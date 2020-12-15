@@ -2,18 +2,18 @@
 /**
  * \file	camera.h
  *
- * Class for representing renderer camera projection and viewport data 
+ * Class for representing renderer camera projection and viewport data
  * \date  2014/11/16
- * \author Michal Folta, CTU Prague		  
+ * \author Michal Folta, CTU Prague
  */
 //---------------------------------------------------------------------------
 
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-#include <glm/glm.hpp>
 
 #include "Config.h"
 #include "Core/InputController.h"
@@ -26,12 +26,12 @@ class ViewPort
 {
 protected:
   glm::vec3 position; ///< camera position
-  glm::vec3 lookAt; ///< camera center - point camera looks at
-  glm::vec3 up; ///< up vector
+  glm::vec3 lookAt;   ///< camera center - point camera looks at
+  glm::vec3 up;       ///< up vector
 
 public:
-
-  ViewPort() = default;;
+  ViewPort() = default;
+  ;
 
   ViewPort(const glm::vec3 position, const glm::vec3 lookAt, const glm::vec3 up)
   {
@@ -47,59 +47,29 @@ public:
     lookAt = position + glm::vec3(trans[2]);
   }
 
-  void setPosition(const glm::vec3 pos)
-  {
-    this->position = pos;
-  }
+  void setPosition(const glm::vec3 pos) { this->position = pos; }
 
-  void setPosition(const float x, const float y, const float z)
-  {
-    this->position = glm::vec3(x, y, z);
-  }
+  void setPosition(const float x, const float y, const float z) { this->position = glm::vec3(x, y, z); }
 
-  glm::vec3 getPosition() const
-  {
-    return position;
-  }
+  glm::vec3 getPosition() const { return position; }
 
-  void setLookAt(const glm::vec3 lat)
-  {
-    this->lookAt = lat;
-  }
+  void setLookAt(const glm::vec3 lat) { this->lookAt = lat; }
 
-  void setLookAt(const float x, const float y, const float z)
-  {
-    this->lookAt = glm::vec3(x, y, z);
-  }
+  void setLookAt(const float x, const float y, const float z) { this->lookAt = glm::vec3(x, y, z); }
 
   /**
    * \brief Get the center (point camera looks at)
    * \return Point camera looks at
    */
-  glm::vec3 getLookAt() const
-  {
-    return lookAt;
-  }
+  glm::vec3 getLookAt() const { return lookAt; }
 
-  void setUp(const glm::vec3 vup)
-  {
-    this->up = vup;
-  }
+  void setUp(const glm::vec3 vup) { this->up = vup; }
 
-  void setUp(const float x, const float y, const float z)
-  {
-    this->up = glm::vec3(x, y, z);
-  }
+  void setUp(const float x, const float y, const float z) { this->up = glm::vec3(x, y, z); }
 
-  glm::vec3 getUp() const
-  {
-    return up;
-  }
+  glm::vec3 getUp() const { return up; }
 
-  glm::vec3 getDirection() const
-  {
-    return glm::normalize(lookAt - position);
-  }
+  glm::vec3 getDirection() const { return glm::normalize(lookAt - position); }
 };
 
 /**
@@ -108,11 +78,10 @@ public:
 class Camera final
 {
 private:
-
   // lerping data
   ViewPort* lerpViewPort;
-  float lerpAlpha; ///< current lerp parameter 
-  float lerpDelta; ///< lerpAlha increment 
+  float lerpAlpha;    ///< current lerp parameter
+  float lerpDelta;    ///< lerpAlha increment
   bool continualLerp; ///< true while camera is lerping
 
   // old camera position
@@ -122,20 +91,19 @@ private:
 
   // current camera position and field of view
   glm::vec3 position; ///< camera position - eye
-  glm::vec3 lookAt; ///< camera center - point camera looks at
-  glm::vec3 up; ///< up vector
-  float fov; ///< camera field of view
+  glm::vec3 lookAt;   ///< camera center - point camera looks at
+  glm::vec3 up;       ///< up vector
+  float fov;          ///< camera field of view
 
-  glm::mat4 view; ///< view matrix V = E^(-1)
+  glm::mat4 view;       ///< view matrix V = E^(-1)
   glm::mat4 projection; ///< projection matrix P
-  glm::mat4 combined; ///< projection * view
+  glm::mat4 combined;   ///< projection * view
 
   glm::mat4 trackballRotationSum;
 
   void lerp();
 
 public:
-
   Camera()
   {
     lerpViewPort = nullptr;
@@ -182,72 +150,45 @@ public:
     lookAt = port->getLookAt();
     up = port->getUp();
 
-    continualLerp = false; //PF
-    fov = 70.0f; //PF
+    continualLerp = false; // PF
+    fov = 70.0f;           // PF
 
     view = glm::lookAt(position, lookAt, up);
   }
 
-  void setContinualLerp(bool enable)
-  {
-    continualLerp = enable;
-  }
+  void setContinualLerp(bool enable) { continualLerp = enable; }
 
-  glm::vec3 getUpVector() const
-  {
-    return up;
-  }
+  glm::vec3 getUpVector() const { return up; }
 
-  glm::vec3 getRealUpVector() const
-  {
-    return glm::cross(getDirection(), getSide());
-  }
+  glm::vec3 getRealUpVector() const { return glm::cross(getDirection(), getSide()); }
 
   /**
-   * \brief Get the camera position. 
+   * \brief Get the camera position.
    * \return point the camera position (eye)
    */
-  glm::vec3 getPosition() const
-  {
-    return position;
-  }
+  glm::vec3 getPosition() const { return position; }
 
   /**
-  * \brief Get the camera lookAt point.
-  * \return point the camera looks at (center)
-  */
-  glm::vec3 getLookAt() const
-  {
-    return lookAt;
-  }
+   * \brief Get the camera lookAt point.
+   * \return point the camera looks at (center)
+   */
+  glm::vec3 getLookAt() const { return lookAt; }
 
   /**
    * \brief Get camera direction
-   * \return Direction of the camera (normalized vector from camera position to the center), i.e., camera z- 
+   * \return Direction of the camera (normalized vector from camera position to the center), i.e., camera z-
    */
-  glm::vec3 getDirection() const
-  {
-    return glm::normalize(lookAt - position);
-  }
+  glm::vec3 getDirection() const { return glm::normalize(lookAt - position); }
 
   /**
    * \brief Get the camera right vector
    * \return Vector of camera x
    */
-  glm::vec3 getSide() const
-  {
-    return glm::normalize(glm::cross(getDirection(), up));
-  }
+  glm::vec3 getSide() const { return glm::normalize(glm::cross(getDirection(), up)); }
 
-  void setPosition(const float x, const float y, const float z)
-  {
-    position = glm::vec3(x, y, z);
-  }
+  void setPosition(const float x, const float y, const float z) { position = glm::vec3(x, y, z); }
 
-  void setPosition(const glm::vec3 vec)
-  {
-    position = vec;
-  }
+  void setPosition(const glm::vec3 vec) { position = vec; }
 
   void setLookAt(const float x, const float y, const float z)
   {
@@ -256,10 +197,7 @@ public:
     lookAt.z = z;
   }
 
-  void setLookAt(glm::vec3 vec)
-  {
-    lookAt = vec;
-  }
+  void setLookAt(glm::vec3 vec) { lookAt = vec; }
 
   void setUp(const float x, const float y, const float z)
   {
@@ -268,37 +206,28 @@ public:
     up.z = z;
   }
 
-  void setUp(const glm::vec3 vec)
-  {
-    up = vec;
-  }
+  void setUp(const glm::vec3 vec) { up = vec; }
 
   /**
    * \brief Set parallel projection of given width and height
-   * \param width   Width 
+   * \param width   Width
    * \param height  Height
    * \param near    Not used, set to 1.0
    * \param far     Not used, set to 100.0
    */
   void setOrtho(const int width, const int height, int near, int far)
   {
-    const float wh = (float) width / 2.0f;
-    const float hh = (float) height / 2.0f;
+    const float wh = (float)width / 2.0f;
+    const float hh = (float)height / 2.0f;
     const float n = 1.0f;
     const float f = 100.0f;
 
     projection = glm::ortho(-wh, wh, -hh, hh, n, f);
   }
 
-  void setFov(const float _fov)
-  {
-    fov = _fov;
-  }
+  void setFov(const float _fov) { fov = _fov; }
 
-  float getFov() const
-  {
-    return fov;
-  }
+  float getFov() const { return fov; }
 
   void setPerspective(const float _fov, const float width, const float height)
   {
@@ -312,24 +241,15 @@ public:
   }
 
   // matrices
-  glm::mat4 getCombined() const
-  {
-    return combined;
-  }
+  glm::mat4 getCombined() const { return combined; }
 
-  glm::mat4 getProjection() const
-  {
-    return projection;
-  }
+  glm::mat4 getProjection() const { return projection; }
 
-  glm::mat4 getView() const
-  {
-    return view;
-  }
+  glm::mat4 getView() const { return view; }
 
-  /// special translation. 
+  /// special translation.
   /// translation perpendicular to the view direction (translation to the left)
-  //void strafe(const float delta)
+  // void strafe(const float delta)
   //{
   //  //std::cout << "strafe" << std::endl;
   //  glm::vec3 dir = lookAt - position; // same as getDirection()
@@ -338,25 +258,24 @@ public:
   //  lookAt = lookAt + d;
   //}
 
-  
   /**
    * \brief  Translate camera in the view direction about delta
    * Translates both - camera position (eye) and camera lookAt (center)
-   * 
-   * \param  delta step in camera view direction 
+   *
+   * \param  delta step in camera view direction
    */
   void pedal(const float delta)
   {
     const glm::vec3 dir = delta * glm::normalize(lookAt - position);
 
-    //const float len = glm::length(lookAt - position);
-    //const glm::vec3 dir = delta * (lookAt - position) / len;
+    // const float len = glm::length(lookAt - position);
+    // const glm::vec3 dir = delta * (lookAt - position) / len;
 
     position = position + dir;
     lookAt = lookAt + dir;
   }
 
-  //void WSAD(const Keys::Code forward, const Keys::Code back, const Keys::Code left, const Keys::Code right,
+  // void WSAD(const Keys::Code forward, const Keys::Code back, const Keys::Code left, const Keys::Code right,
   //          const float delta)
   //{
   //  if (InputController::isKeyPressed(forward))
@@ -397,19 +316,16 @@ public:
     backupUp = up;
   }
 
-  bool isLerping() const
-  {
-    return lerpViewPort != nullptr;
-  }
+  bool isLerping() const { return lerpViewPort != nullptr; }
 
   // rotations
   /*
   void rotateYCenter(float angle) {
     //glm::mat4 R = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-    //position = glm::vec3(R * glm::vec4(position, 1.0f));		
+    //position = glm::vec3(R * glm::vec4(position, 1.0f));
   }
   */
-  
+
   /**
    * \brief Rotate camera direction around camera up vector (turning left - right)
    * \param angle Rotation angle around upVector
@@ -422,7 +338,6 @@ public:
 
     lookAt = position + dir;
   }
-
 
   /**
    * \brief Tilt the camera - rotate around camera X-axis
@@ -440,7 +355,7 @@ public:
 
   /**
    * \brief Roll the camera - rotate around the view direction
-   * \param angle 
+   * \param angle
    */
   void roll(const float angle)
   {
@@ -452,14 +367,15 @@ public:
   // freeLook
   void freeLook()
   {
-    if (InputController::m_mouseX != (float) Config::WIN_WIDTH / 2)
+    if (InputController::m_mouseX != (float)Config::WIN_WIDTH / 2)
     {
-      const float angleDelta = Config::MOUSE_SENSITIVITY * (InputController::m_mouseX - (float) Config::WIN_WIDTH / 2);
+      const float angleDelta = Config::MOUSE_SENSITIVITY * (InputController::m_mouseX - (float)Config::WIN_WIDTH / 2);
       rotateY((float)-angleDelta);
     }
-    if (InputController::m_mouseY != (float) Config::WIN_HEIGHT / 2)
+    if (InputController::m_mouseY != (float)Config::WIN_HEIGHT / 2)
     {
-      const float angleDelta = Config::MOUSE_SENSITIVITY * (InputController::m_mouseY - (float) Config::WIN_HEIGHT / 2);
+      const float angleDelta =
+          Config::MOUSE_SENSITIVITY * (InputController::m_mouseY - (float)Config::WIN_HEIGHT / 2);
       rotateX((float)angleDelta);
     }
   }
@@ -471,7 +387,8 @@ public:
 
     if (d < radius) /* Inside sphere */
       z = sqrt(radius * radius - d * d);
-    else z = 0;
+    else
+      z = 0;
 
     return radius * glm::normalize(glm::vec3(x, y, (float)z));
   }
@@ -499,10 +416,14 @@ public:
   // trackball
   void trackball(glm::vec3 center, float sens)
   {
-    glm::vec2 end = glm::vec2((float)InputController::m_mouseX / (float) Config::WIN_WIDTH,
-                              (float)InputController::m_mouseY / (float) Config::WIN_HEIGHT) * 2.0f - 1.0f;
-    glm::vec2 start = glm::vec2((float)InputController::m_mouseXPrev / (float) Config::WIN_WIDTH,
-                                (float)InputController::m_mouseYPrev / (float) Config::WIN_HEIGHT) * 2.0f - 1.0f;
+    glm::vec2 end = glm::vec2((float)InputController::m_mouseX / (float)Config::WIN_WIDTH,
+                              (float)InputController::m_mouseY / (float)Config::WIN_HEIGHT) *
+                        2.0f -
+                    1.0f;
+    glm::vec2 start = glm::vec2((float)InputController::m_mouseXPrev / (float)Config::WIN_WIDTH,
+                                (float)InputController::m_mouseYPrev / (float)Config::WIN_HEIGHT) *
+                          2.0f -
+                      1.0f;
 
     if (start != end)
     {
@@ -517,10 +438,12 @@ public:
       double t = glm::length(d) / 2.0f; // (2.0 * trackballScreenRadius);
 
       /* Avoid problems with out-of-control values of sinus...s */
-      if (t > 1.0) t = 1.0;
-      else if (t < -1.0) t = -1.0;
+      if (t > 1.0)
+        t = 1.0;
+      else if (t < -1.0)
+        t = -1.0;
 
-      //angle = float(RADTODEG(2.0f * asin(t))); /* how much to rotate about axis (in degrees) */
+      // angle = float(RADTODEG(2.0f * asin(t))); /* how much to rotate about axis (in degrees) */
       auto angle = float(2.0f * asin(t)); /* how much to rotate about axis (in radians) */
 
       glm::mat4 trackBallRotation = glm::rotate(glm::mat4(1.0f), angle * Config::MOUSE_SENSITIVITY * 1000.0f, axis);
@@ -528,9 +451,9 @@ public:
       glm::mat4 viewRotation = glm::inverse(view); // INVERSE!!! - we need E, not E^(-1)
       glm::mat4 viewTranslation = glm::mat4(1.0f);
       viewTranslation[3] = viewRotation[3];
-      viewRotation[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); //without translation
+      viewRotation[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // without translation
       glm::mat4 viewRotationInv = view;
-      viewRotationInv[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); //without translation
+      viewRotationInv[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // without translation
       glm::mat4 TC = glm::mat4(1.0);
       TC[3] = view * glm::vec4(lookAt, 1.0f); // camera center in camera space
       glm::mat4 nv = glm::inverse(TC * trackBallRotation * glm::inverse(TC) * view);
@@ -562,7 +485,7 @@ public:
     {
       center += getSide() * delta;
     }
-    //cout << "CAM_MOTION_SENSITIVITY : " << Config::CAM_MOTION_SENSITIVITY << std::endl;
+    // cout << "CAM_MOTION_SENSITIVITY : " << Config::CAM_MOTION_SENSITIVITY << std::endl;
   }
 
   void moveOrbitCenter(const float dx, const float dy, const float delta, glm::vec3& center)
@@ -597,7 +520,7 @@ public:
       }
     }
 
-    if (InputController::m_mouseX != (float) Config::WIN_WIDTH / 2)
+    if (InputController::m_mouseX != (float)Config::WIN_WIDTH / 2)
     {
       // const float angleDelta = Config::MOUSE_SENSITIVITY * (InputController::mouseX - Config::WIN_WIDTH / 2);
       const float angleDelta = Config::MOUSE_SENSITIVITY * InputController::m_mouseXDelta;
@@ -614,12 +537,12 @@ public:
    */
   void update()
   {
-    if (lerpViewPort != nullptr) lerp();
+    if (lerpViewPort != nullptr)
+      lerp();
 
     view = glm::lookAt(position, lookAt, up);
     combined = projection * view;
   }
 };
-
 
 #endif

@@ -16,7 +16,7 @@ int ShaderProvider::getShaderID(ModelInstance* m)
 
   // base
   if (m->getGeometry()->getAttribsPerVertex() == 8 && m->material->getTextureId() != 0)
-    return 1; //PF was != -1, but texture is GLuint. Matches the 0 in Material with no Texture 
+    return 1; // PF was != -1, but texture is GLuint. Matches the 0 in Material with no Texture
 
   // red
   return 0;
@@ -25,14 +25,14 @@ int ShaderProvider::getShaderID(ModelInstance* m)
 int ShaderProvider::getShaderID(Geometry* g)
 {
   // base
-  if (g->getAttribsPerVertex() == 8) return 1;
+  if (g->getAttribsPerVertex() == 8)
+    return 1;
 
   // red
   return 0;
 }
 
-int ShaderProvider::init(const char* redVert, const char* redFrag,
-                         const char* baseVert, const char* baseFrag,
+int ShaderProvider::init(const char* redVert, const char* redFrag, const char* baseVert, const char* baseFrag,
                          const char* alphaVert, const char* alphaFrag)
 {
   RedShader* redShader = new RedShader(redVert, redFrag);
@@ -40,21 +40,24 @@ int ShaderProvider::init(const char* redVert, const char* redFrag,
   {
     return redShader->getErrorCode();
   }
-  else shaders.push_back(redShader);
+  else
+    shaders.push_back(redShader);
 
   BaseShader* baseShader = new BaseShader(baseVert, baseFrag);
   if (baseShader->getErrorCode())
   {
     return baseShader->getErrorCode();
   }
-  else shaders.push_back(baseShader);
+  else
+    shaders.push_back(baseShader);
 
   AlphaShader* alphaShader = new AlphaShader(alphaVert, alphaFrag);
   if (alphaShader->getErrorCode())
   {
     return alphaShader->getErrorCode();
   }
-  else shaders.push_back(alphaShader);
+  else
+    shaders.push_back(alphaShader);
 
   for (unsigned int i = 0; i < shaders.size(); i++)
     shaders[i]->getLocations();
@@ -75,7 +78,6 @@ void ShaderProvider::setRenderGroups(RenderGroups* rg)
   renderGroups = rg;
 }
 
-
 Shader* ShaderProvider::provideShader(ModelInstance* m)
 {
   return shaders[getShaderID(m)];
@@ -83,19 +85,21 @@ Shader* ShaderProvider::provideShader(ModelInstance* m)
 
 void ShaderProvider::addToGroup(ModelInstance* m)
 {
-  if (renderGroups == nullptr) return;
+  if (renderGroups == nullptr)
+    return;
   renderGroups->groups[getShaderID(m)].push_back(m);
 }
 
 void ShaderProvider::removeFromGroup(ModelInstance* m)
 {
-  if (renderGroups == nullptr) return;
-  //if (!renderGroups) return; //PF  why not this way<
+  if (renderGroups == nullptr)
+    return;
+  // if (!renderGroups) return; //PF  why not this way<
 
   const int gi = getShaderID(m);
 
-  for (std::vector<ModelInstance*>::iterator iter = renderGroups->groups[gi].begin(); iter != renderGroups->groups[gi].end();
-       ++iter)
+  for (std::vector<ModelInstance*>::iterator iter = renderGroups->groups[gi].begin();
+       iter != renderGroups->groups[gi].end(); ++iter)
   {
     if (*iter == m)
     {
@@ -107,7 +111,8 @@ void ShaderProvider::removeFromGroup(ModelInstance* m)
 
 void ShaderProvider::renderAll(Camera* camera, Environment* environment)
 {
-  if (!renderGroups) return;
+  if (!renderGroups)
+    return;
 
   for (unsigned int i = 0; i < shaders.size(); i++)
   {
@@ -121,7 +126,8 @@ void ShaderProvider::renderAll(Camera* camera, Environment* environment)
 
 void ShaderProvider::renderAll(const glm::mat4 proj, const glm::mat4 view, Environment* environment)
 {
-  if (!renderGroups) return;
+  if (!renderGroups)
+    return;
 
   for (unsigned int i = 0; i < shaders.size(); i++)
   {
@@ -133,9 +139,11 @@ void ShaderProvider::renderAll(const glm::mat4 proj, const glm::mat4 view, Envir
   }
 }
 
-void ShaderProvider::renderAll(const glm::mat4 proj, const glm::mat4 view, Environment* environment, ModelInstance* noRender)
+void ShaderProvider::renderAll(const glm::mat4 proj, const glm::mat4 view, Environment* environment,
+                               ModelInstance* noRender)
 {
-  if (!renderGroups) return;
+  if (!renderGroups)
+    return;
 
   for (unsigned int i = 0; i < shaders.size(); i++)
   {

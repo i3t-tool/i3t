@@ -2,8 +2,8 @@
 /**
  * \file	shaper.h
  *
- * Header for representing line drawer (for debugging) 
- * 
+ * Header for representing line drawer (for debugging)
+ *
  * \date  	2014/11/16
  * \author 	Michal Folta, CTU Prague
  */
@@ -35,15 +35,14 @@ class Camera;
 class Shaper final
 {
 private:
-
   static const std::string vertexShaderSrc;
   static const std::string fragmentShaderSrc;
 
   // shader
-  static GLuint id; ///< shader program ID
-  static GLint positionLoc;  ///< location od position
-  static GLint colorLoc;  ///< location od color
-  static GLint PVMLoc;  ///< location od PVM matrix
+  static GLuint id;         ///< shader program ID
+  static GLint positionLoc; ///< location od position
+  static GLint colorLoc;    ///< location od color
+  static GLint PVMLoc;      ///< location od PVM matrix
 
   // buffers
   GLuint vao;
@@ -53,7 +52,7 @@ private:
   glm::vec3 currentColor; ///< variable for storage of current draw color
 
   std::vector<float> vertices; ///< XYZ points prepared for copying to buffers and drawing
-  std::vector<float> colors; ///< RGB colors prepared for copying to buffers and
+  std::vector<float> colors;   ///< RGB colors prepared for copying to buffers and
 
   void addVector(const float x, const float y, const float z)
   {
@@ -70,9 +69,8 @@ private:
   }
 
 public:
-
   /**
-   * \brief Generate OpenGL buffer names 
+   * \brief Generate OpenGL buffer names
    */
   Shaper()
   {
@@ -98,7 +96,7 @@ public:
   }
 
   /**
-   * \brief Set the current drawing color. 
+   * \brief Set the current drawing color.
    * \param color New drawing color "currentColor"
    */
   void setColor(const glm::vec3 color)
@@ -110,7 +108,7 @@ public:
 
   /**
    * \brief Prepare geometry for line from \a a to \a b using the single global color \a currentColor
-   * \param a point from 
+   * \param a point from
    * \param b point to
    */
   void line(const glm::vec3 a, const glm::vec3 b)
@@ -122,11 +120,9 @@ public:
   }
 
   /**
-  * \brief Prepare geometry for line from \a a to \a b using the single color \a color for the whole line (both line ends)
-  * \param a Start point 
-  * \param b End point
-  * \param color Line color
-  */
+   * \brief Prepare geometry for line from \a a to \a b using the single color \a color for the whole line (both line
+   * ends) \param a Start point \param b End point \param color Line color
+   */
   void line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color)
   {
     addVector(a.x, a.y, a.z);
@@ -136,12 +132,9 @@ public:
   }
 
   /**
-  * \brief Prepare geometry for line from \a a to \a b using the single color \a color for the whole line (both line ends)
-  * \param a Start point
-  * \param b End point
-  * \param color_a Start-point color
-  * \param color_b End-point color
-  */
+   * \brief Prepare geometry for line from \a a to \a b using the single color \a color for the whole line (both line
+   * ends) \param a Start point \param b End point \param color_a Start-point color \param color_b End-point color
+   */
   void line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color_a, const glm::vec3 color_b)
   {
     addVector(a.x, a.y, a.z);
@@ -161,24 +154,21 @@ public:
 
   /**
    * \brief Dispose the Shaper - Delete program a Shaders.
-   * 
+   *
    * The colors and vertices, and VAO and VBuffers are deleted by the destructor
    * Called from main, finalizeApplication()
    */
-  static void dispose()
-  {
-    pgr::deleteProgramAndShaders(id);
-  }
+  static void dispose() { pgr::deleteProgramAndShaders(id); }
 
   // initialize OpenGL staff
   /**
-  *  \brief Create the Shaper shader program and get attribute locations.
-  *
-  * \retval 0 OK
-  * \retval 1 shader files error
-  * \retval 2 shader compile error
-  *
-  */
+   *  \brief Create the Shaper shader program and get attribute locations.
+   *
+   * \retval 0 OK
+   * \retval 1 shader files error
+   * \retval 2 shader compile error
+   *
+   */
   static int initShaders();
 
   void rebuildVaos();
@@ -189,23 +179,22 @@ public:
   void deleteBuffers() const;
 
   /**
-  * \brief Draw lines already prepared in the vertex buffer and VAO. 
-  * Does not change the VAO and VBOs contents, neither the stored vertices and colors.
-  * 
-  * (former staticFlush() renamed to drawAndPreserve() - other possible name is e.g. drawPreparedBuffers())
-  * \param cam Camera from which the PVM transformation matrix is taken from using (Camera::getCombined()).
-  */
+   * \brief Draw lines already prepared in the vertex buffer and VAO.
+   * Does not change the VAO and VBOs contents, neither the stored vertices and colors.
+   *
+   * (former staticFlush() renamed to drawAndPreserve() - other possible name is e.g. drawPreparedBuffers())
+   * \param cam Camera from which the PVM transformation matrix is taken from using (Camera::getCombined()).
+   */
   void drawAndPreserve(Camera* cam) const;
 
   /**
-  * \brief Move the prepared geometry (from vertices and colors) to OpenGL vertex buffer objects. And draw them.
-  * The prepared geometry is then cleared (vertices and colors).
-  * \todo Who generates the buffer names? Delete also the VBOs and VAO - try call to deleteBuffers()? Now deleted in the destructor  ~Shaper() 
-  * (former  flush() renamed to drawOnceAndDestroy() - other possible name drawPreparedGeometryAndDeleteIt())
-  * \param cam Camera from which the PVM transformation matrix is taken.
-  */
+   * \brief Move the prepared geometry (from vertices and colors) to OpenGL vertex buffer objects. And draw them.
+   * The prepared geometry is then cleared (vertices and colors).
+   * \todo Who generates the buffer names? Delete also the VBOs and VAO - try call to deleteBuffers()? Now deleted in
+   * the destructor  ~Shaper() (former  flush() renamed to drawOnceAndDestroy() - other possible name
+   * drawPreparedGeometryAndDeleteIt()) \param cam Camera from which the PVM transformation matrix is taken.
+   */
   void drawOnceAndDestroy(Camera* cam);
-
 };
 
 #endif

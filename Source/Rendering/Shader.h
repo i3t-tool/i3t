@@ -2,7 +2,7 @@
 /**
  * \file	shader.h
  *
- * Header for representing shader data 
+ * Header for representing shader data
  * \date  2014/11/16
  * \author Michal Folta, CTU Prague
  */
@@ -27,28 +27,26 @@
 class Shader
 {
 protected:
-
   int errorCode; ///< 0-no error, 1-shader files error, 2-shader compile error
 
-  GLuint id; ///< openGL program name (ID) 
+  GLuint id; ///< openGL program name (ID)
 
   // atributes
   GLint positionLoc; ///< Locaition of a_position attribute
-  GLint normalLoc; ///< Location of  a_normal attribute 
+  GLint normalLoc;   ///< Location of  a_normal attribute
 
-  // transformations 
+  // transformations
   GLint PVMLoc; ///< Location of the PVM matrix uniform u_PVM - does not store the u_normalTrans location
 
 public:
-
   Shader(const char* vertexShader, const char* fragmentShader)
   {
     std::cout << "shader init" << std::endl;
 
     GLuint shaders[] = {
-      pgr::createShaderFromFile(GL_VERTEX_SHADER, vertexShader),
-      pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fragmentShader),
-      0,
+        pgr::createShaderFromFile(GL_VERTEX_SHADER, vertexShader),
+        pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fragmentShader),
+        0,
     };
 
     if (shaders[0] == 0 || shaders[1] == 0)
@@ -66,7 +64,7 @@ public:
       errorCode = 2;
       return;
     }
-    //else {
+    // else {
     //	std::cout << "compiled... id = " << id << std::endl;
     //}
 
@@ -77,12 +75,9 @@ public:
    * \brief Return status of shader compilation and program linking
    * \retval  0 no error
    * \retval  1 shader files error
-   * \retval  2 shader compile error 
+   * \retval  2 shader compile error
    */
-  int getErrorCode() const
-  {
-    return errorCode;
-  }
+  int getErrorCode() const { return errorCode; }
 
   /**
    * \brief Get locations of all shader variables (implemented for each shader)
@@ -93,42 +88,25 @@ public:
     positionLoc = glGetAttribLocation(id, "a_position");
     normalLoc = glGetAttribLocation(id, "a_normal");
 
-
     // uniforms
     PVMLoc = glGetUniformLocation(id, "u_PVM");
   }
 
-  ~Shader()
-  {
-    pgr::deleteProgramAndShaders(id);
-  }
-
+  ~Shader() { pgr::deleteProgramAndShaders(id); }
 
   /**
    * \brief Get compiled shader program ID
    * \return OpenGL shader program name
    */
-  GLuint getId() const
-  {
-    return id;
-  }
+  GLuint getId() const { return id; }
 
   // matrices
-  GLint getPVMLoc() const
-  {
-    return PVMLoc;
-  }
+  GLint getPVMLoc() const { return PVMLoc; }
 
   // attributes
-  GLint getPositionLoc() const
-  {
-    return positionLoc;
-  }
+  GLint getPositionLoc() const { return positionLoc; }
 
-  GLint getNormalLoc() const
-  {
-    return normalLoc;
-  }
+  GLint getNormalLoc() const { return normalLoc; }
 
   /*
   void begin(GLuint texId) {
@@ -147,17 +125,17 @@ public:
    */
   virtual void begin()
   {
-    //PFXX 
-    glEnable(GL_CULL_FACE);     // side effect - see inside 
-    //glDisable(GL_CULL_FACE);
+    // PFXX
+    glEnable(GL_CULL_FACE); // side effect - see inside
+    // glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
 
     glDisable(GL_BLEND);
 
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable( GL_BLEND );
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable( GL_BLEND );
 
     glUseProgram(id);
 
@@ -168,16 +146,13 @@ public:
   /**
    * \brief useProgram(0)
    */
-  virtual void end()
-  {
-    glUseProgram(0);
-  }
+  virtual void end() { glUseProgram(0); }
 
   /**
-   * \brief Draw the object using the appropriate shader. Calls draw() with four parameters - using projection and view matrices extracted from camera instead of camera object itself
-   * \param modelInstance Model to draw
-   * \param camera		Camera object (stores projection and view matrices)
-   * \param environment   Directional light source and ambient color
+   * \brief Draw the object using the appropriate shader. Calls draw() with four parameters - using projection and
+   * view matrices extracted from camera instead of camera object itself \param modelInstance Model to draw \param
+   * camera		Camera object (stores projection and view matrices) \param environment   Directional light source and
+   * ambient color
    */
   virtual void draw(ModelInstance* modelInstance, Camera* camera, Environment* environment) = 0;
 
@@ -192,14 +167,15 @@ public:
 
   /**
    * \brief Binds all VBOs into the VAO, sets VertexAttribPointers and enables all atribute arrays
-   * \param geometry 
+   * \param geometry
    */
   virtual void connectVertexAttributes(Geometry* geometry) = 0;
 
   /**
-   * \brief Get and print the shader compile log - not used... and probably duplicates the code in pgr lib \todo remove or call the routine from pgr.lib
+   * \brief Get and print the shader compile log - not used... and probably duplicates the code in pgr lib \todo
+   * remove or call the routine from pgr.lib
    */
-  //void shaderLog() const
+  // void shaderLog() const
   //{
   //	GLint result;
   //	glGetShaderiv(id, GL_COMPILE_STATUS, &result);

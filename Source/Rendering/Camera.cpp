@@ -19,7 +19,8 @@ void Camera::lerp()
     position = lerpViewPort->getPosition();
     lookAt = lerpViewPort->getLookAt();
     up = lerpViewPort->getUp();
-    if (!continualLerp) lerpViewPort = NULL;
+    if (!continualLerp)
+      lerpViewPort = NULL;
   }
   else
   {

@@ -9,8 +9,8 @@ Naší ambicí je, aby fungoval na všech uvedených platformách.
 |------------|-------------|-------------|----------------------|------------|-------|
 | Windows    | Win32, x64  | Debug       | Visual Studio        | cl.exe     | ✅    |
 | Windows    | Win32, x64  | Debug       | NMake Makefiles      | cl.exe     | ✅    |
-| Linux      | x86/x64     | -           | Default              | g++/clang  | ⛔    |
-| Unix       | x86/x64     | -           | Default              | clang      | ⛔    |
+| Linux      | x86/x64     | -           | Default              | g++/clang  | ❓    |
+| Unix       | x86/x64     | -           | Default              | clang      | ❓    |
 
 Pro sestavení postupujte prosím dle [návodu](Docs/Build.md).
 

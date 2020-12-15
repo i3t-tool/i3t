@@ -5,7 +5,6 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/World.h"
 
-
 void SetupDialog::render()
 {
   static int cameraMode;
@@ -20,15 +19,19 @@ void SetupDialog::render()
   ImGui::Begin("Setup");
   {
     ImGui::Text("Camera control:");
-    ImGui::RadioButton("orbit", &cameraMode, 0); ImGui::SameLine();
-    ImGui::RadioButton("trackball", &cameraMode, 1); ImGui::SameLine();
+    ImGui::RadioButton("orbit", &cameraMode, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("trackball", &cameraMode, 1);
+    ImGui::SameLine();
     ImGui::NewLine();
 
     ImGui::Separator();
 
     ImGui::Text("Angle units:");
-    ImGui::RadioButton("radians", &angleUnits, 0); ImGui::SameLine();
-    ImGui::RadioButton("degrees", &angleUnits, 1); ImGui::SameLine();
+    ImGui::RadioButton("radians", &angleUnits, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("degrees", &angleUnits, 1);
+    ImGui::SameLine();
     ImGui::NewLine();
 
     ImGui::Separator();

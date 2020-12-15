@@ -13,7 +13,6 @@
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 // #include "RecentFiles.h"
 
-
 MainMenuBar::MainMenuBar()
 {
   m_showDemoWindow = false;
@@ -35,7 +34,6 @@ void MainMenuBar::render()
     ImGui::PopFont();
   }
   ImGui::End();
-
 
   if (m_showDemoWindow)
     ImGui::ShowDemoWindow(&m_showDemoWindow);
@@ -77,7 +75,6 @@ void MainMenuBar::showFileMenu()
     if (ImGui::MenuItem("Append"))
     {
       /// \todo File -> Append?
-
     }
     ImGui::Separator();
 
@@ -230,7 +227,7 @@ void MainMenuBar::showHelpMenu()
 
     ImGui::Separator();
 
-    if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow)) {  }
+    if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow)) {}
 
     ImGui::EndMenu();
   }

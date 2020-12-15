@@ -13,14 +13,14 @@ class MainMenuBar
 {
 public:
   MainMenuBar();
-  ~MainMenuBar() {};
+  ~MainMenuBar(){};
   void render();
 
 private:
   bool m_showDemoWindow;
 
-  //AboutDialog m_aboutDialog;
-  //DescriptionDialog m_descriptionDialog;
+  // AboutDialog m_aboutDialog;
+  // DescriptionDialog m_descriptionDialog;
   // SetupDialog m_setupDialog;
 
   void showFileMenu();

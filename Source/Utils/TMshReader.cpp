@@ -1,10 +1,9 @@
 #include "TMshReader.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "Rendering/Geometry.h"
-
 
 Geometry* TMshReader::geometryFromTMsh(std::string filename)
 {
@@ -13,10 +12,10 @@ Geometry* TMshReader::geometryFromTMsh(std::string filename)
 
 Geometry* TMshReader::geometryFromTMsh(std::string filename, float scale)
 {
-  //string path = "data/models/";
+  // string path = "data/models/";
   std::string path = "";
   path.append(filename);
-  //path.append(".tmsh");
+  // path.append(".tmsh");
 
   std::ifstream is(path);
 
@@ -30,7 +29,8 @@ Geometry* TMshReader::geometryFromTMsh(std::string filename, float scale)
 
   // name
   std::string str;
-  while (str != "object") is >> str;
+  while (str != "object")
+    is >> str;
   std::string name;
   is >> name;
 
@@ -38,7 +38,7 @@ Geometry* TMshReader::geometryFromTMsh(std::string filename, float scale)
   is >> str;
   if (str == "matrix")
   {
-    // read matrix code, its skiped 
+    // read matrix code, its skiped
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     is >> str;
   }
@@ -98,7 +98,8 @@ Geometry* TMshReader::geometryFromTMsh(std::string filename, float scale)
 
   // vertices
   int vertexSize = positionSize + normalSize + uvCount * 2 + colorCount * colorSize;
-  if (weights) vertexSize += 8;
+  if (weights)
+    vertexSize += 8;
 
   /*
   cout << "position size : " << positionSize << std::endl;

@@ -4,8 +4,9 @@
 
 #include <imgui.h>
 
-/// \todo If you want to use ImGui Markdown run $ git submodule add https://github.com/juliettef/imgui_markdown.git Depencencies/imgui_markdown.
-/// After that modify CMakeLists.txt, append include_directories(Dependencies/imgui_markdown) to block of includes.
+/// \todo If you want to use ImGui Markdown run $ git submodule add https://github.com/juliettef/imgui_markdown.git
+/// Depencencies/imgui_markdown. After that modify CMakeLists.txt, append
+/// include_directories(Dependencies/imgui_markdown) to block of includes.
 // #include <ImGui_markdown.h>
 
 #include "Config.h"
@@ -78,7 +79,6 @@ void TutorialWindow::renderTutorialContent()
     ImGui::TextWrapped(
         "Try to change the parameters of the given transformations and explain the behaviour of each of them");
     ImGui::PopFont();
-
   }
 }
 
@@ -90,12 +90,14 @@ void TutorialWindow::renderTutorialControls()
   // ImGui::PopStyleColor();
 
   ImGui::NewLine();
-  if (ImGui::Button("Back", ImVec2(100, 0))) {
+  if (ImGui::Button("Back", ImVec2(100, 0)))
+  {
     if (m_current_step != 0)
       m_current_step--;
   }
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 100);
-  if (ImGui::Button("Next", ImVec2(100, 0))) {
+  if (ImGui::Button("Next", ImVec2(100, 0)))
+  {
     if (m_current_step != m_tutorial->getNumSteps() - 1)
       m_current_step++;
   }

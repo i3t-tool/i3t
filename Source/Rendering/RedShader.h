@@ -16,15 +16,13 @@
 
 //#include "geometry.h"
 
-
 /**
- * \brief Shader program, where VS transforms both, the vertex position and the normal and 
+ * \brief Shader program, where VS transforms both, the vertex position and the normal and
  *        FS modulates ambient + diffuse lighting by a diffuseColor uniform.
  */
 class RedShader : public Shader
 {
 protected:
-
   GLint normalTransLoc;
   GLint lightDirectionLoc;
   GLint lightColorLoc;
@@ -32,10 +30,7 @@ protected:
   GLint ambientColorLoc;
 
 public:
-
-  RedShader(const char* vertexShader, const char* fragmentShader) : Shader(vertexShader, fragmentShader)
-  {
-  }
+  RedShader(const char* vertexShader, const char* fragmentShader) : Shader(vertexShader, fragmentShader) {}
 
   void getLocations() override
   {
@@ -48,32 +43,20 @@ public:
     ambientColorLoc = glGetUniformLocation(id, "u_ambientColor");
   }
 
-  GLint getLightDirectionLoc() const
-  {
-    return lightDirectionLoc;
-  }
+  GLint getLightDirectionLoc() const { return lightDirectionLoc; }
 
-  GLint getLightColorLoc() const
-  {
-    return lightColorLoc;
-  }
+  GLint getLightColorLoc() const { return lightColorLoc; }
 
-  GLint getDiffuseColorLoc() const
-  {
-    return diffuseColorLoc;
-  }
+  GLint getDiffuseColorLoc() const { return diffuseColorLoc; }
 
-  GLint getAmbientColorLoc() const
-  {
-    return ambientColorLoc;
-  }
+  GLint getAmbientColorLoc() const { return ambientColorLoc; }
 
   void draw(ModelInstance* modelInstance, Camera* camera, Environment* environment) override
   {
     draw(modelInstance, camera->getProjection(), camera->getView(), environment);
   }
 
-  //PF2018-03-05
+  // PF2018-03-05
   void printMatrix(std::string s, glm::mat4 m)
   {
     std::cout << s << std::endl;
@@ -100,15 +83,16 @@ public:
     // PVM
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection * view * modelInstance->getTrans()));
 
-    //PF2018-03-05
-    //printMatrix("Projection:", projection);
-    //printMatrix("View", view);
-    //printMatrix("Model", modelInstance->getTrans());
-    //printMatrix("PVM", projection * view * modelInstance->getTrans());
+    // PF2018-03-05
+    // printMatrix("Projection:", projection);
+    // printMatrix("View", view);
+    // printMatrix("Model", modelInstance->getTrans());
+    // printMatrix("PVM", projection * view * modelInstance->getTrans());
     // normal trans
     glUniformMatrix3fv(normalTransLoc, 1, GL_FALSE,
                        glm::value_ptr(glm::transpose(glm::inverse(glm::mat3(modelInstance->getTrans())))));
-    //glm::vec3 lightDirection = glm::vec3(glm::inverse(modelInstance->getTrans()) * glm::vec4(environment->lightDirection, 0.0f));
+    // glm::vec3 lightDirection = glm::vec3(glm::inverse(modelInstance->getTrans()) *
+    // glm::vec4(environment->lightDirection, 0.0f));
 
     glUniform3fv(lightDirectionLoc, 1, glm::value_ptr(environment->lightDirection));
     glUniform3fv(lightColorLoc, 1, glm::value_ptr(environment->lightColor));
@@ -126,9 +110,8 @@ public:
     glBindVertexArray(0);
   }
 
-
   /**
-   * \brief Connect vertex data to locations (glVertexAttribPointer and enable them. 
+   * \brief Connect vertex data to locations (glVertexAttribPointer and enable them.
    *        Called by ShaderProvider::connectGeometry
    * \param geometry Model (vertices an indices) + OpenGL names of buffers
    */
@@ -143,19 +126,20 @@ public:
     // position
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
-                          (void *)0);
+                          (void*)0);
 
     // normal
     if (normalLoc > 0)
     {
       glEnableVertexAttribArray(normalLoc);
       glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
-                            (void *)(3 * sizeof(float)));
+                            (void*)(3 * sizeof(float)));
     }
     /*
     // uv
     glEnableVertexAttribArray(texCoord0Loc);
-    glVertexAttribPointer(texCoord0Loc, 2, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float), (void *) (6 * sizeof(float)));
+    glVertexAttribPointer(texCoord0Loc, 2, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float), (void
+    *) (6 * sizeof(float)));
     */
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->getIndicesBuffer());

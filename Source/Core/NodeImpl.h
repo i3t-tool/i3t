@@ -57,7 +57,8 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[T])
     m_internalData.emplace_back();
   }
 
-  /// \todo Do not call virtual member function from constructor https://isocpp.org/wiki/faq/strange-inheritance#calling-virtuals-from-ctors
+  /// \todo Do not call virtual member function from constructor
+  /// https://isocpp.org/wiki/faq/strange-inheritance#calling-virtuals-from-ctors
   updateValues(0);
 }
 

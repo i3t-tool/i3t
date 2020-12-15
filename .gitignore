@@ -4,3 +4,10 @@
 /Binaries/
 cmake-*
 out/
+*.dll
+*.lib
+*.exe
+*.obj
+!/data/models/bunny.obj
+!/data/models/monkey.obj
+!/data/models/teapot.obj

@@ -3,7 +3,7 @@
  * \file	scene.h
  *
  * Declares the scene class
- * 
+ *
  * \date  	2014/11/16
  * \author 	Michal Folta, CTU Prague
  */
@@ -15,8 +15,8 @@
 class Transformation;
 class ModelInstance;
 
-//class Object;
-//class CameraObject;
+// class Object;
+// class CameraObject;
 
 #include "Rendering/CameraObject.h"
 #include "Rendering/Object.h"
@@ -36,7 +36,6 @@ class ViewPort;
 class Scene
 {
 public:
-
   World* world;
 
   Environment* environment;
@@ -77,7 +76,7 @@ public:
 
   void render(Camera* _camera);
   void render(glm::mat4 proj, glm::mat4 view, CameraObject* noCamera) const;
-  //void renderAlpha(Camera * _camera);
+  // void renderAlpha(Camera * _camera);
 
   /**
    * \brief \notused drawCamera() in never used

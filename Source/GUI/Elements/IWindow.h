@@ -11,10 +11,7 @@
 class IWindow
 {
 public:
-  IWindow(bool show = false)
-  {
-    m_show = show;
-  };
+  IWindow(bool show = false) { m_show = show; };
 
   virtual ~IWindow() = default;
   virtual void render() = 0;

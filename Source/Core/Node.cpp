@@ -4,7 +4,8 @@
 
 using namespace Core;
 
-NodeBase::~NodeBase() {
+NodeBase::~NodeBase()
+{
   unplugAll();
 }
 
@@ -98,7 +99,8 @@ ENodePlugResult NodeBase::isOperatorPlugCorrect(Pin* sender, Pin* plugged)
     NodeBase* act = stack.back();
     stack.pop_back();
 
-    if (act == toFind) return ENodePlugResult::Err_Loop;
+    if (act == toFind)
+      return ENodePlugResult::Err_Loop;
 
     for (auto& pin : act->m_inputs)
     {
@@ -110,10 +112,10 @@ ENodePlugResult NodeBase::isOperatorPlugCorrect(Pin* sender, Pin* plugged)
     }
   }
 
-/*
-  if (isOperatorPlugCorrectMod != NULL)
-    return isOperatorPlugCorrectMod(inp, out);
-*/
+  /*
+    if (isOperatorPlugCorrectMod != NULL)
+      return isOperatorPlugCorrectMod(inp, out);
+  */
 
   return ENodePlugResult::Ok;
 }
@@ -128,8 +130,7 @@ ENodePlugResult NodeBase::plugToParent(UPtr<NodeBase>& toPlug, unsigned fromInde
     return result;
 
   // Insert to toPlug output pin outputs this operator input pin.
-  toPlug->m_outputs[fromIndex].m_outputs.push_back(
-      &(m_inputs[myIndex]));
+  toPlug->m_outputs[fromIndex].m_outputs.push_back(&(m_inputs[myIndex]));
 
   // Attach given operator output pin to this operator input pin.
   m_inputs[myIndex].m_input = &toPlug->m_outputs[fromIndex];

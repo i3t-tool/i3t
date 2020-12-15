@@ -12,7 +12,7 @@ class BeforeCloseModal : public IWindow
 public:
   static constexpr const char id[] = "BeforeCloseModal";
 
-  BeforeCloseModal() {};
+  BeforeCloseModal(){};
 
   /**
    * Show Close? modal centered in main window.

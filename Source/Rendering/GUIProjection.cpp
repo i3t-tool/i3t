@@ -20,16 +20,13 @@ void GUIProjection::setProjection(const glm::vec2 _pos, const glm::vec2 _size, c
   PV[2][0] = -1.0f;
   PV[2][1] = 1.0f;
 
-  PV = PV * glm::inverse(glm::mat3(_scale, 0.0f, 0.0f,
-                                   0.0f, _scale, 0.0f,
-                                   _pos.x, _pos.y, 1.0f));
+  PV = PV * glm::inverse(glm::mat3(_scale, 0.0f, 0.0f, 0.0f, _scale, 0.0f, _pos.x, _pos.y, 1.0f));
 
+  // PV[2][0] = _pos.x;
+  // PV[2][1] = _pos.y;
 
-  //PV[2][0] = _pos.x;
-  //PV[2][1] = _pos.y;
-
-  //PV[3][0] = pos.x;
-  //PV[3][1] = pos.y;
+  // PV[3][0] = pos.x;
+  // PV[3][1] = pos.y;
 }
 
 // statics

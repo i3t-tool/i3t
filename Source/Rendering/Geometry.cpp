@@ -12,7 +12,7 @@
 
 /**
     Constructor.
-	Accepts given vertices and indices and stores them in VBOs.
+  Accepts given vertices and indices and stores them in VBOs.
 
     \param [in]		vertices			If non-null, the vertices.
     \param [in]		indices				If non-null, the indices.
@@ -24,7 +24,7 @@
 Geometry::Geometry(float* vertices, unsigned int* indices, GLuint verticesCount, GLuint indicesCount,
                    GLuint attribsPerVertex)
 {
-  //actShaderId = -1;
+  // actShaderId = -1;
   actShaderId = 0; // This glCreateShader returns 0 if an error occurs creating the shader object.
 
   this->vertices = vertices;
@@ -62,25 +62,27 @@ void Geometry::calculateAABB()
 
   for (unsigned int i = 1; i < verticesCount; i++)
   {
-    const int index = i * attribsPerVertex; // Trinagle first vertex index 
+    const int index = i * attribsPerVertex; // Trinagle first vertex index
 
-    if (vertices[index] < low.x) low.x = vertices[index];
-    else
-      if (vertices[index] > high.x) high.x = vertices[index];
+    if (vertices[index] < low.x)
+      low.x = vertices[index];
+    else if (vertices[index] > high.x)
+      high.x = vertices[index];
 
-    if (vertices[index + 1] < low.y) low.y = vertices[index + 1];
-    else
-      if (vertices[index + 1] > high.y) high.y = vertices[index + 1];
+    if (vertices[index + 1] < low.y)
+      low.y = vertices[index + 1];
+    else if (vertices[index + 1] > high.y)
+      high.y = vertices[index + 1];
 
-    if (vertices[index + 2] < low.z) low.z = vertices[index + 2];
-    else
-      if (vertices[index + 2] > high.z) high.z = vertices[index + 2];
+    if (vertices[index + 2] < low.z)
+      low.z = vertices[index + 2];
+    else if (vertices[index + 2] > high.z)
+      high.z = vertices[index + 2];
   }
 
   AABBMin = low;
   AABBMax = high;
 }
-
 
 /** Bind VBO for vertices and indices and copy data there. Generate a VAO name \a vao - nothing more.*/
 void Geometry::bindVBOs()
@@ -99,7 +101,6 @@ void Geometry::bindVBOs()
 
   glGenVertexArrays(1, &vao);
 }
-
 
 void Geometry::print()
 {
@@ -135,7 +136,6 @@ void Geometry::print()
   */
 }
 
-
 int GeometryMap::addGeometry(const std::string& name, const std::string& filename)
 {
   if (geometries.find(name) != geometries.end())
@@ -147,19 +147,22 @@ int GeometryMap::addGeometry(const std::string& name, const std::string& filenam
   if (filename.substr(filename.find_last_of(".") + 1) == "tmsh")
   {
     Geometry* g = TMshReader::geometryFromTMsh(filename);
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     geometries[name] = g;
   }
   else if (filename.substr(filename.find_last_of(".") + 1) == "obj")
   {
     Geometry* g = ObjReader::geometryFromOBJ(filename.c_str());
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     geometries[name] = g;
   }
   return 0;
-  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry was not loaded and the flag is set to false or not changed at all
+  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry
+  // was not loaded and the flag is set to false or not changed at all
 }
 
 int GeometryMap::addGeometry(const std::string& name, const std::string& filename, const float scale)
@@ -173,20 +176,23 @@ int GeometryMap::addGeometry(const std::string& name, const std::string& filenam
   if (filename.substr(filename.find_last_of(".") + 1) == "tmsh")
   {
     Geometry* g = TMshReader::geometryFromTMsh(filename, scale);
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     geometries[name] = g;
   }
   else if (filename.substr(filename.find_last_of(".") + 1) == "obj")
   {
     Geometry* g = ObjReader::geometryFromOBJ(filename.c_str(), scale);
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     geometries[name] = g;
   }
 
   return 0;
-  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry was not loaded and the flag is set to false or not changed at all
+  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry
+  // was not loaded and the flag is set to false or not changed at all
 }
 
 int GeometryMap::addHCGeometry(std::string name, std::string filename)
@@ -200,21 +206,23 @@ int GeometryMap::addHCGeometry(std::string name, std::string filename)
   if (filename.substr(filename.find_last_of(".") + 1) == "tmsh")
   {
     Geometry* g = TMshReader::geometryFromTMsh(filename);
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     hcGeometries[name] = g;
   }
   else if (filename.substr(filename.find_last_of(".") + 1) == "obj")
   {
     Geometry* g = ObjReader::geometryFromOBJ(filename.c_str());
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     hcGeometries[name] = g;
   }
   return 0;
-  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry was not loaded and the flag is set to false or not changed at all
+  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry
+  // was not loaded and the flag is set to false or not changed at all
 }
-
 
 int GeometryMap::addHCGeometry(std::string name, std::string filename, float scale)
 {
@@ -227,19 +235,22 @@ int GeometryMap::addHCGeometry(std::string name, std::string filename, float sca
   if (filename.substr(filename.find_last_of(".") + 1) == "tmsh")
   {
     Geometry* g = TMshReader::geometryFromTMsh(filename, scale);
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     hcGeometries[name] = g;
   }
   else if (filename.substr(filename.find_last_of(".") + 1) == "obj")
   {
     Geometry* g = ObjReader::geometryFromOBJ(filename.c_str(), scale);
-    if (!g) return 1;
+    if (!g)
+      return 1;
     g->flag = true;
     hcGeometries[name] = g;
   }
   return 0;
-  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry was not loaded and the flag is set to false or not changed at all
+  // geometry was loaded correctly and flag is set to true, OR the geometry file format was different and the geometry
+  // was not loaded and the flag is set to false or not changed at all
 }
 
 void GeometryMap::connectAllToShader()
@@ -254,13 +265,13 @@ void GeometryMap::connectAllHCToShader()
 {
   for (std::map<std::string, Geometry*>::const_iterator it = hcGeometries.begin(); it != hcGeometries.end(); ++it)
   {
-    //cout << "Geometry name = " << it->first << std::endl;
+    // cout << "Geometry name = " << it->first << std::endl;
     const std::string geomName = it->first;
     if (geomName == "frustrum")
       ShaderProvider::connectGeometry(it->second, 2); ///< \todo hack + add enum for shaders
     else
       ShaderProvider::connectGeometry(it->second);
-    //cout << "actShaderID = " << it->second->actShaderId << std::endl;
+    // cout << "actShaderID = " << it->second->actShaderId << std::endl;
   }
 }
 

@@ -2,7 +2,6 @@
 
 #include "Core/InputController.h"
 
-
 struct Settings final
 {
   static bool CameraOrbit;

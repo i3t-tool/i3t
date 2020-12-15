@@ -22,14 +22,13 @@
  * \tparam Type command derived class (CloseCommand for example)-
  * \tparam Args command argument for callback call.
  */
-template <typename Type, typename... Args>
-class Command : public ICommand
+template <typename Type, typename... Args> class Command : public ICommand
 {
 public:
   typedef std::function<void(Args&...)> Callback;
 
-  Command() {};
-  virtual ~Command() {};
+  Command(){};
+  virtual ~Command(){};
 
   /**
    * Add a listener for a command.
@@ -41,10 +40,7 @@ public:
    *
    * \todo Check how std::bind handle `this` reference.
    */
-  static void addListener(Callback function)
-  {
-    s_listeners.push_back(function);
-  };
+  static void addListener(Callback function) { s_listeners.push_back(function); };
 
   /**
    * Call all callbacks.
@@ -55,9 +51,7 @@ public:
   {
     for (Callback callback : s_listeners)
     {
-      std::apply([callback](auto... args) {
-        callback(args...);
-      }, m_args);
+      std::apply([callback](auto... args) { callback(args...); }, m_args);
     }
   };
 
@@ -79,10 +73,7 @@ protected:
    *
    * \param args command arguments.
    */
-  explicit Command(const std::tuple<Args...>& args)
-  {
-    m_args = args;
-  }
+  explicit Command(const std::tuple<Args...>& args) { m_args = args; }
 
 private:
   static std::vector<Callback> s_listeners;
@@ -91,4 +82,4 @@ private:
 };
 
 template <typename Type, typename... Args>
-std::vector<std::function<void(Args& ...)>> Command<Type, Args...>::s_listeners;
+std::vector<std::function<void(Args&...)>> Command<Type, Args...>::s_listeners;

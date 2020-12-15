@@ -1,9 +1,9 @@
 /**
  * \file	shaperElements.h
  *
- * Drawer of some special shapes with shaper 
+ * Drawer of some special shapes with shaper
  * \date  2014/11/16
- * \author Michal Folta, CTU Prague		  
+ * \author Michal Folta, CTU Prague
  */
 #pragma once
 
@@ -19,22 +19,14 @@
 class ShaperElements
 {
 private:
-
   static glm::vec3 unitCube[24];
 
-  static Shaper* shaper;   ///< active Shaper - all commands are applied to this Shaper vertices and OpenGL buffers
+  static Shaper* shaper; ///< active Shaper - all commands are applied to this Shaper vertices and OpenGL buffers
 
 public:
+  static void setShaper(Shaper* sh) { shaper = sh; }
 
-  static void setShaper(Shaper* sh)
-  {
-    shaper = sh;
-  }
-
-  static Shaper* getShaper()
-  {
-    return shaper;
-  }
+  static Shaper* getShaper() { return shaper; }
 
   /**
    * \brief Prepare Coordinate axes (vertices and colors to vertices and colors float vectors)
@@ -85,11 +77,10 @@ public:
   }
 
   /**
-   * \brief Draw a coordinate frame based on column values of the given matrix 
-   * 
-   * \rename Rename to something like coordinateFrameOfTheMatrix, because it does not call OpenGL draw, but adds other object to the current Shaper vertices
-   * \param ori Given matrix
-   * \param size Cross size - length of cross arms.
+   * \brief Draw a coordinate frame based on column values of the given matrix
+   *
+   * \rename Rename to something like coordinateFrameOfTheMatrix, because it does not call OpenGL draw, but adds other
+   * object to the current Shaper vertices \param ori Given matrix \param size Cross size - length of cross arms.
    */
   static void drawOrientation(glm::mat4 ori, const float size)
   {
@@ -103,7 +94,7 @@ public:
   /**
    * \brief Create box wire-frame of the given color.
    * \param ppp First corner
-   * \param nnn Second corner 
+   * \param nnn Second corner
    * \param color Color of the lines
    */
   static void alignBox(glm::vec3 ppp, glm::vec3 nnn, glm::vec3 color);
@@ -120,14 +111,13 @@ public:
   }
 
   /**
-   * \brief Draw the frustrum as wireframe 
+   * \brief Draw the frustrum as wireframe
    * \param p Projection matrix
    * \param v View matrix - most probably E^(-1)
    */
   static void drawFrustum(const glm::mat4 p, const glm::mat4 v)
   {
-    //if (a.w < 0) cout << "je zaporny " << a.w << std::endl;
-
+    // if (a.w < 0) cout << "je zaporny " << a.w << std::endl;
 
     const glm::mat4 tr = glm::inverse(p * glm::inverse(v));
 

@@ -7,7 +7,6 @@
 
 #include "Rendering/Geometry.h"
 
-
 Geometry* ObjReader::geometryFromOBJ(const char* filename)
 {
   return geometryFromOBJ(filename, 1.0f);
@@ -20,15 +19,15 @@ Geometry* ObjReader::geometryFromOBJ(const char* filename, float scale)
   Assimp::Importer importer;
 
   // Unitize object in size (scale the model to fit into (-1..1)^3)
-  //importer.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE, 1);
+  // importer.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE, 1);
 
   // Load asset from the file - you can play with various processing steps
-  const aiScene* scn = importer.ReadFile(filename, 0
-                                         | aiProcess_Triangulate // Triangulate polygons (if any).
-                                         | aiProcess_PreTransformVertices
-                                         // Transforms scene hierarchy into one root with geometry-leafs only. For more see Doc.
-                                         | aiProcess_GenSmoothNormals // Calculate normals per vertex.
-                                         | aiProcess_JoinIdenticalVertices);
+  const aiScene* scn = importer.ReadFile(
+      filename, 0 | aiProcess_Triangulate // Triangulate polygons (if any).
+                    | aiProcess_PreTransformVertices
+                    // Transforms scene hierarchy into one root with geometry-leafs only. For more see Doc.
+                    | aiProcess_GenSmoothNormals // Calculate normals per vertex.
+                    | aiProcess_JoinIdenticalVertices);
 
   // abort if the loader fails
   if (scn == NULL)
@@ -37,7 +36,8 @@ Geometry* ObjReader::geometryFromOBJ(const char* filename, float scale)
     return NULL;
   }
 
-  // some formats store whole scene (multiple meshes and materials, lights, cameras, ...) in one file, we cannot handle that in our simplified example
+  // some formats store whole scene (multiple meshes and materials, lights, cameras, ...) in one file, we cannot
+  // handle that in our simplified example
   if (scn->mNumMeshes != 1)
   {
     std::cout << "this simplified loader can only process files with only one mesh" << std::endl;
@@ -67,7 +67,8 @@ Geometry* ObjReader::geometryFromOBJ(const char* filename, float scale)
 
   // verices
   int attribsPerVertex = 6;
-  if (mesh->HasTextureCoords(0)) attribsPerVertex += 2;
+  if (mesh->HasTextureCoords(0))
+    attribsPerVertex += 2;
 
   float* vertices = new float[mesh->mNumVertices * attribsPerVertex];
   for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -93,7 +94,8 @@ Geometry* ObjReader::geometryFromOBJ(const char* filename, float scale)
     }
   }
 
-  // copy all mesh faces into one big array (assimp supports faces with ordinary number of vertices, we use only 3 -> triangles)
+  // copy all mesh faces into one big array (assimp supports faces with ordinary number of vertices, we use only 3 ->
+  // triangles)
   unsigned int* indices = new unsigned int[mesh->mNumFaces * 3];
   for (unsigned int f = 0; f < mesh->mNumFaces; ++f)
   {

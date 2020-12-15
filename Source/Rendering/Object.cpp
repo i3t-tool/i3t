@@ -8,8 +8,8 @@
 #include "Rendering/ShaperElements.h"
 #include "Transformation.h"
 
-Object::Object(Geometry* _geometry, Material* _material, Transformation* _transformation) :
-  ModelInstance(_geometry, _material), transformation(_transformation)
+Object::Object(Geometry* _geometry, Material* _material, Transformation* _transformation)
+    : ModelInstance(_geometry, _material), transformation(_transformation)
 {
 }
 
@@ -28,7 +28,7 @@ void Object::update()
 {
   if (transformation != NULL)
   {
-    //setTrans(transformation->getTransformationOut());
+    // setTrans(transformation->getTransformationOut());
     glm::mat4 trans = WorkspaceWindow::DrawInScene();
     setTrans(trans);
   }
@@ -67,7 +67,7 @@ ObjectDefinition* ObjectDefinitionTree::getObjectDefinitionFromTreePath(const st
 
   while (ss.good())
   {
-    ObjectDefinitionTree* t = an->getNode(input); //getSubmenu
+    ObjectDefinitionTree* t = an->getNode(input); // getSubmenu
 
     if (t == NULL)
     {
@@ -83,5 +83,5 @@ ObjectDefinition* ObjectDefinitionTree::getObjectDefinitionFromTreePath(const st
 }
 
 // statics
-//std::map<std::string, Object*> ObjectMap::objects;
+// std::map<std::string, Object*> ObjectMap::objects;
 ObjectDefinitionTree* ObjectDefinitionTree::tree;

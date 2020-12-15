@@ -2,8 +2,8 @@
 /**
  * \file	object.h
  *
- * Header for representing base object in scene 
- * 
+ * Header for representing base object in scene
+ *
  * \date  	2014/11/16
  * \author 	Michal Folta, CTU Prague
  */
@@ -23,11 +23,9 @@ class Shader;
 class Object : public ModelInstance
 {
 protected:
-
   Transformation* transformation; ///< object model transformation or view transformation for CameraObject
 
 public:
-
   Object(Geometry* _geometry, Material* _material, Transformation* _transformation);
 
   Transformation* getTransformation() const;
@@ -46,39 +44,28 @@ struct ObjectDefinitionTree;
 class ObjectDefinition
 {
 private:
-
-  std::string name; ///< object name
+  std::string name;   ///< object name
   Geometry* geometry; ///< object geometry (vertices, VBOs, ...)
-  Material* material; ///< object material 
+  Material* material; ///< object material
 
   ObjectDefinitionTree* node; ///< probably parent node of this definition \todo rename to parentNode
 
 public:
-
   ObjectDefinition(std::string _name, ObjectDefinitionTree* _node, Geometry* _geometry, Material* _material)
-    : name(_name), node(_node), geometry(_geometry), material(_material)
+      : name(_name), node(_node), geometry(_geometry), material(_material)
   {
   }
 
-  std::string getName() const
-  {
-    return name;
-  }
+  std::string getName() const { return name; }
 
-  Geometry* getGeometry() const
-  {
-    return geometry;
-  }
+  Geometry* getGeometry() const { return geometry; }
 
-  Material* getMaterial() const
-  {
-    return material;
-  }
+  Material* getMaterial() const { return material; }
 
   /**
-   * \brief Get the space separated node names from the root to this node 
+   * \brief Get the space separated node names from the root to this node
    *        This method is used for writing full object name with path to the .scn file
-   * \return 
+   * \return
    */
   std::string getObjectDefinitionTreePath() const;
 
@@ -107,16 +94,14 @@ struct ObjectDefinitionTree
 
   ObjectDefinitionTree* parent; ///< parent in the tree
 
-  std::vector<ObjectDefinitionTree*> nodes; ///< subMenus - vector of attached subtrees
+  std::vector<ObjectDefinitionTree*> nodes;   ///< subMenus - vector of attached subtrees
   std::vector<ObjectDefinition*> definitions; ///< menu items - definition of geometric objects
 
   /**
    * \brief Constructor of the objectMenuHierarchy tree root with name "objects"
    * \param _parent parent of this tree node
    */
-  ObjectDefinitionTree(ObjectDefinitionTree* _parent) : parent(_parent), name("objects")
-  {
-  }
+  ObjectDefinitionTree(ObjectDefinitionTree* _parent) : parent(_parent), name("objects") {}
 
   ~ObjectDefinitionTree()
   {
@@ -137,7 +122,7 @@ struct ObjectDefinitionTree
 
   /**
    * \brief Search of the \a subtree of given \a name in this submenu level
-   * \param name Name of the subTree found in this menu level 
+   * \param name Name of the subTree found in this menu level
    * \return object or NULL
    */
   ObjectDefinitionTree* getNode(const std::string& name)
@@ -151,10 +136,10 @@ struct ObjectDefinitionTree
   }
 
   /**
-  * \brief Search of the \a menu item (objectDefinition) of given \a name in this submenu level
-  * \param name Name of the object to be found in this menu level (menuItems)
-  * \return object or NULL
-  */
+   * \brief Search of the \a menu item (objectDefinition) of given \a name in this submenu level
+   * \param name Name of the object to be found in this menu level (menuItems)
+   * \return object or NULL
+   */
   ObjectDefinition* getDefiniton(const std::string& name)
   {
     for (unsigned int i = 0; i < definitions.size(); i++)
@@ -171,24 +156,24 @@ class ObjectDefinitionMap {
 
 private:
 
-	static std::map<std::string, ObjectDefinition*> definitions;
+  static std::map<std::string, ObjectDefinition*> definitions;
 
 public:
 
-	static ObjectDefinition * get(string name) {
-		return definitions[name];
-	}
+  static ObjectDefinition * get(string name) {
+    return definitions[name];
+  }
 
-	void addObject(string name, ObjectDefinition * def) {
-		definitions[name] = def;
-	}
-	
-	static void dispose() {
-		for(std::map<std::string, ObjectDefinition*>::const_iterator it = definitions.begin(); it != definitions.end(); ++it) {			
-			delete (it->second);
-		}
-		definitions.clear();
-	}
+  void addObject(string name, ObjectDefinition * def) {
+    definitions[name] = def;
+  }
+
+  static void dispose() {
+    for(std::map<std::string, ObjectDefinition*>::const_iterator it = definitions.begin(); it != definitions.end();
+++it) { delete (it->second);
+    }
+    definitions.clear();
+  }
 };
 */
 

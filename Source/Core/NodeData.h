@@ -5,12 +5,11 @@
  */
 #pragma once
 
-#include <vector>
 #include <set>
+#include <vector>
 
-#include "glm/gtc/quaternion.hpp"
 #include "glm/glm.hpp"
-
+#include "glm/gtc/quaternion.hpp"
 
 /** An operator value type = type of the interconnection wire. */
 struct OpValueType
@@ -30,7 +29,7 @@ struct OpValueType
     QUAT,
     ///< orange		(1.0, 0.1, 0.0)
     MATRIX_MUL,
-    ///< white		(1.0, 1.0, 1.0) connection of sequences in the scene graph - represents a matrix multiplication 
+    ///< white		(1.0, 1.0, 1.0) connection of sequences in the scene graph - represents a matrix multiplication
     SCREEN ///< turqouise	(0.0, 1.0, 1.0) projection and camera view transformation
   };
 };
@@ -58,28 +57,23 @@ union OpValue
 class DataStore
 {
 protected:
-
-  OpValue value; ///< transmitted data (union of all data types passed along the wire) 
+  OpValue value;   ///< transmitted data (union of all data types passed along the wire)
   int opValueType; ///< wire type, such as FLOAT or MATRIX
 
 public:
-
   /** Default constructor constructs a signal of type OpValueType::MATRIX and undefined value (a unit matrix) */
-  //Transmitter() : opValueType(0) { //PFQ: 0 je pulse a value matrix??? - pulse nema typ, tak inicializace default matice
-  //Transmitter() : opValueType(OpValueType::MATRIX), value(glm::mat4()) {
-  DataStore() : opValueType(OpValueType::MATRIX)
-  {
-    value.matrix = glm::mat4();
-  }
+  // Transmitter() : opValueType(0) { //PFQ: 0 je pulse a value matrix??? - pulse nema typ, tak inicializace default
+  // matice Transmitter() : opValueType(OpValueType::MATRIX), value(glm::mat4()) {
+  DataStore() : opValueType(OpValueType::MATRIX) { value.matrix = glm::mat4(); }
 
   /**
       Constructor
-  
+
       \param	_opValueType	Type of the operation value.
    */
   DataStore(const int _opValueType) : opValueType(_opValueType)
   {
-    //Transmitter(int _opValueType) : opValueType(_opValueType), value(glm::mat4()) {
+    // Transmitter(int _opValueType) : opValueType(_opValueType), value(glm::mat4()) {
 
     switch (_opValueType)
     {
@@ -99,80 +93,38 @@ public:
       setValue(glm::quat());
       break;
     default: // MATRIX, MATRIX_MUL, PULSE
-      //setValue(glm::mat4()); //  set moved to initialiation 
+      // setValue(glm::mat4()); //  set moved to initialiation
       break;
     }
   }
 
-  int getOpValType() const
-  {
-    return opValueType;
-  }
+  int getOpValType() const { return opValueType; }
 
-  glm::mat4& getMat4()
-  {
-    return value.matrix;
-  }
+  glm::mat4& getMat4() { return value.matrix; }
 
-  glm::vec3& getVec3()
-  {
-    return value.vector3;
-  }
+  glm::vec3& getVec3() { return value.vector3; }
 
-  glm::vec4& getVec4()
-  {
-    return value.vector4;
-  }
+  glm::vec4& getVec4() { return value.vector4; }
 
-  glm::quat& getQuat()
-  {
-    return value.quat;
-  }
+  glm::quat& getQuat() { return value.quat; }
 
-  float& getFloat()
-  {
-    return value.fValue;
-  }
+  float& getFloat() { return value.fValue; }
 
-	OpValue * getValue() {
-		return &value;
-	}
+  OpValue* getValue() { return &value; }
 
-	void setValue(OpValue value) {
-		this->value = value;
-	}
+  void setValue(OpValue value) { this->value = value; }
 
-	void * & getPointer() {
-    return value.pointer;
-  }
+  void*& getPointer() { return value.pointer; }
 
-  void setValue(glm::mat4 mat)
-  {
-    value.matrix = mat;
-  }
+  void setValue(glm::mat4 mat) { value.matrix = mat; }
 
-  void setValue(glm::vec3 vec)
-  {
-    value.vector3 = vec;
-  }
+  void setValue(glm::vec3 vec) { value.vector3 = vec; }
 
-  void setValue(glm::vec4 vec)
-  {
-    value.vector4 = vec;
-  }
+  void setValue(glm::vec4 vec) { value.vector4 = vec; }
 
-  void setValue(glm::quat q)
-  {
-    value.quat = q;
-  }
+  void setValue(glm::quat q) { value.quat = q; }
 
-  void setValue(float f)
-  {
-    value.fValue = f;
-  }
+  void setValue(float f) { value.fValue = f; }
 
-  void setValue(void* p)
-  {
-    value.pointer = p;
-  }
+  void setValue(void* p) { value.pointer = p; }
 };

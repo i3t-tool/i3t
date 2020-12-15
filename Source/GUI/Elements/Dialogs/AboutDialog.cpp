@@ -2,15 +2,14 @@
 
 #include "imgui.h"
 
-#include "Config.h"
 #include "Commands/ApplicationCommands.h"
+#include "Config.h"
 #include "Rendering/TextureRegion.h"
 #include "Utils/TextureLoader.h"
 
-
 AboutDialog::AboutDialog()
 {
-    dcgiReg = std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f, 0.0f, 1.0f, 1.0f);
+  dcgiReg = std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 void AboutDialog::render()
@@ -51,11 +50,11 @@ void AboutDialog::render()
 
     ImGui::Separator();
 
-    ImGui::BeginHorizontal("AboutFooter", ImVec2{ ImGui::GetWindowContentRegionMax().x, 0.0f });
+    ImGui::BeginHorizontal("AboutFooter", ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
     ImGui::Spring(0.0f);
     ImGui::Text(Config::VERSION.c_str());
     ImGui::Spring();
-    if (ImGui::Button("OK", ImVec2{ 100.0f, 0.0f }))
+    if (ImGui::Button("OK", ImVec2{100.0f, 0.0f}))
     {
       HideWindowCommand::dispatch(id);
     }

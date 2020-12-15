@@ -20,7 +20,8 @@ std::string Logger::getLogString(const std::string& key) const
   {
     return value->second;
   }
-  else {
+  else
+  {
     return "String not found!";
   }
 }
@@ -83,7 +84,8 @@ void Logger::update()
       tutorialCount++;
       stepCount = 1;
     }
-    LOG_EVENT_TUTORIAL_STEP(std::to_string(tutorialCount), std::to_string(stepCount), std::string("Dummy tutorial step"));
+    LOG_EVENT_TUTORIAL_STEP(std::to_string(tutorialCount), std::to_string(stepCount),
+                            std::string("Dummy tutorial step"));
     stepCount++;
   }
 }
@@ -113,7 +115,8 @@ void Logger::addToLogBuffer(const LoggingOption& logType, const std::string mess
   va_end(args);
 }
 
-void Logger::vAddToLogBuffer(const LoggingOption& logType, const std::string& message, const int numOfArgs, va_list& arguments)
+void Logger::vAddToLogBuffer(const LoggingOption& logType, const std::string& message, const int numOfArgs,
+                             va_list& arguments)
 {
   if (logType == LoggingOption::MOUSE_MOVEMENT && isLoggingMouseRaw)
   {
@@ -147,8 +150,8 @@ void Logger::vAddToLogBuffer(const LoggingOption& logType, const std::string& me
 bool Logger::shouldLogMouse()
 {
   // Current time in milliseconds.
-  //const int currentTime = glutGet(GLUT_ELAPSED_TIME);
-  const int currentTime = (int) (glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
+  // const int currentTime = glutGet(GLUT_ELAPSED_TIME);
+  const int currentTime = (int)(glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
   bool shouldLog = currentTime - previousTime > MOUSE_MOVEMENT_LOG_INTERVALS;
   if (shouldLog)
   {
@@ -163,7 +166,8 @@ void Logger::loadStrings()
   std::ifstream i(LOG_STRINGS_PATH);
   i >> json_strings; // TODO -> throws an exception when file LOG_STRINGS_PATH does not exist.
 
-  for (auto& el : json_strings.items()) {
+  for (auto& el : json_strings.items())
+  {
     logStrings[el.key()] = el.value().get<std::string>();
   }
 }
@@ -186,7 +190,8 @@ void Logger::flushBuffer(std::shared_ptr<spdlog::logger> logger)
 std::string Logger::formatMessage(const std::string& message, std::queue<std::string> arguments) const
 {
   std::ostringstream outMessage;
-  for (int i = 0; i < message.size(); i++) {
+  for (int i = 0; i < message.size(); i++)
+  {
     if (message[i] == '{' && message[++i] == '}')
     {
       outMessage << arguments.front();
@@ -209,7 +214,6 @@ std::queue<std::string> Logger::vaListToQueue(const int numOfArgs, va_list& args
   }
   return argsQueue;
 }
-
 
 void Logger::toggleLoggingPopUps()
 {
@@ -234,7 +238,6 @@ void Logger::toggleLoggingMouseRaw()
   isLoggingMouseRaw = !isLoggingMouseRaw;
   std::cout << "mouse raw logging " << isLoggingMouseRaw << std::endl;
 }
-
 
 // Control key definitions
 Keys::Code LoggingToggle::KEY_LoggingToggle_popUps = Keys::f1;

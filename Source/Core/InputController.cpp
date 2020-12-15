@@ -7,12 +7,9 @@
 #include "Core/GlfwWindow.h"
 #include "Logger/Logger.h"
 
-
 #define IM_MOUSE_KEYS_COUNT 3
 
-constexpr Keys::Code imGuiMouseKeys[] = {
-    Keys::mouseLeft, Keys::mouseRight, Keys::mouseMiddle
-};
+constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys::mouseMiddle};
 
 ImGuiConfigFlags g_mousedFlags;
 
@@ -27,7 +24,8 @@ void InputController::processViewportEvents()
   float cursorXPos = io.MousePos.x - m_mouseOffset.x;
   float cursorYPos = io.MousePos.y - m_mouseOffset.y;
 
-  double x = 0; double y = 0;
+  double x = 0;
+  double y = 0;
   glfwGetCursorPos(Application::get().mainWindow(), &x, &y);
 
   if (ImGui::IsMousePosValid())
@@ -45,13 +43,15 @@ void InputController::processViewportEvents()
   {
     if (ImGui::IsMouseClicked(i))
     {
-      LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX), std::to_string(m_mouseY));
+      LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX),
+                            std::to_string(m_mouseY));
       setPressed(imGuiMouseKeys[i]);
     }
 
     if (ImGui::IsMouseReleased(i))
     {
-      LOG_EVENT_MOUSE_RELEASE(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX), std::to_string(m_mouseY));
+      LOG_EVENT_MOUSE_RELEASE(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX),
+                              std::to_string(m_mouseY));
       setUnpressed(imGuiMouseKeys[i]);
     }
   }
@@ -127,8 +127,8 @@ void InputController::update()
 
   LOG_EVENT_MOUSE_POS(std::to_string(m_mouseX), std::to_string(m_mouseY));
 
-  //mouseXDelta = 0;
-  //mouseYDelta = 0;
+  // mouseXDelta = 0;
+  // mouseYDelta = 0;
 
   for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
   {
@@ -352,8 +352,7 @@ void InputController::keyDown(int keyPressed)
     setPressed(Keys::pageUp);
     break;
 
-  default:
-    ; // printf("Unrecognized key pressed\n");
+  default:; // printf("Unrecognized key pressed\n");
   }
 }
 
@@ -364,7 +363,7 @@ void InputController::keyUp(int keyReleased)
   switch (keyReleased)
   {
   /// \todo Will this be used?
-  //alphabet a-z
+  // alphabet a-z
   case GLFW_KEY_A:
     setUnpressed(Keys::a);
     break;
@@ -612,12 +611,11 @@ int InputController::m_winHeight = 0;
 
 /// std::strings describing the keys
 const char* Keys::keyStrings[] = {
-  "key a", "key b", "key c", "key d", "key e", "key f", "key g", "key h", "key i", "key j", "key k", "key l", "key m",
-  "key n", "key o", "key p", "key q", "key r", "key s", "key t", "key u", "key v", "key w", "key x", "key y", "key z",
-  "num 1", "num 2", "num 3", "num 4", "num 5", "num 6", "num 7", "num 8", "num 9", "num 0",
-  "altr", "altl", "ctrll", "ctrlr", "shiftl", "shiftr",
-  "left", "right", "up", "down",
-  "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
-  "home", "end", "insert", "del", "pageUp", "pageDown", "esc",
-  "mouseLeft", "mouseRight", "mouseMiddle", "mouseScrlUp", "mouseScrlDown"
-};
+    "key a",    "key b", "key c",     "key d",      "key e",       "key f",       "key g",        "key h", "key i",
+    "key j",    "key k", "key l",     "key m",      "key n",       "key o",       "key p",        "key q", "key r",
+    "key s",    "key t", "key u",     "key v",      "key w",       "key x",       "key y",        "key z", "num 1",
+    "num 2",    "num 3", "num 4",     "num 5",      "num 6",       "num 7",       "num 8",        "num 9", "num 0",
+    "altr",     "altl",  "ctrll",     "ctrlr",      "shiftl",      "shiftr",      "left",         "right", "up",
+    "down",     "f1",    "f2",        "f3",         "f4",          "f5",          "f6",           "f7",    "f8",
+    "f9",       "f10",   "f11",       "f12",        "home",        "end",         "insert",       "del",   "pageUp",
+    "pageDown", "esc",   "mouseLeft", "mouseRight", "mouseMiddle", "mouseScrlUp", "mouseScrlDown"};

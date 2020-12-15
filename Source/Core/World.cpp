@@ -15,26 +15,24 @@
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 
-
-
 World::World() : debugged(true), scene(NULL), cameraIsControlled(false), cameraOrbitControl(true)
 {
-  //OpFloatVal o(OpValuePlugType::INPUT);
+  // OpFloatVal o(OpValuePlugType::INPUT);
 
   key_ToggleFreeLook = Keys::mouseRight;
 
   //----------------- World Coordinate axes  ---------------------------------
-  worldFrameShaper = new Shaper();  // for World coordinate axes
+  worldFrameShaper = new Shaper(); // for World coordinate axes
 
   // static debug
-  ShaperElements::setShaper(worldFrameShaper);  // switch to this shaper
+  ShaperElements::setShaper(worldFrameShaper);                       // switch to this shaper
   ShaperElements::coordinateAxes(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f); // prepare coordinates
-  worldFrameShaper->rebuildVaos(); // create buffers with the coordinate axes frame, do not delete the prepared geometry (stored in vertices and colors)
+  worldFrameShaper->rebuildVaos(); // create buffers with the coordinate axes frame, do not delete the prepared
+                                   // geometry (stored in vertices and colors)
   // ---------------------- ^^^^^^^-----------------
 
-
   // objects definitions
-  //objectDefinitionTree = new ObjectDefinitionTree();
+  // objectDefinitionTree = new ObjectDefinitionTree();
 
   // dynamic debug
 
@@ -72,8 +70,10 @@ void World::constructScene()
 
 void World::setConfigCameraControl()
 {
-  if (Settings::CameraOrbit) setToOrbitControl();
-  else setToTrackballControl();
+  if (Settings::CameraOrbit)
+    setToOrbitControl();
+  else
+    setToTrackballControl();
 }
 
 void World::setToOrbitControl()
@@ -149,8 +149,10 @@ void World::update()
   }
 
   // CAMERA ZOOM
-  if (InputController::isKeyJustUp(Keys::mouseScrlUp)) scene->camera->pedal(Config::CAM_SCROLL_SENSITIVITY);
-  if (InputController::isKeyJustUp(Keys::mouseScrlDown)) scene->camera->pedal(-Config::CAM_SCROLL_SENSITIVITY);
+  if (InputController::isKeyJustUp(Keys::mouseScrlUp))
+    scene->camera->pedal(Config::CAM_SCROLL_SENSITIVITY);
+  if (InputController::isKeyJustUp(Keys::mouseScrlDown))
+    scene->camera->pedal(-Config::CAM_SCROLL_SENSITIVITY);
 
   /*
   // freeLook
@@ -187,7 +189,7 @@ void World::update()
 
   UPDATE_LOGGER();
 
-  //scene->camera->WSAD(Keys::w, Keys::s, Keys::a, Keys::d, Config::CAM_MOTION_SENSITIVITY);
+  // scene->camera->WSAD(Keys::w, Keys::s, Keys::a, Keys::d, Config::CAM_MOTION_SENSITIVITY);
 
   /*
   for (int i=0; i<TabSpace::transformationSpaceForm->transformationForms.size(); i++) {
@@ -195,28 +197,32 @@ void World::update()
   }
   */
 
-  //cout << scene->camera->getPosition().x << ", " << scene->camera->getPosition().y << ", " << scene->camera->getPosition().z << std::endl; 
+  // cout << scene->camera->getPosition().x << ", " << scene->camera->getPosition().y << ", " <<
+  // scene->camera->getPosition().z << std::endl;
 }
-
 
 void World::render() const
 {
-  scene->render(getActiveCamera());  // 3D scene models 
-  debug(); // 3D scene wire-frame objects (axes, frustrum,...)
-  //scene->renderAlpha(getActiveCamera());
+  scene->render(getActiveCamera()); // 3D scene models
+  debug();                          // 3D scene wire-frame objects (axes, frustrum,...)
+  // scene->renderAlpha(getActiveCamera());
 }
 
 void World::debug() const
 {
-  if (!debugged) return;
+  if (!debugged)
+    return;
 
-  //PF ShaperElements::setShaper(dShaper); // set to active \todo kill - it is reset in each object  in scene->debug() 
+  // PF ShaperElements::setShaper(dShaper); // set to active \todo kill - it is reset in each object  in
+  // scene->debug()
 
-  //PFXX 
-  //PF ShaperElements::setShaper(dShaper); // was set twice???? \todo kill - it is reset in each object in scene->debug() 
+  // PFXX
+  // PF ShaperElements::setShaper(dShaper); // was set twice???? \todo kill - it is reset in each object in
+  // scene->debug()
   scene->debug(objectsShaper);
 
-  objectsShaper->drawOnceAndDestroy(getActiveCamera()); // move prepared geometry to buffers, draw them, and destroy afterwards
+  objectsShaper->drawOnceAndDestroy(
+      getActiveCamera()); // move prepared geometry to buffers, draw them, and destroy afterwards
 
-  worldFrameShaper->drawAndPreserve(getActiveCamera()); // world axes: only draw	
+  worldFrameShaper->drawAndPreserve(getActiveCamera()); // world axes: only draw
 }

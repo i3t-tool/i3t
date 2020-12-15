@@ -17,6 +17,7 @@ public:
   TutorialWindow(bool show);
   void setTutorial(std::string filename);
   void render() override;
+
 private:
   Tutorial* m_tutorial;
   int m_current_step;

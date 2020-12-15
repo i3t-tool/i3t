@@ -18,15 +18,15 @@
 
 constexpr char* ImGui_GLSLVersion = "#version 140";
 
-#define FONT_MENU_LARGE     0
-#define FONT_TUTORIAL_TEXT  0
-#define FONT_BUTTON         1
-#define FONT_TAB            1
-#define FONT_NODE           2
-#define FONT_MENU_SMALL     2
-#define FONT_TITLE          3
-#define FONT_TASK_TITLE     4
-#define FONTS_COUNT         4
+#define FONT_MENU_LARGE    0
+#define FONT_TUTORIAL_TEXT 0
+#define FONT_BUTTON        1
+#define FONT_TAB           1
+#define FONT_NODE          2
+#define FONT_MENU_SMALL    2
+#define FONT_TITLE         3
+#define FONT_TASK_TITLE    4
+#define FONTS_COUNT        4
 
 class ICommand;
 class GlfwWindow;
@@ -80,8 +80,7 @@ public:
    *
    * \tparam T window to create. T must be derived from IWindow class.
    */
-  template <typename T>
-  void showUniqueWindow();
+  template <typename T> void showUniqueWindow();
 
   /**
    * Issue command.
@@ -135,7 +134,7 @@ private:
 
   MainMenuBar* m_menu;
 
-  World* m_world;  ///< all GUI and logic objects
+  World* m_world; ///< all GUI and logic objects
 
   // GLFWwindow* m_window;
   GlfwWindow* m_window;
@@ -145,7 +144,7 @@ private:
 
   std::map<std::string, std::unique_ptr<IWindow>> m_windows;
 
-  std::array<ImFont*, (unsigned) FONTS_COUNT + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
+  std::array<ImFont*, (unsigned)FONTS_COUNT + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
 
   /// Array of commands which the application is going to process in its main loop.
   std::vector<ICommand*> m_commands;

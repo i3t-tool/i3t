@@ -25,7 +25,6 @@
 #include "Rendering/ShaperElements.h"
 #include "Transformation.h"
 
-
 Scene::Scene(World* _world) : world(_world)
 {
   // camera
@@ -65,12 +64,12 @@ Scene::~Scene()
 void Scene::onReshape(int width, int height)
 {
   camera->setPerspective(float(width), float(height));
-  //camera->update();
+  // camera->update();
 }
 
 Object* Scene::addObject(Transformation* t, ObjectDefinition* o)
 {
-  //Object * o = new Object(GeometryMap::get("testCube"), MaterialMap::get("testMaterial"), t);
+  // Object * o = new Object(GeometryMap::get("testCube"), MaterialMap::get("testMaterial"), t);
   Object* obj = o->getInstance(t);
   ShaderProvider::addToGroup(obj);
   objects.push_back(obj);
@@ -105,7 +104,7 @@ void Scene::removeCameraObject(CameraObject* co)
   removeObject(co);
 }
 
-//PF2018-03-05
+// PF2018-03-05
 void printMatrix(glm::mat4 m)
 {
   for (int i = 0; i < 4; i++)
@@ -124,8 +123,8 @@ CameraObject* Scene::addCamera(Transformation* p, Transformation* v)
   CameraObject* c = new CameraObject(GeometryMap::getHC("camera"), MaterialMap::getHC("camera"), v, p);
   ShaderProvider::addToGroup(c);
 
-  //PF2018-03-05
-  //printMatrix(c->getTrans());
+  // PF2018-03-05
+  // printMatrix(c->getTrans());
 
   objects.push_back(c);
   cameraObjects.push_back(c);
@@ -146,7 +145,7 @@ void Scene::update()
 }
 
 /**
- * \brief Updates camera position and 
+ * \brief Updates camera position and
  */
 void Scene::keyUpdate()
 {
@@ -155,13 +154,20 @@ void Scene::keyUpdate()
     return;
   if (!camera->isLerping())
   {
-    if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitX)) setCamToOrbitCenterX();
-    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitY)) setCamToOrbitCenterY();
-    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitZ)) setCamToOrbitCenterZ();
-    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldX)) setCamToCenterX();
-    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldY)) setCamToCenterY();
-    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldZ)) setCamToCenterZ();
-    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_scene)) setCamToCenter();
+    if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitX))
+      setCamToOrbitCenterX();
+    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitY))
+      setCamToOrbitCenterY();
+    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitZ))
+      setCamToOrbitCenterZ();
+    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldX))
+      setCamToCenterX();
+    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldY))
+      setCamToCenterY();
+    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldZ))
+      setCamToCenterZ();
+    else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_scene))
+      setCamToCenter();
     else if (InputController::isKeyJustPressed(Settings::Key_undo))
     {
       /// \todo Scene undo.
@@ -258,14 +264,20 @@ void Scene::setCamToCenter()
     {
       v = tr * glm::vec4(vb[k], vb[k + 1], vb[k + 2], 1.0f);
 
-      if (v.x < min.x) min.x = v.x;
-      if (v.x > max.x) max.x = v.x;
+      if (v.x < min.x)
+        min.x = v.x;
+      if (v.x > max.x)
+        max.x = v.x;
 
-      if (v.y < min.y) min.y = v.y;
-      if (v.y > max.y) max.y = v.y;
+      if (v.y < min.y)
+        min.y = v.y;
+      if (v.y > max.y)
+        max.y = v.y;
 
-      if (v.z < min.z) min.z = v.z;
-      if (v.z > max.z) max.z = v.z;
+      if (v.z < min.z)
+        min.z = v.z;
+      if (v.z > max.z)
+        max.z = v.z;
     }
   }
 
@@ -291,7 +303,7 @@ void Scene::render(Camera* _camera)
     if (cameraObjects[i]->getDrawFrustum())
     {
       frustrumObject->setTrans(
-        glm::inverse(cameraObjects[i]->getProjection() * glm::inverse(cameraObjects[i]->getTrans())));
+          glm::inverse(cameraObjects[i]->getProjection() * glm::inverse(cameraObjects[i]->getTrans())));
       ShaderProvider::getAlphaShader()->draw(frustrumObject, _camera, environment);
       /// should be drawn as a hcGeometries[2]
     }
@@ -307,13 +319,13 @@ void Scene::render(const glm::mat4 proj, const glm::mat4 view, CameraObject* noC
 /*
 void Scene::renderAlpha(Camera * _camera) {
 
-	// alpha shader group
-	world->alphaShader->begin();
-	for (int i=0; i<cameraObjects.size(); i++) {
-		frustrumObject->setTrans(glm::inverse(cameraObjects[i]->getProjection() * glm::inverse(cameraObjects[i]->getTrans())));
-		world->alphaShader->draw(frustrumObject, _camera, environment);
-	}
-	world->alphaShader->end();
+  // alpha shader group
+  world->alphaShader->begin();
+  for (int i=0; i<cameraObjects.size(); i++) {
+    frustrumObject->setTrans(glm::inverse(cameraObjects[i]->getProjection() *
+glm::inverse(cameraObjects[i]->getTrans()))); world->alphaShader->draw(frustrumObject, _camera, environment);
+  }
+  world->alphaShader->end();
 }
 */
 
@@ -323,9 +335,9 @@ void Scene::drawCamera()
 
 void Scene::debug(Shaper* shaper)
 {
-  for (unsigned int i = 0; i < objects.size(); i++) 
+  for (unsigned int i = 0; i < objects.size(); i++)
     objects[i]->debug(shaper);
 
-  //ShapersElements::getShaper()->setColor(Color::RED);
-  //ShapersElements::gridXY(glm::vec2(), 1, 10);
+  // ShapersElements::getShaper()->setColor(Color::RED);
+  // ShapersElements::gridXY(glm::vec2(), 1, 10);
 }

@@ -18,13 +18,13 @@
 #elif defined(__GNUC__)
 #define FORCE_INLINE inline __attribute__((__always_inline__))
 #elif defined(__CLANG__)
-    #if __has_attribute(__always_inline__)
-        #define FORCE_INLINE inline __attribute__((__always_inline__))
-    #else
-        #define FORCE_INLINE inline
-    #endif
+#if __has_attribute(__always_inline__)
+#define FORCE_INLINE inline __attribute__((__always_inline__))
 #else
-    #define FORCE_INLINE inline
+#define FORCE_INLINE inline
+#endif
+#else
+#define FORCE_INLINE inline
 #endif
 
 static void i3tAssert(bool condition, std::string message, std::string file, unsigned line)
@@ -47,4 +47,6 @@ template <typename T> using Ptr = std::shared_ptr<T>;
 /// Unique pointer shortcut.
 template <typename T> using UPtr = std::unique_ptr<T>;
 
-#define COND_TO_DEG(x)  (SetupForm::radians ? (x)  :  glm::degrees(x) ) ///< Converts from radians to degrees if the application set up for degrees
+#define COND_TO_DEG(x)                                                                                               \
+  (SetupForm::radians ? (x)                                                                                          \
+                      : glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees

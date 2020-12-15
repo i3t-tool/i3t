@@ -2,8 +2,8 @@
 /**
  * \file	cameraObject.h
  *
- * Header for representing camera object in scene 
- * 
+ * Header for representing camera object in scene
+ *
  * \date  	2014/11/16
  * \author 	Michal Folta, CTU Prague
  */
@@ -14,8 +14,8 @@
 
 #include "Object.h"
 
-//class Transformation;
-//class Shaper;
+// class Transformation;
+// class Shaper;
 
 /**
  * \brief Geometry of the camera
@@ -23,24 +23,17 @@
 class CameraObject : public Object
 {
 protected:
-
   Transformation* projection; ///< projection matrix
 
   bool drawFrustum; ///< true to show the camera frustrum in the 3D scene preview
 
 public:
+  CameraObject(Geometry* _geometry, Material* _material, Transformation* _transformation,
+               Transformation* _projection);
 
-  CameraObject(Geometry* _geometry, Material* _material, Transformation* _transformation, Transformation* _projection);
+  bool getDrawFrustum() const { return drawFrustum; }
 
-  bool getDrawFrustum() const
-  {
-    return drawFrustum;
-  }
-
-  void setDrawFrustum(const bool val)
-  {
-    drawFrustum = val;
-  }
+  void setDrawFrustum(const bool val) { drawFrustum = val; }
 
   Transformation* getTransformationProjection();
 
@@ -66,8 +59,8 @@ public:
 
   /**
    * \brief Prepare the camera coordinate frame and frustrum into the Shaper geometry (vertices and colors)
-   *  \notused Parameter \a shaper NOT USED - already set in static object Shaper - differs from overloaded method of Object::debug()
-   * \param shaper Parameter \a shaper NOT USED - already set in static object Shaper 
+   *  \notused Parameter \a shaper NOT USED - already set in static object Shaper - differs from overloaded method of
+   * Object::debug() \param shaper Parameter \a shaper NOT USED - already set in static object Shaper
    */
   void debug(Shaper* shaper) override;
 };

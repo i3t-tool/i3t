@@ -4,7 +4,7 @@
  *
  * Declares some math functions
  * \date  2014/11/16
- * \author Michal Folta, CTU Prague		  
+ * \author Michal Folta, CTU Prague
  */
 //---------------------------------------------------------------------------
 
@@ -15,17 +15,15 @@
 #include <random>
 #include <vector>
 
-
 class Math
 {
 public:
-
   /**
    * \brief Linear interpolation between two vectors vec3 \a a and \a b
-   * \param a 
-   * \param b 
+   * \param a
+   * \param b
    * \param alpha interpolation parameter - must be from interval (0..1)
-   * \return 
+   * \return
    */
   static glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float alpha)
   {
@@ -35,12 +33,12 @@ public:
   }
 
   /**
-  * \brief Linear interpolation between two vectors vec4 \a a and \a b
-  * \param a
-  * \param b
-  * \param alpha interpolation parameter - must be from interval (0..1)
-  * \return
-  */
+   * \brief Linear interpolation between two vectors vec4 \a a and \a b
+   * \param a
+   * \param b
+   * \param alpha interpolation parameter - must be from interval (0..1)
+   * \return
+   */
   static glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float alpha)
   {
     glm::vec4 inter = a * (1.0f - alpha);
@@ -50,12 +48,12 @@ public:
   }
 
   /**
-  * \brief Value base linear interpolation between two matrices \a a and \a b. Incorrect, just for teaching purposes. 
-  * \param a
-  * \param b
-  * \param alpha interpolation parameter - must be from interval (0..1)
-  * \return
-  */
+   * \brief Value base linear interpolation between two matrices \a a and \a b. Incorrect, just for teaching purposes.
+   * \param a
+   * \param b
+   * \param alpha interpolation parameter - must be from interval (0..1)
+   * \return
+   */
   static glm::mat4 lerp(glm::mat4 a, glm::mat4 b, float alpha)
   {
     glm::mat4 res;
@@ -68,58 +66,44 @@ public:
     return res;
   }
 
-  static float smoothAlpha(const float a)
-  {
-    return ((6 * a - 15) * a + 10) * a * a * a;
-  }
+  static float smoothAlpha(const float a) { return ((6 * a - 15) * a + 10) * a * a * a; }
 
   /**
    * \brief Random float from interval 0 .. 0.999
    * \return random float
    */
-  static float randomf()
-  {
-    return (float)((rand() % 1000) / 1000.0f);
-  }
+  static float randomf() { return (float)((rand() % 1000) / 1000.0f); }
 
   /**
-  * \brief Random float from interval -0.5 .. +0.499
-  * \return random float
-  */
-  static float randomfHalf()
-  {
-    return -0.5f + randomf();
-  }
+   * \brief Random float from interval -0.5 .. +0.499
+   * \return random float
+   */
+  static float randomfHalf() { return -0.5f + randomf(); }
 
   /**
    * \brief Random integer from interval 0..\a topNotInclude
-   * \param topNotInclude 
+   * \param topNotInclude
    * \return Random integer
    */
-  static int randomi(const int topNotInclude)
-  {
-    return rand() % topNotInclude;
-  }
+  static int randomi(const int topNotInclude) { return rand() % topNotInclude; }
 
   /**
-  * \brief Random integer from interval \a downIncluded .. \a topNotInclude
-  * \param downIncluded [min generated value
-  * \param topNotInclude max) generated value
-  * \return Random integer
-  */
+   * \brief Random integer from interval \a downIncluded .. \a topNotInclude
+   * \param downIncluded [min generated value
+   * \param topNotInclude max) generated value
+   * \return Random integer
+   */
   static int randomi(const int downIncluded, const int topNotInclude)
   {
     return rand() % topNotInclude + downIncluded;
   }
 
-  static glm::vec3 randomVec()
-  {
-    return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf()));
-  }
+  static glm::vec3 randomVec() { return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf())); }
 
   static void prefixSum(std::vector<int>& arr)
   {
-    if (arr.empty()) return;
+    if (arr.empty())
+      return;
 
     int tmp = arr[0];
     arr[0] = 0;

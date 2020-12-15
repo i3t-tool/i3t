@@ -38,7 +38,6 @@ static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
   return result;
 }
 
-
 namespace ed = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
 
@@ -107,9 +106,9 @@ struct Node
 
 struct Matrix4x4
 {
-    //Node* node;
-    ed::NodeId ID;
-    glm::mat4 data;
+  // Node* node;
+  ed::NodeId ID;
+  glm::mat4 data;
 };
 
 struct Link
@@ -252,24 +251,23 @@ static void BuildNode(Node* node)
   }
 }
 
-
-
 /**
  * Workspace - node editor.
  */
 class WorkspaceWindow : public IWindow
 {
 public:
-  WorkspaceWindow(bool show) : IWindow(show) {
-    
-    //g_Context = ed::CreateEditor(&config);
-  };
+  WorkspaceWindow(bool show)
+      : IWindow(show){
+
+            // g_Context = ed::CreateEditor(&config);
+        };
   virtual ~WorkspaceWindow()
   {
     auto releaseTexture = [](ImTextureID& id) {
       if (id)
       {
-        //Application_DestroyTexture(id);
+        // Application_DestroyTexture(id);
         id = nullptr;
       }
     };

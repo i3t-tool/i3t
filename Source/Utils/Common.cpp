@@ -1,5 +1,5 @@
-#include <sys/timeb.h>
 #include "common.h"
+#include <sys/timeb.h>
 
 /**
  * \fn	long GetTime()

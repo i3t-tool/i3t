@@ -7,7 +7,6 @@
 #include "GUI/Settings.h"
 #include "Rendering/FrameBuffer.h"
 
-
 /// \todo Use Framebuffer class.
 ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
 {
@@ -26,7 +25,7 @@ ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
   // create a renderbuffer to allow depth and stencil
   glGenRenderbuffers(1, &m_rboMain);
 
-  //init vectors definig size to display
+  // init vectors definig size to display
   m_wcMin = ImVec2(0, 0);
   m_wcMax = ImVec2(0, 0);
 }
@@ -36,12 +35,14 @@ void ViewportWindow::render()
   if (!Application::get().m_showViewportWindow)
     return;
 
-  //ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
-  //ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
+  // ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
+  // ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
   {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    ImGui::Begin("Viewport", &Application::get().m_showViewportWindow);// Create a window called "Hello, world!" and append into it.
+    ImGui::Begin(
+        "Viewport",
+        &Application::get().m_showViewportWindow); // Create a window called "Hello, world!" and append into it.
     ImGui::PopStyleVar();
 
     // get positions of min max points of the window
@@ -53,14 +54,16 @@ void ViewportWindow::render()
     newWcMax.x += ImGui::GetWindowPos().x;
     newWcMax.y += ImGui::GetWindowPos().y;
 
-    //ImGui::GetWindowDrawList()->AddCallback(render_callback, NULL); // Option 1 (did not manage to get it working correctly - too hard to grasp all the stuff for it)
+    // ImGui::GetWindowDrawList()->AddCallback(render_callback, NULL); // Option 1 (did not manage to get it working
+    // correctly - too hard to grasp all the stuff for it)
     InputController::processViewportEvents();
 
     // bind our special framebuffer for rendering (and binding a new texture for it if needed)
     glBindFramebuffer(GL_FRAMEBUFFER, m_fboMain);
 
     // IF NEW WINDOW SIZE IS DIFFERENT, CHANGE SIZES ACCORDINGLY
-    if ( newWcMin.x != m_wcMin.x || newWcMin.y != m_wcMin.y || newWcMax.x != m_wcMax.x || newWcMax.y != m_wcMax.y) {
+    if (newWcMin.x != m_wcMin.x || newWcMin.y != m_wcMin.y || newWcMax.x != m_wcMax.x || newWcMax.y != m_wcMax.y)
+    {
       m_wcMin = newWcMin;
       m_wcMax = newWcMax;
 
@@ -86,7 +89,8 @@ void ViewportWindow::render()
       // resize all other things
       m_world->onReshape(width, height);
       Settings::resize((float)width, (float)height);
-      Config::WIN_HEIGHT = height; Config::WIN_WIDTH = width;
+      Config::WIN_HEIGHT = height;
+      Config::WIN_WIDTH = width;
 
       // set viewport size to be sure
       glViewport(0, 0, width, height);
@@ -94,7 +98,7 @@ void ViewportWindow::render()
 
     // clear
     glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_MULTISAMPLE);
@@ -107,10 +111,12 @@ void ViewportWindow::render()
     // Unbind our framebuffer, bind main framebuffer.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    //ImGui::GetForegroundDrawList()->AddRect(wcMin, wcMax, IM_COL32(255, 255, 0, 255)); // test
+    // ImGui::GetForegroundDrawList()->AddRect(wcMin, wcMax, IM_COL32(255, 255, 0, 255)); // test
 
-    //add the texture to this's window drawList
-    ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0,1), ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
+    // add the texture to this's window drawList
+    ImGui::GetWindowDrawList()->AddImage(
+        (void*)(intptr_t)m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0, 1),
+        ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
 
     ImGui::End();
   }

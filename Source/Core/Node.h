@@ -15,7 +15,6 @@
 #include "NodeData.h"
 #include "Operations.h"
 
-
 enum class ENodePlugResult
 {
   Ok = 0,
@@ -52,7 +51,8 @@ protected:
 
   /// \todo Is there values in NodeBase used?
   bool m_pulseOnPlug;      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
-  bool m_restrictedOutput; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll only)
+  bool m_restrictedOutput; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
+                           ///< only)
   int m_restrictedOutputIndex; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
@@ -252,4 +252,4 @@ public:
     }
   }
 };
-}
+} // namespace Core

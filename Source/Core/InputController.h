@@ -152,7 +152,7 @@ public:
   static int m_winWidth, m_winHeight; ///< Window size
 
   static MouseButtonState m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed) without modifiers.
-                                            ///< \todo passed to all handlers, but probably not used
+                                              ///< \todo passed to all handlers, but probably not used
 
   static bool m_ignoreImGuiEvents;
   static glm::vec2 m_mouseOffset;

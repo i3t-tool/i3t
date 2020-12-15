@@ -21,7 +21,6 @@
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 
-
 /// \todo Set dynamic scale (reload font in runtime).
 float fontScale = 1.2f;
 
@@ -70,8 +69,8 @@ void Application::initImGui()
   ImGuiIO& io = ImGui::GetIO();
   (void)io;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
   io.ConfigWindowsMoveFromTitleBarOnly = true;
 
   // Setup Dear ImGui style
@@ -288,11 +287,9 @@ int Application::initI3T()
     return 1;
   if (!TextureLoader::loadHCTexture("abCube", Config::getAbsolutePath("/Data/textures/cube.png")))
     return 1;
-  if (!TextureLoader::loadHCTexture("cube_color",
-                                    Config::getAbsolutePath("/Data/textures/cube_color.png")))
+  if (!TextureLoader::loadHCTexture("cube_color", Config::getAbsolutePath("/Data/textures/cube_color.png")))
     return 1;
-  if (!TextureLoader::loadHCTexture("dcgiLogo",
-                                    Config::getAbsolutePath("/Data/textures/dcgi-logo-60.png")))
+  if (!TextureLoader::loadHCTexture("dcgiLogo", Config::getAbsolutePath("/Data/textures/dcgi-logo-60.png")))
     return 1;
   if (!TextureLoader::loadHCTexture("icons", Config::getAbsolutePath("/Data/textures/icons.png")))
     return 1;

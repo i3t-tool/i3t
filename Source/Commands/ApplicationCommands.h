@@ -9,8 +9,14 @@
 
 #include "Command.h"
 
-class BeforeCloseCommand : public Command<BeforeCloseCommand> {};
+class BeforeCloseCommand : public Command<BeforeCloseCommand>
+{
+};
 
-class CloseCommand : public Command<CloseCommand> {};
+class CloseCommand : public Command<CloseCommand>
+{
+};
 
-class HideWindowCommand : public Command<HideWindowCommand, std::string> {};
+class HideWindowCommand : public Command<HideWindowCommand, std::string>
+{
+};

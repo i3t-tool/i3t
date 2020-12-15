@@ -6,7 +6,7 @@
 
 CameraObject::CameraObject(Geometry* _geometry, Material* _material, Transformation* _transformation,
                            Transformation* _projection)
-  : Object(_geometry, _material, _transformation), projection(_projection), drawFrustum(true)
+    : Object(_geometry, _material, _transformation), projection(_projection), drawFrustum(true)
 {
 }
 
@@ -43,9 +43,10 @@ void CameraObject::debug(Shaper* shaper)
 
   if (drawFrustum)
   {
-    ShaperElements::getShaper()->setColor(Color::RED);  // \todo presumes the dhaper was set elsewhere, ignores the parameter
+    ShaperElements::getShaper()->setColor(
+        Color::RED); // \todo presumes the dhaper was set elsewhere, ignores the parameter
     ShaperElements::drawFrustum(getProjection(), getTrans());
   }
 
-  ShaperElements::drawOrientation(getTrans(), 1.0f);  // camera coordinate frame
+  ShaperElements::drawOrientation(getTrans(), 1.0f); // camera coordinate frame
 }

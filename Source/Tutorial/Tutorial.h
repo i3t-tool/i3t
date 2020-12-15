@@ -17,7 +17,6 @@ struct TStep
 class Tutorial
 {
 public:
-
   Tutorial(std::string filename);
   void render(int step);
   size_t getNumSteps();

@@ -3,7 +3,7 @@
 #include "portable-file-dialogs.h"
 
 bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string& title, const std::string& root,
-                                   const std::vector<std::string>& filter)
+                                         const std::vector<std::string>& filter)
 {
   auto dialog = pfd::open_file(title, root, filter);
 
@@ -16,8 +16,8 @@ bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string&
   return false;
 }
 
-bool SystemDialogs::SaveSingleFileDialog(std::string& result, const std::string& title,
-    const std::string& root, const std::vector<std::string>& filter)
+bool SystemDialogs::SaveSingleFileDialog(std::string& result, const std::string& title, const std::string& root,
+                                         const std::vector<std::string>& filter)
 {
   auto destination = pfd::save_file(title, root, filter).result();
   if (!destination.empty())
@@ -29,7 +29,7 @@ bool SystemDialogs::SaveSingleFileDialog(std::string& result, const std::string&
   return false;
 }
 
-void SystemDialogs::FireErrorMessageDialog(const std::string &title, const std::string &message)
+void SystemDialogs::FireErrorMessageDialog(const std::string& title, const std::string& message)
 {
   pfd::message(title, message, pfd::choice::ok, pfd::icon::error);
 }

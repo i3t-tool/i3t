@@ -2,7 +2,6 @@
 
 #include "Rendering/GUIProjection.h"
 
-
 /// \todo Set default keys according to the Dr. Felkel's table.
 bool Settings::CameraOrbit = true;
 Keys::Code Settings::KeyWorld_mousePan = Keys::mouseMiddle;

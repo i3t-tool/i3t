@@ -1,5 +1,5 @@
 #include "FrameBuffer.h"
 
 // statics
-std::vector<FrameBuffer *> FrameBuffer::frameBuffers;
+std::vector<FrameBuffer*> FrameBuffer::frameBuffers;
 GLuint FrameBuffer::defaultBuffer;

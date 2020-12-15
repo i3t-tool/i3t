@@ -1,8 +1,8 @@
 /**
  *  \file world.h
- *  	  
+ *
  *  Header for representing the 3D world (scene, camera, trackball control)
- *  
+ *
  *  \date   2014/11/16
  *  \author Michal Folta, CTU Prague
  */
@@ -15,7 +15,6 @@ class Shaper;
 class Camera;
 struct ObjectDefinitionTree;
 class Transformation;
-
 
 /**
  * \class	World
@@ -31,7 +30,6 @@ private:
   bool cameraIsControlled; ///< True after mouse click in 3D view, false after mouse release
 
 public:
-
   glm::vec2 storeMouse; ///< store mouse coordinate before free look
 
   Keys::Code key_ToggleFreeLook;
@@ -41,11 +39,12 @@ public:
   Scene* scene; ///< The 3D scene preview (the upper window part)
 
   Shaper* worldFrameShaper; ///< The shaper (geometry and OpenGL buffers) for drawing the world axis
-  Shaper* objectsShaper; ///< The shaper (geometry and OpenGL buffers) for drawing other object axes and frustrum
+  Shaper* objectsShaper;    ///< The shaper (geometry and OpenGL buffers) for drawing other object axes and frustrum
 
-  ObjectDefinitionTree* objectDefinitionTree; ///< The object menu tree (menu and submenus) \image html MenuObjects.png
+  ObjectDefinitionTree*
+      objectDefinitionTree; ///< The object menu tree (menu and submenus) \image html MenuObjects.png
 
-  //Transformation * transformation;
+  // Transformation * transformation;
 
   /**
    * \brief	Default constructor
@@ -73,16 +72,12 @@ public:
    *
    * \return	Null if it fails, else the active camera.
    */
-  [[nodiscard]] Camera* getActiveCamera() const
-  {
-    return scene->camera;
-  }
+  [[nodiscard]] Camera* getActiveCamera() const { return scene->camera; }
 
   /**
    * \brief	regenerate the scene
    */
   void reset();
-
 
   ////// ROTATION CONTROL
   /**
@@ -106,27 +101,27 @@ public:
    * \return	True if camera control as orbit, false if not.
    */
 
-  //bool isCameraControlAsOrbit() const
+  // bool isCameraControlAsOrbit() const
   //{
   //  return cameraOrbitControl;
   //}
 
   /**
-   * \brief Update the world (in each step). 
-   * 
-   * Either update tabGroup events or perform camera interaction using 
-   * trackball or camera orbit rotation. Than updates the scene->keys 
+   * \brief Update the world (in each step).
+   *
+   * Either update tabGroup events or perform camera interaction using
+   * trackball or camera orbit rotation. Than updates the scene->keys
    * and finally the scene itself.
    */
   void update();
 
   /**
-   * \brief	Render the scene and wire-frame objects (call debug()). 
+   * \brief	Render the scene and wire-frame objects (call debug()).
    */
   void render() const;
 
   /**
-   * \brief Debug (=draw all reference coordinate frames and wire-frame objects) world 
+   * \brief Debug (=draw all reference coordinate frames and wire-frame objects) world
    * (called from render() in each timer step. Uses shaper to debug the scene.
    * \todo rename to something like drawWireframeObjects
    */
