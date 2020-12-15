@@ -1,0 +1,16 @@
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Right
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: InlineOnly
+BreakBeforeBraces: Allman
+ColumnLimit: 118
+IndentWidth: 2
+NamespaceIndentation: None
+PointerAlignment: Left
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+TabWidth: 2
