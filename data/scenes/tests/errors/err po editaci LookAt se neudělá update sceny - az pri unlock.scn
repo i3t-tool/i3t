@@ -1,0 +1,92 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 22.1708 -0.0766573 6.10337
+		lookAt 3.22677 -2.27182 -1.31854
+		up 0 1 0
+		orbitCenter 3.22677 -2.27182 -1.31854
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 425
+	projectionPosition 147.44 14.63
+	projectionScale 0.81
+	cameraTransformationForm {
+		position 251.36 10.82
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+			}
+		}
+		transformationForm {
+			position 117 0
+			inputsStorage -1 
+			inputsMultiOut 2 0 
+			transformations {
+				lookAt {
+					params 0 0 5.03 0 0 0 0 1 0
+					default 1 0 -0 0 -0 1 -0 0 0 0 1 0 -0 -0 -5.03 1
+					matrix 1 0 -0 0 -0 1 -0 0 0 0 1 0 -0 -0 -5.03 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+	}
+	transformationForm {
+		position 635.35 19.33
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		objectVisible 1
+		transformations {
+			uniformScale {
+				params 2
+				default 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				matrix 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				hint {
+uniform scale of 2}
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+		rotationY {
+			params -60
+			default 0.5 0 0.866025 0 0 1 0 0 -0.866025 0 0.5 0 0 0 0 1
+			matrix 0.94 0 -0.341174 0 0 1 0 0 0.341174 0 0.94 0 0 0 0 1
+			hint {
+rotation about 60 degrees in y - axes}
+			position 677.77 248.02
+			isLocked 1
+			useSynergies 1
+		}
+		translation {
+			params 2 0 0
+			default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 4 0 0 1
+			hint {
+translation by [4, 0, 0]}
+			position 674.98 148.39
+			isLocked 1
+			useSynergies 0
+		}
+	}
+	sceneTab {
+		position 988.46 52.13
+		size 250 250
+		input 0 0 
+	}
+	operators {
+	}
+}

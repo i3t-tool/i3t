@@ -1,0 +1,86 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 4.23483 9.40228 -2.51382
+		lookAt 0.0901509 -0.089391 -1.02139
+		up 0 1 0
+		orbitCenter -0.305934 -0.99646 -0.878762
+	}
+	desc {
+Rotation around a point
+
+The scene demonstrates the rotation (R) around a general point (T).
+
+1. Try to change the angle of the rotation (R) and the translation (T).
+
+2. Between which coordinate systems is the object subsequently transformed by the matrix ... ?
+
+3. Try to replace the rotation (R) with different types of transformations and explain their behavior.
+
+4. Try to replace the translation (T) with different types of transformations and explain their behavior. Which transformations cannot be used and why?
+}
+		position 865 30
+}
+transformationSpace {
+	position 3 538
+	projectionPosition 189 55
+	projectionScale 1
+	transformationForm {
+		position 217 87
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics axes
+		transformations {
+			translation {
+				params 0 0 4
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 4 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 4 1
+				hint {
+Translation T}
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 837 255
+		inputsStorage 8 0 
+		inputsMultiOut 7 0 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 419 260
+		inputsStorage 0 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 632 249
+		inputsStorage -1 
+		inputsMultiOut 5 0 
+		transformations {
+			rotationY {
+				params 50.7232
+				default 0.633067 0 -0.774097 0 0 1 0 0 0.774097 0 0.633067 0 0 0 0 1
+				matrix 0.633067 0 -0.774097 0 0 1 0 0 0.774097 0 0.633067 0 0 0 0 1
+				hint {
+Rotation R about point defined by translation T.}
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		Inversion {
+			position 670 74
+			inputs 0 0  
+		}
+	}
+}

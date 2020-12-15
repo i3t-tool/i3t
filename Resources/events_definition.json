@@ -1,0 +1,24 @@
+{ 
+    "version" : "1.2",
+    "mousePos" : "Mouse position: [{}, {}]",
+    "mouseClick" : "{} mouse button pressed at: [{}, {}]",
+    "mouseRelease" : "{} mouse button released at: [{}, {}]",
+    "openPopUp" : "P: Right clicked \"{}\" to show the pop up menu",
+    "closePopUp" : "P: Clicked elsewhere to close the pop up menu \"{}\"",
+    "closePopUpIn" : "P: Clicked in the pop up menu \"{}\" to close it",
+    "button" : "P: Clicked \"{}\"",
+    "disconnect" : "L: Disconnecting \"{}\" from \"{}\"",
+    "connect" : "L: Connecting \"{}\" output to \"{}\" input",
+    "tabAddIndex": "L: \"{}\" added to \"{}\" at index \"{}\"",
+    "tabAdd" : "L: \"{}\" added to \"{}\"",
+    "tabRem" : "L: \"{}\" removed from \"{}\"",
+    "objAdd" : "L: Object \"{}\" added to \"{}\"",
+    "objRem" : "L: Object removed from \"{}\"",
+    "matrix" : "M: Value at index \"{}\" in the matrix \"{}\" changed to \"{}\"",
+    "tutorial" : "T: {}.{}: {}",
+        
+    "logInit" : ">>> Main logger initialized! <<<",
+    "mouseLogInit" : ">>> Mouse logger initialized! <<<",
+    "logEnd" : ">>> Main logger ending! <<<",
+    "mouseLogEnd" : ">>> Mouse logger ending! <<<"
+}

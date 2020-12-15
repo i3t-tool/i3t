@@ -1,0 +1,127 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 278.6
+	projectionPosition 0 0
+	projectionScale 1
+	transformationForm {
+		position 910 228.4
+		inputsStorage 9 0 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1140 499.4
+		inputsStorage 14 0 
+		inputsMultiOut 5 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 983 501.4
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.015 0.015 -0.03 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		VecVecToQuat {
+			position 423 227.4
+			inputs 7 0 8 0  
+		}
+		Vector3Sender {
+			position 296 154.4
+			inputs -1  
+			value 0.015 0.27 -0.15 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.015 0.27 -0.15 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position 295 255.4
+			inputs -1  
+			value 1.56 0.045 -0.3 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.56 0.045 -0.3 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 668 228.4
+			inputs 6 0  
+		}
+		QuatLength {
+			position 670 348.4
+			inputs 6 0  
+		}
+		Vector3Length {
+			position 422 154.4
+			inputs 7 0  
+		}
+		Vector3Length {
+			position 423 311.4
+			inputs 8 0  
+		}
+		Vector3Sender {
+			position 295 527.4
+			inputs 21 0  
+			value 0.981613 0.0283157 -0.188772 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.12 0.045 -0.045 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 668 500.4
+			inputs 15 0  
+		}
+		VecVecToQuat {
+			position 423 499.4
+			inputs 16 0 13 0  
+		}
+		Vector3Sender {
+			position 296 426.4
+			inputs 20 0  
+			value 0.0485071 0.873128 -0.485071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.015 0.27 -0.15 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Length {
+			position 423 583.4
+			inputs 13 0  
+		}
+		QuatLength {
+			position 670 620.4
+			inputs 15 0  
+		}
+		Vector3Length {
+			position 422 426.4
+			inputs 16 0  
+		}
+		NormalizeVector3 {
+			position 156 426.4
+			inputs 7 0  
+		}
+		NormalizeVector3 {
+			position 155 524.4
+			inputs 8 0  
+		}
+	}
+}

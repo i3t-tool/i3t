@@ -1,0 +1,352 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 5.03476 -4.58208 4.25104
+		lookAt 0.260483 -0.601326 0.119116
+		up 0 1 0
+		orbitCenter 0.260483 -0.601326 0.119116
+		radians 1
+	}
+	desc {
+Comparison of different methods for computation o vector rotation by quaternion
+1. qvq*
+2. (qv)q*
+3. q(vq*)
+v is used as is, without normalization. This results in non-unit quaternion
+
+Color legend:
+Red - input vector v
+       - normalized input vector v
+Yellow - qvq*
+Blue - (qv)q* and normalized
+Cyan - q(vq*)
+
+}
+		position 871 164
+}
+transformationSpace {
+	position 3 201
+	projectionPosition -455.803 -352.68
+	projectionScale 1.99729
+	transformationForm {
+		position 1189.47 -210.779
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+Normalized vector v (to be rotated)}
+		position 1380.26 -208.359
+		inputsStorage 33 0 
+		inputsMultiOut 1 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1197.09 -3.41728
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+v rotated by qvq*}
+		position 1387.88 -0.997284
+		inputsStorage 34 0 
+		inputsMultiOut 5 0 
+		object objects basics vectors yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1194.37 165.709
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.135 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+v rotated as (qv)q* 
+|v| <> 1}
+		position 1385.16 168.129
+		inputsStorage 35 0 
+		inputsMultiOut 9 0 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1185 -399.527
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+Vector v (to be rotated)}
+		position 1375.79 -397.107
+		inputsStorage 39 0 
+		inputsMultiOut 13 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1232.27 465.622
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.015 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+v rotated as (qv)q*
+using normalized v for rotation multiplied by original |v| at the end}
+		position 1423.06 468.042
+		inputsStorage 45 0 
+		inputsMultiOut 17 0 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1222.54 720.78
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.255 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+v rotated as q(vq*) - demonstration of different associativity}
+		position 1413.33 723.2
+		inputsStorage 52 0 
+		inputsMultiOut 21 0 
+		object objects basics vectors cyan
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		QuatMulQuat {
+			position 171.835 224.811
+			inputs 26 0 30 0  
+		}
+		ConjQuat {
+			position 37.5884 341.047
+			inputs 26 0  
+		}
+		QuatSender {
+		hint {
+Podle tohoto kvaternionu se rotuje vektor v}
+			position 253.835 -524.049
+			inputs 42 0  
+			value 0.548064 0.51457 0.257332 0.607143 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.834999 0.285 -0.24 -2.49 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatMulQuat {
+			position 307.075 341.887
+			inputs 24 0 25 0  
+		}
+		Vector3Sender {
+		hint {
+Vektor, ktery se rotuje kvaternionem
+Obecný vektor libovolné délky.
+Nemusi se normalizovat, aby byl pro qvq*jednotkovy. 
+Nenormalizovany v ma stejne hodnotu w=0, coz je podminkou, 
+aby qvq* nemìnilo délku vektoru.}
+			position -360.352 -397.405
+			inputs 49 0  
+			value 1.3794 1.1628 0.5985 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.21 1.32 0.525 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatVecConjQuat {
+			position 697.047 -0.25885
+			inputs 26 0 28 0  
+		}
+		FloatsToQuat {
+			position -203.624 110.833
+			inputs 31 0 31 1 31 2 -1  
+		}
+		Vector3ToFloats {
+			position -362.624 108.833
+			inputs 28 0  
+		}
+		NormalizeQuat {
+			position -208.931 236.037
+			inputs 30 0  
+		}
+		ShowVector3 {
+			position 931.144 -210.939
+			inputs 40 0  
+		}
+		ShowVector3 {
+			position 938.763 -3.57729
+			inputs 29 0  
+		}
+		ShowVector3 {
+			position 936.043 165.549
+			inputs 37 0  
+		}
+		QuatToFloatVec {
+			position 554.511 319.893
+			inputs 27 0  
+		}
+		Vector3Sender {
+			position 730.09 342.414
+			inputs 36 1  
+			value 1.30153 1.2795 0.530989 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Length {
+			position -233.396 -399.305
+			inputs 28 0  
+		}
+		ShowVector3 {
+			position 926.673 -399.687
+			inputs 28 0  
+		}
+		NormalizeVector3 {
+			position -232.099 -322.737
+			inputs 28 0  
+		}
+		OrbitRotate {
+			position -360.577 -597.86
+			inputs  
+			value 0.337993 0.87651 -0.342767 0 0.251562 0.26681 0.930338 0 0.906903 -0.400675 -0.130314 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixToQuat {
+			position -1.09809 -523.888
+			inputs 41 0  
+		}
+		QuatLength {
+			position 548.604 453.532
+			inputs 27 0  
+		}
+		QuatLength {
+			position 478.384 -542.656
+			inputs 26 0  
+		}
+		ShowVector3 {
+			position 973.938 465.462
+			inputs 46 0  
+		}
+		Vector3MulFloat {
+			position 832.092 481.027
+			inputs -1 37 0  
+		}
+		QuatToFloats {
+			position 554.81 191.027
+			inputs 27 0  
+		}
+		QuatToFloatVec {
+			position 620.947 -455.117
+			inputs 26 0  
+		}
+		Vector3MulFloat {
+			position -381.334 -242.705
+			inputs 51 0 50 0  
+		}
+		Vector3Sender {
+			position -529.782 -401.484
+			inputs -1  
+			value 1.21 1.02 0.525 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.21 1.02 0.525 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position -512.334 -242.705
+			inputs -1  
+			value 1.14 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.14 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 964.215 720.62
+			inputs 56 0  
+		}
+		QuatMulQuat {
+			position -10.9881 791.098
+			inputs 30 0 25 0  
+		}
+		QuatMulQuat {
+			position 263.538 730.317
+			inputs 26 0 53 0  
+		}
+		QuatToFloatVec {
+			position 510.974 708.323
+			inputs 54 0  
+		}
+		Vector3Sender {
+			position 686.553 730.844
+			inputs 55 1  
+			value 1.30153 1.2795 0.530989 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatLength {
+			position 505.067 841.962
+			inputs 54 0  
+		}
+		QuatToFloats {
+			position 511.273 579.457
+			inputs 54 0  
+		}
+	}
+}

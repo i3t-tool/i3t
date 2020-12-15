@@ -1,0 +1,298 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -1.15189 0.873523 3.70246
+		lookAt 0.150549 -0.722663 -0.00305872
+		up 0 1 0
+		orbitCenter 0.150549 -0.722663 -0.00305872
+		radians 1
+	}
+	desc {
+Vector Cross product variants
+===================
+Input - vectors red and green
+
+Output
+a) cross product of original vectors 
+    blue = cross(red,green)
+    white = normalize(blue)
+
+b) cross product of normalized vectors  
+    magenta = normalize(red) and cyan = normalized(green)
+    yellow = cross(magenta, green)
+    white = normalize(yellow)
+
+Yellow should have the length sin(angle), as 
+||magenta  x green|| = ||magenta|| ||green|| sin(angle).
+angle = angle(magenta, green) }
+		position 802 421
+}
+transformationSpace {
+	position 3 325
+	projectionPosition 170.332 -647.712
+	projectionScale 1.65708
+	transformationForm {
+		position 1692 204
+		inputsStorage 20 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.21 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1884 204
+		inputsStorage 35 0 
+		inputsMultiOut 1 0 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1692 336
+		inputsStorage 0 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -5.02914e-008 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1884 336
+		inputsStorage 36 0 
+		inputsMultiOut 5 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2225.05 -64.2917
+		inputsStorage 26 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.23 -0.375 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2417.05 -64.2917
+		inputsStorage 41 0 
+		inputsMultiOut 9 0 
+		object objects basics vectors yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2218.6 80.5834
+		inputsStorage 26 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -1.365 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2410.6 80.5834
+		inputsStorage 42 0 
+		inputsMultiOut 13 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2224.48 -232.292
+		inputsStorage 26 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.2 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2416.48 -232.292
+		inputsStorage 44 0 
+		inputsMultiOut 17 0 
+		object objects basics vectors cyan
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1681.08 -363.684
+		inputsStorage 30 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.2 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1873.08 -363.684
+		inputsStorage 45 0 
+		inputsMultiOut 21 0 
+		object objects basics vectors green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2410.92 -518.146
+		inputsStorage 46 0 
+		inputsMultiOut 27 0 
+		object objects basics vectors magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2212.48 -520.292
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.575 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1875.27 -655.133
+		inputsStorage 47 0 
+		inputsMultiOut 31 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1683.27 -655.133
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -1.11 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		Vector3Sender {
+			position 499.518 -641.13
+			inputs -1  
+			value -0.77 0.149996 0.15 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.77 0.149996 0.15 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position 499.518 -355.025
+			inputs -1  
+			value 2.04999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2.04999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3CrossVector3 {
+			position 995.831 206.146
+			inputs 32 0 33 0  
+		}
+		ShowVector3 {
+			position 1440 204
+			inputs 34 0  
+		}
+		ShowVector3 {
+			position 1440 336
+			inputs 37 0  
+		}
+		NormalizeVector3 {
+			position 1246.65 342.438
+			inputs 34 0  
+		}
+		NormalizeVector3 {
+			position 825.914 -211.708
+			inputs 33 0  
+		}
+		NormalizeVector3 {
+			position 825.914 -499.708
+			inputs 32 0  
+		}
+		Vector3CrossVector3 {
+			position 1089.6 -44.9791
+			inputs 39 0 38 0  
+		}
+		ShowVector3 {
+			position 1440 -60
+			inputs 40 0  
+		}
+		ShowVector3 {
+			position 1440 72
+			inputs 43 0  
+		}
+		NormalizeVector3 {
+			position 1246.65 78.4376
+			inputs 40 0  
+		}
+		ShowVector3 {
+			position 1440 -224.583
+			inputs 38 0  
+		}
+		ShowVector3 {
+			position 1441.08 -363.684
+			inputs 33 0  
+		}
+		ShowVector3 {
+			position 1440 -514.729
+			inputs 39 0  
+		}
+		ShowVector3 {
+			position 1443.27 -655.133
+			inputs 32 0  
+		}
+		Vector3Length {
+			position 1234.67 -68.8012
+			inputs 40 0  
+		}
+		Vector3Length {
+			position 992.824 -531.066
+			inputs 39 0  
+		}
+		Vector3Length {
+			position 1149.99 189.623
+			inputs 34 0  
+		}
+	}
+}

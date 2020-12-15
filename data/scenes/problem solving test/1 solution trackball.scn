@@ -1,0 +1,233 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 4.00156 12.4273 -5.63976
+		lookAt 2.21486 -7.45484 -1.13687
+		up 0 1 0
+		orbitCenter 2.21486 -7.45484 -1.13687
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 500
+	projectionPosition -316.508 -170.215
+	projectionScale 1.23453
+	transformationForm {
+		position 992.451 33.5492
+		inputsStorage 14 0 
+		inputsMultiOut 3 0 
+		object objects basics cube red
+		objectVisible 1
+		transformations {
+			translation {
+				params 2 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 4 0 0 1
+				hint {
+translation by [4, 0, 0]}
+				isLocked 1
+				useSynergies 0
+			}
+			rotationY {
+				params -60
+				default 0.5 0 0.866025 0 0 1 0 0 -0.866025 0 0.5 0 0 0 0 1
+				matrix 0.5 0 0.866025 0 0 1 0 0 -0.866025 0 0.5 0 0 0 0 1
+				hint {
+rotation about 60 degrees in y - axes}
+				isLocked 1
+				useSynergies 1
+			}
+			uniformScale {
+				params 2
+				default 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				matrix 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				hint {
+uniform scale of 2}
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 749.488 25.6716
+		inputsStorage 23 0 
+		inputsMultiOut 11 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 60.4162 26.3372
+		inputsStorage 22 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1273.96 183.35
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		object objects basics cube green
+		objectVisible 1
+		transformations {
+			uniformScale {
+				params 1
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 0.16 0 0 0 0 0.16 0 0 0 0 0.16 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1071.59 206.116
+		inputsStorage 22 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 477.977 21.4556
+		inputsStorage -1 
+		inputsMultiOut 5 0 
+		transformations {
+			scale {
+				params 1 1 1
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 997.637 352.283
+		inputsStorage 14 0 
+		inputsMultiOut 17 0 
+		object objects basics cube white
+		objectVisible 1
+		transformations {
+			translation {
+				params 2 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 4 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+			rotationY {
+				params -60
+				default -0.952413 0 -0.304811 0 0 1 0 0 0.304811 0 -0.952413 0 0 0 0 1
+				matrix 0.5 0 0.866025 0 0 1 0 0 -0.866025 0 0.5 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			uniformScale {
+				params 2
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 977.823 -140.334
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube yellow
+		objectVisible 1
+		transformations {
+			translation {
+				params 2 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+			rotationY {
+				params -60
+				default -0.952413 0 -0.304811 0 0 1 0 0 0.304811 0 -0.952413 0 0 0 0 1
+				matrix 0.29 0 0.957027 0 0 1 0 0 -0.957027 0 0.29 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			uniformScale {
+				params 2
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 787.944 371.525
+		inputsStorage 23 0 
+		inputsMultiOut 21 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 71.7127 407.992
+		inputsStorage 22 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 512.83 360.6
+		inputsStorage 29 0 
+		inputsMultiOut 19 0 
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		Translation {
+			position 196.28 140.42
+			inputs 24 0  
+		}
+		Inversion {
+			position 196.28 256.25
+			inputs 22 0  
+		}
+		Vector3Sender {
+			position 65.2802 140.42
+			inputs -1  
+			value 2.505 0.585 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2.505 0.585 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		AxisAngle {
+			position 455.776 519.356
+			inputs 27 0 28 0  
+		}
+		Vector3Sender {
+			position 51.9455 536.652
+			inputs -1  
+			value 1.29 9.615 0.745001 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.29 9.615 0.745001 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 316.135 455.16
+			inputs -1  
+			value 1.57 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.57 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 269.362 536.639
+			inputs 26 0  
+		}
+		OrbitRotate {
+			position -317.039 110.727
+			inputs  
+			value -0.66667 -0.405522 0.625383 0 -0.670709 0.692375 -0.266023 0 -0.325122 -0.596797 -0.73357 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

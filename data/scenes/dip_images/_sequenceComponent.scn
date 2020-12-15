@@ -1,0 +1,46 @@
+scene {
+	camera {
+		position 2.67571 0.605375 2.09766
+		lookAt 1.50329 -0.55469 -0.948601
+		up 0 1 0
+		orbitCenter 1.50329 -0.55469 -0.948601
+	}
+}
+transformationSpace {
+	position 3 414
+	projectionPosition 9 -42
+	projectionScale 1
+	transformationForm {
+		position 442 30
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube red
+		transformations {
+			translation {
+				params 10 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+			rotationY {
+				params 45
+				default 0.707107 0 -0.707107 0 0 1 0 0 0.707107 0 0.707107 0 0 0 0 1
+				matrix 0.707107 0 -0.707107 0 0 1 0 0 0.707107 0 0.707107 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			scale {
+				params 0.5 0.5 0.5
+				default 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 1
+				matrix 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+	}
+}

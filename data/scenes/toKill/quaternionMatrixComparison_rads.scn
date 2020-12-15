@@ -1,0 +1,134 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -2.48031 4.02287 -6.72551
+		lookAt -0.0639917 -2.34654 1.21702
+		up 0 1 0
+		orbitCenter -0.0639917 -2.34654 1.21702
+	}
+}
+transformationSpace {
+	position 3 325.607
+	projectionPosition 848.837 158.861
+	projectionScale 1.44818
+	transformationForm {
+		position 2305.1 761.986
+		inputsStorage 10 0 
+		inputsMultiOut 3 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Vzajemne posunuti kosticek (relativni posun zelene kosticky)}
+		position 2058.52 749.5
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.995 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1989.88 602.642
+		inputsStorage 16 0 
+		inputsMultiOut 7 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Spolecny posun obou kosticek}
+		position 1715.98 590.811
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.815 0 2.7 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatSender {
+			position 161.303 527.949
+			inputs  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 2242.16 374.271
+			inputs 12 0  
+		}
+		QuatToMatrix {
+			position 2241.97 452.754
+			inputs 9 0  
+		}
+		floatCycle {
+		hint {
+Uhel otoceni okolo zadane osy}
+			position 1107.51 250.241
+			inputs -1 -1 -1  
+			value 5.63003 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 0
+		}
+		FloatsToQuat {
+			position 2256.3 246.413
+			inputs 20 0 20 1 20 2 15 1  
+		}
+		FloatDivFloat {
+			position 1375.58 449.726
+			inputs 11 0 14 0  
+		}
+		FloatSender {
+			position 1267.97 499.407
+			inputs  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position 1517.05 446.984
+			inputs 13 0  
+		}
+		AxisAngle {
+			position 1930.31 460.425
+			inputs 11 0 18 0  
+		}
+		Vector3Sender {
+		hint {
+Osa rotace}
+			position 1595.41 167.256
+			inputs  
+			value 2.68 -2.58 1.47 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 1639.69 245.849
+			inputs 17 0  
+		}
+		Vector3MulFloat {
+			position 1890 255
+			inputs 15 0 18 0  
+		}
+		Vector3ToFloats {
+			position 2103.83 239.373
+			inputs 19 0  
+		}
+	}
+}

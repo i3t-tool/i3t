@@ -1,0 +1,292 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 7.08225 -1.47246 0.324251
+		lookAt 0.0575264 -1.47246 0.324251
+		up 0 1 0
+		orbitCenter 0.0575264 -1.47246 0.324251
+		radians 1
+	}
+	desc {
+Comparison of quaternion rotation operators:
+
+Interpolate rotation from yellow to blue.
+yellow cube - from
+blue cube - to
+green cube Slerp - use the shorter way (dot > 0)
+magenta cube - Slerp Long Way (dot < 0)
+red cube - Lerp
+
+Task
+1. Try manual changing of interpolation parameter - use |< and>| buttons on float cycle
+    - see the difference betweem lerp (red) and slerp (green).
+      For which parametervalues are they rotations  identical?
+Move the red cube slightly to the left by modifying its translation to (0,0,1.33).
+2. Reconnect lerp directly to quat->mat to skip normalization. 
+    See the influece on red cube. 
+3. Modify start end end quaternions. See the influence of selecting 
+    the shorter interpolation way by taking dot()>0.
+    Or reconnect to the second predefined end quat. 
+    a) for what dot(start,end) is the rotation orientation of mix (green) equal to slerp (green) and for which ones is equal to longWaySlerp (magenta)? }
+		position 444 409
+}
+transformationSpace {
+	position 3 402
+	projectionPosition -836.379 -220.271
+	projectionScale 1.54705
+	transformationForm {
+		position 976.471 74.4675
+		inputsStorage 22 0 
+		inputsMultiOut 17 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 979.699 214.493
+		inputsStorage 23 0 
+		inputsMultiOut 5 0 
+		object objects basics cube red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 784.814 214.493
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 982.453 374.67
+		inputsStorage 34 0 
+		inputsMultiOut 19 0 
+		object objects basics cube magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 973.682 -67.074
+		inputsStorage 37 0 
+		inputsMultiOut 15 0 
+		object objects basics cube blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 974.451 -209.802
+		inputsStorage 38 0 
+		inputsMultiOut 13 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 780.839 -209.298
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 3 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 781.609 -67.4045
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 3 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 784.749 73.3031
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.395 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 782.273 374.262
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -1.815 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		QuatSlerp {
+			position 33.3213 72.6986
+			inputs 29 0 30 0 24 0  
+		}
+		QuatLerp {
+			position 35.6931 213.603
+			inputs 29 0 30 0 24 0  
+		}
+		QuatToMatrix {
+			position 535.115 74
+			inputs 27 0  
+		}
+		QuatToMatrix {
+			position 536.301 213.533
+			inputs 28 0  
+		}
+		FloatSender {
+			position -241.062 266.986
+			inputs 31 0  
+			value 0.62 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2.76001 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatSender {
+		hint {
+Start orientation quaternion}
+			position -485.137 -187.471
+			inputs -1  
+			value 0.985 4.65661e-008 0 -0.964999 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.985 4.65661e-008 0 -0.964999 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0.985 4.65661e-008 0 -0.964999 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatSender {
+		hint {
+End orientation quaternion
+
+dot(start,end) > 0   
+
+=> short path
+=> end is used directly
+}
+			position -483.951 -46.1048
+			inputs -1  
+			value 2.575 4.74 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2.575 4.74 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 2.575 2.475 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+		hint {
+Normalization after slerp is not necessary - slerp returns unit quaternion, |q| == 1}
+			position 272.487 73.2816
+			inputs 20 0  
+		}
+		NormalizeQuat {
+		hint {
+Normalization after Lerp is absolutely  necessary - Lerp returns a shorter quaternion, |q|<=1 }
+			position 278.796 213.876
+			inputs 21 0  
+		}
+		NormalizeQuat {
+			position -247.89 -187.643
+			inputs 25 0  
+		}
+		NormalizeQuat {
+			position -243.431 -47.0668
+			inputs 26 0  
+		}
+		floatCycle {
+			position -484.906 161.651
+			inputs -1 -1 -1  
+			value 0.62 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 2
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		QuatToMatrix {
+			position 535.662 373.461
+			inputs 35 0  
+		}
+		NormalizeQuat {
+			position 280.619 377.005
+			inputs 36 0  
+		}
+		QuatLongWaySlerp {
+			position 38.7084 379.71
+			inputs 29 0 30 0 24 0  
+		}
+		QuatToMatrix {
+			position 534.699 -67.5415
+			inputs 30 0  
+		}
+		QuatToMatrix {
+			position 537.839 -210.269
+			inputs 29 0  
+		}
+		QuatLength {
+			position 279.673 287.146
+			inputs 21 0  
+		}
+		QuatLength {
+			position 273.326 150.348
+			inputs 20 0  
+		}
+		QuatLength {
+			position 409.707 287.915
+			inputs 28 0  
+		}
+		QuatSender {
+		hint {
+dot(start,end) < 0   
+
+=> long path
+=> - end (negation of end) and negative angle are used 
+
+
+T cosTheta = dot(x, y);
+
+// If cosTheta < 0, the interpolation will take the long way around the sphere. 
+// To fix this, one quat must be negated.
+if (cosTheta < T(0))
+{
+    z        = -y;
+    cosTheta = -cosTheta;
+}}
+			position -484.294 39.2157
+			inputs -1  
+			value 0.955 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.955 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0.955 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

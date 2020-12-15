@@ -1,0 +1,258 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2.28227 -0.178102 0.787452
+		lookAt -0.0700714 -0.314727 0.0664942
+		up 0 1 0
+		orbitCenter -0.0700714 -0.314727 0.0664942
+		radians 1
+	}
+	desc {
+Jednoducha demonstrace, ze rotace q a -q je totozna.
+
+Nevim, jestli se to znamenko nepolaci v modulu quat-> mat
+}
+		position 444 409
+}
+transformationSpace {
+	position 3 172
+	projectionPosition -527.962 -503.878
+	projectionScale 1.36666
+	transformationForm {
+		position 445.765 -12.308
+		inputsStorage 29 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 782.003 -10.3189
+		inputsStorage -1 
+		inputsMultiOut 1 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 409.885 307.142
+		inputsStorage 30 0 
+		inputsMultiOut 9 0 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 741.059 309.131
+		inputsStorage -1 
+		inputsMultiOut 5 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 109.145 303.123
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -3.525 -0.045 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 434.253 -301.814
+		inputsStorage 36 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 770.492 -299.825
+		inputsStorage -1 
+		inputsMultiOut 11 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1656.05 -64.0141
+		inputsStorage 37 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1992.29 -62.025
+		inputsStorage -1 
+		inputsMultiOut 15 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1695.68 247.585
+		inputsStorage 38 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 2031.92 249.574
+		inputsStorage -1 
+		inputsMultiOut 19 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatVecToQuat {
+			position -106.04 -184.305
+			inputs 23 0 -1 24 0  
+		}
+		FloatSender {
+			position -269.04 -184.305
+			inputs -1  
+			value -6.345 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -6.345 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -404.384 -120.807
+			inputs -1  
+			value -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatMulQuat {
+			position -97.0873 54.035
+			inputs 22 0 26 0  
+		}
+		FloatsToQuat {
+			position -84.1878 151.849
+			inputs 28 0 28 0 28 0 27 0  
+		}
+		FloatSender {
+			position -245.71 215.401
+			inputs -1  
+			value -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position -245.71 153.635
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 342.624 -131.804
+			inputs 22 0  
+		}
+		QuatToMatrix {
+			position 327.003 182.581
+			inputs 25 0  
+		}
+		QuatSlerp {
+			position 1208.17 63.2909
+			inputs 33 0 22 0 39 0  
+		}
+		QuatLerp {
+			position 1208.63 172.026
+			inputs 33 0 22 0 39 0  
+		}
+		FloatVecToQuat {
+			position -133.952 -446.478
+			inputs 34 0 -1 35 0  
+		}
+		FloatSender {
+			position -296.952 -446.478
+			inputs -1  
+			value -9.61499 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -9.61499 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -432.296 -382.98
+			inputs -1  
+			value -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 331.112 -421.31
+			inputs 33 0  
+		}
+		QuatToMatrix {
+			position 1552.91 -183.51
+			inputs 31 0  
+		}
+		QuatToMatrix {
+			position 1592.54 128.089
+			inputs 42 0  
+		}
+		floatCycle {
+			position 1070.77 -357.911
+			inputs -1 -1 -1  
+			value 0.410001 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 2
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		NormalizeQuat {
+			position 1311.3 313.118
+			inputs 32 0  
+		}
+	}
+}

@@ -1,0 +1,36 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 1.99525 3.95728 7.30088
+		lookAt 0.740074 -2.3395 -2.19661
+		up 0 1 0
+		orbitCenter 0.740074 -2.3395 -2.19661
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 656
+	projectionPosition -193.292 -19.0219
+	projectionScale 1.0375
+	transformationForm {
+		position 637.855 251.877
+		inputsStorage 2 0 
+		inputsMultiOut -1 
+		object objects basics axes
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		OrbitRotate {
+			position 180.319 95.2153
+			inputs  
+			value 1 0 0 0 0 0 -1 0 0 1 0 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

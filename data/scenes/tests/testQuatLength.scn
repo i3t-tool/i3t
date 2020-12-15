@@ -1,0 +1,111 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 1
+	}
+	desc {
+Test of quat functions:
+- conjugate
+- mormalize
+- length
+- float * quat
+- inverse
+- multiplication pq}
+		position 413 35
+}
+transformationSpace {
+	position 3 252
+	projectionPosition 949.887 -244.632
+	projectionScale 0.880295
+	transformations {
+	}
+	operators {
+		QuatLength {
+			position 1405.23 -218.694
+			inputs 1 0  
+		}
+		QuatSender {
+			position 1018.93 -215.564
+			inputs -1  
+			value 1.755 1.56 0.735 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.755 1.56 0.735 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 1002.07 -124.889
+			inputs 1 0  
+		}
+		QuatLength {
+			position 1405.24 -128.41
+			inputs 2 0  
+		}
+		ConjQuat {
+			position 1256.17 35.5518
+			inputs 1 0  
+		}
+		QuatLength {
+			position 1504.45 37.1057
+			inputs 4 0  
+		}
+		QuatInverse {
+			position 1257.38 203.447
+			inputs 1 0  
+		}
+		QuatMulQuat {
+			position 1504.03 202.062
+			inputs 1 0 6 0  
+		}
+		QuatLength {
+			position 1752.73 202.479
+			inputs 7 0  
+		}
+		FloatMulQuat {
+			position 1701.55 -205.502
+			inputs 11 0 1 0  
+		}
+		FloatMulQuat {
+			position 1705.99 -44.3727
+			inputs 11 0 2 0  
+		}
+		FloatSender {
+			position 1572.31 -43.5275
+			inputs -1  
+			value 0.675 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.675 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatLength {
+			position 1961.61 -195.771
+			inputs 9 0  
+		}
+		QuatLength {
+			position 1950.2 -31.1213
+			inputs 10 0  
+		}
+		FloatMulQuat {
+			position 1255.87 117.691
+			inputs 15 0 1 0  
+		}
+		FloatSender {
+			position 1124.87 104.486
+			inputs -1  
+			value -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatLength {
+			position 1504.49 119.008
+			inputs 14 0  
+		}
+		FloatMulFloat {
+			position 1963.63 -133.193
+			inputs 11 0 0 0  
+		}
+	}
+}

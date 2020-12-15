@@ -1,0 +1,4 @@
+// the configured options and settings for I3T
+#define I3T_VERSION_MAJOR @I3T_VERSION_MAJOR@
+#define I3T_VERSION_MINOR @I3T_VERSION_MINOR@
+#cmakedefine I3T_VERSION "@I3T_VERSION@"

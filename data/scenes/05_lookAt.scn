@@ -1,0 +1,119 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 19.2556 3.61861 -1.65943
+		lookAt -0.557345 -6.14843 -5.74582
+		up 0 1 0
+		orbitCenter -0.557345 -6.14843 -5.74582
+		radians 1
+	}
+	desc {
+The scene demonstrates the function lookAt(...) that is used for a construction of the view transformation matrix of the camera.
+
+1. Edit the values of all of the input vectors and explain their purpose.
+
+2. Explain why the position of the camera does not correspond the translation in the fourth column of the view transformation matrix.
+
+3. Use the operators to construct your own view transformation matrix from the input vectors.
+
+4. Use a combination of the translation and the rotation to construct your own view transformation matrix.
+}
+		position 863 32
+}
+transformationSpace {
+	position 3 405
+	projectionPosition -25 31
+	projectionScale 1
+	cameraTransformationForm {
+		position 456 274
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				perspective {
+					params 70 1.33 1 6
+					default 1.58686 0 0 0 0 2.11053 0 0 0 0 -1.4 -1 0 0 -2.4 0
+					matrix 1.58686 0 0 0 0 2.11053 0 0 0 0 -1.4 -1 0 0 -2.4 0
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage 8 0 
+			inputsMultiOut 2 0 
+			transformations {
+			}
+		}
+	}
+	transformationForm {
+		position 818 350
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 818 29
+		size 383 304
+		input 0 0 
+	}
+	operators {
+		LookAt {
+		hint {
+function glm::lookAt() creates a viewing matrix derived from an eye point, a reference point indicating the center of the scene, and an UP vector. The matrix maps the reference point to the negative z axes and the eye point to the origin. When a typical projection matrix is used, the center of the scene therefore maps to the center of the viewport. Similarly, the direction described by the UP vector projected onto the viewing plane is mapped to the positive y axes so that it points upward in the viewport. The UP vector must not be parallel to the line of sight from the eye point to the reference point.}
+			position 419 139
+			inputs 9 0 10 0 11 0  
+		}
+		Vector3Sender {
+		hint {
+Eye vector:
+
+Specifies the position of the eye point. Position of camera.}
+			position 203 92
+			inputs -1  
+			value 2 1 2 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2 1 2 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 2 1 2 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+Center vector:
+
+Specifies the position of the reference point. Position of point the camera looking at.}
+			position 203 164
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+Up vector:
+
+Specifies the direction of the up vector.}
+			position 202 234
+			inputs -1  
+			value 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

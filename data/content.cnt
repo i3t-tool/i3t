@@ -1,0 +1,26 @@
+// -----------------------------------------------------------------
+// content definition file
+//
+// restricted order :
+//
+// TEXTURES_CFG's
+// MATERIALS_CFG's
+// GEOMETRIES_CFG's
+// OBJECTS_CFG's
+// -----------------------------------------------------------------
+
+// textures
+// -----------------------------------------------------------------
+TEXTURES_CFG	\data\textures.cfg
+
+// materials
+// -----------------------------------------------------------------
+MATERIALS_CFG	\data\materials.cfg
+
+// geometries
+// -----------------------------------------------------------------
+GEOMETRIES_CFG	\data\geometries.cfg
+
+// objects
+// -----------------------------------------------------------------
+OBJECTS_CFG		\data\objects.cfg

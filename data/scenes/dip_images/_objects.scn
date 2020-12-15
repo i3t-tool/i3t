@@ -1,0 +1,124 @@
+scene {
+	camera {
+		position 6.45994 4.81014 6.8934
+		lookAt 2.69819 -3.91851 -1.16965
+		up 0 1 0
+		orbitCenter 3.30181 -2.5179 0.124157
+	}
+}
+transformationSpace {
+	position 3 621
+	projectionPosition -14.6636 -0.316787
+	projectionScale 1.69582
+	transformationForm {
+		position 177 78
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 414 65
+		inputsStorage -1 
+		inputsMultiOut 1 0 
+		object objects basics cube red
+		transformations {
+			translation {
+				params 1.5 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 1.5 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.2 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 692 77
+		inputsStorage 2 0 
+		inputsMultiOut 3 0 
+		object objects basics cube blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 976 82
+		inputsStorage 4 0 
+		inputsMultiOut 5 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1272 81
+		inputsStorage 6 0 
+		inputsMultiOut 7 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1553 85
+		inputsStorage 8 0 
+		inputsMultiOut 9 0 
+		object objects basics cube cyan
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1834 89
+		inputsStorage 10 0 
+		inputsMultiOut 11 0 
+		object objects basics cube magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1284 224.934
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		object objects basics axis
+		transformations {
+			translation {
+				params 1.5 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 1.5 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.605 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 642.886 228.281
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects custom teapot
+		transformations {
+			translation {
+				params 1.5 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 1.5 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.42 -0.465001 2.565 1
+				isLocked 1
+				useSynergies 0
+			}
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 0.947467 0 -0.319853 0 0 1 0 0 0.319853 0 0.947467 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			uniformScale {
+				params 1
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 2.365 0 0 0 0 2.365 0 0 0 0 2.365 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+	}
+}

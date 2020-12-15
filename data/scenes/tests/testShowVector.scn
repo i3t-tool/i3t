@@ -1,0 +1,199 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 3.57432 1.94821 7.28261
+		lookAt 0.375043 -2.56704 0.235663
+		up 0.0502009 0.830419 -0.554872
+		orbitCenter 0.375043 -2.56704 0.235663
+		radians 1
+	}
+	desc {
+Testing of mudule showVec3.
+Demonstration on Linear interpolation of two vectors - mix(vec3, vec3, t)}
+		position 820 95
+}
+transformationSpace {
+	position 3 385
+	projectionPosition -926.245 -167.61
+	projectionScale 1.90388
+	transformationForm {
+		position 1055.65 492.925
+		inputsStorage 12 0 
+		inputsMultiOut -1 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1054.14 -30.0193
+		inputsStorage 15 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1055 141.165
+		inputsStorage 22 0 
+		inputsMultiOut -1 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1052.29 -156.367
+		inputsStorage 23 0 
+		inputsMultiOut -1 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1056.83 266.351
+		inputsStorage 27 0 
+		inputsMultiOut -1 
+		object objects basics vectors green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1056 618.995
+		inputsStorage 29 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		ShowVector3 {
+			position 798.929 492.959
+			inputs 14 0  
+		}
+		OrbitRotate {
+			position -705.395 -132.702
+			inputs  
+			value 0.658199 -0.109921 -0.744775 0 -0.744689 0.0501621 -0.665526 0 0.110514 0.992675 -0.0488428 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position 390.84 20.132
+			inputs 18 0  
+			value 0.261291 -0.815483 0.666037 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.149997 -3.96 -3.365 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 800.929 -37.0195
+			inputs 16 0  
+		}
+		NormalizeVector3 {
+			position 668.929 -31.0193
+			inputs 19 0  
+		}
+		MatrixMulVector {
+			position -351.375 69.2034
+			inputs 13 0 32 0  
+		}
+		MixVector3 {
+			position 243.15 17.6149
+			inputs 19 0 20 0 21 0  
+		}
+		Vector3Sender {
+		hint {
+Vector to
+}
+			position -44.1207 -21.8321
+			inputs -1  
+			value 0.179997 -0.959996 0.954999 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.179997 -0.959996 0.954999 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -42.6035 84.1682
+			inputs 31 0  
+			value 0.658199 -0.109921 -0.744775 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1.085 -0.395 1.55 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Interpolation parameter t}
+			position 364.566 384.628
+			inputs 24 0  
+			value 0.17 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.369999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 800.038 139.441
+			inputs 20 0  
+		}
+		ShowVector3 {
+			position 800.843 -158.091
+			inputs 19 0  
+		}
+		floatCycle {
+			position -8.49735 365.26
+			inputs -1 -1 -1  
+			value 0.17 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 2
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		ShowVector3 {
+			position 796.585 262.868
+			inputs 28 0  
+		}
+		NormalizeVector3 {
+			position 664.585 268.868
+			inputs 20 0  
+		}
+		ShowVector3 {
+			position 799.275 619.029
+			inputs 30 0  
+		}
+		NormalizeVector3 {
+			position 667.275 625.03
+			inputs 14 0  
+		}
+		VectorToVector3 {
+			position -189.539 81.7001
+			inputs 17 0  
+		}
+		Vector3ToVector {
+			position -513.742 72.0454
+			inputs 33 0 -1  
+		}
+		Vector3Sender {
+		hint {
+Vector from}
+			position -644.742 72.0454
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorToFloats {
+			position -330.53 -135.296
+			inputs 32 0  
+		}
+		VectorPerspectiveDivision {
+			position -165.174 202.54
+			inputs 17 0  
+		}
+	}
+}

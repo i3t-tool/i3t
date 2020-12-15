@@ -1,0 +1,115 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 9.38249 5.44649 8.49153
+		lookAt 7.38248 3.44649 6.49153
+		up 0 1 0
+		orbitCenter 1.60899 -2.32702 0.718029
+	}
+}
+transformationSpace {
+	position 3 535
+	projectionPosition -996.601 19.3375
+	projectionScale 1.77398
+	cameraTransformationForm {
+		position 115.323 342.426
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 0
+		transformationForm {
+			position 0 0
+			inputsStorage 12 0 
+			inputsMultiOut -1 
+			transformations {
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage 16 0 
+			inputsMultiOut 1 0 
+			transformations {
+			}
+		}
+	}
+	transformationForm {
+		position -39.7967 176.242
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 2.82 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position -254.848 186.765
+		inputsStorage 17 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 165.997 44.0271
+		inputsStorage 18 0 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 458.795 42.8627
+		size 655.287 528.378
+		camera 0
+	}
+	operators {
+		floatCycle {
+			position -809.445 43.0783
+			inputs -1 -1 -1  
+			value 0.9 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.03
+			mode 1
+			manualStep 0.1
+			pause 0
+		}
+		Perspective {
+			position -158.19 362.417
+			inputs 13 0 10 0 14 0 15 0  
+		}
+		FloatSender {
+			position -292.19 334.608
+			inputs  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position -291.695 402.154
+			inputs  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position -290.2 465.7
+			inputs  
+			value 4.66 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Inversion {
+			position 176.37 180.669
+			inputs 5 1  
+		}
+		EulerY {
+			position -398.017 38.7409
+			inputs 11 0  
+		}
+		Transpose {
+			position -106.445 40.5718
+			inputs 17 0  
+		}
+	}
+}

@@ -1,0 +1,42 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 1
+	}
+	desc {
+Split matrix to Translation and Rotation
+
+Values in the last row are forgotten.
+}
+		position 444 409
+}
+transformationSpace {
+	position 3 630
+	projectionPosition 158 -8
+	projectionScale 1
+	transformations {
+	}
+	operators {
+		MatrixToTR {
+			position 951 17
+			inputs 1 0  
+		}
+		MatrixSender {
+			position 715 17
+			inputs -1  
+			value 1 0 0 0.18 0.195 1 0.12 0.195 0.255 0.075 1.135 0.33 0.06 0.06 0.03 1
+			manual 1 0 0 0.18 0.195 1 0.12 0.195 0.255 0.075 1.135 0.33 0.06 0.06 0.03 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		TRToMatrix {
+			position 1244 46
+			inputs 0 0 0 1  
+		}
+	}
+}

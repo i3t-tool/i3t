@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Set project name.
-project(I3T VERSION 1.2)
+project(I3T VERSION 2.1.0)
 
 # Required packages.
 find_package(OpenGL REQUIRED)
@@ -15,7 +15,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Version number to file config.h in build directory.
-configure_file(Source/configVersion.h.in Source/configVersion.h)
+configure_file(Source/ConfigVersion.h.in Source/configVersion.h)
 
 # Specifies where build system should find header files.
 include_directories(Source/)
@@ -106,6 +106,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
 set(CONFIGURATION_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS False CACHE BOOL "Assimp should not build build tests.")
+
+set(YAML_BUILD_SHARED_LIBS Off)
 # =============================================================
 
 # ======== Project dependencies which should be compiled. =====
@@ -115,7 +117,6 @@ add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
 
-set(YAML_BUILD_SHARED_LIBS Off)
 
 # ======== Macros and functions. ==============================
 macro(copy_shared_libs target_project from_path)
@@ -193,7 +194,7 @@ add_executable(${PROJECT_NAME} ${I3T_SOURCE}
         Source/Core/Node.h
         Source/Core/Node.cpp
         Source/Core/NodeImpl.h
-        Source/Core/NodeBuilder.h)
+        Source/Core/NodeBuilder.h Source/GUI/Settings.h Source/GUI/Settings.cpp)
 # =============================================================
 
 # Set VS_DEBUGGER_WORKING_DIRECTORY
@@ -239,7 +240,7 @@ endif()
 
 # ==== Target parameters. =====================================
 # Tell ImGui which header file contains OpenGL functions signatures.
-target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1)
+target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
 
 # Link following binaries.
 target_link_libraries(

@@ -1,0 +1,319 @@
+scene {
+	camera {
+		position 2.17934 2.03767 9.87219
+		lookAt -0.179348 -2.7924 0.894563
+		up 0 1 0
+		orbitCenter -0.179348 -2.7924 0.894563
+	}
+}
+transformationSpace {
+	position 3 437.607
+	projectionPosition 572.762 657.997
+	projectionScale 1.36961
+	transformationForm {
+		position 2305 760
+		inputsStorage 22 0 
+		inputsMultiOut 3 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Vzajemne posunuti kosticek (relativni posun zelene kosticky)}
+		position 2055 745
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.995 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1990 600
+		inputsStorage 30 0 
+		inputsMultiOut 7 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Spolecny posun obou kosticek}
+		position 1715 590
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.815 0 2.7 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 3283.28 539.43
+		inputsStorage 39 0 
+		inputsMultiOut 11 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 3087.3 539.43
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2838.18 1091.18
+		inputsStorage -1 
+		inputsMultiOut 17 0 
+		object objects basics cube red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 3292.97 666.492
+		inputsStorage 9 1 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2624.58 1091.1
+		inputsStorage 60 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.995 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1735 605
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.815 0 2.7 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatSender {
+			position 161.303 527.949
+			inputs  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 2395.51 385.737
+			inputs 26 0  
+		}
+		QuatToMatrix {
+			position 2395.32 464.22
+			inputs 21 0  
+		}
+		floatCycle {
+		hint {
+Uhel otoceni okolo zadane osy}
+			position 1107.51 250.241
+			inputs -1 -1 -1  
+			value 2.04 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		FloatsToQuat {
+			position 2256.3 246.413
+			inputs 34 0 34 1 34 2 29 1  
+		}
+		FloatDivFloat {
+			position 1375.58 449.726
+			inputs 23 0 28 0  
+		}
+		FloatSender {
+			position 1267.97 499.407
+			inputs  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position 1517.05 446.984
+			inputs 27 0  
+		}
+		AxisAngle {
+			position 1930.31 460.425
+			inputs 23 0 32 0  
+		}
+		Vector3Sender {
+		hint {
+Osa rotace}
+			position 1557.72 196.329
+			inputs  
+			value 1.72 -2.115 0.0450016 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 1602 274.922
+			inputs 31 0  
+		}
+		Vector3MulFloat {
+			position 1874.39 246.329
+			inputs 29 0 32 0  
+		}
+		Vector3ToFloats {
+			position 2103.83 239.373
+			inputs 33 0  
+		}
+		QuatMulQuat {
+			position 3099.15 868.929
+			inputs -1 36 0  
+		}
+		MatrixToQuat {
+			position 2669.51 794.63
+			inputs -1  
+		}
+		Vector3Sender {
+			position 2650.67 391.229
+			inputs  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 2800.47 391.216
+			inputs 37 0  
+		}
+		AxisAngle {
+			position 3004.39 318.688
+			inputs 40 0 38 0  
+		}
+		FloatSender {
+			position 2651.65 330.35
+			inputs  
+			value -0.0249999 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixToQuat {
+			position 2149.25 384.731
+			inputs 30 0  
+		}
+		FloatSender {
+			position 938.094 913.228
+			inputs  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatDivFloat {
+			position 946.827 914.302
+			inputs 45 0 42 0  
+		}
+		FloatSinCos {
+			position 1077.25 911.924
+			inputs 43 0  
+		}
+		FloatSender {
+		hint {
+Angle alpha
+}
+			position 848.981 690.345
+			inputs  
+			value -3.495 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3MulFloat {
+			position 1245.89 810.772
+			inputs 44 0 61 0  
+		}
+		Vector3ToFloats {
+			position 1464.6 865.592
+			inputs 46 0  
+		}
+		FloatsToQuat {
+		hint {
+q - quaternion}
+			position 1608.4 877.835
+			inputs 47 0 47 1 47 2 44 1  
+		}
+		Vector3MulFloat {
+			position 1255.82 1002.11
+			inputs 50 0 46 0  
+		}
+		FloatSender {
+			position 1126.45 1033.71
+			inputs  
+			value -1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+Axis vector
+}
+			position 941.038 690.751
+			inputs  
+			value 0.63 -1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatsToQuat {
+		hint {
+q* - conjugate}
+			position 1609.88 1004.95
+			inputs 53 0 53 1 53 2 44 1  
+		}
+		Vector3ToFloats {
+			position 1466.08 989.753
+			inputs 49 0  
+		}
+		Vector3Sender {
+			position 1056.33 1157.83
+			inputs  
+			value 0 -1 1 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatMulQuat {
+			position 1893.45 1018.93
+			inputs 48 0 62 0  
+		}
+		QuatMulQuat {
+			position 2133.65 1111.31
+			inputs 55 0 52 0  
+		}
+		FloatsToQuat {
+			position 1612.09 1127.63
+			inputs 58 0 58 1 58 2 59 0  
+		}
+		Vector3ToFloats {
+			position 1372.31 1126.26
+			inputs 54 0  
+		}
+		FloatSender {
+			position 1120.19 1227.77
+			inputs  
+			value -0.15 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 2385.31 1094.45
+			inputs 56 0  
+		}
+		NormalizeVector3 {
+			position 1257.47 667.862
+			inputs 51 0  
+		}
+		NormalizeQuat {
+			position 1705.17 1251.31
+			inputs 57 0  
+		}
+	}
+}

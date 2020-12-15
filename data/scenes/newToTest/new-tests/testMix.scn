@@ -1,0 +1,82 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 0
+	}
+}
+transformationSpace {
+	position 3 209.6
+	projectionPosition 247 183
+	projectionScale 1
+	transformations {
+	}
+	operators {
+		MixVector3 {
+			position 1223 318.4
+			inputs 6 0 7 0 -1  
+		}
+		MixVector {
+			position 1227 200.4
+			inputs 3 0 4 0 5 0  
+		}
+		MixFloat {
+			position 1207 492.4
+			inputs 8 0 9 0 5 0  
+		}
+		VectorSender {
+			position 714 254.4
+			inputs -1  
+			value 0.315 0.135 0.09 0.18 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.315 0.135 0.09 0.18 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorSender {
+			position 711 376.4
+			inputs -1  
+			value 1.77 1.05 3.15 0.57 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.77 1.05 3.15 0.57 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 716 500.4
+			inputs -1  
+			value 1.335 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.335 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorToVector3 {
+			position 965 256.4
+			inputs 3 0  
+		}
+		VectorToVector3 {
+			position 967 361.4
+			inputs 4 0  
+		}
+		VectorToFloats {
+			position 966 493.4
+			inputs 3 0  
+		}
+		VectorToFloats {
+			position 967 642.4
+			inputs 4 0  
+		}
+		MixFloat {
+			position 1209 595.4
+			inputs 8 1 9 1 5 0  
+		}
+		MixFloat {
+			position 1208 702.4
+			inputs 8 2 9 2 5 0  
+		}
+		MixFloat {
+			position 1210 800.4
+			inputs 8 3 9 3 5 0  
+		}
+	}
+}

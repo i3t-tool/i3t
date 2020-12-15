@@ -1,0 +1,129 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 4.57207 4.42568 -3.69635
+		lookAt -0.457573 -0.991785 -2.66371
+		up 0 1 0
+		orbitCenter -0.457573 -0.991785 -2.66371
+	}
+	desc {
+Tutorial 1:
+
+-------------------------------------------------
+
+
+
+In this tutorial we show base principles of program, key controls and base components. Thera are two main components.
+
+
+
+Global view: Showing all created geometrics objects.
+
+Space form: Main workspace of program. 
+
+
+
+Key control:
+
+-------------------------------------------------
+
+
+
+Global view:
+
+
+
+mouse right:        rotate
+
+mouse middle:     translate
+
+mouse scroll:       zoom
+
+
+
+Space form:
+
+
+
+mouse right:        show "add" menu to adding components
+
+mouse middle:     translate
+
+mouse scroll:       zoom
+
+
+
+Hints:
+
+-------------------------------------------------
+
+Some components in space with blue icon of "?" has "hint". By clicking it you can show this hint and read information about particualr component.
+
+
+
+Acces this description via: main menu -> help -> description}
+		position 855.096 19.4826
+}
+transformationSpace {
+	position 3 398
+	projectionPosition 447.952 58.0829
+	projectionScale 0.989668
+	transformationForm {
+	hint {
+This is "sequence" component. You can add it by:
+
+
+
+space "add" menu -> sequence
+
+
+
+This component is container for matrices and you can manage them by "drag and drop". Sequence then represented multiplication of containing matrices.
+
+
+
+To compoment can be bind }
+		position 653.161 294.443
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 0.535 0 -0.844852 0 0 1 0 0 0.844852 0 0.535 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			translation {
+				params 2 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -2 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+		free {
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			hint {
+This is transformation matrix. There are a several types of them and you can add them by:
+
+
+
+space "add" menu -> transformation -> choose some type.
+
+
+
+Transformation matrices can be by "drag and drop" method added to "sequence" component.}
+			position 1141.2 263.808
+			isLocked 1
+			useSynergies 1
+		}
+	}
+	operators {
+	}
+}

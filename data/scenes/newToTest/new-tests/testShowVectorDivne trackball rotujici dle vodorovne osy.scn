@@ -1,0 +1,218 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 3.57432 1.94821 7.28261
+		lookAt 0.375043 -2.56704 0.235663
+		up 0.0502009 0.830419 -0.554872
+		orbitCenter 0.375043 -2.56704 0.235663
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 385
+	projectionPosition -832.809 -302.048
+	projectionScale 1.32619
+	transformationForm {
+		position 1055.65 492.925
+		inputsStorage 14 0 
+		inputsMultiOut -1 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1054.14 -30.0193
+		inputsStorage 17 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1056.89 751.581
+		inputsStorage 20 0 
+		inputsMultiOut -1 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1055 141.165
+		inputsStorage 28 0 
+		inputsMultiOut -1 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1052.29 -156.367
+		inputsStorage 29 0 
+		inputsMultiOut -1 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1056.83 266.351
+		inputsStorage 33 0 
+		inputsMultiOut -1 
+		object objects basics vectors green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1056 618.995
+		inputsStorage 35 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		ShowVector3 {
+			position 798.929 492.959
+			inputs 16 0  
+		}
+		OrbitRotate {
+			position -705.395 -132.702
+			inputs  
+			value -0.936896 0.146529 0.317423 0 -0.0302634 0.870537 -0.491177 0 -0.348299 -0.469785 -0.811167 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position 390.84 20.132
+			inputs 24 0  
+			value -0.0981804 -0.300632 0.317333 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.149997 -3.96 -3.365 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 800.929 -37.0195
+			inputs 18 0  
+		}
+		NormalizeVector3 {
+			position 668.929 -31.0193
+			inputs 25 0  
+		}
+		Vector3MulFloat {
+			position 520.929 700.099
+			inputs 22 0 16 0  
+		}
+		ShowVector3 {
+			position 801.929 748.099
+			inputs 21 0  
+		}
+		NormalizeVector3 {
+			position 669.929 754.099
+			inputs 19 0  
+		}
+		FloatSender {
+			position 397.929 702.099
+			inputs -1  
+			value -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixMulVector {
+			position -351.375 69.2034
+			inputs 15 0 38 0  
+		}
+		MixVector3 {
+			position 243.15 17.6149
+			inputs 25 0 26 0 27 0  
+		}
+		Vector3Sender {
+			position -44.1207 -21.8321
+			inputs -1  
+			value 0.389997 -0.959996 0.744999 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.389997 -0.959996 0.744999 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -42.6035 84.1682
+			inputs 37 0  
+			value -0.397385 0.103494 0.0552154 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1.085 -0.395 1.55 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 364.566 384.628
+			inputs 30 0  
+			value 0.62 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.369999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 800.038 139.441
+			inputs 26 0  
+		}
+		ShowVector3 {
+			position 800.843 -158.091
+			inputs 25 0  
+		}
+		floatCycle {
+			position -8.49735 365.26
+			inputs -1 -1 -1  
+			value 0.62 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 2
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		ShowVector3 {
+			position 796.585 262.868
+			inputs 34 0  
+		}
+		NormalizeVector3 {
+			position 664.585 268.868
+			inputs 26 0  
+		}
+		ShowVector3 {
+			position 799.275 619.029
+			inputs 36 0  
+		}
+		NormalizeVector3 {
+			position 667.275 625.03
+			inputs 16 0  
+		}
+		VectorToVector3 {
+			position -189.539 81.7001
+			inputs 23 0  
+		}
+		Vector3ToVector {
+			position -513.742 72.0454
+			inputs 40 0 39 0  
+		}
+		FloatSender {
+			position -359.38 202.103
+			inputs -1  
+			value 1.695 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.695 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -644.742 72.0454
+			inputs -1  
+			value 0.404999 0.075 0.045 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.404999 0.075 0.045 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorToFloats {
+			position -330.53 -135.296
+			inputs 38 0  
+		}
+	}
+}

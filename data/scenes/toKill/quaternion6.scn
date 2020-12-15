@@ -1,0 +1,180 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -10.2204 3.12241 0.799039
+		lookAt 6.75943 -9.65951 3.80034
+		up 0 1 0
+		orbitCenter 0.430728 -4.89544 2.6817
+	}
+}
+transformationSpace {
+	position 3 106
+	projectionPosition 1129.49 70.843
+	projectionScale 1.18567
+	transformationForm {
+		position 2482.22 525.747
+		inputsStorage 11 0 
+		inputsMultiOut 3 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2180.48 514.121
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 1.905 0 -2.76 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.905 0 -2.76 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1516.71 679.581
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 1.905 1.59 -2.76 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.905 1.59 -2.76 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2276.33 812.312
+		inputsStorage 31 0 
+		inputsMultiOut -1 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatSender {
+			position 161.303 527.949
+			inputs  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 2188.75 436.448
+			inputs 10 0  
+		}
+		FloatsToQuat {
+			position 2188.64 307.697
+			inputs 28 0 28 1 28 2 18 1  
+		}
+		QuatToMatrix {
+			position 2440.35 409.271
+			inputs 9 0  
+		}
+		FloatSender {
+			position 1624.96 109.076
+			inputs  
+			value 3.25 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1624.96 169.076
+			inputs  
+			value -2.325 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1624.96 229.076
+			inputs  
+			value 2.635 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1519.81 519.205
+			inputs  
+			value 0.0550022 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixToQuat {
+			position 2832.91 434.114
+			inputs 11 0  
+		}
+		QuatToFloats {
+			position 3110.72 399.863
+			inputs 16 0  
+		}
+		FloatSinCos {
+			position 1584.38 359.333
+			inputs 19 0  
+		}
+		FloatDivFloat {
+			position 1427.14 356.607
+			inputs 22 0 20 0  
+		}
+		FloatSender {
+			position 1433.65 436.446
+			inputs  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1028.61 237.673
+			inputs  
+			value 2.595 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatMulFloat {
+			position 1295.35 356.606
+			inputs 24 0 23 0  
+		}
+		FloatSender {
+			position 1296.41 435.537
+			inputs  
+			value 3.14159 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatDivFloat {
+			position 1156.29 355.698
+			inputs 32 0 25 0  
+		}
+		FloatSender {
+			position 1161.89 434.628
+			inputs  
+			value 180 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorMulFloat {
+			position 1745.25 301.164
+			inputs 18 0 29 0  
+		}
+		FloatsToVector {
+			position 1745.25 111.204
+			inputs 12 0 13 0 14 0 -1  
+		}
+		VectorToFloats {
+			position 2020.65 270.261
+			inputs 26 0  
+		}
+		NormalizeVector {
+			position 1745.25 233.905
+			inputs 27 0  
+		}
+		AxisAngle {
+			position 1736.72 585.718
+			inputs 32 0 29 0  
+		}
+		MatrixMulMatrix {
+			position 2023.91 667.397
+			inputs 4 0 30 0  
+		}
+		floatCycle {
+			position 1100.41 104.862
+			inputs -1 -1 -1  
+			value 329 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 360
+			step 1
+			mode 1
+			manualStep 0.1
+			pause 0
+		}
+	}
+}

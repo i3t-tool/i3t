@@ -1,0 +1,241 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 3.07065 4.43654 8.96107
+		lookAt 1.15202 -0.62654 3.82328
+		up 0 1 0
+		orbitCenter 0.380873 -2.66151 1.75828
+		radians 1
+	}
+	desc {
+Comparisomn of different constructions of quaternion:
+
+a) manually from normalized axis and a halph angle - correct
+b) manualy from axis and halph angle followed by quaternion normalization - wrong
+c) via modul using full angle
+d) via modul using halph angle
+
+Both modules variants use non-normalized axis - axis normalization is done inside
+
+Task:
+Rotate by the cubes via float angle. Change the values of the rotation axis vector. 
+Compare the values of computed quaternions (mind the red cube, representing case b).
+
+Conclusion: quaternion axis vector must be normalized (to u unit length).
+
+}
+		position 444 409
+}
+transformationSpace {
+	position 3 284
+	projectionPosition -538.908 -180.673
+	projectionScale 1.31724
+	transformationForm {
+		position 1152 204
+		inputsStorage 20 0 
+		inputsMultiOut 3 0 
+		object objects basics cube red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 945.873 206.018
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 947.178 449.146
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 2.34 0.0149999 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1153.3 447.128
+		inputsStorage 21 0 
+		inputsMultiOut 5 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 948.765 -120.048
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.540001 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1154.89 -122.066
+		inputsStorage 38 0 
+		inputsMultiOut 9 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatSender {
+		hint {
+Angle of rotation}
+			position -361.076 58.5359
+			inputs -1  
+			value 34.465 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 34.465 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+rotation axis - must be a unit vector => normalize}
+			position -361.076 -49.4641
+			inputs -1  
+			value 1.335 1.12 1.71 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.335 1.12 1.71 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position -132.809 243.235
+			inputs 23 0  
+		}
+		Vector3ToFloats {
+			position -53.5014 -78.1633
+			inputs 13 0  
+		}
+		FloatsToQuat {
+			position 282.499 53.8367
+			inputs 19 0 18 0 17 0 14 1  
+		}
+		FloatMulFloat {
+			position 102.499 89.8367
+			inputs 15 2 14 0  
+		}
+		FloatMulFloat {
+			position 102.499 5.83673
+			inputs 15 1 14 0  
+		}
+		FloatMulFloat {
+			position 102.499 -78.1633
+			inputs 15 0 14 0  
+		}
+		QuatToMatrix {
+			position 1152 72
+			inputs 22 0  
+		}
+		AxisAngle {
+		hint {
+Rotation matrix directly from axis and angle
+(a Rodrigues formula)}
+			position 1153.3 327.128
+			inputs 12 0 13 0  
+		}
+		NormalizeQuat {
+		hint {
+Wrong construction from a non-unit vector, followed by resulting quaternion normalization.}
+			position 516.445 51.8186
+			inputs 16 0  
+		}
+		FloatDivFloat {
+			position -264.809 243.235
+			inputs 12 0 24 0  
+		}
+		FloatSender {
+		hint {
+Do not touch this.}
+			position -264.809 327.235
+			inputs -1  
+			value 2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatVecToQuat {
+		hint {
+Direct construction using a supplied module}
+			position 511.585 151.432
+			inputs 12 0 -1 13 0  
+		}
+		FloatVecToQuat {
+		hint {
+Direct construction using a supplied module}
+			position 511.585 259.432
+			inputs -1 23 0 13 0  
+		}
+		FloatMulFloat {
+			position 282.499 -174.163
+			inputs 30 1 14 0  
+		}
+		FloatMulFloat {
+			position 282.499 -90.1633
+			inputs 30 2 14 0  
+		}
+		FloatMulFloat {
+			position 282.499 -258.163
+			inputs 30 0 14 0  
+		}
+		Vector3ToFloats {
+			position 126.499 -258.163
+			inputs 32 0  
+		}
+		FloatsToQuat {
+		hint {
+Correct construction from u unit axis vector and a halph angle}
+			position 516.989 -126.163
+			inputs 29 0 27 0 28 0 14 1  
+		}
+		NormalizeVector3 {
+			position -29.5014 -258.163
+			inputs 13 0  
+		}
+		QuatLength {
+			position 757.008 -156.611
+			inputs 31 0  
+		}
+		QuatLength {
+		hint {
+Normalization to unit length does help if the quaternion was not constructed correctly using a unit vector axis ..}
+			position 766.053 19.4263
+			inputs 22 0  
+		}
+		QuatLength {
+			position 783.798 181.703
+			inputs 25 0  
+		}
+		QuatLength {
+			position 785.753 267.147
+			inputs 26 0  
+		}
+		QuatLength {
+			position 1690.26 -99.2299
+			inputs -1  
+		}
+		QuatToMatrix {
+			position 1154.89 -254.066
+			inputs 31 0  
+		}
+	}
+}

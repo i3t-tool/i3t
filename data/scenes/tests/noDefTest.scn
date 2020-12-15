@@ -1,0 +1,56 @@
+contentFiles {
+	contentFile \data\content.cnt
+	contentFile \data\gimbalContent.cnt
+}
+scene {
+	camera {
+		position 2.6699 2.72108 7.53451
+		lookAt 0.541227 -1.18356 0.33287
+		up 0 1 0
+		orbitCenter 0.541227 -1.18356 0.33287
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 551
+	projectionPosition 272.299 408.903
+	projectionScale 1.089
+	transformationForm {
+		position 535.31 451.06
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube red1
+		transformations {
+			free {
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -2.46 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 828.896 444.676
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube yellow1
+		transformations {
+			free {
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.41 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1191.68 524.604
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects gimbal gimbal_outer_y
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+	}
+}

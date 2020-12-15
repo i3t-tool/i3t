@@ -1,0 +1,115 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+	}
+}
+transformationSpace {
+	position 3 120
+	projectionPosition -41.5285 -359.921
+	projectionScale 2.31994
+	transformations {
+	}
+	operators {
+		Vector3Sender {
+		hint {
+eye}
+			position 88 59
+			inputs  
+			value 1 1 1 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+target}
+			position 88 134
+			inputs  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+up}
+			position 88 208
+			inputs  
+			value 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		LookAt {
+			position 694.03 -307.636
+			inputs 0 0 1 0 2 0  
+		}
+		Vector3SubVector3 {
+			position 398.081 163.37
+			inputs 0 0 1 0  
+		}
+		NormalizeVector3 {
+		hint {
+z-axes}
+			position 606.081 172.37
+			inputs 4 0  
+		}
+		Vector3CrossVector3 {
+			position 572.477 -31.9957
+			inputs 2 0 5 0  
+		}
+		NormalizeVector3 {
+		hint {
+x-axes}
+			position 779.477 -21.9957
+			inputs 6 0  
+		}
+		Vector3CrossVector3 {
+		hint {
+y-axes}
+			position 1099.93 7.12801
+			inputs 5 0 7 0  
+		}
+		VectorsToMatrix {
+			position 1762.58 -26.3039
+			inputs 10 0 11 0 12 0 13 0  
+		}
+		Vector3ToVector {
+			position 1489.11 -125.86
+			inputs 7 0 17 0  
+		}
+		Vector3ToVector {
+			position 1489.11 -47.8605
+			inputs 8 0 16 0  
+		}
+		Vector3ToVector {
+			position 1490.11 35.1395
+			inputs 5 0 15 0  
+		}
+		Vector3ToVector {
+			position 1491.11 115.14
+			inputs 0 0 14 0  
+		}
+		FloatSender {
+			position 1394.05 182.051
+			inputs  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1393.15 89.3422
+			inputs  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1392.01 5.50018
+			inputs  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1392.92 -80.5404
+			inputs  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Inversion {
+			position 693.758 -184.371
+			inputs 9 0  
+		}
+	}
+}

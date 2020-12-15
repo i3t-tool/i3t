@@ -1,0 +1,206 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 8.5542 2.67404 4.38124
+		lookAt -0.0639917 -2.34654 1.21702
+		up 0 1 0
+		orbitCenter -0.0639917 -2.34654 1.21702
+		radians 1
+	}
+	desc {
+Comparison of methods for definition of orientation
+===============================
+Input: 
+  angle <0,2*Pi>
+  axis - a (normalized) 3D vector
+
+Output
+  rotation matrix
+a) directly computed by rotate(angle, axis)
+b) converted from quaternion, constructed as (cos, sin*axis)
+
+Notes:
+1. Quaternion computes cos(angle/2) and sin(angle/2) and takes a normalized axis (a unit vector)
+2. Rotate takes any nonzero vector as axis, as it normalizes the axis itself 
+3. Both quaternions (1,0,0,0) for angle 0 and (-1,0,0,0) for pi/2 represent no rotation
+4. operator quat(float, vec) takes angle (or angle/2) and non-normalized vector, as it normalizes the axis itself 
+
+
+}
+		position 957 58
+}
+transformationSpace {
+	position 3 909.607
+	projectionPosition 1181.62 144.785
+	projectionScale 0.914521
+	transformationForm {
+		position 2264.42 748.825
+		inputsStorage 13 0 
+		inputsMultiOut 3 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Vzajemne posunuti kosticek (relativni posun zelene kosticky)}
+		position 2058.52 749.5
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.785 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1964.17 588.799
+		inputsStorage 21 0 
+		inputsMultiOut 7 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Spolecny posun obou kosticek}
+		position 1715.98 590.811
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.77 0 2.7 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2263.87 890.03
+		inputsStorage 27 0 
+		inputsMultiOut 11 0 
+		object objects basics cube blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2061.63 888.875
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 3.465 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		NormalizeQuat {
+			position 2226.34 336.697
+			inputs 17 0  
+		}
+		QuatToMatrix {
+			position 2226.15 415.18
+			inputs 12 0  
+		}
+		floatCycle {
+		hint {
+Uhel otoceni okolo zadane osy}
+			position 1107.51 250.241
+			inputs -1 -1 -1  
+			value 3.49 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.01
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		FloatsToQuat {
+			position 2240.48 208.839
+			inputs 25 0 25 1 25 2 20 1  
+		}
+		FloatDivFloat {
+			position 1375.58 449.726
+			inputs 14 0 19 0  
+		}
+		FloatSender {
+			position 1267.97 499.407
+			inputs -1  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position 1517.05 446.984
+			inputs 18 0  
+		}
+		AxisAngle {
+			position 1889.77 455.481
+			inputs 14 0 22 0  
+		}
+		Vector3Sender {
+		hint {
+Osa rotace}
+			position 1526.19 210.763
+			inputs -1  
+			value 2.125 -2.085 1.47 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2.125 -2.085 1.47 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 1659.47 211.241
+			inputs 22 0  
+		}
+		Vector3MulFloat {
+			position 1890.99 210.504
+			inputs 20 0 23 0  
+		}
+		Vector3ToFloats {
+			position 2043.51 209.709
+			inputs 24 0  
+		}
+		FloatVecToQuat {
+			position 1965.24 336.003
+			inputs 14 0 -1 22 0  
+		}
+		QuatToMatrix {
+			position 2693.07 577.456
+			inputs 28 0  
+		}
+		FloatMulQuat {
+			position 2689.41 441.193
+			inputs 29 0 12 0  
+		}
+		FloatSender {
+			position 2589.51 299.442
+			inputs -1  
+			value 1.48 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.48 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatLength {
+			position 2782.69 303.1
+			inputs 28 0  
+		}
+	}
+}

@@ -1,0 +1,105 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 4.89967 3.75145 6.24924
+		lookAt 3.21334 0.716567 3.8159
+		up 0 1 0
+		orbitCenter 1.62237 -2.14671 1.52016
+		radians 1
+	}
+	desc {
+Demo of the qvq* module (vector rotation by quaternion)
+---------------------------------------------------------------------
+
+Inputs:
+1. vector v [vec3]  
+2. quaternion angle [float]
+3. quaternion axis [vec3]
+
+Shows:
+1. vector v
+2. quaternion axis
+3. rotated vector qvq*
+4. rotated vector (1,0,0) - as the result of quat->mat
+
+PROBLEM - qvq* and quat->mat differ - the latter needs a half-angle
+
+
+
+The right part of the work space serves just for display of the vectors.}
+		position 422 336
+}
+transformationSpace {
+	position 3 199
+	projectionPosition -946.161 1024.72
+	projectionScale 1.96599
+	transformations {
+	}
+	operators {
+		FloatsToQuat {
+			position 562.66 1607.94
+			inputs 3 0 4 0 5 0 6 0  
+		}
+		QuatToEuler {
+			position 828.568 1743.2
+			inputs 7 0  
+		}
+		EulerToQuat {
+			position 578.508 1840.52
+			inputs 1 0 1 1 1 2  
+		}
+		FloatSender {
+			position 413.88 1551.79
+			inputs -1  
+			value 0.225 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.225 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 412.944 1612.09
+			inputs -1  
+			value 0.255 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.255 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 411.073 1667.72
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 410.137 1718.66
+			inputs -1  
+			value -0.195 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.195 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 561.611 1765.75
+			inputs 0 0  
+		}
+		FloatsToQuat {
+			position 684.197 1951.97
+			inputs 9 0 9 1 9 2 9 3  
+		}
+		VectorToFloats {
+			position 541.025 1947.29
+			inputs 10 0  
+		}
+		VectorMulFloat {
+			position 279.945 1961.33
+			inputs 11 0 -1  
+		}
+		FloatSender {
+			position 279.952 1906.12
+			inputs -1  
+			value -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

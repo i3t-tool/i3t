@@ -1,27 +1,34 @@
 [submodule "Dependencies/glfw"]
 	path = Dependencies/glfw
 	url = https://github.com/glfw/glfw.git
+	ignore = dirty
 [submodule "Dependencies/glm"]
 	path = Dependencies/glm
 	url = https://github.com/g-truc/glm.git
 [submodule "Dependencies/assimp"]
 	path = Dependencies/assimp
 	url = https://github.com/assimp/assimp.git
+	ignore = dirty
 [submodule "Dependencies/gtest"]
 	path = Dependencies/gtest
 	url = https://github.com/google/googletest.git
+	ignore = dirty
 [submodule "Dependencies/spdlog"]
 	path = Dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
+	ignore = dirty
 [submodule "Dependencies/jsonlib"]
 	path = Dependencies/jsonlib
 	url = https://github.com/nlohmann/json.git
 [submodule "Dependencies/imgui_node_editor"]
 	path = Dependencies/imgui_node_editor
 	url = https://github.com/thedmd/imgui-node-editor.git
+	ignore = dirty
 [submodule "Dependencies/portable-file-dialogs"]
 	path = Dependencies/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs.git
+	ignore = dirty
 [submodule "Dependencies/yaml-cpp"]
 	path = Dependencies/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+	ignore = dirty

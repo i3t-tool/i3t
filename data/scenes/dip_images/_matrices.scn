@@ -1,0 +1,112 @@
+scene {
+	camera {
+		position 6.42868 1.96734 -2.39602
+		lookAt 4.42868 -0.0326599 -4.39602
+		up 0 1 0
+		orbitCenter 4.42868 -0.0326599 -4.39602
+	}
+}
+transformationSpace {
+	position 3 105
+	projectionPosition -11.2132 -144.739
+	projectionScale 0.960596
+	transformationForm {
+		position 110.664 42.4591
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 10 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+			free {
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			scale {
+				params 0.5 2 5
+				default 0.5 0 0 0 0 2 0 0 0 0 5 0 0 0 0 1
+				matrix 0.5 0 0 0 0 2 0 0 0 0 5 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+			translation {
+				params 10 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+		quat {
+			params 1 0 0 0
+			default 1 0 0 0
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			position 416.348 243.709
+			isLocked 1
+			useSynergies 0
+		}
+		scale {
+			params 0.5 2 5
+			default 0.5 0 0 0 0 2 0 0 0 0 5 0 0 0 0 1
+			matrix 0.5 0 0 0 0 2 0 0 0 0 5 0 0 0 0 1
+			position 429.291 322.317
+			isLocked 1
+			useSynergies 1
+		}
+		free {
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			position 793.557 336.968
+			isLocked 1
+			useSynergies 1
+		}
+		rotationAxisAngle {
+			params 50 1 0 0
+			default 1 0 0 0 0 0.964966 -0.262375 0 0 0.262375 0.964966 0 0 0 0 1
+			matrix 1 0 0 0 0 0.964966 -0.262375 0 0 0.262375 0.964966 0 0 0 0 1
+			position 808.646 98.9718
+			isLocked 1
+			useSynergies 1
+		}
+		uniformScale {
+			params 0.5
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			matrix 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 1
+			position 605.754 249.991
+			isLocked 1
+			useSynergies 1
+		}
+		translation {
+			params 10 0 0
+			default 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 10 0 0 1
+			position 255.201 317.098
+			isLocked 1
+			useSynergies 0
+		}
+		rotationAxisAngle {
+			params 50 1 0 0
+			default 1 0 0 0 0 0.964966 -0.262375 0 0 0.262375 0.964966 0 0 0 0 1
+			matrix 1 0 0 0 0 0.964966 -0.262375 0 0 0.262375 0.964966 0 0 0 0 1
+			position 616.525 384.631
+			isLocked 1
+			useSynergies 1
+		}
+		scale {
+			params 0.5 2 5
+			default 0.5 0 0 0 0 2 0 0 0 0 5 0 0 0 0 1
+			matrix 0.5 0 0 0 0 2 0 0 0 0 5 0 0 0 0 1
+			position 785.956 224.935
+			isLocked 1
+			useSynergies 1
+		}
+	}
+	operators {
+	}
+}

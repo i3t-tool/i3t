@@ -1,0 +1,250 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2.28227 -0.178102 0.787452
+		lookAt -0.0700714 -0.314727 0.0664942
+		up 0 1 0
+		orbitCenter -0.0700714 -0.314727 0.0664942
+		radians 1
+	}
+	desc {
+Demonstrace 
+
+1. odlisnosti Lerp a Slerp
+    Lerp jen mixuje slozky, ale vystupni quat  se mus normalizovat
+    Slerp interpoluje "uhel" ve 4D (arccos(q.r)). Bere ten kratsi oblouk.
+
+2. ukazka interpolace po delsim uhlu (cos < 0)
+    LongWaySlerp bere ten delsi uhel 
+   
+Zadavaji se dva kvaterniony, mezi kterymi se interpoluje - zadavaji se osou a uhlem.
+Modul cyklu pak generuje hodnotu parametru z intervalu <0,1>
+Pozor - pri ruznem zoomu se obcas nezobrazuji zaporna znamenka floatu.}
+		position 444 409
+}
+transformationSpace {
+	position 3 290
+	projectionPosition -404.618 -440.989
+	projectionScale 1.81902
+	transformationForm {
+		position 445.765 -12.308
+		inputsStorage 23 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 782.003 -10.3189
+		inputsStorage -1 
+		inputsMultiOut 1 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 434.253 -301.814
+		inputsStorage 29 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 770.492 -299.825
+		inputsStorage -1 
+		inputsMultiOut 5 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1656.05 -64.0141
+		inputsStorage 30 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1992.29 -62.025
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1695.68 247.585
+		inputsStorage 31 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 2031.92 249.574
+		inputsStorage -1 
+		inputsMultiOut 13 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1731.21 541.417
+		inputsStorage 37 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 2067.45 543.406
+		inputsStorage -1 
+		inputsMultiOut 17 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatVecToQuat {
+		hint {
+Koncovy kvaternion
+}
+			position -106.04 -184.305
+			inputs 21 0 -1 22 0  
+		}
+		FloatSender {
+			position -269.04 -184.305
+			inputs -1  
+			value -9.15 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -9.15 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -404.384 -120.807
+			inputs -1  
+			value -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 195.283 37.3649
+			inputs 20 0  
+		}
+		QuatSlerp {
+		hint {
+SLERP se pohybuje konstantn9 uhlovou rychlosti (ve 4D)}
+			position 1208.17 63.2909
+			inputs 26 0 20 0 32 0  
+		}
+		QuatLerp {
+		hint {
+Lerp a Slerp se kryji pro t=0, 0.5 a 1.
+Lerp se zpocatku opozduje za Slerpem, v 0,5 se prekryji a pak Lerp predbiha slerp.
+}
+			position 1208.63 172.026
+			inputs 26 0 20 0 32 0  
+		}
+		FloatVecToQuat {
+		hint {
+Pocatecni kvaternion
+}
+			position -133.952 -446.478
+			inputs 27 0 -1 28 0  
+		}
+		FloatSender {
+			position -296.952 -446.478
+			inputs -1  
+			value -14.385 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -14.385 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -432.296 -382.98
+			inputs -1  
+			value -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.83 -0.615 -0.375 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 331.112 -421.31
+			inputs 26 0  
+		}
+		QuatToMatrix {
+			position 1552.91 -183.51
+			inputs 24 0  
+		}
+		QuatToMatrix {
+			position 1592.54 128.089
+			inputs 35 0  
+		}
+		floatCycle {
+		hint {
+Parametr interpolace}
+			position 1070.77 -357.911
+			inputs -1 -1 -1  
+			value 0.41 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 2
+			manualStep 0.01
+			pause 1
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		NormalizeQuat {
+		hint {
+Tato normalizace je nutna - LERP zkracuje kvaternion}
+			position 1165.78 273.099
+			inputs 25 0  
+		}
+		QuatLongWaySlerp {
+			position 1225.2 430.651
+			inputs 26 0 20 0 32 0  
+		}
+		QuatToMatrix {
+			position 1628.07 421.921
+			inputs 36 0  
+		}
+	}
+}

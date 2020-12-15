@@ -1,0 +1,215 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -1.24053 3.93916 5.08287
+		lookAt 4.00616 -4.72981 -0.278316
+		up 0 1 0
+		orbitCenter 3.54848 -3.97361 0.189342
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 493
+	projectionPosition 960.68 92.39
+	projectionScale 0.81
+	transformationForm {
+		position 711.44 178.49
+		inputsStorage 14 0 
+		inputsMultiOut -1 
+		object objects basics vectors red
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 711.86 308.51
+		inputsStorage 16 0 
+		inputsMultiOut -1 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 713.09 430.43
+		inputsStorage 18 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1820.75 166.76
+		inputsStorage 25 0 
+		inputsMultiOut 13 0 
+		object objects basics vectors red
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1822.4 418.7
+		inputsStorage 23 0 
+		inputsMultiOut 13 0 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1821.17 296.78
+		inputsStorage 27 0 
+		inputsMultiOut 13 0 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1606.49 30.26
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 3.24 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		ShowVector3 {
+			position 466.82 176.87
+			inputs 15 0  
+		}
+		Vector3Sender {
+			position 351.21 175.25
+			inputs -1  
+			value 0.7071 0 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.7071 0 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 467.24 306.89
+			inputs 17 0  
+		}
+		Vector3Sender {
+			position 351.63 305.27
+			inputs -1  
+			value 0.7071 0.7071 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.7071 0.7071 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 468.47 428.81
+			inputs 19 0  
+		}
+		Vector3Sender {
+			position 352.86 427.19
+			inputs -1  
+			value 0 0.7071 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 0.7071 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3DotVector3 {
+			position 1013.57 165.53
+			inputs 15 0 17 0  
+		}
+		Vector3DotVector3 {
+			position 1014.8 252.62
+			inputs 15 0 19 0  
+		}
+		Vector3DotVector3 {
+			position 1016.03 347
+			inputs 17 0 19 0  
+		}
+		ShowVector3 {
+			position 1577.78 417.08
+			inputs 34 0  
+		}
+		Vector3DotVector3 {
+			position 2124.11 236.84
+			inputs 26 0 28 0  
+		}
+		ShowVector3 {
+			position 1576.13 165.14
+			inputs 32 0  
+		}
+		Vector3Sender {
+			position 1330.11 165.95
+			inputs -1  
+			value 0.7071 0 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.7071 0 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 1576.55 295.16
+			inputs 33 0  
+		}
+		Vector3Sender {
+			position 1328.52 415.46
+			inputs -1  
+			value -0.7071 0 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.7071 0 0.7071 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position 1329.72 297.59
+			inputs -1  
+			value 0 0.7071 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 0.7071 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3DotVector3 {
+			position 2122.88 153.8
+			inputs 26 0 29 0  
+		}
+		Vector3DotVector3 {
+			position 2125.34 335.27
+			inputs 29 0 28 0  
+		}
+		NormalizeVector3 {
+			position 1446.11 164.72
+			inputs 26 0  
+		}
+		NormalizeVector3 {
+			position 1445.72 301.22
+			inputs 29 0  
+		}
+		NormalizeVector3 {
+			position 1442.9 415.85
+			inputs 28 0  
+		}
+		Vector3Length {
+			position 1147.22 164.72
+			inputs 15 0  
+		}
+		Vector3Length {
+			position 1149.26 251.81
+			inputs 17 0  
+		}
+		Vector3Length {
+			position 1155.35 347.81
+			inputs 19 0  
+		}
+		Vector3Length {
+			position 2296.25 340.94
+			inputs 28 0  
+		}
+		Vector3Length {
+			position 2290.16 244.94
+			inputs 29 0  
+		}
+		Vector3Length {
+			position 2288.12 157.85
+			inputs 26 0  
+		}
+	}
+}

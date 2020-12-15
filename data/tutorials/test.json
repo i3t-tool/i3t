@@ -1,0 +1,30 @@
+{
+    "title": "Testovaci ukol",
+    "description": "Tohle bude hardcore ukol ve kterem se naucis spoustu veci",
+    "assignments": [
+        {
+            "title": "Pohyb mysi",             
+            "content": [
+                {
+                    "type": "text",
+                    "value": "Takze nejprve zkus pohnout *myskou*, dela se to asi takhle"
+                },
+                {
+                    "type": "text", 
+                    "value": "Pokud ses poradne podival, tak uz nyni vis jak na to"
+                }
+            ]
+
+        },
+        {
+            "title": "Stisk klavesnice",
+            "content": [
+                {
+                    "type": "text",
+                    "value": "Tak mys uz mame za sebou, ted klavesnice, zkus zmacknout *ctrl+W*"
+                }
+        ]
+        }
+    ],
+    "ending": "Fiha ty jsi ale dobry, blahopreji ke splneni tohoto ukolu."
+}

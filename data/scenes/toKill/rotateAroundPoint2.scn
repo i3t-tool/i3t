@@ -1,0 +1,89 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 6.71022 8.58528 2.27602
+		lookAt 0.540783 -1.07716 2.30412
+		up 0 1 0
+		orbitCenter 0.540783 -1.07716 2.30412
+	}
+}
+transformationSpace {
+	position 3 470
+	projectionPosition -266.505 44.7414
+	projectionScale 0.965273
+	transformationForm {
+		position -60.0624 240.569
+		inputsStorage 9 0 
+		inputsMultiOut -1 
+		object objects basics axes
+		transformations {
+		}
+	}
+	transformationForm {
+		position 739.302 316.675
+		inputsStorage 8 0 
+		inputsMultiOut 7 0 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 259.469 318.141
+		inputsStorage 0 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 520.182 316.475
+		inputsStorage 13 0 
+		inputsMultiOut 5 0 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 0.633067 0 -0.774097 0 0 1 0 0 0.774097 0 0.633067 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		Inversion {
+			position 444.395 45.09
+			inputs 0 0  
+		}
+		Translation {
+			position -97.2778 107.777
+			inputs 10 0 11 0 12 0  
+		}
+		FloatSender {
+			position -208.492 71.6698
+			inputs  
+			value -2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position -208 133.812
+			inputs  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position -207.088 198.253
+			inputs  
+			value 4 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		EulerY {
+			position 498.329 171.576
+			inputs 14 0  
+		}
+		FloatSender {
+			position 397.965 197.781
+			inputs  
+			value 0.8 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

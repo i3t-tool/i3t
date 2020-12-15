@@ -1,0 +1,153 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 1.47272 -0.0354138 3.96013
+		lookAt 0.286578 -0.975004 -0.000350098
+		up 0 1 0
+		orbitCenter 0.286578 -0.975004 -0.000350098
+		radians 1
+	}
+	desc {
+Showing a vector in the scene
+===================
+a) using a matrix created from the qaternion
+b) by means os show vec3
+
+Both variants rotate the arrow (0,0,0) - (1,0,0).}
+		position 764 326
+}
+transformationSpace {
+	position 3 529
+	projectionPosition 688.823 346.519
+	projectionScale 1.26919
+	transformationForm {
+		position 1808.46 505.704
+		inputsStorage -1 
+		inputsMultiOut 3 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1615.72 503.715
+		inputsStorage 16 0 
+		inputsMultiOut 13 0 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1808.46 505.704
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1615.72 503.715
+		inputsStorage 16 0 
+		inputsMultiOut 13 0 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1612.67 617.468
+		inputsStorage 20 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1805.41 619.457
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		object objects basics vectors green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1529.64 353.211
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.015 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		VecVecToQuat {
+			position 1143.02 526.319
+			inputs 15 0 17 0  
+		}
+		Vector3Sender {
+			position 1144.4 425.846
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 1376.21 498.771
+			inputs 14 0  
+		}
+		Vector3Sender {
+		hint {
+Input vector - will be shown in the scene
+a) using a matrix created from the qaternion
+b) by means os show vec3
+
+Both variants rotate the arrow (0,0,0) - (1,0,0).}
+			position 896.97 400.578
+			inputs -1  
+			value -0.590002 0.51 -0.165 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.590002 0.51 -0.165 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VecVecToQuat {
+			position 1143.02 526.319
+			inputs -1 -1  
+		}
+		QuatToMatrix {
+			position 1376.21 498.771
+			inputs 18 0  
+		}
+		ShowVector3 {
+			position 1370.36 617.614
+			inputs 21 0  
+		}
+		NormalizeVector3 {
+			position 1208.96 623.985
+			inputs 17 0  
+		}
+	}
+}

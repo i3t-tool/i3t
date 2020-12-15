@@ -1,0 +1,117 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -0.0998746 4.1014 7.61134
+		lookAt 3.22677 -2.27182 -1.31854
+		up 0 1 0
+		orbitCenter 3.22677 -2.27182 -1.31854
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 192
+	projectionPosition 147.44 14.63
+	projectionScale 0.81
+	transformations {
+	}
+	operators {
+		QuatToFloatVec {
+			position 1003.85 21.3501
+			inputs 1 0  
+		}
+		AngleAxisToQuat {
+			position 712.25 34.3101
+			inputs 4 0 -1 2 0  
+		}
+		NormalizeVector3 {
+			position 552.68 84.5299
+			inputs 3 0  
+		}
+		Vector3Sender {
+			position 422.49 84.5299
+			inputs -1  
+			value 1 0 3.195 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 3.195 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 578.82 19.7301
+			inputs -1  
+			value 0.569999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.569999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 550.67 356.3
+			inputs 7 0  
+		}
+		QuatToFloatVec {
+			position 1001.84 293.12
+			inputs 8 0  
+		}
+		Vector3Sender {
+			position 420.48 356.3
+			inputs -1  
+			value 2.115 1 -8.175 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2.115 1 -8.175 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		AngleAxisToQuat {
+			position 710.24 306.08
+			inputs 9 0 -1 5 0  
+		}
+		FloatSender {
+			position 576.81 291.5
+			inputs -1  
+			value 0.809999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.809999 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorDotVector {
+			position 1425.86 317
+			inputs 14 0 13 0  
+		}
+		QuatToFloats {
+			position 1005.47 150.14
+			inputs 1 0  
+		}
+		QuatToFloats {
+			position 1003.46 427.58
+			inputs 8 0  
+		}
+		FloatsToVector {
+			position 1163.42 427.97
+			inputs 12 0 12 1 12 2 12 3  
+		}
+		FloatsToVector {
+			position 1156.55 152.18
+			inputs 11 0 11 1 11 2 11 3  
+		}
+		Vector3DotVector3 {
+			position 1348.1 100.73
+			inputs 0 1 6 1  
+		}
+		FloatMulFloat {
+			position 1346.48 22.16
+			inputs 0 0 6 0  
+		}
+		FloatAddFloat {
+			position 1425.05 236
+			inputs 16 0 15 0  
+		}
+		ASinACos {
+			position 1525.49 428.78
+			inputs 10 0  
+		}
+		ASinACos {
+			position 834.17 480.23
+			inputs 20 0  
+		}
+		Vector3DotVector3 {
+			position 695.24 481.43
+			inputs 2 0 5 0  
+		}
+	}
+}

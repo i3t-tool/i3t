@@ -1,0 +1,130 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 407
+	projectionPosition 230.434 -166.949
+	projectionScale 1.31217
+	transformations {
+	}
+	operators {
+		Vector3Sender {
+		hint {
+eye}
+			position 234.203 -3.15629
+			inputs -1  
+			value 1.09 1.015 0.805 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.09 1.015 0.805 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+target (center)}
+			position 231.958 101.35
+			inputs -1  
+			value 0.63 0 0.9 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.63 0 0.9 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+up}
+			position 230.434 196.674
+			inputs -1  
+			value 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		LookAt {
+			position 612.403 277.097
+			inputs 0 0 1 0 2 0  
+		}
+		Vector3SubVector3 {
+			position 634.051 -42.9192
+			inputs 0 0 1 0  
+		}
+		NormalizeVector3 {
+		hint {
+z-axis}
+			position 778.235 -42.8238
+			inputs 4 0  
+		}
+		Vector3CrossVector3 {
+			position 947.953 -165.564
+			inputs 2 0 5 0  
+		}
+		NormalizeVector3 {
+		hint {
+x-axis}
+			position 1088.17 -166.949
+			inputs 6 0  
+		}
+		Vector3CrossVector3 {
+		hint {
+y-axis}
+			position 1230.53 -43.3312
+			inputs 5 0 7 0  
+		}
+		VectorsToMatrix {
+			position 1762.58 -26.3039
+			inputs 10 0 11 0 12 0 13 0  
+		}
+		Vector3ToVector {
+			position 1503.27 -165.657
+			inputs 7 0 17 0  
+		}
+		Vector3ToVector {
+			position 1502.51 -42.92
+			inputs 8 0 16 0  
+		}
+		Vector3ToVector {
+			position 1501.98 80.2873
+			inputs 5 0 15 0  
+		}
+		Vector3ToVector {
+			position 1501.46 202.78
+			inputs 0 0 14 0  
+		}
+		FloatSender {
+			position 1365.95 259.829
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1368.02 137.439
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1380.24 10.5578
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1384.11 -112.585
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Inversion {
+			position 612.131 149.551
+			inputs 9 0  
+		}
+	}
+}

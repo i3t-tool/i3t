@@ -1,0 +1,314 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 55.6334 6.29053 5.18226
+		lookAt -0.579969 -2.00997 18.0334
+		up -0.215753 -0.0487476 -0.97523
+		orbitCenter -0.579969 -2.00997 18.0334
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 484
+	projectionPosition -661.622 -230.22
+	projectionScale 1.0268
+	cameraTransformationForm {
+		position -621.087 -508.872
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 0
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				free {
+					matrix -1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0.84 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 207 0
+			inputsStorage -1 
+			inputsMultiOut 2 0 
+			transformations {
+				ortho {
+					params -7.8 7.8 -7.8 7.8 3.4 10
+					default 0.128205 0 0 0 0 0.128205 0 0 0 0 -0.30303 0 -0 -0 -2.0303 1
+					matrix 0.128205 0 0 0 0 0.128205 0 0 0 0 -0.30303 0 -0 -0 -2.0153 1
+					isLocked 1
+					useSynergies 1
+				}
+				lookAt {
+					params 0 0 10 0 0 0 0 1 0
+					default 1 0 -0 0 -0 1 -0 0 0 0 1 0 -0 -0 -10 1
+					matrix 1 0 -0 0 -0 1 -0 0 0 0 1 0 -0 0 -10 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	cameraTransformationForm {
+		position -624.657 2.75569
+		drawScreen 1
+		drawFrustum 0
+		drawLinks 0
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				free {
+					matrix -1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 1
+				}
+				ortho {
+					params -7.8 7.8 -0 6.6 3.4 19
+					default 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					matrix 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.1809 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 405 0
+			inputsStorage -1 
+			inputsMultiOut 7 0 
+			transformations {
+				lookAt {
+					params 11.2 0 0 0 0 0 0 0 1
+					default 0 0 1 0 1 0 -0 0 -0 1 -0 0 -0 -0 -11.2 1
+					matrix 0 0 1 0 1 0 -0 0 -0 1 -0 0 -0 -0 -11.11 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	cameraTransformationForm {
+		position -622.265 269.778
+		drawScreen 1
+		drawFrustum 0
+		drawLinks 0
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				free {
+					matrix -1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 207 0
+			inputsStorage -1 
+			inputsMultiOut 12 0 
+			transformations {
+				ortho {
+					params -7.8 7.8 -0 6.6 3.4 19
+					default 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					matrix 0.128205 0 0 0 0 0.22803 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					isLocked 1
+					useSynergies 1
+				}
+				lookAt {
+					params -11.25 0 0 0 0 0 0 0 1
+					default 0 -0 -1 0 -1 0 -0 0 0 1 -0 0 -0 -0 -11.25 1
+					matrix 0 -0 -1 0 -1 0 -0 0 0 1 -0 0 -0 -0 -28.095 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	cameraTransformationForm {
+		position 332.421 262.285
+		drawScreen 1
+		drawFrustum 0
+		drawLinks 0
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				free {
+					matrix -1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 1
+				}
+				ortho {
+					params -7.8 7.8 -0 6.6 3.4 19
+					default 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					matrix 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 405 0
+			inputsStorage -1 
+			inputsMultiOut 17 0 
+			transformations {
+				lookAt {
+					params 0 11.25 0 0 0 0 0 0 1
+					default -1 0 -0 0 0 0 1 0 0 1 -0 0 -0 -0 -11.25 1
+					matrix -1 0 -0 0 0 0 1 0 0 1 -0 0 -0 -0 -11.25 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	cameraTransformationForm {
+		position 319.682 3.38913
+		drawScreen 1
+		drawFrustum 0
+		drawLinks 0
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				free {
+					matrix -1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 1
+				}
+				ortho {
+					params -7.8 7.8 -0 6.6 3.4 19
+					default 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					matrix 0.128205 0 0 0 0 0.30303 0 0 0 0 -0.128205 0 -0 -1 -1.4359 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 405 0
+			inputsStorage -1 
+			inputsMultiOut 22 0 
+			transformations {
+				lookAt {
+					params 0 -11.2 0 0 0 0 0 0 1
+					default 1 0 -0 0 0 0 -1 0 0 1 -0 0 -0 -0 -11.2 1
+					matrix 1 0 -0 0 0 0 -1 0 0 1 -0 0 -0 -0 -11.22 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	cameraTransformationForm {
+		position -619.065 -273.346
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 0
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				free {
+					matrix -1 0 0 0 0 -1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 207 0
+			inputsStorage -1 
+			inputsMultiOut 27 0 
+			transformations {
+				ortho {
+					params -7.8 7.8 -7.8 7.8 3.4 10
+					default 0.128205 0 0 0 0 0.128205 0 0 0 0 -0.30303 0 -0 -0 -2.0303 1
+					matrix 0.128205 0 0 0 0 0.128205 0 0 0 0 -0.30303 0 -0 -0 -2.0153 1
+					isLocked 1
+					useSynergies 1
+				}
+				lookAt {
+					params 0 0 -3.4 0 0 0 0 1 0
+					default -1 0 -0 0 0 1 -0 0 0 -0 -1 0 -0 -0 -3.4 1
+					matrix -1 0 -0 0 0 1 -0 0 0 -0 -1 0 -0 -0 -3.4 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	transformationForm {
+		position 734.654 -196.765
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube yellow
+		objectVisible 1
+		transformations {
+			scale {
+				params 7.8 7.8 3.3
+				default 7.8 -0 -0 -0 -0 7.8 -0 -0 0 0 3.3 0 0 0 1.65 1
+				matrix 7.8 -0 -0 -0 0 7.8 -0 -0 0 0 3.3 0 0 0 3.3 1
+				isLocked 0
+				useSynergies 1
+			}
+			uniformScale {
+				params 2
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1.97 0 0 0 0 1.97 0 0 0 0 1.97 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 19.9971 -529.019
+		size 260.53 237.85
+		input 0 0 
+	}
+	sceneTab {
+		position 16.606 1.60887
+		size 260.53 237.85
+		input 5 0 
+	}
+	sceneTab {
+		position 16.2633 270.624
+		size 260.53 237.85
+		input 10 0 
+	}
+	sceneTab {
+		position 964.214 2.64765
+		size 260.53 237.85
+		input 20 0 
+	}
+	sceneTab {
+		position 968.026 262.297
+		size 260.53 237.85
+		input 15 0 
+	}
+	sceneTab {
+		position 18.7491 -270.509
+		size 260.53 237.85
+		input 25 0 
+	}
+	operators {
+	}
+}

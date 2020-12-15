@@ -1,0 +1,46 @@
+---
+name: Můj první objekt
+desc: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
+thumb: test1.png
+--- 
+# Okna aplikace
+Aplikace se skládá ze tří hlavních oken - tutoriálu, workspace a scény.
+![Okna aplikace](navrh.png)
+
+# Tutoriál
+V tomto okně nalezneš výklad látky daného tutoriálu a úkoly k procvičení.
+Úkoly jsou psané modře, viz následující příklad:
+> Prozkoumej tento úkol
++ Toto je konkrétní intrukce k úkolu, prohlédni si ji.
++ Tato intrukce má u sebe nápovědu, rozklikni si ji.
+? Zde vždy nalezneš dodatečnou pomoc jak můžeš danou intrukci splnit.
+
+# Workspace
+Workspace je plocha v dolní části obrazovky, kde vytváříte a upravujete jednotlivé objekty, matice, sekvence a další entity. Zatím je prázdná.
+![Okno workspace](workspaceexample.jpg)
+[h2] Scene
+3D scene je plocha v horní části obrazovky, kde se zobrazují 3D modely poskládané ve workspace. Scene vidíte nyní také prázdnou, jen se třemi úsečkami, které reprezentují osy <red>(X), <blue>(Y) a <green>(Z) a počátek světové soustavy souřadnic.
+
+
+    #- img: sceneexample.jpg
+  -
+    - h1: Vytvoření objektu
+    - text: Objekty reprezentují 3D modely, které budete modifikovat pomocí transformací a sekvencí.
+    - task: Ve workspace vytvoř novou sekvenci.
+    - hint: Klikni pravým tlačítkem myši > Add > Sequence.
+    - task: Na sekvenci navázej bílou krychli.
+    - hint: Klikni pravým tlačítkem na danou sekvenci > bind object > basics > cube > white
+  -
+    - h1: Prohlížení scény
+    - text: 'Se scénou můžeš pracovat obdobně jako v jiných grafických programech. Vyzkoušej si následující:'
+    - task: Otočit scénu
+    - hint: Podržením pravého tlačítka myši a tažením
+    - task: Přiblížit / oddálit scénu
+    - hint: Kolečkem myši
+    - task: Posunout scénu
+    - hint: Podržením prostředního tlačítka myši a tažením
+  -
+    - text: V neposlední řadě je užitečné zarovnání pohledu s některou ze souřadných os.
+    - task: Nastav úhel pohledu podle světové osy X
+    - hint: V menu nahoře klikni na viewports > world X
+...

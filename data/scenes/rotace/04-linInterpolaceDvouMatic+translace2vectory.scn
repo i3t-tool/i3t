@@ -1,0 +1,157 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 0.381198 0.0590737 3.52296
+		lookAt 0.381198 0.0590737 0.0588581
+		up 0 1 0
+		orbitCenter 0.381198 0.0590737 0.0588581
+		radians 0
+	}
+}
+transformationSpace {
+	position 3 655
+	projectionPosition -1252.68 69.0799
+	projectionScale 2.27607
+	transformationForm {
+		position 1199.65 60.1769
+		inputsStorage 14 0 
+		inputsMultiOut 3 0 
+		object objects basics vectors white
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 964.877 207.246
+		inputsStorage 15 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1333.92 506.432
+		inputsStorage 18 0 
+		inputsMultiOut 7 0 
+		object objects basics vectors yellow
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1242.53 206.408
+		inputsStorage -1 
+		inputsMultiOut 3 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.615 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		MixFloat {
+			position 318 51
+			inputs 9 0 10 0 24 0  
+		}
+		FloatSender {
+			position 144 18
+			inputs -1  
+			value 5.635 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 5.635 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 143 79
+			inputs -1  
+			value 173.01 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 173.01 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		floatCycle {
+			position -196.462 192.015
+			inputs -1 -1 -1  
+			value 0.5 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 2
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		EulerZ {
+			position 526 28
+			inputs 8 0  
+		}
+		Translation {
+			position 598.437 194.318
+			inputs 16 0  
+		}
+		FloatsToVector3 {
+			position 465.842 195.798
+			inputs 27 0 27 0 -1  
+		}
+		MatrixToVectors {
+			position 502 320
+			inputs 25 0  
+		}
+		VectorsToMatrix {
+			position 999 515
+			inputs 19 0 21 0 22 0 23 0  
+		}
+		MixVector {
+			position 772 398
+			inputs 17 0 20 0 24 0  
+		}
+		MatrixToVectors {
+			position 499 676
+			inputs 26 0  
+		}
+		MixVector {
+			position 772 520
+			inputs 17 1 20 1 24 0  
+		}
+		MixVector {
+			position 773 650
+			inputs 17 2 20 2 24 0  
+		}
+		MixVector {
+			position 773 782
+			inputs 17 3 20 3 24 0  
+		}
+		FloatSender {
+			position 261.277 316.538
+			inputs 11 0  
+			value 0.5 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.0299993 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		EulerZ {
+			position 80 428
+			inputs 9 0  
+		}
+		EulerZ {
+			position 83 560
+			inputs 10 0  
+		}
+		FloatSender {
+			position 349.518 195.987
+			inputs -1  
+			value -0.165 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.165 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

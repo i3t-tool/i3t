@@ -1,0 +1,155 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 1
+	}
+	desc {
+Test the order of euler angles in glm.
+=======================
+
+The order is  X(Y(Z(model))) }
+		position 446 57
+}
+transformationSpace {
+	position 3 205
+	projectionPosition -85.1719 -292.153
+	projectionScale 1.45602
+	transformationForm {
+		position 516 456
+		inputsStorage 19 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 732 456
+		inputsStorage 20 0 
+		inputsMultiOut 1 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 960 456
+		inputsStorage 21 0 
+		inputsMultiOut 3 0 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1500 276
+		inputsStorage 23 0 
+		inputsMultiOut 9 0 
+		object objects basics cube red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1284 276
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.35 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1488 12
+		inputsStorage 26 0 
+		inputsMultiOut 13 0 
+		object objects basics cube blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1284 12
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -1.605 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatVecToQuat {
+			position 312 72
+			inputs -1 16 0 24 0  
+		}
+		Vector3Sender {
+			position -15.2 193.9
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 192 72
+			inputs -1  
+			value -2.86 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -2.86 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToFloatVec {
+			position 648 -132
+			inputs 14 0  
+		}
+		QuatToEuler {
+			position 648 156
+			inputs 14 0  
+		}
+		EulerX {
+			position 456 300
+			inputs 18 0  
+		}
+		EulerY {
+			position 708 300
+			inputs 18 1  
+		}
+		EulerZ {
+			position 960 300
+			inputs 18 2  
+		}
+		EulerToQuat {
+			position 828 156
+			inputs 18 0 18 1 18 2  
+		}
+		QuatToMatrix {
+			position 1416 156
+			inputs 22 0  
+		}
+		NormalizeVector3 {
+			position 108 192
+			inputs 15 0  
+		}
+		FloatVecToQuat {
+			position 816 -132
+			inputs 17 0 -1 17 1  
+		}
+		QuatToMatrix {
+			position 1416 -132
+			inputs 27 0  
+		}
+		NormalizeQuat {
+			position 1104 -132
+			inputs 25 0  
+		}
+	}
+}

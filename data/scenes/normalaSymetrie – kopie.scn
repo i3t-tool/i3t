@@ -1,0 +1,361 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2.33678 -3.03647 10.369
+		lookAt -2.62475 -3.51212 1.16886
+		up 0 1 0
+		orbitCenter -2.62475 -3.51212 1.16886
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 344
+	projectionPosition -574.36 275.661
+	projectionScale 1.40958
+	transformationForm {
+		position 1687.66 62.3139
+		inputsStorage 34 0 
+		inputsMultiOut -1 
+		object objects basics vectors yellow
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1687.03 -239.483
+		inputsStorage 41 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1687.03 -93.1599
+		inputsStorage 42 0 
+		inputsMultiOut -1 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1685.61 342.969
+		inputsStorage 44 0 
+		inputsMultiOut 9 0 
+		object objects basics vectors cyan
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1484.63 348.083
+		inputsStorage 45 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position -258.034 355.604
+		inputsStorage -1 
+		inputsMultiOut 17 0 
+		transformations {
+			scale {
+				params 1 1 1
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix -1.03 0 0 0 0 1 0 0 0 0 1.375 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1696.63 645.113
+		inputsStorage 46 0 
+		inputsMultiOut -1 
+		object objects basics vectors red
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position -719.18 351.695
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 1 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 1 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.24 -0.255 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position -501.143 365.477
+		inputsStorage 47 0 
+		inputsMultiOut 15 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1699.08 1472.62
+		inputsStorage 64 0 
+		inputsMultiOut 31 0 
+		object objects basics vectors yellow
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1697.04 1753.28
+		inputsStorage 66 0 
+		inputsMultiOut 27 0 
+		object objects basics vectors cyan
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1698.46 1317.15
+		inputsStorage 67 0 
+		inputsMultiOut 31 0 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1698.46 1170.82
+		inputsStorage 68 0 
+		inputsMultiOut 31 0 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1496.05 1758.39
+		inputsStorage 65 0 
+		inputsMultiOut 31 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 11.1619 282.281
+		inputsStorage 11 1 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1428.48 870.654
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+		translation {
+			params 1 0 0
+			default 1 0 0 0 0 1 0 0 0 0 1 0 1 0 0 1
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.455001 0.135 -0.255 1
+			position -479.404 552.779
+			isLocked 1
+			useSynergies 0
+		}
+		free {
+			matrix 0.954999 0 0 0 0 1.27 0 0 0 0 1 0 0 0 0 1
+			position -527.535 692.013
+			isLocked 1
+			useSynergies 1
+		}
+	}
+	operators {
+		Inversion {
+			position 152.746 476.838
+			inputs 11 1  
+		}
+		Transpose {
+			position 404.656 477.567
+			inputs 32 0  
+		}
+		ShowVector3 {
+			position 1425.21 63.8854
+			inputs 40 0  
+		}
+		Vector3Sender {
+		hint {
+Bod C}
+			position 83.3698 32.7664
+			inputs -1  
+			value 0.370011 -0.405 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.370011 -0.405 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3SubVector3 {
+		hint {
+Vector B-A    (blue)}
+			position 371.342 -180.5
+			inputs 39 0 38 0  
+		}
+		Vector3SubVector3 {
+		hint {
+Vector C-A    (yellow)
+}
+			position 374.877 3.725
+			inputs 35 0 38 0  
+		}
+		Vector3Sender {
+		hint {
+Bod A
+}
+			position 82.5108 -199.255
+			inputs -1  
+			value 3.16 -0.029998 0.12 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 3.16 -0.029998 0.12 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+Bod B
+}
+			position 81.7262 -90.9827
+			inputs -1  
+			value 0.3 0.3 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.3 0.3 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3CrossVector3 {
+		hint {
+Cross( B-A, C-A )    (green)}
+			position 615.301 -117.462
+			inputs 36 0 37 0  
+		}
+		ShowVector3 {
+			position 1424.59 -237.912
+			inputs 36 0  
+		}
+		ShowVector3 {
+			position 1424.59 -91.5885
+			inputs 37 0  
+		}
+		Vector3SubVector3 {
+			position 360.044 172.152
+			inputs 35 0 39 0  
+		}
+		ShowVector3 {
+			position 1418.9 203.899
+			inputs 43 0  
+		}
+		Translation {
+			position 1201.93 340.98
+			inputs 36 0  
+		}
+		ShowVector3 {
+			position 1434.18 646.685
+			inputs 63 0  
+		}
+		OrbitRotate {
+			position -636.939 83.5699
+			inputs  
+			value -0.787727 0.476219 0.390763 0 0.359588 0.870514 -0.336004 0 -0.500176 -0.124167 -0.856972 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3ToVector {
+			position 180.901 883.466
+			inputs 38 0 -1  
+		}
+		MatrixMulVector {
+			position 341.4 871.36
+			inputs 11 1 48 0  
+		}
+		MatrixMulVector {
+			position 346.036 1002.09
+			inputs 11 1 51 0  
+		}
+		Vector3ToVector {
+			position 185.537 1014.2
+			inputs 39 0 -1  
+		}
+		MatrixMulVector {
+			position 348.945 1138
+			inputs 11 1 53 0  
+		}
+		Vector3ToVector {
+			position 188.446 1150.11
+			inputs 35 0 -1  
+		}
+		Vector3SubVector3 {
+			position 863.873 1121.63
+			inputs 60 0 59 0  
+		}
+		Vector3CrossVector3 {
+			position 1113.95 904.562
+			inputs 57 0 56 0  
+		}
+		Vector3SubVector3 {
+			position 863.161 1013.66
+			inputs 60 0 58 0  
+		}
+		Vector3SubVector3 {
+			position 866.536 901.98
+			inputs 59 0 58 0  
+		}
+		VectorToVector3 {
+			position 519.164 878.184
+			inputs 49 0  
+		}
+		VectorToVector3 {
+			position 518.618 1002
+			inputs 50 0  
+		}
+		VectorToVector3 {
+			position 523.254 1139.64
+			inputs 52 0  
+		}
+		MatrixMulVector {
+			position 872.866 677.355
+			inputs 33 0 62 0  
+		}
+		Vector3ToVector {
+			position 722.73 673.915
+			inputs 40 0 -1  
+		}
+		VectorToVector3 {
+			position 1061 668.633
+			inputs 61 0  
+		}
+		ShowVector3 {
+			position 1436.64 1474.19
+			inputs 55 0  
+		}
+		Translation {
+			position 1213.35 1751.29
+			inputs 57 0  
+		}
+		ShowVector3 {
+			position 1430.33 1614.21
+			inputs 54 0  
+		}
+		ShowVector3 {
+			position 1436.01 1318.72
+			inputs 56 0  
+		}
+		ShowVector3 {
+			position 1436.01 1172.39
+			inputs 57 0  
+		}
+	}
+}

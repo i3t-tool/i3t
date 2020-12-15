@@ -1,0 +1,44 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 3.37545 2.65664 3.43202
+		lookAt 1.37545 0.656638 1.43202
+		up 0 1 0
+		orbitCenter 0.220747 -0.498063 0.277316
+	}
+}
+transformationSpace {
+	position 3 597
+	projectionPosition 70 182
+	projectionScale 1
+	transformationForm {
+		position 863 321
+		inputsStorage 2 0 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		EulerY {
+			position 808 189
+			inputs 3 0  
+		}
+		floatCycle {
+			position 406 201
+			inputs -1 -1 -1  
+			value 0.46 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.02
+			mode 1
+			manualStep 0.1
+			pause 0
+			playerInputs -1 -1 -1 -1 -1 
+		}
+	}
+}

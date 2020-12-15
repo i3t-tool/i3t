@@ -1,0 +1,130 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 25.575 1.44027 -2.67569
+		lookAt 6.80944 -3.62617 -3.69581
+		up -0.229916 0.917137 -0.325573
+		orbitCenter 6.80944 -3.62617 -3.69581
+		radians 1
+	}
+	desc {
+07. Perspective projection
+-------------------------------
+
+The scene demonstrates the function perspective(..) that is used for a construction of the perspective projection matrix.
+
+1. Edit the input parameters and explain how they influence the positions of the clipping planes and the form of the resulting projection matrix.
+
+}
+		position 854 42
+}
+transformationSpace {
+	position 3 629
+	projectionPosition -38.2288 71.6744
+	projectionScale 1.0218
+	cameraTransformationForm {
+		position 379.318 350.436
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				perspective {
+					params 1 1.33 1 6
+					default 1.37631 0 0 0 0 1.83049 0 0 0 0 -1.4 -1 0 0 -2.4 0
+					matrix 1.49631 0 0 0 0 1.86049 0 0 0 0 -1.645 -1 0 0 -3.53 0
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 207 0
+			inputsStorage -1 
+			inputsMultiOut 2 0 
+			transformations {
+				translation {
+					params 0 0 0
+					default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+					matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 0
+				}
+			}
+		}
+	}
+	transformationForm {
+		position 831.498 362.386
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		objectVisible 1
+		transformations {
+			translation {
+				params 0 0 -3
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -3 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -3 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 743.513 72.7616
+		size 363.42 261.24
+		input 0 0 
+	}
+	operators {
+		FloatSender {
+		hint {
+Specifies the field of view angle, in radians, in the y direction.
+                }
+			position 108 132
+			inputs -1  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specifies the aspect ratio that determines the field of view in the x direction. The aspect ratio is the ratio of x (width) to y (height).}
+			position 108 192
+			inputs -1  
+			value 1.33 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.33 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1.33 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specifies the distance from the viewer to the near clipping plane (always positive).}
+			position 108 252
+			inputs -1  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specifies the distance from the viewer to the far clipping plane (always positive).}
+			position 108 312
+			inputs -1  
+			value 6 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 6 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 6 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Perspective {
+		hint {
+Function glm::perspective specifies a viewing frustum into the world coordinate system. In general, the aspect ratio in gluPerspective should match the aspect ratio of the associated viewport. For example, aspect = 2.0 means the viewer's angle of view is twice as wide in x as it is in y. If the viewport is twice as wide as it is tall, it displays the image without distortion.}
+			position 242.804 195.327
+			inputs 8 0 9 0 10 0 11 0  
+		}
+	}
+}

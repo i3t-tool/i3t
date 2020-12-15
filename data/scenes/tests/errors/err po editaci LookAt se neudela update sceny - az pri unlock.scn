@@ -1,0 +1,115 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 23.6715 0.539764 5.7886
+		lookAt 2.6868 -5.44768 0.457438
+		up 0 1 0
+		orbitCenter 2.6868 -5.44768 0.457438
+		radians 0
+	}
+}
+transformationSpace {
+	position 3 425
+	projectionPosition 147.44 14.63
+	projectionScale 0.81
+	cameraTransformationForm {
+		position 196.28 18.92
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		cameraVisible 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				frustum {
+					params -5 5 -5 5 1 10
+					default 0.2 0 0 0 0 0.2 0 0 0 0 -1.22222 -1 0 0 -2.22222 0
+					matrix 1.67 0 0 0 0 1.4 0 0 0.3 -0.195 -1.41722 -1 0 0 -2.26722 0
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 207 0
+			inputsStorage -1 
+			inputsMultiOut 2 0 
+			transformations {
+				lookAt {
+					params 0 0 3 0 0 0 0 1 0
+					default 1 0 -0 0 -0 1 -0 0 0 0 1 0 -0 -0 -3 1
+					matrix 1 0 -0 0 -0 1 -0 0 0 0 1 0 -0 -0 -5.865 1
+					isLocked 0
+					useSynergies 1
+				}
+			}
+		}
+	}
+	transformationForm {
+		position 635.35 19.33
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		objectVisible 1
+		transformations {
+			uniformScale {
+				params 2
+				default 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				matrix 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 1
+				hint {
+uniform scale of 2}
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformations {
+		rotationY {
+			params -60
+			default 0.5 0 0.866025 0 0 1 0 0 -0.866025 0 0.5 0 0 0 0 1
+			matrix 0.94 0 -0.341174 0 0 1 0 0 0.341174 0 0.94 0 0 0 0 1
+			hint {
+rotation about 60 degrees in y - axes}
+			position 677.77 248.02
+			isLocked 1
+			useSynergies 1
+		}
+		translation {
+			params 2 0 0
+			default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+			matrix 1 0 0 0 0 1 0 0 0 0 1 0 4 0 0 1
+			hint {
+translation by [4, 0, 0]}
+			position 674.98 148.39
+			isLocked 1
+			useSynergies 0
+		}
+		ortho {
+			params -2 2 -2 2 1 10
+			default 0.5 0 0 0 0 0.5 0 0 0 0 -0.222222 0 -0 -0 -1.22222 1
+			matrix 1 0 0 0 0 0.5 0 0 0 0 1 0 -0 0 2.025 1
+			position 173.12 235.73
+			isLocked 1
+			useSynergies 1
+		}
+		perspective {
+			params 0.698132 1.33 2 10
+			default 2.06577 0 0 0 0 2.74748 0 0 0 0 -1.5 -1 0 0 -5 0
+			matrix 1.88577 0 0 0 0 3.69248 0 0 -0.825 0.0749981 1.36 -1 0 0 1.65 0
+			position 395.42 239.78
+			isLocked 0
+			useSynergies 1
+		}
+	}
+	sceneTab {
+		position 988.46 52.13
+		size 250 250
+		input 0 0 
+	}
+	operators {
+	}
+}

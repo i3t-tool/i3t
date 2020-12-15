@@ -1,0 +1,93 @@
+contentFiles {
+	contentFile \data\content.cnt
+	contentFile \data\gimbalContent.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 0
+	}
+}
+transformationSpace {
+	position 3 268.6
+	projectionPosition 860.079 34.8789
+	projectionScale 0.770302
+	transformationForm {
+		position 1276.84 41.0079
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			quat {
+				params 1 0.6 0 0
+				default 1 0.6 0 0
+				matrix 1 -0 0 0 0 -0.6 0.8 0 -0 -0.8 -0.6 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1487.96 108.447
+		inputsStorage 0 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatVecToQuat {
+			position 1225.28 368.039
+			inputs 6 0 -1 12 0  
+		}
+		QuatToFloats {
+			position 1762.18 86.1082
+			inputs -1  
+		}
+		ASinACos {
+			position 1338.52 237.857
+			inputs 7 0  
+		}
+		FloatSender {
+			position 1217.54 236.317
+			inputs -1  
+			value 0.544299 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.544299 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position 1597.34 238.628
+			inputs 6 0  
+		}
+		FloatSinCos {
+			position 1596.93 327.577
+			inputs 6 1  
+		}
+		ASinACos {
+			position 1760.24 220.505
+			inputs 8 0  
+		}
+		ASinACos {
+			position 1762.14 308.683
+			inputs 8 1  
+		}
+		Vector3Sender {
+			position 1094.28 410.039
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		AxisAngle {
+			position 2035.64 177.004
+			inputs 6 0 12 0  
+		}
+		QuatToMatrix {
+			position 2034.1 290.238
+			inputs 4 0  
+		}
+	}
+}

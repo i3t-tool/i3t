@@ -1,0 +1,155 @@
+scene {
+	camera {
+		position -12.4201 3.04141 16.614
+		lookAt -1.87539 -1.55667 3.47421
+		up 0 1 0
+		orbitCenter -0.0639917 -2.34654 1.21702
+	}
+}
+transformationSpace {
+	position 3 422.607
+	projectionPosition 648.999 185.011
+	projectionScale 1.65778
+	transformationForm {
+		position 2305.1 761.986
+		inputsStorage 12 0 
+		inputsMultiOut 3 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Vzajemne posunuti kosticek (relativni posun zelene kosticky)}
+		position 1983.34 749.5
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.92 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1989.88 602.642
+		inputsStorage 20 0 
+		inputsMultiOut 7 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Spolecny posun obou kosticek}
+		position 1640.8 596.449
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.815 0 2.7 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1586.3 784.387
+		inputsStorage 26 0 
+		inputsMultiOut -1 
+		object objects basics cube red
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.815 0 2.7 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatSender {
+			position 161.303 527.949
+			inputs  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 2311.7 344.201
+			inputs 16 0  
+		}
+		QuatToMatrix {
+			position 2311.51 422.684
+			inputs 11 0  
+		}
+		floatCycle {
+		hint {
+Uhel otoceni okolo zadane osy}
+			position 1107.51 250.241
+			inputs -1 -1 -1  
+			value 4.14 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		FloatsToQuat {
+			position 2325.84 216.343
+			inputs 24 0 24 1 24 2 19 1  
+		}
+		FloatDivFloat {
+			position 1375.58 449.726
+			inputs 13 0 18 0  
+		}
+		FloatSender {
+			position 1264.21 501.286
+			inputs  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position 1549 448.863
+			inputs 17 0  
+		}
+		AxisAngle {
+			position 1930.31 460.425
+			inputs 13 0 22 0  
+		}
+		Vector3Sender {
+		hint {
+Osa rotace}
+			position 1595.41 167.256
+			inputs  
+			value 2.68 -2.58 1.47 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 1540.08 240.211
+			inputs 21 0  
+		}
+		Vector3MulFloat {
+			position 1848.65 221.171
+			inputs 19 0 22 0  
+		}
+		Vector3ToFloats {
+			position 2147.06 207.424
+			inputs 23 0  
+		}
+		FloatVecToQuat {
+			position 767.787 621.836
+			inputs 13 0 -1 22 0  
+		}
+		QuatToMatrix {
+			position 1176.36 620.019
+			inputs 25 0  
+		}
+	}
+}

@@ -1,0 +1,90 @@
+scene {
+	camera {
+		position 5.06633 5.16989 5.52561
+		lookAt -1.12646 -5.74143 -6.62295
+		up 0 1 0
+		orbitCenter 0.291943 -3.24228 -3.84043
+	}
+}
+transformationSpace {
+	position 3 501
+	projectionPosition 3.89058 102.024
+	projectionScale 1.00487
+	transformationForm {
+		position 519.347 100.494
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		object objects basics cube white
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -6 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 599.905 265.274
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 2.5 0 -6 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 820.976 188.234
+		inputsStorage -1 
+		inputsMultiOut 3 0 
+		object objects basics cube red
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 2 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 822.092 328.916
+		inputsStorage -1 
+		inputsMultiOut 3 0 
+		object objects basics cube green
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 0.8 0 -0.6 0 0 1 0 0 0.6 0 0.8 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 221.403 193.817
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.15 0 4.095 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+	}
+}

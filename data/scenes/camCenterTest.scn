@@ -1,0 +1,35 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+	}
+}
+transformationSpace {
+	position 3 630
+	projectionPosition 0 0
+	projectionScale 1
+	transformationForm {
+		position 587 67
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -2.16 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+	}
+}

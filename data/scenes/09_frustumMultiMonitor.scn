@@ -1,0 +1,234 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 7.38444 2.78642 9.58573
+		lookAt 3.00519 -8.58071 -15.029
+		up 0 1 0
+		orbitCenter 3.643 -6.92515 -11.444
+		radians 1
+	}
+	desc {
+09. Multi monitor projection
+-----------------------------
+
+The scene demonstrates how the function frustum(..) can be used for constructing the multiple displays projection.
+
+1. Explain the method of the construction of the shared view transformation.
+
+2. Create your own scene with a different screen configuration 
+
+}
+		position 864 55
+}
+transformationSpace {
+	position 3 426
+	projectionPosition -321.525 -205.142
+	projectionScale 1.91082
+	cameraTransformationForm {
+		position 649.261 65.5559
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		transformationForm {
+			position 0 0
+			inputsStorage 22 0 
+			inputsMultiOut -1 
+			transformations {
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage 33 0 
+			inputsMultiOut 2 0 
+			transformations {
+			}
+		}
+	}
+	cameraTransformationForm {
+		position 648 215
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		transformationForm {
+			position 0 0
+			inputsStorage 23 0 
+			inputsMultiOut -1 
+			transformations {
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage 33 0 
+			inputsMultiOut 7 0 
+			transformations {
+			}
+		}
+	}
+	cameraTransformationForm {
+		position 649 364
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		transformationForm {
+			position 0 0
+			inputsStorage 24 0 
+			inputsMultiOut -1 
+			transformations {
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage 33 0 
+			inputsMultiOut 9 0 
+			transformations {
+			}
+		}
+	}
+	transformationForm {
+	hint {
+Shared view transformation.}
+		position 298.64 -173.575
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -1.8 -0.0149998 -0.539999 1
+				isLocked 1
+				useSynergies 0
+			}
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 0.854166 0 0.52 0 0 1 0 0 -0.52 0 0.854166 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1108.64 366.539
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+			translation {
+				params 0 0 -3.5
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -3.5 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.390002 -0.045 -4.13 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 1106.36 -194.984
+		size 423.86 537.964
+		input 0 0 
+	}
+	sceneTab {
+		position 1537.79 -195.025
+		size 423.235 265.248
+		input 5 0 
+	}
+	sceneTab {
+		position 1537.91 78.0524
+		size 423.441 264.896
+		input 10 0 
+	}
+	operators {
+		Frustum {
+			position 361.98 40.5097
+			inputs 25 0 31 0 27 0 28 0 29 0 30 0  
+		}
+		Frustum {
+			position 364 210
+			inputs 31 0 26 0 32 0 28 0 29 0 30 0  
+		}
+		Frustum {
+			position 364.98 379.429
+			inputs 31 0 26 0 27 0 32 0 29 0 30 0  
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the left vertical clipping planes.}
+			position 45.8993 95.0861
+			inputs -1  
+			value -1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default -1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the right vertical clipping planes.}
+			position 45.9106 154.524
+			inputs -1  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the bottom horizontal clipping planes.}
+			position 45.7873 216.83
+			inputs -1  
+			value -0.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default -0.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the top horizontal clipping planes.}
+			position 45.9468 275.255
+			inputs -1  
+			value 0.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the distances to the near depth clipping planes. Distance must be positive.}
+			position 45.8114 335.604
+			inputs -1  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the distances to the far depth clipping planes. Distance must be positive.}
+			position 46.8114 394
+			inputs -1  
+			value 8 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 8 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 8 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the central vertical clipping planes.}
+			position 144.822 -16.9806
+			inputs -1  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the central horizontal clipping planes.}
+			position 161.303 527.949
+			inputs -1  
+			value 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Inversion {
+			position 701.401 -171.459
+			inputs 15 0  
+		}
+	}
+}

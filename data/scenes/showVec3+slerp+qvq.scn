@@ -1,0 +1,491 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 0.101574 -4.63307 3.74841
+		lookAt 0.622278 -1.18098 0.909196
+		up -0.91379 0.331216 0.235126
+		orbitCenter 0.622278 -1.18098 0.909196
+		radians 1
+	}
+	desc {
+Examples of show vec3:
+===============
+
+1. show the first and the second vector and the axis, they define.
+2. show an interpolated vector - slerp interpolation between zero rotation (1,0,0,0) quaternion and the rotation from the first to the second vectors.
+    a) by means of the matrix, created from the slerped quaternion
+         - rotate the first vector to the second
+         - rotate x-axis (1,0,0) by the same angle and axis
+    b) by quaternion rotation qvq* of the first vector}
+		position 105 363
+}
+transformationSpace {
+	position 3 240
+	projectionPosition 787.783 -286.471
+	projectionScale 1.2424
+	transformationForm {
+		position 2236.14 966.219
+		inputsStorage 39 0 
+		inputsMultiOut 15 0 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 2443.39 960.076
+		inputsStorage -1 
+		inputsMultiOut 1 0 
+		object objects basics vectors cyan
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2217.35 818.748
+		inputsStorage 40 0 
+		inputsMultiOut 15 0 
+		object objects basics axes
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+Image of the second vector, defining the rotation axis - and the axis of a quaternion.}
+		position 1812 -156
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1608 -156
+		inputsStorage 47 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 1608 -288
+		inputsStorage 46 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+	hint {
+Image of the first vector, defining the rotation axis - and the axis of a quaternion.}
+		position 1812 -288
+		inputsStorage -1 
+		inputsMultiOut 11 0 
+		object objects basics vectors magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2007.76 816.101
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 2.02 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2216.82 694.764
+		inputsStorage 54 0 
+		inputsMultiOut 15 0 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 2417.47 688.621
+		inputsStorage -1 
+		inputsMultiOut 17 0 
+		object objects basics vectors yellow
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+a) axis of rotation below
+b) axis of the quaternion}
+		position 1812 -24
+		inputsStorage -1 
+		inputsMultiOut 23 0 
+		object objects basics vectors yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1608 -24
+		inputsStorage 54 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+	hint {
+Interpolated rotation of vector (1,0,0) around the axis}
+		position 2445.44 217.038
+		inputsStorage -1 
+		inputsMultiOut 27 0 
+		object objects basics vectors yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2253.48 215.726
+		inputsStorage 64 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 3025.33 -27.6652
+		inputsStorage 68 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+	hint {
+Interpolated rotation of the first vector around the axis (to the second vector)}
+		position 3229.33 -27.6652
+		inputsStorage -1 
+		inputsMultiOut 29 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2468.54 341.608
+		inputsStorage 70 0 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 0
+				default 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 -0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 2672.54 341.608
+		inputsStorage -1 
+		inputsMultiOut 33 0 
+		object objects basics vectors green
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		VecVecToQuat {
+		hint {
+Rotation from the first to the second vector.}
+			position 841.602 -22.5328
+			inputs 37 0 38 0  
+		}
+		Vector3Sender {
+		hint {
+The first vector, defining the rotation axis - and the axis of a quaternion.}
+			position 605.641 -187.989
+			inputs -1  
+			value 0.925 0.55 0.7 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.925 0.55 0.7 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+The second vector, defining the rotation axis - and the axis of a quaternion.}
+			position 604.699 -85.1928
+			inputs -1  
+			value 0.824999 1.335 1.575 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.824999 1.335 1.575 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToMatrix {
+			position 1941.49 949.605
+			inputs 36 0  
+		}
+		AxisAngle {
+			position 1693.56 760.837
+			inputs 41 0 56 0  
+		}
+		FloatSender {
+			position 1562.56 760.837
+			inputs 42 0  
+			value 0.64 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.165002 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		floatCycle {
+			position 1400.07 618.884
+			inputs -1 -1 -1  
+			value 0.64 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		QuatLength {
+			position 1107.15 -87.2318
+			inputs 36 0  
+		}
+		ShowVector3 {
+			position 1344 -288
+			inputs 37 0  
+		}
+		ShowVector3 {
+			position 1344 -156
+			inputs 38 0  
+		}
+		QuatToFloatVec {
+		hint {
+Check point of angle and quaternion axis.
+
+angle = acos(normalize(cyan) . normalize(white))
+axis = normalize(cyan  x white)) =
+        = normalize(normalize(cyan)  x normalize(white))
+
+see the acos and normalize vec3 below.}
+			position 1072.03 64.6395
+			inputs 36 0  
+		}
+		Vector3DotVector3 {
+			position 931.267 202.618
+			inputs 51 0 52 0  
+		}
+		ASinACos {
+		hint {
+Check point of quaternion angle.
+
+angle = acos(normalize(cyan) . normalize(white))
+
+See the quaternion above.
+}
+			position 1065.84 203.917
+			inputs 49 0  
+		}
+		NormalizeVector3 {
+			position 709.67 267.768
+			inputs 37 0  
+		}
+		NormalizeVector3 {
+			position 711.502 370.021
+			inputs 38 0  
+		}
+		Vector3CrossVector3 {
+			position 930.261 300.305
+			inputs 51 0 52 0  
+		}
+		ShowVector3 {
+			position 1344 -24
+			inputs 48 1  
+		}
+		Vector3Length {
+			position 1074.55 402.132
+			inputs 53 0  
+		}
+		NormalizeVector3 {
+		hint {
+Check point of  axis.
+
+axis = normalize(cyan  x white)) =
+        = normalize(normalize(cyan)  x normalize(white))
+
+See the quaternion axis above.}
+			position 1070.46 302.215
+			inputs 53 0  
+		}
+		Vector3CrossVector3 {
+			position 928.637 496.505
+			inputs 37 0 38 0  
+		}
+		NormalizeVector3 {
+		hint {
+Crosss product normalization is OK without normalization of the operands. 
+
+axis = normalize(cyan  x white)) =
+        = normalize(normalize(cyan)  x normalize(white))
+
+See the normalize vec3 above.}
+			position 1068.83 498.415
+			inputs 57 0  
+		}
+		Vector3Length {
+			position 1072.22 617.925
+			inputs 57 0  
+		}
+		QuatSlerp {
+			position 1737.18 222.225
+			inputs 74 0 36 0 61 0  
+		}
+		floatCycle {
+			position 1267.72 303.081
+			inputs -1 -1 -1  
+			value 0.65 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 1
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		QuatToMatrix {
+			position 1994.04 214.881
+			inputs 60 0  
+		}
+		MatrixMulVector {
+		hint {
+Interpolated rotation of the first vector around the axis to the second  vector.
+}
+			position 2447.61 -27.6186
+			inputs 64 0 66 0  
+		}
+		Vector3ToVector {
+			position 2255.28 -15.2548
+			inputs 37 0 -1  
+		}
+		VectorToVector3 {
+			position 2603.39 -16.7659
+			inputs 65 0  
+		}
+		ShowVector3 {
+			position 2761.33 -27.6652
+			inputs 67 0  
+		}
+		QuatVecConjQuat {
+		hint {
+qvq* rotates double the angle used for creation of the qaternion (quaternion uses cos(angle/2) and sin(angle/2)).}
+			position 1990.64 356.619
+			inputs 76 0 37 0  
+		}
+		ShowVector3 {
+			position 2204.54 341.608
+			inputs 69 0  
+		}
+		FloatSender {
+		hint {
+Check point of angle .
+
+angle = acos(normalize(cyan) . normalize(white))
+
+Look left to the first quat parameter q0.}
+			position 1207.54 65.7828
+			inputs 50 1  
+			value 0.425487 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+Check point of  quaternion axis.
+
+axis = normalize(cyan  x white)) =
+        = normalize(normalize(cyan)  x normalize(white))
+
+Look lefto to quaternion parameters q1, q2, q3.}
+			position 1209.68 124.248
+			inputs 56 0  
+			value -0.0579286 -0.746382 0.662991 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatSlerp {
+			position 1492.52 178.832
+			inputs 74 0 36 0 75 0  
+		}
+		QuatSender {
+		hint {
+No rotation quaternion.}
+			position 1496.77 94.067
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 1361.52 220.832
+			inputs -1  
+			value 0.5 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.5 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatSlerp {
+			position 1745.97 354.011
+			inputs 74 0 73 0 61 0  
+		}
+	}
+}

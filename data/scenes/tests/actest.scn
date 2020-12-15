@@ -1,0 +1,37 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+	}
+}
+transformationSpace {
+	position 3 403
+	projectionPosition 0 0
+	projectionScale 1
+	transformations {
+	}
+	operators {
+		FloatSender {
+			position 217 197
+			inputs  
+			value 0.255 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSinCos {
+			position 408 188
+			inputs 0 0  
+		}
+		ASinACos {
+			position 673 111
+			inputs 1 0  
+		}
+		ASinACos {
+			position 675 258
+			inputs 1 1  
+		}
+	}
+}

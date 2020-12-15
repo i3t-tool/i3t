@@ -1,0 +1,250 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 1.38572 13.245 13.5382
+		lookAt 0.015618 -6.0543 0.263168
+		up 0 1 0
+		orbitCenter 0.0740093 -5.2318 0.828926
+	}
+}
+transformationSpace {
+	position 3 479
+	projectionPosition -2232.68 -331.918
+	projectionScale 4
+	transformationForm {
+		position 552.931 407.143
+		inputsStorage 39 1 
+		inputsMultiOut 5 0 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 322.991 555.196
+		inputsStorage 39 1 
+		inputsMultiOut 27 0 
+		object objects basics cube red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 331.687 404.811
+		inputsStorage 32 0 
+		inputsMultiOut 27 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 576.329 282.672
+		inputsStorage 32 0 
+		inputsMultiOut 5 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 812.37 282.85
+		inputsStorage 39 1 
+		inputsMultiOut 7 0 
+		object objects basics cube blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1051.65 157.463
+		inputsStorage 39 1 
+		inputsMultiOut 19 0 
+		object objects basics cube green
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1291.29 36.9619
+		inputsStorage 39 1 
+		inputsMultiOut 21 0 
+		object objects basics cube yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1513.72 -91.8041
+		inputsStorage 39 1 
+		inputsMultiOut 23 0 
+		object objects basics cube cyan
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1739.95 -213.401
+		inputsStorage 39 1 
+		inputsMultiOut 25 0 
+		object objects basics cube magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 814.904 159.401
+		inputsStorage 32 0 
+		inputsMultiOut 7 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1052.51 38.4123
+		inputsStorage 32 0 
+		inputsMultiOut 19 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1290.84 -91.135
+		inputsStorage 32 0 
+		inputsMultiOut 21 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1513.81 -212.188
+		inputsStorage 32 0 
+		inputsMultiOut 23 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 59.9809 556.748
+		inputsStorage 46 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 89.5719 93.3826
+		inputsStorage -1 
+		inputsMultiOut 31 0 
+		object objects custom teapot
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 -0.675 0 1
+				isLocked 1
+				useSynergies 0
+			}
+			uniformScale {
+				params 1
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 3.07 0 0 0 0 3.07 0 0 0 0 3.07 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position -131.838 105.425
+		inputsStorage 41 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 706.378 -152.076
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			rotationY {
+				params 51.42
+				default 0.623607 0 -0.781738 0 0 1 0 0 0.781738 0 0.623607 0 0 0 0 1
+				matrix 0.623607 0 -0.781738 0 0 1 0 0 0.781738 0 0.623607 0 0 0 0 1
+				isLocked 1
+				useSynergies 1
+			}
+		}
+	}
+	transformationForm {
+		position 453.493 979.631
+		inputsStorage 40 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 700.42 881.901
+		inputsStorage 42 0 
+		inputsMultiOut 35 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 961.112 794.495
+		inputsStorage 47 0 
+		inputsMultiOut 37 0 
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		Translation {
+			position 168.581 983.555
+			inputs 54 0  
+		}
+		EulerY {
+			position -481.417 355.11
+			inputs 48 0  
+		}
+		EulerX {
+			position 39.9194 842.545
+			inputs 44 0  
+		}
+		FloatSender {
+			position -326.964 855.69
+			inputs  
+			value 10 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatMulFloat {
+			position -200.697 795.363
+			inputs 48 0 43 0  
+		}
+		EulerZ {
+			position -474.649 494.062
+			inputs 48 0  
+		}
+		MatrixMulMatrix {
+			position -159.639 424.199
+			inputs 41 0 45 0  
+		}
+		EulerY {
+			position 41.6315 721.419
+			inputs 48 0  
+		}
+		floatCycle {
+			position -1014.78 657.996
+			inputs -1 -1 -1  
+			value 5.38508 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.005
+			mode 1
+			manualStep 0.1
+			pause 0
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		floatCycle {
+			position -534.95 1036.72
+			inputs -1 -1 -1  
+			value 4.74 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 2
+			to 5
+			step 0.02
+			mode 2
+			manualStep 0.1
+			pause 0
+			playerInputs 49 0 49 1 49 2 49 3 49 4  
+		}
+		FloatsToVector3 {
+			position -42.6349 1000.19
+			inputs -1 -1 51 0  
+		}
+	}
+}

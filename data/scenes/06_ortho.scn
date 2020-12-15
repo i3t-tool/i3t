@@ -1,0 +1,144 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 14.2235 5.95659 1.87318
+		lookAt 2.94688 -4.44763 -6.46843
+		up 0 1 0
+		orbitCenter 4.884 -2.66038 -5.0355
+		radians 1
+	}
+	desc {
+06. Orthographic projection
+---------------------------------
+
+The scene demonstrates the function ortho(..) that is used for a construction of the orthogonal projection matrix.
+
+1. Edit the input parameters and explain how they influence the positions of the clipping planes and the form of the resulting projection matrix.
+
+2. When is appropriate to use the parallel projection? Think of examples.
+
+3. Use the aspect ratio value to replace the parameters left, right, top and bottom with a single input value of the height or the width of the screen.
+
+}
+		position 850 37
+}
+transformationSpace {
+	position 3 421
+	projectionPosition -46 46
+	projectionScale 1
+	cameraTransformationForm {
+		position 416 321
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		transformationForm {
+			position 0 0
+			inputsStorage 8 0 
+			inputsMultiOut -1 
+			transformations {
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage -1 
+			inputsMultiOut 2 0 
+			transformations {
+				translation {
+					params 0 0 0
+					default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+					matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+					isLocked 1
+					useSynergies 0
+				}
+			}
+		}
+	}
+	transformationForm {
+		position 776 344
+		inputsStorage -1 
+		inputsMultiOut -1 
+		object objects basics cube white
+		transformations {
+			translation {
+				params 0 0 -3
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -3 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -3 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 772 51
+		size 351 260
+		input 0 0 
+	}
+	operators {
+		Ortho {
+		hint {
+Function glm::ortho describes a transformation that produces a parallel projection.}
+			position 280 142
+			inputs 14 0 9 0 10 0 11 0 12 0 13 0  
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the right vertical clipping planes.
+                }
+			position 137 106
+			inputs -1  
+			value 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the bottom horizontal clipping planes.}
+			position 137 166
+			inputs -1  
+			value -1.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -1.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default -1.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the top horizontal clipping planes.}
+			position 137 226
+			inputs -1  
+			value 1.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1.5 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the distance to the nearer depth clipping planes. This value is negative if the plane is to be behind the viewer.}
+			position 137 286
+			inputs -1  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the distance to the farther depth clipping planes. This value is negative if the plane is to be behind the viewer.}
+			position 137 346
+			inputs -1  
+			value 6 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 6 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 6 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+Specify the coordinates for the left vertical clipping planes.
+                }
+			position 137 46
+			inputs -1  
+			value -2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default -2 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+	}
+}

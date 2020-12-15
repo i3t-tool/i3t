@@ -1,0 +1,42 @@
+// -------------------------------------------------------------
+// default config file
+// custom config file may be passed like run parameter 
+// order of parameters is arbitrary
+// -------------------------------------------------------------
+
+// if console is visible
+SHOW_CONSOLE 1
+
+// if aplication run in fullscreen mode
+FULLSCREEN 0
+
+// size of window form
+// -------------------------------------------------------------
+WIN_WIDTH 1920
+WIN_HEIGHT 1080
+
+// back groud color
+BACKGROUND_COLOR 0.3 0.3 0.35
+
+// camera visibility
+// -------------------------------------------------------------
+CAM_NEAR 	0.1
+CAM_FAR		1000
+
+// control settings
+// -------------------------------------------------------------
+MOUSE_SENSITIVITY 			0.002
+CAM_MOTION_SENSITIVITY		0.001
+CAM_SCROLL_SENSITIVITY		1.0
+
+// gui config file - MUST BE DEFINED!!!
+GUI_CFG						\data\gui.cfg
+
+// content files
+CONTENT_FILE				\data\content.cnt
+
+// load scene at start
+LOAD_SCENE					\data\internal\defScene.scn
+
+
+

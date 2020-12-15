@@ -1,0 +1,145 @@
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+	}
+}
+transformationSpace {
+	position 3 205
+	projectionPosition -402.463 -397.686
+	projectionScale 1.8902
+	transformationForm {
+		position 574 538
+		inputsStorage 19 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 790 537
+		inputsStorage 20 0 
+		inputsMultiOut 1 0 
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1022 536
+		inputsStorage 21 0 
+		inputsMultiOut 3 0 
+		object objects basics cube white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1499 195
+		inputsStorage 23 0 
+		inputsMultiOut 9 0 
+		object objects basics cube red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1282 194
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 1.35 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1517.52 -149.897
+		inputsStorage 26 0 
+		inputsMultiOut 13 0 
+		object objects basics cube blue
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1298.76 -161.482
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -1.605 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		FloatVecToQuat {
+			position 377 96
+			inputs -1 16 0 24 0  
+		}
+		Vector3Sender {
+			position -15.2 193.9
+			inputs  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+			position 268 84
+			inputs  
+			value -0.219998 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatToFloatVec {
+			position 665.611 -263.887
+			inputs 14 0  
+		}
+		QuatToEuler {
+			position 719 222
+			inputs 14 0  
+		}
+		EulerX {
+			position 492 375
+			inputs 18 0  
+		}
+		EulerY {
+			position 742 375
+			inputs 18 1  
+		}
+		EulerZ {
+			position 992 376
+			inputs 18 2  
+		}
+		EulerToQuat {
+			position 889 227
+			inputs 18 0 18 1 18 2  
+		}
+		QuatToMatrix {
+			position 1159 33
+			inputs 22 0  
+		}
+		NormalizeVector3 {
+			position 145.6 194.2
+			inputs 15 0  
+		}
+		FloatVecToQuat {
+			position 897.33 -284.293
+			inputs -1 17 0 17 1  
+		}
+		QuatToMatrix {
+			position 1464.2 -289.735
+			inputs 27 0  
+		}
+		NormalizeQuat {
+			position 1192.58 -267.615
+			inputs 25 0  
+		}
+		QuatInverse {
+			position 1484.95 507.44
+			inputs 22 0  
+		}
+	}
+}

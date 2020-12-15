@@ -1,0 +1,183 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -0.0119131 1.30954 2.94051
+		lookAt 0.297437 -0.54811 0.0330458
+		up 0 1 0
+		orbitCenter 0.297437 -0.54811 0.0330458
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 77
+	projectionPosition -120 -289
+	projectionScale 1
+	transformationForm {
+		position 958 16
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.0150007 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1151 16
+		inputsStorage 20 0 
+		inputsMultiOut 1 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 962 140
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1155 140
+		inputsStorage 21 0 
+		inputsMultiOut 5 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 962 285
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1155 285
+		inputsStorage 22 0 
+		inputsMultiOut 9 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformationForm {
+		position 966 424
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1159 424
+		inputsStorage 23 0 
+		inputsMultiOut 13 0 
+		object objects basics vectorX
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		Vector3Sender {
+			position -17 70
+			inputs -1  
+			value 1 -4.065 -1.89 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 -4.065 -1.89 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position -19 172
+			inputs -1  
+			value 1.245 3.415 -5.175 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1.245 3.415 -5.175 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3CrossVector3 {
+			position 363 119
+			inputs 24 0 25 0  
+		}
+		Vector3DotVector3 {
+			position 362 18
+			inputs 24 0 25 0  
+		}
+		AxisAngle {
+			position 542 42
+			inputs 26 0 18 0  
+		}
+		ShowVector3 {
+			position 509 216
+			inputs 18 0  
+		}
+		ShowVector3 {
+			position 512 349
+			inputs 24 0  
+		}
+		ShowVector3 {
+			position 514 472
+			inputs 25 0  
+		}
+		NormalizeVector3 {
+			position 99 70
+			inputs 16 0  
+		}
+		NormalizeVector3 {
+			position 98 173
+			inputs 17 0  
+		}
+		MixFloat {
+			position 279 -164
+			inputs 27 0 19 0 28 0  
+		}
+		FloatSender {
+			position 188 -250
+			inputs -1  
+			value 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		floatCycle {
+			position -98 -156
+			inputs -1 -1 -1  
+			value 0.14 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 2
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 0
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+	}
+}

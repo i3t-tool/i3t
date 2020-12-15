@@ -1,0 +1,51 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 2 2 2
+		lookAt 0 0 0
+		up 0 1 0
+		orbitCenter 0 0 0
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 630
+	projectionPosition 158 -8
+	projectionScale 1
+	transformations {
+	}
+	operators {
+		FloatMulQuat {
+			position 444 36
+			inputs 1 0 2 0  
+		}
+		FloatSender {
+			position 290 -3
+			inputs -1  
+			value -8.715 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -8.715 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatSender {
+			position 182 65
+			inputs -1  
+			value 1 0.165 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0.165 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		QuatLength {
+			position 696 36
+			inputs 0 0  
+		}
+		QuatLength {
+			position 696 108
+			inputs 2 0  
+		}
+		FloatDivFloat {
+			position 852 60
+			inputs 3 0 4 0  
+		}
+	}
+}

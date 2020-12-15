@@ -1,0 +1,153 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 27.1949 8.70417 -5.91987
+		lookAt 4.10485 -5.49795 -1.51268
+		up 0 1 0
+		orbitCenter 4.10485 -5.49795 -1.51268
+	}
+}
+transformationSpace {
+	position 3 508
+	projectionPosition -698.337 -128.64
+	projectionScale 2.39856
+	cameraTransformationForm {
+		position 462.457 416.049
+		drawScreen 1
+		drawFrustum 1
+		drawLinks 1
+		transformationForm {
+			position 0 0
+			inputsStorage -1 
+			inputsMultiOut -1 
+			transformations {
+				perspective {
+					params 70 1.33 1 10
+					default 1.58686 0 0 0 0 2.11053 0 0 0 0 -1.22222 -1 0 0 -2.22222 0
+					matrix 1.58686 0 0 0 0 2.11053 0 0 0 0 -1.22222 -1 0 0 -2.22222 0
+					isLocked 1
+					useSynergies 1
+				}
+			}
+		}
+		transformationForm {
+			position 155 0
+			inputsStorage 13 0 
+			inputsMultiOut 1 0 
+			transformations {
+			}
+		}
+	}
+	transformationForm {
+		position 944.097 45.2668
+		inputsStorage -1 
+		inputsMultiOut 7 0 
+		object objects basics cube white
+		transformations {
+			translation {
+				params 2 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 4 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 679.9 54.6888
+		inputsStorage 14 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position -312.093 537.894
+		inputsStorage 19 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+		position -78.9795 522.934
+		inputsStorage -1 
+		inputsMultiOut 9 0 
+		transformations {
+			translation {
+				params 2 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 2 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 6 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	sceneTab {
+		position 1248.47 -121.066
+		size 1021.15 802.711
+		camera 0
+	}
+	operators {
+		LookAt {
+			position 725.507 223.397
+			inputs 25 0 26 0 24 0  
+		}
+		EulerY {
+			position 229.053 -65.5742
+			inputs 15 0  
+		}
+		floatCycle {
+			position -200.041 -58.4191
+			inputs -1 -1 -1  
+			value 5.70004 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 0
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		MatrixToVectors {
+			position 144.097 120.353
+			inputs 5 1  
+		}
+		Transpose {
+			position -313.427 377.794
+			inputs 21 0  
+		}
+		MatrixToVectors {
+			position 142.497 314.669
+			inputs 11 1  
+		}
+		EulerY {
+			position -271.94 220.751
+			inputs 22 0  
+		}
+		FloatMulFloat {
+			position -156.854 102.374
+			inputs 23 0 15 0  
+		}
+		FloatSender {
+			position -265.049 100.218
+			inputs  
+			value 2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+			position 519.631 330.121
+			inputs  
+			value 0 1 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorToVector3 {
+			position 457.985 256.157
+			inputs 20 3  
+		}
+		VectorToVector3 {
+			position 456.814 182.214
+			inputs 18 3  
+		}
+	}
+}

@@ -1,0 +1,279 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 0.469739 -0.968547 6.4641
+		lookAt 0.469739 -0.968547 3
+		up 0 1 0
+		orbitCenter 0.469739 -0.968547 0
+		radians 1
+	}
+}
+transformationSpace {
+	position 3 180
+	projectionPosition -51.9887 -278.12
+	projectionScale 1.28478
+	transformationForm {
+	hint {
+u (blue)}
+		position 1854.14 257.468
+		inputsStorage 20 0 
+		inputsMultiOut -1 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+v (yellow)}
+		position 1850.74 392.068
+		inputsStorage 21 0 
+		inputsMultiOut -1 
+		object objects basics vectors yellow
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+u (blue) projected to v (yellow)}
+		position 1862.42 667.261
+		inputsStorage 25 0 
+		inputsMultiOut -1 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2017.97 -159.208
+		inputsStorage 36 0 
+		inputsMultiOut 9 0 
+		object objects basics vectors white
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1814.97 -154.548
+		inputsStorage 35 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+v (yellow) projected to u (blue) }
+		position 1861.6 48.4367
+		inputsStorage 40 0 
+		inputsMultiOut -1 
+		object objects basics vectors cyan
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2090.66 1024.04
+		inputsStorage 45 0 
+		inputsMultiOut 15 0 
+		object objects basics vectors white
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1887.66 1028.7
+		inputsStorage 44 0 
+		inputsMultiOut -1 
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		floatCycle {
+			position 31 81.4
+			inputs -1 -1 -1  
+			value 1.2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			from 0
+			to 6.28
+			step 0.01
+			mode 1
+			manualStep 0.1
+			pause 1
+			defStep 0.01
+			defFrom 0
+			defTo 1
+			playerInputs -1 -1 -1 -1 -1  
+		}
+		FloatSinCos {
+		hint {
+angle of the blue vector u
+(the one being projected to the yellow vector v)}
+			position 27 258.4
+			inputs 16 0  
+		}
+		ShowVector3 {
+			position 1614.14 256.468
+			inputs 28 0  
+		}
+		ShowVector3 {
+			position 1610.74 391.068
+			inputs 31 0  
+		}
+		FloatsToVector3 {
+		hint {
+u - blue}
+			position 283 255.4
+			inputs 19 1 19 0 -1  
+		}
+		FloatsToVector3 {
+		hint {
+v - yellow}
+			position 283 375.4
+			inputs 38 1 38 0 -1  
+		}
+		FloatSender {
+			position -106.9 403.8
+			inputs -1  
+			value 6.6771 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 6.6771 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 1622.42 666.261
+			inputs 34 0  
+		}
+		Vector3DotVector3 {
+		hint {
+u . v = |u| |v| cos(angle)}
+			position 758.326 325.11
+			inputs 28 0 31 0  
+		}
+		Vector3Length {
+			position 597.442 684.45
+			inputs 31 0  
+		}
+		Vector3MulFloat {
+			position 472 195.4
+			inputs 29 0 22 0  
+		}
+		FloatSender {
+			position 472 135.4
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		FloatSender {
+		hint {
+scale of v}
+			position 463 360.4
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3MulFloat {
+		hint {
+scaled v}
+			position 463 420.4
+			inputs 30 0 23 0  
+		}
+		FloatMulFloat {
+		hint {
+|v|^2}
+			position 767.493 681.243
+			inputs 27 0 27 0  
+		}
+		FloatDivFloat {
+		hint {
+(u . v) / |v|^2}
+			position 954.094 677.543
+			inputs 26 0 32 0  
+		}
+		Vector3MulFloat {
+		hint {
+((u . v) /|v|) normalized (v) 
+= ( (|u| |v| cos(angle) )/ |v| ) (v / |v|)
+= (u . v) v / |v|^2
+= ( (u . v) / |v|^2 ) v}
+			position 1430.55 680.861
+			inputs 33 0 31 0  
+		}
+		Translation {
+			position 1574.07 -283.248
+			inputs 28 0  
+		}
+		ShowVector3 {
+			position 1576.67 -156.908
+			inputs 37 0  
+		}
+		Vector3SubVector3 {
+		hint {
+vector showing the direction of the perpendicular projection}
+			position 1434.37 -141.348
+			inputs 34 0 28 0  
+		}
+		FloatSinCos {
+			position 24.4 391.1
+			inputs 24 0  
+		}
+		Vector3MulFloat {
+		hint {
+((u . v) /|u|) normalized (u) 
+
+= ( (u . v) / |u|^2 ) u}
+			position 1434.8 46.7369
+			inputs 41 0 28 0  
+		}
+		ShowVector3 {
+			position 1621.6 47.4367
+			inputs 39 0  
+		}
+		FloatDivFloat {
+			position 968.87 43.6034
+			inputs 26 0 42 0  
+		}
+		FloatMulFloat {
+		hint {
+|u|^2}
+			position 782.269 47.3035
+			inputs 43 0 43 0  
+		}
+		Vector3Length {
+			position 602.987 57.8655
+			inputs 28 0  
+		}
+		Translation {
+			position 1646.76 899.997
+			inputs 31 0  
+		}
+		ShowVector3 {
+			position 1649.36 1026.34
+			inputs 46 0  
+		}
+		Vector3SubVector3 {
+			position 1507.06 1041.9
+			inputs 39 0 31 0  
+		}
+		FloatMulFloat {
+			position 1009.26 321.829
+			inputs 43 0 27 0  
+		}
+		FloatDivFloat {
+			position 1163.74 320.698
+			inputs 26 0 47 0  
+		}
+		ASinACos {
+		hint {
+acos() = angel of (u,v)}
+			position 1313.3 329.15
+			inputs 48 0  
+		}
+	}
+}

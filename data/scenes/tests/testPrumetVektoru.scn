@@ -1,0 +1,312 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position 1.35642 4.58928 9.58361
+		lookAt -0.150871 -0.0970378 0
+		up 0 1 0
+		orbitCenter -0.150871 -0.0970378 0
+		radians 1
+	}
+	desc {
+Test prùmìtu vektoru do vektoru pomoci skalarniho soucinu.
+
+modry - prvni vektor u
+zluty -   druhy vektor v
+tyrkysovy (cyan) - smer prumetu}
+		position 1169 170
+}
+transformationSpace {
+	position 3 72
+	projectionPosition -1096.99 -2250.97
+	projectionScale 1.44563
+	transformationForm {
+	hint {
+u}
+		position 1272 -1968
+		inputsStorage 29 0 
+		inputsMultiOut 23 0 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+v}
+		position 1272 -1812
+		inputsStorage 34 0 
+		inputsMultiOut 23 0 
+		object objects basics vectors yellow
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1062.38 -1172.66
+		inputsStorage 39 0 
+		inputsMultiOut 23 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 923.702 -733.39
+		inputsStorage 49 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 2.595 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+smer kolmeho prumetu vektoru v na vektor u}
+		position 1266.38 -1172.66
+		inputsStorage 40 0 
+		inputsMultiOut 5 0 
+		object objects basics vectors cyan
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+u (u.v)}
+		position 1266.38 -1533.83
+		inputsStorage 43 0 
+		inputsMultiOut 23 0 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1250.61 -375.227
+		inputsStorage 44 0 
+		inputsMultiOut 17 0 
+		object objects basics vectors cyan
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1250.61 -783.227
+		inputsStorage 47 0 
+		inputsMultiOut 7 0 
+		object objects basics vectors green
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1046.61 -375.227
+		inputsStorage 48 0 
+		inputsMultiOut 7 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1652.69 -1962.35
+		inputsStorage 29 0 
+		inputsMultiOut 7 0 
+		object objects basics vectors blue
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1659.13 -1807.96
+		inputsStorage 34 0 
+		inputsMultiOut 7 0 
+		object objects basics vectors yellow
+		objectVisible 1
+		transformations {
+		}
+	}
+	transformationForm {
+		position 938.471 -1721.63
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -2.925 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformations {
+	}
+	operators {
+		OrbitRotate {
+			position -1233.97 -1890.54
+			inputs  
+			value 0.656831 0.721036 0.220635 0 0.00289352 -0.295013 0.955489 0 0.754032 -0.626956 -0.19586 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixMulVector {
+			position -884.844 -1814.07
+			inputs 24 0 26 0  
+		}
+		VectorSender {
+			position -1018.48 -1703.59
+			inputs -1  
+			value 3.745 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 3.745 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorToVector3 {
+		hint {
+u - first vector }
+			position -734.406 -1814.16
+			inputs 25 0  
+		}
+		Vector3Sender {
+		hint {
+q}
+			position -555.575 -1841.33
+			inputs 27 0  
+			value 2.45983 2.70028 0.826278 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.618496 0.590073 -0.518915 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 624 -1968
+			inputs 28 0  
+		}
+		VectorSender {
+			position -1027.53 -1358.99
+			inputs -1  
+			value 0 0.715 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0 0.715 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixMulVector {
+			position -893.892 -1469.47
+			inputs 33 0 30 0  
+		}
+		VectorToVector3 {
+		hint {
+v - second vector}
+			position -743.454 -1469.57
+			inputs 31 0  
+		}
+		OrbitRotate {
+			position -1243.02 -1545.95
+			inputs  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 624 -1824
+			inputs 36 0  
+		}
+		NormalizeVector3 {
+			position -553.344 -1948.37
+			inputs 27 0  
+		}
+		Vector3Sender {
+			position -564.624 -1456.58
+			inputs 32 0  
+			value 0 0.715 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position -563.896 -1568.13
+			inputs 32 0  
+		}
+		Vector3DotVector3 {
+		hint {
+dot(u,v) = u . v}
+			position -298.924 -1532.94
+			inputs 28 0 36 0  
+		}
+		Translation {
+			position 858.38 -1304.66
+			inputs 36 0  
+		}
+		ShowVector3 {
+			position 618.38 -1424.66
+			inputs 42 0  
+		}
+		Vector3MulFloat {
+		hint {
+vector  u( u . v) = projection of v to u}
+			position 81.0693 -1479.13
+			inputs 51 0 28 0  
+		}
+		Vector3SubVector3 {
+			position 243.124 -1355.1
+			inputs 41 0 36 0  
+		}
+		ShowVector3 {
+			position 618.38 -1557.83
+			inputs 41 0  
+		}
+		ShowVector3 {
+			position 602.613 -627.227
+			inputs 46 0  
+		}
+		Vector3MulFloat {
+			position 89.6342 -1159.26
+			inputs 38 0 36 0  
+		}
+		Vector3SubVector3 {
+			position 253.682 -897.611
+			inputs 45 0 28 0  
+		}
+		ShowVector3 {
+			position 611.126 -845.536
+			inputs 45 0  
+		}
+		Translation {
+			position 842.613 -507.227
+			inputs 28 0  
+		}
+		Inversion {
+			position 817.403 -947.788
+			inputs 22 0  
+		}
+		Vector3Length {
+			position -89.5677 -1702.74
+			inputs 28 0  
+		}
+		FloatDivFloat {
+			position 87.5898 -1646.16
+			inputs 38 0 50 0  
+		}
+		FloatDivFloat {
+			position 89.6473 -1311.3
+			inputs 38 0 53 0  
+		}
+		Vector3Length {
+			position 88.511 -1227.21
+			inputs 36 0  
+		}
+	}
+}
