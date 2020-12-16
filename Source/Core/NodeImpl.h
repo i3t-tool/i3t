@@ -563,23 +563,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::AngleAxisToQuat>::updateValues
   // angle - is divided by 2 in angleAxes
   if (m_inputs[0].isPluggedIn() && m_inputs[2].isPluggedIn())
   {
-    if (SetupForm::radians)
-      m_internalData[0].setValue(
-          glm::angleAxis(m_inputs[0].getStorage().getFloat(), glm::normalize(m_inputs[2].getStorage().getVec3())));
-    else
-      m_internalData[0].setValue(glm::angleAxis(glm::radians(m_inputs[0].getStorage().getFloat()),
-                                                glm::normalize(m_inputs[2].getStorage().getVec3())));
+    m_internalData[0].setValue(
+        glm::angleAxis(m_inputs[0].getStorage().getFloat(), glm::normalize(m_inputs[2].getStorage().getVec3())));
   }
   else if (m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
   {
     // angle / 2  - given a halfAngle - multiply by 2, as needed by angleAxis
 
-    if (SetupForm::radians)
-      m_internalData[0].setValue(glm::angleAxis(m_inputs[1].getStorage().getFloat() * 2.0f,
-                                                glm::normalize(m_inputs[2].getStorage().getVec3())));
-    else
-      m_internalData[0].setValue(glm::angleAxis(glm::radians(m_inputs[1].getStorage().getFloat() * 2.0f),
-                                                glm::normalize(m_inputs[2].getStorage().getVec3())));
+    m_internalData[0].setValue(glm::angleAxis(m_inputs[1].getStorage().getFloat() * 2.0f,
+                                              glm::normalize(m_inputs[2].getStorage().getVec3())));
   }
   else if (m_inputs[2].isPluggedIn())
   {
@@ -632,7 +624,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToAngleAxis>::updateValues
     // if (SetupForm::radians)	m_internalData[0].setValue(glm::angle(m_inputs[0].getStorage().getQuat()));
     // else m_internalData[0].setValue(glm::degrees(glm::angle(m_inputs[0].getStorage().getQuat())));
 
-    m_internalData[0].setValue(COND_TO_DEG(glm::angle(m_inputs[0].getStorage().getQuat())));
+    m_internalData[0].setValue(glm::angle(m_inputs[0].getStorage().getQuat()));
 
     m_internalData[1].setValue(glm::axis(m_inputs[0].getStorage().getQuat()));
   }
@@ -652,18 +644,9 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToEuler>::updateValues(int
 
     glm::vec3 e = glm::eulerAngles(m_inputs[0].getStorage().getQuat());
 
-    if (SetupForm::radians)
-    {
-      m_internalData[0].setValue(e.x);
-      m_internalData[1].setValue(e.y);
-      m_internalData[2].setValue(e.z);
-    }
-    else
-    {
-      m_internalData[0].setValue(glm::degrees(e.x));
-      m_internalData[1].setValue(glm::degrees(e.y));
-      m_internalData[2].setValue(glm::degrees(e.z));
-    }
+    m_internalData[0].setValue(e.x);
+    m_internalData[1].setValue(e.y);
+    m_internalData[2].setValue(e.z);
   }
   else
   {
@@ -679,14 +662,9 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerToQuat>::updateValues(int
   if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
   {
 
-    if (SetupForm::radians)
-      m_internalData[0].setValue(
-          glm::quat(glm::vec3(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-                              m_inputs[2].getStorage().getFloat())));
-    else
-      m_internalData[0].setValue(glm::quat(glm::vec3(glm::degrees(m_inputs[0].getStorage().getFloat()),
-                                                     glm::degrees(m_inputs[1].getStorage().getFloat()),
-                                                     glm::degrees(m_inputs[2].getStorage().getFloat()))));
+    m_internalData[0].setValue(
+        glm::quat(glm::vec3(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+                            m_inputs[2].getStorage().getFloat())));
   }
   else
   {
@@ -1026,17 +1004,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatSinCos>::updateValues(int
 {
   if (m_inputs[0].isPluggedIn())
   {
-
-    if (SetupForm::radians)
-    {
-      m_internalData[0].setValue(sin(m_inputs[0].getStorage().getFloat()));
-      m_internalData[1].setValue(cos(m_inputs[0].getStorage().getFloat()));
-    }
-    else
-    {
-      m_internalData[0].setValue(sin(glm::radians(m_inputs[0].getStorage().getFloat())));
-      m_internalData[1].setValue(cos(glm::radians(m_inputs[0].getStorage().getFloat())));
-    }
+    m_internalData[0].setValue(sin(m_inputs[0].getStorage().getFloat()));
+    m_internalData[1].setValue(cos(m_inputs[0].getStorage().getFloat()));
   }
   else
   {
@@ -1050,17 +1019,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ASinACos>::updateValues(int in
 {
   if (m_inputs[0].isPluggedIn())
   {
-
-    if (SetupForm::radians)
-    {
-      m_internalData[0].setValue(asin(m_inputs[0].getStorage().getFloat()));
-      m_internalData[1].setValue(acos(m_inputs[0].getStorage().getFloat()));
-    }
-    else
-    {
-      m_internalData[0].setValue(glm::degrees(asin(m_inputs[0].getStorage().getFloat())));
-      m_internalData[1].setValue(glm::degrees(acos(m_inputs[0].getStorage().getFloat())));
-    }
+    m_internalData[0].setValue(asin(m_inputs[0].getStorage().getFloat()));
+    m_internalData[1].setValue(acos(m_inputs[0].getStorage().getFloat()));
   }
   else
   {
@@ -1412,10 +1372,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerX>::updateValues(int inpu
 
     float angle;
 
-    if (SetupForm::radians)
-      angle = m_inputs[0].getStorage().getFloat();
-    else
-      angle = glm::radians(m_inputs[0].getStorage().getFloat());
+    angle = m_inputs[0].getStorage().getFloat();
 
     m_internalData[0].setValue(glm::eulerAngleX(angle));
   }
@@ -1433,10 +1390,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerY>::updateValues(int inpu
 
     float angle;
 
-    if (SetupForm::radians)
-      angle = m_inputs[0].getStorage().getFloat();
-    else
-      angle = glm::radians(m_inputs[0].getStorage().getFloat());
+    angle = m_inputs[0].getStorage().getFloat();
 
     m_internalData[0].setValue(glm::eulerAngleY(angle));
   }
@@ -1453,10 +1407,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerZ>::updateValues(int inpu
   {
     float angle;
 
-    if (SetupForm::radians)
-      angle = m_inputs[0].getStorage().getFloat();
-    else
-      angle = glm::radians(m_inputs[0].getStorage().getFloat());
+    angle = m_inputs[0].getStorage().getFloat();
 
     m_internalData[0].setValue(glm::eulerAngleZ(angle));
   }
@@ -1471,13 +1422,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::AxisAngle>::updateValues(int i
 {
   if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
   {
-
-    if (SetupForm::radians)
-      m_internalData[0].setValue(
-          glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
-    else
-      m_internalData[0].setValue(
-          glm::rotate(glm::radians(m_inputs[0].getStorage().getFloat()), m_inputs[1].getStorage().getVec3()));
+    m_internalData[0].setValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
   }
   else
   {
@@ -1520,18 +1465,9 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Perspective>::updateValues(int
   if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
       m_inputs[3].isPluggedIn())
   {
-    if (SetupForm::radians)
-    {
-      m_internalData[0].setValue(
-          glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-                           m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
-    }
-    else
-    {
-      m_internalData[0].setValue(
-          glm::perspective(glm::radians(m_inputs[0].getStorage().getFloat()), m_inputs[1].getStorage().getFloat(),
-                           m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
-    }
+    m_internalData[0].setValue(
+        glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+                         m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
   }
   else
   {
