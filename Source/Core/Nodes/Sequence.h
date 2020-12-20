@@ -50,13 +50,30 @@ public:
   };
 
   /**
+   * \brief Get reference to matrix in a sequence at given position.
+   *
+   * <b>Be careful</b> not to access matrix via invalid reference after
+   * calling popMatrix.
+   *
+   * \param idx Index of matrix.
+   * \return Reference to matrix holt in m_matrices vector.
+   */
+  [[nodiscard]] FORCE_INLINE UPtr<Matrix>& getMatRef(size_t idx)
+  {
+    return m_matrices.at(idx);
+  }
+
+  /**
    * Pop matrix from a sequence. Caller takes ownership of returned matrix.
    */
-  [[nodiscard]] UPtr<Matrix> popMatrix(const int index)
+  [[nodiscard]] FORCE_INLINE UPtr<Matrix> popMatrix(const int index)
   {
-    I3T_DEBUG_ASSERT(m_matrices.size() > index, "Sequence does not have to many matrices.");
+    I3T_DEBUG_ASSERT(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
 
-    return std::move(*m_matrices.erase(m_matrices.begin() + index));
+    auto result = std::move(m_matrices.at(index));
+    m_matrices.erase(m_matrices.begin() + index);
+
+    return result;
   };
 
   void updateValues(int inputIndex) override

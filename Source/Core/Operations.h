@@ -46,6 +46,7 @@ struct Operation
       DEFAULT_NAMES; // if the names are not the names of the OpValueType
 };
 
+/// \todo Use enum class!
 enum ENodeType
 {
   Inversion,
