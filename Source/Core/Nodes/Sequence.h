@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "Core/Node.h"
+#include "Node.h"
 
 namespace Core
 {

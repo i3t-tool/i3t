@@ -9,7 +9,7 @@
 #include "glm/gtx/norm.hpp"
 #include "glm/gtx/transform.hpp"
 
-#include "Defs.h"
+#include "Core/Defs.h"
 
 static const std::vector<std::string> emptyNames = {};
 

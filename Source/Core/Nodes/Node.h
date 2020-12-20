@@ -11,7 +11,7 @@
 #include <set>
 #include <vector>
 
-#include "Defs.h"
+#include "Core/Defs.h"
 #include "NodeData.h"
 #include "Operations.h"
 

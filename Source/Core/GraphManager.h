@@ -1,9 +1,16 @@
+/**
+ * \file Core/GraphManager.h
+ * \author Martin Herich, hericmar@fel.cvut.cz
+ * \date 10.12.2020
+ *
+ * Interface for the transformation and operator graph.
+ */
 #pragma once
 
-#include "Node.h"
-#include "NodeImpl.h"
+#include "Core/Nodes/Node.h"
+#include "Core/Nodes/NodeImpl.h"
+#include "Core/Nodes/Operations.h"
 #include "Nodes/Sequence.h"
-#include "Operations.h"
 
 namespace Builder
 {

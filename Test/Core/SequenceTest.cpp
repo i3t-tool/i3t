@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "Core/NodeBuilder.h"
+#include "Core/GraphManager.h"
 
 Ptr<Core::Sequence> arrangeSequence()
 {

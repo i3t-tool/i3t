@@ -144,7 +144,7 @@ if (BUILD_TESTS)
 
     add_subdirectory(Dependencies/gtest)
 
-    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} Source/Core/Node.h Source/Core/Node.cpp Test/Core/SequenceTest.cpp)
+    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} Source/Core/Nodes/Node.h Source/Core/Nodes/Node.cpp Test/Core/SequenceTest.cpp)
 
     target_link_libraries(${TEST_PROJECT_NAME} gtest gtest_main)
 
@@ -191,10 +191,10 @@ add_executable(${PROJECT_NAME} ${I3T_SOURCE}
         Source/GUI/Elements/Dialogs/SystemDialogs.h
         Source/Utils/System.h
         Source/Utils/System.cpp
-        Source/Core/Node.h
-        Source/Core/Node.cpp
-        Source/Core/NodeImpl.h
-        Source/Core/NodeBuilder.h Source/GUI/Settings.h Source/GUI/Settings.cpp Source/Core/Nodes/Sequence.h)
+        Source/Core/Nodes/Node.h
+        Source/Core/Nodes/Node.cpp
+        Source/Core/Nodes/NodeImpl.h
+        Source/Core/GraphManager.h Source/GUI/Settings.h Source/GUI/Settings.cpp Source/Core/Nodes/Sequence.h)
 # =============================================================
 
 # Set VS_DEBUGGER_WORKING_DIRECTORY
