@@ -128,7 +128,8 @@ enum ENodeType
   Float,
   Vector3,
   Vector4,
-  Matrix__,
+  Matrix,
+  Sequence
 };
 
 // pro kazdy OpValueType je jeden string
@@ -313,4 +314,8 @@ static const std::vector<Operation> operations = {
     {"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input},
     {"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
     {"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
+
+    // Sequence
+    /// \todo Complete sequence inputs and outputs description.
+    {"Sequence", "seq", 2, twoMatrixInput, 3, twoMatrixInput}
 };

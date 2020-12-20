@@ -35,6 +35,7 @@ class Pin;
 class NodeBase
 {
   template <ENodeType NodeType> friend class NodeImpl;
+  friend class Sequence;
 
   /// Inputs of the box: Input tabs with glyphs.
   std::vector<Pin> m_inputs;
@@ -56,6 +57,8 @@ protected:
   int m_restrictedOutputIndex; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
+  NodeBase() {}
+
   /**
    * I3T v2 default Operator constructor.
    */
@@ -65,7 +68,7 @@ public:
   }
 
   /** Delete node and unplug its all inputs and outputs. */
-  ~NodeBase();
+  virtual ~NodeBase();
 
   //===-- Obtaining value functions. ----------------------------------------===//
   /**
