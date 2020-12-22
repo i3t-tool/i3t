@@ -67,7 +67,7 @@
 #include "pgr.h"
 
 #include "Config.h"
-#include "Logger.h"
+#include "Logger/Logger.h"
 #include "Utils/Other.h"
 
 #include "Commands/ApplicationCommands.h"
@@ -161,14 +161,26 @@ int main(int argc, char* argv[])
 #ifdef _DEBUG
   // Config::WORKING_DIRECTORY = std::string(argv[0]).substr(0, std::string(argv[0]).find("Debug") - 1); // without
   // \Debug
-  auto root = FS::absolute("");
-  Config::WORKING_DIRECTORY = root;
+
+	/* Sem se kód vůbec nedostane - i když jsem ho zkompiloval jako Debug*/
+	if (true){
+		auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny/Binaries/Debug";
+	}else{
+		auto root = FS::absolute("");
+	}
+	
+	Config::WORKING_DIRECTORY = root;
+	std::cout << "Current working directory: " << root << "\n";
+  
 #else
   Config::WORKING_DIRECTORY =
       std::string(argv[0]).substr(0, std::string(argv[0]).find("Release") - 1); // without \Release
 #endif
 #endif
 
+	auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny";
+	Config::WORKING_DIRECTORY = root;
+	std::cout << "Current working directory: " << root << "\n";
   // init the logging library
   INIT_LOGGER(argc, argv);
 
@@ -202,7 +214,7 @@ int main(int argc, char* argv[])
     Config::loadFromFile(dcfg);
   else
   {
-    Config::loadFromFile(Config::getAbsolutePath("\\cfg_default.dcfg"));
+    Config::loadFromFile(Config::getAbsolutePath("/cfg_default.dcfg"));
   }
   ///   - load the scene
   /// \todo Load scene in App::initI3T().

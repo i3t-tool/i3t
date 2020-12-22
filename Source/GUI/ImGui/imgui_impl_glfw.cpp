@@ -55,6 +55,7 @@
 #include <Core/InputController.h>
 #include <GLFW/glfw3native.h> // for glfwGetWin32Window
 #endif
+#include <Core/InputController.h>
 #define GLFW_HAS_WINDOW_TOPMOST (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3200) // 3.2+ GLFW_FLOATING
 #define GLFW_HAS_WINDOW_HOVERED (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3300) // 3.3+ GLFW_HOVERED
 #define GLFW_HAS_WINDOW_ALPHA                                                                                        \

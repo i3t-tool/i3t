@@ -269,7 +269,7 @@ struct Config
    */
   static std::string getFileName(std::string filename)
   {
-    size_t l = filename.find_last_of("\\");
+    size_t l = filename.find_last_of("/");
 
     if (l == std::string::npos)
       return filename;
@@ -303,7 +303,7 @@ struct Config
   {
     if (path.size() == 0)
       return false;
-    return (path[0] == '\\');
+    return (path[0] == '/');
   }
 
   //@}

@@ -7,10 +7,11 @@ project(I3T VERSION 2.1.0)
 find_package(OpenGL REQUIRED)
 
 # Customizable options.
-option(BUILD_TESTS "Build test programs" ON)
+option(BUILD_TESTS "Build test programs" OFF)
 
+### >>> ZMENA : CMake mi hlásilo "vývojářskou chybu" - před parametrem -CMAKE_BUILD_TYPE=Release má být mezera -> nevím proč mu to vadí i když je to ve zprávě pro uživatele... ale dal jsem jí tam
 if (NOT CMAKE_BUILD_TYPE)
-    message(WARNING "Configuration is not set, using Debug as default. If you want to set custom configuration, run cmake with "-CMAKE_BUILD_TYPE=Release" for example.")
+    message(WARNING "Configuration is not set, using Debug as default. If you want to set custom configuration, run cmake with " -CMAKE_BUILD_TYPE=Release" for example.")
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
 endif()
 
@@ -52,6 +53,7 @@ endif()
 add_definitions(-DI3T_PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 
 
+### >>> ZMENA - tady jsem nic neměnil, ale mám x64 a v pohodě to proběhlo... divný ne?
 if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
     message(FATAL_ERROR "64 bit configuration is not supported in this moment!")
 endif()
@@ -66,6 +68,15 @@ if (MSVC)
     # Get Assimp shared library location.
     set(ASSIMP_LIB_NAME "assimp${LIBRARY_SUFFIX}${CMAKE_DEBUG_POSTFIX}.dll")
     set(LIB_POSTFIX "${CMAKE_DEBUG_POSTFIX}.dll")
+endif()
+
+### >>> ZMENA - nevim moc kam to patri... :-D
+if (UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
+
+	### Tohle by asi bylo lepsi - ale nevykoumal jsem pro jaky target zkolabuje make - napsalo ze pro target "all", ale ten jsem tu zase nenasel :-D
+	### target_link_libraries(all PRIVATE -lstdc++fs)
+	
 endif()
 
 # ---------- Set VS specific properties. -----------------------
@@ -100,6 +111,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
         CACHE PATH
         "Single Directory for all static libraries."
         )
+
 # =============================================================
 
 # ========== Set project specific parameters. =================
@@ -129,12 +141,16 @@ endmacro()
 
 # Configuration for building tests.
 if (BUILD_TESTS)
-    set(TEST_PROJECT_NAME test)
+#### >>>> ZMENA : Z set(TEST_PROJECT_NAME test) - název test vadil CMake, protože to používá pro něco svého -> klíďo rozmyslete jiný název pro testový adresář - jen jsme potřeboval rychle zkusit slovo test změnit
+    set(TEST_PROJECT_NAME i3t_test)
 
     message("Building tests...")
 
     include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googlemock/include)
     include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googletest/include)
+
+    # include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googlemock)
+    # include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googletest)
 
     file(GLOB_RECURSE TEST_SOURCE
             "Test/*.cpp"

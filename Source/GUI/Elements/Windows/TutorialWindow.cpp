@@ -19,7 +19,7 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   m_current_step = 0;
 
   // TEMPORARY
-  setTutorial(Config::getAbsolutePath(R"(\data\tutorials\test_quite_simple.yml)"));
+  setTutorial(Config::getAbsolutePath("/Data/tutorials/test_quite_simple.yml"));
 }
 
 void TutorialWindow::setTutorial(std::string filename)

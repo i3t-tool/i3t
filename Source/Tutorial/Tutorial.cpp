@@ -1,14 +1,15 @@
 ﻿#include "Tutorial.h"
 #include "Core/Application.h"
-#include "gl/GL.h"
+//#include "gl/GL.h"
 #include "imgui.h"
-#include "logger/Logger.h"
+#include "Logger/Logger.h"
 #include "stb_image.h"
 #include "yaml-cpp/yaml.h"
 #include <utility>
 
 Tutorial::Tutorial(std::string filename)
 {
+//	std::replace( filename.begin(), filename.end(), '\\', '/'); // replace all '\' to '/'
   m_filename = filename;
   loadFile();
   loadImages();
@@ -16,6 +17,7 @@ Tutorial::Tutorial(std::string filename)
 
 void Tutorial::loadFile() // todo think about making an interface of tutorial and let this be tut file type dependend?
 {
+	std::cout << "Tutorial::loadFile()" << std::endl;
   // LOAD GENERAL INFO
   YAML::Node tutorial = YAML::LoadFile(m_filename);
   // name
@@ -87,11 +89,12 @@ void Tutorial::loadFile() // todo think about making an interface of tutorial an
 
 void Tutorial::loadImages()
 {
+std::cout << "Tutorial::loadImages()" << std::endl;
   for (auto& image : m_images)
   {
     auto& image_filename = image.first;
     auto& image_id = image.second; // by reference
-    std::string whole_filename = Config::getAbsolutePath((R"(\data\tutorials\)" + image_filename).c_str());
+    std::string whole_filename = Config::getAbsolutePath(("/Data/tutorials/" + image_filename).c_str());
     // glEnable(GL_TEXTURE_2D);
     GLuint tex_id = 0;
     glGenTextures(1, &tex_id);
@@ -132,6 +135,7 @@ void Tutorial::loadImages()
 
 unsigned int Tutorial::getImageID(std::string filename)
 {
+	std::cout << "Tutorial::getImageID()" << std::endl;
   const auto images_it = m_images.find(filename);
   if (images_it == m_images.end())
   {
@@ -146,6 +150,7 @@ unsigned int Tutorial::getImageID(std::string filename)
 // render the tutorial content using ImGui
 void Tutorial::render(int step)
 {
+std::cout << "Tutorial::render()" << std::endl;
   for (const TWidget& widget : m_steps[step].m_content)
   {
     if (widget.m_type == "text")

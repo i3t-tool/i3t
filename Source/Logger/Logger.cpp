@@ -7,6 +7,8 @@
 
 #include "Core/GlfwWindow.h"
 
+#include <cstdarg>
+
 Logger& Logger::getInstance()
 {
   static Logger instance;

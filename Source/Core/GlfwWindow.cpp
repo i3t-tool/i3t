@@ -3,7 +3,7 @@
 #include <pgr.h>
 
 #include "Commands/ApplicationCommands.h"
-#include "logger/Logger.h"
+#include "Logger/Logger.h"
 
 void glfwErrorCallback(int error, const char* description)
 {

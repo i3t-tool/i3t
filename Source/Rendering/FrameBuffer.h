@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "pgr.h"
-#include <Logger.h>
+#include <Logger/Logger.h>
 #include <glm/glm.hpp>
 
 /**
