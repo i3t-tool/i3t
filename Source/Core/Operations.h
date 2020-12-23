@@ -131,10 +131,10 @@ enum ENodeType
   Matrix__,
 };
 
-// pro kazdy OpValueType je jeden string
+// pro kazdy OpValueType (NodeData.h) je jeden string
 static const std::vector<std::string> defaultIoNames = {
     "",       // PULSE		MN dodelat
-    "float",  // MATRIX
+    "float",  // FLOAT
     "vec3",   // VEC3
     "vec4",   // VEC4
     "matrix", // MATRIX

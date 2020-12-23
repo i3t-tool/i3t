@@ -48,6 +48,8 @@ void TutorialWindow::render()
 
 void TutorialWindow::renderTutorialContent()
 {
+  ImGui::Text(u8"かきくけこéíšířáěéšíčřá");
+
   if (m_tutorial)
   {
     m_tutorial->render(m_current_step);

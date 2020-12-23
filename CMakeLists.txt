@@ -10,16 +10,15 @@ find_package(OpenGL REQUIRED)
 option(BUILD_TESTS "Build test programs" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
-    message(WARNING "Configuration is not set, using Debug as default. If you want to set custom configuration, run cmake with "-CMAKE_BUILD_TYPE=Release" for example.")
+    message(WARNING 'Configuration is not set, using Debug as default. If you want to set custom configuration, run cmake with "-DCMAKE_BUILD_TYPE=Release" for example.')
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
 endif()
 
 # Version number to file config.h in build directory.
-configure_file(Source/ConfigVersion.h.in Source/configVersion.h)
+configure_file(Source/ConfigVersion.h.in Source/ConfigVersion.h)
 
 # Specifies where build system should find header files.
 include_directories(Source/)
-include_directories(Source/logger)
 include_directories(Dependencies/assimp/include)
 include_directories(Dependencies/jsonlib/single_include)
 include_directories(Dependencies/glfw/include)
@@ -39,9 +38,9 @@ include_directories($(OPENGL_INCLUDE_DIRS))
 # Target machine must have a C++17 compiler.
 # To set in in Visual studio use: /std:c++17
 # To set this for a project:
-#1. Right click a project, go to Properties
-#2. Select Configuration Properties > C/C++ > Language
-#3. For C++ Language Standard select "ISO C++17 Standard (/std:c++17)"
+#   1. Right click a project, go to Properties
+#   2. Select Configuration Properties > C/C++ > Language
+#   3. For C++ Language Standard select "ISO C++17 Standard (/std:c++17)"
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -51,30 +50,18 @@ endif()
 
 add_definitions(-DI3T_PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 
-
-if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
-    message(FATAL_ERROR "64 bit configuration is not supported in this moment!")
-endif()
-
 if (MSVC)
     # Enable multi-processor compilation for MSVC.
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
     message(STATUS "MSVC: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
     message(STATUS "MSVC: CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")
-
-    # Get Assimp shared library location.
-    set(ASSIMP_LIB_NAME "assimp${LIBRARY_SUFFIX}${CMAKE_DEBUG_POSTFIX}.dll")
-    set(LIB_POSTFIX "${CMAKE_DEBUG_POSTFIX}.dll")
 endif()
 
 # ---------- Set VS specific properties. -----------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/")
     set(I3T_LOGS_DIR "${I3T_OUT_DIR}${CMAKE_BUILD_TYPE}/logs")
-
-    # Get Assimp shared library location.
-    set(ASSIMP_LIB_NAME "${CMAKE_BUILD_TYPE}/assimp${LIBRARY_SUFFIX}${CMAKE_DEBUG_POSTFIX}.dll")
 else()
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/${CMAKE_BUILD_TYPE}/")
     set(I3T_LOGS_DIR "${I3T_OUT_DIR}logs")
@@ -117,16 +104,6 @@ add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
 
-
-# ======== Macros and functions. ==============================
-macro(copy_shared_libs target_project from_path)
-    add_custom_command(TARGET ${target_project} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${from_path}
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-endmacro()
-# =============================================================
-
 # Configuration for building tests.
 if (BUILD_TESTS)
     set(TEST_PROJECT_NAME test)
@@ -148,8 +125,10 @@ if (BUILD_TESTS)
 
     target_link_libraries(${TEST_PROJECT_NAME} gtest gtest_main)
 
-    copy_shared_libs(${TEST_PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/bin/gtest_main${LIB_POSTFIX}")
-    copy_shared_libs(${TEST_PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/bin/gtest${LIB_POSTFIX}")
+    set_target_properties(gtest PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+    set_target_properties(gtest_main PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
 endif()
 
 # ====== Add source files. ====================================
@@ -205,6 +184,7 @@ set_target_properties(
 # ==== Organize files into groups in Visual Studio based on directories (ideal goal)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# ==== Source files grouping for VS. ==========================
 if(FALSE)
 	# Simple structure - .h and .cpp together
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${I3T_SOURCE})
@@ -242,7 +222,7 @@ endif()
 # Tell ImGui which header file contains OpenGL functions signatures.
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
 
-# Link following binaries.
+# Link I3T with following binaries.
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC
@@ -259,9 +239,6 @@ target_link_libraries(
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${I3T_LOGS_DIR}")
 
-# Copy shared libraries to executable directory.
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD            # Adds a post-build event to I3T
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different           # which executes "cmake - E copy_if_different ..."
-        "${CMAKE_CURRENT_BINARY_DIR}/Dependencies/assimp/bin/${ASSIMP_LIB_NAME}"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+set_target_properties(assimp PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
 # =============================================================
