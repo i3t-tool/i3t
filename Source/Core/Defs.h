@@ -34,8 +34,7 @@ static void i3tAssert(bool condition, std::string message, std::string file, uns
 }
 
 /// Debug assert macro.
-#ifdef _DEBUG
-#define I3T_DEBUG
+#ifdef I3T_DEBUG
 #define I3T_DEBUG_ASSERT(...) i3tAssert(__VA_ARGS__, __FILE__, __LINE__);
 #else
 #define I3T_DEBUG_ASSERT(...)

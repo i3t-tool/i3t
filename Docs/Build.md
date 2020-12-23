@@ -8,6 +8,12 @@ Nejprve je nutno stáhnout zdrojový kód. Přepínač `--recursive` zajistí to
 git clone --recursive https://gitlab.fel.cvut.cz/i3t-diplomky/i3t.git
 ````
 
+## Instalace potřebných závislotí
+### Linux (aptitude)
+````shell
+apt install libgl-dev libglx-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev -y
+````
+
 ## 2. CMake
 Sestavení projektu je realizováno pomocí utility `cmake`. Všechny potřebné závislosti
 jsou obsažené v adresáři `Dependencies/`.

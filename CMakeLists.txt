@@ -48,6 +48,10 @@ if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
     add_compile_definitions(I3T_RELEASE_STANDALONE)
 endif()
 
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_compile_definitions(I3T_DEBUG)
+endif()
+
 add_definitions(-DI3T_PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 
 if (MSVC)

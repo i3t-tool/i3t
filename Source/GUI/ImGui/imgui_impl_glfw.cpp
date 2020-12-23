@@ -47,6 +47,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui.h"
 
+#include "Core/InputController.h"
+
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32

@@ -67,6 +67,7 @@
 #include "pgr.h"
 
 #include "Config.h"
+#include "Core/Defs.h"
 #include "Logger/Logger.h"
 #include "Utils/Other.h"
 
@@ -162,15 +163,7 @@ int main(int argc, char* argv[])
   // Config::WORKING_DIRECTORY = std::string(argv[0]).substr(0, std::string(argv[0]).find("Debug") - 1); // without
   // \Debug
 
-  /* Sem se kód vůbec nedostane - i když jsem ho zkompiloval jako Debug*/
-  if (true)
-  {
-    auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny/Binaries/Debug";
-  }
-  else
-  {
-    auto root = FS::absolute("");
-  }
+  auto root = FS::absolute("");
 
   Config::WORKING_DIRECTORY = root;
   std::cout << "Current working directory: " << root << "\n";
@@ -181,7 +174,6 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
-  auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny";
   Config::WORKING_DIRECTORY = root;
   std::cout << "Current working directory: " << root << "\n";
   // init the logging library
