@@ -740,7 +740,12 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
   {
     // Essential Mathematics, page 467
     T angle = acos(cosTheta);
-    return (sin((T(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
+    /// \todo operator* override (float and double?)
+    // return (sin((T(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
+    return glm::tquat<T, P>(
+        glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
+        glm::mix(x.z, z.z,
+                 a)); // tohle je určitě špatně - je to tu jen abych to zkompiloval - má tu být to o řádek výš
   }
 }
 

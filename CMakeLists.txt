@@ -7,7 +7,7 @@ project(I3T VERSION 2.1.0)
 find_package(OpenGL REQUIRED)
 
 # Customizable options.
-option(BUILD_TESTS "Build test programs" ON)
+option(BUILD_TESTS "Build test programs" OFF)
 
 if (NOT CMAKE_BUILD_TYPE)
     message(WARNING 'Configuration is not set, using Debug as default. If you want to set custom configuration, run cmake with "-DCMAKE_BUILD_TYPE=Release" for example.')
@@ -58,6 +58,11 @@ if (MSVC)
     message(STATUS "MSVC: CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")
 endif()
 
+# Link C++17 filesystem library.
+if (UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
+endif()
+
 # ---------- Set VS specific properties. -----------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set(I3T_OUT_DIR "${CMAKE_SOURCE_DIR}/Binaries/")
@@ -104,9 +109,19 @@ add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
 
+
+# ======== Macros and functions. ==============================
+macro(copy_shared_libs target_project from_path)
+    add_custom_command(TARGET ${target_project} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${from_path}
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+endmacro()
+# =============================================================
+
 # Configuration for building tests.
 if (BUILD_TESTS)
-    set(TEST_PROJECT_NAME test)
+    set(TEST_PROJECT_NAME i3t_test)
 
     message("Building tests...")
 

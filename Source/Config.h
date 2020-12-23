@@ -1,4 +1,3 @@
-//---------------------------------------------------------------------------
 /**
  * \file	config.h
  *
@@ -7,7 +6,6 @@
  * \date  	2014/11/16
  * \author 	Michal Folta, CTU Prague
  */
-//---------------------------------------------------------------------------
 
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
@@ -18,14 +16,11 @@
 #include <iostream>
 #include <string>
 
-//---------------------------------------------------------------------------
 /**
-  A configuration structure.
-
-  it is read by loadFromFile(), default is in the file \\cfg_default.dcfg
+ * A configuration structure.
+ *
+ * it is read by loadFromFile(), default is in the file \\cfg_default.dcfg
  */
-//---------------------------------------------------------------------------
-
 struct Config
 {
   static std::string WORKING_DIRECTORY; ///< Pathname of the working directory - set at the beginning of main()
@@ -92,10 +87,10 @@ struct Config
    * Read a float of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -105,10 +100,10 @@ struct Config
    * Read a bool of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -119,10 +114,10 @@ struct Config
    * Read a word (string) of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -133,10 +128,10 @@ struct Config
    * Read vector 2 of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -147,10 +142,10 @@ struct Config
    * Read vector 3 of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -161,10 +156,10 @@ struct Config
    * Read a vector 4 of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -175,10 +170,10 @@ struct Config
    * Read a matrix 4 of given name from the input stream
    *
    * \param [in]		is   		The input stream.
-   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which follows.
-   * Is provided by the file reader.
-   * \param 		  	attribName 	The std::string with the attribute name to be read from the stream. This value is being
-   * compared with the input \param [out]		val  		The read value is stored to the given variable.
+   * \param 		  	input		The std::string just read from the stream containing the name of the attribute which
+   * follows. Is provided by the file reader. \param 		  	attribName 	The std::string with the attribute name to be
+   * read from the stream. This value is being compared with the input \param [out]		val  		The read value is stored
+   * to the given variable.
    *
    * \return	True if it succeeds to read the attribute value, false if it fails.
    */
@@ -269,7 +264,7 @@ struct Config
    */
   static std::string getFileName(std::string filename)
   {
-    size_t l = filename.find_last_of("\\");
+    size_t l = filename.find_last_of('/');
 
     if (l == std::string::npos)
       return filename;
@@ -297,13 +292,13 @@ struct Config
    *
    * \param	path	Full pathname of the file.
    *
-   * \return	True if the path starts with a backsclash "\" indicating it is relative, false if not.
+   * \return	True if the path starts with a slash "/" indicating it is relative, false if not.
    */
   static bool isPathRelative(std::string path)
   {
     if (path.size() == 0)
       return false;
-    return (path[0] == '\\');
+    return (path[0] == '/');
   }
 
   //@}

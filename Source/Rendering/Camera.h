@@ -1,4 +1,3 @@
-//---------------------------------------------------------------------------
 /**
  * \file	camera.h
  *
@@ -6,10 +5,7 @@
  * \date  2014/11/16
  * \author Michal Folta, CTU Prague
  */
-//---------------------------------------------------------------------------
-
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
+#pragma once
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -17,7 +13,7 @@
 
 #include "Config.h"
 #include "Core/InputController.h"
-#include "Logger.h"
+#include "Logger/Logger.h"
 
 /**
  * \brief Storage for lookAt parameters (position, center and up vector)
@@ -544,5 +540,3 @@ public:
     combined = projection * view;
   }
 };
-
-#endif

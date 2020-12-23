@@ -1,6 +1,6 @@
 #include "Node.h"
 
-#include "logger/Logger.h"
+#include "Logger/Logger.h"
 
 using namespace Core;
 
@@ -137,48 +137,6 @@ ENodePlugResult NodeBase::plugToParent(UPtr<NodeBase>& toPlug, unsigned fromInde
 
   return ENodePlugResult::Ok;
 }
-
-/*
-void __Pin::unplug()
-{
-  if (m_isInput)
-  {
-    if (m_inComponent != nullptr)
-    {
-      for (auto iter = m_inComponent->m_outComponents.begin(); iter != m_inComponent->m_outComponents.end(); ++iter)
-      {
-        if (*iter == this)
-        {
-          /// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
-          m_inComponent->m_outComponents.erase(iter);
-          break;
-        }
-      }
-      if (m_inComponent->onPlugChange) m_inComponent->onPlugChange(m_inComponent, nullptr, this);
-      __Pin* oldIn = m_inComponent;
-      m_inComponent = nullptr;
-      if (onPlugChange) onPlugChange(this, nullptr, oldIn);
-    }
-  }
-  else
-  {
-    auto it = m_outComponents.begin();
-
-    while (it != m_outComponents.end())
-    {
-      __Pin* oc = *it;
-
-      __Pin* oldOut = oc->m_inComponent;
-      oc->m_inComponent = nullptr;
-      it = m_outComponents.erase(it);
-
-      if (oc->onPlugChange) oc->onPlugChange(oc, nullptr, oldOut);
-    }
-
-    if (onPlugChange) onPlugChange(this, nullptr, nullptr);
-  }
-}
- */
 
 void NodeBase::unplugInput(int index)
 {

@@ -1,5 +1,6 @@
 #include "Logger.h"
 
+#include <cstdarg>
 #include <sstream>
 
 #include <nlohmann/json.hpp>

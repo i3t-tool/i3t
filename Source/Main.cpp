@@ -67,7 +67,7 @@
 #include "pgr.h"
 
 #include "Config.h"
-#include "Logger.h"
+#include "Logger/Logger.h"
 #include "Utils/Other.h"
 
 #include "Commands/ApplicationCommands.h"
@@ -114,9 +114,9 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
 // Dal�� sd�len�
 //- jako v�ukov� sc�ny pou�ijte 01xxx ... 0nxxx
 //- ostatn� sc�ny jsou taky u�ite�n� a demonstruj� dal�� transformace a �lohy z grafiky a schopnosti n�stroje I3T, ale
-//nejsou sou��st� testov�n�
+// nejsou sou��st� testov�n�
 //- vydr�te se pros�m s nik�m z jin�ch cvi�en� n�sleduj�c� 2 t�dny nebavit o testov�n� a o n�stroji I3T, zkreslilo by
-//to v�sledek testov�n�
+// to v�sledek testov�n�
 //"
 /**
  * \brief	Main entry-point for this application
@@ -158,17 +158,32 @@ int main(int argc, char* argv[])
   Config::WORKING_DIRECTORY = std::string(buffer);
   /// \todo
 #else // special settings for usage in Visual Studio devenv
-#ifdef _DEBUG
+#ifdef I3T_DEBUG
   // Config::WORKING_DIRECTORY = std::string(argv[0]).substr(0, std::string(argv[0]).find("Debug") - 1); // without
   // \Debug
-  auto root = FS::absolute("");
+
+  /* Sem se kód vůbec nedostane - i když jsem ho zkompiloval jako Debug*/
+  if (true)
+  {
+    auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny/Binaries/Debug";
+  }
+  else
+  {
+    auto root = FS::absolute("");
+  }
+
   Config::WORKING_DIRECTORY = root;
+  std::cout << "Current working directory: " << root << "\n";
+
 #else
   Config::WORKING_DIRECTORY =
       std::string(argv[0]).substr(0, std::string(argv[0]).find("Release") - 1); // without \Release
 #endif
 #endif
 
+  auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny";
+  Config::WORKING_DIRECTORY = root;
+  std::cout << "Current working directory: " << root << "\n";
   // init the logging library
   INIT_LOGGER(argc, argv);
 
@@ -202,7 +217,7 @@ int main(int argc, char* argv[])
     Config::loadFromFile(dcfg);
   else
   {
-    Config::loadFromFile(Config::getAbsolutePath("\\cfg_default.dcfg"));
+    Config::loadFromFile(Config::getAbsolutePath("/cfg_default.dcfg"));
   }
   ///   - load the scene
   /// \todo Load scene in App::initI3T().

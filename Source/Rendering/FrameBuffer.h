@@ -1,19 +1,15 @@
-//---------------------------------------------------------------------------
 /**
  * \file	GUI\frameBuffer.h
  *
  * Declares the frame buffer class
  */
-//---------------------------------------------------------------------------
-
-#ifndef _FRAME_BUFFER_H_
-#define _FRAME_BUFFER_H_
+#pragma once
 
 #include <iostream>
 #include <vector>
 
 #include "pgr.h"
-#include <Logger.h>
+#include <Logger/Logger.h>
 #include <glm/glm.hpp>
 
 /**
@@ -293,5 +289,3 @@ public:
   }
   */
 };
-
-#endif
