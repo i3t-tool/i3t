@@ -164,21 +164,21 @@ int main(int argc, char* argv[])
 
 	/* Sem se kód vůbec nedostane - i když jsem ho zkompiloval jako Debug*/
 	if (true){
-		auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny/Binaries/Debug";
+		auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny_linux-ubuntu-18.04/";
 	}else{
 		auto root = FS::absolute("");
 	}
-	
+
 	Config::WORKING_DIRECTORY = root;
 	std::cout << "Current working directory: " << root << "\n";
-  
+
 #else
   Config::WORKING_DIRECTORY =
       std::string(argv[0]).substr(0, std::string(argv[0]).find("Release") - 1); // without \Release
 #endif
 #endif
 
-	auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny";
+	auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny_linux-ubuntu-18.04/";
 	Config::WORKING_DIRECTORY = root;
 	std::cout << "Current working directory: " << root << "\n";
   // init the logging library

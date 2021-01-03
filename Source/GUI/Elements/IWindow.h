@@ -19,6 +19,5 @@ public:
 
 protected:
   friend class Application;
-
   bool m_show;
 };
