@@ -29,7 +29,7 @@ void Object::update()
   if (transformation != NULL)
   {
     // setTrans(transformation->getTransformationOut());
-    glm::mat4 trans = WorkspaceWindow::DrawInScene();
+    //glm::mat4 trans = WorkspaceWindow::DrawInScene();
     setTrans(trans);
   }
 }

@@ -27,6 +27,8 @@ mkdir out && cd out
 
 # Build in the directory MSVC project files.
 cmake -DCMAKE_BUILD_TYPE=Debug -A Win32 -G "Visual Studio 16 2019" ..
+# or for Code-Blocks projekt on Linux
+cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" ..
 ````
 Tento příklad spuštění CMake z příkazové řádky vygeneruje soubory projektu pro Visual 
  Studio 2019 v adresáři, ve kterém je CMake spuštěn, a to pro konfiguraci ``Debug | x86``.

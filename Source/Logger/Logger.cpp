@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "Logger/Logger.h"
 
 #include <cstdarg>
 #include <sstream>
@@ -32,6 +32,8 @@ void Logger::initLogger(int argc, char* argv[])
   std::cout << "initializing logger" << std::endl;
 
   loadStrings();
+
+  std::cout << "After load" << std::endl;
 
   spdlog::set_pattern("[%d.%m.%Y %T:%e]: %v");
 
@@ -163,6 +165,7 @@ bool Logger::shouldLogMouse()
 
 void Logger::loadStrings()
 {
+  std::cout << "Load strings from: " << LOG_STRINGS_PATH << std::endl;
   nlohmann::json json_strings;
   std::ifstream i(LOG_STRINGS_PATH);
   i >> json_strings; // TODO -> throws an exception when file LOG_STRINGS_PATH does not exist.
