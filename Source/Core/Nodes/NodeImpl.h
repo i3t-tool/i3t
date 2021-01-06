@@ -62,6 +62,8 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[T])
   updateValues(0);
 }
 
+//===-----------------------------------------------------------------------===//
+
 template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
 {
   I3T_DEBUG_ASSERT(false, "Calling update function of unimplemented NodeImpl type.")
@@ -1524,6 +1526,14 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int input
   if (m_inputs[0].isPluggedIn())
   {
     m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+  }
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(m_inputs[0].getStorage().getMat4());
   }
 }
 } // namespace Core

@@ -11,7 +11,7 @@
 #include <set>
 #include <vector>
 
-#include "Defs.h"
+#include "Core/Defs.h"
 #include "NodeData.h"
 #include "Operations.h"
 
@@ -34,7 +34,9 @@ class Pin;
  */
 class NodeBase
 {
+  friend class GraphManager;
   template <ENodeType NodeType> friend class NodeImpl;
+  friend class Sequence;
 
   /// Inputs of the box: Input tabs with glyphs.
   std::vector<Pin> m_inputs;
@@ -56,6 +58,8 @@ protected:
   int m_restrictedOutputIndex; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
+  NodeBase() {}
+
   /**
    * I3T v2 default Operator constructor.
    */
@@ -65,7 +69,7 @@ public:
   }
 
   /** Delete node and unplug its all inputs and outputs. */
-  ~NodeBase();
+  virtual ~NodeBase();
 
   //===-- Obtaining value functions. ----------------------------------------===//
   /**
@@ -84,63 +88,6 @@ public:
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;
   [[nodiscard]] const std::vector<Pin>& getOutputPins() const;
-  //===----------------------------------------------------------------------===//
-
-  //===-- Operator manipulation functions. ----------------------------------===//
-  /**
-   * Connect given node output pin to this operator input pin.
-   *
-   * Usage:
-   * \code
-   *    // Create nodes.
-   *    auto vec1 = Builder::createNode<OperationType::Vector3>();
-   *    auto vec2 = Builder::createNode<OperationType::Vector3>();
-   *    auto dotNode = Builder::createNode<OperationType::Vector3DotVector3>();
-   *
-   *    // Plug vector nodes output to dot node inputs.
-   *    dotNode->plug(vec1, 0, 0);
-   *    dotNode->plug(vec2, 1, 0);
-   * \endcode
-   *
-   * \param parentNode Reference to a unique pointer to a parent node to which \a parentOutputPinIndex this node
-   *        should be connected to.
-   * \param parentOutputPinIndex Index of the output pin of the parent node.
-   * \param myInputPinIndex Index of input pin of this node.
-   *
-   * \return Result enum is returned from the function. \see ENodePlugResult.
-   */
-  ENodePlugResult plugToParent(UPtr<NodeBase>& parentNode, unsigned parentOutputPinIndex, unsigned myInputPinIndex);
-
-  /// Unplug all inputs and outputs.
-  void unplugAll();
-
-  /**
-   * Unplug plugged node from given input pin of this node.
-   *
-   * \param index
-   */
-  void unplugInput(int index);
-
-  /**
-   * Unplug all nodes connected to given output pin of this node.
-   *
-   * \param index
-   */
-  void unplugOutput(int index);
-
-  /**
-   * Is used to check before connecting to avoid cycles in the node graph.
-   *
-   * The function is used in plug() function.
-   *
-   * Algorithm described in panel Algoritmus 1 in [Folta, page 30]
-   *
-   * \param sender probably the input (the wire goes to its input)
-   * \param pluged probably the output (the wire starts here)
-   *
-   * \todo Correct the parameter names. Rename: sender -> receiver or input, plugged -> output or sender
-   */
-  static ENodePlugResult isOperatorPlugCorrect(Pin* sender, Pin* plugged);
   //===----------------------------------------------------------------------===//
 
   //===-- Values updating functions. ----------------------------------------===//
@@ -190,6 +137,7 @@ public:
  */
 class Pin
 {
+  friend class GraphManager;
   template <ENodeType NodeType> friend class NodeImpl;
   friend class NodeBase;
 

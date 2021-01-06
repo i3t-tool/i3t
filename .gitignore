@@ -11,3 +11,5 @@ out/
 !/data/models/bunny.obj
 !/data/models/monkey.obj
 !/data/models/teapot.obj
+
+/Data/imgui.ini

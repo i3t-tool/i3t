@@ -9,7 +9,7 @@
 #include "glm/gtx/norm.hpp"
 #include "glm/gtx/transform.hpp"
 
-#include "Defs.h"
+#include "Core/Defs.h"
 
 static const std::vector<std::string> emptyNames = {};
 
@@ -46,6 +46,7 @@ struct Operation
       DEFAULT_NAMES; // if the names are not the names of the OpValueType
 };
 
+/// \todo Use enum class!
 enum ENodeType
 {
   Inversion,
@@ -128,7 +129,8 @@ enum ENodeType
   Float,
   Vector3,
   Vector4,
-  Matrix__,
+  Matrix,
+  Sequence
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
@@ -313,4 +315,8 @@ static const std::vector<Operation> operations = {
     {"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input},
     {"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
     {"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
+
+    // Sequence
+    /// \todo Complete sequence inputs and outputs description.
+    {"Sequence", "seq", 2, twoMatrixInput, 3, twoMatrixInput}
 };
