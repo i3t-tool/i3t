@@ -162,10 +162,10 @@ class Pin
    */
   std::vector<Pin*> m_outputs;
 
-  const OpValueType::type m_opValueType = OpValueType::type::PULSE;
+  const EValueType m_opValueType = EValueType::Pulse;
 
 public:
-  Pin(OpValueType::type valueType, bool isInput, NodeBase* op)
+  Pin(EValueType valueType, bool isInput, NodeBase* op)
       : m_opValueType(valueType), m_isInput(isInput), m_master(op)
   {
   }
@@ -175,19 +175,12 @@ public:
   [[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 
   /**
-   * Query if input of this object is plugged to any parent output.
-   *
-   * \return True if plugged to parent, false if not.
-   */
-  [[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
-
-  /**
    * Get stored data based on pin type.
    *
    * \returns data storage owner by node connected to this input pin. If pin is output pin,
    *          it returns data storage of pin owner.
    */
-  DataStore& getStorage(unsigned id = 0)
+  [[nodiscard]] DataStore& getStorage(unsigned id = 0)
   {
     if (m_isInput)
     {
@@ -199,5 +192,14 @@ public:
       return m_master->getInternalData(id);
     }
   }
+
+  [[nodiscard]] EValueType getType() const { return m_opValueType; }
+
+  /**
+   * Query if input of this object is plugged to any parent output.
+   *
+   * \return True if plugged to parent, false if not.
+   */
+  [[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
 };
 } // namespace Core

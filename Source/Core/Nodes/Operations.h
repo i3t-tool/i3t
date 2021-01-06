@@ -36,9 +36,9 @@ struct Operation
   const std::string keyWord;
   const std::string defaultLabel;
   const int numberOfInputs;
-  const std::vector<OpValueType::type> inputTypes;
+  const std::vector<EValueType> inputTypes;
   const int numberOfOutputs;
-  const std::vector<OpValueType::type> outputTypes;
+  const std::vector<EValueType> outputTypes;
   const std::string defaultTagText = NO_TAG;
   const std::vector<std::string> defaultInputNames =
       DEFAULT_NAMES; // if the names are not the names of the OpValueType
@@ -136,66 +136,66 @@ enum ENodeType
 // pro kazdy OpValueType (NodeData.h) je jeden string
 static const std::vector<std::string> defaultIoNames = {
     "",       // PULSE		MN dodelat
-    "float",  // FLOAT
-    "vec3",   // VEC3
-    "vec4",   // VEC4
-    "matrix", // MATRIX
-    "quat",   // QUAT
-    "",       // MATRIX_MULL	MN dodelat
+    "float",  // Float
+    "vec3",   // Vec3
+    "vec4",   // Vec4
+    "matrix", // Matrix
+    "quat",   // Quat
+    "",       // Matrix_MULL	MN dodelat
     ""        // SCREEN		MN dodelat
 
 };
 
-static const std::vector<OpValueType::type> matrixInput = {OpValueType::MATRIX};
-static const std::vector<OpValueType::type> vectorInput = {OpValueType::VEC4};
-static const std::vector<OpValueType::type> vector3Input = {OpValueType::VEC3};
-static const std::vector<OpValueType::type> floatInput = {OpValueType::FLOAT};
-static const std::vector<OpValueType::type> quatInput = {OpValueType::QUAT};
+static const std::vector<EValueType> matrixInput = {EValueType::Matrix};
+static const std::vector<EValueType> vectorInput = {EValueType::Vec4};
+static const std::vector<EValueType> vector3Input = {EValueType::Vec3};
+static const std::vector<EValueType> floatInput = {EValueType::Float};
+static const std::vector<EValueType> quatInput = {EValueType::Quat};
 
-static const std::vector<OpValueType::type> twoMatrixInput = {OpValueType::MATRIX, OpValueType::MATRIX};
-static const std::vector<OpValueType::type> twoVectorInput = {OpValueType::VEC4, OpValueType::VEC4};
-static const std::vector<OpValueType::type> twoVector3Input = {OpValueType::VEC3, OpValueType::VEC3};
-static const std::vector<OpValueType::type> twoQuatInput = {OpValueType::QUAT, OpValueType::QUAT};
-static const std::vector<OpValueType::type> twoFloatInput = {OpValueType::FLOAT, OpValueType::FLOAT};
+static const std::vector<EValueType> twoMatrixInput = {EValueType::Matrix, EValueType::Matrix};
+static const std::vector<EValueType> twoVectorInput = {EValueType::Vec4, EValueType::Vec4};
+static const std::vector<EValueType> twoVector3Input = {EValueType::Vec3, EValueType::Vec3};
+static const std::vector<EValueType> twoQuatInput = {EValueType::Quat, EValueType::Quat};
+static const std::vector<EValueType> twoFloatInput = {EValueType::Float, EValueType::Float};
 
-static const std::vector<OpValueType::type> threeFloatInput = {OpValueType::FLOAT, OpValueType::FLOAT,
-                                                               OpValueType::FLOAT};
-static const std::vector<OpValueType::type> threeVector3Input = {OpValueType::VEC3, OpValueType::VEC3,
-                                                                 OpValueType::VEC3};
+static const std::vector<EValueType> threeFloatInput = {EValueType::Float, EValueType::Float,
+                                                               EValueType::Float};
+static const std::vector<EValueType> threeVector3Input = {EValueType::Vec3, EValueType::Vec3,
+                                                                 EValueType::Vec3};
 
-static const std::vector<OpValueType::type> fourVectorInput = {OpValueType::VEC4, OpValueType::VEC4,
-                                                               OpValueType::VEC4, OpValueType::VEC4};
-static const std::vector<OpValueType::type> fourVector3Input = {OpValueType::VEC3, OpValueType::VEC3,
-                                                                OpValueType::VEC3, OpValueType::VEC3};
-static const std::vector<OpValueType::type> fourFloatInput = {OpValueType::FLOAT, OpValueType::FLOAT,
-                                                              OpValueType::FLOAT, OpValueType::FLOAT};
+static const std::vector<EValueType> fourVectorInput = {EValueType::Vec4, EValueType::Vec4,
+                                                               EValueType::Vec4, EValueType::Vec4};
+static const std::vector<EValueType> fourVector3Input = {EValueType::Vec3, EValueType::Vec3,
+                                                                EValueType::Vec3, EValueType::Vec3};
+static const std::vector<EValueType> fourFloatInput = {EValueType::Float, EValueType::Float,
+                                                              EValueType::Float, EValueType::Float};
 
-static const std::vector<OpValueType::type> sixFloatInput = {OpValueType::FLOAT, OpValueType::FLOAT,
-                                                             OpValueType::FLOAT, OpValueType::FLOAT,
-                                                             OpValueType::FLOAT, OpValueType::FLOAT};
+static const std::vector<EValueType> sixFloatInput = {EValueType::Float, EValueType::Float,
+                                                             EValueType::Float, EValueType::Float,
+                                                             EValueType::Float, EValueType::Float};
 
-static const std::vector<OpValueType::type> sixteenFloatInput = {
-    OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT,
-    OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT,
-    OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT,
-    OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT, OpValueType::FLOAT};
+static const std::vector<EValueType> sixteenFloatInput = {
+    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float};
 
-static const std::vector<OpValueType::type> twoVectorFloatInput = {OpValueType::VEC4, OpValueType::VEC4,
-                                                                   OpValueType::FLOAT};
-static const std::vector<OpValueType::type> twoVector3FloatInput = {OpValueType::VEC3, OpValueType::VEC3,
-                                                                    OpValueType::FLOAT};
-static const std::vector<OpValueType::type> twoFloatVector3Input = {OpValueType::FLOAT, OpValueType::FLOAT,
-                                                                    OpValueType::VEC3};
-static const std::vector<OpValueType::type> twoQuatFloatInput = {OpValueType::QUAT, OpValueType::QUAT,
-                                                                 OpValueType::FLOAT};
+static const std::vector<EValueType> twoVectorFloatInput = {EValueType::Vec4, EValueType::Vec4,
+                                                                   EValueType::Float};
+static const std::vector<EValueType> twoVector3FloatInput = {EValueType::Vec3, EValueType::Vec3,
+                                                                    EValueType::Float};
+static const std::vector<EValueType> twoFloatVector3Input = {EValueType::Float, EValueType::Float,
+                                                                    EValueType::Vec3};
+static const std::vector<EValueType> twoQuatFloatInput = {EValueType::Quat, EValueType::Quat,
+                                                                 EValueType::Float};
 
-static const std::vector<OpValueType::type> matrixVectorInput = {OpValueType::MATRIX, OpValueType::VEC4};
-static const std::vector<OpValueType::type> vectorMatrixInput = {OpValueType::VEC4, OpValueType::MATRIX};
-static const std::vector<OpValueType::type> floatMatrixInput = {OpValueType::FLOAT, OpValueType::MATRIX};
-static const std::vector<OpValueType::type> floatVectorInput = {OpValueType::FLOAT, OpValueType::VEC4};
-static const std::vector<OpValueType::type> floatVector3Input = {OpValueType::FLOAT, OpValueType::VEC3};
-static const std::vector<OpValueType::type> floatQuatInput = {OpValueType::FLOAT, OpValueType::QUAT};
-static const std::vector<OpValueType::type> quatVector3Input = {OpValueType::QUAT, OpValueType::VEC3};
+static const std::vector<EValueType> matrixVectorInput = {EValueType::Matrix, EValueType::Vec4};
+static const std::vector<EValueType> vectorMatrixInput = {EValueType::Vec4, EValueType::Matrix};
+static const std::vector<EValueType> floatMatrixInput = {EValueType::Float, EValueType::Matrix};
+static const std::vector<EValueType> floatVectorInput = {EValueType::Float, EValueType::Vec4};
+static const std::vector<EValueType> floatVector3Input = {EValueType::Float, EValueType::Vec3};
+static const std::vector<EValueType> floatQuatInput = {EValueType::Float, EValueType::Quat};
+static const std::vector<EValueType> quatVector3Input = {EValueType::Quat, EValueType::Vec3};
 
 static const std::vector<std::string> mixInputNames = {"from", "to", "t"};
 static const std::vector<std::string> AngleAxisToQuatInputNames = {"angle", "angle / 2", "vec3"};

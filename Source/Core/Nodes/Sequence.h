@@ -21,11 +21,11 @@ class Sequence : public NodeBase
 public:
   Sequence() : NodeBase(&operations[ENodeType::Sequence])
   {
-    m_inputs.emplace_back(OpValueType::MATRIX, true, this); // mul. input
-    m_inputs.emplace_back(OpValueType::MATRIX, true, this); // direct mat. input
+    m_inputs.emplace_back(EValueType::Matrix, true, this); // mul. input
+    m_inputs.emplace_back(EValueType::Matrix, true, this); // direct mat. input
 
-    m_outputs.emplace_back(OpValueType::MATRIX, false, this); // mul. output
-    m_outputs.emplace_back(OpValueType::MATRIX, false, this); // direct mat. output
+    m_outputs.emplace_back(EValueType::Matrix, false, this); // mul. output
+    m_outputs.emplace_back(EValueType::Matrix, false, this); // direct mat. output
 
     m_internalData.emplace_back();
     m_internalData.emplace_back();

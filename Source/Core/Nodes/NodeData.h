@@ -12,26 +12,19 @@
 #include "glm/gtc/quaternion.hpp"
 
 /** An operator value type = type of the interconnection wire. */
-struct OpValueType
+enum class EValueType
 {
-  enum type
-  {
-    PULSE = 0,
-    ///< pink		(1.0, 0.0, 1.0), purely abstract - used just to provoke the connected operator to perfom some activity
-    FLOAT,
-    ///< green		(0.0, 0.7, 0.0) standard data type
-    VEC3,
-    ///< blue		(0.0, 0.2, 1.0)
-    VEC4,
-    ///< brown		(0.4, 0.3, 0.0)
-    MATRIX,
-    ///< red		(1.0, 0.7, 0.0)
-    QUAT,
-    ///< orange		(1.0, 0.1, 0.0)
-    MATRIX_MUL,
-    ///< white		(1.0, 1.0, 1.0) connection of sequences in the scene graph - represents a matrix multiplication
-    SCREEN ///< turqouise	(0.0, 1.0, 1.0) projection and camera view transformation
-  };
+  /**
+   * purely abstract - used just to provoke the connected operator to perfom some activity
+   */
+  Pulse = 0,
+  Float, ///< standard data type
+  Vec3,
+  Vec4,
+  Matrix,
+  Quat,
+  MatrixMul, ///< connection of sequences in the scene graph - represents a matrix multiplication
+  Screen     ///< projection and camera view transformation
 };
 
 /**
@@ -58,38 +51,29 @@ class DataStore
 {
 protected:
   OpValue value;   ///< transmitted data (union of all data types passed along the wire)
-  int opValueType; ///< wire type, such as FLOAT or MATRIX
+  EValueType opValueType; ///< wire type, such as FLOAT or MATRIX
 
 public:
   /** Default constructor constructs a signal of type OpValueType::MATRIX and undefined value (a unit matrix) */
-  // Transmitter() : opValueType(0) { //PFQ: 0 je pulse a value matrix??? - pulse nema typ, tak inicializace default
-  // matice Transmitter() : opValueType(OpValueType::MATRIX), value(glm::mat4()) {
-  DataStore() : opValueType(OpValueType::MATRIX) { value.matrix = glm::mat4(); }
+  DataStore() : opValueType(EValueType::Matrix) { value.matrix = glm::mat4(); }
 
-  /**
-      Constructor
-
-      \param	_opValueType	Type of the operation value.
-   */
-  DataStore(const int _opValueType) : opValueType(_opValueType)
+  DataStore(EValueType valueType) : opValueType(valueType)
   {
-    // Transmitter(int _opValueType) : opValueType(_opValueType), value(glm::mat4()) {
-
-    switch (_opValueType)
+    switch (valueType)
     {
-    case OpValueType::SCREEN:
-      setValue((void*)NULL);
+    case EValueType::Screen:
+      setValue((void*) nullptr);
       break;
-    case OpValueType::FLOAT:
+    case EValueType::Float:
       setValue(0.0f);
       break;
-    case OpValueType::VEC3:
+    case EValueType::Vec3:
       setValue(glm::vec3());
       break;
-    case OpValueType::VEC4:
+    case EValueType::Vec4:
       setValue(glm::vec4());
       break;
-    case OpValueType::QUAT:
+    case EValueType::Quat:
       setValue(glm::quat());
       break;
     default: // MATRIX, MATRIX_MUL, PULSE
@@ -98,7 +82,7 @@ public:
     }
   }
 
-  int getOpValType() const { return opValueType; }
+  [[nodiscard]] EValueType getOpValType() const { return opValueType; }
 
   glm::mat4& getMat4() { return value.matrix; }
 
