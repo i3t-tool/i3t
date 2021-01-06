@@ -164,10 +164,11 @@ int main(int argc, char* argv[])
 
 	/* Sem se kód vůbec nedostane - i když jsem ho zkompiloval jako Debug*/
 	if (true){
-		auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny_linux-ubuntu-18.04/";
+		//auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny_linux-ubuntu-18.04/";
 	}else{
 		auto root = FS::absolute("");
 	}
+  auto root = FS::absolute("");
 
 	Config::WORKING_DIRECTORY = root;
 	std::cout << "Current working directory: " << root << "\n";
@@ -178,7 +179,8 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
-	auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny_linux-ubuntu-18.04/";
+	//auto root = "/home/jahol/CVUT/Diplomka/VizTransformApp/i3t-bunny_linux-ubuntu-18.04/";
+  //auto root = FS::absolute("");
 	Config::WORKING_DIRECTORY = root;
 	std::cout << "Current working directory: " << root << "\n";
   // init the logging library
