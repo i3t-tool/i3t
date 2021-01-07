@@ -24,9 +24,9 @@ public:
 
 	void drawBox(util::NodeBuilder& builder);
 
-  void drawOutputs(util::NodeBuilder& builder, Pin* newLinkPin);
+  void drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin);
 
-  void drawInputs(util::NodeBuilder& builder, Pin* newLinkPin);
+  void drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin);
 
 };
 

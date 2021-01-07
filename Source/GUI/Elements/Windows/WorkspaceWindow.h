@@ -13,11 +13,13 @@
 
 #include <glm/glm.hpp>
 #include <imgui_node_editor.h>
-#include "../../../Core/Node.h"
-#include "../../../Core/NodeImpl.h"
-#include "../../../Core/NodeBuilder.h"
+#include "../../../Core/Nodes/Node.h"
+#include "../../../Core/Nodes/NodeImpl.h"
+#include "../../../Core/Nodes/GraphManager.h"
 #include "Core/Application.h"
 #include <memory>
+#include "pgr.h"
+#include "Config.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
@@ -27,6 +29,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 
 /*! \fn static inline ImRect ImGui_GetItemRect()
     \brief Get ImRect of last (active/added ?) item
@@ -63,25 +66,6 @@ namespace util = ax::NodeEditor::Utilities;
 
 static ed::EditorContext* m_Editor = nullptr; /*! \brief Object for store workspace scene */
 
-
-/*! \enum PinType
-    \brief types (close to data types) of Pin
- */
-enum class PinType
-{
-  Flow,
-  Bool,
-  Int,
-  Float,
-  String,
-  Object,
-  Function,
-  Delegate,
-  Mat4x4,
-  Vec
-};
-
-
 /*! \enum PinKind
     \brief kinds (in/out) of Pin
  */
@@ -97,12 +81,12 @@ struct Link;
 /*! \struct Pin
     \brief use to connecting Link to Node
  */
-struct Pin
+struct GUIPin
 {
   ed::PinId ID; /*! \brief unique (among Pins) identificator */
   ::Namespace* Node; /*! \brief Node the Pin belongs to */
   std::string Name; /*! \brief Name of Pin */
-  PinType Type; /*! \brief Type of pin \sa PinType */
+  EValueType Type;   /*! \brief Type of pin \sa PinType */
   PinKind Kind;  /*! \brief Kind of pin \sa PinKind */
 
   /*! \fn Pin
@@ -113,7 +97,9 @@ struct Pin
 
         PinKind is set to input. Node is set to nullptr.
     */
-  Pin(int id, const char* name, PinType type) : ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input){}
+  GUIPin(int id, const char* name, EValueType type) : ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input)
+  {
+  }
 };
 
 class Namespace
@@ -122,8 +108,8 @@ class Namespace
       
       ed::NodeId ID; /*! \brief unique (among Nodes) identificator */
       std::string Name; /*! \brief Name of Node */
-      std::vector<Pin*> Inputs; /*! \brief Vector of input Pins */
-      std::vector<Pin*> Outputs; /*! \brief Vector of output Pins */
+      std::vector<GUIPin*> Inputs; /*! \brief Vector of input Pins */
+      std::vector<GUIPin*> Outputs; /*! \brief Vector of output Pins */
       ImColor Color; /*! \brief Color of Node */
       ENodeType Type; /*! \brief Type of Node */
       ImVec2 Size;  /*! \brief Size of box */
@@ -157,9 +143,9 @@ class Namespace
 
        virtual void drawBox(util::NodeBuilder& builder)=0;
 
-       virtual void drawOutputs(util::NodeBuilder& builder, Pin* newLinkPin) = 0;
+       virtual void drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin) = 0;
 
-       virtual void drawInputs(util::NodeBuilder& builder, Pin* newLinkPin) = 0;
+       virtual void drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin) = 0;
 };
 
 /*! \struct Link
@@ -169,8 +155,8 @@ struct Link
 {
   ed::LinkId ID; /*! \brief unique (among Links) identificator */
 
-  Pin* StartPin; /*! \brief Pin from which Link comes from */
-  Pin* EndPin; /*! \brief Pin to which Link goes to */
+  GUIPin* StartPin; /*! \brief Pin from which Link comes from */
+  GUIPin* EndPin; /*! \brief Pin to which Link goes to */
   
   ImColor Color; /*! \brief Color of Link  */
 
@@ -182,7 +168,7 @@ struct Link
 
     Color is set to Color(255, 255, 255)
 */
-  Link(ed::LinkId id, Pin* StartPin, Pin* EndPin)
+  Link(ed::LinkId id, GUIPin* StartPin, GUIPin* EndPin)
       : ID(id), StartPin(StartPin), EndPin(EndPin), Color(255, 255, 255)
   {
   }
@@ -318,7 +304,7 @@ static Link* FindLink(ed::LinkId id)
     \param[in] id PinId of Pin function search for
     \return Pin* of Pin with given id or nullptr when not found
 */
-static Pin* FindPin(ed::PinId id)
+static GUIPin* FindPin(ed::PinId id)
 {
   if (!id)
     return nullptr;
@@ -359,7 +345,7 @@ static bool IsPinLinked(ed::PinId id)
     \param[in] a,b Pin* to check possibility of connection between
     \return true if it is possible create Link from a to b, false otherwise
 */
-static bool CanCreateLink(Pin* a, Pin* b)
+static bool CanCreateLink(GUIPin* a, GUIPin* b)
 {
   if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
     return false;
@@ -399,30 +385,26 @@ inline void fromVecToArray4(glm::vec4& vec, float arr[4])
     \return ImColor
 */
 // TODO change to core pintypes and fuse with DrawPinIcon
-inline ImColor GetIconColor(PinType type)
+inline ImColor GetIconColor(EValueType type)
 {
   switch (type)
   {  // TODO: Define colors in Const.h
-  case PinType::Flow:
+  case EValueType::Float:
     return ImColor(255, 255, 255);
-  case PinType::Bool:
+  case EValueType::Matrix:
     return ImColor(220, 48, 48);
-  case PinType::Int:
+  case EValueType::MatrixMul:
     return ImColor(68, 201, 156);
-  case PinType::Float:
+  case EValueType::Pulse:
     return ImColor(147, 226, 74);
-  case PinType::String:
+  case EValueType::Quat:
     return ImColor(124, 21, 153);
-  case PinType::Object:
+  case EValueType::Screen:
     return ImColor(51, 150, 215);
-  case PinType::Function:
+  case EValueType::Vec3:
     return ImColor(218, 0, 183);
-  case PinType::Delegate:
+  case EValueType::Vec4:
     return ImColor(255, 48, 48);
-  case PinType::Mat4x4:
-    return ImColor(255, 0, 0);
-  case PinType::Vec:
-    return ImColor(0, 255, 0);
   default:
     // TODO: Log error - unknown PinType
     return ImColor(0, 0, 0);
@@ -436,42 +418,36 @@ inline ImColor GetIconColor(PinType type)
     \param[in] alpha int of transparency channel of ImColor of icom
 */
 //TODO change to core pintypes
-inline void DrawPinIcon(const Pin& pin, bool connected, int alpha)
+inline void DrawPinIcon(const GUIPin& pin, bool connected, int alpha)
 {
   IconType iconType;
   ImColor color = GetIconColor(pin.Type);
   color.Value.w = alpha / 255.0f;
   switch (pin.Type)
   {
-  case PinType::Flow:
+  case EValueType::Matrix:
     iconType = IconType::Flow;
     break;
-  case PinType::Bool:
+  case EValueType::MatrixMul:
     iconType = IconType::Circle;
     break;
-  case PinType::Int:
+  case EValueType::Pulse:
     iconType = IconType::Circle;
     break;
-  case PinType::Float:
+  case EValueType::Float:
     iconType = IconType::Circle;
     break;
-  case PinType::String:
+  case EValueType::Quat:
     iconType = IconType::Circle;
     break;
-  case PinType::Object:
+  case EValueType::Screen:
     iconType = IconType::Circle;
     break;
-  case PinType::Function:
+  case EValueType::Vec3:
     iconType = IconType::Circle;
     break;
-  case PinType::Delegate:
+  case EValueType::Vec4:
     iconType = IconType::Square;
-    break;
-  case PinType::Mat4x4:
-    iconType = IconType::Square;
-    break;
-  case PinType::Vec:
-    iconType = IconType::Flow;
     break;
   default:
     // TODO: Log error Unknown PinType

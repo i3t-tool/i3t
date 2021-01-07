@@ -14,14 +14,15 @@ Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
   auto inputs = s_nodes->back()->nodebase.get()->getInputPins();
   for (auto input : inputs)
   {
+    
     // s_nodes->back()->Inputs.push_back(new Pin(input.getIndex(), "IN", PinType::Mat4x4));
-    s_nodes->back()->Inputs.push_back(new Pin(GetNextId(), "IN", PinType::Vec));
+    s_nodes->back()->Inputs.push_back(new GUIPin(GetNextId(), "IN", input.getType()));
   }
   auto outputs = s_nodes->back()->nodebase.get()->getOutputPins();
   for (auto output : outputs)
   {
     // s_nodes->back()->Outputs.emplace_back(new Pin(output.getIndex(), "OUT", PinType::Mat4x4));
-    s_nodes->back()->Outputs.emplace_back(new Pin(GetNextId(), "OUT", PinType::Float));
+    s_nodes->back()->Outputs.emplace_back(new GUIPin(GetNextId(), "OUT", output.getType()));
   }
 
   BuildGUINode(s_nodes->back());
@@ -29,7 +30,7 @@ Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
   return s_nodes->back();
 }
 
-void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, Pin* newLinkPin)
+void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
   for (auto& output : Outputs)
   {
@@ -46,7 +47,7 @@ void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, Pin* newLinkPi
   }
 }
 
-void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, Pin* newLinkPin)
+void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
   builder.Header(Color);
   ImGui::Spring(0);

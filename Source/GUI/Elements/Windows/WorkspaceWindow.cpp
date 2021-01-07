@@ -7,6 +7,8 @@
 #include "../Nodes/Matrix4x4Impl.h"
 #include "../Nodes/NormalizeVectorImpl.h"
 
+using namespace Core;
+
 
 bool editorStart = false;
     /*! \brief flag for state of editor run */ // TODO: Use as least global variable as possible please => and it is
@@ -328,8 +330,8 @@ void WorkspaceWindow_init()
   m_Editor = ed::CreateEditor(&config);
   ed::SetCurrentEditor(m_Editor);
 
-  //TODO read scene file
-  Matrix4x4Impl *mat = new Matrix4x4Impl();
+  // TODO read scene file
+  Matrix4x4Impl* mat = new Matrix4x4Impl();
   Namespace* node = nullptr;
   node = mat->SpawnNode(&s_Nodes);
 
@@ -345,13 +347,14 @@ void WorkspaceWindow_init()
 
   // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[14].Outputs[0].ID, s_Nodes[15].Inputs[0].ID));
 
-  // s_HeaderBackground = Application_LoadTexture("Data/BlueprintBackground.png");
-  s_HeaderBackground = new ImTextureID(); //TODO load texture OR making a simple rectangle
+  //GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
+  GLuint imageId = pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"), true);
+  s_HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
   // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
   // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
 }
 
-void popupMenu(bool& createNewNode, Pin* newNodeLinkPin, ed::NodeId& contextNodeId,
+void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ed::NodeId& contextNodeId,
                ed::PinId& contextPinId,
                ed::LinkId& contextLinkId)
 {
@@ -474,7 +477,8 @@ void popupMenu(bool& createNewNode, Pin* newNodeLinkPin, ed::NodeId& contextNode
             s_Links.back().Color = GetIconColor(startPin->Type);
 
             //TODO predelat indexy v ramci jedny krabicky
-            auto result = node->nodebase->plugToParent(startPin->Node->nodebase, 0, 0);
+            //auto result = node->nodebase->plugToParent(startPin->Node->nodebase, 0, 0);
+            auto result = GraphManager::plug(startPin->Node->nodebase, endPin->Node->nodebase, 0, 0);
             if (result != ENodePlugResult::Ok) {
                 //print result;
             }
@@ -509,9 +513,9 @@ void DeleteNode()
   ed::NodeId nodeId = 0;
   while (ed::QueryDeletedNode(&nodeId))
   {
-    auto nodeBase = FindNode(nodeId);
-    nodeBase->nodebase->unplugAll();
-    nodeBase->nodebase = nullptr;
+    auto node = FindNode(nodeId);
+    GraphManager::unplugAll(node->nodebase);
+    node->nodebase = nullptr;
 
     if (ed::AcceptDeletedItem())
     {
@@ -522,7 +526,7 @@ void DeleteNode()
   }
 }
 
-void DrawNodes(util::NodeBuilder& builder, Pin* newLinkPin)
+void DrawNodes(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
   for (auto& node : s_Nodes)
   {
@@ -551,7 +555,6 @@ void WorkspaceWindow::render(){
   }
 
     UpdateTouch();
-
     auto& io = ImGui::GetIO();
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
@@ -562,8 +565,8 @@ void WorkspaceWindow::render(){
     static ed::LinkId contextLinkId = 0;
     static ed::PinId contextPinId = 0;
     static bool createNewNode = false;
-    static Pin* newNodeLinkPin = nullptr;
-    static Pin* newLinkPin = nullptr;
+    static GUIPin* newNodeLinkPin = nullptr;
+    static GUIPin* newLinkPin = nullptr;
 
     static float leftPaneWidth = 400.0f;
     static float rightPaneWidth = 800.0f;
@@ -652,7 +655,7 @@ void WorkspaceWindow::render(){
                   s_Links.emplace_back(Link(GetNextId(), startPin, endPin));
                   s_Links.back().Color = GetIconColor(startPin->Type);
 
-                  auto result = endPin->Node->nodebase->plugToParent(startPin->Node->nodebase, 0, 0);
+                  auto result = GraphManager::plug(startPin->Node->nodebase, endPin->Node->nodebase, 0, 0);
                   if (result != ENodePlugResult::Ok)
                   {
                     // print result;
