@@ -1,3 +1,4 @@
+.gitignore
 .idea/
 /Docs/Doxygen/html/
 
@@ -12,5 +13,4 @@ out/
 !/data/models/monkey.obj
 !/data/models/teapot.obj
 /CmakeOutputDebug/
-
-/Data/imgui.ini
+Data/imgui.ini

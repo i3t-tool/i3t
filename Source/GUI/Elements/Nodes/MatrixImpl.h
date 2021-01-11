@@ -4,20 +4,20 @@
 #include "../Windows/WorkspaceWindow.h"
 
 
-class Matrix4x4Impl : public Namespace
+class MatrixImpl : public Namespace
 {
 public:
-    Matrix4x4Impl(int id, const char* name)
+  MatrixImpl(int id, const char* name)
     {
-        Type = ENodeType::Inversion;
+        Type = ENodeType::Matrix;
         ID = id;
         Name = name;
         Size = ImVec2(0, 0);
         Color = ImColor(255, 113, 5);
     }
 
-	Matrix4x4Impl(){ 
-		Type = ENodeType::Inversion;
+	MatrixImpl() { 
+		Type = ENodeType::Matrix;
 	};
 
 	Namespace* SpawnNode(std::vector<Namespace*> *s_nodes);

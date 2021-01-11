@@ -1,20 +1,36 @@
-
-#include "NormalizeVectorImpl.h"
+#include "FloatMulFloatImpl.h"
 
 using namespace Builder;
 
-// Will be almost look the same in all nodes
-Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+void ImGuiEx_BeginColumn()
 {
-  auto NV = new NormalizeVectorImpl(GetNextId(), "NormalizeVector");
+  ImGui::BeginGroup();
+}
+
+void ImGuiEx_NextColumn()
+{
+  ImGui::EndGroup();
+  ImGui::SameLine();
+  ImGui::BeginGroup();
+}
+
+void ImGuiEx_EndColumn()
+{
+  ImGui::EndGroup();
+}
+
+// Will be almost look the same in all nodes
+Namespace* FloatMulFloatImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+{
+  auto NV = new FloatMulFloatImpl(GetNextId(), "FloatMulFloat");
   s_nodes->emplace_back(NV);
-  auto node = Builder::createNode<ENodeType::NormalizeVector>();
+  auto node = Builder::createNode<ENodeType::FloatMulFloat>();
   s_nodes->back()->nodebase = std::move(node);
 
   auto inputs = s_nodes->back()->nodebase.get()->getInputPins();
   for (auto input : inputs)
   {
-    
+
     // s_nodes->back()->Inputs.push_back(new Pin(input.getIndex(), "IN", PinType::Mat4x4));
     s_nodes->back()->Inputs.push_back(new GUIPin(GetNextId(), "IN", input.getType()));
   }
@@ -30,7 +46,7 @@ Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
   return s_nodes->back();
 }
 
-void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+void FloatMulFloatImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
   for (auto& output : Outputs)
   {
@@ -52,15 +68,19 @@ void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLin
   }
 }
 
-void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+void FloatMulFloatImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
+  // Make new function drawHeader?
+  // header
   builder.Header(Color);
   ImGui::Spring(0);
   ImGui::TextUnformatted(Name.c_str());
   ImGui::Spring(1);
-  ImGui::Dummy(ImVec2(150, 28));
+  ImGui::Dummy(ImVec2(50, 28));
   ImGui::Spring(0);
   builder.EndHeader();
+  // end header
+
 
   for (auto& input : Inputs)
   {
@@ -83,27 +103,14 @@ void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLink
   }
 }
 
-void NormalizeVectorImpl::drawBox(util::NodeBuilder& builder)
+void FloatMulFloatImpl::drawBox(util::NodeBuilder& builder)
 {
+  ImGui::SameLine();
+  float data = nodebase->getInternalData().getFloat();
 
-  float x[4] = {0, 0, 0, 0};
-  glm::vec4 vec(0.0f);
-
-  auto data = nodebase->getInternalData().getVec4();
-
-  vec = data;
-  fromVecToArray4(vec, x);
-
-  ImGui::PushItemWidth(200.0f);
-  ImGui::InputFloat4("x", x, 3);
+  ImGui::PushItemWidth(20.0f);
+  ImGui::Text("%f", data);
   ImGui::PopItemWidth();
-
-  fromArrayToVec4(vec, x);
-  data = vec;
-
-  nodebase->getInternalData().setValue(data);
-
-  nodebase->updateValues(0);
 
   ImGui::Spring(0);
 }

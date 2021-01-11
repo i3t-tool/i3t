@@ -4,8 +4,11 @@
     Details no here now... Cca in middle is file split between example and used part
 */
 
-#include "../Nodes/Matrix4x4Impl.h"
+#include "../Nodes/MatrixImpl.h"
 #include "../Nodes/NormalizeVectorImpl.h"
+#include "../Nodes/DeterminantImpl.h"
+#include "../Nodes/FloatImpl.h"
+#include "../Nodes/FloatMulFloatImpl.h"
 
 using namespace Core;
 
@@ -331,7 +334,7 @@ void WorkspaceWindow_init()
   ed::SetCurrentEditor(m_Editor);
 
   // TODO read scene file
-  Matrix4x4Impl* mat = new Matrix4x4Impl();
+  MatrixImpl* mat = new MatrixImpl();
   Namespace* node = nullptr;
   node = mat->SpawnNode(&s_Nodes);
 
@@ -384,7 +387,7 @@ void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ed::NodeId& contextN
     if (node)
     {
       ImGui::Text("ID: %p", node->ID.AsPointer());
-      ImGui::Text("Type: %s", node->Type);
+      //ImGui::Text("Type: %s", static_cast<ENodeType>(node->Type)); //TODO print type
       ImGui::Text("Inputs: %d", (int)node->Inputs.size());
       ImGui::Text("Outputs: %d", (int)node->Outputs.size());
     }
@@ -446,12 +449,27 @@ void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ed::NodeId& contextN
     
     Namespace* node = nullptr;
     if (ImGui::MenuItem("Matrix 4x4")){
-        Matrix4x4Impl* mat = new Matrix4x4Impl();
+      MatrixImpl* mat = new MatrixImpl();
         node = mat->SpawnNode(&s_Nodes);
     }
     if (ImGui::MenuItem("Normalize Vector")){
       NormalizeVectorImpl* nv = new NormalizeVectorImpl();
       node = nv->SpawnNode(&s_Nodes);
+    }
+    if (ImGui::MenuItem("Determinant"))
+    {
+      DeterminantImpl* det = new DeterminantImpl();
+      node = det->SpawnNode(&s_Nodes);
+    }
+    if (ImGui::MenuItem("Float"))
+    {
+      FloatImpl* fl = new FloatImpl();
+      node = fl->SpawnNode(&s_Nodes);
+    }
+    if (ImGui::MenuItem("Float * Float"))
+    {
+      FloatMulFloatImpl* fl = new FloatMulFloatImpl();
+      node = fl->SpawnNode(&s_Nodes);
     }
 
     if (node)

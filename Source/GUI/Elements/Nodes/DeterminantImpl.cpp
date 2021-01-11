@@ -1,20 +1,20 @@
 
-#include "NormalizeVectorImpl.h"
+#include "DeterminantImpl.h"
 
 using namespace Builder;
 
 // Will be almost look the same in all nodes
-Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+Namespace* DeterminantImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
 {
-  auto NV = new NormalizeVectorImpl(GetNextId(), "NormalizeVector");
+  auto NV = new DeterminantImpl(GetNextId(), "Determinant");
   s_nodes->emplace_back(NV);
-  auto node = Builder::createNode<ENodeType::NormalizeVector>();
+  auto node = Builder::createNode<ENodeType::Determinant>();
   s_nodes->back()->nodebase = std::move(node);
 
   auto inputs = s_nodes->back()->nodebase.get()->getInputPins();
   for (auto input : inputs)
   {
-    
+
     // s_nodes->back()->Inputs.push_back(new Pin(input.getIndex(), "IN", PinType::Mat4x4));
     s_nodes->back()->Inputs.push_back(new GUIPin(GetNextId(), "IN", input.getType()));
   }
@@ -30,7 +30,7 @@ Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
   return s_nodes->back();
 }
 
-void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+void DeterminantImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
   for (auto& output : Outputs)
   {
@@ -52,8 +52,10 @@ void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLin
   }
 }
 
-void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+void DeterminantImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 {
+    //Make new function drawHeader?
+    //header
   builder.Header(Color);
   ImGui::Spring(0);
   ImGui::TextUnformatted(Name.c_str());
@@ -61,6 +63,7 @@ void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLink
   ImGui::Dummy(ImVec2(150, 28));
   ImGui::Spring(0);
   builder.EndHeader();
+  //end header
 
   for (auto& input : Inputs)
   {
@@ -83,27 +86,15 @@ void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLink
   }
 }
 
-void NormalizeVectorImpl::drawBox(util::NodeBuilder& builder)
+void DeterminantImpl::drawBox(util::NodeBuilder& builder)
 {
 
-  float x[4] = {0, 0, 0, 0};
-  glm::vec4 vec(0.0f);
+  float data = nodebase->getInternalData().getFloat();
 
-  auto data = nodebase->getInternalData().getVec4();
-
-  vec = data;
-  fromVecToArray4(vec, x);
-
-  ImGui::PushItemWidth(200.0f);
-  ImGui::InputFloat4("x", x, 3);
+  ImGui::PushItemWidth(20.0f);
+  ImGui::Text("%f", data);
   ImGui::PopItemWidth();
 
-  fromArrayToVec4(vec, x);
-  data = vec;
-
-  nodebase->getInternalData().setValue(data);
-
-  nodebase->updateValues(0);
-
   ImGui::Spring(0);
+  
 }
