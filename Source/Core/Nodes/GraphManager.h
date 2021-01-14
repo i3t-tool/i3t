@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#include "Core/Nodes/Node.h"
 #include "Core/Nodes/NodeImpl.h"
 #include "Core/Nodes/Operations.h"
 #include "Sequence.h"

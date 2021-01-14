@@ -5,9 +5,7 @@
 
 using namespace Core;
 
-NodeBase::~NodeBase()
-{
-}
+NodeBase::~NodeBase() = default;
 
 const std::vector<Pin>& NodeBase::getInputPins() const
 {

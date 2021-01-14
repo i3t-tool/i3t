@@ -2,7 +2,6 @@
  * \file	GUI/Elements/Windows/WorkspaceWindow.h
  *
  *  A Workspace window elements declaration.
-
  */
 #pragma once
 
@@ -75,7 +74,7 @@ enum class PinKind
   Input
 };
 
-struct Namespace; /* Just for using in struct Pin*/
+class Namespace; /* Just for using in struct Pin*/
 struct Link;
 
 /*! \struct Pin
@@ -105,7 +104,7 @@ struct GUIPin
 class Namespace
 {
     public:
-      
+
       ed::NodeId ID; /*! \brief unique (among Nodes) identificator */
       std::string Name; /*! \brief Name of Node */
       std::vector<GUIPin*> Inputs; /*! \brief Vector of input Pins */
@@ -123,7 +122,7 @@ class Namespace
         \brief default Node constructor with no parameters
       */
       Namespace() {
-          Color = ImColor(255, 255, 255); 
+          Color = ImColor(255, 255, 255);
           Type = ENodeType::Float;
       }
 
@@ -157,7 +156,7 @@ struct Link
 
   GUIPin* StartPin; /*! \brief Pin from which Link comes from */
   GUIPin* EndPin; /*! \brief Pin to which Link goes to */
-  
+
   ImColor Color; /*! \brief Color of Link  */
 
   /*! \fn Link
@@ -195,7 +194,7 @@ struct NodeIdLess
   bool operator()(const ed::NodeId& lhs, const ed::NodeId& rhs) const { return lhs.AsPointer() < rhs.AsPointer(); }
 };
 
-static std::map<ed::NodeId, float, NodeIdLess> s_NodeTouchTime; 
+static std::map<ed::NodeId, float, NodeIdLess> s_NodeTouchTime;
 
 static int s_NextId = 1; /*! \brief prepared identificator of next added element */
 
@@ -464,7 +463,7 @@ class WorkspaceWindow : public IWindow
 {
 public:
   WorkspaceWindow(bool show) : IWindow(show) {
-    
+
     //g_Context = ed::CreateEditor(&config);
   };
   virtual ~WorkspaceWindow()

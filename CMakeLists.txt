@@ -255,6 +255,8 @@ target_link_libraries(
         spdlog
         yaml-cpp
 )
+
+target_link_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 # =============================================================
 
 # ==== Post build commands. ===================================
