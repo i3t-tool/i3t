@@ -26,7 +26,7 @@ include_directories(Dependencies/glm)
 include_directories(Dependencies/imgui/examples)
 include_directories(Dependencies/imgui_node_editor)
 include_directories(Dependencies/imgui_node_editor/external/imgui)
-include_directories(Dependencies/imgui_markdown)
+include_directories(Dependencies/imgui_markdown_extended)
 include_directories(Dependencies/pgr-framework/include)
 include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/spdlog/include)
@@ -233,6 +233,7 @@ else()
 		"Dependencies/imgui_node_editor/imgui*.cpp"
 #		"Dependencies/imgui/examples/imgui_impl_glfw.*"
 #		"Dependencies/imgui/examples/imgui_impl_opengl3.*"
+        "Dependencies/imgui_markdown_extended/*.h"
 	)
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Header Files" FILES ${I3T_SOURCE_H})
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source Files" FILES ${I3T_SOURCE_CPP})
