@@ -19,6 +19,8 @@
 //---G
 
 const ImVec2 NEXT_BUTTON_SIZE = ImVec2(150, 40);
+const int SIMPLE_SPACE = 20;
+const int CONTROLS_SIZE_Y = 120;
 
 
 // TUTORIAL WINDOW FUNCTIONS
@@ -56,8 +58,17 @@ void TutorialWindow::render()
   if (!Application::get().m_showTutorialWindow)
     return;
 
-  // SET STYLE AND BEGIN WINDOW
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 20.0f));
+  // PUSH STYLE 
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(25.0f, 30.0f));
+  ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
+  ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 17);
+  ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(232, 232, 232, 255));
+  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(51, 51, 51, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(225, 225, 225, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(232, 232, 232, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(240, 240, 240, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(245, 245, 245, 255));
+  // BEGIN WINDOW
   ImGui::Begin("Tutorial window", &Application::get().m_showTutorialWindow);
 
   // CREATE IMGUI CONTENT
@@ -65,8 +76,10 @@ void TutorialWindow::render()
   renderTutorialContent();
   renderTutorialControls();
 
-  // REMOVE STYLE AND END WINDOW
-  ImGui::PopStyleVar(1);
+  // POP STYLE
+  ImGui::PopStyleVar(3);
+  ImGui::PopStyleColor(6);
+  // END WINDOW
   ImGui::End();
 }
 
@@ -79,7 +92,11 @@ void TutorialWindow::renderTutorialHeader()
 
 void TutorialWindow::renderTutorialContent()
 {
-  ImGui::BeginChild("content", ImVec2(0, -ImGui::GetContentRegionAvail().y));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  ImGui::BeginChild("content", ImVec2(0, -(CONTROLS_SIZE_Y + ImGui::GetStyle().ItemSpacing.y))); // be of size: [remaining Y space] - [planned Y size of contents]
+  // btw ImGui::GetContentRegionAvail().y - remaining space Y 
+  ImGui::PopStyleVar();
+
   if (m_tutorial)
   {
     if (m_tutorial->getStepCount() > 0) {
@@ -203,12 +220,18 @@ You can add [links like this one to enkisoftware](https://www.enkisoftware.com/)
 
 void TutorialWindow::renderTutorialControls()
 {
+  // PUSH STYLE
+  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+  // BEGIN CHILD
+  ImGui::BeginChild("controls", ImVec2(0,0)); // stretch remaining Y space
+  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
+
   // ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0,0,0,1));
-  ImGui::Dummy(ImVec2(0.0f, 20.0f)); // vertical spacing
   ImGui::ProgressBar(static_cast<float>(m_current_step) / static_cast<float>(m_tutorial->getStepCount()), ImVec2(-1, 20));
   // ImGui::PopStyleColor();
 
-  ImGui::NewLine();
+  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+
   if (ImGui::Button("Back", ImVec2(100, 0)))
   {
     if (m_current_step != 0) {
@@ -218,11 +241,16 @@ void TutorialWindow::renderTutorialControls()
   }
   
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE.x);
-  if (ImGui::Button("Next", NEXT_BUTTON_SIZE))
+  if (ImGui::Button("Next", ImVec2(-1, -1)))
   {
     if (m_current_step != m_tutorial->getStepCount() - 1) {
       m_current_step++;
       std::cout << m_current_step << std::endl;
     }
   }
+
+  // POP STYLE
+  ImGui::PopStyleColor();
+  // END
+  ImGui::EndChild();
 }
