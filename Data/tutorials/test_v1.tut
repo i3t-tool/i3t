@@ -1,11 +1,11 @@
 ---
-name: Zkušební tutoriál
-desc: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
-thumb: test1.png
+title: Zkusebni lekce
+description: V tomto tutorialu se naucis ovladat aplikaci a vytvorit jednoduchou scenu.
+thumbnail: test1.png
 scene: empty
 --- 
 
-# Nadpis stránky tutoriálu
+# Nadpis stranky tutorialu
 
 Odstavec textu s vykladem latky, kde jsou **zvyraznene** latka. Zaroven je mozne pouzivat [nazev odkazu](https://internetovastranka.com).
 Takto oddeleneny text bude pouze na novem radku, bez odstavcove mezery.
@@ -13,53 +13,15 @@ Takto oddeleneny text bude pouze na novem radku, bez odstavcove mezery.
 Takto oddeleny texy jiz bude bran jako dalsi
 
 # Okna aplikace
-Aplikace se skládá ze tří hlavních oken - tutorial, workspace a scene.
-![Okna aplikace](navrh.png)
 
+Aplikace se sklada ze tri hlavnich oken - tutorial, workspace a scene.
 
-# Tutorial
-V tomto okně nalezneš výklad látky dané lekce a úkoly k procvičení.
-Úkoly jsou psané modře, viz následující příklad:
-> Prozkoumej si tyto úkoly
-> Tento úkol má u sebe nápovědu, rozklikni si ji.
-? Zde vždy nalezneš dodatečnou pomoc, jak danou intrukci splnit.
+# Ovladani sceny
 
-
-# Workspace
-Workspace je plocha v dolní části obrazovky, kde vytváříte a upravujete jednotlivé objekty, matice, sekvence a další entity. 
-![Okno workspace](workspaceexample.png)
-Zatím je prázdná, avšak za pár kroků se naučíš jak ji naplnit.
-
-
-# Scene
-3D scene je plocha v horní části obrazovky, kde se zobrazují 3D modely poskládané ve workspace.
-![Okno scene](sceneexample.png)
-Scénu vidíte nyní prázdnou, jen se třemi úsečkami, které reprezentují osy [x](red), [y](#0f0) a [z](##0000ff) a počátek světové soustavy souřadnic.
-
-
-
-# Vytvoření objektu
-
-Objekty reprezentují 3D modely, které budete modifikovat pomocí transformací a sekvencí.
-
-> Ve workspace vytvoř novou sekvenci.
-
-? Klikni pravým tlačítkem myši > Add > Sequence.
-
-> Na sekvenci navázej bílou krychli.
-
-Klikni pravým tlačítkem na danou sekvenci > bind object > basics > cube > white
-
-
-# Ovládání scény
-
-Se scénou můžeš pracovat obdobně jako v jiných grafických programech. Vyzkoušej si následující:
+Se scenou muzes pracovat obdobne jako v jinych grafickych programech. Vyzkousej si nasledujici:
 asddasdsdsad [nazev odkazu](https://sdsdssfsd)
 
 dassaadsda sdss
-
-<img>[blabla](soubor.jpg)
-<button>[dfsfse](command)
 
 skfskf **tucny** mdskdsds
   + odrazka
@@ -70,41 +32,7 @@ skfskf **tucny** mdskdsds
   + odrazkadjijids
     - fssfs
     - sfssfs
-  + sdjisfj %[barevne](red) sdjusdhs
+  + sdjisfj 
 dsdadadasda
 
-Ted udelej dsjs
-
-> Otoč scénu
-
-? Podrž pravé tlačítko myši a táhni
-
-> Přibliž / oddal scénu
-? Kolečkem myši
-
-> Posuň se ve scéně
-Podrž prostřední tlačítko myši a táhni
-    
-V neposlední řadě je užitečné zarovnání pohledu s některou ze souřadných os.
-
-> Nastav úhel pohledu podle světové osy X
-? V menu nahoře klikni na viewports > world X
-
-
-# Test dalších featur
-
-> Testovací mutliline úkol se **zdůrazněním** slov
-![testík](test.jpg)
-Takto by měl vypadat výsledek
-
-? Multiline nápověda
-![testík nápověda](test2.jpg)
-Zkusil si použít tento tool?
-
-
-// vysvetleni
-
-// zadani
-
-// napoveda
 

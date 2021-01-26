@@ -16,15 +16,15 @@
 #include "Tutorial/TutorialLoader.h"
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
-//---G
+//---
 
-const ImVec2 NEXT_BUTTON_SIZE = ImVec2(150, 40);
-const int SIMPLE_SPACE = 20;
-const int CONTROLS_SIZE_Y = 120;
+const int NEXT_BUTTON_SIZE_X = 150;
+const int SIMPLE_SPACE = 10;
+const int CONTROLS_SIZE_Y = 100;
 
 
 // TUTORIAL WINDOW FUNCTIONS
-//---G
+//---
 
 TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 {
@@ -51,7 +51,7 @@ bool TutorialWindow::setStep(int step_number)
   return true;
 }
 
-//---G
+//---
 
 void TutorialWindow::render()
 {
@@ -61,7 +61,7 @@ void TutorialWindow::render()
   // PUSH STYLE 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(25.0f, 30.0f));
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
-  ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 17);
+  ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(232, 232, 232, 255));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(51, 51, 51, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(225, 225, 225, 255));
@@ -69,7 +69,8 @@ void TutorialWindow::render()
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(240, 240, 240, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(245, 245, 245, 255));
   // BEGIN WINDOW
-  ImGui::Begin("Tutorial window", &Application::get().m_showTutorialWindow);
+  const std::string window_name = "Tutorial - " + m_tutorial->m_title;
+  ImGui::Begin(window_name.c_str(), &Application::get().m_showTutorialWindow);
 
   // CREATE IMGUI CONTENT
   renderTutorialHeader();
@@ -85,17 +86,30 @@ void TutorialWindow::render()
 
 void TutorialWindow::renderTutorialHeader()
 {
+  //ImGui::BeginChild("header");
+  std::string title;
+  if (m_tutorial->getStepCount() > 0) {
+    title = m_tutorial->m_steps[m_current_step].m_title;
+  }
+  else {
+    title = "Empty tutorial";
+  }
+
   ImGui::PushFont(App::get().getFont(FONT_TITLE));
-  ImGui::TextWrapped((m_tutorial->m_title).c_str());
+  ImGui::TextWrapped(title.c_str());
   ImGui::PopFont();
+  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
+  //ImGui::EndChild();
 }
 
 void TutorialWindow::renderTutorialContent()
 {
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  // PUSH STYLE
+  //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  // BEGIN CHILD
   ImGui::BeginChild("content", ImVec2(0, -(CONTROLS_SIZE_Y + ImGui::GetStyle().ItemSpacing.y))); // be of size: [remaining Y space] - [planned Y size of contents]
   // btw ImGui::GetContentRegionAvail().y - remaining space Y 
-  ImGui::PopStyleVar();
+  //ImGui::PopStyleVar();
 
   if (m_tutorial)
   {
@@ -240,7 +254,7 @@ void TutorialWindow::renderTutorialControls()
     }
   }
   
-  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE.x);
+  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
   if (ImGui::Button("Next", ImVec2(-1, -1)))
   {
     if (m_current_step != m_tutorial->getStepCount() - 1) {

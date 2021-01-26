@@ -17,39 +17,7 @@
 //
 //void TutorialLoader::loadFile() // todo think about making an interface of tutorial and let this be tut file type dependend?
 //{
-//  std::cout << "Tutorial::loadFile()" << std::endl;
-//  // LOAD GENERAL INFO
-//  YAML::Node tutorial = YAML::LoadFile(m_filename);
-//  // name
-//  if (tutorial["name"])
-//  {
-//    m_name = tutorial["name"].as<std::string>();
-//    LOG_DEBUG(m_name);
-//  }
-//  else
-//  {
-//    m_name = "untitled";
-//    throw "Tutorial must have a name";
-//  }
-//  // description
-//  if (tutorial["desc"])
-//  {
-//    m_description = tutorial["desc"].as<std::string>();
-//  }
-//  else
-//  {
-//    m_description = "";
-//  }
-//  // thumbnail image
-//  if (tutorial["thumb"])
-//  {
-//    m_thumb_filename = tutorial["thumb"].as<std::string>();
-//  }
-//  else
-//  {
-//    m_thumb_filename = ""; // todo some default path of a blank pic
-//  }
-//
+
 //  // LOAD STEPS
 //  if (!tutorial["steps"])
 //  {
