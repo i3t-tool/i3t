@@ -59,17 +59,21 @@ void TutorialWindow::render()
     return;
 
   // PUSH STYLE 
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(25.0f, 30.0f));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
   ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(232, 232, 232, 255));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(51, 51, 51, 255));
-  ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(225, 225, 225, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(215, 215, 215, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(232, 232, 232, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(240, 240, 240, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(245, 245, 245, 255));
+  ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 150, 250, 255));
+  ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(66, 150, 250, 205));
+  ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
+  //ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(245, 245, 245, 255));
   // BEGIN WINDOW
-  const std::string window_name = "Tutorial - " + m_tutorial->m_title;
+  const std::string window_name = "Tutorial - " + m_tutorial->m_title + "###Tutorial window";
   ImGui::Begin(window_name.c_str(), &Application::get().m_showTutorialWindow);
 
   // CREATE IMGUI CONTENT
@@ -79,7 +83,7 @@ void TutorialWindow::render()
 
   // POP STYLE
   ImGui::PopStyleVar(3);
-  ImGui::PopStyleColor(6);
+  ImGui::PopStyleColor(9);
   // END WINDOW
   ImGui::End();
 }
@@ -111,22 +115,8 @@ void TutorialWindow::renderTutorialContent()
   // btw ImGui::GetContentRegionAvail().y - remaining space Y 
   //ImGui::PopStyleVar();
 
-  if (m_tutorial)
-  {
-    if (m_tutorial->getStepCount() > 0) {
-      for (std::unique_ptr<TWidget>& widget_uptr : m_tutorial->m_steps[m_current_step].m_content) {
-        const TWidget* const widget = widget_uptr.get(); // tenhle pointer se nebude nestarat o konstrukci/destrukci a ani (bonusove) o zmenu toho objektu -> its okay to have it (zaruceno constantami) https://stackoverflow.com/questions/10802046/whats-the-point-of-stdunique-ptrget
-
-        if (const TWText* const twtext = dynamic_cast<const TWText*>(widget); twtext != nullptr) {
-          ImGui::Text(twtext->m_text.c_str());
-        }
-        else {
-          std::cout << "wrong widget type" << std::endl;
-        }
-      
-      }
-    }
-  //    ImGuiIO& io = ImGui::GetIO();
+  // SET UP MARKDOWN
+    //    ImGuiIO& io = ImGui::GetIO();
   //io.Fonts->Clear();
   //// Base font
   //io.Fonts->AddFontFromFileTTF( "myfont.ttf", fontSize_ );
@@ -136,19 +126,59 @@ void TutorialWindow::renderTutorialContent()
   //// bold heading H1
   //float fontSizeH1 = fontSize_ * 1.1f;
   //H1 = io.Fonts->AddFontFromFileTTF( "myfont-bold.ttf", fontSizeH1 );
-    const ImGui::MarkdownConfig mdConfig{nullptr, nullptr, nullptr, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
-    const std::string markdownText = u8R"(
-# H1 Header: Text and Links
-You can add [links like this one to enkisoftware](https://www.enkisoftware.com/) and lines will wrap well.
-## H2 Header: indented text.
-  This text has an indent (two leading spaces).
-  This one has two.
-### H3 Header: Lists
-  * Unordered lists
-  * Lists can be indented with two extra spaces.
-  * Lists can have [links like this one to Avoyd](https://www.avoyd.com/)
-)";
-    Markdown( markdownText.c_str(), markdownText.length(),  mdConfig);
+  const ImGui::MarkdownConfig mdConfig{nullptr, nullptr, nullptr, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
+
+  if (m_tutorial)
+  {
+    if (m_tutorial->getStepCount() > 0) {
+      // ITERATE OVER STEPS
+      for (std::unique_ptr<TWidget>& widget_uptr : m_tutorial->m_steps[m_current_step].m_content) {
+        const TWidget* const widget = widget_uptr.get(); // tenhle pointer se nebude nestarat o konstrukci/destrukci a ani (bonusove) o zmenu toho objektu -> its okay to have it (zaruceno constantami) https://stackoverflow.com/questions/10802046/whats-the-point-of-stdunique-ptrget
+
+        if (const TWText* const tw_text = dynamic_cast<const TWText*>(widget); tw_text != nullptr) {
+          Markdown( tw_text->m_text.c_str(), tw_text->m_text.length(), mdConfig);
+        }
+        else if (const TWSpacing* const tw_spacing = dynamic_cast<const TWSpacing*>(widget); tw_spacing != nullptr) {
+          ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
+        }
+        else if (const TWTask* const tw_task = dynamic_cast<const TWTask*>(widget); tw_task != nullptr) {
+          ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
+          ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+          ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+
+          ImGui::TextWrapped(tw_task->m_task.c_str());
+
+          ImGui::PopStyleColor();
+          ImGui::PopFont();
+          ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+        }
+        else if (const TWHint* const tw_hint = dynamic_cast<const TWHint*>(widget); tw_hint != nullptr) {
+          ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+          if (ImGui::CollapsingHeader("Napoveda")) {
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+            ImGui::TextWrapped(tw_hint->m_hint.c_str());
+            ImGui::PopStyleColor();
+          }
+          ImGui::PopStyleColor();
+        }
+        else {
+          std::cout << "wrong widget type" << std::endl;
+        }
+      
+      }
+    }
+
+    //    const std::string markdownText = u8R"(
+    //# H1 Header: Text and Links
+    //You can add [links like this one to enkisoftware](https://www.enkisoftware.com/) and lines will wrap well.
+    //## H2 Header: indented text.
+    //  This text has an indent (two leading spaces).
+    //  This one has two.
+    //### H3 Header: Lists
+    //  * Unordered lists
+    //  * Lists can be indented with two extra spaces.
+    //  * Lists can have [links like this one to Avoyd](https://www.avoyd.com/)
+    //)";
 
     //ImGui::Text(u8"かきくけこéíšířáěéšíčřá");
     //for (const TWidget& widget : m_tutorial->m_steps[m_current_step].m_content)
@@ -207,7 +237,7 @@ You can add [links like this one to enkisoftware](https://www.enkisoftware.com/)
     // ImGui::PushFont(App::get().getFont(FONT_TITLE));
     // ImGui::Text("Model transformations");
     // ImGui::PopFont();
-    // ImGui::Spacing();
+    // ImGui::Spacing(); //TODO change my spacing into the default imgui one
     //
     // ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
     // ImGui::PushTextWrapPos(0.0f);

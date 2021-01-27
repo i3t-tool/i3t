@@ -11,15 +11,32 @@ struct TWidget
   //std::string m_id;
 };
 
-struct TWText : TWidget  // todo can also contain bullet list???
+struct TWText : TWidget  // can also contain bullets and other MD syntaxe for now 
 {
-  explicit TWText(std::string text) : m_text(std::move(text)) {}
+  TWText(std::string text) : m_text(std::move(text)) {}
   std::string m_text;
+};
+
+struct TWTask : TWidget 
+{
+  TWTask(std::string task) : m_task(std::move(task)) {}
+  std::string m_task;
+};
+
+struct TWHint : TWidget 
+{
+  TWHint(std::string hint) : m_hint(std::move(hint)) {}
+  std::string m_hint;
+};
+
+struct TWSpacing : TWidget 
+{
+  TWSpacing() = default;
 };
 
 struct TWImage : TWidget
 {
-  explicit TWImage(std::string filename) : m_filename(std::move(filename)) {}
+  TWImage(std::string filename) : m_filename(std::move(filename)) {}
 
   std::string m_filename;
 };

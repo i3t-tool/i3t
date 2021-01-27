@@ -97,7 +97,7 @@ void Application::initImGui()
       io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Regular.ttf").c_str(),
                                    12.0f * fontScale),
       io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale),
-      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Bold.ttf").c_str(), 14.0f * fontScale),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Bold.ttf").c_str(), 18.0f * fontScale),
   };
 
   io.FontDefault = m_fonts[FONT_MENU_LARGE];

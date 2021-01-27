@@ -26,7 +26,7 @@ constexpr char* ImGui_GLSLVersion = "#version 140";
 #define FONT_MENU_SMALL    2
 #define FONT_TITLE         3
 #define FONT_TASK_TITLE    4
-#define FONTS_COUNT        4
+#define FONTS_COUNT        5
 
 class ICommand;
 class GlfwWindow;
