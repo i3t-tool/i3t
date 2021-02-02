@@ -28,6 +28,8 @@ namespace Core
 {
 class Pin;
 
+typedef std::array<char, 16> Mask;
+
 /**
  * Base class interface for all boxes.
  * \image html baseOperator.png
@@ -45,6 +47,7 @@ class NodeBase
   std::vector<Pin> m_outputs;
 
   /// Values which node owns.
+  std::vector<DataStore> m_initialData;
   std::vector<DataStore> m_internalData;
 
 protected:
@@ -52,13 +55,13 @@ protected:
   const Operation* m_operation = nullptr;
 
   /// \todo Is there values in NodeBase used?
-  bool m_pulseOnPlug;      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
-  bool m_restrictedOutput; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
+  bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
+  bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
                            ///< only)
-  int m_restrictedOutputIndex; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
+  int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
-  NodeBase() {}
+  NodeBase() = default;
 
   /**
    * I3T v2 default Operator constructor.
@@ -81,10 +84,34 @@ public:
    */
   DataStore& getInternalData(unsigned index = 0)
   {
-    I3T_DEBUG_ASSERT(m_internalData.size() && m_internalData.size() > index, "Desired data storage does not exist!");
+    I3T_DEBUG_ASSERT(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
 
     return m_internalData[index];
   }
+
+  /**
+   * Set a value of node.
+   *
+   * Sets value of the first float of DataStore. Derived types may override
+   * default behaviour. 
+   *
+   * \param val
+   */
+  virtual void setValue(float val) {}
+
+  virtual void setValue(const glm::vec3& vec) {}
+
+  virtual void setValue(const glm::vec4& vec) {}
+
+  virtual void setValue(const glm::mat4& mat) {}
+
+  /**
+   * Smart set function, used with constrained transformation for value checking.
+   *
+   * \param mask array of 16 chars.
+   * \param mat
+   */
+  virtual void setValue(const Mask& mask, const glm::mat4& mat) {}
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;
   [[nodiscard]] const std::vector<Pin>& getOutputPins() const;
