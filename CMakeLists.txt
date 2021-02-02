@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13) # 3.13 for target_link_options and add_compile_definitions
 
 # Set project name.
 project(I3T VERSION 2.1.0)
@@ -45,11 +45,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
-    add_compile_definitions(I3T_RELEASE_STANDALONE)
+    add_compile_definitions(I3T_RELEASE_STANDALONE) 
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_compile_definitions(I3T_DEBUG)
+    add_compile_definitions(I3T_DEBUG) 
 endif()
 
 add_definitions(-DI3T_PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
