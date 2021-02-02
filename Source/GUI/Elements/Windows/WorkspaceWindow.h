@@ -7,8 +7,8 @@
 
 #include "GUI/Elements/IWindow.h"
 
-#include "GUI/NodeEditorUtilities/builders.h"
-#include "GUI/NodeEditorUtilities/widgets.h"
+#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
+#include "GUI/NodeEditorUtilities/Widgets.h"
 
 #include <glm/glm.hpp>
 #include <imgui_node_editor.h>
