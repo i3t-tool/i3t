@@ -144,7 +144,7 @@ if (BUILD_TESTS)
             Source/Core/Nodes/GraphManager.cpp
             Source/Core/Nodes/Node.h
             Source/Core/Nodes/Node.cpp
-            Test/Core/SequenceTest.cpp)
+            Test/Core/SequenceTest.cpp Test/Core/TransformationTest.cpp)
 
     target_link_libraries(${TEST_PROJECT_NAME} gtest gtest_main)
 
@@ -256,7 +256,7 @@ target_link_libraries(
         yaml-cpp
 )
 
-target_link_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
+# target_link_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 # =============================================================
 
 # ==== Post build commands. ===================================

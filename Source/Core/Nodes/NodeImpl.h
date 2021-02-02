@@ -27,6 +27,7 @@ public:
    * or output names are assigned here.
    */
   NodeImpl();
+  virtual ~NodeImpl() {};
 
 private:
   /**
@@ -66,7 +67,7 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[T])
 
 template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
 {
-  I3T_DEBUG_ASSERT(false, "Calling update function of unimplemented NodeImpl type.")
+  I3T_DEBUG_ASSERT(false, "Calling update function of unimplemented NodeImpl type.");
 }
 
 // inversion
