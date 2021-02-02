@@ -5,7 +5,7 @@ Přehled podporovaných platform je uveden v [tabulce](../README.md) v souboru R
 Nejprve je nutno stáhnout zdrojový kód. Přepínač `--recursive` zajistí to, 
 že budou spolu s hlavním repozitářem staženy i git submoduly s knihovnami.
 ````shell script
-git clone --recursive https://gitlab.fel.cvut.cz/i3t-diplomky/i3t.git
+git clone --recursive https://gitlab.fel.cvut.cz/i3t-diplomky/i3t-bunny.git
 ````
 
 ## Instalace potřebných závislotí
