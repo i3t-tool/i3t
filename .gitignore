@@ -14,3 +14,4 @@ out/
 !/data/models/teapot.obj
 /CmakeOutputDebug/
 Data/imgui.ini
+.vs/

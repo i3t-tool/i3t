@@ -21,7 +21,7 @@ namespace Builder
  */
 template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
 {
-  I3T_DEBUG_ASSERT(T != ENodeType::Sequence, "Use createSequence instead.");
+  Debug::Assert(T != ENodeType::Sequence, "Use createSequence instead.");
 
   return std::make_unique<Core::NodeImpl<T>>();
 }
@@ -30,9 +30,15 @@ template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
  * Sequence has custom non virtual member functions, so shared_ptr is returned
  * instead of unique_ptr.
  */
-FORCE_INLINE Ptr<Core::Sequence> createSequence()
+Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
   return std::make_shared<Core::Sequence>();
+}
+
+template <typename T, typename... Args>
+Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
+{
+  return std::make_shared<T>(std::forward<Args>(args)...);
 }
 } // namespace Builder
 

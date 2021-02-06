@@ -63,8 +63,8 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 ENodePlugResult GraphManager::plug(UPtr<Core::NodeBase>& leftNode, UPtr<Core::NodeBase>& rightNode, unsigned fromIndex,
                                            unsigned myIndex)
 {
-  I3T_DEBUG_ASSERT(rightNode->m_inputs.size() > myIndex, "Desired input pin in this node with myIndex does not exists!")
-  I3T_DEBUG_ASSERT(leftNode->m_outputs.size() > fromIndex, "Desired pin in other node with fromIndex does not exists!")
+  Debug::Assert(rightNode->m_inputs.size() > myIndex, "Desired input pin in this node with myIndex does not exists!");
+  Debug::Assert(leftNode->m_outputs.size() > fromIndex, "Desired pin in other node with fromIndex does not exists!");
 
   auto result = isPlugCorrect(&rightNode->m_inputs[myIndex], &leftNode->m_outputs[fromIndex]);
   if (result != ENodePlugResult::Ok)
@@ -94,7 +94,7 @@ void GraphManager::unplugAll(UPtr<Core::NodeBase>& node)
 
 void GraphManager::unplugInput(UPtr<Core::NodeBase>& node, int index)
 {
-  I3T_DEBUG_ASSERT(node->m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
+  Debug::Assert(node->m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
 
   auto* otherPin = node->m_inputs[index].m_input;
 
@@ -111,7 +111,7 @@ void GraphManager::unplugInput(UPtr<Core::NodeBase>& node, int index)
     }
     else
     {
-      I3T_DEBUG_ASSERT(false, "Can't find pointer to input pin in other node outputs.");
+      Debug::Assert(false, "Can't find pointer to input pin in other node outputs.");
     }
 
     auto& myPin = node->m_inputs[index];
@@ -121,7 +121,7 @@ void GraphManager::unplugInput(UPtr<Core::NodeBase>& node, int index)
 
 void GraphManager::unplugOutput(UPtr<Core::NodeBase>& node, int index)
 {
-  I3T_DEBUG_ASSERT(node->m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
+  Debug::Assert(node->m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
 
   auto& pin = node->m_outputs[index];
 

@@ -39,7 +39,7 @@ public:
    * \param matrix Matrix to transfer.
    * \param index New position of matrix.
    */
-  FORCE_INLINE void addMatrix(UPtr<Matrix> matrix, const int index) noexcept
+  void addMatrix(UPtr<Matrix> matrix, const int index) noexcept
   {
     if (index > m_matrices.size())
       m_matrices.push_back(std::move(matrix));
@@ -58,7 +58,7 @@ public:
    * \param idx Index of matrix.
    * \return Reference to matrix holt in m_matrices vector.
    */
-  [[nodiscard]] FORCE_INLINE UPtr<Matrix>& getMatRef(size_t idx)
+  [[nodiscard]] UPtr<Matrix>& getMatRef(size_t idx)
   {
     return m_matrices.at(idx);
   }
@@ -66,9 +66,9 @@ public:
   /**
    * Pop matrix from a sequence. Caller takes ownership of returned matrix.
    */
-  [[nodiscard]] FORCE_INLINE UPtr<Matrix> popMatrix(const int index)
+  [[nodiscard]] UPtr<Matrix> popMatrix(const int index)
   {
-    I3T_DEBUG_ASSERT(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
+    Debug::Assert(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
 
     auto result = std::move(m_matrices.at(index));
     m_matrices.erase(m_matrices.begin() + index);

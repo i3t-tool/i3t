@@ -7,7 +7,7 @@ project(I3T VERSION 2.1.0)
 find_package(OpenGL REQUIRED)
 
 # Customizable options.
-option(BUILD_TESTS "Build test programs" OFF)
+option(BUILD_TESTS "Build test programs" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
     message(WARNING 'Configuration is not set, using Debug as default. If you want to set custom configuration, run cmake with "-DCMAKE_BUILD_TYPE=Release" for example.')
@@ -124,8 +124,9 @@ endmacro()
 # =============================================================
 
 # Configuration for building tests.
-if (BUILD_TESTS)
-    set(TEST_PROJECT_NAME i3t_test)
+# if (BUILD_TESTS)
+if (True)
+    set(TEST_PROJECT_NAME I3TTest)
 
     message("Building tests...")
 
@@ -144,7 +145,8 @@ if (BUILD_TESTS)
             Source/Core/Nodes/GraphManager.cpp
             Source/Core/Nodes/Node.h
             Source/Core/Nodes/Node.cpp
-            Test/Core/SequenceTest.cpp Test/Core/TransformationTest.cpp)
+            Source/Core/Nodes/Transform.cpp
+            Test/Core/SequenceTest.cpp Test/Core/TransformationTest.cpp Test/Core/ValueSetTest.cpp)
 
     target_link_libraries(${TEST_PROJECT_NAME} gtest gtest_main)
 
@@ -196,7 +198,7 @@ add_executable(${PROJECT_NAME} ${I3T_SOURCE}
         Source/Core/Nodes/Node.h
         Source/Core/Nodes/Node.cpp
         Source/Core/Nodes/NodeImpl.h
-        Source/Core/Nodes/GraphManager.h Source/GUI/Settings.h Source/GUI/Settings.cpp Source/Core/Nodes/Sequence.h Source/Core/Nodes/GraphManager.cpp)
+        Source/Core/Nodes/GraphManager.h Source/GUI/Settings.h Source/GUI/Settings.cpp Source/Core/Nodes/Sequence.h Source/Core/Nodes/GraphManager.cpp Source/Core/Nodes/Transform.h Source/Core/Nodes/Transform.cpp)
 # =============================================================
 
 # Set VS_DEBUGGER_WORKING_DIRECTORY

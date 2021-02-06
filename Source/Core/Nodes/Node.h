@@ -24,11 +24,15 @@ enum class ENodePlugResult
   Err_Loop,
 };
 
+enum class EValueSetResult
+{
+  Ok = 0,
+  Err_ConstraintViolation
+};
+
 namespace Core
 {
 class Pin;
-
-typedef std::array<char, 16> Mask;
 
 /**
  * Base class interface for all boxes.
@@ -37,9 +41,8 @@ typedef std::array<char, 16> Mask;
 class NodeBase
 {
   friend class GraphManager;
-  template <ENodeType NodeType> friend class NodeImpl;
-  friend class Sequence;
 
+protected:
   /// Inputs of the box: Input tabs with glyphs.
   std::vector<Pin> m_inputs;
 
@@ -50,7 +53,9 @@ class NodeBase
   std::vector<DataStore> m_initialData;
   std::vector<DataStore> m_internalData;
 
-protected:
+  DataMap m_initialMap{};
+  DataMap m_currentMap{};
+
   /** Operator node properties. */
   const Operation* m_operation = nullptr;
 
@@ -84,9 +89,14 @@ public:
    */
   DataStore& getInternalData(unsigned index = 0)
   {
-    I3T_DEBUG_ASSERT(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
+    Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
 
     return m_internalData[index];
+  }
+
+  DataStore& getData()
+  {
+    return m_internalData[0];
   }
 
   /**
@@ -97,13 +107,18 @@ public:
    *
    * \param val
    */
-  virtual void setValue(float val) {}
+  virtual EValueSetResult setValue(float val) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(const glm::vec3& vec) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(const glm::vec4& vec) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(const glm::mat4& mat)
+  {
+    if (eq(m_currentMap, g_Free))
+      m_internalData[0].setValue(mat);
 
-  virtual void setValue(const glm::vec3& vec) {}
+    return EValueSetResult::Ok;
+  }
 
-  virtual void setValue(const glm::vec4& vec) {}
-
-  virtual void setValue(const glm::mat4& mat) {}
+  virtual void reset() {}
 
   /**
    * Smart set function, used with constrained transformation for value checking.
@@ -111,7 +126,8 @@ public:
    * \param mask array of 16 chars.
    * \param mat
    */
-  virtual void setValue(const Mask& mask, const glm::mat4& mat) {}
+  virtual EValueSetResult setValue(const glm::mat4& mat, const DataMap& map) { return EValueSetResult::Ok; }
+  virtual void setDataMap(const DataMap& map) { m_currentMap = map; }
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;
   [[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -211,7 +227,7 @@ public:
   {
     if (m_isInput)
     {
-      I3T_DEBUG_ASSERT(isPluggedIn(), "This input pin is not plugged to any output pin!");
+      Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
       return m_input->m_master->getInternalData(id);
     }
     else

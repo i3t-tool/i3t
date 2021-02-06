@@ -7,7 +7,6 @@
  * \author Michal Folta, CTU Prague
  */
 //---------------------------------------------------------------------------
-
 #ifndef _MATHUTILS_H_
 #define _MATHUTILS_H_
 
@@ -15,9 +14,36 @@
 #include <random>
 #include <vector>
 
-class Math
+namespace Math
 {
-public:
+static constexpr float epsilon = 0.000001f;
+
+FORCE_INLINE bool eq(float lhs, float rhs)
+{
+  return abs(lhs - rhs) < epsilon;
+}
+
+FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs)
+{
+  for (int i = 0; i < 4; ++i)
+  {
+    for (int j = 0; j < 4; ++j)
+    {
+      if (!Math::eq(lhs[i][j], rhs[i][j]))
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+FORCE_INLINE bool areElementsSame(const glm::vec3 vec)
+{
+  return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]);
+}
+
   /**
    * \brief Linear interpolation between two vectors vec3 \a a and \a b
    * \param a
