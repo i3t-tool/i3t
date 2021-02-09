@@ -4,6 +4,8 @@
     Details no here now... Cca in middle is file split between example and used part
 */
 
+#include "WorkspaceWindow.h"
+
 #include "../Nodes/MatrixImpl.h"
 #include "../Nodes/NormalizeVectorImpl.h"
 #include "../Nodes/DeterminantImpl.h"
@@ -12,9 +14,301 @@
 
 using namespace Core;
 
+WorkspaceWindow::WorkspaceWindow(bool show)
+ : IWindow(show), TouchTime(1.0f)
+{
+
+    contextNodeId = 0;
+    contextLinkId = 0;
+    contextPinId = 0;
+    createNewNode = false;
+    newNodeLinkPin = nullptr;
+    newLinkPin = nullptr;
+
+    leftPaneWidth = 400.0f;
+    rightPaneWidth = 800.0f;
+
+
+
+        // \TODO read scene file
+        //  MatrixImpl* mat = new MatrixImpl();
+        //  Namespace* node = nullptr;
+        //  node = mat->SpawnNode(&s_Nodes);
+
+        WorkspaceMatrix4x4(0, "Mat4x4Label", s_HeaderBackground, "Mat4x4State", nodebase)
+
+        ed::SetNodePosition(node->ID, ImVec2(-252, 220));
+
+        ed::NavigateToContent();
+
+        BuildGUINodes();
+
+        //GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
+        GLuint imageId = pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"), true);
+        s_HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
+        // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
+        // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
+
+
+        editorStart = true;
+        ed::Config config;
+
+        config.SettingsFile = "Blueprints.json";
+
+        config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t
+        {
+            auto node = FindNode(nodeId);
+            if (!node)
+              return 0;
+
+            if (data != nullptr)
+              memcpy(data, node->State.data(), node->State.size());
+            return node->State.size();
+        };
+
+        config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason,
+                                   void* userPointer) -> bool
+        {
+            auto node = FindNode(nodeId);
+            if (!node)
+              return false;
+
+            node->State.assign(data, size);
+
+            TouchNode(nodeId);
+        }
+
+        m_Editor = ed::CreateEditor(&config);
+        ed::SetCurrentEditor(m_Editor);
+};
+
+WorkspaceWindow::~WorkspaceWindow()
+  {
+    auto releaseTexture = [](ImTextureID& id) {
+      if (id)
+      {
+        //Application_DestroyTexture(id);
+        id = nullptr;
+      }
+    };
+
+    //releaseTexture(s_RestoreIcon);
+    //releaseTexture(s_SaveIcon);
+    releaseTexture(s_HeaderBackground);
+
+    if (m_Editor)
+    {
+      ed::DestroyEditor(m_Editor);
+      m_Editor = nullptr;
+    }
+  };
+
+WorkspaceWindow::FindNode(ed::NodeId id)
+{
+  for (auto& node : Nodes)
+    if (node->ID == id)
+      return node;
+
+  return nullptr;
+}
+
+WorkspaceWindow::FindLink(ed::LinkId id)
+{
+  for (auto& link : Links)
+    if (link.ID == id)
+      return &link;
+
+  return nullptr;
+}
+
+WorkspaceWindow::FindPin(ed::PinId id)
+{
+  if (!id)
+    return nullptr;
+
+  for (auto& node : s_Nodes)
+  {
+    for (auto& pin : node->Inputs)
+      if (pin->ID == id)
+        return pin;
+
+    for (auto& pin : node->Outputs)
+      if (pin->ID == id)
+        return pin;
+  }
+
+  return nullptr;
+}
+
+WorkspaceWindow::render(){
+
+  if (!Application::get().m_showWorkspaceWindow)
+    return;
+
+  ImGui::Begin("Workspace", &Application::get().m_showWorkspaceWindow);
+
+//  if (!editorStart){
+//      WorkspaceWindow_init();
+//  }
+
+    UpdateTouch();
+    auto& io = ImGui::GetIO();
+
+    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
+
+    ed::SetCurrentEditor(m_Editor);
+
+    contextNodeId = 0;
+    contextLinkId = 0;
+    contextPinId = 0;
+    createNewNode = false;
+    newNodeLinkPin = nullptr;
+    newLinkPin = nullptr;
+
+    leftPaneWidth = 400.0f;
+    rightPaneWidth = 800.0f;
+
+
+    Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
+
+    ShowLeftPane(leftPaneWidth - 4.0f);
+
+    ImGui::SameLine(0.0f, 12.0f);
+
+    ed::Begin("Node editor");
+    {
+      auto cursorTopLeft = ImGui::GetCursorScreenPos();
+
+      //util::NodeBuilder builder(s_HeaderBackground, Application_GetTextureWidth(s_HeaderBackground),Application_GetTextureHeight(s_HeaderBackground));
+      util::NodeBuilder builder(s_HeaderBackground, 64, 64);
+
+      //
+      //DrawNodes(builder, newLinkPin);
+        WorkspaceDrawNodes(s_nodes, builder, newLinkPin);
+
+
+      //draw links
+      for (auto& link : s_Links)
+        ed::Link(link.ID, link.StartPin->ID, link.EndPin->ID, link.Color, 2.0f);
+
+     //create link
+     if (!createNewNode)
+      {
+        if (ed::BeginCreate(ImColor(255, 255, 255), 2.0f)){
+
+          auto showLabel = [](const char* label, ImColor color) {
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+            auto size = ImGui::CalcTextSize(label);
+
+            auto padding = ImGui::GetStyle().FramePadding;
+            auto spacing = ImGui::GetStyle().ItemSpacing;
+
+            ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+            auto rectMin = ImGui::GetCursorScreenPos() - padding;
+            auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
+
+            auto drawList = ImGui::GetWindowDrawList();
+            drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
+            ImGui::TextUnformatted(label);
+          };
+
+          ed::PinId startPinId = 0, endPinId = 0;
+          if (ed::QueryNewLink(&startPinId, &endPinId))
+          {
+            auto startPin = FindPin(startPinId);
+            auto endPin = FindPin(endPinId);
+
+            newLinkPin = startPin ? startPin : endPin;
+
+            if (startPin->Kind == PinKind::Input)
+            {
+              std::swap(startPin, endPin);
+              std::swap(startPinId, endPinId);
+            }
+
+            if (startPin && endPin)
+            {
+              if (endPin == startPin)
+              {
+                ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+              }
+              else if (endPin->Kind == startPin->Kind)
+              {
+                showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
+                ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+              }
+              else if (endPin->Node == startPin->Node)
+              {
+                  showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
+                  ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
+              }
+              else if (endPin->Type != startPin->Type)
+              {
+                showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+                ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
+              }
+              else
+              {
+                showLabel("+ Create Link", ImColor(32, 45, 32, 180));
+                if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
+                {
+                  s_Links.emplace_back(Link(GetNextId(), startPin, endPin));
+                  s_Links.back().Color = GetIconColor(startPin->Type);
+
+                  auto result = GraphManager::plug(startPin->Node->nodebase, endPin->Node->nodebase, 0, 0);
+                  if (result != ENodePlugResult::Ok)
+                  {
+                    // print result;
+                  }
+                }
+              }
+            }
+          }
+
+          ed::PinId pinId = 0;
+          if (ed::QueryNewNode(&pinId))
+          {
+            newLinkPin = FindPin(pinId);
+            if (newLinkPin)
+              showLabel("+ Create Namespace", ImColor(32, 45, 32, 180));
+
+            if (ed::AcceptNewItem())
+            {
+              createNewNode = true;
+              newNodeLinkPin = FindPin(pinId);
+              newLinkPin = nullptr;
+              ed::Suspend();
+              ImGui::OpenPopup("Create New Namespace");
+              ed::Resume();
+            }
+          }
+        }
+        else
+          newLinkPin = nullptr;
+
+        ed::EndCreate();
+
+        if (ed::BeginDelete())
+        {
+          DeleteNode();
+        }
+        ed::EndDelete();
+      }
+
+      ImGui::SetCursorScreenPos(cursorTopLeft);
+    }
+
+    popupMenu(createNewNode, newNodeLinkPin, contextNodeId, contextPinId, contextLinkId);
+    ed::Resume();
+
+    ed::End();
+    ImGui::End();
+
+}
 
 bool editorStart = false;
-    /*! \brief flag for state of editor run */ // TODO: Use as least global variable as possible please => and it is
+    /*! \brief flag for state of editor run */ // \TODO: Use as least global variable as possible please => and it is
                                                // possible (almost) every time :-)
 
 /* >>>> define static functions <<<< */ //{
@@ -296,66 +590,68 @@ void ShowLeftPane(float paneWidth)
 }
 
 
-/*! \fn void WorkspaceWindow_init() TODO: rename to WorkspaceWindow::init()
-    \brief initialize Workspace window
-    \details configuration setting
-*/
-void WorkspaceWindow_init()
-{
-  editorStart = true;
-  ed::Config config;
+///*! \fn void WorkspaceWindow_init() TODO: rename to WorkspaceWindow::init()
+//    \brief initialize Workspace window
+//    \details configuration setting
+//*/
+//void WorkspaceWindow_init()
+//{
+//  editorStart = true;
+//  ed::Config config;
+//
+//  config.SettingsFile = "Blueprints.json";
+//
+//  config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t {
+//    auto node = FindNode(nodeId);
+//    if (!node)
+//      return 0;
+//
+//    if (data != nullptr)
+//      memcpy(data, node->State.data(), node->State.size());
+//    return node->State.size();
+//  };
+//
+//  config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason,
+//                               void* userPointer) -> bool {
+//    auto node = FindNode(nodeId);
+//    if (!node)
+//      return false;
+//
+//    node->State.assign(data, size);
+//
+//    TouchNode(nodeId);
+//
+//    return true;
+//  };
 
-  config.SettingsFile = "Blueprints.json";
+//  m_Editor = ed::CreateEditor(&config);
+//  ed::SetCurrentEditor(m_Editor);
+//
+//  // \TODO read scene file
+////  MatrixImpl* mat = new MatrixImpl();
+////  Namespace* node = nullptr;
+////  node = mat->SpawnNode(&s_Nodes);
+//
+//    WorkspaceMatrix4x4(0, "Mat4x4Label", s_HeaderBackground, "Mat4x4State", nodebase)
+//
+//  ed::SetNodePosition(node->ID, ImVec2(-252, 220));
+//
+//  ed::NavigateToContent();
+//
+//  BuildGUINodes();
+//
+//  // EXAMPLE of pre spawn links
+//  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[6].Inputs[0].ID));
+//  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[7].Inputs[0].ID));
+//
+//  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[14].Outputs[0].ID, s_Nodes[15].Inputs[0].ID));
+//
+//  //GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
+//  GLuint imageId = pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"), true);
+//  s_HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
+//  // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
+//  // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
 
-  config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t {
-    auto node = FindNode(nodeId);
-    if (!node)
-      return 0;
-
-    if (data != nullptr)
-      memcpy(data, node->State.data(), node->State.size());
-    return node->State.size();
-  };
-
-  config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason,
-                               void* userPointer) -> bool {
-    auto node = FindNode(nodeId);
-    if (!node)
-      return false;
-
-    node->State.assign(data, size);
-
-    TouchNode(nodeId);
-
-    return true;
-  };
-
-  m_Editor = ed::CreateEditor(&config);
-  ed::SetCurrentEditor(m_Editor);
-
-  // TODO read scene file
-  MatrixImpl* mat = new MatrixImpl();
-  Namespace* node = nullptr;
-  node = mat->SpawnNode(&s_Nodes);
-
-  ed::SetNodePosition(node->ID, ImVec2(-252, 220));
-
-  ed::NavigateToContent();
-
-  BuildGUINodes();
-
-  // EXAMPLE of pre spawn links
-  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[6].Inputs[0].ID));
-  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[7].Inputs[0].ID));
-
-  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[14].Outputs[0].ID, s_Nodes[15].Inputs[0].ID));
-
-  //GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
-  GLuint imageId = pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"), true);
-  s_HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
-  // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
-  // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
-}
 
 void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ed::NodeId& contextNodeId,
                ed::PinId& contextPinId,
@@ -446,7 +742,7 @@ void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ed::NodeId& contextN
 
     auto drawList = ImGui::GetWindowDrawList();
     drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
-    
+
     Namespace* node = nullptr;
     if (ImGui::MenuItem("Matrix 4x4")){
       MatrixImpl* mat = new MatrixImpl();
@@ -506,7 +802,7 @@ void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ed::NodeId& contextN
         }
       }
     }
-   
+
     ImGui::EndPopup();
   }
   else
@@ -557,173 +853,17 @@ void DrawNodes(util::NodeBuilder& builder, GUIPin* newLinkPin)
     node->drawOutputs(builder, newLinkPin);
 
     builder.End();
-  } 
-
-}
-
-void WorkspaceWindow::render(){
-
-  if (!Application::get().m_showWorkspaceWindow)
-    return;
-
-  ImGui::Begin("Workspace", &Application::get().m_showWorkspaceWindow);
-  
-  if (!editorStart){
-      WorkspaceWindow_init();
   }
 
-    UpdateTouch();
-    auto& io = ImGui::GetIO();
-
-    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-
-    ed::SetCurrentEditor(m_Editor);
-
-    static ed::NodeId contextNodeId = 0;
-    static ed::LinkId contextLinkId = 0;
-    static ed::PinId contextPinId = 0;
-    static bool createNewNode = false;
-    static GUIPin* newNodeLinkPin = nullptr;
-    static GUIPin* newLinkPin = nullptr;
-
-    static float leftPaneWidth = 400.0f;
-    static float rightPaneWidth = 800.0f;
-    Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
-
-    ShowLeftPane(leftPaneWidth - 4.0f);
-
-    ImGui::SameLine(0.0f, 12.0f);
-
-    ed::Begin("Node editor");
-    {
-      auto cursorTopLeft = ImGui::GetCursorScreenPos();
-
-      //util::NodeBuilder builder(s_HeaderBackground, Application_GetTextureWidth(s_HeaderBackground),Application_GetTextureHeight(s_HeaderBackground));
-      util::NodeBuilder builder(s_HeaderBackground, 64, 64);
-
-      //
-      DrawNodes(builder, newLinkPin);
-
-      //draw links
-      for (auto& link : s_Links)
-        ed::Link(link.ID, link.StartPin->ID, link.EndPin->ID, link.Color, 2.0f);
-
-     //create link
-     if (!createNewNode)
-      {
-        if (ed::BeginCreate(ImColor(255, 255, 255), 2.0f)){
-          
-          auto showLabel = [](const char* label, ImColor color) {
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-            auto size = ImGui::CalcTextSize(label);
-
-            auto padding = ImGui::GetStyle().FramePadding;
-            auto spacing = ImGui::GetStyle().ItemSpacing;
-
-            ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-
-            auto rectMin = ImGui::GetCursorScreenPos() - padding;
-            auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
-
-            auto drawList = ImGui::GetWindowDrawList();
-            drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-            ImGui::TextUnformatted(label);
-          };
-
-          ed::PinId startPinId = 0, endPinId = 0;
-          if (ed::QueryNewLink(&startPinId, &endPinId))
-          {
-            auto startPin = FindPin(startPinId);
-            auto endPin = FindPin(endPinId);
-
-            newLinkPin = startPin ? startPin : endPin;
-
-            if (startPin->Kind == PinKind::Input)
-            {
-              std::swap(startPin, endPin);
-              std::swap(startPinId, endPinId);
-            }
-
-            if (startPin && endPin)
-            {
-              if (endPin == startPin)
-              {
-                ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-              }
-              else if (endPin->Kind == startPin->Kind)
-              {
-                showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
-                ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-              }
-              else if (endPin->Node == startPin->Node)
-              {
-                  showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
-                  ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
-              }
-              else if (endPin->Type != startPin->Type)
-              {
-                showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
-                ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
-              }
-              else
-              {
-                showLabel("+ Create Link", ImColor(32, 45, 32, 180));
-                if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
-                {
-                  s_Links.emplace_back(Link(GetNextId(), startPin, endPin));
-                  s_Links.back().Color = GetIconColor(startPin->Type);
-
-                  auto result = GraphManager::plug(startPin->Node->nodebase, endPin->Node->nodebase, 0, 0);
-                  if (result != ENodePlugResult::Ok)
-                  {
-                    // print result;
-                  }
-                }
-              }
-            }
-          }
-
-          ed::PinId pinId = 0;
-          if (ed::QueryNewNode(&pinId))
-          {
-            newLinkPin = FindPin(pinId);
-            if (newLinkPin)
-              showLabel("+ Create Namespace", ImColor(32, 45, 32, 180));
-
-            if (ed::AcceptNewItem())
-            {
-              createNewNode = true;
-              newNodeLinkPin = FindPin(pinId);
-              newLinkPin = nullptr;
-              ed::Suspend();
-              ImGui::OpenPopup("Create New Namespace");
-              ed::Resume();
-            }
-          }
-        }
-        else
-          newLinkPin = nullptr;
-
-        ed::EndCreate();
-
-        if (ed::BeginDelete())
-        {
-          DeleteNode();
-        }
-        ed::EndDelete();
-      }
-
-      ImGui::SetCursorScreenPos(cursorTopLeft);
-    }
-
-    popupMenu(createNewNode, newNodeLinkPin, contextNodeId, contextPinId, contextLinkId);
-    ed::Resume();
-        
-    ed::End();
-    ImGui::End(); 
-  
 }
 
+void WorkspaceDrawNodes(std::vector<WorkspaceNode*> nodes, util::NodeBuilder& builder, GUIPin* newLinkPin)
+{
+    for (auto& node : nodes)
+    {
+            node.drawNode(builder, newLinkPin);
+    }
+}
 
 void maybeUsefulCode()
 {
@@ -859,7 +999,7 @@ void maybeUsefulCode()
       auto drawList = ed::GetNodeBackgroundDrawList(node.ID);
     }*/
 
-    
+
 //Making tree nodes
  /*for (auto& node : s_Nodes)
        {

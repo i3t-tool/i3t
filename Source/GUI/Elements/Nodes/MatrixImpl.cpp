@@ -65,26 +65,8 @@ void MatrixImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
       ImGui::EndVertical();
       ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
       builder.EndHeader();
-      
-    for (auto& input : Inputs)
-  {
-    auto alpha = ImGui::GetStyle().Alpha;
-    if (newLinkPin && !CanCreateLink(newLinkPin, input) && input != newLinkPin)
-      alpha = alpha * (48.0f / 255.0f);
 
-    builder.Input(input->ID);
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-    DrawPinIcon(*input, IsPinLinked(input->ID), (int)(alpha * 255));
-    ImGui::Spring(0);
-    if (!input->Name.empty())
-    {
-      ImGui::TextUnformatted(input->Name.c_str());
-      ImGui::Spring(0);
-    }
-    
-    ImGui::PopStyleVar();
-    builder.EndInput();
-  }
+
 }
 
 void MatrixImpl::drawBox(util::NodeBuilder& builder)
@@ -125,7 +107,7 @@ void MatrixImpl::drawBox(util::NodeBuilder& builder)
       nodebase->getInternalData().setValue(f);
       nodebase->updateValues(0);
     }
-   
+
     ImGui::Spring(0);
 }
 
