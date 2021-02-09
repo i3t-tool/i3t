@@ -192,7 +192,7 @@ typedef Application App;
 
 template <typename T> void Application::showUniqueWindow()
 {
-  I3T_DEBUG_ASSERT(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
+  Debug::Assert(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
 
   if (!hasWindow(T::id))
     m_windows.insert(std::pair<std::string, std::unique_ptr<IWindow>>(T::id, std::make_unique<T>()));

@@ -27,8 +27,8 @@ template <typename Type, typename... Args> class Command : public ICommand
 public:
   typedef std::function<void(Args&...)> Callback;
 
-  Command(){};
-  virtual ~Command(){};
+  Command() = default;
+  virtual ~Command() = default;
 
   /**
    * Add a listener for a command.
@@ -58,7 +58,7 @@ public:
   /**
    * Tell application that command was issued.
    *
-   * Pass a copy of command and its arguments to an application.
+   * Pass a copy of command and its arguments to the Application.
    */
   static void dispatch(Args... args)
   {

@@ -24,6 +24,12 @@ enum class ENodePlugResult
   Err_Loop,
 };
 
+enum class EValueSetResult
+{
+  Ok = 0,
+  Err_ConstraintViolation
+};
+
 namespace Core
 {
 class Pin;
@@ -35,9 +41,8 @@ class Pin;
 class NodeBase
 {
   friend class GraphManager;
-  template <ENodeType NodeType> friend class NodeImpl;
-  friend class Sequence;
 
+protected:
   /// Inputs of the box: Input tabs with glyphs.
   std::vector<Pin> m_inputs;
 
@@ -45,20 +50,23 @@ class NodeBase
   std::vector<Pin> m_outputs;
 
   /// Values which node owns.
+  std::vector<DataStore> m_initialData;
   std::vector<DataStore> m_internalData;
 
-protected:
+  DataMap m_initialMap{};
+  DataMap m_currentMap{};
+
   /** Operator node properties. */
   const Operation* m_operation = nullptr;
 
   /// \todo Is there values in NodeBase used?
-  bool m_pulseOnPlug;      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
-  bool m_restrictedOutput; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
+  bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
+  bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
                            ///< only)
-  int m_restrictedOutputIndex; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
+  int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
-  NodeBase() {}
+  NodeBase() = default;
 
   /**
    * I3T v2 default Operator constructor.
@@ -81,10 +89,45 @@ public:
    */
   DataStore& getInternalData(unsigned index = 0)
   {
-    I3T_DEBUG_ASSERT(m_internalData.size() && m_internalData.size() > index, "Desired data storage does not exist!");
+    Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
 
     return m_internalData[index];
   }
+
+  DataStore& getData()
+  {
+    return m_internalData[0];
+  }
+
+  /**
+   * Set a value of node.
+   *
+   * Sets value of the first float of DataStore. Derived types may override
+   * default behaviour. 
+   *
+   * \param val
+   */
+  virtual EValueSetResult setValue(float val) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(const glm::vec3& vec) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(const glm::vec4& vec) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(const glm::mat4& mat)
+  {
+    if (eq(m_currentMap, g_Free))
+      m_internalData[0].setValue(mat);
+
+    return EValueSetResult::Ok;
+  }
+
+  virtual void reset() {}
+
+  /**
+   * Smart set function, used with constrained transformation for value checking.
+   *
+   * \param mask array of 16 chars.
+   * \param mat
+   */
+  virtual EValueSetResult setValue(const glm::mat4& mat, const DataMap& map) { return EValueSetResult::Ok; }
+  virtual void setDataMap(const DataMap& map) { m_currentMap = map; }
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;
   [[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -184,7 +227,7 @@ public:
   {
     if (m_isInput)
     {
-      I3T_DEBUG_ASSERT(isPluggedIn(), "This input pin is not plugged to any output pin!");
+      Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
       return m_input->m_master->getInternalData(id);
     }
     else
