@@ -171,6 +171,12 @@ public:
    */
   void receiveSignal(int inputIndex);
   //===----------------------------------------------------------------------===//
+
+private:
+  /// \todo unplug* are internal functions.
+  void _unplugAll();
+  void _unplugInput(int index);
+  void _unplugOutput(int index);
 };
 
 /**

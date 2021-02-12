@@ -5,7 +5,10 @@
 
 using namespace Core;
 
-NodeBase::~NodeBase() = default;
+NodeBase::~NodeBase()
+{
+  _unplugAll();
+}
 
 const std::vector<Pin>& NodeBase::getInputPins() const
 {
@@ -45,4 +48,57 @@ void NodeBase::receiveSignal(int inputIndex)
     spreadSignal(m_restrictedOutputIndex);
   else
     spreadSignal();
+}
+
+void NodeBase::_unplugAll()
+{
+  for (auto i = 0; i < m_inputs.size(); ++i)
+  {
+    _unplugInput(i);
+  }
+
+  for (auto i = 0; i < m_outputs.size(); ++i)
+  {
+    _unplugOutput(i);
+  }
+}
+
+void NodeBase::_unplugInput(int index)
+{
+  Debug::Assert(m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
+
+  auto* otherPin = m_inputs[index].m_input;
+
+  if (otherPin)
+  {
+    // Erase pointer to my input pin in connected node outputs.
+    auto& otherPinOutputs = otherPin->m_outputs;
+
+    auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &m_inputs[index]);
+    if (it != otherPinOutputs.end())
+    {
+      /// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
+      otherPinOutputs.erase(it);
+    }
+    else
+    {
+      Debug::Assert(false, "Can't find pointer to input pin in other node outputs.");
+    }
+
+    auto& myPin = m_inputs[index];
+    myPin.m_input = nullptr;
+  }
+}
+
+void NodeBase::_unplugOutput(int index)
+{
+  Debug::Assert(m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
+
+  auto& pin = m_outputs[index];
+
+  // Set all connected nodes input as nullptr.
+  for (const auto& otherPin : pin.m_outputs)
+    otherPin->m_input = nullptr;
+
+  pin.m_outputs.clear();
 }

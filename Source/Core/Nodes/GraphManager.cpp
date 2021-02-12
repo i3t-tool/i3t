@@ -81,53 +81,15 @@ ENodePlugResult GraphManager::plug(UPtr<Core::NodeBase>& leftNode, UPtr<Core::No
 
 void GraphManager::unplugAll(UPtr<Core::NodeBase>& node)
 {
-  for (auto i = 0; i < node->m_inputs.size(); ++i)
-  {
-    unplugInput(node, i);
-  }
-
-  for (auto i = 0; i < node->m_outputs.size(); ++i)
-  {
-    unplugOutput(node, i);
-  }
+  node.get()->_unplugAll();
 }
 
 void GraphManager::unplugInput(UPtr<Core::NodeBase>& node, int index)
 {
-  Debug::Assert(node->m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
-
-  auto* otherPin = node->m_inputs[index].m_input;
-
-  if (otherPin)
-  {
-    // Erase pointer to my input pin in connected node outputs.
-    auto& otherPinOutputs = otherPin->m_outputs;
-
-    auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &node->m_inputs[index]);
-    if (it != otherPinOutputs.end())
-    {
-      /// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
-      otherPinOutputs.erase(it);
-    }
-    else
-    {
-      Debug::Assert(false, "Can't find pointer to input pin in other node outputs.");
-    }
-
-    auto& myPin = node->m_inputs[index];
-    myPin.m_input = nullptr;
-  }
+  node.get()->_unplugInput(index);
 }
 
 void GraphManager::unplugOutput(UPtr<Core::NodeBase>& node, int index)
 {
-  Debug::Assert(node->m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
-
-  auto& pin = node->m_outputs[index];
-
-  // Set all connected nodes input as nullptr.
-  for (const auto& otherPin : pin.m_outputs)
-    otherPin->m_input = nullptr;
-
-  pin.m_outputs.clear();
+  node.get()->_unplugOutput(index);
 }
