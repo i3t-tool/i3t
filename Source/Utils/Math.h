@@ -10,9 +10,12 @@
 #ifndef _MATHUTILS_H_
 #define _MATHUTILS_H_
 
-#include <glm/glm.hpp>
 #include <random>
 #include <vector>
+
+#include "glm/glm.hpp"
+
+#include "Core/Defs.h"
 
 namespace Math
 {

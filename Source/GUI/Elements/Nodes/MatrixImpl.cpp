@@ -89,8 +89,7 @@ void MatrixImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 
 void MatrixImpl::drawBox(util::NodeBuilder& builder)
 {
-
-    glm::mat4& data = nodebase->getInternalData().getMat4();
+    glm::mat4 data = nodebase->getInternalData().getMat4();
     bool valueCH = false;
     std::string s = "";
     const char* c = "";
