@@ -102,3 +102,8 @@ void NodeBase::_unplugOutput(int index)
 
   pin.m_outputs.clear();
 }
+
+ID NodeBase::getId() const
+{
+  return m_id;
+}

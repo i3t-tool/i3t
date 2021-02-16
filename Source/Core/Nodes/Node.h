@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Core/Defs.h"
+#include "Id.h"
 #include "NodeData.h"
 #include "Operations.h"
 
@@ -43,6 +44,8 @@ class NodeBase
   friend class GraphManager;
 
 protected:
+  ID m_id{};
+
   /// Inputs of the box: Input tabs with glyphs.
   std::vector<Pin> m_inputs;
 
@@ -56,7 +59,9 @@ protected:
   DataMap m_initialMap{};
   DataMap m_currentMap{};
 
-  /** Operator node properties. */
+  /**
+   * Operator node properties.
+   */
   const Operation* m_operation = nullptr;
 
   /// \todo Is there values in NodeBase used?
@@ -74,10 +79,13 @@ public:
   explicit NodeBase(const Operation* operation)
       : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
   {
+    m_id = IdGenerator::next();
   }
 
   /** Delete node and unplug its all inputs and outputs. */
   virtual ~NodeBase();
+
+  [[nodiscard]] ID getId() const;
 
   //===-- Obtaining value functions. ----------------------------------------===//
   /**
@@ -85,7 +93,6 @@ public:
    *
    * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
    *              Value of field[0] is returned if this parameter omitted)
-   *
    */
   DataStore& getInternalData(unsigned index = 0)
   {
@@ -190,7 +197,9 @@ class Pin
   template <ENodeType NodeType> friend class NodeImpl;
   friend class NodeBase;
 
-  /// \todo Is pin index maybe unused?
+  ID m_id;
+
+  /// Index within a node.
   int m_index = -1;
 
   /// Pin type.
@@ -214,10 +223,13 @@ class Pin
   const EValueType m_opValueType = EValueType::Pulse;
 
 public:
-  Pin(EValueType valueType, bool isInput, NodeBase* op)
-      : m_opValueType(valueType), m_isInput(isInput), m_master(op)
+  Pin(EValueType valueType, bool isInput, NodeBase* op, int index)
+      : m_opValueType(valueType), m_isInput(isInput), m_master(op), m_index(index)
   {
+    m_id = IdGenerator::next();
   }
+
+  [[nodiscard]] ID getId() const { return m_id; }
 
   [[nodiscard]] int getIndex() const { return m_index; }
 
