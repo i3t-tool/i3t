@@ -7,10 +7,11 @@
  */
 #pragma once
 
+#include <algorithm>
+
 #include "Core/Nodes/NodeImpl.h"
 #include "Core/Nodes/Operations.h"
 #include "Sequence.h"
-#include <algorithm>
 
 namespace Builder
 {

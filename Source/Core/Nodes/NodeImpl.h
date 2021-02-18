@@ -48,13 +48,13 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[T])
   // Create input pins.
   for (int i = 0; i < m_operation->numberOfInputs; i++)
   {
-    m_inputs.emplace_back(m_operation->inputTypes[i], true, this);
+    m_inputs.emplace_back(m_operation->inputTypes[i], true, this, i);
   }
 
   // Create output pins and data storage for each output.
   for (int i = 0; i < m_operation->numberOfOutputs; i++)
   {
-    m_outputs.emplace_back(m_operation->outputTypes[i], false, this);
+    m_outputs.emplace_back(m_operation->outputTypes[i], false, this, i);
     m_internalData.emplace_back();
   }
 
