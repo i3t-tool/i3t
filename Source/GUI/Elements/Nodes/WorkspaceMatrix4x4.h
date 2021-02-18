@@ -1,22 +1,16 @@
 
 
-#include "WorkspaceNode.h"
+#include "WorkspaceElements.h"
 
 
 class WorkspaceMatrix4x4 :
     public WorkspaceNode,
-    public WorkspaceNodeFrame,
-    public WorkspaceNodeData,
-    public WorkspaceNodeInputs,
-    public WorkspaceNodeOutputs
+    public WorkspaceNodeBaseData
 {
     public:
-        WorkspaceMatrix4x4(int id, std::string label, ImTextureID header_background, std::string state, std::unique_ptr<Core::NodeBase> nodebase)
-        :WorkspaceNode(id, state)
-        WorkspaceNodeFrame(label, header_background),
-        WorkspaceNodeData(nodebase),
-        WorkspaceNodeInputs(),
-        WorkspaceNodeOutputs() {}
+        WorkspaceMatrix4x4();
 
+        void drawWorkspaceNode(util::NodeBuilder& builder, WorkspacePin* newLinkPin);
 
+        void drawWorkspaceNodeData(util::NodeBuilder& builder);
 };

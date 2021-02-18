@@ -64,11 +64,11 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[T])
 }
 
 //===-----------------------------------------------------------------------===//
-
-template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
-{
-  I3T_DEBUG_ASSERT(false, "Calling update function of unimplemented NodeImpl type.");
-}
+// build error: there are no arguments to ‘I3T_DEBUG_ASSERT’ that depend on a template parameter, so a declaration of ‘I3T_DEBUG_ASSERT’ must be available [-fpermissive]
+//template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
+//{
+//  I3T_DEBUG_ASSERT(false, "Calling update function of unimplemented NodeImpl type.");
+//}
 
 // inversion
 template <> FORCE_INLINE void NodeImpl<ENodeType::Inversion>::updateValues(int inputIndex)

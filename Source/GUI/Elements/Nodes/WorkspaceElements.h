@@ -1,11 +1,40 @@
 #pragma once
 
+#include "GUI/Elements/IWindow.h"
 
-namespace ed = ax::NodeEditor;
+#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
+#include "GUI/NodeEditorUtilities/Widgets.h"
 
+#include <glm/glm.hpp>
+
+#include "../../../Core/Nodes/Node.h"
+#include "../../../Core/Nodes/NodeImpl.h"
+#include "../../../Core/Nodes/GraphManager.h"
+#include "Core/Application.h"
+#include <memory>
+#include "pgr.h"
+#include "Config.h"
+#include "GUI/Elements/Nodes/WorkspaceElements.h"
+
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui_node_editor.h>
+#include <imgui_internal.h>
+#include <imgui_node_editor_internal.h>
+
+#include <algorithm>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+
+using ax::Widgets::IconType;
+namespace util = ax::NodeEditor::Utilities;
+
+namespace ne = ax::NodeEditor; /* /ed/ is used in imgui_node_editir.cpp for some other namespace - so for clearity I use /ne/ */
 
 /*! \enum PinKind
-    \brief kinds (in/out) of Pin
+    \brief kinds (in/out) of Pin \todo maybe unused - this info is in Core
  */
 enum class PinKind
 {
@@ -45,16 +74,7 @@ enum class PinKind
 //  }
 //};
 /* \todo look above - and move this to Konstant.h */
-const std::map<EValueType, ImColor> WorkspacePinColor = {
-    {EValueType::Float,     ImColor(255, 255, 255)},
-    {EValueType::Matrix,    ImColor(220, 48, 48)},
-    {EValueType::MatrixMul, ImColor(68, 201, 156)},
-    {EValueType::Pulse,     ImColor(147, 226, 74)},
-    {EValueType::Quat,      ImColor(124, 21, 153)},
-    {EValueType::Screen,    ImColor(51, 150, 215)},
-    {EValueType::Vec3,      ImColor(218, 0, 183)},
-    {EValueType::Vec4,      ImColor(255, 48, 48)}
-};
+extern std::map<EValueType, ImColor> WorkspacePinColor;
 
 ///*! \fn void DrawPinIcon(const Pin& pin, bool connected, int alpha)
 //    \brief draw icon of Pin \TODO: probably on place of cursor?
@@ -104,26 +124,19 @@ const std::map<EValueType, ImColor> WorkspacePinColor = {
 
 
 /* \todo look above - and move this to Konstant.h */
-const std::map<EValueType, ImColor> WorkspacePinShape = {
-    {EValueType::Float,     IconType::Circle},
-    {EValueType::Matrix,    IconType::Flow},
-    {EValueType::MatrixMul, IconType::Circle},
-    {EValueType::Pulse,     IconType::Circle},
-    {EValueType::Quat,      IconType::Circle},
-    {EValueType::Screen,    IconType::Circle},
-    {EValueType::Vec3,      IconType::Circle},
-    {EValueType::Vec4,      IconType::Square}
-};
+extern std::map<EValueType, IconType> WorkspacePinShape;
+
 
 /*! \class Link
     \brief use for connecting Pins (consequently Nodes)
  */
 class WorkspaceLink
 {
-  ed::LinkId ID; /*! \brief unique (among Links) identificator */
+    public:
+  ne::LinkId ID; /*! \brief unique (among Links) identificator */
 
-  GUIPin* StartPin; /*! \brief Pin from which Link comes from */
-  GUIPin* EndPin; /*! \brief Pin to which Link goes to */
+  WorkspacePin* StartPin; /*! \brief Pin from which Link comes from */
+  WorkspacePin* EndPin; /*! \brief Pin to which Link goes to */
 
   ImColor Color; /*! \brief Color of Link  */
 
@@ -135,32 +148,68 @@ class WorkspaceLink
 
     Color is set to Color(255, 255, 255)
 */
-  WorkspaceLink(ed::LinkId id, GUIPin* StartPin, GUIPin* EndPin)
-      : ID(id), StartPin(StartPin), EndPin(EndPin), Color(255, 255, 255)
-  {
-  }
+  WorkspaceLink(ne::LinkId id, WorkspacePin* StartPin, WorkspacePin* EndPin);
+
+  void drawLink();
+};
+
+
+class WorkspaceNode
+{
+public:
+    const ne::NodeId Id;
+    std::string State; /*! \brief e.g. selected \todo what is it for? */
+
+    ImColor Color; /*! \brief Color of Node */
+    ImVec2 Size;  /*! \brief Size of box */
+    float TouchTime;
+
+    std::string HeaderLabel;
+    ImTextureID HeaderBackground;
+
+
+    WorkspaceNode(ne::NodeId id, std::string state, ENodeType type);
+
+    virtual void drawWorkspaceNode(util::NodeBuilder& builder, WorkspacePin* newLinkPin)=0;
+
+    virtual void drawWorkspaceNodeHeader(util::NodeBuilder& builder);
+
+
+    /*! \fn static void TouchNode(ne::NodeId id) \todo for what is it ?
+    \brief update TouchTime
+    */
+    void TouchNode(float touchTime);
+
+    float GetTouchProgress(const float constTouchTime);
+
 };
 
 
 
-class WorkspaceNode;
+class WorkspaceLinkProperties
+{
+public:
+    const ed::LinkId Id;
+
+    WorkspaceLinkProperties(ed::LinkId id);
+
+};
 
 /*! \struct Pin
     \brief use to connecting Link to Node
  */
-class WorkspacePin
+class WorkspacePinProperties
 {
 public:
-  ed::PinId ID; /*! \brief unique (among Pins) identificator */
-  WorkspaceNode* Node; /*! \brief Node the Pin belongs to */
+  const ne::PinId& Id; /*! \brief unique (among Pins) identificator */
   std::string Name; /*! \brief Name of Pin */
-  EValueType Type;   /*! \brief Type of pin \sa PinType */
-  PinKind Kind;  /*! \brief Kind of pin \sa PinKind */
+  const PinKind Kind;  /*! \brief Kind of pin \sa PinKind */
+  const EValueType& Type;
 
   int IconSize = 24; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
 
-    bool conected;
-    float alpha;
+    bool Connected;
+    float Alpha;
   /*! \fn Pin
         \brief default Pin constructor
         \param[in] id int identificator
@@ -169,104 +218,39 @@ public:
 
         PinKind is set to input. Node is set to nullptr.
     */
-  WorkspacePin(int id, const char* name, WorkspaceNode* Node, PinKind Kind, EValueType type)
-  : ID(id), Name(name), Node(Node),  Kind(Kind), Type(type), conected(false), alpha(2.0) {}
+  WorkspacePinProperties(const ne::PinId& id, const char* name, PinKind Kind, EValueType type);
 
 
-
-/*! \fn bool IsPinConected(ed::PinId id)
-    \brief check whether some Link is connect to Pin with given id
-    \param[in] id PinId of Pin function check
-    \return true if some Link is connect to Pin, false otherwise or if Pin id not exist
-*/
-bool IsPinConected();
-
-///*! \fn void drawPin()
-//    \brief draw icon of Pin \TODO: probably on place of cursor?
-//*/
-  virtual void drawPin();
-};
-
-
-
-class WorkspaceNode
-{
-
-    int id;
-    std::string state; /*! \brief e.g. selected */
-
-    ImColor Color; /*! \brief Color of Node */
-      ENodeType Type; /*! \brief Type of Node */
-      ImVec2 Size;  /*! \brief Size of box */
-      float TouchTime;
-
-public:
-    WorkspaceNode(int id, std::string state)
-    : id(id), state(state)
-    {
-        Color = ImColor(255, 255, 255);
-    }
-
-    virtual void drawNode(util::NodeBuilder& builder, GUIPin* newLinkPin) = 0;
-
-    /*! \fn static void TouchNode(ed::NodeId id)
-    \brief save s_TouchTime for node
-    \sa s_TouchTime
+    /*! \fn bool IsPinConected(ne::PinId id)
+        \brief check whether some Link is connect to Pin with given id
+        \param[in] id PinId of Pin function check
+        \return true if some Link is connect to Pin, false otherwise or if Pin id not exist
     */
-    void TouchNode();
+    bool IsPinConnected();
 
+    bool CanCreateLink(Core::Pin* b); /* \todo check in Core ? */
 };
 
-
-class WorkspaceNodeHeader
+class WorkspaceNodeBaseData
 {
 public:
-    std::string label;
-    ImTextureID header_background;
 
-    WorkspaceNodeHeader(std::string label, ImTextureID header_background)
-    :label(label) header_background(header_background) {}
+    /*see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
+    const std::unique_ptr<Core::NodeBase> Nodebase; /*! \brief reference to core
+                                                         WorkspaceNodeData is owner of unique pointer
+                                              */
 
-    virtual void drawNodeHeader(util::NodeBuilder& builder);
+    std::vector<WorkspaceLinkProperties> WorkspaceLinksProperties;
+    std::vector<WorkspacePinProperties> WorkspaceInputsProperties;
+    std::vector<WorkspacePinProperties> WorkspaceOutputsProperties;
+
+    WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> const &nodebase);
+
+    virtual void drawWorkspaceInputLinks;(util::NodeBuilder& builder);
+    virtual void drawWorkspaceInputs(util::NodeBuilder& builder);
+    virtual void drawWorkspaceNodeData(util::NodeBuilder& builder) = 0;
+    virtual void drawWorkspaceOutputs(util::NodeBuilder& builder);
+
 
 };
 
-
-class WorkspaceNodeData
-{
-public:
-    std::unique_ptr<Core::NodeBase> nodebase; /*! \brief reference to core */
-
-
-    WorkspaceNodeData(std::unique_ptr<Core::NodeBase> nodebase)
-    : nodebase(nodebase) {}
-
-    virtual void drawData();
-};
-
-
-class WorkspaceNodeInputs
-{
-public:
-    std::vector<GUIPin*> inputs; /*! \brief Vector of input Pins */
-
-
-    WorkspaceNodeInputs(){}
-
-    virtual void spawnInputs(const std::vector<Pin>& inputPins);
-    virtual void drawInputs();
-};
-
-
-class WorkspaceNodeOutputs
-{
-public:
-    std::vector<GUIPin*> outputs; /*! \brief Vector of output Pins*/
-
-
-    WorkspaceNodeOutputs(){}
-
-    virtual void spawnOutputs(const std::vector<Pin>& outputPins);
-    virtual void drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin);
-
-};

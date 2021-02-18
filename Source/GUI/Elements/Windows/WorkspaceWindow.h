@@ -11,7 +11,7 @@
 #include "GUI/NodeEditorUtilities/Widgets.h"
 
 #include <glm/glm.hpp>
-#include <imgui_node_editor.h>
+
 #include "../../../Core/Nodes/Node.h"
 #include "../../../Core/Nodes/NodeImpl.h"
 #include "../../../Core/Nodes/GraphManager.h"
@@ -19,9 +19,12 @@
 #include <memory>
 #include "pgr.h"
 #include "Config.h"
+#include "GUI/Elements/Nodes/WorkspaceElements.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui_node_editor.h>
 #include <imgui_internal.h>
+#include <imgui_node_editor_internal.h>
 
 #include <algorithm>
 #include <map>
@@ -30,39 +33,22 @@
 #include <vector>
 
 //using namespace ax;
-using ax::Widgets::IconType;
+//using ax::Widgets::IconType;
 
-namespace ed = ax::NodeEditor;
+namespace ne = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
 
 /* >>> Some struct <<< \todo What is it for? */ //{
 
 struct NodeIdLess
 {
-  bool operator()(const ed::NodeId& lhs, const ed::NodeId& rhs) const { return lhs.AsPointer() < rhs.AsPointer(); }
+  bool operator()(const ne::NodeId& lhs, const ne::NodeId& rhs) const { return lhs.AsPointer() < rhs.AsPointer(); }
 };
 
-static std::map<ed::NodeId, float, NodeIdLess> s_NodeTouchTime;
+static std::map<ne::NodeId, float, NodeIdLess> s_NodeTouchTime;
 
 
-static float GetTouchProgress(ed::NodeId id)
-{
-  auto it = s_NodeTouchTime.find(id);
-  if (it != s_NodeTouchTime.end() && it->second > 0.0f)
-    return (s_TouchTime - it->second) / s_TouchTime;
-  else
-    return 0.0f;
-}
 
-static void UpdateTouch()
-{
-  const auto deltaTime = ImGui::GetIO().DeltaTime;
-  for (auto& entry : s_NodeTouchTime)
-  {
-    if (entry.second > 0.0f)
-      entry.second -= deltaTime;
-  }
-}
 
 //}
 
@@ -141,54 +127,78 @@ inline void fromVecToArray4(glm::vec4& vec, float arr[4])
 class WorkspaceWindow  : public IWindow {
     public:
 
-    ed::NodeId contextNodeId;
-    ed::LinkId contextLinkId;
-    ed::PinId contextPinId;
+    Application& WholeApplication;
+    ne::EditorContext* NodeEditorContext; /*! \brief Object for store workspace scene */
+
+    ImTextureID HeaderBackgroundTexture;
+
+    util::NodeBuilder NodeBuilderContext; /* \todo builder as variable of WorkspceWindow?*/
+//
+
+    //static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
+    std::vector<WorkspaceNode> WorkspaceNodes;   /*! \brief All WorkspaceNodes */
+
+
+
+
+    ne::NodeId contextNodeId;
+    ne::LinkId contextLinkId;
+    ne::PinId contextPinId;
     bool createNewNode;
-    GUIPin* newNodeLinkPin ;
-    GUIPin* newLinkPin;
+    WorkspacePin* newNodeLinkPin ;
+    WorkspacePin* newLinkPin;
 
     float leftPaneWidth;
     float rightPaneWidth;
 
+    ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
-    const float TouchTime; /*! \brief \TODO: take values from (move to) Const.h */
 
-    ed::EditorContext* m_Editor; /*! \brief Object for store workspace scene */
+    const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
 
-    //static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
-    std::vector<WorkspaceNode*> Nodes;
-    std::vector<WorkspaceLink> Links;  /*! \brief All Links */
 
 
 
     WorkspaceWindow(bool show);
+    ~WorkspaceWindow();
 
-    /*! \fn static Node* FindNode(ed::NodeId id)
+        /*! \fn static Node* FindNode(ne::NodeId id)
     \brief search for Node by its id
     \param[in] id NodeId of Node function search for
     \return Node* of Node with given id or nullptr when not found
-*/
-    WorkspaceNode* FindNode(ed::NodeId id);
+    */
+    WorkspaceNode* FindNode(ne::NodeId id);
 
 
-/*! \fn static Link* FindLink(ed::LinkId id)
-    \brief search for Link by its id
-    \param[in] id LinkId of Link function search for
-    \return Link* of Link with given id or nullptr when not found
-*/
-Link* FindLink(ed::LinkId id);
+    /*! \fn static Link* FindLink(ne::LinkId id)
+        \brief search for Link by its id
+        \param[in] id LinkId of Link function search for
+        \return Link* of Link with given id or nullptr when not found
+    */
+    WorkspaceLink* FindLink(ne::LinkId id);
 
 
 
-/*! \fn static Pin* FindPin(ed::PinId id)
-    \brief search for Pin by its id
-    \param[in] id PinId of Pin function search for
-    \return Pin* of Pin with given id or nullptr when not found
-*/
-WorkspacePin* FindPin(ed::PinId id);
+    /*! \fn static Pin* FindPin(ne::PinId id)
+        \brief search for Pin by its id
+        \param[in] id PinId of Pin function search for
+        \return Pin* of Pin with given id or nullptr when not found
+    */
+    WorkspacePin* FindPin(ne::PinId id);
 
-void render();
+    void UpdateTouch();
+
+    void WorkspaceDrawNodes(util::NodeBuilder& builder, WorkspacePin* newLinkPin);
+
+    void render();
+
+    bool Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1,
+                     float min_size2, float splitter_long_axis_size = -1.0f);
+
+    void ShowLeftPane(float paneWidth);
+
+    void ShowStyleEditor(bool* show = nullptr);
+
 
 
 };
@@ -235,8 +245,8 @@ void render();
 //  return s_NextId++;
 //}
 
-//static ed::LinkId GetNextLinkId()
+//static ne::LinkId GetNextLinkId()
 //{
-//  return ed::LinkId(GetNextId());
+//  return ne::LinkId(GetNextId());
 //}
 

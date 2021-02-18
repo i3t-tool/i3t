@@ -10,6 +10,8 @@
 #ifndef _MATHUTILS_H_
 #define _MATHUTILS_H_
 
+#include "Core/Defs.h"
+
 #include <glm/glm.hpp>
 #include <random>
 #include <vector>

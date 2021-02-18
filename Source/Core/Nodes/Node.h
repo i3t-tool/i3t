@@ -103,7 +103,7 @@ public:
    * Set a value of node.
    *
    * Sets value of the first float of DataStore. Derived types may override
-   * default behaviour. 
+   * default behaviour.
    *
    * \param val
    */
@@ -184,7 +184,6 @@ class Pin
   template <ENodeType NodeType> friend class NodeImpl;
   friend class NodeBase;
 
-  /// \todo Is pin index maybe unused?
   int m_index = -1;
 
   /// Pin type.
