@@ -5,8 +5,8 @@
 
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4()
-        : WorkspaceNodeBaseData(Builder::createNode<ENodeType::Matrix>())
-        , WorkspaceNode(Nodebase., state, ENodeType::Matrix)
+        : WorkspaceNodeBaseData( Builder::createNode<ENodeType::Matrix>() )
+        , WorkspaceNode( Nodebase.getId(), Nodebase.getType() )
 {}
 
 
@@ -62,9 +62,5 @@ void WorkspaceMatrix4x4::drawWorkspaceNode(util::NodeBuilder& builder, Workspace
     drawWorkspaceNodeOutputs(builder, newLinkPin);
 }
 
-
-
-//        std::vector<WorkspacePin>& WorkspaceMatrix4x4::getInputs(){return Inputs;}
-//        std::vector<WorkspacePin>& WorkspaceMatrix4x4::getOutputs(){return Outputs;}
 
 

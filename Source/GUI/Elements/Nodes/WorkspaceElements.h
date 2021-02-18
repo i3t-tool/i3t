@@ -157,7 +157,7 @@ class WorkspaceLink
 class WorkspaceNode
 {
 public:
-    const ne::NodeId Id;
+    const ne::NodeId& Id;
     std::string State; /*! \brief e.g. selected \todo what is it for? */
 
     ImColor Color; /*! \brief Color of Node */
@@ -168,7 +168,7 @@ public:
     ImTextureID HeaderBackground;
 
 
-    WorkspaceNode(ne::NodeId id, std::string state, ENodeType type);
+    WorkspaceNode(const ne::NodeId& id);
 
     virtual void drawWorkspaceNode(util::NodeBuilder& builder, WorkspacePin* newLinkPin)=0;
 
@@ -237,14 +237,14 @@ public:
 
     /*see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
     const std::unique_ptr<Core::NodeBase> Nodebase; /*! \brief reference to core
-                                                         WorkspaceNodeData is owner of unique pointer
+                                                         WorkspaceNodeBaseData is owner of unique pointer
                                               */
 
     std::vector<WorkspaceLinkProperties> WorkspaceLinksProperties;
     std::vector<WorkspacePinProperties> WorkspaceInputsProperties;
     std::vector<WorkspacePinProperties> WorkspaceOutputsProperties;
 
-    WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> const &nodebase);
+    WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nodebase);
 
     virtual void drawWorkspaceInputLinks;(util::NodeBuilder& builder);
     virtual void drawWorkspaceInputs(util::NodeBuilder& builder);

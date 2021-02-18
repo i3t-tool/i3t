@@ -1,15 +1,16 @@
 
 #include "WorkspaceElements.h"
+#include <format>
 
 std::map<EValueType, ImColor> WorkspacePinColor = {
-    {EValueType::Float,     ImColor(255, 255, 255)},
-    {EValueType::Matrix,    ImColor(220, 48, 48)},
-    {EValueType::MatrixMul, ImColor(68, 201, 156)},
-    {EValueType::Pulse,     ImColor(147, 226, 74)},
-    {EValueType::Quat,      ImColor(124, 21, 153)},
-    {EValueType::Screen,    ImColor(51, 150, 215)},
-    {EValueType::Vec3,      ImColor(218, 0, 183)},
-    {EValueType::Vec4,      ImColor(255, 48, 48)}
+     {EValueType::Float,     ImColor(255, 255, 255)}
+    ,{EValueType::Matrix,    ImColor(220, 48, 48)}
+    ,{EValueType::MatrixMul, ImColor(68, 201, 156)}
+    ,{EValueType::Pulse,     ImColor(147, 226, 74)}
+    ,{EValueType::Quat,      ImColor(124, 21, 153)}
+    ,{EValueType::Screen,    ImColor(51, 150, 215)}
+    ,{EValueType::Vec3,      ImColor(218, 0, 183)}
+    ,{EValueType::Vec4,      ImColor(255, 48, 48)}
 };
 
 std::map<EValueType, IconType> WorkspacePinShape = {
@@ -22,6 +23,49 @@ std::map<EValueType, IconType> WorkspacePinShape = {
     {EValueType::Vec3,      IconType::Circle},
     {EValueType::Vec4,      IconType::Square}
 };
+
+/* \todo some better way? */
+static int linkID = 0;
+static getLinkID(){return linkID++;}
+
+/* see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
+WorkspaceNodeBaseData::WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nodebase)
+    : Nodebase(std::move(nodebase))
+{
+    const std::vector<Pin>& InputPins = Nodebase.getInputPins();
+    WorkspaceInputsProperties.reserve(InputPins.size())
+    for( Pin& pin : InputPins )
+    {
+        WorkspaceInputsProperties.push_back(new WorkspacePinProperties(pin.getId()
+                                                                      ,std::format("input #{}", pin.getIndex())
+                                                                      ,PinKind::Input
+                                                                      ,pin.getType()
+                                                                       )
+                                            )
+    }
+
+    for( Pin& pin : Nodebase.getOutputPins() )
+    {
+        WorkspaceOutputsProperties.push_back(new WorkspacePinProperties(pin.getId()
+                                                                      ,std::format("output #{}", pin.getIndex())
+                                                                      ,PinKind::Output
+                                                                      ,pin.getType()
+                                                                       )
+                                            )
+    }
+
+}
+
+WorkspaceNode::WorkspaceNode(const ne::NodeId id)
+    :Id(id)
+{
+
+}
+
+
+
+
+
 
 WorkspacePin::WorkspacePin(ne::PinId id, const char* name, WorkspaceNode* Node, PinKind Kind, EValueType type)
   : ID(id), Name(name), Node(Node),  Kind(Kind), Type(type), Connected(false), Alpha(2.0)
