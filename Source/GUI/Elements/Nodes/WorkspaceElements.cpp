@@ -1,6 +1,9 @@
 
 #include "WorkspaceElements.h"
-#include <format>
+#include <string>
+#include <sstream>
+
+// #include <format> // not as standard library yet
 
 std::map<EValueType, ImColor> WorkspacePinColor = {
      {EValueType::Float,     ImColor(255, 255, 255)}
@@ -24,79 +27,45 @@ std::map<EValueType, IconType> WorkspacePinShape = {
     {EValueType::Vec4,      IconType::Square}
 };
 
-/* \todo some better way? */
-static int linkID = 0;
-static getLinkID(){return linkID++;}
-
-/* see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
-WorkspaceNodeBaseData::WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nodebase)
-    : Nodebase(std::move(nodebase))
+void WorkspaceNode::drawWorkspaceNodeHeader(util::NodeBuilder& builder)
 {
-    const std::vector<Pin>& InputPins = Nodebase.getInputPins();
-    WorkspaceInputsProperties.reserve(InputPins.size())
-    for( Pin& pin : InputPins )
-    {
-        WorkspaceInputsProperties.push_back(new WorkspacePinProperties(pin.getId()
-                                                                      ,std::format("input #{}", pin.getIndex())
-                                                                      ,PinKind::Input
-                                                                      ,pin.getType()
-                                                                       )
-                                            )
-    }
+    builder.Header(Color);
 
-    for( Pin& pin : Nodebase.getOutputPins() )
-    {
-        WorkspaceOutputsProperties.push_back(new WorkspacePinProperties(pin.getId()
-                                                                      ,std::format("output #{}", pin.getIndex())
-                                                                      ,PinKind::Output
-                                                                      ,pin.getType()
-                                                                       )
-                                            )
-    }
+    ImGui::Spring(0);
+    ImGui::TextUnformatted(Label.c_str());
+    ImGui::Spring(1);
+    ImGui::Dummy(ImVec2(0, 28));
+    ImGui::Spring(0);
 
+    builder.EndHeader();
 }
 
-WorkspaceNode::WorkspaceNode(const ne::NodeId id)
-    :Id(id)
+WorkspaceNode::WorkspaceNode(const ne::NodeId& id, ImTextureID headerBackground)
+    : Id(id)
 {
-
-}
-
-
-
-
-
-
-WorkspacePin::WorkspacePin(ne::PinId id, const char* name, WorkspaceNode* Node, PinKind Kind, EValueType type)
-  : ID(id), Name(name), Node(Node),  Kind(Kind), Type(type), Connected(false), Alpha(2.0)
-{}
-
-// \TODO change to core pintypes
-void WorkspaceNodeBaseData::drawWorkspaceInputs()
-{
-    //color.Value.w = alpha / 255.0f;
-    ax::Widgets::Icon(ImVec2(IconSize, IconSize), WorkspacePinShape[Type], Connected, WorkspacePinColor[Type], ImColor(32.0, 32.0, 32.0, Alpha));
-}
-
-
-bool WorkspacePin::IsPinConnected()
-{
-    return Connected;
-}
-
-WorkspaceLink::WorkspaceLink(ne::LinkId id, WorkspacePin* StartPin, WorkspacePin* EndPin)
-      : ID(id), StartPin(StartPin), EndPin(EndPin), Color(255, 255, 255)
-{}
-
-void WorkspaceLink::drawLink()
-{
-    ne::Link(ID, StartPin->ID, EndPin->ID, Color, 2.0f);
-}
-
-WorkspaceNode::WorkspaceNode(ne::NodeId id, std::string state, ENodeType type)
-    : ID(id), State(state), Type(type)
-{
+    /* \todo Some better default values - take from Const.h*/
+    State = "selected";
+    Label = "default WorkspaceNode Label";
     Color = ImColor(255, 255, 255);
+    Size = ImVec2(100,100);
+    TouchTime = 1.0;
+
+    HeaderLabel = "default WorkspaceNode HeaderLabel";
+    HeaderBackground = headerBackground;
+}
+
+WorkspaceNode::WorkspaceNode(const ne::NodeId& id, std::string headerLabel, ImTextureID headerBackground)
+    : Id(id)
+{
+    /* \todo Some better default values - take from Const.h*/
+    State = "selected";
+    Label = "default WorkspaceNode Label";
+    Color = ImColor(255, 255, 255);
+    Size = ImVec2(100,100);
+    TouchTime = 1.0;
+
+    HeaderLabel = headerLabel;
+    HeaderBackground = headerBackground;
 }
 
 void WorkspaceNode::TouchNode(float touchTime)
@@ -112,105 +81,161 @@ float WorkspaceNode::GetTouchProgress(const float constTouchTime)
     return 0.0f;
 }
 
-WorkspaceNodeHeader::WorkspaceNodeHeader(std::string label, ImTextureID header_background, ImColor color)
-    :Label(label), header_background(header_background), Color(color)
+WorkspaceLinkProperties::WorkspaceLinkProperties( const ne::LinkId id )
+:Id(id), Color(ImColor(0,0,0))
 {}
 
 
-void WorkspaceNodeHeader::drawWorkspaceNodeHeader(util::NodeBuilder& builder)
+WorkspacePinProperties::WorkspacePinProperties(const ne::PinId& id, const char* name, PinKind kind, EValueType type)
+:Id(id), Name(name), Kind(kind), Type(type), IconSize(24), Connected(false), Alpha(100)
 {
-      builder.Header(Color);
-      ImGui::Spring(0);
-      ImGui::TextUnformatted(Label.c_str());
-      ImGui::Spring(1);
-      ImGui::Dummy(ImVec2(0, 28));
-      //ImGui::Spring(0);
 
-      ImGui::BeginVertical("delegates", ImVec2(0, 28)); /* \todo rewrite /delegates/ to label ? */
-      ImGui::Spring(1, 0);
-      ImGui::Spring(1, 0);
-      ImGui::EndVertical();
-      ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
-      builder.EndHeader();
+}
+
+bool WorkspacePinProperties::IsPinConnected()
+{
+    return Connected;
+}
+
+bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
+{
+    return true; /* \todo todo... */
 }
 
 
-WorkspaceNodeData::WorkspaceNodeData(std::unique_ptr<Core::NodeBase> const &nodebase)
-    : Nodebase(nodebase)
-{}
+/* \todo not used yet - some better way? -> maybe use id of input pin that the link belongs to...  */
+static int linkID = 0;
+static int getLinkID(){return linkID++;}
 
 
-
-WorkspaceNodeInputs::WorkspaceNodeInputs(const std::vector<Core::Pin>& coreInputs, WorkspaceNode* node)
+/* see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
+WorkspaceNodeBaseData::WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nodebase)
+    : Nodebase(std::move(nodebase))
 {
-    for(auto corePin:coreInputs){
-        Inputs.push_back(
-                         WorkspacePin(getNew_s_ID() , "test inpin name", node, PinKind::Input, corePin.getType())
-                         );
+    std::ostringstream pinName;
+    std::string pinNameStr;
+
+    const std::vector<Core::Pin>& InputPins = Nodebase->getInputPins();
+    const std::vector<Core::Pin>& OutputPins = Nodebase->getOutputPins();
+
+    WorkspaceLinksProperties.reserve(InputPins.size());
+
+    WorkspaceInputsProperties.reserve(InputPins.size());
+    WorkspaceOutputsProperties.reserve(OutputPins.size());
+
+    for(const Core::Pin& pin : InputPins )
+    {
+        pinName << "input #" << pin.getIndex();
+        pinNameStr = pinName.str();
+        WorkspaceInputsProperties.push_back( std::make_unique<WorkspacePinProperties>(   pin.getId()
+                                                                                        ,pinNameStr.c_str() //,std::format("input #{}", pin.getIndex()) // format is not part of standard library
+                                                                                        ,PinKind::Input
+                                                                                        ,pin.getType()
+                                                                                       )
+                                            );
+        pinName.str("");
+    }
+
+    for(const Core::Pin& pin : OutputPins )
+    {
+        pinName << "output #" << pin.getIndex();
+        pinNameStr = pinName.str();
+        WorkspaceOutputsProperties.push_back( std::make_unique<WorkspacePinProperties>(   pin.getId()
+                                                                                         ,pinNameStr.c_str() //,std::format("output #{}", pin.getIndex())
+                                                                                         ,PinKind::Output
+                                                                                         ,pin.getType()
+                                                                                        )
+                                            );
+        pinName.str("");
+    }
+
+}
+
+
+/* \todo test whether it work... */
+void WorkspaceNodeBaseData::drawWorkspaceInputLinks(util::NodeBuilder& builder)
+{
+    for ( std::pair<pinIter, linkPropIter> elem(Nodebase->getInputPins().begin(), WorkspaceLinksProperties.begin())
+         ;/* elem.first() != Nodebase->getInputPins().end()  &&*/ elem.second != WorkspaceLinksProperties.end()
+         ; ++elem.first, ++elem.second
+         )
+    {
+        if (elem.first->isPluggedIn())
+            ne::Link(elem.second->get()->Id, elem.first->getParentPin()->getId(), elem.first->getId(), elem.second->get()->Color, 2.0f); /* elem.second->get() for dereferencing unique_ptr*/
+    }
+
+}
+
+
+/* \todo use newLinkPin arg*/
+void WorkspaceNodeBaseData::drawWorkspaceInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
+{
+
+    for ( std::pair<pinIter, pinPropIter> elem(Nodebase->getInputPins().begin(), WorkspaceInputsProperties.begin())
+         ;/* elem.first() != Nodebase->getInputPins().end()  &&*/ elem.second != WorkspaceInputsProperties.end()
+         ; ++elem.first, ++elem.second
+         )
+    {
+        float alpha = ImGui::GetStyle().Alpha;
+//        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
+//          alpha = alpha * (48.0f / 255.0f);
+
+        builder.Input(elem.first->getId());
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+        //color.Value.w = alpha / 255.0f;
+        ax::Widgets::Icon(  ImVec2(elem.second->get()->IconSize, elem.second->get()->IconSize)
+                          , WorkspacePinShape[elem.second->get()->Type]
+                          , elem.second->get()->Connected /* \todo do it better - it is copy from Core*/
+                          , WorkspacePinColor[elem.second->get()->Type]
+                          , ImColor(32.0, 32.0, 32.0, alpha)
+                          );
+
+        ImGui::Spring(0);
+        if (!elem.second->get()->Name.empty())
+        {
+          ImGui::TextUnformatted(elem.second->get()->Name.c_str());
+          ImGui::Spring(0);
+        }
+
+        ImGui::PopStyleVar();
+        builder.EndInput();
     }
 }
 
-void WorkspaceNodeInputs::drawWorkspaceNodeInputs(util::NodeBuilder& builder, WorkspacePin* newLinkPin)
+
+/* \todo use newLinkPin arg*/
+void WorkspaceNodeBaseData::drawWorkspaceOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-    for (auto& input : Inputs)
+    for ( std::pair<pinIter, pinPropIter> elem(Nodebase->getOutputPins().begin(), WorkspaceOutputsProperties.begin())
+                 ;/* elem.first() != Nodebase->getOutputPins().end()  &&*/ elem.second != WorkspaceOutputsProperties.end()
+                 ; ++elem.first, ++elem.second
+                 )
         {
             float alpha = ImGui::GetStyle().Alpha;
-            if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
-              alpha = alpha * (48.0f / 255.0f);
+    //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
+    //          alpha = alpha * (48.0f / 255.0f);
 
-            builder.Input(input.ID);
+            builder.Output(elem.first->getId());
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-            input.drawPin();
-            ImGui::Spring(0);
-            if (!input.Name.empty())
+
+            if (!elem.second->get()->Name.empty())
             {
-              ImGui::TextUnformatted(input.Name.c_str());
+              ImGui::TextUnformatted(elem.second->get()->Name.c_str());
               ImGui::Spring(0);
             }
 
+            //color.Value.w = alpha / 255.0f;
+            ax::Widgets::Icon(  ImVec2(elem.second->get()->IconSize, elem.second->get()->IconSize)
+                              , WorkspacePinShape[elem.second->get()->Type]
+                              , elem.second->get()->Connected /* \todo do it better - it is copy from Core*/
+                              , WorkspacePinColor[elem.second->get()->Type]
+                              , ImColor(32.0, 32.0, 32.0, alpha)
+                              );
+
+            ImGui::Spring(0);
+
             ImGui::PopStyleVar();
-            builder.EndInput();
+            builder.EndOutput();
         }
 }
-
-WorkspaceNodeOutputs::WorkspaceNodeOutputs(const std::vector<Core::Pin>& coreOutputs, WorkspaceNode* node)
-{
-    for(auto corePin:coreOutputs){
-        Outputs.push_back(
-                         WorkspacePin(getNew_s_ID() , "test outpin name", node, PinKind::Output, corePin.getType())
-                         );
-    }
-}
-
-bool WorkspacePin::CanCreateLink(WorkspacePin* b)
-{
-    if (!this || !b || this == b || this->Kind == b->Kind || this->Type != b->Type || this->Node == b->Node)
-        return false;
-
-    return true;
-}
-
-void WorkspaceNodeOutputs::drawWorkspaceNodeOutputs(util::NodeBuilder& builder, WorkspacePin* newLinkPin)
-{
-    for (auto& output : Outputs)
-    {
-        float alpha = ImGui::GetStyle().Alpha;
-
-        if (newLinkPin && !output.CanCreateLink(newLinkPin) && &output != newLinkPin)
-          alpha = alpha * (48.0f / 255.0f);
-
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-        builder.Output(output.ID);
-        if (!output.Name.empty())
-        {
-          ImGui::TextUnformatted(output.Name.c_str());
-          ImGui::Spring(0);
-        }
-        output.drawPin();
-        ImGui::PopStyleVar();
-        builder.EndOutput();
-    }
-}
-
-
-

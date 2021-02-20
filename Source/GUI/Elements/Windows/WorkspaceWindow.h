@@ -85,39 +85,13 @@ static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
     \param[in] a,b Pin* to check possibility of connection between
     \return true if it is possible create Link from a to b, false otherwise
 */
-static bool CanCreateLink(WorkspacePin* a, WorkspacePin* b)
-{
-  if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
-    return false;
-
-  return true;
-}
-
-/*! \fn void fromArrayToVec4(glm::vec4& vec, float arr[4])
-    \brief convert float array of size 4 to glm::vec4
-    \param[out] vec glm::vec4& result object
-    \param[in] arr float* input values -> must be of size 4*sizeof(float)
-*/
-inline void fromArrayToVec4(glm::vec4& vec, float arr[4])
-{
-  vec.x = arr[0];
-  vec.y = arr[1];
-  vec.z = arr[2];
-  vec.w = arr[3];
-}
-
-/*! \fn void fromVecToArray4(glm::vec4& vec, float arr[4])
-    \brief convert glm::vec4 to float array of size 4
-    \param[in] vec glm::vec4& input object
-    \param[out] arr float* result values -> should be of size 4*sizeof(float)
-*/
-inline void fromVecToArray4(glm::vec4& vec, float arr[4])
-{
-  arr[0] = vec.x;
-  arr[1] = vec.y;
-  arr[2] = vec.z;
-  arr[3] = vec.w;
-}
+//static bool CanCreateLink(WorkspacePinProperties* a, WorkspacePinProperties* b)
+//{
+//  if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
+//    return false;
+//
+//  return true;
+//}
 
 //} /* >>> Static functions - end <<< */
 
@@ -136,20 +110,20 @@ class WorkspaceWindow  : public IWindow {
 //
 
     //static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
-    std::vector<WorkspaceNode> WorkspaceNodes;   /*! \brief All WorkspaceNodes */
+    std::vector< std::unique_ptr<WorkspaceNode> > WorkspaceNodes;   /*! \brief All WorkspaceNodes */
 
 
 
 
-    ne::NodeId contextNodeId;
-    ne::LinkId contextLinkId;
-    ne::PinId contextPinId;
-    bool createNewNode;
-    WorkspacePin* newNodeLinkPin ;
-    WorkspacePin* newLinkPin;
-
-    float leftPaneWidth;
-    float rightPaneWidth;
+//    ne::NodeId contextNodeId;
+//    ne::LinkId contextLinkId;
+//    ne::PinId contextPinId;
+//    bool createNewNode;
+//    WorkspacePin* newNodeLinkPin ;
+//    WorkspacePin* newLinkPin;
+//
+//    float leftPaneWidth;
+//    float rightPaneWidth;
 
     ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
@@ -175,7 +149,7 @@ class WorkspaceWindow  : public IWindow {
         \param[in] id LinkId of Link function search for
         \return Link* of Link with given id or nullptr when not found
     */
-    WorkspaceLink* FindLink(ne::LinkId id);
+//    WorkspaceLink* FindLink(ne::LinkId id);
 
 
 
@@ -184,11 +158,11 @@ class WorkspaceWindow  : public IWindow {
         \param[in] id PinId of Pin function search for
         \return Pin* of Pin with given id or nullptr when not found
     */
-    WorkspacePin* FindPin(ne::PinId id);
+//    WorkspacePin* FindPin(ne::PinId id);
 
     void UpdateTouch();
 
-    void WorkspaceDrawNodes(util::NodeBuilder& builder, WorkspacePin* newLinkPin);
+    void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
     void render();
 

@@ -13,8 +13,9 @@
 #include "../Nodes/FloatMulFloatImpl.h"
 
 #include "../Nodes/WorkspaceMatrix4x4.h"
+#include "../Nodes/WorkspaceNormalizeVector.h"
 
-using namespace Core;
+//using namespace Core;
 
 WorkspaceWindow::WorkspaceWindow(bool show)
  : IWindow(show)
@@ -57,38 +58,29 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
     ne::SetCurrentEditor(NodeEditorContext);
 
-    /* just for testing */
-    WorkspaceNodes.push_back(new WorkspaceMatrix4x4())
-    ne::SetNodePosition(WorkspaceNodes.back().ID, ImVec2(-252, 220));
+    /* \todo adding nodes here just for testing */
+//    WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
+//    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
+//
+    WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
+    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
+
+    WorkspaceNodes.push_back( std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture) );
+    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(0, 0));
+
     ne::NavigateToContent();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    contextNodeId = 0;
-    contextLinkId = 0;
-    contextPinId = 0;
-    createNewNode = false;
-    newNodeLinkPin = nullptr;
-    newLinkPin = nullptr;
-
-    leftPaneWidth = 400.0f;
-    rightPaneWidth = 800.0f;
+//
+//    contextNodeId = 0;
+//    contextLinkId = 0;
+//    contextPinId = 0;
+//    createNewNode = false;
+//    newNodeLinkPin = nullptr;
+//    newLinkPin = nullptr;
+//
+//    leftPaneWidth = 400.0f;
+//    rightPaneWidth = 800.0f;
 
 
 
@@ -118,7 +110,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 
 WorkspaceWindow::~WorkspaceWindow()
-  {
+{
 /* lambda for releasing texture \todo what function to call instead of Application_DestroyTexture()?  */
 //    auto releaseTexture = [](ImTextureID& id) {
 //      if (id)
@@ -135,7 +127,7 @@ WorkspaceWindow::~WorkspaceWindow()
       ne::DestroyEditor(NodeEditorContext);
       NodeEditorContext = nullptr;
     }
-  }
+}
 
 
 void WorkspaceWindow::render(){
@@ -147,7 +139,10 @@ void WorkspaceWindow::render(){
 
         ne::Begin("Node editor");
 
-
+            for(auto &WorkspaceNode : WorkspaceNodes)
+            {
+                    WorkspaceNode->drawWorkspaceNode(NodeBuilderContext, nullptr);
+            }
 
         ne::End();
 

@@ -1,26 +1,22 @@
-
-
 #include "WorkspaceMatrix4x4.h"
 
-
-
-WorkspaceMatrix4x4::WorkspaceMatrix4x4()
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground)
         : WorkspaceNodeBaseData( Builder::createNode<ENodeType::Matrix>() )
-        , WorkspaceNode( Nodebase.getId(), Nodebase.getType() )
+        , WorkspaceNode( Nodebase->getId(), "default Matrix4x4 label", headerBackground ) /* \todo take default label from Const.h*/
 {}
 
 
 void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
 {
-    const glm::mat4& data = Nodebase->getInternalData().getMat4();
+    const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
     bool valueCH = false;
     std::string s = "";
     const char* c = "";
 
-    glm::mat4 f;
+    glm::mat4 localData;
     for (int rows = 0; rows < 4; rows++) {
         for (int columns = 0; columns < 4; columns++) {
-          f[rows][columns] = data[rows][columns];
+          localData[rows][columns] = coreData[rows][columns];
       }
     }
 
@@ -35,7 +31,7 @@ void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
           s += std::to_string(rows);
           s += std::to_string(columns);
           c = s.c_str();
-          valueCH |= ImGui::InputFloat(c, &f[rows][columns]);
+          valueCH |= ImGui::InputFloat(c, &localData[rows][columns]);
           if (columns < 3)
           {
             ImGui::SameLine();
@@ -46,7 +42,7 @@ void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
 
     if (valueCH)
     {
-      Nodebase->getInternalData().setValue(f);
+      Nodebase->getInternalData().setValue(localData);
     }
 
     ImGui::Spring(0);
@@ -54,12 +50,17 @@ void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
 }
 
 
-void WorkspaceMatrix4x4::drawWorkspaceNode(util::NodeBuilder& builder, WorkspacePin* newLinkPin)
+void WorkspaceMatrix4x4::drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+    builder.Begin(Id);
+
     drawWorkspaceNodeHeader(builder);
-    drawWorkspaceNodeInputs(builder, newLinkPin);
+    drawWorkspaceInputLinks(builder);
+    drawWorkspaceInputs(builder, newLinkPin);
     drawWorkspaceNodeData(builder);
-    drawWorkspaceNodeOutputs(builder, newLinkPin);
+    drawWorkspaceOutputs(builder, newLinkPin);
+
+    builder.End();
 }
 
 

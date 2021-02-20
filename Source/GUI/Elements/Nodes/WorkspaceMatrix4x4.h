@@ -1,16 +1,15 @@
-
-
 #include "WorkspaceElements.h"
 
-
+/* Order of inheritance is important! WorkspaceNodeBaseData has to be first because it is necessary first create NodeBase to read data from it */
 class WorkspaceMatrix4x4 :
-    public WorkspaceNode,
-    public WorkspaceNodeBaseData
+     public WorkspaceNodeBaseData
+    ,public WorkspaceNode
+
 {
     public:
-        WorkspaceMatrix4x4();
+        WorkspaceMatrix4x4(ImTextureID headerBackground);
 
-        void drawWorkspaceNode(util::NodeBuilder& builder, WorkspacePin* newLinkPin);
+        void drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
         void drawWorkspaceNodeData(util::NodeBuilder& builder);
 };
