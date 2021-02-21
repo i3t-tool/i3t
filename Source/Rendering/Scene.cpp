@@ -297,13 +297,14 @@ void Scene::render(Camera* _camera)
 {
   ShaderProvider::renderAll(_camera, environment);
 
+  // printMatrix("uuu",view);
+
   ShaderProvider::getAlphaShader()->begin();
   for (unsigned int i = 0; i < cameraObjects.size(); i++)
   {
     if (cameraObjects[i]->getDrawFrustum())
     {
-      frustrumObject->setTrans(
-          glm::inverse(cameraObjects[i]->getProjection() * glm::inverse(cameraObjects[i]->getTrans())));
+      frustrumObject->setTrans(glm::inverse(cameraObjects[i]->getProjection() * glm::inverse(cameraObjects[i]->getTrans())));
       ShaderProvider::getAlphaShader()->draw(frustrumObject, _camera, environment);
       /// should be drawn as a hcGeometries[2]
     }

@@ -119,7 +119,9 @@ void ShaderProvider::renderAll(Camera* camera, Environment* environment)
     shaders[i]->begin();
     for (unsigned int k = 0; k < renderGroups->groups[i].size(); k++)
       if (renderGroups->groups[i][k]->isVisible())
+      {
         shaders[i]->draw(renderGroups->groups[i][k], camera, environment);
+      }
     shaders[i]->end();
   }
 }
@@ -134,7 +136,9 @@ void ShaderProvider::renderAll(const glm::mat4 proj, const glm::mat4 view, Envir
     shaders[i]->begin();
     for (unsigned int k = 0; k < renderGroups->groups[i].size(); k++)
       if (renderGroups->groups[i][k]->isVisible())
+      {
         shaders[i]->draw(renderGroups->groups[i][k], proj, view, environment);
+      }
     shaders[i]->end();
   }
 }

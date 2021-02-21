@@ -21,6 +21,8 @@
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 
+#include "../World2/World2.h"
+
 /// \todo Set dynamic scale (reload font in runtime).
 float fontScale = 1.2f;
 
@@ -28,6 +30,7 @@ Application::Application()
 {
   m_isPaused = false;
   m_world = nullptr;
+  m_world2 = nullptr;
 
   /// \todo How to get which window was open previously?
   m_showWorkspaceWindow = true;
@@ -249,6 +252,7 @@ void Application::logicUpdate()
     m_world->update(); ///< update World = handle 2D and 3D interaction
   // PF glutExit called during this update - crash after window close. Solved in TabSpace::closeMessageExitEvent
 
+
   InputController::update(); ///< Update mouseDelta, mousePrev, and the stored statuses of the keys in the \a keyMap
                              ///< array (JUST_UP -> UP, JUST_DOWN -> DOWN).
 }
@@ -318,6 +322,7 @@ int Application::initI3T()
     return err;
 
   ///    - load geometry to GeometryMap
+  
   if (GeometryMap::addHCGeometry("testCube", Config::getAbsolutePath("/Data/models/testCube.tmsh")))
     return 1;
   if (GeometryMap::addHCGeometry("orbit", Config::getAbsolutePath("/Data/models/orbit.tmsh")))
@@ -332,7 +337,12 @@ int Application::initI3T()
     return 1;
 
   ///     - load materials to MaterialMap
-  MaterialMap::addHCMaterial(new Material("testMaterial", TextureLoader::getHCId("cGrid")));
+  //MaterialMap::addHCMaterial(new Material("testMaterial", TextureLoader::getHCId("cGrid")));
+  
+  MaterialMap::addHCMaterial(new Material("testMaterial", pgr::createTexture(Config::getAbsolutePath("/Data/textures2/rocks.png").c_str())));
+  //MaterialMap::addHCMaterial(new Material("testMaterial", pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.jpg").c_str())));
+
+
   MaterialMap::addHCMaterial(new Material("abCube", TextureLoader::getHCId("abCube")));
   MaterialMap::addHCMaterial(new Material("cube_color", TextureLoader::getHCId("cube_color")));
   // MaterialMap::addHCMaterial(new Material("camera", -1, Color::GRAY, Color::WHITE, 1.0f, 1.0f, 1.0f, 1.0f));
@@ -364,6 +374,11 @@ int Application::initI3T()
   ///   - setup camera control
   m_world->setConfigCameraControl();
 
+
+  //new scene scheme 
+  bool b=World2::initRender();
+  m_world2 = World2::loadDefaultScene();
+  World2::tmpAccess = m_world2;
   return 0;
 }
 

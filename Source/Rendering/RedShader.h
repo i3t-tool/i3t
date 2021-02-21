@@ -12,6 +12,8 @@
 #define _RED_SHADER_H_
 
 #include "Rendering/Shader.h"
+#include "World2/World2.h"
+#include "World2/HardcodedMeshes.h"
 #include <glm/gtc/type_ptr.hpp>
 
 //#include "geometry.h"
@@ -103,11 +105,14 @@ public:
 
     // draw
     glBindVertexArray(modelInstance->getGeometry()->getVao());
-    glDrawElements(GL_TRIANGLES, modelInstance->getGeometry()->getIndicesCount(), GL_UNSIGNED_INT, (void*)0);
+    //glDrawElements(GL_TRIANGLES, modelInstance->getGeometry()->getIndicesCount(), GL_UNSIGNED_INT, (void*)0);
+    //glDrawElements(GL_TRIANGLES, modelInstance->getGeometry()->getIndicesCount(), GL_UNSIGNED_INT, (void*)0);
 
     CHECK_GL_ERROR();
 
     glBindVertexArray(0);
+    //World2::tmpAccess->sceneRoot->children[2]->draw(glm::mat4(1.0f));
+    printf("tttttttt\n");
   }
 
   /**

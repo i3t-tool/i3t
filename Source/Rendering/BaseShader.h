@@ -11,6 +11,8 @@
 #ifndef _BASESHADER_H_
 #define _BASESHADER_H_
 
+#include "../World2/World2.h"
+#include "../World2/HardcodedMeshes.h"
 #include "RedShader.h"
 #include <glm/gtc/type_ptr.hpp>
 
@@ -59,15 +61,11 @@ public:
 
     // PVM
     glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection * view * modelInstance->getTrans()));
-
     // environment
-    // glm::vec3 lightDirection = glm::vec3( modelInstance->getTrans() * glm::vec4(environment->lightDirection, 0.0f)
-    // );
+    // glm::vec3 lightDirection = glm::vec3( modelInstance->getTrans() * glm::vec4(environment->lightDirection, 0.0f));
 
     // normal trans
-    glUniformMatrix3fv(normalTransLoc, 1, GL_FALSE,
-                       glm::value_ptr(glm::transpose(glm::inverse(glm::mat3(modelInstance->getTrans())))));
-
+    glUniformMatrix3fv(normalTransLoc, 1, GL_FALSE,glm::value_ptr(glm::transpose(glm::inverse(glm::mat3(modelInstance->getTrans())))));
     glUniform3fv(lightDirectionLoc, 1, glm::value_ptr(environment->lightDirection));
     glUniform3fv(lightColorLoc, 1, glm::value_ptr(environment->lightColor));
     glUniform3fv(ambientColorLoc, 1, glm::value_ptr(environment->ambientColor));

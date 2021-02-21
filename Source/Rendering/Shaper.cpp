@@ -7,7 +7,6 @@
 int Shaper::initShaders()
 {
   std::cout << "shaper shader init" << std::endl;
-
   GLuint shaders[] = {
       pgr::createShaderFromSource(GL_VERTEX_SHADER, vertexShaderSrc),
       pgr::createShaderFromSource(GL_FRAGMENT_SHADER, fragmentShaderSrc),

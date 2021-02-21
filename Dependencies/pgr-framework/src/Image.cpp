@@ -59,6 +59,7 @@ bool loadTexImage2D(const std::string & fileName, GLenum target) {
 
   if (data)
   {
+    //printf("%s,bpp %d\n",fileName.c_str(),Bpp);
     glTexImage2D(target, 0, Bpp == 4 ? GL_RGBA : GL_RGB, width, height, 0, Bpp == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
     result = true;
   }

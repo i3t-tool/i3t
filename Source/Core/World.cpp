@@ -66,6 +66,13 @@ void World::constructScene()
   // scene
   scene = new Scene(this);
   ShaderProvider::setRenderGroups(scene->renderGroups);
+
+
+  ModelInstance*mi = new ModelInstance(GeometryMap::getHC("testCube"), MaterialMap::getHC("testMaterial"));
+  //mi->getTrans();
+  mi->scale(3.0f, 3.0f, 3.0f);
+  //ShaderProvider::addToGroup(mi);
+  //here construct scene
 }
 
 void World::setConfigCameraControl()
@@ -205,7 +212,7 @@ void World::render() const
 {
   scene->render(getActiveCamera()); // 3D scene models
   debug();                          // 3D scene wire-frame objects (axes, frustrum,...)
-  // scene->renderAlpha(getActiveCamera());
+
 }
 
 void World::debug() const
@@ -221,8 +228,7 @@ void World::debug() const
   // scene->debug()
   scene->debug(objectsShaper);
 
-  objectsShaper->drawOnceAndDestroy(
-      getActiveCamera()); // move prepared geometry to buffers, draw them, and destroy afterwards
+  objectsShaper->drawOnceAndDestroy(getActiveCamera()); // move prepared geometry to buffers, draw them, and destroy afterwards
 
   worldFrameShaper->drawAndPreserve(getActiveCamera()); // world axes: only draw
 }

@@ -7,6 +7,8 @@
 #include "GUI/Settings.h"
 #include "Rendering/FrameBuffer.h"
 
+#include "../../../World2/World2.h"
+
 /// \todo Use Framebuffer class.
 ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
 {
@@ -15,6 +17,8 @@ ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
   // Framebuffer is used in Viewport window.
   // generate a framebuffer for display function
   glGenFramebuffers(1, &m_fboMain);
+  glBindFramebuffer(GL_FRAMEBUFFER,m_fboMain);
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
 
   // set it as the default framebuffer in framebuffer.h
   FrameBuffer::setDefaultBuffer(m_fboMain);
@@ -24,7 +28,15 @@ ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
 
   // create a renderbuffer to allow depth and stencil
   glGenRenderbuffers(1, &m_rboMain);
-
+  glBindRenderbuffer(GL_RENDERBUFFER,m_rboMain);
+  //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glEnable(GL_STENCIL_TEST);
+  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+  glStencilFunc(GL_ALWAYS, 63, 255);
+  glStencilMask(255);
+  glClearStencil(15);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
   // init vectors definig size to display
   m_wcMin = ImVec2(0, 0);
   m_wcMax = ImVec2(0, 0);
@@ -98,13 +110,34 @@ void ViewportWindow::render()
 
     // clear
     glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
+    glClearStencil(15);
     // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
     glEnable(GL_MULTISAMPLE);
-
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     // draw
-    m_world->render();
+    //m_world->render();
+
+    //world2
+    if (InputController::isKeyJustUp(Keys::mouseLeft))
+    {
+      int i;
+      glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &i);
+      printf("stencil clear %d\n", i);
+      // unsigned char read[1];
+      unsigned int read;
+      glReadPixels((GLint)InputController::m_mouseX, World2::height - (GLint)InputController::m_mouseY, 1, 1,GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, &read);
+      printf("-----0x%x-----\n", read);
+    }
+    // World2::tmpAccess->sceneRoot->transform = getActiveCamera()->getCombined();
+    // World2::tmpAccess->onUpdate();
+    // World2::mainCamera = getActiveCamera()->getView();
+    // World2::perspective = getActiveCamera()->getProjection();
+    // World2::mainCamPos = getActiveCamera()->getPosition();
+    World2::tmpAccess->onUpdate();
+
 
     glDisable(GL_MULTISAMPLE);
 

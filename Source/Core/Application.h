@@ -32,6 +32,7 @@ class ICommand;
 class GlfwWindow;
 class MainMenuBar;
 class World;
+class World2;
 
 /**
  * Application class.
@@ -135,6 +136,8 @@ private:
   MainMenuBar* m_menu;
 
   World* m_world; ///< all GUI and logic objects
+
+  World2* m_world2;///<3D scene
 
   // GLFWwindow* m_window;
   GlfwWindow* m_window;
