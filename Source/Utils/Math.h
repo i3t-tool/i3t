@@ -47,6 +47,11 @@ FORCE_INLINE bool areElementsSame(const glm::vec3 vec)
   return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]);
 }
 
+FORCE_INLINE bool withinInterval(float val, float from, float to)
+{
+  return from <= val && val <= to;
+}
+
   /**
    * \brief Linear interpolation between two vectors vec3 \a a and \a b
    * \param a

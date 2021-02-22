@@ -140,7 +140,7 @@ public:
     return EValueSetResult::Ok;
   }
 
-  virtual EValueSetResult setValue(float val, glm::ivec2 cords)
+  virtual EValueSetResult setValue(float val, glm::ivec2 coords)
   {
     Debug::Assert(false, "Unsupported operation!");
     return EValueSetResult::Err_ConstraintViolation;

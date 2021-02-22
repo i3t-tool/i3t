@@ -23,6 +23,15 @@ public:
   void updateValues(int inputIndex) override;
 };
 
+
+/**
+ * \code
+ *   1      0       0       0
+ *   0    cos(T)  -sin(T)   0
+ *   0    sin(T)   cos(T)   0
+ *   0      0       0       1
+ * \endcode
+ */
 class EulerRotX : public NodeBase
 {
   float m_initialRot;
@@ -33,10 +42,12 @@ public:
   {
     m_initialMap = map;
     m_currentMap = map;
+    getData().setValue(glm::rotate(initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
   }
 
   EValueSetResult setValue(float rad) override;
   EValueSetResult setValue(const glm::mat4&) override;
+  EValueSetResult setValue(float val, glm::ivec2 coords) override;
   void reset() override;
   void updateValues(int inputIndex) override;
 };

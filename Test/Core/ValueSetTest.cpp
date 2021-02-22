@@ -115,3 +115,53 @@ TEST(TranslationCoordsValidation, ShouldBeValid)
     EXPECT_EQ(translMat, data);
   }
 }
+
+TEST(EulerXOneValueSet, ShouldBeCorrect)
+{
+  auto rotXNode = Builder::createTransform<EulerRotX>();
+
+  {
+    // mat[1][1], cos(T)
+    auto rads = 0.5f;
+
+    auto result = rotXNode->setValue(glm::cos(rads), {1, 1});
+    EXPECT_EQ(EValueSetResult::Ok, result);
+
+    auto mat = rotXNode->getData().getMat4();
+    auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+    EXPECT_TRUE(Math::eq(expectedMat, mat));
+  }
+  {
+    // mat[1][2], sin(T)
+    auto rads = 0.4f;
+
+    auto result = rotXNode->setValue(glm::sin(rads), {1, 2});
+    EXPECT_EQ(EValueSetResult::Ok, result);
+
+    auto mat = rotXNode->getData().getMat4();
+    auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+    EXPECT_TRUE(Math::eq(expectedMat, mat));
+  }
+  {
+    // mat[2][1], -sin(T)
+    auto rads = 0.8f;
+
+    auto result = rotXNode->setValue(-glm::sin(rads), {2, 1});
+    EXPECT_EQ(EValueSetResult::Ok, result);
+
+    auto mat = rotXNode->getData().getMat4();
+    auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+    EXPECT_TRUE(Math::eq(expectedMat, mat));
+  }
+  {
+    // mat[2][2], cos(T)
+    auto rads = 1.0f;
+
+    auto result = rotXNode->setValue(glm::cos(rads), {2, 2});
+    EXPECT_EQ(EValueSetResult::Ok, result);
+
+    auto mat = rotXNode->getData().getMat4();
+    auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+    EXPECT_TRUE(Math::eq(expectedMat, mat));
+  }
+}

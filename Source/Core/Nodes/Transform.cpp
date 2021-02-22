@@ -2,8 +2,6 @@
 
 #include "glm/gtx/rotate_vector.hpp"
 
-#include "Utils/Math.h"
-
 using namespace Core;
 
 EValueSetResult Core::Scale::setValue(const glm::vec3& vec)
@@ -150,6 +148,54 @@ void EulerRotX::updateValues(int inputIndex)
   {
     m_internalData[0].setValue(glm::eulerAngleX(0.0f));
   }
+}
+
+EValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
+{
+  if (!coordsAreValid(coords, m_currentMap))
+  {
+    return EValueSetResult::Err_ConstraintViolation;
+  }
+
+  if (!Math::withinInterval(val, -1.0f, 1.0f))
+  {
+    return EValueSetResult::Err_ConstraintViolation;
+  }
+
+  auto& mat = getData().getMat4Ref();
+
+  if (coords == glm::ivec2(1, 2))
+  {
+    // -sin(T)
+    mat[1][2] = val;
+    mat[2][1] = -val;
+
+    auto cos = sqrt(1.0f - (val * val));
+    mat[1][1] = cos;
+    mat[2][2] = cos;
+  }
+  else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
+  {
+    // cos(T)
+    mat[1][1] = val;
+    mat[2][2] = val;
+
+    auto sin = sqrt(1.0f - (val * val));
+    mat[1][2] = sin;
+    mat[2][1] = -sin;
+  }
+  else if (coords == glm::ivec2(2, 1))
+  {
+    // sin(T)
+    mat[2][1] = val;
+    mat[1][2] = -val;
+
+    auto cos = sqrt(1.0f - (val * val));
+    mat[1][1] = cos;
+    mat[2][2] = cos;
+  }
+
+  return EValueSetResult::Ok;
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//

@@ -26,7 +26,7 @@ FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::Data
   int x = coords[0];
   int y = coords[1];
 
-  return map[4 * x + y] != 255 && map[4 * x + y] != 1;
+  return map[4 * x + y] != 255 && map[4 * x + y] != 0;
 }
 }
 
@@ -54,7 +54,10 @@ static constexpr DataMap g_UniformScale = {
 };
 
 static constexpr DataMap g_EulerX = {
-    255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255,
+    255, 0, 0, 0,
+    0, 1, 2, 0,
+    0, 3, 1, 0,
+    0, 0, 0, 255,
 };
 
 static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 255};
