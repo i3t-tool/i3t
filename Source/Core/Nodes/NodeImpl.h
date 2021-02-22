@@ -32,7 +32,6 @@ public:
   NodeImpl();
   ~NodeImpl() override = default;
 
-private:
   /**
    * Implementation of virtual function NodeBase::updateValues(int).
    *

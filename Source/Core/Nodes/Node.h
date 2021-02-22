@@ -9,6 +9,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 #include <vector>
 
 #include "Core/Defs.h"
@@ -29,6 +30,15 @@ enum class EValueSetResult
 {
   Ok = 0,
   Err_ConstraintViolation
+};
+
+struct ValueSetResult
+{
+  const EValueSetResult m_status;
+  const std::string m_message;
+
+  ValueSetResult(EValueSetResult status, std::string message)
+    : m_status(status), m_message(std::move(message)) {}
 };
 
 namespace Core
@@ -56,8 +66,8 @@ protected:
   std::vector<DataStore> m_initialData;
   std::vector<DataStore> m_internalData;
 
-  DataMap m_initialMap{};
-  DataMap m_currentMap{};
+  Transform::DataMap m_initialMap{};
+  Transform::DataMap m_currentMap{};
 
   /**
    * Operator node properties.
@@ -124,11 +134,18 @@ public:
 
   virtual EValueSetResult setValue(const glm::mat4& mat)
   {
-    if (eq(m_currentMap, g_Free))
+    if (m_currentMap == Transform::g_Free)
       m_internalData[0].setValue(mat);
 
     return EValueSetResult::Ok;
   }
+
+  virtual EValueSetResult setValue(float val, glm::ivec2 cords)
+  {
+    Debug::Assert(false, "Unsupported operation!");
+    return EValueSetResult::Err_ConstraintViolation;
+  }
+
 
   virtual void reset() {}
 
@@ -138,8 +155,8 @@ public:
    * \param mask array of 16 chars.
    * \param mat
    */
-  virtual EValueSetResult setValue(const glm::mat4& mat, const DataMap& map) { return EValueSetResult::Ok; }
-  virtual void setDataMap(const DataMap& map) { m_currentMap = map; }
+  virtual EValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map) { return EValueSetResult::Ok; }
+  virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;
   [[nodiscard]] const std::vector<Pin>& getOutputPins() const;

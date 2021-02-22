@@ -8,7 +8,7 @@ using namespace Core;
 
 EValueSetResult Core::Scale::setValue(const glm::vec3& vec)
 {
-  if (eq(m_currentMap, g_UniformScale))
+  if (m_currentMap == Transform::g_UniformScale)
   {
     if (Math::areElementsSame(vec))
       m_internalData[0].setValue(glm::scale(vec));
@@ -27,16 +27,16 @@ EValueSetResult Scale::setValue(const glm::mat4& mat)
 {
   auto result = EValueSetResult::Ok;
 
-  if (eq(m_currentMap, g_UniformScale))
+  if (m_currentMap == Transform::g_UniformScale)
   {
     if (Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]))
       m_internalData[0].setValue(mat);
     else
       result = EValueSetResult::Err_ConstraintViolation;
   }
-  else if (eq(m_currentMap, g_Scale))
+  else if (m_currentMap == Transform::g_Scale)
   {
-    if (cmp(m_currentMap, mat))
+    if (Transform::cmp(m_currentMap, mat))
     {
       m_internalData[0].setValue(mat);
     }
@@ -45,7 +45,7 @@ EValueSetResult Scale::setValue(const glm::mat4& mat)
       result = EValueSetResult::Err_ConstraintViolation;
     }
   }
-  else if (eq(m_currentMap, g_Free))
+  else if (m_currentMap == Transform::g_Free)
   {
     // Free transformation is set.
     NodeBase::setValue(mat);
@@ -54,15 +54,41 @@ EValueSetResult Scale::setValue(const glm::mat4& mat)
   return result;
 }
 
+EValueSetResult Scale::setValue(float val, glm::ivec2 coords)
+{
+  if (m_currentMap == Transform::g_Free)
+  {
+    // Free transformation is set.
+    getData().getMat4Ref()[coords.x][coords.y];
+  }
+
+  if (coordsAreValid(coords, m_currentMap))
+  {
+    return EValueSetResult::Err_ConstraintViolation;
+  }
+
+  if (m_currentMap == Transform::g_UniformScale)
+  {
+    getInternalData().setValue(glm::scale(glm::vec3(val)));
+  }
+
+  if (m_currentMap == Transform::g_Scale)
+  {
+    getData().getMat4Ref()[coords.x][coords.y];
+  }
+
+  return EValueSetResult::Ok;
+}
+
 void Scale::reset()
 {
   setDataMap(m_initialMap);
   getInternalData().setValue(glm::scale(m_initialScale));
 }
 
-void Scale::setDataMap(const DataMap& map)
+void Scale::setDataMap(const Transform::DataMap& map)
 {
-  Debug::Assert(eq(map, g_Free) || eq(map, g_Scale) || eq(map, g_UniformScale));
+  Debug::Assert(map == Transform::g_Free || map == Transform::g_Scale || map == Transform::g_UniformScale);
   NodeBase::setDataMap(map);
 }
 
@@ -88,15 +114,15 @@ EValueSetResult EulerRotX::setValue(float val)
 
 EValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 {
-  if (m_currentMap == g_EulerX)
+  if (m_currentMap == Transform::g_EulerX)
   {
-    if (isMatValid(m_currentMap, mat))
+    if (Transform::isMatValid(m_currentMap, mat))
     {
       /// \todo Rotation matrix values validation.
       Debug::Assert(false, "Not implemented yet.");
     }
   }
-  else if (m_currentMap == g_Free)
+  else if (m_currentMap == Transform::g_Free)
   {
     getData().setValue(mat);
   }
@@ -208,9 +234,9 @@ EValueSetResult Core::Translation::setValue(const glm::vec3& vec)
 
 EValueSetResult Translation::setValue(const glm::mat4& mat)
 {
-  if (m_currentMap == g_Translate)
+  if (m_currentMap == Transform::g_Translate)
   {
-    if (isMatValid(m_currentMap, mat))
+    if (Transform::isMatValid(m_currentMap, mat))
     {
       getData().setValue(mat);
     }
@@ -219,7 +245,7 @@ EValueSetResult Translation::setValue(const glm::mat4& mat)
       return EValueSetResult::Err_ConstraintViolation;
     }
   }
-  else if (m_currentMap == g_Free)
+  else if (m_currentMap == Transform::g_Free)
   {
     getData().setValue(mat);
   }
@@ -241,6 +267,19 @@ void Translation::updateValues(int inputIndex)
   }
   else
   {
-    m_internalData[0].setValue(glm::mat4());
+    m_internalData[0].setValue(glm::mat4(1.0f));
+  }
+}
+
+EValueSetResult Translation::setValue(float val, glm::ivec2 coords)
+{
+  if (coordsAreValid(coords, m_currentMap))
+  {
+    getData().getMat4Ref()[coords.x][coords.y] = val;
+    return EValueSetResult::Ok;
+  }
+  else
+  {
+    return EValueSetResult::Err_ConstraintViolation;
   }
 }

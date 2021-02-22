@@ -24,7 +24,7 @@ namespace Builder
 template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
 {
   auto&& ret = std::make_unique<Core::NodeImpl<T>>();
-  ret->updateValues();
+  ret->updateValues(0);
   return ret;
 }
 
@@ -42,7 +42,7 @@ Ptr<Core::Sequence> FORCE_INLINE createSequence()
 template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
 {
   auto&& ret = std::make_shared<T>(std::forward<Args>(args)...);
-  ret->updateValues();
+  ret->updateValues(0);
   return ret;
 }
 } // namespace Builder

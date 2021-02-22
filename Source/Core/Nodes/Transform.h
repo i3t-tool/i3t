@@ -9,7 +9,7 @@ class Scale : public NodeBase
   glm::vec3 m_initialScale;
 
 public:
-  explicit Scale(glm::vec3 initialScale = glm::vec3(1.0f), const DataMap& map = g_UniformScale)
+  explicit Scale(glm::vec3 initialScale = glm::vec3(1.0f), const Transform::DataMap& map = Transform::g_UniformScale)
       : NodeBase(getTransformProps(ETransformType::Scale)), m_initialScale(initialScale)
   {
     m_initialMap = map;
@@ -17,8 +17,9 @@ public:
   }
   EValueSetResult setValue(const glm::vec3& vec) override;
   EValueSetResult setValue(const glm::mat4& mat) override;
+  EValueSetResult setValue(float val, glm::ivec2 coords) override;
   void reset() override;
-  void setDataMap(const DataMap& map) override;
+  void setDataMap(const Transform::DataMap& map) override;
   void updateValues(int inputIndex) override;
 };
 
@@ -27,7 +28,7 @@ class EulerRotX : public NodeBase
   float m_initialRot;
 
 public:
-  explicit EulerRotX(float initialRot = 0.0f, const DataMap& map = g_EulerX)
+  explicit EulerRotX(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
       : NodeBase(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot)
   {
     m_initialMap = map;
@@ -45,7 +46,7 @@ class EulerRotY : public NodeBase
   float m_initialRot;
 
 public:
-  explicit EulerRotY(float initialRot = 0.0f, const DataMap& map = g_EulerY)
+  explicit EulerRotY(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
       : NodeBase(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot)
   {
     m_initialMap = map;
@@ -63,7 +64,7 @@ class EulerRotZ : public NodeBase
   float m_initialRot;
 
 public:
-  explicit EulerRotZ(float initialRot = 0.0f, const DataMap& map = g_EulerZ)
+  explicit EulerRotZ(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)
       : NodeBase(getTransformProps(ETransformType::EulerZ)), m_initialRot(initialRot)
   {
     m_initialMap = map;
@@ -81,15 +82,17 @@ class Translation : public NodeBase
   glm::vec3 m_initialTrans;
 
 public:
-  explicit Translation(glm::vec3 initialTrans = glm::vec3(1.0f), const DataMap& map = g_Translate)
+  explicit Translation(glm::vec3 initialTrans = glm::vec3(0.0f), const Transform::DataMap& map = Transform::g_Translate)
       : NodeBase(getTransformProps(ETransformType::Translation)), m_initialTrans(initialTrans)
   {
     m_initialMap = map;
     m_currentMap = map;
+    getData().setValue(glm::translate(initialTrans));
   }
 
   EValueSetResult setValue(const glm::vec3& vec) override;
   EValueSetResult setValue(const glm::mat4&) override;
+  EValueSetResult setValue(float val, glm::ivec2 coords) override;
   void reset() override;
   void updateValues(int inputIndex) override;
 };

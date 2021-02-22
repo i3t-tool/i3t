@@ -14,18 +14,43 @@
 
 #include "Utils/Math.h"
 
-namespace Core
+namespace Core::Transform
 {
 typedef std::array<unsigned char, 16> DataMap;
+}
 
-static constexpr DataMap g_Free = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+namespace Core
+{
+FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::DataMap& map)
+{
+  int x = coords[0];
+  int y = coords[1];
+
+  return map[4 * x + y] != 255 && map[4 * x + y] != 1;
+}
+}
+
+namespace Core::Transform
+{
+static constexpr DataMap g_Free = {
+    1, 2, 3, 4,
+    5, 6, 7, 8,
+    9, 10, 11, 12,
+    13, 14, 15, 16
+};
 
 static constexpr DataMap g_Scale = {
-    1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255,
+    1, 0, 0, 0,
+    0, 2, 0, 0,
+    0, 0, 3, 0,
+    0, 0, 0, 255,
 };
 
 static constexpr DataMap g_UniformScale = {
-    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255,
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 255,
 };
 
 static constexpr DataMap g_EulerX = {
@@ -37,12 +62,14 @@ static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0,
 static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_Translate = {
-    0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 255,
+    0, 0, 0, 1,
+    0, 0, 0, 2,
+    0, 0, 0, 3,
+    0, 0, 0, 255,
 };
 
 /**
  * Return whether DataMaps are same.
- * \todo use == operator instead.
  */
 FORCE_INLINE bool eq(const DataMap& lhs, const DataMap& rhs)
 {
@@ -82,7 +109,7 @@ FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
 {
   return cmp(map, mat);
 }
-} // namespace Core
+} // namespace Core::TransformMap
 
 /** An operator value type = type of the interconnection wire. */
 enum class EValueType
@@ -157,6 +184,7 @@ public:
 
   [[nodiscard]] EValueType getOpValType() const { return opValueType; }
   [[nodiscard]] const glm::mat4& getMat4() const { return value.matrix; }
+  [[nodiscard]] glm::mat4& getMat4Ref() { return value.matrix; }
   [[nodiscard]] const glm::vec3& getVec3() const { return value.vector3; }
   [[nodiscard]] const glm::vec4& getVec4() const { return value.vector4; }
   [[nodiscard]] const glm::quat& getQuat() const { return value.quat; }
