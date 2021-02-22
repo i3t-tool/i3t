@@ -11,4 +11,4 @@ class IdGenerator
 public:
   static ID next();
 };
-}
+} // namespace Core

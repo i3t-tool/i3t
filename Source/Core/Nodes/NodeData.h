@@ -18,53 +18,26 @@ namespace Core
 {
 typedef std::array<unsigned char, 16> DataMap;
 
-static constexpr DataMap g_Free = {
-    1, 2, 3, 4,
-    5, 6, 7, 8,
-    9, 10, 11, 12,
-    13, 14, 15, 16
-};
+static constexpr DataMap g_Free = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
 static constexpr DataMap g_Scale = {
-    1, 0, 0, 0,
-    0, 2, 0, 0,
-    0, 0, 3, 0,
-    0, 0, 0, 255,
+    1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255,
 };
 
 static constexpr DataMap g_UniformScale = {
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 255,
+    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255,
 };
 
 static constexpr DataMap g_EulerX = {
-    255, 0, 0, 0,
-    0, 1, 2, 0,
-    0, 3, 1, 0,
-    0, 0, 0, 255,
+    255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255,
 };
 
-static constexpr DataMap g_EulerY = {
-    1, 0, 2, 0,
-    0, 255, 0, 0,
-    3, 0, 1, 0,
-    0, 0, 0, 255
-};
+static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 255};
 
-static constexpr DataMap g_EulerZ = {
-    1, 2, 0, 0,
-    3, 1, 0, 0,
-    0, 0, 255, 0,
-    0, 0, 0, 255
-};
+static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_Translate = {
-    0, 0, 0, 1,
-    0, 0, 0, 2,
-    0, 0, 0, 3,
-    0, 0, 0, 255,
+    0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 255,
 };
 
 /**
@@ -109,7 +82,7 @@ FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
 {
   return cmp(map, mat);
 }
-}
+} // namespace Core
 
 /** An operator value type = type of the interconnection wire. */
 enum class EValueType
@@ -150,7 +123,7 @@ union OpValue
 class DataStore
 {
 protected:
-  OpValue value;   ///< transmitted data (union of all data types passed along the wire)
+  OpValue value;          ///< transmitted data (union of all data types passed along the wire)
   EValueType opValueType; ///< wire type, such as FLOAT or MATRIX
 
 public:
@@ -162,7 +135,7 @@ public:
     switch (valueType)
     {
     case EValueType::Screen:
-      setValue((void*) nullptr);
+      setValue((void*)nullptr);
       break;
     case EValueType::Float:
       setValue(0.0f);

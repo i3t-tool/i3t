@@ -46,8 +46,8 @@ struct Operation
       DEFAULT_NAMES; // if the names are not the names of the OpValueType
 };
 
-/// \todo Use enum class!
-enum ENodeType
+/// \todo rename to optype
+enum class ENodeType
 {
   Inversion,
   Transpose,
@@ -116,21 +116,26 @@ enum ENodeType
   QuatToFloats,
   FloatsToQuat,
   NormalizeQuat,
-  Translation,
-  EulerX,
-  EulerY,
-  EulerZ,
-  AxisAngle,
-  Scale,
-  Ortho,
-  Perspective,
   Frustum,
   LookAt,
   Float,
   Vector3,
   Vector4,
   Matrix,
-  Sequence
+
+  /// \todo Create following transfoms.
+  AxisAngle,
+  Ortho,
+  Perspective,
+};
+
+enum class ETransformType
+{
+  Translation,
+  EulerX,
+  EulerY,
+  EulerZ,
+  Scale,
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
@@ -158,36 +163,28 @@ static const std::vector<EValueType> twoVector3Input = {EValueType::Vec3, EValue
 static const std::vector<EValueType> twoQuatInput = {EValueType::Quat, EValueType::Quat};
 static const std::vector<EValueType> twoFloatInput = {EValueType::Float, EValueType::Float};
 
-static const std::vector<EValueType> threeFloatInput = {EValueType::Float, EValueType::Float,
-                                                               EValueType::Float};
-static const std::vector<EValueType> threeVector3Input = {EValueType::Vec3, EValueType::Vec3,
-                                                                 EValueType::Vec3};
+static const std::vector<EValueType> threeFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float};
+static const std::vector<EValueType> threeVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3};
 
-static const std::vector<EValueType> fourVectorInput = {EValueType::Vec4, EValueType::Vec4,
-                                                               EValueType::Vec4, EValueType::Vec4};
-static const std::vector<EValueType> fourVector3Input = {EValueType::Vec3, EValueType::Vec3,
-                                                                EValueType::Vec3, EValueType::Vec3};
-static const std::vector<EValueType> fourFloatInput = {EValueType::Float, EValueType::Float,
-                                                              EValueType::Float, EValueType::Float};
+static const std::vector<EValueType> fourVectorInput = {EValueType::Vec4, EValueType::Vec4, EValueType::Vec4,
+                                                        EValueType::Vec4};
+static const std::vector<EValueType> fourVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3,
+                                                         EValueType::Vec3};
+static const std::vector<EValueType> fourFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float,
+                                                       EValueType::Float};
 
-static const std::vector<EValueType> sixFloatInput = {EValueType::Float, EValueType::Float,
-                                                             EValueType::Float, EValueType::Float,
-                                                             EValueType::Float, EValueType::Float};
+static const std::vector<EValueType> sixFloatInput = {EValueType::Float, EValueType::Float, EValueType::Float,
+                                                      EValueType::Float, EValueType::Float, EValueType::Float};
 
 static const std::vector<EValueType> sixteenFloatInput = {
-    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
-    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
-    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
+    EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float,
     EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Float};
 
-static const std::vector<EValueType> twoVectorFloatInput = {EValueType::Vec4, EValueType::Vec4,
-                                                                   EValueType::Float};
-static const std::vector<EValueType> twoVector3FloatInput = {EValueType::Vec3, EValueType::Vec3,
-                                                                    EValueType::Float};
-static const std::vector<EValueType> twoFloatVector3Input = {EValueType::Float, EValueType::Float,
-                                                                    EValueType::Vec3};
-static const std::vector<EValueType> twoQuatFloatInput = {EValueType::Quat, EValueType::Quat,
-                                                                 EValueType::Float};
+static const std::vector<EValueType> twoVectorFloatInput = {EValueType::Vec4, EValueType::Vec4, EValueType::Float};
+static const std::vector<EValueType> twoVector3FloatInput = {EValueType::Vec3, EValueType::Vec3, EValueType::Float};
+static const std::vector<EValueType> twoFloatVector3Input = {EValueType::Float, EValueType::Float, EValueType::Vec3};
+static const std::vector<EValueType> twoQuatFloatInput = {EValueType::Quat, EValueType::Quat, EValueType::Float};
 
 static const std::vector<EValueType> matrixVectorInput = {EValueType::Matrix, EValueType::Vec4};
 static const std::vector<EValueType> vectorMatrixInput = {EValueType::Vec4, EValueType::Matrix};
@@ -296,19 +293,12 @@ static const std::vector<Operation> operations = {
     {"VectorToVector3", "vec4 -> vec3", 1, vectorInput, 1, vector3Input},                    // vec4 -> vec3
     {"Vector3ToVector", "vec3 -> vec4", 1, vector3Input, 1, vectorInput},                    // vec3 -> vec4
     {"QuatToFloats", "quat -> floats", 1, quatInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES,
-     xyzw},                                                                                     // quat -> floats
-    {"FloatsToQuat", "floats -> quat", 4, fourFloatInput, 1, quatInput, NO_TAG, xyzw},          // floats -> quat
-    {"NormalizeQuat", "normalize quat", 1, quatInput, 1, quatInput},                            // normalize quat
-    {"Translation", "translate", 1, vector3Input, 1, matrixInput},                              // translate
-    {"EulerX", "eulerAngleX", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},          // eulerAngleX
-    {"EulerY", "eulerAngleY", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},          // eulerAngleY
-    {"EulerZ", "eulerAngleZ", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},          // eulerAngleZ
-    {"AxisAngle", "rotate", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames}, // rotate
-    {"Scale", "scale", 1, vector3Input, 1, matrixInput},                                        // scale
-    {"Ortho", "ortho", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},      // ortho
-    {"Perspective", "perspective", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
-    {"Frustum", "frustum", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},        // frustrum
-    {"LookAt", "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames},             // lookAt
+     xyzw},                                                                            // quat -> floats
+    {"FloatsToQuat", "floats -> quat", 4, fourFloatInput, 1, quatInput, NO_TAG, xyzw}, // floats -> quat
+    {"NormalizeQuat", "normalize quat", 1, quatInput, 1, quatInput},                   // normalize quat
+
+    {"Frustum", "frustum", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustrum
+    {"LookAt", "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames},      // lookAt
 
     // Value nodes.
     {"FloatToFloat", "float", 1, floatInput, 1, floatInput},
@@ -316,7 +306,26 @@ static const std::vector<Operation> operations = {
     {"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
     {"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
 
-    // Sequence
-    /// \todo Complete sequence inputs and outputs description.
-    {"Sequence", "seq", 2, twoMatrixInput, 3, twoMatrixInput}
+    // \todo
+    {"AxisAngle", "rotate", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames},       // rotate
+    {"Ortho", "ortho", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},            // ortho
+    {"Perspective", "perspective", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
 };
+
+namespace Core
+{
+static const Operation g_sequence = {"Sequence", "seq", 2, twoMatrixInput, 2, twoMatrixInput};
+
+static const std::vector<Operation> g_transforms = {
+    {"Translation", "translate", 1, vector3Input, 1, matrixInput},                     // translate
+    {"EulerX", "eulerAngleX", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
+    {"EulerY", "eulerAngleY", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
+    {"EulerZ", "eulerAngleZ", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleZ
+    {"Scale", "scale", 1, vector3Input, 1, matrixInput},                               // scale
+};
+
+FORCE_INLINE const Operation* getTransformProps(ETransformType type)
+{
+  return &g_transforms[static_cast<unsigned>(type)];
+}
+}; // namespace Core

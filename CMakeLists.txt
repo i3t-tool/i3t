@@ -147,7 +147,7 @@ if (True)
             Source/Core/Nodes/Node.h
             Source/Core/Nodes/Node.cpp
             Source/Core/Nodes/Transform.cpp
-            Test/Core/SequenceTest.cpp Test/Core/TransformationTest.cpp Test/Core/ValueSetTest.cpp)
+            Test/Core/SequenceTest.cpp Test/Core/ValueSetTest.cpp)
 
     target_link_libraries(${TEST_PROJECT_NAME} gtest gtest_main)
 

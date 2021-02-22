@@ -67,20 +67,13 @@ protected:
   /// \todo Is there values in NodeBase used?
   bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
   bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
-                           ///< only)
+                             ///< only)
   int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
   NodeBase() = default;
 
-  /**
-   * I3T v2 default Operator constructor.
-   */
-  explicit NodeBase(const Operation* operation)
-      : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
-  {
-    m_id = IdGenerator::next();
-  }
+  explicit NodeBase(const Operation* operation);
 
   /** Delete node and unplug its all inputs and outputs. */
   virtual ~NodeBase();
@@ -101,16 +94,13 @@ public:
     return m_internalData[index];
   }
 
-  DataStore& getData()
-  {
-    return m_internalData[0];
-  }
+  DataStore& getData() { return m_internalData[0]; }
 
   /**
    * Set a value of node.
    *
    * Sets value of the first float of DataStore. Derived types may override
-   * default behaviour. 
+   * default behaviour.
    *
    * \param val
    */
@@ -209,7 +199,7 @@ private:
 class Pin
 {
   friend class GraphManager;
-  template <ENodeType NodeType> friend class NodeImpl;
+  // template <ENodeType NodeType> friend class NodeImpl;
   friend class NodeBase;
 
   ID m_id;
@@ -261,7 +251,6 @@ public:
       return nullptr;
     }
   }
-
 
   [[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 

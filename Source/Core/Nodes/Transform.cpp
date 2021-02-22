@@ -57,7 +57,7 @@ EValueSetResult Scale::setValue(const glm::mat4& mat)
 void Scale::reset()
 {
   setDataMap(m_initialMap);
-  setValue(glm::scale(m_initialScale));
+  getInternalData().setValue(glm::scale(m_initialScale));
 }
 
 void Scale::setDataMap(const DataMap& map)
@@ -66,12 +66,22 @@ void Scale::setDataMap(const DataMap& map)
   NodeBase::setDataMap(map);
 }
 
+void Scale::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(glm::scale(m_inputs[0].getStorage().getVec3()));
+  }
+  else
+  {
+    m_internalData[0].setValue(glm::mat4());
+  }
+}
+
 //===-- Euler rotation around X axis --------------------------------------===//
 EValueSetResult EulerRotX::setValue(float val)
 {
-  NodeBase::setValue(
-      glm::rotateX(glm::vec3(1.0f, 0.0f, 0.0f), val)
-  );
+  NodeBase::setValue(glm::rotateX(glm::vec3(1.0f, 0.0f, 0.0f), val));
 
   return EValueSetResult::Ok;
 }
@@ -100,13 +110,27 @@ void EulerRotX::reset()
   setValue(m_initialRot);
 }
 
+void EulerRotX::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    float angle;
+
+    angle = m_inputs[0].getStorage().getFloat();
+
+    m_internalData[0].setValue(glm::eulerAngleX(angle));
+  }
+  else
+  {
+    m_internalData[0].setValue(glm::eulerAngleX(0.0f));
+  }
+}
+
 //===-- Euler rotation around Y axis --------------------------------------===//
 
 EValueSetResult EulerRotY::setValue(float val)
 {
-  return NodeBase::setValue(
-      glm::rotateY(glm::vec3(0.0f, 1.0f, 0.0f), val)
-  );
+  return NodeBase::setValue(glm::rotateY(glm::vec3(0.0f, 1.0f, 0.0f), val));
 }
 
 EValueSetResult EulerRotY::setValue(const glm::mat4&)
@@ -121,13 +145,27 @@ void EulerRotY::reset()
   setValue(m_initialRot);
 }
 
+void EulerRotY::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    float angle;
+
+    angle = m_inputs[0].getStorage().getFloat();
+
+    m_internalData[0].setValue(glm::eulerAngleY(angle));
+  }
+  else
+  {
+    m_internalData[0].setValue(glm::eulerAngleY(0.0f));
+  }
+}
+
 //===-- Euler rotation around Z axis --------------------------------------===//
 
 EValueSetResult EulerRotZ::setValue(float val)
 {
-  getData().setValue(
-      glm::rotateZ(glm::vec3(0.0f, 0.0f, 1.0f), val)
-  );
+  getData().setValue(glm::rotateZ(glm::vec3(0.0f, 0.0f, 1.0f), val));
 
   return EValueSetResult::Ok;
 }
@@ -142,6 +180,21 @@ void EulerRotZ::reset()
 {
   setDataMap(m_initialMap);
   setValue(m_initialRot);
+}
+void EulerRotZ::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    float angle;
+
+    angle = m_inputs[0].getStorage().getFloat();
+
+    m_internalData[0].setValue(glm::eulerAngleZ(angle));
+  }
+  else
+  {
+    m_internalData[0].setValue(glm::eulerAngleZ(0.0f));
+  }
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -178,4 +231,16 @@ void Core::Translation::reset()
 {
   setDataMap(m_initialMap);
   setValue(m_initialTrans);
+}
+
+void Translation::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(glm::translate(m_inputs[0].getStorage().getVec3()));
+  }
+  else
+  {
+    m_internalData[0].setValue(glm::mat4());
+  }
 }
