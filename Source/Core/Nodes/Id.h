@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Core
 {
 typedef unsigned long long ID;

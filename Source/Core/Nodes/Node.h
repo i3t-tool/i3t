@@ -114,9 +114,24 @@ public:
    *
    * \param val
    */
-  virtual EValueSetResult setValue(float val) { return EValueSetResult::Ok; }
-  virtual EValueSetResult setValue(const glm::vec3& vec) { return EValueSetResult::Ok; }
-  virtual EValueSetResult setValue(const glm::vec4& vec) { return EValueSetResult::Ok; }
+  virtual EValueSetResult setValue(float val)
+  {
+    m_internalData[0].setValue(val);
+    return EValueSetResult::Ok;
+  }
+
+  virtual EValueSetResult setValue(const glm::vec3& vec)
+  {
+    m_internalData[0].setValue(vec);
+    return EValueSetResult::Ok;
+  }
+
+  virtual EValueSetResult setValue(const glm::vec4& vec)
+  {
+    m_internalData[0].setValue(vec);
+    return EValueSetResult::Ok;
+  }
+
   virtual EValueSetResult setValue(const glm::mat4& mat)
   {
     if (eq(m_currentMap, g_Free))
@@ -232,6 +247,21 @@ public:
   [[nodiscard]] ID getId() const { return m_id; }
 
   [[nodiscard]] int getIndex() const { return m_index; }
+
+  [[nodiscard]] const Pin* getParentPin() const
+  {
+    if (m_isInput)
+    {
+      Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
+      return m_input;
+    }
+    else
+    {
+      Debug::Assert(false, "Output pin can not has parent pin!");
+      return nullptr;
+    }
+  }
+
 
   [[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 

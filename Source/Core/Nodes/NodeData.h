@@ -105,7 +105,7 @@ FORCE_INLINE bool cmp(const DataMap& map, const glm::mat4& mat)
   return true;
 }
 
-FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4 mat)
+FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
 {
   return cmp(map, mat);
 }
@@ -192,10 +192,10 @@ public:
   void*& getPointer() { return value.pointer; }
 
   void setValue(OpValue value) { this->value = value; }
-  void setValue(glm::mat4 mat) { value.matrix = mat; }
-  void setValue(glm::vec3 vec) { value.vector3 = vec; }
-  void setValue(glm::vec4 vec) { value.vector4 = vec; }
-  void setValue(glm::quat q) { value.quat = q; }
+  void setValue(const glm::mat4& mat) { value.matrix = mat; }
+  void setValue(const glm::vec3& vec) { value.vector3 = vec; }
+  void setValue(const glm::vec4& vec) { value.vector4 = vec; }
+  void setValue(const glm::quat& q) { value.quat = q; }
   void setValue(float f) { value.fValue = f; }
   void setValue(void* p) { value.pointer = p; }
 };
