@@ -26,7 +26,7 @@ void WorkspaceNormalizeVector::drawWorkspaceNodeData(util::NodeBuilder& builder)
 
     if (valueCH)
     {
-      fromArrayToVec4(localData, localDataArray)
+      fromArrayToVec4(localData, localDataArray);
       Nodebase->getInternalData().setValue(localData);
     }
 

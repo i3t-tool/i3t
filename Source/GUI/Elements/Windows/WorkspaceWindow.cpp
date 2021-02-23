@@ -59,52 +59,25 @@ WorkspaceWindow::WorkspaceWindow(bool show)
     ne::SetCurrentEditor(NodeEditorContext);
 
     /* \todo adding nodes here just for testing */
-//    WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
-//    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
+    WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
+    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
 //
     WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
     ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
     WorkspaceNodes.push_back( std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture) );
-    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(0, 0));
+    ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
     ne::NavigateToContent();
 
 
-//
-//    contextNodeId = 0;
-//    contextLinkId = 0;
-//    contextPinId = 0;
-//    createNewNode = false;
-//    newNodeLinkPin = nullptr;
-//    newLinkPin = nullptr;
-//
-//    leftPaneWidth = 400.0f;
-//    rightPaneWidth = 800.0f;
-
-
-
-    // \TODO read scene file
-    //  MatrixImpl* mat = new MatrixImpl();
-    //  Namespace* node = nullptr;
-    //  node = mat->SpawnNode(&s_Nodes);
 
     //GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 //    GLuint imageId = pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"), true);
 //    HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
 //    // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
 //    // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
-//
-//    auto nodebase = Builder::createNode<ENodeType::Matrix>();
-//    std::vector<WorkspaceNode> WorkspaceNodesToDraw;
-//    WorkspaceNodesToDraw.push_back( WorkspaceMatrix4x4(0, "Mat4x4Label", HeaderBackground, "Mat4x4State", nodebase) );
-//
-//
-//
-//    //BuildGUINodes();
-//
-//
-//
+
 
 }
 
@@ -137,9 +110,11 @@ void WorkspaceWindow::render(){
 
     ImGui::Begin("Workspace", &(WholeApplication.m_showWorkspaceWindow));
 
+
+        UpdateTouchAllNodes();
         ne::Begin("Node editor");
 
-            for(auto &WorkspaceNode : WorkspaceNodes)
+            for(auto&& WorkspaceNode : WorkspaceNodes)
             {
                     WorkspaceNode->drawWorkspaceNode(NodeBuilderContext, nullptr);
             }
@@ -149,16 +124,11 @@ void WorkspaceWindow::render(){
     ImGui::End();
   /* ed::SetCurrentEditor(m_Editor); \todo maybe call it here for static load of current editor setting (if changed) */
 
-//  if (!editorStart){
-//      WorkspaceWindow_init();
-//  }
 
-//    UpdateTouch();
 //    auto& io = ImGui::GetIO();
 //
 //    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-//
-//    ne::SetCurrentEditor(m_Editor);
+
 //
 //    contextNodeId = 0;
 //    contextLinkId = 0;
@@ -181,17 +151,6 @@ void WorkspaceWindow::render(){
 //    {
 //      auto cursorTopLeft = ImGui::GetCursorScreenPos();
 //
-//      //util::NodeBuilder builder(s_HeaderBackground, Application_GetTextureWidth(s_HeaderBackground),Application_GetTextureHeight(s_HeaderBackground));
-//      util::NodeBuilder builder(HeaderBackground, 64, 64); /* \todo builder as variable of WorkspceWindow?*/
-//
-//      //
-//      //DrawNodes(builder, newLinkPin);
-//        WorkspaceDrawNodes(builder, newLinkPin);
-//
-//
-//      //draw links
-//      for (auto& link : Links)
-//        ne::Link(link.ID, link.StartPin->ID, link.EndPin->ID, link.Color, 2.0f);
 //
 //     //create link
 //     if (!createNewNode)
@@ -306,6 +265,15 @@ void WorkspaceWindow::render(){
 //
 
 
+}
+
+void WorkspaceWindow::UpdateTouchAllNodes()
+{
+    const auto deltaTime = ImGui::GetIO().DeltaTime;
+    for (auto&& WorkspaceNode : WorkspaceNodes)
+    {
+        WorkspaceNode->UpdateTouch(deltaTime);
+    }
 }
 
 
@@ -651,69 +619,6 @@ void WorkspaceWindow::render(){
 //}
 //
 
-///*! \fn void WorkspaceWindow_init() TODO: rename to WorkspaceWindow::init()
-//    \brief initialize Workspace window
-//    \details configuration setting
-//*/
-//void WorkspaceWindow_init()
-//{
-//  editorStart = true;
-//  ne::Config config;
-//
-//  config.SettingsFile = "Blueprints.json";
-//
-//  config.LoadNodeSettings = [](ne::NodeId nodeId, char* data, void* userPointer) -> size_t {
-//    auto node = FindNode(nodeId);
-//    if (!node)
-//      return 0;
-//
-//    if (data != nullptr)
-//      memcpy(data, node->State.data(), node->State.size());
-//    return node->State.size();
-//  };
-//
-//  config.SaveNodeSettings = [](ne::NodeId nodeId, const char* data, size_t size, ne::SaveReasonFlags reason,
-//                               void* userPointer) -> bool {
-//    auto node = FindNode(nodeId);
-//    if (!node)
-//      return false;
-//
-//    node->State.assign(data, size);
-//
-//    TouchNode(nodeId);
-//
-//    return true;
-//  };
-
-//  m_Editor = ne::CreateEditor(&config);
-//  ne::SetCurrentEditor(m_Editor);
-//
-//  // \TODO read scene file
-////  MatrixImpl* mat = new MatrixImpl();
-////  Namespace* node = nullptr;
-////  node = mat->SpawnNode(&s_Nodes);
-//
-//    WorkspaceMatrix4x4(0, "Mat4x4Label", s_HeaderBackground, "Mat4x4State", nodebase)
-//
-//  ne::SetNodePosition(node->ID, ImVec2(-252, 220));
-//
-//  ne::NavigateToContent();
-//
-//  BuildGUINodes();
-//
-//  // EXAMPLE of pre spawn links
-//  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[6].Inputs[0].ID));
-//  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[7].Inputs[0].ID));
-//
-//  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[14].Outputs[0].ID, s_Nodes[15].Inputs[0].ID));
-//
-//  //GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
-//  GLuint imageId = pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"), true);
-//  s_HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
-//  // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
-//  // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
-
-
 //void popupMenu(bool& createNewNode, GUIPin* newNodeLinkPin, ne::NodeId& contextNodeId,
 //               ne::PinId& contextPinId,
 //               ne::LinkId& contextLinkId)
@@ -901,30 +806,6 @@ void WorkspaceWindow::render(){
 //  }
 //}
 //
-//void DrawNodes(util::NodeBuilder& builder, GUIPin* newLinkPin)
-//{
-//  for (auto& node : s_Nodes)
-//  {
-//    builder.Begin(node->ID);
-//
-//    node->drawInputs(builder, newLinkPin);
-//
-//    node->drawBox(builder);
-//
-//    node->drawOutputs(builder, newLinkPin);
-//
-//    builder.End();
-//  }
-//
-//}
-//
-//WorkspaceWindow::WorkspaceDrawNodes(util::NodeBuilder& builder, GUIPin* newLinkPin)
-//{
-//    for (auto& node : Nodes)
-//    {
-//            node.drawWorkspaceNode(builder, newLinkPin);
-//    }
-//}
 
 void maybeUsefulCode()
 {

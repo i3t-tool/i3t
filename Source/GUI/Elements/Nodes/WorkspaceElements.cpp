@@ -32,7 +32,7 @@ void WorkspaceNode::drawWorkspaceNodeHeader(util::NodeBuilder& builder)
     builder.Header(Color);
 
     ImGui::Spring(0);
-    ImGui::TextUnformatted(Label.c_str());
+    ImGui::TextUnformatted(HeaderLabel.c_str());
     ImGui::Spring(1);
     ImGui::Dummy(ImVec2(0, 28));
     ImGui::Spring(0);
@@ -40,7 +40,7 @@ void WorkspaceNode::drawWorkspaceNodeHeader(util::NodeBuilder& builder)
     builder.EndHeader();
 }
 
-WorkspaceNode::WorkspaceNode(const ne::NodeId& id, ImTextureID headerBackground)
+WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground)
     : Id(id)
 {
     /* \todo Some better default values - take from Const.h*/
@@ -54,7 +54,7 @@ WorkspaceNode::WorkspaceNode(const ne::NodeId& id, ImTextureID headerBackground)
     HeaderBackground = headerBackground;
 }
 
-WorkspaceNode::WorkspaceNode(const ne::NodeId& id, std::string headerLabel, ImTextureID headerBackground)
+WorkspaceNode::WorkspaceNode(const ne::NodeId id, std::string headerLabel, ImTextureID headerBackground)
     : Id(id)
 {
     /* \todo Some better default values - take from Const.h*/
@@ -68,9 +68,17 @@ WorkspaceNode::WorkspaceNode(const ne::NodeId& id, std::string headerLabel, ImTe
     HeaderBackground = headerBackground;
 }
 
-void WorkspaceNode::TouchNode(float touchTime)
+void WorkspaceNode::TouchNode(const float constTouchTime)
 {
-  TouchTime = touchTime;
+  TouchTime = constTouchTime;
+}
+
+void WorkspaceNode::UpdateTouch(const float constDeltaTime)
+{
+    if(TouchTime > 0)
+    {
+        TouchTime -= constDeltaTime;
+    }
 }
 
 float WorkspaceNode::GetTouchProgress(const float constTouchTime)

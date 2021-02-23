@@ -54,7 +54,7 @@ extern std::map<EValueType, IconType> WorkspacePinShape;
 class WorkspaceNode
 {
 public:
-    const ne::NodeId& Id;
+    const ne::NodeId Id;
     std::string State; /*! \brief e.g. selected \todo what is it for? */
     std::string Label;
 
@@ -66,8 +66,8 @@ public:
     ImTextureID HeaderBackground;
 
     /* \todo some better constructors - this are just for test*/
-    WorkspaceNode(const ne::NodeId& id, ImTextureID headerBackground);
-    WorkspaceNode(const ne::NodeId& id, std::string headerLabel, ImTextureID headerBackground);
+    WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground);
+    WorkspaceNode(const ne::NodeId id, std::string headerLabel, ImTextureID headerBackground);
 
     virtual void drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
 
@@ -77,7 +77,9 @@ public:
     /*! \fn static void TouchNode(ne::NodeId id) \todo for what is it ?
     \brief update TouchTime
     */
-    void TouchNode(float touchTime);
+    void TouchNode(const float constTouchTime);
+
+    void UpdateTouch(const float constDeltaTime);
 
     float GetTouchProgress(const float constTouchTime);
 

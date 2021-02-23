@@ -112,9 +112,6 @@ class WorkspaceWindow  : public IWindow {
     //static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
     std::vector< std::unique_ptr<WorkspaceNode> > WorkspaceNodes;   /*! \brief All WorkspaceNodes */
 
-
-
-
 //    ne::NodeId contextNodeId;
 //    ne::LinkId contextLinkId;
 //    ne::PinId contextPinId;
@@ -129,8 +126,6 @@ class WorkspaceWindow  : public IWindow {
 
 
     const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
-
-
 
 
     WorkspaceWindow(bool show);
@@ -160,7 +155,7 @@ class WorkspaceWindow  : public IWindow {
     */
 //    WorkspacePin* FindPin(ne::PinId id);
 
-    void UpdateTouch();
+    void UpdateTouchAllNodes();
 
     void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
@@ -176,51 +171,4 @@ class WorkspaceWindow  : public IWindow {
 
 
 };
-
-
-//static int s_NextId = 1; /*! \brief prepared identificator of next added element */
-
-
-///*! \fn static void BuildNode(Node* node)
-//    \brief set right values (Node and Kind) to all Pins in node
-//    \param[in] node Node* to manage Pins in
-//*/
-//static void BuildGUINode(Namespace* node)
-//{
-//  for (auto& input : node->Inputs)
-//  {
-//    input->Node = node;
-//    input->Kind = PinKind::Input;
-//  }
-//
-//  for (auto& output : node->Outputs)
-//  {
-//    output->Node = node;
-//    output->Kind = PinKind::Output;
-//  }
-//}
-
-///*! \fn void BuildNodes()
-//    \brief build all Nodes
-//    \sa BuildNode
-//*/
-//inline void BuildGUINodes()
-//{
-//  for (auto& node : s_Nodes)
-//    BuildGUINode(node);
-//}
-
-//
-///*! \fn static int GetNextId()
-//    \brief Compute value of identificator for elements
-//    \return Value of identificator for added element */
-// inline int GetNextId()
-//{
-//  return s_NextId++;
-//}
-
-//static ne::LinkId GetNextLinkId()
-//{
-//  return ne::LinkId(GetNextId());
-//}
 
