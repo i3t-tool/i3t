@@ -13,7 +13,7 @@
 
 #include "Config.h"
 #include "Core/InputController.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 
 /**
  * \brief Storage for lookAt parameters (position, center and up vector)

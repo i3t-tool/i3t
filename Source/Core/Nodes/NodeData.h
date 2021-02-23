@@ -26,6 +26,8 @@ FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::Data
   int x = coords[0];
   int y = coords[1];
 
+  int i = 4 * x + y;
+
   return map[4 * x + y] != 255 && map[4 * x + y] != 0;
 }
 }
@@ -65,10 +67,10 @@ static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0,
 static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_Translate = {
-    0, 0, 0, 1,
-    0, 0, 0, 2,
-    0, 0, 0, 3,
-    0, 0, 0, 255,
+    255, 0, 0, 0,
+    0, 255, 0, 0,
+    0, 0, 255, 0,
+    1, 2, 3, 255,
 };
 
 /**
@@ -189,6 +191,7 @@ public:
   [[nodiscard]] const glm::mat4& getMat4() const { return value.matrix; }
   [[nodiscard]] glm::mat4& getMat4Ref() { return value.matrix; }
   [[nodiscard]] const glm::vec3& getVec3() const { return value.vector3; }
+  [[nodiscard]] glm::vec3& getVec3Ref() { return value.vector3; }
   [[nodiscard]] const glm::vec4& getVec4() const { return value.vector4; }
   [[nodiscard]] const glm::quat& getQuat() const { return value.quat; }
   [[nodiscard]] float getFloat() const { return value.fValue; }

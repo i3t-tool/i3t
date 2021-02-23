@@ -12,6 +12,7 @@
 #define _TEXTURE_LOADER_H_
 
 #include "pgr.h"
+
 #include <iostream>
 #include <map>
 #include <string>

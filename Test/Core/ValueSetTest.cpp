@@ -14,13 +14,13 @@ TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
     // Set new uniform scale.
     auto result = scale->setValue(glm::scale(glm::vec3(3.0f, 3.0f, 3.0f)));
 
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
   }
   {
     // Set new non-uniform scale.
     auto result = scale->setValue(glm::scale(glm::vec3(1.0f, 5.0f, 3.0f)));
 
-    EXPECT_EQ(EValueSetResult::Err_ConstraintViolation, result);
+    EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
   }
   {
     // Create free transform.
@@ -31,7 +31,7 @@ TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
     scale->setDataMap(Transform::g_Scale);
     auto result = scale->setValue(mat);
 
-    EXPECT_EQ(EValueSetResult::Err_ConstraintViolation, result);
+    EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
   }
 }
 
@@ -48,7 +48,7 @@ TEST(ResetScaleNode, ResetsNodeToInitialValues)
   mat[1][3] = 165.0f;
 
   auto result = scaleNode->setValue(mat);
-  EXPECT_EQ(EValueSetResult::Ok, result);
+  EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
   {
     auto data = scaleNode->getInternalData().getMat4();
@@ -76,12 +76,12 @@ TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
   {
     // Invalid coordinates.
     auto result = scaleNode->setValue(-2.0f, {3, 1});
-    EXPECT_EQ(EValueSetResult::Err_ConstraintViolation, result);
+    EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
   }
   {
     // Valid coordinates.
     auto result = scaleNode->setValue(-2.0f, {1, 1});
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
     auto data = scaleNode->getData().getMat4();
 
@@ -96,18 +96,22 @@ TEST(TranslationCoordsValidation, ShouldBeValid)
   {
     // Invalid coordinates.
     auto result = translationNode->setValue(-2.0f, {0, 3});
-    EXPECT_EQ(EValueSetResult::Err_ConstraintViolation, result);
+    EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
   }
   {
     // Valid coordinates.
-    auto result = translationNode->setValue(-2.0f, {3, 0});
-    EXPECT_EQ(EValueSetResult::Ok, result);
-
-    result = translationNode->setValue(-2.0f, {3, 1});
-    EXPECT_EQ(EValueSetResult::Ok, result);
-
-    result = translationNode->setValue(-2.0f, {3, 2});
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    {
+      auto result = translationNode->setValue(-2.0f, {3, 0});
+      EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    }
+    {
+      auto result = translationNode->setValue(-2.0f, {3, 1});
+      EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    }
+    {
+      auto result = translationNode->setValue(-2.0f, {3, 2});
+      EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    }
 
     auto translMat = glm::translate(glm::vec3(-2.0f, -2.0f, -2.0f));
     auto data = translationNode->getData().getMat4();
@@ -125,7 +129,7 @@ TEST(EulerXOneValueSet, ShouldBeCorrect)
     auto rads = 0.5f;
 
     auto result = rotXNode->setValue(glm::cos(rads), {1, 1});
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
     auto mat = rotXNode->getData().getMat4();
     auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -136,7 +140,7 @@ TEST(EulerXOneValueSet, ShouldBeCorrect)
     auto rads = 0.4f;
 
     auto result = rotXNode->setValue(glm::sin(rads), {1, 2});
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
     auto mat = rotXNode->getData().getMat4();
     auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -147,7 +151,7 @@ TEST(EulerXOneValueSet, ShouldBeCorrect)
     auto rads = 0.8f;
 
     auto result = rotXNode->setValue(-glm::sin(rads), {2, 1});
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
     auto mat = rotXNode->getData().getMat4();
     auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -158,7 +162,7 @@ TEST(EulerXOneValueSet, ShouldBeCorrect)
     auto rads = 1.0f;
 
     auto result = rotXNode->setValue(glm::cos(rads), {2, 2});
-    EXPECT_EQ(EValueSetResult::Ok, result);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
     auto mat = rotXNode->getData().getMat4();
     auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));

@@ -1,7 +1,7 @@
 #include "Node.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 
 using namespace Core;
 

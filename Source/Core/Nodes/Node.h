@@ -26,19 +26,18 @@ enum class ENodePlugResult
   Err_Loop,
 };
 
-enum class EValueSetResult
-{
-  Ok = 0,
-  Err_ConstraintViolation
-};
-
 struct ValueSetResult
 {
-  const EValueSetResult m_status;
-  const std::string m_message;
+  enum class Status {
+    Ok = 0,
+    Err_ConstraintViolation
+  };
 
-  ValueSetResult(EValueSetResult status, std::string message)
-    : m_status(status), m_message(std::move(message)) {}
+  const Status status;
+  const std::string message;
+
+  explicit ValueSetResult(Status aStatus, std::string aMessage = "")
+    : status(aStatus), message(std::move(aMessage)) {}
 };
 
 namespace Core
@@ -114,40 +113,38 @@ public:
    *
    * \param val
    */
-  virtual EValueSetResult setValue(float val)
+  [[nodiscard]] virtual ValueSetResult setValue(float val)
   {
     m_internalData[0].setValue(val);
-    return EValueSetResult::Ok;
+    return ValueSetResult{ValueSetResult::Status::Ok, ""};
   }
 
-  virtual EValueSetResult setValue(const glm::vec3& vec)
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
   {
     m_internalData[0].setValue(vec);
-    return EValueSetResult::Ok;
+    return ValueSetResult{ValueSetResult::Status::Ok, ""};
   }
 
-  virtual EValueSetResult setValue(const glm::vec4& vec)
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
   {
     m_internalData[0].setValue(vec);
-    return EValueSetResult::Ok;
+    return ValueSetResult{ValueSetResult::Status::Ok, ""};
   }
 
-  virtual EValueSetResult setValue(const glm::mat4& mat)
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
   {
     if (m_currentMap == Transform::g_Free)
+    {
       m_internalData[0].setValue(mat);
-
-    return EValueSetResult::Ok;
+      return ValueSetResult{ValueSetResult::Status::Ok, ""};
+    }
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not a free transformation."};
   }
 
-  virtual EValueSetResult setValue(float val, glm::ivec2 coords)
+  [[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
   {
-    Debug::Assert(false, "Unsupported operation!");
-    return EValueSetResult::Err_ConstraintViolation;
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Unsupported operation on non transform object."};
   }
-
-
-  virtual void reset() {}
 
   /**
    * Smart set function, used with constrained transformation for value checking.
@@ -155,7 +152,13 @@ public:
    * \param mask array of 16 chars.
    * \param mat
    */
-  virtual EValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map) { return EValueSetResult::Ok; }
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
+  {
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Unsupported operation on non transform object."};
+  }
+
+  virtual void reset() {}
+
   virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;

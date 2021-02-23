@@ -15,9 +15,9 @@ public:
     m_initialMap = map;
     m_currentMap = map;
   }
-  EValueSetResult setValue(const glm::vec3& vec) override;
-  EValueSetResult setValue(const glm::mat4& mat) override;
-  EValueSetResult setValue(float val, glm::ivec2 coords) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
+  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
   void reset() override;
   void setDataMap(const Transform::DataMap& map) override;
   void updateValues(int inputIndex) override;
@@ -45,9 +45,9 @@ public:
     getData().setValue(glm::rotate(initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
   }
 
-  EValueSetResult setValue(float rad) override;
-  EValueSetResult setValue(const glm::mat4&) override;
-  EValueSetResult setValue(float val, glm::ivec2 coords) override;
+  [[nodiscard]] ValueSetResult setValue(float rad) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
+  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
   void reset() override;
   void updateValues(int inputIndex) override;
 };
@@ -64,8 +64,8 @@ public:
     m_currentMap = map;
   }
 
-  EValueSetResult setValue(float rad) override;
-  EValueSetResult setValue(const glm::mat4&) override;
+  [[nodiscard]] ValueSetResult setValue(float rad) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
   void reset() override;
   void updateValues(int inputIndex) override;
 };
@@ -82,8 +82,8 @@ public:
     m_currentMap = map;
   }
 
-  EValueSetResult setValue(float rad) override;
-  EValueSetResult setValue(const glm::mat4&) override;
+  [[nodiscard]] ValueSetResult setValue(float rad) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
   void reset() override;
   void updateValues(int inputIndex) override;
 };
@@ -101,9 +101,9 @@ public:
     getData().setValue(glm::translate(initialTrans));
   }
 
-  EValueSetResult setValue(const glm::vec3& vec) override;
-  EValueSetResult setValue(const glm::mat4&) override;
-  EValueSetResult setValue(float val, glm::ivec2 coords) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
+  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
   void reset() override;
   void updateValues(int inputIndex) override;
 };

@@ -5,15 +5,15 @@
  */
 #pragma once
 
-#include "Core/GlfwWindow.h"
-#include <gl_core_4_4.h>
-#include <imgui.h>
-
 #include <array>
 #include <map>
 #include <vector>
 
+#include "gl_core_4_4.h"
+#include "imgui.h"
+
 #include "Core/Defs.h"
+#include "Core/GlfwWindow.h"
 #include "GUI/Elements/IWindow.h"
 
 constexpr char* ImGui_GLSLVersion = "#version 140";

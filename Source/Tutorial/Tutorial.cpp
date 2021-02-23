@@ -1,7 +1,7 @@
 ﻿#include "Tutorial.h"
 #include "Core/Application.h"
 //#include "gl/GL.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 #include "imgui.h"
 #include "stb_image.h"
 #include "yaml-cpp/yaml.h"
