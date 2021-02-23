@@ -1,4 +1,4 @@
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 
 #include <cstdarg>
 #include <sstream>

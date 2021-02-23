@@ -1,7 +1,6 @@
 #include "Application.h"
 
 #include <functional>
-#include <sstream>
 
 #include "imgui.h"
 
@@ -15,7 +14,6 @@
 #include "GUI/ImGui/imgui_impl_glfw.h"
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "GUI/Style.h"
-#include "GlfwWindow.h"
 #include "Rendering/ShaderProvider.h"
 #include "Rendering/Shaper.h"
 #include "Utils/Color.h"

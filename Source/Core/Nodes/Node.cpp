@@ -1,9 +1,28 @@
 #include "Node.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 
 using namespace Core;
+
+NodeBase::NodeBase(const Operation* operation)
+    : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+{
+  m_id = IdGenerator::next();
+
+  // Create input pins.
+  for (int i = 0; i < m_operation->numberOfInputs; i++)
+  {
+    m_inputs.emplace_back(m_operation->inputTypes[i], true, this, i);
+  }
+
+  // Create output pins and data storage for each output.
+  for (int i = 0; i < m_operation->numberOfOutputs; i++)
+  {
+    m_outputs.emplace_back(m_operation->outputTypes[i], false, this, i);
+    m_internalData.emplace_back();
+  }
+}
 
 NodeBase::~NodeBase()
 {

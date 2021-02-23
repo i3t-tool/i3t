@@ -68,7 +68,7 @@
 
 #include "Config.h"
 #include "Core/Defs.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 #include "Utils/Other.h"
 
 #include "Commands/ApplicationCommands.h"

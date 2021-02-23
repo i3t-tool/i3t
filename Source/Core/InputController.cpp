@@ -5,7 +5,7 @@
 
 #include "Core/Application.h"
 #include "Core/GlfwWindow.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 
 #define IM_MOUSE_KEYS_COUNT 3
 
