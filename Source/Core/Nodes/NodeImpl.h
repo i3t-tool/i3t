@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include <type_traits>
+#include <variant>
+
 #include "Node.h"
 
 namespace Core
@@ -27,9 +30,8 @@ public:
    * or output names are assigned here.
    */
   NodeImpl();
-  virtual ~NodeImpl() {};
+  ~NodeImpl() override = default;
 
-private:
   /**
    * Implementation of virtual function NodeBase::updateValues(int).
    *
@@ -43,32 +45,14 @@ private:
 
 //===-- Member template function definitions. ------------------------------===//
 
-template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[T])
-{
-  // Create input pins.
-  for (int i = 0; i < m_operation->numberOfInputs; i++)
-  {
-    m_inputs.emplace_back(m_operation->inputTypes[i], true, this, i);
-  }
-
-  // Create output pins and data storage for each output.
-  for (int i = 0; i < m_operation->numberOfOutputs; i++)
-  {
-    m_outputs.emplace_back(m_operation->outputTypes[i], false, this, i);
-    m_internalData.emplace_back();
-  }
-
-  /// \todo Do not call virtual member function from constructor
-  /// https://isocpp.org/wiki/faq/strange-inheritance#calling-virtuals-from-ctors
-  updateValues(0);
-}
+template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[static_cast<unsigned>(T)]) {}
 
 //===-----------------------------------------------------------------------===//
-// build error: there are no arguments to ‘I3T_DEBUG_ASSERT’ that depend on a template parameter, so a declaration of ‘I3T_DEBUG_ASSERT’ must be available [-fpermissive]
-//template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
-//{
-//  I3T_DEBUG_ASSERT(false, "Calling update function of unimplemented NodeImpl type.");
-//}
+
+template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
+{
+  Debug::Assert(false, "Calling update function of unimplemented NodeImpl type.");
+}
 
 // inversion
 template <> FORCE_INLINE void NodeImpl<ENodeType::Inversion>::updateValues(int inputIndex)
@@ -1359,91 +1343,12 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
   }
 }
 
-// Translation
-template <> FORCE_INLINE void NodeImpl<ENodeType::Translation>::updateValues(int inputIndex)
-{
-  if (m_inputs[0].isPluggedIn())
-  {
-    m_internalData[0].setValue(glm::translate(m_inputs[0].getStorage().getVec3()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
-}
-
-// EulerX
-template <> FORCE_INLINE void NodeImpl<ENodeType::EulerX>::updateValues(int inputIndex)
-{
-  if (m_inputs[0].isPluggedIn())
-  {
-
-    float angle;
-
-    angle = m_inputs[0].getStorage().getFloat();
-
-    m_internalData[0].setValue(glm::eulerAngleX(angle));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::eulerAngleX(0.0f));
-  }
-}
-
-// EulerY
-template <> FORCE_INLINE void NodeImpl<ENodeType::EulerY>::updateValues(int inputIndex)
-{
-  if (m_inputs[0].isPluggedIn())
-  {
-
-    float angle;
-
-    angle = m_inputs[0].getStorage().getFloat();
-
-    m_internalData[0].setValue(glm::eulerAngleY(angle));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::eulerAngleY(0.0f));
-  }
-}
-
-// EulerZ
-template <> FORCE_INLINE void NodeImpl<ENodeType::EulerZ>::updateValues(int inputIndex)
-{
-  if (m_inputs[0].isPluggedIn())
-  {
-    float angle;
-
-    angle = m_inputs[0].getStorage().getFloat();
-
-    m_internalData[0].setValue(glm::eulerAngleZ(angle));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::eulerAngleZ(0.0f));
-  }
-}
-
 // AxisAngle
 template <> FORCE_INLINE void NodeImpl<ENodeType::AxisAngle>::updateValues(int inputIndex)
 {
   if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
   {
     m_internalData[0].setValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
-}
-
-// Scale
-template <> FORCE_INLINE void NodeImpl<ENodeType::Scale>::updateValues(int inputIndex)
-{
-  if (m_inputs[0].isPluggedIn())
-  {
-    m_internalData[0].setValue(glm::scale(m_inputs[0].getStorage().getVec3()));
   }
   else
   {

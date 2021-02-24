@@ -19,19 +19,7 @@ class Sequence : public NodeBase
   std::vector<UPtr<Matrix>> m_matrices;
 
 public:
-  Sequence() : NodeBase(&operations[ENodeType::Sequence])
-  {
-    m_inputs.emplace_back(EValueType::Matrix, true, this, 0); // mul. input
-    m_inputs.emplace_back(EValueType::Matrix, true, this, 1); // direct mat. input
-
-    m_outputs.emplace_back(EValueType::Matrix, false, this, 0); // mul. output
-    m_outputs.emplace_back(EValueType::Matrix, false, this, 1); // direct mat. output
-
-    m_internalData.emplace_back();
-    m_internalData.emplace_back();
-
-    updateValues(0);
-  };
+  Sequence() : NodeBase(&g_sequence){};
 
   /**
    * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -58,10 +46,7 @@ public:
    * \param idx Index of matrix.
    * \return Reference to matrix holt in m_matrices vector.
    */
-  [[nodiscard]] UPtr<Matrix>& getMatRef(size_t idx)
-  {
-    return m_matrices.at(idx);
-  }
+  [[nodiscard]] UPtr<Matrix>& getMatRef(size_t idx) { return m_matrices.at(idx); }
 
   /**
    * Pop matrix from a sequence. Caller takes ownership of returned matrix.
@@ -97,6 +82,4 @@ public:
     m_internalData[1].setValue(result);
   };
 };
-}
-
-
+} // namespace Core

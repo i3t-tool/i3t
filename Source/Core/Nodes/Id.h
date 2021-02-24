@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Core
 {
 typedef unsigned long long ID;
@@ -9,4 +11,4 @@ class IdGenerator
 public:
   static ID next();
 };
-}
+} // namespace Core

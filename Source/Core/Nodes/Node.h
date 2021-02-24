@@ -9,6 +9,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 #include <vector>
 
 #include "Core/Defs.h"
@@ -25,10 +26,18 @@ enum class ENodePlugResult
   Err_Loop,
 };
 
-enum class EValueSetResult
+struct ValueSetResult
 {
-  Ok = 0,
-  Err_ConstraintViolation
+  enum class Status {
+    Ok = 0,
+    Err_ConstraintViolation
+  };
+
+  const Status status;
+  const std::string message;
+
+  explicit ValueSetResult(Status aStatus, std::string aMessage = "")
+    : status(aStatus), message(std::move(aMessage)) {}
 };
 
 namespace Core
@@ -56,8 +65,8 @@ protected:
   std::vector<DataStore> m_initialData;
   std::vector<DataStore> m_internalData;
 
-  DataMap m_initialMap{};
-  DataMap m_currentMap{};
+  Transform::DataMap m_initialMap{};
+  Transform::DataMap m_currentMap{};
 
   /**
    * Operator node properties.
@@ -67,20 +76,13 @@ protected:
   /// \todo Is there values in NodeBase used?
   bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
   bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
-                           ///< only)
+                             ///< only)
   int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
   NodeBase() = default;
 
-  /**
-   * I3T v2 default Operator constructor.
-   */
-  explicit NodeBase(const Operation* operation)
-      : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
-  {
-    m_id = IdGenerator::next();
-  }
+  explicit NodeBase(const Operation* operation);
 
   /** Delete node and unplug its all inputs and outputs. */
   virtual ~NodeBase();
@@ -101,10 +103,7 @@ public:
     return m_internalData[index];
   }
 
-  DataStore& getData()
-  {
-    return m_internalData[0];
-  }
+  DataStore& getData() { return m_internalData[0]; }
 
   /**
    * Set a value of node.
@@ -114,18 +113,38 @@ public:
    *
    * \param val
    */
-  virtual EValueSetResult setValue(float val) { return EValueSetResult::Ok; }
-  virtual EValueSetResult setValue(const glm::vec3& vec) { return EValueSetResult::Ok; }
-  virtual EValueSetResult setValue(const glm::vec4& vec) { return EValueSetResult::Ok; }
-  virtual EValueSetResult setValue(const glm::mat4& mat)
+  [[nodiscard]] virtual ValueSetResult setValue(float val)
   {
-    if (eq(m_currentMap, g_Free))
-      m_internalData[0].setValue(mat);
-
-    return EValueSetResult::Ok;
+    m_internalData[0].setValue(val);
+    return ValueSetResult{ValueSetResult::Status::Ok, ""};
   }
 
-  virtual void reset() {}
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
+  {
+    m_internalData[0].setValue(vec);
+    return ValueSetResult{ValueSetResult::Status::Ok, ""};
+  }
+
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
+  {
+    m_internalData[0].setValue(vec);
+    return ValueSetResult{ValueSetResult::Status::Ok, ""};
+  }
+
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
+  {
+    if (m_currentMap == Transform::g_Free)
+    {
+      m_internalData[0].setValue(mat);
+      return ValueSetResult{ValueSetResult::Status::Ok, ""};
+    }
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not a free transformation."};
+  }
+
+  [[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
+  {
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Unsupported operation on non transform object."};
+  }
 
   /**
    * Smart set function, used with constrained transformation for value checking.
@@ -133,8 +152,14 @@ public:
    * \param mask array of 16 chars.
    * \param mat
    */
-  virtual EValueSetResult setValue(const glm::mat4& mat, const DataMap& map) { return EValueSetResult::Ok; }
-  virtual void setDataMap(const DataMap& map) { m_currentMap = map; }
+  [[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
+  {
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Unsupported operation on non transform object."};
+  }
+
+  virtual void reset() {}
+
+  virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
 
   [[nodiscard]] const std::vector<Pin>& getInputPins() const;
   [[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -194,7 +219,7 @@ private:
 class Pin
 {
   friend class GraphManager;
-  template <ENodeType NodeType> friend class NodeImpl;
+  // template <ENodeType NodeType> friend class NodeImpl;
   friend class NodeBase;
 
   ID m_id;
@@ -247,6 +272,20 @@ public:
   [[nodiscard]] ID getId() const { return m_id; }
 
   [[nodiscard]] int getIndex() const { return m_index; }
+
+  [[nodiscard]] const Pin* getParentPin() const
+  {
+    if (m_isInput)
+    {
+      Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
+      return m_input;
+    }
+    else
+    {
+      Debug::Assert(false, "Output pin can not has parent pin!");
+      return nullptr;
+    }
+  }
 
   [[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 

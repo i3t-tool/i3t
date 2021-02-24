@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "pgr.h"
-#include <Logger/Logger.h>
+#include <Logger/LoggerInternal.h>
 #include <glm/glm.hpp>
 
 /**

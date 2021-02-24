@@ -123,41 +123,17 @@ macro(copy_shared_libs target_project from_path)
 endmacro()
 # =============================================================
 
-# Configuration for building tests.
-# if (BUILD_TESTS)
-if (True)
-    set(TEST_PROJECT_NAME I3TTest)
+# ======== Source groups ======================================
+# Add ImGui source files.
+set(I3T_IMGUI_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_internal.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_demo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_draw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_widgets.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imconfig.h)
 
-    message("Building tests...")
-
-    include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googlemock/include)
-    include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googletest/include)
-
-    file(GLOB_RECURSE TEST_SOURCE
-            "Test/*.cpp"
-            "Test/*.h"
-            "Test/*.hpp"
-            )
-
-    add_subdirectory(Dependencies/gtest)
-
-    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE}
-            Source/Core/Nodes/GraphManager.cpp
-            Source/Core/Nodes/Id.cpp
-            Source/Core/Nodes/Node.h
-            Source/Core/Nodes/Node.cpp
-            Source/Core/Nodes/Transform.cpp
-            Test/Core/SequenceTest.cpp Test/Core/TransformationTest.cpp Test/Core/ValueSetTest.cpp)
-
-    target_link_libraries(${TEST_PROJECT_NAME} gtest gtest_main)
-
-    set_target_properties(gtest PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
-    set_target_properties(gtest_main PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
-endif()
-
-# ====== Add source files. ====================================
 file(GLOB_RECURSE I3T_SOURCE
     "Source/*.h"
     "Source/*.hpp"
@@ -165,15 +141,9 @@ file(GLOB_RECURSE I3T_SOURCE
     "Dependencies/pgr-framework/src/*"
     "Dependencies/pgr-framework/include/*"
 )
+list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 
-# Add ImGui source files.
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_internal.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_demo.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_draw.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_widgets.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imconfig.h)
+list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
 
 # Add ImGui_node_editor source files.
 list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.h)
@@ -188,26 +158,40 @@ list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_edito
 list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/crude_json.cpp)
 # =============================================================
 
+# ======== Configuration for building tests.  =================
+# if (BUILD_TESTS)
+if (True)
+    set(TEST_PROJECT_NAME I3TTest)
+
+    message("Building tests...")
+
+    include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googlemock/include)
+    include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googletest/include)
+
+    add_subdirectory(Dependencies/gtest)
+
+    file(GLOB_RECURSE TEST_SOURCE
+            "Test/*.cpp"
+            "Test/*.h"
+            "Test/*.hpp"
+            )
+
+    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
+
+    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp)
+
+    set_target_properties(gtest PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+    set_target_properties(gtest_main PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+
+    target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
+endif()
+# =============================================================
+
 # ===== Create target executable from I3T source files. =======
 add_executable(${PROJECT_NAME} ${I3T_SOURCE}
-        Source/Core/GlfwWindow.cpp
-        Source/Core/GlfwWindow.h
-        Source/GUI/Elements/Dialogs/SystemDialogs.cpp
-        Source/GUI/Elements/Dialogs/SystemDialogs.h
-        Source/Utils/System.h
-        Source/Utils/System.cpp
-        Source/Core/Nodes/Node.h
-        Source/Core/Nodes/Node.cpp
-        Source/Core/Nodes/NodeImpl.h
-        Source/Core/Nodes/GraphManager.h
-        Source/GUI/Settings.h
-        Source/GUI/Settings.cpp
-        Source/Core/Nodes/Sequence.h
-        Source/Core/Nodes/GraphManager.cpp
-        Source/Core/Nodes/Transform.h
-        Source/Core/Nodes/Transform.cpp
-        Source/Core/Nodes/Id.h
-        Source/Core/Nodes/Id.cpp)
+        Source/Main.cpp)
 # =============================================================
 
 # Set VS_DEBUGGER_WORKING_DIRECTORY

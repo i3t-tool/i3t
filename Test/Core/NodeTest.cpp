@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "Core/Nodes/Node.h"
 
 using namespace Core;
 

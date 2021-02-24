@@ -5,7 +5,7 @@
 #include "Core/Defs.h"
 #include "Core/InputController.h"
 #include "GUI/Settings.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 #include "Rendering/AlphaShader.h"
 #include "Rendering/BaseShader.h"
 #include "Rendering/RedShader.h"

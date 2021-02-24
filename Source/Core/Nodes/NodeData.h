@@ -14,10 +14,26 @@
 
 #include "Utils/Math.h"
 
-namespace Core
+namespace Core::Transform
 {
 typedef std::array<unsigned char, 16> DataMap;
+}
 
+namespace Core
+{
+FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::DataMap& map)
+{
+  int x = coords[0];
+  int y = coords[1];
+
+  int i = 4 * x + y;
+
+  return map[4 * x + y] != 255 && map[4 * x + y] != 0;
+}
+}
+
+namespace Core::Transform
+{
 static constexpr DataMap g_Free = {
     1, 2, 3, 4,
     5, 6, 7, 8,
@@ -46,30 +62,19 @@ static constexpr DataMap g_EulerX = {
     0, 0, 0, 255,
 };
 
-static constexpr DataMap g_EulerY = {
-    1, 0, 2, 0,
-    0, 255, 0, 0,
-    3, 0, 1, 0,
-    0, 0, 0, 255
-};
+static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 255};
 
-static constexpr DataMap g_EulerZ = {
-    1, 2, 0, 0,
-    3, 1, 0, 0,
-    0, 0, 255, 0,
-    0, 0, 0, 255
-};
+static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_Translate = {
-    0, 0, 0, 1,
-    0, 0, 0, 2,
-    0, 0, 0, 3,
-    0, 0, 0, 255,
+    255, 0, 0, 0,
+    0, 255, 0, 0,
+    0, 0, 255, 0,
+    1, 2, 3, 255,
 };
 
 /**
  * Return whether DataMaps are same.
- * \todo use == operator instead.
  */
 FORCE_INLINE bool eq(const DataMap& lhs, const DataMap& rhs)
 {
@@ -105,11 +110,11 @@ FORCE_INLINE bool cmp(const DataMap& map, const glm::mat4& mat)
   return true;
 }
 
-FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4 mat)
+FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
 {
   return cmp(map, mat);
 }
-}
+} // namespace Core::TransformMap
 
 /** An operator value type = type of the interconnection wire. */
 enum class EValueType
@@ -150,7 +155,7 @@ union OpValue
 class DataStore
 {
 protected:
-  OpValue value;   ///< transmitted data (union of all data types passed along the wire)
+  OpValue value;          ///< transmitted data (union of all data types passed along the wire)
   EValueType opValueType; ///< wire type, such as FLOAT or MATRIX
 
 public:
@@ -162,7 +167,7 @@ public:
     switch (valueType)
     {
     case EValueType::Screen:
-      setValue((void*) nullptr);
+      setValue((void*)nullptr);
       break;
     case EValueType::Float:
       setValue(0.0f);
@@ -184,7 +189,9 @@ public:
 
   [[nodiscard]] EValueType getOpValType() const { return opValueType; }
   [[nodiscard]] const glm::mat4& getMat4() const { return value.matrix; }
+  [[nodiscard]] glm::mat4& getMat4Ref() { return value.matrix; }
   [[nodiscard]] const glm::vec3& getVec3() const { return value.vector3; }
+  [[nodiscard]] glm::vec3& getVec3Ref() { return value.vector3; }
   [[nodiscard]] const glm::vec4& getVec4() const { return value.vector4; }
   [[nodiscard]] const glm::quat& getQuat() const { return value.quat; }
   [[nodiscard]] float getFloat() const { return value.fValue; }
@@ -192,10 +199,10 @@ public:
   void*& getPointer() { return value.pointer; }
 
   void setValue(OpValue value) { this->value = value; }
-  void setValue(glm::mat4 mat) { value.matrix = mat; }
-  void setValue(glm::vec3 vec) { value.vector3 = vec; }
-  void setValue(glm::vec4 vec) { value.vector4 = vec; }
-  void setValue(glm::quat q) { value.quat = q; }
+  void setValue(const glm::mat4& mat) { value.matrix = mat; }
+  void setValue(const glm::vec3& vec) { value.vector3 = vec; }
+  void setValue(const glm::vec4& vec) { value.vector4 = vec; }
+  void setValue(const glm::quat& q) { value.quat = q; }
   void setValue(float f) { value.fValue = f; }
   void setValue(void* p) { value.pointer = p; }
 };

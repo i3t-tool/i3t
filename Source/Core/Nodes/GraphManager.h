@@ -23,9 +23,9 @@ namespace Builder
  */
 template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
 {
-  Debug::Assert(T != ENodeType::Sequence, "Use createSequence instead.");
-
-  return std::make_unique<Core::NodeImpl<T>>();
+  auto&& ret = std::make_unique<Core::NodeImpl<T>>();
+  ret->updateValues(0);
+  return ret;
 }
 
 /**
@@ -34,13 +34,16 @@ template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
  */
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
-  return std::make_shared<Core::Sequence>();
+  auto&& ret = std::make_shared<Core::Sequence>();
+  ret->updateValues(0);
+  return ret;
 }
 
-template <typename T, typename... Args>
-Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
+template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
 {
-  return std::make_shared<T>(std::forward<Args>(args)...);
+  auto&& ret = std::make_shared<T>(std::forward<Args>(args)...);
+  ret->updateValues(0);
+  return ret;
 }
 } // namespace Builder
 
@@ -103,4 +106,4 @@ public:
    */
   static void unplugOutput(UPtr<Core::NodeBase>& node, int index);
 };
-}
+} // namespace Core
