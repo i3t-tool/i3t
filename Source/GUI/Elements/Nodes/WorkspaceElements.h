@@ -86,6 +86,11 @@ public:
 };
 
 
+
+/* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
+static int linkID = 0;
+static int getLinkID(){return linkID++;}
+
 /*! \class WorkspaceLinkProperties
     \brief Information of Link for graphic
  */
@@ -132,7 +137,7 @@ class WorkspaceNodeBaseData
 public:
 
     /*see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-    const std::unique_ptr<Core::NodeBase> Nodebase; /*! \brief reference to core
+    std::unique_ptr<Core::NodeBase> const Nodebase; /*! \brief reference to core
                                                          WorkspaceNodeBaseData is owner of unique pointer
                                                     */
 
@@ -142,7 +147,7 @@ public:
 
     WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nodebase);
 
-    virtual void drawWorkspaceInputLinks(util::NodeBuilder& builder);
+    virtual void drawWorkspaceInputLinks();
     virtual void drawWorkspaceInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
     virtual void drawWorkspaceNodeData(util::NodeBuilder& builder) = 0;
     virtual void drawWorkspaceOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);

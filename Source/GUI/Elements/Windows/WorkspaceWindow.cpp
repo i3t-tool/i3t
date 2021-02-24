@@ -61,9 +61,14 @@ WorkspaceWindow::WorkspaceWindow(bool show)
     /* \todo adding nodes here just for testing */
     WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
     ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
-//
+
     WorkspaceNodes.push_back( std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture) );
     ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
+
+    Core::GraphManager::plug( dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get())->Nodebase
+                             ,dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
+    dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get())->WorkspaceLinksProperties.push_back(
+                              std::make_unique<WorkspaceLinkProperties>(getLinkID()));
 
     WorkspaceNodes.push_back( std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture) );
     ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
@@ -118,6 +123,13 @@ void WorkspaceWindow::render(){
             {
                     WorkspaceNode->drawWorkspaceNode(NodeBuilderContext, nullptr);
             }
+
+            /* \todo I am not able to do it with for-each loop - compilation fail on casting - if somebody can do it... */
+            for(int i=0; i<WorkspaceNodes.size(); ++i)
+            {
+                    dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(i).get())->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
+            }
+
 
         ne::End();
 

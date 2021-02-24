@@ -83,8 +83,8 @@ public:
    * \param myInputPinIndex Index of input pin of this node.
    *
    * \return Result enum is returned from the function. \see ENodePlugResult.
-   */
-  static ENodePlugResult plug(UPtr<Core::NodeBase>& leftNode, UPtr<Core::NodeBase>& rightNode, unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+   */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
+  static ENodePlugResult plug(const UPtr<Core::NodeBase>& leftNode,const UPtr<Core::NodeBase>& rightNode, unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
   /// Unplug all inputs and outputs.
   static void unplugAll(UPtr<Core::NodeBase>& node);

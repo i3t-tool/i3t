@@ -55,7 +55,6 @@ void WorkspaceMatrix4x4::drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin
     builder.Begin(Id);
 
     drawWorkspaceNodeHeader(builder);
-    drawWorkspaceInputLinks(builder);
     drawWorkspaceInputs(builder, newLinkPin);
     drawWorkspaceNodeData(builder);
     drawWorkspaceOutputs(builder, newLinkPin);

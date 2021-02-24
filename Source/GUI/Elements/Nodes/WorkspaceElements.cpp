@@ -90,7 +90,7 @@ float WorkspaceNode::GetTouchProgress(const float constTouchTime)
 }
 
 WorkspaceLinkProperties::WorkspaceLinkProperties( const ne::LinkId id )
-:Id(id), Color(ImColor(0,0,0))
+:Id(id), Color(ImColor(255,255,255))
 {}
 
 
@@ -111,9 +111,7 @@ bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
 }
 
 
-/* \todo not used yet - some better way? -> maybe use id of input pin that the link belongs to...  */
-static int linkID = 0;
-static int getLinkID(){return linkID++;}
+
 
 
 /* see: https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
@@ -161,10 +159,10 @@ WorkspaceNodeBaseData::WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nod
 
 
 /* \todo test whether it work... */
-void WorkspaceNodeBaseData::drawWorkspaceInputLinks(util::NodeBuilder& builder)
+void WorkspaceNodeBaseData::drawWorkspaceInputLinks()
 {
     for ( std::pair<pinIter, linkPropIter> elem(Nodebase->getInputPins().begin(), WorkspaceLinksProperties.begin())
-         ;/* elem.first() != Nodebase->getInputPins().end()  &&*/ elem.second != WorkspaceLinksProperties.end()
+         ; elem.first != Nodebase->getInputPins().end()  /* && elem.second != WorkspaceLinksProperties.end() */
          ; ++elem.first, ++elem.second
          )
     {

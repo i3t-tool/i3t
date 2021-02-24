@@ -40,7 +40,6 @@ void WorkspaceNormalizeVector::drawWorkspaceNode(util::NodeBuilder& builder, Cor
     builder.Begin(Id);
 
     drawWorkspaceNodeHeader(builder);
-    drawWorkspaceInputLinks(builder);
     drawWorkspaceInputs(builder, newLinkPin);
     drawWorkspaceNodeData(builder);
     drawWorkspaceOutputs(builder, newLinkPin);

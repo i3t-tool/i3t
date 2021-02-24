@@ -60,7 +60,7 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
   return ENodePlugResult::Ok;
 }
 
-ENodePlugResult GraphManager::plug(UPtr<Core::NodeBase>& leftNode, UPtr<Core::NodeBase>& rightNode, unsigned fromIndex,
+ENodePlugResult GraphManager::plug(const UPtr<Core::NodeBase>& leftNode, const UPtr<Core::NodeBase>& rightNode, unsigned fromIndex,
                                            unsigned myIndex)
 {
   Debug::Assert(rightNode->m_inputs.size() > myIndex, "Desired input pin in this node with myIndex does not exists!");
