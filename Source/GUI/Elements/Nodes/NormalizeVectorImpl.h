@@ -2,9 +2,9 @@
 //
 //#include "../Windows/WorkspaceWindow.h"
 //
-//class NormalizeVectorImpl : public Namespace
+// class NormalizeVectorImpl : public Namespace
 //{
-//public:
+// public:
 //  NormalizeVectorImpl(int id, const char* name)
 //  {
 //    Type = ENodeType::NormalizeVector;

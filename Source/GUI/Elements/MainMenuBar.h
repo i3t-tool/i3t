@@ -12,20 +12,20 @@
 class MainMenuBar
 {
 public:
-  MainMenuBar();
-  ~MainMenuBar(){};
-  void render();
+	MainMenuBar();
+	~MainMenuBar(){};
+	void render();
 
 private:
-  bool m_showDemoWindow;
+	bool m_showDemoWindow;
 
-  // AboutDialog m_aboutDialog;
-  // DescriptionDialog m_descriptionDialog;
-  // SetupDialog m_setupDialog;
+	// AboutDialog m_aboutDialog;
+	// DescriptionDialog m_descriptionDialog;
+	// SetupDialog m_setupDialog;
 
-  void showFileMenu();
-  void showEditMenu();
-  void showWindowsMenu();
-  void showViewportsMenu();
-  void showHelpMenu();
+	void showFileMenu();
+	void showEditMenu();
+	void showWindowsMenu();
+	void showViewportsMenu();
+	void showHelpMenu();
 };

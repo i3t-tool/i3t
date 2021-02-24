@@ -1,26 +1,26 @@
 //#include "FloatMulFloatImpl.h"
 //
-//using namespace Builder;
+// using namespace Builder;
 //
-//void ImGuiEx_BeginColumn()
+// void ImGuiEx_BeginColumn()
 //{
 //  ImGui::BeginGroup();
 //}
 //
-//void ImGuiEx_NextColumn()
+// void ImGuiEx_NextColumn()
 //{
 //  ImGui::EndGroup();
 //  ImGui::SameLine();
 //  ImGui::BeginGroup();
 //}
 //
-//void ImGuiEx_EndColumn()
+// void ImGuiEx_EndColumn()
 //{
 //  ImGui::EndGroup();
 //}
 //
 //// Will be almost look the same in all nodes
-//Namespace* FloatMulFloatImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+// Namespace* FloatMulFloatImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
 //{
 //  auto NV = new FloatMulFloatImpl(GetNextId(), "FloatMulFloat");
 //  s_nodes->emplace_back(NV);
@@ -46,7 +46,7 @@
 //  return s_nodes->back();
 //}
 //
-//void FloatMulFloatImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void FloatMulFloatImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  for (auto& output : Outputs)
 //  {
@@ -68,7 +68,7 @@
 //  }
 //}
 //
-//void FloatMulFloatImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void FloatMulFloatImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  // Make new function drawHeader?
 //  // header
@@ -103,7 +103,7 @@
 //  }
 //}
 //
-//void FloatMulFloatImpl::drawBox(util::NodeBuilder& builder)
+// void FloatMulFloatImpl::drawBox(util::NodeBuilder& builder)
 //{
 //  ImGui::SameLine();
 //  float data = nodebase->getInternalData().getFloat();

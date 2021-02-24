@@ -6,9 +6,9 @@ typedef unsigned long long ID;
 
 class IdGenerator
 {
-  static ID m_id;
+	static ID m_id;
 
 public:
-  static ID next();
+	static ID next();
 };
 } // namespace Core

@@ -2,10 +2,10 @@
 //#include "MatrixImpl.h"
 //
 //
-//using namespace Builder;
+// using namespace Builder;
 //
 ////Will be almost look the same in all nodes
-//Namespace* MatrixImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+// Namespace* MatrixImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
 //{
 //  auto mat = new MatrixImpl(GetNextId(), "Matrix");
 //  s_nodes->emplace_back(mat);
@@ -28,7 +28,7 @@
 //  return s_nodes->back();
 //}
 //
-//void MatrixImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void MatrixImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  for (auto& output : Outputs)
 //  {
@@ -50,7 +50,7 @@
 //  }
 //}
 //
-//void MatrixImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void MatrixImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //      builder.Header(Color);
 //      ImGui::Spring(0);
@@ -69,7 +69,7 @@
 //
 //}
 //
-//void MatrixImpl::drawBox(util::NodeBuilder& builder)
+// void MatrixImpl::drawBox(util::NodeBuilder& builder)
 //{
 //
 //    glm::mat4& data = nodebase->getInternalData().getMat4();

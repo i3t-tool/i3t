@@ -1,10 +1,10 @@
 //#include "FloatImpl.h"
 //
 //
-//using namespace Builder;
+// using namespace Builder;
 //
 //// Will be almost look the same in all nodes
-//Namespace* FloatImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+// Namespace* FloatImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
 //{
 //  auto NV = new FloatImpl(GetNextId(), "Float");
 //  s_nodes->emplace_back(NV);
@@ -30,7 +30,7 @@
 //  return s_nodes->back();
 //}
 //
-//void FloatImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void FloatImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  for (auto& output : Outputs)
 //  {
@@ -52,7 +52,7 @@
 //  }
 //}
 //
-//void FloatImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void FloatImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  // Make new function drawHeader?
 //  // header
@@ -86,7 +86,7 @@
 //  }
 //}
 //
-//void FloatImpl::drawBox(util::NodeBuilder& builder)
+// void FloatImpl::drawBox(util::NodeBuilder& builder)
 //{
 //  float data = nodebase->getInternalData().getFloat();
 //

@@ -13,16 +13,16 @@
 class GlfwWindow
 {
 public:
-  /**
-   * Initialize GLFW window.
-   *
-   * Exit the program if a window cannot be created.
-   */
-  void init();
-  void setTitle(const char* title);
-  void swapBuffers();
-  GLFWwindow* get();
+	/**
+	 * Initialize GLFW window.
+	 *
+	 * Exit the program if a window cannot be created.
+	 */
+	void init();
+	void setTitle(const char* title);
+	void swapBuffers();
+	GLFWwindow* get();
 
 private:
-  GLFWwindow* m_mainWindow;
+	GLFWwindow* m_mainWindow;
 };

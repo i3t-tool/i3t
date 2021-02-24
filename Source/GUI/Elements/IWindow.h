@@ -11,13 +11,13 @@
 class IWindow
 {
 public:
-  IWindow(bool show = false) { m_show = show; };
+	IWindow(bool show = false) { m_show = show; };
 
-  virtual ~IWindow() = default;
-  virtual void render() = 0;
-  void hide() { m_show = false; }
+	virtual ~IWindow() = default;
+	virtual void render() = 0;
+	void hide() { m_show = false; }
 
 protected:
-  friend class Application;
-  bool m_show;
+	friend class Application;
+	bool m_show;
 };

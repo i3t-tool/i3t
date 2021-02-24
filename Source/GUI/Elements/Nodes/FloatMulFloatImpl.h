@@ -1,9 +1,9 @@
 //#pragma once
 //#include "../Windows/WorkspaceWindow.h"
 //
-//class FloatMulFloatImpl : public Namespace
+// class FloatMulFloatImpl : public Namespace
 //{
-//public:
+// public:
 //  FloatMulFloatImpl(int id, const char* name)
 //  {
 //    Type = ENodeType::FloatMulFloat;

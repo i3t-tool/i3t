@@ -2,9 +2,9 @@
 //
 //#include "../Windows/WorkspaceWindow.h"
 //
-//class DeterminantImpl : public Namespace
+// class DeterminantImpl : public Namespace
 //{
-//public:
+// public:
 //  DeterminantImpl(int id, const char* name)
 //  {
 //    Type = ENodeType::Determinant;

@@ -9,9 +9,9 @@ class TextureRegion;
 class AboutDialog : public IWindow
 {
 public:
-  static constexpr const char id[] = "AboutDialog";
-  std::shared_ptr<TextureRegion> dcgiReg;
+	static constexpr const char id[] = "AboutDialog";
+	std::shared_ptr<TextureRegion> dcgiReg;
 
-  AboutDialog();
-  void render() override;
+	AboutDialog();
+	void render() override;
 };

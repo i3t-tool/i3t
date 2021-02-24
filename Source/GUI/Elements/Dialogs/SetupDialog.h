@@ -8,7 +8,7 @@
 class SetupDialog : public IWindow
 {
 public:
-  static constexpr const char id[] = "SetupDialog";
+	static constexpr const char id[] = "SetupDialog";
 
-  virtual void render() override;
+	virtual void render() override;
 };

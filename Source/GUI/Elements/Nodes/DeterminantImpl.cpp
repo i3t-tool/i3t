@@ -1,10 +1,10 @@
 //
 //#include "DeterminantImpl.h"
 //
-//using namespace Builder;
+// using namespace Builder;
 //
 //// Will be almost look the same in all nodes
-//Namespace* DeterminantImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+// Namespace* DeterminantImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
 //{
 //  auto NV = new DeterminantImpl(GetNextId(), "Determinant");
 //  s_nodes->emplace_back(NV);
@@ -30,7 +30,7 @@
 //  return s_nodes->back();
 //}
 //
-//void DeterminantImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void DeterminantImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  for (auto& output : Outputs)
 //  {
@@ -52,7 +52,7 @@
 //  }
 //}
 //
-//void DeterminantImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void DeterminantImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //    //Make new function drawHeader?
 //    //header
@@ -86,7 +86,7 @@
 //  }
 //}
 //
-//void DeterminantImpl::drawBox(util::NodeBuilder& builder)
+// void DeterminantImpl::drawBox(util::NodeBuilder& builder)
 //{
 //
 //  float data = nodebase->getInternalData().getFloat();

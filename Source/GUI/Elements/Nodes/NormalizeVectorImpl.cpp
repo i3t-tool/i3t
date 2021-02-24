@@ -1,10 +1,10 @@
 //
 //#include "NormalizeVectorImpl.h"
 //
-//using namespace Builder;
+// using namespace Builder;
 //
 //// Will be almost look the same in all nodes
-//Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
+// Namespace* NormalizeVectorImpl::SpawnNode(std::vector<Namespace*>* s_nodes)
 //{
 //  auto NV = new NormalizeVectorImpl(GetNextId(), "NormalizeVector");
 //  s_nodes->emplace_back(NV);
@@ -30,7 +30,7 @@
 //  return s_nodes->back();
 //}
 //
-//void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void NormalizeVectorImpl::drawOutputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  for (auto& output : Outputs)
 //  {
@@ -52,7 +52,7 @@
 //  }
 //}
 //
-//void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
+// void NormalizeVectorImpl::drawInputs(util::NodeBuilder& builder, GUIPin* newLinkPin)
 //{
 //  builder.Header(Color);
 //  ImGui::Spring(0);
@@ -83,7 +83,7 @@
 //  }
 //}
 //
-//void NormalizeVectorImpl::drawBox(util::NodeBuilder& builder)
+// void NormalizeVectorImpl::drawBox(util::NodeBuilder& builder)
 //{
 //
 //  float x[4] = {0, 0, 0, 0};

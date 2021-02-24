@@ -4,9 +4,9 @@
 //#include "../Windows/WorkspaceWindow.h"
 //
 //
-//class MatrixImpl : public Namespace
+// class MatrixImpl : public Namespace
 //{
-//public:
+// public:
 //  MatrixImpl(int id, const char* name)
 //    {
 //        Type = ENodeType::Matrix;

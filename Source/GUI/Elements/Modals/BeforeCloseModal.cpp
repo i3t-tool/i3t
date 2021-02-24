@@ -6,45 +6,45 @@
 
 void BeforeCloseModal::render()
 {
-  ImGui::OpenPopup("Close?###%s");
+	ImGui::OpenPopup("Close?###%s");
 
-  // Always center this window when appearing
-  ImVec2 center = ImVec2(ImGui::GetWindowSize().x * 0.5f, ImGui::GetWindowSize().y * 0.5f);
-  // ImVec2 parent_pos = ImGui::GetWindowPos();
-  // ImVec2 parent_size = ImGui::GetWindowSize();
-  // ImVec2 center(parent_pos.x + parent_size.x * 0.5f, parent_pos.y + parent_size.y * 0.5f);
-  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	// Always center this window when appearing
+	ImVec2 center = ImVec2(ImGui::GetWindowSize().x * 0.5f, ImGui::GetWindowSize().y * 0.5f);
+	// ImVec2 parent_pos = ImGui::GetWindowPos();
+	// ImVec2 parent_size = ImGui::GetWindowSize();
+	// ImVec2 center(parent_pos.x + parent_size.x * 0.5f, parent_pos.y + parent_size.y * 0.5f);
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-  if (ImGui::BeginPopupModal("Close?###%s", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-  {
-    ImGui::Text("Any unsaved content will be discarded, are you sure?\n\n");
-    ImGui::Separator();
+	if (ImGui::BeginPopupModal("Close?###%s", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Any unsaved content will be discarded, are you sure?\n\n");
+		ImGui::Separator();
 
-    if (ImGui::Button("Save and quit", ImVec2(100, 0)))
-    {
-      HideWindowCommand::dispatch(id);
-      CloseCommand::dispatch();
+		if (ImGui::Button("Save and quit", ImVec2(100, 0)))
+		{
+			HideWindowCommand::dispatch(id);
+			CloseCommand::dispatch();
 
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::SetItemDefaultFocus();
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SetItemDefaultFocus();
 
-    ImGui::SameLine();
-    if (ImGui::Button("Quit anyway", ImVec2(100, 0)))
-    {
-      HideWindowCommand::dispatch(id);
-      CloseCommand::dispatch();
+		ImGui::SameLine();
+		if (ImGui::Button("Quit anyway", ImVec2(100, 0)))
+		{
+			HideWindowCommand::dispatch(id);
+			CloseCommand::dispatch();
 
-      ImGui::CloseCurrentPopup();
-    }
+			ImGui::CloseCurrentPopup();
+		}
 
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel", ImVec2(100, 0)))
-    {
-      HideWindowCommand::dispatch(id);
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(100, 0)))
+		{
+			HideWindowCommand::dispatch(id);
 
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
-  }
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
 }

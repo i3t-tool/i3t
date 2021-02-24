@@ -16,8 +16,8 @@ class Geometry;
 class ObjReader
 {
 public:
-  static Geometry* geometryFromOBJ(const char* filename);
-  static Geometry* geometryFromOBJ(const char* filename, float scale);
+	static Geometry* geometryFromOBJ(const char* filename);
+	static Geometry* geometryFromOBJ(const char* filename, float scale);
 };
 
 #endif

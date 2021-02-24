@@ -1,8 +1,8 @@
 //#pragma once
 //#include "../Windows/WorkspaceWindow.h"
 //
-//class FloatImpl : public Namespace {
-//public:
+// class FloatImpl : public Namespace {
+// public:
 //  FloatImpl(int id, const char* name)
 //  {
 //    Type = ENodeType::Float;

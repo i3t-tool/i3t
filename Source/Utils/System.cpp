@@ -7,6 +7,6 @@
 void runShell(const char* sexe)
 {
 #ifdef WIN32
-  ShellExecute(NULL, "open", sexe, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, "open", sexe, NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
