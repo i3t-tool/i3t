@@ -254,21 +254,6 @@ public:
     m_id = IdGenerator::next();
   }
 
-  /* \todo maybe some better implementation - I am not good in security impl... */
-  [[nodiscard]] const Pin* getParentPin() const
-  {
-    if (m_isInput)
-    {
-      Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-      return m_input;
-    }
-    else
-    {
-      Debug::Assert(false, "Output pin can not has parent pin!");
-      return nullptr;
-    }
-  }
-
   [[nodiscard]] ID getId() const { return m_id; }
 
   [[nodiscard]] int getIndex() const { return m_index; }
