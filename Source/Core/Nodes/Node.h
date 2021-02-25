@@ -196,7 +196,7 @@ public:
 	 * Implements the operator reaction to the change of its \a inputIndex input.
 	 *
 	 * 1. Forces the operator to recompute its outputs based on the changed input \a
-	 *    inputIndex byc calling updateValues() and <BR>
+	 *    inputIndex by calling updateValues() and <BR>
 	 * 2. Spread signal to the connected children by spreadSignal().
 	 *
 	 * This method is called by the spreadSignal() of the parent box in the
@@ -271,7 +271,7 @@ public:
 		}
 		else
 		{
-			Debug::Assert(false, "Output pin can not has parent pin!");
+			Debug::Assert(false, "Output pin can not have a parent pin!");
 			return nullptr;
 		}
 	}
