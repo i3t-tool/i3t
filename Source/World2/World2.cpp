@@ -48,10 +48,10 @@ World2* World2::loadDefaultScene(){
   RenderTexture* rend;
   GameObject *terrainGrass, *terrainRocks, *skybox, *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild;
 
-  grassTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grass.jpg").c_str());
-  grassBigTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grassbig.jpg").c_str());
-  rocksTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/rocks.jpg").c_str());
-  skyboxTexture =   pgr::createTexture(Config::getAbsolutePath("/Data/textures2/skybox.png").c_str());
+  grassTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grass.jpg"));
+  grassBigTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grassbig.jpg"));
+  rocksTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/rocks.jpg"));
+  skyboxTexture =   pgr::createTexture(Config::getAbsolutePath("/Data/textures2/skybox.png"));
 
   rend =        new RenderTexture(&renderTexture,256,256);
 

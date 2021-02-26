@@ -59,12 +59,12 @@ public:
   std::vector<Component*> components; ///< components with functionalities - have render and update functions, that are called in app loop
 
   bool isRender;         ///< enable/disable rendering
-  glm::mat4x4 transform; ///< transformation matrix of this object, is composed from pos*rot*scal matricies, meaning
-                         ///< if rot,pos,scal matricies are edited directly, transfrom must be recalculated
+  glm::mat4x4 transform; ///< transformation matrix of this object, is composed from pos*rot*scal matrices, meaning
+                         ///< if rot,pos,scal matrices are edited directly, transform must be recalculated
 
   /// Unparent this object
   /**
-    \param[in] keepTransform keep observable transfromation after reparenting?
+    \param[in] keepTransform keep observable transformation after re-parenting?
   */
   static glm::mat4 inheritedTransform(GameObject* obj);
   void unparent(bool keepTransform);
@@ -87,16 +87,16 @@ public:
     Creates scene object without any geometry.
     \param[in] mesh Mesh data of this object
     \param[in] shader Shader program that is used for rendering this object
-    \param[in] param Callback Function that is called on draw(). Can be NULL.
+    \param[in] param Callback Function that is called on draw(). Can be NULL. \todo PF -chybejici parametr
     \param[in] texture Texture of this object. Set 0 for no texture, object is then rendered solid black
   */
   GameObject(pgr::MeshData mesh, GLuint shader, GLuint texture);
   /// Translate, scale and rotate object at once
   /**
-    Because calling rotate, scale and rotate separatelly makes init of many objects very tedious.
+    Because calling rotate, scale and rotate separately makes init of many objects very tedious.
 
     \param[in] trans Translation
-    \param[in] scal Scale
+    \param[in] scale Scale
     \param[in] rotAxis Rotation axis
     \param[in] degrees Angle in degrees
   */

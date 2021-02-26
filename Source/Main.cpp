@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
    *		   Setting to ".\\" or ".") does not work either
    *			  not working ofstream if Config::WORKING_DIRECTORY="." in void RecentFiles::writeRecent()
    *			  can't open config file : .\\data\gimbalContent.cnt
-   *		   The ofstream and "." works strange also for starting by doubleclick.
+   *		   The ofstream and "." works strange also for starting by double click.
    *
    *	Solution:  GetCurrentDirectory
    */

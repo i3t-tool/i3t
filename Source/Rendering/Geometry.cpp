@@ -62,7 +62,7 @@ void Geometry::calculateAABB()
 
   for (unsigned int i = 1; i < verticesCount; i++)
   {
-    const int index = i * attribsPerVertex; // Trinagle first vertex index
+    const int index = i * attribsPerVertex; // Triangle first vertex index
 
     if (vertices[index] < low.x)
       low.x = vertices[index];
