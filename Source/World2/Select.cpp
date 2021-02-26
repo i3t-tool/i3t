@@ -1,5 +1,7 @@
 #include "Select.h"
 #include "Component.h"
+#include "World2.h"
+#include "../Core/InputController.h"
 Component* Select::stencilRef[256] = {NULL};
 
 int Select::registerStencil(Component* owner){
@@ -24,10 +26,9 @@ bool Select::freeStencil(Component* owner){
 }
 unsigned char Select::getStencilAt(int x, int y, int r, int filter){
   int w=r*2+1,h=r*2+1;x-=r;y-=r;
-  unsigned char*read=(unsigned char*)malloc(w * h);
-  glPixelStorei(GL_PACK_ALIGNMENT, 1);
-  glReadPixels(x, y, w, h, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &read);
-
+  unsigned int*read=(unsigned int*)malloc(size_t(w * h*sizeof(unsigned int)));
+  glReadPixels(x, y, w, h, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, read);
+  
   unsigned char stencilnum = 0;
   int pos;
   float dist, closest = 1000000.0f, tmp;
@@ -38,6 +39,7 @@ unsigned char Select::getStencilAt(int x, int y, int r, int filter){
       tmp=j-w*0.5f;
       dist+=tmp*tmp;
       pos=w*i+j;
+      read[pos] = read[pos] & 255;
       if (dist < closest && Select::stencilRef[read[pos]] != NULL && read[pos] != filter){closest = dist;stencilnum = read[pos];}
     }
   }

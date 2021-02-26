@@ -13,3 +13,4 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis);
 glm::vec3 getScale(glm::mat4 transform);
 glm::mat4 getFullTransform(GameObject* obj);
 float angle2(float x, float y);
+bool dirEqual(glm::vec3 v1,glm::vec3 v2);

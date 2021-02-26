@@ -1,6 +1,7 @@
 #pragma once
 #include "pgr.h"
 #include "GameObject.h"
+#include "../Rendering/FrameBuffer.h"
 
 class GameObject;
 class World2
@@ -36,16 +37,15 @@ public:
     Draws scene, updates global camera matricies
   */
   void onUpdate();
-  GameObject* sceneRoot;
+  GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
 
 
   static bool initRender();
-  static int width;               ///< current viewport width
-  static int height;              ///< current viewport width
-  static glm::mat4x4 perspective; ///< Global perspective matrix, updated by Callbacks::onResize
-  static glm::mat4x4 mainCamera;  ///< Global camera transform, updated by Render::onDisplay
-  static glm::vec3 mainCamPos;    ///< Global camera position before rotation. Needed for reflection calculation in fs
-  //static World2* current;
+  static float width;               ///< current viewport width
+  static float height;              ///< current viewport width
+  static glm::mat4x4 perspective; ///< Main camera perspective matrix, updated by Callbacks::onResize. Accessed by GameObject::draw(glm::mat4).
+  static glm::mat4x4 mainCamera;  ///< Main camera transform, updated by Render::onDisplay. Accessed by GameObject::draw(glm::mat4).
+  static glm::vec3 mainCamPos;    ///< Main camera position before rotation. Needed for reflection calculation in fs. Accessed by GameObject::draw(glm::mat4).
 
   static GLuint shader0; ///< Default shader
   static GLuint shaderTerrain; ///< Terrain shader
