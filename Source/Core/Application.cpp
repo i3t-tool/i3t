@@ -44,7 +44,6 @@ void Application::initWindow()
 {
   m_window = new GlfwWindow();
   m_window->init();
-
   /// \todo Show console -> ShowWindow() function is from Win32 API.
   // showConsole(Config::SHOW_CONSOLE);
 
@@ -110,6 +109,8 @@ void Application::initImGui()
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(m_window->get(), true);
   ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion);
+  //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //this doesnt work (3bpp textures)
 }
 
 void Application::run()

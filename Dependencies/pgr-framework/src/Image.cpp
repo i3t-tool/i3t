@@ -73,6 +73,8 @@ bool loadTexImage2D(const std::string & fileName, GLenum target) {
 }
 
 GLuint createTexture(const std::string &fileName, bool mipmap) {
+   //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   // generate and bind one texture
   GLuint tex = 0;
   glGenTextures(1, &tex);
