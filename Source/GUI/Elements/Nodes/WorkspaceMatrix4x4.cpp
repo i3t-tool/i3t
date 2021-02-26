@@ -1,15 +1,13 @@
 #include "WorkspaceMatrix4x4.h"
 
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground)
-		: WorkspaceNodeBaseData(Builder::createNode<ENodeType::Matrix>()),
-			WorkspaceNode(Nodebase->getId(), "default Matrix4x4 label",
-                    headerBackground) /* \todo take default label from Const.h*/
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
+    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
 {
 }
 
-void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
+void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
-	const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
+    const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
 	bool valueCH = false;
 	std::string s = "";
 	const char* c = "";
@@ -34,7 +32,7 @@ void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
 			s += std::to_string(rows);
 			s += std::to_string(columns);
 			c = s.c_str();
-			valueCH |= ImGui::InputFloat(c, &localData[rows][columns]);
+			valueCH |= ImGui::DragFloat(c, &localData[rows][columns]);
 			if (columns < 3)
 			{
 				ImGui::SameLine();
@@ -49,16 +47,4 @@ void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
 	}
 
 	ImGui::Spring(0);
-}
-
-void WorkspaceMatrix4x4::drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
-{
-	builder.Begin(Id);
-
-	drawWorkspaceNodeHeader(builder);
-	drawWorkspaceInputs(builder, newLinkPin);
-	drawWorkspaceNodeData(builder);
-	drawWorkspaceOutputs(builder, newLinkPin);
-
-	builder.End();
 }

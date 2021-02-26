@@ -1,13 +1,11 @@
 #include "WorkspaceNormalizeVector.h"
 
-WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground)
-		: WorkspaceNodeBaseData(Builder::createNode<ENodeType::NormalizeVector>()),
-			WorkspaceNode(Nodebase->getId(), "default NormalizeVector label",
-                    headerBackground) /* \todo take default label from Const.h */
+WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel = "default NormalizeVector header")
+    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::NormalizeVector>(), headerBackground, headerLabel)
 {
 }
 
-void WorkspaceNormalizeVector::drawWorkspaceNodeData(util::NodeBuilder& builder)
+void WorkspaceNormalizeVector::drawData(util::NodeBuilder& builder)
 {
 	const glm::vec4& coreData = Nodebase->getInternalData().getVec4();
 	bool valueCH = false;
@@ -32,14 +30,14 @@ void WorkspaceNormalizeVector::drawWorkspaceNodeData(util::NodeBuilder& builder)
 	ImGui::Spring(0);
 }
 
-void WorkspaceNormalizeVector::drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
+void WorkspaceNormalizeVector::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
 	builder.Begin(Id);
 
-	drawWorkspaceNodeHeader(builder);
-	drawWorkspaceInputs(builder, newLinkPin);
-	drawWorkspaceNodeData(builder);
-	drawWorkspaceOutputs(builder, newLinkPin);
+	drawHeader(builder);
+	drawInputs(builder, newLinkPin);
+	drawData(builder);
+	drawOutputs(builder, newLinkPin);
 
 	builder.End();
 }

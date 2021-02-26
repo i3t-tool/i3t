@@ -1,16 +1,15 @@
-#include "WorkspaceElements.h"
+#include "WorkspaceNodeWithCoreData.h"
 
 /* Order of inheritance is important! WorkspaceNodeBaseData has to be first because it is necessary first create
  * NodeBase to read data from it */
-class WorkspaceNormalizeVector : public WorkspaceNodeBaseData, public WorkspaceNode
-
+class WorkspaceNormalizeVector : public WorkspaceNodeWithCoreData
 {
 public:
-	WorkspaceNormalizeVector(ImTextureID headerBackground);
+	WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel);
 
-	void drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
-	void drawWorkspaceNodeData(util::NodeBuilder& builder);
+	void drawData(util::NodeBuilder& builder);
 
 	/*! \fn void fromArrayToVec4(glm::vec4& vec, float arr[4])
 	    \brief convert float array of size 4 to glm::vec4

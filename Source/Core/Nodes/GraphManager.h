@@ -23,7 +23,7 @@ namespace Builder
  */
 template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
 {
-	auto&& ret = std::make_unique<Core::NodeImpl<T>>();
+	auto ret = std::make_unique<Core::NodeImpl<T>>();
 	ret->updateValues(0);
 	return ret;
 }

@@ -12,7 +12,8 @@
 #include "../Nodes/MatrixImpl.h"
 #include "../Nodes/NormalizeVectorImpl.h"
 
-#include "../Nodes/WorkspaceMatrix4x4.h"
+#include "../Nodes/WorkspaceNodeWithCoreData.h"
+#include "../Nodes/WorkspaceMatrixTranslation.h"
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
 // using namespace Core;
@@ -61,20 +62,27 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(NodeEditorContext);
 
 	/* \todo adding nodes here just for testing */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
-
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
+    /*---*/
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
-	Core::GraphManager::plug(dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	                         dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
-	dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get())
-			->WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(getLinkID()));
+	Core::GraphManager::plug(static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(0).get())->Nodebase,
+	                         static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
 
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
+	/*---*/
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 3"));
+	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+
+    Core::GraphManager::plug(static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(0).get())->Nodebase,
+	                         static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
+
+	/*---*/
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
+	/*--*/
 	ne::NavigateToContent();
 
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
@@ -117,15 +125,21 @@ void WorkspaceWindow::render()
 
 	for (auto&& WorkspaceNode : WorkspaceNodes)
 	{
-		WorkspaceNode->drawWorkspaceNode(NodeBuilderContext, nullptr);
+		WorkspaceNode->drawNode(NodeBuilderContext, nullptr);
 	}
 
-	/* \todo I am not able to do it with for-each loop - compilation fail on casting - if somebody can do it... */
-	for (int i = 0; i < WorkspaceNodes.size(); ++i)
+	/* link have to be drawn after both of pins was drawn */
+	for (auto&& WorkspaceNode : WorkspaceNodes)
 	{
-		dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(i).get())
-				->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
+		WorkspaceNode->drawInputLinks();
 	}
+//
+//	/* \todo I am not able to do it with for-each loop - compilation fail on casting - if somebody can do it... */
+//
+//	for (int i = 0; i < WorkspaceNodes.size(); ++i)
+//	{
+//		WorkspaceNodes.at(i).get()->drawInputLinks(); /* \todo skip nodes with no inputs...*/
+//	}
 
 	ne::End();
 
