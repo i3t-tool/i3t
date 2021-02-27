@@ -21,7 +21,7 @@ namespace Builder
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
+template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
 {
 	auto ret = std::make_unique<Core::NodeImpl<T>>();
 	ret->updateValues(0);
@@ -87,24 +87,24 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-	static ENodePlugResult plug(const UPtr<Core::NodeBase>& leftNode, const UPtr<Core::NodeBase>& rightNode,
+	static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
 	/// Unplug all inputs and outputs.
-	static void unplugAll(UPtr<Core::NodeBase>& node);
+	static void unplugAll(Ptr<Core::NodeBase>& node);
 
 	/**
 	 * Unplug plugged node from given input pin of this node.
 	 *
 	 * \param index
 	 */
-	static void unplugInput(UPtr<Core::NodeBase>& node, int index);
+	static void unplugInput(Ptr<Core::NodeBase>& node, int index);
 
 	/**
 	 * Unplug all nodes connected to given output pin of this node.
 	 *
 	 * \param index
 	 */
-	static void unplugOutput(UPtr<Core::NodeBase>& node, int index);
+	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 };
 } // namespace Core

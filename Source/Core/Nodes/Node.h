@@ -31,7 +31,8 @@ struct ValueSetResult
 	enum class Status
 	{
 		Ok = 0,
-		Err_ConstraintViolation
+		Err_ConstraintViolation,
+		Err_LogicError
 	};
 
 	const Status status;
@@ -140,9 +141,15 @@ public:
 			m_internalData[0].setValue(mat);
 			return ValueSetResult{ValueSetResult::Status::Ok, ""};
 		}
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not a free transformation."};
+		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Not a free transformation."};
 	}
 
+	/**
+	 *
+	 * \param val
+	 * \param coords in column major order, coords.x is column index and coords.y is row index.
+	 * \return
+	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,

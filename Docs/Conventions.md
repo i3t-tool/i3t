@@ -8,8 +8,9 @@ Aneb, jak by měl kód od každého přispěvatele vypadat.
  *                                                               
  * Declares the edit box class.                                   
  */                                                             
-#ifndef _EDIT_BOX_H_
-#define _EDIT_BOX_H_
+#ifndef EDIT_BOX_H_
+#define EDIT_BOX_H_
+// nebo #pragma once
 
 #include <string>
 
@@ -32,13 +33,13 @@ private:
 
 ### Doporučení pro C++
 - **Nikdy** nepoužívat `using namespace std;`. Může kvůli tomu docházet ke konfliktům.
-- **Nikdy** nepoužívat v cestách velmi velmi ošklivá zpětná lomítka `path\\to\\file`, je preferován POSIX 
+- **Nikdy** nepoužívat v cestách velmi velmi ošklivá zpětná lomítka `path\to\file`, je preferován POSIX 
 styl `path/to/file` (Windows „umí“ i tyto cesty).
 - `auto` proměnné jen pro iterátory nebo pro přímou inicializaci proměnných. Například
 `auto map = std::map<std::string, GUI::Elements::Tab>`.
 
 ### Struktura kódu
-- **Statické proměnné** deklarujeme na konci `.cpp` souboru.
+- **Statické proměnné** deklarujeme na začátku `.cpp` souboru.
 - **Hlavičkové soubory** includujeme ve skupinách oddělených prázdným řádkem,
 a to v následujícím pořadí:
     - **1.** hlavičkový soubor přidružený k danému `.cpp` souboru,
@@ -62,5 +63,6 @@ automaticky, pokud ne, je třeba podporu ručně nastavit.)
 - Všechny **proměnné** a **funkce** ``myVariable`` pojmenovávat také ve stylu camel-case, ale s malým počátečním písmenem.
 - Všechny **C++ soubory** ``FileUtils.[cpp/h]`` pojmenovávat stejně jako třídy a struktury.
 - **Globální proměnné** s prefixem `g_`.
-- **Členské proměnné** stejně jako proměnné, ale s prefixem `m_`.
+- **Členské proměnné** stejně jako proměnné, ale s prefixem `m_`. U čistě datových struktur (bez členských funkcí)
+  je přípustné použití jména bez prefixu.
 - **Členské statické** proměnné s prefixem `s_`.

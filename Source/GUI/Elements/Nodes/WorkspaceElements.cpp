@@ -98,7 +98,7 @@ bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
 
 /* see:
  * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
-WorkspaceNodeBaseData::WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nodebase) : Nodebase(std::move(nodebase))
+WorkspaceNodeBaseData::WorkspaceNodeBaseData(Ptr<Core::NodeBase> nodebase) : Nodebase(std::move(nodebase))
 {
 	std::ostringstream pinName;
 	std::string pinNameStr;
@@ -120,6 +120,7 @@ WorkspaceNodeBaseData::WorkspaceNodeBaseData(std::unique_ptr<Core::NodeBase> nod
 				pinNameStr.c_str() //,std::format("input #{}", pin.getIndex()) // format is not part of standard library
 				,
 				PinKind::Input, pin.getType()));
+    WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(pin.getId()));
 		pinName.str("");
 	}
 

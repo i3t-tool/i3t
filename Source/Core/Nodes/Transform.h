@@ -107,4 +107,90 @@ public:
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
+
+class AxisAngleRot : public NodeBase
+{
+	float m_initialRads;
+	glm::vec3 m_initialAxis;
+
+public:
+	AxisAngleRot(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
+			: NodeBase(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
+	{
+	}
+
+	void updateValues(int inputIndex) override;
+};
+
+class QuatRot : public NodeBase
+{
+	glm::quat m_initialQuat;
+
+public:
+	QuatRot(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
+			: NodeBase(getTransformProps(ETransformType::Quat)), m_initialQuat(q)
+	{
+	}
+};
+
+class OrthoProj : public NodeBase
+{
+
+public:
+	OrthoProj(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
+	          float far = 10.0f)
+	{
+	}
+
+	void updateValues(int inputIndex) override;
+};
+
+class PerspectiveProj : public NodeBase
+{
+	float m_initialFOW;
+	float m_initialAspect;
+	float m_initialZNear;
+	float m_initialZFar;
+
+public:
+	PerspectiveProj(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
+			: NodeBase(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
+				m_initialZNear(zNear), m_initialZFar(zFar)
+	{
+	}
+
+	void updateValues(int inputIndex) override;
+};
+
+class Frustum : public NodeBase
+{
+	// \todo MH Frustum initial values.
+public:
+	Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
+	        float far = 10.0f)
+	    : NodeBase(getTransformProps(ETransformType::Frustum))
+	{
+	}
+
+	void updateValues(int inputIndex) override;
+};
+
+/**
+ * Same as perspective projection node, but all values are locked.
+ */
+class LookAt : public NodeBase
+{
+	glm::vec3 m_initialEye;
+	glm::vec3 m_initialCenter;
+	glm::vec3 m_initialUp;
+
+public:
+	LookAt(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
+	       const glm::vec3& up = {0.0f, 1.0f, 0.0f})
+	    : NodeBase(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center), m_initialUp(up)
+	{
+	}
+
+	void updateValues(int inputIndex) override;
+};
 } // namespace Core
