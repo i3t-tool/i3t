@@ -60,7 +60,7 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 	return ENodePlugResult::Ok;
 }
 
-ENodePlugResult GraphManager::plug(const UPtr<Core::NodeBase>& leftNode, const UPtr<Core::NodeBase>& rightNode,
+ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
 	Debug::Assert(rightNode->m_inputs.size() > myIndex, "Desired input pin in this node with myIndex does not exists!");
@@ -79,17 +79,17 @@ ENodePlugResult GraphManager::plug(const UPtr<Core::NodeBase>& leftNode, const U
 	return ENodePlugResult::Ok;
 }
 
-void GraphManager::unplugAll(UPtr<Core::NodeBase>& node)
+void GraphManager::unplugAll(Ptr<Core::NodeBase>& node)
 {
 	node.get()->_unplugAll();
 }
 
-void GraphManager::unplugInput(UPtr<Core::NodeBase>& node, int index)
+void GraphManager::unplugInput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->_unplugInput(index);
 }
 
-void GraphManager::unplugOutput(UPtr<Core::NodeBase>& node, int index)
+void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->_unplugOutput(index);
 }

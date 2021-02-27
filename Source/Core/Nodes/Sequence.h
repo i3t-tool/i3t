@@ -16,7 +16,7 @@ class Sequence : public NodeBase
 {
 	using Matrix = NodeBase;
 
-	std::vector<UPtr<Matrix>> m_matrices;
+	std::vector<Ptr<Matrix>> m_matrices;
 
 public:
 	Sequence() : NodeBase(&g_sequence){};
@@ -27,8 +27,10 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	void addMatrix(UPtr<Matrix> matrix, const int index) noexcept
+	void addMatrix(Ptr<Matrix> matrix, const int index) noexcept
 	{
+		/// \todo MH matrix validation.
+
 		if (index > m_matrices.size())
 			m_matrices.push_back(std::move(matrix));
 		else
@@ -46,12 +48,12 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] UPtr<Matrix>& getMatRef(size_t idx) { return m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Matrix>& getMatRef(size_t idx) { return m_matrices.at(idx); }
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] UPtr<Matrix> popMatrix(const int index)
+	[[nodiscard]] Ptr<Matrix> popMatrix(const int index)
 	{
 		Debug::Assert(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
 
