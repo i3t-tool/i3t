@@ -68,8 +68,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
-	Core::GraphManager::plug(static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(0).get())->Nodebase,
-	                         static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
+	Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
+	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
 
 	/*---*/
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 3"));
