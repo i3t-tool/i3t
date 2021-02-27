@@ -3,14 +3,14 @@
 #include "../GameObject.h"
 
 
-class Transformate: public Component{
+class TransformHandles: public Component{
 public:
-	Transformate(GameObject*_editedobj);
+	TransformHandles(GameObject*_editedobj);
 	void start();
 	void update();
 	void render(glm::mat4*parent,bool renderTransparent);
-	static const char* componentType(){return Transformate::typeStatic;};
-	const char* getComponentType(){return Transformate::typeStatic;};
+	static const char* componentType(){return TransformHandles::typeStatic;};
+	const char* getComponentType(){return TransformHandles::typeStatic;};
 
 	static const int EDIT_LOCAL=0,EDIT_FREE=5,EDIT_ROTATION=7,EDIT_SCALE=8,EDIT_POSITION=9,EDIT_LOOKAT=10;
 	int editmode=EDIT_ROTATION;

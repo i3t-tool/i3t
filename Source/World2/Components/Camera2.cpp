@@ -36,18 +36,19 @@ Camera2::Camera2(float viewingAngle, GameObject* sceneRoot){
 
 void Camera2::renderRecursive(GameObject* obj, glm::mat4 parent,bool isTranspartentPass){
   for (int i = 0; i < obj->components.size(); i++){if (obj->components[i]->isActive){obj->components[i]->render(&parent, isTranspartentPass);}}
-  for (int i = 0; i < obj->children.size(); i++){renderRecursive(obj->children[i], parent * obj->transform,isTranspartentPass);}
+  for (int i = 0; i < obj->children.size(); i++){renderRecursive(obj->children[i], parent * obj->transformation,isTranspartentPass);}
 }
 
 void Camera2::start(){}
 
 void Camera2::update(){
-
+  GLint fbobkp = 0;
   if (this->mainCamera){
     this->perspective = glm::perspective(glm::radians(angle), World2::width / World2::height, 0.2f, 2000.0f);
     glViewport(0, 0, World2::width, World2::height);
   }
   else{
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbobkp);
     glBindFramebuffer(GL_FRAMEBUFFER, this->fbo->getFbo());
     glStencilMask(255);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -60,7 +61,7 @@ void Camera2::update(){
 
   glm::mat4 transform = glm::mat4(1.0f); //*owner->parent->transform*owner->transform;
   GameObject* obj = owner;
-  while (obj != NULL){transform = obj->transform * transform;obj = obj->parent;}
+  while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
 
   World2::perspective = this->perspective;
   World2::mainCamPos = -(glm::vec3)transform[3];
@@ -73,9 +74,7 @@ void Camera2::update(){
   renderRecursive(sceneRoot, glm::mat4(1.0f),true);//render transparent
 
   if (!this->mainCamera){
-    GLint fbo = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbobkp);
     World2::mainCamPos = posbkp;
     World2::perspective = perspectivebkp;
     World2::mainCamera = mainCamera2bkp;

@@ -27,7 +27,7 @@ CameraHandles::CameraHandles(){
 	this->shader_colh=glGetUniformLocation(World2::shaderHandle, "color");
 }
 void CameraHandles::start(){
-	this->cam = (Camera2*)this->owner->getComponent(Camera2::componentType());printf("Camera2 0x%p\n",this->cam);
+	this->cam = (Camera2*)this->owner->getComponent(Camera2::componentType());
 	this->frustrum = new GameObject(unitcubeMesh, World2::shaderProj, 0);
 	this->frustruml = new GameObject(cubelinesMesh, World2::shaderProj, 0);
 	this->frustruml->primitive = GL_LINES;
@@ -39,7 +39,7 @@ void CameraHandles::start(){
 
 void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 projinv=glm::inverse(this->cam->perspective);
-	glm::mat4 transform=(*parent)*this->owner->transform;
+	glm::mat4 transform=(*parent)*this->owner->transformation;
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 		
 	glUseProgram(World2::shaderProj);
@@ -79,8 +79,8 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 				}
 
 				float depth=(World2::perspective*World2::mainCamera*transform*pos)[2];
-				this->handle->transform=glm::mat4(depth*0.01f+0.1);
-				this->handle->transform[3]=pos;
+				this->handle->transformation=glm::mat4(depth*0.01f+0.1);
+				this->handle->transformation[3]=pos;
 				this->handle->draw(transform);
 				//printf("%d, %f %f %f %f\n",i,pos[0],pos[1],pos[2],pos[3]);//getchar();
 			}
@@ -88,7 +88,7 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 		}
 		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
 		if(this->editmode==CameraHandles::EDIT_PERSPECTIVE||this->editmode==CameraHandles::EDIT_FRUSTUM){mov[2]=1.5f;}
-		this->cameraico->transform[3]+=mov;
+		this->cameraico->transformation[3]+=mov;
 		
 		float color=(float)this->isEdit*0.2f+0.8f;
 		glUseProgram(World2::shaderHandle);
@@ -99,7 +99,7 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 		this->cameraico->draw(transform);
 		glStencilMask(0);
 			
-		this->cameraico->transform[3]-=mov;
+		this->cameraico->transformation[3]-=mov;
 	}
 	
 }

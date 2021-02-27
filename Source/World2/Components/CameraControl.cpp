@@ -31,16 +31,16 @@ void CameraControl::update(){
 			
 		//owner->rot=rotx*owner->rot*roty;
 		//owner->translate(glm::vec3(0.0f));
-		glm::vec4 tmp=owner->transform[3];
-		owner->transform[3]=glm::vec4(0.0f,0.0f,0.0f,1.0f);
+		glm::vec4 tmp=owner->transformation[3];
+		owner->transformation[3]=glm::vec4(0.0f,0.0f,0.0f,1.0f);
 			
 			
 		//owner->transform=owner->transform*roty;
 		//owner->transform=rotx*owner->transform;
-		owner->transform=glm::rotate(owner->transform, glm::radians(-y), glm::vec3(1.0f, 0.0f, 0.0f));
-		owner->transform=glm::rotate(glm::mat4(1.0f), glm::radians(-x), glm::vec3(0.0f, 1.0f, 0.0f))*owner->transform;
+		owner->transformation=glm::rotate(owner->transformation, glm::radians(-y), glm::vec3(1.0f, 0.0f, 0.0f));
+		owner->transformation=glm::rotate(glm::mat4(1.0f), glm::radians(-x), glm::vec3(0.0f, 1.0f, 0.0f))*owner->transformation;
 			
-		owner->transform[3]=tmp;
+		owner->transformation[3]=tmp;
 	}
 		
 	glm::vec4 move = glm::vec4(0.0f);

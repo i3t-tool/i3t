@@ -2,7 +2,7 @@
 #include <typeinfo>
 #include <math.h>
 #include "glm/gtx/norm.hpp"
-#include "Transformate.h"
+#include "TransformHandles.h"
 #include "Renderer.h"
 #include "../HardcodedMeshes.h"
 #include "../World2.h"
@@ -10,21 +10,21 @@
 #include "../Select.h"
 #include "../../Core/InputController.h"
 
-const char* Transformate::typeStatic=NULL;
-GLint Transformate::shader_color;
+const char* TransformHandles::typeStatic=NULL;
+GLint TransformHandles::shader_color;
 	
 void drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,bool active){
 	glStencilMask(255*(stencil!=-1));
 	glStencilFunc(GL_ALWAYS, (unsigned char)stencil, 255);
 	glUseProgram(World2::shaderHandle);
-	if(active){glUniform4f(Transformate::shader_color, 1.0f,1.0f,1.0f,color[3]);}
-	else{glUniform4f(Transformate::shader_color, color[0],color[1],color[2],color[3]);}
+	if(active){glUniform4f(TransformHandles::shader_color, 1.0f,1.0f,1.0f,color[3]);}
+	else{glUniform4f(TransformHandles::shader_color, color[0],color[1],color[2],color[3]);}
 	_handle->draw(space);
 }
 	
-Transformate::Transformate(GameObject*_editedobj){
-	Transformate::typeStatic=typeid(Transformate).name();
-	this->type=Transformate::typeStatic;
+TransformHandles::TransformHandles(GameObject*_editedobj){
+	TransformHandles::typeStatic=typeid(TransformHandles).name();
+	this->type=TransformHandles::typeStatic;
 		
 	this->editedobj=_editedobj;
 	shader_color = glGetUniformLocation(World2::shaderHandle, "color");
@@ -40,22 +40,22 @@ Transformate::Transformate(GameObject*_editedobj){
 	this->stencilaxisz=	Select::registerStencil(this);
 	this->stencilaxisw=	Select::registerStencil(this);
 }
-void Transformate::start(){
+void TransformHandles::start(){
 	this->circleh =	new GameObject(unitcircleMesh, World2::shaderHandle, 0);
 	this->arrowh =	new GameObject(arrowMesh, World2::shaderHandle, 0);
 	this->planeh =	new GameObject(quadMesh, World2::shaderHandle, 0);
 	this->scaleh =	new GameObject(scalearrowMesh, World2::shaderHandle, 0);
 	this->uniscaleh=new GameObject(unitcubeMesh, World2::shaderHandle, 0);
 	this->lineh =	new GameObject(lineMesh, World2::shaderHandle, 0);
-	this->bkp=editedobj->transform;
+	this->bkp=editedobj->transformation;
 }
-void Transformate::render(glm::mat4*parent,bool renderTransparent){
+void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 	if(!this->isEdit||!renderTransparent){return;}
-
+	glDepthRange(0.0, 0.01);
 	GameObject*handle=this->circleh;
-	if(this->editmode==Transformate::EDIT_ROTATION){handle=this->circleh;}
-	else if(this->editmode==Transformate::EDIT_POSITION||this->editmode==Transformate::EDIT_LOOKAT	){handle=this->arrowh;}
-	else if(this->editmode==Transformate::EDIT_SCALE){handle=this->scaleh;}
+	if(this->editmode==TransformHandles::EDIT_ROTATION){handle=this->circleh;}
+	else if(this->editmode==TransformHandles::EDIT_POSITION||this->editmode==TransformHandles::EDIT_LOOKAT	){handle=this->arrowh;}
+	else if(this->editmode==TransformHandles::EDIT_SCALE){handle=this->scaleh;}
 		
 	float depth=(World2::perspective*World2::mainCamera*this->handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
@@ -63,26 +63,26 @@ void Transformate::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 ftransform=getFullTransform(this->editedobj);
 		
 	float transparency=1.0f;//(float)(renderTransparent==false)*0.5f+0.5f;
-	if(this->editspace==Transformate::EDIT_FREE||true){
+	if(this->editspace==TransformHandles::EDIT_FREE||true){
 		glm::mat4 t;
 		float f,selected;
 			
 		selected=0.3f*(float)(this->editaxis==0);
 		t=getRotation(ftransform,0);
 		t=glm::mat4(t[0]*glm::length((glm::vec3)ftransform[0]),t[1]*(1.0f+selected*3.0f),t[2]*(1.0f+selected*3.0f),ftransform[3]);
-		lineh->transform=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+		lineh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
 		drawHandle(lineh,t,glm::vec4( 1.0f,selected,selected,transparency),this->stencilaxisx,false);
 			
 		selected=0.3f*(float)(this->editaxis==1);
 		t=getRotation(ftransform,1);
 		t=glm::mat4(t[0]*(1.0f+selected*3.0f),t[1]*glm::length((glm::vec3)ftransform[1]),t[2]*(1.0f+selected*3.0f),ftransform[3]);
-		lineh->transform=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f));
+		lineh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f));
 		drawHandle(lineh,t,glm::vec4(selected,1.0f,selected,transparency),this->stencilaxisy,false);
 			
 		selected=0.3f*(float)(this->editaxis==2);	
 		t=getRotation(ftransform,2);
 		t=glm::mat4(t[0]*(1.0f+selected*3.0f),t[1]*(1.0f+selected*3.0f),t[2]*glm::length((glm::vec3)ftransform[2]),ftransform[3]);
-		lineh->transform=glm::mat4(1.0f);
+		lineh->transformation=glm::mat4(1.0f);
 		drawHandle(lineh,t,glm::vec4(selected*0.5f+0.1f,selected*0.5f+0.4f,1.0f,transparency),this->stencilaxisz,false);
 			
 		selected=0.3f*(float)(this->editaxis==3);
@@ -90,64 +90,65 @@ void Transformate::render(glm::mat4*parent,bool renderTransparent){
 		t=getRotation(tt,2);
 		f=glm::length((glm::vec3)tt[2]);
 		t=glm::mat4(t[0]*(1.0f+selected*3.0f),t[1]*(1.0f+selected*3.0f),t[2]*glm::length((glm::vec3)tt[2]),ftransform[3]);
-		lineh->transform=glm::mat4(1.0f);
+		lineh->transformation=glm::mat4(1.0f);
 		drawHandle(lineh,t,glm::vec4(1.0f,selected+0.2f,1.0f,transparency),this->stencilaxisw,false);
 	}
 
 
-	if(this->editspace==Transformate::EDIT_FREE&&this->editmode==Transformate::EDIT_SCALE){//override scale handles for free edit
+	if(this->editspace==TransformHandles::EDIT_FREE&&this->editmode==TransformHandles::EDIT_SCALE){//override scale handles for free edit
 		scale=glm::scale(scale, glm::vec3(0.09f));		
 		if(this->editaxis==0){
-			uniscaleh->transform=glm::mat4(1.0f)*scale;
+			uniscaleh->transformation=glm::mat4(1.0f)*scale;
 			drawHandle(uniscaleh,this->handlespace,glm::vec4( 1.0f,0.0f,0.0f,transparency),this->stencilx,this->activehandle==this->stencilx);	
 		}
 		else if(this->editaxis==1){
-			uniscaleh->transform=glm::mat4(1.0f)*scale;
+			uniscaleh->transformation=glm::mat4(1.0f)*scale;
 			drawHandle(uniscaleh,this->handlespace,glm::vec4(0.0f,1.0f,0.0f,transparency),this->stencily,this->activehandle==this->stencily);
 		}
 		else if(this->editaxis==2){
-			uniscaleh->transform=glm::mat4(1.0f)*scale;
+			uniscaleh->transformation=glm::mat4(1.0f)*scale;
 			drawHandle(uniscaleh,this->handlespace,glm::vec4(0.1f,0.4f,1.0f,transparency),this->stencilz,this->activehandle==this->stencilz);
 		}
 		else if(this->editaxis==3){
-			uniscaleh->transform=glm::mat4(1.0f)*scale;	
+			uniscaleh->transformation=glm::mat4(1.0f)*scale;	
 			drawHandle(uniscaleh,this->handlespace,glm::vec4(1.0f,0.2f,1.0f,transparency),this->stencilz,this->activehandle==this->stencilz);
 		}
 	}
 	else{
-		handle->transform=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
+		handle->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 		drawHandle(handle,getOrtho(this->handlespace,0),glm::vec4( 1.0f,0.0f,0.0f,transparency),this->stencilx,this->activehandle==this->stencilx);	
-		handle->transform=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
+		handle->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
 		drawHandle(handle,getOrtho(this->handlespace,1),glm::vec4(0.0f,1.0f,0.0f,transparency),this->stencily,this->activehandle==this->stencily);
-		handle->transform=glm::mat4(1.0f)*scale;
+		handle->transformation=glm::mat4(1.0f)*scale;
 		drawHandle(handle,getOrtho(this->handlespace,2),glm::vec4(0.1f,0.4f,1.0f,transparency),this->stencilz,this->activehandle==this->stencilz);
 			
-		if (this->editmode == Transformate::EDIT_LOOKAT || this->editmode == Transformate::EDIT_POSITION ||this->editmode == Transformate::EDIT_SCALE){ // two-axis handles
-			this->planeh->transform=glm::mat4(1.0f)*scale;
+		if (this->editmode == TransformHandles::EDIT_LOOKAT || this->editmode == TransformHandles::EDIT_POSITION ||this->editmode == TransformHandles::EDIT_SCALE){ // two-axis handles
+			this->planeh->transformation=glm::mat4(1.0f)*scale;
 				
-			this->planeh->transform=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
+			this->planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 			drawHandle(this->planeh,this->handlespace,glm::vec4(0.0f,1.0f,1.0f,transparency*0.5f),this->stencilzy,this->activehandle==this->stencilzy);
-			this->planeh->transform=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
+			this->planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
 			drawHandle(this->planeh,this->handlespace,glm::vec4(1.0f,0.2f,1.0f,transparency*0.5f),this->stencilzx,this->activehandle==this->stencilzx);
-			this->planeh->transform=glm::mat4(1.0f)*scale;
+			this->planeh->transformation=glm::mat4(1.0f)*scale;
 			drawHandle(this->planeh,this->handlespace,glm::vec4(1.0f,1.0f,0.0f,transparency*0.5f),this->stencilyx,this->activehandle==this->stencilyx);
 		}
-		else if(this->editmode==Transformate::EDIT_SCALE){//three-axis handle
-			this->uniscaleh->transform=glm::mat4(1.0f)*scale;
+		if(this->editmode==TransformHandles::EDIT_SCALE){//three-axis handle
+			this->uniscaleh->transformation=glm::mat4(1.0f)*scale;
 			this->uniscaleh->scale(glm::vec3(0.2f));
 			float active=0.7f+0.3f*(float)(this->activehandle==this->stencilxyz);
 			glUniform4f(shader_color, active,active,active,transparency);
 			glStencilMask(255);
 			glStencilFunc(GL_ALWAYS, this->stencilxyz, 255);
 			this->uniscaleh->draw(this->handlespace);
+			glStencilMask(0);
 		}
 	}
-	glStencilMask(0);
 	glUseProgram(0);
+	glDepthRange(0.0, 1.0);
 	CHECK_GL_ERROR();
 }
 	
-void Transformate::update(){ 
+void TransformHandles::update(){ 
 	//if(Controls::mouseKeysEventTable[GLUT_LEFT_BUTTON]==Controls::EVENT_DOWN){
 	if(InputController::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
@@ -186,33 +187,33 @@ void Transformate::update(){
 	if(!this->isEdit){return;}
 		
 	if(this->activehandle==-1){
-		if(			InputController::isKeyPressed(Keys::l)){this->editspace =Transformate::EDIT_LOCAL;}
-		else if (	InputController::isKeyPressed(Keys::f)){this->editspace =Transformate::EDIT_FREE;}
+		if(			InputController::isKeyPressed(Keys::l)){this->editspace =TransformHandles::EDIT_LOCAL;}
+		else if (	InputController::isKeyPressed(Keys::f)){this->editspace =TransformHandles::EDIT_FREE;}
 
-		if (		InputController::isKeyPressed(Keys::a)){this->editmode = Transformate::EDIT_LOOKAT;}
-		else if (	InputController::isKeyPressed(Keys::r)){this->editmode = Transformate::EDIT_ROTATION;}
-		else if (	InputController::isKeyPressed(Keys::s)){this->editmode = Transformate::EDIT_SCALE;}
-		else if (	InputController::isKeyPressed(Keys::p)){this->editmode = Transformate::EDIT_POSITION;}
+		if (		InputController::isKeyPressed(Keys::a)){this->editmode = TransformHandles::EDIT_LOOKAT;}
+		else if (	InputController::isKeyPressed(Keys::r)){this->editmode = TransformHandles::EDIT_ROTATION;}
+		else if (	InputController::isKeyPressed(Keys::s)){this->editmode = TransformHandles::EDIT_SCALE;}
+		else if (	InputController::isKeyPressed(Keys::p)){this->editmode = TransformHandles::EDIT_POSITION;}
 		
 		if (		InputController::isKeyPressed(Keys::x)){this->editaxis = 0;}
 		else if (	InputController::isKeyPressed(Keys::y)){this->editaxis = 1;}
 		else if (	InputController::isKeyPressed(Keys::z)){this->editaxis = 2;}
 		else if (	InputController::isKeyPressed(Keys::w)){this->editaxis = 3;}
-		this->bkp=editedobj->transform;
-		this->rotfreebkp=this->editedobj->transform;
+		this->bkp=editedobj->transformation;
+		this->rotfreebkp=this->editedobj->transformation;
 	}
 		
-	if(this->editspace==Transformate::EDIT_FREE){//free editing - editing axes of matix directly
+	if(this->editspace==TransformHandles::EDIT_FREE){//free editing - editing axes of matix directly
 		this->handlespace=glm::mat4(1.0f);
 
-		if(this->editmode==Transformate::EDIT_POSITION){
+		if(this->editmode==TransformHandles::EDIT_POSITION){
 			glm::mat4 m=getFullTransform(this->editedobj->parent);
 			this->handlespace=getNormalized(m);
-			m=m*this->editedobj->transform;
+			m=m*this->editedobj->transformation;
 			this->handlespace[3]=m[3]+m[this->editaxis]*(float)(this->editaxis!=3);
 
 		}
-		else if(this->editmode==Transformate::EDIT_SCALE){
+		else if(this->editmode==TransformHandles::EDIT_SCALE){
 			glm::mat4 m=getFullTransform(this->editedobj->parent);
 			if(this->editaxis==3){
 				glm::vec4 dir=m[3]-(m*this->bkp)[3];
@@ -221,10 +222,10 @@ void Transformate::update(){
 			else{
 				this->handlespace=getRotation(m*this->bkp,this->editaxis);
 			}
-			m=m*this->editedobj->transform;
+			m=m*this->editedobj->transformation;
 			this->handlespace[3]=m[3]+m[this->editaxis]*(float)(this->editaxis!=3);
 		}
-		else if(this->editmode==Transformate::EDIT_ROTATION){
+		else if(this->editmode==TransformHandles::EDIT_ROTATION){
 			this->rotfreebkp=getRotation(this->rotfreebkp,this->editaxis);
 			glm::mat4 m=getFullTransform(this->editedobj->parent);
 			if(this->editaxis==3){
@@ -233,12 +234,12 @@ void Transformate::update(){
 			}
 			else{
 				this->handlespace=getRotation(m*this->rotfreebkp,this->editaxis);
-				this->handlespace[3]=(m*this->editedobj->transform)[3];
+				this->handlespace[3]=(m*this->editedobj->transformation)[3];
 			}
 		}
 	}
 	else{
-		if (this->editmode == Transformate::EDIT_LOOKAT) {
+		if (this->editmode == TransformHandles::EDIT_LOOKAT) {
 			glm::mat4 m = getFullTransform(this->editedobj);
 			glm::vec3 dirobj = (glm::vec3)(m * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
 			glm::vec3 dirh = (glm::vec3)this->handlespace[3] - (glm::vec3)m[3];
@@ -249,13 +250,13 @@ void Transformate::update(){
 		else{
 			this->handlespace = glm::mat4(1.0f);
 
-			if(this->editmode==Transformate::EDIT_POSITION){
+			if(this->editmode==TransformHandles::EDIT_POSITION){
 				this->handlespace=getNormalized(getFullTransform(this->editedobj->parent));
 			}
-			else if(this->editmode==Transformate::EDIT_SCALE){
+			else if(this->editmode==TransformHandles::EDIT_SCALE){
 				this->handlespace=getNormalized(getFullTransform(this->editedobj->parent)*this->bkp);
 			}
-			else if(this->editmode==Transformate::EDIT_ROTATION){
+			else if(this->editmode==TransformHandles::EDIT_ROTATION){
 				this->handlespace=getNormalized(getFullTransform(this->editedobj));
 			}
 			this->handlespace[3]=getFullTransform(this->editedobj)[3];
@@ -292,28 +293,28 @@ void Transformate::update(){
 		olddrag=glm::inverse(mov)*(mouse-spos1);
 		dragfinal=drag-olddrag;
 			
-		if(this->editmode==Transformate::EDIT_ROTATION){dragfinal=glm::vec2(dragfinal[1],dragfinal[0]);}//coaxial
+		if(this->editmode==TransformHandles::EDIT_ROTATION){dragfinal=glm::vec2(dragfinal[1],dragfinal[0]);}//coaxial
 			
 		drag3+=((glm::vec3)axes[axisnum])*(dragfinal[0]);
 		if(axisnum2!=-1){drag3+=((glm::vec3)axes[this->axisnum2])*(dragfinal[1]);}
 			
 		float depth=glm::length(World2::mainCamPos+(glm::vec3)this->handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
-		if(this->editmode==Transformate::EDIT_POSITION){drag3*=depth*0.5f;}
-		else if(this->editmode==Transformate::EDIT_LOOKAT){drag3*=depth*0.5f;}
-		else if(this->editmode==Transformate::EDIT_SCALE){drag3*=depth*0.5f;}
+		if(this->editmode==TransformHandles::EDIT_POSITION){drag3*=depth*0.5f;}
+		else if(this->editmode==TransformHandles::EDIT_LOOKAT){drag3*=depth*0.5f;}
+		else if(this->editmode==TransformHandles::EDIT_SCALE){drag3*=depth*0.5f;}
 		if(InputController::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 			
-		if(this->editspace==Transformate::EDIT_FREE){
+		if(this->editspace==TransformHandles::EDIT_FREE){
 			drag3*=1.2f;
-			if(this->editmode==Transformate::EDIT_ROTATION){
+			if(this->editmode==TransformHandles::EDIT_ROTATION){
 				glm::mat3 r=glm::mat3((glm::vec3)this->rotfreebkp[0],(glm::vec3)this->rotfreebkp[1],(glm::vec3)this->rotfreebkp[2]);//axes of rotation
 				glm::mat4 rot1=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[this->axisnum]),r[this->axisnum]);
 				this->rotfreebkp=rot1*this->rotfreebkp;
-				this->editedobj->transform[this->editaxis]=rot1*this->editedobj->transform[this->editaxis];
-				this->editedobj->transform[3][3]=1.0f;
+				this->editedobj->transformation[this->editaxis]=rot1*this->editedobj->transformation[this->editaxis];
+				this->editedobj->transformation[3][3]=1.0f;
 					
 			}
-			else if(this->editmode==Transformate::EDIT_POSITION){
+			else if(this->editmode==TransformHandles::EDIT_POSITION){
 				if (axisnum2 != -1){
 					glm::mat4 ftransform=getFullTransform(this->editedobj);
 
@@ -334,27 +335,27 @@ void Transformate::update(){
 						glm::mat4 parent=getFullTransform(this->editedobj->parent);
 						glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 						glm::vec3 editedo=(glm::vec3)(glm::inverse(parent)*result);
-						editedo-=(glm::vec3)(this->editedobj->transform[3]*(float)(this->editaxis!=3));
-						*((glm::vec3*)&(this->editedobj->transform[this->editaxis]))=editedo;
+						editedo-=(glm::vec3)(this->editedobj->transformation[3]*(float)(this->editaxis!=3));
+						*((glm::vec3*)&(this->editedobj->transformation[this->editaxis]))=editedo;
 					}
 				}
 				else{
 					drag3*=0.008f;
-					this->editedobj->transform[this->editaxis][this->axisnum]+=drag3[this->axisnum];
+					this->editedobj->transformation[this->editaxis][this->axisnum]+=drag3[this->axisnum];
 				}
 				glm::mat4 ftransform=getFullTransform(this->editedobj);
 				this->handlespace[3]=ftransform[3]+ftransform[this->editaxis]*(float)(this->editaxis!=3);
 				this->handlespace[3][3]=1.0f;
 			}
-			else if(this->editmode==Transformate::EDIT_SCALE){
+			else if(this->editmode==TransformHandles::EDIT_SCALE){
 				drag3*=0.005f;
 					
 				if(this->editaxis==3){
-					this->editedobj->transform[3]+=this->bkp[3]*drag3[2]/glm::length((glm::vec3)this->bkp[3]);
-					this->editedobj->transform[3][3]=1.0f;
+					this->editedobj->transformation[3]+=this->bkp[3]*drag3[2]/glm::length((glm::vec3)this->bkp[3]);
+					this->editedobj->transformation[3][3]=1.0f;
 				}
 				else{
-					this->editedobj->transform[this->editaxis]+=this->bkp[this->editaxis]*drag3[this->editaxis]/glm::length((glm::vec3)this->bkp[this->editaxis]);
+					this->editedobj->transformation[this->editaxis]+=this->bkp[this->editaxis]*drag3[this->editaxis]/glm::length((glm::vec3)this->bkp[this->editaxis]);
 				}
 				glm::mat4 ftransform=getFullTransform(this->editedobj);
 				this->handlespace[3]=ftransform[3]+ftransform[this->editaxis]*(float)(this->editaxis!=3);
@@ -362,15 +363,15 @@ void Transformate::update(){
 			}
 		}
 		else {
-			if(this->editmode==Transformate::EDIT_ROTATION){
+			if(this->editmode==TransformHandles::EDIT_ROTATION){
 				drag3*=1.0f;
-				glm::mat4 rot=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[this->axisnum]),(glm::vec3)this->editedobj->transform[this->axisnum]);
-				glm::vec4 bkp=this->editedobj->transform[3];
-				this->editedobj->transform[3]=glm::vec4(0.0f,0.0f,0.0f,1.0f);
-				this->editedobj->transform=rot*this->editedobj->transform;
-				this->editedobj->transform[3]=bkp;
+				glm::mat4 rot=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[this->axisnum]),(glm::vec3)this->editedobj->transformation[this->axisnum]);
+				glm::vec4 bkp=this->editedobj->transformation[3];
+				this->editedobj->transformation[3]=glm::vec4(0.0f,0.0f,0.0f,1.0f);
+				this->editedobj->transformation=rot*this->editedobj->transformation;
+				this->editedobj->transformation[3]=bkp;
 			}
-			else if (this->editmode == Transformate::EDIT_LOOKAT){
+			else if (this->editmode == TransformHandles::EDIT_LOOKAT){
 				if (axisnum2 != -1){
 					//glm::mat4 ftransform = getFullTransform(this->editedobj->parent);
 					//ftransform[3] = getFullTransform(this->editedobj)[3];
@@ -415,10 +416,10 @@ void Transformate::update(){
 
 					float anglev = angle2(sqrt(forward[0] * forward[0] + forward[2] * forward[2]), forward[1]) - angle2(sqrt(trgdir[0] * trgdir[0] + trgdir[2] * trgdir[2]), trgdir[1]);
 					printf("angleV %f,", anglev);
-					this->editedobj->rotate((glm::vec3)(this->editedobj->transform[0]), anglev);
+					this->editedobj->rotate((glm::vec3)(this->editedobj->transformation[0]), anglev);
 				}
 			}
-			else if(this->editmode==Transformate::EDIT_POSITION){
+			else if(this->editmode==TransformHandles::EDIT_POSITION){
 				if(axisnum2!=-1){
 					glm::mat4 ftransform=getFullTransform(this->editedobj->parent);
 					ftransform[3]=getFullTransform(this->editedobj)[3];
@@ -438,17 +439,17 @@ void Transformate::update(){
 						glm::mat4 parent=getFullTransform(this->editedobj->parent);
 						glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 						glm::vec4 editedo=glm::inverse(parent)*result;
-						this->editedobj->transform[3]=editedo;
+						this->editedobj->transformation[3]=editedo;
 						//this->handlespace[3]=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 					}
 				}
 				else{
 					drag3*=0.008f;
-					this->editedobj->transform[3][this->axisnum]+=drag3[this->axisnum];
+					this->editedobj->transformation[3][this->axisnum]+=drag3[this->axisnum];
 				}
 				this->handlespace[3]=getFullTransform(this->editedobj)[3];
 			}
-			else if(this->editmode==Transformate::EDIT_SCALE){
+			else if(this->editmode==TransformHandles::EDIT_SCALE){
 				drag3*=0.005f;
 				glm::vec3 scal=glm::vec3(glm::length((glm::vec3)this->bkp[0]),glm::length((glm::vec3)this->bkp[1]),glm::length((glm::vec3)this->bkp[2]));
 					
@@ -470,9 +471,9 @@ void Transformate::update(){
 					}
 				}
 					
-				this->editedobj->transform[0]+=this->bkp[0]*drag3[0]/scal[0];
-				this->editedobj->transform[1]+=this->bkp[1]*drag3[1]/scal[1];
-				this->editedobj->transform[2]+=this->bkp[2]*drag3[2]/scal[2];
+				this->editedobj->transformation[0]+=this->bkp[0]*drag3[0]/scal[0];
+				this->editedobj->transformation[1]+=this->bkp[1]*drag3[1]/scal[1];
+				this->editedobj->transformation[2]+=this->bkp[2]*drag3[2]/scal[2];
 			}
 		}
 	}
