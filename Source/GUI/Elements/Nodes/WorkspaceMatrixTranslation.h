@@ -1,3 +1,4 @@
+#pragma once
 #include "WorkspaceMatrix4x4.h"
 
 class WorkspaceMatrixTranslation : public WorkspaceMatrix4x4
@@ -7,6 +8,5 @@ public:
 
 	void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
-	void drawData(util::NodeBuilder& builder);
 };
 

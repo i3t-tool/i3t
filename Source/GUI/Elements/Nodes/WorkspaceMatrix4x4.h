@@ -7,5 +7,5 @@ class WorkspaceMatrix4x4 : public WorkspaceNodeWithCoreData
 public:
 	WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel);
 
-	void drawData(util::NodeBuilder& builder);
+	virtual void drawData(util::NodeBuilder& builder);
 };

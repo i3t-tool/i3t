@@ -5,7 +5,7 @@ typedef std::vector<Core::Pin>::const_iterator pinIter;
 typedef std::vector<std::unique_ptr<WorkspacePinProperties>>::const_iterator pinPropIter;
 typedef std::vector<std::unique_ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
 
-class WorkspaceNodeWithCoreData : public virtual WorkspaceNode
+class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
 public:
 	/*see:
@@ -20,7 +20,7 @@ public:
 
 	WorkspaceNodeWithCoreData(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel);
 
-	void drawInputLinks();
-	void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
-	void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	virtual void drawInputLinks();
+	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 };
