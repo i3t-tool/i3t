@@ -66,17 +66,17 @@ World2* World2::loadDefaultScene(){
   camera =      new GameObject();
   scene =       new GameObject();
 
-  terrainGrass->transformate(   glm::vec3(0.0f, -5.0f, 0.0f),    glm::vec3(48.0f, 48.0f, 48.0f),     glm::vec3(1.0f, 0.0f, 0.0f),-90.0f);
-  terrainRocks->transformate(   glm::vec3(0.0f, -5.0f, 0.0f),    glm::vec3(48.0f, 48.0f, 48.0f),     glm::vec3(1.0f, 0.0f, 0.0f),-90.0f);
-  skybox->transformate(         glm::vec3(0.0f, -5.0f, 0.0f),    glm::vec3(10.0f, 10.0f, 10.0f),     glm::vec3(1.0f, 0.0f, 0.0f),90.0f);
-  camera->transformate(         glm::vec3(0.0f, 0.0f, 10.0f),    glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
-  objhandles->transformate(     glm::vec3(0.0f, -5.0f, -0.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f),0.0f);
-  camhandles->transformate(     glm::vec3(-0.0f, -1.0f, -0.0f),  glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 1.0f, 0.0f),-0.0f);
-  lookat->transformate(         glm::vec3(-4.0f, -1.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),        glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);
-  testparent->transformate(     glm::vec3(2.0f, -4.0f, 0.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);
-  testchild->transformate(      glm::vec3(2.0f, -0.5f, 0.0f),    glm::vec3(0.5f, 1.5f, 0.5f),        glm::vec3(0.0f, 0.0f, 1.0f),45.0f);
+  terrainGrass->transform(   glm::vec3(0.0f, -5.0f, 0.0f),    glm::vec3(48.0f, 48.0f, 48.0f),     glm::vec3(1.0f, 0.0f, 0.0f),-90.0f);
+  terrainRocks->transform(   glm::vec3(0.0f, -5.0f, 0.0f),    glm::vec3(48.0f, 48.0f, 48.0f),     glm::vec3(1.0f, 0.0f, 0.0f),-90.0f);
+  skybox->transform(         glm::vec3(0.0f, -5.0f, 0.0f),    glm::vec3(10.0f, 10.0f, 10.0f),     glm::vec3(1.0f, 0.0f, 0.0f),90.0f);
+  camera->transform(         glm::vec3(0.0f, 0.0f, 10.0f),    glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
+  objhandles->transform(     glm::vec3(0.0f, -5.0f, -0.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f),0.0f);
+  camhandles->transform(     glm::vec3(-0.0f, -1.0f, -0.0f),  glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 1.0f, 0.0f),-0.0f);
+  lookat->transform(         glm::vec3(-4.0f, -1.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),        glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);
+  testparent->transform(     glm::vec3(2.0f, -4.0f, 0.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);
+  testchild->transform(      glm::vec3(2.0f, -0.5f, 0.0f),    glm::vec3(0.5f, 1.5f, 0.5f),        glm::vec3(0.0f, 0.0f, 1.0f),45.0f);
 
-  scene->addComponent(new Transformate(objhandles));
+  scene->addComponent(new TransformHandles(objhandles));
   scene->addChild(terrainGrass, false);     terrainGrass->addComponent(new Renderer());
   scene->addChild(terrainRocks, false);     terrainRocks->addComponent(new Renderer());
   scene->addChild(skybox, false);           skybox->addComponent(new Renderer());

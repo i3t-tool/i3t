@@ -1,7 +1,7 @@
 #version 140
-#extension GL_ARB_conservative_depth : enable
+//#extension GL_ARB_conservative_depth : enable
 out vec4 fragmentColor;
-layout (depth_less) out float gl_FragDepth;
+//layout (depth_less) out float gl_FragDepth;
 
 uniform sampler2D tex0;
 uniform vec3 camera;
@@ -23,5 +23,5 @@ void main(){
 	
 	if(color.a>0.8){gl_FragDepth=gl_FragCoord.z;}
 	else{gl_FragDepth=gl_FragCoord.z*0.01;}
-	gl_FragDepth=gl_FragCoord.z*0.01;
+	//gl_FragDepth=gl_FragCoord.z*0.01;
 }

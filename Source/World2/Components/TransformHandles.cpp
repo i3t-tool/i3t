@@ -10,6 +10,14 @@
 #include "../Select.h"
 #include "../../Core/InputController.h"
 
+void printMatrix2(glm::mat4 m){
+  printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n",
+	  m[0][0], m[1][0], m[2][0], m[3][0],
+	  m[0][1], m[1][1], m[2][1], m[3][1],
+	  m[0][2], m[1][2], m[2][2], m[3][2],
+	  m[0][3], m[1][3], m[2][3], m[3][3]);
+}
+
 const char* TransformHandles::typeStatic=NULL;
 GLint TransformHandles::shader_color;
 	
@@ -240,16 +248,19 @@ void TransformHandles::update(){
 	}
 	else{
 		if (this->editmode == TransformHandles::EDIT_LOOKAT) {
-			glm::mat4 m = getFullTransform(this->editedobj);
-			glm::vec3 dirobj = (glm::vec3)(m * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-			glm::vec3 dirh = (glm::vec3)this->handlespace[3] - (glm::vec3)m[3];
-			if (!dirEqual(dirobj, dirh)) {
-				//*((glm::vec3*)(&this->handlespace[3])) = (glm::vec3)m[3] + dirobj;
-			}
+			glm::vec4 pos=this->handlespace[3];
+			this->handlespace = getNormalized(getFullTransform(this->editedobj->parent));
+			this->handlespace[3]=pos;
+
+			glm::mat4 t=getFullTransform(this->editedobj);
+			glm::vec4 pose=t[3];
+			glm::vec4 posh=this->handlespace[3];
+			glm::vec4 dir=posh-pose;
+			if(glm::length2(dir)<0.05f){this->handlespace[3] = pose + glm::normalize(t[2]);}//non-zero distance between editedobj and position to look at
 		}
 		else{
 			this->handlespace = glm::mat4(1.0f);
-
+			
 			if(this->editmode==TransformHandles::EDIT_POSITION){
 				this->handlespace=getNormalized(getFullTransform(this->editedobj->parent));
 			}
@@ -273,7 +284,7 @@ void TransformHandles::update(){
 		glm::vec2 spos2=world2screen((glm::vec3)(this->handlespace[3]+this->handlespace*axes[this->axisnum]));//spos1,spos2 - project two points on screen - project axis on screen
 		glm::vec2 dir=spos2-spos1;//the axis in screen space
 		if(glm::length(dir)<0.01){dir[0]=1.0f;}//axis length must not be zero
-			
+
 		glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
 
 		if(this->axisnum2!=-1){
@@ -403,21 +414,13 @@ void TransformHandles::update(){
 					if (glm::length2(mov) != 0.0f){mov = glm::normalize(mov) * glm::length(drag3);}
 					*((glm::vec3*)&this->handlespace[3]) += mov;
 				}
-				glm::vec3 trgdir = (glm::vec3)this->handlespace[3] - (glm::vec3)(getFullTransform(this->editedobj)[3]);
-				glm::vec3 forward = (glm::vec3)(getFullTransform(this->editedobj) * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-				
-				if (glm::length2(glm::vec2(trgdir[0], trgdir[2])) > 0.3f){
-					float angleh = angle2(trgdir[0], trgdir[2]) - angle2(forward[0], forward[2]); // angle horizontal - XZ
-					printf("angleXZ %f,", angleh);
-					this->editedobj->rotate(glm::vec3(0.0f, 1.0f, 0.0f), -angleh);
-				}
-				if (glm::length2(glm::vec2(trgdir[0], trgdir[2])) > 0.3f){
-					forward = (glm::vec3)(getFullTransform(this->editedobj) * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-
-					float anglev = angle2(sqrt(forward[0] * forward[0] + forward[2] * forward[2]), forward[1]) - angle2(sqrt(trgdir[0] * trgdir[0] + trgdir[2] * trgdir[2]), trgdir[1]);
-					printf("angleV %f,", anglev);
-					this->editedobj->rotate((glm::vec3)(this->editedobj->transformation[0]), anglev);
-				}
+				glm::mat4 m=getFullTransform(this->editedobj->parent);
+				for (int i = 0; i < 4; i++) {if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
+				glm::vec4 posh=(glm::inverse(m)*this->handlespace)[3];
+				glm::vec4 pose=this->editedobj->transformation[3];
+				glm::vec4 dir=posh-pose;
+				this->editedobj->transformation=getRotation(glm::mat4(glm::vec4(0.0f),glm::vec4(0.0f,1.0f,0.0f,0.0f),dir,glm::vec4(0.0f)),2);
+				this->editedobj->transformation[3]=pose;
 			}
 			else if(this->editmode==TransformHandles::EDIT_POSITION){
 				if(axisnum2!=-1){

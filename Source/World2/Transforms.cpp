@@ -96,7 +96,7 @@ glm::vec3 getScale(glm::mat4 transform){
 }
 glm::mat4 getFullTransform(GameObject* obj){
   glm::mat4 transform = glm::mat4(1.0f);
-  while (obj != NULL){transform = obj->transform * transform;obj = obj->parent;}
+  while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
   return transform;
 }
 float angle2(float x, float y){

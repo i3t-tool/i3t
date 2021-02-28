@@ -7,7 +7,7 @@ Component* Select::stencilRef[256] = {NULL};
 int Select::registerStencil(Component* owner){
   for (int i = 1; i < 255; i++){
     if (Select::stencilRef[i] == NULL){
-      printf("reg stencil %d\n", i);
+      //printf("reg stencil %d\n", i);
       Select::stencilRef[i] = owner;
       return i;
     }
@@ -17,7 +17,7 @@ int Select::registerStencil(Component* owner){
 bool Select::freeStencil(Component* owner){
   for (int i = 1; i < 255; i++){
     if (Select::stencilRef[i] == owner){
-      printf("free stencil %d\n", i);
+      //printf("free stencil %d\n", i);
       Select::stencilRef[i] = NULL;
       return true;
     }
@@ -45,5 +45,11 @@ unsigned char Select::getStencilAt(int x, int y, int r, int filter){
   }
   // printf("ret %d\n",stencilnum);
   free(read);
+  /*const char* name;
+  if (Select::stencilRef[stencilnum] != NULL) {
+      name=Select::stencilRef[stencilnum]->getComponentType();
+      printf("select %d,%s\n", stencilnum, name);
+  }
+  printf("select %d,-\n",stencilnum);*/
   return stencilnum;
 }

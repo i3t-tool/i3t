@@ -14,7 +14,7 @@ void GameObject::draw(glm::mat4 parentTransform){
   glUseProgram(this->shader);
   glUniform3f(this->shader_camera, World2::mainCamPos[0], World2::mainCamPos[1], World2::mainCamPos[2]);
   glUniformMatrix4fv(this->shader_Pmatrix, 1, GL_FALSE, glm::value_ptr(World2::perspective));
-  glm::mat4 tmp = parentTransform * this->transform;
+  glm::mat4 tmp = parentTransform * this->transformation;
   glUniformMatrix4fv(this->shader_VMmatrix, 1, GL_FALSE, glm::value_ptr(World2::mainCamera * tmp));
   glUniformMatrix4fv(this->shader_VNmatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(tmp))));
   glUniformMatrix4fv(this->shader_Mmatrix, 1, GL_FALSE, glm::value_ptr(tmp));
@@ -31,38 +31,38 @@ void GameObject::draw(glm::mat4 parentTransform){
   //glUseProgram(0);
   CHECK_GL_ERROR();
 }
-void GameObject::transformate(glm::vec3 trans, glm::vec3 scale, glm::vec3 rotAxis, float degrees){
+void GameObject::transform(glm::vec3 trans, glm::vec3 scale, glm::vec3 rotAxis, float degrees){
   glm::mat4 pos = glm::translate(glm::mat4(1.0f), trans);
   glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(degrees), rotAxis);
   glm::mat4 scal = glm::scale(glm::mat4(1.0f), scale);
 
   // this->transform = rot*scal;
-  this->transform = rot * this->transform;
-  this->transform = this->transform * scal;
+  this->transformation = rot * this->transformation;
+  this->transformation = this->transformation * scal;
 
-  this->transform[3] = pos[3];
+  this->transformation[3] = pos[3];
 }
 void GameObject::translate(glm::vec3 translate){
   glm::vec4 mov = glm::vec4(translate[0], translate[1], translate[2], 0.0f);
-  this->transform[3] += mov;
+  this->transformation[3] += mov;
 }
 void GameObject::rotateCamera(glm::vec3 axis, float angleDegrees){
   // this->transform=this->transform*glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), axis);
 }
 void GameObject::rotate(glm::vec3 axis, float angleDegrees){
-  glm::vec4 tmp = this->transform[3];
-  this->transform[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  this->transform = glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), axis) * this->transform;
-  this->transform[3] = tmp;
+  glm::vec4 tmp = this->transformation[3];
+  this->transformation[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  this->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), axis) * this->transformation;
+  this->transformation[3] = tmp;
 }
 void GameObject::scale(glm::vec3 scale){
   glm::mat4 scal = glm::scale(glm::mat4(1.0f), scale);
-  this->transform = this->transform * scal;
+  this->transformation = this->transformation * scal;
 }
 GameObject::GameObject(){
   this->isRender = false;
   this->draw_callback = NULL;
-  this->transform = glm::mat4(1.0f);
+  this->transformation = glm::mat4(1.0f);
   this->num_triangles = 0;
   this->num_vertices = 0;
   this->num_attribs = 0;
@@ -87,7 +87,7 @@ GameObject::GameObject(pgr::MeshData mesh, GLuint shader, GLuint texture){
   this->shader_VMmatrix = glGetUniformLocation(this->shader, "VMmatrix");
   this->shader_VNmatrix = glGetUniformLocation(this->shader, "VNmatrix");
   this->shader_Pmatrix = glGetUniformLocation(this->shader, "Pmatrix");
-  this->transform = glm::mat4(1.0f);
+  this->transformation = glm::mat4(1.0f);
   this->textures.push_back(texture);
 
   glUseProgram(shader);
@@ -136,7 +136,7 @@ GameObject::GameObject(pgr::MeshData mesh, GLuint shader, GLuint texture){
 }
 glm::mat4 GameObject::inheritedTransform(GameObject* obj){
   glm::mat4 transform = glm::mat4(1.0f);
-  while (obj->parent != NULL){obj = obj->parent;transform = obj->transform * transform;}
+  while (obj->parent != NULL){obj = obj->parent;transform = obj->transformation * transform;}
   return transform;
 }
 
@@ -153,7 +153,7 @@ void GameObject::rmChild(GameObject* obj, bool keepTransform){
       this->children[i]->parent = NULL;
       this->children[i] = this->children.back();
       this->children.pop_back();
-      if (keepTransform){obj->transform = GameObject::inheritedTransform(this) * this->transform * obj->transform;}
+      if (keepTransform){obj->transformation = GameObject::inheritedTransform(this) * this->transformation * obj->transformation;}
       return;
     }
   }
@@ -162,7 +162,7 @@ void GameObject::addChild(GameObject* obj, bool keepTransform){
   if (obj->parent != NULL){obj->unparent(keepTransform);}
   this->children.push_back(obj);
   obj->parent = this;
-  if (keepTransform){obj->transform = glm::inverse(GameObject::inheritedTransform(this) * this->transform) * obj->transform;}
+  if (keepTransform){obj->transformation = glm::inverse(GameObject::inheritedTransform(this) * this->transformation) * obj->transformation;}
 }
 void GameObject::addComponent(Component* c){
   this->components.push_back(c);c->owner = this;

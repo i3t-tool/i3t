@@ -59,8 +59,7 @@ public:
   std::vector<Component*> components; ///< components with functionalities - have render and update functions, that are called in app loop
 
   bool isRender;         ///< enable/disable rendering
-  glm::mat4x4 transform; ///< transformation matrix of this object, is composed from pos*rot*scal matrices, meaning
-                         ///< if rot,pos,scal matrices are edited directly, transform must be recalculated
+  glm::mat4x4 transformation; ///< transformation matrix of this object
 
   /// Unparent this object
   /**
@@ -74,8 +73,7 @@ public:
   void addComponent(Component* c);
   Component* getComponent(const char* type);
 
-  void (*draw_callback)(GameObject* o) =
-      NULL; ///< if not NULL, this function called before object is drawn (good for animating, etc...)
+  void (*draw_callback)(GameObject* o) = NULL; ///< if not NULL, this function called before object is drawn (good for animating, etc...)
   /// Constructor.
   /**
     Creates 'blank' object without any geometry.
@@ -100,7 +98,7 @@ public:
     \param[in] rotAxis Rotation axis
     \param[in] degrees Angle in degrees
   */
-  void transformate(glm::vec3 trans, glm::vec3 scale, glm::vec3 rotAxis, float degrees);
+  void transform(glm::vec3 trans, glm::vec3 scale, glm::vec3 rotAxis, float degrees);
   /// Translate object
   /**
     \param[in] translate Translation
