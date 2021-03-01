@@ -11,6 +11,7 @@
 #include <map>
 
 #include "Core/Defs.h"
+#include "Core/Nodes/NodeData.h"
 
 enum class EColor
 {
@@ -21,7 +22,15 @@ enum class EColor
 	MenuBarBackground,
 	PrimaryColor, /// Color of tabs, separators, titles ...
   ActiveColor,
-	TabColor
+	TabColor,
+
+  PulseLink,
+  FloatLink,
+	MatrixLink,
+	QuatLink,
+	Vec3Link,
+	Vec4Link,
+	ScreenLink
 };
 
 enum class EFont
@@ -36,6 +45,31 @@ enum class EFont
 	TaskTitle,
 };
 
+constexpr inline EColor asColor(EValueType type)
+{
+	switch (type)
+	{
+	case EValueType::Pulse:
+		return EColor::PulseLink;
+	case EValueType::Float:
+		return EColor::FloatLink;
+	case EValueType::Vec3:
+		return EColor::Vec3Link;
+	case EValueType::Vec4:
+    return EColor::Vec4Link;
+	case EValueType::Matrix:
+		return EColor::MatrixLink;
+	case EValueType::Quat:
+		return EColor::QuatLink;
+	case EValueType::MatrixMul:
+		return EColor::MatrixLink;
+	case EValueType::Screen:
+		return EColor::ScreenLink;
+	}
+
+	return EColor::Vec3Link;
+}
+
 /**
  * Global color scheme.
  */
@@ -43,11 +77,11 @@ class Theme
 {
   using Colors = std::map<EColor, ImVec4>;
   Colors m_colors;
-	std::map<EFont, size_t> m_fontsAssoc;
 
 	static constexpr const size_t m_fontsCount = 4;
-  /// \todo Set dynamic scale (reload font in runtime).
+  /// \todo MH Set dynamic scale (reload font in runtime).
   static constexpr float m_fontScale = 1.2f;
+  std::map<EFont, size_t> m_fontsAssoc;
   std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
 
 public:

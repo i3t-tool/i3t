@@ -12,6 +12,14 @@ Theme::Theme()
   set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
   set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
 
+	set(EColor::PulseLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
+	set(EColor::FloatLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
+	set(EColor::MatrixLink, ImVec4(68.0f / 255.0f, 201.0f / 255.0f, 156.0f / 255.0f, 1.00f));
+	set(EColor::QuatLink, ImVec4(124.0f / 255.0f, 21.0f / 255.0f, 153.0f / 255.0f, 1.00f));
+	set(EColor::Vec3Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
+	set(EColor::Vec4Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
+	set(EColor::ScreenLink, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
+
   m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
   m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
   m_fontsAssoc.insert(std::pair(EFont::Button, 1));
