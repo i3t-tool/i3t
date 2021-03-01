@@ -2,7 +2,9 @@
 
 #include <utility>
 
-#include <imgui.h>
+#include "imgui.h"
+
+#include "Core/API.h"
 
 /// \todo If you want to use ImGui Markdown run $ git submodule add https://github.com/juliettef/imgui_markdown.git
 /// Depencencies/imgui_markdown. After that modify CMakeLists.txt, append
@@ -31,12 +33,9 @@ void TutorialWindow::setTutorial(std::string filename)
 
 void TutorialWindow::render()
 {
-	if (!Application::get().m_showTutorialWindow)
-		return;
-
 	// SET STYLE
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 20.0f));
-	ImGui::Begin("Tutorial window", &Application::get().m_showTutorialWindow);
+	ImGui::Begin("Tutorial window", getShowPtr());
 
 	// CREATE IMGUI CONTENT
 	renderTutorialContent();
@@ -57,12 +56,12 @@ void TutorialWindow::renderTutorialContent()
 	else
 	{
 		// default content
-		ImGui::PushFont(App::get().getFont(FONT_TITLE));
+		ImGui::PushFont(I3T::getFont(EFont::Title));
 		ImGui::Text("Model transformations");
 		ImGui::PopFont();
 		ImGui::Spacing();
 
-		ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
+		ImGui::PushFont(I3T::getFont(EFont::TutorialText));
 		ImGui::PushTextWrapPos(0.0f);
 		ImGui::Text("The scene demonstrates an ");
 		ImGui::SameLine(0.0);
@@ -73,11 +72,11 @@ void TutorialWindow::renderTutorialContent()
 		ImGui::PopTextWrapPos();
 		ImGui::PopFont();
 
-		ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+		ImGui::PushFont(I3T::getFont(EFont::Title));
 		ImGui::Text("Assignment 3 of 12:");
 		ImGui::PopFont();
 
-		ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
+		ImGui::PushFont(I3T::getFont(EFont::TutorialText));
 		ImGui::TextWrapped(
 				"Try to change the parameters of the given transformations and explain the behaviour of each of them");
 		ImGui::PopFont();

@@ -36,7 +36,7 @@ void DescriptionDialog::render()
 		}
 		else
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 		}
 	}
 

@@ -9,7 +9,7 @@ class TextureRegion;
 class AboutDialog : public IWindow
 {
 public:
-	static constexpr const char id[] = "AboutDialog";
+	I3T_WINDOW(AboutDialog)
 	std::shared_ptr<TextureRegion> dcgiReg;
 
 	AboutDialog();
