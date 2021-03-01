@@ -19,5 +19,5 @@ TEST(SetValueOnVector, SignalSpreadedThroughAllConnectedNodes)
 	vec1->setValue(glm::vec3(1.0f, 2.0f, 3.0f));
 	vec2->setValue(glm::vec3(3.0f, 2.0f, -1.0f));
 
-	EXPECT_EQ(4.0f, floatNode->getInternalData().getFloat());
+	EXPECT_EQ(4.0f, floatNode->getData().getFloat());
 }

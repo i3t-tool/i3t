@@ -9,7 +9,7 @@ WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground)
 
 void WorkspaceNormalizeVector::drawWorkspaceNodeData(util::NodeBuilder& builder)
 {
-	const glm::vec4& coreData = Nodebase->getInternalData().getVec4();
+	const glm::vec4& coreData = Nodebase->getData().getVec4();
 	bool valueCH = false;
 
 	glm::vec4 localData = coreData;
@@ -26,7 +26,7 @@ void WorkspaceNormalizeVector::drawWorkspaceNodeData(util::NodeBuilder& builder)
 	if (valueCH)
 	{
 		fromArrayToVec4(localData, localDataArray);
-		Nodebase->getInternalData().setValue(localData);
+		Nodebase->setValue(localData);
 	}
 
 	ImGui::Spring(0);
