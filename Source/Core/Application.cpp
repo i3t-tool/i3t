@@ -32,14 +32,14 @@ Application::Application()
 
 void Application::init()
 {
-  BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
-  CloseCommand::addListener([this] { onClose(); });
+	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
+	CloseCommand::addListener([this] { onClose(); });
 }
 
 void Application::initModules()
 {
-  for (auto* module : m_modules)
-    module->init();
+	for (auto* module : m_modules)
+		module->init();
 }
 
 void Application::initWindow()
@@ -97,11 +97,11 @@ void Application::onDisplay()
 	/// \todo move the logic Update to the timer
 	// TIME_STEP_ACU -= TIME_STEP;
 
-  for (auto* module : m_modules)
-    module->beginFrame();
+	for (auto* module : m_modules)
+		module->beginFrame();
 
-  for (auto* module : m_modules)
-    module->endFrame();
+	for (auto* module : m_modules)
+		module->endFrame();
 
 	// glfwSwapBuffers(m_window);
 	m_window->swapBuffers();

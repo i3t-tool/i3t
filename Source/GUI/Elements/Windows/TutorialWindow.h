@@ -14,7 +14,7 @@ class Tutorial;
 class TutorialWindow : public IWindow
 {
 public:
-  I3T_WINDOW(TutorialWindow)
+	I3T_WINDOW(TutorialWindow)
 
 	TutorialWindow(bool show);
 	void setTutorial(std::string filename);

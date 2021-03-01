@@ -168,7 +168,7 @@ class Frustum : public NodeBase
 public:
 	Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	        float far = 10.0f)
-	    : NodeBase(getTransformProps(ETransformType::Frustum))
+			: NodeBase(getTransformProps(ETransformType::Frustum))
 	{
 	}
 
@@ -187,7 +187,8 @@ class LookAt : public NodeBase
 public:
 	LookAt(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
 	       const glm::vec3& up = {0.0f, 1.0f, 0.0f})
-	    : NodeBase(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center), m_initialUp(up)
+			: NodeBase(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
+				m_initialUp(up)
 	{
 	}
 

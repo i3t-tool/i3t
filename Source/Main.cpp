@@ -235,8 +235,8 @@ int main(int argc, char* argv[])
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
 	}
 
-  // Initialize all modules.
-  app.init();
+	// Initialize all modules.
+	app.init();
 
 	// III. Initialize I3T stuff,
 	// read other config files.

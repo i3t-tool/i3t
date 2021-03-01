@@ -15,17 +15,17 @@
 
 enum class EColor
 {
-  Text,
+	Text,
 	Border,
 	WindowBackground,
 	PopupBackground,
 	MenuBarBackground,
 	PrimaryColor, /// Color of tabs, separators, titles ...
-  ActiveColor,
+	ActiveColor,
 	TabColor,
 
-  PulseLink,
-  FloatLink,
+	PulseLink,
+	FloatLink,
 	MatrixLink,
 	QuatLink,
 	Vec3Link,
@@ -56,7 +56,7 @@ constexpr inline EColor asColor(EValueType type)
 	case EValueType::Vec3:
 		return EColor::Vec3Link;
 	case EValueType::Vec4:
-    return EColor::Vec4Link;
+		return EColor::Vec4Link;
 	case EValueType::Matrix:
 		return EColor::MatrixLink;
 	case EValueType::Quat:
@@ -75,14 +75,14 @@ constexpr inline EColor asColor(EValueType type)
  */
 class Theme
 {
-  using Colors = std::map<EColor, ImVec4>;
-  Colors m_colors;
+	using Colors = std::map<EColor, ImVec4>;
+	Colors m_colors;
 
 	static constexpr const size_t m_fontsCount = 4;
-  /// \todo MH Set dynamic scale (reload font in runtime).
-  static constexpr float m_fontScale = 1.2f;
-  std::map<EFont, size_t> m_fontsAssoc;
-  std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
+	/// \todo MH Set dynamic scale (reload font in runtime).
+	static constexpr float m_fontScale = 1.2f;
+	std::map<EFont, size_t> m_fontsAssoc;
+	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
 
 public:
 	/**
@@ -100,27 +100,24 @@ public:
 	ImVec4 get(EColor color)
 	{
 		if (m_colors.count(color) == 0)
-			return ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f };
+			return ImVec4{0.0f, 0.0f, 0.0f, 1.0f};
 
 		return m_colors[color];
 	}
 
-  ImFont* get(EFont font)
+	ImFont* get(EFont font)
 	{
-    Debug::Assert(m_fontsAssoc.count(font) != 0, "");
+		Debug::Assert(m_fontsAssoc.count(font) != 0, "");
 		return m_fonts[m_fontsAssoc[font]];
 	}
 
 	ImFont* get(size_t id)
-  {
+	{
 		Debug::Assert(m_fonts.size() < id, "Out of bounds!");
-    return m_fonts[id];
+		return m_fonts[id];
 	}
 
-	void set(EColor color, ImVec4 value)
-  {
-		m_colors.insert(std::pair(color, value));
-	}
+	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 
 	const Colors& getColors() const { return m_colors; }
 	void setColors(const Colors& colors) { m_colors = colors; }

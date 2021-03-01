@@ -150,9 +150,11 @@ void MainMenuBar::showWindowsMenu()
 
 		if (ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr())) {}
 
-		// if (ImGui::MenuItem("Console I3T window", nullptr, I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
+		// if (ImGui::MenuItem("Console I3T window", nullptr,
+		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
 
-		// if (ImGui::MenuItem("Active matrix zoom window", nullptr, I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
+		// if (ImGui::MenuItem("Active matrix zoom window", nullptr,
+		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
 
 		if (ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<ViewportWindow>()->getShowPtr())) {}
 

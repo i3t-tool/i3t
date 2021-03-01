@@ -3,8 +3,8 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Core/API.h"
 #include "Config.h"
+#include "Core/API.h"
 #include "Rendering/TextureRegion.h"
 #include "Utils/TextureLoader.h"
 

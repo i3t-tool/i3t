@@ -98,7 +98,7 @@ static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
 class WorkspaceWindow : public IWindow
 {
 public:
-  I3T_WINDOW(WorkspaceWindow)
+	I3T_WINDOW(WorkspaceWindow)
 
 	Application& WholeApplication;
 	ne::EditorContext* NodeEditorContext; /*! \brief Object for store workspace scene */

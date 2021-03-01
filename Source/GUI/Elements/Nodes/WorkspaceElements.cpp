@@ -120,7 +120,7 @@ WorkspaceNodeBaseData::WorkspaceNodeBaseData(Ptr<Core::NodeBase> nodebase) : Nod
 				pinNameStr.c_str() //,std::format("input #{}", pin.getIndex()) // format is not part of standard library
 				,
 				PinKind::Input, pin.getType()));
-    WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(pin.getId()));
+		WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(pin.getId()));
 		pinName.str("");
 	}
 

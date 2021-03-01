@@ -5,10 +5,10 @@
  */
 #pragma once
 
+#include <GUI/UI.h>
 #include <array>
 #include <map>
 #include <vector>
-#include <GUI/UI.h>
 
 #include "gl_core_4_4.h"
 #include "imgui.h"

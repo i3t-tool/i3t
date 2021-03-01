@@ -205,7 +205,7 @@ void World::render() const
 {
 	scene->render(getActiveCamera()); // 3D scene models
 	debug();                          // 3D scene wire-frame objects (axes, frustrum,...)
-	// scene->renderAlpha(getActiveCamera());
+																		// scene->renderAlpha(getActiveCamera());
 }
 
 void World::debug() const

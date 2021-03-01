@@ -352,71 +352,71 @@ ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
 
 void AxisAngleRot::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
-  {
-    m_internalData[0].setValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
+	{
+		m_internalData[0].setValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
+	}
+	else
+	{
+		m_internalData[0].setValue(glm::mat4());
+	}
 }
 
 void OrthoProj::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
-      m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
-  {
-    m_internalData[0].setValue(glm::ortho(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-                                          m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
-                                          m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
+	    m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
+	{
+		m_internalData[0].setValue(glm::ortho(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                                      m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+		                                      m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
+	}
+	else
+	{
+		m_internalData[0].setValue(glm::mat4());
+	}
 }
 
 void PerspectiveProj::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
-      m_inputs[3].isPluggedIn())
-  {
-    m_internalData[0].setValue(
-        glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-                         m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
+	    m_inputs[3].isPluggedIn())
+	{
+		m_internalData[0].setValue(
+				glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                     m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
+	}
+	else
+	{
+		m_internalData[0].setValue(glm::mat4());
+	}
 }
 
 void Frustum::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
-      m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
-  {
-    m_internalData[0].setValue(glm::frustum(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-                                            m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
-                                            m_inputs[4].getStorage().getFloat(),
-                                            m_inputs[5].getStorage().getFloat()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
+	    m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
+	{
+		m_internalData[0].setValue(glm::frustum(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                                        m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+		                                        m_inputs[4].getStorage().getFloat(),
+		                                        m_inputs[5].getStorage().getFloat()));
+	}
+	else
+	{
+		m_internalData[0].setValue(glm::mat4());
+	}
 }
 
 void LookAt::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
-  {
-    m_internalData[0].setValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
-                                           m_inputs[2].getStorage().getVec3()));
-  }
-  else
-  {
-    m_internalData[0].setValue(glm::mat4());
-  }
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
+	{
+		m_internalData[0].setValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
+		                                       m_inputs[2].getStorage().getVec3()));
+	}
+	else
+	{
+		m_internalData[0].setValue(glm::mat4());
+	}
 }
