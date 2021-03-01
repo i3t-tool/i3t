@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "Core/Nodes/Node.h"
 
 using namespace Core;
 
@@ -15,11 +14,11 @@ TEST(PlugTwoVec3Nodes, TheirDotProductShouldBeCorrect)
   GraphManager::plug(vec1, dotNode, 0, 0);
   GraphManager::plug(vec2, dotNode, 0, 1);
 
-  vec1->getInternalData().setValue(glm::vec3(1.0f, 2.0f, 1.0f));
-  vec2->getInternalData().setValue(glm::vec3(2.0f, 1.0f, 2.0f));
+  vec1->setValue(glm::vec3(1.0f, 2.0f, 1.0f));
+  vec2->setValue(glm::vec3(2.0f, 1.0f, 2.0f));
   dotNode->updateValues(0);
 
-  EXPECT_EQ(6.0f, dotNode->getInternalData().getFloat());
+  EXPECT_EQ(6.0f, dotNode->getData().getFloat());
 }
 
 TEST(PlugTwoNodesWithDifferentTypes, NodeShouldNotBeConnected)
@@ -64,10 +63,10 @@ TEST(SimpleUnplug, UnplugMeFromPluggedNode)
 
   GraphManager::plug(vec1, vec2, 0, 0);
 
-  vec1->getInternalData().setValue(glm::vec3(2.1f, 0.5f, 0.0f));
+  vec1->setValue(glm::vec3(2.1f, 0.5f, 0.0f));
   vec2->updateValues(0);
 
-  EXPECT_FALSE(vec2->getInternalData().getVec3().x == 0.0f);
+  EXPECT_FALSE(vec2->getData().getVec3().x == 0.0f);
 
   GraphManager::unplugAll(vec1);
 

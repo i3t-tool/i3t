@@ -6,35 +6,36 @@
 
 int Shaper::initShaders()
 {
-  std::cout << "shaper shader init" << std::endl;
-  GLuint shaders[] = {
-      pgr::createShaderFromSource(GL_VERTEX_SHADER, vertexShaderSrc),
-      pgr::createShaderFromSource(GL_FRAGMENT_SHADER, fragmentShaderSrc),
-      0,
-  };
+	std::cout << "shaper shader init" << std::endl;
 
-  if (shaders[0] == 0 || shaders[1] == 0)
-  {
-    std::cout << "shader files error" << std::endl;
-    return 1;
-  }
+	GLuint shaders[] = {
+			pgr::createShaderFromSource(GL_VERTEX_SHADER, vertexShaderSrc),
+			pgr::createShaderFromSource(GL_FRAGMENT_SHADER, fragmentShaderSrc),
+			0,
+	};
 
-  id = pgr::createProgram(shaders);
+	if (shaders[0] == 0 || shaders[1] == 0)
+	{
+		std::cout << "shader files error" << std::endl;
+		return 1;
+	}
 
-  if (id == 0)
-  {
-    std::cout << "shader compile error" << std::endl;
-    return 2;
-  }
-  // else {
-  //	std::cout << "compiled... id = " << id << std::endl;
-  //}
+	id = pgr::createProgram(shaders);
 
-  positionLoc = glGetAttribLocation(id, "a_position");
-  colorLoc = glGetAttribLocation(id, "a_color");
-  PVMLoc = glGetUniformLocation(id, "u_PVM");
+	if (id == 0)
+	{
+		std::cout << "shader compile error" << std::endl;
+		return 2;
+	}
+	// else {
+	//	std::cout << "compiled... id = " << id << std::endl;
+	//}
 
-  return 0;
+	positionLoc = glGetAttribLocation(id, "a_position");
+	colorLoc = glGetAttribLocation(id, "a_color");
+	PVMLoc = glGetUniformLocation(id, "u_PVM");
+
+	return 0;
 }
 
 /**
@@ -43,56 +44,56 @@ int Shaper::initShaders()
  */
 void Shaper::rebuildVaos()
 {
-  size_t size = vertices.size();
+	size_t size = vertices.size();
 
-  glBindVertexArray(vao);
+	glBindVertexArray(vao);
 
-  // vertices
-  glBindBuffer(GL_ARRAY_BUFFER, vertsId);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, vertices.data(), GL_STATIC_DRAW);
-  glEnableVertexAttribArray(positionLoc);
-  glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// vertices
+	glBindBuffer(GL_ARRAY_BUFFER, vertsId);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, vertices.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(positionLoc);
+	glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-  // colors
-  glBindBuffer(GL_ARRAY_BUFFER, colorsId);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, colors.data(), GL_STATIC_DRAW);
-  glEnableVertexAttribArray(colorLoc);
-  glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// colors
+	glBindBuffer(GL_ARRAY_BUFFER, colorsId);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, colors.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(colorLoc);
+	glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-  glBindVertexArray(0);
+	glBindVertexArray(0);
 }
 
 void Shaper::drawAndPreserve(Camera* cam) const
 {
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 
-  glBindVertexArray(vao);
+	glBindVertexArray(vao);
 
-  glUseProgram(id);
+	glUseProgram(id);
 
-  glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(cam->getCombined()));
+	glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(cam->getCombined()));
 
-  // draw
-  const auto size = static_cast<const GLsizei>(vertices.size());
-  glDrawArrays(GL_LINES, 0, size / 3);
+	// draw
+	const auto size = static_cast<const GLsizei>(vertices.size());
+	glDrawArrays(GL_LINES, 0, size / 3);
 
-  CHECK_GL_ERROR();
+	CHECK_GL_ERROR();
 
-  glBindVertexArray(0);
+	glBindVertexArray(0);
 
-  glUseProgram(0);
+	glUseProgram(0);
 }
 
 void Shaper::drawOnceAndDestroy(Camera* cam)
 {
-  rebuildVaos(); // copy prepared geometry (vertices and colors) to OpenGL buffers
+	rebuildVaos(); // copy prepared geometry (vertices and colors) to OpenGL buffers
 
-  drawAndPreserve(cam);
-  // !!! //
-  clearPreparedVertices(); // delete the prepared vertices and colors
-  // deleteBuffers();  //deleteOpenGL Buffers
+	drawAndPreserve(cam);
+	// !!! //
+	clearPreparedVertices(); // delete the prepared vertices and colors
+													 // deleteBuffers();  //deleteOpenGL Buffers
 }
 
 // PF - reimplemented above
@@ -137,10 +138,10 @@ void Shaper::drawOnceAndDestroy(Camera* cam)
 // delete VAO
 void Shaper::deleteBuffers() const
 {
-  glDeleteBuffers(1, &vertsId);
-  glDeleteBuffers(1, &colorsId);
-  glDeleteVertexArrays(1, &vao);
-  // std::cout << vertices.size() << std::endl;
+	glDeleteBuffers(1, &vertsId);
+	glDeleteBuffers(1, &colorsId);
+	glDeleteVertexArrays(1, &vao);
+	// std::cout << vertices.size() << std::endl;
 }
 
 /**

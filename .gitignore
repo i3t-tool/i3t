@@ -1,6 +1,7 @@
 .gitignore
 .idea/
 /Docs/Doxygen/html/
+/Data/imgui.ini
 
 /Binaries/
 cmake-*

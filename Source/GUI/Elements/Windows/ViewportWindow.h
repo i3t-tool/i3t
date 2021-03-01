@@ -12,14 +12,16 @@
 class ViewportWindow : public IWindow
 {
 public:
-  ViewportWindow(bool show, World* world);
-  void render();
+	I3T_WINDOW(ViewportWindow)
+
+	ViewportWindow(bool show, World* world);
+	void render();
 
 private:
-  World* m_world;
-  unsigned int m_fboMain;
-  unsigned int m_texColBufMain;
-  unsigned int m_rboMain;
-  ImVec2 m_wcMin;
-  ImVec2 m_wcMax;
+	World* m_world;
+	unsigned int m_fboMain;
+	unsigned int m_texColBufMain;
+	unsigned int m_rboMain;
+	ImVec2 m_wcMin;
+	ImVec2 m_wcMax;
 };

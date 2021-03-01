@@ -21,10 +21,10 @@
 class Transformation
 {
 public:
-  virtual ~Transformation(){};
+	virtual ~Transformation(){};
 
-  virtual glm::mat4 getTransformationMatrix() = 0;
-  virtual glm::mat4 getTransformationOut() = 0;
+	virtual glm::mat4 getTransformationMatrix() = 0;
+	virtual glm::mat4 getTransformationOut() = 0;
 };
 
 #endif

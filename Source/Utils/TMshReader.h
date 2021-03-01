@@ -19,9 +19,9 @@ class Geometry;
 class TMshReader
 {
 public:
-  static Geometry* geometryFromTMsh(std::string filename);
+	static Geometry* geometryFromTMsh(std::string filename);
 
-  static Geometry* geometryFromTMsh(std::string filename, float scale);
+	static Geometry* geometryFromTMsh(std::string filename, float scale);
 };
 
 #endif

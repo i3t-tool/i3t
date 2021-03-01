@@ -14,89 +14,76 @@ namespace Core
  */
 class Sequence : public NodeBase
 {
-  using Matrix = NodeBase;
+	using Matrix = NodeBase;
 
-  std::vector<UPtr<Matrix>> m_matrices;
+	std::vector<Ptr<Matrix>> m_matrices;
 
 public:
-  Sequence() : NodeBase(&operations[ENodeType::Sequence])
-  {
-    m_inputs.emplace_back(EValueType::Matrix, true, this, 0); // mul. input
-    m_inputs.emplace_back(EValueType::Matrix, true, this, 1); // direct mat. input
+	Sequence() : NodeBase(&g_sequence){};
 
-    m_outputs.emplace_back(EValueType::Matrix, false, this, 0); // mul. output
-    m_outputs.emplace_back(EValueType::Matrix, false, this, 1); // direct mat. output
+	/**
+	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
+	 *
+	 * \param matrix Matrix to transfer.
+	 * \param index New position of matrix.
+	 */
+	void addMatrix(Ptr<Matrix> matrix, const int index) noexcept
+	{
+		/// \todo MH matrix validation.
 
-    m_internalData.emplace_back();
-    m_internalData.emplace_back();
+		if (index > m_matrices.size())
+			m_matrices.push_back(std::move(matrix));
+		else
+			m_matrices.insert(m_matrices.begin() + index, std::move(matrix));
 
-    updateValues(0);
-  };
+		receiveSignal(0);
+	};
 
-  /**
-   * Pass matrix to a sequence. Sequence takes ownership of matrix.
-   *
-   * \param matrix Matrix to transfer.
-   * \param index New position of matrix.
-   */
-  void addMatrix(UPtr<Matrix> matrix, const int index) noexcept
-  {
-    if (index > m_matrices.size())
-      m_matrices.push_back(std::move(matrix));
-    else
-      m_matrices.insert(m_matrices.begin() + index, std::move(matrix));
+	/**
+	 * \brief Get reference to matrix in a sequence at given position.
+	 *
+	 * <b>Be careful</b> not to access matrix via invalid reference after
+	 * calling popMatrix.
+	 *
+	 * \param idx Index of matrix.
+	 * \return Reference to matrix holt in m_matrices vector.
+	 */
+	[[nodiscard]] Ptr<Matrix>& getMatRef(size_t idx) { return m_matrices.at(idx); }
 
-    receiveSignal(0);
-  };
+	/**
+	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
+	 */
+	[[nodiscard]] Ptr<Matrix> popMatrix(const int index)
+	{
+		Debug::Assert(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
 
-  /**
-   * \brief Get reference to matrix in a sequence at given position.
-   *
-   * <b>Be careful</b> not to access matrix via invalid reference after
-   * calling popMatrix.
-   *
-   * \param idx Index of matrix.
-   * \return Reference to matrix holt in m_matrices vector.
-   */
-  [[nodiscard]] UPtr<Matrix>& getMatRef(size_t idx)
-  {
-    return m_matrices.at(idx);
-  }
+		auto result = std::move(m_matrices.at(index));
+		m_matrices.erase(m_matrices.begin() + index);
 
-  /**
-   * Pop matrix from a sequence. Caller takes ownership of returned matrix.
-   */
-  [[nodiscard]] UPtr<Matrix> popMatrix(const int index)
-  {
-    Debug::Assert(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
+		return result;
+	};
 
-    auto result = std::move(m_matrices.at(index));
-    m_matrices.erase(m_matrices.begin() + index);
+	void updateValues(int inputIndex) override
+	{
+		glm::mat4 result(1.0f);
 
-    return result;
-  };
+		if (m_inputs[1].isPluggedIn())
+		{
+			// Matrix node is connected to direct matrix input.
+			result = m_inputs[1].getStorage().getMat4();
+		}
+		else
+		{
+			for (const auto& mat : m_matrices)
+			{
+				result *= mat->getData().getMat4();
+			}
+		}
 
-  void updateValues(int inputIndex) override
-  {
-    glm::mat4 result(1.0f);
+		m_internalData[0].setValue(result);
+		m_internalData[1].setValue(result);
 
-    if (m_inputs[1].isPluggedIn())
-    {
-      // Matrix node is connected to direct matrix input.
-      result = m_inputs[1].getStorage().getMat4();
-    }
-    else
-    {
-      for (const auto& mat : m_matrices)
-      {
-        result *= mat->getInternalData().getMat4();
-      }
-    }
-
-    m_internalData[0].setValue(result);
-    m_internalData[1].setValue(result);
-  };
+		spreadSignal();
+	};
 };
-}
-
-
+} // namespace Core

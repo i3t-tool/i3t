@@ -19,17 +19,17 @@
  */
 struct Environment
 {
-  glm::vec3 lightDirection; ///< direction of the directional light source
-  glm::vec3 lightColor;     ///< color of the directional light source
+	glm::vec3 lightDirection; ///< direction of the directional light source
+	glm::vec3 lightColor;     ///< color of the directional light source
 
-  glm::vec3 ambientColor; ///< ambient coolor of the environment
+	glm::vec3 ambientColor; ///< ambient coolor of the environment
 
-  Environment()
-  {
-    lightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f));
-    lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-    ambientColor = glm::vec3(0.2f, 0.2f, 0.2f);
-  }
+	Environment()
+	{
+		lightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f));
+		lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+		ambientColor = glm::vec3(0.2f, 0.2f, 0.2f);
+	}
 };
 
 #endif

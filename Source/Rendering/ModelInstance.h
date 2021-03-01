@@ -20,37 +20,37 @@ class Shader;
 class ModelInstance : public Transformable
 {
 protected:
-  bool visible;
+	bool visible;
 
-  bool alphaFlag; ///<
+	bool alphaFlag; ///<
 
-  Geometry* geometry; ///< model geometry (vertice, OpenGL buffers, AABB, ...)
+	Geometry* geometry; ///< model geometry (vertice, OpenGL buffers, AABB, ...)
 
 public:
-  Material* material;
+	Material* material;
 
-  ModelInstance(Geometry* _geometry, Material* _material)
-      : geometry(_geometry), material(_material), alphaFlag(false), visible(true)
-  {
-  }
+	ModelInstance(Geometry* _geometry, Material* _material)
+			: geometry(_geometry), material(_material), alphaFlag(false), visible(true)
+	{
+	}
 
-  virtual ~ModelInstance() {}
+	virtual ~ModelInstance() {}
 
-  Geometry* getGeometry() const { return geometry; }
+	Geometry* getGeometry() const { return geometry; }
 
-  /**
-   * \brief \todo NOT USED. Set material alphaFlag
-   * \param val should set the material alphaFlag to this val
-   */
-  void setAlphaFlag(const bool val) { alphaFlag = val; }
+	/**
+	 * \brief \todo NOT USED. Set material alphaFlag
+	 * \param val should set the material alphaFlag to this val
+	 */
+	void setAlphaFlag(const bool val) { alphaFlag = val; }
 
-  bool getAlphaFlag() const { return alphaFlag; }
+	bool getAlphaFlag() const { return alphaFlag; }
 
-  void setVisible(const bool val) { visible = val; }
+	void setVisible(const bool val) { visible = val; }
 
-  bool isVisible() const { return visible; }
+	bool isVisible() const { return visible; }
 
-  virtual void draw() {}
+	virtual void draw() {}
 };
 
 #endif

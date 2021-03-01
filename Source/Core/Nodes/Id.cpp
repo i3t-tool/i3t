@@ -6,5 +6,5 @@ ID IdGenerator::m_id = 0;
 
 ID IdGenerator::next()
 {
-  return m_id++;
+	return m_id++;
 }

@@ -12,13 +12,13 @@
  */
 template <typename E> constexpr auto toUnderlying(E e) noexcept
 {
-  return static_cast<std::underlying_type_t<E>>(e);
+	return static_cast<std::underlying_type_t<E>>(e);
 }
 
 namespace FS
 {
 FORCE_INLINE std::string absolute(const std::string& relativePath)
 {
-  return I3T_PROJECT_ROOT + relativePath;
+	return I3T_PROJECT_ROOT + relativePath;
 }
 } // namespace FS

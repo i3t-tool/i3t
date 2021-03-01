@@ -36,64 +36,64 @@ class ViewPort;
 class Scene
 {
 public:
-  World* world;
+	World* world;
 
-  Environment* environment;
+	Environment* environment;
 
-  /// camera objects
-  std::vector<CameraObject*> cameraObjects;
+	/// camera objects
+	std::vector<CameraObject*> cameraObjects;
 
-  /// all objects (render groups, cameras??, free objects ...)
-  std::vector<Object*> objects;
+	/// all objects (render groups, cameras??, free objects ...)
+	std::vector<Object*> objects;
 
-  /// render groups
-  RenderGroups* renderGroups;
+	/// render groups
+	RenderGroups* renderGroups;
 
-  /// \todo TOFIX get out of scene - collision with 	GeometryMap::connectAllHCToShader() in main.cpp::init()
-  /// frustrum model to draw all cameras frustra
-  ModelInstance* frustrumObject;
+	/// \todo TOFIX get out of scene - collision with 	GeometryMap::connectAllHCToShader() in main.cpp::init()
+	/// frustrum model to draw all cameras frustra
+	ModelInstance* frustrumObject;
 
-  /// global camera
-  Camera* camera; ///< the world camera - probably the camera for the 3D scene preview
-  glm::vec3 cameraOrbitCenter;
+	/// global camera
+	Camera* camera; ///< the world camera - probably the camera for the 3D scene preview
+	glm::vec3 cameraOrbitCenter;
 
-  ViewPort* viewPort;
+	ViewPort* viewPort;
 
-  Scene(World* _world);
-  ~Scene();
+	Scene(World* _world);
+	~Scene();
 
-  void onReshape(int width, int height);
+	void onReshape(int width, int height);
 
-  Object* addObject(Transformation* t, ObjectDefinition* o);
+	Object* addObject(Transformation* t, ObjectDefinition* o);
 
-  void removeObject(Object* object);
-  void removeCameraObject(CameraObject* co);
+	void removeObject(Object* object);
+	void removeCameraObject(CameraObject* co);
 
-  CameraObject* addCamera(Transformation* p, Transformation* v);
+	CameraObject* addCamera(Transformation* p, Transformation* v);
 
-  void update();
-  void keyUpdate();
+	void update();
+	void keyUpdate();
 
-  void render(Camera* _camera);
-  void render(glm::mat4 proj, glm::mat4 view, CameraObject* noCamera) const;
-  // void renderAlpha(Camera * _camera);
+	void render(Camera* _camera);
+	void render(glm::mat4 proj, glm::mat4 view, CameraObject* noCamera) const;
+	// void renderAlpha(Camera * _camera);
 
-  /**
-   * \brief \notused drawCamera() in never used
-   */
-  void drawCamera();
+	/**
+	 * \brief \notused drawCamera() in never used
+	 */
+	void drawCamera();
 
-  void debug(Shaper* shaper);
+	void debug(Shaper* shaper);
 
-  void setCamToOrbitCenterX() const;
-  void setCamToOrbitCenterY();
-  void setCamToOrbitCenterZ();
+	void setCamToOrbitCenterX() const;
+	void setCamToOrbitCenterY();
+	void setCamToOrbitCenterZ();
 
-  void setCamToCenterX();
-  void setCamToCenterY();
-  void setCamToCenterZ();
+	void setCamToCenterX();
+	void setCamToCenterY();
+	void setCamToCenterZ();
 
-  void setCamToCenter();
+	void setCamToCenter();
 };
 
 #endif

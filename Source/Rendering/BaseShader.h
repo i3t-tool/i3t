@@ -26,102 +26,106 @@
 class BaseShader : public RedShader
 {
 protected:
-  // textures
-  GLint texCoord0Loc;      ///< location of the v_texCoord0 attribute variable
-  GLint diffuseSamplerLoc; ///< location of uniform sampler u_diffuse
+	// textures
+	GLint texCoord0Loc;      ///< location of the v_texCoord0 attribute variable
+	GLint diffuseSamplerLoc; ///< location of uniform sampler u_diffuse
 
 public:
-  BaseShader(const char* vertexShader, const char* fragmentShader) : RedShader(vertexShader, fragmentShader) {}
+	BaseShader(const char* vertexShader, const char* fragmentShader) : RedShader(vertexShader, fragmentShader) {}
 
-  void getLocations() override
-  {
-    RedShader::getLocations();
+	void getLocations() override
+	{
+		RedShader::getLocations();
 
-    texCoord0Loc = glGetAttribLocation(id, "a_texCoord0");
-    diffuseSamplerLoc = glGetUniformLocation(id, "u_diffuse");
-  }
+		texCoord0Loc = glGetAttribLocation(id, "a_texCoord0");
+		diffuseSamplerLoc = glGetUniformLocation(id, "u_diffuse");
+	}
 
-  GLint getTexCoord0Loc() { return texCoord0Loc; }
+	GLint getTexCoord0Loc() { return texCoord0Loc; }
 
-  GLint getDiffuseSamplerLoc() { return diffuseSamplerLoc; }
+	GLint getDiffuseSamplerLoc() { return diffuseSamplerLoc; }
 
-  void draw(ModelInstance* modelInstance, Camera* camera, Environment* environment) override
-  {
-    draw(modelInstance, camera->getProjection(), camera->getView(), environment);
-  }
+	void draw(ModelInstance* modelInstance, Camera* camera, Environment* environment) override
+	{
+		draw(modelInstance, camera->getProjection(), camera->getView(), environment);
+	}
 
-  void draw(ModelInstance* modelInstance, glm::mat4 projection, glm::mat4 view, Environment* environment) override
-  {
-    /*
-    // Set in ShaderProvider::connectGeometry()
-    if (modelInstance->getGeometry()->actShaderId != id) {
-      modelInstance->getGeometry()->connectVertexAttributes(this);
-    }
-    */
+	void draw(ModelInstance* modelInstance, glm::mat4 projection, glm::mat4 view, Environment* environment) override
+	{
+		/*
+		// Set in ShaderProvider::connectGeometry()
+		if (modelInstance->getGeometry()->actShaderId != id) {
+		  modelInstance->getGeometry()->connectVertexAttributes(this);
+		}
+		*/
 
-    // PVM
-    glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection * view * modelInstance->getTrans()));
-    // environment
-    // glm::vec3 lightDirection = glm::vec3( modelInstance->getTrans() * glm::vec4(environment->lightDirection, 0.0f));
+		// PVM
+		glUniformMatrix4fv(PVMLoc, 1, GL_FALSE, glm::value_ptr(projection * view * modelInstance->getTrans()));
 
-    // normal trans
-    glUniformMatrix3fv(normalTransLoc, 1, GL_FALSE,glm::value_ptr(glm::transpose(glm::inverse(glm::mat3(modelInstance->getTrans())))));
-    glUniform3fv(lightDirectionLoc, 1, glm::value_ptr(environment->lightDirection));
-    glUniform3fv(lightColorLoc, 1, glm::value_ptr(environment->lightColor));
-    glUniform3fv(ambientColorLoc, 1, glm::value_ptr(environment->ambientColor));
+		// environment
+		// glm::vec3 lightDirection = glm::vec3( modelInstance->getTrans() * glm::vec4(environment->lightDirection, 0.0f)
+		// );
 
-    // material
-    glUniform3fv(diffuseColorLoc, 1, glm::value_ptr(modelInstance->material->diffuseColor));
+		// normal trans
+		glUniformMatrix3fv(normalTransLoc, 1, GL_FALSE,
+		                   glm::value_ptr(glm::transpose(glm::inverse(glm::mat3(modelInstance->getTrans())))));
 
-    // textures
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(diffuseSamplerLoc, 0);
-    glBindTexture(GL_TEXTURE_2D, modelInstance->material->getTextureId());
+		glUniform3fv(lightDirectionLoc, 1, glm::value_ptr(environment->lightDirection));
+		glUniform3fv(lightColorLoc, 1, glm::value_ptr(environment->lightColor));
+		glUniform3fv(ambientColorLoc, 1, glm::value_ptr(environment->ambientColor));
 
-    // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		// material
+		glUniform3fv(diffuseColorLoc, 1, glm::value_ptr(modelInstance->material->diffuseColor));
 
-    // draw
-    glBindVertexArray(modelInstance->getGeometry()->getVao());
-    glDrawElements(GL_TRIANGLES, modelInstance->getGeometry()->getIndicesCount(), GL_UNSIGNED_INT, (void*)0);
+		// textures
+		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(diffuseSamplerLoc, 0);
+		glBindTexture(GL_TEXTURE_2D, modelInstance->material->getTextureId());
 
-    CHECK_GL_ERROR();
+		// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-    glBindVertexArray(0);
-  }
+		// draw
+		glBindVertexArray(modelInstance->getGeometry()->getVao());
+		glDrawElements(GL_TRIANGLES, modelInstance->getGeometry()->getIndicesCount(), GL_UNSIGNED_INT, (void*)0);
 
-  /**
-   * \brief Called by ShaderProvider::connectGeometry
-   * \param geometry Model (vertices an indices) + OpenGL names of buffers
-   */
-  void connectVertexAttributes(Geometry* geometry) override
-  {
-    geometry->actShaderId = id;
+		CHECK_GL_ERROR();
 
-    glBindVertexArray(geometry->getVao());
+		glBindVertexArray(0);
+	}
 
-    glBindBuffer(GL_ARRAY_BUFFER, geometry->getVerticesBuffer());
+	/**
+	 * \brief Called by ShaderProvider::connectGeometry
+	 * \param geometry Model (vertices an indices) + OpenGL names of buffers
+	 */
+	void connectVertexAttributes(Geometry* geometry) override
+	{
+		geometry->actShaderId = id;
 
-    // position
-    glEnableVertexAttribArray(positionLoc);
-    glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
-                          (void*)0);
+		glBindVertexArray(geometry->getVao());
 
-    // normal
-    glEnableVertexAttribArray(normalLoc);
-    glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
-                          (void*)(3 * sizeof(float)));
+		glBindBuffer(GL_ARRAY_BUFFER, geometry->getVerticesBuffer());
 
-    // uv
-    glEnableVertexAttribArray(texCoord0Loc);
-    glVertexAttribPointer(texCoord0Loc, 2, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
-                          (void*)(6 * sizeof(float)));
+		// position
+		glEnableVertexAttribArray(positionLoc);
+		glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
+		                      (void*)0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->getIndicesBuffer());
+		// normal
+		glEnableVertexAttribArray(normalLoc);
+		glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
+		                      (void*)(3 * sizeof(float)));
 
-    glBindVertexArray(0);
+		// uv
+		glEnableVertexAttribArray(texCoord0Loc);
+		glVertexAttribPointer(texCoord0Loc, 2, GL_FLOAT, GL_FALSE, geometry->getAttribsPerVertex() * sizeof(float),
+		                      (void*)(6 * sizeof(float)));
 
-    CHECK_GL_ERROR();
-  }
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->getIndicesBuffer());
+
+		glBindVertexArray(0);
+
+		CHECK_GL_ERROR();
+	}
 };
 
 #endif
