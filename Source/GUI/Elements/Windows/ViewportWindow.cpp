@@ -32,15 +32,12 @@ ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
   glBindRenderbuffer(GL_RENDERBUFFER,m_rboMain);
   //glPixelStorei(GL_PACK_ALIGNMENT, 1);
   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glEnable(GL_STENCIL_TEST);
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
   glEnable(GL_MULTISAMPLE);
   glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
-  // glClearStencil(255);
-  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -118,14 +115,14 @@ void ViewportWindow::render()
 
     // clear
     glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-    glClearStencil(0);
     glStencilMask(255);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-    glEnable(GL_MULTISAMPLE);
-    glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glClearStencil(0);
+    //glEnable(GL_MULTISAMPLE);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // draw
-    m_world->render();
+    //m_world->render();
 
     // world2
     World2::tmpAccess->onUpdate();

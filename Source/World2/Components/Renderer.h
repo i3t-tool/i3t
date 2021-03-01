@@ -1,4 +1,13 @@
 #pragma once
+//----------------
+/**
+ * \file Renderer.h
+ * \author Daniel Gruncl
+ * \brief Wrapper of GameObject::draw(glm::mat4)
+ * Allows to render it two passes - opaque, transparent.
+ * Adds functionality of drawing stencil and drawing GL_LINES/GL_TRIANGLES
+ */
+//---------------
 #include "../Component.h"
 
 class Renderer : public Component

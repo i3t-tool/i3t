@@ -27,7 +27,7 @@ void GlfwWindow::init()
   /// \todo GLFW antialiasing. Antialiasing in scene window.
   // glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing custom thingy
 
-  m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, Config::WIN_TITLE.c_str(), NULL, NULL);
+  m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, Config::WIN_TITLE.c_str(), NULL, NULL);//c++ exception
   if (m_mainWindow == nullptr)
   {
     LOG_FATAL("GLFW could not create main window!");

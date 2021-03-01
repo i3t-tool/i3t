@@ -1,4 +1,15 @@
 #pragma once
+//----------------
+/**
+ * \file Camera2.h
+ * \author Daniel Gruncl
+ * \brief renders scene
+ * renders tree of GameObjects in update();
+ * Can render in already prepared framebuffer (default configuration),
+ * or into framebuffer provided by user.
+ * Camera renders by calling render(glm::mat4*,bool) on each component on every GameObject in scene tree.
+ */
+//---------------
 #include "../GameObject.h"
 #include "../Component.h"
 #include "../RenderTexture.h"
@@ -21,6 +32,6 @@ public:
 private:
   static const char* typeStatic;
 
-  void renderRecursive(GameObject* obj, glm::mat4 parent,bool isTranspartentPass);
+  void renderRecursive(GameObject* obj, glm::mat4 parent,bool isTranspartentPass);///<render scene tree
   bool mainCamera;///<if fbo is NULL, camera renders to screen and sets World2 camera settings to its own
 };

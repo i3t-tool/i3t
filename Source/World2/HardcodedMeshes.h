@@ -31,7 +31,8 @@ extern pgr::MeshData cameraicoMesh;
 extern pgr::MeshData plane_grassMesh;
 // TERRAIN_ROCKS \/
 extern pgr::MeshData plane_rocksMesh;
-// SKYBOX \/
-extern pgr::MeshData skyboxMesh;
 // PLANE \/
 extern pgr::MeshData planeMesh;
+
+extern pgr::MeshData three_axisMesh;
+extern pgr::MeshData gridMesh;

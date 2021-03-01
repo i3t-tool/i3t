@@ -117,6 +117,7 @@ void Application::run()
 {
   while (!m_bShouldClose)
   {
+   
     // Process commands.
     for (auto& command : m_commands)
     {
@@ -129,7 +130,7 @@ void Application::run()
     onDisplay();
 
     // Poll events.
-    glfwWaitEvents();
+    glfwWaitEvents();//c++ exception
   }
 }
 

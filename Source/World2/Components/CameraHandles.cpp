@@ -22,19 +22,17 @@ CameraHandles::CameraHandles(){
 	this->hposs[3]=glm::vec4(0.0f,-1.0f,0.0f,1.0f);
 	this->hposs[4]=glm::vec4(1.0f,0.0f,0.0f,1.0f);
 	this->hposs[5]=glm::vec4(-1.0f,0.0f,0.0f,1.0f);
-		
-	this->shader_colp=glGetUniformLocation(World2::shaderProj, "color");
-	this->shader_colh=glGetUniformLocation(World2::shaderHandle, "color");
 }
 void CameraHandles::start(){
 	this->cam = (Camera2*)this->owner->getComponent(Camera2::componentType());
-	this->frustrum = new GameObject(unitcubeMesh, World2::shaderProj, 0);
-	this->frustruml = new GameObject(cubelinesMesh, World2::shaderProj, 0);
+	this->frustrum = new GameObject(unitcubeMesh, &World2::shaderProj, 0);
+	this->frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f);
+	this->frustruml = new GameObject(cubelinesMesh, &World2::shaderProj, 0);
 	this->frustruml->primitive = GL_LINES;
-	this->cameraico = new GameObject(cameraicoMesh, World2::shaderHandle, 0);
+	this->frustruml->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	this->cameraico = new GameObject(cameraicoMesh, &World2::shaderHandle, 0);
 	this->cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
-
-	this->handle = new GameObject(unitcubeMesh, World2::shaderHandle, 0);
+	this->handle = new GameObject(unitcubeMesh, &World2::shaderHandle, 0);
 }
 
 void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
@@ -42,29 +40,28 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 transform=(*parent)*this->owner->transformation;
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 		
-	glUseProgram(World2::shaderProj);
-	glUniformMatrix4fv(glGetUniformLocation(World2::shaderProj, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
+	glUseProgram(World2::shaderProj.program);
+	glUniformMatrix4fv(glGetUniformLocation(World2::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
 	if(renderTransparent){
 		if(this->isEdit){
-			glUniform4f(this->shader_colp, 0.5f,0.5f,0.5f,0.5f);
 			glDisable(GL_CULL_FACE);
-			//this->frustrum->draw(transform);
+			this->frustrum->draw(transform);
+			this->frustruml->draw(transform);
 			glEnable(GL_CULL_FACE);
 		}
 	}
 	else{
+		glDepthRange(0.0, 0.01);
+		glUseProgram(World2::shaderHandle.program);
+
 		if(this->isEdit){
-			glUniform4f(this->shader_colp, 0.0f,0.0f,0.0f,1.0f);
-			this->frustruml->draw(transform);
-				
-			glUseProgram(World2::shaderHandle);
 			glStencilMask(255);
 			for(int i=0;i<6;i++){
 				glStencilFunc(GL_ALWAYS, this->stencils.arr[i], 255);
 				glm::vec3 col=glm::vec4((float)(this->activehandle==this->stencils.arr[i]));
 				col[(5-i)/2]=1.0f;
 					
-				glUniform4f(this->shader_colh,col[0],col[1],col[2],1.0f);
+				this->handle->color=glm::vec4(col[0],col[1],col[2],1.0f);
 					
 				glm::vec4 pos=projinv*this->hposs[i];
 				pos/=pos[3];
@@ -79,8 +76,9 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 				}
 
 				float depth=(World2::perspective*World2::mainCamera*transform*pos)[2];
-				this->handle->transformation=glm::mat4(depth*0.01f+0.1);
+				this->handle->transformation=glm::mat4(depth*0.01f+0.1f);
 				this->handle->transformation[3]=pos;
+
 				this->handle->draw(transform);
 				//printf("%d, %f %f %f %f\n",i,pos[0],pos[1],pos[2],pos[3]);//getchar();
 			}
@@ -91,14 +89,12 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 		this->cameraico->transformation[3]+=mov;
 		
 		float color=(float)this->isEdit*0.2f+0.8f;
-		glUseProgram(World2::shaderHandle);
-		glUniform4f(this->shader_colh, color,color,color,1.0f);
-	
+		this->cameraico->color=glm::vec4(color,color,color,1.0f);
 		glStencilMask(255);
 		glStencilFunc(GL_ALWAYS, this->editedcam, 255);
 		this->cameraico->draw(transform);
 		glStencilMask(0);
-			
+		glDepthRange(0.0, 1.0);
 		this->cameraico->transformation[3]-=mov;
 	}
 	

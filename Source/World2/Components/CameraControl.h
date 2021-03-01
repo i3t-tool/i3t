@@ -1,4 +1,13 @@
 #pragma once
+//----------------
+/**
+ * \file CameraControl.h
+ * \author Daniel Gruncl
+ * \brief control scene camera
+ * mouse right button, mouse middle button,
+ * arrows,ctrl,shift
+ */
+//---------------
 #include <iostream>
 #include "../Component.h"
 

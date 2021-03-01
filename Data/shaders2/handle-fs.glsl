@@ -6,22 +6,18 @@ out vec4 fragmentColor;
 uniform sampler2D tex0;
 uniform vec3 camera;
 uniform vec4 light;
-
-uniform vec4 color=vec4(1.0,0.0,0.0,1.0);
+uniform vec4 color=vec4(1.0,1.0,1.0,1.0);
 
 smooth in vec3 normn;//camera space normal
+smooth in vec2 coord;//uv
 
-vec3 lvec;
+vec3 lvec=vec3(0.5,1.0,-1.0);
 
 void main(){
+	//fragmentColor=texture(tex0,vec2(coord.x,-coord.y),-0.5)*color;
 	fragmentColor=color;
 	
-	lvec=vec3(0.5,1.0,-1.0);				//dir
 	lvec=normalize(lvec);
-	fragmentColor.rgb=fragmentColor.rgb*max(dot(lvec,normn),0.0);
-	fragmentColor.rgb=mix(fragmentColor.rgb,color.rgb,0.7);	
+	fragmentColor.rgb=fragmentColor.rgb*max(dot(lvec,normn),0.5);
 	
-	if(color.a>0.8){gl_FragDepth=gl_FragCoord.z;}
-	else{gl_FragDepth=gl_FragCoord.z*0.01;}
-	//gl_FragDepth=gl_FragCoord.z*0.01;
 }

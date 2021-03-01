@@ -1,7 +1,7 @@
 #pragma once
 //----------------
 /**
- * \file gameobject.h
+ * \file GameObject.h
  * \author Daniel Gruncl
  * \brief scene objects
  * intialize new scene object using mesh, shader program, GL texture and drawing callback
@@ -10,11 +10,12 @@
 //---------------
 #pragma once
 #include "Component.h"
+#include "World2.h"
 #include "pgr.h"
 #include <vector>
 
-extern glm::mat4x4 perspective; ///< global perspective matrix
-extern glm::mat4x4 mainCamera;  ///< global main camera
+class Component;
+
 /// Scene object
 /**
   Contains transformation matricies, optionally geometry, shader program and texture
@@ -23,15 +24,9 @@ extern glm::mat4x4 mainCamera;  ///< global main camera
   Transfromation functions of object will update transform matrix.
   All transformations are additive.
 */
-class Component;
 class GameObject
 {
 private:
-  GLuint shader_camera;   ///< camera position before rotation
-  GLuint shader_Mmatrix;  ///< matrix of model's transform in shader
-  GLuint shader_VMmatrix; ///< matrix view*model's transform in shader
-  GLuint shader_VNmatrix; ///< matrix for adjusting model's normals in shader
-  GLuint shader_Pmatrix;  ///< projection matrix in shader
 
   GLuint vbo_positions; ///< vertices buffer
   GLuint vbo_indices;   ///< triangle indicies buffer
@@ -39,18 +34,15 @@ private:
   GLuint num_triangles; ///< number of triangles of mesh of this object
   GLuint num_attribs;   ///< number of attributes per vertex
 
-  GLint attr_pos;  ///< shader program attribute - vertex position
-  GLint attr_norm; ///< shader program attribute - vertex normals
-  GLint attr_uv;   ///< shader program attribute - texturing coordinates
   GLuint vao = 0;  ///< GL vertex array object
   // GLuint buffer;
 
 public:
-  GLuint shader;                ///< shader program used for rendering of this object
+  struct Shader2*shader;                ///< shader program used for rendering of this object
   int primitive = GL_TRIANGLES; ///< GL_TRIANGLES, GL_LINES, etc...
 
-  std::vector<GLuint> textures; ///< GL textures
-  std::vector<GLint> samplers;  /// glsl samplers
+  GLuint texture; ///< GL texture
+  glm::vec4 color;///< color,in shader texture*color
 
   GameObject* parent = NULL;         ///< parent of this object - should not be NULL for other objects than scene root
   std::vector<GameObject*> children; ///< child objects of this object - relation child-parent is designed to be
@@ -82,13 +74,13 @@ public:
   GameObject();
   /// Constructor.
   /**
-    Creates scene object without any geometry.
+    Creates scene object.
     \param[in] mesh Mesh data of this object
     \param[in] shader Shader program that is used for rendering this object
     \param[in] param Callback Function that is called on draw(). Can be NULL. \todo PF -chybejici parametr
     \param[in] texture Texture of this object. Set 0 for no texture, object is then rendered solid black
   */
-  GameObject(pgr::MeshData mesh, GLuint shader, GLuint texture);
+  GameObject(const pgr::MeshData mesh, struct Shader2* shader, GLuint texture);
   /// Translate, scale and rotate object at once
   /**
     Because calling rotate, scale and rotate separately makes init of many objects very tedious.

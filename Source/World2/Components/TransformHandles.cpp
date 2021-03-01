@@ -19,14 +19,13 @@ void printMatrix2(glm::mat4 m){
 }
 
 const char* TransformHandles::typeStatic=NULL;
-GLint TransformHandles::shader_color;
 	
-void drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,bool active){
+void TransformHandles::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,bool active){
 	glStencilMask(255*(stencil!=-1));
 	glStencilFunc(GL_ALWAYS, (unsigned char)stencil, 255);
-	glUseProgram(World2::shaderHandle);
-	if(active){glUniform4f(TransformHandles::shader_color, 1.0f,1.0f,1.0f,color[3]);}
-	else{glUniform4f(TransformHandles::shader_color, color[0],color[1],color[2],color[3]);}
+	glUseProgram(World2::shaderHandle.program);
+	if (active) {_handle->color=glm::vec4(1.0f,1.0f,1.0f,color[3]);}
+	else{_handle->color=glm::vec4(color[0],color[1],color[2],color[3]);}
 	_handle->draw(space);
 }
 	
@@ -35,7 +34,6 @@ TransformHandles::TransformHandles(GameObject*_editedobj){
 	this->type=TransformHandles::typeStatic;
 		
 	this->editedobj=_editedobj;
-	shader_color = glGetUniformLocation(World2::shaderHandle, "color");
 	this->stencilx=		Select::registerStencil(this);
 	this->stencily=		Select::registerStencil(this);
 	this->stencilz=		Select::registerStencil(this);
@@ -49,12 +47,12 @@ TransformHandles::TransformHandles(GameObject*_editedobj){
 	this->stencilaxisw=	Select::registerStencil(this);
 }
 void TransformHandles::start(){
-	this->circleh =	new GameObject(unitcircleMesh, World2::shaderHandle, 0);
-	this->arrowh =	new GameObject(arrowMesh, World2::shaderHandle, 0);
-	this->planeh =	new GameObject(quadMesh, World2::shaderHandle, 0);
-	this->scaleh =	new GameObject(scalearrowMesh, World2::shaderHandle, 0);
-	this->uniscaleh=new GameObject(unitcubeMesh, World2::shaderHandle, 0);
-	this->lineh =	new GameObject(lineMesh, World2::shaderHandle, 0);
+	this->circleh =	new GameObject(unitcircleMesh,	&World2::shaderHandle, 0);
+	this->arrowh =	new GameObject(arrowMesh,		&World2::shaderHandle, 0);
+	this->planeh =	new GameObject(quadMesh,		&World2::shaderHandle, 0);
+	this->scaleh =	new GameObject(scalearrowMesh,	&World2::shaderHandle, 0);
+	this->uniscaleh=new GameObject(unitcubeMesh,	&World2::shaderHandle, 0);
+	this->lineh =	new GameObject(lineMesh,		&World2::shaderHandle, 0);
 	this->bkp=editedobj->transformation;
 }
 void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
@@ -144,9 +142,9 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 			this->uniscaleh->transformation=glm::mat4(1.0f)*scale;
 			this->uniscaleh->scale(glm::vec3(0.2f));
 			float active=0.7f+0.3f*(float)(this->activehandle==this->stencilxyz);
-			glUniform4f(shader_color, active,active,active,transparency);
 			glStencilMask(255);
 			glStencilFunc(GL_ALWAYS, this->stencilxyz, 255);
+			this->uniscaleh->color=glm::vec4(active,active,active,transparency);
 			this->uniscaleh->draw(this->handlespace);
 			glStencilMask(0);
 		}

@@ -15,8 +15,8 @@ Camera2::Camera2(float viewingAngle, GameObject* sceneRoot, RenderTexture* rende
   assert(renderTarget!=NULL);
   this->angle = viewingAngle;
   this->sceneRoot = sceneRoot;
-  float camw = renderTarget->getWidth();
-  float camh = renderTarget->getHeight();
+  float camw = (float)renderTarget->getWidth();
+  float camh = (float)renderTarget->getHeight();
   this->perspective = glm::perspective(glm::radians(angle),camw/camh, 0.2f, 2000.0f);
   this->fbo = renderTarget;
   this->mainCamera = false;
@@ -43,9 +43,13 @@ void Camera2::start(){}
 
 void Camera2::update(){
   GLint fbobkp = 0;
+  glm::vec3 posbkp = World2::mainCamPos;
+  glm::mat4 perspectivebkp = World2::perspective;
+  glm::mat4 mainCamera2bkp = World2::mainCamera;
+
   if (this->mainCamera){
     this->perspective = glm::perspective(glm::radians(angle), World2::width / World2::height, 0.2f, 2000.0f);
-    glViewport(0, 0, World2::width, World2::height);
+    glViewport(0, 0, (int)World2::width, (int)World2::height);
   }
   else{
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbobkp);
@@ -55,20 +59,12 @@ void Camera2::update(){
     glStencilMask(0);
   }
 
-  glm::vec3 posbkp = World2::mainCamPos;
-  glm::mat4 perspectivebkp = World2::perspective;
-  glm::mat4 mainCamera2bkp = World2::mainCamera;
-
-  glm::mat4 transform = glm::mat4(1.0f); //*owner->parent->transform*owner->transform;
-  GameObject* obj = owner;
-  while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
+  glm::mat4 transform = getFullTransform(this->owner);
 
   World2::perspective = this->perspective;
   World2::mainCamPos = -(glm::vec3)transform[3];
   World2::mainCamera = glm::inverse(getRotation(transform, 0));
-  World2::mainCamera[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  World2::mainCamera = World2::mainCamera * glm::translate(glm::mat4(1.0f), World2::mainCamPos);
-
+  World2::mainCamera[3] = World2::mainCamera * glm::vec4(World2::mainCamPos,1.0f);
 
   renderRecursive(sceneRoot, glm::mat4(1.0f),false);//render opaque
   renderRecursive(sceneRoot, glm::mat4(1.0f),true);//render transparent
