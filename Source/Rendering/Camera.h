@@ -18,7 +18,7 @@
 /**
  * \brief Storage for lookAt parameters (position, center and up vector)
  */
-class ViewPort
+class ViewPort final
 {
 protected:
 	glm::vec3 position; ///< camera position
