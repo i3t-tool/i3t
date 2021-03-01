@@ -69,7 +69,7 @@ protected:
 	std::vector<DataStore> m_internalData;
 
 	Transform::DataMap m_initialMap{};
-	Transform::DataMap m_currentMap{};
+	Transform::DataMap m_currentMap = Transform::g_Free;
 
 	/**
 	 * Operator node properties.
@@ -119,18 +119,24 @@ public:
 	[[nodiscard]] virtual ValueSetResult setValue(float val)
 	{
 		m_internalData[0].setValue(val);
+    spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
 	{
 		m_internalData[0].setValue(vec);
+		spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
 	{
 		m_internalData[0].setValue(vec);
+    spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
@@ -139,6 +145,8 @@ public:
 		if (m_currentMap == Transform::g_Free)
 		{
 			m_internalData[0].setValue(mat);
+      spreadSignal();
+
 			return ValueSetResult{ValueSetResult::Status::Ok, ""};
 		}
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Not a free transformation."};

@@ -45,7 +45,8 @@ void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
 
 	if (valueCH)
 	{
-		Nodebase->getInternalData().setValue(localData);
+		// Nodebase->getInternalData().setValue(localData);
+		Nodebase->setValue(localData);
 	}
 
 	ImGui::Spring(0);
