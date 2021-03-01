@@ -49,8 +49,6 @@ void UI::init()
 	m_currentTheme.init();
 	m_currentTheme.apply();
 
-  setupImGuiStyle();
-
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(App::get().mainWindow(), true);
   ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion);
