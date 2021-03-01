@@ -12,6 +12,8 @@
 class ViewportWindow : public IWindow
 {
 public:
+  I3T_WINDOW(ViewportWindow)
+
 	ViewportWindow(bool show, World* world);
 	void render();
 

@@ -1,11 +1,14 @@
 ﻿#include "Tutorial.h"
-#include "Core/Application.h"
-//#include "gl/GL.h"
-#include "Logger/LoggerInternal.h"
+
+#include <utility>
+
 #include "imgui.h"
 #include "stb_image.h"
 #include "yaml-cpp/yaml.h"
-#include <utility>
+
+#include "Core/API.h"
+#include "Core/Application.h"
+#include "Logger/LoggerInternal.h"
 
 Tutorial::Tutorial(std::string filename)
 {
@@ -17,7 +20,6 @@ Tutorial::Tutorial(std::string filename)
 
 void Tutorial::loadFile() // todo think about making an interface of tutorial and let this be tut file type dependend?
 {
-	std::cout << "Tutorial::loadFile()" << std::endl;
 	// LOAD GENERAL INFO
 	YAML::Node tutorial = YAML::LoadFile(m_filename);
 	// name
@@ -135,7 +137,6 @@ void Tutorial::loadImages()
 
 unsigned int Tutorial::getImageID(std::string filename)
 {
-	std::cout << "Tutorial::getImageID()" << std::endl;
 	const auto images_it = m_images.find(filename);
 	if (images_it == m_images.end())
 	{
@@ -155,44 +156,44 @@ void Tutorial::render(int step)
 	{
 		if (widget.m_type == "text")
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
+			ImGui::PushFont(I3T::getFont(EFont::TutorialText));
 			ImGui::TextWrapped(("Text: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}
 		else if (widget.m_type == "h1")
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TITLE));
+			ImGui::PushFont(I3T::getFont(EFont::Title));
 			ImGui::TextWrapped(("H1: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}
 		else if (widget.m_type == "h2")
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TITLE)); // todo
+			ImGui::PushFont(I3T::getFont(EFont::Title)); // todo
 			ImGui::TextWrapped(("H2: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}
 		else if (widget.m_type == "img")
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
+			ImGui::PushFont(I3T::getFont(EFont::TutorialText));
 			ImGui::TextWrapped(("Img: " + widget.m_string).c_str());
 			ImGui::PopFont();
 			ImGui::Image((void*)(intptr_t)getImageID(widget.m_string), ImVec2(256, 256));
 		}
 		else if (widget.m_type == "task")
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+			ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
 			ImGui::TextWrapped(("Task: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}
 		else if (widget.m_type == "hint")
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
+			ImGui::PushFont(I3T::getFont(EFont::TutorialText));
 			ImGui::TextWrapped(("Hint: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}
 		else
 		{
-			ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
+			ImGui::PushFont(I3T::getFont(EFont::TutorialText));
 			ImGui::TextWrapped(("Unknown type: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}

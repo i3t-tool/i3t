@@ -55,7 +55,7 @@ void SetupDialog::render()
 
 		if (ImGui::Button("OK"))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 		}
 	}
 	ImGui::End();

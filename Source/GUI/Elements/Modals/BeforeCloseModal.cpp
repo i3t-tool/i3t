@@ -22,7 +22,7 @@ void BeforeCloseModal::render()
 
 		if (ImGui::Button("Save and quit", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 			CloseCommand::dispatch();
 
 			ImGui::CloseCurrentPopup();
@@ -32,7 +32,7 @@ void BeforeCloseModal::render()
 		ImGui::SameLine();
 		if (ImGui::Button("Quit anyway", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 			CloseCommand::dispatch();
 
 			ImGui::CloseCurrentPopup();
@@ -41,7 +41,7 @@ void BeforeCloseModal::render()
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 
 			ImGui::CloseCurrentPopup();
 		}

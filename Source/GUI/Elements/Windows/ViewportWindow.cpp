@@ -2,6 +2,7 @@
 
 #include "imgui.h"
 
+#include "Core/API.h"
 #include "Core/Application.h"
 #include "Core/InputController.h"
 #include "GUI/Settings.h"
@@ -32,9 +33,6 @@ ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
 
 void ViewportWindow::render()
 {
-	if (!Application::get().m_showViewportWindow)
-		return;
-
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
@@ -42,7 +40,7 @@ void ViewportWindow::render()
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 		ImGui::Begin(
 				"Viewport",
-				&Application::get().m_showViewportWindow); // Create a window called "Hello, world!" and append into it.
+				getShowPtr()); // Create a window called "Hello, world!" and append into it.
 		ImGui::PopStyleVar();
 
 		// get positions of min max points of the window

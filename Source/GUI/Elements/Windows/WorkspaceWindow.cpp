@@ -106,11 +106,7 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-
-	if (!WholeApplication.m_showWorkspaceWindow) /* \todo Maybe unusefull - open-Flag is used below in ImGUI::Begin*/
-		return;
-
-	ImGui::Begin("Workspace", &(WholeApplication.m_showWorkspaceWindow));
+	ImGui::Begin("Workspace", getShowPtr());
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");

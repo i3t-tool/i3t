@@ -176,7 +176,7 @@ if (True)
             "Test/*.hpp"
             )
 
-    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
+    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE} Source/Core/Module.h Source/Core/API.h Source/Core/API.cpp)
 
     target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp)
 
@@ -191,7 +191,7 @@ endif()
 
 # ===== Create target executable from I3T source files. =======
 add_executable(${PROJECT_NAME} ${I3T_SOURCE}
-        Source/Main.cpp)
+        Source/Main.cpp Source/GUI/Theme.cpp Source/Core/Module.h)
 # =============================================================
 
 # Set VS_DEBUGGER_WORKING_DIRECTORY

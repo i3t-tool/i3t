@@ -17,7 +17,7 @@
 class DescriptionDialog : public IWindow
 {
 public:
-	static constexpr const char id[] = "DescriptionDialog";
+	I3T_WINDOW(DescriptionDialog)
 
 	DescriptionDialog();
 	virtual void render() override;
