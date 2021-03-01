@@ -151,7 +151,6 @@ unsigned int Tutorial::getImageID(std::string filename)
 // render the tutorial content using ImGui
 void Tutorial::render(int step)
 {
-	std::cout << "Tutorial::render()" << std::endl;
 	for (const TWidget& widget : m_steps[step].m_content)
 	{
 		if (widget.m_type == "text")

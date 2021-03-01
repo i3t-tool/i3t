@@ -37,7 +37,10 @@ void GlfwWindow::init()
 	glfwMakeContextCurrent(m_mainWindow);
 	glfwSwapInterval(1); // Enable vsync.
 
-	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
+	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window)
+	                           {
+															 BeforeCloseCommand::dispatch();
+														 });
 }
 
 GLFWwindow* GlfwWindow::get()

@@ -67,7 +67,10 @@ public:
     checkWindowType<T>();
 
     if (!hasWindow(T::ID))
-      m_windows.insert(std::pair<std::string, std::unique_ptr<IWindow>>(T::ID, std::make_unique<T>()));
+    {
+      m_windows.insert(std::pair(std::string(T::ID), std::make_unique<T>()));
+			m_windows[T::ID]->show();
+    }
 	}
 
 	/*
