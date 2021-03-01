@@ -81,15 +81,15 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 
 void GraphManager::unplugAll(Ptr<Core::NodeBase>& node)
 {
-	node.get()->_unplugAll();
+	node.get()->unplugAll();
 }
 
 void GraphManager::unplugInput(Ptr<Core::NodeBase>& node, int index)
 {
-	node.get()->_unplugInput(index);
+	node.get()->unplugInput(index);
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
-	node.get()->_unplugOutput(index);
+	node.get()->unplugOutput(index);
 }

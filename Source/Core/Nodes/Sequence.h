@@ -76,12 +76,14 @@ public:
 		{
 			for (const auto& mat : m_matrices)
 			{
-				result *= mat->getInternalData().getMat4();
+				result *= mat->getData().getMat4();
 			}
 		}
 
 		m_internalData[0].setValue(result);
 		m_internalData[1].setValue(result);
+
+		spreadSignal();
 	};
 };
 } // namespace Core

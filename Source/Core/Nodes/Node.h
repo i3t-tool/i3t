@@ -69,7 +69,7 @@ protected:
 	std::vector<DataStore> m_internalData;
 
 	Transform::DataMap m_initialMap{};
-	Transform::DataMap m_currentMap{};
+	Transform::DataMap m_currentMap = Transform::g_Free;
 
 	/**
 	 * Operator node properties.
@@ -93,20 +93,22 @@ public:
 	[[nodiscard]] ID getId() const;
 
 	//===-- Obtaining value functions. ----------------------------------------===//
-	/**
-	 * Get node internal value
-	 *
-	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
-	 *              Value of field[0] is returned if this parameter omitted)
-	 */
-	DataStore& getInternalData(unsigned index = 0)
+protected:
+	DataStore& getInternalData(size_t index = 0)
 	{
 		Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
 
-	DataStore& getData() { return m_internalData[0]; }
+public:
+	/**
+	 * Get Node contents.
+	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
+	 *              Value of field[0] is returned if this parameter omitted)
+	 * \return Struct which holds data
+	 */
+	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 	/**
 	 * Set a value of node.
@@ -119,18 +121,24 @@ public:
 	[[nodiscard]] virtual ValueSetResult setValue(float val)
 	{
 		m_internalData[0].setValue(val);
+    spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
 	{
 		m_internalData[0].setValue(vec);
+		spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
 	{
 		m_internalData[0].setValue(vec);
+    spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
@@ -139,6 +147,8 @@ public:
 		if (m_currentMap == Transform::g_Free)
 		{
 			m_internalData[0].setValue(mat);
+      spreadSignal();
+
 			return ValueSetResult{ValueSetResult::Status::Ok, ""};
 		}
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Not a free transformation."};
@@ -166,6 +176,26 @@ public:
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
 		                      "Unsupported operation on non transform object."};
+	}
+
+	/**
+	 * Sets node value without validation.
+	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
+	 *    by compiler.
+	 * \param value Value to set.
+	 * \param index Index of DataStore (if the node stores more than one value)
+	 */
+	template <typename T>
+	void setInternalValue(const T& value, size_t index = 0)
+  {
+		getInternalData(index).setValue(value);
+		spreadSignal();
+	}
+
+	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
+  {
+    getInternalData(index).getMat4Ref()[coordinates.x][coordinates.y] = value;
+		spreadSignal();
 	}
 
 	virtual void reset() {}
@@ -216,10 +246,9 @@ public:
 	//===----------------------------------------------------------------------===//
 
 private:
-	/// \todo unplug* are internal functions.
-	void _unplugAll();
-	void _unplugInput(int index);
-	void _unplugOutput(int index);
+	void unplugAll();
+	void unplugInput(int index);
+	void unplugOutput(int index);
 };
 
 /**
@@ -291,16 +320,16 @@ public:
 	 * \returns data storage owner by node connected to this input pin. If pin is output pin,
 	 *          it returns data storage of pin owner.
 	 */
-	[[nodiscard]] DataStore& getStorage(unsigned id = 0)
+	[[nodiscard]] const DataStore& getStorage(unsigned id = 0)
 	{
 		if (m_isInput)
 		{
 			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-			return m_input->m_master->getInternalData(id);
+			return m_input->m_master->getData(id);
 		}
 		else
 		{
-			return m_master->getInternalData(id);
+			return m_master->getData(id);
 		}
 	}
 
