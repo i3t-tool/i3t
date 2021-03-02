@@ -1,30 +1,15 @@
 #include "picoc.h"
 
+#include "Scripting.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #define PICOC_STACK_SIZE (128*1024)              /* space for the the stack */
 
-int PicocRunInteractive();
-int PicocRunFile(char* filename);
-int PicocRunSource(char* source);
 
-int picoc(int argc, char** argv){
-  int ret;
-  if (argc == 1){
-    ret = PicocRunInteractive();
-  }
-  else if (argc == 2){
-    if (strcmp("-s", argv[1]) == 0){ret = PicocRunSource("printf(\"deutschland siegt!\");");}
-    else{ret = PicocRunFile(argv[1]);}
-  }
-  else if (argc == 3){
-    // picocrunfiles
-  }
-  printf("ret %d\n", ret);
-  return ret;
-}
+
 int PicocRunInteractive(){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
