@@ -104,10 +104,12 @@ void Scale::updateValues(int inputIndex)
 	{
 		setInternalValue(glm::scale(m_inputs[0].getStorage().getVec3()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4());
 	}
+	 */
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
@@ -139,11 +141,7 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 void EulerRotX::reset()
 {
 	setDataMap(m_initialMap);
-	auto result = setValue(m_initialRot);
-	if (result.status != ValueSetResult::Status::Ok)
-	{
-		Log::fatal("Could not reset values at EulerRotX#{}", getId());
-	}
+	setInternalValue(glm::rotate(m_initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
 }
 
 void EulerRotX::updateValues(int inputIndex)
@@ -156,10 +154,12 @@ void EulerRotX::updateValues(int inputIndex)
 
 		setInternalValue(glm::eulerAngleX(angle));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::eulerAngleX(0.0f));
 	}
+	 */
 }
 
 ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
@@ -246,10 +246,12 @@ void EulerRotY::updateValues(int inputIndex)
 
 		setInternalValue(glm::eulerAngleY(angle));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::eulerAngleY(0.0f));
 	}
+	 */
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -287,10 +289,12 @@ void EulerRotZ::updateValues(int inputIndex)
 
 		setInternalValue(glm::eulerAngleZ(angle));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::eulerAngleZ(0.0f));
 	}
+	 */
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -327,11 +331,7 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 void Translation::reset()
 {
 	setDataMap(m_initialMap);
-	auto result = setValue(m_initialTrans);
-	if (result.status != ValueSetResult::Status::Ok)
-	{
-		Log::fatal("Could not reset values at EulerRotX#{}", getId());
-	}
+	setInternalValue(glm::translate(m_initialTrans));
 }
 
 void Translation::updateValues(int inputIndex)
@@ -340,10 +340,12 @@ void Translation::updateValues(int inputIndex)
 	{
 		setInternalValue(glm::translate(m_inputs[0].getStorage().getVec3()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4(1.0f));
 	}
+	 */
 }
 
 ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
@@ -362,10 +364,12 @@ void AxisAngleRot::updateValues(int inputIndex)
 	{
 		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4());
 	}
+	 */
 }
 
 void OrthoProj::updateValues(int inputIndex)
@@ -377,10 +381,12 @@ void OrthoProj::updateValues(int inputIndex)
 		                                      m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
 		                                      m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4());
 	}
+	 */
 }
 
 void PerspectiveProj::updateValues(int inputIndex)
@@ -392,10 +398,12 @@ void PerspectiveProj::updateValues(int inputIndex)
 				glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
 		                     m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4());
 	}
+	 */
 }
 
 void Frustum::updateValues(int inputIndex)
@@ -408,10 +416,12 @@ void Frustum::updateValues(int inputIndex)
 		                                        m_inputs[4].getStorage().getFloat(),
 		                                        m_inputs[5].getStorage().getFloat()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4());
 	}
+	 */
 }
 
 void LookAt::updateValues(int inputIndex)
@@ -421,8 +431,10 @@ void LookAt::updateValues(int inputIndex)
 		setInternalValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
 		                                       m_inputs[2].getStorage().getVec3()));
 	}
+	/*
 	else
 	{
 		setInternalValue(glm::mat4());
 	}
+	 */
 }

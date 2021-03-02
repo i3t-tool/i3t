@@ -51,7 +51,7 @@ class Pin;
  * Base class interface for all boxes.
  * \image html baseOperator.png
  */
-class NodeBase
+class NodeBase : public std::enable_shared_from_this<NodeBase>
 {
 	friend class GraphManager;
 
@@ -85,12 +85,18 @@ protected:
 public:
 	NodeBase() = default;
 
-	explicit NodeBase(const Operation* operation);
+	NodeBase(const Operation* operation) : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+  {}
 
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
+	void create();
+
 	[[nodiscard]] ID getId() const;
+
+	Ptr<NodeBase> getPtr() { return shared_from_this(); }
+	const Operation* const getOperation() { return m_operation; }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:
@@ -271,7 +277,7 @@ class Pin
 	const bool m_isInput;
 
 	/// Owner of the pin.
-	NodeBase* m_master;
+	Ptr<NodeBase> m_master;
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component
@@ -287,9 +293,11 @@ class Pin
 
 	const EValueType m_opValueType = EValueType::Pulse;
 
+	friend void setPinOwner(Ptr<Core::NodeBase>& node);
+
 public:
-	Pin(EValueType valueType, bool isInput, NodeBase* op, int index)
-			: m_opValueType(valueType), m_isInput(isInput), m_master(op), m_index(index)
+	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index)
+			: m_opValueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
 	{
 		m_id = IdGenerator::next();
 	}

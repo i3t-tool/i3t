@@ -8,7 +8,7 @@ using namespace Core;
 TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
 {
   // Create uniform scale.
-  auto scale = Builder::createTransform<Core::Scale>();
+  auto scale = Builder::createTransform<Scale>();
 
   {
     // Set new uniform scale.
