@@ -125,6 +125,7 @@ void Application::finalize()
 	delete ObjectDefinitionTree::tree;
 
 	delete m_world;
+	delete m_world2;
 	// world = nullptr; //PF problem during glutExit...
 
 	/// \todo Write recent files.
@@ -252,7 +253,10 @@ World* Application::world()
 {
 	return m_world;
 }
-
+World2* Application::world2()
+{
+	return m_world2;
+}
 ImFont* Application::getFont(int fontId)
 {
 	return m_ui->m_currentTheme.get(static_cast<size_t>(fontId));

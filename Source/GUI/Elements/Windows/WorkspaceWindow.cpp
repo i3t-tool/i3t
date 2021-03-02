@@ -76,6 +76,12 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
 	ne::NavigateToContent();
+	//
+	glm::mat4 m=glm::mat4(0.1f);
+	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
+	ValueSetResult vsr=wnbd->Nodebase->setValue(m);
+	ValueSetResult vsr2=wnbd->Nodebase->setValue(m,Core::Transform::g_Translate);
+	printf("%d\n",vsr2.status);
 
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =

@@ -12,9 +12,10 @@
 #include "../../../World2/Select.h"
 
 /// \todo Use Framebuffer class.
-ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
+ViewportWindow::ViewportWindow(bool show, World* world,World2*world2) : IWindow(show)
 {
 	m_world = world;
+	m_world2 = world2;
 
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
@@ -126,7 +127,8 @@ void ViewportWindow::render()
 		//m_world->render();
 
 		// world2
-		World2::tmpAccess->onUpdate();
+		//World2::tmpAccess->onUpdate();
+		m_world2->onUpdate();
 
 		glDisable(GL_MULTISAMPLE);
 

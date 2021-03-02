@@ -57,6 +57,8 @@ public:
     Draws scene, updates global camera matricies
     */
     void onUpdate();
+    void handlesSetMatrix(glm::mat4 parent,glm::mat4*transform,int type);
+    void handlesSetMatrix(glm::mat4 parent,glm::mat4 transform,bool(*)(glm::mat4),int type);
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
 
     ///load shaders

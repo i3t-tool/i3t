@@ -15,7 +15,7 @@ void UI::init()
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(new TutorialWindow(false));
-	m_dockableWindows.push_back(new ViewportWindow(true, App::get().world()));
+	m_dockableWindows.push_back(new ViewportWindow(true, App::get().world(),App::get().world2()));
 	m_dockableWindows.push_back(new WorkspaceWindow(true));
 
 	HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });

@@ -68,6 +68,7 @@ public:
 	void run();
 
 	World* world();
+	World2*world2();
 	ImFont* getFont(int fontId);
 	GLFWwindow* mainWindow();
 
