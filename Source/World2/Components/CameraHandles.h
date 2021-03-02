@@ -3,7 +3,12 @@
 #include "Camera2.h"
 #include "../Components.h"
 #include "../GameObject.h"
-
+//----------------
+/**
+ * \file CameraHandles.h
+ * \author Daniel Gruncl
+ */
+//---------------
 class CameraHandles: public Component{
 public:
 	CameraHandles();

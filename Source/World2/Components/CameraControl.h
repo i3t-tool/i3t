@@ -21,8 +21,6 @@ public:
 	void setRotation(float x,float y);
 private:
 	static const char* typeStatic;
-		
-	float rotyNeg=0.0f,rotxNeg=0.0f;
 };
 	
 

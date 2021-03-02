@@ -60,7 +60,7 @@ bool loadTexImage2D(const std::string & fileName, GLenum target) {
   if (data)
   {
     //printf("%s,bpp %d\n",fileName.c_str(),Bpp);
-    glTexImage2D(target, 0, Bpp == 4 ? GL_RGBA : GL_RGB, width, height, 0, Bpp == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     result = true;
   }
   else
@@ -73,8 +73,6 @@ bool loadTexImage2D(const std::string & fileName, GLenum target) {
 }
 
 GLuint createTexture(const std::string &fileName, bool mipmap) {
-   //glPixelStorei(GL_PACK_ALIGNMENT, 1);
-   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   // generate and bind one texture
   GLuint tex = 0;
   glGenTextures(1, &tex);

@@ -18,10 +18,9 @@ class Component;
 
 /// Scene object
 /**
-  Contains transformation matricies, optionally geometry, shader program and texture
-  Object's scale, position and rotation are stored in separate matricies.
-  Changing them directly will not change transform matrix, which is the one, that is passed to shaders.
-  Transfromation functions of object will update transform matrix.
+  Contains transformation matricies, optionally geometry, shader program and texture.
+  GameObject can have parent or children, creating tree of GameObjects.
+  GameObject can have Components, carrying additional functionalities.
   All transformations are additive.
 */
 class GameObject

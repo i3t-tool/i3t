@@ -16,18 +16,20 @@
 
 class Camera2 : public Component{
 public:
-  Camera2(float viewingAngle, GameObject* sceneRoot,RenderTexture*renderTarget);
-  Camera2(float viewingAngle, GameObject* sceneRoot);
-  //~Camera2();
-  void update();
-  void start();
-  static const char* componentType() { return Camera2::typeStatic; };
-  const char* getComponentType() { return Camera2::typeStatic; };
+	///Create camera rendering on user-defined framebuffer - rendering into textures
+	Camera2(float viewingAngle, GameObject* sceneRoot,RenderTexture*renderTarget);
+	///create camera rendering on default framebuffer
+	Camera2(float viewingAngle, GameObject* sceneRoot);
+	//~Camera2();
+	void update();
+	void start();
+	static const char* componentType() { return Camera2::typeStatic; };
+	const char* getComponentType() { return Camera2::typeStatic; };
 
-  float angle = 60.0f;
-  RenderTexture* fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
-  glm::mat4x4 perspective; ///< Perspective matrix
-  GameObject* sceneRoot = NULL;///< this scene tree will be rendered by camera
+	float angle = 60.0f;
+	RenderTexture* fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
+	glm::mat4x4 perspective; ///< Perspective matrix
+	GameObject* sceneRoot = NULL;///< this scene tree will be rendered by camera
 
 private:
   static const char* typeStatic;

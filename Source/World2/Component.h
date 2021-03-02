@@ -1,4 +1,12 @@
 #pragma once
+//----------------
+/**
+ * \file Component.h
+ * \author Daniel Gruncl
+ * \brief Component is added to GameObject
+ * Abstract class.
+ */
+//---------------
 #include <typeinfo>
 
 #include "GameObject.h"

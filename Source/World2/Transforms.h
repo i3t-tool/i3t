@@ -1,4 +1,11 @@
 #pragma once
+//----------------
+/**
+ * \file Transforms.h
+ * \author Daniel Gruncl
+ * \brief Transformation utils.
+ */
+//---------------
 #include "GameObject.h"
 #include "pgr.h"
 

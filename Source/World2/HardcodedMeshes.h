@@ -2,7 +2,7 @@
 /**
  * \file HardcodedMeshes.h
  * \author Daniel Gruncl
- * \brief meshes hardcoded in source
+ * \brief Meshes hardcoded in source.
  */
 //---------------
 #pragma once
