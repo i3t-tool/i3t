@@ -41,7 +41,6 @@ public:
 	{
 		m_initialMap = map;
 		m_currentMap = map;
-		setInternalValue(glm::rotate(initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
@@ -98,7 +97,6 @@ public:
 	{
 		m_initialMap = map;
 		m_currentMap = map;
-		setInternalValue(glm::translate(initialTrans));
 	}
 
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
