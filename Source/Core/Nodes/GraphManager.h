@@ -111,5 +111,20 @@ public:
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
 	static Ptr<NodeBase> getParent(Ptr<Core::NodeBase>& node, size_t index = 0);
+
+	/**
+	 * \return All nodes connected to given node inputs.
+	 */
+	static std::vector<Ptr<NodeBase>> getAllInputNodes(Ptr<Core::NodeBase>& node);
+
+  /**
+   * \return All nodes plugged into given node output pins.
+   */
+	static std::vector<Ptr<NodeBase>> getAllOutputNodes(Ptr<Core::NodeBase>& node);
+
+	/**
+	 * \return All nodes plugged into node input pin on given index.
+	 */
+	static std::vector<Ptr<NodeBase>> getOutputNodes(Ptr<Core::NodeBase>& node, size_t index);
 };
 } // namespace Core
