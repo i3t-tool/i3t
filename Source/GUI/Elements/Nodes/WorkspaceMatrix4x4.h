@@ -1,3 +1,4 @@
+#pragma once
 #include "WorkspaceElements.h"
 
 /* Order of inheritance is important! WorkspaceNodeBaseData has to be first because it is necessary first create

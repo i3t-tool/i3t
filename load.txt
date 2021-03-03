@@ -1,0 +1,5 @@
+printf("vbeuivbweuibwivewb\n");
+int a=createMat4(mat4rotatex,12,200,260);
+int b=createMat4(mat4scale,12,720,300);
+bool c=plugNodes(a,b,0,0);
+createGameObject();

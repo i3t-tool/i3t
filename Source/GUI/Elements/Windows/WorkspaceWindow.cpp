@@ -15,6 +15,8 @@
 #include "../Nodes/WorkspaceMatrix4x4.h"
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
+#include "Scripting/Scripting.h"
+
 // using namespace Core;
 
 WorkspaceWindow::WorkspaceWindow(bool show)
@@ -61,10 +63,10 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(NodeEditorContext);
 
 	/* \todo adding nodes here just for testing */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>((ImTextureID)0));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
 
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>((ImTextureID)0));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
 	Core::GraphManager::plug(dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get())->Nodebase,
@@ -75,9 +77,12 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
+
+
+
 	ne::NavigateToContent();
 	//////////////////////////////////
-	glm::mat4 m=glm::mat4(0.14f);
+	/*glm::mat4 m=glm::mat4(0.14f);
 	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
 	std::vector<Core::Pin>cp= wnbd->Nodebase->getInputPins();
 	//cp[0].getParentPin()->getMaster();
@@ -93,6 +98,20 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 				mm[0][2], mm[1][2], mm[2][2], mm[3][2], 
 				mm[0][3], mm[1][3], mm[2][3], mm[3][3] );
 
+	//std::vector<WorkspaceMatrix4x4>*ww= */
+
+	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
+	//std::vector<WorkspaceMatrix4x4>*ww= LoadWorkspace();
+	/*if(ww->size()>0){
+		printf("add\n");
+		WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(&ww->back()));
+		ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-220,180));
+	}*/
+	//LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),NULL);
+
+	//int ii=PicocRunFile(Config::getAbsolutePath("/load.txt").c_str());
+	//int ii=PicocRunSource("printf(\"huuhuh\n\");");
+	//printf("picoc %d\n",ii);
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
 	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
