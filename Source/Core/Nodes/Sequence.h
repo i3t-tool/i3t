@@ -21,13 +21,18 @@ class Sequence : public NodeBase
 public:
 	Sequence() : NodeBase(&g_sequence){};
 
-	/**
+	void addMatrix(Ptr<Matrix> matrix) noexcept
+  {
+		addMatrix(matrix, m_matrices.size());
+	}
+
+  /**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
 	 *
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	void addMatrix(Ptr<Matrix> matrix, const int index) noexcept
+	void addMatrix(Ptr<Matrix> matrix, size_t index) noexcept
 	{
 		/// \todo MH matrix validation.
 
@@ -38,6 +43,8 @@ public:
 
 		receiveSignal(0);
 	};
+
+	std::vector<Ptr<Matrix>>& getMatrices() { return m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -86,4 +93,12 @@ public:
 		spreadSignal();
 	};
 };
+
+FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
+{
+	if (node == nullptr) return nullptr;
+
+  Debug::Assert(node->getOperation()->keyWord == g_sequence.keyWord, "Given node is not a sequence!");
+  return std::dynamic_pointer_cast<Sequence>(node);
+}
 } // namespace Core

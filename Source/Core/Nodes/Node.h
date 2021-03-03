@@ -47,6 +47,7 @@ namespace Core
 {
 class Pin;
 
+
 /**
  * Base class interface for all boxes.
  * \image html baseOperator.png
@@ -83,7 +84,7 @@ protected:
 	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
-	NodeBase() = default;
+  NodeBase() = default;
 
 	NodeBase(const Operation* operation) : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
   {}
@@ -207,6 +208,7 @@ public:
 	virtual void reset() {}
 
 	virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
+  const Transform::DataMap& getDataMap() { return m_currentMap; }
 
 	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
 	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -353,4 +355,7 @@ public:
 	 */
 	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
 };
+
+using Node = NodeBase;
+using NodePtr = Ptr<NodeBase>;
 } // namespace Core
