@@ -79,18 +79,24 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 
 
-
 	ne::NavigateToContent();
 	//////////////////////////////////
-	/*glm::mat4 m=glm::mat4(0.14f);
+		//WorkspaceNodes.at(0).get().
+	
+	
 	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
-	std::vector<Core::Pin>cp= wnbd->Nodebase->getInputPins();
-	//cp[0].getParentPin()->getMaster();
+	Ptr<Core::NodeBase> hh=wnbd->Nodebase;
+	std::vector<Core::Pin>cp= hh->getInputPins();
+	//cp[0].getParentPin()->
+	const Operation* uu = hh->getOperation();
 
-	ValueSetResult vsr=wnbd->Nodebase->setValue(m);
-	ValueSetResult vsr2=wnbd->Nodebase->setValue(m,Core::Transform::g_Translate);
+	//cp[0].getParentPin()->getMaster();
+	//WorkspaceNodes.at(0).get()->
+	glm::mat4 m = glm::mat4(0.14f);
+	ValueSetResult vsr=hh->setValue(m);
+	ValueSetResult vsr2=hh->setValue(m,Core::Transform::g_Translate);
 	printf("%d\n",vsr2.status);
-	DataStore ds=wnbd->Nodebase->getData();
+	DataStore ds=hh->getData();
 	glm::mat4 mm=ds.getMat4();
 	printf("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
 				mm[0][0], mm[1][0], mm[2][0], mm[3][0],
@@ -98,20 +104,9 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 				mm[0][2], mm[1][2], mm[2][2], mm[3][2], 
 				mm[0][3], mm[1][3], mm[2][3], mm[3][3] );
 
-	//std::vector<WorkspaceMatrix4x4>*ww= */
+	//std::vector<WorkspaceMatrix4x4>*ww= 
 
 	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
-	//std::vector<WorkspaceMatrix4x4>*ww= LoadWorkspace();
-	/*if(ww->size()>0){
-		printf("add\n");
-		WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(&ww->back()));
-		ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-220,180));
-	}*/
-	//LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),NULL);
-
-	//int ii=PicocRunFile(Config::getAbsolutePath("/load.txt").c_str());
-	//int ii=PicocRunSource("printf(\"huuhuh\n\");");
-	//printf("picoc %d\n",ii);
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
 	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
