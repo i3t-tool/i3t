@@ -25,10 +25,10 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 	}
 
 	// cycle detector
-	NodeBase* toFind = inp->m_master; // INPUT
+	auto toFind = inp->m_master; // INPUT
 
 	// stack in vector - TOS is at the vector back.
-	std::vector<NodeBase*> stack;
+	std::vector<Ptr<NodeBase>> stack;
 
 	// PUSH(output) insert element at end.
 	stack.push_back(out->m_master);
@@ -36,7 +36,7 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 	while (!stack.empty())
 	{
 		// Return last element of mutable sequence.
-		NodeBase* act = stack.back();
+		auto act = stack.back();
 		stack.pop_back();
 
 		if (act == toFind)
@@ -76,6 +76,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	// Attach given operator output pin to this operator input pin.
 	rightNode->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
 
+	leftNode->spreadSignal();
+
 	return ENodePlugResult::Ok;
 }
 
@@ -92,4 +94,14 @@ void GraphManager::unplugInput(Ptr<Core::NodeBase>& node, int index)
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugOutput(index);
+}
+
+Ptr<NodeBase> GraphManager::getParent(Ptr<NodeBase>& node, size_t index)
+{
+	auto pins = node->getInputPins();
+	if (pins.empty() || pins[index].m_input == nullptr)
+	{
+        return nullptr;
+    }
+    return pins[index].m_input->m_master;
 }

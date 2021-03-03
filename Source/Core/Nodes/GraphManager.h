@@ -23,7 +23,8 @@ namespace Builder
  */
 template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
 {
-	auto ret = std::make_unique<Core::NodeImpl<T>>();
+	auto ret = std::make_shared<Core::NodeImpl<T>>();
+	ret->create();
 	ret->updateValues(0);
 	return ret;
 }
@@ -35,6 +36,7 @@ template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
 	auto ret = std::make_shared<Core::Sequence>();
+  ret->create();
 	ret->updateValues(0);
 	return ret;
 }
@@ -42,7 +44,8 @@ Ptr<Core::Sequence> FORCE_INLINE createSequence()
 template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
 {
 	auto ret = std::make_shared<T>(std::forward<Args>(args)...);
-	ret->updateValues(0);
+  ret->create();
+	ret->reset();
 	return ret;
 }
 } // namespace Builder
@@ -106,5 +109,7 @@ public:
 	 * \param index
 	 */
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
+
+	static Ptr<NodeBase> getParent(Ptr<Core::NodeBase>& node, size_t index = 0);
 };
 } // namespace Core
