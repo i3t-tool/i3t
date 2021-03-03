@@ -77,11 +77,18 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::NavigateToContent();
 	//
-	glm::mat4 m=glm::mat4(0.1f);
+	glm::mat4 m=glm::mat4(0.14f);
 	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
 	ValueSetResult vsr=wnbd->Nodebase->setValue(m);
 	ValueSetResult vsr2=wnbd->Nodebase->setValue(m,Core::Transform::g_Translate);
 	printf("%d\n",vsr2.status);
+	DataStore ds=wnbd->Nodebase->getData();
+	glm::mat4 mm=ds.getMat4();
+	printf("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
+				mm[0][0], mm[1][0], mm[2][0], mm[3][0],
+				mm[0][1], mm[1][1], mm[2][1], mm[3][1], 
+				mm[0][2], mm[1][2], mm[2][2], mm[3][2], 
+				mm[0][3], mm[1][3], mm[2][3], mm[3][3] );
 
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
