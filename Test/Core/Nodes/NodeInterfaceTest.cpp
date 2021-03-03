@@ -74,3 +74,22 @@ TEST(GetTreeRootValue, ShouldBeOk)
   }
 	auto readOnlyMat = root->getData().getMat4();
 }
+
+TEST(GetNodeInputsAndOutputs, ReturnsValidResults)
+{
+	// Last node is mul3
+	auto lastNode = prepareEnvironment();
+	auto lastNodeInputs = GraphManager::getAllInputNodes(lastNode);
+	EXPECT_EQ(2, lastNodeInputs.size());
+	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
+
+	auto root = getRoot(lastNode);
+  auto anotherMatNode1 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+  auto anotherMatNode2 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+	GraphManager::plug(root, anotherMatNode1, 0, 0);
+	GraphManager::plug(root, anotherMatNode2, 0, 0);
+
+	auto rootOutputs = GraphManager::getAllOutputNodes(root);
+	EXPECT_EQ(1 + 2, rootOutputs.size());
+	EXPECT_EQ(3, GraphManager::getOutputNodes(root, 0).size());
+}

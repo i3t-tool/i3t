@@ -147,12 +147,17 @@ void WorkspaceWindow::render()
 	}
 
 	/* \todo I am not able to do it with for-each loop - compilation fail on casting - if somebody can do it... */
-	for (int i = 0; i < WorkspaceNodes.size(); ++i)
-	{
-		dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(i).get())
-				->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
-	}
+	//for (int i = 0; i < WorkspaceNodes.size(); ++i)
+	//{
+	//	dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(i).get())
+	//			->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
+	//}
 
+  for (auto& workspaceNode : WorkspaceNodes)
+  {
+    dynamic_cast<WorkspaceNodeBaseData*>(workspaceNode.get())
+      ->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
+  }
 	ne::End();
 
 	ImGui::End();

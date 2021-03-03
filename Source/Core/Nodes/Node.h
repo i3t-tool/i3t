@@ -320,6 +320,9 @@ public:
 		}
 	}
 
+	/**
+	 * @return Input pins of connected nodes.
+	 */
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 
 	/**

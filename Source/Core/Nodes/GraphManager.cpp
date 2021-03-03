@@ -105,3 +105,43 @@ Ptr<NodeBase> GraphManager::getParent(Ptr<NodeBase>& node, size_t index)
     }
     return pins[index].m_input->m_master;
 }
+
+std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(Ptr<Core::NodeBase>& node)
+{
+  std::vector<Ptr<NodeBase>> result;
+	size_t inputsCount = node->getInputPins().size();
+	for (auto i = 0; i < inputsCount; ++i)
+  {
+		auto parent = getParent(node);
+		if (parent != nullptr)
+		  result.push_back(parent);
+	}
+
+	return result;
+}
+
+std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
+{
+  std::vector<Ptr<NodeBase>> result;
+	auto pins = node->getOutputPins();
+	for (auto i = 0; i < pins.size(); ++i)
+  {
+    auto pinOutputs = getOutputNodes(node, i);
+		result.insert(result.end(), pinOutputs.begin(), pinOutputs.end());
+	}
+
+	return result;
+}
+
+std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(Ptr<Core::NodeBase>& node, size_t index)
+{
+	Debug::Assert(node->getOutputPins().size() > index, "Out of range.");
+
+  std::vector<Ptr<NodeBase>> result;
+  auto pin = node->getOutputPins()[index];
+  auto othersInputs = pin.getOutComponents();
+  for (const auto& other : othersInputs)
+    result.push_back(other->m_master);
+
+	return result;
+}
