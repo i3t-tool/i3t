@@ -84,19 +84,21 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 		//WorkspaceNodes.at(0).get().
 	
 	
-	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
-	Ptr<Core::NodeBase> hh=wnbd->Nodebase;
-	std::vector<Core::Pin>cp= hh->getInputPins();
-	//cp[0].getParentPin()->
-	const Operation* uu = hh->getOperation();
-
+	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get());
+	
+	Ptr<Core::NodeBase> child=wnbd->Nodebase;
+	std::vector<Core::Pin>cp= child->getInputPins();
+	Ptr<Core::NodeBase> parent=Core::GraphManager::getParent(child);
+	const Operation* uu = child->getOperation();
+	
 	//cp[0].getParentPin()->getMaster();
 	//WorkspaceNodes.at(0).get()->
 	glm::mat4 m = glm::mat4(0.14f);
-	ValueSetResult vsr=hh->setValue(m);
-	ValueSetResult vsr2=hh->setValue(m,Core::Transform::g_Translate);
-	printf("%d\n",vsr2.status);
-	DataStore ds=hh->getData();
+	ValueSetResult vsr=parent->setValue(m);
+	ValueSetResult vsr2= child->setValue(m);
+	//ValueSetResult vsr2= child->setValue(m,Core::Transform::g_Translate);
+	//printf("%d\n",vsr2.status);
+	DataStore ds=child->getData();
 	glm::mat4 mm=ds.getMat4();
 	printf("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
 				mm[0][0], mm[1][0], mm[2][0], mm[3][0],
@@ -107,6 +109,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//std::vector<WorkspaceMatrix4x4>*ww= 
 
 	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
+	SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(),&WorkspaceNodes);
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
 	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),

@@ -12,6 +12,7 @@
 #include <memory>
 
 void LoadWorkspace(const char*filename, std::vector<std::unique_ptr<WorkspaceNode>>*_workspace);
+void SaveWorkspace(const char*filename, std::vector<std::unique_ptr<WorkspaceNode>>*_workspace);
 //std::vector<WorkspaceMatrix4x4>* LoadWorkspace();
 int PicocRunInteractive();
 int PicocRunFile(const char* filename);

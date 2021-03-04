@@ -9,7 +9,35 @@
 
 #define PICOC_STACK_SIZE (128*1024)              /* space for the the stack */
 
+void SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNode>>* _workspace) {
+	printf("saving\n");
+	for (int i = 0; i < _workspace->size(); i++) {
+		WorkspaceNode* w = _workspace->at(i).get();
+		WorkspaceNodeBaseData* nodebasedata = dynamic_cast<WorkspaceNodeBaseData*>(w);
+		Ptr<Core::NodeBase> nodebase = nodebasedata->Nodebase;
 
+		printf("%d: ",i);
+		
+		ImVec2 pos=ne::GetNodePosition(w->Id);
+		printf("(%d,%d) ",(int)pos[0],(int)pos[1]);
+		std::vector<Core::Pin>inputs = nodebase->getInputPins();
+		for(int indexin=0;indexin<inputs.size();indexin++){
+			Ptr<Core::NodeBase> parent = Core::GraphManager::getParent(nodebase,indexin);
+			int parentindex = -1;
+			int indexout = -1;
+			if(inputs[indexin].isPluggedIn()){
+				const Core::Pin*parentpin=inputs[indexin].getParentPin();
+				if(parentpin!=NULL){indexout=parentpin->getIndex(); }
+			}
+			for (int j = 0; j < _workspace->size(); j++) {
+				if (parent.get() == (dynamic_cast<WorkspaceNodeBaseData*>(_workspace->at(j).get()))->Nodebase.get()) {parentindex = j;}
+			}
+			printf("plug %d (%d->%d) ", parentindex,indexin,indexout);
+		}
+		printf("type --\n");
+	}
+	printf("saved\n");
+}
 void LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNode>>* _workspace) {
 	PicocRunFile(filename);
 	WorkspaceLayout*ret=getWorkspaceLayout();
