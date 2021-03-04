@@ -39,31 +39,22 @@ void PlugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
     ReturnValue->Val->Integer=TRUE;
 
 }
-void createGameObject(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+void setData(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
-	ReturnValue->Val->Pointer=(void*)115;
+	ReturnValue->Val->Integer=TRUE;
 	printf("create\n");
 }
-void parentGameObject(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
-{
-	void *a, *b;
-    a = Param[0]->Val->Pointer;
-    b = Param[1]->Val->Pointer;
-    printf("parent\n");
-}
+
 /* list of all library functions and their prototypes */
 struct LibraryFunction PlatformLibrary1[] =
 {
 	{ CreateMat4,     	"int createMat4(int,int,int,int);" },
 	{ PlugNodes,     	"bool plugNodes(int,int,int,int);" },
-	{ createGameObject, "GameObject *createGameObject();" },
-	{ parentGameObject, "void parentGameObject(GameObject*,GameObject*);" },
+	{ setData,          "bool setData(int,float*);" },
     { NULL,         NULL }
 };
-/*struct mat4{
-	float f[16];
-};*/
-const char defs[]="typedef void GameObject;typedef int bool;typedef void node;";
+
+const char defs[]="typedef int bool;typedef void node;";
 
 void PlatformLibraryInitI3T(Picoc *pc)
 {

@@ -11,12 +11,24 @@
 
 void SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNode>>* _workspace) {
 	printf("saving\n");
+	
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNode* w = _workspace->at(i).get();
 		WorkspaceNodeBaseData* nodebasedata = dynamic_cast<WorkspaceNodeBaseData*>(w);
 		Ptr<Core::NodeBase> nodebase = nodebasedata->Nodebase;
 
 		printf("%d: ",i);
+		char* type = "-";
+		Core::Transform::DataMap data = nodebase.get()->getDataMap();
+		if (Core::Transform::eq(data, Core::Transform::g_EulerX)) { type = "mat4.rotatex"; }
+		else if (Core::Transform::eq(data, Core::Transform::g_EulerY)) { type = "mat4.rotatey"; }
+		else if (Core::Transform::eq(data, Core::Transform::g_EulerZ)) { type = "mat4.rotatez"; }
+		else if (Core::Transform::eq(data, Core::Transform::g_Free)) { type = "mat4.free"; }
+		else if (Core::Transform::eq(data, Core::Transform::g_Scale)) { type = "mat4.scale"; }
+		else if (Core::Transform::eq(data, Core::Transform::g_Translate)) { type = "mat4.translate"; }
+		else if (Core::Transform::eq(data, Core::Transform::g_UniformScale)) { type = "mat4.uniscale"; }
+
+		printf("type %s ", type);
 		
 		ImVec2 pos=ne::GetNodePosition(w->Id);
 		printf("(%d,%d) ",(int)pos[0],(int)pos[1]);
@@ -32,9 +44,9 @@ void SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 			for (int j = 0; j < _workspace->size(); j++) {
 				if (parent.get() == (dynamic_cast<WorkspaceNodeBaseData*>(_workspace->at(j).get()))->Nodebase.get()) {parentindex = j;}
 			}
-			printf("plug %d (%d->%d) ", parentindex,indexin,indexout);
+			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){printf("plugNodes(%d,%d,%d,%d) ", parentindex,i,indexout,indexin);}
 		}
-		printf("type --\n");
+		printf("\n");
 	}
 	printf("saved\n");
 }
@@ -64,6 +76,7 @@ int PicocRunInteractive(){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
   PicocInitialise(&pc, StackSize);
+  if(PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
   PicocIncludeAllSystemHeaders(&pc);
   PicocParseInteractive(&pc);
   PicocCleanup(&pc);
@@ -76,6 +89,7 @@ int PicocRunFile(const char* filename){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
   PicocInitialise(&pc, StackSize);
+  if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
   PicocIncludeAllSystemHeaders(&pc);
   PicocPlatformScanFile(&pc, filename);
   PicocCleanup(&pc);
@@ -87,6 +101,7 @@ int PicocRunSource(const char* source){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
   PicocInitialise(&pc, StackSize);
+  if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
   PicocIncludeAllSystemHeaders(&pc);
   PicocParse(&pc, "somefilename", source, (int)strlen(source), TRUE, TRUE, TRUE, TRUE);
   PicocCleanup(&pc);

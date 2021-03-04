@@ -26,19 +26,6 @@ Here are some snippets from libraryI3T.cpp:
         VariableDefinePlatformVar(pc, NULL, "mat4scale", &pc->IntType, (union AnyValue *)&mat4scale, FALSE);// add readonly variable exposed to script
     }
 
-NOTE:
-Picoc crashes when:
-(1) Custom functions are using unknown datatypes (you must define them first):
-
-struct LibraryFunction PlatformLibrary1[] ={
-	{ PlugNodes,     	"bool plugNodes(int,int,int,int);" }, //bool is unknown type
-};
-
-(2) Running script, where function returns 8B value and result is saved to 4B value:
-bool b=getPointer(); //returns void*, that may be of size 8B
-
-(3) Yet to be discovered...
-
 picoc
 -----
 
