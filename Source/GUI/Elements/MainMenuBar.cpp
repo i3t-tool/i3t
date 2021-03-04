@@ -6,11 +6,15 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/API.h"
 #include "Core/Application.h"
 #include "Core/World.h"
 #include "GUI/Elements/Dialogs/AboutDialog.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
+#include "GUI/Elements/Windows/TutorialWindow.h"
+#include "GUI/Elements/Windows/ViewportWindow.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 // #include "RecentFiles.h"
 
 MainMenuBar::MainMenuBar()
@@ -22,7 +26,7 @@ void MainMenuBar::render()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		ImGui::PushFont(App::get().getFont(FONT_MENU_LARGE));
+		ImGui::PushFont(I3T::getFont(EFont::MenuLarge));
 
 		showFileMenu();
 		showEditMenu();
@@ -103,7 +107,7 @@ void MainMenuBar::showFileMenu()
 			// TabSpace::showSetupForm();
 			// App::get().enqueueWindow(SetupDialog::id, &m_setupDialog);
 			// App::get().enqueueWindow(SetupDialog::id, std::make_unique<SetupDialog>());
-			App::get().showUniqueWindow<SetupDialog>();
+			I3T::getUI()->showUniqueWindow<SetupDialog>();
 		}
 		ImGui::Separator();
 
@@ -142,15 +146,17 @@ void MainMenuBar::showWindowsMenu()
 {
 	if (ImGui::BeginMenu("Windows"))
 	{
-		if (ImGui::MenuItem("Workspace window", nullptr, &Application::get().m_showWorkspaceWindow)) {}
+		if (ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
 
-		if (ImGui::MenuItem("Tutorial window", nullptr, &Application::get().m_showTutorialWindow)) {}
+		if (ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr())) {}
 
-		if (ImGui::MenuItem("Console I3T window", nullptr, &Application::get().m_showConsoleWindow)) {}
+		// if (ImGui::MenuItem("Console I3T window", nullptr,
+		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
 
-		if (ImGui::MenuItem("Active matrix zoom window", nullptr, &Application::get().m_showZoomWindow)) {}
+		// if (ImGui::MenuItem("Active matrix zoom window", nullptr,
+		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
 
-		if (ImGui::MenuItem("Scene view window", nullptr, &Application::get().m_showViewportWindow)) {}
+		if (ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<ViewportWindow>()->getShowPtr())) {}
 
 		ImGui::EndMenu();
 	}
@@ -214,7 +220,7 @@ void MainMenuBar::showHelpMenu()
 		{
 			// App::get().enqueueWindow(DescriptionDialog::id, &m_descriptionDialog);
 			// App::get().enqueueWindow(DescriptionDialog::id, std::make_unique<DescriptionDialog>());
-			App::get().showUniqueWindow<DescriptionDialog>();
+			I3T::getUI()->showUniqueWindow<DescriptionDialog>();
 		}
 
 		if (ImGui::MenuItem("About"))
@@ -222,7 +228,7 @@ void MainMenuBar::showHelpMenu()
 			// TabSpace::showAboutForm();
 			// App::get().enqueueWindow(AboutDialog::id, &m_aboutDialog);
 			// App::get().enqueueWindow(AboutDialog::id, std::make_unique<SetupDialog>());
-			App::get().showUniqueWindow<AboutDialog>();
+			I3T::getUI()->showUniqueWindow<AboutDialog>();
 		}
 
 		ImGui::Separator();

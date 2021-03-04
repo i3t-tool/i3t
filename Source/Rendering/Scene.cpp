@@ -32,7 +32,7 @@ Scene::Scene(World* _world) : world(_world)
 	camera->setPosition(2.0f, 2.0f, 2.0f);
 	camera->setLookAt(0.0f, 0.0f, 0.0f);
 
-	camera->setPerspective((float)Config::WIN_WIDTH, (float)Config::WIN_HEIGHT);
+	camera->setPerspective(static_cast<float>(Config::WIN_WIDTH), static_cast<float>(Config::WIN_HEIGHT));
 	camera->update();
 
 	viewPort = new ViewPort(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -48,7 +48,7 @@ Scene::Scene(World* _world) : world(_world)
 
 Scene::~Scene()
 {
-	// clear objets arrays
+	// clear object array
 	for (std::vector<Object*>::iterator it = objects.begin(); it != objects.end(); ++it)
 	{
 		delete (*it);

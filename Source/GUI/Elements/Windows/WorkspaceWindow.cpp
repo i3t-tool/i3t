@@ -85,6 +85,22 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	/*--*/
 	ne::NavigateToContent();
 
+	glm::mat4 m=glm::mat4(0.14f);
+	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
+	std::vector<Core::Pin>cp= wnbd->Nodebase->getInputPins();
+	//cp[0].getParentPin()->getMaster();
+
+	ValueSetResult vsr=wnbd->Nodebase->setValue(m);
+	ValueSetResult vsr2=wnbd->Nodebase->setValue(m,Core::Transform::g_Translate);
+	printf("%d\n",vsr2.status);
+	DataStore ds=wnbd->Nodebase->getData();
+	glm::mat4 mm=ds.getMat4();
+	printf("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
+				mm[0][0], mm[1][0], mm[2][0], mm[3][0],
+				mm[0][1], mm[1][1], mm[2][1], mm[3][1],
+				mm[0][2], mm[1][2], mm[2][2], mm[3][2],
+				mm[0][3], mm[1][3], mm[2][3], mm[3][3] );
+
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
 	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
@@ -114,11 +130,7 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-
-	if (!WholeApplication.m_showWorkspaceWindow) /* \todo Maybe unusefull - open-Flag is used below in ImGUI::Begin*/
-		return;
-
-	ImGui::Begin("Workspace", &(WholeApplication.m_showWorkspaceWindow));
+	ImGui::Begin("Workspace", getShowPtr());
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");
@@ -128,18 +140,11 @@ void WorkspaceWindow::render()
 		WorkspaceNode->drawNode(NodeBuilderContext, nullptr);
 	}
 
-	/* link have to be drawn after both of pins was drawn */
-	for (auto&& WorkspaceNode : WorkspaceNodes)
-	{
-		WorkspaceNode->drawInputLinks();
-	}
-//
-//	/* \todo I am not able to do it with for-each loop - compilation fail on casting - if somebody can do it... */
-//
-//	for (int i = 0; i < WorkspaceNodes.size(); ++i)
-//	{
-//		WorkspaceNodes.at(i).get()->drawInputLinks(); /* \todo skip nodes with no inputs...*/
-//	}
+    for (auto& workspaceNode : WorkspaceNodes)
+    {
+        dynamic_cast<WorkspaceNodeBaseData*>(workspaceNode.get())
+            ->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
+    }
 
 	ne::End();
 

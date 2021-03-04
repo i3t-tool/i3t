@@ -31,7 +31,8 @@ struct ValueSetResult
 	enum class Status
 	{
 		Ok = 0,
-		Err_ConstraintViolation
+		Err_ConstraintViolation,
+		Err_LogicError
 	};
 
 	const Status status;
@@ -46,11 +47,12 @@ namespace Core
 {
 class Pin;
 
+
 /**
  * Base class interface for all boxes.
  * \image html baseOperator.png
  */
-class NodeBase
+class NodeBase : public std::enable_shared_from_this<NodeBase>
 {
 	friend class GraphManager;
 
@@ -68,7 +70,7 @@ protected:
 	std::vector<DataStore> m_internalData;
 
 	Transform::DataMap m_initialMap{};
-	Transform::DataMap m_currentMap{};
+	Transform::DataMap m_currentMap = Transform::g_Free;
 
 	/**
 	 * Operator node properties.
@@ -82,30 +84,38 @@ protected:
 	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
-	NodeBase() = default;
+  NodeBase() = default;
 
-	explicit NodeBase(const Operation* operation);
+	NodeBase(const Operation* operation) : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+  {}
 
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
+	void create();
+
 	[[nodiscard]] ID getId() const;
 
+	Ptr<NodeBase> getPtr() { return shared_from_this(); }
+	const Operation* const getOperation() { return m_operation; }
+
 	//===-- Obtaining value functions. ----------------------------------------===//
-	/**
-	 * Get node internal value
-	 *
-	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
-	 *              Value of field[0] is returned if this parameter omitted)
-	 */
-	DataStore& getInternalData(unsigned index = 0)
+protected:
+	DataStore& getInternalData(size_t index = 0)
 	{
 		Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
 
-	DataStore& getData() { return m_internalData[0]; }
+public:
+	/**
+	 * Get Node contents.
+	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
+	 *              Value of field[0] is returned if this parameter omitted)
+	 * \return Struct which holds data
+	 */
+	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 	/**
 	 * Set a value of node.
@@ -118,18 +128,24 @@ public:
 	[[nodiscard]] virtual ValueSetResult setValue(float val)
 	{
 		m_internalData[0].setValue(val);
+    spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
 	{
 		m_internalData[0].setValue(vec);
+		spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
 	{
 		m_internalData[0].setValue(vec);
+    spreadSignal();
+
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
 
@@ -138,11 +154,19 @@ public:
 		if (m_currentMap == Transform::g_Free)
 		{
 			m_internalData[0].setValue(mat);
+      spreadSignal();
+
 			return ValueSetResult{ValueSetResult::Status::Ok, ""};
 		}
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not a free transformation."};
+		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Not a free transformation."};
 	}
 
+	/**
+	 *
+	 * \param val
+	 * \param coords in column major order, coords.x is column index and coords.y is row index.
+	 * \return
+	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
@@ -161,9 +185,30 @@ public:
 		                      "Unsupported operation on non transform object."};
 	}
 
+	/**
+	 * Sets node value without validation.
+	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
+	 *    by compiler.
+	 * \param value Value to set.
+	 * \param index Index of DataStore (if the node stores more than one value)
+	 */
+	template <typename T>
+	void setInternalValue(const T& value, size_t index = 0)
+  {
+		getInternalData(index).setValue(value);
+		spreadSignal();
+	}
+
+	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
+  {
+    getInternalData(index).getMat4Ref()[coordinates.x][coordinates.y] = value;
+		spreadSignal();
+	}
+
 	virtual void reset() {}
 
 	virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
+  const Transform::DataMap& getDataMap() { return m_currentMap; }
 
 	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
 	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -209,10 +254,9 @@ public:
 	//===----------------------------------------------------------------------===//
 
 private:
-	/// \todo unplug* are internal functions.
-	void _unplugAll();
-	void _unplugInput(int index);
-	void _unplugOutput(int index);
+	void unplugAll();
+	void unplugInput(int index);
+	void unplugOutput(int index);
 };
 
 /**
@@ -235,7 +279,7 @@ class Pin
 	const bool m_isInput;
 
 	/// Owner of the pin.
-	NodeBase* m_master;
+	Ptr<NodeBase> m_master;
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component
@@ -251,9 +295,11 @@ class Pin
 
 	const EValueType m_opValueType = EValueType::Pulse;
 
+	friend void setPinOwner(Ptr<Core::NodeBase>& node);
+
 public:
-	Pin(EValueType valueType, bool isInput, NodeBase* op, int index)
-			: m_opValueType(valueType), m_isInput(isInput), m_master(op), m_index(index)
+	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index)
+			: m_opValueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
 	{
 		m_id = IdGenerator::next();
 	}
@@ -276,6 +322,9 @@ public:
 		}
 	}
 
+	/**
+	 * @return Input pins of connected nodes.
+	 */
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 
 	/**
@@ -284,16 +333,16 @@ public:
 	 * \returns data storage owner by node connected to this input pin. If pin is output pin,
 	 *          it returns data storage of pin owner.
 	 */
-	[[nodiscard]] DataStore& getStorage(unsigned id = 0)
+	[[nodiscard]] const DataStore& getStorage(unsigned id = 0)
 	{
 		if (m_isInput)
 		{
 			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-			return m_input->m_master->getInternalData(id);
+			return m_input->m_master->getData(id);
 		}
 		else
 		{
-			return m_master->getInternalData(id);
+			return m_master->getData(id);
 		}
 	}
 
@@ -306,4 +355,7 @@ public:
 	 */
 	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
 };
+
+using Node = NodeBase;
+using NodePtr = Ptr<NodeBase>;
 } // namespace Core

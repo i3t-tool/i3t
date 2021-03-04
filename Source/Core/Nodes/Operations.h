@@ -116,17 +116,10 @@ enum class ENodeType
 	QuatToFloats,
 	FloatsToQuat,
 	NormalizeQuat,
-	Frustum,
-	LookAt,
 	Float,
 	Vector3,
 	Vector4,
 	Matrix,
-
-	/// \todo Create following transfoms.
-	AxisAngle,
-	Ortho,
-	Perspective,
 };
 
 enum class ETransformType
@@ -136,6 +129,12 @@ enum class ETransformType
 	EulerY,
 	EulerZ,
 	Scale,
+	AxisAngle,
+	Quat,
+	Ortho,
+	Perspective,
+	Frustum,
+	LookAt,
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
@@ -297,19 +296,11 @@ static const std::vector<Operation> operations = {
 		{"FloatsToQuat", "floats -> quat", 4, fourFloatInput, 1, quatInput, NO_TAG, xyzw}, // floats -> quat
 		{"NormalizeQuat", "normalize quat", 1, quatInput, 1, quatInput},                   // normalize quat
 
-		{"Frustum", "frustum", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustrum
-		{"LookAt", "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames},      // lookAt
-
 		// Value nodes.
 		{"FloatToFloat", "float", 1, floatInput, 1, floatInput},
 		{"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input},
 		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
 		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
-
-		// \todo
-		{"AxisAngle", "rotate", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames},       // rotate
-		{"Ortho", "ortho", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},            // ortho
-		{"Perspective", "perspective", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
 };
 
 namespace Core
@@ -317,11 +308,17 @@ namespace Core
 static const Operation g_sequence = {"Sequence", "seq", 2, twoMatrixInput, 2, twoMatrixInput};
 
 static const std::vector<Operation> g_transforms = {
-		{"Translation", "translate", 1, vector3Input, 1, matrixInput},                     // translate
-		{"EulerX", "eulerAngleX", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
-		{"EulerY", "eulerAngleY", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
-		{"EulerZ", "eulerAngleZ", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleZ
-		{"Scale", "scale", 1, vector3Input, 1, matrixInput},                               // scale
+		{"Translation", "translate", 1, vector3Input, 1, matrixInput},                                    // translate
+		{"EulerX", "eulerAngleX", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},                // eulerAngleX
+		{"EulerY", "eulerAngleY", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},                // eulerAngleY
+		{"EulerZ", "eulerAngleZ", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},                // eulerAngleZ
+		{"Scale", "scale", 1, vector3Input, 1, matrixInput},                                              // scale
+		{"AxisAngle", "rotate", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames},       // rotate
+		{"Quat", "quat", 2, quatInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},                      // quat rotate
+		{"Ortho", "ortho", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},            // ortho
+		{"Perspective", "perspective", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
+		{"Frustum", "frustum", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},        // frustrum
+		{"LookAt", "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames},             // lookAt
 };
 
 FORCE_INLINE const Operation* getTransformProps(ETransformType type)

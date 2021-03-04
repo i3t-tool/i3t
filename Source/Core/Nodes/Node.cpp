@@ -5,28 +5,27 @@
 
 using namespace Core;
 
-NodeBase::NodeBase(const Operation* operation)
-		: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
-{
-	m_id = IdGenerator::next();
-
-	// Create input pins.
-	for (int i = 0; i < m_operation->numberOfInputs; i++)
-	{
-		m_inputs.emplace_back(m_operation->inputTypes[i], true, this, i);
-	}
-
-	// Create output pins and data storage for each output.
-	for (int i = 0; i < m_operation->numberOfOutputs; i++)
-	{
-		m_outputs.emplace_back(m_operation->outputTypes[i], false, this, i);
-		m_internalData.emplace_back();
-	}
-}
-
 NodeBase::~NodeBase()
 {
-	_unplugAll();
+	unplugAll();
+}
+
+void NodeBase::create()
+{
+  m_id = IdGenerator::next();
+
+  // Create input pins.
+  for (int i = 0; i < m_operation->numberOfInputs; i++)
+  {
+    m_inputs.emplace_back(m_operation->inputTypes[i], true, getPtr(), i);
+  }
+
+  // Create output pins and data storage for each output.
+  for (int i = 0; i < m_operation->numberOfOutputs; i++)
+  {
+    m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
+    m_internalData.emplace_back();
+  }
 }
 
 const std::vector<Pin>& NodeBase::getInputPins() const
@@ -69,20 +68,20 @@ void NodeBase::receiveSignal(int inputIndex)
 		spreadSignal();
 }
 
-void NodeBase::_unplugAll()
+void NodeBase::unplugAll()
 {
 	for (auto i = 0; i < m_inputs.size(); ++i)
 	{
-		_unplugInput(i);
+		unplugInput(i);
 	}
 
 	for (auto i = 0; i < m_outputs.size(); ++i)
 	{
-		_unplugOutput(i);
+		unplugOutput(i);
 	}
 }
 
-void NodeBase::_unplugInput(int index)
+void NodeBase::unplugInput(int index)
 {
 	Debug::Assert(m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
 
@@ -109,7 +108,7 @@ void NodeBase::_unplugInput(int index)
 	}
 }
 
-void NodeBase::_unplugOutput(int index)
+void NodeBase::unplugOutput(int index)
 {
 	Debug::Assert(m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
 

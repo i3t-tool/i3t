@@ -67,8 +67,49 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 	builder.EndHeader();
 }
 
+
 WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : Id(id), Color(ImColor(255, 255, 255))
+{}
+
+/* see:
+ * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
+WorkspaceNodeBaseData::WorkspaceNodeBaseData(Ptr<Core::NodeBase> nodebase) : Nodebase(std::move(nodebase))
 {
+	std::ostringstream pinName;
+	std::string pinNameStr;
+
+	const std::vector<Core::Pin>& InputPins = Nodebase->getInputPins();
+	const std::vector<Core::Pin>& OutputPins = Nodebase->getOutputPins();
+
+	WorkspaceLinksProperties.reserve(InputPins.size());
+
+	WorkspaceInputsProperties.reserve(InputPins.size());
+	WorkspaceOutputsProperties.reserve(OutputPins.size());
+
+	for (const Core::Pin& pin : InputPins)
+	{
+		pinName << "input #" << pin.getIndex();
+		pinNameStr = pinName.str();
+		WorkspaceInputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
+				pin.getId(),
+				pinNameStr.c_str() //,std::format("input #{}", pin.getIndex()) // format is not part of standard library
+				,
+				PinKind::Input, pin.getType()));
+		WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(pin.getId()));
+		pinName.str("");
+	}
+
+	for (const Core::Pin& pin : OutputPins)
+	{
+		pinName << "output #" << pin.getIndex();
+		pinNameStr = pinName.str();
+		WorkspaceOutputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
+				pin.getId(), pinNameStr.c_str() //,std::format("output #{}", pin.getIndex())
+				,
+				PinKind::Output, pin.getType()));
+		pinName.str("");
+	}
+
 }
 
 WorkspacePinProperties::WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type)

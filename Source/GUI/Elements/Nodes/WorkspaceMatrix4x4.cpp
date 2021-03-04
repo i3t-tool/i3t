@@ -7,7 +7,11 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string
 
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
-    const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
+
+    //const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
+
+	const glm::mat4& coreData = Nodebase->getData().getMat4();
+
 	bool valueCH = false;
 	std::string s = "";
 	const char* c = "";
@@ -43,7 +47,8 @@ void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 
 	if (valueCH)
 	{
-		Nodebase->getInternalData().setValue(localData);
+		// Nodebase->getInternalData().setValue(localData);
+		Nodebase->setValue(localData);
 	}
 
 	ImGui::Spring(0);

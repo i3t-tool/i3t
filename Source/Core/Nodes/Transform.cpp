@@ -11,14 +11,16 @@ ValueSetResult Core::Scale::setValue(const glm::vec3& vec)
 	if (m_currentMap == Transform::g_UniformScale)
 	{
 		if (Math::areElementsSame(vec))
-			m_internalData[0].setValue(glm::scale(vec));
+    {
+      setInternalValue(glm::scale(vec));
+    }
 		else
 			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
 			                      "Given vector does not have all three values same."};
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::scale(vec));
+		setInternalValue(glm::scale(vec));
 	}
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -29,7 +31,9 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 	if (m_currentMap == Transform::g_UniformScale)
 	{
 		if (Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]))
-			m_internalData[0].setValue(mat);
+    {
+			setInternalValue(mat);
+		}
 		else
 			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
 			                      "Given matrix does not represent uniform scale."};
@@ -38,7 +42,7 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 	{
 		if (Transform::cmp(m_currentMap, mat))
 		{
-			m_internalData[0].setValue(mat);
+			setInternalValue(mat);
 		}
 		else
 		{
@@ -49,7 +53,7 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 	else if (m_currentMap == Transform::g_Free)
 	{
 		// Free transformation is set.
-		getData().getMat4Ref() = mat;
+		setInternalValue(mat);
 	}
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -60,23 +64,23 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 	if (m_currentMap == Transform::g_Free)
 	{
 		// Free transformation is set.
-		getData().getMat4Ref()[coords.x][coords.y];
+		setInternalValue(val, coords);
 	}
 
 	if (!coordsAreValid(coords, m_currentMap))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-		;
 	}
 
 	if (m_currentMap == Transform::g_UniformScale)
 	{
-		getInternalData().setValue(glm::scale(glm::vec3(val)));
+		setInternalValue(glm::scale(glm::vec3(val)));
 	}
 
 	if (m_currentMap == Transform::g_Scale)
 	{
-		getData().getMat4Ref()[coords.x][coords.y];
+    setInternalValue(val, coords);
+		spreadSignal();
 	}
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -85,7 +89,7 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 void Scale::reset()
 {
 	setDataMap(m_initialMap);
-	getInternalData().setValue(glm::scale(m_initialScale));
+	setInternalValue(glm::scale(m_initialScale));
 }
 
 void Scale::setDataMap(const Transform::DataMap& map)
@@ -98,18 +102,20 @@ void Scale::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::scale(m_inputs[0].getStorage().getVec3()));
+		setInternalValue(glm::scale(m_inputs[0].getStorage().getVec3()));
 	}
+	/*
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
+	 */
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
 ValueSetResult EulerRotX::setValue(float val)
 {
-	getData().getVec3Ref() = glm::rotateX(glm::vec3(1.0f, 0.0f, 0.0f), val);
+	setInternalValue(glm::rotateX(glm::vec3(1.0f, 0.0f, 0.0f), val));
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -126,7 +132,7 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 	}
 	else if (m_currentMap == Transform::g_Free)
 	{
-		getData().setValue(mat);
+		setInternalValue(mat);
 	}
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -135,11 +141,7 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 void EulerRotX::reset()
 {
 	setDataMap(m_initialMap);
-	auto result = setValue(m_initialRot);
-	if (result.status != ValueSetResult::Status::Ok)
-	{
-		Log::fatal("Could not reset values at EulerRotX#{}", getId());
-	}
+	setInternalValue(glm::rotate(m_initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
 }
 
 void EulerRotX::updateValues(int inputIndex)
@@ -150,12 +152,14 @@ void EulerRotX::updateValues(int inputIndex)
 
 		angle = m_inputs[0].getStorage().getFloat();
 
-		m_internalData[0].setValue(glm::eulerAngleX(angle));
+		setInternalValue(glm::eulerAngleX(angle));
 	}
+	/*
 	else
 	{
-		m_internalData[0].setValue(glm::eulerAngleX(0.0f));
+		setInternalValue(glm::eulerAngleX(0.0f));
 	}
+	 */
 }
 
 ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
@@ -171,7 +175,7 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 		                      "Value must be within [-1.0, 1.0] interval."};
 	}
 
-	auto& mat = getData().getMat4Ref();
+	auto mat = getData().getMat4();
 
 	if (coords == glm::ivec2(1, 2))
 	{
@@ -203,6 +207,8 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 		mat[1][1] = cos;
 		mat[2][2] = cos;
 	}
+
+	setInternalValue(mat);
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -238,19 +244,21 @@ void EulerRotY::updateValues(int inputIndex)
 
 		angle = m_inputs[0].getStorage().getFloat();
 
-		m_internalData[0].setValue(glm::eulerAngleY(angle));
+		setInternalValue(glm::eulerAngleY(angle));
 	}
+	/*
 	else
 	{
-		m_internalData[0].setValue(glm::eulerAngleY(0.0f));
+		setInternalValue(glm::eulerAngleY(0.0f));
 	}
+	 */
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
 
 ValueSetResult EulerRotZ::setValue(float val)
 {
-	getData().setValue(glm::rotateZ(glm::vec3(0.0f, 0.0f, 1.0f), val));
+	setInternalValue(glm::rotateZ(glm::vec3(0.0f, 0.0f, 1.0f), val));
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -279,19 +287,21 @@ void EulerRotZ::updateValues(int inputIndex)
 
 		angle = m_inputs[0].getStorage().getFloat();
 
-		m_internalData[0].setValue(glm::eulerAngleZ(angle));
+		setInternalValue(glm::eulerAngleZ(angle));
 	}
+	/*
 	else
 	{
-		m_internalData[0].setValue(glm::eulerAngleZ(0.0f));
+		setInternalValue(glm::eulerAngleZ(0.0f));
 	}
+	 */
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
 
 ValueSetResult Core::Translation::setValue(const glm::vec3& vec)
 {
-	getData().setValue(glm::translate(vec));
+	setInternalValue(glm::translate(vec));
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -302,7 +312,7 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 	{
 		if (Transform::isMatValid(m_currentMap, mat))
 		{
-			getData().setValue(mat);
+			setInternalValue(mat);
 		}
 		else
 		{
@@ -312,7 +322,7 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 	}
 	else if (m_currentMap == Transform::g_Free)
 	{
-		getData().setValue(mat);
+		setInternalValue(mat);
 	}
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -321,23 +331,21 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 void Translation::reset()
 {
 	setDataMap(m_initialMap);
-	auto result = setValue(m_initialTrans);
-	if (result.status != ValueSetResult::Status::Ok)
-	{
-		Log::fatal("Could not reset values at EulerRotX#{}", getId());
-	}
+	setInternalValue(glm::translate(m_initialTrans));
 }
 
 void Translation::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::translate(m_inputs[0].getStorage().getVec3()));
+		setInternalValue(glm::translate(m_inputs[0].getStorage().getVec3()));
 	}
+	/*
 	else
 	{
-		m_internalData[0].setValue(glm::mat4(1.0f));
+		setInternalValue(glm::mat4(1.0f));
 	}
+	 */
 }
 
 ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
@@ -346,6 +354,87 @@ ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
-	getData().getMat4Ref()[coords.x][coords.y] = val;
+  setInternalValue(val, coords);
 	return ValueSetResult{ValueSetResult::Status::Ok};
+}
+
+void AxisAngleRot::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
+	{
+		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
+	}
+	/*
+	else
+	{
+		setInternalValue(glm::mat4());
+	}
+	 */
+}
+
+void OrthoProj::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
+	    m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
+	{
+		setInternalValue(glm::ortho(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                                      m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+		                                      m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
+	}
+	/*
+	else
+	{
+		setInternalValue(glm::mat4());
+	}
+	 */
+}
+
+void PerspectiveProj::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
+	    m_inputs[3].isPluggedIn())
+	{
+		setInternalValue(
+				glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                     m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
+	}
+	/*
+	else
+	{
+		setInternalValue(glm::mat4());
+	}
+	 */
+}
+
+void Frustum::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
+	    m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
+	{
+		setInternalValue(glm::frustum(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                                        m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+		                                        m_inputs[4].getStorage().getFloat(),
+		                                        m_inputs[5].getStorage().getFloat()));
+	}
+	/*
+	else
+	{
+		setInternalValue(glm::mat4());
+	}
+	 */
+}
+
+void LookAt::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
+	{
+		setInternalValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
+		                                       m_inputs[2].getStorage().getVec3()));
+	}
+	/*
+	else
+	{
+		setInternalValue(glm::mat4());
+	}
+	 */
 }

@@ -4,6 +4,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
+#include "Core/API.h"
 #include "Rendering/TextureRegion.h"
 #include "Utils/TextureLoader.h"
 
@@ -25,7 +26,7 @@ void AboutDialog::render()
 		ImGui::TextWrapped(Config::INFO_TEXT.c_str());
 		ImGui::Text("");
 
-		ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+		ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
 		ImGui::Text("Supervisor:");
 		ImGui::PopFont();
 
@@ -35,7 +36,7 @@ void AboutDialog::render()
 
 		/// \todo Add interactive link to http://www.i3t-tool.org/.
 
-		ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+		ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
 		ImGui::Text("Authors:");
 		ImGui::PopFont();
 
@@ -56,7 +57,7 @@ void AboutDialog::render()
 		ImGui::Spring();
 		if (ImGui::Button("OK", ImVec2{100.0f, 0.0f}))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 		}
 		ImGui::Spring(0.0f);
 		ImGui::EndHorizontal();

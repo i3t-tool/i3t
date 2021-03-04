@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <GUI/UI.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -16,22 +17,16 @@
 #include "Core/GlfwWindow.h"
 #include "GUI/Elements/IWindow.h"
 
+#include "World2/World2.h"
+
 constexpr char* ImGui_GLSLVersion = "#version 140";
 
-#define FONT_MENU_LARGE    0
-#define FONT_TUTORIAL_TEXT 0
-#define FONT_BUTTON        1
-#define FONT_TAB           1
-#define FONT_NODE          2
-#define FONT_MENU_SMALL    2
-#define FONT_TITLE         3
-#define FONT_TASK_TITLE    4
-#define FONTS_COUNT        4
-
+class Module;
 class ICommand;
 class GlfwWindow;
 class MainMenuBar;
 class World;
+class World2;
 
 /**
  * Application class.
@@ -52,6 +47,7 @@ public:
 	void finalize();
 
 	static Application& get();
+	UI* getUI();
 
 	/**
 	 * Init OpenGL stuffs before display loop.
@@ -72,15 +68,9 @@ public:
 	void run();
 
 	World* world();
+	World2*world2();
 	ImFont* getFont(int fontId);
 	GLFWwindow* mainWindow();
-
-	/**
-	 * Create and show desired window.
-	 *
-	 * \tparam T window to create. T must be derived from IWindow class.
-	 */
-	template <typename T> void showUniqueWindow();
 
 	/**
 	 * Issue command.
@@ -91,12 +81,10 @@ public:
 	 */
 	void enqueueCommand(ICommand* command);
 
-	bool hasWindow(const std::string& id);
+	void init();
 
-	/**
-	 * Initialize ImGui stuffs.
-	 */
-	void initImGui();
+	/// \todo MH This function must be called after world instantiation.
+	void initModules();
 
 	/**
 	 * \fn	int init()
@@ -111,12 +99,10 @@ public:
 	int initI3T();
 
 private:
-	friend class MainMenuBar;
-	friend class TutorialWindow;
-	friend class ViewportWindow;
-	friend class WorkspaceWindow;
-
 	static Application s_instance;
+
+	UI* m_ui;
+	std::vector<Module*> m_modules;
 
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback resulting in no
@@ -124,27 +110,13 @@ private:
 	 */
 	bool m_isPaused;
 
-	bool m_showWorkspaceWindow;
-	bool m_showTutorialWindow;
-	bool m_showConsoleWindow;
-	bool m_showZoomWindow;
-	bool m_showViewportWindow;
-
 	bool m_bShouldClose = false;
 
-	MainMenuBar* m_menu;
-
 	World* m_world; ///< all GUI and logic objects
+	World2*m_world2;
 
 	// GLFWwindow* m_window;
 	GlfwWindow* m_window;
-
-	/// Application subwindows/dockable windows such as Viewport, Node editor. A window can be showed or hidden.
-	std::vector<IWindow*> m_dockableWindows;
-
-	std::map<std::string, std::unique_ptr<IWindow>> m_windows;
-
-	std::array<ImFont*, (unsigned)FONTS_COUNT + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
 
 	/// Array of commands which the application is going to process in its main loop.
 	std::vector<ICommand*> m_commands;
@@ -174,14 +146,6 @@ private:
 	void onClose();
 
 	/**
-	 * Hide and remove window.
-	 *
-	 * Called by HideWindowCommand.
-	 * \param windowId identification of window to hide.
-	 */
-	void popWindow(const std::string& windowId);
-
-	/**
 	 * \brief	Updates the world and the mouse button state, mouseDelta, mousePrev and throws JUST_Pressed to PRESSED
 	 * 			PreUpdate, world update, update
 	 */
@@ -189,11 +153,3 @@ private:
 };
 
 typedef Application App;
-
-template <typename T> void Application::showUniqueWindow()
-{
-	Debug::Assert(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
-
-	if (!hasWindow(T::id))
-		m_windows.insert(std::pair<std::string, std::unique_ptr<IWindow>>(T::id, std::make_unique<T>()));
-}

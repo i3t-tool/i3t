@@ -2,15 +2,20 @@
 
 #include "imgui.h"
 
+#include "Core/API.h"
 #include "Core/Application.h"
 #include "Core/InputController.h"
 #include "GUI/Settings.h"
 #include "Rendering/FrameBuffer.h"
 
+#include "../../../World2/World2.h"
+#include "../../../World2/Select.h"
+
 /// \todo Use Framebuffer class.
-ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
+ViewportWindow::ViewportWindow(bool show, World* world,World2*world2) : IWindow(show)
 {
 	m_world = world;
+	m_world2 = world2;
 
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
@@ -22,27 +27,36 @@ ViewportWindow::ViewportWindow(bool show, World* world) : IWindow(show)
 	// generate texture to draw on
 	glGenTextures(1, &m_texColBufMain);
 
-	// create a renderbuffer to allow depth and stencil
-	glGenRenderbuffers(1, &m_rboMain);
+  // create a renderbuffer to allow depth and stencil
+  glGenRenderbuffers(1, &m_rboMain);
+  glBindRenderbuffer(GL_RENDERBUFFER,m_rboMain);
+  //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+  glEnable(GL_MULTISAMPLE);
+  glCullFace(GL_BACK);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// init vectors definig size to display
-	m_wcMin = ImVec2(0, 0);
-	m_wcMax = ImVec2(0, 0);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  // init vectors definig size to display
+  m_wcMin = ImVec2(0, 0);
+  m_wcMax = ImVec2(0, 0);
 }
 
 void ViewportWindow::render()
 {
-	if (!Application::get().m_showViewportWindow)
-		return;
 
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::Begin(
-				"Viewport",
-				&Application::get().m_showViewportWindow); // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Viewport",
+		             getShowPtr()); // Create a window called "Hello, world!" and append into it.
 		ImGui::PopStyleVar();
 
 		// get positions of min max points of the window
@@ -104,7 +118,17 @@ void ViewportWindow::render()
 		glEnable(GL_MULTISAMPLE);
 
 		// draw
-		m_world->render();
+		glStencilMask(255);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+		glClearStencil(0);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// draw
+		//m_world->render();
+
+		// world2
+		//World2::tmpAccess->onUpdate();
+		m_world2->onUpdate();
 
 		glDisable(GL_MULTISAMPLE);
 

@@ -15,14 +15,14 @@ void BeforeCloseModal::render()
 	// ImVec2 center(parent_pos.x + parent_size.x * 0.5f, parent_pos.y + parent_size.y * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-	if (ImGui::BeginPopupModal("Close?###%s", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Close?###%s", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Any unsaved content will be discarded, are you sure?\n\n");
 		ImGui::Separator();
 
 		if (ImGui::Button("Save and quit", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 			CloseCommand::dispatch();
 
 			ImGui::CloseCurrentPopup();
@@ -32,7 +32,7 @@ void BeforeCloseModal::render()
 		ImGui::SameLine();
 		if (ImGui::Button("Quit anyway", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 			CloseCommand::dispatch();
 
 			ImGui::CloseCurrentPopup();
@@ -41,7 +41,7 @@ void BeforeCloseModal::render()
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(id);
+			HideWindowCommand::dispatch(ID);
 
 			ImGui::CloseCurrentPopup();
 		}

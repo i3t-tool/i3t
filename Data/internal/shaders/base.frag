@@ -18,7 +18,7 @@ void main() {
 	float NdotL = max(dot(normal, -u_lightDirection), 0.0);
 	vec3 lightDiffuse = u_lightColor * NdotL;
 
-	vec3 diffuse = texture(u_diffuse, v_texCoord0).rgb * u_diffuseColor;
+	vec3 diffuse = texture(u_diffuse, v_texCoord0,-0.5).rgb * u_diffuseColor;
 
 	vec3 finalColor = diffuse * (u_ambientColor + lightDiffuse);
 

@@ -8,7 +8,7 @@ using namespace Core;
 TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
 {
   // Create uniform scale.
-  auto scale = Builder::createTransform<Core::Scale>();
+  auto scale = Builder::createTransform<Scale>();
 
   {
     // Set new uniform scale.
@@ -51,14 +51,14 @@ TEST(ResetScaleNode, ResetsNodeToInitialValues)
   EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 
   {
-    auto data = scaleNode->getInternalData().getMat4();
+    auto data = scaleNode->getData().getMat4();
 
     EXPECT_TRUE(Math::eq(data, mat));
   }
   {
     // Reset to initial values and state.
     scaleNode->reset();
-    auto data = scaleNode->getInternalData().getMat4();
+    auto data = scaleNode->getData().getMat4();
 
     auto tmp = glm::scale(scale);
 

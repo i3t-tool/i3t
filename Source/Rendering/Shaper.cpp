@@ -93,7 +93,7 @@ void Shaper::drawOnceAndDestroy(Camera* cam)
 	drawAndPreserve(cam);
 	// !!! //
 	clearPreparedVertices(); // delete the prepared vertices and colors
-	// deleteBuffers();  //deleteOpenGL Buffers
+													 // deleteBuffers();  //deleteOpenGL Buffers
 }
 
 // PF - reimplemented above

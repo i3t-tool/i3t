@@ -21,9 +21,11 @@ namespace Builder
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
+template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
 {
-	auto ret = std::make_unique<Core::NodeImpl<T>>();
+
+	auto ret = std::make_shared<Core::NodeImpl<T>>();
+	ret->create();
 	ret->updateValues(0);
 	return ret;
 }
@@ -34,15 +36,17 @@ template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
  */
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
-	auto&& ret = std::make_shared<Core::Sequence>();
+	auto ret = std::make_shared<Core::Sequence>();
+  ret->create();
 	ret->updateValues(0);
 	return ret;
 }
 
 template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
 {
-	auto&& ret = std::make_shared<T>(std::forward<Args>(args)...);
-	ret->updateValues(0);
+	auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+  ret->create();
+	ret->reset();
 	return ret;
 }
 } // namespace Builder
@@ -87,24 +91,97 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-	static ENodePlugResult plug(const UPtr<Core::NodeBase>& leftNode, const UPtr<Core::NodeBase>& rightNode,
+	static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
 	/// Unplug all inputs and outputs.
-	static void unplugAll(UPtr<Core::NodeBase>& node);
+	static void unplugAll(Ptr<Core::NodeBase>& node);
 
 	/**
 	 * Unplug plugged node from given input pin of this node.
 	 *
 	 * \param index
 	 */
-	static void unplugInput(UPtr<Core::NodeBase>& node, int index);
+	static void unplugInput(Ptr<Core::NodeBase>& node, int index);
 
 	/**
 	 * Unplug all nodes connected to given output pin of this node.
 	 *
 	 * \param index
 	 */
-	static void unplugOutput(UPtr<Core::NodeBase>& node, int index);
+	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
+
+	static Ptr<NodeBase> getParent(Ptr<Core::NodeBase>& node, size_t index = 0);
+	static Ptr<NodeBase> getParent(Ptr<Core::Sequence> node, size_t index = 0);
+
+	/**
+	 * \return All nodes connected to given node inputs.
+	 */
+	static std::vector<Ptr<NodeBase>> getAllInputNodes(Ptr<Core::NodeBase>& node);
+
+  /**
+   * \return All nodes plugged into given node output pins.
+   */
+	static std::vector<Ptr<NodeBase>> getAllOutputNodes(Ptr<Core::NodeBase>& node);
+
+	/**
+	 * \return All nodes plugged into node input pin on given index.
+	 */
+	static std::vector<Ptr<NodeBase>> getOutputNodes(Ptr<Core::NodeBase>& node, size_t index);
+};
+
+class SequenceTree
+{
+  Ptr<Sequence> m_beginSequence;
+
+public:
+  class MatrixIterator
+  {
+		friend class SequenceTree;
+    SequenceTree* m_tree;
+    Ptr<Sequence> m_currentSequence;
+    Ptr<NodeBase> m_currentMatrix;
+
+  public:
+    MatrixIterator(Ptr<Sequence>& sequence);
+    MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
+
+		/// Move iterator to root sequence.
+    MatrixIterator& operator++();
+
+    /// Move iterator to root sequence.
+    MatrixIterator operator++(int);
+
+    /// Move iterator towards to the leaf sequence.
+    MatrixIterator& operator--();
+
+    /// Move iterator towards to the leaf sequence.
+    MatrixIterator operator--(int);
+
+    Ptr<NodeBase> operator*() const;
+
+    bool operator==(const MatrixIterator& rhs) const;
+    bool operator!=(const MatrixIterator& rhs) const;
+
+	private:
+		/// Move to the next matrix.
+		void advance();
+
+		/// Move to the previous matrix.
+		void withdraw();
+  };
+
+public:
+	SequenceTree(Ptr<NodeBase> sequence);
+
+  /**
+   * \return Iterator which points sequence.
+   */
+  MatrixIterator begin();
+
+  /**
+   * \return Iterator which points to the sequence root.
+   */
+  MatrixIterator end();
 };
 } // namespace Core

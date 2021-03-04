@@ -235,6 +235,9 @@ int main(int argc, char* argv[])
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
 	}
 
+	// Initialize all modules.
+	app.init();
+
 	// III. Initialize I3T stuff,
 	// read other config files.
 	// Load objects(geometry and textures), create the world and load the initial scene.
@@ -248,8 +251,7 @@ int main(int argc, char* argv[])
 		exit(-1);
 	}
 
-	// IV. Create dockspace and ImGui windows.
-	app.initImGui();
+	app.initModules();
 
 	app.run();
 

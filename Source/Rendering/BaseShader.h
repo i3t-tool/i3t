@@ -11,6 +11,8 @@
 #ifndef _BASESHADER_H_
 #define _BASESHADER_H_
 
+#include "../World2/World2.h"
+#include "../World2/HardcodedMeshes.h"
 #include "RedShader.h"
 #include <glm/gtc/type_ptr.hpp>
 

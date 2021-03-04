@@ -12,6 +12,8 @@
 #define _RED_SHADER_H_
 
 #include "Rendering/Shader.h"
+#include "World2/World2.h"
+#include "World2/HardcodedMeshes.h"
 #include <glm/gtc/type_ptr.hpp>
 
 //#include "geometry.h"
