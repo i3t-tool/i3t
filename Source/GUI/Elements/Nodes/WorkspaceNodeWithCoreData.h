@@ -24,4 +24,6 @@ public:
 	virtual void drawInputLinks();
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+
+	bool drawDragFloatWithMap_Inline(float * const value, const int mapValue, std::string label);
 };

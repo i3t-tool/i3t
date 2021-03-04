@@ -1,4 +1,5 @@
 #include "WorkspaceMatrix4x4.h"
+// #include "Source/Core/Nodes/Node.h"
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
     : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
@@ -11,10 +12,9 @@ void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
     //const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
 
 	const glm::mat4& coreData = Nodebase->getData().getMat4();
+	const Core::Transform::DataMap& coreMap = Nodebase->getDataMap();
 
-	bool valueCH = false;
-	std::string s = "";
-	const char* c = "";
+	bool valueChanged = false;
 
 	glm::mat4 localData;
 	for (int rows = 0; rows < 4; rows++)
@@ -32,24 +32,19 @@ void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 	{
 		for (int columns = 0; columns < 4; columns++)
 		{
-			s = "##";
-			s += std::to_string(rows);
-			s += std::to_string(columns);
-			c = s.c_str();
-			valueCH |= ImGui::DragFloat(c, &localData[rows][columns]);
-			if (columns < 3)
-			{
-				ImGui::SameLine();
-			}
+
+		    valueChanged |= drawDragFloatWithMap_Inline(&localData[rows][columns],
+                                                        coreMap[rows*4+columns],
+                                                        fmt::format("##{}-{}", rows, columns));
 		}
+		ImGui::NewLine();
 	}
 	ImGui::PopItemWidth();
 
-	if (valueCH)
+	if (valueChanged)
 	{
-		// Nodebase->getInternalData().setValue(localData);
 		Nodebase->setValue(localData);
 	}
 
-	ImGui::Spring(0);
+	ImGui::Spring(0); /* \todo JH ehat is Spring? */
 }

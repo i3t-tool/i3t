@@ -64,6 +64,10 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	/* \todo adding nodes here just for testing */
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
+
+    Core::Transform::DataMap scaleMap = Core::Transform::g_Scale;
+	static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase->setDataMap(scaleMap);
+
     /*---*/
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));

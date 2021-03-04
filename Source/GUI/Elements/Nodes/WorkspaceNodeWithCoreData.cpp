@@ -115,3 +115,29 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 	}
 }
 
+bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value, int const mapValue, std::string const label)
+{
+    bool inactive = mapValue == 0 ? true : false; /* \todo JH some other type than just active/inactive will be here - maybe */
+
+    if (inactive)
+    {
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+    }
+
+    ImGui::SameLine();
+    bool valueChanged = ImGui::DragFloat(label.c_str(), value);
+
+    if (inactive)
+    {
+        ImGui::PopItemFlag();
+        ImGui::PopStyleVar();
+    }
+
+    if(valueChanged){
+        inactive = true;
+    }
+
+    return valueChanged;
+}
+
