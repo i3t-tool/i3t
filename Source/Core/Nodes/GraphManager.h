@@ -111,6 +111,7 @@ public:
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
 	static Ptr<NodeBase> getParent(Ptr<Core::NodeBase>& node, size_t index = 0);
+	static Ptr<NodeBase> getParent(Ptr<Core::Sequence> node, size_t index = 0);
 
 	/**
 	 * \return All nodes connected to given node inputs.
@@ -126,5 +127,60 @@ public:
 	 * \return All nodes plugged into node input pin on given index.
 	 */
 	static std::vector<Ptr<NodeBase>> getOutputNodes(Ptr<Core::NodeBase>& node, size_t index);
+};
+
+class SequenceTree
+{
+  Ptr<Sequence> m_beginSequence;
+
+public:
+  class MatrixIterator
+  {
+		friend class SequenceTree;
+    SequenceTree* m_tree;
+    Ptr<Sequence> m_currentSequence;
+    Ptr<NodeBase> m_currentMatrix;
+
+  public:
+    MatrixIterator(Ptr<Sequence>& sequence);
+    MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
+
+		/// Move iterator to root sequence.
+    MatrixIterator& operator++();
+
+    /// Move iterator to root sequence.
+    MatrixIterator operator++(int);
+
+    /// Move iterator towards to the leaf sequence.
+    MatrixIterator& operator--();
+
+    /// Move iterator towards to the leaf sequence.
+    MatrixIterator operator--(int);
+
+    Ptr<NodeBase> operator*() const;
+
+    bool operator==(const MatrixIterator& rhs) const;
+    bool operator!=(const MatrixIterator& rhs) const;
+
+	private:
+		/// Move to the next matrix.
+		void advance();
+
+		/// Move to the previous matrix.
+		void withdraw();
+  };
+
+public:
+	SequenceTree(Ptr<NodeBase> sequence);
+
+  /**
+   * \return Iterator which points sequence.
+   */
+  MatrixIterator begin();
+
+  /**
+   * \return Iterator which points to the sequence root.
+   */
+  MatrixIterator end();
 };
 } // namespace Core

@@ -10,6 +10,6 @@ UI* getUI();
 
 template <typename T> IWindow* getWindowPtr()
 {
-	return getUI()->template getWindowPtr<T>();
+	return getUI()->getWindowPtr<T>();
 }
 } // namespace I3T
