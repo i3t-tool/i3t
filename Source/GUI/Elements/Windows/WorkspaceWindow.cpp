@@ -86,14 +86,14 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::NavigateToContent();
 
 	glm::mat4 m=glm::mat4(0.14f);
-	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get());
-	std::vector<Core::Pin>cp= wnbd->Nodebase->getInputPins();
+	WorkspaceNodeWithCoreData*wnwcd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get());
+	std::vector<Core::Pin>cp= wnwcd->Nodebase->getInputPins();
 	//cp[0].getParentPin()->getMaster();
 
-	ValueSetResult vsr=wnbd->Nodebase->setValue(m);
-	ValueSetResult vsr2=wnbd->Nodebase->setValue(m,Core::Transform::g_Translate);
+	ValueSetResult vsr=wnwcd->Nodebase->setValue(m);
+	ValueSetResult vsr2=wnwcd->Nodebase->setValue(m,Core::Transform::g_Translate);
 	printf("%d\n",vsr2.status);
-	DataStore ds=wnbd->Nodebase->getData();
+	DataStore ds=wnwcd->Nodebase->getData();
 	glm::mat4 mm=ds.getMat4();
 	printf("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
 				mm[0][0], mm[1][0], mm[2][0], mm[3][0],
@@ -142,8 +142,8 @@ void WorkspaceWindow::render()
 
     for (auto& workspaceNode : WorkspaceNodes)
     {
-        dynamic_cast<WorkspaceNodeBaseData*>(workspaceNode.get())
-            ->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
+        dynamic_cast<WorkspaceNodeWithCoreData*>(workspaceNode.get())
+            ->drawInputLinks(); /* \todo skip nodes with no inputs...*/
     }
 
 	ne::End();

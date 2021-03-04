@@ -139,23 +139,23 @@ public:
 	bool CanCreateLink(Core::Pin* b); /* \todo check in Core ? */
 };
 
-class WorkspaceNodeBaseData
-{
-public:
-	/*see:
-	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-	Ptr<Core::NodeBase> const Nodebase; /*! \brief reference to core
-	                                                     WorkspaceNodeBaseData is owner of unique pointer
-	                                                */
-
-	std::vector<std::unique_ptr<WorkspaceLinkProperties>> WorkspaceLinksProperties;
-	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceInputsProperties;
-	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceOutputsProperties;
-
-	WorkspaceNodeBaseData(Ptr<Core::NodeBase> nodebase);
-
-	virtual void drawWorkspaceInputLinks();
-	virtual void drawWorkspaceInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
-	virtual void drawWorkspaceNodeData(util::NodeBuilder& builder) = 0;
-	virtual void drawWorkspaceOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
-};
+//class WorkspaceNodeBaseData
+//{
+//public:
+//	/*see:
+//	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
+//	Ptr<Core::NodeBase> const Nodebase; /*! \brief reference to core
+//	                                                     WorkspaceNodeBaseData is owner of unique pointer
+//	                                                */
+//
+//	std::vector<std::unique_ptr<WorkspaceLinkProperties>> WorkspaceLinksProperties;
+//	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceInputsProperties;
+//	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceOutputsProperties;
+//
+//	WorkspaceNodeBaseData(Ptr<Core::NodeBase> nodebase);
+//
+//	virtual void drawInputLinks();
+//	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+//	virtual void drawData(util::NodeBuilder& builder) = 0;
+//	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+//};

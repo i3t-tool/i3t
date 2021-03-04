@@ -10,7 +10,7 @@ class WorkspaceNodeWithCoreData : public WorkspaceNode
 public:
 	/*see:
 	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-	std::unique_ptr<Core::NodeBase> const Nodebase; /*! \brief reference to core
+	Ptr<Core::NodeBase> const Nodebase; /*! \brief reference to core
 	                                                     WorkspaceNodeWithCoreData is owner of unique pointer
 	                                                */
 
@@ -18,7 +18,8 @@ public:
 	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceInputsProperties;
 	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceOutputsProperties;
 
-	WorkspaceNodeWithCoreData(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel);
+	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel);
+
 
 	virtual void drawInputLinks();
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);

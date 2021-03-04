@@ -5,9 +5,10 @@
 
 /* see:
  * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
-WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel = "default CoreData-node header") /* \todo JH take default label from Const.h*/
+WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel = "default CoreData-node header") /* \todo JH take default label from Const.h*/
     :   WorkspaceNode(nodebase->getId(), headerBackground, headerLabel)
-    ,   Nodebase(std::move(nodebase))
+//    ,   Nodebase(std::move(nodebase))
+    ,   Nodebase(nodebase)
 
 {
 	const std::vector<Core::Pin>& InputPins = Nodebase->getInputPins();
