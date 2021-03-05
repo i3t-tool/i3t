@@ -6,6 +6,7 @@ class Module
 
 public:
 	Module(){};
+	virtual ~Module(){};
 	virtual void init(){};
 	virtual void beginFrame(){};
 	virtual void endFrame(){};
