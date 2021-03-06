@@ -35,15 +35,33 @@ TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
   }
 }
 
+TEST(SetVec3Scale, ScaleShouldBeValid)
+{
+  auto scale = glm::vec3(1.5f, 1.5f, 1.5f);
+	auto scaleNode = Builder::createTransform<Scale>();
+
+	scaleNode->setDataMap(Transform::g_Scale);
+	EXPECT_EQ(Transform::g_Scale, scaleNode->getDataMap());
+
+	auto result = scaleNode->setValue(scale);
+	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+
+	auto expectedScale = glm::scale(scale);
+	EXPECT_EQ(expectedScale, scaleNode->getData().getMat4());
+}
+
 TEST(ResetScaleNode, ResetsNodeToInitialValues)
 {
   auto scale = glm::vec3(7.f, -5.f, 3.f);
 
   // Create non-uniform scale
   auto scaleNode = Builder::createTransform<Core::Scale>(scale, Transform::g_Scale);
+  EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Scale);
 
   // Set free transformation node.
   scaleNode->setDataMap(Transform::g_Free);
+  EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Free);
+
   glm::mat4 mat(1.0f);
   mat[1][3] = 165.0f;
 
@@ -58,6 +76,8 @@ TEST(ResetScaleNode, ResetsNodeToInitialValues)
   {
     // Reset to initial values and state.
     scaleNode->reset();
+    EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Scale);
+
     auto data = scaleNode->getData().getMat4();
 
     auto tmp = glm::scale(scale);

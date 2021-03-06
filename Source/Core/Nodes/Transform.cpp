@@ -6,7 +6,7 @@
 
 using namespace Core;
 
-ValueSetResult Core::Scale::setValue(const glm::vec3& vec)
+ValueSetResult Scale::setValue(const glm::vec3& vec)
 {
 	if (m_currentMap == Transform::g_UniformScale)
 	{
@@ -24,6 +24,11 @@ ValueSetResult Core::Scale::setValue(const glm::vec3& vec)
 	}
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
+}
+
+ValueSetResult Scale::setValue(const glm::vec4& vec)
+{
+  return setValue(glm::vec3(vec));
 }
 
 ValueSetResult Scale::setValue(const glm::mat4& mat)
