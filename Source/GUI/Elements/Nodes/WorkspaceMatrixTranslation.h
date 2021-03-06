@@ -6,7 +6,7 @@ class WorkspaceMatrixTranslation : public WorkspaceMatrix4x4
 public:
 	WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel);
 
-	void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	void drawData(util::NodeBuilder& builder);
 
 };
 

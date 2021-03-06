@@ -1,41 +1,45 @@
 #include "WorkspaceMatrix4x4.h"
 // #include "Source/Core/Nodes/Node.h"
 
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
-    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
+//WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
+//    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
+//{
+//}
+
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground,
+                                       std::string headerLabel = "default Matrix4x4 header",
+                                       Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>() )
+    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
+{}
+
+void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
-}
-
-void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
-{
-
-    //const glm::mat4& coreData = Nodebase->getInternalData().getMat4();
-
 	const glm::mat4& coreData = Nodebase->getData().getMat4();
 	const Core::Transform::DataMap& coreMap = Nodebase->getDataMap();
+	int const idOfNode = this->Id.Get();
 
 	bool valueChanged = false;
-
-	glm::mat4 localData;
-	for (int rows = 0; rows < 4; rows++)
-	{
-		for (int columns = 0; columns < 4; columns++)
-		{
-			localData[rows][columns] = coreData[rows][columns];
-		}
-	}
+	int rowOfChange, columnOfChange;
+	float valueOfChange, localData; /* user can change just one value at the moment */
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(50.0f);
+	ImGui::PushItemWidth(100.0f);
+	/* Drawing is row-wise */
 	for (int rows = 0; rows < 4; rows++)
 	{
 		for (int columns = 0; columns < 4; columns++)
 		{
-
-		    valueChanged |= drawDragFloatWithMap_Inline(&localData[rows][columns],
-                                                        coreMap[rows*4+columns],
-                                                        fmt::format("##{}-{}", rows, columns));
+		    localData = coreData[columns][rows]; /* Data are column-wise */
+		    if (drawDragFloatWithMap_Inline(&localData,
+                                            coreMap[columns*4+rows],
+                                            fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
+            {
+                valueChanged = true;
+                rowOfChange = rows;
+                columnOfChange = columns;
+                valueOfChange = localData;
+            }
 		}
 		ImGui::NewLine();
 	}
@@ -43,8 +47,8 @@ void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 
 	if (valueChanged)
 	{
-		Nodebase->setValue(localData);
+		Nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
 	}
 
-	ImGui::Spring(0); /* \todo JH ehat is Spring? */
+	ImGui::Spring(0); /* \todo JH what is Spring? */
 }

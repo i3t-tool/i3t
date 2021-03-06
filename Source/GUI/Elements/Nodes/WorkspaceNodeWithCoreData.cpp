@@ -38,6 +38,18 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebas
 	}
 }
 
+void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
+{
+	builder.Begin(Id);
+
+	drawHeader(builder);
+	drawInputs(builder, newLinkPin);
+	drawData(builder);
+	drawOutputs(builder, newLinkPin);
+
+	builder.End();
+}
+
 void WorkspaceNodeWithCoreData::drawInputLinks()
 {
 	for (std::pair<pinIter, linkPropIter> elem(Nodebase->getInputPins().begin(), WorkspaceLinksProperties.begin());
@@ -117,7 +129,8 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 
 bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value, int const mapValue, std::string const label)
 {
-    bool inactive = mapValue == 0 ? true : false; /* \todo JH some other type than just active/inactive will be here - maybe */
+    bool inactive = (mapValue == 0 || mapValue == 255) ? true : false; /* \todo JH some other type than just active/inactive will be here - maybe */
+    /* \todo JH some mark for "hard-coded" values (diagonal 1 in translation (255 Map value) for example) */
 
     if (inactive)
     {

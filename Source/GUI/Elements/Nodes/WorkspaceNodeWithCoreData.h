@@ -1,5 +1,6 @@
 #pragma once
 #include "WorkspaceElements.h"
+#include "Core/Nodes/Transform.h" /* building transformations nodes*/
 
 typedef std::vector<Core::Pin>::const_iterator pinIter;
 typedef std::vector<std::unique_ptr<WorkspacePinProperties>>::const_iterator pinPropIter;
@@ -20,6 +21,7 @@ public:
 
 	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel);
 
+    virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	virtual void drawInputLinks();
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
