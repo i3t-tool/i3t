@@ -55,8 +55,7 @@ void ViewportWindow::render()
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::Begin("Viewport",
-		             getShowPtr()); // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Viewport", getShowPtr());
 		ImGui::PopStyleVar();
 
 		// get positions of min max points of the window

@@ -35,6 +35,7 @@ class UI final : public Module
 	friend class Application;
 
 	UI() {}
+	~UI() override;
 	void init() override;
 	void beginFrame() override;
 
