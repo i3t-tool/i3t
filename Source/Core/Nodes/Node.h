@@ -38,6 +38,8 @@ struct ValueSetResult
 	const Status status;
 	const std::string message;
 
+	ValueSetResult() : status(Status::Ok), message("") {}
+
 	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage))
 	{
 	}
@@ -46,7 +48,6 @@ struct ValueSetResult
 namespace Core
 {
 class Pin;
-
 
 /**
  * Base class interface for all boxes.
@@ -84,10 +85,12 @@ protected:
 	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 public:
-  NodeBase() = default;
+	NodeBase() = default;
 
-	NodeBase(const Operation* operation) : m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
-  {}
+	NodeBase(const Operation* operation)
+			: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+	{
+	}
 
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
@@ -128,7 +131,7 @@ public:
 	[[nodiscard]] virtual ValueSetResult setValue(float val)
 	{
 		m_internalData[0].setValue(val);
-    spreadSignal();
+		spreadSignal();
 
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
@@ -144,7 +147,7 @@ public:
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
 	{
 		m_internalData[0].setValue(vec);
-    spreadSignal();
+		spreadSignal();
 
 		return ValueSetResult{ValueSetResult::Status::Ok, ""};
 	}
@@ -154,7 +157,7 @@ public:
 		if (m_currentMap == Transform::g_Free)
 		{
 			m_internalData[0].setValue(mat);
-      spreadSignal();
+			spreadSignal();
 
 			return ValueSetResult{ValueSetResult::Status::Ok, ""};
 		}
@@ -169,8 +172,7 @@ public:
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-		                      "Unsupported operation on non transform object."};
+		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
 	/**
@@ -181,8 +183,7 @@ public:
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-		                      "Unsupported operation on non transform object."};
+		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
 	/**
@@ -192,23 +193,22 @@ public:
 	 * \param value Value to set.
 	 * \param index Index of DataStore (if the node stores more than one value)
 	 */
-	template <typename T>
-	void setInternalValue(const T& value, size_t index = 0)
-  {
+	template <typename T> void setInternalValue(const T& value, size_t index = 0)
+	{
 		getInternalData(index).setValue(value);
 		spreadSignal();
 	}
 
 	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
-  {
-    getInternalData(index).getMat4Ref()[coordinates.x][coordinates.y] = value;
+	{
+		getInternalData(index).getMat4Ref()[coordinates.x][coordinates.y] = value;
 		spreadSignal();
 	}
 
 	virtual void reset() {}
 
 	virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
-  const Transform::DataMap& getDataMap() { return m_currentMap; }
+	const Transform::DataMap& getDataMap() { return m_currentMap; }
 
 	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
 	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;

@@ -15,6 +15,7 @@ public:
 		m_initialMap = map;
 		m_currentMap = map;
 	}
+	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
@@ -45,12 +46,22 @@ public:
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
 
+/**
+ * \code
+ *  cos(T)   0   sin(T)   0
+ *    0      1     0      0
+ * -sin(T)   0   cos(T)   0
+ *    0      0     0      1
+ * \endcode
+ */
 class EulerRotY : public NodeBase
 {
 	float m_initialRot;
@@ -64,11 +75,22 @@ public:
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
+  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
 
+/**
+ * \code
+ *   cos(T)  -sin(T)   0    0
+ *   sin(T)   cos(T)   0    0
+ *     0        0      1    0
+ *     0        0      0    1
+ * \endcode
+ */
 class EulerRotZ : public NodeBase
 {
 	float m_initialRot;
@@ -82,7 +104,10 @@ public:
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+  [[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
+  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
@@ -100,13 +125,16 @@ public:
 		m_currentMap = map;
 	}
 
+	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
 
+//===-- Other transformations ---------------------------------------------===//
 class AxisAngleRot : public NodeBase
 {
 	float m_initialRads;
