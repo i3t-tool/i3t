@@ -16,6 +16,7 @@ public:
 		m_currentMap = map;
 	}
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;

@@ -176,7 +176,7 @@ if (True)
             "Test/*.hpp"
             )
 
-    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE} Source/Core/Module.h Source/Core/API.h Source/Core/API.cpp)
+    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE} Source/Core/Module.h Source/Core/API.h Source/Core/API.cpp Source/GUI/Elements/Windows/ConsoleWindow.cpp)
 
     target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp)
 
