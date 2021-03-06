@@ -16,6 +16,7 @@
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
 #include "Scripting/Scripting.h"
+#include "Core/InputController.h"
 
 // using namespace Core;
 
@@ -100,16 +101,13 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//printf("%d\n",vsr2.status);
 	DataStore ds=child->getData();
 	glm::mat4 mm=ds.getMat4();
-	printf("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
-				mm[0][0], mm[1][0], mm[2][0], mm[3][0],
-				mm[0][1], mm[1][1], mm[2][1], mm[3][1], 
-				mm[0][2], mm[1][2], mm[2][2], mm[3][2], 
-				mm[0][3], mm[1][3], mm[2][3], mm[3][3] );
 
 	//std::vector<WorkspaceMatrix4x4>*ww= 
 
 	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
-	SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(),&WorkspaceNodes);
+
+	SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
+
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
 	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
@@ -139,6 +137,10 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
+	if (InputController::isKeyPressed(Keys::l)) { 
+		//SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes); 
+		printf("press\n");
+	}
 	ImGui::Begin("Workspace", getShowPtr());
 
 	UpdateTouchAllNodes();

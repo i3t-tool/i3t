@@ -16,6 +16,7 @@ struct NodePlug {
 struct WorkspaceLayout {
 	std::vector<NodeMatrix4x4>matrix4x4Nodes;
 	std::vector<NodePlug>nodePlugs;
+	std::vector<glm::mat4>nodeData;
 };
 
 WorkspaceLayout*getWorkspaceLayout();
