@@ -1,7 +1,7 @@
 #pragma once
 #include "WorkspaceVector4.h"
 
-/* Order of inheritance is important! WorkspaceNodeBaseData has to be first because it is necessary first create
+/* Order of inheritance is important! WorkspaceNodeWithCoreData has to be first because it is necessary first create
  * NodeBase to read data from it */
 class WorkspaceNormalizeVector : public WorkspaceVector4
 {

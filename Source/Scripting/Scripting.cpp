@@ -15,7 +15,7 @@ void SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 	
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNode* w = _workspace->at(i).get();
-		WorkspaceNodeBaseData* nodebasedata = dynamic_cast<WorkspaceNodeBaseData*>(w);
+		WorkspaceNodeWithCoreData* nodebasedata = dynamic_cast<WorkspaceNodeWithCoreData*>(w);
 		Ptr<Core::NodeBase> nodebase = nodebasedata->Nodebase;
 		ImVec2 pos = ne::GetNodePosition(w->Id);
 		Core::Transform::DataMap data = nodebase.get()->getDataMap();
@@ -73,7 +73,7 @@ void SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 				if(parentpin!=NULL){indexout=parentpin->getIndex(); }
 			}
 			for (int j = 0; j < _workspace->size(); j++) {
-				if (parent.get() == (dynamic_cast<WorkspaceNodeBaseData*>(_workspace->at(j).get()))->Nodebase.get()) {parentindex = j;}
+				if (parent.get() == (dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->at(j).get()))->Nodebase.get()) {parentindex = j;}
 			}
 			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){fprintf(f,"plugnodes(n%d,n%d,%d,%d);\n", parentindex,i,indexout,indexin);}
 		}
@@ -86,8 +86,8 @@ void LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 	int startlen=(int)_workspace->size();
 	for (int i = 0; i < ret->matrix4x4Nodes.size();i++) {
 		_workspace->push_back(std::make_unique<WorkspaceMatrix4x4>(ret->matrix4x4Nodes[i].node));
-		dynamic_cast<WorkspaceNodeBaseData*>(_workspace->back().get())->Nodebase.get()->setDataMap(ret->matrix4x4Nodes[i].node->Nodebase->getDataMap());//nn datamap must be set again (resets after pushing to workspace?)
-		dynamic_cast<WorkspaceNodeBaseData*>(_workspace->back().get())->Nodebase.get()->setInternalValue(ret->matrix4x4Nodes[i].node->Nodebase->getData().getMat4());
+		dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setDataMap(ret->matrix4x4Nodes[i].node->Nodebase->getDataMap());//nn datamap must be set again (resets after pushing to workspace?)
+		dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setInternalValue(ret->matrix4x4Nodes[i].node->Nodebase->getData().getMat4());
 		ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)ret->matrix4x4Nodes[i].x, (float)ret->matrix4x4Nodes[i].y));
 		//ret->matrix4x4Nodes[i].node->Nodebase->setInternalValue(m);
 	}
@@ -95,19 +95,19 @@ void LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 	for (int i = 0; i < ret->nodePlugs.size(); i++) {
 		int indexA=ret->nodePlugs[i].indexA+startlen;
 		int indexB=ret->nodePlugs[i].indexB+startlen;
-		Ptr<Core::NodeBase> pca= dynamic_cast<WorkspaceNodeBaseData*>(_workspace->at(indexA).get())->Nodebase;
-		Ptr<Core::NodeBase> pcb= dynamic_cast<WorkspaceNodeBaseData*>(_workspace->at(indexB).get())->Nodebase;
+		Ptr<Core::NodeBase> pca= dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->at(indexA).get())->Nodebase;
+		Ptr<Core::NodeBase> pcb= dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->at(indexB).get())->Nodebase;
 
 
 		ENodePlugResult p = Core::GraphManager::plug(pca,pcb, ret->nodePlugs[i].indexPinA, ret->nodePlugs[i].indexPinB);
-		dynamic_cast<WorkspaceNodeBaseData*>(_workspace->at(indexB).get())->WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(getLinkID()));
+		dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->at(indexB).get())->WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(getLinkID()));
 
 	}
 	/*WorkspaceMatrix4x4* nm = new WorkspaceMatrix4x4((ImTextureID)0);
 	nm->Nodebase->setDataMap(Core::Transform::g_UniformScale);
 	_workspace->push_back(std::make_unique<WorkspaceMatrix4x4>(nm));
 	ne::SetNodePosition(_workspace->back()->Id, ImVec2(200.0f, 600.0f));
-	Ptr<Core::NodeBase> nn = dynamic_cast<WorkspaceNodeBaseData*>(_workspace->back().get())->Nodebase;
+	Ptr<Core::NodeBase> nn = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase;
 	nn.get()->setDataMap(nm->Nodebase->getDataMap());//nn datamap must be set again (resets after pushing to workspace?)
 	Core::Transform::DataMap data = nn.get()->getDataMap();
 	char* subtype = "-";
