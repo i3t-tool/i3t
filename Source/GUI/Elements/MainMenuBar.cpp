@@ -1,17 +1,14 @@
 #include "MainMenuBar.h"
 
-#include <Commands/Command.h>
-#include <filesystem>
-
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
-#include "Core/Application.h"
 #include "Core/World.h"
 #include "GUI/Elements/Dialogs/AboutDialog.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
+#include "GUI/Elements/Windows/ConsoleWindow.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -150,8 +147,7 @@ void MainMenuBar::showWindowsMenu()
 
 		if (ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr())) {}
 
-		// if (ImGui::MenuItem("Console I3T window", nullptr,
-		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
+		if (ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<ConsoleWindow>()->getShowPtr())) {}
 
 		// if (ImGui::MenuItem("Active matrix zoom window", nullptr,
 		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}

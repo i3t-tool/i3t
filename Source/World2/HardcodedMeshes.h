@@ -16,23 +16,14 @@
   const float* verticesInterleaved; ///< vertex data for each vertex 3pos, 3nor, 2tex
   const unsigned* triangles; ///< for each triangle 3 indices to the vertex array
 };*/
-extern pgr::MeshData scalearrowMesh;
-extern pgr::MeshData unitquadMesh;
-extern pgr::MeshData quadMesh;
-extern pgr::MeshData arrowMesh;
-extern pgr::MeshData lineMesh;
-extern pgr::MeshData unitcircleMesh;
-// UNIT CUBE \/
-extern pgr::MeshData unitcubeMesh;
-extern pgr::MeshData cubelinesMesh;
-extern pgr::MeshData cameraicoMesh;
-
-// TERRAIN_GRASS \/
-extern pgr::MeshData plane_grassMesh;
-// TERRAIN_ROCKS \/
-extern pgr::MeshData plane_rocksMesh;
-// PLANE \/
-extern pgr::MeshData planeMesh;
-
-extern pgr::MeshData three_axisMesh;
-extern pgr::MeshData gridMesh;
+extern pgr::MeshData scalearrowMesh;//scale arrow handle
+extern pgr::MeshData unitquadMesh;//unit quad
+extern pgr::MeshData quadMesh;//quad handle
+extern pgr::MeshData arrowMesh;//arrow handle
+extern pgr::MeshData lineMesh;//line mesh
+extern pgr::MeshData unitcircleMesh;//ring handle
+extern pgr::MeshData unitcubeMesh;//unit cube
+extern pgr::MeshData cubelinesMesh;//unit cube line representation
+extern pgr::MeshData cameraicoMesh;//camera icon handle
+extern pgr::MeshData three_axisMesh;//x,y,z lines
+extern pgr::MeshData gridMesh;//line grid
