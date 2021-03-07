@@ -18,7 +18,7 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
 /* \todo JH not use constant values here */
-WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel")
+WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel)
     :   Id(id)
 {
 	/* \todo Some better default values - take from Const.h*/

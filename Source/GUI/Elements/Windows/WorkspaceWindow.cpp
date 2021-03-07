@@ -13,8 +13,12 @@
 #include "../Nodes/NormalizeVectorImpl.h"
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
+
 #include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceMatrixScale.h"
+
 #include "../Nodes/WorkspaceNormalizeVector.h"
+
 
 // using namespace Core;
 
@@ -62,26 +66,30 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(NodeEditorContext);
 
 	/* \todo adding nodes here just for testing */
+	/*--- TRANSLATION */
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
 
-    /*---*/
+    /*--- TRANSLATION with connection to translation */
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
-	static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.back().get())->Nodebase->setValue(-2.0f, {3, 0});
-
+	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
 	Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
 	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
 
-	/*---*/
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 3"));
+	/*--- MATRIX_4x4 with connection to translation*/
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, "just Matrix4x4"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
 
-    Core::GraphManager::plug(static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(0).get())->Nodebase,
-	                         static_cast<WorkspaceMatrixTranslation*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
+    Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
+	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
 
-	/*---*/
+    /*--- SCALE */
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
+	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+
+	/*--- NORMALIZE VECTOR */
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 

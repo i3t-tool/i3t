@@ -92,7 +92,7 @@ public:
 
 //private:
    	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel);
+	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel");
 
 
 };

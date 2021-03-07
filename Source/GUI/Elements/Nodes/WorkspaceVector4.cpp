@@ -1,8 +1,6 @@
 #include "WorkspaceVector4.h"
 
-WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground,
-                                   std::string headerLabel = "default Vector4 header",
-                                   Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Vector4>())
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase)
     : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
 {}
 

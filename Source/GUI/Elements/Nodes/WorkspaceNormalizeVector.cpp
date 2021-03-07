@@ -1,6 +1,6 @@
 #include "WorkspaceNormalizeVector.h"
 
-WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel = "default NormalizeVector header")
+WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel)
     : WorkspaceVector4(headerBackground, headerLabel, Builder::createNode<ENodeType::NormalizeVector>())
 {
 }

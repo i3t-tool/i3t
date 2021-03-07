@@ -19,7 +19,7 @@ public:
 	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceInputsProperties;
 	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceOutputsProperties;
 
-	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel);
+	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel = "default CoreData-node header");
 
     virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 

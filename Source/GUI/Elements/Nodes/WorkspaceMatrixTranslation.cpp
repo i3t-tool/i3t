@@ -1,6 +1,6 @@
 #include "WorkspaceMatrixTranslation.h"
 
-WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel = "default MatrixTranslation header")
+WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel)
     : WorkspaceMatrix4x4(headerBackground, headerLabel, Builder::createTransform<Core::Translation>() )
 {
 }

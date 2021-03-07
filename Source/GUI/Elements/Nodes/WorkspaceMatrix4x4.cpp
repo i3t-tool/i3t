@@ -6,11 +6,14 @@
 //{
 //}
 
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground,
-                                       std::string headerLabel = "default Matrix4x4 header",
-                                       Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>() )
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase)
     : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
 {}
+
+void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
+{
+    drawDataFull(builder); /* default function always draw all data */
+}
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
