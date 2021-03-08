@@ -26,6 +26,12 @@ void NodeBase::create()
 		m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
 		m_internalData.emplace_back();
 	}
+
+	// Ugly workaround for Model node, which has no outputs.
+	if (m_operation->numberOfOutputs == 0)
+  {
+		m_internalData.emplace_back();
+	}
 }
 
 const std::vector<Pin>& NodeBase::getInputPins() const
