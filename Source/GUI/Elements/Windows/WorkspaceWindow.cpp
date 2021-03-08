@@ -67,29 +67,29 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::SetCurrentEditor(NodeEditorContext);
 
-	/* \todo adding nodes here just for testing */
+	/*\todo adding nodes here just for testing */
 	/*--- TRANSLATION */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 1"));
-	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
+	//WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 1"));
+	//ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
 
     /*--- TRANSLATION with connection to translation */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
-	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
+	//WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
+	//ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
 	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
-	Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
+	//Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
+	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
 
 	/*--- MATRIX_4x4 with connection to translation*/
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, "just Matrix4x4"));
-	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+	//WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, "just Matrix4x4"));
+	//ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
 
-    Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
+    //Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
+	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
 
     /*--- SCALE */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
-	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+	//WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
+	//ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
 
 	/*--- NORMALIZE VECTOR */
 	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
@@ -99,36 +99,26 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::NavigateToContent();
 	//////////////////////////////////
-		//WorkspaceNodes.at(0).get().
 	
-	
-	WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get());
+	/*WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get());
 	
 	Ptr<Core::NodeBase> child=wnbd->Nodebase;
 	std::vector<Core::Pin>cp= child->getInputPins();
 	Ptr<Core::NodeBase> parent=Core::GraphManager::getParent(child);
 	const Operation* uu = child->getOperation();
-	
-	Ptr<Core::NodeBase> c1= (dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get()))->Nodebase;
-	parent = Core::GraphManager::getParent(c1);
 
-	printf("--------0x%p\n",parent.get());
 	//cp[0].getParentPin()->getMaster();
 	//WorkspaceNodes.at(0).get()->
 	glm::mat4 m = glm::mat4(0.14f);
-	//parent->getId();
-	/*ValueSetResult vsr=parent->setValue(m);
+	ValueSetResult vsr=parent->setValue(m);
 	ValueSetResult vsr2= child->setValue(m);
-	//ValueSetResult vsr2= child->setValue(m,Core::Transform::g_Translate);
-	//printf("%d\n",vsr2.status);
+
 	DataStore ds=child->getData();
 	glm::mat4 mm=ds.getMat4();*/
 
-	//std::vector<WorkspaceMatrix4x4>*ww= 
+	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
 
-	//LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
-
-	//SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
+	SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
 
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =

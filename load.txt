@@ -1,9 +1,16 @@
-printf("vbeuivbweuibwivewb\n");
-int m1=datamat4rot(0.5f);
-int m2=datamat4scale(1.5f,1.5f,1.5f);
-int a=mat4(rotatex,m1,200,260);
-int b=mat4(scale,m2,720,300);
-//bool c=plugnodes(a,b,0,0);
+printf("loading\n");
 
+int d0=datamat4(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f);
+int d1=datascalar(0.5f);
+int d2=datavec3(1.5f,1.5f,1.5f);
+int d3=datavec3(1.5f,0.5f,9.5f);
+int d4=datavec4(1.5f,0.5f,9.5f,5.0f);
 
-datamat4free(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f);
+//int n0=mat4(free,d0,150,230);
+int n1=mat4(free,d0,100,330);
+int n2=mat4(scale,d2,720,300);
+int n3=mat4(translate,d3,100,300);
+
+bool p0=plugnodes(n2,n1,0,0);
+
+printf("loaded\n");

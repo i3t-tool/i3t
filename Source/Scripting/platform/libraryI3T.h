@@ -4,9 +4,10 @@
 #include <vector>
 #include <memory>
 struct NodeMatrix4x4 {
-	WorkspaceMatrix4x4* node;
+	Core::Transform::DataMap type;
+	glm::mat4 data;
 	int x, y;
-	NodeMatrix4x4(WorkspaceMatrix4x4* _node, int _x, int _y) {node=_node;x=_x;y=_y;}
+	NodeMatrix4x4(Core::Transform::DataMap _type,glm::mat4 _data, int _x, int _y) {type=_type;data=_data;x=_x;y=_y;}
 };
 struct NodePlug {
 	int indexA,indexB;
