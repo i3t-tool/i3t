@@ -120,6 +120,7 @@ enum class ENodeType
 	Vector3,
 	Vector4,
 	Matrix,
+	Model
 };
 
 enum class ETransformType
@@ -301,6 +302,8 @@ static const std::vector<Operation> operations = {
 		{"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input},
 		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
 		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
+
+    {"Model", "model", 1, matrixInput, 0, {}}
 };
 
 namespace Core

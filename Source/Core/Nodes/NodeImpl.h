@@ -10,6 +10,8 @@
 
 #include "Node.h"
 
+#include "World2/GameObject.h"
+
 namespace Core
 {
 /**
@@ -53,7 +55,7 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[static_cas
 
 template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
 {
-	Debug::Assert(false, "Calling update function of unimplemented NodeImpl type.");
+	static_assert(false, "Calling update function of unimplemented NodeImpl type.");
 }
 
 // inversion
@@ -1366,6 +1368,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inpu
 	if (m_inputs[0].isPluggedIn())
 	{
 		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4());
+	}
+}
+
+template <>
+FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+  {
+		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = m_inputs[0].getStorage().getMat4();
 	}
 }
 } // namespace Core
