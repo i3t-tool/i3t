@@ -1,3 +1,31 @@
+Extending picoc with custom libraries
+-----
+Create function
+libraryxxx(Picoc *pc);
+and add call to it in
+PicocInitialise(Picoc *pc, int StackSize) (file platform.c)
+
+How to create custom data types and functions:
+Here are some snippets from libraryI3T.cpp:
+
+    void parentGameObject(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs){//custom function
+        void *a = Param[0]->Val->Pointer; //read parameter 0 as int
+        void *b = Param[1]->Val->Pointer; //read parameter 1 as int
+        ReturnValue->Val->Integer=FALSE; //set return value as int (==bool)
+    }
+    struct LibraryFunction PlatformLibrary1[] =
+    {
+	    { parentGameObject, "bool parentGameObject(GameObject*,GameObject*);" },
+        { NULL,         NULL }
+    };
+    const char defs[]="typedef void GameObject;typedef int bool;typedef void node;";
+    int mat4scale=1;
+    void PlatformLibraryInitI3T(Picoc *pc){
+        IncludeRegister(pc, "I3T.h", NULL, &PlatformLibrary1[0], defs);// add custom functions and type definitions
+    
+        VariableDefinePlatformVar(pc, NULL, "mat4scale", &pc->IntType, (union AnyValue *)&mat4scale, FALSE);// add readonly variable exposed to script
+    }
+
 picoc
 -----
 
@@ -16,40 +44,6 @@ picoc is now feature frozen. Since it's important that it remain small it's
 intended that no more major features will be added from now on. It's been 
 tested on x86-32, x86-64, powerpc, arm, ultrasparc, HP-PA and blackfin 
 processors and is easy to port to new targets. 
-
-
-Compiling picoc
----------------
-
-picoc can be compiled for a UNIX/Linux/POSIX host by typing "make".
-
-The test suite can be run by typing "make test".
-
-
-Porting picoc
--------------
-
-platform.h is where you select your platform type and specify the includes 
-etc. for your platform.
-
-platform_XXX.c contains support functions so the compiler can work on 
-your platform, such as how to write characters to the console etc..
-
-platform_library.c contains your library of functions you want to make 
-available to user programs.
-
-There's also a clibrary.c which contains user library functions like 
-printf() which are platform-independent.
-
-Porting the system will involve setting up suitable includes and defines 
-in platform.h, writing some I/O routines in platform_XXX.c, putting 
-whatever user functions you want in platform_library.c and then changing 
-the main program in picoc.c to whatever you need to do to get programs 
-into the system.
-
-platform.h is set to UNIX_HOST by default so tests can be easily run on
-a UNIX system. You'll need to specify your own host setup dependent on 
-your target platform.
 
 
 Copyright

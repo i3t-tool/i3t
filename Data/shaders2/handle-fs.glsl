@@ -7,17 +7,16 @@ uniform sampler2D tex0;
 uniform vec3 camera;
 uniform vec4 light;
 uniform vec4 color=vec4(1.0,1.0,1.0,1.0);
+uniform vec3 ldir=vec3(0.5,1.0,-0.5);
 
 smooth in vec3 normn;//camera space normal
 smooth in vec2 coord;//uv
-
-vec3 lvec=vec3(0.5,1.0,-1.0);
 
 void main(){
 	//fragmentColor=texture(tex0,vec2(coord.x,-coord.y),-0.5)*color;
 	fragmentColor=color;
 	
-	lvec=normalize(lvec);
-	fragmentColor.rgb=fragmentColor.rgb*max(dot(lvec,normn),0.5);
+	vec3 lvec=normalize(ldir);
+	fragmentColor.rgb=fragmentColor.rgb*max(dot(lvec,normn),0.6);
 	
 }
