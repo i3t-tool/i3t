@@ -24,6 +24,7 @@ namespace Builder
  */
 template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
 {
+
 	auto ret = std::make_shared<Core::NodeImpl<T>>();
 	ret->create();
 	ret->updateValues(0);

@@ -39,6 +39,8 @@ class WorkspacePinProperties;
 /*! \enum PinKind
     \brief kinds (in/out) of Pin \todo maybe unused - this info is in Core
  */
+
+
 enum class PinKind
 {
 	Output,
@@ -62,15 +64,16 @@ public:
 	std::string HeaderLabel;
 	ImTextureID HeaderBackground;
 
-	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground);
-	WorkspaceNode(const ne::NodeId id, std::string headerLabel, ImTextureID headerBackground);
 
-	virtual void drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
 
-	virtual void drawWorkspaceNodeHeader(util::NodeBuilder& builder);
+	virtual void drawInputLinks()=0;
+	virtual void drawHeader(util::NodeBuilder& builder);
+	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+	virtual void drawData(util::NodeBuilder& builder)=0;
+	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
 
-	/*! \fn static void TouchNode(ne::NodeId id) \todo for what is it ?
+	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
 	*/
 	void TouchNode(const float constTouchTime);
@@ -78,6 +81,20 @@ public:
 	void UpdateTouch(const float constDeltaTime);
 
 	float GetTouchProgress(const float constTouchTime);
+
+//    // named-constructor-idiom
+//    //  copy ctor public
+//    WorkspaceNode(WorkspaceNode const& other);
+//
+//    static WorkspaceNode WorkspaceNodeFromCore(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel){
+//        return WorkspaceNode(nodebase->getId(), headerBackground, headerLabel);
+//    }
+
+//private:
+   	/* \todo some better constructors - this are just for test*/
+	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel");
+
+
 };
 
 /* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
@@ -105,7 +122,7 @@ public:
 class WorkspacePinProperties
 {
 public:
-	const ne::PinId& Id; /*! \brief unique (among Pins) identificator */
+	const ne::PinId Id; /*! \brief unique (among Pins) identificator */
 	std::string Name;    /*! \brief Name of Pin */
 	const PinKind Kind;  /*! \brief Kind of pin \sa PinKind */
 	const EValueType Type;
@@ -115,34 +132,9 @@ public:
 	bool Connected;
 	float Alpha;
 
-	WorkspacePinProperties(const ne::PinId& id, const char* name, PinKind kind, EValueType type);
+	WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type);
 
 	bool IsPinConnected(); /* \todo check in Core ? */
 
 	bool CanCreateLink(Core::Pin* b); /* \todo check in Core ? */
-};
-
-typedef std::vector<Core::Pin>::const_iterator pinIter;
-typedef std::vector<std::unique_ptr<WorkspacePinProperties>>::const_iterator pinPropIter;
-typedef std::vector<std::unique_ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
-
-class WorkspaceNodeBaseData
-{
-public:
-	/*see:
-	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-	Ptr<Core::NodeBase> const Nodebase; /*! \brief reference to core
-	                                                     WorkspaceNodeBaseData is owner of unique pointer
-	                                                */
-
-	std::vector<std::unique_ptr<WorkspaceLinkProperties>> WorkspaceLinksProperties;
-	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceInputsProperties;
-	std::vector<std::unique_ptr<WorkspacePinProperties>> WorkspaceOutputsProperties;
-
-	WorkspaceNodeBaseData(Ptr<Core::NodeBase> nodebase);
-
-	virtual void drawWorkspaceInputLinks();
-	virtual void drawWorkspaceInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
-	virtual void drawWorkspaceNodeData(util::NodeBuilder& builder) = 0;
-	virtual void drawWorkspaceOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 };

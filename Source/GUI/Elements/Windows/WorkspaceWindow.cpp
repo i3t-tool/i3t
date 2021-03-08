@@ -12,7 +12,11 @@
 #include "../Nodes/MatrixImpl.h"
 #include "../Nodes/NormalizeVectorImpl.h"
 
-#include "../Nodes/WorkspaceMatrix4x4.h"
+#include "../Nodes/WorkspaceNodeWithCoreData.h"
+
+#include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceMatrixScale.h"
+
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
 #include "Scripting/Scripting.h"
@@ -64,18 +68,31 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(NodeEditorContext);
 
 	/* \todo adding nodes here just for testing */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>((ImTextureID)0));
+	/*--- TRANSLATION */
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
 
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>((ImTextureID)0));
+    /*--- TRANSLATION with connection to translation */
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation 2"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
 
-	Core::GraphManager::plug(dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	                         dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
-	dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get())
-			->WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(getLinkID()));
+	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
+	Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
+	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
 
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
+	/*--- MATRIX_4x4 with connection to translation*/
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, "just Matrix4x4"));
+	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+
+    Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
+	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
+
+    /*--- SCALE */
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
+	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+
+	/*--- NORMALIZE VECTOR */
+	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
 	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
 
@@ -148,21 +165,15 @@ void WorkspaceWindow::render()
 
 	for (auto&& WorkspaceNode : WorkspaceNodes)
 	{
-		WorkspaceNode->drawWorkspaceNode(NodeBuilderContext, nullptr);
+		WorkspaceNode->drawNode(NodeBuilderContext, nullptr);
 	}
 
-	/* \todo I am not able to do it with for-each loop - compilation fail on casting - if somebody can do it... */
-	//for (int i = 0; i < WorkspaceNodes.size(); ++i)
-	//{
-	//	dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(i).get())
-	//			->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
-	//}
+    for (auto& workspaceNode : WorkspaceNodes)
+    {
+        dynamic_cast<WorkspaceNodeWithCoreData*>(workspaceNode.get())
+            ->drawInputLinks(); /* \todo skip nodes with no inputs...*/
+    }
 
-  for (auto& workspaceNode : WorkspaceNodes)
-  {
-    dynamic_cast<WorkspaceNodeBaseData*>(workspaceNode.get())
-      ->drawWorkspaceInputLinks(); /* \todo skip nodes with no inputs...*/
-  }
 	ne::End();
 
 	ImGui::End();

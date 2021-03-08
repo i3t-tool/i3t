@@ -1,65 +1,57 @@
 #include "WorkspaceMatrix4x4.h"
+// #include "Source/Core/Nodes/Node.h"
 
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground)
-		: WorkspaceNodeBaseData(Builder::createNode<ENodeType::Matrix>()),
-			WorkspaceNode(Nodebase->getId(), "default Matrix4x4 label",
-                    headerBackground) /* \todo take default label from Const.h*/
+//WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
+//    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
+//{
+//}
+
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase)
+    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
+{}
+
+void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
+    drawDataFull(builder); /* default function always draw all data */
 }
 
-void WorkspaceMatrix4x4::drawWorkspaceNodeData(util::NodeBuilder& builder)
+void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
 	const glm::mat4& coreData = Nodebase->getData().getMat4();
-	bool valueCH = false;
-	std::string s = "";
-	const char* c = "";
+	const Core::Transform::DataMap& coreMap = Nodebase->getDataMap();
+	int const idOfNode = this->Id.Get();
 
-	glm::mat4 localData;
-	for (int rows = 0; rows < 4; rows++)
-	{
-		for (int columns = 0; columns < 4; columns++)
-		{
-			localData[rows][columns] = coreData[rows][columns];
-		}
-	}
+	bool valueChanged = false;
+	int rowOfChange, columnOfChange;
+	float valueOfChange, localData; /* user can change just one value at the moment */
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(50.0f);
+	ImGui::PushItemWidth(100.0f);
+	/* Drawing is row-wise */
 	for (int rows = 0; rows < 4; rows++)
 	{
 		for (int columns = 0; columns < 4; columns++)
 		{
-			s = "##";
-			s += std::to_string(rows);
-			s += std::to_string(columns);
-			c = s.c_str();
-			valueCH |= ImGui::InputFloat(c, &localData[rows][columns]);
-			if (columns < 3)
-			{
-				ImGui::SameLine();
-			}
+		    localData = coreData[columns][rows]; /* Data are column-wise */
+		    if (drawDragFloatWithMap_Inline(&localData,
+                                            coreMap[columns*4+rows],
+                                            fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
+            {
+                valueChanged = true;
+                rowOfChange = rows;
+                columnOfChange = columns;
+                valueOfChange = localData;
+            }
 		}
+		ImGui::NewLine();
 	}
 	ImGui::PopItemWidth();
 
-	if (valueCH)
+	if (valueChanged)
 	{
-		// Nodebase->getInternalData().setValue(localData);
-		Nodebase->setValue(localData);
+		Nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
 	}
 
-	ImGui::Spring(0);
-}
-
-void WorkspaceMatrix4x4::drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
-{
-	builder.Begin(Id);
-
-	drawWorkspaceNodeHeader(builder);
-	drawWorkspaceInputs(builder, newLinkPin);
-	drawWorkspaceNodeData(builder);
-	drawWorkspaceOutputs(builder, newLinkPin);
-
-	builder.End();
+	ImGui::Spring(0); /* \todo JH what is Spring? */
 }

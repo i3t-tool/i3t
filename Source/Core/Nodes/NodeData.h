@@ -36,25 +36,17 @@ namespace Core::Transform
 {
 static constexpr DataMap g_Free = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
-static constexpr DataMap g_Scale = {
-		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255,
-};
+static constexpr DataMap g_Scale = {1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255};
 
-static constexpr DataMap g_UniformScale = {
-		1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255,
-};
+static constexpr DataMap g_UniformScale = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255};
 
-static constexpr DataMap g_EulerX = {
-		255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255,
-};
+static constexpr DataMap g_EulerX = {255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
-static constexpr DataMap g_Translate = {
-		255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 1, 2, 3, 255,
-};
+static constexpr DataMap g_Translate = {255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 1, 2, 3, 255};
 
 /**
  * Return whether DataMaps are same.

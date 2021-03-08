@@ -1,15 +1,15 @@
 #pragma once
-#include "WorkspaceElements.h"
+#include "WorkspaceNodeWithCoreData.h"
 
-/* Order of inheritance is important! WorkspaceNodeBaseData has to be first because it is necessary first create
- * NodeBase to read data from it */
-class WorkspaceMatrix4x4 : public WorkspaceNodeBaseData, public WorkspaceNode
-
+/*! \class WorkspaceMatrix4x4 virtual class for all Nodes with Matrix4x4 Core data*/
+class WorkspaceMatrix4x4 : public WorkspaceNodeWithCoreData
 {
 public:
-	WorkspaceMatrix4x4(ImTextureID headerBackground);
+	WorkspaceMatrix4x4(ImTextureID headerBackground,
+                        std::string headerLabel = "default Matrix4x4 header",
+                        Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>());
 
-	void drawWorkspaceNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	virtual void drawData(util::NodeBuilder& builder);
 
-	void drawWorkspaceNodeData(util::NodeBuilder& builder);
+	virtual void drawDataFull(util::NodeBuilder& builder);
 };
