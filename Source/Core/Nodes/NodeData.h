@@ -179,7 +179,7 @@ public:
 	[[nodiscard]] const glm::quat& getQuat() const { return value.quat; }
 	[[nodiscard]] float getFloat() const { return value.fValue; }
 	OpValue* getValue() { return &value; }
-	void*& getPointer() { return value.pointer; }
+  [[nodiscard]] void* getPointer() const { return value.pointer; }
 
 	void setValue(OpValue value) { this->value = value; }
 	void setValue(const glm::mat4& mat) { value.matrix = mat; }

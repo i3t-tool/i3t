@@ -12,20 +12,26 @@ NodeBase::~NodeBase()
 
 void NodeBase::create()
 {
-  m_id = IdGenerator::next();
+	m_id = IdGenerator::next();
 
-  // Create input pins.
-  for (int i = 0; i < m_operation->numberOfInputs; i++)
-  {
-    m_inputs.emplace_back(m_operation->inputTypes[i], true, getPtr(), i);
-  }
+	// Create input pins.
+	for (int i = 0; i < m_operation->numberOfInputs; i++)
+	{
+		m_inputs.emplace_back(m_operation->inputTypes[i], true, getPtr(), i);
+	}
 
-  // Create output pins and data storage for each output.
-  for (int i = 0; i < m_operation->numberOfOutputs; i++)
+	// Create output pins and data storage for each output.
+	for (int i = 0; i < m_operation->numberOfOutputs; i++)
+	{
+		m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
+		m_internalData.emplace_back();
+	}
+
+	// Ugly workaround for Model node, which has no outputs.
+	if (m_operation->numberOfOutputs == 0)
   {
-    m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
-    m_internalData.emplace_back();
-  }
+		m_internalData.emplace_back();
+	}
 }
 
 const std::vector<Pin>& NodeBase::getInputPins() const
