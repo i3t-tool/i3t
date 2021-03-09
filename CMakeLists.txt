@@ -190,7 +190,7 @@ endif()
 # =============================================================
 
 # ===== Create target executable from I3T source files. =======
-add_executable(${PROJECT_NAME} ${I3T_SOURCE})
+add_executable(${PROJECT_NAME} ${I3T_SOURCE} Source/Main.cpp)
 # =============================================================
 
 # Set VS_DEBUGGER_WORKING_DIRECTORY

@@ -6,6 +6,7 @@
 namespace I3T
 {
 ImFont* getFont(EFont font);
+Theme& getTheme();
 UI* getUI();
 
 template <typename T> IWindow* getWindowPtr()

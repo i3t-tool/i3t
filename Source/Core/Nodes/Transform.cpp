@@ -501,6 +501,12 @@ void Translation::updateValues(int inputIndex)
 	 */
 }
 
+void AxisAngleRot::reset()
+{
+	m_currentMap = m_initialMap;
+  setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
+}
+
 void AxisAngleRot::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
@@ -513,6 +519,23 @@ void AxisAngleRot::updateValues(int inputIndex)
 	  setInternalValue(glm::mat4());
 	}
 	 */
+}
+
+void OrthoProj::reset()
+{
+  m_currentMap = m_initialMap;
+	setInternalValue(glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far));
+}
+
+ValueSetResult OrthoProj::setValue(float val, glm::ivec2 coords)
+{
+  if (!coordsAreValid(coords, m_currentMap))
+  {
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."};
+	}
+	setInternalValue(val, coords);
+
+	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void OrthoProj::updateValues(int inputIndex)
@@ -548,6 +571,23 @@ void PerspectiveProj::updateValues(int inputIndex)
 	 */
 }
 
+void PerspectiveProj::reset()
+{
+  m_currentMap = m_initialMap;
+  setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
+}
+
+ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
+{
+	if (!coordsAreValid(coords, m_currentMap))
+  {
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+	}
+	setInternalValue(val, coords);
+
+	return ValueSetResult{};
+}
+
 void Frustum::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
@@ -565,6 +605,23 @@ void Frustum::updateValues(int inputIndex)
 	 */
 }
 
+void Frustum::reset()
+{
+	m_currentMap = m_initialMap;
+	setInternalValue(glm::frustum(m_left, m_right, m_bottom, m_top, m_near, m_far));
+}
+
+ValueSetResult Frustum::setValue(float val, glm::ivec2 coords)
+{
+  if (!coordsAreValid(coords, m_currentMap))
+  {
+    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+  }
+  setInternalValue(val, coords);
+
+  return ValueSetResult{};
+}
+
 void LookAt::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
@@ -578,4 +635,20 @@ void LookAt::updateValues(int inputIndex)
 	  setInternalValue(glm::mat4());
 	}
 	 */
+}
+void LookAt::reset()
+{
+	m_currentMap = m_initialMap;
+	setInternalValue(glm::lookAt(m_initialEye, m_initialCenter, m_initialUp));
+}
+
+ValueSetResult LookAt::setValue(float val, glm::ivec2 coords)
+{
+	if (!coordsAreValid(coords, m_currentMap))
+  {
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+	}
+	setInternalValue(val, coords);
+
+	return ValueSetResult{};
 }

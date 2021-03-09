@@ -16,6 +16,7 @@
 
 namespace Core::Transform
 {
+/// In column-major order.
 typedef std::array<unsigned char, 16> DataMap;
 }
 
@@ -26,14 +27,15 @@ FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::Data
 	int x = coords[0];
 	int y = coords[1];
 
-	int i = 4 * x + y;
-
 	return map[4 * x + y] != 255 && map[4 * x + y] != 0;
 }
 } // namespace Core
 
 namespace Core::Transform
 {
+static constexpr uint8_t ZERO = 0;
+static constexpr uint8_t ONE = 255;
+
 static constexpr DataMap g_Free = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
 static constexpr DataMap g_Scale = {
@@ -53,7 +55,35 @@ static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0,
 static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_Translate = {
-		255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 1, 2, 3, 255,
+		255, 0, 0, 0,
+		0, 255, 0, 0,
+		0, 0, 255, 0,
+		1, 2, 3, 255,
+};
+
+static constexpr DataMap g_AllLocked = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static constexpr DataMap g_Ortho = {
+		1, 0, 0, 0,
+		0, 2, 0, 0,
+		0, 0, 3, 0,
+		4, 5, 6, 255,
+};
+
+static constexpr DataMap g_Frustum = {
+		1, 0, 0, 0,
+		0, 2, 0, 0,
+		3, 4, 5, 6,
+		0, 0, 7, 0
+};
+
+static constexpr DataMap g_Perspective = {
+		1, 0, 0, 0,
+		0, 2, 0, 0,
+		0, 0, 3, 4,
+		0, 0, 5, 0,
 };
 
 /**

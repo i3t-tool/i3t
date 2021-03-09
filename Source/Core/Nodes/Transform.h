@@ -2,6 +2,11 @@
 
 #include "NodeImpl.h"
 
+#if WIN32
+#undef far
+#undef near
+#endif
+
 namespace Core
 {
 class Scale : public NodeBase
@@ -46,8 +51,8 @@ public:
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
-  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-  [[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
@@ -75,10 +80,10 @@ public:
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
-  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-  [[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
@@ -104,10 +109,10 @@ public:
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
-  [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-  [[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-  [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };
@@ -144,8 +149,11 @@ public:
 	AxisAngleRot(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
 			: NodeBase(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
 	{
+		m_initialMap = Transform::g_AllLocked;
+		m_currentMap = m_initialMap;
 	}
 
+	void reset() override;
 	void updateValues(int inputIndex) override;
 };
 
@@ -162,13 +170,26 @@ public:
 
 class OrthoProj : public NodeBase
 {
+	float m_left;
+	float m_right;
+	float m_bottom;
+	float m_top;
+	float m_near;
+	float m_far;
 
 public:
 	OrthoProj(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	          float far = 10.0f)
+			: NodeBase(getTransformProps(ETransformType::Ortho)), m_left(left), m_right(right), m_bottom(bottom),
+				m_top(top), m_near(near), m_far(far)
 	{
+		m_initialMap = Transform::g_Ortho;
+		m_currentMap = m_initialMap;
 	}
 
+	/// No synergies required.
+	void reset() override;
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void updateValues(int inputIndex) override;
 };
 
@@ -184,21 +205,36 @@ public:
 			: NodeBase(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
 				m_initialZNear(zNear), m_initialZFar(zFar)
 	{
+		m_initialMap = Transform::g_Perspective;
+		m_currentMap = m_initialMap;
 	}
 
+	void reset() override;
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void updateValues(int inputIndex) override;
 };
 
 class Frustum : public NodeBase
 {
-	// \todo MH Frustum initial values.
+  float m_left;
+  float m_right;
+  float m_bottom;
+  float m_top;
+  float m_near;
+  float m_far;
+
 public:
 	Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	        float far = 10.0f)
-			: NodeBase(getTransformProps(ETransformType::Frustum))
+			: NodeBase(getTransformProps(ETransformType::Frustum)), m_left(left), m_right(right), m_bottom(bottom),
+				m_top(top), m_near(near), m_far(far)
 	{
+		m_initialMap = Transform::g_Frustum;
+		m_currentMap = m_initialMap;
 	}
 
+	void reset() override;
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void updateValues(int inputIndex) override;
 };
 
@@ -217,8 +253,12 @@ public:
 			: NodeBase(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
 				m_initialUp(up)
 	{
+		m_initialMap = Transform::g_AllLocked;
+		m_currentMap = m_initialMap;
 	}
 
+	void reset() override;
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void updateValues(int inputIndex) override;
 };
 } // namespace Core
