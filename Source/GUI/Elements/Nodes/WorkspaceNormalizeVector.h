@@ -6,7 +6,7 @@
 class WorkspaceNormalizeVector : public WorkspaceVector4
 {
 public:
-	WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel = "default NormalizeVector header");
+	WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel = "default NormalizeVector header", WorkspaceViewScale viewScale = WorkspaceViewScale::Full);
 
 	void drawData(util::NodeBuilder& builder);
 

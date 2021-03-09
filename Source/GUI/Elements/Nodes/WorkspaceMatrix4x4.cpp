@@ -1,13 +1,7 @@
 #include "WorkspaceMatrix4x4.h"
-// #include "Source/Core/Nodes/Node.h"
 
-//WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
-//    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
-//{
-//}
-
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase)
-    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase, WorkspaceViewScale viewScale)
+    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel, viewScale)
 {}
 
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
@@ -17,9 +11,9 @@ void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
-	const glm::mat4& coreData = Nodebase->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = Nodebase->getDataMap();
-	int const idOfNode = this->Id.Get();
+	const glm::mat4& coreData = m_nodebase->getData().getMat4();
+	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
+	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
 	int rowOfChange, columnOfChange;
@@ -50,7 +44,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 
 	if (valueChanged)
 	{
-		Nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
+		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
 	}
 
 	ImGui::Spring(0); /* \todo JH what is Spring? */

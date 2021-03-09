@@ -7,7 +7,8 @@ class WorkspaceMatrix4x4 : public WorkspaceNodeWithCoreData
 public:
 	WorkspaceMatrix4x4(ImTextureID headerBackground,
                         std::string headerLabel = "default Matrix4x4 header",
-                        Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>());
+                        Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>(),
+                        WorkspaceViewScale viewScale = WorkspaceViewScale::Full);
 
 	virtual void drawData(util::NodeBuilder& builder);
 

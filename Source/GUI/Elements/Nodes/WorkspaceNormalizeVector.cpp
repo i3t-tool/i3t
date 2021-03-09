@@ -1,7 +1,7 @@
 #include "WorkspaceNormalizeVector.h"
 
-WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel)
-    : WorkspaceVector4(headerBackground, headerLabel, Builder::createNode<ENodeType::NormalizeVector>())
+WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale)
+    : WorkspaceVector4(headerBackground, headerLabel, Builder::createNode<ENodeType::NormalizeVector>(), viewScale)
 {
 }
 

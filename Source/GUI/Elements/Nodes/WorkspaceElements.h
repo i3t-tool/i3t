@@ -47,22 +47,29 @@ enum class PinKind
 	Input
 };
 
+enum class WorkspaceViewScale
+{
+    Full,
+    JustChangeAble
+};
+
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
 
 class WorkspaceNode
 {
 public:
-	const ne::NodeId Id;
-	std::string State; /*! \brief e.g. selected \todo what is it for? */
-	std::string Label;
+	const ne::NodeId m_id;
+	std::string m_state; /*! \brief e.g. selected \todo what is it for? */
+	std::string m_label;
+	WorkspaceViewScale m_viewScale;
 
-	ImColor Color; /*! \brief Color of Node */
-	ImVec2 Size;   /*! \brief Size of box */
-	float TouchTime;
+	ImColor m_color; /*! \brief Color of Node */
+	ImVec2 m_size;   /*! \brief Size of box */
+	float m_touchTime;
 
-	std::string HeaderLabel;
-	ImTextureID HeaderBackground;
+	std::string m_headerLabel;
+	ImTextureID m_headerBackground;
 
 
 	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
@@ -92,16 +99,16 @@ public:
 
 //private:
    	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel");
+	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel", WorkspaceViewScale viewScale = WorkspaceViewScale::Full );
 
 
 };
 
 /* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
-static int linkID = 0;
-static int getLinkID()
+static int s_linkID = 0;
+static int s_getLinkID()
 {
-	return linkID++;
+	return s_linkID++;
 }
 
 /*! \class WorkspaceLinkProperties
@@ -110,8 +117,8 @@ static int getLinkID()
 class WorkspaceLinkProperties
 {
 public:
-	const ne::LinkId Id;
-	ImColor Color;
+	const ne::LinkId m_id;
+	ImColor m_color;
 
 	WorkspaceLinkProperties(const ne::LinkId id);
 };
@@ -122,15 +129,15 @@ public:
 class WorkspacePinProperties
 {
 public:
-	const ne::PinId Id; /*! \brief unique (among Pins) identificator */
-	std::string Name;    /*! \brief Name of Pin */
-	const PinKind Kind;  /*! \brief Kind of pin \sa PinKind */
-	const EValueType Type;
+	const ne::PinId m_id; /*! \brief unique (among Pins) identificator */
+	std::string m_name;    /*! \brief Name of Pin */
+	const PinKind m_kind;  /*! \brief Kind of pin \sa PinKind */
+	const EValueType m_type;
 
-	int IconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
+	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
 
-	bool Connected;
-	float Alpha;
+	bool m_connected;
+	float m_alpha;
 
 	WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type);
 

@@ -1,14 +1,14 @@
 #include "WorkspaceVector4.h"
 
-WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase)
-    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase, WorkspaceViewScale viewScale)
+    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel, viewScale)
 {}
 
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 {
-	const glm::vec4& coreData = Nodebase->getData().getVec4();
+	const glm::vec4& coreData = m_nodebase->getData().getVec4();
 	int const coreMap[4] = {1,2,3,4}; /* \todo JH will be map for vector? */
-	int const idOfNode = this->Id.Get();
+	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
 	/* \todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably better /same as in Matrix4x4/
@@ -41,7 +41,7 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 
 	if (valueChanged)
 	{
-	    Nodebase->setValue(localData);
+	    m_nodebase->setValue(localData);
 //		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 

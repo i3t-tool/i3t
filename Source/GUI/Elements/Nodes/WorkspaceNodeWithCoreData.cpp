@@ -5,33 +5,32 @@
 
 /* see:
  * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
-WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel) /* \todo JH take default label from Const.h*/
-    :   WorkspaceNode(nodebase->getId(), headerBackground, headerLabel)
-//    ,   Nodebase(std::move(nodebase))
-    ,   Nodebase(nodebase)
+WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale) /* \todo JH take default label from Const.h*/
+    :   WorkspaceNode(nodebase->getId(), headerBackground, headerLabel, viewScale)
+    ,   m_nodebase(nodebase)
 
 {
-	const std::vector<Core::Pin>& InputPins = Nodebase->getInputPins();
-	const std::vector<Core::Pin>& OutputPins = Nodebase->getOutputPins();
+	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
+	const std::vector<Core::Pin>& outputPins = m_nodebase->getOutputPins();
 
-	WorkspaceLinksProperties.reserve(InputPins.size());
-	WorkspaceInputsProperties.reserve(InputPins.size());
-	WorkspaceOutputsProperties.reserve(OutputPins.size());
+	m_workspaceLinksProperties.reserve(inputPins.size());
+	m_workspaceInputsProperties.reserve(inputPins.size());
+	m_workspaceOutputsProperties.reserve(outputPins.size());
 
-	for (const Core::Pin& pin : InputPins)
+	for (const Core::Pin& pin : inputPins)
 	{
-        WorkspaceInputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
+        m_workspaceInputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
 				pin.getId(),
 				fmt::format("input #{}", pin.getIndex()).c_str(),
 				PinKind::Input, pin.getType()));
 
-        WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
+        m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
 	}
 
-	for (const Core::Pin& pin : OutputPins)
+	for (const Core::Pin& pin : outputPins)
 	{
-		WorkspaceOutputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
+		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
                 pin.getId(),
 				fmt::format("output #{}", pin.getIndex()).c_str(),
 				PinKind::Output, pin.getType()));
@@ -40,7 +39,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebas
 
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	builder.Begin(Id);
+	builder.Begin(m_id);
 
 	drawHeader(builder);
 	drawInputs(builder, newLinkPin);
@@ -52,21 +51,21 @@ void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* 
 
 void WorkspaceNodeWithCoreData::drawInputLinks()
 {
-	for (std::pair<pinIter, linkPropIter> elem(Nodebase->getInputPins().begin(), WorkspaceLinksProperties.begin());
-	     elem.first != Nodebase->getInputPins().end() && elem.second != WorkspaceLinksProperties.end();
+	for (std::pair<pinIter, linkPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceLinksProperties.begin());
+	     elem.first != m_nodebase->getInputPins().end() && elem.second != m_workspaceLinksProperties.end();
 	     ++elem.first, ++elem.second)
 	{
 		if (elem.first->isPluggedIn())
-			ne::Link(elem.second->get()->Id, elem.first->getParentPin()->getId(), elem.first->getId(),
-			         elem.second->get()->Color, 2.0f); /* elem.second->get() for dereferencing unique_ptr*/
+			ne::Link(elem.second->get()->m_id, elem.first->getParentPin()->getId(), elem.first->getId(),
+			         elem.second->get()->m_color, 2.0f); /* elem.second->get() for dereferencing unique_ptr*/
 	}
 }
 
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (std::pair<pinIter, pinPropIter> elem(Nodebase->getInputPins().begin(), WorkspaceInputsProperties.begin());
-            elem.first != Nodebase->getInputPins().end()  && elem.second != WorkspaceInputsProperties.end();
+	for (std::pair<pinIter, pinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
+            elem.first != m_nodebase->getInputPins().end()  && elem.second != m_workspaceInputsProperties.end();
             ++elem.first, ++elem.second)
 	{
 		float alpha = ImGui::GetStyle().Alpha;
@@ -77,15 +76,16 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
 		// color.Value.w = alpha / 255.0f;
-		ax::Widgets::Icon(ImVec2(elem.second->get()->IconSize, elem.second->get()->IconSize),
-		                  WorkspacePinShape[elem.second->get()->Type],
-		                  elem.second->get()->Connected, /* \todo do it better - it is copy from Core*/
-		                  WorkspacePinColor[elem.second->get()->Type], ImColor(32.0, 32.0, 32.0, alpha)); /* \todo JH not constant here... */
+		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
+                            WorkspacePinShape[elem.second->get()->m_type],
+                            elem.second->get()->m_connected, /* \todo do it better - it is copy from Core*/
+                            WorkspacePinColor[elem.second->get()->m_type],
+                            ImColor(32.0, 32.0, 32.0, alpha)); /* \todo JH not constant here... */
 
 		ImGui::Spring(0);
-		if (!elem.second->get()->Name.empty())
+		if (!elem.second->get()->m_name.empty())
 		{
-			ImGui::TextUnformatted(elem.second->get()->Name.c_str());
+			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
 			ImGui::Spring(0);
 		}
 
@@ -97,8 +97,8 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (std::pair<pinIter, pinPropIter> elem(Nodebase->getOutputPins().begin(), WorkspaceOutputsProperties.begin());
-	     /* elem.first() != Nodebase->getOutputPins().end()  &&*/ elem.second != WorkspaceOutputsProperties.end();
+	for (std::pair<pinIter, pinPropIter> elem(m_nodebase->getOutputPins().begin(), m_workspaceOutputsProperties.begin());
+	     elem.first != m_nodebase->getOutputPins().end() && elem.second != m_workspaceOutputsProperties.end();
 	     ++elem.first, ++elem.second)
 	{
 		float alpha = ImGui::GetStyle().Alpha;
@@ -108,17 +108,18 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 		builder.Output(elem.first->getId());
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		if (!elem.second->get()->Name.empty())
+		if (!elem.second->get()->m_name.empty())
 		{
-			ImGui::TextUnformatted(elem.second->get()->Name.c_str());
+			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
 			ImGui::Spring(0);
 		}
 
 		// color.Value.w = alpha / 255.0f;
-		ax::Widgets::Icon(ImVec2(elem.second->get()->IconSize, elem.second->get()->IconSize),
-		                  WorkspacePinShape[elem.second->get()->Type],
-		                  elem.second->get()->Connected, /* \todo do it better - it is copy from Core*/
-		                  WorkspacePinColor[elem.second->get()->Type], ImColor(32.0, 32.0, 32.0, alpha));
+		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
+                            WorkspacePinShape[elem.second->get()->m_type],
+                            elem.second->get()->m_connected, /* \todo do it better - it is copy from Core*/
+                            WorkspacePinColor[elem.second->get()->m_type],
+                            ImColor(32.0, 32.0, 32.0, alpha));
 
 		ImGui::Spring(0);
 
@@ -130,7 +131,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value, int const mapValue, std::string const label)
 {
     bool inactive = (mapValue == 0 || mapValue == 255) ? true : false; /* \todo JH some other type than just active/inactive will be here - maybe */
-    /* \todo JH some mark for "hard-coded" values (diagonal 1 in translation (255 Map value) for example) */
+    /* \todo JH some graphical mark for "hard-coded" values (diagonal 1 in translation (255 Map value) for example) ? */
 
     if (inactive)
     {

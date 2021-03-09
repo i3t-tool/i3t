@@ -18,48 +18,48 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
 /* \todo JH not use constant values here */
-WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel)
-    :   Id(id)
+WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale)
+    :   m_id(id), m_viewScale(viewScale)
 {
 	/* \todo Some better default values - take from Const.h*/
-	State = "default WorkspaceNode state";
-	Label = "default WorkspaceNode Label";
-	Color = ImColor(255, 255, 255);
-	Size = ImVec2(100, 100);
-	TouchTime = 1.0;
+	m_state = "default WorkspaceNode state";
+	m_label = "default WorkspaceNode Label";
+	m_color = ImColor(255, 255, 255);
+	m_size = ImVec2(100, 100);
+	m_touchTime = 1.0;
 
-	HeaderLabel = headerLabel;
-	HeaderBackground = headerBackground;
+	m_headerLabel = headerLabel;
+	m_headerBackground = headerBackground;
 }
 
 /* \todo JH time-functions are taken from example */
 void WorkspaceNode::TouchNode(const float constTouchTime)
 {
-	TouchTime = constTouchTime;
+	m_touchTime = constTouchTime;
 }
 
 void WorkspaceNode::UpdateTouch(const float constDeltaTime)
 {
-	if (TouchTime > 0)
+	if (m_touchTime > 0)
 	{
-		TouchTime -= constDeltaTime;
+		m_touchTime -= constDeltaTime;
 	}
 }
 
 float WorkspaceNode::GetTouchProgress(const float constTouchTime)
 {
-	if (TouchTime > 0.0f)
-		return (constTouchTime - TouchTime) / constTouchTime;
+	if (m_touchTime > 0.0f)
+		return (constTouchTime - m_touchTime) / constTouchTime;
 	else
 		return 0.0f;
 }
 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
-	builder.Header(Color);
+	builder.Header(m_color);
 
 	ImGui::Spring(0); /* \todo JH what 0/1 means */
-	ImGui::TextUnformatted(HeaderLabel.c_str());
+	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);
 	ImGui::Dummy(ImVec2(0, 28));
 	ImGui::Spring(0);
@@ -68,19 +68,19 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 }
 
 
-WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : Id(id), Color(ImColor(255, 255, 255))
+WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id), m_color(ImColor(255, 255, 255))
 {}
 
 
 WorkspacePinProperties::WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type)
-		: Id(id), Name(name), Kind(kind), Type(type), IconSize(24), Connected(false), Alpha(100) /* \todo JH no konstants here... */
+		: m_id(id), m_name(name), m_kind(kind), m_type(type), m_iconSize(24), m_connected(false), m_alpha(100) /* \todo JH no konstants here... */
 {
 }
 
 /* \todo JH this functions are in Core... */
 bool WorkspacePinProperties::IsPinConnected()
 {
-	return Connected;
+	return m_connected;
 }
 
 bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
