@@ -132,11 +132,11 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 			this->planeh->transformation=glm::mat4(1.0f)*scale;
 				
 			this->planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
-			drawHandle(this->planeh,this->handlespace,glm::vec4(0.0f,1.0f,1.0f,transparency*0.5f),this->stencilzy,this->activehandle==this->stencilzy);
+			drawHandle(this->planeh,this->handlespace,glm::vec4(0.0f,1.0f,1.0f,transparency*0.6f),this->stencilzy,this->activehandle==this->stencilzy);
 			this->planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
-			drawHandle(this->planeh,this->handlespace,glm::vec4(1.0f,0.2f,1.0f,transparency*0.5f),this->stencilzx,this->activehandle==this->stencilzx);
+			drawHandle(this->planeh,this->handlespace,glm::vec4(1.0f,0.2f,1.0f,transparency*0.6f),this->stencilzx,this->activehandle==this->stencilzx);
 			this->planeh->transformation=glm::mat4(1.0f)*scale;
-			drawHandle(this->planeh,this->handlespace,glm::vec4(1.0f,1.0f,0.0f,transparency*0.5f),this->stencilyx,this->activehandle==this->stencilyx);
+			drawHandle(this->planeh,this->handlespace,glm::vec4(1.0f,1.0f,0.0f,transparency*0.6f),this->stencilyx,this->activehandle==this->stencilyx);
 		}
 		if(this->editmode==TransformHandles::EDIT_SCALE){//three-axis handle
 			this->uniscaleh->transformation=glm::mat4(1.0f)*scale;
@@ -156,6 +156,7 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 	
 void TransformHandles::update(){ 
 	//if(Controls::mouseKeysEventTable[GLUT_LEFT_BUTTON]==Controls::EVENT_DOWN){
+	bool transactionBegin=false;
 	if(InputController::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
 		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->stencil;
@@ -176,6 +177,7 @@ void TransformHandles::update(){
 		else if(sel==this->stencilaxisw){this->editaxis=3;}
 		else if(sele==stencile){}
 		else{this->clicked--;}//click outside editedobj or handle
+		if(this->activehandle!=-1){transactionBegin=true;}
 	}
 		
 	if (InputController::isKeyJustUp(Keys::mouseLeft)){
@@ -271,7 +273,7 @@ void TransformHandles::update(){
 			this->handlespace[3]=getFullTransform(this->editedobj)[3];
 		}
 	}
-
+	
 	if(this->activehandle!=-1){
 		//printf("hs %f %f %f\n\n", this->handlespace[3][0], this->handlespace[3][1], this->handlespace[3][2]);
 		//if(Controls::keysEventTable[27]==Controls::EVENT_UP){editedobj->transform=this->bkp;}
@@ -281,7 +283,27 @@ void TransformHandles::update(){
 		glm::vec2 spos1=world2screen((glm::vec3)(this->handlespace[3]));//position of transformated object on the screen
 		glm::vec2 spos2=world2screen((glm::vec3)(this->handlespace[3]+this->handlespace*axes[this->axisnum]));//spos1,spos2 - project two points on screen - project axis on screen
 		glm::vec2 dir=spos2-spos1;//the axis in screen space
-		if(glm::length(dir)<0.01){dir[0]=1.0f;}//axis length must not be zero
+
+		if (this->editmode == TransformHandles::EDIT_ROTATION) {
+			if (transactionBegin) {
+				glm::mat4 ortho=getOrtho(this->handlespace,this->axisnum);
+				glm::vec3 p0 = (glm::vec3)this->handlespace[3];
+				glm::vec3 px = (glm::vec3)(ortho * axes[(axisnum+1)%3]);
+				glm::vec3 py = (glm::vec3)(ortho * axes[(axisnum+2)%3]);
+				glm::vec3 t0 = -World2::mainCamPos;
+				//glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
+				glm::vec3 tz = mouseray(glm::vec2(InputController::m_mouseX,World2::height -InputController::m_mouseY));
+				glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
+
+				glm::vec3 pc = px*coef[1]+py*coef[2];
+				glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)axes[this->axisnum]));
+				this->dirbkp = glm::normalize(world2screen(p0)-world2screen(p0 + dir3));
+			}
+			dir=this->dirbkp;
+		}
+		if(glm::length(dir)<0.01f){dir[0]=1.0f;}//axis length must not be zero
+
+
 
 		glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
 
@@ -291,26 +313,23 @@ void TransformHandles::update(){
 			if(glm::length(dir2)<0.01){dir2[0]=1.0f;}//axis length must not be zero
 			mov[1]=dir2;
 		}
-		mov=glm::mat2(glm::normalize(mov[0]),glm::normalize(mov[1]));
+
+		mov=glm::inverse(glm::mat2(glm::normalize(mov[0]),glm::normalize(mov[1])));
 			
 		
 		glm::vec2 drag,olddrag,dragfinal,mouse;
 
 		mouse = glm::vec2(InputController::m_mouseX, World2::height - InputController::m_mouseY);
-		drag=glm::inverse(mov)*(mouse-spos1);
-		mouse = glm::vec2(InputController::m_mouseX - InputController::m_mouseXDelta,World2::height - InputController::m_mouseY + InputController::m_mouseYDelta);
-		olddrag=glm::inverse(mov)*(mouse-spos1);
+		drag=mov*(mouse-spos1);
+		mouse = glm::vec2(InputController::m_mouseXPrev,World2::height - InputController::m_mouseYPrev);
+		olddrag=mov*(mouse-spos1);
 		dragfinal=drag-olddrag;
-			
-		if(this->editmode==TransformHandles::EDIT_ROTATION){dragfinal=glm::vec2(dragfinal[1],dragfinal[0]);}//coaxial
-			
+
 		drag3+=((glm::vec3)axes[axisnum])*(dragfinal[0]);
 		if(axisnum2!=-1){drag3+=((glm::vec3)axes[this->axisnum2])*(dragfinal[1]);}
 			
 		float depth=glm::length(World2::mainCamPos+(glm::vec3)this->handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
-		if(this->editmode==TransformHandles::EDIT_POSITION){drag3*=depth*0.5f;}
-		else if(this->editmode==TransformHandles::EDIT_LOOKAT){drag3*=depth*0.5f;}
-		else if(this->editmode==TransformHandles::EDIT_SCALE){drag3*=depth*0.5f;}
+		if(this->editmode!=TransformHandles::EDIT_ROTATION){drag3*=depth*0.5f;}
 		if(InputController::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 			
 		if(this->editspace==TransformHandles::EDIT_FREE){
@@ -325,27 +344,14 @@ void TransformHandles::update(){
 			}
 			else if(this->editmode==TransformHandles::EDIT_POSITION){
 				if (axisnum2 != -1){
-					glm::mat4 ftransform=getFullTransform(this->editedobj);
+					glm::vec3 pc = planeIntersect((glm::vec3)(this->handlespace[axisnum]), (glm::vec3)(this->handlespace[axisnum2]), (glm::vec3)(this->handlespace[3]));
 
-					glm::vec3 p0=(glm::vec3)this->handlespace[3];
-					glm::vec3 px=glm::normalize((glm::vec3)(this->handlespace*axes[axisnum]));
-					glm::vec3 py=glm::normalize((glm::vec3)(this->handlespace*axes[axisnum2]));
-
-					glm::vec3 t0=-World2::mainCamPos;
-					glm::vec3 tz=mouseray(
-					world2screen( (glm::vec3)ftransform[3]+(glm::vec3)ftransform[this->editaxis]*(float)(this->editaxis!=3) )+
-                                  glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-					glm::vec3 coef=glm::inverse(glm::mat3(-tz,px,py))*glm::vec3(t0-p0);
-
-					glm::vec3 pc=p0+px*coef[1]+py*coef[2];
-					glm::vec3 obj=world2viewport(pc);
-
-					if(world2viewport(pc)[2]<0.992f){
-						glm::mat4 parent=getFullTransform(this->editedobj->parent);
-						glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
-						glm::vec3 editedo=(glm::vec3)(glm::inverse(parent)*result);
-						editedo-=(glm::vec3)(this->editedobj->transformation[3]*(float)(this->editaxis!=3));
-						*((glm::vec3*)&(this->editedobj->transformation[this->editaxis]))=editedo;
+					if (world2viewport(pc)[2] < 0.992f) {
+						glm::mat4 parent = getFullTransform(this->editedobj->parent);
+						glm::vec4 editedo = glm::inverse(parent) * glm::vec4(pc, 1.0f);
+						if(this->editaxis!=3){editedo-=this->editedobj->transformation[3]; }
+						
+						this->editedobj->transformation[this->editaxis] = editedo;
 					}
 				}
 				else{
@@ -382,21 +388,7 @@ void TransformHandles::update(){
 			}
 			else if (this->editmode == TransformHandles::EDIT_LOOKAT){
 				if (axisnum2 != -1){
-					//glm::mat4 ftransform = getFullTransform(this->editedobj->parent);
-					//ftransform[3] = getFullTransform(this->editedobj)[3];
-					glm::mat4 ftransform = this->handlespace;
-
-					glm::vec3 p0 = (glm::vec3)this->handlespace[3];
-					glm::vec3 px = glm::normalize((glm::vec3)(this->handlespace * axes[axisnum]));
-					glm::vec3 py = glm::normalize((glm::vec3)(this->handlespace * axes[axisnum2]));
-
-					glm::vec3 t0 = -World2::mainCamPos;
-					glm::vec3 tz = mouseray(world2screen((glm::vec3)ftransform[3]) +
-											glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-					glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * glm::vec3(t0 - p0);
-
-					glm::vec3 pc = p0 + px * coef[1] + py * coef[2];
-					glm::vec3 obj = world2viewport(pc);
+					glm::vec3 pc = planeIntersect((glm::vec3)(this->handlespace[axisnum]), (glm::vec3)(this->handlespace[axisnum2]), (glm::vec3)(this->handlespace[3]));
 
 					if (world2viewport(pc)[2] < 0.992f){
 						glm::mat4 parent = getFullTransform(this->editedobj->parent);
@@ -422,26 +414,13 @@ void TransformHandles::update(){
 			}
 			else if(this->editmode==TransformHandles::EDIT_POSITION){
 				if(axisnum2!=-1){
-					glm::mat4 ftransform=getFullTransform(this->editedobj->parent);
-					ftransform[3]=getFullTransform(this->editedobj)[3];
-						
-					glm::vec3 p0=(glm::vec3)this->handlespace[3];
-					glm::vec3 px=glm::normalize((glm::vec3)(this->handlespace*axes[axisnum]));
-					glm::vec3 py=glm::normalize((glm::vec3)(this->handlespace*axes[axisnum2]));
-						
-					glm::vec3 t0=-World2::mainCamPos;
-					glm::vec3 tz = mouseray(world2screen((glm::vec3)ftransform[3]) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-					glm::vec3 coef=glm::inverse(glm::mat3(-tz,px,py))*glm::vec3(t0-p0);
-						
-					glm::vec3 pc=p0+px*coef[1]+py*coef[2];
-					glm::vec3 obj=world2viewport(pc);
+					glm::vec3 pc = planeIntersect((glm::vec3)(this->handlespace[axisnum]), (glm::vec3)(this->handlespace[axisnum2]), (glm::vec3)(this->handlespace[3]));
 						
 					if(world2viewport(pc)[2]<0.992f){
 						glm::mat4 parent=getFullTransform(this->editedobj->parent);
 						glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 						glm::vec4 editedo=glm::inverse(parent)*result;
 						this->editedobj->transformation[3]=editedo;
-						//this->handlespace[3]=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 					}
 				}
 				else{

@@ -7,7 +7,7 @@
 
 #include "platform.h"
 
-
+#include <stdio.h>
 /* handy definitions */
 #ifndef TRUE
 #define TRUE 1
@@ -396,19 +396,6 @@ struct Picoc_Struct
     void *HeapBottom;                   /* the bottom of the (downward-growing) heap */
     void *StackFrame;                   /* the current stack frame */
     void *HeapStackTop;                 /* the top of the stack */
-#else
-# ifdef SURVEYOR_HOST
-    unsigned char *HeapMemory;          /* all memory - stack and heap */
-    void *HeapBottom;                   /* the bottom of the (downward-growing) heap */
-    void *StackFrame;                   /* the current stack frame */
-    void *HeapStackTop;                 /* the top of the stack */
-    void *HeapMemStart;
-# else
-    unsigned char HeapMemory[HEAP_SIZE];  /* all memory - stack and heap */
-    void *HeapBottom;                   /* the bottom of the (downward-growing) heap */
-    void *StackFrame;                   /* the current stack frame */
-    void *HeapStackTop;                 /* the top of the stack */
-# endif
 #endif
 
     struct AllocNode *FreeListBucket[FREELIST_BUCKETS];      /* we keep a pool of freelist buckets to reduce fragmentation */
@@ -457,9 +444,6 @@ struct Picoc_Struct
     /* exit longjump buffer */
 #if defined(UNIX_HOST) || defined(WIN32)
     jmp_buf PicocExitBuf;
-#endif
-#ifdef SURVEYOR_HOST
-    int PicocExitBuf[41];
 #endif
     
     /* string table */
@@ -620,7 +604,7 @@ extern const char StdioDefs[];
 extern struct LibraryFunction StdioFunctions[];
 void StdioSetupFunc(Picoc *pc);
 
-/* library_ffox.c */
+/* library_I3T.cpp */
 extern struct LibraryFunction PlatformLibrary1[];
 void PlatformLibraryInitI3T(Picoc *pc);
 
