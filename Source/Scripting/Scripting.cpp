@@ -4,6 +4,7 @@
 #include "platform/libraryI3T.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,29 +27,29 @@ void SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 
 		if(strcmp(keyword,"MatrixToMatrix")==0){
 			glm::mat4 m = nodebase->getData().getMat4();
-			fprintf(f, "int d%d=datamat4(%0.3f,%0.3f,%0.3f,%0.3f, %0.3f,%0.3f,%0.3f,%0.3f, %0.3f,%0.3f,%0.3f,%0.3f, %0.3f,%0.3f,%0.3f,%0.3f);\n",
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff);\n",
 				i, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[0][2], m[1][3],
 				m[2][0], m[2][1], m[0][2], m[2][3], m[3][0], m[3][1], m[0][2], m[3][3]);
 			fprintf(f, "int n%d=mat4(free,d%d,%d,%d);\n", i, i, (int)pos[0], (int)pos[1]);
 		}
 		else if (strcmp(keyword, "Scale") == 0) {
 			glm::vec3 s = nodebase->getData().getVec3();
-			fprintf(f, "int d%d=datavec3(%0.3f,%0.3f,%0.3f);\n", i, s[0], s[1], s[2]);
+			fprintf(f, "int d%d=datavec3(%0.3ff,%0.3ff,%0.3ff);\n", i, s[0], s[1], s[2]);
 			fprintf(f, "int n%d=mat4(scale,d%d,%d,%d);\n", i, i, (int)pos[0], (int)pos[1]);
 		}
 		else if (strcmp(keyword, "Translation") == 0) {
 			glm::vec3 s = nodebase->getData().getVec3();
-			fprintf(f, "int d%d=datavec3(%0.3f,%0.3f,%0.3f);\n", i, s[0], s[1], s[2]);
+			fprintf(f, "int d%d=datavec3(%0.3ff,%0.3ff,%0.3ff);\n", i, s[0], s[1], s[2]);
 			fprintf(f, "int n%d=mat4(translate,d%d,%d,%d);\n", i, i, (int)pos[0], (int)pos[1]);
 		}
 		else if (strcmp(keyword, "NormalizeVector") == 0) {
 			glm::vec4 s = nodebase->getData().getVec4();
-			fprintf(f,"int d%d=datavec4(%0.3f,%0.3f,%0.3f,%0.3f);\n", i, s[0], s[1], s[2], s[3]);
+			fprintf(f,"int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i, s[0], s[1], s[2], s[3]);
 			fprintf(f,"int n%d=normvec4(d%d,%d,%d);\n", i,i, (int)pos[0], (int)pos[1]);
 		}
 		else {
 			glm::mat4 m = nodebase->getData().getMat4();
-			fprintf(f, "int d%d=datamat4(%0.3f,%0.3f,%0.3f,%0.3f, %0.3f,%0.3f,%0.3f,%0.3f, %0.3f,%0.3f,%0.3f,%0.3f, %0.3f,%0.3f,%0.3f,%0.3f);\n",
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff);\n",
 				i, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[0][2], m[1][3],
 				m[2][0], m[2][1], m[0][2], m[2][3], m[3][0], m[3][1], m[0][2], m[3][3]);
 			fprintf(f, "//int n%d=%s(d%d,%d,%d);//unknown type\n", i, keyword,i, (int)pos[0], (int)pos[1]);
@@ -75,8 +76,8 @@ void LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 	PicocRunFile(filename);
 	WorkspaceLayout*ret=getWorkspaceLayout();
 	int startlen=(int)_workspace->size();
-	for (int i = 0; i < ret->matrix4x4Nodes.size();i++) {
-		NodeMatrix4x4 node=ret->matrix4x4Nodes[i];
+	for (int i = 0; i < ret->mat4Nodes.size();i++) {
+		NodeMat4 node=ret->mat4Nodes[i];
 		if(Core::Transform::eq(node.type,Core::Transform::g_Free)){
 			_workspace->push_back(std::make_unique<WorkspaceMatrix4x4>(new WorkspaceMatrix4x4((ImTextureID)0,"load free")));
 			ValueSetResult result =dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
@@ -84,16 +85,21 @@ void LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 		}
 		else if (Core::Transform::eq(node.type, Core::Transform::g_Scale)) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixScale>(new WorkspaceMatrixScale((ImTextureID)0, "load scale")));
-			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(glm::vec3(node.data[0][0], node.data[1][1], node.data[2][2]));
+			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue((glm::vec3)node.data[0]);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
 		else if (Core::Transform::eq(node.type, Core::Transform::g_Translate)) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>(new WorkspaceMatrixTranslation((ImTextureID)0, "load translation")));
-			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(glm::vec3(node.data[0][0], node.data[1][1], node.data[2][2]));
+			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue((glm::vec3)node.data[0]);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
 	}
-
+	for (int i = 0; i < ret->normVec4Nodes.size(); i++) {
+		NodeNormVec4 node=ret->normVec4Nodes[i];
+		_workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "load NormalizeVector"));
+		ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+		ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
+	}
 	for (int i = 0; i < ret->nodePlugs.size(); i++) {
 		int indexA=ret->nodePlugs[i].indexA+startlen;
 		int indexB=ret->nodePlugs[i].indexB+startlen;

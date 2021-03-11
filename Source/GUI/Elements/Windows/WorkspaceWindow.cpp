@@ -92,8 +92,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
 
 	/*--- NORMALIZE VECTOR */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
-	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
+	//WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
+	//ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
 
 

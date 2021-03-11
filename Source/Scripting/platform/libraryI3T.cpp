@@ -13,7 +13,8 @@ struct Mat4types{
 
 WorkspaceLayout*getWorkspaceLayout(){return &workspaceLayout;}
 void clearWorkspaceLayout(){
-    workspaceLayout.matrix4x4Nodes.clear(); 
+    workspaceLayout.mat4Nodes.clear(); 
+    workspaceLayout.normVec4Nodes.clear(); 
     workspaceLayout.nodePlugs.clear(); 
 }
 
@@ -28,19 +29,29 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
     Core::Transform::DataMap map=Core::Transform::g_Free;
     if (type > -1 && type < 7) { map = types[type]; }
 
-    NodeMatrix4x4 nm = NodeMatrix4x4(map,mat, x, y);
+    NodeMat4 nm = NodeMat4(map,mat, x, y);
+    workspaceLayout.mat4Nodes.push_back(nm);
+    ReturnValue->Val->Integer = (int)workspaceLayout.mat4Nodes.size() - 1;
+}
+void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    int dataindex = Param[0]->Val->Integer;
+    int x = Param[1]->Val->Integer;
+    int y = Param[2]->Val->Integer;
 
-    workspaceLayout.matrix4x4Nodes.push_back(nm);
+    glm::vec4 vec = glm::vec4(1.0f);
+    if (dataindex > -1 && dataindex < workspaceLayout.nodeData.size()) { vec = workspaceLayout.nodeData[dataindex][0]; }
 
-    ReturnValue->Val->Integer = (int)workspaceLayout.matrix4x4Nodes.size() - 1;
+    NodeNormVec4 nm = NodeNormVec4(vec, x, y);
+    workspaceLayout.normVec4Nodes.push_back(nm);
+    ReturnValue->Val->Integer = (int)workspaceLayout.normVec4Nodes.size() - 1;
 }
 void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int indexa=Param[0]->Val->Integer;
     int indexb=Param[1]->Val->Integer;
     int outputindex= Param[2]->Val->Integer;
     int inputindex= Param[3]->Val->Integer;
-    if(indexa>=workspaceLayout.matrix4x4Nodes.size()||indexa < 0){ReturnValue->Val->Integer=FALSE;return;}
-    if(indexb>=workspaceLayout.matrix4x4Nodes.size()||indexb < 0){ReturnValue->Val->Integer=FALSE;return;}
+    if(indexa>=workspaceLayout.mat4Nodes.size()||indexa < 0){ReturnValue->Val->Integer=FALSE;return;}
+    if(indexb>=workspaceLayout.mat4Nodes.size()||indexb < 0){ReturnValue->Val->Integer=FALSE;return;}
 
     workspaceLayout.nodePlugs.push_back(NodePlug(indexa,indexb,outputindex,inputindex));
     ReturnValue->Val->Integer=TRUE;
@@ -73,6 +84,7 @@ void dataScalar(struct ParseState* Parser, struct Value* ReturnValue, struct Val
 struct LibraryFunction PlatformLibrary1[] =
 {
 	{ mat4,         "int mat4(int,int,int,int);" },
+	{ normVec4,     "int normvec4(int,int,int);" },
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
 	{ dataMat4,     "int datamat4(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float);" },
 	{ dataVec4,     "int datavec4(float,float,float,float);" },

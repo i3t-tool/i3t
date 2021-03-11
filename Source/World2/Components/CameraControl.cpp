@@ -23,22 +23,22 @@ void CameraControl::update(){
 		owner->translate(glm::vec3(-move.x, move.y, -move.z));
 	}
 	else if (InputController::isKeyPressed(Keys::mouseRight)){
-		owner->rotate((glm::vec3)owner->transformation[0],-y);	
-		owner->rotate(glm::vec3(0.0f,1.0f,0.0f),-x);	
+		owner->rotateAround((glm::vec3)owner->transformation[0],-y,(glm::vec3)owner->transformation[3]);
+		owner->rotateAround(glm::vec3(0.0f,1.0f,0.0f),-x, (glm::vec3)owner->transformation[3]);
 	}
 		
 	glm::vec4 move = glm::vec4(0.0f);
 	bool moved=false;
 	if (InputController::isKeyPressed(Keys::ctrlr)){
-		if (InputController::isKeyPressed(Keys::up)){	move += glm::vec4(0.0f, 0.2f, 0.0f, 0.0f);	moved = true;}
-		if (InputController::isKeyPressed(Keys::down)){	move += glm::vec4(0.0f, -0.2f, 0.0f, 0.0f);	moved = true;}
+		if (InputController::isKeyPressed(Keys::up)){	move[1] += 0.2f;	moved = true;}
+		if (InputController::isKeyPressed(Keys::down)){	move[1] += -0.2f;	moved = true;}
 	}
 	else {
-		if (InputController::isKeyPressed(Keys::up)){	move += glm::vec4(0.0f, 0.0f, -0.2f, 0.0f);	moved = true;}
-		if (InputController::isKeyPressed(Keys::down)){	move += glm::vec4(0.0f, 0.0f, 0.2f, 0.0f);	moved = true;}
+		if (InputController::isKeyPressed(Keys::up)){	move[2] +=-0.2f;	moved = true;}
+		if (InputController::isKeyPressed(Keys::down)){	move[2] += 0.2f;	moved = true;}
 	}
-	if (InputController::isKeyPressed(Keys::left)){		move += glm::vec4(-0.2f, 0.0f, 0.0f, 0.0f);	moved = true;}
-	if (InputController::isKeyPressed(Keys::right)){	move += glm::vec4(0.2f, 0.0f, 0.0f, 0.0f);	moved = true;}
+	if (InputController::isKeyPressed(Keys::left)){		move[0]+= -0.2f;	moved = true;}
+	if (InputController::isKeyPressed(Keys::right)){	move[0]+= 0.2f;		moved = true;}
 	if (InputController::isKeyPressed(Keys::shiftr)){	move *= 3.0f;}
 
 	if(moved){
