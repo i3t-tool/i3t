@@ -28,6 +28,7 @@ include_directories(Dependencies/imgui_node_editor)
 include_directories(Dependencies/imgui_node_editor/external/imgui)
 include_directories(Dependencies/imgui_markdown)
 include_directories(Dependencies/pgr-framework/include)
+include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
@@ -109,6 +110,7 @@ set(YAML_BUILD_SHARED_LIBS Off)
 # ======== Project dependencies which should be compiled. =====
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
+add_subdirectory(Dependencies/picoc)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
@@ -231,7 +233,6 @@ else()
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Header Files" FILES ${I3T_SOURCE_H})
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source Files" FILES ${I3T_SOURCE_CPP})
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${I3T_SOURCE_DEP})
-
 endif()
 # =============================================================
 
@@ -244,8 +245,9 @@ target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC
         ${OPENGL_LIBRARIES}
-        glfw
         assimp
+        glfw
+        picoc
         spdlog
         yaml-cpp
 )
