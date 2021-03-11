@@ -22,9 +22,9 @@ World2*World2::tmpAccess=NULL;
 World2::World2(){
 }
 bool World2::initRender(){
-    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders2/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders2/simple-fs.glsl").c_str()); 
-    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders2/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders2/handle-fs.glsl").c_str()); 
-    World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders2/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders2/viewproj-fs.glsl").c_str());
+    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
+    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
+    World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
         getchar();printf("World2::initRender():cannot load shaders\n");return false;
     }
@@ -35,21 +35,21 @@ bool World2::initRender(){
 }
 World2* World2::loadDefaultScene(){
     if (!World2::initializedRender){printf("initialize render before meshes!\n");return nullptr;}
-    GLuint rocksTexture, grassTexture, grassBigTexture,renderTexture,axisTexture;
+    GLuint cgridTexture, cubeGrayTexture, cubeTexture,renderTexture,axisTexture;
     RenderTexture* rend;
     GameObject *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild;
 
-    grassTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grass.png"));
-    grassBigTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grassbig.jpg"));
-    rocksTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/rocks.jpg"));
-    axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures2/axis.png"));
+    cubeGrayTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
+    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/cubecolor.jpg"));
+    cgridTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.jpg"));
+    axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
 
     rend =        new RenderTexture(&renderTexture,256,256);
 
-    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, grassTexture);
+    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, cubeGrayTexture);
     lookat =      new GameObject(unitquadMesh,    &World2::shader0, renderTexture);
     camhandles =  new GameObject(unitcubeMesh,    &World2::shader0, 0);
-    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, rocksTexture);
+    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, cgridTexture);
     testparent =  new GameObject(three_axisMesh,  &World2::shader0, axisTexture);   testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
     camera =      new GameObject();
     scene =       new GameObject(gridMesh,        &World2::shader0, 0);             scene->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
