@@ -9,7 +9,9 @@ void BeforeCloseModal::render()
 	ImGui::OpenPopup("Close?###%s");
 
 	// Always center this window when appearing
-	ImVec2 center = ImVec2(ImGui::GetWindowSize().x * 0.5f, ImGui::GetWindowSize().y * 0.5f);
+	ImVec2 center = ImGui::GetMainViewport()->GetWorkSize();
+	center.x *= 0.5f;
+	center.y *= 0.5f;
 	// ImVec2 parent_pos = ImGui::GetWindowPos();
 	// ImVec2 parent_size = ImGui::GetWindowSize();
 	// ImVec2 center(parent_pos.x + parent_size.x * 0.5f, parent_pos.y + parent_size.y * 0.5f);
