@@ -1,5 +1,4 @@
-#include "../picoc.h"
-#include "../interpreter.h"
+#include "picoc.h"
 
 /* mark where to end the program for platforms which require this */
 jmp_buf PicocExitBuf;

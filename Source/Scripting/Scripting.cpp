@@ -1,7 +1,7 @@
-#include "picoc.h"
+#include "Dependencies/picoc/picoc.h"
 
 #include "Scripting.h"
-#include "platform/libraryI3T.h"
+#include "Dependencies/picoc/platform/libraryI3T.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"

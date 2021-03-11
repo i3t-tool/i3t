@@ -1,8 +1,9 @@
 #pragma once
-#include "GUI/Elements/Nodes/WorkspaceElements.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include <vector>
 #include <memory>
+#include "pgr.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+
 struct NodeMat4 {
 	Core::Transform::DataMap type;
 	glm::mat4 data;
