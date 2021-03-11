@@ -13,7 +13,18 @@ ImFont* I3T::getFont(EFont font)
 	return theme.get(font);
 }
 
+const ImVec4& I3T::getColor(EColor color)
+{
+  return getTheme().get(color);
+}
+
+Theme& I3T::getTheme()
+{
+	return App::get().getUI()->getTheme();
+}
+
 UI* I3T::getUI()
 {
 	return App::get().getUI();
 }
+

@@ -78,6 +78,8 @@ class Theme
 	using Colors = std::map<EColor, ImVec4>;
 	Colors m_colors;
 
+  ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
+
 	static constexpr const size_t m_fontsCount = 4;
 	/// \todo MH Set dynamic scale (reload font in runtime).
 	static constexpr float m_fontScale = 1.2f;
@@ -97,10 +99,10 @@ public:
 	 * Call this function whenever you change style settings.
 	 */
 	void apply();
-	ImVec4 get(EColor color)
+	const ImVec4& get(EColor color)
 	{
 		if (m_colors.count(color) == 0)
-			return ImVec4{0.0f, 0.0f, 0.0f, 1.0f};
+			return m_defaultColor;
 
 		return m_colors[color];
 	}

@@ -6,6 +6,7 @@
 namespace I3T
 {
 ImFont* getFont(EFont font);
+const ImVec4& getColor(EColor color);
 Theme& getTheme();
 UI* getUI();
 
