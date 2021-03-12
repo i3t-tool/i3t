@@ -73,7 +73,7 @@ void MainMenuBar::showFileMenu()
 			/// \todo OpenFileDialog, use Utils/System.h.
 			// TabSpace::onOpenScene(TabSpace::OPEN_FILE_DIALOG);
 			char fname[256];
-			openFile(fname,256);
+			openFileDialog(fname,256);
 			printf("OPEN %s\n",fname);
 		}
 

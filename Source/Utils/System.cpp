@@ -10,7 +10,7 @@ void runShell(const char* sexe)
 	ShellExecute(NULL, "open", sexe, NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
-bool openFile(char* filename, int bufsize) {
+bool openFileDialog(char* filename, int bufsize) {
 #ifdef WIN32
 	char*filter= "C source file (*.c)\0*.c\0\0";
 	char initfile[256]="\0";
