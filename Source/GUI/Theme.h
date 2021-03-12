@@ -45,6 +45,17 @@ enum class EFont
 	TaskTitle,
 };
 
+enum class ESize
+{
+	Nodes_Rounding,
+  Nodes_FloatWidth,
+  Nodes_FloatMargin,
+	Nodes_ItemsSpacingX,
+	Nodes_ItemsSpacingY,
+  Window_FramePadding,
+  COUNT
+};
+
 constexpr inline EColor asColor(EValueType type)
 {
 	switch (type)
@@ -85,10 +96,11 @@ class Theme
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
 	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
+  std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
 
 public:
 	/**
-	 * Creates default global color scheme based on Zadina's thesis.
+	 * Creates default global color scheme based on Lukas Pilka's design.
 	 */
 	Theme();
 	Theme(const Colors& colors) { m_colors = colors; }
@@ -117,6 +129,12 @@ public:
 	{
 		Debug::Assert(m_fonts.size() < id, "Out of bounds!");
 		return m_fonts[id];
+	}
+
+	float get(ESize size)
+  {
+		Debug::Assert(size != ESize::COUNT, "Strange size, isn't it?");
+		return m_sizes[static_cast<size_t>(size)];
 	}
 
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }

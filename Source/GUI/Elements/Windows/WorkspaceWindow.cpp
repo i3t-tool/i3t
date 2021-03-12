@@ -116,9 +116,9 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	DataStore ds=child->getData();
 	glm::mat4 mm=ds.getMat4();*/
 
-	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
+	// LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
 
-	SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
+	// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
 
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
@@ -153,7 +153,9 @@ void WorkspaceWindow::render()
 		//SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes); 
 		printf("press\n");
 	}
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("Workspace", getShowPtr());
+	ImGui::PopStyleVar();
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");
