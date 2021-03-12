@@ -24,9 +24,6 @@ void PicocInitialise(Picoc *pc, int StackSize)
     LibraryAdd(pc, &GlobalTable, "c library", &CLibrary[0]);
     CLibraryInit(pc);
 #endif
-    //LibraryAdd(pc,&GlobalTable,"ffox library",&PlatformLibrary1[0]);
-    //PlatformLibraryInit(pc);
-    PlatformLibraryInitI3T(pc);//ADD_CUSTOM
     DebugInit(pc);
 }
 

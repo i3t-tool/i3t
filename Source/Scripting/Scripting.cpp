@@ -1,7 +1,7 @@
 #include "Dependencies/picoc/picoc.h"
 
 #include "Scripting.h"
-#include "Dependencies/picoc/platform/libraryI3T.h"
+#include "libraryI3T.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
@@ -78,17 +78,17 @@ void LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 	int startlen=(int)_workspace->size();
 	for (int i = 0; i < ret->mat4Nodes.size();i++) {
 		NodeMat4 node=ret->mat4Nodes[i];
-		if(Core::Transform::eq(node.type,Core::Transform::g_Free)){
+		if(node.type==ret->mat4Types.free){
 			_workspace->push_back(std::make_unique<WorkspaceMatrix4x4>(new WorkspaceMatrix4x4((ImTextureID)0,"load free")));
 			ValueSetResult result =dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
-		else if (Core::Transform::eq(node.type, Core::Transform::g_Scale)) {
+		else if (node.type == ret->mat4Types.scale) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixScale>(new WorkspaceMatrixScale((ImTextureID)0, "load scale")));
 			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue((glm::vec3)node.data[0]);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
-		else if (Core::Transform::eq(node.type, Core::Transform::g_Translate)) {
+		else if (node.type == ret->mat4Types.translate) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>(new WorkspaceMatrixTranslation((ImTextureID)0, "load translation")));
 			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue((glm::vec3)node.data[0]);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
@@ -119,6 +119,7 @@ int PicocRunInteractive(){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
   PicocInitialise(&pc, StackSize);
+  PlatformLibraryInitI3T(&pc);
   if(PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
   PicocIncludeAllSystemHeaders(&pc);
   PicocParseInteractive(&pc);
@@ -132,6 +133,7 @@ int PicocRunFile(const char* filename){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
   PicocInitialise(&pc, StackSize);
+  PlatformLibraryInitI3T(&pc);
   if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
   PicocIncludeAllSystemHeaders(&pc);
   PicocPlatformScanFile(&pc, filename);
@@ -144,6 +146,7 @@ int PicocRunSource(const char* source){
   int StackSize = getenv("STACKSIZE") ? atoi(getenv("STACKSIZE")) : PICOC_STACK_SIZE;
   Picoc pc;
   PicocInitialise(&pc, StackSize);
+  PlatformLibraryInitI3T(&pc);
   if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
   PicocIncludeAllSystemHeaders(&pc);
   PicocParse(&pc, "somefilename", source, (int)strlen(source), TRUE, TRUE, TRUE, TRUE);
