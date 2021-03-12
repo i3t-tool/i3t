@@ -35,13 +35,12 @@ bool World2::initRender(){
 }
 World2* World2::loadDefaultScene(){
     if (!World2::initializedRender){printf("initialize render before meshes!\n");return nullptr;}
-    GLuint cgridTexture, cubeGrayTexture, cubeTexture,renderTexture,axisTexture;
+    GLuint cubeGrayTexture, cubeTexture,renderTexture,axisTexture;
     RenderTexture* rend;
     GameObject *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild;
 
     cubeGrayTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
-    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/cubecolor.jpg"));
-    cgridTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.jpg"));
+    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
     axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
 
     rend =        new RenderTexture(&renderTexture,256,256);
@@ -49,7 +48,7 @@ World2* World2::loadDefaultScene(){
     objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, cubeGrayTexture);
     lookat =      new GameObject(unitquadMesh,    &World2::shader0, renderTexture);
     camhandles =  new GameObject(unitcubeMesh,    &World2::shader0, 0);
-    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, cgridTexture);
+    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, cubeTexture);
     testparent =  new GameObject(three_axisMesh,  &World2::shader0, axisTexture);   testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
     camera =      new GameObject();
     scene =       new GameObject(gridMesh,        &World2::shader0, 0);             scene->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -59,7 +58,7 @@ World2* World2::loadDefaultScene(){
     objhandles->transform(     glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);
     lookat->transform(         glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),        glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
     testparent->transform(     glm::vec3(2.0f, 1.0f,-3.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);
-    testchild->transform(      glm::vec3(0.0f, 4.0f,-6.0f),    glm::vec3(2.5f, 2.5f, 0.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
+    testchild->transform(      glm::vec3(0.0f, 4.0f,-6.0f),    glm::vec3(2.5f, 2.5f, 1.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
 
     scene->addComponent(new TransformHandles(objhandles)); scene->addComponent(new Renderer(Renderer::DRAW_LINES));
     scene->addChild(camera, false);           camera->addComponent(new Camera2(60.0f, scene)); 
