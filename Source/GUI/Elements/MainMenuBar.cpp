@@ -2,6 +2,7 @@
 
 #include "imgui.h"
 
+#include "Utils/System.h"
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
 #include "Core/World.h"
@@ -71,6 +72,9 @@ void MainMenuBar::showFileMenu()
 		{
 			/// \todo OpenFileDialog, use Utils/System.h.
 			// TabSpace::onOpenScene(TabSpace::OPEN_FILE_DIALOG);
+			char fname[256];
+			openFile(fname,256);
+			printf("OPEN %s\n",fname);
 		}
 
 		if (ImGui::MenuItem("Append"))

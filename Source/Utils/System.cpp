@@ -31,7 +31,11 @@ bool openFile(char* filename, int bufsize) {
 	openfile.lpstrInitialDir=initdir;
 	openfile.lpstrTitle=title;
 	openfile.Flags=OFN_CREATEPROMPT;
-
+	if (GetOpenFileName(&openfile)) {
+		if(strlen(openfile.lpstrFile)>=bufsize){return false;}
+		strcpy(filename,openfile.lpstrFile);
+		return true;
+	}
 	return false;
 #endif
 	return false;
