@@ -7,7 +7,7 @@ out vec4 fragmentColor;
 uniform sampler2D tex0;
 uniform vec3 camera;
 uniform vec4 light;
-uniform vec3 ldir=vec3(0.5,1.0,-0.5);
+uniform vec3 ldir=vec3(0.25,1.0,0.5);
 
 uniform vec4 color=vec4(1.0,1.0,1.0,1.0);
 

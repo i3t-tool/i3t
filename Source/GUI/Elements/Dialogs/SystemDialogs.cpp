@@ -7,10 +7,9 @@ bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string&
 {
 	auto dialog = pfd::open_file(title, root, filter);
 
-	while (!dialog.ready(40) && !result.empty())
+	while (!dialog.ready(40) && result.empty())
 	{
-		result = dialog.result()[0];
-		return true;
+		if (dialog.result().size() > 0) {result = dialog.result()[0];return true;}
 	}
 
 	return false;

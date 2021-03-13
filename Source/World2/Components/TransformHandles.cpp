@@ -23,10 +23,10 @@ const char* TransformHandles::typeStatic=NULL;
 void TransformHandles::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,bool active){
 	glStencilMask(255*(stencil!=-1));
 	glStencilFunc(GL_ALWAYS, (unsigned char)stencil, 255);
-	glUseProgram(World2::shaderHandle.program);
 	if (active) {_handle->color=glm::vec4(1.0f,1.0f,1.0f,color[3]);}
 	else{_handle->color=glm::vec4(color[0],color[1],color[2],color[3]);}
 	_handle->draw(space);
+	glStencilMask(0);
 }
 	
 TransformHandles::TransformHandles(GameObject*_editedobj){
@@ -57,6 +57,7 @@ void TransformHandles::start(){
 }
 void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 	if(!this->isEdit||!renderTransparent){return;}
+	glUseProgram(World2::shaderHandle.program);
 	glDepthRange(0.0, 0.01);
 	GameObject*handle=this->circleh;
 	if(this->editmode==TransformHandles::EDIT_ROTATION){handle=this->circleh;}
@@ -69,37 +70,35 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 ftransform=getFullTransform(this->editedobj);
 		
 	float transparency=1.0f;//(float)(renderTransparent==false)*0.5f+0.5f;
-	if(this->editspace==TransformHandles::EDIT_FREE||true){
+	//if(this->editspace==TransformHandles::EDIT_FREE||true){
 		glm::mat4 t;
-		float f,selected;
+		float selected;
 			
-		selected=0.3f*(float)(this->editaxis==0);
-		t=getRotation(ftransform,0);
-		t=glm::mat4(t[0]*glm::length((glm::vec3)ftransform[0]),t[1]*(1.0f+selected*3.0f),t[2]*(1.0f+selected*3.0f),ftransform[3]);
+		selected=0.3f*(float)(this->editaxis==0 && this->editspace == TransformHandles::EDIT_FREE);
+		t=getOrtho(ftransform,0);
+		t[1]*=1.0f+selected*3.0f;t[2]*=1.0f+selected*3.0f;
 		lineh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
-		drawHandle(lineh,t,glm::vec4( 1.0f,selected,selected,transparency),this->stencilaxisx,false);
+		drawHandle(lineh,t,glm::vec4( 1.0f,selected*1.5f,selected * 1.5f,transparency),this->stencilaxisx,false);
 			
-		selected=0.3f*(float)(this->editaxis==1);
-		t=getRotation(ftransform,1);
-		t=glm::mat4(t[0]*(1.0f+selected*3.0f),t[1]*glm::length((glm::vec3)ftransform[1]),t[2]*(1.0f+selected*3.0f),ftransform[3]);
+		selected=0.3f*(float)(this->editaxis==1 && this->editspace == TransformHandles::EDIT_FREE);
+		t=getOrtho(ftransform,1);
+		t[0]*=1.0f+selected*3.0f;t[2]*=1.0f+selected*3.0f;
 		lineh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f));
-		drawHandle(lineh,t,glm::vec4(selected,1.0f,selected,transparency),this->stencilaxisy,false);
+		drawHandle(lineh,t,glm::vec4(selected*1.5f,1.0f,selected*1.5f,transparency),this->stencilaxisy,false);
 			
-		selected=0.3f*(float)(this->editaxis==2);	
-		t=getRotation(ftransform,2);
-		t=glm::mat4(t[0]*(1.0f+selected*3.0f),t[1]*(1.0f+selected*3.0f),t[2]*glm::length((glm::vec3)ftransform[2]),ftransform[3]);
+		selected=0.3f*(float)(this->editaxis==2 && this->editspace == TransformHandles::EDIT_FREE);
+		t=getOrtho(ftransform,2);
+		t[0]*=1.0f+selected*3.0f;t[1]*=1.0f+selected*3.0f;
 		lineh->transformation=glm::mat4(1.0f);
 		drawHandle(lineh,t,glm::vec4(selected*0.5f+0.1f,selected*0.5f+0.4f,1.0f,transparency),this->stencilaxisz,false);
 			
-		selected=0.3f*(float)(this->editaxis==3);
-		glm::mat4 tt=glm::mat4(ftransform[1],ftransform[2],getFullTransform(this->editedobj->parent)[3]-ftransform[3],glm::vec4(0.0f));
-		t=getRotation(tt,2);
-		f=glm::length((glm::vec3)tt[2]);
-		t=glm::mat4(t[0]*(1.0f+selected*3.0f),t[1]*(1.0f+selected*3.0f),t[2]*glm::length((glm::vec3)tt[2]),ftransform[3]);
+		selected=0.3f*(float)(this->editaxis==3&& this->editspace == TransformHandles::EDIT_FREE);
+		t=glm::mat4(ftransform[1],ftransform[2],getFullTransform(this->editedobj->parent)[3]-ftransform[3], ftransform[3]);
+		t = getOrtho(t, 2);
+		t[0]*=1.0f+selected*3.0f;t[1]*=1.0f+selected*3.0f;
 		lineh->transformation=glm::mat4(1.0f);
 		drawHandle(lineh,t,glm::vec4(1.0f,selected+0.2f,1.0f,transparency),this->stencilaxisw,false);
-	}
-
+	//}
 
 	if(this->editspace==TransformHandles::EDIT_FREE&&this->editmode==TransformHandles::EDIT_SCALE){//override scale handles for free edit
 		scale=glm::scale(scale, glm::vec3(0.09f));		
@@ -149,7 +148,6 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 			glStencilMask(0);
 		}
 	}
-	glUseProgram(0);
 	glDepthRange(0.0, 1.0);
 	CHECK_GL_ERROR();
 }
