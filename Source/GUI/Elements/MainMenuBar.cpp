@@ -9,6 +9,7 @@
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Windows/ConsoleWindow.h"
+#include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -143,16 +144,11 @@ void MainMenuBar::showWindowsMenu()
 {
 	if (ImGui::BeginMenu("Windows"))
 	{
-		if (ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
-
-		if (ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr())) {}
-
-		if (ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<ConsoleWindow>()->getShowPtr())) {}
-
-		// if (ImGui::MenuItem("Active matrix zoom window", nullptr,
-		// I3T::getUI()->getWindowPtr<WorkspaceWindow>()->getShowPtr())) {}
-
-		if (ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<ViewportWindow>()->getShowPtr())) {}
+		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
+		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
+		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<ConsoleWindow>()->getShowPtr());
+		ImGui::MenuItem("Log window", nullptr, I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
+		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<ViewportWindow>()->getShowPtr());
 
 		ImGui::EndMenu();
 	}

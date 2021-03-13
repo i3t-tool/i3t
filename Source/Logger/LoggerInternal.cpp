@@ -4,7 +4,8 @@
 #include <sstream>
 
 #include <nlohmann/json.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+#include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/stdout_sinks.h"
 
 #include "Core/GlfwWindow.h"
 
@@ -40,6 +41,7 @@ void Logger::initLogger(int argc, char* argv[])
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+	sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
 	sinks[0]->set_level(spdlog::level::trace);
 	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
 

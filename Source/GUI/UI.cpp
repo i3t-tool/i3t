@@ -1,9 +1,11 @@
 #include "UI.h"
+#include <GUI/Elements/Windows/LogWindow.h>
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/ConsoleWindow.h"
+#include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -28,6 +30,7 @@ void UI::init()
 	m_dockableWindows.push_back(new ViewportWindow(true, App::get().world(),App::get().world2()));
 	m_dockableWindows.push_back(new WorkspaceWindow(true));
 	m_dockableWindows.push_back(new ConsoleWindow());
+	m_dockableWindows.push_back(new LogWindow());
 
 	HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
 

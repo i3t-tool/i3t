@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LoggerInternal.h"
+#include "Core/Defs.h"
 
 namespace Log
 {

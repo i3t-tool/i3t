@@ -16,6 +16,7 @@
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "GUI/Theme.h"
 #include "GUI/UI.h"
+#include "Logger/Logger.h"
 #include "Rendering/ShaderProvider.h"
 #include "Rendering/Shaper.h"
 #include "Utils/Color.h"
@@ -35,6 +36,9 @@ void Application::init()
 {
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
+	ConsoleCommand::addListener([this](std::string rawCommand) {
+		Log::info("Application got command '{}'.", rawCommand);
+	});
 }
 
 void Application::initModules()
