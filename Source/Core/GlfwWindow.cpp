@@ -24,8 +24,7 @@ void GlfwWindow::init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	/// \todo GLFW antialiasing. Antialiasing in scene window.
-	//glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing custom thingy
+  glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
 	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, Config::WIN_TITLE.c_str(), NULL, NULL);//c++ exception
 	if (m_mainWindow == nullptr)

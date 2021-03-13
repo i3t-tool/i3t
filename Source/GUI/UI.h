@@ -9,6 +9,10 @@
 #include "GUI/Elements/IWindow.h"
 #include "Theme.h"
 
+static const ImGuiWindowFlags_ g_WindowFlags = ImGuiWindowFlags_NoCollapse;
+static constexpr ImGuiWindowFlags_ g_dialogFlags =
+		static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+
 class MainMenuBar;
 
 template <typename T> constexpr inline void checkWindowType()
