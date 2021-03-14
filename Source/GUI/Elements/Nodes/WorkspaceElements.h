@@ -26,6 +26,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <initializer_list>
 
 using ax::Widgets::IconType;
 namespace util = ax::NodeEditor::Utilities;
@@ -50,11 +51,21 @@ enum class PinKind
 enum class WorkspaceViewScale
 {
     Full,
-    JustChangeAble
+    SetValues,
+    Label
 };
 
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
+
+/* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
+struct WorkspaceNodeArgs
+{
+    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    std::string headerLabel = "default WorkspaceNode header";
+    std::string nodeLabel = "Node";
+    /* \todo JH it will be nice, if we are able give some default headerBackground here ... */
+};
 
 class WorkspaceNode
 {
@@ -99,7 +110,7 @@ public:
 
 //private:
    	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel", WorkspaceViewScale viewScale = WorkspaceViewScale::Full );
+	WorkspaceNode(ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
 
 
 };

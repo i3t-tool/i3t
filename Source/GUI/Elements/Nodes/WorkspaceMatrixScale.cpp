@@ -1,7 +1,7 @@
 #include "WorkspaceMatrixScale.h"
 
-WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale)
-    : WorkspaceMatrix4x4(headerBackground, headerLabel, Builder::createTransform<Core::Scale>(), viewScale )
+WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, WorkspaceMatrixScaleArgs const& args)
+    : WorkspaceMatrix4x4(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 }
 

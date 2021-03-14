@@ -1,14 +1,19 @@
 #pragma once
 #include "WorkspaceNodeWithCoreData.h"
 
+struct WorkspaceMatrix4x4Args
+{
+    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    std::string headerLabel = "default Matrix4x4 header";
+    std::string nodeLabel = "Free";
+    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();
+};
+
 /*! \class WorkspaceMatrix4x4 virtual class for all Nodes with Matrix4x4 Core data*/
 class WorkspaceMatrix4x4 : public WorkspaceNodeWithCoreData
 {
 public:
-	WorkspaceMatrix4x4(ImTextureID headerBackground,
-                        std::string headerLabel = "default Matrix4x4 header",
-                        Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>(),
-                        WorkspaceViewScale viewScale = WorkspaceViewScale::Full);
+	WorkspaceMatrix4x4( ImTextureID headerBackground, WorkspaceMatrix4x4Args const& args);
 
 	virtual void drawData(util::NodeBuilder& builder);
 

@@ -1,7 +1,7 @@
 #include "WorkspaceVector4.h"
 
-WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase, WorkspaceViewScale viewScale)
-    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel, viewScale)
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args)
+    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)

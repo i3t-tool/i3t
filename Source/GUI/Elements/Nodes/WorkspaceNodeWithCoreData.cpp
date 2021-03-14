@@ -3,11 +3,9 @@
 #include <string>
 #include "spdlog/fmt/fmt.h"
 
-/* see:
- * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913*/
-WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale) /* \todo JH take default label from Const.h*/
-    :   WorkspaceNode(nodebase->getId(), headerBackground, headerLabel, viewScale)
-    ,   m_nodebase(nodebase)
+WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args) /* \todo JH take default label from Const.h*/
+    :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
+    ,   m_nodebase(args.nodebase)
 
 {
 	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();

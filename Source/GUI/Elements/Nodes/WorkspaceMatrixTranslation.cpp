@@ -1,7 +1,7 @@
 #include "WorkspaceMatrixTranslation.h"
 
-WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale)
-    : WorkspaceMatrix4x4(headerBackground, headerLabel, Builder::createTransform<Core::Translation>(), viewScale )
+WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args)
+    : WorkspaceMatrix4x4(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 }
 
@@ -12,8 +12,11 @@ void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
     case WorkspaceViewScale::Full:
         drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
         break;
-    case WorkspaceViewScale::JustChangeAble:
-        drawDataJustChangAble(builder);
+    case WorkspaceViewScale::SetValues:
+        drawDataSetValues(builder);
+        break;
+    case WorkspaceViewScale::Label:
+        drawDataLabel(builder);
         break;
 
     default:
@@ -23,7 +26,7 @@ void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
 
 }
 
-void WorkspaceMatrixTranslation::drawDataJustChangAble(util::NodeBuilder& builder)
+void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
 {
     const glm::mat4& coreData = m_nodebase->getData().getMat4();
 	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
@@ -61,3 +64,9 @@ void WorkspaceMatrixTranslation::drawDataJustChangAble(util::NodeBuilder& builde
 
 }
 
+void WorkspaceMatrixTranslation::drawDataLabel(util::NodeBuilder& builder)
+{
+    builder.Middle();
+    ImGui::Text(this->m_label.c_str());
+    ImGui::Spring(0);
+}
