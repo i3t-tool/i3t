@@ -9,9 +9,10 @@ class ConsoleWindow : public IWindow
 public:
 	I3T_WINDOW(ConsoleWindow)
 
-	ConsoleWindow() = default;
+	ConsoleWindow(bool show);
+	~ConsoleWindow();
 	void render() override;
 
 private:
-  std::ostringstream m_buffer;
+	std::ostringstream m_buffer;
 };

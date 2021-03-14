@@ -4,7 +4,15 @@
 
 #include "Commands/ApplicationCommands.h"
 
-char command[1024];
+
+
+
+char command[1024]; 
+
+ConsoleWindow::ConsoleWindow(bool show) : IWindow(show) {
+}
+ConsoleWindow::~ConsoleWindow() {
+}
 
 void ConsoleWindow::render()
 {
@@ -32,16 +40,6 @@ void ConsoleWindow::render()
     // CE_LOG_INFO("Command: {}", command);
     m_buffer << command << "\n";
 
-		/// MESSAGE FOR DANIEL!
-		/// To catch fired command, use the following anywhere in your code:
-		///
-		/// void functionWhichProcessConsoleCommands(std::string rawCommand) { ... }
-		///
-		/// # Bind function to the command.
-		/// ConsoleCommand::addListener(&functionWhich...);
-		///
-		/// # if you need to bind non static member function, use lambda expr.:
-		/// ConsoleCommand::addListener([this](std::string c) { ... });
 		ConsoleCommand::dispatch(command);
 
     strcpy_s(command, "");

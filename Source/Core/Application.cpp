@@ -22,6 +22,7 @@
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World2/World2.h"
+#include "Scripting/Scripting.h"
 
 Application::Application()
 {
@@ -30,6 +31,8 @@ Application::Application()
 
 	m_ui = new UI();
 	m_modules.push_back(m_ui);
+
+	m_scriptInterpreter=new Scripting();
 }
 
 void Application::init()
@@ -39,6 +42,7 @@ void Application::init()
 	ConsoleCommand::addListener([this](std::string rawCommand) {
 		Log::info("Application got command '{}'.", rawCommand);
 	});
+	ConsoleCommand::addListener([this](std::string c) {m_scriptInterpreter->runCommand(c); });
 }
 
 void Application::initModules()

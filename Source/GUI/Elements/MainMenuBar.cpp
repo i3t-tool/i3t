@@ -3,7 +3,6 @@
 #include "imgui.h"
 
 #include "Scripting/Scripting.h"
-#include "Core/API.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
@@ -103,15 +102,14 @@ void MainMenuBar::showFileMenu()
 
 		if (ImGui::MenuItem("Save"))
 		{
-			/// \todo SaveFileDialog, use Utils/System.h.
-			// Reader::saveScene(FileMode::PROJECT);
+			/// \todo SaveFileDialog, scene name 
 		}
 
 		if (ImGui::MenuItem("Save As"))
 		{
 			std::string result;
 			std::string title="Save I3T script...";
-			std::string root=Config::getAbsolutePath("./");
+			std::string root=Config::getAbsolutePath("./"); 
 			std::vector<std::string> filter; filter.push_back("C source files"); filter.push_back("*.c");
 			bool b= SystemDialogs::SaveSingleFileDialog(result,title,root,filter);
 
@@ -170,6 +168,7 @@ void MainMenuBar::showEditMenu()
 
 void MainMenuBar::showWindowsMenu()
 {
+	
 	if (ImGui::BeginMenu("Windows"))
 	{
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());

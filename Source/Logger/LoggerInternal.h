@@ -13,6 +13,7 @@
 #include <queue>
 #include <stack>
 #include <string>
+#include <sstream>
 
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"

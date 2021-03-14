@@ -604,9 +604,4 @@ extern const char StdioDefs[];
 extern struct LibraryFunction StdioFunctions[];
 void StdioSetupFunc(Picoc *pc);
 
-/* library_I3T.cpp */
-extern struct LibraryFunction PlatformLibrary1[];
-void PlatformLibraryInitI3T(Picoc *pc);
-
-
 #endif /* INTERPRETER_H */

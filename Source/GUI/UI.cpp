@@ -29,7 +29,7 @@ void UI::init()
 	m_dockableWindows.push_back(new TutorialWindow(false));
 	m_dockableWindows.push_back(new ViewportWindow(true, App::get().world(),App::get().world2()));
 	m_dockableWindows.push_back(new WorkspaceWindow(true));
-	m_dockableWindows.push_back(new ConsoleWindow());
+	m_dockableWindows.push_back(new ConsoleWindow(true));
 	m_dockableWindows.push_back(new LogWindow());
 
 	HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
