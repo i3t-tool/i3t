@@ -22,8 +22,8 @@ bool SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 		WorkspaceNodeWithCoreData*  nodebasedata= dynamic_cast<WorkspaceNodeWithCoreData*>(node);
 		Ptr<Core::NodeBase>			nodebase	= nodebasedata->Nodebase;
 		ImVec2						pos			= ne::GetNodePosition(node->Id);
-		Core::Transform::DataMap	data		= nodebase.get()->getDataMap();
-		const Operation*			operation	= nodebase.get()->getOperation();
+		Core::Transform::DataMap	data		= nodebase->getDataMap();
+		const Operation*			operation	= nodebase->getOperation();
 		const char*					keyword		= operation->keyWord.c_str();
 
 		if(strcmp(keyword,"MatrixToMatrix")==0){
@@ -57,13 +57,13 @@ bool SaveWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 		}
 	}
 	for (int i = 0; i < _workspace->size(); i++) {
-		WorkspaceNode* node = _workspace->at(i).get();
-		WorkspaceNodeWithCoreData* nodebasedata = dynamic_cast<WorkspaceNodeWithCoreData*>(node);
+		WorkspaceNode*				node = _workspace->at(i).get();
+		WorkspaceNodeWithCoreData*  nodebasedata = dynamic_cast<WorkspaceNodeWithCoreData*>(node);
 		Ptr<Core::NodeBase>			nodebase = nodebasedata->Nodebase;
 		ImVec2						pos = ne::GetNodePosition(node->Id);
-		Core::Transform::DataMap	data = nodebase.get()->getDataMap();
-		const Operation* operation = nodebase.get()->getOperation();
-		const char* keyword = operation->keyWord.c_str();
+		Core::Transform::DataMap	data = nodebase->getDataMap();
+		const Operation*			operation = nodebase->getOperation();
+		const char* keyword =		operation->keyWord.c_str();
 
 		std::vector<Core::Pin>inputs = nodebase->getInputPins();
 		for(int indexin=0;indexin<inputs.size();indexin++){
@@ -147,7 +147,7 @@ int PicocRunFile(const char* filename){
 	if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocPlatformScanFile(&pc, filename);
-	PicocCleanup(&pc);
+	PicocCleanup(&pc); printf("ASAS %d\n", pc.PicocExitValue);
 	return pc.PicocExitValue;
 	// for (; ParamCount < argc && strcmp(argv[ParamCount], "-") != 0; ParamCount++){PicocPlatformScanFile(&pc,
 	// argv[ParamCount]);}//run multiple files PicocCallMain(&pc, argc - ParamCount, &argv[ParamCount]);	//call main
@@ -162,7 +162,6 @@ int PicocRunSource(const char* source){
 	PicocCleanup(&pc);
 	return pc.PicocExitValue;
 }
-int dd=0;
 void Scripting::runCommand(std::string cmd) {
 	if(PicocPlatformSetExitPoint(&m_picoc)){return;}
 	PicocParse(&m_picoc, "Run command", cmd.c_str(), (int)cmd.size(), TRUE, TRUE, TRUE, TRUE);

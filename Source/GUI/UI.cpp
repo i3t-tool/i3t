@@ -82,14 +82,17 @@ void UI::beginFrame()
 
 	// Scene is rendered in the Viewport window.
 	// TODO -> Do not render scene in the ViewportWindow class.
-	for (auto* element : m_dockableWindows)
-		if (element->isVisible())
-			element->render();
-
+	for (auto* element : m_dockableWindows){
+		if (element->isVisible()){element->render();}
+		//if (InputController::isKeyJustPressed(Keys::f)) { printf("UP %s\n",element->getID()); }
+	}
+	//if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
 	// Render other windows.
-	for (const auto& [id, w] : m_windows)
-		if (w->isVisible())
-			w->render();
+	for (const auto& [id, w] : m_windows){
+		if (w->isVisible()){w->render(); }
+
+;	}
+	
 
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();
