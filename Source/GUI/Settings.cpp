@@ -20,6 +20,6 @@ Keys::Code Settings::Key_redo = Keys::n;
 
 void Settings::resize(float width, float height)
 {
-	InputController::setScreenSize((int)width, (int)height);
+	InputManager::setScreenSize((int)width, (int)height);
 	GUIProjection::setScreenSize(width, height);
 }

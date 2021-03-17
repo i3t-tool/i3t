@@ -180,7 +180,7 @@ if (True)
 
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
 
-    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp)
+    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp picoc)
 
     set_target_properties(gtest PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})

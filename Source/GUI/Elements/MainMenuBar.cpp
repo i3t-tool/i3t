@@ -2,20 +2,22 @@
 
 #include "imgui.h"
 
-#include "Scripting/Scripting.h"
-#include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
 #include "Core/World.h"
 #include "GUI/Elements/Dialogs/AboutDialog.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
-#include "GUI/Elements/Windows/ConsoleWindow.h"
+#include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "Scripting/Scripting.h"
 // #include "RecentFiles.h"
+
+using namespace UI;
 
 MainMenuBar::MainMenuBar()
 {
@@ -47,7 +49,11 @@ void MainMenuBar::showFileMenu()
 {
 	if (ImGui::BeginMenu("File"))
 	{
-		if (ImGui::MenuItem("New"))
+    // printf("aha!\n");
+    // std::cout << "aha!" << std::endl;
+    fprintf(stdout, "aha\n");
+
+    if (ImGui::MenuItem("New"))
 		{
 			// TabSpace::onOpenScene(TabSpace::RESET);
 		}
@@ -66,7 +72,6 @@ void MainMenuBar::showFileMenu()
 			  }
 			}
 			 */
-
 			ImGui::EndMenu();
 		}
 
@@ -182,9 +187,9 @@ void MainMenuBar::showWindowsMenu()
 	{
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<ConsoleWindow>()->getShowPtr());
+		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<Console>()->getShowPtr());
 		ImGui::MenuItem("Log window", nullptr, I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
-		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<ViewportWindow>()->getShowPtr());
+		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
 
 		ImGui::EndMenu();
 	}

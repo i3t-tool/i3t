@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <GUI/UI.h>
+#include <GUI/UIModule.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -48,7 +48,7 @@ public:
 	void finalize();
 
 	static Application& get();
-	UI* getUI();
+	UIModule* getUI();
 
 	/**
 	 * Init OpenGL stuffs before display loop.
@@ -102,7 +102,7 @@ public:
 private:
 	static Application s_instance;
 
-	UI* m_ui;
+	UIModule* m_ui;
 	std::vector<Module*> m_modules;
 
 	/**

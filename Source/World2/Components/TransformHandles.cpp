@@ -1,14 +1,14 @@
-#include <iostream>
-#include <typeinfo>
-#include <math.h>
-#include "glm/gtx/norm.hpp"
 #include "TransformHandles.h"
-#include "Renderer.h"
+#include "Core/Input/InputManager.h"
 #include "../HardcodedMeshes.h"
-#include "../World2.h"
-#include "../Transforms.h"
 #include "../Select.h"
-#include "../../Core/InputController.h"
+#include "../Transforms.h"
+#include "../World2.h"
+#include "Renderer.h"
+#include "glm/gtx/norm.hpp"
+#include <iostream>
+#include <math.h>
+#include <typeinfo>
 
 void printMatrix2(glm::mat4 m){
   printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n",
@@ -155,11 +155,11 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 void TransformHandles::update(){ 
 	//if(Controls::mouseKeysEventTable[GLUT_LEFT_BUTTON]==Controls::EVENT_DOWN){
 	bool transactionBegin=false;
-	if(InputController::isKeyJustPressed(Keys::mouseLeft)){
+	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
 		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->stencil;
-		unsigned char sel =Select::getStencilAt((int)InputController::m_mouseX, (int)(World2::height - InputController::m_mouseY), 3, stencile);
-		unsigned char sele =Select::getStencilAt((int)InputController::m_mouseX, (int)(World2::height - InputController::m_mouseY), 3, -1);
+		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, stencile);
+		unsigned char sele =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
 		this->clicked++;
 		this->activehandle=-1;
 		if(sel==this->stencilx){this->activehandle=this->stencilx;this->axisnum=0;this->axisnum2=-1;}//manipulating handles clicked
@@ -178,9 +178,9 @@ void TransformHandles::update(){
 		if(this->activehandle!=-1){transactionBegin=true;}
 	}
 		
-	if (InputController::isKeyJustUp(Keys::mouseLeft)){
+	if (InputManager::isKeyJustUp(Keys::mouseLeft)){
 		unsigned char stencile=((Renderer*)editedobj->getComponent(Renderer::componentType()))->stencil;
-		unsigned char sel =Select::getStencilAt((int)InputController::m_mouseX, (int)(World2::height - InputController::m_mouseY), 0, -1);
+		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 0, -1);
 		if(sel==stencile){clicked++;}//click inside editedobj
 			
 		if(clicked==2){this->isEdit=true;printf("is edit\n");}
@@ -193,18 +193,18 @@ void TransformHandles::update(){
 	if(!this->isEdit){return;}
 		
 	if(this->activehandle==-1){
-		if(			InputController::isKeyPressed(Keys::l)){this->editspace =TransformHandles::EDIT_LOCAL;}
-		else if (	InputController::isKeyPressed(Keys::f)){this->editspace =TransformHandles::EDIT_FREE;}
+		if(InputManager::isKeyPressed(Keys::l)){this->editspace =TransformHandles::EDIT_LOCAL;}
+		else if (InputManager::isKeyPressed(Keys::f)){this->editspace =TransformHandles::EDIT_FREE;}
 
-		if (		InputController::isKeyPressed(Keys::a)){this->editmode = TransformHandles::EDIT_LOOKAT;}
-		else if (	InputController::isKeyPressed(Keys::r)){this->editmode = TransformHandles::EDIT_ROTATION;}
-		else if (	InputController::isKeyPressed(Keys::s)){this->editmode = TransformHandles::EDIT_SCALE;}
-		else if (	InputController::isKeyPressed(Keys::p)){this->editmode = TransformHandles::EDIT_POSITION;}
+		if (InputManager::isKeyPressed(Keys::a)){this->editmode = TransformHandles::EDIT_LOOKAT;}
+		else if (InputManager::isKeyPressed(Keys::r)){this->editmode = TransformHandles::EDIT_ROTATION;}
+		else if (InputManager::isKeyPressed(Keys::s)){this->editmode = TransformHandles::EDIT_SCALE;}
+		else if (InputManager::isKeyPressed(Keys::p)){this->editmode = TransformHandles::EDIT_POSITION;}
 		
-		if (		InputController::isKeyPressed(Keys::x)){this->editaxis = 0;}
-		else if (	InputController::isKeyPressed(Keys::y)){this->editaxis = 1;}
-		else if (	InputController::isKeyPressed(Keys::z)){this->editaxis = 2;}
-		else if (	InputController::isKeyPressed(Keys::w)){this->editaxis = 3;}
+		if (InputManager::isKeyPressed(Keys::x)){this->editaxis = 0;}
+		else if (InputManager::isKeyPressed(Keys::y)){this->editaxis = 1;}
+		else if (InputManager::isKeyPressed(Keys::z)){this->editaxis = 2;}
+		else if (InputManager::isKeyPressed(Keys::w)){this->editaxis = 3;}
 		this->bkp=editedobj->transformation;
 		this->rotfreebkp=this->editedobj->transformation;
 	}
@@ -290,7 +290,7 @@ void TransformHandles::update(){
 				glm::vec3 py = (glm::vec3)(ortho * axes[(axisnum+2)%3]);
 				glm::vec3 t0 = -World2::mainCamPos;
 				//glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-				glm::vec3 tz = mouseray(glm::vec2(InputController::m_mouseX,World2::height -InputController::m_mouseY));
+				glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World2::height - InputManager::m_mouseY));
 				glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 				glm::vec3 pc = px*coef[1]+py*coef[2];
@@ -317,9 +317,9 @@ void TransformHandles::update(){
 		
 		glm::vec2 drag,olddrag,dragfinal,mouse;
 
-		mouse = glm::vec2(InputController::m_mouseX, World2::height - InputController::m_mouseY);
+		mouse = glm::vec2(InputManager::m_mouseX, World2::height - InputManager::m_mouseY);
 		drag=mov*(mouse-spos1);
-		mouse = glm::vec2(InputController::m_mouseXPrev,World2::height - InputController::m_mouseYPrev);
+		mouse = glm::vec2(InputManager::m_mouseXPrev,World2::height - InputManager::m_mouseYPrev);
 		olddrag=mov*(mouse-spos1);
 		dragfinal=drag-olddrag;
 
@@ -328,7 +328,7 @@ void TransformHandles::update(){
 			
 		float depth=glm::length(World2::mainCamPos+(glm::vec3)this->handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
 		if(this->editmode!=TransformHandles::EDIT_ROTATION){drag3*=depth*0.5f;}
-		if(InputController::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
+		if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 			
 		if(this->editspace==TransformHandles::EDIT_FREE){
 			drag3*=1.2f;

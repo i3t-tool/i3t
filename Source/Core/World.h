@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "InputController.h"
+#include "Input/InputManager.h"
 #include "Rendering/Scene.h"
 
 class Shaper;

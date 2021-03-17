@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
 
 struct Settings final
 {
