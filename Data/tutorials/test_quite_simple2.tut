@@ -1,6 +1,6 @@
 ---
-name: Zkušební tutoriál
-desc: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
+title: Zkušební tutoriál
+description: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
 thumb: test1.png
 scene: empty
 --- 

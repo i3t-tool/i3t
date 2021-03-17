@@ -126,6 +126,7 @@ private:
 
   bool m_showWorkspaceWindow;
   bool m_showTutorialWindow;
+  bool m_showIntroWindow;
   bool m_showConsoleWindow;
   bool m_showZoomWindow;
   bool m_showViewportWindow;

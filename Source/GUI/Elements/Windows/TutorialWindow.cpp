@@ -1,5 +1,5 @@
 #include "TutorialWindow.h"
-
+#include "Logger/Logger.h"
 #include <utility>
 
 #include <imgui.h>
@@ -14,14 +14,20 @@
 #include "Core/Application.h"
 #include "Tutorial/Tutorial.h"
 #include "Tutorial/TutorialLoader.h"
+#include "Utils/TextureLoader.h"
+
+#include <filesystem>
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
 //---
 
 const int NEXT_BUTTON_SIZE_X = 150;
 const int SIMPLE_SPACE = 10;
+const int SMALL_SPACE = 5;
 const int CONTROLS_SIZE_Y = 100;
 
+// TEMPORARY TODO
+static std::string current_dir = "";
 
 // TUTORIAL WINDOW FUNCTIONS
 //---
@@ -32,13 +38,19 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   m_current_step = 0;
 
   // TEMPORARY todo
-  setTutorial(Config::getAbsolutePath("/Data/tutorials/test_v1.tut"));
+  TutorialHeader dummy_header;
+  setTutorial(dummy_header);
 }
 
-void TutorialWindow::setTutorial(std::string filename)
+void TutorialWindow::setTutorial(TutorialHeader header)
 {
-  m_tutorial = TutorialLoader::loadFile(std::move(filename)); // btw if there was a previous unique pointer to another Tutorial, it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
+  m_tutorial = TutorialLoader::loadTutorial(std::move(header)); // btw if there was a previous unique pointer to another Tutorial, it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
   setStep(0);
+
+  std::cout << m_tutorial->m_header.m_filename;
+  std::filesystem::path p(m_tutorial->m_header.m_filename);
+  current_dir = p.parent_path().string() + "/";
+  std::cout << current_dir;
 }
 
 bool TutorialWindow::setStep(int step_number)
@@ -68,12 +80,12 @@ void TutorialWindow::render()
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(232, 232, 232, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(240, 240, 240, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(245, 245, 245, 255));
-  ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 150, 250, 255));
-  ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(66, 150, 250, 205));
-  ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
+  //ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 150, 250, 255));
+  //ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(66, 150, 250, 205));
+  //ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
   //ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(245, 245, 245, 255));
   // BEGIN WINDOW
-  const std::string window_name = "Tutorial - " + m_tutorial->m_title + "###Tutorial window";
+  const std::string window_name = "Tutorial - " + m_tutorial->m_header.m_title + "###Tutorial window";
   ImGui::Begin(window_name.c_str(), &Application::get().m_showTutorialWindow);
 
   // CREATE IMGUI CONTENT
@@ -83,7 +95,7 @@ void TutorialWindow::render()
 
   // POP STYLE
   ImGui::PopStyleVar(3);
-  ImGui::PopStyleColor(9);
+  ImGui::PopStyleColor(6);
   // END WINDOW
   ImGui::End();
 }
@@ -99,11 +111,40 @@ void TutorialWindow::renderTutorialHeader()
     title = "Empty tutorial";
   }
 
-  ImGui::PushFont(App::get().getFont(FONT_TITLE));
-  ImGui::TextWrapped(title.c_str());
-  ImGui::PopFont();
-  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
+  if (title != "undefined") {
+    ImGui::PushFont(App::get().getFont(FONT_TITLE));
+    ImGui::TextWrapped(title.c_str());
+    ImGui::PopFont();
+    ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
+  }
+  else {
+    ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
+  }
   //ImGui::EndChild();
+}
+
+
+// TEMPORARY TODO
+inline ImGui::MarkdownImageData ImageCallback( ImGui::MarkdownLinkCallbackData data_ )
+{
+  // In your application you would load an image based on data_ input. Here we just use the imgui font texture.
+  std::string image_path = current_dir + data_.link;
+  image_path.pop_back(); // BUG FIX where there's an ")" in the data_.link member
+  //std::cout << image_path.c_str() << std::endl;
+  int tex_id = TextureLoader::loadTexture(data_.text, image_path);
+  
+  ImGui::MarkdownImageData imageData{ true, false, (ImTextureID)tex_id, ImVec2( 400.0f, 200.0f ) };
+
+  // For image resize when available size.x > image width, add
+  ImVec2 const contentSize = ImGui::GetContentRegionAvail();
+  if( imageData.size.x > contentSize.x )
+  {
+    float const ratio = imageData.size.y/imageData.size.x;
+    imageData.size.x = contentSize.x;
+    imageData.size.y = contentSize.x*ratio;
+  }
+
+  return imageData;
 }
 
 void TutorialWindow::renderTutorialContent()
@@ -126,7 +167,7 @@ void TutorialWindow::renderTutorialContent()
   //// bold heading H1
   //float fontSizeH1 = fontSize_ * 1.1f;
   //H1 = io.Fonts->AddFontFromFileTTF( "myfont-bold.ttf", fontSizeH1 );
-  const ImGui::MarkdownConfig mdConfig{nullptr, nullptr, nullptr, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
+  const ImGui::MarkdownConfig mdConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
 
   if (m_tutorial)
   {
@@ -150,16 +191,23 @@ void TutorialWindow::renderTutorialContent()
 
           ImGui::PopStyleColor();
           ImGui::PopFont();
-          ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+          ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
         }
         else if (const TWHint* const tw_hint = dynamic_cast<const TWHint*>(widget); tw_hint != nullptr) {
+          //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
           ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-          if (ImGui::CollapsingHeader("Napoveda")) {
+          std::string hint_header = u8"N�pov�da##" + std::to_string(m_current_step);
+          if (ImGui::CollapsingHeader(hint_header.c_str())) {
+            ImGui::PopStyleColor();
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
-            ImGui::TextWrapped(tw_hint->m_hint.c_str());
+            //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
+            //ImGui::TextWrapped(tw_hint->m_hint.c_str());
+            Markdown( tw_hint->m_hint.c_str(), tw_hint->m_hint.length(), mdConfig);
             ImGui::PopStyleColor();
           }
-          ImGui::PopStyleColor();
+          else {
+            ImGui::PopStyleColor();
+          }
         }
         else {
           std::cout << "wrong widget type" << std::endl;
@@ -168,99 +216,38 @@ void TutorialWindow::renderTutorialContent()
       }
     }
 
-    //    const std::string markdownText = u8R"(
-    //# H1 Header: Text and Links
-    //You can add [links like this one to enkisoftware](https://www.enkisoftware.com/) and lines will wrap well.
-    //## H2 Header: indented text.
-    //  This text has an indent (two leading spaces).
-    //  This one has two.
-    //### H3 Header: Lists
-    //  * Unordered lists
-    //  * Lists can be indented with two extra spaces.
-    //  * Lists can have [links like this one to Avoyd](https://www.avoyd.com/)
-    //)";
 
-    //ImGui::Text(u8"かきくけこéíšířáěéšíčřá");
-    //for (const TWidget& widget : m_tutorial->m_steps[m_current_step].m_content)
-    //{
-    //  if (widget.m_type == "text")
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
-    //    ImGui::TextWrapped(("Text: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //  }
-    //  else if (widget.m_type == "h1")
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TITLE));
-    //    ImGui::TextWrapped(("H1: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //  }
-    //  else if (widget.m_type == "h2")
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TITLE)); // todo
-    //    ImGui::TextWrapped(("H2: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //  }
-    //  else if (widget.m_type == "img")
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
-    //    ImGui::TextWrapped(("Img: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //    ImGui::Image((void*)(intptr_t)getImageID(widget.m_string), ImVec2(256, 256));
-    //  }
-    //  else if (widget.m_type == "task")
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
-    //    ImGui::TextWrapped(("Task: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //  }
-    //  else if (widget.m_type == "hint")
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
-    //    ImGui::TextWrapped(("Hint: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //  }
-    //  else
-    //  {
-    //    ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
-    //    ImGui::TextWrapped(("Unknown type: " + widget.m_string).c_str());
-    //    ImGui::PopFont();
-    //  }
-    //  ImGui::Spacing();
-    //}
   }
   else
   {
     // default content
     // todo eg "No tutorial loaded. You can close the window or choose one here:"
-    
-    // ImGui::PushFont(App::get().getFont(FONT_TITLE));
-    // ImGui::Text("Model transformations");
-    // ImGui::PopFont();
-    // ImGui::Spacing(); //TODO change my spacing into the default imgui one
-    //
-    // ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
-    // ImGui::PushTextWrapPos(0.0f);
-    // ImGui::Text("The scene demonstrates an ");
-    // ImGui::SameLine(0.0);
-    // ImGui::TextColored(ImVec4(1.0, 0.0, 0.0, 1.0), "application");
-    // ImGui::SameLine(0.0);
-    // ImGui::Text(" of the model transformation that is commonly used to define "
-    //             "the position, the orientation, and the scale of a geometric object in the worlds coordinates.");
-    // ImGui::PopTextWrapPos();
-    // ImGui::PopFont();
-    //
-    // ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
-    // ImGui::Text("Assignment 3 of 12:");
-    // ImGui::PopFont();
-    //
-    // ImGui::PushFont(App::get().getFont(FONT_TUTORIAL_TEXT));
-    // ImGui::TextWrapped(
-    //     "Try to change the parameters of the given transformations and explain the behaviour of each of them");
-    // ImGui::PopFont();
+    // also change spacing to default imgui one
+
   }
   ImGui::EndChild();
 }
+
+void TutorialWindow::renderTextWidget(TWText tw_text)
+{
+}
+
+void TutorialWindow::renderImageWidget(TWImage tw_image)
+{
+}
+
+void TutorialWindow::renderAnimatedImageWidget(TWAnimatedImage tw_animated_image)
+{
+}
+
+void TutorialWindow::renderTaskWidget(TWTask tw_task)
+{
+}
+
+void TutorialWindow::renderHintWidget(TWHint tw_hint)
+{
+}
+
 
 void TutorialWindow::renderTutorialControls()
 {
@@ -280,16 +267,16 @@ void TutorialWindow::renderTutorialControls()
   {
     if (m_current_step != 0) {
       m_current_step--;
-      std::cout << m_current_step << std::endl;
+      //std::cout << m_current_step << std::endl;
     }
   }
   
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
-  if (ImGui::Button("Next", ImVec2(-1, -1)))
+  if (ImGui::Button("Next", ImVec2(-1, 0)))
   {
     if (m_current_step != m_tutorial->getStepCount() - 1) {
       m_current_step++;
-      std::cout << m_current_step << std::endl;
+      //std::cout << m_current_step << std::endl;
     }
   }
 

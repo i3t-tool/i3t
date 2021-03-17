@@ -181,6 +181,8 @@ void Config::loadFromFile(const std::string filename)
      */
     if (getWord(is, input, "LOAD_SCENE", word))
       LOAD_SCENE = word;
+    if (getWord(is, input, "TUTORIALS_FOLDER", word))
+      TUTORIALS_FOLDER = word;
 
     is >> input;
   }
@@ -249,3 +251,4 @@ float Config::CAM_LERP_DISTTOSTEP_KOEF = 0.05f;
 
 std::string Config::CONTENT_FILE = "Data/content.cfg";
 std::string Config::LOAD_SCENE = "NONE";
+std::string Config::TUTORIALS_FOLDER = "/Data/tutorials";

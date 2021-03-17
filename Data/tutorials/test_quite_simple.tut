@@ -1,6 +1,6 @@
 ---
-name: Můj první objekt
-desc: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
+title: Můj první objekt
+description: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
 thumb: test1.png
 --- 
 # Okna aplikace

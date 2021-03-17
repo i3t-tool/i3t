@@ -4,7 +4,8 @@
 class TutorialLoader
 {
 public:
-  static std::unique_ptr<Tutorial> loadFile(std::string filename);
+  static TutorialHeader loadTutorialHeader(std::string filename);
+  static std::unique_ptr<Tutorial> loadTutorial(TutorialHeader header);
 private:
   TutorialLoader() = default;
   static void loadImages();

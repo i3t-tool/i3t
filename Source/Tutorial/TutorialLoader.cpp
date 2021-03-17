@@ -1,4 +1,5 @@
 ﻿#include "TutorialLoader.h"
+#include "Tutorial/Tutorial.h"
 #include "Logger/Logger.h"
 #include <iostream>
 #include <fstream>
@@ -6,21 +7,21 @@
 #include <yaml-cpp/yaml.h>
 #include <imgui.h>
 #include <stdint.h>
+#include "pgr.h"
 
-std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
+TutorialHeader TutorialLoader::loadTutorialHeader(std::string filename)
 {
-
-
+  
   // CREATE TUTORIAL
-  std::unique_ptr<Tutorial> tutorial(new Tutorial()); // we create our tutorial object on heap
+  TutorialHeader tutorial_header; // we create our tutorial object on heap
   // filename
-  tutorial->m_filename = filename;
+  tutorial_header.m_filename = filename;
 
   // CHECK
   std::ifstream tutorial_stream(filename);
   if (!tutorial_stream.good()) {
     LOG_ERROR("Tutorial file '" + filename + "' was not found")
-    return tutorial; // return a dummy tutorial
+    return tutorial_header; // return a dummy tutorial
   }
 
   // -- PARSE GENERAL INFO - YAML --
@@ -29,8 +30,8 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
   // title
   if (tutorial_yaml["title"])
   {
-    tutorial->m_title = tutorial_yaml["title"].as<std::string>();
-    LOG_DEBUG(tutorial->m_title);
+    tutorial_header.m_title = tutorial_yaml["title"].as<std::string>();
+    LOG_DEBUG(tutorial_header.m_title);
   }
   else
   {
@@ -39,12 +40,25 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
   // description
   if (tutorial_yaml["description"])
   {
-    tutorial->m_description = tutorial_yaml["description"].as<std::string>();
-    LOG_DEBUG(tutorial->m_description);
+    tutorial_header.m_description = tutorial_yaml["description"].as<std::string>();
+    LOG_DEBUG(tutorial_header.m_description);
   }
   else
   {
     LOG_ERROR("Tutorial description not specified");
+  }
+  return tutorial_header;
+}
+
+std::unique_ptr<Tutorial> TutorialLoader::loadTutorial(TutorialHeader header)
+{
+  // CREATE TUTORIAL
+  std::unique_ptr<Tutorial> tutorial(new Tutorial(header)); // we create our tutorial object on heap
+  // CHECK
+  std::ifstream tutorial_stream(header.m_filename);
+  if (!tutorial_stream.good()) {
+    LOG_ERROR("Tutorial file '" + header.m_filename + "' was not found")
+    return tutorial; // return a dummy tutorial
   }
 
   // -- PARSE STEPS - CUSTOM + IMGUI MARKDOWN --
@@ -56,9 +70,9 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
     std::getline(tutorial_stream, line);
     if (!tutorial_stream.good()) {
       if (tutorial_stream.eof()) {
-        LOG_ERROR("Tutorial file '" + filename + "' missing 2 '---' markers at the beginning of file")
+        LOG_ERROR("Tutorial file '" + header.m_filename + "' missing 2 '---' markers at the beginning of file")
       } else {
-        LOG_ERROR("Tutorial file '" + filename + "' I/O error")
+        LOG_ERROR("Tutorial file '" + header.m_filename + "' I/O error")
       }
       return tutorial; // return a dummy tutorial
     }
@@ -86,7 +100,12 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
       line_iss >> std::ws;  // skip spaces
       std::string step_title;
       std::getline(line_iss, step_title);  // get rest of the line
-      tutorial->m_steps.emplace_back(TStep(step_title));
+      if (step_title.empty()) {
+        tutorial->m_steps.emplace_back(TStep());
+      }
+      else {
+        tutorial->m_steps.emplace_back(TStep(step_title));
+      }
     }
     // empty line
     else if (first_text_block.empty()) {
@@ -99,7 +118,7 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
     else {
       // check if not before first step
       if (current_step == -1) {
-        LOG_ERROR("Tutorial file '" + filename + "' has characters before first step")
+        LOG_ERROR("Tutorial file '" + header.m_filename + "' has characters before first step")
       }
       else {
         if (was_spacing && !tutorial->m_steps[current_step].m_content.empty()) {
@@ -113,7 +132,7 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
           line_iss >> std::ws;  // skip spaces
           std::string task;
           std::getline(line_iss, task);  // get rest of the line
-          tutorial->m_steps[current_step].m_content.push_back(std::make_unique<TWTask>("> " + task));
+          tutorial->m_steps[current_step].m_content.push_back(std::make_unique<TWTask>(task));
         }
         // hint line
         else if (first_text_block == "?")
@@ -135,7 +154,7 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
 
   // CHECK if parsing ended because of error
   if (!tutorial_stream.eof()) { 
-    LOG_ERROR("Tutorial file '" + filename + "' I/O error");
+    LOG_ERROR("Tutorial file '" + header.m_filename + "' I/O error");
   }
 
   /*
@@ -164,11 +183,15 @@ std::unique_ptr<Tutorial> TutorialLoader::loadFile(std::string filename)
 void TutorialLoader::loadImages()
 {
   // todo for cyklus
+
 }
 
 unsigned int TutorialLoader::loadImageOpenGL(std::string filename)
 {
   // todo opengl image loading, zvazit co pouzit za knihovnu
+
+  // return pgr::createTexture(filename);
+
   return 0;
 }
 

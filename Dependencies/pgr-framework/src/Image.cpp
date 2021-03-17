@@ -52,7 +52,7 @@ bool loadTexImage2D(const std::string & fileName, GLenum target) {
    */
   bool result = false;
 
-  stbi_set_flip_vertically_on_load(true);
+  stbi_set_flip_vertically_on_load(false);
 
   int width, height, Bpp;
   unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &Bpp, STBI_rgb_alpha);

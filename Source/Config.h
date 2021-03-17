@@ -67,6 +67,7 @@ struct Config
   ///< parameters + textures),  geometries (models), and objects (combines names, geometries and textures to groups of
   ///< named objects))
   static std::string LOAD_SCENE; ///< The load scene
+  static std::string TUTORIALS_FOLDER;
 
   //@{
 

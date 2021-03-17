@@ -1,11 +1,11 @@
 ---
-name: Zkušební tutoriál
-desc: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
+title: Zkušební tutoriál 1
+description: V tomto tutoriálu se naučíš ovládat aplikaci a vytvořit jednoduchou scénu.
 thumb: test1.png
 scene: empty
 --- 
 
-# Nadpis stránky tutoriálu
+# Nadpis stránky tutoriálu haha
 
 Odstavec textu s vykladem latky, kde jsou **zvyraznene** latka. Zaroven je mozne pouzivat [nazev odkazu](https://internetovastranka.com).
 Takto oddeleneny text bude pouze na novem radku, bez odstavcove mezery.

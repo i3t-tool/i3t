@@ -16,6 +16,7 @@
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "GUI/Style.h"
 #include "GlfwWindow.h"
+#include "GUI/Elements/Windows/IntroWindow.h"
 #include "Rendering/ShaderProvider.h"
 #include "Rendering/Shaper.h"
 #include "Utils/Color.h"
@@ -32,6 +33,7 @@ Application::Application()
   /// \todo How to get which window was open previously?
   m_showWorkspaceWindow = true;
   m_showTutorialWindow = true;
+  m_showIntroWindow = true;
   m_showConsoleWindow = false;
   m_showZoomWindow = false;
   m_showViewportWindow = true;
@@ -54,7 +56,9 @@ void Application::initImGui()
 {
   // Create GUI Elements.
   m_menu = new MainMenuBar();
-  m_dockableWindows.push_back(new TutorialWindow(false));
+  TutorialWindow* tutorial_window = new TutorialWindow(false);
+  m_dockableWindows.push_back(tutorial_window);
+  m_dockableWindows.push_back(new IntroWindow(true, tutorial_window));
   m_dockableWindows.push_back(new ViewportWindow(true, m_world));
   m_dockableWindows.push_back(new WorkspaceWindow(true));
 
@@ -89,18 +93,25 @@ void Application::initImGui()
   auto* path = new std::string(Config::getAbsolutePath("/Data/imgui.ini"));
   io.IniFilename = path->c_str();
 
+  // build range for Czech, see https://github.com/ocornut/imgui/blob/master/docs/FONTS.md
+  ImVector<ImWchar> ranges;
+  ImFontGlyphRangesBuilder builder;
+  builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+  builder.AddText(u8"ÁáÈèÏïÉéÌìÍíÒòÓóØøŠšÙùÚúÝýŽž„“");
+  builder.BuildRanges(&ranges);
+
   /// \todo Better fonts loading.
   m_fonts = {
-      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Regular.ttf").c_str(),
-                                   14.0f * fontScale),
-      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale),
-      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Regular.ttf").c_str(),
-                                   12.0f * fontScale),
-      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale),
-      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Bold.ttf").c_str(), 18.0f * fontScale),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale, nullptr, ranges.Data),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale, nullptr, ranges.Data),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale, nullptr, ranges.Data),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale, nullptr, ranges.Data),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("/Data/fonts/Roboto-Bold.ttf").c_str(), 16.0f * fontScale, nullptr, ranges.Data),
   };
 
   io.FontDefault = m_fonts[FONT_MENU_LARGE];
+
+  io.Fonts->Build(); // because of czech building
 
   setupImGuiStyle();
 
