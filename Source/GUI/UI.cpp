@@ -29,7 +29,7 @@ void UI::init()
 	m_dockableWindows.push_back(new TutorialWindow(false));
 	m_dockableWindows.push_back(new ViewportWindow(true, App::get().world(),App::get().world2()));
 	m_dockableWindows.push_back(new WorkspaceWindow(true));
-	m_dockableWindows.push_back(new ConsoleWindow());
+	m_dockableWindows.push_back(new ConsoleWindow(true));
 	m_dockableWindows.push_back(new LogWindow());
 
 	HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
@@ -82,14 +82,17 @@ void UI::beginFrame()
 
 	// Scene is rendered in the Viewport window.
 	// TODO -> Do not render scene in the ViewportWindow class.
-	for (auto* element : m_dockableWindows)
-		if (element->isVisible())
-			element->render();
-
+	for (auto* element : m_dockableWindows){
+		if (element->isVisible()){element->render();}
+		//if (InputController::isKeyJustPressed(Keys::f)) { printf("UP %s\n",element->getID()); }
+	}
+	//if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
 	// Render other windows.
-	for (const auto& [id, w] : m_windows)
-		if (w->isVisible())
-			w->render();
+	for (const auto& [id, w] : m_windows){
+		if (w->isVisible()){w->render(); }
+
+;	}
+	
 
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();

@@ -27,6 +27,7 @@ class GlfwWindow;
 class MainMenuBar;
 class World;
 class World2;
+class Scripting;
 
 /**
  * Application class.
@@ -114,7 +115,7 @@ private:
 
 	World* m_world; ///< all GUI and logic objects
 	World2*m_world2;
-
+	Scripting*m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	GlfwWindow* m_window;
 

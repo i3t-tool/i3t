@@ -1,15 +1,11 @@
-#include "../picoc.h"
+#include "Dependencies/picoc/picoc.h"
+#include "Core/API.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "libraryI3T.h"
-#include "GUI/Elements/Nodes/WorkspaceElements.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "Scripting/Scripting.h"
 #include <stdio.h>
 
 WorkspaceLayout workspaceLayout;
-const Core::Transform::DataMap types[]= {Core::Transform::g_Free,    Core::Transform::g_Scale,   Core::Transform::g_UniformScale,
-                                         Core::Transform::g_EulerX,  Core::Transform::g_EulerY,  Core::Transform::g_EulerZ,          Core::Transform::g_Translate};
-struct Mat4types{
-    const int free=0,scale=1,uniscale=2,rotatex=3,rotatey=4,rotatez=5,translate=6;
-}mat4types;
 
 WorkspaceLayout*getWorkspaceLayout(){return &workspaceLayout;}
 void clearWorkspaceLayout(){
@@ -26,8 +22,8 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
 
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < workspaceLayout.nodeData.size()) { mat = workspaceLayout.nodeData[dataindex]; }
-    Core::Transform::DataMap map=Core::Transform::g_Free;
-    if (type > -1 && type < 7) { map = types[type]; }
+    int map=workspaceLayout.mat4Types.free;
+    if (type > -1 && type < 7) { map = type; }
 
     NodeMat4 nm = NodeMat4(map,mat, x, y);
     workspaceLayout.mat4Nodes.push_back(nm);
@@ -80,6 +76,22 @@ void dataScalar(struct ParseState* Parser, struct Value* ReturnValue, struct Val
     workspaceLayout.nodeData.push_back(m);
     ReturnValue->Val->Integer = (int)workspaceLayout.nodeData.size() - 1;
 }
+void loadW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    std::string filename= Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    bool status=false;
+    if (ww != NULL) {ww->WorkspaceNodes.clear(); status=LoadWorkspace(filename.c_str(), &ww->WorkspaceNodes); }
+    ReturnValue->Val->Integer=status;
+}
+void saveW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
+    WorkspaceWindow * ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    bool status=false;
+    if (ww != NULL) {status=SaveWorkspace(filename.c_str(), &ww->WorkspaceNodes); }
+    ReturnValue->Val->Integer = status;
+}
+void runScript(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+}
 /* list of all library functions and their prototypes */
 struct LibraryFunction PlatformLibrary1[] =
 {
@@ -90,6 +102,9 @@ struct LibraryFunction PlatformLibrary1[] =
 	{ dataVec4,     "int datavec4(float,float,float,float);" },
 	{ dataVec3,     "int datavec3(float,float,float);" },
 	{ dataScalar,   "int datascalar(float);" },
+	{ loadW,        "bool load(char*);" },
+	{ saveW,        "bool save(char*);" },
+	{ runScript,    "bool run(char*);" },
     { NULL,         NULL }
 };
 
@@ -101,14 +116,14 @@ void PlatformLibraryInitI3T(Picoc *pc)
 	//TypeParse(&Parser, &ReturnType, &Identifier, NULL);
 	//printf("AAAAAAAA");
     //LibraryAdd(&GlobalTable, "platform library", &PlatformLibrary1);
-    IncludeRegister(pc, "I3T.h", NULL, &PlatformLibrary1[0], defs);//ADD_CUSTOM
+    IncludeRegister(pc, "I3T.h", NULL, PlatformLibrary1, defs);//ADD_CUSTOM
     
-    VariableDefinePlatformVar(pc, NULL, "free",     &pc->IntType, (union AnyValue *)&mat4types.free,        FALSE);
-    VariableDefinePlatformVar(pc, NULL, "scale",    &pc->IntType, (union AnyValue *)&mat4types.scale,       FALSE);
-    VariableDefinePlatformVar(pc, NULL, "uniscale", &pc->IntType, (union AnyValue *)&mat4types.uniscale,    FALSE);
-    VariableDefinePlatformVar(pc, NULL, "rotatex",  &pc->IntType, (union AnyValue *)&mat4types.rotatex,     FALSE);
-    VariableDefinePlatformVar(pc, NULL, "rotatey",  &pc->IntType, (union AnyValue *)&mat4types.rotatey,     FALSE);
-    VariableDefinePlatformVar(pc, NULL, "rotatez",  &pc->IntType, (union AnyValue *)&mat4types.rotatez,     FALSE);
-    VariableDefinePlatformVar(pc, NULL, "translate",&pc->IntType, (union AnyValue *)&mat4types.translate,   FALSE);
+    VariableDefinePlatformVar(pc, NULL, "free",     &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.free,        FALSE);
+    VariableDefinePlatformVar(pc, NULL, "scale",    &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.scale,       FALSE);
+    VariableDefinePlatformVar(pc, NULL, "uniscale", &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.uniscale,    FALSE);
+    VariableDefinePlatformVar(pc, NULL, "rotatex",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatex,     FALSE);
+    VariableDefinePlatformVar(pc, NULL, "rotatey",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatey,     FALSE);
+    VariableDefinePlatformVar(pc, NULL, "rotatez",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatez,     FALSE);
+    VariableDefinePlatformVar(pc, NULL, "translate",&pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.translate,   FALSE);
 }
 

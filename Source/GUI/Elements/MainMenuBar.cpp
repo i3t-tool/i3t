@@ -3,7 +3,6 @@
 #include "imgui.h"
 
 #include "Scripting/Scripting.h"
-#include "Core/API.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
@@ -80,11 +79,14 @@ void MainMenuBar::showFileMenu()
 			bool b=SystemDialogs::OpenSingleFileDialog(result,title,root,filter);
 
 			WorkspaceWindow*ww= (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
-			if(ww!=NULL){
-				ww->WorkspaceNodes.clear();
-				LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
+			if (!result.empty()) {
+				if(ww!=NULL){
+					ww->WorkspaceNodes.clear();
+					LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
+				}
+				else { fprintf(stderr, "Open failed:WorkspaceWindow not found\n"); }
 			}
-			else {fprintf(stderr, "Open failed:WorkspaceWindow not found\n");}
+			
 		}
 
 		if (ImGui::MenuItem("Append"))
@@ -95,29 +97,34 @@ void MainMenuBar::showFileMenu()
 			std::vector<std::string> filter; filter.push_back("C source files"); filter.push_back("*.c");
 			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 
-			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
-			if (ww != NULL) {LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);}
-			else {fprintf(stderr, "Append failed:WorkspaceWindow not found\n");}
+			WorkspaceWindow*ww= (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+			if (!result.empty()) {
+				if(ww!=NULL){
+					LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
+				}
+				else { fprintf(stderr, "Append failed:WorkspaceWindow not found\n"); }
+			}
 		}
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Save"))
 		{
-			/// \todo SaveFileDialog, use Utils/System.h.
-			// Reader::saveScene(FileMode::PROJECT);
+			/// \todo SaveFileDialog, scene name 
 		}
 
 		if (ImGui::MenuItem("Save As"))
 		{
 			std::string result;
 			std::string title="Save I3T script...";
-			std::string root=Config::getAbsolutePath("./");
+			std::string root=Config::getAbsolutePath("./"); 
 			std::vector<std::string> filter; filter.push_back("C source files"); filter.push_back("*.c");
 			bool b= SystemDialogs::SaveSingleFileDialog(result,title,root,filter);
 
 			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
-			if (ww != NULL) {SaveWorkspace(result.c_str(), &ww->WorkspaceNodes);}
-			else {fprintf(stderr, "Save failed:WorkspaceWindow not found\n");}
+			if (!result.empty()) {
+				if (ww != NULL) {SaveWorkspace(result.c_str(), &ww->WorkspaceNodes);}
+				else {fprintf(stderr, "Save failed:WorkspaceWindow not found\n");}
+			}
 		}
 		ImGui::Separator();
 
@@ -170,6 +177,7 @@ void MainMenuBar::showEditMenu()
 
 void MainMenuBar::showWindowsMenu()
 {
+	
 	if (ImGui::BeginMenu("Windows"))
 	{
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
