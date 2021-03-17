@@ -1,6 +1,6 @@
 #include "Transforms.h"
+#include "Core/Input/InputManager.h"
 #include "World2.h"
-#include "Core/InputController.h"
 #include "glm/gtx/norm.hpp"
 
 glm::vec2 world2screen(glm::vec3 pos){
@@ -99,7 +99,7 @@ glm::mat4 getFullTransform(GameObject* obj){
 }
 glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
 	glm::vec3 t0 = -World2::mainCamPos;
-	glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
+	glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta));
 	glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 	return t0 + tz * coef[0];

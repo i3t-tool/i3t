@@ -9,11 +9,14 @@
  */
 #pragma once
 
+#include <vector>
 #include <map>
 
-#include <glm/vec2.hpp>
+#include "glm/vec2.hpp"
 
 #include "GUI/Elements/IWindow.h"
+#include "InputController.h"
+#include "KeyCodes.h"
 
 struct GLFWwindow;
 
@@ -41,93 +44,6 @@ struct MouseButtonState final
 };
 //===----------------------------------------------------------------------===//
 
-/** Status of the keyboard keys and also mouse keys. */
-class Keys final
-{
-public:
-	/** Codes representing keys on the keyboard and mouse (letters, numbers, functional keys, arrows, ... )
-	  \todo Add handling of Ctrl-C, Ctrl-V, ...
-	  */
-	enum Code
-	{
-		a = 0,
-		b,
-		c,
-		d,
-		e,
-		f,
-		g,
-		h,
-		i,
-		j,
-		k,
-		l,
-		m,
-		n,
-		o,
-		p,
-		q,
-		r,
-		s,
-		t,
-		u,
-		v,
-		w,
-		x,
-		y,
-		z,
-		n1,
-		n2,
-		n3,
-		n4,
-		n5,
-		n6,
-		n7,
-		n8,
-		n9,
-		n0,
-		altr,
-		altl,
-		ctrll,
-		ctrlr,
-		shiftl,
-		shiftr,
-		left,
-		right,
-		up,
-		down,
-		f1,
-		f2,
-		f3,
-		f4,
-		f5,
-		f6,
-		f7,
-		f8,
-		f9,
-		f10,
-		f11,
-		f12,
-		home,
-		end,
-		insert,
-		del,
-		pageUp,
-		pageDown,
-		esc,
-		mouseLeft,
-		mouseRight,
-		mouseMiddle,
-		mouseScrlUp,
-		mouseScrlDown
-	};
-
-	static const char* getKeyString(int enumVal) { return keyStrings[enumVal]; }
-
-	static const char* keyStrings[];
-};
-//===----------------------------------------------------------------------===//
-
 /**
  * \brief Class handling all GLUT interaction events (mouse and keyboard) and starting the label editor.
  *
@@ -135,7 +51,7 @@ public:
  * interaction. It also updates the stored statuses of the keys from JUST pressed/released to pressed/release.
  * The update() is called regularly from the end of main.cpp: logicUpdate()
  */
-class InputController final
+class InputManager final
 {
 public:
 	enum KeyState
@@ -159,7 +75,18 @@ public:
 	static float m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
 	static float m_mouseXDelta, m_mouseYDelta;
 
+	static std::vector<InputController*> m_inputControllers;
+	static class IWindow* m_hoveredWindow;
+
 public:
+	static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
+
+	/// Hovered window must be set from ImGui Context.
+	static void setHoveredWindow(IWindow* window)
+	{
+		m_hoveredWindow = window;
+	}
+
 	//@{
 	/** \name Handling of the keyboard keys */
 
@@ -227,7 +154,7 @@ public:
 
 	//@{
 	/** \name Key callbacks */
-private:
+public:
 	/**
 	 * \brief Helper function for handling pressed keys.
 	 * \param	keyPressed	The key pressed.

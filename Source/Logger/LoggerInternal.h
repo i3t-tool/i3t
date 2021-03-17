@@ -22,7 +22,7 @@
 #include "Config.h"
 
 /// \todo Logger should not import InputController!
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
 
 #ifdef _DEBUG
 #define LOG_DEBUG(...) Logger::getInstance().getConsoleLogger()->trace(__VA_ARGS__);

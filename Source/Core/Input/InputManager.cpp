@@ -1,4 +1,4 @@
-#include "InputController.h"
+#include "InputManager.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -13,7 +13,7 @@ constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys
 
 ImGuiConfigFlags g_mousedFlags;
 
-void InputController::processViewportEvents()
+void InputManager::processViewportEvents()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -78,12 +78,13 @@ void InputController::processViewportEvents()
 	}
 }
 
-bool InputController::isActionZoomToAll()
+bool InputManager::isActionZoomToAll()
 {
 	return isKeyPressed(Keys::ctrll) && isKeyJustPressed(Keys::a);
 }
 
-void InputController::beginCameraControl()
+void InputManager::
+		beginCameraControl()
 {
 	// Disable system cursor. The cursor will be hidden and at the endCameraControl the cursor will
 	// be at the same position.
@@ -97,7 +98,7 @@ void InputController::beginCameraControl()
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
 }
 
-void InputController::endCameraControl()
+void InputManager::endCameraControl()
 {
 	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
@@ -107,14 +108,14 @@ void InputController::endCameraControl()
 	io.ConfigFlags = g_mousedFlags;
 }
 
-void InputController::preUpdate()
+void InputManager::preUpdate()
 {
 	m_mouseButtonState.left = isKeyPressed(Keys::mouseLeft);
 	m_mouseButtonState.right = isKeyPressed(Keys::mouseRight);
 	m_mouseButtonState.middle = isKeyPressed(Keys::mouseMiddle);
 }
 
-void InputController::update()
+void InputManager::update()
 {
 	m_mouseXDelta = m_mouseX - m_mouseXPrev;
 	m_mouseYDelta = m_mouseY - m_mouseYPrev;
@@ -130,6 +131,17 @@ void InputController::update()
 	// mouseXDelta = 0;
 	// mouseYDelta = 0;
 
+  if (m_hoveredWindow)
+  {
+    for (const auto& [key, fn] : m_hoveredWindow->Input.m_keyDownCallbacks)
+    {
+      if (m_keyMap[key] == KeyState::JUST_DOWN)
+      {
+        fn();
+      }
+    }
+  }
+
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
 		if (it->second == JUST_UP)
@@ -143,7 +155,7 @@ void InputController::update()
 	}
 }
 
-void InputController::keyDown(int keyPressed)
+void InputManager::keyDown(int keyPressed)
 {
 	switch (keyPressed)
 	{
@@ -356,7 +368,7 @@ void InputController::keyDown(int keyPressed)
 	}
 }
 
-void InputController::keyUp(int keyReleased)
+void InputManager::keyUp(int keyReleased)
 {
 	// LOG_DEBUG("keyup: {}", keyReleased);
 
@@ -574,7 +586,7 @@ void InputController::keyUp(int keyReleased)
 	}
 }
 
-GLFWwindow* InputController::getCurrentViewport()
+GLFWwindow* InputManager::getCurrentViewport()
 {
 	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
 	ImGuiContext* g = ImGui::GetCurrentContext(); // Get current/last moused viewport.
@@ -592,22 +604,25 @@ GLFWwindow* InputController::getCurrentViewport()
 }
 
 //===-- Statics -----------------------------------------------------------===//
-MouseButtonState InputController::m_mouseButtonState;
+MouseButtonState InputManager::m_mouseButtonState;
 
-std::map<Keys::Code, InputController::KeyState> InputController::m_keyMap;
+std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
-bool InputController::m_ignoreImGuiEvents = false;
-glm::vec2 InputController::m_mouseOffset;
-float InputController::m_mouseX = 0;
-float InputController::m_mouseY = 0;
-float InputController::m_mouseXPrev = 0;
-float InputController::m_mouseYPrev = 0;
+std::vector<InputController*> InputManager::m_inputControllers;
+IWindow* InputManager::m_hoveredWindow;
 
-float InputController::m_mouseXDelta = 0;
-float InputController::m_mouseYDelta = 0;
+bool InputManager::m_ignoreImGuiEvents = false;
+glm::vec2 InputManager::m_mouseOffset;
+float InputManager::m_mouseX = 0;
+float InputManager::m_mouseY = 0;
+float InputManager::m_mouseXPrev = 0;
+float InputManager::m_mouseYPrev = 0;
 
-int InputController::m_winWidth = 0;
-int InputController::m_winHeight = 0;
+float InputManager::m_mouseXDelta = 0;
+float InputManager::m_mouseYDelta = 0;
+
+int InputManager::m_winWidth = 0;
+int InputManager::m_winHeight = 0;
 
 /// std::strings describing the keys
 const char* Keys::keyStrings[] = {

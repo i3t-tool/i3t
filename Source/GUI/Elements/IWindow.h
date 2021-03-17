@@ -7,6 +7,10 @@
 
 #include <string>
 
+#include "spdlog/fmt/fmt.h"
+
+#include "Core/Input/InputController.h"
+
 #define I3T_WINDOW(WindowType)                                                                                       \
 public:                                                                                                              \
 	static constexpr const char* ID = #WindowType;                                                                     \
@@ -30,5 +34,7 @@ public:
 
 protected:
 	friend class Application;
+	friend class InputManager;
 	bool m_show;
+	InputController Input;
 };

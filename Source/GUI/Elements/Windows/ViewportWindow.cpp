@@ -4,15 +4,17 @@
 
 #include "Core/API.h"
 #include "Core/Application.h"
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
 #include "GUI/Settings.h"
 #include "Rendering/FrameBuffer.h"
 
 #include "../../../World2/World2.h"
 #include "../../../World2/Select.h"
 
+using namespace UI;
+
 /// \todo Use Framebuffer class.
-ViewportWindow::ViewportWindow(bool show, World* world,World2*world2) : IWindow(show)
+Viewport::Viewport(bool show, World* world,World2*world2) : IWindow(show)
 {
 	m_world = world;
 	m_world2 = world2;
@@ -47,7 +49,7 @@ ViewportWindow::ViewportWindow(bool show, World* world,World2*world2) : IWindow(
   m_wcMax = ImVec2(0, 0);
 }
 
-void ViewportWindow::render()
+void Viewport::render()
 {
 
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
@@ -55,7 +57,7 @@ void ViewportWindow::render()
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::Begin("Viewport", getShowPtr());
+		ImGui::Begin(ID, getShowPtr());
 		ImGui::PopStyleVar();
 
 		// get positions of min max points of the window
@@ -69,7 +71,7 @@ void ViewportWindow::render()
 
 		// ImGui::GetWindowDrawList()->AddCallback(render_callback, NULL); // Option 1 (did not manage to get it working
 		// correctly - too hard to grasp all the stuff for it)
-		InputController::processViewportEvents();
+		InputManager::processViewportEvents();
 
 		// bind our special framebuffer for rendering (and binding a new texture for it if needed)
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fboMain);

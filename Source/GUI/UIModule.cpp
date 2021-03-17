@@ -1,10 +1,11 @@
-#include "UI.h"
+#include "UIModule.h"
 #include <GUI/Elements/Windows/LogWindow.h>
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
+#include "Core/Input/InputManager.h"
 #include "GUI/Elements/MainMenuBar.h"
-#include "GUI/Elements/Windows/ConsoleWindow.h"
+#include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
@@ -13,23 +14,25 @@
 #include "GUI/ImGui/imgui_impl_glfw.h"
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 
-UI::~UI()
+using namespace UI;
+
+UIModule::~UIModule()
 {
 	delete m_menu;
 	for (auto* window : m_dockableWindows)
-  {
+	{
 		delete window;
 	}
 }
 
-void UI::init()
+void UIModule::init()
 {
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(new TutorialWindow(false));
-	m_dockableWindows.push_back(new ViewportWindow(true, App::get().world(),App::get().world2()));
+	m_dockableWindows.push_back(new Viewport(true, App::get().world(), App::get().world2()));
 	m_dockableWindows.push_back(new WorkspaceWindow(true));
-	m_dockableWindows.push_back(new ConsoleWindow(true));
+	m_dockableWindows.push_back(new Console(true));
 	m_dockableWindows.push_back(new LogWindow());
 
 	HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
@@ -68,7 +71,7 @@ void UI::init()
 	ImGui_ImplOpenGL3_Init(ImGui_GLSLVersion);
 }
 
-void UI::beginFrame()
+void UIModule::beginFrame()
 {
 	// Start the Dear ImGui frame ----------------------
 	ImGui_ImplOpenGL3_NewFrame();
@@ -82,17 +85,25 @@ void UI::beginFrame()
 
 	// Scene is rendered in the Viewport window.
 	// TODO -> Do not render scene in the ViewportWindow class.
-	for (auto* element : m_dockableWindows){
-		if (element->isVisible()){element->render();}
-		//if (InputController::isKeyJustPressed(Keys::f)) { printf("UP %s\n",element->getID()); }
+	for (auto* element : m_dockableWindows)
+	{
+		if (element->isVisible())
+		{
+			element->render();
+		}
+		// if (InputController::isKeyJustPressed(Keys::f)) { printf("UP %s\n",element->getID()); }
 	}
-	//if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
+	// if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
 	// Render other windows.
-	for (const auto& [id, w] : m_windows){
-		if (w->isVisible()){w->render(); }
+	for (const auto& [id, w] : m_windows)
+	{
+		if (w->isVisible())
+		{
+			w->render();
+		}
+	}
 
-;	}
-	
+	setActiveWindow();
 
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();
@@ -114,7 +125,7 @@ void UI::beginFrame()
 	}
 }
 
-void UI::buildDockspace()
+void UIModule::buildDockspace()
 {
 	// create dockspace -----------------------------
 	static bool opt_fullscreen_persistant = true;
@@ -167,13 +178,36 @@ void UI::buildDockspace()
 	}
 }
 
-void UI::popWindow(const std::string& windowId)
+void UIModule::setActiveWindow()
+{
+  ImGuiContext& g = *GImGui;
+  auto windowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+
+	if (strlen(windowID) != 0)
+  {
+    for (auto& dockableWindow : m_dockableWindows)
+    {
+      // Remove ## or ### from ImGui window name.
+      auto sanitizedWindowID = windowID;
+      while (*sanitizedWindowID == '#') ++sanitizedWindowID;
+
+      auto mainID = std::strtok(const_cast<char*>(sanitizedWindowID), "/");
+
+      if (strcmp(mainID, dockableWindow->getID()) == 0)
+      {
+        InputManager::setHoveredWindow(dockableWindow);
+      }
+    }
+	}
+}
+
+void UIModule::popWindow(const std::string& windowId)
 {
 	if (hasWindow(windowId))
 		m_windows.erase(windowId);
 }
 
-bool UI::hasWindow(const std::string& id)
+bool UIModule::hasWindow(const std::string& id)
 {
 	return m_windows.count(id);
 }

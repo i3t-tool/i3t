@@ -154,26 +154,26 @@ void Scene::keyUpdate()
 		return;
 	if (!camera->isLerping())
 	{
-		if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitX))
+		if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_orbitX))
 			setCamToOrbitCenterX();
-		else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitY))
+		else if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_orbitY))
 			setCamToOrbitCenterY();
-		else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_orbitZ))
+		else if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_orbitZ))
 			setCamToOrbitCenterZ();
-		else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldX))
+		else if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_worldX))
 			setCamToCenterX();
-		else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldY))
+		else if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_worldY))
 			setCamToCenterY();
-		else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_worldZ))
+		else if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_worldZ))
 			setCamToCenterZ();
-		else if (InputController::isKeyJustPressed(Settings::KeyScene_camTo_scene))
+		else if (InputManager::isKeyJustPressed(Settings::KeyScene_camTo_scene))
 			setCamToCenter();
-		else if (InputController::isKeyJustPressed(Settings::Key_undo))
+		else if (InputManager::isKeyJustPressed(Settings::Key_undo))
 		{
 			/// \todo Scene undo.
 			// UndoRedo::undo();
 		}
-		else if (InputController::isKeyJustPressed(Settings::Key_redo))
+		else if (InputManager::isKeyJustPressed(Settings::Key_redo))
 		{
 			/// \todo Scene redo.
 			// UndoRedo::redo();

@@ -15,21 +15,21 @@
 #include "GUI/ImGui/imgui_impl_glfw.h"
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "GUI/Theme.h"
-#include "GUI/UI.h"
+#include "GUI/UIModule.h"
 #include "Logger/Logger.h"
 #include "Rendering/ShaderProvider.h"
 #include "Rendering/Shaper.h"
+#include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World2/World2.h"
-#include "Scripting/Scripting.h"
 
 Application::Application()
 {
 	m_isPaused = false;
 	m_world = nullptr;
 
-	m_ui = new UI();
+	m_ui = new UIModule();
 	m_modules.push_back(m_ui);
 
 	m_scriptInterpreter=new Scripting();
@@ -118,13 +118,13 @@ void Application::onDisplay()
 
 void Application::logicUpdate()
 {
-	InputController::preUpdate(); ///< update the mouse button state
+	InputManager::preUpdate(); ///< update the mouse button state
 
 	if (m_world)
 		m_world->update(); ///< update World = handle 2D and 3D interaction
 	// PF glutExit called during this update - crash after window close. Solved in TabSpace::closeMessageExitEvent
 
-	InputController::update(); ///< Update mouseDelta, mousePrev, and the stored statuses of the keys in the \a keyMap
+	InputManager::update(); ///< Update mouseDelta, mousePrev, and the stored statuses of the keys in the \a keyMap
 	                           ///< array (JUST_UP -> UP, JUST_DOWN -> DOWN).
 }
 
@@ -252,7 +252,7 @@ Application& Application::get()
 	return s_instance;
 }
 
-UI* Application::getUI()
+UIModule* Application::getUI()
 {
 	return m_ui;
 }

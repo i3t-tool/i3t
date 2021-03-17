@@ -34,12 +34,12 @@ template <typename T> inline IWindow* findWindow(const std::vector<IWindow*>& do
 	return result;
 }
 
-class UI final : public Module
+class UIModule final : public Module
 {
 	friend class Application;
 
-	UI() {}
-	~UI() override;
+	UIModule() {}
+	~UIModule() override;
 	void init() override;
 	void beginFrame() override;
 
@@ -86,6 +86,9 @@ public:
 	 */
 
 	template <typename T> IWindow* getWindowPtr() { return findWindow<T>(m_dockableWindows); }
+
+private:
+  void setActiveWindow();
 
 private:
 	MainMenuBar* m_menu;

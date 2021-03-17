@@ -19,8 +19,8 @@
 
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
+#include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
-#include "Core/InputController.h"
 
 // using namespace Core;
 
@@ -148,7 +148,7 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-	if (InputController::isKeyPressed(Keys::l)) { 
+	if (InputManager::isKeyPressed(Keys::l)) {
 		//SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes); 
 		printf("press\n");
 	}

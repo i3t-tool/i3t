@@ -4,11 +4,11 @@
 
 #include "Core/Application.h"
 #include "GUI/Theme.h"
-#include "GUI/UI.h"
+#include "GUI/UIModule.h"
 
 namespace I3T
 {
-inline UI* getUI()
+inline UIModule* getUI()
 {
   return App::get().getUI();
 }
