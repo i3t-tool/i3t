@@ -29,6 +29,29 @@ const int CONTROLS_SIZE_Y = 100;
 // TEMPORARY TODO
 static std::string current_dir = "";
 
+// TEMPORARY TODO
+inline ImGui::MarkdownImageData ImageCallback( ImGui::MarkdownLinkCallbackData data_ )
+{
+  // In your application you would load an image based on data_ input. Here we just use the imgui font texture.
+  std::string image_path = current_dir + data_.link;
+  image_path.pop_back(); // BUG FIX where there's an ")" in the data_.link member
+  //std::cout << image_path.c_str() << std::endl;
+  int tex_id = TextureLoader::loadTexture(data_.text, image_path);
+  
+  ImGui::MarkdownImageData imageData{ true, false, (ImTextureID)tex_id, ImVec2( 400.0f, 200.0f ) };
+
+  // For image resize when available size.x > image width, add
+  ImVec2 const contentSize = ImGui::GetContentRegionAvail();
+  if( imageData.size.x > contentSize.x )
+  {
+    float const ratio = imageData.size.y/imageData.size.x;
+    imageData.size.x = contentSize.x;
+    imageData.size.y = contentSize.x*ratio;
+  }
+
+  return imageData;
+}
+
 // TUTORIAL WINDOW FUNCTIONS
 //---
 
@@ -36,6 +59,7 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 {
   m_tutorial = nullptr;
   m_current_step = 0;
+  m_mdConfig = ImGui::MarkdownConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
 
   // TEMPORARY todo
   TutorialHeader dummy_header;
@@ -124,28 +148,6 @@ void TutorialWindow::renderTutorialHeader()
 }
 
 
-// TEMPORARY TODO
-inline ImGui::MarkdownImageData ImageCallback( ImGui::MarkdownLinkCallbackData data_ )
-{
-  // In your application you would load an image based on data_ input. Here we just use the imgui font texture.
-  std::string image_path = current_dir + data_.link;
-  image_path.pop_back(); // BUG FIX where there's an ")" in the data_.link member
-  //std::cout << image_path.c_str() << std::endl;
-  int tex_id = TextureLoader::loadTexture(data_.text, image_path);
-  
-  ImGui::MarkdownImageData imageData{ true, false, (ImTextureID)tex_id, ImVec2( 400.0f, 200.0f ) };
-
-  // For image resize when available size.x > image width, add
-  ImVec2 const contentSize = ImGui::GetContentRegionAvail();
-  if( imageData.size.x > contentSize.x )
-  {
-    float const ratio = imageData.size.y/imageData.size.x;
-    imageData.size.x = contentSize.x;
-    imageData.size.y = contentSize.x*ratio;
-  }
-
-  return imageData;
-}
 
 void TutorialWindow::renderTutorialContent()
 {
@@ -167,52 +169,14 @@ void TutorialWindow::renderTutorialContent()
   //// bold heading H1
   //float fontSizeH1 = fontSize_ * 1.1f;
   //H1 = io.Fonts->AddFontFromFileTTF( "myfont-bold.ttf", fontSizeH1 );
-  const ImGui::MarkdownConfig mdConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
+
 
   if (m_tutorial)
   {
     if (m_tutorial->getStepCount() > 0) {
-      // ITERATE OVER STEPS
+      // ITERATE OVER WIDGETS IN CURRENT STEP AND RENDER THEM
       for (std::unique_ptr<TWidget>& widget_uptr : m_tutorial->m_steps[m_current_step].m_content) {
-        const TWidget* const widget = widget_uptr.get(); // tenhle pointer se nebude nestarat o konstrukci/destrukci a ani (bonusove) o zmenu toho objektu -> its okay to have it (zaruceno constantami) https://stackoverflow.com/questions/10802046/whats-the-point-of-stdunique-ptrget
-
-        if (const TWText* const tw_text = dynamic_cast<const TWText*>(widget); tw_text != nullptr) {
-          Markdown( tw_text->m_text.c_str(), tw_text->m_text.length(), mdConfig);
-        }
-        else if (const TWSpacing* const tw_spacing = dynamic_cast<const TWSpacing*>(widget); tw_spacing != nullptr) {
-          ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
-        }
-        else if (const TWTask* const tw_task = dynamic_cast<const TWTask*>(widget); tw_task != nullptr) {
-          ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
-          ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
-          ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
-
-          ImGui::TextWrapped(tw_task->m_task.c_str());
-
-          ImGui::PopStyleColor();
-          ImGui::PopFont();
-          ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
-        }
-        else if (const TWHint* const tw_hint = dynamic_cast<const TWHint*>(widget); tw_hint != nullptr) {
-          //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
-          ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-          std::string hint_header = u8"Nápovìda##" + std::to_string(m_current_step);
-          if (ImGui::CollapsingHeader(hint_header.c_str())) {
-            ImGui::PopStyleColor();
-            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
-            //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
-            //ImGui::TextWrapped(tw_hint->m_hint.c_str());
-            Markdown( tw_hint->m_hint.c_str(), tw_hint->m_hint.length(), mdConfig);
-            ImGui::PopStyleColor();
-          }
-          else {
-            ImGui::PopStyleColor();
-          }
-        }
-        else {
-          std::cout << "wrong widget type" << std::endl;
-        }
-      
+        widget_uptr->acceptRenderer(this);
       }
     }
 
@@ -228,24 +192,53 @@ void TutorialWindow::renderTutorialContent()
   ImGui::EndChild();
 }
 
-void TutorialWindow::renderTextWidget(TWText tw_text)
+void TutorialWindow::renderTextWidget(TWText* tw_text)
+{
+  ImGui::Markdown( tw_text->m_text.c_str(), tw_text->m_text.length(), m_mdConfig);
+}
+
+void TutorialWindow::renderImageWidget(TWImage* tw_image)
 {
 }
 
-void TutorialWindow::renderImageWidget(TWImage tw_image)
+void TutorialWindow::renderAnimatedImageWidget(TWAnimatedImage* tw_animated_image)
 {
 }
 
-void TutorialWindow::renderAnimatedImageWidget(TWAnimatedImage tw_animated_image)
+void TutorialWindow::renderTaskWidget(TWTask* tw_task)
 {
+  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
+  ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+
+  ImGui::TextWrapped(tw_task->m_task.c_str());
+
+  ImGui::PopStyleColor();
+  ImGui::PopFont();
+  ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
 }
 
-void TutorialWindow::renderTaskWidget(TWTask tw_task)
+void TutorialWindow::renderHintWidget(TWHint* tw_hint)
 {
+  //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+  std::string hint_header = u8"Nápovìda##" + std::to_string(m_current_step);
+  if (ImGui::CollapsingHeader(hint_header.c_str())) {
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+    //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
+    //ImGui::TextWrapped(tw_hint->m_hint.c_str());
+    ImGui::Markdown( tw_hint->m_hint.c_str(), tw_hint->m_hint.length(), m_mdConfig);
+    ImGui::PopStyleColor();
+  }
+  else {
+    ImGui::PopStyleColor();
+  }
 }
 
-void TutorialWindow::renderHintWidget(TWHint tw_hint)
+void TutorialWindow::renderSpacingWidget(TWSpacing* tw_hint)
 {
+  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
 }
 
 

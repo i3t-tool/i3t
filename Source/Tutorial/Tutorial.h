@@ -1,58 +1,91 @@
 ﻿#pragma once
+
+#include "TutorialRenderer.h"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+// forward declaration from TutorialRenderer.h to avoid cyclic dependency
+class ITutorialRenderer;
+
 struct TWidget
 {
   virtual ~TWidget() = default;
   //std::string m_id;
-  //virtual void acceptRenderer();
+  virtual void acceptRenderer(ITutorialRenderer* tutorialRenderer) = 0;
 };
 
 struct TWText : TWidget  // can also contain bullets and other MD syntaxe for now 
 {
-  TWText(std::string text) : m_text(std::move(text)) {}
+  TWText(std::string text) : m_text(text) {}
   std::string m_text;
+  void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+  {
+    tutorialRenderer->renderTextWidget(this);
+  }
 };
 
 struct TWTask : TWidget 
 {
-  TWTask(std::string task) : m_task(std::move(task)) {}
+  TWTask(std::string task) : m_task(task) {}
   std::string m_task;
+  void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+  {
+    tutorialRenderer->renderTaskWidget(this);
+  }
 };
 
 struct TWHint : TWidget 
 {
-  TWHint(std::string hint) : m_hint(std::move(hint)) {}
+  TWHint(std::string hint) : m_hint(hint) {}
   std::string m_hint;
+  void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+  {
+    tutorialRenderer->renderHintWidget(this);
+  }
 };
 
 struct TWSpacing : TWidget 
 {
   TWSpacing() = default;
+  void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+  {
+    tutorialRenderer->renderSpacingWidget(this);
+  }
 };
 
 struct TWImage : TWidget
 {
-  TWImage(std::string filename) : m_filename(std::move(filename)) {}
-
+  TWImage(std::string filename) : m_filename(filename) {}
   std::string m_filename;
+  void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+  {
+    tutorialRenderer->renderImageWidget(this);
+  }
 };
 
 struct TWAnimatedImage : TWidget
 {
   std::string m_filename;
   // todo animation stuf
+  void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+  {
+    tutorialRenderer->renderAnimatedImageWidget(this);
+  }
 };
 
-struct TWButton : TWidget
-{
-  std::string m_text;
-  // todo command
-};
+// struct TWButton : TWidget
+// {
+//   std::string m_text;
+//   // todo command
+//   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+//   {
+//     tutorialRenderer->renderButtonWidget(this);
+//   }
+// };
 
 struct TStep
 {

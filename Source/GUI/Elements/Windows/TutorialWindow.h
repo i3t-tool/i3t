@@ -4,6 +4,8 @@
  * Tutorial window.
  */
 #pragma once
+#include <imgui.h> // temporary
+#include "imgui_markdown.h" // tmeporary
 
 #include <string>
 
@@ -38,13 +40,16 @@ public:
 private:
   std::unique_ptr<Tutorial> m_tutorial;
   int m_current_step;
+  ImGui::MarkdownConfig m_mdConfig; // todo temporary
   // std::string getAbsolutePathByTutorial(std::string filename);
   void renderTutorialHeader();
   void renderTutorialContent();
   void renderTutorialControls();
-  void renderTextWidget(TWText tw_text) override;
-  void renderImageWidget(TWImage tw_image) override;
-  void renderAnimatedImageWidget(TWAnimatedImage tw_animated_image) override;
-  void renderTaskWidget(TWTask tw_task) override;
-  void renderHintWidget(TWHint tw_hint) override;
+  // overrides todo jsou private ale parent classa je ma public, ocividne je to dulezitejsi
+  void renderTextWidget(TWText* tw_text) override;
+  void renderImageWidget(TWImage* tw_image) override;
+  void renderAnimatedImageWidget(TWAnimatedImage* tw_animated_image) override;
+  void renderTaskWidget(TWTask* tw_task) override;
+  void renderHintWidget(TWHint* tw_hint) override;
+  void renderSpacingWidget(TWSpacing* tw_hint) override;
 };
