@@ -133,7 +133,7 @@ public:
 \param[in] id NodeId of Node function search for
 \return Node* of Node with given id or nullptr when not found
 */
-	WorkspaceNode* FindNode(ne::NodeId id);
+	WorkspaceNode* WorkspaceWindow::FindNode(ne::NodeId id);
 
 	/*! \fn static Link* FindLink(ne::LinkId id)
 	    \brief search for Link by its id
