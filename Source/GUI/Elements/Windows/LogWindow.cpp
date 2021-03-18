@@ -6,18 +6,18 @@
 
 void LogWindow::render()
 {
-  ImGui::Begin("Log View", getShowPtr());
+	ImGui::Begin("Log View", getShowPtr());
 
-  ImGui::Text("Log output");
+	ImGui::Text("Log output");
 
-  ImGui::BeginChild(ID);
-  ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
+	ImGui::BeginChild(ID);
+	ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
 
-  // Set scroll to bottom of the child window.
-  if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-    ImGui::SetScrollHereY(1.0f);
+	// Set scroll to bottom of the child window.
+	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+		ImGui::SetScrollHereY(1.0f);
 
-  ImGui::EndChild();
+	ImGui::EndChild();
 
-  ImGui::End();
+	ImGui::End();
 }

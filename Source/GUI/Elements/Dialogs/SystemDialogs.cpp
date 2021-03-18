@@ -9,7 +9,11 @@ bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string&
 
 	while (!dialog.ready(40) && result.empty())
 	{
-		if (dialog.result().size() > 0) {result = dialog.result()[0];return true;}
+		if (dialog.result().size() > 0)
+		{
+			result = dialog.result()[0];
+			return true;
+		}
 	}
 
 	return false;

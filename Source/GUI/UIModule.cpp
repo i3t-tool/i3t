@@ -30,7 +30,7 @@ void UIModule::init()
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(new TutorialWindow(false));
-	m_dockableWindows.push_back(new Viewport(true, App::get().world(), App::get().world2()));
+	m_dockableWindows.push_back(new Viewport(true, App::get().world2()));
 	m_dockableWindows.push_back(new WorkspaceWindow(true));
 	m_dockableWindows.push_back(new Console(true));
 	m_dockableWindows.push_back(new LogWindow());
@@ -180,24 +180,25 @@ void UIModule::buildDockspace()
 
 void UIModule::setActiveWindow()
 {
-  ImGuiContext& g = *GImGui;
-  auto windowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+	ImGuiContext& g = *GImGui;
+	auto windowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 
 	if (strlen(windowID) != 0)
-  {
-    for (auto& dockableWindow : m_dockableWindows)
-    {
-      // Remove ## or ### from ImGui window name.
-      auto sanitizedWindowID = windowID;
-      while (*sanitizedWindowID == '#') ++sanitizedWindowID;
+	{
+		for (auto& dockableWindow : m_dockableWindows)
+		{
+			// Remove ## or ### from ImGui window name.
+			auto sanitizedWindowID = windowID;
+			while (*sanitizedWindowID == '#')
+				++sanitizedWindowID;
 
-      auto mainID = std::strtok(const_cast<char*>(sanitizedWindowID), "/");
+			auto mainID = std::strtok(const_cast<char*>(sanitizedWindowID), "/");
 
-      if (strcmp(mainID, dockableWindow->getID()) == 0)
-      {
-        InputManager::setHoveredWindow(dockableWindow);
-      }
-    }
+			if (strcmp(mainID, dockableWindow->getID()) == 0)
+			{
+				InputManager::setHoveredWindow(dockableWindow);
+			}
+		}
 	}
 }
 

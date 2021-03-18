@@ -13,16 +13,16 @@ namespace UI
 class Console : public IWindow
 {
 public:
-I3T_WINDOW(Console)
+	I3T_WINDOW(Console)
 
-Console(bool show);
-  ~Console() override;
-  void render() override;
+	Console(bool show);
+	~Console() override;
+	void render() override;
 
 private:
-  void onUpKey();
-  void onDownKey();
+	void onUpKey();
+	void onDownKey();
 
-  COutRedirect m_stdoutCapture;
+	COutRedirect m_stdoutCapture;
 };
-}
+} // namespace UI

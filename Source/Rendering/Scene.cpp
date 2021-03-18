@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "Core/World.h"
 #include "Core/Input/InputActions.h"
 
 #include "Rendering/Camera.h"

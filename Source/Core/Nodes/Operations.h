@@ -303,8 +303,7 @@ static const std::vector<Operation> operations = {
 		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
 		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
 
-    {"Model", "model", 1, matrixInput, 0, {}}
-};
+		{"Model", "model", 1, matrixInput, 0, {}}};
 
 namespace Core
 {

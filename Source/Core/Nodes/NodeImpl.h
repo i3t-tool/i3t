@@ -1371,11 +1371,10 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inpu
 	}
 }
 
-template <>
-FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
-  {
+	{
 		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = m_inputs[0].getStorage().getMat4();
 	}
 }

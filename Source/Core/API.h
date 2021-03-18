@@ -10,22 +10,22 @@ namespace I3T
 {
 inline UIModule* getUI()
 {
-  return App::get().getUI();
+	return App::get().getUI();
 }
 
 inline Theme& getTheme()
 {
-  return getUI()->getTheme();
+	return getUI()->getTheme();
 }
 
 inline ImFont* getFont(EFont font)
 {
-  return getTheme().get(font);
+	return getTheme().get(font);
 }
 
 inline const ImVec4& getColor(EColor color)
 {
-  return getTheme().get(color);
+	return getTheme().get(color);
 }
 
 inline float getSize(ESize size)

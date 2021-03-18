@@ -18,7 +18,7 @@ namespace Core::Transform
 {
 /// In column-major order.
 typedef std::array<unsigned char, 16> DataMap;
-}
+} // namespace Core::Transform
 
 namespace Core
 {
@@ -49,35 +49,19 @@ static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0,
 static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
 
 static constexpr DataMap g_Translate = {
-		255, 0, 0, 0,
-		0, 255, 0, 0,
-		0, 0, 255, 0,
-		1, 2, 3, 255,
+		255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 1, 2, 3, 255,
 };
 
-static constexpr DataMap g_AllLocked = {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+static constexpr DataMap g_AllLocked = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static constexpr DataMap g_Ortho = {
-		1, 0, 0, 0,
-		0, 2, 0, 0,
-		0, 0, 3, 0,
-		4, 5, 6, 255,
+		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 4, 5, 6, 255,
 };
 
-static constexpr DataMap g_Frustum = {
-		1, 0, 0, 0,
-		0, 2, 0, 0,
-		3, 4, 5, 6,
-		0, 0, 7, 0
-};
+static constexpr DataMap g_Frustum = {1, 0, 0, 0, 0, 2, 0, 0, 3, 4, 5, 6, 0, 0, 7, 0};
 
 static constexpr DataMap g_Perspective = {
-		1, 0, 0, 0,
-		0, 2, 0, 0,
-		0, 0, 3, 4,
-		0, 0, 5, 0,
+		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 4, 0, 0, 5, 0,
 };
 
 /**
@@ -203,7 +187,7 @@ public:
 	[[nodiscard]] const glm::quat& getQuat() const { return value.quat; }
 	[[nodiscard]] float getFloat() const { return value.fValue; }
 	OpValue* getValue() { return &value; }
-  [[nodiscard]] void* getPointer() const { return value.pointer; }
+	[[nodiscard]] void* getPointer() const { return value.pointer; }
 
 	void setValue(OpValue value) { this->value = value; }
 	void setValue(const glm::mat4& mat) { value.matrix = mat; }

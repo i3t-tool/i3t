@@ -9,8 +9,8 @@
  */
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "glm/vec2.hpp"
 
@@ -82,10 +82,7 @@ public:
 	static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
 
 	/// Hovered window must be set from ImGui Context.
-	static void setHoveredWindow(IWindow* window)
-	{
-		m_hoveredWindow = window;
-	}
+	static void setHoveredWindow(IWindow* window) { m_hoveredWindow = window; }
 
 	static bool isViewportActive();
 

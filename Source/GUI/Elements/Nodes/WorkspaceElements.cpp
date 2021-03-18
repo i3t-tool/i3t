@@ -1,7 +1,7 @@
 
 #include "WorkspaceElements.h"
-#include <string>
 #include "spdlog/fmt/fmt.h"
+#include <string>
 
 // #include <format> // not as standard library yet
 
@@ -18,8 +18,7 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
 /* \todo JH not use constant values here */
-WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel)
-    :   Id(id)
+WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel) : Id(id)
 {
 	/* \todo Some better default values - take from Const.h*/
 	State = "default WorkspaceNode state";
@@ -67,13 +66,13 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 	builder.EndHeader();
 }
 
-
 WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : Id(id), Color(ImColor(255, 255, 255))
-{}
-
+{
+}
 
 WorkspacePinProperties::WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type)
-		: Id(id), Name(name), Kind(kind), Type(type), IconSize(24), Connected(false), Alpha(100) /* \todo JH no konstants here... */
+		: Id(id), Name(name), Kind(kind), Type(type), IconSize(24), Connected(false),
+			Alpha(100) /* \todo JH no konstants here... */
 {
 }
 

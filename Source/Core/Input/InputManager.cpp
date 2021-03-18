@@ -18,7 +18,7 @@ ImGuiConfigFlags g_mousedFlags;
 bool InputManager::isViewportActive()
 {
 	if (m_hoveredWindow)
-    return strcmp(m_hoveredWindow->getID(), UI::Viewport::ID) == 0;
+		return strcmp(m_hoveredWindow->getID(), UI::Viewport::ID) == 0;
 	else
 		return false;
 }
@@ -81,11 +81,11 @@ void InputManager::processViewportEvents()
 	/*
 	for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++)
 	{
-		if (ImGui::IsKeyPressed(i))
-			keyDown(i);
+	  if (ImGui::IsKeyPressed(i))
+	    keyDown(i);
 
-		if (ImGui::IsKeyReleased(i))
-			keyUp(i);
+	  if (ImGui::IsKeyReleased(i))
+	    keyUp(i);
 	}
 	 */
 }

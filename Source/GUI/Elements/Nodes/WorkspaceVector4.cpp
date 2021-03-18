@@ -23,7 +23,8 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 	builder.Middle();
 
 	ImGui::PushItemWidth(I3T::getSize(ESize::Nodes_FloatWidth));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
 	for (int columns = 0; columns < 4; columns++)
 	{
 		localData[columns] = coreData[columns];

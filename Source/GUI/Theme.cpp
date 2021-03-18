@@ -91,6 +91,6 @@ void Theme::apply()
 	style.WindowBorderSize = 0.0f;
 
 	auto& nodesStyle = ax::NodeEditor::GetStyle();
-  nodesStyle.NodeRounding = m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)];
+	nodesStyle.NodeRounding = m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)];
 	nodesStyle.NodeBorderWidth = 0.0f;
 }

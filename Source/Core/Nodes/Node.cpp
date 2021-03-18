@@ -29,7 +29,7 @@ void NodeBase::create()
 
 	// Ugly workaround for Model node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
-  {
+	{
 		m_internalData.emplace_back();
 	}
 }

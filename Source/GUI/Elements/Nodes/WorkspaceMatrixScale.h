@@ -7,7 +7,4 @@ public:
 	WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel = "default MatrixScale header");
 
 	void drawData(util::NodeBuilder& builder);
-
 };
-
-

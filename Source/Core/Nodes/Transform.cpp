@@ -137,7 +137,7 @@ ValueSetResult EulerRotX::setValue(const glm::vec3& val)
 
 ValueSetResult EulerRotX::setValue(const glm::vec4& val)
 {
-  return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
 ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
@@ -160,53 +160,53 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 
 ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 {
-  if (!coordsAreValid(coords, m_currentMap))
-  {
-    ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-  }
+	if (!coordsAreValid(coords, m_currentMap))
+	{
+		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
 
-  if (!Math::withinInterval(val, -1.0f, 1.0f))
-  {
-    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-                          "Value must be within [-1.0, 1.0] interval."};
-  }
+	if (!Math::withinInterval(val, -1.0f, 1.0f))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Value must be within [-1.0, 1.0] interval."};
+	}
 
-  auto mat = getData().getMat4();
+	auto mat = getData().getMat4();
 
-  if (coords == glm::ivec2(1, 2))
-  {
-    // -sin(T)
-    mat[1][2] = val;
-    mat[2][1] = -val;
+	if (coords == glm::ivec2(1, 2))
+	{
+		// -sin(T)
+		mat[1][2] = val;
+		mat[2][1] = -val;
 
-    auto cos = sqrt(1.0f - (val * val));
-    mat[1][1] = cos;
-    mat[2][2] = cos;
-  }
-  else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
-  {
-    // cos(T)
-    mat[1][1] = val;
-    mat[2][2] = val;
+		auto cos = sqrt(1.0f - (val * val));
+		mat[1][1] = cos;
+		mat[2][2] = cos;
+	}
+	else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
+	{
+		// cos(T)
+		mat[1][1] = val;
+		mat[2][2] = val;
 
-    auto sin = sqrt(1.0f - (val * val));
-    mat[1][2] = sin;
-    mat[2][1] = -sin;
-  }
-  else if (coords == glm::ivec2(2, 1))
-  {
-    // sin(T)
-    mat[2][1] = val;
-    mat[1][2] = -val;
+		auto sin = sqrt(1.0f - (val * val));
+		mat[1][2] = sin;
+		mat[2][1] = -sin;
+	}
+	else if (coords == glm::ivec2(2, 1))
+	{
+		// sin(T)
+		mat[2][1] = val;
+		mat[1][2] = -val;
 
-    auto cos = sqrt(1.0f - (val * val));
-    mat[1][1] = cos;
-    mat[2][2] = cos;
-  }
+		auto cos = sqrt(1.0f - (val * val));
+		mat[1][1] = cos;
+		mat[2][2] = cos;
+	}
 
-  setInternalValue(mat);
+	setInternalValue(mat);
 
-  return ValueSetResult{ValueSetResult::Status::Ok};
+	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void EulerRotX::reset()
@@ -243,12 +243,12 @@ ValueSetResult EulerRotY::setValue(float val)
 
 ValueSetResult EulerRotY::setValue(const glm::vec3& val)
 {
-  return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
 ValueSetResult EulerRotY::setValue(const glm::vec4& val)
 {
-  return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
 ValueSetResult EulerRotY::setValue(const glm::mat4&)
@@ -259,59 +259,59 @@ ValueSetResult EulerRotY::setValue(const glm::mat4&)
 
 ValueSetResult EulerRotY::setValue(float val, glm::ivec2 coords)
 {
-  if (!coordsAreValid(coords, m_currentMap))
-  {
-    ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-  }
+	if (!coordsAreValid(coords, m_currentMap))
+	{
+		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
 
-  if (!Math::withinInterval(val, -1.0f, 1.0f))
-  {
-    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-                          "Value must be within [-1.0, 1.0] interval."};
-  }
+	if (!Math::withinInterval(val, -1.0f, 1.0f))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Value must be within [-1.0, 1.0] interval."};
+	}
 
-  auto mat = getData().getMat4();
+	auto mat = getData().getMat4();
 
-  if (coords == glm::ivec2(0, 2))
-  {
-    // -sin(T)
-    mat[0][2] = val;
-    mat[2][0] = -val;
+	if (coords == glm::ivec2(0, 2))
+	{
+		// -sin(T)
+		mat[0][2] = val;
+		mat[2][0] = -val;
 
-    auto cos = sqrt(1.0f - (val * val));
-    mat[0][0] = cos;
-    mat[2][2] = cos;
-  }
-  else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(2, 2))
-  {
-    // cos(T)
-    mat[0][0] = val;
-    mat[2][2] = val;
+		auto cos = sqrt(1.0f - (val * val));
+		mat[0][0] = cos;
+		mat[2][2] = cos;
+	}
+	else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(2, 2))
+	{
+		// cos(T)
+		mat[0][0] = val;
+		mat[2][2] = val;
 
-    auto sin = sqrt(1.0f - (val * val));
-    mat[0][2] = -sin;
-    mat[2][0] = sin;
-  }
-  else if (coords == glm::ivec2(2, 0))
-  {
-    // sin(T)
-    mat[2][0] = val;
-    mat[0][2] = -val;
+		auto sin = sqrt(1.0f - (val * val));
+		mat[0][2] = -sin;
+		mat[2][0] = sin;
+	}
+	else if (coords == glm::ivec2(2, 0))
+	{
+		// sin(T)
+		mat[2][0] = val;
+		mat[0][2] = -val;
 
-    auto cos = sqrt(1.0f - (val * val));
-    mat[0][0] = cos;
-    mat[2][2] = cos;
-  }
+		auto cos = sqrt(1.0f - (val * val));
+		mat[0][0] = cos;
+		mat[2][2] = cos;
+	}
 
-  setInternalValue(mat);
+	setInternalValue(mat);
 
-  return ValueSetResult{ValueSetResult::Status::Ok};
+	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void EulerRotY::reset()
 {
 	setDataMap(m_initialMap);
-  setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
+	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
 void EulerRotY::updateValues(int inputIndex)
@@ -342,12 +342,12 @@ ValueSetResult EulerRotZ::setValue(float val)
 
 ValueSetResult EulerRotZ::setValue(const glm::vec3& val)
 {
-  return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
 ValueSetResult EulerRotZ::setValue(const glm::vec4& val)
 {
-  return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
+	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
 ValueSetResult EulerRotZ::setValue(const glm::mat4&)
@@ -358,59 +358,59 @@ ValueSetResult EulerRotZ::setValue(const glm::mat4&)
 
 ValueSetResult EulerRotZ::setValue(float val, glm::ivec2 coords)
 {
-  if (!coordsAreValid(coords, m_currentMap))
-  {
-    ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-  }
+	if (!coordsAreValid(coords, m_currentMap))
+	{
+		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
 
-  if (!Math::withinInterval(val, -1.0f, 1.0f))
-  {
-    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-                          "Value must be within [-1.0, 1.0] interval."};
-  }
+	if (!Math::withinInterval(val, -1.0f, 1.0f))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Value must be within [-1.0, 1.0] interval."};
+	}
 
-  auto mat = getData().getMat4();
+	auto mat = getData().getMat4();
 
-  if (coords == glm::ivec2(0, 1))
-  {
-    // -sin(T)
-    mat[0][1] = val;
-    mat[1][0] = -val;
+	if (coords == glm::ivec2(0, 1))
+	{
+		// -sin(T)
+		mat[0][1] = val;
+		mat[1][0] = -val;
 
-    auto cos = sqrt(1.0f - (val * val));
-    mat[0][0] = cos;
-    mat[1][1] = cos;
-  }
-  else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
-  {
-    // cos(T)
-    mat[0][0] = val;
-    mat[1][1] = val;
+		auto cos = sqrt(1.0f - (val * val));
+		mat[0][0] = cos;
+		mat[1][1] = cos;
+	}
+	else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
+	{
+		// cos(T)
+		mat[0][0] = val;
+		mat[1][1] = val;
 
-    auto sin = sqrt(1.0f - (val * val));
-    mat[0][1] = sin;
-    mat[1][0] = -sin;
-  }
-  else if (coords == glm::ivec2(1, 0))
-  {
-    // sin(T)
-    mat[1][0] = val;
-    mat[0][1] = -val;
+		auto sin = sqrt(1.0f - (val * val));
+		mat[0][1] = sin;
+		mat[1][0] = -sin;
+	}
+	else if (coords == glm::ivec2(1, 0))
+	{
+		// sin(T)
+		mat[1][0] = val;
+		mat[0][1] = -val;
 
-    auto cos = sqrt(1.0f - (val * val));
-    mat[0][0] = cos;
-    mat[1][1] = cos;
-  }
+		auto cos = sqrt(1.0f - (val * val));
+		mat[0][0] = cos;
+		mat[1][1] = cos;
+	}
 
-  setInternalValue(mat);
+	setInternalValue(mat);
 
-  return ValueSetResult{ValueSetResult::Status::Ok};
+	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void EulerRotZ::reset()
 {
 	setDataMap(m_initialMap);
-  setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
+	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
 }
 
 void EulerRotZ::updateValues(int inputIndex)
@@ -434,7 +434,7 @@ void EulerRotZ::updateValues(int inputIndex)
 //===-- Euler rotation around Z axis --------------------------------------===//
 ValueSetResult Translation::setValue(float val)
 {
-  return setValue(glm::vec3(val));
+	return setValue(glm::vec3(val));
 }
 
 ValueSetResult Translation::setValue(const glm::vec3& vec)
@@ -446,7 +446,7 @@ ValueSetResult Translation::setValue(const glm::vec3& vec)
 
 ValueSetResult Translation::setValue(const glm::vec4& vec)
 {
-  return setValue(glm::vec3(vec));
+	return setValue(glm::vec3(vec));
 }
 
 ValueSetResult Translation::setValue(const glm::mat4& mat)
@@ -473,12 +473,12 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 
 ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
 {
-  if (!coordsAreValid(coords, m_currentMap))
-  {
-    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-  }
-  setInternalValue(val, coords);
-  return ValueSetResult{ValueSetResult::Status::Ok};
+	if (!coordsAreValid(coords, m_currentMap))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
+	setInternalValue(val, coords);
+	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void Translation::reset()
@@ -504,7 +504,7 @@ void Translation::updateValues(int inputIndex)
 void AxisAngleRot::reset()
 {
 	m_currentMap = m_initialMap;
-  setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
+	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
 }
 
 void AxisAngleRot::updateValues(int inputIndex)
@@ -523,14 +523,14 @@ void AxisAngleRot::updateValues(int inputIndex)
 
 void OrthoProj::reset()
 {
-  m_currentMap = m_initialMap;
+	m_currentMap = m_initialMap;
 	setInternalValue(glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
 ValueSetResult OrthoProj::setValue(float val, glm::ivec2 coords)
 {
-  if (!coordsAreValid(coords, m_currentMap))
-  {
+	if (!coordsAreValid(coords, m_currentMap))
+	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."};
 	}
 	setInternalValue(val, coords);
@@ -573,14 +573,14 @@ void PerspectiveProj::updateValues(int inputIndex)
 
 void PerspectiveProj::reset()
 {
-  m_currentMap = m_initialMap;
-  setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
+	m_currentMap = m_initialMap;
+	setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
 }
 
 ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
-  {
+	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 	setInternalValue(val, coords);
@@ -613,13 +613,13 @@ void Frustum::reset()
 
 ValueSetResult Frustum::setValue(float val, glm::ivec2 coords)
 {
-  if (!coordsAreValid(coords, m_currentMap))
-  {
-    return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
-  }
-  setInternalValue(val, coords);
+	if (!coordsAreValid(coords, m_currentMap))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+	}
+	setInternalValue(val, coords);
 
-  return ValueSetResult{};
+	return ValueSetResult{};
 }
 
 void LookAt::updateValues(int inputIndex)
@@ -645,7 +645,7 @@ void LookAt::reset()
 ValueSetResult LookAt::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
-  {
+	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 	setInternalValue(val, coords);

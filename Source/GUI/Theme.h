@@ -48,12 +48,12 @@ enum class EFont
 enum class ESize
 {
 	Nodes_Rounding,
-  Nodes_FloatWidth,
-  Nodes_FloatMargin,
+	Nodes_FloatWidth,
+	Nodes_FloatMargin,
 	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
-  Window_FramePadding,
-  COUNT
+	Window_FramePadding,
+	COUNT
 };
 
 constexpr inline EColor asColor(EValueType type)
@@ -89,14 +89,14 @@ class Theme
 	using Colors = std::map<EColor, ImVec4>;
 	Colors m_colors;
 
-  ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
+	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
 	static constexpr const size_t m_fontsCount = 4;
 	/// \todo MH Set dynamic scale (reload font in runtime).
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
 	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
-  std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
+	std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
 
 public:
 	/**
@@ -132,7 +132,7 @@ public:
 	}
 
 	float get(ESize size)
-  {
+	{
 		Debug::Assert(size != ESize::COUNT, "Strange size, isn't it?");
 		return m_sizes[static_cast<size_t>(size)];
 	}

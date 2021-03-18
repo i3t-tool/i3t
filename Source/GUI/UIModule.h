@@ -88,7 +88,7 @@ public:
 	template <typename T> IWindow* getWindowPtr() { return findWindow<T>(m_dockableWindows); }
 
 private:
-  void setActiveWindow();
+	void setActiveWindow();
 
 private:
 	MainMenuBar* m_menu;

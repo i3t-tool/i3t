@@ -1,18 +1,21 @@
 #include "WorkspaceMatrix4x4.h"
 // #include "Source/Core/Nodes/Node.h"
 
-//WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4 header")
+// WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel = "default Matrix4x4
+// header")
 //    : WorkspaceNodeWithCoreData(Builder::createNode<ENodeType::Matrix>(), headerBackground, headerLabel)
 //{
 //}
 
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase)
-    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
-{}
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel,
+                                       Ptr<Core::NodeBase> nodebase)
+		: WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
+{
+}
 
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
-    drawDataFull(builder); /* default function always draw all data */
+	drawDataFull(builder); /* default function always draw all data */
 }
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
@@ -33,16 +36,15 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	{
 		for (int columns = 0; columns < 4; columns++)
 		{
-		    localData = coreData[columns][rows]; /* Data are column-wise */
-		    if (drawDragFloatWithMap_Inline(&localData,
-                                            coreMap[columns*4+rows],
-                                            fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
-            {
-                valueChanged = true;
-                rowOfChange = rows;
-                columnOfChange = columns;
-                valueOfChange = localData;
-            }
+			localData = coreData[columns][rows]; /* Data are column-wise */
+			if (drawDragFloatWithMap_Inline(&localData, coreMap[columns * 4 + rows],
+			                                fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
+			{
+				valueChanged = true;
+				rowOfChange = rows;
+				columnOfChange = columns;
+				valueOfChange = localData;
+			}
 		}
 		ImGui::NewLine();
 	}

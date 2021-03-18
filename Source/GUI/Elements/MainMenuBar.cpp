@@ -4,7 +4,6 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
-#include "Core/World.h"
 #include "GUI/Elements/Dialogs/AboutDialog.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
@@ -49,11 +48,11 @@ void MainMenuBar::showFileMenu()
 {
 	if (ImGui::BeginMenu("File"))
 	{
-    // printf("aha!\n");
-    // std::cout << "aha!" << std::endl;
-    fprintf(stdout, "aha\n");
+		// printf("aha!\n");
+		// std::cout << "aha!" << std::endl;
+		fprintf(stdout, "aha\n");
 
-    if (ImGui::MenuItem("New"))
+		if (ImGui::MenuItem("New"))
 		{
 			// TabSpace::onOpenScene(TabSpace::RESET);
 		}
@@ -78,20 +77,26 @@ void MainMenuBar::showFileMenu()
 		if (ImGui::MenuItem("Open"))
 		{
 			std::string result;
-			std::string title="Open I3T script...";
-			std::string root=Config::getAbsolutePath("./");
-			std::vector<std::string> filter; filter.push_back("C source files"); filter.push_back("*.c");
-			bool b=SystemDialogs::OpenSingleFileDialog(result,title,root,filter);
+			std::string title = "Open I3T script...";
+			std::string root = Config::getAbsolutePath("./");
+			std::vector<std::string> filter;
+			filter.push_back("C source files");
+			filter.push_back("*.c");
+			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 
-			WorkspaceWindow*ww= (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
-			if (!result.empty()) {
-				if(ww!=NULL){
+			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+			if (!result.empty())
+			{
+				if (ww != NULL)
+				{
 					ww->WorkspaceNodes.clear();
 					LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
 				}
-				else { fprintf(stderr, "Open failed:WorkspaceWindow not found\n"); }
+				else
+				{
+					fprintf(stderr, "Open failed:WorkspaceWindow not found\n");
+				}
 			}
-			
 		}
 
 		if (ImGui::MenuItem("Append"))
@@ -99,36 +104,52 @@ void MainMenuBar::showFileMenu()
 			std::string result;
 			std::string title = "Open I3T script...";
 			std::string root = Config::getAbsolutePath("./");
-			std::vector<std::string> filter; filter.push_back("C source files"); filter.push_back("*.c");
+			std::vector<std::string> filter;
+			filter.push_back("C source files");
+			filter.push_back("*.c");
 			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 
-			WorkspaceWindow*ww= (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
-			if (!result.empty()) {
-				if(ww!=NULL){
+			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+			if (!result.empty())
+			{
+				if (ww != NULL)
+				{
 					LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
 				}
-				else { fprintf(stderr, "Append failed:WorkspaceWindow not found\n"); }
+				else
+				{
+					fprintf(stderr, "Append failed:WorkspaceWindow not found\n");
+				}
 			}
 		}
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Save"))
 		{
-			/// \todo SaveFileDialog, scene name 
+			/// \todo SaveFileDialog, scene name
 		}
 
 		if (ImGui::MenuItem("Save As"))
 		{
 			std::string result;
-			std::string title="Save I3T script...";
-			std::string root=Config::getAbsolutePath("./"); 
-			std::vector<std::string> filter; filter.push_back("C source files"); filter.push_back("*.c");
-			bool b= SystemDialogs::SaveSingleFileDialog(result,title,root,filter);
+			std::string title = "Save I3T script...";
+			std::string root = Config::getAbsolutePath("./");
+			std::vector<std::string> filter;
+			filter.push_back("C source files");
+			filter.push_back("*.c");
+			bool b = SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
 
 			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
-			if (!result.empty()) {
-				if (ww != NULL) {SaveWorkspace(result.c_str(), &ww->WorkspaceNodes);}
-				else {fprintf(stderr, "Save failed:WorkspaceWindow not found\n");}
+			if (!result.empty())
+			{
+				if (ww != NULL)
+				{
+					SaveWorkspace(result.c_str(), &ww->WorkspaceNodes);
+				}
+				else
+				{
+					fprintf(stderr, "Save failed:WorkspaceWindow not found\n");
+				}
 			}
 		}
 		ImGui::Separator();
@@ -182,7 +203,7 @@ void MainMenuBar::showEditMenu()
 
 void MainMenuBar::showWindowsMenu()
 {
-	
+
 	if (ImGui::BeginMenu("Windows"))
 	{
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
@@ -197,48 +218,49 @@ void MainMenuBar::showWindowsMenu()
 
 void MainMenuBar::showViewportsMenu()
 {
+	/// \todo MH setCamTo*, see Scene::setCamTo*
 	if (ImGui::BeginMenu("Viewports"))
 	{
 		if (ImGui::MenuItem("View-x"))
 		{
 			// Num 1
-			App::get().world()->scene->setCamToOrbitCenterX();
+			// App::get().world()->scene->setCamToOrbitCenterX();
 		}
 
 		if (ImGui::MenuItem("View-y"))
 		{
 			// Num 2
-			App::get().world()->scene->setCamToOrbitCenterY();
+			// App::get().world()->scene->setCamToOrbitCenterY();
 		}
 
 		if (ImGui::MenuItem("View-z"))
 		{
 			// Num 3
-			App::get().world()->scene->setCamToOrbitCenterZ();
+			// App::get().world()->scene->setCamToOrbitCenterZ();
 		}
 
 		if (ImGui::MenuItem("World-x"))
 		{
 			// Num 4
-			App::get().world()->scene->setCamToCenterX();
+			// App::get().world()->scene->setCamToCenterX();
 		}
 
 		if (ImGui::MenuItem("World-y"))
 		{
 			// Num 5
-			App::get().world()->scene->setCamToCenterY();
+			// App::get().world()->scene->setCamToCenterY();
 		}
 
 		if (ImGui::MenuItem("World-z"))
 		{
 			// Num 6
-			App::get().world()->scene->setCamToCenterZ();
+			// App::get().world()->scene->setCamToCenterZ();
 		}
 
 		if (ImGui::MenuItem("Center"))
 		{
 			// Num 0
-			App::get().world()->scene->setCamToCenter();
+			// App::get().world()->scene->setCamToCenter();
 		}
 
 		ImGui::EndMenu();

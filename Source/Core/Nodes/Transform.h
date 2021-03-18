@@ -216,12 +216,12 @@ public:
 
 class Frustum : public NodeBase
 {
-  float m_left;
-  float m_right;
-  float m_bottom;
-  float m_top;
-  float m_near;
-  float m_far;
+	float m_left;
+	float m_right;
+	float m_bottom;
+	float m_top;
+	float m_near;
+	float m_far;
 
 public:
 	Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,

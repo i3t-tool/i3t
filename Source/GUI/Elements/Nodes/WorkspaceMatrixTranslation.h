@@ -4,9 +4,8 @@
 class WorkspaceMatrixTranslation : public WorkspaceMatrix4x4
 {
 public:
-	WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel = "default MatrixTranslation header");
+	WorkspaceMatrixTranslation(ImTextureID headerBackground,
+	                           std::string headerLabel = "default MatrixTranslation header");
 
 	void drawData(util::NodeBuilder& builder);
-
 };
-

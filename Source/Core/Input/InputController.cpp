@@ -14,5 +14,5 @@ void InputController::addKeyDownFn(Keys::Code key, KeyCallback fn)
 
 void InputController::addKeyFn(Keys::Code key, KeyCallback fn)
 {
-  m_keyCallbacks.insert(std::pair(key, fn));
+	m_keyCallbacks.insert(std::pair(key, fn));
 }

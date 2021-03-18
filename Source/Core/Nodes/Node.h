@@ -121,7 +121,7 @@ public:
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
-  {
+	{
 		m_internalData[0].setValue(ptr);
 		spreadSignal();
 

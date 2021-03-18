@@ -40,7 +40,6 @@ class WorkspacePinProperties;
     \brief kinds (in/out) of Pin \todo maybe unused - this info is in Core
  */
 
-
 enum class PinKind
 {
 	Output,
@@ -64,14 +63,13 @@ public:
 	std::string HeaderLabel;
 	ImTextureID HeaderBackground;
 
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-
-	virtual void drawInputLinks()=0;
+	virtual void drawInputLinks() = 0;
 	virtual void drawHeader(util::NodeBuilder& builder);
-	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-	virtual void drawData(util::NodeBuilder& builder)=0;
-	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
+	virtual void drawData(util::NodeBuilder& builder) = 0;
+	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
@@ -82,19 +80,19 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
-//    // named-constructor-idiom
-//    //  copy ctor public
-//    WorkspaceNode(WorkspaceNode const& other);
-//
-//    static WorkspaceNode WorkspaceNodeFromCore(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel){
-//        return WorkspaceNode(nodebase->getId(), headerBackground, headerLabel);
-//    }
+	//    // named-constructor-idiom
+	//    //  copy ctor public
+	//    WorkspaceNode(WorkspaceNode const& other);
+	//
+	//    static WorkspaceNode WorkspaceNodeFromCore(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID
+	//    headerBackground, std::string headerLabel){
+	//        return WorkspaceNode(nodebase->getId(), headerBackground, headerLabel);
+	//    }
 
-//private:
-   	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel = "default WorkspaceNode HeaderLabel");
-
-
+	// private:
+	/* \todo some better constructors - this are just for test*/
+	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground,
+	              std::string headerLabel = "default WorkspaceNode HeaderLabel");
 };
 
 /* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
@@ -123,8 +121,8 @@ class WorkspacePinProperties
 {
 public:
 	const ne::PinId Id; /*! \brief unique (among Pins) identificator */
-	std::string Name;    /*! \brief Name of Pin */
-	const PinKind Kind;  /*! \brief Kind of pin \sa PinKind */
+	std::string Name;   /*! \brief Name of Pin */
+	const PinKind Kind; /*! \brief Kind of pin \sa PinKind */
 	const EValueType Type;
 
 	int IconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */

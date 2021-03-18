@@ -68,8 +68,7 @@ public:
 	 */
 	void run();
 
-	World* world();
-	World2*world2();
+	World2* world2();
 	ImFont* getFont(int fontId);
 	GLFWwindow* mainWindow();
 
@@ -113,9 +112,8 @@ private:
 
 	bool m_bShouldClose = false;
 
-	World* m_world; ///< all GUI and logic objects
-	World2*m_world2;
-	Scripting*m_scriptInterpreter;
+	World2* m_world2;
+	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	GlfwWindow* m_window;
 
