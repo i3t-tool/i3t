@@ -2,9 +2,19 @@
 #include "WorkspaceElements.h"
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 
+
 typedef std::vector<Core::Pin>::const_iterator pinIter;
 typedef std::vector<std::unique_ptr<WorkspacePinProperties>>::const_iterator pinPropIter;
 typedef std::vector<std::unique_ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
+
+struct WorkspaceNodeWithCoreDataArgs
+{
+    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    std::string headerLabel = "default WorkspaceNode header";
+    std::string nodeLabel = "Node";
+
+    Ptr<Core::NodeBase> nodebase = nullptr; /* \todo JH some default type of Core-Node will be nice (at least some of existing one) */
+};
 
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
@@ -19,7 +29,7 @@ public:
 	std::vector<std::unique_ptr<WorkspacePinProperties>> m_workspaceInputsProperties;
 	std::vector<std::unique_ptr<WorkspacePinProperties>> m_workspaceOutputsProperties;
 
-	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel = "default CoreData-node header", WorkspaceViewScale viewScale = WorkspaceViewScale::Full);
+	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
 
     virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 

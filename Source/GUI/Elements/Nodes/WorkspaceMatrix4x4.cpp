@@ -1,7 +1,7 @@
 #include "WorkspaceMatrix4x4.h"
 
-WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, std::string headerLabel, Ptr<Core::NodeBase> nodebase, WorkspaceViewScale viewScale)
-    : WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel, viewScale)
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMatrix4x4Args const& args)
+    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)

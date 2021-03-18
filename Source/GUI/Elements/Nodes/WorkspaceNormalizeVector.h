@@ -1,12 +1,19 @@
 #pragma once
 #include "WorkspaceVector4.h"
 
-/* Order of inheritance is important! WorkspaceNodeBaseData has to be first because it is necessary first create
- * NodeBase to read data from it */
+struct WorkspaceNormalizeVectorArgs
+{
+    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    std::string headerLabel = "default NormalizeVector header";
+    std::string nodeLabel = "default NormalizeVector label";
+    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::NormalizeVector>();
+};
+
+
 class WorkspaceNormalizeVector : public WorkspaceVector4
 {
 public:
-	WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel = "default NormalizeVector header", WorkspaceViewScale viewScale = WorkspaceViewScale::Full);
+	WorkspaceNormalizeVector(ImTextureID headerBackground, WorkspaceNormalizeVectorArgs const& args);
 
 	void drawData(util::NodeBuilder& builder);
 

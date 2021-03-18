@@ -18,18 +18,14 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
 /* \todo JH not use constant values here */
-WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, std::string headerLabel, WorkspaceViewScale viewScale)
-    :   m_id(id), m_viewScale(viewScale)
+WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
+    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel), m_viewScale(args.viewScale)
 {
 	/* \todo Some better default values - take from Const.h*/
 	m_state = "default WorkspaceNode state";
-	m_label = "default WorkspaceNode Label";
 	m_color = ImColor(255, 255, 255);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
-
-	m_headerLabel = headerLabel;
-	m_headerBackground = headerBackground;
 }
 
 /* \todo JH time-functions are taken from example */

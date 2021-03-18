@@ -1,14 +1,23 @@
 #pragma once
 #include "WorkspaceMatrix4x4.h"
 
+struct WorkspaceMatrixTranslationArgs
+{
+    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    std::string headerLabel = "default Translation header";
+    std::string nodeLabel = "Translation";
+    Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Translation>();
+};
+
 class WorkspaceMatrixTranslation : public WorkspaceMatrix4x4
 {
 public:
-	WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel = "default MatrixTranslation header", WorkspaceViewScale viewScale = WorkspaceViewScale::Full);
+	WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args);
 
 	void drawData(util::NodeBuilder& builder);
 
-	void drawDataJustChangAble(util::NodeBuilder& builder);
+	void drawDataSetValues(util::NodeBuilder& builder);
+	void drawDataLabel(util::NodeBuilder& builder);
 
 };
 
