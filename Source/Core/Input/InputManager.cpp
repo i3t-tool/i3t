@@ -7,11 +7,21 @@
 #include "Core/GlfwWindow.h"
 #include "Logger/LoggerInternal.h"
 
+#include "GUI/Elements/Windows/ViewportWindow.h"
+
 #define IM_MOUSE_KEYS_COUNT 3
 
 constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys::mouseMiddle};
 
 ImGuiConfigFlags g_mousedFlags;
+
+bool InputManager::isViewportActive()
+{
+	if (m_hoveredWindow)
+    return strcmp(m_hoveredWindow->getID(), UI::Viewport::ID) == 0;
+	else
+		return false;
+}
 
 void InputManager::processViewportEvents()
 {
@@ -68,6 +78,7 @@ void InputManager::processViewportEvents()
 		setUnpressed(Keys::mouseScrlDown);
 
 	// Handle keys.
+	/*
 	for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++)
 	{
 		if (ImGui::IsKeyPressed(i))
@@ -76,6 +87,7 @@ void InputManager::processViewportEvents()
 		if (ImGui::IsKeyReleased(i))
 			keyUp(i);
 	}
+	 */
 }
 
 bool InputManager::isActionZoomToAll()
@@ -83,8 +95,7 @@ bool InputManager::isActionZoomToAll()
 	return isKeyPressed(Keys::ctrll) && isKeyJustPressed(Keys::a);
 }
 
-void InputManager::
-		beginCameraControl()
+void InputManager::beginCameraControl()
 {
 	// Disable system cursor. The cursor will be hidden and at the endCameraControl the cursor will
 	// be at the same position.
@@ -131,16 +142,20 @@ void InputManager::update()
 	// mouseXDelta = 0;
 	// mouseYDelta = 0;
 
-  if (m_hoveredWindow)
-  {
-    for (const auto& [key, fn] : m_hoveredWindow->Input.m_keyDownCallbacks)
-    {
-      if (m_keyMap[key] == KeyState::JUST_DOWN)
-      {
-        fn();
-      }
-    }
-  }
+	if (m_hoveredWindow)
+	{
+		for (const auto& [key, fn] : m_hoveredWindow->Input.m_keyCallbacks)
+		{
+			if (m_keyMap[key] == KeyState::DOWN)
+				fn();
+		}
+
+		for (const auto& [key, fn] : m_hoveredWindow->Input.m_keyDownCallbacks)
+		{
+			if (m_keyMap[key] == KeyState::JUST_DOWN)
+				fn();
+		}
+	}
 
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
@@ -623,14 +638,3 @@ float InputManager::m_mouseYDelta = 0;
 
 int InputManager::m_winWidth = 0;
 int InputManager::m_winHeight = 0;
-
-/// std::strings describing the keys
-const char* Keys::keyStrings[] = {
-		"key a",    "key b", "key c",     "key d",      "key e",       "key f",       "key g",        "key h", "key i",
-		"key j",    "key k", "key l",     "key m",      "key n",       "key o",       "key p",        "key q", "key r",
-		"key s",    "key t", "key u",     "key v",      "key w",       "key x",       "key y",        "key z", "num 1",
-		"num 2",    "num 3", "num 4",     "num 5",      "num 6",       "num 7",       "num 8",        "num 9", "num 0",
-		"altr",     "altl",  "ctrll",     "ctrlr",      "shiftl",      "shiftr",      "left",         "right", "up",
-		"down",     "f1",    "f2",        "f3",         "f4",          "f5",          "f6",           "f7",    "f8",
-		"f9",       "f10",   "f11",       "f12",        "home",        "end",         "insert",       "del",   "pageUp",
-		"pageDown", "esc",   "mouseLeft", "mouseRight", "mouseMiddle", "mouseScrlUp", "mouseScrlDown"};

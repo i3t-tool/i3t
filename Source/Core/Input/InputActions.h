@@ -2,7 +2,7 @@
 
 #include "Core/Input/InputManager.h"
 
-struct Settings final
+struct InputActions final
 {
 	static bool CameraOrbit;
 	static Keys::Code KeyWorld_mousePan;

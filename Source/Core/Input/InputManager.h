@@ -87,6 +87,8 @@ public:
 		m_hoveredWindow = window;
 	}
 
+	static bool isViewportActive();
+
 	//@{
 	/** \name Handling of the keyboard keys */
 
