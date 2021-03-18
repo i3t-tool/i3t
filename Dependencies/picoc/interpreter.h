@@ -7,6 +7,7 @@
 
 #include "platform.h"
 
+#include <iostream>
 #include <stdio.h>
 /* handy definitions */
 #ifndef TRUE
@@ -30,12 +31,7 @@
 #define PRINT_SOURCE_POS ({ PrintSourceTextErrorLine(Parser->pc->CStdOut, Parser->FileName, Parser->SourceText, Parser->Line, Parser->CharacterPos); PlatformPrintf(Parser->pc->CStdOut, "\n"); })
 #define PRINT_TYPE(typ) PlatformPrintf(Parser->pc->CStdOut, "%t\n", typ);
 
-/* small processors use a simplified FILE * for stdio, otherwise use the system FILE * */
-#ifdef BUILTIN_MINI_STDLIB
-typedef struct OutputStream IOFILE;
-#else
 typedef FILE IOFILE;
-#endif
 
 /* coercion of numeric types to other numeric types */
 #ifndef NO_FP
@@ -435,8 +431,7 @@ struct Picoc_Struct
     int BigEndian;
     int LittleEndian;
 
-    IOFILE *CStdOut;
-    IOFILE CStdOutBase;
+    std::ostream *CStdOut;
 
     /* the picoc version string */
     const char *VersionString;
@@ -554,12 +549,12 @@ void BasicIOInit(Picoc *pc);
 void LibraryInit(Picoc *pc);
 void LibraryAdd(Picoc *pc, struct Table *GlobalTable, const char *LibraryName, struct LibraryFunction *FuncList);
 void CLibraryInit(Picoc *pc);
-void PrintCh(char OutCh, IOFILE *Stream);
-void PrintSimpleInt(long Num, IOFILE *Stream);
-void PrintInt(long Num, int FieldWidth, int ZeroPad, int LeftJustify, IOFILE *Stream);
-void PrintStr(const char *Str, IOFILE *Stream);
-void PrintFP(double Num, IOFILE *Stream);
-void PrintType(struct ValueType *Typ, IOFILE *Stream);
+//void PrintCh(char OutCh, IOFILE *Stream);
+//void PrintSimpleInt(long Num, IOFILE *Stream);
+//void PrintInt(long Num, int FieldWidth, int ZeroPad, int LeftJustify, IOFILE *Stream);
+//void PrintStr(const char *Str, IOFILE *Stream);
+//void PrintFP(double Num, IOFILE *Stream);
+void PrintType(struct ValueType *Typ, std::ostream *Stream);
 void LibPrintf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs);
 
 /* platform.c */
@@ -579,8 +574,8 @@ void PlatformCleanup(Picoc *pc);
 char *PlatformGetLine(char *Buf, int MaxLen, const char *Prompt);
 int PlatformGetCharacter();
 void PlatformPutc(unsigned char OutCh, union OutputStreamInfo *);
-void PlatformPrintf(IOFILE *Stream, const char *Format, ...);
-void PlatformVPrintf(IOFILE *Stream, const char *Format, va_list Args);
+void PlatformPrintf(std::ostream *Stream, const char *Format, ...);
+void PlatformVPrintf(std::ostream *Stream, const char *Format, va_list Args);
 void PlatformExit(Picoc *pc, int ExitVal);
 char *PlatformMakeTempName(Picoc *pc, char *TempNameBuffer);
 void PlatformLibraryInit(Picoc *pc);

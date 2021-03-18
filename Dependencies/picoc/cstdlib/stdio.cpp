@@ -1,6 +1,4 @@
-/* stdio.h library for large systems - small embedded systems use clibrary.c instead */
-#ifndef BUILTIN_MINI_STDLIB
-
+#include <iostream>
 #include <errno.h>
 #include "../interpreter.h"
 
@@ -45,7 +43,10 @@ struct StdVararg
 /* initialises the I/O system so error reporting works */
 void BasicIOInit(Picoc *pc)
 {
-    pc->CStdOut = stdout;
+
+    //pc->CStdOut = stdout;
+    pc->CStdOut = &std::cout;
+
     stdinValue = stdin;
     stdoutValue = stdout;
     stderrValue = stderr;
@@ -357,11 +358,47 @@ int StdioBaseScanf(struct ParseState *Parser, FILE *Stream, char *StrIn, char *F
 /* stdio calls */
 
 void StdioPrintf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs){
+
+    /*const char* FPos;
+    char*Format=(char*)Param[0]->Val->Pointer;
+    std::ostream*Stream=Parser->pc->CStdOut;
+
+    *Stream<<"PRINTF"<<std::endl;
+
+    int i=0;
+    for (FPos = Format; *FPos != '\0'; FPos++)
+    {
+        
+        if (*FPos == '%')
+        {
+            i++;
+            if(i>NumArgs-1){printf("ARG\n");break;}
+            FPos++;
+            printf("i %d,param %d/%d, valint %d\n",i, i+1,NumArgs,Param[i]->Val->Integer);
+            switch (*FPos)
+            {
+                case 's': *Stream<<"(char*)Param[i]->Val->Pointer"; break;
+                case 'd': *Stream<<"(int)Param[i]->Val->Integer"; break;
+                case 'c': *Stream <<"(char)Param[i]->Val->Character"; break;
+                //case 't': *Stream << va_arg(Args, struct ValueType *); break;
+        #ifndef NO_FP
+                case 'f': *Stream << "(double)Param[i]->Val->FP"; break;
+        #endif
+                case '%': *Stream << '%'; break;
+                case '\0': FPos--; break;
+                default: i--;break;
+            }
+        }
+        else{
+          *Stream << (char)*FPos;
+        }
+        
+    }*/
     struct StdVararg PrintfArgs;
-    
+
     PrintfArgs.Param = Param;
-    PrintfArgs.NumArgs = NumArgs-1;
-    ReturnValue->Val->Integer = StdioBasePrintf(Parser, stdout, NULL, 0, (char*)Param[0]->Val->Pointer, &PrintfArgs);
+    PrintfArgs.NumArgs = NumArgs - 1;
+    ReturnValue->Val->Integer = StdioBasePrintf(Parser,stdout, NULL, 0, (char*)Param[0]->Val->Pointer, &PrintfArgs);
 }
 
 /* handy structure definitions */
@@ -372,7 +409,7 @@ typedef struct __FILEStruct FILE;\
 
 /* all stdio functions */
 struct LibraryFunction StdioFunctions[] ={
-    { StdioPrintf,  "int printf(char *, ...);" },
+    { StdioPrintf,  "void printf(char *, ...);" },
     { NULL,         NULL }
 };
 
@@ -415,7 +452,7 @@ void StdioSetupFunc(Picoc *pc)
 }
 
 /* portability-related I/O calls */
-void PrintCh(char OutCh, FILE *Stream)
+/*void PrintCh(char OutCh, FILE *Stream)
 {
     putc(OutCh, Stream);
 }
@@ -433,6 +470,5 @@ void PrintStr(const char *Str, FILE *Stream)
 void PrintFP(double Num, FILE *Stream)
 {
     fprintf(Stream, "%f", Num);
-}
+}*/
 
-#endif /* !BUILTIN_MINI_STDLIB */

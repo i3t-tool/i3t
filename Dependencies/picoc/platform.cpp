@@ -89,7 +89,7 @@ void PicocCallMain(Picoc *pc, int argc, char **argv)
 }
 #endif
 
-void PrintSourceTextErrorLine(IOFILE *Stream, const char *FileName, const char *SourceText, int Line, int CharacterPos)
+void PrintSourceTextErrorLine(std::ostream *Stream, const char *FileName, const char *SourceText, int Line, int CharacterPos)
 {
     int LineCount;
     const char *LinePos;
@@ -106,24 +106,34 @@ void PrintSourceTextErrorLine(IOFILE *Stream, const char *FileName, const char *
         }
         
         /* display the line */
-        for (CPos = LinePos; *CPos != '\n' && *CPos != '\0'; CPos++)
-            PrintCh(*CPos, Stream);
-        PrintCh('\n', Stream);
-        
+        for (CPos = LinePos; *CPos != '\n' && *CPos != '\0'; CPos++){
+            //PrintCh(*CPos, Stream);
+        //PrintCh('\n', Stream);
+            *Stream<<*CPos;
+        }
+        *Stream<<std::endl;
         /* display the error position */
         for (CPos = LinePos, CCount = 0; *CPos != '\n' && *CPos != '\0' && (CCount < CharacterPos || *CPos == ' '); CPos++, CCount++)
         {
             if (*CPos == '\t')
-                PrintCh('\t', Stream);
+            {
+                //PrintCh('\t', Stream);
+                *Stream<<'\t';
+            }
             else
-                PrintCh(' ', Stream);
+            { 
+                //PrintCh(' ', Stream);
+                *Stream<<' ';
+            }
         }
     }
     else
     {
         /* assume we're in interactive mode - try to make the arrow match up with the input text */
-        for (CCount = 0; CCount < CharacterPos + (int)strlen(INTERACTIVE_PROMPT_STATEMENT); CCount++)
-            PrintCh(' ', Stream);
+        for (CCount = 0; CCount < CharacterPos + (int)strlen(INTERACTIVE_PROMPT_STATEMENT); CCount++){
+            //PrintCh(' ', Stream);
+            *Stream <<' ';
+        }
     }
     PlatformPrintf(Stream, "^\n%s:%d:%d ", FileName, Line, CharacterPos);
     
@@ -157,9 +167,9 @@ void ProgramFailNoParser(Picoc *pc, const char *Message, ...)
 /* like ProgramFail() but gives descriptive error messages for assignment */
 void AssignFail(struct ParseState *Parser, const char *Format, struct ValueType *Type1, struct ValueType *Type2, int Num1, int Num2, const char *FuncName, int ParamNo)
 {
-    IOFILE *Stream = Parser->pc->CStdOut;
-    
+    std::ostream *Stream = Parser->pc->CStdOut;
     PrintSourceTextErrorLine(Parser->pc->CStdOut, Parser->FileName, Parser->SourceText, Parser->Line, Parser->CharacterPos);
+    
     PlatformPrintf(Stream, "can't %s ", (FuncName == NULL) ? "assign" : "set");   
         
     if (Type1 != NULL)
@@ -188,7 +198,7 @@ void LexFail(Picoc *pc, struct LexState *Lexer, const char *Message, ...)
 }
 
 /* printf for compiler error reporting */
-void PlatformPrintf(IOFILE *Stream, const char *Format, ...)
+void PlatformPrintf(std::ostream *Stream, const char *Format, ...)
 {
     va_list Args;
     
@@ -197,11 +207,11 @@ void PlatformPrintf(IOFILE *Stream, const char *Format, ...)
     va_end(Args);
 }
 
-void PlatformVPrintf(IOFILE *Stream, const char *Format, va_list Args)
+void PlatformVPrintf(std::ostream *Stream, const char *Format, va_list Args)
 {
-    const char *FPos;
+   const char *FPos;
     
-    for (FPos = Format; *FPos != '\0'; FPos++)
+    /*for (FPos = Format; *FPos != '\0'; FPos++)
     {
         if (*FPos == '%')
         {
@@ -221,7 +231,30 @@ void PlatformVPrintf(IOFILE *Stream, const char *Format, va_list Args)
         }
         else
             PrintCh(*FPos, Stream);
+    }*/
+    for (FPos = Format; *FPos != '\0'; FPos++)
+    {
+        if (*FPos == '%')
+        {
+            FPos++;
+            switch (*FPos)
+            {
+            case 's': *Stream<<(char*)va_arg(Args, char *); break;
+            case 'd': *Stream<<(int)va_arg(Args, int); break;
+            case 'c': *Stream <<(int)va_arg(Args, int); break;
+            //case 't': *Stream << va_arg(Args, struct ValueType *); break;
+    #ifndef NO_FP
+            case 'f': *Stream << (double)va_arg(Args, double); break;
+    #endif
+            case '%': *Stream << '%'; break;
+            case '\0': FPos--; break;
+            }
+        }
+        else{
+          *Stream << (char)*FPos;
+        }
     }
+
 }
 
 /* make a new temporary name. takes a static buffer of char [7] as a parameter. should be initialised to "XX0000"
