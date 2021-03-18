@@ -109,7 +109,7 @@ public:
 																				//
 
 	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
-	std::vector<std::unique_ptr<WorkspaceNode>> WorkspaceNodes; /*! \brief All WorkspaceNodes */
+	std::vector<std::unique_ptr<WorkspaceNode>> m_workspaceNodes; /*! \brief All WorkspaceNodes */
 
 	//    ne::NodeId contextNodeId;
 	//    ne::LinkId contextLinkId;
@@ -124,6 +124,9 @@ public:
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
 	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
+
+	std::vector<WorkspaceNode*> getSelectedWorkspaceNodes();
+	WorkspaceNode* getWorkspaceNodeByID(ne::NodeId id);
 
 	WorkspaceWindow(bool show);
 	~WorkspaceWindow();

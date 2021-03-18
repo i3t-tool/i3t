@@ -151,5 +151,9 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value,
     }
 
     return valueChanged;
+    /* maybe usefull
+        ImGui::GetFontSize() or ImGui::GetFrameHeight()
+
+    */
 }
 

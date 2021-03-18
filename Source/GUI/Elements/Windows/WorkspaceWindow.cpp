@@ -68,31 +68,31 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	/* \todo adding nodes here just for testing */
 	/*--- TRANSLATION */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>( HeaderBackgroundTexture, WorkspaceMatrixTranslationArgs{} ));
-	ne::SetNodePosition(WorkspaceNodes.back()->m_id, ImVec2(-252, 220));
+	m_workspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>( HeaderBackgroundTexture, WorkspaceMatrixTranslationArgs{} ));
+	ne::SetNodePosition(m_workspaceNodes.back()->m_id, ImVec2(-252, 220));
 
     /*--- TRANSLATION with connection to translation */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, WorkspaceMatrixTranslationArgs{.viewScale=WorkspaceViewScale::Label, .headerLabel="MatrixTranslation 2", .nodeLabel="Translation label"}));
-	ne::SetNodePosition(WorkspaceNodes.back()->m_id, ImVec2(-300, 351));
+	m_workspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, WorkspaceMatrixTranslationArgs{.viewScale=WorkspaceViewScale::Label, .headerLabel="MatrixTranslation 2", .nodeLabel="Translation label"}));
+	ne::SetNodePosition(m_workspaceNodes.back()->m_id, ImVec2(-300, 351));
 
 	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
-	Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->m_nodebase,
-	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->m_nodebase, 0, 0);
+	Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(m_workspaceNodes.at(0).get())->m_nodebase,
+	                         static_cast<WorkspaceNodeWithCoreData*>(m_workspaceNodes.at(1).get())->m_nodebase, 0, 0);
 
 	/*--- MATRIX_4x4 with connection to translation*/
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, WorkspaceMatrix4x4Args{.headerLabel="just Matrix4x4 1"}));
-	ne::SetNodePosition(WorkspaceNodes.back()->m_id, ImVec2(-500, 351));
+	m_workspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, WorkspaceMatrix4x4Args{.headerLabel="just Matrix4x4 1"}));
+	ne::SetNodePosition(m_workspaceNodes.back()->m_id, ImVec2(-500, 351));
 
-    Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->m_nodebase,
-	                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->m_nodebase, 0, 0);
+    Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(m_workspaceNodes.at(0).get())->m_nodebase,
+	                         static_cast<WorkspaceNodeWithCoreData*>(m_workspaceNodes.at(2).get())->m_nodebase, 0, 0);
 
     /*--- SCALE */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, WorkspaceMatrixScaleArgs{}));
-	ne::SetNodePosition(WorkspaceNodes.back()->m_id, ImVec2(-500, 351));
+	m_workspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, WorkspaceMatrixScaleArgs{}));
+	ne::SetNodePosition(m_workspaceNodes.back()->m_id, ImVec2(-500, 351));
 
 	/*--- NORMALIZE VECTOR */
-	WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, WorkspaceNormalizeVectorArgs{}));
-	ne::SetNodePosition(WorkspaceNodes.back()->m_id, ImVec2(100, 400));
+	m_workspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, WorkspaceNormalizeVectorArgs{}));
+	ne::SetNodePosition(m_workspaceNodes.back()->m_id, ImVec2(100, 400));
 
 
 
@@ -162,12 +162,12 @@ void WorkspaceWindow::render()
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");
 
-	for (auto&& WorkspaceNode : WorkspaceNodes)
+	for (auto&& WorkspaceNode : m_workspaceNodes)
 	{
 		WorkspaceNode->drawNode(NodeBuilderContext, nullptr);
 	}
 
-    for (auto& workspaceNode : WorkspaceNodes)
+    for (auto& workspaceNode : m_workspaceNodes)
     {
         dynamic_cast<WorkspaceNodeWithCoreData*>(workspaceNode.get())
             ->drawInputLinks(); /* \todo skip nodes with no inputs...*/
@@ -178,7 +178,7 @@ void WorkspaceWindow::render()
 	ImGui::End();
 	/* ed::SetCurrentEditor(m_Editor); \todo maybe call it here for static load of current editor setting (if changed)
 	 */
-
+/*
 	//    auto& io = ImGui::GetIO();
 	//
 	//    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
@@ -317,14 +317,52 @@ void WorkspaceWindow::render()
 	//    popupMenu(createNewNode, newNodeLinkPin, contextNodeId, contextPinId, contextLinkId);
 	//    ne::Resume();
 	//
+	*/
+}
+
+WorkspaceNode* WorkspaceWindow::getWorkspaceNodeByID(ne::NodeId const id){
+    for(auto&& workspaceNode : m_workspaceNodes)
+    {
+        if(workspaceNode->m_id == id){ return workspaceNode.get(); }
+    }
+    return nullptr;
+}
+
+std::vector<WorkspaceNode*> WorkspaceWindow::getSelectedWorkspaceNodes()
+{
+    std::vector<WorkspaceNode*> allSelectedNodes;
+    std::vector<ne::NodeId> allSelectedNodesIDs;
+    WorkspaceNode *temp;
+
+    int numOfSelectedObjects = ne::GetSelectedObjectCount(); /* not Nodes only */
+
+    allSelectedNodesIDs.resize(numOfSelectedObjects);
+
+    int numOfSelectedNodes = ne::GetSelectedNodes(allSelectedNodesIDs.data(), numOfSelectedObjects);
+    allSelectedNodesIDs.resize(numOfSelectedNodes);
+
+    allSelectedNodes.reserve(numOfSelectedNodes);
+
+    for (auto nodeId : allSelectedNodesIDs)
+    {
+        temp = getWorkspaceNodeByID(nodeId);
+        if (temp)
+        {
+            allSelectedNodes.push_back(temp);
+        }
+    }
+
+    return allSelectedNodes;
+
+
 }
 
 void WorkspaceWindow::UpdateTouchAllNodes()
 {
 	const auto deltaTime = ImGui::GetIO().DeltaTime;
-	for (auto&& WorkspaceNode : WorkspaceNodes)
+	for (auto&& workspaceNode : m_workspaceNodes)
 	{
-		WorkspaceNode->UpdateTouch(deltaTime);
+		workspaceNode->UpdateTouch(deltaTime);
 	}
 }
 
