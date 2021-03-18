@@ -5,7 +5,7 @@
 #include "Core/API.h"
 #include "Core/Application.h"
 #include "Core/Input/InputManager.h"
-#include "GUI/Settings.h"
+#include "Core/Input/InputActions.h"
 #include "Rendering/FrameBuffer.h"
 
 #include "../../../World2/World2.h"
@@ -103,7 +103,7 @@ void Viewport::render()
 
 			// resize all other things
 			m_world->onReshape(width, height);
-			Settings::resize((float)width, (float)height);
+			InputActions::resize((float)width, (float)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 

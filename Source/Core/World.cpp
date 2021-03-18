@@ -4,7 +4,7 @@
 #include "Core/Application.h"
 #include "Core/Defs.h"
 #include "Core/Input/InputManager.h"
-#include "GUI/Settings.h"
+#include "Core/Input/InputActions.h"
 #include "Logger/LoggerInternal.h"
 #include "Rendering/AlphaShader.h"
 #include "Rendering/BaseShader.h"
@@ -77,7 +77,7 @@ void World::constructScene()
 
 void World::setConfigCameraControl()
 {
-	if (Settings::CameraOrbit)
+	if (InputActions::CameraOrbit)
 		setToOrbitControl();
 	else
 		setToTrackballControl();
@@ -101,65 +101,68 @@ void World::setToTrackballControl()
 
 void World::update()
 {
-	// CAMERA ROTATION
-	// orbit or trackball
-	if (cameraOrbitControl)
-	{
-		if (InputManager::isKeyJustPressed(Settings::KeyWorld_mouseRotate)) // ORBIT camera rotation
-		{
-			cameraIsControlled = true;
-			InputManager::beginCameraControl();
-		}
-		if (cameraIsControlled && InputManager::isKeyPressed(Settings::KeyWorld_mouseRotate))
-		{
-			scene->camera->orbit(scene->cameraOrbitCenter);
-		}
-		if (InputManager::isKeyJustUp(Settings::KeyWorld_mouseRotate))
-		{
-			cameraIsControlled = false;
-			InputManager::endCameraControl();
-		}
-	}
-	else // TRACKBALL camera rotation
-	{
-		if (InputManager::isKeyJustPressed(Settings::KeyWorld_mouseRotate))
-		{
-			cameraIsControlled = true;
-			InputManager::beginCameraControl();
-		}
-		if (InputManager::isKeyPressed(Settings::KeyWorld_mouseRotate))
-		{
-			scene->camera->trackball(scene->cameraOrbitCenter, 2.0f);
-		}
-		if (InputManager::isKeyJustUp(Settings::KeyWorld_mouseRotate))
-		{
-			cameraIsControlled = false;
-			InputManager::endCameraControl();
-		}
-	}
+  if (InputManager::isViewportActive())
+  {
+    // CAMERA ROTATION
+    // orbit or trackball
+    if (cameraOrbitControl)
+    {
+      if (InputManager::isKeyJustPressed(InputActions::KeyWorld_mouseRotate)) // ORBIT camera rotation
+      {
+        cameraIsControlled = true;
+        InputManager::beginCameraControl();
+      }
+      if (cameraIsControlled && InputManager::isKeyPressed(InputActions::KeyWorld_mouseRotate))
+      {
+        scene->camera->orbit(scene->cameraOrbitCenter);
+      }
+      if (InputManager::isKeyJustUp(InputActions::KeyWorld_mouseRotate))
+      {
+        cameraIsControlled = false;
+        InputManager::endCameraControl();
+      }
+    }
+    else // TRACKBALL camera rotation
+    {
+      if (InputManager::isKeyJustPressed(InputActions::KeyWorld_mouseRotate))
+      {
+        cameraIsControlled = true;
+        InputManager::beginCameraControl();
+      }
+      if (InputManager::isKeyPressed(InputActions::KeyWorld_mouseRotate))
+      {
+        scene->camera->trackball(scene->cameraOrbitCenter, 2.0f);
+      }
+      if (InputManager::isKeyJustUp(InputActions::KeyWorld_mouseRotate))
+      {
+        cameraIsControlled = false;
+        InputManager::endCameraControl();
+      }
+    }
 
-	// CAMERA PANNING - set a new orbit center
-	if (InputManager::isKeyJustPressed(Keys::mouseMiddle))
-	{
-		cameraIsControlled = true;
-		InputManager::beginCameraControl();
-	}
-	if (cameraIsControlled && InputManager::isKeyPressed(Settings::KeyWorld_mousePan))
-	{
-		scene->camera->moveOrbitCenter((float)-InputManager::m_mouseXDelta, (float)-InputManager::m_mouseYDelta,
-		                               Config::CAM_MOTION_SENSITIVITY, scene->cameraOrbitCenter);
-	}
-	if (InputManager::isKeyJustUp(Settings::KeyWorld_mousePan))
-	{
-		cameraIsControlled = false;
-		InputManager::endCameraControl();
-	}
+    // CAMERA PANNING - set a new orbit center
+    if (InputManager::isKeyJustPressed(Keys::mouseMiddle))
+    {
+      cameraIsControlled = true;
+      InputManager::beginCameraControl();
+    }
+    if (cameraIsControlled && InputManager::isKeyPressed(InputActions::KeyWorld_mousePan))
+    {
+      scene->camera->moveOrbitCenter((float)-InputManager::m_mouseXDelta, (float)-InputManager::m_mouseYDelta,
+                                     Config::CAM_MOTION_SENSITIVITY, scene->cameraOrbitCenter);
+    }
+    if (InputManager::isKeyJustUp(InputActions::KeyWorld_mousePan))
+    {
+      cameraIsControlled = false;
+      InputManager::endCameraControl();
+    }
 
-	// CAMERA ZOOM
-	if (InputManager::isKeyJustUp(Keys::mouseScrlUp))
-		scene->camera->pedal(Config::CAM_SCROLL_SENSITIVITY);
-	if (InputManager::isKeyJustUp(Keys::mouseScrlDown))
-		scene->camera->pedal(-Config::CAM_SCROLL_SENSITIVITY);
+    // CAMERA ZOOM
+    if (InputManager::isKeyJustUp(Keys::mouseScrlUp))
+      scene->camera->pedal(Config::CAM_SCROLL_SENSITIVITY);
+    if (InputManager::isKeyJustUp(Keys::mouseScrlDown))
+      scene->camera->pedal(-Config::CAM_SCROLL_SENSITIVITY);
+	}
 
 	/*
 	// freeLook
