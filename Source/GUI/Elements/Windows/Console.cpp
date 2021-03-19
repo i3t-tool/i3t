@@ -78,8 +78,11 @@ void Console::onUpKey()
 		std::string ss=str.substr(commands[selected][0], commands[selected][1]);
 		memcpy(command, ss.c_str(), ss.size());
 		command[ss.size()] = '\0';
+
+		printf("up   %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 	}
-	printf("up   %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
+	
+	render();
 }
 
 void Console::onDownKey()
@@ -98,7 +101,9 @@ void Console::onDownKey()
 			memcpy(command, ss.c_str(), ss.size());
 			command[ss.size()] = '\0';
 		}
-	}
-	printf("down %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 
+		printf("down %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
+	}
+
+	render();
 }
