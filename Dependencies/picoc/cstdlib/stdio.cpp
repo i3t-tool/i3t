@@ -28,7 +28,7 @@ static FILE* stderrValue;
 /* our own internal output stream which can output to FILE * or strings */
 typedef struct StdOutStreamStruct
 {
-    FILE* FilePtr;
+    std::ostream* FilePtr;
     char* StrOutPtr;
     int StrOutLen;
     int CharCount;
@@ -46,7 +46,7 @@ struct StdVararg
 void BasicIOInit(Picoc* pc)
 {
     //pc->CStdOut = stdout;
-    pc->CStdOut=&std::cout;
+    pc->CStdOut = &std::cout;
     stdinValue = stdin;
     stdoutValue = stdout;
     stderrValue = stderr;
@@ -58,7 +58,7 @@ void StdioOutPutc(int OutCh, StdOutStream* Stream)
     if (Stream->FilePtr != NULL)
     {
         /* output to stdio stream */
-        putc(OutCh, Stream->FilePtr);
+        *(Stream->FilePtr) << (char)OutCh;
         Stream->CharCount++;
     }
     else if (Stream->StrOutLen < 0 || Stream->StrOutLen > 1)
@@ -80,7 +80,7 @@ void StdioOutPuts(const char* Str, StdOutStream* Stream)
     if (Stream->FilePtr != NULL)
     {
         /* output to stdio stream */
-        fputs(Str, Stream->FilePtr);
+        *(Stream->FilePtr) << Str;
     }
     else
     {
@@ -106,9 +106,11 @@ void StdioOutPuts(const char* Str, StdOutStream* Stream)
 /* printf-style format of an int or other word-sized object */
 void StdioFprintfWord(StdOutStream* Stream, const char* Format, unsigned long Value)
 {
-    if (Stream->FilePtr != NULL)
-        Stream->CharCount += fprintf(Stream->FilePtr, Format, Value);
-
+    if (Stream->FilePtr != NULL) {
+        char out[128] = { 0 };
+        Stream->CharCount += sprintf(out, Format, Value);
+        *(Stream->FilePtr) << out;
+    }
     else if (Stream->StrOutLen >= 0)
     {
 #ifndef WIN32
@@ -131,9 +133,12 @@ void StdioFprintfWord(StdOutStream* Stream, const char* Format, unsigned long Va
 /* printf-style format of a floating point number */
 void StdioFprintfFP(StdOutStream* Stream, const char* Format, double Value)
 {
-    if (Stream->FilePtr != NULL)
-        Stream->CharCount += fprintf(Stream->FilePtr, Format, Value);
-
+    if (Stream->FilePtr != NULL) {
+        char out[128] = { 0 };
+        Stream->CharCount += sprintf(out, Format, Value);
+        fprintf(stdout, Format, Value);
+        *(Stream->FilePtr) << (char*)out;
+    }
     else if (Stream->StrOutLen >= 0)
     {
 #ifndef WIN32
@@ -156,9 +161,11 @@ void StdioFprintfFP(StdOutStream* Stream, const char* Format, double Value)
 /* printf-style format of a pointer */
 void StdioFprintfPointer(StdOutStream* Stream, const char* Format, void* Value)
 {
-    if (Stream->FilePtr != NULL)
-        Stream->CharCount += fprintf(Stream->FilePtr, Format, Value);
-
+    if (Stream->FilePtr != NULL) {
+        char out[128] = { 0 };
+        Stream->CharCount += sprintf(out, Format, Value);
+        *(Stream->FilePtr) << (char*)out;
+    }
     else if (Stream->StrOutLen >= 0)
     {
 #ifndef WIN32
@@ -194,7 +201,8 @@ int StdioBasePrintf(struct ParseState* Parser, FILE* Stream, char* StrOut, int S
         Format = "[null format]\n";
 
     FPos = Format;
-    SOStream.FilePtr = Stream;
+    //SOStream.FilePtr = Stream;
+    SOStream.FilePtr = &std::cout;
     SOStream.StrOutPtr = StrOut;
     SOStream.StrOutLen = StrOutLen;
     SOStream.CharCount = 0;
@@ -358,45 +366,6 @@ int StdioBaseScanf(struct ParseState* Parser, FILE* Stream, char* StrIn, char* F
 /* stdio calls */
 
 void StdioPrintf(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
-
-    /*const char* FPos;
-    char*Format=(char*)Param[0]->Val->Pointer;
-    std::ostream*Stream=&std::cout;
-
-    int i=0;
-    for (FPos = Format; *FPos != '\0'; FPos++)
-    {
-
-        if (*FPos == '%')
-        {
-            i++;
-            if(i>NumArgs-1){printf("ARG\n");break;}
-            FPos++;
-            //printf("i %d,param %d/%d, valint %d\n",i, i+1,NumArgs,Param[i]->Val->Integer);
-            switch (*FPos)
-            {
-                case 's': *Stream<<"(char*)Param[i]->Val->Pointer"; break;
-                case 'd': *Stream<<"(int)Param[i]->Val->Integer"; break;
-                case 'c': *Stream <<"(char)Param[i]->Val->Character"; break;
-                //case 't': *Stream << va_arg(Args, struct ValueType *); break;
-        #ifndef NO_FP
-                case 'f': *Stream << "(double)Param[i]->Val->FP"; break;
-        #endif
-                case '%': *Stream << '%'; break;
-                case '\0': FPos--; break;
-                default: i--;break;
-            }
-        }
-        else{
-          *Stream << (char)*FPos;
-        }
-
-    }
-
-    printf("param %d/%s\n", NumArgs, (char*)Param[0]->Val->Pointer);*/
-    //int t= Param[1]->Val->Integer;
-    //printf("t is %d\n",t);
-    //printf("param %d/%d\n", NumArgs, Param[1]->Val->Integer);
 
     struct StdVararg PrintfArgs;
 

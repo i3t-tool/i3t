@@ -104,6 +104,6 @@ void Console::onDownKey()
 
 		printf("down %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 	}
-
+	
 	render();
 }
