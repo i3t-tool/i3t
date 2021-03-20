@@ -11,7 +11,7 @@
 #include <typeinfo>
 
 void printMatrix2(glm::mat4 m){
-  printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n",
+  printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",
 	  m[0][0], m[1][0], m[2][0], m[3][0],
 	  m[0][1], m[1][1], m[2][1], m[3][1],
 	  m[0][2], m[1][2], m[2][2], m[3][2],
@@ -66,9 +66,25 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 		
 	float depth=(World2::perspective*World2::mainCamera*this->handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
-		
+	
+
+
+
+	glm::vec4 row4bkp = glm::vec4(this->editedobj->transformation[0][3], this->editedobj->transformation[1][3], this->editedobj->transformation[2][3], this->editedobj->transformation[3][3]);
+	this->editedobj->transformation[0][3] = 0.0f;
+	this->editedobj->transformation[1][3] = 0.0f;
+	this->editedobj->transformation[2][3] = 0.0f;
+	this->editedobj->transformation[3][3] = 1.0f;
+
 	glm::mat4 ftransform=getFullTransform(this->editedobj);
+
+	this->editedobj->transformation[0][3] = row4bkp[0];
+	this->editedobj->transformation[1][3] = row4bkp[1];
+	this->editedobj->transformation[2][3] = row4bkp[2];
+	this->editedobj->transformation[3][3] = row4bkp[3];
 		
+
+
 	float transparency=1.0f;//(float)(renderTransparent==false)*0.5f+0.5f;
 	//if(this->editspace==TransformHandles::EDIT_FREE||true){
 		glm::mat4 t;
@@ -76,26 +92,26 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 			
 		selected=0.3f*(float)(this->editaxis==0 && this->editspace == TransformHandles::EDIT_FREE);
 		t=getOrtho(ftransform,0);
-		t[1]*=1.0f+selected*3.0f;t[2]*=1.0f+selected*3.0f;
+		setLen((glm::vec3*)&t[1],1.0f+selected*3.0f);setLen((glm::vec3*)&t[2],1.0f+selected*3.0f);
 		lineh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
 		drawHandle(lineh,t,glm::vec4( 1.0f,selected*1.5f,selected * 1.5f,transparency),this->stencilaxisx,false);
 			
 		selected=0.3f*(float)(this->editaxis==1 && this->editspace == TransformHandles::EDIT_FREE);
 		t=getOrtho(ftransform,1);
-		t[0]*=1.0f+selected*3.0f;t[2]*=1.0f+selected*3.0f;
+		setLen((glm::vec3*)&t[0],1.0f+selected*3.0f);setLen((glm::vec3*)&t[2],1.0f+selected*3.0f);
 		lineh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f));
 		drawHandle(lineh,t,glm::vec4(selected*1.5f,1.0f,selected*1.5f,transparency),this->stencilaxisy,false);
 			
 		selected=0.3f*(float)(this->editaxis==2 && this->editspace == TransformHandles::EDIT_FREE);
 		t=getOrtho(ftransform,2);
-		t[0]*=1.0f+selected*3.0f;t[1]*=1.0f+selected*3.0f;
+		setLen((glm::vec3*)&t[0],1.0f+selected*3.0f);setLen((glm::vec3*)&t[1],1.0f+selected*3.0f);
 		lineh->transformation=glm::mat4(1.0f);
 		drawHandle(lineh,t,glm::vec4(selected*0.5f+0.1f,selected*0.5f+0.4f,1.0f,transparency),this->stencilaxisz,false);
 			
 		selected=0.3f*(float)(this->editaxis==3&& this->editspace == TransformHandles::EDIT_FREE);
 		t=glm::mat4(ftransform[1],ftransform[2],getFullTransform(this->editedobj->parent)[3]-ftransform[3], ftransform[3]);
 		t = getOrtho(t, 2);
-		t[0]*=1.0f+selected*3.0f;t[1]*=1.0f+selected*3.0f;
+		setLen((glm::vec3*)&t[0],1.0f+selected*3.0f);setLen((glm::vec3*)&t[1],1.0f+selected*3.0f);
 		lineh->transformation=glm::mat4(1.0f);
 		drawHandle(lineh,t,glm::vec4(1.0f,selected+0.2f,1.0f,transparency),this->stencilaxisw,false);
 	//}
@@ -115,7 +131,7 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 			drawHandle(uniscaleh,this->handlespace,glm::vec4(0.1f,0.4f,1.0f,transparency),this->stencilz,this->activehandle==this->stencilz);
 		}
 		else if(this->editaxis==3){
-			uniscaleh->transformation=glm::mat4(1.0f)*scale;	
+			uniscaleh->transformation=glm::mat4(1.0f)*scale;
 			drawHandle(uniscaleh,this->handlespace,glm::vec4(1.0f,0.2f,1.0f,transparency),this->stencilz,this->activehandle==this->stencilz);
 		}
 	}
@@ -191,6 +207,11 @@ void TransformHandles::update(){
 	}
 		
 	if(!this->isEdit){return;}
+	glm::vec4 row4bkp=glm::vec4(this->editedobj->transformation[0][3], this->editedobj->transformation[1][3],this->editedobj->transformation[2][3],this->editedobj->transformation[3][3]);
+	this->editedobj->transformation[0][3]=0.0f;
+	this->editedobj->transformation[1][3]=0.0f;
+	this->editedobj->transformation[2][3]=0.0f;
+	this->editedobj->transformation[3][3]=1.0f;
 		
 	if(this->activehandle==-1){
 		if(InputManager::isKeyPressed(Keys::l)){this->editspace =TransformHandles::EDIT_LOCAL;}
@@ -206,7 +227,14 @@ void TransformHandles::update(){
 		else if (InputManager::isKeyPressed(Keys::z)){this->editaxis = 2;}
 		else if (InputManager::isKeyPressed(Keys::w)){this->editaxis = 3;}
 		this->bkp=editedobj->transformation;
-		this->rotfreebkp=this->editedobj->transformation;
+
+		if(this->editaxis==3){
+			glm::mat4 m= this->editedobj->transformation;m[2]=m[3];
+			this->rotfreebkp=getRotation(m, 2);
+		}
+		else{
+			this->rotfreebkp=getRotation(this->editedobj->transformation,this->editaxis);
+		}
 	}
 		
 	if(this->editspace==TransformHandles::EDIT_FREE){//free editing - editing axes of matix directly
@@ -217,7 +245,7 @@ void TransformHandles::update(){
 			this->handlespace=getNormalized(m);
 			m=m*this->editedobj->transformation;
 			this->handlespace[3]=m[3]+m[this->editaxis]*(float)(this->editaxis!=3);
-
+			//printMatrix2(this->handlespace);
 		}
 		else if(this->editmode==TransformHandles::EDIT_SCALE){
 			glm::mat4 m=getFullTransform(this->editedobj->parent);
@@ -232,11 +260,11 @@ void TransformHandles::update(){
 			this->handlespace[3]=m[3]+m[this->editaxis]*(float)(this->editaxis!=3);
 		}
 		else if(this->editmode==TransformHandles::EDIT_ROTATION){
-			this->rotfreebkp=getRotation(this->rotfreebkp,this->editaxis);
+			
 			glm::mat4 m=getFullTransform(this->editedobj->parent);
 			if(this->editaxis==3){
 				this->handlespace=getRotation(m*this->rotfreebkp,2);
-				this->handlespace[3]=getFullTransform(this->editedobj->parent)[3];
+				this->handlespace[3]=m[3];
 			}
 			else{
 				this->handlespace=getRotation(m*this->rotfreebkp,this->editaxis);
@@ -271,6 +299,10 @@ void TransformHandles::update(){
 			this->handlespace[3]=getFullTransform(this->editedobj)[3];
 		}
 	}
+	this->handlespace[0][3]=0.0f;
+	this->handlespace[1][3]=0.0f;
+	this->handlespace[2][3]=0.0f;
+	this->handlespace[3][3]=1.0f;
 	
 	if(this->activehandle!=-1){
 		//printf("hs %f %f %f\n\n", this->handlespace[3][0], this->handlespace[3][1], this->handlespace[3][2]);
@@ -333,9 +365,11 @@ void TransformHandles::update(){
 		if(this->editspace==TransformHandles::EDIT_FREE){
 			drag3*=1.2f;
 			if(this->editmode==TransformHandles::EDIT_ROTATION){
-				glm::mat3 r=glm::mat3((glm::vec3)this->rotfreebkp[0],(glm::vec3)this->rotfreebkp[1],(glm::vec3)this->rotfreebkp[2]);//axes of rotation
-				glm::mat4 rot1=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[this->axisnum]),r[this->axisnum]);
+				glm::mat4 r=glm::mat4(this->rotfreebkp[0],this->rotfreebkp[1],this->rotfreebkp[2], this->rotfreebkp[2]);//axes of rotation (0,1,2,2)
+				glm::mat4 rot1=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[this->axisnum]),(glm::vec3)r[this->axisnum]);
+				//printMatrix2(this->rotfreebkp);
 				this->rotfreebkp=rot1*this->rotfreebkp;
+				//printMatrix2(this->rotfreebkp);printf("----------------\n");
 				this->editedobj->transformation[this->editaxis]=rot1*this->editedobj->transformation[this->editaxis];
 				this->editedobj->transformation[3][3]=1.0f;
 					
@@ -392,7 +426,6 @@ void TransformHandles::update(){
 						glm::mat4 parent = getFullTransform(this->editedobj->parent);
 						glm::vec4 result = glm::vec4(pc[0], pc[1], pc[2], 1.0f);
 						glm::vec4 editedo = glm::inverse(parent) * result;
-						//this->editedobj->transform[3] = editedo;
 						this->handlespace[3]=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 					}
 				}
@@ -457,7 +490,10 @@ void TransformHandles::update(){
 	}
 		
 		
-		
+	this->editedobj->transformation[0][3] = row4bkp[0];
+	this->editedobj->transformation[1][3] = row4bkp[1];
+	this->editedobj->transformation[2][3] = row4bkp[2];
+	this->editedobj->transformation[3][3] = row4bkp[3];
 		
 
 }

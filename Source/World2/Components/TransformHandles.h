@@ -28,7 +28,7 @@ private:
 	char stencilx,stencily,stencilz,stencilzx,stencilzy,stencilyx,stencilxyz,stencilaxisx,stencilaxisy,stencilaxisz,stencilaxisw;
 	int activehandle=-1,axisnum=-1,axisnum2=-1;
 	glm::mat4 handlespace;///<transformation of handles - position+rotation - handles are not parent of any object
-	glm::mat4 bkp;///<transform of editedobj before current operation started - escape - abort
+	glm::mat4 bkp=glm::mat4(1.0f);///<transform of editedobj before current operation started - escape - abort
 	glm::mat4 rotfreebkp=glm::mat4(1.0f);
 	glm::vec2 dirbkp=glm::vec2(0.0f);
 };
