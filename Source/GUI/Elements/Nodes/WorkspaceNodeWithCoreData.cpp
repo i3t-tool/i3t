@@ -37,6 +37,39 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	}
 }
 
+WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase) /* \todo JH take default label from Const.h*/
+    :   WorkspaceNode(nodebase->getId(), headerBackground)
+    ,   m_nodebase(nodebase)
+{
+	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
+	const std::vector<Core::Pin>& outputPins = m_nodebase->getOutputPins();
+
+	m_workspaceLinksProperties.reserve(inputPins.size());
+	m_workspaceInputsProperties.reserve(inputPins.size());
+	m_workspaceOutputsProperties.reserve(outputPins.size());
+
+	for (Core::Pin const &pin : inputPins)
+	{
+        m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+				pin.getId(),
+                pin,
+                *this,
+				fmt::format("input #{}", pin.getIndex()).c_str() ));
+
+        m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
+				pin.getId()));
+	}
+
+	for (Core::Pin const &pin : outputPins)
+	{
+		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+                pin.getId(),
+                pin,
+                *this,
+				fmt::format("output #{}", pin.getIndex()).c_str() ));
+	}
+}
+
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
 	builder.Begin(m_id);

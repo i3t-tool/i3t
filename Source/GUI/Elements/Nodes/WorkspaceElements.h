@@ -100,8 +100,8 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
-	WorkspaceNode(ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
-
+	WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
+    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground);
 
 };
 
@@ -114,7 +114,7 @@ public:
 	const ne::LinkId m_id;
 	ImColor m_color;
 
-	WorkspaceLinkProperties(const ne::LinkId id);
+	WorkspaceLinkProperties(ne::LinkId const id);
 };
 
 

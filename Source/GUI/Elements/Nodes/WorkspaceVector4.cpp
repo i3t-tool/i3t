@@ -4,6 +4,12 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector
     : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
+    : WorkspaceNodeWithCoreData(headerBackground, nodebase)
+{
+}
+
+
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 {
 	const glm::vec4& coreData = m_nodebase->getData().getVec4();

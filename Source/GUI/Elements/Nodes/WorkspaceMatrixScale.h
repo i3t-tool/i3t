@@ -13,6 +13,7 @@ class WorkspaceMatrixScale : public WorkspaceMatrix4x4
 {
 public:
 	WorkspaceMatrixScale(ImTextureID headerBackground, WorkspaceMatrixScaleArgs const& args);
+    WorkspaceMatrixScale(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Scale>());
 
 	void drawData(util::NodeBuilder& builder);
 

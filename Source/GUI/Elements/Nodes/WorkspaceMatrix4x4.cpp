@@ -4,6 +4,10 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMa
     : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
+WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
+    : WorkspaceNodeWithCoreData(headerBackground, nodebase)
+{}
+
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
     drawDataFull(builder); /* default function always draw all data */

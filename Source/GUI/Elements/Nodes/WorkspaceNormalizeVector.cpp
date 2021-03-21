@@ -5,6 +5,11 @@ WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground,
 {
 }
 
+WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
+    : WorkspaceVector4(headerBackground, nodebase)
+{
+}
+
 void WorkspaceNormalizeVector::drawData(util::NodeBuilder& builder)
 {
     drawDataFull(builder); /* \todo JH here will be switch between different scale of view */

@@ -18,7 +18,7 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
 /* \todo JH not use constant values here */
-WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
+WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel), m_viewScale(args.viewScale)
 {
 	/* \todo Some better default values - take from Const.h*/
@@ -28,13 +28,24 @@ WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, 
 	m_touchTime = 1.0;
 }
 
+/* \todo JH not use constant values here */
+WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground)
+    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel("def WN header label"), m_label("def WN label"), m_viewScale(WorkspaceViewScale::Full)
+{
+	/* \todo Some better default values - take from Const.h*/
+	m_state = "default WorkspaceNode state";
+	m_color = ImColor(255, 255, 255);
+	m_size = ImVec2(100, 100);
+	m_touchTime = 1.0;
+}
+
 /* \todo JH time-functions are taken from example */
-void WorkspaceNode::TouchNode(const float constTouchTime)
+void WorkspaceNode::TouchNode(float const constTouchTime)
 {
 	m_touchTime = constTouchTime;
 }
 
-void WorkspaceNode::UpdateTouch(const float constDeltaTime)
+void WorkspaceNode::UpdateTouch(float const constDeltaTime)
 {
 	if (m_touchTime > 0)
 	{
@@ -42,7 +53,7 @@ void WorkspaceNode::UpdateTouch(const float constDeltaTime)
 	}
 }
 
-float WorkspaceNode::GetTouchProgress(const float constTouchTime)
+float WorkspaceNode::GetTouchProgress(float const constTouchTime)
 {
 	if (m_touchTime > 0.0f)
 		return (constTouchTime - m_touchTime) / constTouchTime;
@@ -64,7 +75,7 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 }
 
 
-WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id), m_color(ImColor(255, 255, 255))
+WorkspaceLinkProperties::WorkspaceLinkProperties(ne::LinkId const id) : m_id(id), m_color(ImColor(255, 255, 255))
 {}
 
 

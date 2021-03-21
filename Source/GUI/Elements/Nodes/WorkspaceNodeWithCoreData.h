@@ -33,6 +33,7 @@ public:
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
 
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
+    WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr);
 
     virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 

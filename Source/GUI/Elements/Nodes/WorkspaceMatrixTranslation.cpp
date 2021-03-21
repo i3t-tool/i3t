@@ -5,6 +5,11 @@ WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackgro
 {
 }
 
+WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
+    : WorkspaceMatrix4x4(headerBackground, nodebase)
+{
+}
+
 void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
 {
     switch(m_viewScale)

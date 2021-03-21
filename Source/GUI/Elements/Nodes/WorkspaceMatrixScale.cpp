@@ -5,6 +5,10 @@ WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, Workspa
 {
 }
 
+WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
+    : WorkspaceMatrix4x4(headerBackground, nodebase){
+}
+
 void WorkspaceMatrixScale::drawData(util::NodeBuilder& builder)
 {
     drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
