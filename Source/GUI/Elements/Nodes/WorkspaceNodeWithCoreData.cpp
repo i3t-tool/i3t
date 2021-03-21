@@ -15,23 +15,25 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	m_workspaceInputsProperties.reserve(inputPins.size());
 	m_workspaceOutputsProperties.reserve(outputPins.size());
 
-	for (const Core::Pin& pin : inputPins)
+	for (Core::Pin const &pin : inputPins)
 	{
-        m_workspaceInputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
+        m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				pin.getId(),
-				fmt::format("input #{}", pin.getIndex()).c_str(),
-				PinKind::Input, pin.getType()));
+                pin,
+                *this,
+				fmt::format("input #{}", pin.getIndex()).c_str() ));
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
 	}
 
-	for (const Core::Pin& pin : outputPins)
+	for (Core::Pin const &pin : outputPins)
 	{
-		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspacePinProperties>(
+		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
                 pin.getId(),
-				fmt::format("output #{}", pin.getIndex()).c_str(),
-				PinKind::Output, pin.getType()));
+                pin,
+                *this,
+				fmt::format("output #{}", pin.getIndex()).c_str() ));
 	}
 }
 
@@ -49,7 +51,7 @@ void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* 
 
 void WorkspaceNodeWithCoreData::drawInputLinks()
 {
-	for (std::pair<pinIter, linkPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceLinksProperties.begin());
+	for (std::pair<corePinIter, linkPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceLinksProperties.begin());
 	     elem.first != m_nodebase->getInputPins().end() && elem.second != m_workspaceLinksProperties.end();
 	     ++elem.first, ++elem.second)
 	{
@@ -62,7 +64,7 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (std::pair<pinIter, pinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
+	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
             elem.first != m_nodebase->getInputPins().end()  && elem.second != m_workspaceInputsProperties.end();
             ++elem.first, ++elem.second)
 	{
@@ -75,9 +77,9 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 
 		// color.Value.w = alpha / 255.0f;
 		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
-                            WorkspacePinShape[elem.second->get()->m_type],
-                            elem.second->get()->m_connected, /* \todo do it better - it is copy from Core*/
-                            WorkspacePinColor[elem.second->get()->m_type],
+                            WorkspacePinShape[elem.second->get()->getType()],
+                            elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
+                            WorkspacePinColor[elem.second->get()->getType()],
                             ImColor(32.0, 32.0, 32.0, alpha)); /* \todo JH not constant here... */
 
 		ImGui::Spring(0);
@@ -95,7 +97,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (std::pair<pinIter, pinPropIter> elem(m_nodebase->getOutputPins().begin(), m_workspaceOutputsProperties.begin());
+	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getOutputPins().begin(), m_workspaceOutputsProperties.begin());
 	     elem.first != m_nodebase->getOutputPins().end() && elem.second != m_workspaceOutputsProperties.end();
 	     ++elem.first, ++elem.second)
 	{
@@ -114,9 +116,9 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 
 		// color.Value.w = alpha / 255.0f;
 		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
-                            WorkspacePinShape[elem.second->get()->m_type],
-                            elem.second->get()->m_connected, /* \todo do it better - it is copy from Core*/
-                            WorkspacePinColor[elem.second->get()->m_type],
+                            WorkspacePinShape[elem.second->get()->getType()],
+                            elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
+                            WorkspacePinColor[elem.second->get()->getType()],
                             ImColor(32.0, 32.0, 32.0, alpha));
 
 		ImGui::Spring(0);
@@ -155,5 +157,26 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value,
         ImGui::GetFontSize() or ImGui::GetFrameHeight()
 
     */
+}
+
+WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)
+		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no konstants here... */
+{
+}
+
+PinKind WorkspaceCorePinProperties::getKind()
+{
+    return m_pin.isInput() ? PinKind::Input : PinKind::Output;
+}
+
+EValueType WorkspaceCorePinProperties::getType()
+{
+    return m_pin.getType();
+}
+
+/* \todo JH implement this function in Core? */
+bool WorkspaceCorePinProperties::getIsConnected()
+{
+	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
 }
 

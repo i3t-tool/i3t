@@ -354,6 +354,8 @@ public:
 	 * \return True if plugged to parent, false if not.
 	 */
 	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
+
+	[[nodiscard]] bool isInput() const { return m_isInput; }
 };
 
 using Node = NodeBase;

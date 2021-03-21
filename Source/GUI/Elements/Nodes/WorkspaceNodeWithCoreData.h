@@ -1,11 +1,14 @@
 #pragma once
-#include "WorkspaceElements.h"
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 
+#include "WorkspaceElements.h"
 
-typedef std::vector<Core::Pin>::const_iterator pinIter;
-typedef std::vector<std::unique_ptr<WorkspacePinProperties>>::const_iterator pinPropIter;
-typedef std::vector<std::unique_ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
+class WorkspaceCorePinProperties;
+
+
+typedef std::vector<Core::Pin>::const_iterator corePinIter;
+typedef std::vector<Ptr<WorkspaceCorePinProperties>>::const_iterator corePinPropIter;
+typedef std::vector<Ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
 
 struct WorkspaceNodeWithCoreDataArgs
 {
@@ -25,9 +28,9 @@ public:
 	                                                     WorkspaceNodeWithCoreData is owner of unique pointer
 	                                                */
 
-	std::vector<std::unique_ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
-	std::vector<std::unique_ptr<WorkspacePinProperties>> m_workspaceInputsProperties;
-	std::vector<std::unique_ptr<WorkspacePinProperties>> m_workspaceOutputsProperties;
+	std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
+	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
+	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
 
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
 
@@ -38,4 +41,26 @@ public:
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	bool drawDragFloatWithMap_Inline(float * const value, const int mapValue, std::string label);
+};
+
+/*! \class WorkspaceCorePinProperties
+    \brief Information of Pin for graphic
+ */
+/* \todo JH later maybe create more general parent class*/
+class WorkspaceCorePinProperties
+{
+public:
+	ne::PinId const m_id; /*! \brief unique (among Pins) identificator */
+    Core::Pin const &m_pin;
+    WorkspaceNodeWithCoreData &m_node;
+
+	std::string m_name;    /*! \brief Name of Pin */
+	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
+    float m_alpha;
+
+	WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name);
+
+    PinKind getKind();
+    EValueType getType();
+	bool getIsConnected();
 };

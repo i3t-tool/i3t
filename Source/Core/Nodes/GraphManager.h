@@ -102,7 +102,7 @@ public:
 	 *
 	 * \param index
 	 */
-	static void unplugInput(Ptr<Core::NodeBase>& node, int index);
+	static void unplugInput(Ptr<Core::NodeBase> const & node, int index);
 
 	/**
 	 * Unplug all nodes connected to given output pin of this node.

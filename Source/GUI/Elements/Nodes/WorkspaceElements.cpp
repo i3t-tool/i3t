@@ -68,18 +68,3 @@ WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id)
 {}
 
 
-WorkspacePinProperties::WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type)
-		: m_id(id), m_name(name), m_kind(kind), m_type(type), m_iconSize(24), m_connected(false), m_alpha(100) /* \todo JH no konstants here... */
-{
-}
-
-/* \todo JH this functions are in Core... */
-bool WorkspacePinProperties::IsPinConnected()
-{
-	return m_connected;
-}
-
-bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
-{
-	return true; /* \todo todo... */
-}

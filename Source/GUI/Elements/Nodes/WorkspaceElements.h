@@ -100,27 +100,10 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
-//    // named-constructor-idiom
-//    //  copy ctor public
-//    WorkspaceNode(WorkspaceNode const& other);
-//
-//    static WorkspaceNode WorkspaceNodeFromCore(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel){
-//        return WorkspaceNode(nodebase->getId(), headerBackground, headerLabel);
-//    }
-
-//private:
-   	/* \todo some better constructors - this are just for test*/
 	WorkspaceNode(ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
 
 
 };
-
-/* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
-static int s_linkID = 0;
-static int s_getLinkID()
-{
-	return s_linkID++;
-}
 
 /*! \class WorkspaceLinkProperties
     \brief Information of Link for graphic
@@ -134,25 +117,4 @@ public:
 	WorkspaceLinkProperties(const ne::LinkId id);
 };
 
-/*! \class WorkspacePinProperties
-    \brief Information of Pin for graphic
- */
-class WorkspacePinProperties
-{
-public:
-	const ne::PinId m_id; /*! \brief unique (among Pins) identificator */
-	std::string m_name;    /*! \brief Name of Pin */
-	const PinKind m_kind;  /*! \brief Kind of pin \sa PinKind */
-	const EValueType m_type;
 
-	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
-
-	bool m_connected;
-	float m_alpha;
-
-	WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type);
-
-	bool IsPinConnected(); /* \todo check in Core ? */
-
-	bool CanCreateLink(Core::Pin* b); /* \todo check in Core ? */
-};
