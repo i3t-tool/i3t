@@ -178,6 +178,8 @@ void WorkspaceWindow::render()
 
     ImGui::SetCursorScreenPos(cursorTopLeft);
 
+    shiftSelectedNodesToFront();
+
 
 
 
@@ -328,7 +330,30 @@ void WorkspaceWindow::render()
 	*/
 }
 
-bool WorkspaceWindow::manipulatorStartCheck3D()
+/* \todo JH not work yet - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
+void WorkspaceWindow::shiftSelectedNodesToFront()
+{
+    if (ne::HasSelectionChanged())
+    {
+        std::vector<Ptr<WorkspaceNodeWithCoreData>> selectedCoreNodes = getSelectedWorkspaceCoreNodes();
+
+        for(int i=0; i < selectedCoreNodes.size(); i++)
+        {
+
+            coreNodeIter node = std::find_if(m_workspaceCoreNodes.begin(),
+                                            m_workspaceCoreNodes.end(),
+                                            [selectedCoreNodes, i](Ptr<WorkspaceNodeWithCoreData> const &n) -> bool { return n->m_id == selectedCoreNodes.at(i)->m_id; });
+
+            if (node != m_workspaceCoreNodes.end())
+            {
+              std::iter_swap(m_workspaceCoreNodes.begin()+i, node);
+            }
+        }
+    }
+
+}
+
+void WorkspaceWindow::manipulatorStartCheck3D()
 {
     Ptr<WorkspaceNodeWithCoreData> selectedCoreNode;
     ne::NodeId selectedNodeID;

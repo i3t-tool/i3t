@@ -111,7 +111,7 @@ public:
 
 	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
 
-	bool manipulatorStartCheck3D();
+	void manipulatorStartCheck3D();
 
     void checkQueryElements();
     void checkQueryElementsCreating();
@@ -122,6 +122,8 @@ public:
     void checkQueryNodeDelete();
 
     void checkQueryContextMenus();
+
+    void shiftSelectedNodesToFront();
 
 
 
