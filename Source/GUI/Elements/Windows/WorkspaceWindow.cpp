@@ -88,16 +88,18 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
 
 	/*--- SCALE */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
-	// ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+	 /*WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
+	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
 
 	/*--- NORMALIZE VECTOR */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector
-	// 1")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
+	/*WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1")); 
+	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
 
 	ne::NavigateToContent();
-	//////////////////////////////////
+	ne::CenterNodeOnScreen(WorkspaceNodes.back()->Id);*/
 
+	//////////////////////////////////
+	//printf("len %lld \n",WorkspaceNodes.size());
 	/*WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get());
 
 	Ptr<Core::NodeBase> child=wnbd->Nodebase;
@@ -146,6 +148,9 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
+	//ImGui::SetScrollHereX(100.0f);
+	//ImGui::SetScrollHereY(400.0f);
+
 	if (InputManager::isKeyPressed(Keys::l))
 	{
 		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);

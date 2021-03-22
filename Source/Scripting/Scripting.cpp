@@ -92,24 +92,24 @@ bool LoadWorkspace(const char* filename, std::vector<std::unique_ptr<WorkspaceNo
 		NodeMat4 node=scene->mat4Nodes[i];
 		if(node.type==scene->mat4Types.free){
 			_workspace->push_back(std::make_unique<WorkspaceMatrix4x4>(new WorkspaceMatrix4x4((ImTextureID)0,"load free")));
-			ValueSetResult result =dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+			ValueSetResult result =dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase->setValue(node.data);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
 		else if (node.type == scene->mat4Types.scale) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixScale>(new WorkspaceMatrixScale((ImTextureID)0, "load scale")));
-			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue((glm::vec3)node.data[0]);
+			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase->setValue((glm::vec3)node.data[0]);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
 		else if (node.type == scene->mat4Types.translate) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>(new WorkspaceMatrixTranslation((ImTextureID)0, "load translation")));
-			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue((glm::vec3)node.data[0]);
+			ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase->setValue((glm::vec3)node.data[0]);
 			ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 		}
 	}
 	for (int i = 0; i < scene->normVec4Nodes.size(); i++) {
 		NodeNormVec4 node=scene->normVec4Nodes[i];
 		_workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "load NormalizeVector"));
-		ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+		ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase->setValue(node.data);
 		ne::SetNodePosition(_workspace->back()->Id, ImVec2((float)node.x, (float)node.y));
 	}
 	for (int i = 0; i < scene->nodePlugs.size(); i++) {
