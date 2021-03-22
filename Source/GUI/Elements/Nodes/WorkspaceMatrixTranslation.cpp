@@ -5,8 +5,8 @@ WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackgro
 {
 }
 
-WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
-    : WorkspaceMatrix4x4(headerBackground, nodebase)
+WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, nodebase, headerLabel, nodeLabel)
 {
 }
 

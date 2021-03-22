@@ -14,7 +14,7 @@ class WorkspaceNormalizeVector : public WorkspaceVector4
 {
 public:
 	WorkspaceNormalizeVector(ImTextureID headerBackground, WorkspaceNormalizeVectorArgs const& args);
-    WorkspaceNormalizeVector(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::NormalizeVector>());
+    WorkspaceNormalizeVector(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::NormalizeVector>(), std::string headerLabel = "NormVector", std::string nodeLabel = "NormVector");
 
 	void drawData(util::NodeBuilder& builder);
 

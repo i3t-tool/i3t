@@ -13,7 +13,7 @@ class WorkspaceMatrixTranslation : public WorkspaceMatrix4x4
 {
 public:
 	WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args);
-    WorkspaceMatrixTranslation(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Translation>());
+    WorkspaceMatrixTranslation(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Translation>(), std::string headerLabel = "Translation", std::string nodeLabel = "Translation");
 
 	void drawData(util::NodeBuilder& builder);
 

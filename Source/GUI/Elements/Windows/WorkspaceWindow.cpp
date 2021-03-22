@@ -516,163 +516,378 @@ void WorkspaceWindow::checkQueryContextMenus()
 {
     m_openPopupMenuPosition = ImGui::GetMousePos();
     ne::Suspend();
-    if (ne::ShowLinkContextMenu(&m_contextLinkId))
-        ImGui::OpenPopup("Link Context Menu");
-    else if (ne::ShowPinContextMenu(&m_contextPinId))
-        ImGui::OpenPopup("Pin Context Menu");
-    else if (ne::ShowNodeContextMenu(&m_contextNodeId))
-        ImGui::OpenPopup("Node Context Menu");
-    else if (ne::ShowBackgroundContextMenu())
-    {
-        ImGui::OpenPopup("Create New Node");
-        m_pinPropertiesForNewNodeLink = nullptr;
-    }
-    ne::Resume();
+	if (ne::ShowBackgroundContextMenu())
+	{
+		ImGui::OpenPopup("Create New Node"); /* \todo JH take string from some constants file */
+	}
+	else if (ne::ShowNodeContextMenu(&m_contextNodeId))
+	{
+		ImGui::OpenPopup("Node Context Menu");
+	}
+	ne::Resume();
 
-    ne::Suspend();
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-    if (ImGui::BeginPopup("Node Context Menu"))
-    {
-//        auto node = FindNode(contextNodeId);
-//
-//        ImGui::TextUnformatted("Node Context Menu");
-//        ImGui::Separator();
-//        if (node)
-//        {
-//            ImGui::Text("ID: %p", node->ID.AsPointer());
-//            ImGui::Text("Type: %s", node->Type == NodeType::Blueprint ? "Blueprint" : (node->Type == NodeType::Tree ? "Tree" : "Comment"));
-//            ImGui::Text("Inputs: %d", (int)node->Inputs.size());
-//            ImGui::Text("Outputs: %d", (int)node->Outputs.size());
-//        }
-//        else
-//            ImGui::Text("Unknown node: %p", contextNodeId.AsPointer());
-//        ImGui::Separator();
-//        if (ImGui::MenuItem("Delete"))
-//            ed::DeleteNode(contextNodeId);
-        ImGui::EndPopup();
-    }
+	ne::Suspend();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8)); /* \todo JH take graphic setting from constants file */
 
-    if (ImGui::BeginPopup("Pin Context Menu"))
-    {
-//        auto pin = FindPin(contextPinId);
-//
-//        ImGui::TextUnformatted("Pin Context Menu");
-//        ImGui::Separator();
-//        if (pin)
-//        {
-//            ImGui::Text("ID: %p", pin->ID.AsPointer());
-//            if (pin->Node)
-//                ImGui::Text("Node: %p", pin->Node->ID.AsPointer());
-//            else
-//                ImGui::Text("Node: %s", "<none>");
-//        }
-//        else
-//            ImGui::Text("Unknown pin: %p", contextPinId.AsPointer());
+	if (ImGui::BeginPopup("Node Context Menu")) {
 
-        ImGui::EndPopup();
-    }
+        Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
 
-    if (ImGui::BeginPopup("Link Context Menu"))
-    {
-//        auto link = FindLink(contextLinkId);
-//
-//        ImGui::TextUnformatted("Link Context Menu");
-//        ImGui::Separator();
-//        if (link)
-//        {
-//            ImGui::Text("ID: %p", link->ID.AsPointer());
-//            ImGui::Text("From: %p", link->StartPinID.AsPointer());
-//            ImGui::Text("To: %p", link->EndPinID.AsPointer());
-//        }
-//        else
-//            ImGui::Text("Unknown link: %p", contextLinkId.AsPointer());
-//        ImGui::Separator();
-//        if (ImGui::MenuItem("Delete"))
-//            ed::DeleteLink(contextLinkId);
-        ImGui::EndPopup();
-    }
+		if (node) {
+			ImGui::Text("ID: %p", m_contextNodeId.AsPointer());
+			ImGui::Separator();
+		}
+		else {
+			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
+		}
 
-    if (ImGui::BeginPopup("Create New Node"))
-    {
-//        auto newNodePostion = openPopupPosition;
-//        //ImGui::SetCursorScreenPos(ImGui::GetMousePosOnOpeningCurrentPopup());
-//
-//        //auto drawList = ImGui::GetWindowDrawList();
-//        //drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
-//
-//        Node* node = nullptr;
-//        if (ImGui::MenuItem("Input Action"))
-//            node = SpawnInputActionNode();
-//        if (ImGui::MenuItem("Output Action"))
-//            node = SpawnOutputActionNode();
-//        if (ImGui::MenuItem("Branch"))
-//            node = SpawnBranchNode();
-//        if (ImGui::MenuItem("Do N"))
-//            node = SpawnDoNNode();
-//        if (ImGui::MenuItem("Set Timer"))
-//            node = SpawnSetTimerNode();
-//        if (ImGui::MenuItem("Less"))
-//            node = SpawnLessNode();
-//        if (ImGui::MenuItem("Weird"))
-//            node = SpawnWeirdNode();
-//        if (ImGui::MenuItem("Trace by Channel"))
-//            node = SpawnTraceByChannelNode();
-//        if (ImGui::MenuItem("Print String"))
-//            node = SpawnPrintStringNode();
-//        ImGui::Separator();
-//        if (ImGui::MenuItem("Comment"))
-//            node = SpawnComment();
-//        ImGui::Separator();
-//        if (ImGui::MenuItem("Sequence"))
-//            node = SpawnTreeSequenceNode();
-//        if (ImGui::MenuItem("Move To"))
-//            node = SpawnTreeTaskNode();
-//        if (ImGui::MenuItem("Random Wait"))
-//            node = SpawnTreeTask2Node();
-//        ImGui::Separator();
-//        if (ImGui::MenuItem("Message"))
-//            node = SpawnMessageNode();
-//        ImGui::Separator();
-//        if (ImGui::MenuItem("Transform"))
-//            node = SpawnHoudiniTransformNode();
-//        if (ImGui::MenuItem("Group"))
-//            node = SpawnHoudiniGroupNode();
-//
-//        if (node)
-//        {
-//            BuildNodes();
-//
-//            createNewNode = false;
-//
-//            ed::SetNodePosition(node->ID, newNodePostion);
-//
-//            if (auto startPin = newNodeLinkPin)
-//            {
-//                auto& pins = startPin->Kind == PinKind::Input ? node->Outputs : node->Inputs;
-//
-//                for (auto& pin : pins)
-//                {
-//                    if (CanCreateLink(startPin, &pin))
-//                    {
-//                        auto endPin = &pin;
-//                        if (startPin->Kind == PinKind::Input)
-//                            std::swap(startPin, endPin);
-//
-//                        s_Links.emplace_back(Link(GetNextId(), startPin->ID, endPin->ID));
-//                        s_Links.back().Color = GetIconColor(startPin->Type);
-//
-//                        break;
-//                    }
-//                }
-//            }
-//        }
+		if (ImGui::MenuItem("Delete")) {
+			if (ne::BeginDelete())
+			{
+				checkQueryNodeDelete();
+			}
+			ne::EndDelete();
+			//ne::DeleteNode(m_contextNodeId); /* \todo JH check whether node remain in nodeeditor */
+		}
+		ImGui::EndPopup();
+	}
 
-        ImGui::EndPopup();
-    }
-    else
-        m_createNewNode = false;
-    ImGui::PopStyleVar();
-    ne::Resume();
+	if (ImGui::BeginPopup("Create New Node"))
+	{
+		m_newNodePostion = m_openPopupMenuPosition;
+
+		ImGui::Text("add...");
+		ImGui::Separator();
+		if (ImGui::BeginMenu("transformation")) {
+
+			ImGui::Text("add transforamtion");
+			ImGui::Separator();
+			if (ImGui::MenuItem("free")) {
+			}
+			if (ImGui::MenuItem("translation")) {
+			}
+			if (ImGui::BeginMenu("rotation")) {
+
+				ImGui::Text("add rotation");
+				ImGui::Separator();
+				if (ImGui::MenuItem("eulerAngleX")) {
+				}
+				if (ImGui::MenuItem("eulerAngleY")) {
+				}
+				if (ImGui::MenuItem("eulerAngleZ")) {
+				}
+				if (ImGui::MenuItem("rotate")) {
+				}
+				if (ImGui::MenuItem("quat")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("scale")) {
+
+				ImGui::Text("add scale");
+				ImGui::Separator();
+				if (ImGui::MenuItem("uniform scale")) {
+				}
+				if (ImGui::MenuItem("scale")) {
+
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::MenuItem("lookAt")) {
+			}
+			if (ImGui::BeginMenu("projection")) {
+
+				ImGui::Text("add projection");
+				ImGui::Separator();
+				if (ImGui::MenuItem("ortho")) {
+				}
+				if (ImGui::MenuItem("perspective")) {
+				}
+				if (ImGui::MenuItem("frustrum")) {
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("operator")) {
+
+			ImGui::Text("add operator");
+			ImGui::Separator();
+			if (ImGui::BeginMenu("transformation")) {
+
+				ImGui::Text("transformation operators");
+				ImGui::Separator();
+				if (ImGui::MenuItem("translate")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("eulerAngleX")) {
+				}
+				if (ImGui::MenuItem("eulerAngleY")) {
+				}
+				if (ImGui::MenuItem("eulerAngleZ")) {
+				}
+				if (ImGui::MenuItem("rotate")) {
+				}
+				if (ImGui::MenuItem("scale")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("ortho")) {
+				}
+				if (ImGui::MenuItem("perspective")) {
+				}
+				if (ImGui::MenuItem("frustrum")) {
+				}
+				if (ImGui::MenuItem("lookAt")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("matrix")) {
+
+				ImGui::Text("matrix operators");
+				ImGui::Separator();
+				if (ImGui::MenuItem("matrix")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("trackball")) {
+				}
+				if (ImGui::MenuItem("inversion")) {
+//					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixInversion>(HeaderBackgroundTexture));
+//					ne::SetNodePosition(WorkspaceNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("transpose")) {
+				}
+				if (ImGui::MenuItem("determinant")) {
+//					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
+//					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat * mat")) {
+				}
+				if (ImGui::MenuItem("mat + mat")) {
+				}
+				if (ImGui::MenuItem("mat * vec4")) {
+				}
+				if (ImGui::MenuItem("vec4 * mat")) {
+				}
+				if (ImGui::MenuItem("float * mat")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("vec3")) {
+
+				ImGui::Text("vec3 operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("vec3")) {
+				}
+				if (ImGui::MenuItem("show vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 x vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 . vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 + vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 - vec3")) {
+				}
+				if (ImGui::MenuItem("float * vec3")) {
+				}
+				if (ImGui::MenuItem("normalize vec3")) {
+				}
+				if (ImGui::MenuItem("length(vec3)")) {
+				}
+				if (ImGui::MenuItem("mix vec3")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("vec4")) {
+
+				ImGui::Text("vec4 operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector4>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 . vec4")) {
+				}
+				if (ImGui::MenuItem("vec4 + vec4")) {
+				}
+				if (ImGui::MenuItem("vec4 - vec4")) {
+				}
+				if (ImGui::MenuItem("float * vec4")) {
+				}
+				if (ImGui::MenuItem("normalize vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("perspective division")) {
+				}
+				if (ImGui::MenuItem("mix vec4")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("quat")) {
+
+				ImGui::Text("quat operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("quat")) {
+				}
+				if (ImGui::MenuItem("quat(float, vec3)")) {
+				}
+				if (ImGui::MenuItem("quat(angle, axis)")) {
+				}
+				if (ImGui::MenuItem("quat(vec3, vec3)")) {
+				}
+				if (ImGui::MenuItem("quat -> float, vec3")) {
+				}
+				if (ImGui::MenuItem("quat -> angle, axis")) {
+				}
+				if (ImGui::MenuItem("float * quat")) {
+				}
+				if (ImGui::MenuItem("quat * quat")) {
+				}
+				if (ImGui::MenuItem("quat -> euler")) {
+				}
+				if (ImGui::MenuItem("euler -> quat")) {
+				}
+				if (ImGui::MenuItem("slerp")) {
+				}
+				if (ImGui::MenuItem("long way slerp")) {
+				}
+				if (ImGui::MenuItem("lerp")) {
+				}
+				if (ImGui::MenuItem("quat conjugate")) {
+				}
+				if (ImGui::MenuItem("qvq*")) {
+				}
+				if (ImGui::MenuItem("inverse quat")) {
+				}
+				if (ImGui::MenuItem("normalize quat")) {
+				}
+				if (ImGui::MenuItem("length(quat)")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("float")) {
+
+				ImGui::Text("float operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("float")) {
+				}
+				if (ImGui::MenuItem("clamp float")) {
+				}
+				if (ImGui::MenuItem("float cycle")) {
+				}
+				if (ImGui::MenuItem("float * float")) {
+				}
+				if (ImGui::MenuItem("float / float")) {
+				}
+				if (ImGui::MenuItem("float + float")) {
+				}
+				if (ImGui::MenuItem("float ^ float")) {
+				}
+				if (ImGui::MenuItem("mix float")) {
+				}
+				if (ImGui::MenuItem("sin & cos(float)")) {
+				}
+				if (ImGui::MenuItem("asin & acos(float")) {
+				}
+				if (ImGui::MenuItem("signum")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("conversion")) {
+
+				ImGui::Text("conversion operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("mat -> TR")) {
+				}
+				if (ImGui::MenuItem("TR -> mat")) {
+				}
+				if (ImGui::MenuItem("mat -> vecs4")) {
+				}
+				if (ImGui::MenuItem("mat -> quat")) {
+				}
+				if (ImGui::MenuItem("mat -> floats")) {
+				}
+				if (ImGui::MenuItem("vecs4 -> mat")) {
+				}
+				if (ImGui::MenuItem("vec4 -> vec3")) {
+				}
+				if (ImGui::MenuItem("vec4 -> floats")) {
+				}
+				if (ImGui::MenuItem("vecs3 -> mat")) {
+				}
+				if (ImGui::MenuItem("vec3 -> vec4")) {
+				}
+				if (ImGui::MenuItem("vec3 -> floats")) {
+				}
+				if (ImGui::MenuItem("quat -> mat")) {
+				}
+				if (ImGui::MenuItem("quat -> floats")) {
+				}
+				if (ImGui::MenuItem("floats -> mat")) {
+				}
+				if (ImGui::MenuItem("floats -> vec4")) {
+				}
+				if (ImGui::MenuItem("floats -> vec3")) {
+				}
+				if (ImGui::MenuItem("floats -> quat")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::MenuItem("sequence")) {
+		}
+		if (ImGui::MenuItem("camera")) {
+		}
+		if (ImGui::MenuItem("screen")) {
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("selection")) {
+
+			ImGui::Text("selection");
+			ImGui::Separator();
+			if (ImGui::MenuItem("select all")) { //SS todo make hotkey hint
+			}
+			if (ImGui::MenuItem("invert")) { //SS todo make hotkey hint
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("zoom")) {
+
+			ImGui::Text("zoom");
+			ImGui::Separator();
+			if (ImGui::MenuItem("to all")) { //SS todo make hotkey hint
+			}
+			if (ImGui::MenuItem("to selection")) { //SS todo make hotkey hint
+			}
+			ImGui::EndMenu();
+
+		}
+
+		ImGui::EndPopup();
+	}
+
+
+	ImGui::PopStyleVar();
+	ne::Resume();
 
 }
 

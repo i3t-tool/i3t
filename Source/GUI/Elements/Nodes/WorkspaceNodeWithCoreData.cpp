@@ -37,8 +37,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	}
 }
 
-WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase) /* \todo JH take default label from Const.h*/
-    :   WorkspaceNode(nodebase->getId(), headerBackground)
+WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel) /* \todo JH take default label from Const.h*/
+    :   WorkspaceNode(nodebase->getId(), headerBackground, headerLabel, nodeLabel)
     ,   m_nodebase(nodebase)
 {
 	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();

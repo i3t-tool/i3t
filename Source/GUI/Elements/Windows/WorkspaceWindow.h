@@ -90,6 +90,7 @@ public:
     bool m_createNewNode = false;
 
     ImVec2 m_openPopupMenuPosition = ImVec2(100,100); /* \todo JH some better default value - maybe little bit unused, but for certainty */
+    ImVec2 m_newNodePostion = ImVec2(100,100);
     ne::NodeId m_contextNodeId = 0;
     ne::LinkId m_contextLinkId = 0;
     ne::PinId  m_contextPinId = 0;

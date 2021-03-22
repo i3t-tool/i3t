@@ -101,7 +101,7 @@ public:
 	float GetTouchProgress(const float constTouchTime);
 
 	WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
-    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground);
+    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel = "Node", std::string nodeLabel = "Node");
 
 };
 

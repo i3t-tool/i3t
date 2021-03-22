@@ -4,11 +4,15 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector
     : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
-WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase)
-    : WorkspaceNodeWithCoreData(headerBackground, nodebase)
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
+    : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
 {
 }
 
+void WorkspaceVector4::drawData(util::NodeBuilder& builder)
+{
+    drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+}
 
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 {
