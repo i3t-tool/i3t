@@ -10,6 +10,7 @@
 //---------------
 #include "pgr.h"
 #include "GameObject.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 
 class GameObject;
 struct Shader2{
@@ -59,6 +60,7 @@ public:
     void onUpdate();
     void handlesSetMatrix(glm::mat4 parent,glm::mat4*transform,int type);//A*B*C*D*E,parent=A*B*C*D,transform=E
     void handlesSetMatrix(glm::mat4 parent,glm::mat4 transform,bool(*)(glm::mat4),int type);
+    void handlesSetMatrix(WorkspaceMatrix4x4 mat);
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
 
     ///load shaders
