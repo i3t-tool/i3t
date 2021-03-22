@@ -71,20 +71,13 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>( HeaderBackgroundTexture ));
 	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-252, 220));
 
-    /*--- TRANSLATION with connection to translation */
+    /*--- TRANSLATION */
 	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture));
 	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-300, 351));
 
-	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
-//	Core::GraphManager::plug(m_workspaceCoreNodes.at(0)->m_nodebase,
-//	                         m_workspaceCoreNodes.at(1)->m_nodebase, 0, 0);
-
-	/*--- MATRIX_4x4 with connection to translation*/
+	/*--- MATRIX_4x4 */
 	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
 	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-500, 351));
-
-//    Core::GraphManager::plug(m_workspaceCoreNodes.at(0)->m_nodebase,
-//	                         m_workspaceCoreNodes.at(2)->m_nodebase, 0, 0);
 
     /*--- SCALE */
 	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
@@ -96,31 +89,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::NavigateToContent();
 	//////////////////////////////////
-		//WorkspaceNodes.at(0).get().
-//
-//
-//	WorkspaceNodeBaseData*wnbd=dynamic_cast<WorkspaceNodeBaseData*>(WorkspaceNodes.at(1).get());
-//
-//	Ptr<Core::NodeBase> child=wnbd->Nodebase;
-//	std::vector<Core::Pin>cp= child->getInputPins();
-//	Ptr<Core::NodeBase> parent=Core::GraphManager::getParent(child);
-//	const Operation* uu = child->getOperation();
-//
-//	//cp[0].getParentPin()->getMaster();
-//	//WorkspaceNodes.at(0).get()->
-//	glm::mat4 m = glm::mat4(0.14f);
-//	ValueSetResult vsr=parent->setValue(m);
-//	ValueSetResult vsr2= child->setValue(m);
-//	//ValueSetResult vsr2= child->setValue(m,Core::Transform::g_Translate);
-//	//printf("%d\n",vsr2.status);
-//	DataStore ds=child->getData();
-//	glm::mat4 mm=ds.getMat4();
-//
-//	//std::vector<WorkspaceMatrix4x4>*ww=
-//
-//	LoadWorkspace(Config::getAbsolutePath("/load.txt").c_str(),&WorkspaceNodes);
-//
-//	SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
 
 	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
 	//    GLuint imageId =
@@ -161,13 +129,14 @@ void WorkspaceWindow::render()
 	ne::Begin("Node editor");{
     ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
 
+
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 	{
 		workspaceCoreNode->drawNode(NodeBuilderContext, nullptr);
 	}
 
     /* both connected pins have to be drawn before link is drawn -> therefore separated for */
-    for (auto& workspaceCoreNode : m_workspaceCoreNodes)
+    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
     {
         workspaceCoreNode->drawInputLinks();
     }
@@ -178,12 +147,14 @@ void WorkspaceWindow::render()
 
     ImGui::SetCursorScreenPos(cursorTopLeft);
 
-    shiftSelectedNodesToFront();
+
 
 
 
 
 	}ne::End();
+
+	shiftSelectedNodesToFront();
 
 	ImGui::End();
 	/* ed::SetCurrentEditor(m_Editor); \todo maybe call it here for static load of current editor setting (if changed)
@@ -340,17 +311,16 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
         for(int i=0; i < selectedCoreNodes.size(); i++)
         {
 
-            coreNodeIter node = std::find_if(m_workspaceCoreNodes.begin(),
-                                            m_workspaceCoreNodes.end(),
-                                            [selectedCoreNodes, i](Ptr<WorkspaceNodeWithCoreData> const &n) -> bool { return n->m_id == selectedCoreNodes.at(i)->m_id; });
+            coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(),
+                                                        m_workspaceCoreNodes.end(),
+                                                        [selectedCoreNodes, i](Ptr<WorkspaceNodeWithCoreData> const &node) -> bool { return node->m_id == selectedCoreNodes.at(i)->m_id; });
 
-            if (node != m_workspaceCoreNodes.end())
+            if (ith_selected_node != m_workspaceCoreNodes.end())
             {
-              std::iter_swap(m_workspaceCoreNodes.begin()+i, node);
+              std::iter_swap(m_workspaceCoreNodes.begin()+i, ith_selected_node);
             }
         }
     }
-
 }
 
 void WorkspaceWindow::manipulatorStartCheck3D()
