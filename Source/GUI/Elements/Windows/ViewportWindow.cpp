@@ -127,7 +127,6 @@ void Viewport::render()
 		// m_world->render();
 
 		// world2
-		// World2::tmpAccess->onUpdate();
 		m_world2->onUpdate();
 
 		glDisable(GL_MULTISAMPLE);

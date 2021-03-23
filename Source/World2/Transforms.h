@@ -20,5 +20,6 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis);
 glm::vec3 getScale(glm::mat4 transform);
 glm::mat4 getFullTransform(GameObject* obj);
 glm::vec3 planeIntersect(glm::vec3 px,glm::vec3 py,glm::vec3 p0);
+void setLen(glm::vec3* vec, float len);
 float angle2(float x, float y);
 bool dirEqual(glm::vec3 v1,glm::vec3 v2,float bias = 0.00005f);

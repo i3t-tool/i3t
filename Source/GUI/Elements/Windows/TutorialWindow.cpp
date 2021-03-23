@@ -47,7 +47,8 @@ void TutorialWindow::render()
 
 void TutorialWindow::renderTutorialContent()
 {
-	ImGui::Text(u8"かきくけこéíšířáěéšíčřá");
+	//ImGui::Text(u8"かきくけこéíšířáěéšíčřá");
+	ImGui::Text("かきくけこéíšířáěéšíčřá");
 
 	if (m_tutorial)
 	{

@@ -44,19 +44,19 @@ glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis){
 	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3, (referenceAxis + 2) % 3};
 	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]], (glm::vec3)transform[mapaxis[1]],(glm::vec3)transform[mapaxis[2]]};
 	if (glm::length2(axes[0]) < bias){axes[0] = glm::vec3(0.0f);axes[0][mapaxis[0]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
+	if (glm::length2(axes[1]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
+	if (glm::length2(axes[2]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
 
 	axes[0] = glm::normalize(axes[0])* glm::length((glm::vec3)transform[mapaxis[0]]);
 	axes[1] = glm::normalize(glm::cross(axes[2], axes[0]))* glm::length((glm::vec3)transform[mapaxis[1]]);
 	axes[2] = glm::normalize(glm::cross(axes[0], axes[1]))* glm::length((glm::vec3)transform[mapaxis[2]]);
 
-	glm::mat4 rot = glm::mat4(1.0f);
-	*((glm::vec3*)(&rot[mapaxis[0]])) = axes[0];
-	*((glm::vec3*)(&rot[mapaxis[1]])) = axes[1];
-	*((glm::vec3*)(&rot[mapaxis[2]])) = axes[2];
-	*((glm::vec3*)(&rot[3])) = transform[3];
-	return rot;
+	glm::mat4 ortho = glm::mat4(1.0f);
+	*((glm::vec3*)(&ortho[mapaxis[0]])) = axes[0];
+	*((glm::vec3*)(&ortho[mapaxis[1]])) = axes[1];
+	*((glm::vec3*)(&ortho[mapaxis[2]])) = axes[2];
+	*((glm::vec3*)(&ortho[3])) = transform[3];
+	return ortho;
 }
 glm::mat4 getNormalized(glm::mat4 transform){
 	float bias = 0.005f;
@@ -75,8 +75,8 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis){
 	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3, (referenceAxis + 2) % 3};
 	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]], (glm::vec3)transform[mapaxis[1]],(glm::vec3)transform[mapaxis[2]]};
 	if (glm::length2(axes[0]) < bias){axes[0] = glm::vec3(0.0f);axes[0][mapaxis[0]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
+	if (glm::length2(axes[1]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
+	if (glm::length2(axes[2]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
 
 	axes[0] = glm::normalize(axes[0]);
 	axes[1] = glm::normalize(glm::cross(axes[2], axes[0]));
@@ -103,6 +103,11 @@ glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
 	glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 	return t0 + tz * coef[0];
+}
+void setLen(glm::vec3* vec, float len) {
+	float f=glm::length(*vec);
+	*vec/=f+(float)(f==0.0f);
+	*vec*=len;
 }
 float angle2(float x, float y){
 	float a = glm::degrees(atan(y / x));
