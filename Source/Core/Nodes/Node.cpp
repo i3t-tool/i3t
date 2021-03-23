@@ -74,14 +74,33 @@ void NodeBase::receiveSignal(int inputIndex)
 		spreadSignal();
 }
 
+bool NodeBase::arePluggedIn(int numInputs)
+{
+	Debug::Assert(m_inputs.size() <= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
+
+	bool result = true;
+
+	for (size_t i = 0; i < numInputs; ++i)
+  {
+		result = result && m_inputs[i].isPluggedIn();
+	}
+
+	return result;
+}
+
+bool NodeBase::areAllPluggedIn()
+{
+	return arePluggedIn(m_operation->numberOfInputs);
+}
+
 void NodeBase::unplugAll()
 {
-	for (auto i = 0; i < m_inputs.size(); ++i)
+	for (size_t i = 0; i < m_inputs.size(); ++i)
 	{
 		unplugInput(i);
 	}
 
-	for (auto i = 0; i < m_outputs.size(); ++i)
+	for (size_t i = 0; i < m_outputs.size(); ++i)
 	{
 		unplugOutput(i);
 	}

@@ -261,6 +261,9 @@ public:
 	void receiveSignal(int inputIndex);
 	//===----------------------------------------------------------------------===//
 
+	bool arePluggedIn(int numInputs);
+	bool areAllPluggedIn();
+
 private:
 	void unplugAll();
 	void unplugInput(int index);

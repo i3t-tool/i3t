@@ -170,13 +170,15 @@ if (True)
     include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googlemock/include)
     include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gtest/googletest/include)
 
+    include_directories(${CMAKE_SOURCE_DIR}/Test)
+
     add_subdirectory(Dependencies/gtest)
 
     file(GLOB_RECURSE TEST_SOURCE
             "Test/*.cpp"
             "Test/*.h"
             "Test/*.hpp"
-            )
+    )
 
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
 
