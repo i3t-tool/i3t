@@ -14,7 +14,7 @@ class WorkspaceVector4 : public WorkspaceNodeWithCoreData
 {
 public:
 	WorkspaceVector4( ImTextureID headerBackground, WorkspaceVector4Args const& args);
-    WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Vector4>(), std::string headerLabel = "Vector4", std::string nodeLabel = "Vector4");
+    WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
     virtual void drawData(util::NodeBuilder& builder);
 	virtual void drawDataFull(util::NodeBuilder& builder);

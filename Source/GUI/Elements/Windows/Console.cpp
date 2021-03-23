@@ -126,7 +126,8 @@ void Console::render()
 
 		ConsoleCommand::dispatch(command);
 
-		strcpy_s(command, "");
+		strcpy(command, "");
+		// strcpy_s(command, ""); /* 3 arguments?*/
 		lineend = (int)m_buffer.str().size() - 1;   // skip \0
 		linebegin = (int)m_buffer.str().size() - 1; // skip \0
 

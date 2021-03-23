@@ -28,7 +28,7 @@ include_directories(Dependencies/imgui_node_editor)
 include_directories(Dependencies/imgui_node_editor/external/imgui)
 include_directories(Dependencies/imgui_markdown)
 include_directories(Dependencies/pgr-framework/include)
-include_directories(Dependencies/picoc)
+# temporary comment-out === include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
@@ -110,7 +110,7 @@ set(YAML_BUILD_SHARED_LIBS Off)
 # ======== Project dependencies which should be compiled. =====
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
-	# temporary comment-out ==== add_subdirectory(Dependencies/picoc) ===
+# temporary comment-out ==== add_subdirectory(Dependencies/picoc)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
@@ -182,7 +182,7 @@ if (True)
 
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
 
-    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp picoc)
+    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp ) # temporary comment-out === picoc)
 
     set_target_properties(gtest PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
@@ -249,7 +249,7 @@ target_link_libraries(
         ${OPENGL_LIBRARIES}
         assimp
         glfw
-        picoc
+        # temporary comment-out === picoc
         spdlog
         yaml-cpp
 )

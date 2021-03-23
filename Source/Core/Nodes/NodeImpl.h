@@ -55,7 +55,8 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[static_cas
 
 template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
 {
-	static_assert(false, "Calling update function of unimplemented NodeImpl type.");
+    Debug::Assert(false, "Calling update function of unimplemented NodeImpl type.");
+	//static_assert(false, "Calling update function of unimplemented NodeImpl type.");
 }
 
 // inversion

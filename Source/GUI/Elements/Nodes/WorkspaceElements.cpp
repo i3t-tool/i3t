@@ -75,22 +75,6 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 }
 
 
-WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : Id(id), Color(ImColor(255, 255, 255))
+WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id), m_color(ImColor(255, 255, 255))
 {}
-
-WorkspacePinProperties::WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type)
-		: Id(id), Name(name), Kind(kind), Type(type), IconSize(24), Connected(false),
-			Alpha(100) /* \todo JH no konstants here... */
-{}
-
-/* \todo JH this functions are in Core... */
-bool WorkspacePinProperties::IsPinConnected()
-{
-	return Connected;
-}
-
-bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
-{
-	return true; /* \todo todo... */
-}
 

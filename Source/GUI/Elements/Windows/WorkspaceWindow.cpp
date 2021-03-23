@@ -14,9 +14,11 @@
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
+#include "../Nodes/WorkspaceMatrixFree.h"
 #include "../Nodes/WorkspaceMatrixScale.h"
 #include "../Nodes/WorkspaceMatrixTranslation.h"
 
+#include "../Nodes/WorkspaceVectorFree.h"
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
 #include "Core/Input/InputManager.h"
@@ -482,7 +484,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("matrix operators");
 				ImGui::Separator();
 				if (ImGui::MenuItem("matrix")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixFree>(HeaderBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("trackball")) {
@@ -542,7 +544,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("vec4 operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("vec4")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector4>(HeaderBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorFree>(HeaderBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 . vec4")) {

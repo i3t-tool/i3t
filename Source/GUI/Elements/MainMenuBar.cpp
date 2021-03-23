@@ -89,8 +89,8 @@ void MainMenuBar::showFileMenu()
 			{
 				if (ww != NULL)
 				{
-					ww->WorkspaceNodes.clear();
-					LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
+					ww->m_workspaceCoreNodes.clear();
+					LoadWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
 				}
 				else
 				{
@@ -114,7 +114,7 @@ void MainMenuBar::showFileMenu()
 			{
 				if (ww != NULL)
 				{
-					LoadWorkspace(result.c_str(), &ww->WorkspaceNodes);
+					LoadWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
 				}
 				else
 				{
@@ -144,7 +144,7 @@ void MainMenuBar::showFileMenu()
 			{
 				if (ww != NULL)
 				{
-					SaveWorkspace(result.c_str(), &ww->WorkspaceNodes);
+					SaveWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
 				}
 				else
 				{
