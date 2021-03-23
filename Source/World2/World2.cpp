@@ -101,7 +101,7 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
         return;
     }
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)matnode;
-    Ptr<Core::NodeBase>		    nodebase    = nodebasedata->Nodebase;
+    Ptr<Core::NodeBase>		    nodebase    = nodebasedata->m_nodebase;
     WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata;
     Core::Transform::DataMap	data		= nodebase->getDataMap();
 	const Operation*			operation	= nodebase->getOperation();

@@ -8,15 +8,15 @@
  //---------------
 #include "Dependencies/picoc/picoc.h"
 
-#include "GUI/Elements/Nodes/WorkspaceElements.h"
+#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 //#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include <vector>
 #include <memory>
 
 #define PICOC_STACK_SIZE (32*1024)       /* space for the the stack */
 
-bool LoadWorkspace(const char*filename, std::vector<std::unique_ptr<WorkspaceNode>>*_workspace);
-bool SaveWorkspace(const char*filename, std::vector<std::unique_ptr<WorkspaceNode>>*_workspace);
+bool LoadWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
+bool SaveWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
 //std::vector<WorkspaceMatrix4x4>* LoadWorkspace();
 int PicocRunInteractive();
 int PicocRunFile(const char* filename);

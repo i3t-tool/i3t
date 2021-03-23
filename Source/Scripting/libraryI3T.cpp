@@ -9,9 +9,9 @@ WorkspaceLayout workspaceLayout;
 
 WorkspaceLayout*getWorkspaceLayout(){return &workspaceLayout;}
 void clearWorkspaceLayout(){
-    workspaceLayout.mat4Nodes.clear(); 
-    workspaceLayout.normVec4Nodes.clear(); 
-    workspaceLayout.nodePlugs.clear(); 
+    workspaceLayout.mat4Nodes.clear();
+    workspaceLayout.normVec4Nodes.clear();
+    workspaceLayout.nodePlugs.clear();
 }
 
 void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
@@ -80,14 +80,14 @@ void loadW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** 
     std::string filename= Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != NULL) {ww->WorkspaceNodes.clear(); status=LoadWorkspace(filename.c_str(), &ww->WorkspaceNodes); }
+    if (ww != NULL) {ww->m_workspaceCoreNodes.clear(); status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer=status;
 }
 void saveW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     WorkspaceWindow * ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != NULL) {status=SaveWorkspace(filename.c_str(), &ww->WorkspaceNodes); }
+    if (ww != NULL) {status=SaveWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer = status;
 }
 void runScript(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
@@ -112,12 +112,13 @@ const char defs[]="typedef int bool;typedef void node;";
 
 void PlatformLibraryInitI3T(Picoc *pc)
 {
+    /* picoc problem */
 	//TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "mat4"), sizeof(struct mat4));
 	//TypeParse(&Parser, &ReturnType, &Identifier, NULL);
 	//printf("AAAAAAAA");
     //LibraryAdd(&GlobalTable, "platform library", &PlatformLibrary1);
     IncludeRegister(pc, "I3T.h", NULL, PlatformLibrary1, defs);//ADD_CUSTOM
-    
+
     VariableDefinePlatformVar(pc, NULL, "free",     &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.free,        FALSE);
     VariableDefinePlatformVar(pc, NULL, "scale",    &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.scale,       FALSE);
     VariableDefinePlatformVar(pc, NULL, "uniscale", &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.uniscale,    FALSE);

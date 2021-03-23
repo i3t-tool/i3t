@@ -20,12 +20,14 @@
 #include <imgui_internal.h>
 #include <imgui_node_editor.h>
 #include <imgui_node_editor_internal.h>
+#include <Core/API.h>
 
 #include <algorithm>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+#include <initializer_list>
 
 using ax::Widgets::IconType;
 namespace util = ax::NodeEditor::Utilities;
@@ -46,22 +48,39 @@ enum class PinKind
 	Input
 };
 
+enum class WorkspaceViewScale
+{
+    Full,
+    SetValues,
+    Label
+};
+
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
+
+/* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
+struct WorkspaceNodeArgs
+{
+    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    std::string headerLabel = "default WorkspaceNode header";
+    std::string nodeLabel = "Node";
+    /* \todo JH it will be nice, if we are able give some default headerBackground here ... */
+};
 
 class WorkspaceNode
 {
 public:
-	const ne::NodeId Id;
-	std::string State; /*! \brief e.g. selected \todo what is it for? */
-	std::string Label;
+	const ne::NodeId m_id;
+	std::string m_state; /*! \brief e.g. selected \todo what is it for? */
+	std::string m_label;
+	WorkspaceViewScale m_viewScale;
 
-	ImColor Color; /*! \brief Color of Node */
-	ImVec2 Size;   /*! \brief Size of box */
-	float TouchTime;
+	ImColor m_color; /*! \brief Color of Node */
+	ImVec2 m_size;   /*! \brief Size of box */
+	float m_touchTime;
 
-	std::string HeaderLabel;
-	ImTextureID HeaderBackground;
+	std::string m_headerLabel;
+	ImTextureID m_headerBackground;
 
 	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
@@ -80,27 +99,10 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
-	//    // named-constructor-idiom
-	//    //  copy ctor public
-	//    WorkspaceNode(WorkspaceNode const& other);
-	//
-	//    static WorkspaceNode WorkspaceNodeFromCore(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID
-	//    headerBackground, std::string headerLabel){
-	//        return WorkspaceNode(nodebase->getId(), headerBackground, headerLabel);
-	//    }
+	WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
+    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel = "Node", std::string nodeLabel = "Node");
 
-	// private:
-	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground,
-	              std::string headerLabel = "default WorkspaceNode HeaderLabel");
 };
-
-/* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
-static int linkID = 0;
-static int getLinkID()
-{
-	return linkID++;
-}
 
 /*! \class WorkspaceLinkProperties
     \brief Information of Link for graphic
@@ -108,31 +110,9 @@ static int getLinkID()
 class WorkspaceLinkProperties
 {
 public:
-	const ne::LinkId Id;
-	ImColor Color;
+	const ne::LinkId m_id;
+	ImColor m_color;
 
-	WorkspaceLinkProperties(const ne::LinkId id);
+	WorkspaceLinkProperties(ne::LinkId const id);
 };
 
-/*! \class WorkspacePinProperties
-    \brief Information of Pin for graphic
- */
-class WorkspacePinProperties
-{
-public:
-	const ne::PinId Id; /*! \brief unique (among Pins) identificator */
-	std::string Name;   /*! \brief Name of Pin */
-	const PinKind Kind; /*! \brief Kind of pin \sa PinKind */
-	const EValueType Type;
-
-	int IconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
-
-	bool Connected;
-	float Alpha;
-
-	WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type);
-
-	bool IsPinConnected(); /* \todo check in Core ? */
-
-	bool CanCreateLink(Core::Pin* b); /* \todo check in Core ? */
-};

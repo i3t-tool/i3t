@@ -1,18 +1,24 @@
 #include "WorkspaceVector4.h"
 
-#include "Core/API.h"
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args)
+    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+{}
 
-WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, std::string headerLabel,
-                                   Ptr<Core::NodeBase> nodebase)
-		: WorkspaceNodeWithCoreData(nodebase, headerBackground, headerLabel)
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
+    : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
 {
+}
+
+void WorkspaceVector4::drawData(util::NodeBuilder& builder)
+{
+    drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
 }
 
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 {
-	const glm::vec4& coreData = Nodebase->getData().getVec4();
-	int const coreMap[4] = {1, 2, 3, 4}; /* \todo JH will be map for vector? */
-	int const idOfNode = this->Id.Get();
+	const glm::vec4& coreData = m_nodebase->getData().getVec4();
+	int const coreMap[4] = {1,2,3,4}; /* \todo JH will be map for vector? */
+	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
 	/* \todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
@@ -46,8 +52,8 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 
 	if (valueChanged)
 	{
-		Nodebase->setValue(localData);
-		//		Nodebase->setValue(valueOfChange, {columnOfChange});
+	    m_nodebase->setValue(localData);
+//		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 
 	ImGui::Spring(0);

@@ -29,6 +29,8 @@
 #define FORCE_INLINE inline
 #endif
 
+#undef Assert /* \todo JH due to compile error */
+
 namespace Debug
 {
 template <typename... Args> void Assert(bool condition, const std::string& message = "", Args&&... args)
