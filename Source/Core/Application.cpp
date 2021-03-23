@@ -24,6 +24,10 @@
 #include "Utils/TextureLoader.h"
 #include "World2/World2.h"
 
+
+#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+
 Application::Application()
 {
 	m_isPaused = false;
@@ -188,7 +192,15 @@ int Application::initI3T()
 	// new scene scheme
 	bool b = World2::initRender();
 	m_world2 = World2::loadDefaultScene();
-	World2::tmpAccess = m_world2;
+
+	//testing
+	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
+	glm::mat4 m=glm::mat4(1.0f);
+	ValueSetResult result = mat->m_nodebase->setValue(glm::vec3(2.0f,2.0f,2.0f));
+	printf("value set result %d\n",result.status);
+	//ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+	m_world2->handlesSetMatrix(mat);
+
 	return 0;
 }
 

@@ -5,6 +5,8 @@
 #include "GUI/Elements/IWindow.h"
 #include "Utils/Other.h"
 
+#include <string.h> /* for strcpy_s */
+
 namespace UI
 {
 /**

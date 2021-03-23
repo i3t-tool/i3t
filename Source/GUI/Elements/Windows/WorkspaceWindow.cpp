@@ -14,13 +14,16 @@
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
+#include "../Nodes/WorkspaceMatrixFree.h"
 #include "../Nodes/WorkspaceMatrixScale.h"
 #include "../Nodes/WorkspaceMatrixTranslation.h"
 
+#include "../Nodes/WorkspaceVectorFree.h"
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
+
 
 // using namespace Core;
 
@@ -88,16 +91,18 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
 
 	/*--- SCALE */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
-	// ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
+	 /*WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
+	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
 
 	/*--- NORMALIZE VECTOR */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector
-	// 1")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
+	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1")); 
+	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
 
 	ne::NavigateToContent();
-	//////////////////////////////////
+	ne::CenterNodeOnScreen(m_workspaceCoreNodes.back()->m_id);
 
+	//////////////////////////////////
+	//printf("len %lld \n",WorkspaceNodes.size());
 	/*WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get());
 
 	Ptr<Core::NodeBase> child=wnbd->Nodebase;
@@ -117,12 +122,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	// LoadWorkspace(Config::getAbsolutePath("/load.c").c_str(),&WorkspaceNodes);
 
 	// SaveWorkspace(Config::getAbsolutePath("/save.c").c_str(), &WorkspaceNodes);
-	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
-	//    GLuint imageId =
-	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
-	//    true); HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
-	//    // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
-	//    // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -146,9 +145,10 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
+
 	if (InputManager::isKeyPressed(Keys::l))
 	{
-		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
+		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
 		printf("press\n");
 	}
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -156,237 +156,696 @@ void WorkspaceWindow::render()
 	ImGui::PopStyleVar();
 
 	UpdateTouchAllNodes();
-	ne::Begin("Node editor");
+	ne::Begin("Node editor");{
+    ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
 
-	for (auto&& WorkspaceNode : WorkspaceNodes)
+
+	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 	{
-		WorkspaceNode->drawNode(NodeBuilderContext, nullptr);
+		workspaceCoreNode->drawNode(NodeBuilderContext, nullptr);
 	}
 
-	for (auto& workspaceNode : WorkspaceNodes)
-	{
-		dynamic_cast<WorkspaceNodeWithCoreData*>(workspaceNode.get())
-				->drawInputLinks(); /* \todo skip nodes with no inputs...*/
-	}
+    /* both connected pins have to be drawn before link is drawn -> therefore separated for */
+    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+    {
+        workspaceCoreNode->drawInputLinks();
+    }
 
-	ne::End();
+    checkQueryElements();
+
+    checkQueryContextMenus();
+
+    ImGui::SetCursorScreenPos(cursorTopLeft);
+
+
+	}ne::End();
+
+	shiftSelectedNodesToFront();
 
 	ImGui::End();
-	/* ed::SetCurrentEditor(m_Editor); \todo maybe call it here for static load of current editor setting (if changed)
-	 */
-
-	//    auto& io = ImGui::GetIO();
-	//
-	//    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-
-	//
-	//    contextNodeId = 0;
-	//    contextLinkId = 0;
-	//    contextPinId = 0;
-	//    createNewNode = false;
-	//    newNodeLinkPin = nullptr;
-	//    newLinkPin = nullptr;
-	//
-	//    leftPaneWidth = 400.0f;
-	//    rightPaneWidth = 800.0f;
-	//
-	//
-	//    Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
-	//
-	//    ShowLeftPane(leftPaneWidth - 4.0f);
-	//
-	//    ImGui::SameLine(0.0f, 12.0f);
-	//
-	//    ne::Begin("Node editor");
-	//    {
-	//      auto cursorTopLeft = ImGui::GetCursorScreenPos();
-	//
-	//
-	//     //create link
-	//     if (!createNewNode)
-	//      {
-	//        if (ne::BeginCreate(ImColor(255, 255, 255), 2.0f)){
-	//
-	//          auto showLabel = [](const char* label, ImColor color) {
-	//            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-	//            auto size = ImGui::CalcTextSize(label);
-	//
-	//            auto padding = ImGui::GetStyle().FramePadding;
-	//            auto spacing = ImGui::GetStyle().ItemSpacing;
-	//
-	//            ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-	//
-	//            auto rectMin = ImGui::GetCursorScreenPos() - padding;
-	//            auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
-	//
-	//            auto drawList = ImGui::GetWindowDrawList();
-	//            drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-	//            ImGui::TextUnformatted(label);
-	//          };
-	//
-	//          ne::PinId startPinId = 0, endPinId = 0;
-	//          if (ne::QueryNewLink(&startPinId, &endPinId))
-	//          {
-	//            auto startPin = FindPin(startPinId);
-	//            auto endPin = FindPin(endPinId);
-	//
-	//            newLinkPin = startPin ? startPin : endPin;
-	//
-	//            if (startPin->Kind == PinKind::Input)
-	//            {
-	//              std::swap(startPin, endPin);
-	//              std::swap(startPinId, endPinId);
-	//            }
-	//
-	//            if (startPin && endPin)
-	//            {
-	//              if (endPin == startPin)
-	//              {
-	//                ne::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-	//              }
-	//              else if (endPin->Kind == startPin->Kind)
-	//              {
-	//                showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
-	//                ne::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-	//              }
-	//              else if (endPin->Node == startPin->Node)
-	//              {
-	//                  showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
-	//                  ne::RejectNewItem(ImColor(255, 0, 0), 1.0f);
-	//              }
-	//              else if (endPin->Type != startPin->Type)
-	//              {
-	//                showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
-	//                ne::RejectNewItem(ImColor(255, 128, 128), 1.0f);
-	//              }
-	//              else
-	//              {
-	//                showLabel("+ Create Link", ImColor(32, 45, 32, 180));
-	//                if (ne::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
-	//                {
-	//                  Links.emplace_back(WorkspaceLink(getNew_s_ID(), startPin, endPin));
-	//                  Links.back().Color = WorkspacePinColor[startPin->Type];
-	//
-	//                  auto result = GraphManager::plug(startPin->Node->Nodebase, endPin->Node->Nodebase, 0, 0);
-	//                  if (result != ENodePlugResult::Ok)
-	//                  {
-	//                    // print result;
-	//                  }
-	//                }
-	//              }
-	//            }
-	//          }
-	//
-	//          ne::PinId pinId = 0;
-	//          if (ne::QueryNewNode(&pinId))
-	//          {
-	//            newLinkPin = FindPin(pinId);
-	//            if (newLinkPin)
-	//              showLabel("+ Create Namespace", ImColor(32, 45, 32, 180));
-	//
-	//            if (ne::AcceptNewItem())
-	//            {
-	//              createNewNode = true;
-	//              newNodeLinkPin = FindPin(pinId);
-	//              newLinkPin = nullptr;
-	//              ne::Suspend();
-	//              ImGui::OpenPopup("Create New Namespace");
-	//              ne::Resume();
-	//            }
-	//          }
-	//        }
-	//        else
-	//          newLinkPin = nullptr;
-	//
-	//        ne::EndCreate();
-	//
-	//        if (ne::BeginDelete())
-	//        {
-	//          DeleteNode();
-	//        }
-	//        ne::EndDelete();
-	//      }
-	//
-	//      ImGui::SetCursorScreenPos(cursorTopLeft);
-	//    }
-	//
-	//    popupMenu(createNewNode, newNodeLinkPin, contextNodeId, contextPinId, contextLinkId);
-	//    ne::Resume();
-	//
 }
+
+/* \todo JH not work yet - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
+void WorkspaceWindow::shiftSelectedNodesToFront()
+{
+    if (ne::HasSelectionChanged())
+    {
+        std::vector<Ptr<WorkspaceNodeWithCoreData>> selectedCoreNodes = getSelectedWorkspaceCoreNodes();
+
+        for(int i=0; i < selectedCoreNodes.size(); i++)
+        {
+
+            coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(),
+                                                        m_workspaceCoreNodes.end(),
+                                                        [selectedCoreNodes, i](Ptr<WorkspaceNodeWithCoreData> const &node) -> bool { return node->m_id == selectedCoreNodes.at(i)->m_id; });
+
+            if (ith_selected_node != m_workspaceCoreNodes.end())
+            {
+              std::iter_swap(m_workspaceCoreNodes.begin()+i, ith_selected_node);
+            }
+        }
+    }
+}
+
+void WorkspaceWindow::manipulatorStartCheck3D()
+{
+    Ptr<WorkspaceNodeWithCoreData> selectedCoreNode;
+    ne::NodeId selectedNodeID;
+
+    if (ne::HasSelectionChanged() && ne::GetSelectedNodes(&selectedNodeID, 1) == 1 )
+    {
+        selectedCoreNode = getWorkspaceCoreNodeByID(selectedNodeID);
+        if (selectedCoreNode != nullptr)
+        {
+            /* \todo JH call manipulator with selectedCoreNode->m_nodebase */
+        }
+        else
+        {
+            /* \todo JH call manipulator with null */
+        }
+    }
+}
+
+
+Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByID(ne::NodeId const id){
+    if (id)
+    {
+        for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+        {
+            if(node->m_id == id){ return node; }
+        }
+    }
+    return nullptr;
+}
+
+/* \todo JH I want to return Ptr<WorkspaceNodeWithCoreData>, but not know how to do it... */
+Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByPinID(ne::PinId const id){
+    if (id)
+    {
+        for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+        {
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceInputsProperties)
+            {
+                if (pin->m_id == id)
+                {
+                    return node;
+                }
+            }
+
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceOutputsProperties)
+            {
+                if (pin->m_id == id)
+                {
+                    return node;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+Ptr<WorkspaceCorePinProperties> WorkspaceWindow::getWorkspacePinPropertiesByID(ne::PinId const id)
+{
+    if (id)
+    {
+        for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+        {
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceInputsProperties)
+            {
+                if (pin->m_id == id)
+                {
+                    return pin;
+                }
+            }
+
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceOutputsProperties)
+            {
+                if (pin->m_id == id)
+                {
+                    return pin;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::getSelectedWorkspaceCoreNodes()
+{
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> allSelectedCoreNodes;
+    std::vector<ne::NodeId> allSelectedNodesIDs;
+    Ptr<WorkspaceNodeWithCoreData> temp;
+
+    int numOfSelectedObjects = ne::GetSelectedObjectCount(); /* not Nodes only */
+
+    allSelectedNodesIDs.resize(numOfSelectedObjects);
+    int numOfSelectedNodes = ne::GetSelectedNodes(allSelectedNodesIDs.data(), numOfSelectedObjects);
+    allSelectedNodesIDs.shrink_to_fit();
+
+    allSelectedCoreNodes.reserve(numOfSelectedNodes);
+    for (auto nodeId : allSelectedNodesIDs)
+    {
+        temp = getWorkspaceCoreNodeByID(nodeId);
+        if (temp)
+        {
+            allSelectedCoreNodes.push_back(temp);
+        }
+    }
+    allSelectedCoreNodes.shrink_to_fit();
+
+    return allSelectedCoreNodes;
+}
+
+void WorkspaceWindow::showPopUpLabel(std::string label, ImColor color)
+{
+    const char* label_c = label.c_str();
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+    ImVec2 labelSize = ImGui::CalcTextSize(label_c);
+
+    ImVec2 padding = ImGui::GetStyle().FramePadding;
+    ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
+
+    ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+    ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
+    ImVec2 rectMax = ImGui::GetCursorScreenPos() + labelSize + padding;
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    drawList->AddRectFilled(rectMin, rectMax, color, labelSize.y * 0.15f); /* \todo JH remove constant here */
+    ImGui::TextUnformatted(label_c);
+}
+
+void WorkspaceWindow::checkQueryElementsCreating()
+{
+    if (ne::BeginCreate(ImColor(255, 255, 255), 2.0f))
+    {
+        checkQueryLinkCreate();
+        // checkQueryNewNode(); /* \todo JH not work well.. block other manipulations */
+    }
+    else
+    {
+        m_pinPropertiesForNewLink = nullptr;
+    }
+    ne::EndCreate();
+
+}
+
+void WorkspaceWindow::checkQueryElements()
+{
+    if (!m_createNewNode)
+    {
+        checkQueryElementsCreating();
+        checkQueryElementsDeleting();
+
+    }
+}
+
+void WorkspaceWindow::checkQueryLinkCreate()
+{
+    ne::PinId startPinId = 0, endPinId = 0;
+    if (ne::QueryNewLink(&startPinId, &endPinId))
+    {
+        Ptr<WorkspaceCorePinProperties> startPin = getWorkspacePinPropertiesByID(startPinId);
+        Ptr<WorkspaceCorePinProperties> endPin   = getWorkspacePinPropertiesByID(endPinId);
+
+        /* \todo JH comment where it is used */
+        m_pinPropertiesForNewLink = startPin ? startPin : endPin;
+
+        if (startPin && endPin && (startPin->getKind() != endPin->getKind()) ) /* \todo JH check kind in Core? */
+        {
+            if (startPin->getKind() == PinKind::Input)
+            {
+                std::swap(startPin, endPin);
+            }
+
+
+            /* \todo JH manage different result of trying to connect (probably use showPopUpLabel() ) */
+            switch (Core::GraphManager::plug(startPin->m_node.m_nodebase,
+                                             endPin->m_node.m_nodebase,
+                                             startPin->m_pin.getIndex(),
+                                             endPin->m_pin.getIndex() ))
+            {
+                case ENodePlugResult::Ok:
+                    showPopUpLabel("Connected", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    break;
+            }
+        }
+    }
+
+}
+
+void WorkspaceWindow::checkQueryContextMenus()
+{
+    m_openPopupMenuPosition = ImGui::GetMousePos();
+    ne::Suspend();
+	if (ne::ShowBackgroundContextMenu())
+	{
+		ImGui::OpenPopup("Create New Node"); /* \todo JH take string from some constants file */
+	}
+	else if (ne::ShowNodeContextMenu(&m_contextNodeId))
+	{
+		ImGui::OpenPopup("Node Context Menu");
+	}
+	ne::Resume();
+
+	ne::Suspend();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8)); /* \todo JH take graphic setting from constants file */
+
+	if (ImGui::BeginPopup("Node Context Menu")) {
+
+        Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
+
+		if (node) {
+			ImGui::Text("ID: %p", m_contextNodeId.AsPointer());
+			ImGui::Separator();
+		}
+		else {
+			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
+		}
+
+		if (ImGui::MenuItem("Delete")) {
+			if (ne::BeginDelete())
+			{
+				checkQueryNodeDelete();
+			}
+			ne::EndDelete();
+			//ne::DeleteNode(m_contextNodeId); /* \todo JH check whether node remain in nodeeditor */
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopup("Create New Node"))
+	{
+		m_newNodePostion = m_openPopupMenuPosition;
+
+		ImGui::Text("add...");
+		ImGui::Separator();
+		if (ImGui::BeginMenu("transformation")) {
+
+			ImGui::Text("add transforamtion");
+			ImGui::Separator();
+			if (ImGui::MenuItem("free")) {
+			}
+			if (ImGui::MenuItem("translation")) {
+			}
+			if (ImGui::BeginMenu("rotation")) {
+
+				ImGui::Text("add rotation");
+				ImGui::Separator();
+				if (ImGui::MenuItem("eulerAngleX")) {
+				}
+				if (ImGui::MenuItem("eulerAngleY")) {
+				}
+				if (ImGui::MenuItem("eulerAngleZ")) {
+				}
+				if (ImGui::MenuItem("rotate")) {
+				}
+				if (ImGui::MenuItem("quat")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("scale")) {
+
+				ImGui::Text("add scale");
+				ImGui::Separator();
+				if (ImGui::MenuItem("uniform scale")) {
+				}
+				if (ImGui::MenuItem("scale")) {
+
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::MenuItem("lookAt")) {
+			}
+			if (ImGui::BeginMenu("projection")) {
+
+				ImGui::Text("add projection");
+				ImGui::Separator();
+				if (ImGui::MenuItem("ortho")) {
+				}
+				if (ImGui::MenuItem("perspective")) {
+				}
+				if (ImGui::MenuItem("frustrum")) {
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("operator")) {
+
+			ImGui::Text("add operator");
+			ImGui::Separator();
+			if (ImGui::BeginMenu("transformation")) {
+
+				ImGui::Text("transformation operators");
+				ImGui::Separator();
+				if (ImGui::MenuItem("translate")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("eulerAngleX")) {
+				}
+				if (ImGui::MenuItem("eulerAngleY")) {
+				}
+				if (ImGui::MenuItem("eulerAngleZ")) {
+				}
+				if (ImGui::MenuItem("rotate")) {
+				}
+				if (ImGui::MenuItem("scale")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("ortho")) {
+				}
+				if (ImGui::MenuItem("perspective")) {
+				}
+				if (ImGui::MenuItem("frustrum")) {
+				}
+				if (ImGui::MenuItem("lookAt")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("matrix")) {
+
+				ImGui::Text("matrix operators");
+				ImGui::Separator();
+				if (ImGui::MenuItem("matrix")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixFree>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("trackball")) {
+				}
+				if (ImGui::MenuItem("inversion")) {
+//					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixInversion>(HeaderBackgroundTexture));
+//					ne::SetNodePosition(WorkspaceNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("transpose")) {
+				}
+				if (ImGui::MenuItem("determinant")) {
+//					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
+//					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat * mat")) {
+				}
+				if (ImGui::MenuItem("mat + mat")) {
+				}
+				if (ImGui::MenuItem("mat * vec4")) {
+				}
+				if (ImGui::MenuItem("vec4 * mat")) {
+				}
+				if (ImGui::MenuItem("float * mat")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("vec3")) {
+
+				ImGui::Text("vec3 operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("vec3")) {
+				}
+				if (ImGui::MenuItem("show vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 x vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 . vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 + vec3")) {
+				}
+				if (ImGui::MenuItem("vec3 - vec3")) {
+				}
+				if (ImGui::MenuItem("float * vec3")) {
+				}
+				if (ImGui::MenuItem("normalize vec3")) {
+				}
+				if (ImGui::MenuItem("length(vec3)")) {
+				}
+				if (ImGui::MenuItem("mix vec3")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("vec4")) {
+
+				ImGui::Text("vec4 operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorFree>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 . vec4")) {
+				}
+				if (ImGui::MenuItem("vec4 + vec4")) {
+				}
+				if (ImGui::MenuItem("vec4 - vec4")) {
+				}
+				if (ImGui::MenuItem("float * vec4")) {
+				}
+				if (ImGui::MenuItem("normalize vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+				}
+				if (ImGui::MenuItem("perspective division")) {
+				}
+				if (ImGui::MenuItem("mix vec4")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("quat")) {
+
+				ImGui::Text("quat operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("quat")) {
+				}
+				if (ImGui::MenuItem("quat(float, vec3)")) {
+				}
+				if (ImGui::MenuItem("quat(angle, axis)")) {
+				}
+				if (ImGui::MenuItem("quat(vec3, vec3)")) {
+				}
+				if (ImGui::MenuItem("quat -> float, vec3")) {
+				}
+				if (ImGui::MenuItem("quat -> angle, axis")) {
+				}
+				if (ImGui::MenuItem("float * quat")) {
+				}
+				if (ImGui::MenuItem("quat * quat")) {
+				}
+				if (ImGui::MenuItem("quat -> euler")) {
+				}
+				if (ImGui::MenuItem("euler -> quat")) {
+				}
+				if (ImGui::MenuItem("slerp")) {
+				}
+				if (ImGui::MenuItem("long way slerp")) {
+				}
+				if (ImGui::MenuItem("lerp")) {
+				}
+				if (ImGui::MenuItem("quat conjugate")) {
+				}
+				if (ImGui::MenuItem("qvq*")) {
+				}
+				if (ImGui::MenuItem("inverse quat")) {
+				}
+				if (ImGui::MenuItem("normalize quat")) {
+				}
+				if (ImGui::MenuItem("length(quat)")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("float")) {
+
+				ImGui::Text("float operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("float")) {
+				}
+				if (ImGui::MenuItem("clamp float")) {
+				}
+				if (ImGui::MenuItem("float cycle")) {
+				}
+				if (ImGui::MenuItem("float * float")) {
+				}
+				if (ImGui::MenuItem("float / float")) {
+				}
+				if (ImGui::MenuItem("float + float")) {
+				}
+				if (ImGui::MenuItem("float ^ float")) {
+				}
+				if (ImGui::MenuItem("mix float")) {
+				}
+				if (ImGui::MenuItem("sin & cos(float)")) {
+				}
+				if (ImGui::MenuItem("asin & acos(float")) {
+				}
+				if (ImGui::MenuItem("signum")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("conversion")) {
+
+				ImGui::Text("conversion operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("mat -> TR")) {
+				}
+				if (ImGui::MenuItem("TR -> mat")) {
+				}
+				if (ImGui::MenuItem("mat -> vecs4")) {
+				}
+				if (ImGui::MenuItem("mat -> quat")) {
+				}
+				if (ImGui::MenuItem("mat -> floats")) {
+				}
+				if (ImGui::MenuItem("vecs4 -> mat")) {
+				}
+				if (ImGui::MenuItem("vec4 -> vec3")) {
+				}
+				if (ImGui::MenuItem("vec4 -> floats")) {
+				}
+				if (ImGui::MenuItem("vecs3 -> mat")) {
+				}
+				if (ImGui::MenuItem("vec3 -> vec4")) {
+				}
+				if (ImGui::MenuItem("vec3 -> floats")) {
+				}
+				if (ImGui::MenuItem("quat -> mat")) {
+				}
+				if (ImGui::MenuItem("quat -> floats")) {
+				}
+				if (ImGui::MenuItem("floats -> mat")) {
+				}
+				if (ImGui::MenuItem("floats -> vec4")) {
+				}
+				if (ImGui::MenuItem("floats -> vec3")) {
+				}
+				if (ImGui::MenuItem("floats -> quat")) {
+				}
+				ImGui::EndMenu();
+
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::MenuItem("sequence")) {
+		}
+		if (ImGui::MenuItem("camera")) {
+		}
+		if (ImGui::MenuItem("screen")) {
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("selection")) {
+
+			ImGui::Text("selection");
+			ImGui::Separator();
+			if (ImGui::MenuItem("select all")) { //SS todo make hotkey hint
+			}
+			if (ImGui::MenuItem("invert")) { //SS todo make hotkey hint
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("zoom")) {
+
+			ImGui::Text("zoom");
+			ImGui::Separator();
+			if (ImGui::MenuItem("to all")) { //SS todo make hotkey hint
+			}
+			if (ImGui::MenuItem("to selection")) { //SS todo make hotkey hint
+			}
+			ImGui::EndMenu();
+
+		}
+
+		ImGui::EndPopup();
+	}
+
+
+	ImGui::PopStyleVar();
+	ne::Resume();
+
+}
+
+void WorkspaceWindow::checkQueryNodeCreate()
+{
+    ne::PinId pinId = 0;
+    if (ne::QueryNewNode(&pinId))
+    {
+        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
+        if (m_pinPropertiesForNewLink)
+        {
+            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
+        }
+
+        if (ne::AcceptNewItem())
+        {
+            m_createNewNode  = true;
+            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
+            m_pinPropertiesForNewLink = nullptr;
+
+            ne::Suspend();
+            ImGui::OpenPopup("Create New Node");
+            ne::Resume();
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryElementsDeleting()
+{
+    if (ne::BeginDelete())
+    {
+        checkQueryLinkDelete();
+        checkQueryNodeDelete();
+    }
+    ne::EndDelete();
+}
+
+void WorkspaceWindow::checkQueryLinkDelete()
+{
+    ne::LinkId linkId = 0;
+    while (ne::QueryDeletedLink(&linkId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
+
+            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryNodeDelete()
+{
+    ne::NodeId nodeId = 0;
+    while (ne::QueryDeletedNode(&nodeId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
+            if (id != m_workspaceCoreNodes.end())
+                m_workspaceCoreNodes.erase(id);
+        }
+    }
+}
+
 
 void WorkspaceWindow::UpdateTouchAllNodes()
 {
 	const auto deltaTime = ImGui::GetIO().DeltaTime;
-	for (auto&& WorkspaceNode : WorkspaceNodes)
+	for (auto&& workspaceNode : m_workspaceCoreNodes)
 	{
-		WorkspaceNode->UpdateTouch(deltaTime);
+		workspaceNode->UpdateTouch(deltaTime);
 	}
 }
-
-// WorkspaceNode* WorkspaceWindow::FindNode(ne::NodeId id)
-//{
-//  for (auto& node : Nodes)
-//    if (node.ID == id)
-//      return &node;
-//
-//  return nullptr;
-//}
-//
-// WorkspaceLink* WorkspaceWindow::FindLink(ne::LinkId id)
-//{
-//  for (auto& link : Links)
-//    if (link.ID == id)
-//      return &link;
-//
-//  return nullptr;
-//}
-//
-// WorkspacePin* WorkspaceWindow::FindPin(ne::PinId id)
-//{
-//  if (!id)
-//    return nullptr;
-//
-//    WorkspaceNodeInputs *in;
-//    WorkspaceNodeOutputs *out;
-//  for (WorkspaceNode node : Nodes)
-//  {
-//    //      try{
-//    in = dynamic_cast<WorkspaceNodeInputs*>(&node);
-//    if (in != nullptr) {
-//        for (auto& pin : in->Inputs)
-//          if (pin.ID == id)
-//            return &pin;
-//    //    }catch (std::bad_cast){}
-//    }
-//
-//    //  try{
-//    out = dynamic_cast<WorkspaceNodeOutputs*>(&node);
-//    if (out != nullptr) {
-//        for (auto& pin : out->Outputs)
-//          if (pin.ID == id)
-//            return &pin;
-//    }
-////   }catch (std::bad_cast){}
-//  }
-//
-//  return nullptr;
-//}
-//
-//
-// void WorkspaceWindow::UpdateTouch()
-//{
-//    const auto deltaTime = ImGui::GetIO().DeltaTime;
-//    for (WorkspaceNode& entry : Nodes)
-//    {
-//        if (entry.TouchTime > 0.0f)
-//            entry.TouchTime -= deltaTime;
-//    }
-//}
-
-// bool editorStart = false;
-/*! \brief flag for state of editor run */ // \TODO: Use as least global variable as possible please => and it is
-                                           // possible (almost) every time :-)
 
 // bool WorkspaceWindow::Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1,
 //                     float min_size2, float splitter_long_axis_size = -1.0f)
