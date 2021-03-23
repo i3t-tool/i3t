@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
+#include "WorkspaceElements.h"
 
 #include "WorkspaceElements.h"
 
@@ -35,13 +36,13 @@ public:
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
     WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr, std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");
 
-    virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	virtual void drawInputLinks();
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
-	bool drawDragFloatWithMap_Inline(float * const value, const int mapValue, std::string label);
+	bool drawDragFloatWithMap_Inline(float* const value, const int mapValue, std::string label);
 };
 
 /*! \class WorkspaceCorePinProperties

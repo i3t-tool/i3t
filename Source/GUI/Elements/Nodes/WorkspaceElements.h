@@ -41,7 +41,6 @@ class WorkspacePinProperties;
     \brief kinds (in/out) of Pin \todo maybe unused - this info is in Core
  */
 
-
 enum class PinKind
 {
 	Output,
@@ -82,14 +81,13 @@ public:
 	std::string m_headerLabel;
 	ImTextureID m_headerBackground;
 
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-
-	virtual void drawInputLinks()=0;
+	virtual void drawInputLinks() = 0;
 	virtual void drawHeader(util::NodeBuilder& builder);
-	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-	virtual void drawData(util::NodeBuilder& builder)=0;
-	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
+	virtual void drawData(util::NodeBuilder& builder) = 0;
+	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
@@ -116,5 +114,4 @@ public:
 
 	WorkspaceLinkProperties(ne::LinkId const id);
 };
-
 

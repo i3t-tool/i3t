@@ -9,9 +9,10 @@
 
 #include <algorithm>
 
-#include "Core/Nodes/NodeImpl.h"
-#include "Core/Nodes/Operations.h"
+#include "NodeImpl.h"
+#include "Operations.h"
 #include "Sequence.h"
+#include "Transform.h"
 
 namespace Builder
 {
@@ -37,7 +38,7 @@ template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
 	auto ret = std::make_shared<Core::Sequence>();
-  ret->create();
+	ret->create();
 	ret->updateValues(0);
 	return ret;
 }
@@ -45,7 +46,7 @@ Ptr<Core::Sequence> FORCE_INLINE createSequence()
 template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
 {
 	auto ret = std::make_shared<T>(std::forward<Args>(args)...);
-  ret->create();
+	ret->create();
 	ret->reset();
 	return ret;
 }
@@ -67,6 +68,9 @@ public:
 	 * \param output
 	 */
 	static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+
+	/// Plug first output pin of lhs to the first input pin of rhs.
+	static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
 
 	/**
 	 * Connect given node output pin to this operator input pin.
@@ -119,9 +123,9 @@ public:
 	 */
 	static std::vector<Ptr<NodeBase>> getAllInputNodes(Ptr<Core::NodeBase>& node);
 
-  /**
-   * \return All nodes plugged into given node output pins.
-   */
+	/**
+	 * \return All nodes plugged into given node output pins.
+	 */
 	static std::vector<Ptr<NodeBase>> getAllOutputNodes(Ptr<Core::NodeBase>& node);
 
 	/**
@@ -132,36 +136,36 @@ public:
 
 class SequenceTree
 {
-  Ptr<Sequence> m_beginSequence;
+	Ptr<Sequence> m_beginSequence;
 
 public:
-  class MatrixIterator
-  {
+	class MatrixIterator
+	{
 		friend class SequenceTree;
-    SequenceTree* m_tree;
-    Ptr<Sequence> m_currentSequence;
-    Ptr<NodeBase> m_currentMatrix;
+		SequenceTree* m_tree;
+		Ptr<Sequence> m_currentSequence;
+		Ptr<NodeBase> m_currentMatrix;
 
-  public:
-    MatrixIterator(Ptr<Sequence>& sequence);
-    MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
+	public:
+		MatrixIterator(Ptr<Sequence>& sequence);
+		MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
 
 		/// Move iterator to root sequence.
-    MatrixIterator& operator++();
+		MatrixIterator& operator++();
 
-    /// Move iterator to root sequence.
-    MatrixIterator operator++(int);
+		/// Move iterator to root sequence.
+		MatrixIterator operator++(int);
 
-    /// Move iterator towards to the leaf sequence.
-    MatrixIterator& operator--();
+		/// Move iterator towards to the leaf sequence.
+		MatrixIterator& operator--();
 
-    /// Move iterator towards to the leaf sequence.
-    MatrixIterator operator--(int);
+		/// Move iterator towards to the leaf sequence.
+		MatrixIterator operator--(int);
 
-    Ptr<NodeBase> operator*() const;
+		Ptr<NodeBase> operator*() const;
 
-    bool operator==(const MatrixIterator& rhs) const;
-    bool operator!=(const MatrixIterator& rhs) const;
+		bool operator==(const MatrixIterator& rhs) const;
+		bool operator!=(const MatrixIterator& rhs) const;
 
 	private:
 		/// Move to the next matrix.
@@ -169,19 +173,19 @@ public:
 
 		/// Move to the previous matrix.
 		void withdraw();
-  };
+	};
 
 public:
 	SequenceTree(Ptr<NodeBase> sequence);
 
-  /**
-   * \return Iterator which points sequence.
-   */
-  MatrixIterator begin();
+	/**
+	 * \return Iterator which points sequence.
+	 */
+	MatrixIterator begin();
 
-  /**
-   * \return Iterator which points to the sequence root.
-   */
-  MatrixIterator end();
+	/**
+	 * \return Iterator which points to the sequence root.
+	 */
+	MatrixIterator end();
 };
 } // namespace Core

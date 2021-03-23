@@ -4,7 +4,8 @@
 #include <sstream>
 
 #include <nlohmann/json.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+#include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/stdout_sinks.h"
 
 #include "Core/GlfwWindow.h"
 
@@ -39,7 +40,8 @@ void Logger::initLogger(int argc, char* argv[])
 
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
-	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+	// sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+	sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
 	sinks[0]->set_level(spdlog::level::trace);
 	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
 
@@ -63,24 +65,24 @@ void Logger::endLogger() const
 
 void Logger::update()
 {
-	if (InputController::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_popUps))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_popUps))
 	{
 		toggleLoggingPopUps();
 	}
-	if (InputController::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_logic))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_logic))
 	{
 		toggleLoggingLogic();
 	}
-	if (InputController::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_matrixFields))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_matrixFields))
 	{
 		toggleLoggingMatrixFields();
 	}
-	if (InputController::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_mouseMovement))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_mouseMovement))
 	{
 		toggleLoggingMouseRaw();
 	}
 	// #TUTORIAL
-	if (InputController::isKeyJustPressed(LoggingToggle::KEY_Dummy_tutorialStep))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_Dummy_tutorialStep))
 	{
 		if (stepCount > 4)
 		{

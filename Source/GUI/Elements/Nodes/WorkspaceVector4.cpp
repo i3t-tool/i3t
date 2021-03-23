@@ -21,33 +21,34 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
-	/* \todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably better /same as in Matrix4x4/
-	int columnOfChange;
-	float localData, valueOfChange;
-    */
-    glm::vec4 localData;
+	/* \todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
+	better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
+	  */
+	glm::vec4 localData;
 
 	builder.Middle();
 
-    ImGui::PushItemWidth(100.0f);
+	ImGui::PushItemWidth(I3T::getSize(ESize::Nodes_FloatWidth));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
 	for (int columns = 0; columns < 4; columns++)
-    {
-        localData[columns] = coreData[columns];
-        valueChanged |= drawDragFloatWithMap_Inline(&localData[columns],
-                                                    coreMap[columns],
-                                                    fmt::format("##{}:{}", idOfNode, columns));
+	{
+		localData[columns] = coreData[columns];
+		valueChanged |=
+				drawDragFloatWithMap_Inline(&localData[columns], coreMap[columns], fmt::format("##{}:{}", idOfNode, columns));
 
-//        localData = coreData[columns];
-//        if (drawDragFloatWithMap_Inline(&localData,
-//                                        coreMap[columns],
-//                                        fmt::format("##{}:{}", idOfNode, columns)))
-//        {
-//            valueChanged = true;
-//            columnOfChange = columns;
-//            valueOfChange = localData;
-//        }
-}
-    ImGui::PopItemWidth();
+		//        localData = coreData[columns];
+		//        if (drawDragFloatWithMap_Inline(&localData,
+		//                                        coreMap[columns],
+		//                                        fmt::format("##{}:{}", idOfNode, columns)))
+		//        {
+		//            valueChanged = true;
+		//            columnOfChange = columns;
+		//            valueOfChange = localData;
+		//        }
+	}
+	ImGui::PopStyleVar();
+	ImGui::PopItemWidth();
 
 	if (valueChanged)
 	{

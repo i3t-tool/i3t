@@ -100,7 +100,7 @@ public:
     \param[in] axis Rotation axis
     \param[in] angleDegrees Angle in degrees
   */
-  void rotateCamera(glm::vec3 axis, float angleDegrees);
+  void rotateAround(glm::vec3 axis, float angleDegrees, glm::vec3 center);
   /// Rotate object as camera (translate,THEN rotate)
   /**
     \param[in] axis Rotation axis

@@ -14,12 +14,14 @@
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
-#include "../Nodes/WorkspaceMatrixTranslation.h"
 #include "../Nodes/WorkspaceMatrixScale.h"
+#include "../Nodes/WorkspaceMatrixTranslation.h"
 
 #include "../Nodes/WorkspaceNormalizeVector.h"
 
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
+#include "Scripting/Scripting.h"
+
 
 // using namespace Core;
 
@@ -66,36 +68,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::SetCurrentEditor(NodeEditorContext);
 
-	/* \todo adding nodes here just for testing */
-	/*--- TRANSLATION */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>( HeaderBackgroundTexture ));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-252, 220));
-
-    /*--- TRANSLATION */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-300, 351));
-
-	/*--- MATRIX_4x4 */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-500, 351));
-
-    /*--- SCALE */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-500, 351));
-
-	/*--- NORMALIZE VECTOR */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
-
-	ne::NavigateToContent();
-	//////////////////////////////////
-
-	// GLuint imageId = pgr::createTexture("/data/BlueprintBackground.png", true);
-	//    GLuint imageId =
-	//    pgr::createTexture(Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
-	//    true); HeaderBackground = (void*)(intptr_t)imageId; // TODO load texture OR making a simple rectangle
-	//    // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
-	//    // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -119,11 +91,15 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-	if (InputController::isKeyPressed(Keys::l)) {
-		//SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &WorkspaceNodes);
+
+	if (InputManager::isKeyPressed(Keys::l))
+	{
+		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
 		printf("press\n");
 	}
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("Workspace", getShowPtr());
+	ImGui::PopStyleVar();
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");{
@@ -148,157 +124,11 @@ void WorkspaceWindow::render()
     ImGui::SetCursorScreenPos(cursorTopLeft);
 
 
-
-
-
-
 	}ne::End();
 
 	shiftSelectedNodesToFront();
 
 	ImGui::End();
-	/* ed::SetCurrentEditor(m_Editor); \todo maybe call it here for static load of current editor setting (if changed)
-	 */
-/*
-	//    auto& io = ImGui::GetIO();
-	//
-	//    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-
-	//
-	//    contextNodeId = 0;
-	//    contextLinkId = 0;
-	//    contextPinId = 0;
-	//    createNewNode = false;
-	//    newNodeLinkPin = nullptr;
-	//    newLinkPin = nullptr;
-	//
-	//    leftPaneWidth = 400.0f;
-	//    rightPaneWidth = 800.0f;
-	//
-	//
-	//    Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
-	//
-	//    ShowLeftPane(leftPaneWidth - 4.0f);
-	//
-	//    ImGui::SameLine(0.0f, 12.0f);
-	//
-	//    ne::Begin("Node editor");
-	//    {
-	//      auto cursorTopLeft = ImGui::GetCursorScreenPos();
-	//
-	//
-	//     //create link
-	//     if (!createNewNode)
-	//      {
-	//        if (ne::BeginCreate(ImColor(255, 255, 255), 2.0f)){
-	//
-	//          auto showLabel = [](const char* label, ImColor color) {
-	//            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-	//            auto size = ImGui::CalcTextSize(label);
-	//
-	//            auto padding = ImGui::GetStyle().FramePadding;
-	//            auto spacing = ImGui::GetStyle().ItemSpacing;
-	//
-	//            ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-	//
-	//            auto rectMin = ImGui::GetCursorScreenPos() - padding;
-	//            auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
-	//
-	//            auto drawList = ImGui::GetWindowDrawList();
-	//            drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-	//            ImGui::TextUnformatted(label);
-	//          };
-	//
-	//          ne::PinId startPinId = 0, endPinId = 0;
-	//          if (ne::QueryNewLink(&startPinId, &endPinId))
-	//          {
-	//            auto startPin = FindPin(startPinId);
-	//            auto endPin = FindPin(endPinId);
-	//
-	//            newLinkPin = startPin ? startPin : endPin;
-	//
-	//            if (startPin->Kind == PinKind::Input)
-	//            {
-	//              std::swap(startPin, endPin);
-	//              std::swap(startPinId, endPinId);
-	//            }
-	//
-	//            if (startPin && endPin)
-	//            {
-	//              if (endPin == startPin)
-	//              {
-	//                ne::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-	//              }
-	//              else if (endPin->Kind == startPin->Kind)
-	//              {
-	//                showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
-	//                ne::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-	//              }
-	//              else if (endPin->Node == startPin->Node)
-	//              {
-	//                  showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
-	//                  ne::RejectNewItem(ImColor(255, 0, 0), 1.0f);
-	//              }
-	//              else if (endPin->Type != startPin->Type)
-	//              {
-	//                showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
-	//                ne::RejectNewItem(ImColor(255, 128, 128), 1.0f);
-	//              }
-	//              else
-	//              {
-	//                showLabel("+ Create Link", ImColor(32, 45, 32, 180));
-	//                if (ne::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
-	//                {
-	//                  Links.emplace_back(WorkspaceLink(getNew_s_ID(), startPin, endPin));
-	//                  Links.back().Color = WorkspacePinColor[startPin->Type];
-	//
-	//                  auto result = GraphManager::plug(startPin->Node->Nodebase, endPin->Node->Nodebase, 0, 0);
-	//                  if (result != ENodePlugResult::Ok)
-	//                  {
-	//                    // print result;
-	//                  }
-	//                }
-	//              }
-	//            }
-	//          }
-	//
-	//          ne::PinId pinId = 0;
-	//          if (ne::QueryNewNode(&pinId))
-	//          {
-	//            newLinkPin = FindPin(pinId);
-	//            if (newLinkPin)
-	//              showLabel("+ Create Namespace", ImColor(32, 45, 32, 180));
-	//
-	//            if (ne::AcceptNewItem())
-	//            {
-	//              createNewNode = true;
-	//              newNodeLinkPin = FindPin(pinId);
-	//              newLinkPin = nullptr;
-	//              ne::Suspend();
-	//              ImGui::OpenPopup("Create New Namespace");
-	//              ne::Resume();
-	//            }
-	//          }
-	//        }
-	//        else
-	//          newLinkPin = nullptr;
-	//
-	//        ne::EndCreate();
-	//
-	//        if (ne::BeginDelete())
-	//        {
-	//          DeleteNode();
-	//        }
-	//        ne::EndDelete();
-	//      }
-	//
-	//      ImGui::SetCursorScreenPos(cursorTopLeft);
-	//    }
-	//
-	//    popupMenu(createNewNode, newNodeLinkPin, contextNodeId, contextPinId, contextLinkId);
-	//    ne::Resume();
-	//
-	*/
 }
 
 /* \todo JH not work yet - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */

@@ -10,7 +10,7 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
-    drawDataFull(builder); /* default function always draw all data */
+	drawDataFull(builder); /* default function always draw all data */
 }
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
@@ -31,16 +31,15 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	{
 		for (int columns = 0; columns < 4; columns++)
 		{
-		    localData = coreData[columns][rows]; /* Data are column-wise */
-		    if (drawDragFloatWithMap_Inline(&localData,
-                                            coreMap[columns*4+rows],
-                                            fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
-            {
-                valueChanged = true;
-                rowOfChange = rows;
-                columnOfChange = columns;
-                valueOfChange = localData;
-            }
+			localData = coreData[columns][rows]; /* Data are column-wise */
+			if (drawDragFloatWithMap_Inline(&localData, coreMap[columns * 4 + rows],
+			                                fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
+			{
+				valueChanged = true;
+				rowOfChange = rows;
+				columnOfChange = columns;
+				valueOfChange = localData;
+			}
 		}
 		ImGui::NewLine();
 	}

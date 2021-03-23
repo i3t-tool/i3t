@@ -1,7 +1,7 @@
 #include "Select.h"
+#include "Core/Input/InputManager.h"
 #include "Component.h"
 #include "World2.h"
-#include "../Core/InputController.h"
 Component* Select::stencilRef[256] = {NULL};
 
 int Select::registerStencil(Component* owner){

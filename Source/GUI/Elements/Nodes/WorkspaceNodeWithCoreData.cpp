@@ -1,12 +1,11 @@
 #include "WorkspaceNodeWithCoreData.h"
 
-#include <string>
 #include "spdlog/fmt/fmt.h"
+#include <string>
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args) /* \todo JH take default label from Const.h*/
     :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
     ,   m_nodebase(args.nodebase)
-
 {
 	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
 	const std::vector<Core::Pin>& outputPins = m_nodebase->getOutputPins();
@@ -161,29 +160,31 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 	}
 }
 
-bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value, int const mapValue, std::string const label)
+bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, int const mapValue,
+                                                            std::string const label)
 {
     bool inactive = (mapValue == 0 || mapValue == 255) ? true : false; /* \todo JH some other type than just active/inactive will be here - maybe */
     /* \todo JH some graphical mark for "hard-coded" values (diagonal 1 in translation (255 Map value) for example) ? */
 
-    if (inactive)
-    {
-        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-    }
+	if (inactive)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	}
 
-    ImGui::SameLine();
-    bool valueChanged = ImGui::DragFloat(label.c_str(), value);
+	ImGui::SameLine();
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value);
 
-    if (inactive)
-    {
-        ImGui::PopItemFlag();
-        ImGui::PopStyleVar();
-    }
+	if (inactive)
+	{
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
+	}
 
-    if(valueChanged){
-        inactive = true;
-    }
+	if (valueChanged)
+	{
+		inactive = true;
+	}
 
     return valueChanged;
     /* maybe usefull
@@ -194,8 +195,7 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float * const value,
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)
 		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no konstants here... */
-{
-}
+{}
 
 PinKind WorkspaceCorePinProperties::getKind()
 {
@@ -212,4 +212,3 @@ bool WorkspaceCorePinProperties::getIsConnected()
 {
 	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
 }
-

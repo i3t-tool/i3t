@@ -20,3 +20,7 @@ class CloseCommand : public Command<CloseCommand>
 class HideWindowCommand : public Command<HideWindowCommand, std::string>
 {
 };
+
+class ConsoleCommand : public Command<ConsoleCommand, std::string>
+{
+};

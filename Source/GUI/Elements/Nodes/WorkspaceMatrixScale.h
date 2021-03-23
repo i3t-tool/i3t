@@ -16,7 +16,4 @@ public:
     WorkspaceMatrixScale(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Scale>(), std::string headerLabel = "Scale", std::string nodeLabel = "Scale");
 
 	void drawData(util::NodeBuilder& builder);
-
 };
-
-

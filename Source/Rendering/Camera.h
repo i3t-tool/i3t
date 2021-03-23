@@ -12,7 +12,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "Config.h"
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
 #include "Logger/LoggerInternal.h"
 
 /**
@@ -363,15 +363,15 @@ public:
 	// freeLook
 	void freeLook()
 	{
-		if (InputController::m_mouseX != (float)Config::WIN_WIDTH / 2)
+		if (InputManager::m_mouseX != (float)Config::WIN_WIDTH / 2)
 		{
-			const float angleDelta = Config::MOUSE_SENSITIVITY * (InputController::m_mouseX - (float)Config::WIN_WIDTH / 2);
+			const float angleDelta = Config::MOUSE_SENSITIVITY * (InputManager::m_mouseX - (float)Config::WIN_WIDTH / 2);
 			rotateY((float)-angleDelta);
 		}
-		if (InputController::m_mouseY != (float)Config::WIN_HEIGHT / 2)
+		if (InputManager::m_mouseY != (float)Config::WIN_HEIGHT / 2)
 		{
 			const float angleDelta =
-					Config::MOUSE_SENSITIVITY * (InputController::m_mouseY - (float)Config::WIN_HEIGHT / 2);
+					Config::MOUSE_SENSITIVITY * (InputManager::m_mouseY - (float)Config::WIN_HEIGHT / 2);
 			rotateX((float)angleDelta);
 		}
 	}
@@ -412,12 +412,12 @@ public:
 	// trackball
 	void trackball(glm::vec3 center, float sens)
 	{
-		glm::vec2 end = glm::vec2((float)InputController::m_mouseX / (float)Config::WIN_WIDTH,
-		                          (float)InputController::m_mouseY / (float)Config::WIN_HEIGHT) *
+		glm::vec2 end = glm::vec2((float)InputManager::m_mouseX / (float)Config::WIN_WIDTH,
+		                          (float)InputManager::m_mouseY / (float)Config::WIN_HEIGHT) *
 		                    2.0f -
 		                1.0f;
-		glm::vec2 start = glm::vec2((float)InputController::m_mouseXPrev / (float)Config::WIN_WIDTH,
-		                            (float)InputController::m_mouseYPrev / (float)Config::WIN_HEIGHT) *
+		glm::vec2 start = glm::vec2((float)InputManager::m_mouseXPrev / (float)Config::WIN_WIDTH,
+		                            (float)InputManager::m_mouseYPrev / (float)Config::WIN_HEIGHT) *
 		                      2.0f -
 		                  1.0f;
 
@@ -465,19 +465,19 @@ public:
 	void moveOrbitCenter(const Keys::Code forward, const Keys::Code back, const Keys::Code left, const Keys::Code right,
 	                     const float delta, glm::vec3& center) const
 	{
-		if (InputController::isKeyPressed(forward))
+		if (InputManager::isKeyPressed(forward))
 		{
 			center += up * delta;
 		}
-		if (InputController::isKeyPressed(back))
+		if (InputManager::isKeyPressed(back))
 		{
 			center -= up * delta;
 		}
-		if (InputController::isKeyPressed(left))
+		if (InputManager::isKeyPressed(left))
 		{
 			center -= getSide() * delta;
 		}
-		if (InputController::isKeyPressed(right))
+		if (InputManager::isKeyPressed(right))
 		{
 			center += getSide() * delta;
 		}
@@ -497,10 +497,10 @@ public:
 	{
 		glm::vec3 toCam = position - center;
 
-		if (InputController::m_mouseY != Config::WIN_HEIGHT / 2)
+		if (InputManager::m_mouseY != Config::WIN_HEIGHT / 2)
 		{
 			// const float angleDelta = Config::MOUSE_SENSITIVITY * (-InputController::mouseY + Config::WIN_HEIGHT / 2);
-			const float angleDelta = Config::MOUSE_SENSITIVITY * -InputController::m_mouseYDelta;
+			const float angleDelta = Config::MOUSE_SENSITIVITY * -InputManager::m_mouseYDelta;
 
 			toCam = glm::rotate(toCam, angleDelta, getSide());
 
@@ -516,10 +516,10 @@ public:
 			}
 		}
 
-		if (InputController::m_mouseX != (float)Config::WIN_WIDTH / 2)
+		if (InputManager::m_mouseX != (float)Config::WIN_WIDTH / 2)
 		{
 			// const float angleDelta = Config::MOUSE_SENSITIVITY * (InputController::mouseX - Config::WIN_WIDTH / 2);
-			const float angleDelta = Config::MOUSE_SENSITIVITY * InputController::m_mouseXDelta;
+			const float angleDelta = Config::MOUSE_SENSITIVITY * InputManager::m_mouseXDelta;
 
 			toCam = glm::rotate(toCam, -angleDelta, up);
 		}

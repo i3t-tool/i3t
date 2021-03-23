@@ -47,14 +47,14 @@
 #include "imgui_impl_glfw.h"
 #include "imgui.h"
 
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
 
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
 #undef APIENTRY
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <Core/InputController.h>
+#include "Core/Input/InputManager.h"
 #include <GLFW/glfw3native.h> // for glfwGetWin32Window
 #endif
 #define GLFW_HAS_WINDOW_TOPMOST (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3200) // 3.2+ GLFW_FLOATING
@@ -134,15 +134,15 @@ void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int acti
 		g_MouseJustPressed[button] = true;
 
 	// Events are ignored by ImGui, if the camera is controlled by user input.
-	if (InputController::m_ignoreImGuiEvents && action == GLFW_RELEASE)
+	if (InputManager::m_ignoreImGuiEvents && action == GLFW_RELEASE)
 	{
 		switch (button)
 		{
 		case GLFW_MOUSE_BUTTON_MIDDLE:
-			InputController::setUnpressed(Keys::mouseMiddle);
+			InputManager::setUnpressed(Keys::mouseMiddle);
 			break;
 		case GLFW_MOUSE_BUTTON_RIGHT:
-			InputController::setUnpressed(Keys::mouseRight);
+			InputManager::setUnpressed(Keys::mouseRight);
 			break;
 		}
 	}
@@ -165,9 +165,15 @@ void ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int a
 
 	ImGuiIO& io = ImGui::GetIO();
 	if (action == GLFW_PRESS)
+	{
 		io.KeysDown[key] = true;
+		InputManager::keyDown(key);
+	}
 	if (action == GLFW_RELEASE)
+	{
 		io.KeysDown[key] = false;
+		InputManager::keyUp(key);
+	}
 
 	// Modifiers are not reliable across systems
 	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];

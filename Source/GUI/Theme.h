@@ -45,6 +45,17 @@ enum class EFont
 	TaskTitle,
 };
 
+enum class ESize
+{
+	Nodes_Rounding,
+	Nodes_FloatWidth,
+	Nodes_FloatMargin,
+	Nodes_ItemsSpacingX,
+	Nodes_ItemsSpacingY,
+	Window_FramePadding,
+	COUNT
+};
+
 constexpr inline EColor asColor(EValueType type)
 {
 	switch (type)
@@ -78,15 +89,18 @@ class Theme
 	using Colors = std::map<EColor, ImVec4>;
 	Colors m_colors;
 
+	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
+
 	static constexpr const size_t m_fontsCount = 4;
 	/// \todo MH Set dynamic scale (reload font in runtime).
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
 	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
+	std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
 
 public:
 	/**
-	 * Creates default global color scheme based on Zadina's thesis.
+	 * Creates default global color scheme based on Lukas Pilka's design.
 	 */
 	Theme();
 	Theme(const Colors& colors) { m_colors = colors; }
@@ -97,10 +111,10 @@ public:
 	 * Call this function whenever you change style settings.
 	 */
 	void apply();
-	ImVec4 get(EColor color)
+	const ImVec4& get(EColor color)
 	{
 		if (m_colors.count(color) == 0)
-			return ImVec4{0.0f, 0.0f, 0.0f, 1.0f};
+			return m_defaultColor;
 
 		return m_colors[color];
 	}
@@ -115,6 +129,12 @@ public:
 	{
 		Debug::Assert(m_fonts.size() < id, "Out of bounds!");
 		return m_fonts[id];
+	}
+
+	float get(ESize size)
+	{
+		Debug::Assert(size != ESize::COUNT, "Strange size, isn't it?");
+		return m_sizes[static_cast<size_t>(size)];
 	}
 
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }

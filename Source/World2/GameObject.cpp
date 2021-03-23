@@ -41,12 +41,13 @@ void GameObject::translate(glm::vec3 translate){
     glm::vec4 mov = glm::vec4(translate[0], translate[1], translate[2], 0.0f);
     this->transformation[3] += mov;
 }
-void GameObject::rotateCamera(glm::vec3 axis, float angleDegrees){
-    // this->transform=this->transform*glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), axis);
+void GameObject::rotateAround(glm::vec3 axis, float angleDegrees,glm::vec3 center){
+    this->transformation[3] -= glm::vec4(center, 0.0f);
+    this->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), axis) * this->transformation;
+    this->transformation[3] += glm::vec4(center, 0.0f);
 }
 void GameObject::rotate(glm::vec3 axis, float angleDegrees){
     glm::vec4 tmp = this->transformation[3];
-    this->transformation[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     this->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(angleDegrees), axis) * this->transformation;
     this->transformation[3] = tmp;
 }

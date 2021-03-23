@@ -21,4 +21,3 @@ public:
 	void drawDataLabel(util::NodeBuilder& builder);
 
 };
-

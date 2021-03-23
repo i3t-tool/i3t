@@ -1,5 +1,7 @@
 #include "Theme.h"
 
+#include "imgui_node_editor.h"
+
 #include "Config.h"
 
 Theme::Theme()
@@ -28,6 +30,15 @@ Theme::Theme()
 	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
 	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
 	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
+
+	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 60.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)] = 4.0f;
+
+	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingX)] = 4.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingY)] = 4.0f;
+
+	m_sizes[static_cast<size_t>(ESize::Window_FramePadding)] = 8.0f;
 }
 
 void Theme::init()
@@ -72,5 +83,14 @@ void Theme::apply()
 
 	style.Colors[ImGuiCol_PlotHistogram] = m_colors[EColor::ActiveColor];
 
-	style.FramePadding.y = 8.0f;
+	style.FramePadding.x = 8.0f;
+	style.FramePadding.y = m_sizes[static_cast<size_t>(ESize::Window_FramePadding)];
+	style.TabRounding = 2.0f;
+	style.ChildBorderSize = 0.0f;
+	style.PopupBorderSize = 0.0f;
+	style.WindowBorderSize = 0.0f;
+
+	auto& nodesStyle = ax::NodeEditor::GetStyle();
+	nodesStyle.NodeRounding = m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)];
+	nodesStyle.NodeBorderWidth = 0.0f;
 }
