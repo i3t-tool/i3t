@@ -6,7 +6,9 @@
 #include "../World2.h"
 #include "Renderer.h"
 #include "glm/gtx/norm.hpp"
-#include <iostream>
+
+#include "imgui.h"
+
 #include <math.h>
 #include <typeinfo>
 
@@ -169,7 +171,13 @@ void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 }
 	
 void TransformHandles::update(){ 
-	//if(Controls::mouseKeysEventTable[GLUT_LEFT_BUTTON]==Controls::EVENT_DOWN){
+
+	//ImGuiMouseCursor c= ImGui::GetMouseCursor();
+	if(InputManager::isKeyPressed(Keys::c)){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
+	if(InputManager::isKeyPressed(Keys::v)){ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);}
+	if(InputManager::isKeyPressed(Keys::b)){ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);}
+	if(InputManager::isKeyPressed(Keys::n)){ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);}
+
 	bool transactionBegin=false;
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
@@ -328,6 +336,9 @@ void TransformHandles::update(){
 				glm::vec3 pc = px*coef[1]+py*coef[2];
 				glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)axes[this->axisnum]));
 				this->dirbkp = glm::normalize(world2screen(p0)-world2screen(p0 + dir3));
+
+				//glm::vec3 dir3 = glm::normalize(glm::cross(pc - (glm::vec3)ortho[3], (glm::vec3)axes[this->axisnum]));
+				//this->dirbkp = glm::normalize(world2screen(p0) - world2screen(p0 - dir3));
 			}
 			dir=this->dirbkp;
 		}
@@ -440,7 +451,7 @@ void TransformHandles::update(){
 				glm::vec4 posh=(glm::inverse(m)*this->handlespace)[3];
 				glm::vec4 pose=this->editedobj->transformation[3];
 				glm::vec4 dir=posh-pose;
-				this->editedobj->transformation=getRotation(glm::mat4(glm::vec4(0.0f),glm::vec4(0.0f,1.0f,0.0f,0.0f),dir,glm::vec4(0.0f)),2);
+				this->editedobj->transformation=getRotation(glm::mat4(glm::vec4(0.0f),glm::vec4(0.0f),dir,glm::vec4(0.0f)),2);
 				this->editedobj->transformation[3]=pose;
 			}
 			else if(this->editmode==TransformHandles::EDIT_POSITION){
