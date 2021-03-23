@@ -19,7 +19,7 @@
 
 #include "World2/World2.h"
 
-constexpr char* ImGui_GLSLVersion = "#version 140";
+constexpr const char* ImGui_GLSLVersion = "#version 140";
 
 class Module;
 class ICommand;

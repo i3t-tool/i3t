@@ -119,12 +119,12 @@ void PlatformLibraryInitI3T(Picoc *pc)
     //LibraryAdd(&GlobalTable, "platform library", &PlatformLibrary1);
     IncludeRegister(pc, "I3T.h", NULL, PlatformLibrary1, defs);//ADD_CUSTOM
 
-    VariableDefinePlatformVar(pc, NULL, "free",     &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.free,        FALSE);
-    VariableDefinePlatformVar(pc, NULL, "scale",    &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.scale,       FALSE);
-    VariableDefinePlatformVar(pc, NULL, "uniscale", &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.uniscale,    FALSE);
-    VariableDefinePlatformVar(pc, NULL, "rotatex",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatex,     FALSE);
-    VariableDefinePlatformVar(pc, NULL, "rotatey",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatey,     FALSE);
-    VariableDefinePlatformVar(pc, NULL, "rotatez",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatez,     FALSE);
-    VariableDefinePlatformVar(pc, NULL, "translate",&pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.translate,   FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"free",     &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.free,        FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"scale",    &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.scale,       FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"uniscale", &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.uniscale,    FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"rotatex",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatex,     FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"rotatey",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatey,     FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"rotatez",  &pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.rotatez,     FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"translate",&pc->IntType, (union AnyValue *)&workspaceLayout.mat4Types.translate,   FALSE);
 }
 

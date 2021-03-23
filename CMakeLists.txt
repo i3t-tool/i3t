@@ -36,13 +36,7 @@ include_directories($(OPENGL_INCLUDE_DIRS))
 
 # ========== BUILD CONFIGURATION ==============================
 # ---------- Setup compiler parameters. ------------------------
-# Target machine must have a C++17 compiler.
-# To set in in Visual studio use: /std:c++17
-# To set this for a project:
-#   1. Right click a project, go to Properties
-#   2. Select Configuration Properties > C/C++ > Language
-#   3. For C++ Language Standard select "ISO C++17 Standard (/std:c++17)"
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
@@ -110,7 +104,7 @@ set(YAML_BUILD_SHARED_LIBS Off)
 # ======== Project dependencies which should be compiled. =====
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
-# temporary comment-out ==== add_subdirectory(Dependencies/picoc)
+add_subdirectory(Dependencies/picoc)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
@@ -182,7 +176,15 @@ if (True)
 
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
 
-    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp ) # temporary comment-out === picoc)
+    target_link_libraries(
+            ${TEST_PROJECT_NAME}
+            ${OPENGL_LIBRARIES}
+            gtest
+            gtest_main
+            assimp
+            picoc
+            glfw
+            yaml-cpp)
 
     set_target_properties(gtest PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
@@ -249,7 +251,7 @@ target_link_libraries(
         ${OPENGL_LIBRARIES}
         assimp
         glfw
-        # temporary comment-out === picoc
+        picoc
         spdlog
         yaml-cpp
 )
