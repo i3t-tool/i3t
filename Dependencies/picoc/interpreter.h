@@ -20,7 +20,7 @@
 #endif
 
 #ifndef min
-#define min(x,y) (((x)<(y))?(x):(y))
+//#define min(x,y) (((x)<(y))?(x):(y))
 #endif
 
 #define MEM_ALIGN(x) (((x) + sizeof(ALIGN_TYPE) - 1) & ~(sizeof(ALIGN_TYPE)-1))
@@ -392,12 +392,10 @@ struct Picoc_Struct
     struct IncludeLibrary* IncludeLibList;
 
     /* heap memory */
-#ifdef USE_MALLOC_STACK
     unsigned char* HeapMemory;          /* stack memory since our heap is malloc()ed */
     void* HeapBottom;                   /* the bottom of the (downward-growing) heap */
     void* StackFrame;                   /* the current stack frame */
     void* HeapStackTop;                 /* the top of the stack */
-#endif
 
     struct AllocNode* FreeListBucket[FREELIST_BUCKETS];      /* we keep a pool of freelist buckets to reduce fragmentation */
     struct AllocNode* FreeListBig;                           /* free memory which doesn't fit in a bucket */
