@@ -74,23 +74,23 @@ void NodeBase::receiveSignal(int inputIndex)
 		spreadSignal();
 }
 
-bool NodeBase::arePluggedIn(int numInputs)
+bool NodeBase::areInputsPlugged(int numInputs)
 {
-	Debug::Assert(m_inputs.size() <= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
+	Debug::Assert(m_inputs.size() >= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
 
 	bool result = true;
 
-	for (size_t i = 0; i < numInputs; ++i)
-  {
+	for (auto i = 0; i < numInputs; ++i)
+	{
 		result = result && m_inputs[i].isPluggedIn();
 	}
 
 	return result;
 }
 
-bool NodeBase::areAllPluggedIn()
+bool NodeBase::areAllInputsPlugged()
 {
-	return arePluggedIn(m_operation->numberOfInputs);
+	return areInputsPlugged(m_operation->numberOfInputs);
 }
 
 void NodeBase::unplugAll()
@@ -108,7 +108,8 @@ void NodeBase::unplugAll()
 
 void NodeBase::unplugInput(int index)
 {
-	Debug::Assert(m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
+	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
+	              "The node's input pin that you want to unplug does not exists.");
 
 	auto* otherPin = m_inputs[index].m_input;
 
@@ -135,7 +136,8 @@ void NodeBase::unplugInput(int index)
 
 void NodeBase::unplugOutput(int index)
 {
-	Debug::Assert(m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
+	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
+	              "The node's output pin that you want to unplug does not exists.");
 
 	auto& pin = m_outputs[index];
 

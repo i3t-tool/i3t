@@ -64,7 +64,7 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
 {
-  return GraphManager::plug(lhs, rhs, 0, 0);
+	return GraphManager::plug(lhs, rhs, 0, 0);
 }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,

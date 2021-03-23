@@ -16,11 +16,11 @@ std::tuple<std::array<float, Size>, std::array<Ptr<NodeBase>, Size>> generateFlo
 	std::array<Ptr<Core::NodeBase>, Size> inputNodes;
 
 	for (size_t i = 0; i < Size; ++i)
-  {
+	{
 		inputValues[i] = generateFloat();
 		inputNodes[i] = Builder::createNode<ENodeType::Float>();
 		inputNodes[i]->setValue(inputValues[i]);
-    GraphManager::plug(inputNodes[i], node, 0, i);
+		GraphManager::plug(inputNodes[i], node, 0, i);
 	}
 
 	return std::make_tuple(inputValues, inputNodes);
