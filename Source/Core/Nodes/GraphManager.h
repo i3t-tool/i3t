@@ -69,6 +69,9 @@ public:
 	 */
 	static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
 
+	/// Plug first output pin of lhs to the first input pin of rhs.
+	static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
+
 	/**
 	 * Connect given node output pin to this operator input pin.
 	 *

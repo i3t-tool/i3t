@@ -261,6 +261,9 @@ public:
 	void receiveSignal(int inputIndex);
 	//===----------------------------------------------------------------------===//
 
+	bool areInputsPlugged(int numInputs);
+	bool areAllInputsPlugged();
+
 private:
 	void unplugAll();
 	void unplugInput(int index);
@@ -302,8 +305,6 @@ class Pin
 	std::vector<Pin*> m_outputs;
 
 	const EValueType m_opValueType = EValueType::Pulse;
-
-	friend void setPinOwner(Ptr<Core::NodeBase>& node);
 
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index)

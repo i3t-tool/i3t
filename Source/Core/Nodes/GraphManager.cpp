@@ -62,6 +62,11 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 	return ENodePlugResult::Ok;
 }
 
+ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
+{
+	return GraphManager::plug(lhs, rhs, 0, 0);
+}
+
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
@@ -118,7 +123,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(Ptr<Core::NodeBase>& n
 {
 	std::vector<Ptr<NodeBase>> result;
 	size_t inputsCount = node->getInputPins().size();
-	for (auto i = 0; i < inputsCount; ++i)
+	for (size_t i = 0; i < inputsCount; ++i)
 	{
 		auto parent = getParent(node);
 		if (parent != nullptr)
@@ -132,7 +137,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& 
 {
 	std::vector<Ptr<NodeBase>> result;
 	auto pins = node->getOutputPins();
-	for (auto i = 0; i < pins.size(); ++i)
+	for (size_t i = 0; i < pins.size(); ++i)
 	{
 		auto pinOutputs = getOutputNodes(node, i);
 		result.insert(result.end(), pinOutputs.begin(), pinOutputs.end());
