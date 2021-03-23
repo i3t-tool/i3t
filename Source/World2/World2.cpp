@@ -95,6 +95,7 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
 void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
+    printf("handlesSetMatrix\n");
     for(int i=0;i<this->sceneHandles->components.size();i++){this->sceneHandles->components[i]->isActive=false;}
     if(matnode==NULL){
 

@@ -95,11 +95,11 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
 
 	/*--- NORMALIZE VECTOR */
-	/*WorkspaceNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1")); 
-	ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(100, 400));
+	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1")); 
+	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
 
 	ne::NavigateToContent();
-	ne::CenterNodeOnScreen(WorkspaceNodes.back()->Id);*/
+	ne::CenterNodeOnScreen(m_workspaceCoreNodes.back()->m_id);
 
 	//////////////////////////////////
 	//printf("len %lld \n",WorkspaceNodes.size());
