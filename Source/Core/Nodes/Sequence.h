@@ -21,12 +21,9 @@ class Sequence : public NodeBase
 public:
 	Sequence() : NodeBase(&g_sequence){};
 
-	void addMatrix(Ptr<Matrix> matrix) noexcept
-  {
-		addMatrix(matrix, m_matrices.size());
-	}
+	void addMatrix(Ptr<Matrix> matrix) noexcept { addMatrix(matrix, m_matrices.size()); }
 
-  /**
+	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
 	 *
 	 * \param matrix Matrix to transfer.
@@ -62,7 +59,8 @@ public:
 	 */
 	[[nodiscard]] Ptr<Matrix> popMatrix(const int index)
 	{
-		Debug::Assert(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
+		Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
+		              "Sequence does not have so many matrices as you are expecting.");
 
 		auto result = std::move(m_matrices.at(index));
 		m_matrices.erase(m_matrices.begin() + index);
@@ -96,9 +94,10 @@ public:
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
 {
-	if (node == nullptr) return nullptr;
+	if (node == nullptr)
+		return nullptr;
 
-  Debug::Assert(node->getOperation()->keyWord == g_sequence.keyWord, "Given node is not a sequence!");
-  return std::dynamic_pointer_cast<Sequence>(node);
+	Debug::Assert(node->getOperation()->keyWord == g_sequence.keyWord, "Given node is not a sequence!");
+	return std::dynamic_pointer_cast<Sequence>(node);
 }
 } // namespace Core

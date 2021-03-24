@@ -20,6 +20,7 @@
 #include <imgui_internal.h>
 #include <imgui_node_editor.h>
 #include <imgui_node_editor_internal.h>
+#include <Core/API.h>
 
 #include <algorithm>
 #include <map>
@@ -40,7 +41,6 @@ class WorkspacePinProperties;
 /*! \enum PinKind
     \brief kinds (in/out) of Pin \todo maybe unused - this info is in Core
  */
-
 
 enum class PinKind
 {
@@ -82,14 +82,13 @@ public:
 	std::string m_headerLabel;
 	ImTextureID m_headerBackground;
 
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-
-	virtual void drawInputLinks()=0;
+	virtual void drawInputLinks() = 0;
 	virtual void drawHeader(util::NodeBuilder& builder);
-	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-	virtual void drawData(util::NodeBuilder& builder)=0;
-	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
+	virtual void drawData(util::NodeBuilder& builder) = 0;
+	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
@@ -100,27 +99,10 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
-//    // named-constructor-idiom
-//    //  copy ctor public
-//    WorkspaceNode(WorkspaceNode const& other);
-//
-//    static WorkspaceNode WorkspaceNodeFromCore(std::unique_ptr<Core::NodeBase> nodebase, ImTextureID headerBackground, std::string headerLabel){
-//        return WorkspaceNode(nodebase->getId(), headerBackground, headerLabel);
-//    }
-
-//private:
-   	/* \todo some better constructors - this are just for test*/
-	WorkspaceNode(ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
-
+	WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
+    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel = "Node", std::string nodeLabel = "Node");
 
 };
-
-/* \todo some better way? -> maybe use id of input pin that the link belongs to...  */
-static int s_linkID = 0;
-static int s_getLinkID()
-{
-	return s_linkID++;
-}
 
 /*! \class WorkspaceLinkProperties
     \brief Information of Link for graphic
@@ -131,28 +113,6 @@ public:
 	const ne::LinkId m_id;
 	ImColor m_color;
 
-	WorkspaceLinkProperties(const ne::LinkId id);
+	WorkspaceLinkProperties(ne::LinkId const id);
 };
 
-/*! \class WorkspacePinProperties
-    \brief Information of Pin for graphic
- */
-class WorkspacePinProperties
-{
-public:
-	const ne::PinId m_id; /*! \brief unique (among Pins) identificator */
-	std::string m_name;    /*! \brief Name of Pin */
-	const PinKind m_kind;  /*! \brief Kind of pin \sa PinKind */
-	const EValueType m_type;
-
-	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
-
-	bool m_connected;
-	float m_alpha;
-
-	WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type);
-
-	bool IsPinConnected(); /* \todo check in Core ? */
-
-	bool CanCreateLink(Core::Pin* b); /* \todo check in Core ? */
-};

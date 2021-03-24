@@ -17,7 +17,7 @@
 #include "../../../Core/Nodes/NodeImpl.h"
 #include "Config.h"
 #include "Core/Application.h"
-#include "GUI/Elements/Nodes/WorkspaceElements.h"
+#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 #include "pgr.h"
 #include <memory>
 
@@ -38,18 +38,7 @@
 namespace ne = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
 
-/* >>> Some struct <<< \todo What is it for? */ //{
-
-struct NodeIdLess
-{
-	bool operator()(const ne::NodeId& lhs, const ne::NodeId& rhs) const { return lhs.AsPointer() < rhs.AsPointer(); }
-};
-
-static std::map<ne::NodeId, float, NodeIdLess> s_NodeTouchTime;
-
-//}
-
-/* >>> Static functions <<< \todo make it as method of class?  */ //{
+/* >>> Static function <<< */ //{
 
 /*! \fn static inline ImRect ImGui_GetItemRect()
     \brief Get ImRect of last  ( \todo active/added ?) item
@@ -76,21 +65,9 @@ static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
 	result.Max.y += y;
 	return result;
 }
-
-/*! \fn static bool CanCreateLink(Pin* a, Pin* b)
-    \brief check whether it is possible to connect two Pins
-    \param[in] a,b Pin* to check possibility of connection between
-    \return true if it is possible create Link from a to b, false otherwise
-*/
-// static bool CanCreateLink(WorkspacePinProperties* a, WorkspacePinProperties* b)
-//{
-//  if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
-//    return false;
-//
-//  return true;
-//}
-
 //} /* >>> Static functions - end <<< */
+
+typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
 /*! \class class for Workspace window object
     \brief Store everything what Workspace window need
@@ -106,50 +83,54 @@ public:
 	ImTextureID HeaderBackgroundTexture;
 
 	util::NodeBuilder NodeBuilderContext; /* \todo builder as variable of WorkspceWindow?*/
-																				//
+
+    /* \todo JH better name for this atributes - for better description what they do... */
+    Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewLink = nullptr;
+    Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewNodeLink = nullptr;
+    bool m_createNewNode = false;
+
+    ImVec2 m_openPopupMenuPosition = ImVec2(100,100); /* \todo JH some better default value - maybe little bit unused, but for certainty */
+    ImVec2 m_newNodePostion = ImVec2(100,100);
+    ne::NodeId m_contextNodeId = 0;
+    ne::LinkId m_contextLinkId = 0;
+    ne::PinId  m_contextPinId = 0;
 
 	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
-	std::vector<std::unique_ptr<WorkspaceNode>> WorkspaceNodes; /*! \brief All WorkspaceNodes */
-
-	//    ne::NodeId contextNodeId;
-	//    ne::LinkId contextLinkId;
-	//    ne::PinId contextPinId;
-	//    bool createNewNode;
-	//    WorkspacePin* newNodeLinkPin ;
-	//    WorkspacePin* newLinkPin;
-	//
-	//    float leftPaneWidth;
-	//    float rightPaneWidth;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
 
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
 	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
 
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
+
 	WorkspaceWindow(bool show);
 	~WorkspaceWindow();
 
-	/*! \fn static Node* FindNode(ne::NodeId id)
-\brief search for Node by its id
-\param[in] id NodeId of Node function search for
-\return Node* of Node with given id or nullptr when not found
-*/
-	WorkspaceNode* WorkspaceWindow::FindNode(ne::NodeId id);
+	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
+	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);
 
-	/*! \fn static Link* FindLink(ne::LinkId id)
-	    \brief search for Link by its id
-	    \param[in] id LinkId of Link function search for
-	    \return Link* of Link with given id or nullptr when not found
-	*/
-	//    WorkspaceLink* FindLink(ne::LinkId id);
+	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
 
-	/*! \fn static Pin* FindPin(ne::PinId id)
-	    \brief search for Pin by its id
-	    \param[in] id PinId of Pin function search for
-	    \return Pin* of Pin with given id or nullptr when not found
-	*/
-	//    WorkspacePin* FindPin(ne::PinId id);
+	void manipulatorStartCheck3D();
 
-	void UpdateTouchAllNodes();
+    void checkQueryElements();
+    void checkQueryElementsCreating();
+    void checkQueryLinkCreate();
+    void checkQueryNodeCreate();
+    void checkQueryElementsDeleting();
+    void checkQueryLinkDelete();
+    void checkQueryNodeDelete();
+
+    void checkQueryContextMenus();
+
+    void shiftSelectedNodesToFront();
+
+
+
+    void showPopUpLabel(std::string label, ImColor color);
+
+    void UpdateTouchAllNodes();
 
 	void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 

@@ -1,11 +1,11 @@
+#include "CameraHandles.h"
+#include "Core/Input/InputManager.h"
+#include "../HardcodedMeshes.h"
+#include "../Select.h"
+#include "../Transforms.h"
+#include "../World2.h"
 #include <iostream>
 #include <typeinfo>
-#include "CameraHandles.h"
-#include "../HardcodedMeshes.h"
-#include "../Transforms.h"
-#include "../Select.h"
-#include "../World2.h"
-#include "../../Core/InputController.h"
 
 const char* CameraHandles::typeStatic=NULL;
 
@@ -101,8 +101,8 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 }
 	
 void CameraHandles::update(){
-	if (InputController::isKeyJustUp(Keys::mouseLeft)) {
-		unsigned char sel=Select::getStencilAt((int)InputController::m_mouseX,(int)(World2::height- InputController::m_mouseY),0,-1);
+	if (InputManager::isKeyJustUp(Keys::mouseLeft)) {
+		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World2::height- InputManager::m_mouseY),0,-1);
 		if(sel==this->editedcam){this->isEdit=true;printf("is edit cam-handles\n");}
 		else if(this->activehandle==-1){this->isEdit=false;}
 			
@@ -110,21 +110,21 @@ void CameraHandles::update(){
 	}
 	if(!this->isEdit){return;}
 		
-	if(InputController::isKeyPressed(Keys::o)){this->editmode=CameraHandles::EDIT_ORTHO;}
-	if(InputController::isKeyPressed(Keys::p)){this->editmode = CameraHandles::EDIT_PERSPECTIVE;}
-	if(InputController::isKeyPressed(Keys::f)){this->editmode=CameraHandles::EDIT_FRUSTUM;}
+	if(InputManager::isKeyPressed(Keys::o)){this->editmode=CameraHandles::EDIT_ORTHO;}
+	if(InputManager::isKeyPressed(Keys::p)){this->editmode = CameraHandles::EDIT_PERSPECTIVE;}
+	if(InputManager::isKeyPressed(Keys::f)){this->editmode=CameraHandles::EDIT_FRUSTUM;}
 		
 	if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){this->cam->perspective=glm::perspective(glm::radians(this->pangle),this->paspect,this->pnear,this->pfar);}
 	else if(this->editmode==CameraHandles::EDIT_ORTHO){this->cam->perspective=glm::ortho(this->left,this->right,this->bottom,this->top,this->onear,this->ofar);}
 	else if(this->editmode==CameraHandles::EDIT_FRUSTUM){this->cam->perspective=glm::frustum(this->fleft,this->fright,this->fbottom,this->ftop,this->fnear,this->ffar);}
 		
-	if (InputController::isKeyJustPressed(Keys::mouseLeft)){
-		unsigned char sel=Select::getStencilAt((int)InputController::m_mouseX,(int)(World2::height- InputController::m_mouseY),3,this->editedcam);
+	if (InputManager::isKeyJustPressed(Keys::mouseLeft)){
+		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World2::height- InputManager::m_mouseY),3,this->editedcam);
 		this->activehandle=-1;
 		for(int i=0;i<6;i++){if(sel==this->stencils.arr[i]){this->activehandle=this->stencils.arr[i];this->axisnum=i;}}
 	}
 		
-	if(InputController::isKeyJustUp(Keys::e)){
+	if(InputManager::isKeyJustUp(Keys::e)){
 		printf("p params angle %3.2f, aspect %3.2f, far %3.2f, near %3.2f\n",this->pangle,this->paspect,this->pfar,this->pnear);
 			
 		glm::mat4 projinv=glm::inverse(this->cam->perspective);
@@ -136,7 +136,7 @@ void CameraHandles::update(){
 	}
 		
 	if(this->activehandle!=-1){
-		if(InputController::isKeyJustUp(Keys::esc)){}
+		if(InputManager::isKeyJustUp(Keys::esc)){}
 		glm::mat4 projinv=glm::inverse(this->cam->perspective);
 		glm::vec3 drag3=glm::vec3(0.0f);
 		glm::vec4 axis=this->hposs[this->axisnum];
@@ -168,9 +168,9 @@ void CameraHandles::update(){
 			
 		glm::vec2 drag,olddrag,dragfinal,mouse;
 
-		mouse=glm::vec2(InputController::m_mouseX,World2::height-InputController::m_mouseY);
+		mouse=glm::vec2(InputManager::m_mouseX,World2::height- InputManager::m_mouseY);
 		drag=glm::inverse(mov)*(mouse-spos1);
-		mouse=glm::vec2(InputController::m_mouseX-InputController::m_mouseXDelta,World2::height-InputController::m_mouseY+InputController::m_mouseYDelta);
+		mouse=glm::vec2(InputManager::m_mouseX- InputManager::m_mouseXDelta,World2::height- InputManager::m_mouseY+ InputManager::m_mouseYDelta);
 		olddrag=glm::inverse(mov)*(mouse-spos1);
 		dragfinal=drag-olddrag;
 		dragfinal*=0.05f;

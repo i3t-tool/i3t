@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <GUI/UI.h>
+#include <GUI/UIModule.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -19,7 +19,7 @@
 
 #include "World2/World2.h"
 
-constexpr char* ImGui_GLSLVersion = "#version 140";
+constexpr const char* ImGui_GLSLVersion = "#version 140";
 
 class Module;
 class ICommand;
@@ -27,6 +27,7 @@ class GlfwWindow;
 class MainMenuBar;
 class World;
 class World2;
+class Scripting;
 
 /**
  * Application class.
@@ -47,7 +48,7 @@ public:
 	void finalize();
 
 	static Application& get();
-	UI* getUI();
+	UIModule* getUI();
 
 	/**
 	 * Init OpenGL stuffs before display loop.
@@ -67,8 +68,7 @@ public:
 	 */
 	void run();
 
-	World* world();
-	World2*world2();
+	World2* world2();
 	ImFont* getFont(int fontId);
 	GLFWwindow* mainWindow();
 
@@ -101,7 +101,7 @@ public:
 private:
 	static Application s_instance;
 
-	UI* m_ui;
+	UIModule* m_ui;
 	std::vector<Module*> m_modules;
 
 	/**
@@ -112,9 +112,8 @@ private:
 
 	bool m_bShouldClose = false;
 
-	World* m_world; ///< all GUI and logic objects
-	World2*m_world2;
-
+	World2* m_world2;
+	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	GlfwWindow* m_window;
 

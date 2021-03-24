@@ -4,17 +4,18 @@
 
 #include "Core/API.h"
 #include "Core/Application.h"
-#include "Core/InputController.h"
-#include "GUI/Settings.h"
+#include "Core/Input/InputActions.h"
+#include "Core/Input/InputManager.h"
 #include "Rendering/FrameBuffer.h"
 
-#include "../../../World2/World2.h"
 #include "../../../World2/Select.h"
+#include "../../../World2/World2.h"
+
+using namespace UI;
 
 /// \todo Use Framebuffer class.
-ViewportWindow::ViewportWindow(bool show, World* world,World2*world2) : IWindow(show)
+Viewport::Viewport(bool show, World2* world2) : IWindow(show)
 {
-	m_world = world;
 	m_world2 = world2;
 
 	// Framebuffer is used in Viewport window.
@@ -27,27 +28,27 @@ ViewportWindow::ViewportWindow(bool show, World* world,World2*world2) : IWindow(
 	// generate texture to draw on
 	glGenTextures(1, &m_texColBufMain);
 
-  // create a renderbuffer to allow depth and stencil
-  glGenRenderbuffers(1, &m_rboMain);
-  glBindRenderbuffer(GL_RENDERBUFFER,m_rboMain);
-  //glPixelStorei(GL_PACK_ALIGNMENT, 1);
-  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-  glEnable(GL_MULTISAMPLE);
-  glCullFace(GL_BACK);
-  glEnable(GL_CULL_FACE);
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_STENCIL_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// create a renderbuffer to allow depth and stencil
+	glGenRenderbuffers(1, &m_rboMain);
+	glBindRenderbuffer(GL_RENDERBUFFER, m_rboMain);
+	// glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glEnable(GL_MULTISAMPLE);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
-  // init vectors definig size to display
-  m_wcMin = ImVec2(0, 0);
-  m_wcMax = ImVec2(0, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	// init vectors definig size to display
+	m_wcMin = ImVec2(0, 0);
+	m_wcMax = ImVec2(0, 0);
 }
 
-void ViewportWindow::render()
+void Viewport::render()
 {
 
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
@@ -55,7 +56,7 @@ void ViewportWindow::render()
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::Begin("Viewport", getShowPtr());
+		ImGui::Begin(ID, getShowPtr());
 		ImGui::PopStyleVar();
 
 		// get positions of min max points of the window
@@ -69,7 +70,7 @@ void ViewportWindow::render()
 
 		// ImGui::GetWindowDrawList()->AddCallback(render_callback, NULL); // Option 1 (did not manage to get it working
 		// correctly - too hard to grasp all the stuff for it)
-		InputController::processViewportEvents();
+		InputManager::processViewportEvents();
 
 		// bind our special framebuffer for rendering (and binding a new texture for it if needed)
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fboMain);
@@ -100,8 +101,8 @@ void ViewportWindow::render()
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rboMain);
 
 			// resize all other things
-			m_world->onReshape(width, height);
-			Settings::resize((float)width, (float)height);
+			// m_world->onReshape(width, height);
+			InputActions::resize((float)width, (float)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 
@@ -118,15 +119,14 @@ void ViewportWindow::render()
 
 		// draw
 		glStencilMask(255);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glClearStencil(0);
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// draw
-		//m_world->render();
+		// m_world->render();
 
 		// world2
-		//World2::tmpAccess->onUpdate();
 		m_world2->onUpdate();
 
 		glDisable(GL_MULTISAMPLE);

@@ -13,6 +13,7 @@
 #include <queue>
 #include <stack>
 #include <string>
+#include <sstream>
 
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
@@ -21,7 +22,7 @@
 #include "Config.h"
 
 /// \todo Logger should not import InputController!
-#include "Core/InputController.h"
+#include "Core/Input/InputManager.h"
 
 #ifdef _DEBUG
 #define LOG_DEBUG(...) Logger::getInstance().getConsoleLogger()->trace(__VA_ARGS__);
@@ -134,6 +135,7 @@ public:
 	void update();
 	void log(const LoggingOption& logType, const std::string message, const int numOfArgs, ...);
 	void addToLogBuffer(const LoggingOption& logType, const std::string message, const int numOfArgs, ...);
+  std::ostringstream& getBuffer() { return m_buffer; };
 
 private:
 	Logger() = default;
@@ -142,9 +144,12 @@ private:
 	Logger(Logger&&) = delete;
 	Logger& operator=(const Logger&) = delete;
 
-	std::shared_ptr<spdlog::logger> appLogger = spdlog::basic_logger_mt("app_logger", "logs/main.log");
+	// std::shared_ptr<spdlog::logger> appLogger = spdlog::basic_logger_mt("app_logger", "logs/main.log");
+	std::shared_ptr<spdlog::logger> appLogger;
 	std::shared_ptr<spdlog::logger> logger = spdlog::basic_logger_mt("basic_logger", "logs/user_interaction.log");
 	std::shared_ptr<spdlog::logger> mouseLogger = spdlog::basic_logger_mt("mouse_logger", "logs/mouse_log.log");
+
+	std::ostringstream m_buffer;
 
 	std::shared_ptr<spdlog::logger> m_consoleLogger;
 

@@ -3,6 +3,8 @@
 #include "Components.h"
 
 #include "Config.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "Source/Core/Nodes/GraphManager.h"
 
 //#include "../Scripting/Scripting.h"
 
@@ -20,11 +22,15 @@ Shader2 World2::shaderProj; ///< preview projection matrices
 World2*World2::tmpAccess=NULL;
 
 World2::World2(){
+    /*this->sceneRoot = new GameObject(gridMesh,&World2::shader0,0);
+    this->sceneRoot->addComponent(new Renderer(Renderer::DRAW_LINES));
+    this->sceneHandles = new GameObject();
+    this->onStart();*/
 }
 bool World2::initRender(){
-    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders2/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders2/simple-fs.glsl").c_str()); 
-    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders2/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders2/handle-fs.glsl").c_str()); 
-    World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders2/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders2/viewproj-fs.glsl").c_str());
+    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
+    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
+    World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
         getchar();printf("World2::initRender():cannot load shaders\n");return false;
     }
@@ -34,32 +40,32 @@ bool World2::initRender(){
     return true;
 }
 World2* World2::loadDefaultScene(){
-    if (!World2::initializedRender){printf("initialize render before meshes!\n");return nullptr;}
-    GLuint rocksTexture, grassTexture, grassBigTexture,renderTexture,axisTexture;
+    if (!World2::initializedRender){printf("initialize render before creating World2!\n");return nullptr;}
+    GLuint cubeGrayTexture, cubeTexture,renderTexture,axisTexture;
     RenderTexture* rend;
-    GameObject *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild;
+    GameObject *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild,*handles;
 
-    grassTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grass.png"));
-    grassBigTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures2/grassbig.jpg"));
-    rocksTexture =    pgr::createTexture(Config::getAbsolutePath("/Data/textures2/rocks.jpg"));
-    axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures2/axis.png"));
+    cubeGrayTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
+    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
+    axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
 
     rend =        new RenderTexture(&renderTexture,256,256);
 
-    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, grassTexture);
+    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, cubeGrayTexture);
     lookat =      new GameObject(unitquadMesh,    &World2::shader0, renderTexture);
     camhandles =  new GameObject(unitcubeMesh,    &World2::shader0, 0);
-    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, rocksTexture);
+    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, cubeTexture);
     testparent =  new GameObject(three_axisMesh,  &World2::shader0, axisTexture);   testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
     camera =      new GameObject();
     scene =       new GameObject(gridMesh,        &World2::shader0, 0);             scene->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    handles =     new GameObject();
 
-    camera->transform(         glm::vec3(0.0f, 5.0f, 10.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
+    camera->transform(         glm::vec3(0.0f, 7.0f, 10.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
     camhandles->transform(     glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
-    objhandles->transform(     glm::vec3(0.0f, 0.0f, -0.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f),0.0f);
-    lookat->transform(         glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),        glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
-    testparent->transform(     glm::vec3(2.0f, 1.0f,-3.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);
-    testchild->transform(      glm::vec3(0.0f, 4.0f,-6.0f),    glm::vec3(2.5f, 2.5f, 0.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
+    objhandles->transform(     glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);//objhandles->transformation[0][3]=1.0f;
+    lookat->transform(         glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),        glm::vec3(0.0f, 1.0f, 0.0f), 225.0f);
+    testparent->transform(     glm::vec3(2.0f, 1.0f,-3.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);//testparent->transformation[0][1]=0.5f;
+    testchild->transform(      glm::vec3(0.0f, 6.0f,-8.0f),    glm::vec3(2.5f, 2.5f, 1.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
 
     scene->addComponent(new TransformHandles(objhandles)); scene->addComponent(new Renderer(Renderer::DRAW_LINES));
     scene->addChild(camera, false);           camera->addComponent(new Camera2(60.0f, scene)); 
@@ -70,8 +76,13 @@ World2* World2::loadDefaultScene(){
             objhandles->addChild(camhandles, true);     camhandles->addComponent(new CameraHandles());
                                                         camhandles->addComponent(new Camera2(60.0f, scene, rend));
     scene->addChild(lookat, false);           lookat->addComponent(new Renderer());
+    scene->addChild(handles,false);           handles->addComponent(new TranslationHandles());
+                                              handles->addComponent(new ScaleHandles());
 
-    World2* w = new World2();w->sceneRoot = scene;w->onStart();
+    World2* w = new World2();
+    w->sceneRoot = scene;
+    w->sceneHandles = handles;
+    w->onStart();
     return w;
 }
 void updateRecursive(GameObject* root){
@@ -83,9 +94,47 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
+void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
+    printf("handlesSetMatrix\n");
+    for(int i=0;i<this->sceneHandles->components.size();i++){this->sceneHandles->components[i]->isActive=false;}
+    if(matnode==NULL){
 
-void World2::onStart(){startRecursive(this->sceneRoot);}
+        return;
+    }
+    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)matnode;
+    Ptr<Core::NodeBase>		    nodebase    = nodebasedata->m_nodebase;
+    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata;
+    Core::Transform::DataMap	data		= nodebase->getDataMap();
+	const Operation*			operation	= nodebase->getOperation();
+	const char*					keyword		= operation->keyWord.c_str();
+    DataStore                   datastore   = nodebase->getData();
+    glm::mat4                   mat         = datastore.getMat4();
 
+    if(strcmp("Scale",keyword)==0){
+        printf("Scale %f %f %f\n",mat[0][0], mat[1][1], mat[2][2]);
+        ScaleHandles* handles = (ScaleHandles*)this->sceneHandles->getComponent(ScaleHandles::componentType());
+        if(handles==NULL){return;}
+        handles->editedobj=nodebase.get();
+    }
+    else if(strcmp(keyword,"Translation")==0){
+        printf("Translation %f %f %f\n", mat[3][0], mat[3][1], mat[3][2]);
+        TranslationHandles*handles=(TranslationHandles*)this->sceneHandles->getComponent(TranslationHandles::componentType());
+        if(handles==NULL){return;}
+        handles->editedobj=nodebase.get();
+    }
+    printf("-\n");
+    printf("operation %s\n",keyword);
+    printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",
+        mat[0][0], mat[1][0], mat[2][0], mat[3][0],
+        mat[0][1], mat[1][1], mat[2][1], mat[3][1],
+        mat[0][2], mat[1][2], mat[2][2], mat[3][2],
+        mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
+    printf("-\n");
+
+}
+void World2::onStart(){
+    startRecursive(this->sceneRoot);
+}
 void World2::onUpdate(){
     float viewport[4];
     glGetFloatv(GL_VIEWPORT, viewport);

@@ -1,7 +1,7 @@
 
 #include "WorkspaceElements.h"
-#include <string>
 #include "spdlog/fmt/fmt.h"
+#include <string>
 
 // #include <format> // not as standard library yet
 
@@ -18,7 +18,7 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
 /* \todo JH not use constant values here */
-WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
+WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel), m_viewScale(args.viewScale)
 {
 	/* \todo Some better default values - take from Const.h*/
@@ -28,13 +28,24 @@ WorkspaceNode::WorkspaceNode(const ne::NodeId id, ImTextureID headerBackground, 
 	m_touchTime = 1.0;
 }
 
+/* \todo JH not use constant values here */
+WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
+    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel), m_viewScale(WorkspaceViewScale::Full)
+{
+	/* \todo Some better default values - take from Const.h*/
+	m_state = "default WorkspaceNode state";
+	m_color = ImColor(255, 255, 255);
+	m_size = ImVec2(100, 100);
+	m_touchTime = 1.0;
+}
+
 /* \todo JH time-functions are taken from example */
-void WorkspaceNode::TouchNode(const float constTouchTime)
+void WorkspaceNode::TouchNode(float const constTouchTime)
 {
 	m_touchTime = constTouchTime;
 }
 
-void WorkspaceNode::UpdateTouch(const float constDeltaTime)
+void WorkspaceNode::UpdateTouch(float const constDeltaTime)
 {
 	if (m_touchTime > 0)
 	{
@@ -42,7 +53,7 @@ void WorkspaceNode::UpdateTouch(const float constDeltaTime)
 	}
 }
 
-float WorkspaceNode::GetTouchProgress(const float constTouchTime)
+float WorkspaceNode::GetTouchProgress(float const constTouchTime)
 {
 	if (m_touchTime > 0.0f)
 		return (constTouchTime - m_touchTime) / constTouchTime;
@@ -67,19 +78,3 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id), m_color(ImColor(255, 255, 255))
 {}
 
-
-WorkspacePinProperties::WorkspacePinProperties(const ne::PinId id, const char* name, PinKind kind, EValueType type)
-		: m_id(id), m_name(name), m_kind(kind), m_type(type), m_iconSize(24), m_connected(false), m_alpha(100) /* \todo JH no konstants here... */
-{
-}
-
-/* \todo JH this functions are in Core... */
-bool WorkspacePinProperties::IsPinConnected()
-{
-	return m_connected;
-}
-
-bool WorkspacePinProperties::CanCreateLink(Core::Pin* b)
-{
-	return true; /* \todo todo... */
-}

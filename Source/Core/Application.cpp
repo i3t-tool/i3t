@@ -15,26 +15,36 @@
 #include "GUI/ImGui/imgui_impl_glfw.h"
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "GUI/Theme.h"
-#include "GUI/UI.h"
+#include "GUI/UIModule.h"
+#include "Logger/Logger.h"
 #include "Rendering/ShaderProvider.h"
 #include "Rendering/Shaper.h"
+#include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World2/World2.h"
 
+
+#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+
 Application::Application()
 {
 	m_isPaused = false;
-	m_world = nullptr;
 
-	m_ui = new UI();
+	m_ui = new UIModule();
 	m_modules.push_back(m_ui);
+
+	m_scriptInterpreter = new Scripting();
 }
 
 void Application::init()
 {
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
+	ConsoleCommand::addListener(
+			[this](std::string rawCommand) { Log::info("Application got command '{}'.", rawCommand); });
+	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 }
 
 void Application::initModules()
@@ -110,21 +120,15 @@ void Application::onDisplay()
 
 void Application::logicUpdate()
 {
-	InputController::preUpdate(); ///< update the mouse button state
+	InputManager::preUpdate(); ///< update the mouse button state
 
-	if (m_world)
-		m_world->update(); ///< update World = handle 2D and 3D interaction
-	// PF glutExit called during this update - crash after window close. Solved in TabSpace::closeMessageExitEvent
-
-	InputController::update(); ///< Update mouseDelta, mousePrev, and the stored statuses of the keys in the \a keyMap
-	                           ///< array (JUST_UP -> UP, JUST_DOWN -> DOWN).
+	InputManager::update(); ///< Update mouseDelta, mousePrev, and the stored statuses of the keys in the \a keyMap
+	                        ///< array (JUST_UP -> UP, JUST_DOWN -> DOWN).
 }
 
 void Application::finalize()
 {
-	delete ObjectDefinitionTree::tree;
 
-	delete m_world;
 	delete m_world2;
 	// world = nullptr; //PF problem during glutExit...
 
@@ -137,9 +141,6 @@ void Application::finalize()
 
 	TextureLoader::endTextures();
 	TextureLoader::endHCTextures();
-
-	GeometryMap::dispose();
-	GeometryMap::disposeHC();
 
 	glfwTerminate();
 }
@@ -185,57 +186,21 @@ int Application::initI3T()
 	if (err)
 		return err;
 
-	///    - load geometry to GeometryMap
-	if (GeometryMap::addHCGeometry("testCube", Config::getAbsolutePath("/Data/models/testCube.tmsh")))
-		return 1;
-	if (GeometryMap::addHCGeometry("orbit", Config::getAbsolutePath("/Data/models/orbit.tmsh")))
-		return 1;
-	if (GeometryMap::addHCGeometry("abCube", Config::getAbsolutePath("/Data/models/cube.tmsh")))
-		return 1;
-	if (GeometryMap::addHCGeometry("frustrum", Config::getAbsolutePath("/Data/models/testCube.tmsh"), 2.0f))
-		return 1;
-	if (GeometryMap::addHCGeometry("camera", Config::getAbsolutePath("/Data/models/camModel.tmsh"), 1.5f))
-		return 1;
-	if (GeometryMap::addHCGeometry("defAxis", Config::getAbsolutePath("/Data/models/axis.tmsh"), 1.5f))
-		return 1;
-
-	///     - load materials to MaterialMap
-	MaterialMap::addHCMaterial(new Material("testMaterial", TextureLoader::getHCId("cGrid")));
-	MaterialMap::addHCMaterial(new Material("abCube", TextureLoader::getHCId("abCube")));
-	MaterialMap::addHCMaterial(new Material("cube_color", TextureLoader::getHCId("cube_color")));
-	// MaterialMap::addHCMaterial(new Material("camera", -1, Color::GRAY, Color::WHITE, 1.0f, 1.0f, 1.0f, 1.0f));
-	MaterialMap::addHCMaterial(
-			new Material("camera", TextureLoader::getHCId("white"), Color::GRAY, Color::WHITE, 1.0f, 1.0f, 1.0f, 1.0f));
-	MaterialMap::addHCMaterial(
-			new Material("frustrum", TextureLoader::getHCId("cGrid"), Color::YELLOW, Color::WHITE, 1.0f, 1.0f, 1.0f, 1.0f));
-	MaterialMap::addHCMaterial(new Material("defAxisMat", TextureLoader::getHCId("defAxisTex"), Color::WHITE,
-	                                        Color::WHITE, 1.0f, 1.0f, 1.0f, 1.0f));
-
-	GeometryMap::connectAllHCToShader(); /// \todo Connection of shader should take into account the materials too...
-	/// \bug problem - dle dat se neda urcit shader - byl spatne shader pro kameru s texturou -1 a je spatne shader pro
-	/// frustrum, ktery ma byt alphaShader a je baseShader
-
-	///   - objects definitions data structure ObjectDefinitionTree
-	ObjectDefinitionTree::tree = new ObjectDefinitionTree(nullptr);
-
 	// read content files -- see 6 lines below
 	// if (Reader::readContentCFG(Config::getAbsolutePath(Config::CONTENT_FILE.c_str()).c_str())) return 1;
 
-	///   - create the \ref world World
-	m_world = new World();
-
-	// connect users geometries
-	// GeometryMap::connectAllToShader();
-
-	// world->onReshape(Config::WIN_WIDTH, Config::WIN_HEIGHT);
-
-	///   - setup camera control
-	m_world->setConfigCameraControl();
-
-	//new scene scheme 
-	bool b=World2::initRender();
+	// new scene scheme
+	bool b = World2::initRender();
 	m_world2 = World2::loadDefaultScene();
-	World2::tmpAccess = m_world2;
+
+	//testing
+	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
+	glm::mat4 m=glm::mat4(1.0f);
+	ValueSetResult result = mat->m_nodebase->setValue(glm::vec3(2.0f,2.0f,2.0f));
+	printf("value set result %d\n",result.status);
+	//ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+	m_world2->handlesSetMatrix(mat);
+
 	return 0;
 }
 
@@ -244,15 +209,11 @@ Application& Application::get()
 	return s_instance;
 }
 
-UI* Application::getUI()
+UIModule* Application::getUI()
 {
 	return m_ui;
 }
 
-World* Application::world()
-{
-	return m_world;
-}
 World2* Application::world2()
 {
 	return m_world2;

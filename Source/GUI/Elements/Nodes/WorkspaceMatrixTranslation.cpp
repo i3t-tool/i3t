@@ -2,8 +2,11 @@
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args)
     : WorkspaceMatrix4x4(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
-{
-}
+{}
+
+WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Builder::createTransform<Core::Translation>(), headerLabel, nodeLabel)
+{}
 
 void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
 {

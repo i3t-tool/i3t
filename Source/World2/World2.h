@@ -11,7 +11,9 @@
 #include "pgr.h"
 #include "GameObject.h"
 
+class WorkspaceMatrix4x4;
 class GameObject;
+
 struct Shader2{
     GLuint program;///< GL shader program
     GLuint camera;    ///< camera position before rotation
@@ -35,11 +37,6 @@ public:
     \return GL shader, 0 if failure
     */
     static Shader2 loadShader(const char* vs_name,const char* fs_name);
-    /// Initialize render
-    /**
-    Call before initMeshes.
-    Loads textures, shaders, uniforms, initializes GL properties and functions
-    */
     /// Initialize scene
     /**
     Creates and initializes default scene
@@ -48,23 +45,26 @@ public:
     static World2* tmpAccess;
     /// calls start() on each component in scene
     /**
-    called by initMeshes();
+    
     */
     void onStart();
     /// Render scene
     /**
-    Called by glut onDisplay event.
     Draws scene, updates global camera matricies
     */
     void onUpdate();
-    void handlesSetMatrix(glm::mat4 parent,glm::mat4*transform,int type);//A*B*C*D*E,parent=A*B*C*D,transform=E
-    void handlesSetMatrix(glm::mat4 parent,glm::mat4 transform,bool(*)(glm::mat4),int type);
+
+    void handlesSetMatrix(WorkspaceMatrix4x4*mat);
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
+    GameObject* sceneHandles;///<control of transformation manipulators 
 
     ///load shaders
-    static bool initRender();
-    static float width;               ///< current viewport width
-    static float height;              ///< current viewport width
+    /**
+    load shaders
+    */
+    static bool initRender();           
+    static float width;             ///< current viewport width
+    static float height;            ///< current viewport width
     static glm::mat4x4 perspective; ///< Main camera perspective matrix, updated by Callbacks::onResize. Accessed by GameObject::draw(glm::mat4).
     static glm::mat4x4 mainCamera;  ///< Main camera transform, updated by Render::onDisplay. Accessed by GameObject::draw(glm::mat4).
     static glm::vec3 mainCamPos;    ///< Main camera position before rotation. Needed for reflection calculation in fs. Accessed by GameObject::draw(glm::mat4).

@@ -1,4 +1,5 @@
 #include "Transforms.h"
+#include "Core/Input/InputManager.h"
 #include "World2.h"
 #include "glm/gtx/norm.hpp"
 
@@ -43,19 +44,19 @@ glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis){
 	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3, (referenceAxis + 2) % 3};
 	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]], (glm::vec3)transform[mapaxis[1]],(glm::vec3)transform[mapaxis[2]]};
 	if (glm::length2(axes[0]) < bias){axes[0] = glm::vec3(0.0f);axes[0][mapaxis[0]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
+	if (glm::length2(axes[1]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
+	if (glm::length2(axes[2]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
 
 	axes[0] = glm::normalize(axes[0])* glm::length((glm::vec3)transform[mapaxis[0]]);
 	axes[1] = glm::normalize(glm::cross(axes[2], axes[0]))* glm::length((glm::vec3)transform[mapaxis[1]]);
 	axes[2] = glm::normalize(glm::cross(axes[0], axes[1]))* glm::length((glm::vec3)transform[mapaxis[2]]);
 
-	glm::mat4 rot = glm::mat4(1.0f);
-	*((glm::vec3*)(&rot[mapaxis[0]])) = axes[0];
-	*((glm::vec3*)(&rot[mapaxis[1]])) = axes[1];
-	*((glm::vec3*)(&rot[mapaxis[2]])) = axes[2];
-	*((glm::vec3*)(&rot[3])) = transform[3];
-	return rot;
+	glm::mat4 ortho = glm::mat4(1.0f);
+	*((glm::vec3*)(&ortho[mapaxis[0]])) = axes[0];
+	*((glm::vec3*)(&ortho[mapaxis[1]])) = axes[1];
+	*((glm::vec3*)(&ortho[mapaxis[2]])) = axes[2];
+	*((glm::vec3*)(&ortho[3])) = transform[3];
+	return ortho;
 }
 glm::mat4 getNormalized(glm::mat4 transform){
 	float bias = 0.005f;
@@ -74,8 +75,8 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis){
 	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3, (referenceAxis + 2) % 3};
 	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]], (glm::vec3)transform[mapaxis[1]],(glm::vec3)transform[mapaxis[2]]};
 	if (glm::length2(axes[0]) < bias){axes[0] = glm::vec3(0.0f);axes[0][mapaxis[0]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
-	if (glm::length2(axes[0]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
+	if (glm::length2(axes[1]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
+	if (glm::length2(axes[2]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
 
 	axes[0] = glm::normalize(axes[0]);
 	axes[1] = glm::normalize(glm::cross(axes[2], axes[0]));
@@ -96,14 +97,25 @@ glm::mat4 getFullTransform(GameObject* obj){
 	while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
 	return transform;
 }
+glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
+	glm::vec3 t0 = -World2::mainCamPos;
+	glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta));
+	glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
+
+	return t0 + tz * coef[0];
+}
+void setLen(glm::vec3* vec, float len) {
+	float f=glm::length(*vec);
+	*vec/=f+(float)(f==0.0f);
+	*vec*=len;
+}
 float angle2(float x, float y){
 	float a = glm::degrees(atan(y / x));
 	if (a < 0.0f){a = 180.0f + a;}
 	if (y < 0.0f){a += 180.0f;}
 	return a;
 }
-bool dirEqual(glm::vec3 v1, glm::vec3 v2){
-	float bias = 0.00005f;
+bool dirEqual(glm::vec3 v1, glm::vec3 v2, float bias){
 	float _cos = glm::dot(v1, v2) / (glm::length(v1)* glm::length(v2));
 	return _cos > 1-bias;//cos==1 =>angle between v1,V2 is 0
 }

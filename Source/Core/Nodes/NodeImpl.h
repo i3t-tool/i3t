@@ -10,6 +10,8 @@
 
 #include "Node.h"
 
+#include "World2/GameObject.h"
+
 namespace Core
 {
 /**
@@ -53,7 +55,6 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[static_cas
 
 template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
 {
-	Debug::Assert(false, "Calling update function of unimplemented NodeImpl type.");
 }
 
 // inversion
@@ -1366,6 +1367,92 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inpu
 	if (m_inputs[0].isPluggedIn())
 	{
 		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4());
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = m_inputs[0].getStorage().getMat4();
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeTranslation>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		setInternalValue(glm::translate(m_inputs[0].getStorage().getVec3()));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerX>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), glm::vec3(1.0f, 0.0f, 0.0f)));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerY>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerZ>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeAxisAngle>::updateValues(int inputIndex)
+{
+	if (areAllInputsPlugged())
+	{
+		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeOrtho>::updateValues(int inputIndex)
+{
+	if (areAllInputsPlugged())
+	{
+		setInternalValue(glm::ortho(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                            m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+		                            m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakePerspective>::updateValues(int inputIndex)
+{
+	if (areAllInputsPlugged())
+	{
+		setInternalValue(glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                                  m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeFrustum>::updateValues(int inputIndex)
+{
+	if (areAllInputsPlugged())
+	{
+		setInternalValue(glm::frustum(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+		                              m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+		                              m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int inputIndex)
+{
+	if (areAllInputsPlugged())
+	{
+		setInternalValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
+		                             m_inputs[2].getStorage().getVec3()));
 	}
 }
 } // namespace Core

@@ -3,7 +3,6 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Core/World.h"
 
 void SetupDialog::render()
 {

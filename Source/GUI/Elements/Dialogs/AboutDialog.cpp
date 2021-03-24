@@ -15,7 +15,7 @@ AboutDialog::AboutDialog()
 
 void AboutDialog::render()
 {
-	ImGui::Begin("About");
+	ImGui::Begin("About", nullptr, g_dialogFlags);
 	{
 		ImGui::Columns(2, NULL, false);
 
