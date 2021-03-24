@@ -1,7 +1,9 @@
 #include "CameraControl.h"
 #include "../Component.h"
 #include "../Transforms.h"
+#include "Core/Input/InputActions.h"
 #include "Core/Input/InputManager.h"
+#include "GUI/Elements/Windows/ViewportWindow.h"
 #include <iostream>
 #include <typeinfo>
 
@@ -15,7 +17,7 @@ CameraControl::CameraControl()
 
 void CameraControl::update()
 {
-	if (!InputManager::isViewportActive())
+	if (!InputManager::isFocused<UI::Viewport>())
 		return;
 
 	float x = InputManager::m_mouseXDelta / 8.0f;

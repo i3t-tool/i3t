@@ -33,8 +33,16 @@ inline float getSize(ESize size)
 	return getTheme().get(size);
 }
 
-template <typename T> IWindow* getWindowPtr()
+/**
+ * Get pointer to dockable (unique) window.
+ * \tparam T window type
+ * \return shared pointer to window of type T.
+ */
+template <typename T> Ptr<T> getWindowPtr()
 {
-	return getUI()->getWindowPtr<T>();
+	Ptr<IWindow> ptr;
+	if ((ptr = getUI()->getWindowPtr<T>()) == nullptr)
+	    return nullptr;
+  return std::dynamic_pointer_cast<T>(ptr);
 }
 } // namespace I3T

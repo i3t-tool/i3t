@@ -78,14 +78,14 @@ void dataScalar(struct ParseState* Parser, struct Value* ReturnValue, struct Val
 }
 void loadW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     std::string filename= Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
     if (ww != NULL) {ww->m_workspaceCoreNodes.clear(); status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer=status;
 }
 void saveW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
-    WorkspaceWindow * ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
     if (ww != NULL) {status=SaveWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer = status;

@@ -152,7 +152,7 @@ void WorkspaceWindow::render()
 		printf("press\n");
 	}
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::Begin("Workspace", getShowPtr());
+	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 	ImGui::PopStyleVar();
 
 	UpdateTouchAllNodes();
