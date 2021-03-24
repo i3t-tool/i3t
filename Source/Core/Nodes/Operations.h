@@ -49,10 +49,10 @@ struct Operation
 /// \todo rename to optype
 enum class ENodeType
 {
-	Inversion,
+	Inversion,	//SS
 	Transpose,
-	Determinant,
-	MatrixMulMatrix,
+	Determinant,	//SS
+	MatrixMulMatrix, //SS
 	MatrixAddMatrix,
 	MatrixMulVector,
 	VectorMulMatrix,
@@ -118,13 +118,13 @@ enum class ENodeType
 	NormalizeQuat,
 	Float,
 	Vector3,
-	Vector4,
-	Matrix,
+	Vector4,	//JH
+	Matrix,	//JH
 };
 
 enum class ETransformType
 {
-	Translation,
+	Translation,	//JH
 	EulerX,
 	EulerY,
 	EulerZ,
