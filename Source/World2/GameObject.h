@@ -27,11 +27,11 @@ class GameObject
 {
 private:
 
-  GLuint vbo_positions; ///< vertices buffer
-  GLuint vbo_indices;   ///< triangle indicies buffer
-  GLuint num_vertices;  ///< number of vertices of mesh of this object
-  GLuint num_triangles; ///< number of triangles of mesh of this object
-  GLuint num_attribs;   ///< number of attributes per vertex
+  GLuint vbo_positions=0; ///< vertices buffer
+  GLuint vbo_indices=0;   ///< triangle indicies buffer
+  GLuint num_vertices=0;  ///< number of vertices of mesh of this object
+  GLuint num_triangles=0; ///< number of triangles of mesh of this object
+  GLuint num_attribs=0;   ///< number of attributes per vertex
 
   GLuint vao = 0;  ///< GL vertex array object
   // GLuint buffer;
@@ -45,8 +45,7 @@ public:
 
   GameObject* parent = NULL;         ///< parent of this object - should not be NULL for other objects than scene root
   std::vector<GameObject*> children; ///< child objects of this object - relation child-parent is designed to be
-                                     ///< traceable
-                                 ///< in both directions
+                                     ///< traceable in both directions
   std::vector<Component*> components; ///< components with functionalities - have render and update functions, that are called in app loop
 
   bool isRender;         ///< enable/disable rendering
@@ -59,7 +58,7 @@ public:
   static glm::mat4 inheritedTransform(GameObject* obj);
   void unparent(bool keepTransform);
   void setParent(GameObject* parent, bool keepTransform);
-  void rmChild(GameObject* obj, bool keepTransform);
+  bool rmChild(GameObject* obj, bool keepTransform);
   void addChild(GameObject* obj, bool keepTransform);
   void addComponent(Component* c);
   Component* getComponent(const char* type);
@@ -80,6 +79,7 @@ public:
     \param[in] texture Texture of this object. Set 0 for no texture, object is then rendered solid black
   */
   GameObject(const pgr::MeshData mesh, struct Shader2* shader, GLuint texture);
+  ~GameObject();
   /// Translate, scale and rotate object at once
   /**
     Because calling rotate, scale and rotate separately makes init of many objects very tedious.

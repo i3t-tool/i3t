@@ -106,6 +106,11 @@ GameObject::GameObject(const pgr::MeshData mesh, struct Shader2* shader, GLuint 
 
     CHECK_GL_ERROR();
 }
+GameObject::~GameObject() {
+    glDeleteBuffers(1,&this->vbo_positions);
+    glDeleteBuffers(1,&this->vbo_indices);
+    glDeleteVertexArrays(1,&this->vao);
+}
 glm::mat4 GameObject::inheritedTransform(GameObject* obj){
     glm::mat4 transform = glm::mat4(1.0f);
     while (obj->parent != NULL){obj = obj->parent;transform = obj->transformation * transform;}
@@ -119,16 +124,17 @@ void GameObject::unparent(bool keepTransform){
 void GameObject::setParent(GameObject* parent, bool keepTransform){
     parent->addChild(this, keepTransform);
 }
-void GameObject::rmChild(GameObject* obj, bool keepTransform){
+bool GameObject::rmChild(GameObject* obj, bool keepTransform){
     for (int i = 0; i < this->children.size(); i++){
         if (this->children[i] == obj){
             this->children[i]->parent = NULL;
             this->children[i] = this->children.back();
             this->children.pop_back();
             if (keepTransform){obj->transformation = GameObject::inheritedTransform(this) * this->transformation * obj->transformation;}
-            return;
+            return true;
         }
     }
+    return false;
 }
 void GameObject::addChild(GameObject* obj, bool keepTransform){
     if (obj->parent != NULL){obj->unparent(keepTransform);}

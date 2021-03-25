@@ -19,6 +19,12 @@ Shader2 World2::shader0; ///< Default shader
 Shader2 World2::shaderHandle;  ///< Handle shader
 Shader2 World2::shaderProj; ///< preview projection matrices
 
+GLuint World2::cubeTexture=0;
+GLuint World2::cubeColorTexture=0;
+GLuint World2::cGridTexture=0;
+GLuint World2::axisTexture=0;
+GLuint World2::whiteTexture=0;
+
 World2*World2::tmpAccess=NULL;
 
 World2::World2(){
@@ -27,37 +33,49 @@ World2::World2(){
     this->sceneHandles = new GameObject();
     this->onStart();*/
 }
-bool World2::initRender(){
+bool World2::init(){
     World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
     World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
     World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
-        getchar();printf("World2::initRender():cannot load shaders\n");return false;
+        getchar();printf("World2::init():cannot load shaders\n");return false;
     }
+
+    World2::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
+    World2::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
+    World2::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.png"));
+    World2::axisTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
+    World2::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/white.png"));
 
     CHECK_GL_ERROR();
     World2::initializedRender = true;
     return true;
 }
+void World2::end() {
+    pgr::deleteProgramAndShaders(World2::shader0.program);
+    pgr::deleteProgramAndShaders(World2::shaderHandle.program);
+    pgr::deleteProgramAndShaders(World2::shaderProj.program);
+    glDeleteTextures(1,&World2::cubeTexture);
+    glDeleteTextures(1,&World2::cubeColorTexture);
+    glDeleteTextures(1,&World2::cGridTexture);
+    glDeleteTextures(1,&World2::axisTexture);
+    glDeleteTextures(1,&World2::whiteTexture);
+}
 World2* World2::loadDefaultScene(){
     if (!World2::initializedRender){printf("initialize render before creating World2!\n");return nullptr;}
-    GLuint cubeGrayTexture, cubeTexture,renderTexture,axisTexture;
+    GLuint renderTexture;
     RenderTexture* rend;
     GameObject *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild,*handles;
 
-    cubeGrayTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
-    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
-    axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
-
     rend =        new RenderTexture(&renderTexture,256,256);
 
-    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, cubeGrayTexture);
+    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, World2::cubeTexture);
     lookat =      new GameObject(unitquadMesh,    &World2::shader0, renderTexture);
     camhandles =  new GameObject(unitcubeMesh,    &World2::shader0, 0);
-    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, cubeTexture);
-    testparent =  new GameObject(three_axisMesh,  &World2::shader0, axisTexture);   testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
+    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, World2::cubeColorTexture);
+    testparent =  new GameObject(three_axisMesh,  &World2::shader0, World2::axisTexture);          testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
     camera =      new GameObject();
-    scene =       new GameObject(gridMesh,        &World2::shader0, 0);             scene->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    scene =       new GameObject(gridMesh,        &World2::shader0, 0);                            scene->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     handles =     new GameObject();
 
     camera->transform(         glm::vec3(0.0f, 7.0f, 10.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
@@ -110,6 +128,9 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
     DataStore                   datastore   = nodebase->getData();
     glm::mat4                   mat         = datastore.getMat4();
 
+
+    //nodebase->
+
     if(strcmp("Scale",keyword)==0){
         printf("Scale %f %f %f\n",mat[0][0], mat[1][1], mat[2][2]);
         ScaleHandles* handles = (ScaleHandles*)this->sceneHandles->getComponent(ScaleHandles::componentType());
@@ -131,6 +152,18 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
         mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
     printf("-\n");
 
+}
+GameObject* World2::addModel(const char* name) {
+    GameObject* g=NULL;
+    if(strcmp("CubeGray",name)==0){g= new GameObject(unitcubeMesh,&World2::shader0,World2::cubeTexture);}
+    else if (strcmp("CubeColor", name) == 0) {g = new GameObject(unitcubeMesh, &World2::shader0, World2::cubeColorTexture); }
+    else if (strcmp("CubeColorGrid", name) == 0) {g = new GameObject(unitcubeMesh, &World2::shader0, World2::cGridTexture); }
+    else if (strcmp("PlainAxis", name) == 0) {g = new GameObject(three_axisMesh, &World2::shader0, World2::axisTexture); }
+    if(g!=NULL){this->sceneRoot->addChild(g,true);}
+    return g;
+}
+bool World2::removeModel(GameObject*g) {
+    return this->sceneRoot->rmChild(g,true);
 }
 void World2::onStart(){
     startRecursive(this->sceneRoot);

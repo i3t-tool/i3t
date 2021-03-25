@@ -130,6 +130,7 @@ void Application::finalize()
 {
 
 	delete m_world2;
+	World2::end();
 	// world = nullptr; //PF problem during glutExit...
 
 	/// \todo Write recent files.
@@ -147,7 +148,7 @@ void Application::finalize()
 
 int Application::initI3T()
 {
-	int err;
+	/*int err;
 
 	///   - load hard coded textures to TextureLoader
 	if (!TextureLoader::loadHCTexture("defAxisTex", Config::getAbsolutePath("/Data/textures/axis.png")))
@@ -185,12 +186,12 @@ int Application::initI3T()
 	                           Config::getAbsolutePath("/Data/internal/shaders/alpha.frag").c_str());
 	if (err)
 		return err;
-
+		*/
 	// read content files -- see 6 lines below
 	// if (Reader::readContentCFG(Config::getAbsolutePath(Config::CONTENT_FILE.c_str()).c_str())) return 1;
 
 	// new scene scheme
-	bool b = World2::initRender();
+	bool b = World2::init();
 	m_world2 = World2::loadDefaultScene();
 
 	//testing

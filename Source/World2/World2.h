@@ -11,6 +11,8 @@
 #include "pgr.h"
 #include "GameObject.h"
 
+#include <map>
+
 class WorkspaceMatrix4x4;
 class GameObject;
 
@@ -55,25 +57,38 @@ public:
     void onUpdate();
 
     void handlesSetMatrix(WorkspaceMatrix4x4*mat);
+    GameObject* addModel(const char* name);
+    bool removeModel(GameObject*);
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
     GameObject* sceneHandles;///<control of transformation manipulators 
 
     ///load shaders
     /**
-    load shaders
+    load shaders, HC textures, HC gameobjects
     */
-    static bool initRender();           
+    static bool init();
+    static void end();
     static float width;             ///< current viewport width
     static float height;            ///< current viewport width
     static glm::mat4x4 perspective; ///< Main camera perspective matrix, updated by Callbacks::onResize. Accessed by GameObject::draw(glm::mat4).
     static glm::mat4x4 mainCamera;  ///< Main camera transform, updated by Render::onDisplay. Accessed by GameObject::draw(glm::mat4).
     static glm::vec3 mainCamPos;    ///< Main camera position before rotation. Needed for reflection calculation in fs. Accessed by GameObject::draw(glm::mat4).
 
+    //HC shaders
     static Shader2 shader0; ///< Default shader
     static Shader2 shaderHandle;   ///< Handle shader
     static Shader2 shaderProj; ///< preview projection matrices
 
-    //static GLuint texture0;
+    //HC textures
+    static GLuint cubeTexture;
+    static GLuint cubeColorTexture;
+    static GLuint cGridTexture;
+    static GLuint axisTexture;
+    static GLuint whiteTexture;
+
+    //static std::map<const char*, GLuint > textures;
+    //static std::map<const char*, pgr::MeshData > models;
+    
 private:
     static bool initializedRender; ///< Was render already initialized?
 };
