@@ -9,6 +9,32 @@
 
 namespace Core
 {
+class Free : public NodeBase
+{
+public:
+  Free() : NodeBase(getTransformProps(ETransformType::Free))
+  {
+	  m_currentMap = Transform::g_Free;
+	  m_initialMap = Transform::g_Free;
+  }
+
+  [[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
+  {
+		setInternalValue(mat);
+    return ValueSetResult{};
+  }
+
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
+  {
+    setInternalValue(val, coords);
+    return ValueSetResult{};
+  }
+
+  void reset() override { setInternalValue(glm::mat4(1.0f)); };
+  void setDataMap(const Transform::DataMap& map) override {};
+  void updateValues(int inputIndex) override {};
+};
+
 class Scale : public NodeBase
 {
 	glm::vec3 m_initialScale;
