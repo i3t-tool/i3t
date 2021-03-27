@@ -57,6 +57,7 @@ void Console::render()
         strcpy(command, "");
 		//strcpy_s(command, "");
 
+
 		reclaimFocus = true;
 	}
 
