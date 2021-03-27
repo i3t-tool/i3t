@@ -9,6 +9,31 @@
 
 namespace Core
 {
+class Free : public NodeBase
+{
+public:
+	Free() : NodeBase(getTransformProps(ETransformType::Free))
+	{
+		m_currentMap = Transform::g_Free;
+		m_initialMap = Transform::g_Free;
+	}
+
+	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
+	{
+		setInternalValue(mat);
+		return ValueSetResult{};
+	}
+
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
+	{
+		setInternalValue(val, coords);
+		return ValueSetResult{};
+	}
+
+	void reset() override { setInternalValue(glm::mat4(1.0f)); };
+	void setDataMap(const Transform::DataMap& map) override{};
+};
+
 class Scale : public NodeBase
 {
 	glm::vec3 m_initialScale;
@@ -27,7 +52,14 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 	void setDataMap(const Transform::DataMap& map) override;
-	void updateValues(int inputIndex) override;
+
+  float getX();
+  float getY();
+  float getZ();
+
+  ValueSetResult setX(float v);
+  ValueSetResult setY(float v);
+  ValueSetResult setZ(float v);
 };
 
 /**
@@ -56,7 +88,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
-	void updateValues(int inputIndex) override;
 };
 
 /**
@@ -85,7 +116,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
-	void updateValues(int inputIndex) override;
 };
 
 /**
@@ -114,7 +144,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
-	void updateValues(int inputIndex) override;
 };
 
 class Translation : public NodeBase
@@ -136,7 +165,14 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
-	void updateValues(int inputIndex) override;
+
+	float getX();
+	float getY();
+	float getZ();
+
+	ValueSetResult setX(float v);
+  ValueSetResult setY(float v);
+  ValueSetResult setZ(float v);
 };
 
 //===-- Other transformations ---------------------------------------------===//
@@ -154,7 +190,6 @@ public:
 	}
 
 	void reset() override;
-	void updateValues(int inputIndex) override;
 };
 
 class QuatRot : public NodeBase
@@ -190,7 +225,20 @@ public:
 	/// No synergies required.
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-	void updateValues(int inputIndex) override;
+
+  float getLeft() { return m_left; }
+  float getRight() { return m_right; }
+  float getBottom() { return m_bottom; }
+  float getTop() { return m_top; }
+  float getNear() { return m_near; }
+  float getFar() { return m_far; }
+
+  ValueSetResult setLeft(float val);
+  ValueSetResult setRight(float val);
+  ValueSetResult setBottom(float val);
+  ValueSetResult setTop(float val);
+  ValueSetResult setNear(float val);
+  ValueSetResult setFar(float val);
 };
 
 class PerspectiveProj : public NodeBase
@@ -211,7 +259,16 @@ public:
 
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-	void updateValues(int inputIndex) override;
+
+	float getFOW() { return m_initialFOW; }
+	float getAspect() { return m_initialAspect; }
+	float getZNear() { return m_initialZNear; }
+	float getZFar() { return m_initialZFar; }
+
+	ValueSetResult setFOW(float v);
+	ValueSetResult setAspect(float v);
+	ValueSetResult setZNear(float v);
+	ValueSetResult setZFar(float v);
 };
 
 class Frustum : public NodeBase
@@ -235,7 +292,20 @@ public:
 
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-	void updateValues(int inputIndex) override;
+
+	float getLeft() { return m_left; }
+	float getRight() { return m_right; }
+	float getBottom() { return m_bottom; }
+	float getTop() { return m_top; }
+	float getNear() { return m_near; }
+	float getFar() { return m_far; }
+
+	ValueSetResult setLeft(float val);
+	ValueSetResult setRight(float val);
+	ValueSetResult setBottom(float val);
+	ValueSetResult setTop(float val);
+	ValueSetResult setNear(float val);
+	ValueSetResult setFar(float val);
 };
 
 /**
@@ -259,6 +329,13 @@ public:
 
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-	void updateValues(int inputIndex) override;
+
+	const glm::vec3& getEye() { return m_initialEye; }
+	const glm::vec3& getCenter() { return m_initialCenter; }
+	const glm::vec3& getUp() { return m_initialUp; }
+
+	ValueSetResult setEye(const glm::vec3& eye);
+	ValueSetResult setCenter(const glm::vec3& center);
+	ValueSetResult setUp(const glm::vec3& up);
 };
 } // namespace Core

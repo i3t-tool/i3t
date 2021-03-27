@@ -90,10 +90,9 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 	if (m_currentMap == Transform::g_Scale)
 	{
 		setInternalValue(val, coords);
-		spreadSignal();
 	}
 
-	return ValueSetResult{ValueSetResult::Status::Ok};
+  return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void Scale::reset()
@@ -108,21 +107,38 @@ void Scale::setDataMap(const Transform::DataMap& map)
 	NodeBase::setDataMap(map);
 }
 
-void Scale::updateValues(int inputIndex)
+float Scale::getX()
 {
-	if (m_inputs[0].isPluggedIn())
-	{
-		setInternalValue(glm::scale(m_inputs[0].getStorage().getVec3()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4());
-	}
-	 */
+  return getInternalData().getMat4()[0][0];
+}
+
+float Scale::getY()
+{
+  return getInternalData().getMat4()[1][1];
+}
+
+float Scale::getZ()
+{
+  return getInternalData().getMat4()[2][2];
+}
+
+ValueSetResult Scale::setX(float v)
+{
+  return setValue(v, {0, 0});
+}
+
+ValueSetResult Scale::setY(float v)
+{
+  return setValue(v, {1, 1});
+}
+
+ValueSetResult Scale::setZ(float v)
+{
+  return setValue(v, {2, 2});
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
+
 ValueSetResult EulerRotX::setValue(float val)
 {
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
@@ -215,24 +231,6 @@ void EulerRotX::reset()
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
 }
 
-void EulerRotX::updateValues(int inputIndex)
-{
-	if (m_inputs[0].isPluggedIn())
-	{
-		float angle;
-
-		angle = m_inputs[0].getStorage().getFloat();
-
-		setInternalValue(glm::eulerAngleX(angle));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::eulerAngleX(0.0f));
-	}
-	 */
-}
-
 //===-- Euler rotation around Y axis --------------------------------------===//
 
 ValueSetResult EulerRotY::setValue(float val)
@@ -312,24 +310,6 @@ void EulerRotY::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
-}
-
-void EulerRotY::updateValues(int inputIndex)
-{
-	if (m_inputs[0].isPluggedIn())
-	{
-		float angle;
-
-		angle = m_inputs[0].getStorage().getFloat();
-
-		setInternalValue(glm::eulerAngleY(angle));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::eulerAngleY(0.0f));
-	}
-	 */
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -413,25 +393,8 @@ void EulerRotZ::reset()
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
 }
 
-void EulerRotZ::updateValues(int inputIndex)
-{
-	if (m_inputs[0].isPluggedIn())
-	{
-		float angle;
 
-		angle = m_inputs[0].getStorage().getFloat();
-
-		setInternalValue(glm::eulerAngleZ(angle));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::eulerAngleZ(0.0f));
-	}
-	 */
-}
-
-//===-- Euler rotation around Z axis --------------------------------------===//
+//===-- Translation -------------------------------------------------------===//
 ValueSetResult Translation::setValue(float val)
 {
 	return setValue(glm::vec3(val));
@@ -487,38 +450,42 @@ void Translation::reset()
 	setInternalValue(glm::translate(m_initialTrans));
 }
 
-void Translation::updateValues(int inputIndex)
+float Translation::getX()
 {
-	if (m_inputs[0].isPluggedIn())
-	{
-		setInternalValue(glm::translate(m_inputs[0].getStorage().getVec3()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4(1.0f));
-	}
-	 */
+  return getInternalData().getMat4()[3][0];
 }
+
+float Translation::getY()
+{
+  return getInternalData().getMat4()[3][1];
+}
+
+float Translation::getZ()
+{
+  return getInternalData().getMat4()[3][2];
+}
+
+ValueSetResult Translation::setX(float v)
+{
+  return setValue(v, {3, 0});
+}
+
+ValueSetResult Translation::setY(float v)
+{
+  return setValue(v, {3, 1});
+}
+
+ValueSetResult Translation::setZ(float v)
+{
+  return setValue(v, {3, 2});
+}
+
+//===-- Axis angle rotation -----------------------------------------------===//
 
 void AxisAngleRot::reset()
 {
 	m_currentMap = m_initialMap;
 	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
-}
-
-void AxisAngleRot::updateValues(int inputIndex)
-{
-	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
-	{
-		setInternalValue(glm::rotate(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4());
-	}
-	 */
 }
 
 void OrthoProj::reset()
@@ -538,39 +505,51 @@ ValueSetResult OrthoProj::setValue(float val, glm::ivec2 coords)
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-void OrthoProj::updateValues(int inputIndex)
+//===-- Orthographic projection -------------------------------------------===//
+
+ValueSetResult OrthoProj::setLeft(float val)
 {
-	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
-	    m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
-	{
-		setInternalValue(glm::ortho(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                            m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
-		                            m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4());
-	}
-	 */
+  m_left = val;
+  reset();
+  return ValueSetResult{};
 }
 
-void PerspectiveProj::updateValues(int inputIndex)
+ValueSetResult OrthoProj::setRight(float val)
 {
-	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
-	    m_inputs[3].isPluggedIn())
-	{
-		setInternalValue(glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                                  m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4());
-	}
-	 */
+  m_right = val;
+  reset();
+  return ValueSetResult{};
 }
 
+ValueSetResult OrthoProj::setBottom(float val)
+{
+  m_bottom = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult OrthoProj::setTop(float val)
+{
+  m_top = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult OrthoProj::setNear(float val)
+{
+  m_near = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult OrthoProj::setFar(float val)
+{
+  m_far = val;
+  reset();
+  return ValueSetResult{};
+}
+
+//===-- Perspective -------------------------------------------------------===//
 void PerspectiveProj::reset()
 {
 	m_currentMap = m_initialMap;
@@ -588,22 +567,35 @@ ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
 	return ValueSetResult{};
 }
 
-void Frustum::updateValues(int inputIndex)
+ValueSetResult PerspectiveProj::setFOW(float v)
 {
-	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn() &&
-	    m_inputs[3].isPluggedIn() && m_inputs[4].isPluggedIn() && m_inputs[5].isPluggedIn())
-	{
-		setInternalValue(glm::frustum(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                              m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
-		                              m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4());
-	}
-	 */
+	m_initialFOW = v;
+	reset();
+  return ValueSetResult{};
 }
+
+ValueSetResult PerspectiveProj::setAspect(float v)
+{
+	m_initialAspect = v;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult PerspectiveProj::setZNear(float v)
+{
+	m_initialZNear = v;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult PerspectiveProj::setZFar(float v)
+{
+	m_initialZFar = v;
+  reset();
+  return ValueSetResult{};
+}
+
+//===-- Frusum ------------------------------------------------------------===//
 
 void Frustum::reset()
 {
@@ -622,20 +614,50 @@ ValueSetResult Frustum::setValue(float val, glm::ivec2 coords)
 	return ValueSetResult{};
 }
 
-void LookAt::updateValues(int inputIndex)
+ValueSetResult Frustum::setLeft(float val)
 {
-	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
-	{
-		setInternalValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
-		                             m_inputs[2].getStorage().getVec3()));
-	}
-	/*
-	else
-	{
-	  setInternalValue(glm::mat4());
-	}
-	 */
+  m_left = val;
+	reset();
+  return ValueSetResult{};
 }
+
+ValueSetResult Frustum::setRight(float val)
+{
+  m_right = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult Frustum::setBottom(float val)
+{
+  m_bottom = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult Frustum::setTop(float val)
+{
+  m_top = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult Frustum::setNear(float val)
+{
+  m_near = val;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult Frustum::setFar(float val)
+{
+  m_far = val;
+  reset();
+  return ValueSetResult{};
+}
+
+//===-- Look At -----------------------------------------------------------===//
+
 void LookAt::reset()
 {
 	m_currentMap = m_initialMap;
@@ -651,4 +673,25 @@ ValueSetResult LookAt::setValue(float val, glm::ivec2 coords)
 	setInternalValue(val, coords);
 
 	return ValueSetResult{};
+}
+
+ValueSetResult LookAt::setEye(const glm::vec3& eye)
+{
+  m_initialEye = eye;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult LookAt::setCenter(const glm::vec3& center)
+{
+  m_initialCenter = center;
+  reset();
+  return ValueSetResult{};
+}
+
+ValueSetResult LookAt::setUp(const glm::vec3& up)
+{
+  m_initialUp = up;
+  reset();
+  return ValueSetResult{};
 }

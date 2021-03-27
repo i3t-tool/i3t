@@ -88,6 +88,16 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	return ENodePlugResult::Ok;
 }
 
+ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex)
+{
+  return plug(node, seq, nodeIndex, 1);
+}
+
+ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex)
+{
+  return plug(seq, node, 1, nodeIndex);
+}
+
 void GraphManager::unplugAll(Ptr<Core::NodeBase>& node)
 {
 	node.get()->unplugAll();
