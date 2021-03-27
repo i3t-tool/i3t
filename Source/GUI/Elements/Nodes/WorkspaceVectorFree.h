@@ -3,7 +3,7 @@
 
 struct WorkspaceVectorFreeArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default FreeVector header";
     std::string nodeLabel = "default FreeVector label";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Vector4>();

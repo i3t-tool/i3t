@@ -4,7 +4,7 @@
 #include <string>
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args) /* \todo JH take default label from Const.h*/
-    :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
+    :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
     ,   m_nodebase(args.nodebase)
 {
 	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
@@ -194,51 +194,51 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 }
 
 
-void WorkspaceNodeWithCoreData::drawDataSetValues(util::NodeBuilder& builder)
-{
-    const glm::mat4& coreData = m_nodebase->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
-	int const idOfNode = this->m_id.Get();
-
-	bool valueChanged = false;
-	int rowOfChange, columnOfChange = 3;
-	float valueOfChange, localData; /* user can change just one value at the moment */
-
-	builder.Middle();
-
-	ImGui::PushItemWidth(100.0f);
-    /* Drawing is row-wise */
-    for (int rows = 0; rows < 3; rows++)
-    {
-        localData = coreData[columnOfChange][rows]; /* Data are column-wise */
-        if (drawDragFloatWithMap_Inline(&localData,
-                                        coreMap[columnOfChange*4+rows],
-                                        fmt::format("##{}:r{}c{}", idOfNode, rows, columnOfChange)))
-        {
-            valueChanged = true;
-            rowOfChange = rows;
-            valueOfChange = localData;
-        }
-        ImGui::NewLine();
-    }
-	ImGui::PopItemWidth();
-
-	if (valueChanged)
-	{
-		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-		okynko1 > fce_set_transleate_x(okynko1)
-	}
-
-	ImGui::Spring(0); /* \todo JH what is Spring? */
-
-}
-
-void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
-{
-    builder.Middle();
-    ImGui::Text(this->m_label.c_str());
-    ImGui::Spring(0);
-}
+//void WorkspaceNodeWithCoreData::drawDataSetValues(util::NodeBuilder& builder)
+//{
+//    const glm::mat4& coreData = m_nodebase->getData().getMat4();
+//	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
+//	int const idOfNode = this->m_id.Get();
+//
+//	bool valueChanged = false;
+//	int rowOfChange, columnOfChange = 3;
+//	float valueOfChange, localData; /* user can change just one value at the moment */
+//
+//	builder.Middle();
+//
+//	ImGui::PushItemWidth(100.0f);
+//    /* Drawing is row-wise */
+//    for (int rows = 0; rows < 3; rows++)
+//    {
+//        localData = coreData[columnOfChange][rows]; /* Data are column-wise */
+//        if (drawDragFloatWithMap_Inline(&localData,
+//                                        coreMap[columnOfChange*4+rows],
+//                                        fmt::format("##{}:r{}c{}", idOfNode, rows, columnOfChange)))
+//        {
+//            valueChanged = true;
+//            rowOfChange = rows;
+//            valueOfChange = localData;
+//        }
+//        ImGui::NewLine();
+//    }
+//	ImGui::PopItemWidth();
+//
+//	if (valueChanged)
+//	{
+//		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
+//		okynko1 > fce_set_transleate_x(okynko1)
+//	}
+//
+//	ImGui::Spring(0); /* \todo JH what is Spring? */
+//
+//}
+//
+//void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
+//{
+//    builder.Middle();
+//    ImGui::Text(this->m_label.c_str());
+//    ImGui::Spring(0);
+//}
 
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)

@@ -481,6 +481,21 @@ ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
+ValueSetResult Translation::setValueX(float val)
+{
+    return setValue(val, glm::ivec2(3, 0));
+}
+
+ValueSetResult Translation::setValueY(float val)
+{
+    return setValue(val, glm::ivec2(3, 1));
+}
+
+ValueSetResult Translation::setValueZ(float val)
+{
+    return setValue(val, glm::ivec2(3, 2));
+}
+
 void Translation::reset()
 {
 	setDataMap(m_initialMap);

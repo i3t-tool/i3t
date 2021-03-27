@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrix4x4Args
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Matrix4x4 header";
     std::string nodeLabel = "Free";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();

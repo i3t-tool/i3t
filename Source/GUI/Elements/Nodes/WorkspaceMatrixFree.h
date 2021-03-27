@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixFreeArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixScale header";
     std::string nodeLabel = "Scale";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();

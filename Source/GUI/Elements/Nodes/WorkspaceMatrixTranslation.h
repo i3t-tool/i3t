@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixTranslationArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Translation header";
     std::string nodeLabel = "Translation";
     Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Translation>();

@@ -72,7 +72,7 @@ public:
 	const ne::NodeId m_id;
 	std::string m_state; /*! \brief e.g. selected \todo what is it for? */
 	std::string m_label;
-	WorkspaceViewScale m_levelOfDetail;
+	WorkspaceLevelOfDetail m_levelOfDetail;
 
 	ImColor m_color; /*! \brief Color of Node */
 	ImVec2 m_size;   /*! \brief Size of box */

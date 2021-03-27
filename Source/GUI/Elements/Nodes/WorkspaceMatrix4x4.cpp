@@ -1,7 +1,7 @@
 #include "WorkspaceMatrix4x4.h"
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMatrix4x4Args const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
@@ -25,7 +25,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(default_width*scale);
+	//ImGui::PushItemWidth(default_width*scale);
 	/* Drawing is row-wise */
 	for (int rows = 0; rows < 4; rows++)
 	{

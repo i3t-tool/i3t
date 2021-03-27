@@ -1,7 +1,7 @@
 #include "WorkspaceVectorFree.h"
 
 WorkspaceVectorFree::WorkspaceVectorFree(ImTextureID headerBackground, WorkspaceVectorFreeArgs const& args)
-    : WorkspaceVector4(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceVector4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
 WorkspaceVectorFree::WorkspaceVectorFree(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)

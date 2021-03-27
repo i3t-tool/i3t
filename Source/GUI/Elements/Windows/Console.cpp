@@ -54,7 +54,8 @@ void Console::render()
 
 		ConsoleCommand::dispatch(command);
 
-		strcpy_s(command, "");
+        strcpy(command, "");
+		//strcpy_s(command, "");
 
 		reclaimFocus = true;
 	}
@@ -90,7 +91,7 @@ void Console::onDownKey()
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected++;
 		if (selected < 0) { selected = 0; }
-		else if (selected >= commands.size()) { 
+		else if (selected >= commands.size()) {
 			selected = commands.size() - 1;
 			command[0] = '\0';
 		}

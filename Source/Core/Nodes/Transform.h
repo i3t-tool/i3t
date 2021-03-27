@@ -135,6 +135,10 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] ValueSetResult setValueX(float val);
+    [[nodiscard]] ValueSetResult setValueY(float val);
+    [[nodiscard]] ValueSetResult setValueZ(float val);
+
 	void reset() override;
 	void updateValues(int inputIndex) override;
 };

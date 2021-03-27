@@ -13,7 +13,7 @@ typedef std::vector<Ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
 
 struct WorkspaceNodeWithCoreDataArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default WorkspaceNode header";
     std::string nodeLabel = "Node";
 

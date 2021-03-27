@@ -4,7 +4,7 @@
 
 /* configurable options */
 /* select your host type (or do it in the Makefile):*/
- // #define  UNIX_HOST
+#define  UNIX_HOST
  // #define  WIN32  //(predefined on MSVC)
  
 

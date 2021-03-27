@@ -3,7 +3,7 @@
 
 struct WorkspaceNormalizeVectorArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default NormalizeVector header";
     std::string nodeLabel = "default NormalizeVector label";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::NormalizeVector>();

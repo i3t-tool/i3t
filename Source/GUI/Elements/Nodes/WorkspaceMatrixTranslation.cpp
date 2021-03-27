@@ -1,7 +1,7 @@
 #include "WorkspaceMatrixTranslation.h"
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {}
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
@@ -10,15 +10,15 @@ WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackgro
 
 void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
 {
-    switch(m_viewScale)
+    switch(m_levelOfDetail)
     {
-    case WorkspaceViewScale::Full:
+    case WorkspaceLevelOfDetail::Full:
         drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
         break;
-    case WorkspaceViewScale::SetValues:
+    case WorkspaceLevelOfDetail::SetValues:
         drawDataSetValues(builder);
         break;
-    case WorkspaceViewScale::Label:
+    case WorkspaceLevelOfDetail::Label:
         drawDataLabel(builder);
         break;
 
@@ -61,7 +61,7 @@ void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
 	if (valueChanged)
 	{
 		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-		okynko1 > fce_set_transleate_x(okynko1)
+//		okynko1 > fce_set_transleate_x(okynko1)
 	}
 
 	ImGui::Spring(0); /* \todo JH what is Spring? */
