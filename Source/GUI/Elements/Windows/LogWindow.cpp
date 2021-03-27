@@ -6,7 +6,7 @@
 
 void LogWindow::render()
 {
-	ImGui::Begin("Log View", getShowPtr());
+	ImGui::Begin(getName("Log View").c_str(), getShowPtr());
 
 	ImGui::Text("Log output");
 

@@ -24,7 +24,7 @@ Console::~Console()
 
 void Console::render()
 {
-	ImGui::Begin("Console", getShowPtr());
+	ImGui::Begin(getName("Console").c_str(), getShowPtr());
 
 	// Reserve enough left-over height for 1 separator + 1 input text
 	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
@@ -81,8 +81,6 @@ void Console::onUpKey()
 
 		printf("up   %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 	}
-	
-	render();
 }
 
 void Console::onDownKey()
@@ -104,6 +102,4 @@ void Console::onDownKey()
 
 		printf("down %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 	}
-	
-	render();
 }
