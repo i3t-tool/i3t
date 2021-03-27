@@ -16,8 +16,8 @@
 class Select
 {
 public:
-  static Component* stencilRef[256];
-  static int registerStencil(Component* owner);
-  static bool freeStencil(Component* owner);
+  static bool stencilRef[256];
+  static int registerStencil();
+  static bool freeStencil(char stencil);
   static unsigned char getStencilAt(int x, int y, int r, int filter);
 };

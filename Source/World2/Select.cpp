@@ -2,25 +2,23 @@
 #include "Core/Input/InputManager.h"
 #include "Component.h"
 #include "World2.h"
-Component* Select::stencilRef[256] = {NULL};
+bool Select::stencilRef[256] = {false};
 
-int Select::registerStencil(Component* owner){
+int Select::registerStencil(){
     for (int i = 1; i < 255; i++){
-        if (Select::stencilRef[i] == NULL){
+        if (!Select::stencilRef[i]){
             //printf("reg stencil %d\n", i);
-            Select::stencilRef[i] = owner;
+            Select::stencilRef[i] = true;
             return i;
         }
     }
     return -1;
 }
-bool Select::freeStencil(Component* owner){
-    for (int i = 1; i < 255; i++){
-        if (Select::stencilRef[i] == owner){
-            //printf("free stencil %d\n", i);
-            Select::stencilRef[i] = NULL;
-            return true;
-        }
+bool Select::freeStencil(char stencil){
+    if (Select::stencilRef[stencil]){
+        //printf("free stencil %d\n", i);
+        Select::stencilRef[stencil] = false;
+        return true;
     }
     return false;
 }

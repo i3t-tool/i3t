@@ -39,7 +39,7 @@ bool World2::init(){
     World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
         getchar();printf("World2::init():cannot load shaders\n");return false;
-    }
+    }//World2::shaderHandle=World2::shader0;
 
     World2::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
     World2::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
@@ -76,7 +76,7 @@ World2* World2::loadDefaultScene(){
     testparent =  new GameObject(three_axisMesh,  &World2::shader0, World2::axisTexture);          testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
     camera =      new GameObject();
     scene =       new GameObject(gridMesh,        &World2::shader0, 0);                            scene->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    handles =     new GameObject();
+    handles =     new GameObject(three_axisMesh,  &World2::shader0, World2::axisTexture);
 
     camera->transform(         glm::vec3(0.0f, 7.0f, 10.0f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
     camhandles->transform(     glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
@@ -113,7 +113,7 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
 void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
-    printf("handlesSetMatrix\n");
+    printf("handlesSetMatrix 0x%p\n",matnode);
     for(int i=0;i<this->sceneHandles->components.size();i++){this->sceneHandles->components[i]->isActive=false;}
     if(matnode==NULL){
 
@@ -134,16 +134,17 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
     if(strcmp("Scale",keyword)==0){
         printf("Scale %f %f %f\n",mat[0][0], mat[1][1], mat[2][2]);
         ScaleHandles* handles = (ScaleHandles*)this->sceneHandles->getComponent(ScaleHandles::componentType());
-        if(handles==NULL){return;}
-        handles->editedobj=nodebase.get();
+        handles->m_editedobj2=nodebase.get();
+        handles->isActive=true;
     }
     else if(strcmp(keyword,"Translation")==0){
         printf("Translation %f %f %f\n", mat[3][0], mat[3][1], mat[3][2]);
         TranslationHandles*handles=(TranslationHandles*)this->sceneHandles->getComponent(TranslationHandles::componentType());
-        if(handles==NULL){return;}
-        handles->editedobj=nodebase.get();
+        handles->editedobj2=nodebase.get();
+        handles->isActive=true;
     }
-    printf("-\n");
+
+
     printf("operation %s\n",keyword);
     printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",
         mat[0][0], mat[1][0], mat[2][0], mat[3][0],

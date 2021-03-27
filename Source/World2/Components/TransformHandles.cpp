@@ -36,17 +36,17 @@ TransformHandles::TransformHandles(GameObject*_editedobj){
 	this->type=TransformHandles::typeStatic;
 		
 	this->editedobj=_editedobj;
-	this->stencilx=		Select::registerStencil(this);
-	this->stencily=		Select::registerStencil(this);
-	this->stencilz=		Select::registerStencil(this);
-	this->stencilzy=	Select::registerStencil(this);
-	this->stencilzx=	Select::registerStencil(this);
-	this->stencilyx=	Select::registerStencil(this);
-	this->stencilxyz=	Select::registerStencil(this);
-	this->stencilaxisx=	Select::registerStencil(this);
-	this->stencilaxisy=	Select::registerStencil(this);
-	this->stencilaxisz=	Select::registerStencil(this);
-	this->stencilaxisw=	Select::registerStencil(this);
+	this->stencilx=		Select::registerStencil();
+	this->stencily=		Select::registerStencil();
+	this->stencilz=		Select::registerStencil();
+	this->stencilzy=	Select::registerStencil();
+	this->stencilzx=	Select::registerStencil();
+	this->stencilyx=	Select::registerStencil();
+	this->stencilxyz=	Select::registerStencil();
+	this->stencilaxisx=	Select::registerStencil();
+	this->stencilaxisy=	Select::registerStencil();
+	this->stencilaxisz=	Select::registerStencil();
+	this->stencilaxisw=	Select::registerStencil();
 }
 void TransformHandles::start(){
 	this->circleh =	new GameObject(unitcircleMesh,	&World2::shaderHandle, 0);
@@ -351,7 +351,7 @@ void TransformHandles::update(){
 		if(this->axisnum2!=-1){
 			glm::vec2 spos22=world2screen((glm::vec3)(this->handlespace[3]+this->handlespace*axes[this->axisnum2]));//project two points on screen - project axis on screen
 			glm::vec2 dir2=spos22-spos1;//the axis in screen space
-			if(glm::length(dir2)<0.01){dir2[0]=1.0f;}//axis length must not be zero
+			if(glm::length(dir2)<0.01){dir2[1]=1.0f;}//axis length must not be zero
 			mov[1]=dir2;
 		}
 

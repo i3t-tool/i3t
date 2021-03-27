@@ -14,7 +14,7 @@ Renderer::Renderer(unsigned int flags){
     this->drawLines = (flags & Renderer::DRAW_LINES) != 0;
     this->stencil = 0;
 
-    if (this->useStencil){this->stencil = Select::registerStencil((Component*)this);}
+    if (this->useStencil){this->stencil = Select::registerStencil();}
     // printf("is transparent %d, mask %d\n",this->isTransparent,);
 }
 

@@ -25,7 +25,7 @@ public:
   unsigned char stencil = 0;
   static const unsigned int IS_TRANSPARENT = 1 << 0, USE_STENCIL = 1 << 1, DRAW_LINES = 1 << 2;
   // static Component*stencilRef[256];
-  // static int registerStencil(Component*req);
+  // static int registerStencil();
 private:
   static const char* typeStatic;
 };

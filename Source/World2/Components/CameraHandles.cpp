@@ -13,8 +13,8 @@ CameraHandles::CameraHandles(){
 	CameraHandles::typeStatic=typeid(CameraHandles).name();
 	this->type=CameraHandles::typeStatic;
 		
-	this->editedcam=Select::registerStencil(this);
-	for(int i=0;i<6;i++){this->stencils.arr[i]=Select::registerStencil(this);}
+	this->editedcam=Select::registerStencil();
+	for(int i=0;i<6;i++){this->stencils.arr[i]=Select::registerStencil();}
 
 	this->hposs[0]=glm::vec4(0.0f,0.0f,1.0f,1.0f);
 	this->hposs[1]=glm::vec4(0.0f,0.0f,-1.0f,1.0f);
