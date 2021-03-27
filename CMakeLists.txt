@@ -28,7 +28,7 @@ include_directories(Dependencies/imgui_node_editor)
 include_directories(Dependencies/imgui_node_editor/external/imgui)
 include_directories(Dependencies/imgui_markdown)
 include_directories(Dependencies/pgr-framework/include)
-# temporary comment-out === include_directories(Dependencies/picoc)
+include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
@@ -98,7 +98,7 @@ set(CONFIGURATION_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS False CACHE BOOL "Assimp should not build build tests.")
 
-set(YAML_BUILD_SHARED_LIBS Off)
+set(YAML_BUILD_SHARED_LIBS FALSE)
 
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_3DS_IMPORTER ON)
@@ -106,6 +106,9 @@ set(ASSIMP_BUILD_COLLADA_IMPORTER ON)
 set(ASSIMP_BUILD_FBX_IMPORTER ON)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(ASSIMP_BUILD_PLY_IMPORTER ON)
+
+# Assimp tools requires multiple format support.
+set(ASSIMP_BUILD_ASSIMP_TOOLS CACHE INTERNAL FALSE)
 
 set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_FBX_EXPORTER ON)

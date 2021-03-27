@@ -84,22 +84,31 @@ protected:
 	                           ///< only)
 	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
-public:
+protected:
 	NodeBase() = default;
 
-	NodeBase(const Operation* operation)
+  NodeBase(const Operation* operation)
 			: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
 	{
 	}
 
+public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
+
+	template <typename T>
+	Ptr<T> as()
+  {
+		static_assert(std::is_base_of_v<NodeBase, T>, "T must be derived from NodeBase class.");
+		return std::dynamic_pointer_cast<T>(shared_from_this());
+	}
 
 	void create();
 
 	[[nodiscard]] ID getId() const;
 
 	Ptr<NodeBase> getPtr() { return shared_from_this(); }
+
 	const Operation* const getOperation() { return m_operation; }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
@@ -236,7 +245,7 @@ public:
 	 *
 	 * \param	inputIndex Index of the modified input.
 	 */
-	virtual void updateValues(int inputIndex) = 0;
+	virtual void updateValues(int inputIndex) {}
 
 	/// Spread signal to all outputs.
 	/// \todo Does not use operators for calling each follower just once
