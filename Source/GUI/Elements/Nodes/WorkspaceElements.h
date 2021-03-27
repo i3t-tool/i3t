@@ -39,16 +39,15 @@ class WorkspaceLinkProperties;
 class WorkspacePinProperties;
 
 /*! \enum PinKind
-    \brief kinds (in/out) of Pin \todo maybe unused - this info is in Core
+    \brief kinds (in/out) of Workspace Pin
  */
-
 enum class PinKind
 {
 	Output,
 	Input
 };
 
-enum class WorkspaceViewScale
+enum class WorkspaceLevelOfDetail
 {
     Full,
     SetValues,
@@ -61,7 +60,7 @@ extern std::map<EValueType, IconType> WorkspacePinShape;
 /* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
 struct WorkspaceNodeArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default WorkspaceNode header";
     std::string nodeLabel = "Node";
     /* \todo JH it will be nice, if we are able give some default headerBackground here ... */
@@ -73,7 +72,7 @@ public:
 	const ne::NodeId m_id;
 	std::string m_state; /*! \brief e.g. selected \todo what is it for? */
 	std::string m_label;
-	WorkspaceViewScale m_viewScale;
+	WorkspaceViewScale m_levelOfDetail;
 
 	ImColor m_color; /*! \brief Color of Node */
 	ImVec2 m_size;   /*! \brief Size of box */

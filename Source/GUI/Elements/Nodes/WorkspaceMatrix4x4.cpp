@@ -25,7 +25,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(100.0f);
+	ImGui::PushItemWidth(default_width*scale);
 	/* Drawing is row-wise */
 	for (int rows = 0; rows < 4; rows++)
 	{

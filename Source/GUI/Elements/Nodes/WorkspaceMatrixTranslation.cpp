@@ -42,9 +42,9 @@ void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
 	builder.Middle();
 
 	ImGui::PushItemWidth(100.0f);
-	/* Drawing is row-wise */
-	for (int rows = 0; rows < 3; rows++)
-	{
+    /* Drawing is row-wise */
+    for (int rows = 0; rows < 3; rows++)
+    {
         localData = coreData[columnOfChange][rows]; /* Data are column-wise */
         if (drawDragFloatWithMap_Inline(&localData,
                                         coreMap[columnOfChange*4+rows],
@@ -54,13 +54,14 @@ void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
             rowOfChange = rows;
             valueOfChange = localData;
         }
-		ImGui::NewLine();
-	}
+        ImGui::NewLine();
+    }
 	ImGui::PopItemWidth();
 
 	if (valueChanged)
 	{
 		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
+		okynko1 > fce_set_transleate_x(okynko1)
 	}
 
 	ImGui::Spring(0); /* \todo JH what is Spring? */
