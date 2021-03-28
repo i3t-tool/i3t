@@ -1,6 +1,10 @@
 #include "Dependencies/picoc/picoc.h"
 #include "Core/API.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
 #include "libraryI3T.h"
 #include "Scripting/Scripting.h"
 #include <stdio.h>
@@ -9,9 +13,8 @@ WorkspaceLayout workspaceLayout;
 
 WorkspaceLayout*getWorkspaceLayout(){return &workspaceLayout;}
 void clearWorkspaceLayout(){
-    workspaceLayout.mat4Nodes.clear();
-    workspaceLayout.normVec4Nodes.clear();
-    workspaceLayout.nodePlugs.clear();
+    workspaceLayout.nodeData.clear();
+    workspaceLayout.startlen=0;
 }
 
 void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
@@ -25,9 +28,25 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
     int map=workspaceLayout.mat4Types.free;
     if (type > -1 && type < 7) { map = type; }
 
-    NodeMat4 nm = NodeMat4(map,mat, x, y);
-    workspaceLayout.mat4Nodes.push_back(nm);
-    ReturnValue->Val->Integer = (int)workspaceLayout.mat4Nodes.size() - 1;
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace=&(ww->m_workspaceCoreNodes);
+    
+	if(type== workspaceLayout.mat4Types.free){
+		_workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "load free"));
+		ValueSetResult result =(_workspace->back().get())->m_nodebase.get()->setValue(mat);
+		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
+	}
+	else if (type == workspaceLayout.mat4Types.scale) {
+		_workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "load scale"));
+		ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)mat[0]);
+		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
+	}
+	else if (type == workspaceLayout.mat4Types.translate) {
+		_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, "load translation"));
+		ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)mat[0]);
+		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
+	}
+    ReturnValue->Val->Integer = (int)_workspace->size() - 1;
 }
 void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int dataindex = Param[0]->Val->Integer;
@@ -37,20 +56,34 @@ void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value
     glm::vec4 vec = glm::vec4(1.0f);
     if (dataindex > -1 && dataindex < workspaceLayout.nodeData.size()) { vec = workspaceLayout.nodeData[dataindex][0]; }
 
-    NodeNormVec4 nm = NodeNormVec4(vec, x, y);
-    workspaceLayout.normVec4Nodes.push_back(nm);
-    ReturnValue->Val->Integer = (int)workspaceLayout.normVec4Nodes.size() - 1;
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace = &(ww->m_workspaceCoreNodes);
+    ReturnValue->Val->Integer = (int)_workspace->size() - 1;
+
+    _workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "load NormalizeVector"));
+    ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue(vec);
+    ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
+
+    ReturnValue->Val->Integer = (int)_workspace->size() - 1;
 }
 void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
-    int indexa=Param[0]->Val->Integer;
-    int indexb=Param[1]->Val->Integer;
-    int outputindex= Param[2]->Val->Integer;
+    int indexa=Param[0]->Val->Integer+workspaceLayout.startlen;
+    int indexb=Param[1]->Val->Integer+workspaceLayout.startlen;
+    int outputindex=Param[2]->Val->Integer;
     int inputindex= Param[3]->Val->Integer;
-    if(indexa>=workspaceLayout.mat4Nodes.size()||indexa < 0){ReturnValue->Val->Integer=FALSE;return;}
-    if(indexb>=workspaceLayout.mat4Nodes.size()||indexb < 0){ReturnValue->Val->Integer=FALSE;return;}
 
-    workspaceLayout.nodePlugs.push_back(NodePlug(indexa,indexb,outputindex,inputindex));
-    ReturnValue->Val->Integer=TRUE;
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace = &(ww->m_workspaceCoreNodes);
+    int startlen=workspaceLayout.startlen;
+
+    if(indexa<0||indexa>=_workspace->size()-1){ReturnValue->Val->Integer =0;return;}
+    if(indexb<0||indexb>=_workspace->size()-1){ReturnValue->Val->Integer =0;return;}
+
+	Ptr<Core::NodeBase> pca= (_workspace->at(indexa).get())->m_nodebase;
+	Ptr<Core::NodeBase> pcb= (_workspace->at(indexb).get())->m_nodebase;
+
+	ENodePlugResult p = Core::GraphManager::plug(pca,pcb, outputindex, inputindex);
+    ReturnValue->Val->Integer =(int)p==0;
 }
 void dataMat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     glm::mat4 m;
@@ -60,13 +93,13 @@ void dataMat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value
 }
 void dataVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     glm::mat4 m=glm::mat4(1.0f);
-    m[0][0]=(float)Param[0]->Val->FP;m[1][1]= (float)Param[1]->Val->FP;m[2][2]=(float)Param[2]->Val->FP; m[3][3] = (float)Param[3]->Val->FP;
+    m[0][0]=(float)Param[0]->Val->FP;m[0][1]= (float)Param[1]->Val->FP;m[0][2]=(float)Param[2]->Val->FP; m[0][3] = (float)Param[3]->Val->FP;
     workspaceLayout.nodeData.push_back(m);
     ReturnValue->Val->Integer = (int)workspaceLayout.nodeData.size() - 1;
 }
 void dataVec3(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     glm::mat4 m = glm::mat4(1.0f);
-    m[0][0] = (float)Param[0]->Val->FP; m[1][1] = (float)Param[1]->Val->FP; m[2][2] = (float)Param[2]->Val->FP;
+    m[0][0] = (float)Param[0]->Val->FP; m[0][1] = (float)Param[1]->Val->FP; m[0][2] = (float)Param[2]->Val->FP;
     workspaceLayout.nodeData.push_back(m);
     ReturnValue->Val->Integer = (int)workspaceLayout.nodeData.size() - 1;
 }

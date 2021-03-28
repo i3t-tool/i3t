@@ -7,13 +7,27 @@ glm::vec2 world2screen(glm::vec3 pos){
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 
-	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos[0], pos[1], pos[2], 1.0f);
+	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
 	glm::vec2 spos1 = glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],(pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 	return spos1;
 }
+glm::vec2 vecWorld2screen(glm::vec3 pos,glm::vec3 dir){
+	float viewport[4];
+	glGetFloatv(GL_VIEWPORT, viewport);
+
+	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos, 1.0f);
+	pos1 /= pos1[3];
+	glm::vec2 spos1 = glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],(pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
+
+	glm::vec4 pos2 = World2::perspective * World2::mainCamera * glm::vec4(pos+dir,1.0f);
+	pos2 /= pos2[3];
+	glm::vec2 spos2 = glm::vec2((pos2[0] + 1.0f) * 0.5f * viewport[2] + viewport[0], (pos2[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
+
+	return spos2-spos1;
+}
 glm::vec3 world2viewport(glm::vec3 pos){
-	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos[0], pos[1], pos[2], 1.0f);
+	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
 	return (glm::vec3)pos1;
 }

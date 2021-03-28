@@ -30,9 +30,7 @@ ScaleHandles::ScaleHandles() {
 	m_stencilzx =ManipulatorUtil::getStencil(4);
 	m_stencilyx =ManipulatorUtil::getStencil(5);
 	m_stencilxyz=ManipulatorUtil::getStencil(6);
-}
 
-void ScaleHandles::start() {
 	m_planeh =	new GameObject(quadMesh,		&World2::shaderHandle,	0);
 	m_scaleh =	new GameObject(scalearrowMesh,	&World2::shaderHandle,	0);
 	m_uniscaleh=new GameObject(unitcubeMesh,	&World2::shaderHandle,	0);
@@ -40,7 +38,6 @@ void ScaleHandles::start() {
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_editedobj=new GameObject();
-	m_bkp=m_editedobj->transformation;
 }
 
 void ScaleHandles::render(glm::mat4* parent, bool renderTransparent) {
@@ -114,51 +111,39 @@ void ScaleHandles::update() {
 
 	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 
-	m_handlespace=getNormalized(getFullTransform(m_editedobj->parent)*m_bkp);//TMP
+	m_handlespace=getNormalized(getFullTransform(m_editedobj->parent)/**m_bkp*/);//TMP
 	//m_handlespace=glm::mat4(1.0f);
 
-	if(m_activehandle==-1){return;}
+	if(m_activehandle==-1){/*m_bkp=m_editedobj->transformation;*/return;}
 
-	glm::vec3 drag3=glm::vec3(0.0f);
+	///
 	glm::mat4 axes=glm::mat4(1.0f);axes[3]=glm::vec4(1.0f,1.0f,1.0f,0.0f);
-	glm::vec2 spos1=world2screen((glm::vec3)(m_handlespace[3]));//position of transformated object on the screen
-	glm::vec2 spos2=world2screen((glm::vec3)(m_handlespace[3]+m_handlespace*axes[m_axisnum]));//spos1,spos2 - project two points on screen - project axis on screen
-	glm::vec2 dir=spos2-spos1;//the axis in screen space
+	glm::mat2 mov =glm::mat2(1.0f);
+	mov[0]=vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));//the axis in screen space
 
-	if(glm::length(dir)<0.01f){dir[0]=1.0f;}//axis length must not be zero
+	if(m_axisnum2!=-1){mov[1]=vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum2]));}//the axis in screen space}
+	else{mov[1]=glm::vec2(mov[0][1],-mov[0][0]);}
 
-
-
-	glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
-
-	if(m_axisnum2!=-1){
-		glm::vec2 spos22=world2screen((glm::vec3)(m_handlespace[3]+m_handlespace*axes[m_axisnum2]));//project two points on screen - project axis on screen
-		glm::vec2 dir2=spos22-spos1;//the axis in screen space
-		if(glm::length(dir2)<0.01){dir2[1]=1.0f;}//axis length must not be zero
-		mov[1]=dir2;
-	}
+	if(glm::length(mov[0])<0.01f){mov[0][0]=1.0f;}//axis length must not be zero
+	if(glm::length(mov[1])<0.01f){mov[1][1]=1.0f;}//axis length must not be zero
 
 	mov=glm::inverse(glm::mat2(glm::normalize(mov[0]),glm::normalize(mov[1])));
-			
 		
-	glm::vec2 drag,olddrag,dragfinal,mouse;
+	glm::vec2 drag2=mov*glm::vec2(InputManager::m_mouseXDelta,-InputManager::m_mouseYDelta);
+	glm::vec3 drag3=((glm::vec3)axes[m_axisnum])*drag2[0];
+	if(m_axisnum2!=-1){drag3+=((glm::vec3)axes[m_axisnum2])*drag2[1];}
 
-	mouse = glm::vec2(InputManager::m_mouseX, World2::height - InputManager::m_mouseY);
-	drag=mov*(mouse-spos1);
-	mouse = glm::vec2(InputManager::m_mouseXPrev,World2::height - InputManager::m_mouseYPrev);
-	olddrag=mov*(mouse-spos1);
-	dragfinal=drag-olddrag;
-
-	drag3+=((glm::vec3)axes[m_axisnum])*(dragfinal[0]);
-	if(m_axisnum2!=-1){drag3+=((glm::vec3)axes[m_axisnum2])*(dragfinal[1]);}
-			
 	float depth=glm::length(World2::mainCamPos+(glm::vec3)m_handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
 	drag3*=depth*0.5f;
 	if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 
 	///
-	drag3*=0.005f;
-	glm::vec3 scal=glm::vec3(glm::length((glm::vec3)m_bkp[0]),glm::length((glm::vec3)m_bkp[1]),glm::length((glm::vec3)m_bkp[2]));
+	drag3*=0.004f;
+	glm::vec3 scal=glm::vec3(
+		glm::length((glm::vec3)m_editedobj->transformation[0]),
+		glm::length((glm::vec3)m_editedobj->transformation[1]),
+		glm::length((glm::vec3)m_editedobj->transformation[2])
+	);
 					
 	if(m_activehandle==m_stencilxyz){//if uniform scale, scale of other axes proportionate to ref axis
 		int ref=0;
@@ -178,7 +163,7 @@ void ScaleHandles::update() {
 		}
 	}
 					
-	m_editedobj->transformation[0]+=m_bkp[0]*drag3[0]/scal[0];//TMP
-	m_editedobj->transformation[1]+=m_bkp[1]*drag3[1]/scal[1];//TMP
-	m_editedobj->transformation[2]+=m_bkp[2]*drag3[2]/scal[2];//TMP
+	m_editedobj->transformation[0][0]+=drag3[0];//TMP
+	m_editedobj->transformation[1][1]+=drag3[1];//TMP
+	m_editedobj->transformation[2][2]+=drag3[2];//TMP
 }

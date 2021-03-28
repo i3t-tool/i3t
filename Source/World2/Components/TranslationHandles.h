@@ -8,13 +8,12 @@
 class TranslationHandles : public Component {
 public:
 	TranslationHandles();
-	void start();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
 	static const char* componentType() { return TranslationHandles::typeStatic; };
 	const char* getComponentType() { return TranslationHandles::typeStatic; };
 
-	Core::NodeBase *editedobj2;
+	Core::NodeBase *m_editednode;
 private:
 	static const char* typeStatic;
 

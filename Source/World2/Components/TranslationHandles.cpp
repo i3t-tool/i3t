@@ -23,9 +23,7 @@ TranslationHandles::TranslationHandles() {
 	m_stencilzy =ManipulatorUtil::getStencil(3);
 	m_stencilzx =ManipulatorUtil::getStencil(4);
 	m_stencilyx =ManipulatorUtil::getStencil(5);
-}
 
-void TranslationHandles::start(){
 	m_planeh =	new GameObject(quadMesh,		&World2::shaderHandle,	0);
 	m_arrowh =	new GameObject(arrowMesh,		&World2::shaderHandle,	0);
 	m_threeaxis=new GameObject(three_axisMesh,	&World2::shader0,		World2::axisTexture);		
@@ -34,7 +32,6 @@ void TranslationHandles::start(){
 	m_editedobj=new GameObject();
 	m_bkp=m_editedobj->transformation;
 }
-
 void TranslationHandles::render(glm::mat4* parent, bool renderTransparent) {
 	if(!renderTransparent){return;}
 
@@ -106,43 +103,26 @@ void TranslationHandles::update() {
 
 	if(m_activehandle==-1){return;}
 
-	glm::vec3 drag3=glm::vec3(0.0f);
+	///
 	glm::mat4 axes=glm::mat4(1.0f);axes[3]=glm::vec4(1.0f,1.0f,1.0f,0.0f);
-	glm::vec2 spos1=world2screen((glm::vec3)(m_handlespace[3]));//position of transformated object on the screen
-	glm::vec2 spos2=world2screen((glm::vec3)(m_handlespace[3]+m_handlespace*axes[m_axisnum]));//spos1,spos2 - project two points on screen - project axis on screen
-	glm::vec2 dir=spos2-spos1;//the axis in screen space
+	glm::mat2 mov =glm::mat2(1.0f);
+	mov[0]=vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));//the axis in screen space
 
-	if(glm::length(dir)<0.01f){dir[0]=1.0f;}//axis length must not be zero
+	if(m_axisnum2!=-1){mov[1]=vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum2]));}//the axis in screen space}
+	else{mov[1]=glm::vec2(mov[0][1],-mov[0][0]);}
 
-
-
-	glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
-
-	if(m_axisnum2!=-1){
-		glm::vec2 spos22=world2screen((glm::vec3)(m_handlespace[3]+m_handlespace*axes[m_axisnum2]));//project two points on screen - project axis on screen
-		glm::vec2 dir2=spos22-spos1;//the axis in screen space
-		if(glm::length(dir2)<0.01){dir2[1]=1.0f;}//axis length must not be zero
-		mov[1]=dir2;
-	}
+	if(glm::length(mov[0])<0.01f){mov[0][0]=1.0f;}//axis length must not be zero
+	if(glm::length(mov[1])<0.01f){mov[1][1]=1.0f;}//axis length must not be zero
 
 	mov=glm::inverse(glm::mat2(glm::normalize(mov[0]),glm::normalize(mov[1])));
-			
 		
-	glm::vec2 drag,olddrag,dragfinal,mouse;
+	glm::vec2 drag2=mov*glm::vec2(InputManager::m_mouseXDelta,-InputManager::m_mouseYDelta);
+	glm::vec3 drag3=((glm::vec3)axes[m_axisnum])*drag2[0];
+	if(m_axisnum2!=-1){drag3+=((glm::vec3)axes[m_axisnum2])*drag2[1];}
 
-	mouse = glm::vec2(InputManager::m_mouseX, World2::height - InputManager::m_mouseY);
-	drag=mov*(mouse-spos1);
-	mouse = glm::vec2(InputManager::m_mouseXPrev,World2::height - InputManager::m_mouseYPrev);
-	olddrag=mov*(mouse-spos1);
-	dragfinal=drag-olddrag;
-
-	drag3+=((glm::vec3)axes[m_axisnum])*(dragfinal[0]);
-	if(m_axisnum2!=-1){drag3+=((glm::vec3)axes[m_axisnum2])*(dragfinal[1]);}
-			
 	float depth=glm::length(World2::mainCamPos+(glm::vec3)m_handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
 	drag3*=depth*0.5f;
 	if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
-
 
 	///
 	if(m_axisnum2!=-1){

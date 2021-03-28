@@ -83,44 +83,10 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	return true;
 }
 bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
+	WorkspaceLayout* scene = getWorkspaceLayout();
+	scene->startlen = (int)_workspace->size();
+
 	int p=PicocRunFile(filename);
-	WorkspaceLayout*scene=getWorkspaceLayout();
-	int startlen=(int)_workspace->size();
-	for (int i = 0; i < scene->mat4Nodes.size();i++) {
-		NodeMat4 node=scene->mat4Nodes[i];
-		if(node.type==scene->mat4Types.free){
-			_workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "load free"));
-			ValueSetResult result =(_workspace->back().get())->m_nodebase.get()->setValue(node.data);
-			ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
-		}
-		else if (node.type == scene->mat4Types.scale) {
-			_workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "load scale"));
-			ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)node.data[0]);
-			ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
-		}
-		else if (node.type == scene->mat4Types.translate) {
-			_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, "load translation"));
-			ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)node.data[0]);
-			ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
-		}
-	}
-	for (int i = 0; i < scene->normVec4Nodes.size(); i++) {
-		NodeNormVec4 node=scene->normVec4Nodes[i];
-		_workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "load NormalizeVector"));
-		ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue(node.data);
-		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
-	}
-	for (int i = 0; i < scene->nodePlugs.size(); i++) {
-		int indexA=scene->nodePlugs[i].indexA+startlen;
-		int indexB=scene->nodePlugs[i].indexB+startlen;
-		Ptr<Core::NodeBase> pca= (_workspace->at(indexA).get())->m_nodebase;
-		Ptr<Core::NodeBase> pcb= (_workspace->at(indexB).get())->m_nodebase;
-
-
-		ENodePlugResult p = Core::GraphManager::plug(pca,pcb, scene->nodePlugs[i].indexPinA, scene->nodePlugs[i].indexPinB);
-		// (_workspace->at(indexB).get())->WorkspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(getLinkID())); /* JH dont know what this does, but WorkspaceLinkProperties all exist since Node is created - just change values in it  */
-
-	}
 
 	clearWorkspaceLayout();
 	return true;

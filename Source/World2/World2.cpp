@@ -134,13 +134,13 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
     if(strcmp("Scale",keyword)==0){
         printf("Scale %f %f %f\n",mat[0][0], mat[1][1], mat[2][2]);
         ScaleHandles* handles = (ScaleHandles*)this->sceneHandles->getComponent(ScaleHandles::componentType());
-        handles->m_editedobj2=nodebase.get();
+        handles->m_editednode=nodebase.get();
         handles->isActive=true;
     }
     else if(strcmp(keyword,"Translation")==0){
         printf("Translation %f %f %f\n", mat[3][0], mat[3][1], mat[3][2]);
         TranslationHandles*handles=(TranslationHandles*)this->sceneHandles->getComponent(TranslationHandles::componentType());
-        handles->editedobj2=nodebase.get();
+        handles->m_editednode=nodebase.get();
         handles->isActive=true;
     }
 
