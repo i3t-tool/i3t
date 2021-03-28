@@ -15,5 +15,12 @@ public:
 	WorkspaceMatrixScale(ImTextureID headerBackground, WorkspaceMatrixScaleArgs const& args);
     WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel = "Scale", std::string nodeLabel = "Scale");
 
-	void drawData(util::NodeBuilder& builder);
+	void drawDataSetValues(util::NodeBuilder& builder);
+
+	ValueSetResult setValueX(float val);
+    ValueSetResult setValueY(float val);
+    ValueSetResult setValueZ(float val);
+    float getValueX();
+    float getValueY();
+    float getValueZ();
 };

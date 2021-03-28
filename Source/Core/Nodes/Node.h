@@ -21,6 +21,7 @@ enum class ENodePlugResult
 {
 	Ok = 0,
 	Err_MismatchedPinTypes,
+	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
 	Err_Loopback,
 	Err_NonexistentPin,
 	Err_Loop,

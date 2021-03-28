@@ -96,6 +96,7 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+    bool showlabel = false;
 	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
             elem.first != m_nodebase->getInputPins().end()  && elem.second != m_workspaceInputsProperties.end();
             ++elem.first, ++elem.second)
@@ -115,7 +116,8 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
                             ImColor(32.0, 32.0, 32.0, alpha)); /* \todo JH not constant here... */
 
 		ImGui::Spring(0);
-		if (!elem.second->get()->m_name.empty())
+        /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
+		if (showlabel && !elem.second->get()->m_name.empty())
 		{
 			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
 			ImGui::Spring(0);
@@ -129,6 +131,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+    bool showlabel = false;
 	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getOutputPins().begin(), m_workspaceOutputsProperties.begin());
 	     elem.first != m_nodebase->getOutputPins().end() && elem.second != m_workspaceOutputsProperties.end();
 	     ++elem.first, ++elem.second)
@@ -140,7 +143,8 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 		builder.Output(elem.first->getId());
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		if (!elem.second->get()->m_name.empty())
+        /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
+		if (showlabel && !elem.second->get()->m_name.empty())
 		{
 			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
 			ImGui::Spring(0);
@@ -194,51 +198,70 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 }
 
 
-//void WorkspaceNodeWithCoreData::drawDataSetValues(util::NodeBuilder& builder)
-//{
-//    const glm::mat4& coreData = m_nodebase->getData().getMat4();
-//	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
-//	int const idOfNode = this->m_id.Get();
-//
-//	bool valueChanged = false;
-//	int rowOfChange, columnOfChange = 3;
-//	float valueOfChange, localData; /* user can change just one value at the moment */
-//
-//	builder.Middle();
-//
-//	ImGui::PushItemWidth(100.0f);
-//    /* Drawing is row-wise */
-//    for (int rows = 0; rows < 3; rows++)
-//    {
-//        localData = coreData[columnOfChange][rows]; /* Data are column-wise */
-//        if (drawDragFloatWithMap_Inline(&localData,
-//                                        coreMap[columnOfChange*4+rows],
-//                                        fmt::format("##{}:r{}c{}", idOfNode, rows, columnOfChange)))
-//        {
-//            valueChanged = true;
-//            rowOfChange = rows;
-//            valueOfChange = localData;
-//        }
-//        ImGui::NewLine();
-//    }
-//	ImGui::PopItemWidth();
-//
-//	if (valueChanged)
-//	{
-//		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-//		okynko1 > fce_set_transleate_x(okynko1)
-//	}
-//
-//	ImGui::Spring(0); /* \todo JH what is Spring? */
-//
-//}
-//
-//void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
-//{
-//    builder.Middle();
-//    ImGui::Text(this->m_label.c_str());
-//    ImGui::Spring(0);
-//}
+void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
+{
+    builder.Middle();
+
+    switch(m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Full:
+        drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+        break;
+    case WorkspaceLevelOfDetail::SetValues:
+        drawDataSetValues(builder);
+        break;
+    case WorkspaceLevelOfDetail::Label:
+        drawDataLabel(builder);
+        break;
+
+    default:
+        /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
+        drawDataFull(builder);
+    }
+
+}
+
+void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters)
+{
+    /* \todo JH assert different length of vectors in argument */
+    int number_of_values = labels.size();
+    int const idOfNode = this->m_id.Get();
+
+    bool valueChanged = false;
+    int index_of_change;
+    float valueOfChange, localData; /* user can change just one value at the moment */
+
+    ImGui::PushItemWidth(100.0f);
+    for (int i = 0; i < number_of_values; i++)
+    {
+        ImGui::Text(labels[i].c_str() );
+        localData = getters[i]();
+        if (drawDragFloatWithMap_Inline(&localData,
+                                        1, /* \todo JH will be always changeable? */
+                                        fmt::format("##{}:ch{}", idOfNode, i)))
+        {
+            valueChanged = true;
+            index_of_change = i;
+            valueOfChange = localData;
+        }
+
+    }
+    ImGui::PopItemWidth();
+
+    if (valueChanged)
+	{
+		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value*/
+	}
+
+    ImGui::Spring(0); /* \todo JH what is Spring? */
+
+}
+
+void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
+{
+    ImGui::Text(this->m_label.c_str());
+    ImGui::Spring(0);
+}
 
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)

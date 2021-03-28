@@ -8,7 +8,7 @@ WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground,
     : WorkspaceVector4(headerBackground, Builder::createNode<ENodeType::NormalizeVector>(), headerLabel, nodeLabel)
 {}
 
-void WorkspaceNormalizeVector::drawData(util::NodeBuilder& builder)
+void WorkspaceNormalizeVector::drawDataSetValues(util::NodeBuilder& builder)
 {
-	drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+    drawDataFull(builder);
 }

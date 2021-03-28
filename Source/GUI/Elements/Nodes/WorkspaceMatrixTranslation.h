@@ -15,9 +15,13 @@ public:
 	WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args);
     WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel = "Translation", std::string nodeLabel = "Translation");
 
-	void drawData(util::NodeBuilder& builder);
-
 	void drawDataSetValues(util::NodeBuilder& builder);
-	void drawDataLabel(util::NodeBuilder& builder);
+
+	ValueSetResult setValueX(float val);
+    ValueSetResult setValueY(float val);
+    ValueSetResult setValueZ(float val);
+    float getValueX();
+    float getValueY();
+    float getValueZ();
 
 };

@@ -8,8 +8,8 @@ WorkspaceVectorFree::WorkspaceVectorFree(ImTextureID headerBackground, std::stri
     : WorkspaceVector4(headerBackground, Builder::createNode<ENodeType::Vector4>(), headerLabel, nodeLabel)
 {}
 
-void WorkspaceVectorFree::drawData(util::NodeBuilder& builder)
+void WorkspaceVectorFree::drawDataSetValues(util::NodeBuilder& builder)
 {
-	drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+    drawDataFull(builder);
 }
 

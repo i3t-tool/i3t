@@ -15,5 +15,6 @@ public:
 	WorkspaceMatrixFree(ImTextureID headerBackground, WorkspaceMatrixFreeArgs const& args);
     WorkspaceMatrixFree(ImTextureID headerBackground, std::string headerLabel = "Free", std::string nodeLabel = "Free");
 
-	void drawData(util::NodeBuilder& builder);
+    void drawDataSetValues(util::NodeBuilder& builder);
+
 };

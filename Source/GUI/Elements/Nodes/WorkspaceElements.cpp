@@ -30,7 +30,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 
 /* \todo JH not use constant values here */
 WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel), m_levelOfDetail(WorkspaceLevelOfDetail::Full)
+    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel), m_levelOfDetail(WorkspaceLevelOfDetail::SetValues)
 {
 	/* \todo Some better default values - take from Const.h*/
 	m_state = "default WorkspaceNode state";

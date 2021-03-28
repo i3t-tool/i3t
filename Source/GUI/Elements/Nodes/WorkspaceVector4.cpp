@@ -9,11 +9,6 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeB
 {
 }
 
-void WorkspaceVector4::drawData(util::NodeBuilder& builder)
-{
-    drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
-}
-
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 {
 	const glm::vec4& coreData = m_nodebase->getData().getVec4();

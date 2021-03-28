@@ -95,7 +95,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
 
 	/*--- NORMALIZE VECTOR */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1")); 
+	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
 	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
 
 	ne::NavigateToContent();
@@ -171,6 +171,8 @@ void WorkspaceWindow::render()
         workspaceCoreNode->drawInputLinks();
     }
 
+    checkUserActions();
+
     checkQueryElements();
 
     checkQueryContextMenus();
@@ -181,8 +183,17 @@ void WorkspaceWindow::render()
 	}ne::End();
 
 	shiftSelectedNodesToFront();
+	manipulatorStartCheck3D();
 
 	ImGui::End();
+}
+
+void WorkspaceWindow::checkUserActions()
+{
+    if (ImGui::IsMouseClicked(1)) /* right button */
+    {
+        m_rightClickPosition = ImGui::GetMousePos();
+    }
 }
 
 /* \todo JH not work yet - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
@@ -373,23 +384,29 @@ void WorkspaceWindow::checkQueryLinkCreate()
         /* \todo JH comment where it is used */
         m_pinPropertiesForNewLink = startPin ? startPin : endPin;
 
-        if (startPin && endPin && (startPin->getKind() != endPin->getKind()) ) /* \todo JH check kind in Core? */
+        if ( startPin && endPin) /* \todo JH check kind in Core? */
         {
             if (startPin->getKind() == PinKind::Input)
             {
                 std::swap(startPin, endPin);
             }
 
-
-            /* \todo JH manage different result of trying to connect (probably use showPopUpLabel() ) */
-            switch (Core::GraphManager::plug(startPin->m_node.m_nodebase,
-                                             endPin->m_node.m_nodebase,
-                                             startPin->m_pin.getIndex(),
-                                             endPin->m_pin.getIndex() ))
+            switch (Core::GraphManager::isPlugCorrect(&(endPin->m_pin), &(startPin->m_pin)))
             {
                 case ENodePlugResult::Ok:
-                    showPopUpLabel("Connected", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    showPopUpLabel("Connection possible", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    if (!ImGui::GetIO().MouseDown[0])
+                    {
+                        Core::GraphManager::plug(startPin->m_node.m_nodebase,
+                                                 endPin->m_node.m_nodebase,
+                                                 startPin->m_pin.getIndex(),
+                                                 endPin->m_pin.getIndex() );
+                    }
                     break;
+                /* \todo JH react informatively to other result too */
+                default:
+                    showPopUpLabel("Connection not possible", ImColor(255,0,0)); /* \todo JH remove constant here */
+
             }
         }
     }
@@ -398,7 +415,6 @@ void WorkspaceWindow::checkQueryLinkCreate()
 
 void WorkspaceWindow::checkQueryContextMenus()
 {
-    m_openPopupMenuPosition = ImGui::GetMousePos();
     ne::Suspend();
 	if (ne::ShowBackgroundContextMenu())
 	{
@@ -438,7 +454,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 	if (ImGui::BeginPopup("Create New Node"))
 	{
-		m_newNodePostion = m_openPopupMenuPosition;
+		m_newNodePostion = m_rightClickPosition;
 
 		ImGui::Text("add...");
 		ImGui::Separator();

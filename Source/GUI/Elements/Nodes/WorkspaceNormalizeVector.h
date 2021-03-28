@@ -15,6 +15,6 @@ public:
 	WorkspaceNormalizeVector(ImTextureID headerBackground, WorkspaceNormalizeVectorArgs const& args);
     WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel = "NormVector", std::string nodeLabel = "NormVector");
 
-	void drawData(util::NodeBuilder& builder);
+	void drawDataSetValues(util::NodeBuilder& builder);
 
 };

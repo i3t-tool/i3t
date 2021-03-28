@@ -11,6 +11,9 @@ typedef std::vector<Core::Pin>::const_iterator corePinIter;
 typedef std::vector<Ptr<WorkspaceCorePinProperties>>::const_iterator corePinPropIter;
 typedef std::vector<Ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
 
+typedef std::function<float()> getter_function_pointer;
+typedef std::function<ValueSetResult(float)> setter_function_pointer;
+
 struct WorkspaceNodeWithCoreDataArgs
 {
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
@@ -38,11 +41,20 @@ public:
 
 	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
+	virtual void drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters);
+
+    virtual void drawData(util::NodeBuilder& builder);
+    virtual void drawDataFull(util::NodeBuilder& builder)=0;
+	virtual void drawDataSetValues(util::NodeBuilder& builder)=0;
+	virtual void drawDataLabel(util::NodeBuilder& builder);
+
+
 	virtual void drawInputLinks();
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	bool drawDragFloatWithMap_Inline(float* const value, const int mapValue, std::string label);
+
 };
 
 /*! \class WorkspaceCorePinProperties

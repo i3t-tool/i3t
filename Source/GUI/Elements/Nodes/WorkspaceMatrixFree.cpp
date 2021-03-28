@@ -8,8 +8,8 @@ WorkspaceMatrixFree::WorkspaceMatrixFree(ImTextureID headerBackground, std::stri
     : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::Matrix>(), headerLabel, nodeLabel){
 }
 
-void WorkspaceMatrixFree::drawData(util::NodeBuilder& builder)
+void WorkspaceMatrixFree::drawDataSetValues(util::NodeBuilder& builder)
 {
-	drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+    drawDataFull(builder);
 }
 

@@ -8,10 +8,6 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
     : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
 {}
 
-void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
-{
-	drawDataFull(builder); /* default function always draw all data */
-}
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
@@ -52,3 +48,4 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 
 	ImGui::Spring(0); /* \todo JH what is Spring? */
 }
+
