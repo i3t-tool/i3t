@@ -22,6 +22,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	builder.Middle();
 
 	//ImGui::PushItemWidth(default_width*scale);
+	ImGui::PushItemWidth(100);  // PF: pada na radce 47: ImGui::PopItemWidth();
 	/* Drawing is row-wise */
 	for (int rows = 0; rows < 4; rows++)
 	{

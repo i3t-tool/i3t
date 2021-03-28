@@ -113,6 +113,9 @@ set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_FBX_EXPORTER ON)
 set(ASSIMP_BUILD_OBJ_EXPORTER ON)
 set(ASSIMP_BUILD_PLY_EXPORTER ON)
+#https://github.com/assimp/assimp/issues/3074 : Missing Assimp::DumpSceneToAssbin in assimp\tools\assimp_cmd\WriteDump.cpp
+set(ASSIMP_BUILD_ASSBIN_EXPORTER ON)
+set(ASSIMP_BUILD_ASSXML_EXPORTER ON)
 # =============================================================
 
 # ======== Project dependencies which should be compiled. =====
