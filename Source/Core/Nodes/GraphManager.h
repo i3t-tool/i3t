@@ -9,6 +9,7 @@
 
 #include <algorithm>
 
+#include "Cycle.h"
 #include "NodeImpl.h"
 #include "Operations.h"
 #include "Sequence.h"
@@ -56,7 +57,31 @@ namespace Core
 {
 class GraphManager
 {
+	/// References to created cycle nodes which needs to be updated.
+	static std::vector<Ptr<Cycle>> m_cycles;
+
 public:
+  /**
+   * Create Cycle
+   */
+  static Ptr<Core::Cycle> createCycle()
+  {
+    auto ret = std::make_shared<Core::Cycle>();
+    ret->create();
+    ret->updateValues(0);
+
+		m_cycles.push_back(ret);
+
+    return ret;
+  }
+
+	/**
+	 * \param tick in ms
+	 */
+	static void update(double tick);
+
+	static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
+
 	/**
 	 * Is used to check before connecting to avoid cycles in the node graph.
 	 *
@@ -135,6 +160,8 @@ public:
 	 * \return All nodes plugged into node input pin on given index.
 	 */
 	static std::vector<Ptr<NodeBase>> getOutputNodes(Ptr<Core::NodeBase>& node, size_t index);
+
+
 };
 
 class SequenceTree

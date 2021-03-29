@@ -85,8 +85,6 @@ protected:
 	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
 
 protected:
-	NodeBase() = default;
-
   NodeBase(const Operation* operation)
 			: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
 	{
