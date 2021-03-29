@@ -79,7 +79,7 @@ void Console::onUpKey()
 		memcpy(command, ss.c_str(), ss.size());
 		command[ss.size()] = '\0';
 
-		printf("up   %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
+		printf("up   %d/%lld,,<%s>\n", selected, commands.size()-1, command);
 	}
 	
 	render();
@@ -92,8 +92,7 @@ void Console::onDownKey()
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected++;
 		if (selected < 0) { selected = 0; }
-		else if (selected >= commands.size()) { 
-			selected = commands.size() - 1;
+		else if (selected >= commands.size()) {
 			command[0] = '\0';
 		}
 		else{
@@ -102,7 +101,7 @@ void Console::onDownKey()
 			command[ss.size()] = '\0';
 		}
 
-		printf("down %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
+		printf("down %d/%lld,,<%s>\n", selected, commands.size() - 1, command);
 	}
 	
 	render();

@@ -83,8 +83,8 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	return true;
 }
 bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
-	WorkspaceLayout* scene = getWorkspaceLayout();
-	scene->startlen = (int)_workspace->size();
+	clearWorkspaceLayout();
+	getWorkspaceLayout()->startlen=(int)_workspace->size();
 
 	int p=PicocRunFile(filename);
 
