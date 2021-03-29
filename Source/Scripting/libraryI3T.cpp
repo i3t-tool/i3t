@@ -28,7 +28,7 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
     int map=workspaceLayout.mat4Types.free;
     if (type > -1 && type < 7) { map = type; }
 
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>().get();
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace=&(ww->m_workspaceCoreNodes);
     
 	if(type== workspaceLayout.mat4Types.free){
@@ -56,7 +56,7 @@ void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value
     glm::vec4 vec = glm::vec4(1.0f);
     if (dataindex > -1 && dataindex < workspaceLayout.nodeData.size()) { vec = workspaceLayout.nodeData[dataindex][0]; }
 
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>().get();
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace = &(ww->m_workspaceCoreNodes);
     ReturnValue->Val->Integer = (int)_workspace->size() - 1;
 
@@ -72,7 +72,7 @@ void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
     int outputindex=Param[2]->Val->Integer;
     int inputindex= Param[3]->Val->Integer;
 
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>().get();
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace = &(ww->m_workspaceCoreNodes);
     int startlen=workspaceLayout.startlen;
 

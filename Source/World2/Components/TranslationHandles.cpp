@@ -29,8 +29,7 @@ TranslationHandles::TranslationHandles() {
 	m_threeaxis=new GameObject(three_axisMesh,	&World2::shader0,		World2::axisTexture);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
-	m_editedobj=new GameObject();
-	m_bkp=m_editedobj->transformation;
+	m_edited=glm::mat4(1.0f);
 }
 void TranslationHandles::render(glm::mat4* parent, bool renderTransparent) {
 	if(!renderTransparent){return;}
@@ -38,8 +37,8 @@ void TranslationHandles::render(glm::mat4* parent, bool renderTransparent) {
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
-	glm::mat4 ftransform=getFullTransform(m_editedobj);//TMP
-	//glm::mat4 ftransform=glm::mat4(1.0f);//full transform from nodebase
+	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
+	glm::mat4 ftransform=m_edited;//full transform from nodebase
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -70,7 +69,9 @@ void TranslationHandles::render(glm::mat4* parent, bool renderTransparent) {
 }
 
 void TranslationHandles::update() {
-    //if(InputManager::isKeyPressed(Keys::p)){printMatrix3(m_editedobj->transformation);}//TMP
+	if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
+	///
+    //if(InputManager::isKeyPressed(Keys::p)){printMatrix3(m_edited->transformation);}//TMP
 	bool transactionBegin=false;
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
@@ -97,9 +98,9 @@ void TranslationHandles::update() {
 
 	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 
-	m_handlespace=getNormalized(getFullTransform(m_editedobj->parent));//TMP
-	m_handlespace[3]=getFullTransform(m_editedobj)[3];//TMP
-	//m_handlespace=glm::mat4(1.0f);
+	//m_handlespace=getNormalized(getFullTransform(m_edited->parent));//TMP
+	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
+	m_handlespace=m_edited;
 
 	if(m_activehandle==-1){return;}
 
@@ -129,15 +130,19 @@ void TranslationHandles::update() {
 		glm::vec3 pc = planeIntersect((glm::vec3)(m_handlespace[m_axisnum]), (glm::vec3)(m_handlespace[m_axisnum2]), (glm::vec3)(m_handlespace[3]));
 						
 		if(world2viewport(pc)[2]<0.992f){
-			glm::mat4 parent=getFullTransform(m_editedobj->parent);//TMP
+			//glm::mat4 parent=getFullTransform(m_edited->parent);//TMP
+			glm::mat4 parent=glm::mat4(1.0f);
 			glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 			glm::vec4 editedo=glm::inverse(parent)*result;
-			m_editedobj->transformation[3]=editedo;//TMP
+			m_edited[3]=editedo;//TMP
 		}
 	}
 	else{
 		drag3*=0.006f;
-		m_editedobj->transformation[3][m_axisnum]+=drag3[m_axisnum];//TMP
+		m_edited[3][m_axisnum]+=drag3[m_axisnum];//TMP
 	}
-	m_handlespace[3]=getFullTransform(m_editedobj)[3];//TMP
+	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
+	m_handlespace[3]=m_edited[3];//TMP
+	///
+	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[3][0], m_edited[3][1], m_edited[3][2]));}
 }

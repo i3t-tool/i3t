@@ -116,7 +116,7 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
     printf("handlesSetMatrix 0x%p\n",matnode);
     for(int i=0;i<this->sceneHandles->components.size();i++){this->sceneHandles->components[i]->isActive=false;}
     if(matnode==NULL){
-
+        printf("set null\n");
         return;
     }
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)matnode;
@@ -143,7 +143,9 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
         handles->m_editednode=nodebase.get();
         handles->isActive=true;
     }
-
+    else if(strcmp(keyword,"Free")==0){
+        printf("Free...\n");
+    }
 
     printf("operation %s\n",keyword);
     printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",

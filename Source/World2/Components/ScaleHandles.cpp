@@ -37,7 +37,7 @@ ScaleHandles::ScaleHandles() {
 	m_threeaxis=new GameObject(three_axisMesh,	&World2::shader0,		World2::axisTexture);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
-	m_editedobj=new GameObject();
+	m_edited=glm::mat4(1.0f);
 }
 
 void ScaleHandles::render(glm::mat4* parent, bool renderTransparent) {
@@ -46,8 +46,8 @@ void ScaleHandles::render(glm::mat4* parent, bool renderTransparent) {
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
-	glm::mat4 ftransform=getFullTransform(m_editedobj);//TMP
-	//glm::mat4 ftransform=glm::mat4(1.0f);//full transform from nodebase
+	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
+	glm::mat4 ftransform=m_edited;//full transform from nodebase
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -82,7 +82,9 @@ void ScaleHandles::render(glm::mat4* parent, bool renderTransparent) {
 }
 
 void ScaleHandles::update() {
-	if(InputManager::isKeyPressed(Keys::p)){printMatrix3(m_editedobj->transformation);}//TMP
+	if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
+	///
+	if(InputManager::isKeyPressed(Keys::p)){printMatrix3(m_edited);}//TMP
 	bool transactionBegin=false;
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
@@ -111,10 +113,11 @@ void ScaleHandles::update() {
 
 	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 
-	m_handlespace=getNormalized(getFullTransform(m_editedobj->parent)/**m_bkp*/);//TMP
-	//m_handlespace=glm::mat4(1.0f);
+	
+	//m_handlespace=getNormalized(getFullTransform(m_edited->parent)/**m_bkp*/);//TMP
+	m_handlespace=glm::mat4(1.0f);
 
-	if(m_activehandle==-1){/*m_bkp=m_editedobj->transformation;*/return;}
+	if(m_activehandle==-1){/*m_bkp=m_edited->transformation;*/return;}
 
 	///
 	glm::mat4 axes=glm::mat4(1.0f);axes[3]=glm::vec4(1.0f,1.0f,1.0f,0.0f);
@@ -140,9 +143,9 @@ void ScaleHandles::update() {
 	///
 	drag3*=0.004f;
 	glm::vec3 scal=glm::vec3(
-		glm::length((glm::vec3)m_editedobj->transformation[0]),
-		glm::length((glm::vec3)m_editedobj->transformation[1]),
-		glm::length((glm::vec3)m_editedobj->transformation[2])
+		glm::length((glm::vec3)m_edited[0]),
+		glm::length((glm::vec3)m_edited[1]),
+		glm::length((glm::vec3)m_edited[2])
 	);
 					
 	if(m_activehandle==m_stencilxyz){//if uniform scale, scale of other axes proportionate to ref axis
@@ -163,7 +166,10 @@ void ScaleHandles::update() {
 		}
 	}
 					
-	m_editedobj->transformation[0][0]+=drag3[0];//TMP
-	m_editedobj->transformation[1][1]+=drag3[1];//TMP
-	m_editedobj->transformation[2][2]+=drag3[2];//TMP
+	m_edited[0][0]+=drag3[0];//TMP
+	m_edited[1][1]+=drag3[1];//TMP
+	m_edited[2][2]+=drag3[2];//TMP
+	///
+	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
+	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0]));}
 }
