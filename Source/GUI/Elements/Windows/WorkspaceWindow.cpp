@@ -70,58 +70,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::SetCurrentEditor(NodeEditorContext);
 
-	/*\todo adding nodes here just for testing */
-	/*--- TRANSLATION */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation
-	// 1")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
-
-	/*--- TRANSLATION with connection to translation */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation
-	// 2")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
-
-	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
-	// Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
-
-	/*--- MATRIX_4x4 with connection to translation*/
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, "just Matrix4x4"));
-	// ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
-
-	// Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
-
-	/*--- SCALE */
-	 /*WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
-	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
-
-	/*--- NORMALIZE VECTOR */
-	m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
-
-	ne::NavigateToContent();
-	ne::CenterNodeOnScreen(m_workspaceCoreNodes.back()->m_id);
-
-	//////////////////////////////////
-	//printf("len %lld \n",WorkspaceNodes.size());
-	/*WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get());
-
-	Ptr<Core::NodeBase> child=wnbd->Nodebase;
-	std::vector<Core::Pin>cp= child->getInputPins();
-	Ptr<Core::NodeBase> parent=Core::GraphManager::getParent(child);
-	const Operation* uu = child->getOperation();
-
-	//cp[0].getParentPin()->getMaster();
-	//WorkspaceNodes.at(0).get()->
-	glm::mat4 m = glm::mat4(0.14f);
-	ValueSetResult vsr=parent->setValue(m);
-	ValueSetResult vsr2= child->setValue(m);
-
-	DataStore ds=child->getData();
-	glm::mat4 mm=ds.getMat4();*/
-
-	// LoadWorkspace(Config::getAbsolutePath("/load.c").c_str(),&WorkspaceNodes);
-
-	// SaveWorkspace(Config::getAbsolutePath("/save.c").c_str(), &WorkspaceNodes);
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -220,21 +168,20 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
 
 void WorkspaceWindow::manipulatorStartCheck3D()
 {
-    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4;
+    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4 = nullptr;
     ne::NodeId selectedNodeID;
 
-    if (ne::HasSelectionChanged() && ne::GetSelectedNodes(&selectedNodeID, 1) == 1 )
+    if (ne::HasSelectionChanged())
     {
         World2* world2= Application::get().world2();
-        selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
-        if (selectedWorkspaceMatrix4x4 != nullptr)
+
+        if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
         {
-            world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
+            selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
         }
-        else
-        {
-            world2->handlesSetMatrix(nullptr);
-        }
+
+        world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
+
     }
 }
 
