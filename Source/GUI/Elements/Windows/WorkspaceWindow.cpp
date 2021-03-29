@@ -70,58 +70,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::SetCurrentEditor(NodeEditorContext);
 
-	/*\todo adding nodes here just for testing */
-	/*--- TRANSLATION */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation
-	// 1")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
-
-	/*--- TRANSLATION with connection to translation */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation
-	// 2")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
-
-	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
-	// Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
-
-	/*--- MATRIX_4x4 with connection to translation*/
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrix4x4>(HeaderBackgroundTexture, "just Matrix4x4"));
-	// ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 351));
-
-	// Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
-
-	/*--- SCALE */
-	 /*WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
-	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
-
-	/*--- NORMALIZE VECTOR */
-	m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
-
-	ne::NavigateToContent();
-	ne::CenterNodeOnScreen(m_workspaceCoreNodes.back()->m_id);
-
-	//////////////////////////////////
-	//printf("len %lld \n",WorkspaceNodes.size());
-	/*WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get());
-
-	Ptr<Core::NodeBase> child=wnbd->Nodebase;
-	std::vector<Core::Pin>cp= child->getInputPins();
-	Ptr<Core::NodeBase> parent=Core::GraphManager::getParent(child);
-	const Operation* uu = child->getOperation();
-
-	//cp[0].getParentPin()->getMaster();
-	//WorkspaceNodes.at(0).get()->
-	glm::mat4 m = glm::mat4(0.14f);
-	ValueSetResult vsr=parent->setValue(m);
-	ValueSetResult vsr2= child->setValue(m);
-
-	DataStore ds=child->getData();
-	glm::mat4 mm=ds.getMat4();*/
-
-	// LoadWorkspace(Config::getAbsolutePath("/load.c").c_str(),&WorkspaceNodes);
-
-	// SaveWorkspace(Config::getAbsolutePath("/save.c").c_str(), &WorkspaceNodes);
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -220,21 +168,20 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
 
 void WorkspaceWindow::manipulatorStartCheck3D()
 {
-    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4;
+    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4 = nullptr;
     ne::NodeId selectedNodeID;
 
-    if (ne::HasSelectionChanged() && ne::GetSelectedNodes(&selectedNodeID, 1) == 1 )
+    if (ne::HasSelectionChanged())
     {
         World2* world2= Application::get().world2();
-        selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
-        if (selectedWorkspaceMatrix4x4 != nullptr)
+
+        if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
         {
-            world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
+            selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
         }
-        else
-        {
-            world2->handlesSetMatrix(nullptr);
-        }
+
+        world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
+
     }
 }
 
@@ -414,6 +361,85 @@ void WorkspaceWindow::checkQueryLinkCreate()
 
 }
 
+
+void WorkspaceWindow::checkQueryNodeCreate()
+{
+    ne::PinId pinId = 0;
+    if (ne::QueryNewNode(&pinId))
+    {
+        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
+        if (m_pinPropertiesForNewLink)
+        {
+            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
+        }
+
+        if (ne::AcceptNewItem())
+        {
+            m_createNewNode  = true;
+            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
+            m_pinPropertiesForNewLink = nullptr;
+
+            ne::Suspend();
+            ImGui::OpenPopup("Create New Node");
+            ne::Resume();
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryElementsDeleting()
+{
+    if (ne::BeginDelete())
+    {
+        checkQueryLinkDelete();
+        checkQueryNodeDelete();
+    }
+    ne::EndDelete();
+}
+
+void WorkspaceWindow::checkQueryLinkDelete()
+{
+    ne::LinkId linkId = 0;
+    while (ne::QueryDeletedLink(&linkId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
+
+            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryNodeDelete()
+{
+    ne::NodeId nodeId = 0;
+    while (ne::QueryDeletedNode(&nodeId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            NodeDelete(nodeId);
+        }
+    }
+}
+
+void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
+{
+    coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
+    if (id != m_workspaceCoreNodes.end())
+        m_workspaceCoreNodes.erase(id);
+        ne::DeleteNode(nodeId); /* \todo JH check whether node remain in nodeeditor */
+}
+
+
+void WorkspaceWindow::UpdateTouchAllNodes()
+{
+	const auto deltaTime = ImGui::GetIO().DeltaTime;
+	for (auto&& workspaceNode : m_workspaceCoreNodes)
+	{
+		workspaceNode->UpdateTouch(deltaTime);
+	}
+}
+
 void WorkspaceWindow::checkQueryContextMenus()
 {
     ne::Suspend();
@@ -442,13 +468,42 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
 
-		if (ImGui::MenuItem("Delete")) {
-			if (ne::BeginDelete())
-			{
-				checkQueryNodeDelete();
-			}
-			ne::EndDelete();
-			//ne::DeleteNode(m_contextNodeId); /* \todo JH check whether node remain in nodeeditor */
+        if (ImGui::BeginMenu("Level of detail")) {
+
+            ImGui::Text(fmt::format("Actual level: {}", node->m_levelOfDetail).c_str());
+            ImGui::Separator();
+            if (ImGui::MenuItem("Full")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::Full;
+            }
+            if (ImGui::MenuItem("SetValues")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::SetValues;
+            }
+            if (ImGui::MenuItem("Label")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::Label;
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Precision")) {
+
+            ImGui::Text(fmt::format("Actual precision: {}", node->getNumberOfVisibleDecimal()).c_str());
+            ImGui::Separator();
+            if (ImGui::MenuItem("0")) {
+                node->setNumberOfVisibleDecimal(0);
+            }
+            if (ImGui::MenuItem("1")) {
+                node->setNumberOfVisibleDecimal(1);
+            }
+            if (ImGui::MenuItem("2")) {
+                node->setNumberOfVisibleDecimal(2);
+            }
+            if (ImGui::MenuItem("3")) {
+                node->setNumberOfVisibleDecimal(3);
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::MenuItem("Delete")) {
+            NodeDelete(node->m_id);
 		}
 		ImGui::EndPopup();
 	}
@@ -792,77 +847,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 }
 
-void WorkspaceWindow::checkQueryNodeCreate()
-{
-    ne::PinId pinId = 0;
-    if (ne::QueryNewNode(&pinId))
-    {
-        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
-        if (m_pinPropertiesForNewLink)
-        {
-            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
-        }
-
-        if (ne::AcceptNewItem())
-        {
-            m_createNewNode  = true;
-            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
-            m_pinPropertiesForNewLink = nullptr;
-
-            ne::Suspend();
-            ImGui::OpenPopup("Create New Node");
-            ne::Resume();
-        }
-    }
-}
-
-void WorkspaceWindow::checkQueryElementsDeleting()
-{
-    if (ne::BeginDelete())
-    {
-        checkQueryLinkDelete();
-        checkQueryNodeDelete();
-    }
-    ne::EndDelete();
-}
-
-void WorkspaceWindow::checkQueryLinkDelete()
-{
-    ne::LinkId linkId = 0;
-    while (ne::QueryDeletedLink(&linkId))
-    {
-        if (ne::AcceptDeletedItem())
-        {
-            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
-
-            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
-        }
-    }
-}
-
-void WorkspaceWindow::checkQueryNodeDelete()
-{
-    ne::NodeId nodeId = 0;
-    while (ne::QueryDeletedNode(&nodeId))
-    {
-        if (ne::AcceptDeletedItem())
-        {
-            coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
-            if (id != m_workspaceCoreNodes.end())
-                m_workspaceCoreNodes.erase(id);
-        }
-    }
-}
-
-
-void WorkspaceWindow::UpdateTouchAllNodes()
-{
-	const auto deltaTime = ImGui::GetIO().DeltaTime;
-	for (auto&& workspaceNode : m_workspaceCoreNodes)
-	{
-		workspaceNode->UpdateTouch(deltaTime);
-	}
-}
 
 // bool WorkspaceWindow::Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1,
 //                     float min_size2, float splitter_long_axis_size = -1.0f)

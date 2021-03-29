@@ -125,6 +125,8 @@ public:
     void checkQueryLinkDelete();
     void checkQueryNodeDelete();
 
+    void NodeDelete(ne::NodeId nodeId);
+
     void checkQueryContextMenus();
 
     void shiftSelectedNodesToFront();
