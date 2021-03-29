@@ -95,7 +95,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
 
 	/*--- NORMALIZE VECTOR */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
+	m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1"));
 	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
 
 	ne::NavigateToContent();
@@ -220,19 +220,20 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
 
 void WorkspaceWindow::manipulatorStartCheck3D()
 {
-    Ptr<WorkspaceNodeWithCoreData> selectedCoreNode;
+    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4;
     ne::NodeId selectedNodeID;
 
     if (ne::HasSelectionChanged() && ne::GetSelectedNodes(&selectedNodeID, 1) == 1 )
     {
-        selectedCoreNode = getWorkspaceCoreNodeByID(selectedNodeID);
-        if (selectedCoreNode != nullptr)
+        World2* world2= Application::get().world2();
+        selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
+        if (selectedWorkspaceMatrix4x4 != nullptr)
         {
-            /* \todo JH call manipulator with selectedCoreNode->m_nodebase */
+            world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
         }
         else
         {
-            /* \todo JH call manipulator with null */
+            world2->handlesSetMatrix(nullptr);
         }
     }
 }

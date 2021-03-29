@@ -32,8 +32,7 @@
 using ax::Widgets::IconType;
 namespace util = ax::NodeEditor::Utilities;
 
-namespace ne =
-		ax::NodeEditor; /* /ed/ is used in imgui_node_editor.cpp for some other namespace - so for clearity I use /ne/ */
+namespace ne = ax::NodeEditor; /* /ed/ is used in imgui_node_editor.cpp for some other namespace - so for clearity I use /ne/ */
 
 class WorkspaceLinkProperties;
 class WorkspacePinProperties;
@@ -114,4 +113,7 @@ public:
 
 	WorkspaceLinkProperties(ne::LinkId const id);
 };
+
+extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
+
 

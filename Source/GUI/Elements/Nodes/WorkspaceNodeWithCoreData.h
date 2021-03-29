@@ -25,12 +25,14 @@ struct WorkspaceNodeWithCoreDataArgs
 
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
+protected:
+    int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
+    float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
 public:
-	/*see:
-	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to core
-	                                                     WorkspaceNodeWithCoreData is owner of unique pointer
-	                                                */
+	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
+                                                WorkspaceNodeWithCoreData is owner
+                                           */
+
 
 	std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
@@ -38,6 +40,13 @@ public:
 
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
     WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr, std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");
+
+    int getNumberOfVisibleDecimal();
+    int setNumberOfVisibleDecimal(int value);
+
+    virtual int maxLenghtOfData()=0;
+    float setDataItemsWidth();
+    float getDataItemsWidth();
 
 	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 

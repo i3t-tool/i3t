@@ -34,6 +34,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 *this,
 				fmt::format("output #{}", pin.getIndex()).c_str() ));
 	}
+
 }
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel) /* \todo JH take default label from Const.h*/
@@ -67,7 +68,32 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 *this,
 				fmt::format("output #{}", pin.getIndex()).c_str() ));
 	}
+
 }
+
+int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
+{
+    return m_numberOfVisibleDecimal;
+}
+
+int WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
+{
+    value >= 0 ? m_numberOfVisibleDecimal = value : m_numberOfVisibleDecimal = 0;
+    return m_numberOfVisibleDecimal;
+}
+
+float WorkspaceNodeWithCoreData::getDataItemsWidth()
+{
+    return m_dataItemsWidth;
+}
+
+float WorkspaceNodeWithCoreData::setDataItemsWidth()
+{
+    float oneCharWidth = 20; /* \todo JH take from some font setting */
+    m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth;
+    return m_dataItemsWidth;
+}
+
 
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
@@ -89,7 +115,7 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 	{
 		if (elem.first->isPluggedIn())
 			ne::Link(elem.second->get()->m_id, elem.first->getParentPin()->getId(), elem.first->getId(),
-			         elem.second->get()->m_color, 2.0f); /* elem.second->get() for dereferencing unique_ptr*/
+			         elem.second->get()->m_color, 2.0f);
 	}
 }
 
@@ -177,17 +203,12 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	}
 
 	ImGui::SameLine();
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value);
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? */
 
 	if (inactive)
 	{
 		ImGui::PopItemFlag();
 		ImGui::PopStyleVar();
-	}
-
-	if (valueChanged)
-	{
-		inactive = true;
 	}
 
     return valueChanged;
@@ -231,10 +252,10 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
     int index_of_change;
     float valueOfChange, localData; /* user can change just one value at the moment */
 
-    ImGui::PushItemWidth(100.0f);
+    ImGui::PushItemWidth(m_dataItemsWidth);
     for (int i = 0; i < number_of_values; i++)
     {
-        ImGui::Text(labels[i].c_str() );
+        ImGui::Text( labels[i].c_str() );
         localData = getters[i]();
         if (drawDragFloatWithMap_Inline(&localData,
                                         1, /* \todo JH will be always changeable? */
@@ -251,6 +272,7 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
     if (valueChanged)
 	{
 		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value*/
+		setDataItemsWidth();
 	}
 
     ImGui::Spring(0); /* \todo JH what is Spring? */
@@ -265,7 +287,7 @@ void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
 
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)
-		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no konstants here... */
+		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no constants here... */
 {}
 
 PinKind WorkspaceCorePinProperties::getKind()

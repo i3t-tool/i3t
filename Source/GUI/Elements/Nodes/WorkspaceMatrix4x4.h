@@ -17,4 +17,5 @@ public:
     WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
 	virtual void drawDataFull(util::NodeBuilder& builder);
+	int maxLenghtOfData();
 };

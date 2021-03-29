@@ -78,3 +78,24 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id), m_color(ImColor(255, 255, 255))
 {}
 
+int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
+{
+    int border = 10, result = 1, int_value;
+
+    if (value < 0)
+    {
+        result++; /* sign */
+        value = -value;
+    }
+
+    int_value = (int)value;
+    while (int_value >= border)
+    {
+        result++;
+        border *=10;
+    }
+
+    return result + (numberOfVisibleDecimal > 0 ? numberOfVisibleDecimal+1 : 0); /* +1 for decimal point */
+
+}
+
