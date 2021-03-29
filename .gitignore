@@ -1,4 +1,3 @@
-.gitignore
 .idea/
 /Docs/Doxygen/html/
 
@@ -17,3 +16,4 @@ CMakeSettings.json
 Data/imgui.ini
 .vs/
 logs/
+/CMakeSettings.json

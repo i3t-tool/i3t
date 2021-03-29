@@ -2,6 +2,8 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "Generator.h"
+
 using namespace Core;
 
 TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
@@ -105,5 +107,30 @@ TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
 		auto data = scaleNode->getData().getMat4();
 
 		EXPECT_EQ(data, scaleMat);
+	}
+}
+
+TEST(Scale, GettersAndSetterShouldBeOk)
+{
+  auto scale = Builder::createTransform<Scale>()->as<Scale>();
+
+  auto vec = generateVec3();
+
+  {
+		// Uniform scale.
+    scale->setX(vec.x);
+    scale->setY(vec.y);
+    scale->setZ(vec.z);
+
+    EXPECT_EQ(glm::scale(glm::vec3{vec.z, vec.z, vec.z}), scale->getData().getMat4());
+	}
+  {
+		scale->setDataMap(Transform::g_Scale);
+
+    scale->setX(vec.x);
+    scale->setY(vec.y);
+    scale->setZ(vec.z);
+
+    EXPECT_EQ(glm::scale(vec), scale->getData().getMat4());
 	}
 }

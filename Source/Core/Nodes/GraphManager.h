@@ -98,6 +98,9 @@ public:
 	static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
+	static ENodePlugResult plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
+	static ENodePlugResult plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
+
 	/// Unplug all inputs and outputs.
 	static void unplugAll(Ptr<Core::NodeBase>& node);
 
