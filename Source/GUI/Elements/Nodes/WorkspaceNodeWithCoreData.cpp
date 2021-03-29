@@ -79,6 +79,7 @@ int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
 int WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 {
     value >= 0 ? m_numberOfVisibleDecimal = value : m_numberOfVisibleDecimal = 0;
+    setDataItemsWidth();
     return m_numberOfVisibleDecimal;
 }
 
@@ -89,8 +90,8 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 20; /* \todo JH take from some font setting */
-    m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth;
+    float oneCharWidth = 20, padding = 10; /* \todo JH take from some font setting */
+    m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
 

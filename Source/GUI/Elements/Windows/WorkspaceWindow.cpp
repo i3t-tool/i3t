@@ -414,6 +414,85 @@ void WorkspaceWindow::checkQueryLinkCreate()
 
 }
 
+
+void WorkspaceWindow::checkQueryNodeCreate()
+{
+    ne::PinId pinId = 0;
+    if (ne::QueryNewNode(&pinId))
+    {
+        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
+        if (m_pinPropertiesForNewLink)
+        {
+            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
+        }
+
+        if (ne::AcceptNewItem())
+        {
+            m_createNewNode  = true;
+            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
+            m_pinPropertiesForNewLink = nullptr;
+
+            ne::Suspend();
+            ImGui::OpenPopup("Create New Node");
+            ne::Resume();
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryElementsDeleting()
+{
+    if (ne::BeginDelete())
+    {
+        checkQueryLinkDelete();
+        checkQueryNodeDelete();
+    }
+    ne::EndDelete();
+}
+
+void WorkspaceWindow::checkQueryLinkDelete()
+{
+    ne::LinkId linkId = 0;
+    while (ne::QueryDeletedLink(&linkId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
+
+            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryNodeDelete()
+{
+    ne::NodeId nodeId = 0;
+    while (ne::QueryDeletedNode(&nodeId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            NodeDelete(nodeId);
+        }
+    }
+}
+
+void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
+{
+    coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
+    if (id != m_workspaceCoreNodes.end())
+        m_workspaceCoreNodes.erase(id);
+        ne::DeleteNode(nodeId); /* \todo JH check whether node remain in nodeeditor */
+}
+
+
+void WorkspaceWindow::UpdateTouchAllNodes()
+{
+	const auto deltaTime = ImGui::GetIO().DeltaTime;
+	for (auto&& workspaceNode : m_workspaceCoreNodes)
+	{
+		workspaceNode->UpdateTouch(deltaTime);
+	}
+}
+
 void WorkspaceWindow::checkQueryContextMenus()
 {
     ne::Suspend();
@@ -442,13 +521,42 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
 
-		if (ImGui::MenuItem("Delete")) {
-			if (ne::BeginDelete())
-			{
-				checkQueryNodeDelete();
-			}
-			ne::EndDelete();
-			//ne::DeleteNode(m_contextNodeId); /* \todo JH check whether node remain in nodeeditor */
+        if (ImGui::BeginMenu("Level of detail")) {
+
+            ImGui::Text(fmt::format("Actual level: {}", node->m_levelOfDetail).c_str());
+            ImGui::Separator();
+            if (ImGui::MenuItem("Full")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::Full;
+            }
+            if (ImGui::MenuItem("SetValues")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::SetValues;
+            }
+            if (ImGui::MenuItem("Label")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::Label;
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Precision")) {
+
+            ImGui::Text(fmt::format("Actual precision: {}", node->getNumberOfVisibleDecimal()).c_str());
+            ImGui::Separator();
+            if (ImGui::MenuItem("0")) {
+                node->setNumberOfVisibleDecimal(0);
+            }
+            if (ImGui::MenuItem("1")) {
+                node->setNumberOfVisibleDecimal(1);
+            }
+            if (ImGui::MenuItem("2")) {
+                node->setNumberOfVisibleDecimal(2);
+            }
+            if (ImGui::MenuItem("3")) {
+                node->setNumberOfVisibleDecimal(3);
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::MenuItem("Delete")) {
+            NodeDelete(node->m_id);
 		}
 		ImGui::EndPopup();
 	}
@@ -792,77 +900,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 }
 
-void WorkspaceWindow::checkQueryNodeCreate()
-{
-    ne::PinId pinId = 0;
-    if (ne::QueryNewNode(&pinId))
-    {
-        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
-        if (m_pinPropertiesForNewLink)
-        {
-            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
-        }
-
-        if (ne::AcceptNewItem())
-        {
-            m_createNewNode  = true;
-            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
-            m_pinPropertiesForNewLink = nullptr;
-
-            ne::Suspend();
-            ImGui::OpenPopup("Create New Node");
-            ne::Resume();
-        }
-    }
-}
-
-void WorkspaceWindow::checkQueryElementsDeleting()
-{
-    if (ne::BeginDelete())
-    {
-        checkQueryLinkDelete();
-        checkQueryNodeDelete();
-    }
-    ne::EndDelete();
-}
-
-void WorkspaceWindow::checkQueryLinkDelete()
-{
-    ne::LinkId linkId = 0;
-    while (ne::QueryDeletedLink(&linkId))
-    {
-        if (ne::AcceptDeletedItem())
-        {
-            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
-
-            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
-        }
-    }
-}
-
-void WorkspaceWindow::checkQueryNodeDelete()
-{
-    ne::NodeId nodeId = 0;
-    while (ne::QueryDeletedNode(&nodeId))
-    {
-        if (ne::AcceptDeletedItem())
-        {
-            coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
-            if (id != m_workspaceCoreNodes.end())
-                m_workspaceCoreNodes.erase(id);
-        }
-    }
-}
-
-
-void WorkspaceWindow::UpdateTouchAllNodes()
-{
-	const auto deltaTime = ImGui::GetIO().DeltaTime;
-	for (auto&& workspaceNode : m_workspaceCoreNodes)
-	{
-		workspaceNode->UpdateTouch(deltaTime);
-	}
-}
 
 // bool WorkspaceWindow::Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1,
 //                     float min_size2, float splitter_long_axis_size = -1.0f)
