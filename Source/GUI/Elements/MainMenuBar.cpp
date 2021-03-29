@@ -84,7 +84,7 @@ void MainMenuBar::showFileMenu()
 			filter.push_back("*.c");
 			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 
-			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+			auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 			if (!result.empty())
 			{
 				if (ww != NULL)
@@ -109,7 +109,7 @@ void MainMenuBar::showFileMenu()
 			filter.push_back("*.c");
 			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 
-			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+      auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 			if (!result.empty())
 			{
 				if (ww != NULL)
@@ -139,7 +139,7 @@ void MainMenuBar::showFileMenu()
 			filter.push_back("*.c");
 			bool b = SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
 
-			WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>();
+      auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 			if (!result.empty())
 			{
 				if (ww != NULL)

@@ -198,7 +198,7 @@ int StdioBasePrintf(struct ParseState* Parser, FILE* Stream, char* StrOut, int S
     Picoc* pc = Parser->pc;
 
     if (Format == NULL)
-        Format = "[null format]\n";
+        Format = (char*)"[null format]\n";
 
     FPos = Format;
     //SOStream.FilePtr = Stream;
@@ -403,7 +403,7 @@ void StdioSetupFunc(Picoc* pc)
     //TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "__va_listStruct"), sizeof(FILE));
 
     /* define EOF equal to the system EOF */
-    VariableDefinePlatformVar(pc, NULL, "EOF", &pc->IntType, (union AnyValue*)&EOFValue, FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"EOF", &pc->IntType, (union AnyValue*)&EOFValue, FALSE);
     VariableDefinePlatformVar(pc, NULL, "SEEK_SET", &pc->IntType, (union AnyValue*)&SEEK_SETValue, FALSE);
     VariableDefinePlatformVar(pc, NULL, "SEEK_CUR", &pc->IntType, (union AnyValue*)&SEEK_CURValue, FALSE);
     VariableDefinePlatformVar(pc, NULL, "SEEK_END", &pc->IntType, (union AnyValue*)&SEEK_ENDValue, FALSE);

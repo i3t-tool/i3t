@@ -214,7 +214,7 @@ std::string Logger::formatMessage(const std::string& message, std::queue<std::st
 std::queue<std::string> Logger::vaListToQueue(const int numOfArgs, va_list& args)
 {
 	std::queue<std::string> argsQueue;
-	for (size_t i = 0; i < numOfArgs; i++)
+	for (int i = 0; i < numOfArgs; i++)
 	{
 		argsQueue.push(va_arg(args, std::string));
 	}

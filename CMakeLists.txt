@@ -28,7 +28,7 @@ include_directories(Dependencies/imgui_node_editor)
 include_directories(Dependencies/imgui_node_editor/external/imgui)
 include_directories(Dependencies/imgui_markdown)
 include_directories(Dependencies/pgr-framework/include)
-# temporary comment-out === include_directories(Dependencies/picoc)
+include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
@@ -36,13 +36,7 @@ include_directories($(OPENGL_INCLUDE_DIRS))
 
 # ========== BUILD CONFIGURATION ==============================
 # ---------- Setup compiler parameters. ------------------------
-# Target machine must have a C++17 compiler.
-# To set in in Visual studio use: /std:c++17
-# To set this for a project:
-#   1. Right click a project, go to Properties
-#   2. Select Configuration Properties > C/C++ > Language
-#   3. For C++ Language Standard select "ISO C++17 Standard (/std:c++17)"
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
@@ -104,13 +98,31 @@ set(CONFIGURATION_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS False CACHE BOOL "Assimp should not build build tests.")
 
-set(YAML_BUILD_SHARED_LIBS Off)
+set(YAML_BUILD_SHARED_LIBS FALSE)
+
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
+set(ASSIMP_BUILD_3DS_IMPORTER ON)
+set(ASSIMP_BUILD_COLLADA_IMPORTER ON)
+set(ASSIMP_BUILD_FBX_IMPORTER ON)
+set(ASSIMP_BUILD_OBJ_IMPORTER ON)
+set(ASSIMP_BUILD_PLY_IMPORTER ON)
+
+# Assimp tools requires multiple format support.
+set(ASSIMP_BUILD_ASSIMP_TOOLS CACHE INTERNAL FALSE)
+
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
+set(ASSIMP_BUILD_FBX_EXPORTER ON)
+set(ASSIMP_BUILD_OBJ_EXPORTER ON)
+set(ASSIMP_BUILD_PLY_EXPORTER ON)
+#https://github.com/assimp/assimp/issues/3074 : Missing Assimp::DumpSceneToAssbin in assimp\tools\assimp_cmd\WriteDump.cpp
+set(ASSIMP_BUILD_ASSBIN_EXPORTER ON)
+set(ASSIMP_BUILD_ASSXML_EXPORTER ON)
 # =============================================================
 
 # ======== Project dependencies which should be compiled. =====
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
-# temporary comment-out ==== add_subdirectory(Dependencies/picoc)
+add_subdirectory(Dependencies/picoc)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
@@ -182,7 +194,15 @@ if (True)
 
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
 
-    target_link_libraries(${TEST_PROJECT_NAME} ${OPENGL_LIBRARIES} gtest gtest_main assimp glfw yaml-cpp ) # temporary comment-out === picoc)
+    target_link_libraries(
+            ${TEST_PROJECT_NAME}
+            ${OPENGL_LIBRARIES}
+            gtest
+            gtest_main
+            assimp
+            picoc
+            glfw
+            yaml-cpp)
 
     set_target_properties(gtest PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
@@ -249,7 +269,7 @@ target_link_libraries(
         ${OPENGL_LIBRARIES}
         assimp
         glfw
-        # temporary comment-out === picoc
+        picoc
         spdlog
         yaml-cpp
 )

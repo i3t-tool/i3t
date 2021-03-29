@@ -12,7 +12,7 @@ DescriptionDialog::DescriptionDialog()
 
 void DescriptionDialog::render()
 {
-	ImGui::Begin("Description");
+	ImGui::Begin(getName("Description").c_str());
 
 	if (m_isEditState)
 	{

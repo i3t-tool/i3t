@@ -67,7 +67,7 @@ public:
 	 * \param input
 	 * \param output
 	 */
-	static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+	static ENodePlugResult isPlugCorrect(Pin const * input, Pin const * output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
 	static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
@@ -97,6 +97,9 @@ public:
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
 	static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+
+	static ENodePlugResult plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
+	static ENodePlugResult plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(Ptr<Core::NodeBase>& node);

@@ -14,14 +14,14 @@ void LibraryInit(Picoc* pc)
 
     /* define the version number macro */
     pc->VersionString = TableStrRegister(pc, PICOC_VERSION);
-    VariableDefinePlatformVar(pc, NULL, "PICOC_VERSION", pc->CharPtrType, (union AnyValue*)&pc->VersionString, FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"PICOC_VERSION", pc->CharPtrType, (union AnyValue*)&pc->VersionString, FALSE);
 
     /* define endian-ness macros */
     BigEndian = ((*(char*)&__ENDIAN_CHECK__) == 0);
     LittleEndian = ((*(char*)&__ENDIAN_CHECK__) == 1);
 
-    VariableDefinePlatformVar(pc, NULL, "BIG_ENDIAN", &pc->IntType, (union AnyValue*)&BigEndian, FALSE);
-    VariableDefinePlatformVar(pc, NULL, "LITTLE_ENDIAN", &pc->IntType, (union AnyValue*)&LittleEndian, FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"BIG_ENDIAN", &pc->IntType, (union AnyValue*)&BigEndian, FALSE);
+    VariableDefinePlatformVar(pc, NULL, (char*)"LITTLE_ENDIAN", &pc->IntType, (union AnyValue*)&LittleEndian, FALSE);
 }
 
 /* add a library */

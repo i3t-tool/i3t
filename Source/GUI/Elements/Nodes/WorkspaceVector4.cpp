@@ -1,17 +1,15 @@
 #include "WorkspaceVector4.h"
 
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
-{}
+    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+{
+    setDataItemsWidth();
+}
 
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
     : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
 {
-}
-
-void WorkspaceVector4::drawData(util::NodeBuilder& builder)
-{
-    drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+    setDataItemsWidth();
 }
 
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
@@ -28,9 +26,8 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(I3T::getSize(ESize::Nodes_FloatWidth));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+	ImGui::PushItemWidth(m_dataItemsWidth);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
 	for (int columns = 0; columns < 4; columns++)
 	{
 		localData[columns] = coreData[columns];
@@ -53,8 +50,26 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 	if (valueChanged)
 	{
 	    m_nodebase->setValue(localData);
+	    setDataItemsWidth();
 //		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 
 	ImGui::Spring(0);
+}
+
+int WorkspaceVector4::maxLenghtOfData()
+{
+    int act, maximal = 0;
+    const glm::vec4& coreData = m_nodebase->getData().getVec4();
+
+    for(int column=0; column < 4; column++)
+    {
+        act = numberOfCharWithDecimalPoint( coreData[column], m_numberOfVisibleDecimal );
+        if(act > maximal)
+        {
+            maximal = act;
+        }
+    }
+
+    return maximal;
 }
