@@ -49,7 +49,7 @@ void Console::render()
 	if (ImGui::InputText("Input", command, 1024, inputTextFlags))
 	{
 		commands.push_back(glm::ivec2(m_buffer.str().size(), strlen(command)));
-		selected=commands.size();
+		selected=(int)commands.size();
 		m_buffer << command << "\n";
 
 		ConsoleCommand::dispatch(command);
@@ -74,8 +74,9 @@ void Console::onUpKey()
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected--;
 		if(selected<0){selected=0;}
-		else if(selected>=commands.size()){selected=commands.size()-1; }
+		else if(selected>=commands.size()){selected=(int)commands.size()-1;}
 		std::string ss=str.substr(commands[selected][0], commands[selected][1]);
+
 		memcpy(command, ss.c_str(), ss.size());
 		command[ss.size()] = '\0';
 
