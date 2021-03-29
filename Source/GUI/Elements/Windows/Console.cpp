@@ -82,7 +82,6 @@ void Console::onUpKey()
 		printf("up   %d/%lld,,<%s>\n", selected, commands.size()-1, command);
 	}
 	
-	render();
 }
 
 void Console::onDownKey()
@@ -104,5 +103,4 @@ void Console::onDownKey()
 		printf("down %d/%lld,,<%s>\n", selected, commands.size() - 1, command);
 	}
 	
-	render();
 }

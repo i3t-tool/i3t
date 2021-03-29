@@ -24,6 +24,14 @@ bool Select::freeStencil(char stencil){
 }
 unsigned char Select::getStencilAt(int x, int y, int r, int filter){
     int w=r*2+1,h=r*2+1;x-=r;y-=r;
+    float viewport[4];
+    glGetFloatv(GL_VIEWPORT, viewport);
+    if(x<(int)viewport[0]){w-=(int)viewport[0]-x;x=(int)viewport[0];}
+    if(y<(int)viewport[1]){h-=(int)viewport[1]-y;y=(int)viewport[1];}
+    if(x+w>(int)viewport[2]){w-=x+w-(int)viewport[2];}
+    if(y+h>(int)viewport[3]){h-=y+h-(int)viewport[3];}
+    if(w<=0||h<=0){return 0;}
+
     unsigned int*read=(unsigned int*)malloc(size_t(w * h*sizeof(unsigned int)));
     glReadPixels(x, y, w, h, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, read);
   

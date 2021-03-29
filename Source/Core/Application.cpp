@@ -196,8 +196,8 @@ int Application::initI3T()
 	m_world2 = World2::loadDefaultScene();
 
 	//testing
-	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
-	WorkspaceMatrix4x4* mat =new WorkspaceMatrixTranslation((ImTextureID)0, "load translate");
+	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
+	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixTranslation((ImTextureID)0, "load translate");
 	glm::mat4 m=glm::mat4(1.0f);
 	ValueSetResult result = mat->m_nodebase->setValue(glm::vec3(2.0f,2.0f,2.0f));
 	printf("value set result %d\n",result.status);
