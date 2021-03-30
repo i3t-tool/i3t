@@ -341,7 +341,14 @@ static const std::vector<Operation> operations = {
 
 namespace Core
 {
+/**
+ * From, to, multiplier, receive (play, pause, stopAndReset, prev, next).
+ */
 static const PinGroup cycleInputs = { EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, };
+
+/**
+ * Output value, emit (play, pause, stopAndReset, prev, next).
+ */
 static const PinGroup cycleOutputs = { EValueType::Float, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, };
 
 static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs };

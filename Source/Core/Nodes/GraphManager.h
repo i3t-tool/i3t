@@ -76,7 +76,7 @@ public:
   }
 
 	/**
-	 * \param tick in ms
+	 * \param tick in seconds.
 	 */
 	static void update(double tick);
 
@@ -159,7 +159,7 @@ public:
 	/**
 	 * \return All nodes plugged into node input pin on given index.
 	 */
-	static std::vector<Ptr<NodeBase>> getOutputNodes(Ptr<Core::NodeBase>& node, size_t index);
+	static std::vector<Ptr<NodeBase>> getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index);
 
 
 };

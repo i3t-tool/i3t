@@ -19,7 +19,9 @@ void LogWindow::render()
 	ImGui::Text("%f", cycle->getData().getFloat());
 
 	if (ImGui::Button("Play")) { cycle->play(); } ImGui::SameLine();
-	if (ImGui::Button("Stop")) { cycle->stop(); }
+	if (ImGui::Button("Stop")) { cycle->stop(); } ImGui::SameLine();
+	if (ImGui::Button("Prev")) { cycle->stepBack(); } ImGui::SameLine();
+	if (ImGui::Button("Next")) { cycle->stepNext(); }
 
 	ImGui::BeginChild(ID);
 	ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
