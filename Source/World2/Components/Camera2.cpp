@@ -51,6 +51,9 @@ void Camera2::update(){
 
     if (this->mainCamera){
         this->perspective = glm::perspective(glm::radians(angle), World2::width / World2::height, 0.2f, 2000.0f);
+        glStencilMask(255);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClearStencil(0);
     }
     else{
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbobkp);

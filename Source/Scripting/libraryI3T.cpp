@@ -28,21 +28,27 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
     int map=workspaceLayout.mat4Types.free;
     if (type > -1 && type < 7) { map = type; }
 
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>().get();
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace=&(ww->m_workspaceCoreNodes);
-    
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    char label[100]={0};
+
 	if(type== workspaceLayout.mat4Types.free){
-		_workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "load free"));
+		_workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "-"));
+        sprintf(label,"#%02llu %s",_workspace->back()->m_nodebase->getId(),_workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
+        _workspace->back()->m_headerLabel = label;
 		ValueSetResult result =(_workspace->back().get())->m_nodebase.get()->setValue(mat);
 		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
 	}
 	else if (type == workspaceLayout.mat4Types.scale) {
-		_workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "load scale"));
+		_workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "-"));
+        sprintf(label,"#%02llu %s",_workspace->back()->m_nodebase->getId(),_workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
+        _workspace->back()->m_headerLabel = label;
 		ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)mat[0]);
 		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
 	}
 	else if (type == workspaceLayout.mat4Types.translate) {
-		_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, "load translation"));
+		_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, ""));
+        sprintf(label,"#%02llu %s",_workspace->back()->m_nodebase->getId(),_workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
+        _workspace->back()->m_headerLabel= label;
 		ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)mat[0]);
 		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
 	}
@@ -56,11 +62,13 @@ void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value
     glm::vec4 vec = glm::vec4(1.0f);
     if (dataindex > -1 && dataindex < workspaceLayout.nodeData.size()) { vec = workspaceLayout.nodeData[dataindex][0]; }
 
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>().get();
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace = &(ww->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    char label[100]={0};
     ReturnValue->Val->Integer = (int)_workspace->size() - 1;
 
-    _workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "load NormalizeVector"));
+    _workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "-"));
+    sprintf(label,"#%02llu %s",_workspace->back()->m_nodebase->getId(),_workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
+    _workspace->back()->m_headerLabel = label;
     ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue(vec);
     ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)x, (float)y));
 
@@ -72,8 +80,7 @@ void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
     int outputindex=Param[2]->Val->Integer;
     int inputindex= Param[3]->Val->Integer;
 
-    WorkspaceWindow* ww = (WorkspaceWindow*)I3T::getWindowPtr<WorkspaceWindow>().get();
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace = &(ww->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     int startlen=workspaceLayout.startlen;
 
     if(indexa<0||indexa>=_workspace->size()-1){ReturnValue->Val->Integer =0;return;}

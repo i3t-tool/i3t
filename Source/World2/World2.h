@@ -15,17 +15,25 @@
 
 class WorkspaceMatrix4x4;
 class GameObject;
+namespace Core{class NodeBase;}
 
 struct Shader2{
-    GLuint program;///< GL shader program
-    GLuint camera;    ///< camera position before rotation
-    GLuint Mmatrix;   ///< matrix of model's transform in shader
-    GLuint PVMmatrix; ///< matrix view*model's transform in shader
-    GLuint VNmatrix;  ///< matrix for adjusting model's normals in shader
-    GLuint color;///<color
-    GLint attr_pos;///<vertice position attribute
-    GLint attr_norm; ///<vertice normal vector attribute
-    GLint attr_uv;///<vertice texture coords attribute
+    GLuint program;     ///< GL shader program
+    GLuint camera;      ///<uniform camera position before rotation
+    GLuint Mmatrix;     ///<uniform matrix of model's transform in shader
+    GLuint PVMmatrix;   ///<uniform matrix view*model's transform in shader
+    GLuint VNmatrix;    ///<uniform matrix for adjusting model's normals in shader
+    GLuint color;       ///<uniform color
+    GLint attr_pos;     ///<vertice position attribute
+    GLint attr_norm;    ///<vertice normal vector attribute
+    GLint attr_uv;      ///<vertice texture coords attribute
+};
+struct Manipulator {
+    Manipulator(bool*_isActive,Core::NodeBase**_edtedNode){this->isActive=_isActive;this->editedNode=_edtedNode;}
+    Manipulator(){this->isActive=nullptr;this->editedNode=nullptr;}
+    bool*isActive;
+    Core::NodeBase**editedNode;
+    //Component*owner;
 };
 
 class World2
@@ -44,7 +52,6 @@ public:
     Creates and initializes default scene
     */
     static World2* loadDefaultScene();
-    static World2* tmpAccess;
     /// calls start() on each component in scene
     /**
     
@@ -55,18 +62,18 @@ public:
     Draws scene, updates global camera matricies
     */
     void onUpdate();
-
+    ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(WorkspaceMatrix4x4*mat);
+    ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
+    ///Remove GameObject from scene (viewport window)
     bool removeModel(GameObject*);
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
-    GameObject* sceneHandles;///<control of transformation manipulators 
+    std::map<std::string,Manipulator>manipulators;///<Properites of manipulator components
 
-    ///load shaders
-    /**
-    load shaders, HC textures, HC gameobjects
-    */
+    ///load HC shaders, textures, gameobjects
     static bool init();
+    ///unload HC shaders, textures, gameobjects
     static void end();
     static float width;             ///< current viewport width
     static float height;            ///< current viewport width

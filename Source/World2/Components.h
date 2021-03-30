@@ -11,5 +11,5 @@
 #include "Components/Renderer.h"
 #include "Components/TransformHandles.h"
 #include "Components/CameraHandles.h"
-#include "Components/TranslationHandles.h"
-#include "Components/ScaleHandles.h"
+#include "Components/TranslationManipulator.h"
+#include "Components/ScaleManipulator.h"
