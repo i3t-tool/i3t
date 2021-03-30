@@ -5,13 +5,13 @@
 #include "Source/Core/Nodes/Node.h"
 
 
-class TranslationHandles : public Component {
+class TranslationManipulator : public Component {
 public:
-	TranslationHandles();
+	TranslationManipulator();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return TranslationHandles::typeStatic; };
-	const char* getComponentType() { return TranslationHandles::typeStatic; };
+	static const char* componentType() { return TranslationManipulator::typeStatic; };
+	const char* getComponentType() { return TranslationManipulator::typeStatic; };
 
 	Core::NodeBase *m_editednode;
 private:

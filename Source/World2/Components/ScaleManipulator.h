@@ -5,13 +5,13 @@
 #include "Source/Core/Nodes/Node.h"
 
 
-class ScaleHandles : public Component {
+class ScaleManipulator : public Component {
 public:
-	ScaleHandles();
+	ScaleManipulator();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return ScaleHandles::typeStatic; };
-	const char* getComponentType() { return ScaleHandles::typeStatic; };
+	static const char* componentType() { return ScaleManipulator::typeStatic; };
+	const char* getComponentType() { return ScaleManipulator::typeStatic; };
 
 	Core::NodeBase* m_editednode;
 private:
