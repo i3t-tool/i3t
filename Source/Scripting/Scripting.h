@@ -31,6 +31,5 @@ public:
 	void runCommand(std::string);
 private:
 	Picoc m_picoc;
-	bool m_picocExitPoint;
-
+	bool m_init=false;
 };

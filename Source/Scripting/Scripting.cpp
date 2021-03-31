@@ -14,7 +14,6 @@
 bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
 	FILE*f=fopen(filename,"w");
 	if(f==NULL){return false;}
-	//FILE*f=stdout;//dont fclose
 	fprintf(f,"//saving\n");
 
 	for (int i = 0; i < _workspace->size(); i++) {
@@ -78,28 +77,22 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){fprintf(f,"bool p%d_%d=plugnodes(n%d,n%d,%d,%d);\n",i,indexin, parentindex,i,indexout,indexin);}
 		}
 	}
-	fprintf(f,"//saved\n");
 	fclose(f);
 	return true;
 }
 bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
-	clearWorkspaceLayout();
-	getWorkspaceLayout()->startlen=(int)_workspace->size();
 
+	ScriptingData*data=getScriptingData();
+	int datalen=data->nodeData.size();
 	int p=PicocRunFile(filename);
-
-	clearWorkspaceLayout();
+	while(data->nodeData.size()>datalen){data->nodeData.pop_back(); }
 	return true;
 }
-void functionWhichProcessConsoleCommands(std::string rawCommand){
-
-}
-/* picoc problem */
 int PicocRunInteractive(){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
-	PlatformLibraryInitI3T(&pc);
 	if(PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
+	PlatformLibraryInitI3T(&pc);
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocParseInteractive(&pc);
 	PicocCleanup(&pc);
@@ -108,8 +101,8 @@ int PicocRunInteractive(){
 int PicocRunFile(const char* filename){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
+	if (PicocPlatformSetExitPoint(&pc)) {PicocCleanup(&pc); return pc.PicocExitValue;}
 	PlatformLibraryInitI3T(&pc);
-	if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocPlatformScanFile(&pc, filename);
 	PicocCleanup(&pc); printf("ASAS %d\n", pc.PicocExitValue);
@@ -120,14 +113,15 @@ int PicocRunFile(const char* filename){
 int PicocRunSource(const char* source){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
+	if (PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
 	PlatformLibraryInitI3T(&pc);
-	if (PicocPlatformSetExitPoint(&pc)) { PicocCleanup(&pc); return pc.PicocExitValue; }
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocParse(&pc, "somefilename", source, (int)strlen(source), TRUE, TRUE, TRUE, TRUE);
 	PicocCleanup(&pc);
 	return pc.PicocExitValue;
 }
 void Scripting::runCommand(std::string cmd) {
+	if(!m_init){return;}
 	if(PicocPlatformSetExitPoint(&m_picoc)){return;}
 	PicocParse(&m_picoc, "Run command", cmd.c_str(), (int)cmd.size(), TRUE, TRUE, TRUE, TRUE);
 	/*char s[1024]={0};
@@ -136,9 +130,10 @@ void Scripting::runCommand(std::string cmd) {
 }
 Scripting::Scripting() {
 	PicocInitialise(&m_picoc, PICOC_STACK_SIZE);
+	if(PicocPlatformSetExitPoint(&m_picoc)){PicocCleanup(&m_picoc); return;}
 	PlatformLibraryInitI3T(&m_picoc);
 	PicocIncludeAllSystemHeaders(&m_picoc);
-	m_picocExitPoint = false;
+	m_init=true;
 }
 Scripting::~Scripting() {
 	PicocCleanup(&m_picoc);
