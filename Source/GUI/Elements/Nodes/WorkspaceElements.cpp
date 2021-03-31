@@ -65,9 +65,9 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 	builder.Header(m_color);
 
-	ImGui::Spring(0); /* \todo JH what 0/1 means */
+	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
-	ImGui::Spring(1);
+	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y
 	ImGui::Dummy(ImVec2(0, 28));
 	ImGui::Spring(0);
 
