@@ -30,10 +30,10 @@ World2::World2(){
     ScaleManipulator* sm =          new ScaleManipulator();
     LookAtManipulator*lm =          new LookAtManipulator();
     OrthoManipulator*om =           new OrthoManipulator();
-    this->manipulators.emplace("Translation",   Manipulator(&tm->isActive,&tm->m_editednode));
-    this->manipulators.emplace("Scale",         Manipulator(&sm->isActive,&sm->m_editednode));
-    this->manipulators.emplace("LookAt",        Manipulator(&lm->isActive,&lm->m_editednode));
-    this->manipulators.emplace("Ortho",         Manipulator(&om->isActive,&om->m_editednode));
+    this->manipulators.emplace("Translation",   Manipulator(&tm->isActive,&tm->m_editednode));tm->isActive=false;
+    this->manipulators.emplace("Scale",         Manipulator(&sm->isActive,&sm->m_editednode));sm->isActive=false;
+    this->manipulators.emplace("LookAt",        Manipulator(&lm->isActive,&lm->m_editednode));lm->isActive=false;
+    this->manipulators.emplace("Ortho",         Manipulator(&om->isActive,&om->m_editednode));om->isActive=false;
     GameObject*sceneHandles = new GameObject();
     sceneHandles->addComponent(tm);
     sceneHandles->addComponent(sm);

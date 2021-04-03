@@ -41,6 +41,7 @@ ScaleManipulator::ScaleManipulator() {
 }
 
 void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
+	if(m_editednode==NULL){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -82,7 +83,8 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 }
 
 void ScaleManipulator::update() {
-	if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
+	if(m_editednode==NULL){return;}
+	m_edited=m_editednode->getData().getMat4();
 	///
 	bool transactionBegin=false;
 

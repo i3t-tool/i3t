@@ -30,6 +30,7 @@ LookAtManipulator::LookAtManipulator() {
 	m_edited=glm::mat4(1.0f);
 }
 void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
+	if(m_editednode==NULL){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -66,7 +67,8 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	CHECK_GL_ERROR();
 }
 void LookAtManipulator::update() {
-	if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
+	if(m_editednode==NULL){return;}
+	m_edited=m_editednode->getData().getMat4();
 	///
 	bool transactionBegin=false;
 

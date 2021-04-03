@@ -34,6 +34,7 @@ void OrthoManipulator::start(){
 	m_handle = new GameObject(unitcubeMesh, &World2::shaderHandle, 0);
 }
 void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
+	if(m_editednode==NULL){return;}
 	glm::mat4 projinv=glm::inverse(m_edited);
 	//glm::mat4 transform=(*parent)*owner->transformation;//TMP
 	glm::mat4 transform=glm::mat4(1.0f);
@@ -81,7 +82,8 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 	}
 }
 void OrthoManipulator::update(){
-	//if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
+	if(m_editednode==NULL){return;}
+	//m_edited=m_editednode->getData().getMat4();
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)) {
 		m_activehandle=-1;
 	}
