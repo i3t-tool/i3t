@@ -13,3 +13,5 @@
 #include "Components/CameraHandles.h"
 #include "Components/TranslationManipulator.h"
 #include "Components/ScaleManipulator.h"
+#include "Components/LookAtManipulator.h"
+#include "Components/OrthoManipulator.h"

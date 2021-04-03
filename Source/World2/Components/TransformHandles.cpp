@@ -434,9 +434,6 @@ void TransformHandles::update(){
 					glm::vec3 pc = planeIntersect((glm::vec3)(this->handlespace[axisnum]), (glm::vec3)(this->handlespace[axisnum2]), (glm::vec3)(this->handlespace[3]));
 
 					if (world2viewport(pc)[2] < 0.992f){
-						glm::mat4 parent = getFullTransform(this->editedobj->parent);
-						glm::vec4 result = glm::vec4(pc[0], pc[1], pc[2], 1.0f);
-						glm::vec4 editedo = glm::inverse(parent) * result;
 						this->handlespace[3]=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 					}
 				}

@@ -1,4 +1,4 @@
-#include "TranslationManipulator.h"
+#include "LookAtManipulator.h"
 
 #include "Core/Input/InputManager.h"
 #include "../HardcodedMeshes.h"
@@ -9,13 +9,11 @@
 #include "imgui.h"
 #include "ManipulatorUtil.h"
 
-#include <typeinfo>
+const char* LookAtManipulator::typeStatic = NULL;
 
-const char* TranslationManipulator::typeStatic = NULL;
-
-TranslationManipulator::TranslationManipulator() {
-    TranslationManipulator::typeStatic = typeid(TranslationManipulator).name();
-    type = TranslationManipulator::typeStatic;
+LookAtManipulator::LookAtManipulator() {
+    LookAtManipulator::typeStatic = typeid(LookAtManipulator).name();
+    type = LookAtManipulator::typeStatic;
 
 	m_stencilx = ManipulatorUtil::getStencil(0);printf("x %d\n",m_stencilx);
 	m_stencily = ManipulatorUtil::getStencil(1);
@@ -31,7 +29,7 @@ TranslationManipulator::TranslationManipulator() {
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
 }
-void TranslationManipulator::render(glm::mat4* parent, bool renderTransparent) {
+void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -67,8 +65,7 @@ void TranslationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	glDepthRange(0.0, 1.0);
 	CHECK_GL_ERROR();
 }
-
-void TranslationManipulator::update() {
+void LookAtManipulator::update() {
 	if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
 	///
 	bool transactionBegin=false;
@@ -98,9 +95,17 @@ void TranslationManipulator::update() {
 
 	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 
-	//m_handlespace=getNormalized(getFullTransform(m_edited->parent));//TMP
-	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
-	m_handlespace=m_edited;
+	glm::vec4 pos=m_handlespace[3];
+	//m_handlespace = getNormalized(getFullTransform(this->editedobj->parent));//TMP
+	m_handlespace=glm::mat4(1.0f);
+	m_handlespace[3]=pos;
+
+	//glm::mat4 t=getFullTransform(this->editedobj);//TMP
+	glm::mat4 t=m_edited;
+	glm::vec4 pose0=t[3];
+	glm::vec4 posh0=m_handlespace[3];
+	glm::vec4 dir0=posh0-pose0;
+	if(glm::length(dir0)<0.1f){m_handlespace[3] = pose0 + 0.1f*glm::normalize(t[2]);}//non-zero distance between editedobj and position to look at*/
 
 	if(m_activehandle==-1){return;}
 
@@ -130,19 +135,22 @@ void TranslationManipulator::update() {
 		glm::vec3 pc = planeIntersect((glm::vec3)(m_handlespace[m_axisnum]), (glm::vec3)(m_handlespace[m_axisnum2]), (glm::vec3)(m_handlespace[3]));
 						
 		if(world2viewport(pc)[2]<0.992f){
-			//glm::mat4 parent=getFullTransform(m_edited->parent);//TMP
-			glm::mat4 parent=glm::mat4(1.0f);
-			glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
-			glm::vec4 editedo=glm::inverse(parent)*result;
-			m_edited[3]=editedo;//TMP
+			m_handlespace[3]=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 		}
 	}
 	else{
 		drag3*=0.006f;
-		m_edited[3][m_axisnum]+=drag3[m_axisnum];
+		m_handlespace[3][m_axisnum]+=drag3[m_axisnum];
 	}
-	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
-	m_handlespace[3]=m_edited[3];//TMP
+	//glm::mat4 m=getFullTransform(this->editedobj->parent);//TMP
+	glm::mat4 m=glm::mat4(1.0f);//TMP
+	for (int i=0;i<4;i++){if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
+	glm::vec4 posh=(glm::inverse(m)*m_handlespace)[3];
+	glm::vec4 pose=m_edited[3];
+	glm::vec4 dir=posh-pose;
+	m_edited=getRotation(glm::mat4(glm::vec4(0.0f),glm::vec4(0.0f),dir,glm::vec4(0.0f)),2);
+	m_edited[3]=pose;
+
 	///
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue((glm::vec3)m_edited[3]);}
+	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[3][0], m_edited[3][1], m_edited[3][2]));}
 }

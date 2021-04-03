@@ -841,7 +841,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 		ImGui::EndPopup();
 	}
 
-
 	ImGui::PopStyleVar();
 	ne::Resume();
 

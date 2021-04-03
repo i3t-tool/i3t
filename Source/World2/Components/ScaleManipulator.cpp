@@ -84,7 +84,6 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 void ScaleManipulator::update() {
 	if(m_editednode!=NULL){m_edited=m_editednode->getData().getMat4();}
 	///
-	if(InputManager::isKeyPressed(Keys::p)){printMatrix3(m_edited);}//TMP
 	bool transactionBegin=false;
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);

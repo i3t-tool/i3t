@@ -161,19 +161,11 @@ void CameraHandles::update(){
 		glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen
 		glm::vec2 dir=spos2-spos1;//the axis in screen space
 		if(glm::length(dir)<0.01){dir[0]=1.0f;}//axis length must not be zero
-			
-		glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));			
-		mov[0]=glm::normalize(mov[0]);
-		mov[1]=glm::normalize(mov[1]);
-			
-		glm::vec2 drag,olddrag,dragfinal,mouse;
+		
+		glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
+		mov=glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 
-		mouse=glm::vec2(InputManager::m_mouseX,World2::height- InputManager::m_mouseY);
-		drag=glm::inverse(mov)*(mouse-spos1);
-		mouse=glm::vec2(InputManager::m_mouseX- InputManager::m_mouseXDelta,World2::height- InputManager::m_mouseY+ InputManager::m_mouseYDelta);
-		olddrag=glm::inverse(mov)*(mouse-spos1);
-		dragfinal=drag-olddrag;
-		dragfinal*=0.05f;
+		glm::vec2 dragfinal=mov*glm::vec2(InputManager::m_mouseXDelta,-InputManager::m_mouseYDelta)*0.05f;
 			
 		if(this->activehandle==this->stencils.names.n){
 			if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){

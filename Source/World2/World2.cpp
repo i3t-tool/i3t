@@ -28,11 +28,17 @@ GLuint World2::whiteTexture=0;
 World2::World2(){
     TranslationManipulator* tm =    new TranslationManipulator();
     ScaleManipulator* sm =          new ScaleManipulator();
+    LookAtManipulator*lm =          new LookAtManipulator();
+    OrthoManipulator*om =           new OrthoManipulator();
     this->manipulators.emplace("Translation",   Manipulator(&tm->isActive,&tm->m_editednode));
     this->manipulators.emplace("Scale",         Manipulator(&sm->isActive,&sm->m_editednode));
+    this->manipulators.emplace("LookAt",        Manipulator(&lm->isActive,&lm->m_editednode));
+    this->manipulators.emplace("Ortho",         Manipulator(&om->isActive,&om->m_editednode));
     GameObject*sceneHandles = new GameObject();
     sceneHandles->addComponent(tm);
     sceneHandles->addComponent(sm);
+    sceneHandles->addComponent(lm);
+    sceneHandles->addComponent(om);
 
     this->sceneRoot = new GameObject(gridMesh,&World2::shader0,0); 
     this->sceneRoot->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -151,9 +157,9 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
 }
 GameObject* World2::addModel(const char* name) {
     GameObject* g=nullptr;
-    if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,&World2::shader0,World2::cubeTexture);}
-    else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,&World2::shader0,World2::cubeColorTexture); }
-    else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,&World2::shader0,World2::cGridTexture); }
+    if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World2::shader0,World2::cubeTexture);}
+    else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World2::shader0,World2::cubeColorTexture); }
+    else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World2::shader0,World2::cGridTexture); }
     else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World2::shader0,World2::axisTexture); }
     if(g!=nullptr){this->sceneRoot->addChild(g,true);}
     return g;
