@@ -133,6 +133,9 @@ enum class ENodeType
 	MakePerspective,
 	MakeFrustum,
 	MakeLookAt,
+
+	Camera,
+	Screen,
 };
 
 enum class ETransformType
@@ -337,6 +340,9 @@ static const std::vector<Operation> operations = {
 		{"MakeFrustum", "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
+
+    {"Camera", "camera", 2, {EValueType::Matrix, EValueType::Matrix}, 1, {EValueType::Screen}},
+    {"Screen", "screen", 1, {EValueType::Screen}, 0, {}},
 };
 
 namespace Core

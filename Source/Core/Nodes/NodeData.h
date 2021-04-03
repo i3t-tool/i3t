@@ -110,9 +110,6 @@ FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
 /** An operator value type = type of the interconnection wire. */
 enum class EValueType
 {
-	/**
-	 * purely abstract - used just to provoke the connected operator to perfom some activity
-	 */
 	Pulse = 0,
 	Float, ///< standard data type
 	Vec3,
@@ -172,8 +169,9 @@ public:
 		case EValueType::Quat:
 			setValue(glm::quat());
 			break;
-		default: // MATRIX, MATRIX_MUL, PULSE
-			// setValue(glm::mat4()); //  set moved to initialiation
+		case EValueType::Matrix:
+			setValue(glm::mat4());
+		default:
 			break;
 		}
 	}

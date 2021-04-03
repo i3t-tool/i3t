@@ -27,7 +27,7 @@ void NodeBase::init()
 		m_internalData.emplace_back();
 	}
 
-	// Ugly workaround for Model node, which has no outputs.
+	// Ugly workaround for Model and Screen node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
 	{
 		m_internalData.emplace_back();
