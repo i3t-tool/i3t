@@ -5,7 +5,7 @@ WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, Workspa
 {}
 
 WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createTransform<Core::Scale>(), headerLabel, nodeLabel){
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Scale>(), headerLabel, nodeLabel){
 }
 
 void WorkspaceMatrixScale::drawData(util::NodeBuilder& builder)

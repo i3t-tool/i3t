@@ -4,6 +4,8 @@
 
 using namespace Core;
 
+std::vector<Ptr<Cycle>> GraphManager::m_cycles;
+
 ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 {
 	auto* inp = input;
@@ -156,7 +158,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& 
 	return result;
 }
 
-std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(Ptr<Core::NodeBase>& node, size_t index)
+std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
 {
 	Debug::Assert(node->getOutputPins().size() > index, "Out of range.");
 
@@ -167,6 +169,12 @@ std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(Ptr<Core::NodeBase>& nod
 		result.push_back(other->m_master);
 
 	return result;
+}
+
+void GraphManager::update(double tick)
+{
+	for (auto& cycle : m_cycles)
+		cycle->update(tick);
 }
 
 SequenceTree::SequenceTree(Ptr<NodeBase> sequence)

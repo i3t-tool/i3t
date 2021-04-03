@@ -24,9 +24,12 @@
 #include "Utils/TextureLoader.h"
 #include "World2/World2.h"
 
-
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "Nodes/GraphManager.h"
+
+double lastFrameSeconds = 0.0f;
+Ptr<Core::Cycle> testCycle;
 
 Application::Application()
 {
@@ -45,6 +48,11 @@ void Application::init()
 	ConsoleCommand::addListener(
 			[this](std::string rawCommand) { Log::info("Application got command '{}'.", rawCommand); });
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
+
+  /// \todo MH remove test code.
+  testCycle = Core::GraphManager::createCycle();
+	testCycle->setTo(10.0f);
+	testCycle->setMultiplier(0.10f);
 }
 
 void Application::initModules()
@@ -77,6 +85,11 @@ void Application::run()
 			delete command;
 		}
 		m_commands.clear();
+
+		double current = glfwGetTime();
+		double delta = current - lastFrameSeconds;
+		Core::GraphManager::update(delta);
+    lastFrameSeconds = current;
 
 		// Update and display.
 		onDisplay();

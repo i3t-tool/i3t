@@ -8,7 +8,7 @@ using namespace Core;
 
 TEST(Translation, CoordsValidation)
 {
-	auto translationNode = Builder::createTransform<Translation>();
+	auto translationNode = Core::Builder::createTransform<Translation>();
 
 	{
 		// Invalid coordinates.
@@ -39,7 +39,7 @@ TEST(Translation, CoordsValidation)
 
 TEST(Translation, GettersAndSetterShouldBeOk)
 {
-  auto translation = Builder::createTransform<Translation>()->as<Translation>();
+  auto translation = Core::Builder::createTransform<Translation>()->as<Translation>();
 
 	auto vec = generateVec3();
 

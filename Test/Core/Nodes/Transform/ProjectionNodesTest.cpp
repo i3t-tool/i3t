@@ -8,7 +8,7 @@ using namespace Core;
 
 TEST(OrthoProj, ShouldBeOk)
 {
-	auto ortho = Builder::createTransform<OrthoProj>(-10.0f, 10.0f, -5.0f, 5.0f, 1.0f, 100.0f);
+	auto ortho = Core::Builder::createTransform<OrthoProj>(-10.0f, 10.0f, -5.0f, 5.0f, 1.0f, 100.0f);
 
 	auto expectedMat = glm::ortho(-10.0f, 10.0f, -5.0f, 5.0f, 1.0f, 100.0f);
 	auto resultMat = ortho->getData().getMat4();
@@ -18,7 +18,7 @@ TEST(OrthoProj, ShouldBeOk)
 
 TEST(Ortho, GettersAndSettersShouldBeOk)
 {
-  auto ortho = Builder::createTransform<OrthoProj>()->as<OrthoProj>();
+  auto ortho = Core::Builder::createTransform<OrthoProj>()->as<OrthoProj>();
 
   float left = generateFloat();
   float right = generateFloat();
@@ -51,7 +51,7 @@ TEST(Ortho, GettersAndSettersShouldBeOk)
 //--- Perspective -------------------------------------------------------------
 TEST(PerspectiveProj, ShouldBeOk)
 {
-	auto perspective = Builder::createTransform<PerspectiveProj>(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
+	auto perspective = Core::Builder::createTransform<PerspectiveProj>(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
 
 	auto expectedMat = glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
 	auto resultMat = perspective->getData().getMat4();
@@ -61,7 +61,7 @@ TEST(PerspectiveProj, ShouldBeOk)
 
 TEST(PerspectiveProj, GettersAndSettersShouldBeOk)
 {
-  auto perspective = Builder::createTransform<PerspectiveProj>()->as<PerspectiveProj>();
+  auto perspective = Core::Builder::createTransform<PerspectiveProj>()->as<PerspectiveProj>();
 
 	float FOW = generateFloat();
 	float aspect = generateFloat();
@@ -86,7 +86,7 @@ TEST(PerspectiveProj, GettersAndSettersShouldBeOk)
 //--- Frustum -----------------------------------------------------------------
 TEST(Frustum, ShouldBeOk)
 {
-	auto frustum = Builder::createTransform<Frustum>(-15.0f, 15.0f, -10.0f, 10.0f, 0.01f, 100.0f);
+	auto frustum = Core::Builder::createTransform<Frustum>(-15.0f, 15.0f, -10.0f, 10.0f, 0.01f, 100.0f);
 
 	auto expectedMat = glm::frustum(-15.0f, 15.0f, -10.0f, 10.0f, 0.01f, 100.0f);
 	auto resultMat = frustum->getData().getMat4();
@@ -96,7 +96,7 @@ TEST(Frustum, ShouldBeOk)
 
 TEST(Frustum, GettersAndSettersShouldBeOk)
 {
-	auto frustum = Builder::createTransform<Frustum>()->as<Frustum>();
+	auto frustum = Core::Builder::createTransform<Frustum>()->as<Frustum>();
 
 	float left = generateFloat();
 	float right = generateFloat();
@@ -129,7 +129,7 @@ TEST(Frustum, GettersAndSettersShouldBeOk)
 //--- Look At -----------------------------------------------------------------
 TEST(LookAt, ShouldBeOk)
 {
-	auto lookAt = Builder::createTransform<LookAt>(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f},
+	auto lookAt = Core::Builder::createTransform<LookAt>(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f},
 	                                               glm::vec3{0.0f, 1.0f, 0.0f});
 
 	auto expectedMat =
@@ -141,7 +141,7 @@ TEST(LookAt, ShouldBeOk)
 
 TEST(LookAt, GettersAndSettersShouldBeOk)
 {
-	auto lookAt = Builder::createTransform<LookAt>();
+	auto lookAt = Core::Builder::createTransform<LookAt>();
 
 	auto lookAtAsTransform = lookAt->as<LookAt>();
 

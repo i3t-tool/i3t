@@ -9,7 +9,7 @@
 //{
 //  auto mat = new MatrixImpl(GetNextId(), "Matrix");
 //  s_nodes->emplace_back(mat);
-//  auto node = Builder::createNode<ENodeType::Matrix>();
+//  auto node = Core::Builder::createNode<ENodeType::Matrix>();
 //  s_nodes->back()->nodebase = std::move(node);
 //
 //  auto inputs = s_nodes->back()->nodebase.get()->getInputPins();

@@ -2,7 +2,7 @@
 
 #include "NodeImpl.h"
 
-#if WIN32
+#if defined(WIN32)
 #undef far
 #undef near
 #endif

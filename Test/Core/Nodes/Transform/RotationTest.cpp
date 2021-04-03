@@ -6,7 +6,7 @@ using namespace Core;
 
 TEST(EulerXOneValueSet, ShouldBeCorrect)
 {
-	auto rotXNode = Builder::createTransform<EulerRotX>();
+	auto rotXNode = Core::Builder::createTransform<EulerRotX>();
 
 	{
 		// mat[1][1], cos(T)
@@ -56,8 +56,8 @@ TEST(EulerXOneValueSet, ShouldBeCorrect)
 
 TEST(EulerXAngleSet, ShouldBeCorrect)
 {
-	std::array<NodePtr, 3> rots = {Builder::createTransform<EulerRotX>(), Builder::createTransform<EulerRotY>(),
-	                               Builder::createTransform<EulerRotZ>()};
+	std::array<NodePtr, 3> rots = {Builder::createTransform<EulerRotX>(), Core::Builder::createTransform<EulerRotY>(),
+	                               Core::Builder::createTransform<EulerRotZ>()};
 	auto angle = glm::radians(85.0f);
 	std::array<glm::mat4, 3> expectedMatrices = {
 			glm::rotate(angle, glm::vec3(1.0f, 0.0f, 0.0f)),
@@ -75,7 +75,7 @@ TEST(EulerXAngleSet, ShouldBeCorrect)
 
 TEST(EulerYOneValueSet, ShouldBeCorrect)
 {
-	auto rotYNode = Builder::createTransform<EulerRotY>();
+	auto rotYNode = Core::Builder::createTransform<EulerRotY>();
 
 	{
 		// mat[0][0], cos(T)
@@ -127,7 +127,7 @@ TEST(EulerYOneValueSet, ShouldBeCorrect)
 
 TEST(EulerZOneValueSet, ShouldBeCorrect)
 {
-	auto rotZNode = Builder::createTransform<EulerRotZ>();
+	auto rotZNode = Core::Builder::createTransform<EulerRotZ>();
 
 	{
 		// mat[0][0], cos(T)

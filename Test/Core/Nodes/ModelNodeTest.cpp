@@ -6,16 +6,16 @@ using namespace Core;
 
 TEST(ModelNode, ShouldConsumeTransformMatrix)
 {
-	auto sequence = Builder::createSequence();
+	auto sequence = Core::Builder::createSequence();
 
   GameObject gameObject;
-  auto modelNode = Builder::createNode<ENodeType::Model>();
+  auto modelNode = Core::Builder::createNode<ENodeType::Model>();
   modelNode->setValue(static_cast<void*>(&gameObject));
 
 	GraphManager::plug(sequence, modelNode, 0, 0);
 
-	auto scl = Builder::createTransform<Scale>(glm::vec3(5.0f));
-	auto rotZ = Builder::createTransform<EulerRotZ>(glm::radians(120.0f));
+	auto scl = Core::Builder::createTransform<Scale>(glm::vec3(5.0f));
+	auto rotZ = Core::Builder::createTransform<EulerRotZ>(glm::radians(120.0f));
 
 	sequence->addMatrix(scl);
 	sequence->addMatrix(rotZ);

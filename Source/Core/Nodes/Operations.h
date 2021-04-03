@@ -133,6 +133,9 @@ enum class ENodeType
 	MakePerspective,
 	MakeFrustum,
 	MakeLookAt,
+
+	Camera,
+	Screen,
 };
 
 enum class ETransformType
@@ -163,6 +166,8 @@ static const std::vector<std::string> defaultIoNames = {
 		""        // SCREEN		MN dodelat
 
 };
+
+using PinGroup = std::vector<EValueType>;
 
 static const std::vector<EValueType> matrixInput = {EValueType::Matrix};
 static const std::vector<EValueType> vectorInput = {EValueType::Vec4};
@@ -335,10 +340,25 @@ static const std::vector<Operation> operations = {
 		{"MakeFrustum", "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
+
+    {"Camera", "camera", 2, {EValueType::Matrix, EValueType::Matrix}, 1, {EValueType::Screen}},
+    {"Screen", "screen", 1, {EValueType::Screen}, 0, {}},
 };
 
 namespace Core
 {
+/**
+ * From, to, multiplier, receive (play, pause, stopAndReset, prev, next).
+ */
+static const PinGroup cycleInputs = { EValueType::Float, EValueType::Float, EValueType::Float, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, };
+
+/**
+ * Output value, emit (play, pause, stopAndReset, prev, next).
+ */
+static const PinGroup cycleOutputs = { EValueType::Float, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, EValueType::Pulse, };
+
+static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs };
+
 static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
 
 static const std::vector<Operation> g_transforms = {
@@ -365,4 +385,8 @@ FORCE_INLINE const Operation* getTransformProps(ETransformType type)
 {
 	return &g_transforms[static_cast<unsigned>(type)];
 }
+
+namespace Nodes
+{
+};
 }; // namespace Core

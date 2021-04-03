@@ -9,10 +9,10 @@ using namespace Core;
 
 TEST(Nodes, MakeTranslationNodeShouldBeValid)
 {
-	auto vec3 = Builder::createNode<ENodeType::Vector3>();
+	auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 	auto initialTranslation = generateVec3();
 
-	auto makeTranslation = Builder::createNode<ENodeType::MakeTranslation>();
+	auto makeTranslation = Core::Builder::createNode<ENodeType::MakeTranslation>();
 
 	GraphManager::plug(vec3, makeTranslation);
 
@@ -25,12 +25,12 @@ TEST(Nodes, MakeTranslationNodeShouldBeValid)
 
 TEST(Nodes, MakeEulerRotsNodeShouldBeValid)
 {
-	auto floatNode = Builder::createNode<ENodeType::Float>();
+	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
 	auto rotRads = generateFloat();
 
-	auto makeRotX = Builder::createNode<ENodeType::MakeEulerX>();
-	auto makeRotY = Builder::createNode<ENodeType::MakeEulerY>();
-	auto makeRotZ = Builder::createNode<ENodeType::MakeEulerZ>();
+	auto makeRotX = Core::Builder::createNode<ENodeType::MakeEulerX>();
+	auto makeRotY = Core::Builder::createNode<ENodeType::MakeEulerY>();
+	auto makeRotZ = Core::Builder::createNode<ENodeType::MakeEulerZ>();
 
 	GraphManager::plug(floatNode, makeRotX);
 	GraphManager::plug(floatNode, makeRotY);
@@ -49,12 +49,12 @@ TEST(Nodes, MakeEulerRotsNodeShouldBeValid)
 
 TEST(Nodes, MakeAxisRotShouldBeValid)
 {
-	auto floatNode = Builder::createNode<ENodeType::Float>();
-	auto axisNode = Builder::createNode<ENodeType::Vector3>();
+	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
+	auto axisNode = Core::Builder::createNode<ENodeType::Vector3>();
 	float rotRads = generateFloat();
 	auto axis = generateVec3();
 
-	auto makeAxisRotNode = Builder::createNode<ENodeType::MakeAxisAngle>();
+	auto makeAxisRotNode = Core::Builder::createNode<ENodeType::MakeAxisAngle>();
 
 	GraphManager::plug(floatNode, makeAxisRotNode, 0, 0);
 	GraphManager::plug(axisNode, makeAxisRotNode, 0, 1);
@@ -74,7 +74,7 @@ TEST(Nodes, MakeAxisRotShouldBeValid)
 
 TEST(Nodes, MakeOrthoShouldBeValid)
 {
-	auto makeOrthoNode = Builder::createNode<ENodeType::MakeOrtho>();
+	auto makeOrthoNode = Core::Builder::createNode<ENodeType::MakeOrtho>();
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeOrthoNode);
 
@@ -85,7 +85,7 @@ TEST(Nodes, MakeOrthoShouldBeValid)
 
 TEST(Nodes, MakePerspectiveShouldBeValid)
 {
-	auto makePerspectiveNode = Builder::createNode<ENodeType::MakePerspective>();
+	auto makePerspectiveNode = Core::Builder::createNode<ENodeType::MakePerspective>();
 
 	auto [inputValues, inputNodes] = generateFloatInputs<4>(makePerspectiveNode);
 
@@ -96,7 +96,7 @@ TEST(Nodes, MakePerspectiveShouldBeValid)
 
 TEST(Nodes, MakeFrustumShouldBeValid)
 {
-	auto makeFrustumNode = Builder::createNode<ENodeType::MakeFrustum>();
+	auto makeFrustumNode = Core::Builder::createNode<ENodeType::MakeFrustum>();
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeFrustumNode);
 
@@ -107,11 +107,11 @@ TEST(Nodes, MakeFrustumShouldBeValid)
 
 TEST(Nodes, MakeLookAtShouldBeValid)
 {
-	auto makeLookAtNode = Builder::createNode<ENodeType::MakeLookAt>();
+	auto makeLookAtNode = Core::Builder::createNode<ENodeType::MakeLookAt>();
 
-	auto vec1 = Builder::createNode<ENodeType::Vector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3>();
+	auto vec1 = Core::Builder::createNode<ENodeType::Vector3>();
+	auto vec2 = Core::Builder::createNode<ENodeType::Vector3>();
+	auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 
 	GraphManager::plug(vec1, makeLookAtNode, 0, 0);
 	GraphManager::plug(vec2, makeLookAtNode, 0, 1);
