@@ -23,6 +23,13 @@ Console::~Console()
 {
 }
 
+int history(ImGuiInputTextCallbackData*d) {
+	d->DeleteChars(0, d->BufTextLen);
+	d->InsertChars(0, command);
+
+	//if(d->EventKey==ImGuiKey_UpArrow){}
+	return 1;
+}
 void Console::render()
 {
 	ImGui::Begin(getName("Console").c_str(), getShowPtr());
@@ -31,7 +38,7 @@ void Console::render()
 	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
 	ImGui::BeginChild("Output", ImVec2{0, -footerHeightToReserve});
 
-	auto& m_buffer = m_stdoutCapture.GetBuffer();
+	std::stringstream& m_buffer = m_stdoutCapture.GetBuffer();
 
 	ImGui::TextUnformatted(m_buffer.str().c_str());
 
@@ -43,36 +50,30 @@ void Console::render()
 
 	ImGui::Separator();
 
-	// Reclaim focus after pressing enter key.
-	bool reclaimFocus = false;
-	const ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue;
+	const ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue|ImGuiInputTextFlags_CallbackHistory;
+	//ImGuiInputTextCallback in=[this]{return this->h();};
 
-	if (ImGui::InputText("Input", command, 1024, inputTextFlags))
+	if (ImGui::InputText("Input", command, 1024, inputTextFlags, &history))
 	{
-		commands.push_back(glm::ivec2(m_buffer.str().size(), strlen(command)));
+		bool nonwhite=false;
+		int len=strlen(command);
+		for(int i=0;i<len;i++){if(command[i]!='\t'&&command[i]!=' '){nonwhite=true;break;}}
+		if(nonwhite){commands.push_back(glm::ivec2(m_buffer.str().size(), len));}
 		selected=(int)commands.size();
+
 		m_buffer << command << "\n";
 
 		ConsoleCommand::dispatch(command);
 
         strcpy(command, "");
-		//strcpy_s(command, "");
-
-
-		reclaimFocus = true;
+		ImGui::SetKeyboardFocusHere(-1);
 	}
-
-	// Auto-focus on window apparition
-	ImGui::SetItemDefaultFocus();
-	if (reclaimFocus)
-		ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 
 	ImGui::End();
 }
 
 void Console::onUpKey()
 {
-	//std::cout << "UP" << std::endl;
 	if(commands.size()>0){
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected--;
@@ -82,14 +83,12 @@ void Console::onUpKey()
 
 		memcpy(command, ss.c_str(), ss.size());
 		command[ss.size()] = '\0';
-
-		printf("up   %d/%lld,,<%s>\n", selected, commands.size()-1, command);
+		//printf("up   %d/%lld,,<%s>\n", selected, commands.size()-1, command);
 	}
 }
 
 void Console::onDownKey()
 {
-
 	if (commands.size() > 0) {
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected++;
@@ -102,7 +101,6 @@ void Console::onDownKey()
 			memcpy(command, ss.c_str(), ss.size());
 			command[ss.size()] = '\0';
 		}
-
-		printf("down %d/%lld,,<%s>\n", selected, commands.size() - 1, command);
+		//printf("down %d/%lld,,<%s>\n", selected, commands.size() - 1, command);
 	}
 }

@@ -196,7 +196,7 @@ int Application::initI3T()
 	bool b = World2::init();
 	m_world2 = World2::loadDefaultScene();
 
-	//testing
+	/*//testing
 	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load scale");
 	WorkspaceMatrix4x4* mat =new WorkspaceMatrixFree((ImTextureID)0, "load free");
 	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixTranslation((ImTextureID)0, "load translate");
@@ -205,7 +205,7 @@ int Application::initI3T()
 	printf("value set result %d\n",result.status);
 	//ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
 	m_world2->handlesSetMatrix(mat);
-
+	*/
 	return 0;
 }
 
