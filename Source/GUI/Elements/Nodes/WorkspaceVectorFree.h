@@ -6,7 +6,7 @@ struct WorkspaceVectorFreeArgs
     WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
     std::string headerLabel = "default FreeVector header";
     std::string nodeLabel = "default FreeVector label";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Vector4>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector4>();
 };
 
 class WorkspaceVectorFree : public WorkspaceVector4

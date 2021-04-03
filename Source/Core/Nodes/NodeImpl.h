@@ -25,7 +25,7 @@ public:
 	/**
 	 * Creates an operator of given type (as template parameter).
 	 *
-	 * <b>DON'T</b> construct object directly, use Builder::createNode() function.
+	 * <b>DON'T</b> construct object directly, use Core::Builder::createNode() function.
 	 *
 	 * Code taken from I3T v1 NodeImpl<OperatorType>::NodeImpl(...).
 	 * Operator is no more associated with GUI, as used to be, so no input

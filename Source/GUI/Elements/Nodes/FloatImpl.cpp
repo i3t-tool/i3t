@@ -8,7 +8,7 @@
 //{
 //  auto NV = new FloatImpl(GetNextId(), "Float");
 //  s_nodes->emplace_back(NV);
-//  auto node = Builder::createNode<ENodeType::Float>();
+//  auto node = Core::Builder::createNode<ENodeType::Float>();
 //  s_nodes->back()->nodebase = std::move(node);
 //
 //  auto inputs = s_nodes->back()->nodebase.get()->getInputPins();

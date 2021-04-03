@@ -46,11 +46,11 @@ public:
 
 	void onCycleFinish();
 
-	bool isRunning();
-	float getFrom();
-	float getTo();
-	float getMultiplier();
-	float getStep();
+	bool isRunning() const;
+	float getFrom() const;
+	float getTo() const;
+	float getMultiplier() const;
+	float getStep() const;
 
 	/**
 	 * \param from in seconds

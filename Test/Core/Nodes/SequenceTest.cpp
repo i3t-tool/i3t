@@ -4,6 +4,8 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+using namespace Core;
+
 static glm::mat4 matVal1;
 static glm::mat4 matVal2;
 static glm::mat4 matVal3;
@@ -15,11 +17,11 @@ Ptr<Core::Sequence> arrangeSequence()
 	matVal3 = glm::mat4(10.0f);
 
   // Create seq. and matrices.
-  auto seq = Builder::createSequence();
+  auto seq = Core::Builder::createSequence();
 
-  auto mat1 = Builder::createNode<ENodeType::Matrix>();
-  auto mat2 = Builder::createNode<ENodeType::Matrix>();
-  auto mat3 = Builder::createNode<ENodeType::Matrix>();
+  auto mat1 = Core::Builder::createNode<ENodeType::Matrix>();
+  auto mat2 = Core::Builder::createNode<ENodeType::Matrix>();
+  auto mat3 = Core::Builder::createNode<ENodeType::Matrix>();
 
   mat1->setValue(matVal1);
   mat2->setValue(matVal2);
@@ -67,9 +69,9 @@ TEST(Sequence, InternalValueCanBeRead)
 {
   auto seq = arrangeSequence();
 
-  auto matMulMatNode = Builder::createNode<ENodeType::MatrixMulMatrix>();
+  auto matMulMatNode = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
 
-	auto identityMatNode = Builder::createTransform<Core::Free>();
+	auto identityMatNode = Core::Builder::createTransform<Core::Free>();
 	identityMatNode->setValue(glm::mat4(1.0f));
 
   {
@@ -88,7 +90,7 @@ TEST(Sequence, InternalValueCanBeSet)
 {
   auto seq = arrangeSequence();
 
-  auto matNode = Builder::createTransform<Core::Free>();
+  auto matNode = Core::Builder::createTransform<Core::Free>();
   matNode->setValue(generateMat4());
 
   auto plugResult = Core::GraphManager::plugSequenceValueInput(seq, matNode);

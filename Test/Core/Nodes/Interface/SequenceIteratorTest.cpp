@@ -12,9 +12,9 @@ using namespace Core;
 TEST(Sequences, MatrixIterator)
 {
 	// Prepare graph.
-	auto root = Builder::createSequence();
-	auto branch1 = Builder::createSequence();
-	auto branch2 = Builder::createSequence();
+	auto root = Core::Builder::createSequence();
+	auto branch1 = Core::Builder::createSequence();
+	auto branch2 = Core::Builder::createSequence();
 
 	std::vector<Ptr<NodeBase>> matrices = {
 			// sequence 1

@@ -8,7 +8,7 @@ void Cycle::update(double seconds)
 {
   if (m_isRunning)
   {
-		updateValue(seconds * m_multiplier);
+		updateValue(static_cast<float>(seconds) * m_multiplier);
 	}
 }
 
@@ -63,27 +63,27 @@ void Cycle::setStep(float v)
 	m_multiplier = v;
 }
 
-bool Cycle::isRunning()
+bool Cycle::isRunning() const
 {
 	return m_isRunning;
 }
 
-float Cycle::getFrom()
+float Cycle::getFrom() const
 {
 	return m_from;
 }
 
-float Cycle::getTo()
+float Cycle::getTo() const
 {
 	return m_to;
 }
 
-float Cycle::getMultiplier()
+float Cycle::getMultiplier() const
 {
 	return m_updateStep;
 }
 
-float Cycle::getStep()
+float Cycle::getStep() const
 {
 	return m_multiplier;
 }

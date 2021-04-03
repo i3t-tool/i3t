@@ -6,7 +6,7 @@ struct WorkspaceMatrix4x4Args
     WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
     std::string headerLabel = "default Matrix4x4 header";
     std::string nodeLabel = "Free";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Matrix>();
 };
 
 /*! \class WorkspaceMatrix4x4 virtual class for all Nodes with Matrix4x4 Core data*/

@@ -6,7 +6,7 @@ struct WorkspaceMatrixScaleArgs
     WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
     std::string headerLabel = "default MatrixScale header";
     std::string nodeLabel = "Scale";
-    Ptr<Core::NodeBase> nodebase = Builder::createTransform<Core::Scale>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createTransform<Core::Scale>();
 };
 
 class WorkspaceMatrixScale : public WorkspaceMatrix4x4

@@ -18,7 +18,7 @@ std::tuple<std::array<float, Size>, std::array<Ptr<NodeBase>, Size>> generateFlo
 	for (size_t i = 0; i < Size; ++i)
 	{
 		inputValues[i] = generateFloat();
-		inputNodes[i] = Builder::createNode<ENodeType::Float>();
+		inputNodes[i] = Core::Builder::createNode<ENodeType::Float>();
 		inputNodes[i]->setValue(inputValues[i]);
 		GraphManager::plug(inputNodes[i], node, 0, i);
 	}

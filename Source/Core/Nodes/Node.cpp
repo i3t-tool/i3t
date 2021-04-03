@@ -10,7 +10,7 @@ NodeBase::~NodeBase()
 	unplugAll();
 }
 
-void NodeBase::create()
+void NodeBase::init()
 {
 	m_id = IdGenerator::next();
 

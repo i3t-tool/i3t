@@ -9,7 +9,7 @@ using namespace Core;
 TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
 {
 	// Create uniform scale.
-	auto scale = Builder::createTransform<Scale>();
+	auto scale = Core::Builder::createTransform<Scale>();
 
 	{
 		// Set new uniform scale.
@@ -39,7 +39,7 @@ TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
 TEST(SetVec3Scale, ScaleShouldBeValid)
 {
 	auto scale = glm::vec3(1.5f, 1.5f, 1.5f);
-	auto scaleNode = Builder::createTransform<Scale>();
+	auto scaleNode = Core::Builder::createTransform<Scale>();
 
 	scaleNode->setDataMap(Transform::g_Scale);
 	EXPECT_EQ(Transform::g_Scale, scaleNode->getDataMap());
@@ -56,7 +56,7 @@ TEST(ResetScaleNode, ResetsNodeToInitialValues)
 	auto scale = glm::vec3(7.f, -5.f, 3.f);
 
 	// Create non-uniform scale
-	auto scaleNode = Builder::createTransform<Core::Scale>(scale, Transform::g_Scale);
+	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale, Transform::g_Scale);
 	EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Scale);
 
 	// Set free transformation node.
@@ -92,7 +92,7 @@ TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
 	auto scale = glm::vec3(-2.0f);
 	auto scaleMat = glm::scale(scale);
 
-	auto scaleNode = Builder::createTransform<Core::Scale>(scale, Transform::g_UniformScale);
+	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale, Transform::g_UniformScale);
 
 	{
 		// Invalid coordinates.
@@ -112,7 +112,7 @@ TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
 
 TEST(Scale, GettersAndSetterShouldBeOk)
 {
-  auto scale = Builder::createTransform<Scale>()->as<Scale>();
+  auto scale = Core::Builder::createTransform<Scale>()->as<Scale>();
 
   auto vec = generateVec3();
 

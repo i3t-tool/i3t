@@ -8,7 +8,7 @@
 //{
 //  auto NV = new DeterminantImpl(GetNextId(), "Determinant");
 //  s_nodes->emplace_back(NV);
-//  auto node = Builder::createNode<ENodeType::Determinant>();
+//  auto node = Core::Builder::createNode<ENodeType::Determinant>();
 //  s_nodes->back()->nodebase = std::move(node);
 //
 //  auto inputs = s_nodes->back()->nodebase.get()->getInputPins();

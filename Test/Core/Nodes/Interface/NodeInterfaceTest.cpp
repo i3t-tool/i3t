@@ -21,15 +21,15 @@ Ptr<NodeBase> mul1, mul2, mul3;
  */
 Ptr<NodeBase> prepareEnvironment()
 {
-  scale1 = Builder::createTransform<Scale>();
-  rotX = Builder::createTransform<EulerRotX>(initialRot);
-  scale2 = Builder::createTransform<Scale>(initialScale, Transform::g_Scale);
-  translation = Builder::createTransform<Translation>(initialTransl);
+  scale1 = Core::Builder::createTransform<Scale>();
+  rotX = Core::Builder::createTransform<EulerRotX>(initialRot);
+  scale2 = Core::Builder::createTransform<Scale>(initialScale, Transform::g_Scale);
+  translation = Core::Builder::createTransform<Translation>(initialTransl);
 
 	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be complete yet!)
-  mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
-  mul2 = Builder::createNode<ENodeType::MatrixMulMatrix>();
-  mul3 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+  mul1 = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
+  mul2 = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
+  mul3 = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
 
   GraphManager::plug(scale1, mul1, 0, 0);
   GraphManager::plug(rotX, mul1, 0, 1);
@@ -84,8 +84,8 @@ TEST(GetNodeInputsAndOutputs, ReturnsValidResults)
 	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
 
 	auto root = getRoot(lastNode);
-  auto anotherMatNode1 = Builder::createNode<ENodeType::MatrixAddMatrix>();
-  auto anotherMatNode2 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+  auto anotherMatNode1 = Core::Builder::createNode<ENodeType::MatrixAddMatrix>();
+  auto anotherMatNode2 = Core::Builder::createNode<ENodeType::MatrixAddMatrix>();
 	GraphManager::plug(root, anotherMatNode1, 0, 0);
 	GraphManager::plug(root, anotherMatNode2, 0, 0);
 
@@ -96,6 +96,6 @@ TEST(GetNodeInputsAndOutputs, ReturnsValidResults)
 
 TEST(TransformNodeType, TypeShouldBeDeducedFromOperationType)
 {
-	auto scale = Builder::createTransform<Scale>();
+	auto scale = Core::Builder::createTransform<Scale>();
 	EXPECT_EQ(&g_transforms[static_cast<size_t>(ETransformType::Scale)], scale->getOperation());
 }

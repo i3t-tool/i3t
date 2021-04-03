@@ -10,11 +10,14 @@
 #include <algorithm>
 
 #include "Cycle.h"
+#include "NodeData.h"
 #include "NodeImpl.h"
 #include "Operations.h"
 #include "Sequence.h"
 #include "Transform.h"
 
+namespace Core
+{
 namespace Builder
 {
 /**
@@ -23,13 +26,16 @@ namespace Builder
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
+template <ENodeType T> FORCE_INLINE Ptr<NodeBase> createNode()
 {
+  bool shouldUnlockAllValues = T == ENodeType::Float || T == ENodeType::Vector3 || T == ENodeType::Vector4 || T == ENodeType::Matrix;
+  auto ret = std::make_shared<NodeImpl<T>>();
+  ret->init();
+  if (shouldUnlockAllValues)
+    ret->setDataMap(Transform::g_Free);
 
-	auto ret = std::make_shared<Core::NodeImpl<T>>();
-	ret->create();
-	ret->updateValues(0);
-	return ret;
+  ret->updateValues(0);
+  return ret;
 }
 
 /**
@@ -38,23 +44,21 @@ template <ENodeType T> FORCE_INLINE Ptr<Core::NodeBase> createNode()
  */
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
-	auto ret = std::make_shared<Core::Sequence>();
-	ret->create();
-	ret->updateValues(0);
-	return ret;
+  auto ret = std::make_shared<Core::Sequence>();
+  ret->init();
+  ret->updateValues(0);
+  return ret;
 }
 
 template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
 {
-	auto ret = std::make_shared<T>(std::forward<Args>(args)...);
-	ret->create();
-	ret->reset();
-	return ret;
+  auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+  ret->init();
+  ret->reset();
+  return ret;
 }
 } // namespace Builder
 
-namespace Core
-{
 class GraphManager
 {
 	/// References to created cycle nodes which needs to be updated.
@@ -67,7 +71,7 @@ public:
   static Ptr<Core::Cycle> createCycle()
   {
     auto ret = std::make_shared<Core::Cycle>();
-    ret->create();
+		ret->init();
     ret->updateValues(0);
 
 		m_cycles.push_back(ret);
@@ -103,9 +107,9 @@ public:
 	 * Usage:
 	 * \code
 	 *    // Create nodes.
-	 *    auto vec1 = Builder::createNode<OperationType::Vector3>();
-	 *    auto vec2 = Builder::createNode<OperationType::Vector3>();
-	 *    auto dotNode = Builder::createNode<OperationType::Vector3DotVector3>();
+	 *    auto vec1 = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto vec2 = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto dotNode = Core::Builder::createNode<OperationType::Vector3DotVector3>();
 	 *
 	 *    // Plug vector nodes output to dot node inputs.
 	 *    GraphManager::plug(vec1, dotNode, 0, 0);

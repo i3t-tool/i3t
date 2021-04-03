@@ -45,6 +45,7 @@ struct ValueSetResult
 	}
 };
 
+
 namespace Core
 {
 class Pin;
@@ -66,12 +67,11 @@ protected:
 	/// Outputs of the box: output tabs with glyphs.
 	std::vector<Pin> m_outputs;
 
-	/// Values which node owns.
-	std::vector<DataStore> m_initialData;
+	/// Results of operations.
 	std::vector<DataStore> m_internalData;
 
 	Transform::DataMap m_initialMap{};
-	Transform::DataMap m_currentMap = Transform::g_Free;
+	Transform::DataMap m_currentMap = Transform::g_AllLocked;
 
 	/**
 	 * Operator node properties.
@@ -94,23 +94,32 @@ public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
-	template <typename T>
+  Ptr<NodeBase> getPtr() { return shared_from_this(); }
+
+  template <typename T>
 	Ptr<T> as()
   {
 		static_assert(std::is_base_of_v<NodeBase, T>, "T must be derived from NodeBase class.");
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
 
-	void create();
+	/**
+	 * Initialize node inputs and outputs according to preset node type.
+	 *
+	 * Called in create node function.
+	 */
+	void init();
 
 	[[nodiscard]] ID getId() const;
-
-	Ptr<NodeBase> getPtr() { return shared_from_this(); }
 
 	const Operation* const getOperation() { return m_operation; }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:
+	/**
+	 * Get data storage for read and write purposes. No written value validation
+	 * is performed.
+	 */
 	DataStore& getInternalData(size_t index = 0)
 	{
 		Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
@@ -120,7 +129,7 @@ protected:
 
 public:
 	/**
-	 * Get Node contents.
+	 * Get Node contents, read only.
 	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
 	 *              Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data

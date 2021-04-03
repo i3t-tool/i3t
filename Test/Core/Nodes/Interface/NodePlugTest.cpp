@@ -6,9 +6,9 @@ using namespace Core;
 
 TEST(PlugTwoVec3Nodes, TheirDotProductShouldBeCorrect)
 {
-  auto vec1 = Builder::createNode<ENodeType::Vector3>();
-  auto vec2 = Builder::createNode<ENodeType::Vector3>();
-  auto dotNode = Builder::createNode<ENodeType::Vector3DotVector3>();
+  auto vec1 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto vec2 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto dotNode = Core::Builder::createNode<ENodeType::Vector3DotVector3>();
 
   // Plug vec1 and vec2 to dotNode inputs.
   GraphManager::plug(vec1, dotNode, 0, 0);
@@ -23,8 +23,8 @@ TEST(PlugTwoVec3Nodes, TheirDotProductShouldBeCorrect)
 
 TEST(PlugTwoNodesWithDifferentTypes, NodeShouldNotBeConnected)
 {
-  auto fl = Builder::createNode<ENodeType::Float>();
-  auto vec3 = Builder::createNode<ENodeType::Vector3>();
+  auto fl = Core::Builder::createNode<ENodeType::Float>();
+  auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 
   auto result = GraphManager::plug(vec3, fl, 0, 0);
 
@@ -33,7 +33,7 @@ TEST(PlugTwoNodesWithDifferentTypes, NodeShouldNotBeConnected)
 
 TEST(PlugNodeOuputToTheSameNodeInput, NodeShouldNotBeConnected)
 {
-  auto vec3 = Builder::createNode<ENodeType::Vector3>();
+  auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 
   auto result = GraphManager::plug(vec3, vec3, 0, 0);
 
@@ -42,10 +42,10 @@ TEST(PlugNodeOuputToTheSameNodeInput, NodeShouldNotBeConnected)
 
 TEST(PlugWouldCreateCycleInGraph, NodesShouldNotBeConnected)
 {
-  auto f1 = Builder::createNode<ENodeType::Float>();
-  auto f2 = Builder::createNode<ENodeType::Float>();
-  auto f3 = Builder::createNode<ENodeType::Float>();
-  auto f4 = Builder::createNode<ENodeType::Float>();
+  auto f1 = Core::Builder::createNode<ENodeType::Float>();
+  auto f2 = Core::Builder::createNode<ENodeType::Float>();
+  auto f3 = Core::Builder::createNode<ENodeType::Float>();
+  auto f4 = Core::Builder::createNode<ENodeType::Float>();
 
   GraphManager::plug(f2, f1, 0, 0);
   GraphManager::plug(f3, f2, 0, 0);
@@ -58,8 +58,8 @@ TEST(PlugWouldCreateCycleInGraph, NodesShouldNotBeConnected)
 
 TEST(SimpleUnplug, UnplugMeFromPluggedNode)
 {
-  auto vec1 = Builder::createNode<ENodeType::Vector3>();
-  auto vec2 = Builder::createNode<ENodeType::Vector3>();
+  auto vec1 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto vec2 = Core::Builder::createNode<ENodeType::Vector3>();
 
   GraphManager::plug(vec1, vec2, 0, 0);
 
@@ -76,9 +76,9 @@ TEST(SimpleUnplug, UnplugMeFromPluggedNode)
 
 TEST(UnplugInTheMiddleOfChain, UnplugShouldBeSuccessful)
 {
-  auto vec1 = Builder::createNode<ENodeType::Vector3>();
-  auto vec2 = Builder::createNode<ENodeType::Vector3>();
-  auto vec3 = Builder::createNode<ENodeType::Vector3>();
+  auto vec1 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto vec2 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 
   GraphManager::plug(vec1, vec2, 0, 0);
   GraphManager::plug(vec2, vec3, 0, 0);

@@ -6,10 +6,10 @@ using namespace Core;
 
 TEST(SetValueOnVector, SignalSpreadedThroughAllConnectedNodes)
 {
-  auto vec1 = Builder::createNode<ENodeType::Vector3>();
-  auto vec2 = Builder::createNode<ENodeType::Vector3>();
-  auto dotNode = Builder::createNode<ENodeType::Vector3DotVector3>();
-	auto floatNode = Builder::createNode<ENodeType::Float>();
+  auto vec1 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto vec2 = Core::Builder::createNode<ENodeType::Vector3>();
+  auto dotNode = Core::Builder::createNode<ENodeType::Vector3DotVector3>();
+	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
 
   // Plug vec1 and vec2 to dotNode inputs.
   GraphManager::plug(vec1, dotNode, 0, 0);
