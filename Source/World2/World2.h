@@ -15,7 +15,7 @@
 
 class WorkspaceMatrix4x4;
 class GameObject;
-namespace Core{class NodeBase;}
+namespace Core{class NodeBase;class Sequence;}
 
 struct Shader2{
     GLuint program;     ///< GL shader program
@@ -29,10 +29,11 @@ struct Shader2{
     GLint attr_uv;      ///<vertice texture coords attribute
 };
 struct Manipulator {
-    Manipulator(bool*_isActive,Core::NodeBase**_edtedNode){this->isActive=_isActive;this->editedNode=_edtedNode;}
-    Manipulator(){this->isActive=nullptr;this->editedNode=nullptr;}
+    Manipulator(bool*_isActive,const std::shared_ptr<Core::NodeBase>**_editedNode,const std::shared_ptr<Core::Sequence>**_parent){isActive=_isActive;editedNode=_editedNode;parent=_parent;}
+    Manipulator(){isActive=nullptr;editedNode=nullptr;parent=nullptr;}
     bool*isActive;
-    Core::NodeBase**editedNode;
+    const std::shared_ptr<Core::NodeBase>**editedNode;
+    const std::shared_ptr<Core::Sequence>**parent;
     //Component*owner;
 };
 
@@ -63,7 +64,7 @@ public:
     */
     void onUpdate();
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
-    void handlesSetMatrix(WorkspaceMatrix4x4*mat);
+    void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
     ///Remove GameObject from scene (viewport window)

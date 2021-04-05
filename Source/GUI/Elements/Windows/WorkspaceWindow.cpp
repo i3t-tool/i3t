@@ -180,7 +180,7 @@ void WorkspaceWindow::manipulatorStartCheck3D()
             selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
         }
 
-        world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
+        world2->handlesSetMatrix(&selectedWorkspaceMatrix4x4,nullptr);
 
     }
 }

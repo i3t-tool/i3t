@@ -13,7 +13,8 @@ class LookAtManipulator:public Component
 	static const char* componentType() { return LookAtManipulator::typeStatic; };
 	const char* getComponentType() { return LookAtManipulator::typeStatic; };
 
-	Core::NodeBase* m_editednode;
+	const Ptr<Core::NodeBase> *m_editednode=nullptr;
+	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
 	static const char* typeStatic;
 

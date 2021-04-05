@@ -83,7 +83,7 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 }
 void OrthoManipulator::update(){
 	if(m_editednode==NULL){return;}
-	//m_edited=m_editednode->getData().getMat4();
+	//m_edited=m_editednode->get()->getData().getMat4();
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)) {
 		m_activehandle=-1;
 	}
@@ -147,5 +147,5 @@ void OrthoManipulator::update(){
 	}
 	//printf("%f\n",pheight);
 	///
-	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue((glm::vec3)m_edited[3]);}
+	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue((glm::vec3)m_edited[3]);}
 }

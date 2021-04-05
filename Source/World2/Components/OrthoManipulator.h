@@ -14,7 +14,8 @@ public:
 	static const char* componentType() { return OrthoManipulator::typeStatic; };
 	const char* getComponentType() { return OrthoManipulator::typeStatic; };
 
-	Core::NodeBase* m_editednode;
+	const Ptr<Core::NodeBase> *m_editednode=nullptr;
+	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
 	static const char* typeStatic;
 

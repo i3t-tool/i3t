@@ -71,7 +71,7 @@ void TranslationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 void TranslationManipulator::update() {
 	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->getData().getMat4();
+	m_edited=m_editednode->get()->getData().getMat4();
 	///
 	bool transactionBegin=false;
 
@@ -146,5 +146,5 @@ void TranslationManipulator::update() {
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
 	m_handlespace[3]=m_edited[3];//TMP
 	///
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue((glm::vec3)m_edited[3]);}
+	if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue((glm::vec3)m_edited[3]);}
 }

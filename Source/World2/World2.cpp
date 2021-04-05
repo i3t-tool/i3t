@@ -30,10 +30,10 @@ World2::World2(){
     ScaleManipulator* sm =          new ScaleManipulator();
     LookAtManipulator*lm =          new LookAtManipulator();
     OrthoManipulator*om =           new OrthoManipulator();
-    this->manipulators.emplace("Translation",   Manipulator(&tm->isActive,&tm->m_editednode));tm->isActive=false;
-    this->manipulators.emplace("Scale",         Manipulator(&sm->isActive,&sm->m_editednode));sm->isActive=false;
-    this->manipulators.emplace("LookAt",        Manipulator(&lm->isActive,&lm->m_editednode));lm->isActive=false;
-    this->manipulators.emplace("Ortho",         Manipulator(&om->isActive,&om->m_editednode));om->isActive=false;
+    this->manipulators.emplace("Translation",   Manipulator(&tm->isActive,&tm->m_editednode,&tm->m_parent));tm->isActive=false;
+    this->manipulators.emplace("Scale",         Manipulator(&sm->isActive,&sm->m_editednode,&sm->m_parent));sm->isActive=false;
+    this->manipulators.emplace("LookAt",        Manipulator(&lm->isActive,&lm->m_editednode,&lm->m_parent));lm->isActive=false;
+    this->manipulators.emplace("Ortho",         Manipulator(&om->isActive,&om->m_editednode,&om->m_parent));om->isActive=false;
     GameObject*sceneHandles = new GameObject();
     sceneHandles->addComponent(tm);
     sceneHandles->addComponent(sm);
@@ -122,27 +122,29 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
-void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
-    printf("handlesSetMatrix 0x%p\n",matnode);
+void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
+    printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         *(i->second.isActive)=false;
         *(i->second.editedNode)=nullptr;
     }
     if(matnode==nullptr){return;}
-    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)matnode;
-    Ptr<Core::NodeBase>		    nodebase    = nodebasedata->m_nodebase;
+    if(matnode->get()==nullptr){return;}
+    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get());
+    const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->m_nodebase;
     WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata;
-    Core::Transform::DataMap	data		= nodebase->getDataMap();
-	const Operation*			operation	= nodebase->getOperation();
+    Core::Transform::DataMap	data		= nodebase->get()->getDataMap();
+	const Operation*			operation	= nodebase->get()->getOperation();
 	const char*					keyword		= operation->keyWord.c_str();
-    DataStore                   datastore   = nodebase->getData();
+    DataStore                   datastore   = nodebase->get()->getData();
     glm::mat4                   mat         = datastore.getMat4();
 
     //nodebase->
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         *m.isActive=true;
-        *m.editedNode=nodebase.get();
+        *m.editedNode=nodebase;
+        printf("nodebase 0x%p get 0x%p\n",&nodebase,nodebase->get());
     }
     else{printf("No manipulators\n"); }
 

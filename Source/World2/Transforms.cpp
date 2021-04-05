@@ -111,6 +111,24 @@ glm::mat4 getFullTransform(GameObject* obj){
 	while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
 	return transform;
 }
+glm::mat4 getNodeTransform(Ptr<Core::NodeBase>node,Ptr<Core::Sequence>parent){
+	//Ptr<Core::NodeBase>n=Ptr<Core::NodeBase>(node.get());
+	Core::SequenceTree tree(parent);
+
+	glm::mat4 m=glm::mat4(1.0f);
+	Core::SequenceTree::MatrixIterator it=tree.begin();
+	Ptr<Core::NodeBase>nn=*it;
+	while(nn.get()!=node.get()&&it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node.get(),nn.get());it++;nn=*it;}
+	if(it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node.get(),nn.get());it++;nn=*it;}
+	while(it!=tree.end()){
+		nn=*it;
+		DataStore d=nn->getData();
+		printf("op %s\n",nn->getOperation()->keyWord.c_str());
+		m=d.getMat4()*m;
+		it++;
+	}
+	return m;
+}
 glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
 	glm::vec3 t0 = -World2::mainCamPos;
 	glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta));

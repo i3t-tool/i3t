@@ -13,7 +13,8 @@ public:
 	static const char* componentType() { return ScaleManipulator::typeStatic; };
 	const char* getComponentType() { return ScaleManipulator::typeStatic; };
 
-	Core::NodeBase* m_editednode;
+	const Ptr<Core::NodeBase> *m_editednode=nullptr;
+	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
 	static const char* typeStatic;
 

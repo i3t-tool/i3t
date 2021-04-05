@@ -68,7 +68,7 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 }
 void LookAtManipulator::update() {
 	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->getData().getMat4();
+	m_edited=m_editednode->get()->getData().getMat4();
 	///
 	bool transactionBegin=false;
 
@@ -154,5 +154,5 @@ void LookAtManipulator::update() {
 	m_edited[3]=pose;
 
 	///
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[3][0], m_edited[3][1], m_edited[3][2]));}
+	if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[3][0], m_edited[3][1], m_edited[3][2]));}
 }

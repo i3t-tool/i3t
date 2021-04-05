@@ -84,7 +84,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 void ScaleManipulator::update() {
 	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->getData().getMat4();
+	m_edited=m_editednode->get()->getData().getMat4();
 	///
 	bool transactionBegin=false;
 
@@ -172,5 +172,5 @@ void ScaleManipulator::update() {
 	m_edited[2][2]+=drag3[2];//TMP
 	///
 	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0]));}
+	if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
 }
