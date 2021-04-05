@@ -24,13 +24,13 @@ void NodeBase::init()
 	for (int i = 0; i < m_operation->numberOfOutputs; i++)
 	{
 		m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
-		m_internalData.emplace_back();
+		m_internalData.emplace_back(m_operation->outputTypes[i]);
 	}
 
 	// Ugly workaround for Model and Screen node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
 	{
-		m_internalData.emplace_back();
+		m_internalData.emplace_back(m_operation->inputTypes[0]);
 	}
 }
 
