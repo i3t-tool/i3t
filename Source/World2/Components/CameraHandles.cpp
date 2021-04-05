@@ -166,7 +166,8 @@ void CameraHandles::update(){
 		mov=glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 
 		glm::vec2 dragfinal=mov*glm::vec2(InputManager::m_mouseXDelta,-InputManager::m_mouseYDelta)*0.05f;
-			
+		printf("dragfinalh %f %f\n", dragfinal[0], dragfinal[1]);
+
 		if(this->activehandle==this->stencils.names.n){
 			if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){
 				this->pnear-=dragfinal[0];

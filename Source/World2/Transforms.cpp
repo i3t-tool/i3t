@@ -111,15 +111,16 @@ glm::mat4 getFullTransform(GameObject* obj){
 	while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
 	return transform;
 }
-glm::mat4 getNodeTransform(Ptr<Core::NodeBase>node,Ptr<Core::Sequence>parent){
-	//Ptr<Core::NodeBase>n=Ptr<Core::NodeBase>(node.get());
-	Core::SequenceTree tree(parent);
-
+glm::mat4 getNodeTransform(Ptr<Core::NodeBase>*node,Ptr<Core::Sequence>*parent){
 	glm::mat4 m=glm::mat4(1.0f);
+	if(node==nullptr||parent==nullptr){return m;}
+	//Ptr<Core::NodeBase>n=Ptr<Core::NodeBase>(node.get());
+	Core::SequenceTree tree(*parent);
+
 	Core::SequenceTree::MatrixIterator it=tree.begin();
 	Ptr<Core::NodeBase>nn=*it;
-	while(nn.get()!=node.get()&&it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node.get(),nn.get());it++;nn=*it;}
-	if(it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node.get(),nn.get());it++;nn=*it;}
+	while(nn.get()!=node->get()&&it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node->get(),nn.get());it++;nn=*it;}
+	if(it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node->get(),nn.get());it++;nn=*it;}
 	while(it!=tree.end()){
 		nn=*it;
 		DataStore d=nn->getData();

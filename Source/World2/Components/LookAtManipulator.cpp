@@ -15,7 +15,7 @@ LookAtManipulator::LookAtManipulator() {
     LookAtManipulator::typeStatic = typeid(LookAtManipulator).name();
     type = LookAtManipulator::typeStatic;
 
-	m_stencilx = ManipulatorUtil::getStencil(0);printf("x %d\n",m_stencilx);
+	m_stencilx = ManipulatorUtil::getStencil(0);
 	m_stencily = ManipulatorUtil::getStencil(1);
 	m_stencilz = ManipulatorUtil::getStencil(2);
 	m_stencilzy =ManipulatorUtil::getStencil(3);
@@ -68,7 +68,10 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 }
 void LookAtManipulator::update() {
 	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->get()->getData().getMat4();
+	m_edited=glm::inverse(m_editednode->get()->getData().getMat4());
+	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode->get();
+	glm::vec3 center= editedlookat->getCenter();
+	glm::vec3 eye= editedlookat->getEye();
 	///
 	bool transactionBegin=false;
 
@@ -97,17 +100,12 @@ void LookAtManipulator::update() {
 
 	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 
-	glm::vec4 pos=m_handlespace[3];
-	//m_handlespace = getNormalized(getFullTransform(this->editedobj->parent));//TMP
+	//glm::vec4 pos=m_handlespace[3];
+	//m_handlespace=getNormalized(getFullTransform(m_edited->parent));//TMP
+	//glm::mat4 m=m_edited;*(glm::vec3*)&m[3]+=center;
+	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
 	m_handlespace=glm::mat4(1.0f);
-	m_handlespace[3]=pos;
-
-	//glm::mat4 t=getFullTransform(this->editedobj);//TMP
-	glm::mat4 t=m_edited;
-	glm::vec4 pose0=t[3];
-	glm::vec4 posh0=m_handlespace[3];
-	glm::vec4 dir0=posh0-pose0;
-	if(glm::length(dir0)<0.1f){m_handlespace[3] = pose0 + 0.1f*glm::normalize(t[2]);}//non-zero distance between editedobj and position to look at*/
+	m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(center-eye,0.0f));
 
 	if(m_activehandle==-1){return;}
 
@@ -148,11 +146,7 @@ void LookAtManipulator::update() {
 	glm::mat4 m=glm::mat4(1.0f);//TMP
 	for (int i=0;i<4;i++){if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
 	glm::vec4 posh=(glm::inverse(m)*m_handlespace)[3];
-	glm::vec4 pose=m_edited[3];
-	glm::vec4 dir=posh-pose;
-	m_edited=getRotation(glm::mat4(glm::vec4(0.0f),glm::vec4(0.0f),dir,glm::vec4(0.0f)),2);
-	m_edited[3]=pose;
-
 	///
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[3][0], m_edited[3][1], m_edited[3][2]));}
+	editedlookat->setCenter(-glm::vec3(posh)+2.0f*eye);
+	//editedlookat->setCenter(glm::vec3(center));
 }

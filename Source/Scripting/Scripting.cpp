@@ -105,7 +105,7 @@ int PicocRunFile(const char* filename){
 	PlatformLibraryInitI3T(&pc);
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocPlatformScanFile(&pc, filename);
-	PicocCleanup(&pc); printf("ASAS %d\n", pc.PicocExitValue);
+	PicocCleanup(&pc);
 	return pc.PicocExitValue;
 	// for (; ParamCount < argc && strcmp(argv[ParamCount], "-") != 0; ParamCount++){PicocPlatformScanFile(&pc,
 	// argv[ParamCount]);}//run multiple files PicocCallMain(&pc, argc - ParamCount, &argv[ParamCount]);	//call main

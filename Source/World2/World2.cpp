@@ -30,15 +30,20 @@ World2::World2(){
     ScaleManipulator* sm =          new ScaleManipulator();
     LookAtManipulator*lm =          new LookAtManipulator();
     OrthoManipulator*om =           new OrthoManipulator();
-    this->manipulators.emplace("Translation",   Manipulator(&tm->isActive,&tm->m_editednode,&tm->m_parent));tm->isActive=false;
-    this->manipulators.emplace("Scale",         Manipulator(&sm->isActive,&sm->m_editednode,&sm->m_parent));sm->isActive=false;
-    this->manipulators.emplace("LookAt",        Manipulator(&lm->isActive,&lm->m_editednode,&lm->m_parent));lm->isActive=false;
-    this->manipulators.emplace("Ortho",         Manipulator(&om->isActive,&om->m_editednode,&om->m_parent));om->isActive=false;
+    PerspectiveManipulator*pm =     new PerspectiveManipulator();
+    FrustumManipulator*fm =         new FrustumManipulator();
+    this->manipulators.emplace("Translation",   Manipulator(&tm->m_editednode,&tm->m_parent,tm));
+    this->manipulators.emplace("Scale",         Manipulator(&sm->m_editednode,&sm->m_parent,sm));
+    this->manipulators.emplace("LookAt",        Manipulator(&lm->m_editednode,&lm->m_parent,lm));
+    this->manipulators.emplace("Ortho",         Manipulator(&om->m_editednode,&om->m_parent,om));
+    this->manipulators.emplace("Perspective",   Manipulator(&pm->m_editednode,&pm->m_parent,pm));
+    this->manipulators.emplace("Frustum",       Manipulator(&fm->m_editednode,&fm->m_parent,fm));
     GameObject*sceneHandles = new GameObject();
-    sceneHandles->addComponent(tm);
-    sceneHandles->addComponent(sm);
-    sceneHandles->addComponent(lm);
-    sceneHandles->addComponent(om);
+
+    for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
+        i->second.component->isActive=false;
+        sceneHandles->addComponent(i->second.component);
+    }
 
     this->sceneRoot = new GameObject(gridMesh,&World2::shader0,0); 
     this->sceneRoot->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -122,29 +127,36 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
+Ptr<Core::NodeBase>op;
 void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
-        *(i->second.isActive)=false;
+        i->second.component->isActive=false;
         *(i->second.editedNode)=nullptr;
     }
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
-    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get());
+    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
     const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->m_nodebase;
-    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata;
-    Core::Transform::DataMap	data		= nodebase->get()->getDataMap();
-	const Operation*			operation	= nodebase->get()->getOperation();
-	const char*					keyword		= operation->keyWord.c_str();
-    DataStore                   datastore   = nodebase->get()->getData();
-    glm::mat4                   mat         = datastore.getMat4();
+    //op=Builder::createTransform<Core::OrthoProj>();
+    //op=Builder::createTransform<Core::LookAt>(glm::vec3{-0.0f, 1.0f, 0.0f}, glm::vec3{-0.1f, 0.5f, 0.0f },glm::vec3{0.0f, 1.0f, 0.0f});
+    //const Ptr<Core::NodeBase>*	nodebase    = &op;
 
+    printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase->get());
+
+    //WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
+    Core::Transform::DataMap	data		= nodebase->get()->getDataMap(); printf("a");
+	const Operation*			operation	= nodebase->get()->getOperation(); printf("b");
+	const char*					keyword		= operation->keyWord.c_str(); printf("c");
+    DataStore                   datastore   = nodebase->get()->getData(); printf("d");
+    glm::mat4                   mat         = datastore.getMat4(); printf("e\n");
+    
     //nodebase->
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
-        *m.isActive=true;
+        m.component->isActive=true;
         *m.editedNode=nodebase;
-        printf("nodebase 0x%p get 0x%p\n",&nodebase,nodebase->get());
+        printf("nodebase 0x%p ",&nodebase);printf("get 0x%p\n",nodebase->get());
     }
     else{printf("No manipulators\n"); }
 

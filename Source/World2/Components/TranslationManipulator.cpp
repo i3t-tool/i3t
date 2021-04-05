@@ -17,7 +17,7 @@ TranslationManipulator::TranslationManipulator() {
     TranslationManipulator::typeStatic = typeid(TranslationManipulator).name();
     type = TranslationManipulator::typeStatic;
 
-	m_stencilx = ManipulatorUtil::getStencil(0);printf("x %d\n",m_stencilx);
+	m_stencilx = ManipulatorUtil::getStencil(0);
 	m_stencily = ManipulatorUtil::getStencil(1);
 	m_stencilz = ManipulatorUtil::getStencil(2);
 	m_stencilzy =ManipulatorUtil::getStencil(3);

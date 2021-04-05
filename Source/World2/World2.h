@@ -15,6 +15,7 @@
 
 class WorkspaceMatrix4x4;
 class GameObject;
+class Component;
 namespace Core{class NodeBase;class Sequence;}
 
 struct Shader2{
@@ -29,11 +30,13 @@ struct Shader2{
     GLint attr_uv;      ///<vertice texture coords attribute
 };
 struct Manipulator {
-    Manipulator(bool*_isActive,const std::shared_ptr<Core::NodeBase>**_editedNode,const std::shared_ptr<Core::Sequence>**_parent){isActive=_isActive;editedNode=_editedNode;parent=_parent;}
-    Manipulator(){isActive=nullptr;editedNode=nullptr;parent=nullptr;}
-    bool*isActive;
+    Manipulator(const std::shared_ptr<Core::NodeBase>**_editedNode,const std::shared_ptr<Core::Sequence>**_parent,Component*_component){
+        editedNode=_editedNode;parent=_parent;component=_component;
+    }
+    Manipulator(){editedNode=nullptr;parent=nullptr;component=nullptr;}
     const std::shared_ptr<Core::NodeBase>**editedNode;
     const std::shared_ptr<Core::Sequence>**parent;
+    Component*component;
     //Component*owner;
 };
 

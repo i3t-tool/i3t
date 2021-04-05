@@ -15,3 +15,5 @@
 #include "Components/ScaleManipulator.h"
 #include "Components/LookAtManipulator.h"
 #include "Components/OrthoManipulator.h"
+#include "Components/PerspectiveManipulator.h"
+#include "Components/FrustumManipulator.h"
