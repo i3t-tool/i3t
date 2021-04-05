@@ -16,7 +16,8 @@ void Sequence::addMatrix(Ptr<Sequence::Matrix> matrix, size_t index) noexcept
   else
     m_matrices.insert(m_matrices.begin() + index, std::move(matrix));
 
-  spreadSignal(0);
+	updateValues(0);
+  spreadSignal();
 }
 
 void Sequence::updateValues(int inputIndex)

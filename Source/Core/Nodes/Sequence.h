@@ -55,6 +55,9 @@ public:
 		auto result = std::move(m_matrices.at(index));
 		m_matrices.erase(m_matrices.begin() + index);
 
+    updateValues(0);
+    spreadSignal();
+
 		return result;
 	};
 

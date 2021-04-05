@@ -45,7 +45,8 @@ TEST(SequenceTest, SequenceCanBeCreated)
 		expectedMat *= mat->getData().getMat4();
 	}
 
-  EXPECT_EQ(expectedMat, seq->getData().getMat4());
+	auto currentMat = seq->getData().getMat4();
+  EXPECT_EQ(expectedMat, currentMat);
 }
 
 TEST(SequenceTest, MatricesCanBeMoved)
