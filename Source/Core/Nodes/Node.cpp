@@ -72,10 +72,7 @@ void NodeBase::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
 
-	if (m_restrictedOutput)
-		spreadSignal(m_restrictedOutputIndex);
-	else
-		spreadSignal();
+  spreadSignal();
 }
 
 bool NodeBase::areInputsPlugged(int numInputs)

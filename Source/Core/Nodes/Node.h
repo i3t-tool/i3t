@@ -78,15 +78,8 @@ protected:
 	 */
 	const Operation* m_operation = nullptr;
 
-	/// \todo Is there values in NodeBase used?
-	bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
-	bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
-	                           ///< only)
-	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
-
 protected:
-  NodeBase(const Operation* operation)
-			: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+  NodeBase(const Operation* operation) : m_operation(operation)
 	{
 	}
 

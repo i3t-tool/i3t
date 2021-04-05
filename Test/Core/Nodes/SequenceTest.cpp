@@ -39,33 +39,47 @@ TEST(SequenceTest, SequenceCanBeCreated)
 {
   auto seq = arrangeSequence();
 
-  seq->updateValues(0);
+	glm::mat4 expectedMat(1.0f);
+	for (auto& mat : seq->getMatrices())
+  {
+		expectedMat *= mat->getData().getMat4();
+	}
 
-	auto expectedMat = (matVal1 * matVal2) * matVal3;
-
-  EXPECT_EQ(glm::mat4(120.0f), seq->getData().getMat4());
+  EXPECT_EQ(expectedMat, seq->getData().getMat4());
 }
 
-TEST(MatrixManipulation, MatricesCanBeMoved)
+TEST(SequenceTest, MatricesCanBeMoved)
 {
   auto seq = arrangeSequence();
 
   // Pop first matrices in the sequence.
   auto mat1 = seq->popMatrix(0);
   auto mat2 = seq->popMatrix(0);
-  seq->updateValues(0);
 
   EXPECT_EQ(glm::mat4(10.0f), seq->getData().getMat4());
 
   // Add them back.
   seq->addMatrix(std::move(mat2), 1);
   seq->addMatrix(std::move(mat1), 2);
-  seq->updateValues(0);
 
   EXPECT_EQ(glm::mat4(120.0f), seq->getData().getMat4());
 }
 
-TEST(Sequence, InternalValueCanBeRead)
+TEST(SequenceTest, UpdateIsCalledOnMatrixValueChange)
+{
+	auto seq = arrangeSequence();
+
+	auto& matrices = seq->getMatrices();
+	auto firstTwoMatricesProduct = matrices[0]->getData().getMat4() * matrices[1]->getData().getMat4();
+  auto mat3NewValue = glm::translate(generateVec3());
+
+	auto& mat = seq->getMatRef(seq->getMatrices().size() - 1);
+	mat->setValue(mat3NewValue);
+
+	EXPECT_EQ(seq->getData().getMat4(), firstTwoMatricesProduct * mat3NewValue);
+}
+
+TEST(SequenceTest, InternalValueCanBeRead)
 {
   auto seq = arrangeSequence();
 
@@ -86,7 +100,7 @@ TEST(Sequence, InternalValueCanBeRead)
   EXPECT_EQ(seq->getData().getMat4(), matMulMatNode->getData().getMat4());
 }
 
-TEST(Sequence, InternalValueCanBeSet)
+TEST(SequenceTest, InternalValueCanBeSet)
 {
   auto seq = arrangeSequence();
 
@@ -99,7 +113,7 @@ TEST(Sequence, InternalValueCanBeSet)
   EXPECT_EQ(matNode->getData().getMat4(), seq->getData().getMat4());
 }
 
-TEST(Sequence, PlugCanCreateCyclicGraph)
+TEST(SequenceTest, PlugCanCreateCyclicGraph)
 {
   auto seq1 = arrangeSequence();
   auto seq2 = arrangeSequence();

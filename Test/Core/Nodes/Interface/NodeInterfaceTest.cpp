@@ -94,8 +94,11 @@ TEST(GetNodeInputsAndOutputs, ReturnsValidResults)
 	EXPECT_EQ(3, GraphManager::getOutputNodes(root, 0).size());
 }
 
-TEST(TransformNodeType, TypeShouldBeDeducedFromOperationType)
+TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 {
 	auto scale = Core::Builder::createTransform<Scale>();
-	EXPECT_EQ(&g_transforms[static_cast<size_t>(ETransformType::Scale)], scale->getOperation());
+
+	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
+
+	EXPECT_EQ(expectedOperation->keyWord, scale->getOperation()->keyWord);
 }

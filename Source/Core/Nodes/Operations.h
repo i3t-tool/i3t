@@ -140,7 +140,7 @@ enum class ENodeType
 
 enum class ETransformType
 {
-	Free,
+	Free = 0,
 	Translation,
 	EulerX,
 	EulerY,

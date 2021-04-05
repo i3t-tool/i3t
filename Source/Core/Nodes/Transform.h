@@ -41,16 +41,18 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
 	{
 		setInternalValue(mat);
+		notifySequence();
 		return ValueSetResult{};
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
 	{
 		setInternalValue(val, coords);
+    notifySequence();
 		return ValueSetResult{};
 	}
 
-	void reset() override { setInternalValue(glm::mat4(1.0f)); };
+	void reset() override { setValue(glm::mat4(1.0f)); };
 	void setDataMap(const Transform::DataMap& map) override{};
 };
 

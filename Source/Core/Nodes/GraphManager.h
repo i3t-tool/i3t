@@ -50,8 +50,9 @@ Ptr<Core::Sequence> FORCE_INLINE createSequence()
   return ret;
 }
 
-template <typename T, typename... Args> Ptr<Core::NodeBase> FORCE_INLINE createTransform(Args&&... args)
+template <typename T, typename... Args> Ptr<T> FORCE_INLINE createTransform(Args&&... args)
 {
+	static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
   auto ret = std::make_shared<T>(std::forward<Args>(args)...);
   ret->init();
   ret->reset();
