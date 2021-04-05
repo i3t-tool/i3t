@@ -19,9 +19,9 @@ Ptr<Core::Sequence> arrangeSequence()
   // Create seq. and matrices.
   auto seq = Core::Builder::createSequence();
 
-  auto mat1 = Core::Builder::createNode<ENodeType::Matrix>();
-  auto mat2 = Core::Builder::createNode<ENodeType::Matrix>();
-  auto mat3 = Core::Builder::createNode<ENodeType::Matrix>();
+  auto mat1 = Core::Builder::createTransform<Free>();
+  auto mat2 = Core::Builder::createTransform<Free>();
+  auto mat3 = Core::Builder::createTransform<Free>();
 
   mat1->setValue(matVal1);
   mat2->setValue(matVal2);
@@ -35,7 +35,7 @@ Ptr<Core::Sequence> arrangeSequence()
   return seq;
 }
 
-TEST(CreateSequence, SequenceCanBeCreated)
+TEST(SequenceTest, SequenceCanBeCreated)
 {
   auto seq = arrangeSequence();
 
@@ -97,4 +97,15 @@ TEST(Sequence, InternalValueCanBeSet)
   EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 
   EXPECT_EQ(matNode->getData().getMat4(), seq->getData().getMat4());
+}
+
+TEST(Sequence, PlugCanCreateCyclicGraph)
+{
+  auto seq1 = arrangeSequence();
+  auto seq2 = arrangeSequence();
+
+	GraphManager::plug(seq1, seq2, 0, 0);
+
+	auto plugResult = GraphManager::plug(seq2, seq1, 1, 1);
+	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 }

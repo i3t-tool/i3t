@@ -1,10 +1,17 @@
 #include "Transform.h"
 
-#include "glm/gtx/rotate_vector.hpp"
-
 #include "Logger/Logger.h"
 
 using namespace Core;
+
+void Transformation::notifySequence()
+{
+	if (m_currentSequence)
+  {
+		m_currentSequence->updateValues(0);
+	}
+}
+
 
 ValueSetResult Scale::setValue(float val)
 {

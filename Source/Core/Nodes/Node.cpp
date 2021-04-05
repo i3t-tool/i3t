@@ -34,6 +34,11 @@ void NodeBase::init()
 	}
 }
 
+ID NodeBase::getId() const
+{
+  return m_id;
+}
+
 const std::vector<Pin>& NodeBase::getInputPins() const
 {
 	return m_inputs;
@@ -59,7 +64,6 @@ void NodeBase::spreadSignal(int outIndex)
 {
 	for (auto* oct : m_outputs[outIndex].getOutComponents())
 	{
-		// for each wire connected to the outIndex output (for each OperatorCurveTab oct):
 		oct->m_master->receiveSignal(oct->getIndex());
 	}
 }
@@ -91,6 +95,64 @@ bool NodeBase::areInputsPlugged(int numInputs)
 bool NodeBase::areAllInputsPlugged()
 {
 	return areInputsPlugged(m_operation->numberOfInputs);
+}
+
+ENodePlugResult NodeBase::isPlugCorrect(Pin* input, Pin* output)
+{
+  auto* inp = input;
+  if (!inp)
+    return ENodePlugResult::Err_NonexistentPin;
+
+  auto* out = output;
+  if (!out)
+    return ENodePlugResult::Err_NonexistentPin;
+
+  if (inp->m_opValueType != out->m_opValueType)
+  {
+    // Do the input and output data types match?
+    return ENodePlugResult::Err_MismatchedPinTypes;
+  }
+
+  if (inp->m_master == out->m_master)
+  {
+    // Not a circular edge?
+    return ENodePlugResult::Err_Loopback;
+  }
+
+  // cycle detector
+  auto toFind = inp->m_master; // INPUT
+
+  // stack in vector - TOS is at the vector back.
+  std::vector<Ptr<NodeBase>> stack;
+
+  // PUSH(output) insert element at end.
+  stack.push_back(out->m_master);
+
+  while (!stack.empty())
+  {
+    // Return last element of mutable sequence.
+    auto act = stack.back();
+    stack.pop_back();
+
+    if (act == toFind)
+      return ENodePlugResult::Err_Loop;
+
+    for (auto& pin : act->m_inputs)
+    {
+      if (pin.isPluggedIn())
+      {
+        Pin* ct = pin.m_input;
+        stack.push_back(ct->m_master);
+      }
+    }
+  }
+
+  /*
+    if (isOperatorPlugCorrectMod != NULL)
+      return isOperatorPlugCorrectMod(inp, out);
+  */
+
+  return ENodePlugResult::Ok;
 }
 
 void NodeBase::unplugAll()
@@ -146,9 +208,4 @@ void NodeBase::unplugOutput(int index)
 		otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
-}
-
-ID NodeBase::getId() const
-{
-	return m_id;
 }

@@ -2,7 +2,7 @@
 
 namespace Core
 {
-typedef unsigned long long ID;
+typedef unsigned int ID;
 
 class IdGenerator
 {
