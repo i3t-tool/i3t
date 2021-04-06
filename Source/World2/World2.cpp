@@ -32,17 +32,26 @@ World2::World2(){
     OrthoManipulator*om =           new OrthoManipulator();
     PerspectiveManipulator*pm =     new PerspectiveManipulator();
     FrustumManipulator*fm =         new FrustumManipulator();
+    RotationManipulator*rm =        new RotationManipulator();
+    FreeManipulator*mm =            new FreeManipulator();
     this->manipulators.emplace("Translation",   Manipulator(&tm->m_editednode,&tm->m_parent,tm));
     this->manipulators.emplace("Scale",         Manipulator(&sm->m_editednode,&sm->m_parent,sm));
     this->manipulators.emplace("LookAt",        Manipulator(&lm->m_editednode,&lm->m_parent,lm));
     this->manipulators.emplace("Ortho",         Manipulator(&om->m_editednode,&om->m_parent,om));
     this->manipulators.emplace("Perspective",   Manipulator(&pm->m_editednode,&pm->m_parent,pm));
     this->manipulators.emplace("Frustum",       Manipulator(&fm->m_editednode,&fm->m_parent,fm));
+    this->manipulators.emplace("EulerX",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
+    this->manipulators.emplace("EulerY",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
+    this->manipulators.emplace("EulerZ",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
+    this->manipulators.emplace("Free",          Manipulator(&mm->m_editednode,&mm->m_parent,mm));
+    //this->manipulators.emplace("AxisAngle",     Manipulator(&rm->m_editednode,&rm->m_parent,rm));//not editable
     GameObject*sceneHandles = new GameObject();
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
-        i->second.component->isActive=false;
-        sceneHandles->addComponent(i->second.component);
+        if(sceneHandles->getComponent(i->second.component->getComponentType())==nullptr){//add each manipulator only once (rotation is stored multiple times under different keys)
+            i->second.component->isActive=false;
+            sceneHandles->addComponent(i->second.component);
+        }
     }
 
     this->sceneRoot = new GameObject(gridMesh,&World2::shader0,0); 
@@ -138,25 +147,26 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     if(matnode->get()==nullptr){return;}
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
     const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->m_nodebase;
+
+    //op=Builder::createTransform<Core::Free>();
     //op=Builder::createTransform<Core::OrthoProj>();
+    //op=Builder::createTransform<Core::EulerRotX>();
+    //op=Builder::createTransform<Core::AxisAngleRot>();
     //op=Builder::createTransform<Core::LookAt>(glm::vec3{-0.0f, 1.0f, 0.0f}, glm::vec3{-0.1f, 0.5f, 0.0f },glm::vec3{0.0f, 1.0f, 0.0f});
     //const Ptr<Core::NodeBase>*	nodebase    = &op;
 
-    printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase->get());
-
     //WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
-    Core::Transform::DataMap	data		= nodebase->get()->getDataMap(); printf("a");
-	const Operation*			operation	= nodebase->get()->getOperation(); printf("b");
-	const char*					keyword		= operation->keyWord.c_str(); printf("c");
-    DataStore                   datastore   = nodebase->get()->getData(); printf("d");
-    glm::mat4                   mat         = datastore.getMat4(); printf("e\n");
+    Core::Transform::DataMap	data		= nodebase->get()->getDataMap(); //printf("a");
+	const Operation*			operation	= nodebase->get()->getOperation(); //printf("b");
+	const char*					keyword		= operation->keyWord.c_str(); //printf("c");
+    DataStore                   datastore   = nodebase->get()->getData(); //printf("d");
+    glm::mat4                   mat         = datastore.getMat4(); //printf("e\n");
     
-    //nodebase->
+    printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase->get());
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         m.component->isActive=true;
         *m.editedNode=nodebase;
-        printf("nodebase 0x%p ",&nodebase);printf("get 0x%p\n",nodebase->get());
     }
     else{printf("No manipulators\n"); }
 

@@ -10,7 +10,7 @@ void ManipulatorUtil::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 co
 	else if(stencil==hover){m=0.5f;}
 	glStencilMask(255*(stencil!=-1));
 	glStencilFunc(GL_ALWAYS, (unsigned char)stencil, 255);
-	_handle->color= glm::vec4(1.0f,1.0f,1.0f,color[3])*m + glm::vec4(color[0],color[1],color[2],color[3])*(1.0f-m);
+	_handle->color= glm::vec4(1.0f,1.0f,1.0f,color[3])*m + color*(1.0f-m);
 	_handle->draw(space);
 	glStencilMask(0);
 }

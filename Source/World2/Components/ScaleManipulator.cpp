@@ -167,10 +167,14 @@ void ScaleManipulator::update() {
 		}
 	}
 					
-	m_edited[0][0]+=drag3[0];//TMP
-	m_edited[1][1]+=drag3[1];//TMP
-	m_edited[2][2]+=drag3[2];//TMP
+	m_edited[0][0]+=drag3[0];
+	m_edited[1][1]+=drag3[1];
+	m_edited[2][2]+=drag3[2];
 	///
 	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
+	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
+	Core::Scale*editedscale=(Core::Scale*)m_editednode->get();
+	editedscale->setX(m_edited[0][0]);
+	editedscale->setY(m_edited[1][1]);
+	editedscale->setZ(m_edited[2][2]);
 }

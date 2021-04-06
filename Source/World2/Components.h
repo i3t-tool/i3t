@@ -11,9 +11,12 @@
 #include "Components/Renderer.h"
 #include "Components/TransformHandles.h"
 #include "Components/CameraHandles.h"
+
 #include "Components/TranslationManipulator.h"
 #include "Components/ScaleManipulator.h"
 #include "Components/LookAtManipulator.h"
 #include "Components/OrthoManipulator.h"
 #include "Components/PerspectiveManipulator.h"
 #include "Components/FrustumManipulator.h"
+#include "Components/RotationManipulator.h"
+#include "Components/FreeManipulator.h"
