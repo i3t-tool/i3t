@@ -550,6 +550,32 @@ void AxisAngleRot::reset()
 	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
 }
 
+ValueSetResult AxisAngleRot::setValue(float rads)
+{
+	return setRot(rads);
+}
+
+ValueSetResult AxisAngleRot::setValue(const glm::vec3& axis)
+{
+	return setAxis(axis);
+}
+
+ValueSetResult AxisAngleRot::setRot(float rads)
+{
+	m_initialRads = rads;
+	setInternalValue(glm::rotate(rads, m_initialAxis));
+	return ValueSetResult();
+}
+
+ValueSetResult AxisAngleRot::setAxis(const glm::vec3& axis)
+{
+  m_initialAxis = axis;
+  setInternalValue(glm::rotate(m_initialRads, axis));
+	return ValueSetResult();
+}
+
+//===-- Orthographic projection -------------------------------------------===//
+
 void OrthoProj::reset()
 {
 	m_currentMap = m_initialMap;
@@ -568,8 +594,6 @@ ValueSetResult OrthoProj::setValue(float val, glm::ivec2 coords)
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
-
-//===-- Orthographic projection -------------------------------------------===//
 
 ValueSetResult OrthoProj::setLeft(float val)
 {

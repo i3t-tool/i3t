@@ -218,6 +218,14 @@ public:
 	}
 
 	void reset() override;
+	ValueSetResult setValue(float rads) override;
+	ValueSetResult setValue(const glm::vec3& axis) override;
+
+  float getRot() const { return m_initialRads; };
+  const glm::vec3& getAxis() const { return m_initialAxis; };
+
+  ValueSetResult setRot(float rads);
+  ValueSetResult setAxis(const glm::vec3& axis);
 };
 
 

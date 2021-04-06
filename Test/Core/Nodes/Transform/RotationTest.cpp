@@ -293,3 +293,27 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
     EXPECT_EQ(expectedMatrices[i], rots[i]->getData().getMat4());
   }
 }
+
+//===-- Axis angle test ---------------------------------------------------===//
+
+TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
+{
+	auto axisAngle = Builder::createTransform<AxisAngleRot>();
+
+	auto rads = generateFloat();
+	auto axis = generateVec3();
+
+	auto expectedMat = glm::rotate(rads, axis);
+
+  {
+    auto result = axisAngle->setValue(rads);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		EXPECT_EQ(rads, axisAngle->getRot());
+  }
+  {
+    auto result = axisAngle->setAxis(axis);
+    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    EXPECT_EQ(axis, axisAngle->getAxis());
+  }
+	EXPECT_EQ(expectedMat, axisAngle->getData().getMat4());
+}
