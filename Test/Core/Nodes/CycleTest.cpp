@@ -7,7 +7,7 @@ using namespace CycleInternals;
 
 double sPerFrame = 1.0 / 60.0;
 
-TEST(Cycle, Basics)
+TEST(CycleTest, CycleIsUpdatetedAndResetAfterMaxValueIsGained)
 {
   auto cycle = GraphManager::createCycle();
 

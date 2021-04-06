@@ -140,7 +140,7 @@ enum class ENodeType
 
 enum class ETransformType
 {
-	Free,
+	Free = 0,
 	Translation,
 	EulerX,
 	EulerY,
@@ -385,8 +385,4 @@ FORCE_INLINE const Operation* getTransformProps(ETransformType type)
 {
 	return &g_transforms[static_cast<unsigned>(type)];
 }
-
-namespace Nodes
-{
-};
 }; // namespace Core

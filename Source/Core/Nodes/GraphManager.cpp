@@ -8,60 +8,8 @@ std::vector<Ptr<Cycle>> GraphManager::m_cycles;
 
 ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 {
-	auto* inp = input;
-	if (!inp)
-		return ENodePlugResult::Err_NonexistentPin;
-
-	auto* out = output;
-	if (!out)
-		return ENodePlugResult::Err_NonexistentPin;
-
-	if (inp->m_opValueType != out->m_opValueType)
-	{
-		// Do the input and output data types match?
-		return ENodePlugResult::Err_MismatchedPinTypes;
-	}
-
-	if (inp->m_master == out->m_master)
-	{
-		// Not a circular edge?
-		return ENodePlugResult::Err_Loopback;
-	}
-
-	// cycle detector
-	auto toFind = inp->m_master; // INPUT
-
-	// stack in vector - TOS is at the vector back.
-	std::vector<Ptr<NodeBase>> stack;
-
-	// PUSH(output) insert element at end.
-	stack.push_back(out->m_master);
-
-	while (!stack.empty())
-	{
-		// Return last element of mutable sequence.
-		auto act = stack.back();
-		stack.pop_back();
-
-		if (act == toFind)
-			return ENodePlugResult::Err_Loop;
-
-		for (auto& pin : act->m_inputs)
-		{
-			if (pin.isPluggedIn())
-			{
-				Pin* ct = pin.m_input;
-				stack.push_back(ct->m_master);
-			}
-		}
-	}
-
-	/*
-	  if (isOperatorPlugCorrectMod != NULL)
-	    return isOperatorPlugCorrectMod(inp, out);
-	*/
-
-	return ENodePlugResult::Ok;
+	auto lhs = input->m_master;
+  return lhs->isPlugCorrect(input, output);
 }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
@@ -175,6 +123,28 @@ void GraphManager::update(double tick)
 {
 	for (auto& cycle : m_cycles)
 		cycle->update(tick);
+}
+
+const Operation* GraphManager::getOperation(const Pin* pin)
+{
+	return pin->m_master->getOperation();
+}
+
+bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs)
+{
+	return lhs->m_master == rhs->m_master;
+}
+
+bool GraphManager::arePlugged(const Pin* input, const Pin* output)
+{
+	return arePlugged(*input, *output);
+}
+
+bool GraphManager::arePlugged(const Pin& input, const Pin& output)
+{
+	Debug::Assert(input.isInput(), "Given input pin is not input pin.");
+	if (!input.isPluggedIn()) return false;
+	return input.getParentPin() == &output;
 }
 
 SequenceTree::SequenceTree(Ptr<NodeBase> sequence)

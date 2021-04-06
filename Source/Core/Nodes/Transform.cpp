@@ -1,13 +1,21 @@
 #include "Transform.h"
 
-#include "glm/gtx/rotate_vector.hpp"
-
 #include "Logger/Logger.h"
 
 using namespace Core;
 
+void Transformation::notifySequence()
+{
+	if (m_currentSequence)
+  {
+		m_currentSequence->updateValues(0);
+	}
+}
+
+
 ValueSetResult Scale::setValue(float val)
 {
+  notifySequence();
 	return NodeBase::setValue(glm::vec3(val));
 }
 
@@ -28,6 +36,7 @@ ValueSetResult Scale::setValue(const glm::vec3& vec)
 		setInternalValue(glm::scale(vec));
 	}
 
+  notifySequence();
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
@@ -65,6 +74,7 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 		// Free transformation is set.
 		setInternalValue(mat);
 	}
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -92,13 +102,14 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 		setInternalValue(val, coords);
 	}
 
+  notifySequence();
   return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void Scale::reset()
 {
 	setDataMap(m_initialMap);
-	setInternalValue(glm::scale(m_initialScale));
+	setValue(glm::scale(m_initialScale));
 }
 
 void Scale::setDataMap(const Transform::DataMap& map)
@@ -143,6 +154,7 @@ ValueSetResult EulerRotX::setValue(float val)
 {
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
 
+  notifySequence();
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
@@ -162,14 +174,25 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 	{
 		if (Transform::isMatValid(m_currentMap, mat))
 		{
-			/// \todo Rotation matrix values validation.
-			Debug::Assert(false, "Not implemented yet.");
+      float angleRad = std::atan2(-mat[2][1], mat[2][2]);
+
+      bool isValid = Math::eq(glm::eulerAngleX(angleRad), mat);
+
+			if (isValid)
+      {
+				setInternalValue(mat);
+			}
+			else
+			{
+        return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Given matrix is not Euler rot. around X axis."};
+      }
 		}
 	}
 	else if (m_currentMap == Transform::g_Free)
 	{
 		setInternalValue(mat);
 	}
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -221,6 +244,7 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 	}
 
 	setInternalValue(mat);
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -228,7 +252,7 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 void EulerRotX::reset()
 {
 	setDataMap(m_initialMap);
-	setInternalValue(glm::rotate(m_initialRot, glm::vec3(1.0f, 0.0f, 0.0f)));
+	setValue(glm::eulerAngleX(m_initialRot));
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
@@ -236,6 +260,7 @@ void EulerRotX::reset()
 ValueSetResult EulerRotY::setValue(float val)
 {
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 1.0f, 0.0f)));
+  notifySequence();
 	return ValueSetResult{};
 }
 
@@ -249,10 +274,26 @@ ValueSetResult EulerRotY::setValue(const glm::vec4& val)
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult EulerRotY::setValue(const glm::mat4&)
+ValueSetResult EulerRotY::setValue(const glm::mat4& mat)
 {
-	Debug::Assert(false, "Not implemented yet.");
-	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Unsupported yet."};
+	/// \todo MH Validation is not always correct.
+
+	if (m_currentMap == Transform::g_Free)
+		setInternalValue(mat);
+	else if (m_currentMap == Transform::g_EulerY)
+  {
+		float angleRad = std::asin(mat[2][0]);
+		auto eulerY = glm::eulerAngleY(angleRad);
+
+		if (!Math::eq(eulerY, mat))
+    {
+      return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an Euler rot around Y axis."};
+		}
+		setInternalValue(mat);
+	}
+  notifySequence();
+
+	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 ValueSetResult EulerRotY::setValue(float val, glm::ivec2 coords)
@@ -302,6 +343,7 @@ ValueSetResult EulerRotY::setValue(float val, glm::ivec2 coords)
 	}
 
 	setInternalValue(mat);
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -309,7 +351,7 @@ ValueSetResult EulerRotY::setValue(float val, glm::ivec2 coords)
 void EulerRotY::reset()
 {
 	setDataMap(m_initialMap);
-	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
+	setValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -317,6 +359,7 @@ void EulerRotY::reset()
 ValueSetResult EulerRotZ::setValue(float val)
 {
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 0.0f, 1.0f)));
+  notifySequence();
 	return ValueSetResult{};
 }
 
@@ -330,9 +373,22 @@ ValueSetResult EulerRotZ::setValue(const glm::vec4& val)
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult EulerRotZ::setValue(const glm::mat4&)
+ValueSetResult EulerRotZ::setValue(const glm::mat4& mat)
 {
-	Debug::Assert(false, "Not implemented yet.");
+	if (m_currentMap == Transform::g_Free)
+		setInternalValue(mat);
+  else if (m_currentMap == Transform::g_EulerZ)
+  {
+    float angle = glm::atan(mat[0][1], mat[0][0]);
+		auto eulerZ = glm::eulerAngleZ(angle);
+		if (!Math::eq(eulerZ, mat))
+    {
+			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an Euler rot around Z axis."};
+		}
+		setInternalValue(mat);
+	}
+	notifySequence();
+
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
@@ -383,6 +439,7 @@ ValueSetResult EulerRotZ::setValue(float val, glm::ivec2 coords)
 	}
 
 	setInternalValue(mat);
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -390,7 +447,7 @@ ValueSetResult EulerRotZ::setValue(float val, glm::ivec2 coords)
 void EulerRotZ::reset()
 {
 	setDataMap(m_initialMap);
-	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
+	setValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
 }
 
 
@@ -403,6 +460,7 @@ ValueSetResult Translation::setValue(float val)
 ValueSetResult Translation::setValue(const glm::vec3& vec)
 {
 	setInternalValue(glm::translate(vec));
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -430,6 +488,7 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 	{
 		setInternalValue(mat);
 	}
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
@@ -441,13 +500,15 @@ ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 	setInternalValue(val, coords);
+  notifySequence();
+
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void Translation::reset()
 {
 	setDataMap(m_initialMap);
-	setInternalValue(glm::translate(m_initialTrans));
+	setValue(glm::translate(m_initialTrans));
 }
 
 float Translation::getX()
@@ -485,12 +546,40 @@ ValueSetResult Translation::setZ(float v)
 void AxisAngleRot::reset()
 {
 	m_currentMap = m_initialMap;
+  notifySequence();
 	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
 }
+
+ValueSetResult AxisAngleRot::setValue(float rads)
+{
+	return setRot(rads);
+}
+
+ValueSetResult AxisAngleRot::setValue(const glm::vec3& axis)
+{
+	return setAxis(axis);
+}
+
+ValueSetResult AxisAngleRot::setRot(float rads)
+{
+	m_initialRads = rads;
+	setInternalValue(glm::rotate(rads, m_initialAxis));
+	return ValueSetResult();
+}
+
+ValueSetResult AxisAngleRot::setAxis(const glm::vec3& axis)
+{
+  m_initialAxis = axis;
+  setInternalValue(glm::rotate(m_initialRads, axis));
+	return ValueSetResult();
+}
+
+//===-- Orthographic projection -------------------------------------------===//
 
 void OrthoProj::reset()
 {
 	m_currentMap = m_initialMap;
+  notifySequence();
 	setInternalValue(glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
@@ -501,11 +590,10 @@ ValueSetResult OrthoProj::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."};
 	}
 	setInternalValue(val, coords);
+  notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
-
-//===-- Orthographic projection -------------------------------------------===//
 
 ValueSetResult OrthoProj::setLeft(float val)
 {
@@ -553,6 +641,7 @@ ValueSetResult OrthoProj::setFar(float val)
 void PerspectiveProj::reset()
 {
 	m_currentMap = m_initialMap;
+  notifySequence();
 	setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
 }
 
@@ -563,6 +652,7 @@ ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 	setInternalValue(val, coords);
+  notifySequence();
 
 	return ValueSetResult{};
 }
@@ -600,6 +690,7 @@ ValueSetResult PerspectiveProj::setZFar(float v)
 void Frustum::reset()
 {
 	m_currentMap = m_initialMap;
+  notifySequence();
 	setInternalValue(glm::frustum(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
@@ -610,6 +701,7 @@ ValueSetResult Frustum::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 	setInternalValue(val, coords);
+  notifySequence();
 
 	return ValueSetResult{};
 }
@@ -661,6 +753,7 @@ ValueSetResult Frustum::setFar(float val)
 void LookAt::reset()
 {
 	m_currentMap = m_initialMap;
+  notifySequence();
 	setInternalValue(glm::lookAt(m_initialEye, m_initialCenter, m_initialUp));
 }
 
@@ -671,6 +764,7 @@ ValueSetResult LookAt::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 	setInternalValue(val, coords);
+  notifySequence();
 
 	return ValueSetResult{};
 }

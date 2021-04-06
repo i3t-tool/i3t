@@ -29,17 +29,7 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	void addMatrix(Ptr<Matrix> matrix, size_t index) noexcept
-	{
-		/// \todo MH matrix validation.
-
-		if (index > m_matrices.size())
-			m_matrices.push_back(std::move(matrix));
-		else
-			m_matrices.insert(m_matrices.begin() + index, std::move(matrix));
-
-		receiveSignal(0);
-	};
+	void addMatrix(Ptr<Matrix> matrix, size_t index) noexcept;;
 
 	std::vector<Ptr<Matrix>>& getMatrices() { return m_matrices; }
 
@@ -65,31 +55,16 @@ public:
 		auto result = std::move(m_matrices.at(index));
 		m_matrices.erase(m_matrices.begin() + index);
 
+    updateValues(0);
+    spreadSignal();
+
 		return result;
 	};
 
-	void updateValues(int inputIndex) override
-	{
-		glm::mat4 result(1.0f);
+	void updateValues(int inputIndex) override;
 
-		if (m_inputs[1].isPluggedIn())
-		{
-			// Matrix node is connected to direct matrix input.
-			result = m_inputs[1].getStorage().getMat4();
-		}
-		else
-		{
-			for (const auto& mat : m_matrices)
-			{
-				result *= mat->getData().getMat4();
-			}
-		}
-
-		m_internalData[0].setValue(result);
-		m_internalData[1].setValue(result);
-
-		spreadSignal();
-	};
+private:
+	ENodePlugResult isPlugCorrect(Pin* input, Pin* output) override;
 };
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)

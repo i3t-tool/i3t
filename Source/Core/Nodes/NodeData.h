@@ -74,32 +74,8 @@ FORCE_INLINE bool eq(const DataMap& lhs, const DataMap& rhs)
 
 /**
  * Compare data map with matrix..
- * \todo Zeroes only are compared.
  */
-FORCE_INLINE bool cmp(const DataMap& map, const glm::mat4& mat)
-{
-	for (int i = 0; i < 4; ++i)
-	{
-		for (int j = 0; j < 4; ++j)
-		{
-			switch (map[4 * i + j])
-			{
-			case 0:
-				if (!Math::eq(mat[i][j], 0.0f) || !Math::eq(mat[i][j], -0.0f))
-				{
-					return false;
-				}
-			case 255:
-				if (!Math::eq(mat[i][j], 255.0f))
-				{
-					return false;
-				}
-			}
-		}
-	}
-
-	return true;
-}
+bool cmp(const DataMap& map, const glm::mat4& mat);
 
 FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
 {
@@ -148,7 +124,7 @@ protected:
 
 public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and undefined value (a unit matrix) */
-	DataStore() : opValueType(EValueType::Matrix) { value.matrix = glm::mat4(); }
+	DataStore() : opValueType(EValueType::Matrix) { value.matrix = glm::mat4(1.0f); }
 
 	DataStore(EValueType valueType) : opValueType(valueType)
 	{
@@ -170,7 +146,7 @@ public:
 			setValue(glm::quat());
 			break;
 		case EValueType::Matrix:
-			setValue(glm::mat4());
+			setValue(glm::mat4(1.0f));
 		default:
 			break;
 		}

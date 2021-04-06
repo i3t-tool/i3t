@@ -78,21 +78,17 @@ protected:
 	 */
 	const Operation* m_operation = nullptr;
 
-	/// \todo Is there values in NodeBase used?
-	bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
-	bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
-	                           ///< only)
-	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
-
 protected:
-  NodeBase(const Operation* operation)
-			: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+  NodeBase(const Operation* operation) : m_operation(operation)
 	{
 	}
 
 public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
+
+	const Pin& getInPin(int index) const  { return m_inputs[index]; }
+	const Pin& getOutPin(int index) const { return m_outputs[index]; }
 
   Ptr<NodeBase> getPtr() { return shared_from_this(); }
 
@@ -280,11 +276,17 @@ public:
 	bool areInputsPlugged(int numInputs);
 	bool areAllInputsPlugged();
 
+protected:
+  virtual ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+
 private:
 	void unplugAll();
 	void unplugInput(int index);
 	void unplugOutput(int index);
 };
+
+using Node = NodeBase;
+using NodePtr = Ptr<Node>;
 
 /**
  * Pin used for connecting nodes.
@@ -294,7 +296,6 @@ private:
 class Pin
 {
 	friend class GraphManager;
-	// template <ENodeType NodeType> friend class NodeImpl;
 	friend class NodeBase;
 
 	ID m_id;
@@ -333,6 +334,8 @@ public:
 
 	[[nodiscard]] int getIndex() const { return m_index; }
 
+	[[nodiscard]] NodePtr getOwner() { return m_master; };
+
 	[[nodiscard]] const Pin* getParentPin() const
 	{
 		if (m_isInput)
@@ -348,7 +351,7 @@ public:
 	}
 
 	/**
-	 * @return Input pins of connected nodes.
+	 * \return Input pins of connected nodes.
 	 */
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 
@@ -382,7 +385,4 @@ public:
 
 	[[nodiscard]] bool isInput() const { return m_isInput; }
 };
-
-using Node = NodeBase;
-using NodePtr = Ptr<NodeBase>;
 } // namespace Core

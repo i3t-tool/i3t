@@ -51,7 +51,7 @@ TEST(SetVec3Scale, ScaleShouldBeValid)
 	EXPECT_EQ(expectedScale, scaleNode->getData().getMat4());
 }
 
-TEST(ResetScaleNode, ResetsNodeToInitialValues)
+TEST(ScaleNodeTest, ResetsNodeToInitialValues)
 {
 	auto scale = glm::vec3(7.f, -5.f, 3.f);
 
