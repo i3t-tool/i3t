@@ -3,9 +3,9 @@
 /**
  * \file Select.h
  * \author Daniel Gruncl
- * \brief Registration of stencil values.
- * This class keeps global record of Components and stencil values registered by them,
- * which allows to use globally unique stencil values and find Component instance binded to int.
+ * \brief Registration of m_stencil values.
+ * This class keeps global record of Components and m_stencil values registered by them,
+ * which allows to use globally unique m_stencil values and find Component instance binded to int.
  * This is used for selecting objects in 3D scene.
  */
 //---------------

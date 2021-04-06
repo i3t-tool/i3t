@@ -10,13 +10,13 @@ public:
 	TranslationManipulator();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return TranslationManipulator::typeStatic; };
-	const char* getComponentType() { return TranslationManipulator::typeStatic; };
+	static const char* componentType() { return TranslationManipulator::s_type; };
+	const char* getComponentType() { return TranslationManipulator::s_type; };
 
 	const Ptr<Core::NodeBase> *m_editednode=nullptr;
 	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 
 	GameObject*m_planeh,*m_arrowh,*m_threeaxis;
 	char m_stencilx,m_stencily,m_stencilz,m_stencilzx,m_stencilzy,m_stencilyx;

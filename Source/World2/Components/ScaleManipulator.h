@@ -10,13 +10,13 @@ public:
 	ScaleManipulator();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return ScaleManipulator::typeStatic; };
-	const char* getComponentType() { return ScaleManipulator::typeStatic; };
+	static const char* componentType() { return ScaleManipulator::s_type; };
+	const char* getComponentType() { return ScaleManipulator::s_type; };
 
 	const Ptr<Core::NodeBase> *m_editednode=nullptr;
 	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 
 	GameObject*m_planeh,*m_scaleh,*m_uniscaleh,*m_threeaxis;
 	char m_stencilx,m_stencily,m_stencilz,m_stencilzx,m_stencilzy,m_stencilyx,m_stencilxyz;

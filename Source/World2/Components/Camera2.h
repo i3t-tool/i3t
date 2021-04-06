@@ -23,17 +23,17 @@ public:
 	//~Camera2();
 	void update();
 	void start();
-	static const char* componentType() { return Camera2::typeStatic; };
-	const char* getComponentType() { return Camera2::typeStatic; };
+	static const char* componentType() { return Camera2::s_type; };
+	const char* getComponentType() { return Camera2::s_type; };
 
-	float angle = 60.0f;
-	RenderTexture* fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
-	glm::mat4x4 perspective; ///< Perspective matrix
-	GameObject* sceneRoot = NULL;///< this scene tree will be rendered by camera
+	float m_angle = 60.0f;
+	RenderTexture* m_fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
+	glm::mat4x4 m_perspective; ///< Perspective matrix
+	GameObject* m_sceneRoot = NULL;///< this scene tree will be rendered by camera
 
 private:
-  static const char* typeStatic;
+  static const char* s_type;
 
   void renderRecursive(GameObject* obj, glm::mat4 parent,bool isTranspartentPass);///<render scene tree
-  bool mainCamera;///<if fbo is NULL, camera renders to screen and sets World2 camera settings to its own
+  bool m_mainCamera;///<if fbo is NULL, camera renders to screen and sets World2 camera settings to its own
 };

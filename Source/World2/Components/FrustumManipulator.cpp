@@ -8,11 +8,11 @@
 #include "ManipulatorUtil.h"
 #include <typeinfo>
 
-const char* FrustumManipulator::typeStatic=NULL;
+const char* FrustumManipulator::s_type=NULL;
 
 FrustumManipulator::FrustumManipulator(){
-	FrustumManipulator::typeStatic=typeid(FrustumManipulator).name();
-	type= FrustumManipulator::typeStatic;
+	FrustumManipulator::s_type=typeid(FrustumManipulator).name();
+	m_type= FrustumManipulator::s_type;
 		
 	for(int i=0;i<6;i++){m_stencils.arr[i]=ManipulatorUtil::getStencil(i);}
 
@@ -37,7 +37,7 @@ void FrustumManipulator::start(){}
 void FrustumManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==NULL){return;}
 	glm::mat4 projinv=glm::inverse(m_edited);;
-	//glm::mat4 transform=(*parent)*owner->transformation;//TMP
+	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	glm::mat4 transform=glm::mat4(1.0f);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 

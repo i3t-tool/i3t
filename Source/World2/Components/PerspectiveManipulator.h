@@ -11,13 +11,13 @@ public:
 	void update();
 	void start();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return PerspectiveManipulator::typeStatic; };
-	const char* getComponentType() { return PerspectiveManipulator::typeStatic; };
+	static const char* componentType() { return PerspectiveManipulator::s_type; };
+	const char* getComponentType() { return PerspectiveManipulator::s_type; };
 
 	const Ptr<Core::NodeBase>* m_editednode = nullptr;
 	const Ptr<Core::Sequence>* m_parent = nullptr;
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 
 	GameObject* m_frustrum, * m_frustruml, * m_cameraico, * m_handle;
 	union Stencils { struct N { unsigned char f, n, hu, hb, wr, wl, a; }names; unsigned char arr[7]; }m_stencils;

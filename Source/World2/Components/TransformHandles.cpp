@@ -20,7 +20,7 @@ void printMatrix2(glm::mat4 m){
 	  m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
-const char* TransformHandles::typeStatic=NULL;
+const char* TransformHandles::s_type=NULL;
 	
 void TransformHandles::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,bool active){
 	glStencilMask(255*(stencil!=-1));
@@ -32,8 +32,8 @@ void TransformHandles::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 c
 }
 	
 TransformHandles::TransformHandles(GameObject*_editedobj){
-	TransformHandles::typeStatic=typeid(TransformHandles).name();
-	this->type=TransformHandles::typeStatic;
+	TransformHandles::s_type=typeid(TransformHandles).name();
+	this->m_type=TransformHandles::s_type;
 		
 	this->editedobj=_editedobj;
 	this->stencilx=		Select::registerStencil();
@@ -181,7 +181,7 @@ void TransformHandles::update(){
 	bool transactionBegin=false;
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
-		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->stencil;
+		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->m_stencil;
 		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, stencile);
 		unsigned char sele =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
 		this->clicked++;
@@ -203,7 +203,7 @@ void TransformHandles::update(){
 	}
 		
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)){
-		unsigned char stencile=((Renderer*)editedobj->getComponent(Renderer::componentType()))->stencil;
+		unsigned char stencile=((Renderer*)editedobj->getComponent(Renderer::componentType()))->m_stencil;
 		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 0, -1);
 		if(sel==stencile){clicked++;}//click inside editedobj
 			

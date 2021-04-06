@@ -8,11 +8,11 @@
 #include "ManipulatorUtil.h"
 #include <typeinfo>
 
-const char* PerspectiveManipulator::typeStatic=NULL;
+const char* PerspectiveManipulator::s_type=NULL;
 
 PerspectiveManipulator::PerspectiveManipulator(){
-	PerspectiveManipulator::typeStatic=typeid(PerspectiveManipulator).name();
-	type= PerspectiveManipulator::typeStatic;
+	PerspectiveManipulator::s_type=typeid(PerspectiveManipulator).name();
+	m_type= PerspectiveManipulator::s_type;
 		
 	for(int i=0;i<6;i++){m_stencils.arr[i]=ManipulatorUtil::getStencil(i);}
 
@@ -37,7 +37,7 @@ void PerspectiveManipulator::start(){}
 void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==NULL){return;}
 	glm::mat4 projinv=glm::inverse(m_edited);;
-	//glm::mat4 transform=(*parent)*owner->transformation;//TMP
+	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	glm::mat4 transform=glm::mat4(1.0f);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 

@@ -37,7 +37,7 @@ struct Manipulator {
     const std::shared_ptr<Core::NodeBase>**editedNode;
     const std::shared_ptr<Core::Sequence>**parent;
     Component*component;
-    //Component*owner;
+    //Component*m_gameObject;
 };
 
 class World2

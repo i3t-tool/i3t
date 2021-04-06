@@ -9,11 +9,11 @@
 #include "imgui.h"
 #include "ManipulatorUtil.h"
 
-const char* LookAtManipulator::typeStatic = NULL;
+const char* LookAtManipulator::s_type = NULL;
 
 LookAtManipulator::LookAtManipulator() {
-    LookAtManipulator::typeStatic = typeid(LookAtManipulator).name();
-    type = LookAtManipulator::typeStatic;
+    LookAtManipulator::s_type = typeid(LookAtManipulator).name();
+    m_type = LookAtManipulator::s_type;
 
 	m_stencilx = ManipulatorUtil::getStencil(0);
 	m_stencily = ManipulatorUtil::getStencil(1);

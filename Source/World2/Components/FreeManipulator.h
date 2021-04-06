@@ -10,14 +10,14 @@ public:
 	void update();
 	void start();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return FreeManipulator::typeStatic; };
-	const char* getComponentType() { return FreeManipulator::typeStatic; };
+	static const char* componentType() { return FreeManipulator::s_type; };
+	const char* getComponentType() { return FreeManipulator::s_type; };
 
 	static const int EDIT_ROTATION=7,EDIT_SCALE=8,EDIT_POSITION=9;
 	const Ptr<Core::NodeBase> *m_editednode=nullptr;
 	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 
 	int m_editmode=EDIT_ROTATION;
 	int m_editaxis=0;

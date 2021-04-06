@@ -8,11 +8,11 @@
 #include "ManipulatorUtil.h"
 #include <typeinfo>
 
-const char* OrthoManipulator::typeStatic=NULL;
+const char* OrthoManipulator::s_type=NULL;
 
 OrthoManipulator::OrthoManipulator(){
-	OrthoManipulator::typeStatic=typeid(OrthoManipulator).name();
-	type= OrthoManipulator::typeStatic;
+	OrthoManipulator::s_type=typeid(OrthoManipulator).name();
+	m_type= OrthoManipulator::s_type;
 		
 	for(int i=0;i<6;i++){m_stencils.arr[i]=ManipulatorUtil::getStencil(i);}
 
@@ -37,7 +37,7 @@ void OrthoManipulator::start(){}
 void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==NULL){return;}
 	glm::mat4 projinv=glm::inverse(m_edited);;
-	//glm::mat4 transform=(*parent)*owner->transformation;//TMP
+	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	glm::mat4 transform=glm::mat4(1.0f);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
@@ -111,7 +111,7 @@ void OrthoManipulator::update(){
 			
 	pos[3]=0.0f;
 	axis[3]=0.0f;
-	//glm::mat4 handlespace=getFullTransform(owner);//TMP
+	//glm::mat4 handlespace=getFullTransform(m_gameObject);//TMP
 	glm::mat4 handlespace=glm::mat4(1.0f);
 			//vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));
 	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+pos));//position of transformated object on the screen

@@ -28,7 +28,7 @@ Viewport::Viewport(bool show, World2* world2) : IWindow(show)
 	// generate texture to draw on
 	glGenTextures(1, &m_texColBufMain);
 
-	// create a renderbuffer to allow depth and stencil
+	// create a renderbuffer to allow depth and m_stencil
 	glGenRenderbuffers(1, &m_rboMain);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_rboMain);
 	// glPixelStorei(GL_PACK_ALIGNMENT, 1);

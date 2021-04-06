@@ -10,13 +10,13 @@ public:
 	RotationManipulator();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
-	static const char* componentType() { return RotationManipulator::typeStatic; };
-	const char* getComponentType() { return RotationManipulator::typeStatic; };
+	static const char* componentType() { return RotationManipulator::s_type; };
+	const char* getComponentType() { return RotationManipulator::s_type; };
 
 	const Ptr<Core::NodeBase> *m_editednode=nullptr;
 	const Ptr<Core::Sequence> *m_parent=nullptr;
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 
 	static const int s_x=1<<0,s_y=1<<1,s_z=1<<2;
 	GameObject*m_circleh,*m_threeaxis;

@@ -32,24 +32,19 @@ private:
   GLuint num_vertices=0;  ///< number of vertices of mesh of this object
   GLuint num_triangles=0; ///< number of triangles of mesh of this object
   GLuint num_attribs=0;   ///< number of attributes per vertex
-
-  GLuint vao = 0;  ///< GL vertex array object
-  // GLuint buffer;
+  GLuint vao = 0;         ///< GL vertex array object
 
 public:
-  struct Shader2*shader;                ///< shader program used for rendering of this object
-  int primitive = GL_TRIANGLES; ///< GL_TRIANGLES, GL_LINES, etc...
-
-  GLuint texture; ///< GL texture
-  glm::vec4 color;///< color,in shader texture*color
-
+  struct Shader2*shader;             ///< shader program used for rendering of this object
+  int primitive = GL_TRIANGLES;      ///< GL_TRIANGLES, GL_LINES, etc...
+  GLuint texture;                    ///< GL texture
+  glm::vec4 color;                   ///< color,in shader texture*color
   GameObject* parent = NULL;         ///< parent of this object - should not be NULL for other objects than scene root
   std::vector<GameObject*> children; ///< child objects of this object - relation child-parent is designed to be
                                      ///< traceable in both directions
-  std::vector<Component*> components; ///< components with functionalities - have render and update functions, that are called in app loop
-
-  bool isRender;         ///< enable/disable rendering
-  glm::mat4x4 transformation; ///< transformation matrix of this object
+  std::vector<Component*> components;///< components with functionalities - have render and update functions, that are called in app loop
+  bool isRender;                     ///< enable/disable rendering
+  glm::mat4x4 transformation;        ///< transformation matrix of this object
 
   /// Unparent this object
   /**
@@ -95,13 +90,13 @@ public:
     \param[in] translate Translation
   */
   void translate(glm::vec3 translate);
-  /// Rotate object
+  /// Rotate object as camera (translate,THEN rotate)
   /**
     \param[in] axis Rotation axis
     \param[in] angleDegrees Angle in degrees
   */
   void rotateAround(glm::vec3 axis, float angleDegrees, glm::vec3 center);
-  /// Rotate object as camera (translate,THEN rotate)
+  /// Rotate object
   /**
     \param[in] axis Rotation axis
     \param[in] angleDegrees Angle in degrees
@@ -120,5 +115,4 @@ public:
     \param[in] parentTransform
   */
   void draw(glm::mat4 parentTransform);
-  // void drawLines(glm::mat4 parentTransform);
 };

@@ -9,13 +9,13 @@ public:
 	void start();
 	void update();
 	void render(glm::mat4*parent,bool renderTransparent);
-	static const char* componentType(){return TransformHandles::typeStatic;};
-	const char* getComponentType(){return TransformHandles::typeStatic;};
+	static const char* componentType(){return TransformHandles::s_type;};
+	const char* getComponentType(){return TransformHandles::s_type;};
 
 	static const int EDIT_LOCAL=0,EDIT_FREE=5,EDIT_ROTATION=7,EDIT_SCALE=8,EDIT_POSITION=9,EDIT_LOOKAT=10;
 		
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 
 	static void drawHandle(GameObject* _handle, glm::mat4 space, glm::vec4 color, int stencil, bool active);
 		

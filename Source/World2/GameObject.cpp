@@ -143,7 +143,7 @@ void GameObject::addChild(GameObject* obj, bool keepTransform){
     if (keepTransform){obj->transformation = glm::inverse(GameObject::inheritedTransform(this) * this->transformation) * obj->transformation;}
 }
 void GameObject::addComponent(Component* c){
-    this->components.push_back(c);c->owner = this;
+    this->components.push_back(c);c->m_gameObject = this;
 }
 Component* GameObject::getComponent(const char* type){
     for (int i = 0; i < this->components.size(); i++){

@@ -20,11 +20,11 @@ void printMatrix4(glm::mat4 m){
 	  m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
-const char* FreeManipulator::typeStatic=NULL;
+const char* FreeManipulator::s_type=NULL;
 	
 FreeManipulator::FreeManipulator(){
-	FreeManipulator::typeStatic=typeid(FreeManipulator).name();
-	type=FreeManipulator::typeStatic;
+	FreeManipulator::s_type=typeid(FreeManipulator).name();
+	m_type=FreeManipulator::s_type;
 	
 	m_stencilx=		Select::registerStencil();
 	m_stencily=		Select::registerStencil();

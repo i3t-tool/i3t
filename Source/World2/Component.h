@@ -22,11 +22,11 @@ public:
   virtual void render(glm::mat4* parent, bool renderTransparent);
   virtual const char* getComponentType();
 
-  GameObject* owner;
-  bool isActive;
+  GameObject* m_gameObject;
+  bool m_isActive;
 
 protected:
-  static const char* typeStatic;
-  const char* type;
+  static const char* s_type;
+  const char* m_type;
   Component();
 };

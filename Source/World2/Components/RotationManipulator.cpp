@@ -9,11 +9,11 @@
 #include "imgui.h"
 #include "ManipulatorUtil.h"
 
-const char* RotationManipulator::typeStatic = NULL;
+const char* RotationManipulator::s_type = NULL;
 
 RotationManipulator::RotationManipulator() {
-    RotationManipulator::typeStatic = typeid(RotationManipulator).name();
-    type = RotationManipulator::typeStatic;
+    RotationManipulator::s_type = typeid(RotationManipulator).name();
+    m_type = RotationManipulator::s_type;
 
 	m_stencilx = ManipulatorUtil::getStencil(0);
 	m_stencily = ManipulatorUtil::getStencil(1);

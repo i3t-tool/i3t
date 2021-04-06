@@ -11,11 +11,11 @@
 
 #include <typeinfo>
 
-const char* TranslationManipulator::typeStatic = NULL;
+const char* TranslationManipulator::s_type = NULL;
 
 TranslationManipulator::TranslationManipulator() {
-    TranslationManipulator::typeStatic = typeid(TranslationManipulator).name();
-    type = TranslationManipulator::typeStatic;
+    TranslationManipulator::s_type = typeid(TranslationManipulator).name();
+    m_type = TranslationManipulator::s_type;
 
 	m_stencilx = ManipulatorUtil::getStencil(0);
 	m_stencily = ManipulatorUtil::getStencil(1);

@@ -49,7 +49,7 @@ World2::World2(){
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         if(sceneHandles->getComponent(i->second.component->getComponentType())==nullptr){//add each manipulator only once (rotation is stored multiple times under different keys)
-            i->second.component->isActive=false;
+            i->second.component->m_isActive=false;
             sceneHandles->addComponent(i->second.component);
         }
     }
@@ -129,18 +129,18 @@ World2* World2::loadDefaultScene(){
 }
 void updateRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){updateRecursive(root->children[i]);}
-    for (int i = 0; i < root->components.size(); i++){if (root->components[i]->isActive){root->components[i]->update();}}
+    for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->update();}}
 }
 
 void startRecursive(GameObject* root){
-    for (int i = 0; i < root->components.size(); i++){if (root->components[i]->isActive){root->components[i]->start();}}
+    for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
 Ptr<Core::NodeBase>op;
 void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
-        i->second.component->isActive=false;
+        i->second.component->m_isActive=false;
         *(i->second.editedNode)=nullptr;
     }
     if(matnode==nullptr){return;}
@@ -150,10 +150,10 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
 
     //op=Builder::createTransform<Core::Free>();
     //op=Builder::createTransform<Core::OrthoProj>();
-    //op=Builder::createTransform<Core::EulerRotX>();
+    op=Builder::createTransform<Core::EulerRotX>();
     //op=Builder::createTransform<Core::AxisAngleRot>();
     //op=Builder::createTransform<Core::LookAt>(glm::vec3{-0.0f, 1.0f, 0.0f}, glm::vec3{-0.1f, 0.5f, 0.0f },glm::vec3{0.0f, 1.0f, 0.0f});
-    //const Ptr<Core::NodeBase>*	nodebase    = &op;
+    nodebase    = &op;
 
     //WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
     Core::Transform::DataMap	data		= nodebase->get()->getDataMap(); //printf("a");
@@ -165,7 +165,7 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase->get());
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
-        m.component->isActive=true;
+        m.component->m_isActive=true;
         *m.editedNode=nodebase;
     }
     else{printf("No manipulators\n"); }

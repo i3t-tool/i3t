@@ -7,7 +7,7 @@ bool Select::stencilRef[256] = {false};
 int Select::registerStencil(){
     for (int i = 1; i < 255; i++){
         if (!Select::stencilRef[i]){
-            //printf("reg stencil %d\n", i);
+            //printf("reg m_stencil %d\n", i);
             Select::stencilRef[i] = true;
             return i;
         }
@@ -16,7 +16,7 @@ int Select::registerStencil(){
 }
 bool Select::freeStencil(char stencil){
     if (Select::stencilRef[stencil]){
-        //printf("free stencil %d\n", i);
+        //printf("free m_stencil %d\n", i);
         Select::stencilRef[stencil] = false;
         return true;
     }
