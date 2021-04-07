@@ -119,7 +119,31 @@ void getNodeById(struct ParseState* Parser, struct Value* ReturnValue, struct Va
             return;
         }
     }
+    std::cout<<"node with id "<<coreid<<" not found!"<<std::endl;
     ReturnValue->Val->Integer=-1;
+}
+void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
+    char* label=(char*)Param[0]->Val->Pointer;
+    int occurances=0;
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    for(int i=0;i<workspace->size();i++){
+        if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {occurances++;}
+    }
+    if(occurances==0){
+        ReturnValue->Val->Integer=-1;
+        std::cout<<"No matches found!"<<std::endl;
+        return;
+    }
+    else if(occurances>1){
+        std::cout<<"Multiple matches found:"<<std::endl;
+    }
+    for(int i=0;i<workspace->size();i++){
+        if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {
+            ReturnValue->Val->Integer=i;
+            if(occurances>1){std::cout<<"Id: "<<i<<" Name: "<<label<<std::endl;}
+        }
+    }
+    
 }
 void deleteNode(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
     int index=Param[0]->Val->Integer;
@@ -187,6 +211,7 @@ struct LibraryFunction PlatformLibrary1[] =
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
 	{ unplugInput,  "void unpluginput(int,int);" },
 	{ getNodeById,  "int getnode(int);" },
+	{ getNodeByName,"int getnodel(char*);" },
 	{ deleteNode,   "bool delnode(int);" },
 	{ dataMat4,     "int datamat4(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float);" },
 	{ dataVec4,     "int datavec4(float,float,float,float);" },
