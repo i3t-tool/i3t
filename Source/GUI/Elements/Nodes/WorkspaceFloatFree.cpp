@@ -1,7 +1,7 @@
 #include "WorkspaceFloatFree.h"
 
-WorkspaceFloatFree::WorkspaceFloatFree(ImTextureID headerBackground, WorkspaceVectorFreeArgs const& args)
-    : WorkspaceFloat(headerBackground, { .viewScale = args.viewScale, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+WorkspaceFloatFree::WorkspaceFloatFree(ImTextureID headerBackground, WorkspaceFloatFreeArgs const& args)
+    : WorkspaceFloat(headerBackground, {.levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
 {}
 
 WorkspaceFloatFree::WorkspaceFloatFree(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
@@ -10,6 +10,6 @@ WorkspaceFloatFree::WorkspaceFloatFree(ImTextureID headerBackground, std::string
 
 void WorkspaceFloatFree::drawData(util::NodeBuilder& builder)
 {
-    drawDataFull(builder); 
+    drawDataFull(builder);
 }
 

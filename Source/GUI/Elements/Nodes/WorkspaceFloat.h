@@ -3,7 +3,7 @@
 
 struct WorkspaceFloatArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Float header";
     std::string nodeLabel = "Float";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Float>();

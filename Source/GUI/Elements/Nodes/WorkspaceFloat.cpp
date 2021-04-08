@@ -1,7 +1,7 @@
 #include "WorkspaceFloat.h"
 
 WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, WorkspaceFloatArgs const& args)
-	: WorkspaceNodeWithCoreData(headerBackground, { .viewScale = args.viewScale, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+	: WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
 {}
 
 WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
@@ -11,7 +11,7 @@ WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase>
 
 void WorkspaceFloat::drawData(util::NodeBuilder& builder)
 {
-	drawDataFull(builder); 
+	drawDataFull(builder);
 }
 
 void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)

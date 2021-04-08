@@ -145,7 +145,6 @@ void WorkspaceNodeWithCoreData::drawMenuSetDataMap()
             }
         }
 
-
         ImGui::EndMenu();
     }
 
@@ -196,9 +195,6 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
                             elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
                             WorkspacePinColor[elem.second->get()->getType()],
                             ImColor(100.0, 200.0, 10.0, 1.0f)); /* \todo JH not constant here... */ //SS what is this?
-		
-		
-
 
 		ImGui::Spring(0);
 
@@ -300,7 +296,6 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
         /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
         drawDataFull(builder);
     }
-
 }
 
 void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters)

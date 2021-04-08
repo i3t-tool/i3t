@@ -1,8 +1,7 @@
 #include "WorkspaceVector4.h"
 
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args)
-
-    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 	fw.showMyPopup = false;
 	fw.id = "";
@@ -21,12 +20,6 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeB
 	fw.name = "vector4";
 	fw.rows = 0;
 
-    setDataItemsWidth();
-}
-
-WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
-{
     setDataItemsWidth();
 }
 
@@ -70,7 +63,7 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 					fw.value = localData[columns];
 					fw.columns = columns;
 				}
-					
+
 	}
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
