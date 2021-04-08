@@ -4,20 +4,26 @@
 
 using namespace Core;
 
-void Sequence::addMatrix(Ptr<Sequence::Matrix> matrix, size_t index) noexcept
+ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
-	Debug::Assert(isTransform(matrix), "Parameter 'matrix' is not transform node.");
-
 	GraphManager::unplugAll(matrix);
-	matrix->as<Transformation>()->m_currentSequence = getPtr();
 
-	if (index > m_matrices.size())
-		m_matrices.push_back(std::move(matrix));
-	else
-		m_matrices.insert(m_matrices.begin() + index, std::move(matrix));
+	index = index > m_matrices.size() ? m_matrices.size() : index;
+  m_matrices.insert(m_matrices.begin() + index, matrix);
 
-	updateValues(0);
+  matrix->as<Transformation>()->setSequence(getPtr(), index);
+
+  updateValues(0);
 	spreadSignal();
+
+	return ValueSetResult{};
+}
+
+void Sequence::swap(int from, int to)
+{
+  if (from > m_matrices.size() || to > m_matrices.size()) return;
+
+  std::swap(m_matrices[from], m_matrices[to]);
 }
 
 void Sequence::updateValues(int inputIndex)
@@ -70,11 +76,11 @@ void Sequence::receiveSignal(int inputIndex)
 
 	// Do not spread signal from matrix output when got signal from mul input.
 	if (inputIndex == 0)
-  {
-    spreadSignal(0);
+	{
+		spreadSignal(0);
 	}
 	else
-  {
+	{
 		spreadSignal(1);
 	}
 }

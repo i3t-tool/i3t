@@ -152,6 +152,7 @@ TEST(EulerYTest, OneValueSet)
 	}
 }
 
+/// \todo MH GLM_GetAngleFromEulerY won't pass.
 TEST(GLM, GetAngleFromEulerY)
 {
   for (int i = 0; i < 10; ++i)
@@ -167,11 +168,12 @@ TEST(GLM, GetAngleFromEulerY)
   }
 }
 
+/// \todo MH EulerYTest_SetMatrixShouldBeValid won't pass.
 TEST(EulerYTest, SetMatrixShouldBeValid)
 {
 	for (int i = 0; i < 10; ++i)
   {
-    float initialRad = glm::radians(generateFloat());
+    float initialRad = generateFloat(-(M_PI / 2.0f), M_PI / 2.0f);
     auto eulerY = Builder::createTransform<EulerRotY>(initialRad);
 
     auto mat = glm::eulerAngleY(generateFloat());

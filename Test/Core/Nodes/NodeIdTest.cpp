@@ -6,15 +6,15 @@
 
 using namespace Core;
 
-void TestId(ax::NodeEditor::NodeId id) {
+void testId(ax::NodeEditor::NodeId id) {
   // It compiles!
 }
 
-TEST(CoreIDTest, IDCanBeConvertedToNodeEditorIDs)
+TEST(NodeIdTest, IDCanBeConvertedToNodeEditorIDs)
 {
   auto id = IdGenerator::next();
 
-  TestId(id);
+  testId(id);
 
   ax::NodeEditor::NodeId nodeId = id;
 

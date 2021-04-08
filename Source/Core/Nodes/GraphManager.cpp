@@ -53,6 +53,11 @@ void GraphManager::unplugAll(Ptr<Core::NodeBase>& node)
 	node.get()->unplugAll();
 }
 
+void GraphManager::unplugAll(Ptr<Core::NodeBase>&& node)
+{
+  node.get()->unplugAll();
+}
+
 void GraphManager::unplugInput(Ptr<Core::NodeBase> const & node, int index)
 {
 	node.get()->unplugInput(index);

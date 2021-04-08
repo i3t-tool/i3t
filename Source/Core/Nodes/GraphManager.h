@@ -133,6 +133,7 @@ public:
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(Ptr<Core::NodeBase>& node);
+	static void unplugAll(Ptr<Core::NodeBase>&& node);
 
 	/**
 	 * Unplug plugged node from given input pin of this node.
