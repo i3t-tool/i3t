@@ -20,7 +20,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 				pin.getId(),
                 pin,
                 *this,
-				fmt::format("input #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
@@ -32,7 +32,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 pin.getId(),
                 pin,
                 *this,
-				fmt::format("output #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 	}
 }
 
@@ -53,7 +53,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 				pin.getId(),
                 pin,
                 *this,
-				fmt::format("input #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
@@ -65,7 +65,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 pin.getId(),
                 pin,
                 *this,
-				fmt::format("output #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 	}
 }
 
@@ -112,14 +112,17 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
                             WorkspacePinShape[elem.second->get()->getType()],
                             elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
                             WorkspacePinColor[elem.second->get()->getType()],
-                            ImColor(32.0, 32.0, 32.0, alpha)); /* \todo JH not constant here... */
+                            ImColor(100.0, 200.0, 10.0, 1.0f)); /* \todo JH not constant here... */ //SS what is this?
+		
+		
+
 
 		ImGui::Spring(0);
-		if (!elem.second->get()->m_name.empty())
-		{
-			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
-			ImGui::Spring(0);
-		}
+		//if (!elem.second->get()->m_name.empty())
+		//{
+		//	ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
+		//	ImGui::Spring(0);
+		//}
 
 		ImGui::PopStyleVar();
 		builder.EndInput();
@@ -140,11 +143,11 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 		builder.Output(elem.first->getId());
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		if (!elem.second->get()->m_name.empty())
-		{
-			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
-			ImGui::Spring(0);
-		}
+		//if (!elem.second->get()->m_name.empty())
+		//{
+		//	ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
+		//	ImGui::Spring(0);
+		//}
 
 		// color.Value.w = alpha / 255.0f;
 		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
@@ -170,10 +173,11 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		//ImGui::PushStyleVar();
 	}
 
 	ImGui::SameLine();
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value);
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, "%.0f");
 
 	if (inactive)
 	{

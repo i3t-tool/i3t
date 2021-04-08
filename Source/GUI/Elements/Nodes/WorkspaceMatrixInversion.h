@@ -13,6 +13,7 @@ class WorkspaceMatrixInversion : public WorkspaceMatrix4x4
 {
 public:
 	WorkspaceMatrixInversion(ImTextureID headerBackground, WorkspaceMatrixInversionArgs const& args);
+	WorkspaceMatrixInversion(ImTextureID headerBackground, std::string headerLabel = "Inversion", std::string nodeLabel = "Inversion");
 
 	void drawData(util::NodeBuilder& builder);
 

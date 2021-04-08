@@ -6,13 +6,13 @@
 // #include <format> // not as standard library yet
 
 std::map<EValueType, ImColor> WorkspacePinColor = {
-		{EValueType::Float, ImColor(255, 255, 255)},    {EValueType::Matrix, ImColor(220, 48, 48)},
+		{EValueType::Float, ImColor(255, 255, 255)},    {EValueType::Matrix, ImColor(150, 8, 8)},
 		{EValueType::MatrixMul, ImColor(68, 201, 156)}, {EValueType::Pulse, ImColor(147, 226, 74)},
 		{EValueType::Quat, ImColor(124, 21, 153)},      {EValueType::Screen, ImColor(51, 150, 215)},
 		{EValueType::Vec3, ImColor(218, 0, 183)},       {EValueType::Vec4, ImColor(255, 48, 48)}};
 
 std::map<EValueType, IconType> WorkspacePinShape = {
-		{EValueType::Float, IconType::Circle},     {EValueType::Matrix, IconType::Flow},
+		{EValueType::Float, IconType::Circle},     {EValueType::Matrix, IconType::Arrow},
 		{EValueType::MatrixMul, IconType::Circle}, {EValueType::Pulse, IconType::Circle},
 		{EValueType::Quat, IconType::Circle},      {EValueType::Screen, IconType::Circle},
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
@@ -34,7 +34,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 {
 	/* \todo Some better default values - take from Const.h*/
 	m_state = "default WorkspaceNode state";
-	m_color = ImColor(255, 255, 255);
+	m_color = ImColor(89, 134, 179);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
 }

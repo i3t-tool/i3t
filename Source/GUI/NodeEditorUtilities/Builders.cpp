@@ -101,17 +101,19 @@ void util::NodeBuilder::Input(ed::PinId id)
 
 	SetStage(Stage::Input);
 
-	if (applyPadding)
-		ImGui::Spring(0);
-
+	if (applyPadding) {
+		//ImGui::Spring(0);
+	}
 	Pin(id, PinKind::Input);
 
-	ImGui::BeginHorizontal(id.AsPointer());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	//ImGui::BeginHorizontal(id.AsPointer());
 }
 
 void util::NodeBuilder::EndInput()
 {
-	ImGui::EndHorizontal();
+	ImGui::PopStyleVar();
+	//ImGui::EndHorizontal();
 
 	EndPin();
 }
@@ -138,12 +140,14 @@ void util::NodeBuilder::Output(ed::PinId id)
 
 	Pin(id, PinKind::Output);
 
-	ImGui::BeginHorizontal(id.AsPointer());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	//ImGui::BeginHorizontal(id.AsPointer());
 }
 
 void util::NodeBuilder::EndOutput()
 {
-	ImGui::EndHorizontal();
+	ImGui::PopStyleVar();
+	//ImGui::EndHorizontal();
 
 	EndPin();
 }

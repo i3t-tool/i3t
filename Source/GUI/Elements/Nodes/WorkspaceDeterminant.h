@@ -1,5 +1,5 @@
 #pragma once
-#include "WorkspaceNodeWithCoreData.h"
+#include "WorkspaceFloat.h"
 
 struct WorkspaceDeterminantArgs
 {
@@ -10,11 +10,12 @@ struct WorkspaceDeterminantArgs
 };
 
 
-class WorkspaceDeterminant : public WorkspaceNodeWithCoreData
+class WorkspaceDeterminant : public WorkspaceFloat
 {
 public:
     WorkspaceDeterminant(ImTextureID headerBackground, WorkspaceDeterminantArgs const& args);
+    WorkspaceDeterminant(ImTextureID headerBackground, std::string headerLabel = "Determinant", std::string nodeLabel = "Determinant");
 
-    virtual void drawDataFull(util::NodeBuilder& builder);
+    void drawData(util::NodeBuilder& builder);
 };
 
