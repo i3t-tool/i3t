@@ -90,8 +90,9 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 20, padding = 10; /* \todo JH take from some font setting */
+    float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
+	m_dataItemsWidth = (float)(maxLenghtOfData()) * oneCharWidth;
     return m_dataItemsWidth;
 }
 

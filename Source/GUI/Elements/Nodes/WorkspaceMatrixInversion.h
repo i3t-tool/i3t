@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixInversionArgs
 {
-	WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+	//WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
 	std::string headerLabel = "default Inversion header";
 	std::string nodeLabel = "Inversion";
 	Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Inversion>();

@@ -3,7 +3,7 @@
 
 struct WorkspaceDeterminantArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    //WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
     std::string headerLabel = "default Determinant header";
     std::string nodeLabel = "Determinant";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Determinant>();

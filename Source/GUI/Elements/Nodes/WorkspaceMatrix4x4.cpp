@@ -1,7 +1,7 @@
 #include "WorkspaceMatrix4x4.h"
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMatrix4x4Args const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceNodeWithCoreData(headerBackground, { .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 	fw.showMyPopup = false;
 	fw.id = "";
@@ -18,12 +18,9 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 	fw.id = "";
 	fw.value = NULL;
 	fw.name = "matrix4x4";
+	setDataItemsWidth();
 }
 
-void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
-{
-    setDataItemsWidth();
-}
 
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
@@ -44,8 +41,6 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 
-	//ImGui::BeginHorizontal(idOfNode, ImVec2(0, 0), 0.0f);
-	//ImGui::BeginVertical(idOfNode, ImVec2(0, 0), 0.0f);
 
 	for (int rows = 0; rows < 4; rows++)
 	{

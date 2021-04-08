@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixMulMatrixArgs
 {
-	WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+	//WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
 	std::string headerLabel = "default Matrix Mul Matrix header";
 	std::string nodeLabel = "MatrixMulMatrix";
 	Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MatrixMulMatrix>();

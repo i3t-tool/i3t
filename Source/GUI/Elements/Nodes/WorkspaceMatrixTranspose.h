@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixTransposeArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    //WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
     std::string headerLabel = "default MatrixTranspose header";
     std::string nodeLabel = "Matrix Transpose";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Transpose>();

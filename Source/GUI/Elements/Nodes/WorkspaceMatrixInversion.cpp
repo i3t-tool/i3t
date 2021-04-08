@@ -1,7 +1,7 @@
 #include "WorkspaceMatrixInversion.h"
 
 WorkspaceMatrixInversion::WorkspaceMatrixInversion(ImTextureID headerBackground, WorkspaceMatrixInversionArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, { .viewScale = args.viewScale, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+    : WorkspaceMatrix4x4(headerBackground, {  .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
 {}
 
 WorkspaceMatrixInversion::WorkspaceMatrixInversion(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
@@ -10,7 +10,7 @@ WorkspaceMatrixInversion::WorkspaceMatrixInversion(ImTextureID headerBackground,
 
 void WorkspaceMatrixInversion::drawData(util::NodeBuilder& builder)
 {
-    switch (m_viewScale)
+    /*switch (m_viewScale)
     {
     case WorkspaceViewScale::Full:
         //drawDataFull(builder); tmp
@@ -25,7 +25,8 @@ void WorkspaceMatrixInversion::drawData(util::NodeBuilder& builder)
 
     default:
          drawDataFull(builder);
-    }
+    }*/
+	drawDataFull(builder);
 
 }
 

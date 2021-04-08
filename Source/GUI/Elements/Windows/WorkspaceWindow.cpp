@@ -13,8 +13,8 @@
 #include "../Nodes/WorkspaceMatrixTranslation.h"
 #include "../Nodes/WorkspaceMatrixInversion.h"
 #include "../Nodes/WorkspaceMatrixMulMatrix.h"
-#include "../Nodes/WorkspaceMatrixTranspose.h"
-#include "../Nodes/WorkspaceDeterminant.h"
+//#include "../Nodes/WorkspaceMatrixTranspose.h"
+//#include "../Nodes/WorkspaceDeterminant.h"
 
 #include "../Nodes/WorkspaceFloatFree.h"
 
@@ -658,12 +658,12 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("transpose")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranspose>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranspose>(HeaderBackgroundTexture));
+					//ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("determinant")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
+					//ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * mat")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulMatrix>(HeaderBackgroundTexture));
@@ -894,74 +894,13 @@ void WorkspaceWindow::checkQueryContextMenus()
 }
 
 
-void WorkspaceWindow::checkQueryNodeCreate()
-{
-    ne::PinId pinId = 0;
-    if (ne::QueryNewNode(&pinId))
-    {
-        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
-        if (m_pinPropertiesForNewLink)
-        {
-            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
-        }
-
-        if (ne::AcceptNewItem())
-        {
-            m_createNewNode  = true;
-            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
-            m_pinPropertiesForNewLink = nullptr;
-
-            ne::Suspend();
-            ImGui::OpenPopup("Create New Node");
-            ne::Resume();
-        }
-    }
-}
-
-void WorkspaceWindow::checkQueryElementsDeleting()
-{
-    if (ne::BeginDelete())
-    {
-        checkQueryLinkDelete();
-        checkQueryNodeDelete();
-    }
-    ne::EndDelete();
-}
-
-void WorkspaceWindow::checkQueryLinkDelete()
-{
-    ne::LinkId linkId = 0;
-    while (ne::QueryDeletedLink(&linkId))
-    {
-        if (ne::AcceptDeletedItem())
-        {
-            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
-
-            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
-        }
-    }
-}
-
-void WorkspaceWindow::checkQueryNodeDelete()
-{
-    ne::NodeId nodeId = 0;
-    while (ne::QueryDeletedNode(&nodeId))
-    {
-        if (ne::AcceptDeletedItem())
-        {
-            coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
-            if (id != m_workspaceCoreNodes.end())
-                m_workspaceCoreNodes.erase(id);
-        }
-    }
-}
 
 
-void WorkspaceWindow::UpdateTouchAllNodes()
-{
-	const auto deltaTime = ImGui::GetIO().DeltaTime;
-	for (auto&& workspaceNode : m_workspaceCoreNodes)
-	{
-		workspaceNode->UpdateTouch(deltaTime);
-	}
-}
+
+
+
+
+
+
+
+
