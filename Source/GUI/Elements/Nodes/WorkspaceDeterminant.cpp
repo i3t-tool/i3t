@@ -8,7 +8,10 @@ WorkspaceDeterminant::WorkspaceDeterminant(ImTextureID headerBackground, std::st
     : WorkspaceFloat(headerBackground, Builder::createNode<ENodeType::Determinant>(), headerLabel, nodeLabel)
 {}
 
-void WorkspaceDeterminant::drawData(util::NodeBuilder& builder)
+void WorkspaceDeterminant::drawDataSetValues(util::NodeBuilder& builder)
 {
+    /* \todo JH - is something to do here? function have to exist anyway... */
     drawDataFull(builder);
 }
+
+

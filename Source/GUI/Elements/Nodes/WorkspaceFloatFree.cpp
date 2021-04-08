@@ -8,8 +8,7 @@ WorkspaceFloatFree::WorkspaceFloatFree(ImTextureID headerBackground, std::string
     : WorkspaceFloat(headerBackground, Builder::createNode<ENodeType::Float>(), headerLabel, nodeLabel)
 {}
 
-void WorkspaceFloatFree::drawData(util::NodeBuilder& builder)
+void WorkspaceFloatFree::drawDataSetValues(util::NodeBuilder& builder)
 {
     drawDataFull(builder);
 }
-

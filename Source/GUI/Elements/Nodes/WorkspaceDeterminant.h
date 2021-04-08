@@ -16,6 +16,7 @@ public:
     WorkspaceDeterminant(ImTextureID headerBackground, WorkspaceDeterminantArgs const& args);
     WorkspaceDeterminant(ImTextureID headerBackground, std::string headerLabel = "Determinant", std::string nodeLabel = "Determinant");
 
-    void drawData(util::NodeBuilder& builder);
+    void drawDataSetValues(util::NodeBuilder& builder);
+
 };
 

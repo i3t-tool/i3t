@@ -18,6 +18,8 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 	fw.id = "";
 	fw.value = NULL;
 	fw.name = "matrix4x4";
+
+    setDataItemsWidth();
 }
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)

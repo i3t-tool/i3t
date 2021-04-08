@@ -9,11 +9,6 @@ WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase>
 {
 }
 
-void WorkspaceFloat::drawData(util::NodeBuilder& builder)
-{
-	drawDataFull(builder);
-}
-
 void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 {
 	const float& coreData = m_nodebase->getData().getFloat();
@@ -23,14 +18,13 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 
 	float localData;
 
-	builder.Middle();
-
+	/* \todo JH somehow include m_dataItemsWidth - width based on number of characters*/
 	ImGui::PushItemWidth(I3T::getSize(ESize::Nodes_FloatWidth));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
 		{ I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
 	localData = coreData;
-	valueChanged |= drawDragFloatWithMap_Inline(&localData, 0, fmt::format("##{}:{}", idOfNode, 0));
+	valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, 0)); /* datamap value 1 is changeable */
 
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
@@ -41,4 +35,9 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 	}
 
 	ImGui::Spring(0);
+}
+
+int WorkspaceFloat::maxLenghtOfData()
+{
+    return numberOfCharWithDecimalPoint( m_nodebase->getData().getFloat(), m_numberOfVisibleDecimal );
 }

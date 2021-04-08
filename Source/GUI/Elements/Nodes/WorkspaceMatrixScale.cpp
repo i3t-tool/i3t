@@ -11,38 +11,13 @@ WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, std::st
 void WorkspaceMatrixScale::drawDataSetValues(util::NodeBuilder& builder)
 {
     drawDataSetValues_builder(builder,
-                              {"x", "y", "z"},
-                              { [this](){return getValueX();}, [this](){return getValueY();}, [this](){return getValueZ();} },
-                              { [this](float v){return setValueX(v);}, [this](float v){return setValueY(v);}, [this](float v){return setValueZ(v);} });
-}
-
-/* \todo JH underlying functions will be taken from Core */
-ValueSetResult WorkspaceMatrixScale::setValueX(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(0, 0));
-}
-
-ValueSetResult WorkspaceMatrixScale::setValueY(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(1, 1));
-}
-
-ValueSetResult WorkspaceMatrixScale::setValueZ(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(2, 2));
-}
-
-float WorkspaceMatrixScale::getValueX()
-{
-    return m_nodebase->getData().getMat4()[0][0];
-}
-
-float WorkspaceMatrixScale::getValueY()
-{
-    return m_nodebase->getData().getMat4()[1][1];
-}
-
-float WorkspaceMatrixScale::getValueZ()
-{
-    return m_nodebase->getData().getMat4()[2][2];
+                              { "x",
+                                "y",
+                                "z"},
+                              { [this](){return m_nodebase->as<Core::Scale>()->getX();},
+                                [this](){return m_nodebase->as<Core::Scale>()->getY();},
+                                [this](){return m_nodebase->as<Core::Scale>()->getZ();} },
+                              { [this](float v){return m_nodebase->as<Core::Scale>()->setX(v);},
+                                [this](float v){return m_nodebase->as<Core::Scale>()->setY(v);},
+                                [this](float v){return m_nodebase->as<Core::Scale>()->setZ(v);} });
 }

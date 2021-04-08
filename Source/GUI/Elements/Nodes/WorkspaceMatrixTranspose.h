@@ -15,5 +15,5 @@ public:
     WorkspaceMatrixTranspose(ImTextureID headerBackground, WorkspaceMatrixTransposeArgs const& args);
     WorkspaceMatrixTranspose(ImTextureID headerBackground, std::string headerLabel = "Transpose", std::string nodeLabel = "Transpose");
 
-    void drawData(util::NodeBuilder& builder);
+    void drawDataSetValues(util::NodeBuilder& builder);
 };

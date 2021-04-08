@@ -150,6 +150,22 @@ void WorkspaceNodeWithCoreData::drawMenuSetDataMap()
 
 }
 
+void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
+{
+    if (ImGui::BeginMenu("Precision")) {
+        ImGui::Text(fmt::format("Actual precision: {}", getNumberOfVisibleDecimal()).c_str());
+        ImGui::Separator();
+        for(int i = 0; i < 5; i++) /* \todo JH some better setter for precision */
+        {
+            if (ImGui::MenuItem(fmt::format("{}",i).c_str()))
+            {
+                setNumberOfVisibleDecimal(i);
+            }
+        }
+        ImGui::EndMenu();
+    }
+}
+
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
 	builder.Begin(m_id);

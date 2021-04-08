@@ -8,7 +8,8 @@ WorkspaceMatrixTranspose::WorkspaceMatrixTranspose(ImTextureID headerBackground,
     : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::Transpose>(), headerLabel, nodeLabel) {
 }
 
-void WorkspaceMatrixTranspose::drawData(util::NodeBuilder& builder)
+void WorkspaceMatrixTranspose::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    // \todo JH
+	drawDataFull(builder);
 }

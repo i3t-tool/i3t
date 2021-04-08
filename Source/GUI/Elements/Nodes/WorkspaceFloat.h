@@ -16,6 +16,6 @@ public:
     WorkspaceFloat(ImTextureID headerBackground, WorkspaceFloatArgs const& args);
     WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
-    virtual void drawData(util::NodeBuilder& builder);
     virtual void drawDataFull(util::NodeBuilder& builder);
+    int maxLenghtOfData();
 };

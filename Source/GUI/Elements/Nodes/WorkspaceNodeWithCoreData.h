@@ -40,7 +40,7 @@ protected:
     int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
     float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
 public:
-	
+
 	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
                                                 WorkspaceNodeWithCoreData is owner
                                            */
@@ -51,7 +51,7 @@ public:
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
 
-	
+
 
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
     WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr, std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");
@@ -65,6 +65,8 @@ public:
 
     void setDataMap(const Core::Transform::DataMap& mapToSet);
     void drawMenuSetDataMap();
+
+    void drawMenuSetPrecision();
 
 	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 

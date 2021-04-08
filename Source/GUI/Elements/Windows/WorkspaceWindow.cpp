@@ -512,20 +512,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 		context_node->drawMenuSetDataMap();
         context_node->drawMenuLevelOfDetail();
+        context_node->drawMenuSetPrecision();
 
-        if (ImGui::BeginMenu("Precision")) {
-
-            ImGui::Text(fmt::format("Actual precision: {}", context_node->getNumberOfVisibleDecimal()).c_str());
-            ImGui::Separator();
-            for(int i = 0; i < 5; i++)
-            {
-                if (ImGui::MenuItem(fmt::format("{}",i).c_str()))
-                {
-                    context_node->setNumberOfVisibleDecimal(i);
-                }
-            }
-            ImGui::EndMenu();
-        }
         if (ImGui::MenuItem("Delete")) {
             ne::DeleteNode(context_node->m_id);
 		}
@@ -638,20 +626,20 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("trackball")) {
 				}
 				if (ImGui::MenuItem("inversion")) {
-					//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixInversion>(HeaderBackgroundTexture));
-					//ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixInversion>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("transpose")) {
-					//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranspose>(HeaderBackgroundTexture));
-					//ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranspose>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("determinant")) {
-					//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
-					//ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * mat")) {
-					//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulMatrix>(HeaderBackgroundTexture));
-					//ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulMatrix>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat + mat")) {
 				}
@@ -766,8 +754,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("float operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("float")) {
-//					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatFree>(HeaderBackgroundTexture));
-//					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatFree>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
 				}
 				if (ImGui::MenuItem("clamp float")) {
 				}

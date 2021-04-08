@@ -15,7 +15,6 @@ public:
     WorkspaceFloatFree(ImTextureID headerBackground, WorkspaceFloatFreeArgs const& args);
     WorkspaceFloatFree(ImTextureID headerBackground, std::string headerLabel = "Free Float", std::string nodeLabel = "Free Float");
 
-    void drawData(util::NodeBuilder& builder);
-
+    void drawDataSetValues(util::NodeBuilder& builder);
 };
 
