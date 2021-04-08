@@ -15,7 +15,7 @@ void SetupDialog::render()
 
 	style.FramePadding.y = 4;
 
-	ImGui::Begin("Setup");
+	ImGui::Begin(getName("Setup").c_str());
 	{
 		ImGui::Text("Camera control:");
 		ImGui::RadioButton("orbit", &cameraMode, 0);

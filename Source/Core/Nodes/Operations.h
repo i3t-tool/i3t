@@ -138,6 +138,7 @@ enum class ENodeType
 
 enum class ETransformType
 {
+	Free,
 	Translation,
 	EulerX,
 	EulerY,
@@ -206,6 +207,9 @@ static const std::vector<EValueType> floatVectorInput = {EValueType::Float, EVal
 static const std::vector<EValueType> floatVector3Input = {EValueType::Float, EValueType::Vec3};
 static const std::vector<EValueType> floatQuatInput = {EValueType::Float, EValueType::Quat};
 static const std::vector<EValueType> quatVector3Input = {EValueType::Quat, EValueType::Vec3};
+
+static const std::vector<EValueType> matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
+static const std::vector<EValueType> matrixMulInput = {EValueType::MatrixMul};
 
 static const std::vector<std::string> mixInputNames = {"from", "to", "t"};
 static const std::vector<std::string> AngleAxisToQuatInputNames = {"angle", "angle / 2", "vec3"};
@@ -316,7 +320,7 @@ static const std::vector<Operation> operations = {
 		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
 		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
 
-		{"Model", "model", 1, matrixInput, 0, {}},
+		{"Model", "model", 1, matrixMulInput, 0, {}},
 
 		// Transform matrices constructors
 		{"MakeTranslation", "translate constructor", 1, vector3Input, 1, matrixInput},                     // translate
@@ -336,20 +340,21 @@ static const std::vector<Operation> operations = {
 
 namespace Core
 {
-static const Operation g_sequence = {"Sequence", "seq", 2, twoMatrixInput, 2, twoMatrixInput};
+static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
 
 static const std::vector<Operation> g_transforms = {
-		{"Translation", "translate", 1, matrixInput, 1, matrixInput},                                  // translate
-		{"EulerX", "eulerAngleX", 1, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleX
-		{"EulerY", "eulerAngleY", 1, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleY
-		{"EulerZ", "eulerAngleZ", 1, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleZ
-		{"Scale", "scale", 1, matrixInput, 1, matrixInput},                                            // scale
-		{"AxisAngle", "rotate", 1, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},          // rotate
-		{"Quat", "quat", 1, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},                 // quat rotate
-		{"Ortho", "ortho", 1, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},           // ortho
-		{"Perspective", "perspective", 1, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
-		{"Frustum", "frustum", 1, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},       // frustrum
-		{"LookAt", "lookAt", 1, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames},                // lookAt
+		{"Free", "free", 0, matrixInput, 1, matrixInput},                                              // free
+		{"Translation", "translate", 0, matrixInput, 1, matrixInput},                                  // translate
+		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleX
+		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleY
+		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleZ
+		{"Scale", "scale", 0, matrixInput, 1, matrixInput},                                            // scale
+		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},          // rotate
+		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},                 // quat rotate
+		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},           // ortho
+		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
+		{"Frustum", "frustum", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},       // frustrum
+		{"LookAt", "lookAt", 0, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames},                // lookAt
 };
 
 FORCE_INLINE const Operation* getOperationProps(ENodeType type)

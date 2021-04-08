@@ -31,6 +31,7 @@ public:
 	void show() { m_show = true; }
 	bool isVisible() const { return m_show; }
 	bool* getShowPtr() { return &m_show; }
+  std::string getName(const char* name) const { return fmt::format("{}###{}", name, getID()); };
 
 protected:
 	friend class Application;

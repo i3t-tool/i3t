@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
+ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 {
 	auto* inp = input;
 	if (!inp)
@@ -18,6 +18,12 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 	{
 		// Do the input and output data types match?
 		return ENodePlugResult::Err_MismatchedPinTypes;
+	}
+
+	if (inp->m_isInput == out->m_isInput)
+	{
+		// Is one pin input and other output?
+		return ENodePlugResult::Err_MismatchedPinKind;
 	}
 
 	if (inp->m_master == out->m_master)
@@ -86,6 +92,16 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	leftNode->spreadSignal();
 
 	return ENodePlugResult::Ok;
+}
+
+ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex)
+{
+  return plug(node, seq, nodeIndex, 1);
+}
+
+ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex)
+{
+  return plug(seq, node, 1, nodeIndex);
 }
 
 void GraphManager::unplugAll(Ptr<Core::NodeBase>& node)

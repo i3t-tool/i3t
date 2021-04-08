@@ -1,6 +1,7 @@
 #include "WorkspaceVector4.h"
 
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args)
+
     : WorkspaceNodeWithCoreData(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 	fw.showMyPopup = false;
@@ -8,6 +9,7 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector
 	fw.value = NULL;
 	fw.name = "vector4";
 	fw.rows = 0;
+	setDataItemsWidth();
 }
 
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
@@ -18,11 +20,14 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeB
 	fw.value = NULL;
 	fw.name = "vector4";
 	fw.rows = 0;
+
+    setDataItemsWidth();
 }
 
-void WorkspaceVector4::drawData(util::NodeBuilder& builder)
+WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
+    : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
 {
-    drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+    setDataItemsWidth();
 }
 
 void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
@@ -39,10 +44,10 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(I3T::getSize(ESize::Nodes_FloatWidth));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	//                    {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+
+	ImGui::PushItemWidth(m_dataItemsWidth);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+
 	for (int columns = 0; columns < 4; columns++)
 	{
 		localData[columns] = coreData[columns];
@@ -73,8 +78,26 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 	if (valueChanged)
 	{
 	    m_nodebase->setValue(localData);
+	    setDataItemsWidth();
 //		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 
 	ImGui::Spring(0);
+}
+
+int WorkspaceVector4::maxLenghtOfData()
+{
+    int act, maximal = 0;
+    const glm::vec4& coreData = m_nodebase->getData().getVec4();
+
+    for(int column=0; column < 4; column++)
+    {
+        act = numberOfCharWithDecimalPoint( coreData[column], m_numberOfVisibleDecimal );
+        if(act > maximal)
+        {
+            maximal = act;
+        }
+    }
+
+    return maximal;
 }

@@ -70,64 +70,9 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::SetCurrentEditor(NodeEditorContext);
 
-	/*\todo adding nodes here just for testing */
-	/*--- TRANSLATION */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation
-	// 1")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-252, 220));
-
-	/*--- TRANSLATION with connection to translation */
-	// WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture, "MatrixTranslation
-	// 2")); ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-300, 351));
-
-	/* \todo JH nyni nejde v Core spojovat dva operatory - proto to nefuguje... */
-	// Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(1).get())->Nodebase, 0, 0);
-
-	/*--- MATRIX_4x4 with connection to translation*/
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixFree>(HeaderBackgroundTexture, "just Matrix4x4"));
-	 ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(-500, 351));
-
-	// Core::GraphManager::plug(static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(0).get())->Nodebase,
-	//                         static_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get())->Nodebase, 0, 0);
-
-	/*--- SCALE */
-	 /*WorkspaceNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture, "MatrixScale 1"));
-	 ne::SetNodePosition(WorkspaceNodes.back()->Id, ImVec2(-500, 251));
-
-	/*--- NORMALIZE VECTOR */
-	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture, "NormalizeVector 1")); 
-	ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, ImVec2(100, 400));
-
-	ne::NavigateToContent();
-	ne::CenterNodeOnScreen(m_workspaceCoreNodes.back()->m_id);
-
-	//////////////////////////////////
-	//printf("len %lld \n",WorkspaceNodes.size());
-	/*WorkspaceNodeWithCoreData*wnbd=dynamic_cast<WorkspaceNodeWithCoreData*>(WorkspaceNodes.at(2).get());
-
-	Ptr<Core::NodeBase> child=wnbd->Nodebase;
-	std::vector<Core::Pin>cp= child->getInputPins();
-	Ptr<Core::NodeBase> parent=Core::GraphManager::getParent(child);
-	const Operation* uu = child->getOperation();
-
-	//cp[0].getParentPin()->getMaster();
-	//WorkspaceNodes.at(0).get()->
-	glm::mat4 m = glm::mat4(0.14f);
-	ValueSetResult vsr=parent->setValue(m);
-	ValueSetResult vsr2= child->setValue(m);
-
-	DataStore ds=child->getData();
-	glm::mat4 mm=ds.getMat4();*/
-
-	// LoadWorkspace(Config::getAbsolutePath("/load.c").c_str(),&WorkspaceNodes);
-
-	// SaveWorkspace(Config::getAbsolutePath("/save.c").c_str(), &WorkspaceNodes);
-
 	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = ImColor(67, 103, 152);
 	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = ImColor(158, 158, 158);
 	ne::GetStyle().PivotAlignment = ImVec2(0.0f, 0.0f);
-	
-
 	
 }
 
@@ -159,7 +104,8 @@ void WorkspaceWindow::render()
 		printf("press\n");
 	}
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::Begin("Workspace", getShowPtr());
+
+	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 
 	ImGui::PopStyleVar();
 
@@ -178,6 +124,8 @@ void WorkspaceWindow::render()
         workspaceCoreNode->drawInputLinks();
     }
 
+    checkUserActions();
+
     checkQueryElements();
 
     checkQueryContextMenus();
@@ -188,8 +136,17 @@ void WorkspaceWindow::render()
 	}ne::End();
 
 	shiftSelectedNodesToFront();
+	manipulatorStartCheck3D();
 
 	ImGui::End();
+}
+
+void WorkspaceWindow::checkUserActions()
+{
+    if (ImGui::IsMouseClicked(1)) /* right button */
+    {
+        m_rightClickPosition = ImGui::GetMousePos();
+    }
 }
 
 /* \todo JH not work yet - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
@@ -216,20 +173,20 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
 
 void WorkspaceWindow::manipulatorStartCheck3D()
 {
-    Ptr<WorkspaceNodeWithCoreData> selectedCoreNode;
+    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4 = nullptr;
     ne::NodeId selectedNodeID;
 
-    if (ne::HasSelectionChanged() && ne::GetSelectedNodes(&selectedNodeID, 1) == 1 )
+    if (ne::HasSelectionChanged())
     {
-        selectedCoreNode = getWorkspaceCoreNodeByID(selectedNodeID);
-        if (selectedCoreNode != nullptr)
+        World2* world2= Application::get().world2();
+
+        if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
         {
-            /* \todo JH call manipulator with selectedCoreNode->m_nodebase */
+            selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
         }
-        else
-        {
-            /* \todo JH call manipulator with null */
-        }
+
+        world2->handlesSetMatrix(selectedWorkspaceMatrix4x4.get());
+
     }
 }
 
@@ -380,32 +337,116 @@ void WorkspaceWindow::checkQueryLinkCreate()
         /* \todo JH comment where it is used */
         m_pinPropertiesForNewLink = startPin ? startPin : endPin;
 
-        if (startPin && endPin && (startPin->getKind() != endPin->getKind()) ) /* \todo JH check kind in Core? */
+        if ( startPin && endPin) /* \todo JH check kind in Core? */
         {
             if (startPin->getKind() == PinKind::Input)
             {
                 std::swap(startPin, endPin);
             }
 
-
-            /* \todo JH manage different result of trying to connect (probably use showPopUpLabel() ) */
-            switch (Core::GraphManager::plug(startPin->m_node.m_nodebase,
-                                             endPin->m_node.m_nodebase,
-                                             startPin->m_pin.getIndex(),
-                                             endPin->m_pin.getIndex() ))
+            switch (Core::GraphManager::isPlugCorrect(&(endPin->m_pin), &(startPin->m_pin)))
             {
                 case ENodePlugResult::Ok:
-                    showPopUpLabel("Connected", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    showPopUpLabel("Connection possible", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    if (!ImGui::GetIO().MouseDown[0])
+                    {
+                        Core::GraphManager::plug(startPin->m_node.m_nodebase,
+                                                 endPin->m_node.m_nodebase,
+                                                 startPin->m_pin.getIndex(),
+                                                 endPin->m_pin.getIndex() );
+                    }
                     break;
+                /* \todo JH react informatively to other result too */
+                default:
+                    showPopUpLabel("Connection not possible", ImColor(255,0,0)); /* \todo JH remove constant here */
+
             }
         }
     }
 
 }
 
+
+void WorkspaceWindow::checkQueryNodeCreate()
+{
+    ne::PinId pinId = 0;
+    if (ne::QueryNewNode(&pinId))
+    {
+        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
+        if (m_pinPropertiesForNewLink)
+        {
+            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
+        }
+
+        if (ne::AcceptNewItem())
+        {
+            m_createNewNode  = true;
+            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
+            m_pinPropertiesForNewLink = nullptr;
+
+            ne::Suspend();
+            ImGui::OpenPopup("Create New Node");
+            ne::Resume();
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryElementsDeleting()
+{
+    if (ne::BeginDelete())
+    {
+        checkQueryLinkDelete();
+        checkQueryNodeDelete();
+    }
+    ne::EndDelete();
+}
+
+void WorkspaceWindow::checkQueryLinkDelete()
+{
+    ne::LinkId linkId = 0;
+    while (ne::QueryDeletedLink(&linkId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
+
+            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryNodeDelete()
+{
+    ne::NodeId nodeId = 0;
+    while (ne::QueryDeletedNode(&nodeId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            NodeDelete(nodeId);
+        }
+    }
+}
+
+void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
+{
+    coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
+    if (id != m_workspaceCoreNodes.end())
+        m_workspaceCoreNodes.erase(id);
+        ne::DeleteNode(nodeId); /* \todo JH check whether node remain in nodeeditor */
+}
+
+
+void WorkspaceWindow::UpdateTouchAllNodes()
+{
+	const auto deltaTime = ImGui::GetIO().DeltaTime;
+	for (auto&& workspaceNode : m_workspaceCoreNodes)
+	{
+		workspaceNode->UpdateTouch(deltaTime);
+	}
+}
+
 void WorkspaceWindow::checkQueryContextMenus()
 {
-    m_openPopupMenuPosition = ImGui::GetMousePos();
     ne::Suspend();
 	if (ne::ShowBackgroundContextMenu())
 	{
@@ -467,21 +508,49 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
 
-		if (ImGui::MenuItem("Delete")) {
-			if (ne::BeginDelete())
-			{
-				checkQueryNodeDelete();
-			}
-			
-			ne::DeleteNode(m_contextNodeId); /* \todo JH check whether node remain in nodeeditor */
-			ne::EndDelete();
+        if (ImGui::BeginMenu("Level of detail")) {
+
+            ImGui::Text(fmt::format("Actual level: {}", node->m_levelOfDetail).c_str());
+            ImGui::Separator();
+            if (ImGui::MenuItem("Full")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::Full;
+            }
+            if (ImGui::MenuItem("SetValues")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::SetValues;
+            }
+            if (ImGui::MenuItem("Label")) {
+                node->m_levelOfDetail = WorkspaceLevelOfDetail::Label;
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Precision")) {
+
+            ImGui::Text(fmt::format("Actual precision: {}", node->getNumberOfVisibleDecimal()).c_str());
+            ImGui::Separator();
+            if (ImGui::MenuItem("0")) {
+                node->setNumberOfVisibleDecimal(0);
+            }
+            if (ImGui::MenuItem("1")) {
+                node->setNumberOfVisibleDecimal(1);
+            }
+            if (ImGui::MenuItem("2")) {
+                node->setNumberOfVisibleDecimal(2);
+            }
+            if (ImGui::MenuItem("3")) {
+                node->setNumberOfVisibleDecimal(3);
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::MenuItem("Delete")) {
+            NodeDelete(node->m_id);
 		}
 		ImGui::EndPopup();
 	}
 
 	if (ImGui::BeginPopup("Create New Node"))
 	{
-		m_newNodePostion = m_openPopupMenuPosition;
+		m_newNodePostion = m_rightClickPosition;
 
 		ImGui::Text("add...");
 		ImGui::Separator();
@@ -823,6 +892,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 }
+
 
 void WorkspaceWindow::checkQueryNodeCreate()
 {

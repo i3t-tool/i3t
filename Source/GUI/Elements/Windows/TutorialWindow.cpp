@@ -35,7 +35,7 @@ void TutorialWindow::render()
 {
 	// SET STYLE
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 20.0f));
-	ImGui::Begin("Tutorial window", getShowPtr());
+	ImGui::Begin(getName("Tutorial window").c_str(), getShowPtr());
 
 	// CREATE IMGUI CONTENT
 	renderTutorialContent();

@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrix4x4Args
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Matrix4x4 header";
     std::string nodeLabel = "Free";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();
@@ -16,8 +16,6 @@ public:
 	WorkspaceMatrix4x4( ImTextureID headerBackground, WorkspaceMatrix4x4Args const& args);
     WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
-
-	virtual void drawData(util::NodeBuilder& builder);
-
 	virtual void drawDataFull(util::NodeBuilder& builder);
+	int maxLenghtOfData();
 };

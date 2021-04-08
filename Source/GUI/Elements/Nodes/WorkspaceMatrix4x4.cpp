@@ -7,6 +7,8 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMa
 	fw.id = "";
 	fw.value = NULL;
 	fw.name = "matrix4x4";
+
+    setDataItemsWidth();
 }
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
@@ -20,8 +22,9 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 
 void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
 {
-	drawDataFull(builder); /* default function always draw all data */
+    setDataItemsWidth();
 }
+
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
@@ -35,7 +38,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 
 	builder.Middle();
 
-	ImGui::PushItemWidth(25.0f);
+	ImGui::PushItemWidth(m_dataItemsWidth);
 	/* Drawing is row-wise */
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -85,7 +88,29 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	if (valueChanged)
 	{
 		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
+		setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
 	}
 
 	ImGui::Spring(0); /* \todo JH what is Spring? */
 }
+
+int WorkspaceMatrix4x4::maxLenghtOfData()
+{
+    int act, maximal = 0;
+    const glm::mat4& coreData = m_nodebase->getData().getMat4();
+
+    for(int column = 0; column < 4; column++)
+    {
+        for(int row = 0; row < 4; row++)
+        {
+            act = numberOfCharWithDecimalPoint( coreData[column][row], m_numberOfVisibleDecimal );
+            if(act > maximal)
+            {
+                maximal = act;
+            }
+        }
+    }
+
+    return maximal;
+}
+

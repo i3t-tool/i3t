@@ -4,7 +4,7 @@
 #include <string>
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args) /* \todo JH take default label from Const.h*/
-    :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
+    :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
     ,   m_nodebase(args.nodebase)
 {
 	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
@@ -34,6 +34,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 *this,
 				fmt::format("##{}", pin.getIndex()).c_str() ));
 	}
+
 }
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel) /* \todo JH take default label from Const.h*/
@@ -67,7 +68,33 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 *this,
 				fmt::format("##{}", pin.getIndex()).c_str() ));
 	}
+
 }
+
+int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
+{
+    return m_numberOfVisibleDecimal;
+}
+
+int WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
+{
+    value >= 0 ? m_numberOfVisibleDecimal = value : m_numberOfVisibleDecimal = 0;
+    setDataItemsWidth();
+    return m_numberOfVisibleDecimal;
+}
+
+float WorkspaceNodeWithCoreData::getDataItemsWidth()
+{
+    return m_dataItemsWidth;
+}
+
+float WorkspaceNodeWithCoreData::setDataItemsWidth()
+{
+    float oneCharWidth = 20, padding = 10; /* \todo JH take from some font setting */
+    m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
+    return m_dataItemsWidth;
+}
+
 
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
@@ -89,13 +116,14 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 	{
 		if (elem.first->isPluggedIn())
 			ne::Link(elem.second->get()->m_id, elem.first->getParentPin()->getId(), elem.first->getId(),
-			         elem.second->get()->m_color, 2.0f); /* elem.second->get() for dereferencing unique_ptr*/
+			         elem.second->get()->m_color, 2.0f);
 	}
 }
 
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+    bool showlabel = false;
 	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
             elem.first != m_nodebase->getInputPins().end()  && elem.second != m_workspaceInputsProperties.end();
             ++elem.first, ++elem.second)
@@ -118,11 +146,13 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 
 
 		ImGui::Spring(0);
-		//if (!elem.second->get()->m_name.empty())
-		//{
-		//	ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
-		//	ImGui::Spring(0);
-		//}
+
+        /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
+		if (showlabel && !elem.second->get()->m_name.empty())
+		{
+			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
+			ImGui::Spring(0);
+		}
 
 		ImGui::PopStyleVar();
 		builder.EndInput();
@@ -132,6 +162,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+    bool showlabel = false;
 	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getOutputPins().begin(), m_workspaceOutputsProperties.begin());
 	     elem.first != m_nodebase->getOutputPins().end() && elem.second != m_workspaceOutputsProperties.end();
 	     ++elem.first, ++elem.second)
@@ -143,11 +174,12 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 		builder.Output(elem.first->getId());
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-		//if (!elem.second->get()->m_name.empty())
-		//{
-		//	ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
-		//	ImGui::Spring(0);
-		//}
+        /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
+		if (showlabel && !elem.second->get()->m_name.empty())
+		{
+			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
+			ImGui::Spring(0);
+		}
 
 		// color.Value.w = alpha / 255.0f;
 		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
@@ -177,17 +209,12 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	}
 
 	ImGui::SameLine();
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, "%.0f");
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
 	{
 		ImGui::PopItemFlag();
 		ImGui::PopStyleVar();
-	}
-
-	if (valueChanged)
-	{
-		inactive = true;
 	}
 
     return valueChanged;
@@ -197,8 +224,76 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
     */
 }
 
+
+void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
+{
+    builder.Middle();
+
+    switch(m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Full:
+        drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+        break;
+    case WorkspaceLevelOfDetail::SetValues:
+        drawDataSetValues(builder);
+        break;
+    case WorkspaceLevelOfDetail::Label:
+        drawDataLabel(builder);
+        break;
+
+    default:
+        /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
+        drawDataFull(builder);
+    }
+
+}
+
+void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters)
+{
+    /* \todo JH assert different length of vectors in argument */
+    int number_of_values = labels.size();
+    int const idOfNode = this->m_id.Get();
+
+    bool valueChanged = false;
+    int index_of_change;
+    float valueOfChange, localData; /* user can change just one value at the moment */
+
+    ImGui::PushItemWidth(m_dataItemsWidth);
+    for (int i = 0; i < number_of_values; i++)
+    {
+        ImGui::Text( labels[i].c_str() );
+        localData = getters[i]();
+        if (drawDragFloatWithMap_Inline(&localData,
+                                        1, /* \todo JH will be always changeable? */
+                                        fmt::format("##{}:ch{}", idOfNode, i)))
+        {
+            valueChanged = true;
+            index_of_change = i;
+            valueOfChange = localData;
+        }
+
+    }
+    ImGui::PopItemWidth();
+
+    if (valueChanged)
+	{
+		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value*/
+		setDataItemsWidth();
+	}
+
+    ImGui::Spring(0); /* \todo JH what is Spring? */
+
+}
+
+void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
+{
+    ImGui::Text(this->m_label.c_str());
+    ImGui::Spring(0);
+}
+
+
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)
-		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no konstants here... */
+		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no constants here... */
 {}
 
 PinKind WorkspaceCorePinProperties::getKind()

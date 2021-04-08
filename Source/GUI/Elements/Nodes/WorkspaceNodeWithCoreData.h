@@ -11,9 +11,12 @@ typedef std::vector<Core::Pin>::const_iterator corePinIter;
 typedef std::vector<Ptr<WorkspaceCorePinProperties>>::const_iterator corePinPropIter;
 typedef std::vector<Ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
 
+typedef std::function<float()> getter_function_pointer;
+typedef std::function<ValueSetResult(float)> setter_function_pointer;
+
 struct WorkspaceNodeWithCoreDataArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default WorkspaceNode header";
     std::string nodeLabel = "Node";
 
@@ -31,13 +34,16 @@ struct floatWindow {
 
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
+protected:
+    int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
+    float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
 public:
-	/*see:
-	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to core
-	                                                     WorkspaceNodeWithCoreData is owner of unique pointer
-	                                                */
+	
+	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
+                                                WorkspaceNodeWithCoreData is owner
+                                           */
 	floatWindow fw;
+
 
 	std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
@@ -48,13 +54,29 @@ public:
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
     WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr, std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");
 
+    int getNumberOfVisibleDecimal();
+    int setNumberOfVisibleDecimal(int value);
+
+    virtual int maxLenghtOfData()=0;
+    float setDataItemsWidth();
+    float getDataItemsWidth();
+
 	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+
+	virtual void drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters);
+
+    virtual void drawData(util::NodeBuilder& builder);
+    virtual void drawDataFull(util::NodeBuilder& builder)=0;
+	virtual void drawDataSetValues(util::NodeBuilder& builder)=0;
+	virtual void drawDataLabel(util::NodeBuilder& builder);
+
 
 	virtual void drawInputLinks();
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	bool drawDragFloatWithMap_Inline(float* const value, const int mapValue, std::string label);
+
 };
 
 /*! \class WorkspaceCorePinProperties

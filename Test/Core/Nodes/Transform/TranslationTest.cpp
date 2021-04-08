@@ -2,11 +2,13 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "Generator.h"
+
 using namespace Core;
 
-TEST(TranslationCoordsValidation, ShouldBeValid)
+TEST(Translation, CoordsValidation)
 {
-	auto translationNode = Builder::createTransform<Core::Translation>();
+	auto translationNode = Builder::createTransform<Translation>();
 
 	{
 		// Invalid coordinates.
@@ -33,4 +35,17 @@ TEST(TranslationCoordsValidation, ShouldBeValid)
 
 		EXPECT_EQ(translMat, data);
 	}
+}
+
+TEST(Translation, GettersAndSetterShouldBeOk)
+{
+  auto translation = Builder::createTransform<Translation>()->as<Translation>();
+
+	auto vec = generateVec3();
+
+	translation->setX(vec.x);
+	translation->setY(vec.y);
+	translation->setZ(vec.z);
+
+	EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
 }

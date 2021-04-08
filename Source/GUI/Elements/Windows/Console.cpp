@@ -24,7 +24,7 @@ Console::~Console()
 
 void Console::render()
 {
-	ImGui::Begin("Console", getShowPtr());
+	ImGui::Begin(getName("Console").c_str(), getShowPtr());
 
 	// Reserve enough left-over height for 1 separator + 1 input text
 	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
@@ -54,7 +54,9 @@ void Console::render()
 
 		ConsoleCommand::dispatch(command);
 
-		strcpy_s(command, "");
+        strcpy(command, "");
+		//strcpy_s(command, "");
+
 
 		reclaimFocus = true;
 	}
@@ -81,8 +83,6 @@ void Console::onUpKey()
 
 		printf("up   %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 	}
-	
-	render();
 }
 
 void Console::onDownKey()
@@ -92,7 +92,7 @@ void Console::onDownKey()
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected++;
 		if (selected < 0) { selected = 0; }
-		else if (selected >= commands.size()) { 
+		else if (selected >= commands.size()) {
 			selected = commands.size() - 1;
 			command[0] = '\0';
 		}
@@ -104,6 +104,4 @@ void Console::onDownKey()
 
 		printf("down %d,%d,,<%s>\n", commands[selected][0], commands[selected][1], command);
 	}
-	
-	render();
 }
