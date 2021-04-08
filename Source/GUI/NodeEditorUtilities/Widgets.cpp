@@ -9,7 +9,9 @@ void ax::Widgets::Icon(const ImVec2& size, IconType type, bool filled, const ImV
 	{
 		auto cursorPos = ImGui::GetCursorScreenPos();
 		auto drawList = ImGui::GetWindowDrawList();
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 		ax::Drawing::DrawIcon(drawList, cursorPos, cursorPos + size, type, filled, ImColor(color), ImColor(innerColor));
+		ImGui::PopStyleVar();
 	}
 
 	ImGui::Dummy(size);

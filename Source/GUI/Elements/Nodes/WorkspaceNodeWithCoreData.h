@@ -25,20 +25,33 @@ struct WorkspaceNodeWithCoreDataArgs
     Ptr<Core::NodeBase> nodebase = nullptr; /* \todo JH some default type of Core-Node will be nice (at least some of existing one) */
 };
 
+struct floatWindow {
+	bool showMyPopup;
+	std::string id;
+	std::string name;
+	float value;
+	int columns;
+	int rows;
+};
+
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
 protected:
     int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
     float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
 public:
+	
 	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
                                                 WorkspaceNodeWithCoreData is owner
                                            */
+	floatWindow fw;
 
 
 	std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
+
+	
 
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
     WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr, std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");

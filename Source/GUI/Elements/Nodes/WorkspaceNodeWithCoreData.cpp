@@ -55,7 +55,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 				pin.getId(),
                 pin,
                 *this,
-				fmt::format("input #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
@@ -67,7 +67,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 pin.getId(),
                 pin,
                 *this,
-				fmt::format("output #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 	}
 
 }
@@ -89,7 +89,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 				pin.getId(),
                 pin,
                 *this,
-				fmt::format("input #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
@@ -101,7 +101,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
                 pin.getId(),
                 pin,
                 *this,
-				fmt::format("output #{}", pin.getIndex()).c_str() ));
+				fmt::format("##{}", pin.getIndex()).c_str() ));
 	}
 
 }
@@ -195,9 +195,13 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
                             WorkspacePinShape[elem.second->get()->getType()],
                             elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
                             WorkspacePinColor[elem.second->get()->getType()],
-                            ImColor(32.0, 32.0, 32.0, alpha)); /* \todo JH not constant here... */
+                            ImColor(100.0, 200.0, 10.0, 1.0f)); /* \todo JH not constant here... */ //SS what is this?
+		
+		
+
 
 		ImGui::Spring(0);
+
         /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
 		if (showlabel && !elem.second->get()->m_name.empty())
 		{
@@ -256,10 +260,11 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		//ImGui::PushStyleVar();
 	}
 
 	ImGui::SameLine();
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? */
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
 	{
