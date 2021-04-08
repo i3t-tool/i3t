@@ -78,4 +78,12 @@ FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
 		return nullptr;
 	return node->as<Sequence>();
 }
+
+FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+{
+  glm::mat4 result(1.0f);
+  for (const auto& mat : matrices)
+    result *= mat->getData().getMat4();
+  return result;
+}
 } // namespace Core

@@ -10,7 +10,7 @@ void testId(ax::NodeEditor::NodeId id) {
   // It compiles!
 }
 
-TEST(NodeIdTest, IDCanBeConvertedToNodeEditorIDs)
+TEST(NodeIDTest, IDCanBeConvertedToNodeEditorIDs)
 {
   auto id = IdGenerator::next();
 

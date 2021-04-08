@@ -28,19 +28,18 @@ void Sequence::swap(int from, int to)
 
 void Sequence::updateValues(int inputIndex)
 {
-	glm::mat4 result(1.0f);
+	glm::mat4 result = getMatProduct(getMatrices());
+
+	if (m_inputs[0].isPluggedIn())
+  {
+		auto parent = GraphManager::getParent(getPtr())->as<Sequence>();
+		result = parent->getData().getMat4() * result;
+	}
 
 	if (m_inputs[1].isPluggedIn())
 	{
 		// Matrix node is connected to direct matrix input.
 		result = m_inputs[1].getStorage().getMat4();
-	}
-	else
-	{
-		for (const auto& mat : m_matrices)
-		{
-			result *= mat->getData().getMat4();
-		}
 	}
 
 	m_internalData[0].setValue(result);

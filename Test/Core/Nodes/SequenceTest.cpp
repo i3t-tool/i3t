@@ -76,7 +76,7 @@ TEST(SequenceTest, UpdateIsCalledOnMatrixValueChange)
 	auto mat3NewValue = glm::translate(generateVec3());
 
 	auto& mat = seq->getMatRef(seq->getMatrices().size() - 1);
-	mat->setValue(mat3NewValue);
+	setValue_expectOk(mat, mat3NewValue);
 
 	EXPECT_EQ(seq->getData().getMat4(), firstTwoMatricesProduct * mat3NewValue);
 }
@@ -88,8 +88,7 @@ TEST(SequenceTest, InternalValueCanBeReadByOperator)
 	auto identityMatNode = Core::Builder::createTransform<Core::Free>();
 
 	{
-		auto result = identityMatNode->setValue(glm::mat4(1.0f));
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(identityMatNode, glm::mat4(1.0f));
 	}
 	{
 		auto plugResult = Core::GraphManager::plugSequenceValueOutput(seq, matMulMatNode);
@@ -108,9 +107,9 @@ TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 	auto seq = arrangeSequence();
 
 	auto matNode = Core::Builder::createTransform<Core::Free>();
-	matNode->setValue(generateMat4());
+	setValue_expectOk(matNode, generateMat4());
 
-	auto plugResult = Core::GraphManager::plugSequenceValueInput(seq, matNode);
+	auto plugResult = GraphManager::plugSequenceValueInput(seq, matNode);
 	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 
 	EXPECT_EQ(matNode->getData().getMat4(), seq->getData().getMat4());
@@ -128,8 +127,7 @@ TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInpu
 
 	GraphManager::plug(seq1, seq2, 0, 0);
 
-	auto plugResult = GraphManager::plug(seq2, seq1, 1, 1);
-	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
+	plug_expectOk(seq2, seq1, 1, 1);
 
 	EXPECT_EQ(seq1->getData().getMat4(), seq2->getData().getMat4());
 }
@@ -145,4 +143,26 @@ TEST(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput
 	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 
 	EXPECT_EQ(seq1->getData().getMat4(), seq2->getData().getMat4());
+}
+
+TEST(SequenceTest, ThreeSequencesComposeMatrices)
+{
+  auto seq1 = arrangeSequence();
+  auto seq2 = arrangeSequence();
+  auto seq3 = arrangeSequence();
+
+  {
+    auto expectedMat = getMatProduct(seq1->getMatrices());
+    EXPECT_EQ(expectedMat, seq1->getData().getMat4());
+	}
+  {
+    plug_expectOk(seq1, seq2, 0, 0);
+		auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices());
+    EXPECT_EQ(expectedMat, seq2->getData().getMat4());
+	}
+  {
+		plug_expectOk(seq2, seq3, 0, 0);
+    auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices()) * getMatProduct(seq3->getMatrices());
+    EXPECT_EQ(expectedMat, seq3->getData().getMat4());
+  }
 }

@@ -68,22 +68,6 @@ void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 	node.get()->unplugOutput(index);
 }
 
-Ptr<NodeBase> GraphManager::getParent(Ptr<NodeBase>& node, size_t index)
-{
-	auto pins = node->getInputPins();
-	if (pins.empty() || pins[index].m_input == nullptr)
-	{
-		return nullptr;
-	}
-	return pins[index].m_input->m_master;
-}
-
-Ptr<NodeBase> GraphManager::getParent(const Ptr<Sequence>& node, size_t index)
-{
-	auto seq = std::dynamic_pointer_cast<NodeBase>(node);
-	return getParent(seq, index);
-}
-
 std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(Ptr<Core::NodeBase>& node)
 {
 	std::vector<Ptr<NodeBase>> result;

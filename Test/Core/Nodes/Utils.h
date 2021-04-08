@@ -1,3 +1,5 @@
+#pragma once
+
 #include "gtest/gtest.h"
 
 #include "glm/glm.hpp"
@@ -6,10 +8,15 @@
 
 using namespace Core;
 
-inline glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+template <typename T> inline void setValue_expectOk(NodePtr node, T&& value)
 {
-	glm::mat4 result(1.0f);
-	for (const auto& mat : matrices)
-		result *= mat->getData().getMat4();
-	return result;
+	auto result = node->setValue(std::forward<T>(value));
+	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+}
+
+template <typename T1, typename T2>
+inline void plug_expectOk(T1&& lhs, T2&& rhs, int leftIndex, int rightIndex)
+{
+	auto plugResult = GraphManager::plug(std::forward<T1>(lhs), std::forward<T2>(rhs), leftIndex, rightIndex);
+	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 }
