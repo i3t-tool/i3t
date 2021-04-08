@@ -6,17 +6,18 @@
 
 using namespace Core;
 
-void testId(ax::NodeEditor::NodeId id) {
-  // It compiles!
+void testId(ax::NodeEditor::NodeId id)
+{
+	// It compiles!
 }
 
 TEST(NodeIDTest, IDCanBeConvertedToNodeEditorIDs)
 {
-  auto id = IdGenerator::next();
+	auto id = IdGenerator::next();
 
-  testId(id);
+	testId(id);
 
-  ax::NodeEditor::NodeId nodeId = id;
+	ax::NodeEditor::NodeId nodeId = id;
 
-  EXPECT_EQ(nodeId.Get(), id);
+	EXPECT_EQ(nodeId.Get(), id);
 }

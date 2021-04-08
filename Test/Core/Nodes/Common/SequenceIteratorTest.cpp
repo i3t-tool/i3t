@@ -2,6 +2,8 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "../Utils.h"
+
 using namespace Core;
 
 struct TestTree
@@ -40,8 +42,8 @@ TestTree arrangeSequenceTree()
 			Builder::createTransform<Translation>(),
 	};
 
-	GraphManager::plug(root, branch1, 0, 0);
-	GraphManager::plug(root, branch2, 0, 0);
+	plug_expectOk(root, branch1, 0, 0);
+  plug_expectOk(root, branch2, 0, 0);
 
 	// Add matrices to the sequences.
 	root->addMatrix(matrices[0]);

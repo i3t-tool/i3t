@@ -1,7 +1,10 @@
 #include "gtest/gtest.h"
-#include "Generator.h"
+#include <Core/Nodes/Utils.h>
 
 #include "Core/Nodes/GraphManager.h"
+
+#include "Generator.h"
+#include "../Utils.h"
 
 using namespace Core;
 
@@ -15,8 +18,7 @@ TEST(EulerXTest, OneValueSet)
 		// mat[1][1], cos(T)
 		auto rads = 0.5f;
 
-		auto result = rotXNode->setValue(glm::cos(rads), {1, 1});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotXNode, glm::cos(rads), {1, 1});
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -26,8 +28,7 @@ TEST(EulerXTest, OneValueSet)
 		// mat[1][2], sin(T)
 		auto rads = 0.4f;
 
-		auto result = rotXNode->setValue(glm::sin(rads), {1, 2});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotXNode, glm::sin(rads), {1, 2});
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -37,8 +38,7 @@ TEST(EulerXTest, OneValueSet)
 		// mat[2][1], -sin(T)
 		auto rads = 0.8f;
 
-		auto result = rotXNode->setValue(-glm::sin(rads), {2, 1});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotXNode, -glm::sin(rads), {2, 1});
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -48,8 +48,7 @@ TEST(EulerXTest, OneValueSet)
 		// mat[2][2], cos(T)
 		auto rads = 1.0f;
 
-		auto result = rotXNode->setValue(glm::cos(rads), {2, 2});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotXNode, glm::cos(rads), {2, 2});
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -88,8 +87,7 @@ TEST(EulerXTest, SetMatrixShuldBeValid)
 
 	auto mat = glm::eulerAngleX(generateFloat());
 
-	auto setResult = eulerX->setValue(mat);
-	EXPECT_EQ(ValueSetResult::Status::Ok, setResult.status);
+	setValue_expectOk(eulerX, mat);
 	EXPECT_EQ(mat, eulerX->getData().getMat4());
 
 	eulerX->reset();
@@ -110,8 +108,7 @@ TEST(EulerYTest, OneValueSet)
 
 		auto val = glm::cos(rads);
 
-		auto result = rotYNode->setValue(val, {0, 0});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotYNode, val, {0, 0});
 
 		auto mat = rotYNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -121,8 +118,7 @@ TEST(EulerYTest, OneValueSet)
 		// mat[2][0], sin(T)
 		auto rads = 0.4f;
 
-		auto result = rotYNode->setValue(glm::sin(rads), {2, 0});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotYNode, glm::sin(rads), {2, 0});
 
 		auto mat = rotYNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -132,8 +128,7 @@ TEST(EulerYTest, OneValueSet)
 		// mat[0][2], -sin(T)
 		auto rads = 0.8f;
 
-		auto result = rotYNode->setValue(-glm::sin(rads), {0, 2});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotYNode, -glm::sin(rads), {0, 2});
 
 		auto mat = rotYNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -143,8 +138,7 @@ TEST(EulerYTest, OneValueSet)
 		// mat[2][2], cos(T)
 		auto rads = 1.0f;
 
-		auto result = rotYNode->setValue(glm::cos(rads), {2, 2});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotYNode, glm::cos(rads), {2, 2});
 
 		auto mat = rotYNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -199,8 +193,7 @@ TEST(EulerZTest, OneValueSet)
 		// mat[0][0], cos(T)
 		auto rads = 0.5f;
 
-		auto result = rotZNode->setValue(glm::cos(rads), {0, 0});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotZNode, glm::cos(rads), {0, 0});
 
 		auto mat = rotZNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -210,8 +203,7 @@ TEST(EulerZTest, OneValueSet)
 		// mat[0][1], sin(T)
 		auto rads = 0.4f;
 
-		auto result = rotZNode->setValue(glm::sin(rads), {0, 1});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotZNode, glm::sin(rads), {0, 1});
 
 		auto mat = rotZNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -221,8 +213,7 @@ TEST(EulerZTest, OneValueSet)
 		// mat[1][0], -sin(T)
 		auto rads = 0.8f;
 
-		auto result = rotZNode->setValue(-glm::sin(rads), {1, 0});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotZNode, -glm::sin(rads), {1, 0});
 
 		auto mat = rotZNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -232,8 +223,7 @@ TEST(EulerZTest, OneValueSet)
 		// mat[1][1], cos(T)
 		auto rads = 1.0f;
 
-		auto result = rotZNode->setValue(glm::cos(rads), {1, 1});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(rotZNode, glm::cos(rads), {1, 1});
 
 		auto mat = rotZNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -262,8 +252,7 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
 
   auto mat = glm::eulerAngleZ(generateFloat());
 
-  auto setResult = eulerZ->setValue(mat);
-  EXPECT_EQ(ValueSetResult::Status::Ok, setResult.status);
+  setValue_expectOk(eulerZ, mat);
   EXPECT_EQ(mat, eulerZ->getData().getMat4());
 
 	eulerZ->reset();
@@ -290,8 +279,7 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 
   for (int i = 0; i < 3; ++i)
   {
-    auto result = rots[i]->setValue(angle);
-    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    setValue_expectOk(rots[i], angle);
     EXPECT_EQ(expectedMatrices[i], rots[i]->getData().getMat4());
   }
 }
@@ -308,13 +296,11 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 	auto expectedMat = glm::rotate(rads, axis);
 
   {
-    auto result = axisAngle->setValue(rads);
-    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    setValue_expectOk(axisAngle, rads);
 		EXPECT_EQ(rads, axisAngle->getRot());
   }
   {
-    auto result = axisAngle->setAxis(axis);
-    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+    setValue_expectOk(axisAngle, axis);
     EXPECT_EQ(axis, axisAngle->getAxis());
   }
 	EXPECT_EQ(expectedMat, axisAngle->getData().getMat4());
