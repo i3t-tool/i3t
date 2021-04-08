@@ -65,6 +65,7 @@ public:
 
 private:
 	ENodePlugResult isPlugCorrect(Pin* input, Pin* output) override;
+  void receiveSignal(int inputIndex) override;
 };
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)

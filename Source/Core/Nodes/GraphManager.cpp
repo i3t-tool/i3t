@@ -73,7 +73,7 @@ Ptr<NodeBase> GraphManager::getParent(Ptr<NodeBase>& node, size_t index)
 	return pins[index].m_input->m_master;
 }
 
-Ptr<NodeBase> GraphManager::getParent(Ptr<Sequence> node, size_t index)
+Ptr<NodeBase> GraphManager::getParent(const Ptr<Sequence>& node, size_t index)
 {
 	auto seq = std::dynamic_pointer_cast<NodeBase>(node);
 	return getParent(seq, index);

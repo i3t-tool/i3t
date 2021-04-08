@@ -270,7 +270,7 @@ public:
 	 *
 	 * \param	inputIndex	Index of the input that was changed and that forces the operator to recompute its outputs.
 	 */
-	void receiveSignal(int inputIndex);
+	virtual void receiveSignal(int inputIndex);
 	//===----------------------------------------------------------------------===//
 
 	bool areInputsPlugged(int numInputs);
@@ -287,6 +287,7 @@ private:
 
 using Node = NodeBase;
 using NodePtr = Ptr<Node>;
+
 
 /**
  * Pin used for connecting nodes.

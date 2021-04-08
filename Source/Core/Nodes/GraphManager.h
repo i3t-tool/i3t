@@ -149,7 +149,7 @@ public:
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
 	static Ptr<NodeBase> getParent(Ptr<Core::NodeBase>& node, size_t index = 0);
-	static Ptr<NodeBase> getParent(Ptr<Core::Sequence> node, size_t index = 0);
+	static Ptr<NodeBase> getParent(const Ptr<Core::Sequence>& node, size_t index = 0);
 
 	/**
 	 * \return All nodes connected to given node inputs.
