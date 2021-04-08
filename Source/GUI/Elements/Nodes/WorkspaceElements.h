@@ -53,6 +53,9 @@ enum class WorkspaceLevelOfDetail
     Label
 };
 
+extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
+
+
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
 
@@ -88,6 +91,7 @@ public:
 	virtual void drawData(util::NodeBuilder& builder) = 0;
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
 
+    void drawMenuLevelOfDetail();
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
 	*/

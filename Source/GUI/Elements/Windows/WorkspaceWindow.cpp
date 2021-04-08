@@ -426,8 +426,10 @@ void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
 {
     coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
     if (id != m_workspaceCoreNodes.end())
+    {
         m_workspaceCoreNodes.erase(id);
-        ne::DeleteNode(nodeId); /* \todo JH check whether node remain in nodeeditor */
+    }
+
 }
 
 
@@ -458,9 +460,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 	if (ImGui::BeginPopup("Node Context Menu")) {
 
-        Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
+        Ptr<WorkspaceNodeWithCoreData> context_node = getWorkspaceCoreNodeByID(m_contextNodeId);
 
-		if (node) {
+		if (context_node) {
 			ImGui::Text("ID: %p", m_contextNodeId.AsPointer());
 			ImGui::Separator();
 		}
@@ -468,42 +470,24 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
 
-        if (ImGui::BeginMenu("Level of detail")) {
-
-            ImGui::Text(fmt::format("Actual level: {}", node->m_levelOfDetail).c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Full")) {
-                node->m_levelOfDetail = WorkspaceLevelOfDetail::Full;
-            }
-            if (ImGui::MenuItem("SetValues")) {
-                node->m_levelOfDetail = WorkspaceLevelOfDetail::SetValues;
-            }
-            if (ImGui::MenuItem("Label")) {
-                node->m_levelOfDetail = WorkspaceLevelOfDetail::Label;
-            }
-            ImGui::EndMenu();
-        }
+		context_node->drawMenuSetDataMap();
+        context_node->drawMenuLevelOfDetail();
 
         if (ImGui::BeginMenu("Precision")) {
 
-            ImGui::Text(fmt::format("Actual precision: {}", node->getNumberOfVisibleDecimal()).c_str());
+            ImGui::Text(fmt::format("Actual precision: {}", context_node->getNumberOfVisibleDecimal()).c_str());
             ImGui::Separator();
-            if (ImGui::MenuItem("0")) {
-                node->setNumberOfVisibleDecimal(0);
-            }
-            if (ImGui::MenuItem("1")) {
-                node->setNumberOfVisibleDecimal(1);
-            }
-            if (ImGui::MenuItem("2")) {
-                node->setNumberOfVisibleDecimal(2);
-            }
-            if (ImGui::MenuItem("3")) {
-                node->setNumberOfVisibleDecimal(3);
+            for(int i = 0; i < 5; i++)
+            {
+                if (ImGui::MenuItem(fmt::format("{}",i).c_str()))
+                {
+                    context_node->setNumberOfVisibleDecimal(i);
+                }
             }
             ImGui::EndMenu();
         }
         if (ImGui::MenuItem("Delete")) {
-            NodeDelete(node->m_id);
+            ne::DeleteNode(context_node->m_id);
 		}
 		ImGui::EndPopup();
 	}

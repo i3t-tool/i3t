@@ -17,6 +17,12 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Quat, IconType::Circle},      {EValueType::Screen, IconType::Circle},
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
+std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
+    {WorkspaceLevelOfDetail::Full, "Full"},
+    {WorkspaceLevelOfDetail::SetValues, "Set values"},
+    {WorkspaceLevelOfDetail::Label, "Label"}
+};
+
 /* \todo JH not use constant values here */
 WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel), m_levelOfDetail(args.levelOfDetail)
@@ -37,6 +43,23 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 	m_color = ImColor(255, 255, 255);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
+}
+
+void WorkspaceNode::drawMenuLevelOfDetail()
+{
+    if (ImGui::BeginMenu("Level of detail")) {
+        ImGui::Text(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[m_levelOfDetail]).c_str());
+        ImGui::Separator();
+
+        for (auto const& [levelOfDetail, LoDname] : WorkspaceLevelOfDetailName)
+        {
+            if (ImGui::MenuItem(LoDname.c_str()))
+            {
+                m_levelOfDetail = levelOfDetail;
+            }
+        }
+        ImGui::EndMenu();
+    }
 }
 
 /* \todo JH time-functions are taken from example */

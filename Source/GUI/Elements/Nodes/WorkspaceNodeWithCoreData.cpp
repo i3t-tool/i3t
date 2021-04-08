@@ -3,6 +3,41 @@
 #include "spdlog/fmt/fmt.h"
 #include <string>
 
+std::map<Core::Transform::DataMap, std::string> WorkspaceDatamapName = {
+    {Core::Transform::g_Free, "Free"},
+    {Core::Transform::g_Scale, "Scale"},
+    {Core::Transform::g_UniformScale, "Uniform scale"},
+    {Core::Transform::g_EulerX, "EulerX"},
+    {Core::Transform::g_EulerY, "EulerY"},
+    {Core::Transform::g_EulerZ, "EulerZ"},
+    {Core::Transform::g_Translate, "Translate"},
+    {Core::Transform::g_AllLocked, "Locked"},
+    {Core::Transform::g_Ortho, "Ortho"},
+    {Core::Transform::g_Frustum, "Frustum"},
+    {Core::Transform::g_Perspective, "Perspective"}
+};
+
+std::vector<Core::Transform::DataMap> WorkspaceDatamapMenuList = {
+Core::Transform::g_Free,
+Core::Transform::g_Scale,
+Core::Transform::g_UniformScale,
+Core::Transform::g_EulerX,
+Core::Transform::g_EulerY,
+Core::Transform::g_EulerZ,
+Core::Transform::g_Translate,
+Core::Transform::g_AllLocked,
+Core::Transform::g_Ortho,
+Core::Transform::g_Frustum,
+Core::Transform::g_Perspective};
+
+
+//std::map<Core::ETransformType, std::vector<Transform::DataMap> > WorkspaceTransformTypeDatamaps = {
+//    {ETransformType::Free, {    Transform::DataMap::g_Free  }},
+//    {ETransformType::Scale, {   Transform::DataMap::g_Free,
+//                                Transform::DataMap::g_Scale,
+//                                Transform::DataMap::g_UniformScale  }}
+//}
+
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args) /* \todo JH take default label from Const.h*/
     :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
     ,   m_nodebase(args.nodebase)
@@ -95,6 +130,26 @@ float WorkspaceNodeWithCoreData::setDataItemsWidth()
     return m_dataItemsWidth;
 }
 
+void WorkspaceNodeWithCoreData::setDataMap(const Core::Transform::DataMap& mapToSet)
+{
+    m_nodebase->setDataMap(mapToSet);
+}
+
+void WorkspaceNodeWithCoreData::drawMenuSetDataMap()
+{
+    if (ImGui::BeginMenu("Set datamap")) {
+        for(Core::Transform::DataMap datamap : WorkspaceDatamapMenuList)
+        {
+            if (ImGui::MenuItem(WorkspaceDatamapName[datamap].c_str())) {
+                setDataMap(datamap);
+            }
+        }
+
+
+        ImGui::EndMenu();
+    }
+
+}
 
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
@@ -227,7 +282,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
-        drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
+        drawDataFull(builder);
         break;
     case WorkspaceLevelOfDetail::SetValues:
         drawDataSetValues(builder);
@@ -285,7 +340,6 @@ void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
     ImGui::Text(this->m_label.c_str());
     ImGui::Spring(0);
 }
-
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name)
 		: m_id(id), m_pin(pin), m_node(node), m_name(name), m_iconSize(24), m_alpha(100) /* \todo JH no constants here... */
