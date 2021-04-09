@@ -39,6 +39,17 @@ ID NodeBase::getId() const
   return m_id;
 }
 
+void NodeBase::setDataMap(const Transform::DataMap* map)
+{
+  // PerspectiveProj;
+	auto& validMaps = getValidDataMaps();
+	auto it = std::find_if(validMaps.begin(), validMaps.end(),
+      [&](const Transform::DataMap* m) { return m == map; });
+
+	if (it != validMaps.end())
+	  m_currentMap = map;
+}
+
 const std::vector<Pin>& NodeBase::getInputPins() const
 {
 	return m_inputs;

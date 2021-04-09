@@ -21,7 +21,7 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get();
 		Ptr<Core::NodeBase>			nodebase	= nodebasedata->m_nodebase;
 		ImVec2						pos			= ne::GetNodePosition(nodebasedata->m_id);
-		Core::Transform::DataMap	data		= nodebase->getDataMap();
+		const Core::Transform::DataMap&	data		= nodebase->getDataMapRef();
 		const Operation*			operation	= nodebase->getOperation();
 		const char*					keyword		= operation->keyWord.c_str();
 
@@ -59,7 +59,7 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 		WorkspaceNodeWithCoreData*  nodebasedata = _workspace->at(i).get();
 		Ptr<Core::NodeBase>			nodebase = nodebasedata->m_nodebase;
 		ImVec2						pos = ne::GetNodePosition(nodebasedata->m_id);
-		Core::Transform::DataMap	data = nodebase->getDataMap();
+		const Core::Transform::DataMap&	data = nodebase->getDataMapRef();
 		const Operation*			operation = nodebase->getOperation();
 		const char* keyword =		operation->keyWord.c_str();
 

@@ -3,6 +3,8 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Transform.h"
 
+#include "../Utils.h"
+
 using namespace Core;
 
 float initialRot = glm::radians(60.0f);
@@ -21,24 +23,24 @@ Ptr<NodeBase> mul1, mul2, mul3;
  */
 Ptr<NodeBase> prepareEnvironment()
 {
-  scale1 = Core::Builder::createTransform<Scale>();
-  rotX = Core::Builder::createTransform<EulerRotX>(initialRot);
-  scale2 = Core::Builder::createTransform<Scale>(initialScale, Transform::g_Scale);
-  translation = Core::Builder::createTransform<Translation>(initialTransl);
+  scale1 = Builder::createTransform<Scale>();
+  rotX = Builder::createTransform<EulerRotX>(initialRot);
+  scale2 = Builder::createTransform<Scale>(initialScale, Transform::g_Scale);
+  translation = Builder::createTransform<Translation>(initialTransl);
 
 	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be complete yet!)
-  mul1 = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
-  mul2 = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
-  mul3 = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
+  mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+  mul2 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+  mul3 = Builder::createNode<ENodeType::MatrixMulMatrix>();
 
-  GraphManager::plug(scale1, mul1, 0, 0);
-  GraphManager::plug(rotX, mul1, 0, 1);
+  plug_expectOk(scale1, mul1, 0, 0);
+  plug_expectOk(rotX, mul1, 0, 1);
 
-  GraphManager::plug(mul1, mul2, 0, 0);
-  GraphManager::plug(scale2, mul2, 0, 1);
+  plug_expectOk(mul1, mul2, 0, 0);
+  plug_expectOk(scale2, mul2, 0, 1);
 
-  GraphManager::plug(mul2, mul3, 0, 0);
-  GraphManager::plug(translation, mul3, 0, 1);
+  plug_expectOk(mul2, mul3, 0, 0);
+  plug_expectOk(translation, mul3, 0, 1);
 
 	return mul3;
 }
@@ -53,29 +55,32 @@ Ptr<NodeBase> getRoot(Ptr<NodeBase> node)
   return getRoot(parent);
 }
 
-TEST(GetTreeRootValue, ShouldBeOk)
+TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
 {
-	auto lastNode = prepareEnvironment();
+	auto seq1 = Builder::createSequence();
+	auto seq2 = Builder::createSequence();
+	auto seq3 = Builder::createSequence();
+	auto seq4 = Builder::createSequence();
 
-	// Root is "scale1", see line 18.
-	auto root = getRoot(lastNode);
-	EXPECT_EQ(scale1, root);
+	plug_expectOk(seq1, seq2, 0, 0);
+	plug_expectOk(seq2, seq3, 0, 0);
+	plug_expectOk(seq3, seq4, 0, 0);
 
-  {
-    // Change scale1 (aka root) value.
-    auto result = root->setValue(glm::vec3(1.0f, 5.0f, 3.0f));
-    // Action should not be permitted, scale1 node is uniform scale.
-    EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
-	}
-  {
-    // Change scale1 (aka root) value. Action should be ok.
-    auto result = root->setValue(glm::vec3(-2.0f, -2.0f, -2.0f));
-    EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-  }
-	auto readOnlyMat = root->getData().getMat4();
+	EXPECT_EQ(seq3, gm::getParent(seq4));
+	EXPECT_EQ(seq2, gm::getParent(seq3));
+	EXPECT_EQ(seq1, gm::getParent(seq2));
+	EXPECT_EQ(nullptr, gm::getParent(seq1));
 }
 
-TEST(GetNodeInputsAndOutputs, ReturnsValidResults)
+TEST(NodeInterfaceTest, GetParentOfNonexistentPin_ShouldReturnNull)
+{
+	auto seq = Builder::createSequence();
+
+	EXPECT_EQ(nullptr, gm::getParent(seq, 10));
+	EXPECT_EQ(nullptr, gm::getParent(seq, -10));
+}
+
+TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResults)
 {
 	// Last node is mul3
 	auto lastNode = prepareEnvironment();
@@ -84,10 +89,10 @@ TEST(GetNodeInputsAndOutputs, ReturnsValidResults)
 	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
 
 	auto root = getRoot(lastNode);
-  auto anotherMatNode1 = Core::Builder::createNode<ENodeType::MatrixAddMatrix>();
-  auto anotherMatNode2 = Core::Builder::createNode<ENodeType::MatrixAddMatrix>();
-	GraphManager::plug(root, anotherMatNode1, 0, 0);
-	GraphManager::plug(root, anotherMatNode2, 0, 0);
+  auto anotherMatNode1 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+  auto anotherMatNode2 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+	plug_expectOk(root, anotherMatNode1, 0, 0);
+	plug_expectOk(root, anotherMatNode2, 0, 0);
 
 	auto rootOutputs = GraphManager::getAllOutputNodes(root);
 	EXPECT_EQ(1 + 2, rootOutputs.size());
@@ -101,4 +106,34 @@ TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
 
 	EXPECT_EQ(expectedOperation->keyWord, scale->getOperation()->keyWord);
+}
+
+TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
+{
+	auto seq = Builder::createSequence();
+
+	auto result = GraphManager::getAllInputNodes(seq);
+
+	EXPECT_TRUE(result.empty());
+}
+
+TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
+{
+	auto inputSeq = Builder::createSequence();
+	auto mySeq = Builder::createSequence();
+	auto free = Builder::createTransform<Free>();
+
+	plug_expectOk(inputSeq, mySeq, 0, 0);
+	plug_expectOk(free, mySeq, 0, 1);
+
+	auto result = GraphManager::getAllInputNodes(mySeq);
+
+	EXPECT_EQ(2, result.size());
+}
+
+TEST(NodeInterfaceTest, GetNodesConnectedToNonexistentOutputPin)
+{
+	auto seq = Builder::createSequence();
+
+	EXPECT_THROW(gm::getOutputNodes(seq, 10).empty(), std::exception);
 }
