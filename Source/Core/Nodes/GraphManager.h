@@ -38,10 +38,6 @@ template <ENodeType T> FORCE_INLINE Ptr<NodeBase> createNode()
   return ret;
 }
 
-/**
- * Sequence has custom non virtual member functions, so shared_ptr is returned
- * instead of unique_ptr.
- */
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
   auto ret = std::make_shared<Core::Sequence>();
