@@ -97,7 +97,7 @@ TEST(ScaleTest, UniformScaleSynergies)
 	}
 	{
 		// Valid coordinates.
-		setValue(scaleNode, -2.0f, {1, 1});
+		setValue_expectOk(scaleNode, -2.0f, {1, 1});
 
 		auto data = scaleNode->getData().getMat4();
 
