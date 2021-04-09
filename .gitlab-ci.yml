@@ -3,26 +3,30 @@
 # can use verions as well, like gcc:5.2
 # see https://hub.docker.com/_/gcc/
 image: gcc
+before_script:
+  - apt update && apt -y install cmake git libgl-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libopengl0
+
+stages:
+  - build
+  - test
 
 build:
   stage: build
-  # instead of calling g++ directly you can also use some build toolkit like make
-  # install the necessary build tools when needed
-  before_script:
-    - apt update && apt -y install cmake
   script:
+    - git submodule update --init --recursive
     - mkdir out && cd out 
-    - cmake .. && cmake . --build
+    - cmake .. 
+    - cmake --build . -j 8 --target I3T
+    - cmake --build . -j 8 --target I3TTest
   artifacts:
     paths:
       - Binaries
-      # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
-      # cache:
-      #   paths:
-      #     - "*.o"
+  cache:
+    paths:
+      - Binaries
 
 # run tests using the binary built before
-# test:
-#   stage: test
-#   script:
-#     - ./runmytests.sh
+test:
+  stage: test
+  script:
+    - Binaries/Debug/I3TTest

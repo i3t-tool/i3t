@@ -4,9 +4,12 @@
 
 /* configurable options */
 /* select your host type (or do it in the Makefile):*/
- // #define  UNIX_HOST
- // #define  WIN32  //(predefined on MSVC)
- 
+
+#if defined(__linux__) || defined(__APPLE__)
+    #define  UNIX_HOST
+#else
+    #define  WIN32  //(predefined on MSVC)
+#endif // defined
 
 #define LARGE_INT_POWER_OF_TEN 1000000000   /* the largest power of ten which fits in an int on this architecture */
 #if defined(__hppa__) || defined(__sparc__)
@@ -40,7 +43,7 @@
 # include <math.h>
 # include <sys/types.h>
 # include <sys/stat.h>
-# include <unistd.h>
+//# include <unistd.h>
 # include <stdarg.h>
 # include <setjmp.h>
 # ifndef NO_FP
