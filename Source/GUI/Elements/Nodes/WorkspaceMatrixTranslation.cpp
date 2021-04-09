@@ -32,7 +32,7 @@ void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
 void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
 {
     const glm::mat4& coreData = m_nodebase->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
+	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;

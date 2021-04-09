@@ -60,8 +60,8 @@ class Free : public Transformation
 public:
 	Free() : Transformation(getTransformProps(ETransformType::Free))
 	{
-		m_currentMap = Transform::g_Free;
-		m_initialMap = Transform::g_Free;
+		m_currentMap = &Transform::g_Free;
+		m_initialMap = &Transform::g_Free;
 	}
 
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
@@ -79,7 +79,6 @@ public:
 	}
 
 	void reset() override { setValue(glm::mat4(1.0f)); };
-	void setDataMap(const Transform::DataMap& map) override{};
 };
 
 
@@ -91,8 +90,8 @@ public:
 	explicit Scale(glm::vec3 initialScale = glm::vec3(1.0f), const Transform::DataMap& map = Transform::g_UniformScale)
 			: Transformation(getTransformProps(ETransformType::Scale)), m_initialScale(initialScale)
 	{
-		m_initialMap = map;
-		m_currentMap = map;
+		m_initialMap = &map;
+		m_currentMap = &map;
 	}
 	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -100,7 +99,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
-	void setDataMap(const Transform::DataMap& map) override;
 
   float getX();
   float getY();
@@ -128,8 +126,8 @@ public:
 	explicit EulerRotX(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
 			: Transformation(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot)
 	{
-		m_initialMap = map;
-		m_currentMap = map;
+		m_initialMap = &map;
+		m_currentMap = &map;
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
@@ -157,8 +155,8 @@ public:
 	explicit EulerRotY(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
 			: Transformation(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot)
 	{
-		m_initialMap = map;
-		m_currentMap = map;
+		m_initialMap = &map;
+		m_currentMap = &map;
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
@@ -186,8 +184,8 @@ public:
 	explicit EulerRotZ(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)
 			: Transformation(getTransformProps(ETransformType::EulerZ)), m_initialRot(initialRot)
 	{
-		m_initialMap = map;
-		m_currentMap = map;
+		m_initialMap = &map;
+		m_currentMap = &map;
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
@@ -208,8 +206,8 @@ public:
 	                     const Transform::DataMap& map = Transform::g_Translate)
 			: Transformation(getTransformProps(ETransformType::Translation)), m_initialTrans(initialTrans)
 	{
-		m_initialMap = map;
-		m_currentMap = map;
+		m_initialMap = &map;
+		m_currentMap = &map;
 	}
 
 	[[nodiscard]] ValueSetResult setValue(float val) override;
@@ -239,7 +237,7 @@ public:
 	AxisAngleRot(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
 	{
-		m_initialMap = Transform::g_AllLocked;
+		m_initialMap = &Transform::g_AllLocked;
 		m_currentMap = m_initialMap;
 	}
 
@@ -282,7 +280,7 @@ public:
 			: Transformation(getTransformProps(ETransformType::Ortho)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
 	{
-		m_initialMap = Transform::g_Ortho;
+		m_initialMap = &Transform::g_Ortho;
 		m_currentMap = m_initialMap;
 	}
 
@@ -318,7 +316,8 @@ public:
 			: Transformation(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
 				m_initialZNear(zNear), m_initialZFar(zFar)
 	{
-		m_initialMap = Transform::g_Perspective;
+		m_initialMap = &Transform::g_Perspective;
+		m_currentMap = &Transform::g_Perspective;
 		m_currentMap = m_initialMap;
 	}
 
@@ -352,7 +351,7 @@ public:
 			: Transformation(getTransformProps(ETransformType::Frustum)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
 	{
-		m_initialMap = Transform::g_Frustum;
+		m_initialMap = &Transform::g_Frustum;
 		m_currentMap = m_initialMap;
 	}
 
@@ -390,7 +389,7 @@ public:
 			: Transformation(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
 				m_initialUp(up)
 	{
-		m_initialMap = Transform::g_AllLocked;
+		m_initialMap = &Transform::g_AllLocked;
 		m_currentMap = m_initialMap;
 	}
 

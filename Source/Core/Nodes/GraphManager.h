@@ -32,7 +32,7 @@ template <ENodeType T> FORCE_INLINE Ptr<NodeBase> createNode()
   auto ret = std::make_shared<NodeImpl<T>>();
   ret->init();
   if (shouldUnlockAllValues)
-    ret->setDataMap(Transform::g_Free);
+    ret->setDataMap(&Transform::g_Free);
 
   ret->updateValues(0);
   return ret;
@@ -65,16 +65,7 @@ public:
   /**
    * Create Cycle
    */
-  static Ptr<Core::Cycle> createCycle()
-  {
-    auto ret = std::make_shared<Core::Cycle>();
-		ret->init();
-    ret->updateValues(0);
-
-		m_cycles.push_back(ret);
-
-    return ret;
-  }
+  static Ptr<Core::Cycle> createCycle();
 
 	/**
 	 * \param tick in seconds.
@@ -104,8 +95,8 @@ public:
 	 * Usage:
 	 * \code
 	 *    // Create nodes.
-	 *    auto vec1 = Core::Builder::createNode<OperationType::Vector3>();
-	 *    auto vec2 = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto vec1    = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto vec2    = Core::Builder::createNode<OperationType::Vector3>();
 	 *    auto dotNode = Core::Builder::createNode<OperationType::Vector3DotVector3>();
 	 *
 	 *    // Plug vector nodes output to dot node inputs.
@@ -121,22 +112,21 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-  [[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
+  [[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
 	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
-  [[nodiscard]] static ENodePlugResult plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
-  [[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
+  [[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node, unsigned nodeOutputIndex = 0);
+  [[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node, unsigned nodeInputIndex = 0);
 
 	/// Unplug all inputs and outputs.
-	static void unplugAll(Ptr<Core::NodeBase>& node);
-	static void unplugAll(Ptr<Core::NodeBase>&& node);
+	static void unplugAll(const NodePtr& node);
 
 	/**
 	 * Unplug plugged node from given input pin of this node.
 	 *
 	 * \param index
 	 */
-	static void unplugInput(Ptr<Core::NodeBase> const & node, int index);
+	static void unplugInput(const Ptr<Core::NodeBase>& node, int index);
 
 	/**
 	 * Unplug all nodes connected to given output pin of this node.
@@ -145,37 +135,28 @@ public:
 	 */
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
-	template <typename T>
-	static Ptr<NodeBase> getParent(T&& node, size_t index = 0)
-	{
-		static_assert(std::is_base_of_v<NodeBase, Node>, "T must be derived from NodeBase.");
-
-    auto pins = node->getInputPins();
-    if (pins.empty() || pins[index].m_input == nullptr)
-    {
-      return nullptr;
-    }
-    return pins[index].m_input->m_master;
-	}
+	/**
+	 * \param index input pin index.
+	 */
+	static Ptr<NodeBase> getParent(const NodePtr& node, size_t index = 0);
 
 	/**
 	 * \return All nodes connected to given node inputs.
 	 */
-	static std::vector<Ptr<NodeBase>> getAllInputNodes(Ptr<Core::NodeBase>& node);
+	static std::vector<NodePtr> getAllInputNodes(const NodePtr& node);
 
 	/**
 	 * \return All nodes plugged into given node output pins.
 	 */
-	static std::vector<Ptr<NodeBase>> getAllOutputNodes(Ptr<Core::NodeBase>& node);
+	static std::vector<Ptr<NodeBase>> getAllOutputNodes(NodePtr& node);
 
 	/**
 	 * \return All nodes plugged into node input pin on given index.
 	 */
-	static std::vector<Ptr<NodeBase>> getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index);
+	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
 
   static const Operation* getOperation(const Pin* pin);
 	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
-	static bool arePlugged(const Pin* input, const Pin* output);
 	static bool arePlugged(const Pin& input, const Pin& output);
 };
 
@@ -236,4 +217,16 @@ public:
 	 */
 	MatrixIterator end();
 };
+
+
+inline Ptr<Core::Cycle> GraphManager::createCycle()
+{
+  auto ret = std::make_shared<Core::Cycle>();
+  ret->init();
+  ret->updateValues(0);
+
+  m_cycles.push_back(ret);
+
+  return ret;
+}
 } // namespace Core

@@ -11,6 +11,8 @@
 
 #include "Core/Defs.h"
 
+#include "NodeData.h"
+
 static const std::vector<std::string> emptyNames = {};
 
 #define NO_TAG        ""
@@ -44,9 +46,10 @@ struct Operation
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
 	const std::vector<std::string> defaultOutputNames =
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
+	// std::vector<std::string> hovno;
+	std::vector<const Core::Transform::DataMap*> validDatamaps = { &Core::Transform::g_AllLocked };
 };
 
-/// \todo rename to optype
 enum class ENodeType
 {
 	Inversion,
@@ -361,19 +364,23 @@ static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7,
 
 static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
 
+using ValidDataMaps = std::vector<const Transform::DataMap*>;
+
+static const ValidDataMaps defaultDataMaps = { &Transform::g_AllLocked, &Transform::g_Free };
+
 static const std::vector<Operation> g_transforms = {
-		{"Free", "free", 0, matrixInput, 1, matrixInput},                                              // free
-		{"Translation", "translate", 0, matrixInput, 1, matrixInput},                                  // translate
-		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleX
-		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleY
-		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames},            // eulerAngleZ
-		{"Scale", "scale", 0, matrixInput, 1, matrixInput},                                            // scale
-		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},          // rotate
-		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames},                 // quat rotate
-		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},           // ortho
-		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas}, // perspective
-		{"Frustum", "frustum", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames},       // frustrum
-		{"LookAt", "lookAt", 0, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames},                // lookAt
+		{"Free", "free", 0, matrixInput, 1, matrixInput, "", {}, {}, defaultDataMaps },                                              // free
+		{"Translation", "translate", 0, matrixInput, 1, matrixInput, "", {}, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate } },                                 // translate
+		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX } },            // eulerAngleX
+		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY } },            // eulerAngleY
+		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ } },            // eulerAngleZ
+		{"Scale", "scale", 0, matrixInput, 1, matrixInput, "", {}, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale } },                                            // scale
+		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, {}, defaultDataMaps },          // rotate
+		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, {}, defaultDataMaps },                 // quat rotate
+		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho
+		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas, {},  { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective } }, // perspective
+		{"Frustum", "frustum", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum } },       // frustrum
+		{"LookAt", "lookAt", 0, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames, {}, defaultDataMaps },                // lookAt
 };
 
 FORCE_INLINE const Operation* getOperationProps(ENodeType type)

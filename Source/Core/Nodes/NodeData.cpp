@@ -2,13 +2,14 @@
 
 using namespace Core;
 
-bool Transform::cmp(const Transform::DataMap& map, const glm::mat4& mat)
+bool Transform::cmp(const Transform::DataMap* mapPtr, const glm::mat4& mat)
 {
+	auto& map = *mapPtr;
+
   for (int i = 0; i < 4; ++i)
   {
     for (int j = 0; j < 4; ++j)
     {
-      auto val = map[4 * i + j];
       switch (map[4 * i + j])
       {
       case 0:

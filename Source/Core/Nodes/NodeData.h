@@ -17,15 +17,29 @@
 namespace Core::Transform
 {
 /// In column-major order.
-typedef std::array<unsigned char, 16> DataMap;
+class DataMap
+{
+  std::array<const unsigned char, 16> m_data;
+
+public:
+	DataMap(std::array<const unsigned char, 16> data) : m_data(data) {};
+	//DataMap(const DataMap&) = delete;
+	//DataMap(DataMap&&) = delete;
+  //DataMap& operator=(const DataMap&) = delete;
+  //DataMap& operator=(DataMap&&) = delete;
+
+  unsigned char operator[](size_t i) const { return m_data[i]; };
+};
 } // namespace Core::Transform
 
 namespace Core
 {
-FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::DataMap& map)
+FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::DataMap* mapRef)
 {
 	int x = coords[0];
 	int y = coords[1];
+
+	auto& map = *mapRef;
 
 	return map[4 * x + y] != 255 && map[4 * x + y] != 0;
 }
@@ -36,48 +50,48 @@ namespace Core::Transform
 static constexpr uint8_t ZERO = 0;
 static constexpr uint8_t ONE = 255;
 
-static constexpr DataMap g_Free = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+inline const DataMap g_Free({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
 
-static constexpr DataMap g_Scale = {1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255};
+inline const DataMap g_Scale({1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255});
 
-static constexpr DataMap g_UniformScale = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255};
+inline const DataMap g_UniformScale({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255});
 
-static constexpr DataMap g_EulerX = {255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255};
+inline const DataMap g_EulerX({255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255});
 
-static constexpr DataMap g_EulerY = {1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 255};
+inline const DataMap g_EulerY({1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 255});
 
-static constexpr DataMap g_EulerZ = {1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255};
+inline const DataMap g_EulerZ({1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255});
 
-static constexpr DataMap g_Translate = {
+inline const DataMap g_Translate({
 		255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 1, 2, 3, 255,
-};
+});
 
-static constexpr DataMap g_AllLocked = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+inline const DataMap g_AllLocked({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-static constexpr DataMap g_Ortho = {
+inline const DataMap g_Ortho({
 		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 4, 5, 6, 255,
-};
+});
 
-static constexpr DataMap g_Frustum = {1, 0, 0, 0, 0, 2, 0, 0, 3, 4, 5, 6, 0, 0, 7, 0};
+inline const DataMap g_Frustum({1, 0, 0, 0, 0, 2, 0, 0, 3, 4, 5, 6, 0, 0, 7, 0});
 
-static constexpr DataMap g_Perspective = {
+inline const DataMap g_Perspective({
 		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 4, 0, 0, 5, 0,
-};
+});
 
 /**
  * Return whether DataMaps are same.
  */
 FORCE_INLINE bool eq(const DataMap& lhs, const DataMap& rhs)
 {
-	return std::memcmp(&lhs[0], &rhs[0], 16) == 0;
+	return &lhs == &rhs;
 }
 
 /**
  * Compare data map with matrix..
  */
-bool cmp(const DataMap& map, const glm::mat4& mat);
+bool cmp(const DataMap* map, const glm::mat4& mat);
 
-FORCE_INLINE bool isMatValid(const DataMap& map, const glm::mat4& mat)
+FORCE_INLINE bool isMatValid(const DataMap* map, const glm::mat4& mat)
 {
 	return cmp(map, mat);
 }

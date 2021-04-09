@@ -21,7 +21,7 @@ ValueSetResult Scale::setValue(float val)
 
 ValueSetResult Scale::setValue(const glm::vec3& vec)
 {
-	if (m_currentMap == Transform::g_UniformScale)
+	if (m_currentMap == &Transform::g_UniformScale)
 	{
 		if (Math::areElementsSame(vec))
 		{
@@ -47,7 +47,7 @@ ValueSetResult Scale::setValue(const glm::vec4& vec)
 
 ValueSetResult Scale::setValue(const glm::mat4& mat)
 {
-	if (m_currentMap == Transform::g_UniformScale)
+	if (m_currentMap == &Transform::g_UniformScale)
 	{
 		if (Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]))
 		{
@@ -57,7 +57,7 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
 			                      "Given matrix does not represent uniform scale."};
 	}
-	else if (m_currentMap == Transform::g_Scale)
+	else if (m_currentMap == &Transform::g_Scale)
 	{
 		if (Transform::cmp(m_currentMap, mat))
 		{
@@ -69,7 +69,7 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 			                      "Given matrix does not represent scale."};
 		}
 	}
-	else if (m_currentMap == Transform::g_Free)
+	else if (m_currentMap == &Transform::g_Free)
 	{
 		// Free transformation is set.
 		setInternalValue(mat);
@@ -81,7 +81,7 @@ ValueSetResult Scale::setValue(const glm::mat4& mat)
 
 ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 {
-	if (m_currentMap == Transform::g_Free)
+	if (m_currentMap == &Transform::g_Free)
 	{
 		// Free transformation is set.
 		setInternalValue(val, coords);
@@ -92,12 +92,12 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (m_currentMap == Transform::g_UniformScale)
+	if (m_currentMap == &Transform::g_UniformScale)
 	{
 		setInternalValue(glm::scale(glm::vec3(val)));
 	}
 
-	if (m_currentMap == Transform::g_Scale)
+	if (m_currentMap == &Transform::g_Scale)
 	{
 		setInternalValue(val, coords);
 	}
@@ -110,12 +110,6 @@ void Scale::reset()
 {
 	setDataMap(m_initialMap);
 	setValue(glm::scale(m_initialScale));
-}
-
-void Scale::setDataMap(const Transform::DataMap& map)
-{
-	Debug::Assert(map == Transform::g_Free || map == Transform::g_Scale || map == Transform::g_UniformScale);
-	NodeBase::setDataMap(map);
 }
 
 float Scale::getX()
@@ -170,7 +164,7 @@ ValueSetResult EulerRotX::setValue(const glm::vec4& val)
 
 ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 {
-	if (m_currentMap == Transform::g_EulerX)
+	if (m_currentMap == &Transform::g_EulerX)
 	{
 		if (Transform::isMatValid(m_currentMap, mat))
 		{
@@ -188,7 +182,7 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
       }
 		}
 	}
-	else if (m_currentMap == Transform::g_Free)
+	else if (m_currentMap == &Transform::g_Free)
 	{
 		setInternalValue(mat);
 	}
@@ -278,9 +272,9 @@ ValueSetResult EulerRotY::setValue(const glm::mat4& mat)
 {
 	/// \todo MH Validation is not always correct.
 
-	if (m_currentMap == Transform::g_Free)
+	if (m_currentMap == &Transform::g_Free)
 		setInternalValue(mat);
-	else if (m_currentMap == Transform::g_EulerY)
+	else if (m_currentMap == &Transform::g_EulerY)
   {
 		float angleRad = std::asin(mat[2][0]);
 		auto eulerY = glm::eulerAngleY(angleRad);
@@ -375,9 +369,9 @@ ValueSetResult EulerRotZ::setValue(const glm::vec4& val)
 
 ValueSetResult EulerRotZ::setValue(const glm::mat4& mat)
 {
-	if (m_currentMap == Transform::g_Free)
+	if (m_currentMap == &Transform::g_Free)
 		setInternalValue(mat);
-  else if (m_currentMap == Transform::g_EulerZ)
+  else if (m_currentMap == &Transform::g_EulerZ)
   {
     float angle = glm::atan(mat[0][1], mat[0][0]);
 		auto eulerZ = glm::eulerAngleZ(angle);
@@ -472,7 +466,7 @@ ValueSetResult Translation::setValue(const glm::vec4& vec)
 
 ValueSetResult Translation::setValue(const glm::mat4& mat)
 {
-	if (m_currentMap == Transform::g_Translate)
+	if (m_currentMap == &Transform::g_Translate)
 	{
 		if (Transform::isMatValid(m_currentMap, mat))
 		{
@@ -484,7 +478,7 @@ ValueSetResult Translation::setValue(const glm::mat4& mat)
 			                      "Cannot set given matrix, because it not represents translation."};
 		}
 	}
-	else if (m_currentMap == Transform::g_Free)
+	else if (m_currentMap == &Transform::g_Free)
 	{
 		setInternalValue(mat);
 	}

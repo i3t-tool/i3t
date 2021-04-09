@@ -70,8 +70,8 @@ protected:
 	/// Results of operations.
 	std::vector<DataStore> m_internalData;
 
-	Transform::DataMap m_initialMap{};
-	Transform::DataMap m_currentMap = Transform::g_AllLocked;
+	const Transform::DataMap* m_initialMap{};
+	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
 	 * Operator node properties.
@@ -174,7 +174,7 @@ public:
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
 	{
-		if (m_currentMap == Transform::g_Free)
+		if (m_currentMap == &Transform::g_Free)
 		{
 			m_internalData[0].setValue(mat);
 			spreadSignal();
@@ -227,8 +227,14 @@ public:
 
 	virtual void reset() {}
 
-	virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
-	const Transform::DataMap& getDataMap() { return m_currentMap; }
+  void setDataMap(const Transform::DataMap* map);
+
+	const Transform::DataMap* getDataMap() { return m_currentMap; }
+	const Transform::DataMap& getDataMapRef() { return *m_currentMap; }
+	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps()
+	{
+		return m_operation->validDatamaps;
+	};
 
 	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
 	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -275,6 +281,8 @@ public:
 
 	bool areInputsPlugged(int numInputs);
 	bool areAllInputsPlugged();
+
+	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
 
 protected:
   virtual ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
