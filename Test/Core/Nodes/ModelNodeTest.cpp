@@ -2,29 +2,25 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "Generator.h"
+#include "Utils.h"
+
 using namespace Core;
 
-TEST(ModelNode, ShouldConsumeTransformMatrix)
+TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 {
-	auto sequence = Core::Builder::createSequence();
+	auto sequence = arrangeSequence();
 
-  GameObject gameObject;
-  auto modelNode = Core::Builder::createNode<ENodeType::Model>();
-  modelNode->setValue(static_cast<void*>(&gameObject));
+	GameObject gameObject;
+	auto modelNode = Builder::createNode<ENodeType::Model>();
+	setValue_expectOk(modelNode, static_cast<void*>(&gameObject));
 
-	GraphManager::plug(sequence, modelNode, 0, 0);
-
-	auto scl = Core::Builder::createTransform<Scale>(glm::vec3(5.0f));
-	auto rotZ = Core::Builder::createTransform<EulerRotZ>(glm::radians(120.0f));
-
-	sequence->addMatrix(scl);
-	sequence->addMatrix(rotZ);
-
-	auto expectedMat = glm::scale(glm::vec3(5.0f)) * glm::rotate(glm::radians(120.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-  auto sequenceMat = sequence->getData().getMat4();
-	EXPECT_EQ(expectedMat, sequenceMat);
-
-  auto* gameObjectPtr = static_cast<GameObject*>(modelNode->getData().getPointer());
+	auto* gameObjectPtr = static_cast<GameObject*>(modelNode->getData().getPointer());
 	auto& gameObjectMat = gameObjectPtr->transformation;
-	EXPECT_EQ(expectedMat, gameObjectMat);
+
+	plug_expectOk(sequence, modelNode, 0, 0);
+	{
+		auto expectedMat = getMatProduct(sequence->getMatrices());
+		EXPECT_EQ(expectedMat, gameObjectMat);
+	}
 }

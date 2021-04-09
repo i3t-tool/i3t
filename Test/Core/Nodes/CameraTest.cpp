@@ -2,9 +2,11 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "Utils.h"
+
 using namespace Core;
 
-TEST(CameraNode, CameraNodeCanBePluggedToScreenNode)
+TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 {
 	auto cameraNode = Builder::createNode<ENodeType::Camera>();
 	auto screenNode = Builder::createNode<ENodeType::Screen>();
@@ -12,18 +14,9 @@ TEST(CameraNode, CameraNodeCanBePluggedToScreenNode)
 	auto perspectiveProj = Builder::createTransform<PerspectiveProj>();
 	auto lookAt = Builder::createTransform<LookAt>();
 
-  {
-		auto result = GraphManager::plug(perspectiveProj, cameraNode, 0, 0);
-	  EXPECT_EQ(ENodePlugResult::Ok, result);
-	}
-  {
-    auto result = GraphManager::plug(lookAt, cameraNode, 0, 1);
-    EXPECT_EQ(ENodePlugResult::Ok, result);
-  }
-  {
-    auto result = GraphManager::plug(cameraNode, screenNode, 0, 0);
-    EXPECT_EQ(ENodePlugResult::Ok, result);
-  }
+	plug_expectOk(perspectiveProj, cameraNode, 0, 0);
+	plug_expectOk(lookAt, cameraNode, 0, 1);
+	plug_expectOk(cameraNode, screenNode, 0, 0);
 
 	auto expectedPV = perspectiveProj->getData().getMat4() * lookAt->getData().getMat4();
 	EXPECT_EQ(expectedPV, cameraNode->getData().getMat4());

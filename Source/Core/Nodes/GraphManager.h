@@ -85,7 +85,7 @@ public:
 	 */
 	static void update(double tick);
 
-	static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
+  [[nodiscard]] static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
 
 	/**
 	 * Is used to check before connecting to avoid cycles in the node graph.
@@ -97,10 +97,10 @@ public:
 	 * \param input
 	 * \param output
 	 */
-	static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+	[[nodiscard]] static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
-	static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
+  [[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
 
 	/**
 	 * Connect given node output pin to this operator input pin.
@@ -125,14 +125,15 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-	static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
+  [[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
-	static ENodePlugResult plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
-	static ENodePlugResult plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
+  [[nodiscard]] static ENodePlugResult plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
+  [[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex = 0);
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(Ptr<Core::NodeBase>& node);
+	static void unplugAll(Ptr<Core::NodeBase>&& node);
 
 	/**
 	 * Unplug plugged node from given input pin of this node.
@@ -148,8 +149,18 @@ public:
 	 */
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
-	static Ptr<NodeBase> getParent(Ptr<Core::NodeBase>& node, size_t index = 0);
-	static Ptr<NodeBase> getParent(Ptr<Core::Sequence> node, size_t index = 0);
+	template <typename T>
+	static Ptr<NodeBase> getParent(T&& node, size_t index = 0)
+	{
+		static_assert(std::is_base_of_v<NodeBase, Node>, "T must be derived from NodeBase.");
+
+    auto pins = node->getInputPins();
+    if (pins.empty() || pins[index].m_input == nullptr)
+    {
+      return nullptr;
+    }
+    return pins[index].m_input->m_master;
+	}
 
 	/**
 	 * \return All nodes connected to given node inputs.

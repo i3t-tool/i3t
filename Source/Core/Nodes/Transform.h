@@ -22,10 +22,36 @@ class Transformation : public NodeBase
 {
 	friend class Sequence;
 
+  Ptr<NodeBase> m_currentSequence = nullptr;
+  int m_currentIndex = -1;
+
+public:
+  bool isInSequence() { return m_currentSequence != nullptr; }
+	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
+	int getCurrentIndex() { return m_currentIndex; }
+
 protected:
-	Transformation(const Operation* transformType) : NodeBase(transformType) {}
-	Ptr<NodeBase> m_currentSequence = nullptr;
+  Transformation(const Operation* transformType) : NodeBase(transformType) {}
 	void notifySequence();
+
+private:
+	void nullSequence()
+	{
+		m_currentSequence = nullptr;
+    int m_currentIndex = -1;
+	}
+
+	void setSequence(Ptr<NodeBase>&& s, int index)
+  {
+    m_currentSequence = s;
+    m_currentIndex = index;
+	}
+
+	void setSequence(Ptr<NodeBase>& s, int index)
+  {
+		m_currentSequence = s;
+		m_currentIndex = index;
+	}
 };
 
 

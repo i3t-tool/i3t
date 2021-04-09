@@ -2,21 +2,32 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+#include "../Utils.h"
+
 using namespace Core;
+
+struct TestTree
+{
+	Ptr<Sequence> rootSequence;
+	Ptr<Sequence> branch1Sequence;
+	Ptr<Sequence> branch2Sequence;
+
+	std::vector<NodePtr> branch1ToRootMatrices;
+};
 
 /**
  *                                         /----- Sequence 2 : | Scal | Tran | (branch1)
  * Sequence 1 : | RotX | Scal | Tran | ----|
  *                                         \----- Sequence 3 : | Scal | Tran | (branch2)
  */
-TEST(Sequences, MatrixIterator)
+TestTree arrangeSequenceTree()
 {
 	// Prepare graph.
-	auto root = Core::Builder::createSequence();
-	auto branch1 = Core::Builder::createSequence();
-	auto branch2 = Core::Builder::createSequence();
+	auto root = Builder::createSequence();
+	auto branch1 = Builder::createSequence();
+	auto branch2 = Builder::createSequence();
 
-	std::vector<Ptr<NodeBase>> matrices = {
+	std::vector<Ptr<Transformation>> matrices = {
 			// sequence 1
 			Builder::createTransform<EulerRotX>(),
 			Builder::createTransform<Scale>(),
@@ -31,8 +42,8 @@ TEST(Sequences, MatrixIterator)
 			Builder::createTransform<Translation>(),
 	};
 
-	GraphManager::plug(root, branch1, 0, 0);
-	GraphManager::plug(root, branch2, 0, 0);
+	plug_expectOk(root, branch1, 0, 0);
+  plug_expectOk(root, branch2, 0, 0);
 
 	// Add matrices to the sequences.
 	root->addMatrix(matrices[0]);
@@ -45,12 +56,21 @@ TEST(Sequences, MatrixIterator)
 	branch2->addMatrix(matrices[5]);
 	branch2->addMatrix(matrices[6]);
 
-	// Create sequence–root path from "branch1" sequence to root sequence.
-	SequenceTree tree(branch1);
-
 	std::vector<NodePtr> expectedMatrices = {
 			matrices[4], matrices[3], matrices[2], matrices[1], matrices[0],
 	};
+
+	return TestTree{root, branch1, branch2, expectedMatrices};
+}
+
+TEST(SequenceIteratorTest, MatrixIterator)
+{
+	auto s = arrangeSequenceTree();
+
+	// Create sequence–root path from "branch1" sequence to root sequence.
+	SequenceTree tree(s.branch1Sequence);
+
+	std::vector<NodePtr> expectedMatrices = s.branch1ToRootMatrices;
 
 	// Iterate through matrices.
 	{
