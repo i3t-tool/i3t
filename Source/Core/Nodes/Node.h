@@ -132,6 +132,21 @@ public:
 	 */
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
+private:
+	template <typename T>
+  ValueSetResult setValueEx(T&& val)
+  {
+		if (m_currentMap == &Transform::g_AllLocked)
+      return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
+
+    getInternalData().setValue(val);
+    spreadSignal();
+
+    return ValueSetResult{};
+	}
+
+public:
+
 	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
 	{
 		m_internalData[0].setValue(ptr);
@@ -150,38 +165,22 @@ public:
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val)
 	{
-		m_internalData[0].setValue(val);
-		spreadSignal();
-
-		return ValueSetResult{ValueSetResult::Status::Ok, ""};
+		return setValueEx(val);
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
 	{
-		m_internalData[0].setValue(vec);
-		spreadSignal();
-
-		return ValueSetResult{ValueSetResult::Status::Ok, ""};
+    return setValueEx(vec);
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
 	{
-		m_internalData[0].setValue(vec);
-		spreadSignal();
-
-		return ValueSetResult{ValueSetResult::Status::Ok, ""};
+    return setValueEx(vec);
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
 	{
-		if (m_currentMap == &Transform::g_Free)
-		{
-			m_internalData[0].setValue(mat);
-			spreadSignal();
-
-			return ValueSetResult{ValueSetResult::Status::Ok, ""};
-		}
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Not a free transformation."};
+    return setValueEx(mat);
 	}
 
 	/**
@@ -206,6 +205,7 @@ public:
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
+protected:
 	/**
 	 * Sets node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
@@ -225,6 +225,7 @@ public:
 		spreadSignal();
 	}
 
+public:
 	virtual void reset() {}
 
   void setDataMap(const Transform::DataMap* map);

@@ -8,7 +8,7 @@
 
 using namespace Core;
 
-TEST(NodesTest, MakeTranslationNodeShouldBeValid)
+TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 {
 	auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 	auto initialTranslation = generateVec3();
@@ -23,7 +23,7 @@ TEST(NodesTest, MakeTranslationNodeShouldBeValid)
 	EXPECT_EQ(expectedNodeValue, makeTranslation->getData().getMat4());
 }
 
-TEST(NodesTest, MakeEulerRotsNodeShouldBeValid)
+TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 {
 	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
 	auto rotRads = generateFloat();
@@ -46,7 +46,7 @@ TEST(NodesTest, MakeEulerRotsNodeShouldBeValid)
 	EXPECT_EQ(expectedRotZMat, makeRotZ->getData().getMat4());
 }
 
-TEST(NodesTest, MakeAxisRotShouldBeValid)
+TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 {
 	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
 	auto axisNode = Core::Builder::createNode<ENodeType::Vector3>();
@@ -65,7 +65,7 @@ TEST(NodesTest, MakeAxisRotShouldBeValid)
 	EXPECT_EQ(expectedNodeValue, makeAxisRotNode->getData().getMat4());
 }
 
-TEST(NodesTest, MakeOrthoShouldBeValid)
+TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 {
 	auto makeOrthoNode = Core::Builder::createNode<ENodeType::MakeOrtho>();
 
@@ -76,7 +76,7 @@ TEST(NodesTest, MakeOrthoShouldBeValid)
 	EXPECT_EQ(expectedOrtho, makeOrthoNode->getData().getMat4());
 }
 
-TEST(NodesTest, MakePerspectiveShouldBeValid)
+TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 {
 	auto makePerspectiveNode = Core::Builder::createNode<ENodeType::MakePerspective>();
 
@@ -87,7 +87,7 @@ TEST(NodesTest, MakePerspectiveShouldBeValid)
 	EXPECT_EQ(expectedMat, makePerspectiveNode->getData().getMat4());
 }
 
-TEST(NodesTest, MakeFrustumShouldBeValid)
+TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 {
 	auto makeFrustumNode = Core::Builder::createNode<ENodeType::MakeFrustum>();
 
@@ -98,7 +98,7 @@ TEST(NodesTest, MakeFrustumShouldBeValid)
 	EXPECT_EQ(expectedOrtho, makeFrustumNode->getData().getMat4());
 }
 
-TEST(NodesTest, MakeLookAtShouldBeValid)
+TEST(MakeTransformTest, MakeLookAtShouldBeValid)
 {
 	auto makeLookAtNode = Builder::createNode<ENodeType::MakeLookAt>();
 

@@ -33,8 +33,19 @@ static const std::vector<std::string> matrixIndexNames()
 	return names;
 }
 
+namespace Core
+{
+using ValidDataMaps = std::vector<const Transform::DataMap*>;
+
+static const ValidDataMaps defaultDataMaps = { &Transform::g_AllLocked, &Transform::g_Free };
+}
+
+using PinGroup = std::vector<EValueType>;
+
 struct Operation
 {
+	using Pins = std::vector<EValueType>;
+
 	const std::string keyWord;
 	const std::string defaultLabel;
 	const int numberOfInputs;
@@ -46,8 +57,65 @@ struct Operation
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
 	const std::vector<std::string> defaultOutputNames =
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
-	// std::vector<std::string> hovno;
-	std::vector<const Core::Transform::DataMap*> validDatamaps = { &Core::Transform::g_AllLocked };
+	const std::vector<const Core::Transform::DataMap*> validDatamaps = { &Core::Transform::g_AllLocked };
+
+
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+				numberOfOutputs(numberOfOutputs), outputTypes(outputTypes)
+	{
+	}
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
+	          const std::vector<std::string>& defaultInputNames,
+	          const std::vector<const Core::Transform::DataMap*>& validDatamaps)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+				numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
+				defaultInputNames(defaultInputNames), validDatamaps(validDatamaps)
+	{
+	}
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes,
+	          const std::vector<const Core::Transform::DataMap*>& validDatamaps)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+				numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), validDatamaps(validDatamaps)
+	{
+	}
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
+	          const std::vector<std::string>& defaultInputNames, const std::vector<std::string>& defaultOutputNames)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+				numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
+				defaultInputNames(defaultInputNames), defaultOutputNames(defaultOutputNames)
+	{
+	}
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
+	          const std::vector<std::string>& defaultInputNames)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+				numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
+				defaultInputNames(defaultInputNames)
+	{
+	}
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
+	          const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+	          const std::vector<EValueType>& outputTypes, const std::string& defaultTagText)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+				numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText)
+	{
+	}
 };
 
 enum class ENodeType
@@ -169,8 +237,6 @@ static const std::vector<std::string> defaultIoNames = {
 		""        // SCREEN		MN dodelat
 
 };
-
-using PinGroup = std::vector<EValueType>;
 
 static const std::vector<EValueType> matrixInput = {EValueType::Matrix};
 static const std::vector<EValueType> vectorInput = {EValueType::Vec4};
@@ -322,10 +388,10 @@ static const std::vector<Operation> operations = {
 		{"NormalizeQuat", "normalize quat", 1, quatInput, 1, quatInput},                   // normalize quat
 
 		// Value nodes.
-		{"FloatToFloat", "float", 1, floatInput, 1, floatInput},
-		{"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input},
-		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput},
-		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput},
+		{"FloatToFloat", "float", 1, floatInput, 1, floatInput, Core::defaultDataMaps},
+		{"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input, Core::defaultDataMaps},
+		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput, Core::defaultDataMaps},
+		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput, Core::defaultDataMaps},
 
 		{"Model", "model", 1, matrixMulInput, 0, {}},
 
@@ -364,23 +430,19 @@ static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7,
 
 static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
 
-using ValidDataMaps = std::vector<const Transform::DataMap*>;
-
-static const ValidDataMaps defaultDataMaps = { &Transform::g_AllLocked, &Transform::g_Free };
-
 static const std::vector<Operation> g_transforms = {
-		{"Free", "free", 0, matrixInput, 1, matrixInput, "", {}, {}, defaultDataMaps },                                              // free
-		{"Translation", "translate", 0, matrixInput, 1, matrixInput, "", {}, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate } },                                 // translate
-		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX } },            // eulerAngleX
-		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY } },            // eulerAngleY
-		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ } },            // eulerAngleZ
-		{"Scale", "scale", 0, matrixInput, 1, matrixInput, "", {}, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale } },                                            // scale
-		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, {}, defaultDataMaps },          // rotate
-		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, {}, defaultDataMaps },                 // quat rotate
-		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho
-		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas, {},  { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective } }, // perspective
-		{"Frustum", "frustum", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, {}, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum } },       // frustrum
-		{"LookAt", "lookAt", 0, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames, {}, defaultDataMaps },                // lookAt
+		{"Free", "free", 0, matrixInput, 1, matrixInput, defaultDataMaps },                                              // free
+		{"Translation", "translate", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate } },                                 // translate
+		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX } },            // eulerAngleX
+		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY } },            // eulerAngleY
+		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ } },            // eulerAngleZ
+		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale } },                                            // scale
+		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },          // rotate
+		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },                 // quat rotate
+		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho
+		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective } }, // perspective
+		{"Frustum", "frustum", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum } },       // frustrum
+		{"LookAt", "lookAt", 0, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames, defaultDataMaps },                // lookAt
 };
 
 FORCE_INLINE const Operation* getOperationProps(ENodeType type)

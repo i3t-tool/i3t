@@ -27,7 +27,7 @@ void Cycle::stop()
 void Cycle::resetAndStop()
 {
   m_isRunning = false;
-  setValue(0.0f);
+  getInternalData().setValue(0.0f);
   spreadSignal(out_stop);
 }
 
@@ -132,5 +132,5 @@ void Cycle::updateValue(float seconds)
     // New iteration.
     newValue = fmod(newValue, m_updateStep);
   }
-  setValue(newValue);
+  getInternalData().setValue(newValue);
 }
