@@ -56,7 +56,7 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
 		ne::SetNodePosition(workspace->back()->m_id, ImVec2((float)x, (float)y));
 	}
     if(NumArgs==2){ne::CenterNodeOnScreen(workspace->back()->m_id);}
-    ReturnValue->Val->Integer = (int)workspace->size() - 1;
+    ReturnValue->Val->Integer = (int)workspace->back()->m_nodebase->getId();
 }
 void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int dataindex = Param[0]->Val->Integer;
@@ -78,15 +78,23 @@ void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value
     ValueSetResult result = (workspace->back().get())->m_nodebase.get()->setValue(vec);
     ne::SetNodePosition(workspace->back()->m_id, ImVec2((float)x, (float)y));
     if(NumArgs==1){ne::CenterNodeOnScreen(workspace->back()->m_id);}
-    ReturnValue->Val->Integer = (int)workspace->size() - 1;
+    ReturnValue->Val->Integer = (int)workspace->back()->m_nodebase->getId();
 }
 void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
-    int indexa=Param[0]->Val->Integer;
-    int indexb=Param[1]->Val->Integer;
+    int ida=Param[0]->Val->Integer;
+    int idb=Param[1]->Val->Integer;
     int outputindex=Param[2]->Val->Integer;
     int inputindex= Param[3]->Val->Integer;
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    int indexa=-1;
+    int indexb=-1;
+
+    for(int i=0;i<workspace->size();i++){
+        if((int)workspace->at(i)->m_nodebase->getId()==ida){indexa=i;}
+        if((int)workspace->at(i)->m_nodebase->getId()==idb){indexb=i;}
+    }
+
     if(indexa<0||indexa>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
     if(indexb<0||indexb>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
 
@@ -100,37 +108,33 @@ void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
     ReturnValue->Val->Integer =(int)p==0;
 }
 void unplugInput(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
-    int indexa=Param[0]->Val->Integer;
+    int ida=Param[0]->Val->Integer;
     int inputindex= Param[1]->Val->Integer;
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    int indexa=-1;
+
+    for(int i=0;i<workspace->size();i++){
+        if((int)workspace->at(i)->m_nodebase->getId()==ida){indexa=i;}
+    }
+
     if(indexa<0||indexa>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
 
     Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->m_nodebase;
     if(inputindex>= pca->getInputPins().size()){ ReturnValue->Val->Integer=false;return;}
     Core::GraphManager::unplugInput(pca, inputindex);
-}
-void getNodeById(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
-    int coreid=Param[0]->Val->Integer;
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    for(int i=0;i<workspace->size();i++){
-        if (workspace->at(i).get()->m_nodebase->getId() == (long long unsigned)coreid) {
-            ReturnValue->Val->Integer=i;
-            return;
-        }
-    }
-    std::cout<<"node with id "<<coreid<<" not found!"<<std::endl;
-    ReturnValue->Val->Integer=-1;
+
+    ReturnValue->Val->Integer=true;
 }
 void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
     char* label=(char*)Param[0]->Val->Pointer;
     int occurances=0;
+    ReturnValue->Val->Integer=-1;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {occurances++;}
     }
     if(occurances==0){
-        ReturnValue->Val->Integer=-1;
         std::cout<<"No matches found!"<<std::endl;
         return;
     }
@@ -139,15 +143,20 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
     }
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {
-            ReturnValue->Val->Integer=i;
+            ReturnValue->Val->Integer= (int)workspace->at(i)->m_nodebase->getId();
             if(occurances>1){std::cout<<"Id: "<<i<<" Name: "<<label<<std::endl;}
         }
     }
     
 }
 void deleteNode(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
-    int index=Param[0]->Val->Integer;
+    int ida=Param[0]->Val->Integer;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    int index=-1;
+
+    for(int i=0;i<workspace->size();i++){
+        if((int)workspace->at(i)->m_nodebase->getId()==ida){index=i;}
+    }
     if(index<0||index>=workspace->size()){ReturnValue->Val->Identifier=false;return;}
     Core::NodePtr c= (workspace->at(index).get())->m_nodebase;
     Core::GraphManager::unplugAll(c);
@@ -209,9 +218,8 @@ struct LibraryFunction PlatformLibrary1[] =
 	{ mat4,         "int mat4(int,int,int,int);" },         { mat4,         "int mat4c(int,int);" },
 	{ normVec4,     "int normvec4(int,int,int);" },         { normVec4,     "int normvec4c(int);" },
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
-	{ unplugInput,  "void unpluginput(int,int);" },
-	{ getNodeById,  "int getnode(int);" },
-	{ getNodeByName,"int getnodel(char*);" },
+	{ unplugInput,  "bool unpluginput(int,int);" },
+	{ getNodeByName,"int getnode(char*);" },
 	{ deleteNode,   "bool delnode(int);" },
 	{ dataMat4,     "int datamat4(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float);" },
 	{ dataVec4,     "int datavec4(float,float,float,float);" },
@@ -242,4 +250,3 @@ void PlatformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, NULL, (char*)"rotatez",  &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatez,     false);
     VariableDefinePlatformVar(pc, NULL, (char*)"translate",&pc->IntType, (union AnyValue *)&scriptingData.mat4Types.translate,   false);
 }
-

@@ -124,9 +124,6 @@ void Scripting::runCommand(std::string cmd) {
 	if(!m_init){return;}
 	if(PicocPlatformSetExitPoint(&m_picoc)){return;}
 	PicocParse(&m_picoc, "Run command", cmd.c_str(), (int)cmd.size(), TRUE, TRUE, TRUE, TRUE);
-	/*char s[1024]={0};
-	int r=(int)fread(s,1,1024,stdout);
-	printf(s);*/
 }
 Scripting::Scripting() {
 	PicocInitialise(&m_picoc, PICOC_STACK_SIZE);
