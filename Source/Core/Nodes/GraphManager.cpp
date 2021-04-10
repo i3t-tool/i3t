@@ -55,11 +55,14 @@ ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>&
 void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
   node.get()->unplugAll();
+	node->setDataMap(&Transform::g_Free);
 }
 
 void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
+	if (getAllInputNodes(node).empty())
+    node->setDataMap(&Transform::g_Free);
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)

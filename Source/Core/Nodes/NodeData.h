@@ -7,6 +7,7 @@
 
 #include <array>
 #include <set>
+#include <variant>
 #include <vector>
 
 #include "glm/glm.hpp"
@@ -111,34 +112,20 @@ enum class EValueType
 };
 
 /**
- * An operator value = union used as a value passed between the boxes in the scene.
- */
-union OpValue
-{
-	glm::mat4 matrix;
-	glm::vec3 vector3;
-	glm::vec4 vector4;
-	glm::quat quat;
-
-	float fValue;
-	void* pointer;
-};
-
-/**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
  *
- * Old name is Transmitter in I3T v1.
+ * Old name was Transmitter in I3T v1.
  */
 class DataStore
 {
 protected:
-	OpValue value;          ///< transmitted data (union of all data types passed along the wire)
+	std::variant<glm::mat4, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
 	EValueType opValueType; ///< wire type, such as FLOAT or MATRIX
 
 public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and undefined value (a unit matrix) */
-	DataStore() : opValueType(EValueType::Matrix) { value.matrix = glm::mat4(1.0f); }
+	DataStore() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
 
 	DataStore(EValueType valueType) : opValueType(valueType)
 	{
@@ -167,21 +154,18 @@ public:
 	}
 
 	[[nodiscard]] EValueType getOpValType() const { return opValueType; }
-	[[nodiscard]] const glm::mat4& getMat4() const { return value.matrix; }
-	[[nodiscard]] glm::mat4& getMat4Ref() { return value.matrix; }
-	[[nodiscard]] const glm::vec3& getVec3() const { return value.vector3; }
-	[[nodiscard]] glm::vec3& getVec3Ref() { return value.vector3; }
-	[[nodiscard]] const glm::vec4& getVec4() const { return value.vector4; }
-	[[nodiscard]] const glm::quat& getQuat() const { return value.quat; }
-	[[nodiscard]] float getFloat() const { return value.fValue; }
-	OpValue* getValue() { return &value; }
-	[[nodiscard]] void* getPointer() const { return value.pointer; }
+	[[nodiscard]] const glm::mat4& getMat4() const { return std::get<glm::mat4>(m_value); }
+	[[nodiscard]] glm::mat4& getMat4Ref() { return std::get<glm::mat4>(m_value); }
+	[[nodiscard]] const glm::vec3& getVec3() const { return std::get<glm::vec3>(m_value); }
+	[[nodiscard]] glm::vec3& getVec3Ref() { return std::get<glm::vec3>(m_value); }
+	[[nodiscard]] const glm::vec4& getVec4() const { return std::get<glm::vec4>(m_value); }
+	[[nodiscard]] const glm::quat& getQuat() const { return std::get<glm::quat>(m_value); }
+	[[nodiscard]] float getFloat() const { return std::get<float>(m_value); }
+	[[nodiscard]] void* getPointer() const { return std::get<void*>(m_value); }
 
-	void setValue(OpValue value) { this->value = value; }
-	void setValue(const glm::mat4& mat) { value.matrix = mat; }
-	void setValue(const glm::vec3& vec) { value.vector3 = vec; }
-	void setValue(const glm::vec4& vec) { value.vector4 = vec; }
-	void setValue(const glm::quat& q) { value.quat = q; }
-	void setValue(float f) { value.fValue = f; }
-	void setValue(void* p) { value.pointer = p; }
+	template <typename T>
+	void setValue(T&& val)
+  {
+    m_value = val;
+	}
 };
