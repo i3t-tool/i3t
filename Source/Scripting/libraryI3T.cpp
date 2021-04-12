@@ -135,7 +135,7 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
         if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {occurances++;}
     }
     if(occurances==0){
-        std::cout<<"No matches found!"<<std::endl;
+        std::cout<<"No matches found."<<std::endl;
         return;
     }
     else if(occurances>1){
@@ -144,10 +144,10 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {
             ReturnValue->Val->Integer= (int)workspace->at(i)->m_nodebase->getId();
-            if(occurances>1){std::cout<<"Id: "<<i<<" Name: "<<label<<std::endl;}
+            if(occurances>1){std::cout<<"Id: "<<i<<", Name: "<<label<<std::endl;}
         }
     }
-    
+
 }
 void deleteNode(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
     int ida=Param[0]->Val->Integer;
@@ -157,12 +157,13 @@ void deleteNode(struct ParseState* Parser, struct Value* ReturnValue, struct Val
     for(int i=0;i<workspace->size();i++){
         if((int)workspace->at(i)->m_nodebase->getId()==ida){index=i;}
     }
-    if(index<0||index>=workspace->size()){ReturnValue->Val->Identifier=false;return;}
-    Core::NodePtr c= (workspace->at(index).get())->m_nodebase;
-    Core::GraphManager::unplugAll(c);
-    workspace->at(index)=workspace->back();
-    workspace->pop_back();
-    ReturnValue->Val->Integer=TRUE;
+    if(index<0||index>=workspace->size()){ReturnValue->Val->Integer=false;std::cout<<"Node does not exist."<<std::endl;return;}
+
+    WorkspaceNodeWithCoreData* cc= (workspace->at(index).get());
+    Ptr<WorkspaceWindow> ww = I3T::getWindowPtr<WorkspaceWindow>();
+    ww->NodeDelete(cc->m_id);
+
+    ReturnValue->Val->Integer=true;
 }
 void dataMat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
     glm::mat4 m;

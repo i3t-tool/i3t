@@ -37,7 +37,8 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
-	glm::mat4 ftransform=m_edited;//full transform from nodebase
+	//glm::mat4 ftransform=m_edited;//full transform from nodebase
+	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_edited;
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -104,7 +105,8 @@ void LookAtManipulator::update() {
 	//m_handlespace=getNormalized(getFullTransform(m_edited->parent));//TMP
 	//glm::mat4 m=m_edited;*(glm::vec3*)&m[3]+=center;
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
-	m_handlespace=glm::mat4(1.0f);
+	//m_handlespace=glm::mat4(1.0f);
+	m_handlespace=getNodeTransform(m_editednode,m_parent);
 	m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(center-eye,0.0f));
 
 	if(m_activehandle==-1){return;}
@@ -143,7 +145,8 @@ void LookAtManipulator::update() {
 		m_handlespace[3][m_axisnum]+=drag3[m_axisnum];
 	}
 	//glm::mat4 m=getFullTransform(this->editedobj->parent);//TMP
-	glm::mat4 m=glm::mat4(1.0f);//TMP
+	//glm::mat4 m=glm::mat4(1.0f);//TMP
+	glm::mat4 m=getNodeTransform(m_editednode,m_parent);
 	for (int i=0;i<4;i++){if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
 	glm::vec4 posh=(glm::inverse(m)*m_handlespace)[3];
 	///

@@ -1,10 +1,12 @@
 #include "World2.h"
 #include "HardcodedMeshes.h"
 #include "Components.h"
+#include "Transforms.h"
 
 #include "Config.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 #include "Source/Core/Nodes/GraphManager.h"
+#include "Source/Core/Input/InputManager.h"
 
 //#include "../Scripting/Scripting.h"
 
@@ -65,6 +67,39 @@ World2::World2(){
 
     this->sceneRoot->addChild(camera, false);
     this->sceneRoot->addChild(sceneHandles, false);
+
+    /*auto root = Builder::createSequence();
+    auto branch1 = Builder::createSequence();
+    auto branch2 = Builder::createSequence();
+
+    std::vector<Ptr<Core::NodeBase>> matrices = {
+        // sequence 1
+        Builder::createTransform<Core::EulerRotX>(),
+        Builder::createTransform<Core::Scale>(),
+        Builder::createTransform<Core::Translation>(),
+        // sequence 2
+        Builder::createTransform<Core::Scale>(),
+        Builder::createTransform<Core::Translation>(),
+        // sequence 3
+        Builder::createTransform<Core::Scale>(),
+        Builder::createTransform<Core::Translation>(),
+    };
+    ValueSetResult v = matrices[0].get()->setValue(3.14159f);
+    printf("ValueSetResult %d\n", v.status);
+
+    Core::GraphManager::plug(root, branch1, 0, 0);
+    Core::GraphManager::plug(root, branch2, 0, 0);
+
+    // Add matrices to the sequences.
+    root->addMatrix(matrices[0]); root->addMatrix(matrices[1]); root->addMatrix(matrices[2]);
+    branch1->addMatrix(matrices[3]); branch1->addMatrix(matrices[4]);
+    branch2->addMatrix(matrices[5]); branch2->addMatrix(matrices[6]);
+
+    // Create sequence–root path from "branch1" sequence to root sequence.
+    Core::SequenceTree tree(branch1);
+
+    glm::mat4 m = getNodeTransform(&(Ptr<Core::NodeBase>)matrices[4], &branch1);*/
+    //glm::mat4 m2=
 }
 bool World2::init(){
     World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
@@ -148,17 +183,18 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
     const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->m_nodebase;
 
-    //op=Builder::createTransform<Core::Free>();
+    //op=Builder::createTransform<Core::Frustum>();
     //op=Builder::createTransform<Core::OrthoProj>();
-    op=Builder::createTransform<Core::EulerRotX>();
+    //op=Builder::createTransform<Core::EulerRotX>();
     //op=Builder::createTransform<Core::AxisAngleRot>();
     //op=Builder::createTransform<Core::LookAt>(glm::vec3{-0.0f, 1.0f, 0.0f}, glm::vec3{-0.1f, 0.5f, 0.0f },glm::vec3{0.0f, 1.0f, 0.0f});
-    nodebase    = &op;
+    //nodebase    = &op;
+    op=*nodebase;
 
-    //WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
+    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
     Core::Transform::DataMap	data		= nodebase->get()->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->get()->getOperation(); //printf("b");
-	const char*					keyword		= operation->keyWord.c_str(); //printf("c");
+	const char*					keyword		= nodebase->get()->getOperation()->keyWord.c_str(); //printf("c");
     DataStore                   datastore   = nodebase->get()->getData(); //printf("d");
     glm::mat4                   mat         = datastore.getMat4(); //printf("e\n");
     
@@ -178,6 +214,67 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
         mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
     printf("------------\n");
 
+}
+void World2::tmpDrawNode() {
+	if(op.get()==nullptr){op= Builder::createTransform<Core::EulerRotX>();}
+	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
+	const glm::mat4& coreData = op->getData().getMat4();
+	const Core::Transform::DataMap& coreMap = op->getDataMap();
+	int idOfNode = nodebasedata->m_id.Get();
+	char label[]={0,0};
+    float localData=0.0f;
+
+	ImGui::PushItemWidth(50);
+	for (int rows = 0; rows < 4; rows++){
+		for (int columns = 0; columns < 4; columns++){
+			localData = coreData[columns][rows];
+			bool inactive = (coreMap[columns * 4 + rows] == 0 || coreMap[columns * 4 + rows] == 255);
+			if (inactive){
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+			}
+
+			ImGui::SameLine();
+			label[0]='a'+ columns * 4 + rows;
+			if(ImGui::DragFloat(label, &localData, 0.02f, 0.0f, 0.0f, fmt::format("% .{}f", 3).c_str(), 1.0f)){
+				op->setValue(localData, { columns, rows });
+			}
+
+			if (inactive){ImGui::PopItemFlag();ImGui::PopStyleVar();}
+		}
+		ImGui::NewLine();
+	}
+	ImGui::PopItemWidth();
+	ImGui::End();
+}
+void World2::tmpSetNode() {
+    if(InputManager::isKeyPressed(Keys::x))     {op=Builder::createTransform<Core::EulerRotX>();}
+    else if(InputManager::isKeyPressed(Keys::y)){op=Builder::createTransform<Core::EulerRotY>();}
+    else if(InputManager::isKeyPressed(Keys::z)){op=Builder::createTransform<Core::EulerRotZ>();}
+    else if(InputManager::isKeyPressed(Keys::w)){op=Builder::createTransform<Core::AxisAngleRot>();}
+    else if(InputManager::isKeyPressed(Keys::s)){op=Builder::createTransform<Core::Scale>();}
+    else if(InputManager::isKeyPressed(Keys::t)){op=Builder::createTransform<Core::Translation>();}
+    else if(InputManager::isKeyPressed(Keys::o)){op=Builder::createTransform<Core::OrthoProj>();}
+    else if(InputManager::isKeyPressed(Keys::p)){op=Builder::createTransform<Core::PerspectiveProj>();}
+    else if(InputManager::isKeyPressed(Keys::f)){op=Builder::createTransform<Core::Frustum>();}
+    else if(InputManager::isKeyPressed(Keys::g)){op=Builder::createTransform<Core::Free>();}
+    else if(InputManager::isKeyPressed(Keys::l)){op=Builder::createTransform<Core::LookAt>();}
+
+    for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
+        i->second.component->m_isActive=false;
+        *(i->second.editedNode)=nullptr;
+    }
+
+	const char*keyword=op->getOperation()->keyWord.c_str();
+
+    if(this->manipulators.count(keyword)==1){
+        Manipulator m=this->manipulators[keyword];
+        m.component->m_isActive=true;
+        *m.editedNode=&op;
+    }
+    else{
+        printf("no manipulators\n");
+    }
 }
 GameObject* World2::addModel(const char* name) {
     GameObject* g=nullptr;
@@ -201,6 +298,7 @@ void World2::onUpdate(){
     World2::width = viewport[2];
     World2::height= viewport[3];
     updateRecursive(this->sceneRoot);
+
     CHECK_GL_ERROR();
 }
 Shader2 World2::loadShader(const char* vs_name, const char* fs_name){

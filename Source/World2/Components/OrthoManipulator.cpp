@@ -38,7 +38,8 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==NULL){return;}
 	glm::mat4 projinv=glm::inverse(m_edited);;
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
-	glm::mat4 transform=glm::mat4(1.0f);
+	//glm::mat4 transform=glm::mat4(1.0f);
+	glm::mat4 transform=getNodeTransform(m_editednode,m_parent);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
 	if(renderTransparent){
@@ -112,7 +113,8 @@ void OrthoManipulator::update(){
 	pos[3]=0.0f;
 	axis[3]=0.0f;
 	//glm::mat4 handlespace=getFullTransform(m_gameObject);//TMP
-	glm::mat4 handlespace=glm::mat4(1.0f);
+	//glm::mat4 handlespace=glm::mat4(1.0f);
+	glm::mat4 handlespace=getNodeTransform(m_editednode,m_parent);
 			//vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));
 	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+pos));//position of transformated object on the screen
 	glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen (axis*axis is absolute value)

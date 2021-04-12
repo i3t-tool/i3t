@@ -33,7 +33,8 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
-	glm::mat4 ftransform=m_edited;//full transform from nodebase
+	//glm::mat4 ftransform=m_edited;//full transform from nodebase
+	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -97,7 +98,8 @@ void RotationManipulator::update() {
 	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 
 	//m_handlespace=getNormalized(getFullTransform(m_editedobj));//TMP
-	m_handlespace=m_edited;
+	//m_handlespace=m_edited;
+	m_handlespace=getNormalized(getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4());
 	m_handlespace[0][3]=0.0f;
 	m_handlespace[1][3]=0.0f;
 	m_handlespace[2][3]=0.0f;

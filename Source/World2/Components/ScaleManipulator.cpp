@@ -48,7 +48,8 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
-	glm::mat4 ftransform=m_edited;//full transform from nodebase
+	//glm::mat4 ftransform=m_edited;//full transform from nodebase
+	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();//full transform from nodebase
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -116,7 +117,8 @@ void ScaleManipulator::update() {
 
 	
 	//m_handlespace=getNormalized(getFullTransform(m_edited->parent)/**m_bkp*/);//TMP
-	m_handlespace=glm::mat4(1.0f);
+	//m_handlespace=glm::mat4(1.0f);
+	m_handlespace=getNodeTransform(m_editednode,m_parent);
 
 	if(m_activehandle==-1){/*m_bkp=m_edited->transformation;*/return;}
 

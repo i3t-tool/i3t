@@ -68,6 +68,10 @@ public:
     void onUpdate();
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
+
+    void tmpDrawNode();
+    void tmpSetNode();
+
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
     ///Remove GameObject from scene (viewport window)

@@ -111,7 +111,7 @@ glm::mat4 getFullTransform(GameObject* obj){
 	while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
 	return transform;
 }
-glm::mat4 getNodeTransform(Ptr<Core::NodeBase>*node,Ptr<Core::Sequence>*parent){
+glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent){
 	glm::mat4 m=glm::mat4(1.0f);
 	if(node==nullptr||parent==nullptr){return m;}
 	//Ptr<Core::NodeBase>n=Ptr<Core::NodeBase>(node.get());
