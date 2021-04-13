@@ -3,32 +3,32 @@
 #include "spdlog/fmt/fmt.h"
 #include <string>
 
-std::map<Core::Transform::DataMap, std::string> WorkspaceDatamapName = {
-    {Core::Transform::g_Free, "Free"},
-    {Core::Transform::g_Scale, "Scale"},
-    {Core::Transform::g_UniformScale, "Uniform scale"},
-    {Core::Transform::g_EulerX, "EulerX"},
-    {Core::Transform::g_EulerY, "EulerY"},
-    {Core::Transform::g_EulerZ, "EulerZ"},
-    {Core::Transform::g_Translate, "Translate"},
-    {Core::Transform::g_AllLocked, "Locked"},
-    {Core::Transform::g_Ortho, "Ortho"},
-    {Core::Transform::g_Frustum, "Frustum"},
-    {Core::Transform::g_Perspective, "Perspective"}
+std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName = {
+    {&Core::Transform::g_Free, "Free"},
+    {&Core::Transform::g_Scale, "Scale"},
+    {&Core::Transform::g_UniformScale, "Uniform scale"},
+    {&Core::Transform::g_EulerX, "EulerX"},
+    {&Core::Transform::g_EulerY, "EulerY"},
+    {&Core::Transform::g_EulerZ, "EulerZ"},
+    {&Core::Transform::g_Translate, "Translate"},
+    {&Core::Transform::g_AllLocked, "Locked"},
+    {&Core::Transform::g_Ortho, "Ortho"},
+    {&Core::Transform::g_Frustum, "Frustum"},
+    {&Core::Transform::g_Perspective, "Perspective"}
 };
 
-std::vector<Core::Transform::DataMap> WorkspaceDatamapMenuList = {
-Core::Transform::g_Free,
-Core::Transform::g_Scale,
-Core::Transform::g_UniformScale,
-Core::Transform::g_EulerX,
-Core::Transform::g_EulerY,
-Core::Transform::g_EulerZ,
-Core::Transform::g_Translate,
-Core::Transform::g_AllLocked,
-Core::Transform::g_Ortho,
-Core::Transform::g_Frustum,
-Core::Transform::g_Perspective};
+std::vector<Core::Transform::DataMap const *> WorkspaceDatamapMenuList = {
+&Core::Transform::g_Free,
+&Core::Transform::g_Scale,
+&Core::Transform::g_UniformScale,
+&Core::Transform::g_EulerX,
+&Core::Transform::g_EulerY,
+&Core::Transform::g_EulerZ,
+&Core::Transform::g_Translate,
+&Core::Transform::g_AllLocked,
+&Core::Transform::g_Ortho,
+&Core::Transform::g_Frustum,
+&Core::Transform::g_Perspective};
 
 
 //std::map<Core::ETransformType, std::vector<Transform::DataMap> > WorkspaceTransformTypeDatamaps = {
@@ -130,7 +130,7 @@ float WorkspaceNodeWithCoreData::setDataItemsWidth()
     return m_dataItemsWidth;
 }
 
-void WorkspaceNodeWithCoreData::setDataMap(const Core::Transform::DataMap& mapToSet)
+void WorkspaceNodeWithCoreData::setDataMap(Core::Transform::DataMap const * mapToSet)
 {
     m_nodebase->setDataMap(mapToSet);
 }
@@ -138,7 +138,7 @@ void WorkspaceNodeWithCoreData::setDataMap(const Core::Transform::DataMap& mapTo
 void WorkspaceNodeWithCoreData::drawMenuSetDataMap()
 {
     if (ImGui::BeginMenu("Set datamap")) {
-        for(Core::Transform::DataMap datamap : WorkspaceDatamapMenuList)
+        for(Core::Transform::DataMap const * datamap : WorkspaceDatamapMenuList)
         {
             if (ImGui::MenuItem(WorkspaceDatamapName[datamap].c_str())) {
                 setDataMap(datamap);

@@ -105,7 +105,7 @@ bool NodeBase::areAllInputsPlugged()
 	return areInputsPlugged(m_operation->numberOfInputs);
 }
 
-ENodePlugResult NodeBase::isPlugCorrect(Pin* input, Pin* output)
+ENodePlugResult NodeBase::isPlugCorrect(Pin const * input, Pin const * output)
 {
   auto* inp = input;
   if (!inp)
@@ -119,6 +119,12 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin* input, Pin* output)
   {
     // Do the input and output data types match?
     return ENodePlugResult::Err_MismatchedPinTypes;
+  }
+
+  if (inp->m_isInput == out->m_isInput)
+  {
+    // Do the input and output kind match?
+    return ENodePlugResult::Err_MismatchedPinKind;
   }
 
   if (inp->m_master == out->m_master)

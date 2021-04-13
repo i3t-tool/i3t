@@ -5,7 +5,7 @@ WorkspaceDeterminant::WorkspaceDeterminant(ImTextureID headerBackground, Workspa
 {}
 
 WorkspaceDeterminant::WorkspaceDeterminant(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceFloat(headerBackground, Builder::createNode<ENodeType::Determinant>(), headerLabel, nodeLabel)
+    : WorkspaceFloat(headerBackground, Core::Builder::createNode<ENodeType::Determinant>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceDeterminant::drawDataSetValues(util::NodeBuilder& builder)

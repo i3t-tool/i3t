@@ -5,7 +5,7 @@ WorkspaceMatrixInversion::WorkspaceMatrixInversion(ImTextureID headerBackground,
 {}
 
 WorkspaceMatrixInversion::WorkspaceMatrixInversion(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::Inversion>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::Inversion>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMatrixInversion::drawDataSetValues(util::NodeBuilder& builder)

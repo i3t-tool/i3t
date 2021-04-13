@@ -287,7 +287,7 @@ public:
 	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
 
 protected:
-  virtual ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+  virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const * output);
 
 private:
 	void unplugAll();
@@ -345,7 +345,7 @@ public:
 
 	[[nodiscard]] int getIndex() const { return m_index; }
 
-	[[nodiscard]] NodePtr getOwner() { return m_master; };
+	[[nodiscard]] NodePtr getOwner() const { return m_master; };
 
 	[[nodiscard]] const Pin* getParentPin() const
 	{

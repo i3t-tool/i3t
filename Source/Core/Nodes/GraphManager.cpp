@@ -6,7 +6,7 @@ using namespace Core;
 
 std::vector<Ptr<Cycle>> GraphManager::m_cycles;
 
-ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
+ENodePlugResult GraphManager::isPlugCorrect(Pin const * input, Pin const * output)
 {
 	auto lhs = input->m_master;
   return lhs->isPlugCorrect(input, output);

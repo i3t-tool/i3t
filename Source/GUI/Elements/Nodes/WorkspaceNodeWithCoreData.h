@@ -6,8 +6,8 @@
 
 class WorkspaceCorePinProperties;
 
-extern std::map<Core::Transform::DataMap, std::string> WorkspaceDatamapName;
-extern std::vector<Core::Transform::DataMap> WorkspaceDatamapMenuList;
+extern std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName;
+extern std::vector<Core::Transform::DataMap const *> WorkspaceDatamapMenuList;
 
 typedef std::vector<Core::Pin>::const_iterator corePinIter;
 typedef std::vector<Ptr<WorkspaceCorePinProperties>>::const_iterator corePinPropIter;
@@ -63,7 +63,7 @@ public:
     float setDataItemsWidth();
     float getDataItemsWidth();
 
-    void setDataMap(const Core::Transform::DataMap& mapToSet);
+    void setDataMap(const Core::Transform::DataMap* mapToSet);
     void drawMenuSetDataMap();
 
     void drawMenuSetPrecision();

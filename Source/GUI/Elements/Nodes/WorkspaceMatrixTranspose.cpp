@@ -5,7 +5,7 @@ WorkspaceMatrixTranspose::WorkspaceMatrixTranspose(ImTextureID headerBackground,
 {}
 
 WorkspaceMatrixTranspose::WorkspaceMatrixTranspose(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::Transpose>(), headerLabel, nodeLabel) {
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::Transpose>(), headerLabel, nodeLabel) {
 }
 
 void WorkspaceMatrixTranspose::drawDataSetValues(util::NodeBuilder& builder)

@@ -46,7 +46,7 @@ void Sequence::updateValues(int inputIndex)
 	m_internalData[1].setValue(result);
 }
 
-ENodePlugResult Sequence::isPlugCorrect(Pin* input, Pin* output)
+ENodePlugResult Sequence::isPlugCorrect(Pin const * input, Pin const * output)
 {
 	auto usualCheckResult = NodeBase::isPlugCorrect(input, output);
 	bool areBothDifferentSequences = GraphManager::getOperation(input) == GraphManager::getOperation(output) &&

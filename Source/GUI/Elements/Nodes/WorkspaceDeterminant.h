@@ -6,7 +6,7 @@ struct WorkspaceDeterminantArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Determinant header";
     std::string nodeLabel = "Determinant";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Determinant>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Determinant>();
 };
 
 
