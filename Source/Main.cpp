@@ -133,49 +133,14 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
  */
 int main(int argc, char* argv[])
 {
-	/// \todo Use logger!
-	// save the current dir to Config::WORKING_DIRECTORY
-	std::cout << "argv[0] is " << argv[0] << std::endl; // debugPrint
-
-#ifdef I3T_RELEASE_STANDALONE // variant for release
-	/*
-	 * 	Problem with Config::WORKING_DIRECTORY setting:
-	 *
-	 * 	Folta: Config::WORKING_DIRECTORY = string(argv[0]).substr(0, string(argv[0]).find_last_of("\\"));
-	 * 		   If started from console (cmd.exe) in directory release by writing i3t,
-	 *			  argv[0] is i3t --- and find finds no \ and returns -1 => WRONG WD
-	 *
-	 *	Hack:  Config::WORKING_DIRECTORY = string(".\\"); or "."
-	 *		   Setting to ".\\" or ".") does not work either
-	 *			  not working ofstream if Config::WORKING_DIRECTORY="." in void RecentFiles::writeRecent()
-	 *			  can't open config file : .\\data\gimbalContent.cnt
-	 *		   The ofstream and "." works strange also for starting by doubleclick.
-	 *
-	 *	Solution:  GetCurrentDirectory
-	 */
-	char buffer[MAX_PATH];
-	::GetCurrentDirectory(MAX_PATH, buffer);
-	std::cout << "Current working directory: " << buffer << "\n";
-	Config::WORKING_DIRECTORY = std::string(buffer);
-	/// \todo
+#ifdef I3T_RELEASE_STANDALONE // variant for standalone release
+	std::string root = "";
 #else // special settings for usage in Visual Studio devenv
-#ifdef I3T_DEBUG
-	// Config::WORKING_DIRECTORY = std::string(argv[0]).substr(0, std::string(argv[0]).find("Debug") - 1); // without
-	// \Debug
-
-	auto root = FS::absolute("");
-
-	Config::WORKING_DIRECTORY = root;
-	std::cout << "Current working directory: " << root << "\n";
-
-#else
-	Config::WORKING_DIRECTORY =
-			std::string(argv[0]).substr(0, std::string(argv[0]).find("Release") - 1); // without \Release
-#endif
+  auto root = FS::absolute("");
 #endif
 
 	Config::WORKING_DIRECTORY = root;
-	std::cout << "Current working directory: " << root << "\n";
+
 	// init the logging library
 	INIT_LOGGER(argc, argv);
 
@@ -245,8 +210,6 @@ int main(int argc, char* argv[])
 	if (!app.initI3T())
 	{
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_PROGRAM_INIT);
-		// getchar();
-		// return is;
 		LOG_FATAL("Cannot initialize I3T stuffs.");
 		exit(-1);
 	}
@@ -262,6 +225,5 @@ int main(int argc, char* argv[])
 
 	END_LOGGER;
 
-	getchar();
 	return 0;
 }

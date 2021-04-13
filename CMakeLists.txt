@@ -55,6 +55,8 @@ if (MSVC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
     message(STATUS "MSVC: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
     message(STATUS "MSVC: CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")
+
+    set(CMAKE_SHARED_LINKER_FLAGS  /MANIFEST:NO)
 endif()
 
 # Link C++17 filesystem library.
@@ -123,7 +125,6 @@ add_subdirectory(Dependencies/picoc)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
-
 
 # ======== Macros and functions. ==============================
 macro(copy_shared_libs target_project from_path)
@@ -226,39 +227,6 @@ set_target_properties(
 # ==== Organize files into groups in Visual Studio based on directories (ideal goal)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# ==== Source files grouping for VS. ==========================
-if(FALSE)
-	# Simple structure - .h and .cpp together
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${I3T_SOURCE})
-else()
-	# Better structure - .h and .cpp separated
-	# todo - group files into directories on the disk
-
-	file(GLOB_RECURSE I3T_SOURCE_H
-		"Source/*.h"
-		"Source/*.hpp"
-	)
-	file(GLOB_RECURSE I3T_SOURCE_CPP
-		"Source/*.cpp"
-	)
-	file(GLOB_RECURSE I3T_SOURCE_DEP
-		"Dependencies/pgr-framework/src/*"
-		"Dependencies/pgr-framework/include/*"
-#		"Dependencies/imgui/img*.*"
-#		"Dependencies/imgui/imconfig.h"
-		"Dependencies/imgui_node_editor/external/imgui/imgui*.h"
-		"Dependencies/imgui_node_editor/external/imgui/imgui*.cpp"
-		"Dependencies/imgui_node_editor/imgui*.h"
-		"Dependencies/imgui_node_editor/imgui*.cpp"
-#		"Dependencies/imgui/examples/imgui_impl_glfw.*"
-#		"Dependencies/imgui/examples/imgui_impl_opengl3.*"
-	)
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Header Files" FILES ${I3T_SOURCE_H})
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source Files" FILES ${I3T_SOURCE_CPP})
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${I3T_SOURCE_DEP})
-endif()
-# =============================================================
-
 # ==== Target parameters. =====================================
 # Tell ImGui which header file contains OpenGL functions signatures.
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
@@ -286,4 +254,9 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 set_target_properties(assimp PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
         RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}")
+
+if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Data" "${I3T_OUT_DIR}Data")
+endif()
 # =============================================================

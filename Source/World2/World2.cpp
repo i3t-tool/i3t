@@ -28,9 +28,9 @@ World2::World2(){
     this->onStart();*/
 }
 bool World2::initRender(){
-    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
-    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
-    World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
+    World2::shader0 =         loadShader(Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str());
+    World2::shaderHandle =    loadShader(Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str());
+    World2::shaderProj =      loadShader(Config::getAbsolutePath("Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("Data/shaders/viewproj-fs.glsl").c_str());
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
         getchar();printf("World2::initRender():cannot load shaders\n");return false;
     }
@@ -45,9 +45,9 @@ World2* World2::loadDefaultScene(){
     RenderTexture* rend;
     GameObject *objhandles, *camhandles, *lookat, *camera, *scene, *testparent, *testchild,*handles;
 
-    cubeGrayTexture = pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
-    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
-    axisTexture =     pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
+    cubeGrayTexture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
+    cubeTexture =     pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png"));
+    axisTexture =     pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png"));
 
     rend =        new RenderTexture(&renderTexture,256,256);
 
