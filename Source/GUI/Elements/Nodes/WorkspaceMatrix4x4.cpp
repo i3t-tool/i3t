@@ -25,7 +25,7 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
 	const glm::mat4& coreData = m_nodebase->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
+	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;

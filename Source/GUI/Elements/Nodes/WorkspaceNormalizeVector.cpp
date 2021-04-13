@@ -5,7 +5,7 @@ WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground,
 {}
 
 WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceVector4(headerBackground, Builder::createNode<ENodeType::NormalizeVector>(), headerLabel, nodeLabel)
+    : WorkspaceVector4(headerBackground, Core::Builder::createNode<ENodeType::NormalizeVector>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceNormalizeVector::drawDataSetValues(util::NodeBuilder& builder)

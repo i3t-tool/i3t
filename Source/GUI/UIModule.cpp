@@ -230,6 +230,7 @@ void UIModule::setFocusedWindow()
   const char* hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
   const char* focusedWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 
+	// Check for hovered window.
   if (strlen(hoveredWindowID) != 0)
   {
     auto mainID = makeIDNice(hoveredWindowID);

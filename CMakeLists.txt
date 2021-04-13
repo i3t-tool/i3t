@@ -201,9 +201,13 @@ if (True)
             yaml-cpp)
 
     set_target_properties(gtest PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+        LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+    )
     set_target_properties(gtest_main PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+        LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+    )
 
     target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
 endif()
@@ -279,5 +283,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${I3T_LOGS_DIR}")
 
 set_target_properties(assimp PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+        LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}")
 # =============================================================

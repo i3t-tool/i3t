@@ -87,16 +87,9 @@ public:
 	void initModules();
 
 	/**
-	 * \fn	int init()
-	 *
-	 * \brief	Load hard coded objects (geometry and textures), load some shaders, create the world and load the initial
-	 * scene. \brief	Loads the shaders, updates the camera mode.
-	 *
-	 * \retval 0 OK
-	 * \retval 1 files error (not loaded textures, shaders)
-	 * \retval 2 shader compile error
+	 * \brief	Initializes renderer and scene.
 	 */
-	int initI3T();
+	bool initI3T();
 
 private:
 	static Application s_instance;
@@ -112,7 +105,7 @@ private:
 
 	bool m_bShouldClose = false;
 
-	World2* m_world2;
+	World2* m_world;
 	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	GlfwWindow* m_window;

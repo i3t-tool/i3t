@@ -4,68 +4,12 @@
 
 using namespace Core;
 
-ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
+std::vector<Ptr<Cycle>> GraphManager::m_cycles;
+
+ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 {
-	auto* inp = input;
-	if (!inp)
-		return ENodePlugResult::Err_NonexistentPin;
-
-	auto* out = output;
-	if (!out)
-		return ENodePlugResult::Err_NonexistentPin;
-
-	if (inp->m_opValueType != out->m_opValueType)
-	{
-		// Do the input and output data types match?
-		return ENodePlugResult::Err_MismatchedPinTypes;
-	}
-
-	if (inp->m_isInput == out->m_isInput)
-	{
-		// Is one pin input and other output?
-		return ENodePlugResult::Err_MismatchedPinKind;
-	}
-
-	if (inp->m_master == out->m_master)
-	{
-		// Not a circular edge?
-		return ENodePlugResult::Err_Loopback;
-	}
-
-	// cycle detector
-	auto toFind = inp->m_master; // INPUT
-
-	// stack in vector - TOS is at the vector back.
-	std::vector<Ptr<NodeBase>> stack;
-
-	// PUSH(output) insert element at end.
-	stack.push_back(out->m_master);
-
-	while (!stack.empty())
-	{
-		// Return last element of mutable sequence.
-		auto act = stack.back();
-		stack.pop_back();
-
-		if (act == toFind)
-			return ENodePlugResult::Err_Loop;
-
-		for (auto& pin : act->m_inputs)
-		{
-			if (pin.isPluggedIn())
-			{
-				Pin* ct = pin.m_input;
-				stack.push_back(ct->m_master);
-			}
-		}
-	}
-
-	/*
-	  if (isOperatorPlugCorrectMod != NULL)
-	    return isOperatorPlugCorrectMod(inp, out);
-	*/
-
-	return ENodePlugResult::Ok;
+	auto lhs = input->m_master;
+  return lhs->isPlugCorrect(input, output);
 }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
@@ -76,8 +20,10 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
-	Debug::Assert(rightNode->m_inputs.size() > myIndex, "Desired input pin in this node with myIndex does not exists!");
-	Debug::Assert(leftNode->m_outputs.size() > fromIndex, "Desired pin in other node with fromIndex does not exists!");
+	Debug::Assert(rightNode->m_inputs.size() > myIndex,
+	              "Node {} does not have input pin with index {}!", rightNode->getSig(), myIndex);
+	Debug::Assert(leftNode->m_outputs.size() > fromIndex,
+	              "Node {} does not have output pin with index {}!", leftNode->getSig(), fromIndex);
 
 	auto result = isPlugCorrect(&rightNode->m_inputs[myIndex], &leftNode->m_outputs[fromIndex]);
 	if (result != ENodePlugResult::Ok)
@@ -90,6 +36,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	rightNode->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
 
 	leftNode->spreadSignal();
+
+	rightNode->setDataMap(&Transform::g_AllLocked);
 
 	return ENodePlugResult::Ok;
 }
@@ -104,14 +52,17 @@ ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>&
   return plug(seq, node, 1, nodeIndex);
 }
 
-void GraphManager::unplugAll(Ptr<Core::NodeBase>& node)
+void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
-	node.get()->unplugAll();
+  node.get()->unplugAll();
+	node->setDataMap(&Transform::g_Free);
 }
 
-void GraphManager::unplugInput(Ptr<Core::NodeBase> const & node, int index)
+void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
+	if (getAllInputNodes(node).empty())
+    node->setDataMap(&Transform::g_Free);
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
@@ -119,34 +70,32 @@ void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 	node.get()->unplugOutput(index);
 }
 
-Ptr<NodeBase> GraphManager::getParent(Ptr<NodeBase>& node, size_t index)
+std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)
 {
-	auto pins = node->getInputPins();
-	if (pins.empty() || pins[index].m_input == nullptr)
-	{
+  std::vector<Ptr<NodeBase>> result;
+  size_t inputsCount = node->getInputPins().size();
+  for (size_t i = 0; i < inputsCount; ++i)
+  {
+    auto parent = getParent(node);
+    if (parent != nullptr)
+      result.push_back(parent);
+  }
+
+  return result;
+}
+
+Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
+{
+  auto pins = node->getInputPins();
+
+  if (index > pins.size())
 		return nullptr;
-	}
-	return pins[index].m_input->m_master;
-}
 
-Ptr<NodeBase> GraphManager::getParent(Ptr<Sequence> node, size_t index)
-{
-	auto seq = std::dynamic_pointer_cast<NodeBase>(node);
-	return getParent(seq, index);
-}
-
-std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(Ptr<Core::NodeBase>& node)
-{
-	std::vector<Ptr<NodeBase>> result;
-	size_t inputsCount = node->getInputPins().size();
-	for (size_t i = 0; i < inputsCount; ++i)
-	{
-		auto parent = getParent(node);
-		if (parent != nullptr)
-			result.push_back(parent);
-	}
-
-	return result;
+  if (pins.empty() || pins[index].m_input == nullptr)
+  {
+    return nullptr;
+  }
+  return pins[index].m_input->m_master;
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
@@ -162,7 +111,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& 
 	return result;
 }
 
-std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(Ptr<Core::NodeBase>& node, size_t index)
+std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
 {
 	Debug::Assert(node->getOutputPins().size() > index, "Out of range.");
 
@@ -173,6 +122,29 @@ std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(Ptr<Core::NodeBase>& nod
 		result.push_back(other->m_master);
 
 	return result;
+}
+
+void GraphManager::update(double tick)
+{
+	for (auto& cycle : m_cycles)
+		cycle->update(tick);
+}
+
+const Operation* GraphManager::getOperation(const Pin* pin)
+{
+	return pin->m_master->getOperation();
+}
+
+bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs)
+{
+	return lhs->m_master == rhs->m_master;
+}
+
+bool GraphManager::arePlugged(const Pin& input, const Pin& output)
+{
+	Debug::Assert(input.isInput(), "Given input pin is not input pin.");
+	if (!input.isPluggedIn()) return false;
+	return input.getParentPin() == &output;
 }
 
 SequenceTree::SequenceTree(Ptr<NodeBase> sequence)
