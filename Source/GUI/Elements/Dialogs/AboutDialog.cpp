@@ -5,12 +5,12 @@
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "Core/API.h"
-#include "Rendering/TextureRegion.h"
 #include "Utils/TextureLoader.h"
 
 AboutDialog::AboutDialog()
 {
-	dcgiReg = std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f, 0.0f, 1.0f, 1.0f);
+	/// \todo MH Load DCGI logo.
+	// dcgiReg = std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 void AboutDialog::render()
@@ -19,7 +19,7 @@ void AboutDialog::render()
 	{
 		ImGui::Columns(2, NULL, false);
 
-		ImGui::Image((void*)(intptr_t)dcgiReg->getTexId(), ImVec2(243.0f, 66.0f), ImVec2(0, 1), ImVec2(1, 0));
+		// ImGui::Image((void*)(intptr_t)dcgiReg->getTexId(), ImVec2(243.0f, 66.0f), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::NextColumn();
 

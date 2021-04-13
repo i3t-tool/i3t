@@ -1,7 +1,5 @@
 #include "InputActions.h"
 
-#include "Rendering/GUIProjection.h"
-
 /// \todo Set default keys according to the Dr. Felkel's table.
 bool InputActions::CameraOrbit = true;
 Keys::Code InputActions::KeyWorld_mousePan = Keys::mouseMiddle;
@@ -21,5 +19,5 @@ Keys::Code InputActions::Key_redo = Keys::n;
 void InputActions::resize(float width, float height)
 {
 	InputManager::setScreenSize((int)width, (int)height);
-	GUIProjection::setScreenSize(width, height);
+	// GUIProjection::setScreenSize(width, height);
 }

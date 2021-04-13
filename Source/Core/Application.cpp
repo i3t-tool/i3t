@@ -17,8 +17,6 @@
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
-#include "Rendering/ShaderProvider.h"
-#include "Rendering/Shaper.h"
 #include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
@@ -65,13 +63,6 @@ void Application::initWindow()
 {
 	m_window = new GlfwWindow();
 	m_window->init();
-
-	/// \todo Show console -> ShowWindow() function is from Win32 API.
-	// showConsole(Config::SHOW_CONSOLE);
-
-	/// \todo GLFW does not support timer directly, timer callback behaviour must be implemented
-	/// by yourself.
-	// glutTimerFunc(Config::REFRESHTIME, onTimer, 0);
 }
 
 void Application::run()
@@ -141,80 +132,35 @@ void Application::logicUpdate()
 
 void Application::finalize()
 {
+	delete m_world;
 
-	delete m_world2;
-	// world = nullptr; //PF problem during glutExit...
-
-	/// \todo Write recent files.
-	// RecentFiles::writeRecent();
-
+	/*
 	ShaderProvider::dispose(); // delete red, base and alpha shaders
 
 	Shaper::dispose(); // delete shaper shaders (local shaders in shaper.cpp)
 
 	TextureLoader::endTextures();
 	TextureLoader::endHCTextures();
+	 */
 
 	glfwTerminate();
 }
 
-int Application::initI3T()
+bool Application::initI3T()
 {
-	int err;
-
-	///   - load hard coded textures to TextureLoader
-	if (!TextureLoader::loadHCTexture("defAxisTex", Config::getAbsolutePath("/Data/textures/axis.png")))
-		return 1;
-	if (!TextureLoader::loadHCTexture("cGrid", Config::getAbsolutePath("/Data/textures/cGrid.png")))
-		return 1;
-	if (!TextureLoader::loadHCTexture("abCube", Config::getAbsolutePath("/Data/textures/cube.png")))
-		return 1;
-	if (!TextureLoader::loadHCTexture("cube_color", Config::getAbsolutePath("/Data/textures/cube_color.png")))
-		return 1;
-	if (!TextureLoader::loadHCTexture("dcgiLogo", Config::getAbsolutePath("/Data/textures/dcgi-logo-60.png")))
-		return 1;
-	if (!TextureLoader::loadHCTexture("icons", Config::getAbsolutePath("/Data/textures/icons.png")))
-		return 1;
-	if (!TextureLoader::loadHCTexture("white", Config::getAbsolutePath("/Data/textures/white.png")))
-		return 1;
-
-	/// \todo the font texture name should be defined as config parameter. Now hard coded also in TabSpace::init
-	if (!TextureLoader::loadHCTexture("tahoma_16_0.png",
-	                                  Config::getAbsolutePath("/Data/internal/font/tahoma_16_0.png")))
-		return 1;
-
-	///   - init Shaper, probably the line debugger
-	err = Shaper::initShaders();
-	if (err)
-		return err;
-
-	///    - Init shaders in ShaderProvider <br> Note: Other shaders are in: shaper.cpp(162), GUI\glyphShader.cpp(26),
-	///    and GUI\tabShader.cpp(24)
-	err = ShaderProvider::init(Config::getAbsolutePath("/Data/internal/shaders/red.vert").c_str(),
-	                           Config::getAbsolutePath("/Data/internal/shaders/red.frag").c_str(),
-	                           Config::getAbsolutePath("/Data/internal/shaders/base.vert").c_str(),
-	                           Config::getAbsolutePath("/Data/internal/shaders/base.frag").c_str(),
-	                           Config::getAbsolutePath("/Data/internal/shaders/alpha.vert").c_str(),
-	                           Config::getAbsolutePath("/Data/internal/shaders/alpha.frag").c_str());
-	if (err)
-		return err;
-
-	// read content files -- see 6 lines below
-	// if (Reader::readContentCFG(Config::getAbsolutePath(Config::CONTENT_FILE.c_str()).c_str())) return 1;
-
 	// new scene scheme
 	bool b = World2::initRender();
-	m_world2 = World2::loadDefaultScene();
+	m_world = World2::loadDefaultScene();
 
-	//testing
+	// \todo DG testing
 	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
 	glm::mat4 m=glm::mat4(1.0f);
 	ValueSetResult result = mat->m_nodebase->setValue(glm::vec3(2.0f,2.0f,2.0f));
 	printf("value set result %d\n",result.status);
-	//ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
-	m_world2->handlesSetMatrix(mat);
+	// ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+	m_world->handlesSetMatrix(mat);
 
-	return 0;
+	return b;
 }
 
 Application& Application::get()
@@ -229,7 +175,7 @@ UIModule* Application::getUI()
 
 World2* Application::world2()
 {
-	return m_world2;
+	return m_world;
 }
 ImFont* Application::getFont(int fontId)
 {
@@ -256,4 +202,5 @@ void Application::enqueueCommand(ICommand* command)
 	m_commands.push_back(command);
 }
 
+// Statics
 Application Application::s_instance;

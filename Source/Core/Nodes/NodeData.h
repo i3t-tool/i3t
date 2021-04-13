@@ -24,10 +24,10 @@ class DataMap
 
 public:
 	DataMap(std::array<const unsigned char, 16> data) : m_data(data) {};
-	//DataMap(const DataMap&) = delete;
-	//DataMap(DataMap&&) = delete;
-  //DataMap& operator=(const DataMap&) = delete;
-  //DataMap& operator=(DataMap&&) = delete;
+	DataMap(const DataMap&) = delete;
+	DataMap(DataMap&&) = delete;
+  DataMap& operator=(const DataMap&) = delete;
+  DataMap& operator=(DataMap&&) = delete;
 
   unsigned char operator[](size_t i) const { return m_data[i]; };
 };
