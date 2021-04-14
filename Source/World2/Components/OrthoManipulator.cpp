@@ -54,14 +54,7 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 		glDepthRange(0.0, 0.01);
 		glUseProgram(World2::shaderHandle.program);
 
-		glStencilMask(255);
 		for(int i=0;i<6;i++){
-			glStencilFunc(GL_ALWAYS, m_stencils.arr[i], 255);
-			glm::vec3 col=glm::vec4((float)(m_activehandle==m_stencils.arr[i]));
-			col[(5-i)/2]=1.0f;
-
-			m_handle->color=glm::vec4(col[0],col[1],col[2],1.0f);
-
 			glm::vec4 pos=projinv*m_hposs[i];
 			pos/=pos[3];
 
@@ -69,10 +62,8 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 			m_handle->transformation=glm::mat4(depth*0.01f+0.1f);
 			m_handle->transformation[3]=pos;
 
-			m_handle->draw(transform);
-			//printf("%d, %f %f %f %f\n",i,pos[0],pos[1],pos[2],pos[3]);//getchar();
+			ManipulatorUtil::drawHandle(m_handle,transform,m_hposs[i]*m_hposs[i],m_stencils.arr[i],m_activehandle,m_hoverhandle);//hposs*hposs=absolute value
 		}
-		glStencilMask(0);
 
 		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
 
@@ -87,28 +78,32 @@ void OrthoManipulator::update(){
 	if(m_editednode==NULL){return;}
 	Core::OrthoProj*editedortho=(Core::OrthoProj*)m_editednode->get();
 	m_edited=m_editednode->get()->getData().getMat4();
-	if (InputManager::isKeyJustUp(Keys::mouseLeft)) {m_activehandle=-1;}
-	
-	m_left=		editedortho->getLeft();
-	m_right=	editedortho->getRight();
-	m_top=		editedortho->getTop();
-	m_bottom=	editedortho->getBottom();
-	m_near=		editedortho->getNear();
-	m_far=		editedortho->getFar();
-		
-	if (InputManager::isKeyJustPressed(Keys::mouseLeft)){
-		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World2::height- InputManager::m_mouseY),3,-1);
+
+	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+	m_hoverhandle=-1;
+
+	if(m_activehandle==-1){
+		for(int i=0;i<6;i++){if(sel==m_stencils.arr[i]){m_hoverhandle=m_stencils.arr[i];m_axisnum=i;}}
+	}
+	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		m_activehandle=-1;
 		for(int i=0;i<6;i++){if(sel==m_stencils.arr[i]){m_activehandle=m_stencils.arr[i];m_axisnum=i;}}
 	}
+	if(InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
 		
 	if(m_activehandle==-1){return;}
 
 	if(InputManager::isKeyJustUp(Keys::esc)){}
 	glm::mat4 projinv=glm::inverse(m_edited);
 	glm::vec4 axis=m_hposs[m_axisnum];
-	glm::vec4 pos=projinv*m_hposs[m_axisnum];	
-	pos/=pos[3];
+	glm::vec4 pos=projinv*m_hposs[m_axisnum];pos/=pos[3];
+
+	glm::vec4 p=projinv*glm::vec4(-1.0f,0.0f,-1.0f,1.0f);	p/=p[3];	m_left=		p[0];
+	p=			projinv*glm::vec4(1.0f,0.0f,-1.0f,1.0f);	p/=p[3];	m_right=	p[0];
+	p=			projinv*glm::vec4(0.0f,1.0f,-1.0f,1.0f);	p/=p[3];	m_top=		p[1];
+	p=			projinv*glm::vec4(0.0f,-1.0f,-1.0f,1.0f);	p/=p[3];	m_bottom=	p[1];
+	p=			projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);	p/=p[3];	m_near=		-p[2];
+	p=			projinv*glm::vec4(0.0f,0.0f,1.0f,1.0f);		p/=p[3];	m_far=		-p[2];
 			
 	pos[3]=0.0f;
 	axis[3]=0.0f;
