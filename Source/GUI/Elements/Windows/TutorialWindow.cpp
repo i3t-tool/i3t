@@ -14,6 +14,7 @@
 #include "Core/Application.h"
 #include "Tutorial/Tutorial.h"
 #include "Tutorial/TutorialLoader.h"
+#include "Utils/Other.h"
 #include "Utils/TextureLoader.h"
 
 #include <filesystem>
@@ -27,16 +28,38 @@ const int SMALL_SPACE = 5;
 const int CONTROLS_SIZE_Y = 100;
 
 // TEMPORARY TODO
-static std::string current_dir = "";
-
-// TEMPORARY TODO
-inline ImGui::MarkdownImageData ImageCallback( ImGui::MarkdownLinkCallbackData data_ )
+std::shared_ptr<Tutorial> TutorialWindow::m_tutorial;
+std::string TutorialWindow::m_current_dir;
+inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
 {
+
+
   // In your application you would load an image based on data_ input. Here we just use the imgui font texture.
-  std::string image_path = current_dir + data_.link;
+  std::string image_path = m_current_dir + data_.link;
+  image_path.pop_back(); // VERY TEMPORARY BUG FIX where there's an "\n" in the data_.link member
   image_path.pop_back(); // BUG FIX where there's an ")" in the data_.link member
   //std::cout << image_path.c_str() << std::endl;
-  int tex_id = TextureLoader::loadTexture(data_.text, image_path);
+
+  // try to find the texture, if it isnt loaded, then load it
+  int tex_id;
+  // todo temporary safety check
+  if (m_tutorial == nullptr) {
+    tex_id = 0;
+  }
+  else if (const auto it{ m_tutorial->m_filenameToImage.find(image_path) }; it != std::end(m_tutorial->m_filenameToImage)) {
+    tex_id = it->second->m_texID;
+  }
+  else {
+    try {
+      m_tutorial->m_filenameToImage[image_path] = std::make_shared<GUIImage>(image_path);
+      tex_id = m_tutorial->m_filenameToImage[image_path]->m_texID;
+    }
+    catch (const std::runtime_error& error) {
+      tex_id = 0;
+    }
+  }
+
+  //int tex_id = TextureLoader::loadTexture(data_.text, image_path);
   
   ImGui::MarkdownImageData imageData{ true, false, (ImTextureID)tex_id, ImVec2( 400.0f, 200.0f ) };
 
@@ -61,20 +84,38 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   m_current_step = 0;
   m_mdConfig = ImGui::MarkdownConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
 
-  // TEMPORARY todo
-  TutorialHeader dummy_header;
-  setTutorial(dummy_header);
+  //// TEMPORARY todo
+  //std::shared_ptr<TutorialHeader> dummy_header = std::make_shared<TutorialHeader>("none");
+  //setTutorial(dummy_header);
 }
 
-void TutorialWindow::setTutorial(TutorialHeader header)
+void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader> header)
 {
-  m_tutorial = TutorialLoader::loadTutorial(std::move(header)); // btw if there was a previous unique pointer to another Tutorial, it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
+  std::optional<std::shared_ptr<Tutorial>> tutorial = TutorialLoader::loadTutorial(header);
+  if (!tutorial.has_value()) {
+    LOG_ERROR("Tutorial " + header->m_filename + " not loaded.")
+    return;
+  }
+  m_tutorial = tutorial.value();
+  // btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
   setStep(0);
 
-  std::cout << m_tutorial->m_header.m_filename;
-  std::filesystem::path p(m_tutorial->m_header.m_filename);
-  current_dir = p.parent_path().string() + "/";
-  std::cout << current_dir;
+  // todo make a utility function for this
+  std::cout << m_tutorial->m_header->m_filename;
+  std::filesystem::path p(m_tutorial->m_header->m_filename);
+  m_current_dir = p.parent_path().string() + "/";
+  std::cout << m_current_dir;
+}
+
+void TutorialWindow::setTutorial(std::string path)
+{
+  std::optional<std::shared_ptr<TutorialHeader>> header = TutorialLoader::loadTutorialHeader(path);
+  if (header.has_value()) {
+    setTutorial(header.value());
+  }
+  else {
+    LOG_ERROR("Tutorial header " + path + " not loaded." );
+  }
 }
 
 bool TutorialWindow::setStep(int step_number)
@@ -109,7 +150,13 @@ void TutorialWindow::render()
   //ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
   //ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(245, 245, 245, 255));
   // BEGIN WINDOW
-  const std::string window_name = "Tutorial - " + m_tutorial->m_header.m_title + "###Tutorial window";
+  std::string window_name;
+  if (m_tutorial != nullptr) {
+    window_name = "Tutorial - " + m_tutorial->m_header->m_title + "###Tutorial window";
+  }
+  else {
+    window_name = "Tutorial - empty###Tutorial window";
+  }
   ImGui::Begin(window_name.c_str(), &Application::get().m_showTutorialWindow);
 
   // CREATE IMGUI CONTENT
@@ -128,13 +175,17 @@ void TutorialWindow::renderTutorialHeader()
 {
   //ImGui::BeginChild("header");
   std::string title;
-  if (m_tutorial->getStepCount() > 0) {
-    title = m_tutorial->m_steps[m_current_step].m_title;
+  if (m_tutorial == nullptr){
+    title = "No tutorial";
+  }
+  else if (m_tutorial->getStepCount() > 0) {
+    title = m_tutorial->m_header->m_title;
   }
   else {
     title = "Empty tutorial";
   }
 
+  // todo
   if (title != "undefined") {
     ImGui::PushFont(App::get().getFont(FONT_TITLE));
     ImGui::TextWrapped(title.c_str());
@@ -175,7 +226,7 @@ void TutorialWindow::renderTutorialContent()
   {
     if (m_tutorial->getStepCount() > 0) {
       // ITERATE OVER WIDGETS IN CURRENT STEP AND RENDER THEM
-      for (std::unique_ptr<TWidget>& widget_uptr : m_tutorial->m_steps[m_current_step].m_content) {
+      for (std::shared_ptr<TutorialElement>& widget_uptr : m_tutorial->m_steps[m_current_step].m_content) {
         widget_uptr->acceptRenderer(this);
       }
     }
@@ -192,33 +243,37 @@ void TutorialWindow::renderTutorialContent()
   ImGui::EndChild();
 }
 
-void TutorialWindow::renderTextWidget(TWText* tw_text)
+void TutorialWindow::renderExplanation(Explanation* explanation)
 {
-  ImGui::Markdown( tw_text->m_text.c_str(), tw_text->m_text.length(), m_mdConfig);
+  ImGui::Markdown( explanation->m_content.c_str(), explanation->m_content.length(), m_mdConfig);
 }
 
-void TutorialWindow::renderImageWidget(TWImage* tw_image)
-{
-}
-
-void TutorialWindow::renderAnimatedImageWidget(TWAnimatedImage* tw_animated_image)
+void TutorialWindow::renderChoiceTask(ChoiceTask* choice)
 {
 }
 
-void TutorialWindow::renderTaskWidget(TWTask* tw_task)
+void TutorialWindow::renderMultiChoiceTask(MultiChoiceTask* multiChoice)
+{
+}
+
+void TutorialWindow::renderInputTask(InputTask* input)
+{
+}
+
+void TutorialWindow::renderTask(Task* task)
 {
   ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
   ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
 
-  ImGui::TextWrapped(tw_task->m_task.c_str());
+  ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
 
   ImGui::PopStyleColor();
   ImGui::PopFont();
   ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
 }
 
-void TutorialWindow::renderHintWidget(TWHint* tw_hint)
+void TutorialWindow::renderHint(Hint* hint)
 {
   //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
@@ -228,19 +283,13 @@ void TutorialWindow::renderHintWidget(TWHint* tw_hint)
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
     //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
     //ImGui::TextWrapped(tw_hint->m_hint.c_str());
-    ImGui::Markdown( tw_hint->m_hint.c_str(), tw_hint->m_hint.length(), m_mdConfig);
+    ImGui::Markdown( hint->m_content.c_str(), hint->m_content.length(), m_mdConfig);
     ImGui::PopStyleColor();
   }
   else {
     ImGui::PopStyleColor();
   }
 }
-
-void TutorialWindow::renderSpacingWidget(TWSpacing* tw_hint)
-{
-  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
-}
-
 
 void TutorialWindow::renderTutorialControls()
 {
@@ -251,7 +300,8 @@ void TutorialWindow::renderTutorialControls()
   ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
 
   // ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0,0,0,1));
-  ImGui::ProgressBar(static_cast<float>(m_current_step) / static_cast<float>(m_tutorial->getStepCount()), ImVec2(-1, 20));
+  const int progress = m_tutorial == nullptr ? 0 : m_tutorial->getStepCount();
+  ImGui::ProgressBar(static_cast<float>(m_current_step) / static_cast<float>(progress), ImVec2(-1, 20));
   // ImGui::PopStyleColor();
 
   ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
@@ -267,7 +317,7 @@ void TutorialWindow::renderTutorialControls()
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
   if (ImGui::Button("Next", ImVec2(-1, 0)))
   {
-    if (m_current_step != m_tutorial->getStepCount() - 1) {
+    if (m_tutorial != nullptr && m_current_step != m_tutorial->getStepCount() - 1) {
       m_current_step++;
       //std::cout << m_current_step << std::endl;
     }

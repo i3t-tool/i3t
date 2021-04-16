@@ -1,153 +1,188 @@
 ﻿#pragma once
 
+#include "GUIImage.h"
 #include "TutorialRenderer.h"
 
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
 // forward declaration from TutorialRenderer.h to avoid cyclic dependency
 class ITutorialRenderer;
 
-struct TWidget
+struct TutorialElement
 {
-  virtual ~TWidget() = default;
-  //std::string m_id;
+  TutorialElement()
+  {
+    m_content = "";
+  }
+  TutorialElement(std::string content)
+    : m_content(std::move(content)) {}
+  virtual ~TutorialElement() = default;
+
+  std::string m_content;
+  //std::string m_id; // not used
+
   virtual void acceptRenderer(ITutorialRenderer* tutorialRenderer) = 0;
 };
 
-struct TWText : TWidget  // can also contain bullets and other MD syntaxe for now 
+struct Explanation : TutorialElement  // can also contain bullets and other MD syntax for now 
 {
-  TWText(std::string text) : m_text(text) {}
-  std::string m_text;
+  //Explanation()
+  //{
+  //  m_content = "";
+  //}
+  Explanation(std::string explanation)
+    : TutorialElement(std::move(explanation)) {}
+
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
-    tutorialRenderer->renderTextWidget(this);
+    tutorialRenderer->renderExplanation(this);
   }
 };
 
-struct TWTask : TWidget 
+struct Task : TutorialElement 
 {
-  TWTask(std::string task) : m_task(task) {}
-  std::string m_task;
+  Task(std::string task)
+    : TutorialElement(std::move(task)),
+      m_completed(false)
+  {
+  }
+
+  bool m_completed; // todo future feature
+
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
-    tutorialRenderer->renderTaskWidget(this);
+    tutorialRenderer->renderTask(this);
   }
 };
 
-struct TWHint : TWidget 
+struct Hint : TutorialElement 
 {
-  TWHint(std::string hint) : m_hint(hint) {}
-  std::string m_hint;
+  Hint(std::string hint)
+    : TutorialElement(std::move(hint)),
+      m_collapsed(true)
+  {
+  }
+  bool m_collapsed; // todo future feature
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
-    tutorialRenderer->renderHintWidget(this);
+    tutorialRenderer->renderHint(this);
   }
 };
 
-struct TWSpacing : TWidget 
+struct ChoiceTask : TutorialElement
 {
-  TWSpacing() = default;
+  ChoiceTask(std::string question, std::vector<std::string> choices, int correctChoice)
+    : TutorialElement(std::move(question)),
+      m_choices(std::move(choices)),
+      m_correctChoice(correctChoice)
+  {
+  }
+  std::vector<std::string> m_choices;
+  int m_correctChoice;
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
-    tutorialRenderer->renderSpacingWidget(this);
+    tutorialRenderer->renderChoiceTask(this);
   }
 };
 
-struct TWImage : TWidget
+struct MultiChoiceTask : TutorialElement
 {
-  TWImage(std::string filename) : m_filename(filename) {}
-  std::string m_filename;
+  MultiChoiceTask(std::string question, std::vector<std::string> choices, std::vector<int> correctChoices)
+    : TutorialElement(std::move(question)),
+      m_choices(std::move(choices)),
+      m_correctChoices(std::move(correctChoices))
+  {
+  }
+  std::vector<std::string> m_choices;
+  std::vector<int> m_correctChoices;
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
-    tutorialRenderer->renderImageWidget(this);
+    tutorialRenderer->renderMultiChoiceTask(this);
   }
 };
 
-struct TWAnimatedImage : TWidget
+struct InputTask : TutorialElement
 {
-  std::string m_filename;
-  // todo animation stuf
+  InputTask(std::string question, std::unordered_set<std::string> correctAnswers)
+    : TutorialElement(std::move(question)),
+      m_correctAnswers(std::move(correctAnswers))
+  {
+  }
+  std::unordered_set<std::string> m_correctAnswers;
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
-    tutorialRenderer->renderAnimatedImageWidget(this);
+    tutorialRenderer->renderInputTask(this);
   }
 };
 
-// struct TWButton : TWidget
-// {
-//   std::string m_text;
-//   // todo command
-//   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
-//   {
-//     tutorialRenderer->renderButtonWidget(this);
-//   }
-// };
 
 struct TStep
 {
-  explicit TStep() { m_title = "undefined"; }
-  explicit TStep(std::string title) : m_title(std::move(title)) {}
-  std::string m_title;
-  // HACK using unique pointers because I need pointers in general in order to avoid slicing of subclass objects (TWText,...) into the base class (TWidget) when storing them in this vector.
+  TStep() = default;
+
+  // std::string m_title; // deprecated
+  std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
+
+  // todo
+  // maybe call task?
+  // tasks - ptrs to all task widgets
+  // questions - ptrss to all question widgets
+  // isCompleted - true if all tasks and questions completed (also check in each update vs check after every change)
+
+  // old HACK - using unique pointers because I need pointers in general in order to avoid slicing of subclass objects (TWText,...) into the base class (TWidget) when storing them in this vector.
   // also, it is preffered to have steps also as unique pointers, 
-  std::vector<std::unique_ptr<TWidget>> m_content;
 };
 
 struct TutorialHeader
 {
-  TutorialHeader();
-  ~TutorialHeader();
+  TutorialHeader(std::string filename,
+                 std::string title,
+                 std::string description,
+                 std::shared_ptr<GUIImage> thumbnail,
+                 std::string sceneFilename)
+    : m_filename(std::move(filename)),
+      m_title(std::move(title)),
+      m_description(std::move(description)),
+      m_thumbnailImage(std::move(thumbnail)),
+      m_sceneFilename(std::move(sceneFilename))
+  {
+  }
+  ~TutorialHeader() = default;
+
   std::string m_filename;
   std::string m_title;
   std::string m_description;
-  std::string m_thumb_filename;
-  unsigned int m_thumb_gl_id;
-  std::string m_scene_filename;
+  std::shared_ptr<GUIImage> m_thumbnailImage;
+  std::string m_sceneFilename;
   
 };
 
 /**
- * \brief Structure for holding information need for showing a specific tutorial. Is filled by \fn TutorialLoader::loadFile() function.
+ * \brief Structure for holding information need for showing a specific tutorial. Should be created by \fn TutorialLoader::loadFile() function.
  */
 struct Tutorial
 {
-  Tutorial(TutorialHeader header);
-  ~Tutorial();
+  Tutorial(std::shared_ptr<TutorialHeader> header, 
+           std::vector<TStep> steps, 
+           std::unordered_map<std::string, std::shared_ptr<GUIImage>> filenameToImageMap)
+    : m_header(std::move(header)),
+      m_steps(std::move(steps)),
+      m_filenameToImage(std::move(filenameToImageMap))
+  { 
+  }
+  ~Tutorial() = default;
   // general
-  TutorialHeader m_header;
+  std::shared_ptr<TutorialHeader> m_header;
   // step content
   std::vector<TStep> m_steps;
   // support structures
-  std::unordered_map<std::string, unsigned int> m_image_to_gl_id; // filename to GLuint
+  std::unordered_map<std::string, std::shared_ptr<GUIImage>> m_filenameToImage; // filename to GUIImage (including GLuint id)
   // other properties
   int getStepCount() const { return m_steps.size(); }
 };
 
-
-inline TutorialHeader::TutorialHeader()
-{
-  m_filename = "";
-  m_title = "undefined";
-  m_description = "undefined";
-  m_thumb_filename = "";
-  m_thumb_gl_id = 0;
-  m_scene_filename = "";
-}
-
-inline TutorialHeader::~TutorialHeader() = default;
-
-inline Tutorial::Tutorial(TutorialHeader header) {
-  m_header = header;
-}
-
-inline Tutorial::~Tutorial()
-{
-  // todo free loaded images from video memory
-  // EDIT NOPE! use destructor in the proper widget ... ah... well, its opengl..
-  // then decide, depending on where youll do the opengl initializing stuff
-  // also, you should probably decide if OOP is the top one you use, or if you are trying to force some MVC stuff in here
-}

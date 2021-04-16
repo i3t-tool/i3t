@@ -1,161 +1,396 @@
 ﻿#include "TutorialLoader.h"
-#include "Tutorial/Tutorial.h"
-#include "Logger/Logger.h"
 #include <iostream>
 #include <fstream>
-#include <utility>
-#include <yaml-cpp/yaml.h>
-#include <imgui.h>
-#include <stdint.h>
+#include <cstdint>
+#include "yaml-cpp/yaml.h"
+#include "imgui.h"
+#include "stb_image.h"
 #include "pgr.h"
+#include "Logger/Logger.h"
+#include "Tutorial/Tutorial.h"
 
-TutorialHeader TutorialLoader::loadTutorialHeader(std::string filename)
+std::optional<std::shared_ptr<TutorialHeader>> TutorialLoader::loadTutorialHeader(std::string& path)
 {
-  
-  // CREATE TUTORIAL
-  TutorialHeader tutorial_header; // we create our tutorial object on heap
-  // filename
-  tutorial_header.m_filename = filename;
-
-  // CHECK
-  std::ifstream tutorial_stream(filename);
-  if (!tutorial_stream.good()) {
-    LOG_ERROR("Tutorial file '" + filename + "' was not found")
-    return tutorial_header; // return a dummy tutorial
+  // PARSE GENERAL INFO (YAML)
+  YAML::Node tutorial_yaml;
+  try {
+    tutorial_yaml = YAML::LoadFile(path);
+  } catch (...) {
+    LOG_ERROR("Tutorial file '" + path + "' not found or YAML header unparsable") //todo change logging
+    return std::nullopt; // return nothing
   }
+  //std::cout << tutorial_yaml << std::endl;
 
-  // -- PARSE GENERAL INFO - YAML --
-  YAML::Node tutorial_yaml = YAML::LoadFile(filename);
-  std::cout << tutorial_yaml << std::endl;
   // title
+  std::string title = "undefined";
   if (tutorial_yaml["title"])
   {
-    tutorial_header.m_title = tutorial_yaml["title"].as<std::string>();
-    LOG_DEBUG(tutorial_header.m_title);
+    title = tutorial_yaml["title"].as<std::string>();
+    LOG_DEBUG(title);
   }
   else
   {
     LOG_ERROR("Tutorial title not specified");
   }
   // description
+  std::string description = "undefined";
   if (tutorial_yaml["description"])
   {
-    tutorial_header.m_description = tutorial_yaml["description"].as<std::string>();
-    LOG_DEBUG(tutorial_header.m_description);
+    description = tutorial_yaml["description"].as<std::string>();
+    LOG_DEBUG(description);
   }
   else
   {
     LOG_ERROR("Tutorial description not specified");
   }
-  return tutorial_header;
+  // thumbnail
+  std::shared_ptr<GUIImage> thumbnail = nullptr; // todo dummy image here? - rather later when rendering and encountering a nullptr
+  if (tutorial_yaml["thumbnail"]) {
+    // todo
+    try {
+      thumbnail = std::make_shared<GUIImage>(tutorial_yaml["description"].as<std::string>());
+    }
+    catch (std::runtime_error& e) {
+      LOG_ERROR(e.what())
+    }
+  }
+  else {
+    LOG_ERROR("Thumbnail not specified");
+  }
+  // scene
+  std::string sceneFile;
+  if (tutorial_yaml["scene"]) {
+    sceneFile = tutorial_yaml["scene"].as<std::string>();
+    LOG_DEBUG(sceneFile);
+  }
+  else
+  {
+    LOG_ERROR("Scene file not specified");
+  }
+
+  // we create our tutorial header object on heap, we are using shared ptr, so that when there arent any references, we can eg properly free the loaded image and destroy it
+  return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description), std::move(thumbnail), std::move(sceneFile)); 
 }
 
-std::unique_ptr<Tutorial> TutorialLoader::loadTutorial(TutorialHeader header)
+std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 {
-  // CREATE TUTORIAL
-  std::unique_ptr<Tutorial> tutorial(new Tutorial(header)); // we create our tutorial object on heap
   // CHECK
-  std::ifstream tutorial_stream(header.m_filename);
-  if (!tutorial_stream.good()) {
-    LOG_ERROR("Tutorial file '" + header.m_filename + "' was not found")
-    return tutorial; // return a dummy tutorial
+  std::ifstream tutorialStream(header->m_filename);
+  if (!tutorialStream.good()) {
+    LOG_ERROR("Tutorial file '" + header->m_filename + "' was not found")
+    return std::nullopt; // return nothing
   }
 
-  // -- PARSE STEPS - CUSTOM + IMGUI MARKDOWN --
-  //   SKIP YAML (MOVE STREAM POINTER PAST IT)
-  int yaml_sep_count = 0;
-  std::string line;
-  while (yaml_sep_count < 2) {
-    // read line and check for EOF
-    std::getline(tutorial_stream, line);
-    if (!tutorial_stream.good()) {
-      if (tutorial_stream.eof()) {
-        LOG_ERROR("Tutorial file '" + header.m_filename + "' missing 2 '---' markers at the beginning of file")
-      } else {
-        LOG_ERROR("Tutorial file '" + header.m_filename + "' I/O error")
-      }
-      return tutorial; // return a dummy tutorial
+  // SKIP YAML (MOVE STREAM POINTER PAST IT)
+  int yamlSeparatorCount = 0;
+  while (yamlSeparatorCount < 2) {
+    // GET FIRST WORD OF THE LINE AND MOVE TO NEXT ONE
+    std::string firstWord;
+    tutorialStream >> firstWord;
+    if (firstWord == "---"){
+      yamlSeparatorCount++;  // if its a --- then note it
     }
-    // convert to stream and compare first block of text to '---'
-    std::istringstream line_iss(line);
-    std::string first_text_block;
-    line_iss >> first_text_block;
-    if (first_text_block == "---"){
-      yaml_sep_count++;
+    tutorialStream.ignore(std::numeric_limits<std::streamsize>::max(), tutorialStream.widen('\n'));  // skip to the next line
+    // CHECK
+    if (!tutorialStream.good()) {
+      if (tutorialStream.eof()) {
+        LOG_ERROR("Tutorial file '" + header->m_filename + "' missing 2 '---' YAML marks at the beginning of file or no further content behind them")
+      } else {
+        LOG_ERROR("Tutorial file '" + header->m_filename + "' I/O error")
+      }
+      return std::nullopt; 
     }
   }
-  //   READ THE REST
-  int current_step = -1;
-  bool was_spacing = false;
-  while (tutorial_stream.good()) {
-    std::getline(tutorial_stream, line);
-    std::cout << "* " << line << std::endl;
-    // convert to stream and compare first block to keywords
-    std::istringstream line_iss(line);
-    std::string first_text_block;
-    line_iss >> first_text_block;
-    // new step line
-    if (first_text_block == "#") {
-      current_step++;
-      line_iss >> std::ws;  // skip spaces
-      std::string step_title;
-      std::getline(line_iss, step_title);  // get rest of the line
-      if (step_title.empty()) {
-        tutorial->m_steps.emplace_back(TStep());
-      }
-      else {
-        tutorial->m_steps.emplace_back(TStep(step_title));
-      }
+
+  // PREPARE PARSING MACHINE
+  std::vector<TStep> steps;  // we will be filling this vector and then creating a tutorial with it
+  steps.emplace_back();  // add the first step
+  int currentStep = 0;
+  int currentBlockIndent = -1;
+  blockType_t currentBlock = NOT_BLOCK;
+  std::string line;
+  // temporaries for accumulating multiple line content:
+  std::string textStore;
+  std::vector<std::string> vectorOfTextsStore;
+  int numberStore = -1;
+  std::vector<int> vectorOfNumsStore;
+
+  // auto canBeSingleLine = [](blockType_t keyword) -> bool {
+  //   static const std::unordered_set<blockType_t> singleLines {
+  //     EMPTY, STEP_START, TASK, HINT
+  //   };
+  //   return singleLines.find(keyword) != singleLines.end();
+  // };
+  // auto canBeMultiLine = [](blockType_t keyword) -> bool {
+  //   static const std::unordered_set<blockType_t> multiLines {
+  //     TASK, HINT, 
+  //   };
+  //   return singleLines.find(keyword) != singleLines.end();
+  // };
+
+  auto isBlockType = [](const std::string& string)
+  {
+    // is keyword
+    static const std::unordered_map<std::string, blockType_t> stringToBlockType = {
+        { "task:", TASK },
+        { "hint:", HINT },
+        { "choice:", CHOICE },
+        { "multichoice:", MULTICHOICE },
+        { "input:", INPUT }
+    };
+    if (const auto it{ stringToBlockType.find(string) }; it != std::end(stringToBlockType)) {
+      return it->second;
     }
-    // empty line
-    else if (first_text_block.empty()) {
-      if (current_step == -1) {
+    // is anything else
+    return NOT_BLOCK;
+  };
+
+  auto isSingleLineType = [](const std::string& string)
+  {
+    // is keyword
+    static const std::unordered_map<std::string, singleLineType_t> stringToSingleLineType = {
+        { "task:", TASK_SINGLE },
+        { "hint:", HINT_SINGLE },
+        { "x:", CORRECT_ANSWER },
+        { "o:", WRONG_ANSWER },
+        { "answers:", ANSWER_LIST }
+    };
+    if (const auto it{ stringToSingleLineType.find(string) }; it != std::end(stringToSingleLineType)) {
+      return it->second;
+    }
+    // is anything else
+    return NOT_SINGLE_LINE;
+  };
+
+  // do i need this funtion? i think i dont even need a switch, i just add to the stores
+  //auto addToCurrentBlock = [&](const std::string& string) -> void {
+  //  switch (currentBlock) {
+  //  case EXPLANATION:
+  //    textStore
+  //  }
+  //};
+
+  auto endCurrentBlock = [&]() -> void {
+    switch (currentBlock) {
+    case EXPLANATION:
+      createExplanation(steps[currentStep], textStore);
+      break;
+    case TASK:
+      createTask(steps[currentStep], textStore);
+      break;
+    case HINT:
+      createHint(steps[currentStep], textStore);
+      break;
+    default:
+      LOG_INFO("Creation of " + std::to_string(currentBlock) + " not implemented yet");
+    }
+    
+    currentBlock = NOT_BLOCK;
+  };
+
+  auto beginBlock = [&](blockType_t blockType) -> void {
+    // drop current block if any (safety check)
+    if (currentBlock) {
+      endCurrentBlock();
+    }
+    // set active block
+    currentBlock = blockType;
+    // reset temporary block variables
+    textStore.clear();
+    vectorOfTextsStore.clear();
+    numberStore = -1;
+    vectorOfNumsStore.clear();
+  };
+
+  auto handleSingleLine = [&](singleLineType_t type, const std::string& content) -> void {
+    // check also for current state, and show error when calling singlelines which do not match
+    // nektere pripady ponechavaji state, jine ho musi resetovat!
+
+    //createTask(steps[currentStep], std::move(oneLineContent));
+    // oneLineContent = ""; // unnecessary since i reinit it every while
+
+    switch (type) {
+    case TASK_SINGLE:
+      endCurrentBlock();
+      createTask(steps[currentStep], content);
+      break;
+    case HINT_SINGLE:
+      endCurrentBlock();
+      createHint(steps[currentStep], content);
+      break;
+    default:
+      LOG_INFO("Creation of " + std::to_string(type) + " not implemented yet");
+    }
+  };
+
+  // READ LINES
+  while (std::getline(tutorialStream, line).good()) {
+    // std::cout << "| " << line << std::endl; // todo logging using info
+
+    // PROCESS LINE
+    // make a stream again to be able to move through it
+    std::istringstream lineStream(line); 
+    // skip spaces
+    skipSpaces(lineStream);  //NOTE: 
+    // tell how much indentation did we skip
+    int indent = static_cast<int>(lineStream.tellg()); // todo use
+    // save first word
+    std::string firstWord;
+    lineStream >> firstWord;
+    // special case when empty
+    if (firstWord.empty()) {
+      endCurrentBlock();
+      // todo add this to endcurrentblock: currentBlock = NOT_BLOCK;
+      continue;
+    }
+    // special case when start of a new step
+    if (firstWord == "--") {
+      endCurrentBlock();
+      steps.emplace_back();
+      currentStep++;
+      continue;
+    }
+    // recognize type of line / command
+    blockType_t blockType = isBlockType(firstWord);
+    singleLineType_t singleLineType = isSingleLineType(firstWord);
+    // skip possible spaces between keyword and content if any
+    skipSpaces(lineStream);
+    // get any possible remaining text
+    std::string restOfLine;
+    std::getline(lineStream, restOfLine);
+    // handle single-lines
+    if (singleLineType) {
+      // actually used as single-line
+      if (!restOfLine.empty()) {
+        handleSingleLine(singleLineType, restOfLine);
         continue;
       }
-      was_spacing = true;
-    }
-    // other lines
-    else {
-      // check if not before first step
-      if (current_step == -1) {
-        LOG_ERROR("Tutorial file '" + header.m_filename + "' has characters before first step")
+      // actually used as block but the type does not allow blocks
+      else if (!blockType) {
+        std::cerr << "NOT A BLOCK COMMAND: " << line << std::endl;
+        // todo handle error
       }
+    }
+    // handle block starts
+    if (blockType) {
+      // actually used as block start
+      if (restOfLine.empty()) {
+        beginBlock(blockType);
+      }
+      // actually used as single line but the type does not allow single lines (implicitly by if order)
       else {
-        if (was_spacing && !tutorial->m_steps[current_step].m_content.empty()) {
-          // make a spacing before this widget (if not the first widget)
-          tutorial->m_steps[current_step].m_content.push_back(std::make_unique<TWSpacing>());
-          was_spacing = false; //reset
-        }
-        // task line
-        if (first_text_block == ">")
-        {
-          line_iss >> std::ws;  // skip spaces
-          std::string task;
-          std::getline(line_iss, task);  // get rest of the line
-          tutorial->m_steps[current_step].m_content.push_back(std::make_unique<TWTask>(task));
-        }
-        // hint line
-        else if (first_text_block == "?")
-        {
-          line_iss >> std::ws;  // skip spaces
-          std::string hint;
-          std::getline(line_iss, hint);  // get rest of the line
-          tutorial->m_steps[current_step].m_content.push_back(std::make_unique<TWHint>(hint));
-        }
-        // text line
-        else {
-          // save the whole line as text widget
-          tutorial->m_steps[current_step].m_content.push_back(std::make_unique<TWText>(line));
-        }
+        std::cerr << "NOT A SINGLELINE COMMAND: " << line << std::endl;
+        // todo handle error
       }
     }
-
+    // handle other text
+    else {
+      // no current block -> start explanation
+      if (!currentBlock) {
+        beginBlock(EXPLANATION);
+      }
+      // set this block's indent if this is the first line
+      if (currentBlockIndent == -1) {
+        currentBlockIndent = indent;
+      }
+      // skip that many spaces
+      // todo temporary
+      lineStream.seekg(0);
+      skipSpaces(lineStream, indent);
+      // add to active block
+      std::getline(lineStream, restOfLine);
+      textStore += restOfLine;
+      textStore += '\n';
+      //addToCurrentBlock(line);
+    }
   }
 
   // CHECK if parsing ended because of error
-  if (!tutorial_stream.eof()) { 
-    LOG_ERROR("Tutorial file '" + header.m_filename + "' I/O error");
+  if (!tutorialStream.eof()) { 
+    LOG_ERROR("Tutorial file '" + header->m_filename + "' I/O error");
   }
+
+
+  
+  // CREATE THE TUTORIAL
+  std::optional<std::shared_ptr<Tutorial>> tutorial = std::make_shared<Tutorial>(std::move(header), std::move(steps), std::unordered_map<std::string, std::shared_ptr<GUIImage>>()); // we create our tutorial object on heap
+
+  return tutorial;
+  // OLD NOTE: this will automatically move the unique pointer, no need to worry 
+}
+
+//TutorialLoader::blockType_t TutorialLoader::isKeyword(const std::string& string)
+//{
+//  // is empty
+//  if (string.empty()) {
+//    return EMPTY;
+//  }
+//  // is keyword
+//  static const std::unordered_map<std::string, blockType_t> stringToKeyword = {
+//    { "--", STEP_START },
+//    { "task:", TASK },
+//    { "hint:", HINT },
+//    { "choice:", CHOICE },
+//    { "multichoice:", MULTICHOICE },
+//    { "input:", INPUT }
+//  };
+//  if (const auto it{ stringToKeyword.find(string) }; it != std::end(stringToKeyword)) {
+//    return it->second;
+//  }
+//  // is anything else
+//  return EXPLANATION;
+//}
+
+void TutorialLoader::skipSpaces(std::istringstream& stream)
+{
+  while (stream.peek() == ' ' || stream.peek() == '\t') { // check if space
+    stream.ignore(); // skip the character
+  }
+}
+
+void TutorialLoader::skipSpaces(std::istringstream& stream, unsigned int maxCount)
+{
+  for (int i=0; i < maxCount; i++) { 
+    if (stream.peek() == ' ' || stream.peek() == '\t') { // check if space
+      stream.ignore(); // skip the character 
+    }
+    else {
+      break;
+    }
+  }
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createExplanation(TStep& step, const std::string& string)
+{
+  return step.m_content.emplace_back(std::make_shared<Explanation>(string));
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createTask(TStep& step, const std::string& string)
+{
+  return step.m_content.emplace_back(std::make_shared<Task>(string));
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createHint(TStep& step, const std::string& string)
+{
+  return step.m_content.emplace_back(std::make_shared<Hint>(string));
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createChoice(TStep& step, const std::string& question, const std::vector<std::string>& choices, int correctChoice)
+{
+  return step.m_content.emplace_back(std::make_shared<ChoiceTask>(question, choices, correctChoice));
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createMultichoice(TStep& step, const std::string& question, std::vector<std::string>& choices, const std::vector<int>& correctChoices)
+{
+  return step.m_content.emplace_back(std::make_shared<MultiChoiceTask>(question, choices, correctChoices));
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TStep& step, const std::string& question,  const std::unordered_set<std::string>& correctAnswers)
+{
+  // todo
+  return step.m_content.emplace_back(std::make_shared<InputTask>(question, correctAnswers));
+}
+
 
   /*
   // nicely fill it at that heap place ^^
@@ -177,23 +412,30 @@ std::unique_ptr<Tutorial> TutorialLoader::loadTutorial(TutorialHeader header)
   step2.m_content.push_back(std::make_unique<TWText>("omg"));
   */
 
-  return tutorial; // NOTE: this will automatically move the unique pointer, no need to worry 
-}
+// void TutorialLoader::loadImages()
+// {
+//   // todo for cyklus
+//
+// }
+//
+// unsigned int TutorialLoader::loadImageOpenGL(std::string& filename)
+// {
+//   // todo opengl image loading, zvazit co pouzit za knihovnu
+//
+//   // return pgr::createTexture(filename);
+//
+//   return 0;
+// }
+//
+//
+//
+// std::shared_ptr<Tutorial> TutorialLoader::getDummyTutorial(std::string message)
+// {
+//   
+// }
 
-void TutorialLoader::loadImages()
-{
-  // todo for cyklus
 
-}
 
-unsigned int TutorialLoader::loadImageOpenGL(std::string filename)
-{
-  // todo opengl image loading, zvazit co pouzit za knihovnu
-
-  // return pgr::createTexture(filename);
-
-  return 0;
-}
 
 // TEMPORARY COPY OF IMGUI MARKDOWN TO BE CHANGED AND USED IN THIS CLASS
 namespace md
@@ -406,32 +648,32 @@ You can add [links like this one to enkisoftware](https://www.enkisoftware.com/)
 struct Link;
 struct MarkdownConfig;
 
-struct MarkdownLinkCallbackData                 // for both links and images
+struct MarkdownLinkCallbackData // for both links and images
 {
-  const char*       text;                 // text between square brackets []
-  int           textLength;
-  const char*       link;                 // text between brackets ()
-  int           linkLength;
-  void*           userData;
-  bool          isImage;              // true if '!' is detected in front of the link syntax
+  const char* text; // text between square brackets []
+  int textLength;
+  const char* link; // text between brackets ()
+  int linkLength;
+  void* userData;
+  bool isImage; // true if '!' is detected in front of the link syntax
 };
 
-struct MarkdownTooltipCallbackData                // for tooltips
+struct MarkdownTooltipCallbackData // for tooltips
 {
   MarkdownLinkCallbackData linkData;
-  const char*        linkIcon;
+  const char* linkIcon;
 };
-  
+
 struct MarkdownImageData
 {
-  bool          isValid = false;                     // if true, will draw the image
-  bool          useLinkCallback = false;             // if true, linkCallback will be called when image is clicked
-  ImTextureID       user_texture_id = 0;             // see ImGui::Image
-  ImVec2          size = ImVec2( 100.0f, 100.0f );   // see ImGui::Image
-  ImVec2          uv0 = ImVec2( 0, 0 );              // see ImGui::Image
-  ImVec2          uv1 = ImVec2( 1, 1 );              // see ImGui::Image
-  ImVec4          tint_col = ImVec4( 1, 1, 1, 1 );   // see ImGui::Image
-  ImVec4          border_col = ImVec4( 0, 0, 0, 0 ); // see ImGui::Image
+  bool isValid = false;                   // if true, will draw the image
+  bool useLinkCallback = false;           // if true, linkCallback will be called when image is clicked
+  ImTextureID user_texture_id = 0;        // see ImGui::Image
+  ImVec2 size = ImVec2(100.0f, 100.0f);   // see ImGui::Image
+  ImVec2 uv0 = ImVec2(0, 0);              // see ImGui::Image
+  ImVec2 uv1 = ImVec2(1, 1);              // see ImGui::Image
+  ImVec4 tint_col = ImVec4(1, 1, 1, 1);   // see ImGui::Image
+  ImVec4 border_col = ImVec4(0, 0, 0, 0); // see ImGui::Image
 };
 
 enum class MarkdownFormatType
@@ -444,36 +686,34 @@ enum class MarkdownFormatType
 
 struct MarkdownFormatInfo
 {
-  MarkdownFormatType    type  = MarkdownFormatType::NORMAL_TEXT;
-  int32_t         level   = 0;                 // Set for headings: 1 for H1, 2 for H2 etc.
-  bool          itemHovered = false;             // Currently only set for links when mouse hovered, only valid when start_ == false
-  const MarkdownConfig*   config  = NULL;
+  MarkdownFormatType type = MarkdownFormatType::NORMAL_TEXT;
+  int32_t level = 0;        // Set for headings: 1 for H1, 2 for H2 etc.
+  bool itemHovered = false; // Currently only set for links when mouse hovered, only valid when start_ == false
+  const MarkdownConfig* config = NULL;
 };
 
-typedef void        MarkdownLinkCallback( MarkdownLinkCallbackData data );  
-typedef void        MarkdownTooltipCallback( MarkdownTooltipCallbackData data );
+typedef void MarkdownLinkCallback(MarkdownLinkCallbackData data);
+typedef void MarkdownTooltipCallback(MarkdownTooltipCallbackData data);
 
-inline void defaultMarkdownTooltipCallback( MarkdownTooltipCallbackData data_ )
+inline void defaultMarkdownTooltipCallback(MarkdownTooltipCallbackData data_)
 {
-  if( data_.linkData.isImage )
-  {
-    ImGui::SetTooltip( "%.*s", data_.linkData.linkLength, data_.linkData.link );
+  if (data_.linkData.isImage) {
+    ImGui::SetTooltip("%.*s", data_.linkData.linkLength, data_.linkData.link);
   }
-  else
-  {
-    ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon, data_.linkData.linkLength, data_.linkData.link );
+  else {
+    ImGui::SetTooltip("%s Open in browser\n%.*s", data_.linkIcon, data_.linkData.linkLength, data_.linkData.link);
   }
 }
 
-typedef MarkdownImageData   MarkdownImageCallback( MarkdownLinkCallbackData data );
-typedef void        MarkdownFormalCallback( const MarkdownFormatInfo& markdownFormatInfo_, bool start_ );
+typedef MarkdownImageData MarkdownImageCallback(MarkdownLinkCallbackData data);
+typedef void MarkdownFormalCallback(const MarkdownFormatInfo& markdownFormatInfo_, bool start_);
 
-inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFormatInfo_, bool start_ );
+inline void defaultMarkdownFormatCallback(const MarkdownFormatInfo& markdownFormatInfo_, bool start_);
 
 struct MarkdownHeadingFormat
-{   
-  ImFont*         font;    // ImGui font
-  bool          separator; // if true, an underlined separator is drawn after the header
+{
+  ImFont* font;   // ImGui font
+  bool separator; // if true, an underlined separator is drawn after the header
 };
 
 // Configuration struct for Markdown
@@ -482,14 +722,14 @@ struct MarkdownHeadingFormat
 // - headingFormats controls the format of heading H1 to H3, those above H3 use H3 format
 struct MarkdownConfig
 {
-  static const int    NUMHEADINGS = 3;
+  static const int NUMHEADINGS = 3;
 
-  MarkdownLinkCallback*   linkCallback = NULL;
+  MarkdownLinkCallback* linkCallback = NULL;
   MarkdownTooltipCallback* tooltipCallback = NULL;
-  MarkdownImageCallback*  imageCallback = NULL;
-  const char*       linkIcon = "";            // icon displayd in link tooltip
-  MarkdownHeadingFormat   headingFormats[ NUMHEADINGS ] = { { NULL, true }, { NULL, true }, { NULL, true } };
-  void*           userData = NULL;    
+  MarkdownImageCallback* imageCallback = NULL;
+  const char* linkIcon = ""; // icon displayd in link tooltip
+  MarkdownHeadingFormat headingFormats[NUMHEADINGS] = {{NULL, true}, {NULL, true}, {NULL, true}};
+  void* userData = NULL;
   MarkdownFormalCallback* formatCallback = defaultMarkdownFormatCallback;
 };
 
@@ -497,7 +737,8 @@ struct MarkdownConfig
 // External interface
 //-----------------------------------------------------------------------------
 
-inline void Markdown( const char* markdown_, size_t markdownLength_, const MarkdownConfig& mdConfig_ );  // funckce k volani z venku pro zprasovani a vyrenderovani ImGui contentu na zaklade toho stringu
+inline void Markdown(const char* markdown_, size_t markdownLength_, const MarkdownConfig& mdConfig_);
+// funckce k volani z venku pro zprasovani a vyrenderovani ImGui contentu na zaklade toho stringu
 
 //-----------------------------------------------------------------------------
 // Internals
@@ -505,14 +746,16 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
 
 struct TextRegion;
 struct Line;
-inline void UnderLine( ImColor col_ );
-inline void RenderLine( const char* markdown_, Line& line_, TextRegion& textRegion_, const MarkdownConfig& mdConfig_ );
+inline void UnderLine(ImColor col_);
+inline void RenderLine(const char* markdown_, Line& line_, TextRegion& textRegion_, const MarkdownConfig& mdConfig_);
 
 struct TextRegion
 {
-  TextRegion() : indentX( 0.0f )
+  TextRegion()
+    : indentX(0.0f)
   {
   }
+
   ~TextRegion()
   {
     ResetIndent();
@@ -520,89 +763,92 @@ struct TextRegion
 
   // ImGui::TextWrapped will wrap at the starting position
   // so to work around this we render using our own wrapping for the first line
-  void RenderTextWrapped( const char* text_, const char* text_end_, bool bIndentToHere_ = false )
+  void RenderTextWrapped(const char* text_, const char* text_end_, bool bIndentToHere_ = false)
   {
     const float scale = 1.0f;
-    float     widthLeft = ImGui::GetContentRegionAvail().x;
-    const char* endLine = ImGui::GetFont()->CalcWordWrapPositionA( scale, text_, text_end_, widthLeft );
-    ImGui::TextUnformatted( text_, endLine );
-    if( bIndentToHere_ )
-    {
+    float widthLeft = ImGui::GetContentRegionAvail().x;
+    const char* endLine = ImGui::GetFont()->CalcWordWrapPositionA(scale, text_, text_end_, widthLeft);
+    ImGui::TextUnformatted(text_, endLine);
+    if (bIndentToHere_) {
       float indentNeeded = ImGui::GetContentRegionAvail().x - widthLeft;
-      if( indentNeeded )
-      {
-        ImGui::Indent( indentNeeded );
+      if (indentNeeded) {
+        ImGui::Indent(indentNeeded);
         indentX += indentNeeded;
       }
     }
     widthLeft = ImGui::GetContentRegionAvail().x;
-    while( endLine < text_end_ )
-    {
+    while (endLine < text_end_) {
       text_ = endLine;
-      if( *text_ == ' ' ) { ++text_; }  // skip a space at start of line
-      endLine = ImGui::GetFont()->CalcWordWrapPositionA( scale, text_, text_end_, widthLeft );
-      if( text_ == endLine ) 
-      {
+      if (*text_ == ' ') { ++text_; } // skip a space at start of line
+      endLine = ImGui::GetFont()->CalcWordWrapPositionA(scale, text_, text_end_, widthLeft);
+      if (text_ == endLine) {
         endLine++;
       }
-      ImGui::TextUnformatted( text_, endLine );
+      ImGui::TextUnformatted(text_, endLine);
     }
   }
 
-  void RenderListTextWrapped( const char* text_, const char* text_end_ )
+  void RenderListTextWrapped(const char* text_, const char* text_end_)
   {
     ImGui::Bullet();
     ImGui::SameLine();
-    RenderTextWrapped( text_, text_end_, true );
+    RenderTextWrapped(text_, text_end_, true);
   }
 
-  bool RenderLinkText( const char* text_, const char* text_end_, const Link& link_, const ImGuiStyle& style_, 
-                       const char* markdown_, const MarkdownConfig& mdConfig_, const char** linkHoverStart_ );
+  bool RenderLinkText(const char* text_, const char* text_end_, const Link& link_, const ImGuiStyle& style_,
+                      const char* markdown_, const MarkdownConfig& mdConfig_, const char** linkHoverStart_);
 
-  void RenderLinkTextWrapped( const char* text_, const char* text_end_, const Link& link_, const ImGuiStyle& style_,
-                              const char* markdown_, const MarkdownConfig& mdConfig_, const char** linkHoverStart_, bool bIndentToHere_ = false );
+  void RenderLinkTextWrapped(const char* text_, const char* text_end_, const Link& link_, const ImGuiStyle& style_,
+                             const char* markdown_, const MarkdownConfig& mdConfig_, const char** linkHoverStart_,
+                             bool bIndentToHere_ = false);
 
   void ResetIndent()
   {
-    if( indentX > 0.0f )
-    {
-      ImGui::Unindent( indentX );
+    if (indentX > 0.0f) {
+      ImGui::Unindent(indentX);
     }
     indentX = 0.0f;
   }
 
 private:
-  float     indentX;
+  float indentX;
 };
 
 // Text that starts after a new line (or at beginning) and ends with a newline (or at end)
-struct Line {
+struct Line
+{
   bool isHeading = false;
   bool isUnorderedListStart = false;
-  bool isLeadingSpace = true;   // spaces at start of line
-  int  leadSpaceCount = 0;
-  int  headingCount = 0;
-  int  lineStart = 0;
-  int  lineEnd   = 0;
-  int  lastRenderPosition = 0;   // lines may get rendered in multiple pieces
+  bool isLeadingSpace = true; // spaces at start of line
+  int leadSpaceCount = 0;
+  int headingCount = 0;
+  int lineStart = 0;
+  int lineEnd = 0;
+  int lastRenderPosition = 0; // lines may get rendered in multiple pieces
 };
 
-struct TextBlock {          // subset of line
+struct TextBlock
+{
+  // subset of line
   int start = 0;
-  int stop  = 0;
+  int stop = 0;
+
   int size() const
   {
     return stop - start;
   }
 };
 
-struct Link {
-  enum LinkState {
+struct Link
+{
+  enum LinkState
+  {
     NO_LINK,
     HAS_SQUARE_BRACKET_OPEN,
     HAS_SQUARE_BRACKETS,
     HAS_SQUARE_BRACKETS_ROUND_BRACKET_OPEN,
   };
+
   LinkState state = NO_LINK;
   TextBlock text;
   TextBlock url;
@@ -610,24 +856,24 @@ struct Link {
 };
 
 // podtrhni prave nakresleny prvek?
-inline void UnderLine( ImColor col_ )
+inline void UnderLine(ImColor col_)
 {
   ImVec2 min = ImGui::GetItemRectMin();
   ImVec2 max = ImGui::GetItemRectMax();
   min.y = max.y;
-  ImGui::GetWindowDrawList()->AddLine( min, max, col_, 1.0f );
+  ImGui::GetWindowDrawList()->AddLine(min, max, col_, 1.0f);
 }
 
 // vyrenderuj radek textu?
-inline void RenderLine( const char* markdown_, Line& line_, TextRegion& textRegion_, const MarkdownConfig& mdConfig_ )
+inline void RenderLine(const char* markdown_, Line& line_, TextRegion& textRegion_, const MarkdownConfig& mdConfig_)
 {
   // indent
   int indentStart = 0;
-  if( line_.isUnorderedListStart )  // ImGui unordered list render always adds one indent
-  { 
-    indentStart = 1; 
+  if (line_.isUnorderedListStart) // ImGui unordered list render always adds one indent
+  {
+    indentStart = 1;
   }
-  for( int j = indentStart; j < line_.leadSpaceCount / 2; ++j )  // add indents
+  for (int j = indentStart; j < line_.leadSpaceCount / 2; ++j) // add indents
   {
     ImGui::Indent();
   }
@@ -637,67 +883,61 @@ inline void RenderLine( const char* markdown_, Line& line_, TextRegion& textRegi
   formatInfo.config = &mdConfig_;
   int textStart = line_.lastRenderPosition + 1;
   int textSize = line_.lineEnd - textStart;
-  if( line_.isUnorderedListStart )  // render unordered list
+  if (line_.isUnorderedListStart) // render unordered list
   {
     formatInfo.type = MarkdownFormatType::UNORDERED_LIST;
-    mdConfig_.formatCallback( formatInfo, true );
+    mdConfig_.formatCallback(formatInfo, true);
     const char* text = markdown_ + textStart + 1;
-    textRegion_.RenderListTextWrapped( text, text + textSize - 1 );
+    textRegion_.RenderListTextWrapped(text, text + textSize - 1);
   }
-  else if( line_.isHeading )      // render heading
+  else if (line_.isHeading) // render heading
   {
     formatInfo.level = line_.headingCount;
     formatInfo.type = MarkdownFormatType::HEADING;
-    mdConfig_.formatCallback( formatInfo, true );
+    mdConfig_.formatCallback(formatInfo, true);
     const char* text = markdown_ + textStart + 1;
-    textRegion_.RenderTextWrapped( text, text + textSize - 1 );
+    textRegion_.RenderTextWrapped(text, text + textSize - 1);
   }
-  else                // render a normal paragraph chunk
+  else // render a normal paragraph chunk
   {
     formatInfo.type = MarkdownFormatType::NORMAL_TEXT;
-    mdConfig_.formatCallback( formatInfo, true );
+    mdConfig_.formatCallback(formatInfo, true);
     const char* text = markdown_ + textStart;
-    textRegion_.RenderTextWrapped( text, text + textSize );
+    textRegion_.RenderTextWrapped(text, text + textSize);
   }
-  mdConfig_.formatCallback( formatInfo, false );
+  mdConfig_.formatCallback(formatInfo, false);
 
   // unindent
-  for( int j = indentStart; j < line_.leadSpaceCount / 2; ++j )
-  {
+  for (int j = indentStart; j < line_.leadSpaceCount / 2; ++j) {
     ImGui::Unindent();
   }
 }
-  
+
 // Render markdown - samotne parsovani a nasledne vytvareni ImGui obsahu #important 
-inline void Markdown( const char* markdown_, size_t markdownLength_, const MarkdownConfig& mdConfig_ )
+inline void Markdown(const char* markdown_, size_t markdownLength_, const MarkdownConfig& mdConfig_)
 {
   static const char* linkHoverStart = NULL; // we need to preserve status of link hovering between frames
   ImGuiStyle& style = ImGui::GetStyle();
-  Line    line;
-  Link    link;
-  TextRegion  textRegion;
+  Line line;
+  Link link;
+  TextRegion textRegion;
 
   char c = 0;
-  for( int i=0; i < (int)markdownLength_; ++i )
-  {
-    c = markdown_[i];       // get the character at index
-    if( c == 0 ) { break; } // shouldn't happen but don't go beyond 0.
+  for (int i = 0; i < (int)markdownLength_; ++i) {
+    c = markdown_[i];      // get the character at index
+    if (c == 0) { break; } // shouldn't happen but don't go beyond 0.
 
     // If we're at the beginning of the line, count any spaces
-    if( line.isLeadingSpace )
-    {
-      if( c == ' ' )
-      {
+    if (line.isLeadingSpace) {
+      if (c == ' ') {
         ++line.leadSpaceCount;
         continue;
       }
-      else
-      {
+      else {
         line.isLeadingSpace = false;
         line.lastRenderPosition = i - 1;
-        if(( c == '*' ) && ( line.leadSpaceCount >= 2 ))
-        {
-          if(( (int)markdownLength_ > i + 1 ) && ( markdown_[ i + 1 ] == ' ' ))  // space after '*'
+        if ((c == '*') && (line.leadSpaceCount >= 2)) {
+          if (((int)markdownLength_ > i + 1) && (markdown_[i + 1] == ' ')) // space after '*'
           {
             line.isUnorderedListStart = true;
             ++i;
@@ -705,16 +945,13 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
           }
           continue;
         }
-        else if( c == '#' )
-        {
+        else if (c == '#') {
           line.headingCount++;
           bool bContinueChecking = true;
           uint32_t j = i;
-          while( ++j < (int)markdownLength_ && bContinueChecking )
-          {
+          while (++j < (int)markdownLength_ && bContinueChecking) {
             c = markdown_[j];
-            switch( c )
-            {
+            switch (c) {
             case '#':
               line.headingCount++;
               break;
@@ -730,84 +967,80 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
               break;
             }
           }
-          if( line.isHeading ) { continue; }
+          if (line.isHeading) { continue; }
         }
       }
     }
 
     // Test to see if we have a link
-    switch( link.state )
-    {
+    switch (link.state) {
     case Link::NO_LINK:
-      if( c == '[' )
-      {
+      if (c == '[') {
         link.state = Link::HAS_SQUARE_BRACKET_OPEN;
         link.text.start = i + 1;
-        if( i > 0 && markdown_[i - 1] == '!' )
-        {
+        if (i > 0 && markdown_[i - 1] == '!') {
           link.isImage = true;
         }
       }
       break;
     case Link::HAS_SQUARE_BRACKET_OPEN:
-      if( c == ']' )
-      {
+      if (c == ']') {
         link.state = Link::HAS_SQUARE_BRACKETS;
         link.text.stop = i;
       }
       break;
     case Link::HAS_SQUARE_BRACKETS:
-      if( c == '(' )
-      {
+      if (c == '(') {
         link.state = Link::HAS_SQUARE_BRACKETS_ROUND_BRACKET_OPEN;
         link.url.start = i + 1;
       }
       break;
     case Link::HAS_SQUARE_BRACKETS_ROUND_BRACKET_OPEN:
-      if( c == ')' )
-      {
+      if (c == ')') {
         // render previous line content
-        line.lineEnd = link.text.start - ( link.isImage ? 2 : 1 );
-        RenderLine( markdown_, line, textRegion, mdConfig_ );
+        line.lineEnd = link.text.start - (link.isImage ? 2 : 1);
+        RenderLine(markdown_, line, textRegion, mdConfig_);
         line.leadSpaceCount = 0;
         link.url.stop = i;
-        line.isUnorderedListStart = false;  // the following text shouldn't have bullets
-        ImGui::SameLine( 0.0f, 0.0f );
-        if( link.isImage )   // it's an image, render it.
+        line.isUnorderedListStart = false; // the following text shouldn't have bullets
+        ImGui::SameLine(0.0f, 0.0f);
+        if (link.isImage) // it's an image, render it.
         {
           bool drawnImage = false;
           bool useLinkCallback = false;
-          if( mdConfig_.imageCallback )
-          {
-            MarkdownImageData imageData = mdConfig_.imageCallback({ markdown_ + link.text.start, link.text.size(), markdown_ + link.url.start, link.url.size(), mdConfig_.userData, true });
+          if (mdConfig_.imageCallback) {
+            MarkdownImageData imageData = mdConfig_.imageCallback({markdown_ + link.text.start, link.text.size(),
+                                                                   markdown_ + link.url.start, link.url.size(),
+                                                                   mdConfig_.userData, true});
             useLinkCallback = imageData.useLinkCallback;
-            if( imageData.isValid )
-            {
-              ImGui::Image( imageData.user_texture_id, imageData.size, imageData.uv0, imageData.uv1, imageData.tint_col, imageData.border_col );
+            if (imageData.isValid) {
+              ImGui::Image(imageData.user_texture_id, imageData.size, imageData.uv0, imageData.uv1,
+                           imageData.tint_col, imageData.border_col);
               drawnImage = true;
             }
           }
-          if( !drawnImage )
-          {
-            ImGui::Text( "( Image %.*s not loaded )", link.url.size(), markdown_ + link.url.start );
+          if (!drawnImage) {
+            ImGui::Text("( Image %.*s not loaded )", link.url.size(), markdown_ + link.url.start);
           }
-          if( ImGui::IsItemHovered() )
-          {
-            if( ImGui::IsMouseReleased( 0 ) && mdConfig_.linkCallback && useLinkCallback )
-            {
-              mdConfig_.linkCallback( { markdown_ + link.text.start, link.text.size(), markdown_ + link.url.start, link.url.size(), mdConfig_.userData, true } );
+          if (ImGui::IsItemHovered()) {
+            if (ImGui::IsMouseReleased(0) && mdConfig_.linkCallback && useLinkCallback) {
+              mdConfig_.linkCallback({markdown_ + link.text.start, link.text.size(), markdown_ + link.url.start,
+                                      link.url.size(), mdConfig_.userData, true});
             }
-            if( link.text.size() > 0 && mdConfig_.tooltipCallback )
-            {
-              mdConfig_.tooltipCallback( {{ markdown_ + link.text.start, link.text.size(), markdown_ + link.url.start, link.url.size(), mdConfig_.userData, true }, mdConfig_.linkIcon } );
+            if (link.text.size() > 0 && mdConfig_.tooltipCallback) {
+              mdConfig_.tooltipCallback(
+              {{markdown_ + link.text.start, link.text.size(), markdown_ + link.url.start, link.url.size(), mdConfig_.userData, true},
+               mdConfig_.linkIcon});
             }
           }
         }
-        else         // it's a link, render it.
+        else // it's a link, render it.
         {
-          textRegion.RenderLinkTextWrapped( markdown_ + link.text.start, markdown_ + link.text.start + link.text.size(), link, style, markdown_, mdConfig_, &linkHoverStart, false );
+          textRegion.RenderLinkTextWrapped(markdown_ + link.text.start,
+                                           markdown_ + link.text.start + link.text.size(), link, style, markdown_,
+                                           mdConfig_, &linkHoverStart, false);
         }
-        ImGui::SameLine( 0.0f, 0.0f );
+        ImGui::SameLine(0.0f, 0.0f);
         // reset the link by reinitializing it
         link = Link();
         line.lastRenderPosition = i;
@@ -816,11 +1049,10 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
     }
 
     // handle end of line (render)
-    if( c == '\n' )
-    {
+    if (c == '\n') {
       // render the line
       line.lineEnd = i;
-      RenderLine( markdown_, line, textRegion, mdConfig_ );
+      RenderLine(markdown_, line, textRegion, mdConfig_);
 
       // reset the line
       line = Line();
@@ -828,133 +1060,120 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
       line.lastRenderPosition = i;
 
       textRegion.ResetIndent();
-        
+
       // reset the link
       link = Link();
     }
   }
 
   // render any remaining text if last char wasn't 0 (nejspis null je tim mineno)
-  if( markdownLength_ && line.lineStart < (int)markdownLength_ && markdown_[ line.lineStart ] != 0 )
-  {
+  if (markdownLength_ && line.lineStart < (int)markdownLength_ && markdown_[line.lineStart] != 0) {
     // handle both null terminated and non null terminated strings
     line.lineEnd = (int)markdownLength_;
-    if( 0 == markdown_[ line.lineEnd - 1 ] )
-    {
+    if (0 == markdown_[line.lineEnd - 1]) {
       --line.lineEnd;
     }
-    RenderLine( markdown_, line, textRegion, mdConfig_ );
+    RenderLine(markdown_, line, textRegion, mdConfig_);
   }
 }
 
 
-inline bool TextRegion::RenderLinkText( const char* text_, const char* text_end_, const Link& link_, const ImGuiStyle& style_,
-                                        const char* markdown_, const MarkdownConfig& mdConfig_, const char** linkHoverStart_ )
+inline bool TextRegion::RenderLinkText(const char* text_, const char* text_end_, const Link& link_,
+                                       const ImGuiStyle& style_,
+                                       const char* markdown_, const MarkdownConfig& mdConfig_,
+                                       const char** linkHoverStart_)
 {
-
   MarkdownFormatInfo formatInfo;
   formatInfo.config = &mdConfig_;
   formatInfo.type = MarkdownFormatType::LINK;
-  mdConfig_.formatCallback( formatInfo, true );
-  ImGui::PushTextWrapPos( -1.0f );
-  ImGui::TextUnformatted( text_, text_end_ );
+  mdConfig_.formatCallback(formatInfo, true);
+  ImGui::PushTextWrapPos(-1.0f);
+  ImGui::TextUnformatted(text_, text_end_);
   ImGui::PopTextWrapPos();
 
   bool bThisItemHovered = ImGui::IsItemHovered();
-  if(bThisItemHovered)
-  {
+  if (bThisItemHovered) {
     *linkHoverStart_ = markdown_ + link_.text.start;
   }
-  bool bHovered = bThisItemHovered || ( *linkHoverStart_ == ( markdown_ + link_.text.start ) );
+  bool bHovered = bThisItemHovered || (*linkHoverStart_ == (markdown_ + link_.text.start));
 
   formatInfo.itemHovered = bHovered;
-  mdConfig_.formatCallback( formatInfo, false );
+  mdConfig_.formatCallback(formatInfo, false);
 
-  if(bHovered)
-  {
-    if(ImGui::IsMouseReleased( 0 ) && mdConfig_.linkCallback)
-    {
-      mdConfig_.linkCallback( { markdown_ + link_.text.start, link_.text.size(), markdown_ + link_.url.start, link_.url.size(), mdConfig_.userData, false } );
+  if (bHovered) {
+    if (ImGui::IsMouseReleased(0) && mdConfig_.linkCallback) {
+      mdConfig_.linkCallback({markdown_ + link_.text.start, link_.text.size(), markdown_ + link_.url.start,
+                              link_.url.size(), mdConfig_.userData, false});
     }
-    if( mdConfig_.tooltipCallback )
-    {
-      mdConfig_.tooltipCallback( {{ markdown_ + link_.text.start, link_.text.size(), markdown_ + link_.url.start, link_.url.size(), mdConfig_.userData, false }, mdConfig_.linkIcon } );
+    if (mdConfig_.tooltipCallback) {
+      mdConfig_.tooltipCallback(
+      {{markdown_ + link_.text.start, link_.text.size(), markdown_ + link_.url.start, link_.url.size(), mdConfig_.userData, false},
+       mdConfig_.linkIcon});
     }
   }
   return bThisItemHovered;
 }
 
-inline void TextRegion::RenderLinkTextWrapped( const char* text_, const char* text_end_, const Link& link_, const ImGuiStyle& style_,
-                                               const char* markdown_, const MarkdownConfig& mdConfig_, const char** linkHoverStart_, bool bIndentToHere_ )
+inline void TextRegion::RenderLinkTextWrapped(const char* text_, const char* text_end_, const Link& link_,
+                                              const ImGuiStyle& style_,
+                                              const char* markdown_, const MarkdownConfig& mdConfig_,
+                                              const char** linkHoverStart_, bool bIndentToHere_)
 {
   const float scale = 1.0f;
-  float     widthLeft = ImGui::GetContentRegionAvail().x;
-  const char* endLine = ImGui::GetFont()->CalcWordWrapPositionA( scale, text_, text_end_, widthLeft );
-  bool bHovered = RenderLinkText( text_, endLine, link_, style_, markdown_, mdConfig_, linkHoverStart_ );
-  if( bIndentToHere_ )
-  {
+  float widthLeft = ImGui::GetContentRegionAvail().x;
+  const char* endLine = ImGui::GetFont()->CalcWordWrapPositionA(scale, text_, text_end_, widthLeft);
+  bool bHovered = RenderLinkText(text_, endLine, link_, style_, markdown_, mdConfig_, linkHoverStart_);
+  if (bIndentToHere_) {
     float indentNeeded = ImGui::GetContentRegionAvail().x - widthLeft;
-    if( indentNeeded )
-    {
-      ImGui::Indent( indentNeeded );
+    if (indentNeeded) {
+      ImGui::Indent(indentNeeded);
       indentX += indentNeeded;
     }
   }
   widthLeft = ImGui::GetContentRegionAvail().x;
-  while( endLine < text_end_ )
-  {
+  while (endLine < text_end_) {
     text_ = endLine;
-    if( *text_ == ' ' ) { ++text_; }  // skip a space at start of line
-    endLine = ImGui::GetFont()->CalcWordWrapPositionA( scale, text_, text_end_, widthLeft );
-    if( text_ == endLine ) 
-    {
+    if (*text_ == ' ') { ++text_; } // skip a space at start of line
+    endLine = ImGui::GetFont()->CalcWordWrapPositionA(scale, text_, text_end_, widthLeft);
+    if (text_ == endLine) {
       endLine++;
     }
-    bool bThisLineHovered = RenderLinkText( text_, endLine, link_, style_, markdown_, mdConfig_, linkHoverStart_ );
+    bool bThisLineHovered = RenderLinkText(text_, endLine, link_, style_, markdown_, mdConfig_, linkHoverStart_);
     bHovered = bHovered || bThisLineHovered;
   }
-  if( !bHovered && *linkHoverStart_ == markdown_ + link_.text.start )
-  {
+  if (!bHovered && *linkHoverStart_ == markdown_ + link_.text.start) {
     *linkHoverStart_ = NULL;
   }
 }
 
-  
-inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFormatInfo_, bool start_ )
+
+inline void defaultMarkdownFormatCallback(const MarkdownFormatInfo& markdownFormatInfo_, bool start_)
 {
-  switch( markdownFormatInfo_.type )
-  {
+  switch (markdownFormatInfo_.type) {
   case MarkdownFormatType::NORMAL_TEXT:
     break;
   case MarkdownFormatType::HEADING:
     {
       MarkdownHeadingFormat fmt;
-      if( markdownFormatInfo_.level > MarkdownConfig::NUMHEADINGS )
-      {
-        fmt = markdownFormatInfo_.config->headingFormats[ MarkdownConfig::NUMHEADINGS - 1 ];
+      if (markdownFormatInfo_.level > MarkdownConfig::NUMHEADINGS) {
+        fmt = markdownFormatInfo_.config->headingFormats[MarkdownConfig::NUMHEADINGS - 1];
       }
-      else
-      {
-        fmt = markdownFormatInfo_.config->headingFormats[ markdownFormatInfo_.level - 1 ];
+      else {
+        fmt = markdownFormatInfo_.config->headingFormats[markdownFormatInfo_.level - 1];
       }
-      if( start_ )
-      {
+      if (start_) {
 
-        if( fmt.font  )
-        {
-          ImGui::PushFont( fmt.font );
+        if (fmt.font) {
+          ImGui::PushFont(fmt.font);
         }
         ImGui::NewLine();
       }
-      else
-      {
-        if( fmt.separator )
-        {
+      else {
+        if (fmt.separator) {
           ImGui::Separator();
         }
         ImGui::NewLine();
-        if( fmt.font )
-        {
+        if (fmt.font) {
           ImGui::PopFont();
         }
       }
@@ -963,27 +1182,19 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
   case MarkdownFormatType::UNORDERED_LIST:
     break;
   case MarkdownFormatType::LINK:
-    if( start_ )
-    {
-      ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered] );
+    if (start_) {
+      ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
     }
-    else
-    {
+    else {
       ImGui::PopStyleColor();
-      if( markdownFormatInfo_.itemHovered )
-      {
-        UnderLine( ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered] );
+      if (markdownFormatInfo_.itemHovered) {
+        UnderLine(ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
       }
-      else
-      {
-        UnderLine( ImGui::GetStyle().Colors[ImGuiCol_Button] );
+      else {
+        UnderLine(ImGui::GetStyle().Colors[ImGuiCol_Button]);
       }
     }
     break;
   }
 }
-
-
-
-
 }

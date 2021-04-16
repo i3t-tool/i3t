@@ -5,49 +5,49 @@
 #include <utility>
 #include <vector>
 
-struct TWidget
+struct TutorialElement
 {
-  virtual ~TWidget() = default;
+  virtual ~TutorialElement() = default;
   //std::string m_id;
 };
 
-struct TWText : TWidget  // can also contain bullets and other MD syntaxe for now 
+struct Explanation : TutorialElement  // can also contain bullets and other MD syntaxe for now 
 {
-  TWText(std::string text) : m_text(std::move(text)) {}
+  Explanation(std::string text) : m_text(std::move(text)) {}
   std::string m_text;
 };
 
-struct TWTask : TWidget 
+struct Task : TutorialElement 
 {
-  TWTask(std::string task) : m_task(std::move(task)) {}
+  Task(std::string task) : m_task(std::move(task)) {}
   std::string m_task;
 };
 
-struct TWHint : TWidget 
+struct Hint : TutorialElement 
 {
-  TWHint(std::string hint) : m_hint(std::move(hint)) {}
+  Hint(std::string hint) : m_hint(std::move(hint)) {}
   std::string m_hint;
 };
 
-struct TWSpacing : TWidget 
+struct TWSpacing : TutorialElement 
 {
   TWSpacing() = default;
 };
 
-struct TWImage : TWidget
+struct ChoiceTask : TutorialElement
 {
-  TWImage(std::string filename) : m_filename(std::move(filename)) {}
+  ChoiceTask(std::string filename) : m_filename(std::move(filename)) {}
 
   std::string m_filename;
 };
 
-struct TWAnimatedImage : TWidget
+struct InputTask : TutorialElement
 {
   std::string m_filename;
   // todo animation stuf
 };
 
-struct TWButton : TWidget
+struct TWButton : TutorialElement
 {
   std::string m_text;
   // todo command
@@ -60,7 +60,7 @@ struct TStep
   std::string m_title;
   // HACK using unique pointers because I need pointers in general in order to avoid slicing of subclass objects (TWText,...) into the base class (TWidget) when storing them in this vector.
   // also, it is preffered to have steps also as unique pointers, 
-  std::vector<std::unique_ptr<TWidget>> m_content;
+  std::vector<std::unique_ptr<TutorialElement>> m_content;
 };
 
 /**

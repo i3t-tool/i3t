@@ -30,7 +30,7 @@ public:
 
 private:
   //std::vector<std::unique_ptr<Tutorial>> m_tutorials;
-  std::vector<TutorialHeader> m_tutorial_headers;
+  std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
   TutorialWindow* m_tutorial_window;
   void renderTutorials();
 };
