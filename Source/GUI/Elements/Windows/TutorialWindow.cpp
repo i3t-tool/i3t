@@ -8,7 +8,7 @@
 /// Depencencies/imgui_markdown. After that modify CMakeLists.txt, append
 /// include_directories(Dependencies/imgui_markdown) to block of includes.
 /// a taky zmenit v nem pridani do filtru ve VS a asi i dalsi veci - jeste se zeptat!
-#include <imgui_markdown.h>
+#include "GUI/ImGui/imgui_markdown.h"
 
 #include "Config.h"
 #include "Core/Application.h"
