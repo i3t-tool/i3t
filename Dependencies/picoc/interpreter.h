@@ -5,6 +5,7 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
+
 #include "platform.h"
 
 #include <stdio.h>
@@ -42,6 +43,7 @@ typedef FILE IOFILE;
 #define IS_FP(v) 0
 #define FP_VAL(v) 0
 #endif
+
 
 #define IS_POINTER_COERCIBLE(v, ap) ((ap) ? ((v)->Typ->Base == TypePointer) : 0)
 #define POINTER_COERCE(v) ((int)(v)->Val->Pointer)

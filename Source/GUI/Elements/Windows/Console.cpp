@@ -56,7 +56,7 @@ void Console::render()
 	if (ImGui::InputText("Input", command, 1024, inputTextFlags, &history))
 	{
 		bool nonwhite=false;
-		int len=strlen(command);
+		int len=(int)strlen(command);
 		for(int i=0;i<len;i++){if(command[i]!='\t'&&command[i]!=' '){nonwhite=true;break;}}
 		if(nonwhite){commands.push_back(glm::ivec2(m_buffer.str().size(), len));}
 		selected=(int)commands.size();

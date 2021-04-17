@@ -4,8 +4,8 @@
 #include "picoc.h"
 #include "interpreter.h"
 
-#ifndef NO_HASH_INCLUDE
 
+#ifndef NO_HASH_INCLUDE
 
 /* initialise the built-in include libraries */
 void IncludeInit(Picoc *pc)
@@ -14,6 +14,7 @@ void IncludeInit(Picoc *pc)
     IncludeRegister(pc, "stdio.h", &StdioSetupFunc, &StdioFunctions[0], StdioDefs);
 #endif
 }
+
 
 /* clean up space used by the include system */
 void IncludeCleanup(Picoc *pc)
@@ -73,7 +74,7 @@ void IncludeFile(Picoc *pc, char *FileName)
                 
                 /* parse the setup C source code - may define types etc. */
                 if (LInclude->SetupCSource != NULL)
-                    PicocParse(pc, FileName, LInclude->SetupCSource, strlen(LInclude->SetupCSource), TRUE, TRUE, FALSE, FALSE);
+                    PicocParse(pc, FileName, LInclude->SetupCSource, (int)strlen(LInclude->SetupCSource), TRUE, TRUE, FALSE, FALSE);
                 
                 /* set up the library functions */
                 if (LInclude->FuncList != NULL)

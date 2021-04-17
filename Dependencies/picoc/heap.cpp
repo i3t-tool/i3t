@@ -5,6 +5,7 @@
 /* stack grows up from the bottom and heap grows down from the top of heap space */
 #include "interpreter.h"
 
+
 #ifdef DEBUG_HEAP
 void ShowBigList(Picoc *pc)
 {
@@ -29,7 +30,7 @@ void HeapInit(Picoc *pc, int StackOrHeapSize)
     pc->StackFrame = NULL;                     /* the current stack frame */
     pc->HeapStackTop = NULL;                          /* the top of the stack */
 
-    while (((unsigned long)&pc->HeapMemory[AlignOffset] & (sizeof(ALIGN_TYPE)-1)) != 0)
+    while (((unsigned long long)&pc->HeapMemory[AlignOffset] & (sizeof(ALIGN_TYPE)-1)) != 0)
         AlignOffset++;
         
     pc->StackFrame = &(pc->HeapMemory)[AlignOffset];
