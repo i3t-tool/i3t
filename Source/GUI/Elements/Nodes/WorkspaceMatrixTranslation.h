@@ -6,7 +6,6 @@ struct WorkspaceMatrixTranslationArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Translation header";
     std::string nodeLabel = "Translation";
-    Ptr<Core::NodeBase> nodebase = Core::Builder::createTransform<Core::Translation>();
 };
 
 class WorkspaceMatrixTranslation : public WorkspaceMatrix4x4

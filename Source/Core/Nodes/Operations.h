@@ -189,7 +189,7 @@ enum class ENodeType
 	FloatsToQuat,
 	NormalizeQuat,
 	Float, //done SS
-	Vector3,
+	Vector3, //done JH
 	Vector4, //done JH
 	Matrix, //done JH
 	Model,

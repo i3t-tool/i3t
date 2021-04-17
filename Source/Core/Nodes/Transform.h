@@ -223,6 +223,8 @@ public:
 	float getY();
 	float getZ();
 
+	/* \todo JH Martine prosím o gettery XYZ pro DataMapu */
+
 	ValueSetResult setX(float v);
   ValueSetResult setY(float v);
   ValueSetResult setZ(float v);

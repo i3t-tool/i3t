@@ -155,7 +155,7 @@ bool Application::initI3T()
 	// \todo DG testing
 	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
 	glm::mat4 m=glm::mat4(1.0f);
-	ValueSetResult result = mat->m_nodebase->setValue(glm::vec3(2.0f,2.0f,2.0f));
+	ValueSetResult result = mat->getNodebase()->setValue(glm::vec3(2.0f,2.0f,2.0f));
 	printf("value set result %d\n",result.status);
 	// ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
 	m_world->handlesSetMatrix(mat);

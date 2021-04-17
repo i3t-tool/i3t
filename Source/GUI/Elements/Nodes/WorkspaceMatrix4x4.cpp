@@ -5,7 +5,7 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMa
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
 	fw.name = "matrix4x4";
 
     setDataItemsWidth();
@@ -16,7 +16,7 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
 	fw.name = "matrix4x4";
 
     setDataItemsWidth();

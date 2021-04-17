@@ -28,8 +28,8 @@ World2::World2(){
     this->onStart();*/
 }
 bool World2::initRender(){
-    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
-    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
+    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str());
+    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str());
     World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
         getchar();printf("World2::initRender():cannot load shaders\n");return false;
@@ -68,7 +68,7 @@ World2* World2::loadDefaultScene(){
     testchild->transform(      glm::vec3(0.0f, 6.0f,-8.0f),    glm::vec3(2.5f, 2.5f, 1.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
 
     scene->addComponent(new TransformHandles(objhandles)); scene->addComponent(new Renderer(Renderer::DRAW_LINES));
-    scene->addChild(camera, false);           camera->addComponent(new Camera2(60.0f, scene)); 
+    scene->addChild(camera, false);           camera->addComponent(new Camera2(60.0f, scene));
                                               camera->addComponent(new CameraControl());
     scene->addChild(testchild, false);        testchild->addComponent(new Renderer());
     scene->addChild(testparent, false);       testparent->addComponent(new Renderer(Renderer::DRAW_LINES));
@@ -101,9 +101,9 @@ void World2::handlesSetMatrix(WorkspaceMatrix4x4* matnode) {
 
         return;
     }
-    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)matnode;
-    Ptr<Core::NodeBase>		    nodebase    = nodebasedata->m_nodebase;
-    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata;
+    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)matnode; /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
+    Ptr<Core::NodeBase>		    nodebase    = nodebasedata->getNodebase();
+    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; /* \todo JH is this needed? WorkspaceNode is basically abstract class... */
     const Core::Transform::DataMap&	data		= nodebase->getDataMapRef();
 	const Operation*			operation	= nodebase->getOperation();
 	const char*					keyword		= operation->keyWord.c_str();
