@@ -68,7 +68,7 @@
 
 #include "Config.h"
 #include "Core/Defs.h"
-#include "Logger/Logger.h"
+#include "Logger/LoggerInternal.h"
 #include "Utils/Other.h"
 
 #include "Commands/ApplicationCommands.h"
@@ -77,40 +77,40 @@
 int window; ///< current main window
 
 static const std::string DIE_SEND_MAIL =
-    "If it does not help, send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
-    "as they appear in the program console.\n";
+		"If it does not help, send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
+		"as they appear in the program console.\n";
 
 static const std::string DIE_TEXT =
-    "The I3T tool did not start. "
-    "Please try the following steps to solve the problem and if it does not help, "
-    "send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
-    "as they appear in the program console.\n"
-    " \n"
-    "The steps to try:\n"
-    " \n"
-    " - The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime "
-    "libraries"
-    " from https://www.microsoft.com/en-us/download/details.aspx?id=5555 \n"
-    " \n"
-    " - the program is targeted to a Graphics card with OpenGL 3.1. If you have a internal and external GPU,"
-    " switch to the external GPU card. You may need to add transform.exe in the GPU control panel/3D settings"
-    " to the list of progams using the dedicated GPU card.\n";
+		"The I3T tool did not start. "
+		"Please try the following steps to solve the problem and if it does not help, "
+		"send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
+		"as they appear in the program console.\n"
+		" \n"
+		"The steps to try:\n"
+		" \n"
+		" - The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime "
+		"libraries"
+		" from https://www.microsoft.com/en-us/download/details.aspx?id=5555 \n"
+		" \n"
+		" - the program is targeted to a Graphics card with OpenGL 3.1. If you have a internal and external GPU,"
+		" switch to the external GPU card. You may need to add transform.exe in the GPU control panel/3D settings"
+		" to the list of progams using the dedicated GPU card.\n";
 
 static const std::string DIE_TEXT_OPENGL_VERSION =
-    "The I3T tool did not start. \n\n"
-    "The program is targeted to a Graphics card with OpenGL 3.1. or higher. If you have a system with two graphics "
-    "cards, internal and external, "
-    " switch to the external GPU card please. You may need to add transform.exe in the GPU control panel/3D settings"
-    " to the list of progams using the dedicated GPU card.\n"
-    " \n" +
-    DIE_SEND_MAIL;
+		"The I3T tool did not start. \n\n"
+		"The program is targeted to a Graphics card with OpenGL 3.1. or higher. If you have a system with two graphics "
+		"cards, internal and external, "
+		" switch to the external GPU card please. You may need to add transform.exe in the GPU control panel/3D settings"
+		" to the list of progams using the dedicated GPU card.\n"
+		" \n" +
+		DIE_SEND_MAIL;
 
 static const std::string DIE_TEXT_PROGRAM_INIT =
-    "The I3T tool did not start. \n\n"
-    "The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime libraries "
-    "from https://www.microsoft.com/en-us/download/details.aspx?id=5555 .\n"
-    " \n" +
-    DIE_SEND_MAIL;
+		"The I3T tool did not start. \n\n"
+		"The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime libraries "
+		"from https://www.microsoft.com/en-us/download/details.aspx?id=5555 .\n"
+		" \n" +
+		DIE_SEND_MAIL;
 
 // Dal�� sd�len�
 //- jako v�ukov� sc�ny pou�ijte 01xxx ... 0nxxx
@@ -133,133 +133,97 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
  */
 int main(int argc, char* argv[])
 {
-  /// \todo Use logger!
-  // save the current dir to Config::WORKING_DIRECTORY
-  std::cout << "argv[0] is " << argv[0] << std::endl; // debugPrint
-
-#ifdef I3T_RELEASE_STANDALONE // variant for release
-  /*
-   * 	Problem with Config::WORKING_DIRECTORY setting:
-   *
-   * 	Folta: Config::WORKING_DIRECTORY = string(argv[0]).substr(0, string(argv[0]).find_last_of("\\"));
-   * 		   If started from console (cmd.exe) in directory release by writing i3t,
-   *			  argv[0] is i3t --- and find finds no \ and returns -1 => WRONG WD
-   *
-   *	Hack:  Config::WORKING_DIRECTORY = string(".\\"); or "."
-   *		   Setting to ".\\" or ".") does not work either
-   *			  not working ofstream if Config::WORKING_DIRECTORY="." in void RecentFiles::writeRecent()
-   *			  can't open config file : .\\data\gimbalContent.cnt
-   *		   The ofstream and "." works strange also for starting by doubleclick.
-   *
-   *	Solution:  GetCurrentDirectory
-   */
-  char buffer[MAX_PATH];
-  ::GetCurrentDirectory(MAX_PATH, buffer);
-  std::cout << "Current working directory: " << buffer << "\n";
-  Config::WORKING_DIRECTORY = std::string(buffer);
-  /// \todo
+#ifdef I3T_RELEASE_STANDALONE // variant for standalone release
+	std::string root = "";
 #else // special settings for usage in Visual Studio devenv
-#ifdef I3T_DEBUG
-  // Config::WORKING_DIRECTORY = std::string(argv[0]).substr(0, std::string(argv[0]).find("Debug") - 1); // without
-  // \Debug
-
   auto root = FS::absolute("");
-
-  Config::WORKING_DIRECTORY = root;
-  std::cout << "Current working directory: " << root << "\n";
-
-#else
-  Config::WORKING_DIRECTORY =
-      std::string(argv[0]).substr(0, std::string(argv[0]).find("Release") - 1); // without \Release
-#endif
 #endif
 
-  Config::WORKING_DIRECTORY = root;
-  std::cout << "Current working directory: " << root << "\n";
-  // init the logging library
-  INIT_LOGGER(argc, argv);
+	Config::WORKING_DIRECTORY = root;
 
-  LOG_INFO("Working directory is {}.", Config::WORKING_DIRECTORY);
+	// init the logging library
+	INIT_LOGGER(argc, argv);
 
-  ///   - seek command line parameters for config files
-  /* True if the .dcgf file was given as a command line parameter and must be loaded. */
-  bool dcfgFlag = false;
-  std::string dcfg;
+	LOG_INFO("Working directory is {}.", Config::WORKING_DIRECTORY);
 
-  /* True to load the screen file, the .scn file was given as a command line parameter and must be loaded.*/
-  bool scnFlag = false;
-  std::string scn;
+	///   - seek command line parameters for config files
+	/* True if the .dcgf file was given as a command line parameter and must be loaded. */
+	bool dcfgFlag = false;
+	std::string dcfg;
 
-  for (int i = 1; i < argc; i++)
-  {
-    if (Config::getFileExtension(argv[i]) == "scn")
-    {
-      scn = argv[i];
-      scnFlag = true;
-    }
-    else if (Config::getFileExtension(argv[i]) == "dcfg")
-    {
-      dcfg = argv[i];
-      dcfgFlag = true;
-    }
-  }
+	/* True to load the screen file, the .scn file was given as a command line parameter and must be loaded.*/
+	bool scnFlag = false;
+	std::string scn;
 
-  ///   - load the configuration file .dcfg
-  if (dcfgFlag)
-    Config::loadFromFile(dcfg);
-  else
-  {
-    Config::loadFromFile(Config::getAbsolutePath("/cfg_default.dcfg"));
-  }
-  ///   - load the scene
-  /// \todo Load scene in App::initI3T().
-  if (scnFlag)
-    Config::LOAD_SCENE = scn;
+	for (int i = 1; i < argc; i++)
+	{
+		if (Config::getFileExtension(argv[i]) == "scn")
+		{
+			scn = argv[i];
+			scnFlag = true;
+		}
+		else if (Config::getFileExtension(argv[i]) == "dcfg")
+		{
+			dcfg = argv[i];
+			dcfgFlag = true;
+		}
+	}
 
-  /// \todo Window icon!
+	///   - load the configuration file .dcfg
+	if (dcfgFlag)
+		Config::loadFromFile(dcfg);
+	else
+	{
+		Config::loadFromFile(Config::getAbsolutePath("/cfg_default.dcfg"));
+	}
+	///   - load the scene
+	/// \todo Load scene in App::initI3T().
+	if (scnFlag)
+		Config::LOAD_SCENE = scn;
 
-  /// \todo Run app in fullscreen mode.
-  // if (Config::FULLSCREEN)
-  //  glutFullScreen();
-  //---------------------------------------------------------------------------
+	/// \todo Window icon!
 
-  // Get application instance.
-  Application& app = Application::get();
+	/// \todo Run app in fullscreen mode.
+	// if (Config::FULLSCREEN)
+	//  glutFullScreen();
+	//---------------------------------------------------------------------------
 
-  // I. Create GLFW window.
-  app.initWindow();
+	// Get application instance.
+	Application& app = Application::get();
 
-  // II. PGR and OpenGL initializing.
-  if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
-  {
-    SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
-  }
+	// I. Create GLFW window.
+	app.initWindow();
 
-  // III. Initialize I3T stuff,
-  // read other config files.
-  // Load objects(geometry and textures), create the world and load the initial scene.
-  // Loads the shaders, updates the camera mode.
-  if (app.initI3T() != 0)
-  {
-    SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_PROGRAM_INIT);
-    // getchar();
-    // return is;
-    LOG_FATAL("Cannot initialize I3T stuffs.");
-    exit(-1);
-  }
+	// II. PGR and OpenGL initializing.
+	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
+	{
+		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
+	}
 
-  // IV. Create dockspace and ImGui windows.
-  app.initImGui();
+	// Initialize all modules.
+	app.init();
 
-  app.run();
+	// III. Initialize I3T stuff,
+	// read other config files.
+	// Load objects(geometry and textures), create the world and load the initial scene.
+	// Loads the shaders, updates the camera mode.
+	if (!app.initI3T())
+	{
+		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_PROGRAM_INIT);
+		LOG_FATAL("Cannot initialize I3T stuffs.");
+		exit(-1);
+	}
 
-  /// \todo finalize() test
-  app.finalize();
+	app.initModules();
 
-  LOG_INFO("I3T is now exited.");
+	app.run();
 
-  END_LOGGER;
+	/// \todo finalize() test
+	app.finalize();
 
-  getchar();
-  return 0;
+	LOG_INFO("I3T is now exited.");
+
+	END_LOGGER;
+
+	return 0;
 }

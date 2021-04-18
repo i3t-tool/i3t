@@ -1,4 +1,3 @@
-.gitignore
 .idea/
 /Docs/Doxygen/html/
 
@@ -14,3 +13,6 @@ out/
 !/data/models/teapot.obj
 /CmakeOutputDebug/
 Data/imgui.ini
+.vs/
+logs/
+/CMakeSettings.json

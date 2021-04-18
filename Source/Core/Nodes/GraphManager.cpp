@@ -1,133 +1,287 @@
 #include "Core/Nodes/GraphManager.h"
 
+#include <algorithm>
+
 using namespace Core;
+
+std::vector<Ptr<Cycle>> GraphManager::m_cycles;
 
 ENodePlugResult GraphManager::isPlugCorrect(Pin* input, Pin* output)
 {
-  auto* inp = input;
-  if (!inp)
-    return ENodePlugResult::Err_NonexistentPin;
-
-  auto* out = output;
-  if (!out)
-    return ENodePlugResult::Err_NonexistentPin;
-
-  if (inp->m_opValueType != out->m_opValueType)
-  {
-    // Do the input and output data types match?
-    return ENodePlugResult::Err_MismatchedPinTypes;
-  }
-
-  if (inp->m_master == out->m_master)
-  {
-    // Not a circular edge?
-    return ENodePlugResult::Err_Loopback;
-  }
-
-  // cycle detector
-  NodeBase* toFind = inp->m_master; // INPUT
-
-  // stack in vector - TOS is at the vector back.
-  std::vector<NodeBase*> stack;
-
-  // PUSH(output) insert element at end.
-  stack.push_back(out->m_master);
-
-  while (!stack.empty())
-  {
-    // Return last element of mutable sequence.
-    NodeBase* act = stack.back();
-    stack.pop_back();
-
-    if (act == toFind)
-      return ENodePlugResult::Err_Loop;
-
-    for (auto& pin : act->m_inputs)
-    {
-      if (pin.isPluggedIn())
-      {
-        Pin* ct = pin.m_input;
-        stack.push_back(ct->m_master);
-      }
-    }
-  }
-
-  /*
-    if (isOperatorPlugCorrectMod != NULL)
-      return isOperatorPlugCorrectMod(inp, out);
-  */
-
-  return ENodePlugResult::Ok;
+	auto lhs = input->m_master;
+  return lhs->isPlugCorrect(input, output);
 }
 
-ENodePlugResult GraphManager::plug(UPtr<Core::NodeBase>& leftNode, UPtr<Core::NodeBase>& rightNode, unsigned fromIndex,
-                                           unsigned myIndex)
+ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
 {
-  I3T_DEBUG_ASSERT(rightNode->m_inputs.size() > myIndex, "Desired input pin in this node with myIndex does not exists!")
-  I3T_DEBUG_ASSERT(leftNode->m_outputs.size() > fromIndex, "Desired pin in other node with fromIndex does not exists!")
-
-  auto result = isPlugCorrect(&rightNode->m_inputs[myIndex], &leftNode->m_outputs[fromIndex]);
-  if (result != ENodePlugResult::Ok)
-    return result;
-
-  // Insert to toPlug output pin outputs this operator input pin.
-  leftNode->m_outputs[fromIndex].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
-
-  // Attach given operator output pin to this operator input pin.
-  rightNode->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
-
-  return ENodePlugResult::Ok;
+	return GraphManager::plug(lhs, rhs, 0, 0);
 }
 
-void GraphManager::unplugAll(UPtr<Core::NodeBase>& node)
+ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
+                                   unsigned fromIndex, unsigned myIndex)
 {
-  for (auto i = 0; i < node->m_inputs.size(); ++i)
-  {
-    unplugInput(node, i);
-  }
+	Debug::Assert(rightNode->m_inputs.size() > myIndex,
+	              "Node {} does not have input pin with index {}!", rightNode->getSig(), myIndex);
+	Debug::Assert(leftNode->m_outputs.size() > fromIndex,
+	              "Node {} does not have output pin with index {}!", leftNode->getSig(), fromIndex);
 
-  for (auto i = 0; i < node->m_outputs.size(); ++i)
-  {
-    unplugOutput(node, i);
-  }
+	auto result = isPlugCorrect(&rightNode->m_inputs[myIndex], &leftNode->m_outputs[fromIndex]);
+	if (result != ENodePlugResult::Ok)
+		return result;
+
+	// Insert to toPlug output pin outputs this operator input pin.
+	leftNode->m_outputs[fromIndex].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
+
+	// Attach given operator output pin to this operator input pin.
+	rightNode->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
+
+	leftNode->spreadSignal();
+
+	rightNode->setDataMap(&Transform::g_AllLocked);
+
+	return ENodePlugResult::Ok;
 }
 
-void GraphManager::unplugInput(UPtr<Core::NodeBase>& node, int index)
+ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex)
 {
-  I3T_DEBUG_ASSERT(node->m_inputs.size() > index, "The node's input pin that you want to unplug does not exists.");
-
-  auto* otherPin = node->m_inputs[index].m_input;
-
-  if (otherPin)
-  {
-    // Erase pointer to my input pin in connected node outputs.
-    auto& otherPinOutputs = otherPin->m_outputs;
-
-    auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &node->m_inputs[index]);
-    if (it != otherPinOutputs.end())
-    {
-      /// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
-      otherPinOutputs.erase(it);
-    }
-    else
-    {
-      I3T_DEBUG_ASSERT(false, "Can't find pointer to input pin in other node outputs.");
-    }
-
-    auto& myPin = node->m_inputs[index];
-    myPin.m_input = nullptr;
-  }
+  return plug(node, seq, nodeIndex, 1);
 }
 
-void GraphManager::unplugOutput(UPtr<Core::NodeBase>& node, int index)
+ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node, unsigned nodeIndex)
 {
-  I3T_DEBUG_ASSERT(node->m_outputs.size() > index, "The node's output pin that you want to unplug does not exists.");
+  return plug(seq, node, 1, nodeIndex);
+}
 
-  auto& pin = node->m_outputs[index];
+void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
+{
+  node.get()->unplugAll();
+	node->setDataMap(&Transform::g_Free);
+}
 
-  // Set all connected nodes input as nullptr.
-  for (const auto& otherPin : pin.m_outputs)
-    otherPin->m_input = nullptr;
+void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
+{
+	node.get()->unplugInput(index);
+	if (getAllInputNodes(node).empty())
+    node->setDataMap(&Transform::g_Free);
+}
 
-  pin.m_outputs.clear();
+void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
+{
+	node.get()->unplugOutput(index);
+}
+
+std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)
+{
+  std::vector<Ptr<NodeBase>> result;
+  size_t inputsCount = node->getInputPins().size();
+  for (size_t i = 0; i < inputsCount; ++i)
+  {
+    auto parent = getParent(node);
+    if (parent != nullptr)
+      result.push_back(parent);
+  }
+
+  return result;
+}
+
+Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
+{
+  auto pins = node->getInputPins();
+
+  if (index > pins.size())
+		return nullptr;
+
+  if (pins.empty() || pins[index].m_input == nullptr)
+  {
+    return nullptr;
+  }
+  return pins[index].m_input->m_master;
+}
+
+std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
+{
+	std::vector<Ptr<NodeBase>> result;
+	auto pins = node->getOutputPins();
+	for (size_t i = 0; i < pins.size(); ++i)
+	{
+		auto pinOutputs = getOutputNodes(node, i);
+		result.insert(result.end(), pinOutputs.begin(), pinOutputs.end());
+	}
+
+	return result;
+}
+
+std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
+{
+	Debug::Assert(node->getOutputPins().size() > index, "Out of range.");
+
+	std::vector<Ptr<NodeBase>> result;
+	auto pin = node->getOutputPins()[index];
+	auto othersInputs = pin.getOutComponents();
+	for (const auto& other : othersInputs)
+		result.push_back(other->m_master);
+
+	return result;
+}
+
+void GraphManager::update(double tick)
+{
+	for (auto& cycle : m_cycles)
+		cycle->update(tick);
+}
+
+const Operation* GraphManager::getOperation(const Pin* pin)
+{
+	return pin->m_master->getOperation();
+}
+
+bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs)
+{
+	return lhs->m_master == rhs->m_master;
+}
+
+bool GraphManager::arePlugged(const Pin& input, const Pin& output)
+{
+	Debug::Assert(input.isInput(), "Given input pin is not input pin.");
+	if (!input.isPluggedIn()) return false;
+	return input.getParentPin() == &output;
+}
+
+SequenceTree::SequenceTree(Ptr<NodeBase> sequence)
+{
+	m_beginSequence = toSequence(sequence);
+}
+
+SequenceTree::MatrixIterator SequenceTree::begin()
+{
+	auto it = MatrixIterator(m_beginSequence);
+	it.m_tree = this;
+	return it;
+}
+
+SequenceTree::MatrixIterator SequenceTree::end()
+{
+	auto cur = m_beginSequence;
+	Ptr<Sequence> parent;
+	while ((parent = toSequence(GraphManager::getParent(cur, 0))) != nullptr)
+	{
+		cur = parent;
+	}
+
+	auto it = MatrixIterator(cur, nullptr);
+	it.m_tree = this;
+	return it;
+}
+
+SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence)
+{
+	m_currentSequence = sequence;
+	m_currentMatrix = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
+}
+
+SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence, NodePtr node)
+{
+	m_currentSequence = sequence;
+	m_currentMatrix = node;
+}
+
+SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
+{
+	advance();
+	return *this;
+}
+
+SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator++(int)
+{
+	advance();
+	return *this;
+}
+
+SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator--()
+{
+	withdraw();
+	return *this;
+}
+
+SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator--(int)
+{
+	withdraw();
+	return *this;
+}
+
+Ptr<NodeBase> SequenceTree::MatrixIterator::operator*() const
+{
+	Debug::Assert(m_currentMatrix != nullptr, "Iterator is at the end!");
+	return m_currentMatrix;
+}
+
+bool SequenceTree::MatrixIterator::operator==(const SequenceTree::MatrixIterator& rhs) const
+{
+	return m_currentMatrix == rhs.m_currentMatrix;
+}
+
+bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator& rhs) const
+{
+	return m_currentMatrix != rhs.m_currentMatrix;
+}
+
+void SequenceTree::MatrixIterator::advance()
+{
+	// Find index of current matrix in current sequence.
+	auto& matrices = m_currentSequence->getMatrices();
+	auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
+	auto index = std::distance(matrices.begin(), it);
+
+	/// \todo MH handle case when matrix is not in a sequence.
+
+	if (index == 0)
+	{
+		auto parent = GraphManager::getParent(m_currentSequence);
+
+		// Check if current matrix is not first in the graph.
+		if (parent)
+		{
+			// Sequence is not the root, there is another parent sequence.
+			m_currentSequence = toSequence(parent);
+			m_currentMatrix = m_currentSequence->getMatrices().back();
+		}
+		else
+		{
+			m_currentMatrix = nullptr;
+		}
+	}
+	else
+	{
+		m_currentMatrix = matrices[--index];
+	}
+}
+
+void SequenceTree::MatrixIterator::withdraw()
+{
+	// Find index of current matrix in current sequence.
+	auto& matrices = m_currentSequence->getMatrices();
+	auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
+	auto index = std::distance(matrices.begin(), it);
+
+	if (m_currentMatrix == nullptr)
+		index = -1;
+
+	/// \todo MH handle case when matrix is not in a sequence.
+
+	if (m_currentMatrix == matrices.back())
+	{
+		// Current matrix is last matrix in a sequence. Go to the previous sequence.
+		auto prev = m_tree->m_beginSequence;
+		auto prevsParent = m_tree->m_beginSequence;
+		while ((prevsParent = toSequence(GraphManager::getParent(prev))) != m_currentSequence)
+		{
+			prev = prevsParent;
+		}
+		m_currentSequence = prev;
+		m_currentMatrix = m_currentSequence->getMatrices().front();
+	}
+	else
+	{
+		m_currentMatrix = matrices[++index];
+	}
 }

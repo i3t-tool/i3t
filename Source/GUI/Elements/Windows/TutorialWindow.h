@@ -17,6 +17,7 @@
 class TutorialWindow : public IWindow, private ITutorialRenderer
 {
 public:
+  //I3T_WINDOW(TutorialWindow) // todo co je to zac?
   TutorialWindow(bool show);
   
   /**

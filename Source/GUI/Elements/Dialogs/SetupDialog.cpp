@@ -3,62 +3,61 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Core/World.h"
 
 void SetupDialog::render()
 {
-  static int cameraMode;
-  static int angleUnits;
+	static int cameraMode;
+	static int angleUnits;
 
-  // ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
+	// ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
 
-  auto& style = ImGui::GetStyle();
+	auto& style = ImGui::GetStyle();
 
-  style.FramePadding.y = 4;
+	style.FramePadding.y = 4;
 
-  ImGui::Begin("Setup");
-  {
-    ImGui::Text("Camera control:");
-    ImGui::RadioButton("orbit", &cameraMode, 0);
-    ImGui::SameLine();
-    ImGui::RadioButton("trackball", &cameraMode, 1);
-    ImGui::SameLine();
-    ImGui::NewLine();
+	ImGui::Begin(getName("Setup").c_str());
+	{
+		ImGui::Text("Camera control:");
+		ImGui::RadioButton("orbit", &cameraMode, 0);
+		ImGui::SameLine();
+		ImGui::RadioButton("trackball", &cameraMode, 1);
+		ImGui::SameLine();
+		ImGui::NewLine();
 
-    ImGui::Separator();
+		ImGui::Separator();
 
-    ImGui::Text("Angle units:");
-    ImGui::RadioButton("radians", &angleUnits, 0);
-    ImGui::SameLine();
-    ImGui::RadioButton("degrees", &angleUnits, 1);
-    ImGui::SameLine();
-    ImGui::NewLine();
+		ImGui::Text("Angle units:");
+		ImGui::RadioButton("radians", &angleUnits, 0);
+		ImGui::SameLine();
+		ImGui::RadioButton("degrees", &angleUnits, 1);
+		ImGui::SameLine();
+		ImGui::NewLine();
 
-    ImGui::Separator();
+		ImGui::Separator();
 
-    static bool check = true;
-    ImGui::Checkbox("console", &check);
+		static bool check = true;
+		ImGui::Checkbox("console", &check);
 
-    ImGui::Separator();
+		ImGui::Separator();
 
-    /*
-    if (cameraMode == 0)
-      TabSpace::world->setToOrbitControl();
-    else if (cameraMode == 1)
-      TabSpace::world->setToTrackballControl();
+		/*
+		if (cameraMode == 0)
+		  TabSpace::world->setToOrbitControl();
+		else if (cameraMode == 1)
+		  TabSpace::world->setToTrackballControl();
 
-    if (angleUnits == 0)
-      TabSpace::setToRadians();
-    else if (angleUnits == 1)
-      TabSpace::setToDegrees();
-      */
+		if (angleUnits == 0)
+		  TabSpace::setToRadians();
+		else if (angleUnits == 1)
+		  TabSpace::setToDegrees();
+		  */
 
-    if (ImGui::Button("OK"))
-    {
-      HideWindowCommand::dispatch(id);
-    }
-  }
-  ImGui::End();
+		if (ImGui::Button("OK"))
+		{
+			HideWindowCommand::dispatch(ID);
+		}
+	}
+	ImGui::End();
 
-  style.FramePadding.y = 8;
+	style.FramePadding.y = 8;
 }

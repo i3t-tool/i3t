@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "Node.h"
+#include "Transform.h"
 
 namespace Core
 {
@@ -14,89 +14,76 @@ namespace Core
  */
 class Sequence : public NodeBase
 {
-  using Matrix = NodeBase;
+	using Matrix = NodeBase;
 
-  std::vector<UPtr<Matrix>> m_matrices;
+	std::vector<Ptr<Transformation>> m_matrices;
 
 public:
-  Sequence() : NodeBase(&operations[ENodeType::Sequence])
-  {
-    m_inputs.emplace_back(EValueType::Matrix, true, this); // mul. input
-    m_inputs.emplace_back(EValueType::Matrix, true, this); // direct mat. input
+	Sequence() : NodeBase(&g_sequence){};
 
-    m_outputs.emplace_back(EValueType::Matrix, false, this); // mul. output
-    m_outputs.emplace_back(EValueType::Matrix, false, this); // direct mat. output
+	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, m_matrices.size()); }
 
-    m_internalData.emplace_back();
-    m_internalData.emplace_back();
+	/**
+	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
+	 *
+	 * \param matrix Matrix to transfer.
+	 * \param index New position of matrix.
+	 */
+  ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+
+	const std::vector<Ptr<Transformation>>& getMatrices() { return m_matrices; }
+
+	/**
+	 * \brief Get reference to matrix in a sequence at given position.
+	 *
+	 * <b>Be careful</b> not to access matrix via invalid reference after
+	 * calling popMatrix.
+	 *
+	 * \param idx Index of matrix.
+	 * \return Reference to matrix holt in m_matrices vector.
+	 */
+	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_matrices.at(idx); }
+
+	/**
+	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
+	 */
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index)
+	{
+		Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
+		              "Sequence does not have so many matrices as you are expecting.");
+
+		auto result = std::move(m_matrices.at(index));
+		m_matrices.erase(m_matrices.begin() + index);
+
+		result->nullSequence();
 
     updateValues(0);
-  };
+    spreadSignal();
 
-  /**
-   * Pass matrix to a sequence. Sequence takes ownership of matrix.
-   *
-   * \param matrix Matrix to transfer.
-   * \param index New position of matrix.
-   */
-  FORCE_INLINE void addMatrix(UPtr<Matrix> matrix, const int index) noexcept
-  {
-    if (index > m_matrices.size())
-      m_matrices.push_back(std::move(matrix));
-    else
-      m_matrices.insert(m_matrices.begin() + index, std::move(matrix));
+		return result;
+	};
 
-    receiveSignal(0);
-  };
+	void swap(int from, int to);
 
-  /**
-   * \brief Get reference to matrix in a sequence at given position.
-   *
-   * <b>Be careful</b> not to access matrix via invalid reference after
-   * calling popMatrix.
-   *
-   * \param idx Index of matrix.
-   * \return Reference to matrix holt in m_matrices vector.
-   */
-  [[nodiscard]] FORCE_INLINE UPtr<Matrix>& getMatRef(size_t idx)
-  {
-    return m_matrices.at(idx);
-  }
+	void updateValues(int inputIndex) override;
 
-  /**
-   * Pop matrix from a sequence. Caller takes ownership of returned matrix.
-   */
-  [[nodiscard]] FORCE_INLINE UPtr<Matrix> popMatrix(const int index)
-  {
-    I3T_DEBUG_ASSERT(m_matrices.size() > index, "Sequence does not have so many matrices as you are expecting.");
-
-    auto result = std::move(m_matrices.at(index));
-    m_matrices.erase(m_matrices.begin() + index);
-
-    return result;
-  };
-
-  void updateValues(int inputIndex) override
-  {
-    glm::mat4 result(1.0f);
-
-    if (m_inputs[1].isPluggedIn())
-    {
-      // Matrix node is connected to direct matrix input.
-      result = m_inputs[1].getStorage().getMat4();
-    }
-    else
-    {
-      for (const auto& mat : m_matrices)
-      {
-        result *= mat->getInternalData().getMat4();
-      }
-    }
-
-    m_internalData[0].setValue(result);
-    m_internalData[1].setValue(result);
-  };
+private:
+	ENodePlugResult isPlugCorrect(Pin* input, Pin* output) override;
+  void receiveSignal(int inputIndex) override;
 };
+
+FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
+{
+	if (node == nullptr)
+		return nullptr;
+	return node->as<Sequence>();
 }
 
-
+FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+{
+  glm::mat4 result(1.0f);
+  for (const auto& mat : matrices)
+    result *= mat->getData().getMat4();
+  return result;
+}
+} // namespace Core

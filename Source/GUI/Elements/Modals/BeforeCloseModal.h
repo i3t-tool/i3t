@@ -10,12 +10,12 @@
 class BeforeCloseModal : public IWindow
 {
 public:
-  static constexpr const char id[] = "BeforeCloseModal";
+	I3T_WINDOW(BeforeCloseModal)
 
-  BeforeCloseModal(){};
+	BeforeCloseModal(){};
 
-  /**
-   * Show Close? modal centered in main window.
-   */
-  void render() override;
+	/**
+	 * Show Close? modal centered in main window.
+	 */
+	void render() override;
 };

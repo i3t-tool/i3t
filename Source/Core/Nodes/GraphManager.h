@@ -7,10 +7,17 @@
  */
 #pragma once
 
-#include "Core/Nodes/NodeImpl.h"
-#include "Core/Nodes/Operations.h"
-#include "Sequence.h"
+#include <algorithm>
 
+#include "Cycle.h"
+#include "NodeData.h"
+#include "NodeImpl.h"
+#include "Operations.h"
+#include "Sequence.h"
+#include "Transform.h"
+
+namespace Core
+{
 namespace Builder
 {
 /**
@@ -19,80 +26,207 @@ namespace Builder
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <ENodeType T> FORCE_INLINE UPtr<Core::NodeBase> createNode()
+template <ENodeType T> FORCE_INLINE Ptr<NodeBase> createNode()
 {
-  I3T_DEBUG_ASSERT(T != ENodeType::Sequence, "Use createSequence instead.");
+  bool shouldUnlockAllValues = T == ENodeType::Float || T == ENodeType::Vector3 || T == ENodeType::Vector4 || T == ENodeType::Matrix;
+  auto ret = std::make_shared<NodeImpl<T>>();
+  ret->init();
+  if (shouldUnlockAllValues)
+    ret->setDataMap(&Transform::g_Free);
 
-  return std::make_unique<Core::NodeImpl<T>>();
+  ret->updateValues(0);
+  return ret;
 }
 
-/**
- * Sequence has custom non virtual member functions, so shared_ptr is returned
- * instead of unique_ptr.
- */
-FORCE_INLINE Ptr<Core::Sequence> createSequence()
+Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
-  return std::make_shared<Core::Sequence>();
+  auto ret = std::make_shared<Core::Sequence>();
+  ret->init();
+  ret->updateValues(0);
+  return ret;
+}
+
+template <typename T, typename... Args> Ptr<T> FORCE_INLINE createTransform(Args&&... args)
+{
+	static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
+  auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+  ret->init();
+  ret->reset();
+  return ret;
 }
 } // namespace Builder
 
-namespace Core
-{
 class GraphManager
 {
+	/// References to created cycle nodes which needs to be updated.
+	static std::vector<Ptr<Cycle>> m_cycles;
+
 public:
   /**
-   * Is used to check before connecting to avoid cycles in the node graph.
-   *
-   * The function is used in plug() function.
-   *
-   * Algorithm described in panel Algoritmus 1 in [Folta, page 30]
-   *
-   * \param input
-   * \param output
+   * Create Cycle
    */
-  static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+  static Ptr<Core::Cycle> createCycle();
 
-  /**
-   * Connect given node output pin to this operator input pin.
-   *
-   * Usage:
-   * \code
-   *    // Create nodes.
-   *    auto vec1 = Builder::createNode<OperationType::Vector3>();
-   *    auto vec2 = Builder::createNode<OperationType::Vector3>();
-   *    auto dotNode = Builder::createNode<OperationType::Vector3DotVector3>();
-   *
-   *    // Plug vector nodes output to dot node inputs.
-   *    GraphManager::plug(vec1, dotNode, 0, 0);
-   *    GraphManager::plug(vec2, dotNode, 1, 0);
-   * \endcode
-   *
-   * \param parentNode Reference to a unique pointer to a parent node to which \a parentOutputPinIndex this node
-   *        should be connected to.
-   * \param rightNode node which should be connected to right node output.
-   * \param parentOutputPinIndex Index of the output pin of the parent node.
-   * \param myInputPinIndex Index of input pin of this node.
-   *
-   * \return Result enum is returned from the function. \see ENodePlugResult.
-   */
-  static ENodePlugResult plug(UPtr<Core::NodeBase>& leftNode, UPtr<Core::NodeBase>& rightNode, unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+	/**
+	 * \param tick in seconds.
+	 */
+	static void update(double tick);
 
-  /// Unplug all inputs and outputs.
-  static void unplugAll(UPtr<Core::NodeBase>& node);
+  [[nodiscard]] static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
 
-  /**
-   * Unplug plugged node from given input pin of this node.
-   *
-   * \param index
-   */
-  static void unplugInput(UPtr<Core::NodeBase>& node, int index);
+	/**
+	 * Is used to check before connecting to avoid cycles in the node graph.
+	 *
+	 * The function is used in plug() function.
+	 *
+	 * Algorithm described in panel Algoritmus 1 in [Folta, page 30]
+	 *
+	 * \param input
+	 * \param output
+	 */
+	[[nodiscard]] static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
 
-  /**
-   * Unplug all nodes connected to given output pin of this node.
-   *
-   * \param index
-   */
-  static void unplugOutput(UPtr<Core::NodeBase>& node, int index);
+	/// Plug first output pin of lhs to the first input pin of rhs.
+  [[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
+
+	/**
+	 * Connect given node output pin to this operator input pin.
+	 *
+	 * Usage:
+	 * \code
+	 *    // Create nodes.
+	 *    auto vec1    = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto vec2    = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto dotNode = Core::Builder::createNode<OperationType::Vector3DotVector3>();
+	 *
+	 *    // Plug vector nodes output to dot node inputs.
+	 *    GraphManager::plug(vec1, dotNode, 0, 0);
+	 *    GraphManager::plug(vec2, dotNode, 1, 0);
+	 * \endcode
+	 *
+	 * \param parentNode Reference to a unique pointer to a parent node to which \a parentOutputPinIndex this node
+	 *        should be connected to.
+	 * \param rightNode node which should be connected to right node output.
+	 * \param parentOutputPinIndex Index of the output pin of the parent node.
+	 * \param myInputPinIndex Index of input pin of this node.
+	 *
+	 * \return Result enum is returned from the function. \see ENodePlugResult.
+	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
+  [[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
+	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+
+  [[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node, unsigned nodeOutputIndex = 0);
+  [[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node, unsigned nodeInputIndex = 0);
+
+	/// Unplug all inputs and outputs.
+	static void unplugAll(const NodePtr& node);
+
+	/**
+	 * Unplug plugged node from given input pin of this node.
+	 *
+	 * \param index
+	 */
+	static void unplugInput(const Ptr<Core::NodeBase>& node, int index);
+
+	/**
+	 * Unplug all nodes connected to given output pin of this node.
+	 *
+	 * \param index
+	 */
+	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
+
+	/**
+	 * \param index input pin index.
+	 */
+	static Ptr<NodeBase> getParent(const NodePtr& node, size_t index = 0);
+
+	/**
+	 * \return All nodes connected to given node inputs.
+	 */
+	static std::vector<NodePtr> getAllInputNodes(const NodePtr& node);
+
+	/**
+	 * \return All nodes plugged into given node output pins.
+	 */
+	static std::vector<Ptr<NodeBase>> getAllOutputNodes(NodePtr& node);
+
+	/**
+	 * \return All nodes plugged into node input pin on given index.
+	 */
+	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
+
+  static const Operation* getOperation(const Pin* pin);
+	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
+	static bool arePlugged(const Pin& input, const Pin& output);
 };
+
+using gm = GraphManager;
+
+
+class SequenceTree
+{
+	Ptr<Sequence> m_beginSequence;
+
+public:
+	class MatrixIterator
+	{
+		friend class SequenceTree;
+		SequenceTree* m_tree;
+		Ptr<Sequence> m_currentSequence;
+		Ptr<NodeBase> m_currentMatrix;
+
+	public:
+		MatrixIterator(Ptr<Sequence>& sequence);
+		MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
+
+		/// Move iterator to root sequence.
+		MatrixIterator& operator++();
+
+		/// Move iterator to root sequence.
+		MatrixIterator operator++(int);
+
+		/// Move iterator towards to the leaf sequence.
+		MatrixIterator& operator--();
+
+		/// Move iterator towards to the leaf sequence.
+		MatrixIterator operator--(int);
+
+		Ptr<NodeBase> operator*() const;
+
+		bool operator==(const MatrixIterator& rhs) const;
+		bool operator!=(const MatrixIterator& rhs) const;
+
+	private:
+		/// Move to the next matrix.
+		void advance();
+
+		/// Move to the previous matrix.
+		void withdraw();
+	};
+
+public:
+	SequenceTree(Ptr<NodeBase> sequence);
+
+	/**
+	 * \return Iterator which points sequence.
+	 */
+	MatrixIterator begin();
+
+	/**
+	 * \return Iterator which points to the sequence root.
+	 */
+	MatrixIterator end();
+};
+
+
+inline Ptr<Core::Cycle> GraphManager::createCycle()
+{
+  auto ret = std::make_shared<Core::Cycle>();
+  ret->init();
+  ret->updateValues(0);
+
+  m_cycles.push_back(ret);
+
+  return ret;
 }
+} // namespace Core

@@ -20,6 +20,7 @@
 [submodule "Dependencies/jsonlib"]
 	path = Dependencies/jsonlib
 	url = https://github.com/nlohmann/json.git
+	ignore = dirty
 [submodule "Dependencies/imgui_node_editor"]
 	path = Dependencies/imgui_node_editor
 	url = https://github.com/thedmd/imgui-node-editor.git
