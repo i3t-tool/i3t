@@ -8,7 +8,7 @@
 #include "ManipulatorUtil.h"
 #include <typeinfo>
 
-const char* OrthoManipulator::s_type=NULL;
+const char* OrthoManipulator::s_type=nullptr;
 
 OrthoManipulator::OrthoManipulator(){
 	OrthoManipulator::s_type=typeid(OrthoManipulator).name();
@@ -35,11 +35,11 @@ OrthoManipulator::OrthoManipulator(){
 void OrthoManipulator::start(){}
 
 void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
-	if(m_editednode==NULL){return;}
+	if(m_editednode==nullptr){return;}
 	glm::mat4 projinv=glm::inverse(m_edited);;
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	//glm::mat4 transform=glm::mat4(1.0f);
-	glm::mat4 transform=getNodeTransform(m_editednode,m_parent);
+	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
 	if(renderTransparent){
@@ -75,9 +75,9 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 	}
 }
 void OrthoManipulator::update(){
-	if(m_editednode==NULL){return;}
-	Core::OrthoProj*editedortho=(Core::OrthoProj*)m_editednode->get();
-	m_edited=m_editednode->get()->getData().getMat4();
+	if(m_editednode==nullptr){return;}
+	Core::OrthoProj*editedortho=(Core::OrthoProj*)m_editednode.get();
+	m_edited=m_editednode->getData().getMat4();
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
 	m_hoverhandle=-1;
@@ -109,7 +109,7 @@ void OrthoManipulator::update(){
 	axis[3]=0.0f;
 	//glm::mat4 handlespace=getFullTransform(m_gameObject);//TMP
 	//glm::mat4 handlespace=glm::mat4(1.0f);
-	glm::mat4 handlespace=getNodeTransform(m_editednode,m_parent);
+	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent);
 			//vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));
 	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+pos));//position of transformated object on the screen
 	glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen (axis*axis is absolute value)
@@ -149,12 +149,12 @@ void OrthoManipulator::update(){
 	}
 	//printf("%f\n",pheight);
 	///
-	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue((glm::vec3)m_edited[3]);}
+	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->get()->setValue((glm::vec3)m_edited[3]);}
 	editedortho->setLeft(m_left);
 	editedortho->setRight(m_right);
 	editedortho->setTop(m_top);
 	editedortho->setBottom(m_bottom);
 	editedortho->setNear(m_near);
 	editedortho->setFar(m_far);
-	m_edited=m_editednode->get()->getData().getMat4();
+	m_edited=m_editednode->getData().getMat4();
 }

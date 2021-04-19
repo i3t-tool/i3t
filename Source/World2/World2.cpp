@@ -176,7 +176,7 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;
-        *(i->second.editedNode)=nullptr;
+        //*(i->second.editedNode)=nullptr;
     }
 
     if(matnode==nullptr){return;}
@@ -203,7 +203,8 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         m.component->m_isActive=true;
-        *m.editedNode=nodebase;
+        Ptr<Core::NodeBase> nodebase2 = nodebasedata->getNodebase();
+        *m.editedNode=nodebase2;
     }
     else{printf("No manipulators\n"); }
 
@@ -263,7 +264,7 @@ void World2::tmpSetNode() {
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;
-        *(i->second.editedNode)=nullptr;
+        //*(i->second.editedNode)=nullptr;
     }
 
 	const char*keyword=op->getOperation()->keyWord.c_str();
@@ -271,7 +272,7 @@ void World2::tmpSetNode() {
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         m.component->m_isActive=true;
-        *m.editedNode=&op;
+        *m.editedNode=op;
     }
     else{
         printf("no manipulators\n");

@@ -4,7 +4,12 @@
 #include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
+#include "GUI/Elements/Nodes/WorkspaceVectorFree.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixInversion.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixMulMatrix.h"
+#include "GUI/Elements/Nodes/WorkspaceDeterminant.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixTranspose.h"
 #include "libraryI3T.h"
 #include "Scripting/Scripting.h"
 #include <stdio.h>
@@ -15,88 +20,158 @@ ScriptingData*getScriptingData(){return &scriptingData;}
 void clearScriptingData(){
     scriptingData.nodeData.clear();
 }
+void mat4oper(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    int type=Param[0]->Val->Integer;
+    int x=0,y=0;
+    char*l="-";
+    if(NumArgs==4){
+        x=Param[1]->Val->Integer;
+        y=Param[2]->Val->Integer;
+        if(Param[3]->Val->Pointer!=nullptr){l = (char*)Param[3]->Val->Pointer;}
+    }
+    
+    if (type<0||type>6) {ReturnValue->Val->Integer = -1; return;}
 
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    
+	if(type==scriptingData.mat4Operators.determinant){
+		workspace->push_back(std::make_unique<WorkspaceDeterminant>((ImTextureID)0, l));
+	}
+    else if(type==scriptingData.mat4Operators.inverse){
+		workspace->push_back(std::make_unique<WorkspaceMatrixInversion>((ImTextureID)0, l));
+	}
+    else if(type==scriptingData.mat4Operators.matmul){
+        workspace->push_back(std::make_unique<WorkspaceMatrixMulMatrix>((ImTextureID)0, l));
+	}
+    else if(type==scriptingData.mat4Operators.matadd){
+        return;
+	}
+    else if (type == scriptingData.mat4Operators.matrix) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.trackball) {
+        return;
+    }
+    else if (type == scriptingData.mat4Operators.transpose) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixTranspose>((ImTextureID)0, l));
+    }
+    else {
+        return;
+    }
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+
+    if(NumArgs==1){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+    }
+    ReturnValue->Val->Integer = (int)workspace->size()-1;
+}
 void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int type=Param[0]->Val->Integer;
     int dataindex=Param[1]->Val->Integer;
     int x=0,y=0;
-    if(NumArgs==4){
+    char*l="-";
+    if(NumArgs==5){
         x=Param[2]->Val->Integer;
         y=Param[3]->Val->Integer;
+        if(Param[4]->Val->Pointer!=nullptr){l = (char*)Param[4]->Val->Pointer;}
     }
     
 
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
-    int map=scriptingData.mat4Types.free;
-    if (type > -1 && type < 7) { map = type; }
+    if(type<0||type>6){ ReturnValue->Val->Integer=-1;return;}
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    char label[100]={0};
 
 	if(type== scriptingData.mat4Types.free){
-		workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "-"));
-        sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
-        workspace->back()->getHeaderLabel() = label;
-		ValueSetResult result =(workspace->back().get())->getNodebase().get()->setValue(mat);
-		ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+        return;
 	}
 	else if (type == scriptingData.mat4Types.scale) {
-		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "-"));
-        sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
-        workspace->back()->getHeaderLabel() = label;
+		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
 		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
-		ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
 	}
 	else if (type == scriptingData.mat4Types.translate) {
-		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, ""));
-        sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
-        workspace->back()->getHeaderLabel()= label;
+		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
 		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
-		ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
 	}
-    if(NumArgs==2){ne::CenterNodeOnScreen(workspace->back()->getId());}
-    ReturnValue->Val->Integer = (int)workspace->back()->getNodebase()->getId();
-}
-void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
-    int dataindex = Param[0]->Val->Integer;
-    int x=0,y=0;
-    if(NumArgs==3){
-        x = Param[1]->Val->Integer;
-        y = Param[2]->Val->Integer;
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if(NumArgs==2){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
     }
-    glm::vec4 vec = glm::vec4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { vec = scriptingData.nodeData[dataindex][0]; }
+    
+    ReturnValue->Val->Integer = (int)workspace->size()-1;
+}
+void vec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    int dataindex=Param[0]->Val->Integer;
+    int x=0,y=0;
+    char*l="-";
+    if(NumArgs==4){
+        x=Param[1]->Val->Integer;
+        y=Param[2]->Val->Integer;
+        if(Param[3]->Val->Pointer!=nullptr){l = (char*)Param[3]->Val->Pointer;}
+    }
+    
+
+    glm::mat4 mat = glm::mat4(1.0f);
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    char label[100]={0};
-    ReturnValue->Val->Integer = (int)workspace->size() - 1;
 
-    workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "-"));
-    sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
-    workspace->back()->getHeaderLabel() = label;
-    ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(vec);
+	workspace->push_back(std::make_unique<WorkspaceVectorFree>((ImTextureID)0, l));
+	ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec4)mat[0]);
+
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
-    if(NumArgs==1){ne::CenterNodeOnScreen(workspace->back()->getId());}
-    ReturnValue->Val->Integer = (int)workspace->back()->getNodebase()->getId();
+    if(NumArgs==1){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+    }
+    
+    ReturnValue->Val->Integer = (int)workspace->size()-1;
+}
+void vec4oper(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    int type = Param[0]->Val->Integer;
+    int x=0,y=0;
+    char*l="-";
+    if(NumArgs==4){
+        x = Param[1]->Val->Integer;
+        y = Param[2]->Val->Integer;
+        if(Param[3]->Val->Pointer!=nullptr){l = (char*)Param[3]->Val->Pointer;}
+    }
+    if(type<0||type>0){ ReturnValue->Val->Integer=-1;return;}
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    if(type == scriptingData.vec4Operators.norm){
+        workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, l));
+    }
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if(NumArgs==1){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+    }
+    ReturnValue->Val->Integer = (int)workspace->size()-1;
 }
 void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
-    int ida=Param[0]->Val->Integer;
-    int idb=Param[1]->Val->Integer;
+    int indexa=Param[0]->Val->Integer;
+    int indexb=Param[1]->Val->Integer;
     int outputindex=Param[2]->Val->Integer;
     int inputindex= Param[3]->Val->Integer;
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    int indexa=-1;
-    int indexb=-1;
 
-    for(int i=0;i<workspace->size();i++){
-        if((int)workspace->at(i)->getNodebase()->getId()==ida){indexa=i;}
-        if((int)workspace->at(i)->getNodebase()->getId()==idb){indexb=i;}
-    }
-
-    if(indexa<0||indexa>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
-    if(indexb<0||indexb>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
+    if(indexa<0||indexa>=workspace->size()){ReturnValue->Val->Integer=false;return;}
+    if(indexb<0||indexb>=workspace->size()){ReturnValue->Val->Integer=false;return;}
 
     Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->getNodebase();
 	Ptr<Core::NodeBase> pcb= (workspace->at(indexb).get())->getNodebase();
@@ -108,17 +183,12 @@ void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
     ReturnValue->Val->Integer =(int)p==0;
 }
 void unplugInput(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
-    int ida=Param[0]->Val->Integer;
+    int indexa=Param[0]->Val->Integer;
     int inputindex= Param[1]->Val->Integer;
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    int indexa=-1;
 
-    for(int i=0;i<workspace->size();i++){
-        if((int)workspace->at(i)->getNodebase()->getId()==ida){indexa=i;}
-    }
-
-    if(indexa<0||indexa>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
+    if(indexa<0||indexa>=workspace->size()){ReturnValue->Val->Integer=false;return;}
 
     Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->getNodebase();
     if(inputindex>= pca->getInputPins().size()){ ReturnValue->Val->Integer=false;return;}
@@ -143,20 +213,16 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
     }
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->getHeaderLabel().c_str(),label)==0) {
-            ReturnValue->Val->Integer= (int)workspace->at(i)->getNodebase()->getId();
+            ReturnValue->Val->Integer= i;
             if(occurances>1){std::cout<<"Id: "<<i<<", Name: "<<label<<std::endl;}
         }
     }
 
 }
 void deleteNode(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs){
-    int ida=Param[0]->Val->Integer;
+    int index=Param[0]->Val->Integer;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    int index=-1;
 
-    for(int i=0;i<workspace->size();i++){
-        if((int)workspace->at(i)->getNodebase()->getId()==ida){index=i;}
-    }
     if(index<0||index>=workspace->size()){ReturnValue->Val->Integer=false;std::cout<<"Node does not exist."<<std::endl;return;}
 
     WorkspaceNodeWithCoreData* cc= (workspace->at(index).get());
@@ -193,21 +259,21 @@ void loadW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** 
     std::string filename= Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != NULL) {ww->m_workspaceCoreNodes.clear(); status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+    if (ww != nullptr) {ww->m_workspaceCoreNodes.clear(); status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer=status;
 }
 void appendW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     std::string filename= Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != NULL) {status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+    if (ww != nullptr) {status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer=status;
 }
 void saveW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != NULL) {status=SaveWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+    if (ww != nullptr) {status=SaveWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer = status;
 }
 void runScript(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
@@ -216,8 +282,11 @@ void runScript(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
 /* list of all library functions and their prototypes */
 struct LibraryFunction PlatformLibrary1[] =
 {
-	{ mat4,         "int mat4(int,int,int,int);" },         { mat4,         "int mat4c(int,int);" },
-	{ normVec4,     "int normvec4(int,int,int);" },         { normVec4,     "int normvec4c(int);" },
+	{ mat4oper,     "int mat4oper(int,int,int,char*);" },         { mat4oper,     "int mat4operc(int);" },
+	{ mat4,         "int mat4(int,int,int,int,char*);" },         { mat4,         "int mat4c(int,int);" },
+    { vec4oper,     "int vec4oper(int,int,int,char*);" },         { vec4oper,     "int vec4operc(int);" },
+	{ vec4,         "int vec4(int,int,int,char*);"     },         { vec4,         "int vec4c(int);" },
+    //{ scalar,       "int scalar(int,int,int,char*);" },           { scalar,     "int scalarc(int);" },
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
 	{ unplugInput,  "bool unpluginput(int,int);" },
 	{ getNodeByName,"int getnode(char*);" },
@@ -230,24 +299,34 @@ struct LibraryFunction PlatformLibrary1[] =
 	{ appendW,      "bool append(char*);" },
 	{ saveW,        "bool save(char*);" },
 	{ runScript,    "bool run(char*);" },
-    { NULL,         NULL }
+    { nullptr,         nullptr }
 };
 
 const char defs[]="typedef int bool;";
 
 void PlatformLibraryInitI3T(Picoc *pc)
 {
-	//TypeCreateOpaqueStruct(pc, NULL, TableStrRegister(pc, "mat4"), sizeof(struct mat4));
-	//TypeParse(&Parser, &ReturnType, &Identifier, NULL);
+	//TypeCreateOpaqueStruct(pc, nullptr, TableStrRegister(pc, "mat4"), sizeof(struct mat4));
+	//TypeParse(&Parser, &ReturnType, &Identifier, nullptr);
 	//printf("AAAAAAAA");
     //LibraryAdd(&GlobalTable, "platform library", &PlatformLibrary1);
-    IncludeRegister(pc, "I3T.h", NULL, PlatformLibrary1, defs);//ADD_CUSTOM
+    IncludeRegister(pc, "I3T.h", nullptr, PlatformLibrary1, defs);//ADD_CUSTOM
 
-    VariableDefinePlatformVar(pc, NULL, (char*)"free",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free,        false);
-    VariableDefinePlatformVar(pc, NULL, (char*)"scale",    &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.scale,       false);
-    VariableDefinePlatformVar(pc, NULL, (char*)"uniscale", &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.uniscale,    false);
-    VariableDefinePlatformVar(pc, NULL, (char*)"rotatex",  &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatex,     false);
-    VariableDefinePlatformVar(pc, NULL, (char*)"rotatey",  &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatey,     false);
-    VariableDefinePlatformVar(pc, NULL, (char*)"rotatez",  &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatez,     false);
-    VariableDefinePlatformVar(pc, NULL, (char*)"translate",&pc->IntType, (union AnyValue *)&scriptingData.mat4Types.translate,   false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"free",          &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free,              false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"scale",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.scale,             false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"uniscale",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.uniscale,          false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"rotatex",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatex,           false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"rotatey",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatey,           false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"rotatez",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatez,           false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"translate",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.translate,         false);
+    
+    VariableDefinePlatformVar(pc, nullptr, (char*)"determinant",   &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.determinant,   false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"inverse",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.inverse,       false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"matadd",        &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.matadd,        false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"matmul",        &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.matmul,        false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"matrix",        &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.matrix,        false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"trackball",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.trackball,     false);
+    VariableDefinePlatformVar(pc, nullptr, (char*)"transpose",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.transpose,     false);
+
+    VariableDefinePlatformVar(pc, nullptr, (char*)"norm",          &pc->IntType, (union AnyValue*)&scriptingData.vec4Operators.norm, false);
 }

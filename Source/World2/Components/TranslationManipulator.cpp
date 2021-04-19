@@ -11,7 +11,7 @@
 
 #include <typeinfo>
 
-const char* TranslationManipulator::s_type = NULL;
+const char* TranslationManipulator::s_type = nullptr;
 
 TranslationManipulator::TranslationManipulator() {
     TranslationManipulator::s_type = typeid(TranslationManipulator).name();
@@ -32,7 +32,7 @@ TranslationManipulator::TranslationManipulator() {
 	m_edited=glm::mat4(1.0f);
 }
 void TranslationManipulator::render(glm::mat4* parent, bool renderTransparent) {
-	if(m_editednode==NULL){return;}
+	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -40,7 +40,8 @@ void TranslationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
-	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();
+
+	glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4();
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -71,9 +72,10 @@ void TranslationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 }
 
 void TranslationManipulator::update() {
-	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->get()->getData().getMat4();
+	if(m_editednode==nullptr){return;}
+	m_edited=m_editednode->getData().getMat4();
 	///
+
 	bool transactionBegin=false;
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
@@ -104,7 +106,7 @@ void TranslationManipulator::update() {
 	//m_handlespace=getNormalized(getFullTransform(m_edited->parent));//TMP
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
 	//m_handlespace=m_edited;
-	m_handlespace=getNormalized(getNodeTransform(m_editednode, m_parent)*m_editednode->get()->getData().getMat4());
+	m_handlespace=getNormalized(getNodeTransform(&m_editednode, &m_parent)*m_editednode->getData().getMat4());
 
 	if(m_activehandle==-1){return;}
 
@@ -136,7 +138,7 @@ void TranslationManipulator::update() {
 		if(world2viewport(pc)[2]<0.992f){
 			//glm::mat4 parent=getFullTransform(m_edited->parent);//TMP
 			//glm::mat4 parent=glm::mat4(1.0f);
-			glm::mat4 parent=getNodeTransform(m_editednode,m_parent);
+			glm::mat4 parent=getNodeTransform(&m_editednode,&m_parent);
 			glm::vec4 result=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 			glm::vec4 editedo=glm::inverse(parent)*result;
 			m_edited[3]=editedo;
@@ -148,7 +150,7 @@ void TranslationManipulator::update() {
 	}
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
 	//m_handlespace[3]=m_edited[3];//TMP
-	m_handlespace[3]=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4()[3];
+	m_handlespace[3]=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4()[3];
 	///
-	if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue((glm::vec3)m_edited[3]);}
+	if(m_editednode!=nullptr){ValueSetResult v=m_editednode->setValue((glm::vec3)m_edited[3]);}
 }

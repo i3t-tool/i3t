@@ -9,7 +9,7 @@
 #include "imgui.h"
 #include "ManipulatorUtil.h"
 
-const char* LookAtManipulator::s_type = NULL;
+const char* LookAtManipulator::s_type = nullptr;
 
 LookAtManipulator::LookAtManipulator() {
     LookAtManipulator::s_type = typeid(LookAtManipulator).name();
@@ -30,7 +30,7 @@ LookAtManipulator::LookAtManipulator() {
 	m_edited=glm::mat4(1.0f);
 }
 void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
-	if(m_editednode==NULL){return;}
+	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -38,7 +38,7 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
-	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_edited;
+	glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_edited;
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -68,9 +68,9 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	CHECK_GL_ERROR();
 }
 void LookAtManipulator::update() {
-	if(m_editednode==NULL){return;}
-	m_edited=glm::inverse(m_editednode->get()->getData().getMat4());
-	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode->get();
+	if(m_editednode==nullptr){return;}
+	m_edited=glm::inverse(m_editednode->getData().getMat4());
+	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();
 	glm::vec3 center= editedlookat->getCenter();
 	glm::vec3 eye= editedlookat->getEye();
 	///
@@ -106,7 +106,7 @@ void LookAtManipulator::update() {
 	//glm::mat4 m=m_edited;*(glm::vec3*)&m[3]+=center;
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
 	//m_handlespace=glm::mat4(1.0f);
-	m_handlespace=getNodeTransform(m_editednode,m_parent);
+	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
 	m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(center-eye,0.0f));
 
 	if(m_activehandle==-1){return;}
@@ -146,7 +146,7 @@ void LookAtManipulator::update() {
 	}
 	//glm::mat4 m=getFullTransform(this->editedobj->parent);//TMP
 	//glm::mat4 m=glm::mat4(1.0f);//TMP
-	glm::mat4 m=getNodeTransform(m_editednode,m_parent);
+	glm::mat4 m=getNodeTransform(&m_editednode,&m_parent);
 	for (int i=0;i<4;i++){if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
 	glm::vec4 posh=(glm::inverse(m)*m_handlespace)[3];
 	///

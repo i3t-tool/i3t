@@ -9,7 +9,7 @@
 #include "imgui.h"
 #include "ManipulatorUtil.h"
 
-const char* RotationManipulator::s_type = NULL;
+const char* RotationManipulator::s_type = nullptr;
 
 RotationManipulator::RotationManipulator() {
     RotationManipulator::s_type = typeid(RotationManipulator).name();
@@ -26,7 +26,7 @@ RotationManipulator::RotationManipulator() {
 	m_edited=glm::mat4(1.0f);
 }
 void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
-	if(m_editednode==NULL){return;}
+	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -34,7 +34,7 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
-	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();
+	glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4();
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -67,10 +67,10 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	CHECK_GL_ERROR();
 }
 void RotationManipulator::update() {
-	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->get()->getData().getMat4();
+	if(m_editednode==nullptr){return;}
+	m_edited=m_editednode->getData().getMat4();
 	m_allowedaxis=0;
-	const char*oper= m_editednode->get()->getOperation()->keyWord.c_str();
+	const char*oper= m_editednode->getOperation()->keyWord.c_str();
 	if(strcmp(oper,"EulerX")==0){m_allowedaxis|=s_x;}
 	else if(strcmp(oper,"EulerY")==0){m_allowedaxis|=s_y;}
 	else if(strcmp(oper,"EulerZ")==0){m_allowedaxis|=s_z;}
@@ -99,7 +99,7 @@ void RotationManipulator::update() {
 
 	//m_handlespace=getNormalized(getFullTransform(m_editedobj));//TMP
 	//m_handlespace=m_edited;
-	m_handlespace=getNormalized(getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4());
+	m_handlespace=getNormalized(getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4());
 	m_handlespace[0][3]=0.0f;
 	m_handlespace[1][3]=0.0f;
 	m_handlespace[2][3]=0.0f;
@@ -161,5 +161,5 @@ void RotationManipulator::update() {
 		angle=angle2(v[0],v[1]);
 	}
 	//printf("angle %f, mov %f\n",angle,drag3[m_axisnum]);
-	m_editednode->get()->setValue(glm::radians(angle));
+	m_editednode->setValue(glm::radians(angle));
 }

@@ -113,6 +113,8 @@ glm::mat4 getFullTransform(GameObject* obj){
 }
 glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent){
 	glm::mat4 m=glm::mat4(1.0f);
+	return m;
+	/*
 	if(node==nullptr||parent==nullptr){return m;}
 	//Ptr<Core::NodeBase>n=Ptr<Core::NodeBase>(node.get());
 	Core::SequenceTree tree(*parent);
@@ -128,7 +130,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequen
 		m=d.getMat4()*m;
 		it++;
 	}
-	return m;
+	return m;*/
 }
 glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
 	glm::vec3 t0 = -World2::mainCamPos;

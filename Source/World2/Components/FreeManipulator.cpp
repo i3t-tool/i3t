@@ -20,7 +20,7 @@ void printMatrix4(glm::mat4 m){
 	  m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
-const char* FreeManipulator::s_type=NULL;
+const char* FreeManipulator::s_type=nullptr;
 	
 FreeManipulator::FreeManipulator(){
 	FreeManipulator::s_type=typeid(FreeManipulator).name();
@@ -50,7 +50,7 @@ void FreeManipulator::start(){
 
 }
 void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
-	if(m_editednode==NULL){return;}
+	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 	glUseProgram(World2::shaderHandle.program);
 	glDepthRange(0.0, 0.01);
@@ -70,7 +70,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	m_edited[3][3] = 1.0f;
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;
-	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();
+	glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4();
 	m_edited[0][3] = row4bkp[0];
 	m_edited[1][3] = row4bkp[1];
 	m_edited[2][3] = row4bkp[2];
@@ -101,7 +101,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	selected=0.3f*(float)(m_editaxis==3);
 	//t=glm::mat4(ftransform[1],ftransform[2],getFullTransform(m_edited->parent)[3]-ftransform[3], ftransform[3]);//TMP
 	//t=glm::mat4(ftransform[1],ftransform[2],glm::mat4(1.0f)[3]-ftransform[3], ftransform[3]);//TMP
-	t=glm::mat4(ftransform[1],ftransform[2],getNodeTransform(m_editednode,m_parent)[3]-ftransform[3], ftransform[3]);//TMP
+	t=glm::mat4(ftransform[1],ftransform[2],getNodeTransform(&m_editednode,&m_parent)[3]-ftransform[3], ftransform[3]);//TMP
 	t = getOrtho(t, 2);
 	setLen((glm::vec3*)&t[0],1.0f+selected*3.0f);setLen((glm::vec3*)&t[1],1.0f+selected*3.0f);
 	m_lineh->transformation=glm::mat4(1.0f);
@@ -150,8 +150,8 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 }
 	
 void FreeManipulator::update(){ 
-	if(m_editednode==NULL){return;}
-	m_edited= m_editednode->get()->getData().getMat4();
+	if(m_editednode==nullptr){return;}
+	m_edited= m_editednode.get()->getData().getMat4();
 	//printf("4\n");
 	bool transactionBegin=false;
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
@@ -218,7 +218,7 @@ void FreeManipulator::update(){
 		
 	m_handlespace=glm::mat4(1.0f);
 	//printf("7\n");
-	glm::mat4 m =getNodeTransform(m_editednode,m_parent);
+	glm::mat4 m =getNodeTransform(&m_editednode,&m_parent);
 	if(m_editmode==FreeManipulator::EDIT_POSITION){
 		//glm::mat4 m=getFullTransform(m_edited->parent);//TMP
 		//glm::mat4 m=glm::mat4(1.0f);
@@ -339,7 +339,7 @@ void FreeManipulator::update(){
 			if (world2viewport(pc)[2] < 0.992f) {
 				//glm::mat4 parent=getFullTransform(m_edited->parent);//TMP
 				//glm::mat4 parent=glm::mat4(1.0f);
-				glm::mat4 parent=getNodeTransform(m_editednode,m_parent);
+				glm::mat4 parent=getNodeTransform(&m_editednode,&m_parent);
 				glm::vec4 editedo = glm::inverse(parent) * glm::vec4(pc, 1.0f);
 				if(m_editaxis!=3){editedo-=m_edited[3]; }
 						
@@ -352,7 +352,7 @@ void FreeManipulator::update(){
 		}
 		//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 		//glm::mat4 ftransform=m_edited;
-		glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();
+		glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4();
 		m_handlespace[3]=ftransform[3]+ftransform[m_editaxis]*(float)(m_editaxis!=3);
 		m_handlespace[3][3]=1.0f;
 	}
@@ -368,7 +368,7 @@ void FreeManipulator::update(){
 		}
 		//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 		//glm::mat4 ftransform=m_edited;
-		glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();
+		glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4();
 		m_handlespace[3]=ftransform[3]+ftransform[m_editaxis]*(float)(m_editaxis!=3);
 		m_handlespace[3][3]=1.0f;
 	}
@@ -379,7 +379,7 @@ void FreeManipulator::update(){
 	m_edited[2][3] = row4bkp[2];
 	m_edited[3][3] = row4bkp[3];
 	///	
-	m_editednode->get()->setValue(m_edited);
+	m_editednode->setValue(m_edited);
 }
 
 

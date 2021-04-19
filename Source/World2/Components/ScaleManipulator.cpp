@@ -17,7 +17,7 @@ void printMatrix3(glm::mat4 m){
 	  m[0][0], m[1][0], m[2][0], m[3][0],	m[0][1], m[1][1], m[2][1], m[3][1],
 	  m[0][2], m[1][2], m[2][2], m[3][2],	m[0][3], m[1][3], m[2][3], m[3][3]);
 }
-const char* ScaleManipulator::s_type = NULL;
+const char* ScaleManipulator::s_type = nullptr;
 
 ScaleManipulator::ScaleManipulator() {
     ScaleManipulator::s_type = typeid(ScaleManipulator).name();
@@ -41,7 +41,7 @@ ScaleManipulator::ScaleManipulator() {
 }
 
 void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
-	if(m_editednode==NULL){return;}
+	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
@@ -49,7 +49,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
-	glm::mat4 ftransform=getNodeTransform(m_editednode,m_parent)*m_editednode->get()->getData().getMat4();//full transform from nodebase
+	glm::mat4 ftransform=getNodeTransform(&m_editednode,&m_parent)*m_editednode->getData().getMat4();//full transform from nodebase
 	ftransform[0][3]=0.0f;
 	ftransform[1][3]=0.0f;
 	ftransform[2][3]=0.0f;
@@ -84,8 +84,8 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 }
 
 void ScaleManipulator::update() {
-	if(m_editednode==NULL){return;}
-	m_edited=m_editednode->get()->getData().getMat4();
+	if(m_editednode==nullptr){return;}
+	m_edited=m_editednode->getData().getMat4();
 	///
 	bool transactionBegin=false;
 
@@ -118,7 +118,7 @@ void ScaleManipulator::update() {
 	
 	//m_handlespace=getNormalized(getFullTransform(m_edited->parent)/**m_bkp*/);//TMP
 	//m_handlespace=glm::mat4(1.0f);
-	m_handlespace=getNodeTransform(m_editednode,m_parent);
+	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
 
 	if(m_activehandle==-1){/*m_bkp=m_edited->transformation;*/return;}
 
@@ -173,9 +173,9 @@ void ScaleManipulator::update() {
 	m_edited[1][1]+=drag3[1];
 	m_edited[2][2]+=drag3[2];
 	///
-	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
-	//if(m_editednode!=NULL){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
-	Core::Scale*editedscale=(Core::Scale*)m_editednode->get();
+	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
+	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
+	Core::Scale*editedscale=(Core::Scale*)m_editednode.get();
 	editedscale->setX(m_edited[0][0]);
 	editedscale->setY(m_edited[1][1]);
 	editedscale->setZ(m_edited[2][2]);

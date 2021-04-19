@@ -30,12 +30,12 @@ struct Shader2{
     GLint attr_uv;      ///<vertice texture coords attribute
 };
 struct Manipulator {
-    Manipulator(const std::shared_ptr<Core::NodeBase>**_editedNode,const std::shared_ptr<Core::Sequence>**_parent,Component*_component){
+    Manipulator(std::shared_ptr<Core::NodeBase>*_editedNode,std::shared_ptr<Core::Sequence>*_parent,Component*_component){
         editedNode=_editedNode;parent=_parent;component=_component;
     }
     Manipulator(){editedNode=nullptr;parent=nullptr;component=nullptr;}
-    const std::shared_ptr<Core::NodeBase>**editedNode;
-    const std::shared_ptr<Core::Sequence>**parent;
+    std::shared_ptr<Core::NodeBase>*editedNode;
+    std::shared_ptr<Core::Sequence>*parent;
     Component*component;
     //Component*m_gameObject;
 };
