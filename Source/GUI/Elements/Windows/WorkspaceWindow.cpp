@@ -825,8 +825,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 		}
 		if (ImGui::MenuItem("sequence")) {
-			//m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSequence>(HeaderBackgroundTexture));
-			//ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+			m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSequence>(HeaderBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 		if (ImGui::MenuItem("camera")) {
 		}
