@@ -3,10 +3,11 @@
 #include "Core/Nodes/GraphManager.h"
 
 #include "Generator.h"
+#include "../Utils.h"
 
 using namespace Core;
 
-TEST(Translation, CoordsValidation)
+TEST(TranslationTest, CoordsValidation)
 {
 	auto translationNode = Builder::createTransform<Translation>();
 
@@ -17,18 +18,9 @@ TEST(Translation, CoordsValidation)
 	}
 	{
 		// Valid coordinates.
-		{
-			auto result = translationNode->setValue(-2.0f, {3, 0});
-			EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-		}
-		{
-			auto result = translationNode->setValue(-2.0f, {3, 1});
-			EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-		}
-		{
-			auto result = translationNode->setValue(-2.0f, {3, 2});
-			EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-		}
+    setValue_expectOk(translationNode, -2.0f, {3, 0});
+    setValue_expectOk(translationNode, -2.0f, {3, 1});
+    setValue_expectOk(translationNode, -2.0f, {3, 2});
 
 		auto translMat = glm::translate(glm::vec3(-2.0f, -2.0f, -2.0f));
 		auto data = translationNode->getData().getMat4();
@@ -37,7 +29,7 @@ TEST(Translation, CoordsValidation)
 	}
 }
 
-TEST(Translation, GettersAndSetterShouldBeOk)
+TEST(TranslationTest, GettersAndSetterShouldBeOk)
 {
   auto translation = Builder::createTransform<Translation>()->as<Translation>();
 

@@ -8,7 +8,7 @@
 //{
 //  auto NV = new NormalizeVectorImpl(GetNextId(), "NormalizeVector");
 //  s_nodes->emplace_back(NV);
-//  auto node = Builder::createNode<ENodeType::NormalizeVector>();
+//  auto node = Core::Builder::createNode<ENodeType::NormalizeVector>();
 //  s_nodes->back()->nodebase = std::move(node);
 //
 //  auto inputs = s_nodes->back()->nodebase.get()->getInputPins();
@@ -105,5 +105,4 @@
 //
 //  nodebase->updateValues(0);
 //
-//  ImGui::Spring(0);
-//}
+//  ImGui::Spring(0);//}

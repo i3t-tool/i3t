@@ -53,13 +53,15 @@ enum class WorkspaceLevelOfDetail
     Label
 };
 
+extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
+
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
+
 
 /* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
 struct WorkspaceNodeArgs
 {
-    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default WorkspaceNode header";
     std::string nodeLabel = "Node";
     /* \todo JH it will be nice, if we are able give some default headerBackground here ... */
@@ -67,26 +69,32 @@ struct WorkspaceNodeArgs
 
 class WorkspaceNode
 {
-public:
+protected:
 	const ne::NodeId m_id;
-	std::string m_state; /*! \brief e.g. selected \todo what is it for? */
 	std::string m_label;
-	WorkspaceLevelOfDetail m_levelOfDetail;
 
 	ImColor m_color; /*! \brief Color of Node */
-	ImVec2 m_size;   /*! \brief Size of box */
+	ImVec2 m_size;   /*! \brief Size of box */ /* \todo JH I think this is useless */
 	float m_touchTime;
 
 	std::string m_headerLabel;
 	ImTextureID m_headerBackground;
 
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
+public:
+    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
+    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel = "Node", std::string nodeLabel = "Node");
 
-	virtual void drawInputLinks() = 0;
+    ne::NodeId const getId() const;
+
+    virtual std::string getHeaderLabel();
+    virtual ImTextureID getHeaderBackground();
+
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+
 	virtual void drawHeader(util::NodeBuilder& builder);
-	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
-	virtual void drawData(util::NodeBuilder& builder) = 0;
-	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin) = 0;
+	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+	virtual void drawData(util::NodeBuilder& builder)=0;
+	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
 
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
@@ -97,9 +105,27 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
-	WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
-    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel = "Node", std::string nodeLabel = "Node");
+};
 
+class WorkspacePinProperties
+{
+protected:
+	ne::PinId const m_id; /*! \brief unique (among Pins) identificator */
+
+    bool m_showLabel;
+	std::string m_label;    /*! \brief Name of Pin */
+	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
+    ImColor m_color;
+
+public:
+    WorkspacePinProperties(ne::PinId const id, std::string label);
+
+    ne::PinId const getId() const;
+    int const getIconSize() const;
+    ImColor const getColor() const;
+
+    bool getShowLabel() const;
+    std::string const getLabel() const;
 };
 
 /*! \class WorkspaceLinkProperties
@@ -107,11 +133,18 @@ public:
  */
 class WorkspaceLinkProperties
 {
-public:
+protected:
 	const ne::LinkId m_id;
 	ImColor m_color;
+	float m_thickness;
 
+public:
 	WorkspaceLinkProperties(ne::LinkId const id);
+
+	ne::LinkId const getId() const;
+	ImColor const getColor() const;
+	float const getThickness() const;
+
 };
 
 extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);

@@ -149,7 +149,9 @@ public:
 
   static bool isKeyJustUp(const Keys::Code code) { return (m_keyMap[code] == JUST_UP); }
 
+	/// \returns whether one of three mouse buttons was clicked.
   static bool isMouseClicked();
+  static bool isMouseDown();
   //@}
 
   /**

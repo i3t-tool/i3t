@@ -6,7 +6,6 @@
 #include "Core/Application.h"
 #include "Core/Input/InputActions.h"
 #include "Core/Input/InputManager.h"
-#include "Rendering/FrameBuffer.h"
 
 #include "../../../World2/Select.h"
 #include "../../../World2/World2.h"
@@ -23,9 +22,6 @@ Viewport::Viewport(bool show, World2* world2) : IWindow(show)
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
 	glGenFramebuffers(1, &m_fboMain);
-
-	// set it as the default framebuffer in framebuffer.h
-	FrameBuffer::setDefaultBuffer(m_fboMain);
 
 	// generate texture to draw on
 	glGenTextures(1, &m_texColBufMain);

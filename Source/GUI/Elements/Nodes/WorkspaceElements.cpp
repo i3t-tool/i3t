@@ -6,23 +6,28 @@
 // #include <format> // not as standard library yet
 
 std::map<EValueType, ImColor> WorkspacePinColor = {
-		{EValueType::Float, ImColor(255, 255, 255)},    {EValueType::Matrix, ImColor(220, 48, 48)},
+		{EValueType::Float, ImColor(255, 255, 255)},    {EValueType::Matrix, ImColor(150, 8, 8)},
 		{EValueType::MatrixMul, ImColor(68, 201, 156)}, {EValueType::Pulse, ImColor(147, 226, 74)},
 		{EValueType::Quat, ImColor(124, 21, 153)},      {EValueType::Screen, ImColor(51, 150, 215)},
 		{EValueType::Vec3, ImColor(218, 0, 183)},       {EValueType::Vec4, ImColor(255, 48, 48)}};
 
 std::map<EValueType, IconType> WorkspacePinShape = {
-		{EValueType::Float, IconType::Circle},     {EValueType::Matrix, IconType::Flow},
+		{EValueType::Float, IconType::Circle},     {EValueType::Matrix, IconType::Arrow},
 		{EValueType::MatrixMul, IconType::Circle}, {EValueType::Pulse, IconType::Circle},
 		{EValueType::Quat, IconType::Circle},      {EValueType::Screen, IconType::Circle},
 		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
 
+std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
+    {WorkspaceLevelOfDetail::Full, "Full"},
+    {WorkspaceLevelOfDetail::SetValues, "Set values"},
+    {WorkspaceLevelOfDetail::Label, "Label"}
+};
+
 /* \todo JH not use constant values here */
 WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args)
-    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel), m_levelOfDetail(args.levelOfDetail)
+    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
-	m_state = "default WorkspaceNode state";
 	m_color = ImColor(255, 255, 255);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
@@ -30,13 +35,52 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 
 /* \todo JH not use constant values here */
 WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel), m_levelOfDetail(WorkspaceLevelOfDetail::SetValues)
+    :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
-	m_state = "default WorkspaceNode state";
-	m_color = ImColor(255, 255, 255);
+	m_color = ImColor(89, 134, 179);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
+}
+
+ne::NodeId const WorkspaceNode::getId() const
+{
+    return m_id;
+}
+
+std::string WorkspaceNode::getHeaderLabel()
+{
+    return m_headerLabel;
+}
+
+ImTextureID WorkspaceNode::getHeaderBackground()
+{
+    return m_headerBackground;
+}
+
+void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
+{
+	builder.Begin(m_id);
+
+	drawHeader(builder);
+	drawInputs(builder, newLinkPin);
+	drawData(builder);
+	drawOutputs(builder, newLinkPin);
+
+	builder.End();
+}
+
+void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
+{
+	builder.Header(m_color);
+
+	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
+	ImGui::TextUnformatted(m_headerLabel.c_str());
+	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y
+	//ImGui::Dummy(ImVec2(0, 28));
+	//ImGui::Spring(0);
+
+	builder.EndHeader();
 }
 
 /* \todo JH time-functions are taken from example */
@@ -61,22 +105,31 @@ float WorkspaceNode::GetTouchProgress(float const constTouchTime)
 		return 0.0f;
 }
 
-void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
-{
-	builder.Header(m_color);
 
-	ImGui::Spring(0); /* \todo JH what 0/1 means */
-	ImGui::TextUnformatted(m_headerLabel.c_str());
-	ImGui::Spring(1);
-	ImGui::Dummy(ImVec2(0, 28));
-	ImGui::Spring(0);
-
-	builder.EndHeader();
-}
-
-
-WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) : m_id(id), m_color(ImColor(255, 255, 255))
+WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id)
+    : m_id(id)
+    , m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH not constant here... */ //SS what is this?
+    , m_thickness(3) /* \todo JH not constant here... */
 {}
+
+ne::LinkId const WorkspaceLinkProperties::getId() const	{return m_id; }
+ImColor const WorkspaceLinkProperties::getColor() const {return m_color; }
+float const WorkspaceLinkProperties::getThickness() const {return m_thickness; }
+
+WorkspacePinProperties::WorkspacePinProperties(ne::PinId const id, std::string label)
+		: m_id(id), m_label(label), m_showLabel(false), m_iconSize(24), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
+{}
+
+
+ne::PinId const WorkspacePinProperties::getId() const {return m_id;}
+int const WorkspacePinProperties::getIconSize() const {return m_iconSize;}
+ImColor const WorkspacePinProperties::getColor() const {return m_color;}
+
+bool WorkspacePinProperties::getShowLabel() const {return m_showLabel;}
+std::string const WorkspacePinProperties::getLabel() const {return m_label;}
+
+
+/* >>>>> STATIC FUNCTIONS <<<<< */
 
 int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
 {

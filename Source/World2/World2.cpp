@@ -178,10 +178,11 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
         i->second.component->m_isActive=false;
         *(i->second.editedNode)=nullptr;
     }
+
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
-    const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->m_nodebase;
+    const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->getNodebase();
 
     //op=Builder::createTransform<Core::Frustum>();
     //op=Builder::createTransform<Core::OrthoProj>();
@@ -192,7 +193,7 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     op=*nodebase;
 
     WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
-    Core::Transform::DataMap	data		= nodebase->get()->getDataMap(); //printf("a");
+    const Core::Transform::DataMap*	data		= nodebase->get()->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->get()->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->get()->getOperation()->keyWord.c_str(); //printf("c");
     DataStore                   datastore   = nodebase->get()->getData(); //printf("d");
@@ -216,11 +217,11 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
 
 }
 void World2::tmpDrawNode() {
-	if(op.get()==nullptr){op= Builder::createTransform<Core::EulerRotX>();}
+	if(op.get()==nullptr){op= Core::Builder::createTransform<Core::EulerRotX>();}
 	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
 	const glm::mat4& coreData = op->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = op->getDataMap();
-	int idOfNode = nodebasedata->m_id.Get();
+	const Core::Transform::DataMap* coreMap = op->getDataMap();
+	int idOfNode = nodebasedata->getId().Get();
 	char label[]={0,0};
     float localData=0.0f;
 
@@ -228,7 +229,7 @@ void World2::tmpDrawNode() {
 	for (int rows = 0; rows < 4; rows++){
 		for (int columns = 0; columns < 4; columns++){
 			localData = coreData[columns][rows];
-			bool inactive = (coreMap[columns * 4 + rows] == 0 || coreMap[columns * 4 + rows] == 255);
+			bool inactive = ((*coreMap)[columns * 4 + rows] == 0 || (*coreMap)[columns * 4 + rows] == 255);
 			if (inactive){
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -248,17 +249,17 @@ void World2::tmpDrawNode() {
 	ImGui::End();
 }
 void World2::tmpSetNode() {
-    if(InputManager::isKeyPressed(Keys::x))     {op=Builder::createTransform<Core::EulerRotX>();}
-    else if(InputManager::isKeyPressed(Keys::y)){op=Builder::createTransform<Core::EulerRotY>();}
-    else if(InputManager::isKeyPressed(Keys::z)){op=Builder::createTransform<Core::EulerRotZ>();}
-    else if(InputManager::isKeyPressed(Keys::w)){op=Builder::createTransform<Core::AxisAngleRot>();}
-    else if(InputManager::isKeyPressed(Keys::s)){op=Builder::createTransform<Core::Scale>();}
-    else if(InputManager::isKeyPressed(Keys::t)){op=Builder::createTransform<Core::Translation>();}
-    else if(InputManager::isKeyPressed(Keys::o)){op=Builder::createTransform<Core::OrthoProj>();}
-    else if(InputManager::isKeyPressed(Keys::p)){op=Builder::createTransform<Core::PerspectiveProj>();}
-    else if(InputManager::isKeyPressed(Keys::f)){op=Builder::createTransform<Core::Frustum>();}
-    else if(InputManager::isKeyPressed(Keys::g)){op=Builder::createTransform<Core::Free>();}
-    else if(InputManager::isKeyPressed(Keys::l)){op=Builder::createTransform<Core::LookAt>();}
+    if(InputManager::isKeyPressed(Keys::x))     {op=Core::Builder::createTransform<Core::EulerRotX>();}
+    else if(InputManager::isKeyPressed(Keys::y)){op=Core::Builder::createTransform<Core::EulerRotY>();}
+    else if(InputManager::isKeyPressed(Keys::z)){op=Core::Builder::createTransform<Core::EulerRotZ>();}
+    else if(InputManager::isKeyPressed(Keys::w)){op=Core::Builder::createTransform<Core::AxisAngleRot>();}
+    else if(InputManager::isKeyPressed(Keys::s)){op=Core::Builder::createTransform<Core::Scale>();}
+    else if(InputManager::isKeyPressed(Keys::t)){op=Core::Builder::createTransform<Core::Translation>();}
+    else if(InputManager::isKeyPressed(Keys::o)){op=Core::Builder::createTransform<Core::OrthoProj>();}
+    else if(InputManager::isKeyPressed(Keys::p)){op=Core::Builder::createTransform<Core::PerspectiveProj>();}
+    else if(InputManager::isKeyPressed(Keys::f)){op=Core::Builder::createTransform<Core::Frustum>();}
+    else if(InputManager::isKeyPressed(Keys::g)){op=Core::Builder::createTransform<Core::Free>();}
+    else if(InputManager::isKeyPressed(Keys::l)){op=Core::Builder::createTransform<Core::LookAt>();}
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;

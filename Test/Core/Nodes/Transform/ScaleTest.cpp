@@ -3,19 +3,18 @@
 #include "Core/Nodes/GraphManager.h"
 
 #include "Generator.h"
+#include "../Utils.h"
 
 using namespace Core;
 
-TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
+TEST(ScaleTest, SetWrongMatToScaleNode_ActionShouldNotBePermitted)
 {
 	// Create uniform scale.
-	auto scale = Builder::createTransform<Scale>();
+	auto scale = Core::Builder::createTransform<Scale>();
 
 	{
 		// Set new uniform scale.
-		auto result = scale->setValue(glm::scale(glm::vec3(3.0f, 3.0f, 3.0f)));
-
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(scale, glm::scale(glm::vec3(3.0f, 3.0f, 3.0f)));
 	}
 	{
 		// Set new non-uniform scale.
@@ -29,46 +28,43 @@ TEST(SetWrongMatToScaleNode, ActionShouldNotBePermitted)
 		mat[1][3] = 165.0f;
 
 		// Set non uniform scale constraint.
-		scale->setDataMap(Transform::g_Scale);
+		scale->setDataMap(&Transform::g_Scale);
 		auto result = scale->setValue(mat);
 
 		EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
 	}
 }
 
-TEST(SetVec3Scale, ScaleShouldBeValid)
+TEST(ScaleTest, SetVec3Scale)
 {
 	auto scale = glm::vec3(1.5f, 1.5f, 1.5f);
-	auto scaleNode = Builder::createTransform<Scale>();
+	auto scaleNode = Core::Builder::createTransform<Scale>();
 
-	scaleNode->setDataMap(Transform::g_Scale);
-	EXPECT_EQ(Transform::g_Scale, scaleNode->getDataMap());
+	scaleNode->setDataMap(&Transform::g_Scale);
+	EXPECT_EQ(&Transform::g_Scale, scaleNode->getDataMap());
 
-	auto result = scaleNode->setValue(scale);
-	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+	setValue_expectOk(scaleNode, scale);
 
 	auto expectedScale = glm::scale(scale);
 	EXPECT_EQ(expectedScale, scaleNode->getData().getMat4());
 }
 
-TEST(ResetScaleNode, ResetsNodeToInitialValues)
+TEST(ScaleTest, ResetsNodeToInitialValues)
 {
 	auto scale = glm::vec3(7.f, -5.f, 3.f);
 
 	// Create non-uniform scale
-	auto scaleNode = Builder::createTransform<Core::Scale>(scale, Transform::g_Scale);
-	EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Scale);
+	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale, Transform::g_Scale);
+	EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Scale);
 
 	// Set free transformation node.
-	scaleNode->setDataMap(Transform::g_Free);
-	EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Free);
+	scaleNode->setDataMap(&Transform::g_Free);
+	EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Free);
 
 	glm::mat4 mat(1.0f);
 	mat[1][3] = 165.0f;
 
-	auto result = scaleNode->setValue(mat);
-	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-
+	setValue_expectOk(scaleNode, mat);
 	{
 		auto data = scaleNode->getData().getMat4();
 
@@ -77,7 +73,7 @@ TEST(ResetScaleNode, ResetsNodeToInitialValues)
 	{
 		// Reset to initial values and state.
 		scaleNode->reset();
-		EXPECT_EQ(scaleNode->getDataMap(), Transform::g_Scale);
+		EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Scale);
 
 		auto data = scaleNode->getData().getMat4();
 
@@ -87,12 +83,12 @@ TEST(ResetScaleNode, ResetsNodeToInitialValues)
 	}
 }
 
-TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
+TEST(ScaleTest, UniformScaleSynergies)
 {
 	auto scale = glm::vec3(-2.0f);
 	auto scaleMat = glm::scale(scale);
 
-	auto scaleNode = Builder::createTransform<Core::Scale>(scale, Transform::g_UniformScale);
+	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale, Transform::g_UniformScale);
 
 	{
 		// Invalid coordinates.
@@ -101,8 +97,7 @@ TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
 	}
 	{
 		// Valid coordinates.
-		auto result = scaleNode->setValue(-2.0f, {1, 1});
-		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		setValue_expectOk(scaleNode, -2.0f, {1, 1});
 
 		auto data = scaleNode->getData().getMat4();
 
@@ -110,9 +105,9 @@ TEST(UniformScaleSynergies, OneValueSetShouldFollowUniformScaleSynergies)
 	}
 }
 
-TEST(Scale, GettersAndSetterShouldBeOk)
+TEST(ScaleTest, GettersAndSetterShouldBeOk)
 {
-  auto scale = Builder::createTransform<Scale>()->as<Scale>();
+  auto scale = Core::Builder::createTransform<Scale>()->as<Scale>();
 
   auto vec = generateVec3();
 
@@ -125,7 +120,7 @@ TEST(Scale, GettersAndSetterShouldBeOk)
     EXPECT_EQ(glm::scale(glm::vec3{vec.z, vec.z, vec.z}), scale->getData().getMat4());
 	}
   {
-		scale->setDataMap(Transform::g_Scale);
+		scale->setDataMap(&Transform::g_Scale);
 
     scale->setX(vec.x);
     scale->setY(vec.y);

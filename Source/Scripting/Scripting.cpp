@@ -17,10 +17,10 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	fprintf(f,"//saving\n");
 
 	for (int i = 0; i < _workspace->size(); i++) {
-		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get();
-		Ptr<Core::NodeBase>			nodebase	= nodebasedata->m_nodebase;
-		ImVec2						pos			= ne::GetNodePosition(nodebasedata->m_id);
-		Core::Transform::DataMap	data		= nodebase->getDataMap();
+		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
+		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase();
+		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId());
+		const Core::Transform::DataMap&	data		= nodebase->getDataMapRef();
 		const Operation*			operation	= nodebase->getOperation();
 		const char*					keyword		= operation->keyWord.c_str();
 
@@ -56,9 +56,9 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	}
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData*  nodebasedata = _workspace->at(i).get();
-		Ptr<Core::NodeBase>			nodebase = nodebasedata->m_nodebase;
-		ImVec2						pos = ne::GetNodePosition(nodebasedata->m_id);
-		Core::Transform::DataMap	data = nodebase->getDataMap();
+		Ptr<Core::NodeBase>			nodebase = nodebasedata->getNodebase();
+		ImVec2						pos = ne::GetNodePosition(nodebasedata->getId());
+		const Core::Transform::DataMap&	data = nodebase->getDataMapRef();
 		const Operation*			operation = nodebase->getOperation();
 		const char* keyword =		operation->keyWord.c_str();
 
@@ -72,7 +72,7 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 				if(parentpin!=NULL){indexout=parentpin->getIndex(); }
 			}
 			for (int j = 0; j < _workspace->size(); j++) {
-				if (parent.get() == (_workspace->at(j).get())->m_nodebase.get()) {parentindex = j;}
+				if (parent.get() == (_workspace->at(j).get())->getNodebase().get()) {parentindex = j;}
 			}
 			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){fprintf(f,"bool p%d_%d=plugnodes(n%d,n%d,%d,%d);\n",i,indexin, parentindex,i,indexout,indexin);}
 		}
@@ -81,7 +81,6 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	return true;
 }
 bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
-
 	ScriptingData*data=getScriptingData();
 	int datalen=(int)data->nodeData.size();
 	int p=PicocRunFile(filename);

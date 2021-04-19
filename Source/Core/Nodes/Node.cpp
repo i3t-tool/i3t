@@ -10,7 +10,7 @@ NodeBase::~NodeBase()
 	unplugAll();
 }
 
-void NodeBase::create()
+void NodeBase::init()
 {
 	m_id = IdGenerator::next();
 
@@ -24,14 +24,30 @@ void NodeBase::create()
 	for (int i = 0; i < m_operation->numberOfOutputs; i++)
 	{
 		m_outputs.emplace_back(m_operation->outputTypes[i], false, getPtr(), i);
-		m_internalData.emplace_back();
+		m_internalData.emplace_back(m_operation->outputTypes[i]);
 	}
 
-	// Ugly workaround for Model node, which has no outputs.
+	// Ugly workaround for Model and Screen node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
 	{
-		m_internalData.emplace_back();
+		m_internalData.emplace_back(m_operation->inputTypes[0]);
 	}
+}
+
+ID NodeBase::getId() const
+{
+  return m_id;
+}
+
+void NodeBase::setDataMap(const Transform::DataMap* map)
+{
+  // PerspectiveProj;
+	auto& validMaps = getValidDataMaps();
+	auto it = std::find_if(validMaps.begin(), validMaps.end(),
+      [&](const Transform::DataMap* m) { return m == map; });
+
+	if (it != validMaps.end())
+	  m_currentMap = map;
 }
 
 const std::vector<Pin>& NodeBase::getInputPins() const
@@ -59,7 +75,6 @@ void NodeBase::spreadSignal(int outIndex)
 {
 	for (auto* oct : m_outputs[outIndex].getOutComponents())
 	{
-		// for each wire connected to the outIndex output (for each OperatorCurveTab oct):
 		oct->m_master->receiveSignal(oct->getIndex());
 	}
 }
@@ -68,10 +83,7 @@ void NodeBase::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
 
-	if (m_restrictedOutput)
-		spreadSignal(m_restrictedOutputIndex);
-	else
-		spreadSignal();
+  spreadSignal();
 }
 
 bool NodeBase::areInputsPlugged(int numInputs)
@@ -91,6 +103,70 @@ bool NodeBase::areInputsPlugged(int numInputs)
 bool NodeBase::areAllInputsPlugged()
 {
 	return areInputsPlugged(m_operation->numberOfInputs);
+}
+
+ENodePlugResult NodeBase::isPlugCorrect(Pin const * input, Pin const * output)
+{
+  auto* inp = input;
+  if (!inp)
+    return ENodePlugResult::Err_NonexistentPin;
+
+  auto* out = output;
+  if (!out)
+    return ENodePlugResult::Err_NonexistentPin;
+
+  if (inp->m_opValueType != out->m_opValueType)
+  {
+    // Do the input and output data types match?
+    return ENodePlugResult::Err_MismatchedPinTypes;
+  }
+
+  if (inp->m_isInput == out->m_isInput)
+  {
+    // Do the input and output kind match?
+    return ENodePlugResult::Err_MismatchedPinKind;
+  }
+
+  if (inp->m_master == out->m_master)
+  {
+    // Not a circular edge?
+    return ENodePlugResult::Err_Loopback;
+  }
+
+  // cycle detector
+  auto toFind = inp->m_master; // INPUT
+
+  // stack in vector - TOS is at the vector back.
+  std::vector<Ptr<NodeBase>> stack;
+
+  // PUSH(output) insert element at end.
+  stack.push_back(out->m_master);
+
+  while (!stack.empty())
+  {
+    // Return last element of mutable sequence.
+    auto act = stack.back();
+    stack.pop_back();
+
+    if (act == toFind)
+      return ENodePlugResult::Err_Loop;
+
+    for (auto& pin : act->m_inputs)
+    {
+      if (pin.isPluggedIn())
+      {
+        Pin* ct = pin.m_input;
+        stack.push_back(ct->m_master);
+      }
+    }
+  }
+
+  /*
+    if (isOperatorPlugCorrectMod != NULL)
+      return isOperatorPlugCorrectMod(inp, out);
+  */
+
+  return ENodePlugResult::Ok;
 }
 
 void NodeBase::unplugAll()
@@ -146,9 +222,4 @@ void NodeBase::unplugOutput(int index)
 		otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
-}
-
-ID NodeBase::getId() const
-{
-	return m_id;
 }

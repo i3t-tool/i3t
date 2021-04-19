@@ -36,27 +36,27 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
 
 	if(type== scriptingData.mat4Types.free){
 		workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "-"));
-        sprintf(label,"#%02llu %s",workspace->back()->m_nodebase->getId(),workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
-        workspace->back()->m_headerLabel = label;
-		ValueSetResult result =(workspace->back().get())->m_nodebase.get()->setValue(mat);
-		ne::SetNodePosition(workspace->back()->m_id, ImVec2((float)x, (float)y));
+        sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+		ValueSetResult result =(workspace->back().get())->getNodebase().get()->setValue(mat);
+		ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
 	}
 	else if (type == scriptingData.mat4Types.scale) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "-"));
-        sprintf(label,"#%02llu %s",workspace->back()->m_nodebase->getId(),workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
-        workspace->back()->m_headerLabel = label;
-		ValueSetResult result = (workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)mat[0]);
-		ne::SetNodePosition(workspace->back()->m_id, ImVec2((float)x, (float)y));
+        sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+		ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
 	}
 	else if (type == scriptingData.mat4Types.translate) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, ""));
-        sprintf(label,"#%02llu %s",workspace->back()->m_nodebase->getId(),workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
-        workspace->back()->m_headerLabel= label;
-		ValueSetResult result = (workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)mat[0]);
-		ne::SetNodePosition(workspace->back()->m_id, ImVec2((float)x, (float)y));
+        sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel()= label;
+		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+		ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
 	}
-    if(NumArgs==2){ne::CenterNodeOnScreen(workspace->back()->m_id);}
-    ReturnValue->Val->Integer = (int)workspace->back()->m_nodebase->getId();
+    if(NumArgs==2){ne::CenterNodeOnScreen(workspace->back()->getId());}
+    ReturnValue->Val->Integer = (int)workspace->back()->getNodebase()->getId();
 }
 void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int dataindex = Param[0]->Val->Integer;
@@ -73,12 +73,12 @@ void normVec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value
     ReturnValue->Val->Integer = (int)workspace->size() - 1;
 
     workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "-"));
-    sprintf(label,"#%02llu %s",workspace->back()->m_nodebase->getId(),workspace->back()->m_nodebase->getOperation()->keyWord.c_str());
-    workspace->back()->m_headerLabel = label;
-    ValueSetResult result = (workspace->back().get())->m_nodebase.get()->setValue(vec);
-    ne::SetNodePosition(workspace->back()->m_id, ImVec2((float)x, (float)y));
-    if(NumArgs==1){ne::CenterNodeOnScreen(workspace->back()->m_id);}
-    ReturnValue->Val->Integer = (int)workspace->back()->m_nodebase->getId();
+    sprintf(label,"#%02llu %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+    workspace->back()->getHeaderLabel() = label;
+    ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(vec);
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if(NumArgs==1){ne::CenterNodeOnScreen(workspace->back()->getId());}
+    ReturnValue->Val->Integer = (int)workspace->back()->getNodebase()->getId();
 }
 void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int ida=Param[0]->Val->Integer;
@@ -91,15 +91,15 @@ void plugNodes(struct ParseState* Parser, struct Value* ReturnValue, struct Valu
     int indexb=-1;
 
     for(int i=0;i<workspace->size();i++){
-        if((int)workspace->at(i)->m_nodebase->getId()==ida){indexa=i;}
-        if((int)workspace->at(i)->m_nodebase->getId()==idb){indexb=i;}
+        if((int)workspace->at(i)->getNodebase()->getId()==ida){indexa=i;}
+        if((int)workspace->at(i)->getNodebase()->getId()==idb){indexb=i;}
     }
 
     if(indexa<0||indexa>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
     if(indexb<0||indexb>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
 
-    Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->m_nodebase;
-	Ptr<Core::NodeBase> pcb= (workspace->at(indexb).get())->m_nodebase;
+    Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->getNodebase();
+	Ptr<Core::NodeBase> pcb= (workspace->at(indexb).get())->getNodebase();
 
     if(outputindex>=pca->getOutputPins().size()){ReturnValue->Val->Integer=false;return;}
     if(inputindex>= pcb->getInputPins().size()){ ReturnValue->Val->Integer=false;return;}
@@ -115,12 +115,12 @@ void unplugInput(struct ParseState* Parser, struct Value* ReturnValue, struct Va
     int indexa=-1;
 
     for(int i=0;i<workspace->size();i++){
-        if((int)workspace->at(i)->m_nodebase->getId()==ida){indexa=i;}
+        if((int)workspace->at(i)->getNodebase()->getId()==ida){indexa=i;}
     }
 
     if(indexa<0||indexa>=workspace->size()-1){ReturnValue->Val->Integer=false;return;}
 
-    Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->m_nodebase;
+    Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->getNodebase();
     if(inputindex>= pca->getInputPins().size()){ ReturnValue->Val->Integer=false;return;}
     Core::GraphManager::unplugInput(pca, inputindex);
 
@@ -132,7 +132,7 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
     ReturnValue->Val->Integer=-1;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
-        if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {occurances++;}
+        if (strcmp(workspace->at(i).get()->getHeaderLabel().c_str(),label)==0) {occurances++;}
     }
     if(occurances==0){
         std::cout<<"No matches found."<<std::endl;
@@ -142,8 +142,8 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
         std::cout<<"Multiple matches found:"<<std::endl;
     }
     for(int i=0;i<workspace->size();i++){
-        if (strcmp(workspace->at(i).get()->m_headerLabel.c_str(),label)==0) {
-            ReturnValue->Val->Integer= (int)workspace->at(i)->m_nodebase->getId();
+        if (strcmp(workspace->at(i).get()->getHeaderLabel().c_str(),label)==0) {
+            ReturnValue->Val->Integer= (int)workspace->at(i)->getNodebase()->getId();
             if(occurances>1){std::cout<<"Id: "<<i<<", Name: "<<label<<std::endl;}
         }
     }
@@ -155,13 +155,13 @@ void deleteNode(struct ParseState* Parser, struct Value* ReturnValue, struct Val
     int index=-1;
 
     for(int i=0;i<workspace->size();i++){
-        if((int)workspace->at(i)->m_nodebase->getId()==ida){index=i;}
+        if((int)workspace->at(i)->getNodebase()->getId()==ida){index=i;}
     }
     if(index<0||index>=workspace->size()){ReturnValue->Val->Integer=false;std::cout<<"Node does not exist."<<std::endl;return;}
 
     WorkspaceNodeWithCoreData* cc= (workspace->at(index).get());
     Ptr<WorkspaceWindow> ww = I3T::getWindowPtr<WorkspaceWindow>();
-    ww->NodeDelete(cc->m_id);
+    ww->NodeDelete(cc->getId());
 
     ReturnValue->Val->Integer=true;
 }

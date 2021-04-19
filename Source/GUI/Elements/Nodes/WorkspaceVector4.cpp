@@ -3,12 +3,23 @@
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args)
     : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
-    setDataItemsWidth();
+	fw.showMyPopup = false;
+	fw.id = "";
+	fw.value = NULL;
+	fw.name = "vector4";
+	fw.rows = 0;
+	setDataItemsWidth();
 }
 
 WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
     : WorkspaceNodeWithCoreData(headerBackground, nodebase, headerLabel, nodeLabel)
 {
+	fw.showMyPopup = false;
+	fw.id = "";
+	fw.value = NULL;
+	fw.name = "vector4";
+	fw.rows = 0;
+
     setDataItemsWidth();
 }
 
@@ -26,8 +37,10 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 
 	builder.Middle();
 
+
 	ImGui::PushItemWidth(m_dataItemsWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+
 	for (int columns = 0; columns < 4; columns++)
 	{
 		localData[columns] = coreData[columns];
@@ -43,6 +56,14 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder)
 		//            columnOfChange = columns;
 		//            valueOfChange = localData;
 		//        }
+				if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
+				{
+					fw.showMyPopup = true;
+					fw.id = fmt::format("##{}:{}", idOfNode, columns);
+					fw.value = localData[columns];
+					fw.columns = columns;
+				}
+
 	}
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();

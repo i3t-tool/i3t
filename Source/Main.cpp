@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 	// read other config files.
 	// Load objects(geometry and textures), create the world and load the initial scene.
 	// Loads the shaders, updates the camera mode.
-	if (app.initI3T() != 0)
+	if (!app.initI3T())
 	{
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_PROGRAM_INIT);
 		// getchar();

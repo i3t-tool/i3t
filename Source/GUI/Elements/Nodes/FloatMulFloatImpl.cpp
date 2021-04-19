@@ -24,7 +24,7 @@
 //{
 //  auto NV = new FloatMulFloatImpl(GetNextId(), "FloatMulFloat");
 //  s_nodes->emplace_back(NV);
-//  auto node = Builder::createNode<ENodeType::FloatMulFloat>();
+//  auto node = Core::Builder::createNode<ENodeType::FloatMulFloat>();
 //  s_nodes->back()->nodebase = std::move(node);
 //
 //  auto inputs = s_nodes->back()->nodebase.get()->getInputPins();

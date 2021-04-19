@@ -6,7 +6,7 @@ struct WorkspaceNormalizeVectorArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default NormalizeVector header";
     std::string nodeLabel = "default NormalizeVector label";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::NormalizeVector>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::NormalizeVector>();
 };
 
 class WorkspaceNormalizeVector : public WorkspaceVector4
