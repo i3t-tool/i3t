@@ -1,75 +1,28 @@
 #include "WorkspaceMatrixTranslation.h"
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.viewScale=args.viewScale, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
 {}
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
     : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Translation>(), headerLabel, nodeLabel)
 {}
 
-void WorkspaceMatrixTranslation::drawData(util::NodeBuilder& builder)
-{
-    switch(m_viewScale)
-    {
-    case WorkspaceViewScale::Full:
-        drawDataFull(builder); /* \todo JH here will be switch between different scale of view */
-        break;
-    case WorkspaceViewScale::SetValues:
-        drawDataSetValues(builder);
-        break;
-    case WorkspaceViewScale::Label:
-        drawDataLabel(builder);
-        break;
-
-    default:
-        /* \todo JH log about not supported viewScale - this should not happen since setViewScale /not implemented yet/ should not allow set some other than implemented viewScale */
-        drawDataFull(builder);
-    }
-
-}
-
 void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
 {
-    const glm::mat4& coreData = m_nodebase->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-	int const idOfNode = this->m_id.Get();
-
-	bool valueChanged = false;
-	int rowOfChange, columnOfChange = 3;
-	float valueOfChange, localData; /* user can change just one value at the moment */
-
-	builder.Middle();
-
-	ImGui::PushItemWidth(100.0f);
-	/* Drawing is row-wise */
-	for (int rows = 0; rows < 3; rows++)
-	{
-        localData = coreData[columnOfChange][rows]; /* Data are column-wise */
-        if (drawDragFloatWithMap_Inline(&localData,
-                                        coreMap[columnOfChange*4+rows],
-                                        fmt::format("##{}:r{}c{}", idOfNode, rows, columnOfChange)))
-        {
-            valueChanged = true;
-            rowOfChange = rows;
-            valueOfChange = localData;
-        }
-		ImGui::NewLine();
-	}
-	ImGui::PopItemWidth();
-
-	if (valueChanged)
-	{
-		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-	}
-
-	ImGui::Spring(0); /* \todo JH what is Spring? */
-
-}
-
-void WorkspaceMatrixTranslation::drawDataLabel(util::NodeBuilder& builder)
-{
-    builder.Middle();
-    ImGui::Text(this->m_label.c_str());
-    ImGui::Spring(0);
+    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
+    drawDataSetValues_builder(builder,
+                                {   "x",
+                                    "y",
+                                    "z" },
+                                {   [this](){return m_nodebase->as<Core::Translation>()->getX();},
+                                    [this](){return m_nodebase->as<Core::Translation>()->getY();},
+                                    [this](){return m_nodebase->as<Core::Translation>()->getZ();} },
+                                {   [this](float v){return m_nodebase->as<Core::Translation>()->setX(v);},
+                                    [this](float v){return m_nodebase->as<Core::Translation>()->setY(v);},
+                                    [this](float v){return m_nodebase->as<Core::Translation>()->setZ(v);} },
+                                {   coreMap[3*4+0], /* \todo JH some better way how determine what element from DataMap should be used? */
+                                    coreMap[3*4+1],
+                                    coreMap[3*4+2] }
+                            );
 }

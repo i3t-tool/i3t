@@ -6,31 +6,28 @@
 struct Mat4Types {
 	const int free = 0, scale = 1, uniscale = 2, rotatex = 3, rotatey = 4, rotatez = 5, translate = 6;
 };
-struct NodeMat4 {
-	int type;
-	glm::mat4 data;
-	int x, y;
-	NodeMat4(int _type,glm::mat4 _data, int _x, int _y) {type=_type;data=_data;x=_x;y=_y;}
+struct Mat4Operators {
+	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmul=5,matadd=6;
 };
-struct NodeNormVec4 {
-	glm::vec4 data;
-	int x, y;
-	NodeNormVec4(glm::vec4 _data, int _x, int _y) {data = _data; x = _x; y = _y;}
+struct Vec4Operators {
+	const int norm=0;
 };
-struct NodePlug {
-	int indexA,indexB;
-	int indexPinA,indexPinB;
-	NodePlug(int _a, int _b,int _pina,int _pinb ){ indexA =_a; indexB =_b; indexPinA =_pina; indexPinB =_pinb;}
+struct FloatOperators {
+	const int clamp=0,cycle=1,mul=2,add=3,div=4,pow=5,mix=6,sincos=7,asinacos=8,signum=9;
 };
-struct WorkspaceLayout {
+struct NodeLODs {
+	const int full=0,setvalues=1,label=2;
+};
+struct ScriptingData {
 	Mat4Types mat4Types;
-	std::vector<NodeMat4>mat4Nodes;
-	std::vector<NodeNormVec4>normVec4Nodes;
-	std::vector<NodePlug>nodePlugs;
+	Mat4Operators mat4Operators;
+	Vec4Operators vec4Operators;
+	FloatOperators floatOperators;
+	NodeLODs nodeLODs;
 	std::vector<glm::mat4>nodeData;
 };
 
-WorkspaceLayout*getWorkspaceLayout();
-void clearWorkspaceLayout();
+ScriptingData*getScriptingData();
+void clearScriptingData();
 
 void PlatformLibraryInitI3T(Picoc* pc);

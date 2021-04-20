@@ -215,11 +215,15 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
+
 	void reset() override;
 
 	float getX();
 	float getY();
 	float getZ();
+
+	/* \todo JH Martine prosím o gettery XYZ pro DataMapu */
 
 	ValueSetResult setX(float v);
   ValueSetResult setY(float v);

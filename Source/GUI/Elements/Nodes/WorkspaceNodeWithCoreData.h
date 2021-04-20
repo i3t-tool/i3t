@@ -6,14 +6,28 @@
 
 class WorkspaceCorePinProperties;
 
+extern std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName;
+extern std::vector<Core::Transform::DataMap const *> WorkspaceDatamapMenuList;
 
 typedef std::vector<Core::Pin>::const_iterator corePinIter;
 typedef std::vector<Ptr<WorkspaceCorePinProperties>>::const_iterator corePinPropIter;
 typedef std::vector<Ptr<WorkspaceLinkProperties>>::const_iterator linkPropIter;
 
+typedef std::function<float()> getter_function_pointer;
+typedef std::function<ValueSetResult(float)> setter_function_pointer;
+
+struct floatWindow {
+	bool showMyPopup;
+	std::string id;
+	std::string name;
+	float value;
+	int columns;
+	int rows;
+};
+
 struct WorkspaceNodeWithCoreDataArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default WorkspaceNode header";
     std::string nodeLabel = "Node";
 
@@ -22,47 +36,85 @@ struct WorkspaceNodeWithCoreDataArgs
 
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
-public:
-	/*see:
-	 * https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function*/
-	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to core
-	                                                     WorkspaceNodeWithCoreData is owner of unique pointer
-	                                                */
+protected:
+    int m_numberOfVisibleDecimal = 2; /* \todo JH default number from some setting */
+    float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
 
-	std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
+	WorkspaceLevelOfDetail m_levelOfDetail=WorkspaceLevelOfDetail::Full;/* DG was not initialized - getLevelOfDetail returned garbage */
+
+    std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
+
+	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
+                                                WorkspaceNodeWithCoreData is owner
+                                           */
+
+public:
+	floatWindow fw; /* \todo create it protected */
 
 	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
     WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr, std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");
 
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+    Ptr<Core::NodeBase> const getNodebase() const;
+
+    virtual std::vector<Ptr<WorkspaceLinkProperties>> const &getLinksProperties() const;
+    virtual std::vector<Ptr<WorkspaceCorePinProperties>> const &getInputsProperties() const;
+    virtual std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
+
+    int getNumberOfVisibleDecimal();
+    int setNumberOfVisibleDecimal(int value);
+
+    virtual int maxLenghtOfData()=0;
+
+    float getDataItemsWidth();
+    float setDataItemsWidth();
+
+    WorkspaceLevelOfDetail setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail);
+    WorkspaceLevelOfDetail getLevelOfDetail();
+
+    Core::Transform::DataMap const * setDataMap(const Core::Transform::DataMap* mapToSet);
+    Core::Transform::DataMap const * getDataMap();
+
+    bool drawDragFloatWithMap_Inline(float* const value, const int mapValue, std::string label);
+	virtual void drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters, std::vector<unsigned char> datamap_values);
 
 	virtual void drawInputLinks();
+
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	virtual void drawData(util::NodeBuilder& builder);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
-	bool drawDragFloatWithMap_Inline(float* const value, const int mapValue, std::string label);
+    virtual void drawDataFull(util::NodeBuilder& builder)=0;
+	virtual void drawDataSetValues(util::NodeBuilder& builder)=0;
+	virtual void drawDataLabel(util::NodeBuilder& builder);
+
+    void drawMenuLevelOfDetail();
+    void drawMenuSetDataMap();
+    void drawMenuSetPrecision();
+
 };
 
 /*! \class WorkspaceCorePinProperties
     \brief Information of Pin for graphic
  */
-/* \todo JH later maybe create more general parent class*/
-class WorkspaceCorePinProperties
+class WorkspaceCorePinProperties : public WorkspacePinProperties
 {
-public:
-	ne::PinId const m_id; /*! \brief unique (among Pins) identificator */
-    Core::Pin const &m_pin;
+protected:
+	Core::Pin const &m_pin;
     WorkspaceNodeWithCoreData &m_node;
 
-	std::string m_name;    /*! \brief Name of Pin */
-	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
-    float m_alpha;
+public:
+	WorkspaceCorePinProperties(ne::PinId const id, std::string label, Core::Pin const &pin, WorkspaceNodeWithCoreData &node);
 
-	WorkspaceCorePinProperties(ne::PinId const id, Core::Pin const &pin, WorkspaceNodeWithCoreData &node, char const * name);
+    Core::Pin const & getCorePin() const;
+	ne::PinId const getParentPinId() const;
 
-    PinKind getKind();
-    EValueType getType();
-	bool getIsConnected();
+	WorkspaceNodeWithCoreData & getNode() const;
+
+
+    int getIndex() const;
+    PinKind getKind() const;
+    EValueType getType() const;
+	bool isConnected() const;
 };

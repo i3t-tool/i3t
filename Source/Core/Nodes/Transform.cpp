@@ -499,6 +499,7 @@ ValueSetResult Translation::setValue(float val, glm::ivec2 coords)
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
+
 void Translation::reset()
 {
 	setDataMap(m_initialMap);

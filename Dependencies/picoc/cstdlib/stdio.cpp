@@ -1,6 +1,7 @@
 /* stdio.h library for large systems - small embedded systems use clibrary.c instead */
 #ifndef BUILTIN_MINI_STDLIB
 
+
 #include <errno.h>
 #include "../interpreter.h"
 
@@ -23,7 +24,6 @@ static int GETS_MAXValue = 255;     /* arbitrary maximum size of a gets() file *
 static FILE* stdinValue;
 static FILE* stdoutValue;
 static FILE* stderrValue;
-
 
 /* our own internal output stream which can output to FILE * or strings */
 typedef struct StdOutStreamStruct

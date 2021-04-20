@@ -4,7 +4,7 @@
 
 #include "interpreter.h"
 
-#define BREAKPOINT_HASH(p) ( ((unsigned long)(p)->FileName) ^ (((p)->Line << 16) | ((p)->CharacterPos << 16)) )
+#define BREAKPOINT_HASH(p) ( ((unsigned long long)(p)->FileName) ^ (((p)->Line << 16) | ((p)->CharacterPos << 16)) )
 
 /* initialise the debugger by clearing the breakpoint table */
 void DebugInit(Picoc *pc)

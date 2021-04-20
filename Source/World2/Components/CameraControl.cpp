@@ -7,12 +7,12 @@
 #include <iostream>
 #include <typeinfo>
 
-const char* CameraControl::typeStatic = NULL;
+const char* CameraControl::s_type = NULL;
 
 CameraControl::CameraControl()
 {
-	CameraControl::typeStatic = typeid(CameraControl).name();
-	this->type = CameraControl::typeStatic;
+	CameraControl::s_type = typeid(CameraControl).name();
+	this->m_type = CameraControl::s_type;
 }
 
 void CameraControl::update()
@@ -26,18 +26,18 @@ void CameraControl::update()
 	if (InputManager::isKeyPressed(Keys::mouseMiddle))
 	{
 		glm::vec4 move =
-				(getRotation(owner->transformation, 2) * glm::vec4(x, 0.0f, 0.0f, 0.0f) + glm::vec4(0.0f, y, 0.0f, 0.0f)) *
+				(getRotation(m_gameObject->transformation, 2) * glm::vec4(x, 0.0f, 0.0f, 0.0f) + glm::vec4(0.0f, y, 0.0f, 0.0f)) *
 				0.25f;
 		if (InputManager::isKeyPressed(Keys::shiftr))
 		{
 			move *= 3.0f;
 		}
-		owner->translate(glm::vec3(-move.x, move.y, -move.z));
+		m_gameObject->translate(glm::vec3(-move.x, move.y, -move.z));
 	}
 	else if (InputManager::isKeyPressed(Keys::mouseRight))
 	{
-		owner->rotateAround((glm::vec3)owner->transformation[0], -y, (glm::vec3)owner->transformation[3]);
-		owner->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, (glm::vec3)owner->transformation[3]);
+		m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y, (glm::vec3)m_gameObject->transformation[3]);
+		m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, (glm::vec3)m_gameObject->transformation[3]);
 	}
 
 	glm::vec4 move = glm::vec4(0.0f);
@@ -85,8 +85,8 @@ void CameraControl::update()
 
 	if (moved)
 	{
-		move = getRotation(owner->transformation, 2) * move;
-		owner->translate((glm::vec3)move);
+		move = getRotation(m_gameObject->transformation, 2) * move;
+		m_gameObject->translate((glm::vec3)move);
 	}
 }
 
@@ -98,6 +98,6 @@ void CameraControl::setRotation(float x, float y)
 	glm::mat4 roty = glm::rotate(glm::mat4(1.0f), glm::radians(y), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 rotx = glm::rotate(glm::mat4(1.0f), glm::radians(x), glm::vec3(1.0f, 0.0f, 0.0f));
 
-	owner->rot=rotx*roty;
-	owner->translate(glm::vec3(0.0f));	*/
+	m_gameObject->rot=rotx*roty;
+	m_gameObject->translate(glm::vec3(0.0f));	*/
 }

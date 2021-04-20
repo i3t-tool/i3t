@@ -23,7 +23,9 @@
 #include "World2/World2.h"
 
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
 #include "Nodes/GraphManager.h"
 
 double lastFrameSeconds = 0.0f;
@@ -133,6 +135,11 @@ void Application::logicUpdate()
 void Application::finalize()
 {
 	delete m_world;
+	World2::end();
+	// world = nullptr; //PF problem during glutExit...
+
+	/// \todo Write recent files.
+	// RecentFiles::writeRecent();
 
 	/*
 	ShaderProvider::dispose(); // delete red, base and alpha shaders
@@ -149,16 +156,20 @@ void Application::finalize()
 bool Application::initI3T()
 {
 	// new scene scheme
-	bool b = World2::initRender();
+	bool b = World2::init();
 	m_world = World2::loadDefaultScene();
 
 	// \todo DG testing
-	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
+	/*//testing
+	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load scale");
+	WorkspaceMatrix4x4* mat =new WorkspaceMatrixFree((ImTextureID)0, "load free");
+	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixTranslation((ImTextureID)0, "load translate");
 	glm::mat4 m=glm::mat4(1.0f);
-	ValueSetResult result = mat->m_nodebase->setValue(glm::vec3(2.0f,2.0f,2.0f));
+	ValueSetResult result = mat->m_nodebase->setValue(m);
 	printf("value set result %d\n",result.status);
-	// ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
-	m_world->handlesSetMatrix(mat);
+	//ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
+	m_world2->handlesSetMatrix(mat);
+	*/
 
 	return b;
 }

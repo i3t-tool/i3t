@@ -2,19 +2,19 @@
 
 #include "Component.h"
 
-const char* Component::typeStatic = NULL;
+const char* Component::s_type = NULL;
 
 const char* Component::getComponentType(){
 	printf("Default type\n");
-	return Component::typeStatic;
+	return Component::s_type;
 }
 
 Component::Component(){
 	// printf("component\n");
-	Component::typeStatic = typeid(Component).name();
-	this->type = Component::typeStatic;
-	this->owner = NULL;
-	this->isActive = true;
+	Component::s_type = typeid(Component).name();
+	this->m_type = Component::s_type;
+	this->m_gameObject = NULL;
+	this->m_isActive = true;
 }
 void Component::start(){ /*printf("Default start\n");*/}
 void Component::update(){ /*printf("Default update\n");*/}

@@ -27,30 +27,24 @@ class GameObject
 {
 private:
 
-  GLuint vbo_positions; ///< vertices buffer
-  GLuint vbo_indices;   ///< triangle indicies buffer
-  GLuint num_vertices;  ///< number of vertices of mesh of this object
-  GLuint num_triangles; ///< number of triangles of mesh of this object
-  GLuint num_attribs;   ///< number of attributes per vertex
-
-  GLuint vao = 0;  ///< GL vertex array object
-  // GLuint buffer;
+  GLuint vbo_positions=0; ///< vertices buffer
+  GLuint vbo_indices=0;   ///< triangle indicies buffer
+  GLuint num_vertices=0;  ///< number of vertices of mesh of this object
+  GLuint num_triangles=0; ///< number of triangles of mesh of this object
+  GLuint num_attribs=0;   ///< number of attributes per vertex
+  GLuint vao = 0;         ///< GL vertex array object
 
 public:
-  struct Shader2*shader;                ///< shader program used for rendering of this object
-  int primitive = GL_TRIANGLES; ///< GL_TRIANGLES, GL_LINES, etc...
-
-  GLuint texture; ///< GL texture
-  glm::vec4 color;///< color,in shader texture*color
-
+  struct Shader2*shader;             ///< shader program used for rendering of this object
+  int primitive = GL_TRIANGLES;      ///< GL_TRIANGLES, GL_LINES, etc...
+  GLuint texture;                    ///< GL texture
+  glm::vec4 color;                   ///< color,in shader texture*color
   GameObject* parent = NULL;         ///< parent of this object - should not be NULL for other objects than scene root
   std::vector<GameObject*> children; ///< child objects of this object - relation child-parent is designed to be
-                                     ///< traceable
-                                 ///< in both directions
-  std::vector<Component*> components; ///< components with functionalities - have render and update functions, that are called in app loop
-
-  bool isRender;         ///< enable/disable rendering
-  glm::mat4x4 transformation; ///< transformation matrix of this object
+                                     ///< traceable in both directions
+  std::vector<Component*> components;///< components with functionalities - have render and update functions, that are called in app loop
+  bool isRender;                     ///< enable/disable rendering
+  glm::mat4x4 transformation;        ///< transformation matrix of this object
 
   /// Unparent this object
   /**
@@ -59,7 +53,7 @@ public:
   static glm::mat4 inheritedTransform(GameObject* obj);
   void unparent(bool keepTransform);
   void setParent(GameObject* parent, bool keepTransform);
-  void rmChild(GameObject* obj, bool keepTransform);
+  bool rmChild(GameObject* obj, bool keepTransform);
   void addChild(GameObject* obj, bool keepTransform);
   void addComponent(Component* c);
   Component* getComponent(const char* type);
@@ -80,6 +74,7 @@ public:
     \param[in] texture Texture of this object. Set 0 for no texture, object is then rendered solid black
   */
   GameObject(const pgr::MeshData mesh, struct Shader2* shader, GLuint texture);
+  ~GameObject();
   /// Translate, scale and rotate object at once
   /**
     Because calling rotate, scale and rotate separately makes init of many objects very tedious.
@@ -95,13 +90,13 @@ public:
     \param[in] translate Translation
   */
   void translate(glm::vec3 translate);
-  /// Rotate object
+  /// Rotate object as camera (translate,THEN rotate)
   /**
     \param[in] axis Rotation axis
     \param[in] angleDegrees Angle in degrees
   */
   void rotateAround(glm::vec3 axis, float angleDegrees, glm::vec3 center);
-  /// Rotate object as camera (translate,THEN rotate)
+  /// Rotate object
   /**
     \param[in] axis Rotation axis
     \param[in] angleDegrees Angle in degrees
@@ -120,5 +115,4 @@ public:
     \param[in] parentTransform
   */
   void draw(glm::mat4 parentTransform);
-  // void drawLines(glm::mat4 parentTransform);
 };

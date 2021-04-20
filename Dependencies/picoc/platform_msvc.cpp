@@ -3,6 +3,7 @@
 /* mark where to end the program for platforms which require this */
 jmp_buf PicocExitBuf;
 
+
 void PlatformInit(Picoc *pc)
 {
 }
@@ -54,7 +55,7 @@ char *PlatformReadFile(Picoc *pc, const char *FileName)
     if (InFile == NULL)
         ProgramFailNoParser(pc, "can't read file %s\n", FileName);
     
-    BytesRead = fread(ReadText, 1, FileInfo.st_size, InFile);
+    BytesRead = (int)fread(ReadText, 1, FileInfo.st_size, InFile);
     if (BytesRead == 0)
         ProgramFailNoParser(pc, "can't read file %s\n", FileName);
 
@@ -76,7 +77,7 @@ char *PlatformReadFile(Picoc *pc, const char *FileName)
 void PicocPlatformScanFile(Picoc *pc, const char *FileName)
 {
     char *SourceStr = PlatformReadFile(pc, FileName);
-    PicocParse(pc, FileName, SourceStr, strlen(SourceStr), TRUE, FALSE, TRUE, TRUE);
+    PicocParse(pc, FileName, SourceStr, (int)strlen(SourceStr), TRUE, FALSE, TRUE, TRUE);
 }
 
 /* exit the program */

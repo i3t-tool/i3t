@@ -17,6 +17,6 @@ void main(){
 	fragmentColor=color;
 	
 	vec3 lvec=normalize(ldir);
-	fragmentColor.rgb=fragmentColor.rgb*max(dot(lvec,normn),0.6);
+	fragmentColor.rgb=mix(fragmentColor.rgb,fragmentColor.rgb*max(dot(lvec,normn),0.0),0.2);
 	
 }

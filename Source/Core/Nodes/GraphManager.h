@@ -84,7 +84,7 @@ public:
 	 * \param input
 	 * \param output
 	 */
-	[[nodiscard]] static ENodePlugResult isPlugCorrect(Pin* input, Pin* output);
+	static ENodePlugResult isPlugCorrect(Pin const * input, Pin const * output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
   [[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);

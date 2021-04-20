@@ -2,30 +2,36 @@
 #include "Core/Input/InputManager.h"
 #include "Component.h"
 #include "World2.h"
-Component* Select::stencilRef[256] = {NULL};
+bool Select::stencilRef[256] = {false};
 
-int Select::registerStencil(Component* owner){
+int Select::registerStencil(){
     for (int i = 1; i < 255; i++){
-        if (Select::stencilRef[i] == NULL){
-            //printf("reg stencil %d\n", i);
-            Select::stencilRef[i] = owner;
+        if (!Select::stencilRef[i]){
+            //printf("reg m_stencil %d\n", i);
+            Select::stencilRef[i] = true;
             return i;
         }
     }
     return -1;
 }
-bool Select::freeStencil(Component* owner){
-    for (int i = 1; i < 255; i++){
-        if (Select::stencilRef[i] == owner){
-            //printf("free stencil %d\n", i);
-            Select::stencilRef[i] = NULL;
-            return true;
-        }
+bool Select::freeStencil(char stencil){
+    if (Select::stencilRef[stencil]){
+        //printf("free m_stencil %d\n", i);
+        Select::stencilRef[stencil] = false;
+        return true;
     }
     return false;
 }
 unsigned char Select::getStencilAt(int x, int y, int r, int filter){
     int w=r*2+1,h=r*2+1;x-=r;y-=r;
+    float viewport[4];
+    glGetFloatv(GL_VIEWPORT, viewport);
+    if(x<(int)viewport[0]){w-=(int)viewport[0]-x;x=(int)viewport[0];}
+    if(y<(int)viewport[1]){h-=(int)viewport[1]-y;y=(int)viewport[1];}
+    if(x+w>(int)viewport[2]){w-=x+w-(int)viewport[2];}
+    if(y+h>(int)viewport[3]){h-=y+h-(int)viewport[3];}
+    if(w<=0||h<=0){return 0;}
+
     unsigned int*read=(unsigned int*)malloc(size_t(w * h*sizeof(unsigned int)));
     glReadPixels(x, y, w, h, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, read);
   
@@ -40,7 +46,7 @@ unsigned char Select::getStencilAt(int x, int y, int r, int filter){
             dist+=tmp*tmp;
             pos=w*i+j;
             read[pos] = read[pos] & 255;
-            if (dist < closest && Select::stencilRef[read[pos]] != NULL && read[pos] != filter){closest = dist;stencilnum = read[pos];}
+            if (dist < closest && Select::stencilRef[read[pos]] != false && read[pos] != filter){closest = dist;stencilnum = read[pos];}
         }
     }
     // printf("ret %d\n",stencilnum);

@@ -3,31 +3,31 @@
 #include <iostream>
 #include <typeinfo>
 
-const char* Renderer::typeStatic = NULL;
+const char* Renderer::s_type = NULL;
 
 Renderer::Renderer(unsigned int flags){
-    Renderer::typeStatic = typeid(Renderer).name();
-    this->type = Renderer::typeStatic;
+    Renderer::s_type = typeid(Renderer).name();
+    this->m_type = Renderer::s_type;
 
-    this->isTransparent = (flags & Renderer::IS_TRANSPARENT) != 0;
-    this->useStencil = (flags & Renderer::USE_STENCIL) != 0;
-    this->drawLines = (flags & Renderer::DRAW_LINES) != 0;
-    this->stencil = 0;
+    this->m_isTransparent = (flags & Renderer::IS_TRANSPARENT) != 0;
+    this->m_useStencil = (flags & Renderer::USE_STENCIL) != 0;
+    this->m_drawLines = (flags & Renderer::DRAW_LINES) != 0;
+    this->m_stencil = 0;
 
-    if (this->useStencil){this->stencil = Select::registerStencil((Component*)this);}
-    // printf("is transparent %d, mask %d\n",this->isTransparent,);
+    if (this->m_useStencil){this->m_stencil = Select::registerStencil();}
+    // printf("is transparent %d, mask %d\n",this->m_isTransparent,);
 }
 
 // void Renderer::start(){}
 
 void Renderer::render(glm::mat4* parent, bool renderTransparent){
-    if (this->isTransparent == renderTransparent){
-        glStencilMask(255 * this->useStencil);
-        glStencilFunc(GL_ALWAYS, this->stencil, 255);
-        int primbkp = owner->primitive;
-        if (this->drawLines){owner->primitive = GL_LINES;owner->draw(*parent);}
-        else{owner->primitive = GL_TRIANGLES;owner->draw(*parent);}
-        owner->primitive = primbkp;
+    if (this->m_isTransparent == renderTransparent){
+        glStencilMask(255 * this->m_useStencil);
+        glStencilFunc(GL_ALWAYS, this->m_stencil, 255);
+        int primbkp = m_gameObject->primitive;
+        if (this->m_drawLines){m_gameObject->primitive = GL_LINES;m_gameObject->draw(*parent);}
+        else{m_gameObject->primitive = GL_TRIANGLES;m_gameObject->draw(*parent);}
+        m_gameObject->primitive = primbkp;
         glStencilMask(0);
     }
 }

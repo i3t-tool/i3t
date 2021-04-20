@@ -15,12 +15,12 @@ class CameraControl: public Component{
 public:
 	CameraControl();
 	void update();
-	static const char* componentType(){return CameraControl::typeStatic;};
-	const char* getComponentType(){return CameraControl::typeStatic;};
+	static const char* componentType(){return CameraControl::s_type;};
+	const char* getComponentType(){return CameraControl::s_type;};
 		
 	void setRotation(float x,float y);
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 };
 	
 

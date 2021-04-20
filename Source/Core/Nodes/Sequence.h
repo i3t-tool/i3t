@@ -68,7 +68,7 @@ public:
 	void updateValues(int inputIndex) override;
 
 private:
-	ENodePlugResult isPlugCorrect(Pin* input, Pin* output) override;
+	ENodePlugResult isPlugCorrect(Pin const * input, Pin const * output) override;
   void receiveSignal(int inputIndex) override;
 };
 

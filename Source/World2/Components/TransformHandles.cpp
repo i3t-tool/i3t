@@ -20,7 +20,7 @@ void printMatrix2(glm::mat4 m){
 	  m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
-const char* TransformHandles::typeStatic=NULL;
+const char* TransformHandles::s_type=NULL;
 	
 void TransformHandles::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,bool active){
 	glStencilMask(255*(stencil!=-1));
@@ -32,21 +32,21 @@ void TransformHandles::drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 c
 }
 	
 TransformHandles::TransformHandles(GameObject*_editedobj){
-	TransformHandles::typeStatic=typeid(TransformHandles).name();
-	this->type=TransformHandles::typeStatic;
+	TransformHandles::s_type=typeid(TransformHandles).name();
+	this->m_type=TransformHandles::s_type;
 		
 	this->editedobj=_editedobj;
-	this->stencilx=		Select::registerStencil(this);
-	this->stencily=		Select::registerStencil(this);
-	this->stencilz=		Select::registerStencil(this);
-	this->stencilzy=	Select::registerStencil(this);
-	this->stencilzx=	Select::registerStencil(this);
-	this->stencilyx=	Select::registerStencil(this);
-	this->stencilxyz=	Select::registerStencil(this);
-	this->stencilaxisx=	Select::registerStencil(this);
-	this->stencilaxisy=	Select::registerStencil(this);
-	this->stencilaxisz=	Select::registerStencil(this);
-	this->stencilaxisw=	Select::registerStencil(this);
+	this->stencilx=		Select::registerStencil();
+	this->stencily=		Select::registerStencil();
+	this->stencilz=		Select::registerStencil();
+	this->stencilzy=	Select::registerStencil();
+	this->stencilzx=	Select::registerStencil();
+	this->stencilyx=	Select::registerStencil();
+	this->stencilxyz=	Select::registerStencil();
+	this->stencilaxisx=	Select::registerStencil();
+	this->stencilaxisy=	Select::registerStencil();
+	this->stencilaxisz=	Select::registerStencil();
+	this->stencilaxisw=	Select::registerStencil();
 }
 void TransformHandles::start(){
 	this->circleh =	new GameObject(unitcircleMesh,	&World2::shaderHandle, 0);
@@ -181,7 +181,7 @@ void TransformHandles::update(){
 	bool transactionBegin=false;
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
-		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->stencil;
+		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->m_stencil;
 		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, stencile);
 		unsigned char sele =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
 		this->clicked++;
@@ -203,7 +203,7 @@ void TransformHandles::update(){
 	}
 		
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)){
-		unsigned char stencile=((Renderer*)editedobj->getComponent(Renderer::componentType()))->stencil;
+		unsigned char stencile=((Renderer*)editedobj->getComponent(Renderer::componentType()))->m_stencil;
 		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 0, -1);
 		if(sel==stencile){clicked++;}//click inside editedobj
 			
@@ -351,7 +351,7 @@ void TransformHandles::update(){
 		if(this->axisnum2!=-1){
 			glm::vec2 spos22=world2screen((glm::vec3)(this->handlespace[3]+this->handlespace*axes[this->axisnum2]));//project two points on screen - project axis on screen
 			glm::vec2 dir2=spos22-spos1;//the axis in screen space
-			if(glm::length(dir2)<0.01){dir2[0]=1.0f;}//axis length must not be zero
+			if(glm::length(dir2)<0.01){dir2[1]=1.0f;}//axis length must not be zero
 			mov[1]=dir2;
 		}
 
@@ -434,9 +434,6 @@ void TransformHandles::update(){
 					glm::vec3 pc = planeIntersect((glm::vec3)(this->handlespace[axisnum]), (glm::vec3)(this->handlespace[axisnum2]), (glm::vec3)(this->handlespace[3]));
 
 					if (world2viewport(pc)[2] < 0.992f){
-						glm::mat4 parent = getFullTransform(this->editedobj->parent);
-						glm::vec4 result = glm::vec4(pc[0], pc[1], pc[2], 1.0f);
-						glm::vec4 editedo = glm::inverse(parent) * result;
 						this->handlespace[3]=glm::vec4(pc[0],pc[1],pc[2],1.0f);
 					}
 				}

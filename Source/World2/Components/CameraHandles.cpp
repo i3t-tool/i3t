@@ -7,14 +7,14 @@
 #include <iostream>
 #include <typeinfo>
 
-const char* CameraHandles::typeStatic=NULL;
+const char* CameraHandles::s_type=NULL;
 
 CameraHandles::CameraHandles(){
-	CameraHandles::typeStatic=typeid(CameraHandles).name();
-	this->type=CameraHandles::typeStatic;
+	CameraHandles::s_type=typeid(CameraHandles).name();
+	this->m_type=CameraHandles::s_type;
 		
-	this->editedcam=Select::registerStencil(this);
-	for(int i=0;i<6;i++){this->stencils.arr[i]=Select::registerStencil(this);}
+	this->editedcam=Select::registerStencil();
+	for(int i=0;i<6;i++){this->stencils.arr[i]=Select::registerStencil();}
 
 	this->hposs[0]=glm::vec4(0.0f,0.0f,1.0f,1.0f);
 	this->hposs[1]=glm::vec4(0.0f,0.0f,-1.0f,1.0f);
@@ -24,7 +24,7 @@ CameraHandles::CameraHandles(){
 	this->hposs[5]=glm::vec4(-1.0f,0.0f,0.0f,1.0f);
 }
 void CameraHandles::start(){
-	this->cam = (Camera2*)this->owner->getComponent(Camera2::componentType());
+	this->cam = (Camera2*)this->m_gameObject->getComponent(Camera2::componentType());
 	this->frustrum = new GameObject(unitcubeMesh, &World2::shaderProj, 0);
 	this->frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f);
 	this->frustruml = new GameObject(cubelinesMesh, &World2::shaderProj, 0);
@@ -36,8 +36,8 @@ void CameraHandles::start(){
 }
 
 void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
-	glm::mat4 projinv=glm::inverse(this->cam->perspective);
-	glm::mat4 transform=(*parent)*this->owner->transformation;
+	glm::mat4 projinv=glm::inverse(this->cam->m_perspective);
+	glm::mat4 transform=(*parent)*this->m_gameObject->transformation;
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 		
 	glUseProgram(World2::shaderProj.program);
@@ -114,9 +114,9 @@ void CameraHandles::update(){
 	if(InputManager::isKeyPressed(Keys::p)){this->editmode = CameraHandles::EDIT_PERSPECTIVE;}
 	if(InputManager::isKeyPressed(Keys::f)){this->editmode=CameraHandles::EDIT_FRUSTUM;}
 		
-	if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){this->cam->perspective=glm::perspective(glm::radians(this->pangle),this->paspect,this->pnear,this->pfar);}
-	else if(this->editmode==CameraHandles::EDIT_ORTHO){this->cam->perspective=glm::ortho(this->left,this->right,this->bottom,this->top,this->onear,this->ofar);}
-	else if(this->editmode==CameraHandles::EDIT_FRUSTUM){this->cam->perspective=glm::frustum(this->fleft,this->fright,this->fbottom,this->ftop,this->fnear,this->ffar);}
+	if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){this->cam->m_perspective=glm::perspective(glm::radians(this->pangle),this->paspect,this->pnear,this->pfar);}
+	else if(this->editmode==CameraHandles::EDIT_ORTHO){this->cam->m_perspective=glm::ortho(this->left,this->right,this->bottom,this->top,this->onear,this->ofar);}
+	else if(this->editmode==CameraHandles::EDIT_FRUSTUM){this->cam->m_perspective=glm::frustum(this->fleft,this->fright,this->fbottom,this->ftop,this->fnear,this->ffar);}
 		
 	if (InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World2::height- InputManager::m_mouseY),3,this->editedcam);
@@ -127,7 +127,7 @@ void CameraHandles::update(){
 	if(InputManager::isKeyJustUp(Keys::e)){
 		printf("p params angle %3.2f, aspect %3.2f, far %3.2f, near %3.2f\n",this->pangle,this->paspect,this->pfar,this->pnear);
 			
-		glm::mat4 projinv=glm::inverse(this->cam->perspective);
+		glm::mat4 projinv=glm::inverse(this->cam->m_perspective);
 		glm::vec4 pos=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);pos/=pos[3];float _near=-pos[2];
 		pos=projinv*glm::vec4(0.0f,0.0f,1.0f,1.0f);pos/=pos[3];float _far=-pos[2];
 		pos=projinv*glm::vec4(0.0f,1.0f,1.0f,1.0f);pos/=pos[3];float height=pos[1];
@@ -137,7 +137,7 @@ void CameraHandles::update(){
 		
 	if(this->activehandle!=-1){
 		if(InputManager::isKeyJustUp(Keys::esc)){}
-		glm::mat4 projinv=glm::inverse(this->cam->perspective);
+		glm::mat4 projinv=glm::inverse(this->cam->m_perspective);
 		glm::vec3 drag3=glm::vec3(0.0f);
 		glm::vec4 axis=this->hposs[this->axisnum];
 		glm::vec4 pos=projinv*this->hposs[this->axisnum];
@@ -155,26 +155,19 @@ void CameraHandles::update(){
 			
 		pos[3]=0.0f;
 		axis[3]=0.0f;
-		glm::mat4 handlespace=getFullTransform(this->owner);
+		glm::mat4 handlespace=getFullTransform(this->m_gameObject);
 			
 		glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+handlespace*pos));//position of transformated object on the screen
 		glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen
 		glm::vec2 dir=spos2-spos1;//the axis in screen space
 		if(glm::length(dir)<0.01){dir[0]=1.0f;}//axis length must not be zero
-			
-		glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));			
-		mov[0]=glm::normalize(mov[0]);
-		mov[1]=glm::normalize(mov[1]);
-			
-		glm::vec2 drag,olddrag,dragfinal,mouse;
+		
+		glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
+		mov=glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 
-		mouse=glm::vec2(InputManager::m_mouseX,World2::height- InputManager::m_mouseY);
-		drag=glm::inverse(mov)*(mouse-spos1);
-		mouse=glm::vec2(InputManager::m_mouseX- InputManager::m_mouseXDelta,World2::height- InputManager::m_mouseY+ InputManager::m_mouseYDelta);
-		olddrag=glm::inverse(mov)*(mouse-spos1);
-		dragfinal=drag-olddrag;
-		dragfinal*=0.05f;
-			
+		glm::vec2 dragfinal=mov*glm::vec2(InputManager::m_mouseXDelta,-InputManager::m_mouseYDelta)*0.05f;
+		printf("dragfinalh %f %f\n", dragfinal[0], dragfinal[1]);
+
 		if(this->activehandle==this->stencils.names.n){
 			if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){
 				this->pnear-=dragfinal[0];

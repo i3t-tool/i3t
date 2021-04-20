@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixScaleArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixScale header";
     std::string nodeLabel = "Scale";
     Ptr<Core::NodeBase> nodebase = Core::Builder::createTransform<Core::Scale>();
@@ -15,5 +15,5 @@ public:
 	WorkspaceMatrixScale(ImTextureID headerBackground, WorkspaceMatrixScaleArgs const& args);
     WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel = "Scale", std::string nodeLabel = "Scale");
 
-	void drawData(util::NodeBuilder& builder);
+	void drawDataSetValues(util::NodeBuilder& builder);
 };

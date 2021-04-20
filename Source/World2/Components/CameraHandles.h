@@ -15,14 +15,14 @@ public:
 	void update();
 	void start();
 	void render(glm::mat4*parent,bool renderTransparent);
-	static const char* componentType(){return CameraHandles::typeStatic;};
-	const char* getComponentType(){return CameraHandles::typeStatic;};
+	static const char* componentType(){return CameraHandles::s_type;};
+	const char* getComponentType(){return CameraHandles::s_type;};
 
 	static const int EDIT_ORTHO=0,EDIT_PERSPECTIVE=1,EDIT_FRUSTUM=2;
 	int editmode=EDIT_PERSPECTIVE;
 	bool isEdit=false;
 private:
-	static const char* typeStatic;
+	static const char* s_type;
 		
 	GameObject*frustrum,*frustruml,*cameraico,*handle;
 	unsigned char editedcam;

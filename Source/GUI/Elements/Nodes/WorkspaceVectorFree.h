@@ -3,7 +3,7 @@
 
 struct WorkspaceVectorFreeArgs
 {
-    WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default FreeVector header";
     std::string nodeLabel = "default FreeVector label";
     Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector4>();
@@ -15,7 +15,7 @@ public:
 	WorkspaceVectorFree(ImTextureID headerBackground, WorkspaceVectorFreeArgs const& args);
     WorkspaceVectorFree(ImTextureID headerBackground, std::string headerLabel = "Free", std::string nodeLabel = "Free");
 
-	void drawData(util::NodeBuilder& builder);
+	void drawDataSetValues(util::NodeBuilder& builder);
 
 };
 

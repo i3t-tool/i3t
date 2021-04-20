@@ -10,6 +10,7 @@
 #include "glm/gtx/transform.hpp"
 
 #include "Core/Defs.h"
+#include "Core/Nodes/Node.h"
 
 #include "NodeData.h"
 
@@ -120,10 +121,10 @@ struct Operation
 
 enum class ENodeType
 {
-	Inversion,
-	Transpose,
-	Determinant,
-	MatrixMulMatrix,
+	Inversion,	//done SS
+	Transpose,	//done SS
+	Determinant, //done SS
+	MatrixMulMatrix, //done SS
 	MatrixAddMatrix,
 	MatrixMulVector,
 	VectorMulMatrix,
@@ -133,7 +134,7 @@ enum class ENodeType
 	VectorSubVector,
 	VectorMulFloat,
 	VectorPerspectiveDivision,
-	NormalizeVector,
+	NormalizeVector, //done JH
 	MixVector,
 	Vector3CrossVector3,
 	Vector3DotVector3,
@@ -187,10 +188,10 @@ enum class ENodeType
 	QuatToFloats,
 	FloatsToQuat,
 	NormalizeQuat,
-	Float,
-	Vector3,
-	Vector4,
-	Matrix,
+	Float, //done SS
+	Vector3, //done JH
+	Vector4, //done JH
+	Matrix, //done JH
 	Model,
 
 	// Transform matrices "constructors"
@@ -216,7 +217,7 @@ enum class ETransformType
 	EulerX,
 	EulerY,
 	EulerZ,
-	Scale,
+	Scale, //done JH
 	AxisAngle,
 	Quat,
 	Ortho,
