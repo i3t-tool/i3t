@@ -185,7 +185,7 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
-    const Ptr<Core::NodeBase>*	nodebase    = &nodebasedata->getNodebase();
+    Ptr<Core::NodeBase>	        nodebase    = nodebasedata->getNodebase();
 
     //op=Builder::createTransform<Core::Frustum>();
     //op=Builder::createTransform<Core::OrthoProj>();
@@ -193,16 +193,16 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     //op=Builder::createTransform<Core::AxisAngleRot>();
     //op=Builder::createTransform<Core::LookAt>(glm::vec3{-0.0f, 1.0f, 0.0f}, glm::vec3{-0.1f, 0.5f, 0.0f },glm::vec3{0.0f, 1.0f, 0.0f});
     //nodebase    = &op;
-    op=*nodebase;
+    op=nodebase;
 
     WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
-    const Core::Transform::DataMap*	data		= nodebase->get()->getDataMap(); //printf("a");
-	const Operation*			operation	= nodebase->get()->getOperation(); //printf("b");
-	const char*					keyword		= nodebase->get()->getOperation()->keyWord.c_str(); //printf("c");
-    DataStore                   datastore   = nodebase->get()->getData(); //printf("d");
+    const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
+	const Operation*			operation	= nodebase->getOperation(); //printf("b");
+	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
+    DataStore                   datastore   = nodebase->getData(); //printf("d");
     glm::mat4                   mat         = datastore.getMat4(); //printf("e\n");
     
-    printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase->get());
+    printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase.get());
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         m.component->m_isActive=true;
