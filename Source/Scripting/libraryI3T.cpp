@@ -26,7 +26,7 @@ void clearScriptingData(){
 void mat4oper(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int type=Param[0]->Val->Integer;
     int x=0,y=0;
-    char*l="-";
+    const char*l="-";
     if(NumArgs==4){
         x=Param[1]->Val->Integer;
         y=Param[2]->Val->Integer;
@@ -76,7 +76,7 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
     int type=Param[0]->Val->Integer;
     int dataindex=Param[1]->Val->Integer;
     int x=0,y=0;
-    char*l="-";
+    const char*l="-";
     if(NumArgs==5){
         x=Param[2]->Val->Integer;
         y=Param[3]->Val->Integer;
@@ -115,7 +115,7 @@ void mat4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
 void vec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int dataindex=Param[0]->Val->Integer;
     int x=0,y=0;
-    char*l="-";
+    const char*l="-";
     if(NumArgs==4){
         x=Param[1]->Val->Integer;
         y=Param[2]->Val->Integer;
@@ -144,7 +144,7 @@ void vec4(struct ParseState* Parser, struct Value* ReturnValue, struct Value** P
 void vec4oper(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int type = Param[0]->Val->Integer;
     int x=0,y=0;
-    char*l="-";
+    const char*l="-";
     if(NumArgs==4){
         x = Param[1]->Val->Integer;
         y = Param[2]->Val->Integer;
@@ -168,7 +168,7 @@ void vec4oper(struct ParseState* Parser, struct Value* ReturnValue, struct Value
 void scalar(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int dataindex = Param[0]->Val->Integer;
     int x = 0, y = 0;
-    char* l = "-";
+    const char* l = "-";
     if (NumArgs == 4) {
         x = Param[1]->Val->Integer;
         y = Param[2]->Val->Integer;
@@ -196,7 +196,7 @@ void scalar(struct ParseState* Parser, struct Value* ReturnValue, struct Value**
 }
 void sequence(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
     int x = 0, y = 0;
-    char* l = "-";
+    const char* l = "-";
     if (NumArgs == 3) {
         x = Param[0]->Val->Integer;
         y = Param[1]->Val->Integer;

@@ -89,7 +89,7 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 		WorkspaceNodeWithCoreData* nodebasedata = _workspace->at(i).get();
 		int precision							= nodebasedata->getNumberOfVisibleDecimal();
 		int lod									= (int)nodebasedata->getLevelOfDetail();
-		char* names[4]={"full","setvalues","label",nullptr};
+		const char* names[4]={"full","setvalues","label",nullptr};
 		if(precision!=2||lod!=(int)WorkspaceLevelOfDetail::Full){
 			fprintf(f,"confnode(n%d,%d,%s);\n",i, nodebasedata->getNumberOfVisibleDecimal(),names[(int)nodebasedata->getLevelOfDetail()]);
 		}
