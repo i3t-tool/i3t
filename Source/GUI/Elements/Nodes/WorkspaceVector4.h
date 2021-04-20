@@ -13,7 +13,7 @@ struct WorkspaceVector4Args
 class WorkspaceVector4 : public WorkspaceNodeWithCoreData
 {
 public:
-	WorkspaceVector4( ImTextureID headerBackground, WorkspaceVector4Args const& args);
+	WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args);
     WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
 	virtual void drawDataFull(util::NodeBuilder& builder);

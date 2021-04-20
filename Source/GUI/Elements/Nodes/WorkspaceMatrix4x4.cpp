@@ -38,8 +38,8 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	ImGui::PushItemWidth(m_dataItemsWidth);
 	/* Drawing is row-wise */
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, matrix_frame_padding);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
 
 	for (int rows = 0; rows < 4; rows++)

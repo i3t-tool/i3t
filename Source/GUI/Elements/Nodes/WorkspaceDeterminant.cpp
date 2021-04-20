@@ -8,7 +8,7 @@ WorkspaceDeterminant::WorkspaceDeterminant(ImTextureID headerBackground, std::st
     : WorkspaceFloat(headerBackground, Builder::createNode<ENodeType::Determinant>(), headerLabel, nodeLabel)
 {}
 
-void WorkspaceDeterminant::drawData(util::NodeBuilder& builder)
+void WorkspaceDeterminant::drawDataSetValues(util::NodeBuilder& builder)
 {
     drawDataFull(builder); 
 }

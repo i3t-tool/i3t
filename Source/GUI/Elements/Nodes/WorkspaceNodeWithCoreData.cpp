@@ -92,20 +92,30 @@ float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
     float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
-	m_dataItemsWidth = (float)(maxLenghtOfData()) * oneCharWidth;
     return m_dataItemsWidth;
 }
 
 
 void WorkspaceNodeWithCoreData::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+	
 	builder.Begin(m_id);
+
+	
 
 	drawHeader(builder);
 	drawInputs(builder, newLinkPin);
-	drawData(builder);
-	drawOutputs(builder, newLinkPin);
 
+	//
+	//ImGui::BeginChild("myID");
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.5f);
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(164,171,190,1));
+	drawData(builder);
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+
+	drawOutputs(builder, newLinkPin);
+	//ImGui::EndChild();
 	builder.End();
 }
 
@@ -141,7 +151,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
                             WorkspacePinShape[elem.second->get()->getType()],
                             elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
                             WorkspacePinColor[elem.second->get()->getType()],
-                            ImColor(100.0, 200.0, 10.0, 1.0f)); /* \todo JH not constant here... */ //SS what is this?
+							WorkspaceInnerPinColor[elem.second->get()->getType()]);
 		
 		
 
@@ -187,7 +197,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
                             WorkspacePinShape[elem.second->get()->getType()],
                             elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
                             WorkspacePinColor[elem.second->get()->getType()],
-                            ImColor(32.0, 32.0, 32.0, alpha));
+							WorkspaceInnerPinColor[elem.second->get()->getType()]);
 
 		ImGui::Spring(0);
 
@@ -206,7 +216,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-		//ImGui::PushStyleVar();
 	}
 
 	ImGui::SameLine();
@@ -229,7 +238,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 {
     builder.Middle();
-
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
@@ -244,7 +252,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 
     default:
         /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
-        drawDataFull(builder);
+       drawDataFull(builder);
     }
 
 }

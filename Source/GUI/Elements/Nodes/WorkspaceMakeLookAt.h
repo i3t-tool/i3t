@@ -1,0 +1,20 @@
+#pragma once
+#include "WorkspaceMatrix4x4.h"
+
+struct WorkspaceMakeLookAtArgs
+{
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
+    std::string headerLabel = "default LookAt header";
+    std::string nodeLabel = "LookAt";
+    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeLookAt>();
+};
+
+class WorkspaceMakeLookAt : public WorkspaceMatrix4x4
+{
+public:
+    WorkspaceMakeLookAt(ImTextureID headerBackground, WorkspaceMakeLookAtArgs const& args);
+    WorkspaceMakeLookAt(ImTextureID headerBackground, std::string headerLabel = "LookAt", std::string nodeLabel = "LookAt");
+
+    void drawDataSetValues(util::NodeBuilder& builder);
+
+};

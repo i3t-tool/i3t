@@ -3,7 +3,7 @@
 
 struct WorkspaceMatrixTransposeArgs
 {
-    //WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixTranspose header";
     std::string nodeLabel = "Matrix Transpose";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Transpose>();
@@ -15,5 +15,5 @@ public:
     WorkspaceMatrixTranspose(ImTextureID headerBackground, WorkspaceMatrixTransposeArgs const& args);
     WorkspaceMatrixTranspose(ImTextureID headerBackground, std::string headerLabel = "Transpose", std::string nodeLabel = "Transpose");
 
-    void drawData(util::NodeBuilder& builder);
+    void drawDataSetValues(util::NodeBuilder& builder);
 };

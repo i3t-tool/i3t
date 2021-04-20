@@ -45,7 +45,11 @@ namespace util = ax::NodeEditor::Utilities;
     \return ImRect : New ImRect with position and size of last item
 */
 static inline ImRect ImGui_GetItemRect()
-{
+
+{	
+	//return ImRect(ImVec2(0, 0), ImVec2(1, 1));
+	//ImVec2 minRect = ImGui::GetItemRectMin();
+	//return ImRect(minRect, minRect.x + 12, minRect.y + 12));
 	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 }
 

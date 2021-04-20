@@ -211,18 +211,29 @@ void ax::Drawing::DrawIcon(ImDrawList* drawList, const ImVec2& a, const ImVec2& 
 				const auto p0 = rect_center - ImVec2(r, r);
 				const auto p1 = rect_center + ImVec2(r, r);
 
+				/*const auto r = 0.5f * rect_w / 2.0f;
+				const auto p0 = rect_center - ImVec2(r, r);
+				const auto p1 = rect_center + ImVec2(r, r);*/
+
 				drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
+				//drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
 			}
 			else
 			{
-				const auto r = 0.5f * rect_w / 2.0f - 0.5f;
+				const auto r = 0.5f * rect_w / 2.0f;
 				const auto p0 = rect_center - ImVec2(r, r);
 				const auto p1 = rect_center + ImVec2(r, r);
 
+				/*const auto r = 0.5f * rect_w / 2.0f;
+				const auto p0 = rect_center - ImVec2(r, r);
+				const auto p1 = rect_center + ImVec2(r, r);*/
+
 
 				if (innerColor & 0xFF000000)
+					//drawList->AddRectFilled(p0, p1, color, 0, 0);
 					drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
 
+				//drawList->AddRect(p0, p1, color, 0, 0, 0.0f * outline_scale);
 				drawList->AddRect(p0, p1, color, 0, 15 + extra_segments, 2.0f * outline_scale);
 
 				auto triangleStart_n = p0.x + 1.0f / 24.0f * rect_w;

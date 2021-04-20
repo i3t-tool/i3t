@@ -2,7 +2,7 @@
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 #include "WorkspaceElements.h"
 
-#include "WorkspaceElements.h"
+#include "Utils/NodeEditorStyle.h"
 
 class WorkspaceCorePinProperties;
 

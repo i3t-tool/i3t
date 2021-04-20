@@ -1,11 +1,12 @@
 #pragma once
 #include "WorkspaceNodeWithCoreData.h"
 
+
 struct WorkspaceMatrix4x4Args
 {
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Matrix4x4 header";
-    std::string nodeLabel = "Free";
+    std::string nodeLabel = "Matrix 4x4";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();
 };
 

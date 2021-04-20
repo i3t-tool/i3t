@@ -55,6 +55,7 @@ enum class WorkspaceLevelOfDetail
 
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
+extern std::map<EValueType, ImColor> WorkspaceInnerPinColor;
 
 /* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
 struct WorkspaceNodeArgs

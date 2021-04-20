@@ -3,7 +3,7 @@
 
 struct WorkspaceFloatArgs
 {
-    //WorkspaceViewScale viewScale = WorkspaceViewScale::Full;
+    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Float header";
     std::string nodeLabel = "Float";
     Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Float>();
@@ -16,6 +16,6 @@ public:
     WorkspaceFloat(ImTextureID headerBackground, WorkspaceFloatArgs const& args);
     WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
-    virtual void drawData(util::NodeBuilder& builder);
     virtual void drawDataFull(util::NodeBuilder& builder);
+    int maxLenghtOfData();
 };

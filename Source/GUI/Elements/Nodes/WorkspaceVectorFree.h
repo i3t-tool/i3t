@@ -13,7 +13,7 @@ class WorkspaceVectorFree : public WorkspaceVector4
 {
 public:
 	WorkspaceVectorFree(ImTextureID headerBackground, WorkspaceVectorFreeArgs const& args);
-    WorkspaceVectorFree(ImTextureID headerBackground, std::string headerLabel = "Free", std::string nodeLabel = "Free");
+    WorkspaceVectorFree(ImTextureID headerBackground, std::string headerLabel = "Vector4", std::string nodeLabel = "Vector4");
 
 	void drawDataSetValues(util::NodeBuilder& builder);
 
