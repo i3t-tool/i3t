@@ -40,7 +40,7 @@ protected:
     int m_numberOfVisibleDecimal = 2; /* \todo JH default number from some setting */
     float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
 
-	WorkspaceLevelOfDetail m_levelOfDetail;
+	WorkspaceLevelOfDetail m_levelOfDetail=WorkspaceLevelOfDetail::Full;/* DG was not initialized - getLevelOfDetail returned garbage */
 
     std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;

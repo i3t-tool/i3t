@@ -74,7 +74,7 @@ void RotationManipulator::update() {
 	if(strcmp(oper,"EulerX")==0){m_allowedaxis|=s_x;}
 	else if(strcmp(oper,"EulerY")==0){m_allowedaxis|=s_y;}
 	else if(strcmp(oper,"EulerZ")==0){m_allowedaxis|=s_z;}
-	//else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x|s_y|s_z;}
+	else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x;}
 	///
 	bool transactionBegin=false;
 

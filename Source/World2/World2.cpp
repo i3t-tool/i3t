@@ -46,7 +46,7 @@ World2::World2(){
     this->manipulators.emplace("EulerY",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
     this->manipulators.emplace("EulerZ",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
     this->manipulators.emplace("Free",          Manipulator(&mm->m_editednode,&mm->m_parent,mm));
-    //this->manipulators.emplace("AxisAngle",     Manipulator(&rm->m_editednode,&rm->m_parent,rm));//not editable
+    this->manipulators.emplace("AxisAngle",     Manipulator(&rm->m_editednode,&rm->m_parent,rm));//not editable
     GameObject*sceneHandles = new GameObject();
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){

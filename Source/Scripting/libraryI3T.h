@@ -13,13 +13,17 @@ struct Vec4Operators {
 	const int norm=0;
 };
 struct FloatOperators {
-	const int free=0;
+	const int clamp=0,cycle=1,mul=2,add=3,div=4,pow=5,mix=6,sincos=7,asinacos=8,signum=9;
+};
+struct NodeLODs {
+	const int full=0,setvalues=1,label=2;
 };
 struct ScriptingData {
 	Mat4Types mat4Types;
 	Mat4Operators mat4Operators;
 	Vec4Operators vec4Operators;
 	FloatOperators floatOperators;
+	NodeLODs nodeLODs;
 	std::vector<glm::mat4>nodeData;
 };
 

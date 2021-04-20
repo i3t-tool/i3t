@@ -44,6 +44,12 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			fprintf(f,"int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i, vec4[0], vec4[1], vec4[2],vec4[3]);
 			fprintf(f,"int n%d=vec4(d%d,%d,%d,\"%s\");\n", i,i, (int)pos[0], (int)pos[1], label.c_str());
 		}
+		//float
+		else if (strcmp(keyword, "FloatToFloat") == 0) {
+			float v = nodebase->getData().getFloat();
+			fprintf(f,"int d%d=datascalar(%0.3ff);\n", i, v);
+			fprintf(f,"int n%d=scalar(d%d,%d,%d,\"%s\");\n", i,i, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		//normvec4
 		else if (strcmp(keyword, "NormalizeVector") == 0) {
 			fprintf(f,"int n%d=vec4oper(norm,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
@@ -64,6 +70,10 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 		else if (strcmp(keyword, "MatrixToMatrix") == 0) {
 			fprintf(f, "int n%d=mat4oper(matrix,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
 		}
+		//sequence
+		else if (strcmp(keyword, "Sequence") == 0) {
+			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		//
 		else {
 			//printf("g\n");
@@ -74,6 +84,17 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			fprintf(f, "//int n%d=%s(d%d,%d,%d);//unknown type\n", i, keyword,i, (int)pos[0], (int)pos[1]);
 		}
 	}
+
+	for (int i = 0; i < _workspace->size(); i++) {
+		WorkspaceNodeWithCoreData* nodebasedata = _workspace->at(i).get();
+		int precision							= nodebasedata->getNumberOfVisibleDecimal();
+		int lod									= (int)nodebasedata->getLevelOfDetail();
+		char* names[4]={"full","setvalues","label",nullptr};
+		if(precision!=2||lod!=(int)WorkspaceLevelOfDetail::Full){
+			fprintf(f,"confnode(n%d,%d,%s);\n",i, nodebasedata->getNumberOfVisibleDecimal(),names[(int)nodebasedata->getLevelOfDetail()]);
+		}
+	}
+
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData*  nodebasedata = _workspace->at(i).get(); //printf("i\n");
 		Ptr<Core::NodeBase>			nodebase = nodebasedata->getNodebase();
