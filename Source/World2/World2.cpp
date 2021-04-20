@@ -101,10 +101,12 @@ World2::World2(){
     glm::mat4 m = getNodeTransform(&(Ptr<Core::NodeBase>)matrices[4], &branch1);*/
     //glm::mat4 m2=
 }
+
 bool World2::init(){
     World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
     World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
     World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
+
     if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
         getchar();printf("World2::init():cannot load shaders\n");return false;
     }//World2::shaderHandle=World2::shader0;
@@ -133,6 +135,7 @@ World2* World2::loadDefaultScene(){
     if (!World2::initializedRender){printf("initialize render before creating World2!\n");return nullptr;}
     GLuint renderTexture;
     RenderTexture* rend;
+
     GameObject *objhandles, *camhandles, *lookat, *testparent, *testchild;
 
     rend =        new RenderTexture(&renderTexture,256,256);

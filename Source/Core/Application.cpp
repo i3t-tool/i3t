@@ -188,10 +188,6 @@ World2* Application::world2()
 {
 	return m_world;
 }
-ImFont* Application::getFont(int fontId)
-{
-	return m_ui->m_currentTheme.get(static_cast<size_t>(fontId));
-}
 
 GLFWwindow* Application::mainWindow()
 {

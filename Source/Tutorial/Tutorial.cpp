@@ -96,7 +96,7 @@ void Tutorial::loadImages()
 	{
 		auto& image_filename = image.first;
 		auto& image_id = image.second; // by reference
-		std::string whole_filename = Config::getAbsolutePath(("/Data/tutorials/" + image_filename).c_str());
+		std::string whole_filename = Config::getAbsolutePath(("Data/tutorials/" + image_filename).c_str());
 		// glEnable(GL_TEXTURE_2D);
 		GLuint tex_id = 0;
 		glGenTextures(1, &tex_id);

@@ -31,7 +31,7 @@
 WorkspaceWindow::WorkspaceWindow(bool show)
 		: IWindow(show), WholeApplication(Application::get()), ConstTouchTime(1.0f),
 			HeaderBackgroundTexture((void*)(intptr_t)pgr::createTexture(
-					Config::getAbsolutePath("/Source/GUI/Elements/Windows/data/BlueprintBackground.png"),
+					Config::getAbsolutePath("Data/textures/blueprint_background.png"),
 					true)) // \TODO load texture OR making a simple rectangle
 			,
 			NodeBuilderContext(util::NodeBuilder(HeaderBackgroundTexture, 64, 64))

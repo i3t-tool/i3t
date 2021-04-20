@@ -121,14 +121,8 @@ public:
 
 	ImFont* get(EFont font)
 	{
-		Debug::Assert(m_fontsAssoc.count(font) != 0, "");
+		Debug::Assert(m_fontsAssoc.count(font) != 0, "Font is not registered.");
 		return m_fonts[m_fontsAssoc[font]];
-	}
-
-	ImFont* get(size_t id)
-	{
-		Debug::Assert(m_fonts.size() < id, "Out of bounds!");
-		return m_fonts[id];
 	}
 
 	float get(ESize size)
