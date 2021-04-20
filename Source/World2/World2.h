@@ -12,6 +12,7 @@
 #include "GameObject.h"
 
 #include <map>
+#include <memory>
 
 class WorkspaceMatrix4x4;
 class GameObject;
