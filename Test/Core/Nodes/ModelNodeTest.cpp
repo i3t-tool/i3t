@@ -2,7 +2,7 @@
 
 #include "Core/Nodes/GraphManager.h"
 
-#include "World2/GameObject.h"
+#include "World/GameObject.h"
 #include "Generator.h"
 #include "Utils.h"
 
