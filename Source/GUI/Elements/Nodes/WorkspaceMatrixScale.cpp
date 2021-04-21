@@ -5,44 +5,24 @@ WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, Workspa
 {}
 
 WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createTransform<Core::Scale>(), headerLabel, nodeLabel){
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Scale>(), headerLabel, nodeLabel){
 }
 
 void WorkspaceMatrixScale::drawDataSetValues(util::NodeBuilder& builder)
 {
+    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     drawDataSetValues_builder(builder,
-                              {"x", "y", "z"},
-                              { [this](){return getValueX();}, [this](){return getValueY();}, [this](){return getValueZ();} },
-                              { [this](float v){return setValueX(v);}, [this](float v){return setValueY(v);}, [this](float v){return setValueZ(v);} });
-}
-
-/* \todo JH underlying functions will be taken from Core */
-ValueSetResult WorkspaceMatrixScale::setValueX(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(0, 0));
-}
-
-ValueSetResult WorkspaceMatrixScale::setValueY(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(1, 1));
-}
-
-ValueSetResult WorkspaceMatrixScale::setValueZ(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(2, 2));
-}
-
-float WorkspaceMatrixScale::getValueX()
-{
-    return m_nodebase->getData().getMat4()[0][0];
-}
-
-float WorkspaceMatrixScale::getValueY()
-{
-    return m_nodebase->getData().getMat4()[1][1];
-}
-
-float WorkspaceMatrixScale::getValueZ()
-{
-    return m_nodebase->getData().getMat4()[2][2];
+                                {   "x",
+                                    "y",
+                                    "z" },
+                                {   [this](){return m_nodebase->as<Core::Scale>()->getX();},
+                                    [this](){return m_nodebase->as<Core::Scale>()->getY();},
+                                    [this](){return m_nodebase->as<Core::Scale>()->getZ();} },
+                                {   [this](float v){return m_nodebase->as<Core::Scale>()->setX(v);},
+                                    [this](float v){return m_nodebase->as<Core::Scale>()->setY(v);},
+                                    [this](float v){return m_nodebase->as<Core::Scale>()->setZ(v);} },
+                                {   coreMap[0*4+0], /* \todo JH some better way how determine what element from DataMap should be used? */
+                                    coreMap[1*4+1],
+                                    coreMap[2*4+2] }
+                            );
 }

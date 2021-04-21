@@ -46,6 +46,7 @@ struct ValueSetResult
 	}
 };
 
+
 namespace Core
 {
 class Pin;
@@ -67,29 +68,19 @@ protected:
 	/// Outputs of the box: output tabs with glyphs.
 	std::vector<Pin> m_outputs;
 
-	/// Values which node owns.
-	std::vector<DataStore> m_initialData;
+	/// Results of operations.
 	std::vector<DataStore> m_internalData;
 
-	Transform::DataMap m_initialMap{};
-	Transform::DataMap m_currentMap = Transform::g_Free;
+	const Transform::DataMap* m_initialMap{};
+	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
 	 * Operator node properties.
 	 */
 	const Operation* m_operation = nullptr;
 
-	/// \todo Is there values in NodeBase used?
-	bool m_pulseOnPlug{};      ///< true for all operators except for operatorCycle. used in onOperatorPlugChange
-	bool m_restrictedOutput{}; ///< Restrict the output update to restrictedOutputIndex (used by OperatorPlayerControll
-	                           ///< only)
-	int m_restrictedOutputIndex{}; ///< Used in OperatorPlayerControll::updateValues(int inputIndex) only
-
 protected:
-	NodeBase() = default;
-
-  NodeBase(const Operation* operation)
-			: m_operation(operation), m_pulseOnPlug(true), m_restrictedOutput(false), m_restrictedOutputIndex(0)
+  NodeBase(const Operation* operation) : m_operation(operation)
 	{
 	}
 
@@ -97,23 +88,35 @@ public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
-	template <typename T>
+	const Pin& getInPin(int index) const  { return m_inputs[index]; }
+	const Pin& getOutPin(int index) const { return m_outputs[index]; }
+
+  Ptr<NodeBase> getPtr() { return shared_from_this(); }
+
+  template <typename T>
 	Ptr<T> as()
   {
 		static_assert(std::is_base_of_v<NodeBase, T>, "T must be derived from NodeBase class.");
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
 
-	void create();
+	/**
+	 * Initialize node inputs and outputs according to preset node type.
+	 *
+	 * Called in create node function.
+	 */
+	void init();
 
 	[[nodiscard]] ID getId() const;
-
-	Ptr<NodeBase> getPtr() { return shared_from_this(); }
 
 	const Operation* const getOperation() { return m_operation; }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:
+	/**
+	 * Get data storage for read and write purposes. No written value validation
+	 * is performed.
+	 */
 	DataStore& getInternalData(size_t index = 0)
 	{
 		Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
@@ -123,12 +126,27 @@ protected:
 
 public:
 	/**
-	 * Get Node contents.
+	 * Get Node contents, read only.
 	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
 	 *              Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data
 	 */
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
+
+private:
+	template <typename T>
+  ValueSetResult setValueEx(T&& val)
+  {
+		if (m_currentMap == &Transform::g_AllLocked)
+      return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
+
+    getInternalData().setValue(val);
+    spreadSignal();
+
+    return ValueSetResult{};
+	}
+
+public:
 
 	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
 	{
@@ -148,38 +166,22 @@ public:
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val)
 	{
-		m_internalData[0].setValue(val);
-		spreadSignal();
-
-		return ValueSetResult{ValueSetResult::Status::Ok, ""};
+		return setValueEx(val);
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
 	{
-		m_internalData[0].setValue(vec);
-		spreadSignal();
-
-		return ValueSetResult{ValueSetResult::Status::Ok, ""};
+    return setValueEx(vec);
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
 	{
-		m_internalData[0].setValue(vec);
-		spreadSignal();
-
-		return ValueSetResult{ValueSetResult::Status::Ok, ""};
+    return setValueEx(vec);
 	}
 
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
 	{
-		if (m_currentMap == Transform::g_Free)
-		{
-			m_internalData[0].setValue(mat);
-			spreadSignal();
-
-			return ValueSetResult{ValueSetResult::Status::Ok, ""};
-		}
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Not a free transformation."};
+    return setValueEx(mat);
 	}
 
 	/**
@@ -204,6 +206,7 @@ public:
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
+protected:
 	/**
 	 * Sets node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
@@ -223,10 +226,17 @@ public:
 		spreadSignal();
 	}
 
+public:
 	virtual void reset() {}
 
-	virtual void setDataMap(const Transform::DataMap& map) { m_currentMap = map; }
-	const Transform::DataMap& getDataMap() { return m_currentMap; }
+  void setDataMap(const Transform::DataMap* map);
+
+	const Transform::DataMap* getDataMap() { return m_currentMap; }
+	const Transform::DataMap& getDataMapRef() { return *m_currentMap; }
+	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps()
+	{
+		return m_operation->validDatamaps;
+	};
 
 	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
 	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;
@@ -268,17 +278,26 @@ public:
 	 *
 	 * \param	inputIndex	Index of the input that was changed and that forces the operator to recompute its outputs.
 	 */
-	void receiveSignal(int inputIndex);
+	virtual void receiveSignal(int inputIndex);
 	//===----------------------------------------------------------------------===//
 
 	bool areInputsPlugged(int numInputs);
 	bool areAllInputsPlugged();
+
+	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
+
+protected:
+  virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const * output);
 
 private:
 	void unplugAll();
 	void unplugInput(int index);
 	void unplugOutput(int index);
 };
+
+using Node = NodeBase;
+using NodePtr = Ptr<Node>;
+
 
 /**
  * Pin used for connecting nodes.
@@ -288,7 +307,6 @@ private:
 class Pin
 {
 	friend class GraphManager;
-	// template <ENodeType NodeType> friend class NodeImpl;
 	friend class NodeBase;
 
 	ID m_id;
@@ -327,6 +345,8 @@ public:
 
 	[[nodiscard]] int getIndex() const { return m_index; }
 
+	[[nodiscard]] NodePtr getOwner() const { return m_master; };
+
 	[[nodiscard]] const Pin* getParentPin() const
 	{
 		if (m_isInput)
@@ -342,7 +362,7 @@ public:
 	}
 
 	/**
-	 * @return Input pins of connected nodes.
+	 * \return Input pins of connected nodes.
 	 */
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 
@@ -376,7 +396,4 @@ public:
 
 	[[nodiscard]] bool isInput() const { return m_isInput; }
 };
-
-using Node = NodeBase;
-using NodePtr = Ptr<NodeBase>;
 } // namespace Core

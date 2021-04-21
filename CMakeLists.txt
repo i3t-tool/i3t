@@ -98,7 +98,7 @@ set(CONFIGURATION_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS False CACHE BOOL "Assimp should not build build tests.")
 
-set(YAML_BUILD_SHARED_LIBS FALSE)
+set(YAML_BUILD_SHARED_LIBS Off)
 
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_3DS_IMPORTER ON)
@@ -107,16 +107,12 @@ set(ASSIMP_BUILD_FBX_IMPORTER ON)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(ASSIMP_BUILD_PLY_IMPORTER ON)
 
-# Assimp tools requires multiple format support.
 set(ASSIMP_BUILD_ASSIMP_TOOLS CACHE INTERNAL FALSE)
 
 set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_FBX_EXPORTER ON)
 set(ASSIMP_BUILD_OBJ_EXPORTER ON)
 set(ASSIMP_BUILD_PLY_EXPORTER ON)
-#https://github.com/assimp/assimp/issues/3074 : Missing Assimp::DumpSceneToAssbin in assimp\tools\assimp_cmd\WriteDump.cpp
-set(ASSIMP_BUILD_ASSBIN_EXPORTER ON)
-set(ASSIMP_BUILD_ASSXML_EXPORTER ON)
 # =============================================================
 
 # ======== Project dependencies which should be compiled. =====
@@ -205,9 +201,13 @@ if (True)
             yaml-cpp)
 
     set_target_properties(gtest PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+        LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+    )
     set_target_properties(gtest_main PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+        LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+    )
 
     target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
 endif()
@@ -283,5 +283,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${I3T_LOGS_DIR}")
 
 set_target_properties(assimp PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${I3T_OUT_DIR})
+        LIBRARY_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}")
 # =============================================================

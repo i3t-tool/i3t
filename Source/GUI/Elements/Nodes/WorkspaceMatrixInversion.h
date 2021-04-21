@@ -6,7 +6,7 @@ struct WorkspaceMatrixInversionArgs
 	WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
 	std::string headerLabel = "default Inversion header";
 	std::string nodeLabel = "Inversion";
-	Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Inversion>();
+	Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Inversion>();
 };
 
 class WorkspaceMatrixInversion : public WorkspaceMatrix4x4

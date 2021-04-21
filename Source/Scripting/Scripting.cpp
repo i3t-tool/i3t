@@ -18,10 +18,10 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	fprintf(f,"//saving\n");
 
 	for (int i = 0; i < _workspace->size(); i++) {
-		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get();
-		Ptr<Core::NodeBase>			nodebase	= nodebasedata->m_nodebase;
-		ImVec2						pos			= ne::GetNodePosition(nodebasedata->m_id);
-		Core::Transform::DataMap	data		= nodebase->getDataMap();
+		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
+		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase();
+		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId());
+		const Core::Transform::DataMap&	data		= nodebase->getDataMapRef();
 		const Operation*			operation	= nodebase->getOperation();
 		const char*					keyword		= operation->keyWord.c_str();
 
@@ -57,9 +57,9 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	}
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData*  nodebasedata = _workspace->at(i).get();
-		Ptr<Core::NodeBase>			nodebase = nodebasedata->m_nodebase;
-		ImVec2						pos = ne::GetNodePosition(nodebasedata->m_id);
-		Core::Transform::DataMap	data = nodebase->getDataMap();
+		Ptr<Core::NodeBase>			nodebase = nodebasedata->getNodebase();
+		ImVec2						pos = ne::GetNodePosition(nodebasedata->getId());
+		const Core::Transform::DataMap&	data = nodebase->getDataMapRef();
 		const Operation*			operation = nodebase->getOperation();
 		const char* keyword =		operation->keyWord.c_str();
 
@@ -73,7 +73,7 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 				if(parentpin!=NULL){indexout=parentpin->getIndex(); }
 			}
 			for (int j = 0; j < _workspace->size(); j++) {
-				if (parent.get() == (_workspace->at(j).get())->m_nodebase.get()) {parentindex = j;}
+				if (parent.get() == (_workspace->at(j).get())->getNodebase().get()) {parentindex = j;}
 			}
 			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){fprintf(f,"bool p%d_%d=plugnodes(n%d,n%d,%d,%d);\n",i,indexin, parentindex,i,indexout,indexin);}
 		}
@@ -90,31 +90,31 @@ bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 		NodeMat4 node=scene->mat4Nodes[i];
 		if(node.type==scene->mat4Types.free){
 			_workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, "load free"));
-			ValueSetResult result =(_workspace->back().get())->m_nodebase.get()->setValue(node.data);
-			ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
+			ValueSetResult result =(_workspace->back().get())->getNodebase().get()->setValue(node.data);
+			ne::SetNodePosition(_workspace->back()->getId(), ImVec2((float)node.x, (float)node.y));
 		}
 		else if (node.type == scene->mat4Types.scale) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, "load scale"));
-			ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)node.data[0]);
-			ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
+			ValueSetResult result = (_workspace->back().get())->getNodebase().get()->setValue((glm::vec3)node.data[0]);
+			ne::SetNodePosition(_workspace->back()->getId(), ImVec2((float)node.x, (float)node.y));
 		}
 		else if (node.type == scene->mat4Types.translate) {
 			_workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, "load translation"));
-			ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue((glm::vec3)node.data[0]);
-			ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
+			ValueSetResult result = (_workspace->back().get())->getNodebase().get()->setValue((glm::vec3)node.data[0]);
+			ne::SetNodePosition(_workspace->back()->getId(), ImVec2((float)node.x, (float)node.y));
 		}
 	}
 	for (int i = 0; i < scene->normVec4Nodes.size(); i++) {
 		NodeNormVec4 node=scene->normVec4Nodes[i];
 		_workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, "load NormalizeVector"));
-		ValueSetResult result = (_workspace->back().get())->m_nodebase.get()->setValue(node.data);
-		ne::SetNodePosition(_workspace->back()->m_id, ImVec2((float)node.x, (float)node.y));
+		ValueSetResult result = (_workspace->back().get())->getNodebase().get()->setValue(node.data);
+		ne::SetNodePosition(_workspace->back()->getId(), ImVec2((float)node.x, (float)node.y));
 	}
 	for (int i = 0; i < scene->nodePlugs.size(); i++) {
 		int indexA=scene->nodePlugs[i].indexA+startlen;
 		int indexB=scene->nodePlugs[i].indexB+startlen;
-		Ptr<Core::NodeBase> pca= (_workspace->at(indexA).get())->m_nodebase;
-		Ptr<Core::NodeBase> pcb= (_workspace->at(indexB).get())->m_nodebase;
+		Ptr<Core::NodeBase> pca= (_workspace->at(indexA).get())->getNodebase();
+		Ptr<Core::NodeBase> pcb= (_workspace->at(indexB).get())->getNodebase();
 
 
 		ENodePlugResult p = Core::GraphManager::plug(pca,pcb, scene->nodePlugs[i].indexPinA, scene->nodePlugs[i].indexPinB);

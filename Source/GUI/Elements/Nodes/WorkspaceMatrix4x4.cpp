@@ -1,11 +1,11 @@
 #include "WorkspaceMatrix4x4.h"
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMatrix4x4Args const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, { .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
 	fw.name = "matrix4x4";
 
     setDataItemsWidth();
@@ -16,17 +16,20 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
 	fw.name = "matrix4x4";
 	setDataItemsWidth();
 }
 
-
+void WorkspaceMatrix4x4::drawData(util::NodeBuilder& builder)
+{
+    setDataItemsWidth();
+}
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 {
 	const glm::mat4& coreData = m_nodebase->getData().getMat4();
-	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMap();
+	const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
@@ -46,7 +49,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	{
 		for (int columns = 0; columns < 4; columns++)
 		{
-			
+
 
 			localData = coreData[columns][rows]; /* Data are column-wise */
 			if (drawDragFloatWithMap_Inline(&localData, coreMap[columns * 4 + rows],
@@ -66,14 +69,14 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 				fw.rows = rows;
 				//ImGui::OpenPopup("float_context_menu");
 			}
-			
-			
+
+
 		}
 		ImGui::NewLine();
 	}
 
 	//ImGui::EndVertical();
-	//ImGui::EndHorizontal();	
+	//ImGui::EndHorizontal();
 
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar();

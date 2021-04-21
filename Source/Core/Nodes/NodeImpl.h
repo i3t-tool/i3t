@@ -25,7 +25,7 @@ public:
 	/**
 	 * Creates an operator of given type (as template parameter).
 	 *
-	 * <b>DON'T</b> construct object directly, use Builder::createNode() function.
+	 * <b>DON'T</b> construct object directly, use Core::Builder::createNode() function.
 	 *
 	 * Code taken from I3T v1 NodeImpl<OperatorType>::NodeImpl(...).
 	 * Operator is no more associated with GUI, as used to be, so no input
@@ -1453,6 +1453,35 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int 
 	{
 		setInternalValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
 		                             m_inputs[2].getStorage().getVec3()));
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::Camera>::updateValues(int inputIndex)
+{
+  if (areAllInputsPlugged())
+  {
+    setInternalValue(m_inputs[0].getStorage().getMat4() * m_inputs[1].getStorage().getMat4());
+  }
+	else
+  {
+    if (m_inputs[0].isPluggedIn())
+    {
+      // Projection matrix.
+      setInternalValue(m_inputs[0].getStorage().getMat4());
+    }
+    else if (m_inputs[1].isPluggedIn())
+    {
+      // View matrix.
+      setInternalValue(m_inputs[1].getStorage().getMat4());
+    }
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inputIndex)
+{
+  if (areAllInputsPlugged())
+  {
+		setInternalValue(m_inputs[0].getStorage().getMat4());
 	}
 }
 } // namespace Core

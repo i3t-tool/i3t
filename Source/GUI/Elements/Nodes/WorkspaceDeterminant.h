@@ -6,7 +6,7 @@ struct WorkspaceDeterminantArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Determinant header";
     std::string nodeLabel = "Determinant";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Determinant>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Determinant>();
 };
 
 
@@ -17,5 +17,6 @@ public:
     WorkspaceDeterminant(ImTextureID headerBackground, std::string headerLabel = "Determinant", std::string nodeLabel = "Determinant");
 
     void drawDataSetValues(util::NodeBuilder& builder);
+
 };
 

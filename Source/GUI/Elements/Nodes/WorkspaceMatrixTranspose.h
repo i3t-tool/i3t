@@ -6,7 +6,7 @@ struct WorkspaceMatrixTransposeArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixTranspose header";
     std::string nodeLabel = "Matrix Transpose";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Transpose>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Transpose>();
 };
 
 class WorkspaceMatrixTranspose : public WorkspaceMatrix4x4

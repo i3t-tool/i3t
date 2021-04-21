@@ -34,6 +34,7 @@
 #include "../Nodes/WorkspaceMatrixMulVector.h"
 #include "../Nodes/WorkspaceVectorMulMatrix.h"
 //	} matrix end
+#include "../Nodes/WorkspaceSequence.h"
 
 //	vec4{
 #include "../Nodes/WorkspaceVectorFree.h"
@@ -173,7 +174,7 @@ void WorkspaceWindow::checkUserActions()
     }
 }
 
-/* \todo JH not work yet - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
+/* \todo JH not work yet in all cases - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
 void WorkspaceWindow::shiftSelectedNodesToFront()
 {
     if (ne::HasSelectionChanged())
@@ -182,10 +183,9 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
 
         for(int i=0; i < selectedCoreNodes.size(); i++)
         {
-
             coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(),
                                                         m_workspaceCoreNodes.end(),
-                                                        [selectedCoreNodes, i](Ptr<WorkspaceNodeWithCoreData> const &node) -> bool { return node->m_id == selectedCoreNodes.at(i)->m_id; });
+                                                        [selectedCoreNodes, i](Ptr<WorkspaceNodeWithCoreData> const &node) -> bool { return node->getId() == selectedCoreNodes.at(i)->getId(); });
 
             if (ith_selected_node != m_workspaceCoreNodes.end())
             {
@@ -220,7 +220,7 @@ Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByID(ne::Nod
     {
         for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
         {
-            if(node->m_id == id){ return node; }
+            if(node->getId() == id){ return node; }
         }
     }
     return nullptr;
@@ -232,17 +232,17 @@ Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByPinID(ne::
     {
         for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
         {
-            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceInputsProperties)
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getInputsProperties())
             {
-                if (pin->m_id == id)
+                if (pin->getId() == id)
                 {
                     return node;
                 }
             }
 
-            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceOutputsProperties)
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getOutputsProperties())
             {
-                if (pin->m_id == id)
+                if (pin->getId() == id)
                 {
                     return node;
                 }
@@ -259,17 +259,17 @@ Ptr<WorkspaceCorePinProperties> WorkspaceWindow::getWorkspacePinPropertiesByID(n
     {
         for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
         {
-            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceInputsProperties)
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getInputsProperties())
             {
-                if (pin->m_id == id)
+                if (pin->getId() == id)
                 {
                     return pin;
                 }
             }
 
-            for (Ptr<WorkspaceCorePinProperties> const &pin : node->m_workspaceOutputsProperties)
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getOutputsProperties())
             {
-                if (pin->m_id == id)
+                if (pin->getId() == id)
                 {
                     return pin;
                 }
@@ -368,16 +368,16 @@ void WorkspaceWindow::checkQueryLinkCreate()
                 std::swap(startPin, endPin);
             }
 
-            switch (Core::GraphManager::isPlugCorrect(&(endPin->m_pin), &(startPin->m_pin)))
+            switch (Core::GraphManager::isPlugCorrect(&(endPin->getCorePin()), &(startPin->getCorePin())))
             {
                 case ENodePlugResult::Ok:
                     showPopUpLabel("Connection possible", ImColor(0,255,0)); /* \todo JH remove constant here */
                     if (!ImGui::GetIO().MouseDown[0])
                     {
-                        Core::GraphManager::plug(startPin->m_node.m_nodebase,
-                                                 endPin->m_node.m_nodebase,
-                                                 startPin->m_pin.getIndex(),
-                                                 endPin->m_pin.getIndex() );
+                        Core::GraphManager::plug(startPin->getNode().getNodebase(),
+                                                 endPin->getNode().getNodebase(),
+                                                 startPin->getIndex(),
+                                                 endPin->getIndex() );
                     }
                     break;
                 /* \todo JH react informatively to other result too */
@@ -434,7 +434,7 @@ void WorkspaceWindow::checkQueryLinkDelete()
         {
             Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
 
-            Core::GraphManager::unplugInput(inputPin->m_node.m_nodebase, inputPin->m_pin.getIndex());
+            Core::GraphManager::unplugInput(inputPin->getNode().getNodebase(), inputPin->getIndex());
         }
     }
 }
@@ -453,10 +453,12 @@ void WorkspaceWindow::checkQueryNodeDelete()
 
 void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
 {
-    coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->m_id == nodeId; });
+    coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->getId() == nodeId; });
     if (id != m_workspaceCoreNodes.end())
+    {
         m_workspaceCoreNodes.erase(id);
-        ne::DeleteNode(nodeId); /* \todo JH check whether node remain in nodeeditor */
+    }
+
 }
 
 
@@ -485,7 +487,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 		}else{
 			ImGui::OpenPopup("Node Context Menu");
 		}
-		
+
 	}
 	ne::Resume();
 
@@ -625,9 +627,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 
 		if (node->fw.name == "vector4" && valueChange) {
-			glm::vec4 data = node->m_nodebase->getData().getVec4();
+			glm::vec4 data = node->getNodebase()->getData().getVec4();
 			data[node->fw.columns] = newValue;
-			node->m_nodebase->setValue(data);
+			node->getNodebase()->setValue(data);
 			valueChange = false;
 		}
 		else if (node->fw.name == "vector3" && valueChange) {
@@ -641,7 +643,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 			valueChange = false;
 		}
 		else if (node->fw.name == "matrix4x4" && valueChange) {
-			node->m_nodebase->setValue(newValue, { node->fw.columns, node->fw.rows });
+			node->getNodebase()->setValue(newValue, { node->fw.columns, node->fw.rows });
 			valueChange = false;
 		}
 		ImGui::EndPopup();
@@ -649,9 +651,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 	if (ImGui::BeginPopup("Node Context Menu") && !(ImGui::BeginPopup("float_context_menu"))) {
 
-        Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
+        Ptr<WorkspaceNodeWithCoreData> context_node = getWorkspaceCoreNodeByID(m_contextNodeId);
 
-		if (node) {
+		if (context_node) {
 			ImGui::Text("ID: %p", m_contextNodeId.AsPointer());
 			ImGui::Separator();
 		}
@@ -659,42 +661,12 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
 
-        if (ImGui::BeginMenu("Level of detail")) {
+		context_node->drawMenuSetDataMap();
+        context_node->drawMenuLevelOfDetail();
+        context_node->drawMenuSetPrecision();
 
-            ImGui::Text(fmt::format("Actual level: {}", node->m_levelOfDetail).c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Full")) {
-                node->m_levelOfDetail = WorkspaceLevelOfDetail::Full;
-            }
-            if (ImGui::MenuItem("SetValues")) {
-                node->m_levelOfDetail = WorkspaceLevelOfDetail::SetValues;
-            }
-            if (ImGui::MenuItem("Label")) {
-                node->m_levelOfDetail = WorkspaceLevelOfDetail::Label;
-            }
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("Precision")) {
-
-            ImGui::Text(fmt::format("Actual precision: {}", node->getNumberOfVisibleDecimal()).c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("0")) {
-                node->setNumberOfVisibleDecimal(0);
-            }
-            if (ImGui::MenuItem("1")) {
-                node->setNumberOfVisibleDecimal(1);
-            }
-            if (ImGui::MenuItem("2")) {
-                node->setNumberOfVisibleDecimal(2);
-            }
-            if (ImGui::MenuItem("3")) {
-                node->setNumberOfVisibleDecimal(3);
-            }
-            ImGui::EndMenu();
-        }
         if (ImGui::MenuItem("Delete")) {
-            NodeDelete(node->m_id);
+            ne::DeleteNode(context_node->getId());
 		}
 		ImGui::EndPopup();
 	}
@@ -769,7 +741,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Separator();
 				if (ImGui::MenuItem("translate")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleX")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(HeaderBackgroundTexture));
@@ -789,7 +761,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				if (ImGui::MenuItem("scale")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("ortho")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(HeaderBackgroundTexture));
@@ -816,25 +788,25 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Separator();
 				if (ImGui::MenuItem("matrix")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixFree>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("trackball")) {
 				}
 				if (ImGui::MenuItem("inversion")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixInversion>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("transpose")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranspose>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("determinant")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * mat")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulMatrix>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat + mat")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixAddMatrix>(HeaderBackgroundTexture));
@@ -888,7 +860,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Separator();
 				if (ImGui::MenuItem("vec4")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorFree>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 . vec4")) {
 				}
@@ -900,7 +872,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				if (ImGui::MenuItem("normalize vec4")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("perspective division")) {
 				}
@@ -957,8 +929,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("float operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("float")) {
-//					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatFree>(HeaderBackgroundTexture));
-//					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatFree>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("clamp float")) {
 				}
@@ -1028,6 +1000,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 		}
 		if (ImGui::MenuItem("sequence")) {
+            m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSequence>(HeaderBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 		if (ImGui::MenuItem("camera")) {
 		}

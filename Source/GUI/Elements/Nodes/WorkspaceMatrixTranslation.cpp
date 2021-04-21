@@ -1,49 +1,28 @@
 #include "WorkspaceMatrixTranslation.h"
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, WorkspaceMatrixTranslationArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
 {}
 
 WorkspaceMatrixTranslation::WorkspaceMatrixTranslation(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createTransform<Core::Translation>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Translation>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMatrixTranslation::drawDataSetValues(util::NodeBuilder& builder)
 {
+    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     drawDataSetValues_builder(builder,
-                              {"x", "y", "z"},
-                              { [this](){return getValueX();}, [this](){return getValueY();}, [this](){return getValueZ();} },
-                              { [this](float v){return setValueX(v);}, [this](float v){return setValueY(v);}, [this](float v){return setValueZ(v);} });
+                                {   "x",
+                                    "y",
+                                    "z" },
+                                {   [this](){return m_nodebase->as<Core::Translation>()->getX();},
+                                    [this](){return m_nodebase->as<Core::Translation>()->getY();},
+                                    [this](){return m_nodebase->as<Core::Translation>()->getZ();} },
+                                {   [this](float v){return m_nodebase->as<Core::Translation>()->setX(v);},
+                                    [this](float v){return m_nodebase->as<Core::Translation>()->setY(v);},
+                                    [this](float v){return m_nodebase->as<Core::Translation>()->setZ(v);} },
+                                {   coreMap[3*4+0], /* \todo JH some better way how determine what element from DataMap should be used? */
+                                    coreMap[3*4+1],
+                                    coreMap[3*4+2] }
+                            );
 }
-
-/* \todo JH underlying functions will be taken from Core */
-ValueSetResult WorkspaceMatrixTranslation::setValueX(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(3, 0));
-}
-
-ValueSetResult WorkspaceMatrixTranslation::setValueY(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(3, 1));
-}
-
-ValueSetResult WorkspaceMatrixTranslation::setValueZ(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(3, 2));
-}
-
-float WorkspaceMatrixTranslation::getValueX()
-{
-    return m_nodebase->getData().getMat4()[3][0];
-}
-
-float WorkspaceMatrixTranslation::getValueY()
-{
-    return m_nodebase->getData().getMat4()[3][1];
-}
-
-float WorkspaceMatrixTranslation::getValueZ()
-{
-    return m_nodebase->getData().getMat4()[3][2];
-}
-

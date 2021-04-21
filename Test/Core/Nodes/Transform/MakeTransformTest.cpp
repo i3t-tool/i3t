@@ -2,42 +2,41 @@
 
 #include "Core/Nodes/GraphManager.h"
 
-#include "Core/Nodes/Transform/NodeGenerator.h"
+#include "../Utils.h"
 #include "Generator.h"
+#include "NodeGenerator.h"
 
 using namespace Core;
 
-TEST(Nodes, MakeTranslationNodeShouldBeValid)
+TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 {
-	auto vec3 = Builder::createNode<ENodeType::Vector3>();
+	auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
 	auto initialTranslation = generateVec3();
 
-	auto makeTranslation = Builder::createNode<ENodeType::MakeTranslation>();
+	auto makeTranslation = Core::Builder::createNode<ENodeType::MakeTranslation>();
 
-	GraphManager::plug(vec3, makeTranslation);
+	plug_expectOk(vec3, makeTranslation, 0, 0);
 
-	auto setValueResult = vec3->setValue(initialTranslation);
-	EXPECT_EQ(ValueSetResult::Status::Ok, setValueResult.status);
+	setValue_expectOk(vec3, initialTranslation);
 
 	auto expectedNodeValue = glm::translate(initialTranslation);
 	EXPECT_EQ(expectedNodeValue, makeTranslation->getData().getMat4());
 }
 
-TEST(Nodes, MakeEulerRotsNodeShouldBeValid)
+TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 {
-	auto floatNode = Builder::createNode<ENodeType::Float>();
+	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
 	auto rotRads = generateFloat();
 
-	auto makeRotX = Builder::createNode<ENodeType::MakeEulerX>();
-	auto makeRotY = Builder::createNode<ENodeType::MakeEulerY>();
-	auto makeRotZ = Builder::createNode<ENodeType::MakeEulerZ>();
+	auto makeRotX = Core::Builder::createNode<ENodeType::MakeEulerX>();
+	auto makeRotY = Core::Builder::createNode<ENodeType::MakeEulerY>();
+	auto makeRotZ = Core::Builder::createNode<ENodeType::MakeEulerZ>();
 
-	GraphManager::plug(floatNode, makeRotX);
-	GraphManager::plug(floatNode, makeRotY);
-	GraphManager::plug(floatNode, makeRotZ);
+	plug_expectOk(floatNode, makeRotX, 0, 0);
+	plug_expectOk(floatNode, makeRotY, 0, 0);
+	plug_expectOk(floatNode, makeRotZ, 0, 0);
 
-	auto setValueResult = floatNode->setValue(rotRads);
-	EXPECT_EQ(ValueSetResult::Status::Ok, setValueResult.status);
+	setValue_expectOk(floatNode, rotRads);
 
 	auto expectedRotXMat = glm::rotate(rotRads, glm::vec3(1.0f, 0.0f, 0.0f));
 	auto expectedRotYMat = glm::rotate(rotRads, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -47,34 +46,28 @@ TEST(Nodes, MakeEulerRotsNodeShouldBeValid)
 	EXPECT_EQ(expectedRotZMat, makeRotZ->getData().getMat4());
 }
 
-TEST(Nodes, MakeAxisRotShouldBeValid)
+TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 {
-	auto floatNode = Builder::createNode<ENodeType::Float>();
-	auto axisNode = Builder::createNode<ENodeType::Vector3>();
+	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
+	auto axisNode = Core::Builder::createNode<ENodeType::Vector3>();
 	float rotRads = generateFloat();
 	auto axis = generateVec3();
 
-	auto makeAxisRotNode = Builder::createNode<ENodeType::MakeAxisAngle>();
+	auto makeAxisRotNode = Core::Builder::createNode<ENodeType::MakeAxisAngle>();
 
-	GraphManager::plug(floatNode, makeAxisRotNode, 0, 0);
-	GraphManager::plug(axisNode, makeAxisRotNode, 0, 1);
+	plug_expectOk(floatNode, makeAxisRotNode, 0, 0);
+	plug_expectOk(axisNode, makeAxisRotNode, 0, 1);
 
-	{
-		auto setValueResult = floatNode->setValue(rotRads);
-		EXPECT_EQ(ValueSetResult::Status::Ok, setValueResult.status);
-	}
-	{
-		auto setValueResult = axisNode->setValue(axis);
-		EXPECT_EQ(ValueSetResult::Status::Ok, setValueResult.status);
-	}
+	setValue_expectOk(floatNode, rotRads);
+	setValue_expectOk(axisNode, axis);
 
 	auto expectedNodeValue = glm::rotate(rotRads, axis);
 	EXPECT_EQ(expectedNodeValue, makeAxisRotNode->getData().getMat4());
 }
 
-TEST(Nodes, MakeOrthoShouldBeValid)
+TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 {
-	auto makeOrthoNode = Builder::createNode<ENodeType::MakeOrtho>();
+	auto makeOrthoNode = Core::Builder::createNode<ENodeType::MakeOrtho>();
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeOrthoNode);
 
@@ -83,9 +76,9 @@ TEST(Nodes, MakeOrthoShouldBeValid)
 	EXPECT_EQ(expectedOrtho, makeOrthoNode->getData().getMat4());
 }
 
-TEST(Nodes, MakePerspectiveShouldBeValid)
+TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 {
-	auto makePerspectiveNode = Builder::createNode<ENodeType::MakePerspective>();
+	auto makePerspectiveNode = Core::Builder::createNode<ENodeType::MakePerspective>();
 
 	auto [inputValues, inputNodes] = generateFloatInputs<4>(makePerspectiveNode);
 
@@ -94,9 +87,9 @@ TEST(Nodes, MakePerspectiveShouldBeValid)
 	EXPECT_EQ(expectedMat, makePerspectiveNode->getData().getMat4());
 }
 
-TEST(Nodes, MakeFrustumShouldBeValid)
+TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 {
-	auto makeFrustumNode = Builder::createNode<ENodeType::MakeFrustum>();
+	auto makeFrustumNode = Core::Builder::createNode<ENodeType::MakeFrustum>();
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeFrustumNode);
 
@@ -105,7 +98,7 @@ TEST(Nodes, MakeFrustumShouldBeValid)
 	EXPECT_EQ(expectedOrtho, makeFrustumNode->getData().getMat4());
 }
 
-TEST(Nodes, MakeLookAtShouldBeValid)
+TEST(MakeTransformTest, MakeLookAtShouldBeValid)
 {
 	auto makeLookAtNode = Builder::createNode<ENodeType::MakeLookAt>();
 
@@ -113,15 +106,15 @@ TEST(Nodes, MakeLookAtShouldBeValid)
 	auto vec2 = Builder::createNode<ENodeType::Vector3>();
 	auto vec3 = Builder::createNode<ENodeType::Vector3>();
 
-	GraphManager::plug(vec1, makeLookAtNode, 0, 0);
-	GraphManager::plug(vec2, makeLookAtNode, 0, 1);
-	GraphManager::plug(vec3, makeLookAtNode, 0, 2);
+	plug_expectOk(vec1, makeLookAtNode, 0, 0);
+	plug_expectOk(vec2, makeLookAtNode, 0, 1);
+	plug_expectOk(vec3, makeLookAtNode, 0, 2);
 
 	std::array values = {generateVec3(), generateVec3(), generateVec3()};
 
-	vec1->setValue(values[0]);
-	vec2->setValue(values[1]);
-	vec3->setValue(values[2]);
+	setValue_expectOk(vec1, values[0]);
+	setValue_expectOk(vec2, values[1]);
+	setValue_expectOk(vec3, values[2]);
 
 	auto expectedMat = glm::lookAt(values[0], values[1], values[2]);
 

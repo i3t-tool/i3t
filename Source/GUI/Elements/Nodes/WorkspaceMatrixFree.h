@@ -6,7 +6,7 @@ struct WorkspaceMatrixFreeArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixScale header";
     std::string nodeLabel = "Scale";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::Matrix>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Matrix>();
 };
 
 class WorkspaceMatrixFree : public WorkspaceMatrix4x4
