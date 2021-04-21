@@ -261,7 +261,7 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::getSelectedWorkspac
     std::vector<Ptr<WorkspaceNodeWithCoreData>> allSelectedCoreNodes;
     std::vector<ne::NodeId> allSelectedNodesIDs;
     Ptr<WorkspaceNodeWithCoreData> temp;
-
+	//ne::SelectNode();
     int numOfSelectedObjects = ne::GetSelectedObjectCount(); /* not Nodes only */
 
     allSelectedNodesIDs.resize(numOfSelectedObjects);

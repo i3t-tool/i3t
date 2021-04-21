@@ -225,7 +225,7 @@ void World2::tmpDrawNode() {
 	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
 	const glm::mat4& coreData = op->getData().getMat4();
 	const Core::Transform::DataMap* coreMap = op->getDataMap();
-	int idOfNode = nodebasedata->getId().Get();
+	//int idOfNode = nodebasedata->getId().Get();
 	char label[]={0,0};
     float localData=0.0f;
 
@@ -242,7 +242,7 @@ void World2::tmpDrawNode() {
 			ImGui::SameLine();
 			label[0]='a'+ columns * 4 + rows;
 			if(ImGui::DragFloat(label, &localData, 0.02f, 0.0f, 0.0f, fmt::format("% .{}f", 3).c_str(), 1.0f)){
-				op->setValue(localData, { columns, rows });
+				ValueSetResult vsr=op->setValue(localData, { columns, rows });
 			}
 
 			if (inactive){ImGui::PopItemFlag();ImGui::PopStyleVar();}

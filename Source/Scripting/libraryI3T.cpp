@@ -338,7 +338,14 @@ void appendW(struct ParseState* Parser, struct Value* ReturnValue, struct Value*
     std::string filename= Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
+    int len=(int)ww->m_workspaceCoreNodes.size();
     if (ww != nullptr) {status=LoadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+
+    ne::ClearSelection();
+    for(int i=len;i<(int)ww->m_workspaceCoreNodes.size();i++){
+        ne::SelectNode(ww->m_workspaceCoreNodes[i]->getId(),true);
+    }
+    
     ReturnValue->Val->Integer=status;
 }
 void saveW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
@@ -348,8 +355,16 @@ void saveW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** 
     if (ww != nullptr) {status=SaveWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
     ReturnValue->Val->Integer = status;
 }
+void saveSelW(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
+    std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
+    auto ww = I3T::getWindowPtr<WorkspaceWindow>();
+    bool status = false;
+    if (ww != nullptr) { status = SaveWorkspace(filename.c_str(), &ww->getSelectedWorkspaceCoreNodes()); }
+    ReturnValue->Val->Integer = status;
+}
 void runScript(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
-    ReturnValue->Val->Integer=PicocRunFile((char*)Param[0]->Val->Pointer)==0;
+    std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
+    ReturnValue->Val->Integer=PicocRunFile(filename.c_str())==0;
 }
 /* list of all library functions and their prototypes */
 struct LibraryFunction PlatformLibrary1[] =
@@ -372,6 +387,7 @@ struct LibraryFunction PlatformLibrary1[] =
 	{ loadW,        "bool load(char*);" },
 	{ appendW,      "bool append(char*);" },
 	{ saveW,        "bool save(char*);" },
+	{ saveSelW,     "bool savesel(char*);" },
 	{ runScript,    "bool run(char*);" },
     { nullptr,         nullptr }
 };

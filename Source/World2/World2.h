@@ -80,9 +80,9 @@ public:
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
     std::map<std::string,Manipulator>manipulators;///<Properites of manipulator components
 
-    ///load HC shaders, textures, gameobjects
+    ///load HC shaders, textures
     static bool init();
-    ///unload HC shaders, textures, gameobjects
+    ///unload HC shaders, textures
     static void end();
     static float width;             ///< current viewport width
     static float height;            ///< current viewport width
