@@ -6,7 +6,7 @@ struct WorkspaceMatrixMulFloatArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixMulFloat header";
     std::string nodeLabel = "MatrixMulFloat";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MatrixMulFloat>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MatrixMulFloat>();
 };
 
 class WorkspaceMatrixMulFloat : public WorkspaceMatrix4x4

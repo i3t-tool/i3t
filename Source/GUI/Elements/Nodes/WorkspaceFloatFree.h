@@ -12,7 +12,7 @@ struct WorkspaceFloatFreeArgs
 class WorkspaceFloatFree : public WorkspaceFloat
 {
 public:
-    //WorkspaceFloatFree(ImTextureID headerBackground, WorkspaceFloatFreeArgs const& args);
+    WorkspaceFloatFree(ImTextureID headerBackground, WorkspaceFloatFreeArgs const& args);
     WorkspaceFloatFree(ImTextureID headerBackground, std::string headerLabel = "Free Float", std::string nodeLabel = "Free Float");
 
     void drawDataSetValues(util::NodeBuilder& builder);

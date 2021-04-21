@@ -6,7 +6,7 @@ struct WorkspaceMakeOrthoArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Ortho header";
     std::string nodeLabel = "Ortho";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeOrtho>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeOrtho>();
 };
 
 class WorkspaceMakeOrtho : public WorkspaceMatrix4x4

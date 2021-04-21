@@ -6,7 +6,7 @@ struct WorkspaceMakePerspectiveArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Perspective header";
     std::string nodeLabel = "Perspective";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakePerspective>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakePerspective>();
 };
 
 class WorkspaceMakePerspective : public WorkspaceMatrix4x4

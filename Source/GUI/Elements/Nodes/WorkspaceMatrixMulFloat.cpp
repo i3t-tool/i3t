@@ -5,7 +5,7 @@ WorkspaceMatrixMulFloat::WorkspaceMatrixMulFloat(ImTextureID headerBackground, W
 {}
 
 WorkspaceMatrixMulFloat::WorkspaceMatrixMulFloat(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MatrixMulFloat>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MatrixMulFloat>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMatrixMulFloat::drawDataSetValues(util::NodeBuilder& builder)

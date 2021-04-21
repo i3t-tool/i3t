@@ -5,7 +5,7 @@ WorkspaceMatrixAddMatrix::WorkspaceMatrixAddMatrix(ImTextureID headerBackground,
 {}
 
 WorkspaceMatrixAddMatrix::WorkspaceMatrixAddMatrix(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MatrixAddMatrix>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MatrixAddMatrix>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMatrixAddMatrix::drawDataSetValues(util::NodeBuilder& builder)

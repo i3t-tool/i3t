@@ -6,7 +6,7 @@ struct WorkspaceMakeLookAtArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default LookAt header";
     std::string nodeLabel = "LookAt";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeLookAt>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeLookAt>();
 };
 
 class WorkspaceMakeLookAt : public WorkspaceMatrix4x4

@@ -6,7 +6,7 @@ struct WorkspaceVectorMulMatrixArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default VectorMulMatrix header";
     std::string nodeLabel = "VectorMulMatrix";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::VectorMulMatrix>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::VectorMulMatrix>();
 };
 
 class WorkspaceVectorMulMatrix : public WorkspaceVector4

@@ -6,7 +6,7 @@ struct WorkspaceMatrixAddMatrixArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixAddMatrix header";
     std::string nodeLabel = "MatrixAddMatrix";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MatrixAddMatrix>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MatrixAddMatrix>();
 };
 
 class WorkspaceMatrixAddMatrix : public WorkspaceMatrix4x4

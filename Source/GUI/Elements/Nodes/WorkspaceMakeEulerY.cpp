@@ -5,38 +5,26 @@ WorkspaceMakeEulerY::WorkspaceMakeEulerY(ImTextureID headerBackground, Workspace
 {}
 
 WorkspaceMakeEulerY::WorkspaceMakeEulerY(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakeEulerY>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeEulerY>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMakeEulerY::drawDataSetValues(util::NodeBuilder& builder)
 {
+    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     drawDataSetValues_builder(builder,
         //SS todo
         { "00", "02", "20", "22" },
         { [this]() {return get00(); }, [this]() {return get02(); }, [this]() {return get20(); } , [this]() {return get22(); } },
-        { [this](float v) {return set00(v); }, [this](float v) {return set02(v); }, [this](float v) {return set20(v); } , [this](float v) {return set22(v); } });
+        { [this](float v) {return m_nodebase->as<Core::EulerRotY>()->setValue(v); } },
+
+
+        { coreMap[0 * 4 + 0], /* \todo JH some better way how determine what element from DataMap should be used? */
+            coreMap[0 * 4 + 2],
+            coreMap[2 * 4 + 0],
+            coreMap[2 * 4 + 2]
+        });
 }
 
-/* \todo JH underlying functions will be taken from Core */
-ValueSetResult WorkspaceMakeEulerY::set00(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(0, 0));
-}
-
-ValueSetResult WorkspaceMakeEulerY::set02(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(0, 2));
-}
-
-ValueSetResult WorkspaceMakeEulerY::set20(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(2, 0));
-}
-
-ValueSetResult WorkspaceMakeEulerY::set22(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(2, 2));
-}
 
 float WorkspaceMakeEulerY::get00()
 {

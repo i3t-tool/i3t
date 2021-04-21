@@ -5,7 +5,7 @@ WorkspaceVectorMulMatrix::WorkspaceVectorMulMatrix(ImTextureID headerBackground,
 {}
 
 WorkspaceVectorMulMatrix::WorkspaceVectorMulMatrix(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceVector4(headerBackground, Builder::createNode<ENodeType::VectorMulMatrix>(), headerLabel, nodeLabel)
+    : WorkspaceVector4(headerBackground, Core::Builder::createNode<ENodeType::VectorMulMatrix>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceVectorMulMatrix::drawDataSetValues(util::NodeBuilder& builder)

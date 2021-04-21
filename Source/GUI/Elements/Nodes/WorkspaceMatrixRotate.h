@@ -6,7 +6,7 @@ struct WorkspaceMatrixRotateArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Rotate header";
     std::string nodeLabel = "Rotate";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeAxisAngle>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeAxisAngle>();
 };
 
 class WorkspaceMatrixRotate : public WorkspaceMatrix4x4

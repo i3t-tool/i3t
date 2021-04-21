@@ -5,37 +5,26 @@ WorkspaceMakeEulerX::WorkspaceMakeEulerX(ImTextureID headerBackground, Workspace
 {}
 
 WorkspaceMakeEulerX::WorkspaceMakeEulerX(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakeEulerX>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeEulerX>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMakeEulerX::drawDataSetValues(util::NodeBuilder& builder)
 {
+    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     drawDataSetValues_builder(builder,
         //SS todo
         { "11", "12", "21", "22" },
+        //SS better get?
         { [this]() {return get11(); }, [this]() {return get12(); }, [this]() {return get21(); } , [this]() {return get22(); } },
-        { [this](float v) {return set11(v); }, [this](float v) {return set12(v); }, [this](float v) {return set21(v); }, [this](float v) {return set22(v); } });
-}
 
-/* \todo JH underlying functions will be taken from Core */
-ValueSetResult WorkspaceMakeEulerX::set11(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(1, 1));
-}
-
-ValueSetResult WorkspaceMakeEulerX::set12(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(1, 2));
-}
-
-ValueSetResult WorkspaceMakeEulerX::set21(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(2, 1));
-}
-
-ValueSetResult WorkspaceMakeEulerX::set22(float val)
-{
-    return m_nodebase->setValue(val, glm::ivec2(2, 2));
+        { [this](float v) {return m_nodebase->as<Core::EulerRotX>()->setValue(v); } },
+        
+        
+        {   coreMap[1 * 4 + 1], /* \todo JH some better way how determine what element from DataMap should be used? */
+            coreMap[1 * 4 + 2],
+            coreMap[2 * 4 + 1],
+            coreMap[2 * 4 + 2]
+        });
 }
 
 float WorkspaceMakeEulerX::get11()

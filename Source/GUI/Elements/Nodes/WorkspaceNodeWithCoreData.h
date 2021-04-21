@@ -44,16 +44,12 @@ public:
 	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
                                                 WorkspaceNodeWithCoreData is owner
                                            */
-	floatWindow fw;
 	WorkspaceLevelOfDetail m_levelOfDetail;
 
     std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
 
-	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
-                                                WorkspaceNodeWithCoreData is owner
-                                           */
 
 public:
 	floatWindow fw; /* \todo create it protected */

@@ -5,7 +5,7 @@ WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, WorkspaceFloatArgs 
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NAN; 
 	fw.name = "float";
 	fw.rows = 0;
 	fw.columns = 0;
@@ -17,7 +17,7 @@ WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase>
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NAN; 
 	fw.name = "float";
 	fw.rows = 0;
 	fw.columns = 0;
@@ -62,19 +62,6 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 	ImGui::Spring(0);
 
 
-}
-
-int WorkspaceFloat::maxLenghtOfData() {
-	int act, maximal = 0;
-	const float& coreData = m_nodebase->getData().getFloat();
-
-	act = numberOfCharWithDecimalPoint(coreData, m_numberOfVisibleDecimal);
-	if (act > maximal)
-	{
-		maximal = act;
-	}
-
-	return maximal;
 }
 
 int WorkspaceFloat::maxLenghtOfData()

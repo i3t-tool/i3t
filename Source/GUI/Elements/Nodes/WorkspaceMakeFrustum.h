@@ -6,7 +6,7 @@ struct WorkspaceMakeFrustumArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Frustum header";
     std::string nodeLabel = "Frustum";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeFrustum>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeFrustum>();
 };
 
 class WorkspaceMakeFrustum : public WorkspaceMatrix4x4

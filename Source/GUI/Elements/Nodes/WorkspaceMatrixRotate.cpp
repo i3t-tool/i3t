@@ -5,7 +5,7 @@ WorkspaceMatrixRotate::WorkspaceMatrixRotate(ImTextureID headerBackground, Works
 {}
 
 WorkspaceMatrixRotate::WorkspaceMatrixRotate(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakeAxisAngle>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeAxisAngle>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMatrixRotate::drawDataSetValues(util::NodeBuilder& builder)

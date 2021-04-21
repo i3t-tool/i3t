@@ -5,7 +5,7 @@ WorkspaceMakeLookAt::WorkspaceMakeLookAt(ImTextureID headerBackground, Workspace
 {}
 
 WorkspaceMakeLookAt::WorkspaceMakeLookAt(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakeLookAt>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeLookAt>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMakeLookAt::drawDataSetValues(util::NodeBuilder& builder)

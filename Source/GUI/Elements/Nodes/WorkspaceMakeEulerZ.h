@@ -6,7 +6,7 @@ struct WorkspaceMakeEulerZArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default EulerZ header";
     std::string nodeLabel = "EulerZ";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeEulerZ>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeEulerZ>();
 };
 
 class WorkspaceMakeEulerZ : public WorkspaceMatrix4x4
@@ -17,10 +17,6 @@ public:
 
     void drawDataSetValues(util::NodeBuilder& builder);
 
-    ValueSetResult set00(float val);
-    ValueSetResult set01(float val);
-    ValueSetResult set10(float val);
-    ValueSetResult set11(float val);
     float get00();
     float get01();
     float get10();

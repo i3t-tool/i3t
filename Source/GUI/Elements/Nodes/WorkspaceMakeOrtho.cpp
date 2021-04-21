@@ -5,7 +5,7 @@ WorkspaceMakeOrtho::WorkspaceMakeOrtho(ImTextureID headerBackground, WorkspaceMa
 {}
 
 WorkspaceMakeOrtho::WorkspaceMakeOrtho(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakeOrtho>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeOrtho>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMakeOrtho::drawDataSetValues(util::NodeBuilder& builder)

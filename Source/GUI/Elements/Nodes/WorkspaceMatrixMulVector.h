@@ -6,7 +6,7 @@ struct WorkspaceMatrixMulVectorArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default MatrixMulVector header";
     std::string nodeLabel = "MatrixMulVector";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MatrixMulVector>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MatrixMulVector>();
 };
 
 class WorkspaceMatrixMulVector : public WorkspaceVector4

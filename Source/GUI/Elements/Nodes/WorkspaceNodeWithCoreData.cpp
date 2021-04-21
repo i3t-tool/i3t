@@ -327,9 +327,9 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
 		// color.Value.w = alpha / 255.0f;
-		ax::Widgets::Icon(ImVec2(elem.second->get()->m_iconSize, elem.second->get()->m_iconSize),
+		ax::Widgets::Icon(ImVec2(elem.second->get()->getIconSize(), elem.second->get()->getIconSize()),
                             WorkspacePinShape[elem.second->get()->getType()],
-                            elem.second->get()->getIsConnected(), /* \todo do it better - it is copy from Core*/
+                            elem.second->get()->isConnected(), /* \todo do it better - it is copy from Core*/
                             WorkspacePinColor[elem.second->get()->getType()],
 							WorkspaceInnerPinColor[elem.second->get()->getType()]);
 		
@@ -339,9 +339,9 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 		ImGui::Spring(0);
 
         /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
-		if (showlabel && !elem.second->get()->m_name.empty())
+		if (showlabel && !elem.second->get()->getLabel().empty())
 		{
-			ImGui::TextUnformatted(elem.second->get()->m_name.c_str());
+			ImGui::TextUnformatted(elem.second->get()->getLabel().c_str());
 			ImGui::Spring(0);
 		}
 

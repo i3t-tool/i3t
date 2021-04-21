@@ -66,13 +66,22 @@ ImTextureID WorkspaceNode::getHeaderBackground()
 
 void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
+
 	builder.Begin(m_id);
 
 	drawHeader(builder);
 	drawInputs(builder, newLinkPin);
-	drawData(builder);
-	drawOutputs(builder, newLinkPin);
 
+	//
+	//ImGui::BeginChild("myID");
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.5f);
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(164, 171, 190, 1));
+	drawData(builder);
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+
+	drawOutputs(builder, newLinkPin);
+	//ImGui::EndChild();
 	builder.End();
 }
 

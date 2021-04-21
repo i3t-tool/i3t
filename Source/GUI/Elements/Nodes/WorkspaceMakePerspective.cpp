@@ -5,7 +5,7 @@ WorkspaceMakePerspective::WorkspaceMakePerspective(ImTextureID headerBackground,
 {}
 
 WorkspaceMakePerspective::WorkspaceMakePerspective(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakePerspective>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakePerspective>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMakePerspective::drawDataSetValues(util::NodeBuilder& builder)

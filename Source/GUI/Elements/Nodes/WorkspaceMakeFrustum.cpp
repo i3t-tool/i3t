@@ -5,7 +5,7 @@ WorkspaceMakeFrustum::WorkspaceMakeFrustum(ImTextureID headerBackground, Workspa
 {}
 
 WorkspaceMakeFrustum::WorkspaceMakeFrustum(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Builder::createNode<ENodeType::MakeFrustum>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeFrustum>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceMakeFrustum::drawDataSetValues(util::NodeBuilder& builder)

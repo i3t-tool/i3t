@@ -6,7 +6,7 @@ struct WorkspaceMakeEulerYArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default EulerY header";
     std::string nodeLabel = "EulerY";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::MakeEulerY>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeEulerY>();
 };
 
 class WorkspaceMakeEulerY : public WorkspaceMatrix4x4
@@ -17,10 +17,6 @@ public:
 
     void drawDataSetValues(util::NodeBuilder& builder);
 
-    ValueSetResult set00(float val);
-    ValueSetResult set02(float val);
-    ValueSetResult set20(float val);
-    ValueSetResult set22(float val);
     float get00();
     float get02();
     float get20();

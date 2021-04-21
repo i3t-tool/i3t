@@ -745,19 +745,19 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				if (ImGui::MenuItem("eulerAngleX")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleY")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleZ")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("rotate")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixRotate>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("scale")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
@@ -765,19 +765,19 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				if (ImGui::MenuItem("ortho")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("perspective")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakePerspective>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("frustrum")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeFrustum>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("lookAt")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeLookAt>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -810,19 +810,19 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				if (ImGui::MenuItem("mat + mat")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixAddMatrix>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * vec4")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulVector>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 * mat")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorMulMatrix>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * mat")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulFloat>(HeaderBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->m_id, m_newNodePostion);
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
