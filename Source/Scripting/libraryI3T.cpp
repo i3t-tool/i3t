@@ -269,7 +269,7 @@ void getNodeByName(struct ParseState* Parser, struct Value* ReturnValue, struct 
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->getHeaderLabel().c_str(),label)==0) {
             ReturnValue->Val->Integer= i;
-            if(occurances>1){std::cout<<"Id: "<<i<<", Name: "<<label<<std::endl;}
+            if(occurances>1){std::cout<<"Index: "<<i<<", Name: "<<label<<std::endl;}
         }
     }
 
@@ -359,7 +359,8 @@ void saveSelW(struct ParseState* Parser, struct Value* ReturnValue, struct Value
     std::string filename = Config::getAbsolutePath((char*)Param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status = false;
-    if (ww != nullptr) { status = SaveWorkspace(filename.c_str(), &ww->getSelectedWorkspaceCoreNodes()); }
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>ws= ww->getSelectedWorkspaceCoreNodes();
+    if (ww != nullptr) { status = SaveWorkspace(filename.c_str(), &ws); }
     ReturnValue->Val->Integer = status;
 }
 void runScript(struct ParseState* Parser, struct Value* ReturnValue, struct Value** Param, int NumArgs) {
