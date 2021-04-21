@@ -1,7 +1,7 @@
 #include "Select.h"
 #include "Core/Input/InputManager.h"
 #include "Component.h"
-#include "World2.h"
+#include "World.h"
 bool Select::stencilRef[256] = {false};
 
 int Select::registerStencil(){

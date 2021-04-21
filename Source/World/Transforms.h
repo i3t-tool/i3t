@@ -11,7 +11,7 @@
 #include "Source/Core/Nodes/GraphManager.h"
 
 glm::vec2 world2screen(glm::vec3 pos);
-glm::vec2 vecWorld2screen(glm::vec3 pos,glm::vec3 dir);
+glm::vec2 vecWorldscreen(glm::vec3 pos,glm::vec3 dir);
 glm::vec3 world2viewport(glm::vec3 pos);
 glm::vec2 mouse2viewport(glm::vec2 pos);
 glm::vec3 mouseray(glm::vec2 pos);

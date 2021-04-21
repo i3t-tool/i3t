@@ -3,7 +3,7 @@
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
-#include "../World2.h"
+#include "../World.h"
 #include "Renderer.h"
 #include "glm/gtx/norm.hpp"
 
@@ -49,24 +49,24 @@ TransformHandles::TransformHandles(GameObject*_editedobj){
 	this->stencilaxisw=	Select::registerStencil();
 }
 void TransformHandles::start(){
-	this->circleh =	new GameObject(unitcircleMesh,	&World2::shaderHandle, 0);
-	this->arrowh =	new GameObject(arrowMesh,		&World2::shaderHandle, 0);
-	this->planeh =	new GameObject(quadMesh,		&World2::shaderHandle, 0);
-	this->scaleh =	new GameObject(scalearrowMesh,	&World2::shaderHandle, 0);
-	this->uniscaleh=new GameObject(unitcubeMesh,	&World2::shaderHandle, 0);
-	this->lineh =	new GameObject(lineMesh,		&World2::shaderHandle, 0);
+	this->circleh =	new GameObject(unitcircleMesh,	&World::shaderHandle, 0);
+	this->arrowh =	new GameObject(arrowMesh,		&World::shaderHandle, 0);
+	this->planeh =	new GameObject(quadMesh,		&World::shaderHandle, 0);
+	this->scaleh =	new GameObject(scalearrowMesh,	&World::shaderHandle, 0);
+	this->uniscaleh=new GameObject(unitcubeMesh,	&World::shaderHandle, 0);
+	this->lineh =	new GameObject(lineMesh,		&World::shaderHandle, 0);
 	this->bkp=editedobj->transformation;
 }
 void TransformHandles::render(glm::mat4*parent,bool renderTransparent){
 	if(!this->isEdit||!renderTransparent){return;}
-	glUseProgram(World2::shaderHandle.program);
+	glUseProgram(World::shaderHandle.program);
 	glDepthRange(0.0, 0.01);
 	GameObject*handle=this->circleh;
 	if(this->editmode==TransformHandles::EDIT_ROTATION){handle=this->circleh;}
 	else if(this->editmode==TransformHandles::EDIT_POSITION||this->editmode==TransformHandles::EDIT_LOOKAT	){handle=this->arrowh;}
 	else if(this->editmode==TransformHandles::EDIT_SCALE){handle=this->scaleh;}
 		
-	float depth=(World2::perspective*World2::mainCamera*this->handlespace[3])[2];
+	float depth=(World::perspective*World::mainCamera*this->handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 	
 
@@ -182,8 +182,8 @@ void TransformHandles::update(){
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		//printf("0x%p\n", (void*)this->editedobj->getComponent(Renderer::componentType()));
 		unsigned char stencile=((Renderer*)this->editedobj->getComponent(Renderer::componentType()))->m_stencil;
-		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, stencile);
-		unsigned char sele =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, stencile);
+		unsigned char sele =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 		this->clicked++;
 		this->activehandle=-1;
 		if(sel==this->stencilx){this->activehandle=this->stencilx;this->axisnum=0;this->axisnum2=-1;}//manipulating handles clicked
@@ -204,7 +204,7 @@ void TransformHandles::update(){
 		
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)){
 		unsigned char stencile=((Renderer*)editedobj->getComponent(Renderer::componentType()))->m_stencil;
-		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 0, -1);
+		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 0, -1);
 		if(sel==stencile){clicked++;}//click inside editedobj
 			
 		if(clicked==2){this->isEdit=true;printf("is edit\n");}
@@ -328,9 +328,9 @@ void TransformHandles::update(){
 				glm::vec3 p0 = (glm::vec3)this->handlespace[3];
 				glm::vec3 px = (glm::vec3)(ortho * axes[(axisnum+1)%3]);
 				glm::vec3 py = (glm::vec3)(ortho * axes[(axisnum+2)%3]);
-				glm::vec3 t0 = -World2::mainCamPos;
+				glm::vec3 t0 = -World::mainCamPos;
 				//glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-				glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World2::height - InputManager::m_mouseY));
+				glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World::height - InputManager::m_mouseY));
 				glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 				glm::vec3 pc = px*coef[1]+py*coef[2];
@@ -360,16 +360,16 @@ void TransformHandles::update(){
 		
 		glm::vec2 drag,olddrag,dragfinal,mouse;
 
-		mouse = glm::vec2(InputManager::m_mouseX, World2::height - InputManager::m_mouseY);
+		mouse = glm::vec2(InputManager::m_mouseX, World::height - InputManager::m_mouseY);
 		drag=mov*(mouse-spos1);
-		mouse = glm::vec2(InputManager::m_mouseXPrev,World2::height - InputManager::m_mouseYPrev);
+		mouse = glm::vec2(InputManager::m_mouseXPrev,World::height - InputManager::m_mouseYPrev);
 		olddrag=mov*(mouse-spos1);
 		dragfinal=drag-olddrag;
 
 		drag3+=((glm::vec3)axes[axisnum])*(dragfinal[0]);
 		if(axisnum2!=-1){drag3+=((glm::vec3)axes[this->axisnum2])*(dragfinal[1]);}
 			
-		float depth=glm::length(World2::mainCamPos+(glm::vec3)this->handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
+		float depth=glm::length(World::mainCamPos+(glm::vec3)this->handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
 		if(this->editmode!=TransformHandles::EDIT_ROTATION){drag3*=depth*0.5f;}
 		if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 			

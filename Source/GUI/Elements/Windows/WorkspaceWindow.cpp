@@ -178,7 +178,7 @@ void WorkspaceWindow::manipulatorStartCheck3D()
 
     if (ne::HasSelectionChanged())
     {
-        World2* world2= Application::get().world2();
+        World* world2= Application::get().world2();
 
         if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
         {

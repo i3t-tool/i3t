@@ -20,7 +20,7 @@
 #include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
-#include "World2/World2.h"
+#include "World/World.h"
 
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
@@ -136,7 +136,7 @@ void Application::logicUpdate()
 void Application::finalize()
 {
 	delete m_world;
-	World2::end();
+	World::end();
 	// world = nullptr; //PF problem during glutExit...
 
 	/// \todo Write recent files.
@@ -157,8 +157,8 @@ void Application::finalize()
 bool Application::initI3T()
 {
 	// new scene scheme
-	bool b = World2::init();
-	m_world = World2::loadDefaultScene();
+	bool b = World::init();
+	m_world = World::loadDefaultScene();
 
 	// \todo DG testing
 	/*//testing
@@ -185,7 +185,7 @@ UIModule* Application::getUI()
 	return m_ui;
 }
 
-World2* Application::world2()
+World* Application::world2()
 {
 	return m_world;
 }

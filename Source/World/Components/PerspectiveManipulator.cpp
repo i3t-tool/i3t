@@ -3,7 +3,7 @@
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
-#include "Camera2.h"
+#include "Camera.h"
 #include "pgr.h"
 #include "ManipulatorUtil.h"
 #include <typeinfo>
@@ -23,14 +23,14 @@ PerspectiveManipulator::PerspectiveManipulator(){
 	m_hposs[4]=glm::vec4(1.0f,0.0f,0.0f,1.0f);
 	m_hposs[5]=glm::vec4(-1.0f,0.0f,0.0f,1.0f);
 
-	m_frustrum = new GameObject(unitcubeMesh, &World2::shaderProj, 0);
+	m_frustrum = new GameObject(unitcubeMesh, &World::shaderProj, 0);
 	m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f);
-	m_frustruml = new GameObject(cubelinesMesh, &World2::shaderProj, 0);
+	m_frustruml = new GameObject(cubelinesMesh, &World::shaderProj, 0);
 	m_frustruml->primitive = GL_LINES;
 	m_frustruml->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
-	m_cameraico = new GameObject(cameraicoMesh, &World2::shaderHandle, 0);
+	m_cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	m_cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
-	m_handle = new GameObject(unitcubeMesh, &World2::shaderHandle, 0);
+	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void PerspectiveManipulator::start(){}
 
@@ -43,8 +43,8 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
 	if(renderTransparent){
-		glUseProgram(World2::shaderProj.program);
-		glUniformMatrix4fv(glGetUniformLocation(World2::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
+		glUseProgram(World::shaderProj.program);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
 		m_frustrum->draw(transform);
 		m_frustruml->draw(transform);
@@ -52,7 +52,7 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 	}
 	else{
 		glDepthRange(0.0, 0.01);
-		glUseProgram(World2::shaderHandle.program);
+		glUseProgram(World::shaderHandle.program);
 
 		for(int i=0;i<6;i++){
 			glm::vec4 pos=projinv*m_hposs[i];
@@ -67,7 +67,7 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 				pos=((pf-pn)*0.5f+pn);
 			}
 
-			float depth=(World2::perspective*World2::mainCamera*transform*pos)[2]; 
+			float depth=(World::perspective*World::mainCamera*transform*pos)[2]; 
 			m_handle->transformation=glm::mat4(depth*0.01f+0.1f);
 			m_handle->transformation[3]=pos;
 
@@ -89,7 +89,7 @@ void PerspectiveManipulator::update(){
 	Core::PerspectiveProj*editedpersp=(Core::PerspectiveProj*)m_editednode.get();
 	m_edited=m_editednode->getData().getMat4();
 
-	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 	m_hoverhandle=-1;
 
 	if(m_activehandle==-1){

@@ -10,7 +10,7 @@
 //---------------
 #pragma once
 #include "Component.h"
-#include "World2.h"
+#include "World.h"
 #include "pgr.h"
 #include <vector>
 
@@ -35,7 +35,7 @@ private:
   GLuint vao = 0;         ///< GL vertex array object
 
 public:
-  struct Shader2*shader;             ///< shader program used for rendering of this object
+  struct Shader*shader;             ///< shader program used for rendering of this object
   int primitive = GL_TRIANGLES;      ///< GL_TRIANGLES, GL_LINES, etc...
   GLuint texture;                    ///< GL texture
   glm::vec4 color;                   ///< color,in shader texture*color
@@ -73,7 +73,7 @@ public:
     \param[in] param Callback Function that is called on draw(). Can be NULL. \todo PF -chybejici parametr
     \param[in] texture Texture of this object. Set 0 for no texture, object is then rendered solid black
   */
-  GameObject(const pgr::MeshData mesh, struct Shader2* shader, GLuint texture);
+  GameObject(const pgr::MeshData mesh, struct Shader* shader, GLuint texture);
   ~GameObject();
   /// Translate, scale and rotate object at once
   /**

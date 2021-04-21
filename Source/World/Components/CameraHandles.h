@@ -1,6 +1,6 @@
 #pragma once
 #include "../Component.h"
-#include "Camera2.h"
+#include "Camera.h"
 #include "../Components.h"
 #include "../GameObject.h"
 //----------------
@@ -29,7 +29,7 @@ private:
 	union Stencils{struct N{unsigned char f,n,hu,hb,wr,wl,a;}names;unsigned char arr[7];}stencils;
 	glm::vec4 hposs[6];
 	int activehandle,axisnum;
-	Camera2*cam;
+	Camera*cam;
 	//Renderer*icorend;
 	float fnear=1.0f,ffar=50.0f,fleft=-1.0f,fright=1.0f,ftop=1.0f,fbottom=-1.0f;
 	float pnear=0.5f,pfar=50.0f,pangle=60.0f,paspect=1.0f;

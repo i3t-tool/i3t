@@ -3,7 +3,7 @@
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
-#include "../World2.h"
+#include "../World.h"
 #include "ManipulatorUtil.h"
 #include "glm/gtx/norm.hpp"
 
@@ -38,12 +38,12 @@ FreeManipulator::FreeManipulator(){
 	m_stencilaxisz=	Select::registerStencil();
 	m_stencilaxisw=	Select::registerStencil();
 
-	m_circleh =	new GameObject(unitcircleMesh,	&World2::shaderHandle, 0);
-	m_arrowh =	new GameObject(arrowMesh,		&World2::shaderHandle, 0);
-	m_planeh =	new GameObject(quadMesh,		&World2::shaderHandle, 0);
-	m_scaleh =	new GameObject(scalearrowMesh,	&World2::shaderHandle, 0);
-	m_uniscaleh=new GameObject(unitcubeMesh,	&World2::shaderHandle, 0);
-	m_lineh =	new GameObject(lineMesh,		&World2::shaderHandle, 0);
+	m_circleh =	new GameObject(unitcircleMesh,	&World::shaderHandle, 0);
+	m_arrowh =	new GameObject(arrowMesh,		&World::shaderHandle, 0);
+	m_planeh =	new GameObject(quadMesh,		&World::shaderHandle, 0);
+	m_scaleh =	new GameObject(scalearrowMesh,	&World::shaderHandle, 0);
+	m_uniscaleh=new GameObject(unitcubeMesh,	&World::shaderHandle, 0);
+	m_lineh =	new GameObject(lineMesh,		&World::shaderHandle, 0);
 	m_bkp=m_edited;
 }
 void FreeManipulator::start(){
@@ -52,14 +52,14 @@ void FreeManipulator::start(){
 void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
-	glUseProgram(World2::shaderHandle.program);
+	glUseProgram(World::shaderHandle.program);
 	glDepthRange(0.0, 0.01);
 	GameObject*handle=m_circleh;
 	if(m_editmode==FreeManipulator::EDIT_ROTATION){handle=m_circleh;}
 	else if(m_editmode==FreeManipulator::EDIT_POSITION){handle=m_arrowh;}
 	else if(m_editmode==FreeManipulator::EDIT_SCALE){handle=m_scaleh;}
 		
-	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
+	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 
@@ -154,7 +154,7 @@ void FreeManipulator::update(){
 	m_edited= m_editednode.get()->getData().getMat4();
 	//printf("4\n");
 	bool transactionBegin=false;
-	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 
 	m_hoverhandle=-1;
 	if(m_activehandle==-1){
@@ -172,7 +172,7 @@ void FreeManipulator::update(){
 	}
 
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
-		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+		unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 		m_activehandle=-1;
 		if(sel==m_stencilx){m_activehandle=m_stencilx;m_axisnum=0;m_axisnum2=-1;}//manipulating handles clicked
 		else if(sel==m_stencily){m_activehandle=m_stencily;m_axisnum=1;m_axisnum2=-1;}
@@ -274,9 +274,9 @@ void FreeManipulator::update(){
 			glm::vec3 p0 = (glm::vec3)m_handlespace[3];
 			glm::vec3 px = (glm::vec3)(ortho * axes[(m_axisnum+1)%3]);
 			glm::vec3 py = (glm::vec3)(ortho * axes[(m_axisnum+2)%3]);
-			glm::vec3 t0 = -World2::mainCamPos;
+			glm::vec3 t0 = -World::mainCamPos;
 			//glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-			glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World2::height - InputManager::m_mouseY));
+			glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World::height - InputManager::m_mouseY));
 			glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 			glm::vec3 pc = px*coef[1]+py*coef[2];
@@ -306,16 +306,16 @@ void FreeManipulator::update(){
 		
 	glm::vec2 drag,olddrag,dragfinal,mouse;
 
-	mouse = glm::vec2(InputManager::m_mouseX, World2::height - InputManager::m_mouseY);
+	mouse = glm::vec2(InputManager::m_mouseX, World::height - InputManager::m_mouseY);
 	drag=mov*(mouse-spos1);
-	mouse = glm::vec2(InputManager::m_mouseXPrev,World2::height - InputManager::m_mouseYPrev);
+	mouse = glm::vec2(InputManager::m_mouseXPrev,World::height - InputManager::m_mouseYPrev);
 	olddrag=mov*(mouse-spos1);
 	dragfinal=drag-olddrag;
 
 	drag3+=((glm::vec3)axes[m_axisnum])*(dragfinal[0]);
 	if(m_axisnum2!=-1){drag3+=((glm::vec3)axes[m_axisnum2])*(dragfinal[1]);}
 			
-	float depth=glm::length(World2::mainCamPos+(glm::vec3)m_handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
+	float depth=glm::length(World::mainCamPos+(glm::vec3)m_handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
 	if(m_editmode!=FreeManipulator::EDIT_ROTATION){drag3*=depth*0.5f;}
 	if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 	//printf("9\n");

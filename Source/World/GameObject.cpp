@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "GameObject.h"
-#include "World2.h"
+#include "World.h"
 #include "pgr.h"
 
 
@@ -14,8 +14,8 @@ void GameObject::draw(glm::mat4 parentTransform){
     glUseProgram(this->shader->program);
     glm::mat4 tmp = parentTransform * this->transformation;
     glUniform4f(this->shader->color, this->color[0], this->color[1], this->color[2], this->color[3]);
-    glUniform3f(this->shader->camera, World2::mainCamPos[0], World2::mainCamPos[1], World2::mainCamPos[2]);
-    glUniformMatrix4fv(this->shader->PVMmatrix, 1, GL_FALSE, glm::value_ptr(World2::perspective*World2::mainCamera * tmp));
+    glUniform3f(this->shader->camera, World::mainCamPos[0], World::mainCamPos[1], World::mainCamPos[2]);
+    glUniformMatrix4fv(this->shader->PVMmatrix, 1, GL_FALSE, glm::value_ptr(World::perspective*World::mainCamera * tmp));
     glUniformMatrix4fv(this->shader->VNmatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(tmp))));
     glUniformMatrix4fv(this->shader->Mmatrix, 1, GL_FALSE, glm::value_ptr(tmp));
 
@@ -64,15 +64,15 @@ GameObject::GameObject(){
     this->num_attribs = 0;
     this->shader = 0;
 }
-GameObject::GameObject(const pgr::MeshData mesh, struct Shader2* shader, GLuint texture){
+GameObject::GameObject(const pgr::MeshData mesh, struct Shader* shader, GLuint texture){
     this->isRender = true;
     this->draw_callback = NULL;
     this->num_vertices = mesh.nVertices;
     this->num_triangles = mesh.nTriangles;
     this->num_attribs = mesh.nAttribsPerVertex;
-    this->shader = ((Shader2*)shader);
+    this->shader = ((Shader*)shader);
     this->transformation = glm::mat4(1.0f);
-    this->texture=(texture==0)?World2::whiteTexture:texture;
+    this->texture=(texture==0)?World::whiteTexture:texture;
     this->color = glm::vec4(1.0f);
 
     // buffer for vertices

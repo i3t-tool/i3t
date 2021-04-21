@@ -1,7 +1,7 @@
 #pragma once
 //----------------
 /**
- * \file Camera2.h
+ * \file Camera.h
  * \author Daniel Gruncl
  * \brief renders scene
  * renders tree of GameObjects in update();
@@ -14,17 +14,17 @@
 #include "../Component.h"
 #include "../RenderTexture.h"
 
-class Camera2 : public Component{
+class Camera : public Component{
 public:
 	///Create camera rendering on user-defined framebuffer - rendering into textures
-	Camera2(float viewingAngle, GameObject* sceneRoot,RenderTexture*renderTarget);
+	Camera(float viewingAngle, GameObject* sceneRoot,RenderTexture*renderTarget);
 	///create camera rendering on default framebuffer
-	Camera2(float viewingAngle, GameObject* sceneRoot);
-	//~Camera2();
+	Camera(float viewingAngle, GameObject* sceneRoot);
+	//~Camera();
 	void update();
 	void start();
-	static const char* componentType() { return Camera2::s_type; };
-	const char* getComponentType() { return Camera2::s_type; };
+	static const char* componentType() { return Camera::s_type; };
+	const char* getComponentType() { return Camera::s_type; };
 
 	float m_angle = 60.0f;
 	RenderTexture* m_fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
@@ -35,5 +35,5 @@ private:
   static const char* s_type;
 
   void renderRecursive(GameObject* obj, glm::mat4 parent,bool isTranspartentPass);///<render scene tree
-  bool m_mainCamera;///<if fbo is NULL, camera renders to screen and sets World2 camera settings to its own
+  bool m_mainCamera;///<if fbo is NULL, camera renders to screen and sets World camera settings to its own
 };

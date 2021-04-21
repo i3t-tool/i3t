@@ -31,10 +31,10 @@ ScaleManipulator::ScaleManipulator() {
 	m_stencilyx =ManipulatorUtil::getStencil(5);
 	m_stencilxyz=ManipulatorUtil::getStencil(6);
 
-	m_planeh =	new GameObject(quadMesh,		&World2::shaderHandle,	0);
-	m_scaleh =	new GameObject(scalearrowMesh,	&World2::shaderHandle,	0);
-	m_uniscaleh=new GameObject(unitcubeMesh,	&World2::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World2::shader0,		World2::axisTexture);		
+	m_planeh =	new GameObject(quadMesh,		&World::shaderHandle,	0);
+	m_scaleh =	new GameObject(scalearrowMesh,	&World::shaderHandle,	0);
+	m_uniscaleh=new GameObject(unitcubeMesh,	&World::shaderHandle,	0);
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
@@ -44,7 +44,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 
-	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
+	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
@@ -55,7 +55,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	ftransform[2][3]=0.0f;
 	ftransform[3][3]=1.0f;
 
-	glUseProgram(World2::shaderHandle.program);
+	glUseProgram(World::shaderHandle.program);
 	glDepthRange(0.0, 0.01);
 
 	m_threeaxis->draw(ftransform);
@@ -89,7 +89,7 @@ void ScaleManipulator::update() {
 	///
 	bool transactionBegin=false;
 
-	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 	m_hoverhandle=-1;
 	if(m_activehandle==-1){
 		if(sel==m_stencilx){		m_hoverhandle=m_stencilx;}//manipulating handles clicked
@@ -125,9 +125,9 @@ void ScaleManipulator::update() {
 	///
 	glm::mat4 axes=glm::mat4(1.0f);axes[3]=glm::vec4(1.0f,1.0f,1.0f,0.0f);
 	glm::mat2 mov =glm::mat2(1.0f);
-	mov[0]=vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));//the axis in screen space
+	mov[0]=vecWorldscreen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));//the axis in screen space
 
-	if(m_axisnum2!=-1){mov[1]=vecWorld2screen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum2]));}//the axis in screen space}
+	if(m_axisnum2!=-1){mov[1]=vecWorldscreen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum2]));}//the axis in screen space}
 	else{mov[1]=glm::vec2(mov[0][1],-mov[0][0]);}
 
 	if(glm::length(mov[0])<0.01f){mov[0][0]=1.0f;}//axis length must not be zero
@@ -139,7 +139,7 @@ void ScaleManipulator::update() {
 	glm::vec3 drag3=((glm::vec3)axes[m_axisnum])*drag2[0];
 	if(m_axisnum2!=-1){drag3+=((glm::vec3)axes[m_axisnum2])*drag2[1];}
 
-	float depth=glm::length(World2::mainCamPos+(glm::vec3)m_handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
+	float depth=glm::length(World::mainCamPos+(glm::vec3)m_handlespace[3]);//add, not substract - moving camera is moving world in opposite direction
 	drag3*=depth*0.5f;
 	if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 

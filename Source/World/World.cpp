@@ -1,4 +1,4 @@
-#include "World2.h"
+#include "World.h"
 #include "HardcodedMeshes.h"
 #include "Components.h"
 #include "Transforms.h"
@@ -10,24 +10,24 @@
 
 //#include "../Scripting/Scripting.h"
 
-glm::mat4 World2::perspective = glm::mat4(1.0f);
-glm::mat4 World2::mainCamera = glm::mat4(1.0f);
-glm::vec3 World2::World2::mainCamPos = glm::vec3(0.0f);
-float World2::height = 10;
-float World2::width = 10;
-bool World2::initializedRender = false;
+glm::mat4 World::perspective = glm::mat4(1.0f);
+glm::mat4 World::mainCamera = glm::mat4(1.0f);
+glm::vec3 World::World::mainCamPos = glm::vec3(0.0f);
+float World::height = 10;
+float World::width = 10;
+bool World::initializedRender = false;
 
-Shader2 World2::shader0; ///< Default shader
-Shader2 World2::shaderHandle;  ///< Handle shader
-Shader2 World2::shaderProj; ///< preview projection matrices
+Shader World::shader0; ///< Default shader
+Shader World::shaderHandle;  ///< Handle shader
+Shader World::shaderProj; ///< preview projection matrices
 
-GLuint World2::cubeTexture=0;
-GLuint World2::cubeColorTexture=0;
-GLuint World2::cGridTexture=0;
-GLuint World2::axisTexture=0;
-GLuint World2::whiteTexture=0;
+GLuint World::cubeTexture=0;
+GLuint World::cubeColorTexture=0;
+GLuint World::cGridTexture=0;
+GLuint World::axisTexture=0;
+GLuint World::whiteTexture=0;
 
-World2::World2(){
+World::World(){
     TranslationManipulator* tm =    new TranslationManipulator();
     ScaleManipulator* sm =          new ScaleManipulator();
     LookAtManipulator*lm =          new LookAtManipulator();
@@ -56,13 +56,13 @@ World2::World2(){
         }
     }
 
-    this->sceneRoot = new GameObject(gridMesh,&World2::shader0,0); 
+    this->sceneRoot = new GameObject(gridMesh,&World::shader0,0); 
     this->sceneRoot->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     this->sceneRoot->addComponent(new Renderer(Renderer::DRAW_LINES));
 
     GameObject* camera = new GameObject();
     camera->transform(glm::vec3(0.0f, 5.0f, 10.0f),glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.0f, 0.0f, 0.0f),-30.0f);
-    camera->addComponent(new Camera2(60.0f, this->sceneRoot)); 
+    camera->addComponent(new Camera(60.0f, this->sceneRoot)); 
     camera->addComponent(new CameraControl());
 
     this->sceneRoot->addChild(camera, false);
@@ -102,37 +102,37 @@ World2::World2(){
     //glm::mat4 m2=
 }
 
-bool World2::init(){
-    World2::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
-    World2::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
-    World2::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
+bool World::init(){
+    World::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
+    World::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
+    World::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
 
-    if (World2::shader0.program * World2::shaderHandle.program *World2::shaderProj.program * World2::shaderProj.program == 0){
-        getchar();printf("World2::init():cannot load shaders\n");return false;
-    }//World2::shaderHandle=World2::shader0;
+    if (World::shader0.program * World::shaderHandle.program *World::shaderProj.program * World::shaderProj.program == 0){
+        getchar();printf("World::init():cannot load shaders\n");return false;
+    }//World::shaderHandle=World::shader0;
 
-    World2::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
-    World2::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
-    World2::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.png"));
-    World2::axisTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
-    World2::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/white.png"));
+    World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
+    World::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
+    World::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.png"));
+    World::axisTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
+    World::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/white.png"));
 
     CHECK_GL_ERROR();
-    World2::initializedRender = true;
+    World::initializedRender = true;
     return true;
 }
-void World2::end() {
-    pgr::deleteProgramAndShaders(World2::shader0.program);
-    pgr::deleteProgramAndShaders(World2::shaderHandle.program);
-    pgr::deleteProgramAndShaders(World2::shaderProj.program);
-    glDeleteTextures(1,&World2::cubeTexture);
-    glDeleteTextures(1,&World2::cubeColorTexture);
-    glDeleteTextures(1,&World2::cGridTexture);
-    glDeleteTextures(1,&World2::axisTexture);
-    glDeleteTextures(1,&World2::whiteTexture);
+void World::end() {
+    pgr::deleteProgramAndShaders(World::shader0.program);
+    pgr::deleteProgramAndShaders(World::shaderHandle.program);
+    pgr::deleteProgramAndShaders(World::shaderProj.program);
+    glDeleteTextures(1,&World::cubeTexture);
+    glDeleteTextures(1,&World::cubeColorTexture);
+    glDeleteTextures(1,&World::cGridTexture);
+    glDeleteTextures(1,&World::axisTexture);
+    glDeleteTextures(1,&World::whiteTexture);
 }
-World2* World2::loadDefaultScene(){
-    if (!World2::initializedRender){printf("initialize render before creating World2!\n");return nullptr;}
+World* World::loadDefaultScene(){
+    if (!World::initializedRender){printf("initialize render before creating World!\n");return nullptr;}
     GLuint renderTexture;
     RenderTexture* rend;
 
@@ -140,11 +140,11 @@ World2* World2::loadDefaultScene(){
 
     rend =        new RenderTexture(&renderTexture,256,256);
 
-    objhandles =  new GameObject(unitcubeMesh,    &World2::shader0, World2::cubeTexture);
-    lookat =      new GameObject(unitquadMesh,    &World2::shader0, renderTexture);
-    camhandles =  new GameObject(unitcubeMesh,    &World2::shader0, 0);
-    testchild =   new GameObject(unitcubeMesh,    &World2::shader0, World2::cubeColorTexture);
-    testparent =  new GameObject(three_axisMesh,  &World2::shader0, World2::axisTexture);          testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
+    objhandles =  new GameObject(unitcubeMesh,    &World::shader0, World::cubeTexture);
+    lookat =      new GameObject(unitquadMesh,    &World::shader0, renderTexture);
+    camhandles =  new GameObject(unitcubeMesh,    &World::shader0, 0);
+    testchild =   new GameObject(unitcubeMesh,    &World::shader0, World::cubeColorTexture);
+    testparent =  new GameObject(three_axisMesh,  &World::shader0, World::axisTexture);          testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
 
     camhandles->transform(     glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
     objhandles->transform(     glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);//objhandles->transformation[0][3]=1.0f;
@@ -152,14 +152,14 @@ World2* World2::loadDefaultScene(){
     testparent->transform(     glm::vec3(2.0f, 1.0f,-3.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);//testparent->transformation[0][1]=0.5f;
     testchild->transform(      glm::vec3(0.0f, 6.0f,-8.0f),    glm::vec3(2.5f, 2.5f, 1.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
 
-    World2* w = new World2();
+    World* w = new World();
 
     w->sceneRoot->addComponent(new TransformHandles(objhandles));
     w->sceneRoot->addChild(testchild, false);        testchild->addComponent(new Renderer());
     w->sceneRoot->addChild(testparent, false);       testparent->addComponent(new Renderer(Renderer::DRAW_LINES));
         testparent->addChild(objhandles, true);         objhandles->addComponent(new Renderer(Renderer::USE_STENCIL));
             objhandles->addChild(camhandles, true);         camhandles->addComponent(new CameraHandles());
-                                                            camhandles->addComponent(new Camera2(60.0f, w->sceneRoot, rend));
+                                                            camhandles->addComponent(new Camera(60.0f, w->sceneRoot, rend));
     w->sceneRoot->addChild(lookat, false);           lookat->addComponent(new Renderer());
 
     w->onStart();
@@ -175,7 +175,7 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
 Ptr<Core::NodeBase>op;
-void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
+void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;
@@ -220,7 +220,7 @@ void World2::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::s
     printf("------------\n");
 
 }
-void World2::tmpDrawNode() {
+void World::tmpDrawNode() {
 	if(op.get()==nullptr){op= Core::Builder::createTransform<Core::EulerRotX>();}
 	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
 	const glm::mat4& coreData = op->getData().getMat4();
@@ -252,7 +252,7 @@ void World2::tmpDrawNode() {
 	ImGui::PopItemWidth();
 	ImGui::End();
 }
-void World2::tmpSetNode() {
+void World::tmpSetNode() {
     if(InputManager::isKeyPressed(Keys::x))     {op=Core::Builder::createTransform<Core::EulerRotX>();}
     else if(InputManager::isKeyPressed(Keys::y)){op=Core::Builder::createTransform<Core::EulerRotY>();}
     else if(InputManager::isKeyPressed(Keys::z)){op=Core::Builder::createTransform<Core::EulerRotZ>();}
@@ -281,33 +281,33 @@ void World2::tmpSetNode() {
         printf("no manipulators\n");
     }
 }
-GameObject* World2::addModel(const char* name) {
+GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
-    if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World2::shader0,World2::cubeTexture);}
-    else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World2::shader0,World2::cubeColorTexture); }
-    else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World2::shader0,World2::cGridTexture); }
-    else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World2::shader0,World2::axisTexture); }
+    if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeTexture);}
+    else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeColorTexture); }
+    else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World::shader0,World::cGridTexture); }
+    else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World::shader0,World::axisTexture); }
     if(g!=nullptr){this->sceneRoot->addChild(g,true);}
     return g;
 }
-bool World2::removeModel(GameObject*g) {
+bool World::removeModel(GameObject*g) {
     return this->sceneRoot->rmChild(g,true);
 }
-void World2::onStart(){
+void World::onStart(){
     startRecursive(this->sceneRoot);
 }
-void World2::onUpdate(){
+void World::onUpdate(){
     float viewport[4];
     glGetFloatv(GL_VIEWPORT, viewport);
     //printf("%f %f %f %f\n", viewport[0], viewport[1], viewport[2], viewport[3]);
-    World2::width = viewport[2];
-    World2::height= viewport[3];
+    World::width = viewport[2];
+    World::height= viewport[3];
     updateRecursive(this->sceneRoot);
 
     CHECK_GL_ERROR();
 }
-Shader2 World2::loadShader(const char* vs_name, const char* fs_name){
-    Shader2 shader = {0,0,0,0,0,0,0,0,0};
+Shader World::loadShader(const char* vs_name, const char* fs_name){
+    Shader shader = {0,0,0,0,0,0,0,0,0};
     GLuint gl_shader = 0;
     GLuint shaders[] = {pgr::createShaderFromFile(GL_VERTEX_SHADER, vs_name),pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fs_name), 0};
     if (shaders[0]*shaders[1] == 0){return shader;}

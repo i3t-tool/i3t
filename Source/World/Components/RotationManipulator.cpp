@@ -19,8 +19,8 @@ RotationManipulator::RotationManipulator() {
 	m_stencily = ManipulatorUtil::getStencil(1);
 	m_stencilz = ManipulatorUtil::getStencil(2);
 
-	m_circleh =	new GameObject(unitcircleMesh,	&World2::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World2::shader0,		World2::axisTexture);		
+	m_circleh =	new GameObject(unitcircleMesh,	&World::shaderHandle,	0);
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
@@ -29,7 +29,7 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
 
-	float depth=(World2::perspective*World2::mainCamera*m_handlespace[3])[2];
+	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
 	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
@@ -40,7 +40,7 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	ftransform[2][3]=0.0f;
 	ftransform[3][3]=1.0f;
 
-	glUseProgram(World2::shaderHandle.program);
+	glUseProgram(World::shaderHandle.program);
 	glDepthRange(0.0, 0.01);
 
 	m_threeaxis->draw(ftransform);
@@ -78,7 +78,7 @@ void RotationManipulator::update() {
 	///
 	bool transactionBegin=false;
 
-	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World2::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 
 	m_hoverhandle=-1;
 	if(m_activehandle==-1){
@@ -116,9 +116,9 @@ void RotationManipulator::update() {
 		glm::vec3 p0 = (glm::vec3)m_handlespace[3];
 		glm::vec3 px = (glm::vec3)(ortho * axes[(m_axisnum+1)%3]);
 		glm::vec3 py = (glm::vec3)(ortho * axes[(m_axisnum+2)%3]);
-		glm::vec3 t0 = -World2::mainCamPos;
+		glm::vec3 t0 = -World::mainCamPos;
 		//glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputController::m_mouseXDelta, -InputController::m_mouseYDelta));
-		glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World2::height - InputManager::m_mouseY));
+		glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX,World::height - InputManager::m_mouseY));
 		glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 		glm::vec3 pc = px*coef[1]+py*coef[2];

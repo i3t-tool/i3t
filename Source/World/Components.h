@@ -6,7 +6,7 @@
  * \brief Include all available components.
  */
 //---------------
-#include "Components/Camera2.h"
+#include "Components/Camera.h"
 #include "Components/CameraControl.h"
 #include "Components/Renderer.h"
 #include "Components/TransformHandles.h"

@@ -1,33 +1,33 @@
 #include "Transforms.h"
 #include "Core/Input/InputManager.h"
-#include "World2.h"
+#include "World.h"
 #include "glm/gtx/norm.hpp"
 
 glm::vec2 world2screen(glm::vec3 pos){
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 
-	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos, 1.0f);
+	glm::vec4 pos1 = World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
 	glm::vec2 spos1 = glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],(pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 	return spos1;
 }
-glm::vec2 vecWorld2screen(glm::vec3 pos,glm::vec3 dir){
+glm::vec2 vecWorldscreen(glm::vec3 pos,glm::vec3 dir){
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 
-	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos, 1.0f);
+	glm::vec4 pos1 = World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
 	glm::vec2 spos1 = glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],(pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 
-	glm::vec4 pos2 = World2::perspective * World2::mainCamera * glm::vec4(pos+dir,1.0f);
+	glm::vec4 pos2 = World::perspective * World::mainCamera * glm::vec4(pos+dir,1.0f);
 	pos2 /= pos2[3];
 	glm::vec2 spos2 = glm::vec2((pos2[0] + 1.0f) * 0.5f * viewport[2] + viewport[0], (pos2[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 
 	return spos2-spos1;
 }
 glm::vec3 world2viewport(glm::vec3 pos){
-	glm::vec4 pos1 = World2::perspective * World2::mainCamera * glm::vec4(pos, 1.0f);
+	glm::vec4 pos1 = World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
 	return (glm::vec3)pos1;
 }
@@ -41,7 +41,7 @@ glm::vec2 mouse2viewport(glm::vec2 pos){
 glm::vec3 mouseray(glm::vec2 pos){
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
-	glm::mat4 inv = glm::inverse(World2::perspective * World2::mainCamera);
+	glm::mat4 inv = glm::inverse(World::perspective * World::mainCamera);
 	glm::vec4 mouse = glm::vec4((pos[0] - viewport[0]) / (viewport[2] * 0.5f) - 1.0f,(pos[1] - viewport[1]) / (viewport[3] * 0.5f) - 1.0f, -0.7f, 1.0f);
 
 	glm::vec4 world1 = inv * mouse;
@@ -133,7 +133,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequen
 	return m;*/
 }
 glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
-	glm::vec3 t0 = -World2::mainCamPos;
+	glm::vec3 t0 = -World::mainCamPos;
 	glm::vec3 tz = mouseray(world2screen(p0) +glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta));
 	glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 

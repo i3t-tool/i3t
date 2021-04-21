@@ -1,7 +1,7 @@
 #pragma once
 //----------------
 /**
- * \file World2.h
+ * \file World.h
  * \author Daniel Gruncl
  * \brief 3D rendering context
  * contains shader data, projection and view matricies, viewport dimensions,
@@ -19,7 +19,7 @@ class GameObject;
 class Component;
 namespace Core{class NodeBase;class Sequence;}
 
-struct Shader2{
+struct Shader{
     GLuint program;     ///< GL shader program
     GLuint camera;      ///<uniform camera position before rotation
     GLuint Mmatrix;     ///<uniform matrix of model's transform in shader
@@ -41,22 +41,22 @@ struct Manipulator {
     //Component*m_gameObject;
 };
 
-class World2
+class World
 {
 public:
-    World2();
+    World();
     /// Load and compile shader program
     /**
     \param[in] vs_name Vertex shader file
     \param[in] fs_name Fragment shader file
     \return GL shader, 0 if failure
     */
-    static Shader2 loadShader(const char* vs_name,const char* fs_name);
+    static Shader loadShader(const char* vs_name,const char* fs_name);
     /// Initialize scene
     /**
     Creates and initializes default scene
     */
-    static World2* loadDefaultScene();
+    static World* loadDefaultScene();
     /// calls start() on each component in scene
     /**
     
@@ -91,9 +91,9 @@ public:
     static glm::vec3 mainCamPos;    ///< Main camera position before rotation. Needed for reflection calculation in fs. Accessed by GameObject::draw(glm::mat4).
 
     //HC shaders
-    static Shader2 shader0; ///< Default shader
-    static Shader2 shaderHandle;   ///< Handle shader
-    static Shader2 shaderProj; ///< preview projection matrices
+    static Shader shader0; ///< Default shader
+    static Shader shaderHandle;   ///< Handle shader
+    static Shader shaderProj; ///< preview projection matrices
 
     //HC textures
     static GLuint cubeTexture;

@@ -3,7 +3,7 @@
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
-#include "../World2.h"
+#include "../World.h"
 #include <iostream>
 #include <typeinfo>
 
@@ -24,15 +24,15 @@ CameraHandles::CameraHandles(){
 	this->hposs[5]=glm::vec4(-1.0f,0.0f,0.0f,1.0f);
 }
 void CameraHandles::start(){
-	this->cam = (Camera2*)this->m_gameObject->getComponent(Camera2::componentType());
-	this->frustrum = new GameObject(unitcubeMesh, &World2::shaderProj, 0);
+	this->cam = (Camera*)this->m_gameObject->getComponent(Camera::componentType());
+	this->frustrum = new GameObject(unitcubeMesh, &World::shaderProj, 0);
 	this->frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f);
-	this->frustruml = new GameObject(cubelinesMesh, &World2::shaderProj, 0);
+	this->frustruml = new GameObject(cubelinesMesh, &World::shaderProj, 0);
 	this->frustruml->primitive = GL_LINES;
 	this->frustruml->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	this->cameraico = new GameObject(cameraicoMesh, &World2::shaderHandle, 0);
+	this->cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	this->cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
-	this->handle = new GameObject(unitcubeMesh, &World2::shaderHandle, 0);
+	this->handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 
 void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
@@ -40,8 +40,8 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 transform=(*parent)*this->m_gameObject->transformation;
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 		
-	glUseProgram(World2::shaderProj.program);
-	glUniformMatrix4fv(glGetUniformLocation(World2::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
+	glUseProgram(World::shaderProj.program);
+	glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
 	if(renderTransparent){
 		if(this->isEdit){
 			glDisable(GL_CULL_FACE);
@@ -52,7 +52,7 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 	}
 	else{
 		glDepthRange(0.0, 0.01);
-		glUseProgram(World2::shaderHandle.program);
+		glUseProgram(World::shaderHandle.program);
 
 		if(this->isEdit){
 			glStencilMask(255);
@@ -75,7 +75,7 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 					pos=((pf-pn)*0.5f+pn);
 				}
 
-				float depth=(World2::perspective*World2::mainCamera*transform*pos)[2];
+				float depth=(World::perspective*World::mainCamera*transform*pos)[2];
 				this->handle->transformation=glm::mat4(depth*0.01f+0.1f);
 				this->handle->transformation[3]=pos;
 
@@ -102,7 +102,7 @@ void CameraHandles::render(glm::mat4*parent,bool renderTransparent){
 	
 void CameraHandles::update(){
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)) {
-		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World2::height- InputManager::m_mouseY),0,-1);
+		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World::height- InputManager::m_mouseY),0,-1);
 		if(sel==this->editedcam){this->isEdit=true;printf("is edit cam-handles\n");}
 		else if(this->activehandle==-1){this->isEdit=false;}
 			
@@ -119,7 +119,7 @@ void CameraHandles::update(){
 	else if(this->editmode==CameraHandles::EDIT_FRUSTUM){this->cam->m_perspective=glm::frustum(this->fleft,this->fright,this->fbottom,this->ftop,this->fnear,this->ffar);}
 		
 	if (InputManager::isKeyJustPressed(Keys::mouseLeft)){
-		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World2::height- InputManager::m_mouseY),3,this->editedcam);
+		unsigned char sel=Select::getStencilAt((int)InputManager::m_mouseX,(int)(World::height- InputManager::m_mouseY),3,this->editedcam);
 		this->activehandle=-1;
 		for(int i=0;i<6;i++){if(sel==this->stencils.arr[i]){this->activehandle=this->stencils.arr[i];this->axisnum=i;}}
 	}
