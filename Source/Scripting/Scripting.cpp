@@ -67,6 +67,18 @@ bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 		else if (strcmp(keyword, "MatrixMulMatrix") == 0) {
 			fprintf(f, "int n%d=mat4oper(matmul,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
 		}
+		else if (strcmp(keyword, "VectorMulMatrix") == 0) {
+			fprintf(f, "int n%d=mat4oper(vecmulmat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixMulVector") == 0) {
+			fprintf(f, "int n%d=mat4oper(matmulvec,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixMulFloat") == 0) {
+			fprintf(f, "int n%d=mat4oper(floatmulmat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixAddMatrix") == 0) {
+			fprintf(f, "int n%d=mat4oper(matadd,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		else if (strcmp(keyword, "MatrixToMatrix") == 0) {
 			fprintf(f, "int n%d=mat4oper(matrix,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
 		}

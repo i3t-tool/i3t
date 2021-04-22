@@ -20,7 +20,7 @@ struct Mat4Types {
 * List of types of matrix operators. First parameter of script function mat4oper must be one of these values.
 */
 struct Mat4Operators {
-	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmul=5,matadd=6;
+	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmul=5,matadd=6,matmulvec=7,vecmulmat=8,floatmulmat=9;
 };
 /**
 * \struct Vec4Operators

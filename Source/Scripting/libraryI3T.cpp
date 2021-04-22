@@ -8,9 +8,17 @@
 #include "GUI/Elements/Nodes/WorkspaceMatrixMulMatrix.h"
 #include "GUI/Elements/Nodes/WorkspaceDeterminant.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixTranspose.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixAddMatrix.h"
+#include "GUI/Elements/Nodes/WorkspaceVectorMulMatrix.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixMulVector.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixMulFloat.h"
+
 #include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
+
 #include "GUI/Elements/Nodes/WorkspaceVectorFree.h"
+
 #include "GUI/Elements/Nodes/WorkspaceFloatFree.h"
+
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 
 #include "libraryI3T.h"
@@ -33,7 +41,7 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
     
-    if (type<0||type>6) {returnValue->Val->Integer = -1; return;}
+    if (type<0||type>9) {returnValue->Val->Integer = -1; return;}
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     
@@ -47,8 +55,17 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         workspace->push_back(std::make_unique<WorkspaceMatrixMulMatrix>((ImTextureID)0, l));
 	}
     else if(type==scriptingData.mat4Operators.matadd){
-        return;
+        workspace->push_back(std::make_unique<WorkspaceMatrixAddMatrix>((ImTextureID)0, l));
 	}
+    else if (type == scriptingData.mat4Operators.matmulvec) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixMulVector>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.vecmulmat) {
+        workspace->push_back(std::make_unique<WorkspaceVectorMulMatrix>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.floatmulmat) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixMulFloat>((ImTextureID)0, l));
+    }
     else if (type == scriptingData.mat4Operators.matrix) {
         workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, l));
     }
