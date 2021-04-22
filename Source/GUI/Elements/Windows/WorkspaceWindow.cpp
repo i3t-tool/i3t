@@ -8,23 +8,48 @@
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
-#include "../Nodes/WorkspaceMatrixFree.h"
+//operators {
+
+//	transformations{
 #include "../Nodes/WorkspaceMatrixScale.h"
 #include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceMatrixRotate.h"
+#include "../Nodes/WorkspaceMakeEulerX.h"
+#include "../Nodes/WorkspaceMakeEulerY.h"
+#include "../Nodes/WorkspaceMakeEulerZ.h"
+#include "../Nodes/WorkspaceMakeFrustum.h"
+#include "../Nodes/WorkspaceMakeLookAt.h"
+#include "../Nodes/WorkspaceMakeOrtho.h"
+#include "../Nodes/WorkspaceMakePerspective.h"
+//	} tranformationa end
+
+//	matrix{
+#include "../Nodes/WorkspaceMatrixFree.h"
 #include "../Nodes/WorkspaceMatrixInversion.h"
 #include "../Nodes/WorkspaceMatrixMulMatrix.h"
 #include "../Nodes/WorkspaceMatrixTranspose.h"
 #include "../Nodes/WorkspaceDeterminant.h"
+#include "../Nodes/WorkspaceMatrixAddMatrix.h"
+#include "../Nodes/WorkspaceMatrixMulFloat.h"
+#include "../Nodes/WorkspaceMatrixMulVector.h"
+#include "../Nodes/WorkspaceVectorMulMatrix.h"
+//	} matrix end
 #include "../Nodes/WorkspaceSequence.h"
 
-#include "../Nodes/WorkspaceFloatFree.h"
-
+//	vec4{
 #include "../Nodes/WorkspaceVectorFree.h"
 #include "../Nodes/WorkspaceNormalizeVector.h"
+//	} vec4 end
+
+//	float{
+#include "../Nodes/WorkspaceFloatFree.h"
+//	} float end
+
 
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
 
+#include <math.h>
 
 // using namespace Core;
 
@@ -71,10 +96,11 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	ne::SetCurrentEditor(NodeEditorContext);
 
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = ImColor(67, 103, 152);
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = ImColor(158, 158, 158);
-	ne::GetStyle().PivotAlignment = ImVec2(0.0f, 0.0f);
-
+	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = node_bg_color;
+	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = background_color;
+	ne::GetStyle().PivotAlignment = pivot_alignment;
+	//ne::GetStyle().NodeRounding = node_rounding;
+	
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -104,11 +130,9 @@ void WorkspaceWindow::render()
 		// saveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
 		printf("press\n");
 	}
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
 	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 
-	ImGui::PopStyleVar();
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");{
@@ -468,27 +492,154 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 	ne::Suspend();
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8)); /* \todo JH take graphic setting from constants file */
+	//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, context_menu_padding); 
 
+	
 	if (ImGui::BeginPopup("float_context_menu")) {
-		ImGui::Text("float");
+		ImGui::Text("Set value...");
 		ImGui::Separator();
+
 		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
 		float newValue;
 		bool valueChange = false;
-		if (ImGui::Selectable("Set to zero")) {
-			newValue = 0.0f;
-			valueChange = true;
+
+		if (ImGui::BeginMenu("Radians")) {
+
+			ImGui::Text("Set...                    ");
+			ImGui::Separator();
+			ImGui::Columns(2, "mycolumns2", false);  // 2-ways, no border
+
+			if (ImGui::Selectable("-PI/6")) {
+				newValue = -M_PI / 6;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/4")) {
+				newValue = -M_PI / 4;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/3")) {
+				newValue = -M_PI / 3;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/2")) {
+				newValue = -M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI")) {
+				newValue = -M_PI;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-3PI/2")) {
+				newValue = -3 * M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-1")) {
+				newValue = -1.0f;
+				valueChange = true;
+			}
+			ImGui::NextColumn();
+
+			if (ImGui::Selectable("PI/6")) {
+				newValue = M_PI / 6;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/4")) {
+				newValue = M_PI / 4;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/3")) {
+				newValue = M_PI / 3;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/2")) {
+				newValue = M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI")) {
+				newValue = M_PI;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("3PI/2")) {
+				newValue = -3 * M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("1")) {
+				newValue = 1.0f;
+				valueChange = true;
+			}
+
+			ImGui::Columns(1);
+
+			if (ImGui::Selectable("0")) {
+				newValue = 0.0f;
+				valueChange = true;
+			}
+
+			ImGui::EndMenu();
 		}
-		if (ImGui::Selectable("Set to PI")) {
-			newValue = 3.1415f;
-			valueChange = true;
+		if (ImGui::BeginMenu("Degrees")) {
+
+			ImGui::Text("Set...                                    ");
+			ImGui::Separator();
+			ImGui::Columns(2, "mycolumns", false);
+			if (ImGui::Selectable("-1/2")) {
+				newValue = -1.0f / 2.0f;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-sqrt(2)/2")) {
+				newValue = -sqrt(2) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-sqrt(3)/2")) {
+				newValue = -sqrt(3) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-1")) {
+				newValue = -1.0f;
+				valueChange = true;
+			}
+
+			ImGui::NextColumn();
+
+			if (ImGui::Selectable("1/2")) {
+				newValue = 1.0f / 2.0f;;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("sqrt(3)/2")) {
+				newValue = sqrt(3) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("sqrt(2)/2")) {
+				newValue = sqrt(2) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("1")) {
+				newValue = 1.0f;
+				valueChange = true;
+			}
+			ImGui::Columns(1);
+			if (ImGui::Selectable("0")) {
+				newValue = 0.0f;
+				valueChange = true;
+			}
+			ImGui::EndMenu();
 		}
+
 
 		if (node->fw.name == "vector4" && valueChange) {
 			glm::vec4 data = node->getNodebase()->getData().getVec4();
 			data[node->fw.columns] = newValue;
 			node->getNodebase()->setValue(data);
+			valueChange = false;
+		}
+		else if (node->fw.name == "vector3" && valueChange) {
+			glm::vec3 data = node->m_nodebase->getData().getVec3();
+			data[node->fw.columns] = newValue;
+			node->m_nodebase->setValue(data);
+			valueChange = false;
+		}
+		else if (node->fw.name == "float" && valueChange) {
+			node->m_nodebase->setValue(newValue);
 			valueChange = false;
 		}
 		else if (node->fw.name == "matrix4x4" && valueChange) {
@@ -593,24 +744,40 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleX")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleY")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleZ")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("rotate")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixRotate>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("scale")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(HeaderBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("ortho")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("perspective")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakePerspective>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("frustrum")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeFrustum>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("lookAt")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeLookAt>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -642,12 +809,20 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat + mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixAddMatrix>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorMulMatrix>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulFloat>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -860,9 +1035,20 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 		ImGui::EndPopup();
 	}
-
-	ImGui::PopStyleVar();
+	
+	//ImGui::PopStyleVar();
 	ne::Resume();
 
 }
+
+
+
+
+
+
+
+
+
+
+
 

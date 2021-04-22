@@ -129,7 +129,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 20, padding = 10; /* \todo JH take from some font setting */
+    float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -166,7 +166,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-		//ImGui::PushStyleVar();
 	}
 
 	ImGui::SameLine();
@@ -315,28 +314,34 @@ void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (auto const & pinProp : m_workspaceInputsProperties)
+    bool showlabel = false;
+	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
+            elem.first != m_nodebase->getInputPins().end()  && elem.second != m_workspaceInputsProperties.end();
+            ++elem.first, ++elem.second)
 	{
 		float alpha = ImGui::GetStyle().Alpha;
 		//        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
 		//          alpha = alpha * (48.0f / 255.0f);
 
-		builder.Input(pinProp->getId());
-
+		builder.Input(elem.first->getId());
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
 		// color.Value.w = alpha / 255.0f;
-		ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
-                            WorkspacePinShape[pinProp->getType()],
-                            pinProp->isConnected(),
-                            WorkspacePinColor[pinProp->getType()],
-                            pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
+		ax::Widgets::Icon(ImVec2(elem.second->get()->getIconSize(), elem.second->get()->getIconSize()),
+                            WorkspacePinShape[elem.second->get()->getType()],
+                            elem.second->get()->isConnected(), /* \todo do it better - it is copy from Core*/
+                            WorkspacePinColor[elem.second->get()->getType()],
+							WorkspaceInnerPinColor[elem.second->get()->getType()]);
+		
+		
+
 
 		ImGui::Spring(0);
 
-		if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+        /* \todo JH enable drawing of pin name? - editable by user? -> move showLabel to class variable */
+		if (showlabel && !elem.second->get()->getLabel().empty())
 		{
-			ImGui::TextUnformatted(pinProp->getLabel().c_str());
+			ImGui::TextUnformatted(elem.second->get()->getLabel().c_str());
 			ImGui::Spring(0);
 		}
 

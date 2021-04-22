@@ -2,7 +2,7 @@
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 #include "WorkspaceElements.h"
 
-#include "WorkspaceElements.h"
+#include "Utils/NodeEditorStyle.h"
 
 class WorkspaceCorePinProperties;
 
@@ -37,18 +37,19 @@ struct WorkspaceNodeWithCoreDataArgs
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
 protected:
-    int m_numberOfVisibleDecimal = 2; /* \todo JH default number from some setting */
-    float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
-
-	WorkspaceLevelOfDetail m_levelOfDetail=WorkspaceLevelOfDetail::Full;/* DG was not initialized - getLevelOfDetail returned garbage */
+    int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
+    float m_dataItemsWidth = 25; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
+public:
+	
+	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
+                                                WorkspaceNodeWithCoreData is owner
+                                           */
+	WorkspaceLevelOfDetail m_levelOfDetail = WorkspaceLevelOfDetail::Full;/* DG was not initialized - getLevelOfDetail returned garbage */
 
     std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
 
-	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
-                                                WorkspaceNodeWithCoreData is owner
-                                           */
 
 public:
 	floatWindow fw; /* \todo create it protected */

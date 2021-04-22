@@ -5,7 +5,7 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NAN; 
 	fw.name = "vector4";
 	fw.rows = 0;
 	setDataItemsWidth();
@@ -16,7 +16,7 @@ WorkspaceVector4::WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeB
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NAN; 
 	fw.name = "vector4";
 	fw.rows = 0;
 

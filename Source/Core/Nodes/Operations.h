@@ -125,11 +125,11 @@ enum class ENodeType
 	Transpose,	//done SS
 	Determinant, //done SS
 	MatrixMulMatrix, //done SS
-	MatrixAddMatrix,
-	MatrixMulVector,
-	VectorMulMatrix,
-	MatrixMulFloat,
-	VectorDotVector,
+	MatrixAddMatrix,	//done SS
+	MatrixMulVector,	//done SS
+	VectorMulMatrix,	//done SS
+	MatrixMulFloat,		//done SS
+	VectorDotVector,	//h
 	VectorAddVector,
 	VectorSubVector,
 	VectorMulFloat,
@@ -195,16 +195,16 @@ enum class ENodeType
 	Model,
 
 	// Transform matrices "constructors"
-	MakeTranslation,
-	MakeEulerX,
-	MakeEulerY,
-	MakeEulerZ,
-	MakeScale,
-	MakeAxisAngle,
-	MakeOrtho,
-	MakePerspective,
-	MakeFrustum,
-	MakeLookAt,
+	MakeTranslation, //done JH
+	MakeEulerX, //done SS
+	MakeEulerY, //done SS
+	MakeEulerZ, //done SS
+	MakeScale, //done JH
+	MakeAxisAngle, //done SS
+	MakeOrtho, //done SS
+	MakePerspective, //done SS
+	MakeFrustum, //done SS
+	MakeLookAt, //done SS
 
 	Camera,
 	Screen,
@@ -212,12 +212,13 @@ enum class ENodeType
 
 enum class ETransformType
 {
+	//This is for sequence
 	Free = 0,
-	Translation,
+	Translation, 
 	EulerX,
 	EulerY,
 	EulerZ,
-	Scale, //done JH
+	Scale, 
 	AxisAngle,
 	Quat,
 	Ortho,
@@ -406,7 +407,7 @@ static const std::vector<Operation> operations = {
      AngleAxisInputNames},                                                                                 // rotate
 		{"MakeOrtho", "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // ortho
 		{"MakePerspective", "perspective constructor", 4, fourFloatInput, 1, matrixInput, NO_TAG,
-     PerspectiveInputNamas}, // perspective
+     PerspectiveInputNamas},																			// perspective
 		{"MakeFrustum", "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
