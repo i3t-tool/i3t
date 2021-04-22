@@ -3,7 +3,6 @@
  
 #include "interpreter.h"
 
-
 /* initialise the shared string system */
 void TableInit(Picoc *pc)
 {

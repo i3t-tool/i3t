@@ -2,7 +2,6 @@
 #include "interpreter.h"
 #include <iostream>
 
-
  /* endian-ness checking */
 static const int __ENDIAN_CHECK__ = 1;
 static int BigEndian;

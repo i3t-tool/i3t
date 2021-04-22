@@ -197,7 +197,7 @@ void CameraHandles::update(){
 				this->ffar-=dragfinal[0];
 			}
 		}
-		else if(this->activehandle==this->stencils.names.wl){
+		else if(this->activehandle==this->stencils.names.l){
 			//printf("height %f\n",( this->pfar*tan(glm::radians(this->pangle*0.5f)) ));
 			//printf("width %f\n",( this->pfar*tan(glm::radians(this->pangle*0.5f)) )/( this->pheight/this->paspect ));
 			//printf("%f\n",glm::degrees(atan(1.0f)));
@@ -215,7 +215,7 @@ void CameraHandles::update(){
 				if(this->fleft>this->fright-0.5f){this->fleft=this->fright-0.5f;}
 			}
 		}
-		else if(this->activehandle==this->stencils.names.wr){
+		else if(this->activehandle==this->stencils.names.r){
 			if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){
 				this->paspect+=+dragfinal[0]*0.09f;
 				if(this->paspect<0.1f){this->paspect=0.1f;}
@@ -230,8 +230,8 @@ void CameraHandles::update(){
 				if(this->fright<this->fleft+0.5f){this->fright=this->fleft+0.5f;}
 			}
 		}
-		else if(this->activehandle==this->stencils.names.hu){
-			float sign=(float)(this->activehandle==this->stencils.names.hu)*2.0f-1.0f;
+		else if(this->activehandle==this->stencils.names.t){
+			float sign=(float)(this->activehandle==this->stencils.names.t)*2.0f-1.0f;
 				
 			if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){
 				float amount=dragfinal[0]*5.0f*sign;
@@ -259,8 +259,8 @@ void CameraHandles::update(){
 				if(this->ftop<this->fbottom+0.5f){this->ftop=this->fbottom+0.5f;}
 			}
 		}
-		else if(this->activehandle==this->stencils.names.hb){
-			//printf("hb\n");
+		else if(this->activehandle==this->stencils.names.b){
+			//printf("b\n");
 			if(this->editmode==CameraHandles::EDIT_PERSPECTIVE){
 				float amount=-dragfinal[0]*5.0f;
 				if(this->pangle+amount<1.0f){amount=1.0f-this->pangle;}

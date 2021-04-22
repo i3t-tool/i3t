@@ -26,7 +26,7 @@ private:
 		
 	GameObject*frustrum,*frustruml,*cameraico,*handle;
 	unsigned char editedcam;
-	union Stencils{struct N{unsigned char f,n,hu,hb,wr,wl,a;}names;unsigned char arr[7];}stencils;
+	union Stencils{struct N{unsigned char f,n,t,b,r,l,a;}names;unsigned char arr[7];}stencils;
 	glm::vec4 hposs[6];
 	int activehandle,axisnum;
 	Camera*cam;

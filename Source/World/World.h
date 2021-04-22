@@ -4,7 +4,8 @@
  * \file World.h
  * \author Daniel Gruncl
  * \brief 3D rendering context
- * contains shader data, projection and view matricies, viewport dimensions,
+ * \date 2.3.2021
+ * contains hardcoded textures, hardcoded shaders, shader data, projection and view matricies, viewport dimensions,
  * as well as scene tree (tree of GameObjects).
  */
 //---------------
@@ -64,7 +65,7 @@ public:
     void onStart();
     /// Render scene
     /**
-    Draws scene, updates global camera matricies
+    Draws scene, updates global camera matricies, updates scene logic.
     */
     void onUpdate();
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
@@ -80,7 +81,7 @@ public:
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
     std::map<std::string,Manipulator>manipulators;///<Properites of manipulator components
 
-    ///load HC shaders, textures
+    ///load HC shaders, textures. Must be called before any instance of World is created.
     static bool init();
     ///unload HC shaders, textures
     static void end();

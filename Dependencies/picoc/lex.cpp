@@ -1,5 +1,6 @@
 /* picoc lexer - converts source text into a tokenised form */ 
 
+
 #include "interpreter.h"
 
 #ifdef NO_CTYPE
@@ -626,7 +627,7 @@ enum LexToken LexGetRawToken(struct ParseState *Parser, struct Value **Value, in
 {
     enum LexToken Token = TokenNone;
     int ValueSize;
-    char *Prompt = NULL;
+    const char *Prompt = NULL;
     Picoc *pc = Parser->pc;
     
     do

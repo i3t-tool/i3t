@@ -5,7 +5,6 @@
 /* stack grows up from the bottom and heap grows down from the top of heap space */
 #include "interpreter.h"
 
-
 #ifdef DEBUG_HEAP
 void ShowBigList(Picoc *pc)
 {

@@ -4,17 +4,18 @@
  * \file Transforms.h
  * \author Daniel Gruncl
  * \brief Transformation utils.
+ * \date 2.3.2021
  */
 //---------------
 #include "GameObject.h"
 #include "pgr.h"
 #include "Source/Core/Nodes/GraphManager.h"
 
-glm::vec2 world2screen(glm::vec3 pos);
-glm::vec2 vecWorldscreen(glm::vec3 pos,glm::vec3 dir);
-glm::vec3 world2viewport(glm::vec3 pos);
-glm::vec2 mouse2viewport(glm::vec2 pos);
-glm::vec3 mouseray(glm::vec2 pos);
+glm::vec2 world2screen(glm::vec3 pos);					///Point from world coordinates to screen coordinates (dimensions in pixels)
+glm::vec2 vecWorldscreen(glm::vec3 pos,glm::vec3 dir);	///Vector from world coordinates to screen coordinates (dimensions in pixels)
+glm::vec3 world2viewport(glm::vec3 pos);				///Point from world coordinates to viewport coordinates (<-1;1>^3)
+glm::vec2 mouse2viewport(glm::vec2 pos);				///Mouse cursor from screen coordinates to viewport coordinates (<-1;1>^2)
+glm::vec3 mouseray(glm::vec2 pos);						///Mouse cursor from screen coordinates to ray in world coordinates (z1=)
 glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis);
 glm::mat4 getNormalized(glm::mat4 transform);
 glm::mat4 getRotation(glm::mat4 transform, int referenceAxis);

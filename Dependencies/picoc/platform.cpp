@@ -5,7 +5,6 @@
 #include "interpreter.h"
 #include <iostream>
 
-
  /* initialise everything */
 void PicocInitialise(Picoc* pc, int StackSize)
 {

@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
+bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
 	FILE*f=fopen(filename,"w");
 	if(f==NULL){return false;}
 	fprintf(f,"//saving\n");
@@ -122,14 +122,14 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	fclose(f);
 	return true;
 }
-bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
+bool loadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
 	ScriptingData*data=getScriptingData();
 	int datalen=(int)data->nodeData.size();
-	int p=PicocRunFile(filename);
+	int p=picocRunFile(filename);
 	while(data->nodeData.size()>datalen){data->nodeData.pop_back(); }
 	return true;
 }
-int PicocRunInteractive(){
+int picocRunInteractive(){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
 	if(PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
@@ -139,7 +139,7 @@ int PicocRunInteractive(){
 	PicocCleanup(&pc);
 	return pc.PicocExitValue;
 }
-int PicocRunFile(const char* filename){
+int picocRunFile(const char* filename){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
 	if (PicocPlatformSetExitPoint(&pc)) {PicocCleanup(&pc); return pc.PicocExitValue;}
@@ -151,7 +151,7 @@ int PicocRunFile(const char* filename){
 	// for (; ParamCount < argc && strcmp(argv[ParamCount], "-") != 0; ParamCount++){PicocPlatformScanFile(&pc,
 	// argv[ParamCount]);}//run multiple files PicocCallMain(&pc, argc - ParamCount, &argv[ParamCount]);	//call main
 }
-int PicocRunSource(const char* source){
+int picocRunSource(const char* source){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
 	if (PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}

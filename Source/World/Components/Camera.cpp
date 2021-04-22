@@ -46,8 +46,8 @@ void Camera::update(){
     glm::vec3 posbkp = World::mainCamPos;
     glm::mat4 perspectivebkp = World::perspective;
     glm::mat4 mainCamerabkp = World::mainCamera;
-    float viewportbkp[4];
-    glGetFloatv(GL_VIEWPORT, viewportbkp);
+    int viewportbkp[4];
+    glGetIntegerv(GL_VIEWPORT, viewportbkp);
 
     if (this->m_mainCamera){
         this->m_perspective = glm::perspective(glm::radians(m_angle), World::width / World::height, 0.2f, 2000.0f);
@@ -76,7 +76,7 @@ void Camera::update(){
 
     if (!this->m_mainCamera){
         glBindFramebuffer(GL_FRAMEBUFFER, fbobkp);
-        glViewport((GLint)viewportbkp[0], (GLint)viewportbkp[1], (GLsizei)viewportbkp[2], (GLsizei)viewportbkp[3]);
+        glViewport(viewportbkp[0], viewportbkp[1], viewportbkp[2], viewportbkp[3]);
         World::mainCamPos = posbkp;
         World::perspective = perspectivebkp;
         World::mainCamera = mainCamerabkp;

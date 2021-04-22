@@ -101,7 +101,7 @@ void WorkspaceWindow::render()
 
 	if (InputManager::isKeyPressed(Keys::l))
 	{
-		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
+		// saveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
 		printf("press\n");
 	}
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

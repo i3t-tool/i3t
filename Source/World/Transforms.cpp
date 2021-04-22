@@ -42,7 +42,7 @@ glm::vec3 mouseray(glm::vec2 pos){
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 	glm::mat4 inv = glm::inverse(World::perspective * World::mainCamera);
-	glm::vec4 mouse = glm::vec4((pos[0] - viewport[0]) / (viewport[2] * 0.5f) - 1.0f,(pos[1] - viewport[1]) / (viewport[3] * 0.5f) - 1.0f, -0.7f, 1.0f);
+	glm::vec4 mouse = glm::vec4((pos[0] - viewport[0]) / (viewport[2] * 0.5f) - 1.0f,(pos[1] - viewport[1]) / (viewport[3] * 0.5f) - 1.0f, 0.7f, 1.0f);
 
 	glm::vec4 world1 = inv * mouse;
 	mouse[2] = 0.9f;

@@ -129,21 +129,21 @@ void OrthoManipulator::update(){
 		m_far-=drag2[0];
 		if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
 	}
-	else if(m_activehandle==m_stencils.names.wl){
+	else if(m_activehandle==m_stencils.names.l){
 		m_left+=drag2[0];
 		if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
 	}
-	else if(m_activehandle==m_stencils.names.wr){
+	else if(m_activehandle==m_stencils.names.r){
 		m_right+=drag2[0];
 		if(m_right<m_left+0.5f){m_right=m_left+0.5f;}
 	}
-	else if(m_activehandle==m_stencils.names.hu){
-		float sign=(float)(m_activehandle==m_stencils.names.hu)*2.0f-1.0f;
+	else if(m_activehandle==m_stencils.names.t){
+		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 				
 		m_top+=drag2[0]*sign;
 		if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
 	}
-	else if(m_activehandle==m_stencils.names.hb){
+	else if(m_activehandle==m_stencils.names.b){
 		m_bottom+=drag2[0];
 		if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
 	}

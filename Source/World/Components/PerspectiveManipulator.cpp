@@ -158,7 +158,7 @@ void PerspectiveManipulator::update(){
 		m_far-=dragfinal[0]*2.0f;
 		if(m_far<m_near+1.0f){m_far=m_near+1.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.wl){
+	else if(m_activehandle==m_stencils.names.l){
 		//printf("height %f\n",( m_far*tan(glm::radians(m_angle*0.5f)) ));
 		//printf("width %f\n",( m_far*tan(glm::radians(m_angle*0.5f)) )/( m_height/m_aspect ));
 		//printf("%f\n",glm::degrees(atan(1.0f)));
@@ -166,13 +166,13 @@ void PerspectiveManipulator::update(){
 		if(m_aspect<0.1f){m_aspect=0.1f;}
 		else if(m_aspect>10.0f){m_aspect=10.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.wr){
+	else if(m_activehandle==m_stencils.names.r){
 		m_aspect+=+dragfinal[0]*0.09f;
 		if(m_aspect<0.1f){m_aspect=0.1f;}
 		else if(m_aspect>10.0f){m_aspect=10.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.hu){
-		float sign=(float)(m_activehandle==m_stencils.names.hu)*2.0f-1.0f;
+	else if(m_activehandle==m_stencils.names.t){
+		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 				
 		float amount=dragfinal[0]*5.0f*sign;
 		if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
@@ -190,8 +190,8 @@ void PerspectiveManipulator::update(){
 		m_angle+=amount;
 		//}
 	}
-	else if(m_activehandle==m_stencils.names.hb){
-		//printf("hb\n");
+	else if(m_activehandle==m_stencils.names.b){
+		//printf("b\n");
 		float amount=-dragfinal[0]*5.0f;
 		if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
 		else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
