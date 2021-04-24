@@ -1463,4 +1463,13 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inpu
 		// setInternalValue(m_inputs[0].getStorage(1).getMat4());
 	}
 }
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::Pulse>::updateValues(int inputIndex)
+{
+	if (m_outputs[0].isPluggedIn())
+  {
+		int pinIndex = m_outputs[0].getOutComponents()[0]->getIndex();
+		m_outputs[0].getOutComponents()[0]->getOwner()->updateValues(pinIndex);
+	}
+}
 } // namespace Core

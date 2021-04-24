@@ -207,6 +207,7 @@ enum class ENodeType
 	MakeLookAt,
 
 	Screen,
+	Pulse
 };
 
 enum class ETransformType
@@ -411,6 +412,7 @@ static const std::vector<Operation> operations = {
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
     {"Screen", "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}},
+    {"Pulse", "pulse", 0, {}, 1, {EValueType::Pulse}}
 };
 
 namespace Core
