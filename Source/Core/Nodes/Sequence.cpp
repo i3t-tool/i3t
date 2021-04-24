@@ -64,7 +64,7 @@ ENodePlugResult Sequence::isPlugCorrect(Pin const * input, Pin const * output)
 		return ENodePlugResult::Ok;
 	}
 
-	return ENodePlugResult::Ok;
+	return usualCheckResult;
 
 	// return NodeBase::isPlugCorrect(input, output);
 }

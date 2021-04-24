@@ -206,7 +206,6 @@ enum class ENodeType
 	MakeFrustum,
 	MakeLookAt,
 
-	Camera,
 	Screen,
 };
 
@@ -411,8 +410,7 @@ static const std::vector<Operation> operations = {
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
-    {"Camera", "camera", 2, {EValueType::Matrix, EValueType::Matrix}, 1, {EValueType::Screen}},
-    {"Screen", "screen", 1, {EValueType::Screen}, 0, {}},
+    {"Screen", "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}},
 };
 
 namespace Core
@@ -430,6 +428,8 @@ static const PinGroup cycleOutputs = { EValueType::Float, EValueType::Pulse, EVa
 static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs };
 
 static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
+
+static const Operation g_cameraProperties = { "Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul} };
 
 static const std::vector<Operation> g_transforms = {
 		{"Free", "free", 0, matrixInput, 1, matrixInput, defaultDataMaps },                                              // free

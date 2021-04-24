@@ -1456,32 +1456,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Camera>::updateValues(int inputIndex)
-{
-  if (areAllInputsPlugged())
-  {
-    setInternalValue(m_inputs[0].getStorage().getMat4() * m_inputs[1].getStorage().getMat4());
-  }
-	else
-  {
-    if (m_inputs[0].isPluggedIn())
-    {
-      // Projection matrix.
-      setInternalValue(m_inputs[0].getStorage().getMat4());
-    }
-    else if (m_inputs[1].isPluggedIn())
-    {
-      // View matrix.
-      setInternalValue(m_inputs[1].getStorage().getMat4());
-    }
-	}
-}
-
 template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inputIndex)
 {
   if (areAllInputsPlugged())
   {
-		setInternalValue(m_inputs[0].getStorage().getMat4());
+		// setInternalValue(m_inputs[0].getStorage(1).getMat4());
 	}
 }
 } // namespace Core

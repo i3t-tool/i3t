@@ -9,6 +9,7 @@
 
 #include <algorithm>
 
+#include "Camera.h"
 #include "Cycle.h"
 #include "NodeData.h"
 #include "NodeImpl.h"
@@ -20,6 +21,14 @@ namespace Core
 {
 namespace Builder
 {
+FORCE_INLINE CameraPtr createCamera()
+{
+  auto ret = std::make_shared<Core::Camera>();
+  ret->init();
+  ret->updateValues(0);
+  return ret;
+}
+
 /**
  * Create new node.
  *

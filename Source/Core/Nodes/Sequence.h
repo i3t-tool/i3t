@@ -9,6 +9,8 @@
 
 namespace Core
 {
+using Matrices = std::vector<Ptr<Transformation>>;
+
 /**
  * Sequence of matrices.
  */
@@ -16,7 +18,7 @@ class Sequence : public NodeBase
 {
 	using Matrix = NodeBase;
 
-	std::vector<Ptr<Transformation>> m_matrices;
+  Matrices m_matrices;
 
 public:
 	Sequence() : NodeBase(&g_sequence){};
@@ -31,7 +33,7 @@ public:
 	 */
   ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 
-	const std::vector<Ptr<Transformation>>& getMatrices() { return m_matrices; }
+	const Matrices& getMatrices() { return m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -86,4 +88,6 @@ FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& mat
     result *= mat->getData().getMat4();
   return result;
 }
+
+using SequencePtr = Ptr<Sequence>;
 } // namespace Core
