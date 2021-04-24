@@ -27,12 +27,21 @@ const int out_cycleEnd = 6;
 
 class Cycle : public NodeBase
 {
+  enum class EMode
+  {
+    Once,
+    Repeat,
+    PingPong
+  };
+
   float m_from = 0.0f;
 	float m_to = 10.0f;
 	float m_updateStep = 0.1f;
 	float m_multiplier = 0.1f;
 
 	bool m_isRunning = false;
+
+	EMode m_mode = EMode::Repeat;
 
 public:
 	Cycle() : NodeBase(&g_CycleProperties) {}
@@ -43,6 +52,9 @@ public:
 	void resetAndStop();
 	void stepBack();
 	void stepNext();
+
+	EMode getMode() { return m_mode; }
+	void setMode(EMode mode) { m_mode = mode; }
 
 	void onCycleFinish();
 
