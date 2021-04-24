@@ -8,14 +8,14 @@ using namespace Core;
 
 TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 {
-	auto cameraNode = Builder::createCamera();
+	auto cameraNode = GraphManager::createCamera();
 	auto screenNode = Builder::createNode<ENodeType::Screen>();
 
 	auto perspectiveProj = Builder::createTransform<PerspectiveProj>();
 	auto lookAt = Builder::createTransform<LookAt>();
 
-	//cameraNode->Proj()->addMatrix(perspectiveProj);
-	//cameraNode->View()->addMatrix(lookAt);
+	cameraNode->getProj()->addMatrix(perspectiveProj);
+	cameraNode->getView()->addMatrix(lookAt);
 
 	plug_expectOk(cameraNode, screenNode, 0, 0);
 

@@ -7,17 +7,16 @@ namespace Core
 {
 class Camera : public NodeBase
 {
-SequencePtr m_proj;
-SequencePtr m_view;
+	friend class GraphManager;
+
+  SequencePtr m_proj;
+  SequencePtr m_view;
 
 public:
 	Camera();
 
-  const Matrices& getProjMatrices() { return m_proj->getMatrices(); }
-  const Matrices& getViewMatrices() { return m_view->getMatrices(); }
-
-  const glm::mat4& getProjResult() { return m_proj->getData().getMat4(); }
-  const glm::mat4& getViewResult() { return m_view->getData().getMat4(); }
+  const SequencePtr& getProj() { return m_proj; }
+  const SequencePtr& getView() { return m_view; }
 
 	void updateValues(int inputIndex) override;
 };

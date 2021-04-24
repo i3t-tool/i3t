@@ -21,14 +21,6 @@ namespace Core
 {
 namespace Builder
 {
-FORCE_INLINE CameraPtr createCamera()
-{
-  auto ret = std::make_shared<Core::Camera>();
-  ret->init();
-  ret->updateValues(0);
-  return ret;
-}
-
 /**
  * Create new node.
  *
@@ -71,6 +63,8 @@ class GraphManager
 	static std::vector<Ptr<Cycle>> m_cycles;
 
 public:
+  static CameraPtr createCamera();
+
   /**
    * Create Cycle
    */
@@ -227,6 +221,17 @@ public:
 	MatrixIterator end();
 };
 
+
+inline CameraPtr GraphManager::createCamera()
+{
+  auto ret = std::make_shared<Core::Camera>();
+  ret->init();
+	ret->m_proj->m_parent = ret;
+	ret->m_view->m_parent = ret;
+  ret->updateValues(0);
+
+  return ret;
+}
 
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {

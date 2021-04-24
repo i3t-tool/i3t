@@ -16,12 +16,14 @@ using Matrices = std::vector<Ptr<Transformation>>;
  */
 class Sequence : public NodeBase
 {
+	friend class GraphManager;
 	using Matrix = NodeBase;
 
   Matrices m_matrices;
+	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
 public:
-	Sequence() : NodeBase(&g_sequence){};
+	Sequence() : NodeBase(&g_sequence) {};
 
 	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, m_matrices.size()); }
 
@@ -49,27 +51,14 @@ public:
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index)
-	{
-		Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
-		              "Sequence does not have so many matrices as you are expecting.");
-
-		auto result = std::move(m_matrices.at(index));
-		m_matrices.erase(m_matrices.begin() + index);
-
-		result->nullSequence();
-
-    updateValues(0);
-    spreadSignal();
-
-		return result;
-	};
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);;
 
 	void swap(int from, int to);
 
 	void updateValues(int inputIndex) override;
 
 private:
+	void notifyParent();
 	ENodePlugResult isPlugCorrect(Pin const * input, Pin const * output) override;
   void receiveSignal(int inputIndex) override;
 };
