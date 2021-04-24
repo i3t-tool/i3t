@@ -115,6 +115,21 @@ TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 	EXPECT_EQ(matNode->getData().getMat4(), seq->getData().getMat4());
 }
 
+TEST(SequenceTest, SequenceCantBeSelfPlugged)
+{
+  auto seq1 = arrangeSequence();
+  auto seq2 = arrangeSequence();
+
+  {
+		auto result = GraphManager::plug(seq1, seq1, 0, 0);
+		EXPECT_EQ(ENodePlugResult::Err_Loopback, result);
+	}
+  {
+		auto result = GraphManager::plug(seq1, seq1, 1, 1);
+    EXPECT_EQ(ENodePlugResult::Err_Loopback, result);
+	}
+}
+
 /**
  *    _______
  *   /       \
@@ -125,7 +140,7 @@ TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInpu
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
 
-	GraphManager::plug(seq1, seq2, 0, 0);
+	plug_expectOk(seq1, seq2, 0, 0);
 
 	plug_expectOk(seq2, seq1, 1, 1);
 

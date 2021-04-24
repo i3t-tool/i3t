@@ -22,7 +22,7 @@ enum class ENodePlugResult
 	Ok = 0,
 	Err_MismatchedPinTypes,
 	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
-	Err_Loopback,
+	Err_Loopback, /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
 };
@@ -256,7 +256,7 @@ public:
 	 *
 	 * \param	inputIndex Index of the modified input.
 	 */
-	virtual void updateValues(int inputIndex) {}
+	virtual void updateValues(int inputIndex = 0) {}
 
 	/// Spread signal to all outputs.
 	/// \todo Does not use operators for calling each follower just once

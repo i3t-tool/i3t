@@ -54,6 +54,8 @@ private:
 	}
 };
 
+using TransformationPtr = Ptr<Transformation>;
+
 
 class Free : public Transformation
 {
