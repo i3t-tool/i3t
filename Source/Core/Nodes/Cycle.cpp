@@ -140,12 +140,11 @@ void Cycle::updateValue(float seconds)
 		case EMode::Repeat:
 			// New iteration.
 			newValue = fmod(newValue, m_updateStep);
-			getInternalData().setValue(newValue);
 			break;
 		case EMode::PingPong:
 			newValue -= 2 * seconds;
-			getInternalData().setValue(newValue);
 			break;
 		}
 	}
+	getInternalData().setValue(newValue);
 }
