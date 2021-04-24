@@ -110,6 +110,11 @@ std::vector<Ptr<WorkspaceLinkProperties>> const& WorkspaceNodeWithCoreData::getL
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getInputsProperties() const  { return m_workspaceInputsProperties; }
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getOutputsProperties() const { return m_workspaceOutputsProperties; }
 
+bool WorkspaceNodeWithCoreData::isSequence()
+{
+    return false;
+}
+
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
 {
     return m_numberOfVisibleDecimal;
@@ -286,8 +291,6 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 {
-    builder.Middle();
-
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:

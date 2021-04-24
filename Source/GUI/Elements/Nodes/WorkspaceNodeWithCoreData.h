@@ -58,9 +58,11 @@ public:
 
     Ptr<Core::NodeBase> const getNodebase() const;
 
-    virtual std::vector<Ptr<WorkspaceLinkProperties>> const &getLinksProperties() const;
-    virtual std::vector<Ptr<WorkspaceCorePinProperties>> const &getInputsProperties() const;
-    virtual std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
+    std::vector<Ptr<WorkspaceLinkProperties>> const &getLinksProperties() const;
+    std::vector<Ptr<WorkspaceCorePinProperties>> const &getInputsProperties() const;
+    std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
+
+    virtual bool isSequence();
 
     int getNumberOfVisibleDecimal();
     int setNumberOfVisibleDecimal(int value);

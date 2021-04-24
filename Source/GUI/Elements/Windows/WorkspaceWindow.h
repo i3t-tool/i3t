@@ -77,12 +77,12 @@ class WorkspaceWindow : public IWindow
 public:
 	I3T_WINDOW(WorkspaceWindow)
 
-	Application& WholeApplication;
-	ne::EditorContext* NodeEditorContext; /*! \brief Object for store workspace scene */
+	Application& m_wholeApplication;
+	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene */
 
-	ImTextureID HeaderBackgroundTexture;
+	ImTextureID m_headerBackgroundTexture;
 
-	util::NodeBuilder NodeBuilderContext; /* \todo builder as variable of WorkspceWindow?*/
+	util::NodeBuilder m_nodeBuilderContext; /* \todo builder as variable of WorkspceWindow?*/
 
     /* \todo JH better name for this atributes - for better description what they do... */
     Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewLink = nullptr;
@@ -129,7 +129,12 @@ public:
 
     void checkQueryContextMenus();
 
+    void checkSequenceSelections();
+
+    void shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
+    void shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
     void shiftSelectedNodesToFront();
+    void shiftTransformationInSequenceNodesToFront();
 
 
 

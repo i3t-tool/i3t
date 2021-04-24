@@ -64,7 +64,10 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 
 	drawHeader(builder);
 	drawInputs(builder, newLinkPin);
+
+    builder.Middle();
 	drawData(builder);
+
 	drawOutputs(builder, newLinkPin);
 
 	builder.End();
