@@ -1,25 +1,44 @@
 #include "Dependencies/picoc/picoc.h"
 #include "Core/API.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
+
+//operators {
+
+//	transformations{
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixRotate.h"
+#include "GUI/Elements/Nodes/WorkspaceMakeEulerX.h"
+#include "GUI/Elements/Nodes/WorkspaceMakeEulerY.h"
+#include "GUI/Elements/Nodes/WorkspaceMakeEulerZ.h"
+#include "GUI/Elements/Nodes/WorkspaceMakeFrustum.h"
+#include "GUI/Elements/Nodes/WorkspaceMakeLookAt.h"
+#include "GUI/Elements/Nodes/WorkspaceMakeOrtho.h"
+#include "GUI/Elements/Nodes/WorkspaceMakePerspective.h"
+//	} tranformationa end
+
+//	matrix{
+#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixInversion.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixMulMatrix.h"
-#include "GUI/Elements/Nodes/WorkspaceDeterminant.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixTranspose.h"
+#include "GUI/Elements/Nodes/WorkspaceDeterminant.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixAddMatrix.h"
-#include "GUI/Elements/Nodes/WorkspaceVectorMulMatrix.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixMulVector.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixMulFloat.h"
-
-#include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
-
-#include "GUI/Elements/Nodes/WorkspaceVectorFree.h"
-
-#include "GUI/Elements/Nodes/WorkspaceFloatFree.h"
-
+#include "GUI/Elements/Nodes/WorkspaceMatrixMulVector.h"
+#include "GUI/Elements/Nodes/WorkspaceVectorMulMatrix.h"
+//	} matrix end
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
+
+//	vec4{
+#include "GUI/Elements/Nodes/WorkspaceVectorFree.h"
+#include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
+//	} vec4 end
+
+//	float{
+#include "GUI/Elements/Nodes/WorkspaceFloatFree.h"
+//	} float end
+
 
 #include "libraryI3T.h"
 #include "Scripting/Scripting.h"
@@ -40,8 +59,6 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         y=param[2]->Val->Integer;
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
-    
-    if (type<0||type>9) {returnValue->Val->Integer = -1; return;}
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     
@@ -75,8 +92,39 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
     else if (type == scriptingData.mat4Operators.transpose) {
         workspace->push_back(std::make_unique<WorkspaceMatrixTranspose>((ImTextureID)0, l));
     }
+
+    else if (type == scriptingData.mat4Operators.ortho) {
+        workspace->push_back(std::make_unique<WorkspaceMakeOrtho>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.perspective) {
+        workspace->push_back(std::make_unique<WorkspaceMakePerspective>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.frustrum) {
+        workspace->push_back(std::make_unique<WorkspaceMakeFrustum>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.axisangle) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixRotate>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.rotatex) {
+        workspace->push_back(std::make_unique<WorkspaceMakeEulerX>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.rotatey) {
+        workspace->push_back(std::make_unique<WorkspaceMakeEulerY>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.rotatez) {
+        workspace->push_back(std::make_unique<WorkspaceMakeEulerZ>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.scale) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.lookAt) {
+        workspace->push_back(std::make_unique<WorkspaceMakeLookAt>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.mat4Operators.translate) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
+    }
     else {
-        return;
+        returnValue->Val->Integer = -1;return;
     }
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
@@ -103,21 +151,23 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
 
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
-    if(type<0||type>6){ returnValue->Val->Integer=-1;return;}
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
-	if(type== scriptingData.mat4Types.free){
-        return;
+	if(type== scriptingData.mat4Transforms.free){
+        returnValue->Val->Integer = -1; return;
 	}
-	else if (type == scriptingData.mat4Types.scale) {
+	else if (type == scriptingData.mat4Transforms.scale) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
 		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
 	}
-	else if (type == scriptingData.mat4Types.translate) {
+	else if (type == scriptingData.mat4Transforms.translate) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
 		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
 	}
+    else {
+        returnValue->Val->Integer = -1; return;
+    }
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if(numArgs==2){
@@ -167,11 +217,13 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         y = param[2]->Val->Integer;
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
-    if(type<0||type>0){ returnValue->Val->Integer=-1;return;}
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if(type == scriptingData.vec4Operators.norm){
         workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, l));
+    }
+    else {
+        returnValue->Val->Integer = -1; return;
     }
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
@@ -348,7 +400,7 @@ void loadW(struct ParseState* parser, struct Value* returnValue, struct Value** 
     std::string filename= Config::getAbsolutePath((char*)param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != nullptr) {ww->m_workspaceCoreNodes.clear(); status=loadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+    if (ww != nullptr) {ww->m_workspaceCoreNodes.clear(); status=loadWorkspace(filename.c_str()); }
     returnValue->Val->Integer=status;
 }
 void appendW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
@@ -356,7 +408,7 @@ void appendW(struct ParseState* parser, struct Value* returnValue, struct Value*
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
     int len=(int)ww->m_workspaceCoreNodes.size();
-    if (ww != nullptr) {status=loadWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+    if (ww != nullptr) {status=loadWorkspace(filename.c_str()); }
 
     ne::ClearSelection();
     for(int i=len;i<(int)ww->m_workspaceCoreNodes.size();i++){
@@ -412,7 +464,7 @@ struct LibraryFunction platformLibraryI3T[] =
 
 const char defs[]="typedef int bool;";
 
-void PlatformLibraryInitI3T(Picoc *pc)
+void platformLibraryInitI3T(Picoc *pc)
 {
 	//TypeCreateOpaqueStruct(pc, nullptr, TableStrRegister(pc, "mat4"), sizeof(struct mat4));
 	//TypeParse(&parser, &returnType, &Identifier, nullptr);
@@ -420,14 +472,23 @@ void PlatformLibraryInitI3T(Picoc *pc)
     //LibraryAdd(&GlobalTable, "platform library", &platformLibraryI3T);
     IncludeRegister(pc, "I3T.h", nullptr, platformLibraryI3T, defs);//ADD_CUSTOM
 
-    VariableDefinePlatformVar(pc, nullptr, "free",          &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free,              false);
-    VariableDefinePlatformVar(pc, nullptr, "scale",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.scale,             false);
-    VariableDefinePlatformVar(pc, nullptr, "uniscale",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.uniscale,          false);
-    VariableDefinePlatformVar(pc, nullptr, "rotatex",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatex,           false);
-    VariableDefinePlatformVar(pc, nullptr, "rotatey",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatey,           false);
-    VariableDefinePlatformVar(pc, nullptr, "rotatez",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatez,           false);
-    VariableDefinePlatformVar(pc, nullptr, "translate",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.translate,         false);
+    //mat4 transform
+    VariableDefinePlatformVar(pc, nullptr, "free",          &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.free,         false);
+    VariableDefinePlatformVar(pc, nullptr, "uniscale",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.uniscale,     false);
     
+    //mat4 transform intersect mat4oper
+    VariableDefinePlatformVar(pc, nullptr, "scale",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.scale,        false);
+    VariableDefinePlatformVar(pc, nullptr, "rotatex",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.rotatex,      false);
+    VariableDefinePlatformVar(pc, nullptr, "rotatey",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.rotatey,      false);
+    VariableDefinePlatformVar(pc, nullptr, "rotatez",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.rotatez,      false);
+    VariableDefinePlatformVar(pc, nullptr, "translate",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Transforms.translate,    false);
+    VariableDefinePlatformVar(pc, nullptr, "axisangle",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.axisangle,     false);
+    VariableDefinePlatformVar(pc, nullptr, "ortho",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.ortho,         false);
+    VariableDefinePlatformVar(pc, nullptr, "perspective",   &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.perspective,   false);
+    VariableDefinePlatformVar(pc, nullptr, "frustrum",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.frustrum,      false);
+    VariableDefinePlatformVar(pc, nullptr, "lookat",        &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.lookAt,        false);
+
+    //mat4oper
     VariableDefinePlatformVar(pc, nullptr, "determinant",   &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.determinant,   false);
     VariableDefinePlatformVar(pc, nullptr, "inverse",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.inverse,       false);
     VariableDefinePlatformVar(pc, nullptr, "matadd",        &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.matadd,        false);
@@ -436,8 +497,11 @@ void PlatformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "trackball",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.trackball,     false);
     VariableDefinePlatformVar(pc, nullptr, "transpose",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Operators.transpose,     false);
 
+
+    //vec4oper
     VariableDefinePlatformVar(pc, nullptr, "norm",          &pc->IntType, (union AnyValue*)&scriptingData.vec4Operators.norm,        false);
 
+    //node lod
     VariableDefinePlatformVar(pc, nullptr, "full",          &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.full,             false);
     VariableDefinePlatformVar(pc, nullptr, "setvalues",     &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.setvalues,        false);
     VariableDefinePlatformVar(pc, nullptr, "label",         &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.label,            false);

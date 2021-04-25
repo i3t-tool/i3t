@@ -16,7 +16,7 @@
 
 #define PICOC_STACK_SIZE (32*1024)       /* space for the the stack */
 
-bool loadWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
+bool loadWorkspace(const char*filename);
 bool saveWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
 //std::vector<WorkspaceMatrix4x4>* loadWorkspace();
 int picocRunInteractive();

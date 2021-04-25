@@ -11,9 +11,10 @@
 /**
 * \struct Mat4types
 * List of types of matrix transformation. First parameter of script function mat4 must be one of these values.
+* Same-named members of Mat4transform must be equal to those of Mat4Operators
 */
-struct Mat4Types {
-	const int free = 0, scale = 1, uniscale = 2, rotatex = 3, rotatey = 4, rotatez = 5, translate = 6;
+struct Mat4Transforms {
+	const int free = 8, uniscale = 9, scale = 10,translate = 11, rotatex = 12, rotatey = 13, rotatez = 14;
 };
 /**
 * \struct Mat4Operators
@@ -21,6 +22,7 @@ struct Mat4Types {
 */
 struct Mat4Operators {
 	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmul=5,matadd=6,matmulvec=7,vecmulmat=8,floatmulmat=9;
+	const int scale = 10, translate=11,rotatex =12,rotatey=13,rotatez=14,axisangle=15,ortho=16,perspective=17,frustrum=18,lookAt=19;
 };
 /**
 * \struct Vec4Operators
@@ -50,7 +52,7 @@ struct NodeLODs {
 * 
 */
 struct ScriptingData {
-	Mat4Types mat4Types;
+	Mat4Transforms mat4Transforms;
 	Mat4Operators mat4Operators;
 	Vec4Operators vec4Operators;
 	FloatOperators floatOperators;
@@ -65,4 +67,4 @@ ScriptingData*getScriptingData();
 */
 void clearScriptingData();
 
-void PlatformLibraryInitI3T(Picoc* pc);
+void platformLibraryInitI3T(Picoc* pc);
