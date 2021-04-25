@@ -53,7 +53,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
         m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())
+                , fmt::format("##{}", pin.getIndex())   //SS TODO make map of labels
                 , pin
                 , *this ));
 
@@ -314,7 +314,7 @@ void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-    bool showlabel = false;
+    bool showlabel = true;
 	for (std::pair<corePinIter, corePinPropIter> elem(m_nodebase->getInputPins().begin(), m_workspaceInputsProperties.begin());
             elem.first != m_nodebase->getInputPins().end()  && elem.second != m_workspaceInputsProperties.end();
             ++elem.first, ++elem.second)

@@ -6,7 +6,7 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequ
 
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
+	fw.value = NAN; 
 	fw.name = "WorkspaceSequence";
 }
 
@@ -15,16 +15,16 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string h
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
+	fw.value = NAN;  
 	fw.name = "WorkspaceSequence";
 }
 
 void WorkspaceSequence::drawDataFull(util::NodeBuilder& builder)
 {
-    for( auto const & transformation : static_cast<Core::Sequence>(m_nodebase)->getMatrices() )
+    /*for( auto const & transformation : static_cast<Core::Sequence>(m_nodebase)->getMatrices() )
     {
         transformation->drawData();
-    }
+    }*/
 }
 
 void WorkspaceSequence::drawDataSetValues(util::NodeBuilder& builder)

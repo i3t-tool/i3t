@@ -1,16 +1,15 @@
-WorkspaceVectorDotVector
 #pragma once
-#include "WorkspaceMatrix4x4.h"
+#include "WorkspaceFloat.h"
 
 struct WorkspaceVectorDotVectorArgs
 {
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default WorkspaceVectorDotVector header";
     std::string nodeLabel = "WorkspaceVectorDotVector";
-    Ptr<Core::NodeBase> nodebase = Builder::createNode<ENodeType::VectorDotVector>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::VectorDotVector>();
 };
 
-class WorkspaceVectorDotVector : public WorkspaceMatrix4x4
+class WorkspaceVectorDotVector : public WorkspaceFloat
 {
 public:
     WorkspaceVectorDotVector(ImTextureID headerBackground, WorkspaceVectorDotVectorArgs const& args);

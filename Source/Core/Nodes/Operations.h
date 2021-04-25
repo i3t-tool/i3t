@@ -130,12 +130,12 @@ enum class ENodeType
 	VectorMulMatrix,	//done SS
 	MatrixMulFloat,		//done SS
 	VectorDotVector,	//h
-	VectorAddVector,
-	VectorSubVector,
-	VectorMulFloat,
-	VectorPerspectiveDivision,
+	VectorAddVector,	//t
+	VectorSubVector,	//t
+	VectorMulFloat,	//t
+	VectorPerspectiveDivision,//t
 	NormalizeVector, //done JH
-	MixVector,
+	MixVector,//t
 	Vector3CrossVector3,
 	Vector3DotVector3,
 	Vector3AddVector3,
@@ -298,7 +298,7 @@ static const std::vector<std::string> xyzw = {"X", "Y", "Z", "W"};
 static const std::vector<std::string> tr = {"T", "R"};
 static const std::vector<std::string> eulerInputNames = {"angle"};
 static const std::vector<std::string> orthoFrustrumInputNames = {"left", "right", "bottom", "top", "zNear", "zFar"};
-static const std::vector<std::string> PerspectiveInputNamas = {"fovy", "aspect", "zNear", "zFar"};
+static const std::vector<std::string> PerspectiveInputNames = {"fovy", "aspect", "zNear", "zFar"};
 static const std::vector<std::string> lookAtInputNames = {"eye", "center", "up"};
 
 /**
@@ -407,7 +407,7 @@ static const std::vector<Operation> operations = {
      AngleAxisInputNames},                                                                                 // rotate
 		{"MakeOrtho", "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // ortho
 		{"MakePerspective", "perspective constructor", 4, fourFloatInput, 1, matrixInput, NO_TAG,
-     PerspectiveInputNamas},																			// perspective
+     PerspectiveInputNames},																			// perspective
 		{"MakeFrustum", "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
@@ -442,7 +442,7 @@ static const std::vector<Operation> g_transforms = {
 		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },          // rotate
 		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },                 // quat rotate
 		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho
-		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNamas, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective } }, // perspective
+		{"Perspective", "perspective", 0, matrixInput, 1, matrixInput, NO_TAG, PerspectiveInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective } }, // perspective
 		{"Frustum", "frustum", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum } },       // frustrum
 		{"LookAt", "lookAt", 0, matrixInput, 1, matrixInput, NO_TAG, lookAtInputNames, defaultDataMaps },                // lookAt
 };
