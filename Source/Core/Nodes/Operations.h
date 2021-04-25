@@ -129,22 +129,22 @@ enum class ENodeType
 	MatrixMulVector,	//done SS
 	VectorMulMatrix,	//done SS
 	MatrixMulFloat,		//done SS
-	VectorDotVector,	//h
-	VectorAddVector,	//t
-	VectorSubVector,	//t
-	VectorMulFloat,	//t
-	VectorPerspectiveDivision,//t
+	VectorDotVector,	//done SS
+	VectorAddVector,	//done SS
+	VectorSubVector,	//done SS
+	VectorMulFloat,	//done SS
+	VectorPerspectiveDivision,//done SS
 	NormalizeVector, //done JH
-	MixVector,//t
-	Vector3CrossVector3,
-	Vector3DotVector3,
-	Vector3AddVector3,
-	Vector3SubVector3,
-	Vector3MulFloat,
-	NormalizeVector3,
-	Vector3Length,
-	ShowVector3,
-	MixVector3,
+	MixVector,//done SS
+	Vector3CrossVector3,	//done SS
+	Vector3DotVector3,	//done SS
+	Vector3AddVector3,	//done SS
+	Vector3SubVector3,	//done SS
+	Vector3MulFloat,	//done SS
+	NormalizeVector3,	//done SS
+	Vector3Length,	//done SS
+	ShowVector3,	//done SS
+	MixVector3,	//done SS
 	ConjQuat,
 	FloatVecToQuat,
 	AngleAxisToQuat,
