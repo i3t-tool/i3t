@@ -8,9 +8,7 @@ WorkspaceMatrixMulMatrix::WorkspaceMatrixMulMatrix(ImTextureID headerBackground,
 WorkspaceMatrixMulMatrix::WorkspaceMatrixMulMatrix(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
     : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MatrixMulMatrix>(), headerLabel, nodeLabel)
 {}
-
 void WorkspaceMatrixMulMatrix::drawDataSetValues(util::NodeBuilder& builder)
 {
-    // \todo JH
-    drawDataFull(builder);
+    drawDataLabel(builder);
 }

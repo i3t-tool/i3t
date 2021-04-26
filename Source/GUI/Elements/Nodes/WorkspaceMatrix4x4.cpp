@@ -5,7 +5,7 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMa
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
+	fw.value = NAN;  
 	fw.name = "matrix4x4";
 
     setDataItemsWidth();
@@ -16,10 +16,9 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
+	fw.value = NAN;  
 	fw.name = "matrix4x4";
-
-    setDataItemsWidth();
+	setDataItemsWidth();
 }
 
 void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
@@ -35,11 +34,9 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	ImGui::PushItemWidth(m_dataItemsWidth);
 	/* Drawing is row-wise */
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, matrix_frame_padding);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
-	//ImGui::BeginHorizontal(idOfNode, ImVec2(0, 0), 0.0f);
-	//ImGui::BeginVertical(idOfNode, ImVec2(0, 0), 0.0f);
 
 	for (int rows = 0; rows < 4; rows++)
 	{

@@ -54,12 +54,11 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(m_nodeEditorContext);
 	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = ImColor(67, 103, 152);
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = ImColor(158, 158, 158);
-	ne::GetStyle().PivotAlignment = ImVec2(0.0f, 0.0f);
-
-    m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>(m_headerBackgroundTexture));
-
+	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = node_bg_color;
+	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = background_color;
+	ne::GetStyle().PivotAlignment = pivot_alignment;
+	//ne::GetStyle().NodeRounding = node_rounding;
+	
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -88,11 +87,9 @@ void WorkspaceWindow::render()
 		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
 		printf("press\n");
 	}
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
 	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 
-	ImGui::PopStyleVar();
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");{
@@ -552,27 +549,162 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 	ne::Suspend();
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8)); /* \todo JH take graphic setting from constants file */
+	//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, context_menu_padding); 
 
+	
 	if (ImGui::BeginPopup("float_context_menu")) {
-		ImGui::Text("float");
+		ImGui::Text("Set value...					");
 		ImGui::Separator();
+
+		ImGui::Columns(2, "floatPopupButtons", false);
+		if (ImGui::SmallButton("Radians"))
+			ImGui::OpenPopup("Radians");
+		ImGui::NextColumn();
+		if (ImGui::SmallButton("Degrees"))
+			ImGui::OpenPopup("Degrees");
+		ImGui::Columns(1);
+
 		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
 		float newValue;
 		bool valueChange = false;
-		if (ImGui::Selectable("Set to zero")) {
-			newValue = 0.0f;
-			valueChange = true;
+
+		if (ImGui::BeginPopup("Radians")) {
+
+			ImGui::Text("Set...                    ");
+			ImGui::Separator();
+			ImGui::Columns(2, "mycolumns2", false);  // 2-ways, no border
+
+			if (ImGui::Selectable("-PI/6")) {
+				newValue = -M_PI / 6;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/4")) {
+				newValue = -M_PI / 4;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/3")) {
+				newValue = -M_PI / 3;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/2")) {
+				newValue = -M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI")) {
+				newValue = -M_PI;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-3PI/2")) {
+				newValue = -3 * M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-1")) {
+				newValue = -1.0f;
+				valueChange = true;
+			}
+			ImGui::NextColumn();
+
+			if (ImGui::Selectable("PI/6")) {
+				newValue = M_PI / 6;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/4")) {
+				newValue = M_PI / 4;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/3")) {
+				newValue = M_PI / 3;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/2")) {
+				newValue = M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI")) {
+				newValue = M_PI;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("3PI/2")) {
+				newValue = -3 * M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("1")) {
+				newValue = 1.0f;
+				valueChange = true;
+			}
+
+			ImGui::Columns(1);
+
+			if (ImGui::Selectable("0")) {
+				newValue = 0.0f;
+				valueChange = true;
+			}
+
+			ImGui::EndPopup();
 		}
-		if (ImGui::Selectable("Set to PI")) {
-			newValue = 3.1415f;
-			valueChange = true;
+		if (ImGui::BeginPopup("Degrees")) {
+
+			ImGui::Text("Set...                                    ");
+			ImGui::Separator();
+			ImGui::Columns(2, "mycolumns", false);
+			if (ImGui::Selectable("-1/2")) {
+				newValue = -1.0f / 2.0f;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-sqrt(2)/2")) {
+				newValue = -sqrt(2) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-sqrt(3)/2")) {
+				newValue = -sqrt(3) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-1")) {
+				newValue = -1.0f;
+				valueChange = true;
+			}
+
+			ImGui::NextColumn();
+
+			if (ImGui::Selectable("1/2")) {
+				newValue = 1.0f / 2.0f;;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("sqrt(3)/2")) {
+				newValue = sqrt(3) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("sqrt(2)/2")) {
+				newValue = sqrt(2) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("1")) {
+				newValue = 1.0f;
+				valueChange = true;
+			}
+			ImGui::Columns(1);
+			if (ImGui::Selectable("0")) {
+				newValue = 0.0f;
+				valueChange = true;
+			}
+			ImGui::EndPopup();
 		}
+
 
 		if (node->fw.name == "vector4" && valueChange) {
 			glm::vec4 data = node->getNodebase()->getData().getVec4();
 			data[node->fw.columns] = newValue;
 			node->getNodebase()->setValue(data);
+			valueChange = false;
+		}
+		else if (node->fw.name == "vector3" && valueChange) {
+			glm::vec3 data = node->m_nodebase->getData().getVec3();
+			data[node->fw.columns] = newValue;
+			node->m_nodebase->setValue(data);
+			valueChange = false;
+		}
+		else if (node->fw.name == "float" && valueChange) {
+			node->m_nodebase->setValue(newValue);
 			valueChange = false;
 		}
 		else if (node->fw.name == "matrix4x4" && valueChange) {
@@ -677,24 +809,40 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleX")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleY")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleZ")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("rotate")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixRotate>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("scale")) {
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("ortho")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("perspective")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakePerspective>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("frustrum")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeFrustum>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("lookAt")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeLookAt>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -726,12 +874,20 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat + mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixAddMatrix>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorMulMatrix>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulFloat>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -741,24 +897,44 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("vec3 operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3Free>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("show vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceShowVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 x vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3CrossVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 . vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3DotVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 + vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3AddVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 - vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3SubVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3MulFloat>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("normalize vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("length(vec3)")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3Length>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mix vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMixVector3>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -772,20 +948,32 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 . vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorDotVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 + vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorAddVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 - vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorSubVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorMulFloat>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("normalize vec4")) {
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceNormalizeVector>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("perspective division")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorPerspectiveDivision>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mix vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMixVector>(HeaderBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -945,9 +1133,20 @@ void WorkspaceWindow::checkQueryContextMenus()
 		ImGui::EndPopup();
 	}
 
-
-	ImGui::PopStyleVar();
+	
+	//ImGui::PopStyleVar();
 	ne::Resume();
 
 }
+
+
+
+
+
+
+
+
+
+
+
 

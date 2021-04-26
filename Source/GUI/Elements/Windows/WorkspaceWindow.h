@@ -17,20 +17,77 @@
 #include "../../../Core/Nodes/NodeImpl.h"
 #include "Config.h"
 #include "Core/Application.h"
-#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
-#include "../Nodes/WorkspaceMatrixFree.h"
+
+#include "Core/Input/InputManager.h"
+#include "Scripting/Scripting.h"
+
+#include "../Nodes/WorkspaceNodeWithCoreData.h"
+
+//transformations{
+#include "../Nodes/WorkspaceSequence.h"
+//} tranformationa end
+
+//operators {
+
+//	transformations{
 #include "../Nodes/WorkspaceMatrixScale.h"
 #include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceMatrixRotate.h"
+#include "../Nodes/WorkspaceMakeEulerX.h"
+#include "../Nodes/WorkspaceMakeEulerY.h"
+#include "../Nodes/WorkspaceMakeEulerZ.h"
+#include "../Nodes/WorkspaceMakeFrustum.h"
+#include "../Nodes/WorkspaceMakeLookAt.h"
+#include "../Nodes/WorkspaceMakeOrtho.h"
+#include "../Nodes/WorkspaceMakePerspective.h"
+//	} tranformationa end
+
+//	matrix{
+#include "../Nodes/WorkspaceMatrixFree.h"
 #include "../Nodes/WorkspaceMatrixInversion.h"
 #include "../Nodes/WorkspaceMatrixMulMatrix.h"
 #include "../Nodes/WorkspaceMatrixTranspose.h"
 #include "../Nodes/WorkspaceDeterminant.h"
-#include "../Nodes/WorkspaceSequence.h"
+#include "../Nodes/WorkspaceMatrixAddMatrix.h"
+#include "../Nodes/WorkspaceMatrixMulFloat.h"
+#include "../Nodes/WorkspaceMatrixMulVector.h"
+#include "../Nodes/WorkspaceVectorMulMatrix.h"
+//	} matrix end
 
-#include "../Nodes/WorkspaceFloatFree.h"
-
+//	vec4{
 #include "../Nodes/WorkspaceVectorFree.h"
 #include "../Nodes/WorkspaceNormalizeVector.h"
+#include "../Nodes/WorkspaceVectorDotVector.h"
+#include "../Nodes/WorkspaceVectorAddVector.h"
+#include "../Nodes/WorkspaceVectorSubVector.h"
+#include "../Nodes/WorkspaceVectorMulFloat.h"
+#include "../Nodes/WorkspaceVectorPerspectiveDivision.h"
+#include "../Nodes/WorkspaceMixVector.h"
+//	} vec4 end
+
+//	vec4{
+#include "../Nodes/WorkspaceVector3Free.h"
+#include "../Nodes/WorkspaceNormalizeVector3.h"
+#include "../Nodes/WorkspaceVector3CrossVector3.h"
+#include "../Nodes/WorkspaceVector3DotVector3.h"
+#include "../Nodes/WorkspaceVector3AddVector3.h"
+#include "../Nodes/WorkspaceVector3SubVector3.h"
+#include "../Nodes/WorkspaceVector3MulFloat.h"
+#include "../Nodes/WorkspaceVector3Length.h"
+#include "../Nodes/WorkspaceShowVector3.h"
+#include "../Nodes/WorkspaceMixVector3.h"
+//	} vec4 end
+
+//	float{
+#include "../Nodes/WorkspaceFloatFree.h"
+//	} float end
+//}operators end
+
+#include "Core/Input/InputManager.h"
+#include "Scripting/Scripting.h"
+
+#include <math.h>
+
 
 
 #include "pgr.h"
@@ -52,6 +109,40 @@
 
 namespace ne = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
+
+/* >>> Static function <<< */ //{
+
+/*! \fn static inline ImRect ImGui_GetItemRect()
+    \brief Get ImRect of last  ( \todo active/added ?) item
+    \return ImRect : New ImRect with position and size of last item
+*/
+static inline ImRect ImGui_GetItemRect()
+
+{	
+	//return ImRect(ImVec2(0, 0), ImVec2(1, 1));
+	//ImVec2 minRect = ImGui::GetItemRectMin();
+	//return ImRect(minRect, minRect.x + 12, minRect.y + 12));
+	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+}
+
+/*! \fn static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
+    \brief Enlarge given ImRect (create new / enlarge given ?)
+     \param[in/out?] rect ImRect& for enlarge
+     \param[in] x float value added to left and right
+     \param[in] y float value added to up an d down
+    \return ImRect New
+*/
+static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
+{
+	auto result = rect;
+	result.Min.x -= x;
+	result.Min.y -= y;
+	result.Max.x += x;
+	result.Max.y += y;
+	return result;
+}
+//} /* >>> Static functions - end <<< */
+
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 

@@ -32,11 +32,11 @@ Theme::Theme()
 	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
 
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
-	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 60.0f;
-	m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)] = 4.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 25.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)] = 0.0f;
 
-	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingX)] = 4.0f;
-	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingY)] = 4.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingX)] = 3.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingY)] = 3.0f;
 
 	m_sizes[static_cast<size_t>(ESize::Window_FramePadding)] = 8.0f;
 }

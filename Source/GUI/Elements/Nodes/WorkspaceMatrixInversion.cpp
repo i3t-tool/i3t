@@ -10,8 +10,5 @@ WorkspaceMatrixInversion::WorkspaceMatrixInversion(ImTextureID headerBackground,
 
 void WorkspaceMatrixInversion::drawDataSetValues(util::NodeBuilder& builder)
 {
-    //TODO SS
-	drawDataFull(builder);
-
+    drawDataLabel(builder);
 }
-

@@ -6,7 +6,7 @@ WorkspaceVector3::WorkspaceVector3(ImTextureID headerBackground, WorkspaceVector
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NAN; 
 	fw.name = "vector3";
 	fw.rows = 0;
 	setDataItemsWidth();
@@ -17,7 +17,7 @@ WorkspaceVector3::WorkspaceVector3(ImTextureID headerBackground, Ptr<Core::NodeB
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL;
+	fw.value = NAN; 
 	fw.name = "vector3";
 	fw.rows = 0;
 
@@ -82,7 +82,7 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder)
 int WorkspaceVector3::maxLenghtOfData()
 {
     int act, maximal = 0;
-    const glm::vec4& coreData = m_nodebase->getData().getVec4();
+    const glm::vec3& coreData = m_nodebase->getData().getVec3();
 
     for(int column=0; column < 3; column++)
     {

@@ -7,7 +7,7 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequ
 
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
+	fw.value = NAN; 
 	fw.name = "WorkspaceSequence";
 
 	m_workspaceTransformation.push_back(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
@@ -18,7 +18,7 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string h
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NULL; /* \todo rewrite as some FLOAT_UNDEFINED_VALUE */
+	fw.value = NAN;  
 	fw.name = "WorkspaceSequence";
 
 	pushNode(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));

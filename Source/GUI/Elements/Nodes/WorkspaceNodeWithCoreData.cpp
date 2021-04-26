@@ -53,7 +53,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
         m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())
+                , fmt::format("##{}", pin.getIndex())   //SS TODO make map of labels
                 , pin
                 , *this ));
 
@@ -149,7 +149,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 20, padding = 10; /* \todo JH take from some font setting */
+    float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -186,7 +186,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-		//ImGui::PushStyleVar();
 	}
 
 	ImGui::SameLine();

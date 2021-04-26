@@ -10,6 +10,5 @@ WorkspaceMatrixTranspose::WorkspaceMatrixTranspose(ImTextureID headerBackground,
 
 void WorkspaceMatrixTranspose::drawDataSetValues(util::NodeBuilder& builder)
 {
-    // \todo JH
-	drawDataFull(builder);
+    drawDataLabel(builder);
 }
