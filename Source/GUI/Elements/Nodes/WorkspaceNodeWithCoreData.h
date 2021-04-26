@@ -63,6 +63,9 @@ public:
     std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
 
     virtual bool isSequence();
+    bool inSequence();
+    bool isTransformation();
+
 
     int getNumberOfVisibleDecimal();
     int setNumberOfVisibleDecimal(int value);
@@ -82,6 +85,9 @@ public:
 	virtual void drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters, std::vector<unsigned char> datamap_values);
 
 	virtual void drawInputLinks();
+
+	void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+    void drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
 
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawData(util::NodeBuilder& builder);

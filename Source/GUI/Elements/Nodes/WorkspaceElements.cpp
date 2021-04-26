@@ -3,6 +3,8 @@
 #include "spdlog/fmt/fmt.h"
 #include <string>
 
+
+
 // #include <format> // not as standard library yet
 
 std::map<EValueType, ImColor> WorkspacePinColor = {
@@ -58,25 +60,32 @@ ImTextureID WorkspaceNode::getHeaderBackground()
     return m_headerBackground;
 }
 
-void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
+void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
 {
 	builder.Begin(m_id);
 
 	drawHeader(builder);
-	drawInputs(builder, newLinkPin);
 
-    builder.Middle();
+    if (withPins)
+    {
+        drawInputs(builder, newLinkPin);
+    }
+
 	drawData(builder);
 
-	drawOutputs(builder, newLinkPin);
+    if (withPins)
+    {
+        drawOutputs(builder, newLinkPin);
+    }
+
 
 	builder.End();
 }
 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
-	builder.Header(m_color);
 
+    builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y

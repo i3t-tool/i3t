@@ -6,25 +6,8 @@
 
 #include "WorkspaceWindow.h"
 
-#include "../Nodes/WorkspaceNodeWithCoreData.h"
-
-#include "../Nodes/WorkspaceMatrixFree.h"
-#include "../Nodes/WorkspaceMatrixScale.h"
-#include "../Nodes/WorkspaceMatrixTranslation.h"
-#include "../Nodes/WorkspaceMatrixInversion.h"
-#include "../Nodes/WorkspaceMatrixMulMatrix.h"
-#include "../Nodes/WorkspaceMatrixTranspose.h"
-#include "../Nodes/WorkspaceDeterminant.h"
-#include "../Nodes/WorkspaceSequence.h"
-
-#include "../Nodes/WorkspaceFloatFree.h"
-
-#include "../Nodes/WorkspaceVectorFree.h"
-#include "../Nodes/WorkspaceNormalizeVector.h"
-
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
-
 
 // using namespace Core;
 
@@ -69,10 +52,13 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 
 	m_nodeEditorContext = ne::CreateEditor(&config);
 	ne::SetCurrentEditor(m_nodeEditorContext);
+	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
 	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = ImColor(67, 103, 152);
 	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = ImColor(158, 158, 158);
 	ne::GetStyle().PivotAlignment = ImVec2(0.0f, 0.0f);
+
+    m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>(m_headerBackgroundTexture));
 
 }
 
@@ -97,8 +83,6 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-    ne::SetCurrentEditor(m_nodeEditorContext);
-
 	if (InputManager::isKeyPressed(Keys::l))
 	{
 		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
@@ -116,15 +100,45 @@ void WorkspaceWindow::render()
 
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 	{
-	    if (workspaceCoreNode->isSequence())
-        {
-            for(auto && inSequenceNode : std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode)->getInnerWorkspaceNodes())
-            {
-                inSequenceNode->drawNode(m_nodeBuilderContext, nullptr);
-            }
-        }
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
 	}
+
+    /* put and pop to/from Sequence */
+	ne::Detail::DragAction* drag_action = m_ne_usable->GetCurrentAction() != nullptr ? m_ne_usable->GetCurrentAction()->AsDrag() : nullptr;
+	if(drag_action && drag_action->IsDragging())
+    {
+        m_draged_nodes = getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
+        if(m_draged_nodes.size()==1)
+        {
+            m_draged_node = m_draged_nodes[0];
+            if(m_draged_node->isTransformation())
+            {
+                if (m_draged_node->inSequence())
+                {
+                    Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(m_draged_node);
+                    assert(workspace_sequence != nullptr);
+
+                    workspace_sequence->popNode(m_draged_node);
+                    m_workspaceCoreNodes.push_back(m_draged_node);
+                }
+
+                int position_in_sequence;
+                m_all_sequences = getSequenceNodes();
+                for (Ptr<WorkspaceSequence> & sequence : m_all_sequences)
+                {
+                    position_in_sequence = sequence->getInnerPosition(ne::GetNodePosition(m_draged_node->getId()));
+                    if (position_in_sequence >= 0 && ImGui::IsMouseReleased(0))
+                    {
+                        sequence->pushNode(m_draged_node, position_in_sequence);
+                        m_workspaceCoreNodes.erase(std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+                                                    [this](Ptr<WorkspaceNodeWithCoreData> const &w_node) -> bool { return w_node->getId() == m_draged_node->getId(); }) );
+                        break;
+                    }
+
+                }
+            }
+        }
+    }
 
     /* both connected pins have to be drawn before link is drawn -> therefore separated for */
     for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
@@ -143,43 +157,29 @@ void WorkspaceWindow::render()
 
 	}ne::End();
 
-    checkSequenceSelections();
-
-	shiftSelectedNodesToFront();
-
 	manipulatorStartCheck3D();
 
 	ImGui::End();
 }
 
-void WorkspaceWindow::checkSequenceSelections()
+Ptr<WorkspaceSequence> WorkspaceWindow::getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
-    if (ne::HasSelectionChanged())
+    Ptr<Core::Transformation> transfomation_nodebase = node->getNodebase()->as<Core::Transformation>();
+    if(transfomation_nodebase)
     {
-        for(Ptr<WorkspaceNodeWithCoreData> const &node : getSelectedWorkspaceCoreNodes())
+        Ptr<Core::NodeBase> sequence_nodebase = transfomation_nodebase->getCurrentSequence();
+        if (sequence_nodebase)
         {
-            if (node->isSequence())
+            for(Ptr<WorkspaceNodeWithCoreData> const &workspace_node : m_workspaceCoreNodes)
             {
-                //std::vector<ne::Detail::ObjectWrapper<ne::Detail::Node>> & nodeeditor_nodes = ne::EditorContext::getNodeEditorNodes_addedFunction();
-                std::vector<ne::Detail::ObjectWrapper<ne::Detail::Node>> & nodeeditor_nodes = m_nodeEditorContext->getNodeEditorNodes_addedFunction();
-
-                std::vector<Ptr<WorkspaceNodeWithCoreData>> innerWorkspaceNodes = std::dynamic_pointer_cast<WorkspaceSequence>(node)->getInnerWorkspaceNodes();
-                /* \todo JH there is better way how to shift nodes to end - std::rotate() std::stable_partition() */
-                for(int i=0; i < innerWorkspaceNodes.size(); i++)
+                if (workspace_node->isSequence() &&  workspace_node->getNodebase() == sequence_nodebase)
                 {
-                    auto ith_inner_node = std::find_if(nodeeditor_nodes.begin(),
-                                                        nodeeditor_nodes.end(),
-                                                        [innerWorkspaceNodes, i](ne::Detail::ObjectWrapper<ne::Detail::Node> & ne_node) -> bool { return (ne::NodeId)(ne_node->ID()) == innerWorkspaceNodes.at(i)->getId(); });
-
-                    if (ith_inner_node != nodeeditor_nodes.end())
-                    {
-                      std::iter_swap(nodeeditor_nodes.end()-1-i, ith_inner_node);
-                    }
+                    return std::dynamic_pointer_cast<WorkspaceSequence>(workspace_node);
                 }
-
             }
         }
     }
+    return nullptr;
 }
 
 void WorkspaceWindow::checkUserActions()
@@ -220,7 +220,7 @@ void WorkspaceWindow::shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData
     }
 }
 
-/* \todo JH not work yet in all cases - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
+/* \todo JH not used now (with change in NodeEditor) - not work yet in all cases - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
 void WorkspaceWindow::shiftSelectedNodesToFront()
 {
     if (ne::HasSelectionChanged())
@@ -229,28 +229,6 @@ void WorkspaceWindow::shiftSelectedNodesToFront()
     }
 }
 
-//void WorkspaceWindow::shiftTransformationInSequenceNodesToFront()
-//{
-//    std::vector<Ptr<WorkspaceNodeWithCoreData>> allSequences;
-//
-//    for (auto sequence_node : m_workspaceCoreNodes)
-//    {
-//        if (sequence_node->isSequence())
-//        {
-//                                    /* not work here - invadlid use of incomplete type EditorContext*/
-//            std::stable_partition(m_nodeEditorContext->getNodeEditorNodes_addedFunction().begin(), m_nodeEditorContext->getNodeEditorNodes_addedFunction().end(),
-//                                    [&sequence_node](ne::Node* node_from_nodeeditor) -> bool
-//                                    {
-//                                        return std::find_if(sequence_node->getInnerWorkspaceNodes.begin(), sequence_node->getInnerWorkspaceNodes.end(),
-//                                                            [node_from_nodeeditor](Ptr<WorkspaceNodeWithCoreData> const &node_from_sequence) -> bool { return node_from_nodeeditor->getId() == node_from_sequence->getId(); }
-//                                                            )
-//                                                == sequence_node->getInnerWorkspaceNodes.end();
-//
-//                                    }
-//            );
-//        }
-//    }
-//}
 
 void WorkspaceWindow::manipulatorStartCheck3D()
 {
@@ -271,6 +249,22 @@ void WorkspaceWindow::manipulatorStartCheck3D()
     }
 }
 
+std::vector<Ptr<WorkspaceSequence>> WorkspaceWindow::getSequenceNodes()
+{
+    std::vector<Ptr<WorkspaceSequence>> allSequenceNodes;
+    Ptr<WorkspaceNodeWithCoreData> temp;
+    for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+    {
+        temp = getWorkspaceCoreNodeByID(node->getId());
+        if (temp->isSequence())
+        {
+            allSequenceNodes.push_back(std::dynamic_pointer_cast<WorkspaceSequence>(temp));
+        }
+    }
+
+    return allSequenceNodes;
+}
+
 Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByID(ne::NodeId const id)
 {
     if (id)
@@ -278,6 +272,16 @@ Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByID(ne::Nod
         for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
         {
             if(node->getId() == id){ return node; }
+            else
+            {
+                if (node->isSequence())
+                {
+                    for(auto && inSequenceNode : std::dynamic_pointer_cast<WorkspaceSequence>(node)->getInnerWorkspaceNodes())
+                    {
+                        if(inSequenceNode->getId() == id){ return inSequenceNode; }
+                    }
+               }
+            }
         }
     }
     return nullptr;
@@ -285,6 +289,7 @@ Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByID(ne::Nod
 
 Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByPinID(ne::PinId const id)
 {
+    /* nodes in Sequence have no visible/usable pins */
     if (id)
     {
         for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
@@ -342,7 +347,6 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::getSelectedWorkspac
     std::vector<Ptr<WorkspaceNodeWithCoreData>> allSelectedCoreNodes;
     std::vector<ne::NodeId> allSelectedNodesIDs;
     Ptr<WorkspaceNodeWithCoreData> temp;
-    Ptr<WorkspaceSequence> temp_sequence;
 
     int numOfSelectedObjects = ne::GetSelectedObjectCount(); /* not Nodes only */
 
@@ -402,8 +406,8 @@ void WorkspaceWindow::checkQueryElements()
 {
     if (!m_createNewNode)
     {
+        checkQueryElementsDeleting(); /* \todo JH order is important */
         checkQueryElementsCreating();
-        checkQueryElementsDeleting();
 
     }
 }
@@ -447,7 +451,6 @@ void WorkspaceWindow::checkQueryLinkCreate()
     }
 
 }
-
 
 void WorkspaceWindow::checkQueryNodeCreate()
 {
@@ -511,14 +514,13 @@ void WorkspaceWindow::checkQueryNodeDelete()
 
 void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
 {
-    coreNodeIter id = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->getId() == nodeId; });
-    if (id != m_workspaceCoreNodes.end())
+    coreNodeIter node_iter = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->getId() == nodeId; });
+    if (node_iter != m_workspaceCoreNodes.end())
     {
-        m_workspaceCoreNodes.erase(id);
+        m_workspaceCoreNodes.erase(node_iter);
     }
 
 }
-
 
 void WorkspaceWindow::UpdateTouchAllNodes()
 {
@@ -671,7 +673,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("transformation operators");
 				ImGui::Separator();
 				if (ImGui::MenuItem("translate")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleX")) {
@@ -683,7 +685,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("rotate")) {
 				}
 				if (ImGui::MenuItem("scale")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("ortho")) {
@@ -702,25 +704,25 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("matrix operators");
 				ImGui::Separator();
 				if (ImGui::MenuItem("matrix")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixFree>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("trackball")) {
 				}
 				if (ImGui::MenuItem("inversion")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixInversion>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixInversion>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("transpose")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixTranspose>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranspose>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("determinant")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceDeterminant>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceDeterminant>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat * mat")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulMatrix>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixMulMatrix>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat + mat")) {
@@ -766,7 +768,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("vec4 operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("vec4")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorFree>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceVectorFree>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 . vec4")) {
@@ -778,7 +780,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("float * vec4")) {
 				}
 				if (ImGui::MenuItem("normalize vec4")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceNormalizeVector>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("perspective division")) {
@@ -836,7 +838,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("float operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("float")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatFree>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceFloatFree>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("clamp float")) {
@@ -907,7 +909,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 		}
 		if (ImGui::MenuItem("sequence")) {
-           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSequence>(m_headerBackgroundTexture));
+           m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>(m_headerBackgroundTexture));
             ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 		if (ImGui::MenuItem("camera")) {

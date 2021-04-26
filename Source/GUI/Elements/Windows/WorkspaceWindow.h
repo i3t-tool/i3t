@@ -18,6 +18,21 @@
 #include "Config.h"
 #include "Core/Application.h"
 #include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "../Nodes/WorkspaceMatrixFree.h"
+#include "../Nodes/WorkspaceMatrixScale.h"
+#include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceMatrixInversion.h"
+#include "../Nodes/WorkspaceMatrixMulMatrix.h"
+#include "../Nodes/WorkspaceMatrixTranspose.h"
+#include "../Nodes/WorkspaceDeterminant.h"
+#include "../Nodes/WorkspaceSequence.h"
+
+#include "../Nodes/WorkspaceFloatFree.h"
+
+#include "../Nodes/WorkspaceVectorFree.h"
+#include "../Nodes/WorkspaceNormalizeVector.h"
+
+
 #include "pgr.h"
 #include <memory>
 
@@ -38,35 +53,6 @@
 namespace ne = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
 
-/* >>> Static function <<< */ //{
-
-/*! \fn static inline ImRect ImGui_GetItemRect()
-    \brief Get ImRect of last  ( \todo active/added ?) item
-    \return ImRect : New ImRect with position and size of last item
-*/
-static inline ImRect ImGui_GetItemRect()
-{
-	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
-}
-
-/*! \fn static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
-    \brief Enlarge given ImRect (create new / enlarge given ?)
-     \param[in/out?] rect ImRect& for enlarge
-     \param[in] x float value added to left and right
-     \param[in] y float value added to up an d down
-    \return ImRect New
-*/
-static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
-{
-	auto result = rect;
-	result.Min.x -= x;
-	result.Min.y -= y;
-	result.Max.x += x;
-	result.Max.y += y;
-	return result;
-}
-//} /* >>> Static functions - end <<< */
-
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
 /*! \class class for Workspace window object
@@ -78,11 +64,12 @@ public:
 	I3T_WINDOW(WorkspaceWindow)
 
 	Application& m_wholeApplication;
-	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene */
+	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene - its wrapper for api functions only */
+	ne::Detail::EditorContext* m_ne_usable; /*! \brief On this object you can call inner functions */
 
 	ImTextureID m_headerBackgroundTexture;
 
-	util::NodeBuilder m_nodeBuilderContext; /* \todo builder as variable of WorkspceWindow?*/
+	util::NodeBuilder m_nodeBuilderContext;
 
     /* \todo JH better name for this atributes - for better description what they do... */
     Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewLink = nullptr;
@@ -99,11 +86,18 @@ public:
 	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
 
+	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
+	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
+
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
 	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
+
+    std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
+	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
 
 	WorkspaceWindow(bool show);
 	~WorkspaceWindow();
@@ -128,8 +122,6 @@ public:
     void NodeDelete(ne::NodeId nodeId);
 
     void checkQueryContextMenus();
-
-    void checkSequenceSelections();
 
     void shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
     void shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
