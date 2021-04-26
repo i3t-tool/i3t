@@ -82,7 +82,7 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder)
 int WorkspaceVector3::maxLenghtOfData()
 {
     int act, maximal = 0;
-    const glm::vec4& coreData = m_nodebase->getData().getVec4();
+    const glm::vec3& coreData = m_nodebase->getData().getVec3();
 
     for(int column=0; column < 3; column++)
     {
