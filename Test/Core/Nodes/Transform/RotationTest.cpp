@@ -307,3 +307,17 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
   }
 	EXPECT_EQ(expectedMat, axisAngle->getData().getMat4());
 }
+
+//===-- Quaternion rotation test ------------------------------------------===//
+
+TEST(QuatRotTest, RotShouldBeValid)
+{
+	auto rot = Builder::createTransform<QuatRot>();
+
+	auto vec = generateVec3();
+	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z);
+
+	setValue_expectOk(rot, quat);
+
+	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(quat));
+}

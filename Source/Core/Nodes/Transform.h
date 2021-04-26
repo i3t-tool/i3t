@@ -268,6 +268,11 @@ public:
 			: Transformation(getTransformProps(ETransformType::Quat)), m_initialQuat(q)
 	{
 	}
+
+	void reset() override;
+
+	ValueSetResult setValue(const glm::quat& vec);
+	ValueSetResult setValue(const glm::vec4& vec) override;
 };
 
 
