@@ -10,33 +10,33 @@
 
 /**
 * \struct Mat4types
-* List of types of matrix transformation. First parameter of script function mat4 must be one of these values.
-* Same-named members of Mat4transform must be equal to those of Mat4Operators
+* List of types of matrix operators. First parameter of script function mat4oper or mat4 must be one of these values.
 */
-struct Mat4Transforms {
-	const int free = 8, uniscale = 9, scale = 10,translate = 11, rotatex = 12, rotatey = 13, rotatez = 14;
-};
-/**
-* \struct Mat4Operators
-* List of types of matrix operators. First parameter of script function mat4oper must be one of these values.
-*/
-struct Mat4Operators {
-	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmul=5,matadd=6,matmulvec=7,vecmulmat=8,floatmulmat=9;
+struct Mat4types {
+	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmulvec=7,vecmulmat=8,floatmulmat=9;
 	const int scale = 10, translate=11,rotatex =12,rotatey=13,rotatez=14,axisangle=15,ortho=16,perspective=17,frustrum=18,lookAt=19;
+	const int free = 20, uniscale = 21;
 };
 /**
-* \struct Vec4Operators
+* \struct VecOperators
 * List of types of vector operators. First parameter of script function vec4oper must be one of these values.
 */
-struct Vec4Operators {
-	const int norm=0;
+struct VecOperators {
+	const int cross=100,dot=101,norm=102,length=103,vecmulfloat=104,perspdiv=105;
 };
 /**
-* \struct Mat4Operators
+* \struct FloatOperators
 * List of types of float operators. First parameter of script function float4oper (not implemented yet) must be one of these values.
 */
 struct FloatOperators {
-	const int clamp=0,cycle=1,mul=2,add=3,div=4,pow=5,mix=6,sincos=7,asinacos=8,signum=9;
+	const int clamp=200,cycle=201,pow=205,sincos=207,asinacos=208,signum=209;
+};
+/**
+* \struct ArithmeticOperators
+* Must not collide with other types.
+*/
+struct ArithmeticOperators {
+	const int add=300, substract=301, div=302, mul=303,show=304,mix=305;
 };
 /**
 * \struct Node4LODs
@@ -52,10 +52,10 @@ struct NodeLODs {
 * 
 */
 struct ScriptingData {
-	Mat4Transforms mat4Transforms;
-	Mat4Operators mat4Operators;
-	Vec4Operators vec4Operators;
+	Mat4types mat4Types;
+	VecOperators vecOperators;
 	FloatOperators floatOperators;
+	ArithmeticOperators arithmeticOperators;
 	NodeLODs nodeLODs;
 	std::vector<glm::mat4>nodeData;///<Vector of data as mat4, that were created by script. Serves as temporary static storage. Not needed after script is executed.
 };
