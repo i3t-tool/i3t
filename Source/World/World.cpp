@@ -257,6 +257,7 @@ void World::tmpSetNode() {
     else if(InputManager::isKeyPressed(Keys::y)){op=Core::Builder::createTransform<Core::EulerRotY>();}
     else if(InputManager::isKeyPressed(Keys::z)){op=Core::Builder::createTransform<Core::EulerRotZ>();}
     else if(InputManager::isKeyPressed(Keys::w)){op=Core::Builder::createTransform<Core::AxisAngleRot>();}
+    else if(InputManager::isKeyPressed(Keys::q)){op=Core::Builder::createTransform<Core::QuatRot>();}
     else if(InputManager::isKeyPressed(Keys::s)){op=Core::Builder::createTransform<Core::Scale>();}
     else if(InputManager::isKeyPressed(Keys::t)){op=Core::Builder::createTransform<Core::Translation>();}
     else if(InputManager::isKeyPressed(Keys::o)){op=Core::Builder::createTransform<Core::OrthoProj>();}

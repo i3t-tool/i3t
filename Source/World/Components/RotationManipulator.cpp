@@ -75,6 +75,11 @@ void RotationManipulator::update() {
 	else if(strcmp(oper,"EulerY")==0){m_allowedaxis|=s_y;}
 	else if(strcmp(oper,"EulerZ")==0){m_allowedaxis|=s_z;}
 	else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x;}
+	/*else if(strcmp(oper,"Quat")==0){
+		m_allowedaxis|=s_x;
+		Core::QuatRot* editedquat = (Core::QuatRot*)m_editednode.get();
+		//editedquat->
+	}*/
 	///
 	bool transactionBegin=false;
 
