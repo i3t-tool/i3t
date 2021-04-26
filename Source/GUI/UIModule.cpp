@@ -201,6 +201,9 @@ void UIModule::queryCameraState()
   }
 }
 
+/**
+ * Not thread safe (using strtok).
+ */
 std::string makeIDNice(const char* ID)
 {
   // Remove ## or ### from ImGui window name.

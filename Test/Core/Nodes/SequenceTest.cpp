@@ -128,6 +128,14 @@ TEST(SequenceTest, SequenceCantBeSelfPlugged)
 		auto result = GraphManager::plug(seq1, seq1, 1, 1);
     EXPECT_EQ(ENodePlugResult::Err_Loopback, result);
 	}
+  {
+    auto result = GraphManager::plug(seq1, seq1, 0, 1);
+    EXPECT_EQ(ENodePlugResult::Err_MismatchedPinTypes, result);
+	}
+  {
+    auto result = GraphManager::plug(seq1, seq1, 1, 0);
+    EXPECT_EQ(ENodePlugResult::Err_MismatchedPinTypes, result);
+  }
 }
 
 /**

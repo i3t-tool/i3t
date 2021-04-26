@@ -439,7 +439,7 @@ static const std::vector<Operation> g_transforms = {
 		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX } },            // eulerAngleX
 		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY } },            // eulerAngleY
 		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ } },            // eulerAngleZ
-		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale } },                                            // scale
+		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale, &Transform::g_UniformScale } },                                            // scale
 		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },          // rotate
 		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },                 // quat rotate
 		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho
