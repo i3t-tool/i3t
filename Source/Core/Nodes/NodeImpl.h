@@ -153,7 +153,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulVector>::updateValues
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		m_internalData[0].setValue(glm::vec4());
 	}
 }
 

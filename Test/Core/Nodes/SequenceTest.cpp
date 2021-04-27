@@ -189,18 +189,3 @@ TEST(SequenceTest, ThreeSequencesComposeMatrices)
     EXPECT_EQ(expectedMat, seq3->getData().getMat4());
   }
 }
-
-TEST(_, _)
-{
-	auto seq = Builder::createSequence();
-	auto scale = Builder::createTransform<Scale>();
-
-	seq->addMatrix(scale);
-
-	setValue_expectOk(scale, generateVec3());
-
-	auto expected = scale->getData().getMat4();
-
-	EXPECT_EQ(expected, seq->getData().getMat4());
-	EXPECT_EQ(expected, seq->getData(1).getMat4());
-}
