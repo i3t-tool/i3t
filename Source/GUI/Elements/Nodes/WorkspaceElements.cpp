@@ -3,19 +3,27 @@
 #include "spdlog/fmt/fmt.h"
 #include <string>
 
+
+
 // #include <format> // not as standard library yet
 
 std::map<EValueType, ImColor> WorkspacePinColor = {
-		{EValueType::Float, ImColor(255, 255, 255)},    {EValueType::Matrix, ImColor(150, 8, 8)},
+		{EValueType::Float, ImColor(58, 144, 66)},    {EValueType::Matrix, ImColor(178, 71, 66)},
 		{EValueType::MatrixMul, ImColor(68, 201, 156)}, {EValueType::Pulse, ImColor(147, 226, 74)},
-		{EValueType::Quat, ImColor(124, 21, 153)},      {EValueType::Screen, ImColor(51, 150, 215)},
-		{EValueType::Vec3, ImColor(218, 0, 183)},       {EValueType::Vec4, ImColor(255, 48, 48)}};
+		{EValueType::Quat, ImColor(178, 144, 66)},      {EValueType::Screen, ImColor(51, 150, 215)},
+		{EValueType::Vec3, ImColor(58, 84, 187)},       {EValueType::Vec4, ImColor(106, 96, 67)}};
 
 std::map<EValueType, IconType> WorkspacePinShape = {
-		{EValueType::Float, IconType::Circle},     {EValueType::Matrix, IconType::Arrow},
+		{EValueType::Float, IconType::Arrow},     {EValueType::Matrix, IconType::Arrow},
 		{EValueType::MatrixMul, IconType::Circle}, {EValueType::Pulse, IconType::Circle},
-		{EValueType::Quat, IconType::Circle},      {EValueType::Screen, IconType::Circle},
-		{EValueType::Vec3, IconType::Circle},      {EValueType::Vec4, IconType::Square}};
+		{EValueType::Quat, IconType::Arrow},      {EValueType::Screen, IconType::Circle},
+		{EValueType::Vec3, IconType::Arrow},      {EValueType::Vec4, IconType::Arrow}};
+
+std::map<EValueType, ImColor> WorkspaceInnerPinColor = {
+		{EValueType::Float, ImColor(164, 191, 168)},    {EValueType::Matrix, ImColor(201, 169, 168)},
+		{EValueType::MatrixMul, ImColor(68, 201, 156)}, {EValueType::Pulse, ImColor(147, 226, 74)},
+		{EValueType::Quat, ImColor(201, 191, 168)},      {EValueType::Screen, ImColor(51, 150, 215)},
+		{EValueType::Vec3, ImColor(164, 172, 205)},       {EValueType::Vec4, ImColor(179, 176, 168)} };
 
 std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
     {WorkspaceLevelOfDetail::Full, "Full"},
@@ -58,22 +66,41 @@ ImTextureID WorkspaceNode::getHeaderBackground()
     return m_headerBackground;
 }
 
-void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin)
+void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
 {
+
 	builder.Begin(m_id);
 
 	drawHeader(builder);
-	drawInputs(builder, newLinkPin);
-	drawData(builder);
-	drawOutputs(builder, newLinkPin);
 
+    if (withPins)
+    {
+        drawInputs(builder, newLinkPin);
+    }
+
+	//
+	//ImGui::BeginChild("myID");
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.5f);
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(164, 171, 190, 1));
+
+	drawData(builder);
+
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+
+    if (withPins)
+    {
+        drawOutputs(builder, newLinkPin);
+    }
+
+	//ImGui::EndChild();
 	builder.End();
 }
 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
-	builder.Header(m_color);
 
+    builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y

@@ -29,6 +29,35 @@
 #include <vector>
 #include <initializer_list>
 
+/* >>> Static function <<< */ //{
+
+/*! \fn static inline ImRect ImGui_GetItemRect()
+    \brief Get ImRect of last  ( \todo active/added ?) item
+    \return ImRect : New ImRect with position and size of last item
+*/
+static inline ImRect ImGui_GetItemRect()
+{
+	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+}
+
+/*! \fn static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
+    \brief Enlarge given ImRect (create new / enlarge given ?)
+     \param[in/out?] rect ImRect& for enlarge
+     \param[in] x float value added to left and right
+     \param[in] y float value added to up an d down
+    \return ImRect New
+*/
+static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
+{
+	auto result = rect;
+	result.Min.x -= x;
+	result.Min.y -= y;
+	result.Max.x += x;
+	result.Max.y += y;
+	return result;
+}
+//} /* >>> Static functions - end <<< */
+
 using ax::Widgets::IconType;
 namespace util = ax::NodeEditor::Utilities;
 
@@ -57,6 +86,7 @@ extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
 
 extern std::map<EValueType, ImColor> WorkspacePinColor;
 extern std::map<EValueType, IconType> WorkspacePinShape;
+extern std::map<EValueType, ImColor> WorkspaceInnerPinColor;
 
 
 /* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
@@ -89,7 +119,7 @@ public:
     virtual std::string getHeaderLabel();
     virtual ImTextureID getHeaderBackground();
 
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin=nullptr, bool withPins=true);
 
 	virtual void drawHeader(util::NodeBuilder& builder);
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;

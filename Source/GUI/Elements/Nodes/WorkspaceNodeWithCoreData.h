@@ -2,7 +2,7 @@
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 #include "WorkspaceElements.h"
 
-#include "WorkspaceElements.h"
+#include "Utils/NodeEditorStyle.h"
 
 class WorkspaceCorePinProperties;
 
@@ -37,18 +37,19 @@ struct WorkspaceNodeWithCoreDataArgs
 class WorkspaceNodeWithCoreData : public WorkspaceNode
 {
 protected:
-    int m_numberOfVisibleDecimal = 2; /* \todo JH default number from some setting */
-    float m_dataItemsWidth = 100; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
-
-	WorkspaceLevelOfDetail m_levelOfDetail=WorkspaceLevelOfDetail::Full;/* DG was not initialized - getLevelOfDetail returned garbage */
+    int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
+    float m_dataItemsWidth = 25; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
+public:
+	
+	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
+                                                WorkspaceNodeWithCoreData is owner
+                                           */
+	WorkspaceLevelOfDetail m_levelOfDetail;
 
     std::vector<Ptr<WorkspaceLinkProperties>> m_workspaceLinksProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceInputsProperties;
 	std::vector<Ptr<WorkspaceCorePinProperties>> m_workspaceOutputsProperties;
 
-	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
-                                                WorkspaceNodeWithCoreData is owner
-                                           */
 
 public:
 	floatWindow fw; /* \todo create it protected */
@@ -58,9 +59,14 @@ public:
 
     Ptr<Core::NodeBase> const getNodebase() const;
 
-    virtual std::vector<Ptr<WorkspaceLinkProperties>> const &getLinksProperties() const;
-    virtual std::vector<Ptr<WorkspaceCorePinProperties>> const &getInputsProperties() const;
-    virtual std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
+    std::vector<Ptr<WorkspaceLinkProperties>> const &getLinksProperties() const;
+    std::vector<Ptr<WorkspaceCorePinProperties>> const &getInputsProperties() const;
+    std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
+
+    virtual bool isSequence();
+    bool inSequence();
+    bool isTransformation();
+
 
     int getNumberOfVisibleDecimal();
     int setNumberOfVisibleDecimal(int value);
@@ -80,6 +86,9 @@ public:
 	virtual void drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters, std::vector<unsigned char> datamap_values);
 
 	virtual void drawInputLinks();
+
+	void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+    void drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
 
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawData(util::NodeBuilder& builder);

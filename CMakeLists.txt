@@ -158,7 +158,8 @@ list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
 
 # Add ImGui_node_editor source files.
 list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.cpp)
+# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.cpp)
+list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor.cpp)
 list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_bezier_math.h)
 list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_canvas.cpp)
 list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_canvas.h)

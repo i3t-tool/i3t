@@ -53,7 +53,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
         m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())
+                , fmt::format("##{}", pin.getIndex())   //SS TODO make map of labels
                 , pin
                 , *this ));
 
@@ -110,6 +110,26 @@ std::vector<Ptr<WorkspaceLinkProperties>> const& WorkspaceNodeWithCoreData::getL
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getInputsProperties() const  { return m_workspaceInputsProperties; }
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getOutputsProperties() const { return m_workspaceOutputsProperties; }
 
+bool WorkspaceNodeWithCoreData::isSequence()
+{
+    return false;
+}
+
+bool WorkspaceNodeWithCoreData::isTransformation()
+{
+    return m_nodebase->as<Core::Transformation>() != nullptr;
+}
+
+bool WorkspaceNodeWithCoreData::inSequence()
+{
+    if (isTransformation())
+    {
+        return m_nodebase->as<Core::Transformation>()->isInSequence();
+    }
+    return false;
+}
+
+
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
 {
     return m_numberOfVisibleDecimal;
@@ -129,7 +149,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 20, padding = 10; /* \todo JH take from some font setting */
+    float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -166,7 +186,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-		//ImGui::PushStyleVar();
 	}
 
 	ImGui::SameLine();
@@ -198,7 +217,7 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
     ImGui::PushItemWidth(m_dataItemsWidth);
     for (int i = 0; i < number_of_values; i++)
     {
-        ImGui::Text( labels[i].c_str() );
+        ImGui::TextUnformatted( labels[i].c_str() );
         localData = getters[i]();
         if (drawDragFloatWithMap_Inline(&localData,
                                         datamap_values[i],
@@ -218,7 +237,7 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
 		setDataItemsWidth();
 	}
 
-    ImGui::Spring(0); /* \todo JH what is Spring? */
+    ImGui::Spring(0);
 
 }
 
@@ -240,7 +259,7 @@ void WorkspaceNodeWithCoreData::drawMenuSetDataMap()
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 {
     if (ImGui::BeginMenu("Precision")) {
-        ImGui::Text(fmt::format("Actual precision: {}", getNumberOfVisibleDecimal()).c_str());
+        ImGui::TextUnformatted(fmt::format("Actual precision: {}", getNumberOfVisibleDecimal()).c_str());
         ImGui::Separator();
         for(int i = 0; i < 5; i++) /* \todo JH some better setter for precision */
         {
@@ -256,7 +275,7 @@ void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 void WorkspaceNodeWithCoreData::drawMenuLevelOfDetail()
 {
     if (ImGui::BeginMenu("Level of detail")) {
-        ImGui::Text(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[m_levelOfDetail]).c_str());
+        ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[m_levelOfDetail]).c_str());
         ImGui::Separator();
 
         for (auto const& [levelOfDetail, LoDname] : WorkspaceLevelOfDetailName)
@@ -287,7 +306,6 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 {
     builder.Middle();
-
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
@@ -308,8 +326,39 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 
 void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
 {
-    ImGui::Text(m_label.c_str());
+    ImGui::TextUnformatted(m_label.c_str());
     ImGui::Spring(0);
+}
+
+
+void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin)
+{
+    float alpha = ImGui::GetStyle().Alpha;
+    //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
+    //          alpha = alpha * (48.0f / 255.0f);
+
+    builder.Input(pinProp->getId());
+
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+    // color.Value.w = alpha / 255.0f;
+    ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
+                        WorkspacePinShape[pinProp->getType()],
+                        pinProp->isConnected(),
+                        WorkspacePinColor[pinProp->getType()],
+                        pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
+
+    ImGui::Spring(0);
+
+    if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+    {
+        ImGui::TextUnformatted(pinProp->getLabel().c_str());
+        ImGui::Spring(0);
+    }
+
+    ImGui::PopStyleVar();
+    builder.EndInput();
+
 }
 
 /* \todo use newLinkPin arg*/
@@ -317,32 +366,47 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 {
 	for (auto const & pinProp : m_workspaceInputsProperties)
 	{
-		float alpha = ImGui::GetStyle().Alpha;
-		//        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
-		//          alpha = alpha * (48.0f / 255.0f);
-
-		builder.Input(pinProp->getId());
-
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-
-		// color.Value.w = alpha / 255.0f;
-		ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
-                            WorkspacePinShape[pinProp->getType()],
-                            pinProp->isConnected(),
-                            WorkspacePinColor[pinProp->getType()],
-                            pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
-
-		ImGui::Spring(0);
-
-		if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-		{
-			ImGui::TextUnformatted(pinProp->getLabel().c_str());
-			ImGui::Spring(0);
-		}
-
-		ImGui::PopStyleVar();
-		builder.EndInput();
+	    if(pinProp->getType() == EValueType::MatrixMul)
+        {
+            drawInputPin(builder, pinProp, newLinkPin);
+        }
 	}
+	ImGui::Spring(2);
+    for (auto const & pinProp : m_workspaceInputsProperties)
+	{
+	    if(pinProp->getType() == EValueType::Matrix)
+        {
+            drawInputPin(builder, pinProp, newLinkPin);
+        }
+	}
+}
+
+void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin)
+{
+    float alpha = ImGui::GetStyle().Alpha;
+    //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
+    //          alpha = alpha * (48.0f / 255.0f);
+
+    builder.Output(pinProp->getId());
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+    if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+    {
+        ImGui::TextUnformatted(pinProp->getLabel().c_str());
+        ImGui::Spring(0);
+    }
+
+    // color.Value.w = alpha / 255.0f;
+    ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
+                        WorkspacePinShape[pinProp->getType()],
+                        pinProp->isConnected(),
+                        WorkspacePinColor[pinProp->getType()],
+                        pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
+    ImGui::Spring(0);
+
+    ImGui::PopStyleVar();
+    builder.EndOutput();
+
 }
 
 /* \todo use newLinkPin arg*/
@@ -350,29 +414,18 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 {
 	for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
-		float alpha = ImGui::GetStyle().Alpha;
-		//        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
-		//          alpha = alpha * (48.0f / 255.0f);
-
-		builder.Output(pinProp->getId());
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-
-		if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-		{
-			ImGui::TextUnformatted(pinProp->getLabel().c_str());
-			ImGui::Spring(0);
-		}
-
-		// color.Value.w = alpha / 255.0f;
-		ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
-                            WorkspacePinShape[pinProp->getType()],
-                            pinProp->isConnected(),
-                            WorkspacePinColor[pinProp->getType()],
-                            pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
-		ImGui::Spring(0);
-
-		ImGui::PopStyleVar();
-		builder.EndOutput();
+	    if(pinProp->getType() == EValueType::MatrixMul)
+        {
+            drawOutputPin(builder, pinProp, newLinkPin);
+        }
+	}
+	ImGui::Spring(2);
+    for (auto const & pinProp : m_workspaceOutputsProperties)
+	{
+	    if(pinProp->getType() == EValueType::Matrix)
+        {
+            drawOutputPin(builder, pinProp, newLinkPin);
+        }
 	}
 }
 
