@@ -4,6 +4,7 @@
  * \file Scripting.h
  * \author Daniel Gruncl
  * \brief Interpreter of c scripts.
+ * \date 11.3.2021
  */
  //---------------
 #include "Dependencies/picoc/picoc.h"
@@ -15,15 +16,19 @@
 
 #define PICOC_STACK_SIZE (32*1024)       /* space for the the stack */
 
-bool LoadWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
-bool SaveWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
-//std::vector<WorkspaceMatrix4x4>* LoadWorkspace();
-int PicocRunInteractive();
-int PicocRunFile(const char* filename);
-int PicocRunSource(const char* source);
+bool loadWorkspace(const char*filename);
+bool saveWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>*_workspace);
+//std::vector<WorkspaceMatrix4x4>* loadWorkspace();
+int picocRunInteractive();
+int picocRunFile(const char* filename);
+int picocRunSource(const char* source);
 
-//struct Picoc;
 
+/**
+* \class Scripting
+ * Contains instance of picoc interpreter. Context of interpreter is kept whole during whole lifetime of Scripting instance,
+ * which allows to proces multiple batches of commands, unlike picocRun* functions, which can run only one batch of commands.
+ */
 class Scripting {
 public:
 	Scripting();

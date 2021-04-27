@@ -3,7 +3,6 @@
  
 #include "interpreter.h"
 
-
 /* some basic types */
 static int PointerAlignBytes;
 static int IntAlignBytes;

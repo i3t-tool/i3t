@@ -1,12 +1,12 @@
 /* stdio.h library for large systems - small embedded systems use clibrary.c instead */
 #ifndef BUILTIN_MINI_STDLIB
 
-
 #include <errno.h>
 #include "../interpreter.h"
 
 #define MAX_FORMAT 80
 #define MAX_SCANF_ARGS 10
+
 
 static int Stdio_ZeroValue = 0;
 static int EOFValue = EOF;

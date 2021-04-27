@@ -3,7 +3,6 @@
 /* mark where to end the program for platforms which require this */
 jmp_buf PicocExitBuf;
 
-
 void PlatformInit(Picoc *pc)
 {
 }

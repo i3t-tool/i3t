@@ -5,7 +5,6 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
-
 #include "platform.h"
 
 #include <stdio.h>
@@ -536,7 +535,7 @@ int VariableDefined(Picoc* pc, const char* Ident);
 int VariableDefinedAndOutOfScope(Picoc* pc, const char* Ident);
 void VariableRealloc(struct ParseState* Parser, struct Value* FromValue, int NewSize);
 void VariableGet(Picoc* pc, struct ParseState* Parser, const char* Ident, struct Value** LVal);
-void VariableDefinePlatformVar(Picoc* pc, struct ParseState* Parser, char* Ident, struct ValueType* Typ, union AnyValue* FromValue, int IsWritable);
+void VariableDefinePlatformVar(Picoc* pc, struct ParseState* Parser, const char* Ident, struct ValueType* Typ, union AnyValue* FromValue, int IsWritable);
 void VariableStackFrameAdd(struct ParseState* Parser, const char* FuncName, int NumParams);
 void VariableStackFramePop(struct ParseState* Parser);
 struct Value* VariableStringLiteralGet(Picoc* pc, char* Ident);

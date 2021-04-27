@@ -10,7 +10,7 @@
 
 #include "Node.h"
 
-#include "World2/GameObject.h"
+#include "World/GameObject.h"
 
 namespace Core
 {

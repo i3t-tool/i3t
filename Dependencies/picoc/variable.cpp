@@ -1,6 +1,5 @@
 /* picoc variable storage. This provides ways of defining and accessing
  * variables */
- 
 
 #include "interpreter.h"
 
@@ -372,7 +371,7 @@ void VariableGet(Picoc *pc, struct ParseState *Parser, const char *Ident, struct
 }
 
 /* define a global variable shared with a platform global. Ident will be registered */
-void VariableDefinePlatformVar(Picoc *pc, struct ParseState *Parser, char *Ident, struct ValueType *Typ, union AnyValue *FromValue, int IsWritable)
+void VariableDefinePlatformVar(Picoc *pc, struct ParseState *Parser, const char *Ident, struct ValueType *Typ, union AnyValue *FromValue, int IsWritable)
 {
     struct Value *SomeValue = VariableAllocValueAndData(pc, NULL, 0, IsWritable, NULL, TRUE);
     SomeValue->Typ = Typ;

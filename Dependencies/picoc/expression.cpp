@@ -18,7 +18,7 @@
 #ifdef DEBUG_EXPRESSIONS
 #define debugf printf
 #else
-void debugf(char *Format, ...)
+void debugf(const char *Format, ...)
 {
 }
 #endif
@@ -31,6 +31,7 @@ enum OperatorOrder
     OrderInfix,
     OrderPostfix
 };
+
 
 /* a stack of expressions we use in evaluation */
 struct ExpressionStack
@@ -48,7 +49,7 @@ struct OpPrecedence
     unsigned int PrefixPrecedence:4;
     unsigned int PostfixPrecedence:4;
     unsigned int InfixPrecedence:4;
-    char *Name;
+    const char *Name;
 };
 
 /* NOTE: the order of this array must correspond exactly to the order of these tokens in enum LexToken */

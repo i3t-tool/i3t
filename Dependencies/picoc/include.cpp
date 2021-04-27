@@ -15,7 +15,6 @@ void IncludeInit(Picoc *pc)
 #endif
 }
 
-
 /* clean up space used by the include system */
 void IncludeCleanup(Picoc *pc)
 {

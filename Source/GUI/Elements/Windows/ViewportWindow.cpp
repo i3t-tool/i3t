@@ -7,15 +7,15 @@
 #include "Core/Input/InputActions.h"
 #include "Core/Input/InputManager.h"
 
-#include "../../../World2/Select.h"
-#include "../../../World2/World2.h"
+#include "../../../World/Select.h"
+#include "../../../World/World.h"
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
 using namespace UI;
 
 /// \todo Use Framebuffer class.
-Viewport::Viewport(bool show, World2* world2) : IWindow(show)
+Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world2 = world2;
 

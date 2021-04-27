@@ -3,15 +3,71 @@
 #include "Scripting.h"
 #include "libraryI3T.h"
 #include "Commands/ApplicationCommands.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
-#include "GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
+
+//transformations{
+#include "Source/GUI/Elements/Nodes/WorkspaceSequence.h"
+//} tranformationa end
+
+//operators {
+
+//	transformations{
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixRotate.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerX.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerY.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerZ.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeFrustum.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeLookAt.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeOrtho.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakePerspective.h"
+//	} tranformationa end
+
+//	matrix{
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixFree.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixInversion.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixMulMatrix.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixTranspose.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceDeterminant.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixAddMatrix.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixMulFloat.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrixMulVector.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorMulMatrix.h"
+//	} matrix end
+
+//	vec4{
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorFree.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorDotVector.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorAddVector.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorSubVector.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorMulFloat.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVectorPerspectiveDivision.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMixVector.h"
+//	} vec4 end
+
+//	vec4{
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3Free.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceNormalizeVector3.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3CrossVector3.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3DotVector3.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3AddVector3.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3SubVector3.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3MulFloat.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceVector3Length.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceShowVector3.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMixVector3.h"
+//	} vec4 end
+
+//	float{
+#include "Source/GUI/Elements/Nodes/WorkspaceFloatFree.h"
+//	} float end
+//}operators end
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
+bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
 	FILE*f=fopen(filename,"w");
 	if(f==NULL){return false;}
 	fprintf(f,"//saving\n");
@@ -38,21 +94,73 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			fprintf(f, "int d%d=datavec3(%0.3ff,%0.3ff,%0.3ff);\n", i, s[0], s[1], s[2]);
 			fprintf(f, "int n%d=mat4(translate,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1],label.c_str());
 		}
-		//vec4
-		else if (strcmp(keyword, "Vector4ToVector4") == 0) {
-			glm::vec4 vec4 = nodebase->getData().getVec4();
-			fprintf(f,"int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i, vec4[0], vec4[1], vec4[2],vec4[3]);
-			fprintf(f,"int n%d=vec4(d%d,%d,%d,\"%s\");\n", i,i, (int)pos[0], (int)pos[1], label.c_str());
-		}
 		//float
 		else if (strcmp(keyword, "FloatToFloat") == 0) {
 			float v = nodebase->getData().getFloat();
 			fprintf(f,"int d%d=datascalar(%0.3ff);\n", i, v);
 			fprintf(f,"int n%d=scalar(d%d,%d,%d,\"%s\");\n", i,i, (int)pos[0], (int)pos[1], label.c_str());
 		}
-		//normvec4
+		//vec4
+		else if (strcmp(keyword, "Vector4ToVector4") == 0) {
+			glm::vec4 vec4 = nodebase->getData().getVec4();
+			fprintf(f, "int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i, vec4[0], vec4[1], vec4[2], vec4[3]);
+			fprintf(f, "int n%d=vec4(d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		//vec4oper
+		else if (strcmp(keyword, "VectorDotVector") == 0) {
+			fprintf(f, "int n%d=vec4oper(dot,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorAddVector") == 0) {
+			fprintf(f, "int n%d=vec4oper(add,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorSubVector") == 0) {
+			fprintf(f, "int n%d=vec4oper(sub,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorMulFloat") == 0) {
+			fprintf(f, "int n%d=vec4oper(vecmulfloat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorPerspectiveDivision") == 0) {
+			fprintf(f, "int n%d=vec4oper(perspdiv,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		else if (strcmp(keyword, "NormalizeVector") == 0) {
-			fprintf(f,"int n%d=vec4oper(norm,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+			fprintf(f, "int n%d=vec4oper(norm,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MixVector") == 0) {
+			fprintf(f, "int n%d=vec4oper(mix,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		//vec3
+		else if (strcmp(keyword, "Vector3ToVector3") == 0) {
+			glm::vec3 vec3 = nodebase->getData().getVec3();
+			fprintf(f, "int d%d=datavec3(%0.3ff,%0.3ff,%0.3ff);\n", i, vec3[0], vec3[1], vec3[2]);
+			fprintf(f, "int n%d=vec3(d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		//vec3oper
+		else if (strcmp(keyword, "Vector3CrossVector3") == 0) {
+			fprintf(f, "int n%d=vec3oper(cross,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3DotVector3") == 0) {
+			fprintf(f, "int n%d=vec3oper(dot,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3AddVector3") == 0) {
+			fprintf(f, "int n%d=vec3oper(add,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3SubVector3") == 0) {
+			fprintf(f, "int n%d=vec3oper(sub,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3MulFloat") == 0) {
+			fprintf(f, "int n%d=vec3oper(vecmulfloat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3Length") == 0) {
+			fprintf(f, "int n%d=vec3oper(length,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "ShowVector3") == 0) {
+			fprintf(f, "int n%d=vec3oper(show,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "NormalizeVector3") == 0) {
+			fprintf(f, "int n%d=vec3oper(norm,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MixVector3") == 0) {
+			fprintf(f, "int n%d=vec4oper(mix,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		//mat4oper
 		else if (strcmp(keyword, "Inversion") == 0) {
@@ -65,10 +173,53 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			fprintf(f,"int n%d=mat4oper(determinant,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "MatrixMulMatrix") == 0) {
-			fprintf(f, "int n%d=mat4oper(matmul,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+			fprintf(f, "int n%d=mat4oper(mul,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorMulMatrix") == 0) {
+			fprintf(f, "int n%d=mat4oper(vecmulmat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixMulVector") == 0) {
+			fprintf(f, "int n%d=mat4oper(matmulvec,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixMulFloat") == 0) {
+			fprintf(f, "int n%d=mat4oper(floatmulmat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixAddMatrix") == 0) {
+			fprintf(f, "int n%d=mat4oper(add,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "MatrixToMatrix") == 0) {
 			fprintf(f, "int n%d=mat4oper(matrix,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+
+		else if (strcmp(keyword, "MakePerspective") == 0) {
+			fprintf(f, "int n%d=mat4oper(perspective,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeOrtho") == 0) {
+			fprintf(f, "int n%d=mat4oper(ortho,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeFrustum") == 0) {
+			fprintf(f, "int n%d=mat4oper(frustrum,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeAxisAngle") == 0) {
+			fprintf(f, "int n%d=mat4oper(axisangle,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeEulerX") == 0) {
+			fprintf(f, "int n%d=mat4oper(rotatex,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeEulerY") == 0) {
+			fprintf(f, "int n%d=mat4oper(rotatey,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeEulerZ") == 0) {
+			fprintf(f, "int n%d=mat4oper(rotatez,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeScale") == 0) {
+			fprintf(f, "int n%d=mat4oper(scale,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeLookAt") == 0) {
+			fprintf(f, "int n%d=mat4oper(lookat,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MakeTranslation") == 0) {
+			fprintf(f, "int n%d=mat4oper(translate,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
 		}
 		//sequence
 		else if (strcmp(keyword, "Sequence") == 0) {
@@ -122,28 +273,28 @@ bool SaveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 	fclose(f);
 	return true;
 }
-bool LoadWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace) {
+bool loadWorkspace(const char* filename) {
 	ScriptingData*data=getScriptingData();
 	int datalen=(int)data->nodeData.size();
-	int p=PicocRunFile(filename);
+	int p=picocRunFile(filename);
 	while(data->nodeData.size()>datalen){data->nodeData.pop_back(); }
 	return true;
 }
-int PicocRunInteractive(){
+int picocRunInteractive(){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
 	if(PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
-	PlatformLibraryInitI3T(&pc);
+	platformLibraryInitI3T(&pc);
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocParseInteractive(&pc);
 	PicocCleanup(&pc);
 	return pc.PicocExitValue;
 }
-int PicocRunFile(const char* filename){
+int picocRunFile(const char* filename){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
 	if (PicocPlatformSetExitPoint(&pc)) {PicocCleanup(&pc); return pc.PicocExitValue;}
-	PlatformLibraryInitI3T(&pc);
+	platformLibraryInitI3T(&pc);
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocPlatformScanFile(&pc, filename);
 	PicocCleanup(&pc);
@@ -151,11 +302,11 @@ int PicocRunFile(const char* filename){
 	// for (; ParamCount < argc && strcmp(argv[ParamCount], "-") != 0; ParamCount++){PicocPlatformScanFile(&pc,
 	// argv[ParamCount]);}//run multiple files PicocCallMain(&pc, argc - ParamCount, &argv[ParamCount]);	//call main
 }
-int PicocRunSource(const char* source){
+int picocRunSource(const char* source){
 	Picoc pc;
 	PicocInitialise(&pc, PICOC_STACK_SIZE);
 	if (PicocPlatformSetExitPoint(&pc)){PicocCleanup(&pc); return pc.PicocExitValue;}
-	PlatformLibraryInitI3T(&pc);
+	platformLibraryInitI3T(&pc);
 	PicocIncludeAllSystemHeaders(&pc);
 	PicocParse(&pc, "somefilename", source, (int)strlen(source), TRUE, TRUE, TRUE, TRUE);
 	PicocCleanup(&pc);
@@ -169,7 +320,7 @@ void Scripting::runCommand(std::string cmd) {
 Scripting::Scripting() {
 	PicocInitialise(&m_picoc, PICOC_STACK_SIZE);
 	if(PicocPlatformSetExitPoint(&m_picoc)){PicocCleanup(&m_picoc); return;}
-	PlatformLibraryInitI3T(&m_picoc);
+	platformLibraryInitI3T(&m_picoc);
 	PicocIncludeAllSystemHeaders(&m_picoc);
 	m_init=true;
 }

@@ -20,13 +20,14 @@
 #include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
-#include "World2/World2.h"
+#include "World/World.h"
 
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
 #include "Nodes/GraphManager.h"
+
 
 double lastFrameSeconds = 0.0f;
 Ptr<Core::Cycle> testCycle;
@@ -135,7 +136,8 @@ void Application::logicUpdate()
 void Application::finalize()
 {
 	delete m_world;
-	World2::end();
+
+	World::end();
 
 	glfwTerminate();
 }
@@ -143,8 +145,8 @@ void Application::finalize()
 bool Application::initI3T()
 {
 	// new scene scheme
-	bool b = World2::init();
-	m_world = World2::loadDefaultScene();
+	bool b = World::init();
+	m_world = World::loadDefaultScene();
 
 	return b;
 }
@@ -159,7 +161,7 @@ UIModule* Application::getUI()
 	return m_ui;
 }
 
-World2* Application::world2()
+World* Application::world2()
 {
 	return m_world;
 }

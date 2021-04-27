@@ -3,7 +3,6 @@
 #include "picoc.h"
 #include "interpreter.h"
 
-
 /* deallocate any memory */
 void ParseCleanup(Picoc *pc)
 {

@@ -17,7 +17,7 @@
 #include "Core/GlfwWindow.h"
 #include "GUI/Elements/IWindow.h"
 
-#include "World2/World2.h"
+#include "World/World.h"
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
@@ -26,7 +26,7 @@ class ICommand;
 class GlfwWindow;
 class MainMenuBar;
 class World;
-class World2;
+class World;
 class Scripting;
 
 /**
@@ -68,7 +68,7 @@ public:
 	 */
 	void run();
 
-	World2* world2();
+	World* world2();
 	GLFWwindow* mainWindow();
 
 	/**
@@ -104,7 +104,7 @@ private:
 
 	bool m_bShouldClose = false;
 
-	World2* m_world;
+	World* m_world;
 	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	GlfwWindow* m_window;

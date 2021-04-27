@@ -82,7 +82,7 @@ void WorkspaceWindow::render()
 {
 	if (InputManager::isKeyPressed(Keys::l))
 	{
-		// SaveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
+		// saveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
 		printf("press\n");
 	}
 
@@ -232,7 +232,7 @@ void WorkspaceWindow::manipulatorStartCheck3D()
 
     if (ne::HasSelectionChanged())
     {
-        World2* world2= Application::get().world2();
+        World* world2= Application::get().world2();
 
         if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
         {
@@ -342,7 +342,7 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::getSelectedWorkspac
     std::vector<Ptr<WorkspaceNodeWithCoreData>> allSelectedCoreNodes;
     std::vector<ne::NodeId> allSelectedNodesIDs;
     Ptr<WorkspaceNodeWithCoreData> temp;
-
+	//ne::SelectNode();
     int numOfSelectedObjects = ne::GetSelectedObjectCount(); /* not Nodes only */
 
     allSelectedNodesIDs.resize(numOfSelectedObjects);

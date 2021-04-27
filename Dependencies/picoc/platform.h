@@ -2,7 +2,6 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-
 /* configurable options */
 /* select your host type (or do it in the Makefile):*/
 

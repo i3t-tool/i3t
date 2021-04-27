@@ -374,7 +374,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 	ImGui::Spring(2);
     for (auto const & pinProp : m_workspaceInputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::Matrix)
+	    if(pinProp->getType() != EValueType::MatrixMul)
         {
             drawInputPin(builder, pinProp, newLinkPin);
         }
@@ -422,7 +422,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 	ImGui::Spring(2);
     for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::Matrix)
+	    if(pinProp->getType() != EValueType::MatrixMul)
         {
             drawOutputPin(builder, pinProp, newLinkPin);
         }
