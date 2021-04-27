@@ -68,18 +68,19 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 }
 void RotationManipulator::update() {
 	if(m_editednode==nullptr){return;}
-	m_edited=m_editednode->getData().getMat4();
+	
 	m_allowedaxis=0;
 	const char*oper= m_editednode->getOperation()->keyWord.c_str();
-	if(strcmp(oper,"EulerX")==0){m_allowedaxis|=s_x;}
-	else if(strcmp(oper,"EulerY")==0){m_allowedaxis|=s_y;}
-	else if(strcmp(oper,"EulerZ")==0){m_allowedaxis|=s_z;}
-	else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x;}
-	/*else if(strcmp(oper,"Quat")==0){
-		m_allowedaxis|=s_x;
-		Core::QuatRot* editedquat = (Core::QuatRot*)m_editednode.get();
+	if(strcmp(oper,"EulerX")==0)		{m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();}
+	else if(strcmp(oper,"EulerY")==0)	{m_allowedaxis|=s_y;m_edited=m_editednode->getData().getMat4();}
+	else if(strcmp(oper,"EulerZ")==0)	{m_allowedaxis|=s_z;m_edited=m_editednode->getData().getMat4();}
+	else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();}
+	else if(strcmp(oper,"Quat")==0){
+		//m_allowedaxis|=s_x|s_y|s_z;
+		//Core::QuatRot* editedquat = (Core::QuatRot*)m_editednode.get();
+		
 		//editedquat->
-	}*/
+	}
 	///
 	bool transactionBegin=false;
 
@@ -166,5 +167,10 @@ void RotationManipulator::update() {
 		angle=angle2(v[0],v[1]);
 	}
 	//printf("angle %f, mov %f\n",angle,drag3[m_axisnum]);
-	m_editednode->setValue(glm::radians(angle));
+	if(strcmp(oper,"Quat")!=0){
+		m_editednode->setValue(glm::radians(angle));
+	}
+	else {
+
+	}
 }

@@ -45,8 +45,9 @@ World::World(){
     this->manipulators.emplace("EulerX",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
     this->manipulators.emplace("EulerY",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
     this->manipulators.emplace("EulerZ",        Manipulator(&rm->m_editednode,&rm->m_parent,rm));
+    this->manipulators.emplace("AxisAngle",     Manipulator(&rm->m_editednode,&rm->m_parent,rm));
+    //this->manipulators.emplace("Quat",          Manipulator(&rm->m_editednode,&rm->m_parent,rm));
     this->manipulators.emplace("Free",          Manipulator(&mm->m_editednode,&mm->m_parent,mm));
-    this->manipulators.emplace("AxisAngle",     Manipulator(&rm->m_editednode,&rm->m_parent,rm));//not editable
     GameObject*sceneHandles = new GameObject();
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
@@ -187,20 +188,13 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
     WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
     Ptr<Core::NodeBase>	        nodebase    = nodebasedata->getNodebase();
 
-    //op=Builder::createTransform<Core::Frustum>();
-    //op=Builder::createTransform<Core::OrthoProj>();
-    //op=Builder::createTransform<Core::EulerRotX>();
-    //op=Builder::createTransform<Core::AxisAngleRot>();
-    //op=Builder::createTransform<Core::LookAt>(glm::vec3{-0.0f, 1.0f, 0.0f}, glm::vec3{-0.1f, 0.5f, 0.0f },glm::vec3{0.0f, 1.0f, 0.0f});
     //nodebase    = &op;
-    op=nodebase;
+    op=nodebase;//tmp
 
     WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
-    DataStore                   datastore   = nodebase->getData(); //printf("d");
-    glm::mat4                   mat         = datastore.getMat4(); //printf("e\n");
     
     printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase.get());
     if(this->manipulators.count(keyword)==1){
@@ -212,19 +206,22 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
     else{printf("No manipulators\n"); }
 
     printf("operation %s\n",keyword);
-    printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",
-        mat[0][0], mat[1][0], mat[2][0], mat[3][0],
-        mat[0][1], mat[1][1], mat[2][1], mat[3][1],
-        mat[0][2], mat[1][2], mat[2][2], mat[3][2],
-        mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
-    printf("------------\n");
 
 }
 void World::tmpDrawNode() {
 	if(op.get()==nullptr){op= Core::Builder::createTransform<Core::EulerRotX>();}
 	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
-	const glm::mat4& coreData = op->getData().getMat4();
-	const Core::Transform::DataMap* coreMap = op->getDataMap();
+    const Operation* operation = nodebasedata->getNodebase()->getOperation();
+    const Core::Transform::DataMap* coreMap = op->getDataMap();
+	glm::mat4 coreData = glm::mat4(1.0f);
+    //const std::string s= operation->keyWord;
+    
+    //if(strcmp(s.c_str(), "Quat") != 0){
+        const glm::mat4& cp = op->getData().getMat4();
+        coreData=cp;
+    //}
+    //printf("type %d\n",nodebasedata->getNodebase()->getData().getOpValType());
+	
 	//int idOfNode = nodebasedata->getId().Get();
 	char label[]={0,0};
     float localData=0.0f;
@@ -257,7 +254,7 @@ void World::tmpSetNode() {
     else if(InputManager::isKeyPressed(Keys::y)){op=Core::Builder::createTransform<Core::EulerRotY>();}
     else if(InputManager::isKeyPressed(Keys::z)){op=Core::Builder::createTransform<Core::EulerRotZ>();}
     else if(InputManager::isKeyPressed(Keys::w)){op=Core::Builder::createTransform<Core::AxisAngleRot>();}
-    else if(InputManager::isKeyPressed(Keys::q)){op=Core::Builder::createTransform<Core::QuatRot>();}
+    //else if(InputManager::isKeyPressed(Keys::q)){op=Core::Builder::createTransform<Core::QuatRot>();}
     else if(InputManager::isKeyPressed(Keys::s)){op=Core::Builder::createTransform<Core::Scale>();op->setDataMap(&Core::Transform::g_Scale);}
     else if(InputManager::isKeyPressed(Keys::t)){op=Core::Builder::createTransform<Core::Translation>();}
     else if(InputManager::isKeyPressed(Keys::o)){op=Core::Builder::createTransform<Core::OrthoProj>();}
@@ -265,6 +262,7 @@ void World::tmpSetNode() {
     else if(InputManager::isKeyPressed(Keys::f)){op=Core::Builder::createTransform<Core::Frustum>();}
     else if(InputManager::isKeyPressed(Keys::g)){op=Core::Builder::createTransform<Core::Free>();}
     else if(InputManager::isKeyPressed(Keys::l)){op=Core::Builder::createTransform<Core::LookAt>();((Core::LookAt*)op.get())->setEye(glm::vec3(0.0f));((Core::LookAt*)op.get())->setCenter(glm::vec3(2.0f));}
+    else if(op.get()==nullptr){op=Core::Builder::createTransform<Core::EulerRotX>();}
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;
@@ -281,6 +279,7 @@ void World::tmpSetNode() {
     else{
         printf("no manipulators\n");
     }
+    printf("fff\n");
 }
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
