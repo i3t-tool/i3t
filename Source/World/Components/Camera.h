@@ -7,7 +7,7 @@
  * renders tree of GameObjects in update();
  * Can render in already prepared framebuffer (default configuration),
  * or into framebuffer provided by user.
- * Camera renders by calling render(glm::mat4*,bool) on each component on every GameObject in scene tree.
+ * Camera renders by calling render(glm::mat4*,bool) on each component on every GameObject in scene tree (sceneRoot).
  */
 //---------------
 #include "../GameObject.h"

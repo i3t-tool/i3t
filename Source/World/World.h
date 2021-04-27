@@ -26,7 +26,7 @@ struct Shader{
     GLuint Mmatrix;     ///<uniform matrix of model's transform in shader
     GLuint PVMmatrix;   ///<uniform matrix view*model's transform in shader
     GLuint VNmatrix;    ///<uniform matrix for adjusting model's normals in shader
-    GLuint color;       ///<uniform color
+    GLuint color;       ///<uniform color (vec4)
     GLint attr_pos;     ///<vertice position attribute
     GLint attr_norm;    ///<vertice normal vector attribute
     GLint attr_uv;      ///<vertice texture coords attribute

@@ -258,13 +258,13 @@ void World::tmpSetNode() {
     else if(InputManager::isKeyPressed(Keys::z)){op=Core::Builder::createTransform<Core::EulerRotZ>();}
     else if(InputManager::isKeyPressed(Keys::w)){op=Core::Builder::createTransform<Core::AxisAngleRot>();}
     else if(InputManager::isKeyPressed(Keys::q)){op=Core::Builder::createTransform<Core::QuatRot>();}
-    else if(InputManager::isKeyPressed(Keys::s)){op=Core::Builder::createTransform<Core::Scale>();}
+    else if(InputManager::isKeyPressed(Keys::s)){op=Core::Builder::createTransform<Core::Scale>();op->setDataMap(&Core::Transform::g_Scale);}
     else if(InputManager::isKeyPressed(Keys::t)){op=Core::Builder::createTransform<Core::Translation>();}
     else if(InputManager::isKeyPressed(Keys::o)){op=Core::Builder::createTransform<Core::OrthoProj>();}
     else if(InputManager::isKeyPressed(Keys::p)){op=Core::Builder::createTransform<Core::PerspectiveProj>();}
     else if(InputManager::isKeyPressed(Keys::f)){op=Core::Builder::createTransform<Core::Frustum>();}
     else if(InputManager::isKeyPressed(Keys::g)){op=Core::Builder::createTransform<Core::Free>();}
-    else if(InputManager::isKeyPressed(Keys::l)){op=Core::Builder::createTransform<Core::LookAt>();}
+    else if(InputManager::isKeyPressed(Keys::l)){op=Core::Builder::createTransform<Core::LookAt>();((Core::LookAt*)op.get())->setEye(glm::vec3(0.0f));((Core::LookAt*)op.get())->setCenter(glm::vec3(2.0f));}
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;

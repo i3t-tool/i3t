@@ -1,4 +1,8 @@
 #pragma once
+/**
+ * \file FrustumManipulator.h
+ * \author Daniel Gruncl
+ */
 #include "../Component.h"
 #include "../GameObject.h"
 

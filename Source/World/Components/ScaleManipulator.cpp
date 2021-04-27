@@ -62,23 +62,40 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 
 	m_uniscaleh->transformation=glm::mat4(1.0f)*scale;
 	m_uniscaleh->scale(glm::vec3(0.2f));
-	ManipulatorUtil::drawHandle(m_uniscaleh,getOrtho(m_handlespace, 2),glm::vec4(0.6f,0.6f,0.6f,1.0f), m_stencilxyz,m_activehandle,m_hoverhandle);
+	ManipulatorUtil::drawHandle(m_uniscaleh,getOrtho(m_handlespace, 2),glm::vec4(0.8f,0.75f,0.6f,1.0f), m_stencilxyz,m_activehandle,m_hoverhandle);
 
-	m_scaleh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
-	ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,0),glm::vec4(1.0f,0.0f,0.0f,1.0f),m_stencilx,m_activehandle,m_hoverhandle);
-	m_scaleh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
-	ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,1),glm::vec4(0.0f,1.0f,0.0f,1.0f),m_stencily,m_activehandle,m_hoverhandle);
-	m_scaleh->transformation=glm::mat4(1.0f)*scale;
-	ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,2),glm::vec4(0.1f,0.4f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
+	if(m_uniformscale){
+		m_scaleh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,0),glm::vec4(0.5f,0.5f,0.5f,1.0f),-1,false,false);
+		m_scaleh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,1),glm::vec4(0.5f,0.5f,0.5f,1.0f),-1,false,false);
+		m_scaleh->transformation=glm::mat4(1.0f)*scale;
+		ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,2),glm::vec4(0.5f,0.5f,0.5f,1.0f),-1,false,false);
 			
-	m_planeh->transformation=glm::mat4(1.0f)*scale;
-	m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
-	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.0f,1.0f,1.0f,0.7f),m_stencilzy,m_activehandle,m_hoverhandle);
-	m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
-	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.7f),m_stencilzx,m_activehandle,m_hoverhandle);
-	m_planeh->transformation=glm::mat4(1.0f)*scale;
-	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,1.0f,0.0f,0.7f),m_stencilyx,m_activehandle,m_hoverhandle);
-
+		m_planeh->transformation=glm::mat4(1.0f)*scale;
+		m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.5f,0.5f,0.5f,1.0f),-1,false,false);
+		m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.5f,0.5f,0.5f,1.0f),-1,false,false);
+		m_planeh->transformation=glm::mat4(1.0f)*scale;
+		ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.5f,0.5f,0.5f,1.0f),-1,false,false);
+	}
+	else{
+		m_scaleh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,0),glm::vec4(1.0f,0.0f,0.0f,1.0f),m_stencilx,m_activehandle,m_hoverhandle);
+		m_scaleh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,1),glm::vec4(0.0f,1.0f,0.0f,1.0f),m_stencily,m_activehandle,m_hoverhandle);
+		m_scaleh->transformation=glm::mat4(1.0f)*scale;
+		ManipulatorUtil::drawHandle(m_scaleh,getOrtho(m_handlespace,2),glm::vec4(0.1f,0.4f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
+			
+		m_planeh->transformation=glm::mat4(1.0f)*scale;
+		m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.0f,1.0f,1.0f,0.7f),m_stencilzy,m_activehandle,m_hoverhandle);
+		m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
+		ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.7f),m_stencilzx,m_activehandle,m_hoverhandle);
+		m_planeh->transformation=glm::mat4(1.0f)*scale;
+		ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,1.0f,0.0f,0.7f),m_stencilyx,m_activehandle,m_hoverhandle);
+	}
 	glDepthRange(0.0, 1.0);
 	CHECK_GL_ERROR();
 }
@@ -86,6 +103,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 void ScaleManipulator::update() {
 	if(m_editednode==nullptr){return;}
 	m_edited=m_editednode->getData().getMat4();
+	m_uniformscale=(m_editednode->getDataMap()==&Core::Transform::g_UniformScale);
 	///
 	bool transactionBegin=false;
 

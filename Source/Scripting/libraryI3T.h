@@ -10,7 +10,7 @@
 
 /**
 * \struct Mat4types
-* List of types of matrix operators. First parameter of script function mat4oper or mat4 must be one of these values.
+* List of types of matrix operators and transforms. First parameter of script function mat4oper or mat4 must be one of these values.
 */
 struct Mat4types {
 	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmulvec=7,vecmulmat=8,floatmulmat=9;
@@ -19,7 +19,7 @@ struct Mat4types {
 };
 /**
 * \struct VecOperators
-* List of types of vector operators. First parameter of script function vec4oper must be one of these values.
+* List of types of vector operators. First parameter of script function vec4oper or vec3oper must be one of these values.
 */
 struct VecOperators {
 	const int cross=100,dot=101,norm=102,length=103,vecmulfloat=104,perspdiv=105;
@@ -34,6 +34,7 @@ struct FloatOperators {
 /**
 * \struct ArithmeticOperators
 * Must not collide with other types.
+* Can be passed as first parameter to functions mat4oper, vec4oper, vec3oper a floatoper
 */
 struct ArithmeticOperators {
 	const int add=300, substract=301, div=302, mul=303,show=304,mix=305;
@@ -43,12 +44,12 @@ struct ArithmeticOperators {
 * List of levels of detail of node display. Third parameter of script function confnode must be one of these values.
 */
 struct NodeLODs {
-	const int full=0,setvalues=1,label=2;
+	const int full=400,setvalues=401,label=402;
 };
 /**
 * \struct ScriptingData
 * Contains constant variables that are exposed to scripts, that are used as parameters of functions for creating various operators, telling which type of operator should be created.
-* Contains data as mat4, which were created by script. Data are then used by script to init storage of created nodes.
+* Contains data as vector of mat4, which were created by script. Data are then used by script to init storage of created nodes.
 * 
 */
 struct ScriptingData {
@@ -58,6 +59,7 @@ struct ScriptingData {
 	ArithmeticOperators arithmeticOperators;
 	NodeLODs nodeLODs;
 	std::vector<glm::mat4>nodeData;///<Vector of data as mat4, that were created by script. Serves as temporary static storage. Not needed after script is executed.
+	std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
 };
 
 ScriptingData*getScriptingData();
@@ -66,5 +68,8 @@ ScriptingData*getScriptingData();
 * Clears data created by script.
 */
 void clearScriptingData();
-
+/**
+* \fn void platformLibraryInitI3T(Picoc* pc);
+* Adds library for manipulating workspace to picoc interpreter
+*/
 void platformLibraryInitI3T(Picoc* pc);

@@ -1,4 +1,10 @@
 #pragma once
+/**
+ * \file ManipulatorUtil.h
+ * \author Daniel Gruncl
+ * 
+ * Utils for drawing manipulator interaction handles.
+ */
 #include "../GameObject.h"
 
 #include "pgr.h"
