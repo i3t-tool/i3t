@@ -237,7 +237,7 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
 		setDataItemsWidth();
 	}
 
-    ImGui::Spring(0); /* \todo JH what is Spring? */
+    ImGui::Spring(0);
 
 }
 

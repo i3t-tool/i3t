@@ -7,7 +7,7 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequ
 
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NAN; 
+	fw.value = NAN;
 	fw.name = "WorkspaceSequence";
 
 	m_workspaceTransformation.push_back(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
@@ -18,7 +18,7 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string h
 {
 	fw.showMyPopup = false;
 	fw.id = "";
-	fw.value = NAN;  
+	fw.value = NAN;
 	fw.name = "WorkspaceSequence";
 
 	pushNode(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
@@ -94,7 +94,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 	drawOutputs(builder, newLinkPin);
 	builder.End();
 
-        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(40,30);  /* \todo JH add shift based on size of header and inputs pins */
+        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(20,15);  /* \todo JH add shift based on size of header and inputs pins */
         m_dataRect = ImRect(dataLeftTop, dataLeftTop);
 
         int i = 0;

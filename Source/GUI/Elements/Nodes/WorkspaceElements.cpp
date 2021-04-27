@@ -93,9 +93,6 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
         drawOutputs(builder, newLinkPin);
     }
 
-
-
-	drawOutputs(builder, newLinkPin);
 	//ImGui::EndChild();
 	builder.End();
 }

@@ -40,7 +40,7 @@
 #include "../Nodes/WorkspaceMakeLookAt.h"
 #include "../Nodes/WorkspaceMakeOrtho.h"
 #include "../Nodes/WorkspaceMakePerspective.h"
-//	} tranformationa end
+//	} tranformation end
 
 //	matrix{
 #include "../Nodes/WorkspaceMatrixFree.h"
@@ -109,39 +109,6 @@
 
 namespace ne = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
-
-/* >>> Static function <<< */ //{
-
-/*! \fn static inline ImRect ImGui_GetItemRect()
-    \brief Get ImRect of last  ( \todo active/added ?) item
-    \return ImRect : New ImRect with position and size of last item
-*/
-static inline ImRect ImGui_GetItemRect()
-
-{	
-	//return ImRect(ImVec2(0, 0), ImVec2(1, 1));
-	//ImVec2 minRect = ImGui::GetItemRectMin();
-	//return ImRect(minRect, minRect.x + 12, minRect.y + 12));
-	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
-}
-
-/*! \fn static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
-    \brief Enlarge given ImRect (create new / enlarge given ?)
-     \param[in/out?] rect ImRect& for enlarge
-     \param[in] x float value added to left and right
-     \param[in] y float value added to up an d down
-    \return ImRect New
-*/
-static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
-{
-	auto result = rect;
-	result.Min.x -= x;
-	result.Min.y -= y;
-	result.Max.x += x;
-	result.Max.y += y;
-	return result;
-}
-//} /* >>> Static functions - end <<< */
 
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
