@@ -15,13 +15,35 @@ ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix, size_t index) noe
 
   updateValues(0);
 	spreadSignal();
+  notifyParent();
 
 	return ValueSetResult{};
+}
+
+Ptr<Transformation> Sequence::popMatrix(const int index)
+{
+  Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
+                "Sequence does not have so many matrices as you are expecting.");
+
+  auto result = std::move(m_matrices.at(index));
+  m_matrices.erase(m_matrices.begin() + index);
+
+  result->nullSequence();
+
+  updateValues(0);
+  spreadSignal();
+	notifyParent();
+
+  return result;
 }
 
 void Sequence::swap(int from, int to)
 {
   if (from > m_matrices.size() || to > m_matrices.size()) return;
+
+  updateValues(0);
+  spreadSignal();
+  notifyParent();
 
   std::swap(m_matrices[from], m_matrices[to]);
 }
@@ -46,6 +68,15 @@ void Sequence::updateValues(int inputIndex)
 	m_internalData[1].setValue(result);
 }
 
+void Sequence::notifyParent()
+{
+	if (m_parent)
+  {
+    m_parent->spreadSignal();
+    m_parent->updateValues(0);
+	}
+}
+
 ENodePlugResult Sequence::isPlugCorrect(Pin const * input, Pin const * output)
 {
 	auto usualCheckResult = NodeBase::isPlugCorrect(input, output);
@@ -64,7 +95,7 @@ ENodePlugResult Sequence::isPlugCorrect(Pin const * input, Pin const * output)
 		return ENodePlugResult::Ok;
 	}
 
-	return ENodePlugResult::Ok;
+	return usualCheckResult;
 
 	// return NodeBase::isPlugCorrect(input, output);
 }

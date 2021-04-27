@@ -206,8 +206,8 @@ enum class ENodeType
 	MakeFrustum, //done SS
 	MakeLookAt, //done SS
 
-	Camera,
 	Screen,
+	Pulse
 };
 
 enum class ETransformType
@@ -412,8 +412,8 @@ static const std::vector<Operation> operations = {
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
-    {"Camera", "camera", 2, {EValueType::Matrix, EValueType::Matrix}, 1, {EValueType::Screen}},
-    {"Screen", "screen", 1, {EValueType::Screen}, 0, {}},
+    {"Screen", "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}},
+    {"Pulse", "pulse", 0, {}, 1, {EValueType::Pulse}}
 };
 
 namespace Core
@@ -432,13 +432,15 @@ static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7,
 
 static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
 
+static const Operation g_cameraProperties = { "Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul} };
+
 static const std::vector<Operation> g_transforms = {
 		{"Free", "free", 0, matrixInput, 1, matrixInput, defaultDataMaps },                                              // free
 		{"Translation", "translate", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate } },                                 // translate
 		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX } },            // eulerAngleX
 		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY } },            // eulerAngleY
 		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ } },            // eulerAngleZ
-		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale } },                                            // scale
+		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale, &Transform::g_UniformScale } },                                            // scale
 		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },          // rotate
 		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },                 // quat rotate
 		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho

@@ -569,6 +569,26 @@ ValueSetResult AxisAngleRot::setAxis(const glm::vec3& axis)
 	return ValueSetResult();
 }
 
+//===-- Quaternion rotation -----------------------------------------------===//
+
+void QuatRot::reset()
+{
+  notifySequence();
+	setInternalValue(m_initialQuat);
+}
+
+ValueSetResult QuatRot::setValue(const glm::quat& q)
+{
+  setInternalValue(glm::toMat4(q));
+  return ValueSetResult{};
+}
+
+ValueSetResult QuatRot::setValue(const glm::vec4& vec)
+{
+	glm::quat q(vec);
+  return setValue(glm::quat(q));
+}
+
 //===-- Orthographic projection -------------------------------------------===//
 
 void OrthoProj::reset()

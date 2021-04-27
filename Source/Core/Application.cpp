@@ -136,20 +136,8 @@ void Application::logicUpdate()
 void Application::finalize()
 {
 	delete m_world;
+
 	World::end();
-	// world = nullptr; //PF problem during glutExit...
-
-	/// \todo Write recent files.
-	// RecentFiles::writeRecent();
-
-	/*
-	ShaderProvider::dispose(); // delete red, base and alpha shaders
-
-	Shaper::dispose(); // delete shaper shaders (local shaders in shaper.cpp)
-
-	TextureLoader::endTextures();
-	TextureLoader::endHCTextures();
-	 */
 
 	glfwTerminate();
 }
@@ -159,18 +147,6 @@ bool Application::initI3T()
 	// new scene scheme
 	bool b = World::init();
 	m_world = World::loadDefaultScene();
-
-	// \todo DG testing
-	/*//testing
-	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load scale");
-	WorkspaceMatrix4x4* mat =new WorkspaceMatrixFree((ImTextureID)0, "load free");
-	//WorkspaceMatrix4x4* mat =new WorkspaceMatrixTranslation((ImTextureID)0, "load translate");
-	glm::mat4 m=glm::mat4(1.0f);
-	ValueSetResult result = mat->m_nodebase->setValue(m);
-	printf("value set result %d\n",result.status);
-	//ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
-	m_world2->handlesSetMatrix(mat);
-	*/
 
 	return b;
 }

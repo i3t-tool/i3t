@@ -6,41 +6,41 @@ using namespace CycleInternals;
 
 void Cycle::update(double seconds)
 {
-  if (m_isRunning)
-  {
+	if (m_isRunning)
+	{
 		updateValue(static_cast<float>(seconds) * m_multiplier);
 	}
 }
 
 void Cycle::play()
 {
-  m_isRunning = true;
+	m_isRunning = true;
 	spreadSignal(out_play);
 }
 
 void Cycle::stop()
 {
-  m_isRunning = false;
-  spreadSignal(out_pause);
+	m_isRunning = false;
+	spreadSignal(out_pause);
 }
 
 void Cycle::resetAndStop()
 {
-  m_isRunning = false;
-  getInternalData().setValue(0.0f);
-  spreadSignal(out_stop);
+	m_isRunning = false;
+	getInternalData().setValue(0.0f);
+	spreadSignal(out_stop);
 }
 
 void Cycle::stepBack()
 {
-  updateValue(-m_updateStep);
-  spreadSignal(out_prev);
+	updateValue(-m_updateStep);
+	spreadSignal(out_prev);
 }
 
 void Cycle::stepNext()
 {
-  updateValue(m_updateStep);
-  spreadSignal(out_next);
+	updateValue(m_updateStep);
+	spreadSignal(out_next);
 }
 
 void Cycle::setFrom(float from)
@@ -90,11 +90,14 @@ float Cycle::getStep() const
 
 void Cycle::updateValues(int inputIndex)
 {
-	if (m_inputs[in_from].isPluggedIn()) getInternalData(in_from).setValue(m_inputs[in_from].getStorage().getFloat());
+	if (m_inputs[in_from].isPluggedIn())
+		getInternalData(in_from).setValue(m_inputs[in_from].getStorage().getFloat());
 
-  if (m_inputs[in_to].isPluggedIn()) getInternalData(in_to).setValue(m_inputs[in_to].getStorage().getFloat());
+	if (m_inputs[in_to].isPluggedIn())
+		getInternalData(in_to).setValue(m_inputs[in_to].getStorage().getFloat());
 
-  if (m_inputs[in_multiplier].isPluggedIn()) getInternalData(in_multiplier).setValue(m_inputs[in_multiplier].getStorage().getFloat());
+	if (m_inputs[in_multiplier].isPluggedIn())
+		getInternalData(in_multiplier).setValue(m_inputs[in_multiplier].getStorage().getFloat());
 
 	switch (inputIndex)
 	{
@@ -103,7 +106,7 @@ void Cycle::updateValues(int inputIndex)
 		break;
 	case in_pause:
 		stop();
-    break;
+		break;
 	case in_stop:
 		resetAndStop();
 		break;
@@ -120,17 +123,28 @@ void Cycle::updateValues(int inputIndex)
 
 void Cycle::onCycleFinish()
 {
-
 }
 
 void Cycle::updateValue(float seconds)
 {
-  float current = getData().getFloat();
-  float newValue = current + ((float)seconds);
-  if (newValue > m_to)
-  {
-    // New iteration.
-    newValue = fmod(newValue, m_updateStep);
-  }
-  getInternalData().setValue(newValue);
+	float current = getData().getFloat();
+	float newValue = current + ((float)seconds);
+
+	if (newValue > m_to)
+	{
+		switch (m_mode)
+		{
+		case EMode::Once:
+			stop();
+			break;
+		case EMode::Repeat:
+			// New iteration.
+			newValue = fmod(newValue, m_updateStep);
+			break;
+		case EMode::PingPong:
+			newValue -= 2 * seconds;
+			break;
+		}
+	}
+	getInternalData().setValue(newValue);
 }

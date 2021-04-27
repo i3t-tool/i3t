@@ -8,7 +8,7 @@
 
 using namespace Core;
 
-template <typename T> inline void setValue_expectOk(NodePtr node, T&& value)
+template <typename Node, typename T> inline void setValue_expectOk(const Node& node, T&& value)
 {
 	auto result = node->setValue(std::forward<T>(value));
 	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
