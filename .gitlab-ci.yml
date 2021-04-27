@@ -9,6 +9,7 @@ before_script:
 stages:
   - build
   - test
+  - release
 
 build:
   stage: build
@@ -21,6 +22,7 @@ build:
   artifacts:
     paths:
       - Binaries
+    expire_in: 1 week
   cache:
     paths:
       - Binaries
@@ -30,3 +32,15 @@ test:
   stage: test
   script:
     - Binaries/Debug/I3TTest
+
+release:
+  stage: release
+  only:
+    - master
+  script:
+    - mkdir relase-out && cd release-out
+    - cmake -DCMAKE_BUILD_TYPE=ReleaseStandalone .. 
+    - cmake --build . -j 8 --target I3T
+  artifacts:
+    paths:
+      - Binaries/Release*
