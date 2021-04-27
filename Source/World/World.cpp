@@ -208,7 +208,8 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
     printf("operation %s\n",keyword);
 
 }
-void World::tmpDrawNode() {
+void World::tmpDrawNode() {//this tends to cause crash
+    return;
 	if(op.get()==nullptr){op= Core::Builder::createTransform<Core::EulerRotX>();}
 	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
     const Operation* operation = nodebasedata->getNodebase()->getOperation();
@@ -279,7 +280,7 @@ void World::tmpSetNode() {
     else{
         printf("no manipulators\n");
     }
-    printf("fff\n");
+    //printf("fff\n");
 }
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;

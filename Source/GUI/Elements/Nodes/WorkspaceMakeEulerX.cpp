@@ -17,9 +17,9 @@ void WorkspaceMakeEulerX::drawDataSetValues(util::NodeBuilder& builder)
         //SS better get?
         { [this]() {return get11(); }, [this]() {return get12(); }, [this]() {return get21(); } , [this]() {return get22(); } },
 
-        { [this](float v) {return m_nodebase->as<Core::EulerRotX>()->setValue(v); } },
-        
-        
+        { [this](float v) {return m_nodebase->as<Core::EulerRotX>()->setValue(v); } }, /* \todo JH here have to be same number of setters as getters */
+
+
         {   coreMap[1 * 4 + 1], /* \todo JH some better way how determine what element from DataMap should be used? */
             coreMap[1 * 4 + 2],
             coreMap[2 * 4 + 1],

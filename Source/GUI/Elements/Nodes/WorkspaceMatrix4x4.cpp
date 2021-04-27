@@ -31,8 +31,6 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
 	int rowOfChange, columnOfChange;
 	float valueOfChange, localData; /* user can change just one value at the moment */
 
-	builder.Middle();
-
 	ImGui::PushItemWidth(m_dataItemsWidth);
 	/* Drawing is row-wise */
 

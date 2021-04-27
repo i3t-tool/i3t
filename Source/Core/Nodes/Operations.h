@@ -214,7 +214,7 @@ enum class ETransformType
 {
 	//This is for sequence
 	Free = 0,
-	Translation, 
+	Translation, //done JH
 	EulerX,
 	EulerY,
 	EulerZ,
