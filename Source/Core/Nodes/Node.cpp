@@ -115,7 +115,7 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const * input, Pin const * output)
   if (!out)
     return ENodePlugResult::Err_NonexistentPin;
 
-  if (inp->m_opValueType != out->m_opValueType)
+  if (inp->m_valueType != out->m_valueType)
   {
     // Do the input and output data types match?
     return ENodePlugResult::Err_MismatchedPinTypes;

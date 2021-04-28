@@ -284,6 +284,7 @@ public:
 	bool areInputsPlugged(int numInputs);
 	bool areAllInputsPlugged();
 
+	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
 	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
 
 protected:
@@ -332,11 +333,11 @@ class Pin
 	 */
 	std::vector<Pin*> m_outputs;
 
-	const EValueType m_opValueType = EValueType::Pulse;
+	const EValueType m_valueType = EValueType::Pulse;
 
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index)
-			: m_opValueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
+			: m_valueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
 	{
 		m_id = IdGenerator::next();
 	}
@@ -385,7 +386,35 @@ public:
 		}
 	}
 
-	[[nodiscard]] EValueType getType() const { return m_opValueType; }
+  const char* getLabel() const
+	{
+		auto* op = m_master->getOperation();
+		const char* label = nullptr;
+
+    if (m_isInput)
+    {
+			if (!op->defaultInputNames.empty())
+      {
+				label = op->defaultInputNames[m_index].c_str();
+			}
+		}
+		else
+    {
+      if (!op->defaultOutputNames.empty())
+      {
+        label = op->defaultOutputNames[m_index].c_str();
+      }
+		}
+
+		if (label == nullptr)
+		{
+      label = defaultIoNames[static_cast<size_t>(m_valueType)];
+    }
+
+		return label;
+	}
+
+	[[nodiscard]] EValueType getType() const { return m_valueType; }
 
 	/**
 	 * Query if input of this object is plugged to any parent output.

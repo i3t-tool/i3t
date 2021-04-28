@@ -228,8 +228,8 @@ enum class ETransformType
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
-static const std::vector<std::string> defaultIoNames = {
-		"",       // PULSE		MN dodelat
+static const std::array<const char*, 8> defaultIoNames = {
+		"pulse",  // PULSE		MN dodelat
 		"float",  // Float
 		"vec3",   // Vec3
 		"vec4",   // Vec4
@@ -237,7 +237,6 @@ static const std::vector<std::string> defaultIoNames = {
 		"quat",   // Quat
 		"",       // Matrix_MULL	MN dodelat
 		""        // SCREEN		MN dodelat
-
 };
 
 static const std::vector<EValueType> matrixInput = {EValueType::Matrix};
@@ -293,8 +292,8 @@ static const std::vector<std::string> AngleAxisInputNames = {"angle", "axis"};
 static const std::vector<std::string> Vectors3ToMatrixInputNames = {"vec3 X", "vec3 Y", "vec3 Z", "vec3 T"};
 static const std::vector<std::string> VectorsToMatrixInputNames = {"vec4 X", "vec4 Y", "vec4 Z", "vec4 T"};
 static const std::vector<std::string> ClampFloatInputNames = {"val", "min", "max"};
-static const std::vector<std::string> xyz = {"X", "Y", "Z"};
-static const std::vector<std::string> xyzw = {"X", "Y", "Z", "W"};
+static const std::vector<std::string> xyz = {"x", "y", "z"};
+static const std::vector<std::string> xyzw = {"x", "y", "z", "w"};
 static const std::vector<std::string> tr = {"T", "R"};
 static const std::vector<std::string> eulerInputNames = {"angle"};
 static const std::vector<std::string> orthoFrustrumInputNames = {"left", "right", "bottom", "top", "zNear", "zFar"};
