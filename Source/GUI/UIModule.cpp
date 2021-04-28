@@ -8,6 +8,7 @@
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
+#include "GUI/Elements/Windows/IntroWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
@@ -27,11 +28,12 @@ void UIModule::init()
 {
   // Create GUI Elements.
   m_menu = new MainMenuBar();
-  m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
-  m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world2()));
-  m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
-  m_dockableWindows.push_back(std::make_shared<Console>(true));
-  m_dockableWindows.push_back(std::make_shared<LogWindow>());
+  m_dockableWindows.emplace_back(std::make_shared<TutorialWindow>(true));
+  m_dockableWindows.emplace_back(std::make_shared<IntroWindow>(true));
+  m_dockableWindows.emplace_back(std::make_shared<Viewport>(true, App::get().world2()));
+  m_dockableWindows.emplace_back(std::make_shared<WorkspaceWindow>(true));
+  m_dockableWindows.emplace_back(std::make_shared<Console>(false));
+  m_dockableWindows.emplace_back(std::make_shared<LogWindow>());
 
   HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
 

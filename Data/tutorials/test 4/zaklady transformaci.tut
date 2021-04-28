@@ -1,0 +1,13 @@
+---
+title: Test 4
+description: Oh no neni to ctvrty tutorial?
+thumbnail: test4.png
+scene: empty
+---
+
+Lorem ipsum, toto je temer prazdny tutorial.
+Vyzkousime obrazek v textu ![test4.png](test4.png)
+
+--
+
+A je to! Během tutoriálu jsme prošli, jak vytvářet a naplňovat bloky matic, a jak je propojovat mezi sebou tak, abychom dosáhli požadovaných transformací. Pokud chceš, můžeš si na závěr vyzkoušet se sněhulákem zatočit a sledovat, jaký má rotace efekt, podle toho, jestli se umístí před posunutí, anebo za posunutí.

@@ -2,12 +2,15 @@
 #include <iostream>
 #include <fstream>
 #include <cstdint>
+#include <filesystem>
 #include "yaml-cpp/yaml.h"
 #include "imgui.h"
 #include "stb_image.h"
 #include "pgr.h"
 #include "Logger/Logger.h"
 #include "Tutorial/Tutorial.h"
+
+
 
 std::optional<std::shared_ptr<TutorialHeader>> TutorialLoader::loadTutorialHeader(std::string& path)
 {
@@ -44,15 +47,9 @@ std::optional<std::shared_ptr<TutorialHeader>> TutorialLoader::loadTutorialHeade
     LOG_ERROR("Tutorial description not specified");
   }
   // thumbnail
-  std::shared_ptr<GUIImage> thumbnail = nullptr; // todo dummy image here? - rather later when rendering and encountering a nullptr
+  std::shared_ptr<GUIImage> thumbnail = nullptr; // dummy image here? - NOPE rather later when rendering and encountering a nullptr (safer in case of loader errors)
   if (tutorial_yaml["thumbnail"]) {
-    // todo
-    try {
-      thumbnail = std::make_shared<GUIImage>(tutorial_yaml["description"].as<std::string>());
-    }
-    catch (std::runtime_error& e) {
-      LOG_ERROR(e.what())
-    }
+    thumbnail = loadImage(getDirectoryPath(path) + tutorial_yaml["thumbnail"].as<std::string>());
   }
   else {
     LOG_ERROR("Thumbnail not specified");
@@ -106,6 +103,7 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
   std::vector<TStep> steps;  // we will be filling this vector and then creating a tutorial with it
   steps.emplace_back();  // add the first step
   int currentStep = 0;
+  std::unordered_map<std::string, std::shared_ptr<GUIImage>> images; // we will be loading found images in it
   int currentBlockIndent = -1;
   blockType_t currentBlock = NOT_BLOCK;
   std::string line;
@@ -114,6 +112,7 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
   std::vector<std::string> vectorOfTextsStore;
   int numberStore = -1;
   std::vector<int> vectorOfNumsStore;
+ 
 
   // auto canBeSingleLine = [](blockType_t keyword) -> bool {
   //   static const std::unordered_set<blockType_t> singleLines {
@@ -127,6 +126,37 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
   //   };
   //   return singleLines.find(keyword) != singleLines.end();
   // };
+
+  auto findAndLoadImages = [&](const std::string& string)
+  {
+    int tmpState = 0; // 0 - start, 1 - [, 2 - ](, 3 - )
+    std::string imageFilename;
+    for (size_t i = 1; i < string.size(); i++) {
+      switch(string[i]) {
+        case '[':
+          if (string[i - 1] == '!' && tmpState == 0) {
+            tmpState = 1;
+          }
+          break;
+        case ']':
+          if (i < string.size() - 1 && string[i + 1] == '(' && tmpState == 1) {
+            tmpState = 2;
+          }
+          break;
+        case ')':
+          if (tmpState == 2) {
+            loadImage(getDirectoryPath(header->m_filename) + imageFilename);
+            imageFilename = "";
+            tmpState = 0;
+          }
+          break;
+        default:
+          if (tmpState == 2 && string[i] != ' ') {
+            imageFilename += string[i];
+          }
+      }
+    } 
+  };
 
   auto isBlockType = [](const std::string& string)
   {
@@ -261,7 +291,10 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
     if (singleLineType) {
       // actually used as single-line
       if (!restOfLine.empty()) {
+        // take care of the single line
         handleSingleLine(singleLineType, restOfLine);
+        // load any images in it if any
+        findAndLoadImages(restOfLine);
         continue;
       }
       // actually used as block but the type does not allow blocks
@@ -300,6 +333,8 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
       std::getline(lineStream, restOfLine);
       textStore += restOfLine;
       textStore += '\n';
+      // load any images found
+      findAndLoadImages(restOfLine);
       //addToCurrentBlock(line);
     }
   }
@@ -312,7 +347,7 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
 
   
   // CREATE THE TUTORIAL
-  std::optional<std::shared_ptr<Tutorial>> tutorial = std::make_shared<Tutorial>(std::move(header), std::move(steps), std::unordered_map<std::string, std::shared_ptr<GUIImage>>()); // we create our tutorial object on heap
+  std::optional<std::shared_ptr<Tutorial>> tutorial = std::make_shared<Tutorial>(std::move(header), std::move(steps), std::move(images)); // we create our tutorial object on heap
 
   return tutorial;
   // OLD NOTE: this will automatically move the unique pointer, no need to worry 
@@ -339,6 +374,24 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
 //  // is anything else
 //  return EXPLANATION;
 //}
+
+std::shared_ptr<GUIImage> TutorialLoader::loadImage(const std::string & path)
+{
+  // NOTE: we dont load dummy images here - let renderer handle nullptrs
+  try {
+    return std::make_shared<GUIImage>(path);
+  }
+  catch (std::runtime_error& e) {
+    LOG_ERROR(e.what())
+    return nullptr;
+  }
+}
+
+std::string TutorialLoader::getDirectoryPath(std::string& path)
+{
+  std::filesystem::path p(path);
+  return p.parent_path().string() + "/"; 
+} 
 
 void TutorialLoader::skipSpaces(std::istringstream& stream)
 {

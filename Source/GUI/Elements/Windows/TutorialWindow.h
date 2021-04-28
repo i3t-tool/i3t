@@ -17,9 +17,15 @@
 class TutorialWindow : public IWindow, private ITutorialRenderer
 {
 public:
-  //I3T_WINDOW(TutorialWindow) // todo co je to zac?
+  I3T_WINDOW(TutorialWindow) 
   TutorialWindow(bool show);
-  
+
+  /**
+   * @brief Sets the passed tutorial as the current one
+   * @param tutorial Ptr to an already loaded tutorial
+  */
+  void setTutorial(std::shared_ptr<Tutorial> tutorial);
+
   /**
    * \brief Calls load and parse for a tutorial from file and sets it as the current one to be shown.
    * \param header Ptr to an already loaded tutorial header object describing a specific tutorial.
@@ -46,7 +52,7 @@ public:
 
 private:
   static std::shared_ptr<Tutorial> m_tutorial;  //todo temporarily static because of img callback
-  static std::string m_current_dir;
+  //static std::string m_current_dir;
   int m_current_step;
   ImGui::MarkdownConfig m_mdConfig; // todo temporary
   // std::string getAbsolutePathByTutorial(std::string filename);

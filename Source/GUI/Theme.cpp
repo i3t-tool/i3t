@@ -14,6 +14,8 @@ Theme::Theme()
 	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
 
+	set(EColor::TutorialBgColor,ImVec4(232.0f / 255.0f, 232.0f / 255.0f, 232.0f / 255.0f, 1.00f) );
+
 	set(EColor::PulseLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
 	set(EColor::FloatLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
 	set(EColor::MatrixLink, ImVec4(68.0f / 255.0f, 201.0f / 255.0f, 156.0f / 255.0f, 1.00f));
@@ -30,6 +32,7 @@ Theme::Theme()
 	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
 	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
 	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
+	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
 
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 60.0f;
@@ -45,19 +48,29 @@ void Theme::init()
 {
 	auto& io = ImGui::GetIO();
 
+	const ImWchar ranges[] =
+	{
+		0x0020, 0x00FF, // Basic Latin + Latin Supplement
+		0x0080, 0x07FF, // Czech 
+		0,
+	};
+
 	m_fonts = {
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-	                                 14.0f * m_fontScale),
+	                                 14.0f * m_fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-	                                 12.0f * m_fontScale),
+	                                 12.0f * m_fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-	                                 12.0f * m_fontScale),
+	                                 12.0f * m_fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
-	                                 24.0f * m_fontScale),
+	                                 24.0f * m_fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-	                                 14.0f * m_fontScale),
+	                                 14.0f * m_fontScale, nullptr, ranges),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
+                                   20.0f * m_fontScale, nullptr, ranges),
 	};
 	io.FontDefault = get(EFont::MenuLarge);
+	io.Fonts->Build();
 }
 
 void Theme::apply()

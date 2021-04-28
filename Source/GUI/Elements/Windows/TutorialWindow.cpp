@@ -11,6 +11,7 @@
 #include "GUI/ImGui/imgui_markdown.h"
 
 #include "Config.h"
+#include "Commands/ApplicationCommands.h"
 #include "Core/Application.h"
 #include "Tutorial/Tutorial.h"
 #include "Tutorial/TutorialLoader.h"
@@ -29,36 +30,53 @@ const int CONTROLS_SIZE_Y = 100;
 
 // TEMPORARY TODO
 std::shared_ptr<Tutorial> TutorialWindow::m_tutorial;
-std::string TutorialWindow::m_current_dir;
 inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
 {
 
 
   // In your application you would load an image based on data_ input. Here we just use the imgui font texture.
-  std::string image_path = m_current_dir + data_.link;
-  image_path.pop_back(); // VERY TEMPORARY BUG FIX where there's an "\n" in the data_.link member
-  image_path.pop_back(); // BUG FIX where there's an ")" in the data_.link member
+  std::string imageFilename = data_.link;
+  imageFilename.pop_back(); // VERY TEMPORARY BUG FIX where there's an "\n" in the data_.link member
+  imageFilename.pop_back(); // BUG FIX where there's an ")" in the data_.link member
   //std::cout << image_path.c_str() << std::endl;
 
   // try to find the texture, if it isnt loaded, then load it
-  int tex_id;
-  // todo temporary safety check
-  if (m_tutorial == nullptr) {
-    tex_id = 0;
-  }
-  else if (const auto it{ m_tutorial->m_filenameToImage.find(image_path) }; it != std::end(m_tutorial->m_filenameToImage)) {
-    tex_id = it->second->m_texID;
+  int tex_id = 0;
+  // todo temporary
+  if (m_tutorial != nullptr) {
+    if ( m_tutorial->m_filenameToImage.contains(imageFilename)) {
+      auto img = m_tutorial->m_filenameToImage[imageFilename];
+      if (img != nullptr) {
+        tex_id = img->m_texID;
+      }
+      else {
+        //todo use dummy image
+        Log::info("Using dummy image");
+      }
+    }
+    else {
+      Log::fatal("Image " + imageFilename + " not loaded by loader");
+    }
   }
   else {
-    try {
-      m_tutorial->m_filenameToImage[image_path] = std::make_shared<GUIImage>(image_path);
-      tex_id = m_tutorial->m_filenameToImage[image_path]->m_texID;
-    }
-    catch (const std::runtime_error& error) {
-      tex_id = 0;
-    }
+    Log::fatal("Tutorial is nullptr");
   }
 
+
+
+  //else if (const auto it{ m_tutorial->m_filenameToImage.find(image_path) }; it != std::end(m_tutorial->m_filenameToImage)) {
+  //  tex_id = it->second->m_texID;
+  //}
+  //else {
+  //  try {
+  //    m_tutorial->m_filenameToImage[image_path] = std::make_shared<GUIImage>(image_path);
+  //    tex_id = m_tutorial->m_filenameToImage[image_path]->m_texID;
+  //  }
+  //  catch (const std::runtime_error& error) {
+  //    tex_id = 0;
+  //  }
+  //}
+  
   //int tex_id = TextureLoader::loadTexture(data_.text, image_path);
   
   ImGui::MarkdownImageData imageData{ true, false, (ImTextureID)tex_id, ImVec2( 400.0f, 200.0f ) };
@@ -84,9 +102,16 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   m_current_step = 0;
   m_mdConfig = ImGui::MarkdownConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
 
+  SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) { setTutorial(tutorial); });
+
   //// TEMPORARY todo
   //std::shared_ptr<TutorialHeader> dummy_header = std::make_shared<TutorialHeader>("none");
   //setTutorial(dummy_header);
+}
+
+void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
+{
+  m_tutorial = tutorial;
 }
 
 void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader> header)
@@ -101,10 +126,10 @@ void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader> header)
   setStep(0);
 
   // todo make a utility function for this
-  std::cout << m_tutorial->m_header->m_filename;
-  std::filesystem::path p(m_tutorial->m_header->m_filename);
-  m_current_dir = p.parent_path().string() + "/";
-  std::cout << m_current_dir;
+  //std::cout << m_tutorial->m_header->m_filename;
+  //std::filesystem::path p(m_tutorial->m_header->m_filename);
+  //m_current_dir = p.parent_path().string() + "/";
+  //std::cout << m_current_dir;
 }
 
 void TutorialWindow::setTutorial(std::string path)
@@ -132,14 +157,14 @@ bool TutorialWindow::setStep(int step_number)
 
 void TutorialWindow::render()
 {
-  if (!Application::get().m_showTutorialWindow)
+  if (!isVisible())
     return;
 
   // PUSH STYLE 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
   ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
-  ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(232, 232, 232, 255));
+  ImGui::PushStyleColor(ImGuiCol_ChildBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(51, 51, 51, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(215, 215, 215, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(232, 232, 232, 255));
@@ -157,7 +182,8 @@ void TutorialWindow::render()
   else {
     window_name = "Tutorial - empty###Tutorial window";
   }
-  ImGui::Begin(window_name.c_str(), &Application::get().m_showTutorialWindow);
+  ImGui::SetNextWindowSize(ImVec2(400,300));
+  ImGui::Begin(window_name.c_str(), getShowPtr());
 
   // CREATE IMGUI CONTENT
   renderTutorialHeader();
@@ -187,7 +213,7 @@ void TutorialWindow::renderTutorialHeader()
 
   // todo
   if (title != "undefined") {
-    ImGui::PushFont(App::get().getFont(FONT_TITLE));
+    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Title));
     ImGui::TextWrapped(title.c_str());
     ImGui::PopFont();
     ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
@@ -263,7 +289,7 @@ void TutorialWindow::renderInputTask(InputTask* input)
 void TutorialWindow::renderTask(Task* task)
 {
   ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
-  ImGui::PushFont(App::get().getFont(FONT_TASK_TITLE));
+  ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TaskTitle));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
 
   ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
@@ -277,8 +303,10 @@ void TutorialWindow::renderHint(Hint* hint)
 {
   //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-  std::string hint_header = u8"Nápovìda##" + std::to_string(m_current_step);
-  if (ImGui::CollapsingHeader(hint_header.c_str())) {
+  std::u8string hintHeaderU8 = u8"Nápovìda##";
+  std::string hintHeader(hintHeaderU8.cbegin(), hintHeaderU8.cend()); // todo find better solution
+  hintHeader += std::to_string(m_current_step);
+  if (ImGui::CollapsingHeader(hintHeader.c_str())) {
     ImGui::PopStyleColor();
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
     //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));

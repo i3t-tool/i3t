@@ -24,6 +24,8 @@ enum class EColor
 	ActiveColor,
 	TabColor,
 
+	TutorialBgColor,
+
 	PulseLink,
 	FloatLink,
 	MatrixLink,
@@ -43,6 +45,7 @@ enum class EFont
 	Node,
 	Title,
 	TaskTitle,
+	Header
 };
 
 enum class ESize
@@ -91,11 +94,12 @@ class Theme
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	static constexpr const size_t m_fontsCount = 4;
+	// todo tohle fakt neni dobry na pridavani fontu, predtim tu byla chyba v poctu
+	static constexpr const size_t m_fontsCount = 6;
 	/// \todo MH Set dynamic scale (reload font in runtime).
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
-	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
+	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 	std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
 
 public:
@@ -127,7 +131,7 @@ public:
 
 	ImFont* get(size_t id)
 	{
-		Debug::Assert(m_fonts.size() < id, "Out of bounds!");
+		Debug::Assert(id < m_fonts.size(), "Out of bounds!");
 		return m_fonts[id];
 	}
 

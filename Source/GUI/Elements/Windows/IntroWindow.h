@@ -16,7 +16,8 @@
 class IntroWindow : public IWindow
 {
 public:
-  IntroWindow(bool show, TutorialWindow* tutorial_window);
+  I3T_WINDOW(IntroWindow) 
+  IntroWindow(bool show);
 
   /**
    * \brief get all folders
@@ -31,6 +32,5 @@ public:
 private:
   //std::vector<std::unique_ptr<Tutorial>> m_tutorials;
   std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
-  TutorialWindow* m_tutorial_window;
   void renderTutorials();
 };

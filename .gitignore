@@ -3,7 +3,7 @@
 
 /Binaries/
 cmake-*
-out/
+Solution/
 *.dll
 *.lib
 *.exe
