@@ -189,6 +189,8 @@ void FreeManipulator::update(){
 	}
 	//printf("5\n");
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
+
+	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 		
 	glm::vec4 row4bkp=glm::vec4(m_edited[0][3], m_edited[1][3],m_edited[2][3],m_edited[3][3]);
 	m_edited[0][3]=0.0f;

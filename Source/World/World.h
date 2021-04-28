@@ -71,8 +71,12 @@ public:
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
 
+    ///tmp - for user test, remove
     void tmpDrawNode();
     void tmpSetNode();
+    static std::shared_ptr<Core::NodeBase>tmpNode;
+    static std::shared_ptr<Core::Sequence>tmpSequence;
+    static std::shared_ptr<Core::Sequence>tmpSequence2;
 
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
@@ -108,4 +112,5 @@ public:
     
 private:
     static bool initializedRender; ///< Was render already initialized?
+    bool started=false;///<Was start() already called on this instance of World?
 };

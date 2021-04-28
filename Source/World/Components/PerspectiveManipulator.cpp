@@ -1,11 +1,13 @@
 #include "PerspectiveManipulator.h"
-#include "Core/Input/InputManager.h"
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
 #include "Camera.h"
-#include "pgr.h"
 #include "ManipulatorUtil.h"
+
+#include "pgr.h"
+#include "Core/Input/InputManager.h"
+#include "imgui.h"
 #include <typeinfo>
 
 const char* PerspectiveManipulator::s_type=nullptr;
@@ -101,6 +103,8 @@ void PerspectiveManipulator::update(){
 	}
 	if(InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
 		
+	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
+
 	if(m_activehandle==-1){return;}
 
 	if(InputManager::isKeyJustUp(Keys::esc)){}

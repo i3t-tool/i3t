@@ -113,24 +113,32 @@ glm::mat4 getFullTransform(GameObject* obj){
 }
 glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent){
 	glm::mat4 m=glm::mat4(1.0f);
-	return m;
-	/*
-	if(node==nullptr||parent==nullptr){return m;}
-	//Ptr<Core::NodeBase>n=Ptr<Core::NodeBase>(node.get());
-	Core::SequenceTree tree(*parent);
+	//return m;
 
+	if(node==nullptr||parent==nullptr){return m;}
+	if(node->get()==nullptr||parent->get()==nullptr){return m;}
+	
+	Core::SequenceTree tree(*parent);
 	Core::SequenceTree::MatrixIterator it=tree.begin();
-	Ptr<Core::NodeBase>nn=*it;
-	while(nn.get()!=node->get()&&it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node->get(),nn.get());it++;nn=*it;}
-	if(it!=tree.end()){printf("skip node 0x%p, nn 0x%p\n",node->get(),nn.get());it++;nn=*it;}
-	while(it!=tree.end()){
-		nn=*it;
-		DataStore d=nn->getData();
-		printf("op %s\n",nn->getOperation()->keyWord.c_str());
-		m=d.getMat4()*m;
+	Ptr<Core::NodeBase>nodeindex=Ptr<Core::NodeBase>();
+
+	//printf("sel %s\n", node->get()->getOperation()->keyWord.c_str());//this node
+
+	while(nodeindex.get()!=node->get()&&it!=tree.end()){//skip this node and all right of this node
+		nodeindex=*it;
+		//printf("skip %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
+		//printf("%p %p\n",nodeindex.get(),node->get());
 		it++;
 	}
-	return m;*/
+
+	while(it!=tree.end()){//mul left of this node
+		nodeindex=*it;
+		DataStore d=nodeindex->getData();
+		//printf("mul %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
+		m=d.getMat4()*m;
+		it++;
+	}//getchar();
+	return m;
 }
 glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
 	glm::vec3 t0 = -World::mainCamPos;

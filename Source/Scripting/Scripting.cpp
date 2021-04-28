@@ -315,7 +315,52 @@ int picocRunSource(const char* source){
 void Scripting::runCommand(std::string cmd) {
 	if(!m_init){return;}
 	if(PicocPlatformSetExitPoint(&m_picoc)){return;}
-	PicocParse(&m_picoc, "Run command", cmd.c_str(), (int)cmd.size(), TRUE, TRUE, TRUE, TRUE);
+	if(strcmp(cmd.c_str(),"help")==0){
+		std::cout<<
+			"int datamat4(float f1, float f2, ..., float f16)\n"
+			"int datavec4(float f1, float f2, float f3, float f4)\n"
+			"int datavec3(float f1, float f2, float f3)\n"
+			"int datascalar(float f)\n"
+			"\n"
+			"int mat4oper(int type, int x, int y, char* header)\n"
+			"int mat4operc(int type, char* header)\n"
+			"int mat4(int type, int data, int x, int y, char* header)\n"
+			"int mat4c(int type, int data,  char* header)\n"
+			"int vec4oper(int type, int x, int y, char* header)\n"
+			"int vec4operc(int type, char* header)\n"
+			"int vec4(int data, int x, int y, char* header)\n"
+			"int vec4c(int data, char* header)\n"
+			"int vec3oper(int type, int x, int y, char* header)\n"
+			"int vec3operc(int type, char* header)\n"
+			"int vec3(int data, int x, int y, char* header)\n"
+			"int vec3c(int data, char* header)\n"
+			"int scalar(int data, int x, int y, char* header)\n"
+			"int scalarc(int data, char* header)\n"
+			"int sequence(int x, int y, char* header)\n"
+			"int sequencec(char* header)\n"
+			"\n"
+			"Page 1/2. Enter \"help2\" to continue.\n";
+	}
+	else if(strcmp(cmd.c_str(),"help2")==0){
+		std::cout <<
+			"bool plugnodes(int lnode, int rnode, int output, int input)\n"
+			"bool unpluginput(int node, int input)\n"
+			"\n"
+			"int getnode(char* header)\n"
+			"bool delnode(int node)\n"
+			"bool confnode(int node, int precision, int lod)\n"
+			"\n"
+			"bool load(char* filename)\n"
+			"bool append(char* filename)\n"
+			"bool save(char* filename)\n"
+			"bool savesel(char* filename)\n"
+			"bool run(char* filename)\n"
+			"\n"
+			"Page 2/2.";
+	}
+	else{
+		PicocParse(&m_picoc, "Run command", cmd.c_str(), (int)cmd.size(), TRUE, TRUE, TRUE, TRUE);
+	}
 }
 Scripting::Scripting() {
 	PicocInitialise(&m_picoc, PICOC_STACK_SIZE);

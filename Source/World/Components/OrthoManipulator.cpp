@@ -1,11 +1,13 @@
 #include "OrthoManipulator.h"
-#include "Core/Input/InputManager.h"
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
 #include "Camera.h"
-#include "pgr.h"
 #include "ManipulatorUtil.h"
+
+#include "pgr.h"
+#include "imgui.h"
+#include "Core/Input/InputManager.h"
 #include <typeinfo>
 
 const char* OrthoManipulator::s_type=nullptr;
@@ -39,6 +41,7 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 projinv=glm::inverse(m_edited);;
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	//glm::mat4 transform=glm::mat4(1.0f);
+	//glm::mat4 transform=glm::inverse(getNodeTransform(&m_editednode,&m_parent));//LookAt?
 	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
@@ -91,6 +94,8 @@ void OrthoManipulator::update(){
 	}
 	if(InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
 		
+	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
+
 	if(m_activehandle==-1){return;}
 
 	if(InputManager::isKeyJustUp(Keys::esc)){}

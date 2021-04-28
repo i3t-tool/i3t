@@ -24,9 +24,12 @@ RotationManipulator::RotationManipulator() {
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
+	
+	m_editednode=Ptr<Core::NodeBase>();
+	m_parent=Ptr<Core::Sequence>();
 }
 void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
-	if(m_editednode==nullptr){return;}
+	if(m_editednode.get()==nullptr){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
@@ -67,7 +70,7 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	CHECK_GL_ERROR();
 }
 void RotationManipulator::update() {
-	if(m_editednode==nullptr){return;}
+	if(m_editednode.get()==nullptr){return;}
 	
 	m_allowedaxis=0;
 	const char*oper= m_editednode->getOperation()->keyWord.c_str();
