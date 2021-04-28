@@ -68,7 +68,7 @@
 #include "../Nodes/WorkspaceMixVector.h"
 //	} vec4 end
 
-//	vec4{
+//	vec3{
 #include "../Nodes/WorkspaceVector3Free.h"
 #include "../Nodes/WorkspaceNormalizeVector3.h"
 #include "../Nodes/WorkspaceVector3CrossVector3.h"
@@ -94,6 +94,18 @@
 //#include "../Nodes/WorkspaceASinACos.h"
 //#include "../Nodes/WorkspaceFloatCycle.h"
 //	} float end
+
+//  conversion{
+#include "../Nodes/WorkspaceFloatsToMatrix.h"
+#include "../Nodes/WorkspaceFloatsToVector.h"
+#include "../Nodes/WorkspaceFloatsToVector3.h"
+#include "../Nodes/WorkspaceQuatToMatrix.h"
+#include "../Nodes/WorkspaceTRToMatrix.h"
+#include "../Nodes/WorkspaceVector3ToVector.h"
+#include "../Nodes/WorkspaceVectors3ToMatrix.h"
+#include "../Nodes/WorkspaceVectorsToMatrix.h"
+#include "../Nodes/WorkspaceVectorToVector3.h"
+//  }
 //}operators end
 
 #include "Core/Input/InputManager.h"
