@@ -25,13 +25,16 @@
 
 //transformations{
 #include "../Nodes/WorkspaceSequence.h"
+
+#include "../Nodes/WorkspaceMatrixScale.h"
+#include "../Nodes/WorkspaceMatrixTranslation.h"
 //} tranformationa end
 
 //operators {
 
 //	transformations{
-#include "../Nodes/WorkspaceMatrixScale.h"
-#include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceMakeTranslation.h"
+#include "../Nodes/WorkspaceMakeScale.h"
 #include "../Nodes/WorkspaceMatrixRotate.h"
 #include "../Nodes/WorkspaceMakeEulerX.h"
 #include "../Nodes/WorkspaceMakeEulerY.h"
@@ -80,6 +83,16 @@
 
 //	float{
 #include "../Nodes/WorkspaceFloatFree.h"
+#include "../Nodes/WorkspaceClampFloat.h"
+#include "../Nodes/WorkspaceFloatMulFloat.h"
+#include "../Nodes/WorkspaceFloatDivFloat.h"
+#include "../Nodes/WorkspaceFloatAddFloat.h"
+#include "../Nodes/WorkspaceFloatPowFloat.h"
+#include "../Nodes/WorkspaceMixFloat.h"
+#include "../Nodes/WorkspaceSignum.h"
+//#include "../Nodes/WorkspaceFloatSinCos.h"
+//#include "../Nodes/WorkspaceASinACos.h"
+//#include "../Nodes/WorkspaceFloatCycle.h"
 //	} float end
 //}operators end
 

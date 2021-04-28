@@ -188,7 +188,7 @@ if (True)
             "Test/*.hpp"
     )
 
-    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE})
+    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCE} ${I3T_SOURCE} Source/GUI/Elements/Nodes/WorkspaceClampFloat.h Source/GUI/Elements/Nodes/WorkspaceFloatMulFloat.h Source/GUI/Elements/Nodes/WorkspaceFloatDivFloat.h Source/GUI/Elements/Nodes/WorkspaceFloatAddFloat.h Source/GUI/Elements/Nodes/WorkspaceFloatPowFloat.h Source/GUI/Elements/Nodes/WorkspaceMixFloat.h Source/GUI/Elements/Nodes/WorkspaceFloatSinCos.h Source/GUI/Elements/Nodes/WorkspaceASinACos.h Source/GUI/Elements/Nodes/WorkspaceSignum.h Source/GUI/Elements/Nodes/WorkspaceClampFloat.cpp Source/GUI/Elements/Nodes/WorkspaceFloatMulFloat.cpp Source/GUI/Elements/Nodes/WorkspaceFloatDivFloat.cpp Source/GUI/Elements/Nodes/WorkspaceFloatAddFloat.cpp Source/GUI/Elements/Nodes/WorkspaceFloatPowFloat.cpp Source/GUI/Elements/Nodes/WorkspaceMixFloat.cpp Source/GUI/Elements/Nodes/WorkspaceSignum.cpp Source/GUI/Elements/Nodes/WorkspaceMakeTranslation.cpp Source/GUI/Elements/Nodes/WorkspaceMakeTranslation.h Source/GUI/Elements/Nodes/WorkspaceMakeScale.cpp Source/GUI/Elements/Nodes/WorkspaceMakeScale.h)
 
     target_link_libraries(
             ${TEST_PROJECT_NAME}
