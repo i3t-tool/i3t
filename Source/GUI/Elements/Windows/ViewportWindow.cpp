@@ -136,5 +136,7 @@ void Viewport::render()
 
 		if(InputManager::isKeyPressed(Keys::shiftl)){m_world2->tmpSetNode(); }
 		m_world2->tmpDrawNode();
+
+    ImGui::End();
 	}
 }

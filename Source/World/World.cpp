@@ -96,7 +96,7 @@ World::World(){
     branch1->addMatrix(matrices[3]); branch1->addMatrix(matrices[4]);
     branch2->addMatrix(matrices[5]); branch2->addMatrix(matrices[6]);
 
-    // Create sequence–root path from "branch1" sequence to root sequence.
+    // Create sequenceï¿½root path from "branch1" sequence to root sequence.
     Core::SequenceTree tree(branch1);
 
     glm::mat4 m = getNodeTransform(&(Ptr<Core::NodeBase>)matrices[4], &branch1);*/
@@ -248,7 +248,9 @@ void World::tmpDrawNode() {//this tends to cause crash
 		ImGui::NewLine();
 	}
 	ImGui::PopItemWidth();
-	ImGui::End();
+
+	// Don't End here, it should be in same function as Begin (Viewport::render).
+  // ImGui::End();
 }
 void World::tmpSetNode() {
     if(InputManager::isKeyPressed(Keys::x))     {op=Core::Builder::createTransform<Core::EulerRotX>();}
