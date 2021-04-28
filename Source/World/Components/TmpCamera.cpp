@@ -21,14 +21,14 @@ void TmpCamera::start(){
 void TmpCamera::update(){
     if (World::tmpNode.get() == nullptr) { return; }
 
-    const Core::Transform::DataMap* data = World::tmpNode->getDataMap(); //printf("a");
-    const Operation* operation = World::tmpNode->getOperation(); //printf("b");
     const char* keyword = World::tmpNode->getOperation()->keyWord.c_str(); //printf("c");
     const glm::mat4& cp = World::tmpNode->getData().getMat4();
 
-    if(strcmp(keyword,"LookAt")==0){m_gameObject->transformation = cp;}
     if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Perspective")==0||strcmp(keyword,"Frustum")==0){
         m_cam->m_perspective = cp;
     }
-    else{return;}
+
+    const glm::mat4& cp2 = World::tmpSequence2->getMatrices().at(0)->getData().getMat4();
+
+    m_gameObject->transformation = glm::inverse(cp2);
 }

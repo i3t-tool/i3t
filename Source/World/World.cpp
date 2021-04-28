@@ -116,13 +116,13 @@ World* World::loadDefaultScene(){
 
     camhandles->transform(  glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
     objhandles->transform(  glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);//objhandles->transformation[0][3]=1.0f;
-    screen->transform(      glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),    glm::vec3(0.0f, 1.0f, 0.0f), 225.0f);
+    screen->transform(      glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(4.0f, 4.0f, 0.4f),    glm::vec3(0.0f, 1.0f, 0.0f), 225.0f);
 
     World* w = new World();
 
     w->sceneRoot->addChild(objhandles, false);       objhandles->addComponent(new Renderer(Renderer::USE_STENCIL));
                                                      objhandles->addComponent(new TmpTransform());
-    w->sceneRoot->addChild(camhandles, true);        //camhandles->addComponent(new TmpCamera());
+    w->sceneRoot->addChild(camhandles, true);        camhandles->addComponent(new TmpCamera());
                                                      camhandles->addComponent(new Camera(60.0f, w->sceneRoot, rend));
     w->sceneRoot->addChild(screen, false);           screen->addComponent(new Renderer());
 
@@ -210,6 +210,10 @@ void World::tmpDrawNode() {//this tends to cause crash
 	ImGui::End();
 }
 
+Ptr<Core::OrthoProj> tmportho= Core::Builder::createTransform<Core::OrthoProj>();
+Ptr<Core::PerspectiveProj> tmpproj= Core::Builder::createTransform<Core::PerspectiveProj>();
+Ptr<Core::Frustum> tmpfrustrum= Core::Builder::createTransform<Core::Frustum>();
+
 void World::tmpSetNode() {
     if(tmpSequence.get()==nullptr){
         tmpSequence = Core::Builder::createSequence();
@@ -227,7 +231,7 @@ void World::tmpSetNode() {
     if (tmpSequence2.get() == nullptr) {
         tmpSequence2 = Core::Builder::createSequence();
         tmpSequence2->addMatrix(Core::Builder::createTransform<Core::LookAt>());
-        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::OrthoProj>());
+        tmpSequence2->addMatrix(tmportho);
 
         ((Core::LookAt*)tmpSequence2->getMatrices().at(0).get())->setEye(glm::vec3(0.0f));
         ((Core::LookAt*)tmpSequence2->getMatrices().at(0).get())->setCenter(glm::vec3(0.0f,0.0f,-1.0f));
@@ -245,17 +249,17 @@ void World::tmpSetNode() {
 
     else if(InputManager::isKeyPressed(Keys::o)){
         if(tmpSequence2->getMatrices().size()==2){tmpSequence2->popMatrix(1);}
-        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::OrthoProj>());
+        tmpSequence2->addMatrix(tmportho);
         tmpNode=tmpSequence2->getMatrices().at(1);
     }
     else if(InputManager::isKeyPressed(Keys::p)){
         if(tmpSequence2->getMatrices().size()==2){tmpSequence2->popMatrix(1);}
-        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::PerspectiveProj>());
+        tmpSequence2->addMatrix(tmpproj);
         tmpNode=tmpSequence2->getMatrices().at(1);
     }
     else if(InputManager::isKeyPressed(Keys::f)){
         if(tmpSequence2->getMatrices().size()==2){tmpSequence2->popMatrix(1);}
-        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::Frustum>());
+        tmpSequence2->addMatrix(tmpfrustrum);
         tmpNode=tmpSequence2->getMatrices().at(1);
     }
     
