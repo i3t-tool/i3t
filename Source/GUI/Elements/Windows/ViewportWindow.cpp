@@ -47,6 +47,7 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	m_wcMax = ImVec2(0, 0);
 
 	InputManager::setInputAction("fire", Keys::b);
+	InputManager::setInputAction("fire", Keys::m);
 	InputManager::setInputAxis("move", 1.0f, Keys::o);
 	InputManager::setInputAxis("move", -1.0f, Keys::p);
 

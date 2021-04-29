@@ -18,13 +18,12 @@ ImGuiConfigFlags g_mousedFlags;
 
 void InputManager::canSetInputAction(const char* action, Keys::Code code)
 {
-
 }
 
 void InputManager::setInputAction(const char* action, Keys::Code code)
 {
 	if (!InputBindings::isActionCreated(action))
-		InputBindings::m_inputActions.insert({action, code});
+		InputBindings::m_inputActions.insert({action, {code}});
 }
 
 void InputManager::setInputAxis(const char* action, float scale, Keys::Code code)
@@ -111,14 +110,14 @@ void InputManager::processViewportEvents()
 	/*
 	// Check scrolling.
 	if (io.MouseWheel < -0.1f)
-		setPressed(Keys::mouseScrlUp);
+	  setPressed(Keys::mouseScrlUp);
 	else
-		setUnpressed(Keys::mouseScrlUp);
+	  setUnpressed(Keys::mouseScrlUp);
 
 	if (io.MouseWheel > 0.1f)
-		setPressed(Keys::mouseScrlDown);
+	  setPressed(Keys::mouseScrlDown);
 	else
-		setUnpressed(Keys::mouseScrlDown);
+	  setUnpressed(Keys::mouseScrlDown);
 	 */
 
 	// Handle keys.
@@ -188,48 +187,33 @@ void InputManager::update()
 
 	if (m_focusedWindow)
 	{
-		for (const auto& [key, fn] : m_focusedWindow->Input.m_keyCallbacks)
+		for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
 		{
-			if (m_keyMap[key] == KeyState::DOWN)
-				fn();
-		}
+			auto keys = InputBindings::m_inputActions[action];
+			for (const auto& key : keys)
+			{
+				bool shouldProcess =
+						m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
+            m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released;
 
-		for (const auto& [key, fn] : m_focusedWindow->Input.m_keyDownCallbacks)
-		{
-			if (m_keyMap[key] == KeyState::JUST_DOWN)
-				fn();
+				if (shouldProcess) fn();
+      }
 		}
-
-    for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
-    {
-			auto key = InputBindings::m_inputActions[action];
-			bool shouldProcess = m_keyMap[key] == KeyState::JUST_UP || m_keyMap[key] == KeyState::JUST_DOWN;
-			if (shouldProcess)
-      {
-        if (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed)
-        {
-          fn();
-				}
-        if (m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released)
-        {
-          fn();
-        }
-			}
-    }
 
 		for (const auto& [action, fn] : m_focusedWindow->Input.m_axis)
-    {
-      auto keys = InputBindings::m_inputAxis[action];
+		{
+			auto keys = InputBindings::m_inputAxis[action];
 			for (const auto& [key, scale] : keys)
-      {
+			{
 				if (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN)
-        {
+				{
 					fn(scale);
 				}
 			}
 		}
 	}
 
+	// Process keys.
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
 		if (it->second == JUST_UP)
@@ -712,4 +696,3 @@ float InputManager::m_mouseYDelta = 0;
 
 int InputManager::m_winWidth = 0;
 int InputManager::m_winHeight = 0;
-

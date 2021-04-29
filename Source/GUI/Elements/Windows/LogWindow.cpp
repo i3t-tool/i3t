@@ -27,17 +27,24 @@ void LogWindow::render()
   static bool val = true;
 
   ImGui::Text("Switch fire action key"); ImGui::SameLine();
-	ImGui::Text("Current key: %s", val ? "B" : "V");
+  std::string s;
+  for (auto key : InputBindings::getActionKeys("fire"))
+  {
+		s += std::to_string(key);
+	}
+	ImGui::Text("Current keys: %s", s.c_str());
 	if (ImGui::Button("Switch"))
   {
 		val = !val;
 		if (val)
     {
 			InputBindings::setActionKey("fire", Keys::Code::b);
+			InputBindings::removeActionKey("fire", Keys::Code::v);
 		}
 		else
     {
       InputBindings::setActionKey("fire", Keys::Code::v);
+      InputBindings::removeActionKey("fire", Keys::Code::b);
 		}
 	}
 

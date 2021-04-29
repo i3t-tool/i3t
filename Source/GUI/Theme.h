@@ -7,7 +7,6 @@
 
 #include "imgui.h"
 
-#include <array>
 #include <map>
 
 #include "Core/Defs.h"
@@ -91,11 +90,10 @@ class Theme
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	static constexpr const size_t m_fontsCount = 4;
 	/// \todo MH Set dynamic scale (reload font in runtime).
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
-	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
+	std::vector<ImFont*> m_fonts;
 	std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
 
 public:

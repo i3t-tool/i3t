@@ -20,16 +20,11 @@ class InputController
 		KeyCallback fn;
 	};
 
-	std::map<Keys::Code, KeyCallback> m_keyCallbacks;
-	std::map<Keys::Code, KeyCallback> m_keyDownCallbacks;
-
   std::vector<Action> m_actions;
 	std::unordered_map<std::string_view, AxisCallback> m_axis;
 
 public:
 	InputController();
-	void addKeyDownFn(Keys::Code key, KeyCallback fn);
-	void addKeyFn(Keys::Code key, KeyCallback fn);
 
 	void bindAction(const char* name, EKeyState state, KeyCallback fn);
 	void bindAxis(const char* name, AxisCallback fn);

@@ -5,16 +5,19 @@
 
 #include "KeyCodes.h"
 
-using MActions = std::map<std::string_view, Keys::Code>;
-
 struct InputBindings final
 {
-	using MAxis = std::unordered_map<
+  using MActions = std::unordered_map<
+      std::string_view,
+      std::vector<Keys::Code>
+  >;
+
+  using MAxis = std::unordered_map<
 	    std::string_view,
 			std::vector<std::pair<Keys::Code, float>>
   >;
 
-	friend class InputManager;
+  friend class InputManager;
 
 	static bool CameraOrbit;
 	static Keys::Code KeyWorld_mousePan;
@@ -32,10 +35,14 @@ struct InputBindings final
 
 	static void resize(float width, float height);
 
-	static Keys::Code getActionKey(const char* name);
-	static void setActionKey(const char* name, Keys::Code code);
+	static const std::vector<Keys::Code>& getActionKeys(const char* name);
 	static bool isActionCreated(const char* name);
-	static bool isAxisCreated(const char* name);
+  static void setActionKey(const char* name, Keys::Code code);
+	static void removeActionKey(const char* name, Keys::Code code);
+
+	static std::vector<std::pair<Keys::Code, float>> getAxisMappings(const char* name);
+  static bool isAxisCreated(const char* name);
+	static void removeAxisKey(const char* name, Keys::Code code);
 
 private:
   static MActions m_inputActions;
