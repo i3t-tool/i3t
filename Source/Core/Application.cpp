@@ -147,7 +147,7 @@ bool Application::initI3T()
 	// new scene scheme
 	bool b = World::init();
 	m_world = World::loadDefaultScene();
-
+	m_world->tmpSetNode();//tmp - to be removed
 	return b;
 }
 

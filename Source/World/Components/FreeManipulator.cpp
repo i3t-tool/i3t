@@ -140,7 +140,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 			m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.0f,1.0f,1.0f,0.6f),m_stencilzy,m_activehandle,m_hoverhandle);
 			m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
-			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.6f),m_stencilzy,m_activehandle,m_hoverhandle);
+			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.6f),m_stencilzx,m_activehandle,m_hoverhandle);
 			m_planeh->transformation=glm::mat4(1.0f)*scale;
 			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,1.0f,0.0f,0.6f),m_stencilyx,m_activehandle,m_hoverhandle);
 		}

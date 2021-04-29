@@ -20,15 +20,15 @@ void TmpCamera::start(){
 
 void TmpCamera::update(){
     if (World::tmpNode.get() == nullptr) { return; }
-
-    const char* keyword = World::tmpNode->getOperation()->keyWord.c_str(); //printf("c");
+    
+    const char* keyword = World::tmpNode->getOperation()->keyWord.c_str();
     const glm::mat4& cp = World::tmpNode->getData().getMat4();
-
+    
     if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Perspective")==0||strcmp(keyword,"Frustum")==0){
         m_cam->m_perspective = cp;
     }
-
+    
     const glm::mat4& cp2 = World::tmpSequence2->getMatrices().at(0)->getData().getMat4();
-
+    
     m_gameObject->transformation = glm::inverse(cp2);
 }

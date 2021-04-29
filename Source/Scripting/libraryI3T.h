@@ -13,7 +13,7 @@
 * List of types of matrix operators and transforms. First parameter of script function mat4oper or mat4 must be one of these values.
 */
 struct Mat4types {
-	const int matrix=0,trackball=1,inverse=2,transpose=3,determinant=4,matmulvec=7,vecmulmat=8,floatmulmat=9;
+	const int trackball=1,inverse=2,transpose=3,determinant=4,matmulvec=7,vecmulmat=8,floatmulmat=9;
 	const int scale = 10, translate=11,rotatex =12,rotatey=13,rotatez=14,axisangle=15,ortho=16,perspective=17,frustrum=18,lookAt=19;
 	const int free = 20, uniscale = 21;
 };
@@ -37,14 +37,19 @@ struct FloatOperators {
 * Can be passed as first parameter to functions mat4oper, vec4oper, vec3oper a floatoper
 */
 struct ArithmeticOperators {
-	const int add=300, substract=301, div=302, mul=303,show=304,mix=305;
+	const int add=300, sub=301, div=302, mul=303,show=304,mix=305;
+};
+struct Convertors {
+	const int mat_tr = 400, tr_mat = 401, mat_vecs4 = 402,mat_quat=403,mat_scalars=404,vecs4_mat=405,vec4_vec3=406,vec4_scalars=407;
+	const int vecs3_mat=408,vec3_vec4=409,vec3_scalars=410,quat_mat=411,quat_scalars=412,scalars_mat=413,scalars_vec3=414,scalars_vec4=415,scalars_quat=416;
+	const int norm_quat=417;
 };
 /**
 * \struct Node4LODs
 * List of levels of detail of node display. Third parameter of script function confnode must be one of these values.
 */
 struct NodeLODs {
-	const int full=400,setvalues=401,label=402;
+	const int full=500,setvalues=501,label=502;
 };
 /**
 * \struct ScriptingData
@@ -57,6 +62,7 @@ struct ScriptingData {
 	VecOperators vecOperators;
 	FloatOperators floatOperators;
 	ArithmeticOperators arithmeticOperators;
+	Convertors convertors;
 	NodeLODs nodeLODs;
 	std::vector<glm::mat4>nodeData;///<Vector of data as mat4, that were created by script. Serves as temporary static storage. Not needed after script is executed.
 	std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;

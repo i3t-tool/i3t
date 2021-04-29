@@ -2,67 +2,10 @@
 
 #include "Scripting.h"
 #include "libraryI3T.h"
+#include "Source/World/Transforms.h"
 #include "Commands/ApplicationCommands.h"
+#include "Source/GUI/Elements/Windows/WorkspaceWindow.h"
 
-//transformations{
-#include "Source/GUI/Elements/Nodes/WorkspaceSequence.h"
-//} tranformationa end
-
-//operators {
-
-//	transformations{
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixScale.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixRotate.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerX.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerY.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerZ.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakeFrustum.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakeLookAt.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakeOrtho.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMakePerspective.h"
-//	} tranformationa end
-
-//	matrix{
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixFree.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixInversion.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixMulMatrix.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixTranspose.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceDeterminant.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixAddMatrix.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixMulFloat.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixMulVector.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorMulMatrix.h"
-//	} matrix end
-
-//	vec4{
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorFree.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceNormalizeVector.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorDotVector.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorAddVector.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorSubVector.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorMulFloat.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVectorPerspectiveDivision.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMixVector.h"
-//	} vec4 end
-
-//	vec4{
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3Free.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceNormalizeVector3.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3CrossVector3.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3DotVector3.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3AddVector3.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3SubVector3.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3MulFloat.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceVector3Length.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceShowVector3.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMixVector3.h"
-//	} vec4 end
-
-//	float{
-#include "Source/GUI/Elements/Nodes/WorkspaceFloatFree.h"
-//	} float end
-//}operators end
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -94,17 +37,142 @@ bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			fprintf(f, "int d%d=datavec3(%0.3ff,%0.3ff,%0.3ff);\n", i, s[0], s[1], s[2]);
 			fprintf(f, "int n%d=mat4(translate,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1],label.c_str());
 		}
+		else if (strcmp(keyword, "Free") == 0) {
+			glm::mat4 m = nodebase->getData().getMat4();
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i,
+				m[0][0], m[0][1], m[0][2],m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[1][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]);
+			fprintf(f, "int n%d=mat4(free,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "LookAt") == 0) {
+			Core::LookAt* lookat = (Core::LookAt*)(nodebase.get());
+			glm::mat3 m = glm::mat3(0.0f);
+			m[0]=lookat->getCenter();m[1]=lookat->getEye();m[2]=lookat->getUp();
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,%0.3ff,0.0f, %0.3ff,%0.3ff,%0.3ff,0.0f, %0.3ff,%0.3ff,%0.3ff,0.0f, 0.0f,0.0f,0.0f,0.0f);\n", i,
+				m[0][0],m[0][1],m[0][2], m[1][0],m[1][1],m[1][2], m[2][0],m[2][1],m[2][2]);
+			fprintf(f, "int n%d=mat4(lookat,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "EulerX") == 0) {
+			glm::mat4 m = nodebase->getData().getMat4();
+			glm::vec3 v = (glm::vec3)(m * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+			float a = angle2(v[1], v[2]);
+			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i, a);
+			fprintf(f, "int n%d=mat4(rotatex,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "EulerY") == 0) {
+			glm::mat4 m = nodebase->getData().getMat4();
+			glm::vec3 v = (glm::vec3)(m * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
+			float a = angle2(v[1], v[2]);
+			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i, a);
+			fprintf(f, "int n%d=mat4(rotatey,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "EulerZ") == 0) {
+			glm::mat4 m = nodebase->getData().getMat4();
+			glm::vec3 v = (glm::vec3)(m * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
+			float a = angle2(v[1], v[2]);
+			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i, a);
+			fprintf(f, "int n%d=mat4(rotatez,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "AxisAngle") == 0) {
+			glm::mat4 m = nodebase->getData().getMat4();
+			glm::vec3 v = (glm::vec3)(m * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+			float a = angle2(v[1], v[2]);
+			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i, a);
+			fprintf(f, "int n%d=mat4(axisangle,d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		//float
 		else if (strcmp(keyword, "FloatToFloat") == 0) {
 			float v = nodebase->getData().getFloat();
 			fprintf(f,"int d%d=datascalar(%0.3ff);\n", i, v);
 			fprintf(f,"int n%d=scalar(d%d,%d,%d,\"%s\");\n", i,i, (int)pos[0], (int)pos[1], label.c_str());
 		}
+		//float oper
+		else if (strcmp(keyword, "ClampFloat") == 0) {
+			fprintf(f, "int n%d=scalaroper(clamp,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatMulFloat") == 0) {
+			fprintf(f, "int n%d=scalaroper(mul,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatDivFloat") == 0) {
+			fprintf(f, "int n%d=scalaroper(div,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatAddFloat") == 0) {
+			fprintf(f, "int n%d=scalaroper(add,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatPowFloat") == 0) {
+			fprintf(f, "int n%d=scalaroper(clamp,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MixFloat") == 0) {
+			fprintf(f, "int n%d=scalaroper(mix,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatSinCos") == 0) {
+			fprintf(f, "int n%d=scalaroper(sincos,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatAsinAcos") == 0) {
+			fprintf(f, "int n%d=scalaroper(asinacos,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Signum") == 0) {
+			fprintf(f, "int n%d=scalaroper(signum,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		//convertor
+		else if (strcmp(keyword, "MatrixToVectors") == 0) {
+			fprintf(f, "int n%d=convertor(mat_vec4,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vectors3ToMatrix") == 0) {
+			fprintf(f, "int n%d=convertor(vecs3_mat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorsToMatrix") == 0) {
+			fprintf(f, "int n%d=convertor(vecs4_mat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixToFloats") == 0) {
+			fprintf(f, "int n%d=convertor(mat_scalars,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatsToMatrix") == 0) {
+			fprintf(f, "int n%d=convertor(scalars_mat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixToTR") == 0) {
+			fprintf(f, "int n%d=convertor(mat_tr,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "TRToMatrix") == 0) {
+			fprintf(f, "int n%d=convertor(tr_mat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "MatrixToQuat") == 0) {
+			fprintf(f, "int n%d=convertor(mat_quat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatToMatrix") == 0) {
+			fprintf(f, "int n%d=convertor(quat_mat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorToFloats") == 0) {
+			fprintf(f, "int n%d=convertor(vec4_scalars,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatsToVector") == 0) {
+			fprintf(f, "int n%d=convertor(scalars_vec4,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3ToFloats") == 0) {
+			fprintf(f, "int n%d=convertor(vec3_scalars,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatsToVector3") == 0) {
+			fprintf(f, "int n%d=convertor(scalars_vec3,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VectorToVector3") == 0) {
+			fprintf(f, "int n%d=convertor(vec4_vec3,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Vector3ToVector") == 0) {
+			fprintf(f, "int n%d=convertor(vec3_vec4,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatToFloats") == 0) {
+			fprintf(f, "int n%d=convertor(quat_scalars,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatsToQuat") == 0) {
+			fprintf(f, "int n%d=convertor(scalars_quat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "NormalizeQuat") == 0) {
+			fprintf(f, "int n%d=convertor(norm_quat,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		//vec4
 		else if (strcmp(keyword, "Vector4ToVector4") == 0) {
-			glm::vec4 vec4 = nodebase->getData().getVec4();
-			fprintf(f, "int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i, vec4[0], vec4[1], vec4[2], vec4[3]);
-			fprintf(f, "int n%d=vec4(d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
+			glm::vec4 vec = nodebase->getData().getVec4();
+			fprintf(f, "int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i, vec[0], vec[1], vec[2],vec[3]);
+			fprintf(f, "int n%d=vec3(d%d,%d,%d,\"%s\");\n", i, i, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		//vec4oper
 		else if (strcmp(keyword, "VectorDotVector") == 0) {
@@ -188,7 +256,7 @@ bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreDa
 			fprintf(f, "int n%d=mat4oper(add,%d,%d,\"%s\");\n", i, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "MatrixToMatrix") == 0) {
-			fprintf(f, "int n%d=mat4oper(matrix,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
+			fprintf(f, "int n%d=mat4oper(free,%d,%d,\"%s\");\n", i,(int)pos[0], (int)pos[1], label.c_str());
 		}
 
 		else if (strcmp(keyword, "MakePerspective") == 0) {

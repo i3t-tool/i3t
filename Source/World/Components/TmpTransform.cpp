@@ -29,7 +29,7 @@ void TmpTransform::update() {
 
     if(/*strcmp(keyword,"LookAt")!=0&&*/strcmp(keyword,"Ortho")!=0&&strcmp(keyword,"Perspective")!=0&&strcmp(keyword,"Frustum")!=0){
         Ptr<Core::NodeBase>node= World::tmpSequence->getMatrices().back();
-        m_gameObject->transformation = getNodeTransform(&node,&World::tmpSequence);//*cp;
+        m_gameObject->transformation = getNodeTransform(&node,&World::tmpSequence)*cp;
     }
     
 }
