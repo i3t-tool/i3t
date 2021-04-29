@@ -132,6 +132,8 @@ public:
 		m_currentMap = &map;
 	}
 
+  [[nodiscard]] float getRot() { return m_initialRot; }
+
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
@@ -160,6 +162,8 @@ public:
 		m_initialMap = &map;
 		m_currentMap = &map;
 	}
+
+  [[nodiscard]] float getRot() { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -190,6 +194,8 @@ public:
 		m_currentMap = &map;
 	}
 
+  [[nodiscard]] float getRot() { return m_initialRot; }
+
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
@@ -218,14 +224,11 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-
 	void reset() override;
 
 	float getX();
 	float getY();
 	float getZ();
-
-	/* \todo JH Martine prosím o gettery XYZ pro DataMapu */
 
 	ValueSetResult setX(float v);
   ValueSetResult setY(float v);
