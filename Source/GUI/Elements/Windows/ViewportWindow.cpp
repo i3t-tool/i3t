@@ -6,6 +6,7 @@
 #include "Core/Application.h"
 #include "Core/Input/InputActions.h"
 #include "Core/Input/InputManager.h"
+#include "Logger/Logger.h"
 
 #include "../../../World/Select.h"
 #include "../../../World/World.h"
@@ -44,6 +45,20 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	// init vectors definig size to display
 	m_wcMin = ImVec2(0, 0);
 	m_wcMax = ImVec2(0, 0);
+
+	InputManager::setInputAction("fire", Keys::b);
+	InputManager::setInputAxis("move", 1.0f, Keys::o);
+	InputManager::setInputAxis("move", -1.0f, Keys::o);
+
+	Input.bindAction("fire", EKeyState::Pressed, []()
+  {
+	  Log::info("Action fired.");
+  });
+  Input.bindAction("fire", EKeyState::Released, []()
+  {
+    Log::info("Action released.");
+  });
+
 }
 
 float localData;

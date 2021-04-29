@@ -1,5 +1,7 @@
 #include "InputActions.h"
 
+#include "InputManager.h"
+
 /// \todo Set default keys according to the Dr. Felkel's table.
 bool InputActions::CameraOrbit = true;
 Keys::Code InputActions::KeyWorld_mousePan = Keys::mouseMiddle;
@@ -16,8 +18,21 @@ Keys::Code InputActions::KeyScene_camTo_scene = Keys::n0;
 Keys::Code InputActions::Key_undo = Keys::b;
 Keys::Code InputActions::Key_redo = Keys::n;
 
+MActions InputActions::m_inputActions;
+InputActions::MAxis InputActions::m_inputAxis;
+
 void InputActions::resize(float width, float height)
 {
 	InputManager::setScreenSize((int)width, (int)height);
 	// GUIProjection::setScreenSize(width, height);
+}
+
+bool InputActions::isActionCreated(const char* name)
+{
+	return m_inputActions.contains(name);
+}
+
+bool InputActions::isAxisCreated(const char* name)
+{
+  return m_inputAxis.contains(name);
 }
