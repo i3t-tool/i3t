@@ -48,8 +48,8 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 		glUseProgram(World::shaderProj.program);
 		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
-		m_frustrum->draw(transform);
 		m_frustruml->draw(transform);
+		m_frustrum->draw(transform);
 		glEnable(GL_CULL_FACE);
 	}
 	else{

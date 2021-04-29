@@ -135,7 +135,8 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequen
 		nodeindex=*it;
 		DataStore d=nodeindex->getData();
 		//printf("mul %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
-		m=d.getMat4()*m;
+		if(strcmp(nodeindex->getOperation()->keyWord.c_str(),"LookAt")==0){m=glm::inverse(d.getMat4())*m;}
+		else{m=d.getMat4()*m;}
 		it++;
 	}//getchar();
 	return m;
