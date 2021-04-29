@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <map>
 
 #include "InputBindings.h"
 #include "KeyCodes.h"
