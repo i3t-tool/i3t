@@ -25,17 +25,20 @@
 
 //transformations{
 #include "../Nodes/WorkspaceSequence.h"
-
 #include "../Nodes/WorkspaceMatrixScale.h"
 #include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceTransformationFree.h"
+#include "../Nodes/WorkspaceLookAt.h"
+#include "../Nodes/WorkspaceEulerX.h"
+//#include "../Nodes/WorkspaceEulerY.h"
+//#include "../Nodes/WorkspaceEulerZ.h"
+#include "../Nodes/WorkspaceAxisAngle.h"
 //} tranformationa end
 
 //operators {
 
 //	transformations{
-#include "../Nodes/WorkspaceMakeTranslation.h"
-#include "../Nodes/WorkspaceMakeScale.h"
-#include "../Nodes/WorkspaceMatrixRotate.h"
+#include "../Nodes/WorkspaceMakeAxisAngle.h"
 #include "../Nodes/WorkspaceMakeEulerX.h"
 #include "../Nodes/WorkspaceMakeEulerY.h"
 #include "../Nodes/WorkspaceMakeEulerZ.h"
@@ -43,6 +46,8 @@
 #include "../Nodes/WorkspaceMakeLookAt.h"
 #include "../Nodes/WorkspaceMakeOrtho.h"
 #include "../Nodes/WorkspaceMakePerspective.h"
+#include "../Nodes/WorkspaceMakeScale.h"
+#include "../Nodes/WorkspaceMakeTranslation.h"
 //	} tranformation end
 
 //	matrix{

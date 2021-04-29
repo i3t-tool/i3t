@@ -745,6 +745,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("add transforamtion");
 			ImGui::Separator();
 			if (ImGui::MenuItem("free")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTransformationFree>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::MenuItem("translation")) {
         m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
@@ -755,12 +757,16 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("add rotation");
 				ImGui::Separator();
 				if (ImGui::MenuItem("eulerAngleX")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerX>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleY")) {
 				}
 				if (ImGui::MenuItem("eulerAngleZ")) {
 				}
 				if (ImGui::MenuItem("rotate")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAxisAngle>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat")) {
 				}
@@ -781,6 +787,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 			}
 			if (ImGui::MenuItem("lookAt")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceLookAt>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::BeginMenu("projection")) {
 
@@ -822,7 +830,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("rotate")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixRotate>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeAxisAngle>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("scale")) {

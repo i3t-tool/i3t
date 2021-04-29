@@ -1,7 +1,7 @@
 #pragma once
 #include "WorkspaceMatrix4x4.h"
 
-struct WorkspaceMatrixRotateArgs
+struct WorkspaceMakeAxisAngleArgs
 {
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Rotate header";
@@ -9,11 +9,11 @@ struct WorkspaceMatrixRotateArgs
     Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MakeAxisAngle>();
 };
 
-class WorkspaceMatrixRotate : public WorkspaceMatrix4x4
+class WorkspaceMakeAxisAngle : public WorkspaceMatrix4x4
 {
 public:
-    WorkspaceMatrixRotate(ImTextureID headerBackground, WorkspaceMatrixRotateArgs const& args);
-    WorkspaceMatrixRotate(ImTextureID headerBackground, std::string headerLabel = "Rotate", std::string nodeLabel = "Rotate");
+	WorkspaceMakeAxisAngle(ImTextureID headerBackground, WorkspaceMakeAxisAngleArgs const& args);
+	WorkspaceMakeAxisAngle(ImTextureID headerBackground, std::string headerLabel = "Rotate", std::string nodeLabel = "Rotate");
 
     void drawDataSetValues(util::NodeBuilder& builder);
 

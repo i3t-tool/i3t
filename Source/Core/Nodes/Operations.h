@@ -213,18 +213,18 @@ enum class ENodeType
 enum class ETransformType
 {
 	//This is for sequence
-	Free = 0,
+	Free = 0,//done SS
 	Translation, //done JH
-	EulerX,
-	EulerY,
-	EulerZ,
+	EulerX,//WIP SS
+	EulerY,//WIP SS
+	EulerZ,//WIP SS
 	Scale, //done JH
-	AxisAngle,
+	AxisAngle,//done SS
 	Quat,
 	Ortho,
 	Perspective,
 	Frustum,
-	LookAt,
+	LookAt,//done SS
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
