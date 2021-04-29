@@ -16,10 +16,6 @@ constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys
 
 ImGuiConfigFlags g_mousedFlags;
 
-void InputManager::canSetInputAction(const char* action, Keys::Code code)
-{
-}
-
 void InputManager::setInputAction(const char* action, Keys::Code code)
 {
 	if (!InputBindings::isActionCreated(action))
@@ -106,36 +102,6 @@ void InputManager::processViewportEvents()
 			setUnpressed(imGuiMouseKeys[i]);
 		}
 	}
-
-	/*
-	// Check scrolling.
-	if (io.MouseWheel < -0.1f)
-	  setPressed(Keys::mouseScrlUp);
-	else
-	  setUnpressed(Keys::mouseScrlUp);
-
-	if (io.MouseWheel > 0.1f)
-	  setPressed(Keys::mouseScrlDown);
-	else
-	  setUnpressed(Keys::mouseScrlDown);
-	 */
-
-	// Handle keys.
-	/*
-	for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++)
-	{
-	  if (ImGui::IsKeyPressed(i))
-	    keyDown(i);
-
-	  if (ImGui::IsKeyReleased(i))
-	    keyUp(i);
-	}
-	 */
-}
-
-bool InputManager::isActionZoomToAll()
-{
-	return isKeyPressed(Keys::ctrll) && isKeyJustPressed(Keys::a);
 }
 
 void InputManager::beginCameraControl()

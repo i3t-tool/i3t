@@ -5,29 +5,16 @@
 std::vector<Keys::Code> g_defaultAction;
 std::vector<std::pair<Keys::Code, float>> g_defaultAxis;
 
-/// \todo Set default keys according to the Dr. Felkel's table.
-bool InputBindings::CameraOrbit = true;
-Keys::Code InputBindings::KeyWorld_mousePan = Keys::mouseMiddle;
-Keys::Code InputBindings::KeyWorld_mouseRotate = Keys::mouseRight;
+InputBindings::ActionsMap InputBindings::m_inputActions;
+InputBindings::AxisMap InputBindings::m_inputAxis;
 
-Keys::Code InputBindings::KeyScene_camTo_orbitX = Keys::n1;
-Keys::Code InputBindings::KeyScene_camTo_orbitY = Keys::n2;
-Keys::Code InputBindings::KeyScene_camTo_orbitZ = Keys::n3;
-Keys::Code InputBindings::KeyScene_camTo_worldX = Keys::n4;
-Keys::Code InputBindings::KeyScene_camTo_worldY = Keys::n5;
-Keys::Code InputBindings::KeyScene_camTo_worldZ = Keys::n6;
-Keys::Code InputBindings::KeyScene_camTo_scene = Keys::n0;
-
-Keys::Code InputBindings::Key_undo = Keys::b;
-Keys::Code InputBindings::Key_redo = Keys::n;
-
-InputBindings::MActions InputBindings::m_inputActions;
-InputBindings::MAxis InputBindings::m_inputAxis;
-
-void InputBindings::resize(float width, float height)
+void InputBindings::init()
 {
-	InputManager::setScreenSize((int)width, (int)height);
-	// GUIProjection::setScreenSize(width, height);
+	// Default input bindings.
+	InputManager::setInputAction("KeyWorld_mousePan", Keys::mouseMiddle);
+	InputManager::setInputAction("KeyWorld_mouseRotate", Keys::mouseRight);
+	InputManager::setInputAction("Key_undo", Keys::b);
+	InputManager::setInputAction("Key_redo", Keys::n);
 }
 
 const std::vector<Keys::Code>& InputBindings::getActionKeys(const char* name)

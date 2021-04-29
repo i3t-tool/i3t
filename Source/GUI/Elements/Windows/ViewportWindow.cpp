@@ -125,7 +125,7 @@ void Viewport::render()
 
 			// resize all other things
 			// m_world->onReshape(width, height);
-			InputBindings::resize((float)width, (float)height);
+      InputManager::setScreenSize((int)width, (int)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 

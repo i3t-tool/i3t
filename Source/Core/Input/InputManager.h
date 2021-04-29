@@ -82,7 +82,8 @@ private:
   static Ptr<IWindow> m_focusedWindow;
 
 public:
-	static void canSetInputAction(const char* action, Keys::Code code);
+	static glm::vec2 getMouseDelta() { return { m_mouseXDelta, m_mouseYDelta }; }
+
 	static void setInputAction(const char* action, Keys::Code code);
 	static void setInputAxis(const char* action, float scale, Keys::Code code);
 
@@ -197,8 +198,6 @@ public:
    * Use this function after ImGui::Begin(...).
    */
   static void processViewportEvents();
-
-  static bool isActionZoomToAll();
 
   //@{
   /** \name Key callbacks */
