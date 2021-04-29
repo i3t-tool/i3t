@@ -1,7 +1,7 @@
 #include "CameraControl.h"
 #include "../Component.h"
 #include "../Transforms.h"
-#include "Core/Input/InputActions.h"
+#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include <iostream>

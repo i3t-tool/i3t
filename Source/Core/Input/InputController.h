@@ -3,7 +3,7 @@
 #include <functional>
 #include <map>
 
-#include "InputActions.h"
+#include "InputBindings.h"
 #include "KeyCodes.h"
 
 using KeyCallback = std::function<void()>;
@@ -24,6 +24,7 @@ class InputController
 	std::map<Keys::Code, KeyCallback> m_keyDownCallbacks;
 
   std::vector<Action> m_actions;
+	std::unordered_map<std::string_view, AxisCallback> m_axis;
 
 public:
 	InputController();

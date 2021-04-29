@@ -7,9 +7,12 @@
 
 using MActions = std::map<std::string_view, Keys::Code>;
 
-struct InputActions final
+struct InputBindings final
 {
-	using MAxis = std::unordered_map<std::string_view, std::pair<Keys::Code, float>>;
+	using MAxis = std::unordered_map<
+	    std::string_view,
+			std::vector<std::pair<Keys::Code, float>>
+  >;
 
 	friend class InputManager;
 
@@ -29,8 +32,10 @@ struct InputActions final
 
 	static void resize(float width, float height);
 
-	bool isActionCreated(const char* name);
-	bool isAxisCreated(const char* name);
+	static Keys::Code getActionKey(const char* name);
+	static void setActionKey(const char* name, Keys::Code code);
+	static bool isActionCreated(const char* name);
+	static bool isAxisCreated(const char* name);
 
 private:
   static MActions m_inputActions;

@@ -5,7 +5,7 @@
 
 #include "Core/Application.h"
 #include "Core/GlfwWindow.h"
-#include "InputActions.h"
+#include "InputBindings.h"
 #include "Logger/LoggerInternal.h"
 
 #include "GUI/Elements/Windows/ViewportWindow.h"
@@ -23,12 +23,16 @@ void InputManager::canSetInputAction(const char* action, Keys::Code code)
 
 void InputManager::setInputAction(const char* action, Keys::Code code)
 {
-  InputActions::m_inputActions.insert({action, code});
+	if (!InputBindings::isActionCreated(action))
+		InputBindings::m_inputActions.insert({action, code});
 }
 
 void InputManager::setInputAxis(const char* action, float scale, Keys::Code code)
 {
-  InputActions::m_inputAxis.insert({action, {code, scale}});
+	if (!InputBindings::isAxisCreated(action))
+		InputBindings::m_inputAxis[action];
+
+	InputBindings::m_inputAxis[action].push_back({code, scale});
 }
 
 bool InputManager::isMouseClicked()
@@ -198,8 +202,7 @@ void InputManager::update()
 
     for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
     {
-			auto& actions = InputActions::m_inputActions;
-			auto key = InputActions::m_inputActions[action];
+			auto key = InputBindings::m_inputActions[action];
 			bool shouldProcess = m_keyMap[key] == KeyState::JUST_UP || m_keyMap[key] == KeyState::JUST_DOWN;
 			if (shouldProcess)
       {
@@ -213,6 +216,18 @@ void InputManager::update()
         }
 			}
     }
+
+		for (const auto& [action, fn] : m_focusedWindow->Input.m_axis)
+    {
+      auto keys = InputBindings::m_inputAxis[action];
+			for (const auto& [key, scale] : keys)
+      {
+				if (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN)
+        {
+					fn(scale);
+				}
+			}
+		}
 	}
 
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)

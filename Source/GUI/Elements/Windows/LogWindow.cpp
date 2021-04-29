@@ -23,6 +23,24 @@ void LogWindow::render()
 	if (ImGui::Button("Prev")) { cycle->stepBack(); } ImGui::SameLine();
 	if (ImGui::Button("Next")) { cycle->stepNext(); }
 
+	/// \todo MH test code, remove
+  static bool val = true;
+
+  ImGui::Text("Switch fire action key"); ImGui::SameLine();
+	ImGui::Text("%s", val ? "b" : "v");
+	if (ImGui::Button("Switch"))
+  {
+		val = !val;
+		if (val)
+    {
+			InputBindings::setActionKey("fire", Keys::Code::b);
+		}
+		else
+    {
+      InputBindings::setActionKey("fire", Keys::Code::v);
+		}
+	}
+
 	ImGui::BeginChild(ID);
 	ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
 

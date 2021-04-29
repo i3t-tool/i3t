@@ -2,7 +2,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
-#include "Core/Input/InputActions.h"
+#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
@@ -181,21 +181,21 @@ void UIModule::buildDockspace()
 void UIModule::queryCameraState()
 {
   // ORBIT camera rotation
-  if (InputManager::isKeyJustPressed(InputActions::KeyWorld_mouseRotate))
+  if (InputManager::isKeyJustPressed(InputBindings::KeyWorld_mouseRotate))
   {
     InputManager::beginCameraControl();
   }
-  if (InputManager::isKeyJustUp(InputActions::KeyWorld_mouseRotate))
+  if (InputManager::isKeyJustUp(InputBindings::KeyWorld_mouseRotate))
   {
     InputManager::endCameraControl();
   }
 
   // CAMERA PANNING - set a new orbit center
-  if (InputManager::isKeyJustPressed(InputActions::KeyWorld_mousePan))
+  if (InputManager::isKeyJustPressed(InputBindings::KeyWorld_mousePan))
   {
     InputManager::beginCameraControl();
   }
-  if (InputManager::isKeyJustUp(InputActions::KeyWorld_mousePan))
+  if (InputManager::isKeyJustUp(InputBindings::KeyWorld_mousePan))
   {
     InputManager::endCameraControl();
   }

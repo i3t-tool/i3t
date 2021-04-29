@@ -4,7 +4,7 @@
 
 #include "Core/API.h"
 #include "Core/Application.h"
-#include "Core/Input/InputActions.h"
+#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 
@@ -48,7 +48,7 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 
 	InputManager::setInputAction("fire", Keys::b);
 	InputManager::setInputAxis("move", 1.0f, Keys::o);
-	InputManager::setInputAxis("move", -1.0f, Keys::o);
+	InputManager::setInputAxis("move", -1.0f, Keys::p);
 
 	Input.bindAction("fire", EKeyState::Pressed, []()
   {
@@ -58,7 +58,10 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
   {
     Log::info("Action released.");
   });
-
+  Input.bindAxis("move", [](float val)
+  {
+    Log::info("move: {}", val);
+  });
 }
 
 float localData;
@@ -121,7 +124,7 @@ void Viewport::render()
 
 			// resize all other things
 			// m_world->onReshape(width, height);
-			InputActions::resize((float)width, (float)height);
+			InputBindings::resize((float)width, (float)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 
