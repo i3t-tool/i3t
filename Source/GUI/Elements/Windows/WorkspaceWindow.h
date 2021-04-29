@@ -25,14 +25,20 @@
 
 //transformations{
 #include "../Nodes/WorkspaceSequence.h"
+#include "../Nodes/WorkspaceMatrixScale.h"
+#include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceTransformationFree.h"
+#include "../Nodes/WorkspaceLookAt.h"
+#include "../Nodes/WorkspaceEulerX.h"
+//#include "../Nodes/WorkspaceEulerY.h"
+//#include "../Nodes/WorkspaceEulerZ.h"
+#include "../Nodes/WorkspaceAxisAngle.h"
 //} tranformationa end
 
 //operators {
 
 //	transformations{
-#include "../Nodes/WorkspaceMatrixScale.h"
-#include "../Nodes/WorkspaceMatrixTranslation.h"
-#include "../Nodes/WorkspaceMatrixRotate.h"
+#include "../Nodes/WorkspaceMakeAxisAngle.h"
 #include "../Nodes/WorkspaceMakeEulerX.h"
 #include "../Nodes/WorkspaceMakeEulerY.h"
 #include "../Nodes/WorkspaceMakeEulerZ.h"
@@ -40,6 +46,8 @@
 #include "../Nodes/WorkspaceMakeLookAt.h"
 #include "../Nodes/WorkspaceMakeOrtho.h"
 #include "../Nodes/WorkspaceMakePerspective.h"
+#include "../Nodes/WorkspaceMakeScale.h"
+#include "../Nodes/WorkspaceMakeTranslation.h"
 //	} tranformation end
 
 //	matrix{
@@ -65,7 +73,7 @@
 #include "../Nodes/WorkspaceMixVector.h"
 //	} vec4 end
 
-//	vec4{
+//	vec3{
 #include "../Nodes/WorkspaceVector3Free.h"
 #include "../Nodes/WorkspaceNormalizeVector3.h"
 #include "../Nodes/WorkspaceVector3CrossVector3.h"
@@ -80,7 +88,29 @@
 
 //	float{
 #include "../Nodes/WorkspaceFloatFree.h"
+#include "../Nodes/WorkspaceClampFloat.h"
+#include "../Nodes/WorkspaceFloatMulFloat.h"
+#include "../Nodes/WorkspaceFloatDivFloat.h"
+#include "../Nodes/WorkspaceFloatAddFloat.h"
+#include "../Nodes/WorkspaceFloatPowFloat.h"
+#include "../Nodes/WorkspaceMixFloat.h"
+#include "../Nodes/WorkspaceSignum.h"
+//#include "../Nodes/WorkspaceFloatSinCos.h"
+//#include "../Nodes/WorkspaceASinACos.h"
+//#include "../Nodes/WorkspaceFloatCycle.h"
 //	} float end
+
+//  conversion{
+#include "../Nodes/WorkspaceFloatsToMatrix.h"
+#include "../Nodes/WorkspaceFloatsToVector.h"
+#include "../Nodes/WorkspaceFloatsToVector3.h"
+#include "../Nodes/WorkspaceQuatToMatrix.h"
+#include "../Nodes/WorkspaceTRToMatrix.h"
+#include "../Nodes/WorkspaceVector3ToVector.h"
+#include "../Nodes/WorkspaceVectors3ToMatrix.h"
+#include "../Nodes/WorkspaceVectorsToMatrix.h"
+#include "../Nodes/WorkspaceVectorToVector3.h"
+//  }
 //}operators end
 
 #include "Core/Input/InputManager.h"

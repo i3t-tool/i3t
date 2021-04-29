@@ -745,20 +745,28 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("add transforamtion");
 			ImGui::Separator();
 			if (ImGui::MenuItem("free")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTransformationFree>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::MenuItem("translation")) {
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::BeginMenu("rotation")) {
 
 				ImGui::Text("add rotation");
 				ImGui::Separator();
 				if (ImGui::MenuItem("eulerAngleX")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerX>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleY")) {
 				}
 				if (ImGui::MenuItem("eulerAngleZ")) {
 				}
 				if (ImGui::MenuItem("rotate")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAxisAngle>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat")) {
 				}
@@ -772,12 +780,15 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("uniform scale")) {
 				}
 				if (ImGui::MenuItem("scale")) {
-
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
 			}
 			if (ImGui::MenuItem("lookAt")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceLookAt>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::BeginMenu("projection")) {
 
@@ -803,8 +814,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("transformation operators");
 				ImGui::Separator();
 				if (ImGui::MenuItem("translate")) {
-					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeTranslation>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("eulerAngleX")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(m_headerBackgroundTexture));
@@ -819,12 +830,12 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("rotate")) {
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixRotate>(m_headerBackgroundTexture));
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeAxisAngle>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("scale")) {
-					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeScale>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("ortho")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(m_headerBackgroundTexture));
@@ -1028,24 +1039,38 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("clamp float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceClampFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float cycle")) {
 				}
 				if (ImGui::MenuItem("float * float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float / float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatDivFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float + float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatAddFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float ^ float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatPowFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mix float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMixFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("sin & cos(float)")) {
 				}
 				if (ImGui::MenuItem("asin & acos(float")) {
 				}
 				if (ImGui::MenuItem("signum")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSignum>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -1055,8 +1080,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("conversion operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("mat -> TR")) {
+
 				}
 				if (ImGui::MenuItem("TR -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTRToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat -> vecs4")) {
 				}
@@ -1065,26 +1093,43 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("mat -> floats")) {
 				}
 				if (ImGui::MenuItem("vecs4 -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorsToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 -> vec3")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorToVector3>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 -> floats")) {
+
 				}
 				if (ImGui::MenuItem("vecs3 -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectors3ToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 -> vec4")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3ToVector>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 -> floats")) {
 				}
 				if (ImGui::MenuItem("quat -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> floats")) {
 				}
 				if (ImGui::MenuItem("floats -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("floats -> vec4")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToVector>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("floats -> vec3")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToVector3>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("floats -> quat")) {
 				}

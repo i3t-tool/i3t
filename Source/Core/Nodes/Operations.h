@@ -145,49 +145,49 @@ enum class ENodeType
 	Vector3Length,	//done SS
 	ShowVector3,	//done SS
 	MixVector3,	//done SS
-	ConjQuat,
-	FloatVecToQuat,
-	AngleAxisToQuat,
-	VecVecToQuat,
-	QuatToFloatVec,
-	QuatToAngleAxis,
-	QuatToEuler,
-	EulerToQuat,
-	QuatInverse,
-	QuatSlerp,
-	QuatLongWaySlerp,
-	QuatLerp,
-	FloatMulQuat,
-	QuatMulQuat,
-	QuatVecConjQuat,
-	QuatLength,
-	ClampFloat,
-	FloatMulFloat,
-	FloatDivFloat,
-	FloatAddFloat,
-	FloatPowFloat,
-	MixFloat,
-	FloatSinCos,
-	ASinACos,
-	Signum,
-	MatrixToVectors,
-	Vectors3ToMatrix,
-	VectorsToMatrix,
-	MatrixToFloats,
-	FloatsToMatrix,
-	MatrixToTR,
-	TRToMatrix,
-	MatrixToQuat,
-	QuatToMatrix,
-	VectorToFloats,
-	FloatsToVector,
-	Vector3ToFloats,
-	FloatsToVector3,
-	VectorToVector3,
-	Vector3ToVector,
-	QuatToFloats,
-	FloatsToQuat,
-	NormalizeQuat,
+	ConjQuat, //t
+	FloatVecToQuat,//t
+	AngleAxisToQuat,//t
+	VecVecToQuat,//t
+	QuatToFloatVec,//todo  vec3 + float
+	QuatToAngleAxis,//todo vec3 + float
+	QuatToEuler, //todo 3 floats
+	EulerToQuat,//t
+	QuatInverse,//t
+	QuatSlerp,//t
+	QuatLongWaySlerp,//t
+	QuatLerp, //t
+	FloatMulQuat,//t
+	QuatMulQuat,//t
+	QuatVecConjQuat,//t vec3
+	QuatLength, //t float
+	ClampFloat, //done SS
+	FloatMulFloat,  //done SS
+	FloatDivFloat,//done SS
+	FloatAddFloat,//done SS
+	FloatPowFloat,//done SS
+	MixFloat,//done SS
+	FloatSinCos,//todo 2 floats
+	ASinACos,//todo 2 floats
+	Signum,//done SS
+	MatrixToVectors, //todo 4 vectors
+	Vectors3ToMatrix, //done SS
+	VectorsToMatrix, //done SS
+	MatrixToFloats, //todo 16 floats
+	FloatsToMatrix, //done SS
+	MatrixToTR, // todo 2 matrix
+	TRToMatrix, //done SS
+	MatrixToQuat, //t
+	QuatToMatrix,//done SS
+	VectorToFloats, // todo 4 floats
+	FloatsToVector,  //done SS
+	Vector3ToFloats, // todo 4 floats
+	FloatsToVector3,//done SS
+	VectorToVector3,//done SS
+	Vector3ToVector,//done SS
+	QuatToFloats, //todo 4 floats
+	FloatsToQuat,//t
+	NormalizeQuat, //t
 	Float, //done SS
 	Vector3, //done JH
 	Vector4, //done JH
@@ -195,11 +195,11 @@ enum class ENodeType
 	Model,
 
 	// Transform matrices "constructors"
-	MakeTranslation, //done JH
+	MakeTranslation, //done SS
 	MakeEulerX, //done SS
 	MakeEulerY, //done SS
 	MakeEulerZ, //done SS
-	MakeScale, //done JH
+	MakeScale, //done SS
 	MakeAxisAngle, //done SS
 	MakeOrtho, //done SS
 	MakePerspective, //done SS
@@ -213,18 +213,18 @@ enum class ENodeType
 enum class ETransformType
 {
 	//This is for sequence
-	Free = 0,
+	Free = 0,//done SS
 	Translation, //done JH
-	EulerX,
-	EulerY,
-	EulerZ,
-	Scale, 
-	AxisAngle,
+	EulerX,//WIP SS
+	EulerY,//WIP SS
+	EulerZ,//WIP SS
+	Scale, //done JH
+	AxisAngle,//done SS
 	Quat,
 	Ortho,
 	Perspective,
 	Frustum,
-	LookAt,
+	LookAt,//done SS
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
