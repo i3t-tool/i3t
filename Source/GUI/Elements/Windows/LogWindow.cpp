@@ -27,7 +27,7 @@ void LogWindow::render()
   static bool val = true;
 
   ImGui::Text("Switch fire action key"); ImGui::SameLine();
-	ImGui::Text("%s", val ? "b" : "v");
+	ImGui::Text("Current key: %s", val ? "B" : "V");
 	if (ImGui::Button("Switch"))
   {
 		val = !val;

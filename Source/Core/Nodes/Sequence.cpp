@@ -64,8 +64,10 @@ void Sequence::updateValues(int inputIndex)
 		result = m_inputs[1].getStorage().getMat4();
 	}
 
-	m_internalData[0].setValue(result);
-	m_internalData[1].setValue(result);
+	setInternalValue(result, 0);
+	setInternalValue(result, 1);
+	// m_internalData[0].setValue();
+	// m_internalData[1].setValue(result);
 }
 
 void Sequence::notifyParent()
