@@ -16,6 +16,11 @@ constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys
 
 ImGuiConfigFlags g_mousedFlags;
 
+void InputManager::init()
+{
+	InputBindings::init();
+}
+
 void InputManager::setInputAction(const char* action, Keys::Code code)
 {
 	if (!InputBindings::isActionCreated(action))
@@ -28,6 +33,31 @@ void InputManager::setInputAxis(const char* action, float scale, Keys::Code code
 		InputBindings::m_inputAxis[action];
 
 	InputBindings::m_inputAxis[action].push_back({code, scale});
+}
+
+bool InputManager::isActionTriggered(const char* name, EKeyState state)
+{
+	if (!InputBindings::m_inputActions.contains(name)) return false;
+
+	auto& keys = InputBindings::m_inputActions[name];
+
+	bool result = false;
+	if (state == EKeyState::Released)
+  {
+    for (auto key : keys)
+    {
+			result |= isKeyJustUp(key);
+    }
+	}
+	if (state == EKeyState::Pressed)
+  {
+    for (auto key : keys)
+    {
+      result |= isKeyJustPressed(key);
+    }
+	}
+
+	return result;
 }
 
 bool InputManager::isMouseClicked()

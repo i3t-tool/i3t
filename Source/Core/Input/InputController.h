@@ -14,13 +14,13 @@ class InputController
 
 	struct Action
   {
-    std::string_view name;
+    std::string name;
     EKeyState state;
 		KeyCallback fn;
 	};
 
   std::vector<Action> m_actions;
-	std::unordered_map<std::string_view, AxisCallback> m_axis;
+	std::unordered_map<std::string, AxisCallback> m_axis;
 
 public:
 	InputController();

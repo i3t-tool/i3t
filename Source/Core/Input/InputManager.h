@@ -82,6 +82,7 @@ private:
   static Ptr<IWindow> m_focusedWindow;
 
 public:
+	static void init();
 	static glm::vec2 getMouseDelta() { return { m_mouseXDelta, m_mouseYDelta }; }
 
 	static void setInputAction(const char* action, Keys::Code code);
@@ -145,6 +146,8 @@ public:
     // if (keyMap[code] != DOWN)
     m_keyMap[code] = JUST_DOWN;
   }
+
+	static bool isActionTriggered(const char* name, EKeyState state);
 
   static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string_view>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -9,12 +9,12 @@
 struct InputBindings final
 {
   using ActionsMap = std::unordered_map<
-      std::string_view,
+      std::string,
       std::vector<Keys::Code>
   >;
 
   using AxisMap = std::unordered_map<
-	    std::string_view,
+	    std::string,
 			std::vector<std::pair<Keys::Code, float>>
   >;
 

@@ -54,6 +54,8 @@ void Application::init()
   testCycle = Core::GraphManager::createCycle();
 	testCycle->setTo(10.0f);
 	testCycle->setMultiplier(0.10f);
+
+	InputManager::init();
 }
 
 void Application::initModules()

@@ -181,21 +181,21 @@ void UIModule::buildDockspace()
 void UIModule::queryCameraState()
 {
   // ORBIT camera rotation
-  if (InputManager::isKeyJustPressed(InputBindings::KeyWorld_mouseRotate))
+  if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Pressed))
   {
     InputManager::beginCameraControl();
   }
-  if (InputManager::isKeyJustUp(InputBindings::KeyWorld_mouseRotate))
+  if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Released))
   {
     InputManager::endCameraControl();
   }
 
   // CAMERA PANNING - set a new orbit center
-  if (InputManager::isKeyJustPressed(InputBindings::KeyWorld_mousePan))
+  if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Pressed))
   {
     InputManager::beginCameraControl();
   }
-  if (InputManager::isKeyJustUp(InputBindings::KeyWorld_mousePan))
+  if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Released))
   {
     InputManager::endCameraControl();
   }
