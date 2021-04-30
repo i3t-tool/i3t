@@ -1283,11 +1283,6 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector>::updateValues
 		m_internalData[0].setValue(glm::vec4(m_inputs[0].getStorage().getVec3(), 0.0f)); // PF implicitne pro vektor se
 		                                                                                 // w=0
 	}
-	else if (m_inputs[1].isPluggedIn())
-	{
-		m_internalData[0].setValue(glm::vec4(
-				glm::vec3(), m_inputs[1].getStorage().getFloat())); // PF implicitne pro nezapojeny vektor kopiruje w=0
-	}
 	else
 	{
 		m_internalData[0].setValue(glm::vec4());
