@@ -215,15 +215,15 @@ enum class ETransformType
 	//This is for sequence
 	Free = 0,//done SS
 	Translation, //done JH
-	EulerX,//WIP SS
-	EulerY,//WIP SS
-	EulerZ,//WIP SS
+	EulerX,//done SS
+	EulerY,//done SS
+	EulerZ,//done SS
 	Scale, //done JH
 	AxisAngle,//done SS
 	Quat,
-	Ortho,
-	Perspective,
-	Frustum,
+	Ortho,//done SS
+	Perspective,//done SS
+	Frustum,//done SS
 	LookAt,//done SS
 };
 

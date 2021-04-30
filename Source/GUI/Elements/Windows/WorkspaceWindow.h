@@ -30,9 +30,13 @@
 #include "../Nodes/WorkspaceTransformationFree.h"
 #include "../Nodes/WorkspaceLookAt.h"
 #include "../Nodes/WorkspaceEulerX.h"
-//#include "../Nodes/WorkspaceEulerY.h"
-//#include "../Nodes/WorkspaceEulerZ.h"
+#include "../Nodes/WorkspaceEulerY.h"
+#include "../Nodes/WorkspaceEulerZ.h"
 #include "../Nodes/WorkspaceAxisAngle.h"
+#include "../Nodes/WorkspaceOrtho.h"
+#include "../Nodes/WorkspacePerspective.h"
+#include "../Nodes/WorkspaceFrustrum.h"
+//todo quat
 //} tranformationa end
 
 //operators {

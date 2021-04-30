@@ -20,8 +20,4 @@ public:
   WorkspaceEulerX(ImTextureID headerBackground, std::string headerLabel = "Euler X", std::string nodeLabel = "Euler X");
 
   void drawDataSetValues(util::NodeBuilder& builder);
-  float get11();
-  float get12();
-  float get21();
-  float get22();
 };
