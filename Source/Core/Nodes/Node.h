@@ -217,13 +217,13 @@ protected:
 	template <typename T> void setInternalValue(const T& value, size_t index = 0)
 	{
 		getInternalData(index).setValue(value);
-		spreadSignal();
+		spreadSignal(index);
 	}
 
 	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
 	{
 		getInternalData(index).getMat4Ref()[coordinates.x][coordinates.y] = value;
-		spreadSignal();
+		spreadSignal(index);
 	}
 
 public:

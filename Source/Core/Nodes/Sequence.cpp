@@ -56,7 +56,7 @@ void Sequence::updateValues(int inputIndex)
   {
 		auto parent = GraphManager::getParent(getPtr())->as<Sequence>();
 		result = parent->getData().getMat4() * result;
-	}
+  }
 
 	if (m_inputs[1].isPluggedIn())
 	{
@@ -64,10 +64,15 @@ void Sequence::updateValues(int inputIndex)
 		result = m_inputs[1].getStorage().getMat4();
 	}
 
+	/*
+	if (inputIndex != 0)
+	  setInternalValue(result, 1);
+	  */
+
+	// m_internalData[0].setValue(result);
+	// m_internalData[1].setValue(result);
 	setInternalValue(result, 0);
 	setInternalValue(result, 1);
-	// m_internalData[0].setValue();
-	// m_internalData[1].setValue(result);
 }
 
 void Sequence::notifyParent()
@@ -81,32 +86,45 @@ void Sequence::notifyParent()
 
 ENodePlugResult Sequence::isPlugCorrect(Pin const * input, Pin const * output)
 {
-	auto usualCheckResult = NodeBase::isPlugCorrect(input, output);
-	bool areBothDifferentSequences = GraphManager::getOperation(input) == GraphManager::getOperation(output) &&
-	                                 !GraphManager::areFromSameNode(input, output);
-	if (usualCheckResult == ENodePlugResult::Err_Loop && areBothDifferentSequences)
-	{
-		// Two sequences can have a loop.
-		auto lhs = output->getOwner();
-		auto rhs = input->getOwner();
+  /*
+  auto usualCheckResult = NodeBase::isPlugCorrect(input, output);
+  bool areBothDifferentSequences = GraphManager::getOperation(input) == GraphManager::getOperation(output) &&
+                                   !GraphManager::areFromSameNode(input, output);
+  if (usualCheckResult == ENodePlugResult::Err_Loop && areBothDifferentSequences)
+  {
+    // Two sequences can have a loop.
+    auto lhs = output->getOwner();
+    auto rhs = input->getOwner();
 
-		if (gm::arePlugged(lhs->getInPin(1), rhs->getOutPin(1)))
-		{
-			return ENodePlugResult::Err_Loop;
-		}
-		return ENodePlugResult::Ok;
-	}
+    if (gm::arePlugged(lhs->getInPin(1), rhs->getOutPin(1)))
+    {
+      return ENodePlugResult::Err_Loop;
+    }
+    if (input->getIndex() == 0 && input->getIndex() == 0)
+    {
+      return ENodePlugResult::Err_Loop;
+    }
+    return ENodePlugResult::Ok;
+  }
 
-	return usualCheckResult;
+  return usualCheckResult;
+ */
 
-	// return NodeBase::isPlugCorrect(input, output);
+	return NodeBase::isPlugCorrect(input, output);
 }
 
 void Sequence::receiveSignal(int inputIndex)
 {
-	updateValues(0);
+	updateValues(inputIndex);
+
+	spreadSignal(0);
+	if (inputIndex != 0)
+  {
+		spreadSignal(1);
+	}
 
 	// Do not spread signal from matrix output when got signal from mul input.
+	/*
 	if (inputIndex == 0)
 	{
 		spreadSignal(0);
@@ -115,4 +133,5 @@ void Sequence::receiveSignal(int inputIndex)
 	{
 		spreadSignal(1);
 	}
+	 */
 }
