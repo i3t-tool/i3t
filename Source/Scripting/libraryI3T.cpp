@@ -521,6 +521,23 @@ void plugNodes(struct ParseState* parser, struct Value* returnValue, struct Valu
 	ENodePlugResult p = Core::GraphManager::plug(pca,pcb, outputindex, inputindex);
     returnValue->Val->Integer =(int)p==0;
 }
+void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int seqindex = param[0]->Val->Integer;
+    int nodeindex =param[1]->Val->Integer;
+    //int at =param[2]->Val->Integer;
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+
+    if(seqindex<0||seqindex>=workspace->size()){returnValue->Val->Integer=false;return;}
+    if(nodeindex<0||nodeindex>=workspace->size()){returnValue->Val->Integer=false;return;}
+    if(!workspace->at(seqindex)->isSequence()){returnValue->Val->Integer=false;return;}
+    if(!workspace->at(nodeindex)->isTransformation()){returnValue->Val->Integer=false;return;}
+
+    WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
+    WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
+    seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
+    returnValue->Val->Integer = true;
+}
 void unplugInput(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){
     int indexa=param[0]->Val->Integer;
     int inputindex= param[1]->Val->Integer;
@@ -664,6 +681,7 @@ struct LibraryFunction platformLibraryI3T[] =
     { scalar,       "int scalar(int,int,int,char*);"   },         { scalar,       "int scalarc(int);" },
     { convertor,    "int convertor(int,int,int,char*);"},         { convertor,    "int convertorc(int);" },
 	{ sequence,     "int sequence(int,int,char*);"     },         { sequence,     "int sequencec(char*);" },
+	{ seqAdd,       "bool seqadd(int,int);" },
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
 	{ unplugInput,  "bool unpluginput(int,int);" },
 	{ getNodeByName,"int getnode(char*);" },
