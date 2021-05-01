@@ -148,6 +148,35 @@ glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0) {
 
 	return t0 + tz * coef[0];
 }
+glm::mat4 getProjParams(glm::mat4 projinv, bool isPersp) {
+	glm::mat4 ret=glm::mat4(0.0f);
+
+	float left,right,top,bottom,near,far;
+
+	glm::vec4 p=projinv*glm::vec4(-1.0f,0.0f,-1.0f,1.0f);	p/=p[3];	left=	p[0];
+	p=			projinv*glm::vec4(1.0f,0.0f,-1.0f,1.0f);	p/=p[3];	right=	p[0];
+	p=			projinv*glm::vec4(0.0f,1.0f,-1.0f,1.0f);	p/=p[3];	top =	p[1];
+	p=			projinv*glm::vec4(0.0f,-1.0f,-1.0f,1.0f);	p/=p[3];	bottom =p[1];
+	p=			projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);	p/=p[3];	near =	-p[2];
+	p=			projinv*glm::vec4(0.0f,0.0f,1.0f,1.0f);		p/=p[3];	far =	-p[2];
+	if(isPersp){
+		float angle=	2.0f*glm::degrees(atan((0.5f*(top-bottom))/(near)));
+		float aspect=	(right-left)/(top-bottom);
+		ret[2][0] = near;
+		ret[2][1] = far;
+		ret[3][0] = angle;
+		ret[3][1] = aspect;
+	}
+	else {
+		ret[0][0] = left;
+		ret[0][1] = right;
+		ret[1][0] = top;
+		ret[1][1] = bottom;
+		ret[2][0] = near;
+		ret[2][1] = far;
+	}
+	return ret;
+}
 void setLen(glm::vec3* vec, float len) {
 	float f=glm::length(*vec);
 	*vec/=f+(float)(f==0.0f);

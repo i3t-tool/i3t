@@ -50,7 +50,7 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         workspace->push_back(std::make_unique<WorkspaceMatrixFree>((ImTextureID)0, l));
     }
     else if (type == scriptingData.mat4Types.trackball) {
-        return;
+        returnValue->Val->Integer = -1; return;
     }
     else if (type == scriptingData.mat4Types.transpose) {
         workspace->push_back(std::make_unique<WorkspaceMatrixTranspose>((ImTextureID)0, l));
@@ -121,6 +121,10 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
 		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
 		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
 	}
+    else if (type == scriptingData.mat4Types.uniscale) {
+        workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
+        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+    }
 	else if (type == scriptingData.mat4Types.translate) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
 		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
@@ -134,8 +138,36 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
         Core::LookAt* lookat=(Core::LookAt*)(workspace->back()->getNodebase().get());
         lookat->setCenter((glm::vec3)mat[0]);lookat->setEye((glm::vec3)mat[1]);lookat->setUp((glm::vec3)mat[2]);
     }
+    else if (type == scriptingData.mat4Types.ortho) {
+        workspace->push_back(std::make_unique<WorkspaceOrtho>((ImTextureID)0, l));
+        Core::OrthoProj* ff = (Core::OrthoProj*)workspace->back().get();
+        ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
+        ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
+        ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
+    }
+    else if (type == scriptingData.mat4Types.perspective) {
+        workspace->push_back(std::make_unique<WorkspacePerspective>((ImTextureID)0, l));
+        Core::PerspectiveProj*  ff = (Core::PerspectiveProj*)workspace->back().get();
+        ff->setZNear(mat[2][0]);ff->setZFar(mat[2][1]);
+        ff->setFOW(mat[3][0]);  ff->setAspect(mat[3][1]);
+    }
+    else if (type == scriptingData.mat4Types.frustrum) {
+        workspace->push_back(std::make_unique<WorkspaceFrustum>((ImTextureID)0, l));
+        Core::Frustum*ff=(Core::Frustum*)workspace->back().get();
+        ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
+        ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
+        ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
+    }
     else if (type == scriptingData.mat4Types.rotatex) {
         workspace->push_back(std::make_unique<WorkspaceEulerX>((ImTextureID)0, l));
+        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
+    }
+    else if (type == scriptingData.mat4Types.rotatey) {
+        workspace->push_back(std::make_unique<WorkspaceEulerY>((ImTextureID)0, l));
+        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
+    }
+    else if (type == scriptingData.mat4Types.rotatez) {
+        workspace->push_back(std::make_unique<WorkspaceEulerZ>((ImTextureID)0, l));
         ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
     }
     else if (type == scriptingData.mat4Types.axisangle) {

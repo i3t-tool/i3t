@@ -67,19 +67,39 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		else if (strcmp(keyword, "EulerY") == 0) {
 			glm::mat4 m = nodebase->getData().getMat4();
 			glm::vec3 v = (glm::vec3)(m * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-			float a = angle2(v[1], v[2]);
+			float a = angle2(v[2], v[0]);
 			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i+at, a);
 			fprintf(f, "int n%d=mat4(rotatey,d%d,%d,%d,\"%s\");\n", i+at, i+at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "EulerZ") == 0) {
 			glm::mat4 m = nodebase->getData().getMat4();
 			glm::vec3 v = (glm::vec3)(m * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
-			float a = angle2(v[1], v[2]);
+			float a = angle2(v[0], v[1]);
 			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i+at, a);
 			fprintf(f, "int n%d=mat4(rotatez,d%d,%d,%d,\"%s\");\n", i+at, i+at, (int)pos[0], (int)pos[1], label.c_str());
 		}
+		else if (strcmp(keyword, "Ortho") == 0) {
+			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()), false);
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f);\n", i + at,
+				m[0][0], m[0][1], m[1][0], m[1][1], m[1][0], m[2][1], m[3][0], m[3][1]);
+			fprintf(f, "int n%d=mat4(ortho,d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Perspective") == 0) {
+			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()), false);
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f);\n", i + at,
+				m[0][0], m[0][1], m[1][0], m[1][1], m[1][0], m[2][1], m[3][0], m[3][1]);
+			fprintf(f, "int n%d=mat4(perspective,d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "Frustum") == 0) {
+			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()),false);
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f);\n", i + at,
+				m[0][0],m[0][1], m[1][0],m[1][1],  m[1][0],m[2][1], m[3][0],m[3][1]);
+			fprintf(f, "int n%d=mat4(frustrum,d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		else if (strcmp(keyword, "AxisAngle") == 0) {
 			glm::mat4 m = nodebase->getData().getMat4();
+			//Core::AxisAngleRot*ar=(Core::AxisAngleRot*)nodebase.get();
+			//float rr=ar->getRot();
 			glm::vec3 v = (glm::vec3)(m * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 			float a = angle2(v[1], v[2]);
 			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i+at, a);
@@ -352,10 +372,10 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 	return true;
 }
 bool loadWorkspace(const char* filename) {
-	ScriptingData*data=getScriptingData();
-	int datalen=(int)data->nodeData.size();
-	int p=picocRunFile(filename);
-	while(data->nodeData.size()>datalen){data->nodeData.pop_back(); }
+	ScriptingData*data=getScriptingData();//printf("a\n");
+	int datalen=(int)data->nodeData.size(); //printf("b\n");
+	int p=picocRunFile(filename); //printf("c\n");
+	while(data->nodeData.size()>datalen){data->nodeData.pop_back(); }//printf("d\n");
 	return true;
 }
 int picocRunInteractive(){

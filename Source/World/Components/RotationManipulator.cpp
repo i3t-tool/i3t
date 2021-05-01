@@ -73,11 +73,23 @@ void RotationManipulator::update() {
 	if(m_editednode.get()==nullptr){return;}
 	
 	m_allowedaxis=0;
+	float angle=0.0f;
 	const char*oper= m_editednode->getOperation()->keyWord.c_str();
-	if(strcmp(oper,"EulerX")==0)		{m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();}
-	else if(strcmp(oper,"EulerY")==0)	{m_allowedaxis|=s_y;m_edited=m_editednode->getData().getMat4();}
-	else if(strcmp(oper,"EulerZ")==0)	{m_allowedaxis|=s_z;m_edited=m_editednode->getData().getMat4();}
-	else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();}
+	if(strcmp(oper,"EulerX")==0)		{
+		m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();
+		//Core::EulerRotX*r=(Core::EulerRotX*)m_editednode.get();
+		//angle=glm::degrees(r->getAngle());
+		//printf("angle %f,,%f\n", angle,r->getAngle());
+	}
+	else if(strcmp(oper,"EulerY")==0)	{
+		m_allowedaxis|=s_y;m_edited=m_editednode->getData().getMat4();
+	}
+	else if(strcmp(oper,"EulerZ")==0)	{
+		m_allowedaxis|=s_z;m_edited=m_editednode->getData().getMat4();
+	}
+	else if(strcmp(oper,"AxisAngle")==0){
+		m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();
+	}
 	else if(strcmp(oper,"Quat")==0){
 		//m_allowedaxis|=s_x|s_y|s_z;
 		//Core::QuatRot* editedquat = (Core::QuatRot*)m_editednode.get();
@@ -148,6 +160,7 @@ void RotationManipulator::update() {
 	if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 
 	///
+	//angle+=drag3[m_axisnum];
 	drag3*=1.0f;
 	glm::mat4 rot=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[m_axisnum]),(glm::vec3)m_edited[m_axisnum]);
 	glm::vec4 bkp=m_edited[3];
@@ -155,8 +168,8 @@ void RotationManipulator::update() {
 	m_edited=rot*m_edited;
 	m_edited[3]=bkp;
 	///
-
-	float angle=0.0f;
+	
+	angle=0.0f;
 	if(m_axisnum==0){
 		glm::vec3 v=(glm::vec3)(m_edited*glm::vec4(0.0f,1.0f,0.0f,0.0f));
 		angle=angle2(v[1],v[2]);
@@ -170,8 +183,15 @@ void RotationManipulator::update() {
 		angle=angle2(v[0],v[1]);
 	}
 	//printf("angle %f, mov %f\n",angle,drag3[m_axisnum]);
+
 	if(strcmp(oper,"Quat")!=0){
 		m_editednode->setValue(glm::radians(angle));
+		/*printf("angle %f, ",angle);
+		Core::EulerRotX* r = (Core::EulerRotX*)m_editednode.get();
+		r->setValue(glm::radians(angle));
+		angle = glm::degrees(r->getAngle());
+		
+		printf("angle %f\n", angle);*/
 	}
 	else {
 

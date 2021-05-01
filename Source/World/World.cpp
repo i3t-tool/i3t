@@ -120,7 +120,7 @@ World* World::loadDefaultScene(){
 
     World* w = new World();
 
-    w->sceneRoot->addChild(objhandles, false);       objhandles->addComponent(new Renderer(Renderer::USE_STENCIL));
+    w->sceneRoot->addChild(objhandles, false);       objhandles->addComponent(new Renderer());
                                                      objhandles->addComponent(new TmpTransform());
     w->sceneRoot->addChild(camhandles, true);        camhandles->addComponent(new TmpCamera());
                                                      camhandles->addComponent(new Camera(60.0f, w->sceneRoot, rend));
