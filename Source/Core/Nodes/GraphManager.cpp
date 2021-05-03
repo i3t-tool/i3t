@@ -20,20 +20,52 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
-	Debug::Assert(rightNode->m_inputs.size() > myIndex,
+	Debug::Assert(rightNode->getInputPins().size() > myIndex,
 	              "Node {} does not have input pin with index {}!", rightNode->getSig(), myIndex);
-	Debug::Assert(leftNode->m_outputs.size() > fromIndex,
+	Debug::Assert(leftNode->getOutputPins().size() > fromIndex,
 	              "Node {} does not have output pin with index {}!", leftNode->getSig(), fromIndex);
 
-	auto result = isPlugCorrect(&rightNode->m_inputs[myIndex], &leftNode->m_outputs[fromIndex]);
+	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
 
 	// Insert to toPlug output pin outputs this operator input pin.
-	leftNode->m_outputs[fromIndex].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
+	leftNode->getOutputPinsRef()[fromIndex].m_outputs.push_back(&(rightNode->getInputPinsRef()[myIndex]));
 
 	// Attach given operator output pin to this operator input pin.
-	rightNode->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
+	rightNode->getInputPinsRef()[myIndex].m_input = &leftNode->getOutputPinsRef()[fromIndex];
+
+  if (isSequence(leftNode))
+  {
+    leftNode->as<Sequence>()->updatePins();
+  }
+  else if (isSequence(rightNode))
+  {
+    rightNode->as<Sequence>()->updatePins();
+  }
+
+	// Workaround for sequences.
+	/*
+  if (isSequence(leftNode))
+  {
+    auto s = leftNode->as<Sequence>();
+
+		if (fromIndex == 0)
+		  s->m_storage->m_outputs[fromIndex].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
+		else if (fromIndex == 1 || fromIndex == 2)
+      s->m_multiplier->m_outputs[fromIndex - 1].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
+  }
+	else if (isSequence(rightNode))
+  {
+    auto s = rightNode->as<Sequence>();
+
+    if (myIndex == 0)
+      s->m_storage->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
+    else if (myIndex == 1 || myIndex == 2)
+      s->m_multiplier->m_inputs[myIndex - 1].m_input = &leftNode->m_outputs[fromIndex];
+	}
+	 */
+
 
 	leftNode->spreadSignal();
 
@@ -95,7 +127,17 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
   {
     return nullptr;
   }
-  return pins[index].m_input->m_master;
+
+	auto expected = pins[index].m_input->m_master;
+
+	if (expected->m_owner != nullptr)
+  {
+    return expected->m_owner;
+	}
+	else
+  {
+    return expected;
+	}
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)

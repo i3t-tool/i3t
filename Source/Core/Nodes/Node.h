@@ -62,9 +62,6 @@ class NodeBase : public std::enable_shared_from_this<NodeBase>
 protected:
 	ID m_id{};
 
-	/// Inputs of the box: Input tabs with glyphs.
-	std::vector<Pin> m_inputs;
-
 	/// Outputs of the box: output tabs with glyphs.
 	std::vector<Pin> m_outputs;
 
@@ -75,9 +72,17 @@ protected:
 	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
+	 * 	Owner of the node, sequence or camera, otherwise null.
+	 */
+	Ptr<NodeBase> m_owner = nullptr;
+
+	/**
 	 * Operator node properties.
 	 */
 	const Operation* m_operation = nullptr;
+
+	/// Inputs of the box: Input tabs with glyphs.
+	std::vector<Pin> m_inputs;
 
 protected:
   NodeBase(const Operation* operation) : m_operation(operation)
@@ -88,10 +93,18 @@ public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
-	const Pin& getInPin(int index) const  { return m_inputs[index]; }
-	const Pin& getOutPin(int index) const { return m_outputs[index]; }
+public:
+	const Pin& getInPin(int index) { return getInputPins()[index]; }
+	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
+protected:
+  Pin& getInPinRef(int index) { return getInputPinsRef()[index]; }
+  Pin& getOutPinRef(int index) { return getOutputPinsRef()[index]; }
+
+public:
   Ptr<NodeBase> getPtr() { return shared_from_this(); }
+
+public:
 
   template <typename T>
 	Ptr<T> as()
@@ -116,10 +129,12 @@ protected:
 	/**
 	 * Get data storage for read and write purposes. No written value validation
 	 * is performed.
+	 *
+	 * Overriden in Sequence class.
 	 */
-	DataStore& getInternalData(size_t index = 0)
+	virtual DataStore& getInternalData(size_t index = 0)
 	{
-		Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
+		Debug::Assert(m_internalData.size() > index, "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
@@ -207,6 +222,8 @@ public:
 	}
 
 protected:
+	void setPinOwner(Pin& pin, Ptr<NodeBase> node);
+
 	/**
 	 * Sets node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
@@ -238,8 +255,14 @@ public:
 		return m_operation->validDatamaps;
 	};
 
-	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
-	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;
+	[[nodiscard]] const std::vector<Pin>& getInputPins();
+	[[nodiscard]] const std::vector<Pin>& getOutputPins();
+
+protected:
+  [[nodiscard]] virtual std::vector<Pin>& getInputPinsRef();
+  [[nodiscard]] virtual std::vector<Pin>& getOutputPinsRef();
+
+public:
 	//===----------------------------------------------------------------------===//
 
 	//===-- Values updating functions. ----------------------------------------===//
@@ -310,6 +333,9 @@ class Pin
 	friend class GraphManager;
 	friend class NodeBase;
 
+	/// \todo MH do not access pin directly.
+	friend class Sequence;
+
 	ID m_id;
 
 	/// Index within a node.
@@ -373,18 +399,7 @@ public:
 	 * \returns data storage owner by node connected to this input pin. If pin is output pin,
 	 *          it returns data storage of pin owner.
 	 */
-	[[nodiscard]] const DataStore& getStorage(unsigned id = 0)
-	{
-		if (m_isInput)
-		{
-			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-			return m_input->m_master->getData(id);
-		}
-		else
-		{
-			return m_master->getData(id);
-		}
-	}
+	[[nodiscard]] const DataStore& getStorage(unsigned id = 0);
 
   const char* getLabel() const
 	{

@@ -11,6 +11,31 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
+namespace SequenceInternals
+{
+class Storage : public Node
+{
+  friend class Core::Sequence;
+
+public:
+  Storage() : Node(nullptr) {}
+
+	void updateValues(int inputIndex) override;
+};
+
+
+class Multiplier : public Node
+{
+  friend class Core::Sequence;
+
+public:
+	Multiplier() : Node(nullptr) {}
+
+	void updateValues(int inputIndex) override;
+};
+}
+
+
 /**
  * Sequence of matrices.
  */
@@ -22,8 +47,11 @@ class Sequence : public NodeBase
   Matrices m_matrices;
 	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
+  Ptr<SequenceInternals::Storage> m_storage;
+  Ptr<SequenceInternals::Multiplier> m_multiplier;
+
 public:
-	Sequence() : NodeBase(&g_sequence) {};
+	Sequence();
 
 	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, m_matrices.size()); }
 
@@ -34,6 +62,10 @@ public:
 	 * \param index New position of matrix.
 	 */
   ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+
+	void createComponents();
+
+  DataStore& getInternalData(size_t index = 0) override;
 
 	const Matrices& getMatrices() { return m_matrices; }
 
@@ -51,15 +83,20 @@ public:
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);;
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);
 
 	void swap(int from, int to);
+
+	/**
+	 * Keep storage and multipliers pins at same state as sequences pins are.
+	 */
+	void updatePins();
+	void resetInputPin(std::vector<Pin*>& outputsOfPin, Pin* newInput);
 
 	void updateValues(int inputIndex) override;
 
 private:
 	void notifyParent();
-	ENodePlugResult isPlugCorrect(Pin const * input, Pin const * output) override;
   void receiveSignal(int inputIndex) override;
 };
 
@@ -79,4 +116,9 @@ FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& mat
 }
 
 using SequencePtr = Ptr<Sequence>;
+
+FORCE_INLINE bool isSequence(const NodePtr& p)
+{
+	return p->getOperation() == &g_sequence;
+}
 } // namespace Core

@@ -4,6 +4,27 @@
 
 using namespace Core;
 
+void SequenceInternals::Storage::updateValues(int inputIndex)
+{
+	if (m_owner->getInPin(1).isPluggedIn())
+  {
+		// Matrix input
+		m_owner->updateValues();
+	}
+}
+
+void SequenceInternals::Multiplier::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+
+	}
+}
+
+Sequence::Sequence() : NodeBase(&g_sequence)
+{
+}
+
 ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
 	GraphManager::unplugAll(matrix);
@@ -20,6 +41,51 @@ ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix, size_t index) noe
 	return ValueSetResult{};
 }
 
+void Sequence::createComponents()
+{
+	m_storage = std::make_shared<SequenceInternals::Storage>();
+	m_multiplier = std::make_shared<SequenceInternals::Multiplier>();
+
+	m_storage->m_owner = getPtr();
+  m_multiplier->m_owner = getPtr();
+
+	m_storage->m_inputs.emplace_back(m_inputs[1]);
+  setPinOwner(m_storage->getInPinRef(0), m_storage);
+
+  m_storage->m_outputs.emplace_back(m_outputs[1]);
+  setPinOwner(m_storage->getOutPinRef(0), m_storage);
+
+  m_storage->m_internalData.emplace_back(EValueType::Matrix);
+
+
+	m_multiplier->m_inputs.emplace_back(m_inputs[0]);
+  setPinOwner(m_multiplier->getInPinRef(0), m_multiplier);
+
+  m_multiplier->m_outputs.emplace_back(m_outputs[0]);
+  setPinOwner(m_multiplier->getOutPinRef(0), m_multiplier);
+
+  m_multiplier->m_outputs.emplace_back(m_outputs[2]);
+  setPinOwner(m_multiplier->getOutPinRef(1), m_multiplier);
+
+  m_multiplier->m_internalData.emplace_back(EValueType::MatrixMul);
+  m_multiplier->m_internalData.emplace_back(EValueType::Matrix);
+
+	m_inputs[0].m_master = m_multiplier;
+	m_inputs[1].m_master = m_storage;
+
+	m_outputs[0].m_master = m_multiplier;
+	m_outputs[1].m_master = m_storage;
+	m_outputs[2].m_master = m_multiplier;
+}
+
+DataStore& Sequence::getInternalData(size_t index)
+{
+  if (index == 0)
+		return m_storage->getInternalData(index);
+	else
+		return m_multiplier->getInternalData(index - 1);
+}
+
 Ptr<Transformation> Sequence::popMatrix(const int index)
 {
   Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
@@ -32,7 +98,7 @@ Ptr<Transformation> Sequence::popMatrix(const int index)
 
   updateValues(0);
   spreadSignal();
-	notifyParent();
+  notifyParent();
 
   return result;
 }
@@ -48,31 +114,57 @@ void Sequence::swap(int from, int to)
   std::swap(m_matrices[from], m_matrices[to]);
 }
 
+
+void Sequence::updatePins()
+{
+  m_storage->m_inputs[0].m_input = m_inputs[1].m_input;
+  m_multiplier->m_inputs[0].m_input = m_inputs[0].m_input;
+
+
+	m_storage->m_outputs[0].m_outputs = m_outputs[1].m_outputs;
+	resetInputPin(m_storage->m_outputs[0].m_outputs, &m_storage->m_outputs[0]);
+
+	m_multiplier->m_outputs[0].m_outputs = m_outputs[0].m_outputs;
+  resetInputPin(m_multiplier->m_outputs[0].m_outputs, &m_multiplier->m_outputs[0]);
+
+	m_multiplier->m_outputs[1].m_outputs = m_outputs[2].m_outputs;
+  resetInputPin(m_multiplier->m_outputs[1].m_outputs, &m_multiplier->m_outputs[1]);
+}
+
+void Sequence::resetInputPin(std::vector<Pin*>& outputsOfPin, Pin* newInput)
+{
+  std::for_each(outputsOfPin.begin(), outputsOfPin.end(), [newInput](Pin* p)
+	              {
+									p->m_input = newInput;
+								});
+}
+
 void Sequence::updateValues(int inputIndex)
 {
-	glm::mat4 result = getMatProduct(getMatrices());
-
-	if (m_inputs[0].isPluggedIn())
+	if (getInPin(0).isPluggedIn() && !getInPin(1).isPluggedIn())
   {
-		auto parent = GraphManager::getParent(getPtr())->as<Sequence>();
-		result = parent->getData().getMat4() * result;
+		auto r = getMatProduct(getMatrices());
+    auto parent = GraphManager::getParent(getPtr())->as<Sequence>();
+
+		/// \todo MH output index information gets lost when storage and multiplier are combined.
+		setInternalValue(r, 0);
+    setInternalValue(r, 1);
+		setInternalValue(parent->getData().getMat4() * r, 2);
   }
+	if (getInPin(1).isPluggedIn())
+  {
+		auto forcedMat = getInPinRef(1).getStorage(0).getMat4();
 
-	if (m_inputs[1].isPluggedIn())
-	{
-		// Matrix node is connected to direct matrix input.
-		result = m_inputs[1].getStorage().getMat4();
+		glm::mat4 parentMat(1.0f);
+
+		auto parent = GraphManager::getParent(getPtr());
+		if (parent)
+      parentMat = parent->getData().getMat4();
+
+		setInternalValue(forcedMat, 0);
+		setInternalValue(forcedMat, 1);
+    setInternalValue(parentMat * forcedMat, 2);
 	}
-
-	/*
-	if (inputIndex != 0)
-	  setInternalValue(result, 1);
-	  */
-
-	// m_internalData[0].setValue(result);
-	// m_internalData[1].setValue(result);
-	setInternalValue(result, 0);
-	setInternalValue(result, 1);
 }
 
 void Sequence::notifyParent()
@@ -84,54 +176,14 @@ void Sequence::notifyParent()
 	}
 }
 
-ENodePlugResult Sequence::isPlugCorrect(Pin const * input, Pin const * output)
-{
-  /*
-  auto usualCheckResult = NodeBase::isPlugCorrect(input, output);
-  bool areBothDifferentSequences = GraphManager::getOperation(input) == GraphManager::getOperation(output) &&
-                                   !GraphManager::areFromSameNode(input, output);
-  if (usualCheckResult == ENodePlugResult::Err_Loop && areBothDifferentSequences)
-  {
-    // Two sequences can have a loop.
-    auto lhs = output->getOwner();
-    auto rhs = input->getOwner();
-
-    if (gm::arePlugged(lhs->getInPin(1), rhs->getOutPin(1)))
-    {
-      return ENodePlugResult::Err_Loop;
-    }
-    if (input->getIndex() == 0 && input->getIndex() == 0)
-    {
-      return ENodePlugResult::Err_Loop;
-    }
-    return ENodePlugResult::Ok;
-  }
-
-  return usualCheckResult;
- */
-
-	return NodeBase::isPlugCorrect(input, output);
-}
-
 void Sequence::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
 
+	/// \todo MH check this expression.
 	spreadSignal(0);
 	if (inputIndex != 0)
   {
 		spreadSignal(1);
 	}
-
-	// Do not spread signal from matrix output when got signal from mul input.
-	/*
-	if (inputIndex == 0)
-	{
-		spreadSignal(0);
-	}
-	else
-	{
-		spreadSignal(1);
-	}
-	 */
 }

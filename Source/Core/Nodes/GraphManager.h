@@ -43,6 +43,7 @@ Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
   auto ret = std::make_shared<Core::Sequence>();
   ret->init();
+	ret->createComponents();
   ret->updateValues(0);
   return ret;
 }

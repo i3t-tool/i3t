@@ -148,7 +148,6 @@ TEST(SequenceTest, SequenceCantBeSelfPlugged)
  */
 TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInput)
 {
-	/*
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
 	auto mat = Builder::createNode<ENodeType::Matrix>();
@@ -160,7 +159,6 @@ TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInpu
 
   EXPECT_EQ(seq1->getData().getMat4(), seq2->getData().getMat4());
 	EXPECT_EQ(seq1->getData().getMat4(), mat->getData().getMat4());
-	 */
 }
 
 TEST(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput)

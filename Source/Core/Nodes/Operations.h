@@ -429,7 +429,7 @@ static const PinGroup cycleOutputs = { EValueType::Float, EValueType::Pulse, EVa
 
 static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs };
 
-static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
+static inline const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 3, {EValueType::MatrixMul, EValueType::Matrix, EValueType::Matrix}};
 
 static const Operation g_cameraProperties = { "Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul} };
 
