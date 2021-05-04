@@ -6,6 +6,12 @@ using namespace Core;
 
 std::vector<Ptr<Cycle>> GraphManager::m_cycles;
 
+void tryToDoSequenceProcedure(Ptr<Node> node)
+{
+	if (isSequence(node))
+		node->as<Sequence>()->updatePins();
+}
+
 ENodePlugResult GraphManager::isPlugCorrect(Pin const * input, Pin const * output)
 {
 	auto lhs = input->m_master;
@@ -39,7 +45,7 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
   {
     leftNode->as<Sequence>()->updatePins();
   }
-  else if (isSequence(rightNode))
+  if (isSequence(rightNode))
   {
     rightNode->as<Sequence>()->updatePins();
   }
@@ -88,11 +94,13 @@ void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
   node.get()->unplugAll();
 	node->setDataMap(&Transform::g_Free);
+  tryToDoSequenceProcedure(node);
 }
 
 void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
+  tryToDoSequenceProcedure(node);
 	if (getAllInputNodes(node).empty())
     node->setDataMap(&Transform::g_Free);
 }
@@ -100,6 +108,7 @@ void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugOutput(index);
+  tryToDoSequenceProcedure(node);
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)

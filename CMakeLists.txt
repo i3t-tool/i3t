@@ -211,7 +211,7 @@ if (True)
         RUNTIME_OUTPUT_DIRECTORY "${I3T_OUT_DIR}"
     )
 
-    target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC I3T_TEST IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
 endif()
 # =============================================================
 

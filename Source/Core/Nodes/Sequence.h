@@ -16,9 +16,17 @@ namespace SequenceInternals
 class Storage : public Node
 {
   friend class Core::Sequence;
+  friend class Multiplier;
+
+  Matrices m_matrices;
 
 public:
   Storage() : Node(nullptr) {}
+
+  ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
+  ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+  Ptr<Transformation> popMatrix(const int index);
+  void swap(int from, int to);
 
 	void updateValues(int inputIndex) override;
 };
@@ -41,19 +49,25 @@ public:
  */
 class Sequence : public NodeBase
 {
+	friend class SequenceInternals::Storage;
+	friend class SequenceInternals::Multiplier;
 	friend class GraphManager;
 	using Matrix = NodeBase;
 
-  Matrices m_matrices;
 	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
+#ifdef I3T_TEST
+public:
+#endif
   Ptr<SequenceInternals::Storage> m_storage;
   Ptr<SequenceInternals::Multiplier> m_multiplier;
 
 public:
 	Sequence();
 
-	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, m_matrices.size()); }
+  void createComponents();
+
+  ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, m_storage->m_matrices.size()); }
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -61,13 +75,11 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-  ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
-
-	void createComponents();
+  ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept { return m_storage->addMatrix(matrix, index); }
 
   DataStore& getInternalData(size_t index = 0) override;
 
-	const Matrices& getMatrices() { return m_matrices; }
+	const Matrices& getMatrices() { return m_storage->m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -78,14 +90,14 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage->m_matrices.at(idx); }
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index) { return m_storage->popMatrix(index); }
 
-	void swap(int from, int to);
+	void swap(int from, int to) { return m_storage->swap(from, to); }
 
 	/**
 	 * Keep storage and multipliers pins at same state as sequences pins are.
@@ -119,6 +131,8 @@ using SequencePtr = Ptr<Sequence>;
 
 FORCE_INLINE bool isSequence(const NodePtr& p)
 {
+	auto* op = p->getOperation();
+	auto* expected = &g_sequence;
 	return p->getOperation() == &g_sequence;
 }
 } // namespace Core

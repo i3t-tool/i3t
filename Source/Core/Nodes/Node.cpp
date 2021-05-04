@@ -77,7 +77,7 @@ std::vector<Pin>& NodeBase::getOutputPinsRef()
 
 void NodeBase::spreadSignal()
 {
-	for (auto& operatorOutput : m_outputs)
+	for (auto& operatorOutput : getOutputPinsRef())
 	{
 		for (auto* oct : operatorOutput.getOutComponents())
 		{
@@ -88,9 +88,10 @@ void NodeBase::spreadSignal()
 
 void NodeBase::spreadSignal(int outIndex)
 {
-	for (auto* oct : m_outputs[outIndex].getOutComponents())
+	for (auto* oct : getOutputPinsRef()[outIndex].getOutComponents())
 	{
 		oct->m_master->receiveSignal(oct->getIndex());
+		//oct->m_master->receiveSignal(outIndex);
 	}
 }
 

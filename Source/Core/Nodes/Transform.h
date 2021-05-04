@@ -20,7 +20,7 @@ FORCE_INLINE bool isTransform(NodePtr& node)
 
 class Transformation : public NodeBase
 {
-	friend class Sequence;
+	friend class Storage;
 
   Ptr<NodeBase> m_currentSequence = nullptr;
   int m_currentIndex = -1;
@@ -34,12 +34,13 @@ protected:
   Transformation(const Operation* transformType) : NodeBase(transformType) {}
 	void notifySequence();
 
-private:
-	void nullSequence()
-	{
-		m_currentSequence = nullptr;
+public:
+	/// \todo MH these should not be public.
+  void nullSequence()
+  {
+    m_currentSequence = nullptr;
     int m_currentIndex = -1;
-	}
+  }
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
   {

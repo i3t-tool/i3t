@@ -1361,7 +1361,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inpu
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
+		auto mat = m_inputs[0].getStorage(inputIndex).getMat4();
+		m_internalData[0].setValue(mat);
 	}
 }
 
@@ -1369,7 +1370,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int input
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = m_inputs[0].getStorage().getMat4();
+		auto targetStorage = m_inputs[0].getStorage();
+		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = targetStorage.getMat4();
 	}
 }
 
