@@ -90,7 +90,17 @@ void Theme::apply()
 	style.PopupBorderSize = 0.0f;
 	style.WindowBorderSize = 0.0f;
 
+  //SS, MH please check this
+	//---------------------------------------------------------------------------------------
 	auto& nodesStyle = ax::NodeEditor::GetStyle();
 	nodesStyle.NodeRounding = m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)];
 	nodesStyle.NodeBorderWidth = 0.0f;
+  nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = ImColor(83, 101, 146);
+  nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg] = ImColor(112, 112, 116);;
+  nodesStyle.PivotAlignment = ImVec2(0.0f, 0.0f);
+
+	//SS I need this but I dont know how to use
+  const ImVec2 matrix_frame_padding = ImVec2(10, 3);
+  const ImVec2 pin_spacing = ImVec2(0, 0);
+  //---------------------------------------------------------------------------------------
 }

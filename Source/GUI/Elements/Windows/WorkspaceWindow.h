@@ -37,6 +37,7 @@
 #include "../Nodes/WorkspaceSequence.h"
 #include "../Nodes/WorkspaceTransformationFree.h"
 //todo quat
+//#include "../Nodes/WorkspaceQuatRot.h"
 //} tranformationa end
 
 //operators {
@@ -104,6 +105,12 @@
 //#include "../Nodes/WorkspaceFloatCycle.h"
 //	} float end
 
+//	quat{
+#include "../Nodes/WorkspaceQuatVecConjQuat.h"
+#include "../Nodes/WorkspaceQuatLength.h"
+//TODO Wqiting for free quat
+//	} quat end
+
 //  conversion{
 #include "../Nodes/WorkspaceFloatsToMatrix.h"
 #include "../Nodes/WorkspaceFloatsToVector.h"
@@ -114,6 +121,7 @@
 #include "../Nodes/WorkspaceVectors3ToMatrix.h"
 #include "../Nodes/WorkspaceVectorsToMatrix.h"
 #include "../Nodes/WorkspaceVectorToVector3.h"
+#include "../Nodes/WorkspaceQuatToEuler.h"
 //  }
 //}operators end
 

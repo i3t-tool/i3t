@@ -27,7 +27,7 @@ void util::NodeBuilder::Begin(ed::NodeId id)
 	HasHeader = false;
 	HeaderMin = HeaderMax = ImVec2();
 
-	ed::PushStyleVar(StyleVar_NodePadding, ImVec4(0, 0, 0, 0));	//ImVec4(8, 4, 8, 8) ImVec4(0, 0, 0, 0)
+	ed::PushStyleVar(StyleVar_NodePadding, ImVec4(0, 0, 0, 0)); // ImVec4(8, 4, 8, 8) ImVec4(0, 0, 0, 0)
 
 	ed::BeginNode(id);
 
@@ -49,7 +49,7 @@ void util::NodeBuilder::End()
 
 		auto drawList = ed::GetNodeBackgroundDrawList(CurrentNodeId);
 
-		const auto halfBorderWidth = ed::GetStyle().NodeBorderWidth * 0.0f;	//0.5f
+		const auto halfBorderWidth = ed::GetStyle().NodeBorderWidth * 0.5f;	//0.5f
 
 		auto headerColor = IM_COL32(0, 0, 0, alpha) | (HeaderColor & IM_COL32(255, 255, 255, 0));
 		if ((HeaderMax.x > HeaderMin.x) && (HeaderMax.y > HeaderMin.y) && HeaderTextureId)
@@ -60,22 +60,22 @@ void util::NodeBuilder::End()
 			drawList->AddImageRounded(HeaderTextureId, HeaderMin - ImVec2(0 - halfBorderWidth, 0 - halfBorderWidth),
 			                          HeaderMax + ImVec2(0 - halfBorderWidth, 0), ImVec2(0.0f, 0.0f), uv, headerColor,
 			                          GetStyle().NodeRounding, 1 | 2);
-			//drawList->AddImageRounded(HeaderTextureId, HeaderMin - ImVec2(8 - halfBorderWidth, 4 - halfBorderWidth),
-			//HeaderMax + ImVec2(8 - halfBorderWidth, 0), ImVec2(0.0f, 0.0f), uv, headerColor,
-			//	GetStyle().NodeRounding, 1 | 2);
+			/*drawList->AddImageRounded(HeaderTextureId, HeaderMin - ImVec2(8 - halfBorderWidth, 4 - halfBorderWidth),
+			HeaderMax + ImVec2(8 - halfBorderWidth, 0), ImVec2(0.0f, 0.0f), uv, headerColor,
+				GetStyle().NodeRounding, 1 | 2);*/
 
 			auto headerSeparatorMin = ImVec2(HeaderMin.x, HeaderMax.y);
 			auto headerSeparatorMax = ImVec2(HeaderMax.x, HeaderMin.y);
 
 			if ((headerSeparatorMax.x > headerSeparatorMin.x) && (headerSeparatorMax.y > headerSeparatorMin.y))
 			{
-				drawList->AddLine(headerSeparatorMin + ImVec2(-(0 - halfBorderWidth), -0.0f),
+				/*drawList->AddLine(headerSeparatorMin + ImVec2(-(0 - halfBorderWidth), -0.0f),
 				                  headerSeparatorMax + ImVec2((0 - halfBorderWidth), -0.0f),
-				                  ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);
-
-				/*drawList->AddLine(headerSeparatorMin + ImVec2(-(8 - halfBorderWidth), -0.5f),
-				                  headerSeparatorMax + ImVec2((8 - halfBorderWidth), -0.5f),
 				                  ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);*/
+
+				drawList->AddLine(headerSeparatorMin + ImVec2(-(8 - halfBorderWidth), -0.5f),
+				                  headerSeparatorMax + ImVec2((8 - halfBorderWidth), -0.5f),
+				                  ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);
 			}
 		}
 	}
@@ -110,7 +110,7 @@ void util::NodeBuilder::Input(ed::PinId id)
 	SetStage(Stage::Input);
 
 	if (applyPadding) {
-		//ImGui::Spring(0);
+		ImGui::Spring(0);
 	}
 	Pin(id, PinKind::Input);
 
@@ -180,7 +180,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 		HeaderMax = ImGui::GetItemRectMax();
 
 		// spacing between header and content
-		ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.y * 1.0f);	//2.0f
+		ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.y * 2.0f);	//2.0f
 
 		break;
 
@@ -270,7 +270,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 		ImGui::BeginVertical("outputs", ImVec2(0, 0), 1.0f);
 
 		ed::PushStyleVar(ed::StyleVar_PivotAlignment, ImVec2(1.0f, 0.5f));
-		ed::PushStyleVar(ed::StyleVar_PivotSize, ImVec2(0, 0));
+		ed::PushStyleVar(ed::StyleVar_PivotSize, ImVec2(10, 10));
 
 		if (!HasHeader)
 			ImGui::Spring(1, 0);

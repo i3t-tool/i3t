@@ -78,22 +78,14 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
         drawInputs(builder, newLinkPin);
     }
 
-	//
-	//ImGui::BeginChild("myID");
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.5f);
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(164, 171, 190, 1));
 
-	drawData(builder);
+	//drawData(builder);
 
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-
-    if (withPins)
-    {
+    //if (withPins)
+    //{
         drawOutputs(builder, newLinkPin);
-    }
+    //}
 
-	//ImGui::EndChild();
 	builder.End();
 }
 

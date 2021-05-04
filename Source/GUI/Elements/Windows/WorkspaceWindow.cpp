@@ -52,11 +52,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(m_nodeEditorContext);
 	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = node_bg_color;
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = background_color;
-	ne::GetStyle().PivotAlignment = pivot_alignment;
-	//ne::GetStyle().NodeRounding = node_rounding;
-
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -547,7 +542,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 	ne::Suspend();
-	//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, context_menu_padding);
 
 
 	if (ImGui::BeginPopup("float_context_menu")) {
@@ -1021,6 +1015,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("quat * quat")) {
 				}
 				if (ImGui::MenuItem("quat -> euler")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToEuler>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("euler -> quat")) {
 				}
@@ -1031,14 +1027,19 @@ void WorkspaceWindow::checkQueryContextMenus()
 				if (ImGui::MenuItem("lerp")) {
 				}
 				if (ImGui::MenuItem("quat conjugate")) {
+
 				}
 				if (ImGui::MenuItem("qvq*")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatVecConjQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("inverse quat")) {
 				}
 				if (ImGui::MenuItem("normalize quat")) {
 				}
 				if (ImGui::MenuItem("length(quat)")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatLength>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -1189,8 +1190,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 		ImGui::EndPopup();
 	}
 
-
-	//ImGui::PopStyleVar();
 	ne::Resume();
 
 }

@@ -145,22 +145,22 @@ enum class ENodeType
 	Vector3Length,	//done SS
 	ShowVector3,	//done SS
 	MixVector3,	//done SS
-	ConjQuat, //t
-	FloatVecToQuat,//t
-	AngleAxisToQuat,//t
-	VecVecToQuat,//t
+	ConjQuat, //waiting for free quat
+	FloatVecToQuat,//waiting for free quat
+	AngleAxisToQuat,//waiting for free quat
+	VecVecToQuat,//waiting for free quat
 	QuatToFloatVec,//todo  vec3 + float
 	QuatToAngleAxis,//todo vec3 + float
 	QuatToEuler, //todo 3 floats
-	EulerToQuat,//t
-	QuatInverse,//t
-	QuatSlerp,//t
-	QuatLongWaySlerp,//t
-	QuatLerp, //t
-	FloatMulQuat,//t
-	QuatMulQuat,//t
-	QuatVecConjQuat,//t vec3
-	QuatLength, //t float
+	EulerToQuat,//waiting for free quat
+	QuatInverse,//waiting for free quat
+	QuatSlerp,//waiting for free quat
+	QuatLongWaySlerp,//waiting for free quat
+	QuatLerp, //waiting for free quat
+	FloatMulQuat,//waiting for free quat
+	QuatMulQuat,//waiting for free quat
+	QuatVecConjQuat,//done SS
+	QuatLength,  //done SS
 	ClampFloat, //done SS
 	FloatMulFloat,  //done SS
 	FloatDivFloat,//done SS
@@ -177,7 +177,7 @@ enum class ENodeType
 	FloatsToMatrix, //done SS
 	MatrixToTR, // todo 2 matrix
 	TRToMatrix, //done SS
-	MatrixToQuat, //t
+	MatrixToQuat, //waiting for free quat
 	QuatToMatrix,//done SS
 	VectorToFloats, // todo 4 floats
 	FloatsToVector,  //done SS
@@ -186,8 +186,8 @@ enum class ENodeType
 	VectorToVector3,//done SS
 	Vector3ToVector,//done SS
 	QuatToFloats, //todo 4 floats
-	FloatsToQuat,//t
-	NormalizeQuat, //t
+	FloatsToQuat,//waiting for free quat
+	NormalizeQuat, //waiting for free quat
 	Float, //done SS
 	Vector3, //done JH
 	Vector4, //done JH
@@ -208,6 +208,8 @@ enum class ENodeType
 
 	Camera,
 	Screen,
+
+	//SS missing trackball, float cycle and free quat types
 };
 
 enum class ETransformType
