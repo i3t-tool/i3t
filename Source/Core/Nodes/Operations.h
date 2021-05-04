@@ -161,15 +161,15 @@ enum class ENodeType
 	QuatMulQuat,
 	QuatVecConjQuat,
 	QuatLength,
-	ClampFloat,
-	FloatMulFloat,
-	FloatDivFloat,
-	FloatAddFloat,
-	FloatPowFloat,
-	MixFloat,
-	FloatSinCos,
-	ASinACos,
-	Signum,
+	ClampFloat, //done SS
+	FloatMulFloat,  //done SS
+	FloatDivFloat,//done SS
+	FloatAddFloat,//done SS
+	FloatPowFloat,//done SS
+	MixFloat,//done SS
+	FloatSinCos,//todo
+	ASinACos,//todo
+	Signum,//done SS
 	MatrixToVectors,
 	Vectors3ToMatrix,
 	VectorsToMatrix,
@@ -195,11 +195,11 @@ enum class ENodeType
 	Model,
 
 	// Transform matrices "constructors"
-	MakeTranslation, //done JH
+	MakeTranslation, //done
 	MakeEulerX, //done SS
 	MakeEulerY, //done SS
 	MakeEulerZ, //done SS
-	MakeScale, //done JH
+	MakeScale, //done
 	MakeAxisAngle, //done SS
 	MakeOrtho, //done SS
 	MakePerspective, //done SS
@@ -218,7 +218,7 @@ enum class ETransformType
 	EulerX,
 	EulerY,
 	EulerZ,
-	Scale, 
+	Scale, //done JH
 	AxisAngle,
 	Quat,
 	Ortho,
