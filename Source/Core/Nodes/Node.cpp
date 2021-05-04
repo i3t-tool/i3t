@@ -91,7 +91,6 @@ void NodeBase::spreadSignal(int outIndex)
 	for (auto* oct : getOutputPinsRef()[outIndex].getOutComponents())
 	{
 		oct->m_master->receiveSignal(oct->getIndex());
-		//oct->m_master->receiveSignal(outIndex);
 	}
 }
 

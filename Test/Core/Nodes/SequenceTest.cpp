@@ -102,19 +102,6 @@ TEST(SequenceTest, InternalValueCanBeReadByOperator)
 	EXPECT_EQ(seq->getData().getMat4(), matMulMatNode->getData().getMat4());
 }
 
-TEST(SequenceTest, PinsTest)
-{
-	auto seq = Builder::createSequence();
-	auto mat = Builder::createTransform<Translation>();
-
-  auto plugResult = GraphManager::plugSequenceValueInput(seq, mat);
-  EXPECT_EQ(ENodePlugResult::Ok, plugResult);
-
-	EXPECT_EQ(seq->getInputPins()[1].isPluggedIn(), seq->m_storage->getInputPins()[0].isPluggedIn());
-
-
-}
-
 TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 {
 	auto seq = arrangeSequence();
@@ -151,7 +138,6 @@ TEST(SequenceTest, SequenceCantBeSelfPlugged)
   }
 }
 
-/// \todo Make test pass.
 /**
  *    _______
  *   /       \
@@ -168,9 +154,6 @@ TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInpu
 	plug_expectOk(seq1, seq2, 0, 0);
 
 	plug_expectOk(seq2, seq1, 1, 1);
-	auto mat1   = seq1->getData(1).getMat4();
-	auto matMod = seq1->getData(2).getMat4();
-	auto mat2   = seq2->getData(1).getMat4();
 
   // Matrix storages should be same.
   EXPECT_EQ(seq1->getData(1).getMat4(), seq2->getData(1).getMat4());
@@ -197,32 +180,6 @@ TEST(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput
 
 	EXPECT_EQ(seq1->getData(1).getMat4(), seq2->getData(1).getMat4());
 }
-
-/*
-TEST(SequenceTest, TwoMatrices)
-{
-	auto seq1 = Builder::createSequence();
-	auto seq2 = Builder::createSequence();
-
-	auto mat1 = Builder::createTransform<Translation>(generateVec3());
-	auto mat2 = Builder::createTransform<Translation>(generateVec3());
-
-	seq1->addMatrix(mat1);
-	seq2->addMatrix(mat2);
-
-	plug_expectOk(seq1, seq2, 0, 0);
-
-	auto lhsStorage = seq1->getData();
-	// auto lgs
-
-	auto rhsModel = seq2->getData(2);
-
-	auto prod = lhsStorage.getMat4() * seq2->getData().getMat4();
-	auto rhsProd = rhsModel.getMat4();
-
-	EXPECT_EQ(prod, rhsProd);
-}
- */
 
 TEST(SequenceTest, ThreeSequencesComposeMatrices)
 {

@@ -50,29 +50,6 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
     rightNode->as<Sequence>()->updatePins();
   }
 
-	// Workaround for sequences.
-	/*
-  if (isSequence(leftNode))
-  {
-    auto s = leftNode->as<Sequence>();
-
-		if (fromIndex == 0)
-		  s->m_storage->m_outputs[fromIndex].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
-		else if (fromIndex == 1 || fromIndex == 2)
-      s->m_multiplier->m_outputs[fromIndex - 1].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
-  }
-	else if (isSequence(rightNode))
-  {
-    auto s = rightNode->as<Sequence>();
-
-    if (myIndex == 0)
-      s->m_storage->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
-    else if (myIndex == 1 || myIndex == 2)
-      s->m_multiplier->m_inputs[myIndex - 1].m_input = &leftNode->m_outputs[fromIndex];
-	}
-	 */
-
-
 	leftNode->spreadSignal();
 
 	rightNode->setDataMap(&Transform::g_AllLocked);

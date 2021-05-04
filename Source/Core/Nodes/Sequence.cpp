@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-void SequenceInternals::Storage::updateValues(int inputIndex)
+void Sequence::Storage::updateValues(int inputIndex)
 {
   auto mat = getMatProduct(m_matrices);
 
@@ -12,22 +12,12 @@ void SequenceInternals::Storage::updateValues(int inputIndex)
   {
 		// Matrix input
     mat = getInPinRef(0).getStorage(0).getMat4();
-
-		/*
-		glm::mat4 mult(1.0f);
-
-    auto parent = GraphManager::getParent(getPtr());
-    if (parent)
-      mult = parent->getData().getMat4();
-      */
-    //setInternalValue(mat, 1);
-    //setInternalValue(mult * mat, 2);
 	}
   setInternalValue(mat, 0);
   m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 }
 
-ValueSetResult SequenceInternals::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
+ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
   GraphManager::unplugAll(matrix);
 
@@ -39,15 +29,13 @@ ValueSetResult SequenceInternals::Storage::addMatrix(Ptr<Transformation> matrix,
   updateValues(-1);
 	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-	// spreadSignal();
-
 	// If sequence is sub-node of camera node.
   m_owner->as<Sequence>()->notifyParent();
 
   return ValueSetResult{};
 }
 
-Ptr<Transformation> SequenceInternals::Storage::popMatrix(const int index)
+Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 {
   Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
                 "Sequence does not have so many matrices as you are expecting.");
@@ -60,41 +48,32 @@ Ptr<Transformation> SequenceInternals::Storage::popMatrix(const int index)
   updateValues(-1);
   m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-	// spreadSignal();
-
   m_owner->as<Sequence>()->notifyParent();
 
   return result;
 }
 
-void SequenceInternals::Storage::swap(int from, int to)
+void Sequence::Storage::swap(int from, int to)
 {
   if (from > m_matrices.size() || to > m_matrices.size()) return;
 
   updateValues(-1);
   m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-  // spreadSignal();
-
   m_owner->as<Sequence>()->notifyParent();
 
   std::swap(m_matrices[from], m_matrices[to]);
 }
 
-void SequenceInternals::Multiplier::updateValues(int inputIndex)
+void Sequence::Multiplier::updateValues(int inputIndex)
 {
 	auto product = m_owner->as<Sequence>()->m_storage->getData().getMat4();
   glm::mat4 mult(1.0f);
 
   if (m_owner->getInPin(0).isPluggedIn())
   {
-    // auto mat = getMatProduct(m_owner->as<Sequence>()->getMatrices());
     auto parent = GraphManager::getParent(m_owner)->as<Sequence>();
     mult = parent->getData().getMat4();
-
-    // setInternalValue(mat, 0);
-    //setInternalValue(mat, 1);
-    //setInternalValue(mult * mat, 2);
 	}
 	// Mul. output
 	setInternalValue(mult * product, 0);
@@ -110,8 +89,8 @@ Sequence::Sequence() : NodeBase(&g_sequence)
 
 void Sequence::createComponents()
 {
-	m_storage = std::make_shared<SequenceInternals::Storage>();
-	m_multiplier = std::make_shared<SequenceInternals::Multiplier>();
+	m_storage = std::make_shared<Sequence::Storage>();
+	m_multiplier = std::make_shared<Sequence::Multiplier>();
 
 	m_storage->m_owner = getPtr();
   m_multiplier->m_owner = getPtr();
@@ -147,12 +126,6 @@ void Sequence::createComponents()
 
 DataStore& Sequence::getInternalData(size_t index)
 {
-	/*
-  if (index == 0)
-		return m_storage->getInternalData(index);
-	else
-		return m_multiplier->getInternalData(index - 1);
-	 */
 	if (index == 0)
   {
 		return m_multiplier->getInternalData(0);

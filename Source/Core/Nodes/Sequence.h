@@ -13,34 +13,7 @@ using Matrices = std::vector<Ptr<Transformation>>;
 
 namespace SequenceInternals
 {
-class Storage : public Node
-{
-  friend class Core::Sequence;
-  friend class Multiplier;
 
-  Matrices m_matrices;
-
-public:
-  Storage() : Node(nullptr) {}
-
-  ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
-  ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
-  Ptr<Transformation> popMatrix(const int index);
-  void swap(int from, int to);
-
-	void updateValues(int inputIndex) override;
-};
-
-
-class Multiplier : public Node
-{
-  friend class Core::Sequence;
-
-public:
-	Multiplier() : Node(nullptr) {}
-
-	void updateValues(int inputIndex) override;
-};
 }
 
 
@@ -49,18 +22,45 @@ public:
  */
 class Sequence : public NodeBase
 {
-	friend class SequenceInternals::Storage;
-	friend class SequenceInternals::Multiplier;
 	friend class GraphManager;
 	using Matrix = NodeBase;
 
+	/** Structure for storing transform matrices. */
+  class Storage : public Node
+  {
+    friend class Core::Sequence;
+    friend class Multiplier;
+
+    Matrices m_matrices;
+
+  public:
+    Storage() : Node(nullptr) {}
+
+    ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
+    ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+    Ptr<Transformation> popMatrix(const int index);
+    void swap(int from, int to);
+
+    void updateValues(int inputIndex) override;
+  };
+
+
+	/** Structure which represents sequences multiplication. */
+  class Multiplier : public Node
+  {
+    friend class Core::Sequence;
+
+  public:
+    Multiplier() : Node(nullptr) {}
+
+    void updateValues(int inputIndex) override;
+  };
+
+
 	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
-#ifdef I3T_TEST
-public:
-#endif
-  Ptr<SequenceInternals::Storage> m_storage;
-  Ptr<SequenceInternals::Multiplier> m_multiplier;
+  Ptr<Storage> m_storage;
+  Ptr<Multiplier> m_multiplier;
 
 public:
 	Sequence();
