@@ -28,13 +28,14 @@ WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase>
 void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 {
 
+	//getData(0) doesnt work
 	const float coreData = m_nodebase->getData().getFloat();
 	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
 	float localData;
 
-	builder.Middle();
+	//builder.Middle();
 
 	ImGui::PushItemWidth(m_dataItemsWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
