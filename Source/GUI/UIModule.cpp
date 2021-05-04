@@ -58,7 +58,7 @@ void UIModule::init()
   }
 
   // Allocate path to the imgui ini file on heap.
-  auto* path = new std::string(Config::getAbsolutePath("/Data/imgui.ini"));
+  auto* path = new std::string(Config::getAbsolutePath("Data/imgui.ini"));
   io.IniFilename = path->c_str();
 
   m_currentTheme.init();
