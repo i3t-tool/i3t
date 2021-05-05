@@ -188,12 +188,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-	if(m_workspaceOutputsProperties.size() < 2){
-        //making troubles in multiple output
-        ImGui::SameLine();
-	}
-
-
 	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
@@ -226,7 +220,7 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
         localData = getters[i]();
         if (drawDragFloatWithMap_Inline(&localData,
                                         datamap_values[i],
-                                        fmt::format("##{}:ch{}", idOfNode, i)))
+                                        fmt::format("##{}:ch{}", idOfNode, i))) //todo check
         {
             valueChanged = true;
             index_of_change = i;
@@ -308,13 +302,15 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 	}
 }
 
-void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
+void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
 {
-    //builder.Middle();
+    if(isTransformation()){
+		  builder.Middle();
+    }
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
-        drawDataFull(builder);
+        drawDataFull(builder, index);
         break;
     case WorkspaceLevelOfDetail::SetValues:
         drawDataSetValues(builder);
@@ -325,7 +321,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 
     default:
         /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
-        drawDataFull(builder);
+        drawDataFull(builder, index);
     }
 }
 
@@ -390,7 +386,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
   }
 }
 
-void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin)
+void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
 {
     float alpha = ImGui::GetStyle().Alpha;
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
@@ -398,10 +394,10 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 	//here draw data
 	if(isTransformation()){
-      drawData(builder);
+      drawData(builder, 0);
 	}else{
       builder.Output(pinProp->getId());
-      drawData(builder);
+      drawData(builder, outputIndex);
 
 	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
       ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
@@ -447,7 +443,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 
   for (auto const & pinProp : m_workspaceOutputsProperties)
   {
-      drawOutputPin(builder, pinProp, newLinkPin);
+      drawOutputPin(builder, pinProp, newLinkPin, pinProp->getIndex());
   }
 }
 

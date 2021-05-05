@@ -14,6 +14,6 @@ WorkspaceFloatsToMatrix::WorkspaceFloatsToMatrix(ImTextureID headerBackground, s
 
 void WorkspaceFloatsToMatrix::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }
 

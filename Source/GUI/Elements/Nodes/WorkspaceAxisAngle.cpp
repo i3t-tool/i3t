@@ -14,5 +14,5 @@ WorkspaceAxisAngle::WorkspaceAxisAngle(ImTextureID headerBackground, std::string
 
 void WorkspaceAxisAngle::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

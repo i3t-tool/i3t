@@ -14,6 +14,6 @@ WorkspaceVectorToVector3::WorkspaceVectorToVector3(ImTextureID headerBackground,
 
 void WorkspaceVectorToVector3::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }
 

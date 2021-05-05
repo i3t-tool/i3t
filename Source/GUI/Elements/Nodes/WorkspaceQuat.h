@@ -4,22 +4,21 @@
 
 #pragma once
 #include "WorkspaceNodeWithCoreData.h"
-/*
-struct WorkspaceVector4Args
+
+struct WorkspaceQuatArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default Vector4 header";
-  std::string nodeLabel = "Vec4";
+  std::string headerLabel = "default Quat header";
+  std::string nodeLabel = "Quat";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Quat>();
 };
 
-class WorkspaceVector4 : public WorkspaceNodeWithCoreData
+class WorkspaceQuat : public WorkspaceNodeWithCoreData
 {
 public:
-  WorkspaceVector4(ImTextureID headerBackground, WorkspaceVector4Args const& args);
-  WorkspaceVector4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
+  WorkspaceQuat(ImTextureID headerBackground, WorkspaceQuatArgs const& args);
+  WorkspaceQuat(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
-  virtual void drawDataFull(util::NodeBuilder& builder);
+  virtual void drawDataFull(util::NodeBuilder& builder, int index);
   int maxLenghtOfData();
 };
-*/

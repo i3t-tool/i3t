@@ -14,6 +14,6 @@ WorkspaceFloatsToVector3::WorkspaceFloatsToVector3(ImTextureID headerBackground,
 
 void WorkspaceFloatsToVector3::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }
 

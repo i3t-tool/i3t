@@ -14,5 +14,5 @@ WorkspaceTransformationFree::WorkspaceTransformationFree(ImTextureID headerBackg
 
 void WorkspaceTransformationFree::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

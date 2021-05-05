@@ -10,6 +10,6 @@ WorkspaceMatrixFree::WorkspaceMatrixFree(ImTextureID headerBackground, std::stri
 
 void WorkspaceMatrixFree::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

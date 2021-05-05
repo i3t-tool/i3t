@@ -14,6 +14,6 @@ WorkspaceQuatVecConjQuat::WorkspaceQuatVecConjQuat(ImTextureID headerBackground,
 
 void WorkspaceQuatVecConjQuat::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }
 

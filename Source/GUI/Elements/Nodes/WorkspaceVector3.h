@@ -15,7 +15,7 @@ public:
 	WorkspaceVector3( ImTextureID headerBackground, WorkspaceVector3Args const& args);
     WorkspaceVector3(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel);
 
-	virtual void drawDataFull(util::NodeBuilder& builder);
+	virtual void drawDataFull(util::NodeBuilder& builder, int index);
 	int maxLenghtOfData();
 };
 

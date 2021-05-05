@@ -21,9 +21,9 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::N
 	setDataItemsWidth();
 }
 
-void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
+void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
 {
-    const glm::mat4& coreData = m_nodebase->getData().getMat4();
+    const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
     const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     int const idOfNode = this->m_id.Get();
 
@@ -43,7 +43,6 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
       for (int columns = 0; columns < 4; columns++)
       {
 
-
         localData = coreData[columns][rows]; /* Data are column-wise */
         if (drawDragFloatWithMap_Inline(&localData, coreMap[columns * 4 + rows],
                                         fmt::format("##{}:r{}c{}", idOfNode, rows, columns)))
@@ -62,15 +61,16 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder)
           fw.rows = rows;
         }
 
-
+				if(columns != 3)
+				{
+					ImGui::SameLine();
+				}
       }
-      ImGui::NewLine();
     }
 
 
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
-
     ImGui::PopItemWidth();
 
     if (valueChanged)

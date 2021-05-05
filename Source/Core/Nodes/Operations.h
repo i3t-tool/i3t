@@ -145,20 +145,20 @@ enum class ENodeType
 	Vector3Length,	//done SS
 	ShowVector3,	//done SS
 	MixVector3,	//done SS
-	ConjQuat, //waiting for free quat
-	FloatVecToQuat,//waiting for free quat
-	AngleAxisToQuat,//waiting for free quat
-	VecVecToQuat,//waiting for free quat
-	QuatToFloatVec,//todo  vec3 + float
-	QuatToAngleAxis,//todo vec3 + float
-	QuatToEuler, //todo 3 floats
-	EulerToQuat,//waiting for free quat
-	QuatInverse,//waiting for free quat
-	QuatSlerp,//waiting for free quat
-	QuatLongWaySlerp,//waiting for free quat
-	QuatLerp, //waiting for free quat
-	FloatMulQuat,//waiting for free quat
-	QuatMulQuat,//waiting for free quat
+	ConjQuat, //done SS waiting for free quat
+	FloatVecToQuat,//done SS waiting for free quat
+	AngleAxisToQuat,//done SS waiting for free quat
+	VecVecToQuat,//done SS waiting for free quat
+	QuatToFloatVec,//todo vec3 + float
+	QuatToAngleAxis,//todo  vec3 + float
+	QuatToEuler, //done SS
+	EulerToQuat,//done SS waiting for free quat
+	QuatInverse,//done SS waiting for free quat
+	QuatSlerp,//done SS waiting for free quat
+	QuatLongWaySlerp,//done SS waiting for free quat
+	QuatLerp, //done SS waiting for free quat
+	FloatMulQuat,//done SS waiting for free quat
+	QuatMulQuat,//done SS waiting for free quat
 	QuatVecConjQuat,//done SS
 	QuatLength,  //done SS
 	ClampFloat, //done SS
@@ -167,27 +167,27 @@ enum class ENodeType
 	FloatAddFloat,//done SS
 	FloatPowFloat,//done SS
 	MixFloat,//done SS
-	FloatSinCos,//todo 2 floats
-	ASinACos,//todo 2 floats
+	FloatSinCos,//done SS
+	ASinACos,//done SS
 	Signum,//done SS
-	MatrixToVectors, //todo 4 vectors
+	MatrixToVectors, //done SS
 	Vectors3ToMatrix, //done SS
 	VectorsToMatrix, //done SS
-	MatrixToFloats, //todo 16 floats
+	MatrixToFloats, //done SS
 	FloatsToMatrix, //done SS
-	MatrixToTR, // todo 2 matrix
+	MatrixToTR, //done SS
 	TRToMatrix, //done SS
-	MatrixToQuat, //waiting for free quat
+	MatrixToQuat, //done SS waiting for free quat
 	QuatToMatrix,//done SS
-	VectorToFloats, // todo 4 floats
+	VectorToFloats, // done SS
 	FloatsToVector,  //done SS
-	Vector3ToFloats, // todo 4 floats
+	Vector3ToFloats, // done SS
 	FloatsToVector3,//done SS
 	VectorToVector3,//done SS
 	Vector3ToVector,//done SS
-	QuatToFloats, //todo 4 floats
-	FloatsToQuat,//waiting for free quat
-	NormalizeQuat, //waiting for free quat
+	QuatToFloats, //done SS
+	FloatsToQuat,//done SS waiting for free quat
+	NormalizeQuat, //done SS waiting for free quat
 	Float, //done SS
 	Vector3, //done JH
 	Vector4, //done JH
@@ -222,7 +222,7 @@ enum class ETransformType
 	EulerZ,//done SS
 	Scale, //done JH
 	AxisAngle,//done SS
-	Quat,
+	Quat, //waiting for base quat
 	Ortho,//done SS
 	Perspective,//done SS
 	Frustum,//done SS

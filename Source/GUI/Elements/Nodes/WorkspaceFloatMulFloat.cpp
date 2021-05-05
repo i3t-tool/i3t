@@ -13,5 +13,5 @@ WorkspaceFloatMulFloat::WorkspaceFloatMulFloat(ImTextureID headerBackground, std
 
 void WorkspaceFloatMulFloat::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

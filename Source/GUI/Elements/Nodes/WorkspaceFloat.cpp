@@ -25,12 +25,13 @@ WorkspaceFloat::WorkspaceFloat(ImTextureID headerBackground, Ptr<Core::NodeBase>
 }
 
 
-void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
+void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 {
 
-	//getData(0) doesnt work
-	const float coreData = m_nodebase->getData().getFloat();
+	//assert if operator its imposible to value change (except free operators)
+	const float coreData = m_nodebase->getData(index).getFloat();
 	int const idOfNode = this->m_id.Get();
+	int const map = m_nodebase->getDataMapRef()[0];
 
 	bool valueChanged = false;
 	float localData;
@@ -41,7 +42,7 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
 	localData = coreData;
-	valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, 0)); /* datamap value 1 is changeable */
+	valueChanged |= drawDragFloatWithMap_Inline(&localData, map, fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */
 
 		if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
 		{
@@ -56,6 +57,7 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder)
 
 	if (valueChanged)
 	{
+		//ask MH
 		m_nodebase->setValue(localData);
 		setDataItemsWidth();
 	}
