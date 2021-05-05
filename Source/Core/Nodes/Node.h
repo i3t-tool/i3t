@@ -249,6 +249,8 @@ public:
   void setDataMap(const Transform::DataMap* map);
 
 	const Transform::DataMap* getDataMap() { return m_currentMap; }
+
+	/// \todo MH will be removed.
 	const Transform::DataMap& getDataMapRef() { return *m_currentMap; }
 	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps()
 	{
