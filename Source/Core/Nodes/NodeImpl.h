@@ -1341,6 +1341,14 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
 	}
 }
 
+template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+  }
+}
+
 template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
@@ -1349,21 +1357,20 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inp
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::Quat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getQuat());
 	}
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inputIndex)
 {
-	if (m_inputs[0].isPluggedIn())
-	{
-		auto mat = m_inputs[0].getStorage(inputIndex).getMat4();
-		m_internalData[0].setValue(mat);
-	}
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
+  }
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)

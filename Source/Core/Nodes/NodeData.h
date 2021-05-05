@@ -127,7 +127,7 @@ public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and undefined value (a unit matrix) */
 	DataStore() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
 
-	DataStore(EValueType valueType) : opValueType(valueType)
+	explicit DataStore(EValueType valueType) : opValueType(valueType)
 	{
 		switch (valueType)
 		{
@@ -147,6 +147,7 @@ public:
 			setValue(glm::quat());
 			break;
 		case EValueType::Matrix:
+		case EValueType::MatrixMul:
 			setValue(glm::mat4(1.0f));
 		default:
 			break;

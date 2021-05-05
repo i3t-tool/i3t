@@ -192,6 +192,7 @@ enum class ENodeType
 	Vector3, //done JH
 	Vector4, //done JH
 	Matrix, //done JH
+	Quat,
 	Model,
 
 	// Transform matrices "constructors"
@@ -393,6 +394,7 @@ static const std::vector<Operation> operations = {
 		{"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input, Core::defaultDataMaps},
 		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput, Core::defaultDataMaps},
 		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput, Core::defaultDataMaps},
+    {"QuatToQuat", "quat", 1, {EValueType::Quat}, 1, {EValueType::Quat}, Core::defaultDataMaps},
 
 		{"Model", "model", 1, matrixMulInput, 0, {}},
 
