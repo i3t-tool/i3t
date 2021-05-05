@@ -29,7 +29,7 @@ Theme::Theme()
 	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
 	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
 	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
-	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
+	m_fontsAssoc.insert(std::pair(EFont::TitleSmall, 4));
 
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 25.0f;

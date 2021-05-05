@@ -41,17 +41,18 @@ enum class EFont
 	Tab,
 	Node,
 	Title,
-	TaskTitle,
+	TitleSmall,
 };
 
 enum class ESize
 {
-	Nodes_Rounding,
+  Window_FramePadding,
+
+  Nodes_Rounding,
 	Nodes_FloatWidth,
 	Nodes_FloatMargin,
 	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
-	Window_FramePadding,
 	COUNT
 };
 
@@ -86,6 +87,8 @@ constexpr inline EColor asColor(EValueType type)
 class Theme
 {
 	using Colors = std::map<EColor, ImVec4>;
+	using Sizes = std::array<float, static_cast<size_t>(ESize::COUNT)>;
+
 	Colors m_colors;
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
@@ -94,7 +97,7 @@ class Theme
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
 	std::vector<ImFont*> m_fonts;
-	std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
+	Sizes m_sizes;
 
 public:
 	/**
@@ -109,6 +112,7 @@ public:
 	 * Call this function whenever you change style settings.
 	 */
 	void apply();
+
 	const ImVec4& get(EColor color)
 	{
 		if (m_colors.count(color) == 0)
@@ -131,6 +135,9 @@ public:
 
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 
-	const Colors& getColors() const { return m_colors; }
+	[[nodiscard]] const Colors& getColors() const { return m_colors; }
+	Colors& getColorsRef() { return m_colors; }
 	void setColors(const Colors& colors) { m_colors = colors; }
+
+  Sizes& getSizesRef() { return m_sizes; }
 };

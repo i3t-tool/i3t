@@ -10,6 +10,7 @@
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -289,6 +290,7 @@ void MainMenuBar::showHelpMenu()
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow)) {}
+		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getUI()->getWindowPtr<StyleEditor>()->getShowPtr())) {}
 
 		ImGui::EndMenu();
 	}

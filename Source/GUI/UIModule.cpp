@@ -7,6 +7,7 @@
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -32,6 +33,8 @@ void UIModule::init()
   m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
   m_dockableWindows.push_back(std::make_shared<Console>(true));
   m_dockableWindows.push_back(std::make_shared<LogWindow>());
+
+  m_dockableWindows.push_back(std::make_shared<StyleEditor>());
 
   HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
 

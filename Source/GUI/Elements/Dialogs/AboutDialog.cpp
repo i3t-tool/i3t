@@ -26,7 +26,7 @@ void AboutDialog::render()
 		ImGui::TextWrapped(Config::INFO_TEXT.c_str());
 		ImGui::Text("");
 
-		ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
+		ImGui::PushFont(I3T::getFont(EFont::TitleSmall));
 		ImGui::Text("Supervisor:");
 		ImGui::PopFont();
 
@@ -36,7 +36,7 @@ void AboutDialog::render()
 
 		/// \todo Add interactive link to http://www.i3t-tool.org/.
 
-		ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
+		ImGui::PushFont(I3T::getFont(EFont::TitleSmall));
 		ImGui::Text("Authors:");
 		ImGui::PopFont();
 
