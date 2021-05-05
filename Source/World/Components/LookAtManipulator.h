@@ -12,6 +12,7 @@ class LookAtManipulator:public Component
 {
 public:
 	LookAtManipulator();
+	void GUI();
 	void update();
 	void render(glm::mat4* parent, bool renderTransparent);
 	static const char* componentType() { return LookAtManipulator::s_type; };

@@ -16,6 +16,7 @@ Component::Component(){
 	this->m_gameObject = NULL;
 	this->m_isActive = true;
 }
+void Component::GUI(){ /*printf("Default GUI\n");*/}
 void Component::start(){ /*printf("Default start\n");*/}
 void Component::update(){ /*printf("Default update\n");*/}
 void Component::render(glm::mat4* parent, bool renderTransparent){ /*printf("Default render\n");*/}

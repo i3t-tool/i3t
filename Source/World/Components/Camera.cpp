@@ -5,6 +5,13 @@
 #include <iostream>
 #include <typeinfo>
 
+void printMatrix5(glm::mat4 m){
+  printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",
+	  m[0][0], m[1][0], m[2][0], m[3][0],
+	  m[0][1], m[1][1], m[2][1], m[3][1],
+	  m[0][2], m[1][2], m[2][2], m[3][2],
+	  m[0][3], m[1][3], m[2][3], m[3][3]);
+}
 
 const char* Camera::s_type = NULL;
 
@@ -69,12 +76,15 @@ void Camera::update(){
     World::perspective = this->m_perspective;
     World::mainCamPos = -(glm::vec3)transform[3];
     World::mainCamera = glm::inverse(getRotation(transform, 0));
-    World::mainCamera[3] = World::mainCamera * glm::vec4(World::mainCamPos,1.0f);
+
+    World::mainCamera[3] = World::mainCamera * glm::vec4(-(glm::vec3)transform[3],1.0f);
+    //*(glm::vec3*)(&World::mainCamera[3]) = -(glm::vec3)transform[3];
 
     renderRecursive(m_sceneRoot, glm::mat4(1.0f),false);//render opaque
     renderRecursive(m_sceneRoot, glm::mat4(1.0f),true);//render transparent
 
     if (!this->m_mainCamera){
+        //printMatrix5(World::mainCamera);
         glBindFramebuffer(GL_FRAMEBUFFER, fbobkp);
         glViewport(viewportbkp[0], viewportbkp[1], viewportbkp[2], viewportbkp[3]);
         World::mainCamPos = posbkp;

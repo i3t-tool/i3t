@@ -17,7 +17,7 @@ using namespace UI;
 /// \todo Use Framebuffer class.
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
-	m_world2 = world2;
+	m_world = world2;
 
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
@@ -120,7 +120,7 @@ void Viewport::render()
 
 		// draw
 		glEnable(GL_MULTISAMPLE);
-		m_world2->onUpdate();
+		m_world->onUpdate();
 		glDisable(GL_MULTISAMPLE);
 
 		// Unbind our framebuffer, bind main framebuffer.
@@ -134,8 +134,9 @@ void Viewport::render()
 				ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
 
 
-		if(InputManager::isKeyPressed(Keys::shiftl)){m_world2->tmpSetNode(); }
-		m_world2->tmpDrawNode();
+		if(InputManager::isKeyPressed(Keys::shiftl)){m_world->tmpSetNode(); }
+		m_world->tmpDrawNode();
+		m_world->onGUI();
 		
 	}
 }

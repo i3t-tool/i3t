@@ -29,6 +29,9 @@ LookAtManipulator::LookAtManipulator() {
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
 }
+void LookAtManipulator::GUI() {
+	if(m_activehandle!=-1){ManipulatorUtil::hint("Move center of LookAt transformation matrix.");}
+}
 void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
@@ -107,7 +110,7 @@ void LookAtManipulator::update() {
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
 	//m_handlespace=glm::mat4(1.0f);
 	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
-	m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(center-eye,0.0f));
+	m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(eye-center,0.0f));
 
 	if(m_activehandle==-1){return;}
 
@@ -150,6 +153,6 @@ void LookAtManipulator::update() {
 	for (int i=0;i<4;i++){if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
 	glm::vec4 posh=(glm::inverse(m)*m_handlespace)[3];
 	///
-	editedlookat->setCenter(-glm::vec3(posh)+2.0f*eye);
+	editedlookat->setCenter(glm::vec3(posh)-2.0f*eye);
 	//editedlookat->setCenter(glm::vec3(center));
 }

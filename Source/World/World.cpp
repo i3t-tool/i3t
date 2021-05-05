@@ -77,19 +77,19 @@ World::World(){
 }
 
 bool World::init(){
-    World::shader0 =         loadShader(Config::getAbsolutePath("/Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/simple-fs.glsl").c_str()); 
-    World::shaderHandle =    loadShader(Config::getAbsolutePath("/Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("/Data/shaders/handle-fs.glsl").c_str()); 
-    World::shaderProj =      loadShader(Config::getAbsolutePath("/Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("/Data/shaders/viewproj-fs.glsl").c_str());
+    World::shader0 =         loadShader(Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str()); 
+    World::shaderHandle =    loadShader(Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str()); 
+    World::shaderProj =      loadShader(Config::getAbsolutePath("Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("Data/shaders/viewproj-fs.glsl").c_str());
 
     if (World::shader0.program * World::shaderHandle.program *World::shaderProj.program * World::shaderProj.program == 0){
         printf("World::init():cannot load shaders\n");return false;
     }
 
-    World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube.png"));
-    World::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("/Data/textures/cube_color.png"));
-    World::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/cGrid.png"));
-    World::axisTexture =       pgr::createTexture(Config::getAbsolutePath("/Data/textures/axis.png"));
-    World::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("/Data/textures/white.png"));
+    World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
+    World::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png"));
+    World::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png"));
+    World::axisTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png"));
+    World::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png"));
 
     CHECK_GL_ERROR();
     World::initializedRender = true;
@@ -128,6 +128,10 @@ World* World::loadDefaultScene(){
 
     w->onStart();
     return w;
+}
+void GUIRecursive(GameObject* root) {
+    for (int i = 0; i < root->children.size(); i++) { GUIRecursive(root->children[i]); }
+    for (int i = 0; i < root->components.size(); i++) { if (root->components[i]->m_isActive) { root->components[i]->GUI(); } }
 }
 void updateRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){updateRecursive(root->children[i]);}
@@ -207,7 +211,6 @@ void World::tmpDrawNode() {//this tends to cause crash
 		ImGui::NewLine();
 	}
 	ImGui::PopItemWidth();
-	ImGui::End();
 }
 
 Ptr<Core::OrthoProj> tmportho= Core::Builder::createTransform<Core::OrthoProj>();
@@ -310,6 +313,9 @@ void World::onUpdate(){
     updateRecursive(this->sceneRoot);
 
     CHECK_GL_ERROR();
+}
+void World::onGUI(){
+    GUIRecursive(this->sceneRoot);
 }
 Shader World::loadShader(const char* vs_name, const char* fs_name){
     Shader shader = {0,0,0,0,0,0,0,0,0};

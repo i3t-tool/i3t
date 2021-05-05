@@ -434,13 +434,19 @@ void Scripting::runCommand(std::string cmd) {
 			"int vec3c(int data, char* header)\n"
 			"int scalar(int data, int x, int y, char* header)\n"
 			"int scalarc(int data, char* header)\n"
-			"int sequence(int x, int y, char* header)\n"
-			"int sequencec(char* header)\n"
+			"int scalar3oper(int type, int x, int y, char* header)\n"
+			"int scalar3operc(int type, char* header)\n"
 			"\n"
 			"Page 1/2. Enter \"help2\" to continue.\n";
 	}
 	else if(strcmp(cmd.c_str(),"help2")==0){
 		std::cout <<
+			"int convertor(int type, int x, int y, char* header)\n"
+			"int convertorc(int type, char* header)\n"
+			"int sequence(int x, int y, char* header)\n"
+			"int sequencec(char* header)\n"
+			"\n"
+			"bool seqadd(int sequence, int node);\n"
 			"bool plugnodes(int lnode, int rnode, int output, int input)\n"
 			"bool unpluginput(int node, int input)\n"
 			"\n"

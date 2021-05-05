@@ -68,6 +68,8 @@ public:
     Draws scene, updates global camera matricies, updates scene logic.
     */
     void onUpdate();
+
+    void onGUI();
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
 

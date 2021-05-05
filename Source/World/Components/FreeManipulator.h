@@ -13,6 +13,7 @@ public:
 	FreeManipulator();
 	void update();
 	void start();
+	void GUI();
 	void render(glm::mat4* parent, bool renderTransparent);
 	static const char* componentType() { return FreeManipulator::s_type; };
 	const char* getComponentType() { return FreeManipulator::s_type; };

@@ -567,7 +567,9 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
 
     WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
     WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
+    //ne::DeleteNode(workspace->at(nodeindex)->getId());
     seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
+    workspace->erase(workspace->begin()+nodeindex);
     returnValue->Val->Integer = true;
 }
 void unplugInput(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){

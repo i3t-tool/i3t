@@ -49,6 +49,10 @@ FreeManipulator::FreeManipulator(){
 void FreeManipulator::start(){
 
 }
+void FreeManipulator::GUI() {
+	if(m_activehandle!=-1){ManipulatorUtil::hint("Use keys S, R, T to switch scale, rotation and translation.\nUse keys X, Y, Z, W or LMB to switch axis.");}
+}
+
 void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
@@ -201,7 +205,7 @@ void FreeManipulator::update(){
 	if(m_activehandle==-1){
 		if (InputManager::isKeyPressed(Keys::r)){m_editmode = FreeManipulator::EDIT_ROTATION;}
 		else if (InputManager::isKeyPressed(Keys::s)){m_editmode = FreeManipulator::EDIT_SCALE;}
-		else if (InputManager::isKeyPressed(Keys::p)){m_editmode = FreeManipulator::EDIT_POSITION;}
+		else if (InputManager::isKeyPressed(Keys::t)){m_editmode = FreeManipulator::EDIT_POSITION;}
 		
 		if (InputManager::isKeyPressed(Keys::x)){m_editaxis = 0;}
 		else if (InputManager::isKeyPressed(Keys::y)){m_editaxis = 1;}

@@ -26,6 +26,7 @@ OrthoManipulator::OrthoManipulator(){
 	m_hposs[5]=glm::vec4(-1.0f,0.0f,0.0f,1.0f);
 
 	m_frustrum = new GameObject(unitcubeMesh, &World::shaderProj, 0);
+	//m_frustrum = new GameObject(unitquadMesh, &World::shaderProj, 0);
 	m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f);
 	m_frustruml = new GameObject(cubelinesMesh, &World::shaderProj, 0);
 	m_frustruml->primitive = GL_LINES;
@@ -35,10 +36,10 @@ OrthoManipulator::OrthoManipulator(){
 	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void OrthoManipulator::start(){}
-
+glm::mat4 mm;
 void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==nullptr){return;}
-	glm::mat4 projinv=glm::inverse(m_edited);;
+	glm::mat4 projinv=glm::inverse(m_edited);
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	//glm::mat4 transform=glm::mat4(1.0f);
 	//glm::mat4 transform=glm::inverse(getNodeTransform(&m_editednode,&m_parent));//LookAt?
@@ -51,6 +52,40 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 		glDisable(GL_CULL_FACE);
 		m_frustruml->draw(transform);
 		m_frustrum->draw(transform);
+
+		/*glm::mat4 m=glm::mat4(2.0f);
+		m[3]=glm::vec4(-1.0f,-1.0f,1.0f,1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv*m));
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f)*((float)(m_activehandle==m_stencils.names.f)*0.3f+1.0f);
+		m_frustrum->draw(transform);
+
+		m[3]=glm::vec4(-1.0f,-1.0f,-1.0f,1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv*m));
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f)*((float)(m_activehandle==m_stencils.names.n)*0.3f+1.0f);
+		m_frustrum->draw(transform);
+
+		m=glm::rotate(m,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+		m[3]=glm::vec4(1.0f,-1.0f,1.0f,1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv*m));
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f)*((float)(m_activehandle==m_stencils.names.r)*0.3f+1.0f);
+		m_frustrum->draw(transform);
+
+		m[3]=glm::vec4(-1.0f,-1.0f,1.0f,1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv*m));
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f)*((float)(m_activehandle==m_stencils.names.l)*0.3f+1.0f);
+		m_frustrum->draw(transform);
+
+		m=glm::rotate(m,glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f));
+		m[3]=glm::vec4(-1.0f,1.0f,1.0f,1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv*m));
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f)*((float)(m_activehandle==m_stencils.names.t)*0.3f+1.0f);
+		m_frustrum->draw(transform);
+
+		m[3]=glm::vec4(-1.0f,-1.0f,1.0f,1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv*m));
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f)*((float)(m_activehandle==m_stencils.names.b)*0.3f+1.0f);
+		m_frustrum->draw(transform);
+		m_frustrum->color=glm::vec4(0.5f,0.5f,0.5f,0.5f);*/
 		glEnable(GL_CULL_FACE);
 	}
 	else{
@@ -116,11 +151,11 @@ void OrthoManipulator::update(){
 	//glm::mat4 handlespace=glm::mat4(1.0f);
 	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent);
 			//vecWorldscreen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));
-	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+pos));//position of transformated object on the screen
+	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+handlespace*pos));//position of transformated object on the screen
 	glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen (axis*axis is absolute value)
 	glm::vec2 dir=spos2-spos1;//the axis in screen space
 	if(glm::length(dir)<0.01){dir[0]=1.0f;}//axis length must not be zero
-			
+
 	glm::mat2 mov=glm::mat2(dir,glm::vec2(dir[1],-dir[0]));
 	mov=glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 

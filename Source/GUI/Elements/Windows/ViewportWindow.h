@@ -21,7 +21,7 @@ public:
 	void render();
 
 private:
-	World* m_world2;
+	World* m_world;
 	unsigned int m_fboMain;
 	unsigned int m_texColBufMain;
 	unsigned int m_rboMain;
