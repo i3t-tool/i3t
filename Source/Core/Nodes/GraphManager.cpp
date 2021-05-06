@@ -6,6 +6,12 @@ using namespace Core;
 
 std::vector<Ptr<Cycle>> GraphManager::m_cycles;
 
+void tryToDoSequenceProcedure(Ptr<Node> node)
+{
+	if (isSequence(node))
+		node->as<Sequence>()->updatePins();
+}
+
 ENodePlugResult GraphManager::isPlugCorrect(Pin const * input, Pin const * output)
 {
 	auto lhs = input->m_master;
@@ -20,20 +26,29 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
-	Debug::Assert(rightNode->m_inputs.size() > myIndex,
+	Debug::Assert(rightNode->getInputPins().size() > myIndex,
 	              "Node {} does not have input pin with index {}!", rightNode->getSig(), myIndex);
-	Debug::Assert(leftNode->m_outputs.size() > fromIndex,
+	Debug::Assert(leftNode->getOutputPins().size() > fromIndex,
 	              "Node {} does not have output pin with index {}!", leftNode->getSig(), fromIndex);
 
-	auto result = isPlugCorrect(&rightNode->m_inputs[myIndex], &leftNode->m_outputs[fromIndex]);
+	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
 
 	// Insert to toPlug output pin outputs this operator input pin.
-	leftNode->m_outputs[fromIndex].m_outputs.push_back(&(rightNode->m_inputs[myIndex]));
+	leftNode->getOutputPinsRef()[fromIndex].m_outputs.push_back(&(rightNode->getInputPinsRef()[myIndex]));
 
 	// Attach given operator output pin to this operator input pin.
-	rightNode->m_inputs[myIndex].m_input = &leftNode->m_outputs[fromIndex];
+	rightNode->getInputPinsRef()[myIndex].m_input = &leftNode->getOutputPinsRef()[fromIndex];
+
+  if (isSequence(leftNode))
+  {
+    leftNode->as<Sequence>()->updatePins();
+  }
+  if (isSequence(rightNode))
+  {
+    rightNode->as<Sequence>()->updatePins();
+  }
 
 	leftNode->spreadSignal();
 
@@ -56,18 +71,21 @@ void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
   node.get()->unplugAll();
 	node->setDataMap(&Transform::g_Free);
+  tryToDoSequenceProcedure(node);
 }
 
 void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
+  tryToDoSequenceProcedure(node);
 	if (getAllInputNodes(node).empty())
-    node->setDataMap(&Transform::g_Free);
+    node->setDataMap(node->m_initialMap);
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugOutput(index);
+  tryToDoSequenceProcedure(node);
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)
@@ -95,7 +113,17 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
   {
     return nullptr;
   }
-  return pins[index].m_input->m_master;
+
+	auto expected = pins[index].m_input->m_master;
+
+	if (expected->m_owner != nullptr)
+  {
+    return expected->m_owner;
+	}
+	else
+  {
+    return expected;
+	}
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)

@@ -34,10 +34,10 @@ TEST(SequenceTest, MatricesCanBeMoved)
 {
 	auto seq = arrangeSequence();
 
-	// Pop first matrices in the sequence.
-	auto mat1 = seq->popMatrix(0);
-	auto mat2 = seq->popMatrix(0);
-	EXPECT_FALSE(mat1->isInSequence() && mat2->isInSequence());
+  // Pop first matrices in the sequence.
+  auto mat1 = seq->popMatrix(0);
+  auto mat2 = seq->popMatrix(0);
+  EXPECT_FALSE(mat1->isInSequence() && mat2->isInSequence());
 
 	{
 		auto expectedSequenceValue = getMatProduct(seq->getMatrices());
@@ -106,7 +106,7 @@ TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 {
 	auto seq = arrangeSequence();
 
-	auto matNode = Core::Builder::createTransform<Core::Free>();
+	auto matNode = Builder::createTransform<Core::Free>();
 	setValue_expectOk(matNode, generateMat4());
 
 	auto plugResult = GraphManager::plugSequenceValueInput(seq, matNode);
@@ -142,17 +142,30 @@ TEST(SequenceTest, SequenceCantBeSelfPlugged)
  *    _______
  *   /       \
  * seq1 --- seq2
+ *             \
+ *             mat
  */
 TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInput)
 {
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
+	auto mat = Builder::createNode<ENodeType::Matrix>();
 
 	plug_expectOk(seq1, seq2, 0, 0);
 
 	plug_expectOk(seq2, seq1, 1, 1);
 
-	EXPECT_EQ(seq1->getData().getMat4(), seq2->getData().getMat4());
+  // Matrix storages should be same.
+  EXPECT_EQ(seq1->getData(1).getMat4(), seq2->getData(1).getMat4());
+
+	// seq1 model matrix and seq2 stored matrices product should be same.
+  EXPECT_EQ(seq1->getData(2).getMat4(), seq2->getData(1).getMat4());
+
+  plug_expectOk(seq2, mat, 1, 0);
+  EXPECT_EQ(seq1->getData(1).getMat4(), mat->getData().getMat4());
+
+	// seq2 model matrix should be same as seq1 * seq2
+  EXPECT_EQ(seq2->getData(2).getMat4(), seq1->getData(1).getMat4() * seq2->getData(1).getMat4());
 }
 
 TEST(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput)
@@ -160,12 +173,12 @@ TEST(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
 
-	GraphManager::plug(seq1, seq2, 0, 0);
+  plug_expectOk(seq1, seq2, 0, 0);
 
 	auto plugResult = GraphManager::plug(seq1, seq2, 1, 1);
 	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 
-	EXPECT_EQ(seq1->getData().getMat4(), seq2->getData().getMat4());
+	EXPECT_EQ(seq1->getData(1).getMat4(), seq2->getData(1).getMat4());
 }
 
 TEST(SequenceTest, ThreeSequencesComposeMatrices)
@@ -188,19 +201,4 @@ TEST(SequenceTest, ThreeSequencesComposeMatrices)
     auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices()) * getMatProduct(seq3->getMatrices());
     EXPECT_EQ(expectedMat, seq3->getData().getMat4());
   }
-}
-
-TEST(_, _)
-{
-	auto seq = Builder::createSequence();
-	auto scale = Builder::createTransform<Scale>();
-
-	seq->addMatrix(scale);
-
-	setValue_expectOk(scale, generateVec3());
-
-	auto expected = scale->getData().getMat4();
-
-	EXPECT_EQ(expected, seq->getData().getMat4());
-	EXPECT_EQ(expected, seq->getData(1).getMat4());
 }

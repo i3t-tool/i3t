@@ -180,7 +180,7 @@ void Tutorial::render(int step)
 		}
 		else if (widget.m_type == "task")
 		{
-			ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
+			ImGui::PushFont(I3T::getFont(EFont::TitleSmall));
 			ImGui::TextWrapped(("Task: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}

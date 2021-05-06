@@ -211,6 +211,7 @@ void World::tmpDrawNode() {//this tends to cause crash
 		ImGui::NewLine();
 	}
 	ImGui::PopItemWidth();
+
 }
 
 Ptr<Core::OrthoProj> tmportho= Core::Builder::createTransform<Core::OrthoProj>();

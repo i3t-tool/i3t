@@ -13,5 +13,5 @@ WorkspaceMixFloat::WorkspaceMixFloat(ImTextureID headerBackground, std::string h
 
 void WorkspaceMixFloat::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

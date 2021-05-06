@@ -2,7 +2,23 @@
 // Created by Sofie on 28.04.2021.
 //
 
-#ifndef I3T_WORKSPACEFLOATVECTOQUAT_H
-#define I3T_WORKSPACEFLOATVECTOQUAT_H
+#pragma once
+#include "WorkspaceQuat.h"
 
-#endif // I3T_WORKSPACEFLOATVECTOQUAT_H
+struct WorkspaceFloatVecToQuatArgs
+{
+  WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
+  std::string headerLabel = "default quat(float, vec3) header";
+  std::string nodeLabel = "default quat(float, vec3) label";
+  Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::FloatVecToQuat>();
+};
+
+class WorkspaceFloatVecToQuat : public WorkspaceQuat
+{
+public:
+  WorkspaceFloatVecToQuat(ImTextureID headerBackground, WorkspaceFloatVecToQuatArgs const& args);
+  WorkspaceFloatVecToQuat(ImTextureID headerBackground, std::string headerLabel = "quat(float, vec3)", std::string nodeLabel = "quat(float, vec3)");
+
+  void drawDataSetValues(util::NodeBuilder& builder);
+
+};

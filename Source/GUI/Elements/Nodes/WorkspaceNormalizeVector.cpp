@@ -10,5 +10,5 @@ WorkspaceNormalizeVector::WorkspaceNormalizeVector(ImTextureID headerBackground,
 
 void WorkspaceNormalizeVector::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

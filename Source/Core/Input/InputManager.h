@@ -63,8 +63,8 @@ public:
     JUST_DOWN
   }; ///< state of the key used in keyMap - enum { 0 - up, 1 - just up, 2 - down, 3 - just down}
 
-  static std::map<Keys::Code, KeyState>
-      m_keyMap; ///< states of all keys, modifiers, and mouse buttons - enum value KeyState. changed in update()
+  /// States of all keys, modifiers, and mouse buttons - enum value KeyState. changed in update()
+  static std::map<Keys::Code, KeyState> m_keyMap;
 
   static int m_winWidth, m_winHeight; ///< Window size
 
@@ -82,6 +82,12 @@ private:
   static Ptr<IWindow> m_focusedWindow;
 
 public:
+	static void init();
+	static glm::vec2 getMouseDelta() { return { m_mouseXDelta, m_mouseYDelta }; }
+
+	static void setInputAction(const char* action, Keys::Code code);
+	static void setInputAxis(const char* action, float scale, Keys::Code code);
+
   static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
 
   /**
@@ -141,6 +147,8 @@ public:
     m_keyMap[code] = JUST_DOWN;
   }
 
+	static bool isActionTriggered(const char* name, EKeyState state);
+
   static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 
   static bool isKeyPressed(const Keys::Code code) { return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN); }
@@ -193,8 +201,6 @@ public:
    * Use this function after ImGui::Begin(...).
    */
   static void processViewportEvents();
-
-  static bool isActionZoomToAll();
 
   //@{
   /** \name Key callbacks */

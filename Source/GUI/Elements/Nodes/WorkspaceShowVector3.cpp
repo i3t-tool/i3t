@@ -10,6 +10,6 @@ WorkspaceShowVector3::WorkspaceShowVector3(ImTextureID headerBackground, std::st
 
 void WorkspaceShowVector3::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

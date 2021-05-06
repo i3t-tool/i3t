@@ -4,8 +4,9 @@
 
 #include "Core/API.h"
 #include "Core/Application.h"
-#include "Core/Input/InputActions.h"
+#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
+#include "Logger/Logger.h"
 
 #include "../../../World/Select.h"
 #include "../../../World/World.h"
@@ -44,6 +45,24 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	// init vectors definig size to display
 	m_wcMin = ImVec2(0, 0);
 	m_wcMax = ImVec2(0, 0);
+
+	InputManager::setInputAction("fire", Keys::b);
+	InputManager::setInputAction("fire", Keys::m);
+	InputManager::setInputAxis("move", 1.0f, Keys::o);
+	InputManager::setInputAxis("move", -1.0f, Keys::p);
+
+	Input.bindAction("fire", EKeyState::Pressed, []()
+  {
+	  Log::info("Action fired.");
+  });
+  Input.bindAction("fire", EKeyState::Released, []()
+  {
+    Log::info("Action released.");
+  });
+  Input.bindAxis("move", [](float val)
+  {
+    Log::info("move: {}", val);
+  });
 }
 
 float localData;
@@ -106,7 +125,7 @@ void Viewport::render()
 
 			// resize all other things
 			// m_world->onReshape(width, height);
-			InputActions::resize((float)width, (float)height);
+      InputManager::setScreenSize((int)width, (int)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 
@@ -137,6 +156,6 @@ void Viewport::render()
 		if(InputManager::isKeyPressed(Keys::shiftl)){m_world->tmpSetNode(); }
 		m_world->tmpDrawNode();
 		m_world->onGUI();
-		
+		ImGui::End();
 	}
 }

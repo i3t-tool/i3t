@@ -15,12 +15,10 @@ int selected=0;
 
 Console::Console(bool show) : IWindow(show)
 {
-	Input.addKeyDownFn(Keys::Code::down, [this] { onDownKey(); });
-	Input.addKeyDownFn(Keys::Code::up, [this] { onUpKey(); });
-}
-
-Console::~Console()
-{
+	InputManager::setInputAction("console_down", Keys::Code::down);
+	InputManager::setInputAction("console_up", Keys::Code::up);
+	Input.bindAction("console_down", EKeyState::Pressed, [this] { onDownKey(); });
+	Input.bindAction("console_up", EKeyState::Released, [this] { onUpKey(); });
 }
 
 int history(ImGuiInputTextCallbackData*d) {

@@ -10,6 +10,6 @@ WorkspaceVectorPerspectiveDivision::WorkspaceVectorPerspectiveDivision(ImTexture
 
 void WorkspaceVectorPerspectiveDivision::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

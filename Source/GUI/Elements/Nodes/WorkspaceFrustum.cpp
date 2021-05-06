@@ -2,14 +2,14 @@
 // Created by Sofie on 30.04.2021.
 //
 
-#include "WorkspaceFrustrum.h"
+#include "WorkspaceFrustum.h"
 
 WorkspaceFrustum::WorkspaceFrustum(ImTextureID headerBackground, WorkspaceFrustumArgs const& args)
     : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
 {}
 
 WorkspaceFrustum::WorkspaceFrustum(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Translation>(), headerLabel, nodeLabel)
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Frustum>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceFrustum::drawDataSetValues(util::NodeBuilder& builder)

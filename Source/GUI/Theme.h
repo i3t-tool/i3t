@@ -24,6 +24,13 @@ enum class EColor
 	ActiveColor,
 	TabColor,
 
+  NodeBgOperator,
+  NodeBgTransformation,
+	NodeHeaderOperator,
+	NodeHeaderTranformation,
+	NodeHeader,
+	NodeEditorBg,
+
 	PulseLink,
 	FloatLink,
 	MatrixLink,
@@ -42,17 +49,26 @@ enum class EFont
 	Tab,
 	Node,
 	Title,
-	TaskTitle,
+	TitleSmall,
 };
 
 enum class ESize
 {
-	Nodes_Rounding,
+  Window_FramePadding,
+
+  Nodes_Rounding,
 	Nodes_FloatWidth,
 	Nodes_FloatMargin,
 	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
-	Window_FramePadding,
+  Nodes_matrixFramePaddingX,
+  Nodes_matrixFramePaddingY,
+  Nodes_pinSpacingX,
+  Nodes_pinSpacingY,
+  Nodes_PivotAlignmentX,
+  Nodes_PivotAlignmentY,
+  Nodes_BorderWidth,
+
 	COUNT
 };
 
@@ -87,16 +103,17 @@ constexpr inline EColor asColor(EValueType type)
 class Theme
 {
 	using Colors = std::map<EColor, ImVec4>;
+	using Sizes = std::array<float, static_cast<size_t>(ESize::COUNT)>;
+
 	Colors m_colors;
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	static constexpr const size_t m_fontsCount = 4;
 	/// \todo MH Set dynamic scale (reload font in runtime).
 	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
-	std::array<ImFont*, m_fontsCount + 1> m_fonts = {nullptr, nullptr, nullptr, nullptr, nullptr};
-	std::array<float, static_cast<size_t>(ESize::COUNT)> m_sizes;
+	std::vector<ImFont*> m_fonts;
+	Sizes m_sizes;
 
 public:
 	/**
@@ -111,6 +128,7 @@ public:
 	 * Call this function whenever you change style settings.
 	 */
 	void apply();
+
 	const ImVec4& get(EColor color)
 	{
 		if (m_colors.count(color) == 0)
@@ -133,6 +151,12 @@ public:
 
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 
-	const Colors& getColors() const { return m_colors; }
+	[[nodiscard]] const Colors& getColors() const { return m_colors; }
+	Colors& getColorsRef() { return m_colors; }
 	void setColors(const Colors& colors) { m_colors = colors; }
+
+  Sizes& getSizesRef() { return m_sizes; }
+
+	void makeNodeBlue();
+	void makeNodeYellow();
 };

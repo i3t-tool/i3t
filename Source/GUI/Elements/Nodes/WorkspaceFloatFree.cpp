@@ -10,5 +10,5 @@ WorkspaceFloatFree::WorkspaceFloatFree(ImTextureID headerBackground, std::string
 
 void WorkspaceFloatFree::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

@@ -38,6 +38,13 @@ void GlfwWindow::init()
 	glfwSwapInterval(1); // Enable vsync.
 
 	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
+
+	/*
+	glfwSetKeyCallback(m_mainWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+  {
+
+  });
+	 */
 }
 
 GLFWwindow* GlfwWindow::get()

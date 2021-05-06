@@ -10,5 +10,5 @@ WorkspaceMakeEulerX::WorkspaceMakeEulerX(ImTextureID headerBackground, std::stri
 
 void WorkspaceMakeEulerX::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

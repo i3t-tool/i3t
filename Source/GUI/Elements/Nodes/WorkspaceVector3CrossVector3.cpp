@@ -10,6 +10,6 @@ WorkspaceVector3CrossVector3::WorkspaceVector3CrossVector3(ImTextureID headerBac
 
 void WorkspaceVector3CrossVector3::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

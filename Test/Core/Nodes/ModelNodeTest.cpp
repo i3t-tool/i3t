@@ -10,9 +10,14 @@ using namespace Core;
 
 TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 {
-	auto sequence = arrangeSequence();
+	// auto sequence = arrangeSequence();
+	auto sequence = Builder::createSequence();
+	auto transform = Builder::createTransform<Translation>(generateVec3());
 
-  /// \todo DG/MH GameObject local initialization throws an error.
+	sequence->addMatrix(transform);
+
+  /// \todo DG/MH GameObject local initialization throws an error (OpenGL context is not
+  /// initialized).
   auto* gameObject = new GameObject();
 
   auto modelNode = Builder::createNode<ENodeType::Model>();

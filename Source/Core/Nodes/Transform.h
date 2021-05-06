@@ -20,7 +20,7 @@ FORCE_INLINE bool isTransform(NodePtr& node)
 
 class Transformation : public NodeBase
 {
-	friend class Sequence;
+	friend class Storage;
 
   Ptr<NodeBase> m_currentSequence = nullptr;
   int m_currentIndex = -1;
@@ -34,12 +34,13 @@ protected:
   Transformation(const Operation* transformType) : NodeBase(transformType) {}
 	void notifySequence();
 
-private:
-	void nullSequence()
-	{
-		m_currentSequence = nullptr;
+public:
+	/// \todo MH these should not be public.
+  void nullSequence()
+  {
+    m_currentSequence = nullptr;
     int m_currentIndex = -1;
-	}
+  }
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
   {
@@ -53,8 +54,6 @@ private:
 		m_currentIndex = index;
 	}
 };
-
-using TransformationPtr = Ptr<Transformation>;
 
 
 class Free : public Transformation
@@ -132,6 +131,8 @@ public:
 		m_currentMap = &map;
 	}
 
+  [[nodiscard]] float getRot() { return m_initialRot; }
+
   float getAngle() { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
@@ -162,6 +163,8 @@ public:
 		m_initialMap = &map;
 		m_currentMap = &map;
 	}
+
+  [[nodiscard]] float getRot() { return m_initialRot; }
 
   float getAngle() { return m_initialRot; }
 
@@ -196,6 +199,8 @@ public:
 
   float getAngle() { return m_initialRot; }
 
+  [[nodiscard]] float getRot() { return m_initialRot; }
+
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
@@ -224,14 +229,11 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-
 	void reset() override;
 
 	float getX();
 	float getY();
 	float getZ();
-
-	/* \todo JH Martine prosím o gettery XYZ pro DataMapu */
 
 	ValueSetResult setX(float v);
   ValueSetResult setY(float v);

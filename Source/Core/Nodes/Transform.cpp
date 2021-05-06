@@ -8,7 +8,7 @@ void Transformation::notifySequence()
 {
 	if (m_currentSequence)
   {
-		m_currentSequence->updateValues(0);
+		m_currentSequence->updateValues(-1);
 	}
 }
 

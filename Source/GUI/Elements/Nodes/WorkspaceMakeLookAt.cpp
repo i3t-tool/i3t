@@ -10,5 +10,5 @@ WorkspaceMakeLookAt::WorkspaceMakeLookAt(ImTextureID headerBackground, std::stri
 
 void WorkspaceMakeLookAt::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

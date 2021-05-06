@@ -4,6 +4,7 @@
 
 #include "WorkspaceWindow.h"
 
+#include "../../Theme.h"
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
 
@@ -52,11 +53,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(m_nodeEditorContext);
 	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_NodeBg] = node_bg_color;
-	ne::GetStyle().Colors[ne::StyleColor::StyleColor_Bg] = background_color;
-	ne::GetStyle().PivotAlignment = pivot_alignment;
-	//ne::GetStyle().NodeRounding = node_rounding;
-
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -95,6 +91,14 @@ void WorkspaceWindow::render()
 
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 	{
+
+		//SS to MH how to get current theme?
+        Theme& t = I3T::getTheme();
+		if(workspaceCoreNode->isTransformation()){
+			t.makeNodeYellow();
+		}else{
+            t.makeNodeBlue();
+		}
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
 	}
 
@@ -547,7 +551,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 	ne::Suspend();
-	//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, context_menu_padding);
 
 
 	if (ImGui::BeginPopup("float_context_menu")) {
@@ -773,6 +776,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatRot>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -878,7 +883,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("trackball")) {
-				}
+//          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTrackball>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+        }
 				if (ImGui::MenuItem("inversion")) {
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixInversion>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -1005,40 +1012,76 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("quat operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatFree>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat(float, vec3)")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatVecToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat(angle, axis)")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAngleAxisToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat(vec3, vec3)")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVecVecToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> float, vec3")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToFloatVec>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> angle, axis")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToAngleAxis>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat * quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatMulQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> euler")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToEuler>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("euler -> quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("slerp")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatSlerp>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("long way slerp")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLongWaySlerp>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("lerp")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLerp>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat conjugate")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceConjQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("qvq*")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatVecConjQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("inverse quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatInverse>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("normalize quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("length(quat)")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatLength>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -1056,7 +1099,9 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float cycle")) {
-				}
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatCycle>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+        }
 				if (ImGui::MenuItem("float * float")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulFloat>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -1078,8 +1123,12 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("sin & cos(float)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatSinCos>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("asin & acos(float")) {
+				if (ImGui::MenuItem("asin & acos(float)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceASinACos>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("signum")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSignum>(m_headerBackgroundTexture));
@@ -1093,17 +1142,24 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("conversion operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("mat -> TR")) {
-
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToTR>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("TR -> mat")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTRToMatrix>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat -> vecs4")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToVectors>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat -> quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vecs4 -> mat")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorsToMatrix>(m_headerBackgroundTexture));
@@ -1114,7 +1170,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec4 -> floats")) {
-
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vecs3 -> mat")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectors3ToMatrix>(m_headerBackgroundTexture));
@@ -1125,12 +1182,16 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("vec3 -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3ToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> mat")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToMatrix>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("floats -> mat")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToMatrix>(m_headerBackgroundTexture));
@@ -1145,6 +1206,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("floats -> quat")) {
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
@@ -1189,8 +1252,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 		ImGui::EndPopup();
 	}
 
-
-	//ImGui::PopStyleVar();
 	ne::Resume();
 
 }

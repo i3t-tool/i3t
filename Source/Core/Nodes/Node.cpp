@@ -27,7 +27,7 @@ void NodeBase::init()
 		m_internalData.emplace_back(m_operation->outputTypes[i]);
 	}
 
-	// Ugly workaround for Model and Screen node, which has no outputs.
+	// \todo MH Ugly workaround for Model and Screen node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
 	{
 		m_internalData.emplace_back(m_operation->inputTypes[0]);
@@ -37,6 +37,11 @@ void NodeBase::init()
 ID NodeBase::getId() const
 {
   return m_id;
+}
+
+void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node)
+{
+	pin.m_master = node;
 }
 
 void NodeBase::setDataMap(const Transform::DataMap* map)
@@ -50,19 +55,29 @@ void NodeBase::setDataMap(const Transform::DataMap* map)
 	  m_currentMap = map;
 }
 
-const std::vector<Pin>& NodeBase::getInputPins() const
+const std::vector<Pin>& NodeBase::getInputPins()
 {
-	return m_inputs;
+	return getInputPinsRef();
 }
 
-const std::vector<Pin>& NodeBase::getOutputPins() const
+const std::vector<Pin>& NodeBase::getOutputPins()
+{
+	return getOutputPinsRef();
+}
+
+std::vector<Pin>& NodeBase::getInputPinsRef()
+{
+  return m_inputs;
+}
+
+std::vector<Pin>& NodeBase::getOutputPinsRef()
 {
 	return m_outputs;
 }
 
 void NodeBase::spreadSignal()
 {
-	for (auto& operatorOutput : m_outputs)
+	for (auto& operatorOutput : getOutputPinsRef())
 	{
 		for (auto* oct : operatorOutput.getOutComponents())
 		{
@@ -73,7 +88,7 @@ void NodeBase::spreadSignal()
 
 void NodeBase::spreadSignal(int outIndex)
 {
-	for (auto* oct : m_outputs[outIndex].getOutComponents())
+	for (auto* oct : getOutputPinsRef()[outIndex].getOutComponents())
 	{
 		oct->m_master->receiveSignal(oct->getIndex());
 	}
@@ -115,7 +130,7 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const * input, Pin const * output)
   if (!out)
     return ENodePlugResult::Err_NonexistentPin;
 
-  if (inp->m_opValueType != out->m_opValueType)
+  if (inp->m_valueType != out->m_valueType)
   {
     // Do the input and output data types match?
     return ENodePlugResult::Err_MismatchedPinTypes;
@@ -222,4 +237,17 @@ void NodeBase::unplugOutput(int index)
 		otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
+}
+
+const DataStore& Pin::getStorage(unsigned int id)
+{
+  if (m_isInput)
+  {
+    // Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
+    return m_input->m_master->getData(id);
+  }
+  else
+  {
+    return m_master->getData(id);
+  }
 }

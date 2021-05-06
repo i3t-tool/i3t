@@ -10,6 +10,6 @@ WorkspaceVector3Length::WorkspaceVector3Length(ImTextureID headerBackground, std
 
 void WorkspaceVector3Length::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 
