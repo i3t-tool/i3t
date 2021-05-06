@@ -814,8 +814,8 @@ struct LibraryFunction platformLibraryI3T[] =
 	{ vec3,         "int vec3(int,int,int,char*);"     },         { vec3,         "int vec3c(int);" },
     { scalaroper,   "int scalaroper(int,int,int,char*);"},        { scalaroper,   "int scalaroperc(int);" },
     { scalar,       "int scalar(int,int,int,char*);"   },         { scalar,       "int scalarc(int);" },
-    //{ quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },
-    //{ quat,         "int quat(int,int,int,char*);"   },           { quat,         "int quatc(int);" },
+    { quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },
+    { quat,         "int quat(int,int,int,char*);"   },           { quat,         "int quatc(int);" },
     { convertor,    "int convertor(int,int,int,char*);"},         { convertor,    "int convertorc(int);" },
 	{ sequence,     "int sequence(int,int,char*);"     },         { sequence,     "int sequencec(char*);" },
 	{ seqAdd,       "bool seqadd(int,int);" },
@@ -884,7 +884,7 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "mul",           &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.mul,  false);
     VariableDefinePlatformVar(pc, nullptr, "show",          &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.show, false);
     VariableDefinePlatformVar(pc, nullptr, "mix",           &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.mix,  false);
-    VariableDefinePlatformVar(pc, nullptr, "norm",          &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.inverse,false);
+    VariableDefinePlatformVar(pc, nullptr, "inverse",       &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.inverse,false);
     VariableDefinePlatformVar(pc, nullptr, "norm",          &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.norm, false);
     VariableDefinePlatformVar(pc, nullptr, "length",        &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.length,false);
 
@@ -917,7 +917,7 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "norm_quat",     &pc->IntType, (union AnyValue*)&scriptingData.convertors.norm_quat,     false);
     
     //quat oper
-    /*VariableDefinePlatformVar(pc, nullptr, "scalarvec3_quat",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.scalarvec3_quat,false);
+    VariableDefinePlatformVar(pc, nullptr, "scalarvec3_quat",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.scalarvec3_quat,false);
     VariableDefinePlatformVar(pc, nullptr, "angleaxis_quat",    &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.angleaxis_quat, false);
     VariableDefinePlatformVar(pc, nullptr, "vec3vec3_quat",     &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.vec3vec3_quat,  false);
     VariableDefinePlatformVar(pc, nullptr, "quat_scalarvec3",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.quat_scalarvec3,false);
@@ -929,7 +929,7 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "longslerp",         &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.longslerp,      false);
     VariableDefinePlatformVar(pc, nullptr, "lerp",              &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.lerp,           false);
     VariableDefinePlatformVar(pc, nullptr, "conjugate",         &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.conjugate,      false);
-    VariableDefinePlatformVar(pc, nullptr, "qvq",               &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.qvq,            false);*/
+    VariableDefinePlatformVar(pc, nullptr, "qvq",               &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.qvq,            false);
     //node lod
     VariableDefinePlatformVar(pc, nullptr, "full",          &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.full,            false);
     VariableDefinePlatformVar(pc, nullptr, "setvalues",     &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.setvalues,       false);
