@@ -147,6 +147,7 @@ public:
 	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
 	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
+	ne::Detail::Node *m_draged_node_nodeeditor;
 
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 

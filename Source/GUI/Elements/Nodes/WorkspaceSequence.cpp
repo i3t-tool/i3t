@@ -2,7 +2,7 @@
 #include "WorkspaceMatrixTranslation.h"
 
 WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequenceArgs const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createSequence()})
+    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
 
 	fw.showMyPopup = false;
@@ -13,8 +13,8 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequ
 	m_workspaceTransformation.push_back(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
 }
 
-WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceNodeWithCoreData(headerBackground, Core::Builder::createSequence(), headerLabel, nodeLabel)
+WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel, Ptr<Core::Sequence> nodebase)
+    : WorkspaceNodeWithCoreData(headerBackground, nodebase == nullptr ? Core::Builder::createSequence() : nodebase, headerLabel, nodeLabel)
 {
 	fw.showMyPopup = false;
 	fw.id = "";
@@ -34,27 +34,39 @@ bool WorkspaceSequence::isSequence()
 
 int WorkspaceSequence::getInnerPosition(ImVec2 point)
 {
-    ImVec2 position = ne::GetNodePosition(getId());
-    ImVec2 size = ne::GetNodeSize(getId());
-    ImRect rect = ImRect(position, position+size);
+    ImVec2 sequence_position = ne::GetNodePosition(getId());
+    ImVec2 sequence_size = ne::GetNodeSize(getId());
+
+    ImRect rect = ImRect(sequence_position, sequence_position+sequence_size);
     if (!rect.Contains(point))
     {
         return -1;
     }
+
+    rect.Max.x = rect.Min.x; /* squeeze rect at begin -> then in cykle shift rect and check point position */
     int i = 0;
     for (auto const & innerNode : getInnerWorkspaceNodes())
     {
-        position = ne::GetNodePosition(innerNode->getId());
-        size = ne::GetNodeSize(innerNode->getId());
-        rect  = ImRect(position, position+size);
-        rect.TranslateX(-size.x/2);
+        rect.Max.x = ne::GetNodePosition(innerNode->getId()).x + ne::GetNodeSize(innerNode->getId()).x/2;
         if(rect.Contains(point))
         {
             return i;
         }
+        rect.Min.x = rect.Max.x;
         i++;
     }
     return i;
+}
+
+int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
+{
+    int position = -1; /* position of first found point that match */
+    for(auto const & point : points)
+    {
+        position = getInnerPosition(point);
+        if (position > -1){return position;}
+    }
+    return position;
 }
 
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
@@ -84,6 +96,10 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceTransformation; }
 
+void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
+void WorkspaceSequence::setWidthOfDummy(int width) {m_widthOfDummy = width;}
+
+
 
 void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
 {
@@ -100,10 +116,23 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
         int i = 0;
         for( auto const & transformation : m_workspaceTransformation )
         {
-            ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
+            if(m_position_of_dummy_data == i)
+            {
+                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x + m_widthOfDummy, m_dataRect.Min.y));
+            }else
+            {
+                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
+            }
+
             transformation->drawNode(builder, nullptr, false);
 
             m_dataRect.Add(ImGui::GetItemRectMax());
+
+            i++;
+        }
+        if (m_position_of_dummy_data == i) /* add dummy after last inner */
+        {
+            m_dataRect.Add(m_dataRect.Max + ImVec2(m_widthOfDummy, 0));
         }
 }
 

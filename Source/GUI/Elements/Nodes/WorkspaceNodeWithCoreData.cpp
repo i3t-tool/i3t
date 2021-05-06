@@ -115,6 +115,11 @@ bool WorkspaceNodeWithCoreData::isSequence()
     return false;
 }
 
+bool WorkspaceNodeWithCoreData::isCamera()
+{
+    return false;
+}
+
 bool WorkspaceNodeWithCoreData::isTransformation()
 {
     return m_nodebase->as<Core::Transformation>() != nullptr;
@@ -322,6 +327,25 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
         /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
         drawDataFull(builder);
     }
+
+    if (m_inactiveMark != 0)
+    {
+        ImVec2 start = ne::GetNodePosition(m_id);
+        ImVec2 size = ne::GetNodeSize(m_id);
+        ImVec2 end = start + size;
+        if(m_inactiveMark > 0)
+        {
+            end.x -= (1-m_inactiveMark)*size.x;
+        }
+        else
+        {
+            start.x += m_inactiveMark*size.x;
+        }
+
+        //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
+        //ImGui::Dummy(const ImVec2& size);
+        ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
+    }
 }
 
 void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
@@ -366,7 +390,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 {
 	for (auto const & pinProp : m_workspaceInputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::MatrixMul)
+	    if(pinProp->getType() == EValueType::Matrix)
         {
             drawInputPin(builder, pinProp, newLinkPin);
         }
@@ -374,7 +398,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 	ImGui::Spring(2);
     for (auto const & pinProp : m_workspaceInputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::Matrix)
+	    if(pinProp->getType() != EValueType::Matrix)
         {
             drawInputPin(builder, pinProp, newLinkPin);
         }
@@ -414,7 +438,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 {
 	for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::MatrixMul)
+	    if(pinProp->getType() == EValueType::Matrix)
         {
             drawOutputPin(builder, pinProp, newLinkPin);
         }
@@ -422,7 +446,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 	ImGui::Spring(2);
     for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::Matrix)
+	    if(pinProp->getType() != EValueType::Matrix)
         {
             drawOutputPin(builder, pinProp, newLinkPin);
         }
