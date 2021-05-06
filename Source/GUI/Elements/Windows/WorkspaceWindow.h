@@ -22,6 +22,7 @@
 #include "Scripting/Scripting.h"
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
+#include "Core/API.h"
 
 //transformations{
 #include "../Nodes/WorkspaceAxisAngle.h"

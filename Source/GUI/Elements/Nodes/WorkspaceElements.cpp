@@ -93,10 +93,9 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 
-	//TODO get here actual theme
-  Theme t;
+  Theme& t = I3T::getTheme();
   m_color =	t.get(EColor::NodeHeader);
-    builder.Header(m_color);
+	builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y

@@ -93,12 +93,11 @@ void WorkspaceWindow::render()
 	{
 
 		//SS to MH how to get current theme?
-    Theme t;
-
+        Theme& t = I3T::getTheme();
 		if(workspaceCoreNode->isTransformation()){
 			t.makeNodeYellow();
 		}else{
-      t.makeNodeBlue();
+            t.makeNodeBlue();
 		}
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
 	}

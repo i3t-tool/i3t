@@ -16,9 +16,13 @@
 namespace ed = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
 
-util::NodeBuilder::NodeBuilder(ImTextureID texture, int textureWidth, int textureHeight)
-		: HeaderTextureId(texture), HeaderTextureWidth(textureWidth), HeaderTextureHeight(textureHeight),
-			CurrentNodeId(0), CurrentStage(Stage::Invalid), HasHeader(false)
+util::NodeBuilder::NodeBuilder(ImTextureID texture, int textureWidth, int textureHeight):
+			HeaderTextureId(texture),
+			HeaderTextureWidth(textureWidth),
+			HeaderTextureHeight(textureHeight),
+			CurrentNodeId(0),
+			CurrentStage(Stage::Invalid),
+			HasHeader(false)
 {
 }
 
@@ -27,7 +31,7 @@ void util::NodeBuilder::Begin(ed::NodeId id)
 	HasHeader = false;
 	HeaderMin = HeaderMax = ImVec2();
 
-	ed::PushStyleVar(StyleVar_NodePadding, ImVec4(0, 0, 0, 0)); // ImVec4(8, 4, 8, 8) ImVec4(0, 0, 0, 0)
+	ed::PushStyleVar(StyleVar_NodePadding, ImVec4(8, 4, 8, 8)); // ImVec4(8, 4, 8, 8) ImVec4(0, 0, 0, 0)
 
 	ed::BeginNode(id);
 
@@ -57,25 +61,31 @@ void util::NodeBuilder::End()
 			const auto uv = ImVec2((HeaderMax.x - HeaderMin.x) / (float)(4.0f * HeaderTextureWidth),
 			                       (HeaderMax.y - HeaderMin.y) / (float)(4.0f * HeaderTextureHeight));
 
-			drawList->AddImageRounded(HeaderTextureId, HeaderMin - ImVec2(0 - halfBorderWidth, 0 - halfBorderWidth),
-			                          HeaderMax + ImVec2(0 - halfBorderWidth, 0), ImVec2(0.0f, 0.0f), uv, headerColor,
-			                          GetStyle().NodeRounding, 1 | 2);
-			/*drawList->AddImageRounded(HeaderTextureId, HeaderMin - ImVec2(8 - halfBorderWidth, 4 - halfBorderWidth),
-			HeaderMax + ImVec2(8 - halfBorderWidth, 0), ImVec2(0.0f, 0.0f), uv, headerColor,
-				GetStyle().NodeRounding, 1 | 2);*/
+			/*drawList->AddImageRounded(HeaderTextureId,
+			                          HeaderMin - ImVec2(0 - halfBorderWidth, 0 - halfBorderWidth),
+			                          HeaderMax + ImVec2(0 - halfBorderWidth, 0),
+			                          ImVec2(0.0f, 0.0f), uv,
+			                          headerColor, GetStyle().NodeRounding, 1 | 2);*/
+
+			drawList->AddImageRounded(HeaderTextureId,
+			  HeaderMin - ImVec2(8 - halfBorderWidth, 4 - halfBorderWidth),
+			  HeaderMax + ImVec2(8 - halfBorderWidth, 0), ImVec2(0.0f, 0.0f), uv,
+			  headerColor, GetStyle().NodeRounding, 1 | 2);
 
 			auto headerSeparatorMin = ImVec2(HeaderMin.x, HeaderMax.y);
 			auto headerSeparatorMax = ImVec2(HeaderMax.x, HeaderMin.y);
 
 			if ((headerSeparatorMax.x > headerSeparatorMin.x) && (headerSeparatorMax.y > headerSeparatorMin.y))
 			{
-				/*drawList->AddLine(headerSeparatorMin + ImVec2(-(0 - halfBorderWidth), -0.0f),
-				                  headerSeparatorMax + ImVec2((0 - halfBorderWidth), -0.0f),
-				                  ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);*/
+				/*drawList->AddLine(
+				 *    headerSeparatorMin + ImVec2(-(0 - halfBorderWidth), -0.0f),
+              headerSeparatorMax + ImVec2((0 - halfBorderWidth), -0.0f),
+              ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);*/
 
-				drawList->AddLine(headerSeparatorMin + ImVec2(-(8 - halfBorderWidth), -0.5f),
-				                  headerSeparatorMax + ImVec2((8 - halfBorderWidth), -0.5f),
-				                  ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);
+				drawList->AddLine(
+						headerSeparatorMin + ImVec2(-(8 - halfBorderWidth), -0.5f),
+						headerSeparatorMax + ImVec2((8 - halfBorderWidth), -0.5f),
+						ImColor(255, 255, 255, 96 * alpha / (3 * 255)), 1.0f);
 			}
 		}
 	}
@@ -114,14 +124,15 @@ void util::NodeBuilder::Input(ed::PinId id)
 	}
 	Pin(id, PinKind::Input);
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, pin_spacing);
-	//ImGui::BeginHorizontal(id.AsPointer());
+	//SS
+	//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, pin_spacing);
+	ImGui::BeginHorizontal(id.AsPointer());
 }
 
 void util::NodeBuilder::EndInput()
 {
-	ImGui::PopStyleVar();
-	//ImGui::EndHorizontal();
+	//ImGui::PopStyleVar();
+	ImGui::EndHorizontal();
 
 	EndPin();
 }
@@ -148,14 +159,15 @@ void util::NodeBuilder::Output(ed::PinId id)
 
 	Pin(id, PinKind::Output);
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, pin_spacing);
-	//ImGui::BeginHorizontal(id.AsPointer());
+	//SS
+	//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, pin_spacing);
+	ImGui::BeginHorizontal(id.AsPointer());
 }
 
 void util::NodeBuilder::EndOutput()
 {
-	ImGui::PopStyleVar();
-	//ImGui::EndHorizontal();
+	//ImGui::PopStyleVar();
+	ImGui::EndHorizontal();
 
 	EndPin();
 }
@@ -250,7 +262,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 	case Stage::Input:
 		ImGui::BeginVertical("inputs", ImVec2(0, 0), 0.0f);
 
-		ed::PushStyleVar(ed::StyleVar_PivotAlignment, ImVec2(0, 0.0f));
+		ed::PushStyleVar(ed::StyleVar_PivotAlignment, ImVec2(0, 0.5f)); //SS
 		ed::PushStyleVar(ed::StyleVar_PivotSize, ImVec2(0, 0));
 
 		if (!HasHeader)
@@ -259,7 +271,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 
 	case Stage::Middle:
 		ImGui::Spring(1);
-		ImGui::BeginVertical("middle", ImVec2(0, 0), 0.0f);
+		ImGui::BeginVertical("middle", ImVec2(0, 0), 1.0f); //SS
 		break;
 
 	case Stage::Output:
@@ -270,7 +282,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 		ImGui::BeginVertical("outputs", ImVec2(0, 0), 1.0f);
 
 		ed::PushStyleVar(ed::StyleVar_PivotAlignment, ImVec2(1.0f, 0.5f));
-		ed::PushStyleVar(ed::StyleVar_PivotSize, ImVec2(10, 10));
+		ed::PushStyleVar(ed::StyleVar_PivotSize, ImVec2(0, 0));
 
 		if (!HasHeader)
 			ImGui::Spring(1, 0);
