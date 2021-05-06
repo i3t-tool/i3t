@@ -221,6 +221,64 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		}
 		else if (strcmp(keyword, "MixVector") == 0) {
 			fprintf(f, "int n%d=vec4oper(mix,%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
+		}		
+		//quat
+		else if (strcmp(keyword, "QuatToQuat") == 0) {
+			glm::vec4 vec = nodebase->getData().getVec4();
+			fprintf(f, "int d%d=datavec4(%0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i + at, vec[0], vec[1], vec[2],vec[3]);
+			fprintf(f, "int n%d=quat(d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		//quat oper
+		else if (strcmp(keyword, "ConjQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(conjugate,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatVecToQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(scalarvec3_quat,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "AngleAxisToQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(angleaxis_quat,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "VecVecToQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(vec3vec3_quat,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatToFloatVec") == 0) {
+			fprintf(f, "int n%d=quatoper(quat_scalarvec3,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatToAngleAxis") == 0) {
+			fprintf(f, "int n%d=quatoper(quat_angleaxis,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatToEuler") == 0) {
+			fprintf(f, "int n%d=quatoper(quat_euler,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "EulerToQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(euler_quat,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatInverse") == 0) {
+			fprintf(f, "int n%d=quatoper(inverse,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatSlerp") == 0) {
+			fprintf(f, "int n%d=quatoper(slerp,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatLongWaySlerp") == 0) {
+			fprintf(f, "int n%d=quatoper(longslerp,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatLerp") == 0) {
+			fprintf(f, "int n%d=quatoper(lerp,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "FloatMulQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(scalarmulquat,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatMulQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(mul,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatVecConjQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(qvq,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "QuatLength") == 0) {
+			fprintf(f, "int n%d=quatoper(length,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		else if (strcmp(keyword, "NormalizeQuat") == 0) {
+			fprintf(f, "int n%d=quatoper(norm,%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		//vec3
 		else if (strcmp(keyword, "Vector3ToVector3") == 0) {

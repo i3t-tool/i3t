@@ -27,7 +27,7 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
 	if(type==scriptingData.mat4Types.determinant){
 		workspace->push_back(std::make_unique<WorkspaceDeterminant>((ImTextureID)0, l));
 	}
-    else if(type==scriptingData.mat4Types.inverse){
+    else if(type==scriptingData.arithmeticOperators.inverse){
 		workspace->push_back(std::make_unique<WorkspaceMatrixInversion>((ImTextureID)0, l));
 	}
     else if(type==scriptingData.arithmeticOperators.mul){
@@ -266,10 +266,10 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
     else if (type == scriptingData.vecOperators.perspdiv) {
         workspace->push_back(std::make_unique<WorkspaceVectorPerspectiveDivision>((ImTextureID)0, l));
     }
-    else if (type == scriptingData.vecOperators.norm) {
+    else if (type == scriptingData.arithmeticOperators.norm) {
         workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, l));
     }
-    else if (type == scriptingData.vecOperators.length) {
+    else if (type == scriptingData.arithmeticOperators.length) {
         //workspace->push_back(std::make_unique<WorkspaceVectorLength((ImTextureID)0, l));
         returnValue->Val->Integer = -1; return;
     }
@@ -318,10 +318,10 @@ void vec3oper(struct ParseState* parser, struct Value* returnValue, struct Value
     else if (type == scriptingData.vecOperators.dot) {
         workspace->push_back(std::make_unique<WorkspaceVector3DotVector3>((ImTextureID)0, l));
     }
-    else if (type == scriptingData.vecOperators.norm) {
+    else if (type == scriptingData.arithmeticOperators.norm) {
         workspace->push_back(std::make_unique<WorkspaceNormalizeVector3>((ImTextureID)0, l));
     }
-    else if (type == scriptingData.vecOperators.length) {
+    else if (type == scriptingData.arithmeticOperators.length) {
         workspace->push_back(std::make_unique<WorkspaceVector3Length>((ImTextureID)0,l));
     }
     else if (type == scriptingData.vecOperators.vecmulfloat) {
@@ -392,7 +392,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
     //clamp=200,cycle=201,pow=205,sincos=207,asinacos=208,signum=209;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if (type == scriptingData.floatOperators.asinacos) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceASinACos>((ImTextureID)0, l));
     }
     else if (type == scriptingData.floatOperators.cycle) {
         returnValue->Val->Integer = -1; return;
@@ -401,7 +401,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         workspace->push_back(std::make_unique<WorkspaceFloatPowFloat>((ImTextureID)0, l));
     }
     else if (type == scriptingData.floatOperators.sincos) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceFloatSinCos>((ImTextureID)0, l));
     }
     else if (type == scriptingData.floatOperators.clamp) {
         workspace->push_back(std::make_unique<WorkspaceClampFloat>((ImTextureID)0, l));
@@ -432,7 +432,8 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
     }
     returnValue->Val->Integer = (int)workspace->size() - 1;
-}void convertor(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+}
+void convertor(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
     int x = 0, y = 0;
     const char* l = "-";
@@ -444,19 +445,19 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
     
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if (type == scriptingData.convertors.mat_tr) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceMatrixToTR>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.tr_mat) {
         workspace->push_back(std::make_unique<WorkspaceTRToMatrix>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.mat_vecs4) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceMatrixToVectors>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.mat_quat) {
         returnValue->Val->Integer = -1; return;
     }
     else if (type == scriptingData.convertors.mat_scalars) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceMatrixToFloats>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.vecs4_mat) {
         workspace->push_back(std::make_unique<WorkspaceVectorsToMatrix>((ImTextureID)0, l));
@@ -465,7 +466,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         workspace->push_back(std::make_unique<WorkspaceVectorToVector3>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.vec4_scalars) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceVectorToFloats>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.vecs3_mat) {
         workspace->push_back(std::make_unique<WorkspaceVectors3ToMatrix>((ImTextureID)0, l));
@@ -474,13 +475,13 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         workspace->push_back(std::make_unique<WorkspaceVector3ToVector>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.vec3_scalars) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceVector3ToFloats>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.quat_mat) {
         workspace->push_back(std::make_unique<WorkspaceQuatToMatrix>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.quat_scalars) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceQuatToFloats>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.scalars_mat) {
         workspace->push_back(std::make_unique<WorkspaceFloatsToMatrix>((ImTextureID)0, l));
@@ -495,6 +496,107 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         returnValue->Val->Integer = -1; return;
     }
     else if (type == scriptingData.convertors.norm_quat) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else {
+        returnValue->Val->Integer = -1; return;
+    }
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if (numArgs == 1) {
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100] = { 0 };
+        sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+    }
+    returnValue->Val->Integer = (int)workspace->size() - 1;
+}
+void quat(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int dataindex = param[0]->Val->Integer;
+    int x = 0, y = 0;
+    const char* l = "-";
+    if (numArgs == 4) {
+        x = param[1]->Val->Integer;
+        y = param[2]->Val->Integer;
+        if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
+    }
+
+
+    glm::mat4 mat = glm::mat4(1.0f);
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+
+    returnValue->Val->Integer =- 1; return;
+    //workspace->push_back(std::make_unique<WorkspaceQuatFree>((ImTextureID)0, l));
+    ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0]);
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if (numArgs == 1) {
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100] = { 0 };
+        sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+    }
+
+    returnValue->Val->Integer = (int)workspace->size() - 1;
+}
+void quatoper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int type = param[0]->Val->Integer;
+    int x = 0, y = 0;
+    const char* l = "-";
+    if (numArgs == 4) {
+        x = param[1]->Val->Integer;
+        y = param[2]->Val->Integer;
+        if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
+    }
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    if (type == scriptingData.quatOperators.scalarvec3_quat) {
+        //workspace->push_back(std::make_unique<WorkspaceFloatVecToQuat>((ImTextureID)0, l));
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.angleaxis_quat) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.vec3vec3_quat) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.quat_scalarvec3) {
+        workspace->push_back(std::make_unique<WorkspaceQuatToFloatVec>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.quatOperators.quat_angleaxis) {
+        workspace->push_back(std::make_unique<WorkspaceQuatToAngleAxis>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.quatOperators.scalarmulquat) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.quat_euler) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.euler_quat) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.slerp) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.longslerp) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.lerp) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.conjugate) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.quatOperators.qvq) {
+        workspace->push_back(std::make_unique<WorkspaceQuatVecConjQuat>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.arithmeticOperators.inverse) {
+        returnValue->Val->Integer = -1; return;
+    }
+    else if (type == scriptingData.arithmeticOperators.length) {
+        workspace->push_back(std::make_unique<WorkspaceQuatLength>((ImTextureID)0, l));
+    }
+    else if (type == scriptingData.arithmeticOperators.norm) {
         returnValue->Val->Integer = -1; return;
     }
     else {
@@ -712,6 +814,8 @@ struct LibraryFunction platformLibraryI3T[] =
 	{ vec3,         "int vec3(int,int,int,char*);"     },         { vec3,         "int vec3c(int);" },
     { scalaroper,   "int scalaroper(int,int,int,char*);"},        { scalaroper,   "int scalaroperc(int);" },
     { scalar,       "int scalar(int,int,int,char*);"   },         { scalar,       "int scalarc(int);" },
+    //{ quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },
+    //{ quat,         "int quat(int,int,int,char*);"   },           { quat,         "int quatc(int);" },
     { convertor,    "int convertor(int,int,int,char*);"},         { convertor,    "int convertorc(int);" },
 	{ sequence,     "int sequence(int,int,char*);"     },         { sequence,     "int sequencec(char*);" },
 	{ seqAdd,       "bool seqadd(int,int);" },
@@ -744,15 +848,15 @@ void platformLibraryInitI3T(Picoc *pc)
 
 
     //mat4 transform
-    VariableDefinePlatformVar(pc, nullptr, "free",          &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free,         false);
-    VariableDefinePlatformVar(pc, nullptr, "uniscale",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.uniscale,     false);
+    VariableDefinePlatformVar(pc, nullptr, "free",          &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free,          false);
+    VariableDefinePlatformVar(pc, nullptr, "uniscale",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.uniscale,      false);
     
     //mat4 transform intersect mat4oper
-    VariableDefinePlatformVar(pc, nullptr, "scale",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.scale,        false);
-    VariableDefinePlatformVar(pc, nullptr, "rotatex",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatex,      false);
-    VariableDefinePlatformVar(pc, nullptr, "rotatey",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatey,      false);
-    VariableDefinePlatformVar(pc, nullptr, "rotatez",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatez,      false);
-    VariableDefinePlatformVar(pc, nullptr, "translate",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.translate,    false);
+    VariableDefinePlatformVar(pc, nullptr, "scale",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.scale,         false);
+    VariableDefinePlatformVar(pc, nullptr, "rotatex",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatex,       false);
+    VariableDefinePlatformVar(pc, nullptr, "rotatey",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatey,       false);
+    VariableDefinePlatformVar(pc, nullptr, "rotatez",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatez,       false);
+    VariableDefinePlatformVar(pc, nullptr, "translate",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.translate,     false);
     VariableDefinePlatformVar(pc, nullptr, "axisangle",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.axisangle,     false);
     VariableDefinePlatformVar(pc, nullptr, "ortho",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.ortho,         false);
     VariableDefinePlatformVar(pc, nullptr, "perspective",   &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.perspective,   false);
@@ -761,19 +865,15 @@ void platformLibraryInitI3T(Picoc *pc)
 
     //mat4oper
     VariableDefinePlatformVar(pc, nullptr, "determinant",   &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.determinant,   false);
-    VariableDefinePlatformVar(pc, nullptr, "inverse",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.inverse,       false);
     VariableDefinePlatformVar(pc, nullptr, "trackball",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.trackball,     false);
     VariableDefinePlatformVar(pc, nullptr, "transpose",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.transpose,     false);
     VariableDefinePlatformVar(pc, nullptr, "matmulvec",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.matmulvec,     false);
     VariableDefinePlatformVar(pc, nullptr, "vecmulmat",     &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.vecmulmat,     false);
     VariableDefinePlatformVar(pc, nullptr, "floatmulmat",   &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.floatmulmat,   false);
 
-
     //vecoper
     VariableDefinePlatformVar(pc, nullptr, "cross",         &pc->IntType, (union AnyValue*)&scriptingData.vecOperators.cross,       false);
     VariableDefinePlatformVar(pc, nullptr, "dot",           &pc->IntType, (union AnyValue*)&scriptingData.vecOperators.dot,         false);
-    VariableDefinePlatformVar(pc, nullptr, "norm",          &pc->IntType, (union AnyValue*)&scriptingData.vecOperators.norm,        false);
-    VariableDefinePlatformVar(pc, nullptr, "length",        &pc->IntType, (union AnyValue*)&scriptingData.vecOperators.length,      false);
     VariableDefinePlatformVar(pc, nullptr, "vecmulfloat",   &pc->IntType, (union AnyValue*)&scriptingData.vecOperators.vecmulfloat, false);
     VariableDefinePlatformVar(pc, nullptr, "perspdiv",      &pc->IntType, (union AnyValue*)&scriptingData.vecOperators.perspdiv,    false);
 
@@ -784,6 +884,9 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "mul",           &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.mul,  false);
     VariableDefinePlatformVar(pc, nullptr, "show",          &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.show, false);
     VariableDefinePlatformVar(pc, nullptr, "mix",           &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.mix,  false);
+    VariableDefinePlatformVar(pc, nullptr, "norm",          &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.inverse,false);
+    VariableDefinePlatformVar(pc, nullptr, "norm",          &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.norm, false);
+    VariableDefinePlatformVar(pc, nullptr, "length",        &pc->IntType, (union AnyValue*)&scriptingData.arithmeticOperators.length,false);
 
     //float oper
     VariableDefinePlatformVar(pc, nullptr, "clamp",         &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.clamp,     false);
@@ -812,6 +915,21 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "scalars_vec4",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_vec4,  false);
     VariableDefinePlatformVar(pc, nullptr, "scalars_quat",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_quat,  false);
     VariableDefinePlatformVar(pc, nullptr, "norm_quat",     &pc->IntType, (union AnyValue*)&scriptingData.convertors.norm_quat,     false);
+    
+    //quat oper
+    /*VariableDefinePlatformVar(pc, nullptr, "scalarvec3_quat",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.scalarvec3_quat,false);
+    VariableDefinePlatformVar(pc, nullptr, "angleaxis_quat",    &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.angleaxis_quat, false);
+    VariableDefinePlatformVar(pc, nullptr, "vec3vec3_quat",     &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.vec3vec3_quat,  false);
+    VariableDefinePlatformVar(pc, nullptr, "quat_scalarvec3",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.quat_scalarvec3,false);
+    VariableDefinePlatformVar(pc, nullptr, "quat_angleaxis",    &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.quat_angleaxis, false);
+    VariableDefinePlatformVar(pc, nullptr, "scalarmulquat",     &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.scalarmulquat,  false);
+    VariableDefinePlatformVar(pc, nullptr, "quat_euler",        &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.quat_euler,     false);
+    VariableDefinePlatformVar(pc, nullptr, "euler_quat",        &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.euler_quat,     false);
+    VariableDefinePlatformVar(pc, nullptr, "slerp",             &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.slerp,          false);
+    VariableDefinePlatformVar(pc, nullptr, "longslerp",         &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.longslerp,      false);
+    VariableDefinePlatformVar(pc, nullptr, "lerp",              &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.lerp,           false);
+    VariableDefinePlatformVar(pc, nullptr, "conjugate",         &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.conjugate,      false);
+    VariableDefinePlatformVar(pc, nullptr, "qvq",               &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.qvq,            false);*/
     //node lod
     VariableDefinePlatformVar(pc, nullptr, "full",          &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.full,            false);
     VariableDefinePlatformVar(pc, nullptr, "setvalues",     &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.setvalues,       false);
