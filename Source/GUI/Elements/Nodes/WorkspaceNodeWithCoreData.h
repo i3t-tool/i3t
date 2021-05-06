@@ -2,8 +2,6 @@
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 #include "WorkspaceElements.h"
 
-#include "Utils/NodeEditorStyle.h"
-
 class WorkspaceCorePinProperties;
 
 extern std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName;

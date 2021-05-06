@@ -45,6 +45,7 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
     float localData;
 
     ImGui::PushItemWidth(m_dataItemsWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
     localData = coreData;
@@ -57,6 +58,7 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
       fw.value = localData;
     }
 
+    ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopItemWidth();
 
@@ -78,6 +80,7 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
     glm::vec3 localData;
 
     ImGui::PushItemWidth(m_dataItemsWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
 
     for (int columns = 0; columns < 3; columns++)
@@ -98,6 +101,8 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
         ImGui::SameLine();
       }
     }
+
+    ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopItemWidth();
 

@@ -29,7 +29,7 @@ WorkspaceQuat::WorkspaceQuat(ImTextureID headerBackground, Ptr<Core::NodeBase> n
 void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
 {
 	// SS WIP
-  const glm::vec4& coreData = m_nodebase->getData(index).getVec4();
+  const glm::quat& coreData = m_nodebase->getData(index).getQuat();
   int const coreMap[4] = {1,2,3,4}; //todo JH will be map for vector?
   int const idOfNode = this->m_id.Get();
 
@@ -40,6 +40,7 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
   glm::vec4 localData;
 
   ImGui::PushItemWidth(m_dataItemsWidth);
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
 
   for (int columns = 0; columns < 4; columns++)
@@ -57,6 +58,7 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
     }
 
   }
+  ImGui::PopStyleVar();
   ImGui::PopStyleVar();
   ImGui::PopItemWidth();
 

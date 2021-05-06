@@ -45,8 +45,8 @@ Theme::Theme()
 	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingX)] = 3.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingY)] = 3.0f;
 
-	m_sizes[static_cast<size_t>(ESize::Nodes_matrixFramePaddingX)] = 10.0f;
-	m_sizes[static_cast<size_t>(ESize::Nodes_matrixFramePaddingY)] = 3.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_floatPaddingX)] = 8.0f;
+	m_sizes[static_cast<size_t>(ESize::Nodes_floatPaddingY)] = 1.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_pinSpacingX)] = 0.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_pinSpacingY)] = 0.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_PivotAlignmentX)] = 0.0f;
@@ -116,15 +116,14 @@ void Theme::apply()
 	//---------------------------------------------------------------------------------------
 }
 
-void Theme::makeNodeBlue()
+void Theme::operatorColorTheme()
 {
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
 	set(EColor::NodeHeader, m_colors[EColor::NodeHeaderOperator]);
 }
 
-void Theme::makeNodeYellow()
+void Theme::transformationColorTheme()
 {
-	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
-			m_colors[EColor::NodeBgTransformation];
+	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgTransformation];
 	set(EColor::NodeHeader, m_colors[EColor::NodeHeaderTranformation]);
 }

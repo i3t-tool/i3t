@@ -53,7 +53,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
         m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())   //SS TODO make map of labels
+                //, fmt::format("##{}", pin.getIndex())
+				        , pin.getLabel()
                 , pin
                 , *this ));
 
@@ -65,8 +66,9 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
 		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
                   pin.getId()
-                , fmt::format("##{}", pin.getIndex())
-                , pin
+                //, fmt::format("##{}", pin.getIndex())
+				        , pin.getLabel()
+				        , pin
                 , *this ));
 	}
 }
@@ -86,7 +88,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
         m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())
+                //, fmt::format("##{}", pin.getIndex())
+				        , pin.getLabel()
                 , pin
                 , *this ));
 
@@ -98,7 +101,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
 		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
                   pin.getId()
-                , fmt::format("##{}", pin.getIndex())
+               // , fmt::format("##{}", pin.getIndex())
+                , pin.getLabel()
                 , pin
                 , *this ));
 	}
@@ -335,9 +339,11 @@ void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
 
 void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin)
 {
+	if(!isTransformation()){
     float alpha = ImGui::GetStyle().Alpha;
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
+
 
     builder.Input(pinProp->getId());
 
@@ -345,22 +351,23 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
 
     // color.Value.w = alpha / 255.0f;
     ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
-                        WorkspacePinShape[pinProp->getType()],
-                        pinProp->isConnected(),
-                        WorkspacePinColor[pinProp->getType()],
-                        pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
+                      WorkspacePinShape[pinProp->getType()],
+                      pinProp->isConnected(),
+                      WorkspacePinColor[pinProp->getType()],
+                      pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
 
-    ImGui::Spring(0);
+    ImGui::Spring(1);
 
-    if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+    //if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+    if (true && !pinProp->getLabel().empty())
     {
-        ImGui::TextUnformatted(pinProp->getLabel().c_str());
-        ImGui::Spring(0);
+      ImGui::TextUnformatted(pinProp->getLabel().c_str());
+      ImGui::Spring(1);
     }
 
     ImGui::PopStyleVar();
     builder.EndInput();
-
+	}
 }
 
 /* \todo use newLinkPin arg*/
@@ -397,28 +404,39 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 	if(isTransformation()){
       drawData(builder, 0);
 	}else{
-      builder.Output(pinProp->getId());
-      drawData(builder, outputIndex);
+
+		builder.Output(pinProp->getId());
+    ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
+    drawData(builder, outputIndex);
+		ImGui::EndVertical();
 
 	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
       ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-      if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+    ImGui::Spring(1);
+
+      //if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+			if (true && !pinProp->getLabel().empty())
       {
         ImGui::TextUnformatted(pinProp->getLabel().c_str());
         ImGui::Spring(1);
       }
 
       // color.Value.w = alpha / 255.0f;
+			auto cursor = ImGui::GetCursorScreenPos();
+			//cursor.x += 100;
+      ImGui::SetCursorScreenPos(cursor);
+			auto tmp = ImGui::GetCursorScreenPos();
       ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
                         WorkspacePinShape[pinProp->getType()],
                         pinProp->isConnected(),
                         WorkspacePinColor[pinProp->getType()],
-                        pinProp->getColor()); 
+                        pinProp->getColor());
       ImGui::Spring(1);
 
       ImGui::PopStyleVar();
-	  ImGui::PopStyleVar();
+	    ImGui::PopStyleVar();
+
       builder.EndOutput();
 		}
 }

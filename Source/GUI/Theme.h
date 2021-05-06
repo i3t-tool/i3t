@@ -61,8 +61,8 @@ enum class ESize
 	Nodes_FloatMargin,
 	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
-  Nodes_matrixFramePaddingX,
-  Nodes_matrixFramePaddingY,
+	Nodes_floatPaddingX,
+	Nodes_floatPaddingY,
   Nodes_pinSpacingX,
   Nodes_pinSpacingY,
   Nodes_PivotAlignmentX,
@@ -157,6 +157,6 @@ public:
 
   Sizes& getSizesRef() { return m_sizes; }
 
-	void makeNodeBlue();
-	void makeNodeYellow();
+	void operatorColorTheme();
+	void transformationColorTheme();
 };

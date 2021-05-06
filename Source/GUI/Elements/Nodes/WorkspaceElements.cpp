@@ -74,18 +74,15 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 
 	drawHeader(builder);
 
-    if (withPins)
-    {
-        drawInputs(builder, newLinkPin);
-    }
+	if (withPins)
+	{
+		drawInputs(builder, newLinkPin);
+	}
 
-
-	//drawData(builder);
-
-    //if (withPins)
-    //{
-        drawOutputs(builder, newLinkPin);
-    //}
+	//if (withPins)
+	//{
+	  drawOutputs(builder, newLinkPin);
+	//}
 
 	builder.End();
 }

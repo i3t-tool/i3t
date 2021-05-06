@@ -34,7 +34,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
     ImGui::PushItemWidth(m_dataItemsWidth);
     /* Drawing is row-wise */
 
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, matrix_frame_padding);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
 
@@ -66,6 +66,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
 					ImGui::SameLine();
 				}
       }
+      //ImGui::NewLine();
     }
 
 
@@ -79,7 +80,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
       setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
     }
 
-    ImGui::Spring(0); /* \todo JH what is Spring? */
+    ImGui::Spring(1); /* \todo JH what is Spring? */
 
 }
 
