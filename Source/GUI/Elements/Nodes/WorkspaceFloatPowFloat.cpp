@@ -13,5 +13,5 @@ WorkspaceFloatPowFloat::WorkspaceFloatPowFloat(ImTextureID headerBackground, std
 
 void WorkspaceFloatPowFloat::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

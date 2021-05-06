@@ -10,6 +10,6 @@ WorkspaceVector3DotVector3::WorkspaceVector3DotVector3(ImTextureID headerBackgro
 
 void WorkspaceVector3DotVector3::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

@@ -24,7 +24,7 @@ WorkspaceVector3::WorkspaceVector3(ImTextureID headerBackground, Ptr<Core::NodeB
     setDataItemsWidth();
 }
 
-void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder)
+void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 {
 	const glm::vec3& coreData = m_nodebase->getData().getVec3();
 	int const coreMap[3] = {1,2,3}; /* \todo JH will be map for vector? */
@@ -36,7 +36,7 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder)
 	  */
 	glm::vec3 localData;
 
-	builder.Middle();
+	//builder.Middle();
 
 
 	ImGui::PushItemWidth(m_dataItemsWidth);

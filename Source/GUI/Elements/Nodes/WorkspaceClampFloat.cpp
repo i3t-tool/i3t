@@ -13,5 +13,5 @@ WorkspaceClampFloat::WorkspaceClampFloat(ImTextureID headerBackground, std::stri
 
 void WorkspaceClampFloat::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

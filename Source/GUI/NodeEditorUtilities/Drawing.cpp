@@ -18,20 +18,23 @@ void ax::Drawing::DrawIcon(ImDrawList* drawList, const ImVec2& a, const ImVec2& 
 
 	if (type == IconType::Flow)
 	{
-		const auto origin_scale = rect_w / 100.0f;
+		const auto origin_scale = rect_w / 24.0f;
 
-		const auto offset_x = 0.0f * origin_scale;
+		const auto offset_x = 1.0f * origin_scale;
 		const auto offset_y = 0.0f * origin_scale;
-		const auto margin = (filled ? 0.0f : 0.0f) * origin_scale;
+		const auto margin = (filled ? 2.0f : 2.0f) * origin_scale;
 		const auto rounding = 0.1f * origin_scale;
 		const auto tip_round = 0.7f; // percentage of triangle edge (for tip)
 		// const auto edge_round = 0.7f; // percentage of triangle edge (for corner)
 
-		//const auto canvas = ImRect(rect.Min.x + margin + offset_x, rect.Min.y + margin + offset_y,
-		//                           rect.Max.x - margin + offset_x, rect.Max.y - margin + offset_y);
+		const auto canvas = ImRect(
+				rect.Min.x + margin + offset_x,
+				rect.Min.y + margin + offset_y,
+				rect.Max.x - margin + offset_x,
+				rect.Max.y - margin + offset_y);
 
-		const auto canvas = ImRect(rect.Min.x, rect.Min.y,
-							rect.Max.x, rect.Max.y);
+		//const auto canvas = ImRect(rect.Min.x, rect.Min.y,
+		//					rect.Max.x, rect.Max.y);
 		const auto canvas_x = canvas.Min.x;
 		const auto canvas_y = canvas.Min.y;
 		const auto canvas_w = canvas.Max.x - canvas.Min.x;
@@ -210,13 +213,7 @@ void ax::Drawing::DrawIcon(ImDrawList* drawList, const ImVec2& a, const ImVec2& 
 				const auto r = 0.5f * rect_w / 2.0f;
 				const auto p0 = rect_center - ImVec2(r, r);
 				const auto p1 = rect_center + ImVec2(r, r);
-
-				/*const auto r = 0.5f * rect_w / 2.0f;
-				const auto p0 = rect_center - ImVec2(r, r);
-				const auto p1 = rect_center + ImVec2(r, r);*/
-
 				drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
-				//drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
 			}
 			else
 			{
@@ -224,16 +221,11 @@ void ax::Drawing::DrawIcon(ImDrawList* drawList, const ImVec2& a, const ImVec2& 
 				const auto p0 = rect_center - ImVec2(r, r);
 				const auto p1 = rect_center + ImVec2(r, r);
 
-				/*const auto r = 0.5f * rect_w / 2.0f;
-				const auto p0 = rect_center - ImVec2(r, r);
-				const auto p1 = rect_center + ImVec2(r, r);*/
 
 
 				if (innerColor & 0xFF000000)
-					//drawList->AddRectFilled(p0, p1, color, 0, 0);
 					drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
 
-				//drawList->AddRect(p0, p1, color, 0, 0, 0.0f * outline_scale);
 				drawList->AddRect(p0, p1, color, 0, 15 + extra_segments, 2.0f * outline_scale);
 
 				auto triangleStart_n = p0.x + 1.0f / 24.0f * rect_w;

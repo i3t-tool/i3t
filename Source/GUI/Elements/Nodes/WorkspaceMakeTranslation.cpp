@@ -14,5 +14,5 @@ WorkspaceMakeTranslation::WorkspaceMakeTranslation(ImTextureID headerBackground,
 
 void WorkspaceMakeTranslation::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

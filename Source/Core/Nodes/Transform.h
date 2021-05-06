@@ -55,8 +55,6 @@ public:
 	}
 };
 
-using TransformationPtr = Ptr<Transformation>;
-
 
 class Free : public Transformation
 {
@@ -135,6 +133,8 @@ public:
 
   [[nodiscard]] float getRot() { return m_initialRot; }
 
+  float getAngle() { return m_initialRot; }
+
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
@@ -166,6 +166,8 @@ public:
 
   [[nodiscard]] float getRot() { return m_initialRot; }
 
+  float getAngle() { return m_initialRot; }
+
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
@@ -194,6 +196,8 @@ public:
 		m_initialMap = &map;
 		m_currentMap = &map;
 	}
+
+  float getAngle() { return m_initialRot; }
 
   [[nodiscard]] float getRot() { return m_initialRot; }
 

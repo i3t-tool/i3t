@@ -10,6 +10,6 @@ WorkspaceVector3MulFloat::WorkspaceVector3MulFloat(ImTextureID headerBackground,
 
 void WorkspaceVector3MulFloat::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

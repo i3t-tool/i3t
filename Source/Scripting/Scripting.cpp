@@ -13,7 +13,7 @@
 //	transformations{
 #include "Source/GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixRotate.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeAxisAngle.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerX.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerY.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerZ.h"

@@ -10,5 +10,5 @@ WorkspaceMakeOrtho::WorkspaceMakeOrtho(ImTextureID headerBackground, std::string
 
 void WorkspaceMakeOrtho::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

@@ -145,49 +145,49 @@ enum class ENodeType
 	Vector3Length,	//done SS
 	ShowVector3,	//done SS
 	MixVector3,	//done SS
-	ConjQuat,
-	FloatVecToQuat,
-	AngleAxisToQuat,
-	VecVecToQuat,
-	QuatToFloatVec,
-	QuatToAngleAxis,
-	QuatToEuler,
-	EulerToQuat,
-	QuatInverse,
-	QuatSlerp,
-	QuatLongWaySlerp,
-	QuatLerp,
-	FloatMulQuat,
-	QuatMulQuat,
-	QuatVecConjQuat,
-	QuatLength,
+	ConjQuat, //done SS waiting for free quat
+	FloatVecToQuat,//done SS waiting for free quat
+	AngleAxisToQuat,//done SS waiting for free quat
+	VecVecToQuat,//done SS waiting for free quat
+	QuatToFloatVec,//todo vec3 + float
+	QuatToAngleAxis,//todo  vec3 + float
+	QuatToEuler, //done SS
+	EulerToQuat,//done SS waiting for free quat
+	QuatInverse,//done SS waiting for free quat
+	QuatSlerp,//done SS waiting for free quat
+	QuatLongWaySlerp,//done SS waiting for free quat
+	QuatLerp, //done SS waiting for free quat
+	FloatMulQuat,//done SS waiting for free quat
+	QuatMulQuat,//done SS waiting for free quat
+	QuatVecConjQuat,//done SS
+	QuatLength,  //done SS
 	ClampFloat, //done SS
 	FloatMulFloat,  //done SS
 	FloatDivFloat,//done SS
 	FloatAddFloat,//done SS
 	FloatPowFloat,//done SS
 	MixFloat,//done SS
-	FloatSinCos,//todo
-	ASinACos,//todo
+	FloatSinCos,//done SS
+	ASinACos,//done SS
 	Signum,//done SS
-	MatrixToVectors,
-	Vectors3ToMatrix,
-	VectorsToMatrix,
-	MatrixToFloats,
-	FloatsToMatrix,
-	MatrixToTR,
-	TRToMatrix,
-	MatrixToQuat,
-	QuatToMatrix,
-	VectorToFloats,
-	FloatsToVector,
-	Vector3ToFloats,
-	FloatsToVector3,
-	VectorToVector3,
-	Vector3ToVector,
-	QuatToFloats,
-	FloatsToQuat,
-	NormalizeQuat,
+	MatrixToVectors, //done SS
+	Vectors3ToMatrix, //done SS
+	VectorsToMatrix, //done SS
+	MatrixToFloats, //done SS
+	FloatsToMatrix, //done SS
+	MatrixToTR, //done SS
+	TRToMatrix, //done SS
+	MatrixToQuat, //done SS waiting for free quat
+	QuatToMatrix,//done SS
+	VectorToFloats, // done SS
+	FloatsToVector,  //done SS
+	Vector3ToFloats, // done SS
+	FloatsToVector3,//done SS
+	VectorToVector3,//done SS
+	Vector3ToVector,//done SS
+	QuatToFloats, //done SS
+	FloatsToQuat,//done SS waiting for free quat
+	NormalizeQuat, //done SS waiting for free quat
 	Float, //done SS
 	Vector3, //done JH
 	Vector4, //done JH
@@ -196,11 +196,11 @@ enum class ENodeType
 	Model,
 
 	// Transform matrices "constructors"
-	MakeTranslation, //done
+	MakeTranslation, //done SS
 	MakeEulerX, //done SS
 	MakeEulerY, //done SS
 	MakeEulerZ, //done SS
-	MakeScale, //done
+	MakeScale, //done SS
 	MakeAxisAngle, //done SS
 	MakeOrtho, //done SS
 	MakePerspective, //done SS
@@ -209,23 +209,25 @@ enum class ENodeType
 
 	Screen,
 	Pulse
+
+	//SS missing trackball and free quat types
 };
 
 enum class ETransformType
 {
 	//This is for sequence
-	Free = 0,
+	Free = 0,//done SS
 	Translation, //done JH
-	EulerX,
-	EulerY,
-	EulerZ,
+	EulerX,//done SS
+	EulerY,//done SS
+	EulerZ,//done SS
 	Scale, //done JH
-	AxisAngle,
-	Quat,
-	Ortho,
-	Perspective,
-	Frustum,
-	LookAt,
+	AxisAngle,//done SS
+	Quat, //waiting for base quat
+	Ortho,//done SS
+	Perspective,//done SS
+	Frustum,//done SS
+	LookAt,//done SS
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string

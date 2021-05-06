@@ -10,6 +10,6 @@ WorkspaceVectorAddVector::WorkspaceVectorAddVector(ImTextureID headerBackground,
 
 void WorkspaceVectorAddVector::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

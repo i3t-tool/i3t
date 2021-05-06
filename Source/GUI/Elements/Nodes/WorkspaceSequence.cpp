@@ -87,7 +87,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
     builder.Begin(m_id);
 	drawHeader(builder);
 	drawInputs(builder, newLinkPin);
-    drawData(builder);
+    drawData(builder,0);
 	drawOutputs(builder, newLinkPin);
 	builder.End();
 
@@ -106,7 +106,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 
 void WorkspaceSequence::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 
 
@@ -115,7 +115,7 @@ ImVec2 WorkspaceSequence::getDataSize()
     return m_dataRect.Max - m_dataRect.Min;
 }
 
-void WorkspaceSequence::drawDataFull(util::NodeBuilder& builder)
+void WorkspaceSequence::drawDataFull(util::NodeBuilder& builder, int index)
 {
     ImGui::Dummy(getDataSize());
 }

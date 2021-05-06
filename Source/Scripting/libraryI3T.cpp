@@ -11,7 +11,7 @@
 //	transformations{
 #include "Source/GUI/Elements/Nodes/WorkspaceMatrixScale.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrixRotate.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMakeAxisAngle.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerX.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerY.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMakeEulerZ.h"
@@ -126,7 +126,7 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         workspace->push_back(std::make_unique<WorkspaceMakeFrustum>((ImTextureID)0, l));
     }
     else if (type == scriptingData.mat4Types.axisangle) {
-        workspace->push_back(std::make_unique<WorkspaceMatrixRotate>((ImTextureID)0, l));
+        workspace->push_back(std::make_unique<WorkspaceMakeAxisAngle>((ImTextureID)0, l));
     }
     else if (type == scriptingData.mat4Types.rotatex) {
         workspace->push_back(std::make_unique<WorkspaceMakeEulerX>((ImTextureID)0, l));

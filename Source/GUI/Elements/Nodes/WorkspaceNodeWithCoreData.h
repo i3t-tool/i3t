@@ -88,13 +88,13 @@ public:
 	virtual void drawInputLinks();
 
 	void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
-    void drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+	void drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex);
 
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
-	virtual void drawData(util::NodeBuilder& builder);
+	virtual void drawData(util::NodeBuilder& builder, int index);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
-    virtual void drawDataFull(util::NodeBuilder& builder)=0;
+	virtual void drawDataFull(util::NodeBuilder& builder, int index)=0;
 	virtual void drawDataSetValues(util::NodeBuilder& builder)=0;
 	virtual void drawDataLabel(util::NodeBuilder& builder);
 

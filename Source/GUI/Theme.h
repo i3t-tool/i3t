@@ -7,6 +7,7 @@
 
 #include "imgui.h"
 
+#include <array>
 #include <map>
 
 #include "Core/Defs.h"
@@ -22,6 +23,13 @@ enum class EColor
 	PrimaryColor, /// Color of tabs, separators, titles ...
 	ActiveColor,
 	TabColor,
+
+  NodeBgOperator,
+  NodeBgTransformation,
+	NodeHeaderOperator,
+	NodeHeaderTranformation,
+	NodeHeader,
+	NodeEditorBg,
 
 	PulseLink,
 	FloatLink,
@@ -53,6 +61,14 @@ enum class ESize
 	Nodes_FloatMargin,
 	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
+  Nodes_matrixFramePaddingX,
+  Nodes_matrixFramePaddingY,
+  Nodes_pinSpacingX,
+  Nodes_pinSpacingY,
+  Nodes_PivotAlignmentX,
+  Nodes_PivotAlignmentY,
+  Nodes_BorderWidth,
+
 	COUNT
 };
 
@@ -140,4 +156,7 @@ public:
 	void setColors(const Colors& colors) { m_colors = colors; }
 
   Sizes& getSizesRef() { return m_sizes; }
+
+	void makeNodeBlue();
+	void makeNodeYellow();
 };

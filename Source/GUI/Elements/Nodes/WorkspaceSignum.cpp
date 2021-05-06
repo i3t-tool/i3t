@@ -13,5 +13,5 @@ WorkspaceSignum::WorkspaceSignum(ImTextureID headerBackground, std::string heade
 
 void WorkspaceSignum::drawDataSetValues(util::NodeBuilder& builder)
 {
-  drawDataFull(builder);
+  drawDataFull(builder,0);
 }

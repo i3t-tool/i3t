@@ -22,20 +22,28 @@
 #include "Scripting/Scripting.h"
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
+#include "Core/API.h"
 
 //transformations{
-#include "../Nodes/WorkspaceSequence.h"
-
+#include "../Nodes/WorkspaceAxisAngle.h"
+#include "../Nodes/WorkspaceEulerX.h"
+#include "../Nodes/WorkspaceEulerY.h"
+#include "../Nodes/WorkspaceEulerZ.h"
+#include "../Nodes/WorkspaceFrustum.h"
+#include "../Nodes/WorkspaceLookAt.h"
 #include "../Nodes/WorkspaceMatrixScale.h"
 #include "../Nodes/WorkspaceMatrixTranslation.h"
+#include "../Nodes/WorkspaceOrtho.h"
+#include "../Nodes/WorkspacePerspective.h"
+#include "../Nodes/WorkspaceSequence.h"
+#include "../Nodes/WorkspaceTransformationFree.h"
+//#include "../Nodes/WorkspaceQuatRot.h"
 //} tranformationa end
 
 //operators {
 
 //	transformations{
-#include "../Nodes/WorkspaceMakeTranslation.h"
-#include "../Nodes/WorkspaceMakeScale.h"
-#include "../Nodes/WorkspaceMatrixRotate.h"
+#include "../Nodes/WorkspaceMakeAxisAngle.h"
 #include "../Nodes/WorkspaceMakeEulerX.h"
 #include "../Nodes/WorkspaceMakeEulerY.h"
 #include "../Nodes/WorkspaceMakeEulerZ.h"
@@ -43,6 +51,8 @@
 #include "../Nodes/WorkspaceMakeLookAt.h"
 #include "../Nodes/WorkspaceMakeOrtho.h"
 #include "../Nodes/WorkspaceMakePerspective.h"
+#include "../Nodes/WorkspaceMakeScale.h"
+#include "../Nodes/WorkspaceMakeTranslation.h"
 //	} tranformation end
 
 //	matrix{
@@ -55,6 +65,7 @@
 #include "../Nodes/WorkspaceMatrixMulFloat.h"
 #include "../Nodes/WorkspaceMatrixMulVector.h"
 #include "../Nodes/WorkspaceVectorMulMatrix.h"
+//#include "../Nodes/WorkspaceTrackball.h"
 //	} matrix end
 
 //	vec4{
@@ -68,7 +79,7 @@
 #include "../Nodes/WorkspaceMixVector.h"
 //	} vec4 end
 
-//	vec4{
+//	vec3{
 #include "../Nodes/WorkspaceVector3Free.h"
 #include "../Nodes/WorkspaceNormalizeVector3.h"
 #include "../Nodes/WorkspaceVector3CrossVector3.h"
@@ -90,11 +101,55 @@
 #include "../Nodes/WorkspaceFloatPowFloat.h"
 #include "../Nodes/WorkspaceMixFloat.h"
 #include "../Nodes/WorkspaceSignum.h"
-//#include "../Nodes/WorkspaceFloatSinCos.h"
-//#include "../Nodes/WorkspaceASinACos.h"
+#include "../Nodes/WorkspaceFloatSinCos.h"
+#include "../Nodes/WorkspaceASinACos.h"
 //#include "../Nodes/WorkspaceFloatCycle.h"
 //	} float end
+
+//	quat{
+#include "../Nodes/WorkspaceQuatVecConjQuat.h"
+#include "../Nodes/WorkspaceQuatLength.h"
+/*#include "../Nodes/WorkspaceQuatFree.h"
+#include "../Nodes/WorkspaceFloatVecToQuat.h"
+#include "../Nodes/WorkspaceAngleAxisToQuat.h"
+#include "../Nodes/WorkspaceVecVecToQuat.h"
+#include "../Nodes/WorkspaceFloatMulQuat.h"
+#include "../Nodes/WorkspaceQuatMulQuat.h"
+#include "../Nodes/WorkspaceEulerToQuat.h"
+#include "../Nodes/WorkspaceQuatSlerp.h"
+#include "../Nodes/WorkspaceQuatLerp.h"
+#include "../Nodes/WorkspaceQuatLongWaySlerp.h"
+#include "../Nodes/WorkspaceConjQuat.h"
+#include "../Nodes/WorkspaceQuatInverse.h"
+#include "../Nodes/WorkspaceNormalizeQuat.h"*/
+#include "../Nodes/WorkspaceQuatToFloatVec.h"
+#include "../Nodes/WorkspaceQuatToAngleAxis.h"
+//	} quat end
+
+//  conversion{
+#include "../Nodes/WorkspaceFloatsToMatrix.h"
+#include "../Nodes/WorkspaceFloatsToVector.h"
+#include "../Nodes/WorkspaceFloatsToVector3.h"
+#include "../Nodes/WorkspaceQuatToMatrix.h"
+#include "../Nodes/WorkspaceTRToMatrix.h"
+#include "../Nodes/WorkspaceVector3ToVector.h"
+#include "../Nodes/WorkspaceVectors3ToMatrix.h"
+#include "../Nodes/WorkspaceVectorsToMatrix.h"
+#include "../Nodes/WorkspaceVectorToVector3.h"
+#include "../Nodes/WorkspaceQuatToEuler.h"
+#include "../Nodes/WorkspaceVectorToFloats.h"
+#include "../Nodes/WorkspaceVector3ToFloats.h"
+#include "../Nodes/WorkspaceQuatToFloats.h"
+#include "../Nodes/WorkspaceMatrixToFloats.h"
+#include "../Nodes/WorkspaceMatrixToTR.h"
+#include "../Nodes/WorkspaceMatrixToVectors.h"
+//#include "../Nodes/WorkspaceMatrixToQuat.h"
+//#include "../Nodes/WorkspaceFloatsToQuat.h"
+//  }
 //}operators end
+
+//#include "../Nodes/WorkspaceCamera.h"
+//#include "../Nodes/WorkspaceScreen.h"
 
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
