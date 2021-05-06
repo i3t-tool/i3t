@@ -24,6 +24,13 @@ enum class EColor
 	ActiveColor,
 	TabColor,
 
+  NodeBgOperator,
+  NodeBgTransformation,
+	NodeHeaderOperator,
+	NodeHeaderTranformation,
+	NodeHeader,
+	NodeEditorBg,
+
 	PulseLink,
 	FloatLink,
 	MatrixLink,
@@ -52,7 +59,16 @@ enum class ESize
 	Nodes_FloatMargin,
 	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
+  Nodes_matrixFramePaddingX,
+  Nodes_matrixFramePaddingY,
+  Nodes_pinSpacingX,
+  Nodes_pinSpacingY,
+  Nodes_PivotAlignmentX,
+  Nodes_PivotAlignmentY,
+  Nodes_BorderWidth,
+
 	Window_FramePadding,
+
 	COUNT
 };
 
@@ -141,4 +157,7 @@ public:
 
 	const Colors& getColors() const { return m_colors; }
 	void setColors(const Colors& colors) { m_colors = colors; }
+
+	void makeNodeBlue();
+	void makeNodeYellow();
 };

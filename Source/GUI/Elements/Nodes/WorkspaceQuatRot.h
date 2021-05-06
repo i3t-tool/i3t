@@ -10,7 +10,7 @@ struct WorkspaceQuatRotArgs
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
   std::string headerLabel = "default Quat header";
   std::string nodeLabel = "default Quat label";
-  Ptr<Core::NodeBase> nodebase = Core::Builder::createTransform<ENodeType::QuatRot>();
+  Ptr<Core::NodeBase> nodebase = Core::Builder::createTransform<Core::QuatRot>();
 };
 
 class WorkspaceQuatRot : public WorkspaceQuat

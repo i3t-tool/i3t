@@ -46,7 +46,8 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
-	m_color = ImColor(89, 134, 179);
+	Theme t;
+	m_color =	t.get(EColor::NodeHeader);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
 }
@@ -92,6 +93,9 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 
+	//TODO get here actual theme
+  Theme t;
+  m_color =	t.get(EColor::NodeHeader);
     builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());

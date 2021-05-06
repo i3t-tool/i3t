@@ -108,7 +108,7 @@
 //	quat{
 #include "../Nodes/WorkspaceQuatVecConjQuat.h"
 #include "../Nodes/WorkspaceQuatLength.h"
-#include "../Nodes/WorkspaceQuatFree.h"
+/*#include "../Nodes/WorkspaceQuatFree.h"
 #include "../Nodes/WorkspaceFloatVecToQuat.h"
 #include "../Nodes/WorkspaceAngleAxisToQuat.h"
 #include "../Nodes/WorkspaceVecVecToQuat.h"
@@ -120,9 +120,9 @@
 #include "../Nodes/WorkspaceQuatLongWaySlerp.h"
 #include "../Nodes/WorkspaceConjQuat.h"
 #include "../Nodes/WorkspaceQuatInverse.h"
-#include "../Nodes/WorkspaceNormalizeQuat.h"
-//#include "../Nodes/WorkspaceQuatToFloatVec.h"
-//#include "../Nodes/WorkspaceQuatToAngleAxis.h"
+#include "../Nodes/WorkspaceNormalizeQuat.h"*/
+#include "../Nodes/WorkspaceQuatToFloatVec.h"
+#include "../Nodes/WorkspaceQuatToAngleAxis.h"
 //	} quat end
 
 //  conversion{
@@ -142,8 +142,8 @@
 #include "../Nodes/WorkspaceMatrixToFloats.h"
 #include "../Nodes/WorkspaceMatrixToTR.h"
 #include "../Nodes/WorkspaceMatrixToVectors.h"
-#include "../Nodes/WorkspaceMatrixToQuat.h"
-#include "../Nodes/WorkspaceFloatsToQuat.h"
+//#include "../Nodes/WorkspaceMatrixToQuat.h"
+//#include "../Nodes/WorkspaceFloatsToQuat.h"
 //  }
 //}operators end
 

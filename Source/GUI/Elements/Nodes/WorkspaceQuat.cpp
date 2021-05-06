@@ -28,14 +28,14 @@ WorkspaceQuat::WorkspaceQuat(ImTextureID headerBackground, Ptr<Core::NodeBase> n
 
 void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
 {
-	/* SS WIP
+	// SS WIP
   const glm::vec4& coreData = m_nodebase->getData(index).getVec4();
   int const coreMap[4] = {1,2,3,4}; //todo JH will be map for vector?
   int const idOfNode = this->m_id.Get();
 
   bool valueChanged = false;
   //todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
-  better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
+  //better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
 
   glm::vec4 localData;
 
@@ -48,15 +48,6 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
     valueChanged |=
         drawDragFloatWithMap_Inline(&localData[columns], coreMap[columns], fmt::format("##{}:{}", idOfNode, columns));
 
-    //        localData = coreData[columns];
-    //        if (drawDragFloatWithMap_Inline(&localData,
-    //                                        coreMap[columns],
-    //                                        fmt::format("##{}:{}", idOfNode, columns)))
-    //        {
-    //            valueChanged = true;
-    //            columnOfChange = columns;
-    //            valueOfChange = localData;
-    //        }
     if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
     {
       fw.showMyPopup = true;
@@ -76,13 +67,13 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
 //		Nodebase->setValue(valueOfChange, {columnOfChange});
   }
 
-  ImGui::Spring(0);*/
+  ImGui::Spring(0);
 }
 
 int WorkspaceQuat::maxLenghtOfData()
 {
 	// SS WIP
-  /*int act, maximal = 0;
+  int act, maximal = 0;
   const glm::vec4& coreData = m_nodebase->getData().getVec4();
 
   for(int column=0; column < 4; column++)
@@ -94,5 +85,5 @@ int WorkspaceQuat::maxLenghtOfData()
     }
   }
 
-  return maximal;*/
+  return maximal;
 }

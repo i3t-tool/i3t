@@ -22,6 +22,13 @@ Theme::Theme()
 	set(EColor::Vec4Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
 	set(EColor::ScreenLink, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
 
+  set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
+  set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
+  set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+
+  set(EColor::NodeHeaderOperator, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f)); //WIP
+  set(EColor::NodeHeaderTranformation, ImVec4(89.0f / 255.0f, 134.0f / 179.0f, 116.0f / 255.0f, 1.00f));
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
@@ -37,6 +44,14 @@ Theme::Theme()
 
 	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingX)] = 3.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingY)] = 3.0f;
+
+  m_sizes[static_cast<size_t>(ESize::Nodes_matrixFramePaddingX)] = 10.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_matrixFramePaddingY)] = 3.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_pinSpacingX)] = 0.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_pinSpacingY)] = 0.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_PivotAlignmentX)] = 0.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_PivotAlignmentY)] = 0.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_BorderWidth)] = 0.0f;
 
 	m_sizes[static_cast<size_t>(ESize::Window_FramePadding)] = 8.0f;
 }
@@ -94,13 +109,19 @@ void Theme::apply()
 	//---------------------------------------------------------------------------------------
 	auto& nodesStyle = ax::NodeEditor::GetStyle();
 	nodesStyle.NodeRounding = m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)];
-	nodesStyle.NodeBorderWidth = 0.0f;
-  nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = ImColor(83, 101, 146);
-  nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg] = ImColor(112, 112, 116);;
-  nodesStyle.PivotAlignment = ImVec2(0.0f, 0.0f);
+	nodesStyle.NodeBorderWidth = m_sizes[static_cast<size_t>(ESize::Nodes_BorderWidth)];
+  nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
+  nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg] =  m_colors[EColor::NodeEditorBg];
 
-	//SS I need this but I dont know how to use
-  const ImVec2 matrix_frame_padding = ImVec2(10, 3);
-  const ImVec2 pin_spacing = ImVec2(0, 0);
   //---------------------------------------------------------------------------------------
+}
+
+void Theme::makeNodeBlue(){
+  ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
+  set(EColor::NodeHeader, m_colors[EColor::NodeHeaderOperator]);
+}
+
+void Theme::makeNodeYellow(){
+  ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgTransformation];
+  set(EColor::NodeHeader, m_colors[EColor::NodeHeaderTranformation]);
 }

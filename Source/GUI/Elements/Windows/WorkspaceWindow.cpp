@@ -4,6 +4,7 @@
 
 #include "WorkspaceWindow.h"
 
+#include "../../Theme.h"
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
 
@@ -90,6 +91,15 @@ void WorkspaceWindow::render()
 
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 	{
+
+		//SS to MH how to get current theme?
+    Theme t;
+
+		if(workspaceCoreNode->isTransformation()){
+			t.makeNodeYellow();
+		}else{
+      t.makeNodeBlue();
+		}
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
 	}
 
@@ -1003,72 +1013,72 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::Text("quat operator");
 				ImGui::Separator();
 				if (ImGui::MenuItem("quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatFree>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatFree>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat(float, vec3)")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatVecToQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatVecToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat(angle, axis)")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAngleAxisToQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAngleAxisToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat(vec3, vec3)")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVecVecToQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVecVecToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> float, vec3")) {
-//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToFloatVec>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToFloatVec>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> angle, axis")) {
-//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToAngleAxis>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToAngleAxis>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float * quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat * quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatMulQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatMulQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat -> euler")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToEuler>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToEuler>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("euler -> quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerToQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("slerp")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatSlerp>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatSlerp>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("long way slerp")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLongWaySlerp>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLongWaySlerp>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("lerp")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLerp>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLerp>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat conjugate")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceConjQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceConjQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("qvq*")) {
           m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatVecConjQuat>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("inverse quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatInverse>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatInverse>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("normalize quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("length(quat)")) {
           m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatLength>(m_headerBackgroundTexture));
@@ -1145,8 +1155,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat -> quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("mat -> floats")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToFloats>(m_headerBackgroundTexture));
@@ -1197,8 +1207,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("floats -> quat")) {
-          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToQuat>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToQuat>(m_headerBackgroundTexture));
+//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 

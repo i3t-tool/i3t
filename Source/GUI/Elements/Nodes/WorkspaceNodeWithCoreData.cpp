@@ -304,9 +304,10 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
 {
-    if(isTransformation()){
+    if(isTransformation())
+	  {
 		  builder.Middle();
-    }
+	  }
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:

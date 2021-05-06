@@ -209,7 +209,7 @@ enum class ENodeType
 	Camera,
 	Screen,
 
-	//SS missing trackball, float cycle and free quat types
+	//SS missing trackball and free quat types
 };
 
 enum class ETransformType

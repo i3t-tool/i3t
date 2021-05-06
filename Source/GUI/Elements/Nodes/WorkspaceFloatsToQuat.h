@@ -16,7 +16,7 @@ struct WorkspaceFloatsToQuatArgs
 class WorkspaceFloatsToQuat : public WorkspaceQuat
 {
 public:
-  WorkspaceFloatsToQuat(ImTextureID headerBackground, WorkspaceQuatFreeArgs const& args);
+  WorkspaceFloatsToQuat(ImTextureID headerBackground, WorkspaceFloatsToQuatArgs const& args);
   WorkspaceFloatsToQuat(ImTextureID headerBackground, std::string headerLabel = "floats -> quat", std::string nodeLabel = "floats -> quat");
 
   void drawDataSetValues(util::NodeBuilder& builder);

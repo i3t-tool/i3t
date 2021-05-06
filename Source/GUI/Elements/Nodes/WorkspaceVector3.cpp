@@ -36,7 +36,7 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 	  */
 	glm::vec3 localData;
 
-	builder.Middle();
+	//builder.Middle();
 
 
 	ImGui::PushItemWidth(m_dataItemsWidth);
