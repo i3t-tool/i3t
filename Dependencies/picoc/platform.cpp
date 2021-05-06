@@ -73,18 +73,18 @@ void PicocCallMain(Picoc* pc, int argc, char** argv)
     if (FuncValue->Val->FuncDef.ReturnType == &pc->VoidType)
     {
         if (FuncValue->Val->FuncDef.NumParams == 0)
-            PicocParse(pc, "startup", CALL_MAIN_NO_ARGS_RETURN_VOID, strlen(CALL_MAIN_NO_ARGS_RETURN_VOID), TRUE, TRUE, FALSE, TRUE);
+            PicocParse(pc, "startup", CALL_MAIN_NO_ARGS_RETURN_VOID, (int)strlen(CALL_MAIN_NO_ARGS_RETURN_VOID), TRUE, TRUE, FALSE, TRUE);
         else
-            PicocParse(pc, "startup", CALL_MAIN_WITH_ARGS_RETURN_VOID, strlen(CALL_MAIN_WITH_ARGS_RETURN_VOID), TRUE, TRUE, FALSE, TRUE);
+            PicocParse(pc, "startup", CALL_MAIN_WITH_ARGS_RETURN_VOID, (int)strlen(CALL_MAIN_WITH_ARGS_RETURN_VOID), TRUE, TRUE, FALSE, TRUE);
     }
     else
     {
         VariableDefinePlatformVar(pc, NULL, "__exit_value", &pc->IntType, (union AnyValue*)&pc->PicocExitValue, TRUE);
 
         if (FuncValue->Val->FuncDef.NumParams == 0)
-            PicocParse(pc, "startup", CALL_MAIN_NO_ARGS_RETURN_INT, strlen(CALL_MAIN_NO_ARGS_RETURN_INT), TRUE, TRUE, FALSE, TRUE);
+            PicocParse(pc, "startup", CALL_MAIN_NO_ARGS_RETURN_INT, (int)strlen(CALL_MAIN_NO_ARGS_RETURN_INT), TRUE, TRUE, FALSE, TRUE);
         else
-            PicocParse(pc, "startup", CALL_MAIN_WITH_ARGS_RETURN_INT, strlen(CALL_MAIN_WITH_ARGS_RETURN_INT), TRUE, TRUE, FALSE, TRUE);
+            PicocParse(pc, "startup", CALL_MAIN_WITH_ARGS_RETURN_INT, (int)strlen(CALL_MAIN_WITH_ARGS_RETURN_INT), TRUE, TRUE, FALSE, TRUE);
     }
 }
 #endif

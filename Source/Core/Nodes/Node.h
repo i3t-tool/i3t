@@ -22,7 +22,7 @@ enum class ENodePlugResult
 	Ok = 0,
 	Err_MismatchedPinTypes,
 	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
-	Err_Loopback,
+	Err_Loopback, /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
 };
@@ -62,9 +62,6 @@ class NodeBase : public std::enable_shared_from_this<NodeBase>
 protected:
 	ID m_id{};
 
-	/// Inputs of the box: Input tabs with glyphs.
-	std::vector<Pin> m_inputs;
-
 	/// Outputs of the box: output tabs with glyphs.
 	std::vector<Pin> m_outputs;
 
@@ -75,9 +72,17 @@ protected:
 	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
+	 * 	Owner of the node, sequence or camera, otherwise null.
+	 */
+	Ptr<NodeBase> m_owner = nullptr;
+
+	/**
 	 * Operator node properties.
 	 */
 	const Operation* m_operation = nullptr;
+
+	/// Inputs of the box: Input tabs with glyphs.
+	std::vector<Pin> m_inputs;
 
 protected:
   NodeBase(const Operation* operation) : m_operation(operation)
@@ -88,10 +93,18 @@ public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
-	const Pin& getInPin(int index) const  { return m_inputs[index]; }
-	const Pin& getOutPin(int index) const { return m_outputs[index]; }
+public:
+	const Pin& getInPin(int index) { return getInputPins()[index]; }
+	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
+protected:
+  Pin& getInPinRef(int index) { return getInputPinsRef()[index]; }
+  Pin& getOutPinRef(int index) { return getOutputPinsRef()[index]; }
+
+public:
   Ptr<NodeBase> getPtr() { return shared_from_this(); }
+
+public:
 
   template <typename T>
 	Ptr<T> as()
@@ -116,10 +129,12 @@ protected:
 	/**
 	 * Get data storage for read and write purposes. No written value validation
 	 * is performed.
+	 *
+	 * Overriden in Sequence class.
 	 */
-	DataStore& getInternalData(size_t index = 0)
+	virtual DataStore& getInternalData(size_t index = 0)
 	{
-		Debug::Assert(!m_internalData.empty() && m_internalData.size() > index, "Desired data storage does not exist!");
+		Debug::Assert(m_internalData.size() > index, "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
@@ -207,6 +222,8 @@ public:
 	}
 
 protected:
+	void setPinOwner(Pin& pin, Ptr<NodeBase> node);
+
 	/**
 	 * Sets node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
@@ -217,13 +234,13 @@ protected:
 	template <typename T> void setInternalValue(const T& value, size_t index = 0)
 	{
 		getInternalData(index).setValue(value);
-		spreadSignal();
+		spreadSignal(index);
 	}
 
 	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
 	{
 		getInternalData(index).getMat4Ref()[coordinates.x][coordinates.y] = value;
-		spreadSignal();
+		spreadSignal(index);
 	}
 
 public:
@@ -232,14 +249,22 @@ public:
   void setDataMap(const Transform::DataMap* map);
 
 	const Transform::DataMap* getDataMap() { return m_currentMap; }
+
+	/// \todo MH will be removed.
 	const Transform::DataMap& getDataMapRef() { return *m_currentMap; }
 	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps()
 	{
 		return m_operation->validDatamaps;
 	};
 
-	[[nodiscard]] const std::vector<Pin>& getInputPins() const;
-	[[nodiscard]] const std::vector<Pin>& getOutputPins() const;
+	[[nodiscard]] const std::vector<Pin>& getInputPins();
+	[[nodiscard]] const std::vector<Pin>& getOutputPins();
+
+protected:
+  [[nodiscard]] virtual std::vector<Pin>& getInputPinsRef();
+  [[nodiscard]] virtual std::vector<Pin>& getOutputPinsRef();
+
+public:
 	//===----------------------------------------------------------------------===//
 
 	//===-- Values updating functions. ----------------------------------------===//
@@ -256,7 +281,7 @@ public:
 	 *
 	 * \param	inputIndex Index of the modified input.
 	 */
-	virtual void updateValues(int inputIndex) {}
+	virtual void updateValues(int inputIndex = 0) {}
 
 	/// Spread signal to all outputs.
 	/// \todo Does not use operators for calling each follower just once
@@ -284,6 +309,7 @@ public:
 	bool areInputsPlugged(int numInputs);
 	bool areAllInputsPlugged();
 
+	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
 	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
 
 protected:
@@ -309,6 +335,9 @@ class Pin
 	friend class GraphManager;
 	friend class NodeBase;
 
+	/// \todo MH do not access pin directly.
+	friend class Sequence;
+
 	ID m_id;
 
 	/// Index within a node.
@@ -332,11 +361,11 @@ class Pin
 	 */
 	std::vector<Pin*> m_outputs;
 
-	const EValueType m_opValueType = EValueType::Pulse;
+	const EValueType m_valueType = EValueType::Pulse;
 
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index)
-			: m_opValueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
+			: m_valueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
 	{
 		m_id = IdGenerator::next();
 	}
@@ -372,20 +401,37 @@ public:
 	 * \returns data storage owner by node connected to this input pin. If pin is output pin,
 	 *          it returns data storage of pin owner.
 	 */
-	[[nodiscard]] const DataStore& getStorage(unsigned id = 0)
+	[[nodiscard]] const DataStore& getStorage(unsigned id = 0);
+
+  const char* getLabel() const
 	{
-		if (m_isInput)
-		{
-			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-			return m_input->m_master->getData(id);
+		auto* op = m_master->getOperation();
+		const char* label = nullptr;
+
+    if (m_isInput)
+    {
+			if (!op->defaultInputNames.empty())
+      {
+				label = op->defaultInputNames[m_index].c_str();
+			}
 		}
 		else
-		{
-			return m_master->getData(id);
+    {
+      if (!op->defaultOutputNames.empty())
+      {
+        label = op->defaultOutputNames[m_index].c_str();
+      }
 		}
+
+		if (label == nullptr)
+		{
+      label = defaultIoNames[static_cast<size_t>(m_valueType)];
+    }
+
+		return label;
 	}
 
-	[[nodiscard]] EValueType getType() const { return m_opValueType; }
+	[[nodiscard]] EValueType getType() const { return m_valueType; }
 
 	/**
 	 * Query if input of this object is plugged to any parent output.

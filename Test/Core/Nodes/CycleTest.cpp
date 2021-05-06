@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
+#include "Utils.h"
 
 using namespace Core;
 using namespace CycleInternals;

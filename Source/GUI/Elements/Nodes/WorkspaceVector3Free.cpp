@@ -10,6 +10,6 @@ WorkspaceVector3Free::WorkspaceVector3Free(ImTextureID headerBackground, std::st
 
 void WorkspaceVector3Free::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

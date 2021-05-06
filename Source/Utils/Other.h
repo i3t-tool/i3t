@@ -33,6 +33,7 @@ private:
 
 namespace FS
 {
+// Only for debug purposes.
 FORCE_INLINE std::string absolute(const std::string& relativePath)
 {
 	return I3T_PROJECT_ROOT + relativePath;

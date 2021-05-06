@@ -193,7 +193,6 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-	ImGui::SameLine();
 	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
@@ -226,7 +225,7 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
         localData = getters[i]();
         if (drawDragFloatWithMap_Inline(&localData,
                                         datamap_values[i],
-                                        fmt::format("##{}:ch{}", idOfNode, i)))
+                                        fmt::format("##{}:ch{}", idOfNode, i))) //todo check
         {
             valueChanged = true;
             index_of_change = i;
@@ -308,13 +307,16 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 	}
 }
 
-void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
+void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
 {
-    builder.Middle();
+    if(isTransformation())
+	  {
+		  builder.Middle();
+	  }
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
-        drawDataFull(builder);
+        drawDataFull(builder, index);
         break;
     case WorkspaceLevelOfDetail::SetValues:
         drawDataSetValues(builder);
@@ -325,7 +327,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder)
 
     default:
         /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
-        drawDataFull(builder);
+        drawDataFull(builder, index);
     }
 
     if (m_inactiveMark != 0)
@@ -388,7 +390,7 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (auto const & pinProp : m_workspaceInputsProperties)
+	/*for (auto const & pinProp : m_workspaceInputsProperties)
 	{
 	    if(pinProp->getType() == EValueType::Matrix)
         {
@@ -402,41 +404,53 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
         {
             drawInputPin(builder, pinProp, newLinkPin);
         }
-	}
+	}*/
+  for (auto const & pinProp : m_workspaceInputsProperties)
+  {
+      drawInputPin(builder, pinProp, newLinkPin);
+  }
 }
 
-void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin)
+void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
 {
     float alpha = ImGui::GetStyle().Alpha;
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
 
-    builder.Output(pinProp->getId());
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+	//here draw data
+	if(isTransformation()){
+      drawData(builder, 0);
+	}else{
+      builder.Output(pinProp->getId());
+      drawData(builder, outputIndex);
 
-    if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-    {
+	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
+      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+      if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
+      {
         ImGui::TextUnformatted(pinProp->getLabel().c_str());
-        ImGui::Spring(0);
-    }
+        ImGui::Spring(1);
+      }
 
-    // color.Value.w = alpha / 255.0f;
-    ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
+      // color.Value.w = alpha / 255.0f;
+      ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
                         WorkspacePinShape[pinProp->getType()],
                         pinProp->isConnected(),
                         WorkspacePinColor[pinProp->getType()],
-                        pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
-    ImGui::Spring(0);
+                        pinProp->getColor());
+      ImGui::Spring(1);
 
-    ImGui::PopStyleVar();
-    builder.EndOutput();
-
+      ImGui::PopStyleVar();
+	  ImGui::PopStyleVar();
+      builder.EndOutput();
+		}
 }
 
 /* \todo use newLinkPin arg*/
 void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
 {
-	for (auto const & pinProp : m_workspaceOutputsProperties)
+	/*for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
 	    if(pinProp->getType() == EValueType::Matrix)
         {
@@ -450,7 +464,12 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
         {
             drawOutputPin(builder, pinProp, newLinkPin);
         }
-	}
+	}*/
+
+  for (auto const & pinProp : m_workspaceOutputsProperties)
+  {
+      drawOutputPin(builder, pinProp, newLinkPin, pinProp->getIndex());
+  }
 }
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, std::string label, Core::Pin const &pin, WorkspaceNodeWithCoreData &node)

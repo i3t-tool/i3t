@@ -4,13 +4,10 @@
 WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequenceArgs const& args)
     : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
 {
-
 	fw.showMyPopup = false;
 	fw.id = "";
 	fw.value = NAN;
 	fw.name = "WorkspaceSequence";
-
-	m_workspaceTransformation.push_back(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
 }
 
 WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel, Ptr<Core::Sequence> nodebase)
@@ -21,8 +18,8 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string h
 	fw.value = NAN;
 	fw.name = "WorkspaceSequence";
 
-	pushNode(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
-	pushNode(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
+	//pushNode(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
+	//pushNode(std::make_shared<WorkspaceMatrixTranslation>(headerBackground));
 
 	m_dataRect = ImRect(0,0,0,0); /* init value used just in first frame */
 }
@@ -106,7 +103,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
     builder.Begin(m_id);
 	drawHeader(builder);
 	drawInputs(builder, newLinkPin);
-    drawData(builder);
+    drawData(builder,0);
 	drawOutputs(builder, newLinkPin);
 	builder.End();
 
@@ -138,7 +135,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 
 void WorkspaceSequence::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 
 
@@ -147,7 +144,7 @@ ImVec2 WorkspaceSequence::getDataSize()
     return m_dataRect.Max - m_dataRect.Min;
 }
 
-void WorkspaceSequence::drawDataFull(util::NodeBuilder& builder)
+void WorkspaceSequence::drawDataFull(util::NodeBuilder& builder, int index)
 {
     ImGui::Dummy(getDataSize());
 }

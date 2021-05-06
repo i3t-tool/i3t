@@ -10,5 +10,5 @@ WorkspaceMakePerspective::WorkspaceMakePerspective(ImTextureID headerBackground,
 
 void WorkspaceMakePerspective::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

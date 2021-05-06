@@ -229,12 +229,17 @@ struct Config
 	 */
 	static std::string getAbsolutePath(const char* filename)
 	{
+#ifdef I3T_RELEASE_STANDALONE
+    std::string path = std::string(filename);
+#else
+		// For debug purposes only.
 		std::string path = WORKING_DIRECTORY;
-		//std::cout << "WORKING_DIRECTORY is " << WORKING_DIRECTORY << std::endl; // PF 2018-03-22
-		if(filename[0]!='/'){path.append("/"); }
+		if (filename[0]!='/') { path.append("/"); }
 		path.append(filename);
-		return path;
-	}
+#endif
+
+    return path;
+  }
 
 	/**
 	 * Gets relative path

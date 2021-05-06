@@ -4,17 +4,19 @@
 
 #include "Core/API.h"
 #include "Core/Application.h"
-#include "Core/Input/InputActions.h"
+#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
-#include "Rendering/FrameBuffer.h"
+#include "Logger/Logger.h"
 
-#include "../../../World2/Select.h"
-#include "../../../World2/World2.h"
+#include "../../../World/Select.h"
+#include "../../../World/World.h"
+
+#include "../Nodes/WorkspaceNodeWithCoreData.h"
 
 using namespace UI;
 
 /// \todo Use Framebuffer class.
-Viewport::Viewport(bool show, World2* world2) : IWindow(show)
+Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world2 = world2;
 
@@ -22,13 +24,10 @@ Viewport::Viewport(bool show, World2* world2) : IWindow(show)
 	// generate a framebuffer for display function
 	glGenFramebuffers(1, &m_fboMain);
 
-	// set it as the default framebuffer in framebuffer.h
-	FrameBuffer::setDefaultBuffer(m_fboMain);
-
 	// generate texture to draw on
 	glGenTextures(1, &m_texColBufMain);
 
-	// create a renderbuffer to allow depth and stencil
+	// create a renderbuffer to allow depth and m_stencil
 	glGenRenderbuffers(1, &m_rboMain);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_rboMain);
 	// glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -46,7 +45,28 @@ Viewport::Viewport(bool show, World2* world2) : IWindow(show)
 	// init vectors definig size to display
 	m_wcMin = ImVec2(0, 0);
 	m_wcMax = ImVec2(0, 0);
+
+	InputManager::setInputAction("fire", Keys::b);
+	InputManager::setInputAction("fire", Keys::m);
+	InputManager::setInputAxis("move", 1.0f, Keys::o);
+	InputManager::setInputAxis("move", -1.0f, Keys::p);
+
+	Input.bindAction("fire", EKeyState::Pressed, []()
+  {
+	  Log::info("Action fired.");
+  });
+  Input.bindAction("fire", EKeyState::Released, []()
+  {
+    Log::info("Action released.");
+  });
+  Input.bindAxis("move", [](float val)
+  {
+    Log::info("move: {}", val);
+  });
 }
+
+float localData;
+Ptr<Core::NodeBase>op2;
 
 void Viewport::render()
 {
@@ -105,7 +125,7 @@ void Viewport::render()
 
 			// resize all other things
 			// m_world->onReshape(width, height);
-			InputActions::resize((float)width, (float)height);
+      InputManager::setScreenSize((int)width, (int)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 
@@ -115,35 +135,27 @@ void Viewport::render()
 
 		// clear
 		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-		// glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		// draw
 		glEnable(GL_MULTISAMPLE);
-
-		// draw
-		glStencilMask(255);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glClearStencil(0);
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		// draw
-		// m_world->render();
-
-		// world2
 		m_world2->onUpdate();
-
 		glDisable(GL_MULTISAMPLE);
 
 		// Unbind our framebuffer, bind main framebuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		// ImGui::GetForegroundDrawList()->AddRect(wcMin, wcMax, IM_COL32(255, 255, 0, 255)); // test
+		//ImGui::GetForegroundDrawList()->AddRect(m_wcMin, m_wcMax, IM_COL32(255, 255, 0, 255)); // test
 
 		// add the texture to this's window drawList
 		ImGui::GetWindowDrawList()->AddImage(
 				(void*)(intptr_t)m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0, 1),
 				ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
 
-		ImGui::End();
+
+		if(InputManager::isKeyPressed(Keys::shiftl)){m_world2->tmpSetNode(); }
+		m_world2->tmpDrawNode();
+
+    ImGui::End();
 	}
 }

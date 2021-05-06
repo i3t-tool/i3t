@@ -1,5 +1,11 @@
 #pragma once
 
+enum class EKeyState
+{
+	Pressed,
+	Released
+};
+
 /** Status of the keyboard keys and also mouse keys. */
 class Keys final
 {

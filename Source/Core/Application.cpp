@@ -20,11 +20,14 @@
 #include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
-#include "World2/World2.h"
+#include "World/World.h"
 
 #include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
 #include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
+#include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
 #include "Nodes/GraphManager.h"
+
 
 double lastFrameSeconds = 0.0f;
 Ptr<Core::Cycle> testCycle;
@@ -51,6 +54,8 @@ void Application::init()
   testCycle = Core::GraphManager::createCycle();
 	testCycle->setTo(10.0f);
 	testCycle->setMultiplier(0.10f);
+
+	InputManager::init();
 }
 
 void Application::initModules()
@@ -134,14 +139,7 @@ void Application::finalize()
 {
 	delete m_world;
 
-	/*
-	ShaderProvider::dispose(); // delete red, base and alpha shaders
-
-	Shaper::dispose(); // delete shaper shaders (local shaders in shaper.cpp)
-
-	TextureLoader::endTextures();
-	TextureLoader::endHCTextures();
-	 */
+	World::end();
 
 	glfwTerminate();
 }
@@ -149,16 +147,8 @@ void Application::finalize()
 bool Application::initI3T()
 {
 	// new scene scheme
-	bool b = World2::initRender();
-	m_world = World2::loadDefaultScene();
-
-	// \todo DG testing
-	WorkspaceMatrix4x4* mat =new WorkspaceMatrixScale((ImTextureID)0, "load free");
-	glm::mat4 m=glm::mat4(1.0f);
-	ValueSetResult result = mat->getNodebase()->setValue(glm::vec3(2.0f,2.0f,2.0f));
-	printf("value set result %d\n",result.status);
-	// ValueSetResult result = dynamic_cast<WorkspaceNodeWithCoreData*>(_workspace->back().get())->Nodebase.get()->setValue(node.data);
-	m_world->handlesSetMatrix(mat);
+	bool b = World::init();
+	m_world = World::loadDefaultScene();
 
 	return b;
 }
@@ -173,13 +163,9 @@ UIModule* Application::getUI()
 	return m_ui;
 }
 
-World2* Application::world2()
+World* Application::world2()
 {
 	return m_world;
-}
-ImFont* Application::getFont(int fontId)
-{
-	return m_ui->m_currentTheme.get(static_cast<size_t>(fontId));
 }
 
 GLFWwindow* Application::mainWindow()

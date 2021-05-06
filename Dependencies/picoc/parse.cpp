@@ -18,7 +18,6 @@ void ParseCleanup(Picoc *pc)
         pc->CleanupTokenList = Next;
     }
 }
-
 /* parse a statement, but only run it if Condition is TRUE */
 enum ParseResult ParseStatementMaybeRun(struct ParseState *Parser, int Condition, int CheckTrailingSemicolon)
 {
@@ -210,7 +209,7 @@ int ParseArrayInitialiser(struct ParseState *Parser, struct Value *NewVariable, 
             if (Parser->Mode == RunModeRun && DoAssignment)
             {
                 SubArraySize = TypeSize(NewVariable->Typ->FromType, NewVariable->Typ->FromType->ArraySize, TRUE);
-                SubArray = VariableAllocValueFromExistingData(Parser, NewVariable->Typ->FromType, (union AnyValue *)(&NewVariable->Val->ArrayMem[0] + SubArraySize * ArrayIndex), TRUE, NewVariable);
+                SubArray = VariableAllocValueFromExistingData(Parser, NewVariable->Typ->FromType, (union AnyValue *)(&NewVariable->Val->ArrayMem[0] + (long long int)SubArraySize * ArrayIndex), TRUE, NewVariable);
                 #ifdef DEBUG_ARRAY_INITIALIZER
                 int FullArraySize = TypeSize(NewVariable->Typ, NewVariable->Typ->ArraySize, TRUE);
                 PRINT_SOURCE_POS;
@@ -250,7 +249,7 @@ int ParseArrayInitialiser(struct ParseState *Parser, struct Value *NewVariable, 
                 #endif
                 if (ArrayIndex >= TotalSize)
                     ProgramFail(Parser, "too many array elements");
-                ArrayElement = VariableAllocValueFromExistingData(Parser, ElementType, (union AnyValue *)(&NewVariable->Val->ArrayMem[0] + ElementSize * ArrayIndex), TRUE, NewVariable);
+                ArrayElement = VariableAllocValueFromExistingData(Parser, ElementType, (union AnyValue *)(&NewVariable->Val->ArrayMem[0] + (long long int)ElementSize * ArrayIndex), TRUE, NewVariable);
             }
 
             /* this is a normal expression initialiser */

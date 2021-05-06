@@ -10,6 +10,7 @@
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -90,7 +91,7 @@ void MainMenuBar::showFileMenu()
 				if (ww != NULL)
 				{
 					ww->m_workspaceCoreNodes.clear();
-					LoadWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
+					loadWorkspace(result.c_str());
 				}
 				else
 				{
@@ -114,7 +115,7 @@ void MainMenuBar::showFileMenu()
 			{
 				if (ww != NULL)
 				{
-					LoadWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
+					loadWorkspace(result.c_str());
 				}
 				else
 				{
@@ -144,7 +145,7 @@ void MainMenuBar::showFileMenu()
 			{
 				if (ww != NULL)
 				{
-					SaveWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
+					saveWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
 				}
 				else
 				{
@@ -289,6 +290,7 @@ void MainMenuBar::showHelpMenu()
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow)) {}
+		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getUI()->getWindowPtr<StyleEditor>()->getShowPtr())) {}
 
 		ImGui::EndMenu();
 	}

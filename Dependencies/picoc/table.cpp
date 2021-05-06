@@ -41,7 +41,7 @@ void TableInitTable(struct Table *Tbl, struct TableEntry **HashTable, int Size, 
 static struct TableEntry *TableSearch(struct Table *Tbl, const char *Key, int *AddAt)
 {
     struct TableEntry *Entry;
-    int HashValue = ((unsigned long)Key) % Tbl->Size;   /* shared strings have unique addresses so we don't need to hash them */
+    int HashValue = ((unsigned long long)Key) % Tbl->Size;   /* shared strings have unique addresses so we don't need to hash them */
     
     for (Entry = Tbl->HashTable[HashValue]; Entry != NULL; Entry = Entry->Next)
     {
@@ -101,7 +101,7 @@ int TableGet(struct Table *Tbl, const char *Key, struct Value **Val, const char 
 struct Value *TableDelete(Picoc *pc, struct Table *Tbl, const char *Key)
 {
     struct TableEntry **EntryPtr;
-    int HashValue = ((unsigned long)Key) % Tbl->Size;   /* shared strings have unique addresses so we don't need to hash them */
+    int HashValue = ((unsigned long long)Key) % Tbl->Size;   /* shared strings have unique addresses so we don't need to hash them */
     
     for (EntryPtr = &Tbl->HashTable[HashValue]; *EntryPtr != NULL; EntryPtr = &(*EntryPtr)->Next)
     {
@@ -165,7 +165,7 @@ char *TableStrRegister2(Picoc *pc, const char *Str, int Len)
 
 char *TableStrRegister(Picoc *pc, const char *Str)
 {
-    return TableStrRegister2(pc, Str, strlen((char *)Str));
+    return TableStrRegister2(pc, Str, (int)strlen((char *)Str));
 }
 
 /* free all the strings */

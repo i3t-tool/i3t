@@ -1,6 +1,6 @@
 /* picoc expression evaluator - a stack-based expression evaluation system
  * which handles operator precedence */
- 
+
 #include "interpreter.h"
 
 /* whether evaluation is left to right for a given precedence level */
@@ -14,10 +14,11 @@
 
 #define DEEP_PRECEDENCE (BRACKET_PRECEDENCE*1000)
 
+
 #ifdef DEBUG_EXPRESSIONS
 #define debugf printf
 #else
-void debugf(char *Format, ...)
+void debugf(const char *Format, ...)
 {
 }
 #endif
@@ -30,6 +31,7 @@ enum OperatorOrder
     OrderInfix,
     OrderPostfix
 };
+
 
 /* a stack of expressions we use in evaluation */
 struct ExpressionStack
@@ -47,7 +49,7 @@ struct OpPrecedence
     unsigned int PrefixPrecedence:4;
     unsigned int PostfixPrecedence:4;
     unsigned int InfixPrecedence:4;
-    char *Name;
+    const char *Name;
 };
 
 /* NOTE: the order of this array must correspond exactly to the order of these tokens in enum LexToken */
@@ -376,7 +378,7 @@ void ExpressionAssignToPointer(struct ParseState *Parser, struct Value *ToValue,
     else if (AllowPointerCoercion && IS_NUMERIC_COERCIBLE(FromValue))
     {
         /* assign integer to native pointer */
-        ToValue->Val->Pointer = (void *)(unsigned long)ExpressionCoerceUnsignedInteger(FromValue);
+        ToValue->Val->Pointer = (void *)ExpressionCoerceUnsignedInteger(FromValue);
     }
     else if (AllowPointerCoercion && FromValue->Typ->Base == TypePointer)
     {
@@ -439,7 +441,7 @@ void ExpressionAssign(struct ParseState *Parser, struct Value *DestValue, struct
             {
                 if (DestValue->Typ->ArraySize == 0) /* char x[] = "abcd", x is unsized */
                 {
-                    int Size = strlen((char*)SourceValue->Val->Pointer) + 1;
+                    int Size = (int)strlen((char*)SourceValue->Val->Pointer) + 1;
                     #ifdef DEBUG_ARRAY_INITIALIZER
                     PRINT_SOURCE_POS;
                     fprintf(stderr, "str size: %d\n", Size);
@@ -702,8 +704,8 @@ void ExpressionInfixOperator(struct ParseState *Parser, struct ExpressionStack *
         /* make the array element result */
         switch (BottomValue->Typ->Base)
         {
-            case TypeArray:   Result = VariableAllocValueFromExistingData(Parser, BottomValue->Typ->FromType, (union AnyValue *)(&BottomValue->Val->ArrayMem[0] + TypeSize(BottomValue->Typ, ArrayIndex, TRUE)), BottomValue->IsLValue, BottomValue->LValueFrom); break;
-            case TypePointer: Result = VariableAllocValueFromExistingData(Parser, BottomValue->Typ->FromType, (union AnyValue *)((char *)BottomValue->Val->Pointer + TypeSize(BottomValue->Typ->FromType, 0, TRUE) * ArrayIndex), BottomValue->IsLValue, BottomValue->LValueFrom); break;
+            case TypeArray:   Result = VariableAllocValueFromExistingData(Parser, BottomValue->Typ->FromType, (union AnyValue *)(&BottomValue->Val->ArrayMem[0] + (long long int)TypeSize(BottomValue->Typ, ArrayIndex, TRUE)), BottomValue->IsLValue, BottomValue->LValueFrom); break;
+            case TypePointer: Result = VariableAllocValueFromExistingData(Parser, BottomValue->Typ->FromType, (union AnyValue *)((char *)BottomValue->Val->Pointer + (long long int)TypeSize(BottomValue->Typ->FromType, 0, TRUE) * ArrayIndex), BottomValue->IsLValue, BottomValue->LValueFrom); break;
             default:          ProgramFail(Parser, "this %t is not an array", BottomValue->Typ);
         }
         
@@ -823,9 +825,9 @@ void ExpressionInfixOperator(struct ParseState *Parser, struct ExpressionStack *
                 ProgramFail(Parser, "invalid use of a NULL pointer");
             
             if (Op == TokenPlus)
-                Pointer = (void *)((char *)Pointer + TopInt * Size);
+                Pointer = (void *)((char *)Pointer + (long long int)TopInt * Size);
             else
-                Pointer = (void *)((char *)Pointer - TopInt * Size);
+                Pointer = (void *)((char *)Pointer - (long long int)TopInt * Size);
             
             StackValue = ExpressionStackPushValueByType(Parser, StackTop, BottomValue->Typ);
             StackValue->Val->Pointer = Pointer;
@@ -847,9 +849,9 @@ void ExpressionInfixOperator(struct ParseState *Parser, struct ExpressionStack *
                 ProgramFail(Parser, "invalid use of a NULL pointer");
 
             if (Op == TokenAddAssign)
-                Pointer = (void *)((char *)Pointer + TopInt * Size);
+                Pointer = (void *)((char *)Pointer + (long long int)TopInt * Size);
             else
-                Pointer = (void *)((char *)Pointer - TopInt * Size);
+                Pointer = (void *)((char *)Pointer - (long long int)TopInt * Size);
 
             HeapUnpopStack(Parser->pc, sizeof(struct Value));
             BottomValue->Val->Pointer = Pointer;
@@ -868,7 +870,7 @@ void ExpressionInfixOperator(struct ParseState *Parser, struct ExpressionStack *
         {
             case TokenEqual:                ExpressionPushInt(Parser, StackTop, BottomLoc == TopLoc); break;
             case TokenNotEqual:             ExpressionPushInt(Parser, StackTop, BottomLoc != TopLoc); break;
-            case TokenMinus:                ExpressionPushInt(Parser, StackTop, BottomLoc - TopLoc); break;
+            case TokenMinus:                ExpressionPushInt(Parser, StackTop, (int)(BottomLoc - TopLoc)); break;
             default:                        ProgramFail(Parser, "invalid operation"); break;
         }
     }

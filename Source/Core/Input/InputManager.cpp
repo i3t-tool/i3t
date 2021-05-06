@@ -5,6 +5,7 @@
 
 #include "Core/Application.h"
 #include "Core/GlfwWindow.h"
+#include "InputBindings.h"
 #include "Logger/LoggerInternal.h"
 
 #include "GUI/Elements/Windows/ViewportWindow.h"
@@ -14,6 +15,50 @@
 constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys::mouseMiddle};
 
 ImGuiConfigFlags g_mousedFlags;
+
+void InputManager::init()
+{
+	InputBindings::init();
+}
+
+void InputManager::setInputAction(const char* action, Keys::Code code)
+{
+	if (!InputBindings::isActionCreated(action))
+		InputBindings::m_inputActions.insert({action, {code}});
+}
+
+void InputManager::setInputAxis(const char* action, float scale, Keys::Code code)
+{
+	if (!InputBindings::isAxisCreated(action))
+		InputBindings::m_inputAxis[action];
+
+	InputBindings::m_inputAxis[action].push_back({code, scale});
+}
+
+bool InputManager::isActionTriggered(const char* name, EKeyState state)
+{
+	if (!InputBindings::m_inputActions.contains(name)) return false;
+
+	auto& keys = InputBindings::m_inputActions[name];
+
+	bool result = false;
+	if (state == EKeyState::Released)
+  {
+    for (auto key : keys)
+    {
+			result |= isKeyJustUp(key);
+    }
+	}
+	if (state == EKeyState::Pressed)
+  {
+    for (auto key : keys)
+    {
+      result |= isKeyJustPressed(key);
+    }
+	}
+
+	return result;
+}
 
 bool InputManager::isMouseClicked()
 {
@@ -87,34 +132,6 @@ void InputManager::processViewportEvents()
 			setUnpressed(imGuiMouseKeys[i]);
 		}
 	}
-
-	// Check scrolling.
-	if (io.MouseWheel < -0.1f)
-		setPressed(Keys::mouseScrlUp);
-	else
-		setUnpressed(Keys::mouseScrlUp);
-
-	if (io.MouseWheel > 0.1f)
-		setPressed(Keys::mouseScrlDown);
-	else
-		setUnpressed(Keys::mouseScrlDown);
-
-	// Handle keys.
-	/*
-	for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++)
-	{
-	  if (ImGui::IsKeyPressed(i))
-	    keyDown(i);
-
-	  if (ImGui::IsKeyReleased(i))
-	    keyUp(i);
-	}
-	 */
-}
-
-bool InputManager::isActionZoomToAll()
-{
-	return isKeyPressed(Keys::ctrll) && isKeyJustPressed(Keys::a);
 }
 
 void InputManager::beginCameraControl()
@@ -166,19 +183,33 @@ void InputManager::update()
 
 	if (m_focusedWindow)
 	{
-		for (const auto& [key, fn] : m_focusedWindow->Input.m_keyCallbacks)
+		for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
 		{
-			if (m_keyMap[key] == KeyState::DOWN)
-				fn();
+			auto keys = InputBindings::m_inputActions[action];
+			for (const auto& key : keys)
+			{
+				bool shouldProcess =
+						m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
+            m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released;
+
+				if (shouldProcess) fn();
+      }
 		}
 
-		for (const auto& [key, fn] : m_focusedWindow->Input.m_keyDownCallbacks)
+		for (const auto& [action, fn] : m_focusedWindow->Input.m_axis)
 		{
-			if (m_keyMap[key] == KeyState::JUST_DOWN)
-				fn();
+			auto keys = InputBindings::m_inputAxis[action];
+			for (const auto& [key, scale] : keys)
+			{
+				if (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN)
+				{
+					fn(scale);
+				}
+			}
 		}
 	}
 
+	// Process keys.
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
 		if (it->second == JUST_UP)

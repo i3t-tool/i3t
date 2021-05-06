@@ -46,7 +46,8 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
-	m_color = ImColor(89, 134, 179);
+	Theme t;
+	m_color =	t.get(EColor::NodeHeader);
 	m_size = ImVec2(100, 100);
 	m_touchTime = 1.0;
 }
@@ -82,29 +83,23 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
         drawInputs(builder, newLinkPin);
     }
 
-	//
-	//ImGui::BeginChild("myID");
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.5f);
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(164, 171, 190, 1));
 
-	drawData(builder);
+	//drawData(builder);
 
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-
-    if (withPins)
-    {
+    //if (withPins)
+    //{
         drawOutputs(builder, newLinkPin);
-    }
+    //}
 
-	//ImGui::EndChild();
 	builder.End();
 }
 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 
-    builder.Header(m_color);
+  Theme& t = I3T::getTheme();
+  m_color =	t.get(EColor::NodeHeader);
+	builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y

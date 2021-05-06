@@ -38,7 +38,7 @@ public:
     std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;
 
     void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin=nullptr, bool withPins=true);
-	void drawDataFull(util::NodeBuilder& builder);
+	void drawDataFull(util::NodeBuilder& builder, int index);
     void drawDataSetValues(util::NodeBuilder& builder);
 
 	int maxLenghtOfData();

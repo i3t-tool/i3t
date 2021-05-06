@@ -2,11 +2,12 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
-#include "Core/Input/InputActions.h"
+#include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -33,6 +34,8 @@ void UIModule::init()
   m_dockableWindows.push_back(std::make_shared<Console>(true));
   m_dockableWindows.push_back(std::make_shared<LogWindow>());
 
+  m_dockableWindows.push_back(std::make_shared<StyleEditor>());
+
   HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
 
   // Setup Dear ImGui context after OpenGL context.
@@ -58,7 +61,7 @@ void UIModule::init()
   }
 
   // Allocate path to the imgui ini file on heap.
-  auto* path = new std::string(Config::getAbsolutePath("/Data/imgui.ini"));
+  auto* path = new std::string(Config::getAbsolutePath("Data/imgui.ini"));
   io.IniFilename = path->c_str();
 
   m_currentTheme.init();
@@ -181,26 +184,29 @@ void UIModule::buildDockspace()
 void UIModule::queryCameraState()
 {
   // ORBIT camera rotation
-  if (InputManager::isKeyJustPressed(InputActions::KeyWorld_mouseRotate))
+  if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Pressed))
   {
     InputManager::beginCameraControl();
   }
-  if (InputManager::isKeyJustUp(InputActions::KeyWorld_mouseRotate))
+  if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Released))
   {
     InputManager::endCameraControl();
   }
 
   // CAMERA PANNING - set a new orbit center
-  if (InputManager::isKeyJustPressed(InputActions::KeyWorld_mousePan))
+  if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Pressed))
   {
     InputManager::beginCameraControl();
   }
-  if (InputManager::isKeyJustUp(InputActions::KeyWorld_mousePan))
+  if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Released))
   {
     InputManager::endCameraControl();
   }
 }
 
+/**
+ * Not thread safe (using strtok).
+ */
 std::string makeIDNice(const char* ID)
 {
   // Remove ## or ### from ImGui window name.

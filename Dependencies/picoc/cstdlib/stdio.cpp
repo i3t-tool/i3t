@@ -7,6 +7,7 @@
 #define MAX_FORMAT 80
 #define MAX_SCANF_ARGS 10
 
+
 static int Stdio_ZeroValue = 0;
 static int EOFValue = EOF;
 static int SEEK_SETValue = SEEK_SET;
@@ -23,7 +24,6 @@ static int GETS_MAXValue = 255;     /* arbitrary maximum size of a gets() file *
 static FILE* stdinValue;
 static FILE* stdoutValue;
 static FILE* stderrValue;
-
 
 /* our own internal output stream which can output to FILE * or strings */
 typedef struct StdOutStreamStruct

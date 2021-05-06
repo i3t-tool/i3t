@@ -96,7 +96,7 @@ void Tutorial::loadImages()
 	{
 		auto& image_filename = image.first;
 		auto& image_id = image.second; // by reference
-		std::string whole_filename = Config::getAbsolutePath(("/Data/tutorials/" + image_filename).c_str());
+		std::string whole_filename = Config::getAbsolutePath(("Data/tutorials/" + image_filename).c_str());
 		// glEnable(GL_TEXTURE_2D);
 		GLuint tex_id = 0;
 		glGenTextures(1, &tex_id);
@@ -180,7 +180,7 @@ void Tutorial::render(int step)
 		}
 		else if (widget.m_type == "task")
 		{
-			ImGui::PushFont(I3T::getFont(EFont::TaskTitle));
+			ImGui::PushFont(I3T::getFont(EFont::TitleSmall));
 			ImGui::TextWrapped(("Task: " + widget.m_string).c_str());
 			ImGui::PopFont();
 		}

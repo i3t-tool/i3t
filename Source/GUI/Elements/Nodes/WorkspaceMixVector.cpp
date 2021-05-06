@@ -10,6 +10,6 @@ WorkspaceMixVector::WorkspaceMixVector(ImTextureID headerBackground, std::string
 
 void WorkspaceMixVector::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }
 

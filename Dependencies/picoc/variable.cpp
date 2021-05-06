@@ -1,11 +1,10 @@
 /* picoc variable storage. This provides ways of defining and accessing
  * variables */
- 
+
 #include "interpreter.h"
 
 /* maximum size of a value to temporarily copy while we create a variable */
 #define MAX_TMP_COPY_BUF 256
-
 
 /* initialise the variable system */
 void VariableInit(Picoc *pc)
@@ -372,7 +371,7 @@ void VariableGet(Picoc *pc, struct ParseState *Parser, const char *Ident, struct
 }
 
 /* define a global variable shared with a platform global. Ident will be registered */
-void VariableDefinePlatformVar(Picoc *pc, struct ParseState *Parser, char *Ident, struct ValueType *Typ, union AnyValue *FromValue, int IsWritable)
+void VariableDefinePlatformVar(Picoc *pc, struct ParseState *Parser, const char *Ident, struct ValueType *Typ, union AnyValue *FromValue, int IsWritable)
 {
     struct Value *SomeValue = VariableAllocValueAndData(pc, NULL, 0, IsWritable, NULL, TRUE);
     SomeValue->Typ = Typ;

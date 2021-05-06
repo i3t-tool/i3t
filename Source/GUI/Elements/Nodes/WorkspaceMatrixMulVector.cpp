@@ -10,5 +10,5 @@ WorkspaceMatrixMulVector::WorkspaceMatrixMulVector(ImTextureID headerBackground,
 
 void WorkspaceMatrixMulVector::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

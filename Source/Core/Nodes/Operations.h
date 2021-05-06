@@ -145,91 +145,94 @@ enum class ENodeType
 	Vector3Length,	//done SS
 	ShowVector3,	//done SS
 	MixVector3,	//done SS
-	ConjQuat,
-	FloatVecToQuat,
-	AngleAxisToQuat,
-	VecVecToQuat,
-	QuatToFloatVec,
-	QuatToAngleAxis,
-	QuatToEuler,
-	EulerToQuat,
-	QuatInverse,
-	QuatSlerp,
-	QuatLongWaySlerp,
-	QuatLerp,
-	FloatMulQuat,
-	QuatMulQuat,
-	QuatVecConjQuat,
-	QuatLength,
-	ClampFloat,
-	FloatMulFloat,
-	FloatDivFloat,
-	FloatAddFloat,
-	FloatPowFloat,
-	MixFloat,
-	FloatSinCos,
-	ASinACos,
-	Signum,
-	MatrixToVectors,
-	Vectors3ToMatrix,
-	VectorsToMatrix,
-	MatrixToFloats,
-	FloatsToMatrix,
-	MatrixToTR,
-	TRToMatrix,
-	MatrixToQuat,
-	QuatToMatrix,
-	VectorToFloats,
-	FloatsToVector,
-	Vector3ToFloats,
-	FloatsToVector3,
-	VectorToVector3,
-	Vector3ToVector,
-	QuatToFloats,
-	FloatsToQuat,
-	NormalizeQuat,
+	ConjQuat, //done SS waiting for free quat
+	FloatVecToQuat,//done SS waiting for free quat
+	AngleAxisToQuat,//done SS waiting for free quat
+	VecVecToQuat,//done SS waiting for free quat
+	QuatToFloatVec,//todo vec3 + float
+	QuatToAngleAxis,//todo  vec3 + float
+	QuatToEuler, //done SS
+	EulerToQuat,//done SS waiting for free quat
+	QuatInverse,//done SS waiting for free quat
+	QuatSlerp,//done SS waiting for free quat
+	QuatLongWaySlerp,//done SS waiting for free quat
+	QuatLerp, //done SS waiting for free quat
+	FloatMulQuat,//done SS waiting for free quat
+	QuatMulQuat,//done SS waiting for free quat
+	QuatVecConjQuat,//done SS
+	QuatLength,  //done SS
+	ClampFloat, //done SS
+	FloatMulFloat,  //done SS
+	FloatDivFloat,//done SS
+	FloatAddFloat,//done SS
+	FloatPowFloat,//done SS
+	MixFloat,//done SS
+	FloatSinCos,//done SS
+	ASinACos,//done SS
+	Signum,//done SS
+	MatrixToVectors, //done SS
+	Vectors3ToMatrix, //done SS
+	VectorsToMatrix, //done SS
+	MatrixToFloats, //done SS
+	FloatsToMatrix, //done SS
+	MatrixToTR, //done SS
+	TRToMatrix, //done SS
+	MatrixToQuat, //done SS waiting for free quat
+	QuatToMatrix,//done SS
+	VectorToFloats, // done SS
+	FloatsToVector,  //done SS
+	Vector3ToFloats, // done SS
+	FloatsToVector3,//done SS
+	VectorToVector3,//done SS
+	Vector3ToVector,//done SS
+	QuatToFloats, //done SS
+	FloatsToQuat,//done SS waiting for free quat
+	NormalizeQuat, //done SS waiting for free quat
 	Float, //done SS
 	Vector3, //done JH
 	Vector4, //done JH
 	Matrix, //done JH
+	Quat,
 	Model,
 
 	// Transform matrices "constructors"
-	MakeTranslation, //done JH
+	MakeTranslation, //done SS
 	MakeEulerX, //done SS
 	MakeEulerY, //done SS
 	MakeEulerZ, //done SS
-	MakeScale, //done JH
+	MakeScale, //done SS
 	MakeAxisAngle, //done SS
 	MakeOrtho, //done SS
 	MakePerspective, //done SS
 	MakeFrustum, //done SS
 	MakeLookAt, //done SS
 
-	Camera,
 	Screen,
+	Pulse
+
+	//SS missing trackball and free quat types
 };
 
 enum class ETransformType
 {
 	//This is for sequence
-	Free = 0,
+	Free = 0,//done SS
 	Translation, //done JH
-	EulerX,
-	EulerY,
-	EulerZ,
-	Scale, 
-	AxisAngle,
-	Quat,
-	Ortho,
-	Perspective,
-	Frustum,
-	LookAt,
+	EulerX,//done SS
+	EulerY,//done SS
+	EulerZ,//done SS
+	Scale, //done JH
+	AxisAngle,//done SS
+	Quat, //waiting for base quat
+	Ortho,//done SS
+	Perspective,//done SS
+	Frustum,//done SS
+	LookAt,//done SS
 };
 
 // pro kazdy OpValueType (NodeData.h) je jeden string
-static const std::vector<std::string> defaultIoNames = {
-		"",       // PULSE		MN dodelat
+static const std::array<const char*, 8> defaultIoNames = {
+		"pulse",  // PULSE		MN dodelat
 		"float",  // Float
 		"vec3",   // Vec3
 		"vec4",   // Vec4
@@ -237,7 +240,6 @@ static const std::vector<std::string> defaultIoNames = {
 		"quat",   // Quat
 		"",       // Matrix_MULL	MN dodelat
 		""        // SCREEN		MN dodelat
-
 };
 
 static const std::vector<EValueType> matrixInput = {EValueType::Matrix};
@@ -293,8 +295,8 @@ static const std::vector<std::string> AngleAxisInputNames = {"angle", "axis"};
 static const std::vector<std::string> Vectors3ToMatrixInputNames = {"vec3 X", "vec3 Y", "vec3 Z", "vec3 T"};
 static const std::vector<std::string> VectorsToMatrixInputNames = {"vec4 X", "vec4 Y", "vec4 Z", "vec4 T"};
 static const std::vector<std::string> ClampFloatInputNames = {"val", "min", "max"};
-static const std::vector<std::string> xyz = {"X", "Y", "Z"};
-static const std::vector<std::string> xyzw = {"X", "Y", "Z", "W"};
+static const std::vector<std::string> xyz = {"x", "y", "z"};
+static const std::vector<std::string> xyzw = {"x", "y", "z", "w"};
 static const std::vector<std::string> tr = {"T", "R"};
 static const std::vector<std::string> eulerInputNames = {"angle"};
 static const std::vector<std::string> orthoFrustrumInputNames = {"left", "right", "bottom", "top", "zNear", "zFar"};
@@ -394,6 +396,7 @@ static const std::vector<Operation> operations = {
 		{"Vector3ToVector3", "vec3", 1, vector3Input, 1, vector3Input, Core::defaultDataMaps},
 		{"Vector4ToVector4", "vec4", 1, vectorInput, 1, vectorInput, Core::defaultDataMaps},
 		{"MatrixToMatrix", "mat", 1, matrixInput, 1, matrixInput, Core::defaultDataMaps},
+    {"QuatToQuat", "quat", 1, {EValueType::Quat}, 1, {EValueType::Quat}, Core::defaultDataMaps},
 
 		{"Model", "model", 1, matrixMulInput, 0, {}},
 
@@ -412,8 +415,8 @@ static const std::vector<Operation> operations = {
      orthoFrustrumInputNames},                                                                            // frustrum
 		{"MakeLookAt", "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
-    {"Camera", "camera", 2, {EValueType::Matrix, EValueType::Matrix}, 1, {EValueType::Screen}},
-    {"Screen", "screen", 1, {EValueType::Screen}, 0, {}},
+    {"Screen", "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}},
+    {"Pulse", "pulse", 0, {}, 1, {EValueType::Pulse}}
 };
 
 namespace Core
@@ -430,7 +433,9 @@ static const PinGroup cycleOutputs = { EValueType::Float, EValueType::Pulse, EVa
 
 static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs };
 
-static const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 2, matrixMulAndMatrixInput};
+inline const Operation g_sequence = {"Sequence", "seq", 2, matrixMulAndMatrixInput, 3, {EValueType::MatrixMul, EValueType::Matrix, EValueType::Matrix}};
+
+static const Operation g_cameraProperties = { "Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul} };
 
 static const std::vector<Operation> g_transforms = {
 		{"Free", "free", 0, matrixInput, 1, matrixInput, defaultDataMaps },                                              // free
@@ -438,7 +443,7 @@ static const std::vector<Operation> g_transforms = {
 		{"EulerX", "eulerAngleX", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX } },            // eulerAngleX
 		{"EulerY", "eulerAngleY", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY } },            // eulerAngleY
 		{"EulerZ", "eulerAngleZ", 0, matrixInput, 1, matrixInput, NO_TAG, eulerInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ } },            // eulerAngleZ
-		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale } },                                            // scale
+		{"Scale", "scale", 0, matrixInput, 1, matrixInput, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale, &Transform::g_UniformScale } },                                            // scale
 		{"AxisAngle", "rotate", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },          // rotate
 		{"Quat", "quat", 0, matrixInput, 1, matrixInput, NO_TAG, AngleAxisInputNames, defaultDataMaps },                 // quat rotate
 		{"Ortho", "ortho", 0, matrixInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames, { &Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho } },           // ortho

@@ -10,5 +10,5 @@ WorkspaceMakeFrustum::WorkspaceMakeFrustum(ImTextureID headerBackground, std::st
 
 void WorkspaceMakeFrustum::drawDataSetValues(util::NodeBuilder& builder)
 {
-    drawDataFull(builder);
+    drawDataFull(builder,0);
 }

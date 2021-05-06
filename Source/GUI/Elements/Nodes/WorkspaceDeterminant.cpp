@@ -11,7 +11,7 @@ WorkspaceDeterminant::WorkspaceDeterminant(ImTextureID headerBackground, std::st
 void WorkspaceDeterminant::drawDataSetValues(util::NodeBuilder& builder)
 {
     /* \todo JH - is something to do here? function have to exist anyway... */
-    drawDataFull(builder);
+    drawDataFull(builder, 0);
 }
 
 

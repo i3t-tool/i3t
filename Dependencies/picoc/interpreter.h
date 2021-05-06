@@ -43,6 +43,7 @@ typedef FILE IOFILE;
 #define FP_VAL(v) 0
 #endif
 
+
 #define IS_POINTER_COERCIBLE(v, ap) ((ap) ? ((v)->Typ->Base == TypePointer) : 0)
 #define POINTER_COERCE(v) ((int)(v)->Val->Pointer)
 
@@ -388,12 +389,10 @@ struct Picoc_Struct
     struct IncludeLibrary* IncludeLibList;
 
     /* heap memory */
-#ifdef USE_MALLOC_STACK
     unsigned char* HeapMemory;          /* stack memory since our heap is malloc()ed */
     void* HeapBottom;                   /* the bottom of the (downward-growing) heap */
     void* StackFrame;                   /* the current stack frame */
     void* HeapStackTop;                 /* the top of the stack */
-#endif
 
     struct AllocNode* FreeListBucket[FREELIST_BUCKETS];      /* we keep a pool of freelist buckets to reduce fragmentation */
     struct AllocNode* FreeListBig;                           /* free memory which doesn't fit in a bucket */
@@ -536,7 +535,7 @@ int VariableDefined(Picoc* pc, const char* Ident);
 int VariableDefinedAndOutOfScope(Picoc* pc, const char* Ident);
 void VariableRealloc(struct ParseState* Parser, struct Value* FromValue, int NewSize);
 void VariableGet(Picoc* pc, struct ParseState* Parser, const char* Ident, struct Value** LVal);
-void VariableDefinePlatformVar(Picoc* pc, struct ParseState* Parser, char* Ident, struct ValueType* Typ, union AnyValue* FromValue, int IsWritable);
+void VariableDefinePlatformVar(Picoc* pc, struct ParseState* Parser, const char* Ident, struct ValueType* Typ, union AnyValue* FromValue, int IsWritable);
 void VariableStackFrameAdd(struct ParseState* Parser, const char* FuncName, int NumParams);
 void VariableStackFramePop(struct ParseState* Parser);
 struct Value* VariableStringLiteralGet(Picoc* pc, char* Ident);

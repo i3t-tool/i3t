@@ -7,7 +7,6 @@
 static int PointerAlignBytes;
 static int IntAlignBytes;
 
-
 /* add a new type to the set of types we know about */
 struct ValueType *TypeAdd(Picoc *pc, struct ParseState *Parser, struct ValueType *ParentType, enum BaseType Base, int ArraySize, const char *Identifier, int Sizeof, int AlignBytes)
 {
@@ -115,33 +114,34 @@ void TypeInit(Picoc *pc)
 #endif
     struct PointerAlign { char x; void *y; } pa;
     
-    IntAlignBytes = (char *)&ia.y - &ia.x;
-    PointerAlignBytes = (char *)&pa.y - &pa.x;
-    
+    IntAlignBytes = (int)((char *)&ia.y - &ia.x);
+    PointerAlignBytes = (int)((char *)&pa.y - &pa.x);
+
     pc->UberType.DerivedTypeList = NULL;
     TypeAddBaseType(pc, &pc->IntType, TypeInt, sizeof(int), IntAlignBytes);
-    TypeAddBaseType(pc, &pc->ShortType, TypeShort, sizeof(short), (char *)&sa.y - &sa.x);
-    TypeAddBaseType(pc, &pc->CharType, TypeChar, sizeof(char), (char *)&ca.y - &ca.x);
-    TypeAddBaseType(pc, &pc->LongType, TypeLong, sizeof(long), (char *)&la.y - &la.x);
+    TypeAddBaseType(pc, &pc->ShortType, TypeShort, sizeof(short), (int)((char *)&sa.y - &sa.x));
+    TypeAddBaseType(pc, &pc->CharType, TypeChar, sizeof(char), (int)((char *)&ca.y - &ca.x));
+    TypeAddBaseType(pc, &pc->LongType, TypeLong, sizeof(long), (int)((char *)&la.y - &la.x));
     TypeAddBaseType(pc, &pc->UnsignedIntType, TypeUnsignedInt, sizeof(unsigned int), IntAlignBytes);
-    TypeAddBaseType(pc, &pc->UnsignedShortType, TypeUnsignedShort, sizeof(unsigned short), (char *)&sa.y - &sa.x);
-    TypeAddBaseType(pc, &pc->UnsignedLongType, TypeUnsignedLong, sizeof(unsigned long), (char *)&la.y - &la.x);
-    TypeAddBaseType(pc, &pc->UnsignedCharType, TypeUnsignedChar, sizeof(unsigned char), (char *)&ca.y - &ca.x);
+    TypeAddBaseType(pc, &pc->UnsignedShortType, TypeUnsignedShort, sizeof(unsigned short), (int)((char *)&sa.y - &sa.x));
+    TypeAddBaseType(pc, &pc->UnsignedLongType, TypeUnsignedLong, sizeof(unsigned long), (int)((char *)&la.y - &la.x));
+    TypeAddBaseType(pc, &pc->UnsignedCharType, TypeUnsignedChar, sizeof(unsigned char), (int)((char *)&ca.y - &ca.x));
     TypeAddBaseType(pc, &pc->VoidType, TypeVoid, 0, 1);
     TypeAddBaseType(pc, &pc->FunctionType, TypeFunction, sizeof(int), IntAlignBytes);
     TypeAddBaseType(pc, &pc->MacroType, TypeMacro, sizeof(int), IntAlignBytes);
     TypeAddBaseType(pc, &pc->GotoLabelType, TypeGotoLabel, 0, 1);
 #ifndef NO_FP
-    TypeAddBaseType(pc, &pc->FPType, TypeFP, sizeof(double), (char *)&da.y - &da.x);
-    TypeAddBaseType(pc, &pc->TypeType, Type_Type, sizeof(double), (char *)&da.y - &da.x);  /* must be large enough to cast to a double */
+    TypeAddBaseType(pc, &pc->FPType, TypeFP, sizeof(double), (int)((char *)&da.y - &da.x));
+    TypeAddBaseType(pc, &pc->TypeType, Type_Type, sizeof(double), (int)((char *)&da.y - &da.x));  /* must be large enough to cast to a double */
 #else
     TypeAddBaseType(pc, &pc->TypeType, Type_Type, sizeof(struct ValueType *), PointerAlignBytes);
 #endif
-    pc->CharArrayType = TypeAdd(pc, NULL, &pc->CharType, TypeArray, 0, pc->StrEmpty, sizeof(char), (char *)&ca.y - &ca.x);
+    pc->CharArrayType = TypeAdd(pc, NULL, &pc->CharType, TypeArray, 0, pc->StrEmpty, sizeof(char), (int)((char *)&ca.y - &ca.x));
     pc->CharPtrType = TypeAdd(pc, NULL, &pc->CharType, TypePointer, 0, pc->StrEmpty, sizeof(void *), PointerAlignBytes);
     pc->CharPtrPtrType = TypeAdd(pc, NULL, pc->CharPtrType, TypePointer, 0, pc->StrEmpty, sizeof(void *), PointerAlignBytes);
     pc->VoidPtrType = TypeAdd(pc, NULL, &pc->VoidType, TypePointer, 0, pc->StrEmpty, sizeof(void *), PointerAlignBytes);
 }
+
 
 /* deallocate heap-allocated types */
 void TypeCleanupNode(Picoc *pc, struct ValueType *Typ)

@@ -8,7 +8,9 @@
 #if defined(__linux__) || defined(__APPLE__)
     #define  UNIX_HOST
 #else
-    #define  WIN32  //(predefined on MSVC)
+    #ifndef WIN32//(predefined on MSVC)
+        #define  WIN32
+    #endif // !WIN32
 #endif // defined
 
 #define LARGE_INT_POWER_OF_TEN 1000000000   /* the largest power of ten which fits in an int on this architecture */

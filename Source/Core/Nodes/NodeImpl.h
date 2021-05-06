@@ -10,7 +10,7 @@
 
 #include "Node.h"
 
-#include "World2/GameObject.h"
+#include "World/GameObject.h"
 
 namespace Core
 {
@@ -153,7 +153,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulVector>::updateValues
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		m_internalData[0].setValue(glm::vec4());
 	}
 }
 
@@ -1283,11 +1283,6 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector>::updateValues
 		m_internalData[0].setValue(glm::vec4(m_inputs[0].getStorage().getVec3(), 0.0f)); // PF implicitne pro vektor se
 		                                                                                 // w=0
 	}
-	else if (m_inputs[1].isPluggedIn())
-	{
-		m_internalData[0].setValue(glm::vec4(
-				glm::vec3(), m_inputs[1].getStorage().getFloat())); // PF implicitne pro nezapojeny vektor kopiruje w=0
-	}
 	else
 	{
 		m_internalData[0].setValue(glm::vec4());
@@ -1346,6 +1341,14 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
 	}
 }
 
+template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
+{
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+  }
+}
+
 template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
@@ -1354,27 +1357,28 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inp
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::Quat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getQuat());
 	}
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inputIndex)
 {
-	if (m_inputs[0].isPluggedIn())
-	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4());
-	}
+  if (m_inputs[0].isPluggedIn())
+  {
+    m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
+  }
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = m_inputs[0].getStorage().getMat4();
+		auto targetStorage = m_inputs[0].getStorage();
+		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = targetStorage.getMat4();
 	}
 }
 
@@ -1456,32 +1460,20 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Camera>::updateValues(int inputIndex)
-{
-  if (areAllInputsPlugged())
-  {
-    setInternalValue(m_inputs[0].getStorage().getMat4() * m_inputs[1].getStorage().getMat4());
-  }
-	else
-  {
-    if (m_inputs[0].isPluggedIn())
-    {
-      // Projection matrix.
-      setInternalValue(m_inputs[0].getStorage().getMat4());
-    }
-    else if (m_inputs[1].isPluggedIn())
-    {
-      // View matrix.
-      setInternalValue(m_inputs[1].getStorage().getMat4());
-    }
-	}
-}
-
 template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inputIndex)
 {
   if (areAllInputsPlugged())
   {
-		setInternalValue(m_inputs[0].getStorage().getMat4());
+		// setInternalValue(m_inputs[0].getStorage(1).getMat4());
+	}
+}
+
+template <> FORCE_INLINE void NodeImpl<ENodeType::Pulse>::updateValues(int inputIndex)
+{
+	if (m_outputs[0].isPluggedIn())
+  {
+		int pinIndex = m_outputs[0].getOutComponents()[0]->getIndex();
+		m_outputs[0].getOutComponents()[0]->getOwner()->updateValues(pinIndex);
 	}
 }
 } // namespace Core

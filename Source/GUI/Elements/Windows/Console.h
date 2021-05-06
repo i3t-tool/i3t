@@ -18,7 +18,7 @@ public:
 	I3T_WINDOW(Console)
 
 	Console(bool show);
-	~Console() override;
+	~Console() override = default;
 	void render() override;
 
 private:
