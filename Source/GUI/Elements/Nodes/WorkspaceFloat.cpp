@@ -54,6 +54,7 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 
 
 	ImGui::PopStyleVar();
+  ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
 	if (valueChanged)
@@ -62,10 +63,6 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 		m_nodebase->setValue(localData);
 		setDataItemsWidth();
 	}
-
-	ImGui::Spring(0);
-
-
 }
 
 int WorkspaceFloat::maxLenghtOfData()

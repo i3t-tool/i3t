@@ -349,6 +349,9 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
+    ImGui::BeginVertical(pinProp->getId().AsPointer());
+    ImGui::Spring(1);
+
     // color.Value.w = alpha / 255.0f;
     ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
                       WorkspacePinShape[pinProp->getType()],
@@ -356,15 +359,15 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
                       WorkspacePinColor[pinProp->getType()],
                       pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
 
+
     ImGui::Spring(1);
+    ImGui::EndVertical();
 
     //if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
     if (true && !pinProp->getLabel().empty())
     {
       ImGui::TextUnformatted(pinProp->getLabel().c_str());
-      ImGui::Spring(1);
     }
-
     ImGui::PopStyleVar();
     builder.EndInput();
 	}
@@ -388,10 +391,16 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
             drawInputPin(builder, pinProp, newLinkPin);
         }
 	}*/
+
+  ImGui::BeginVertical(m_nodebase->getId());
+  ImGui::Spring(1);
+
   for (auto const & pinProp : m_workspaceInputsProperties)
   {
       drawInputPin(builder, pinProp, newLinkPin);
   }
+
+  ImGui::EndVertical();
 }
 
 void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
@@ -402,7 +411,11 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 	//here draw data
 	if(isTransformation()){
-      drawData(builder, 0);
+		/*ImGui::BeginHorizontal(m_nodebase->getId());
+    ImGui::Spring(1);*/
+		drawData(builder, 0);
+    /*ImGui::Spring(1);
+		ImGui::EndHorizontal();*/
 	}else{
 
 		builder.Output(pinProp->getId());
@@ -423,10 +436,6 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
       }
 
       // color.Value.w = alpha / 255.0f;
-			auto cursor = ImGui::GetCursorScreenPos();
-			//cursor.x += 100;
-      ImGui::SetCursorScreenPos(cursor);
-			auto tmp = ImGui::GetCursorScreenPos();
       ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
                         WorkspacePinShape[pinProp->getType()],
                         pinProp->isConnected(),

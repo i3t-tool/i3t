@@ -1,6 +1,7 @@
 .idea/
 /Docs/Doxygen/html/
 
+/Dependencies/
 /Binaries/
 cmake-*
 out/

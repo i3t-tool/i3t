@@ -136,7 +136,7 @@ ImColor const WorkspaceLinkProperties::getColor() const {return m_color; }
 float const WorkspaceLinkProperties::getThickness() const {return m_thickness; }
 
 WorkspacePinProperties::WorkspacePinProperties(ne::PinId const id, std::string label)
-		: m_id(id), m_label(label), m_showLabel(false), m_iconSize(24), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
+		: m_id(id), m_label(label), m_showLabel(false), m_iconSize(12), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
 {}
 
 

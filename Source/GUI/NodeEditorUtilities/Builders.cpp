@@ -119,9 +119,9 @@ void util::NodeBuilder::Input(ed::PinId id)
 
 	SetStage(Stage::Input);
 
-	if (applyPadding) {
+	/*if (applyPadding) {
 		ImGui::Spring(0);
-	}
+	}*/
 	Pin(id, PinKind::Input);
 
 	//SS
@@ -155,9 +155,9 @@ void util::NodeBuilder::Output(ed::PinId id)
 
 	SetStage(Stage::Output);
 
-	if (applyPadding)
+	/*if (applyPadding)
 		ImGui::Spring(0);
-
+*/
 	Pin(id, PinKind::Output);
 
 	//SS
@@ -225,7 +225,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 	case Stage::Output:
 		ed::PopStyleVar(2);
 
-		ImGui::Spring(1, 0);
+		//ImGui::Spring(1, 0);
 		ImGui::EndVertical();
 
 		// #debug
@@ -254,11 +254,11 @@ bool util::NodeBuilder::SetStage(Stage stage)
 		break;
 
 	case Stage::Content:
-		if (oldStage == Stage::Begin)
-			ImGui::Spring(0);
+		//if (oldStage == Stage::Begin)
+			//ImGui::Spring(0);
 
 		ImGui::BeginHorizontal("content");
-		ImGui::Spring(0, 0);
+		//ImGui::Spring(0, 0);
 		break;
 
 	case Stage::Input:
@@ -272,27 +272,27 @@ bool util::NodeBuilder::SetStage(Stage stage)
 		break;
 
 	case Stage::Middle:
-		ImGui::Spring(1);
+		//ImGui::Spring(1);
 		ImGui::BeginVertical("middle", ImVec2(0, 0), 0.0f); //SS
 		break;
 
 	case Stage::Output:
-		if (oldStage == Stage::Middle || oldStage == Stage::Input)
+		/*if (oldStage == Stage::Middle || oldStage == Stage::Input)
 			ImGui::Spring(1);
 		else
-			ImGui::Spring(1, 0);
+			ImGui::Spring(1, 0);*/
 		ImGui::BeginVertical("outputs", ImVec2(0, 0), 0.0f);
 
 		ed::PushStyleVar(ed::StyleVar_PivotAlignment, ImVec2(1.0f, 0.5f));
 		ed::PushStyleVar(ed::StyleVar_PivotSize, ImVec2(0, 0));
 
-		if (!HasHeader)
-			ImGui::Spring(1, 0);
+		/*if (!HasHeader)
+			ImGui::Spring(1, 0);*/
 		break;
 
 	case Stage::End:
-		if (oldStage == Stage::Input)
-			ImGui::Spring(1, 0);
+		/*if (oldStage == Stage::Input)
+			ImGui::Spring(1, 0);*/
 		if (oldStage != Stage::Begin)
 			ImGui::EndHorizontal();
 		ContentMin = ImGui::GetItemRectMin();

@@ -8,7 +8,6 @@ void ax::Widgets::Icon(const ImVec2& size, IconType type, bool filled, const ImV
 	if (ImGui::IsRectVisible(size))
 	{
 		auto cursorPos = ImGui::GetCursorScreenPos();
-		//cursorPos.x += 100;
 		auto drawList = ImGui::GetWindowDrawList();
 		ax::Drawing::DrawIcon(drawList, cursorPos, cursorPos + size, type, filled, ImColor(color), ImColor(innerColor));
 	}

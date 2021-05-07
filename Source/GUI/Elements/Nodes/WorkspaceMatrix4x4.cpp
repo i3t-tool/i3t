@@ -31,6 +31,9 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
     int rowOfChange, columnOfChange;
     float valueOfChange, localData; /* user can change just one value at the moment */
 
+    //ImGui::BeginHorizontal(m_nodebase->getId());
+    //ImGui::Spring(1);
+
     ImGui::PushItemWidth(m_dataItemsWidth);
     /* Drawing is row-wise */
 
@@ -80,7 +83,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
       setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
     }
 
-    ImGui::Spring(1); /* \todo JH what is Spring? */
+    //ImGui::Spring(1);
 
 }
 
