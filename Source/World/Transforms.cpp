@@ -62,6 +62,7 @@ glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis){
 	if (glm::length2(axes[2]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
 
 	axes[0] = glm::normalize(axes[0])* glm::length((glm::vec3)transform[mapaxis[0]]);
+	if(glm::length2(glm::cross(axes[2],axes[0])) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[1]] = 1.0f;}
 	axes[1] = glm::normalize(glm::cross(axes[2], axes[0]))* glm::length((glm::vec3)transform[mapaxis[1]]);
 	axes[2] = glm::normalize(glm::cross(axes[0], axes[1]))* glm::length((glm::vec3)transform[mapaxis[2]]);
 
@@ -92,7 +93,8 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis){
 	if (glm::length2(axes[1]) < bias){axes[1] = glm::vec3(0.0f);axes[1][mapaxis[1]] = 1.0f;}
 	if (glm::length2(axes[2]) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[2]] = 1.0f;}
 
-	axes[0] = glm::normalize(axes[0]);
+	axes[0] = glm::normalize(axes[0]); 
+	if(glm::length2(glm::cross(axes[2],axes[0])) < bias){axes[2] = glm::vec3(0.0f);axes[2][mapaxis[1]] = 1.0f;}
 	axes[1] = glm::normalize(glm::cross(axes[2], axes[0]));
 	axes[2] = glm::normalize(glm::cross(axes[0], axes[1]));
 
@@ -100,7 +102,6 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis){
 	*((glm::vec3*)(&rot[mapaxis[0]])) = axes[0];
 	*((glm::vec3*)(&rot[mapaxis[1]])) = axes[1];
 	*((glm::vec3*)(&rot[mapaxis[2]])) = axes[2];
-
 	return rot;
 }
 glm::vec3 getScale(glm::mat4 transform){

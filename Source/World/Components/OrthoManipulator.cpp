@@ -10,6 +10,14 @@
 #include "Core/Input/InputManager.h"
 #include <typeinfo>
 
+void printMatrix7(glm::mat4 m) {
+	printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\n",
+		m[0][0], m[1][0], m[2][0], m[3][0],
+		m[0][1], m[1][1], m[2][1], m[3][1],
+		m[0][2], m[1][2], m[2][2], m[3][2],
+		m[0][3], m[1][3], m[2][3], m[3][3]);
+}
+
 const char* OrthoManipulator::s_type=nullptr;
 
 OrthoManipulator::OrthoManipulator(){
@@ -33,6 +41,7 @@ OrthoManipulator::OrthoManipulator(){
 	m_frustruml->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	m_cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	m_cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
+	m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
 	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void OrthoManipulator::start(){}
@@ -103,12 +112,10 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 			ManipulatorUtil::drawHandle(m_handle,transform,m_hposs[i]*m_hposs[i],m_stencils.arr[i],m_activehandle,m_hoverhandle);//hposs*hposs=absolute value
 		}
 
-		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
+		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[2]+=1.5f;
 
-		m_cameraico->transformation[3]+=mov;
-		m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+		m_cameraico->transformation[3]=mov;
 		m_cameraico->draw(transform);
-		m_cameraico->transformation[3]-=mov;
 		glDepthRange(0.0, 1.0);
 	}
 }
@@ -163,29 +170,29 @@ void OrthoManipulator::update(){
 
 	if(m_activehandle==m_stencils.names.n){
 		m_near-=drag2[0];
-		if(m_near>m_far-0.5f){m_near=m_far-0.5f;}
+		//if(m_near>m_far-0.5f){m_near=m_far-0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.f){
 		m_far-=drag2[0];
-		if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
+		//if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.l){
 		m_left+=drag2[0];
-		if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
+		//if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.r){
 		m_right+=drag2[0];
-		if(m_right<m_left+0.5f){m_right=m_left+0.5f;}
+		//if(m_right<m_left+0.5f){m_right=m_left+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.t){
 		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 				
 		m_top+=drag2[0]*sign;
-		if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
+		//if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.b){
 		m_bottom+=drag2[0];
-		if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
+		//if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
 	}
 	//printf("%f\n",pheight);
 	///

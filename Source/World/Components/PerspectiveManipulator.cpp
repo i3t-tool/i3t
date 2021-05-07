@@ -32,6 +32,7 @@ PerspectiveManipulator::PerspectiveManipulator(){
 	m_frustruml->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	m_cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	m_cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
+	m_cameraico->color = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
 	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void PerspectiveManipulator::start(){}
@@ -76,13 +77,11 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 			ManipulatorUtil::drawHandle(m_handle,transform,m_hposs[i]*m_hposs[i],m_stencils.arr[i],m_activehandle,m_hoverhandle);//hposs*hposs=absolute value
 		}
 
-		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
+		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[2]+=1.5f;
 		mov[2] = 1.5f;
 
-		m_cameraico->transformation[3]+=mov;
-		m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+		m_cameraico->transformation[3]=mov;
 		m_cameraico->draw(transform);
-		m_cameraico->transformation[3]-=mov;
 		glDepthRange(0.0, 1.0);
 	}
 }
@@ -155,57 +154,33 @@ void PerspectiveManipulator::update(){
 			
 	if(m_activehandle==m_stencils.names.n){
 		m_near-=dragfinal[0];
-		if(m_near<0.1f){m_near=0.1f;}
-		if(m_near>m_far-1.0f){m_near=m_far-1.0f;}
+		//if(m_near<0.1f){m_near=0.1f;}
+		//if(m_near>m_far-1.0f){m_near=m_far-1.0f;}
 	}
 	else if(m_activehandle==m_stencils.names.f){
 		m_far-=dragfinal[0]*2.0f;
-		if(m_far<m_near+1.0f){m_far=m_near+1.0f;}
+		//if(m_far<m_near+1.0f){m_far=m_near+1.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.l){
-		//printf("height %f\n",( m_far*tan(glm::radians(m_angle*0.5f)) ));
-		//printf("width %f\n",( m_far*tan(glm::radians(m_angle*0.5f)) )/( m_height/m_aspect ));
-		//printf("%f\n",glm::degrees(atan(1.0f)));
-		m_aspect+=-dragfinal[0]*0.09f;
-		if(m_aspect<0.1f){m_aspect=0.1f;}
-		else if(m_aspect>10.0f){m_aspect=10.0f;}
+	else if(m_activehandle==m_stencils.names.r|| m_activehandle == m_stencils.names.l){
+		float sign=(float)(m_activehandle==m_stencils.names.r)*2.0f-1.0f;
+		m_aspect+=sign*dragfinal[0]*0.12f;
+		//if(m_aspect<0.1f){m_aspect=0.1f;}
+		//else if(m_aspect>10.0f){m_aspect=10.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.r){
-		m_aspect+=+dragfinal[0]*0.09f;
-		if(m_aspect<0.1f){m_aspect=0.1f;}
-		else if(m_aspect>10.0f){m_aspect=10.0f;}
-	}
-	else if(m_activehandle==m_stencils.names.t){
+	else if(m_activehandle==m_stencils.names.t||m_activehandle==m_stencils.names.b){
 		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 				
 		float amount=dragfinal[0]*5.0f*sign;
-		if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
-		else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
+		//if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
+		//else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
 					
 		float f=tan(glm::radians((m_angle+amount)*0.5f))/tan(glm::radians(m_angle*0.5f));
 
 		float f2=1.0f;
-		if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
-		else if(m_aspect>10.0f*f){f2=0.1f*(m_aspect);}
-		else{m_aspect/=f;m_angle+=amount;}
-		//if(f2!=1.0f){
-		amount=glm::degrees(atan(f2*tan(glm::radians(m_angle*0.5f))))*2.0f-m_angle;
-		m_aspect/=f2;
-		m_angle+=amount;
-		//}
-	}
-	else if(m_activehandle==m_stencils.names.b){
-		//printf("b\n");
-		float amount=-dragfinal[0]*5.0f;
-		if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
-		else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
-					
-		float f=tan(glm::radians((m_angle+amount)*0.5f))/tan(glm::radians(m_angle*0.5f));
-
-		float f2=1.0f;
-		if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
-		else if(m_aspect>10.0f*f){f2=0.1f*(m_aspect);}
-		else{m_aspect/=f;m_angle+=amount;}
+		//if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
+		//else if(m_aspect>10.0f*f){f2=0.1f*(m_aspect);}
+		//else{m_aspect/=f;m_angle+=amount;}
+		m_aspect/=f;m_angle+=amount;
 		//if(f2!=1.0f){
 		amount=glm::degrees(atan(f2*tan(glm::radians(m_angle*0.5f))))*2.0f-m_angle;
 		m_aspect/=f2;

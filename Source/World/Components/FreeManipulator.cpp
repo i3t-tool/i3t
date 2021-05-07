@@ -127,7 +127,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 		}
 		else if(m_editaxis==3){
 			m_uniscaleh->transformation=glm::mat4(1.0f)*scale;
-			ManipulatorUtil::drawHandle(m_uniscaleh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
+			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace,glm::vec4(1.0f,0.2f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
 		}
 	}
 	else{
@@ -365,12 +365,12 @@ void FreeManipulator::update(){
 	else if(m_editmode==FreeManipulator::EDIT_SCALE){
 		drag3*=0.005f;
 					
-		if(m_editaxis==3){
-			m_edited[3]+=m_bkp[3]*drag3[2]/glm::length((glm::vec3)m_bkp[3]);
+		if(m_editaxis==3&& glm::length2((glm::vec3)m_bkp[3])>0.0005f){
+			m_edited[3]+=m_bkp[3]*drag3[2]/(glm::length((glm::vec3)m_bkp[3]));
 			m_edited[3][3]=1.0f;
 		}
-		else{
-			m_edited[m_editaxis]+=m_bkp[m_editaxis]*drag3[m_editaxis]/glm::length((glm::vec3)m_bkp[m_editaxis]);
+		else if(glm::length2((glm::vec3)m_bkp[m_editaxis])>0.0005f){
+			m_edited[m_editaxis]+=m_bkp[m_editaxis]*drag3[m_editaxis]/(glm::length((glm::vec3)m_bkp[m_editaxis]));
 		}
 		//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 		//glm::mat4 ftransform=m_edited;

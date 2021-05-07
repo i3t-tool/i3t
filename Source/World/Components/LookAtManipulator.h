@@ -23,7 +23,7 @@ public:
 private:
 	static const char* s_type;
 
-	GameObject*m_planeh,*m_arrowh,*m_threeaxis;
+	GameObject*m_planeh,*m_arrowh,*m_threeaxis,*m_cameraico;
 	char m_stencilx,m_stencily,m_stencilz,m_stencilzx,m_stencilzy,m_stencilyx;
 	int m_activehandle=-1,m_hoverhandle=-1,m_axisnum=-1,m_axisnum2=-1;
 	glm::mat4 m_handlespace=glm::mat4(1.0f);///<transformation of handles - handles are not parent of any object

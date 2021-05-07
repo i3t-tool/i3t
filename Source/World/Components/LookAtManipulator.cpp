@@ -24,7 +24,10 @@ LookAtManipulator::LookAtManipulator() {
 
 	m_planeh =	new GameObject(quadMesh,		&World::shaderHandle,	0);
 	m_arrowh =	new GameObject(arrowMesh,		&World::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
+	m_cameraico=new GameObject(cameraicoMesh,	&World::shaderHandle,	0);
+	m_cameraico->transform(glm::vec3(0.0f,0.0f,1.5f),glm::vec3(0.5f),glm::vec3(1.0f, 0.0f, 0.0f), -90.0f);
+	m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);	
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
@@ -51,20 +54,21 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	glDepthRange(0.0, 0.01);
 
 	m_threeaxis->draw(ftransform);
+	m_cameraico->draw(ftransform*scale);
 
 	m_arrowh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_arrowh,getOrtho(m_handlespace,0),glm::vec4(1.0f,0.0f,0.0f,1.0f),m_stencilx,m_activehandle,m_hoverhandle);
 	m_arrowh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_arrowh,getOrtho(m_handlespace,1),glm::vec4(0.0f,1.0f,0.0f,1.0f),m_stencily,m_activehandle,m_hoverhandle);
-	m_arrowh->transformation=glm::mat4(1.0f)*scale;
+	m_arrowh->transformation=scale;
 	ManipulatorUtil::drawHandle(m_arrowh,getOrtho(m_handlespace,2),glm::vec4(0.1f,0.4f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
 			
-	m_planeh->transformation=glm::mat4(1.0f)*scale;
+	m_planeh->transformation=scale;
 	m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.0f,1.0f,1.0f,0.7f),m_stencilzy,m_activehandle,m_hoverhandle);
 	m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.7f),m_stencilzx,m_activehandle,m_hoverhandle);
-	m_planeh->transformation=glm::mat4(1.0f)*scale;
+	m_planeh->transformation=scale;
 	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,1.0f,0.0f,0.7f),m_stencilyx,m_activehandle,m_hoverhandle);
 
 	glDepthRange(0.0, 1.0);

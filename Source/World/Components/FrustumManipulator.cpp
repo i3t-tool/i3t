@@ -33,6 +33,7 @@ FrustumManipulator::FrustumManipulator(){
 	m_frustruml->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	m_cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	m_cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
+	m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
 	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void FrustumManipulator::start(){}
@@ -77,13 +78,11 @@ void FrustumManipulator::render(glm::mat4*parent,bool renderTransparent){
 			ManipulatorUtil::drawHandle(m_handle,transform,m_hposs[i]*m_hposs[i],m_stencils.arr[i],m_activehandle,m_hoverhandle);//hposs*hposs=absolute value
 		}
 
-		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
+		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[2]+=1.5f;
 		mov[2] = 1.5f;
 
-		m_cameraico->transformation[3]+=mov;
-		m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+		m_cameraico->transformation[3]=mov;
 		m_cameraico->draw(transform);
-		m_cameraico->transformation[3]-=mov;
 		glDepthRange(0.0, 1.0);
 	}
 }
@@ -151,16 +150,16 @@ void FrustumManipulator::update(){
 			
 	if(m_activehandle==m_stencils.names.n){
 		m_near-=dragfinal[0];
-		if(m_near<0.01f){m_near=0.01f;}
-		if(m_near>m_far-0.5f){m_near=m_far-0.5f;}
+		//if(m_near<0.01f){m_near=0.01f;}
+		//if(m_near>m_far-0.5f){m_near=m_far-0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.f){
 		m_far-=dragfinal[0];
-		if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
+		//if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.l){
 		m_left+=dragfinal[0];
-		if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
+		//if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.r){
 		m_right+=dragfinal[0];
@@ -170,12 +169,12 @@ void FrustumManipulator::update(){
 		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 
 		m_top+=dragfinal[0];
-		if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
+		//if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.b){
 		//printf("b\n");
 		m_bottom+=dragfinal[0];
-		if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
+		//if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
 	}
 		//printf("%f\n",m_height);
 	//printf("%f\n",pheight);
