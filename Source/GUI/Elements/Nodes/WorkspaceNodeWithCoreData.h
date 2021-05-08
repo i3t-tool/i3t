@@ -91,6 +91,7 @@ public:
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawData(util::NodeBuilder& builder, int index);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+  virtual void drawMiddle(util::NodeBuilder& builder);
 
 	virtual void drawDataFull(util::NodeBuilder& builder, int index)=0;
 	virtual void drawDataSetValues(util::NodeBuilder& builder)=0;

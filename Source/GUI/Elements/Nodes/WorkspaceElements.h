@@ -125,6 +125,7 @@ public:
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
 	virtual void drawData(util::NodeBuilder& builder, int index)=0;
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+  virtual void drawMiddle(util::NodeBuilder& builder)=0;
 
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime

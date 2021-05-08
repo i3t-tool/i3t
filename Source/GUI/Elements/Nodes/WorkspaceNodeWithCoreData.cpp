@@ -86,12 +86,19 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 
 	for (Core::Pin const &pin : inputPins)
 	{
-        m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
-				  pin.getId()
-                //, fmt::format("##{}", pin.getIndex())
-				        , pin.getLabel()
-                , pin
-                , *this ));
+		if(nodeLabel == "Sequence"){
+      m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , fmt::format("##{}", pin.getIndex())
+          , pin
+          , *this ));
+		}else{
+      m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , pin.getLabel()
+          , pin
+          , *this ));
+		}
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
@@ -99,12 +106,19 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 
 	for (Core::Pin const &pin : outputPins)
 	{
-		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
-                  pin.getId()
-               // , fmt::format("##{}", pin.getIndex())
-                , pin.getLabel()
-                , pin
-                , *this ));
+    if(nodeLabel == "Sequence"){
+      m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , fmt::format("##{}", pin.getIndex())
+          , pin
+          , *this ));
+		}else{
+      m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , pin.getLabel()
+          , pin
+          , *this ));
+		}
 	}
 }
 
@@ -116,7 +130,8 @@ std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::g
 
 bool WorkspaceNodeWithCoreData::isSequence()
 {
-    return false;
+	  return m_nodebase->getOperation() == NULL;
+    //return fw.name == "WorkspaceSequence";
 }
 
 bool WorkspaceNodeWithCoreData::isTransformation()
@@ -409,19 +424,13 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
 
-	//here draw data
-	if(isTransformation()){
-		/*ImGui::BeginHorizontal(m_nodebase->getId());
-    ImGui::Spring(1);*/
-		drawData(builder, 0);
-    /*ImGui::Spring(1);
-		ImGui::EndHorizontal();*/
-	}else{
-
 		builder.Output(pinProp->getId());
-    ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
-    drawData(builder, outputIndex);
-		ImGui::EndVertical();
+
+		if(!isTransformation()){
+      ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
+      drawData(builder, outputIndex);
+      ImGui::EndVertical();
+		}
 
 	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
       ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
@@ -447,7 +456,13 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 	    ImGui::PopStyleVar();
 
       builder.EndOutput();
-		}
+}
+
+void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
+	if(isTransformation()){
+		builder.Middle();
+		drawData(builder, 0);
+	}
 }
 
 /* \todo use newLinkPin arg*/

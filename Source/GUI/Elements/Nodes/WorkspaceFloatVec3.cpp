@@ -118,10 +118,10 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 int WorkspaceFloatVec3::maxLenghtOfData()
 {
 	if(fw.name == "float"){
-    return numberOfCharWithDecimalPoint( m_nodebase->getData().getFloat(), m_numberOfVisibleDecimal );
+    return numberOfCharWithDecimalPoint( m_nodebase->getData(0).getFloat(), m_numberOfVisibleDecimal );
 	}else if(fw.name == "vector3") {
     int act, maximal = 0;
-    const glm::vec3& coreData = m_nodebase->getData().getVec3();
+    const glm::vec3& coreData = m_nodebase->getData(1).getVec3();
 
     for(int column=0; column < 3; column++)
     {

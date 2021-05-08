@@ -79,19 +79,23 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 		drawInputs(builder, newLinkPin);
 	}
 
-	//if (withPins)
-	//{
+	drawMiddle(builder);
+
+	if (withPins)
+	{
 	  drawOutputs(builder, newLinkPin);
-	//}
+	}
 
 	builder.End();
 }
+
+
 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 
   Theme& t = I3T::getTheme();
-  m_color =	t.get(EColor::NodeHeader);
+  m_color =	t.getHeader();
 	builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());

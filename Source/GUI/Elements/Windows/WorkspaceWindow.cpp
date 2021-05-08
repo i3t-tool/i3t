@@ -91,12 +91,11 @@ void WorkspaceWindow::render()
 
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 	{
-
-		//SS to MH how to get current theme?
 		Theme& t = I3T::getTheme();
 		if(workspaceCoreNode->isTransformation()){
 			t.transformationColorTheme();
-		}else{
+		}else
+		{
 			t.operatorColorTheme();
 		}
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);

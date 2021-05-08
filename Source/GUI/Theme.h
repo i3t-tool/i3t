@@ -159,4 +159,6 @@ public:
 
 	void operatorColorTheme();
 	void transformationColorTheme();
+
+  ImVec4 getHeader();
 };

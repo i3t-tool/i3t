@@ -26,8 +26,8 @@ Theme::Theme()
 	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
 	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 
-	set(EColor::NodeHeaderOperator, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f)); // WIP
-	set(EColor::NodeHeaderTranformation, ImVec4(89.0f / 255.0f, 134.0f / 179.0f, 116.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f)); // WIP
+	set(EColor::NodeHeaderTranformation, ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
@@ -119,11 +119,23 @@ void Theme::apply()
 void Theme::operatorColorTheme()
 {
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
-	set(EColor::NodeHeader, m_colors[EColor::NodeHeaderOperator]);
 }
 
 void Theme::transformationColorTheme()
 {
-	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgTransformation];
-	set(EColor::NodeHeader, m_colors[EColor::NodeHeaderTranformation]);
+  ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgTransformation];
+}
+
+bool isVectorsEqual(ImVec4 a, ImVec4 b){
+  return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w ? true : false;
+}
+
+ImVec4 Theme::getHeader(){
+  if(isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg], m_colors[EColor::NodeBgOperator])){
+		return m_colors[EColor::NodeHeaderOperator];
+	}
+  if(isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg], m_colors[EColor::NodeBgTransformation])){
+    return m_colors[EColor::NodeHeaderTranformation];
+  }
+	return ImVec4(0,0,0,0);
 }
