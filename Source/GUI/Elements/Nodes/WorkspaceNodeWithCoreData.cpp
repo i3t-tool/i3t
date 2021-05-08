@@ -401,11 +401,14 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
     ImGui::Spring(1);
     ImGui::EndVertical();
 
-    //if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-    if (true && !pinProp->getLabel().empty())
-    {
-      ImGui::TextUnformatted(pinProp->getLabel().c_str());
-    }
+    if (pinProp->getShowLabel()){
+			if(pinProp->getLabel().empty()){
+        ImGui::TextUnformatted(pinProp->getCorePin().getLabel());
+			}else{
+        ImGui::TextUnformatted(pinProp->getLabel().c_str());
+			}
+		}
+
     ImGui::PopStyleVar();
     builder.EndInput();
 	}
@@ -430,6 +433,10 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
         }
 	}*/
 
+	if(!isTransformation()){
+
+	}
+
   ImGui::BeginVertical(m_nodebase->getId());
   ImGui::Spring(1);
 
@@ -439,6 +446,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
   }
 
   ImGui::EndVertical();
+
 }
 
 void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
@@ -449,7 +457,7 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 		builder.Output(pinProp->getId());
 
-		if(!isTransformation()){
+		if(!isTransformation() && !isCamera() && !isSequence()){ //is Operator
       ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
       drawData(builder, outputIndex);
       ImGui::EndVertical();

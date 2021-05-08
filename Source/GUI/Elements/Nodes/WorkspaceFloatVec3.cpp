@@ -10,7 +10,7 @@ WorkspaceFloatVec3::WorkspaceFloatVec3(ImTextureID headerBackground, WorkspaceFl
   fw.showMyPopup = false;
   fw.id = "";
   fw.value = NAN;
-  fw.name = "floatVec3";
+  fw.name = "float";
   fw.rows = 0;
   fw.columns = 0;
   setDataItemsWidth();
@@ -22,7 +22,7 @@ WorkspaceFloatVec3::WorkspaceFloatVec3(ImTextureID headerBackground, Ptr<Core::N
   fw.showMyPopup = false;
   fw.id = "";
   fw.value = NAN;
-  fw.name = "floatVec3";
+  fw.name = "float";
   fw.rows = 0;
   fw.columns = 0;
   setDataItemsWidth();
