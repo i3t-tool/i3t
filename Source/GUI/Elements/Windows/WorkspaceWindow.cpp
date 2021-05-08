@@ -267,12 +267,18 @@ std::vector<Ptr<WorkspaceSequence>> WorkspaceWindow::getSequenceNodes()
 {
     std::vector<Ptr<WorkspaceSequence>> allSequenceNodes;
     Ptr<WorkspaceNodeWithCoreData> temp;
+
     for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
     {
         temp = getWorkspaceCoreNodeByID(node->getId());
         if (temp->isSequence())
         {
             allSequenceNodes.push_back(std::dynamic_pointer_cast<WorkspaceSequence>(temp));
+        }else if (temp->isCamera())
+        {
+            Ptr<WorkspaceCamera> temp_camera = std::dynamic_pointer_cast<WorkspaceCamera>(temp);
+            allSequenceNodes.push_back(temp_camera->getProjection());
+            allSequenceNodes.push_back(temp_camera->getView());
         }
     }
 
@@ -763,12 +769,12 @@ void WorkspaceWindow::checkQueryContextMenus()
 			ImGui::Text("add transforamtion");
 			ImGui::Separator();
 			if (ImGui::MenuItem("free")) {
-        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTransformationFree>(m_headerBackgroundTexture));
-        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+                m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTransformationFree>(m_headerBackgroundTexture));
+                ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::MenuItem("translation")) {
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
-        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+                m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
+                ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::BeginMenu("rotation")) {
 
@@ -1235,6 +1241,8 @@ void WorkspaceWindow::checkQueryContextMenus()
             ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 		if (ImGui::MenuItem("camera")) {
+            m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
+            ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 		if (ImGui::MenuItem("screen")) {
 		}

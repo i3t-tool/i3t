@@ -110,6 +110,15 @@ std::vector<Ptr<WorkspaceLinkProperties>> const& WorkspaceNodeWithCoreData::getL
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getInputsProperties() const  { return m_workspaceInputsProperties; }
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getOutputsProperties() const { return m_workspaceOutputsProperties; }
 
+bool WorkspaceNodeWithCoreData::inSequence()
+{
+    if (isTransformation())
+    {
+        return m_nodebase->as<Core::Transformation>()->isInSequence();
+    }
+    return false;
+}
+
 bool WorkspaceNodeWithCoreData::isSequence()
 {
     return false;
@@ -124,16 +133,6 @@ bool WorkspaceNodeWithCoreData::isTransformation()
 {
     return m_nodebase->as<Core::Transformation>() != nullptr;
 }
-
-bool WorkspaceNodeWithCoreData::inSequence()
-{
-    if (isTransformation())
-    {
-        return m_nodebase->as<Core::Transformation>()->isInSequence();
-    }
-    return false;
-}
-
 
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
 {
@@ -309,10 +308,10 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
 {
-    if(isTransformation())
-	  {
-		  builder.Middle();
-	  }
+    if(!isTransformation())
+      {
+          builder.Middle();
+      }
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
@@ -417,12 +416,13 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
 
-	//here draw data
-	if(isTransformation()){
-      drawData(builder, 0);
-	}else{
       builder.Output(pinProp->getId());
-      drawData(builder, outputIndex);
+
+      if (isTransformation())
+      {
+          drawData(builder, outputIndex);
+      }
+
 
 	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
       ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
@@ -444,7 +444,6 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
       ImGui::PopStyleVar();
 	  ImGui::PopStyleVar();
       builder.EndOutput();
-		}
 }
 
 /* \todo use newLinkPin arg*/

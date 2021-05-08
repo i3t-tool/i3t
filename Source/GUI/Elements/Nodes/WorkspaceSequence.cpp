@@ -10,7 +10,7 @@ WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequ
 	fw.name = "WorkspaceSequence";
 }
 
-WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel, Ptr<Core::Sequence> nodebase)
+WorkspaceSequence::WorkspaceSequence(ImTextureID headerBackground, Ptr<Core::Sequence> nodebase, std::string headerLabel, std::string nodeLabel)
     : WorkspaceNodeWithCoreData(headerBackground, nodebase == nullptr ? Core::Builder::createSequence() : nodebase, headerLabel, nodeLabel)
 {
 	fw.showMyPopup = false;

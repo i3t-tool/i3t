@@ -65,9 +65,10 @@ public:
     std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
 
     virtual bool isCamera();
-    virtual bool inSequence();
+    virtual bool isSequence();
     bool isTransformation();
 
+    virtual bool inSequence();
 
     int getNumberOfVisibleDecimal();
     int setNumberOfVisibleDecimal(int value);

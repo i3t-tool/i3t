@@ -83,13 +83,12 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
         drawInputs(builder, newLinkPin);
     }
 
+	drawData(builder, 0);
 
-	//drawData(builder);
-
-    //if (withPins)
-    //{
+    if (withPins)
+    {
         drawOutputs(builder, newLinkPin);
-    //}
+    }
 
 	builder.End();
 }

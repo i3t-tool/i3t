@@ -20,7 +20,7 @@ protected:
     std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceTransformation;
 public:
 	WorkspaceSequence(ImTextureID headerBackground, WorkspaceSequenceArgs const& args);
-    WorkspaceSequence(ImTextureID headerBackground, std::string headerLabel = "default Sequence header", std::string nodeLabel = "Sequence", Ptr<Core::Sequence> nodebase = nullptr);
+    WorkspaceSequence(ImTextureID headerBackground, Ptr<Core::Sequence> nodebase = nullptr, std::string headerLabel = "default Sequence header", std::string nodeLabel = "Sequence");
 
     void setPostionOfDummyData(int positionOfDummyData = -1);
     void setWidthOfDummy(int width = 0);

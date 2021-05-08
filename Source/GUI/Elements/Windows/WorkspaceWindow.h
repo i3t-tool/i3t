@@ -24,6 +24,8 @@
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 #include "Core/API.h"
 
+#include "../Nodes/WorkspaceCamera.h"
+
 //transformations{
 #include "../Nodes/WorkspaceAxisAngle.h"
 #include "../Nodes/WorkspaceEulerX.h"
