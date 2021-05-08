@@ -37,7 +37,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 {
 	/* \todo Some better default values - take from Const.h*/
 	m_color = ImColor(255, 255, 255);
-	m_size = ImVec2(100, 100);
+	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
 }
 
@@ -48,7 +48,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 	/* \todo Some better default values - take from Const.h*/
 	Theme t;
 	m_color =	t.get(EColor::NodeHeader);
-	m_size = ImVec2(100, 100);
+	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
 }
 
@@ -78,6 +78,7 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 
 	drawHeader(builder);
 
+
 	if (withPins)
 	{
 		drawInputs(builder, newLinkPin);
@@ -89,6 +90,7 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 	{
 	  drawOutputs(builder, newLinkPin);
 	}
+
 
 	builder.End();
 }
@@ -149,7 +151,7 @@ ImColor const WorkspaceLinkProperties::getColor() const {return m_color; }
 float const WorkspaceLinkProperties::getThickness() const {return m_thickness; }
 
 WorkspacePinProperties::WorkspacePinProperties(ne::PinId const id, std::string label)
-		: m_id(id), m_label(label), m_showLabel(false), m_iconSize(12), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
+		: m_id(id), m_label(label), m_showLabel(true), m_iconSize(12), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
 {}
 
 

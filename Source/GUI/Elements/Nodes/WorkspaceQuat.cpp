@@ -30,7 +30,7 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
 {
 	// SS WIP
   const glm::quat& coreData = m_nodebase->getData(index).getQuat();
-  int const coreMap[4] = {1,2,3,4}; //todo JH will be map for vector?
+  const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
   int const idOfNode = this->m_id.Get();
 
   bool valueChanged = false;

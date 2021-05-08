@@ -327,10 +327,6 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
 {
-    if(isTransformation())
-	  {
-		  builder.Middle();
-	  }
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
@@ -402,12 +398,28 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
     ImGui::EndVertical();
 
     if (pinProp->getShowLabel()){
-			if(pinProp->getLabel().empty()){
-        ImGui::TextUnformatted(pinProp->getCorePin().getLabel());
-			}else{
-        ImGui::TextUnformatted(pinProp->getLabel().c_str());
-			}
-		}
+      if(pinProp->getLabel().empty()){ //it's never empty :(
+
+        auto label = pinProp->getCorePin().getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else
+        {
+          ImGui::TextUnformatted(label);
+        }
+
+      }else{
+
+        auto label = pinProp->getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else{
+          ImGui::TextUnformatted(label.c_str());
+        }
+
+      }
+      ImGui::Spring(1);
+    }
 
     ImGui::PopStyleVar();
     builder.EndInput();
@@ -434,19 +446,17 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 	}*/
 
 	if(!isTransformation()){
+    ImGui::BeginVertical(m_nodebase->getId());
+    ImGui::Spring(1);
 
-	}
-
-  ImGui::BeginVertical(m_nodebase->getId());
-  ImGui::Spring(1);
-
-  for (auto const & pinProp : m_workspaceInputsProperties)
-  {
+    for (auto const & pinProp : m_workspaceInputsProperties)
+    {
       drawInputPin(builder, pinProp, newLinkPin);
-  }
+    }
 
-  ImGui::EndVertical();
-
+    ImGui::Spring(1);
+    ImGui::EndVertical();
+	}
 }
 
 void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
@@ -463,17 +473,36 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
       ImGui::EndVertical();
 		}
 
-	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
-      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+	  //ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(1000.0f, 1000.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
     ImGui::Spring(1);
 
-      //if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-			if (true && !pinProp->getLabel().empty())
-      {
-        ImGui::TextUnformatted(pinProp->getLabel().c_str());
-        ImGui::Spring(1);
+
+    if (pinProp->getShowLabel()){
+      if(pinProp->getLabel().empty()){ //it's never empty :(
+
+        auto label = pinProp->getCorePin().getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else
+				{
+          ImGui::TextUnformatted(label);
+				}
+
+      }else{
+
+        auto label = pinProp->getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else{
+          ImGui::TextUnformatted(label.c_str());
+        }
+
       }
+      ImGui::Spring(1);
+    }
+
 
       // color.Value.w = alpha / 255.0f;
       ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
@@ -481,9 +510,9 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
                         pinProp->isConnected(),
                         WorkspacePinColor[pinProp->getType()],
                         pinProp->getColor());
-      ImGui::Spring(1);
+      //ImGui::Spring(1);
 
-      ImGui::PopStyleVar();
+      //ImGui::PopStyleVar();
 	    ImGui::PopStyleVar();
 
       builder.EndOutput();
@@ -491,8 +520,10 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
 	if(isTransformation()){
-		builder.Middle();
+		//builder.Middle();
+    ImGui::BeginVertical(m_nodebase->getId());
 		drawData(builder, 0);
+    ImGui::EndVertical();
 	}
 }
 
