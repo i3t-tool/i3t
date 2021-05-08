@@ -67,6 +67,10 @@ ImTextureID WorkspaceNode::getHeaderBackground()
     return m_headerBackground;
 }
 
+bool WorkspaceNode::dataAreValid()
+{
+    return false; /* \todo this function will return true on default  */
+}
 void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
 {
 
@@ -89,8 +93,6 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 	builder.End();
 }
 
-
-
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 
@@ -100,8 +102,15 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y
-	//ImGui::Dummy(ImVec2(0, 28));
-	//ImGui::Spring(0);
+	if(!dataAreValid()) /* \todo JH function for check validity of data here */
+    {
+        ax::Widgets::Icon(ImVec2(20, 20), /* \todo JH size based on header size */
+                            IconType::Square,
+                            true,
+                            ImColor(255,0,0),
+                            ImColor(0,0,0)); /* \todo JH not constant here... */ //SS what is this?
+    }
+	ImGui::Spring(0);
 
 	builder.EndHeader();
 }

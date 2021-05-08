@@ -136,6 +136,8 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
+	virtual bool dataAreValid();
+
 };
 
 class WorkspacePinProperties

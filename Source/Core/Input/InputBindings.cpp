@@ -2,6 +2,7 @@
 
 #include "InputManager.h"
 
+
 std::vector<Keys::Code> g_defaultAction;
 std::vector<std::pair<Keys::Code, float>> g_defaultAxis;
 
