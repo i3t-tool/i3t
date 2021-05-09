@@ -21,18 +21,41 @@ void InputManager::init()
 	InputBindings::init();
 }
 
-void InputManager::setInputAction(const char* action, Keys::Code code)
+void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersList mods)
 {
-	if (!InputBindings::isActionCreated(action))
-		InputBindings::m_inputActions.insert({action, {code}});
+	if (!InputBindings::isActionCreated(name))
+  {
+    InputBindings::m_inputActions.insert({
+				name,
+				{
+						{ code, createModifiers(mods) }
+				}
+		});
+  }
 }
 
-void InputManager::setInputAxis(const char* action, float scale, Keys::Code code)
+void InputManager::setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods)
 {
 	if (!InputBindings::isAxisCreated(action))
-		InputBindings::m_inputAxis[action];
+  {
+		InputBindings::m_inputAxis.insert({
+        action,
+        {
+            { code, scale, createModifiers(mods) },
+				}
+    });
+	}
+}
 
-	InputBindings::m_inputAxis[action].push_back({code, scale});
+bool InputManager::areModifiersActive(Modifiers mods)
+{
+	bool active = false;
+
+  active |= mods[0] ? isKeyPressed(Keys::Code::ctrll)  : false;
+  active |= mods[1] ? isKeyPressed(Keys::Code::altl)   : false;
+  active |= mods[2] ? isKeyPressed(Keys::Code::shiftl) : false;
+
+	return active;
 }
 
 bool InputManager::isActionTriggered(const char* name, EKeyState state)
@@ -44,16 +67,16 @@ bool InputManager::isActionTriggered(const char* name, EKeyState state)
 	bool result = false;
 	if (state == EKeyState::Released)
   {
-    for (auto key : keys)
+    for (auto action : keys)
     {
-			result |= isKeyJustUp(key);
+			result |= isKeyJustUp(action.code);
     }
 	}
 	if (state == EKeyState::Pressed)
   {
-    for (auto key : keys)
+    for (auto action : keys)
     {
-      result |= isKeyJustPressed(key);
+      result |= isKeyJustPressed(action.code);
     }
 	}
 
@@ -105,7 +128,7 @@ void InputManager::processViewportEvents()
 		m_mouseY = cursorYPos;
 	}
 
-	/// \todo MH
+	/// \todo MH check if this code is active.
 
 	/*
 	// Avoid catching events outside of window.
@@ -185,12 +208,14 @@ void InputManager::update()
 	{
 		for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
 		{
-			auto keys = InputBindings::m_inputActions[action];
-			for (const auto& key : keys)
+			auto& keys = InputBindings::m_inputActions[action];
+			for (const auto& [key, mods] : keys)
 			{
+				// Check if key is in desired state.
 				bool shouldProcess =
-						m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
-            m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released;
+            (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
+            m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released)  &&
+            areModifiersActive(mods);
 
 				if (shouldProcess) fn();
       }
@@ -199,9 +224,13 @@ void InputManager::update()
 		for (const auto& [action, fn] : m_focusedWindow->Input.m_axis)
 		{
 			auto keys = InputBindings::m_inputAxis[action];
-			for (const auto& [key, scale] : keys)
+			for (const auto& [key, scale, mods] : keys)
 			{
-				if (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN)
+				bool shouldProcess =
+            (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) &&
+						areModifiersActive(mods);
+
+				if (shouldProcess)
 				{
 					fn(scale);
 				}

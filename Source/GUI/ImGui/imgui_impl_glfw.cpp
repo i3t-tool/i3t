@@ -133,8 +133,20 @@ void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int acti
 	if (action == GLFW_PRESS && button >= 0 && button < IM_ARRAYSIZE(g_MouseJustPressed))
 		g_MouseJustPressed[button] = true;
 
-	// Events are ignored by ImGui, if the camera is controlled by user input.
-	if (InputManager::m_ignoreImGuiEvents && action == GLFW_RELEASE)
+	if (action == GLFW_PRESS)
+  {
+    switch (button)
+    {
+    case GLFW_MOUSE_BUTTON_MIDDLE:
+      InputManager::setPressed(Keys::mouseMiddle);
+      break;
+    case GLFW_MOUSE_BUTTON_RIGHT:
+      InputManager::setPressed(Keys::mouseRight);
+      break;
+    }
+	}
+
+	if (action == GLFW_RELEASE)
 	{
 		switch (button)
 		{
