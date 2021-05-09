@@ -165,6 +165,22 @@ void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yo
 	if (g_PrevUserCallbackScroll != NULL && window == g_Window)
 		g_PrevUserCallbackScroll(window, xoffset, yoffset);
 
+	if (abs(yoffset) < 0.0001)
+  {
+		InputManager::setUnpressed(Keys::mouseScrlDown);
+		InputManager::setUnpressed(Keys::mouseScrlUp);
+	}
+	else if (yoffset > 0.0)
+  {
+    InputManager::setPressed(Keys::mouseScrlUp);
+    InputManager::setUnpressed(Keys::mouseScrlDown);
+	}
+  else if (yoffset < 0.0)
+  {
+    InputManager::setPressed(Keys::mouseScrlDown);
+    InputManager::setUnpressed(Keys::mouseScrlUp);
+  }
+
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseWheelH += (float)xoffset;
 	io.MouseWheel += (float)yoffset;

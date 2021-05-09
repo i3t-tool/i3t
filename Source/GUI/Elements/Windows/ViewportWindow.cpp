@@ -15,6 +15,11 @@
 
 using namespace UI;
 
+void onScroll(float val)
+{
+	Log::info("Scroll: {}", val);
+}
+
 /// \todo Use Framebuffer class.
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
@@ -63,6 +68,10 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
   {
     Log::info("move: {}", val);
   });
+
+
+	// Scrolling
+  Input.bindAxis("MouseScroll", onScroll);
 }
 
 float localData;

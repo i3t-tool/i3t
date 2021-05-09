@@ -49,11 +49,9 @@ void InputManager::setInputAxis(const char* action, float scale, Keys::Code code
 
 bool InputManager::areModifiersActive(Modifiers mods)
 {
-	bool active = false;
-
-  active |= mods[0] ? isKeyPressed(Keys::Code::ctrll)  : false;
-  active |= mods[1] ? isKeyPressed(Keys::Code::altl)   : false;
-  active |= mods[2] ? isKeyPressed(Keys::Code::shiftl) : false;
+  bool active = mods[0] ? isKeyPressed(Keys::Code::ctrll)  : true;
+  active &= mods[1] ? isKeyPressed(Keys::Code::altl)   : true;
+  active &= mods[2] ? isKeyPressed(Keys::Code::shiftl) : true;
 
 	return active;
 }
@@ -250,6 +248,10 @@ void InputManager::update()
 			m_keyMap[it->first] = DOWN;
 		}
 	}
+
+	/// \todo MH mouse scroll release.
+	m_keyMap[Keys::Code::mouseScrlUp]   = KeyState::UP;
+	m_keyMap[Keys::Code::mouseScrlDown] = KeyState::UP;
 }
 
 void InputManager::keyDown(int keyPressed)
