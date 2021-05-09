@@ -229,6 +229,8 @@ struct Config
 	 */
 	static std::string getAbsolutePath(const char* filename)
 	{
+		//Defined in compiler, still doesnt exist
+#define I3T_RELEASE_STANDALONE
 #ifdef I3T_RELEASE_STANDALONE
     std::string path = std::string(filename);
 #else

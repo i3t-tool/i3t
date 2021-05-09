@@ -45,7 +45,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(!renderTransparent){return;}
 
 	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
-	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
+	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase

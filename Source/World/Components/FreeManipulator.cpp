@@ -64,7 +64,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	else if(m_editmode==FreeManipulator::EDIT_SCALE){handle=m_scaleh;}
 		
 	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
-	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
+	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 
 	glm::vec4 row4bkp = glm::vec4(m_edited[0][3], m_edited[1][3], m_edited[2][3], m_edited[3][3]);
@@ -155,6 +155,10 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	
 void FreeManipulator::update(){ 
 	if(m_editednode==nullptr){return;}
+	glm::mat4 changed= m_editednode.get()->getData().getMat4();
+	for(int i=0;i<4;i++){
+		for(int j=0;j<4;j++){if(changed[i][j]!=m_edited[i][j]){m_editaxis=i;break;}}//active axis that was changed from workspace
+	}
 	m_edited= m_editednode.get()->getData().getMat4();
 	//printf("4\n");
 	bool transactionBegin=false;
@@ -201,6 +205,8 @@ void FreeManipulator::update(){
 	m_edited[1][3]=0.0f;
 	m_edited[2][3]=0.0f;
 	m_edited[3][3]=1.0f;
+
+
 
 	if(m_activehandle==-1){
 		if (InputManager::isKeyPressed(Keys::r)){m_editmode = FreeManipulator::EDIT_ROTATION;}
