@@ -82,7 +82,10 @@ void CameraControl::update()
 	{
 		move *= 3.0f;
 	}
-
+	if(World::scroll!=0.0f){
+		move[2] -= World::scroll * 0.5f;
+		moved = true;
+	}
 	if (moved)
 	{
 		move = getRotation(m_gameObject->transformation, 2) * move;

@@ -13,11 +13,11 @@ class InputController
 	friend class InputManager;
 
 	struct Action{
-		Action(std::string _name,EKeyState _state,KeyCallback _fn){
+		/*Action(std::string _name,EKeyState _state,KeyCallback _fn){
 			name=_name;
 			state=_state;
 			fn=_fn;
-		}
+		}*/
 		std::string name;
 		EKeyState state;
 		KeyCallback fn;

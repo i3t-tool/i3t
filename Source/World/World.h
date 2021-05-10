@@ -112,7 +112,9 @@ public:
     //static std::map<const char*, GLuint > textures;
     //static std::map<const char*, pgr::MeshData > models;
     
+    static float scroll;
 private:
     static bool initializedRender; ///< Was render already initialized?
     bool started=false;///<Was start() already called on this instance of World?
+    
 };

@@ -24,6 +24,7 @@ void onScroll(float val)
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
+	Input.bindAxis("MouseScroll",[this](float val){m_world->scroll=val;});
 
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
@@ -69,9 +70,9 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
     Log::info("move: {}", val);
   });
 
-
+  
 	// Scrolling
-  Input.bindAxis("MouseScroll", onScroll);
+  //Input.bindAxis("MouseScroll", onScroll);
 }
 
 float localData;

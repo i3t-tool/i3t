@@ -13,6 +13,8 @@ std::shared_ptr<Core::NodeBase>World::tmpNode;
 Core::SequencePtr World::tmpSequence = Core::SequencePtr();
 Core::SequencePtr World::tmpSequence2 = Core::SequencePtr();
 
+float World::scroll=0.0f;
+
 glm::mat4 World::perspective = glm::mat4(1.0f);
 glm::mat4 World::mainCamera = glm::mat4(1.0f);
 glm::vec3 World::World::mainCamPos = glm::vec3(0.0f);
@@ -312,6 +314,9 @@ void World::onUpdate(){
     World::height= viewport[3];
     if(!this->started){ printf("World:call start() before update()!\n"); return;}
     updateRecursive(this->sceneRoot);
+
+    scroll*=0.85f;
+    if(scroll*scroll<0.0005f){scroll=0.0f;}
 
     CHECK_GL_ERROR();
 }
