@@ -74,7 +74,9 @@ void Application::run()
 {
 	while (!m_bShouldClose)
 	{
-		// Process commands.
+    glfwWaitEvents();
+
+    // Process commands.
 		for (auto& command : m_commands)
 		{
 			command->execute();
@@ -89,9 +91,6 @@ void Application::run()
 
 		// Update and display.
 		onDisplay();
-
-		// Poll events.
-		glfwWaitEvents();
 	}
 }
 
