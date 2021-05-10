@@ -5,6 +5,17 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Logger/Logger.h"
 
+LogWindow::LogWindow()
+{
+	Input.bindAction("MyTestAction", EKeyState::Pressed, [] {
+    Log::info("MyTestAction triggered!");
+	});
+
+	Input.bindAxis("MyTestAxis", [](float val) {
+	  Log::info("MyTestAxis triggered: {}!", val);
+  });
+}
+
 void LogWindow::render()
 {
 	ImGui::Begin(getName("Log View").c_str(), getShowPtr());
@@ -28,9 +39,9 @@ void LogWindow::render()
 
   ImGui::Text("Switch fire action key"); ImGui::SameLine();
   std::string s;
-  for (auto key : InputBindings::getActionKeys("fire"))
+  for (auto action : InputBindings::getActionMapping("fire"))
   {
-		s += std::to_string(key);
+		s += std::to_string(action.code);
 	}
 	ImGui::Text("Current keys: %s", s.c_str());
 	if (ImGui::Button("Switch"))

@@ -133,8 +133,20 @@ void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int acti
 	if (action == GLFW_PRESS && button >= 0 && button < IM_ARRAYSIZE(g_MouseJustPressed))
 		g_MouseJustPressed[button] = true;
 
-	// Events are ignored by ImGui, if the camera is controlled by user input.
-	if (InputManager::m_ignoreImGuiEvents && action == GLFW_RELEASE)
+	if (action == GLFW_PRESS)
+  {
+    switch (button)
+    {
+    case GLFW_MOUSE_BUTTON_MIDDLE:
+      InputManager::setPressed(Keys::mouseMiddle);
+      break;
+    case GLFW_MOUSE_BUTTON_RIGHT:
+      InputManager::setPressed(Keys::mouseRight);
+      break;
+    }
+	}
+
+	if (action == GLFW_RELEASE)
 	{
 		switch (button)
 		{
@@ -152,6 +164,22 @@ void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yo
 {
 	if (g_PrevUserCallbackScroll != NULL && window == g_Window)
 		g_PrevUserCallbackScroll(window, xoffset, yoffset);
+
+	if (abs(yoffset) < 0.0001)
+  {
+		InputManager::setUnpressed(Keys::mouseScrlDown);
+		InputManager::setUnpressed(Keys::mouseScrlUp);
+	}
+	else if (yoffset > 0.0)
+  {
+    InputManager::setPressed(Keys::mouseScrlUp);
+    InputManager::setUnpressed(Keys::mouseScrlDown);
+	}
+  else if (yoffset < 0.0)
+  {
+    InputManager::setPressed(Keys::mouseScrlDown);
+    InputManager::setUnpressed(Keys::mouseScrlUp);
+  }
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseWheelH += (float)xoffset;

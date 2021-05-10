@@ -271,6 +271,8 @@ class QuatRot : public Transformation
 {
 	glm::quat m_initialQuat;
 
+	glm::quat m_normalized;
+
 public:
 	QuatRot(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::Quat)), m_initialQuat(q)
@@ -278,6 +280,8 @@ public:
 	}
 
 	void reset() override;
+
+	const glm::quat& getNormalized() const;
 
 	ValueSetResult setValue(const glm::quat& vec);
 	ValueSetResult setValue(const glm::vec4& vec) override;

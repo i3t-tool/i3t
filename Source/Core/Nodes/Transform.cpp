@@ -577,8 +577,14 @@ void QuatRot::reset()
 	setInternalValue(m_initialQuat);
 }
 
+const glm::quat& QuatRot::getNormalized() const
+{
+  return m_normalized;
+};
+
 ValueSetResult QuatRot::setValue(const glm::quat& q)
 {
+	m_normalized = glm::normalize(q);
   setInternalValue(glm::toMat4(q));
   return ValueSetResult{};
 }

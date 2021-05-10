@@ -321,3 +321,17 @@ TEST(QuatRotTest, RotShouldBeValid)
 
 	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(quat));
 }
+
+TEST(QuatRotTest, NodeValueShouldBeNormalized)
+{
+	auto rot = Builder::createTransform<QuatRot>();
+
+  auto vec = generateVec4();
+  auto quat = glm::quat(vec.x, vec.y, vec.z, vec.w);
+
+	setValue_expectOk(rot, quat);
+
+	auto normalized = glm::normalize(quat);
+
+  EXPECT_EQ(normalized, rot->getNormalized());
+}

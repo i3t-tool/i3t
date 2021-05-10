@@ -85,10 +85,12 @@ public:
 	static void init();
 	static glm::vec2 getMouseDelta() { return { m_mouseXDelta, m_mouseYDelta }; }
 
-	static void setInputAction(const char* action, Keys::Code code);
-	static void setInputAxis(const char* action, float scale, Keys::Code code);
+	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
+	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
 
   static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
+
+	static bool areModifiersActive(Modifiers mods);
 
   /**
    * Set window within mouse input actions should be listened to.

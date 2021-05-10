@@ -7,6 +7,6 @@ class LogWindow : public IWindow
 public:
 	I3T_WINDOW(LogWindow)
 
-	LogWindow() = default;
+	LogWindow();
 	void render() override;
 };
