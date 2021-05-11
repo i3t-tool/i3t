@@ -23,6 +23,7 @@ public:
 	*/
 	static int getStencil(char at);
 	static void hint(const char*label);
+	static void hintAt(const char*label, glm::vec2 pos);
 private:
 	static bool s_stencilInit;
 	static char s_stencilArr[7];

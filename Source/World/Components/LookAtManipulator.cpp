@@ -33,7 +33,16 @@ LookAtManipulator::LookAtManipulator() {
 	m_edited=glm::mat4(1.0f);
 }
 void LookAtManipulator::GUI() {
-	if(m_activehandle!=-1){ManipulatorUtil::hint("Move center of LookAt transformation matrix.");}
+	if(m_activehandle!=-1){
+		ManipulatorUtil::hint("Move center of LookAt transformation matrix.");
+
+		//char txt[100];
+		//sprintf(txt,"X: %0.3f, Y: %0.3f, Z: %0.3f",m_handlespace[3][0],m_handlespace[3][1],m_handlespace[3][2]);
+		//ManipulatorUtil::hintAt("jj",world2screen((glm::vec3)m_handlespace[3])-glm::vec2(0.0f,20.0f));
+		glm::vec2 pos=world2screen((glm::vec3)m_handlespace[3])-glm::vec2(90.0f,70.0f);
+		ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
+		ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", m_handlespace[3][0], m_handlespace[3][1], m_handlespace[3][2]);
+	}
 }
 void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(m_editednode==nullptr){return;}

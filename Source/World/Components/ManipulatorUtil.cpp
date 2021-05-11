@@ -34,3 +34,10 @@ void ManipulatorUtil::hint(const char* label) {
 	ImGui::Text(label);
 	//ImGui::PopStyleColor();
 }
+void ManipulatorUtil::hintAt(const char* label,glm::vec2 pos) {
+	ImGui::SetCursorPos(ImVec2(pos.x,World::height-pos.y));
+	//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+	//ImGui::
+	ImGui::Text(label);
+	//ImGui::PopStyleColor();
+}
