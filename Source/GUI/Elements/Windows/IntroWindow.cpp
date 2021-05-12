@@ -12,6 +12,26 @@
 
 IntroWindow::IntroWindow(bool show) : IWindow(show)
 {
+  // load images
+  try {
+    dummyImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "dummy.png"));
+  }
+  catch (std::runtime_error& e) {
+    LOG_ERROR(e.what())
+  }
+  try {
+    folderImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "pilkaFolder.png"));
+  }
+  catch (std::runtime_error& e) {
+    LOG_ERROR(e.what())
+  }
+  try {
+    cvutImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "dcgi-logo-60.png"));
+  }
+  catch (std::runtime_error& e) {
+    LOG_ERROR(e.what())
+  }
+  
   reloadTutorials();
 }
 
@@ -39,36 +59,71 @@ void IntroWindow::reloadTutorials()
 
 void IntroWindow::render()
 {
+  ImVec2 windowSize = ImVec2(1020, 600);
+  static bool firstTime = true;
+  if (firstTime) {
+    firstTime = false;
+    ImGui::SetNextWindowSize(windowSize);
+  }
+  const float leftBarWidth = 330;
+  const float loadBtnWidth = 120;
+  const float startNewBtnWidth = loadBtnWidth;
+  const float thumbImageSize = 80;
+  const float startBtnWidth = 120;
+
   ImGui::PushStyleColor(ImGuiCol_WindowBg , IM_COL32_WHITE);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6);
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
-  ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
-  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(51, 51, 51, 255));
-  ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(215, 215, 215, 255));
-  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(232, 232, 232, 255));
-  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(240, 240, 240, 255));
-  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(245, 245, 245, 255));
-  ImGui::SetNextWindowSize(ImVec2(800, 500));
-  ImGui::Begin("Intro", getShowPtr(), ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking); 
+  ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 14);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.8f * windowSize.x, 0.8f * windowSize.y));
+  //ImGui::PushStyleColor(ImGuiCol_TitleBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(202, 202, 202, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(202, 202, 202, 255));
+  ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(202, 202, 202, 255));
+  ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(202, 202, 202, 255));
+  ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
+  ImGui::Begin("Intro", getShowPtr(), ImGuiWindowFlags_NoDocking); 
   {
-    // LEFT
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20, 20));
-    ImGui::BeginChild("logo", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.36f, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    // LEFT CHILD WINDOW
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30, 30));
+    ImGui::BeginChild("logo", ImVec2(leftBarWidth, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
     {
-      // CONTENT
-      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Title));
-      ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::ActiveColor));
-      ImGui::TextWrapped("Learn Transformations");
+      // TITLE
+      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::I3TTitle));
+      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+      ImGui::Text("Learn\nTransformations");
       ImGui::PopStyleColor();
       ImGui::PopFont();
 
-      ImGui::Spacing();
+      ImGui::Dummy(ImVec2(0, 10));
+      // DOTS
+      float size = 10.f;
+      float space = 7.f;
+      ImVec2 screenPos = ImGui::GetCursorScreenPos();
+      float x = screenPos.x;
+      float y = screenPos.y;
+      ImDrawList* draw_list = ImGui::GetWindowDrawList();
+      for (int i = 0; i < 3; i++) {
+        draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x + size, y + size), IM_COL32(8, 187, 230, 255));
+        x += size + space;
+      }
+      ImGui::Dummy(ImVec2(0, size));
 
-      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Tab));
-      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_BLACK);
+      ImGui::Dummy(ImVec2(0, 10));
+      // DESCRIPTION
+      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::I3TDescription));
+      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
       ImGui::TextWrapped("I3T is an educational application which enables the study of 3D transformation and their hierarchy in an illustrative way.");
       ImGui::PopStyleColor();
       ImGui::PopFont();
+
+      // IMAGE
+      if (cvutImage) {
+        ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - cvutImage->m_height);
+        ImGui::Image((ImTextureID)cvutImage->m_texID, ImVec2(cvutImage->m_width, cvutImage->m_height));
+      }
 
       ImGui::EndChild();
     }
@@ -76,80 +131,182 @@ void IntroWindow::render()
 
     ImGui::SameLine();
 
-    // RIGHT
+    // RIGHT CHILD WINDOW
     ImGui::PushStyleColor(ImGuiCol_ChildBg , Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
     ImGui::BeginChild("panel", ImVec2(0, 0), false);
-    { 
-      // HEADER
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20, 20));
-      ImGui::BeginChild("header", ImVec2(0, 80), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    {
+      // WRAPPER CHILD WINDOW
+      const ImVec2 outerPadding = ImVec2(10, 10);
+      const ImVec2 innerPadding = ImVec2(10, 10);
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, outerPadding);
+      ImGui::BeginChild("wrapper", ImVec2(0, thumbImageSize + 2 * (outerPadding.y + innerPadding.y)), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
       {
-        ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Header));
-        ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::PrimaryColor));
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Choose file");
-        ImGui::PopStyleColor();
-        ImGui::PopFont();
-
-        //ImGui::GetFontSize()
-        //ImGui::SetNextItemWidth(100.0f);
-
-        const float loadBtnWidth = 80;
-        const float startBtnWidth = 120;
-        const float itemSpacing = ImGui::GetStyle().ItemSpacing.x;
-        //const float itemSpacing = ImGui::GetStyle().
-        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - (loadBtnWidth + startBtnWidth + itemSpacing));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-        if (ImGui::Button("Load", ImVec2(loadBtnWidth, 0)))
+        // SCENE PICKER CHILD WINDOW
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, innerPadding);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg , IM_COL32_WHITE);
+        ImGui::BeginChild("header", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollbar);
         {
-          // todo load from file
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Start new", ImVec2(startBtnWidth, 0))) {
-          *this->getShowPtr() = false;
+          // FOLDER IMAGE
+          if (folderImage) {
+            //ImVec2 offset = ImVec2(ImGui::GetCursorPosX() + (thumbImageSize - folderImage->m_width)/2,ImGui::GetCursorPosY() + (thumbImageSize - folderImage->m_height)/2);
+            //ImGui::Dummy(ImVec2(thumbImageSize, thumbImageSize));
+            //ImGui::SetCursorPos(offset);
+            ImGui::Image((ImTextureID)folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+          }
+          else {
+            
+          }
+          ImGui::SameLine();
+          // YOUR SCENE TEXT
+          //ImGui::AlignTextToFramePadding();
+          ImGui::BeginGroup();
+          {
+            ImGui::BeginVertical("yourScene", ImVec2(0, 0));
+            ImGui::Spring(1);  // not working
+
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
+            ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
+            ImGui::Text("Your scene");
+            ImGui::PopFont();
+            ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemDescription));
+            ImGui::Text("Start with an empty scene or load your previous work.");
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+
+            ImGui::Spring(1);  // not working
+            ImGui::EndVertical();
+            ImGui::EndGroup();
+          }
+
+          //ImGui::GetFontSize()
+          //ImGui::SetNextItemWidth(100.0f);
+        
+          //const float itemSpacing = ImGui::GetStyle().
+          ImGui::SameLine(ImGui::GetContentRegionMax().x - (loadBtnWidth + ImGui::GetStyle().WindowPadding.x + 5));
+          // BUTTONS
+          ImGui::BeginGroup();
+          {
+            ImGui::BeginVertical("buttons", ImVec2(0, 0));
+            ImGui::Spring(1);
+
+            ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
+            if (ImGui::Button("New", ImVec2(startNewBtnWidth, 0))) {
+              *this->getShowPtr() = false;
+            }
+            //ImGui::SameLine();
+            ImGui::Dummy(ImVec2(0, 2));
+            if (ImGui::Button("Load", ImVec2(loadBtnWidth, 0)))
+            {
+              // todo load from file
+            }
+            ImGui::PopStyleColor(2);
+            ImGui::PopFont();
+
+            ImGui::Spring(1);
+            ImGui::EndVertical();
+            ImGui::EndGroup();
+          }
+          ImGui::EndChild(); // SCENE PICKER
         }
         ImGui::PopStyleColor();
-        ImGui::EndChild(); // header
+        ImGui::PopStyleVar(2);
+        ImGui::EndChild(); // wrapper
       }
       ImGui::PopStyleVar();
 
-      ImGui::Spacing();
-      // LIST
+
+      //ImGui::Spacing();
+
+
       ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20, 0));
-      ImGui::BeginChild("list", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+      //// TABS
+      //if (ImGui::BeginTabBar("TabBar")) 
+      //{
+      //  // TUTORIALS
+      //  if (ImGui::BeginTabItem("Tutorials")) 
+      //  {
+      // TUTORIAL LIST CHILD WINDOW
+      ImGui::BeginChild("Tutorial list", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
       {
+        //ImGui::Separator();
         for (auto& header : m_tutorial_headers) {
           // ITEM
           ImGui::BeginGroup();
           {
+            const float titleDescWidth = ImGui::GetContentRegionAvail().x - (thumbImageSize + startBtnWidth);
+
+            ImGui::Columns(3, "ThreeCols", false);
+            ImGui::SetColumnWidth(0, thumbImageSize + 2 * ImGui::GetStyle().ColumnsMinSpacing);
+            ImGui::SetColumnWidth(1, titleDescWidth - 2 * ImGui::GetStyle().ColumnsMinSpacing);
+            //ImGui::SetColumnWidth(2, startBtnWidth);
+
             auto img = header->m_thumbnailImage;
             if (img) {
-              ImGui::Image((ImTextureID)img->m_texID, ImVec2(50, 50));
+              ImGui::Image((ImTextureID)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
             }
             else {
               //todo load dummy at introwindow init
-              ImGui::Image(nullptr, ImVec2(50, 50));
-            }
-            ImGui::SameLine();
-            std::string buttonName = header->m_title + "##" + header->m_filename;
-            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-            if (ImGui::Button(buttonName.c_str(), ImVec2(0,0))) {
-              auto tutorial = TutorialLoader::loadTutorial(header);
-              if (tutorial.has_value()) {
-                Log::debug("Tutorial " + header->m_title + " loaded");
-                SetTutorialCommand::dispatch(tutorial.value());
+              if (dummyImage) {
+                ImGui::Image((ImTextureID)dummyImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
               }
               else {
-                Log::info("ERR: Tutorial " + header->m_title + " not loaded");
+                ImGui::Image(nullptr, ImVec2(thumbImageSize, thumbImageSize));
               }
             }
-            ImGui::PopStyleColor();
-            ImGui::SameLine();
-            ImGui::Text(header->m_filename.c_str());
-            ImGui::Text(header->m_description.c_str());
-            ImGui::Dummy(ImVec2(20, 5));
+
+            ImGui::NextColumn();
+            //ImGui::SameLine();
+            ImGui::BeginGroup();
+            {
+              // TITLE
+              ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+              ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
+              ImGui::TextWrapped(header->m_title.c_str());
+              ImGui::PopStyleColor();
+              ImGui::PopFont();
+              // DESCRIPTIONS
+              ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
+              ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemDescription));
+              ImGui::TextWrapped(header->m_description.c_str());
+              ImGui::PopStyleColor();
+              ImGui::PopFont();
+              ImGui::EndGroup();
+            }
+
+            ImGui::NextColumn();
+            //ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - ImGui::GetStyle().WindowPadding.x);
+            // START BUTTON
+            ImGui::BeginGroup();
+            {
+              ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
+              ImGui::Spring(1);
+              ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
+              ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+              if (ImGui::Button("Start", ImVec2(startBtnWidth,0))) {
+                auto tutorial = TutorialLoader::loadTutorial(header);
+                if (tutorial.has_value()) {
+                  Log::debug("Tutorial " + header->m_title + " loaded");
+                  SetTutorialCommand::dispatch(tutorial.value());
+                }
+                else {
+                  Log::info("ERR: Tutorial " + header->m_title + " not loaded");
+                }
+              }
+              ImGui::PopStyleColor();
+              ImGui::PopFont();
+              ImGui::Spring(1);
+              ImGui::EndVertical();
+              ImGui::EndGroup();
+            }
+            ImGui::Columns(1); // end columns
+            ImGui::Dummy(ImVec2(0, 2));
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(0, 2));
+            ImGui::EndGroup();
           }
-          ImGui::EndGroup();
           // ITEM ACTIONS
           if (ImGui::IsItemHovered()) {
             ImGui::BeginTooltip();
@@ -159,16 +316,31 @@ void IntroWindow::render()
         }
         ImGui::EndChild(); // list
       }
+      //    ImGui::EndTabItem();
+      //  }
+      //  // TEMPLATES
+      //  if (ImGui::BeginTabItem("Templates")) 
+      //  {
+      //    ImGui::Text("List of preset scene files");
+      //    ImGui::EndTabItem();
+      //  }
+      //  // RECENT
+      //  if (ImGui::BeginTabItem("Recent")) 
+      //  {
+      //    ImGui::Text("List of recent files files");
+      //    ImGui::EndTabItem();
+      //  }
+      //  ImGui::EndTabBar();
+      //}
       ImGui::PopStyleVar();
-      
-      ImGui::EndChild(); // panel
+      ImGui::EndChild(); // right panel
     }
     ImGui::PopStyleColor();
 
     ImGui::End(); // window
   }
-  ImGui::PopStyleVar(3);
-  ImGui::PopStyleColor(6);
+  ImGui::PopStyleVar(5);
+  ImGui::PopStyleColor(7);
 
 }
 

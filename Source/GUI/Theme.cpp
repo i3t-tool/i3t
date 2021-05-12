@@ -33,6 +33,10 @@ Theme::Theme()
 	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
 	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
 	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
+	m_fontsAssoc.insert(std::pair(EFont::I3TTitle, 7));
+	m_fontsAssoc.insert(std::pair(EFont::I3TDescription, 8));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemTitle, 6));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemDescription, 2));
 
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 60.0f;
@@ -54,7 +58,8 @@ void Theme::init()
 		0x0080, 0x07FF, // Czech 
 		0,
 	};
-
+  ImFontConfig font_cfg;
+  font_cfg.GlyphExtraSpacing.x = -0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirkku
 	m_fonts = {
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
 	                                 14.0f * m_fontScale, nullptr, ranges),
@@ -68,6 +73,12 @@ void Theme::init()
 	                                 14.0f * m_fontScale, nullptr, ranges),
       io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
                                    20.0f * m_fontScale, nullptr, ranges),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
+                                   18.0f * m_fontScale, nullptr, ranges),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
+                                   33.5f * m_fontScale, &font_cfg, ranges),
+      io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
+                                   17.5f * m_fontScale, nullptr, ranges),
 	};
 	io.FontDefault = get(EFont::MenuLarge);
 	io.Fonts->Build();

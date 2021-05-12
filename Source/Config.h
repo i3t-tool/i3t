@@ -68,6 +68,7 @@ struct Config
   ///< named objects))
   static std::string LOAD_SCENE; ///< The load scene
   static std::string TUTORIALS_FOLDER;
+  static std::string TEXTURE_FOLDER;
 
 	//@{
 
