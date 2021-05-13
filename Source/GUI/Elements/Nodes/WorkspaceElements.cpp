@@ -37,7 +37,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 {
 	/* \todo Some better default values - take from Const.h*/
 	m_color = ImColor(255, 255, 255);
-	m_size = ImVec2(100, 100);
+	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
 }
 
@@ -48,7 +48,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
 	/* \todo Some better default values - take from Const.h*/
 	Theme t;
 	m_color =	t.get(EColor::NodeHeader);
-	m_size = ImVec2(100, 100);
+	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
 }
 
@@ -67,6 +67,10 @@ ImTextureID WorkspaceNode::getHeaderBackground()
     return m_headerBackground;
 }
 
+bool WorkspaceNode::dataAreValid()
+{
+    return false; /* \todo this function will return true on default  */
+}
 void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
 {
 
@@ -74,18 +78,19 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 
 	drawHeader(builder);
 
-    if (withPins)
-    {
-        drawInputs(builder, newLinkPin);
-    }
 
+	if (withPins)
+	{
+		drawInputs(builder, newLinkPin);
+	}
 
-	//drawData(builder);
+	drawMiddle(builder);
 
-    //if (withPins)
-    //{
-        drawOutputs(builder, newLinkPin);
-    //}
+	if (withPins)
+	{
+	  drawOutputs(builder, newLinkPin);
+	}
+
 
 	builder.End();
 }
@@ -94,13 +99,20 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
 
   Theme& t = I3T::getTheme();
-  m_color =	t.get(EColor::NodeHeader);
+  m_color =	t.getHeader();
 	builder.Header(m_color);
 	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y
-	//ImGui::Dummy(ImVec2(0, 28));
-	//ImGui::Spring(0);
+	if(!dataAreValid()) /* \todo JH function for check validity of data here */
+    {
+        ax::Widgets::Icon(ImVec2(20, 20), /* \todo JH size based on header size */
+                            IconType::Square,
+                            true,
+                            ImColor(255,0,0),
+                            ImColor(0,0,0)); /* \todo JH not constant here... */ //SS what is this?
+    }
+	ImGui::Spring(0);
 
 	builder.EndHeader();
 }
@@ -139,12 +151,12 @@ ImColor const WorkspaceLinkProperties::getColor() const {return m_color; }
 float const WorkspaceLinkProperties::getThickness() const {return m_thickness; }
 
 WorkspacePinProperties::WorkspacePinProperties(ne::PinId const id, std::string label)
-		: m_id(id), m_label(label), m_showLabel(false), m_iconSize(24), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
+		: m_id(id), m_label(label), m_showLabel(true), m_iconSize(I3T::getTheme().get(ESize::Nodes_IconSizeX), I3T::getTheme().get(ESize::Nodes_IconSizeY)), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
 {}
 
 
 ne::PinId const WorkspacePinProperties::getId() const {return m_id;}
-int const WorkspacePinProperties::getIconSize() const {return m_iconSize;}
+ImVec2 const WorkspacePinProperties::getIconSize() const {return m_iconSize;}
 ImColor const WorkspacePinProperties::getColor() const {return m_color;}
 
 bool WorkspacePinProperties::getShowLabel() const {return m_showLabel;}

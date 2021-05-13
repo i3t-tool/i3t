@@ -24,6 +24,8 @@
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 #include "Core/API.h"
 
+#include "../Nodes/WorkspaceCamera.h"
+
 //transformations{
 #include "../Nodes/WorkspaceAxisAngle.h"
 #include "../Nodes/WorkspaceEulerX.h"
@@ -109,7 +111,7 @@
 //	quat{
 #include "../Nodes/WorkspaceQuatVecConjQuat.h"
 #include "../Nodes/WorkspaceQuatLength.h"
-/*#include "../Nodes/WorkspaceQuatFree.h"
+#include "../Nodes/WorkspaceQuatFree.h"
 #include "../Nodes/WorkspaceFloatVecToQuat.h"
 #include "../Nodes/WorkspaceAngleAxisToQuat.h"
 #include "../Nodes/WorkspaceVecVecToQuat.h"
@@ -121,7 +123,7 @@
 #include "../Nodes/WorkspaceQuatLongWaySlerp.h"
 #include "../Nodes/WorkspaceConjQuat.h"
 #include "../Nodes/WorkspaceQuatInverse.h"
-#include "../Nodes/WorkspaceNormalizeQuat.h"*/
+#include "../Nodes/WorkspaceNormalizeQuat.h"
 #include "../Nodes/WorkspaceQuatToFloatVec.h"
 #include "../Nodes/WorkspaceQuatToAngleAxis.h"
 //	} quat end
@@ -143,12 +145,11 @@
 #include "../Nodes/WorkspaceMatrixToFloats.h"
 #include "../Nodes/WorkspaceMatrixToTR.h"
 #include "../Nodes/WorkspaceMatrixToVectors.h"
-//#include "../Nodes/WorkspaceMatrixToQuat.h"
-//#include "../Nodes/WorkspaceFloatsToQuat.h"
+#include "../Nodes/WorkspaceMatrixToQuat.h"
+#include "../Nodes/WorkspaceFloatsToQuat.h"
 //  }
 //}operators end
 
-//#include "../Nodes/WorkspaceCamera.h"
 //#include "../Nodes/WorkspaceScreen.h"
 
 #include "Core/Input/InputManager.h"
@@ -215,6 +216,7 @@ public:
 	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
 	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
+	ne::Detail::Node *m_draged_node_nodeeditor;
 
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 

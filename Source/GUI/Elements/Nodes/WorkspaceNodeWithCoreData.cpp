@@ -53,7 +53,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
         m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
 				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())   //SS TODO make map of labels
+                //, fmt::format("##{}", pin.getIndex())
+				        , pin.getLabel()
                 , pin
                 , *this ));
 
@@ -65,8 +66,9 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 	{
 		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
                   pin.getId()
-                , fmt::format("##{}", pin.getIndex())
-                , pin
+                //, fmt::format("##{}", pin.getIndex())
+				        , pin.getLabel()
+				        , pin
                 , *this ));
 	}
 }
@@ -84,11 +86,19 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 
 	for (Core::Pin const &pin : inputPins)
 	{
-        m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
-				  pin.getId()
-                , fmt::format("##{}", pin.getIndex())
-                , pin
-                , *this ));
+		if(nodeLabel == "Sequence"){
+      m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , fmt::format("##{}", pin.getIndex())
+          , pin
+          , *this ));
+		}else{
+      m_workspaceInputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , pin.getLabel()
+          , pin
+          , *this ));
+		}
 
         m_workspaceLinksProperties.push_back(std::make_unique<WorkspaceLinkProperties>(
 				pin.getId()));
@@ -96,11 +106,19 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
 
 	for (Core::Pin const &pin : outputPins)
 	{
-		m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
-                  pin.getId()
-                , fmt::format("##{}", pin.getIndex())
-                , pin
-                , *this ));
+    if(nodeLabel == "Sequence"){
+      m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , fmt::format("##{}", pin.getIndex())
+          , pin
+          , *this ));
+		}else{
+      m_workspaceOutputsProperties.push_back(std::make_unique<WorkspaceCorePinProperties>(
+          pin.getId()
+          , pin.getLabel()
+          , pin
+          , *this ));
+		}
 	}
 }
 
@@ -109,16 +127,6 @@ Ptr<Core::NodeBase> const WorkspaceNodeWithCoreData::getNodebase() const {return
 std::vector<Ptr<WorkspaceLinkProperties>> const& WorkspaceNodeWithCoreData::getLinksProperties() const  { return m_workspaceLinksProperties; }
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getInputsProperties() const  { return m_workspaceInputsProperties; }
 std::vector<Ptr<WorkspaceCorePinProperties>> const& WorkspaceNodeWithCoreData::getOutputsProperties() const { return m_workspaceOutputsProperties; }
-
-bool WorkspaceNodeWithCoreData::isSequence()
-{
-    return false;
-}
-
-bool WorkspaceNodeWithCoreData::isTransformation()
-{
-    return m_nodebase->as<Core::Transformation>() != nullptr;
-}
 
 bool WorkspaceNodeWithCoreData::inSequence()
 {
@@ -129,6 +137,21 @@ bool WorkspaceNodeWithCoreData::inSequence()
     return false;
 }
 
+bool WorkspaceNodeWithCoreData::isSequence()
+{
+	  return m_nodebase->getOperation() == NULL;
+    //return fw.name == "WorkspaceSequence";
+}
+
+bool WorkspaceNodeWithCoreData::isCamera()
+{
+    return false;
+}
+
+bool WorkspaceNodeWithCoreData::isTransformation()
+{
+    return m_nodebase->as<Core::Transformation>() != nullptr;
+}
 
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
 {
@@ -149,7 +172,8 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
+	  ImFont* f = I3T::getTheme().get(EFont::Node);
+    float oneCharWidth = 0.57f * f->FontSize, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -188,7 +212,8 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
+	// make step a configurable constant.
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 0.01f, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
 	{
@@ -297,17 +322,13 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 		if (elem.first->get()->isConnected())
         {
             ne::Link(elem.second->get()->getId(), elem.first->get()->getParentPinId(), elem.first->get()->getId(),
-			         elem.second->get()->getColor(), elem.second->get()->getThickness());
+                     WorkspacePinColor[elem.first->get()->getType()], elem.second->get()->getThickness());
         }
 	}
 }
 
 void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
 {
-    if(isTransformation())
-	  {
-		  builder.Middle();
-	  }
     switch(m_levelOfDetail)
     {
     case WorkspaceLevelOfDetail::Full:
@@ -324,6 +345,25 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
         /* \todo JH log about not supported viewScale - this should not happen since m_levelOfDetail should not allow set some other than implemented levelOfDetail */
         drawDataFull(builder, index);
     }
+
+    if (m_inactiveMark != 0)
+    {
+        ImVec2 start = ne::GetNodePosition(m_id);
+        ImVec2 size = ne::GetNodeSize(m_id);
+        ImVec2 end = start + size;
+        if(m_inactiveMark > 0)
+        {
+            end.x -= (1-m_inactiveMark)*size.x;
+        }
+        else
+        {
+            start.x += m_inactiveMark*size.x;
+        }
+
+        //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
+        //ImGui::Dummy(const ImVec2& size);
+        ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
+    }
 }
 
 void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
@@ -335,32 +375,57 @@ void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
 
 void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin)
 {
+	if(!isTransformation()){
     float alpha = ImGui::GetStyle().Alpha;
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
+
 
     builder.Input(pinProp->getId());
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
+    ImGui::BeginVertical(pinProp->getId().AsPointer());
+    ImGui::Spring(1);
+
     // color.Value.w = alpha / 255.0f;
-    ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
-                        WorkspacePinShape[pinProp->getType()],
-                        pinProp->isConnected(),
-                        WorkspacePinColor[pinProp->getType()],
-                        pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
+    ax::Widgets::Icon(pinProp->getIconSize(),
+                      WorkspacePinShape[pinProp->getType()],
+                      pinProp->isConnected(), // SS add global variable. User test change or not.
+                      WorkspacePinColor[pinProp->getType()],
+                      pinProp->getColor());
 
-    ImGui::Spring(0);
 
-    if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-    {
-        ImGui::TextUnformatted(pinProp->getLabel().c_str());
-        ImGui::Spring(0);
+    ImGui::Spring(1);
+    ImGui::EndVertical();
+
+    if (pinProp->getShowLabel()){
+      if(pinProp->getLabel().empty()){ //it's never empty :(
+
+        auto label = pinProp->getCorePin().getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else
+        {
+          ImGui::TextUnformatted(label);
+        }
+
+      }else{
+
+        auto label = pinProp->getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else{
+          ImGui::TextUnformatted(label.c_str());
+        }
+
+      }
+      ImGui::Spring(1);
     }
 
     ImGui::PopStyleVar();
     builder.EndInput();
-
+	}
 }
 
 /* \todo use newLinkPin arg*/
@@ -368,7 +433,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 {
 	/*for (auto const & pinProp : m_workspaceInputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::MatrixMul)
+	    if(pinProp->getType() == EValueType::Matrix)
         {
             drawInputPin(builder, pinProp, newLinkPin);
         }
@@ -376,15 +441,24 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 	ImGui::Spring(2);
     for (auto const & pinProp : m_workspaceInputsProperties)
 	{
-	    if(pinProp->getType() != EValueType::MatrixMul)
+	    if(pinProp->getType() != EValueType::Matrix)
         {
             drawInputPin(builder, pinProp, newLinkPin);
         }
 	}*/
-  for (auto const & pinProp : m_workspaceInputsProperties)
-  {
+
+	if(!isTransformation()){
+    ImGui::BeginVertical(m_nodebase->getId());
+    ImGui::Spring(1);
+
+    for (auto const & pinProp : m_workspaceInputsProperties)
+    {
       drawInputPin(builder, pinProp, newLinkPin);
-  }
+    }
+
+    ImGui::Spring(1);
+    ImGui::EndVertical();
+	}
 }
 
 void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
@@ -393,34 +467,67 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
 
-	//here draw data
-	if(isTransformation()){
-      drawData(builder, 0);
-	}else{
-      builder.Output(pinProp->getId());
+		builder.Output(pinProp->getId());
+
+		if(!isTransformation() && !isCamera() && !isSequence()){ //is Operator
+      ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
       drawData(builder, outputIndex);
+      ImGui::EndVertical();
+		}
 
-	  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(100.0f, 100.0f));
-      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+	  //ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(1000.0f, 1000.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-      if (pinProp->getShowLabel() && !pinProp->getLabel().empty())
-      {
-        ImGui::TextUnformatted(pinProp->getLabel().c_str());
-        ImGui::Spring(1);
+    ImGui::Spring(1);
+
+
+    if (pinProp->getShowLabel()){
+      if(pinProp->getLabel().empty()){ //it's never empty :(
+
+        auto label = pinProp->getCorePin().getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else
+				{
+          ImGui::TextUnformatted(label);
+				}
+
+      }else{
+
+        auto label = pinProp->getLabel();
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+          ImGui::TextUnformatted("");
+        }else{
+          ImGui::TextUnformatted(label.c_str());
+        }
+
       }
+      ImGui::Spring(1);
+    }
+
 
       // color.Value.w = alpha / 255.0f;
-      ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
+      ax::Widgets::Icon(pinProp->getIconSize(),
                         WorkspacePinShape[pinProp->getType()],
-                        pinProp->isConnected(),
+                        false,
                         WorkspacePinColor[pinProp->getType()],
-                        pinProp->getColor()); 
-      ImGui::Spring(1);
+                        pinProp->getColor());
+      //ImGui::Spring(1);
 
-      ImGui::PopStyleVar();
-	  ImGui::PopStyleVar();
+      //ImGui::PopStyleVar();
+	    ImGui::PopStyleVar();
+
       builder.EndOutput();
-		}
+}
+
+void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
+	if(isTransformation()){
+		//builder.Middle();
+    ImGui::Spring(2, 2); //spring from left side. right side in builder.cpp
+    ImGui::BeginVertical(m_nodebase->getId());
+		drawData(builder, 0);
+    ImGui::EndVertical();
+	}
 }
 
 /* \todo use newLinkPin arg*/
@@ -428,7 +535,7 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 {
 	/*for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
-	    if(pinProp->getType() == EValueType::MatrixMul)
+	    if(pinProp->getType() == EValueType::Matrix)
         {
             drawOutputPin(builder, pinProp, newLinkPin);
         }
@@ -436,16 +543,19 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
 	ImGui::Spring(2);
     for (auto const & pinProp : m_workspaceOutputsProperties)
 	{
-	    if(pinProp->getType() != EValueType::MatrixMul)
+	    if(pinProp->getType() != EValueType::Matrix)
         {
             drawOutputPin(builder, pinProp, newLinkPin);
         }
 	}*/
 
-  for (auto const & pinProp : m_workspaceOutputsProperties)
-  {
+	if(!isTransformation()){
+    for (auto const & pinProp : m_workspaceOutputsProperties)
+    {
       drawOutputPin(builder, pinProp, newLinkPin, pinProp->getIndex());
-  }
+    }
+	}
+
 }
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, std::string label, Core::Pin const &pin, WorkspaceNodeWithCoreData &node)

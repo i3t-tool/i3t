@@ -31,18 +31,17 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 	//assert if operator its imposible to value change (except free operators)
 	const float coreData = m_nodebase->getData(index).getFloat();
 	int const idOfNode = this->m_id.Get();
-	int const map = m_nodebase->getDataMapRef()[0];
+  const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 
 	bool valueChanged = false;
 	float localData;
 
-	//builder.Middle();
-
 	ImGui::PushItemWidth(m_dataItemsWidth);
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
 
 	localData = coreData;
-	valueChanged |= drawDragFloatWithMap_Inline(&localData, map, fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */
+	valueChanged |= drawDragFloatWithMap_Inline(&localData, coreMap[0], fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */
 
 		if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
 		{
@@ -53,6 +52,7 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 
 
 	ImGui::PopStyleVar();
+  ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 
 	if (valueChanged)
@@ -61,10 +61,6 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 		m_nodebase->setValue(localData);
 		setDataItemsWidth();
 	}
-
-	ImGui::Spring(0);
-
-
 }
 
 int WorkspaceFloat::maxLenghtOfData()

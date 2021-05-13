@@ -10,7 +10,7 @@ struct WorkspaceQuatFreeArgs
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
   std::string headerLabel = "default Quat header";
   std::string nodeLabel = "default Quat label";
-  Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector4>();
+  Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Quat>();
 };
 
 class WorkspaceQuatFree : public WorkspaceQuat

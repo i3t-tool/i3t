@@ -125,6 +125,7 @@ public:
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
 	virtual void drawData(util::NodeBuilder& builder, int index)=0;
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
+  virtual void drawMiddle(util::NodeBuilder& builder)=0;
 
 	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
 	\brief update TouchTime
@@ -135,6 +136,8 @@ public:
 
 	float GetTouchProgress(const float constTouchTime);
 
+	virtual bool dataAreValid();
+
 };
 
 class WorkspacePinProperties
@@ -144,14 +147,14 @@ protected:
 
     bool m_showLabel;
 	std::string m_label;    /*! \brief Name of Pin */
-	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
+	ImVec2 m_iconSize; /*! \brief Size of Pin icon */
     ImColor m_color;
 
 public:
     WorkspacePinProperties(ne::PinId const id, std::string label);
 
     ne::PinId const getId() const;
-    int const getIconSize() const;
+    ImVec2 const getIconSize() const;
     ImColor const getColor() const;
 
     bool getShowLabel() const;
