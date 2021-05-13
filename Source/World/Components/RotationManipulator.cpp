@@ -143,9 +143,11 @@ void RotationManipulator::update() {
 		glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 		glm::vec3 pc = px*coef[1]+py*coef[2];
-		glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)axes[m_axisnum]));
+		glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)(ortho * axes[m_axisnum])));
+
 		m_dirbkp = glm::normalize(world2screen(p0)-world2screen(p0 + dir3));
 	}
+
 	mov[0]=m_dirbkp;
 	mov[1]=glm::vec2(mov[0][1],-mov[0][0]);
 
