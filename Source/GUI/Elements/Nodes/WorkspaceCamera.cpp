@@ -50,10 +50,24 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     m_dataRect = ImRect(dataLeftTop, dataLeftTop);
 
     ne::SetNodePosition(m_projection->getId(), m_dataRect.Min);
+  Theme& t = I3T::getTheme();
+  if(m_projection->isTransformation()){
+    t.transformationColorTheme();
+  }else
+  {
+    t.operatorColorTheme();
+  }
 	m_projection->drawNode(builder);
 	m_dataRect.Add(ImGui::GetItemRectMax());
 
 	ne::SetNodePosition(m_view->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
+
+  if(m_view->isTransformation()){
+    t.transformationColorTheme();
+  }else
+  {
+    t.operatorColorTheme();
+  }
 	m_view->drawNode(builder);
 	m_dataRect.Add(ImGui::GetItemRectMax());
 }

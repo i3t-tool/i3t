@@ -172,7 +172,8 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-    float oneCharWidth = 8, padding = 1; /* \todo JH take from some font setting */
+	  ImFont* f = I3T::getTheme().get(EFont::Node);
+    float oneCharWidth = 0.57f * f->FontSize, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -211,7 +212,8 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 1.0f, 0.0f, 0.0f, fmt::format("% .{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
+	// make step a configurable constant.
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 0.01f, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
 	{
@@ -320,7 +322,7 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 		if (elem.first->get()->isConnected())
         {
             ne::Link(elem.second->get()->getId(), elem.first->get()->getParentPinId(), elem.first->get()->getId(),
-			         elem.second->get()->getColor(), elem.second->get()->getThickness());
+                     WorkspacePinColor[elem.first->get()->getType()], elem.second->get()->getThickness());
         }
 	}
 }
@@ -387,11 +389,11 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
     ImGui::Spring(1);
 
     // color.Value.w = alpha / 255.0f;
-    ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
+    ax::Widgets::Icon(pinProp->getIconSize(),
                       WorkspacePinShape[pinProp->getType()],
-                      pinProp->isConnected(),
+                      pinProp->isConnected(), // SS add global variable. User test change or not.
                       WorkspacePinColor[pinProp->getType()],
-                      pinProp->getColor()); /* \todo JH not constant here... */ //SS what is this?
+                      pinProp->getColor());
 
 
     ImGui::Spring(1);
@@ -505,9 +507,9 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 
       // color.Value.w = alpha / 255.0f;
-      ax::Widgets::Icon(ImVec2(pinProp->getIconSize(), pinProp->getIconSize()),
+      ax::Widgets::Icon(pinProp->getIconSize(),
                         WorkspacePinShape[pinProp->getType()],
-                        pinProp->isConnected(),
+                        false,
                         WorkspacePinColor[pinProp->getType()],
                         pinProp->getColor());
       //ImGui::Spring(1);
@@ -521,6 +523,7 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
 	if(isTransformation()){
 		//builder.Middle();
+    ImGui::Spring(2, 2); //spring from left side. right side in builder.cpp
     ImGui::BeginVertical(m_nodebase->getId());
 		drawData(builder, 0);
     ImGui::EndVertical();
@@ -546,10 +549,13 @@ void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pi
         }
 	}*/
 
-  for (auto const & pinProp : m_workspaceOutputsProperties)
-  {
+	if(!isTransformation()){
+    for (auto const & pinProp : m_workspaceOutputsProperties)
+    {
       drawOutputPin(builder, pinProp, newLinkPin, pinProp->getIndex());
-  }
+    }
+	}
+
 }
 
 WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, std::string label, Core::Pin const &pin, WorkspaceNodeWithCoreData &node)

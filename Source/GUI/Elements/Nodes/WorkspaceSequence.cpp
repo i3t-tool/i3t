@@ -121,6 +121,9 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
                 ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
             }
 
+            Theme& t = I3T::getTheme();
+            t.transformationColorTheme();
+
             transformation->drawNode(builder, nullptr, false);
 
             m_dataRect.Add(ImGui::GetItemRectMax());

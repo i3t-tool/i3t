@@ -147,14 +147,14 @@ protected:
 
     bool m_showLabel;
 	std::string m_label;    /*! \brief Name of Pin */
-	int m_iconSize; /*! \brief Size of Pin icon \TODO: take from (move to) Const.h */
+	ImVec2 m_iconSize; /*! \brief Size of Pin icon */
     ImColor m_color;
 
 public:
     WorkspacePinProperties(ne::PinId const id, std::string label);
 
     ne::PinId const getId() const;
-    int const getIconSize() const;
+    ImVec2 const getIconSize() const;
     ImColor const getColor() const;
 
     bool getShowLabel() const;

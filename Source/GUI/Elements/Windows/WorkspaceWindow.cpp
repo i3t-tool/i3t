@@ -112,6 +112,8 @@ void WorkspaceWindow::render()
             m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
             if( m_draged_node->isTransformation())
             {
+                Theme& t = I3T::getTheme();
+                t.transformationColorTheme();
 
                 if (m_draged_node->inSequence())
                 {
@@ -680,6 +682,10 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue = -sqrt(3) / 2;
 				valueChange = true;
 			}
+      if (ImGui::Selectable("-2")) {
+        newValue = -2.0f;
+        valueChange = true;
+      }
 			if (ImGui::Selectable("-1")) {
 				newValue = -1.0f;
 				valueChange = true;
@@ -699,6 +705,10 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue = sqrt(2) / 2;
 				valueChange = true;
 			}
+      if (ImGui::Selectable("2")) {
+        newValue = 2.0f;
+        valueChange = true;
+      }
 			if (ImGui::Selectable("1")) {
 				newValue = 1.0f;
 				valueChange = true;

@@ -25,9 +25,17 @@ enum class EColor
 	TabColor,
 
   NodeBgOperator,
+  NodeHeaderOperator,
+  FloatBgOperator,
+  FloatBgOperatorActive,
+  FloatBgOperatorHovered,
+
   NodeBgTransformation,
-	NodeHeaderOperator,
-	NodeHeaderTranformation,
+  NodeHeaderTranformation,
+  FloatBgTransformation,
+  FloatBgTransformationActive,
+  FloatBgTransformationHovered,
+
 	NodeHeader,
 	NodeEditorBg,
 
@@ -59,15 +67,22 @@ enum class ESize
   Nodes_Rounding,
 	Nodes_FloatWidth,
 	Nodes_FloatMargin,
-	Nodes_ItemsSpacingX,
+  Nodes_BorderWidth,
+
+  Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
+
 	Nodes_floatPaddingX,
 	Nodes_floatPaddingY,
+
   Nodes_pinSpacingX,
   Nodes_pinSpacingY,
+
   Nodes_PivotAlignmentX,
   Nodes_PivotAlignmentY,
-  Nodes_BorderWidth,
+
+  Nodes_IconSizeX,
+  Nodes_IconSizeY,
 
 	COUNT
 };

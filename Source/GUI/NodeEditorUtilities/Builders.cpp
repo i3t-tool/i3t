@@ -61,6 +61,7 @@ void util::NodeBuilder::End()
 			const auto uv = ImVec2((HeaderMax.x - HeaderMin.x) / (float)(4.0f * HeaderTextureWidth),
 			                       (HeaderMax.y - HeaderMin.y) / (float)(4.0f * HeaderTextureHeight));
 
+			//Header rect
 			drawList->AddImageRounded(HeaderTextureId,
 			                          HeaderMin - ImVec2(0 - halfBorderWidth, 0 - halfBorderWidth),
 			                          HeaderMax + ImVec2(0 - halfBorderWidth, 0),
@@ -258,7 +259,6 @@ bool util::NodeBuilder::SetStage(Stage stage)
 			//ImGui::Spring(0);
 
 		ImGui::BeginHorizontal("content");
-		//ImGui::Spring(0, 0);
 		break;
 
 	case Stage::Input:
@@ -272,7 +272,7 @@ bool util::NodeBuilder::SetStage(Stage stage)
 		break;
 
 	case Stage::Middle:
-		//ImGui::Spring(1);
+		//ImGui::Spring(2,2);
 		ImGui::BeginVertical("middle", ImVec2(0, 0), 0.0f); //SS
 		break;
 
@@ -293,6 +293,8 @@ bool util::NodeBuilder::SetStage(Stage stage)
 	case Stage::End:
 		if (oldStage == Stage::Input)
 			ImGui::Spring(1, 0);
+    if (oldStage == Stage::Content)
+      ImGui::Spring(2, 2);  //spring from right side
 		if (oldStage != Stage::Begin)
 			ImGui::EndHorizontal();
 		ContentMin = ImGui::GetItemRectMin();
