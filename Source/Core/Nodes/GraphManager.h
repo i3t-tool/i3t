@@ -29,32 +29,33 @@ namespace Builder
  */
 template <ENodeType T> FORCE_INLINE Ptr<NodeBase> createNode()
 {
-  bool shouldUnlockAllValues = T == ENodeType::Float || T == ENodeType::Vector3 || T == ENodeType::Vector4 || T == ENodeType::Matrix;
-  auto ret = std::make_shared<NodeImpl<T>>();
-  ret->init();
-  if (shouldUnlockAllValues)
-    ret->setDataMap(&Transform::g_Free);
+	bool shouldUnlockAllValues =
+			T == ENodeType::Float || T == ENodeType::Vector3 || T == ENodeType::Vector4 || T == ENodeType::Matrix;
+	auto ret = std::make_shared<NodeImpl<T>>();
+	ret->init();
+	if (shouldUnlockAllValues)
+		ret->setDataMap(&Transform::g_Free);
 
-  ret->updateValues(0);
-  return ret;
+	ret->updateValues(0);
+	return ret;
 }
 
 Ptr<Core::Sequence> FORCE_INLINE createSequence()
 {
-  auto ret = std::make_shared<Core::Sequence>();
-  ret->init();
+	auto ret = std::make_shared<Core::Sequence>();
+	ret->init();
 	ret->createComponents();
-  ret->updateValues(0);
-  return ret;
+	ret->updateValues(0);
+	return ret;
 }
 
 template <typename T, typename... Args> Ptr<T> FORCE_INLINE createTransform(Args&&... args)
 {
 	static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
-  auto ret = std::make_shared<T>(std::forward<Args>(args)...);
-  ret->init();
-  ret->reset();
-  return ret;
+	auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+	ret->init();
+	ret->reset();
+	return ret;
 }
 } // namespace Builder
 
@@ -64,19 +65,19 @@ class GraphManager
 	static std::vector<Ptr<Cycle>> m_cycles;
 
 public:
-  static CameraPtr createCamera();
+	static CameraPtr createCamera();
 
-  /**
-   * Create Cycle
-   */
-  static Ptr<Core::Cycle> createCycle();
+	/**
+	 * Create Cycle
+	 */
+	static Ptr<Core::Cycle> createCycle();
 
 	/**
 	 * \param tick in seconds.
 	 */
 	static void update(double tick);
 
-  [[nodiscard]] static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
+	[[nodiscard]] static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
 
 	/**
 	 * Is used to check before connecting to avoid cycles in the node graph.
@@ -88,10 +89,10 @@ public:
 	 * \param input
 	 * \param output
 	 */
-	static ENodePlugResult isPlugCorrect(Pin const * input, Pin const * output);
+	static ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
-  [[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
+	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
 
 	/**
 	 * Connect given node output pin to this operator input pin.
@@ -116,11 +117,13 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-  [[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
-	                            unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
+	                                          unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
-  [[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node, unsigned nodeOutputIndex = 0);
-  [[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node, unsigned nodeInputIndex = 0);
+	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
+	                                                            unsigned nodeOutputIndex = 0);
+	[[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node,
+	                                                             unsigned nodeInputIndex = 0);
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(const NodePtr& node);
@@ -159,13 +162,12 @@ public:
 	 */
 	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
 
-  static const Operation* getOperation(const Pin* pin);
+	static const Operation* getOperation(const Pin* pin);
 	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
 	static bool arePlugged(const Pin& input, const Pin& output);
 };
 
 using gm = GraphManager;
-
 
 class SequenceTree
 {
@@ -222,26 +224,26 @@ public:
 	MatrixIterator end();
 };
 
-
 inline CameraPtr GraphManager::createCamera()
 {
-  auto ret = std::make_shared<Core::Camera>();
-  ret->init();
+	auto ret = std::make_shared<Core::Camera>();
+	ret->init();
 	ret->m_proj->m_parent = ret;
 	ret->m_view->m_parent = ret;
-  ret->updateValues(0);
+	ret->updateValues(0);
 
-  return ret;
+	return ret;
 }
 
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {
-  auto ret = std::make_shared<Core::Cycle>();
-  ret->init();
-  ret->updateValues(0);
+	auto ret = std::make_shared<Core::Cycle>();
+	ret->init();
+	ret->updateValues(0);
+	ret->resetAndStop();
 
-  m_cycles.push_back(ret);
+	m_cycles.push_back(ret);
 
-  return ret;
+	return ret;
 }
 } // namespace Core

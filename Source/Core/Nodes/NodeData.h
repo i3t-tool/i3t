@@ -20,16 +20,16 @@ namespace Core::Transform
 /// In column-major order.
 class DataMap
 {
-  std::array<const unsigned char, 16> m_data;
+	std::array<const unsigned char, 16> m_data;
 
 public:
-	DataMap(std::array<const unsigned char, 16> data) : m_data(data) {};
+	DataMap(std::array<const unsigned char, 16> data) : m_data(data){};
 	DataMap(const DataMap&) = delete;
 	DataMap(DataMap&&) = delete;
-  DataMap& operator=(const DataMap&) = delete;
-  DataMap& operator=(DataMap&&) = delete;
+	DataMap& operator=(const DataMap&) = delete;
+	DataMap& operator=(DataMap&&) = delete;
 
-  unsigned char operator[](size_t i) const { return m_data[i]; };
+	unsigned char operator[](size_t i) const { return m_data[i]; };
 };
 } // namespace Core::Transform
 
@@ -64,19 +64,64 @@ inline const DataMap g_EulerY({1, 0, 2, 0, 0, 255, 0, 0, 3, 0, 1, 0, 0, 0, 0, 25
 inline const DataMap g_EulerZ({1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255});
 
 inline const DataMap g_Translate({
-		255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 1, 2, 3, 255,
+		255,
+		0,
+		0,
+		0,
+		0,
+		255,
+		0,
+		0,
+		0,
+		0,
+		255,
+		0,
+		1,
+		2,
+		3,
+		255,
 });
 
 inline const DataMap g_AllLocked({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
 inline const DataMap g_Ortho({
-		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 4, 5, 6, 255,
+		1,
+		0,
+		0,
+		0,
+		0,
+		2,
+		0,
+		0,
+		0,
+		0,
+		3,
+		0,
+		4,
+		5,
+		6,
+		255,
 });
 
 inline const DataMap g_Frustum({1, 0, 0, 0, 0, 2, 0, 0, 3, 4, 5, 6, 0, 0, 7, 0});
 
 inline const DataMap g_Perspective({
-		1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 4, 0, 0, 5, 0,
+		1,
+		0,
+		0,
+		0,
+		0,
+		2,
+		0,
+		0,
+		0,
+		0,
+		3,
+		4,
+		0,
+		0,
+		5,
+		0,
 });
 
 /**
@@ -159,18 +204,11 @@ public:
 	[[nodiscard]] glm::mat4& getMat4Ref() { return std::get<glm::mat4>(m_value); }
 	[[nodiscard]] const glm::vec3& getVec3() const { return std::get<glm::vec3>(m_value); }
 	[[nodiscard]] glm::vec3& getVec3Ref() { return std::get<glm::vec3>(m_value); }
-	[[nodiscard]] const glm::vec4& getVec4() const
-	{
-		return std::get<glm::vec4>(m_value);
-	}
+	[[nodiscard]] const glm::vec4& getVec4() const { return std::get<glm::vec4>(m_value); }
 
 	[[nodiscard]] const glm::quat& getQuat() const { return std::get<glm::quat>(m_value); }
 	[[nodiscard]] float getFloat() const { return std::get<float>(m_value); }
 	[[nodiscard]] void* getPointer() const { return std::get<void*>(m_value); }
 
-	template <typename T>
-	void setValue(T&& val)
-  {
-    m_value = val;
-	}
+	template <typename T> void setValue(T&& val) { m_value = val; }
 };
