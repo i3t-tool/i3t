@@ -6,76 +6,77 @@ using namespace Core;
 
 void Sequence::Storage::updateValues(int inputIndex)
 {
-  auto mat = getMatProduct(m_matrices);
+	auto mat = getMatProduct(m_matrices);
 
-  if (getInPin(0).isPluggedIn())
-  {
+	if (getInPin(0).isPluggedIn())
+	{
 		// Matrix input
-    mat = getInPinRef(0).getStorage(0).getMat4();
+		mat = getInPinRef(0).getStorage(0).getMat4();
 	}
-  setInternalValue(mat, 0);
-  m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
+	setInternalValue(mat, 0);
+	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 }
 
 ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
 	auto* currentMap = matrix->getDataMap();
-  GraphManager::unplugAll(matrix);
+	GraphManager::unplugAll(matrix);
 	matrix->setDataMap(currentMap);
 
-  index = index > m_matrices.size() ? m_matrices.size() : index;
-  m_matrices.insert(m_matrices.begin() + index, matrix);
+	index = index > m_matrices.size() ? m_matrices.size() : index;
+	m_matrices.insert(m_matrices.begin() + index, matrix);
 
-  matrix->as<Transformation>()->setSequence(m_owner, index);
+	matrix->as<Transformation>()->setSequence(m_owner, index);
 
-  updateValues(-1);
+	updateValues(-1);
 	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
 	// If sequence is sub-node of camera node.
-  m_owner->as<Sequence>()->notifyParent();
+	m_owner->as<Sequence>()->notifyParent();
 
-  return ValueSetResult{};
+	return ValueSetResult{};
 }
 
 Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 {
-  Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
-                "Sequence does not have so many matrices as you are expecting.");
+	Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
+	              "Sequence does not have so many matrices as you are expecting.");
 
-  auto result = std::move(m_matrices.at(index));
-  m_matrices.erase(m_matrices.begin() + index);
+	auto result = std::move(m_matrices.at(index));
+	m_matrices.erase(m_matrices.begin() + index);
 
-  result->nullSequence();
+	result->nullSequence();
 
-  updateValues(-1);
-  m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
+	updateValues(-1);
+	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-  m_owner->as<Sequence>()->notifyParent();
+	m_owner->as<Sequence>()->notifyParent();
 
-  return result;
+	return result;
 }
 
 void Sequence::Storage::swap(int from, int to)
 {
-  if (from > m_matrices.size() || to > m_matrices.size()) return;
+	if (from > m_matrices.size() || to > m_matrices.size())
+		return;
 
-  updateValues(-1);
-  m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
+	updateValues(-1);
+	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-  m_owner->as<Sequence>()->notifyParent();
+	m_owner->as<Sequence>()->notifyParent();
 
-  std::swap(m_matrices[from], m_matrices[to]);
+	std::swap(m_matrices[from], m_matrices[to]);
 }
 
 void Sequence::Multiplier::updateValues(int inputIndex)
 {
 	auto product = m_owner->as<Sequence>()->m_storage->getData().getMat4();
-  glm::mat4 mult(1.0f);
+	glm::mat4 mult(1.0f);
 
-  if (m_owner->getInPin(0).isPluggedIn())
-  {
-    auto parent = GraphManager::getParent(m_owner)->as<Sequence>();
-    mult = parent->getData().getMat4();
+	if (m_owner->getInPin(0).isPluggedIn())
+	{
+		auto parent = GraphManager::getParent(m_owner)->as<Sequence>();
+		mult = parent->getData().getMat4();
 	}
 	// Mul. output
 	setInternalValue(mult * product, 0);
@@ -83,7 +84,6 @@ void Sequence::Multiplier::updateValues(int inputIndex)
 	// Model matrix
 	setInternalValue(mult * product, 1);
 }
-
 
 Sequence::Sequence() : NodeBase(&g_sequence)
 {
@@ -95,28 +95,27 @@ void Sequence::createComponents()
 	m_multiplier = std::make_shared<Sequence::Multiplier>();
 
 	m_storage->m_owner = getPtr();
-  m_multiplier->m_owner = getPtr();
+	m_multiplier->m_owner = getPtr();
 
 	m_storage->m_inputs.emplace_back(m_inputs[1]);
-  setPinOwner(m_storage->getInPinRef(0), m_storage);
+	setPinOwner(m_storage->getInPinRef(0), m_storage);
 
-  m_storage->m_outputs.emplace_back(m_outputs[1]);
-  setPinOwner(m_storage->getOutPinRef(0), m_storage);
+	m_storage->m_outputs.emplace_back(m_outputs[1]);
+	setPinOwner(m_storage->getOutPinRef(0), m_storage);
 
-  m_storage->m_internalData.emplace_back(EValueType::Matrix);
-
+	m_storage->m_internalData.emplace_back(EValueType::Matrix);
 
 	m_multiplier->m_inputs.emplace_back(m_inputs[0]);
-  setPinOwner(m_multiplier->getInPinRef(0), m_multiplier);
+	setPinOwner(m_multiplier->getInPinRef(0), m_multiplier);
 
-  m_multiplier->m_outputs.emplace_back(m_outputs[0]);
-  setPinOwner(m_multiplier->getOutPinRef(0), m_multiplier);
+	m_multiplier->m_outputs.emplace_back(m_outputs[0]);
+	setPinOwner(m_multiplier->getOutPinRef(0), m_multiplier);
 
-  m_multiplier->m_outputs.emplace_back(m_outputs[2]);
-  setPinOwner(m_multiplier->getOutPinRef(1), m_multiplier);
+	m_multiplier->m_outputs.emplace_back(m_outputs[2]);
+	setPinOwner(m_multiplier->getOutPinRef(1), m_multiplier);
 
-  m_multiplier->m_internalData.emplace_back(EValueType::MatrixMul);
-  m_multiplier->m_internalData.emplace_back(EValueType::Matrix);
+	m_multiplier->m_internalData.emplace_back(EValueType::MatrixMul);
+	m_multiplier->m_internalData.emplace_back(EValueType::Matrix);
 
 	m_inputs[0].m_master = m_multiplier;
 	m_inputs[1].m_master = m_storage;
@@ -129,47 +128,43 @@ void Sequence::createComponents()
 DataStore& Sequence::getInternalData(size_t index)
 {
 	if (index == 0)
-  {
+	{
 		return m_multiplier->getInternalData(0);
 	}
 	else if (index == 1)
-  {
+	{
 		return m_storage->getInternalData(0);
 	}
 	else if (index == 2)
-  {
-    return m_multiplier->getInternalData(1);
-  }
+	{
+		return m_multiplier->getInternalData(1);
+	}
 }
 
 void Sequence::updatePins()
 {
-  m_storage->m_inputs[0].m_input = m_inputs[1].m_input;
-  m_multiplier->m_inputs[0].m_input = m_inputs[0].m_input;
-
+	m_storage->m_inputs[0].m_input = m_inputs[1].m_input;
+	m_multiplier->m_inputs[0].m_input = m_inputs[0].m_input;
 
 	m_storage->m_outputs[0].m_outputs = m_outputs[1].m_outputs;
 	resetInputPin(m_storage->m_outputs[0].m_outputs, &m_storage->m_outputs[0]);
 
 	m_multiplier->m_outputs[0].m_outputs = m_outputs[0].m_outputs;
-  resetInputPin(m_multiplier->m_outputs[0].m_outputs, &m_multiplier->m_outputs[0]);
+	resetInputPin(m_multiplier->m_outputs[0].m_outputs, &m_multiplier->m_outputs[0]);
 
 	m_multiplier->m_outputs[1].m_outputs = m_outputs[2].m_outputs;
-  resetInputPin(m_multiplier->m_outputs[1].m_outputs, &m_multiplier->m_outputs[1]);
+	resetInputPin(m_multiplier->m_outputs[1].m_outputs, &m_multiplier->m_outputs[1]);
 }
 
 void Sequence::resetInputPin(std::vector<Pin*>& outputsOfPin, Pin* newInput)
 {
-  std::for_each(outputsOfPin.begin(), outputsOfPin.end(), [newInput](Pin* p)
-	              {
-									p->m_input = newInput;
-								});
+	std::for_each(outputsOfPin.begin(), outputsOfPin.end(), [newInput](Pin* p) { p->m_input = newInput; });
 }
 
 void Sequence::updateValues(int inputIndex)
 {
 	if (inputIndex == -1)
-  {
+	{
 		// Got update from nested transform.
 		m_storage->updateValues(inputIndex);
 		m_multiplier->updateValues(inputIndex);
@@ -179,9 +174,9 @@ void Sequence::updateValues(int inputIndex)
 void Sequence::notifyParent()
 {
 	if (m_parent)
-  {
-    m_parent->spreadSignal();
-    m_parent->updateValues(0);
+	{
+		m_parent->spreadSignal();
+		m_parent->updateValues(0);
 	}
 }
 
@@ -192,7 +187,7 @@ void Sequence::receiveSignal(int inputIndex)
 	/// \todo MH check this expression.
 	spreadSignal(0);
 	if (inputIndex != 0)
-  {
+	{
 		spreadSignal(1);
 	}
 }

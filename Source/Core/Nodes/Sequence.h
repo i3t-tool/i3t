@@ -16,7 +16,6 @@ namespace SequenceInternals
 
 }
 
-
 /**
  * Sequence of matrices.
  */
@@ -26,48 +25,50 @@ class Sequence : public NodeBase
 	using Matrix = NodeBase;
 
 	/** Structure for storing transform matrices. */
-  class Storage : public Node
-  {
-    friend class Core::Sequence;
-    friend class Multiplier;
+	class Storage : public Node
+	{
+		friend class Core::Sequence;
+		friend class Multiplier;
 
-    Matrices m_matrices;
+		Matrices m_matrices;
 
-  public:
-    Storage() : Node(nullptr) {}
+	public:
+		Storage() : Node(nullptr) {}
 
-    ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
-    ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
-    Ptr<Transformation> popMatrix(const int index);
-    void swap(int from, int to);
+		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
+		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+		Ptr<Transformation> popMatrix(const int index);
+		void swap(int from, int to);
 
-    void updateValues(int inputIndex) override;
-  };
-
+		void updateValues(int inputIndex) override;
+	};
 
 	/** Structure which represents sequences multiplication. */
-  class Multiplier : public Node
-  {
-    friend class Core::Sequence;
+	class Multiplier : public Node
+	{
+		friend class Core::Sequence;
 
-  public:
-    Multiplier() : Node(nullptr) {}
+	public:
+		Multiplier() : Node(nullptr) {}
 
-    void updateValues(int inputIndex) override;
-  };
+		void updateValues(int inputIndex) override;
+	};
 
-
+	/// \todo MH use Node::m_owner!
 	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
-  Ptr<Storage> m_storage;
-  Ptr<Multiplier> m_multiplier;
+	Ptr<Storage> m_storage;
+	Ptr<Multiplier> m_multiplier;
 
 public:
 	Sequence();
 
-  void createComponents();
+	void createComponents();
 
-  ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, m_storage->m_matrices.size()); }
+	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept
+	{
+		return addMatrix(matrix, m_storage->m_matrices.size());
+	}
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -75,9 +76,12 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-  ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept { return m_storage->addMatrix(matrix, index); }
+	ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
+	{
+		return m_storage->addMatrix(matrix, index);
+	}
 
-  DataStore& getInternalData(size_t index = 0) override;
+	DataStore& getInternalData(size_t index = 0) override;
 
 	const Matrices& getMatrices() { return m_storage->m_matrices; }
 
@@ -109,7 +113,7 @@ public:
 
 private:
 	void notifyParent();
-  void receiveSignal(int inputIndex) override;
+	void receiveSignal(int inputIndex) override;
 };
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
@@ -121,10 +125,10 @@ FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
 
 FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
 {
-  glm::mat4 result(1.0f);
-  for (const auto& mat : matrices)
-    result *= mat->getData().getMat4();
-  return result;
+	glm::mat4 result(1.0f);
+	for (const auto& mat : matrices)
+		result *= mat->getData().getMat4();
+	return result;
 }
 
 using SequencePtr = Ptr<Sequence>;

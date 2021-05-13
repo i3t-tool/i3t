@@ -22,7 +22,7 @@ enum class ENodePlugResult
 	Ok = 0,
 	Err_MismatchedPinTypes,
 	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
-	Err_Loopback, /// Same nodes.
+	Err_Loopback,          /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
 };
@@ -45,7 +45,6 @@ struct ValueSetResult
 	{
 	}
 };
-
 
 namespace Core
 {
@@ -85,9 +84,7 @@ protected:
 	std::vector<Pin> m_inputs;
 
 protected:
-  NodeBase(const Operation* operation) : m_operation(operation)
-	{
-	}
+	NodeBase(const Operation* operation) : m_operation(operation) {}
 
 public:
 	/** Delete node and unplug its all inputs and outputs. */
@@ -98,17 +95,15 @@ public:
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
 protected:
-  Pin& getInPinRef(int index) { return getInputPinsRef()[index]; }
-  Pin& getOutPinRef(int index) { return getOutputPinsRef()[index]; }
+	Pin& getInPinRef(int index) { return getInputPinsRef()[index]; }
+	Pin& getOutPinRef(int index) { return getOutputPinsRef()[index]; }
 
 public:
-  Ptr<NodeBase> getPtr() { return shared_from_this(); }
+	Ptr<NodeBase> getPtr() { return shared_from_this(); }
 
 public:
-
-  template <typename T>
-	Ptr<T> as()
-  {
+	template <typename T> Ptr<T> as()
+	{
 		static_assert(std::is_base_of_v<NodeBase, T>, "T must be derived from NodeBase class.");
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
@@ -149,20 +144,18 @@ public:
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 private:
-	template <typename T>
-  ValueSetResult setValueEx(T&& val)
-  {
+	template <typename T> ValueSetResult setValueEx(T&& val)
+	{
 		if (m_currentMap == &Transform::g_AllLocked)
-      return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
+			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
 
-    getInternalData().setValue(val);
-    spreadSignal();
+		getInternalData().setValue(val);
+		spreadSignal();
 
-    return ValueSetResult{};
+		return ValueSetResult{};
 	}
 
 public:
-
 	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
 	{
 		m_internalData[0].setValue(ptr);
@@ -179,25 +172,13 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val)
-	{
-		return setValueEx(val);
-	}
+	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
 
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
-	{
-    return setValueEx(vec);
-	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
 
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
-	{
-    return setValueEx(vec);
-	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
 
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
-	{
-    return setValueEx(mat);
-	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
 
 	/**
 	 *
@@ -246,7 +227,7 @@ protected:
 public:
 	virtual void reset() {}
 
-  void setDataMap(const Transform::DataMap* map);
+	void setDataMap(const Transform::DataMap* map);
 
 	const Transform::DataMap* getDataMap() { return m_currentMap; }
 
@@ -261,8 +242,8 @@ public:
 	[[nodiscard]] const std::vector<Pin>& getOutputPins();
 
 protected:
-  [[nodiscard]] virtual std::vector<Pin>& getInputPinsRef();
-  [[nodiscard]] virtual std::vector<Pin>& getOutputPinsRef();
+	[[nodiscard]] virtual std::vector<Pin>& getInputPinsRef();
+	[[nodiscard]] virtual std::vector<Pin>& getOutputPinsRef();
 
 public:
 	//===----------------------------------------------------------------------===//
@@ -313,7 +294,7 @@ public:
 	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
 
 protected:
-  virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const * output);
+	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 
 private:
 	void unplugAll();
@@ -323,7 +304,6 @@ private:
 
 using Node = NodeBase;
 using NodePtr = Ptr<Node>;
-
 
 /**
  * Pin used for connecting nodes.
@@ -403,30 +383,30 @@ public:
 	 */
 	[[nodiscard]] const DataStore& getStorage(unsigned id = 0);
 
-  const char* getLabel() const
+	const char* getLabel() const
 	{
 		auto* op = m_master->getOperation();
 		const char* label = nullptr;
 
-    if (m_isInput)
-    {
+		if (m_isInput)
+		{
 			if (!op->defaultInputNames.empty())
-      {
+			{
 				label = op->defaultInputNames[m_index].c_str();
 			}
 		}
 		else
-    {
-      if (!op->defaultOutputNames.empty())
-      {
-        label = op->defaultOutputNames[m_index].c_str();
-      }
+		{
+			if (!op->defaultOutputNames.empty())
+			{
+				label = op->defaultOutputNames[m_index].c_str();
+			}
 		}
 
 		if (label == nullptr)
 		{
-      label = defaultIoNames[static_cast<size_t>(m_valueType)];
-    }
+			label = defaultIoNames[static_cast<size_t>(m_valueType)];
+		}
 
 		return label;
 	}

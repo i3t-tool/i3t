@@ -22,7 +22,7 @@ public:                                                                         
 class IWindow
 {
 public:
-	IWindow(bool show = false) : m_show(show) {}
+	explicit IWindow(bool show = false) : m_show(show) {}
 
 	virtual ~IWindow() = default;
 	virtual void render() = 0;

@@ -1343,10 +1343,10 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn())
-  {
-    m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
-  }
+	if (m_inputs[0].isPluggedIn())
+	{
+		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+	}
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inputIndex)
@@ -1367,10 +1367,10 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Quat>::updateValues(int inputI
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inputIndex)
 {
-  if (m_inputs[0].isPluggedIn())
-  {
-    m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
-  }
+	if (m_inputs[0].isPluggedIn())
+	{
+		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
+	}
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
@@ -1462,8 +1462,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int 
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inputIndex)
 {
-  if (areAllInputsPlugged())
-  {
+	if (areAllInputsPlugged())
+	{
 		// setInternalValue(m_inputs[0].getStorage(1).getMat4());
 	}
 }
@@ -1471,7 +1471,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inpu
 template <> FORCE_INLINE void NodeImpl<ENodeType::Pulse>::updateValues(int inputIndex)
 {
 	if (m_outputs[0].isPluggedIn())
-  {
+	{
 		int pinIndex = m_outputs[0].getOutComponents()[0]->getIndex();
 		m_outputs[0].getOutComponents()[0]->getOwner()->updateValues(pinIndex);
 	}
