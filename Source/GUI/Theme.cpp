@@ -53,6 +53,7 @@ Theme::Theme()
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 25.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)] = 0.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_LabelIndent)] = 3.0f;
 
 	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingX)] = 2.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_ItemsSpacingY)] = 3.0f;

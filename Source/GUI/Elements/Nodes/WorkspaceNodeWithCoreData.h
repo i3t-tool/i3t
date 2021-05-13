@@ -87,7 +87,7 @@ public:
 
 	virtual void drawInputLinks();
 
-	void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+	virtual void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
 	void drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex);
 
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);

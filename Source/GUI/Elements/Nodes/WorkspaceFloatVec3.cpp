@@ -74,6 +74,11 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 			setDataItemsWidth();
 		}
     ImGui::Spring(1);
+
+    ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+		//TODO better way to change X?
+		ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x,window->DC.LastItemRect.Min.y),ImVec2(window->DC.LastItemRect.Max.x + 58.0f,window->DC.LastItemRect.Max.y));
+
 	}
 	else if (index == 1)
 	{ // -> vector3

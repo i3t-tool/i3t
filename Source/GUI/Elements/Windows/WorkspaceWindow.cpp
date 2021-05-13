@@ -1129,8 +1129,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float cycle")) {
-//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatCycle>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceCycle>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
         }
 				if (ImGui::MenuItem("float * float")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulFloat>(m_headerBackgroundTexture));

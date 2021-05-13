@@ -105,7 +105,7 @@
 #include "../Nodes/WorkspaceSignum.h"
 #include "../Nodes/WorkspaceFloatSinCos.h"
 #include "../Nodes/WorkspaceASinACos.h"
-//#include "../Nodes/WorkspaceFloatCycle.h"
+#include "../Nodes/WorkspaceCycle.h"
 //	} float end
 
 //	quat{

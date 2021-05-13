@@ -56,6 +56,10 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
       fw.value = localData[columns];
       fw.columns = columns;
     }
+		if(columns != 3){
+			ImGui::SameLine();
+		}
+
 
   }
   ImGui::PopStyleVar();
@@ -76,7 +80,7 @@ int WorkspaceQuat::maxLenghtOfData()
 {
 	// SS WIP
   int act, maximal = 0;
-  const glm::vec4& coreData = m_nodebase->getData().getVec4();
+  const glm::quat& coreData = m_nodebase->getData().getQuat();
 
   for(int column=0; column < 4; column++)
   {

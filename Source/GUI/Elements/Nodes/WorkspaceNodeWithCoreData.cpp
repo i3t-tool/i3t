@@ -172,8 +172,9 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-	  ImFont* f = I3T::getTheme().get(EFont::Node);
-    float oneCharWidth = 0.57f * f->FontSize, padding = 1; /* \todo JH take from some font setting */
+	  //ImFont* f = I3T::getTheme().get(EFont::Node);
+		float size = ImGui::GetFontSize();
+    float oneCharWidth = size / 2, padding = 1; /* \todo JH take from some font setting */
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -394,10 +395,9 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
                       pinProp->isConnected(), // SS add global variable. User test change or not.
                       WorkspacePinColor[pinProp->getType()],
                       pinProp->getColor());
-
-
     ImGui::Spring(1);
     ImGui::EndVertical();
+
 
     if (pinProp->getShowLabel()){
       if(pinProp->getLabel().empty()){ //it's never empty :(
@@ -407,6 +407,7 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
           ImGui::TextUnformatted("");
         }else
         {
+          ImGui::Spring(0,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label);
         }
 
@@ -416,11 +417,11 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
         if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
           ImGui::TextUnformatted("");
         }else{
+          ImGui::Spring(0,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label.c_str());
         }
 
       }
-      ImGui::Spring(1);
     }
 
     ImGui::PopStyleVar();
@@ -467,6 +468,9 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
     //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
     //          alpha = alpha * (48.0f / 255.0f);
 
+
+
+
 		builder.Output(pinProp->getId());
 
 		if(!isTransformation() && !isCamera() && !isSequence()){ //is Operator
@@ -475,13 +479,14 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
       ImGui::EndVertical();
 		}
 
-	  //ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(1000.0f, 1000.0f));
+    ImGui::Spring(1);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-    ImGui::Spring(1);
 
-
+		//label
     if (pinProp->getShowLabel()){
+
+
       if(pinProp->getLabel().empty()){ //it's never empty :(
 
         auto label = pinProp->getCorePin().getLabel();
@@ -489,7 +494,9 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
           ImGui::TextUnformatted("");
         }else
 				{
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label);
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
 				}
 
       }else{
@@ -498,23 +505,23 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
         if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
           ImGui::TextUnformatted("");
         }else{
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label.c_str());
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
         }
 
       }
-      ImGui::Spring(1);
     }
 
+      ImGui::Spring(1);
 
-      // color.Value.w = alpha / 255.0f;
+		  //Icon
       ax::Widgets::Icon(pinProp->getIconSize(),
                         WorkspacePinShape[pinProp->getType()],
                         false,
                         WorkspacePinColor[pinProp->getType()],
                         pinProp->getColor());
-      //ImGui::Spring(1);
 
-      //ImGui::PopStyleVar();
 	    ImGui::PopStyleVar();
 
       builder.EndOutput();

@@ -68,6 +68,7 @@ enum class ESize
 	Nodes_FloatWidth,
 	Nodes_FloatMargin,
   Nodes_BorderWidth,
+	Nodes_LabelIndent,
 
   Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
