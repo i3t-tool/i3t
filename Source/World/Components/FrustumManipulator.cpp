@@ -43,7 +43,7 @@ void FrustumManipulator::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 projinv=glm::inverse(m_edited);;
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	//glm::mat4 transform=glm::mat4(1.0f);
-	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent);
+	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent,true);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
 	if(renderTransparent){
@@ -134,7 +134,7 @@ void FrustumManipulator::update(){
 	axis[3]=0.0f;
 	//glm::mat4 handlespace=getFullTransform(m_owner);//TMP
 	//glm::mat4 handlespace=glm::mat4(1.0f);
-	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent);
+	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent,true);
 			
 	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+handlespace*pos));//position of transformated object on the screen
 	glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen

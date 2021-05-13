@@ -18,11 +18,13 @@ public:
 	static const char* componentType() { return LookAtManipulator::s_type; };
 	const char* getComponentType() { return LookAtManipulator::s_type; };
 
+	static const int EDIT_CENTER=1,EDIT_EYE=2;
 	Ptr<Core::NodeBase> m_editednode;
 	Ptr<Core::Sequence> m_parent;
 private:
 	static const char* s_type;
 
+	int m_editmode=EDIT_CENTER;
 	GameObject*m_planeh,*m_arrowh,*m_threeaxis,*m_cameraico;
 	char m_stencilx,m_stencily,m_stencilz,m_stencilzx,m_stencilzy,m_stencilyx;
 	int m_activehandle=-1,m_hoverhandle=-1,m_axisnum=-1,m_axisnum2=-1;

@@ -236,11 +236,14 @@ void World::tmpSetNode() {
     }
     if (tmpSequence2.get() == nullptr) {
         tmpSequence2 = Core::Builder::createSequence();
+        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::Translation>());
         tmpSequence2->addMatrix(Core::Builder::createTransform<Core::LookAt>());
         tmpSequence2->addMatrix(tmportho);
 
-        ((Core::LookAt*)tmpSequence2->getMatrices().at(0).get())->setEye(glm::vec3(0.0f));
-        ((Core::LookAt*)tmpSequence2->getMatrices().at(0).get())->setCenter(glm::vec3(0.0f,0.0f,-1.0f));
+        //((Core::Translation*)tmpSequence2->getMatrices().at(0).get())->setX(2.0f);
+        //((Core::EulerRotX*)tmpSequence2->getMatrices().at(0).get())->setValue(1.0f);
+        ((Core::LookAt*)tmpSequence2->getMatrices().at(1).get())->setEye(glm::vec3(0.0f));
+        ((Core::LookAt*)tmpSequence2->getMatrices().at(1).get())->setCenter(glm::vec3(0.0f,0.0f,-1.0f));
     }
 
     if(InputManager::isKeyPressed(Keys::t))     {tmpNode=tmpSequence->getMatrices().at(0);}
@@ -254,22 +257,22 @@ void World::tmpSetNode() {
     
 
     else if(InputManager::isKeyPressed(Keys::o)){
-        if(tmpSequence2->getMatrices().size()==2){tmpSequence2->popMatrix(1);}
+        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
         tmpSequence2->addMatrix(tmportho);
-        tmpNode=tmpSequence2->getMatrices().at(1);
+        tmpNode=tmpSequence2->getMatrices().at(2);
     }
     else if(InputManager::isKeyPressed(Keys::p)){
-        if(tmpSequence2->getMatrices().size()==2){tmpSequence2->popMatrix(1);}
+        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
         tmpSequence2->addMatrix(tmpproj);
-        tmpNode=tmpSequence2->getMatrices().at(1);
+        tmpNode=tmpSequence2->getMatrices().at(2);
     }
     else if(InputManager::isKeyPressed(Keys::f)){
-        if(tmpSequence2->getMatrices().size()==2){tmpSequence2->popMatrix(1);}
+        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
         tmpSequence2->addMatrix(tmpfrustrum);
-        tmpNode=tmpSequence2->getMatrices().at(1);
+        tmpNode=tmpSequence2->getMatrices().at(2);
     }
     
-    else if(InputManager::isKeyPressed(Keys::l)){tmpNode=tmpSequence2->getMatrices().at(0);}
+    else if(InputManager::isKeyPressed(Keys::l)){tmpNode=tmpSequence2->getMatrices().at(1);}
     else if (tmpNode.get() == nullptr){tmpNode=tmpSequence->getMatrices().at(5);}
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
@@ -284,7 +287,7 @@ void World::tmpSetNode() {
         m.component->m_isActive=true;
         *m.editedNode=tmpNode;
         *m.parent=tmpSequence;
-        if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Frustum")==0||strcmp(keyword,"Perspective")==0){*m.parent=tmpSequence2;}
+        if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Frustum")==0||strcmp(keyword,"Perspective")==0||strcmp("LookAt",keyword)==0){*m.parent=tmpSequence2;}
     }
     else{
         printf("no manipulators\n");

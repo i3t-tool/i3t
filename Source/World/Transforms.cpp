@@ -112,7 +112,7 @@ glm::mat4 getFullTransform(GameObject* obj){
 	while (obj != NULL){transform = obj->transformation * transform;obj = obj->parent;}
 	return transform;
 }
-glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent){
+glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent,bool invLookAt){
 	glm::mat4 m=glm::mat4(1.0f);
 	//return m;
 
@@ -136,7 +136,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequen
 		nodeindex=*it;
 		DataStore d=nodeindex->getData();
 		//printf("mul %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
-		if(strcmp(nodeindex->getOperation()->keyWord.c_str(),"LookAt")==0){m=glm::inverse(d.getMat4())*m;}
+		if(strcmp(nodeindex->getOperation()->keyWord.c_str(),"LookAt")==0&&invLookAt){m=glm::inverse(d.getMat4())*m;}
 		else{m=d.getMat4()*m;}
 		it++;
 	}//getchar();

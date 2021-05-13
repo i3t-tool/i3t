@@ -1,4 +1,5 @@
 #include "TmpCamera.h"
+#include "../Transforms.h"
 
 #include "Source/GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 #include "Source/Core/Nodes/GraphManager.h"
@@ -27,8 +28,10 @@ void TmpCamera::update(){
     if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Perspective")==0||strcmp(keyword,"Frustum")==0){
         m_cam->m_perspective = cp;
     }
+    Core::NodePtr v= World::tmpSequence2->getMatrices().at(2);
+    //const glm::mat4& cp2 = World::tmpSequence2->getMatrices().at(0)->getData().getMat4();
+    const glm::mat4& cp2 =getNodeTransform(&v,&World::tmpSequence2,true);
     
-    const glm::mat4& cp2 = World::tmpSequence2->getMatrices().at(0)->getData().getMat4();
-    
-    m_gameObject->transformation = glm::inverse(cp2);
+    //m_gameObject->transformation = glm::inverse(cp2);
+    m_gameObject->transformation = cp2;
 }

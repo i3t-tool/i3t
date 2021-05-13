@@ -348,7 +348,7 @@ void FreeManipulator::update(){
 		if (m_axisnum2 != -1){
 			glm::vec3 pc = planeIntersect((glm::vec3)(m_handlespace[m_axisnum]), (glm::vec3)(m_handlespace[m_axisnum2]), (glm::vec3)(m_handlespace[3]));
 
-			if (world2viewport(pc)[2] < 0.992f) {
+			if (world2viewport(pc)[2] < 0.998f) {
 				//glm::mat4 parent=getFullTransform(m_edited->parent);//TMP
 				//glm::mat4 parent=glm::mat4(1.0f);
 				glm::mat4 parent=getNodeTransform(&m_editednode,&m_parent);
