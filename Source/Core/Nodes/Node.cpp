@@ -27,10 +27,13 @@ void NodeBase::init()
 		m_internalData.emplace_back(m_operation->outputTypes[i]);
 	}
 
-	// \todo MH Ugly workaround for Model and Screen node, which has no outputs.
+	// \todo MH Ugly workaround for Model, Transforms and Screen node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
 	{
-		m_internalData.emplace_back(m_operation->inputTypes[0]);
+		if (!m_operation->inputTypes.empty())
+		  m_internalData.emplace_back(m_operation->inputTypes[0]);
+		else
+      m_internalData.emplace_back(EValueType::Matrix);
 	}
 }
 
@@ -87,6 +90,9 @@ void NodeBase::spreadSignal()
 
 void NodeBase::spreadSignal(int outIndex)
 {
+	if (getOutputPinsRef().empty())
+		return;
+
 	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
 	{
 		inPin->m_master->receiveSignal(inPin->getIndex());
