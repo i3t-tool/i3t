@@ -63,6 +63,7 @@ public:
     std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
 
     virtual bool isCamera();
+    virtual bool isCycle();
     virtual bool isSequence();
     bool isTransformation();
 

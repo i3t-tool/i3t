@@ -148,6 +148,12 @@ bool WorkspaceNodeWithCoreData::isCamera()
     return false;
 }
 
+bool WorkspaceNodeWithCoreData::isCycle()
+{
+  return false;
+}
+
+
 bool WorkspaceNodeWithCoreData::isTransformation()
 {
     return m_nodebase->as<Core::Transformation>() != nullptr;
@@ -528,12 +534,18 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 }
 
 void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
-	if(isTransformation()){
-		//builder.Middle();
-    ImGui::Spring(2, 2); //spring from left side. right side in builder.cpp
-    ImGui::BeginVertical(m_nodebase->getId());
-		drawData(builder, 0);
-    ImGui::EndVertical();
+	if(isTransformation() || isCycle()){
+		if(isTransformation()){
+      ImGui::Spring(2, 2); //spring from left side. right side in builder.cpp
+      ImGui::BeginVertical(m_nodebase->getId());
+      drawData(builder, 0);
+      ImGui::EndVertical();
+		}else{
+      builder.Middle();
+			ImGui::Spring(1);
+      drawData(builder, -1);  // for cycle
+      ImGui::Spring(1);
+		}
 	}
 }
 

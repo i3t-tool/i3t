@@ -563,7 +563,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 	{
 		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
 		if (node->fw.showMyPopup) {
-			ImGui::OpenPopup("float_context_menu");
+			if(node->isCycle() && node->fw.id == "Mode"){
+        ImGui::OpenPopup("Cycle_Mode");
+			}else{
+        ImGui::OpenPopup("float_context_menu");
+			}
 			node->fw.showMyPopup = false;
 		}else{
 			ImGui::OpenPopup("Node Context Menu");
@@ -574,6 +578,27 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 	ne::Suspend();
 
+
+
+  if (ImGui::BeginPopup("Cycle_Mode"))
+  {
+    Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
+
+    ImGui::Text("Mode");
+    ImGui::Separator();
+
+    if (ImGui::Selectable("Once")) {
+      node->getNodebase()->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Once);
+    }
+    if (ImGui::Selectable("Repeat")) {
+      node->getNodebase()->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Repeat);
+    }
+    if (ImGui::Selectable("ping-pong")) {
+      node->getNodebase()->as<Core::Cycle>()->setMode(Core::Cycle::EMode::PingPong);
+    }
+
+    ImGui::EndPopup();
+  }
 
 	if (ImGui::BeginPopup("float_context_menu")) {
 		ImGui::Text("Set value...					");
@@ -812,7 +837,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::EndMenu();
 
 			}
-			if (ImGui::BeginMenu("scale")) {
+			/*if (ImGui::BeginMenu("scale")) {
 
 				ImGui::Text("add scale");
 				ImGui::Separator();
@@ -827,7 +852,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				ImGui::EndMenu();
 
-			}
+			}*/
+      if (ImGui::MenuItem("scale")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+      }
 			if (ImGui::MenuItem("lookAt")) {
         m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceLookAt>(m_headerBackgroundTexture));
         ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);

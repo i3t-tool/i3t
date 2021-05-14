@@ -207,9 +207,11 @@ void ax::Drawing::DrawIcon(ImDrawList* drawList, const ImVec2& a, const ImVec2& 
 		{
 			if (filled)
 			{
-				const auto r = rect_w / 2.0f;
-				const auto p0 = rect_center - ImVec2(r, r / 2);
-				const auto p1 = rect_center + ImVec2(r, r / 2);
+        const auto r = rect_w / 2.0f;
+
+        const auto p0 = rect_center - ImVec2(r, r);
+        const auto p1 = rect_center + ImVec2(r, r);
+
 				drawList->AddRectFilled(p0, p1, color, 0, 15 + extra_segments);
 			}
 			else

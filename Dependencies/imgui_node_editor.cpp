@@ -7,16 +7,17 @@
 // CREDITS
 //   Written by Michal Cichon
 //------------------------------------------------------------------------------
-# include "imgui_node_editor_internal.h"
-# include <cstdio> // snprintf
-# include <string>
-# include <fstream>
-# include <bitset>
-# include <climits>
-# include <algorithm>
-# include <sstream>
-# include <streambuf>
-# include <type_traits>
+#include "imgui_node_editor_internal.h"
+#include <Core/API.h>
+#include <algorithm>
+#include <bitset>
+#include <climits>
+#include <cstdio> // snprintf
+#include <fstream>
+#include <sstream>
+#include <streambuf>
+#include <string>
+#include <type_traits>
 
 // https://stackoverflow.com/a/8597498
 # define DECLARE_HAS_NESTED(Name, Member)                                          \
@@ -4132,6 +4133,8 @@ bool ed::CreateItemAction::Process(const Control& control)
         cursorPin.m_Strength =  m_DraggedPin->m_Strength;
 
         ed::Link candidate(Editor, 0);
+        //auto& window = I3T::getWindowPtr<Work>();
+				candidate.m_Color = m_DraggedPin->m_Color;
         //candidate.m_Color    = m_LinkColor;
         candidate.m_StartPin = draggingFromSource ? m_DraggedPin : &cursorPin;
         candidate.m_EndPin   = draggingFromSource ? &cursorPin : m_DraggedPin;
