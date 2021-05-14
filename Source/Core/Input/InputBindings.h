@@ -18,20 +18,20 @@ using ModifiersList = std::vector<Keys::Code>;
  */
 FORCE_INLINE Modifiers createModifiers(const ModifiersList& list)
 {
-	Modifiers mods = { false, false, false, false };
+	Modifiers mods = {false, false, false, false};
 	for (auto mod : list)
-  {
+	{
 		switch (mod)
 		{
 		case Keys::Code::ctrll:
 			mods[0] = true;
-      break;
+			break;
 		case Keys::Code::altl:
-      mods[1] = true;
-      break;
+			mods[1] = true;
+			break;
 		case Keys::Code::shiftl:
-      mods[2] = true;
-      break;
+			mods[2] = true;
+			break;
 		default:
 			break;
 		}
@@ -43,44 +43,39 @@ FORCE_INLINE Modifiers createModifiers(const ModifiersList& list)
 struct InputBindings final
 {
 	struct ActionMapping
-  {
+	{
 		Keys::Code code;
-    Modifiers modifiers;
+		Modifiers modifiers;
 	};
 
 	struct AxisMapping
-  {
+	{
 		Keys::Code code;
 		float value;
-    Modifiers modifiers;
+		Modifiers modifiers;
 	};
 
-  using ActionsMap = std::unordered_map<
-      std::string,
-      std::vector<ActionMapping>
-  >;
+	using ActionsMap = std::unordered_map<std::string, std::vector<ActionMapping>>;
 
-  using AxisMap = std::unordered_map<
-	    std::string,
-			std::vector<AxisMapping>
-  >;
+	using AxesMap = std::unordered_map<std::string, std::vector<AxisMapping>>;
 
-  friend class InputManager;
+	friend class InputManager;
 
-
-  static void init();
+	static void init();
 
 	static const std::vector<ActionMapping>& getActionMapping(const char* name);
 	static bool isActionCreated(const char* name);
-  static void setActionKey(const char* name, Keys::Code code, ModifiersList modifiers = ModifiersList());
+	static void setAction(const char* name);
+	static void setActionKey(const char* name, Keys::Code code, ModifiersList modifiers = ModifiersList());
 	static void removeActionKey(const char* name, Keys::Code code);
 
 	static std::vector<AxisMapping> getAxisMapping(const char* name);
-  static bool isAxisCreated(const char* name);
+	static bool isAxisCreated(const char* name);
+	static void setAxis(const char* name);
 	static void setAxisKey(const char* name, float scale, Keys::Code code, ModifiersList modifiers = ModifiersList());
 	static void removeAxisKey(const char* name, Keys::Code code);
 
 private:
-  static ActionsMap m_inputActions;
-	static AxisMap    m_inputAxis;
+	static ActionsMap m_inputActions;
+	static AxesMap m_inputAxis;
 };

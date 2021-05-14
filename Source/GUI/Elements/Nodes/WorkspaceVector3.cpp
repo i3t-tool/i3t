@@ -26,20 +26,16 @@ WorkspaceVector3::WorkspaceVector3(ImTextureID headerBackground, Ptr<Core::NodeB
 
 void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 {
-	const glm::vec3& coreData = m_nodebase->getData().getVec3();
-	int const coreMap[3] = {1,2,3}; /* \todo JH will be map for vector? */
+	const glm::vec3& coreData = m_nodebase->getData(index).getVec3();
+  const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 	int const idOfNode = this->m_id.Get();
 
 	bool valueChanged = false;
-	/* \todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
-	better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
-	  */
 	glm::vec3 localData;
-
-	//builder.Middle();
 
 
 	ImGui::PushItemWidth(m_dataItemsWidth);
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
 
 	for (int columns = 0; columns < 3; columns++)
@@ -48,15 +44,6 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 		valueChanged |=
 				drawDragFloatWithMap_Inline(&localData[columns], coreMap[columns], fmt::format("##{}:{}", idOfNode, columns));
 
-		//        localData = coreData[columns];
-		//        if (drawDragFloatWithMap_Inline(&localData,
-		//                                        coreMap[columns],
-		//                                        fmt::format("##{}:{}", idOfNode, columns)))
-		//        {
-		//            valueChanged = true;
-		//            columnOfChange = columns;
-		//            valueOfChange = localData;
-		//        }
 				if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
 				{
 					fw.showMyPopup = true;
@@ -66,6 +53,8 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 				}
 
 	}
+
+  ImGui::PopStyleVar();
 	ImGui::PopStyleVar();
 	ImGui::PopItemWidth();
 

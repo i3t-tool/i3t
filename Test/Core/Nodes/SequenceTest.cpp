@@ -85,7 +85,7 @@ TEST(SequenceTest, InternalValueCanBeReadByOperator)
 {
 	auto seq = arrangeSequence();
 	auto matMulMatNode = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
-	auto identityMatNode = Core::Builder::createTransform<Core::Free>();
+	auto identityMatNode = Core::Builder::createNode<ENodeType::Matrix>();
 
 	{
 		setValue_expectOk(identityMatNode, glm::mat4(1.0f));
@@ -106,7 +106,7 @@ TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 {
 	auto seq = arrangeSequence();
 
-	auto matNode = Builder::createTransform<Core::Free>();
+	auto matNode = Builder::createNode<ENodeType::Matrix>();
 	setValue_expectOk(matNode, generateMat4());
 
 	auto plugResult = GraphManager::plugSequenceValueInput(seq, matNode);

@@ -499,6 +499,11 @@ void Scripting::runCommand(std::string cmd) {
 	}
 	else if(strcmp(cmd.c_str(),"help2")==0){
 		std::cout <<
+			"int quatoper(int type, int x, int y, char* header)\n"
+			"int quatoperc(int type, char* header)\n"
+			"int quat(int data, int x, int y, char* header)\n"
+			"int quatc(int data, char* header)\n"
+			"\n"
 			"int convertor(int type, int x, int y, char* header)\n"
 			"int convertorc(int type, char* header)\n"
 			"int sequence(int x, int y, char* header)\n"

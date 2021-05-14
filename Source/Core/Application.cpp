@@ -52,10 +52,13 @@ void Application::init()
 
   /// \todo MH remove test code.
   testCycle = Core::GraphManager::createCycle();
-	testCycle->setTo(10.0f);
-	testCycle->setMultiplier(0.10f);
+	testCycle->setFrom(1.25f);
+	testCycle->setTo(-1.25f);
+	testCycle->setMultiplier(-0.10f);
+  testCycle->setMode(Core::Cycle::EMode::Once);
 
-	InputManager::init();
+
+  InputManager::init();
 }
 
 void Application::initModules()
@@ -74,7 +77,9 @@ void Application::run()
 {
 	while (!m_bShouldClose)
 	{
-		// Process commands.
+    glfwWaitEvents();
+
+    // Process commands.
 		for (auto& command : m_commands)
 		{
 			command->execute();
@@ -89,9 +94,6 @@ void Application::run()
 
 		// Update and display.
 		onDisplay();
-
-		// Poll events.
-		glfwWaitEvents();
 	}
 }
 

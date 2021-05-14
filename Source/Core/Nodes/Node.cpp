@@ -27,16 +27,19 @@ void NodeBase::init()
 		m_internalData.emplace_back(m_operation->outputTypes[i]);
 	}
 
-	// \todo MH Ugly workaround for Model and Screen node, which has no outputs.
+	// \todo MH Ugly workaround for Model, Transforms and Screen node, which has no outputs.
 	if (m_operation->numberOfOutputs == 0)
 	{
-		m_internalData.emplace_back(m_operation->inputTypes[0]);
+		if (!m_operation->inputTypes.empty())
+		  m_internalData.emplace_back(m_operation->inputTypes[0]);
+		else
+      m_internalData.emplace_back(EValueType::Matrix);
 	}
 }
 
 ID NodeBase::getId() const
 {
-  return m_id;
+	return m_id;
 }
 
 void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node)
@@ -46,13 +49,12 @@ void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node)
 
 void NodeBase::setDataMap(const Transform::DataMap* map)
 {
-  // PerspectiveProj;
+	// PerspectiveProj;
 	auto& validMaps = getValidDataMaps();
-	auto it = std::find_if(validMaps.begin(), validMaps.end(),
-      [&](const Transform::DataMap* m) { return m == map; });
+	auto it = std::find_if(validMaps.begin(), validMaps.end(), [&](const Transform::DataMap* m) { return m == map; });
 
 	if (it != validMaps.end())
-	  m_currentMap = map;
+		m_currentMap = map;
 }
 
 const std::vector<Pin>& NodeBase::getInputPins()
@@ -67,7 +69,7 @@ const std::vector<Pin>& NodeBase::getOutputPins()
 
 std::vector<Pin>& NodeBase::getInputPinsRef()
 {
-  return m_inputs;
+	return m_inputs;
 }
 
 std::vector<Pin>& NodeBase::getOutputPinsRef()
@@ -88,9 +90,12 @@ void NodeBase::spreadSignal()
 
 void NodeBase::spreadSignal(int outIndex)
 {
-	for (auto* oct : getOutputPinsRef()[outIndex].getOutComponents())
+	if (getOutputPinsRef().empty())
+		return;
+
+	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
 	{
-		oct->m_master->receiveSignal(oct->getIndex());
+		inPin->m_master->receiveSignal(inPin->getIndex());
 	}
 }
 
@@ -98,7 +103,8 @@ void NodeBase::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
 
-  spreadSignal();
+	/// \todo MH this call is unnecessary, but SpreadSignalTest.ValuesShouldBeSpreadThroughConnectedNodes fails.
+	spreadSignal();
 }
 
 bool NodeBase::areInputsPlugged(int numInputs)
@@ -120,68 +126,68 @@ bool NodeBase::areAllInputsPlugged()
 	return areInputsPlugged(m_operation->numberOfInputs);
 }
 
-ENodePlugResult NodeBase::isPlugCorrect(Pin const * input, Pin const * output)
+ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 {
-  auto* inp = input;
-  if (!inp)
-    return ENodePlugResult::Err_NonexistentPin;
+	auto* inp = input;
+	if (!inp)
+		return ENodePlugResult::Err_NonexistentPin;
 
-  auto* out = output;
-  if (!out)
-    return ENodePlugResult::Err_NonexistentPin;
+	auto* out = output;
+	if (!out)
+		return ENodePlugResult::Err_NonexistentPin;
 
-  if (inp->m_valueType != out->m_valueType)
-  {
-    // Do the input and output data types match?
-    return ENodePlugResult::Err_MismatchedPinTypes;
-  }
+	if (inp->m_valueType != out->m_valueType)
+	{
+		// Do the input and output data types match?
+		return ENodePlugResult::Err_MismatchedPinTypes;
+	}
 
-  if (inp->m_isInput == out->m_isInput)
-  {
-    // Do the input and output kind match?
-    return ENodePlugResult::Err_MismatchedPinKind;
-  }
+	if (inp->m_isInput == out->m_isInput)
+	{
+		// Do the input and output kind match?
+		return ENodePlugResult::Err_MismatchedPinKind;
+	}
 
-  if (inp->m_master == out->m_master)
-  {
-    // Not a circular edge?
-    return ENodePlugResult::Err_Loopback;
-  }
+	if (inp->m_master == out->m_master)
+	{
+		// Not a circular edge?
+		return ENodePlugResult::Err_Loopback;
+	}
 
-  // cycle detector
-  auto toFind = inp->m_master; // INPUT
+	// cycle detector
+	auto toFind = inp->m_master; // INPUT
 
-  // stack in vector - TOS is at the vector back.
-  std::vector<Ptr<NodeBase>> stack;
+	// stack in vector - TOS is at the vector back.
+	std::vector<Ptr<NodeBase>> stack;
 
-  // PUSH(output) insert element at end.
-  stack.push_back(out->m_master);
+	// PUSH(output) insert element at end.
+	stack.push_back(out->m_master);
 
-  while (!stack.empty())
-  {
-    // Return last element of mutable sequence.
-    auto act = stack.back();
-    stack.pop_back();
+	while (!stack.empty())
+	{
+		// Return last element of mutable sequence.
+		auto act = stack.back();
+		stack.pop_back();
 
-    if (act == toFind)
-      return ENodePlugResult::Err_Loop;
+		if (act == toFind)
+			return ENodePlugResult::Err_Loop;
 
-    for (auto& pin : act->m_inputs)
-    {
-      if (pin.isPluggedIn())
-      {
-        Pin* ct = pin.m_input;
-        stack.push_back(ct->m_master);
-      }
-    }
-  }
+		for (auto& pin : act->m_inputs)
+		{
+			if (pin.isPluggedIn())
+			{
+				Pin* ct = pin.m_input;
+				stack.push_back(ct->m_master);
+			}
+		}
+	}
 
-  /*
-    if (isOperatorPlugCorrectMod != NULL)
-      return isOperatorPlugCorrectMod(inp, out);
-  */
+	/*
+	  if (isOperatorPlugCorrectMod != NULL)
+	    return isOperatorPlugCorrectMod(inp, out);
+	*/
 
-  return ENodePlugResult::Ok;
+	return ENodePlugResult::Ok;
 }
 
 void NodeBase::unplugAll()
@@ -241,13 +247,13 @@ void NodeBase::unplugOutput(int index)
 
 const DataStore& Pin::getStorage(unsigned int id)
 {
-  if (m_isInput)
-  {
-    // Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-    return m_input->m_master->getData(id);
-  }
-  else
-  {
-    return m_master->getData(id);
-  }
+	if (m_isInput)
+	{
+		// Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
+		return m_input->m_master->getData(id);
+	}
+	else
+	{
+		return m_master->getData(id);
+	}
 }

@@ -2,8 +2,6 @@
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 #include "WorkspaceElements.h"
 
-#include "Utils/NodeEditorStyle.h"
-
 class WorkspaceCorePinProperties;
 
 extern std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName;
@@ -39,8 +37,9 @@ class WorkspaceNodeWithCoreData : public WorkspaceNode
 protected:
     int m_numberOfVisibleDecimal=2; /* \todo JH default number from some setting */
     float m_dataItemsWidth = 25; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
+    float m_inactiveMark = 0.7;
 public:
-	
+
 	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
                                                 WorkspaceNodeWithCoreData is owner
                                            */
@@ -63,10 +62,11 @@ public:
     std::vector<Ptr<WorkspaceCorePinProperties>> const &getInputsProperties() const;
     std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
 
+    virtual bool isCamera();
     virtual bool isSequence();
-    bool inSequence();
     bool isTransformation();
 
+    virtual bool inSequence();
 
     int getNumberOfVisibleDecimal();
     int setNumberOfVisibleDecimal(int value);
@@ -93,6 +93,7 @@ public:
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 	virtual void drawData(util::NodeBuilder& builder, int index);
 	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+  virtual void drawMiddle(util::NodeBuilder& builder);
 
 	virtual void drawDataFull(util::NodeBuilder& builder, int index)=0;
 	virtual void drawDataSetValues(util::NodeBuilder& builder)=0;

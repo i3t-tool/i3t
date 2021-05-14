@@ -22,22 +22,25 @@ const int out_stop = 3;
 const int out_prev = 4;
 const int out_next = 5;
 const int out_cycleEnd = 6;
-}
-
+} // namespace CycleInternals
 
 class Cycle : public NodeBase
 {
-  enum class EMode
-  {
-    Once,
-    Repeat,
-    PingPong
-  };
+public:
+	enum class EMode
+	{
+		Once,
+		Repeat,
+		PingPong
+	};
 
-  float m_from = 0.0f;
+private:
+	float m_from = 0.0f;
 	float m_to = 10.0f;
 	float m_updateStep = 0.1f;
 	float m_multiplier = 0.1f;
+
+	float m_modeMultiplier = 1.0f;
 
 	bool m_isRunning = false;
 
@@ -45,7 +48,7 @@ class Cycle : public NodeBase
 
 public:
 	Cycle() : NodeBase(&g_CycleProperties) {}
-  void update(double s);
+	void update(double s);
 
 	void play();
 	void stop();
@@ -69,24 +72,26 @@ public:
 	 */
 	void setFrom(float from);
 
-  /**
-   * \param from in seconds
-   */
+	/**
+	 * \param from in seconds
+	 */
 	void setTo(float to);
 
-  /**
-   * \param from in seconds
-   */
+	/**
+	 * \param from in seconds
+	 */
 	void setMultiplier(float v);
 
-  /**
-   * \param from in seconds
-   */
+	/**
+	 * \param from in seconds
+	 */
 	void setStep(float v);
 
 	void updateValues(int inputIndex) override;
 
 private:
 	void updateValue(float seconds);
+
+	void setModeMultiplier();
 };
-}
+} // namespace Core

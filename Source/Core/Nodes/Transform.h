@@ -11,50 +11,48 @@ namespace Core
 {
 FORCE_INLINE bool isTransform(NodePtr& node)
 {
-	auto it = std::find_if(g_transforms.begin(), g_transforms.end(), [&node] (const Operation& o) {
-		return o.keyWord == node->getOperation()->keyWord;
-	});
+	auto it = std::find_if(g_transforms.begin(), g_transforms.end(),
+	                       [&node](const Operation& o) { return o.keyWord == node->getOperation()->keyWord; });
 	return it != g_transforms.end();
 }
-
 
 class Transformation : public NodeBase
 {
 	friend class Storage;
 
-  Ptr<NodeBase> m_currentSequence = nullptr;
-  int m_currentIndex = -1;
+	/// \todo MH Use Node::m_owner.
+	Ptr<NodeBase> m_currentSequence = nullptr;
+	int m_currentIndex = -1;
 
 public:
-  bool isInSequence() { return m_currentSequence != nullptr; }
+	bool isInSequence() { return m_currentSequence != nullptr; }
 	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
 	int getCurrentIndex() { return m_currentIndex; }
 
 protected:
-  Transformation(const Operation* transformType) : NodeBase(transformType) {}
+	Transformation(const Operation* transformType) : NodeBase(transformType) {}
 	void notifySequence();
 
 public:
 	/// \todo MH these should not be public.
-  void nullSequence()
-  {
-    m_currentSequence = nullptr;
-    int m_currentIndex = -1;
-  }
+	void nullSequence()
+	{
+		m_currentSequence = nullptr;
+		int m_currentIndex = -1;
+	}
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
-  {
-    m_currentSequence = s;
-    m_currentIndex = index;
+	{
+		m_currentSequence = s;
+		m_currentIndex = index;
 	}
 
 	void setSequence(Ptr<NodeBase>& s, int index)
-  {
+	{
 		m_currentSequence = s;
 		m_currentIndex = index;
 	}
 };
-
 
 class Free : public Transformation
 {
@@ -75,13 +73,12 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
 	{
 		setInternalValue(val, coords);
-    notifySequence();
+		notifySequence();
 		return ValueSetResult{};
 	}
 
 	void reset() override { setValue(glm::mat4(1.0f)); };
 };
-
 
 class Scale : public Transformation
 {
@@ -101,15 +98,14 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 
-  float getX();
-  float getY();
-  float getZ();
+	float getX();
+	float getY();
+	float getZ();
 
-  ValueSetResult setX(float v);
-  ValueSetResult setY(float v);
-  ValueSetResult setZ(float v);
+	ValueSetResult setX(float v);
+	ValueSetResult setY(float v);
+	ValueSetResult setZ(float v);
 };
-
 
 /**
  * \code
@@ -131,9 +127,9 @@ public:
 		m_currentMap = &map;
 	}
 
-  [[nodiscard]] float getRot() { return m_initialRot; }
+	[[nodiscard]] float getRot() { return m_initialRot; }
 
-  float getAngle() { return m_initialRot; }
+	float getAngle() { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -142,7 +138,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 };
-
 
 /**
  * \code
@@ -164,9 +159,9 @@ public:
 		m_currentMap = &map;
 	}
 
-  [[nodiscard]] float getRot() { return m_initialRot; }
+	[[nodiscard]] float getRot() { return m_initialRot; }
 
-  float getAngle() { return m_initialRot; }
+	float getAngle() { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -175,7 +170,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 };
-
 
 /**
  * \code
@@ -197,9 +191,9 @@ public:
 		m_currentMap = &map;
 	}
 
-  float getAngle() { return m_initialRot; }
+	float getAngle() { return m_initialRot; }
 
-  [[nodiscard]] float getRot() { return m_initialRot; }
+	[[nodiscard]] float getRot() { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -208,7 +202,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	void reset() override;
 };
-
 
 class Translation : public Transformation
 {
@@ -236,10 +229,9 @@ public:
 	float getZ();
 
 	ValueSetResult setX(float v);
-  ValueSetResult setY(float v);
-  ValueSetResult setZ(float v);
+	ValueSetResult setY(float v);
+	ValueSetResult setZ(float v);
 };
-
 
 //===-- Other transformations ---------------------------------------------===//
 class AxisAngleRot : public Transformation
@@ -259,13 +251,12 @@ public:
 	ValueSetResult setValue(float rads) override;
 	ValueSetResult setValue(const glm::vec3& axis) override;
 
-  float getRot() const { return m_initialRads; };
-  const glm::vec3& getAxis() const { return m_initialAxis; };
+	float getRot() const { return m_initialRads; };
+	const glm::vec3& getAxis() const { return m_initialAxis; };
 
-  ValueSetResult setRot(float rads);
-  ValueSetResult setAxis(const glm::vec3& axis);
+	ValueSetResult setRot(float rads);
+	ValueSetResult setAxis(const glm::vec3& axis);
 };
-
 
 class QuatRot : public Transformation
 {
@@ -286,7 +277,6 @@ public:
 	ValueSetResult setValue(const glm::quat& vec);
 	ValueSetResult setValue(const glm::vec4& vec) override;
 };
-
 
 class OrthoProj : public Transformation
 {
@@ -311,21 +301,20 @@ public:
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-  float getLeft() { return m_left; }
-  float getRight() { return m_right; }
-  float getBottom() { return m_bottom; }
-  float getTop() { return m_top; }
-  float getNear() { return m_near; }
-  float getFar() { return m_far; }
+	float getLeft() { return m_left; }
+	float getRight() { return m_right; }
+	float getBottom() { return m_bottom; }
+	float getTop() { return m_top; }
+	float getNear() { return m_near; }
+	float getFar() { return m_far; }
 
-  ValueSetResult setLeft(float val);
-  ValueSetResult setRight(float val);
-  ValueSetResult setBottom(float val);
-  ValueSetResult setTop(float val);
-  ValueSetResult setNear(float val);
-  ValueSetResult setFar(float val);
+	ValueSetResult setLeft(float val);
+	ValueSetResult setRight(float val);
+	ValueSetResult setBottom(float val);
+	ValueSetResult setTop(float val);
+	ValueSetResult setNear(float val);
+	ValueSetResult setFar(float val);
 };
-
 
 class PerspectiveProj : public Transformation
 {
@@ -357,7 +346,6 @@ public:
 	ValueSetResult setZNear(float v);
 	ValueSetResult setZFar(float v);
 };
-
 
 class Frustum : public Transformation
 {
@@ -395,7 +383,6 @@ public:
 	ValueSetResult setNear(float val);
 	ValueSetResult setFar(float val);
 };
-
 
 /**
  * Same as perspective projection node, but all values are locked.

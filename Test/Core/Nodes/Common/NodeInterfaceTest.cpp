@@ -23,10 +23,10 @@ Ptr<NodeBase> mul1, mul2, mul3;
  */
 Ptr<NodeBase> prepareEnvironment()
 {
-  scale1 = Builder::createTransform<Scale>();
-  rotX = Builder::createTransform<EulerRotX>(initialRot);
-  scale2 = Builder::createTransform<Scale>(initialScale, Transform::g_Scale);
-  translation = Builder::createTransform<Translation>(initialTransl);
+  scale1 = Builder::createNode<ENodeType::MakeScale>();
+  rotX = Builder::createNode<ENodeType::MakeEulerX>();
+  scale2 = Builder::createNode<ENodeType::MakeScale>();
+  translation = Builder::createNode<ENodeType::MakeTranslation>();
 
 	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be complete yet!)
   mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
@@ -121,7 +121,7 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
 	auto inputSeq = Builder::createSequence();
 	auto mySeq = Builder::createSequence();
-	auto free = Builder::createTransform<Free>();
+	auto free = Builder::createNode<ENodeType::Matrix>();
 
 	plug_expectOk(inputSeq, mySeq, 0, 0);
 	plug_expectOk(free, mySeq, 0, 1);
