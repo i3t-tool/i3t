@@ -33,22 +33,22 @@ LookAtManipulator::LookAtManipulator() {
 	m_edited=glm::mat4(1.0f);
 }
 void LookAtManipulator::GUI() {
-	if(m_activehandle!=-1){
-		ManipulatorUtil::hint("Move center or eye of LookAt transformation matrix.\nUse keys C, E to switch between center and eye.");
+	//if(m_activehandle!=-1){
+	ManipulatorUtil::hint("Move center or eye of LookAt transformation matrix.\nUse keys C, E to switch between center and eye.");
 
-		//char txt[100];
-		//sprintf(txt,"X: %0.3f, Y: %0.3f, Z: %0.3f",m_handlespace[3][0],m_handlespace[3][1],m_handlespace[3][2]);
-		//ManipulatorUtil::hintAt("jj",world2screen((glm::vec3)m_handlespace[3])-glm::vec2(0.0f,20.0f));
-		glm::vec2 pos=world2screen((glm::vec3)m_handlespace[3])-glm::vec2(90.0f,70.0f);
-		ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
+	//char txt[100];
+	//sprintf(txt,"X: %0.3f, Y: %0.3f, Z: %0.3f",m_handlespace[3][0],m_handlespace[3][1],m_handlespace[3][2]);
+	//ManipulatorUtil::hintAt("jj",world2screen((glm::vec3)m_handlespace[3])-glm::vec2(0.0f,20.0f));
+	glm::vec2 pos=world2screen((glm::vec3)m_handlespace[3])-glm::vec2(90.0f,70.0f);
+	ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
 
-		Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();
-		glm::vec3 center= editedlookat->getCenter();
-		glm::vec3 eye= editedlookat->getEye();
+	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();
+	glm::vec3 center= editedlookat->getCenter();
+	glm::vec3 eye= editedlookat->getEye();
 
-		if(m_editmode==LookAtManipulator::EDIT_CENTER){ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", center[0], center[1], center[2]);}
-		else{ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", eye[0], eye[1], eye[2]);}
-	}
+	if(m_editmode==LookAtManipulator::EDIT_CENTER){ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", center[0], center[1], center[2]);}
+	else{ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", eye[0], eye[1], eye[2]);}
+	//}
 }
 void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(m_editednode==nullptr){return;}

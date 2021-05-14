@@ -50,7 +50,7 @@ void FreeManipulator::start(){
 
 }
 void FreeManipulator::GUI() {
-	if(m_activehandle!=-1){ManipulatorUtil::hint("Use keys S, R, T to switch scale, rotation and translation.\nUse keys X, Y, Z, W or LMB to switch axis.");}
+	ManipulatorUtil::hint("Use keys S, R, T to switch scale, rotation and translation.\nUse keys X, Y, Z, W or LMB to switch axis.");
 }
 
 void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
