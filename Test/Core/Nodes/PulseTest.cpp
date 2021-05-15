@@ -11,14 +11,15 @@ TEST(PulseTest, PulseNodeCanTriggerCycle)
 	auto cycle = GraphManager::createCycle();
 
   plug_expectOk(pulse, cycle, 0, CycleInternals::in_play);
+	EXPECT_TRUE(!cycle->isRunning());
 
-	pulse->updateValues();
+	pulse->spreadSignal();
 	EXPECT_TRUE(cycle->isRunning());
 
 	GraphManager::unplugAll(pulse);
 
 	plug_expectOk(pulse, cycle, 0, CycleInternals::in_pause);
 
-  pulse->updateValues();
+  pulse->spreadSignal();
   EXPECT_FALSE(cycle->isRunning());
 }
