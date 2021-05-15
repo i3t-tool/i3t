@@ -16,6 +16,15 @@
 
 enum class EColor
 {
+	PulseLink = 0,
+	FloatLink,
+	Vec3Link,
+	Vec4Link,
+	MatrixLink,
+	QuatLink,
+	MatrixMulLink,
+	ScreenLink,
+
 	Text,
 	Border,
 	WindowBackground,
@@ -39,14 +48,6 @@ enum class EColor
 
 	NodeHeader,
 	NodeEditorBg,
-
-	PulseLink,
-	FloatLink,
-	MatrixLink,
-	QuatLink,
-	Vec3Link,
-	Vec4Link,
-	ScreenLink
 };
 
 enum class EFont
@@ -99,28 +100,10 @@ enum class ESizeVec2
 
 constexpr inline EColor asColor(EValueType type)
 {
-	switch (type)
-	{
-	case EValueType::Pulse:
-		return EColor::PulseLink;
-	case EValueType::Float:
-		return EColor::FloatLink;
-	case EValueType::Vec3:
-		return EColor::Vec3Link;
-	case EValueType::Vec4:
-		return EColor::Vec4Link;
-	case EValueType::Matrix:
-		return EColor::MatrixLink;
-	case EValueType::Quat:
-		return EColor::QuatLink;
-	case EValueType::MatrixMul:
-		return EColor::MatrixLink;
-	case EValueType::Screen:
-		return EColor::ScreenLink;
-	}
-
-	return EColor::Vec3Link;
+	return EColor(type);
 }
+
+
 
 template <typename T>
 std::optional<const char*> enumToStr(std::map<T, const char*>& map, T en)

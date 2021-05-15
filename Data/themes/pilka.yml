@@ -39,37 +39,37 @@ colors:
     y: 0.588
     z: 0.980000019
     w: 1
-  Pulse Link:
+  Pulse Pin:
     x: 1.00899994
     y: 1
     z: 1
     w: 1
-  Float Link:
+  Float Pin:
     x: 1.00899994
     y: 1
     z: 1
     w: 1
-  Matrix Link:
+  Matrix Pin:
     x: 0.266666681
     y: 0.788235307
     z: 0.611764729
     w: 1
-  Quaternion Link:
+  Quaternion Pin:
     x: 0.486274511
     y: 0.0823529437
     z: 0.600000024
     w: 1
-  Vector 3 Link:
+  Vector 3 Pin:
     x: 0.854901969
     y: 0
     z: 0.717647076
     w: 1
-  Vector 4 Link:
+  Vector 4 Pin:
     x: 0.854901969
     y: 0
     z: 0.717647076
     w: 1
-  Screen Link:
+  Screen Pin:
     x: 0.854901969
     y: 0
     z: 0.717647076

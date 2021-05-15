@@ -128,13 +128,13 @@ void Theme::initNames()
 	g_ColorNames[EColor::NodeHeader] = "Node Header";
 	g_ColorNames[EColor::NodeEditorBg] = "Node Editor Background";
 
-	g_ColorNames[EColor::PulseLink] = "Pulse Link";
-	g_ColorNames[EColor::FloatLink] = "Float Link";
-	g_ColorNames[EColor::MatrixLink] = "Matrix Link";
-	g_ColorNames[EColor::QuatLink] = "Quaternion Link";
-	g_ColorNames[EColor::Vec3Link] = "Vector 3 Link";
-	g_ColorNames[EColor::Vec4Link] = "Vector 4 Link";
-	g_ColorNames[EColor::ScreenLink] = "Screen Link";
+	g_ColorNames[EColor::PulseLink] = "Pulse Pin";
+	g_ColorNames[EColor::FloatLink] = "Float Pin";
+	g_ColorNames[EColor::MatrixLink] = "Matrix Pin";
+	g_ColorNames[EColor::QuatLink] = "Quaternion Pin";
+	g_ColorNames[EColor::Vec3Link] = "Vector 3 Pin";
+	g_ColorNames[EColor::Vec4Link] = "Vector 4 Pin";
+	g_ColorNames[EColor::ScreenLink] = "Screen Pin";
 
 	g_SizeNames[ESize::Nodes_Rounding] = "Nodes Rounding";
 	g_SizeNames[ESize::Nodes_FloatWidth] = "Nodes Float Width";
