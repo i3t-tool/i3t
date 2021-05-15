@@ -15,6 +15,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include "GUI/Theme.h"
 
 /**
  * A configuration structure.
@@ -67,6 +70,8 @@ struct Config
 	///< parameters + textures),  geometries (models), and objects (combines names, geometries and textures to groups of
 	///< named objects))
 	static std::string LOAD_SCENE; ///< The load scene
+
+	static std::string DEFAULT_THEME;
 
 	//@{
 

@@ -16,6 +16,7 @@
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"
+#include "Loader/ConfigLoader.h"
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
 #include "Utils/Color.h"
@@ -143,11 +144,15 @@ void Application::finalize()
 
 	World::end();
 
+	loadConfig();
+
 	glfwTerminate();
 }
 
 bool Application::initI3T()
 {
+	loadConfig();
+
 	// new scene scheme
 	bool b = World::init();
 	m_world = World::loadDefaultScene();

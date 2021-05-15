@@ -218,7 +218,6 @@ int main(int argc, char* argv[])
 
 	app.run();
 
-	/// \todo finalize() test
 	app.finalize();
 
 	LOG_INFO("I3T is now exited.");

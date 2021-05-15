@@ -70,6 +70,12 @@ TEST(Cycle, TriggerStepNextOnParentPlay)
   EXPECT_TRUE(Math::eq(expected, current));
 }
 
+TEST(_, _)
+{
+	NodePtr c = GraphManager::createCycle();
+	c->getData().getFloat();
+}
+
 TEST(Cycle, TriggerOnPlay)
 {
   auto cycle1 = GraphManager::createCycle();
