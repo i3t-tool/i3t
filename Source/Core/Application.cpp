@@ -144,8 +144,6 @@ void Application::finalize()
 
 	World::end();
 
-	loadConfig();
-
 	glfwTerminate();
 }
 
