@@ -158,20 +158,20 @@ enum class ENodeType
 	Vector3Length,             // done SS
 	ShowVector3,               // done SS
 	MixVector3,                // done SS
-	ConjQuat,                  // done SS waiting for free quat
-	FloatVecToQuat,            // done SS waiting for free quat
-	AngleAxisToQuat,           // done SS waiting for free quat
-	VecVecToQuat,              // done SS waiting for free quat
-	QuatToFloatVec,            // todo vec3 + float
-	QuatToAngleAxis,           // todo  vec3 + float
+	ConjQuat,                  // done SS
+	FloatVecToQuat,            // done SS
+	AngleAxisToQuat,           // done SS
+	VecVecToQuat,              // done SS
+	QuatToFloatVec,            // done SS
+	QuatToAngleAxis,           // done SS
 	QuatToEuler,               // done SS
-	EulerToQuat,               // done SS waiting for free quat
-	QuatInverse,               // done SS waiting for free quat
-	QuatSlerp,                 // done SS waiting for free quat
-	QuatLongWaySlerp,          // done SS waiting for free quat
-	QuatLerp,                  // done SS waiting for free quat
-	FloatMulQuat,              // done SS waiting for free quat
-	QuatMulQuat,               // done SS waiting for free quat
+	EulerToQuat,               // done SS
+	QuatInverse,               // done SS
+	QuatSlerp,                 // done SS
+	QuatLongWaySlerp,          // done SS
+	QuatLerp,                  // done SS
+	FloatMulQuat,              // done SS
+	QuatMulQuat,               // done SS
 	QuatVecConjQuat,           // done SS
 	QuatLength,                // done SS
 	ClampFloat,                // done SS
@@ -190,7 +190,7 @@ enum class ENodeType
 	FloatsToMatrix,            // done SS
 	MatrixToTR,                // done SS
 	TRToMatrix,                // done SS
-	MatrixToQuat,              // done SS waiting for free quat
+	MatrixToQuat,              // done SS
 	QuatToMatrix,              // done SS
 	VectorToFloats,            // done SS
 	FloatsToVector,            // done SS
@@ -199,13 +199,13 @@ enum class ENodeType
 	VectorToVector3,           // done SS
 	Vector3ToVector,           // done SS
 	QuatToFloats,              // done SS
-	FloatsToQuat,              // done SS waiting for free quat
-	NormalizeQuat,             // done SS waiting for free quat
+	FloatsToQuat,              // done SS
+	NormalizeQuat,             // done SS
 	Float,                     // done SS
 	Vector3,                   // done JH
 	Vector4,                   // done JH
 	Matrix,                    // done JH
-	Quat,
+	Quat,                      // done SS
 	Model,
 
 	// Transform matrices "constructors"
@@ -223,7 +223,7 @@ enum class ENodeType
 	Screen,
 	Pulse
 
-	// SS missing trackball and free quat types
+	// SS missing trackball
 };
 
 enum class ETransformType

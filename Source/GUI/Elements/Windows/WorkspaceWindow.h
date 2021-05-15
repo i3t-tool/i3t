@@ -39,8 +39,8 @@
 #include "../Nodes/WorkspacePerspective.h"
 #include "../Nodes/WorkspaceSequence.h"
 #include "../Nodes/WorkspaceTransformationFree.h"
-//#include "../Nodes/WorkspaceQuatRot.h"
-//} tranformationa end
+#include "../Nodes/WorkspaceQuatRot.h"
+//} transformations end
 
 //operators {
 
@@ -55,7 +55,7 @@
 #include "../Nodes/WorkspaceMakePerspective.h"
 #include "../Nodes/WorkspaceMakeScale.h"
 #include "../Nodes/WorkspaceMakeTranslation.h"
-//	} tranformation end
+//	} transformations end
 
 //	matrix{
 #include "../Nodes/WorkspaceMatrixFree.h"
