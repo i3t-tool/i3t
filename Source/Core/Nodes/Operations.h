@@ -221,7 +221,7 @@ enum class ENodeType
 	MakeLookAt,      // done SS
 
 	Screen,
-	Pulse
+	Pulse            // done SS
 
 	// SS missing trackball
 };
@@ -236,7 +236,7 @@ enum class ETransformType
 	EulerZ,      // done SS
 	Scale,       // done JH
 	AxisAngle,   // done SS
-	Quat,        // waiting for base quat
+	Quat,        // done SS
 	Ortho,       // done SS
 	Perspective, // done SS
 	Frustum,     // done SS

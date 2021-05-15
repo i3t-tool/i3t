@@ -1282,6 +1282,10 @@ void WorkspaceWindow::checkQueryContextMenus()
             m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
             ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
+    if (ImGui::MenuItem("Pulse")) {
+      m_workspaceCoreNodes.push_back(std::make_shared<WorkspacePulse>(m_headerBackgroundTexture));
+      ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+    }
 		if (ImGui::MenuItem("screen")) {
 		}
 
