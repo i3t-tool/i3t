@@ -388,7 +388,7 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
     //          alpha = alpha * (48.0f / 255.0f);
 
 
-    builder.Input(pinProp->getId());
+    builder.Input(pinProp->getId(), WorkspacePinColor[pinProp->getType()]);
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
@@ -477,7 +477,7 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 
 
-		builder.Output(pinProp->getId());
+		builder.Output(pinProp->getId(), WorkspacePinColor[pinProp->getType()]);
 
 		if(!isTransformation() && !isCamera() && !isSequence()){ //is Operator
       ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());

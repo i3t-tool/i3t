@@ -1711,6 +1711,15 @@ ed::Pin* ed::EditorContext::CreatePin(PinId id, PinKind kind)
     return pin;
 }
 
+ed::Pin* ed::EditorContext::CreatePin(PinId id, PinKind kind, ImColor color)
+{
+  IM_ASSERT(nullptr == FindObject(id));
+  auto pin = new Pin(this, id, kind, color);
+  m_Pins.push_back({id, pin});
+  std::sort(m_Pins.begin(), m_Pins.end());
+  return pin;
+}
+
 ed::Node* ed::EditorContext::CreateNode(NodeId id)
 {
     IM_ASSERT(nullptr == FindObject(id));
@@ -4133,8 +4142,7 @@ bool ed::CreateItemAction::Process(const Control& control)
         cursorPin.m_Strength =  m_DraggedPin->m_Strength;
 
         ed::Link candidate(Editor, 0);
-        //auto& window = I3T::getWindowPtr<Work>();
-				candidate.m_Color = m_DraggedPin->m_Color;
+				candidate.m_Color = m_DraggedPin->m_InnerColor;
         //candidate.m_Color    = m_LinkColor;
         candidate.m_StartPin = draggingFromSource ? m_DraggedPin : &cursorPin;
         candidate.m_EndPin   = draggingFromSource ? &cursorPin : m_DraggedPin;
@@ -4802,7 +4810,7 @@ void ed::NodeBuilder::End()
     m_CurrentNode = nullptr;
 }
 
-void ed::NodeBuilder::BeginPin(PinId pinId, PinKind kind)
+void ed::NodeBuilder::BeginPin(PinId pinId, PinKind kind, ImColor color)
 {
     IM_ASSERT(nullptr != m_CurrentNode);
     IM_ASSERT(nullptr == m_CurrentPin);
@@ -4814,6 +4822,7 @@ void ed::NodeBuilder::BeginPin(PinId pinId, PinKind kind)
     m_CurrentPin->m_Node = m_CurrentNode;
 
     m_CurrentPin->m_IsLive      = true;
+		m_CurrentPin->m_InnerColor  = color;
     m_CurrentPin->m_Color       = Editor->GetColor(StyleColor_PinRect);
     m_CurrentPin->m_BorderColor = Editor->GetColor(StyleColor_PinRectBorder);
     m_CurrentPin->m_BorderWidth = editorStyle.PinBorderWidth;

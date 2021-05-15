@@ -30,12 +30,12 @@ struct NodeBuilder
 	void Header(const ImVec4& color = ImVec4(1, 1, 1, 1));
 	void EndHeader();
 
-	void Input(PinId id);
+	void Input(PinId id, ImColor color);
 	void EndInput();
 
 	void Middle();
 
-	void Output(PinId id);
+	void Output(PinId id, ImColor color);
 	void EndOutput();
 
 private:
@@ -53,7 +53,7 @@ private:
 
 	bool SetStage(Stage stage);
 
-	void Pin(PinId id, ax::NodeEditor::PinKind kind);
+	void Pin(PinId id, ax::NodeEditor::PinKind kind, ImColor color);
 	void EndPin();
 
 	ImTextureID HeaderTextureId;

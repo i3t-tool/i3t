@@ -111,7 +111,7 @@ void util::NodeBuilder::EndHeader()
 	SetStage(Stage::Content);
 }
 
-void util::NodeBuilder::Input(ed::PinId id)
+void util::NodeBuilder::Input(ed::PinId id, ImColor color)
 {
 	if (CurrentStage == Stage::Begin)
 		SetStage(Stage::Content);
@@ -123,7 +123,7 @@ void util::NodeBuilder::Input(ed::PinId id)
 	if (applyPadding) {
 		ImGui::Spring(0);
 	}
-	Pin(id, PinKind::Input);
+	Pin(id, PinKind::Input, color);
 
 	//SS
 
@@ -147,7 +147,7 @@ void util::NodeBuilder::Middle()
 	SetStage(Stage::Middle);
 }
 
-void util::NodeBuilder::Output(ed::PinId id)
+void util::NodeBuilder::Output(ed::PinId id, ImColor color)
 {
 	if (CurrentStage == Stage::Begin)
 		SetStage(Stage::Content);
@@ -159,7 +159,7 @@ void util::NodeBuilder::Output(ed::PinId id)
 	if (applyPadding)
 		ImGui::Spring(0);
 
-	Pin(id, PinKind::Output);
+	Pin(id, PinKind::Output, color);
 
 	//SS
 
@@ -313,9 +313,9 @@ bool util::NodeBuilder::SetStage(Stage stage)
 	return true;
 }
 
-void util::NodeBuilder::Pin(ed::PinId id, ed::PinKind kind)
+void util::NodeBuilder::Pin(ed::PinId id, ed::PinKind kind, ImColor color)
 {
-	ed::BeginPin(id, kind);
+	ed::BeginPin(id, kind, color);
 }
 
 void util::NodeBuilder::EndPin()

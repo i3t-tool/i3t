@@ -213,7 +213,7 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 
   float alpha = ImGui::GetStyle().Alpha;
 
-  builder.Input(pinProp->getId());
+  builder.Input(pinProp->getId(), WorkspacePinColor[pinProp->getType()]);
 
   ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
