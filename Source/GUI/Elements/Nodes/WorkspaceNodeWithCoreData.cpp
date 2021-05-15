@@ -2,6 +2,7 @@
 
 #include "spdlog/fmt/fmt.h"
 #include <string>
+#include "Core/Input/InputManager.h"
 
 std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName = {
     {&Core::Transform::g_Free, "Free"},
@@ -219,8 +220,20 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
+  float step = 0.01f;
+	auto io = ImGui::GetIO();
+	if(InputManager::isKeyPressed(Keys::ctrll)){
+    step = 10.0f;
+	}else if(InputManager::isKeyPressed(Keys::altl)){
+    step = 1.0f;
+  }else if(InputManager::isKeyPressed(Keys::shiftl)){
+    step = 0.1f;
+  }else{
+    step = 0.01f;
+	}
+
 	// make step a configurable constant.
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 0.01f, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, step, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
 	{

@@ -13,7 +13,7 @@ Theme::Theme()
 	set(EColor::Border, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
 	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
-
+  set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 
 	// Node Editor
 	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
@@ -135,9 +135,10 @@ void Theme::apply()
 
 void Theme::operatorColorTheme()
 {
+
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
   ImGuiStyle& style = ImGui::GetStyle();
-  style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBgOperator];
+	style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBgOperator];
   style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgOperatorHovered];
   style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgOperatorActive];
 }
@@ -163,4 +164,9 @@ ImVec4 Theme::getHeader(){
     return m_colors[EColor::NodeHeaderTranformation];
   }
 	return ImVec4(0,0,0,0);
+}
+
+void Theme::returnFloatColorToDefault(){
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBg];
 }

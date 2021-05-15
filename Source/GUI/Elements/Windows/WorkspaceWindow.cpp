@@ -99,6 +99,7 @@ void WorkspaceWindow::render()
 			t.operatorColorTheme();
 		}
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
+    t.returnFloatColorToDefault();
 	}
 
     /* put and pop to/from Sequence */

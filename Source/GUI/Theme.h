@@ -23,6 +23,7 @@ enum class EColor
 	PrimaryColor, /// Color of tabs, separators, titles ...
 	ActiveColor,
 	TabColor,
+  FloatBg,
 
   NodeBgOperator,
   NodeHeaderOperator,
@@ -175,6 +176,7 @@ public:
 
 	void operatorColorTheme();
 	void transformationColorTheme();
+  void returnFloatColorToDefault();
 
   ImVec4 getHeader();
 };

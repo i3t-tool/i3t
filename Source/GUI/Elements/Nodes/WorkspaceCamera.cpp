@@ -58,6 +58,7 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     t.operatorColorTheme();
   }
 	m_projection->drawNode(builder);
+	t.returnFloatColorToDefault();
 	m_dataRect.Add(ImGui::GetItemRectMax());
 
 	ne::SetNodePosition(m_view->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
@@ -69,6 +70,7 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     t.operatorColorTheme();
   }
 	m_view->drawNode(builder);
+  t.returnFloatColorToDefault();
 	m_dataRect.Add(ImGui::GetItemRectMax());
 }
 
