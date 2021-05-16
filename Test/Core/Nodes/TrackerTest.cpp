@@ -7,6 +7,9 @@
 #include "Generator.h"
 #include "Utils.h"
 
+#include "imgui.h"
+#include "GUI/Theme.h"
+
 using namespace Core;
 
 /**

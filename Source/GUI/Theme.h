@@ -103,6 +103,18 @@ constexpr inline EColor asColor(EValueType type)
 	return EColor(type);
 }
 
+template <typename T>
+inline T color_b2f(T&& color)
+{
+	static_assert(std::is_same_v<ImVec4, T>);
+
+	color.x = color.x / 255.0f;
+	color.y = color.y / 255.0f;
+	color.z = color.z / 255.0f;
+	color.w = color.w / 255.0f;
+
+	return color;
+}
 
 
 template <typename T>
