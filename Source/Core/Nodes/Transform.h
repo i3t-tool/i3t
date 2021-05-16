@@ -100,6 +100,7 @@ public:
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
+		enableSynergies();
 	}
 
 	void lock() override;
@@ -139,6 +140,7 @@ public:
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
+		enableSynergies();
 	}
 
 	void lock() override;
@@ -173,6 +175,7 @@ public:
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
+		enableSynergies();
 	}
 
 	void lock() override;
@@ -207,6 +210,7 @@ public:
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
+		enableSynergies();
 	}
 
 	void lock() override;

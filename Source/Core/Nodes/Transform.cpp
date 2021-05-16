@@ -228,35 +228,37 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 
 	auto mat = getData().getMat4();
 
-	if (coords == glm::ivec2(1, 2))
+	mat[coords.x][coords.y] = val;
+	if (hasSynergies())
 	{
-		// -sin(T)
-		mat[1][2] = val;
-		mat[2][1] = -val;
+		if (coords == glm::ivec2(1, 2))
+		{
+			// -sin(T)
+			mat[2][1] = -val;
 
-		auto cos = sqrt(1.0f - (val * val));
-		mat[1][1] = cos;
-		mat[2][2] = cos;
-	}
-	else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
-	{
-		// cos(T)
-		mat[1][1] = val;
-		mat[2][2] = val;
+			auto cos = sqrt(1.0f - (val * val));
+			mat[1][1] = cos;
+			mat[2][2] = cos;
+		}
+		else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
+		{
+			// cos(T)
+			mat[1][1] = val;
+			mat[2][2] = val;
 
-		auto sin = sqrt(1.0f - (val * val));
-		mat[1][2] = sin;
-		mat[2][1] = -sin;
-	}
-	else if (coords == glm::ivec2(2, 1))
-	{
-		// sin(T)
-		mat[2][1] = val;
-		mat[1][2] = -val;
+			auto sin = sqrt(1.0f - (val * val));
+			mat[1][2] = sin;
+			mat[2][1] = -sin;
+		}
+		else if (coords == glm::ivec2(2, 1))
+		{
+			// sin(T)
+			mat[1][2] = -val;
 
-		auto cos = sqrt(1.0f - (val * val));
-		mat[1][1] = cos;
-		mat[2][2] = cos;
+			auto cos = sqrt(1.0f - (val * val));
+			mat[1][1] = cos;
+			mat[2][2] = cos;
+		}
 	}
 
 	setInternalValue(mat);
@@ -331,35 +333,37 @@ ValueSetResult EulerRotY::setValue(float val, glm::ivec2 coords)
 
 	auto mat = getData().getMat4();
 
-	if (coords == glm::ivec2(0, 2))
+	mat[coords.x][coords.y] = val;
+	if (hasSynergies())
 	{
-		// -sin(T)
-		mat[0][2] = val;
-		mat[2][0] = -val;
+		if (coords == glm::ivec2(0, 2))
+		{
+			// -sin(T)
+			mat[2][0] = -val;
 
-		auto cos = sqrt(1.0f - (val * val));
-		mat[0][0] = cos;
-		mat[2][2] = cos;
-	}
-	else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(2, 2))
-	{
-		// cos(T)
-		mat[0][0] = val;
-		mat[2][2] = val;
+			auto cos = sqrt(1.0f - (val * val));
+			mat[0][0] = cos;
+			mat[2][2] = cos;
+		}
+		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(2, 2))
+		{
+			// cos(T)
+			mat[0][0] = val;
+			mat[2][2] = val;
 
-		auto sin = sqrt(1.0f - (val * val));
-		mat[0][2] = -sin;
-		mat[2][0] = sin;
-	}
-	else if (coords == glm::ivec2(2, 0))
-	{
-		// sin(T)
-		mat[2][0] = val;
-		mat[0][2] = -val;
+			auto sin = sqrt(1.0f - (val * val));
+			mat[0][2] = -sin;
+			mat[2][0] = sin;
+		}
+		else if (coords == glm::ivec2(2, 0))
+		{
+			// sin(T)
+			mat[0][2] = -val;
 
-		auto cos = sqrt(1.0f - (val * val));
-		mat[0][0] = cos;
-		mat[2][2] = cos;
+			auto cos = sqrt(1.0f - (val * val));
+			mat[0][0] = cos;
+			mat[2][2] = cos;
+		}
 	}
 
 	setInternalValue(mat);
@@ -431,35 +435,37 @@ ValueSetResult EulerRotZ::setValue(float val, glm::ivec2 coords)
 
 	auto mat = getData().getMat4();
 
-	if (coords == glm::ivec2(0, 1))
+	mat[coords.x][coords.y] = val;
+	if (hasSynergies())
 	{
-		// -sin(T)
-		mat[0][1] = val;
-		mat[1][0] = -val;
+		if (coords == glm::ivec2(0, 1))
+		{
+			// -sin(T)
+			mat[1][0] = -val;
 
-		auto cos = sqrt(1.0f - (val * val));
-		mat[0][0] = cos;
-		mat[1][1] = cos;
-	}
-	else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
-	{
-		// cos(T)
-		mat[0][0] = val;
-		mat[1][1] = val;
+			auto cos = sqrt(1.0f - (val * val));
+			mat[0][0] = cos;
+			mat[1][1] = cos;
+		}
+		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
+		{
+			// cos(T)
+			mat[0][0] = val;
+			mat[1][1] = val;
 
-		auto sin = sqrt(1.0f - (val * val));
-		mat[0][1] = sin;
-		mat[1][0] = -sin;
-	}
-	else if (coords == glm::ivec2(1, 0))
-	{
-		// sin(T)
-		mat[1][0] = val;
-		mat[0][1] = -val;
+			auto sin = sqrt(1.0f - (val * val));
+			mat[0][1] = sin;
+			mat[1][0] = -sin;
+		}
+		else if (coords == glm::ivec2(1, 0))
+		{
+			// sin(T)
+			mat[0][1] = -val;
 
-		auto cos = sqrt(1.0f - (val * val));
-		mat[0][0] = cos;
-		mat[1][1] = cos;
+			auto cos = sqrt(1.0f - (val * val));
+			mat[0][0] = cos;
+			mat[1][1] = cos;
+		}
 	}
 
 	setInternalValue(mat);
