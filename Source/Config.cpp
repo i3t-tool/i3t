@@ -249,3 +249,5 @@ float Config::CAM_LERP_DISTTOSTEP_KOEF = 0.05f;
 
 std::string Config::CONTENT_FILE = "Data/content.cfg";
 std::string Config::LOAD_SCENE = "NONE";
+
+std::string Config::DEFAULT_THEME = "default";

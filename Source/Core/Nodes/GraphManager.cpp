@@ -50,7 +50,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 		rightNode->as<Sequence>()->updatePins();
 	}
 
-	leftNode->spreadSignal();
+	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
+		leftNode->spreadSignal();
 
 	rightNode->setDataMap(&Transform::g_AllLocked);
 

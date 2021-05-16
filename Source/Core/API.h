@@ -18,6 +18,11 @@ inline Theme& getTheme()
 	return getUI()->getTheme();
 }
 
+inline std::vector<Theme>& getThemes()
+{
+	return getUI()->getThemes();
+}
+
 inline ImFont* getFont(EFont font)
 {
 	return getTheme().get(font);

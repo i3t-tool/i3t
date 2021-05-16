@@ -14,7 +14,6 @@ stages:
 build:
   stage: build
   script:
-    - git submodule update --init --recursive
     - mkdir out && cd out 
     - cmake .. 
     - cmake --build . -j 8 --target I3T
@@ -26,6 +25,8 @@ build:
   cache:
     paths:
       - Binaries
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
 
 # run tests using the binary built before
 test:

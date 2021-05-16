@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
+
 #include "GUI/Elements/IWindow.h"
+#include "GUI/Theme.h"
 
 class StyleEditor : public IWindow
 {

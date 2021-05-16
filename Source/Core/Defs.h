@@ -14,6 +14,8 @@
 
 #include "spdlog/formatter.h"
 
+constexpr const size_t MAX_PATH_LENGTH = 4096L;
+
 /// Inlining macro.
 #ifdef _MSC_VER
 #define FORCE_INLINE __forceinline
