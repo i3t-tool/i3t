@@ -84,7 +84,7 @@ void Theme::initDefaultProperties()
 	set(EColor::NodeHeaderTranformation, ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformation, ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgTransformationHovered, color_b2f(ImVec4{ 101.0f, 94.0f, 77.0f, 255.0f }));
+	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;

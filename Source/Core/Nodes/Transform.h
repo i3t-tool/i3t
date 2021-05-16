@@ -20,6 +20,8 @@ class Transformation : public NodeBase
 {
 	friend class Storage;
 
+	bool m_hasEnabledSynergies = true;
+
 	/// \todo MH Use Node::m_owner.
 	Ptr<NodeBase> m_currentSequence = nullptr;
 	int m_currentIndex = -1;
@@ -27,10 +29,16 @@ class Transformation : public NodeBase
 public:
 	bool isInSequence() { return m_currentSequence != nullptr; }
 	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
-	int getCurrentIndex() { return m_currentIndex; }
+	int getCurrentIndex() const { return m_currentIndex; }
+
+	virtual void lock();
+	virtual void unlock();
+	bool hasSynergies() const { return m_hasEnabledSynergies; }
+	void disableSynergies() { m_hasEnabledSynergies = false; }
+	void enableSynergies() { m_hasEnabledSynergies = true; }
 
 protected:
-	Transformation(const Operation* transformType) : NodeBase(transformType) {}
+	explicit Transformation(const Operation* transformType) : NodeBase(transformType) {}
 	void notifySequence();
 
 public:
@@ -38,7 +46,7 @@ public:
 	void nullSequence()
 	{
 		m_currentSequence = nullptr;
-		int m_currentIndex = -1;
+		m_currentIndex = -1;
 	}
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
@@ -53,6 +61,7 @@ public:
 		m_currentIndex = index;
 	}
 };
+
 
 class Free : public Transformation
 {
@@ -80,22 +89,27 @@ public:
 	void reset() override { setValue(glm::mat4(1.0f)); };
 };
 
+
 class Scale : public Transformation
 {
 	glm::vec3 m_initialScale;
 
 public:
-	explicit Scale(glm::vec3 initialScale = glm::vec3(1.0f), const Transform::DataMap& map = Transform::g_UniformScale)
+	explicit Scale(glm::vec3 initialScale = glm::vec3(1.0f), const Transform::DataMap& map = Transform::g_Scale)
 			: Transformation(getTransformProps(ETransformType::Scale)), m_initialScale(initialScale)
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
 	}
+
+	void lock() override;
+
 	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
 	void reset() override;
 
 	float getX();
@@ -127,15 +141,17 @@ public:
 		m_currentMap = &map;
 	}
 
-	[[nodiscard]] float getRot() { return m_initialRot; }
+	void lock() override;
 
-	float getAngle() { return m_initialRot; }
+	[[nodiscard]] float getRot() const { return m_initialRot; }
+	float getAngle() const { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
 	void reset() override;
 };
 
@@ -159,15 +175,17 @@ public:
 		m_currentMap = &map;
 	}
 
-	[[nodiscard]] float getRot() { return m_initialRot; }
+	void lock() override;
 
-	float getAngle() { return m_initialRot; }
+	[[nodiscard]] float getRot() const { return m_initialRot; }
+	float getAngle() const { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
 	void reset() override;
 };
 
@@ -191,15 +209,17 @@ public:
 		m_currentMap = &map;
 	}
 
-	float getAngle() { return m_initialRot; }
+	void lock() override;
 
-	[[nodiscard]] float getRot() { return m_initialRot; }
+	float getAngle() const { return m_initialRot; }
+	[[nodiscard]] float getRot() const { return m_initialRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
 	void reset() override;
 };
 
@@ -216,13 +236,7 @@ public:
 		m_currentMap = &map;
 	}
 
-	[[nodiscard]] ValueSetResult setValue(float val) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
+	void lock() override;
 
 	float getX();
 	float getY();
@@ -231,6 +245,14 @@ public:
 	ValueSetResult setX(float v);
 	ValueSetResult setY(float v);
 	ValueSetResult setZ(float v);
+
+	[[nodiscard]] ValueSetResult setValue(float val) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
+	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
+	void reset() override;
 };
 
 //===-- Other transformations ---------------------------------------------===//
@@ -247,21 +269,21 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
-	void reset() override;
-	ValueSetResult setValue(float rads) override;
-	ValueSetResult setValue(const glm::vec3& axis) override;
-
 	float getRot() const { return m_initialRads; };
 	const glm::vec3& getAxis() const { return m_initialAxis; };
 
 	ValueSetResult setRot(float rads);
 	ValueSetResult setAxis(const glm::vec3& axis);
+
+	ValueSetResult setValue(float rads) override;
+	ValueSetResult setValue(const glm::vec3& axis) override;
+
+	void reset() override;
 };
 
 class QuatRot : public Transformation
 {
 	glm::quat m_initialQuat;
-
 	glm::quat m_normalized;
 
 public:
@@ -270,12 +292,12 @@ public:
 	{
 	}
 
-	void reset() override;
-
 	const glm::quat& getNormalized() const;
 
 	ValueSetResult setValue(const glm::quat& vec);
 	ValueSetResult setValue(const glm::vec4& vec) override;
+
+	void reset() override;
 };
 
 class OrthoProj : public Transformation
@@ -297,16 +319,14 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
-	/// No synergies required.
-	void reset() override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	void lock() override;
 
-	float getLeft() { return m_left; }
-	float getRight() { return m_right; }
-	float getBottom() { return m_bottom; }
-	float getTop() { return m_top; }
-	float getNear() { return m_near; }
-	float getFar() { return m_far; }
+	float getLeft() const { return m_left; }
+	float getRight() const { return m_right; }
+	float getBottom() const { return m_bottom; }
+	float getTop() const { return m_top; }
+	float getNear() const { return m_near; }
+	float getFar() const { return m_far; }
 
 	ValueSetResult setLeft(float val);
 	ValueSetResult setRight(float val);
@@ -314,6 +334,11 @@ public:
 	ValueSetResult setTop(float val);
 	ValueSetResult setNear(float val);
 	ValueSetResult setFar(float val);
+
+	/// No synergies required.
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
+	void reset() override;
 };
 
 class PerspectiveProj : public Transformation
@@ -333,8 +358,7 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
-	void reset() override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	void lock() override;
 
 	float getFOW() { return m_initialFOW; }
 	float getAspect() { return m_initialAspect; }
@@ -345,6 +369,10 @@ public:
 	ValueSetResult setAspect(float v);
 	ValueSetResult setZNear(float v);
 	ValueSetResult setZFar(float v);
+
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+
+	void reset() override;
 };
 
 class Frustum : public Transformation
@@ -366,8 +394,7 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
-	void reset() override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	void lock() override;
 
 	float getLeft() { return m_left; }
 	float getRight() { return m_right; }
@@ -382,6 +409,10 @@ public:
 	ValueSetResult setTop(float val);
 	ValueSetResult setNear(float val);
 	ValueSetResult setFar(float val);
+
+	void reset() override;
+
+	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 };
 
 /**

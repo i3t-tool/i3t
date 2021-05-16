@@ -103,15 +103,13 @@ constexpr inline EColor asColor(EValueType type)
 	return EColor(type);
 }
 
-template <typename T>
-inline T color_b2f(T&& color)
+inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-	static_assert(std::is_same_v<ImVec4, T>);
-
-	color.x = color.x / 255.0f;
-	color.y = color.y / 255.0f;
-	color.z = color.z / 255.0f;
-	color.w = color.w / 255.0f;
+	ImVec4 color;
+	color.x = (float) r / 255.0f;
+	color.y = (float) g / 255.0f;
+	color.z = (float) b / 255.0f;
+	color.w = (float) a / 255.0f;
 
 	return color;
 }
@@ -130,8 +128,6 @@ std::optional<const char*> enumToStr(std::map<T, const char*>& map, T en)
  */
 class Theme
 {
-	friend Theme createDefaultTheme();
-
 public:
 	using Colors = std::unordered_map<EColor, ImVec4>;
 	using Sizes = std::unordered_map<ESize, float>;

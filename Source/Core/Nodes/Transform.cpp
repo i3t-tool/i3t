@@ -4,12 +4,28 @@
 
 using namespace Core;
 
+void Transformation::lock()
+{
+	m_currentMap = &Transform::g_AllLocked;
+}
+
+void Transformation::unlock()
+{
+	m_currentMap = &Transform::g_Free;
+}
+
 void Transformation::notifySequence()
 {
 	if (m_currentSequence)
 	{
 		m_currentSequence->updateValues(-1);
 	}
+}
+
+//===----------------------------------------------------------------------===//
+void Scale::lock()
+{
+	m_currentMap = &Transform::g_Scale;
 }
 
 ValueSetResult Scale::setValue(float val)
@@ -20,7 +36,7 @@ ValueSetResult Scale::setValue(float val)
 
 ValueSetResult Scale::setValue(const glm::vec3& vec)
 {
-	if (m_currentMap == &Transform::g_UniformScale)
+	if (hasSynergies())
 	{
 		if (Math::areElementsSame(vec))
 		{
@@ -46,18 +62,18 @@ ValueSetResult Scale::setValue(const glm::vec4& vec)
 
 ValueSetResult Scale::setValue(const glm::mat4& mat)
 {
-	if (m_currentMap == &Transform::g_UniformScale)
+	if (m_currentMap == &Transform::g_Scale)
 	{
-		if (Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]))
+		if (hasSynergies())
 		{
-			setInternalValue(mat);
+			if (Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]))
+			{
+				setInternalValue(mat);
+			}
+			else
+				return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+															"Given matrix does not represent uniform scale."};
 		}
-		else
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-			                      "Given matrix does not represent uniform scale."};
-	}
-	else if (m_currentMap == &Transform::g_Scale)
-	{
 		if (Transform::cmp(m_currentMap, mat))
 		{
 			setInternalValue(mat);
@@ -91,14 +107,16 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (m_currentMap == &Transform::g_UniformScale)
-	{
-		setInternalValue(glm::scale(glm::vec3(val)));
-	}
-
 	if (m_currentMap == &Transform::g_Scale)
 	{
-		setInternalValue(val, coords);
+		if (hasSynergies())
+		{
+			setInternalValue(glm::scale(glm::vec3(val)));
+		}
+		else
+		{
+			setInternalValue(val, coords);
+		}
 	}
 
 	notifySequence();
@@ -108,7 +126,7 @@ ValueSetResult Scale::setValue(float val, glm::ivec2 coords)
 void Scale::reset()
 {
 	setDataMap(m_initialMap);
-	setValue(glm::scale(m_initialScale));
+	setInternalValue(glm::scale(m_initialScale));
 }
 
 float Scale::getX()
@@ -142,6 +160,10 @@ ValueSetResult Scale::setZ(float v)
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
+void EulerRotX::lock()
+{
+	m_currentMap = &Transform::g_EulerX;
+}
 
 ValueSetResult EulerRotX::setValue(float val)
 {
@@ -250,6 +272,10 @@ void EulerRotX::reset()
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
+void EulerRotY::lock()
+{
+    m_currentMap = &Transform::g_EulerY;
+}
 
 ValueSetResult EulerRotY::setValue(float val)
 {
@@ -349,6 +375,10 @@ void EulerRotY::reset()
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
+void EulerRotZ::lock()
+{
+    m_currentMap = &Transform::g_EulerZ;
+}
 
 ValueSetResult EulerRotZ::setValue(float val)
 {
@@ -445,6 +475,11 @@ void EulerRotZ::reset()
 }
 
 //===-- Translation -------------------------------------------------------===//
+void Translation::lock()
+{
+	m_currentMap = &Transform::g_Translate;
+}
+
 ValueSetResult Translation::setValue(float val)
 {
 	return setValue(glm::vec3(val));
@@ -535,7 +570,6 @@ ValueSetResult Translation::setZ(float v)
 }
 
 //===-- Axis angle rotation -----------------------------------------------===//
-
 void AxisAngleRot::reset()
 {
 	m_currentMap = m_initialMap;
@@ -568,7 +602,6 @@ ValueSetResult AxisAngleRot::setAxis(const glm::vec3& axis)
 }
 
 //===-- Quaternion rotation -----------------------------------------------===//
-
 void QuatRot::reset()
 {
 	notifySequence();
@@ -594,6 +627,10 @@ ValueSetResult QuatRot::setValue(const glm::vec4& vec)
 }
 
 //===-- Orthographic projection -------------------------------------------===//
+void OrthoProj::lock()
+{
+    m_currentMap = &Transform::g_Ortho;
+}
 
 void OrthoProj::reset()
 {
@@ -657,23 +694,9 @@ ValueSetResult OrthoProj::setFar(float val)
 }
 
 //===-- Perspective -------------------------------------------------------===//
-void PerspectiveProj::reset()
+void PerspectiveProj::lock()
 {
-	m_currentMap = m_initialMap;
-	notifySequence();
-	setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
-}
-
-ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
-{
-	if (!coordsAreValid(coords, m_currentMap))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
-	}
-	setInternalValue(val, coords);
-	notifySequence();
-
-	return ValueSetResult{};
+    m_currentMap = &Transform::g_Perspective;
 }
 
 ValueSetResult PerspectiveProj::setFOW(float v)
@@ -704,7 +727,30 @@ ValueSetResult PerspectiveProj::setZFar(float v)
 	return ValueSetResult{};
 }
 
+void PerspectiveProj::reset()
+{
+    m_currentMap = m_initialMap;
+    notifySequence();
+    setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
+}
+
+ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
+{
+    if (!coordsAreValid(coords, m_currentMap))
+    {
+        return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
+    }
+    setInternalValue(val, coords);
+    notifySequence();
+
+    return ValueSetResult{};
+}
+
 //===-- Frusum ------------------------------------------------------------===//
+void Frustum::lock()
+{
+    m_currentMap = &Transform::g_Frustum;
+}
 
 void Frustum::reset()
 {

@@ -352,7 +352,7 @@ static const std::vector<Operation> operations = {
 		{"FloatVecToQuat", "quatfloat, vec3", 2, floatVector3Input, 1, quatInput},                   // quatfloat, vec3
 		{"AngleAxisToQuat", "quatangle, axis", 3, twoFloatVector3Input, 1, quatInput, NO_TAG,
      AngleAxisToQuatInputNames}, // quatangle, axis
-		{"VecVecToQuat", "quatvec3, vec3", 3, twoVector3Input, 1, floatInput,
+		{"VecVecToQuat", "quatvec3, vec3", 2, twoVector3Input, 1, floatInput,
      "Input vector's are normalized."}, // quatvec3, vec3
 		{"QuatToFloatVec", "quat -> float, vec3", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,
      QuatToFloatVecInputNames}, // quat -> float, vec3
@@ -466,7 +466,7 @@ static const std::vector<Operation> g_transforms = {
 		{"EulerZ", "eulerAngleZ", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ}}, // eulerAngleZ
 		{"Scale",
      "scale",
-     {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale, &Transform::g_UniformScale}}, // scale
+     {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale}}, // scale
 		{"AxisAngle", "rotate", defaultDataMaps},                                                         // rotate
 		{"Quat", "quat", defaultDataMaps},                                                                // quat rotate
 		{"Ortho", "ortho", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho}},           // ortho
