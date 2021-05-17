@@ -42,7 +42,6 @@ struct ArithmeticOperators {
 struct Convertors {
 	const int mat_tr = 400, tr_mat = 401, mat_vecs4 = 402,mat_quat=403,mat_scalars=404,vecs4_mat=405,vec4_vec3=406,vec4_scalars=407;
 	const int vecs3_mat=408,vec3_vec4=409,vec3_scalars=410,quat_mat=411,quat_scalars=412,scalars_mat=413,scalars_vec3=414,scalars_vec4=415,scalars_quat=416;
-	const int norm_quat=417;
 };
 struct QuatOperators {
 	const int scalarvec3_quat=501,angleaxis_quat=502,vec3vec3_quat=503,quat_scalarvec3=504,quat_angleaxis=505,scalarmulquat=506;

@@ -160,6 +160,7 @@ glm::mat4 getProjParams(glm::mat4 projinv, bool isPersp) {
 	p=			projinv*glm::vec4(0.0f,-1.0f,-1.0f,1.0f);	p/=p[3];	bottom =p[1];
 	p=			projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);	p/=p[3];	near =	-p[2];
 	p=			projinv*glm::vec4(0.0f,0.0f,1.0f,1.0f);		p/=p[3];	far =	-p[2];
+	//printf("t %f %f, %f %f,%f %f\n", left, right, top, bottom, near, far);
 	if(isPersp){
 		float angle=	2.0f*glm::degrees(atan((0.5f*(top-bottom))/(near)));
 		float aspect=	(right-left)/(top-bottom);
@@ -167,6 +168,7 @@ glm::mat4 getProjParams(glm::mat4 projinv, bool isPersp) {
 		ret[2][1] = far;
 		ret[3][0] = angle;
 		ret[3][1] = aspect;
+		printf("t %f %f, %f %f\n", near, far, angle, aspect);
 	}
 	else {
 		ret[0][0] = left;

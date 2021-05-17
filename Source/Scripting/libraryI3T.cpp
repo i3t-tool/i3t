@@ -54,7 +54,6 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
     else if (type == scriptingData.mat4Types.transpose) {
         workspace->push_back(std::make_unique<WorkspaceMatrixTranspose>((ImTextureID)0, l));
     }
-
     else if (type == scriptingData.mat4Types.ortho) {
         workspace->push_back(std::make_unique<WorkspaceMakeOrtho>((ImTextureID)0, l));
     }
@@ -77,13 +76,13 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         workspace->push_back(std::make_unique<WorkspaceMakeEulerZ>((ImTextureID)0, l));
     }
     else if (type == scriptingData.mat4Types.scale) {
-        workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
+        workspace->push_back(std::make_unique<WorkspaceMakeScale>((ImTextureID)0, l));
     }
     else if (type == scriptingData.mat4Types.lookAt) {
         workspace->push_back(std::make_unique<WorkspaceMakeLookAt>((ImTextureID)0, l));
     }
     else if (type == scriptingData.mat4Types.translate) {
-        workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
+        workspace->push_back(std::make_unique<WorkspaceMakeTranslation>((ImTextureID)0, l));
     }
     else {
         returnValue->Val->Integer = -1;return;
@@ -97,7 +96,7 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
         workspace->back()->getHeaderLabel() = label;
     }
-    returnValue->Val->Integer = (int)workspace->size()-1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type=param[0]->Val->Integer;
@@ -118,19 +117,19 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
 
 	if (type == scriptingData.mat4Types.scale) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
-		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+		ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);
 	}
     else if (type == scriptingData.mat4Types.uniscale) {
         workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);
     }
 	else if (type == scriptingData.mat4Types.translate) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
-		ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+		ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);
 	}
     else if (type == scriptingData.mat4Types.free) {
         workspace->push_back(std::make_unique<WorkspaceTransformationFree>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat);
+        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(mat);
     }
     else if (type == scriptingData.mat4Types.lookAt) {
         workspace->push_back(std::make_unique<WorkspaceLookAt>((ImTextureID)0, l));
@@ -139,39 +138,39 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
     }
     else if (type == scriptingData.mat4Types.ortho) {
         workspace->push_back(std::make_unique<WorkspaceOrtho>((ImTextureID)0, l));
-        Core::OrthoProj* ff = (Core::OrthoProj*)workspace->back().get();
+        Core::OrthoProj* ff = (Core::OrthoProj*)workspace->back()->getNodebase().get();
         ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
         ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
         ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
     }
     else if (type == scriptingData.mat4Types.perspective) {
         workspace->push_back(std::make_unique<WorkspacePerspective>((ImTextureID)0, l));
-        Core::PerspectiveProj*  ff = (Core::PerspectiveProj*)workspace->back().get();
+        Core::PerspectiveProj*  ff = (Core::PerspectiveProj*)workspace->back()->getNodebase().get();
         ff->setZNear(mat[2][0]);ff->setZFar(mat[2][1]);
-        ff->setFOW(mat[3][0]);  ff->setAspect(mat[3][1]);
+        ff->setFOW(glm::radians(mat[3][0]));  ff->setAspect(mat[3][1]);
     }
     else if (type == scriptingData.mat4Types.frustrum) {
         workspace->push_back(std::make_unique<WorkspaceFrustum>((ImTextureID)0, l));
-        Core::Frustum*ff=(Core::Frustum*)workspace->back().get();
+        Core::Frustum*ff=(Core::Frustum*)workspace->back()->getNodebase().get();
         ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
         ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
         ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
     }
     else if (type == scriptingData.mat4Types.rotatex) {
         workspace->push_back(std::make_unique<WorkspaceEulerX>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
+        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
     }
     else if (type == scriptingData.mat4Types.rotatey) {
         workspace->push_back(std::make_unique<WorkspaceEulerY>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
+        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
     }
     else if (type == scriptingData.mat4Types.rotatez) {
         workspace->push_back(std::make_unique<WorkspaceEulerZ>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
+        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
     }
     else if (type == scriptingData.mat4Types.axisangle) {
         workspace->push_back(std::make_unique<WorkspaceAxisAngle>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(glm::radians(mat[0][0]));
+        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
     }
     else {
         returnValue->Val->Integer = -1; return;
@@ -185,7 +184,8 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
         workspace->back()->getHeaderLabel() = label;
     }
 
-    returnValue->Val->Integer = (int)workspace->size()-1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+    //    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void vec4(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int dataindex=param[0]->Val->Integer;
@@ -214,7 +214,7 @@ void vec4(struct ParseState* parser, struct Value* returnValue, struct Value** p
         workspace->back()->getHeaderLabel() = label;
     }
 
-    returnValue->Val->Integer = (int)workspace->size()-1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void vec3(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int dataindex=param[0]->Val->Integer;
@@ -243,7 +243,7 @@ void vec3(struct ParseState* parser, struct Value* returnValue, struct Value** p
         workspace->back()->getHeaderLabel() = label;
     }
 
-    returnValue->Val->Integer = (int)workspace->size()-1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
@@ -256,11 +256,8 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
     }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    if(type == scriptingData.vecOperators.cross){
-        //workspace->push_back(std::make_unique<WorkspaceVectorCrossVector>((ImTextureID)0, l));
-        returnValue->Val->Integer = -1; return;
-    }
-    else if (type == scriptingData.vecOperators.dot) {
+
+    if (type == scriptingData.vecOperators.dot) {
         workspace->push_back(std::make_unique<WorkspaceVectorDotVector>((ImTextureID)0, l));
     }
     else if (type == scriptingData.vecOperators.perspdiv) {
@@ -299,7 +296,7 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         char label[100]={0};
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
     }
-    returnValue->Val->Integer = (int)workspace->size()-1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void vec3oper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
@@ -349,7 +346,7 @@ void vec3oper(struct ParseState* parser, struct Value* returnValue, struct Value
         char label[100]={0};
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
     }
-    returnValue->Val->Integer = (int)workspace->size()-1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void scalar(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int dataindex = param[0]->Val->Integer;
@@ -378,7 +375,7 @@ void scalar(struct ParseState* parser, struct Value* returnValue, struct Value**
         workspace->back()->getHeaderLabel() = label;
     }
 
-    returnValue->Val->Integer = (int)workspace->size() - 1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
@@ -389,7 +386,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         y = param[2]->Val->Integer;
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
-    //clamp=200,cycle=201,pow=205,sincos=207,asinacos=208,signum=209;
+    
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if (type == scriptingData.floatOperators.asinacos) {
         workspace->push_back(std::make_unique<WorkspaceASinACos>((ImTextureID)0, l));
@@ -431,7 +428,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         char label[100] = { 0 };
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
     }
-    returnValue->Val->Integer = (int)workspace->size() - 1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void convertor(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
@@ -454,7 +451,7 @@ void convertor(struct ParseState* parser, struct Value* returnValue, struct Valu
         workspace->push_back(std::make_unique<WorkspaceMatrixToVectors>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.mat_quat) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceMatrixToQuat>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.mat_scalars) {
         workspace->push_back(std::make_unique<WorkspaceMatrixToFloats>((ImTextureID)0, l));
@@ -493,10 +490,7 @@ void convertor(struct ParseState* parser, struct Value* returnValue, struct Valu
         workspace->push_back(std::make_unique<WorkspaceFloatsToVector>((ImTextureID)0, l));
     }
     else if (type == scriptingData.convertors.scalars_quat) {
-        returnValue->Val->Integer = -1; return;
-    }
-    else if (type == scriptingData.convertors.norm_quat) {
-        returnValue->Val->Integer = -1; return;
+        workspace->push_back(std::make_unique<WorkspaceFloatsToQuat>((ImTextureID)0, l));
     }
     else {
         returnValue->Val->Integer = -1; return;
@@ -508,7 +502,7 @@ void convertor(struct ParseState* parser, struct Value* returnValue, struct Valu
         char label[100] = { 0 };
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
     }
-    returnValue->Val->Integer = (int)workspace->size() - 1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void quat(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int dataindex = param[0]->Val->Integer;
@@ -538,7 +532,7 @@ void quat(struct ParseState* parser, struct Value* returnValue, struct Value** p
         workspace->back()->getHeaderLabel() = label;
     }
 
-    returnValue->Val->Integer = (int)workspace->size() - 1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void quatoper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
@@ -608,7 +602,7 @@ void quatoper(struct ParseState* parser, struct Value* returnValue, struct Value
         char label[100] = { 0 };
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
     }
-    returnValue->Val->Integer = (int)workspace->size() - 1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
 void sequence(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int x = 0, y = 0;
@@ -621,26 +615,33 @@ void sequence(struct ParseState* parser, struct Value* returnValue, struct Value
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
-    workspace->push_back(std::make_unique<WorkspaceSequence>((ImTextureID)0, nullptr,
-                                                              l));
+    workspace->push_back(std::make_unique<WorkspaceSequence>((ImTextureID)0, nullptr,l));
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if (numArgs == 1) {
         ne::CenterNodeOnScreen(workspace->back()->getId());
         char label[100] = { 0 };
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
-        workspace->back()->getHeaderLabel() = label;
+        workspace->back()->getHeaderLabel() = label;//...
     }
 
-    returnValue->Val->Integer = (int)workspace->size() - 1;
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+    //returnValue->Val->Integer = (int)workspace->size() - 1;
 }
 void plugNodes(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
-    int indexa=param[0]->Val->Integer;
-    int indexb=param[1]->Val->Integer;
+    int ida=param[0]->Val->Integer;
+    int idb=param[1]->Val->Integer;
     int outputindex=param[2]->Val->Integer;
     int inputindex= param[3]->Val->Integer;
-
+    int indexa=-1;
+    int indexb=-1;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==ida){indexa=i;break;}
+    }
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==idb){indexb=i;break;}
+    }
 
     if(indexa<0||indexa>=workspace->size()){returnValue->Val->Integer=false;return;}
     if(indexb<0||indexb>=workspace->size()){returnValue->Val->Integer=false;return;}
@@ -655,11 +656,18 @@ void plugNodes(struct ParseState* parser, struct Value* returnValue, struct Valu
     returnValue->Val->Integer =(int)p==0;
 }
 void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
-    int seqindex = param[0]->Val->Integer;
-    int nodeindex =param[1]->Val->Integer;
+    int seqid = param[0]->Val->Integer;
+    int nodeid =param[1]->Val->Integer;
+    int seqindex=-1,nodeindex=-1;
     //int at =param[2]->Val->Integer;
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==seqid){seqindex=i;break;}
+    }
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==nodeid){nodeindex=i;break;}
+    }
 
     if(seqindex<0||seqindex>=workspace->size()){returnValue->Val->Integer=false;return;}
     if(nodeindex<0||nodeindex>=workspace->size()){returnValue->Val->Integer=false;return;}
@@ -669,16 +677,23 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
     WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
     //ne::DeleteNode(workspace->at(nodeindex)->getId());
+    
+    //printf("push  %s\n",workspace->at(nodeindex)->getNodebase()->getOperation()->keyWord.c_str());
+    //printf("erase %s\n",(workspace->begin()+nodeindex)->get()->getNodebase()->getOperation()->keyWord.c_str());
     seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
     workspace->erase(workspace->begin()+nodeindex);
+
     returnValue->Val->Integer = true;
 }
 void unplugInput(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){
-    int indexa=param[0]->Val->Integer;
+    int ida=param[0]->Val->Integer;
     int inputindex= param[1]->Val->Integer;
+    int indexa=-1;
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==ida){indexa=i;break;}
+    }
     if(indexa<0||indexa>=workspace->size()){returnValue->Val->Integer=false;return;}
 
     Ptr<Core::NodeBase> pca= (workspace->at(indexa).get())->getNodebase();
@@ -711,11 +726,14 @@ void getNodeByName(struct ParseState* parser, struct Value* returnValue, struct 
 
 }
 void deleteNode(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){
-    int index=param[0]->Val->Integer;
+    int id=param[0]->Val->Integer;
+    int index=-1;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-
+    
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==id){index=i;break;}
+    }
     if(index<0||index>=workspace->size()){returnValue->Val->Integer=false;std::cout<<"Node does not exist."<<std::endl;return;}
-
     WorkspaceNodeWithCoreData* cc= (workspace->at(index).get());
     Ptr<WorkspaceWindow> ww = I3T::getWindowPtr<WorkspaceWindow>();
     ww->NodeDelete(cc->getId());
@@ -723,12 +741,14 @@ void deleteNode(struct ParseState* parser, struct Value* returnValue, struct Val
     returnValue->Val->Integer=true;
 }
 void confNode(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){
-    int index=param[0]->Val->Integer;
+    int id=param[0]->Val->Integer;
     int precision=param[1]->Val->Integer;
     int lod=param[2]->Val->Integer;
-
+    int index=-1;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-
+    for(int i=0;i<workspace->size();i++){
+        if(workspace->at(i)->getNodebase()->getId()==id){index=i;break;}
+    }
     if(index<0||index>=workspace->size()){returnValue->Val->Integer=false;return;}
     //if(precision<0||precision>4){precision==0;}
     if(lod<0||lod>3){lod=0;}
@@ -914,7 +934,6 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "scalars_vec3",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_vec3,  false);
     VariableDefinePlatformVar(pc, nullptr, "scalars_vec4",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_vec4,  false);
     VariableDefinePlatformVar(pc, nullptr, "scalars_quat",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_quat,  false);
-    VariableDefinePlatformVar(pc, nullptr, "norm_quat",     &pc->IntType, (union AnyValue*)&scriptingData.convertors.norm_quat,     false);
     
     //quat oper
     VariableDefinePlatformVar(pc, nullptr, "scalarvec3_quat",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.scalarvec3_quat,false);

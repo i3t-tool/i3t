@@ -81,19 +81,19 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		else if (strcmp(keyword, "Ortho") == 0) {
 			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()), false);
 			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f);\n", i + at,
-				m[0][0], m[0][1], m[1][0], m[1][1], m[1][0], m[2][1], m[3][0], m[3][1]);
+				m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1], m[3][0], m[3][1]);
 			fprintf(f, "int n%d=mat4(ortho,d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "Perspective") == 0) {
-			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()), false);
+			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()), true);
 			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f);\n", i + at,
-				m[0][0], m[0][1], m[1][0], m[1][1], m[1][0], m[2][1], m[3][0], m[3][1]);
+				m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1], m[3][0], m[3][1]);
 			fprintf(f, "int n%d=mat4(perspective,d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "Frustum") == 0) {
 			glm::mat4 m = getProjParams(glm::inverse(nodebase->getData().getMat4()),false);
 			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f, %0.3ff,%0.3ff,0.0f,0.0f);\n", i + at,
-				m[0][0],m[0][1], m[1][0],m[1][1],  m[1][0],m[2][1], m[3][0],m[3][1]);
+				m[0][0],m[0][1], m[1][0],m[1][1],  m[2][0],m[2][1], m[3][0],m[3][1]);
 			fprintf(f, "int n%d=mat4(frustrum,d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "AxisAngle") == 0) {
@@ -190,9 +190,6 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		}
 		else if (strcmp(keyword, "FloatsToQuat") == 0) {
 			fprintf(f, "int n%d=convertor(scalars_quat,%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
-		}
-		else if (strcmp(keyword, "NormalizeQuat") == 0) {
-			fprintf(f, "int n%d=convertor(norm_quat,%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		//vec4
 		else if (strcmp(keyword, "Vector4ToVector4") == 0) {

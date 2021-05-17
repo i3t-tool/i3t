@@ -119,8 +119,7 @@ void FrustumManipulator::update(){
 	p=			projinv*glm::vec4(0.0f,-1.0f,-1.0f,1.0f);	p/=p[3];	m_bottom=	p[1];
 	p=			projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);	p/=p[3];	m_near=		-p[2];
 	p=			projinv*glm::vec4(0.0f,0.0f,1.0f,1.0f);		p/=p[3];	m_far=		-p[2];
-	
-			
+
 	if(m_hposs[m_axisnum][2]==0.0f){//move side handles to middle - between far plane and near plane
 		glm::vec4 f=glm::vec4(m_hposs[m_axisnum][0],m_hposs[m_axisnum][1],1.0f,1.0f);
 		glm::vec4 n=glm::vec4(m_hposs[m_axisnum][0],m_hposs[m_axisnum][1],-1.0f,1.0f);
