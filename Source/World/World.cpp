@@ -5,6 +5,7 @@
 
 #include "Config.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "Source/Core/Nodes/GraphManager.h"
 #include "Source/Core/Input/InputManager.h"
 
@@ -150,16 +151,12 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
         i->second.component->m_isActive=false;
         //*(i->second.editedNode)=nullptr;
     }
-
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
-    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
-    Ptr<Core::NodeBase>	        nodebase    = nodebasedata->getNodebase();
+    Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
 
-    //nodebase    = &tmpNode;
     tmpNode=nodebase;//tmp
 
-    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
@@ -177,7 +174,8 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
 void World::tmpDrawNode() {//this tends to cause crash
 	if(tmpNode.get()==nullptr){return;}
 	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(tmpNode.get());
-    const Operation* operation = nodebasedata->getNodebase()->getOperation();
+    //if (nodebasedata->getNodebase().get() == nullptr) { return; }
+    const Operation* operation = tmpNode->getOperation();
     const Core::Transform::DataMap* coreMap = tmpNode->getDataMap();
 	glm::mat4 coreData = glm::mat4(1.0f);
     //const std::string s= operation->keyWord;
@@ -233,6 +231,13 @@ void World::tmpSetNode() {
 
         ((Core::AxisAngleRot*)tmpSequence->getMatrices().at(4).get())->setAxis(glm::vec3(0.0f,1.0f,0.0f));
         ((Core::AxisAngleRot*)tmpSequence->getMatrices().at(4).get())->setRot(0);
+
+        tmpNode = tmpSequence->getMatrices().at(0);
+        
+        //WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(tmpNode.get());
+        //Core::NodePtr nb= nodebasedata->getNodebase();printf("%p\n",nb.get());
+        //const Operation* operation = nodebasedata->getNodebase()->getOperation();
+        //printf("tmp from builder\n");
     }
     if (tmpSequence2.get() == nullptr) {
         tmpSequence2 = Core::Builder::createSequence();

@@ -76,7 +76,6 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 }
 
 float localData;
-Ptr<Core::NodeBase>op2;
 
 void Viewport::render()
 {

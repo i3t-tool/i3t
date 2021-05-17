@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/deno/i3t-bunny/Dependencies/picoc
+# Install script for directory: C:/Users/deno/i3t-bunny2/i3t-bunny/Dependencies/picoc
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
