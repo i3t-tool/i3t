@@ -303,7 +303,7 @@ void TutorialWindow::renderHint(Hint* hint)
 {
   //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-  std::u8string hintHeaderU8 = u8"N�pov�da##";
+  std::u8string hintHeaderU8 = u8"Nápověda##";
   std::string hintHeader(hintHeaderU8.cbegin(), hintHeaderU8.cend()); // todo find better solution
   hintHeader += std::to_string(m_current_step);
   if (ImGui::CollapsingHeader(hintHeader.c_str())) {

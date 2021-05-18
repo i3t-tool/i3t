@@ -96,6 +96,13 @@ void Theme::initDefaultProperties()
 	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
 	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
 
+	// Tutorial fonts.
+	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
+	m_fontsAssoc.insert(std::pair(EFont::I3TTitle, 7));
+	m_fontsAssoc.insert(std::pair(EFont::I3TDescription, 8));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemTitle, 6));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemDescription, 2));
+
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
 	m_sizes[ESize::Nodes_FloatWidth] = 60.0f;
@@ -105,7 +112,7 @@ void Theme::initDefaultProperties()
 	m_sizes[ESize::Nodes_ItemsSpacingY] = 4.0f;
 
 
-	m_sizesVec2[ESizeVec2::Window_FramePadding] = { 8.0f, 4.0f };
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = { 8.0f, 8.0f };
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
 	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(8.0f, 1.0f);
