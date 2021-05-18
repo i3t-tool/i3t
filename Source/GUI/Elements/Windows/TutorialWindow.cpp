@@ -36,7 +36,7 @@ inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLin
 
   // In your application you would load an image based on data_ input. Here we just use the imgui font texture.
   std::string imageFilename = data_.link;
-  imageFilename.pop_back(); // VERY TEMPORARY BUG FIX where there's an "\n" in the data_.link member
+  imageFilename.pop_back(); // VERY TEMPORARY IMGUI_MD BUG FIX where there's an "\n" in the data_.link member
   imageFilename.pop_back(); // BUG FIX where there's an ")" in the data_.link member
   //std::cout << image_path.c_str() << std::endl;
 

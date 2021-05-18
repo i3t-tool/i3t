@@ -139,13 +139,22 @@ std::optional<std::shared_ptr<Tutorial>> TutorialLoader::loadTutorial(std::share
           }
           break;
         case ']':
-          if (i < string.size() - 1 && string[i + 1] == '(' && tmpState == 1) {
-            tmpState = 2;
+          if (tmpState == 1) {
+            if (i < string.size() - 1 && string[i + 1] == '(') { // needs to be ]( in susccession, otherwise reset
+              tmpState = 2;
+            }
+            else {
+              tmpState = 0;
+            }
           }
+          break;
+        case '(':
           break;
         case ')':
           if (tmpState == 2) {
-            loadImage(getDirectoryPath(header->m_filename) + imageFilename);
+            if (!images.contains(imageFilename)) {
+              images[imageFilename] = loadImage(getDirectoryPath(header->m_filename) + imageFilename);
+            }
             imageFilename = "";
             tmpState = 0;
           }

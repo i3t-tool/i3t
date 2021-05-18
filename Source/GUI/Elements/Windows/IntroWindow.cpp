@@ -26,7 +26,7 @@ IntroWindow::IntroWindow(bool show) : IWindow(show)
     LOG_ERROR(e.what())
   }
   try {
-    cvutImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "dcgi-logo-60.png"));
+    cvutImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "cvutLogo.png"));
   }
   catch (std::runtime_error& e) {
     LOG_ERROR(e.what())
@@ -165,6 +165,7 @@ void IntroWindow::render()
             ImGui::BeginVertical("yourScene", ImVec2(0, 0));
             ImGui::Spring(1);  // not working
 
+            ImGui::Dummy(ImVec2(0, 10));
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
             ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
             ImGui::Text("Your scene");
