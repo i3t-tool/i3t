@@ -38,7 +38,7 @@ inline float getSize(ESize size)
 	return getTheme().get(size);
 }
 
-inline ImVec2 getSizeVec2(ESizeVec2 size)
+inline const ImVec2& getSize(ESizeVec2 size)
 {
 	return getTheme().get(size);
 }

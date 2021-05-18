@@ -42,6 +42,12 @@ FORCE_INLINE bool coordsAreValid(const glm::ivec2& coords, const Transform::Data
 
 	auto& map = *mapRef;
 
+	auto val = map[4 * x + y];
+
+	auto s1 = map[4 * x + y] != 255;
+	auto s2 = map[4 * x + y] != 0;
+	auto s3 = map[4 * x + y] != 255 && map[4 * x + y] != 0;
+
 	return map[4 * x + y] != 255 && map[4 * x + y] != 0;
 }
 } // namespace Core
@@ -53,9 +59,11 @@ static constexpr uint8_t ONE = 255;
 
 inline const DataMap g_Free({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
 
-inline const DataMap g_Scale({1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 255});
-
-inline const DataMap g_UniformScale({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 255});
+inline const DataMap g_Scale({
+		1, 0, 0, 0,
+		0, 2, 0,0,
+		0, 0, 3,0,
+		0, 0, 0, 255});
 
 inline const DataMap g_EulerX({255, 0, 0, 0, 0, 1, 2, 0, 0, 3, 1, 0, 0, 0, 0, 255});
 

@@ -103,7 +103,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 void ScaleManipulator::update() {
 	if(m_editednode==nullptr){return;}
 	m_edited=m_editednode->getData().getMat4();
-	m_uniformscale=(m_editednode->getDataMap()==&Core::Transform::g_UniformScale);
+	m_uniformscale=(m_editednode->as<Core::Transformation>()->hasSynergies());
 	///
 	bool transactionBegin=false;
 

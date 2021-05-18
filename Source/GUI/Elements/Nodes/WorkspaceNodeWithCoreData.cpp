@@ -7,7 +7,7 @@
 std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName = {
     {&Core::Transform::g_Free, "Free"},
     {&Core::Transform::g_Scale, "Scale"},
-    {&Core::Transform::g_UniformScale, "Uniform scale"},
+    //{&Core::Transform::g_UniformScale, "Uniform scale"},
     {&Core::Transform::g_EulerX, "EulerX"},
     {&Core::Transform::g_EulerY, "EulerY"},
     {&Core::Transform::g_EulerZ, "EulerZ"},
@@ -21,7 +21,7 @@ std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName = {
 std::vector<Core::Transform::DataMap const *> WorkspaceDatamapMenuList = {
 &Core::Transform::g_Free,
 &Core::Transform::g_Scale,
-&Core::Transform::g_UniformScale,
+//&Core::Transform::g_UniformScale,
 &Core::Transform::g_EulerX,
 &Core::Transform::g_EulerY,
 &Core::Transform::g_EulerZ,

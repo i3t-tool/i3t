@@ -97,7 +97,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 		{
 			out << YAML::Key << *str;
 			out << YAML::Value;
-			dumpVec2(out, (const float*)&val);
+			dumpVec2(out, (const float*) &val);
 		}
 	}
 	out << YAML::EndMap;
