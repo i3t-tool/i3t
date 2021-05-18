@@ -153,7 +153,7 @@ ImColor const WorkspaceLinkProperties::getColor() const {return m_color; }
 float const WorkspaceLinkProperties::getThickness() const {return m_thickness; }
 
 WorkspacePinProperties::WorkspacePinProperties(ne::PinId const id, std::string label)
-		: m_id(id), m_label(label), m_showLabel(true), m_iconSize(I3T::getTheme().get(ESize::Nodes_IconSizeX), I3T::getTheme().get(ESize::Nodes_IconSizeY)), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
+		: m_id(id), m_label(label), m_showLabel(true), m_iconSize(I3T::getSizeVec2(ESizeVec2::Nodes_IconSize)), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
 {}
 
 

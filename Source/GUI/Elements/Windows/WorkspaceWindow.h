@@ -67,7 +67,7 @@
 #include "../Nodes/WorkspaceMatrixMulFloat.h"
 #include "../Nodes/WorkspaceMatrixMulVector.h"
 #include "../Nodes/WorkspaceVectorMulMatrix.h"
-//#include "../Nodes/WorkspaceTrackball.h"
+#include "../Nodes/WorkspaceTrackball.h"
 //	} matrix end
 
 //	vec4{
@@ -249,6 +249,9 @@ public:
     void checkQueryNodeDelete();
 
     void NodeDelete(ne::NodeId nodeId);
+
+		void selectAll();
+		void invertSelection();
 
     void checkQueryContextMenus();
 

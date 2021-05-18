@@ -21,6 +21,7 @@ public:
   WorkspaceQuatToFloatVec(ImTextureID headerBackground, std::string headerLabel = "quat -> float, vec3", std::string nodeLabel = "quat -> float, vec3");
 
   void drawDataSetValues(util::NodeBuilder& builder);
+	bool isQuatToFloatVec();
 
 };
 

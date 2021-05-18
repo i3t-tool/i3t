@@ -94,18 +94,18 @@ void Theme::initDefaultProperties()
 	m_sizes[ESize::Nodes_Rounding] = 0.0f;
 	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
 
-	m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
+	/*/m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 25.0f;
 	m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)] = 0.0f;
-  m_sizes[static_cast<size_t>(ESize::Nodes_LabelIndent)] = 3.0f;
+  m_sizes[static_cast<size_t>(ESize::Nodes_LabelIndent)] = 3.0f;*/
 
-	m_sizesVec2[ESizeVec2::Window_FramePadding] = { 8.0f, 4.0f };
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(8.0f, 4.0f);
 
-	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = glm::vec2(2.0f, 3.0f);
-	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = glm::vec2(8.0f, 1.0f);
-	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = glm::vec2(0.0f, 0.0f);
-	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = glm::vec2(0.0f, 0.0f);
-	m_sizesVec2[ESizeVec2::Nodes_IconSize] = glm::vec2(12.0f, 12.0f);
+	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(8.0f, 1.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);
 }
 
 void Theme::initNames()

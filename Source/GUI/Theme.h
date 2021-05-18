@@ -71,21 +71,6 @@ enum class ESize
 	Nodes_BorderWidth,
 	Nodes_LabelIndent,
 
-	Nodes_ItemsSpacingX,
-	Nodes_ItemsSpacingY,
-
-	Nodes_floatPaddingX,
-	Nodes_floatPaddingY,
-
-	Nodes_pinSpacingX,
-	Nodes_pinSpacingY,
-
-	Nodes_PivotAlignmentX,
-	Nodes_PivotAlignmentY,
-
-	Nodes_IconSizeX,
-	Nodes_IconSizeY,
-
 	COUNT
 };
 
@@ -125,7 +110,7 @@ class Theme
 public:
 	using Colors = std::unordered_map<EColor, ImVec4>;
 	using Sizes = std::unordered_map<ESize, float>;
-	using SizesVec = std::unordered_map<ESizeVec2, glm::vec2>;
+	using SizesVec = std::unordered_map<ESizeVec2, ImVec2>;
 
 private:
 	std::string m_name = "default";
@@ -169,7 +154,7 @@ public:
 
 	float get(ESize size) { return m_sizes[size]; }
 
-	glm::vec2& get(ESizeVec2 sizeVec)
+	ImVec2& get(ESizeVec2 sizeVec)
 	{
 		Debug::Assert(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
 		return m_sizesVec2[sizeVec];

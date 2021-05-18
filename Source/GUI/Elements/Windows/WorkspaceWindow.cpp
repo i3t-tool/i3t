@@ -53,6 +53,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(m_nodeEditorContext);
 	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
+
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -544,6 +545,40 @@ void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
 
 }
 
+void WorkspaceWindow::selectAll(){
+	for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes){
+		ne::SelectNode(node->getId(), true);
+	}
+}
+void WorkspaceWindow::invertSelection(){
+	auto selected = m_ne_usable->GetSelectedObjects();
+	bool all = true;
+
+	for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes){
+
+		for(auto s : selected) {
+			try {
+				auto n = s->AsNode();
+				if(n->m_ID == node->getId()){
+					ne::DeselectNode(node->getId());
+					all = false;
+					break;
+				}
+			}
+			catch (_exception)
+			{
+				continue;
+			}
+		}
+
+		if(all){
+			ne::SelectNode(node->getId(), true);
+		}
+
+		all = true;
+	}
+}
+
 void WorkspaceWindow::UpdateTouchAllNodes()
 {
 	const auto deltaTime = ImGui::GetIO().DeltaTime;
@@ -943,8 +978,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("trackball")) {
-//          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTrackball>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTrackball>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
         }
 				if (ImGui::MenuItem("inversion")) {
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixInversion>(m_headerBackgroundTexture));
@@ -1296,9 +1331,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 			ImGui::Text("selection");
 			ImGui::Separator();
-			if (ImGui::MenuItem("select all")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("select all", "a")) {
+					selectAll();
 			}
-			if (ImGui::MenuItem("invert")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("invert", "i")) {
+				 	invertSelection();
 			}
 			ImGui::EndMenu();
 
@@ -1307,9 +1344,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 			ImGui::Text("zoom");
 			ImGui::Separator();
-			if (ImGui::MenuItem("to all")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("to all", "s")) {
+				ne::NavigateToContent();
 			}
-			if (ImGui::MenuItem("to selection")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("to selection", "d")) {
+				ne::NavigateToSelection();
 			}
 			ImGui::EndMenu();
 

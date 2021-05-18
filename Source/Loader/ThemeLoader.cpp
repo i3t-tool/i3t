@@ -39,9 +39,9 @@ void dumpVec4(YAML::Emitter& out, const float* vec)
 	out << YAML::EndMap;
 }
 
-glm::vec2 parseVec2(YAML::Node& node)
+ImVec2 parseVec2(YAML::Node& node)
 {
-	glm::vec2 vec;
+	ImVec2 vec;
 	vec.x = node["x"].as<float>();
 	vec.y = node["y"].as<float>();
 
@@ -97,7 +97,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 		{
 			out << YAML::Key << *str;
 			out << YAML::Value;
-			dumpVec2(out, static_cast<const float*>(&val[0]));
+			dumpVec2(out, (const float*)&val);
 		}
 	}
 	out << YAML::EndMap;

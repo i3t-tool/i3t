@@ -46,7 +46,7 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
 		//   ImGui::ImageButton(ImTextureID, size, uv0, uv1, frame padding, tint color)
 
-		if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(0*button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
+		/*if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(0*button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
       m_nodebase->as<Core::Cycle>()->play();
 		}
     ImGui::SameLine();
@@ -64,10 +64,10 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     ImGui::SameLine();
     if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(3*button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(4*button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
       m_nodebase->as<Core::Cycle>()->stepNext();
-    }
+    }*/
 
 
-		/*if(ImGui::Button("play", button_sz)){
+		if(ImGui::Button("\u2BC8", button_sz)){
       m_nodebase->as<Core::Cycle>()->play();
 		}
 		ImGui::SameLine();
@@ -75,17 +75,17 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
       m_nodebase->as<Core::Cycle>()->stop();
 		}
     ImGui::SameLine();
-		if(ImGui::Button("reset and stop", button_sz)){
+		if(ImGui::Button("reset", button_sz)){
       m_nodebase->as<Core::Cycle>()->resetAndStop();
 		}
     ImGui::SameLine();
-    if(ImGui::Button("step back", button_sz)){
+    if(ImGui::Button("back", button_sz)){
       m_nodebase->as<Core::Cycle>()->stepBack();
 		}
     ImGui::SameLine();
-    if(ImGui::Button("step next", button_sz)){
+    if(ImGui::Button("next", button_sz)){
       m_nodebase->as<Core::Cycle>()->stepNext();
-		}*/
+		}
 
 
 		//Mode select
@@ -107,7 +107,7 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     //ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f,10.00f)); // Doesnt work :(
     //open_popup |= ImGui::Button(mode, ImVec2(3*button_sz.x+I3T::getSize(ESize::Nodes_floatPaddingX)*2, button_sz.y/2));
 
-    ImGui::PushItemWidth(3*button_sz.x+I3T::getSize(ESize::Nodes_floatPaddingX)*2);
+    ImGui::PushItemWidth(3*button_sz.x+I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing).x*2);
 		//ImGui::
 		ImGui::Text("%s", mode);
 
@@ -152,8 +152,8 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     int const idOfNode = this->m_id.Get();
     bool valueChanged = false;
 
-    ImGui::PushItemWidth(2*button_sz.x+I3T::getSize(ESize::Nodes_floatPaddingX));
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), button_sz.y/16});
+    ImGui::PushItemWidth(2*button_sz.x+I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing).x);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding).x, button_sz.y/16});
 
     valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, index));
 
@@ -182,8 +182,8 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     float localData;
 
     ImGui::PushItemWidth(m_dataItemsWidth);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
 
     localData = coreData;
     valueChanged |= drawDragFloatWithMap_Inline(&localData, coreMap[0], fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */
@@ -282,8 +282,8 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
   float localData;
 
   ImGui::PushItemWidth(m_dataItemsWidth);
-  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
-  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY) });
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
 
   localData = coreData;
 

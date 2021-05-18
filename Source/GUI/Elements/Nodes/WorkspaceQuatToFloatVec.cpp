@@ -18,4 +18,7 @@ void WorkspaceQuatToFloatVec::drawDataSetValues(util::NodeBuilder& builder)
   drawDataFull(builder, 0);
 }
 
+bool WorkspaceQuatToFloatVec::isQuatToFloatVec(){
+	return true;
+}
 

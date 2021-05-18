@@ -38,6 +38,11 @@ inline float getSize(ESize size)
 	return getTheme().get(size);
 }
 
+inline ImVec2 getSizeVec2(ESizeVec2 size)
+{
+	return getTheme().get(size);
+}
+
 /**
  * Get pointer to dockable (unique) window.
  * \tparam T window type

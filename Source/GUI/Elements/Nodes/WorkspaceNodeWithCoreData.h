@@ -65,6 +65,9 @@ public:
     virtual bool isCamera();
     virtual bool isCycle();
     virtual bool isSequence();
+		virtual bool isTrackball();
+		virtual bool isQuatToFloatVec();
+		virtual bool isQuatToAngleAxis();
     bool isTransformation();
 
     virtual bool inSequence();

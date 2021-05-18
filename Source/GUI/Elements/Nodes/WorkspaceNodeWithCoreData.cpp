@@ -144,6 +144,14 @@ bool WorkspaceNodeWithCoreData::isSequence()
     //return fw.name == "WorkspaceSequence";
 }
 
+bool WorkspaceNodeWithCoreData::isQuatToFloatVec(){
+	return false;
+}
+
+bool WorkspaceNodeWithCoreData::isQuatToAngleAxis(){
+	return false;
+}
+
 bool WorkspaceNodeWithCoreData::isCamera()
 {
     return false;
@@ -154,6 +162,10 @@ bool WorkspaceNodeWithCoreData::isCycle()
   return false;
 }
 
+bool WorkspaceNodeWithCoreData::isTrackball()
+{
+	return false;
+}
 
 bool WorkspaceNodeWithCoreData::isTransformation()
 {
@@ -220,16 +232,16 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
-  float step = 0.01f;
+  float step = 0.015f;
 	auto io = ImGui::GetIO();
 	if(InputManager::isKeyPressed(Keys::ctrll)){
-    step = 10.0f;
+    step = 0.0015f;
 	}else if(InputManager::isKeyPressed(Keys::altl)){
-    step = 1.0f;
+    step = 0.00015f;
   }else if(InputManager::isKeyPressed(Keys::shiftl)){
-    step = 0.1f;
+    step = 0.15f;
   }else{
-    step = 0.01f;
+    step = 0.015f;
 	}
 
 	// make step a configurable constant.
@@ -467,7 +479,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
         }
 	}*/
 
-	if(!isTransformation()){
+	if(!isTransformation() && !isTrackball()){
     ImGui::BeginVertical(m_nodebase->getId());
     ImGui::Spring(1);
 
@@ -544,15 +556,22 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 	    ImGui::PopStyleVar();
 
       builder.EndOutput();
+
+			if(isTrackball()){
+				ImGui::EndVertical();
+			}
 }
 
 void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
-	if(isTransformation() || isCycle()){
+	if(isTransformation() || isCycle() || isTrackball()){
 		if(isTransformation()){
       ImGui::Spring(2, 2); //spring from left side. right side in builder.cpp
       ImGui::BeginVertical(m_nodebase->getId());
       drawData(builder, 0);
       ImGui::EndVertical();
+		}else if(isTrackball()){
+			ImGui::Spring(1,3);
+			drawData(builder, -1);  // for trackball
 		}else{
       builder.Middle();
 			ImGui::Spring(1);
