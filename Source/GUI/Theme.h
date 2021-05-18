@@ -7,9 +7,11 @@
 
 #include "imgui.h"
 
+#include <cstddef>
+#include <filesystem>
 #include <array>
 #include <map>
-#include <optional>
+// #include <optional>
 
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
@@ -122,10 +124,10 @@ inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 
 
 template <typename T>
-std::optional<const char*> enumToStr(std::map<T, const char*>& map, T en)
+const char* enumToStr(std::map<T, const char*>& map, T en)
 {
 	if (!map.contains(en))
-		return std::nullopt;
+		return nullptr;
 	return map[en];
 }
 

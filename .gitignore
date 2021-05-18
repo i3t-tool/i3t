@@ -1,7 +1,24 @@
 .idea/
 /Docs/Doxygen/html/
 
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.cmake
+cmake_install.cmake
+CMakeFiles/
+CMakeDoxyfile.in
+CMakeCache.txt
+Dependencies/picoc/cmake_install.cmake
+
 /Binaries/
+I3T.dir/
+I3TTEST.dir/
+picoc.dir/
+bin/
+lib/
+x64/
 cmake-*
 Solution/
 out/

@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "Tutorial.h"
 
-#include <optional>
-
 class TutorialLoader
 {
 public:
