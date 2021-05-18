@@ -49,8 +49,8 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		float localData;
 
 		ImGui::PushItemWidth(m_dataItemsWidth);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		localData = coreData;
 		valueChanged |= drawDragFloatWithMap_Inline(
@@ -96,8 +96,8 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		ImVec2 pinStart = ImVec2(window->DC.LastItemRect.Min.x,window->DC.LastItemRect.Min.y);
 
 		ImGui::PushItemWidth(m_dataItemsWidth);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		for (int columns = 0; columns < 3; columns++)
 		{

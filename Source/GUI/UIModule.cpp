@@ -183,21 +183,31 @@ void UIModule::setDefaultTheme(Theme& theme)
 
 void UIModule::loadFonts()
 {
+
 	auto& io = ImGui::GetIO();
 	float fontScale = 1.2f;
 
+	const ImWchar ranges[] = {
+			0x0020, 0x00FF, //latin
+			0x0080, 0x07FF, //czech
+			0x25FC, 0x2BC8, //media buttons
+			0,
+	};
+
 	m_fonts = {
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-																	 14.0f * fontScale),
+																	 14.0f * fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-																	 12.0f * fontScale),
+																	 12.0f * fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-																	 12.0f * fontScale),
+																	 12.0f * fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
-																	 24.0f * fontScale),
+																	 24.0f * fontScale, nullptr, ranges),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-																	 14.0f * fontScale),
+																	 14.0f * fontScale, nullptr, ranges),
 	};
+	io.Fonts->Build();
+
 }
 
 void UIModule::buildDockspace()

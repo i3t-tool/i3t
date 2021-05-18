@@ -37,8 +37,8 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 	float localData;
 
 	ImGui::PushItemWidth(m_dataItemsWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 	localData = coreData;
 	valueChanged |= drawDragFloatWithMap_Inline(&localData, coreMap[0], fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */

@@ -430,11 +430,11 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
     ImGui::EndVertical();
 
 
-    if (pinProp->getShowLabel()){
+    if (pinProp->getShowLabel() && !isSequence() && !isCamera()){
       if(pinProp->getLabel().empty()){ //it's never empty :(
 
         auto label = pinProp->getCorePin().getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else
         {
@@ -445,7 +445,7 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
       }else{
 
         auto label = pinProp->getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else{
           ImGui::Spring(0,I3T::getSize(ESize::Nodes_LabelIndent));
@@ -515,10 +515,8 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
 
 		//label
-    if (pinProp->getShowLabel()){
-
-
-      if(pinProp->getLabel().empty()){ //it's never empty :(
+    if (pinProp->getShowLabel() && !isSequence() && !isCamera()){
+			if(pinProp->getLabel().empty()){ //it's never empty :(
 
         auto label = pinProp->getCorePin().getLabel();
         if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){

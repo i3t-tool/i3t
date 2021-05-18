@@ -66,24 +66,27 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
       m_nodebase->as<Core::Cycle>()->stepNext();
     }*/
 
+		//std::u8string string = u8"⯈";
+		std::u8string string = u8"ěščřžýáíé";
+		std::string s(string.cbegin(), string.cend());
 
-		if(ImGui::Button("\u2BC8", button_sz)){
+		if(ImGui::Button(s.c_str(), button_sz)){
       m_nodebase->as<Core::Cycle>()->play();
 		}
 		ImGui::SameLine();
-		if(ImGui::Button("stop", button_sz)){
+		if(ImGui::Button("❙❙", button_sz)){
       m_nodebase->as<Core::Cycle>()->stop();
 		}
     ImGui::SameLine();
-		if(ImGui::Button("reset", button_sz)){
+		if(ImGui::Button("◼", button_sz)){
       m_nodebase->as<Core::Cycle>()->resetAndStop();
 		}
     ImGui::SameLine();
-    if(ImGui::Button("back", button_sz)){
+    if(ImGui::Button("❙⯇", button_sz)){
       m_nodebase->as<Core::Cycle>()->stepBack();
 		}
     ImGui::SameLine();
-    if(ImGui::Button("next", button_sz)){
+    if(ImGui::Button("⯈❙", button_sz)){
       m_nodebase->as<Core::Cycle>()->stepNext();
 		}
 
@@ -107,7 +110,7 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     //ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f,10.00f)); // Doesnt work :(
     //open_popup |= ImGui::Button(mode, ImVec2(3*button_sz.x+I3T::getSize(ESize::Nodes_floatPaddingX)*2, button_sz.y/2));
 
-    ImGui::PushItemWidth(3*button_sz.x+I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing).x*2);
+    ImGui::PushItemWidth(3*button_sz.x+I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x*2);
 		//ImGui::
 		ImGui::Text("%s", mode);
 
@@ -152,8 +155,8 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     int const idOfNode = this->m_id.Get();
     bool valueChanged = false;
 
-    ImGui::PushItemWidth(2*button_sz.x+I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing).x);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding).x, button_sz.y/16});
+    ImGui::PushItemWidth(2*button_sz.x+I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESizeVec2::Nodes_FloatPadding).x, button_sz.y/16});
 
     valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, index));
 
@@ -182,8 +185,8 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
     float localData;
 
     ImGui::PushItemWidth(m_dataItemsWidth);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
     localData = coreData;
     valueChanged |= drawDragFloatWithMap_Inline(&localData, coreMap[0], fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */
@@ -282,8 +285,8 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
   float localData;
 
   ImGui::PushItemWidth(m_dataItemsWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
   localData = coreData;
 

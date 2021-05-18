@@ -35,8 +35,8 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 				m_dataItemsWidth*4.0f/3.0f,
 				20.0f);
 		ImVec2 textureSize = ImVec2(
-				5* I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
-				5* I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y
+				5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
+				5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y
 				);
 
 		//Texture
@@ -62,8 +62,8 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 
 		//Buttons
 		ImGui::BeginVertical("Trackball_Buttons");
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-12.0f);
 
@@ -108,8 +108,8 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 		ImGui::PushItemWidth(m_dataItemsWidth);
 		/* Drawing is row-wise */
 
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 
 		for (int rows = 0; rows < 4; rows++)

@@ -34,8 +34,8 @@ void WorkspaceVector4::drawDataFull(util::NodeBuilder& builder, int index)
 	glm::vec4 localData;
 
 	ImGui::PushItemWidth(m_dataItemsWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSizeVec2(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSizeVec2(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 	for (int columns = 0; columns < 4; columns++)
 	{
