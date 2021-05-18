@@ -34,6 +34,8 @@ enum class EColor
 	ActiveColor,
 	TabColor,
 
+	TutorialBgColor,
+
 	NodeBgOperator,
 	NodeHeaderOperator,
 	FloatBgOperator,
@@ -60,6 +62,12 @@ enum class EFont
 	Node,
 	Title,
 	TitleSmall,
+	TaskTitle,
+	Header,
+	I3TTitle,
+	I3TDescription,
+	IntroItemTitle,
+	IntroItemDescription
 };
 
 enum class ESize

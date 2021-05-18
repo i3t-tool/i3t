@@ -9,8 +9,10 @@
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
+#include "GUI/Elements/Windows/IntroWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+
 #include "GUI/ImGui/imgui_impl_glfw.h"
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 #include "Loader/ConfigLoader.h"
@@ -32,6 +34,7 @@ void UIModule::init()
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
+	m_dockableWindows.push_back(std::make_shared<IntroWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world2()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Console>(true));
@@ -184,7 +187,17 @@ void UIModule::setDefaultTheme(Theme& theme)
 void UIModule::loadFonts()
 {
 	auto& io = ImGui::GetIO();
+
 	float fontScale = 1.2f;
+
+	const ImWchar ranges[] = {
+			0x0020, 0x00FF, // Basic Latin + Latin Supplement
+			0x0080, 0x07FF, // Czech
+			0,
+	};
+
+	ImFontConfig fontCfg;
+	fontCfg.GlyphExtraSpacing.x = -0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirkku
 
 	m_fonts = {
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
@@ -197,7 +210,17 @@ void UIModule::loadFonts()
 																	 24.0f * fontScale),
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
 																	 14.0f * fontScale),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
+																	 20.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
+																	 18.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
+																	 33.5f * fontScale, &fontCfg, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
+																	 17.5f * fontScale, nullptr, ranges),
 	};
+	io.FontDefault = I3T::getFont(EFont::MenuLarge);
+	io.Fonts->Build();
 }
 
 void UIModule::buildDockspace()
@@ -313,8 +336,8 @@ void UIModule::setFocusedWindow()
 	{
 		auto mainID = makeIDNice(hoveredWindowID);
 
-		Ptr<IWindow> window;
-		window = findWindow(mainID.c_str(), m_dockableWindows);
+    Ptr<IWindow> window;
+    window = findWindow(mainID.c_str(), m_dockableWindows);
 
 		if (m_windows.count(mainID) != 0)
 			window = m_windows[mainID];

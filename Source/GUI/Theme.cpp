@@ -62,8 +62,6 @@ void Theme::initDefaultProperties()
 	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
 
-	// Node Editor
-	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 	set(EColor::PulseLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
 	set(EColor::FloatLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
 	set(EColor::MatrixLink, ImVec4(68.0f / 255.0f, 201.0f / 255.0f, 156.0f / 255.0f, 1.00f));
@@ -71,6 +69,8 @@ void Theme::initDefaultProperties()
 	set(EColor::Vec3Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
 	set(EColor::Vec4Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
 	set(EColor::ScreenLink, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
+
+	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 
 	// Folta operator color set
 	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
@@ -87,10 +87,22 @@ void Theme::initDefaultProperties()
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
 
+	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
+	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
+	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
+	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
+	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
+	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
+	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
+
+
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
-	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
-	m_sizes[ESize::Nodes_Rounding] = 0.0f;
-	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
+	m_sizes[ESize::Nodes_FloatWidth] = 60.0f;
+	m_sizes[ESize::Nodes_Rounding] = 4.0f;
+
+	m_sizes[ESize::Nodes_ItemsSpacingX] = 4.0f;
+	m_sizes[ESize::Nodes_ItemsSpacingY] = 4.0f;
 
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = { 8.0f, 4.0f };
