@@ -18,6 +18,11 @@ inline Theme& getTheme()
 	return getUI()->getTheme();
 }
 
+inline std::vector<Theme>& getThemes()
+{
+	return getUI()->getThemes();
+}
+
 inline ImFont* getFont(EFont font)
 {
 	return getTheme().get(font);
@@ -29,6 +34,11 @@ inline const ImVec4& getColor(EColor color)
 }
 
 inline float getSize(ESize size)
+{
+	return getTheme().get(size);
+}
+
+inline const ImVec2& getSize(ESizeVec2 size)
 {
 	return getTheme().get(size);
 }

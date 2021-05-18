@@ -38,5 +38,7 @@ CONTENT_FILE				\data\content.cnt
 // load scene at start
 LOAD_SCENE					\data\internal\defScene.scn
 
+// location where are turorials stored
+TUTORIALS_FOLDER            /Data/tutorials
 
 

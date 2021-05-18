@@ -1,0 +1,13 @@
+---
+title: Basics of connecting transformations
+description: Tohle je jen trettiiiiiiiiiiiiiiiii tutorial pro testovani intro okna.
+thumbnail: test3.png
+scene: empty
+---
+
+Lorem ipsum, toto je temer prazdny tutorial.
+Vyzkousime obrazek v textu ![test3.png](test3.png)
+
+--
+
+A je to! Během tutoriálu jsme prošli, jak vytvářet a naplňovat bloky matic, a jak je propojovat mezi sebou tak, abychom dosáhli požadovaných transformací. Pokud chceš, můžeš si na závěr vyzkoušet se sněhulákem zatočit a sledovat, jaký má rotace efekt, podle toho, jestli se umístí před posunutí, anebo za posunutí.

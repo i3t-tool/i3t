@@ -15,6 +15,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include "GUI/Theme.h"
 
 /**
  * A configuration structure.
@@ -61,12 +64,16 @@ struct Config
 	static float CAM_ROLL_SENSITIVITY;     ///< The camera roll sensitivity
 	static float CAM_LERP_DISTTOSTEP_KOEF; ///< The camera linearly interpolate disttostep koef
 
-	// content
-	static std::string CONTENT_FILE;
-	///< The content file, such as \\data\\content.cnt, enumerating the \\data\\*.cfg files (textures, materials (Phong
-	///< parameters + textures),  geometries (models), and objects (combines names, geometries and textures to groups of
-	///< named objects))
-	static std::string LOAD_SCENE; ///< The load scene
+  // content
+  static std::string CONTENT_FILE;
+  ///< The content file, such as \\data\\content.cnt, enumerating the \\data\\*.cfg files (textures, materials (Phong
+  ///< parameters + textures),  geometries (models), and objects (combines names, geometries and textures to groups of
+  ///< named objects))
+  static std::string LOAD_SCENE; ///< The load scene
+  static std::string TUTORIALS_FOLDER;
+  static std::string TEXTURE_FOLDER;
+
+	static std::string DEFAULT_THEME;
 
 	//@{
 

@@ -1,4 +1,5 @@
 #include "Config.h"
+
 #include <istream>
 
 bool Config::getValue(std::istream& is, const std::string& input, const std::string& attribName, float& val)
@@ -172,15 +173,17 @@ void Config::loadFromFile(const std::string filename)
 		if (getValue(is, input, "MOUSE_SENSITIVITY", val))
 			MOUSE_SENSITIVITY = val;
 
-		// content
-		if (getWord(is, input, "CONTENT_FILE", word))
-			CONTENT_FILE = word;
-		/*
-		if (getWord(is, input, "GUI_CFG", word))
-		  TabsConfig::readFromFile(getAbsolutePath(word.c_str()).c_str());
-		 */
-		if (getWord(is, input, "LOAD_SCENE", word))
-			LOAD_SCENE = word;
+    // content
+    if (getWord(is, input, "CONTENT_FILE", word))
+      CONTENT_FILE = word;
+    /*
+    if (getWord(is, input, "GUI_CFG", word))
+      TabsConfig::readFromFile(getAbsolutePath(word.c_str()).c_str());
+     */
+    if (getWord(is, input, "LOAD_SCENE", word))
+      LOAD_SCENE = word;
+    if (getWord(is, input, "TUTORIALS_FOLDER", word))
+      TUTORIALS_FOLDER = word;
 
 		is >> input;
 	}
@@ -249,3 +252,8 @@ float Config::CAM_LERP_DISTTOSTEP_KOEF = 0.05f;
 
 std::string Config::CONTENT_FILE = "Data/content.cfg";
 std::string Config::LOAD_SCENE = "NONE";
+
+std::string Config::DEFAULT_THEME = "default";
+
+std::string Config::TUTORIALS_FOLDER = "Data/tutorials/";
+std::string Config::TEXTURE_FOLDER = "Data/textures/";

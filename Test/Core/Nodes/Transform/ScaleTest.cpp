@@ -51,14 +51,14 @@ TEST(ScaleTest, SetVec3Scale)
 
 TEST(ScaleTest, ResetsNodeToInitialValues)
 {
-	auto scale = glm::vec3(7.f, -5.f, 3.f);
+	auto scale = generateVec3();
 
 	// Create non-uniform scale
-	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale, Transform::g_Scale);
+	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale);
 	EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Scale);
 
 	// Set free transformation node.
-	scaleNode->setDataMap(&Transform::g_Free);
+	scaleNode->unlock();
 	EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Free);
 
 	glm::mat4 mat(1.0f);
@@ -75,29 +75,30 @@ TEST(ScaleTest, ResetsNodeToInitialValues)
 		scaleNode->reset();
 		EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Scale);
 
-		auto data = scaleNode->getData().getMat4();
+		auto expected = glm::scale(scale);
+		auto actual = scaleNode->getData().getMat4();
 
-		auto tmp = glm::scale(scale);
-
-		EXPECT_TRUE(Math::eq(data, tmp));
+		EXPECT_TRUE(Math::eq(expected, actual));
 	}
 }
 
 TEST(ScaleTest, UniformScaleSynergies)
 {
-	auto scale = glm::vec3(-2.0f);
+	auto scaleValue = generateFloat();
+	auto scale = glm::vec3(scaleValue);
 	auto scaleMat = glm::scale(scale);
 
-	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale, Transform::g_UniformScale);
+	auto scaleNode = Core::Builder::createTransform<Core::Scale>(scale);
+	scaleNode->enableSynergies();
 
 	{
 		// Invalid coordinates.
-		auto result = scaleNode->setValue(-2.0f, {3, 1});
+		auto result = scaleNode->setValue(scaleValue, {3, 1});
 		EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
 	}
 	{
 		// Valid coordinates.
-		setValue_expectOk(scaleNode, -2.0f, {1, 1});
+		setValue_expectOk(scaleNode, scaleValue, {1, 1});
 
 		auto data = scaleNode->getData().getMat4();
 
@@ -108,6 +109,7 @@ TEST(ScaleTest, UniformScaleSynergies)
 TEST(ScaleTest, GettersAndSetterShouldBeOk)
 {
   auto scale = Core::Builder::createTransform<Scale>()->as<Scale>();
+	scale->enableSynergies();
 
   auto vec = generateVec3();
 
@@ -120,7 +122,7 @@ TEST(ScaleTest, GettersAndSetterShouldBeOk)
     EXPECT_EQ(glm::scale(glm::vec3{vec.z, vec.z, vec.z}), scale->getData().getMat4());
 	}
   {
-		scale->setDataMap(&Transform::g_Scale);
+		scale->disableSynergies();
 
     scale->setX(vec.x);
     scale->setY(vec.y);

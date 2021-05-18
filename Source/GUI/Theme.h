@@ -9,12 +9,22 @@
 
 #include <array>
 #include <map>
+#include <optional>
 
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
 
 enum class EColor
 {
+	PulseLink = 0,
+	FloatLink,
+	Vec3Link,
+	Vec4Link,
+	MatrixLink,
+	QuatLink,
+	MatrixMulLink,
+	ScreenLink,
+
 	Text,
 	Border,
 	WindowBackground,
@@ -24,28 +34,22 @@ enum class EColor
 	ActiveColor,
 	TabColor,
 
-  NodeBgOperator,
-  NodeHeaderOperator,
-  FloatBgOperator,
-  FloatBgOperatorActive,
-  FloatBgOperatorHovered,
+	TutorialBgColor,
 
-  NodeBgTransformation,
-  NodeHeaderTranformation,
-  FloatBgTransformation,
-  FloatBgTransformationActive,
-  FloatBgTransformationHovered,
+	NodeBgOperator,
+	NodeHeaderOperator,
+	FloatBgOperator,
+	FloatBgOperatorActive,
+	FloatBgOperatorHovered,
+
+	NodeBgTransformation,
+	NodeHeaderTranformation,
+	FloatBgTransformation,
+	FloatBgTransformationActive,
+	FloatBgTransformationHovered,
 
 	NodeHeader,
 	NodeEditorBg,
-
-	PulseLink,
-	FloatLink,
-	MatrixLink,
-	QuatLink,
-	Vec3Link,
-	Vec4Link,
-	ScreenLink
 };
 
 enum class EFont
@@ -58,58 +62,73 @@ enum class EFont
 	Node,
 	Title,
 	TitleSmall,
+	TaskTitle,
+	Header,
+	I3TTitle,
+	I3TDescription,
+	IntroItemTitle,
+	IntroItemDescription
 };
 
 enum class ESize
 {
-  Window_FramePadding,
-
-  Nodes_Rounding,
+	Nodes_Rounding,
 	Nodes_FloatWidth,
 	Nodes_FloatMargin,
-  Nodes_BorderWidth,
+	Nodes_BorderWidth,
 
-  Nodes_ItemsSpacingX,
+	Nodes_ItemsSpacingX,
 	Nodes_ItemsSpacingY,
 
 	Nodes_floatPaddingX,
 	Nodes_floatPaddingY,
 
-  Nodes_pinSpacingX,
-  Nodes_pinSpacingY,
+	Nodes_pinSpacingX,
+	Nodes_pinSpacingY,
 
-  Nodes_PivotAlignmentX,
-  Nodes_PivotAlignmentY,
+	Nodes_PivotAlignmentX,
+	Nodes_PivotAlignmentY,
 
-  Nodes_IconSizeX,
-  Nodes_IconSizeY,
+	Nodes_IconSizeX,
+	Nodes_IconSizeY,
 
 	COUNT
 };
 
+enum class ESizeVec2
+{
+	Window_FramePadding,
+
+	Nodes_ItemsSpacing,
+	Nodes_FloatPadding,
+	Nodes_PinSpacing,
+	Nodes_PivotAlignment,
+	Nodes_IconSize,
+};
+
 constexpr inline EColor asColor(EValueType type)
 {
-	switch (type)
-	{
-	case EValueType::Pulse:
-		return EColor::PulseLink;
-	case EValueType::Float:
-		return EColor::FloatLink;
-	case EValueType::Vec3:
-		return EColor::Vec3Link;
-	case EValueType::Vec4:
-		return EColor::Vec4Link;
-	case EValueType::Matrix:
-		return EColor::MatrixLink;
-	case EValueType::Quat:
-		return EColor::QuatLink;
-	case EValueType::MatrixMul:
-		return EColor::MatrixLink;
-	case EValueType::Screen:
-		return EColor::ScreenLink;
-	}
+	return EColor(type);
+}
 
-	return EColor::Vec3Link;
+inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	ImVec4 color;
+	color.x = (float) r / 255.0f;
+	color.y = (float) g / 255.0f;
+	color.z = (float) b / 255.0f;
+	color.w = (float) a / 255.0f;
+
+	return color;
+}
+
+
+template <typename T>
+std::optional<const char*> enumToStr(std::map<T, const char*>& map, T en)
+{
+	if (!map.contains(en))
+		return std::nullopt;
+	return map[en];
 }
 
 /**
@@ -117,27 +136,35 @@ constexpr inline EColor asColor(EValueType type)
  */
 class Theme
 {
-	using Colors = std::map<EColor, ImVec4>;
-	using Sizes = std::array<float, static_cast<size_t>(ESize::COUNT)>;
+public:
+	using Colors = std::unordered_map<EColor, ImVec4>;
+	using Sizes = std::unordered_map<ESize, float>;
+	using SizesVec = std::unordered_map<ESizeVec2, ImVec2>;
+
+private:
+	std::string m_name = "default";
 
 	Colors m_colors;
+	Sizes m_sizes;
+	SizesVec m_sizesVec2;
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	/// \todo MH Set dynamic scale (reload font in runtime).
-	static constexpr float m_fontScale = 1.2f;
 	std::map<EFont, size_t> m_fontsAssoc;
-	std::vector<ImFont*> m_fonts;
-	Sizes m_sizes;
 
 public:
 	/**
 	 * Creates default global color scheme based on Lukas Pilka's design.
 	 */
 	Theme();
-	Theme(const Colors& colors) { m_colors = colors; }
+	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
-	void init();
+	static Theme createDefault();
+
+	void initFonts();
+	void initDefaultProperties();
+
+	static void initNames();
 
 	/**
 	 * Call this function whenever you change style settings.
@@ -152,17 +179,21 @@ public:
 		return m_colors[color];
 	}
 
-	ImFont* get(EFont font)
+	ImFont* get(EFont font);
+
+	float get(ESize size) { return m_sizes[size]; }
+
+	const ImVec2& get(ESizeVec2 sizeVec)
 	{
-		Debug::Assert(m_fontsAssoc.count(font) != 0, "Font is not registered.");
-		return m_fonts[m_fontsAssoc[font]];
+		Debug::Assert(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
+		return m_sizesVec2[sizeVec];
 	}
 
-	float get(ESize size)
-	{
-		Debug::Assert(size != ESize::COUNT, "Strange size, isn't it?");
-		return m_sizes[static_cast<size_t>(size)];
-	}
+	static std::map<EColor, const char*>& getColorNames();
+	static std::map<ESize, const char*>& getSizeNames();
+	static std::map<ESizeVec2, const char*>& getSizeVecNames();
+
+	const std::string& getName() { return m_name; }
 
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 
@@ -170,10 +201,19 @@ public:
 	Colors& getColorsRef() { return m_colors; }
 	void setColors(const Colors& colors) { m_colors = colors; }
 
-  Sizes& getSizesRef() { return m_sizes; }
+	Sizes& getSizesRef() { return m_sizes; }
+	SizesVec& getSizesVecRef() { return m_sizesVec2; }
 
 	void operatorColorTheme();
 	void transformationColorTheme();
 
-  ImVec4 getHeader();
+	ImVec4 getHeader();
+
+private:
+	template <typename E, typename T>
+	void copyProperties(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
+	{
+		for (const auto [key, val] : source)
+			target[key] = val;
+	}
 };

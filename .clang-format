@@ -14,4 +14,4 @@ SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
 TabWidth: 2
-UseTab: AlignWithSpaces
+UseTab: Always

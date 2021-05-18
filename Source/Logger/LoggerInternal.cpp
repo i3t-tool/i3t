@@ -42,12 +42,12 @@ void Logger::initLogger(int argc, char* argv[])
 	std::vector<spdlog::sink_ptr> sinks;
 	// sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
 	sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
-	sinks[0]->set_level(spdlog::level::trace);
+	sinks[0]->set_level(spdlog::level::debug);
 	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
 
 	m_consoleLogger = std::make_shared<spdlog::logger>("Log", sinks.begin(), sinks.end());
 
-	logger->set_level(spdlog::level::trace);
+	logger->set_level(spdlog::level::debug);
 	mouseLogger->set_level(spdlog::level::trace);
 
 	std::ostringstream init_message;

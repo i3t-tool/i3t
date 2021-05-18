@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "glm/gtx/matrix_interpolation.hpp"
+
 using namespace Core;
 
 std::vector<Ptr<Cycle>> GraphManager::m_cycles;
@@ -24,12 +26,12 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
-                                   unsigned fromIndex, unsigned myIndex)
+																	 unsigned fromIndex, unsigned myIndex)
 {
 	Debug::Assert(rightNode->getInputPins().size() > myIndex, "Node {} does not have input pin with index {}!",
-	              rightNode->getSig(), myIndex);
+								rightNode->getSig(), myIndex);
 	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",
-	              leftNode->getSig(), fromIndex);
+								leftNode->getSig(), fromIndex);
 
 	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
 	if (result != ENodePlugResult::Ok)
@@ -50,7 +52,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 		rightNode->as<Sequence>()->updatePins();
 	}
 
-	leftNode->spreadSignal();
+	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
+		leftNode->spreadSignal();
 
 	rightNode->setDataMap(&Transform::g_AllLocked);
 
@@ -58,13 +61,13 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 }
 
 ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
-                                                     unsigned nodeIndex)
+																										 unsigned nodeIndex)
 {
 	return plug(node, seq, nodeIndex, 1);
 }
 
 ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
-                                                      unsigned nodeIndex)
+																											unsigned nodeIndex)
 {
 	return plug(seq, node, 1, nodeIndex);
 }
@@ -216,6 +219,13 @@ SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence, NodePtr no
 	m_currentMatrix = node;
 }
 
+SequenceTree::MatrixIterator::MatrixIterator(const SequenceTree::MatrixIterator& mt)
+{
+	m_tree = mt.m_tree;
+	m_currentSequence = mt.m_currentSequence;
+	m_currentMatrix = mt.m_currentMatrix;
+}
+
 SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
 {
 	advance();
@@ -315,4 +325,44 @@ void SequenceTree::MatrixIterator::withdraw()
 	{
 		m_currentMatrix = matrices[++index];
 	}
+}
+
+void MatrixTracker::setParam(float param)
+{
+	auto st = SequenceTree(m_beginSequence);
+	auto it = st.begin();
+
+	int matricesCount = 0;	// to root
+    while (it != st.end())
+	{
+		++it;
+		++matricesCount;
+	}
+	if (matricesCount == 0)
+		return;
+
+	glm::mat4 result(1.0f);
+	float requestedMatricesCount = param * matricesCount;
+	int count = (int) requestedMatricesCount;
+	float interpParam;
+	if (count == 0)
+		interpParam = requestedMatricesCount;
+	else
+		interpParam = fmod(requestedMatricesCount, count);
+
+	for (int i = 0; i < count; ++i)
+	{
+    --it;
+    result = result * (*it)->getData().getMat4();
+	}
+
+	// Interpolate current matrix.
+	glm::mat4 lhs(1.0f);
+
+	--it;
+	glm::mat4 rhs = (*it)->getData().getMat4();
+
+	// \todo MH interpolate rotations with quat.
+	result = result * glm::interpolate(lhs, rhs, interpParam);
+	m_interpolatedMatrix = result;
 }

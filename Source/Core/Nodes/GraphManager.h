@@ -182,8 +182,10 @@ public:
 		Ptr<NodeBase> m_currentMatrix;
 
 	public:
-		MatrixIterator(Ptr<Sequence>& sequence);
+		explicit MatrixIterator(Ptr<Sequence>& sequence);
 		MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
+
+		MatrixIterator(const MatrixIterator& mt);
 
 		/// Move iterator to root sequence.
 		MatrixIterator& operator++();
@@ -203,15 +205,15 @@ public:
 		bool operator!=(const MatrixIterator& rhs) const;
 
 	private:
-		/// Move to the next matrix.
+		/// Move to the next matrix (to the root).
 		void advance();
 
-		/// Move to the previous matrix.
+		/// Move to the previous matrix (from the root).
 		void withdraw();
 	};
 
 public:
-	SequenceTree(Ptr<NodeBase> sequence);
+	explicit SequenceTree(Ptr<NodeBase> sequence);
 
 	/**
 	 * \return Iterator which points sequence.
@@ -223,6 +225,35 @@ public:
 	 */
 	MatrixIterator end();
 };
+
+
+class MatrixTracker
+{
+	glm::mat4 m_interpolatedMatrix;
+	float m_param = 0.0f;
+	SequencePtr m_beginSequence;
+
+public:
+	explicit MatrixTracker(const SequencePtr& beginSequence)
+			: m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
+	{}
+
+	const glm::mat4& getInterpolatedMatrix() { return m_interpolatedMatrix; }
+
+	float getParam() const { return m_param; }
+
+	/**
+	 * Set interpolation parameter and calculate interpolated matrix product.
+	 *
+	 * \param param from 0.0f to 1.0f.
+	 *
+	 * \warning Call the function only on parameter change. Note that it is
+	 * necessary to change parameter on sequence unplug or on matrix remove
+	 * or add.
+	 */
+	void setParam(float param);
+};
+
 
 inline CameraPtr GraphManager::createCamera()
 {

@@ -46,10 +46,12 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
+	/*
 	Theme t;
 	m_color =	t.get(EColor::NodeHeader);
 	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
+	 */
 }
 
 ne::NodeId const WorkspaceNode::getId() const
