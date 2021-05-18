@@ -1,32 +1,33 @@
 #include "IntroWindow.h"
-#include "Logger/Logger.h"
-#include "Config.h"
-#include "imgui.h"
-#include "Commands/ApplicationCommands.h"
-#include "Utils/Other.h"
-#include "Core/Application.h"
-#include "Tutorial/TutorialLoader.h"
-
 
 #include <filesystem>
+
+#include "imgui.h"
+
+#include "Config.h"
+
+#include "Commands/ApplicationCommands.h"
+#include "Logger/Logger.h"
+#include "Tutorial/TutorialLoader.h"
+#include "Utils/Other.h"
 
 IntroWindow::IntroWindow(bool show) : IWindow(show)
 {
   // load images
   try {
-    dummyImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "dummy.png"));
+    dummyImage = std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "dummy.png"));
   }
   catch (std::runtime_error& e) {
     LOG_ERROR(e.what())
   }
   try {
-    folderImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "pilkaFolder.png"));
+    folderImage = std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "pilkaFolder.png"));
   }
   catch (std::runtime_error& e) {
     LOG_ERROR(e.what())
   }
   try {
-    cvutImage = std::make_shared<GUIImage>(GUIImage(FS::absolute(Config::TEXTURE_FOLDER) + "cvutLogo.png"));
+    cvutImage = std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "cvutLogo.png"));
   }
   catch (std::runtime_error& e) {
     LOG_ERROR(e.what())
@@ -38,7 +39,7 @@ IntroWindow::IntroWindow(bool show) : IWindow(show)
 void IntroWindow::reloadTutorials()
 {
   // preload all tutorials located in TUTORIALS_FOLDER and its subfolders
-  auto path = std::filesystem::path(FS::absolute(Config::TUTORIALS_FOLDER));
+  auto path = std::filesystem::path(Config::getAbsolutePath(Config::TUTORIALS_FOLDER));
   path.make_preferred(); // unifies the directory separator for this platform
   LOG_INFO("Searching for tutorials in: " + path.string())
   auto dir_iterator = std::filesystem::recursive_directory_iterator(path);

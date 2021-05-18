@@ -91,8 +91,6 @@ enum class ESize
 
 	Nodes_IconSizeX,
 	Nodes_IconSizeY,
-
-	COUNT
 };
 
 enum class ESizeVec2
