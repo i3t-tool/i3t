@@ -109,68 +109,74 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
         if(param[4]->Val->Pointer!=nullptr){l = (char*)param[4]->Val->Pointer;}
     }
 
-
+    bool datavalid=false;
     glm::mat4 mat = glm::mat4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
 	if (type == scriptingData.mat4Types.scale) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
-		ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);
+        if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);}
 	}
     else if (type == scriptingData.mat4Types.uniscale) {
         workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);
+        if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);}
     }
 	else if (type == scriptingData.mat4Types.translate) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
-		ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);
+        if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);}
 	}
     else if (type == scriptingData.mat4Types.free) {
         workspace->push_back(std::make_unique<WorkspaceTransformationFree>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(mat);
+        if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(mat);}
     }
     else if (type == scriptingData.mat4Types.lookAt) {
         workspace->push_back(std::make_unique<WorkspaceLookAt>((ImTextureID)0, l));
         Core::LookAt* lookat=(Core::LookAt*)(workspace->back()->getNodebase().get());
-        lookat->setCenter((glm::vec3)mat[0]);lookat->setEye((glm::vec3)mat[1]);lookat->setUp((glm::vec3)mat[2]);
+        if(datavalid){lookat->setCenter((glm::vec3)mat[0]);lookat->setEye((glm::vec3)mat[1]);lookat->setUp((glm::vec3)mat[2]);}
     }
     else if (type == scriptingData.mat4Types.ortho) {
         workspace->push_back(std::make_unique<WorkspaceOrtho>((ImTextureID)0, l));
         Core::OrthoProj* ff = (Core::OrthoProj*)workspace->back()->getNodebase().get();
-        ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
-        ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
-        ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
+        if (datavalid){
+            ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
+            ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
+            ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
+        }
     }
     else if (type == scriptingData.mat4Types.perspective) {
         workspace->push_back(std::make_unique<WorkspacePerspective>((ImTextureID)0, l));
         Core::PerspectiveProj*  ff = (Core::PerspectiveProj*)workspace->back()->getNodebase().get();
-        ff->setZNear(mat[2][0]);ff->setZFar(mat[2][1]);
-        ff->setFOW(glm::radians(mat[3][0]));  ff->setAspect(mat[3][1]);
+        if (datavalid){
+            ff->setZNear(mat[2][0]);ff->setZFar(mat[2][1]);
+            ff->setFOW(glm::radians(mat[3][0]));  ff->setAspect(mat[3][1]);
+        }
     }
     else if (type == scriptingData.mat4Types.frustrum) {
         workspace->push_back(std::make_unique<WorkspaceFrustum>((ImTextureID)0, l));
         Core::Frustum*ff=(Core::Frustum*)workspace->back()->getNodebase().get();
-        ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
-        ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
-        ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
+        if (datavalid){
+            ff->setLeft(mat[0][0]); ff->setRight(mat[0][1]);
+            ff->setTop(mat[1][0]);  ff->setBottom(mat[1][1]);
+            ff->setNear(mat[2][0]); ff->setFar(mat[2][1]);
+        }
     }
     else if (type == scriptingData.mat4Types.rotatex) {
         workspace->push_back(std::make_unique<WorkspaceEulerX>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
+        if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));}
     }
     else if (type == scriptingData.mat4Types.rotatey) {
         workspace->push_back(std::make_unique<WorkspaceEulerY>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
+        if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));}
     }
     else if (type == scriptingData.mat4Types.rotatez) {
         workspace->push_back(std::make_unique<WorkspaceEulerZ>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
+        if (datavalid) {ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));}
     }
     else if (type == scriptingData.mat4Types.axisangle) {
         workspace->push_back(std::make_unique<WorkspaceAxisAngle>((ImTextureID)0, l));
-        ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));
+        if (datavalid) {ValueSetResult result = (workspace->back().get())->getNodebase()->setValue(glm::radians(mat[0][0]));}
     }
     else {
         returnValue->Val->Integer = -1; return;
@@ -197,14 +203,14 @@ void vec4(struct ParseState* parser, struct Value* returnValue, struct Value** p
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
 
-
+    float datavalid=false;
     glm::mat4 mat = glm::mat4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
 	workspace->push_back(std::make_unique<WorkspaceVectorFree>((ImTextureID)0, l));
-	ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec4)mat[0]);
+    if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec4)mat[0]);}
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if(numArgs==1){
@@ -227,13 +233,14 @@ void vec3(struct ParseState* parser, struct Value* returnValue, struct Value** p
     }
 
 
+    float datavalid=false;
     glm::mat4 mat = glm::mat4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
 	workspace->push_back(std::make_unique<WorkspaceVector3Free>((ImTextureID)0, l));
-	ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);
+    if(datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);}
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if(numArgs==1){
@@ -358,14 +365,14 @@ void scalar(struct ParseState* parser, struct Value* returnValue, struct Value**
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
 
-
+    float datavalid=false;
     glm::mat4 mat = glm::mat4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
     workspace->push_back(std::make_unique<WorkspaceFloatFree>((ImTextureID)0, l));
-    ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0][0]);
+    if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0][0]);}
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if (numArgs == 1) {
@@ -514,15 +521,15 @@ void quat(struct ParseState* parser, struct Value* returnValue, struct Value** p
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
 
-
+    float datavalid=false;
     glm::mat4 mat = glm::mat4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; }
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
     returnValue->Val->Integer =- 1; return;
     //workspace->push_back(std::make_unique<WorkspaceQuatFree>((ImTextureID)0, l));
-    ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0]);
+    if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0]);}
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if (numArgs == 1) {
@@ -618,7 +625,7 @@ void sequence(struct ParseState* parser, struct Value* returnValue, struct Value
     workspace->push_back(std::make_unique<WorkspaceSequence>((ImTextureID)0, nullptr,l));
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
-    if (numArgs == 1) {
+    if (numArgs == 0) {
         ne::CenterNodeOnScreen(workspace->back()->getId());
         char label[100] = { 0 };
         sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
@@ -837,7 +844,7 @@ struct LibraryFunction platformLibraryI3T[] =
     { quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },
     { quat,         "int quat(int,int,int,char*);"   },           { quat,         "int quatc(int);" },
     { convertor,    "int convertor(int,int,int,char*);"},         { convertor,    "int convertorc(int);" },
-	{ sequence,     "int sequence(int,int,char*);"     },         { sequence,     "int sequencec(char*);" },
+	{ sequence,     "int sequence(int,int,char*);"     },         { sequence,     "int sequencec();" },
 	{ seqAdd,       "bool seqadd(int,int);" },
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
 	{ unplugInput,  "bool unpluginput(int,int);" },

@@ -168,7 +168,7 @@ glm::mat4 getProjParams(glm::mat4 projinv, bool isPersp) {
 		ret[2][1] = far;
 		ret[3][0] = angle;
 		ret[3][1] = aspect;
-		printf("t %f %f, %f %f\n", near, far, angle, aspect);
+		//printf("t %f %f, %f %f\n", near, far, angle, aspect);
 	}
 	else {
 		ret[0][0] = left;

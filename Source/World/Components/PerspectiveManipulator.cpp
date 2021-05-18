@@ -126,8 +126,6 @@ void PerspectiveManipulator::update(){
 	//m_near=		editedpersp->getZNear();
 	//m_far=		editedpersp->getZFar();
 	//if(InputManager::isKeyPressed(Keys::a)){printf("m_angle %f, p %f\n",m_angle,2.0f*glm::degrees(atan((0.5f*(top-bottom))/(m_near)))); }
-	printf("m %f %f, %f %f\n", m_near, m_far,m_angle,m_aspect);
-	getProjParams(projinv, true); printf("-----------\n");
 
 	if(m_hposs[m_axisnum][2]==0.0f){//move side handles to middle - between far plane and near plane
 		glm::vec4 f=glm::vec4(m_hposs[m_axisnum][0],m_hposs[m_axisnum][1],1.0f,1.0f);

@@ -18,7 +18,7 @@ vec3 cpos=pos+camera;
 
 void main(){
 	vec3 lvec=normalize(ldir);
-	fragmentColor=texture(tex0,vec2(coord.x,-coord.y),-0.5)*color;
+	fragmentColor=texture(tex0,vec2(coord.x,coord.y),-0.5)*color;
 
 	ambient= ambient*fragmentColor.rgb;
 	diffuse= fragmentColor.rgb*max(dot(lvec,normn),0.0);		

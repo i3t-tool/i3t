@@ -13,7 +13,7 @@ smooth in vec3 normn;//camera space normal
 smooth in vec2 coord;//uv
 
 void main(){
-	//fragmentColor=texture(tex0,vec2(coord.x,-coord.y),-0.5)*color;
+	//fragmentColor=texture(tex0,vec2(coord.x,coord.y),-0.5)*color;
 	fragmentColor=color;
 	
 	vec3 lvec=normalize(ldir);
