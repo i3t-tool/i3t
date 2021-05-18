@@ -33,3 +33,6 @@
 	path = Dependencies/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
 	ignore = dirty
+[submodule "Dependencies/imgui_markdown_extended"]
+	path = Dependencies/imgui_markdown_extended
+	url = https://github.com/Mizumaky/imgui_markdown_extended

@@ -74,6 +74,8 @@ void Theme::initDefaultProperties()
 	set(EColor::Vec4Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
 	set(EColor::ScreenLink, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
 
+	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
+
 	// Folta operator color set
 	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
 	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
@@ -89,15 +91,28 @@ void Theme::initDefaultProperties()
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
 
+	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
+	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
+	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
+	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
+	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
+	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
+	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
+
+	// Tutorial fonts.
+	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
+	m_fontsAssoc.insert(std::pair(EFont::I3TTitle, 7));
+	m_fontsAssoc.insert(std::pair(EFont::I3TDescription, 8));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemTitle, 6));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemDescription, 2));
+
+
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
 	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
 	m_sizes[ESize::Nodes_Rounding] = 0.0f;
 	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
 
-	/*/m_sizes[static_cast<size_t>(ESize::Nodes_FloatMargin)] = 1.0f;
-	m_sizes[static_cast<size_t>(ESize::Nodes_FloatWidth)] = 25.0f;
-	m_sizes[static_cast<size_t>(ESize::Nodes_Rounding)] = 0.0f;
-  m_sizes[static_cast<size_t>(ESize::Nodes_LabelIndent)] = 3.0f;*/
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(8.0f, 4.0f);
 
@@ -218,7 +233,6 @@ std::map<ESizeVec2, const char*>& Theme::getSizeVecNames()
 
 void Theme::operatorColorTheme()
 {
-
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBgOperator];

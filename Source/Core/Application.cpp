@@ -64,8 +64,8 @@ void Application::init()
 
 void Application::initModules()
 {
-	for (auto* module : m_modules)
-		module->init();
+	for (auto* m : m_modules)
+		m->init();
 }
 
 void Application::initWindow()
@@ -120,11 +120,11 @@ void Application::onDisplay()
 	/// \todo move the logic Update to the timer
 	// TIME_STEP_ACU -= TIME_STEP;
 
-	for (auto* module : m_modules)
-		module->beginFrame();
+	for (auto* m : m_modules)
+		m->beginFrame();
 
-	for (auto* module : m_modules)
-		module->endFrame();
+	for (auto* m : m_modules)
+		m->endFrame();
 
 	// glfwSwapBuffers(m_window);
 	m_window->swapBuffers();

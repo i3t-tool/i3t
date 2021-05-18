@@ -71,9 +71,9 @@ void StyleEditor::render()
 
 	for (auto& [key, color] : curr.getColorsRef())
   {
-		if (auto str = enumToStr(Theme::getColorNames(), key))
+		if (auto* str = enumToStr(Theme::getColorNames(), key))
 		{
-			if (ImGui::ColorEdit4(*str, (float*)(&color)))
+			if (ImGui::ColorEdit4(str, (float*)(&color)))
 			{
 				curr.apply();
 			}
@@ -86,9 +86,9 @@ void StyleEditor::render()
 
 	for (auto& [key, val] : curr.getSizesRef())
 	{
-		if (auto str = enumToStr(Theme::getSizeNames(), key))
+		if (auto* str = enumToStr(Theme::getSizeNames(), key))
 		{
-			if (ImGui::DragFloat(*str, &val))
+			if (ImGui::DragFloat(str, &val))
 			{
 				curr.apply();
 			}
@@ -97,9 +97,9 @@ void StyleEditor::render()
 
 	for (auto& [key, val] : curr.getSizesVecRef())
 	{
-		if (auto str = enumToStr(Theme::getSizeVecNames(), key))
+		if (auto* str = enumToStr(Theme::getSizeVecNames(), key))
 		{
-			if (ImGui::DragFloat2(*str, &val[0]))
+			if (ImGui::DragFloat2(str, &val[0]))
 			{
 				curr.apply();
 			}

@@ -132,7 +132,7 @@ sizes:
 size vectors:
   Windows Frame Padding:
     x: 8
-    y: 4
+    y: 8
   Nodes Items Spacing:
     x: 2
     y: 3
