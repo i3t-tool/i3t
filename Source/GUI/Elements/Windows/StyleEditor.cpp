@@ -13,6 +13,7 @@ void StyleEditor::render()
 	auto& curr = I3T::getTheme();
 
 
+	// Theme selector
 	static int currentThemeIdx = 0;
 	if (ImGui::BeginCombo("Themes", curr.getName().c_str()))
 	{
@@ -33,17 +34,21 @@ void StyleEditor::render()
 	}
 	ImGui::SameLine();
 
+
 	if (ImGui::Button("Set as default"))
 	{
 			I3T::getUI()->setDefaultTheme(I3T::getThemes()[currentThemeIdx]);
 	}
 	ImGui::SameLine();
 
+	// Reload themes from Data/themes
 	if (GUI::Button("Reload"))
 	{
 		I3T::getUI()->reloadThemes();
 	}
 
+
+	// Save current theme to file.
 	if (ImGui::Button("Save"))
 	{
 		auto path = std::string("Data/themes/") + curr.getName();
@@ -51,6 +56,7 @@ void StyleEditor::render()
 	}
 	ImGui::SameLine();
 
+	// Revert all changes.
 	if (ImGui::Button("Revert"))
 	{
 		auto path = std::string("Data/themes/") + curr.getName() + ".yml";

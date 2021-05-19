@@ -193,7 +193,7 @@ public:
 	static std::map<ESize, const char*>& getSizeNames();
 	static std::map<ESizeVec2, const char*>& getSizeVecNames();
 
-	const std::string& getName() { return m_name; }
+	const std::string& getName() const { return m_name; }
 
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 

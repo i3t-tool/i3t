@@ -173,6 +173,13 @@ void UIModule::reloadThemes()
 
 void UIModule::setTheme(const Theme& theme)
 {
+	auto it = std::find_if(m_allThemes.begin(), m_allThemes.end(), [&](Theme& other) {
+			return m_currentTheme.getName() == other.getName();
+	});
+
+	Debug::Assert(it != m_allThemes.end(), "Current theme is unknown.");
+	*it = std::move(m_currentTheme);
+
 	m_currentTheme = theme;
 	m_currentTheme.apply();
 }
