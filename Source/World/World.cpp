@@ -9,6 +9,8 @@
 #include "Source/Core/Nodes/GraphManager.h"
 #include "Source/Core/Input/InputManager.h"
 
+#include <string.h>
+
 //#include "../Scripting/Scripting.h"
 std::shared_ptr<Core::NodeBase>World::tmpNode;
 Core::SequencePtr World::tmpSequence = Core::SequencePtr();
@@ -74,6 +76,7 @@ World::World(){
     camera->transform(glm::vec3(0.0f, 5.0f, 10.0f),glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.0f, 0.0f, 0.0f),-30.0f);
     camera->addComponent(new Camera(60.0f, this->sceneRoot)); 
     camera->addComponent(new CameraControl());
+    this->camControl=(CameraControl*)camera->getComponent(CameraControl::componentType());
 
     this->sceneRoot->addChild(camera, false);
     this->sceneRoot->addChild(sceneHandles, false);
@@ -131,6 +134,7 @@ World* World::loadDefaultScene(){
 
     w->onStart();
     return w;
+
 }
 void GUIRecursive(GameObject* root) {
     for (int i = 0; i < root->children.size(); i++) { GUIRecursive(root->children[i]); }
@@ -144,6 +148,9 @@ void updateRecursive(GameObject* root){
 void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
+}
+void World::sceneSetView(glm::vec3 dir, bool world) {
+    this->camControl->setRotation(dir,world);
 }
 void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
@@ -300,11 +307,23 @@ void World::tmpSetNode() {
 }
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
+    bool lines=false;
     if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeTexture);}
     else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeColorTexture); }
     else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World::shader0,World::cGridTexture); }
     else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World::shader0,World::axisTexture); }
-    if(g!=nullptr){this->sceneRoot->addChild(g,true);}
+    else if (strstr("Grid", name) == name) {
+        g = new GameObject(gridMesh, &World::shader0, 0);
+        g->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        g->scale(glm::vec3(0.125f));
+        lines = true;
+        if(strcmp("GridXY",name)==0)       {g->rotate(glm::vec3(1.0f,0.0f,0.0f),90.0f);}
+        else if(strcmp("GridYZ",name)==0)  {g->rotate(glm::vec3(0.0f,0.0f,1.0f),90.0f);}
+    }
+    if(g!=nullptr){
+        g->addComponent(new Renderer(Renderer::DRAW_LINES*lines));
+        this->sceneRoot->addChild(g,true);
+    }
     return g;
 }
 bool World::removeModel(GameObject*g) {

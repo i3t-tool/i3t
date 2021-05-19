@@ -19,8 +19,16 @@ void onScroll(float val)
 {
 	Log::info("Scroll: {}", val);
 }
-
+#include "World/RenderTexture.h"
+#include "World/Components.h"
+#include "World/HardcodedMeshes.h"
 /// \todo Use Framebuffer class.
+/// 
+/*GLuint renderTexture;
+RenderTexture* rend;
+GameObject* screen;
+Camera* cam ;*/
+
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
@@ -46,6 +54,21 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+	/*glClearColor(0.0f, 0.314159f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	GLuint renderTexture;
+	rend = new RenderTexture(&renderTexture, 256, 256);
+	screen = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
+	screen->addComponent(new Renderer());
+	screen->translate(glm::vec3(0.0f, 0.0f, -3.0f));
+	cam = new Camera(60.0f, screen,rend);
+	printf("update\n");
+	cam->update();
+	float val[25]={0.0f};
+	glReadPixels(0,0,5,5,GL_GREEN,GL_FLOAT,val);
+	printf("aaaaa %f\n",val[0]);*/
 
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	// init vectors definig size to display
@@ -73,6 +96,7 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
   
 	// Scrolling
   //Input.bindAxis("MouseScroll", onScroll);
+
 }
 
 float localData;
@@ -142,7 +166,7 @@ void Viewport::render()
 			glViewport(0, 0, width, height);
 		}
 
-		// clear
+		//set clear color
 		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 
 
@@ -155,6 +179,7 @@ void Viewport::render()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		//ImGui::GetForegroundDrawList()->AddRect(m_wcMin, m_wcMax, IM_COL32(255, 255, 0, 255)); // test
+
 
 		// add the texture to this's window drawList
 		ImGui::GetWindowDrawList()->AddImage(

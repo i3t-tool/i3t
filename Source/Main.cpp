@@ -136,7 +136,8 @@ int main(int argc, char* argv[])
 #ifdef I3T_RELEASE_STANDALONE // variant for standalone release
 	std::string root = "";
 #else // special settings for usage in Visual Studio devenv
-  auto root = FS::absolute("");
+  //auto root = Config::getAbsolutePath("");
+  auto root = I3T_PROJECT_ROOT;
 #endif
 
 	Config::WORKING_DIRECTORY = root;

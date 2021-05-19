@@ -82,7 +82,6 @@ void Camera::update(){
 
     renderRecursive(m_sceneRoot, glm::mat4(1.0f),false);//render opaque
     renderRecursive(m_sceneRoot, glm::mat4(1.0f),true);//render transparent
-
     if (!this->m_mainCamera){
         //printMatrix5(World::mainCamera);
         glBindFramebuffer(GL_FRAMEBUFFER, fbobkp);

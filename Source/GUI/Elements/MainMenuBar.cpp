@@ -224,40 +224,42 @@ void MainMenuBar::showViewportsMenu()
 	/// \todo MH setCamTo*, see Scene::setCamTo*
 	if (ImGui::BeginMenu("Viewports"))
 	{
+		//Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
+		World*w=App::get().world2();
 		if (ImGui::MenuItem("View-x"))
 		{
 			// Num 1
-			// App::get().world()->scene->setCamToOrbitCenterX();
+			w->sceneSetView(glm::vec3(1.0f,0.0f,0.0f),false);
 		}
 
 		if (ImGui::MenuItem("View-y"))
 		{
 			// Num 2
-			// App::get().world()->scene->setCamToOrbitCenterY();
+			w->sceneSetView(glm::vec3(0.0f, 1.0f, 0.0f), false);
 		}
 
 		if (ImGui::MenuItem("View-z"))
 		{
 			// Num 3
-			// App::get().world()->scene->setCamToOrbitCenterZ();
+			w->sceneSetView(glm::vec3(0.0f, 0.0f, 1.0f), false);
 		}
 
 		if (ImGui::MenuItem("World-x"))
 		{
 			// Num 4
-			// App::get().world()->scene->setCamToCenterX();
+			w->sceneSetView(glm::vec3(1.0f, 0.0f, 0.0f), true);
 		}
 
 		if (ImGui::MenuItem("World-y"))
 		{
 			// Num 5
-			// App::get().world()->scene->setCamToCenterY();
+			w->sceneSetView(glm::vec3(0.0f, 1.0f, 0.0f), true);
 		}
 
 		if (ImGui::MenuItem("World-z"))
 		{
 			// Num 6
-			// App::get().world()->scene->setCamToCenterZ();
+			w->sceneSetView(glm::vec3(0.0f, 0.0f, 1.0f), true);
 		}
 
 		if (ImGui::MenuItem("Center"))

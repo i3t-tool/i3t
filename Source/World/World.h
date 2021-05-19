@@ -18,6 +18,7 @@
 class WorkspaceMatrix4x4;
 class GameObject;
 class Component;
+class CameraControl;
 namespace Core{class NodeBase;class Sequence;}
 
 struct Shader{
@@ -70,6 +71,9 @@ public:
     void onUpdate();
 
     void onGUI();
+
+    void sceneSetView(glm::vec3 dir,bool world);
+
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
 
@@ -116,5 +120,5 @@ public:
 private:
     static bool initializedRender; ///< Was render already initialized?
     bool started=false;///<Was start() already called on this instance of World?
-    
+    CameraControl*camControl=nullptr;
 };
