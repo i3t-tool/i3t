@@ -192,12 +192,12 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 
 void NodeBase::unplugAll()
 {
-	for (size_t i = 0; i < m_inputs.size(); ++i)
+	for (size_t i = 0L; i < m_inputs.size(); ++i)
 	{
 		unplugInput(i);
 	}
 
-	for (size_t i = 0; i < m_outputs.size(); ++i)
+	for (size_t i = 0L; i < m_outputs.size(); ++i)
 	{
 		unplugOutput(i);
 	}

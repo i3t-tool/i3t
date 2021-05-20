@@ -75,14 +75,12 @@ void StyleEditor::render()
 	GUI::Text("Colors", EFont::TitleSmall);
   ImGui::Separator();
 
-	for (auto& [key, color] : curr.getColorsRef())
+	for (auto& [key, str] : curr.getColorNames())
   {
-		if (auto* str = enumToStr(Theme::getColorNames(), key))
+		auto& color = curr.getColorsRef()[key];
+		if (ImGui::ColorEdit4(str, (float*)(&color)))
 		{
-			if (ImGui::ColorEdit4(str, (float*)(&color)))
-			{
-				curr.apply();
-			}
+			curr.apply();
 		}
 	}
 	ImGui::Separator();
@@ -94,7 +92,7 @@ void StyleEditor::render()
 	{
 		if (auto* str = enumToStr(Theme::getSizeNames(), key))
 		{
-			if (ImGui::DragFloat(str, &val))
+			if (ImGui::DragFloat(str, &val, 1.0f, 0.0f, 0.0f, "%.0f"))
 			{
 				curr.apply();
 			}
@@ -105,7 +103,7 @@ void StyleEditor::render()
 	{
 		if (auto* str = enumToStr(Theme::getSizeVecNames(), key))
 		{
-			if (ImGui::DragFloat2(str, &val[0]))
+			if (ImGui::DragFloat2(str, &val[0], 1.0f, 0.0f, 0.0f, "%.0f"))
 			{
 				curr.apply();
 			}

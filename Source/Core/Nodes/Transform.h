@@ -294,6 +294,7 @@ public:
 	QuatRot(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::Quat)), m_initialQuat(q)
 	{
+
 	}
 
 	const glm::quat& getNormalized() const;

@@ -153,6 +153,7 @@ void UIModule::loadThemes()
 			if (m_allThemes.back().getName() == Config::DEFAULT_THEME)
 			{
 				canLoadDefault = true;
+				m_currentTheme = m_allThemes.back();
 				setTheme(m_allThemes.back());
 			}
 		}
