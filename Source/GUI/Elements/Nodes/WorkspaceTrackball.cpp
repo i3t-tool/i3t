@@ -20,11 +20,13 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, WorkspaceTr
 	);
 
 	texturePos = ImRect();
+	move = false;
 
 	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	GLuint renderTexture;
 	rend = new RenderTexture(&renderTexture, 256, 256);
+	//We dont have mesh forr ball now so using a cube for now
 	trackball = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
 	trackball->addComponent(new Renderer());
 	trackball->translate(glm::vec3(0.0f, 0.0f, -5.0f));
@@ -46,10 +48,12 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, std::string
 	);
 
 	texturePos = ImRect();
+	move = false;
 
 	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	rend = new RenderTexture(&renderTexture, 256, 256);
+	//We dont have mesh forr ball now so using a cube for now
 	trackball = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
 	trackball->addComponent(new Renderer());
 	trackball->translate(glm::vec3(0.0f, 0.0f, -5.0f));
@@ -74,18 +78,26 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 		float x = InputManager::m_mouseXDelta / 5.0f;
 		float y = InputManager::m_mouseYDelta / 5.0f;
 
-		if (InputManager::isKeyPressed(Keys::mouseMiddle))
+		ImVec2 mouse = ImGui::GetMousePos();
+		if (ImGui::IsMouseClicked(2) && (mouse.x > texturePos.Min.x && mouse.x < texturePos.Max.x && mouse.y > texturePos.Min.y && mouse.y < texturePos.Max.y))
 		{
-			//if(InputManager)
+			move = true;
+		}
+		//if (InputManager::isKeyJustUp(Keys::mouseMiddle))
+		if (ImGui::IsMouseReleased(2))
+		{
+			move = false;
+		}
+
+		if(move){
 				trackball->rotateAround((glm::vec3)trackball->transformation[0], -y, (glm::vec3)trackball->transformation[3]);
 				trackball->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, (glm::vec3)trackball->transformation[3]);
-
 		}
 
 		//Texture
 		cam->update();
 		ImGui::Image((void*)(intptr_t)renderTexture,textureSize,ImVec2(0,1), ImVec2(1,0));
-
+		texturePos = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
 
 

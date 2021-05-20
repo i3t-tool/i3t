@@ -36,6 +36,7 @@ public:
 	GameObject* trackball;
 	Camera* cam;
 
+	bool move;
 
 	bool isTrackball();
 
