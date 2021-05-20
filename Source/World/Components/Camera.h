@@ -26,6 +26,7 @@ public:
 	static const char* componentType() { return Camera::s_type; };
 	const char* getComponentType() { return Camera::s_type; };
 
+	bool m_processView=true;
 	float m_angle = 60.0f;
 	RenderTexture* m_fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
 	glm::mat4x4 m_perspective; ///< Perspective matrix
