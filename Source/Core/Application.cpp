@@ -115,7 +115,6 @@ void Application::onDisplay()
 	// glfwSetWindowTitle(m_window->get(), ss.str().c_str());
 	m_window->setTitle(ss.str().c_str());
 
-	logicUpdate();
 	/// \todo after pressing quit, it still updates the logic and fails on nonexistent camera in Scene::keyUpdate()
 	/// \todo move the logic Update to the timer
 	// TIME_STEP_ACU -= TIME_STEP;
@@ -125,6 +124,9 @@ void Application::onDisplay()
 
 	for (auto* m : m_modules)
 		m->endFrame();
+
+	// Input update must be called after rendering.
+	logicUpdate();
 
 	// glfwSwapBuffers(m_window);
 	m_window->swapBuffers();
