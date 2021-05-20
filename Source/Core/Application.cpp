@@ -154,30 +154,7 @@ bool Application::initI3T()
 		// new scene scheme
 		bool b = World::init();
 		m_world = World::loadDefaultScene();
-		m_world->tmpSetNode();//tmp - to be removed
-		m_world->onUpdate();
-		GLuint renderTexture;
 
-		ImVec2 textureSize = ImVec2(
-				5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * 20.0f,
-				5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * 20.0f
-		);
-
-		//rend = new RenderTexture(&renderTexture, textureSize.x, textureSize.y);
-		//screen = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
-		//screen->addComponent(new Renderer());
-		//cam = new Camera(60.0f, screen, rend);
-
-		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-
-		RenderTexture* rend = new RenderTexture(&renderTexture, 256, 256);
-		GameObject* screen = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
-
-		screen->translate(glm::vec3(1000,100,-3));
-
-		screen->addComponent(new Renderer());
-		Camera* cam = new Camera(60.0f, screen, rend);
-		cam->update();
 		return b;
 
 }

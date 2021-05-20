@@ -29,10 +29,12 @@ public:
 	ImVec2 textureSize;
 	ImVec2 buttonSize;
 
-	/*GLuint renderTexture;
+	ImRect texturePos;
+
+	GLuint renderTexture;
 	RenderTexture* rend;
-	GameObject* screen;
-	Camera* cam;*/
+	GameObject* trackball;
+	Camera* cam;
 
 
 	bool isTrackball();

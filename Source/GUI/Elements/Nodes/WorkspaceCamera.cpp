@@ -58,6 +58,7 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     t.operatorColorTheme();
   }
 	m_projection->drawNode(builder);
+	//const glm::mat4& coreData = m_projection->getInnerWorkspaceNodes().begin()->get()->m_nodebase->getData().getMat4();
 	t.returnFloatColorToDefault();
 
 

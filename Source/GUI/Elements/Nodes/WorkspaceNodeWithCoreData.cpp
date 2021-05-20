@@ -253,6 +253,8 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PopStyleVar();
 	}
 
+
+
     return valueChanged;
     /* maybe usefull
         ImGui::GetFontSize() or ImGui::GetFrameHeight()
@@ -274,7 +276,10 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
     for (int i = 0; i < number_of_values; i++)
     {
         ImGui::TextUnformatted( labels[i].c_str() );
+				ImGui::SameLine(50);
         localData = getters[i]();
+
+
         if (drawDragFloatWithMap_Inline(&localData,
                                         datamap_values[i],
                                         fmt::format("##{}:ch{}", idOfNode, i))) //todo check
