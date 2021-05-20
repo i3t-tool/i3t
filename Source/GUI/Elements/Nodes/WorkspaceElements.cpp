@@ -15,8 +15,8 @@ std::map<EValueType, ImColor> WorkspacePinColor = {
 
 std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Float, IconType::Arrow},     {EValueType::Matrix, IconType::Arrow},
-		{EValueType::MatrixMul, IconType::Circle}, {EValueType::Pulse, IconType::Circle},
-		{EValueType::Quat, IconType::Arrow},      {EValueType::Screen, IconType::Circle},
+		{EValueType::MatrixMul, IconType::Arrow}, {EValueType::Pulse, IconType::Arrow},
+		{EValueType::Quat, IconType::Arrow},      {EValueType::Screen, IconType::Arrow},
 		{EValueType::Vec3, IconType::Arrow},      {EValueType::Vec4, IconType::Arrow}};
 
 std::map<EValueType, ImColor> WorkspaceInnerPinColor = {
@@ -103,16 +103,17 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
   Theme& t = I3T::getTheme();
   m_color =	t.getHeader();
 	builder.Header(m_color);
-	ImGui::Spring(0);     // 0 - spring will always have zero size - left align the header
+	ImGui::Spring(0, 2);     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
-	ImGui::Spring(1);     // 1 - power of the current spring = 1, use default spacing .x or .y
+	ImGui::Spring(10);     // 1 - power of the current spring = 1, use default spacing .x or .y
 	if(!dataAreValid()) /* \todo JH function for check validity of data here */
     {
-        ax::Widgets::Icon(ImVec2(20, 20), /* \todo JH size based on header size */
+        /*ax::Widgets::Icon(ImVec2(20, 20), // \todo JH size based on header size
                             IconType::Square,
                             true,
                             ImColor(255,0,0),
-                            ImColor(0,0,0)); /* \todo JH not constant here... */ //SS what is this?
+                            ImColor(0,0,0));  //\todo JH not constant here...
+																						 */
     }
 	ImGui::Spring(0);
 

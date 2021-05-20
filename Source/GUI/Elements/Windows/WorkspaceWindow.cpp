@@ -873,22 +873,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 				ImGui::EndMenu();
 
 			}
-			/*if (ImGui::BeginMenu("scale")) {
-
-				ImGui::Text("add scale");
-				ImGui::Separator();
-				if (ImGui::MenuItem("uniform scale")) {
-          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
-				}
-				if (ImGui::MenuItem("scale")) {
-					//todo make popup when creating for initial values?
-          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
-				}
-				ImGui::EndMenu();
-
-			}*/
       if (ImGui::MenuItem("scale")) {
         m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(m_headerBackgroundTexture));
         ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -1323,6 +1307,8 @@ void WorkspaceWindow::checkQueryContextMenus()
       ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
     }
 		if (ImGui::MenuItem("screen")) {
+			m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>(m_headerBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 
 		ImGui::Separator();

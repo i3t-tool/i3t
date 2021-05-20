@@ -40,141 +40,98 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
   if(index == -1){  // -> draw middle
     //BUTTONS
     ImVec2 button_sz(32.0f, 32.0f);
-    ImTextureID my_tex_id = (ImTextureID)(intptr_t)pgr::createTexture(
-        Config::getAbsolutePath("Data/textures/icons2.png"),
-        true);
 
-		//   ImGui::ImageButton(ImTextureID, size, uv0, uv1, frame padding, tint color)
+		//change framepadding x
+		//framepadding y chnage radio buttons
 
-		/*if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(0*button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
-      m_nodebase->as<Core::Cycle>()->play();
-		}
-    ImGui::SameLine();
-    if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(2*button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(3*button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
-      m_nodebase->as<Core::Cycle>()->stop();
-    }
-    ImGui::SameLine();
-    if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(2*button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
-      m_nodebase->as<Core::Cycle>()->resetAndStop();
-    }
-    ImGui::SameLine();
-    if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(0*button_sz.x/128.0f,2*button_sz.y/128.0f), ImVec2(button_sz.x/128.0f,3*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
-      m_nodebase->as<Core::Cycle>()->stepBack();
-    }
-    ImGui::SameLine();
-    if (ImGui::ImageButton(my_tex_id, button_sz, ImVec2(3*button_sz.x/128.0f,button_sz.y/128.0f), ImVec2(4*button_sz.x/128.0f,2*button_sz.y/128.0f), -1, I3T::getColor(EColor::NodeBgOperator))){
-      m_nodebase->as<Core::Cycle>()->stepNext();
-    }*/
-
+		// "⯈/❙❙" "◼" "❙⯇" "⯈❙"
 		//std::u8string string = u8"⯈";
-		std::u8string string = u8"ěščřžýáíé";
-		std::string s(string.cbegin(), string.cend());
+		//std::u8string string = u8"ěščřžýáíé";
+		//std::string s(string.cbegin(), string.cend());
 
-		if(ImGui::Button(s.c_str(), button_sz)){
-      m_nodebase->as<Core::Cycle>()->play();
-		}
-		ImGui::SameLine();
-		if(ImGui::Button("❙❙", button_sz)){
-      m_nodebase->as<Core::Cycle>()->stop();
+		if(ImGui::Button("P/P", button_sz)){
+			if(m_nodebase->as<Core::Cycle>()->isRunning()){
+				m_nodebase->as<Core::Cycle>()->stop();
+			}else{
+				m_nodebase->as<Core::Cycle>()->play();
+			}
 		}
     ImGui::SameLine();
-		if(ImGui::Button("◼", button_sz)){
+		if(ImGui::Button("SaR", button_sz)){
       m_nodebase->as<Core::Cycle>()->resetAndStop();
 		}
     ImGui::SameLine();
-    if(ImGui::Button("❙⯇", button_sz)){
+    if(ImGui::Button("SB", button_sz)){
       m_nodebase->as<Core::Cycle>()->stepBack();
 		}
     ImGui::SameLine();
-    if(ImGui::Button("⯈❙", button_sz)){
+    if(ImGui::Button("SN", button_sz)){
       m_nodebase->as<Core::Cycle>()->stepNext();
 		}
+
+
 
 
 		//Mode select
-    bool open_popup = false;
-    Core::Cycle::EMode core_mode = m_nodebase->as<Core::Cycle>()->getMode();
-		const char* mode = "";
-		switch(core_mode){
-		case Core::Cycle::EMode::Once:
-			mode = "Mode: Once                 ";
-			break;
-    case Core::Cycle::EMode::Repeat:
-			mode = "Mode: Repeat             ";
-      break;
-    case Core::Cycle::EMode::PingPong:
-			mode = "Mode: Ping-Pong        ";
-      break;
-		}
+		static int mode = 0;
 
-    //ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f,10.00f)); // Doesnt work :(
-    //open_popup |= ImGui::Button(mode, ImVec2(3*button_sz.x+I3T::getSize(ESize::Nodes_floatPaddingX)*2, button_sz.y/2));
+		//TODO is there a way to calculate how much space take radio button with text?
 
-    ImGui::PushItemWidth(3*button_sz.x+I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x*2);
-		//ImGui::
-		ImGui::Text("%s", mode);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(button_sz.x-10.0f, 0.0f));
 
-    if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
-    {
-      fw.showMyPopup = true;
-      fw.id = fmt::format("Mode");
-      fw.value = 0;
-    }
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESizeVec2::Nodes_FloatPadding).x, button_sz.y/16});
 
-		ImGui::PopItemWidth();
-    //ImGui::PopStyleVar();
-
-
-    /*ImGui::PushItemWidth(3*button_sz.x+I3T::getSize(ESize::Nodes_floatPaddingX)*2);
-    static int i = -1;
-    if (ImGui::Combo(mode, &i, "Once\0Repeat\0Ping-Pong\0"))
-    {
-      switch (i)
-      {
-      case 0:
-        m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Once);
-				break;
-
-      case 1:
-        m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Repeat);
-				break;
-
-      case 2:
-        m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::PingPong);
-				break;
-      }
-    }
-    ImGui::PopItemWidth();*/
-
-
-    ImGui::SameLine();
+		ImGui::RadioButton("Once", &mode, 0);
+		ImGui::SameLine();
 
 		//Multiplier
-    const float coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
-    float localData = coreData;
-    int const idOfNode = this->m_id.Get();
-    bool valueChanged = false;
+		const float coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
+		float localData = coreData;
+		int const idOfNode = this->m_id.Get();
+		bool valueChanged = false;
 
-    ImGui::PushItemWidth(2*button_sz.x+I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESizeVec2::Nodes_FloatPadding).x, button_sz.y/16});
+		ImGui::PushItemWidth(2*button_sz.x + 4* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
 
-    valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, index));
+
+		valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, index));
 
 		if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
-    {
-      fw.showMyPopup = true;
-      fw.id = fmt::format("##{}", idOfNode);
-      fw.value = localData;
-    }
+		{
+			fw.showMyPopup = true;
+			fw.id = fmt::format("##{}", idOfNode);
+			fw.value = localData;
+		}
 
-    if (valueChanged)
-    {
-      m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
-      setDataItemsWidth();
-    }
+		if (valueChanged)
+		{
+			m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
+			setDataItemsWidth();
+		}
 
+		ImGui::PopItemWidth();
+
+		ImGui::RadioButton("Repeat", &mode, 1);
+		ImGui::RadioButton("Ping-Pong", &mode, 2);
+
+		switch (mode)
+		{
+		case 0:
+			m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Once);
+			break;
+
+		case 1:
+			m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Repeat);
+			break;
+
+		case 2:
+			m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::PingPong);
+			break;
+		}
 		ImGui::PopStyleVar();
-    ImGui::PopItemWidth();
+		ImGui::PopStyleVar();
+
+
+
 
   }else if (index == 0){
     const float coreData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
@@ -209,6 +166,9 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
       m_nodebase->setValue(localData);
       setDataItemsWidth();
     }
+
+
+
 	}
 }
 
@@ -237,7 +197,7 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
     if(pinProp->getLabel().empty()){ //it's never empty :(
 
       auto label = pinProp->getCorePin().getLabel();
-      if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+      if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
         ImGui::TextUnformatted("");
       }else
       {
@@ -248,7 +208,7 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
     }else{
 
       auto label = pinProp->getLabel();
-      if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+      if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
         ImGui::TextUnformatted("");
       }else{
         ImGui::Spring(0,I3T::getSize(ESize::Nodes_LabelIndent));
@@ -276,8 +236,6 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 	default:
     break;
 	}
-
-	//m_projection = std::make_shared<WorkspaceSequence>(headerBackground, m_nodebase->as<Core::Camera>()->getProj());
 
   int const idOfNode = this->m_id.Get();
 

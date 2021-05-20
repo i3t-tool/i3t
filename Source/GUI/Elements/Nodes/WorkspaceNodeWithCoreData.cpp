@@ -193,7 +193,7 @@ float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
 	  //ImFont* f = I3T::getTheme().get(EFont::Node);
 		float size = ImGui::GetFontSize();
-    float oneCharWidth = size / 2, padding = 1; /* \todo JH take from some font setting */
+    float oneCharWidth = size / 2, padding = 1;
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -378,7 +378,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
         drawDataFull(builder, index);
     }
 
-    if (m_inactiveMark != 0)
+    /*if (m_inactiveMark != 0)
     {
         ImVec2 start = ne::GetNodePosition(m_id);
         ImVec2 size = ne::GetNodeSize(m_id);
@@ -395,7 +395,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
         //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
         //ImGui::Dummy(const ImVec2& size);
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
-    }
+    }*/
 }
 
 void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
@@ -519,7 +519,7 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 			if(pinProp->getLabel().empty()){ //it's never empty :(
 
         auto label = pinProp->getCorePin().getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else
 				{
@@ -531,7 +531,7 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
       }else{
 
         auto label = pinProp->getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else{
           ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
@@ -544,6 +544,16 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 
       ImGui::Spring(1);
 
+			//TODO better way to solve this?
+				if(isCycle() && pinProp->getIndex() > 0){
+					//float w = pinProp->getIconSize().x;
+					ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+					ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x+I3T::getSize(ESizeVec2::Nodes_IconSize).x,
+														 window->DC.LastItemRect.Min.y),
+											ImVec2(window->DC.LastItemRect.Max.x+I3T::getSize(ESizeVec2::Nodes_IconSize).x,
+														 window->DC.LastItemRect.Max.y));
+				}
+
 		  //Icon
       ax::Widgets::Icon(pinProp->getIconSize(),
                         WorkspacePinShape[pinProp->getType()],
@@ -551,9 +561,14 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
                         WorkspacePinColor[pinProp->getType()],
                         pinProp->getColor());
 
-	    ImGui::PopStyleVar();
+
+
+
+			ImGui::PopStyleVar();
 
       builder.EndOutput();
+
+
 
 			if(isTrackball()){
 				ImGui::EndVertical();

@@ -4,18 +4,44 @@
 
 #include "WorkspaceTrackball.h"
 
-#include <World/Components/Camera.h>
-#include <World/Components/Renderer.h>
-#include <World/HardcodedMeshes.h>
-#include <World/RenderTexture.h>
+
 
 WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, WorkspaceTrackballArgs const& args)
 		: WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
-{}
+{
+
+	buttonSize = ImVec2(
+			m_dataItemsWidth*4.0f/3.0f,
+			20.0f);
+
+	textureSize = ImVec2(
+			5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
+			5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y
+	);
+
+	/*rend = new RenderTexture(&renderTexture, textureSize.x, textureSize.y);
+	screen = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
+	screen->addComponent(new Renderer());
+	cam = new Camera(60.0f, screen, rend);*/
+}
 
 WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
 		//TODO change create Node when MH make Trackball in Core.
 		: WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::Matrix>(), headerLabel, nodeLabel){
+
+	buttonSize = ImVec2(
+			m_dataItemsWidth*4.0f/3.0f,
+			20.0f);
+
+	textureSize = ImVec2(
+			5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
+			5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y
+	);
+
+	/*rend = new RenderTexture(&renderTexture, textureSize.x, textureSize.y);
+	screen = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
+	screen->addComponent(new Renderer());
+	cam = new Camera(60.0f, screen, rend);*/
 }
 
 bool WorkspaceTrackball::isTrackball()
@@ -31,41 +57,20 @@ void WorkspaceTrackball::drawDataSetValues(util::NodeBuilder& builder)
 void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 
 	if(index == -1){
-		ImVec2 buttonSize = ImVec2(
-				m_dataItemsWidth*4.0f/3.0f,
-				20.0f);
-		ImVec2 textureSize = ImVec2(
-				5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
-				5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y
-				);
 
 		//Texture
+		//cam->update();
 
-		/*GameObject*g=new GameObject(unitcubeMesh, &World::shader0, World::cubeTexture);
-		g->translate(glm::vec3(-0.0f, 0.0f, -5.0f));//translace do zorného pole kamery
-		GLuint renderTexture;
-		RenderTexture* rend = new RenderTexture(&renderTexture,256,256);
-		Camera*c=new Camera(60.0f, g, rend);
-		g->addComponent(new Renderer());
-		c->update();
-		ImGui::Image(rend,ImVec2(50.0f,50.0f),ImVec2(0.0f,0.0f), ImVec2(50.0f, 50.0f));*/
+		Application& app = Application::get();
 
-
-		ImGui::Image(
-					(ImTextureID)(intptr_t)pgr::createTexture(
-					Config::getAbsolutePath("Data/textures/trackballTest.png"),
-					true),
-						textureSize,
-				ImVec2(0.0f,0.0f),
-				textureSize
-				);
+		ImGui::Image(app.getRenderTexture(),textureSize,ImVec2(0.0f,1.0f), ImVec2(1,0));
 
 		//Buttons
 		ImGui::BeginVertical("Trackball_Buttons");
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-12.0f);
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 
 		if(ImGui::Button("x-", buttonSize)){
 			//core call
@@ -79,7 +84,7 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 			//core call
 		}
 
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-12.0f);
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 
 		if(ImGui::Button("x+", buttonSize)){
 			//core call

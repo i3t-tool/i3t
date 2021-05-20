@@ -38,6 +38,15 @@ struct NodeBuilder
 	void Output(PinId id, ImColor color);
 	void EndOutput();
 
+	ImVec2 HeaderMin;
+	ImVec2 HeaderMax;
+
+
+	ImVec2 NodeMin;
+	ImVec2 NodeMax;
+	ImVec2 ContentMin;
+	ImVec2 ContentMax;
+
 private:
 	enum class Stage
 	{
@@ -62,12 +71,6 @@ private:
 	NodeId CurrentNodeId;
 	Stage CurrentStage;
 	ImU32 HeaderColor;
-	ImVec2 NodeMin;
-	ImVec2 NodeMax;
-	ImVec2 HeaderMin;
-	ImVec2 HeaderMax;
-	ImVec2 ContentMin;
-	ImVec2 ContentMax;
 	bool HasHeader;
 };
 

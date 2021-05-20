@@ -5,6 +5,11 @@
 #pragma once
 #include "WorkspaceMatrix4x4.h"
 
+#include <World/Components/Camera.h>
+#include <World/Components/Renderer.h>
+#include <World/HardcodedMeshes.h>
+#include <World/RenderTexture.h>
+
 struct WorkspaceTrackballArgs
 {
 	WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
@@ -20,6 +25,15 @@ class WorkspaceTrackball : public WorkspaceMatrix4x4
 public:
 	WorkspaceTrackball(ImTextureID headerBackground, WorkspaceTrackballArgs const& args);
 	WorkspaceTrackball(ImTextureID headerBackground, std::string headerLabel = "Trackball", std::string nodeLabel = "Trackball");
+
+	ImVec2 textureSize;
+	ImVec2 buttonSize;
+
+	/*GLuint renderTexture;
+	RenderTexture* rend;
+	GameObject* screen;
+	Camera* cam;*/
+
 
 	bool isTrackball();
 

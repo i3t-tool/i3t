@@ -112,12 +112,13 @@ void Theme::initDefaultProperties()
 	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
 	m_sizes[ESize::Nodes_Rounding] = 0.0f;
 	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
+	m_sizes[ESize::Nodes_LabelIndent] = 3.0f;
 
 
-	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(8.0f, 4.0f);
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(0.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
-	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(8.0f, 1.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(0.0f, 1.0f);
 	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);

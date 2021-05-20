@@ -6,6 +6,7 @@
 #pragma once
 
 #include <GUI/UIModule.h>
+#include <World/Components/Camera.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -90,11 +91,18 @@ public:
 	 */
 	bool initI3T();
 
+	RenderTexture* getRenderTexture(){return rend;}
+
 private:
 	static Application s_instance;
 
 	UIModule* m_ui;
 	std::vector<Module*> m_modules;
+
+	GLuint renderTexture;
+	RenderTexture* rend;
+	GameObject* screen;
+	Camera* cam;
 
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback resulting in no

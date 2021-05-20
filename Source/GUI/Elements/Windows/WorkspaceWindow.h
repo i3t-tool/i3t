@@ -150,7 +150,7 @@
 //  }
 //}operators end
 
-//#include "../Nodes/WorkspaceScreen.h"
+#include "../Nodes/WorkspaceScreen.h"
 #include "../Nodes/WorkspacePulse.h"
 
 #include "Core/Input/InputManager.h"
