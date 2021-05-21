@@ -75,7 +75,8 @@ void Camera::update(){
 
 	World::perspective = this->m_perspective;
 	World::mainCamPos = -(glm::vec3)transform[3];
-	World::mainCamera = glm::inverse(getRotation(transform, 0));
+	if(m_processView){World::mainCamera = glm::inverse(getRotation(transform, 0));}
+	else{ World::mainCamera = transform; }
 
 	World::mainCamera[3] = World::mainCamera * glm::vec4(-(glm::vec3)transform[3],1.0f);
 	//*(glm::vec3*)(&World::mainCamera[3]) = -(glm::vec3)transform[3];

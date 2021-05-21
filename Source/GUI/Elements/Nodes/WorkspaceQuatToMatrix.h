@@ -8,8 +8,8 @@
 struct WorkspaceQuatToMatrixArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default QuatToMatrix header";
-  std::string nodeLabel = "QuatToMatrix";
+  std::string headerLabel = "default quat -> mat header";
+  std::string nodeLabel = "quat -> mat";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::QuatToMatrix>();
 };
 
@@ -17,7 +17,7 @@ class WorkspaceQuatToMatrix : public WorkspaceMatrix4x4
 {
 public:
   WorkspaceQuatToMatrix(ImTextureID headerBackground, WorkspaceQuatToMatrixArgs const& args);
-  WorkspaceQuatToMatrix(ImTextureID headerBackground, std::string headerLabel = "QuatToMatrix", std::string nodeLabel = "QuatToMatrix");
+  WorkspaceQuatToMatrix(ImTextureID headerBackground, std::string headerLabel = "quat -> mat", std::string nodeLabel = "quat -> mat");
 
   void drawDataSetValues(util::NodeBuilder& builder);
 };

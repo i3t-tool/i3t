@@ -25,12 +25,16 @@ public:
 	void start();
 	static const char* componentType() { return Camera::s_type; };
 	const char* getComponentType() { return Camera::s_type; };
+
+	bool m_processView=true;
 	float m_angle = 60.0f;
 	RenderTexture* m_fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
 	glm::mat4x4 m_perspective; ///< Perspective matrix
 	GameObject* m_sceneRoot = NULL;///< this scene tree will be rendered by camera
+
 private:
 	static const char* s_type;
+
 	void renderRecursive(GameObject* obj, glm::mat4 parent,bool isTranspartentPass);///<render scene tree
 	bool m_mainCamera;///<if fbo is NULL, camera renders to screen and sets World camera settings to its own
 };

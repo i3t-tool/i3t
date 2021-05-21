@@ -41,13 +41,7 @@ void WorkspaceScreen::drawDataFull(util::NodeBuilder& builder, int index)
 		cam->m_perspective = camera;
 		cam->update();
 
-		ImGui::Image((void*)(intptr_t)renderTexture,ImVec2(130,130),ImVec2(0.0f,1.0f), ImVec2(1,0));
+		ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
 	}
 
 }
-/*
-1.7  0   0   0
- 0 	1.7  0   0
- 0   0  -1 -0.4
- 0   0  -1   0
- */

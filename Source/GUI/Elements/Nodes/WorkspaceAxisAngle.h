@@ -9,7 +9,7 @@ struct WorkspaceAxisAngleArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
   std::string headerLabel = "default AxisAngle header";
-  std::string nodeLabel = "AxisAngle";
+  std::string nodeLabel = "Rotate";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createTransform<Core::AxisAngleRot>();
 };
 
@@ -17,7 +17,7 @@ class WorkspaceAxisAngle : public WorkspaceMatrix4x4
 {
 public:
   WorkspaceAxisAngle(ImTextureID headerBackground, WorkspaceAxisAngleArgs const& args);
-  WorkspaceAxisAngle(ImTextureID headerBackground, std::string headerLabel = "AxisAngle", std::string nodeLabel = "AxisAngle");
+  WorkspaceAxisAngle(ImTextureID headerBackground, std::string headerLabel = "Rotate", std::string nodeLabel = "Rotate");
 
   void drawDataSetValues(util::NodeBuilder& builder);
 };

@@ -62,7 +62,6 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 	{
 	    m_nodebase->setValue(localData);
 	    setDataItemsWidth();
-//		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 
 	ImGui::Spring(0);

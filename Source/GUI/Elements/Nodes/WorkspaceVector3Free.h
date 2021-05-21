@@ -5,7 +5,7 @@ struct WorkspaceVector3FreeArgs
 {
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Vector3 header";
-    std::string nodeLabel = "default Vector3 label";
+    std::string nodeLabel = "Vector3";
     Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector3>();
 };
 

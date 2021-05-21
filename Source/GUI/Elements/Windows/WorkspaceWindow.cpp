@@ -85,6 +85,22 @@ void WorkspaceWindow::render()
 
 	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 
+	if (InputManager::isKeyPressed(Keys::a))
+	{
+		selectAll();
+	}
+	if (InputManager::isKeyPressed(Keys::i))
+	{
+		invertSelection();
+	}
+	if (InputManager::isKeyPressed(Keys::s))
+	{
+		ne::NavigateToContent();
+	}
+	if (InputManager::isKeyPressed(Keys::d))
+	{
+		ne::NavigateToSelection();
+	}
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");{
@@ -108,9 +124,12 @@ void WorkspaceWindow::render()
 	if(drag_action && drag_action->IsDragging())
     {
         m_draged_nodes = getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
+		/*TODO SS camera fail here. node editor marks different object as dragged one than the actual one.
+			it results that we cannot find workspacenode by id because we have the wrong id*/
         m_draged_node_nodeeditor = drag_action->m_DraggedObject->AsNode();
         if(m_draged_node_nodeeditor)
         {
+					//TODO nullptr check
             m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
             if( m_draged_node->isTransformation())
             {
@@ -456,7 +475,7 @@ void WorkspaceWindow::checkQueryLinkCreate()
             switch (Core::GraphManager::isPlugCorrect(&(endPin->getCorePin()), &(startPin->getCorePin())))
             {
                 case ENodePlugResult::Ok:
-                    showPopUpLabel("Connection possible", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    showPopUpLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
                     if (!ImGui::GetIO().MouseDown[0])
                     {
                         Core::GraphManager::plug(startPin->getNode().getNodebase(),
@@ -467,7 +486,7 @@ void WorkspaceWindow::checkQueryLinkCreate()
                     break;
                 /* \todo JH react informatively to other result too */
                 default:
-                    showPopUpLabel("Connection not possible", ImColor(255,0,0)); /* \todo JH remove constant here */
+                    showPopUpLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 
             }
         }
@@ -483,7 +502,7 @@ void WorkspaceWindow::checkQueryNodeCreate()
         m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
         if (m_pinPropertiesForNewLink)
         {
-            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
+            showPopUpLabel("+ Create Node", I3T::getColor(EColor::Nodes_CreateNode));
         }
 
         if (ne::AcceptNewItem())
@@ -599,11 +618,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 	{
 		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
 		if (node->fw.showMyPopup) {
-			if(node->isCycle() && node->fw.id == "Mode"){
-        ImGui::OpenPopup("Cycle_Mode");
-			}else{
-        ImGui::OpenPopup("float_context_menu");
-			}
+			ImGui::OpenPopup("float_context_menu");
 			node->fw.showMyPopup = false;
 		}else{
 			ImGui::OpenPopup("Node Context Menu");
@@ -613,28 +628,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 	ne::Suspend();
-
-
-
-  if (ImGui::BeginPopup("Cycle_Mode"))
-  {
-    Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
-
-    ImGui::Text("Mode");
-    ImGui::Separator();
-
-    if (ImGui::Selectable("Once")) {
-      node->getNodebase()->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Once);
-    }
-    if (ImGui::Selectable("Repeat")) {
-      node->getNodebase()->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Repeat);
-    }
-    if (ImGui::Selectable("ping-pong")) {
-      node->getNodebase()->as<Core::Cycle>()->setMode(Core::Cycle::EMode::PingPong);
-    }
-
-    ImGui::EndPopup();
-  }
 
 	if (ImGui::BeginPopup("float_context_menu")) {
 		ImGui::Text("Set value...					");
@@ -817,8 +810,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 		else {
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
-
-		context_node->drawMenuSetDataMap();
+				if(context_node->isTransformation()){
+					context_node->drawMenuSetDataMap();
+				}
         context_node->drawMenuLevelOfDetail();
         context_node->drawMenuSetPrecision();
 
@@ -914,15 +908,15 @@ void WorkspaceWindow::checkQueryContextMenus()
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeTranslation>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleX")) {
+				if (ImGui::MenuItem("euler AngleX")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleY")) {
+				if (ImGui::MenuItem("euler AngleY")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleZ")) {
+				if (ImGui::MenuItem("euler AngleZ")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
@@ -1302,7 +1296,7 @@ void WorkspaceWindow::checkQueryContextMenus()
             m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
             ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
-    if (ImGui::MenuItem("Pulse")) {
+    if (ImGui::MenuItem("pulse")) {
       m_workspaceCoreNodes.push_back(std::make_shared<WorkspacePulse>(m_headerBackgroundTexture));
       ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
     }

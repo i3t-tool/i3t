@@ -8,8 +8,8 @@
 struct WorkspaceFloatsToVectorArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default FloatsToVector header";
-  std::string nodeLabel = "default FloatsToVector label";
+  std::string headerLabel = "default floats -> vec4 header";
+  std::string nodeLabel = "default floats -> vec4 label";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::FloatsToVector>();
 };
 
@@ -17,7 +17,7 @@ class WorkspaceFloatsToVector : public WorkspaceVector4
 {
 public:
   WorkspaceFloatsToVector(ImTextureID headerBackground, WorkspaceFloatsToVectorArgs const& args);
-  WorkspaceFloatsToVector(ImTextureID headerBackground, std::string headerLabel = "FloatsToVector", std::string nodeLabel = "FloatsToVector");
+  WorkspaceFloatsToVector(ImTextureID headerBackground, std::string headerLabel = "floats -> vec4", std::string nodeLabel = "floats -> vec4");
 
   void drawDataSetValues(util::NodeBuilder& builder);
 

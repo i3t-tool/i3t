@@ -8,7 +8,7 @@ WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, WorkspaceMa
 	fw.value = NAN;  
 	fw.name = "matrix4x4";
 
-    setDataItemsWidth();
+	setDataItemsWidth();
 }
 
 WorkspaceMatrix4x4::WorkspaceMatrix4x4(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase, std::string headerLabel, std::string nodeLabel)
@@ -31,16 +31,11 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
     int rowOfChange, columnOfChange;
     float valueOfChange, localData; /* user can change just one value at the moment */
 
-    //ImGui::BeginHorizontal(m_nodebase->getId());
-    //ImGui::Spring(1);
-
     ImGui::PushItemWidth(m_dataItemsWidth);
     /* Drawing is row-wise */
 
-
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
-
 
     for (int rows = 0; rows < 4; rows++)
     {
@@ -70,9 +65,7 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
 					ImGui::SameLine();
 				}
       }
-      //ImGui::NewLine();
     }
-
 
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
@@ -83,9 +76,6 @@ void WorkspaceMatrix4x4::drawDataFull(util::NodeBuilder& builder, int index)
       m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
       setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
     }
-
-    //ImGui::Spring(1);
-
 }
 
 int WorkspaceMatrix4x4::maxLenghtOfData()

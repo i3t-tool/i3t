@@ -57,7 +57,6 @@ void WorkspaceFloat::drawDataFull(util::NodeBuilder& builder, int index)
 
 	if (valueChanged)
 	{
-		//ask MH
 		m_nodebase->setValue(localData);
 		setDataItemsWidth();
 	}

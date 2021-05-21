@@ -220,10 +220,10 @@ enum class ENodeType
 	MakeFrustum,     // done SS
 	MakeLookAt,      // done SS
 
-	Screen,
+	Screen,						// done SS
 	Pulse            // done SS
 
-	// SS missing trackball
+	// SS trackball (trackcube) is done, waiting for Core
 };
 
 enum class ETransformType

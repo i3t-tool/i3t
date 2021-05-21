@@ -17,7 +17,7 @@ class WorkspaceCycle : public WorkspaceNodeWithCoreData
 {
 public:
   WorkspaceCycle(ImTextureID headerBackground, WorkspaceCycleArgs const& args);
-  WorkspaceCycle(ImTextureID headerBackground, Ptr<Core::Cycle> nodebase = nullptr, std::string headerLabel = "default Cycle header", std::string nodeLabel = "Cycle");
+  WorkspaceCycle(ImTextureID headerBackground, Ptr<Core::Cycle> nodebase = nullptr, std::string headerLabel = "Cycle", std::string nodeLabel = "Cycle");
 
 	bool isCycle();
 

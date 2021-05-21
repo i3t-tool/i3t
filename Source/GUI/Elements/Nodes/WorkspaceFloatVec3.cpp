@@ -40,7 +40,6 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		fw.name = "float";
 		fw.columns = 0;
 
-		// assert if operator its imposible to value change (except free operators)
 		const float coreData = m_nodebase->getData(index).getFloat();
 		int const idOfNode = this->m_id.Get();
 		const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
@@ -77,7 +76,7 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		//TODO better way to solve this?
 		if(isQuatToFloatVec()){
 			ImGuiWindow* window = ImGui::GetCurrentWindowRead();
-			ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x,window->DC.LastItemRect.Min.y),ImVec2(window->DC.LastItemRect.Max.x + 52.0f,window->DC.LastItemRect.Max.y));
+			ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x,window->DC.LastItemRect.Min.y),ImVec2(window->DC.LastItemRect.Max.x + 58.0f,window->DC.LastItemRect.Max.y));
 		}
 	}
 	else if (index == 1)
@@ -112,14 +111,7 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 				fw.value = localData[columns];
 				fw.columns = columns;
 			}
-
-			/*if (columns != 2)
-			{
-				ImGui::SameLine();
-			}*/
 		}
-
-
 
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
@@ -132,10 +124,8 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 
 		if(isQuatToAngleAxis()){
 			ImGuiWindow* window = ImGui::GetCurrentWindowRead();
-			ne::PinRect(pinStart,ImVec2(window->DC.LastItemRect.Max.x + 50.0f,window->DC.LastItemRect.Max.y));
+			ne::PinRect(pinStart,ImVec2(window->DC.LastItemRect.Max.x + 55.0f,window->DC.LastItemRect.Max.y));
 		}
-
-
 	}
 }
 

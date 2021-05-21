@@ -19,14 +19,13 @@ void WorkspaceQuatRot::drawDataSetValues(util::NodeBuilder& builder)
 
 void WorkspaceQuatRot::drawDataFull(util::NodeBuilder& builder, int index){
   const glm::quat& coreData = m_nodebase->getData(index).getQuat();
+
+	//wrong datamap
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
   int const idOfNode = this->m_id.Get();
 
   bool valueChanged = false;
-  //todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
-  //better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
-
-  glm::vec4 localData;
+	glm::quat localData;
 
   ImGui::PushItemWidth(m_dataItemsWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
@@ -36,7 +35,7 @@ void WorkspaceQuatRot::drawDataFull(util::NodeBuilder& builder, int index){
   {
     localData[columns] = coreData[columns];
     valueChanged |=
-        drawDragFloatWithMap_Inline(&localData[columns], coreMap[columns], fmt::format("##{}:{}", idOfNode, columns));
+        drawDragFloatWithMap_Inline(&localData[columns], 1, fmt::format("##{}:{}", idOfNode, columns));
 
     if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
     {
@@ -48,8 +47,6 @@ void WorkspaceQuatRot::drawDataFull(util::NodeBuilder& builder, int index){
     if(columns != 3){
       ImGui::SameLine();
     }
-
-
   }
   ImGui::PopStyleVar();
   ImGui::PopStyleVar();

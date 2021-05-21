@@ -58,9 +58,12 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     t.operatorColorTheme();
   }
 	m_projection->drawNode(builder);
-	//const glm::mat4& coreData = m_projection->getInnerWorkspaceNodes().begin()->get()->m_nodebase->getData().getMat4();
-	t.returnFloatColorToDefault();
 
+	/*if(!m_nodebase->as<Core::Camera>()->getProj()->getMatrices().empty()){
+		const glm::mat4& coreData = m_nodebase->as<Core::Camera>()->getProj()->getMatrices()[0]->getData().getMat4();
+		I3T::getTheme();
+	}*/
+	t.returnFloatColorToDefault();
 
 
 	if(m_projection->getInnerWorkspaceNodes().empty()){
@@ -98,7 +101,7 @@ void WorkspaceCamera::drawDataSetValues(util::NodeBuilder& builder)
 
 ImVec2 WorkspaceCamera::getDataSize()
 {
-    return m_dataRect.Max - m_dataRect.Min /*+ ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x,0)*/;
+    return m_dataRect.Max - m_dataRect.Min;
 }
 
 void WorkspaceCamera::drawDataFull(util::NodeBuilder& builder, int index=0)

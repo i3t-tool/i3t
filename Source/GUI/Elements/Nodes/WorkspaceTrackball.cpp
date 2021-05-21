@@ -12,7 +12,7 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, WorkspaceTr
 
 	buttonSize = ImVec2(
 			m_dataItemsWidth*4.0f/3.0f,
-			20.0f);
+			I3T::getSize(ESize::Nodes_trackballButtonHeight));
 
 	textureSize = ImVec2(
 			5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
@@ -40,7 +40,7 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, std::string
 
 	buttonSize = ImVec2(
 			m_dataItemsWidth*4.0f/3.0f,
-			20.0f);
+			I3T::getSize(ESize::Nodes_trackballButtonHeight));
 
 	textureSize = ImVec2(
 			5* I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).y + 6 * buttonSize.y,
@@ -75,15 +75,14 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 
 	if(index == -1){
 
-		float x = InputManager::m_mouseXDelta / 5.0f;
-		float y = InputManager::m_mouseYDelta / 5.0f;
+		float x = InputManager::m_mouseXDelta / I3T::getSize(ESize::Nodes_TrackBallSensitivity);
+		float y = InputManager::m_mouseYDelta / I3T::getSize(ESize::Nodes_TrackBallSensitivity);
 
 		ImVec2 mouse = ImGui::GetMousePos();
 		if (ImGui::IsMouseClicked(2) && (mouse.x > texturePos.Min.x && mouse.x < texturePos.Max.x && mouse.y > texturePos.Min.y && mouse.y < texturePos.Max.y))
 		{
 			move = true;
 		}
-		//if (InputManager::isKeyJustUp(Keys::mouseMiddle))
 		if (ImGui::IsMouseReleased(2))
 		{
 			move = false;
@@ -100,12 +99,12 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 		texturePos = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
 
-
 		//Buttons
 		ImGui::BeginVertical("Trackball_Buttons");
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
+		//SS why it have to be shifted? And why this value?
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX()-13.25f);
 
 		if(ImGui::Button("x-", buttonSize)){
@@ -175,7 +174,8 @@ void WorkspaceTrackball::drawDataFull(util::NodeBuilder& builder, int index){
 
 		if (valueChanged)
 		{
-			setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
+			//core call
+			setDataItemsWidth();
 		}
 	}
 

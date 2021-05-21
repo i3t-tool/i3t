@@ -107,7 +107,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 	drawOutputs(builder, newLinkPin);
 	builder.End();
 
-        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x+5,builder.HeaderMax.y-builder.HeaderMin.y+1) /*+ ImVec2(0, builder.HeaderMax.y)*/;  /* \todo JH add shift based on size of header and inputs pins */
+        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x+5,builder.HeaderMax.y-builder.HeaderMin.y+1);  /* \todo JH add shift based on size of header and inputs pins */
         m_dataRect = ImRect(dataLeftTop, dataLeftTop);
 
         int i = 0;
@@ -126,11 +126,14 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 
             transformation->drawNode(builder, nullptr, false);
 
-						ImVec2 tmp = ImGui::GetItemRectSize();
-						if(i == 0){
-							m_dataRect.Max.y += tmp.y - 4* I3T::getSize(ESizeVec2::Nodes_IconSize).y +1;
+						ImVec2 sizeofNode = ImGui::GetItemRectSize();
+						float y = sizeofNode.y - 4* I3T::getSize(ESizeVec2::Nodes_IconSize).y +1;
+						float height = m_dataRect.Max.y - m_dataRect.Min.y;
+						if(y > height || i == 0){
+
+							m_dataRect.Max.y += y - height;
 						}
-						m_dataRect.Max.x += tmp.x;
+						m_dataRect.Max.x += sizeofNode.x;
 
 
             i++;

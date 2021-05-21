@@ -34,10 +34,8 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
   int const idOfNode = this->m_id.Get();
 
   bool valueChanged = false;
-  //todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
-  //better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
 
-  glm::vec4 localData;
+	glm::quat localData;
 
   ImGui::PushItemWidth(m_dataItemsWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
@@ -70,7 +68,6 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
   {
     m_nodebase->setValue(localData);
     setDataItemsWidth();
-//		Nodebase->setValue(valueOfChange, {columnOfChange});
   }
 
   ImGui::Spring(0);

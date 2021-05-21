@@ -8,8 +8,8 @@
 struct WorkspaceTRToMatrixArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default TRToMatrix header";
-  std::string nodeLabel = "TRToMatrix";
+  std::string headerLabel = "default TR -> mat header";
+  std::string nodeLabel = "TR -> mat";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::TRToMatrix>();
 };
 
@@ -17,7 +17,7 @@ class WorkspaceTRToMatrix : public WorkspaceMatrix4x4
 {
 public:
   WorkspaceTRToMatrix(ImTextureID headerBackground, WorkspaceTRToMatrixArgs const& args);
-  WorkspaceTRToMatrix(ImTextureID headerBackground, std::string headerLabel = "TRToMatrix", std::string nodeLabel = "TRToMatrix");
+  WorkspaceTRToMatrix(ImTextureID headerBackground, std::string headerLabel = "TR -> mat", std::string nodeLabel = "TR -> mat");
 
   void drawDataSetValues(util::NodeBuilder& builder);
 

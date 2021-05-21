@@ -7,11 +7,11 @@
 
 // #include <format> // not as standard library yet
 
-std::map<EValueType, ImColor> WorkspacePinColor = {
-		{EValueType::Float, ImColor(58, 144, 66)},    {EValueType::Matrix, ImColor(178, 71, 66)},
-		{EValueType::MatrixMul, ImColor(68, 201, 156)}, {EValueType::Pulse, ImColor(147, 226, 74)},
-		{EValueType::Quat, ImColor(178, 144, 66)},      {EValueType::Screen, ImColor(51, 150, 215)},
-		{EValueType::Vec3, ImColor(58, 84, 187)},       {EValueType::Vec4, ImColor(106, 96, 67)}};
+std::map<EValueType, EColor> WorkspacePinColor = {
+		{EValueType::Float, EColor::FloatPin},    {EValueType::Matrix,EColor::MatrixPin},
+		{EValueType::MatrixMul, EColor::MatrixMulPin}, {EValueType::Pulse, EColor::PulsePin},
+		{EValueType::Quat, EColor::QuatPin},      {EValueType::Screen, EColor::ScreenPin},
+		{EValueType::Vec3, EColor::Vec3Pin},       {EValueType::Vec4, EColor::Vec4Pin}};
 
 std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Float, IconType::Arrow},     {EValueType::Matrix, IconType::Arrow},
@@ -19,11 +19,11 @@ std::map<EValueType, IconType> WorkspacePinShape = {
 		{EValueType::Quat, IconType::Arrow},      {EValueType::Screen, IconType::Arrow},
 		{EValueType::Vec3, IconType::Arrow},      {EValueType::Vec4, IconType::Arrow}};
 
-std::map<EValueType, ImColor> WorkspaceInnerPinColor = {
-		{EValueType::Float, ImColor(164, 191, 168)},    {EValueType::Matrix, ImColor(201, 169, 168)},
-		{EValueType::MatrixMul, ImColor(68, 201, 156)}, {EValueType::Pulse, ImColor(147, 226, 74)},
-		{EValueType::Quat, ImColor(201, 191, 168)},      {EValueType::Screen, ImColor(51, 150, 215)},
-		{EValueType::Vec3, ImColor(164, 172, 205)},       {EValueType::Vec4, ImColor(179, 176, 168)} };
+std::map<EValueType, EColor> WorkspaceInnerPinColor = {
+		{EValueType::Float, EColor::InnerFloatPin},    {EValueType::Matrix, EColor::InnerMatrixPin},
+		{EValueType::MatrixMul, EColor::InnerMatrixMulPin}, {EValueType::Pulse, EColor::InnerPulsePin},
+		{EValueType::Quat, EColor::InnerQuatPin},      {EValueType::Screen, EColor::InnerScreenPin},
+		{EValueType::Vec3, EColor::InnerVec3Pin},       {EValueType::Vec4, EColor::InnerVec4Pin} };
 
 std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
     {WorkspaceLevelOfDetail::Full, "Full"},
@@ -36,7 +36,7 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(args.headerLabel), m_label(args.nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
-	m_color = ImColor(255, 255, 255);
+	m_color = I3T::getColor(EColor::NodeBgOperator);
 	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
 }
@@ -46,12 +46,10 @@ WorkspaceNode::WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, 
     :   m_id(id), m_headerBackground(headerBackground), m_headerLabel(headerLabel), m_label(nodeLabel)
 {
 	/* \todo Some better default values - take from Const.h*/
-	/*
-	Theme t;
-	m_color =	t.get(EColor::NodeHeader);
+
+	m_color =	I3T::getColor(EColor::NodeBgOperator);
 	m_size = ImVec2(1, 1);
 	m_touchTime = 1.0;
-	 */
 }
 
 ne::NodeId const WorkspaceNode::getId() const
@@ -103,7 +101,7 @@ void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
   Theme& t = I3T::getTheme();
   m_color =	t.getHeader();
 	builder.Header(m_color);
-	ImGui::Spring(0, 2);     // 0 - spring will always have zero size - left align the header
+	ImGui::Spring(0, I3T::getSize(ESize::Nodes_HeaderLabelIndent));     // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_headerLabel.c_str());
 	ImGui::Spring(10);     // 1 - power of the current spring = 1, use default spacing .x or .y
 	if(!dataAreValid()) /* \todo JH function for check validity of data here */
@@ -145,8 +143,8 @@ float WorkspaceNode::GetTouchProgress(float const constTouchTime)
 
 WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id)
     : m_id(id)
-    , m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH not constant here... */ //SS what is this?
-    , m_thickness(3) /* \todo JH not constant here... */
+    , m_color(I3T::getColor(EColor::MatrixPin))
+    , m_thickness(I3T::getSize(ESize::Nodes_LinkThickness))
 {}
 
 ne::LinkId const WorkspaceLinkProperties::getId() const	{return m_id; }
@@ -154,7 +152,7 @@ ImColor const WorkspaceLinkProperties::getColor() const {return m_color; }
 float const WorkspaceLinkProperties::getThickness() const {return m_thickness; }
 
 WorkspacePinProperties::WorkspacePinProperties(ne::PinId const id, std::string label)
-		: m_id(id), m_label(label), m_showLabel(true), m_iconSize(I3T::getSize(ESizeVec2::Nodes_IconSize)), m_color(ImColor(100.0, 200.0, 10.0, 1.0f)) /* \todo JH no constants here... */
+		: m_id(id), m_label(label), m_showLabel(true), m_iconSize(I3T::getSize(ESizeVec2::Nodes_IconSize)), m_color(I3T::getColor(EColor::MatrixPin))
 {}
 
 

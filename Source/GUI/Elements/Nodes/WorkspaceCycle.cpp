@@ -39,10 +39,7 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
   if(index == -1){  // -> draw middle
     //BUTTONS
-    ImVec2 button_sz(32.0f, 32.0f);
-
-		//change framepadding x
-		//framepadding y chnage radio buttons
+    ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize);
 
 		// "⯈/❙❙" "◼" "❙⯇" "⯈❙"
 		//std::u8string string = u8"⯈";
@@ -176,7 +173,7 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 
   float alpha = ImGui::GetStyle().Alpha;
 
-  builder.Input(pinProp->getId(), WorkspacePinColor[pinProp->getType()]);
+  builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
 
   ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
@@ -187,8 +184,8 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
   ax::Widgets::Icon(pinProp->getIconSize(),
                     WorkspacePinShape[pinProp->getType()],
                     pinProp->isConnected(), // SS add global variable. User test change or not.
-                    WorkspacePinColor[pinProp->getType()],
-                    pinProp->getColor());
+										I3T::getColor(WorkspacePinColor[pinProp->getType()]),
+										I3T::getColor(WorkspaceInnerPinColor[pinProp->getType()]));
 
   ImGui::Spring(1);
   ImGui::EndVertical();
@@ -218,14 +215,11 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
     }
   }
 
-
-  //assert if operator its imposible to value change (except free operators)
 	float coreData = NAN;
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 	switch (pinProp->getIndex()){
 	case 0:
     coreData = m_nodebase->as<Core::Cycle>()->getFrom();
-    //coreMap = m_nodebase->as<Core::Cycle>()->getDataMapRef();
 		break;
 	case 1:
     coreData = m_nodebase->as<Core::Cycle>()->getTo();
@@ -266,7 +260,6 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 
   if (valueChanged)
   {
-    //ask MH
     m_nodebase->setValue(localData);
     setDataItemsWidth();
   }
