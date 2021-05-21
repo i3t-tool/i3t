@@ -18,14 +18,23 @@
 
 enum class EColor
 {
-	PulseLink = 0,
-	FloatLink,
-	Vec3Link,
-	Vec4Link,
-	MatrixLink,
-	QuatLink,
-	MatrixMulLink,
-	ScreenLink,
+	PulsePin,
+	FloatPin,
+	Vec3Pin,
+	Vec4Pin,
+	MatrixPin,
+	QuatPin,
+	MatrixMulPin,
+	ScreenPin,
+
+    InnerPulsePin,
+    InnerFloatPin,
+    InnerVec3Pin,
+    InnerVec4Pin,
+    InnerMatrixPin,
+    InnerQuatPin,
+    InnerMatrixMulPin,
+    InnerScreenPin,
 
 	Text,
 	Border,
@@ -35,6 +44,9 @@ enum class EColor
 	PrimaryColor, /// Color of tabs, separators, titles ...
 	ActiveColor,
 	TabColor,
+    FloatBg,
+    FloatBgActive,
+    FloatBgHovered,
 
 	TutorialBgColor,
 
@@ -50,8 +62,14 @@ enum class EColor
 	FloatBgTransformationActive,
 	FloatBgTransformationHovered,
 
+    Nodes_FloatText,
 	NodeHeader,
 	NodeEditorBg,
+	Nodes_ConnectionPossible,
+    Nodes_ConnectionNotPossible,
+	Nodes_CreateNode,
+
+    Builder_NodePadding, //not a color but i need a vec4
 };
 
 enum class EFont
@@ -78,21 +96,27 @@ enum class ESize
 	Nodes_FloatWidth,
 	Nodes_FloatMargin,
 	Nodes_BorderWidth,
+	Nodes_LabelIndent,
+    Nodes_HeaderLabelIndent,
+	Nodes_LinkThickness,
+	Nodes_trackballButtonHeight,
+	Nodes_TrackBallSensitivity,
 
-	Nodes_ItemsSpacingX,
-	Nodes_ItemsSpacingY,
+	Nodes_FloatInnerPadding,
 
-	Nodes_floatPaddingX,
-	Nodes_floatPaddingY,
+    Nodes_dragSpeedDefaulrRatio,
+	Nodes_CtrlMultiplicator,
+	Nodes_SHIFTMultiplicator,
+	Nodes_ALTMultiplicator,
 
-	Nodes_pinSpacingX,
-	Nodes_pinSpacingY,
+    Nodes_InputsAlignment,
+    Nodes_MiddleAlignment,
+    Nodes_OutputsAlignment,
 
-	Nodes_PivotAlignmentX,
-	Nodes_PivotAlignmentY,
+	Nodes_leftSideSpacing,
+	Nodes_rightSideSpacing,
 
-	Nodes_IconSizeX,
-	Nodes_IconSizeY,
+	COUNT
 };
 
 enum class ESizeVec2
@@ -103,7 +127,17 @@ enum class ESizeVec2
 	Nodes_FloatPadding,
 	Nodes_PinSpacing,
 	Nodes_PivotAlignment,
+    Nodes_PivotSize,
+
+    Nodes_InputsSize,
+    Nodes_MiddleSize,
+    Nodes_OutputSize,
+
 	Nodes_IconSize,
+    Nodes_FloatCycleButtonSize,
+	Nodes_ScreenTextureSize,
+
+    Builder_ItemSpacing,
 };
 
 constexpr inline EColor asColor(EValueType type)
@@ -206,6 +240,7 @@ public:
 
 	void operatorColorTheme();
 	void transformationColorTheme();
+  void returnFloatColorToDefault();
 
 	ImVec4 getHeader();
 

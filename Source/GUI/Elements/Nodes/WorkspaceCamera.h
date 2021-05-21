@@ -20,7 +20,7 @@ protected:
     Ptr<WorkspaceSequence> m_view = nullptr;
 public:
 	WorkspaceCamera(ImTextureID headerBackground, WorkspaceCameraArgs const& args);
-    WorkspaceCamera(ImTextureID headerBackground, std::string headerLabel = "default Camera header", std::string nodeLabel = "Camera");
+    WorkspaceCamera(ImTextureID headerBackground, std::string headerLabel = "Camera", std::string nodeLabel = "Camera");
 
     bool isCamera();
     ImVec2 getDataSize();

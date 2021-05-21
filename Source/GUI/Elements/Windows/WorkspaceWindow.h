@@ -39,8 +39,8 @@
 #include "../Nodes/WorkspacePerspective.h"
 #include "../Nodes/WorkspaceSequence.h"
 #include "../Nodes/WorkspaceTransformationFree.h"
-//#include "../Nodes/WorkspaceQuatRot.h"
-//} tranformationa end
+#include "../Nodes/WorkspaceQuatRot.h"
+//} transformations end
 
 //operators {
 
@@ -55,7 +55,7 @@
 #include "../Nodes/WorkspaceMakePerspective.h"
 #include "../Nodes/WorkspaceMakeScale.h"
 #include "../Nodes/WorkspaceMakeTranslation.h"
-//	} tranformation end
+//	} transformations end
 
 //	matrix{
 #include "../Nodes/WorkspaceMatrixFree.h"
@@ -67,7 +67,7 @@
 #include "../Nodes/WorkspaceMatrixMulFloat.h"
 #include "../Nodes/WorkspaceMatrixMulVector.h"
 #include "../Nodes/WorkspaceVectorMulMatrix.h"
-//#include "../Nodes/WorkspaceTrackball.h"
+#include "../Nodes/WorkspaceTrackball.h"
 //	} matrix end
 
 //	vec4{
@@ -105,7 +105,7 @@
 #include "../Nodes/WorkspaceSignum.h"
 #include "../Nodes/WorkspaceFloatSinCos.h"
 #include "../Nodes/WorkspaceASinACos.h"
-//#include "../Nodes/WorkspaceFloatCycle.h"
+#include "../Nodes/WorkspaceCycle.h"
 //	} float end
 
 //	quat{
@@ -150,7 +150,8 @@
 //  }
 //}operators end
 
-//#include "../Nodes/WorkspaceScreen.h"
+#include "../Nodes/WorkspaceScreen.h"
+#include "../Nodes/WorkspacePulse.h"
 
 #include "Core/Input/InputManager.h"
 #include "Scripting/Scripting.h"
@@ -248,6 +249,9 @@ public:
     void checkQueryNodeDelete();
 
     void NodeDelete(ne::NodeId nodeId);
+
+		void selectAll();
+		void invertSelection();
 
     void checkQueryContextMenus();
 

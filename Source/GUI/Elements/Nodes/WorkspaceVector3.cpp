@@ -35,8 +35,8 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 
 
 	ImGui::PushItemWidth(m_dataItemsWidth);
-  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 	for (int columns = 0; columns < 3; columns++)
 	{
@@ -62,7 +62,6 @@ void WorkspaceVector3::drawDataFull(util::NodeBuilder& builder, int index)
 	{
 	    m_nodebase->setValue(localData);
 	    setDataItemsWidth();
-//		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 
 	ImGui::Spring(0);

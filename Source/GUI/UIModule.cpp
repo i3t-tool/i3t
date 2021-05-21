@@ -201,6 +201,7 @@ void UIModule::loadFonts()
 	const ImWchar ranges[] = {
 			0x0020, 0x00FF, // Basic Latin + Latin Supplement
 			0x0080, 0x07FF, // Czech
+			0x25FC, 0x2BC8, //media buttons
 			0,
 	};
 

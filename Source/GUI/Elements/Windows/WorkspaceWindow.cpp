@@ -53,6 +53,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	ne::SetCurrentEditor(m_nodeEditorContext);
 	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
+
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -84,6 +85,22 @@ void WorkspaceWindow::render()
 
 	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 
+	if (InputManager::isKeyPressed(Keys::a))
+	{
+		selectAll();
+	}
+	if (InputManager::isKeyPressed(Keys::i))
+	{
+		invertSelection();
+	}
+	if (InputManager::isKeyPressed(Keys::s))
+	{
+		ne::NavigateToContent();
+	}
+	if (InputManager::isKeyPressed(Keys::d))
+	{
+		ne::NavigateToSelection();
+	}
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");{
@@ -99,6 +116,7 @@ void WorkspaceWindow::render()
 			t.operatorColorTheme();
 		}
 		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
+    t.returnFloatColorToDefault();
 	}
 
     /* put and pop to/from Sequence */
@@ -106,9 +124,12 @@ void WorkspaceWindow::render()
 	if(drag_action && drag_action->IsDragging())
     {
         m_draged_nodes = getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
+		/*TODO SS camera fail here. node editor marks different object as dragged one than the actual one.
+			it results that we cannot find workspacenode by id because we have the wrong id*/
         m_draged_node_nodeeditor = drag_action->m_DraggedObject->AsNode();
         if(m_draged_node_nodeeditor)
         {
+					//TODO nullptr check
             m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
             if( m_draged_node->isTransformation())
             {
@@ -454,7 +475,7 @@ void WorkspaceWindow::checkQueryLinkCreate()
             switch (Core::GraphManager::isPlugCorrect(&(endPin->getCorePin()), &(startPin->getCorePin())))
             {
                 case ENodePlugResult::Ok:
-                    showPopUpLabel("Connection possible", ImColor(0,255,0)); /* \todo JH remove constant here */
+                    showPopUpLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
                     if (!ImGui::GetIO().MouseDown[0])
                     {
                         Core::GraphManager::plug(startPin->getNode().getNodebase(),
@@ -465,7 +486,7 @@ void WorkspaceWindow::checkQueryLinkCreate()
                     break;
                 /* \todo JH react informatively to other result too */
                 default:
-                    showPopUpLabel("Connection not possible", ImColor(255,0,0)); /* \todo JH remove constant here */
+                    showPopUpLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
 
             }
         }
@@ -481,7 +502,7 @@ void WorkspaceWindow::checkQueryNodeCreate()
         m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
         if (m_pinPropertiesForNewLink)
         {
-            showPopUpLabel("+ Create Node", ImColor(32, 45, 32, 180)); /* \todo JH remove constant here */
+            showPopUpLabel("+ Create Node", I3T::getColor(EColor::Nodes_CreateNode));
         }
 
         if (ne::AcceptNewItem())
@@ -543,6 +564,40 @@ void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
 
 }
 
+void WorkspaceWindow::selectAll(){
+	for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes){
+		ne::SelectNode(node->getId(), true);
+	}
+}
+void WorkspaceWindow::invertSelection(){
+	auto selected = m_ne_usable->GetSelectedObjects();
+	bool all = true;
+
+	for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes){
+
+		for(auto s : selected) {
+			try {
+				auto n = s->AsNode();
+				if(n->m_ID == node->getId()){
+					ne::DeselectNode(node->getId());
+					all = false;
+					break;
+				}
+			}
+			catch (_exception)
+			{
+				continue;
+			}
+		}
+
+		if(all){
+			ne::SelectNode(node->getId(), true);
+		}
+
+		all = true;
+	}
+}
+
 void WorkspaceWindow::UpdateTouchAllNodes()
 {
 	const auto deltaTime = ImGui::GetIO().DeltaTime;
@@ -573,7 +628,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 	ne::Resume();
 
 	ne::Suspend();
-
 
 	if (ImGui::BeginPopup("float_context_menu")) {
 		ImGui::Text("Set value...					");
@@ -756,8 +810,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 		else {
 			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
 		}
-
-		context_node->drawMenuSetDataMap();
+				if(context_node->isTransformation()){
+					context_node->drawMenuSetDataMap();
+				}
         context_node->drawMenuLevelOfDetail();
         context_node->drawMenuSetPrecision();
 
@@ -806,28 +861,16 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("quat")) {
-//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatRot>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
-				}
-				ImGui::EndMenu();
-
-			}
-			if (ImGui::BeginMenu("scale")) {
-
-				ImGui::Text("add scale");
-				ImGui::Separator();
-				if (ImGui::MenuItem("uniform scale")) {
-          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
-          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
-				}
-				if (ImGui::MenuItem("scale")) {
-					//todo make popup when creating for initial values?
-          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixScale>(m_headerBackgroundTexture));
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatRot>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 
 			}
+      if (ImGui::MenuItem("scale")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+      }
 			if (ImGui::MenuItem("lookAt")) {
         m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceLookAt>(m_headerBackgroundTexture));
         ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -865,15 +908,15 @@ void WorkspaceWindow::checkQueryContextMenus()
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeTranslation>(m_headerBackgroundTexture));
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleX")) {
+				if (ImGui::MenuItem("euler AngleX")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleY")) {
+				if (ImGui::MenuItem("euler AngleY")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleZ")) {
+				if (ImGui::MenuItem("euler AngleZ")) {
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
@@ -913,8 +956,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("trackball")) {
-//          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTrackball>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTrackball>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
         }
 				if (ImGui::MenuItem("inversion")) {
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixInversion>(m_headerBackgroundTexture));
@@ -1129,8 +1172,8 @@ void WorkspaceWindow::checkQueryContextMenus()
           ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				if (ImGui::MenuItem("float cycle")) {
-//          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatCycle>(m_headerBackgroundTexture));
-//          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceCycle>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
         }
 				if (ImGui::MenuItem("float * float")) {
           m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulFloat>(m_headerBackgroundTexture));
@@ -1253,7 +1296,13 @@ void WorkspaceWindow::checkQueryContextMenus()
             m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
             ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
+    if (ImGui::MenuItem("pulse")) {
+      m_workspaceCoreNodes.push_back(std::make_shared<WorkspacePulse>(m_headerBackgroundTexture));
+      ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+    }
 		if (ImGui::MenuItem("screen")) {
+			m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>(m_headerBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 
 		ImGui::Separator();
@@ -1262,9 +1311,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 			ImGui::Text("selection");
 			ImGui::Separator();
-			if (ImGui::MenuItem("select all")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("select all", "a")) {
+					selectAll();
 			}
-			if (ImGui::MenuItem("invert")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("invert", "i")) {
+				 	invertSelection();
 			}
 			ImGui::EndMenu();
 
@@ -1273,9 +1324,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 			ImGui::Text("zoom");
 			ImGui::Separator();
-			if (ImGui::MenuItem("to all")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("to all", "s")) {
+				ne::NavigateToContent();
 			}
-			if (ImGui::MenuItem("to selection")) { //SS todo make hotkey hint
+			if (ImGui::MenuItem("to selection", "d")) {
+				ne::NavigateToSelection();
 			}
 			ImGui::EndMenu();
 

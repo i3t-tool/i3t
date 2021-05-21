@@ -40,7 +40,6 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		fw.name = "float";
 		fw.columns = 0;
 
-		// assert if operator its imposible to value change (except free operators)
 		const float coreData = m_nodebase->getData(index).getFloat();
 		int const idOfNode = this->m_id.Get();
 		const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
@@ -49,10 +48,8 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		float localData;
 
 		ImGui::PushItemWidth(m_dataItemsWidth);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-		                    {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		localData = coreData;
 		valueChanged |= drawDragFloatWithMap_Inline(
@@ -74,6 +71,13 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 			setDataItemsWidth();
 		}
     ImGui::Spring(1);
+
+
+		//TODO better way to solve this?
+		if(isQuatToFloatVec()){
+			ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+			ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x,window->DC.LastItemRect.Min.y),ImVec2(window->DC.LastItemRect.Max.x + 58.0f,window->DC.LastItemRect.Max.y));
+		}
 	}
 	else if (index == 1)
 	{ // -> vector3
@@ -87,11 +91,12 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 		bool valueChanged = false;
 		glm::vec3 localData;
 
+		ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+		ImVec2 pinStart = ImVec2(window->DC.LastItemRect.Min.x,window->DC.LastItemRect.Min.y);
+
 		ImGui::PushItemWidth(m_dataItemsWidth);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-		                    {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-		                    {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		for (int columns = 0; columns < 3; columns++)
 		{
@@ -106,11 +111,6 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 				fw.value = localData[columns];
 				fw.columns = columns;
 			}
-
-			/*if (columns != 2)
-			{
-				ImGui::SameLine();
-			}*/
 		}
 
 		ImGui::PopStyleVar();
@@ -122,7 +122,10 @@ void WorkspaceFloatVec3::drawDataFull(util::NodeBuilder& builder, int index)
 			setDataItemsWidth();
 		}
 
-		//ImGui::Spring(0);
+		if(isQuatToAngleAxis()){
+			ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+			ne::PinRect(pinStart,ImVec2(window->DC.LastItemRect.Max.x + 55.0f,window->DC.LastItemRect.Max.y));
+		}
 	}
 }
 

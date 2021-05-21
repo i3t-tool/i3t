@@ -8,8 +8,8 @@
 struct WorkspaceVectorsToMatrixArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default VectorsToMatrix header";
-  std::string nodeLabel = "VectorsToMatrix";
+  std::string headerLabel = "default vecs4 -> mat header";
+  std::string nodeLabel = "vecs4 -> mat";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::VectorsToMatrix>();
 };
 
@@ -17,7 +17,7 @@ class WorkspaceVectorsToMatrix : public WorkspaceMatrix4x4
 {
 public:
   WorkspaceVectorsToMatrix(ImTextureID headerBackground, WorkspaceVectorsToMatrixArgs const& args);
-  WorkspaceVectorsToMatrix(ImTextureID headerBackground, std::string headerLabel = "VectorsToMatrix", std::string nodeLabel = "VectorsToMatrix");
+  WorkspaceVectorsToMatrix(ImTextureID headerBackground, std::string headerLabel = "vecs4 -> mat", std::string nodeLabel = "vecs4 -> mat");
 
   void drawDataSetValues(util::NodeBuilder& builder);
 

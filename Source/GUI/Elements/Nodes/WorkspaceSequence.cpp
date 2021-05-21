@@ -107,7 +107,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 	drawOutputs(builder, newLinkPin);
 	builder.End();
 
-        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(20,15);  /* \todo JH add shift based on size of header and inputs pins */
+        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x+5,builder.HeaderMax.y-builder.HeaderMin.y+1);  /* \todo JH add shift based on size of header and inputs pins */
         m_dataRect = ImRect(dataLeftTop, dataLeftTop);
 
         int i = 0;
@@ -115,7 +115,7 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
         {
             if(m_position_of_dummy_data == i)
             {
-                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x + m_widthOfDummy, m_dataRect.Min.y));
+                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
             }else
             {
                 ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
@@ -126,7 +126,15 @@ void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkP
 
             transformation->drawNode(builder, nullptr, false);
 
-            m_dataRect.Add(ImGui::GetItemRectMax());
+						ImVec2 sizeofNode = ImGui::GetItemRectSize();
+						float y = sizeofNode.y - 4* I3T::getSize(ESizeVec2::Nodes_IconSize).y +1;
+						float height = m_dataRect.Max.y - m_dataRect.Min.y;
+						if(y > height || i == 0){
+
+							m_dataRect.Max.y += y - height;
+						}
+						m_dataRect.Max.x += sizeofNode.x;
+
 
             i++;
         }
@@ -144,7 +152,7 @@ void WorkspaceSequence::drawDataSetValues(util::NodeBuilder& builder)
 
 ImVec2 WorkspaceSequence::getDataSize()
 {
-    return m_dataRect.Max - m_dataRect.Min;
+    return m_dataRect.Max - m_dataRect.Min + ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x,0);
 }
 
 void WorkspaceSequence::drawDataFull(util::NodeBuilder& builder, int index)

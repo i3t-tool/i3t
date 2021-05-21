@@ -153,11 +153,12 @@ bool Application::initI3T()
 {
 	loadConfig();
 
-	// new scene scheme
-	bool b = World::init();
-	m_world = World::loadDefaultScene();
+		// new scene scheme
+		bool b = World::init();
+		m_world = World::loadDefaultScene();
 
-	return b;
+		return b;
+
 }
 
 Application& Application::get()

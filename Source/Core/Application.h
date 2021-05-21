@@ -6,6 +6,7 @@
 #pragma once
 
 #include <GUI/UIModule.h>
+#include <World/Components/Camera.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -95,7 +96,6 @@ private:
 
 	UIModule* m_ui;
 	std::vector<Module*> m_modules;
-
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback resulting in no
 	 * 			window update.

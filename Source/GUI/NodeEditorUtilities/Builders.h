@@ -11,6 +11,7 @@
 
 //------------------------------------------------------------------------------
 #include <imgui_node_editor.h>
+#include <Core/API.h>
 //------------------------------------------------------------------------------
 namespace ax
 {
@@ -30,13 +31,22 @@ struct NodeBuilder
 	void Header(const ImVec4& color = ImVec4(1, 1, 1, 1));
 	void EndHeader();
 
-	void Input(PinId id);
+	void Input(PinId id, ImColor color);
 	void EndInput();
 
 	void Middle();
 
-	void Output(PinId id);
+	void Output(PinId id, ImColor color);
 	void EndOutput();
+
+	ImVec2 HeaderMin;
+	ImVec2 HeaderMax;
+
+
+	ImVec2 NodeMin;
+	ImVec2 NodeMax;
+	ImVec2 ContentMin;
+	ImVec2 ContentMax;
 
 private:
 	enum class Stage
@@ -53,7 +63,7 @@ private:
 
 	bool SetStage(Stage stage);
 
-	void Pin(PinId id, ax::NodeEditor::PinKind kind);
+	void Pin(PinId id, ax::NodeEditor::PinKind kind, ImColor color);
 	void EndPin();
 
 	ImTextureID HeaderTextureId;
@@ -62,12 +72,6 @@ private:
 	NodeId CurrentNodeId;
 	Stage CurrentStage;
 	ImU32 HeaderColor;
-	ImVec2 NodeMin;
-	ImVec2 NodeMax;
-	ImVec2 HeaderMin;
-	ImVec2 HeaderMax;
-	ImVec2 ContentMin;
-	ImVec2 ContentMax;
 	bool HasHeader;
 };
 

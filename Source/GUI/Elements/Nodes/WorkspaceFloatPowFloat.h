@@ -8,8 +8,8 @@
 struct WorkspaceFloatPowFloatArgs
 {
   WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default FloatPowFloat header";
-  std::string nodeLabel = "default FloatPowFloat label";
+  std::string headerLabel = "default float ^ float header";
+  std::string nodeLabel = "default float ^ float label";
   Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::FloatPowFloat>();
 };
 
@@ -17,7 +17,7 @@ class WorkspaceFloatPowFloat : public WorkspaceFloat
 {
 public:
   WorkspaceFloatPowFloat(ImTextureID headerBackground, WorkspaceFloatPowFloatArgs const& args);
-  WorkspaceFloatPowFloat(ImTextureID headerBackground, std::string headerLabel = "FloatPowFloat", std::string nodeLabel = "FloatPowFloat");
+  WorkspaceFloatPowFloat(ImTextureID headerBackground, std::string headerLabel = "float ^ float", std::string nodeLabel = "float ^ float");
 
   void drawDataSetValues(util::NodeBuilder& builder);
 };

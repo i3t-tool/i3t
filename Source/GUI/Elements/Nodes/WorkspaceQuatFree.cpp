@@ -9,7 +9,7 @@ WorkspaceQuatFree::WorkspaceQuatFree(ImTextureID headerBackground, WorkspaceQuat
 {}
 
 WorkspaceQuatFree::WorkspaceQuatFree(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceQuat(headerBackground, Core::Builder::createNode<ENodeType::Vector4>(), headerLabel, nodeLabel)
+    : WorkspaceQuat(headerBackground, Core::Builder::createNode<ENodeType::Quat>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceQuatFree::drawDataSetValues(util::NodeBuilder& builder)

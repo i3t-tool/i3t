@@ -2,6 +2,7 @@
 
 #include "spdlog/fmt/fmt.h"
 #include <string>
+#include "Core/Input/InputManager.h"
 
 std::map<Core::Transform::DataMap const *, std::string> WorkspaceDatamapName = {
     {&Core::Transform::g_Free, "Free"},
@@ -140,7 +141,14 @@ bool WorkspaceNodeWithCoreData::inSequence()
 bool WorkspaceNodeWithCoreData::isSequence()
 {
 	  return m_nodebase->getOperation() == NULL;
-    //return fw.name == "WorkspaceSequence";
+}
+
+bool WorkspaceNodeWithCoreData::isQuatToFloatVec(){
+	return false;
+}
+
+bool WorkspaceNodeWithCoreData::isQuatToAngleAxis(){
+	return false;
 }
 
 bool WorkspaceNodeWithCoreData::isCamera()
@@ -148,9 +156,23 @@ bool WorkspaceNodeWithCoreData::isCamera()
     return false;
 }
 
+bool WorkspaceNodeWithCoreData::isCycle()
+{
+  return false;
+}
+
+bool WorkspaceNodeWithCoreData::isTrackball()
+{
+	return false;
+}
+
 bool WorkspaceNodeWithCoreData::isTransformation()
 {
-    return m_nodebase->as<Core::Transformation>() != nullptr;
+	//SS remove if when the problem with dragged node in camera will be solved
+		if(this != NULL){
+			return m_nodebase->as<Core::Transformation>() != nullptr;
+		}
+    return false;
 }
 
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
@@ -172,8 +194,8 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-	  ImFont* f = I3T::getTheme().get(EFont::Node);
-    float oneCharWidth = 0.57f * f->FontSize, padding = 1; /* \todo JH take from some font setting */
+		float size = ImGui::GetFontSize();
+    float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
     m_dataItemsWidth = (float)(maxLenghtOfData())*oneCharWidth + 2*padding;
     return m_dataItemsWidth;
 }
@@ -212,8 +234,21 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 	}
 
+  float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
+	auto io = ImGui::GetIO();
+	if(InputManager::isKeyPressed(Keys::ctrll) || InputManager::isKeyPressed(Keys::ctrlr)){
+    step = I3T::getSize(ESize::Nodes_CtrlMultiplicator) * step;
+	}else if(InputManager::isKeyPressed(Keys::altl) || InputManager::isKeyPressed(Keys::altr)){
+		step = I3T::getSize(ESize::Nodes_ALTMultiplicator) * step;
+  }else if(InputManager::isKeyPressed(Keys::shiftl) || InputManager::isKeyPressed(Keys::shiftr)){
+		step = I3T::getSize(ESize::Nodes_SHIFTMultiplicator) * step;
+  }
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
+
 	// make step a configurable constant.
-	bool valueChanged = ImGui::DragFloat(label.c_str(), value, 0.01f, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
+	bool valueChanged = ImGui::DragFloat(label.c_str(), value, step, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(), 1.0f); /* \todo JH what parameter "power" mean? //SS if power >1.0f the number changes logaritmic */
 
 	if (inactive)
 	{
@@ -221,11 +256,9 @@ bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(float* const value, 
 		ImGui::PopStyleVar();
 	}
 
-    return valueChanged;
-    /* maybe usefull
-        ImGui::GetFontSize() or ImGui::GetFrameHeight()
+	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
 
-    */
+    return valueChanged;
 }
 
 void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& builder, std::vector<std::string>const & labels, std::vector<getter_function_pointer>const & getters, std::vector<setter_function_pointer>const & setters, std::vector<unsigned char> datamap_values)
@@ -242,7 +275,12 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder& bui
     for (int i = 0; i < number_of_values; i++)
     {
         ImGui::TextUnformatted( labels[i].c_str() );
+
+				ImGui::SameLine(50);
+
         localData = getters[i]();
+
+
         if (drawDragFloatWithMap_Inline(&localData,
                                         datamap_values[i],
                                         fmt::format("##{}:ch{}", idOfNode, i))) //todo check
@@ -304,10 +342,15 @@ void WorkspaceNodeWithCoreData::drawMenuLevelOfDetail()
 
         for (auto const& [levelOfDetail, LoDname] : WorkspaceLevelOfDetailName)
         {
-            if (ImGui::MenuItem(LoDname.c_str()))
-            {
-                m_levelOfDetail = setLevelOfDetail(levelOfDetail);
-            }
+						if(!isTransformation() && levelOfDetail == WorkspaceLevelOfDetail::SetValues){
+							continue;
+						}else{
+							if (ImGui::MenuItem(LoDname.c_str()))
+							{
+								m_levelOfDetail = setLevelOfDetail(levelOfDetail);
+							}
+						}
+
         }
         ImGui::EndMenu();
     }
@@ -322,7 +365,7 @@ void WorkspaceNodeWithCoreData::drawInputLinks()
 		if (elem.first->get()->isConnected())
         {
             ne::Link(elem.second->get()->getId(), elem.first->get()->getParentPinId(), elem.first->get()->getId(),
-                     WorkspacePinColor[elem.first->get()->getType()], elem.second->get()->getThickness());
+										 I3T::getColor(WorkspacePinColor[elem.first->get()->getType()]), elem.second->get()->getThickness());
         }
 	}
 }
@@ -346,7 +389,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
         drawDataFull(builder, index);
     }
 
-    if (m_inactiveMark != 0)
+    /*if (m_inactiveMark != 0)
     {
         ImVec2 start = ne::GetNodePosition(m_id);
         ImVec2 size = ne::GetNodeSize(m_id);
@@ -363,7 +406,7 @@ void WorkspaceNodeWithCoreData::drawData(util::NodeBuilder& builder, int index)
         //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
         //ImGui::Dummy(const ImVec2& size);
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
-    }
+    }*/
 }
 
 void WorkspaceNodeWithCoreData::drawDataLabel(util::NodeBuilder& builder)
@@ -377,50 +420,49 @@ void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<Wor
 {
 	if(!isTransformation()){
     float alpha = ImGui::GetStyle().Alpha;
-    //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
-    //          alpha = alpha * (48.0f / 255.0f);
 
-
-    builder.Input(pinProp->getId());
+    builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
     ImGui::BeginVertical(pinProp->getId().AsPointer());
     ImGui::Spring(1);
 
-    // color.Value.w = alpha / 255.0f;
-    ax::Widgets::Icon(pinProp->getIconSize(),
+		EColor type = WorkspacePinColor[pinProp->getType()];
+		EColor innerType = WorkspaceInnerPinColor[pinProp->getType()];
+
+    ax::Widgets::Icon(I3T::getSize(ESizeVec2::Nodes_IconSize),
                       WorkspacePinShape[pinProp->getType()],
-                      pinProp->isConnected(), // SS add global variable. User test change or not.
-                      WorkspacePinColor[pinProp->getType()],
-                      pinProp->getColor());
-
-
+                      pinProp->isConnected(), // SS User test change or not.
+											I3T::getColor(type),
+											I3T::getColor(innerType));
     ImGui::Spring(1);
     ImGui::EndVertical();
 
-    if (pinProp->getShowLabel()){
+
+    if (pinProp->getShowLabel() && !isSequence() && !isCamera()){
       if(pinProp->getLabel().empty()){ //it's never empty :(
 
         auto label = pinProp->getCorePin().getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else
         {
+          ImGui::Spring(0,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label);
         }
 
       }else{
 
         auto label = pinProp->getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else{
+          ImGui::Spring(0,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label.c_str());
         }
 
       }
-      ImGui::Spring(1);
     }
 
     ImGui::PopStyleVar();
@@ -447,7 +489,7 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
         }
 	}*/
 
-	if(!isTransformation()){
+	if(!isTransformation() && !isTrackball()){
     ImGui::BeginVertical(m_nodebase->getId());
     ImGui::Spring(1);
 
@@ -464,10 +506,9 @@ void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin
 void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex)
 {
     float alpha = ImGui::GetStyle().Alpha;
-    //        if (newLinkPin && !input.CanCreateLink(newLinkPin) && &input != newLinkPin)
-    //          alpha = alpha * (48.0f / 255.0f);
 
-		builder.Output(pinProp->getId());
+
+		builder.Output(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
 
 		if(!isTransformation() && !isCamera() && !isSequence()){ //is Operator
       ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
@@ -475,58 +516,83 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
       ImGui::EndVertical();
 		}
 
-	  //ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(1000.0f, 1000.0f));
+    ImGui::Spring(1);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-    ImGui::Spring(1);
 
-
-    if (pinProp->getShowLabel()){
-      if(pinProp->getLabel().empty()){ //it's never empty :(
+		//label
+    if (pinProp->getShowLabel() && !isSequence() && !isCamera()){
+			if(pinProp->getLabel().empty()){ //it's never empty :(
 
         auto label = pinProp->getCorePin().getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else
 				{
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label);
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
 				}
 
       }else{
 
         auto label = pinProp->getLabel();
-        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ){
+        if(label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" || label == "pulse"){
           ImGui::TextUnformatted("");
         }else{
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
           ImGui::TextUnformatted(label.c_str());
+          ImGui::Spring(1,I3T::getSize(ESize::Nodes_LabelIndent));
         }
 
       }
-      ImGui::Spring(1);
     }
 
+      ImGui::Spring(1);
 
-      // color.Value.w = alpha / 255.0f;
-      ax::Widgets::Icon(pinProp->getIconSize(),
+			//TODO better way to solve this?
+				if(isCycle() && pinProp->getIndex() > 0){
+					ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+					ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x+I3T::getSize(ESizeVec2::Nodes_IconSize).x,
+														 window->DC.LastItemRect.Min.y),
+											ImVec2(window->DC.LastItemRect.Max.x+I3T::getSize(ESizeVec2::Nodes_IconSize).x,
+														 window->DC.LastItemRect.Max.y));
+				}
+
+		  //Icon
+			EColor type = WorkspacePinColor[pinProp->getType()];
+			EColor innerType = WorkspaceInnerPinColor[pinProp->getType()];
+
+      ax::Widgets::Icon(I3T::getSize(ESizeVec2::Nodes_IconSize),
                         WorkspacePinShape[pinProp->getType()],
                         false,
-                        WorkspacePinColor[pinProp->getType()],
-                        pinProp->getColor());
-      //ImGui::Spring(1);
+												I3T::getColor(type),
+												I3T::getColor(innerType));
 
-      //ImGui::PopStyleVar();
-	    ImGui::PopStyleVar();
-
+			ImGui::PopStyleVar();
       builder.EndOutput();
+
+			if(isTrackball()){
+				ImGui::EndVertical();
+			}
 }
 
 void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
-	if(isTransformation()){
-		//builder.Middle();
-    ImGui::Spring(2, 2); //spring from left side. right side in builder.cpp
-    ImGui::BeginVertical(m_nodebase->getId());
-		drawData(builder, 0);
-    ImGui::EndVertical();
+	if(isTransformation() || isCycle() || isTrackball()){
+		if(isTransformation()){
+      ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
+      ImGui::BeginVertical(m_nodebase->getId());
+      drawData(builder, 0);
+      ImGui::EndVertical();
+		}else if(isTrackball()){
+			ImGui::Spring(1,I3T::getSize(ESize::Nodes_leftSideSpacing));
+			drawData(builder, -1);  // for trackball
+		}else{
+      builder.Middle();
+			ImGui::Spring(1);
+      drawData(builder, -1);  // for cycle
+      ImGui::Spring(1);
+		}
 	}
 }
 

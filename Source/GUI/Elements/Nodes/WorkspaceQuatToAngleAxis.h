@@ -21,6 +21,6 @@ public:
   WorkspaceQuatToAngleAxis(ImTextureID headerBackground, std::string headerLabel = "quat -> angle, axis", std::string nodeLabel = "quat -> angle, axis");
 
   void drawDataSetValues(util::NodeBuilder& builder);
-
+	bool isQuatToAngleAxis();
 };
 

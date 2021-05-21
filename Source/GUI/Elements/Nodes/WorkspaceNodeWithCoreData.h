@@ -63,7 +63,11 @@ public:
     std::vector<Ptr<WorkspaceCorePinProperties>> const &getOutputsProperties() const;
 
     virtual bool isCamera();
+    virtual bool isCycle();
     virtual bool isSequence();
+		virtual bool isTrackball();
+		virtual bool isQuatToFloatVec();
+		virtual bool isQuatToAngleAxis();
     bool isTransformation();
 
     virtual bool inSequence();
@@ -87,7 +91,7 @@ public:
 
 	virtual void drawInputLinks();
 
-	void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+	virtual void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
 	void drawOutputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin, int outputIndex);
 
 	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin);

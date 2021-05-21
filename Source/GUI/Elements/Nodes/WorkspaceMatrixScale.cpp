@@ -12,17 +12,9 @@ void WorkspaceMatrixScale::drawDataSetValues(util::NodeBuilder& builder)
 {
     const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     drawDataSetValues_builder(builder,
-                                {   "x",
-                                    "y",
-                                    "z" },
-                                {   [this](){return m_nodebase->as<Core::Scale>()->getX();},
-                                    [this](){return m_nodebase->as<Core::Scale>()->getY();},
-                                    [this](){return m_nodebase->as<Core::Scale>()->getZ();} },
-                                {   [this](float v){return m_nodebase->as<Core::Scale>()->setX(v);},
-                                    [this](float v){return m_nodebase->as<Core::Scale>()->setY(v);},
-                                    [this](float v){return m_nodebase->as<Core::Scale>()->setZ(v);} },
-                                {   coreMap[0*4+0], /* \todo JH some better way how determine what element from DataMap should be used? */
-                                    coreMap[1*4+1],
-                                    coreMap[2*4+2] }
+                                {   "scale" },
+                                {   [this](){return m_nodebase->as<Core::Scale>()->getX();} },
+                                {   [this](float v){return m_nodebase->as<Core::Scale>()->setX(v);}},
+                                {   coreMap[0*4+0] /* \todo JH some better way how determine what element from DataMap should be used? */}
                             );
 }

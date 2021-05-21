@@ -18,4 +18,8 @@ void WorkspaceQuatToAngleAxis::drawDataSetValues(util::NodeBuilder& builder)
   drawDataFull(builder, 0);
 }
 
+bool WorkspaceQuatToAngleAxis::isQuatToAngleAxis(){
+	return true;
+}
+
 

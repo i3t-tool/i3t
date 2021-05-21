@@ -19,6 +19,7 @@ public:
   WorkspaceQuatRot(ImTextureID headerBackground, WorkspaceQuatRotArgs const& args);
   WorkspaceQuatRot(ImTextureID headerBackground, std::string headerLabel = "Quat", std::string nodeLabel = "Quat");
 
+	void drawDataFull(util::NodeBuilder& builder, int index);
   void drawDataSetValues(util::NodeBuilder& builder);
 
 };

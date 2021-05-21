@@ -34,14 +34,12 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
   int const idOfNode = this->m_id.Get();
 
   bool valueChanged = false;
-  //todo JH if same function setValue(value, position) as for Transformations will be added -> than this is probably
-  //better /same as in Matrix4x4/ int columnOfChange; float localData, valueOfChange;
 
-  glm::vec4 localData;
+	glm::quat localData;
 
   ImGui::PushItemWidth(m_dataItemsWidth);
-  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESize::Nodes_floatPaddingX), I3T::getSize(ESize::Nodes_floatPaddingY)});
-  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {I3T::getSize(ESize::Nodes_ItemsSpacingX), I3T::getSize(ESize::Nodes_ItemsSpacingY)});
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
   for (int columns = 0; columns < 4; columns++)
   {
@@ -56,6 +54,10 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
       fw.value = localData[columns];
       fw.columns = columns;
     }
+		if(columns != 3){
+			ImGui::SameLine();
+		}
+
 
   }
   ImGui::PopStyleVar();
@@ -66,7 +68,6 @@ void WorkspaceQuat::drawDataFull(util::NodeBuilder& builder, int index)
   {
     m_nodebase->setValue(localData);
     setDataItemsWidth();
-//		Nodebase->setValue(valueOfChange, {columnOfChange});
   }
 
   ImGui::Spring(0);
@@ -76,7 +77,7 @@ int WorkspaceQuat::maxLenghtOfData()
 {
 	// SS WIP
   int act, maximal = 0;
-  const glm::vec4& coreData = m_nodebase->getData().getVec4();
+  const glm::quat& coreData = m_nodebase->getData().getQuat();
 
   for(int column=0; column < 4; column++)
   {

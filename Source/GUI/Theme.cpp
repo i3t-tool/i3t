@@ -61,16 +61,41 @@ void Theme::initDefaultProperties()
 	set(EColor::Border, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
 	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
-
-	set(EColor::PulseLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
-	set(EColor::FloatLink, ImVec4(1.009f, 1.00f, 1.00f, 1.00f));
-	set(EColor::MatrixLink, ImVec4(68.0f / 255.0f, 201.0f / 255.0f, 156.0f / 255.0f, 1.00f));
-	set(EColor::QuatLink, ImVec4(124.0f / 255.0f, 21.0f / 255.0f, 153.0f / 255.0f, 1.00f));
-	set(EColor::Vec3Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
-	set(EColor::Vec4Link, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
-	set(EColor::ScreenLink, ImVec4(218.0f / 255.0f, 0.0f / 255.0f, 183.0f / 255.0f, 1.00f));
+  set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
+	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
+	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
+
+	// Node Editor
+	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.00f));
+	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+	set(EColor::Nodes_ConnectionPossible, createColor(0,255,0, 255));
+	set(EColor::Nodes_ConnectionNotPossible, createColor(255,0,0, 255));
+	set(EColor::Nodes_CreateNode, createColor(32, 45, 32, 180));
+
+	set(EColor::Builder_NodePadding, ImVec4(0, 0, 0, 0));
+
+	//pin colors
+	set(EColor::PulsePin, createColor(164, 58, 190, 255));
+	set(EColor::FloatPin, createColor(58, 144, 66, 255));
+	set(EColor::MatrixPin, createColor(178, 71, 66, 255));
+	set(EColor::QuatPin, createColor(178, 144, 66, 255));
+	set(EColor::Vec3Pin, createColor(58, 84, 187, 255));
+	set(EColor::Vec4Pin, createColor(106, 96, 67, 255));
+	set(EColor::ScreenPin, createColor(51, 150, 215, 255));
+	set(EColor::MatrixMulPin, createColor(68, 201, 156, 255));
+
+	//pin inner colors
+	set(EColor::InnerPulsePin, createColor(255, 255, 255, 255));
+	set(EColor::InnerFloatPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerMatrixPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerQuatPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerVec3Pin, createColor(255, 255, 255, 255));
+	set(EColor::InnerVec4Pin, createColor(255, 255, 255, 255));
+	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
+
 
 	// Folta operator color set
 	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
@@ -105,20 +130,46 @@ void Theme::initDefaultProperties()
 
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
-	m_sizes[ESize::Nodes_FloatWidth] = 60.0f;
-	m_sizes[ESize::Nodes_Rounding] = 4.0f;
+	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
+	m_sizes[ESize::Nodes_Rounding] = 0.0f;
+	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
+	m_sizes[ESize::Nodes_LabelIndent] = 3.0f;
+	m_sizes[ESize::Nodes_HeaderLabelIndent] = 2.0f;
+	m_sizes[ESize::Nodes_LinkThickness] = 3.0f;
+	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
+	m_sizes[ESize::Nodes_TrackBallSensitivity] = 5.0f;
 
-	m_sizes[ESize::Nodes_ItemsSpacingX] = 4.0f;
-	m_sizes[ESize::Nodes_ItemsSpacingY] = 4.0f;
+	m_sizes[ESize::Nodes_FloatInnerPadding] = 1.0f;
 
+	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = 0.015f;
+	m_sizes[ESize::Nodes_CtrlMultiplicator] = 0.1f;
+	m_sizes[ESize::Nodes_SHIFTMultiplicator] = 10.0f;
+	m_sizes[ESize::Nodes_ALTMultiplicator] = 0.01f;
 
-	m_sizesVec2[ESizeVec2::Window_FramePadding] = { 8.0f, 8.0f };
+	m_sizes[ESize::Nodes_InputsAlignment] = 0.0f;
+	m_sizes[ESize::Nodes_MiddleAlignment] = 0.0f;
+	m_sizes[ESize::Nodes_OutputsAlignment] = 0.0f;
+
+	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
+	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
+
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(0.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
-	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(8.0f, 1.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(0.0f, 1.0f);
 	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = ImVec2(0.0f, 0.0f);
-	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.5f);
+	m_sizesVec2[ESizeVec2::Nodes_PivotSize] = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = ImVec2(0.0f, 0.0f);
+
 	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = ImVec2(32.0f, 32.0f);
+	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = ImVec2(130.0f, 130.0f);
+
+	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = ImVec2(0.0f, 0.0f);
 }
 
 void Theme::initNames()
@@ -144,21 +195,58 @@ void Theme::initNames()
 	g_ColorNames[EColor::FloatBgTransformationActive] = "Transform Float Active";
 	g_ColorNames[EColor::FloatBgTransformationHovered] = "Transform Float Hovered";
 
-	g_ColorNames[EColor::NodeHeader] = "Node Header";
 	g_ColorNames[EColor::NodeEditorBg] = "Node Editor Background";
 
-	g_ColorNames[EColor::PulseLink] = "Pulse Pin";
-	g_ColorNames[EColor::FloatLink] = "Float Pin";
-	g_ColorNames[EColor::MatrixLink] = "Matrix Pin";
-	g_ColorNames[EColor::QuatLink] = "Quaternion Pin";
-	g_ColorNames[EColor::Vec3Link] = "Vector 3 Pin";
-	g_ColorNames[EColor::Vec4Link] = "Vector 4 Pin";
-	g_ColorNames[EColor::ScreenLink] = "Screen Pin";
+	g_ColorNames[EColor::PulsePin] = "Pulse Pin";
+	g_ColorNames[EColor::FloatPin] = "Float Pin";
+	g_ColorNames[EColor::MatrixPin] = "Matrix Pin";
+	g_ColorNames[EColor::QuatPin] = "Quaternion Pin";
+	g_ColorNames[EColor::Vec3Pin] = "Vector 3 Pin";
+	g_ColorNames[EColor::Vec4Pin] = "Vector 4 Pin";
+	g_ColorNames[EColor::ScreenPin] = "Screen Pin";
+
+	g_ColorNames[EColor::InnerPulsePin] = "Inner Color Pulse";
+	g_ColorNames[EColor::InnerFloatPin] = "Inner Color Float";
+	g_ColorNames[EColor::InnerVec3Pin] = "Inner Color Vec3";
+	g_ColorNames[EColor::InnerVec4Pin] = "Inner Color Vec4";
+	g_ColorNames[EColor::InnerMatrixPin] = "Inner Color Matrix";
+	g_ColorNames[EColor::InnerQuatPin] = "Inner Color Quat";
+	g_ColorNames[EColor::InnerMatrixMulPin] = "Inner Color MatrixMul";
+	g_ColorNames[EColor::InnerScreenPin] = "Inner Color Screen";
+
+	g_ColorNames[EColor::Nodes_FloatText] = "Text in cells";
+	g_ColorNames[EColor::Nodes_ConnectionPossible] = "Connection is possible";
+	g_ColorNames[EColor::Nodes_ConnectionNotPossible] = "Connection is not possible";
+	g_ColorNames[EColor::Nodes_CreateNode] = "Create node popup";
+
+	g_ColorNames[EColor::Builder_NodePadding] = "Builder Padding (Not a color!)";
+
 
 	g_SizeNames[ESize::Nodes_Rounding] = "Nodes Rounding";
 	g_SizeNames[ESize::Nodes_FloatWidth] = "Nodes Float Width";
 	g_SizeNames[ESize::Nodes_FloatMargin] = "Nodes Float Margin";
 	g_SizeNames[ESize::Nodes_BorderWidth] = "Nodes BorderWidth";
+
+	g_SizeNames[ESize::Nodes_LabelIndent] = "pin labels Indent";
+	g_SizeNames[ESize::Nodes_HeaderLabelIndent] = "Header Label Indent";
+	g_SizeNames[ESize::Nodes_LinkThickness] = "Link Thickness";
+	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "Trackball button height";
+	g_SizeNames[ESize::Nodes_TrackBallSensitivity] = "Trackball Sensitivity";
+
+	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "Float inner padding";
+
+	g_SizeNames[ESize::Nodes_dragSpeedDefaulrRatio] = "Drag speed fo float";
+	g_SizeNames[ESize::Nodes_CtrlMultiplicator] = "CTRL Multiplicator";
+	g_SizeNames[ESize::Nodes_SHIFTMultiplicator] = "SHIFT Multiplicator";
+	g_SizeNames[ESize::Nodes_ALTMultiplicator] = "ALT Multiplicator";
+
+	g_SizeNames[ESize::Nodes_InputsAlignment] = "Nodes Inputs Alignment";
+	g_SizeNames[ESize::Nodes_MiddleAlignment] = "Nodes Middle Alignment";
+	g_SizeNames[ESize::Nodes_OutputsAlignment] = "Nodes Outputs Alignment";
+
+	g_SizeNames[ESize::Nodes_leftSideSpacing] = "Nodes left side spacing";
+	g_SizeNames[ESize::Nodes_rightSideSpacing] = "Nodes right side spacing";
+
 
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "Windows Frame Padding";
 	g_SizeVecNames[ESizeVec2::Nodes_IconSize] = "Nodes Icon Size";
@@ -166,6 +254,17 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Nodes_PinSpacing] = "Nodes Pin Spacing";
 	g_SizeVecNames[ESizeVec2::Nodes_ItemsSpacing] = "Nodes Items Spacing";
 	g_SizeVecNames[ESizeVec2::Nodes_FloatPadding] = "Nodes Float Padding";
+
+	g_SizeVecNames[ESizeVec2::Nodes_PivotSize] = "Nodes Pivot size";
+
+	g_SizeVecNames[ESizeVec2::Nodes_InputsSize] = "Nodes Inputs Size";
+	g_SizeVecNames[ESizeVec2::Nodes_MiddleSize] = "Nodes Middle Size";
+	g_SizeVecNames[ESizeVec2::Nodes_OutputSize] = "Nodes Output Size";
+
+	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "Nodes Float Cycle button size";
+	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "Nodes Screen Texture Size";
+
+	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "Builder Item Spacing";
 }
 
 void Theme::apply()
@@ -269,3 +368,9 @@ ImVec4 Theme::getHeader()
 	return ImVec4(0, 0, 0, 0);
 }
 
+void Theme::returnFloatColorToDefault(){
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBg];
+	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgHovered];
+	style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgHovered];
+}

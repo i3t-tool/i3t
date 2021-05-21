@@ -46,8 +46,8 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
 	drawOutputs(builder, newLinkPin);
 	builder.End();
 
-	ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(20,15);  /* \todo JH add shift based on size of header and inputs pins */
-    m_dataRect = ImRect(dataLeftTop, dataLeftTop);
+		ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(3,builder.HeaderMax.y-builder.HeaderMin.y+1);
+   	m_dataRect = ImRect(dataLeftTop, dataLeftTop);
 
     ne::SetNodePosition(m_projection->getId(), m_dataRect.Min);
   Theme& t = I3T::getTheme();
@@ -58,7 +58,20 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     t.operatorColorTheme();
   }
 	m_projection->drawNode(builder);
-	m_dataRect.Add(ImGui::GetItemRectMax());
+
+	/*if(!m_nodebase->as<Core::Camera>()->getProj()->getMatrices().empty()){
+		const glm::mat4& coreData = m_nodebase->as<Core::Camera>()->getProj()->getMatrices()[0]->getData().getMat4();
+		I3T::getTheme();
+	}*/
+	t.returnFloatColorToDefault();
+
+
+	if(m_projection->getInnerWorkspaceNodes().empty()){
+		m_dataRect.Add(ImGui::GetItemRectMax());
+	}else
+	{
+		m_dataRect.Add(ImGui::GetItemRectMax() + ImVec2(1.5f * I3T::getSize(ESizeVec2::Nodes_IconSize).x, 0));
+	}
 
 	ne::SetNodePosition(m_view->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
 
@@ -69,7 +82,15 @@ void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin
     t.operatorColorTheme();
   }
 	m_view->drawNode(builder);
-	m_dataRect.Add(ImGui::GetItemRectMax());
+  t.returnFloatColorToDefault();
+
+
+	if(m_view->getInnerWorkspaceNodes().empty()){
+		m_dataRect.Add(ImGui::GetItemRectMax());
+	}else
+	{
+		m_dataRect.Add(ImGui::GetItemRectMax() + ImVec2(1.5f * I3T::getSize(ESizeVec2::Nodes_IconSize).x, 0));
+	}
 }
 
 void WorkspaceCamera::drawDataSetValues(util::NodeBuilder& builder)
