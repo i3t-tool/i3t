@@ -148,13 +148,14 @@ void Application::finalize()
 }
 bool Application::initI3T()
 {
+	//getchar();printf("a\n");
 	loadConfig();
-
+	
 	// new scene scheme
-	bool b = World::init();
+	bool b = World::init();//getchar(); printf("b\n");
 	m_world = World::loadDefaultScene();
 	m_world->tmpSetNode();//tmp - to be removed
-
+	//getchar(); printf("c\n");
 	return b;
 }
 
