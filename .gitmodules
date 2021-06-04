@@ -21,10 +21,6 @@
 	path = Dependencies/jsonlib
 	url = https://github.com/nlohmann/json.git
 	ignore = dirty
-[submodule "Dependencies/imgui_node_editor"]
-	path = Dependencies/imgui_node_editor
-	url = https://github.com/thedmd/imgui-node-editor.git
-	ignore = dirty
 [submodule "Dependencies/portable-file-dialogs"]
 	path = Dependencies/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs.git
@@ -36,3 +32,6 @@
 [submodule "Dependencies/imgui_markdown_extended"]
 	path = Dependencies/imgui_markdown_extended
 	url = https://github.com/Mizumaky/imgui_markdown_extended
+[submodule "Dependencies/imgui_node_editor"]
+	path = Dependencies/imgui_node_editor
+	url = https://gitlab.fel.cvut.cz/hericmar/imgui-node-editor.git
