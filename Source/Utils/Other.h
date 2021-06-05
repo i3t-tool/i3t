@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <type_traits>
 
@@ -12,13 +13,20 @@
  */
 template <typename E> constexpr auto toUnderlying(E e) noexcept
 {
-  return static_cast<std::underlying_type_t<E>>(e);
+	return static_cast<std::underlying_type_t<E>>(e);
 }
 
-namespace FS
+struct COutRedirect
 {
-FORCE_INLINE std::string absolute(const std::string& relativePath)
-{
-  return I3T_PROJECT_ROOT + relativePath;
-}
-} // namespace FS
+  COutRedirect() { m_default = std::cout.rdbuf(m_buffer.rdbuf()); }
+
+  ~COutRedirect() { std::cout.rdbuf(m_default); }
+
+  std::stringstream& GetBuffer() { return m_buffer; }
+
+  std::string GetStr() { return m_buffer.str(); }
+
+private:
+  std::stringstream m_buffer;
+  std::streambuf* m_default;
+};

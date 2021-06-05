@@ -1,1301 +1,1354 @@
+/*! \file WorkspaceWindow.cpp
+    \brief Drawing and manipulation with Workspace.
+*/
+
 #include "WorkspaceWindow.h"
 
-#include "Core/Application.h"
+#include "../../Theme.h"
+#include "Core/Input/InputManager.h"
+#include "Scripting/Scripting.h"
 
-bool editorStart = false;
+// using namespace Core;
 
-static Node* SpawnMat4x4Node()
+WorkspaceWindow::WorkspaceWindow(bool show)
+		: IWindow(show), m_wholeApplication(Application::get()), ConstTouchTime(1.0f),
+			m_headerBackgroundTexture((ImTextureID)(intptr_t)pgr::createTexture(
+					Config::getAbsolutePath("Data/textures/blueprint_background.png"),
+					true)) // \TODO load texture OR making a simple rectangle
+			,
+			m_nodeBuilderContext(util::NodeBuilder(m_headerBackgroundTexture, 64, 64))
 {
-  s_Nodes.emplace_back(GetNextId(), "Matrix 4x4", ImColor(255, 128, 128));
-  s_Nodes.back().Inputs.emplace_back(GetNextId(), "IN", PinType::Mat4x4);
-  s_Nodes.back().Outputs.emplace_back(GetNextId(), "OUT", PinType::Mat4x4);
 
-  Matrix4x4* mat = new Matrix4x4;
-  mat->data = *(new glm::mat4(1.0f));
+	/* Setting of configuration from blueprint-example */
+	ne::Config config;                       /* \todo used only once in ed::CreateEditor() ? */
+	config.SettingsFile = "Blueprints.json"; /* \todo Rename to some more tight filename*/
+																					 /* \todo Setting of load and store functions
+	                                         //    config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t
+	                                         //    {
+	                                         //        auto node = FindNode(nodeId);
+	                                         //        if (!node)
+	                                         //            return 0;
+	                                         //
+	                                         //        if (data != nullptr)
+	                                         //            memcpy(data, node->State.data(), node->State.size());
+	                                         //        return node->State.size();
+	                                         //    };
+	                                         //
+	                                         //    config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason,
+	                                         void* userPointer) -> bool
+	                                         //    {
+	                                         //        auto node = FindNode(nodeId);
+	                                         //        if (!node)
+	                                         //            return false;
+	                                         //
+	                                         //        node->State.assign(data, size);
+	                                         //
+	                                         //        TouchNode(nodeId);
+	                                         //
+	                                         //        return true;
+	                                         //    };
+	                                         */
 
-  BuildNode(&s_Nodes.back());
+	m_nodeEditorContext = ne::CreateEditor(&config);
+	ne::SetCurrentEditor(m_nodeEditorContext);
+	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
 
-  // mat->node = &s_Nodes.back();
-  mat->ID = s_Nodes.back().ID;
 
-  s_mats.emplace_back(mat);
-
-  return &s_Nodes.back();
 }
 
-void BuildNodes()
+WorkspaceWindow::~WorkspaceWindow()
 {
-  for (auto& node : s_Nodes)
-    BuildNode(&node);
-}
-
-static bool Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1,
-                     float min_size2, float splitter_long_axis_size = -1.0f)
-{
-  using namespace ImGui;
-  ImGuiContext& g = *GImGui;
-  ImGuiWindow* window = g.CurrentWindow;
-  ImGuiID id = window->GetID("##Splitter");
-  ImRect bb;
-  bb.Min = window->DC.CursorPos + (split_vertically ? ImVec2(*size1, 0.0f) : ImVec2(0.0f, *size1));
-  bb.Max = bb.Min + CalcItemSize(split_vertically ? ImVec2(thickness, splitter_long_axis_size)
-                                                  : ImVec2(splitter_long_axis_size, thickness),
-                                 0.0f, 0.0f);
-  return SplitterBehavior(bb, id, split_vertically ? ImGuiAxis_X : ImGuiAxis_Y, size1, size2, min_size1, min_size2,
-                          0.0f);
-}
-
-ImColor GetIconColor(PinType type)
-{
-  switch (type)
-  {
-  default:
-  case PinType::Flow:
-    return ImColor(255, 255, 255);
-  case PinType::Bool:
-    return ImColor(220, 48, 48);
-  case PinType::Int:
-    return ImColor(68, 201, 156);
-  case PinType::Float:
-    return ImColor(147, 226, 74);
-  case PinType::String:
-    return ImColor(124, 21, 153);
-  case PinType::Object:
-    return ImColor(51, 150, 215);
-  case PinType::Function:
-    return ImColor(218, 0, 183);
-  case PinType::Delegate:
-    return ImColor(255, 48, 48);
-  case PinType::Mat4x4:
-    return ImColor(255, 0, 0);
-  }
-};
-
-void DrawPinIcon(const Pin& pin, bool connected, int alpha)
-{
-  IconType iconType;
-  ImColor color = GetIconColor(pin.Type);
-  color.Value.w = alpha / 255.0f;
-  switch (pin.Type)
-  {
-  case PinType::Flow:
-    iconType = IconType::Flow;
-    break;
-  case PinType::Bool:
-    iconType = IconType::Circle;
-    break;
-  case PinType::Int:
-    iconType = IconType::Circle;
-    break;
-  case PinType::Float:
-    iconType = IconType::Circle;
-    break;
-  case PinType::String:
-    iconType = IconType::Circle;
-    break;
-  case PinType::Object:
-    iconType = IconType::Circle;
-    break;
-  case PinType::Function:
-    iconType = IconType::Circle;
-    break;
-  case PinType::Delegate:
-    iconType = IconType::Square;
-    break;
-  case PinType::Mat4x4:
-    iconType = IconType::Square;
-    break;
-  default:
-    return;
-  }
-
-  ax::Widgets::Icon(ImVec2(s_PinIconSize, s_PinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
-};
-
-void ShowStyleEditor(bool* show = nullptr)
-{
-  if (!ImGui::Begin("Style", show))
-  {
-    ImGui::End();
-    return;
-  }
-
-  auto paneWidth = ImGui::GetContentRegionAvailWidth();
-
-  auto& editorStyle = ed::GetStyle();
-  ImGui::BeginHorizontal("Style buttons", ImVec2(paneWidth, 0), 1.0f);
-  ImGui::TextUnformatted("Values");
-  ImGui::Spring();
-  if (ImGui::Button("Reset to defaults"))
-    editorStyle = ed::Style();
-  ImGui::EndHorizontal();
-  ImGui::Spacing();
-  ImGui::DragFloat4("Node Padding", &editorStyle.NodePadding.x, 0.1f, 0.0f, 40.0f);
-  ImGui::DragFloat("Node Rounding", &editorStyle.NodeRounding, 0.1f, 0.0f, 40.0f);
-  ImGui::DragFloat("Node Border Width", &editorStyle.NodeBorderWidth, 0.1f, 0.0f, 15.0f);
-  ImGui::DragFloat("Hovered Node Border Width", &editorStyle.HoveredNodeBorderWidth, 0.1f, 0.0f, 15.0f);
-  ImGui::DragFloat("Selected Node Border Width", &editorStyle.SelectedNodeBorderWidth, 0.1f, 0.0f, 15.0f);
-  ImGui::DragFloat("Pin Rounding", &editorStyle.PinRounding, 0.1f, 0.0f, 40.0f);
-  ImGui::DragFloat("Pin Border Width", &editorStyle.PinBorderWidth, 0.1f, 0.0f, 15.0f);
-  ImGui::DragFloat("Link Strength", &editorStyle.LinkStrength, 1.0f, 0.0f, 500.0f);
-  // ImVec2  SourceDirection;
-  // ImVec2  TargetDirection;
-  ImGui::DragFloat("Scroll Duration", &editorStyle.ScrollDuration, 0.001f, 0.0f, 2.0f);
-  ImGui::DragFloat("Flow Marker Distance", &editorStyle.FlowMarkerDistance, 1.0f, 1.0f, 200.0f);
-  ImGui::DragFloat("Flow Speed", &editorStyle.FlowSpeed, 1.0f, 1.0f, 2000.0f);
-  ImGui::DragFloat("Flow Duration", &editorStyle.FlowDuration, 0.001f, 0.0f, 5.0f);
-  // ImVec2  PivotAlignment;
-  // ImVec2  PivotSize;
-  // ImVec2  PivotScale;
-  // float   PinCorners;
-  // float   PinRadius;
-  // float   PinArrowSize;
-  // float   PinArrowWidth;
-  ImGui::DragFloat("Group Rounding", &editorStyle.GroupRounding, 0.1f, 0.0f, 40.0f);
-  ImGui::DragFloat("Group Border Width", &editorStyle.GroupBorderWidth, 0.1f, 0.0f, 15.0f);
-
-  ImGui::Separator();
-
-  static ImGuiColorEditFlags edit_mode = ImGuiColorEditFlags_RGB;
-  ImGui::BeginHorizontal("Color Mode", ImVec2(paneWidth, 0), 1.0f);
-  ImGui::TextUnformatted("Filter Colors");
-  ImGui::Spring();
-  ImGui::RadioButton("RGB", &edit_mode, ImGuiColorEditFlags_RGB);
-  ImGui::Spring(0);
-  ImGui::RadioButton("HSV", &edit_mode, ImGuiColorEditFlags_HSV);
-  ImGui::Spring(0);
-  ImGui::RadioButton("HEX", &edit_mode, ImGuiColorEditFlags_HEX);
-  ImGui::EndHorizontal();
-
-  static ImGuiTextFilter filter;
-  filter.Draw("", paneWidth);
-
-  ImGui::Spacing();
-
-  ImGui::PushItemWidth(-160);
-  for (int i = 0; i < ed::StyleColor_Count; ++i)
-  {
-    auto name = ed::GetStyleColorName((ed::StyleColor)i);
-    if (!filter.PassFilter(name))
-      continue;
-
-    ImGui::ColorEdit4(name, &editorStyle.Colors[i].x, edit_mode);
-  }
-  ImGui::PopItemWidth();
-
-  ImGui::End();
-}
-
-void ShowLeftPane(float paneWidth)
-{
-  auto& io = ImGui::GetIO();
-
-  ImGui::BeginChild("Selection", ImVec2(paneWidth, 0));
-
-  paneWidth = ImGui::GetContentRegionAvailWidth();
-
-  static bool showStyleEditor = false;
-  ImGui::BeginHorizontal("Style Editor", ImVec2(paneWidth, 0));
-  ImGui::Spring(0.0f, 0.0f);
-  if (ImGui::Button("Zoom to Content"))
-    ed::NavigateToContent();
-  ImGui::Spring(0.0f);
-  if (ImGui::Button("Show Flow"))
-  {
-    for (auto& link : s_Links)
-      ed::Flow(link.ID);
-  }
-  ImGui::Spring();
-  if (ImGui::Button("Edit Style"))
-    showStyleEditor = true;
-  ImGui::EndHorizontal();
-
-  if (showStyleEditor)
-    ShowStyleEditor(&showStyleEditor);
-
-  std::vector<ed::NodeId> selectedNodes;
-  std::vector<ed::LinkId> selectedLinks;
-  selectedNodes.resize(ed::GetSelectedObjectCount());
-  selectedLinks.resize(ed::GetSelectedObjectCount());
-
-  int nodeCount = ed::GetSelectedNodes(selectedNodes.data(), static_cast<int>(selectedNodes.size()));
-  int linkCount = ed::GetSelectedLinks(selectedLinks.data(), static_cast<int>(selectedLinks.size()));
-
-  selectedNodes.resize(nodeCount);
-  selectedLinks.resize(linkCount);
-
-  int saveIconWidth = 32;     // Application_GetTextureWidth(s_SaveIcon);
-  int saveIconHeight = 32;    // Application_GetTextureWidth(s_SaveIcon);
-  int restoreIconWidth = 32;  // Application_GetTextureWidth(s_RestoreIcon);
-  int restoreIconHeight = 32; // Application_GetTextureWidth(s_RestoreIcon);
-
-  ImGui::GetWindowDrawList()->AddRectFilled(
-      ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
-      ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
-  ImGui::Spacing();
-  ImGui::SameLine();
-  ImGui::TextUnformatted("Nodes");
-  ImGui::Indent();
-  for (auto& node : s_Nodes)
-  {
-    ImGui::PushID(node.ID.AsPointer());
-    auto start = ImGui::GetCursorScreenPos();
-
-    if (const auto progress = GetTouchProgress(node.ID))
-    {
-      ImGui::GetWindowDrawList()->AddLine(start + ImVec2(-8, 0), start + ImVec2(-8, ImGui::GetTextLineHeight()),
-                                          IM_COL32(255, 0, 0, 255 - (int)(255 * progress)), 4.0f);
-    }
-
-    bool isSelected = std::find(selectedNodes.begin(), selectedNodes.end(), node.ID) != selectedNodes.end();
-    if (ImGui::Selectable(
-            (node.Name + "##" + std::to_string(reinterpret_cast<uintptr_t>(node.ID.AsPointer()))).c_str(),
-            &isSelected))
-    {
-      if (io.KeyCtrl)
-      {
-        if (isSelected)
-          ed::SelectNode(node.ID, true);
-        else
-          ed::DeselectNode(node.ID);
-      }
-      else
-        ed::SelectNode(node.ID, false);
-
-      ed::NavigateToSelection();
-    }
-    if (ImGui::IsItemHovered() && !node.State.empty())
-      ImGui::SetTooltip("State: %s", node.State.c_str());
-
-    auto id = std::string("(") + std::to_string(reinterpret_cast<uintptr_t>(node.ID.AsPointer())) + ")";
-    auto textSize = ImGui::CalcTextSize(id.c_str(), nullptr);
-    auto iconPanelPos =
-        start + ImVec2(paneWidth - ImGui::GetStyle().FramePadding.x - ImGui::GetStyle().IndentSpacing -
-                           saveIconWidth - restoreIconWidth - ImGui::GetStyle().ItemInnerSpacing.x * 1,
-                       (ImGui::GetTextLineHeight() - saveIconHeight) / 2);
-    ImGui::GetWindowDrawList()->AddText(
-        ImVec2(iconPanelPos.x - textSize.x - ImGui::GetStyle().ItemInnerSpacing.x, start.y),
-        IM_COL32(255, 255, 255, 255), id.c_str(), nullptr);
-
-    auto drawList = ImGui::GetWindowDrawList();
-    ImGui::SetCursorScreenPos(iconPanelPos);
-    ImGui::SetItemAllowOverlap();
-    if (node.SavedState.empty())
-    {
-      if (ImGui::InvisibleButton("save", ImVec2((float)saveIconWidth, (float)saveIconHeight)))
-        node.SavedState = node.State;
-
-      if (ImGui::IsItemActive())
-        drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1),
-                           IM_COL32(255, 255, 255, 96));
-      else if (ImGui::IsItemHovered())
-        drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1),
-                           IM_COL32(255, 255, 255, 255));
-      else
-        drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1),
-                           IM_COL32(255, 255, 255, 160));
-    }
-    else
-    {
-      ImGui::Dummy(ImVec2((float)saveIconWidth, (float)saveIconHeight));
-      drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1),
-                         IM_COL32(255, 255, 255, 32));
-    }
-
-    ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
-    ImGui::SetItemAllowOverlap();
-    if (!node.SavedState.empty())
-    {
-      if (ImGui::InvisibleButton("restore", ImVec2((float)restoreIconWidth, (float)restoreIconHeight)))
-      {
-        node.State = node.SavedState;
-        ed::RestoreNodeState(node.ID);
-        node.SavedState.clear();
-      }
-
-      if (ImGui::IsItemActive())
-        drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0),
-                           ImVec2(1, 1), IM_COL32(255, 255, 255, 96));
-      else if (ImGui::IsItemHovered())
-        drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0),
-                           ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
-      else
-        drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0),
-                           ImVec2(1, 1), IM_COL32(255, 255, 255, 160));
-    }
-    else
-    {
-      ImGui::Dummy(ImVec2((float)restoreIconWidth, (float)restoreIconHeight));
-      drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1),
-                         IM_COL32(255, 255, 255, 32));
-    }
-
-    ImGui::SameLine(0, 0);
-    ImGui::SetItemAllowOverlap();
-    ImGui::Dummy(ImVec2(0, (float)restoreIconHeight));
-
-    ImGui::PopID();
-  }
-  ImGui::Unindent();
-
-  static int changeCount = 0;
-
-  ImGui::GetWindowDrawList()->AddRectFilled(
-      ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
-      ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
-  ImGui::Spacing();
-  ImGui::SameLine();
-  ImGui::TextUnformatted("Selection");
-
-  ImGui::BeginHorizontal("Selection Stats", ImVec2(paneWidth, 0));
-  // ImGui::Text("Changed %d time%s", changeCount, changeCount > 1 ? "s" : "");
-  ImGui::Spring();
-  if (ImGui::Button("Deselect All"))
-    ed::ClearSelection();
-  ImGui::EndHorizontal();
-  ImGui::Indent();
-  for (int i = 0; i < nodeCount; ++i)
-    ImGui::Text("Node (%p)", selectedNodes[i].AsPointer());
-  for (int i = 0; i < linkCount; ++i)
-    ImGui::Text("Link (%p)", selectedLinks[i].AsPointer());
-  ImGui::Unindent();
-
-  if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Z)))
-    for (auto& link : s_Links)
-      ed::Flow(link.ID);
-
-  if (ed::HasSelectionChanged())
-    ++changeCount;
-
-  ImGui::EndChild();
-}
-
-void initEditor()
-{
-  editorStart = true;
-  ed::Config config;
-
-  config.SettingsFile = "Blueprints.json";
-
-  config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t {
-    auto node = FindNode(nodeId);
-    if (!node)
-      return 0;
-
-    if (data != nullptr)
-      memcpy(data, node->State.data(), node->State.size());
-    return node->State.size();
-  };
-
-  config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason,
-                               void* userPointer) -> bool {
-    auto node = FindNode(nodeId);
-    if (!node)
-      return false;
-
-    node->State.assign(data, size);
-
-    TouchNode(nodeId);
-
-    return true;
-  };
-
-  m_Editor = ed::CreateEditor(&config);
-  ed::SetCurrentEditor(m_Editor);
-
-  Node* node;
-  node = SpawnMat4x4Node();
-  ed::SetNodePosition(node->ID, ImVec2(-252, 220));
-
-  ed::NavigateToContent();
-
-  BuildNodes();
-
-  // EXAMPLE of pre spawn links
-  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[6].Inputs[0].ID));
-  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].ID, s_Nodes[7].Inputs[0].ID));
-
-  // s_Links.push_back(Link(GetNextLinkId(), s_Nodes[14].Outputs[0].ID, s_Nodes[15].Inputs[0].ID));
-
-  // s_HeaderBackground = Application_LoadTexture("Data/BlueprintBackground.png");
-  // s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
-  // s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
-}
-
-void popupMenu(bool& createNewNode, Pin* newNodeLinkPin, Pin* newLinkPin, ed::NodeId& contextNodeId,
-               ed::PinId& contextPinId, ed::LinkId& contextLinkId)
-{
-  auto openPopupPosition = ImGui::GetMousePos();
-  ed::Suspend();
-  if (ed::ShowNodeContextMenu(&contextNodeId))
-    ImGui::OpenPopup("Node Context Menu");
-  else if (ed::ShowPinContextMenu(&contextPinId))
-    ImGui::OpenPopup("Pin Context Menu");
-  else if (ed::ShowLinkContextMenu(&contextLinkId))
-    ImGui::OpenPopup("Link Context Menu");
-  else if (ed::ShowBackgroundContextMenu())
-  {
-    ImGui::OpenPopup("Create New Node");
-    newNodeLinkPin = nullptr;
-  }
-  ed::Resume();
-
-  ed::Suspend();
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-  if (ImGui::BeginPopup("Node Context Menu"))
-  {
-    auto node = FindNode(contextNodeId);
-
-    ImGui::TextUnformatted("Node Context Menu");
-    ImGui::Separator();
-    if (node)
-    {
-      ImGui::Text("ID: %p", node->ID.AsPointer());
-      ImGui::Text("Type: %s", node->Type);
-      ImGui::Text("Inputs: %d", (int)node->Inputs.size());
-      ImGui::Text("Outputs: %d", (int)node->Outputs.size());
-    }
-    else
-      ImGui::Text("Unknown node: %p", contextNodeId.AsPointer());
-    ImGui::Separator();
-    if (ImGui::MenuItem("Delete"))
-      ed::DeleteNode(contextNodeId);
-    ImGui::EndPopup();
-  }
-
-  if (ImGui::BeginPopup("Pin Context Menu"))
-  {
-    auto pin = FindPin(contextPinId);
-
-    ImGui::TextUnformatted("Pin Context Menu");
-    ImGui::Separator();
-    if (pin)
-    {
-      ImGui::Text("ID: %p", pin->ID.AsPointer());
-      if (pin->Node)
-        ImGui::Text("Node: %p", pin->Node->ID.AsPointer());
-      else
-        ImGui::Text("Node: %s", "<none>");
-    }
-    else
-      ImGui::Text("Unknown pin: %p", contextPinId.AsPointer());
-
-    ImGui::EndPopup();
-  }
-
-  if (ImGui::BeginPopup("Link Context Menu"))
-  {
-    auto link = FindLink(contextLinkId);
-
-    ImGui::TextUnformatted("Link Context Menu");
-    ImGui::Separator();
-    if (link)
-    {
-      ImGui::Text("ID: %p", link->ID.AsPointer());
-      ImGui::Text("From: %p", link->StartPinID.AsPointer());
-      ImGui::Text("To: %p", link->EndPinID.AsPointer());
-    }
-    else
-      ImGui::Text("Unknown link: %p", contextLinkId.AsPointer());
-    ImGui::Separator();
-    if (ImGui::MenuItem("Delete"))
-      ed::DeleteLink(contextLinkId);
-    ImGui::EndPopup();
-  }
-
-  if (ImGui::BeginPopup("Create New Node"))
-  {
-    auto newNodePostion = openPopupPosition;
-    // ImGui::SetCursorScreenPos(ImGui::GetMousePosOnOpeningCurrentPopup());
-
-    // auto drawList = ImGui::GetWindowDrawList();
-    // drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
-
-    Node* node = nullptr;
-    if (ImGui::MenuItem("Matrix 3x3"))
-      node = SpawnMat4x4Node();
-
-    if (node)
-    {
-
-      BuildNodes();
-
-      createNewNode = false;
-
-      ed::SetNodePosition(node->ID, newNodePostion);
-
-      if (auto startPin = newNodeLinkPin)
-      {
-        auto& pins = startPin->Kind == PinKind::Input ? node->Outputs : node->Inputs;
-
-        for (auto& pin : pins)
-        {
-          if (CanCreateLink(startPin, &pin))
-          {
-            auto endPin = &pin;
-            if (startPin->Kind == PinKind::Input)
-              std::swap(startPin, endPin);
-
-            s_Links.emplace_back(Link(GetNextId(), startPin->ID, endPin->ID));
-            s_Links.back().Color = GetIconColor(startPin->Type);
-
-            break;
-          }
-        }
-      }
-    }
-
-    ImGui::EndPopup();
-  }
-  else
-    createNewNode = false;
-  ImGui::PopStyleVar();
-}
-
-void DeleteNode()
-{
-  ed::LinkId linkId = 0;
-  while (ed::QueryDeletedLink(&linkId))
-  {
-    if (ed::AcceptDeletedItem())
-    {
-      auto id = std::find_if(s_Links.begin(), s_Links.end(), [linkId](auto& link) { return link.ID == linkId; });
-      if (id != s_Links.end())
-        s_Links.erase(id);
-    }
-  }
-
-  ed::NodeId nodeId = 0;
-  while (ed::QueryDeletedNode(&nodeId))
-  {
-    if (ed::AcceptDeletedItem())
-    {
-      auto id = std::find_if(s_Nodes.begin(), s_Nodes.end(), [nodeId](auto& node) { return node.ID == nodeId; });
-      if (id != s_Nodes.end())
-        s_Nodes.erase(id);
-    }
-  }
-}
-
-Matrix4x4* findMatFromNode(ed::NodeId& nodeId)
-{
-  for (auto& mat : s_mats)
-  {
-    /*if (mat->node->ID == nodeId) {
-      return mat;
-    }*/
-    if (mat->ID == nodeId)
-    {
-      return mat;
-    }
-  }
-  return nullptr;
-}
-
-Link* findLinkFromStartPin(ed::PinId id)
-{
-  for (auto& link : s_Links)
-  {
-    if (link.StartPinID == id)
-    {
-      return &link;
-    }
-  }
-  return nullptr;
-}
-
-Node* findNodeByInputPin(ed::PinId id)
-{
-  for (auto& node : s_Nodes)
-    for (auto& pin : node.Inputs)
-    {
-      if (pin.ID == id)
-        return &node;
-    }
-  return nullptr;
-}
-
-void fromArrayToVec4(glm::vec4& vec, float arr[4])
-{
-  vec.x = arr[0];
-  vec.y = arr[1];
-  vec.z = arr[2];
-  vec.w = arr[3];
-}
-
-void fromVecToArray4(glm::vec4& vec, float arr[4])
-{
-  arr[0] = vec.x;
-  arr[1] = vec.y;
-  arr[2] = vec.z;
-  arr[3] = vec.w;
-}
-
-void DrawBlueprintNodes(util::BlueprintNodeBuilder& builder, Pin* newLinkPin)
-{
-  for (auto& node : s_Nodes)
-  {
-    if (node.Type != NodeType::Blueprint)
-      continue;
-
-    builder.Begin(node.ID);
-    builder.Header(node.Color);
-    ImGui::Spring(0);
-    ImGui::TextUnformatted(node.Name.c_str());
-    ImGui::Spring(1);
-    ImGui::Dummy(ImVec2(0, 28));
-    ImGui::Spring(0);
-    builder.EndHeader();
-
-    for (auto& input : node.Inputs)
-    {
-      auto alpha = ImGui::GetStyle().Alpha;
-      if (newLinkPin && !CanCreateLink(newLinkPin, &input) && &input != newLinkPin)
-        alpha = alpha * (48.0f / 255.0f);
-
-      builder.Input(input.ID);
-      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-      DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
-      ImGui::Spring(0);
-      if (!input.Name.empty())
-      {
-        ImGui::TextUnformatted(input.Name.c_str());
-        ImGui::Spring(0);
-      }
-      if (input.Type == PinType::Bool)
-      {
-        ImGui::Button("Hello");
-        ImGui::Spring(0);
-      }
-      ImGui::PopStyleVar();
-      builder.EndInput();
-    }
-
-    for (auto& output : node.Outputs)
-    {
-
-      auto alpha = ImGui::GetStyle().Alpha;
-
-      if (newLinkPin && !CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
-        alpha = alpha * (48.0f / 255.0f);
-
-      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-      builder.Output(output.ID);
-
-      if (output.Type == PinType::String)
-      {
-        static char buffer[128] = "Edit Me\nMultiline!";
-        static bool wasActive = false;
-
-        ImGui::PushItemWidth(100.0f);
-        ImGui::InputText("##edit", buffer, 127);
-        ImGui::PopItemWidth();
-        if (ImGui::IsItemActive() && !wasActive)
-        {
-          ed::EnableShortcuts(false);
-          wasActive = true;
-        }
-        else if (!ImGui::IsItemActive() && wasActive)
-        {
-          ed::EnableShortcuts(true);
-          wasActive = false;
-        }
-        ImGui::Spring(0);
-      }
-
-      if (output.Type == PinType::Mat4x4)
-      {
-        // static bool wasActive = false;
-
-        Matrix4x4* mat = nullptr;
-        float x[4], y[4], z[4], w[4] = {0, 0, 0, 0};
-        glm::vec4 vec(0.0f);
-
-        mat = findMatFromNode(node.ID);
-
-        vec = mat->data[0];
-        fromVecToArray4(vec, x);
-
-        vec = mat->data[1];
-        fromVecToArray4(vec, y);
-
-        vec = mat->data[2];
-        fromVecToArray4(vec, z);
-
-        vec = mat->data[3];
-        fromVecToArray4(vec, w);
-
-        ImGui::PushItemWidth(100.0f);
-        ImGui::InputFloat4("x", x, 3);
-        ImGui::PopItemWidth();
-        ImGui::PushItemWidth(100.0f);
-        ImGui::InputFloat4("y", y, 3);
-        ImGui::PopItemWidth();
-        ImGui::PushItemWidth(100.0f);
-        ImGui::InputFloat4("z", z, 3);
-        ImGui::PopItemWidth();
-        ImGui::PushItemWidth(100.0f);
-        ImGui::InputFloat4("w", w, 3);
-        ImGui::PopItemWidth();
-
-        glm::mat4 data(0.0f);
-
-        fromArrayToVec4(vec, x);
-        data[0] = vec;
-        fromArrayToVec4(vec, y);
-        data[1] = vec;
-        fromArrayToVec4(vec, z);
-        data[2] = vec;
-        fromArrayToVec4(vec, w);
-        data[3] = vec;
-
-        mat->data = data;
-
-        ImGui::Spring(0);
-      }
-
-      if (!output.Name.empty())
-      {
-        ImGui::Spring(0);
-        ImGui::TextUnformatted(output.Name.c_str());
-      }
-
-      ImGui::Spring(0);
-      DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
-      ImGui::PopStyleVar();
-      builder.EndOutput();
-    }
-
-    builder.End();
-  }
-}
-
-// TODO bind to object
-glm::mat4 WorkspaceWindow::DrawInScene()
-{
-  if (s_Nodes.size() == 0)
-  {
-    return glm::mat4(1.0f);
-  }
-  Node* node = &s_Nodes.front();
-  if (node == nullptr)
-  {
-    return glm::mat4(1.0f);
-  }
-  Link* link = nullptr;
-  Matrix4x4* mat;
-  glm::mat4 result(1.0f);
-  while (true)
-  {
-    link = nullptr;
-    // assume we have all nodes with mat4x4
-    mat = findMatFromNode(node->ID);
-    result *= mat->data;
-    for (auto& pin : node->Outputs)
-    {
-      if (pin.Type == PinType::Mat4x4)
-      {
-        link = findLinkFromStartPin(pin.ID);
-        break;
-      }
-    }
-    if (link != nullptr)
-    {
-      node = findNodeByInputPin(link->EndPinID);
-    }
-    else
-    {
-      break;
-    }
-  }
-  return result;
+	/* lambda for releasing texture \todo what function to call instead of Application_DestroyTexture()?  */
+	//    auto releaseTexture = [](ImTextureID& id) {
+	//      if (id)
+	//      {
+	//        Application_DestroyTexture(id);
+	//        id = nullptr;
+	//      }
+	//    };
+	//    releaseTexture(HeaderBackground);
+
+	if (m_nodeEditorContext)
+	{
+		ne::DestroyEditor(m_nodeEditorContext);
+		m_nodeEditorContext = nullptr;
+	}
 }
 
 void WorkspaceWindow::render()
 {
+	if (InputManager::isKeyPressed(Keys::l))
+	{
+		// saveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
+		printf("press\n");
+	}
 
-  if (!Application::get().m_showWorkspaceWindow)
-    return;
+	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
 
-  ImGui::Begin("Workspace", &Application::get().m_showWorkspaceWindow);
+	if (InputManager::isKeyPressed(Keys::a))
+	{
+		selectAll();
+	}
+	if (InputManager::isKeyPressed(Keys::i))
+	{
+		invertSelection();
+	}
+	if (InputManager::isKeyPressed(Keys::s))
+	{
+		ne::NavigateToContent();
+	}
+	if (InputManager::isKeyPressed(Keys::d))
+	{
+		ne::NavigateToSelection();
+	}
 
-  if (!editorStart)
-  {
-    initEditor();
-  }
+	UpdateTouchAllNodes();
+	ne::Begin("Node editor");{
+    ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
 
-  UpdateTouch();
+	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+	{
+		Theme& t = I3T::getTheme();
+		if(workspaceCoreNode->isTransformation()){
+			t.transformationColorTheme();
+		}else
+		{
+			t.operatorColorTheme();
+		}
+		workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
+    t.returnFloatColorToDefault();
+	}
 
-  auto& io = ImGui::GetIO();
-
-  ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
-
-  ed::SetCurrentEditor(m_Editor);
-
-  static ed::NodeId contextNodeId = 0;
-  static ed::LinkId contextLinkId = 0;
-  static ed::PinId contextPinId = 0;
-  static bool createNewNode = false;
-  static Pin* newNodeLinkPin = nullptr;
-  static Pin* newLinkPin = nullptr;
-
-  static float leftPaneWidth = 400.0f;
-  static float rightPaneWidth = 800.0f;
-  Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
-
-  ShowLeftPane(leftPaneWidth - 4.0f);
-
-  ImGui::SameLine(0.0f, 12.0f);
-
-  ed::Begin("Node editor");
-  {
-    auto cursorTopLeft = ImGui::GetCursorScreenPos();
-
-    // util::BlueprintNodeBuilder builder(s_HeaderBackground,
-    // Application_GetTextureWidth(s_HeaderBackground),Application_GetTextureHeight(s_HeaderBackground));
-    util::BlueprintNodeBuilder builder(s_HeaderBackground, 64, 64);
-
-    //
-    DrawBlueprintNodes(builder, newLinkPin);
-
-    // send to scene
-    // DrawInScene();
-
-    // draw links
-    for (auto& link : s_Links)
-      ed::Link(link.ID, link.StartPinID, link.EndPinID, link.Color, 2.0f);
-
-    // create link
-    if (!createNewNode)
+    /* put and pop to/from Sequence */
+	ne::Detail::DragAction* drag_action = m_ne_usable->GetCurrentAction() != nullptr ? m_ne_usable->GetCurrentAction()->AsDrag() : nullptr;
+	if(drag_action && drag_action->IsDragging())
     {
-      if (ed::BeginCreate(ImColor(255, 255, 255), 2.0f))
-      {
-
-        auto showLabel = [](const char* label, ImColor color) {
-          ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-          auto size = ImGui::CalcTextSize(label);
-
-          auto padding = ImGui::GetStyle().FramePadding;
-          auto spacing = ImGui::GetStyle().ItemSpacing;
-
-          ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-
-          auto rectMin = ImGui::GetCursorScreenPos() - padding;
-          auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
-
-          auto drawList = ImGui::GetWindowDrawList();
-          drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-          ImGui::TextUnformatted(label);
-        };
-
-        ed::PinId startPinId = 0, endPinId = 0;
-        if (ed::QueryNewLink(&startPinId, &endPinId))
+        m_draged_nodes = getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
+		/*TODO SS camera fail here. node editor marks different object as dragged one than the actual one.
+			it results that we cannot find workspacenode by id because we have the wrong id*/
+        m_draged_node_nodeeditor = drag_action->m_DraggedObject->AsNode();
+        if(m_draged_node_nodeeditor)
         {
-          auto startPin = FindPin(startPinId);
-          auto endPin = FindPin(endPinId);
+					//TODO nullptr check
+            m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
+            if( m_draged_node->isTransformation())
+            {
+                Theme& t = I3T::getTheme();
+                t.transformationColorTheme();
 
-          newLinkPin = startPin ? startPin : endPin;
+                if (m_draged_node->inSequence())
+                {
+                    Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(m_draged_node);
+                    assert(workspace_sequence != nullptr);
 
-          if (startPin->Kind == PinKind::Input)
-          {
-            std::swap(startPin, endPin);
-            std::swap(startPinId, endPinId);
-          }
+                    workspace_sequence->popNode(m_draged_node);
+                    m_workspaceCoreNodes.push_back(m_draged_node);
+                }
 
-          if (startPin && endPin)
-          {
-            if (endPin == startPin)
-            {
-              ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                int position_in_sequence;
+                m_all_sequences = getSequenceNodes();
+                for (Ptr<WorkspaceSequence> & sequence : m_all_sequences)
+                {
+                    ImVec2 nodeTopMiddlePosition = ne::GetNodePosition(m_draged_node->getId());
+                    ImVec2 nodeSize = ne::GetNodeSize(m_draged_node->getId());
+                    nodeTopMiddlePosition.x += nodeSize.x/2;
+
+                    position_in_sequence = sequence->getInnerPosition({nodeTopMiddlePosition, nodeTopMiddlePosition + ImVec2(0,nodeSize.y/2), nodeTopMiddlePosition + ImVec2(0,nodeSize.y)});
+                    sequence->setPostionOfDummyData(position_in_sequence);
+
+                    if (position_in_sequence >= 0)
+                    {
+                        sequence->setWidthOfDummy(ne::GetNodeSize(m_draged_node->getId()).x);
+                        if(ImGui::IsMouseReleased(0))
+                        {
+                            sequence->pushNode(m_draged_node, position_in_sequence);
+                            m_workspaceCoreNodes.erase(std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+                                                        [this](Ptr<WorkspaceNodeWithCoreData> const &w_node) -> bool { return w_node->getId() == m_draged_node->getId(); }) );
+                            sequence->setPostionOfDummyData(-1);
+                            break;
+                        }
+
+                    }
+
+                }
+
             }
-            else if (endPin->Kind == startPin->Kind)
-            {
-              showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
-              ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-            }
-            // else if (endPin->Node == startPin->Node)
-            //{
-            //    showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
-            //    ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
-            //}
-            else if (endPin->Type != startPin->Type)
-            {
-              showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
-              ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
-            }
-            else
-            {
-              showLabel("+ Create Link", ImColor(32, 45, 32, 180));
-              if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
-              {
-                s_Links.emplace_back(Link(GetNextId(), startPinId, endPinId));
-                s_Links.back().Color = GetIconColor(startPin->Type);
-              }
-            }
-          }
         }
-
-        ed::PinId pinId = 0;
-        if (ed::QueryNewNode(&pinId))
-        {
-          newLinkPin = FindPin(pinId);
-          if (newLinkPin)
-            showLabel("+ Create Node", ImColor(32, 45, 32, 180));
-
-          if (ed::AcceptNewItem())
-          {
-            createNewNode = true;
-            newNodeLinkPin = FindPin(pinId);
-            newLinkPin = nullptr;
-            ed::Suspend();
-            ImGui::OpenPopup("Create New Node");
-            ed::Resume();
-          }
-        }
-      }
-      else
-        newLinkPin = nullptr;
-
-      ed::EndCreate();
-
-      if (ed::BeginDelete())
-      {
-        DeleteNode();
-      }
-      ed::EndDelete();
     }
+
+    /* both connected pins have to be drawn before link is drawn -> therefore separated cycle */
+    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+    {
+        workspaceCoreNode->drawInputLinks();
+    }
+
+    checkUserActions();
+
+    checkQueryElements();
+
+    checkQueryContextMenus();
 
     ImGui::SetCursorScreenPos(cursorTopLeft);
-  }
 
-  popupMenu(createNewNode, newNodeLinkPin, newLinkPin, contextNodeId, contextPinId, contextLinkId);
-  ed::Resume();
 
-  ed::End();
-  ImGui::End();
-  //}
+	}ne::End();
+
+	manipulatorStartCheck3D();
+
+	ImGui::End();
 }
 
-void maybeUsefulCode()
+Ptr<WorkspaceSequence> WorkspaceWindow::getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
-  /*for (auto& node : s_Nodes)
+    Ptr<Core::Transformation> transfomation_nodebase = node->getNodebase()->as<Core::Transformation>();
+    if(transfomation_nodebase)
     {
-      if (node.Type != NodeType::Houdini)
-        continue;
-
-      const float rounding = 10.0f;
-      const float padding = 12.0f;
-
-      ed::PushStyleColor(ed::StyleColor_NodeBg, ImColor(229, 229, 229, 200));
-      ed::PushStyleColor(ed::StyleColor_NodeBorder, ImColor(125, 125, 125, 200));
-      ed::PushStyleColor(ed::StyleColor_PinRect, ImColor(229, 229, 229, 60));
-      ed::PushStyleColor(ed::StyleColor_PinRectBorder, ImColor(125, 125, 125, 60));
-
-      const auto pinBackground = ed::GetStyle().Colors[ed::StyleColor_NodeBg];
-
-      ed::PushStyleVar(ed::StyleVar_NodePadding, ImVec4(0, 0, 0, 0));
-      ed::PushStyleVar(ed::StyleVar_NodeRounding, rounding);
-      ed::PushStyleVar(ed::StyleVar_SourceDirection, ImVec2(0.0f, 1.0f));
-      ed::PushStyleVar(ed::StyleVar_TargetDirection, ImVec2(0.0f, -1.0f));
-      ed::PushStyleVar(ed::StyleVar_LinkStrength, 0.0f);
-      ed::PushStyleVar(ed::StyleVar_PinBorderWidth, 1.0f);
-      ed::PushStyleVar(ed::StyleVar_PinRadius, 6.0f);
-      ed::BeginNode(node.ID);
-
-      ImGui::BeginVertical(node.ID.AsPointer());
-      if (!node.Inputs.empty())
-      {
-        ImGui::BeginHorizontal("inputs");
-        ImGui::Spring(1, 0);
-
-        ImRect inputsRect;
-        int inputAlpha = 200;
-        for (auto& pin : node.Inputs)
+        Ptr<Core::NodeBase> sequence_nodebase = transfomation_nodebase->getCurrentSequence();
+        if (sequence_nodebase)
         {
-          ImGui::Dummy(ImVec2(padding, padding));
-          inputsRect = ImGui_GetItemRect();
-          ImGui::Spring(1, 0);
-          inputsRect.Min.y -= padding;
-          inputsRect.Max.y -= padding;
-
-          // ed::PushStyleVar(ed::StyleVar_PinArrowSize, 10.0f);
-          // ed::PushStyleVar(ed::StyleVar_PinArrowWidth, 10.0f);
-          ed::PushStyleVar(ed::StyleVar_PinCorners, 15);
-          ed::BeginPin(pin.ID, ed::PinKind::Input);
-          ed::PinPivotRect(inputsRect.GetCenter(), inputsRect.GetCenter());
-          ed::PinRect(inputsRect.GetTL(), inputsRect.GetBR());
-          ed::EndPin();
-          // ed::PopStyleVar(3);
-          ed::PopStyleVar(1);
-
-          auto drawList = ImGui::GetWindowDrawList();
-          drawList->AddRectFilled(inputsRect.GetTL(), inputsRect.GetBR(),
-                                  IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                           (int)(255 * pinBackground.z), inputAlpha),
-                                  4.0f, 15);
-          drawList->AddRect(inputsRect.GetTL(), inputsRect.GetBR(),
-                            IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                     (int)(255 * pinBackground.z), inputAlpha),
-                            4.0f, 15);
-
-          if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
-            inputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
+            for(Ptr<WorkspaceNodeWithCoreData> const &workspace_node : m_workspaceCoreNodes)
+            {
+                if (workspace_node->isSequence() &&  workspace_node->getNodebase() == sequence_nodebase)
+                {
+                    return std::dynamic_pointer_cast<WorkspaceSequence>(workspace_node);
+                }
+            }
         }
-
-        // ImGui::Spring(1, 0);
-        ImGui::EndHorizontal();
-      }
-
-      ImGui::BeginHorizontal("content_frame");
-      ImGui::Spring(1, padding);
-
-      ImGui::BeginVertical("content", ImVec2(0.0f, 0.0f));
-      ImGui::Dummy(ImVec2(160, 0));
-      ImGui::Spring(1);
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-      ImGui::TextUnformatted(node.Name.c_str());
-      ImGui::PopStyleColor();
-      ImGui::Spring(1);
-      ImGui::EndVertical();
-      auto contentRect = ImGui_GetItemRect();
-
-      ImGui::Spring(1, padding);
-      ImGui::EndHorizontal();
-
-      if (!node.Outputs.empty())
-      {
-        ImGui::BeginHorizontal("outputs");
-        ImGui::Spring(1, 0);
-
-        ImRect outputsRect;
-        int outputAlpha = 200;
-        for (auto& pin : node.Outputs)
-        {
-          ImGui::Dummy(ImVec2(padding, padding));
-          outputsRect = ImGui_GetItemRect();
-          ImGui::Spring(1, 0);
-          outputsRect.Min.y += padding;
-          outputsRect.Max.y += padding;
-
-          ed::PushStyleVar(ed::StyleVar_PinCorners, 3);
-          ed::BeginPin(pin.ID, ed::PinKind::Output);
-          ed::PinPivotRect(outputsRect.GetCenter(), outputsRect.GetCenter());
-          ed::PinRect(outputsRect.GetTL(), outputsRect.GetBR());
-          ed::EndPin();
-          ed::PopStyleVar();
-
-          auto drawList = ImGui::GetWindowDrawList();
-          drawList->AddRectFilled(outputsRect.GetTL(), outputsRect.GetBR(),
-                                  IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                           (int)(255 * pinBackground.z), outputAlpha),
-                                  4.0f, 15);
-          drawList->AddRect(outputsRect.GetTL(), outputsRect.GetBR(),
-                            IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                     (int)(255 * pinBackground.z), outputAlpha),
-                            4.0f, 15);
-
-          if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
-            outputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
-        }
-
-        ImGui::EndHorizontal();
-      }
-
-      ImGui::EndVertical();
-
-      ed::EndNode();
-      ed::PopStyleVar(7);
-      ed::PopStyleColor(4);
-
-      auto drawList = ed::GetNodeBackgroundDrawList(node.ID);
-    }*/
-
-  // Making tree nodes
-  /*for (auto& node : s_Nodes)
-        {
-          if (node.Type != NodeType::Tree)
-            continue;
-
-          const float rounding = 5.0f;
-          const float padding = 12.0f;
-
-          const auto pinBackground = ed::GetStyle().Colors[ed::StyleColor_NodeBg];
-
-          ed::PushStyleColor(ed::StyleColor_NodeBg, ImColor(128, 128, 128, 200));
-          ed::PushStyleColor(ed::StyleColor_NodeBorder, ImColor(32, 32, 32, 200));
-          ed::PushStyleColor(ed::StyleColor_PinRect, ImColor(60, 180, 255, 150));
-          ed::PushStyleColor(ed::StyleColor_PinRectBorder, ImColor(60, 180, 255, 150));
-
-          ed::PushStyleVar(ed::StyleVar_NodePadding, ImVec4(0, 0, 0, 0));
-          ed::PushStyleVar(ed::StyleVar_NodeRounding, rounding);
-          ed::PushStyleVar(ed::StyleVar_SourceDirection, ImVec2(0.0f, 1.0f));
-          ed::PushStyleVar(ed::StyleVar_TargetDirection, ImVec2(0.0f, -1.0f));
-          ed::PushStyleVar(ed::StyleVar_LinkStrength, 0.0f);
-          ed::PushStyleVar(ed::StyleVar_PinBorderWidth, 1.0f);
-          ed::PushStyleVar(ed::StyleVar_PinRadius, 5.0f);
-          ed::BeginNode(node.ID);
-
-          ImGui::BeginVertical(node.ID.AsPointer());
-          ImGui::BeginHorizontal("inputs");
-          ImGui::Spring(0, padding * 2);
-
-          ImRect inputsRect;
-          int inputAlpha = 200;
-          if (!node.Inputs.empty())
-          {
-            auto& pin = node.Inputs[0];
-            ImGui::Dummy(ImVec2(0, padding));
-            ImGui::Spring(1, 0);
-            inputsRect = ImGui_GetItemRect();
-
-            ed::PushStyleVar(ed::StyleVar_PinArrowSize, 10.0f);
-            ed::PushStyleVar(ed::StyleVar_PinArrowWidth, 10.0f);
-            ed::PushStyleVar(ed::StyleVar_PinCorners, 12);
-            ed::BeginPin(pin.ID, ed::PinKind::Input);
-            ed::PinPivotRect(inputsRect.GetTL(), inputsRect.GetBR());
-            ed::PinRect(inputsRect.GetTL(), inputsRect.GetBR());
-            ed::EndPin();
-            ed::PopStyleVar(3);
-
-            if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
-              inputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
-          }
-          else
-            ImGui::Dummy(ImVec2(0, padding));
-
-          ImGui::Spring(0, padding * 2);
-          ImGui::EndHorizontal();
-
-          ImGui::BeginHorizontal("content_frame");
-          ImGui::Spring(1, padding);
-
-          ImGui::BeginVertical("content", ImVec2(0.0f, 0.0f));
-          ImGui::Dummy(ImVec2(160, 0));
-          ImGui::Spring(1);
-          ImGui::TextUnformatted(node.Name.c_str());
-          ImGui::Spring(1);
-          ImGui::EndVertical();
-          auto contentRect = ImGui_GetItemRect();
-
-          ImGui::Spring(1, padding);
-          ImGui::EndHorizontal();
-
-          ImGui::BeginHorizontal("outputs");
-          ImGui::Spring(0, padding * 2);
-
-          ImRect outputsRect;
-          int outputAlpha = 200;
-          if (!node.Outputs.empty())
-          {
-            auto& pin = node.Outputs[0];
-            ImGui::Dummy(ImVec2(0, padding));
-            ImGui::Spring(1, 0);
-            outputsRect = ImGui_GetItemRect();
-
-            ed::PushStyleVar(ed::StyleVar_PinCorners, 3);
-            ed::BeginPin(pin.ID, ed::PinKind::Output);
-            ed::PinPivotRect(outputsRect.GetTL(), outputsRect.GetBR());
-            ed::PinRect(outputsRect.GetTL(), outputsRect.GetBR());
-            ed::EndPin();
-            ed::PopStyleVar();
-
-            if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
-              outputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
-          }
-          else
-            ImGui::Dummy(ImVec2(0, padding));
-
-          ImGui::Spring(0, padding * 2);
-          ImGui::EndHorizontal();
-
-          ImGui::EndVertical();
-
-          ed::EndNode();
-          ed::PopStyleVar(7);
-          ed::PopStyleColor(4);
-
-          auto drawList = ed::GetNodeBackgroundDrawList(node.ID);
-
-          drawList->AddRectFilled(inputsRect.GetTL() + ImVec2(0, 1), inputsRect.GetBR(),
-                                  IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                           (int)(255 * pinBackground.z), inputAlpha),
-                                  4.0f, 12);
-          // ImGui::PushStyleVar(ImGuiStyleVar_AntiAliasFringeScale, 1.0f);
-          drawList->AddRect(inputsRect.GetTL() + ImVec2(0, 1), inputsRect.GetBR(),
-                            IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                     (int)(255 * pinBackground.z), inputAlpha),
-                            4.0f, 12);
-          // ImGui::PopStyleVar();
-          drawList->AddRectFilled(outputsRect.GetTL(), outputsRect.GetBR() - ImVec2(0, 1),
-                                  IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                           (int)(255 * pinBackground.z), outputAlpha),
-                                  4.0f, 3);
-          // ImGui::PushStyleVar(ImGuiStyleVar_AntiAliasFringeScale, 1.0f);
-          drawList->AddRect(outputsRect.GetTL(), outputsRect.GetBR() - ImVec2(0, 1),
-                            IM_COL32((int)(255 * pinBackground.x), (int)(255 * pinBackground.y),
-                                     (int)(255 * pinBackground.z), outputAlpha),
-                            4.0f, 3);
-          // ImGui::PopStyleVar();
-          drawList->AddRectFilled(contentRect.GetTL(), contentRect.GetBR(), IM_COL32(24, 64, 128, 200), 0.0f);
-          // ImGui::PushStyleVar(ImGuiStyleVar_AntiAliasFringeScale, 1.0f);
-          drawList->AddRect(contentRect.GetTL(), contentRect.GetBR(), IM_COL32(48, 128, 255, 100), 0.0f);
-          // ImGui::PopStyleVar();
-        }*/
-
-  // Make comment nodes
-  /*for (auto& node : s_Nodes)
-  {
-    if (node.Type != NodeType::Comment)
-      continue;
-
-    const float commentAlpha = 0.75f;
-
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, commentAlpha);
-    ed::PushStyleColor(ed::StyleColor_NodeBg, ImColor(255, 255, 255, 64));
-    ed::PushStyleColor(ed::StyleColor_NodeBorder, ImColor(255, 255, 255, 64));
-    ed::BeginNode(node.ID);
-    ImGui::PushID(node.ID.AsPointer());
-    ImGui::BeginVertical("content");
-    ImGui::BeginHorizontal("horizontal");
-    ImGui::Spring(1);
-    ImGui::TextUnformatted(node.Name.c_str());
-    ImGui::Spring(1);
-    ImGui::EndHorizontal();
-    ed::Group(node.Size);
-    ImGui::EndVertical();
-    ImGui::PopID();
-    ed::EndNode();
-    ed::PopStyleColor(2);
-    ImGui::PopStyleVar();
-
-    if (ed::BeginGroupHint(node.ID))
-    {
-      // auto alpha   = static_cast<int>(commentAlpha * ImGui::GetStyle().Alpha * 255);
-      auto bgAlpha = static_cast<int>(ImGui::GetStyle().Alpha * 255);
-
-      // ImGui::PushStyleVar(ImGuiStyleVar_Alpha, commentAlpha * ImGui::GetStyle().Alpha);
-
-      auto min = ed::GetGroupMin();
-      // auto max = ed::GetGroupMax();
-
-      ImGui::SetCursorScreenPos(min - ImVec2(-8, ImGui::GetTextLineHeightWithSpacing() + 4));
-      ImGui::BeginGroup();
-      ImGui::TextUnformatted(node.Name.c_str());
-      ImGui::EndGroup();
-
-      auto drawList = ed::GetHintBackgroundDrawList();
-
-      auto hintBounds = ImGui_GetItemRect();
-      auto hintFrameBounds = ImRect_Expanded(hintBounds, 8, 4);
-
-      drawList->AddRectFilled(hintFrameBounds.GetTL(), hintFrameBounds.GetBR(),
-                              IM_COL32(255, 255, 255, 64 * bgAlpha / 255), 4.0f);
-
-      drawList->AddRect(hintFrameBounds.GetTL(), hintFrameBounds.GetBR(),
-                        IM_COL32(255, 255, 255, 128 * bgAlpha / 255), 4.0f);
-
-      // ImGui::PopStyleVar();
     }
-    ed::EndGroupHint();
-  }*/
+    return nullptr;
 }
+
+void WorkspaceWindow::checkUserActions()
+{
+    if (ImGui::IsMouseClicked(1)) /* right button */
+    {
+        m_rightClickPosition = ImGui::GetMousePos();
+    }
+}
+
+void WorkspaceWindow::shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift)
+{
+    for(int i=0; i < nodesToShift.size(); i++)
+        {
+            coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(),
+                                                        m_workspaceCoreNodes.end(),
+                                                        [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const &node) -> bool { return node->getId() == nodesToShift.at(i)->getId(); });
+
+            if (ith_selected_node != m_workspaceCoreNodes.end())
+            {
+              std::iter_swap(m_workspaceCoreNodes.begin()+i, ith_selected_node);
+            }
+        }
+}
+
+void WorkspaceWindow::shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift)
+{
+    for(int i=0; i < nodesToShift.size(); i++)
+    {
+        coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(),
+                                                    m_workspaceCoreNodes.end(),
+                                                    [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const &node) -> bool { return node->getId() == nodesToShift.at(i)->getId(); });
+
+        if (ith_selected_node != m_workspaceCoreNodes.end())
+        {
+          std::iter_swap(m_workspaceCoreNodes.end()-1-i, ith_selected_node);
+        }
+    }
+}
+
+/* \todo JH not used now (with change in NodeEditor) - not work yet in all cases - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
+void WorkspaceWindow::shiftSelectedNodesToFront()
+{
+    if (ne::HasSelectionChanged())
+    {
+        shiftNodesToFront( getSelectedWorkspaceCoreNodes() );
+    }
+}
+
+
+void WorkspaceWindow::manipulatorStartCheck3D()
+{
+    Ptr<WorkspaceMatrix4x4> selectedWorkspaceMatrix4x4 = nullptr;
+    ne::NodeId selectedNodeID;
+
+    if (ne::HasSelectionChanged())
+    {
+        World* world2= Application::get().world2();
+
+        if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
+        {
+            selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
+        }
+
+        world2->handlesSetMatrix(&selectedWorkspaceMatrix4x4, nullptr);
+
+    }
+}
+
+std::vector<Ptr<WorkspaceSequence>> WorkspaceWindow::getSequenceNodes()
+{
+    std::vector<Ptr<WorkspaceSequence>> allSequenceNodes;
+    Ptr<WorkspaceNodeWithCoreData> temp;
+
+    for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+    {
+        temp = getWorkspaceCoreNodeByID(node->getId());
+        if (temp->isSequence())
+        {
+            allSequenceNodes.push_back(std::dynamic_pointer_cast<WorkspaceSequence>(temp));
+        }else if (temp->isCamera())
+        {
+            Ptr<WorkspaceCamera> temp_camera = std::dynamic_pointer_cast<WorkspaceCamera>(temp);
+            allSequenceNodes.push_back(temp_camera->getProjection());
+            allSequenceNodes.push_back(temp_camera->getView());
+        }
+    }
+
+    return allSequenceNodes;
+}
+
+Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByID(ne::NodeId const id)
+{
+    if (id)
+    {
+        for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+        {
+            if(node->getId() == id){ return node; }
+            else
+            {
+                if (node->isSequence())
+                {
+                    for(auto && inSequenceNode : std::dynamic_pointer_cast<WorkspaceSequence>(node)->getInnerWorkspaceNodes())
+                    {
+                        if(inSequenceNode->getId() == id){ return inSequenceNode; }
+                    }
+               }
+            }
+        }
+    }
+    return nullptr;
+}
+
+Ptr<WorkspaceNodeWithCoreData> WorkspaceWindow::getWorkspaceCoreNodeByPinID(ne::PinId const id)
+{
+    /* nodes in Sequence have no visible/usable pins */
+    if (id)
+    {
+        for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+        {
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getInputsProperties())
+            {
+                if (pin->getId() == id)
+                {
+                    return node;
+                }
+            }
+
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getOutputsProperties())
+            {
+                if (pin->getId() == id)
+                {
+                    return node;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+Ptr<WorkspaceCorePinProperties> WorkspaceWindow::getWorkspacePinPropertiesByID(ne::PinId const id)
+{
+    if (id)
+    {
+        for (Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes)
+        {
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getInputsProperties())
+            {
+                if (pin->getId() == id)
+                {
+                    return pin;
+                }
+            }
+
+            for (Ptr<WorkspaceCorePinProperties> const &pin : node->getOutputsProperties())
+            {
+                if (pin->getId() == id)
+                {
+                    return pin;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::getSelectedWorkspaceCoreNodes()
+{
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> allSelectedCoreNodes;
+    std::vector<ne::NodeId> allSelectedNodesIDs;
+    Ptr<WorkspaceNodeWithCoreData> temp;
+	//ne::SelectNode();
+    int numOfSelectedObjects = ne::GetSelectedObjectCount(); /* not Nodes only */
+
+    allSelectedNodesIDs.resize(numOfSelectedObjects);
+    int numOfSelectedNodes = ne::GetSelectedNodes(allSelectedNodesIDs.data(), numOfSelectedObjects);
+    allSelectedNodesIDs.shrink_to_fit();
+
+    allSelectedCoreNodes.reserve(numOfSelectedNodes);
+    for (auto nodeId : allSelectedNodesIDs)
+    {
+        temp = getWorkspaceCoreNodeByID(nodeId);
+        if (temp)
+        {
+            allSelectedCoreNodes.push_back(temp);
+        }
+    }
+    allSelectedCoreNodes.shrink_to_fit();
+
+    return allSelectedCoreNodes;
+}
+
+void WorkspaceWindow::showPopUpLabel(std::string label, ImColor color)
+{
+    const char* label_c = label.c_str();
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+    ImVec2 labelSize = ImGui::CalcTextSize(label_c);
+
+    ImVec2 padding = ImGui::GetStyle().FramePadding;
+    ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
+
+    ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+    ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
+    ImVec2 rectMax = ImGui::GetCursorScreenPos() + labelSize + padding;
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    drawList->AddRectFilled(rectMin, rectMax, color, labelSize.y * 0.15f); /* \todo JH remove constant here */
+    ImGui::TextUnformatted(label_c);
+}
+
+void WorkspaceWindow::checkQueryElementsCreating()
+{
+    if (ne::BeginCreate(ImColor(255, 255, 255), 2.0f))
+    {
+        checkQueryLinkCreate();
+        // checkQueryNewNode(); /* \todo JH not work well.. block other manipulations */
+    }
+    else
+    {
+        m_pinPropertiesForNewLink = nullptr;
+    }
+    ne::EndCreate();
+
+}
+
+void WorkspaceWindow::checkQueryElements()
+{
+    if (!m_createNewNode)
+    {
+        checkQueryElementsDeleting();
+        checkQueryElementsCreating();
+
+    }
+}
+
+void WorkspaceWindow::checkQueryLinkCreate()
+{
+    ne::PinId startPinId = 0, endPinId = 0;
+    if (ne::QueryNewLink(&startPinId, &endPinId))
+    {
+        Ptr<WorkspaceCorePinProperties> startPin = getWorkspacePinPropertiesByID(startPinId);
+        Ptr<WorkspaceCorePinProperties> endPin   = getWorkspacePinPropertiesByID(endPinId);
+
+        /* \todo JH comment where it is used */
+        m_pinPropertiesForNewLink = startPin ? startPin : endPin;
+
+        if ( startPin && endPin) /* \todo JH check kind in Core? */
+        {
+            if (startPin->getKind() == PinKind::Input)
+            {
+                std::swap(startPin, endPin);
+            }
+
+            switch (Core::GraphManager::isPlugCorrect(&(endPin->getCorePin()), &(startPin->getCorePin())))
+            {
+                case ENodePlugResult::Ok:
+                    showPopUpLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
+                    if (!ImGui::GetIO().MouseDown[0])
+                    {
+                        Core::GraphManager::plug(startPin->getNode().getNodebase(),
+                                                 endPin->getNode().getNodebase(),
+                                                 startPin->getIndex(),
+                                                 endPin->getIndex() );
+                    }
+                    break;
+                /* \todo JH react informatively to other result too */
+                default:
+                    showPopUpLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+
+            }
+        }
+    }
+
+}
+
+void WorkspaceWindow::checkQueryNodeCreate()
+{
+    ne::PinId pinId = 0;
+    if (ne::QueryNewNode(&pinId))
+    {
+        m_pinPropertiesForNewLink = getWorkspacePinPropertiesByID(pinId);
+        if (m_pinPropertiesForNewLink)
+        {
+            showPopUpLabel("+ Create Node", I3T::getColor(EColor::Nodes_CreateNode));
+        }
+
+        if (ne::AcceptNewItem())
+        {
+            m_createNewNode  = true;
+            m_pinPropertiesForNewNodeLink = m_pinPropertiesForNewLink;
+            m_pinPropertiesForNewLink = nullptr;
+
+            ne::Suspend();
+            ImGui::OpenPopup("Create New Node");
+            ne::Resume();
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryElementsDeleting()
+{
+    if (ne::BeginDelete())
+    {
+        checkQueryLinkDelete();
+        checkQueryNodeDelete();
+    }
+    ne::EndDelete();
+}
+
+void WorkspaceWindow::checkQueryLinkDelete()
+{
+    ne::LinkId linkId = 0;
+    while (ne::QueryDeletedLink(&linkId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            Ptr<WorkspaceCorePinProperties> inputPin = getWorkspacePinPropertiesByID(ne::PinId(linkId.Get())); /* link has same id as pin to which is connected as input */
+
+            Core::GraphManager::unplugInput(inputPin->getNode().getNodebase(), inputPin->getIndex());
+        }
+    }
+}
+
+void WorkspaceWindow::checkQueryNodeDelete()
+{
+    ne::NodeId nodeId = 0;
+    while (ne::QueryDeletedNode(&nodeId))
+    {
+        if (ne::AcceptDeletedItem())
+        {
+            NodeDelete(nodeId);
+        }
+    }
+}
+
+void WorkspaceWindow::NodeDelete(ne::NodeId const nodeId)
+{
+    coreNodeIter node_iter = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(), [nodeId](Ptr<WorkspaceNodeWithCoreData>& node) { return node->getId() == nodeId; });
+    if (node_iter != m_workspaceCoreNodes.end())
+    {
+        m_workspaceCoreNodes.erase(node_iter);
+    }
+
+}
+
+void WorkspaceWindow::selectAll(){
+	for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes){
+		ne::SelectNode(node->getId(), true);
+	}
+}
+void WorkspaceWindow::invertSelection(){
+	auto selected = m_ne_usable->GetSelectedObjects();
+	bool all = true;
+
+	for(Ptr<WorkspaceNodeWithCoreData> const &node : m_workspaceCoreNodes){
+
+		for(auto s : selected) {
+			try {
+				auto n = s->AsNode();
+				if(n->m_ID == node->getId()){
+					ne::DeselectNode(node->getId());
+					all = false;
+					break;
+				}
+			}
+			catch (...)
+			{
+				continue;
+			}
+		}
+
+		if(all){
+			ne::SelectNode(node->getId(), true);
+		}
+
+		all = true;
+	}
+}
+
+void WorkspaceWindow::UpdateTouchAllNodes()
+{
+	const auto deltaTime = ImGui::GetIO().DeltaTime;
+	for (auto&& workspaceNode : m_workspaceCoreNodes)
+	{
+		workspaceNode->UpdateTouch(deltaTime);
+	}
+}
+
+void WorkspaceWindow::checkQueryContextMenus()
+{
+    ne::Suspend();
+	if (ne::ShowBackgroundContextMenu())
+	{
+		ImGui::OpenPopup("Create New Node"); /* \todo JH take string from some constants file */
+	}
+	else if (ne::ShowNodeContextMenu(&m_contextNodeId))
+	{
+		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
+		if (node->fw.showMyPopup) {
+			ImGui::OpenPopup("float_context_menu");
+			node->fw.showMyPopup = false;
+		}else{
+			ImGui::OpenPopup("Node Context Menu");
+		}
+
+	}
+	ne::Resume();
+
+	ne::Suspend();
+
+	if (ImGui::BeginPopup("float_context_menu")) {
+		ImGui::Text("Set value...					");
+		ImGui::Separator();
+
+		ImGui::Columns(2, "floatPopupButtons", false);
+		if (ImGui::SmallButton("Radians"))
+			ImGui::OpenPopup("Radians");
+		ImGui::NextColumn();
+		if (ImGui::SmallButton("Degrees"))
+			ImGui::OpenPopup("Degrees");
+		ImGui::Columns(1);
+
+		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
+		float newValue;
+		bool valueChange = false;
+
+		if (ImGui::BeginPopup("Radians")) {
+
+			ImGui::Text("Set...                    ");
+			ImGui::Separator();
+			ImGui::Columns(2, "mycolumns2", false);  // 2-ways, no border
+
+			if (ImGui::Selectable("-PI/6")) {
+				newValue = -M_PI / 6;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/4")) {
+				newValue = -M_PI / 4;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/3")) {
+				newValue = -M_PI / 3;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI/2")) {
+				newValue = -M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-PI")) {
+				newValue = -M_PI;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-3PI/2")) {
+				newValue = -3 * M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-1")) {
+				newValue = -1.0f;
+				valueChange = true;
+			}
+			ImGui::NextColumn();
+
+			if (ImGui::Selectable("PI/6")) {
+				newValue = M_PI / 6;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/4")) {
+				newValue = M_PI / 4;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/3")) {
+				newValue = M_PI / 3;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI/2")) {
+				newValue = M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("PI")) {
+				newValue = M_PI;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("3PI/2")) {
+				newValue = -3 * M_PI / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("1")) {
+				newValue = 1.0f;
+				valueChange = true;
+			}
+
+			ImGui::Columns(1);
+
+			if (ImGui::Selectable("0")) {
+				newValue = 0.0f;
+				valueChange = true;
+			}
+
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopup("Degrees")) {
+
+			ImGui::Text("Set...                                    ");
+			ImGui::Separator();
+			ImGui::Columns(2, "mycolumns", false);
+			if (ImGui::Selectable("-1/2")) {
+				newValue = -1.0f / 2.0f;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-sqrt(2)/2")) {
+				newValue = -sqrt(2) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("-sqrt(3)/2")) {
+				newValue = -sqrt(3) / 2;
+				valueChange = true;
+			}
+      if (ImGui::Selectable("-2")) {
+        newValue = -2.0f;
+        valueChange = true;
+      }
+			if (ImGui::Selectable("-1")) {
+				newValue = -1.0f;
+				valueChange = true;
+			}
+
+			ImGui::NextColumn();
+
+			if (ImGui::Selectable("1/2")) {
+				newValue = 1.0f / 2.0f;;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("sqrt(3)/2")) {
+				newValue = sqrt(3) / 2;
+				valueChange = true;
+			}
+			if (ImGui::Selectable("sqrt(2)/2")) {
+				newValue = sqrt(2) / 2;
+				valueChange = true;
+			}
+      if (ImGui::Selectable("2")) {
+        newValue = 2.0f;
+        valueChange = true;
+      }
+			if (ImGui::Selectable("1")) {
+				newValue = 1.0f;
+				valueChange = true;
+			}
+			ImGui::Columns(1);
+			if (ImGui::Selectable("0")) {
+				newValue = 0.0f;
+				valueChange = true;
+			}
+			ImGui::EndPopup();
+		}
+
+
+		if (node->fw.name == "vector4" && valueChange) {
+			glm::vec4 data = node->getNodebase()->getData().getVec4();
+			data[node->fw.columns] = newValue;
+			node->getNodebase()->setValue(data);
+			valueChange = false;
+		}
+		else if (node->fw.name == "vector3" && valueChange) {
+			glm::vec3 data = node->m_nodebase->getData().getVec3();
+			data[node->fw.columns] = newValue;
+			node->m_nodebase->setValue(data);
+			valueChange = false;
+		}
+		else if (node->fw.name == "float" && valueChange) {
+			node->m_nodebase->setValue(newValue);
+			valueChange = false;
+		}
+		else if (node->fw.name == "matrix4x4" && valueChange) {
+			node->getNodebase()->setValue(newValue, { node->fw.columns, node->fw.rows });
+			valueChange = false;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopup("Node Context Menu") && !(ImGui::BeginPopup("float_context_menu"))) {
+
+        Ptr<WorkspaceNodeWithCoreData> context_node = getWorkspaceCoreNodeByID(m_contextNodeId);
+
+		if (context_node) {
+			ImGui::Text("ID: %p", m_contextNodeId.AsPointer());
+			ImGui::Separator();
+		}
+		else {
+			ImGui::Text("Unknown node: %p", m_contextNodeId.AsPointer());
+		}
+				if(context_node->isTransformation()){
+					context_node->drawMenuSetDataMap();
+				}
+        context_node->drawMenuLevelOfDetail();
+        context_node->drawMenuSetPrecision();
+
+        if (ImGui::MenuItem("Delete")) {
+            ne::DeleteNode(context_node->getId());
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopup("Create New Node"))
+	{
+		m_newNodePostion = m_rightClickPosition;
+
+		ImGui::Text("add...");
+		ImGui::Separator();
+		if (ImGui::BeginMenu("transformation")) {
+
+			ImGui::Text("add transforamtion");
+			ImGui::Separator();
+			if (ImGui::MenuItem("free")) {
+                m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTransformationFree>(m_headerBackgroundTexture));
+                ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+			}
+			if (ImGui::MenuItem("translation")) {
+                m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
+                ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+			}
+			if (ImGui::BeginMenu("rotation")) {
+
+				ImGui::Text("add rotation");
+				ImGui::Separator();
+				if (ImGui::MenuItem("eulerAngleX")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerX>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("eulerAngleY")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerY>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("eulerAngleZ")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerZ>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("rotate")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAxisAngle>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatRot>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+      if (ImGui::MenuItem("scale")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+      }
+			if (ImGui::MenuItem("lookAt")) {
+        m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceLookAt>(m_headerBackgroundTexture));
+        ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+			}
+			if (ImGui::BeginMenu("projection")) {
+
+				ImGui::Text("add projection");
+				ImGui::Separator();
+				if (ImGui::MenuItem("ortho")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceOrtho>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("perspective")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspacePerspective>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("frustrum")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFrustum>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("operator")) {
+
+			ImGui::Text("add operator");
+			ImGui::Separator();
+			if (ImGui::BeginMenu("transformation")) {
+
+				ImGui::Text("transformation operators");
+				ImGui::Separator();
+				if (ImGui::MenuItem("translate")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeTranslation>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("euler AngleX")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("euler AngleY")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("euler AngleZ")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("rotate")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeAxisAngle>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("scale")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeScale>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("ortho")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("perspective")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakePerspective>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("frustrum")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeFrustum>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("lookAt")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeLookAt>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("matrix")) {
+
+				ImGui::Text("matrix operators");
+				ImGui::Separator();
+				if (ImGui::MenuItem("matrix")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("trackball")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTrackball>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+        }
+				if (ImGui::MenuItem("inversion")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixInversion>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("transpose")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranspose>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("determinant")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceDeterminant>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixMulMatrix>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat + mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixAddMatrix>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat * vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulVector>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorMulMatrix>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float * mat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixMulFloat>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("vec3")) {
+
+				ImGui::Text("vec3 operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3Free>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("show vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceShowVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec3 x vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3CrossVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec3 . vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3DotVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec3 + vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3AddVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec3 - vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3SubVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float * vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3MulFloat>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("normalize vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("length(vec3)")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3Length>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mix vec3")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMixVector3>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("vec4")) {
+
+				ImGui::Text("vec4 operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceVectorFree>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 . vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorDotVector>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 + vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorAddVector>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 - vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorSubVector>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float * vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorMulFloat>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("normalize vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceNormalizeVector>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("perspective division")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorPerspectiveDivision>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mix vec4")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMixVector>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("quat")) {
+
+				ImGui::Text("quat operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatFree>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat(float, vec3)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatVecToQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat(angle, axis)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAngleAxisToQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat(vec3, vec3)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVecVecToQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat -> float, vec3")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToFloatVec>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat -> angle, axis")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToAngleAxis>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float * quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat * quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatMulQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat -> euler")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToEuler>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("euler -> quat")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerToQuat>(m_headerBackgroundTexture));
+                    ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("slerp")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatSlerp>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("long way slerp")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLongWaySlerp>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("lerp")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatLerp>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat conjugate")) {
+					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceConjQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("qvq*")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatVecConjQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("inverse quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatInverse>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("normalize quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceNormalizeQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("length(quat)")) {
+          m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceQuatLength>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("float")) {
+
+				ImGui::Text("float operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("float")) {
+					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceFloatFree>(m_headerBackgroundTexture));
+					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("clamp float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceClampFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float cycle")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceCycle>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+        }
+				if (ImGui::MenuItem("float * float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatMulFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float / float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatDivFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float + float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatAddFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("float ^ float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatPowFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mix float")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMixFloat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("sin & cos(float)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatSinCos>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("asin & acos(float)")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceASinACos>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("signum")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceSignum>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			if (ImGui::BeginMenu("conversion")) {
+
+				ImGui::Text("conversion operator");
+				ImGui::Separator();
+				if (ImGui::MenuItem("mat -> TR")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToTR>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("TR -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTRToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat -> vecs4")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToVectors>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat -> quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("mat -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vecs4 -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorsToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 -> vec3")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorToVector3>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec4 -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectorToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vecs3 -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVectors3ToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec3 -> vec4")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3ToVector>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("vec3 -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3ToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("quat -> floats")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatToFloats>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("floats -> mat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToMatrix>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("floats -> vec4")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToVector>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("floats -> vec3")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToVector3>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				if (ImGui::MenuItem("floats -> quat")) {
+          m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceFloatsToQuat>(m_headerBackgroundTexture));
+          ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				}
+				ImGui::EndMenu();
+
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::MenuItem("sequence")) {
+           m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>(m_headerBackgroundTexture));
+            ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+		}
+		if (ImGui::MenuItem("camera")) {
+            m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
+            ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+		}
+    if (ImGui::MenuItem("pulse")) {
+      m_workspaceCoreNodes.push_back(std::make_shared<WorkspacePulse>(m_headerBackgroundTexture));
+      ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+    }
+		if (ImGui::MenuItem("screen")) {
+			m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>(m_headerBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("selection")) {
+
+			ImGui::Text("selection");
+			ImGui::Separator();
+			if (ImGui::MenuItem("select all", "a")) {
+					selectAll();
+			}
+			if (ImGui::MenuItem("invert", "i")) {
+				 	invertSelection();
+			}
+			ImGui::EndMenu();
+
+		}
+		if (ImGui::BeginMenu("zoom")) {
+
+			ImGui::Text("zoom");
+			ImGui::Separator();
+			if (ImGui::MenuItem("to all", "s")) {
+				ne::NavigateToContent();
+			}
+			if (ImGui::MenuItem("to selection", "d")) {
+				ne::NavigateToSelection();
+			}
+			ImGui::EndMenu();
+
+		}
+
+		ImGui::EndPopup();
+	}
+
+	ne::Resume();
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

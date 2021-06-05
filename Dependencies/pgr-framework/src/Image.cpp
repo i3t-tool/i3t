@@ -52,14 +52,15 @@ bool loadTexImage2D(const std::string & fileName, GLenum target) {
    */
   bool result = false;
 
-  stbi_set_flip_vertically_on_load(true);
+  stbi_set_flip_vertically_on_load(false);
 
   int width, height, Bpp;
   unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &Bpp, STBI_rgb_alpha);
 
   if (data)
   {
-    glTexImage2D(target, 0, Bpp == 4 ? GL_RGBA : GL_RGB, width, height, 0, Bpp == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    //printf("%s,bpp %d\n",fileName.c_str(),Bpp);
+    glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     result = true;
   }
   else

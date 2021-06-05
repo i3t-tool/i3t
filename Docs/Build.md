@@ -5,7 +5,13 @@ Přehled podporovaných platform je uveden v [tabulce](../README.md) v souboru R
 Nejprve je nutno stáhnout zdrojový kód. Přepínač `--recursive` zajistí to, 
 že budou spolu s hlavním repozitářem staženy i git submoduly s knihovnami.
 ````shell script
-git clone --recursive https://gitlab.fel.cvut.cz/i3t-diplomky/i3t.git
+git clone --recursive https://gitlab.fel.cvut.cz/i3t-diplomky/i3t-bunny.git
+````
+
+## Instalace potřebných závislotí
+### Linux (aptitude)
+````shell
+apt install libgl-dev libglx-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev -y
 ````
 
 ## 2. CMake
@@ -21,6 +27,8 @@ mkdir out && cd out
 
 # Build in the directory MSVC project files.
 cmake -DCMAKE_BUILD_TYPE=Debug -A Win32 -G "Visual Studio 16 2019" ..
+# or for Code-Blocks projekt on Linux
+cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" ..
 ````
 Tento příklad spuštění CMake z příkazové řádky vygeneruje soubory projektu pro Visual 
  Studio 2019 v adresáři, ve kterém je CMake spuštěn, a to pro konfiguraci ``Debug | x86``.

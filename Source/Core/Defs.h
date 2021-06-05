@@ -12,6 +12,10 @@
 #include <string>
 #include <type_traits>
 
+#include "spdlog/formatter.h"
+
+constexpr const size_t MAX_PATH_LENGTH = 4096L;
+
 /// Inlining macro.
 #ifdef _MSC_VER
 #define FORCE_INLINE __forceinline
@@ -27,19 +31,18 @@
 #define FORCE_INLINE inline
 #endif
 
-static void i3tAssert(bool condition, std::string message, std::string file, unsigned line)
-{
-  if (!condition)
-    throw std::logic_error(std::string(file + ":" + std::to_string(line) + ": " + message).c_str());
-}
+#undef Assert /* \todo JH due to compile error */
 
-/// Debug assert macro.
-#ifdef _DEBUG
-#define I3T_DEBUG_ASSERT(...) i3tAssert(__VA_ARGS__, __FILE__, __LINE__);
-#define I3T_DEBUG
-#else
-#define I3T_DEBUG_ASSERT(...)
+namespace Debug
+{
+template <typename... Args> void Assert(bool condition, const std::string& message = "", Args&&... args)
+{
+#ifdef I3T_DEBUG
+	if (!condition)
+		throw std::logic_error(fmt::format(message, std::forward<Args>(args)...));
 #endif
+}
+} // namespace Debug
 
 /// Definition of more friendly shared_ptr usage.
 template <typename T> using Ptr = std::shared_ptr<T>;
@@ -48,5 +51,5 @@ template <typename T> using Ptr = std::shared_ptr<T>;
 template <typename T> using UPtr = std::unique_ptr<T>;
 
 #define COND_TO_DEG(x)                                                                                               \
-  (SetupForm::radians ? (x)                                                                                          \
-                      : glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
+	(SetupForm::radians ? (x)                                                                                          \
+	                    : glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees

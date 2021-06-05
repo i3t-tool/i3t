@@ -19,5 +19,4 @@ void main() {
 	vec3 finalColor = u_diffuseColor * (u_ambientColor + lightDiffuse);
 
 	fragColor = vec4(finalColor, 1.0);
-
 }

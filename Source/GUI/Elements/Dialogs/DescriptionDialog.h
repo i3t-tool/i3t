@@ -17,14 +17,14 @@
 class DescriptionDialog : public IWindow
 {
 public:
-  static constexpr const char id[] = "DescriptionDialog";
+	I3T_WINDOW(DescriptionDialog)
 
-  DescriptionDialog();
-  virtual void render() override;
+	DescriptionDialog();
+	virtual void render() override;
 
 private:
-  bool m_isEditState;
+	bool m_isEditState;
 
-  /// Description text has fixed length.
-  char m_descriptionText[8096] = "";
+	/// Description text has fixed length.
+	char m_descriptionText[8096] = "";
 };

@@ -1,5 +1,6 @@
-#include "common.h"
+#include "Common.h"
 #include <sys/timeb.h>
+//#include <sys/types.h>
 
 /**
  * \fn	long GetTime()
@@ -11,9 +12,11 @@
 
 long GetTime()
 {
-  static struct _timeb mtime;
-  _ftime64_s(&mtime);
-  return (long)(1000 * (1000 * mtime.time + mtime.millitm));
+	// static struct _timeb mtime;
+	static struct timeb mtime;
+	//_ftime64_s(&mtime);
+	ftime(&mtime);
+	return (long)(1000 * (1000 * mtime.time + mtime.millitm));
 }
 
 /**
@@ -26,9 +29,12 @@ long GetTime()
 
 long GetRealTime()
 {
-  static struct _timeb mtime;
-  _ftime64_s(&mtime);
-  return (long)(1000 * (1000 * mtime.time + mtime.millitm));
+	// static struct _timeb mtime;
+	static struct timeb mtime;
+
+	//_ftime64_s(&mtime);
+	ftime(&mtime);
+	return (long)(1000 * (1000 * mtime.time + mtime.millitm));
 }
 
 /**
@@ -44,8 +50,8 @@ long GetRealTime()
 
 float TimeDiff(long time1, long time2)
 {
-  // in ms
-  const float clk = 1.0e-3f; // ticks per second
-  long t = time2 - time1;
-  return ((t < 0) ? -t : t) * clk;
+	// in ms
+	const float clk = 1.0e-3f; // ticks per second
+	long t = time2 - time1;
+	return ((t < 0) ? -t : t) * clk;
 }

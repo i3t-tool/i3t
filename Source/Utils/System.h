@@ -13,3 +13,4 @@
  * \param sexe The command to run in the shell
  */
 void runShell(const char* sexe);
+//bool openFileDialog(char*filename,int bufsize);
