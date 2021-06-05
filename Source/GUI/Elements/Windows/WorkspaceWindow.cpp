@@ -584,7 +584,7 @@ void WorkspaceWindow::invertSelection(){
 					break;
 				}
 			}
-			catch (_exception)
+			catch (...)
 			{
 				continue;
 			}
