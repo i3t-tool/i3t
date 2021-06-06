@@ -153,8 +153,8 @@ bool Application::initI3T()
 	
 	// new scene scheme
 	bool b = World::init();//getchar(); printf("b\n");
-	m_world = World::loadDefaultScene();
-	m_world->tmpSetNode();//tmp - to be removed
+	m_world = new World();
+	m_world->onStart();
 	//getchar(); printf("c\n");
 	return b;
 }
@@ -169,7 +169,7 @@ UIModule* Application::getUI()
 	return m_ui;
 }
 
-World* Application::world2()
+World* Application::world()
 {
 	return m_world;
 }

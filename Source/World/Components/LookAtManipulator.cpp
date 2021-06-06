@@ -40,6 +40,7 @@ void LookAtManipulator::GUI() {
 	//sprintf(txt,"X: %0.3f, Y: %0.3f, Z: %0.3f",m_handlespace[3][0],m_handlespace[3][1],m_handlespace[3][2]);
 	//ManipulatorUtil::hintAt("jj",world2screen((glm::vec3)m_handlespace[3])-glm::vec2(0.0f,20.0f));
 	glm::vec2 pos=world2screen((glm::vec3)m_handlespace[3])-glm::vec2(90.0f,70.0f);
+	if(pos.y<-5.0f){return;}
 	ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
 
 	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();

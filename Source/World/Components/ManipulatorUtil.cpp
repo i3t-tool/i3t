@@ -29,12 +29,13 @@ void ManipulatorUtil::hint(const char* label) {
 	float offset=0.0f;
 	int mov=0;
 	while(label[mov]!=0){offset+=ImGui::GetTextLineHeight()*(float)(label[mov] == '\n');mov++;}
-	ImGui::SetCursorPos(ImVec2(10.0f, World::height + 10.0f-offset));
+	ImGui::SetCursorPos(ImVec2(10.0f, World::height + 5.0f-offset));
 	//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
 	ImGui::Text(label);
 	//ImGui::PopStyleColor();
 }
 void ManipulatorUtil::hintAt(const char* label,glm::vec2 pos) {
+	//if(pos.y>World::height){return;}
 	ImGui::SetCursorPos(ImVec2(pos.x,World::height-pos.y));
 	//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
 	//ImGui::

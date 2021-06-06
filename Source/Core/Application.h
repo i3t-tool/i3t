@@ -68,7 +68,7 @@ public:
 	 */
 	void run();
 
-	World* world2();
+	World* world();
 	GLFWwindow* mainWindow();
 
 	/**
