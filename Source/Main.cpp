@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
 		Config::loadFromFile(dcfg);
 	else
 	{
-		Config::loadFromFile(Config::getAbsolutePath("/cfg_default.dcfg"));
+		Config::loadFromFile(Config::getAbsolutePath("cfg_default.dcfg"));
 	}
 	///   - load the scene
 	/// \todo Load scene in App::initI3T().

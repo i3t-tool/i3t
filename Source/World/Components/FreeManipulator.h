@@ -13,6 +13,7 @@ public:
 	FreeManipulator();
 	void update();
 	void start();
+	void GUI();
 	void render(glm::mat4* parent, bool renderTransparent);
 	static const char* componentType() { return FreeManipulator::s_type; };
 	const char* getComponentType() { return FreeManipulator::s_type; };
@@ -23,7 +24,7 @@ public:
 private:
 	static const char* s_type;
 
-	int m_editmode=EDIT_ROTATION;
+	int m_editmode=EDIT_POSITION;
 	int m_editaxis=0;
 	GameObject*m_circleh,*m_arrowh,*m_planeh,*m_scaleh,*m_uniscaleh,*m_lineh;
 	char m_stencilx,m_stencily,m_stencilz,m_stencilzx,m_stencilzy,m_stencilyx,stencilxyz,m_stencilaxisx,m_stencilaxisy,m_stencilaxisz,m_stencilaxisw;

@@ -1,5 +1,8 @@
 #include "ManipulatorUtil.h"
 #include "../Select.h"
+#include "../World.h"
+
+#include "imgui.h"
 
 bool ManipulatorUtil::s_stencilInit=false;
 char ManipulatorUtil::s_stencilArr[7]={0};
@@ -21,4 +24,20 @@ int ManipulatorUtil::getStencil(char at){
 	}
 	if(at<0||at>7){return -1;}
 	return s_stencilArr[at];
+}
+void ManipulatorUtil::hint(const char* label) {
+	float offset=0.0f;
+	int mov=0;
+	while(label[mov]!=0){offset+=ImGui::GetTextLineHeight()*(float)(label[mov] == '\n');mov++;}
+	ImGui::SetCursorPos(ImVec2(10.0f, World::height + 10.0f-offset));
+	//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+	ImGui::Text(label);
+	//ImGui::PopStyleColor();
+}
+void ManipulatorUtil::hintAt(const char* label,glm::vec2 pos) {
+	ImGui::SetCursorPos(ImVec2(pos.x,World::height-pos.y));
+	//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+	//ImGui::
+	ImGui::Text(label);
+	//ImGui::PopStyleColor();
 }

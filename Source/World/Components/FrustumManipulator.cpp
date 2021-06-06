@@ -1,11 +1,14 @@
 #include "FrustumManipulator.h"
-#include "Core/Input/InputManager.h"
+#include "ManipulatorUtil.h"
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
 #include "Camera.h"
+
 #include "pgr.h"
-#include "ManipulatorUtil.h"
+#include "Core/Input/InputManager.h"
+#include "imgui.h"
+
 #include <typeinfo>
 
 const char* FrustumManipulator::s_type=nullptr;
@@ -30,6 +33,7 @@ FrustumManipulator::FrustumManipulator(){
 	m_frustruml->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	m_cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	m_cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
+	m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
 	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void FrustumManipulator::start(){}
@@ -39,15 +43,15 @@ void FrustumManipulator::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 projinv=glm::inverse(m_edited);;
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	//glm::mat4 transform=glm::mat4(1.0f);
-	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent);
+	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent,true);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
 	if(renderTransparent){
 		glUseProgram(World::shaderProj.program);
 		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
-		m_frustrum->draw(transform);
 		m_frustruml->draw(transform);
+		m_frustrum->draw(transform);
 		glEnable(GL_CULL_FACE);
 	}
 	else{
@@ -74,13 +78,11 @@ void FrustumManipulator::render(glm::mat4*parent,bool renderTransparent){
 			ManipulatorUtil::drawHandle(m_handle,transform,m_hposs[i]*m_hposs[i],m_stencils.arr[i],m_activehandle,m_hoverhandle);//hposs*hposs=absolute value
 		}
 
-		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
+		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[2]+=1.5f;
 		mov[2] = 1.5f;
 
-		m_cameraico->transformation[3]+=mov;
-		m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+		m_cameraico->transformation[3]=mov;
 		m_cameraico->draw(transform);
-		m_cameraico->transformation[3]-=mov;
 		glDepthRange(0.0, 1.0);
 	}
 }
@@ -101,6 +103,8 @@ void FrustumManipulator::update(){
 	}
 	if(InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
 		
+	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
+
 	if(m_activehandle==-1){return;}
 
 	if(InputManager::isKeyJustUp(Keys::esc)){}
@@ -115,8 +119,7 @@ void FrustumManipulator::update(){
 	p=			projinv*glm::vec4(0.0f,-1.0f,-1.0f,1.0f);	p/=p[3];	m_bottom=	p[1];
 	p=			projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);	p/=p[3];	m_near=		-p[2];
 	p=			projinv*glm::vec4(0.0f,0.0f,1.0f,1.0f);		p/=p[3];	m_far=		-p[2];
-	
-			
+
 	if(m_hposs[m_axisnum][2]==0.0f){//move side handles to middle - between far plane and near plane
 		glm::vec4 f=glm::vec4(m_hposs[m_axisnum][0],m_hposs[m_axisnum][1],1.0f,1.0f);
 		glm::vec4 n=glm::vec4(m_hposs[m_axisnum][0],m_hposs[m_axisnum][1],-1.0f,1.0f);
@@ -130,7 +133,7 @@ void FrustumManipulator::update(){
 	axis[3]=0.0f;
 	//glm::mat4 handlespace=getFullTransform(m_owner);//TMP
 	//glm::mat4 handlespace=glm::mat4(1.0f);
-	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent);
+	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent,true);
 			
 	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+handlespace*pos));//position of transformated object on the screen
 	glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen
@@ -146,16 +149,16 @@ void FrustumManipulator::update(){
 			
 	if(m_activehandle==m_stencils.names.n){
 		m_near-=dragfinal[0];
-		if(m_near<0.01f){m_near=0.01f;}
-		if(m_near>m_far-0.5f){m_near=m_far-0.5f;}
+		//if(m_near<0.01f){m_near=0.01f;}
+		//if(m_near>m_far-0.5f){m_near=m_far-0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.f){
 		m_far-=dragfinal[0];
-		if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
+		//if(m_far<m_near+0.5f){m_far=m_near+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.l){
 		m_left+=dragfinal[0];
-		if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
+		//if(m_left>m_right-0.5f){m_left=m_right-0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.r){
 		m_right+=dragfinal[0];
@@ -165,12 +168,12 @@ void FrustumManipulator::update(){
 		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 
 		m_top+=dragfinal[0];
-		if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
+		//if(m_top<m_bottom+0.5f){m_top=m_bottom+0.5f;}
 	}
 	else if(m_activehandle==m_stencils.names.b){
 		//printf("b\n");
 		m_bottom+=dragfinal[0];
-		if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
+		//if(m_bottom>m_top-0.5f){m_bottom=m_top-0.5f;}
 	}
 		//printf("%f\n",m_height);
 	//printf("%f\n",pheight);

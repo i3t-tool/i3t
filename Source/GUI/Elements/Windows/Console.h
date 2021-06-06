@@ -21,10 +21,10 @@ public:
 	~Console() override = default;
 	void render() override;
 
-private:
 	void onUpKey();
 	void onDownKey();
 
+private:
 	COutRedirect m_stdoutCapture;
 };
 } // namespace UI

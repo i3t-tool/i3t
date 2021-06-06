@@ -241,10 +241,13 @@ struct Config
 	 */
 	static std::string getAbsolutePath(const char* filename)
 	{
+		//Defined in compiler, still doesnt exist
+//#define I3T_RELEASE_STANDALONE
 #ifdef I3T_RELEASE_STANDALONE
     std::string path = std::string(filename);
 #else
 		// For debug purposes only.
+		//printf("wd %s\n",WORKING_DIRECTORY.c_str());
 		std::string path = WORKING_DIRECTORY;
 		if (filename[0]!='/') { path.append("/"); }
 		path.append(filename);

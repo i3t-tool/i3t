@@ -1,11 +1,13 @@
 #include "PerspectiveManipulator.h"
-#include "Core/Input/InputManager.h"
 #include "../HardcodedMeshes.h"
 #include "../Select.h"
 #include "../Transforms.h"
 #include "Camera.h"
-#include "pgr.h"
 #include "ManipulatorUtil.h"
+
+#include "pgr.h"
+#include "Core/Input/InputManager.h"
+#include "imgui.h"
 #include <typeinfo>
 
 const char* PerspectiveManipulator::s_type=nullptr;
@@ -30,6 +32,7 @@ PerspectiveManipulator::PerspectiveManipulator(){
 	m_frustruml->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	m_cameraico = new GameObject(cameraicoMesh, &World::shaderHandle, 0);
 	m_cameraico->rotate(glm::vec3(1.0f,0.0f,0.0f),-90.0f);
+	m_cameraico->color = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
 	m_handle = new GameObject(unitcubeMesh, &World::shaderHandle, 0);
 }
 void PerspectiveManipulator::start(){}
@@ -39,15 +42,15 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 	glm::mat4 projinv=glm::inverse(m_edited);;
 	//glm::mat4 transform=(*parent)*m_gameObject->transformation;//TMP
 	//glm::mat4 transform=glm::mat4(1.0f);
-	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent);
+	glm::mat4 transform=getNodeTransform(&m_editednode,&m_parent,true);
 	glm::vec4 pos=transform[3];transform=getRotation(transform,0);transform[3]=pos;
 
 	if(renderTransparent){
 		glUseProgram(World::shaderProj.program);
 		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE, glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
-		m_frustrum->draw(transform);
 		m_frustruml->draw(transform);
+		m_frustrum->draw(transform);
 		glEnable(GL_CULL_FACE);
 	}
 	else{
@@ -74,13 +77,11 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 			ManipulatorUtil::drawHandle(m_handle,transform,m_hposs[i]*m_hposs[i],m_stencils.arr[i],m_activehandle,m_hoverhandle);//hposs*hposs=absolute value
 		}
 
-		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[3]=0.0f;mov[2]+=1.5f;
+		glm::vec4 mov=projinv*glm::vec4(0.0f,0.0f,-1.0f,1.0f);mov/=mov[3];mov[2]+=1.5f;
 		mov[2] = 1.5f;
 
-		m_cameraico->transformation[3]+=mov;
-		m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+		m_cameraico->transformation[3]=mov;
 		m_cameraico->draw(transform);
-		m_cameraico->transformation[3]-=mov;
 		glDepthRange(0.0, 1.0);
 	}
 }
@@ -101,6 +102,8 @@ void PerspectiveManipulator::update(){
 	}
 	if(InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
 		
+	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
+
 	if(m_activehandle==-1){return;}
 
 	if(InputManager::isKeyJustUp(Keys::esc)){}
@@ -137,7 +140,7 @@ void PerspectiveManipulator::update(){
 	axis[3]=0.0f;
 	//glm::mat4 handlespace=getFullTransform(m_owner);//TMP
 	//glm::mat4 handlespace=glm::mat4(1.0f);
-	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent);
+	glm::mat4 handlespace=getNodeTransform(&m_editednode,&m_parent,true);
 			
 	glm::vec2 spos1=world2screen((glm::vec3)(handlespace[3]+handlespace*pos));//position of transformated object on the screen
 	glm::vec2 spos2=world2screen((glm::vec3)(handlespace[3]+handlespace*(pos+axis*axis)));//spos1,spos2 - project two points on screen - project axis on screen
@@ -151,57 +154,33 @@ void PerspectiveManipulator::update(){
 			
 	if(m_activehandle==m_stencils.names.n){
 		m_near-=dragfinal[0];
-		if(m_near<0.1f){m_near=0.1f;}
-		if(m_near>m_far-1.0f){m_near=m_far-1.0f;}
+		//if(m_near<0.1f){m_near=0.1f;}
+		//if(m_near>m_far-1.0f){m_near=m_far-1.0f;}
 	}
 	else if(m_activehandle==m_stencils.names.f){
 		m_far-=dragfinal[0]*2.0f;
-		if(m_far<m_near+1.0f){m_far=m_near+1.0f;}
+		//if(m_far<m_near+1.0f){m_far=m_near+1.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.l){
-		//printf("height %f\n",( m_far*tan(glm::radians(m_angle*0.5f)) ));
-		//printf("width %f\n",( m_far*tan(glm::radians(m_angle*0.5f)) )/( m_height/m_aspect ));
-		//printf("%f\n",glm::degrees(atan(1.0f)));
-		m_aspect+=-dragfinal[0]*0.09f;
-		if(m_aspect<0.1f){m_aspect=0.1f;}
-		else if(m_aspect>10.0f){m_aspect=10.0f;}
+	else if(m_activehandle==m_stencils.names.r|| m_activehandle == m_stencils.names.l){
+		float sign=(float)(m_activehandle==m_stencils.names.r)*2.0f-1.0f;
+		m_aspect+=sign*dragfinal[0]*0.12f;
+		//if(m_aspect<0.1f){m_aspect=0.1f;}
+		//else if(m_aspect>10.0f){m_aspect=10.0f;}
 	}
-	else if(m_activehandle==m_stencils.names.r){
-		m_aspect+=+dragfinal[0]*0.09f;
-		if(m_aspect<0.1f){m_aspect=0.1f;}
-		else if(m_aspect>10.0f){m_aspect=10.0f;}
-	}
-	else if(m_activehandle==m_stencils.names.t){
+	else if(m_activehandle==m_stencils.names.t||m_activehandle==m_stencils.names.b){
 		float sign=(float)(m_activehandle==m_stencils.names.t)*2.0f-1.0f;
 				
 		float amount=dragfinal[0]*5.0f*sign;
-		if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
-		else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
+		//if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
+		//else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
 					
 		float f=tan(glm::radians((m_angle+amount)*0.5f))/tan(glm::radians(m_angle*0.5f));
 
 		float f2=1.0f;
-		if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
-		else if(m_aspect>10.0f*f){f2=0.1f*(m_aspect);}
-		else{m_aspect/=f;m_angle+=amount;}
-		//if(f2!=1.0f){
-		amount=glm::degrees(atan(f2*tan(glm::radians(m_angle*0.5f))))*2.0f-m_angle;
-		m_aspect/=f2;
-		m_angle+=amount;
-		//}
-	}
-	else if(m_activehandle==m_stencils.names.b){
-		//printf("b\n");
-		float amount=-dragfinal[0]*5.0f;
-		if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
-		else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
-					
-		float f=tan(glm::radians((m_angle+amount)*0.5f))/tan(glm::radians(m_angle*0.5f));
-
-		float f2=1.0f;
-		if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
-		else if(m_aspect>10.0f*f){f2=0.1f*(m_aspect);}
-		else{m_aspect/=f;m_angle+=amount;}
+		//if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
+		//else if(m_aspect>10.0f*f){f2=0.1f*(m_aspect);}
+		//else{m_aspect/=f;m_angle+=amount;}
+		m_aspect/=f;m_angle+=amount;
 		//if(f2!=1.0f){
 		amount=glm::degrees(atan(f2*tan(glm::radians(m_angle*0.5f))))*2.0f-m_angle;
 		m_aspect/=f2;

@@ -9,13 +9,21 @@
 
 #include "pgr.h"
 
-
 class ManipulatorUtil
 {
 public:
 	static void drawHandle(GameObject*_handle,glm::mat4 space,glm::vec4 color,int stencil,int active,int hover);
+	/*
+	* \fn getstencil(char at)
+	* 
+	* Allows to share same stencil values for multiple users (wrapper around Select.cpp)
+	* \param[in] index in array of predefined stencils, length 7
+	* \return stencil value, or -1 if array out of index
+	* 
+	*/
 	static int getStencil(char at);
-
+	static void hint(const char*label);
+	static void hintAt(const char*label, glm::vec2 pos);
 private:
 	static bool s_stencilInit;
 	static char s_stencilArr[7];

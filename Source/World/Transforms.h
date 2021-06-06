@@ -21,8 +21,9 @@ glm::mat4 getNormalized(glm::mat4 transform);					///normalize first three vectr
 glm::mat4 getRotation(glm::mat4 transform, int referenceAxis);	///returns rotation part of matrix
 glm::vec3 getScale(glm::mat4 transform);						///returns length of first three columns taken as vec3
 glm::mat4 getFullTransform(GameObject* obj);
-glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent);
+glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>*node,const Ptr<Core::Sequence>*parent,bool invLookAt=false);
 glm::vec3 planeIntersect(glm::vec3 px,glm::vec3 py,glm::vec3 p0);///returns intersection point of nouse ray with given plane
+glm::mat4 getProjParams(glm::mat4 projinv,bool isPersp);
 void setLen(glm::vec3* vec, float len);
 float angle2(float x, float y);
 bool dirEqual(glm::vec3 v1,glm::vec3 v2,float bias = 0.00005f);

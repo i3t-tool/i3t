@@ -153,12 +153,14 @@ bool Application::initI3T()
 {
 	loadConfig();
 
-		// new scene scheme
-		bool b = World::init();
-		m_world = World::loadDefaultScene();
+	// new scene scheme
+	bool b = World::init();
+	m_world = World::loadDefaultScene();
 
-		return b;
+	// \todo DG - tmp - to be removed (m_world->tmpSetNode();)
+	m_world->tmpSetNode();
 
+	return b;
 }
 
 Application& Application::get()

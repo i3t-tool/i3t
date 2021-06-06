@@ -5,10 +5,18 @@
 
 #include "Config.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "Source/Core/Nodes/GraphManager.h"
 #include "Source/Core/Input/InputManager.h"
 
+#include <string.h>
+
 //#include "../Scripting/Scripting.h"
+std::shared_ptr<Core::NodeBase>World::tmpNode;
+Core::SequencePtr World::tmpSequence = Core::SequencePtr();
+Core::SequencePtr World::tmpSequence2 = Core::SequencePtr();
+
+float World::scroll=0.0f;
 
 glm::mat4 World::perspective = glm::mat4(1.0f);
 glm::mat4 World::mainCamera = glm::mat4(1.0f);
@@ -28,6 +36,9 @@ GLuint World::axisTexture=0;
 GLuint World::whiteTexture=0;
 
 World::World(){
+    if (!World::initializedRender) { printf("initialize render before creating World!\n"); }
+    this->started=false;
+
     TranslationManipulator* tm =    new TranslationManipulator();
     ScaleManipulator* sm =          new ScaleManipulator();
     LookAtManipulator*lm =          new LookAtManipulator();
@@ -65,52 +76,20 @@ World::World(){
     camera->transform(glm::vec3(0.0f, 5.0f, 10.0f),glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.0f, 0.0f, 0.0f),-30.0f);
     camera->addComponent(new Camera(60.0f, this->sceneRoot)); 
     camera->addComponent(new CameraControl());
+    this->camControl=(CameraControl*)camera->getComponent(CameraControl::componentType());
 
     this->sceneRoot->addChild(camera, false);
     this->sceneRoot->addChild(sceneHandles, false);
-
-    /*auto root = Builder::createSequence();
-    auto branch1 = Builder::createSequence();
-    auto branch2 = Builder::createSequence();
-
-    std::vector<Ptr<Core::NodeBase>> matrices = {
-        // sequence 1
-        Builder::createTransform<Core::EulerRotX>(),
-        Builder::createTransform<Core::Scale>(),
-        Builder::createTransform<Core::Translation>(),
-        // sequence 2
-        Builder::createTransform<Core::Scale>(),
-        Builder::createTransform<Core::Translation>(),
-        // sequence 3
-        Builder::createTransform<Core::Scale>(),
-        Builder::createTransform<Core::Translation>(),
-    };
-    ValueSetResult v = matrices[0].get()->setValue(3.14159f);
-    printf("ValueSetResult %d\n", v.status);
-
-    Core::GraphManager::plug(root, branch1, 0, 0);
-    Core::GraphManager::plug(root, branch2, 0, 0);
-
-    // Add matrices to the sequences.
-    root->addMatrix(matrices[0]); root->addMatrix(matrices[1]); root->addMatrix(matrices[2]);
-    branch1->addMatrix(matrices[3]); branch1->addMatrix(matrices[4]);
-    branch2->addMatrix(matrices[5]); branch2->addMatrix(matrices[6]);
-
-    // Create sequence�root path from "branch1" sequence to root sequence.
-    Core::SequenceTree tree(branch1);
-
-    glm::mat4 m = getNodeTransform(&(Ptr<Core::NodeBase>)matrices[4], &branch1);*/
-    //glm::mat4 m2=
 }
 
 bool World::init(){
-    World::shader0 =         loadShader(Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str());
-    World::shaderHandle =    loadShader(Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str());
+    World::shader0 =         loadShader(Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str()); 
+    World::shaderHandle =    loadShader(Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str()); 
     World::shaderProj =      loadShader(Config::getAbsolutePath("Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("Data/shaders/viewproj-fs.glsl").c_str());
 
     if (World::shader0.program * World::shaderHandle.program *World::shaderProj.program * World::shaderProj.program == 0){
-        getchar();printf("World::init():cannot load shaders\n");return false;
-    }//World::shaderHandle=World::shader0;
+        printf("World::init():cannot load shaders\n");return false;
+    }
 
     World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
     World::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png"));
@@ -135,36 +114,31 @@ void World::end() {
 World* World::loadDefaultScene(){
     if (!World::initializedRender){printf("initialize render before creating World!\n");return nullptr;}
     GLuint renderTexture;
-    RenderTexture* rend;
+    RenderTexture* rend =     new RenderTexture(&renderTexture,256,256);
 
-    GameObject *objhandles, *camhandles, *lookat, *testparent, *testchild;
+    GameObject* objhandles =  new GameObject(unitcubeMesh,    &World::shader0, World::cubeTexture);
+    GameObject* screen =      new GameObject(unitquadMesh,    &World::shader0, renderTexture);
+    GameObject* camhandles =  new GameObject(unitcubeMesh,    &World::shader0, 0);
 
-    rend =        new RenderTexture(&renderTexture,256,256);
-
-    objhandles =  new GameObject(unitcubeMesh,    &World::shader0, World::cubeTexture);
-    lookat =      new GameObject(unitquadMesh,    &World::shader0, renderTexture);
-    camhandles =  new GameObject(unitcubeMesh,    &World::shader0, 0);
-    testchild =   new GameObject(unitcubeMesh,    &World::shader0, World::cubeColorTexture);
-    testparent =  new GameObject(three_axisMesh,  &World::shader0, World::axisTexture);          testparent->color = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
-
-    camhandles->transform(     glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
-    objhandles->transform(     glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),        glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);//objhandles->transformation[0][3]=1.0f;
-    lookat->transform(         glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(2.0f, 2.0f, 0.4f),        glm::vec3(0.0f, 1.0f, 0.0f), 225.0f);
-    testparent->transform(     glm::vec3(2.0f, 1.0f,-3.0f),    glm::vec3(1.0f, 1.0f, 0.5f),        glm::vec3(0.0f, 1.0f, 0.0f),45.0f);//testparent->transformation[0][1]=0.5f;
-    testchild->transform(      glm::vec3(0.0f, 6.0f,-8.0f),    glm::vec3(2.5f, 2.5f, 1.5f),        glm::vec3(0.0f, 0.0f, 1.0f),5.0f);
+    camhandles->transform(  glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
+    objhandles->transform(  glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);//objhandles->transformation[0][3]=1.0f;
+    screen->transform(      glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(4.0f, 4.0f, 0.4f),    glm::vec3(0.0f, 1.0f, 0.0f), 225.0f);
 
     World* w = new World();
 
-    w->sceneRoot->addComponent(new TransformHandles(objhandles));
-    w->sceneRoot->addChild(testchild, false);        testchild->addComponent(new Renderer());
-    w->sceneRoot->addChild(testparent, false);       testparent->addComponent(new Renderer(Renderer::DRAW_LINES));
-        testparent->addChild(objhandles, true);         objhandles->addComponent(new Renderer(Renderer::USE_STENCIL));
-            objhandles->addChild(camhandles, true);         camhandles->addComponent(new CameraHandles());
-                                                            camhandles->addComponent(new Camera(60.0f, w->sceneRoot, rend));
-    w->sceneRoot->addChild(lookat, false);           lookat->addComponent(new Renderer());
+    w->sceneRoot->addChild(objhandles, false);       objhandles->addComponent(new Renderer());
+                                                     objhandles->addComponent(new TmpTransform());
+    w->sceneRoot->addChild(camhandles, true);        camhandles->addComponent(new TmpCamera());
+                                                     camhandles->addComponent(new Camera(60.0f, w->sceneRoot, rend));
+    w->sceneRoot->addChild(screen, false);           screen->addComponent(new Renderer());
 
     w->onStart();
     return w;
+
+}
+void GUIRecursive(GameObject* root) {
+    for (int i = 0; i < root->children.size(); i++) { GUIRecursive(root->children[i]); }
+    for (int i = 0; i < root->components.size(); i++) { if (root->components[i]->m_isActive) { root->components[i]->GUI(); } }
 }
 void updateRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){updateRecursive(root->children[i]);}
@@ -175,33 +149,29 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
-Ptr<Core::NodeBase>op;
+void World::sceneSetView(glm::vec3 dir, bool world) {
+    this->camControl->setRotation(dir,world);
+}
 void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;
         //*(i->second.editedNode)=nullptr;
     }
-
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
-    WorkspaceNodeWithCoreData*  nodebasedata= (WorkspaceNodeWithCoreData*)(matnode->get()); 
-    Ptr<Core::NodeBase>	        nodebase    = nodebasedata->getNodebase();
+    Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
 
-    //nodebase    = &op;
-    op=nodebase;//tmp
+    tmpNode=nodebase;//tmp
 
-    WorkspaceNode*              node        = (WorkspaceNode*)nodebasedata; 
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
     
-    printf("nodebase 0x%p ", &nodebase); printf("get 0x%p\n", nodebase.get());
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         m.component->m_isActive=true;
-        Ptr<Core::NodeBase> nodebase2 = nodebasedata->getNodebase();
-        *m.editedNode=nodebase2;
+        *m.editedNode=nodebase;
     }
     else{printf("No manipulators\n"); }
 
@@ -209,16 +179,16 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
 
 }
 void World::tmpDrawNode() {//this tends to cause crash
-    return;
-	if(op.get()==nullptr){op= Core::Builder::createTransform<Core::EulerRotX>();}
-	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(op.get());
-    const Operation* operation = nodebasedata->getNodebase()->getOperation();
-    const Core::Transform::DataMap* coreMap = op->getDataMap();
+	if(tmpNode.get()==nullptr){return;}
+	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(tmpNode.get());
+    //if (nodebasedata->getNodebase().get() == nullptr) { return; }
+    const Operation* operation = tmpNode->getOperation();
+    const Core::Transform::DataMap* coreMap = tmpNode->getDataMap();
 	glm::mat4 coreData = glm::mat4(1.0f);
     //const std::string s= operation->keyWord;
     
     //if(strcmp(s.c_str(), "Quat") != 0){
-        const glm::mat4& cp = op->getData().getMat4();
+        const glm::mat4& cp = tmpNode->getData().getMat4();
         coreData=cp;
     //}
     //printf("type %d\n",nodebasedata->getNodebase()->getData().getOpValType());
@@ -240,7 +210,7 @@ void World::tmpDrawNode() {//this tends to cause crash
 			ImGui::SameLine();
 			label[0]='a'+ columns * 4 + rows;
 			if(ImGui::DragFloat(label, &localData, 0.02f, 0.0f, 0.0f, fmt::format("% .{}f", 3).c_str(), 1.0f)){
-				ValueSetResult vsr=op->setValue(localData, { columns, rows });
+				ValueSetResult vsr=tmpNode->setValue(localData, { columns, rows });
 			}
 
 			if (inactive){ImGui::PopItemFlag();ImGui::PopStyleVar();}
@@ -249,54 +219,118 @@ void World::tmpDrawNode() {//this tends to cause crash
 	}
 	ImGui::PopItemWidth();
 
-	// Don't End here, it should be in same function as Begin (Viewport::render).
-  // ImGui::End();
 }
+
+Ptr<Core::OrthoProj> tmportho= Core::Builder::createTransform<Core::OrthoProj>();
+Ptr<Core::PerspectiveProj> tmpproj= Core::Builder::createTransform<Core::PerspectiveProj>();
+Ptr<Core::Frustum> tmpfrustrum= Core::Builder::createTransform<Core::Frustum>();
+
 void World::tmpSetNode() {
-    if(InputManager::isKeyPressed(Keys::x))     {op=Core::Builder::createTransform<Core::EulerRotX>();}
-    else if(InputManager::isKeyPressed(Keys::y)){op=Core::Builder::createTransform<Core::EulerRotY>();}
-    else if(InputManager::isKeyPressed(Keys::z)){op=Core::Builder::createTransform<Core::EulerRotZ>();}
-    else if(InputManager::isKeyPressed(Keys::w)){op=Core::Builder::createTransform<Core::AxisAngleRot>();}
-    //else if(InputManager::isKeyPressed(Keys::q)){op=Core::Builder::createTransform<Core::QuatRot>();}
-    else if(InputManager::isKeyPressed(Keys::s)){op=Core::Builder::createTransform<Core::Scale>();op->setDataMap(&Core::Transform::g_Scale);}
-    else if(InputManager::isKeyPressed(Keys::t)){op=Core::Builder::createTransform<Core::Translation>();}
-    else if(InputManager::isKeyPressed(Keys::o)){op=Core::Builder::createTransform<Core::OrthoProj>();}
-    else if(InputManager::isKeyPressed(Keys::p)){op=Core::Builder::createTransform<Core::PerspectiveProj>();}
-    else if(InputManager::isKeyPressed(Keys::f)){op=Core::Builder::createTransform<Core::Frustum>();}
-    else if(InputManager::isKeyPressed(Keys::g)){op=Core::Builder::createTransform<Core::Free>();}
-    else if(InputManager::isKeyPressed(Keys::l)){op=Core::Builder::createTransform<Core::LookAt>();((Core::LookAt*)op.get())->setEye(glm::vec3(0.0f));((Core::LookAt*)op.get())->setCenter(glm::vec3(2.0f));}
-    else if(op.get()==nullptr){op=Core::Builder::createTransform<Core::EulerRotX>();}
+    if(tmpSequence.get()==nullptr){
+        tmpSequence = Core::Builder::createSequence();
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::Translation>());
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::EulerRotX>());
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::EulerRotY>());
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::EulerRotZ>());
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::AxisAngleRot>());
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::Scale>());
+        tmpSequence->addMatrix(Core::Builder::createTransform<Core::Free>());
+
+        ((Core::AxisAngleRot*)tmpSequence->getMatrices().at(4).get())->setAxis(glm::vec3(0.0f,1.0f,0.0f));
+        ((Core::AxisAngleRot*)tmpSequence->getMatrices().at(4).get())->setRot(0);
+
+        tmpNode = tmpSequence->getMatrices().at(0);
+        
+        //WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(tmpNode.get());
+        //Core::NodePtr nb= nodebasedata->getNodebase();printf("%p\n",nb.get());
+        //const Operation* operation = nodebasedata->getNodebase()->getOperation();
+        //printf("tmp from builder\n");
+    }
+    if (tmpSequence2.get() == nullptr) {
+        tmpSequence2 = Core::Builder::createSequence();
+        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::Translation>());
+        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::LookAt>());
+        tmpSequence2->addMatrix(tmportho);
+
+        //((Core::Translation*)tmpSequence2->getMatrices().at(0).get())->setX(2.0f);
+        //((Core::EulerRotX*)tmpSequence2->getMatrices().at(0).get())->setValue(1.0f);
+        ((Core::LookAt*)tmpSequence2->getMatrices().at(1).get())->setEye(glm::vec3(0.0f));
+        ((Core::LookAt*)tmpSequence2->getMatrices().at(1).get())->setCenter(glm::vec3(0.0f,0.0f,-1.0f));
+    }
+
+    if(InputManager::isKeyPressed(Keys::t))     {tmpNode=tmpSequence->getMatrices().at(0);}
+    else if(InputManager::isKeyPressed(Keys::x)){tmpNode=tmpSequence->getMatrices().at(1);}
+    else if(InputManager::isKeyPressed(Keys::y)){tmpNode=tmpSequence->getMatrices().at(2);}
+    else if(InputManager::isKeyPressed(Keys::z)){tmpNode=tmpSequence->getMatrices().at(3);}
+    else if(InputManager::isKeyPressed(Keys::w)){tmpNode=tmpSequence->getMatrices().at(4);}
+    //else if(InputManager::isKeyPressed(Keys::q)){tmpNode=Core::Builder::createTransform<Core::QuatRot>();}
+    else if(InputManager::isKeyPressed(Keys::s)){tmpNode=tmpSequence->getMatrices().at(5);tmpNode->setDataMap(&Core::Transform::g_Scale);}
+    else if(InputManager::isKeyPressed(Keys::g)){tmpNode=tmpSequence->getMatrices().at(6);}
+    
+
+    else if(InputManager::isKeyPressed(Keys::o)){
+        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
+        tmpSequence2->addMatrix(tmportho);
+        tmpNode=tmpSequence2->getMatrices().at(2);
+    }
+    else if(InputManager::isKeyPressed(Keys::p)){
+        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
+        tmpSequence2->addMatrix(tmpproj);
+        tmpNode=tmpSequence2->getMatrices().at(2);
+    }
+    else if(InputManager::isKeyPressed(Keys::f)){
+        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
+        tmpSequence2->addMatrix(tmpfrustrum);
+        tmpNode=tmpSequence2->getMatrices().at(2);
+    }
+    
+    else if(InputManager::isKeyPressed(Keys::l)){tmpNode=tmpSequence2->getMatrices().at(1);}
+    else if (tmpNode.get() == nullptr){tmpNode=tmpSequence->getMatrices().at(5);}
 
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
         i->second.component->m_isActive=false;
-        //*(i->second.editedNode)=nullptr;
+        *(i->second.editedNode)=nullptr;
     }
 
-	const char*keyword=op->getOperation()->keyWord.c_str();
+	const char*keyword=tmpNode->getOperation()->keyWord.c_str();
 
     if(this->manipulators.count(keyword)==1){
         Manipulator m=this->manipulators[keyword];
         m.component->m_isActive=true;
-        *m.editedNode=op;
+        *m.editedNode=tmpNode;
+        *m.parent=tmpSequence;
+        if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Frustum")==0||strcmp(keyword,"Perspective")==0||strcmp("LookAt",keyword)==0){*m.parent=tmpSequence2;}
     }
     else{
         printf("no manipulators\n");
     }
-    //printf("fff\n");
 }
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
+    bool lines=false;
     if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeTexture);}
     else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeColorTexture); }
     else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World::shader0,World::cGridTexture); }
     else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World::shader0,World::axisTexture); }
-    if(g!=nullptr){this->sceneRoot->addChild(g,true);}
+    else if (strstr("Grid", name) == name) {
+        g = new GameObject(gridMesh, &World::shader0, 0);
+        g->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        g->scale(glm::vec3(0.125f));
+        lines = true;
+        if(strcmp("GridXY",name)==0)       {g->rotate(glm::vec3(1.0f,0.0f,0.0f),90.0f);}
+        else if(strcmp("GridYZ",name)==0)  {g->rotate(glm::vec3(0.0f,0.0f,1.0f),90.0f);}
+    }
+    if(g!=nullptr){
+        g->addComponent(new Renderer(Renderer::DRAW_LINES*lines));
+        this->sceneRoot->addChild(g,true);
+    }
     return g;
 }
 bool World::removeModel(GameObject*g) {
     return this->sceneRoot->rmChild(g,true);
 }
 void World::onStart(){
+    this->started=true;
     startRecursive(this->sceneRoot);
 }
 void World::onUpdate(){
@@ -305,9 +339,16 @@ void World::onUpdate(){
     //printf("%f %f %f %f\n", viewport[0], viewport[1], viewport[2], viewport[3]);
     World::width = viewport[2];
     World::height= viewport[3];
+    if(!this->started){ printf("World:call start() before update()!\n"); return;}
     updateRecursive(this->sceneRoot);
 
+    scroll*=0.85f;
+    if(scroll*scroll<0.0005f){scroll=0.0f;}
+
     CHECK_GL_ERROR();
+}
+void World::onGUI(){
+    GUIRecursive(this->sceneRoot);
 }
 Shader World::loadShader(const char* vs_name, const char* fs_name){
     Shader shader = {0,0,0,0,0,0,0,0,0};

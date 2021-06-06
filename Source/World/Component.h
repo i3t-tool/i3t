@@ -19,6 +19,7 @@ class Component
 public:
   virtual void start();
   virtual void update();
+  virtual void GUI();
   virtual void render(glm::mat4* parent, bool renderTransparent);
   virtual const char* getComponentType();
 
