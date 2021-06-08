@@ -115,8 +115,6 @@ public:
 		return false;
 	}
 
-private:
-	/// \todo MH Is there any need for this function?
 	template <typename T> static bool isActive()
 	{
 		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");

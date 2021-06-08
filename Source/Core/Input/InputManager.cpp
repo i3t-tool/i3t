@@ -151,9 +151,6 @@ void InputManager::processViewportEvents()
 
 void InputManager::beginCameraControl()
 {
-	// Do camera control only when Viewport windows is active.
-	if (!isActive<UI::Viewport>()) return;
-
 	// Disable system cursor. The cursor will be hidden and at the endCameraControl the cursor will
 	// be at the same position.
 	glfwSetInputMode(getCurrentViewport(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);

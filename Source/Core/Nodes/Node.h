@@ -271,7 +271,7 @@ public:
 	void spreadSignal();
 
 	/// Spread signal to the selected output \a outIndex only.
-	void spreadSignal(int outIndex);
+	void spreadSignal(size_t outIndex);
 
 	/**
 	 * Implements the operator reaction to the change of its \a inputIndex input.

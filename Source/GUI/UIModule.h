@@ -23,7 +23,7 @@ template <typename T> constexpr inline void checkWindowType()
 inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& dockableWindows)
 {
 	Ptr<IWindow> result = nullptr;
-	for (auto w : dockableWindows)
+	for (const auto& w : dockableWindows)
 		if (strcmp(w->getID(), ID) == 0)
 			result = w;
 

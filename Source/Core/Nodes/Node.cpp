@@ -88,7 +88,7 @@ void NodeBase::spreadSignal()
 	}
 }
 
-void NodeBase::spreadSignal(int outIndex)
+void NodeBase::spreadSignal(size_t outIndex)
 {
 	if (getOutputPinsRef().empty())
 		return;
