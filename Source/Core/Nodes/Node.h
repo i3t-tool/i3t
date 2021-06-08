@@ -300,8 +300,8 @@ protected:
 
 private:
 	void unplugAll();
-	void unplugInput(int index);
-	void unplugOutput(int index);
+	void unplugInput(size_t  index);
+	void unplugOutput(size_t  index);
 };
 
 using Node = NodeBase;

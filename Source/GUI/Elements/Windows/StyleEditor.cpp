@@ -6,15 +6,19 @@
 #include "GUI/Shortcuts.h"
 #include "Loader/ThemeLoader.h"
 
+using namespace UI;
+
+constexpr float DRAG_FLOAT_WIDTH = 100.0f;
+
 void StyleEditor::render()
 {
-	ImGui::Begin(getID(), getShowPtr());
+	ImGui::Begin(getID(), getShowPtr(), g_dialogFlags);
 
 	auto& curr = I3T::getTheme();
 
-
 	// Theme selector
 	static int currentThemeIdx = 0;
+	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
 	if (ImGui::BeginCombo("Themes", curr.getName().c_str()))
 	{
 		for (size_t n = 0; n < I3T::getThemes().size(); ++n)
@@ -72,43 +76,78 @@ void StyleEditor::render()
 	}
 
 
-	GUI::Text("Colors", EFont::TitleSmall);
-  ImGui::Separator();
+	showColors(curr);
+	ImGui::Separator();
 
-	for (auto& [key, str] : curr.getColorNames())
-  {
+	showDimensions(curr);
+
+	ImGui::End();
+}
+
+void UI::showColors(Theme& curr)
+{
+	GUI::Text("Colors", EFont::Header);
+	ImGui::Separator();
+
+	std::string lastCat;
+
+	for (auto& [key, str] : Theme::getColorNames())
+	{
+		std::string currCat(str, I3T_PROPERTY_NAME_OFFSET);
+		if (currCat != lastCat)
+		{
+			ImGui::TextUnformatted(Theme::getCategoryName(currCat));
+			lastCat = currCat;
+		}
+
 		auto& color = curr.getColorsRef()[key];
-		if (ImGui::ColorEdit4(str, (float*)(&color)))
+		ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
+		if (ImGui::ColorEdit4(str + I3T_PROPERTY_NAME_OFFSET, (float*)(&color)))
+		{
+			curr.apply();
+		}
+	}
+}
+
+void UI::showDimensions(Theme& curr)
+{
+	GUI::Text("Dimensions", EFont::Header);
+	ImGui::Separator();
+
+	std::string lastCat;
+
+	for (auto& [key, str] : Theme::getSizeNames())
+	{
+		std::string currCat(str, I3T_PROPERTY_NAME_OFFSET);
+		if (currCat != lastCat)
+		{
+			ImGui::TextUnformatted(Theme::getCategoryName(currCat));
+			lastCat = currCat;
+		}
+
+		auto& val = curr.getSizesRef()[key];
+		ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
+		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, 0.0f, "%.0f"))
 		{
 			curr.apply();
 		}
 	}
 	ImGui::Separator();
 
-	GUI::Text("Dimensions", EFont::TitleSmall);
-	ImGui::Separator();
-
-	for (auto& [key, val] : curr.getSizesRef())
+	for (auto& [key, str] : Theme::getSizeVecNames())
 	{
-		if (auto* str = enumToStr(Theme::getSizeNames(), key))
+		std::string currCat(str, I3T_PROPERTY_NAME_OFFSET);
+		if (currCat != lastCat)
 		{
-			if (ImGui::DragFloat(str, &val, 1.0f, 0.0f, 0.0f, "%.0f"))
-			{
-				curr.apply();
-			}
+			ImGui::TextUnformatted(Theme::getCategoryName(currCat));
+			lastCat = currCat;
+		}
+
+		auto& val = curr.getSizesVecRef()[key];
+		ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
+		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f, 0.0f, "%.0f"))
+		{
+			curr.apply();
 		}
 	}
-
-	for (auto& [key, val] : curr.getSizesVecRef())
-	{
-		if (auto* str = enumToStr(Theme::getSizeVecNames(), key))
-		{
-			if (ImGui::DragFloat2(str, &val[0], 1.0f, 0.0f, 0.0f, "%.0f"))
-			{
-				curr.apply();
-			}
-		}
-	}
-
-	ImGui::End();
 }

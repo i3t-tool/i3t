@@ -281,7 +281,7 @@ void UIModule::buildDockspace()
 	}
 	else
 	{
-		// exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 }
 

@@ -477,7 +477,7 @@ ValueSetResult EulerRotZ::setValue(float val, glm::ivec2 coords)
 void EulerRotZ::reset()
 {
 	setDataMap(m_initialMap);
-	setValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
+	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
 }
 
 //===-- Translation -------------------------------------------------------===//

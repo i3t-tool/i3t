@@ -203,7 +203,7 @@ void NodeBase::unplugAll()
 	}
 }
 
-void NodeBase::unplugInput(int index)
+void NodeBase::unplugInput(size_t index)
 {
 	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
 	              "The node's input pin that you want to unplug does not exists.");
@@ -231,7 +231,7 @@ void NodeBase::unplugInput(int index)
 	}
 }
 
-void NodeBase::unplugOutput(int index)
+void NodeBase::unplugOutput(size_t index)
 {
 	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
 	              "The node's output pin that you want to unplug does not exists.");

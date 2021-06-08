@@ -5,8 +5,9 @@
 #include "Config.h"
 #include "Core/API.h"
 
-static std::map<EColor, const char*> g_ColorNames;
-static std::map<ESize, const char*> g_SizeNames;
+static Theme::CategoryNames							g_CategoryNames;
+static std::map<EColor, const char*>		g_ColorNames;
+static std::map<ESize, const char*>			g_SizeNames;
 static std::map<ESizeVec2, const char*> g_SizeVecNames;
 
 Theme Theme::createDefault()
@@ -20,13 +21,9 @@ Theme Theme::createDefault()
 	return theme;
 }
 
-Theme::Theme()
-{
-	initDefaultProperties();
-}
+Theme::Theme() { initDefaultProperties(); }
 
-Theme::Theme(std::string name, const Theme::Colors& colors, const Theme::Sizes& sizes,
-						 const Theme::SizesVec& sizesVec)
+Theme::Theme(std::string name, const Theme::Colors& colors, const Theme::Sizes& sizes, const Theme::SizesVec& sizesVec)
 {
 	initDefaultProperties();
 
@@ -61,7 +58,7 @@ void Theme::initDefaultProperties()
 	set(EColor::Border, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
 	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
-  set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
+	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
 
@@ -70,8 +67,8 @@ void Theme::initDefaultProperties()
 	// Node Editor
 	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.00f));
 	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
-	set(EColor::Nodes_ConnectionPossible, createColor(0,255,0, 255));
-	set(EColor::Nodes_ConnectionNotPossible, createColor(255,0,0, 255));
+	set(EColor::Nodes_ConnectionPossible, createColor(0, 255, 0, 255));
+	set(EColor::Nodes_ConnectionNotPossible, createColor(255, 0, 0, 255));
 	set(EColor::Nodes_CreateNode, createColor(32, 45, 32, 180));
 
 	set(EColor::Builder_NodePadding, ImVec4(0, 0, 0, 0));
@@ -129,142 +126,162 @@ void Theme::initDefaultProperties()
 	m_fontsAssoc.insert(std::pair(EFont::IntroItemDescription, 2));
 
 
-	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
-	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
-	m_sizes[ESize::Nodes_Rounding] = 0.0f;
-	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
-	m_sizes[ESize::Nodes_LabelIndent] = 3.0f;
-	m_sizes[ESize::Nodes_HeaderLabelIndent] = 2.0f;
-	m_sizes[ESize::Nodes_LinkThickness] = 3.0f;
+	m_sizes[ESize::Nodes_FloatMargin]						= 1.0f;
+	m_sizes[ESize::Nodes_FloatWidth]						= 25.0f;
+	m_sizes[ESize::Nodes_Rounding]							= 0.0f;
+	m_sizes[ESize::Nodes_BorderWidth]						= 0.0f;
+	m_sizes[ESize::Nodes_LabelIndent]						= 3.0f;
+	m_sizes[ESize::Nodes_HeaderLabelIndent]			= 2.0f;
+	m_sizes[ESize::Nodes_LinkThickness]					= 3.0f;
 	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
-	m_sizes[ESize::Nodes_TrackBallSensitivity] = 5.0f;
+	m_sizes[ESize::Nodes_TrackBallSensitivity]	= 5.0f;
 
 	m_sizes[ESize::Nodes_FloatInnerPadding] = 1.0f;
 
 	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = 0.015f;
-	m_sizes[ESize::Nodes_CtrlMultiplicator] = 0.1f;
-	m_sizes[ESize::Nodes_SHIFTMultiplicator] = 10.0f;
-	m_sizes[ESize::Nodes_ALTMultiplicator] = 0.01f;
+	m_sizes[ESize::Nodes_CtrlMultiplicator]			= 0.1f;
+	m_sizes[ESize::Nodes_SHIFTMultiplicator]		= 10.0f;
+	m_sizes[ESize::Nodes_ALTMultiplicator]			= 0.01f;
 
-	m_sizes[ESize::Nodes_InputsAlignment] = 0.0f;
-	m_sizes[ESize::Nodes_MiddleAlignment] = 0.0f;
+	m_sizes[ESize::Nodes_InputsAlignment]	 = 0.0f;
+	m_sizes[ESize::Nodes_MiddleAlignment]	 = 0.0f;
 	m_sizes[ESize::Nodes_OutputsAlignment] = 0.0f;
 
-	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
+	m_sizes[ESize::Nodes_leftSideSpacing]	 = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
-	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(0.0f, 4.0f);
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
-	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
-	m_sizesVec2[ESizeVec2::Nodes_FloatPadding] = ImVec2(0.0f, 1.0f);
-	m_sizesVec2[ESizeVec2::Nodes_PinSpacing] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing]	 = ImVec2(2.0f, 3.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatPadding]	 = ImVec2(0.0f, 1.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PinSpacing]		 = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.5f);
-	m_sizesVec2[ESizeVec2::Nodes_PivotSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PivotSize]			 = ImVec2(0.0f, 0.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = ImVec2(0.0f, 0.0f);
 
-	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);
+	m_sizesVec2[ESizeVec2::Nodes_IconSize]						 = ImVec2(12.0f, 12.0f);
 	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = ImVec2(32.0f, 32.0f);
-	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = ImVec2(130.0f, 130.0f);
+	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize]		 = ImVec2(130.0f, 130.0f);
 
 	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = ImVec2(0.0f, 0.0f);
 }
 
 void Theme::initNames()
 {
-	g_ColorNames[EColor::Text] = "Text";
-	g_ColorNames[EColor::Border] = "Border";
-	g_ColorNames[EColor::WindowBackground] = "Window Background";
-	g_ColorNames[EColor::PopupBackground] = "Popup Background";
-	g_ColorNames[EColor::MenuBarBackground] = "Menu Bar Background";
-	g_ColorNames[EColor::PrimaryColor] = "Primary Color (tabs, tiles, ...)";
-	g_ColorNames[EColor::ActiveColor] = "Active Color";
-	g_ColorNames[EColor::TabColor] = "Tab Color";
-
-	g_ColorNames[EColor::NodeBgOperator] = "Operator Background";
-	g_ColorNames[EColor::NodeHeaderOperator] = "Operator Header";
-	g_ColorNames[EColor::FloatBgOperator] = "Operator Float Background";
-	g_ColorNames[EColor::FloatBgOperatorActive] = "Operator Active Float Background";
-	g_ColorNames[EColor::FloatBgOperatorHovered] = "Operator Hovered Float Background";
-
-	g_ColorNames[EColor::NodeBgTransformation] = "Transform Background";
-	g_ColorNames[EColor::NodeHeaderTranformation] = "Transform Header";
-	g_ColorNames[EColor::FloatBgTransformation] = "Transform Float Background";
-	g_ColorNames[EColor::FloatBgTransformationActive] = "Transform Float Active";
-	g_ColorNames[EColor::FloatBgTransformationHovered] = "Transform Float Hovered";
-
-	g_ColorNames[EColor::NodeEditorBg] = "Node Editor Background";
-
-	g_ColorNames[EColor::PulsePin] = "Pulse Pin";
-	g_ColorNames[EColor::FloatPin] = "Float Pin";
-	g_ColorNames[EColor::MatrixPin] = "Matrix Pin";
-	g_ColorNames[EColor::QuatPin] = "Quaternion Pin";
-	g_ColorNames[EColor::Vec3Pin] = "Vector 3 Pin";
-	g_ColorNames[EColor::Vec4Pin] = "Vector 4 Pin";
-	g_ColorNames[EColor::ScreenPin] = "Screen Pin";
-
-	g_ColorNames[EColor::InnerPulsePin] = "Inner Color Pulse";
-	g_ColorNames[EColor::InnerFloatPin] = "Inner Color Float";
-	g_ColorNames[EColor::InnerVec3Pin] = "Inner Color Vec3";
-	g_ColorNames[EColor::InnerVec4Pin] = "Inner Color Vec4";
-	g_ColorNames[EColor::InnerMatrixPin] = "Inner Color Matrix";
-	g_ColorNames[EColor::InnerQuatPin] = "Inner Color Quat";
-	g_ColorNames[EColor::InnerMatrixMulPin] = "Inner Color MatrixMul";
-	g_ColorNames[EColor::InnerScreenPin] = "Inner Color Screen";
-
-	g_ColorNames[EColor::Nodes_FloatText] = "Text in cells";
-	g_ColorNames[EColor::Nodes_ConnectionPossible] = "Connection is possible";
-	g_ColorNames[EColor::Nodes_ConnectionNotPossible] = "Connection is not possible";
-	g_ColorNames[EColor::Nodes_CreateNode] = "Create node popup";
-
-	g_ColorNames[EColor::Builder_NodePadding] = "Builder Padding (Not a color!)";
+	// All category keys must be I3T_PROPERTY_NAME_OFFSET characters long.
+	g_CategoryNames["glob_"] = "Global";
+	g_CategoryNames["ngen_"] = "Node Editor General";
+	g_CategoryNames["npin_"] = "Node Editor Pins";
+	g_CategoryNames["nops_"] = "Node Editor Operators";
+	g_CategoryNames["ntrs_"] = "Node Editor Transformations";
+	g_CategoryNames["npop_"] = "Node Editor Popups";
 
 
-	g_SizeNames[ESize::Nodes_Rounding] = "Nodes Rounding";
-	g_SizeNames[ESize::Nodes_FloatWidth] = "Nodes Float Width";
-	g_SizeNames[ESize::Nodes_FloatMargin] = "Nodes Float Margin";
-	g_SizeNames[ESize::Nodes_BorderWidth] = "Nodes BorderWidth";
+	// Global colors.
+	g_ColorNames[EColor::Text]							= "glob_Text";
+	g_ColorNames[EColor::Border]						= "glob_Border";
+	g_ColorNames[EColor::WindowBackground]	= "glob_Window Background";
+	g_ColorNames[EColor::PopupBackground]		= "glob_Popup Background";
+	g_ColorNames[EColor::MenuBarBackground] = "glob_Menu Bar Background";
+	g_ColorNames[EColor::PrimaryColor]			= "glob_Primary Color (tabs, tiles, ...)";
+	g_ColorNames[EColor::ActiveColor]				= "glob_Active Color";
+	g_ColorNames[EColor::TabColor]					= "glob_Tab Color";
 
-	g_SizeNames[ESize::Nodes_LabelIndent] = "pin labels Indent";
-	g_SizeNames[ESize::Nodes_HeaderLabelIndent] = "Header Label Indent";
-	g_SizeNames[ESize::Nodes_LinkThickness] = "Link Thickness";
-	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "Trackball button height";
-	g_SizeNames[ESize::Nodes_TrackBallSensitivity] = "Trackball Sensitivity";
+	// Node editor colors.
+	// 1. General
+	g_ColorNames[EColor::NodeEditorBg]		= "ngen_Node Editor Background";
+	g_ColorNames[EColor::NodeHeader]			= "ngen_Node Editor Header";
+	g_ColorNames[EColor::Nodes_FloatText] = "ngen_Text in cells";
 
-	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "Float inner padding";
+	// 2. Pins
+	g_ColorNames[EColor::PulsePin]	= "npin_Pulse Pin";
+	g_ColorNames[EColor::FloatPin]	= "npin_Float Pin";
+	g_ColorNames[EColor::MatrixPin] = "npin_Matrix Pin";
+	g_ColorNames[EColor::QuatPin]		= "npin_Quaternion Pin";
+	g_ColorNames[EColor::Vec3Pin]		= "npin_Vector 3 Pin";
+	g_ColorNames[EColor::Vec4Pin]		= "npin_Vector 4 Pin";
+	g_ColorNames[EColor::ScreenPin] = "npin_Screen Pin";
 
-	g_SizeNames[ESize::Nodes_dragSpeedDefaulrRatio] = "Drag speed fo float";
-	g_SizeNames[ESize::Nodes_CtrlMultiplicator] = "CTRL Multiplicator";
-	g_SizeNames[ESize::Nodes_SHIFTMultiplicator] = "SHIFT Multiplicator";
-	g_SizeNames[ESize::Nodes_ALTMultiplicator] = "ALT Multiplicator";
+	g_ColorNames[EColor::InnerPulsePin]			= "npin_Inner Color Pulse";
+	g_ColorNames[EColor::InnerFloatPin]			= "npin_Inner Color Float";
+	g_ColorNames[EColor::InnerVec3Pin]			= "npin_Inner Color Vec3";
+	g_ColorNames[EColor::InnerVec4Pin]			= "npin_Inner Color Vec4";
+	g_ColorNames[EColor::InnerMatrixPin]		= "npin_Inner Color Matrix";
+	g_ColorNames[EColor::InnerQuatPin]			= "npin_Inner Color Quat";
+	g_ColorNames[EColor::InnerMatrixMulPin] = "npin_Inner Color MatrixMul";
+	g_ColorNames[EColor::InnerScreenPin]		= "npin_Inner Color Screen";
 
-	g_SizeNames[ESize::Nodes_InputsAlignment] = "Nodes Inputs Alignment";
-	g_SizeNames[ESize::Nodes_MiddleAlignment] = "Nodes Middle Alignment";
-	g_SizeNames[ESize::Nodes_OutputsAlignment] = "Nodes Outputs Alignment";
+	// 3. Operator
+	g_ColorNames[EColor::NodeBgOperator]				 = "nops_Operator Background";
+	g_ColorNames[EColor::NodeHeaderOperator]		 = "nops_Operator Header";
+	g_ColorNames[EColor::FloatBgOperator]				 = "nops_Operator Float Background";
+	g_ColorNames[EColor::FloatBgOperatorActive]	 = "nops_Operator Active Float Background";
+	g_ColorNames[EColor::FloatBgOperatorHovered] = "nops_Operator Hovered Float Background";
 
-	g_SizeNames[ESize::Nodes_leftSideSpacing] = "Nodes left side spacing";
-	g_SizeNames[ESize::Nodes_rightSideSpacing] = "Nodes right side spacing";
+	// 4. Transforms
+	g_ColorNames[EColor::NodeBgTransformation]				 = "ntrs_Transform Background";
+	g_ColorNames[EColor::NodeHeaderTranformation]			 = "ntrs_Transform Header";
+	g_ColorNames[EColor::FloatBgTransformation]				 = "ntrs_Transform Float Background";
+	g_ColorNames[EColor::FloatBgTransformationActive]	 = "ntrs_Transform Float Active";
+	g_ColorNames[EColor::FloatBgTransformationHovered] = "ntrs_Transform Float Hovered";
+
+	// 5. Popups
+	g_ColorNames[EColor::Nodes_ConnectionPossible]		= "npop_Connection is possible";
+	g_ColorNames[EColor::Nodes_ConnectionNotPossible] = "npop_Connection is not possible";
+	g_ColorNames[EColor::Nodes_CreateNode]						= "npop_Create node popup";
+
+	/// \todo ???
+	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a color!)";
 
 
-	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "Windows Frame Padding";
-	g_SizeVecNames[ESizeVec2::Nodes_IconSize] = "Nodes Icon Size";
-	g_SizeVecNames[ESizeVec2::Nodes_PivotAlignment] = "Nodes Pivot Alignment";
-	g_SizeVecNames[ESizeVec2::Nodes_PinSpacing] = "Nodes Pin Spacing";
-	g_SizeVecNames[ESizeVec2::Nodes_ItemsSpacing] = "Nodes Items Spacing";
-	g_SizeVecNames[ESizeVec2::Nodes_FloatPadding] = "Nodes Float Padding";
+	// Global spacing and other size properties.
+	g_SizeNames[ESize::Nodes_Rounding]		= "ngen_Nodes Rounding";
+	g_SizeNames[ESize::Nodes_FloatWidth]	= "ngen_Nodes Float Width";
+	g_SizeNames[ESize::Nodes_FloatMargin] = "ngen_Nodes Float Margin";
+	g_SizeNames[ESize::Nodes_BorderWidth] = "ngen_Nodes BorderWidth";
 
-	g_SizeVecNames[ESizeVec2::Nodes_PivotSize] = "Nodes Pivot size";
+	g_SizeNames[ESize::Nodes_LabelIndent]						= "ngen_Pin labels Indent";
+	g_SizeNames[ESize::Nodes_HeaderLabelIndent]			= "ngen_Header Label Indent";
+	g_SizeNames[ESize::Nodes_LinkThickness]					= "ngen_Link Thickness";
+	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "ngen_Trackball button height";
+	g_SizeNames[ESize::Nodes_TrackBallSensitivity]	= "ngen_Trackball Sensitivity";
 
-	g_SizeVecNames[ESizeVec2::Nodes_InputsSize] = "Nodes Inputs Size";
-	g_SizeVecNames[ESizeVec2::Nodes_MiddleSize] = "Nodes Middle Size";
-	g_SizeVecNames[ESizeVec2::Nodes_OutputSize] = "Nodes Output Size";
+	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "ngen_Float inner padding";
 
-	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "Nodes Float Cycle button size";
-	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "Nodes Screen Texture Size";
+	g_SizeNames[ESize::Nodes_dragSpeedDefaulrRatio] = "ngen_Drag speed fo float";
+	g_SizeNames[ESize::Nodes_CtrlMultiplicator]			= "ngen_CTRL Multiplicator";
+	g_SizeNames[ESize::Nodes_SHIFTMultiplicator]		= "ngen_SHIFT Multiplicator";
+	g_SizeNames[ESize::Nodes_ALTMultiplicator]			= "ngen_ALT Multiplicator";
 
-	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "Builder Item Spacing";
+	g_SizeNames[ESize::Nodes_InputsAlignment]	 = "ngen_Nodes Inputs Alignment";
+	g_SizeNames[ESize::Nodes_MiddleAlignment]	 = "ngen_Nodes Middle Alignment";
+	g_SizeNames[ESize::Nodes_OutputsAlignment] = "ngen_Nodes Outputs Alignment";
+
+	g_SizeNames[ESize::Nodes_leftSideSpacing]	 = "ngen_Nodes left side spacing";
+	g_SizeNames[ESize::Nodes_rightSideSpacing] = "ngen_Nodes right side spacing";
+
+
+	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
+
+	g_SizeVecNames[ESizeVec2::Nodes_IconSize]				= "ngen_Nodes Icon Size";
+	g_SizeVecNames[ESizeVec2::Nodes_PivotAlignment] = "ngen_Nodes Pivot Alignment";
+	g_SizeVecNames[ESizeVec2::Nodes_PinSpacing]			= "ngen_Nodes Pin Spacing";
+	g_SizeVecNames[ESizeVec2::Nodes_ItemsSpacing]		= "ngen_Nodes Items Spacing";
+	g_SizeVecNames[ESizeVec2::Nodes_FloatPadding]		= "ngen_Nodes Float Padding";
+
+	g_SizeVecNames[ESizeVec2::Nodes_PivotSize] = "ngen_Nodes Pivot size";
+
+	g_SizeVecNames[ESizeVec2::Nodes_InputsSize] = "ngen_Nodes Inputs Size";
+	g_SizeVecNames[ESizeVec2::Nodes_MiddleSize] = "ngen_Nodes Middle Size";
+	g_SizeVecNames[ESizeVec2::Nodes_OutputSize] = "ngen_Nodes Output Size";
+
+	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "ngen_Nodes Float Cycle button size";
+	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize]		= "ngen_Nodes Screen Texture Size";
+
+	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "ngen_Builder Item Spacing";
 }
 
 void Theme::apply()
@@ -273,78 +290,81 @@ void Theme::apply()
 
 	style.Colors[ImGuiCol_Text] = m_colors[EColor::Text];
 
-	style.Colors[ImGuiCol_WindowBg] = m_colors[EColor::WindowBackground];
-	style.Colors[ImGuiCol_Border] = m_colors[EColor::Border];
-	style.Colors[ImGuiCol_PopupBg] = m_colors[EColor::PopupBackground];
-	style.Colors[ImGuiCol_TitleBg] = m_colors[EColor::PrimaryColor];
-	style.Colors[ImGuiCol_TitleBgActive] = m_colors[EColor::PrimaryColor];
+	style.Colors[ImGuiCol_WindowBg]					= m_colors[EColor::WindowBackground];
+	style.Colors[ImGuiCol_Border]						= m_colors[EColor::Border];
+	style.Colors[ImGuiCol_PopupBg]					= m_colors[EColor::PopupBackground];
+	style.Colors[ImGuiCol_TitleBg]					= m_colors[EColor::PrimaryColor];
+	style.Colors[ImGuiCol_TitleBgActive]		= m_colors[EColor::PrimaryColor];
 	style.Colors[ImGuiCol_TitleBgCollapsed] = m_colors[EColor::PrimaryColor];
-	style.Colors[ImGuiCol_MenuBarBg] = m_colors[EColor::MenuBarBackground];
+	style.Colors[ImGuiCol_MenuBarBg]				= m_colors[EColor::MenuBarBackground];
 
-	style.Colors[ImGuiCol_Tab] = m_colors[EColor::PrimaryColor];
-	style.Colors[ImGuiCol_TabActive] = m_colors[EColor::ActiveColor];
-	style.Colors[ImGuiCol_TabUnfocused] = m_colors[EColor::PrimaryColor];
+	style.Colors[ImGuiCol_Tab]								= m_colors[EColor::PrimaryColor];
+	style.Colors[ImGuiCol_TabActive]					= m_colors[EColor::ActiveColor];
+	style.Colors[ImGuiCol_TabUnfocused]				= m_colors[EColor::PrimaryColor];
 	style.Colors[ImGuiCol_TabUnfocusedActive] = m_colors[EColor::PrimaryColor];
 
 	style.Colors[ImGuiCol_Separator] = m_colors[EColor::PrimaryColor];
 
 	style.Colors[ImGuiCol_PlotHistogram] = m_colors[EColor::ActiveColor];
 
-	style.FramePadding.x = m_sizesVec2[ESizeVec2::Window_FramePadding].x;
-	style.FramePadding.y = m_sizesVec2[ESizeVec2::Window_FramePadding].y;
-	style.TabRounding = 2.0f;
-	style.ChildBorderSize = 0.0f;
-	style.PopupBorderSize = 0.0f;
+	style.FramePadding.x	 = m_sizesVec2[ESizeVec2::Window_FramePadding].x;
+	style.FramePadding.y	 = m_sizesVec2[ESizeVec2::Window_FramePadding].y;
+	style.TabRounding			 = 2.0f;
+	style.ChildBorderSize	 = 0.0f;
+	style.PopupBorderSize	 = 0.0f;
 	style.WindowBorderSize = 0.0f;
 
 	// SS, MH please check this
 	//---------------------------------------------------------------------------------------
-	auto& nodesStyle = ax::NodeEditor::GetStyle();
-	nodesStyle.NodeRounding = m_sizes[ESize::Nodes_Rounding];
-	nodesStyle.NodeBorderWidth = m_sizes[ESize::Nodes_BorderWidth];
+	auto& nodesStyle																								 = ax::NodeEditor::GetStyle();
+
+	nodesStyle.NodeRounding																					 = m_sizes[ESize::Nodes_Rounding];
+	nodesStyle.NodeBorderWidth																			 = m_sizes[ESize::Nodes_BorderWidth];
 	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
-	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg] = m_colors[EColor::NodeEditorBg];
+	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg]		 = m_colors[EColor::NodeEditorBg];
 
 	//---------------------------------------------------------------------------------------
 }
 
-ImFont* Theme::get(EFont font)
+ImFont* Theme::get(EFont font) { return I3T::getUI()->getFonts()[m_fontsAssoc[font]]; }
+
+const char* Theme::getCategoryName(const std::string& key)
 {
-	return I3T::getUI()->getFonts()[m_fontsAssoc[font]];
+	auto name = Theme::getCategoryNames()[key];
+	assert(name && "Unknown category, did you create entry in g_CategoryNames?");
+
+	return name;
 }
 
-std::map<EColor, const char*>& Theme::getColorNames()
-{
-	return g_ColorNames;
-}
+Theme::CategoryNames& Theme::getCategoryNames() { return g_CategoryNames; }
 
-std::map<ESize, const char*>& Theme::getSizeNames()
-{
-	return g_SizeNames;
-}
+std::map<EColor, const char*>& Theme::getColorNames() { return g_ColorNames; }
 
-std::map<ESizeVec2, const char*>& Theme::getSizeVecNames()
-{
-	return g_SizeVecNames;
-}
+std::map<ESize, const char*>& Theme::getSizeNames() { return g_SizeNames; }
+
+std::map<ESizeVec2, const char*>& Theme::getSizeVecNames() { return g_SizeVecNames; }
 
 void Theme::operatorColorTheme()
 {
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBgOperator];
+
+	ImGuiStyle& style																																 = ImGui::GetStyle();
+
+	style.Colors[ImGuiCol_FrameBg]																									 = m_colors[EColor::FloatBgOperator];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgOperatorHovered];
-	style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgOperatorActive];
+	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgOperatorActive];
 }
 
 void Theme::transformationColorTheme()
 {
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
 			m_colors[EColor::NodeBgTransformation];
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBgTransformation];
+
+	ImGuiStyle& style											= ImGui::GetStyle();
+
+	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgTransformation];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgTransformationHovered];
-	style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgTransformationActive];
+	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgTransformationActive];
 }
 
 bool isVectorsEqual(ImVec4 a, ImVec4 b)
@@ -368,9 +388,10 @@ ImVec4 Theme::getHeader()
 	return ImVec4(0, 0, 0, 0);
 }
 
-void Theme::returnFloatColorToDefault(){
-  ImGuiStyle& style = ImGui::GetStyle();
-  style.Colors[ImGuiCol_FrameBg] = m_colors[EColor::FloatBg];
+void Theme::returnFloatColorToDefault()
+{
+	ImGuiStyle& style											= ImGui::GetStyle();
+	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBg];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgHovered];
-	style.Colors[ImGuiCol_FrameBgActive] = m_colors[EColor::FloatBgHovered];
+	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgHovered];
 }
