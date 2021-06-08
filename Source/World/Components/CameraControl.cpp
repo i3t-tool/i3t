@@ -119,7 +119,8 @@ void CameraControl::rotate(){
 	glm::vec3 up=glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 checkup=glm::normalize(mixc-mixe);
 
-	if(glm::abs(1-glm::abs( glm::dot(checkup,up)))<0.01f){up=glm::vec3(0.0f ,0.0f, 1.0f); }
+	//if(glm::abs(1-glm::abs( glm::dot(checkup,up)))<0.01f){up=glm::vec3(0.0f ,0.0f, 1.0f); }
+	if(glm::dot(m_dir,up)>0.995f&&glm::dot(m_dir,up)<1.005f){up=glm::vec3(0.0f,0.0f,1.0f); }
 
 	m_gameObject->transformation = glm::inverse(glm::lookAt(mixe, mixc, up));
 
