@@ -727,7 +727,7 @@ void getNodeByName(struct ParseState* parser, struct Value* returnValue, struct 
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->getHeaderLabel().c_str(),label)==0) {
             returnValue->Val->Integer= workspace->at(i)->getNodebase()->getId();
-            if(occurances>1){std::cout<<"Index: "<< workspace->at(i)->getNodebase()->getId() <<", Name: "<<label<<std::endl;}
+            if(occurances>1){std::cout<<"Id: "<< workspace->at(i)->getNodebase()->getId() <<", Name: "<<label<<std::endl;}
         }
     }
 
