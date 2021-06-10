@@ -25,19 +25,18 @@ void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersLi
 {
 	if (!InputBindings::isActionCreated(name))
 	{
-		InputBindings::m_inputActions.insert({name, {{code, createModifiers(mods)}}});
+		InputBindings::m_inputActions.insert({name, {}});
 	}
+	InputBindings::m_inputActions[name].push_back({code, createModifiers(mods)});
 }
 
 void InputManager::setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods)
 {
 	if (!InputBindings::isAxisCreated(action))
 	{
-		InputBindings::m_inputAxis.insert({action,
-		                                   {
-																					 {code, scale, createModifiers(mods)},
-																			 }});
+		InputBindings::m_inputAxis.insert({action, {}});
 	}
+	InputBindings::m_inputAxis[action].push_back({code, scale, createModifiers(mods)});
 }
 
 bool InputManager::areModifiersActive(Modifiers mods)
