@@ -11,6 +11,24 @@ InputBindings::AxesMap InputBindings::m_inputAxis;
 void InputBindings::init()
 {
 	// Default input bindings.
+	InputManager::setInputAction("copy", Keys::c, { Keys::ctrll });
+	InputManager::setInputAction("paste", Keys::v, { Keys::ctrll });
+	InputManager::setInputAction("cut", Keys::x, { Keys::ctrll });
+	InputManager::setInputAction("duplicate", Keys::d, { Keys::ctrll });
+	InputManager::setInputAction("duplicate", Keys::mouseLeft, { Keys::ctrll });
+	InputManager::setInputAction("delete", Keys::del);
+
+	InputManager::setInputAxis("scroll", 1.0f,  Keys::mouseScrlUp);
+	InputManager::setInputAxis("scroll", -1.0f, Keys::mouseScrlDown);
+	InputManager::setInputAxis("pan", 1.0f, Keys::mouseMiddle);
+	InputManager::setInputAxis("rotate", 1.0f, Keys::mouseRight);
+	InputManager::setInputAxis("rotateAround", 1.0f, Keys::mouseRight, { Keys::altl });
+
+	InputManager::setInputAxis("moveForward", 1.0f, Keys::w);
+	InputManager::setInputAxis("moveForward", -1.0f, Keys::s);
+	InputManager::setInputAxis("moveRight", 1.0f, Keys::d);
+	InputManager::setInputAxis("moveRight", -1.0f, Keys::a);
+
 	InputManager::setInputAction("KeyWorld_mousePan", Keys::mouseMiddle);
 	InputManager::setInputAction("KeyWorld_mouseRotate", Keys::mouseRight);
 	InputManager::setInputAction("Key_undo", Keys::b);
@@ -20,8 +38,10 @@ void InputBindings::init()
 	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});
 	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});
 
+	/*
 	InputManager::setInputAxis("MouseScroll", 1.0f, Keys::mouseScrlUp);
 	setAxisKey("MouseScroll", -1.0f, Keys::mouseScrlDown);
+	 */
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)

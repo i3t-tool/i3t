@@ -61,6 +61,7 @@ struct InputBindings final
 
 	friend class InputManager;
 
+
 	static void init();
 
 	static const std::vector<ActionMapping>& getActionMapping(const char* name);

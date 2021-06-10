@@ -22,7 +22,8 @@ void CameraControl::update()
 	float x = InputManager::m_mouseXDelta / 8.0f;
 	float y = InputManager::m_mouseYDelta / 8.0f;
 
-	if (InputManager::isKeyPressed(Keys::mouseMiddle))
+	// if (InputManager::isKeyPressed(Keys::mouseMiddle))
+	if (InputManager::isAxisActive("pan"))
 	{
 		glm::vec4 move =
 				(getRotation(m_gameObject->transformation, 2) * glm::vec4(x, 0.0f, 0.0f, 0.0f) + glm::vec4(0.0f, y, 0.0f, 0.0f)) *
@@ -33,7 +34,7 @@ void CameraControl::update()
 		}
 		m_gameObject->translate(glm::vec3(-move.x, move.y, -move.z));
 	}
-	else if (InputManager::isKeyPressed(Keys::mouseRight))
+	else if (InputManager::isAxisActive("rotate"))
 	{
 		m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y, (glm::vec3)m_gameObject->transformation[3]);
 		m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, (glm::vec3)m_gameObject->transformation[3]);

@@ -3,37 +3,25 @@
 #include "imgui.h"
 
 #include "Core/API.h"
-#include "Core/Application.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 
-#include "../../../World/Select.h"
-#include "../../../World/World.h"
-
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
-using namespace UI;
-
-void onScroll(float val)
-{
-	Log::info("Scroll: {}", val);
-}
-#include "World/RenderTexture.h"
 #include "World/Components.h"
 #include "World/HardcodedMeshes.h"
-/// \todo Use Framebuffer class.
-/// 
-/*GLuint renderTexture;
-RenderTexture* rend;
-GameObject* screen;
-Camera* cam ;*/
+#include "World/RenderTexture.h"
+#include "World/World.h"
+
+using namespace UI;
 
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
-	Input.bindAxis("MouseScroll",[this](float val){m_world->scroll=val;});
+	Input.bindAxis("scroll",[this] (float val) { m_world->scroll = val; });
 
+	/// \todo Use Framebuffer class.
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
 	glGenFramebuffers(1, &m_fboMain);
@@ -92,18 +80,12 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
   {
     Log::info("move: {}", val);
   });
-
-  
-	// Scrolling
-  //Input.bindAxis("MouseScroll", onScroll);
-
 }
 
 float localData;
 
 void Viewport::render()
 {
-
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);

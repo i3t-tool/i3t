@@ -16,6 +16,7 @@
 
 #include "Core/Defs.h"
 #include "GUI/Elements/IWindow.h"
+#include "InputBindings.h"
 #include "InputController.h"
 #include "KeyCodes.h"
 
@@ -135,11 +136,11 @@ public:
 	 */
 	static void setPressed(const Keys::Code code)
 	{
-		// if (keyMap[code] != DOWN)
 		m_keyMap[code] = JUST_DOWN;
 	}
 
 	static bool isActionTriggered(const char* name, EKeyState state);
+	static bool isAxisActive(const char* name);
 
 	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 

@@ -74,6 +74,22 @@ bool InputManager::isActionTriggered(const char* name, EKeyState state)
 	return result;
 }
 
+bool InputManager::isAxisActive(const char* name)
+{
+	if (!InputBindings::m_inputAxis.contains(name))
+		return false;
+
+	auto& axes = InputBindings::m_inputAxis[name];
+	for (const auto& a : axes)
+	{
+		if (isKeyPressed(a.code))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool InputManager::isMouseClicked()
 {
 	for (int i = 0; i < IM_MOUSE_KEYS_COUNT; i++)

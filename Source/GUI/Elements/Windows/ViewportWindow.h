@@ -8,7 +8,8 @@
 #include <imgui.h>
 
 #include "GUI/Elements/IWindow.h"
-#include "World/World.h"
+
+class World;
 
 namespace UI
 {

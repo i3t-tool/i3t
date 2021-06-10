@@ -1,5 +1,6 @@
 #include "InputController.h"
 
+#include "InputBindings.h"
 #include "InputManager.h"
 
 InputController::InputController()
