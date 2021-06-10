@@ -198,7 +198,7 @@ void InputManager::update()
 
 	if (m_focusedWindow)
 	{
-		for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
+		for (const auto& [action, state, callback] : m_focusedWindow->Input.m_actions)
 		{
 			auto& keys = InputBindings::m_inputActions[action];
 			for (const auto& [key, mods] : keys)
@@ -208,12 +208,11 @@ void InputManager::update()
 				                      m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
 				                     areModifiersActive(mods);
 
-				if (shouldProcess)
-					fn();
+				if (shouldProcess) callback();
 			}
 		}
 
-		for (const auto& [action, fn] : m_focusedWindow->Input.m_axis)
+		for (const auto& [action, callback] : m_focusedWindow->Input.m_axis)
 		{
 			auto keys = InputBindings::m_inputAxis[action];
 			for (const auto& [key, scale, mods] : keys)
@@ -221,10 +220,7 @@ void InputManager::update()
 				bool shouldProcess =
 						(m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
 
-				if (shouldProcess)
-				{
-					fn(scale);
-				}
+				if (shouldProcess) callback(scale);
 			}
 		}
 	}

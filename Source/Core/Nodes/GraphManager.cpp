@@ -190,6 +190,7 @@ SequenceTree::MatrixIterator SequenceTree::begin()
 {
 	auto it = MatrixIterator(m_beginSequence);
 	it.m_tree = this;
+
 	return it;
 }
 
@@ -204,6 +205,7 @@ SequenceTree::MatrixIterator SequenceTree::end()
 
 	auto it = MatrixIterator(cur, nullptr);
 	it.m_tree = this;
+
 	return it;
 }
 
@@ -235,24 +237,28 @@ SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
 SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator++(int)
 {
 	advance();
+
 	return *this;
 }
 
 SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator--()
 {
 	withdraw();
+
 	return *this;
 }
 
 SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator--(int)
 {
 	withdraw();
+
 	return *this;
 }
 
 Ptr<NodeBase> SequenceTree::MatrixIterator::operator*() const
 {
 	Debug::Assert(m_currentMatrix != nullptr, "Iterator is at the end!");
+
 	return m_currentMatrix;
 }
 
@@ -329,40 +335,87 @@ void SequenceTree::MatrixIterator::withdraw()
 
 void MatrixTracker::setParam(float param)
 {
+	m_param = glm::clamp(param, 0.0f, 1.0f);
+
+	track();
+}
+
+void MatrixTracker::track()
+{
+	// Create iterator for traversing sequence branch.
 	auto st = SequenceTree(m_beginSequence);
 	auto it = st.begin();
 
-	int matricesCount = 0;	// to root
-    while (it != st.end())
+	// Get matrices count in total.
+	int matricesCount = 0;	// to the root
+	while (it != st.end())
 	{
 		++it;
 		++matricesCount;
 	}
 	if (matricesCount == 0)
-		return;
-
-	glm::mat4 result(1.0f);
-	float requestedMatricesCount = param * matricesCount;
-	int count = (int) requestedMatricesCount;
-	float interpParam;
-	if (count == 0)
-		interpParam = requestedMatricesCount;
-	else
-		interpParam = fmod(requestedMatricesCount, count);
-
-	for (int i = 0; i < count; ++i)
 	{
-    --it;
-    result = result * (*it)->getData().getMat4();
+		// Empty sequence cannot be tracked.
+		return;
+	}
+	// Iterator now points on the sequences root.
+
+	float matFactor    = 1.0f / (float) matricesCount;
+	int matricesBefore = (int) (m_param * (float) matricesCount);
+
+	float interpParam  = fmod(m_param, matFactor) / matFactor;
+	// Handle special cases
+	if (Math::eq(0.0f, m_param))
+	{
+		interpParam = 0.0f;
+	}
+	else if (Math::eq(1.0f, m_param))
+	{
+		interpParam = 1.0f;
 	}
 
-	// Interpolate current matrix.
+	glm::mat4 result(1.0f);
+	glm::mat4 rhs;
 	glm::mat4 lhs(1.0f);
 
-	--it;
-	glm::mat4 rhs = (*it)->getData().getMat4();
+	// Get non-interpolated matrices product.
+	if (m_isReversed)
+	{
+		// From right to left.
+		for (int i = 0; i < matricesBefore; ++i)
+		{
+			--it;
+			result = result * (*it)->getData().getMat4();
+		}
 
-	// \todo MH interpolate rotations with quat.
-	result = result * glm::interpolate(lhs, rhs, interpParam);
+		if (!Math::eq(1.0f, m_param))
+		{
+			--it;
+
+			rhs = (*it)->getData().getMat4();
+			// \todo MH interpolate rotations with quat.
+			result = result * glm::interpolate(lhs, rhs, interpParam);
+		}
+	}
+	else
+	{
+		// Go to the first matrix
+		while (it != st.begin())
+		{
+			--it;
+		}
+
+		for (int i = 0; i < (matricesCount - matricesBefore - 1); ++i)
+		{
+			result = result * (*it)->getData().getMat4();
+			++it;
+		}
+		//++it;
+		rhs = (*it)->getData().getMat4();
+		// \todo MH interpolate rotations with quat.
+		auto mat = glm::interpolate(lhs, rhs, 1.0f - interpParam);
+		result = mat * result;
+	}
+
 	m_interpolatedMatrix = result;
 }

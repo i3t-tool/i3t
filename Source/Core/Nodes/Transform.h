@@ -61,6 +61,7 @@ public:
 		m_currentIndex = index;
 	}
 };
+using TransformPtr = Ptr<Transformation>;
 
 
 class Free : public Transformation
@@ -86,7 +87,7 @@ public:
 		return ValueSetResult{};
 	}
 
-	void reset() override { setValue(glm::mat4(1.0f)); };
+	void reset() override { setInternalValue(glm::mat4(1.0f)); };
 };
 
 
@@ -450,4 +451,4 @@ public:
 	ValueSetResult setCenter(const glm::vec3& center);
 	ValueSetResult setUp(const glm::vec3& up);
 };
-} // namespace Core
+} // namespac
