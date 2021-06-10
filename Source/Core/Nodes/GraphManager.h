@@ -216,7 +216,7 @@ public:
 	explicit SequenceTree(Ptr<NodeBase> sequence);
 
 	/**
-	 * \return Iterator which points sequence.
+	 * \return Iterator which points to the sequence.
 	 */
 	MatrixIterator begin();
 
@@ -231,6 +231,7 @@ class MatrixTracker
 {
 	glm::mat4 m_interpolatedMatrix;
 	float m_param = 0.0f;
+	bool m_isReversed = false;
 	SequencePtr m_beginSequence;
 
 public:
@@ -242,16 +243,21 @@ public:
 
 	float getParam() const { return m_param; }
 
+	void setMode(bool reversed) { m_isReversed = reversed; }
+
 	/**
 	 * Set interpolation parameter and calculate interpolated matrix product.
 	 *
-	 * \param param from 0.0f to 1.0f.
+	 * \param param from -1.0f to 1.0f. Use 0-1 param for tracking from right to left.
 	 *
 	 * \warning Call the function only on parameter change. Note that it is
 	 * necessary to change parameter on sequence unplug or on matrix remove
 	 * or add.
 	 */
 	void setParam(float param);
+
+private:
+	void track();
 };
 
 

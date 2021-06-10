@@ -25,19 +25,18 @@ void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersLi
 {
 	if (!InputBindings::isActionCreated(name))
 	{
-		InputBindings::m_inputActions.insert({name, {{code, createModifiers(mods)}}});
+		InputBindings::m_inputActions.insert({name, {}});
 	}
+	InputBindings::m_inputActions[name].push_back({code, createModifiers(mods)});
 }
 
 void InputManager::setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods)
 {
 	if (!InputBindings::isAxisCreated(action))
 	{
-		InputBindings::m_inputAxis.insert({action,
-		                                   {
-																					 {code, scale, createModifiers(mods)},
-																			 }});
+		InputBindings::m_inputAxis.insert({action, {}});
 	}
+	InputBindings::m_inputAxis[action].push_back({code, scale, createModifiers(mods)});
 }
 
 bool InputManager::areModifiersActive(Modifiers mods)
@@ -198,7 +197,7 @@ void InputManager::update()
 
 	if (m_focusedWindow)
 	{
-		for (const auto& [action, state, fn] : m_focusedWindow->Input.m_actions)
+		for (const auto& [action, state, callback] : m_focusedWindow->Input.m_actions)
 		{
 			auto& keys = InputBindings::m_inputActions[action];
 			for (const auto& [key, mods] : keys)
@@ -208,12 +207,11 @@ void InputManager::update()
 				                      m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
 				                     areModifiersActive(mods);
 
-				if (shouldProcess)
-					fn();
+				if (shouldProcess) callback();
 			}
 		}
 
-		for (const auto& [action, fn] : m_focusedWindow->Input.m_axis)
+		for (const auto& [action, callback] : m_focusedWindow->Input.m_axis)
 		{
 			auto keys = InputBindings::m_inputAxis[action];
 			for (const auto& [key, scale, mods] : keys)
@@ -221,10 +219,7 @@ void InputManager::update()
 				bool shouldProcess =
 						(m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
 
-				if (shouldProcess)
-				{
-					fn(scale);
-				}
+				if (shouldProcess) callback(scale);
 			}
 		}
 	}
