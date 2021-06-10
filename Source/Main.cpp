@@ -61,16 +61,15 @@
 // - hleda data v miste, kde je spusten
 // - negeneruje pdb
 
-#include <sstream>
 #include <string>
 
 #include "pgr.h"
 
 #include "Config.h"
 #include "Core/Defs.h"
+#include "Core/Application.h"
 #include "Logger/LoggerInternal.h"
 #include "Utils/Other.h"
-
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 

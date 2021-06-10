@@ -5,8 +5,6 @@
  */
 #pragma once
 
-#include <GUI/UIModule.h>
-#include <World/Components/Camera.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -16,9 +14,6 @@
 
 #include "Core/Defs.h"
 #include "Core/GlfwWindow.h"
-#include "GUI/Elements/IWindow.h"
-
-#include "World/World.h"
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
@@ -27,8 +22,8 @@ class ICommand;
 class GlfwWindow;
 class MainMenuBar;
 class World;
-class World;
 class Scripting;
+class UIModule;
 
 /**
  * Application class.

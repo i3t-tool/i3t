@@ -1,8 +1,11 @@
 #include "TutorialWindow.h"
-#include "Logger/Logger.h"
+
 #include <utility>
 
 #include "imgui.h"
+
+#include "GUI/UIModule.h"
+#include "Logger/Logger.h"
 
 /// \todo If you want to use ImGui Markdown run $ git submodule add https://github.com/Mizumaky/imgui_markdown_extended
 /// Depencencies/imgui_markdown. After that modify CMakeLists.txt, append

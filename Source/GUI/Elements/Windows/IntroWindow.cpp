@@ -7,6 +7,7 @@
 #include "Config.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "GUI/UIModule.h"
 #include "Logger/Logger.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"

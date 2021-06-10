@@ -2,32 +2,19 @@
 
 #include <functional>
 
-#include "imgui.h"
-
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "Core/Module.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
-#include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "GUI/ImGui/imgui_impl_glfw.h"
-#include "GUI/ImGui/imgui_impl_opengl3.h"
-#include "GUI/Theme.h"
-#include "GUI/UIModule.h"
 #include "Loader/ConfigLoader.h"
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
-
-#include "GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixFree.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixScale.h"
-#include "GUI/Elements/Nodes/WorkspaceMatrixTranslation.h"
-#include "Nodes/GraphManager.h"
 
 
 double lastFrameSeconds = 0.0f;
