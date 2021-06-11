@@ -1,6 +1,5 @@
-#pragma once
-
 #include "Camera.h"
+
 #include "GraphManager.h"
 
 using namespace Core;
