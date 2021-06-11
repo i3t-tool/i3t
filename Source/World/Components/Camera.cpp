@@ -82,7 +82,13 @@ void Camera::update(){
     //*(glm::vec3*)(&World::mainCamera[3]) = -(glm::vec3)transform[3];
 
     renderRecursive(m_sceneRoot, glm::mat4(1.0f),false);//render opaque
-    renderRecursive(m_sceneRoot, glm::mat4(1.0f),true);//render transparent
+    renderRecursive(m_sceneRoot, glm::mat4(1.0f), true);//render transparent
+    /*glDepthMask(GL_FALSE);//render overlaping transparent (replace "render transparent"), naive solution
+    renderRecursive(m_sceneRoot, glm::mat4(1.0f),true);//render color, dont write depth - because of overlapping
+    glDepthMask(GL_TRUE);
+    glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
+    renderRecursive(m_sceneRoot, glm::mat4(1.0f), true);//write depth, color is already rendered
+    glColorMask(GL_TRUE,GL_TRUE, GL_TRUE, GL_TRUE);*/
     if (!this->m_mainCamera){
         //printMatrix5(World::mainCamera);
         glBindFramebuffer(GL_FRAMEBUFFER, fbobkp);
