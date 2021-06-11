@@ -35,7 +35,7 @@ void UIModule::init()
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
 	m_dockableWindows.push_back(std::make_shared<IntroWindow>(true));
-	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world2()));
+	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Console>(true));
 	m_dockableWindows.push_back(std::make_shared<LogWindow>());

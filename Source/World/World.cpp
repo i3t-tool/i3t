@@ -11,11 +11,6 @@
 
 #include <string.h>
 
-//#include "../Scripting/Scripting.h"
-std::shared_ptr<Core::NodeBase>World::tmpNode;
-Core::SequencePtr World::tmpSequence = Core::SequencePtr();
-Core::SequencePtr World::tmpSequence2 = Core::SequencePtr();
-
 float World::scroll=0.0f;
 
 glm::mat4 World::perspective = glm::mat4(1.0f);
@@ -111,31 +106,7 @@ void World::end() {
     glDeleteTextures(1,&World::axisTexture);
     glDeleteTextures(1,&World::whiteTexture);
 }
-World* World::loadDefaultScene(){
-    if (!World::initializedRender){printf("initialize render before creating World!\n");return nullptr;}
-    GLuint renderTexture;
-    RenderTexture* rend =     new RenderTexture(&renderTexture,256,256);
 
-    GameObject* objhandles =  new GameObject(unitcubeMesh,    &World::shader0, World::cubeTexture);
-    GameObject* screen =      new GameObject(unitquadMesh,    &World::shader0, renderTexture);
-    GameObject* camhandles =  new GameObject(unitcubeMesh,    &World::shader0, 0);
-
-    camhandles->transform(  glm::vec3(0.0f, 5.0f, 2.0f),    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(0.0f, 0.0f, 1.0f), 0.0f);
-    objhandles->transform(  glm::vec3(0.0f, 0.0f, 1.41f),   glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, 0.0f, 0.0f), 0.0f);//objhandles->transformation[0][3]=1.0f;
-    screen->transform(      glm::vec3(-4.0f, 4.0f, 0.0f),   glm::vec3(4.0f, 4.0f, 0.4f),    glm::vec3(0.0f, 1.0f, 0.0f), 225.0f);
-
-    World* w = new World();
-
-    w->sceneRoot->addChild(objhandles, false);       objhandles->addComponent(new Renderer());
-                                                     objhandles->addComponent(new TmpTransform());
-    w->sceneRoot->addChild(camhandles, true);        camhandles->addComponent(new TmpCamera());
-                                                     camhandles->addComponent(new Camera(60.0f, w->sceneRoot, rend));
-    w->sceneRoot->addChild(screen, false);           screen->addComponent(new Renderer());
-
-    w->onStart();
-    return w;
-
-}
 void GUIRecursive(GameObject* root) {
     for (int i = 0; i < root->children.size(); i++) { GUIRecursive(root->children[i]); }
     for (int i = 0; i < root->components.size(); i++) { if (root->components[i]->m_isActive) { root->components[i]->GUI(); } }
@@ -144,7 +115,6 @@ void updateRecursive(GameObject* root){
     for (int i = 0; i < root->children.size(); i++){updateRecursive(root->children[i]);}
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->update();}}
 }
-
 void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
@@ -162,8 +132,6 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
     if(matnode->get()==nullptr){return;}
     Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
 
-    tmpNode=nodebase;//tmp
-
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
@@ -178,133 +146,7 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
     printf("operation %s\n",keyword);
 
 }
-void World::tmpDrawNode() {//this tends to cause crash
-	if(tmpNode.get()==nullptr){return;}
-	WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(tmpNode.get());
-    //if (nodebasedata->getNodebase().get() == nullptr) { return; }
-    const Operation* operation = tmpNode->getOperation();
-    const Core::Transform::DataMap* coreMap = tmpNode->getDataMap();
-	glm::mat4 coreData = glm::mat4(1.0f);
-    //const std::string s= operation->keyWord;
-    
-    //if(strcmp(s.c_str(), "Quat") != 0){
-        const glm::mat4& cp = tmpNode->getData().getMat4();
-        coreData=cp;
-    //}
-    //printf("type %d\n",nodebasedata->getNodebase()->getData().getOpValType());
-	
-	//int idOfNode = nodebasedata->getId().Get();
-	char label[]={0,0};
-    float localData=0.0f;
 
-	ImGui::PushItemWidth(50);
-	for (int rows = 0; rows < 4; rows++){
-		for (int columns = 0; columns < 4; columns++){
-			localData = coreData[columns][rows];
-			bool inactive = ((*coreMap)[columns * 4 + rows] == 0 || (*coreMap)[columns * 4 + rows] == 255);
-			if (inactive){
-				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-			}
-
-			ImGui::SameLine();
-			label[0]='a'+ columns * 4 + rows;
-			if(ImGui::DragFloat(label, &localData, 0.02f, 0.0f, 0.0f, fmt::format("% .{}f", 3).c_str(), 1.0f)){
-				ValueSetResult vsr=tmpNode->setValue(localData, { columns, rows });
-			}
-
-			if (inactive){ImGui::PopItemFlag();ImGui::PopStyleVar();}
-		}
-		ImGui::NewLine();
-	}
-	ImGui::PopItemWidth();
-
-}
-
-Ptr<Core::OrthoProj> tmportho= Core::Builder::createTransform<Core::OrthoProj>();
-Ptr<Core::PerspectiveProj> tmpproj= Core::Builder::createTransform<Core::PerspectiveProj>();
-Ptr<Core::Frustum> tmpfrustrum= Core::Builder::createTransform<Core::Frustum>();
-
-void World::tmpSetNode() {
-    if(tmpSequence.get()==nullptr){
-        tmpSequence = Core::Builder::createSequence();
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::Translation>());
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::EulerRotX>());
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::EulerRotY>());
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::EulerRotZ>());
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::AxisAngleRot>());
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::Scale>());
-        tmpSequence->addMatrix(Core::Builder::createTransform<Core::Free>());
-
-        ((Core::AxisAngleRot*)tmpSequence->getMatrices().at(4).get())->setAxis(glm::vec3(0.0f,1.0f,0.0f));
-        ((Core::AxisAngleRot*)tmpSequence->getMatrices().at(4).get())->setRot(0);
-
-        tmpNode = tmpSequence->getMatrices().at(0);
-        
-        //WorkspaceNodeWithCoreData* nodebasedata = (WorkspaceNodeWithCoreData*)(tmpNode.get());
-        //Core::NodePtr nb= nodebasedata->getNodebase();printf("%p\n",nb.get());
-        //const Operation* operation = nodebasedata->getNodebase()->getOperation();
-        //printf("tmp from builder\n");
-    }
-    if (tmpSequence2.get() == nullptr) {
-        tmpSequence2 = Core::Builder::createSequence();
-        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::Translation>());
-        tmpSequence2->addMatrix(Core::Builder::createTransform<Core::LookAt>());
-        tmpSequence2->addMatrix(tmportho);
-
-        //((Core::Translation*)tmpSequence2->getMatrices().at(0).get())->setX(2.0f);
-        //((Core::EulerRotX*)tmpSequence2->getMatrices().at(0).get())->setValue(1.0f);
-        ((Core::LookAt*)tmpSequence2->getMatrices().at(1).get())->setEye(glm::vec3(0.0f));
-        ((Core::LookAt*)tmpSequence2->getMatrices().at(1).get())->setCenter(glm::vec3(0.0f,0.0f,-1.0f));
-    }
-
-    if(InputManager::isKeyPressed(Keys::t))     {tmpNode=tmpSequence->getMatrices().at(0);}
-    else if(InputManager::isKeyPressed(Keys::x)){tmpNode=tmpSequence->getMatrices().at(1);}
-    else if(InputManager::isKeyPressed(Keys::y)){tmpNode=tmpSequence->getMatrices().at(2);}
-    else if(InputManager::isKeyPressed(Keys::z)){tmpNode=tmpSequence->getMatrices().at(3);}
-    else if(InputManager::isKeyPressed(Keys::w)){tmpNode=tmpSequence->getMatrices().at(4);}
-    //else if(InputManager::isKeyPressed(Keys::q)){tmpNode=Core::Builder::createTransform<Core::QuatRot>();}
-    else if(InputManager::isKeyPressed(Keys::s)){tmpNode=tmpSequence->getMatrices().at(5);tmpNode->setDataMap(&Core::Transform::g_Scale);}
-    else if(InputManager::isKeyPressed(Keys::g)){tmpNode=tmpSequence->getMatrices().at(6);}
-    
-
-    else if(InputManager::isKeyPressed(Keys::o)){
-        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
-        tmpSequence2->addMatrix(tmportho);
-        tmpNode=tmpSequence2->getMatrices().at(2);
-    }
-    else if(InputManager::isKeyPressed(Keys::p)){
-        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
-        tmpSequence2->addMatrix(tmpproj);
-        tmpNode=tmpSequence2->getMatrices().at(2);
-    }
-    else if(InputManager::isKeyPressed(Keys::f)){
-        if(tmpSequence2->getMatrices().size()==3){tmpSequence2->popMatrix(2);}
-        tmpSequence2->addMatrix(tmpfrustrum);
-        tmpNode=tmpSequence2->getMatrices().at(2);
-    }
-    
-    else if(InputManager::isKeyPressed(Keys::l)){tmpNode=tmpSequence2->getMatrices().at(1);}
-    else if (tmpNode.get() == nullptr){tmpNode=tmpSequence->getMatrices().at(5);}
-
-    for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
-        i->second.component->m_isActive=false;
-        *(i->second.editedNode)=nullptr;
-    }
-
-	const char*keyword=tmpNode->getOperation()->keyWord.c_str();
-
-    if(this->manipulators.count(keyword)==1){
-        Manipulator m=this->manipulators[keyword];
-        m.component->m_isActive=true;
-        *m.editedNode=tmpNode;
-        *m.parent=tmpSequence;
-        if(strcmp(keyword,"Ortho")==0||strcmp(keyword,"Frustum")==0||strcmp(keyword,"Perspective")==0||strcmp("LookAt",keyword)==0){*m.parent=tmpSequence2;}
-    }
-    else{
-        printf("no manipulators\n");
-    }
-}
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
     bool lines=false;

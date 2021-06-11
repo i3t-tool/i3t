@@ -273,14 +273,14 @@ void WorkspaceWindow::manipulatorStartCheck3D()
 
     if (ne::HasSelectionChanged())
     {
-        World* world2= Application::get().world2();
+        World* world= Application::get().world();
 
         if ( ne::GetSelectedObjectCount() == 1 && ne::GetSelectedNodes(&selectedNodeID, 1) == 1)
         {
             selectedWorkspaceMatrix4x4 = std::dynamic_pointer_cast<WorkspaceMatrix4x4>(getWorkspaceCoreNodeByID(selectedNodeID));
         }
 
-        world2->handlesSetMatrix(&selectedWorkspaceMatrix4x4, nullptr);
+        world->handlesSetMatrix(&selectedWorkspaceMatrix4x4, nullptr);
 
     }
 }

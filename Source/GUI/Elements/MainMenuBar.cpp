@@ -225,7 +225,7 @@ void MainMenuBar::showViewportsMenu()
 	if (ImGui::BeginMenu("Viewports"))
 	{
 		//Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
-		World*w=App::get().world2();
+		World*w=App::get().world();
 		if (ImGui::MenuItem("View-x"))
 		{
 			// Num 1

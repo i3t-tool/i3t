@@ -54,11 +54,7 @@ public:
     \return GL shader, 0 if failure
     */
     static Shader loadShader(const char* vs_name,const char* fs_name);
-    /// Initialize scene
-    /**
-    Creates and initializes default scene
-    */
-    static World* loadDefaultScene();
+
     /// calls start() on each component in scene
     /**
     
@@ -76,13 +72,6 @@ public:
 
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
-
-    ///tmp - for user test, remove
-    void tmpDrawNode();
-    void tmpSetNode();
-    static std::shared_ptr<Core::NodeBase>tmpNode;
-    static std::shared_ptr<Core::Sequence>tmpSequence;
-    static std::shared_ptr<Core::Sequence>tmpSequence2;
 
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);

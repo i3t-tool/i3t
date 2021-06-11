@@ -18,7 +18,7 @@ class Viewport : public IWindow
 public:
 	I3T_WINDOW(Viewport)
 
-	Viewport(bool show, World* world2);
+	Viewport(bool show, World* world);
 	void render();
 
 private:

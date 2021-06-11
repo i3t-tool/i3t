@@ -10,7 +10,7 @@ WorkspaceScreen::WorkspaceScreen(ImTextureID headerBackground, WorkspaceScreenAr
 	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	rend = new RenderTexture(&renderTexture, 256, 256);
-	cam = new Camera(60.0f, Application::get().world2()->sceneRoot ,rend);
+	cam = new Camera(60.0f, Application::get().world()->sceneRoot ,rend);
 	cam->update();
 
 }
@@ -22,7 +22,7 @@ WorkspaceScreen::WorkspaceScreen(ImTextureID headerBackground, std::string heade
 	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	rend = new RenderTexture(&renderTexture, 256, 256);
-	cam = new Camera(60.0f, Application::get().world2()->sceneRoot,rend);
+	cam = new Camera(60.0f, Application::get().world()->sceneRoot,rend);
 	cam->update();
 
 }

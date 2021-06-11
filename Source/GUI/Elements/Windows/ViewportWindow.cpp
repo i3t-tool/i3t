@@ -43,21 +43,6 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-	/*glClearColor(0.0f, 0.314159f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	GLuint renderTexture;
-	rend = new RenderTexture(&renderTexture, 256, 256);
-	screen = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
-	screen->addComponent(new Renderer());
-	screen->translate(glm::vec3(0.0f, 0.0f, -3.0f));
-	cam = new Camera(60.0f, screen,rend);
-	printf("update\n");
-	cam->update();
-	float val[25]={0.0f};
-	glReadPixels(0,0,5,5,GL_GREEN,GL_FLOAT,val);
-	printf("aaaaa %f\n",val[0]);*/
-
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	// init vectors definig size to display
 	m_wcMin = ImVec2(0, 0);
@@ -169,8 +154,6 @@ void Viewport::render()
 				ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
 
 
-		if(InputManager::isKeyPressed(Keys::shiftl)){m_world->tmpSetNode(); }
-		m_world->tmpDrawNode();
 		m_world->onGUI();
 		ImGui::End();
 	}

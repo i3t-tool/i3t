@@ -18,6 +18,3 @@
 #include "Components/FrustumManipulator.h"
 #include "Components/RotationManipulator.h"
 #include "Components/FreeManipulator.h"
-
-#include "Components/TmpCamera.h"
-#include "Components/TmpTransform.h"
