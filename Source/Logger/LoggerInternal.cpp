@@ -36,18 +36,19 @@ void Logger::initLogger(int argc, char* argv[])
 
 	std::cout << "After load" << std::endl;
 
-	spdlog::set_pattern("[%d.%m.%Y %T:%e]: %v");
+	spdlog::set_pattern("[%l](%@){%!}2: %v");
 
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
-	// sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
-	sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
-	sinks[0]->set_level(spdlog::level::debug);
-	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
+	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+	//sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
+	sinks[0]->set_level(spdlog::level::trace);
+	//sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
+	sinks[0]->set_pattern("[%l](%@){%!}: %v");
 
 	m_consoleLogger = std::make_shared<spdlog::logger>("Log", sinks.begin(), sinks.end());
 
-	logger->set_level(spdlog::level::debug);
+	logger->set_level(spdlog::level::trace);
 	mouseLogger->set_level(spdlog::level::trace);
 
 	std::ostringstream init_message;

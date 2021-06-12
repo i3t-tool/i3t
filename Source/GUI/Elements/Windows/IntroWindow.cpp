@@ -32,13 +32,18 @@ IntroWindow::IntroWindow(bool show) : IWindow(show)
   catch (std::runtime_error& e) {
     LOG_ERROR(e.what())
   }
-  
+  LOG_DEBUG("debug")
+  LOG_INFO("info");
+  LOG_ERROR("info");
+  Log::debug("debug new");
+  Log::info("info new");
+  Log::fatal("fatal new");
   reloadTutorials();
 }
 
 void IntroWindow::reloadTutorials()
 {
-  // preload all tutorials located in TUTORIALS_FOLDER and its subfolders
+  // preload all tutorials located in TUTORIALS_FOLDER recursively
   auto path = std::filesystem::path(Config::getAbsolutePath(Config::TUTORIALS_FOLDER));
   path.make_preferred(); // unifies the directory separator for this platform
   LOG_INFO("Searching for tutorials in: " + path.string())
@@ -47,9 +52,9 @@ void IntroWindow::reloadTutorials()
     if (entry.path().extension() == ".tut") {
       std::string pathString = entry.path().string();
       LOG_DEBUG(pathString)
-      std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString);
-      if (header) {
-        m_tutorial_headers.push_back(header);
+    	// Load header part of tutorial
+      if (std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString); header) {
+        m_tutorial_headers.push_back(std::move(header));
       }
       else {
         LOG_ERROR("Tutorial header " + pathString + " not loaded." );
@@ -58,20 +63,26 @@ void IntroWindow::reloadTutorials()
   }
 }
 
+/**
+ * @brief Renders the whole tutorial window
+*/
 void IntroWindow::render()
 {
+	// Set initial window size
   ImVec2 windowSize = ImVec2(1020, 600);
   static bool firstTime = true;
   if (firstTime) {
     firstTime = false;
     ImGui::SetNextWindowSize(windowSize);
   }
+	// Styling constants
   const float leftBarWidth = 330;
   const float loadBtnWidth = 120;
   const float startNewBtnWidth = loadBtnWidth;
   const float thumbImageSize = 80;
   const float startBtnWidth = 120;
 
+	// WINDOW
   ImGui::PushStyleColor(ImGuiCol_WindowBg , IM_COL32_WHITE);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6);
@@ -219,18 +230,16 @@ void IntroWindow::render()
       }
       ImGui::PopStyleVar();
 
-
       //ImGui::Spacing();
-
-
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20, 0));
       //// TABS
       //if (ImGui::BeginTabBar("TabBar")) 
       //{
       //  // TUTORIALS
       //  if (ImGui::BeginTabItem("Tutorials")) 
       //  {
+      
       // TUTORIAL LIST CHILD WINDOW
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20, 0));
       ImGui::BeginChild("Tutorial list", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
       {
         //ImGui::Separator();
@@ -287,7 +296,9 @@ void IntroWindow::render()
               ImGui::Spring(1);
               ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
               ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-              if (ImGui::Button("Start", ImVec2(startBtnWidth,0))) {
+            	std::string buttonName = "Start##" + header->m_filename;
+              if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth,0))) {
+              	// TUTORIAL LOADING !!!
                 auto tutorial = TutorialLoader::loadTutorial(header);
                 if (tutorial) {
                   Log::debug("Tutorial " + header->m_title + " loaded");
