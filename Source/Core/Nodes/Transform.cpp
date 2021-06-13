@@ -23,6 +23,18 @@ void Transformation::notifySequence()
 }
 
 //===----------------------------------------------------------------------===//
+ETransformState Scale::isValid() const
+{
+	bool result = Transform::cmp(&Transform::g_Scale, m_internalData[0].getMat4());
+	if (hasSynergies())
+	{
+		auto& mat = m_internalData[0].getMat4();
+		result = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
+	}
+
+	return ETransformState(result);
+}
+
 void Scale::lock()
 {
 	m_currentMap = &Transform::g_Scale;
@@ -160,6 +172,19 @@ ValueSetResult Scale::setZ(float v)
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
+ETransformState EulerRotX::isValid() const
+{
+	auto& mat = m_internalData[0].getMat4();
+	bool result = Transform::isMatValid(&Transform::g_EulerX, mat);;
+
+	float angle = std::atan2(-mat[2][1], mat[2][2]);
+	auto expectedMat = glm::eulerAngleX(angle);
+
+	result = result && Math::eq(expectedMat, mat);
+
+	return ETransformState(result);
+}
+
 void EulerRotX::lock()
 {
 	m_currentMap = &Transform::g_EulerX;
@@ -270,10 +295,23 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 void EulerRotX::reset()
 {
 	setDataMap(m_initialMap);
-	setValue(glm::eulerAngleX(m_initialRot));
+	setInternalValue(glm::eulerAngleX(m_initialRot));
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
+ETransformState EulerRotY::isValid() const
+{
+	auto& mat = m_internalData[0].getMat4();
+	bool result = Transform::isMatValid(&Transform::g_EulerY, mat);
+
+	float angle = std::asin(mat[2][0]);
+	auto expectedMat = glm::eulerAngleY(angle);
+
+	result = result && Math::eq(expectedMat, mat);
+
+	return ETransformState(result);
+}
+
 void EulerRotY::lock()
 {
     m_currentMap = &Transform::g_EulerY;
@@ -375,10 +413,23 @@ ValueSetResult EulerRotY::setValue(float val, glm::ivec2 coords)
 void EulerRotY::reset()
 {
 	setDataMap(m_initialMap);
-	setValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
+	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
+ETransformState EulerRotZ::isValid() const
+{
+	auto& mat = m_internalData[0].getMat4();
+	bool result = Transform::isMatValid(&Transform::g_EulerZ, mat);
+
+	float angle = glm::atan(mat[0][1], mat[0][0]);
+	auto expectedMat = glm::eulerAngleZ(angle);
+
+	result = result && Math::eq(expectedMat, mat);
+
+	return ETransformState(result);
+}
+
 void EulerRotZ::lock()
 {
     m_currentMap = &Transform::g_EulerZ;
@@ -481,6 +532,18 @@ void EulerRotZ::reset()
 }
 
 //===-- Translation -------------------------------------------------------===//
+ETransformState Translation::isValid() const
+{
+	bool result = Transform::isMatValid(&Transform::g_Translate, m_internalData[0].getMat4());
+	if (hasSynergies())
+	{
+		auto& mat = m_internalData[0].getMat4();
+		result = result && Math::eq(mat[3][0], mat[3][1]) && Math::eq(mat[3][1], mat[3][2]);
+	}
+
+	return ETransformState(result);
+}
+
 void Translation::lock()
 {
 	m_currentMap = &Transform::g_Translate;
@@ -576,6 +639,11 @@ ValueSetResult Translation::setZ(float v)
 }
 
 //===-- Axis angle rotation -----------------------------------------------===//
+ETransformState AxisAngleRot::isValid() const
+{
+	return ETransformState::Unknown;
+}
+
 void AxisAngleRot::reset()
 {
 	m_currentMap = m_initialMap;
@@ -608,6 +676,11 @@ ValueSetResult AxisAngleRot::setAxis(const glm::vec3& axis)
 }
 
 //===-- Quaternion rotation -----------------------------------------------===//
+ETransformState QuatRot::isValid() const
+{
+	return ETransformState::Unknown;
+}
+
 void QuatRot::reset()
 {
 	notifySequence();
@@ -633,6 +706,11 @@ ValueSetResult QuatRot::setValue(const glm::vec4& vec)
 }
 
 //===-- Orthographic projection -------------------------------------------===//
+ETransformState OrthoProj::isValid() const
+{
+	return ETransformState(Transform::isMatValid(&Transform::g_Ortho, m_internalData[0].getMat4()));
+}
+
 void OrthoProj::lock()
 {
     m_currentMap = &Transform::g_Ortho;
@@ -700,6 +778,11 @@ ValueSetResult OrthoProj::setFar(float val)
 }
 
 //===-- Perspective -------------------------------------------------------===//
+ETransformState PerspectiveProj::isValid() const
+{
+	return ETransformState(Transform::isMatValid(&Transform::g_Perspective, m_internalData[0].getMat4()));;
+}
+
 void PerspectiveProj::lock()
 {
     m_currentMap = &Transform::g_Perspective;
@@ -753,6 +836,11 @@ ValueSetResult PerspectiveProj::setValue(float val, glm::ivec2 coords)
 }
 
 //===-- Frusum ------------------------------------------------------------===//
+ETransformState Frustum::isValid() const
+{
+	return ETransformState(Transform::isMatValid(&Transform::g_Frustum, m_internalData[0].getMat4()));
+}
+
 void Frustum::lock()
 {
     m_currentMap = &Transform::g_Frustum;
@@ -820,6 +908,11 @@ ValueSetResult Frustum::setFar(float val)
 }
 
 //===-- Look At -----------------------------------------------------------===//
+
+ETransformState LookAt::isValid() const
+{
+	return ETransformState::Unknown;
+}
 
 void LookAt::reset()
 {

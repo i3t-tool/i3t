@@ -10,9 +10,9 @@ using namespace Core;
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
-TEST(EulerXTest, OneValueSet)
+TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 {
-	auto rotXNode = Core::Builder::createTransform<EulerRotX>();
+	auto rotXNode = Builder::createTransform<EulerRotX>();
 
 	{
 		// mat[1][1], cos(T)
@@ -22,7 +22,9 @@ TEST(EulerXTest, OneValueSet)
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
+		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
 	}
 	{
 		// mat[1][2], sin(T)
@@ -32,7 +34,9 @@ TEST(EulerXTest, OneValueSet)
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
+		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
 	}
 	{
 		// mat[2][1], -sin(T)
@@ -42,7 +46,9 @@ TEST(EulerXTest, OneValueSet)
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
+		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
 	}
 	{
 		// mat[2][2], cos(T)
@@ -52,8 +58,34 @@ TEST(EulerXTest, OneValueSet)
 
 		auto mat = rotXNode->getData().getMat4();
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
+
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
+		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
 	}
+}
+
+TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState)
+{
+	auto rot = Builder::createTransform<EulerRotX>();
+	rot->disableSynergies();
+
+	auto rads = generateFloat();
+
+	setValue_expectOk(rot, glm::sin(rads), {1, 2});
+
+	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
+}
+
+TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
+{
+	auto rot = Builder::createTransform<EulerRotX>();
+	rot->unlock();
+
+	auto rads = generateFloat();
+
+	setValue_expectOk(rot, glm::sin(rads), {2, 3});
+
+	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 }
 
 TEST(GLM, RotateXAndEulerAngleXShouldBeSame)

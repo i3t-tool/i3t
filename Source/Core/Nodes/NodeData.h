@@ -141,7 +141,10 @@ FORCE_INLINE bool eq(const DataMap& lhs, const DataMap& rhs)
 }
 
 /**
- * Compare data map with matrix..
+ * Compare data map with matrix.
+ *
+ * Validate if matrix contains 0, 1 or custom value at positions determined
+ * by appropriate data map.
  */
 bool cmp(const DataMap* map, const glm::mat4& mat);
 

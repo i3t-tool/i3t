@@ -83,7 +83,7 @@ public:
 
 	DataStore& getInternalData(size_t index = 0) override;
 
-	const Matrices& getMatrices() { return m_storage->m_matrices; }
+	const Matrices& getMatrices() const { return m_storage->m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.

@@ -7,26 +7,42 @@
 
 using namespace Core;
 
-TEST(TranslationTest, CoordsValidation)
+TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 {
 	auto translationNode = Builder::createTransform<Translation>();
 
-	{
-		// Invalid coordinates.
-		auto result = translationNode->setValue(-2.0f, {0, 3});
-		EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
-	}
-	{
-		// Valid coordinates.
-    setValue_expectOk(translationNode, -2.0f, {3, 0});
-    setValue_expectOk(translationNode, -2.0f, {3, 1});
-    setValue_expectOk(translationNode, -2.0f, {3, 2});
+	// Invalid coordinates.
+	auto result = translationNode->setValue(-2.0f, {0, 3});
 
-		auto translMat = glm::translate(glm::vec3(-2.0f, -2.0f, -2.0f));
-		auto data = translationNode->getData().getMat4();
+	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
+	EXPECT_EQ(ETransformState::Valid, translationNode->isValid());
+}
 
-		EXPECT_EQ(translMat, data);
-	}
+TEST(TranslationTest, ValidValues_Ok)
+{
+	auto translationNode = Builder::createTransform<Translation>();
+
+	// Valid coordinates.
+	setValue_expectOk(translationNode, -2.0f, {3, 0});
+	setValue_expectOk(translationNode, -2.0f, {3, 1});
+	setValue_expectOk(translationNode, -2.0f, {3, 2});
+
+	auto translMat = glm::translate(glm::vec3(-2.0f, -2.0f, -2.0f));
+	auto data = translationNode->getData().getMat4();
+
+	EXPECT_EQ(translMat, data);
+	EXPECT_EQ(ETransformState::Valid, translationNode->isValid());
+}
+
+TEST(TranslationTest, Unlocked_InvalidValues_InvalidState)
+{
+	auto translationNode = Builder::createTransform<Translation>();
+	translationNode->unlock();
+
+	// Invalid coordinates.
+	setValue_expectOk(translationNode, generateFloat(10.0f, 20.0f), {1, 1});
+
+	EXPECT_EQ(ETransformState::Invalid, translationNode->isValid());
 }
 
 TEST(TranslationTest, GettersAndSetterShouldBeOk)

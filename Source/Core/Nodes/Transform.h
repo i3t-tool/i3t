@@ -16,6 +16,13 @@ FORCE_INLINE bool isTransform(NodePtr& node)
 	return it != g_transforms.end();
 }
 
+enum class ETransformState
+{
+	Invalid = 0,
+	Valid,
+	Unknown
+};
+
 class Transformation : public NodeBase
 {
 	friend class Storage;
@@ -31,6 +38,7 @@ public:
 	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
 	int getCurrentIndex() const { return m_currentIndex; }
 
+	virtual ETransformState isValid() const { return ETransformState::Unknown; }
 	virtual void lock();
 	virtual void unlock();
 	bool hasSynergies() const { return m_hasEnabledSynergies; }
@@ -73,6 +81,8 @@ public:
 		m_initialMap = &Transform::g_Free;
 	}
 
+	ETransformState isValid() const override { return ETransformState::Valid; }
+
 	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
 	{
 		setInternalValue(mat);
@@ -104,6 +114,7 @@ public:
 		enableSynergies();
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
 	[[nodiscard]] ValueSetResult setValue(float val) override;
@@ -144,6 +155,7 @@ public:
 		enableSynergies();
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
 	[[nodiscard]] float getRot() const { return m_initialRot; }
@@ -179,6 +191,7 @@ public:
 		enableSynergies();
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
 	[[nodiscard]] float getRot() const { return m_initialRot; }
@@ -214,6 +227,7 @@ public:
 		enableSynergies();
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
 	float getAngle() const { return m_initialRot; }
@@ -241,6 +255,7 @@ public:
 		m_currentMap = &map;
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
 	float getX();
@@ -267,12 +282,14 @@ class AxisAngleRot : public Transformation
 	glm::vec3 m_initialAxis;
 
 public:
-	AxisAngleRot(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
+	explicit AxisAngleRot(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
 	{
 		m_initialMap = &Transform::g_AllLocked;
 		m_currentMap = m_initialMap;
 	}
+
+	ETransformState isValid() const override;
 
 	float getRot() const { return m_initialRads; };
 	const glm::vec3& getAxis() const { return m_initialAxis; };
@@ -292,15 +309,18 @@ class QuatRot : public Transformation
 	glm::quat m_normalized;
 
 public:
-	QuatRot(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
-			: Transformation(getTransformProps(ETransformType::Quat)), m_initialQuat(q)
+	explicit QuatRot(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
+			: Transformation(getTransformProps(ETransformType::Quat))
 	{
-
+		m_initialQuat = q;
+		m_normalized = glm::normalize(q);
 	}
+
+	ETransformState isValid() const override;
 
 	const glm::quat& getNormalized() const;
 
-	ValueSetResult setValue(const glm::quat& vec);
+	ValueSetResult setValue(const glm::quat& vec) override;
 	ValueSetResult setValue(const glm::vec4& vec) override;
 
 	void reset() override;
@@ -316,7 +336,7 @@ class OrthoProj : public Transformation
 	float m_far;
 
 public:
-	OrthoProj(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
+	explicit OrthoProj(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	          float far = 10.0f)
 			: Transformation(getTransformProps(ETransformType::Ortho)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
@@ -325,6 +345,7 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
 	float getLeft() const { return m_left; }
@@ -355,7 +376,7 @@ class PerspectiveProj : public Transformation
 	float m_initialZFar;
 
 public:
-	PerspectiveProj(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
+	explicit PerspectiveProj(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
 			: Transformation(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
 				m_initialZNear(zNear), m_initialZFar(zFar)
 	{
@@ -364,12 +385,13 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
-	float getFOW() { return m_initialFOW; }
-	float getAspect() { return m_initialAspect; }
-	float getZNear() { return m_initialZNear; }
-	float getZFar() { return m_initialZFar; }
+	float getFOW() const { return m_initialFOW; }
+	float getAspect() const { return m_initialAspect; }
+	float getZNear() const { return m_initialZNear; }
+	float getZFar() const { return m_initialZFar; }
 
 	ValueSetResult setFOW(float v);
 	ValueSetResult setAspect(float v);
@@ -391,7 +413,7 @@ class Frustum : public Transformation
 	float m_far;
 
 public:
-	Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
+	explicit Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	        float far = 10.0f)
 			: Transformation(getTransformProps(ETransformType::Frustum)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
@@ -400,14 +422,15 @@ public:
 		m_currentMap = m_initialMap;
 	}
 
+	ETransformState isValid() const override;
 	void lock() override;
 
-	float getLeft() { return m_left; }
-	float getRight() { return m_right; }
-	float getBottom() { return m_bottom; }
-	float getTop() { return m_top; }
-	float getNear() { return m_near; }
-	float getFar() { return m_far; }
+	float getLeft() const { return m_left; }
+	float getRight() const { return m_right; }
+	float getBottom() const { return m_bottom; }
+	float getTop() const { return m_top; }
+	float getNear() const { return m_near; }
+	float getFar() const { return m_far; }
 
 	ValueSetResult setLeft(float val);
 	ValueSetResult setRight(float val);
@@ -431,7 +454,7 @@ class LookAt : public Transformation
 	glm::vec3 m_initialUp;
 
 public:
-	LookAt(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
+	explicit LookAt(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
 	       const glm::vec3& up = {0.0f, 1.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
 				m_initialUp(up)
@@ -439,6 +462,8 @@ public:
 		m_initialMap = &Transform::g_AllLocked;
 		m_currentMap = m_initialMap;
 	}
+
+	ETransformState isValid() const override;
 
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
@@ -451,4 +476,4 @@ public:
 	ValueSetResult setCenter(const glm::vec3& center);
 	ValueSetResult setUp(const glm::vec3& up);
 };
-} // namespac
+}

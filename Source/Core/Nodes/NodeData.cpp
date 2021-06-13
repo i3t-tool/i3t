@@ -13,7 +13,7 @@ bool Transform::cmp(const Transform::DataMap* mapPtr, const glm::mat4& mat)
 			switch (map[4 * i + j])
 			{
 			case 0:
-				if (!Math::eq(mat[i][j], 0.0f) || !Math::eq(mat[i][j], -0.0f))
+				if (!Math::eq(abs(mat[i][j]), 0.0f))
 				{
 					return false;
 				}
