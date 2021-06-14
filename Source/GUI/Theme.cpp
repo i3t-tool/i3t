@@ -55,7 +55,7 @@ void Theme::initDefaultProperties()
 	set(EColor::WindowBackground, ImVec4(0.439f, 0.439f, 0.455f, 1.00f));
 	set(EColor::PopupBackground, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
 	set(EColor::MenuBarBackground, ImVec4(0.40f, 0.38f, 0.369f, 1.00f));
-	set(EColor::Border, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Border, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
 	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
 	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
@@ -310,13 +310,15 @@ void Theme::apply()
 	style.FramePadding.x	 = m_sizesVec2[ESizeVec2::Window_FramePadding].x;
 	style.FramePadding.y	 = m_sizesVec2[ESizeVec2::Window_FramePadding].y;
 	style.TabRounding			 = 2.0f;
+
+	// Show borders.
 	style.ChildBorderSize	 = 0.0f;
-	style.PopupBorderSize	 = 0.0f;
-	style.WindowBorderSize = 0.0f;
+	style.PopupBorderSize	 = 1.0f;
+	style.WindowBorderSize = 1.0f;
 
 	// SS, MH please check this
 	//---------------------------------------------------------------------------------------
-	auto& nodesStyle																								 = ax::NodeEditor::GetStyle();
+	auto& nodesStyle = ax::NodeEditor::GetStyle();
 
 	nodesStyle.NodeRounding																					 = m_sizes[ESize::Nodes_Rounding];
 	nodesStyle.NodeBorderWidth																			 = m_sizes[ESize::Nodes_BorderWidth];

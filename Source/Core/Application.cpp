@@ -34,8 +34,6 @@ void Application::init()
 {
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
-	ConsoleCommand::addListener(
-			[this](std::string rawCommand) { Log::info("Application got command '{}'.", rawCommand); });
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 
   /// \todo MH remove test code.
