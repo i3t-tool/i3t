@@ -68,12 +68,18 @@ public:
   /// Constructor.
   /**
     Creates scene object.
-    \param[in] mesh Mesh data of this object
+    \param[in] mesh Mesh data of this GameObject
     \param[in] shader Shader program that is used for rendering this object
     \param[in] param Callback Function that is called on draw(). Can be NULL. \todo PF -chybejici parametr
     \param[in] texture Texture of this object. Set 0 for no texture, object is then rendered solid black
   */
   GameObject(const pgr::MeshData mesh, struct Shader* shader, GLuint texture);
+  ///Delete previous geometry, if exists, and create new
+  /*
+   Deletes geometry of this GameObject from GPU and creates new one.
+   \param[in] mesh New mesh data for this GameObject
+  */
+  void setMeshData(const pgr::MeshData mesh);
   ~GameObject();
   /// Translate, scale and rotate object at once
   /**
