@@ -164,7 +164,8 @@ enum class EValueType
 	Matrix,
 	Quat,
 	MatrixMul, ///< connection of sequences in the scene graph - represents a matrix multiplication
-	Screen     ///< projection and camera view transformation
+	Screen,    ///< projection and camera view transformation
+	Ptr,
 };
 
 /**
@@ -187,6 +188,7 @@ public:
 	{
 		switch (valueType)
 		{
+		case EValueType::Ptr:
 		case EValueType::Screen:
 			setValue((void*)nullptr);
 			break;

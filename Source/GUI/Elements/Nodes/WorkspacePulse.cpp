@@ -3,6 +3,7 @@
 //
 
 #include "WorkspacePulse.h"
+
 WorkspacePulse::WorkspacePulse(ImTextureID headerBackground, WorkspacePulseArgs const& args)
     : WorkspaceNodeWithCoreData(headerBackground, { .levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
 {

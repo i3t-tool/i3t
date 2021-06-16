@@ -1,8 +1,9 @@
 /*! \file WorkspaceWindow.cpp
     \brief Drawing and manipulation with Workspace.
 */
-
 #include "WorkspaceWindow.h"
+
+#include "GUI/Elements/Nodes/WorkspaceModel.h"
 
 #include "../../Theme.h"
 #include "Core/Input/InputManager.h"
@@ -1293,8 +1294,13 @@ void WorkspaceWindow::checkQueryContextMenus()
             ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
 		if (ImGui::MenuItem("camera")) {
-            m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
-            ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+			m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCamera>(m_headerBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+		}
+		if (ImGui::MenuItem("model"))
+		{
+			m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceModel>(m_headerBackgroundTexture));
+			ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 		}
     if (ImGui::MenuItem("pulse")) {
       m_workspaceCoreNodes.push_back(std::make_shared<WorkspacePulse>(m_headerBackgroundTexture));

@@ -1377,7 +1377,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int input
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		auto targetStorage = m_inputs[0].getStorage();
+		auto& targetStorage = m_inputs[0].getStorage();
 		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = targetStorage.getMat4();
 	}
 }

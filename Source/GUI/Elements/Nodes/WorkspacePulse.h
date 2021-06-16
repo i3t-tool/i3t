@@ -20,7 +20,6 @@ public:
   WorkspacePulse(ImTextureID headerBackground, std::string headerLabel = "Pulse", std::string nodeLabel = "Pulse");
 
 
-
   void drawDataFull(util::NodeBuilder& builder, int index);
   void drawDataSetValues(util::NodeBuilder& builder);
   int maxLenghtOfData();

@@ -6,6 +6,7 @@
  */
 //---------------
 #pragma once
+
 #include "pgr.h"
 
 /*struct pgr::MeshData {
