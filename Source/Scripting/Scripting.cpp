@@ -370,24 +370,11 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		else if (strcmp(keyword, "MakeTranslation") == 0) {
 			fprintf(f, "int n%d=mat4oper(translate,%d,%d,\"%s\");\n", i+at,(int)pos[0], (int)pos[1], label.c_str());
 		}
-		//sequence
-		else if (strcmp(keyword, "Sequence") == 0) {
-			
-			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
-			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=seq->getInnerWorkspaceNodes();
-			saveWorkspace(f,&ctx,at+i);
-			//at+=ctx.size();
-			int seqpos= i + at + (int)ctx.size();
-			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", seqpos, (int)pos[0], (int)pos[1], label.c_str());
-			for(int j=0;j<ctx.size();j++){
-				fprintf(f, "bool sa%d_%d=seqadd(n%d,n%d);\n", seqpos,i+at, seqpos,i+at);
-				at++;
-			}
-			
-		}
 		//
 		else {
-			fprintf(f, "//int n%d=%s(d%d,%d,%d);//unknown type\n", i+at, keyword,i+at, (int)pos[0], (int)pos[1]);
+		//some nodes must be processed after writing plugs, because they change workspace. They are not processed in this loop and should not be reported as unknown.
+			bool known=(strcmp(keyword, "Sequence") == 0);
+			if(!known){fprintf(f, "//int n%d=%s(d%d,%d,%d);//unknown type\n", i+at, keyword,i+at, (int)pos[0], (int)pos[1]);}
 		}
 	}
 
@@ -422,6 +409,30 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 				if (parent.get() == (_workspace->at(j).get())->getNodebase().get()) {parentindex = j;}
 			}
 			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){fprintf(f,"bool p%d_%d=plugnodes(n%d,n%d,%d,%d);\n",i+at,indexin, parentindex,i+at,indexout,indexin);}
+		}
+	}
+	for (int i = 0; i < _workspace->size(); i++) {
+		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
+		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase(); //printf("a\n");
+		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId()); //printf("b\n");
+		const Core::Transform::DataMap&	data	= nodebase->getDataMapRef(); //printf("c\n");
+		const Operation*			operation	= nodebase->getOperation(); //printf("d\n");
+		const char*					keyword		= operation->keyWord.c_str(); //printf("e\n");
+		std::string					label		= nodebasedata->getHeaderLabel(); //printf("f\n");
+		//sequence
+		if (strcmp(keyword, "Sequence") == 0) {
+			
+			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
+			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=seq->getInnerWorkspaceNodes();
+			saveWorkspace(f,&ctx,at+i);
+			//at+=ctx.size();
+			int seqpos= i + at + (int)ctx.size();
+			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", seqpos, (int)pos[0], (int)pos[1], label.c_str());
+			for(int j=0;j<ctx.size();j++){
+				fprintf(f, "bool sa%d_%d=seqadd(n%d,n%d);\n", seqpos,i+at, seqpos,i+at);
+				at++;
+			}
+			
 		}
 	}
 	return true;
@@ -468,59 +479,15 @@ int picocRunSource(const char* source){
 void Scripting::runCommand(std::string cmd) {
 	if(!m_init){return;}
 	if(PicocPlatformSetExitPoint(&m_picoc)){return;}
+
 	if(strcmp(cmd.c_str(),"help")==0){
-		std::cout<<
-			"int datamat4(float f1, float f2, ..., float f16)\n"
-			"int datavec4(float f1, float f2, float f3, float f4)\n"
-			"int datavec3(float f1, float f2, float f3)\n"
-			"int datascalar(float f)\n"
-			"\n"
-			"int mat4oper(int type, int x, int y, char* header)\n"
-			"int mat4operc(int type)\n"
-			"int mat4(int type, int data, int x, int y, char* header)\n"
-			"int mat4c(int type, int data)\n"
-			"int vec4oper(int type, int x, int y, char* header)\n"
-			"int vec4operc(int type)\n"
-			"int vec4(int data, int x, int y, char* header)\n"
-			"int vec4c(int data)\n"
-			"int vec3oper(int type, int x, int y, char* header)\n"
-			"int vec3operc(int type)\n"
-			"int vec3(int data, int x, int y, char* header)\n"
-			"int vec3c(int data)\n"
-			"int scalar(int data, int x, int y, char* header)\n"
-			"int scalarc(int data)\n"
-			"int scalar3oper(int type, int x, int y, char* header)\n"
-			"int scalar3operc(int type)\n"
-			"\n"
-			"Page 1/2. Enter \"help2\" to continue.\n";
+		scriptingHelp(0);
 	}
 	else if(strcmp(cmd.c_str(),"help2")==0){
-		std::cout <<
-			"int quatoper(int type, int x, int y, char* header)\n"
-			"int quatoperc(int type)\n"
-			"int quat(int data, int x, int y, char* header)\n"
-			"int quatc(int data)\n"
-			"\n"
-			"int convertor(int type, int x, int y, char* header)\n"
-			"int convertorc(int type)\n"
-			"int sequence(int x, int y, char* header)\n"
-			"int sequencec()\n"
-			"\n"
-			"bool seqadd(int sequence, int node);\n"
-			"bool plugnodes(int lnode, int rnode, int output, int input)\n"
-			"bool unpluginput(int node, int input)\n"
-			"\n"
-			"int getnode(char* header)\n"
-			"bool delnode(int node)\n"
-			"bool confnode(int node, int precision, int lod)\n"
-			"\n"
-			"bool load(char* filename)\n"
-			"bool append(char* filename)\n"
-			"bool save(char* filename)\n"
-			"bool savesel(char* filename)\n"
-			"bool run(char* filename)\n"
-			"\n"
-			"Page 2/2.";
+		scriptingHelp(1);
+	}
+	else if(strcmp(cmd.c_str(),"help3")==0){
+		scriptingHelp(2);
 	}
 	else{
 		PicocParse(&m_picoc, "Run command", cmd.c_str(), (int)cmd.size(), TRUE, TRUE, TRUE, TRUE);
@@ -535,4 +502,82 @@ Scripting::Scripting() {
 }
 Scripting::~Scripting() {
 	PicocCleanup(&m_picoc);
+}
+
+void scriptingHelp(int page) {
+	if(page<0){page=0;}
+	else if(page>3){page=3;}
+	char *pages[4];
+	pages[0]=
+		"int datamat4(float f1, float f2, ..., float f16)\n"
+		"int datavec4(float f1, float f2, float f3, float f4)\n"
+		"int datavec3(float f1, float f2, float f3)\n"
+		"int datascalar(float f)\n"
+		"\n"
+		"int mat4oper(int type, int x, int y, char* header)\n"
+		"int mat4operc(int type)\n"
+		"Types are: determinant, inverse, mul, add, matmulvec, vecmulmat, floatmulmat, "
+		"free, /trackball, transpose, ortho, perspective, frustrum, axisangle, rotatex, "
+		"rotatey, rotatez, scale, lookat, translate"
+		"\n"
+		"int mat4(int type, int data, int x, int y, char* header)\n"
+		"int mat4c(int type, int data)\n"
+		"Types are: scale, uniscale, translate, free, lookat, ortho, perspective, "
+		"frustrum, rotatex, rotatey, rotatez, axisangle"
+		"\n"
+		"int vec4(int data, int x, int y, char* header)\n"
+		"int vec4c(int data)\n"
+		"int vec4oper(int type, int x, int y, char* header)\n"
+		"int vec4operc(int type)\n"
+		"Types are: dot, perspdiv, norm, vecmulfloat, add, sub, mix"
+		"\n"
+		"int vec3(int data, int x, int y, char* header)\n"
+		"int vec3c(int data)\n"
+		"int vec3oper(int type, int x, int y, char* header)\n"
+		"int vec3operc(int type)\n"
+		"Types are: cross, dot, norm, length, vecmulfloat, add, sub, ,show, mix"
+		"\n"
+		"Page 1/3. Enter \"help2\" to continue.\n";
+	pages[1] =
+		"int scalar(int data, int x, int y, char* header)\n"
+		"int scalarc(int data)\n"
+		"int scalar3oper(int type, int x, int y, char* header)\n"
+		"int scalar3operc(int type)\n"
+		"Types are: cycle, pow, sincos, clamp, signum, mul, add, div, mix"
+		"\n"
+		"int quat(int data, int x, int y, char* header)\n"
+		"int quatc(int data)\n"
+		"int quatoper(int type, int x, int y, char* header)\n"
+		"int quatoperc(int type)\n"
+		"Types are: scalarvec3_quat, angleaxis_quat, vec3vec3_quat, quat_scalarvec3, "
+		"quat_angleaxis, scalarmulquat, quat_euler, euler_quat, slerp, longslerp, "
+		"lerp, conjugate, qvq, inverse, length, norm"
+		"\n"
+		"int convertor(int type, int x, int y, char* header)\n"
+		"int convertorc(int type)\n"
+		"Types are: mat_tr, tr_mat, mat_vecs4, mat_quat, mat_scalars, vecs4_mat, "
+		"vec4_vec3, vec4_scalars, vecs3_mat, vec3_vec4, vec3_scalars, quat_mat, "
+		"quat_scalars, scalars_mat, scalars_vec3, scalars_vec4, scalars_quat"
+		"\n"
+		"Page 2/3. Enter \"help3\" to continue.\n";
+	pages[2] =
+		"int sequence(int x, int y, char* header)\n"
+		"int sequencec()\n"
+		"\n"
+		"bool seqadd(int sequence, int node);\n"
+		"bool plugnodes(int lnode, int rnode, int output, int input)\n"
+		"bool unpluginput(int node, int input)\n"
+		"\n"
+		"int getnode(char* header)\n"
+		"bool delnode(int node)\n"
+		"bool confnode(int node, int decimals, int lod)\n"
+		"\n"
+		"bool load(char* filename)\n"
+		"bool append(char* filename)\n"
+		"bool save(char* filename)\n"
+		"bool savesel(char* filename)\n"
+		"bool run(char* filename)\n"
+		"\n"
+		"Page 3/3.";
+	std::cout<<pages[page];
 }

@@ -19,6 +19,7 @@ public:
 
 	Viewport(bool show, World* world);
 	void render();
+	InputController getInput();
 
 private:
 	World* m_world;

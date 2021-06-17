@@ -24,15 +24,14 @@ void onScroll(float val)
 #include "World/HardcodedMeshes.h"
 /// \todo Use Framebuffer class.
 /// 
-/*GLuint renderTexture;
-RenderTexture* rend;
-GameObject* screen;
-Camera* cam ;*/
 
 Viewport::Viewport(bool show, World* world) : IWindow(show)
 {
 	m_world = world;
-	Input.bindAxis("MouseScroll",[this](float val){m_world->scroll=val;});
+	Input.bindAxis("MouseScroll",[this](float val){m_world->sceneZoom(val);});
+	Input.bindAxis("KeyWorld_mousePan", [this](float x) {printf("pan %f\n",x); });
+	Input.bindAxis("KeyWorld_mouseRotate", [this](float x) {printf("rot %f\n",x); });
+	Input.bindAction("test",EKeyState::Released,[this](){printf("test bhbhb\n");});
 
 	// Framebuffer is used in Viewport window.
 	// generate a framebuffer for display function
@@ -43,9 +42,7 @@ Viewport::Viewport(bool show, World* world) : IWindow(show)
 
 	// create a renderbuffer to allow depth and m_stencil
 	glGenRenderbuffers(1, &m_rboMain);
-	glBindRenderbuffer(GL_RENDERBUFFER, m_rboMain);
-	// glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glEnable(GL_MULTISAMPLE);
 	glCullFace(GL_BACK);
@@ -55,7 +52,6 @@ Viewport::Viewport(bool show, World* world) : IWindow(show)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	// init vectors definig size to display
 	m_wcMin = ImVec2(0, 0);
 	m_wcMax = ImVec2(0, 0);
@@ -88,6 +84,7 @@ float localData;
 
 void Viewport::render()
 {
+	CHECK_GL_ERROR();
 
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
@@ -126,13 +123,14 @@ void Viewport::render()
 			int height = static_cast<int>(abs(m_wcMax.y - m_wcMin.y));
 
 			// create new image in our texture
-			glBindTexture(GL_TEXTURE_2D, m_texColBufMain);
+			glBindTexture(GL_TEXTURE_2D , m_texColBufMain);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			// attach it to currently bound framebuffer object
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texColBufMain, 0);
+
 
 			// resize renderbuffer
 			glBindRenderbuffer(GL_RENDERBUFFER, m_rboMain);
@@ -142,23 +140,33 @@ void Viewport::render()
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rboMain);
 
 			// resize all other things
-			// m_world->onReshape(width, height);
-      InputManager::setScreenSize((int)width, (int)height);
+			InputManager::setScreenSize((int)width, (int)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 
 			// set viewport size to be sure
 			glViewport(0, 0, width, height);
+
+			/*GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			switch(status){
+			case GL_FRAMEBUFFER_COMPLETE:printf("complete\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:printf("incomplete\n");break;
+			case GL_FRAMEBUFFER_UNDEFINED:printf("undefined\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:printf("incomplete_missing\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:printf("incomplete_draw\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:printf("incomplete_read\n");break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:printf("unsupported\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:printf("incomplete_multisample\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:printf("incomplete_layer_targets\n");break;
+			default:printf("other %x\n",status);break;
+			}*/
 		}
 
 		//set clear color
 		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 
-
 		// draw
-		glEnable(GL_MULTISAMPLE);
 		m_world->onUpdate();
-		glDisable(GL_MULTISAMPLE);
 
 		// Unbind our framebuffer, bind main framebuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -174,5 +182,8 @@ void Viewport::render()
 
 		m_world->onGUI();
 		ImGui::End();
+		CHECK_GL_ERROR();
 	}
 }
+
+InputController Viewport::getInput(){return Input;}

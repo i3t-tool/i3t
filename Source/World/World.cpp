@@ -11,8 +11,6 @@
 
 #include <string.h>
 
-float World::scroll=0.0f;
-
 glm::mat4 World::perspective = glm::mat4(1.0f);
 glm::mat4 World::mainCamera = glm::mat4(1.0f);
 glm::vec3 World::World::mainCamPos = glm::vec3(0.0f);
@@ -122,6 +120,9 @@ void startRecursive(GameObject* root){
 void World::sceneSetView(glm::vec3 dir, bool world) {
     this->camControl->setRotation(dir,world);
 }
+void World::sceneZoom(float val) {
+    camControl->setScroll(val);
+}
 void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
     for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
@@ -184,14 +185,12 @@ void World::onUpdate(){
     if(!this->started){ printf("World:call start() before update()!\n"); return;}
     updateRecursive(this->sceneRoot);
 
-    scroll*=0.85f;
-    if(scroll*scroll<0.0005f){scroll=0.0f;}
-
     CHECK_GL_ERROR();
 }
 void World::onGUI(){
     GUIRecursive(this->sceneRoot);
 }
+
 Shader World::loadShader(const char* vs_name, const char* fs_name){
     Shader shader = {0,0,0,0,0,0,0,0,0};
     GLuint gl_shader = 0;

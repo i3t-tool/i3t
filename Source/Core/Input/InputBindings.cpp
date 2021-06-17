@@ -16,12 +16,15 @@ void InputBindings::init()
 	InputManager::setInputAction("Key_undo", Keys::b);
 	InputManager::setInputAction("Key_redo", Keys::n);
 
+	InputManager::setInputAction("test", Keys::t);
 	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});
 	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});
 	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});
 
 	InputManager::setInputAxis("MouseScroll", 1.0f, Keys::mouseScrlUp);
 	setAxisKey("MouseScroll", -1.0f, Keys::mouseScrlDown);
+
+
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)
