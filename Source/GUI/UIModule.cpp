@@ -356,7 +356,7 @@ void UIModule::setFocusedWindow()
 		if (window != nullptr)
 		{
 			// Set focus if hovered window was clicked.
-			if (InputManager::isMouseClicked())
+			if (InputManager::isMouseClicked() || InputManager::isKeyPressed(Keys::mouseScrlDown) || InputManager::isKeyPressed(Keys::mouseScrlUp))
 			{
 				ImGui::SetWindowFocus(g.HoveredWindow->Name);
 				InputManager::setFocusedWindow(window);

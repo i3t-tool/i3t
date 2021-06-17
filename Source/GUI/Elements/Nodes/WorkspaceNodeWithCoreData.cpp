@@ -578,7 +578,7 @@ void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder& builder, Ptr<Wo
 }
 
 void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder){
-	if(isTransformation() || isCycle() || isTrackball()){
+	if (isTransformation() || isCycle() || isTrackball()) {
 		if(isTransformation()){
       ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
       ImGui::BeginVertical(m_nodebase->getId());
