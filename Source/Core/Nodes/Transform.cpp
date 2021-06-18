@@ -684,7 +684,7 @@ ETransformState QuatRot::isValid() const
 void QuatRot::reset()
 {
 	notifySequence();
-	setInternalValue(m_initialQuat);
+	setInternalValue(glm::toMat4(m_normalized));
 }
 
 const glm::quat& QuatRot::getNormalized() const
@@ -694,8 +694,9 @@ const glm::quat& QuatRot::getNormalized() const
 
 ValueSetResult QuatRot::setValue(const glm::quat& q)
 {
+	m_initialQuat = q;
 	m_normalized = glm::normalize(q);
-	setInternalValue(glm::toMat4(q));
+	setInternalValue(glm::toMat4(m_normalized));
 	return ValueSetResult{};
 }
 

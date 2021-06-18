@@ -318,6 +318,7 @@ public:
 
 	ETransformState isValid() const override;
 
+	const glm::quat& getQuat() const { return m_initialQuat; };
 	const glm::quat& getNormalized() const;
 
 	ValueSetResult setValue(const glm::quat& vec) override;

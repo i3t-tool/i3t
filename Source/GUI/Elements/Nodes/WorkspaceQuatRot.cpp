@@ -18,7 +18,7 @@ void WorkspaceQuatRot::drawDataSetValues(util::NodeBuilder& builder)
 }
 
 void WorkspaceQuatRot::drawDataFull(util::NodeBuilder& builder, int index){
-  const glm::quat& coreData = m_nodebase->getData(index).getQuat();
+  const glm::quat& coreData = m_nodebase->as<Core::QuatRot>()->getQuat();
 
 	//wrong datamap
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();

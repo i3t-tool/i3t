@@ -77,7 +77,7 @@ int WorkspaceQuat::maxLenghtOfData()
 {
 	// SS WIP
   int act, maximal = 0;
-  const glm::quat& coreData = m_nodebase->getData().getQuat();
+  const glm::quat& coreData = m_nodebase->as<Core::QuatRot>()->getQuat();
 
   for(int column=0; column < 4; column++)
   {
