@@ -77,7 +77,10 @@ int WorkspaceQuat::maxLenghtOfData()
 {
 	// SS WIP
   int act, maximal = 0;
-  const glm::quat& coreData = m_nodebase->as<Core::QuatRot>()->getQuat();
+
+	/// \todo This function is shared across multiple nodes which work with quaternions,
+	/// but QuatRot has Matrix, not quaternion.
+  const glm::quat& coreData = m_nodebase->getData().getQuat();
 
   for(int column=0; column < 4; column++)
   {
