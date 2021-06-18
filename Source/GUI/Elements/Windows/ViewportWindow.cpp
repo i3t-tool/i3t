@@ -3,12 +3,23 @@
 #include "imgui.h"
 
 #include "Core/API.h"
+#include "Core/Application.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 
+#include "../../../World/Select.h"
+#include "../../../World/World.h"
+
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
+using namespace UI;
+
+void onScroll(float val)
+{
+	Log::info("Scroll: {}", val);
+}
+#include "World/RenderTexture.h"
 #include "World/Components.h"
 #include "World/HardcodedMeshes.h"
 #include "World/RenderTexture.h"
@@ -19,7 +30,7 @@ using namespace UI;
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
-	Input.bindAxis("scroll",[this] (float val) { m_world->scroll = val; });
+	Input.bindAxis("scroll", [this] (float val) { m_world->sceneZoom(val); });
 
 	/// \todo Use Framebuffer class.
 	// Framebuffer is used in Viewport window.
@@ -31,9 +42,7 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 
 	// create a renderbuffer to allow depth and m_stencil
 	glGenRenderbuffers(1, &m_rboMain);
-	glBindRenderbuffer(GL_RENDERBUFFER, m_rboMain);
-	// glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glEnable(GL_MULTISAMPLE);
 	glCullFace(GL_BACK);
@@ -43,7 +52,6 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	// init vectors definig size to display
 	m_wcMin = ImVec2(0, 0);
 	m_wcMax = ImVec2(0, 0);
@@ -65,12 +73,18 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
   {
     Log::info("move: {}", val);
   });
+
+  
+	// Scrolling
+  //Input.bindAxis("MouseScroll", onScroll);
+
 }
 
 float localData;
 
 void Viewport::render()
 {
+
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
@@ -124,23 +138,33 @@ void Viewport::render()
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rboMain);
 
 			// resize all other things
-			// m_world->onReshape(width, height);
-      InputManager::setScreenSize((int)width, (int)height);
+			InputManager::setScreenSize((int)width, (int)height);
 			Config::WIN_HEIGHT = height;
 			Config::WIN_WIDTH = width;
 
 			// set viewport size to be sure
 			glViewport(0, 0, width, height);
+
+			/*GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			switch(status){
+			case GL_FRAMEBUFFER_COMPLETE:printf("complete\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:printf("incomplete\n");break;
+			case GL_FRAMEBUFFER_UNDEFINED:printf("undefined\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:printf("incomplete_missing\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:printf("incomplete_draw\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:printf("incomplete_read\n");break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:printf("unsupported\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:printf("incomplete_multisample\n");break;
+			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:printf("incomplete_layer_targets\n");break;
+			default:printf("other %x\n",status);break;
+			}*/
 		}
 
 		//set clear color
 		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 
-
 		// draw
-		glEnable(GL_MULTISAMPLE);
 		m_world->onUpdate();
-		glDisable(GL_MULTISAMPLE);
 
 		// Unbind our framebuffer, bind main framebuffer.
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -69,6 +69,7 @@ public:
     void onGUI();
 
     void sceneSetView(glm::vec3 dir,bool world);
+    void sceneZoom(float val);
 
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
     void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
@@ -104,8 +105,6 @@ public:
 
     //static std::map<const char*, GLuint > textures;
     //static std::map<const char*, pgr::MeshData > models;
-    
-    static float scroll;
 private:
     static bool initializedRender; ///< Was render already initialized?
     bool started=false;///<Was start() already called on this instance of World?

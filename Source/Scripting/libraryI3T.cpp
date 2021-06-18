@@ -273,10 +273,6 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
     else if (type == scriptingData.arithmeticOperators.norm) {
         workspace->push_back(std::make_unique<WorkspaceNormalizeVector>((ImTextureID)0, l));
     }
-    else if (type == scriptingData.arithmeticOperators.length) {
-        //workspace->push_back(std::make_unique<WorkspaceVectorLength((ImTextureID)0, l));
-        returnValue->Val->Integer = -1; return;
-    }
     else if (type == scriptingData.vecOperators.vecmulfloat) {
         workspace->push_back(std::make_unique<WorkspaceVectorMulFloat>((ImTextureID)0, l));
     }
@@ -285,10 +281,6 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
     }
     else if (type == scriptingData.arithmeticOperators.sub) {
         workspace->push_back(std::make_unique<WorkspaceVectorSubVector>((ImTextureID)0, l));
-    }
-    else if (type == scriptingData.arithmeticOperators.show) {
-        //workspace->push_back(std::make_unique<WorkspaceShowVector>((ImTextureID)0, l));
-        returnValue->Val->Integer = -1; return;
     }
     else if (type == scriptingData.arithmeticOperators.mix) {
         workspace->push_back(std::make_unique<WorkspaceMixVector>((ImTextureID)0, l));
@@ -830,6 +822,15 @@ void runScript(struct ParseState* parser, struct Value* returnValue, struct Valu
     std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
     returnValue->Val->Integer=picocRunFile(filename.c_str())==0;
 }
+void help(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    scriptingHelp(0);
+}
+void help2(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    scriptingHelp(1);
+}
+void help3(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    scriptingHelp(2);
+}
 /* list of all library functions and their prototypes */
 struct LibraryFunction platformLibraryI3T[] =
 {
@@ -860,6 +861,7 @@ struct LibraryFunction platformLibraryI3T[] =
 	{ saveW,        "bool save(char*);" },
 	{ saveSelW,     "bool savesel(char*);" },
 	{ runScript,    "bool run(char*);" },
+	{ help,         "void help();" },{ help2,    "void help2();" },{ help3,    "void help3();" },
     { nullptr,         nullptr }
 };
 

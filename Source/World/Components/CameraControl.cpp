@@ -26,10 +26,8 @@ void CameraControl::update()
 	if (InputManager::isAxisActive("pan"))
 	{
 		glm::vec4 move =
-				(getRotation(m_gameObject->transformation, 2) * glm::vec4(x, 0.0f, 0.0f, 0.0f) + glm::vec4(0.0f, y, 0.0f, 0.0f)) *
-				0.25f;
-		if (InputManager::isKeyPressed(Keys::shiftr))
-		{
+				(getRotation(m_gameObject->transformation, 2) * glm::vec4(x, 0.0f, 0.0f, 0.0f) + glm::vec4(0.0f, y, 0.0f, 0.0f)) *0.25f;
+		if (InputManager::isKeyPressed(Keys::shiftr)){
 			move *= 3.0f;
 		}
 		m_gameObject->translate(glm::vec3(-move.x, move.y, -move.z));
@@ -84,18 +82,19 @@ void CameraControl::update()
 	{
 		move *= 3.0f;
 	}
-	if(World::scroll!=0.0f){
-		move[2] -= World::scroll * 0.5f;
+	if(m_scroll!=0.0f){
+		move[2] -= m_scroll * 0.5f;
 		moved = true;
 	}
-	if (moved)
-	{
+	if (moved){
 		move = getRotation(m_gameObject->transformation, 2) * move;
 		m_gameObject->translate((glm::vec3)move);
 	}
 
 	if(m_alpha<1.0f){rotate();}
 
+	m_scroll*=0.85f;
+	if(m_scroll*m_scroll<0.0005f){m_scroll=0.0f;}
 }
 void CameraControl::setRotation(glm::vec3 dir, bool moveToCenter) {
 	m_alpha=0.0f;
@@ -104,7 +103,9 @@ void CameraControl::setRotation(glm::vec3 dir, bool moveToCenter) {
 	m_posbkp=(glm::vec3)m_gameObject->transformation[3];
 	m_moveToCenter=moveToCenter;
 }
-
+void CameraControl::setScroll(float val) {
+	m_scroll=val;
+}
 void CameraControl::rotate(){
 	if(m_alpha>0.995f){m_alpha=1.0f;}
 

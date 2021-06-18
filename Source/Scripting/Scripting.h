@@ -22,7 +22,7 @@ bool saveWorkspace(const char*filename, std::vector<Ptr<WorkspaceNodeWithCoreDat
 int picocRunInteractive();
 int picocRunFile(const char* filename);
 int picocRunSource(const char* source);
-
+void scriptingHelp(int);
 
 /**
 * \class Scripting
