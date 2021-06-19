@@ -30,10 +30,11 @@ public:
   void render() override;
 
 private:
-  std::shared_ptr<GUIImage> dummyImage;
-  std::shared_ptr<GUIImage> folderImage;
-  std::shared_ptr<GUIImage> logoImage;
-  std::shared_ptr<GUIImage> cvutImage;
+  std::shared_ptr<GUIImage> m_dummyImage;
+  std::shared_ptr<GUIImage> m_folderImage;
+  std::shared_ptr<GUIImage> m_logoImage;
+  std::shared_ptr<GUIImage> m_cvutImage;
+  std::shared_ptr<GUIImage> m_i3tImage;
   std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
   void renderTutorials();
 };

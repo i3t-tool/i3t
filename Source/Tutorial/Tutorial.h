@@ -13,6 +13,11 @@
 // forward declaration from TutorialRenderer.h to avoid cyclic dependency
 class ITutorialRenderer;
 
+enum class Language
+{
+	English, Czech
+};
+
 struct TutorialElement
 {
   TutorialElement()
