@@ -79,7 +79,6 @@ public:
 
 private:
 	static std::vector<InputController*> m_inputControllers;
-	static Ptr<IWindow> m_hoveredWindow;
 	static Ptr<IWindow> m_focusedWindow;
 
 public:
@@ -94,16 +93,9 @@ public:
 	static bool areModifiersActive(Modifiers mods);
 
 	/**
-	 * Set window within mouse input actions should be listened to.
-	 *
-	 * Hovered window must be set from ImGui Context.
-	 */
-	static void setHoveredWindow(Ptr<IWindow> window) { m_hoveredWindow = window; }
-
-	/**
 	 * Set focused window for key input.
 	 *
-	 * Focused window must be set from ImGui Context.
+	 * \warning Focused window must be set from ImGui Context.
 	 */
 	static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
 
@@ -113,15 +105,6 @@ public:
 
 		if (m_focusedWindow)
 			return strcmp(m_focusedWindow->getID(), T::ID) == 0;
-		return false;
-	}
-
-	template <typename T> static bool isActive()
-	{
-		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
-
-		if (m_hoveredWindow)
-			return strcmp(m_hoveredWindow->getID(), T::ID) == 0;
 		return false;
 	}
 

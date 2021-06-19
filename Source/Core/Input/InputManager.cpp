@@ -142,7 +142,7 @@ void InputManager::processViewportEvents()
 	if (!ImGui::IsWindowFocused() || !ImGui::IsWindowHovered())
 	  return;
 	*/
-	if (!isActive<UI::Viewport>())
+	if (!isFocused<UI::Viewport>())
 		return;
 
 	// Check left, right and middle button.
@@ -713,7 +713,6 @@ std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
 std::vector<InputController*> InputManager::m_inputControllers;
 Ptr<IWindow> InputManager::m_focusedWindow;
-Ptr<IWindow> InputManager::m_hoveredWindow;
 
 bool InputManager::m_ignoreImGuiEvents = false;
 glm::vec2 InputManager::m_mouseOffset;

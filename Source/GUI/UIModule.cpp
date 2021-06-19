@@ -273,7 +273,7 @@ void UIModule::buildDockspace()
 
 void UIModule::queryCameraState()
 {
-	if (!InputManager::isActive<UI::Viewport>()) return;
+	if (!InputManager::isFocused<UI::Viewport>()) return;
 
 	// ORBIT camera rotation
 	if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Pressed))
@@ -332,7 +332,7 @@ void UIModule::setFocusedWindow()
 
 		auto window = findWindow(hoveredID.c_str(), m_dockableWindows);
 
-		if (m_windows.count(hoveredID) != 0) { window = m_windows[hoveredID] };
+		if (m_windows.count(hoveredID) != 0) { window = m_windows[hoveredID]; };
 
 		if (window != nullptr)
 		{
@@ -340,24 +340,16 @@ void UIModule::setFocusedWindow()
 			size_t index;
 
 			// Check if window can be focused (no menu is active).
-			if ((index = navID.find("Menu_", 0L)) != std::string::npos)
+			if (String::contains(navID, "Menu_") || String::contains(navID, "Popup_"))
       {
-				if (index == 0)
-        {
-					shouldSetFocus = false;
-        }
-			}
+        shouldSetFocus = false;
+      }
 
 			if (shouldSetFocus)
 			{
 				ImGui::SetWindowFocus(g.HoveredWindow->Name);
         InputManager::setFocusedWindow(window);
-        InputManager::setHoveredWindow(window);
 			}
-		}
-		else
-		{
-			InputManager::setHoveredWindow(nullptr);
 		}
 	}
 
