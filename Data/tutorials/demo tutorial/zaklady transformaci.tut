@@ -3,6 +3,7 @@ title: Základy skládání transformací
 description: V této lekci se seznámíš s tím, jak transformace skládat za sebou a jak je propojovat v grafu scény.
 thumbnail: snehulak.png
 scene: empty
+language: cs
 ---
 
 V této lekci se seznámíš s tím, jak transformace skládat za sebou a jak je propojovat v grafu scény. Z matematického pohledu jde o násobení matic ve správném pořadí.

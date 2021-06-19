@@ -62,7 +62,20 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
   }
   else
   {
-    LOG_ERROR("Scene file not specified");
+    LOG_ERROR("Scene file not specified - setting empty");
+  }
+	// language
+  Language lang = Language::English;
+  if (tutorial_yaml["language"]) {
+    std::string langStr = tutorial_yaml["language"].as<std::string>();
+    LOG_DEBUG(langStr);
+  	//switch (langStr) {
+  	//	
+  	//}
+  }
+  else
+  {
+    LOG_ERROR("Language not specified - setting english");
   }
 
   // we create our tutorial header object on heap, we are using shared ptr, so that when there arent any references, we can eg properly free the loaded image and destroy it
