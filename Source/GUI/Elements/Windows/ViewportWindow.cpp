@@ -13,13 +13,6 @@
 
 #include "../Nodes/WorkspaceNodeWithCoreData.h"
 
-using namespace UI;
-
-void onScroll(float val)
-{
-	Log::info("Scroll: {}", val);
-}
-#include "World/RenderTexture.h"
 #include "World/Components.h"
 #include "World/HardcodedMeshes.h"
 #include "World/RenderTexture.h"
@@ -30,7 +23,7 @@ using namespace UI;
 Viewport::Viewport(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
-	Input.bindAxis("scroll", [this] (float val) { m_world->sceneZoom(val); });
+	Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
 	/// \todo Use Framebuffer class.
 	// Framebuffer is used in Viewport window.
@@ -56,35 +49,22 @@ Viewport::Viewport(bool show, World* world2) : IWindow(show)
 	m_wcMin = ImVec2(0, 0);
 	m_wcMax = ImVec2(0, 0);
 
+	/// \todo MH This is example code, it can be removed anytime.
 	InputManager::setInputAction("fire", Keys::b);
 	InputManager::setInputAction("fire", Keys::m);
 	InputManager::setInputAxis("move", 1.0f, Keys::o);
 	InputManager::setInputAxis("move", -1.0f, Keys::p);
 
-	Input.bindAction("fire", EKeyState::Pressed, []()
-  {
-	  Log::info("Action fired.");
-  });
-  Input.bindAction("fire", EKeyState::Released, []()
-  {
-    Log::info("Action released.");
-  });
-  Input.bindAxis("move", [](float val)
-  {
-    Log::info("move: {}", val);
-  });
-
-  
-	// Scrolling
-  //Input.bindAxis("MouseScroll", onScroll);
-
+	Input.bindAction("fire", EKeyState::Pressed, []() { Log::info("Action fired."); });
+	Input.bindAction("fire", EKeyState::Released, []() { Log::info("Action released."); });
+	Input.bindAxis("move", [](float val) { Log::info("move: {}", val); });
+	/// todoend
 }
 
 float localData;
 
 void Viewport::render()
 {
-
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650, main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
@@ -93,8 +73,15 @@ void Viewport::render()
 
 		auto name = getName("Scene Viewport");
 
-		ImGui::Begin(name.c_str(), getShowPtr());
+		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar);
 		ImGui::PopStyleVar();
+
+		if (ImGui::BeginMenuBar())
+		{
+			showViewportsMenu();
+
+			ImGui::EndMenuBar();
+		}
 
 		// get positions of min max points of the window
 		ImVec2 newWcMin = ImGui::GetWindowContentRegionMin();
@@ -118,7 +105,7 @@ void Viewport::render()
 			m_wcMin = newWcMin;
 			m_wcMax = newWcMax;
 
-			int width = static_cast<int>(abs(m_wcMax.x - m_wcMin.x));
+			int width	 = static_cast<int>(abs(m_wcMax.x - m_wcMin.x));
 			int height = static_cast<int>(abs(m_wcMax.y - m_wcMin.y));
 
 			// create new image in our texture
@@ -138,9 +125,9 @@ void Viewport::render()
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rboMain);
 
 			// resize all other things
-			InputManager::setScreenSize((int)width, (int)height);
+			InputManager::setScreenSize((int) width, (int) height);
 			Config::WIN_HEIGHT = height;
-			Config::WIN_WIDTH = width;
+			Config::WIN_WIDTH	 = width;
 
 			// set viewport size to be sure
 			glViewport(0, 0, width, height);
@@ -171,14 +158,69 @@ void Viewport::render()
 
 		//ImGui::GetForegroundDrawList()->AddRect(m_wcMin, m_wcMax, IM_COL32(255, 255, 0, 255)); // test
 
-
 		// add the texture to this's window drawList
 		ImGui::GetWindowDrawList()->AddImage(
-				(void*)(intptr_t)m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0, 1),
+				(void*) (intptr_t) m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0, 1),
 				ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
-
 
 		m_world->onGUI();
 		ImGui::End();
+	}
+}
+
+void Viewport::showViewportsMenu()
+{
+	if (ImGui::BeginMenu("test"))
+	{
+		if (ImGui::MenuItem("piča")) {}
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Viewports"))
+	{
+		//Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
+		World* w = App::get().world();
+		if (ImGui::MenuItem("View-x"))
+		{
+			// Num 1
+			w->sceneSetView(glm::vec3(1.0f, 0.0f, 0.0f), false);
+		}
+
+		if (ImGui::MenuItem("View-y"))
+		{
+			// Num 2
+			w->sceneSetView(glm::vec3(0.0f, 1.0f, 0.0f), false);
+		}
+
+		if (ImGui::MenuItem("View-z"))
+		{
+			// Num 3
+			w->sceneSetView(glm::vec3(0.0f, 0.0f, 1.0f), false);
+		}
+
+		if (ImGui::MenuItem("World-x"))
+		{
+			// Num 4
+			w->sceneSetView(glm::vec3(1.0f, 0.0f, 0.0f), true);
+		}
+
+		if (ImGui::MenuItem("World-y"))
+		{
+			// Num 5
+			w->sceneSetView(glm::vec3(0.0f, 1.0f, 0.0f), true);
+		}
+
+		if (ImGui::MenuItem("World-z"))
+		{
+			// Num 6
+			w->sceneSetView(glm::vec3(0.0f, 0.0f, 1.0f), true);
+		}
+
+		if (ImGui::MenuItem("Center"))
+		{
+			// Num 0
+			// App::get().world()->scene->setCamToCenter();
+		}
+
+		ImGui::EndMenu();
 	}
 }

@@ -26,6 +26,5 @@ private:
 	void showFileMenu();
 	void showEditMenu();
 	void showWindowsMenu();
-	void showViewportsMenu();
 	void showHelpMenu();
 };

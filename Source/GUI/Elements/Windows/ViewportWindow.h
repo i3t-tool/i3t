@@ -19,8 +19,7 @@ public:
 	I3T_WINDOW(Viewport)
 
 	Viewport(bool show, World* world);
-	void render();
-	InputController getInput();
+	void render() override;
 
 private:
 	World* m_world;
@@ -29,5 +28,7 @@ private:
 	unsigned int m_rboMain;
 	ImVec2 m_wcMin;
 	ImVec2 m_wcMax;
+
+	void showViewportsMenu();
 };
 } // namespace UI

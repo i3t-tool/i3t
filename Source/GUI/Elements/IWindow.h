@@ -33,6 +33,11 @@ public:
 	bool* getShowPtr() { return &m_show; }
   std::string getName(const char* name) const { return fmt::format("{}###{}", name, getID()); };
 
+	/**
+	 * Returns window input controller.
+	 */
+	InputController& getInput() { return Input; }
+
 protected:
 	friend class Application;
 	friend class InputManager;

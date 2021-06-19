@@ -6,10 +6,10 @@
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
+#include "GUI/Elements/Windows/IntroWindow.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
-#include "GUI/Elements/Windows/IntroWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
@@ -22,10 +22,7 @@
 
 using namespace UI;
 
-UIModule::~UIModule()
-{
-	delete m_menu;
-}
+UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
@@ -48,7 +45,7 @@ void UIModule::init()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	(void)io;
+	(void) io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;		// Enable Multi-Viewport / Platform Windows
@@ -62,12 +59,12 @@ void UIModule::init()
 	ImGuiStyle& style = ImGui::GetStyle();
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
-		style.WindowRounding = 0.0f;
+		style.WindowRounding							= 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f; // disable alpha
 	}
 
 	// Allocate path to the imgui ini file on heap.
-	auto* path = new std::string(Config::getAbsolutePath("Data/imgui.ini"));
+	auto* path		 = new std::string(Config::getAbsolutePath("Data/imgui.ini"));
 	io.IniFilename = path->c_str();
 
 	loadFonts();
@@ -95,20 +92,14 @@ void UIModule::beginFrame()
 	// TODO -> Do not render scene in the ViewportWindow class.
 	for (auto element : m_dockableWindows)
 	{
-		if (element->isVisible())
-		{
-			element->render();
-		}
+		if (element->isVisible()) { element->render(); }
 		// if (InputController::isKeyJustPressed(Keys::f)) { printf("UP %s\n",element->getID()); }
 	}
 	// if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
 	// Render other windows.
 	for (const auto& [id, w] : m_windows)
 	{
-		if (w->isVisible())
-		{
-			w->render();
-		}
+		if (w->isVisible()) { w->render(); }
 	}
 
 	queryCameraState();
@@ -125,7 +116,7 @@ void UIModule::beginFrame()
 	//  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
 	// ImGuiIO& io = ImGui::GetIO(); (void)io;
 	auto& io = ImGui::GetIO();
-	(void)io;
+	(void) io;
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -135,17 +126,14 @@ void UIModule::beginFrame()
 	}
 }
 
-void UIModule::onClose()
-{
-
-}
+void UIModule::onClose() {}
 
 void UIModule::loadThemes()
 {
 	std::string themesDir = Config::getAbsolutePath("Data/themes");
 
 	bool canLoadDefault = false;
-	for (auto &entry : fs::directory_iterator(themesDir))
+	for (auto& entry : fs::directory_iterator(themesDir))
 	{
 		if (auto theme = loadTheme(entry))
 		{
@@ -174,9 +162,8 @@ void UIModule::reloadThemes()
 
 void UIModule::setTheme(const Theme& theme)
 {
-	auto it = std::find_if(m_allThemes.begin(), m_allThemes.end(), [&](Theme& other) {
-			return m_currentTheme.getName() == other.getName();
-	});
+	auto it = std::find_if(m_allThemes.begin(), m_allThemes.end(),
+												 [&](Theme& other) { return m_currentTheme.getName() == other.getName(); });
 
 	Debug::Assert(it != m_allThemes.end(), "Current theme is unknown.");
 	*it = std::move(m_currentTheme);
@@ -206,27 +193,28 @@ void UIModule::loadFonts()
 	};
 
 	ImFontConfig fontCfg;
-	fontCfg.GlyphExtraSpacing.x = -0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirkku
+	fontCfg.GlyphExtraSpacing.x =
+			-0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirkku
 
 	m_fonts = {
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-																	 14.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-																	 12.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-																	 12.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
-																	 24.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-																	 14.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(),
-																	 20.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
-																	 18.0f * fontScale, nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(),
-																	 33.5f * fontScale, &fontCfg, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(),
-																	 17.5f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 14.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale,
+																	 nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale,
+																	 &fontCfg, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale,
+																	 nullptr, ranges),
 	};
 	io.FontDefault = I3T::getFont(EFont::MenuLarge);
 	io.Fonts->Build();
@@ -235,9 +223,9 @@ void UIModule::loadFonts()
 void UIModule::buildDockspace()
 {
 	// create dockspace -----------------------------
-	static bool opt_fullscreen_persistant = true;
-	bool opt_fullscreen = opt_fullscreen_persistant;
-	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_NoWindowMenuButton;
+	static bool								opt_fullscreen_persistant = true;
+	bool											opt_fullscreen						= opt_fullscreen_persistant;
+	static ImGuiDockNodeFlags dockspace_flags						= ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_NoWindowMenuButton;
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
@@ -250,15 +238,14 @@ void UIModule::buildDockspace()
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-										ImGuiWindowFlags_NoMove;
+		window_flags |=
+				ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
 
 	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
 	// and handle the pass-thru hole, so we ask Begin() to not render a background.
-	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-		window_flags |= ImGuiWindowFlags_NoBackground;
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) window_flags |= ImGuiWindowFlags_NoBackground;
 
 	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
 	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
@@ -269,8 +256,7 @@ void UIModule::buildDockspace()
 	ImGui::Begin("DockSpace", nullptr, window_flags);
 	ImGui::PopStyleVar();
 
-	if (opt_fullscreen)
-		ImGui::PopStyleVar(2);
+	if (opt_fullscreen) ImGui::PopStyleVar(2);
 
 	// DockSpace
 	ImGuiIO& io = ImGui::GetIO();
@@ -300,14 +286,8 @@ void UIModule::queryCameraState()
 	}
 
 	// CAMERA PANNING - set a new orbit center
-	if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Pressed))
-	{
-		InputManager::beginCameraControl();
-	}
-	if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Released))
-	{
-		InputManager::endCameraControl();
-	}
+	if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Pressed)) { InputManager::beginCameraControl(); }
+	if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Released)) { InputManager::endCameraControl(); }
 }
 
 /**
@@ -338,35 +318,45 @@ std::string makeIDNice(const char* ID)
 
 void UIModule::setFocusedWindow()
 {
-	ImGuiContext& g = *GImGui;
-	const char* hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
-	const char* focusedWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+	// Get window ids.
+	ImGuiContext& g								= *GImGui;
+	const char*		hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
+	const char*		focusedWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+	const char*		navWindowID			= g.NavWindow ? g.NavWindow->Name : "";
 
 	// Check for hovered window.
 	if (strlen(hoveredWindowID) != 0)
 	{
-		auto mainID = makeIDNice(hoveredWindowID);
+		auto hoveredID = makeIDNice(hoveredWindowID);
+		auto navID		 = makeIDNice(navWindowID);
 
-    Ptr<IWindow> window;
-    window = findWindow(mainID.c_str(), m_dockableWindows);
+		auto window = findWindow(hoveredID.c_str(), m_dockableWindows);
 
-		if (m_windows.count(mainID) != 0)
-			window = m_windows[mainID];
+		if (m_windows.count(hoveredID) != 0) { window = m_windows[hoveredID] };
 
 		if (window != nullptr)
 		{
-			// Set focus if hovered window was clicked.
-			if (InputManager::isMouseClicked() || InputManager::isKeyPressed(Keys::mouseScrlDown) || InputManager::isKeyPressed(Keys::mouseScrlUp))
-			{
-				ImGui::SetWindowFocus(g.HoveredWindow->Name);
-				InputManager::setFocusedWindow(window);
+			bool shouldSetFocus = true;
+			size_t index;
+
+			// Check if window can be focused (no menu is active).
+			if ((index = navID.find("Menu_", 0L)) != std::string::npos)
+      {
+				if (index == 0)
+        {
+					shouldSetFocus = false;
+        }
 			}
 
-			InputManager::setHoveredWindow(window);
+			if (shouldSetFocus)
+			{
+				ImGui::SetWindowFocus(g.HoveredWindow->Name);
+        InputManager::setFocusedWindow(window);
+        InputManager::setHoveredWindow(window);
+			}
 		}
 		else
 		{
-			//
 			InputManager::setHoveredWindow(nullptr);
 		}
 	}
@@ -376,20 +366,13 @@ void UIModule::setFocusedWindow()
 		auto mainID = makeIDNice(focusedWindowID);
 
 		Ptr<IWindow> window;
-		if ((window = findWindow(mainID.c_str(), m_dockableWindows)) != nullptr)
-		{
-			InputManager::setFocusedWindow(window);
-		}
+		if ((window = findWindow(mainID.c_str(), m_dockableWindows)) != nullptr) { InputManager::setFocusedWindow(window); }
 	}
 }
 
 void UIModule::popWindow(const std::string& windowId)
 {
-	if (hasWindow(windowId))
-		m_windows.erase(windowId);
+	if (hasWindow(windowId)) m_windows.erase(windowId);
 }
 
-bool UIModule::hasWindow(const std::string& id)
-{
-	return m_windows.count(id);
-}
+bool UIModule::hasWindow(const std::string& id) { return m_windows.count(id); }
