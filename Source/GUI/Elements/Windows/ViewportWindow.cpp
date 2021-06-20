@@ -170,11 +170,6 @@ void Viewport::render()
 
 void Viewport::showViewportsMenu()
 {
-	if (ImGui::BeginMenu("test"))
-	{
-		if (ImGui::MenuItem("piča")) {}
-		ImGui::EndMenu();
-	}
 	if (ImGui::BeginMenu("Viewports"))
 	{
 		//Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();

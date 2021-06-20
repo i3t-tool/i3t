@@ -32,7 +32,6 @@ void MainMenuBar::render()
 		ImGui::PushFont(I3T::getFont(EFont::MenuLarge));
 
 		showFileMenu();
-		showEditMenu();
 		showWindowsMenu();
 		showHelpMenu();
 
@@ -174,28 +173,6 @@ void MainMenuBar::showFileMenu()
 		if (ImGui::MenuItem("Exit"))
 		{
 			BeforeCloseCommand::dispatch();
-		}
-
-		ImGui::EndMenu();
-	}
-}
-
-void MainMenuBar::showEditMenu()
-{
-	if (ImGui::BeginMenu("Edit"))
-	{
-		if (ImGui::MenuItem("Undo"))
-		{
-			// B
-			/// \todo Undo.
-			// UndoRedo::undo();
-		}
-
-		if (ImGui::MenuItem("Redo"))
-		{
-			// N
-			/// \todo Redo.
-			// UndoRedo::redo();
 		}
 
 		ImGui::EndMenu();

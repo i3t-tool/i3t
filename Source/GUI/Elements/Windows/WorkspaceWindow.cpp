@@ -78,14 +78,16 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-	if (InputManager::isKeyPressed(Keys::l))
+	ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar);
+
+	if (ImGui::BeginMenuBar())
 	{
-		// saveWorkspace(Config::getAbsolutePath("/output.txt").c_str(), &m_workspaceCoreNodes);
-		printf("press\n");
+		showEditMenu();
+
+		ImGui::EndMenuBar();
 	}
 
-	ImGui::Begin(getName("Workspace").c_str(), getShowPtr());
-
+	/// \todo MH use named input.
 	if (InputManager::isKeyPressed(Keys::a))
 	{
 		selectAll();
@@ -102,6 +104,7 @@ void WorkspaceWindow::render()
 	{
 		ne::NavigateToSelection();
 	}
+	/// todoend
 
 	UpdateTouchAllNodes();
 	ne::Begin("Node editor");{
@@ -1347,14 +1350,24 @@ void WorkspaceWindow::checkQueryContextMenus()
 
 }
 
+void WorkspaceWindow::showEditMenu()
+{
+	if (ImGui::BeginMenu("Edit"))
+	{
+		if (ImGui::MenuItem("Undo"))
+		{
+			// B
+			/// \todo Undo.
+			// UndoRedo::undo();
+		}
 
+		if (ImGui::MenuItem("Redo"))
+		{
+			// N
+			/// \todo Redo.
+			// UndoRedo::redo();
+		}
 
-
-
-
-
-
-
-
-
-
+		ImGui::EndMenu();
+	}
+}

@@ -5,7 +5,7 @@
  * Header for representing keyboard/mouse tracker
  *
  * \date:	2014/11/16, 2020/09/09, 2020/12/07
- * \author: Michal Folta, CTU Prague
+ * \author: Michal Folta, CTU Prague, Martin Herich <hericmar@fel.cvut.cz>
  */
 #pragma once
 

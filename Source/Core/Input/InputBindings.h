@@ -1,3 +1,6 @@
+/**
+ * \author Martin Herich <hericmar@fel.cvut.cz>
+ */
 #pragma once
 
 #include <array>

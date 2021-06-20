@@ -348,7 +348,7 @@ void UIModule::setFocusedWindow()
 			bool shouldSetFocus = true;
 
 			// Check if window can be focused (no menu is active).
-			if (String::contains(navID, "Menu_") || String::contains(navID, "Popup_"))
+			if (String::contains(navID, "Menu_") || String::contains(navID, "Popup_") || String::contains(navID, "Combo_"))
       {
         shouldSetFocus = false;
       }

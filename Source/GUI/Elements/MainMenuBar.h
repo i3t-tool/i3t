@@ -1,5 +1,6 @@
 /**
  * \file	GUI/Elements/MainMenuBar.h
+ * \author Martin Herich <hericmar@fel.cvut.cz>
  *
  * ImGui menu bar.
  */
@@ -19,12 +20,7 @@ public:
 private:
 	bool m_showDemoWindow;
 
-	// AboutDialog m_aboutDialog;
-	// DescriptionDialog m_descriptionDialog;
-	// SetupDialog m_setupDialog;
-
 	void showFileMenu();
-	void showEditMenu();
 	void showWindowsMenu();
 	void showHelpMenu();
 };

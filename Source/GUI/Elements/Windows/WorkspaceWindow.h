@@ -26,6 +26,8 @@
 
 #include "../Nodes/WorkspaceCamera.h"
 
+/// \todo MH Move includes to .cpp file!!!
+
 //transformations{
 #include "../Nodes/WorkspaceAxisAngle.h"
 #include "../Nodes/WorkspaceEulerX.h"
@@ -276,4 +278,7 @@ public:
 	void ShowLeftPane(float paneWidth);
 
 	void ShowStyleEditor(bool* show = nullptr);
+
+	private:
+		void showEditMenu();
 };
