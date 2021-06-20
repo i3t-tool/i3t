@@ -54,14 +54,17 @@ class UIModule final : public Module
 	void onClose() override;
 
 public:
-	Theme& getTheme() { return m_currentTheme; }
+	Theme& getTheme()
+	{
+		auto* curr = m_currentTheme;
+		return *curr;
+	}
 	std::vector<Theme>& getThemes() { return m_allThemes; }
 
 	void loadThemes();
 	void reloadThemes();
 
 	void setTheme(const Theme& theme);
-	void setDefaultTheme(Theme& theme);
 
 	Fonts& getFonts() { return m_fonts; }
 	void loadFonts();
@@ -108,7 +111,7 @@ private:
 
 	std::map<std::string, Ptr<IWindow>> m_windows;
 
-	Theme m_currentTheme;
+	Theme* m_currentTheme;
 	std::vector<Theme> m_allThemes;
 
 	Fonts m_fonts;

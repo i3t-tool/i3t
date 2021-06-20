@@ -10,22 +10,33 @@ static std::map<EColor, const char*>		g_ColorNames;
 static std::map<ESize, const char*>			g_SizeNames;
 static std::map<ESizeVec2, const char*> g_SizeVecNames;
 
-Theme Theme::createDefault()
+Theme Theme::createDefaultModern()
 {
 	Theme theme;
 
+	theme.initModernProperties();
 	theme.initFonts();
 
-	theme.m_name = "default";
+	theme.m_name = "modern";
 
 	return theme;
 }
 
-Theme::Theme() { initDefaultProperties(); }
+Theme Theme::createDefaultClassic()
+{
+	Theme theme;
+
+	theme.initClassicProperties();
+	theme.initFonts();
+
+	theme.m_name = "classic";
+
+	return theme;
+}
 
 Theme::Theme(std::string name, const Theme::Colors& colors, const Theme::Sizes& sizes, const Theme::SizesVec& sizesVec)
 {
-	initDefaultProperties();
+	initClassicProperties();
 
 	m_name = std::move(name);
 	copyProperties(m_colors, colors);
@@ -49,7 +60,127 @@ void Theme::initFonts()
 	io.FontDefault = get(EFont::MenuLarge);
 }
 
-void Theme::initDefaultProperties()
+void Theme::initClassicProperties()
+{
+	set(EColor::Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::WindowBackground, ImVec4(0.439f, 0.439f, 0.455f, 1.00f));
+	set(EColor::PopupBackground, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+	set(EColor::MenuBarBackground, ImVec4(0.40f, 0.38f, 0.369f, 1.00f));
+	set(EColor::Border, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
+	set(EColor::PrimaryColor, ImVec4(0.278f, 0.278f, 0.286f, 1.00f));
+	set(EColor::ActiveColor, ImVec4(0.259f, 0.588f, 0.980f, 1.00f));
+	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
+	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
+	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
+
+	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
+
+	// Node Editor
+	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.00f));
+	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+	set(EColor::Nodes_ConnectionPossible, createColor(0, 255, 0, 255));
+	set(EColor::Nodes_ConnectionNotPossible, createColor(255, 0, 0, 255));
+	set(EColor::Nodes_CreateNode, createColor(32, 45, 32, 180));
+
+	set(EColor::Builder_NodePadding, ImVec4(0, 0, 0, 0));
+
+	//pin colors
+	set(EColor::PulsePin, createColor(164, 58, 190, 255));
+	set(EColor::FloatPin, createColor(58, 144, 66, 255));
+	set(EColor::MatrixPin, createColor(178, 71, 66, 255));
+	set(EColor::QuatPin, createColor(178, 144, 66, 255));
+	set(EColor::Vec3Pin, createColor(58, 84, 187, 255));
+	set(EColor::Vec4Pin, createColor(106, 96, 67, 255));
+	set(EColor::ScreenPin, createColor(51, 150, 215, 255));
+	set(EColor::MatrixMulPin, createColor(68, 201, 156, 255));
+
+	//pin inner colors
+	set(EColor::InnerPulsePin, createColor(255, 255, 255, 255));
+	set(EColor::InnerFloatPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerMatrixPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerQuatPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerVec3Pin, createColor(255, 255, 255, 255));
+	set(EColor::InnerVec4Pin, createColor(255, 255, 255, 255));
+	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
+	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
+
+
+	// Folta operator color set
+	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperator, ImVec4(77.0f / 255.0f, 85.0f / 255.0f, 106.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperatorActive, ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperatorHovered, ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+
+	// Folta transformation color set
+	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderTranformation, ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgTransformation, ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
+
+
+	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
+	m_fontsAssoc.insert(std::pair(EFont::TutorialText, 0));
+	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
+	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
+	m_fontsAssoc.insert(std::pair(EFont::Node, 2));
+	m_fontsAssoc.insert(std::pair(EFont::MenuSmall, 2));
+	m_fontsAssoc.insert(std::pair(EFont::Title, 3));
+	m_fontsAssoc.insert(std::pair(EFont::TaskTitle, 4));
+
+	// Tutorial fonts.
+	m_fontsAssoc.insert(std::pair(EFont::Header, 5));
+	m_fontsAssoc.insert(std::pair(EFont::I3TTitle, 7));
+	m_fontsAssoc.insert(std::pair(EFont::I3TDescription, 8));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemTitle, 6));
+	m_fontsAssoc.insert(std::pair(EFont::IntroItemDescription, 2));
+
+
+	m_sizes[ESize::Nodes_FloatMargin]						= 1.0f;
+	m_sizes[ESize::Nodes_FloatWidth]						= 25.0f;
+	m_sizes[ESize::Nodes_Rounding]							= 0.0f;
+	m_sizes[ESize::Nodes_BorderWidth]						= 0.0f;
+	m_sizes[ESize::Nodes_LabelIndent]						= 3.0f;
+	m_sizes[ESize::Nodes_HeaderLabelIndent]			= 2.0f;
+	m_sizes[ESize::Nodes_LinkThickness]					= 3.0f;
+	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
+	m_sizes[ESize::Nodes_TrackBallSensitivity]	= 5.0f;
+
+	m_sizes[ESize::Nodes_FloatInnerPadding] = 1.0f;
+
+	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = 0.015f;
+	m_sizes[ESize::Nodes_CtrlMultiplicator]			= 0.1f;
+	m_sizes[ESize::Nodes_SHIFTMultiplicator]		= 10.0f;
+	m_sizes[ESize::Nodes_ALTMultiplicator]			= 0.01f;
+
+	m_sizes[ESize::Nodes_InputsAlignment]	 = 0.0f;
+	m_sizes[ESize::Nodes_MiddleAlignment]	 = 0.0f;
+	m_sizes[ESize::Nodes_OutputsAlignment] = 0.0f;
+
+	m_sizes[ESize::Nodes_leftSideSpacing]	 = 3.0f;
+	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
+
+	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing]	 = ImVec2(2.0f, 3.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatPadding]	 = ImVec2(0.0f, 1.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PinSpacing]		 = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_PivotAlignment] = ImVec2(0.0f, 0.5f);
+	m_sizesVec2[ESizeVec2::Nodes_PivotSize]			 = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = ImVec2(0.0f, 0.0f);
+	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_IconSize]						 = ImVec2(12.0f, 12.0f);
+	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = ImVec2(32.0f, 32.0f);
+	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize]		 = ImVec2(130.0f, 130.0f);
+
+	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = ImVec2(0.0f, 0.0f);
+}
+
+void Theme::initModernProperties()
 {
 	set(EColor::Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 	set(EColor::WindowBackground, ImVec4(0.439f, 0.439f, 0.455f, 1.00f));
@@ -307,9 +438,9 @@ void Theme::apply()
 
 	style.Colors[ImGuiCol_PlotHistogram] = m_colors[EColor::ActiveColor];
 
-	style.FramePadding.x	 = m_sizesVec2[ESizeVec2::Window_FramePadding].x;
-	style.FramePadding.y	 = m_sizesVec2[ESizeVec2::Window_FramePadding].y;
-	style.TabRounding			 = 2.0f;
+	style.FramePadding.x = m_sizesVec2[ESizeVec2::Window_FramePadding].x;
+	style.FramePadding.y = m_sizesVec2[ESizeVec2::Window_FramePadding].y;
+	style.TabRounding		 = 2.0f;
 
 	// Show borders.
 	style.ChildBorderSize	 = 0.0f;
@@ -350,9 +481,9 @@ void Theme::operatorColorTheme()
 {
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
 
-	ImGuiStyle& style																																 = ImGui::GetStyle();
+	ImGuiStyle& style = ImGui::GetStyle();
 
-	style.Colors[ImGuiCol_FrameBg]																									 = m_colors[EColor::FloatBgOperator];
+	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgOperator];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgOperatorHovered];
 	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgOperatorActive];
 }
@@ -362,7 +493,7 @@ void Theme::transformationColorTheme()
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
 			m_colors[EColor::NodeBgTransformation];
 
-	ImGuiStyle& style											= ImGui::GetStyle();
+	ImGuiStyle& style = ImGui::GetStyle();
 
 	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgTransformation];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgTransformationHovered];

@@ -8,8 +8,8 @@ class Theme;
 
 namespace UI
 {
-void showColors(Theme& curr);
-void showDimensions(Theme& curr);
+void showColors();
+void showDimensions();
 
 class StyleEditor : public IWindow
 {
@@ -20,5 +20,8 @@ I3T_WINDOW(StyleEditor)
 	~StyleEditor() override = default;
 
 	void render() override;
+
+private:
+	void renderSaveRevertField();
 };
 }

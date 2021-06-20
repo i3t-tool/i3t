@@ -7,12 +7,15 @@
  */
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 
 #include "spdlog/formatter.h"
+
+namespace fs = std::filesystem;
 
 constexpr const size_t MAX_PATH_LENGTH = 4096L;
 

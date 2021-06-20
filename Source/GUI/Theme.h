@@ -196,17 +196,19 @@ private:
 	std::map<EFont, size_t> m_fontsAssoc;
 
 public:
-	/**
-	 * Creates default global color scheme based on Lukas Pilka's design.
-	 */
-	Theme();
+	Theme() = default;
 	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
-	static Theme createDefault();
+	static Theme createDefaultClassic();
+	static Theme createDefaultModern();
 
 	void initFonts();
-	void initDefaultProperties();
 
+private:
+	void initClassicProperties();
+	void initModernProperties();
+
+public:
 	/**
 	 * Function which initializes all style properties names.
 	 *

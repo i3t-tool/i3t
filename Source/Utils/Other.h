@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -16,6 +17,20 @@ inline bool contains(const std::string& str, const std::string& substr)
 		if (index == 0) { return true; }
 	}
 	return false;
+}
+}
+
+namespace Utils
+{
+template <typename A, typename Predicate>
+inline int indexOf(A&& array, Predicate p)
+{
+	auto it = std::find_if(array.begin(), array.end(), p);
+	if (it != array.end())
+	{
+		return std::distance(array.begin(), it);
+	}
+	return -1;
 }
 }
 

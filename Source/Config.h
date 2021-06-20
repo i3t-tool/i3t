@@ -227,11 +227,6 @@ struct Config
 	//@{
 	/** \name Filename manipulations*/
 
-
-	static std::string getAbsolutePath(const std::string& filename)
-	{
-		return getAbsolutePath(filename.c_str());
-	}
 	/**
 	 * Gets absolute path
 	 *
@@ -255,6 +250,17 @@ struct Config
 
     return path;
   }
+
+	static std::string getAbsolutePath(const std::string& filename)
+	{
+		return getAbsolutePath(filename.c_str());
+	}
+
+	static std::string getAbsolutePath(fs::path filename)
+	{
+		return getAbsolutePath(filename.string());
+	}
+
 
 	/**
 	 * Gets relative path

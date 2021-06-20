@@ -71,7 +71,7 @@ void UIModule::init()
 
 	loadFonts();
 	loadThemes();
-	m_currentTheme.apply();
+	m_currentTheme->apply();
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(App::get().mainWindow(), true);
@@ -134,25 +134,41 @@ void UIModule::loadThemes()
 {
 	std::string themesDir = Config::getAbsolutePath("Data/themes");
 
+	m_allThemes.push_back(Theme::createDefaultClassic());
+	m_allThemes.push_back(Theme::createDefaultModern());
+	auto defaultThemesCount = m_allThemes.size();
+
 	bool canLoadDefault = false;
 	for (auto& entry : fs::directory_iterator(themesDir))
 	{
 		if (auto theme = loadTheme(entry))
 		{
-			m_allThemes.push_back(*theme);
-			if (m_allThemes.back().getName() == Config::DEFAULT_THEME)
+			// Check if theme name doesn't collides with default themes names.
+			bool canLoadTheme = true;
+			for (auto i = 0L; i < defaultThemesCount; ++i)
 			{
-				canLoadDefault = true;
-				m_currentTheme = m_allThemes.back();
-				setTheme(m_allThemes.back());
+				if (m_allThemes[i].getName() == (*theme).getName())
+				{
+					canLoadTheme = false;
+				}
+			}
+
+			if (canLoadTheme)
+			{
+				m_allThemes.push_back(*theme);
+				if (m_allThemes.back().getName() == Config::DEFAULT_THEME)
+				{
+					canLoadDefault = true;
+					m_currentTheme = &m_allThemes.back();
+					setTheme(m_allThemes.back());
+				}
 			}
 		}
 	}
 
 	if (!canLoadDefault)
 	{
-		setTheme(Theme::createDefault());
-		m_allThemes.push_back(m_currentTheme);
+		setTheme(m_allThemes.front());
 	}
 }
 
@@ -164,19 +180,9 @@ void UIModule::reloadThemes()
 
 void UIModule::setTheme(const Theme& theme)
 {
-	auto it = std::find_if(m_allThemes.begin(), m_allThemes.end(),
-												 [&](Theme& other) { return m_currentTheme.getName() == other.getName(); });
+	m_currentTheme = (Theme*) &theme;
+	m_currentTheme->apply();
 
-	Debug::Assert(it != m_allThemes.end(), "Current theme is unknown.");
-	*it = std::move(m_currentTheme);
-
-	m_currentTheme = theme;
-	m_currentTheme.apply();
-}
-
-void UIModule::setDefaultTheme(Theme& theme)
-{
-	setTheme(theme);
 	Config::DEFAULT_THEME = theme.getName();
 	saveConfig();
 }
@@ -218,7 +224,7 @@ void UIModule::loadFonts()
 			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale,
 																	 nullptr, ranges),
 	};
-	io.FontDefault = I3T::getFont(EFont::MenuLarge);
+	// io.FontDefault = I3T::getFont(EFont::MenuLarge);
 	io.Fonts->Build();
 }
 
