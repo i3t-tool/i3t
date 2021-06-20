@@ -26,6 +26,8 @@ UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
+	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) { InputManager::setFocusedWindow(window); });
+
 	Theme::initNames();
 
 	// Create GUI Elements.
@@ -267,12 +269,15 @@ void UIModule::buildDockspace()
 	}
 	else
 	{
-		exit(EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
 	}
 }
 
 void UIModule::queryCameraState()
 {
+	/// \todo This code causes dockspace crash.
+	return;
+
 	if (!InputManager::isFocused<UI::Viewport>()) return;
 
 	// ORBIT camera rotation
@@ -302,6 +307,8 @@ std::string makeIDNice(const char* ID)
 
 	std::string IDCopy = std::string(ID);
 
+	if (IDCopy.empty()) { return IDCopy; }
+
 	// Get fist part of "window/child-window" id.
 	char* currID = std::strtok(const_cast<char*>(IDCopy.c_str()), "###");
 	char* lastID;
@@ -320,13 +327,15 @@ void UIModule::setFocusedWindow()
 {
 	// Get window ids.
 	ImGuiContext& g								= *GImGui;
+	ImGuiIO& io = g.IO;
 	const char*		hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
-	const char*		focusedWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+	const char*		activeWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 	const char*		navWindowID			= g.NavWindow ? g.NavWindow->Name : "";
 
 	// Check for hovered window.
 	if (strlen(hoveredWindowID) != 0)
 	{
+		auto activeID  = makeIDNice(activeWindowID);
 		auto hoveredID = makeIDNice(hoveredWindowID);
 		auto navID		 = makeIDNice(navWindowID);
 
@@ -337,28 +346,32 @@ void UIModule::setFocusedWindow()
 		if (window != nullptr)
 		{
 			bool shouldSetFocus = true;
-			size_t index;
 
 			// Check if window can be focused (no menu is active).
 			if (String::contains(navID, "Menu_") || String::contains(navID, "Popup_"))
       {
         shouldSetFocus = false;
       }
+			if (!activeID.empty() && activeID != hoveredID)
+			{
+				shouldSetFocus = false;
+
+				if (InputManager::isKeyJustPressed(Keys::mouseRight) || InputManager::isKeyJustPressed(Keys::mouseMiddle))
+				{
+					// Un-focus text input.
+					ImGui::SetActiveID(0, g.HoveredWindow);
+					shouldSetFocus = true;
+				}
+			}
 
 			if (shouldSetFocus)
 			{
 				ImGui::SetWindowFocus(g.HoveredWindow->Name);
-        InputManager::setFocusedWindow(window);
+
+				// Set focused window input in next frame.
+				SetFocusedWindowCommand::dispatch(window);
 			}
 		}
-	}
-
-	if (strlen(focusedWindowID) != 0)
-	{
-		auto mainID = makeIDNice(focusedWindowID);
-
-		Ptr<IWindow> window;
-		if ((window = findWindow(mainID.c_str(), m_dockableWindows)) != nullptr) { InputManager::setFocusedWindow(window); }
 	}
 }
 
