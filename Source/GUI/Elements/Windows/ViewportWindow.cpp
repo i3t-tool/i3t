@@ -177,37 +177,37 @@ void Viewport::showViewportsMenu()
 		if (ImGui::MenuItem("View-x"))
 		{
 			// Num 1
-			w->sceneSetView(glm::vec3(1.0f, 0.0f, 0.0f), false);
+			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), false);
 		}
 
 		if (ImGui::MenuItem("View-y"))
 		{
 			// Num 2
-			w->sceneSetView(glm::vec3(0.0f, 1.0f, 0.0f), false);
+			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
 		}
 
 		if (ImGui::MenuItem("View-z"))
 		{
 			// Num 3
-			w->sceneSetView(glm::vec3(0.0f, 0.0f, 1.0f), false);
+			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), false);
 		}
 
 		if (ImGui::MenuItem("World-x"))
 		{
 			// Num 4
-			w->sceneSetView(glm::vec3(1.0f, 0.0f, 0.0f), true);
+			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), true);
 		}
 
 		if (ImGui::MenuItem("World-y"))
 		{
 			// Num 5
-			w->sceneSetView(glm::vec3(0.0f, 1.0f, 0.0f), true);
+			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
 		}
 
 		if (ImGui::MenuItem("World-z"))
 		{
 			// Num 6
-			w->sceneSetView(glm::vec3(0.0f, 0.0f, 1.0f), true);
+			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), true);
 		}
 
 		if (ImGui::MenuItem("Center"))
@@ -215,10 +215,17 @@ void Viewport::showViewportsMenu()
 			// Num 0
 			// App::get().world()->scene->setCamToCenter();
 		}
-
+		ImGui::Separator();
+		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
+		if (ImGui::MenuItem(action))
+		{
+			w->getCameraControl()->m_rotateAroundCenter=!w->getCameraControl()->m_rotateAroundCenter;
+			// Num 0
+			// App::get().world()->scene->setCamToCenter();
+		}
 		ImGui::EndMenu();
 	}
-	else if (ImGui::BeginMenu("Manipulators")) {
+	if (ImGui::BeginMenu("Manipulators")) {
 		const char*action=w->manipulatorsGetVisible()?"Hide":"Show";
 		if (ImGui::MenuItem(action)) {
 			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());

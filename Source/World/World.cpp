@@ -117,6 +117,9 @@ void startRecursive(GameObject* root){
     for (int i = 0; i < root->components.size(); i++){if (root->components[i]->m_isActive){root->components[i]->start();}}
     for (int i = 0; i < root->children.size(); i++){startRecursive(root->children[i]);}
 }
+CameraControl* World::getCameraControl() {
+    return camControl;
+}
 void World::sceneSetView(glm::vec3 dir, bool world) {
     this->camControl->setRotation(dir,world);
 }

@@ -34,10 +34,11 @@ void CameraControl::update()
 	}
 	else if (InputManager::isAxisActive("rotate"))
 	{
+		glm::vec3 center=m_rotateAroundCenter? glm::vec3(0.0f): (glm::vec3)m_gameObject->transformation[3];
 		//m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y, (glm::vec3)m_gameObject->transformation[3]);
 		//m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, 0.0f*(glm::vec3)m_gameObject->transformation[3]);
-		m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y, glm::vec3(0.0f));
-		m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, glm::vec3(0.0f));
+		m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y, center);
+		m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, center);
 	}
 
 	glm::vec4 move = glm::vec4(0.0f);

@@ -20,6 +20,8 @@ public:
 		
 	void setRotation(glm::vec3 dir,bool moveToCenter);
 	void setScroll(float val);
+
+	bool m_rotateAroundCenter = true;
 private:
 	static const char* s_type;
 
@@ -29,6 +31,7 @@ private:
 	glm::vec3 m_dirbkp=glm::vec3(1.0f);
 	glm::vec3 m_posbkp=glm::vec3(1.0f);
 	float m_alpha=1.0f;
+
 	bool m_moveToCenter=false;
 
 	float m_scroll=0.0f;

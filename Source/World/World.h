@@ -77,6 +77,8 @@ public:
     void manipulatorsSetVisible(bool visible);
     bool manipulatorsGetVisible();
 
+    CameraControl*getCameraControl();
+
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
     ///Remove GameObject from scene (viewport window)
