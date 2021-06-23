@@ -43,6 +43,7 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	// Attach given operator output pin to this operator input pin.
 	rightNode->getInputPinsRef()[myIndex].m_input = &leftNode->getOutputPinsRef()[fromIndex];
 
+	/*
 	if (isSequence(leftNode))
 	{
 		leftNode->as<Sequence>()->updatePins();
@@ -51,6 +52,7 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	{
 		rightNode->as<Sequence>()->updatePins();
 	}
+	 */
 
 	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
 		leftNode->spreadSignal();

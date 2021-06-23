@@ -11,18 +11,16 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
-namespace SequenceInternals
-{
-
-}
-
 /**
  * Sequence of matrices.
  */
 class Sequence : public NodeBase
 {
 	friend class GraphManager;
-	using Matrix = NodeBase;
+
+	using Matrix       = NodeBase;
+	using SequencePins = std::vector<Pin>;
+
 
 	/** Structure for storing transform matrices. */
 	class Storage : public Node
@@ -33,7 +31,10 @@ class Sequence : public NodeBase
 		Matrices m_matrices;
 
 	public:
-		Storage() : Node(nullptr) {}
+		Storage();
+
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
 
 		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
 		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
@@ -43,25 +44,33 @@ class Sequence : public NodeBase
 		void updateValues(int inputIndex) override;
 	};
 
+
 	/** Structure which represents sequences multiplication. */
 	class Multiplier : public Node
 	{
 		friend class Core::Sequence;
 
 	public:
-		Multiplier() : Node(nullptr) {}
+		Multiplier();
+
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
 
 		void updateValues(int inputIndex) override;
 	};
 
+
 	/// \todo MH use Node::m_owner!
 	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
-	Ptr<Storage> m_storage;
+	Ptr<Storage>    m_storage;
 	Ptr<Multiplier> m_multiplier;
 
 public:
 	Sequence();
+
+	Pin& getIn(size_t i) override;
+	Pin& getOut(size_t i) override;
 
 	void createComponents();
 

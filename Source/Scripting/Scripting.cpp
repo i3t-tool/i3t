@@ -396,7 +396,7 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		const Operation*			operation = nodebase->getOperation();
 		const char* keyword =		operation->keyWord.c_str(); //printf("k\n");
 
-		std::vector<Core::Pin>inputs = nodebase->getInputPins();
+		auto& inputs = nodebase->getInputPins();
 		for(int indexin=0;indexin<inputs.size();indexin++){
 			Ptr<Core::NodeBase> parent = Core::GraphManager::getParent(nodebase,indexin);
 			int parentindex = -1;
