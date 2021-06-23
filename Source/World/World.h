@@ -72,7 +72,10 @@ public:
     void sceneZoom(float val);
 
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
-    void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
+    void manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
+
+    void manipulatorsSetVisible(bool visible);
+    bool manipulatorsGetVisible();
 
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
@@ -109,4 +112,6 @@ private:
     static bool initializedRender; ///< Was render already initialized?
     bool started=false;///<Was start() already called on this instance of World?
     CameraControl*camControl=nullptr;
+    bool showManipulators=true;
+    Manipulator*activeManipulator=nullptr;
 };

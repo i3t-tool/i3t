@@ -123,12 +123,12 @@ void World::sceneSetView(glm::vec3 dir, bool world) {
 void World::sceneZoom(float val) {
     camControl->setScroll(val);
 }
-void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
-    printf("handlesSetMatrix 0x%p,0x%p\n",matnode,parent);
-    for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
-        i->second.component->m_isActive=false;
+void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
+    printf("manipulatorsSetMatrix 0x%p,0x%p\n",matnode,parent);
+    //for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
+    if(activeManipulator!=nullptr){activeManipulator->component->m_isActive=false;activeManipulator=nullptr;}
         //*(i->second.editedNode)=nullptr;
-    }
+    //}
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
     Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
@@ -138,16 +138,24 @@ void World::handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::sh
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
     
     if(this->manipulators.count(keyword)==1){
-        Manipulator m=this->manipulators[keyword];
-        m.component->m_isActive=true;
-        *m.editedNode=nodebase;
+        activeManipulator = &(this->manipulators[keyword]);
+        if(showManipulators){activeManipulator->component->m_isActive=true;}
+        *(activeManipulator->editedNode)=nodebase;
+        if(parent!=nullptr){if(parent->get()!=nullptr){*(activeManipulator->parent)=*parent;}}
     }
     else{printf("No manipulators\n"); }
 
     printf("operation %s\n",keyword);
 
 }
+void World::manipulatorsSetVisible(bool visible) {
+    showManipulators=visible;
 
+    if(activeManipulator!=nullptr){activeManipulator->component->m_isActive=visible;}
+}
+bool World::manipulatorsGetVisible() {
+    return showManipulators;
+}
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
     bool lines=false;

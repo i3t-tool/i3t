@@ -170,10 +170,10 @@ void Viewport::render()
 
 void Viewport::showViewportsMenu()
 {
+	World* w = App::get().world();
 	if (ImGui::BeginMenu("Viewports"))
 	{
 		//Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
-		World* w = App::get().world();
 		if (ImGui::MenuItem("View-x"))
 		{
 			// Num 1
@@ -216,6 +216,13 @@ void Viewport::showViewportsMenu()
 			// App::get().world()->scene->setCamToCenter();
 		}
 
+		ImGui::EndMenu();
+	}
+	else if (ImGui::BeginMenu("Manipulators")) {
+		const char*action=w->manipulatorsGetVisible()?"Hide":"Show";
+		if (ImGui::MenuItem(action)) {
+			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());
+		}
 		ImGui::EndMenu();
 	}
 }
