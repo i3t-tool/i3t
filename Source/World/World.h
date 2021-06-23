@@ -83,6 +83,7 @@ public:
     GameObject* addModel(const char* name);
     ///Remove GameObject from scene (viewport window)
     bool removeModel(GameObject*);
+
     GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
     std::map<std::string,Manipulator>manipulators;///<Properites of manipulator components
 
@@ -100,13 +101,6 @@ public:
     static Shader shader0; ///< Default shader
     static Shader shaderHandle;   ///< Handle shader
     static Shader shaderProj; ///< preview projection matrices
-
-    //HC textures
-    /*static GLuint cubeTexture;
-    static GLuint cubeColorTexture;
-    static GLuint cGridTexture;
-    static GLuint axisTexture;
-    static GLuint whiteTexture;*/
 
     static std::map<std::string, GLuint > textures;
     //static std::map<std::string, pgr::MeshData > models;

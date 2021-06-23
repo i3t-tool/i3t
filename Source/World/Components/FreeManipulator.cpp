@@ -110,7 +110,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	setLen((glm::vec3*)&t[0],1.0f+selected*3.0f);setLen((glm::vec3*)&t[1],1.0f+selected*3.0f);
 	m_lineh->transformation=glm::mat4(1.0f);
 	ManipulatorUtil::drawHandle(m_lineh,t,glm::vec4(1.0f,selected+0.2f,1.0f,1.0f),m_stencilaxisw,false,m_hoverhandle);
-
+	
 	if(m_editmode==FreeManipulator::EDIT_SCALE){//override scale handles for free edit
 		scale=glm::scale(scale, glm::vec3(0.09f));		
 		if(m_editaxis==0){
@@ -176,7 +176,7 @@ void FreeManipulator::update(){
 		else if(sel==m_stencilaxisx){ m_hoverhandle=m_stencilaxisx;}
 		else if(sel==m_stencilaxisy){ m_hoverhandle=m_stencilaxisy;}
 		else if(sel==m_stencilaxisz){ m_hoverhandle=m_stencilaxisz;}
-		else if(sel==m_stencilaxisw){ m_hoverhandle=m_stencilaxisx;}
+		else if(sel==m_stencilaxisw){ m_hoverhandle=m_stencilaxisw;}
 	}
 
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){

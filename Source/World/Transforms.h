@@ -16,7 +16,7 @@ glm::vec2 vecWorldscreen(glm::vec3 pos,glm::vec3 dir);	///Vector from world coor
 glm::vec3 world2viewport(glm::vec3 pos);				///Point from world coordinates to viewport coordinates (<-1;1>^3)
 glm::vec2 mouse2viewport(glm::vec2 pos);				///Mouse cursor from screen coordinates to viewport coordinates (<-1;1>^2)
 glm::vec3 mouseray(glm::vec2 pos);						///Mouse cursor from screen coordinates to ray in world coordinates (z1=0.7, z2=0.9)
-glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis);		///sets first three vectros to be orthonormal taken as vec3. Reference axis is only normalized. 
+glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis);		///sets first three vectros to be orthonormal taken as vec3. Reference axis is kept. 
 glm::mat4 getNormalized(glm::mat4 transform);					///normalize first three vectros taken as vec3.
 glm::mat4 getRotation(glm::mat4 transform, int referenceAxis);	///returns rotation part of matrix
 glm::vec3 getScale(glm::mat4 transform);						///returns length of first three columns taken as vec3

@@ -22,12 +22,8 @@ Shader World::shader0; ///< Default shader
 Shader World::shaderHandle;  ///< Handle shader
 Shader World::shaderProj; ///< preview projection matrices
 
-/*GLuint World::cubeTexture=0;
-GLuint World::cubeColorTexture=0;
-GLuint World::cGridTexture=0;
-GLuint World::axisTexture=0;
-GLuint World::whiteTexture=0;*/
 std::map<std::string, GLuint > World::textures;
+//std::map<std::string, pgr::MeshData > World::models;
 
 World::World(){
     if (!World::initializedRender) { printf("initialize render before creating World!\n"); }
@@ -85,17 +81,12 @@ bool World::init(){
         printf("World::init():cannot load shaders\n");return false;
     }
 
-    /*World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
-    World::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png"));
-    World::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png"));
-    World::axisTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png"));
-    World::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png"));*/
-
     World::textures.emplace("cube", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png")));
     World::textures.emplace("cube_color", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png")));
     World::textures.emplace("color_grid", pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png")));
     World::textures.emplace("axis", pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png")));
     World::textures.emplace("white", pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png")));
+
 
     CHECK_GL_ERROR();
     World::initializedRender = true;
@@ -105,12 +96,6 @@ void World::end() {
     pgr::deleteProgramAndShaders(World::shader0.program);
     pgr::deleteProgramAndShaders(World::shaderHandle.program);
     pgr::deleteProgramAndShaders(World::shaderProj.program);
-
-    /*glDeleteTextures(1,&World::cubeTexture);
-    glDeleteTextures(1,&World::cubeColorTexture);
-    glDeleteTextures(1,&World::cGridTexture);
-    glDeleteTextures(1,&World::axisTexture);
-    glDeleteTextures(1,&World::whiteTexture);*/
 
     for (std::map<std::string, GLuint>::const_iterator i = World::textures.cbegin(); i != World::textures.cend(); i++) {
         glDeleteTextures(1,&(i->second));
@@ -139,15 +124,12 @@ void World::sceneZoom(float val) {
     camControl->setScroll(val);
 }
 void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
-    printf("manipulatorsSetMatrix 0x%p,0x%p\n",matnode,parent);
-    //for(std::map<std::string,Manipulator>::const_iterator i=this->manipulators.cbegin();i!=this->manipulators.cend();i++){
+    //printf("manipulatorsSetMatrix 0x%p,0x%p\n",matnode,parent);
     if(activeManipulator!=nullptr){activeManipulator->component->m_isActive=false;activeManipulator=nullptr;}
-        //*(i->second.editedNode)=nullptr;
-    //}
     if(matnode==nullptr){return;}
     if(matnode->get()==nullptr){return;}
-    Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
 
+    Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
@@ -158,10 +140,8 @@ void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,st
         *(activeManipulator->editedNode)=nodebase;
         if(parent!=nullptr){if(parent->get()!=nullptr){*(activeManipulator->parent)=*parent;}}
     }
-    else{printf("No manipulators\n"); }
-
-    printf("operation %s\n",keyword);
-
+    //else{printf("No manipulators\n"); }
+    //printf("operation %s\n",keyword);
 }
 void World::manipulatorsSetVisible(bool visible) {
     showManipulators=visible;
