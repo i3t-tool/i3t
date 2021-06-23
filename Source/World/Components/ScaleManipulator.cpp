@@ -34,7 +34,7 @@ ScaleManipulator::ScaleManipulator() {
 	m_planeh =	new GameObject(quadMesh,		&World::shaderHandle,	0);
 	m_scaleh =	new GameObject(scalearrowMesh,	&World::shaderHandle,	0);
 	m_uniscaleh=new GameObject(unitcubeMesh,	&World::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::textures["axis"]);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);

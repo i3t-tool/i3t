@@ -102,14 +102,14 @@ public:
     static Shader shaderProj; ///< preview projection matrices
 
     //HC textures
-    static GLuint cubeTexture;
+    /*static GLuint cubeTexture;
     static GLuint cubeColorTexture;
     static GLuint cGridTexture;
     static GLuint axisTexture;
-    static GLuint whiteTexture;
+    static GLuint whiteTexture;*/
 
-    //static std::map<const char*, GLuint > textures;
-    //static std::map<const char*, pgr::MeshData > models;
+    static std::map<std::string, GLuint > textures;
+    //static std::map<std::string, pgr::MeshData > models;
 private:
     static bool initializedRender; ///< Was render already initialized?
     bool started=false;///<Was start() already called on this instance of World?

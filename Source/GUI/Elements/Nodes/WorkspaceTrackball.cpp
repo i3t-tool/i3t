@@ -27,7 +27,7 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, WorkspaceTr
 	GLuint renderTexture;
 	rend = new RenderTexture(&renderTexture, 256, 256);
 	//We dont have mesh forr ball now so using a cube for now
-	trackball = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
+	trackball = new GameObject(unitcubeMesh, &World::shader0, World::textures["color_grid"]);
 	trackball->addComponent(new Renderer());
 	trackball->translate(glm::vec3(0.0f, 0.0f, -5.0f));
 	cam = new Camera(60.0f, trackball,rend);
@@ -54,7 +54,7 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, std::string
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	rend = new RenderTexture(&renderTexture, 256, 256);
 	//We dont have mesh forr ball now so using a cube for now
-	trackball = new GameObject(unitcubeMesh, &World::shader0, World::cGridTexture);
+	trackball = new GameObject(unitcubeMesh, &World::shader0, World::textures["color_grid"]);
 	trackball->addComponent(new Renderer());
 	trackball->translate(glm::vec3(0.0f, 0.0f, -5.0f));
 	cam = new Camera(60.0f, trackball,rend);

@@ -22,11 +22,12 @@ Shader World::shader0; ///< Default shader
 Shader World::shaderHandle;  ///< Handle shader
 Shader World::shaderProj; ///< preview projection matrices
 
-GLuint World::cubeTexture=0;
+/*GLuint World::cubeTexture=0;
 GLuint World::cubeColorTexture=0;
 GLuint World::cGridTexture=0;
 GLuint World::axisTexture=0;
-GLuint World::whiteTexture=0;
+GLuint World::whiteTexture=0;*/
+std::map<std::string, GLuint > World::textures;
 
 World::World(){
     if (!World::initializedRender) { printf("initialize render before creating World!\n"); }
@@ -84,11 +85,17 @@ bool World::init(){
         printf("World::init():cannot load shaders\n");return false;
     }
 
-    World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
+    /*World::cubeTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
     World::cubeColorTexture =  pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png"));
     World::cGridTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png"));
     World::axisTexture =       pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png"));
-    World::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png"));
+    World::whiteTexture =      pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png"));*/
+
+    World::textures.emplace("cube", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png")));
+    World::textures.emplace("cube_color", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png")));
+    World::textures.emplace("color_grid", pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png")));
+    World::textures.emplace("axis", pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png")));
+    World::textures.emplace("white", pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png")));
 
     CHECK_GL_ERROR();
     World::initializedRender = true;
@@ -98,11 +105,16 @@ void World::end() {
     pgr::deleteProgramAndShaders(World::shader0.program);
     pgr::deleteProgramAndShaders(World::shaderHandle.program);
     pgr::deleteProgramAndShaders(World::shaderProj.program);
-    glDeleteTextures(1,&World::cubeTexture);
+
+    /*glDeleteTextures(1,&World::cubeTexture);
     glDeleteTextures(1,&World::cubeColorTexture);
     glDeleteTextures(1,&World::cGridTexture);
     glDeleteTextures(1,&World::axisTexture);
-    glDeleteTextures(1,&World::whiteTexture);
+    glDeleteTextures(1,&World::whiteTexture);*/
+
+    for (std::map<std::string, GLuint>::const_iterator i = World::textures.cbegin(); i != World::textures.cend(); i++) {
+        glDeleteTextures(1,&(i->second));
+    }
 }
 
 void GUIRecursive(GameObject* root) {
@@ -162,10 +174,10 @@ bool World::manipulatorsGetVisible() {
 GameObject* World::addModel(const char* name) {
     GameObject* g=nullptr;
     bool lines=false;
-    if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeTexture);}
-    else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World::shader0,World::cubeColorTexture); }
-    else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World::shader0,World::cGridTexture); }
-    else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World::shader0,World::axisTexture); }
+    if(strcmp("CubeGray",name)==0){             g=new GameObject(unitcubeMesh,  &World::shader0,World::textures["cube"]);}
+    else if (strcmp("CubeColor",name)==0) {     g=new GameObject(unitcubeMesh,  &World::shader0,World::textures["cube_color"]); }
+    else if (strcmp("CubeColorGrid",name)==0) { g=new GameObject(unitcubeMesh,  &World::shader0,World::textures["color_grid"]); }
+    else if (strcmp("PlainAxis",name)==0) {     g=new GameObject(three_axisMesh,&World::shader0,World::textures["axis"]); }
     else if (strstr("Grid", name) == name) {
         g = new GameObject(gridMesh, &World::shader0, 0);
         g->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

@@ -72,7 +72,7 @@ GameObject::GameObject(const pgr::MeshData mesh, struct Shader* shader, GLuint t
     this->num_attribs = mesh.nAttribsPerVertex;
     this->shader = ((Shader*)shader);
     this->transformation = glm::mat4(1.0f);
-    this->texture=(texture==0)?World::whiteTexture:texture;
+    this->texture=(texture==0)?World::textures["white"]:texture;
     this->color = glm::vec4(1.0f);
 
     // buffer for vertices

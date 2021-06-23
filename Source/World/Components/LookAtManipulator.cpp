@@ -27,7 +27,7 @@ LookAtManipulator::LookAtManipulator() {
 	m_cameraico=new GameObject(cameraicoMesh,	&World::shaderHandle,	0);
 	m_cameraico->transform(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.5f),glm::vec3(1.0f, 0.0f, 0.0f), -90.0f);
 	m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
-	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);	
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::textures["axis"]);	
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
