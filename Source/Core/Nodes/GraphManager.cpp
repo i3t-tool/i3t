@@ -4,6 +4,8 @@
 
 #include "glm/gtx/matrix_interpolation.hpp"
 
+#include "Logger/Logger.h"
+
 using namespace Core;
 
 std::vector<Ptr<Cycle>> GraphManager::m_cycles;
@@ -33,6 +35,9 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",
 								leftNode->getSig(), fromIndex);
 
+	I3T_DEBUG_LOG("Plugging {}:{} to {}:{}.", leftNode->getSig(), leftNode->getOut(fromIndex).getSig(), rightNode->getSig(), rightNode->getIn(myIndex).getSig());
+
+	/// \todo MH wrong order of nodes!
 	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
@@ -55,7 +60,11 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	 */
 
 	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
-		leftNode->spreadSignal();
+	{
+		/// \todo MH pin mismatch.
+		// leftNode->spreadSignal();
+		leftNode->spreadSignal(fromIndex);
+	}
 
 	rightNode->setDataMap(&Transform::g_AllLocked);
 
@@ -78,13 +87,13 @@ void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
 	node.get()->unplugAll();
 	node->setDataMap(&Transform::g_Free);
-	tryToDoSequenceProcedure(node);
+	// tryToDoSequenceProcedure(node);
 }
 
 void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
-	tryToDoSequenceProcedure(node);
+	// tryToDoSequenceProcedure(node);
 	if (getAllInputNodes(node).empty())
 		node->setDataMap(node->m_initialMap);
 }
@@ -92,7 +101,7 @@ void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugOutput(index);
-	tryToDoSequenceProcedure(node);
+	// tryToDoSequenceProcedure(node);
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)

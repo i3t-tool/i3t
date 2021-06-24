@@ -44,6 +44,18 @@ struct ValueSetResult
 	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
 };
 
+inline constexpr size_t I3T_INPUT0 = 0;
+inline constexpr size_t I3T_INPUT1 = 1;
+inline constexpr size_t I3T_INPUT2 = 2;
+
+inline constexpr size_t I3T_OUTPUT0 = 0;
+inline constexpr size_t I3T_OUTPUT1 = 1;
+inline constexpr size_t I3T_OUTPUT2 = 2;
+
+inline constexpr size_t I3T_DATA0 = 0;
+inline constexpr size_t I3T_DATA1 = 1;
+inline constexpr size_t I3T_DATA2 = 2;
+
 namespace Core
 {
 class Pin;
@@ -161,7 +173,7 @@ protected:
 	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
-	 * 	Owner of the node, sequence or camera, otherwise null.
+	 * Owner of the node, sequence or camera, otherwise null.
 	 */
 	Ptr<NodeBase> m_owner = nullptr;
 
@@ -201,6 +213,8 @@ public:
 	 * Initialize node inputs and outputs according to preset node type.
 	 *
 	 * Called in create node function.
+	 *
+	 * \todo MH Override in derived classes (Sequence).
 	 */
 	void init();
 
@@ -218,7 +232,7 @@ protected:
 	 */
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
-		Debug::Assert(m_internalData.size() > index, "Desired data storage does not exist!");
+		assert(index < m_internalData.size() && "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
@@ -239,8 +253,7 @@ private:
 		if (m_currentMap == &Transform::g_AllLocked)
 			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
 
-		getInternalData().setValue(val);
-		spreadSignal();
+		setInternalValue(val);
 
 		return ValueSetResult{};
 	}
@@ -280,7 +293,9 @@ public:
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
+		setInternalValue(val, coords);
+		return ValueSetResult{};
+		// return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
 	/**
@@ -350,7 +365,7 @@ protected:
 	 * PF: This method is intended for complex modules to allow for optimization.
 	 * May be replaced by updateValues() or implemented in such a way. Do such optimizable modules exist?
 	 *
-	 * \param	inputIndex Index of the modified input.
+	 * \param	inputIndex Index of the modified input (output pin).
 	 */
 	virtual void updateValues(int inputIndex = 0) {}
 
@@ -381,7 +396,17 @@ protected:
 	bool areAllInputsPlugged();
 
 	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
-	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
+	std::string getSig()
+	{
+		std::string masterSig;
+
+		if (m_owner)
+		{
+			masterSig = " of (" + m_owner->getSig() + ")";
+		}
+
+		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
+	};
 
 protected:
 	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
@@ -491,6 +516,11 @@ public:
 
 		return label;
 	}
+
+	std::string getSig()
+	{
+		return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), m_master->getSig(), m_index);
+	};
 
 	[[nodiscard]] EValueType getType() const { return m_valueType; }
 

@@ -168,6 +168,22 @@ enum class EValueType
 	Ptr,
 };
 
+inline const std::string& valueTypeToString(EValueType type)
+{
+	static const std::string names[] = {
+			"Pulse",
+			"Float", ///< standard data type
+			"Vec3",
+			"Vec4",
+			"Matrix",
+			"Quat",
+			"MatrixMul", ///< connection of sequences in the scene graph - represents a matrix multiplication
+			"Screen",    ///< projection and camera view transformation
+			"Ptr",
+	};
+	return names[static_cast<int>(type)];
+}
+
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)

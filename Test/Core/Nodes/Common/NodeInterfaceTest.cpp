@@ -120,11 +120,11 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnec
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
 	auto inputSeq = Builder::createSequence();
-	auto mySeq = Builder::createSequence();
-	auto free = Builder::createNode<ENodeType::Matrix>();
+	auto mySeq    = Builder::createSequence();
+	auto mat      = Builder::createNode<ENodeType::Matrix>();
 
 	plug_expectOk(inputSeq, mySeq, 0, 0);
-	plug_expectOk(free, mySeq, 0, 1);
+	plug_expectOk(mat, mySeq, 0, 1);
 
 	auto result = GraphManager::getAllInputNodes(mySeq);
 

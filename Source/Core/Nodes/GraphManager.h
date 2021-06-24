@@ -86,8 +86,8 @@ public:
 	 *
 	 * Algorithm described in panel Algoritmus 1 in [Folta, page 30]
 	 *
-	 * \param input
-	 * \param output
+	 * \param input Pin of right node.
+	 * \param output Pin of left node.
 	 */
 	static ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 

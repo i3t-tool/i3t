@@ -1,6 +1,7 @@
 #include "Node.h"
 
 #include "Core/Nodes/GraphManager.h"
+#include "Logger/Logger.h"
 #include "Logger/LoggerInternal.h"
 
 using namespace Core;
@@ -134,7 +135,11 @@ void NodeBase::spreadSignal()
 {
 	for (auto& operatorOutput : getOutputPinsRef())
 	{
-		for (auto* oct : operatorOutput.getOutComponents()) { oct->m_master->receiveSignal(oct->getIndex()); }
+		for (auto* oct : operatorOutput.getOutComponents())
+		{
+			I3T_DEBUG_LOG("Spreading signal from {} to {}:{}.", getSig(), oct->m_master->getSig(), oct->getSig());
+			oct->m_master->receiveSignal(oct->getIndex());
+		}
 	}
 }
 
@@ -144,7 +149,10 @@ void NodeBase::spreadSignal(size_t outIndex)
 
 	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
 	{
-		inPin->m_master->receiveSignal(inPin->getIndex());
+    I3T_DEBUG_LOG("Spreading signal from {}:{} to {}:{}.", getSig(), outIndex, inPin->m_master->getSig(), inPin->getSig());
+		/// \todo Mismatched pins.
+		// inPin->m_master->receiveSignal(inPin->getIndex());
+		inPin->m_master->receiveSignal(outIndex);
 	}
 }
 
@@ -153,7 +161,7 @@ void NodeBase::receiveSignal(int inputIndex)
 	updateValues(inputIndex);
 
 	/// \todo MH this call is unnecessary, but SpreadSignalTest.ValuesShouldBeSpreadThroughConnectedNodes fails.
-	spreadSignal();
+	// spreadSignal();
 }
 
 bool NodeBase::areInputsPlugged(int numInputs)
@@ -242,14 +250,16 @@ void NodeBase::unplugInput(size_t index)
 	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
 								"The node's input pin that you want to unplug does not exists.");
 
-	auto* otherPin = m_inputs[index].m_input;
+	// auto* otherPin = m_inputs[index].m_input;
+	auto inputs    = getInputPinsRef();
+	auto* otherPin = inputs[index].m_input;
 
 	if (otherPin)
 	{
 		// Erase pointer to my input pin in connected node outputs.
 		auto& otherPinOutputs = otherPin->m_outputs;
 
-		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &m_inputs[index]);
+		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &inputs[index]);
 		if (it != otherPinOutputs.end())
 		{
 			/// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
@@ -260,7 +270,7 @@ void NodeBase::unplugInput(size_t index)
 			Debug::Assert(false, "Can't find pointer to input pin in other node outputs.");
 		}
 
-		auto& myPin		= m_inputs[index];
+		auto& myPin		= inputs[index];
 		myPin.m_input = nullptr;
 	}
 }
@@ -270,7 +280,8 @@ void NodeBase::unplugOutput(size_t index)
 	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
 								"The node's output pin that you want to unplug does not exists.");
 
-	auto& pin = m_outputs[index];
+	// auto& pin = m_outputs[index];
+	auto& pin = getOut(index);
 
 	// Set all connected nodes input as nullptr.
 	for (const auto& otherPin : pin.m_outputs) otherPin->m_input = nullptr;

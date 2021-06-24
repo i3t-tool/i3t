@@ -2,7 +2,6 @@
 #include "GraphManager.h"
 
 using namespace Core;
-using namespace CycleInternals;
 
 void Cycle::update(double seconds)
 {
@@ -15,32 +14,32 @@ void Cycle::update(double seconds)
 void Cycle::play()
 {
 	m_isRunning = true;
-	spreadSignal(out_play);
+	spreadSignal(I3T_CYCLE_OUT_PLAY);
 }
 
 void Cycle::stop()
 {
 	m_isRunning = false;
-	spreadSignal(out_pause);
+	spreadSignal(I3T_CYCLE_OUT_PAUSE);
 }
 
 void Cycle::resetAndStop()
 {
 	m_isRunning = false;
 	getInternalData().setValue(m_from);
-	spreadSignal(out_stop);
+	spreadSignal(I3T_CYCLE_OUT_STOP);
 }
 
 void Cycle::stepBack()
 {
 	updateValue((-1.0f) * m_modeMultiplier * m_updateStep);
-	spreadSignal(out_prev);
+	spreadSignal(I3T_CYCLE_OUT_PREV);
 }
 
 void Cycle::stepNext()
 {
 	updateValue(m_modeMultiplier * m_updateStep);
-	spreadSignal(out_next);
+	spreadSignal(I3T_CYCLE_OUT_NEXT);
 }
 
 void Cycle::setFrom(float from)
@@ -92,30 +91,30 @@ float Cycle::getStep() const
 
 void Cycle::updateValues(int inputIndex)
 {
-	if (m_inputs[in_from].isPluggedIn())
-		getInternalData(in_from).setValue(m_inputs[in_from].getStorage().getFloat());
+	if (m_inputs[I3T_CYCLE_IN_FROM].isPluggedIn())
+		getInternalData(I3T_CYCLE_IN_FROM).setValue(m_inputs[I3T_CYCLE_IN_FROM].getStorage().getFloat());
 
-	if (m_inputs[in_to].isPluggedIn())
-		getInternalData(in_to).setValue(m_inputs[in_to].getStorage().getFloat());
+	if (m_inputs[I3T_CYCLE_IN_TO].isPluggedIn())
+		getInternalData(I3T_CYCLE_IN_TO).setValue(m_inputs[I3T_CYCLE_IN_TO].getStorage().getFloat());
 
-	if (m_inputs[in_multiplier].isPluggedIn())
-		getInternalData(in_multiplier).setValue(m_inputs[in_multiplier].getStorage().getFloat());
+	if (m_inputs[I3T_CYCLE_IN_MULT].isPluggedIn())
+		getInternalData(I3T_CYCLE_IN_MULT).setValue(m_inputs[I3T_CYCLE_IN_MULT].getStorage().getFloat());
 
 	switch (inputIndex)
 	{
-	case in_play:
+	case I3T_CYCLE_IN_PLAY:
 		play();
 		break;
-	case in_pause:
+	case I3T_CYCLE_IN_PAUSE:
 		stop();
 		break;
-	case in_stop:
+	case I3T_CYCLE_IN_STOP:
 		resetAndStop();
 		break;
-	case in_prev:
+	case I3T_CYCLE_IN_PREV:
 		stepBack();
 		break;
-	case in_next:
+	case I3T_CYCLE_IN_NEXT:
 		stepNext();
 		break;
 	default:

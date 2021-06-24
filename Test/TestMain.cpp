@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include "Logger/LoggerInternal.h"
+
 int main(int argc, char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

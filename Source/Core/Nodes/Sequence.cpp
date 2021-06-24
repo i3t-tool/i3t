@@ -7,7 +7,7 @@ using namespace Core;
 //===-- Storage -----------------------------------------------------------===//
 
 const Operation g_storageOp = {
-		"_", "_", 1, {EValueType::Matrix}, 1, {EValueType::Matrix}
+		"SeqStor", "_", 1, {EValueType::Matrix}, 1, {EValueType::Matrix}
 };
 
 Sequence::Storage::Storage() :
@@ -25,16 +25,33 @@ Pin& Sequence::Storage::getOut(size_t i)
 	return m_owner->getOut(i);
 }
 
+DataStore& Sequence::Storage::getInternalData(size_t index)
+{
+	// return m_owner->as<Sequence>()->getInternalData(index);
+	return m_internalData[0];
+}
+
 void Sequence::Storage::updateValues(int inputIndex)
 {
 	auto mat = getMatProduct(m_matrices);
 
-	if (getInPin(0).isPluggedIn())
+	/*
+	 * \todo MH pin mismatch.
+	if (inputIndex == I3T_SEQ_IN_MAT)
 	{
-		// Matrix input
-		mat = getInPinRef(0).getStorage(0).getMat4();
+		// Matrix is directly set from outside.
+		mat = getIn(I3T_SEQ_IN_MAT).getStorage(I3T_SEQ_MAT).getMat4();
 	}
-	setInternalValue(mat, 0);
+	 */
+	if (inputIndex != -1)
+	{
+		mat = getIn(I3T_SEQ_IN_MAT).getStorage(inputIndex).getMat4();
+	}
+
+	// Set storage value.
+	setInternalValue(mat, I3T_SEQ_MAT);
+
+	// Notify multiplier about change.
 	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 }
 
@@ -92,7 +109,7 @@ void Sequence::Storage::swap(int from, int to)
 //===-- Multiplier --------------------------------------------------------===//
 
 const Operation g_multiplerOp = {
-	"_", "_", 1, {EValueType::MatrixMul}, 2, {EValueType::MatrixMul, EValueType::Matrix}
+	"SeqMul", "_", 1, {EValueType::MatrixMul}, 2, {EValueType::MatrixMul, EValueType::Matrix}
 };
 
 Sequence::Multiplier::Multiplier() :
@@ -109,21 +126,27 @@ Pin& Sequence::Multiplier::getOut(size_t i)
 	return m_owner->getOut(i);
 }
 
+DataStore& Sequence::Multiplier::getInternalData(size_t index)
+{
+	return m_owner->as<Sequence>()->getInternalData(index);
+}
+
 void Sequence::Multiplier::updateValues(int inputIndex)
 {
-	auto product = m_owner->as<Sequence>()->m_storage->getData().getMat4();
+	auto product = getData(I3T_SEQ_MAT).getMat4();
 	glm::mat4 mult(1.0f);
 
-	if (m_owner->getInPin(0).isPluggedIn())
+	if (getIn(I3T_SEQ_IN_MUL).isPluggedIn())
 	{
-		auto parent = GraphManager::getParent(m_owner)->as<Sequence>();
-		mult = parent->getData().getMat4();
+		mult = getIn(I3T_SEQ_IN_MUL).getStorage(I3T_SEQ_MUL).getMat4();
 	}
+	auto result = mult * product;
+
 	// Mul. output
-	setInternalValue(mult * product, 0);
+	setInternalValue(result, I3T_SEQ_MUL);
 
 	// Model matrix
-	setInternalValue(mult * product, 1);
+	setInternalValue(result, I3T_SEQ_MOD);
 }
 
 //===-- Sequence ----------------------------------------------------------===//
@@ -136,10 +159,7 @@ Pin& Sequence::getIn(size_t i)
 {
 	assert(i < m_operation->inputTypes.size() && "Illegal index.");
 
-	if (i == 1)
-	{
-		return m_storage->m_inputs[0];
-	}
+	if (i == I3T_SEQ_IN_MAT) { return m_storage->m_inputs[0]; }
 	return m_multiplier->m_inputs[i];
 }
 
@@ -147,62 +167,61 @@ Pin& Sequence::getOut(size_t i)
 {
 	assert(i < m_operation->outputTypes.size() && "Illegal index.");
 
-	if (i == 2)
+	if (i == I3T_SEQ_IN_MUL) { return m_multiplier->m_outputs[0]; }
+	if (i == I3T_SEQ_IN_MAT) { return m_storage->m_outputs[0]; }
+	else
 	{
-		return m_storage->m_outputs[0];
+		// Model matrix output.
+		return m_multiplier->m_outputs[1];
 	}
-	return m_multiplier->m_outputs[i];
 }
 
 void Sequence::createComponents()
 {
 	m_storage = std::make_shared<Sequence::Storage>();
-	m_storage->init();
+	//m_storage->init();
 
-	/*
-	m_storage->m_inputs.emplace_back(EValueType::Matrix, true, m_storage->getPtr(), 0);
-	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 0);
+	m_storage->m_inputs.emplace_back(EValueType::Matrix, true, m_storage->getPtr(), 1);
+	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 1);
 
 	m_storage->m_internalData.emplace_back(EValueType::Matrix);
-	 */
 
 	m_storage->m_owner = getPtr();
 
 
 	m_multiplier = std::make_shared<Sequence::Multiplier>();
-	m_multiplier->init();
+	//m_multiplier->init();
 
-	/*
 	m_multiplier->m_inputs.emplace_back(EValueType::MatrixMul, true, m_multiplier->getPtr(), 0);
 
 	m_multiplier->m_outputs.emplace_back(EValueType::MatrixMul, false, m_multiplier->getPtr(), 0);
-	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false, m_multiplier->getPtr(), 1);
+	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false, m_multiplier->getPtr(), 2);
 
 	m_multiplier->m_internalData.emplace_back(EValueType::MatrixMul);
 	m_multiplier->m_internalData.emplace_back(EValueType::Matrix);
-	 */
 
 	m_multiplier->m_owner = getPtr();
 }
 
 DataStore& Sequence::getInternalData(size_t index)
 {
-	if (index == 0)
+	if (index == I3T_SEQ_MUL)
 	{
-		return m_multiplier->getInternalData(0);
+		return m_multiplier->m_internalData[0];
 	}
-	else if (index == 1)
+	else if (index == I3T_SEQ_MAT)
 	{
-		return m_storage->getInternalData(0);
+		return m_storage->m_internalData[0];
 	}
-	else if (index == 2)
+	else
 	{
-		return m_multiplier->getInternalData(1);
+		return m_multiplier->m_internalData[1];
 	}
 }
 
 void Sequence::updatePins()
 {
+	/*
 	m_storage->m_inputs[0].m_input = m_inputs[1].m_input;
 	m_multiplier->m_inputs[0].m_input = m_inputs[0].m_input;
 
@@ -214,6 +233,7 @@ void Sequence::updatePins()
 
 	m_multiplier->m_outputs[1].m_outputs = m_outputs[2].m_outputs;
 	resetInputPin(m_multiplier->m_outputs[1].m_outputs, &m_multiplier->m_outputs[1]);
+	 */
 }
 
 void Sequence::resetInputPin(std::vector<Pin*>& outputsOfPin, Pin* newInput)

@@ -348,11 +348,12 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3DotVector3>::updateValu
 	{
 		auto vec1 = m_inputs[0].getStorage().getVec3();
 		auto vec2 = m_inputs[1].getStorage().getVec3();
-		m_internalData[0].setValue(glm::dot(vec1, vec2));
+
+		setInternalValue(glm::dot(vec1, vec2));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -1369,7 +1370,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inpu
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
+		setInternalValue(m_inputs[0].getStorage(inputIndex).getMat4());
 	}
 }
 
