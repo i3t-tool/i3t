@@ -35,9 +35,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",
 								leftNode->getSig(), fromIndex);
 
-	I3T_DEBUG_LOG("Plugging {}:{} to {}:{}.", leftNode->getSig(), leftNode->getOut(fromIndex).getSig(), rightNode->getSig(), rightNode->getIn(myIndex).getSig());
+	// I3T_DEBUG_LOG("Plugging {}:{} to {}:{}.", leftNode->getSig(), leftNode->getOut(fromIndex).getSig(), rightNode->getSig(), rightNode->getIn(myIndex).getSig());
 
-	/// \todo MH wrong order of nodes!
 	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
@@ -48,21 +47,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	// Attach given operator output pin to this operator input pin.
 	rightNode->getInputPinsRef()[myIndex].m_input = &leftNode->getOutputPinsRef()[fromIndex];
 
-	/*
-	if (isSequence(leftNode))
-	{
-		leftNode->as<Sequence>()->updatePins();
-	}
-	if (isSequence(rightNode))
-	{
-		rightNode->as<Sequence>()->updatePins();
-	}
-	 */
-
 	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
 	{
-		/// \todo MH pin mismatch.
-		// leftNode->spreadSignal();
 		leftNode->spreadSignal(fromIndex);
 	}
 

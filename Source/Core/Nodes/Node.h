@@ -309,8 +309,12 @@ public:
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
+	void pulse(size_t index);
+
 protected:
 	void setPinOwner(Pin& pin, Ptr<NodeBase> node);
+
+	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 	/**
 	 * Sets node value without validation.
@@ -419,6 +423,7 @@ private:
 
 using Node		= NodeBase;
 using NodePtr = Ptr<Node>;
+
 
 /**
  * Pin used for connecting nodes.

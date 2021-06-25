@@ -193,7 +193,7 @@ inline const std::string& valueTypeToString(EValueType type)
 class DataStore
 {
 protected:
-	std::variant<glm::mat4, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
+	std::variant<bool, glm::mat4, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
 	EValueType opValueType; ///< wire type, such as FLOAT or MATRIX
 
 public:
@@ -204,6 +204,9 @@ public:
 	{
 		switch (valueType)
 		{
+		case EValueType::Pulse:
+			setValue(false);
+			break;
 		case EValueType::Ptr:
 		case EValueType::Screen:
 			setValue((void*)nullptr);
@@ -229,6 +232,7 @@ public:
 	}
 
 	[[nodiscard]] EValueType getOpValType() const { return opValueType; }
+ 	[[nodiscard]] bool isPulseTriggered() const { return std::get<bool>(m_value); }
 	[[nodiscard]] const glm::mat4& getMat4() const { return std::get<glm::mat4>(m_value); }
 	[[nodiscard]] glm::mat4& getMat4Ref() { return std::get<glm::mat4>(m_value); }
 	[[nodiscard]] const glm::vec3& getVec3() const { return std::get<glm::vec3>(m_value); }

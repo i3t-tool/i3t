@@ -14,32 +14,31 @@ void Cycle::update(double seconds)
 void Cycle::play()
 {
 	m_isRunning = true;
-	spreadSignal(I3T_CYCLE_OUT_PLAY);
+	pulse(I3T_CYCLE_OUT_PLAY);
 }
 
 void Cycle::stop()
 {
 	m_isRunning = false;
-	spreadSignal(I3T_CYCLE_OUT_PAUSE);
+	pulse(I3T_CYCLE_OUT_PAUSE);
 }
 
 void Cycle::resetAndStop()
 {
 	m_isRunning = false;
-	getInternalData().setValue(m_from);
-	spreadSignal(I3T_CYCLE_OUT_STOP);
+	pulse(I3T_CYCLE_OUT_STOP);
 }
 
 void Cycle::stepBack()
 {
 	updateValue((-1.0f) * m_modeMultiplier * m_updateStep);
-	spreadSignal(I3T_CYCLE_OUT_PREV);
+	pulse(I3T_CYCLE_OUT_PREV);
 }
 
 void Cycle::stepNext()
 {
 	updateValue(m_modeMultiplier * m_updateStep);
-	spreadSignal(I3T_CYCLE_OUT_NEXT);
+	pulse(I3T_CYCLE_OUT_NEXT);
 }
 
 void Cycle::setFrom(float from)
@@ -112,25 +111,25 @@ void Cycle::updateValues(int inputIndex)
 		setInternalValue(val, I3T_CYCLE_IN_MULT);
 	}
 
-	switch (inputIndex)
+	if (getIn(I3T_CYCLE_IN_PLAY).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex))
 	{
-	case I3T_CYCLE_IN_PLAY:
 		play();
-		break;
-	case I3T_CYCLE_IN_PAUSE:
+	}
+	else if (getIn(I3T_CYCLE_IN_PAUSE).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PAUSE, inputIndex))
+	{
 		stop();
-		break;
-	case I3T_CYCLE_IN_STOP:
+	}
+	if (getIn(I3T_CYCLE_IN_STOP).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_STOP, inputIndex))
+	{
 		resetAndStop();
-		break;
-	case I3T_CYCLE_IN_PREV:
+	}
+	if (getIn(I3T_CYCLE_IN_PREV).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PREV, inputIndex))
+	{
 		stepBack();
-		break;
-	case I3T_CYCLE_IN_NEXT:
+	}
+	if (getIn(I3T_CYCLE_IN_NEXT).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_NEXT, inputIndex))
+	{
 		stepNext();
-		break;
-	default:
-		break;
 	}
 }
 

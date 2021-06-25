@@ -114,6 +114,24 @@ ID NodeBase::getId() const { return m_id; }
 
 void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node) { pin.m_master = node; }
 
+void NodeBase::pulse(size_t index)
+{
+  setInternalValue(true, index);
+  setInternalValue(false, index);
+}
+
+bool NodeBase::shouldPulse(size_t inputIndex, size_t outputIndex)
+{
+	auto outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
+	auto& storage = getIn(inputIndex).getStorage(outputPinIndex);
+
+	if (getIn(inputIndex).isPluggedIn() && storage.isPulseTriggered())
+	{
+    return true;
+	}
+	return false;
+}
+
 void NodeBase::setDataMap(const Transform::DataMap* map)
 {
 	// PerspectiveProj;
@@ -137,7 +155,7 @@ void NodeBase::spreadSignal()
 	{
 		for (auto* oct : operatorOutput.getOutComponents())
 		{
-			I3T_DEBUG_LOG("Spreading signal from {} to {}:{}.", getSig(), oct->m_master->getSig(), oct->getSig());
+			// I3T_DEBUG_LOG("Spreading signal from {} to {}:{}.", getSig(), oct->m_master->getSig(), oct->getSig());
 			oct->m_master->receiveSignal(oct->getIndex());
 		}
 	}
@@ -149,9 +167,7 @@ void NodeBase::spreadSignal(size_t outIndex)
 
 	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
 	{
-    I3T_DEBUG_LOG("Spreading signal from {}:{} to {}:{}.", getSig(), outIndex, inPin->m_master->getSig(), inPin->getSig());
-		/// \todo Mismatched pins.
-		// inPin->m_master->receiveSignal(inPin->getIndex());
+    // I3T_DEBUG_LOG("Spreading signal from {}:{} to {}:{}.", getSig(), outIndex, inPin->m_master->getSig(), inPin->getSig());
 		inPin->m_master->receiveSignal(outIndex);
 	}
 }
