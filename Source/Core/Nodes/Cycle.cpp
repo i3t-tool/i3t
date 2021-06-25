@@ -92,13 +92,25 @@ float Cycle::getStep() const
 void Cycle::updateValues(int inputIndex)
 {
 	if (m_inputs[I3T_CYCLE_IN_FROM].isPluggedIn())
-		getInternalData(I3T_CYCLE_IN_FROM).setValue(m_inputs[I3T_CYCLE_IN_FROM].getStorage().getFloat());
+	{
+		float val = getIn(I3T_CYCLE_IN_FROM).getStorage().getFloat();
+		setFrom(val);
+		setInternalValue(val, I3T_CYCLE_IN_FROM);
+	}
 
-	if (m_inputs[I3T_CYCLE_IN_TO].isPluggedIn())
-		getInternalData(I3T_CYCLE_IN_TO).setValue(m_inputs[I3T_CYCLE_IN_TO].getStorage().getFloat());
+	if (getIn(I3T_CYCLE_IN_TO).isPluggedIn())
+	{
+		float val = getIn(I3T_CYCLE_IN_TO).getStorage().getFloat();
+		setTo(val);
+		setInternalValue(val, I3T_CYCLE_IN_TO);
+	}
 
 	if (m_inputs[I3T_CYCLE_IN_MULT].isPluggedIn())
-		getInternalData(I3T_CYCLE_IN_MULT).setValue(m_inputs[I3T_CYCLE_IN_MULT].getStorage().getFloat());
+	{
+		float val = getIn(I3T_CYCLE_IN_MULT).getStorage().getFloat();
+		setMultiplier(val);
+		setInternalValue(val, I3T_CYCLE_IN_MULT);
+	}
 
 	switch (inputIndex)
 	{
@@ -164,7 +176,7 @@ void Cycle::updateValue(float seconds)
 			break;
 		}
 	}
-	getInternalData().setValue(newValue);
+	setInternalValue(newValue);
 }
 
 void Cycle::setModeMultiplier()

@@ -10,7 +10,7 @@ TEST(PulseTest, PulseNodeCanTriggerCycle)
 	auto pulse = Builder::createNode<ENodeType::Pulse>();
 	auto cycle = GraphManager::createCycle();
 
-  plug_expectOk(pulse, cycle, 0, CycleInternals::in_play);
+  plug_expectOk(pulse, cycle, 0, I3T_CYCLE_IN_PLAY);
 	EXPECT_TRUE(!cycle->isRunning());
 
 	pulse->spreadSignal();
@@ -18,7 +18,7 @@ TEST(PulseTest, PulseNodeCanTriggerCycle)
 
 	GraphManager::unplugAll(pulse);
 
-	plug_expectOk(pulse, cycle, 0, CycleInternals::in_pause);
+	plug_expectOk(pulse, cycle, 0, I3T_CYCLE_IN_PAUSE);
 
   pulse->spreadSignal();
   EXPECT_FALSE(cycle->isRunning());

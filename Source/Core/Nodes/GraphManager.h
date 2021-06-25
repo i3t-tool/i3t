@@ -276,7 +276,7 @@ inline Ptr<Core::Cycle> GraphManager::createCycle()
 {
 	auto ret = std::make_shared<Core::Cycle>();
 	ret->init();
-	ret->updateValues(0);
+	ret->updateValues(-1);
 	ret->resetAndStop();
 
 	m_cycles.push_back(ret);
