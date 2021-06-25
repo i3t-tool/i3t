@@ -22,7 +22,7 @@ enum class ENodePlugResult
 	Ok = 0,
 	Err_MismatchedPinTypes,
 	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
-	Err_Loopback,          /// Same nodes.
+	Err_Loopback,					 /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
 };
@@ -36,15 +36,25 @@ struct ValueSetResult
 		Err_LogicError
 	};
 
-	const Status status;
+	const Status			status;
 	const std::string message;
 
 	ValueSetResult() : status(Status::Ok), message("") {}
 
-	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage))
-	{
-	}
+	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
 };
+
+inline constexpr size_t I3T_INPUT0 = 0;
+inline constexpr size_t I3T_INPUT1 = 1;
+inline constexpr size_t I3T_INPUT2 = 2;
+
+inline constexpr size_t I3T_OUTPUT0 = 0;
+inline constexpr size_t I3T_OUTPUT1 = 1;
+inline constexpr size_t I3T_OUTPUT2 = 2;
+
+inline constexpr size_t I3T_DATA0 = 0;
+inline constexpr size_t I3T_DATA1 = 1;
+inline constexpr size_t I3T_DATA2 = 2;
 
 namespace Core
 {
@@ -57,6 +67,98 @@ class Pin;
 class NodeBase : public std::enable_shared_from_this<NodeBase>
 {
 	friend class GraphManager;
+
+public:
+	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
+	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
+
+	class Strategy;
+
+	/**
+	 * Class which composes
+	 */
+	class PinView
+	{
+		using value			= Pin;
+		using pointer		= Pin*;
+		using reference = Pin&;
+
+	public:
+		class Iterator
+		{
+		public:
+			Iterator(Ptr<Strategy> strategy, Ptr<NodeBase> node, int index);
+
+			reference		operator*() const;
+			pointer			operator->();
+			Iterator&		operator++();
+			Iterator		operator++(int);
+			Iterator&		operator=(const Iterator&) = default;
+			friend bool operator==(const Iterator& a, const Iterator& b) { return a.m_index == b.m_index; };
+			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.m_index != b.m_index; };
+
+		protected:
+			int						m_index;
+			Ptr<NodeBase> m_node;
+			Ptr<Strategy> m_strategy;
+		};
+
+	public:
+		PinView(Ptr<Strategy> strategy, Ptr<NodeBase> node) : m_strategy(strategy), m_node(node){};
+		Pin&		 operator[](size_t i) const;
+		Iterator begin() const;
+		Iterator end() const;
+		bool		 empty() const;
+		size_t	 size() const;
+
+	private:
+		Ptr<NodeBase> m_node;
+		Ptr<Strategy> m_strategy;
+	};
+
+
+	class Strategy : public std::enable_shared_from_this<Strategy>
+	{
+	public:
+			Strategy(Ptr<NodeBase> node) : m_node(node) {};
+			Ptr<Strategy> getThis() { return shared_from_this(); }
+
+			virtual PinView::Iterator begin()						= 0;
+			virtual PinView::Iterator end()							= 0;
+			virtual bool							empty()						= 0;
+			virtual size_t						size()						= 0;
+			virtual Pin&							get(size_t index) = 0;
+
+	protected:
+			Ptr<NodeBase> m_node;
+	};
+
+	class InputStrategy : public Strategy
+	{
+	public:
+		InputStrategy(Ptr<NodeBase> node) :
+					Strategy(node) {}
+
+		virtual PinView::Iterator begin();
+		virtual PinView::Iterator end();
+		virtual bool							empty();
+		virtual size_t						size();
+		virtual Pin&							get(size_t index);
+	};
+
+	class OutputStrategy : public Strategy
+	{
+	public:
+		OutputStrategy(Ptr<NodeBase> node) :
+					Strategy(node) {}
+
+		virtual PinView::Iterator begin();
+		virtual PinView::Iterator end();
+		virtual bool							empty();
+		virtual size_t						size();
+		virtual Pin&							get(size_t index);
+	};
+
 
 protected:
 	ID m_id{};
@@ -71,7 +173,7 @@ protected:
 	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
-	 * 	Owner of the node, sequence or camera, otherwise null.
+	 * Owner of the node, sequence or camera, otherwise null.
 	 */
 	Ptr<NodeBase> m_owner = nullptr;
 
@@ -90,7 +192,6 @@ public:
 	/** Delete node and unplug its all inputs and outputs. */
 	virtual ~NodeBase();
 
-public:
 	const Pin& getInPin(int index) { return getInputPins()[index]; }
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
@@ -101,8 +202,8 @@ protected:
 public:
 	Ptr<NodeBase> getPtr() { return shared_from_this(); }
 
-public:
-	template <typename T> Ptr<T> as()
+	template <typename T>
+	Ptr<T> as()
 	{
 		static_assert(std::is_base_of_v<NodeBase, T>, "T must be derived from NodeBase class.");
 		return std::dynamic_pointer_cast<T>(shared_from_this());
@@ -112,6 +213,8 @@ public:
 	 * Initialize node inputs and outputs according to preset node type.
 	 *
 	 * Called in create node function.
+	 *
+	 * \todo MH Override in derived classes (Sequence).
 	 */
 	void init();
 
@@ -129,7 +232,7 @@ protected:
 	 */
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
-		Debug::Assert(m_internalData.size() > index, "Desired data storage does not exist!");
+		assert(index < m_internalData.size() && "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
@@ -144,13 +247,13 @@ public:
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 private:
-	template <typename T> ValueSetResult setValueEx(T&& val)
+	template <typename T>
+	ValueSetResult setValueEx(T&& val)
 	{
 		if (m_currentMap == &Transform::g_AllLocked)
 			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
 
-		getInternalData().setValue(val);
-		spreadSignal();
+		setInternalValue(val);
 
 		return ValueSetResult{};
 	}
@@ -190,7 +293,9 @@ public:
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
+		setInternalValue(val, coords);
+		return ValueSetResult{};
+		// return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
 	/**
@@ -204,8 +309,12 @@ public:
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
+	void pulse(size_t index);
+
 protected:
 	void setPinOwner(Pin& pin, Ptr<NodeBase> node);
+
+	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 	/**
 	 * Sets node value without validation.
@@ -214,7 +323,8 @@ protected:
 	 * \param value Value to set.
 	 * \param index Index of DataStore (if the node stores more than one value)
 	 */
-	template <typename T> void setInternalValue(const T& value, size_t index = 0)
+	template <typename T>
+	void setInternalValue(const T& value, size_t index = 0)
 	{
 		getInternalData(index).setValue(value);
 		spreadSignal(index);
@@ -234,20 +344,17 @@ public:
 	const Transform::DataMap* getDataMap() { return m_currentMap; }
 
 	/// \todo MH will be removed.
-	const Transform::DataMap& getDataMapRef() { return *m_currentMap; }
-	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps()
-	{
-		return m_operation->validDatamaps;
-	};
+	const Transform::DataMap&																	 getDataMapRef() { return *m_currentMap; }
+	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps() { return m_operation->validDatamaps; };
 
-	[[nodiscard]] const std::vector<Pin>& getInputPins();
-	[[nodiscard]] const std::vector<Pin>& getOutputPins();
+	[[nodiscard]] const PinView getInputPins();
+	[[nodiscard]] const PinView getOutputPins();
 
 protected:
-	[[nodiscard]] virtual std::vector<Pin>& getInputPinsRef();
-	[[nodiscard]] virtual std::vector<Pin>& getOutputPinsRef();
+	[[nodiscard]] PinView getInputPinsRef();
+	[[nodiscard]] PinView getOutputPinsRef();
 
-public:
+	public:
 	//===----------------------------------------------------------------------===//
 
 	//===-- Values updating functions. ----------------------------------------===//
@@ -262,7 +369,7 @@ public:
 	 * PF: This method is intended for complex modules to allow for optimization.
 	 * May be replaced by updateValues() or implemented in such a way. Do such optimizable modules exist?
 	 *
-	 * \param	inputIndex Index of the modified input.
+	 * \param	inputIndex Index of the modified input (output pin).
 	 */
 	virtual void updateValues(int inputIndex = 0) {}
 
@@ -293,19 +400,30 @@ public:
 	bool areAllInputsPlugged();
 
 	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
-	std::string getSig() { return fmt::format("#{} ({})", m_id, m_operation->keyWord); };
+	std::string getSig()
+	{
+		std::string masterSig;
+
+		if (m_owner)
+		{
+			masterSig = " of (" + m_owner->getSig() + ")";
+		}
+
+		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
+	};
 
 protected:
 	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 
 private:
 	void unplugAll();
-	void unplugInput(size_t  index);
-	void unplugOutput(size_t  index);
+	void unplugInput(size_t index);
+	void unplugOutput(size_t index);
 };
 
-using Node = NodeBase;
+using Node		= NodeBase;
 using NodePtr = Ptr<Node>;
+
 
 /**
  * Pin used for connecting nodes.
@@ -346,8 +464,8 @@ class Pin
 	const EValueType m_valueType = EValueType::Pulse;
 
 public:
-	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index)
-			: m_valueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
+	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index) :
+			m_valueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
 	{
 		m_id = IdGenerator::next();
 	}
@@ -387,31 +505,27 @@ public:
 
 	const char* getLabel() const
 	{
-		auto* op = m_master->getOperation();
+		auto*				op		= m_master->getOperation();
 		const char* label = nullptr;
 
 		if (m_isInput)
 		{
-			if (!op->defaultInputNames.empty())
-			{
-				label = op->defaultInputNames[m_index].c_str();
-			}
+			if (!op->defaultInputNames.empty()) { label = op->defaultInputNames[m_index].c_str(); }
 		}
 		else
 		{
-			if (!op->defaultOutputNames.empty())
-			{
-				label = op->defaultOutputNames[m_index].c_str();
-			}
+			if (!op->defaultOutputNames.empty()) { label = op->defaultOutputNames[m_index].c_str(); }
 		}
 
-		if (label == nullptr)
-		{
-			label = defaultIoNames[static_cast<size_t>(m_valueType)];
-		}
+		if (label == nullptr) { label = defaultIoNames[static_cast<size_t>(m_valueType)]; }
 
 		return label;
 	}
+
+	std::string getSig()
+	{
+		return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), m_master->getSig(), m_index);
+	};
 
 	[[nodiscard]] EValueType getType() const { return m_valueType; }
 

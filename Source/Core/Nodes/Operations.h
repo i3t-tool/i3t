@@ -449,7 +449,11 @@ static const PinGroup cycleOutputs = {
 		EValueType::Pulse, EValueType::Pulse, EValueType::Pulse,
 };
 
-static const Operation g_CycleProperties = {"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs};
+static const Operation g_CycleProperties = {
+		"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs, NO_TAG,
+		{ "from", "to", "mult", "play", "pause", "stop", "prev", "next" },
+		{ "value", "play", "pause", "stop", "prev", "next", "end" }
+};
 
 inline const Operation g_sequence = {"Sequence", "seq",
                                      2,          matrixMulAndMatrixInput,

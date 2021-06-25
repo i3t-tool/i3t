@@ -43,8 +43,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
     :   WorkspaceNode(args.nodebase->getId(), headerBackground, {.headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel})
     ,   m_nodebase(args.nodebase)
 {
-	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
-	const std::vector<Core::Pin>& outputPins = m_nodebase->getOutputPins();
+	const auto& inputPins = m_nodebase->getInputPins();
+	const auto& outputPins = m_nodebase->getOutputPins();
 
 	m_workspaceLinksProperties.reserve(inputPins.size());
 	m_workspaceInputsProperties.reserve(inputPins.size());
@@ -78,8 +78,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(ImTextureID headerBackgroun
     :   WorkspaceNode(nodebase->getId(), headerBackground, headerLabel, nodeLabel)
     ,   m_nodebase(nodebase)
 {
-	const std::vector<Core::Pin>& inputPins = m_nodebase->getInputPins();
-	const std::vector<Core::Pin>& outputPins = m_nodebase->getOutputPins();
+	const auto& inputPins = m_nodebase->getInputPins();
+	const auto& outputPins = m_nodebase->getOutputPins();
 
 	m_workspaceLinksProperties.reserve(inputPins.size());
 	m_workspaceInputsProperties.reserve(inputPins.size());

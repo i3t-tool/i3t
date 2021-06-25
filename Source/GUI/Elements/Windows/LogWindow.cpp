@@ -22,18 +22,6 @@ void LogWindow::render()
 
 	ImGui::Text("Log output");
 
-	/// \todo MH remove test code.
-  auto cycle = Core::GraphManager::getCycles()[0];
-	auto str = fmt::format("Cycle from {} to {} with update step {}.", cycle->getFrom(), cycle->getTo(), cycle->getMultiplier());
-
-	ImGui::Text(str.c_str());
-	ImGui::Text("%f", cycle->getData().getFloat());
-
-	if (ImGui::Button("Play")) { cycle->play(); } ImGui::SameLine();
-	if (ImGui::Button("Stop")) { cycle->stop(); } ImGui::SameLine();
-	if (ImGui::Button("Prev")) { cycle->stepBack(); } ImGui::SameLine();
-	if (ImGui::Button("Next")) { cycle->stepNext(); }
-
 	/// \todo MH test code, remove
   static bool val = true;
 

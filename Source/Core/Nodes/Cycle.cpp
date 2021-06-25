@@ -2,7 +2,6 @@
 #include "GraphManager.h"
 
 using namespace Core;
-using namespace CycleInternals;
 
 void Cycle::update(double seconds)
 {
@@ -15,32 +14,31 @@ void Cycle::update(double seconds)
 void Cycle::play()
 {
 	m_isRunning = true;
-	spreadSignal(out_play);
+	pulse(I3T_CYCLE_OUT_PLAY);
 }
 
 void Cycle::stop()
 {
 	m_isRunning = false;
-	spreadSignal(out_pause);
+	pulse(I3T_CYCLE_OUT_PAUSE);
 }
 
 void Cycle::resetAndStop()
 {
 	m_isRunning = false;
-	getInternalData().setValue(m_from);
-	spreadSignal(out_stop);
+	pulse(I3T_CYCLE_OUT_STOP);
 }
 
 void Cycle::stepBack()
 {
 	updateValue((-1.0f) * m_modeMultiplier * m_updateStep);
-	spreadSignal(out_prev);
+	pulse(I3T_CYCLE_OUT_PREV);
 }
 
 void Cycle::stepNext()
 {
 	updateValue(m_modeMultiplier * m_updateStep);
-	spreadSignal(out_next);
+	pulse(I3T_CYCLE_OUT_NEXT);
 }
 
 void Cycle::setFrom(float from)
@@ -92,34 +90,46 @@ float Cycle::getStep() const
 
 void Cycle::updateValues(int inputIndex)
 {
-	if (m_inputs[in_from].isPluggedIn())
-		getInternalData(in_from).setValue(m_inputs[in_from].getStorage().getFloat());
-
-	if (m_inputs[in_to].isPluggedIn())
-		getInternalData(in_to).setValue(m_inputs[in_to].getStorage().getFloat());
-
-	if (m_inputs[in_multiplier].isPluggedIn())
-		getInternalData(in_multiplier).setValue(m_inputs[in_multiplier].getStorage().getFloat());
-
-	switch (inputIndex)
+	if (m_inputs[I3T_CYCLE_IN_FROM].isPluggedIn())
 	{
-	case in_play:
+		float val = getIn(I3T_CYCLE_IN_FROM).getStorage().getFloat();
+		setFrom(val);
+		setInternalValue(val, I3T_CYCLE_IN_FROM);
+	}
+
+	if (getIn(I3T_CYCLE_IN_TO).isPluggedIn())
+	{
+		float val = getIn(I3T_CYCLE_IN_TO).getStorage().getFloat();
+		setTo(val);
+		setInternalValue(val, I3T_CYCLE_IN_TO);
+	}
+
+	if (m_inputs[I3T_CYCLE_IN_MULT].isPluggedIn())
+	{
+		float val = getIn(I3T_CYCLE_IN_MULT).getStorage().getFloat();
+		setMultiplier(val);
+		setInternalValue(val, I3T_CYCLE_IN_MULT);
+	}
+
+	if (getIn(I3T_CYCLE_IN_PLAY).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex))
+	{
 		play();
-		break;
-	case in_pause:
+	}
+	else if (getIn(I3T_CYCLE_IN_PAUSE).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PAUSE, inputIndex))
+	{
 		stop();
-		break;
-	case in_stop:
+	}
+	if (getIn(I3T_CYCLE_IN_STOP).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_STOP, inputIndex))
+	{
 		resetAndStop();
-		break;
-	case in_prev:
+	}
+	if (getIn(I3T_CYCLE_IN_PREV).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PREV, inputIndex))
+	{
 		stepBack();
-		break;
-	case in_next:
+	}
+	if (getIn(I3T_CYCLE_IN_NEXT).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_NEXT, inputIndex))
+	{
 		stepNext();
-		break;
-	default:
-		break;
 	}
 }
 
@@ -165,7 +175,7 @@ void Cycle::updateValue(float seconds)
 			break;
 		}
 	}
-	getInternalData().setValue(newValue);
+	setInternalValue(newValue);
 }
 
 void Cycle::setModeMultiplier()

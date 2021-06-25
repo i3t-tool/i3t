@@ -4,25 +4,22 @@
 
 namespace Core
 {
-namespace CycleInternals
-{
-const int in_from = 0;
-const int in_to = 1;
-const int in_multiplier = 2;
-const int in_play = 3;
-const int in_pause = 4;
-const int in_stop = 5;
-const int in_prev = 6;
-const int in_next = 7;
+inline constexpr size_t I3T_CYCLE_IN_FROM  = 0;
+inline constexpr size_t I3T_CYCLE_IN_TO		 = 1;
+inline constexpr size_t I3T_CYCLE_IN_MULT  = 2;
+inline constexpr size_t I3T_CYCLE_IN_PLAY  = 3;
+inline constexpr size_t I3T_CYCLE_IN_PAUSE = 4;
+inline constexpr size_t I3T_CYCLE_IN_STOP	 = 5;
+inline constexpr size_t I3T_CYCLE_IN_PREV	 = 6;
+inline constexpr size_t I3T_CYCLE_IN_NEXT	 = 7;
 
-const int out_val = 0;
-const int out_play = 1;
-const int out_pause = 2;
-const int out_stop = 3;
-const int out_prev = 4;
-const int out_next = 5;
-const int out_cycleEnd = 6;
-} // namespace CycleInternals
+inline constexpr size_t I3T_CYCLE_OUT_VAL   = 0;
+inline constexpr size_t I3T_CYCLE_OUT_PLAY  = 1;
+inline constexpr size_t I3T_CYCLE_OUT_PAUSE = 2;
+inline constexpr size_t I3T_CYCLE_OUT_STOP	= 3;
+inline constexpr size_t I3T_CYCLE_OUT_PREV	= 4;
+inline constexpr size_t I3T_CYCLE_OUT_NEXT	= 5;
+inline constexpr size_t I3T_CYCLE_OUT_END		= 6;
 
 class Cycle : public NodeBase
 {

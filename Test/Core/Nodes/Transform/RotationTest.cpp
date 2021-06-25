@@ -351,7 +351,7 @@ TEST(QuatRotTest, RotShouldBeValid)
 
 	setValue_expectOk(rot, quat);
 
-	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(quat));
+	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat)));
 }
 
 TEST(QuatRotTest, NodeValueShouldBeNormalized)

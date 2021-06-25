@@ -16,9 +16,7 @@
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
 
-
 double lastFrameSeconds = 0.0f;
-Ptr<Core::Cycle> testCycle;
 
 Application::Application()
 {
@@ -35,14 +33,6 @@ void Application::init()
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
-
-  /// \todo MH remove test code.
-  testCycle = Core::GraphManager::createCycle();
-	testCycle->setFrom(1.25f);
-	testCycle->setTo(-1.25f);
-	testCycle->setMultiplier(-0.10f);
-  testCycle->setMode(Core::Cycle::EMode::Once);
-
 
   InputManager::init();
 }
