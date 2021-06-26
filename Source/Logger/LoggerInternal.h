@@ -121,7 +121,7 @@ class Logger
 public:
 	/**
 	 * Logger class is a singleton.
-	 * @return Logger instance.
+	 * \return Logger instance.
 	 */
 	static Logger& getInstance();
 
