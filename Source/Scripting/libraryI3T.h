@@ -1,12 +1,17 @@
-#pragma once
 /**
  * \file libraryI3T.h
  * \author Daniel Gruncl
  * \date 12.3.2021
  */
-#include <vector>
+#pragma once
+
 #include <memory>
+#include <vector>
+
+#include "picoc.h"
 #include "pgr.h"
+
+#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 
 /**
 * \struct Mat4types

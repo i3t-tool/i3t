@@ -3,10 +3,11 @@
 */
 #include "WorkspaceWindow.h"
 
-#include "GUI/Elements/Nodes/WorkspaceModel.h"
+#include <glm/glm.hpp>
 
-#include "../../Theme.h"
+#include "Core/API.h"
 #include "Core/Input/InputManager.h"
+#include "GUI/Elements/Nodes/SingleInclude.h"
 #include "Scripting/Scripting.h"
 
 // using namespace Core;

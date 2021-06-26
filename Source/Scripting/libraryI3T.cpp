@@ -1,10 +1,13 @@
-#include "Dependencies/picoc/picoc.h"
-#include "Core/API.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
-
 #include "libraryI3T.h"
-#include "Scripting/Scripting.h"
+
 #include <stdio.h>
+
+#include "picoc.h"
+
+#include "Core/API.h"
+#include "GUI/Elements/Nodes/SingleInclude.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "Scripting/Scripting.h"
 
 ScriptingData scriptingData;
 
