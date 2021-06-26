@@ -43,6 +43,12 @@ void InputBindings::init()
 	InputManager::setInputAxis("MouseScroll", 1.0f, Keys::mouseScrlUp);
 	setAxisKey("MouseScroll", -1.0f, Keys::mouseScrlDown);
 	 */
+
+	// Workspace window actions.
+	InputManager::setInputAction("selectAll", Keys::a);
+	InputManager::setInputAction("invertSelection", Keys::i);
+	InputManager::setInputAction("navigateToContent", Keys::s);
+	InputManager::setInputAction("center", Keys::d);
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)

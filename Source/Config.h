@@ -7,8 +7,8 @@
  * \author 	Michal Folta, CTU Prague
  */
 
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef CONFIG_H_
+#define CONFIG_H_
 
 #include <glm/glm.hpp>
 
@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "GUI/Theme.h"
+#include "Utils/Filesystem.h"
 
 /**
  * A configuration structure.
