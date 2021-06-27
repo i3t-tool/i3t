@@ -75,8 +75,9 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 		ImGui::RadioButton("Once", &mode, 0);
 		ImGui::SameLine();
 
-		// Multiplier
-		const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier();
+		// Multiplier = step for a single tick
+		//const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier();
+		const float coreData		 = m_nodebase->as<Core::Cycle>()->getUpdateStep();
 		float				localData		 = coreData;
 		const auto	idOfNode		 = m_id.Get();
 		bool				valueChanged = false;
@@ -95,7 +96,9 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
 		if (valueChanged)
 		{
-			m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
+			//m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
+			m_nodebase->as<Core::Cycle>()->setStep(localData); //PF
+			///PF
 			setDataItemsWidth();
 		}
 
@@ -228,7 +231,8 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 		coreData = m_nodebase->as<Core::Cycle>()->getTo();
 		break;
 	case 2:
-		coreData = m_nodebase->as<Core::Cycle>()->getStep();
+		//coreData = m_nodebase->as<Core::Cycle>()->getUpdateStep();
+		coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
 		break;
 	default:
 		break;
@@ -278,6 +282,6 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 int WorkspaceCycle::maxLenghtOfData()
 {
 	float m = std::max({m_nodebase->as<Core::Cycle>()->getFrom(), m_nodebase->as<Core::Cycle>()->getTo(),
-											m_nodebase->as<Core::Cycle>()->getStep(), m_nodebase->as<Core::Cycle>()->getMultiplier()});
+											m_nodebase->as<Core::Cycle>()->getUpdateStep(), m_nodebase->as<Core::Cycle>()->getMultiplier()});
 	return numberOfCharWithDecimalPoint(m, m_numberOfVisibleDecimal);
 }

@@ -451,7 +451,7 @@ static const PinGroup cycleOutputs = {
 
 static const Operation g_CycleProperties = {
 		"Cycle", "cycle", 8, cycleInputs, 7, cycleOutputs, NO_TAG,
-		{ "from", "to", "mult", "play", "pause", "stop", "prev", "next" },
+		{ "from", "to", "step", "play", "pause", "stop", "prev", "next" },
 		{ "value", "play", "pause", "stop", "prev", "next", "end" }
 };
 

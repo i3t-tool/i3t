@@ -40,8 +40,8 @@ class WorkspaceNodeWithCoreData : public WorkspaceNode
 protected:
 	int		m_numberOfVisibleDecimal = 2; /* \todo JH default number from some setting */
 	float m_dataItemsWidth =
-			25; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
-	float m_inactiveMark = 0.7;
+			25.0f; /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
+	float m_inactiveMark = 0.7f;
 
 public:
 	Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core

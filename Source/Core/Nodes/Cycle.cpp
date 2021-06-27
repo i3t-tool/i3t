@@ -80,12 +80,12 @@ float Cycle::getTo() const
 
 float Cycle::getMultiplier() const
 {
-	return m_updateStep;
+	return m_multiplier;
 }
 
-float Cycle::getStep() const
+float Cycle::getUpdateStep() const
 {
-	return m_multiplier;
+	return m_updateStep;
 }
 
 void Cycle::updateValues(int inputIndex)
@@ -137,10 +137,10 @@ void Cycle::onCycleFinish()
 {
 }
 
-void Cycle::updateValue(float seconds)
+void Cycle::updateValue(float increment)
 {
 	float current = getData().getFloat();
-	float newValue = current + ((float)seconds);
+	float newValue = current + ((float)increment);
 
 	if (m_from < m_to && (m_to < newValue || newValue < m_from) ||
 	    m_to < m_from && (m_from < newValue || newValue < m_to))

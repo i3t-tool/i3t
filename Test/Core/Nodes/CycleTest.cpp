@@ -64,7 +64,7 @@ TEST(Cycle, TriggerStepNextOnParentPlay)
   cycle1->play();
 
   // cycle6 value increases by step on parent play.
-  float expected = previous + cycle2->getStep();
+  float expected = previous + cycle2->getUpdateStep();
   float current = cycle2->getData().getFloat();
   EXPECT_TRUE(Math::eq(expected, current));
 }
@@ -135,14 +135,14 @@ TEST(Cycle, TriggerOnPlay)
 
   {
     // cycle5 value decreases by step on parent play.
-    float expected = cycle5Val - cycle5->getStep();
+    float expected = cycle5Val - cycle5->getUpdateStep();
     float current = cycle5->getData().getFloat();
     // \todo MH
 		// EXPECT_TRUE(Math::eq(expected, current));
 	}
   {
     // cycle6 value increases by step on parent play.
-    float expected = cycle6Val + cycle6->getStep();
+    float expected = cycle6Val + cycle6->getUpdateStep();
     float current = cycle6->getData().getFloat();
     EXPECT_TRUE(Math::eq(expected, current));
 	}

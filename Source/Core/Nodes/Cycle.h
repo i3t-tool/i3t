@@ -34,10 +34,10 @@ public:
 private:
 	float m_from = 0.0f;
 	float m_to = 10.0f;
-	float m_updateStep = 0.1f;
-	float m_multiplier = 0.1f;
+	float m_updateStep = 0.1f;      //< step after pressing of Prev or Next button
+	float m_multiplier = 0.1f;      //< current step for one tick + sign represents the step direction
 
-	float m_modeMultiplier = 1.0f;
+	float m_modeMultiplier = 1.0f;  //< reverse the increment if (from > to) and flip in the PingPong mode
 
 	bool m_isRunning = false;
 
@@ -45,7 +45,7 @@ private:
 
 public:
 	Cycle() : NodeBase(&g_CycleProperties) {}
-	void update(double s);
+	void update(double seconds);  //< seconds means time delta from the last update
 
 	void play();
 	void stop();
@@ -62,7 +62,7 @@ public:
 	float getFrom() const;
 	float getTo() const;
 	float getMultiplier() const;
-	float getStep() const;
+	float getUpdateStep() const;
 
 	/**
 	 * \param from in seconds
@@ -84,10 +84,10 @@ public:
 	 */
 	void setStep(float v);
 
-	void updateValues(int inputIndex) override;
+	void updateValues(int inputIndex) override;  //< update from a pulse input
 
 private:
-	void updateValue(float seconds);
+	void updateValue(float increment);
 
 	void setModeMultiplier();
 };
