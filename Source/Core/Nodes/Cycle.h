@@ -34,10 +34,10 @@ public:
 private:
 	float m_from = 0.0f;
 	float m_to = 10.0f;
-	float m_updateStep = 0.1f;      //< step after pressing of Prev or Next button
+	float m_manualStep = 0.1f;      //< step after pressing of Prev or Next button
 	float m_multiplier = 0.1f;      //< current step for one tick + sign represents the step direction
 
-	float m_modeMultiplier = 1.0f;  //< reverse the increment if (from > to) and flip in the PingPong mode
+	float m_directionMultiplier = 1.0f;  //< reverse the increment if (from > to) and flip in the PingPong mode
 
 	bool m_isRunning = false;
 
@@ -62,29 +62,29 @@ public:
 	float getFrom() const;
 	float getTo() const;
 	float getMultiplier() const;
-	float getUpdateStep() const;
+	float getManualStep() const;
 
 	/**
-	 * \param from in seconds
+	 * \param from start value
 	 */
 	void setFrom(float from);
 
 	/**
-	 * \param from in seconds
+	 * \param to end value
 	 */
 	void setTo(float to);
 
 	/**
-	 * \param from in seconds
+	 * \param v should be a loop increment - \todo to be renamed
 	 */
 	void setMultiplier(float v);
 
 	/**
-	 * \param from in seconds
+	 * \param v increment added to/subtracted from the cycle value after user action - click to Next/Prev button
 	 */
-	void setStep(float v);
+	void setManualStep(float v);
 
-	void updateValues(int inputIndex) override;  //< update from a pulse input
+	void updateValues(int inputIndex) override;  //< update inner state from connected inputs (values and pulse inputs)
 
 private:
 	void updateValue(float increment);

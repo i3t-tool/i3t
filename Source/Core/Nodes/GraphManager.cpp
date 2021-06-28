@@ -81,7 +81,7 @@ void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 	node.get()->unplugInput(index);
 	// tryToDoSequenceProcedure(node);
 	if (getAllInputNodes(node).empty())
-		node->setDataMap(node->m_initialMap);
+		node->setDataMap(node->m_initialMap);  // \todo???
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)

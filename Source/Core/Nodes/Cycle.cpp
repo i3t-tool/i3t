@@ -7,7 +7,8 @@ void Cycle::update(double seconds)
 {
 	if (m_isRunning)
 	{
-		updateValue(m_modeMultiplier * static_cast<float>(seconds) * m_multiplier);
+		//updateValue(m_directionMultiplier * static_cast<float>(seconds) * m_multiplier);
+		updateValue(m_directionMultiplier * m_multiplier); // discrete step
 	}
 }
 
@@ -31,13 +32,13 @@ void Cycle::resetAndStop()
 
 void Cycle::stepBack()
 {
-	updateValue((-1.0f) * m_modeMultiplier * m_updateStep);
+	updateValue((-1.0f) * m_directionMultiplier * m_manualStep);
 	pulse(I3T_CYCLE_OUT_PREV);
 }
 
 void Cycle::stepNext()
 {
-	updateValue(m_modeMultiplier * m_updateStep);
+	updateValue(m_directionMultiplier * m_manualStep);
 	pulse(I3T_CYCLE_OUT_NEXT);
 }
 
@@ -58,9 +59,9 @@ void Cycle::setMultiplier(float v)
 	m_multiplier = abs(v);
 }
 
-void Cycle::setStep(float v)
+void Cycle::setManualStep(float v)
 {
-	m_updateStep = v;
+	m_manualStep = v;
 }
 
 bool Cycle::isRunning() const
@@ -83,9 +84,9 @@ float Cycle::getMultiplier() const
 	return m_multiplier;
 }
 
-float Cycle::getUpdateStep() const
+float Cycle::getManualStep() const
 {
-	return m_updateStep;
+	return m_manualStep;
 }
 
 void Cycle::updateValues(int inputIndex)
@@ -133,45 +134,46 @@ void Cycle::updateValues(int inputIndex)
 	}
 }
 
-void Cycle::onCycleFinish()
+void Cycle::onCycleFinish()  // \todo not used => remove?
 {
 }
 
 void Cycle::updateValue(float increment)
 {
-	float current = getData().getFloat();
+	const float current = getData().getFloat();
 	float newValue = current + ((float)increment);
 
-	if (m_from < m_to && (m_to < newValue || newValue < m_from) ||
+	// if out of bounds, clamp values to the range <m_from, m_to> or <m_to, m_from> 
+	if (m_from <= m_to && (m_to < newValue || newValue < m_from) ||
 	    m_to < m_from && (m_from < newValue || newValue < m_to))
 	{
 		switch (m_mode)
 		{
 		case EMode::Once:
 			stop();
-      if (m_modeMultiplier == 1.0f)
+      if (m_directionMultiplier == 1.0f)
       {
         newValue = newValue > m_to ? m_to : m_from;
       }
-      else if (m_modeMultiplier == -1.0f)
+      else if (m_directionMultiplier == -1.0f)
       {
         newValue = newValue < m_to ? m_to : m_from;
       }
 			break;
 		case EMode::Repeat:
 			// New iteration.
-			// newValue = m_from < m_to ? m_from : m_to; // + fmod(newValue, m_updateStep);
-			if (m_modeMultiplier == 1.0f)
+			// newValue = m_from < m_to ? m_from : m_to; // + fmod(newValue, m_manualStep);
+			if (m_directionMultiplier == 1.0f)
       {
 				newValue = newValue > m_to ? m_from : m_to;
 			}
-			else if (m_modeMultiplier == -1.0f)
+			else if (m_directionMultiplier == -1.0f)
       {
         newValue = newValue < m_to ? m_from : m_to;;
 			}
 			break;
 		case EMode::PingPong:
-			m_modeMultiplier *= -1.0f;
+			m_directionMultiplier *= -1.0f;
 			break;
 		}
 	}
@@ -181,7 +183,7 @@ void Cycle::updateValue(float increment)
 void Cycle::setModeMultiplier()
 {
 	if (m_to < m_from)
-		m_modeMultiplier = -1.0f;
+		m_directionMultiplier = -1.0f;
 	else
-		m_modeMultiplier = 1.0f;
+		m_directionMultiplier = 1.0f;
 }
