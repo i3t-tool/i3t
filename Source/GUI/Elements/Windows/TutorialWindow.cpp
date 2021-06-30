@@ -3,6 +3,8 @@
 #include <utility>
 
 #include "imgui.h"
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui_internal.h"
 
 /// \todo If you want to use ImGui Markdown run $ git submodule add https://github.com/Mizumaky/imgui_markdown_extended
 /// Depencencies/imgui_markdown. After that modify CMakeLists.txt, append
@@ -164,6 +166,7 @@ void TutorialWindow::render()
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
   ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
+  ImGui::PushStyleColor(ImGuiCol_WindowBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
   ImGui::PushStyleColor(ImGuiCol_ChildBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(51, 51, 51, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(215, 215, 215, 255));
@@ -192,7 +195,7 @@ void TutorialWindow::render()
 
   // POP STYLE
   ImGui::PopStyleVar(3);
-  ImGui::PopStyleColor(6);
+  ImGui::PopStyleColor(7);
   // END WINDOW
   ImGui::End();
 }
@@ -290,8 +293,16 @@ void TutorialWindow::renderTask(Task* task)
 {
   ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
   ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TaskTitle));
-  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
 
+	//ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+ // float bgSizeY = ImGui::CalcTextSize(task->m_content.c_str()).y;
+	//float winXMin = ImGui::GetWindowDrawList()->GetClipRectMin().x;
+	//float winXMax = ImGui::GetWindowDrawList()->GetClipRectMax().x;
+ // ImVec2 p_min = ImVec2(winXMin, cursorPos.y);
+	//ImVec2 p_max = ImVec2(winXMax, cursorPos.y + bgSizeY);	
+  //ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, IM_COL32(245, 249, 252, 255));
+  //ImGui::SetCursorScreenPos(cursorPos);
   ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
 
   ImGui::PopStyleColor();
@@ -301,22 +312,41 @@ void TutorialWindow::renderTask(Task* task)
 
 void TutorialWindow::renderHint(Hint* hint)
 {
-  //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+	//ImGui::PushStyleVar(ImGuiStyleVar_);
+
+  //ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(14, 98, 175, 255));
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-  std::u8string hintHeaderU8 = u8"Nápověda##";
-  std::string hintHeader(hintHeaderU8.cbegin(), hintHeaderU8.cend()); // todo find better solution
+  //std::u8string hintHeaderU8 = u8"Nápověda##";
+  //std::string hintHeader(hintHeaderU8.cbegin(), hintHeaderU8.cend()); // todo find better solution
+	std::string hintHeader = "Hint##";
   hintHeader += std::to_string(m_current_step);
-  if (ImGui::CollapsingHeader(hintHeader.c_str())) {
-    ImGui::PopStyleColor();
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(66, 150, 250, 255));
+	static bool toggled = false;
+	static int lastStep = m_current_step;
+	if (lastStep != m_current_step) {
+		lastStep = m_current_step;
+		toggled = false;
+	}
+	if (ImGui::SmallButton(hintHeader.c_str())) {
+		toggled = !toggled;
+	}
+  if (toggled) {
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
     //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
     //ImGui::TextWrapped(tw_hint->m_hint.c_str());
+  	//ImGui::Indent();
     ImGui::Markdown( hint->m_content.c_str(), hint->m_content.length(), m_mdConfig);
+  	//ImGui::Unindent();
+  	
     ImGui::PopStyleColor();
   }
-  else {
-    ImGui::PopStyleColor();
-  }
+  ImGui::PopStyleColor();
+	//if (ImGui::IsItemActive())
+	//{
+	//	ImGui::Text("open");
+	//}
+	//else {
+	//	ImGui::Text("closed");
+	//}
 }
 
 void TutorialWindow::renderTutorialControls()
@@ -334,6 +364,10 @@ void TutorialWindow::renderTutorialControls()
 
   ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 
+	// BUTTONS
+	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
+  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+  ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
   if (ImGui::Button("Back", ImVec2(100, 0)))
   {
     if (m_current_step != 0) {
@@ -341,7 +375,6 @@ void TutorialWindow::renderTutorialControls()
       //std::cout << m_current_step << std::endl;
     }
   }
-  
   ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
   if (ImGui::Button("Next", ImVec2(-1, 0)))
   {
@@ -350,7 +383,9 @@ void TutorialWindow::renderTutorialControls()
       //std::cout << m_current_step << std::endl;
     }
   }
-
+  ImGui::PopFont();
+  ImGui::PopStyleColor(2);
+	
   // POP STYLE
   ImGui::PopStyleColor();
   // END

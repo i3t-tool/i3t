@@ -1,5 +1,5 @@
 ---
-title: Základy skládání transformací TEST
+title: Základy skládání transformací
 description: V této lekci se seznámíš s tím, jak transformace skládat za sebou a jak je propojovat v grafu scény.
 thumbnail: snehulak.png
 scene: empty
@@ -21,32 +21,6 @@ task:
 hint: 
   Pravým tlačítkem klikni do workspace a zvol Object -> Red cube
   ![Přidání krychle](addred.png)
-
---
-
-choice:
-  Rychlá kontrola, jakou barvu má krychle?
-  o: bílou
-  x: červenou
-  o: zelenou
-  o: modrou
-
-hint: Podívej se na obrazovku
-
---
-
-multichoice:
-  Co se naučíte v PGR?
-  o: zaklínadla 
-  x: shadery 
-  x: transformace 
-  o: fotbal
-
---
-
-input:
-  Zadej odpověď na otázku žiovta, vesmíru a vůbec: 
-  answers: [42, čtyřicet dva, čtyřicetdva]
 
 --
 
@@ -117,7 +91,7 @@ hint:
 
 --
 
-A máme sněhuláka! Hotovi však ještě nejsme – představte si situaci, kdy bychom chtěli sněhuláka uchopit jako jeden objekt a celého ho někam přesunout, zvětšit, či pootočit. Měnit jednotlivé transformace by bylo zdlouhavé, můžeme to však udělat mnohem jednodušeji – přinásobit ke všem částem další matice transformace.
+A máme sněhuláka! Hotovi však ještě nejsme. Představte si situaci, kdy bychom chtěli sněhuláka uchopit jako jeden objekt a celého ho někam přesunout, zvětšit, či pootočit. Měnit jednotlivé transformace by bylo zdlouhavé, můžeme to však udělat mnohem jednodušeji – přinásobit ke všem částem další matice transformace.
 
 task:
   Vlevo ve workspace si vytvoř nový blok matic, pojmenuj ho „sněhulák“ a napoj jeho výstup na vstupy všech našich bloků. Zkus pak zmenšit celého sněhuláka na poloviční velikost a posunout ho na pozici x=3 a z=5.
