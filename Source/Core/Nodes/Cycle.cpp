@@ -8,7 +8,7 @@ void Cycle::update(double seconds)
 	if (m_isRunning)
 	{
 		//updateValue(m_directionMultiplier * static_cast<float>(seconds) * m_multiplier);
-		updateValue(m_directionMultiplier * m_multiplier); // discrete step
+		updateValue(m_multiplier/5.0f); // discrete step
 	}
 }
 
@@ -32,13 +32,13 @@ void Cycle::resetAndStop()
 
 void Cycle::stepBack()
 {
-	updateValue((-1.0f) * m_directionMultiplier * m_manualStep);
+	updateValue((-1.0f) * m_manualStep);
 	pulse(I3T_CYCLE_OUT_PREV);
 }
 
 void Cycle::stepNext()
 {
-	updateValue(m_directionMultiplier * m_manualStep);
+	updateValue(m_manualStep);
 	pulse(I3T_CYCLE_OUT_NEXT);
 }
 
@@ -140,8 +140,8 @@ void Cycle::onCycleFinish()  // \todo not used => remove?
 
 void Cycle::updateValue(float increment)
 {
-	const float current = getData().getFloat();
-	float newValue = current + ((float)increment);
+	const float currentValue = getData().getFloat();
+	float newValue = currentValue + m_directionMultiplier * increment;
 
 	// if out of bounds, clamp values to the range <m_from, m_to> or <m_to, m_from> 
 	if (m_from <= m_to && (m_to < newValue || newValue < m_from) ||
@@ -173,10 +173,25 @@ void Cycle::updateValue(float increment)
 			}
 			break;
 		case EMode::PingPong:
+			//if(m_from == m_to)
+			//{
+			//	nValue = m_to;   // PF  avoid oscillating values +- (current + step)
+			//}
+			if (m_directionMultiplier == 1.0f)
+      {
+        newValue = newValue > m_to ? m_to : m_from;
+      }
+      else if (m_directionMultiplier == -1.0f)
+      {
+        newValue = newValue < m_from ? m_from : m_to;
+			}
+
 			m_directionMultiplier *= -1.0f;
+			
 			break;
 		}
 	}
+	
 	setInternalValue(newValue);
 }
 

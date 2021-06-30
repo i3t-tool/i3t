@@ -403,7 +403,7 @@ void cycle(struct ParseState* parser, struct Value* returnValue, struct Value** 
         else {cycle->setMode(Core::Cycle::EMode::PingPong);}
         cycle->setFrom(mat[1][0]);
 		cycle->setMultiplier(mat[1][1]);
-		cycle->setStep(mat[1][2]);
+		cycle->setManualStep(mat[1][2]);
 		cycle->setTo(mat[1][3]);
     }
 
