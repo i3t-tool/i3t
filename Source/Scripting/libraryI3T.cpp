@@ -1,5 +1,6 @@
 #include "Dependencies/picoc/picoc.h"
 #include "Core/API.h"
+#include "Core/Nodes/Cycle.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
 #include "libraryI3T.h"
@@ -376,6 +377,43 @@ void scalar(struct ParseState* parser, struct Value* returnValue, struct Value**
 
     returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
+void cycle(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int dataindex=param[0]->Val->Integer;
+    int x=0,y=0;
+    const char*l="-";
+    if(numArgs==4){
+        x=param[1]->Val->Integer;
+        y=param[2]->Val->Integer;
+        if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
+    }
+    float datavalid=false;
+    glm::mat4 mat = glm::mat4(1.0f);
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+
+	workspace->push_back(std::make_unique<WorkspaceCycle>((ImTextureID)0, WorkspaceCycleArgs()));
+    if(datavalid){
+        Core::Cycle* cycle= (Core::Cycle*)(workspace->back().get())->getNodebase().get();
+        if(mat[0][0]<1.0f){cycle->setMode(Core::Cycle::EMode::Once);}
+        else if(mat[0][0]<2.0f){ cycle->setMode(Core::Cycle::EMode::Repeat);}
+        else {cycle->setMode(Core::Cycle::EMode::PingPong);}
+        cycle->setFrom(mat[1][0]);
+		cycle->setMultiplier(mat[1][1]);
+		cycle->setStep(mat[1][2]);
+		cycle->setTo(mat[1][3]);
+    }
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if(numArgs==1){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+    }
+
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+}
 void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
     int x = 0, y = 0;
@@ -389,9 +427,6 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if (type == scriptingData.floatOperators.asinacos) {
         workspace->push_back(std::make_unique<WorkspaceASinACos>((ImTextureID)0, l));
-    }
-    else if (type == scriptingData.floatOperators.cycle) {
-        returnValue->Val->Integer = -1; return;
     }
     else if (type == scriptingData.floatOperators.pow) {
         workspace->push_back(std::make_unique<WorkspaceFloatPowFloat>((ImTextureID)0, l));
@@ -840,6 +875,7 @@ struct LibraryFunction platformLibraryI3T[] =
 	{ vec4,         "int vec4(int,int,int,char*);"     },         { vec4,         "int vec4c(int);" },
     { vec3oper,     "int vec3oper(int,int,int,char*);" },         { vec3oper,     "int vec3operc(int);" },
 	{ vec3,         "int vec3(int,int,int,char*);"     },         { vec3,         "int vec3c(int);" },
+    { cycle,        "int cycle(int,int,int,char*);"},             { cycle,        "int cyclec(int);" },
     { scalaroper,   "int scalaroper(int,int,int,char*);"},        { scalaroper,   "int scalaroperc(int);" },
     { scalar,       "int scalar(int,int,int,char*);"   },         { scalar,       "int scalarc(int);" },
     { quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },
@@ -919,7 +955,6 @@ void platformLibraryInitI3T(Picoc *pc)
 
     //float oper
     VariableDefinePlatformVar(pc, nullptr, "clamp",         &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.clamp,     false);
-    VariableDefinePlatformVar(pc, nullptr, "cycle",         &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.cycle,     false);
     VariableDefinePlatformVar(pc, nullptr, "pow",           &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.pow,       false);
     VariableDefinePlatformVar(pc, nullptr, "sincos",        &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.sincos,    false);
     VariableDefinePlatformVar(pc, nullptr, "asinacos",      &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.asinacos,  false);
