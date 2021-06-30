@@ -105,6 +105,21 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 			fprintf(f, "int d%d=datascalar(%0.3ff);\n", i+at, a);
 			fprintf(f, "int n%d=mat4(axisangle,d%d,%d,%d,\"%s\");\n", i+at, i+at, (int)pos[0], (int)pos[1], label.c_str());
 		}
+		//cycle
+		else if (strcmp(keyword, "Cycle") == 0) {
+			glm::mat4 m =glm::mat4(0.0f);
+			Core::Cycle* cycle = (Core::Cycle*)(nodebase.get());
+			if(cycle->getMode()==Core::Cycle::EMode::Once){m[0][0]=0.0f;}
+			else if(cycle->getMode()==Core::Cycle::EMode::Repeat){m[0][0]=1.0f;}
+			else{m[0][0]=2.0f;}
+			m[1][0]=cycle->getFrom();
+			m[1][1]=cycle->getMultiplier();
+			m[1][2]=cycle->getStep();
+			m[1][3]=cycle->getTo();
+			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff, %0.3ff,%0.3ff,%0.3ff,%0.3ff);\n", i + at,
+				m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[1][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]);
+			fprintf(f, "int n%d=cycle(d%d,%d,%d,\"%s\");\n", i + at, i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
 		//float
 		else if (strcmp(keyword, "FloatToFloat") == 0) {
 			float v = nodebase->getData().getFloat();
@@ -516,26 +531,26 @@ void scriptingHelp(int page) {
 		"\n"
 		"int mat4oper(int type, int x, int y, char* header)\n"
 		"int mat4operc(int type)\n"
-		"Types are: determinant, inverse, mul, add, matmulvec, vecmulmat, floatmulmat, "
-		"free, /trackball, transpose, ortho, perspective, frustrum, axisangle, rotatex, "
-		"rotatey, rotatez, scale, lookat, translate"
+		"Types are: determinant, inverse, mul, add, matmulvec, vecmulmat, floatmulmat,\n"
+		"free, /trackball, transpose, ortho, perspective, frustrum, axisangle, rotatex,\n"
+		"rotatey, rotatez, scale, lookat, translate\n"
 		"\n"
 		"int mat4(int type, int data, int x, int y, char* header)\n"
 		"int mat4c(int type, int data)\n"
-		"Types are: scale, uniscale, translate, free, lookat, ortho, perspective, "
-		"frustrum, rotatex, rotatey, rotatez, axisangle"
+		"Types are: scale, uniscale, translate, free, lookat, ortho, perspective,\n"
+		"frustrum, rotatex, rotatey, rotatez, axisangle\n"
 		"\n"
 		"int vec4(int data, int x, int y, char* header)\n"
 		"int vec4c(int data)\n"
 		"int vec4oper(int type, int x, int y, char* header)\n"
 		"int vec4operc(int type)\n"
-		"Types are: dot, perspdiv, norm, vecmulfloat, add, sub, mix"
+		"Types are: dot, perspdiv, norm, vecmulfloat, add, sub, mix\n"
 		"\n"
 		"int vec3(int data, int x, int y, char* header)\n"
 		"int vec3c(int data)\n"
 		"int vec3oper(int type, int x, int y, char* header)\n"
 		"int vec3operc(int type)\n"
-		"Types are: cross, dot, norm, length, vecmulfloat, add, sub, ,show, mix"
+		"Types are: cross, dot, norm, length, vecmulfloat, add, sub, ,show, mix\n"
 		"\n"
 		"Page 1/3. Enter \"help2\" to continue.\n";
 	pages[1] =
@@ -543,21 +558,23 @@ void scriptingHelp(int page) {
 		"int scalarc(int data)\n"
 		"int scalar3oper(int type, int x, int y, char* header)\n"
 		"int scalar3operc(int type)\n"
-		"Types are: cycle, pow, sincos, clamp, signum, mul, add, div, mix"
+		"Types are: pow, sincos, clamp, signum, mul, add, div, mix\n"
+		"int cycle(int data, int x, int y, char* header)\n"
+		"int cycle(int data)\n"
 		"\n"
 		"int quat(int data, int x, int y, char* header)\n"
 		"int quatc(int data)\n"
 		"int quatoper(int type, int x, int y, char* header)\n"
 		"int quatoperc(int type)\n"
-		"Types are: scalarvec3_quat, angleaxis_quat, vec3vec3_quat, quat_scalarvec3, "
-		"quat_angleaxis, scalarmulquat, quat_euler, euler_quat, slerp, longslerp, "
-		"lerp, conjugate, qvq, inverse, length, norm"
+		"Types are: scalarvec3_quat, angleaxis_quat, vec3vec3_quat, quat_scalarvec3,\n"
+		"quat_angleaxis, scalarmulquat, quat_euler, euler_quat, slerp, longslerp,\n"
+		"lerp, conjugate, qvq, inverse, length, norm\n"
 		"\n"
 		"int convertor(int type, int x, int y, char* header)\n"
 		"int convertorc(int type)\n"
-		"Types are: mat_tr, tr_mat, mat_vecs4, mat_quat, mat_scalars, vecs4_mat, "
-		"vec4_vec3, vec4_scalars, vecs3_mat, vec3_vec4, vec3_scalars, quat_mat, "
-		"quat_scalars, scalars_mat, scalars_vec3, scalars_vec4, scalars_quat"
+		"Types are: mat_tr, tr_mat, mat_vecs4, mat_quat, mat_scalars, vecs4_mat,\n"
+		"vec4_vec3, vec4_scalars, vecs3_mat, vec3_vec4, vec3_scalars, quat_mat,\n"
+		"quat_scalars, scalars_mat, scalars_vec3, scalars_vec4, scalars_quat\n"
 		"\n"
 		"Page 2/3. Enter \"help3\" to continue.\n";
 	pages[2] =
@@ -578,6 +595,6 @@ void scriptingHelp(int page) {
 		"bool savesel(char* filename)\n"
 		"bool run(char* filename)\n"
 		"\n"
-		"Page 3/3.";
+		"Page 3/3.\n";
 	std::cout<<pages[page];
 }
