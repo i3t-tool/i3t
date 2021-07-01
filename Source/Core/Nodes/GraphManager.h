@@ -61,7 +61,7 @@ template <typename T, typename... Args> Ptr<T> FORCE_INLINE createTransform(Args
 
 class GraphManager
 {
-	/// References to created cycle nodes which needs to be updated.
+	/// References to created cycle nodes which need to be regularly updated.
 	static std::vector<Ptr<Cycle>> m_cycles;
 
 public:
@@ -86,8 +86,8 @@ public:
 	 *
 	 * Algorithm described in panel Algoritmus 1 in [Folta, page 30]
 	 *
-	 * \param input
-	 * \param output
+	 * \param input Pin of right node.
+	 * \param output Pin of left node.
 	 */
 	static ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 
@@ -131,14 +131,15 @@ public:
 	/**
 	 * Unplug plugged node from given input pin of this node.
 	 *
-	 * \param index
+	 * \param index Index of the input pin
 	 */
 	static void unplugInput(const Ptr<Core::NodeBase>& node, int index);
 
 	/**
 	 * Unplug all nodes connected to given output pin of this node.
 	 *
-	 * \param index
+	 * \param node \todo Why single node here?
+	 * \param index Index of the output pin
 	 */
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
@@ -275,8 +276,9 @@ inline CameraPtr GraphManager::createCamera()
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {
 	auto ret = std::make_shared<Core::Cycle>();
+	ret->setDataMap(&Transform::g_Free);
 	ret->init();
-	ret->updateValues(0);
+	ret->updateValues(-1);
 	ret->resetAndStop();
 
 	m_cycles.push_back(ret);

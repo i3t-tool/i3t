@@ -41,6 +41,12 @@ TEST(PlugTest, PlugNodeOuputToTheSameNodeInput_NodeShouldNotBeConnected)
 	EXPECT_EQ(ENodePlugResult::Err_Loopback, result);
 }
 
+/**
+ * F2 -> F1
+ * ^     |
+ * |     V
+ * F3 <- F4
+ */
 TEST(PlugTest, PlugCannotCreateCycle)
 {
 	auto f1 = Builder::createNode<ENodeType::Float>();

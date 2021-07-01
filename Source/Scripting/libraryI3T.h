@@ -1,11 +1,14 @@
-#pragma once
 /**
  * \file libraryI3T.h
  * \author Daniel Gruncl
  * \date 12.3.2021
  */
-#include <vector>
+#pragma once
+
 #include <memory>
+#include <vector>
+
+#include "picoc.h"
 #include "pgr.h"
 /**
 * 
@@ -44,12 +47,13 @@
 *		saving process.
 *		If you want to save nodes, do it in the second function. The functions consist form huge if-else structure, which switches by
 *		node keyword (WorkspaceNodeWithCoreData->Core::NodeBase->Operation->keyWord), in each branch functions for saving given node and 
-		its inner state are fprintfed.
+*		its inner state are fprintfed.
 *		
 *		
 * 
 * 
 */
+
 /**
 * \struct Mat4types
 * List of types of matrix operators and transforms. First parameter of script function mat4oper or mat4 must be one of these values.
@@ -96,6 +100,9 @@ struct QuatOperators {
 struct NodeLODs {
 	const int full=600,setvalues=601,label=602;
 };
+struct CamAddModes{
+	const int proj=700,view=701;
+};
 /**
 * \struct ScriptingData
 * Contains constant variables that are exposed to scripts, that are used as parameters of functions for creating various operators, telling which type of operator should be created.
@@ -110,6 +117,7 @@ struct ScriptingData {
 	Convertors convertors;
 	QuatOperators quatOperators;
 	NodeLODs nodeLODs;
+	CamAddModes camAddModes;
 	std::vector<glm::mat4>nodeData;///<Vector of data as mat4, that were created by script. Serves as temporary static storage. Not needed after script is executed.
 	//std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
 };

@@ -34,8 +34,9 @@ void WorkspacePulse::drawDataFull(util::NodeBuilder& builder, int index)
 
   ImGui::PushItemWidth(m_dataItemsWidth);
 
-	if(ImGui::Button("Pulse")){
-    m_nodebase->spreadSignal();
+	if (ImGui::Button("Pulse"))
+	{
+    m_nodebase->pulse(I3T_OUTPUT0);
 	}
 
   ImGui::PopItemWidth();

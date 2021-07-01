@@ -109,8 +109,7 @@ TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 	auto matNode = Builder::createNode<ENodeType::Matrix>();
 	setValue_expectOk(matNode, generateMat4());
 
-	auto plugResult = GraphManager::plugSequenceValueInput(seq, matNode);
-	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
+	plug_expectOk(matNode, seq, I3T_OUTPUT0, I3T_SEQ_IN_MAT);
 
 	EXPECT_EQ(matNode->getData().getMat4(), seq->getData().getMat4());
 }
@@ -139,6 +138,7 @@ TEST(SequenceTest, SequenceCantBeSelfPlugged)
 }
 
 /**
+ * Connect storages.
  *    _______
  *   /       \
  * seq1 --- seq2
@@ -151,18 +151,18 @@ TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInpu
 	auto seq2 = arrangeSequence();
 	auto mat = Builder::createNode<ENodeType::Matrix>();
 
-	plug_expectOk(seq1, seq2, 0, 0);
+	plug_expectOk(seq1, seq2, I3T_SEQ_OUT_MUL, I3T_SEQ_IN_MUL);
 
-	plug_expectOk(seq2, seq1, 1, 1);
+	plug_expectOk(seq2, seq1, I3T_SEQ_OUT_MAT, I3T_SEQ_IN_MAT);
 
   // Matrix storages should be same.
-  EXPECT_EQ(seq1->getData(1).getMat4(), seq2->getData(1).getMat4());
+  EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(), seq2->getData(I3T_SEQ_MAT).getMat4());
 
 	// seq1 model matrix and seq2 stored matrices product should be same.
-  EXPECT_EQ(seq1->getData(2).getMat4(), seq2->getData(1).getMat4());
+  EXPECT_EQ(seq1->getData(I3T_SEQ_MOD).getMat4(), seq2->getData(I3T_SEQ_MAT).getMat4());
 
-  plug_expectOk(seq2, mat, 1, 0);
-  EXPECT_EQ(seq1->getData(1).getMat4(), mat->getData().getMat4());
+  plug_expectOk(seq2, mat, I3T_SEQ_OUT_MAT, I3T_INPUT0);
+  EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(), mat->getData(I3T_DATA0).getMat4());
 
 	// seq2 model matrix should be same as seq1 * seq2
   EXPECT_EQ(seq2->getData(2).getMat4(), seq1->getData(1).getMat4() * seq2->getData(1).getMat4());

@@ -11,18 +11,35 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
-namespace SequenceInternals
-{
+inline constexpr size_t I3T_SEQ_IN_MUL = 0;
+inline constexpr size_t I3T_SEQ_IN_MAT = 1;
 
-}
+inline constexpr size_t I3T_SEQ_OUT_MUL = 0;
+inline constexpr size_t I3T_SEQ_OUT_MAT = 1;
+inline constexpr size_t I3T_SEQ_OUT_MOD = 2;
+
+inline constexpr size_t I3T_SEQ_MUL = 0;
+inline constexpr size_t I3T_SEQ_MAT = 1;
+inline constexpr size_t I3T_SEQ_MOD = 2;
 
 /**
  * Sequence of matrices.
+ *
+ * -----------------------
+ * |             0 mul   |
+ * | 0 mul       1 mat   |
+ * | 1 mat       2 model |
+ * -----------------------
  */
 class Sequence : public NodeBase
 {
 	friend class GraphManager;
-	using Matrix = NodeBase;
+
+	using Matrix       = NodeBase;
+	using SequencePins = std::vector<Pin>;
+
+	friend class Multiplier;
+	friend class Storage;
 
 	/** Structure for storing transform matrices. */
 	class Storage : public Node
@@ -33,7 +50,11 @@ class Sequence : public NodeBase
 		Matrices m_matrices;
 
 	public:
-		Storage() : Node(nullptr) {}
+		Storage();
+
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
+		DataStore& getInternalData(size_t index = 0) override;
 
 		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
 		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
@@ -43,25 +64,34 @@ class Sequence : public NodeBase
 		void updateValues(int inputIndex) override;
 	};
 
+
 	/** Structure which represents sequences multiplication. */
 	class Multiplier : public Node
 	{
 		friend class Core::Sequence;
 
 	public:
-		Multiplier() : Node(nullptr) {}
+		Multiplier();
+
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
+		DataStore& getInternalData(size_t index = 0) override;
 
 		void updateValues(int inputIndex) override;
 	};
 
+
 	/// \todo MH use Node::m_owner!
 	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
 
-	Ptr<Storage> m_storage;
+	Ptr<Storage>    m_storage;
 	Ptr<Multiplier> m_multiplier;
 
 public:
 	Sequence();
+
+	Pin& getIn(size_t i) override;
+	Pin& getOut(size_t i) override;
 
 	void createComponents();
 
