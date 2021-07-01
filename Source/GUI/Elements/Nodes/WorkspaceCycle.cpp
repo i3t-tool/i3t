@@ -43,6 +43,7 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
 		auto cycle = m_nodebase->as<Core::Cycle>();
 
+		// \todo Add icons to buttons
 		// "⯈/❙❙" "◼" "❙⯇" "⯈❙"
 		//std::u8string string = u8"⯈";
 		//std::u8string string = u8"ěščřžýáíé";
@@ -75,8 +76,9 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 		ImGui::RadioButton("Once", &mode, 0);
 		ImGui::SameLine();
 
-		// Multiplier
-		const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier();
+		// Multiplier = step for a single tick
+		//const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier(); // wrong
+		const float coreData		 = m_nodebase->as<Core::Cycle>()->getManualStep();
 		float				localData		 = coreData;
 		const auto	idOfNode		 = m_id.Get();
 		bool				valueChanged = false;
@@ -95,7 +97,8 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
 		if (valueChanged)
 		{
-			m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
+			//m_nodebase->as<Core::Cycle>()->setMultiplier(localData); //wrong
+			m_nodebase->as<Core::Cycle>()->setManualStep(localData); //PF
 			setDataItemsWidth();
 		}
 
@@ -228,7 +231,8 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 		coreData = m_nodebase->as<Core::Cycle>()->getTo();
 		break;
 	case 2:
-		coreData = m_nodebase->as<Core::Cycle>()->getStep();
+		//coreData = m_nodebase->as<Core::Cycle>()->getManualStep();
+		coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
 		break;
 	default:
 		break;
@@ -278,6 +282,6 @@ void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCoreP
 int WorkspaceCycle::maxLenghtOfData()
 {
 	float m = std::max({m_nodebase->as<Core::Cycle>()->getFrom(), m_nodebase->as<Core::Cycle>()->getTo(),
-											m_nodebase->as<Core::Cycle>()->getStep(), m_nodebase->as<Core::Cycle>()->getMultiplier()});
+											m_nodebase->as<Core::Cycle>()->getManualStep(), m_nodebase->as<Core::Cycle>()->getMultiplier()});
 	return numberOfCharWithDecimalPoint(m, m_numberOfVisibleDecimal);
 }
