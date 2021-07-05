@@ -11,6 +11,7 @@ CMakeFiles/
 CMakeDoxyfile.in
 CMakeCache.txt
 Dependencies/picoc/cmake_install.cmake
+*.bak
 
 /Binaries/
 I3T.dir/
