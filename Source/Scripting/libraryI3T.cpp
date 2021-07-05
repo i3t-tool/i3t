@@ -1,14 +1,27 @@
+
 #include "libraryI3T.h"
 
 #include <stdio.h>
 
-//#include "picoc.h"
+#include "picoc.h"
 
 #include "Core/API.h"
-///////// #include "Core/Nodes/Cycle.h"
-#include "GUI/Elements/Nodes/SingleInclude.h"  //?????
+
+#include "Core/Nodes/Cycle.h"
+
+#include "GUI/Elements/Nodes/SingleInclude.h"
+
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/Scripting.h"
+//#include <stdio.h>   // \todo - proc je vlozen az posledni?
+
+//NAVIC #include "picoc.h"
+
+//NAVIC  #include "Core/API.h"
+//NAVIC  ///////// #include "Core/Nodes/Cycle.h"
+///////////#include "GUI/Elements/Nodes/SingleInclude.h"  //?????
+//NAVIC  #include "GUI/Elements/Windows/WorkspaceWindow.h"
+//NAVIC  #include "Scripting/Scripting.h"
 
 ScriptingData scriptingData;
 
@@ -391,24 +404,57 @@ void cycle(struct ParseState* parser, struct Value* returnValue, struct Value** 
     }
     float datavalid=false;
     glm::mat4 mat = glm::mat4(1.0f);
-    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
+    if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex]; datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
 	workspace->push_back(std::make_unique<WorkspaceCycle>((ImTextureID)0, WorkspaceCycleArgs()));
-    if(datavalid){
-        Core::Cycle* cycle= (Core::Cycle*)(workspace->back().get())->getNodebase().get();
-        if(mat[0][0]<1.0f){cycle->setMode(Core::Cycle::EMode::Once);}
-        else if(mat[0][0]<2.0f){ cycle->setMode(Core::Cycle::EMode::Repeat);}
-        else {cycle->setMode(Core::Cycle::EMode::PingPong);}
-        cycle->setFrom(mat[1][0]);
-		cycle->setMultiplier(mat[1][1]);
-		cycle->setManualStep(mat[1][2]);
-		cycle->setTo(mat[1][3]);
-    }
+		if (datavalid)
+		{
+			Core::Cycle* cycle = (Core::Cycle*) (workspace->back().get())->getNodebase().get();
+			if (mat[0][0] < 1.0f)
+			{
+				cycle->setMode(Core::Cycle::EMode::Once);
+			}
+			else if (mat[0][0] < 2.0f)
+			{
+				cycle->setMode(Core::Cycle::EMode::Repeat);
+			}
+			else
+			{
+				cycle->setMode(Core::Cycle::EMode::PingPong);
+			}
+			cycle->setFrom(mat[1][0]);
+			cycle->setMultiplier(mat[1][1]);
+			cycle->setManualStep(mat[1][2]);
+			cycle->setTo(mat[1][3]);
+		}
 
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if(numArgs==1){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+    }
+
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+}
+void pulse(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int x=0,y=0;
+    const char*l="-";
+    if(numArgs==3){
+        x=param[0]->Val->Integer;
+        y=param[1]->Val->Integer;
+        if(param[2]->Val->Pointer!=nullptr){l = (char*)param[2]->Val->Pointer;}
+    }
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+
+	workspace->push_back(std::make_unique<WorkspacePulse>((ImTextureID)0,l,l));
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if(numArgs==0){
         ne::CenterNodeOnScreen(workspace->back()->getId());
         char label[100]={0};
         sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
@@ -665,6 +711,29 @@ void sequence(struct ParseState* parser, struct Value* returnValue, struct Value
     returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
     //returnValue->Val->Integer = (int)workspace->size() - 1;
 }
+void camera(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int x = 0, y = 0;
+    const char* l = "-";
+    if (numArgs == 3) {
+        x = param[0]->Val->Integer;
+        y = param[1]->Val->Integer;
+        if (param[2]->Val->Pointer != nullptr) { l = (char*)param[2]->Val->Pointer; }
+    }
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+
+    workspace->push_back(std::make_unique<WorkspaceCamera>((ImTextureID)0, l,l));
+    
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if (numArgs == 0) {
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100] = { 0 };
+        sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;//...
+    }
+
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+}
 void plugNodes(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int ida=param[0]->Val->Integer;
     int idb=param[1]->Val->Integer;
@@ -721,6 +790,43 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     workspace->erase(workspace->begin()+nodeindex);
 
     returnValue->Val->Integer = true;
+}
+void camAdd(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {printf("AAAAAA\n");
+    int camid = param[0]->Val->Integer;
+    int nodeid = param[1]->Val->Integer;
+    int mode=param[2]->Val->Integer;
+    int camindex = -1, nodeindex = -1;
+    //int at =param[2]->Val->Integer;
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    for (int i = 0; i < workspace->size(); i++) {
+        if (workspace->at(i)->getNodebase()->getId() == camid) { camindex = i; break; }
+    }
+    for (int i = 0; i < workspace->size(); i++) {
+        if (workspace->at(i)->getNodebase()->getId() == nodeid) { nodeindex = i; break; }
+    }
+
+    if (camindex < 0 || camindex >= workspace->size()) { returnValue->Val->Integer = false; return; }
+    if (nodeindex < 0 || nodeindex >= workspace->size()) { returnValue->Val->Integer = false; return; }
+    if (!workspace->at(camindex)->isCamera()) { returnValue->Val->Integer = false; return; }
+    if (!workspace->at(nodeindex)->isTransformation()) { returnValue->Val->Integer = false; return; }
+
+    WorkspaceCamera* cam = (WorkspaceCamera*)workspace->at(camindex).get();
+    WorkspaceNodeWithCoreData* node = workspace->at(nodeindex).get();
+
+    if(mode==scriptingData.camAddModes.proj){
+        cam->getProjection()->pushNode(workspace->at(nodeindex), cam->getProjection()->getInnerWorkspaceNodes().size());
+        workspace->erase(workspace->begin() + nodeindex);
+        returnValue->Val->Integer = true;
+    }
+    else if(mode==scriptingData.camAddModes.view){
+        cam->getView()->pushNode(workspace->at(nodeindex), cam->getView()->getInnerWorkspaceNodes().size());
+        workspace->erase(workspace->begin() + nodeindex);
+        returnValue->Val->Integer = true;
+    }
+    else{
+        returnValue->Val->Integer = false;
+    }
 }
 void unplugInput(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){
     int ida=param[0]->Val->Integer;
@@ -879,13 +985,16 @@ struct LibraryFunction platformLibraryI3T[] =
     { vec3oper,     "int vec3oper(int,int,int,char*);" },         { vec3oper,     "int vec3operc(int);" },
 	{ vec3,         "int vec3(int,int,int,char*);"     },         { vec3,         "int vec3c(int);" },
     { cycle,        "int cycle(int,int,int,char*);"},             { cycle,        "int cyclec(int);" },
+    { pulse,        "int pulse(int,int,char*);"},                 { pulse,        "int pulsec();" },
     { scalaroper,   "int scalaroper(int,int,int,char*);"},        { scalaroper,   "int scalaroperc(int);" },
     { scalar,       "int scalar(int,int,int,char*);"   },         { scalar,       "int scalarc(int);" },
     { quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },
     { quat,         "int quat(int,int,int,char*);"   },           { quat,         "int quatc(int);" },
     { convertor,    "int convertor(int,int,int,char*);"},         { convertor,    "int convertorc(int);" },
 	{ sequence,     "int sequence(int,int,char*);"     },         { sequence,     "int sequencec();" },
+	{ camera,       "int camera(int,int,char*);"     },           { camera,       "int camerac();" },
 	{ seqAdd,       "bool seqadd(int,int);" },
+	{ camAdd,       "bool camadd(int,int,int);" },
 	{ plugNodes,    "bool plugnodes(int,int,int,int);" },
 	{ unplugInput,  "bool unpluginput(int,int);" },
 	{ getNodeByName,"int getnode(char*);" },
@@ -958,7 +1067,6 @@ void platformLibraryInitI3T(Picoc *pc)
 
     //float oper
     VariableDefinePlatformVar(pc, nullptr, "clamp",         &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.clamp,     false);
-    VariableDefinePlatformVar(pc, nullptr, "cycle",         &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.cycle,     false);
     VariableDefinePlatformVar(pc, nullptr, "pow",           &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.pow,       false);
     VariableDefinePlatformVar(pc, nullptr, "sincos",        &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.sincos,    false);
     VariableDefinePlatformVar(pc, nullptr, "asinacos",      &pc->IntType, (union AnyValue*)&scriptingData.floatOperators.asinacos,  false);
@@ -1001,4 +1109,7 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "full",          &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.full,            false);
     VariableDefinePlatformVar(pc, nullptr, "setvalues",     &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.setvalues,       false);
     VariableDefinePlatformVar(pc, nullptr, "label",         &pc->IntType, (union AnyValue*)&scriptingData.nodeLODs.label,           false);
+    //cam add modes
+    VariableDefinePlatformVar(pc, nullptr, "proj",         &pc->IntType, (union AnyValue*)&scriptingData.camAddModes.proj,           false);
+    VariableDefinePlatformVar(pc, nullptr, "view",         &pc->IntType, (union AnyValue*)&scriptingData.camAddModes.view,           false);
 }
