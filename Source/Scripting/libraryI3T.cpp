@@ -420,6 +420,29 @@ void cycle(struct ParseState* parser, struct Value* returnValue, struct Value** 
 
     returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
 }
+void pulse(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
+    int x=0,y=0;
+    const char*l="-";
+    if(numArgs==3){
+        x=param[0]->Val->Integer;
+        y=param[1]->Val->Integer;
+        if(param[2]->Val->Pointer!=nullptr){l = (char*)param[2]->Val->Pointer;}
+    }
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+
+	workspace->push_back(std::make_unique<WorkspacePulse>((ImTextureID)0,l,l));
+
+    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+    if(numArgs==0){
+        ne::CenterNodeOnScreen(workspace->back()->getId());
+        char label[100]={0};
+        sprintf(label,"#%02u %s",workspace->back()->getNodebase()->getId(),workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
+        workspace->back()->getHeaderLabel() = label;
+    }
+
+    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+}
 void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;
     int x = 0, y = 0;
@@ -939,6 +962,7 @@ struct LibraryFunction platformLibraryI3T[] =
     { vec3oper,     "int vec3oper(int,int,int,char*);" },         { vec3oper,     "int vec3operc(int);" },
 	{ vec3,         "int vec3(int,int,int,char*);"     },         { vec3,         "int vec3c(int);" },
     { cycle,        "int cycle(int,int,int,char*);"},             { cycle,        "int cyclec(int);" },
+    { pulse,        "int pulse(int,int,char*);"},                 { pulse,        "int pulsec();" },
     { scalaroper,   "int scalaroper(int,int,int,char*);"},        { scalaroper,   "int scalaroperc(int);" },
     { scalar,       "int scalar(int,int,int,char*);"   },         { scalar,       "int scalarc(int);" },
     { quatoper,     "int quatoper(int,int,int,char*);"},          { quatoper,     "int quatoperc(int);" },

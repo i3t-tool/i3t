@@ -110,6 +110,10 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 			fprintf(f, "int n%d=mat4(axisangle,d%d,%d,%d,\"%s\");\n", i+at, i+at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		//cycle
+		else if (strcmp(keyword, "Pulse") == 0) {
+			fprintf(f, "int n%d=pulse(%d,%d,\"%s\");\n", i + at, (int)pos[0], (int)pos[1], label.c_str());
+		}
+		//cycle
 		else if (strcmp(keyword, "Cycle") == 0) {
 			glm::mat4 m =glm::mat4(0.0f);
 			Core::Cycle* cycle = (Core::Cycle*)(nodebase.get());
@@ -570,6 +574,8 @@ void scriptingHelp(int page) {
 		"\n"
 		"Page 1/3. Enter \"help2\" to continue.\n";
 	pages[1] =
+		"int pulse(int x, int y, char* header)\n"
+		"int pulsec()\n"
 		"int scalar(int data, int x, int y, char* header)\n"
 		"int scalarc(int data)\n"
 		"int scalar3oper(int type, int x, int y, char* header)\n"
