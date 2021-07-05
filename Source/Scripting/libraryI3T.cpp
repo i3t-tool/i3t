@@ -13,15 +13,6 @@
 
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/Scripting.h"
-//#include <stdio.h>   // \todo - proc je vlozen az posledni?
-
-//NAVIC #include "picoc.h"
-
-//NAVIC  #include "Core/API.h"
-//NAVIC  ///////// #include "Core/Nodes/Cycle.h"
-///////////#include "GUI/Elements/Nodes/SingleInclude.h"  //?????
-//NAVIC  #include "GUI/Elements/Windows/WorkspaceWindow.h"
-//NAVIC  #include "Scripting/Scripting.h"
 
 ScriptingData scriptingData;
 
