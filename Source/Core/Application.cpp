@@ -16,7 +16,7 @@
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
 
-double lastFrameSeconds = 0.0f;
+double lastFrameSeconds = 0.0;  //PF changed to double
 
 Application::Application()
 {

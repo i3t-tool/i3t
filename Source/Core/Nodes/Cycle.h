@@ -48,13 +48,19 @@ public:
 	void update(double seconds);  //< seconds means time delta from the last update
 
 	void play();
-	void stop();
-	void resetAndStop();
+	void pause();
+	void stopAndReset();
 	void stepBack();
 	void stepNext();
 
 	EMode getMode() { return m_mode; }
-	void setMode(EMode mode) { m_mode = mode; }
+	void setMode(EMode mode)
+	{
+		if (m_mode != mode) {  // \todo A better variant - use value changed in WorkspaceCycle.cpp
+			m_mode = mode;
+			m_directionMultiplier = 1.0f;
+		}
+	}
 
 	void onCycleFinish();
 
@@ -75,7 +81,7 @@ public:
 	void setTo(float to);
 
 	/**
-	 * \param v should be a loop increment - \todo to be renamed
+	 * \param v should be a loop increment - \todo to be renamed to setStep
 	 */
 	void setMultiplier(float v);
 
@@ -89,6 +95,5 @@ public:
 private:
 	void updateValue(float increment);
 
-	void setModeMultiplier();
 };
 } // namespace Core

@@ -51,14 +51,17 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
 		if (ImGui::Button("P/P", button_sz))
 		{
-			if (m_nodebase->as<Core::Cycle>()->isRunning()) { m_nodebase->as<Core::Cycle>()->stop(); }
+			if (m_nodebase->as<Core::Cycle>()->isRunning())
+			{
+				m_nodebase->as<Core::Cycle>()->pause();
+			}
 			else
 			{
 				m_nodebase->as<Core::Cycle>()->play();
 			}
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("SaR", button_sz)) { m_nodebase->as<Core::Cycle>()->resetAndStop(); }
+		if (ImGui::Button("SaR", button_sz)) { m_nodebase->as<Core::Cycle>()->stopAndReset(); }
 		ImGui::SameLine();
 		if (ImGui::Button("SB", button_sz)) { m_nodebase->as<Core::Cycle>()->stepBack(); }
 		ImGui::SameLine();
@@ -157,7 +160,7 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 
 		if (valueChanged)
 		{
-			//ask MH
+			//ask MH \\ \todo SetValue does not call setDirectionMultiplier()
 			m_nodebase->setValue(localData);
 			setDataItemsWidth();
 		}
