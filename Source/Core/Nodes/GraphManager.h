@@ -279,7 +279,7 @@ inline Ptr<Core::Cycle> GraphManager::createCycle()
 	ret->setDataMap(&Transform::g_Free);
 	ret->init();
 	ret->updateValues(-1);
-	ret->resetAndStop();
+	ret->stopAndReset();
 
 	m_cycles.push_back(ret);
 

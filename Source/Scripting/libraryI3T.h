@@ -10,8 +10,49 @@
 
 #include "picoc.h"
 #include "pgr.h"
-
-#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+/**
+* 
+* LOADING, ADDING NEW FUNCTIONS
+*	libraryI3T.cpp -> 
+*		Create function with following prototype
+*			void f(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
+*		Add pair (example, you may define any function prototype you want, however, number of parameters is limited to PARAMETER_MAX (Dependencies/picoc/platform.h))
+*			{ f,     "int f(int,int,int,char*);" }
+*		to existing array
+*			struct LibraryFunction platformLibraryI3T[]
+*		Function 
+*			void platformLibraryInitI3T(Picoc *pc)
+*		is called on picoc init functions (Scripting.h, Scripting.cpp). This function begins with
+*			IncludeRegister(pc, "I3T.h", nullptr, platformLibraryI3T, defs)
+*		which adds the array to picoc 
+*		Then definitions of constats, accessible in scripting, follow:
+*			VariableDefinePlatformVar(pc, nullptr, "free", &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free, false);
+*		This call defines variable 
+			const int free=scriptingData.mat4Types.free;
+		accessible in script. (last parameter writeable=false)
+*	libraryI3T.h ->
+*		Here you may define custom constants and global variables, accessible in script
+*		struct ScriptingData contains all of these variables and also vector of mat4,
+*		which is only used on script execution, during which the vector is filled by script (functions datavec3, datascalar, etc...) and then 
+*		created matricies can accessed by other functions of the script.
+* SAVING
+*   Scripting.cpp ->
+*		There are two similar functions, but their purpose is different
+*			bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace)
+*			bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _workspace,int at)
+*		These functions fprintf's c script directly into target file on disc.
+*		The first one calls the second, and the second may also call itself recursively. The second serves for saving nodes only - 
+*		nodes may contain other nodes (Sequence, camera), thus the recursive calling.
+*		If you want to save non-node related stuff, do it in the first functions, because the second may be called multiple times during 
+*		saving process.
+*		If you want to save nodes, do it in the second function. The functions consist form huge if-else structure, which switches by
+*		node keyword (WorkspaceNodeWithCoreData->Core::NodeBase->Operation->keyWord), in each branch functions for saving given node and 
+*		its inner state are fprintfed.
+*		
+*		
+* 
+* 
+*/
 
 /**
 * \struct Mat4types
@@ -34,7 +75,8 @@ struct VecOperators {
 * List of types of float operators. First parameter of script function float4oper (not implemented yet) must be one of these values.
 */
 struct FloatOperators {
-	const int clamp=200,cycle=201,pow=205,sincos=207,asinacos=208,signum=209;
+//	const int clamp=200,cycle=201,pow=205,sincos=207,asinacos=208,signum=209;
+	const int clamp=200,pow=205,sincos=207,asinacos=208,signum=209;
 };
 /**
 * \struct ArithmeticOperators
@@ -59,6 +101,9 @@ struct QuatOperators {
 struct NodeLODs {
 	const int full=600,setvalues=601,label=602;
 };
+struct CamAddModes{
+	const int proj=700,view=701;
+};
 /**
 * \struct ScriptingData
 * Contains constant variables that are exposed to scripts, that are used as parameters of functions for creating various operators, telling which type of operator should be created.
@@ -73,8 +118,9 @@ struct ScriptingData {
 	Convertors convertors;
 	QuatOperators quatOperators;
 	NodeLODs nodeLODs;
+	CamAddModes camAddModes;
 	std::vector<glm::mat4>nodeData;///<Vector of data as mat4, that were created by script. Serves as temporary static storage. Not needed after script is executed.
-	std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
+	//std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
 };
 
 ScriptingData*getScriptingData();

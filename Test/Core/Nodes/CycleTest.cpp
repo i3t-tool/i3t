@@ -58,7 +58,7 @@ TEST(Cycle, TriggerStepNextOnParentPlay)
   {
     GraphManager::update(sPerFrame);
   }
-  cycle2->stop();
+  cycle2->pause();
 
   float previous = cycle2->getData().getFloat();
   cycle1->play();
