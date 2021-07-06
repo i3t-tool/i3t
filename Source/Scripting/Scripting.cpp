@@ -444,10 +444,10 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		std::string					label		= nodebasedata->getHeaderLabel(); //printf("f\n");
 		//sequence
 		if (strcmp(keyword, "Sequence") == 0) {
-			
+
 			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
 			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
-			
+
 			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=seq->getInnerWorkspaceNodes();
 			saveWorkspace(f,&ctx,maxIndex);
 			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
@@ -457,7 +457,43 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		else if (strcmp(keyword, "Camera") == 0) {
 			WorkspaceCamera*cam=(WorkspaceCamera*)nodebasedata;
 			fprintf(f, "int n%d=camera(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
-			
+
+			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=cam->getProjection()->getInnerWorkspaceNodes();
+			saveWorkspace(f,&ctx,maxIndex);
+			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
+				fprintf(f, "bool cp%d_%d=camadd(n%d,n%d,proj);\n", i+at, j, i+at,j);
+			}
+
+			ctx=cam->getView()->getInnerWorkspaceNodes();
+			saveWorkspace(f,&ctx,maxIndex);
+			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
+				fprintf(f, "bool cv%d_%d=camadd(n%d,n%d,view);\n", i+at, j, i+at,j);
+			}
+		}
+	}
+	for (int i = 0; i < _workspace->size(); i++) {
+		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
+		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase(); //printf("a\n");
+		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId()); //printf("b\n");
+		const Core::Transform::DataMap&	data	= nodebase->getDataMapRef(); //printf("c\n");
+		const Operation*			operation	= nodebase->getOperation(); //printf("d\n");
+		const char*					keyword		= operation->keyWord.c_str(); //printf("e\n");
+		std::string					label		= nodebasedata->getHeaderLabel(); //printf("f\n");
+		//sequence
+		if (strcmp(keyword, "Sequence") == 0) {
+			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
+			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
+
+			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=seq->getInnerWorkspaceNodes();
+			saveWorkspace(f,&ctx,maxIndex);
+			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
+				fprintf(f, "bool sa%d_%d=seqadd(n%d,n%d);\n", i+at, j, i+at,j);
+			}
+		}
+		else if (strcmp(keyword, "Camera") == 0) {
+			WorkspaceCamera*cam=(WorkspaceCamera*)nodebasedata;
+			fprintf(f, "int n%d=camera(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
+
 			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=cam->getProjection()->getInnerWorkspaceNodes();
 			saveWorkspace(f,&ctx,maxIndex);
 			for(int j=maxIndex-ctx.size();j< maxIndex;j++){

@@ -1,4 +1,3 @@
-
 #include "libraryI3T.h"
 
 #include <stdio.h>
@@ -714,7 +713,7 @@ void camera(struct ParseState* parser, struct Value* returnValue, struct Value**
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
     workspace->push_back(std::make_unique<WorkspaceCamera>((ImTextureID)0, l,l));
-    
+
     ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
     if (numArgs == 0) {
         ne::CenterNodeOnScreen(workspace->back()->getId());
@@ -773,10 +772,7 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
 
     WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
     WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
-    //ne::DeleteNode(workspace->at(nodeindex)->getId());
-    
-    //printf("push  %s\n",workspace->at(nodeindex)->getNodebase()->getOperation()->keyWord.c_str());
-    //printf("erase %s\n",(workspace->begin()+nodeindex)->get()->getNodebase()->getOperation()->keyWord.c_str());
+
     seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
     workspace->erase(workspace->begin()+nodeindex);
 
