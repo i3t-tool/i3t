@@ -129,6 +129,13 @@ public:
 	float GetTouchProgress(const float constTouchTime);
 
 	virtual bool dataAreValid();
+
+	/* DIWNE functions */
+        virtual bool drawTop();
+        virtual bool drawLeft();
+        virtual bool drawMiddle();
+        virtual bool drawRight();
+        virtual bool drawBottom();
 };
 
 class WorkspacePinProperties

@@ -317,7 +317,8 @@ bool util::NodeBuilder::SetStage(Stage stage)
 
 void util::NodeBuilder::Pin(ed::PinId id, ed::PinKind kind, ImColor color)
 {
-	ed::BeginPin(id, kind, color);
+	//ed::BeginPin(id, kind, color);
+	ed::BeginPin(id, kind);
 }
 
 void util::NodeBuilder::EndPin()

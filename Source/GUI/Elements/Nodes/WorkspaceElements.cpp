@@ -141,6 +141,8 @@ bool							WorkspacePinProperties::getShowLabel() const { return m_showLabel; }
 std::string const WorkspacePinProperties::getLabel() const { return m_label; }
 
 
+
+
 /* >>>>> STATIC FUNCTIONS <<<<< */
 
 int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)

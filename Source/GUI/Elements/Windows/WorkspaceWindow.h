@@ -12,6 +12,9 @@
 #include <imgui_node_editor.h>
 #include <imgui_node_editor_internal.h>
 
+#include "DIWNE/diwne.h"
+#include "DIWNE/Node.h"
+
 #include <algorithm>
 #include <map>
 #include <math.h>
@@ -41,6 +44,8 @@ typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 class WorkspaceWindow : public IWindow
 {
 public:
+
+
 	I3T_WINDOW(WorkspaceWindow)
 
 	explicit WorkspaceWindow(bool show);
@@ -49,6 +54,9 @@ public:
 	Application& m_wholeApplication;
 	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene - its wrapper for api functions only */
 	ne::Detail::EditorContext* m_ne_usable; /*! \brief On this object you can call inner functions */
+
+    DIWNE::Diwne m_diwne;
+    DIWNE::Node n;
 
 	ImTextureID m_headerBackgroundTexture;
 

@@ -11,6 +11,8 @@
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
 
+DIWNE::SettingsDiwne settingsDiwne;
+
 // using namespace Core;
 
 WorkspaceWindow::WorkspaceWindow(bool show) :
@@ -18,8 +20,9 @@ WorkspaceWindow::WorkspaceWindow(bool show) :
 		m_headerBackgroundTexture(
 				(ImTextureID) (intptr_t) pgr::createTexture(Config::getAbsolutePath("Data/textures/blueprint_background.png"),
 																										true)) // \TODO load texture OR making a simple rectangle
-		,
-		m_nodeBuilderContext(util::NodeBuilder(m_headerBackgroundTexture, 64, 64))
+		,m_nodeBuilderContext(util::NodeBuilder(m_headerBackgroundTexture, 64, 64))
+		,m_diwne(&settingsDiwne)
+		,n(&m_diwne)
 {
 
 	/* Setting of configuration from blueprint-example */
@@ -61,6 +64,10 @@ WorkspaceWindow::WorkspaceWindow(bool show) :
 	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { invertSelection(); });
 	Input.bindAction("navigateToContent", EKeyState::Pressed, [&]() { ne::NavigateToContent(); });
 	Input.bindAction("center", EKeyState::Pressed, [&]() { ne::NavigateToSelection(); });
+
+
+    m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture, &m_diwne));
+
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -84,108 +91,124 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-	ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar);
+    /* Draw to window only if is visible - call ImGui::End() everytime */
+	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar))
+    {
 
-	if (ImGui::BeginMenuBar())
-	{
-		showEditMenu();
 
-		ImGui::EndMenuBar();
-	}
+//	if (ImGui::BeginMenuBar())
+//	{
+//		showEditMenu();
+//
+//		ImGui::EndMenuBar();
+//	}
 
-	UpdateTouchAllNodes();
-	ne::Begin("Node editor");
-	{
-		ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
 
-		for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+
+	//UpdateTouchAllNodes();
+
+	m_diwne.Begin("DIWNE Workspace");
+	n.drawNodeDiwne();
+
+	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
 		{
-			Theme& t = I3T::getTheme();
-			if (workspaceCoreNode->isTransformation()) { t.transformationColorTheme(); }
-			else
-			{
-				t.operatorColorTheme();
-			}
-			workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
-			t.returnFloatColorToDefault();
+			std::dynamic_pointer_cast<WorkspaceMatrixTranslation>(workspaceCoreNode)->drawNodeDiwne();
 		}
 
-		/* put and pop to/from Sequence */
-		ne::Detail::DragAction* drag_action =
-				m_ne_usable->GetCurrentAction() != nullptr ? m_ne_usable->GetCurrentAction()->AsDrag() : nullptr;
-		if (drag_action && drag_action->IsDragging())
-		{
-			m_draged_nodes =
-					getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
-			/*TODO SS camera fail here. node editor marks different object as dragged one than the actual one.
-			it results that we cannot find workspacenode by id because we have the wrong id*/
-			m_draged_node_nodeeditor = drag_action->m_DraggedObject->AsNode();
-			if (m_draged_node_nodeeditor)
-			{
-				//TODO nullptr check
-				m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
-				if (m_draged_node->isTransformation())
-				{
-					Theme& t = I3T::getTheme();
-					t.transformationColorTheme();
+//	ne::Begin("Node editor");
+//	{
+//		ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
+//
+//		for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+//		{
+//			Theme& t = I3T::getTheme();
+//			if (workspaceCoreNode->isTransformation()) { t.transformationColorTheme(); }
+//			else
+//			{
+//				t.operatorColorTheme();
+//			}
+//			workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
+//			t.returnFloatColorToDefault();
+//		}
+//
+//		/* put and pop to/from Sequence */
+//		ne::Detail::DragAction* drag_action =
+//				m_ne_usable->GetCurrentAction() != nullptr ? m_ne_usable->GetCurrentAction()->AsDrag() : nullptr;
+//		if (drag_action && drag_action->IsDragging())
+//		{
+//			m_draged_nodes =
+//					getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
+//			/*TODO SS camera fail here. node editor marks different object as dragged one than the actual one.
+//			it results that we cannot find workspacenode by id because we have the wrong id*/
+//			m_draged_node_nodeeditor = drag_action->m_DraggedObject->AsNode();
+//			if (m_draged_node_nodeeditor)
+//			{
+//				//TODO nullptr check
+//				m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
+//				if (m_draged_node->isTransformation())
+//				{
+//					Theme& t = I3T::getTheme();
+//					t.transformationColorTheme();
+//
+//					if (m_draged_node->inSequence())
+//					{
+//						Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(m_draged_node);
+//						assert(workspace_sequence != nullptr);
+//
+//						workspace_sequence->popNode(m_draged_node);
+//						m_workspaceCoreNodes.push_back(m_draged_node);
+//					}
+//
+//					int position_in_sequence;
+//					m_all_sequences = getSequenceNodes();
+//					for (Ptr<WorkspaceSequence>& sequence : m_all_sequences)
+//					{
+//						ImVec2 nodeTopMiddlePosition = ne::GetNodePosition(m_draged_node->getId());
+//						ImVec2 nodeSize							 = ne::GetNodeSize(m_draged_node->getId());
+//						nodeTopMiddlePosition.x += nodeSize.x / 2;
+//
+//						position_in_sequence =
+//								sequence->getInnerPosition({nodeTopMiddlePosition, nodeTopMiddlePosition + ImVec2(0, nodeSize.y / 2),
+//																						nodeTopMiddlePosition + ImVec2(0, nodeSize.y)});
+//						sequence->setPostionOfDummyData(position_in_sequence);
+//
+//						if (position_in_sequence >= 0)
+//						{
+//							sequence->setWidthOfDummy(ne::GetNodeSize(m_draged_node->getId()).x);
+//							if (ImGui::IsMouseReleased(0))
+//							{
+//								sequence->pushNode(m_draged_node, position_in_sequence);
+//								m_workspaceCoreNodes.erase(std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+//																												[this](Ptr<WorkspaceNodeWithCoreData> const& w_node) -> bool {
+//																													return w_node->getId() == m_draged_node->getId();
+//																												}));
+//								sequence->setPostionOfDummyData(-1);
+//								break;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		/* both connected pins have to be drawn before link is drawn -> therefore separated cycle */
+//		for (auto&& workspaceCoreNode : m_workspaceCoreNodes) { workspaceCoreNode->drawInputLinks(); }
+//
+//		checkUserActions();
+//
+//		checkQueryElements();
+//
+//		checkQueryContextMenus();
+//
+//		ImGui::SetCursorScreenPos(cursorTopLeft);
+//	}
+//	ne::End();
 
-					if (m_draged_node->inSequence())
-					{
-						Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(m_draged_node);
-						assert(workspace_sequence != nullptr);
+	//manipulatorStartCheck3D();
 
-						workspace_sequence->popNode(m_draged_node);
-						m_workspaceCoreNodes.push_back(m_draged_node);
-					}
+    m_diwne.End();
 
-					int position_in_sequence;
-					m_all_sequences = getSequenceNodes();
-					for (Ptr<WorkspaceSequence>& sequence : m_all_sequences)
-					{
-						ImVec2 nodeTopMiddlePosition = ne::GetNodePosition(m_draged_node->getId());
-						ImVec2 nodeSize							 = ne::GetNodeSize(m_draged_node->getId());
-						nodeTopMiddlePosition.x += nodeSize.x / 2;
-
-						position_in_sequence =
-								sequence->getInnerPosition({nodeTopMiddlePosition, nodeTopMiddlePosition + ImVec2(0, nodeSize.y / 2),
-																						nodeTopMiddlePosition + ImVec2(0, nodeSize.y)});
-						sequence->setPostionOfDummyData(position_in_sequence);
-
-						if (position_in_sequence >= 0)
-						{
-							sequence->setWidthOfDummy(ne::GetNodeSize(m_draged_node->getId()).x);
-							if (ImGui::IsMouseReleased(0))
-							{
-								sequence->pushNode(m_draged_node, position_in_sequence);
-								m_workspaceCoreNodes.erase(std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-																												[this](Ptr<WorkspaceNodeWithCoreData> const& w_node) -> bool {
-																													return w_node->getId() == m_draged_node->getId();
-																												}));
-								sequence->setPostionOfDummyData(-1);
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		/* both connected pins have to be drawn before link is drawn -> therefore separated cycle */
-		for (auto&& workspaceCoreNode : m_workspaceCoreNodes) { workspaceCoreNode->drawInputLinks(); }
-
-		checkUserActions();
-
-		checkQueryElements();
-
-		checkQueryContextMenus();
-
-		ImGui::SetCursorScreenPos(cursorTopLeft);
-	}
-	ne::End();
-
-	manipulatorStartCheck3D();
-
-	ImGui::End();
+    }ImGui::End();
 }
 
 Ptr<WorkspaceSequence> WorkspaceWindow::getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node)
@@ -827,7 +850,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 			}
 			if (ImGui::MenuItem("translation"))
 			{
-				m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture));
+				m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>(m_headerBackgroundTexture, &m_diwne));
 				ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
 			if (ImGui::BeginMenu("rotation"))

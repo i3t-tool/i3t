@@ -127,7 +127,7 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
         if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);}
     }
 	else if (type == scriptingData.mat4Types.translate) {
-		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, l));
+		workspace->push_back(std::make_unique<WorkspaceMatrixTranslation>((ImTextureID)0, &I3T::getWindowPtr<WorkspaceWindow>()->m_diwne, l));
         if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase()->setValue((glm::vec3)mat[0]);}
 	}
     else if (type == scriptingData.mat4Types.free) {
@@ -388,7 +388,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         y = param[2]->Val->Integer;
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
-    
+
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if (type == scriptingData.floatOperators.asinacos) {
         workspace->push_back(std::make_unique<WorkspaceASinACos>((ImTextureID)0, l));
@@ -441,7 +441,7 @@ void convertor(struct ParseState* parser, struct Value* returnValue, struct Valu
         y = param[2]->Val->Integer;
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
-    
+
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
     if (type == scriptingData.convertors.mat_tr) {
         workspace->push_back(std::make_unique<WorkspaceMatrixToTR>((ImTextureID)0, l));
@@ -679,7 +679,7 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
     WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
     //ne::DeleteNode(workspace->at(nodeindex)->getId());
-    
+
     //printf("push  %s\n",workspace->at(nodeindex)->getNodebase()->getOperation()->keyWord.c_str());
     //printf("erase %s\n",(workspace->begin()+nodeindex)->get()->getNodebase()->getOperation()->keyWord.c_str());
     seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
@@ -731,7 +731,7 @@ void deleteNode(struct ParseState* parser, struct Value* returnValue, struct Val
     int id=param[0]->Val->Integer;
     int index=-1;
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
-    
+
     for(int i=0;i<workspace->size();i++){
         if(workspace->at(i)->getNodebase()->getId()==id){index=i;break;}
     }
@@ -882,7 +882,7 @@ void platformLibraryInitI3T(Picoc *pc)
     //mat4 transform
     VariableDefinePlatformVar(pc, nullptr, "free",          &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free,          false);
     VariableDefinePlatformVar(pc, nullptr, "uniscale",      &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.uniscale,      false);
-    
+
     //mat4 transform intersect mat4oper
     VariableDefinePlatformVar(pc, nullptr, "scale",         &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.scale,         false);
     VariableDefinePlatformVar(pc, nullptr, "rotatex",       &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.rotatex,       false);
@@ -946,7 +946,7 @@ void platformLibraryInitI3T(Picoc *pc)
     VariableDefinePlatformVar(pc, nullptr, "scalars_vec3",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_vec3,  false);
     VariableDefinePlatformVar(pc, nullptr, "scalars_vec4",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_vec4,  false);
     VariableDefinePlatformVar(pc, nullptr, "scalars_quat",  &pc->IntType, (union AnyValue*)&scriptingData.convertors.scalars_quat,  false);
-    
+
     //quat oper
     VariableDefinePlatformVar(pc, nullptr, "scalarvec3_quat",   &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.scalarvec3_quat,false);
     VariableDefinePlatformVar(pc, nullptr, "angleaxis_quat",    &pc->IntType, (union AnyValue*)&scriptingData.quatOperators.angleaxis_quat, false);
