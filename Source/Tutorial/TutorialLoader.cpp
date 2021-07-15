@@ -321,8 +321,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       }
       // actually used as block but the type does not allow blocks
       else if (!blockType) {
-        std::cerr << "NOT A BLOCK COMMAND: " << line << std::endl;
-        // todo handle error
+        Log::fatal("NOT A BLOCK COMMAND: " + line);
+      	// todo show errors to creator
       }
     }
     // handle block starts
@@ -333,8 +333,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       }
       // actually used as single line but the type does not allow single lines (implicitly by if order)
       else {
-        std::cerr << "NOT A SINGLELINE COMMAND: " << line << std::endl;
-        // todo handle error
+        Log::fatal("NOT A SINGLELINE COMMAND: " + line);
+        // todo show errors to creator
       }
     }
     // handle other text
@@ -360,6 +360,11 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       //addToCurrentBlock(line);
     }
   }
+	// bug fix todo - if there is a non-empty line just before EOF it wont get added (there has to be eg an empty line after it)
+  // FINISH UNFINISHED BLOCKS
+	if (currentBlock != NOT_BLOCK) {
+		endCurrentBlock();
+	}
 
   // CHECK if parsing ended because of error
   if (!tutorialStream.eof()) { 

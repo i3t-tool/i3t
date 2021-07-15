@@ -43,7 +43,7 @@ public:
    * \param step_number A step number counted from 0.
    * \return true if successful, false if number out of range or no currently set tutorial
    */
-  bool setStep(int step_number);
+  void setStep(int step_number);
 
   /**
    * \brief Renders the tutorial window using ImGui.
