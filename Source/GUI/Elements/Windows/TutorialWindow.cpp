@@ -110,7 +110,9 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   m_current_step = 0;
   m_mdConfig = ImGui::MarkdownConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
 
-  SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) { setTutorial(tutorial); });
+  SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
+	  setTutorial(std::move(tutorial));
+  });
 
   //// TEMPORARY todo
   //std::shared_ptr<TutorialHeader> dummy_header = std::make_shared<TutorialHeader>("none");
@@ -119,25 +121,26 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 
 void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 {
-  m_tutorial = tutorial;
-}
+  m_tutorial = std::move(tutorial);
+	// btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
+	m_current_step = 0;
 
-void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader> header)
-{
-  auto tutorial = TutorialLoader::loadTutorial(header);
-  if (tutorial == nullptr) {
-    LOG_ERROR("Tutorial " + header->m_filename + " not loaded.")
-    return;
-  }
-  m_tutorial = tutorial;
-  // btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
-  setStep(0);
-
-  // todo make a utility function for this
+	// todo make a utility function for this
   //std::cout << m_tutorial->m_header->m_filename;
   //std::filesystem::path p(m_tutorial->m_header->m_filename);
   //m_current_dir = p.parent_path().string() + "/";
   //std::cout << m_current_dir;
+}
+
+void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader>& header)
+{
+  auto tutorial = TutorialLoader::loadTutorial(header);
+  if (tutorial) {
+	  setTutorial(tutorial);
+  }
+	else {
+    Log::fatal("Tutorial " + header->m_filename + " not loaded.");
+	}
 }
 
 void TutorialWindow::setTutorial(std::string path)
@@ -147,7 +150,7 @@ void TutorialWindow::setTutorial(std::string path)
     setTutorial(header);
   }
   else {
-    LOG_ERROR("Tutorial header " + path + " not loaded." );
+    Log::fatal("Tutorial header " + path + " not loaded." );
   }
 }
 
@@ -221,7 +224,7 @@ void TutorialWindow::renderTutorialHeader()
     title = "Empty tutorial";
   }
 
-  // todo
+  // display title if not "undefined"
   if (title != "undefined") {
     ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Title));
     ImGui::TextWrapped(title.c_str());

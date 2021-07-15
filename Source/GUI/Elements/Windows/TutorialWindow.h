@@ -30,7 +30,7 @@ public:
    * \brief Calls load and parse for a tutorial from file and sets it as the current one to be shown.
    * \param header Ptr to an already loaded tutorial header object describing a specific tutorial.
    */
-  void setTutorial(std::shared_ptr<TutorialHeader> header);
+  void setTutorial(std::shared_ptr<TutorialHeader>& header);
 
     /**
    * \brief Calls load and parse for a tutorial from file and sets it as the current one to be shown.

@@ -87,7 +87,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   // CHECK
   std::ifstream tutorialStream(header->m_filename);
   if (!tutorialStream.good()) {
-    LOG_ERROR("Tutorial file '" + header->m_filename + "' was not found")
+    Log::fatal("Tutorial file '" + header->m_filename + "' was not found");
 		return nullptr;  // return nothing
   }
 
@@ -104,9 +104,9 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     // CHECK
     if (!tutorialStream.good()) {
       if (tutorialStream.eof()) {
-        LOG_ERROR("Tutorial file '" + header->m_filename + "' missing 2 '---' YAML marks at the beginning of file or no further content behind them")
+        Log::fatal("Tutorial file '" + header->m_filename + "' missing 2 '---' YAML marks at the beginning of file or no further content behind them");
       } else {
-        LOG_ERROR("Tutorial file '" + header->m_filename + "' I/O error")
+        Log::fatal("Tutorial file '" + header->m_filename + "' I/O error");
       }
       return nullptr;
     }
