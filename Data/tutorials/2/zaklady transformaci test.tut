@@ -9,18 +9,18 @@ language: cs
 V této lekci se seznámíš s tím, jak transformace skládat za sebou a jak je propojovat v grafu scény. Z matematického pohledu jde o násobení matic ve správném pořadí.
 
 Pokud se ti vše povede, měli bychom na konci lekce mít takovéhoto krásného sněhuláka, se kterým budeme moci hýbat:
+
 ![Výsledná scéna](snehulak.png)
 
 --
 
-Začněme jednoduše...
+Začněme jednoduše.
 
 task: 
-  Přidej do scény červenou krychli.
-  A ať je pořádná!
+  Přidej do scény model krychle.
 hint: 
-  Pravým tlačítkem klikni do workspace a zvol Object -> Red cube
-  ![Přidání krychle](addred.png)
+  Pravým tlačítkem klikni do workspace a zvol Model
+  ![Přidání krychle](addCube.png)
 
 --
 
@@ -102,3 +102,4 @@ hint:
 --
 
 A je to! Během tutoriálu jsme prošli, jak vytvářet a naplňovat bloky matic, a jak je propojovat mezi sebou tak, abychom dosáhli požadovaných transformací. Pokud chceš, můžeš si na závěr vyzkoušet se sněhulákem zatočit a sledovat, jaký má rotace efekt, podle toho, jestli se umístí před posunutí, anebo za posunutí.
+test

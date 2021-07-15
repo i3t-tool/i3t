@@ -132,15 +132,13 @@ struct TStep
 
   // std::string m_title; // deprecated
   std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
+	//std::vector<Command>
 
   // todo
   // maybe call task?
   // tasks - ptrs to all task widgets
   // questions - ptrss to all question widgets
   // isCompleted - true if all tasks and questions completed (also check in each update vs check after every change)
-
-  // old HACK - using unique pointers because I need pointers in general in order to avoid slicing of subclass objects (TWText,...) into the base class (TWidget) when storing them in this vector.
-  // also, it is preffered to have steps also as unique pointers, 
 };
 
 struct TutorialHeader

@@ -36,7 +36,7 @@ void Logger::initLogger(int argc, char* argv[])
 
 	std::cout << "After load" << std::endl;
 
-	spdlog::set_pattern("[%l](%@){%!}2: %v");
+	spdlog::set_pattern("[%l]: %v");
 
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
@@ -44,7 +44,7 @@ void Logger::initLogger(int argc, char* argv[])
 	//sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
 	sinks[0]->set_level(spdlog::level::trace);
 	//sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
-	sinks[0]->set_pattern("[%l](%@){%!}: %v");
+	sinks[0]->set_pattern("[%l]: %v");
 
 	m_consoleLogger = std::make_shared<spdlog::logger>("Log", sinks.begin(), sinks.end());
 

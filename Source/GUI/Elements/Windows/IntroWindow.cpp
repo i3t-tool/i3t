@@ -9,6 +9,7 @@
 #include "imgui_internal.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/API.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
 #include "Tutorial/TutorialLoader.h"
@@ -342,6 +343,8 @@ void IntroWindow::render()
                 if (tutorial) {
                   Log::debug("Tutorial " + header->m_title + " loaded");
                   SetTutorialCommand::dispatch(tutorial);
+                	 *this->getShowPtr() = false;
+                	 *I3T::getWindowPtr<TutorialWindow>()->getShowPtr() = true;
                 }
                 else {
                   Log::info("ERR: Tutorial " + header->m_title + " not loaded");

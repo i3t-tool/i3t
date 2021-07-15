@@ -24,11 +24,14 @@
 #include "Utils/TextureLoader.h"
 
 #include <filesystem>
+#include <Core/API.h>
+#include "IntroWindow.h"
+
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
 //---
 
-const int NEXT_BUTTON_SIZE_X = 150;
+const int NEXT_BUTTON_SIZE_X = 120;
 const int SIMPLE_SPACE = 10;
 const int SMALL_SPACE = 5;
 const int CONTROLS_SIZE_Y = 100;
@@ -56,7 +59,7 @@ inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLin
       }
       else {
         //todo use dummy image
-        Log::info("Using dummy image");
+        //Log::info("Using dummy image");
       }
     }
     else {
@@ -107,7 +110,9 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   m_current_step = 0;
   m_mdConfig = ImGui::MarkdownConfig{nullptr, nullptr, ImageCallback, "link", { { nullptr, true }, { nullptr, true }, { nullptr, false } }, nullptr };
 
-  SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) { setTutorial(tutorial); });
+  SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
+	  setTutorial(std::move(tutorial));
+  });
 
   //// TEMPORARY todo
   //std::shared_ptr<TutorialHeader> dummy_header = std::make_shared<TutorialHeader>("none");
@@ -116,25 +121,26 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 
 void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 {
-  m_tutorial = tutorial;
-}
+  m_tutorial = std::move(tutorial);
+	// btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
+	m_current_step = 0;
 
-void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader> header)
-{
-  auto tutorial = TutorialLoader::loadTutorial(header);
-  if (tutorial == nullptr) {
-    LOG_ERROR("Tutorial " + header->m_filename + " not loaded.")
-    return;
-  }
-  m_tutorial = tutorial;
-  // btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
-  setStep(0);
-
-  // todo make a utility function for this
+	// todo make a utility function for this
   //std::cout << m_tutorial->m_header->m_filename;
   //std::filesystem::path p(m_tutorial->m_header->m_filename);
   //m_current_dir = p.parent_path().string() + "/";
   //std::cout << m_current_dir;
+}
+
+void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader>& header)
+{
+  auto tutorial = TutorialLoader::loadTutorial(header);
+  if (tutorial) {
+	  setTutorial(tutorial);
+  }
+	else {
+    Log::fatal("Tutorial " + header->m_filename + " not loaded.");
+	}
 }
 
 void TutorialWindow::setTutorial(std::string path)
@@ -144,18 +150,19 @@ void TutorialWindow::setTutorial(std::string path)
     setTutorial(header);
   }
   else {
-    LOG_ERROR("Tutorial header " + path + " not loaded." );
+    Log::fatal("Tutorial header " + path + " not loaded." );
   }
 }
 
-bool TutorialWindow::setStep(int step_number)
+void TutorialWindow::setStep(int step_number)
 {
-  if (m_tutorial == nullptr || step_number < 0 || step_number < m_tutorial->getStepCount())
+  if (m_tutorial == nullptr || step_number < 0 || step_number >= m_tutorial->getStepCount())
   {
-    return false;
+  	Log::fatal("Trying to set an invalid step number or tutorial not active");
   }
-  m_current_step = step_number;
-  return true;
+	else {
+	  m_current_step = step_number;
+	}
 }
 
 //---
@@ -217,7 +224,7 @@ void TutorialWindow::renderTutorialHeader()
     title = "Empty tutorial";
   }
 
-  // todo
+  // display title if not "undefined"
   if (title != "undefined") {
     ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Title));
     ImGui::TextWrapped(title.c_str());
@@ -275,6 +282,69 @@ void TutorialWindow::renderTutorialContent()
   ImGui::EndChild();
 }
 
+void TutorialWindow::renderTutorialControls()
+{
+	if (m_tutorial) {
+		// PUSH STYLE
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+		// BEGIN CHILD
+		ImGui::BeginChild("controls", ImVec2(0,0)); // stretch remaining Y space
+		ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));   // vertical spacing
+
+		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(14, 98, 175, 255));
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(215, 215, 215, 255));
+		const int   progress       = m_tutorial->getStepCount();
+		std::string progressString = std::to_string(m_current_step + 1) + "/" + std::to_string(m_tutorial->getStepCount());
+		ImGui::ProgressBar(static_cast<float>(m_current_step + 1) / static_cast<float>(progress), ImVec2(-1, 20), progressString.c_str());
+		ImGui::PopStyleColor(2);
+
+		ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+
+		// BUTTONS
+		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+		if (m_current_step != 0) {
+			if (ImGui::Button("< Back", ImVec2(50, 0)))
+			{
+				m_current_step--;
+				//std::cout << m_current_step << std::endl;
+			}
+		}
+		else {
+			ImGui::InvisibleButton("< Back", ImVec2(10, 10));
+		}
+		ImGui::PopStyleColor(2);
+		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
+		if (m_current_step != m_tutorial->getStepCount() - 1) {
+			if (ImGui::Button("Next", ImVec2(-1, 0)))
+			{
+				m_current_step++;
+				//std::cout << m_current_step << std::endl;
+			}
+		}
+		else {
+			if (ImGui::Button("Finish", ImVec2(-1, 0)))
+			{
+				m_tutorial = nullptr;
+				*I3T::getWindowPtr<IntroWindow>()->getShowPtr() = true;
+				//std::cout << m_current_step << std::endl;
+			}
+		}
+		ImGui::PopFont();
+		ImGui::PopStyleColor(2);
+	
+		// END CHILD
+		ImGui::EndChild();
+		// POP STYLE
+		ImGui::PopStyleColor();
+	}
+
+}
+
+// TUTORIAL ELEMENTS
 void TutorialWindow::renderExplanation(Explanation* explanation)
 {
   ImGui::Markdown( explanation->m_content.c_str(), explanation->m_content.length(), m_mdConfig);
@@ -352,45 +422,3 @@ void TutorialWindow::renderHint(Hint* hint)
 	//}
 }
 
-void TutorialWindow::renderTutorialControls()
-{
-  // PUSH STYLE
-  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-  // BEGIN CHILD
-  ImGui::BeginChild("controls", ImVec2(0,0)); // stretch remaining Y space
-  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); // vertical spacing
-
-  // ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0,0,0,1));
-  const int progress = m_tutorial == nullptr ? 0 : m_tutorial->getStepCount();
-  ImGui::ProgressBar(static_cast<float>(m_current_step) / static_cast<float>(progress), ImVec2(-1, 20));
-  // ImGui::PopStyleColor();
-
-  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
-
-	// BUTTONS
-	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-  ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
-  if (ImGui::Button("Back", ImVec2(100, 0)))
-  {
-    if (m_current_step != 0) {
-      m_current_step--;
-      //std::cout << m_current_step << std::endl;
-    }
-  }
-  ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
-  if (ImGui::Button("Next", ImVec2(-1, 0)))
-  {
-    if (m_tutorial != nullptr && m_current_step != m_tutorial->getStepCount() - 1) {
-      m_current_step++;
-      //std::cout << m_current_step << std::endl;
-    }
-  }
-  ImGui::PopFont();
-  ImGui::PopStyleColor(2);
-	
-  // POP STYLE
-  ImGui::PopStyleColor();
-  // END
-  ImGui::EndChild();
-}
