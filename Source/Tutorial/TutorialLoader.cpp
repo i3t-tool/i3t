@@ -49,7 +49,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
   // thumbnail
   std::shared_ptr<GUIImage> thumbnail = nullptr; // dummy image here? - NOPE rather later when rendering and encountering a nullptr (safer in case of loader errors)
   if (tutorial_yaml["thumbnail"]) {
-    thumbnail = loadImage(getDirectoryPath(path) + tutorial_yaml["thumbnail"].as<std::string>());
+    thumbnail = loadImage(getDirectory(path) + tutorial_yaml["thumbnail"].as<std::string>());
   }
   else {
     Log::fatal("Thumbnail not specified");
@@ -110,7 +110,6 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   std::vector<TStep> steps;  // we will be filling this vector and then creating a tutorial with it
   steps.emplace_back();  // add the first step
   int currentStep = 0;
-  std::unordered_map<std::string, std::shared_ptr<GUIImage>> images; // we will be loading found images in it
   int currentBlockIndent = -1;
   blockType_t currentBlock = NOT_BLOCK;
   std::string line;
@@ -121,46 +120,6 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   std::vector<int> vectorOfNumsStore;
 
 	// -------------------------------------------------------
-	// [FUNC] PREPARING IMAGES
-  auto findAndLoadImages = [&](const std::string& string)
-  {
-    int tmpState = 0; // 0 - start, 1 - [, 2 - ](, 3 - )
-    std::string imageFilename;
-    for (size_t i = 1; i < string.size(); i++) {
-      switch(string[i]) {
-        case '[':
-          if (string[i - 1] == '!' && tmpState == 0) {
-            tmpState = 1;
-          }
-          break;
-        case ']':
-          if (tmpState == 1) {
-            if (i < string.size() - 1 && string[i + 1] == '(') { // needs to be ]( in susccession, otherwise reset
-              tmpState = 2;
-            }
-            else {
-              tmpState = 0;
-            }
-          }
-          break;
-        case '(':
-          break;
-        case ')':
-          if (tmpState == 2) {
-            if (!images.contains(imageFilename)) {
-              images[imageFilename] = loadImage(getDirectoryPath(header->m_filename) + imageFilename);
-            }
-            imageFilename = "";
-            tmpState = 0;
-          }
-          break;
-        default:
-          if (tmpState == 2 && string[i] != ' ') {
-            imageFilename += string[i];
-          }
-      }
-    } 
-  };
 
 	// [FUNCS] DETERMINING ELEMENT TYPES
   auto isBlockType = [](const std::string& string)
@@ -314,8 +273,6 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       if (!restOfLine.empty()) {
         // take care of the single line
         handleSingleLine(singleLineType, restOfLine);
-        // load any images in it if any
-        findAndLoadImages(restOfLine);
         continue;
       }
       // actually used as block but the type does not allow blocks
@@ -362,8 +319,6 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       std::getline(lineStream, restOfLine);
       textStore += restOfLine;
       textStore += '\n';
-      // load any images found
-      findAndLoadImages(restOfLine);
       //addToCurrentBlock(line);
     }
   }
@@ -379,7 +334,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   }
   
   // CREATE THE TUTORIAL
-  std::shared_ptr<Tutorial> tutorial = std::make_shared<Tutorial>(std::move(header), std::move(steps), std::move(images)); // we create our tutorial object on heap
+  std::shared_ptr<Tutorial> tutorial = std::make_shared<Tutorial>(std::move(header), std::move(steps), std::unordered_map<std::string, std::shared_ptr<GUIImage>>()); // we create our tutorial object on heap
 
   return tutorial;
 }
@@ -406,6 +361,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 //  return EXPLANATION;
 //}
 
+// todo make it a universal function (not belonging to tutorialLoader)
 std::shared_ptr<GUIImage> TutorialLoader::loadImage(const std::string & path)
 {
   // NOTE: we dont load dummy images here - let renderer handle nullptrs
@@ -413,12 +369,12 @@ std::shared_ptr<GUIImage> TutorialLoader::loadImage(const std::string & path)
     return std::make_shared<GUIImage>(path);
   }
   catch (std::runtime_error& e) {
-    LOG_ERROR(e.what())
+    Log::fatal(e.what());
     return nullptr;
   }
 }
 
-std::string TutorialLoader::getDirectoryPath(std::string& path)
+std::string TutorialLoader::getDirectory(std::string& path)
 {
   std::filesystem::path p(path);
   return p.parent_path().string() + "/"; 

@@ -45,46 +45,32 @@ inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLin
   std::string imageFilename(data_.link, data_.linkLength);
 
   // try to find the texture, if it isnt loaded, then load it
-  int tex_id = 0;
-  // todo temporary
+  std::shared_ptr<GUIImage> img = nullptr;
+
   if (m_tutorial != nullptr) {
+  	// image already loaded
     if ( m_tutorial->m_filenameToImage.contains(imageFilename)) {
-      auto img = m_tutorial->m_filenameToImage[imageFilename];
-      if (img != nullptr) {
-        tex_id = img->m_texID;
-      }
-      else {
-        //todo use dummy image
-        //Log::info("Using dummy image");
-      }
+      img = m_tutorial->m_filenameToImage[imageFilename];
     }
-    else {
-    	// todo load the image
-      Log::info("Loading image " + imageFilename);
+  	// image not yet loaded
+		else {
+			Log::info("Loading image " + imageFilename);
+      img = TutorialLoader::loadImage(TutorialLoader::getDirectory(m_tutorial->m_header->m_filename) + imageFilename);
+			m_tutorial->m_filenameToImage[imageFilename] = img; // save for future use
     }
   }
   else {
     Log::fatal("Tutorial is nullptr");
   }
-
-
-
-  //else if (const auto it{ m_tutorial->m_filenameToImage.find(image_path) }; it != std::end(m_tutorial->m_filenameToImage)) {
-  //  tex_id = it->second->m_texID;
-  //}
-  //else {
-  //  try {
-  //    m_tutorial->m_filenameToImage[image_path] = std::make_shared<GUIImage>(image_path);
-  //    tex_id = m_tutorial->m_filenameToImage[image_path]->m_texID;
-  //  }
-  //  catch (const std::runtime_error& error) {
-  //    tex_id = 0;
-  //  }
-  //}
   
-  //int tex_id = TextureLoader::loadTexture(data_.text, image_path);
-  
-  ImGui::MarkdownImageData imageData{ true, false, (ImTextureID)tex_id, ImVec2( 400.0f, 200.0f ) };
+  ImGui::MarkdownImageData imageData;
+	// nullptr check (todo possibly use a dummy image)
+	if (img != nullptr) {
+		imageData = { true, false, (ImTextureID)img->m_texID, ImVec2(img->m_width, img->m_height)};
+	}
+	else {
+		imageData = { false, false, nullptr, ImVec2( 10.0f, 10.0f ) };
+	}
 
   // For image resize when available size.x > image width, add
   ImVec2 const contentSize = ImGui::GetContentRegionAvail();

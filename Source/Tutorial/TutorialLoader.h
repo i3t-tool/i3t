@@ -7,6 +7,13 @@ public:
   // todo zmenit na nullptry
   static std::shared_ptr<TutorialHeader> loadTutorialHeader(std::string& path);
   static std::shared_ptr<Tutorial> loadTutorial(std::shared_ptr<TutorialHeader> header);
+  /**
+   * @brief simple wrapper that tries to load an image
+   * @param path whole path to the image
+   * @return ptr to image if successful, nullptr otherwise
+  */
+  static std::shared_ptr<GUIImage> loadImage(const std::string& path);
+  static std::string getDirectory(std::string& path);
   
 private:
   TutorialLoader() = default;
@@ -26,12 +33,6 @@ private:
     NOT_SINGLE_LINE = 0, TASK_SINGLE, HINT_SINGLE, CORRECT_ANSWER, WRONG_ANSWER, ANSWER_LIST, SCRIPT_SIGNLE
   };
 
-  /**
-   * @brief simple wrapper that tries to load an image
-   * @param path whole path to the image
-   * @return ptr to image if successful, nullptr otherwise
-  */
-  static std::shared_ptr<GUIImage> loadImage(const std::string& path);
 
 
    /**
@@ -56,7 +57,6 @@ private:
    * @brief returns according enum if such keyword was specified, EMPTY / 1 if the string is empty and NO_KEYWORD / 0 if none of the previous
   */
   //static blockType_t isKeyword(const std::string& string);
-  static std::string getDirectoryPath(std::string& path);
   static void skipSpaces(std::istringstream& stream);
   static void skipSpaces(std::istringstream& stream, unsigned int maxCount);
 
