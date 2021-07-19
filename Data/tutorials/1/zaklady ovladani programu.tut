@@ -9,23 +9,21 @@ language: cs
 Vítej, nový učedníku! 
 task:
   Prohlédni si program, kromě tutoriálu bys vidět dvě okna:
-    - Scene Viewport
-    - Workspace
+    + Scene Viewport
+    + Workspace
 
-Aktuální scénu budeme upravovat ve workspace a její 3D náhled z nezávislé kamery si budeme moci prohlížet ve viewportu.
+Aktuální scénu budeme upravovat ve **workspace** a její 3D náhled z nezávislé kamery si budeme moci prohlížet ve __viewportu__.
 
 --
 
-script:
-  load("test.c")
-
 Takto například může scéna vypadat.
+You can add [links like this one to enkisoftware](https://www.enkisoftware.com/) and lines will wrap well.
 
 -- 
 
 Začněme vytvořením krychle.
 
-Klikni pravým tlačítkem do wor
+Klikni *pravým* tlačítkem do wor
 
 Nyní si vyzkoušíme jednoduché manipulace s krychlí. 
 
@@ -36,7 +34,7 @@ task:
   A ať je pořádná!
 hint: 
   Pravým tlačítkem klikni do workspace a zvol Object -> Red cube
-  ![Přidání krychle](addred.png)
+  ![Přidání krychle](test.png)
 
 --
 
@@ -89,10 +87,10 @@ task:
 
 hint:
   Postupujme v pořadí nejprve zvětšení, a poté posunutí (zprava doleva). 
-  * V matici Scale nastav hodnoty na 2 - strana kostky tedy bude velká dva.
-  * Červená kostka končí ve výšce tři, zelenou kostku budeme tedy posouvat po ose y minimálně o tři. 
-  * Kostka má však původně střed v nule, a tak je třeba posunout jí ještě o polovinu její výšky, tedy o jedna. 
-  * Nastav tedy v matici Translate hodnotu u osy y na 4. 
+    * V matici Scale nastav hodnoty na 2 - strana kostky tedy bude velká dva.
+    * Červená kostka končí ve výšce tři, zelenou kostku budeme tedy posouvat po ose y minimálně o tři. 
+    * Kostka má však původně střed v nule, a tak je třeba posunout jí ještě o polovinu její výšky, tedy o jedna. 
+    * Nastav tedy v matici Translate hodnotu u osy y na 4. 
   Kostky by měly hezky stát na sobě.
 
 --

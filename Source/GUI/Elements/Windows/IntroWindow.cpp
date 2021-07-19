@@ -7,11 +7,14 @@
 #include "Config.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
+#include "WorkspaceWindow.h"
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
 #include "GUI/UIModule.h"
+#include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "Logger/Logger.h"
+#include "Scripting/Scripting.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"
 
@@ -42,12 +45,6 @@ IntroWindow::IntroWindow(bool show) : IWindow(show)
   catch (std::runtime_error& e) {
     LOG_ERROR(e.what())
   }
-  LOG_DEBUG("debug")
-  LOG_INFO("info");
-  LOG_ERROR("info");
-  Log::debug("debug new");
-  Log::info("info new");
-  Log::fatal("fatal new");
   reloadTutorials();
 }
 
@@ -85,7 +82,9 @@ void IntroWindow::render()
     firstTime = false;
     ImGui::SetNextWindowSize(windowSize);
   }
-	// Styling constants
+	// Styling constants todo move all constants here, possibly load from theme or other styling settings
+	const float minWinWidth = 800;
+	const float minWinHeight = 400;
 	const ImVec2 logoOffset = ImVec2(5, -20);
 	const float titleVerticalOffset = 130;
   const float leftBarWidth = 330;
@@ -94,13 +93,14 @@ void IntroWindow::render()
   const float thumbImageSize = 80;
   const float startBtnWidth = 120;
 
+	// todo change all color specifications to Application::get().getUI()->getTheme().get(EColor::DesiredColor)
 	// WINDOW
   ImGui::PushStyleColor(ImGuiCol_WindowBg , IM_COL32_WHITE);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6);
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
   ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 14);
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.8f * windowSize.x, 0.8f * windowSize.y));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(minWinWidth, minWinHeight));
   //ImGui::PushStyleColor(ImGuiCol_TitleBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(202, 202, 202, 255));
@@ -161,7 +161,7 @@ void IntroWindow::render()
     ImGui::SameLine();
 
     // RIGHT CHILD WINDOW
-    
+  
     //ImGui::Spacing();
     //// TABS
     //if (ImGui::BeginTabBar("TabBar")) 
@@ -248,13 +248,35 @@ void IntroWindow::render()
 			    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
 			    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
 			    if (ImGui::Button("New", ImVec2(startNewBtnWidth, 0))) {
-				    *this->getShowPtr() = false;
+				    this->hide();
 			    }
 			    //ImGui::SameLine();
 			    ImGui::Dummy(ImVec2(0, 2));
 			    if (ImGui::Button("Load", ImVec2(loadBtnWidth, 0)))
 			    {
-				    // todo load from file
+				    // load from file (taken from main menu bar)
+				    std::string              result;
+				    std::string              title = "Open I3T script...";
+				    std::string              root  = Config::getAbsolutePath("./");
+				    std::vector<std::string> filter;
+				    filter.push_back("C source files");
+				    filter.push_back("*.c");
+				    bool success = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
+				    auto ww      = I3T::getWindowPtr<WorkspaceWindow>();
+				    if (ww != nullptr) {
+					    if (success && !result.empty()) {
+						    ww->m_workspaceCoreNodes.clear();
+						    loadWorkspace(result.c_str());
+					    }
+							else {
+								Log::info("Opening file unsuccesful");
+							}
+				    }
+				    else
+				    {
+					    Log::fatal("Open failed: WorkspaceWindow not found");
+				    }
+
 			    }
 			    ImGui::PopStyleColor(2);
 			    ImGui::PopFont();
@@ -271,115 +293,131 @@ void IntroWindow::render()
       ImGui::Dummy(ImVec2(0, 5));
     	
       // TUTORIAL LIST
-      for (auto& header : m_tutorial_headers)
-        {
-          // ITEM
-          ImGui::BeginGroup();
-          {
-	          ImGui::Indent(innerPadding.x);
-            const float titleDescWidth = ImGui::GetContentRegionAvail().x - (thumbImageSize + startBtnWidth);
+	    for (auto& header : m_tutorial_headers)
+	    {
+		    // ITEM
+		    ImGui::BeginGroup();
+		    {
+			    ImGui::Indent(innerPadding.x);
+			    const float titleDescWidth = ImGui::GetContentRegionAvail().x - (thumbImageSize + startBtnWidth);
 
-            //ImGui::Columns(3, "ThreeCols", false);
-            //ImGui::SetColumnWidth(0, thumbImageSize + 2 * ImGui::GetStyle().ColumnsMinSpacing);
-            //ImGui::SetColumnWidth(1, titleDescWidth - 2 * ImGui::GetStyle().ColumnsMinSpacing);
-            //ImGui::SetColumnWidth(2, startBtnWidth);
+			    //ImGui::Columns(3, "ThreeCols", false);
+			    //ImGui::SetColumnWidth(0, thumbImageSize + 2 * ImGui::GetStyle().ColumnsMinSpacing);
+			    //ImGui::SetColumnWidth(1, titleDescWidth - 2 * ImGui::GetStyle().ColumnsMinSpacing);
+			    //ImGui::SetColumnWidth(2, startBtnWidth);
 
-            auto img = header->m_thumbnailImage;
-            if (img) {
-              ImGui::Image((ImTextureID)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
-            }
-            else {
-              //todo load dummy at introwindow init
-              if (m_dummyImage) {
-                ImGui::Image((ImTextureID)m_dummyImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
-              }
-              else {
-                ImGui::Image(nullptr, ImVec2(thumbImageSize, thumbImageSize));
-              }
-            }
+			    auto img = header->m_thumbnailImage;
+			    if (img) {
+				    ImGui::Image((ImTextureID)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+			    }
+			    else {
+				    //todo load dummy at introwindow init
+				    if (m_dummyImage) {
+					    ImGui::Image((ImTextureID)m_dummyImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+				    }
+				    else {
+					    ImGui::Image(nullptr, ImVec2(thumbImageSize, thumbImageSize));
+				    }
+			    }
 
-            //ImGui::NextColumn();
-            //ImGui::SameLine(ImGui::GetCursorPosX() + innerPadding.x);
-            ImGui::SameLine();
-          	std::string descChildName = "Desc##" + header->m_filename;
-          	ImVec2 descSize (ImGui::GetContentRegionAvailWidth(), thumbImageSize);
-	          descSize.x -= (startNewBtnWidth + 2*innerPadding.x + outerPadding.x);
-          	//ImGui::PushClipRect(ImGui::GetCursorScreenPos(), descBottomRight, true);
-            //ImGui::BeginGroup();
-          	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
-          	ImGui::BeginChild(descChildName.c_str(), descSize, false, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
-            {
-              // TITLE
-              ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
-              ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
-              ImGui::TextWrapped(header->m_title.c_str());
-              ImGui::PopStyleColor();
-              ImGui::PopFont();
-              // DESCRIPTIONS
-              ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
-              ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemDescription));
-              ImGui::TextWrapped(header->m_description.c_str());
-              ImGui::PopStyleColor();
-              ImGui::PopFont();
-              //ImGui::EndGroup();
-	          	//ImGui::PopClipRect();
-	          	ImGui::EndChild();
-            }
-          	ImGui::PopStyleVar();
+			    //ImGui::NextColumn();
+			    //ImGui::SameLine(ImGui::GetCursorPosX() + innerPadding.x);
+			    ImGui::SameLine();
+			    std::string descChildName = "Desc##" + header->m_filename;
+			    ImVec2      descSize (ImGui::GetContentRegionAvailWidth(), thumbImageSize);
+			    descSize.x -= (startNewBtnWidth + 2*innerPadding.x + outerPadding.x);
+			    //ImGui::PushClipRect(ImGui::GetCursorScreenPos(), descBottomRight, true);
+			    //ImGui::BeginGroup();
+			    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
+			    ImGui::BeginChild(descChildName.c_str(), descSize, false, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+			    {
+				    // TITLE
+				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
+				    ImGui::TextWrapped(header->m_title.c_str());
+				    ImGui::PopStyleColor();
+				    ImGui::PopFont();
+				    // DESCRIPTIONS
+				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
+				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemDescription));
+			    	float predictedTextSize = ImGui::CalcTextSize(header->m_description.c_str(), nullptr, false, ImGui::GetContentRegionAvail().x).y;
+			    	bool willTextFit = ImGui::GetContentRegionAvail().y - predictedTextSize >= 0;
+			    	//std::string debug = fmt::format("{} - {} = {}", ImGui::GetContentRegionAvail().y, predictedTextSize, willTextFit);
+			    	//ImGui::Text(debug.c_str());
+				    ImGui::TextWrapped(header->m_description.c_str());
+				    // show tooltip when description doesnt fit
+				    if (!willTextFit && ImGui::IsItemHovered()) {
+					    ImGui::BeginTooltip();
+					    {
+						    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
+						    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_WHITE);
+						    ImGui::TextUnformatted(header->m_description.c_str());
+						    ImGui::PopTextWrapPos();
+						    ImGui::PopStyleColor();	
+						    ImGui::EndTooltip();
+					    }
+				    }
+				    ImGui::PopStyleColor();
+				    ImGui::PopFont();
+				    //ImGui::EndGroup();
+				    //ImGui::PopClipRect();
+				    ImGui::EndChild();
+			    }
+			    ImGui::PopStyleVar();
 
-            //ImGui::NextColumn();
-            ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - innerPadding.x - outerPadding.x);
-            // START BUTTON
-            ImGui::BeginGroup();
-            {
-              ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
-              ImGui::Spring(1);
-              ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-              ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-            	std::string buttonName = "Start##" + header->m_filename;
-              if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth,0))) {
-              	// TUTORIAL LOADING !!!
-                auto tutorial = TutorialLoader::loadTutorial(header);
-                if (tutorial) {
-                  Log::debug("Tutorial " + header->m_title + " loaded");
-                  SetTutorialCommand::dispatch(tutorial);
-                	 *this->getShowPtr() = false;
-                	 *I3T::getWindowPtr<TutorialWindow>()->getShowPtr() = true;
-                }
-                else {
-                  Log::info("ERR: Tutorial " + header->m_title + " not loaded");
-                }
-              }
-              ImGui::PopStyleColor();
-              ImGui::PopFont();
-              ImGui::Spring(1);
-              ImGui::EndVertical();
-              ImGui::EndGroup();
-            }
-            //ImGui::Columns(1); // end columns
-            ImGui::Dummy(ImVec2(0, 2));
-          	// CUSTOM SEPARATOR
-	          float thickness_draw = 1.0f;
-	          float thickness_layout = 0.0f;
-          	ImVec2 sceenPos = ImGui::GetCursorScreenPos();
-	          const ImRect bb(sceenPos, ImVec2(sceenPos.x + ImGui::GetContentRegionAvailWidth() - innerPadding.x, sceenPos.y + thickness_draw));
-	          ImGui::ItemSize(ImVec2(0.0f, thickness_layout));
-	          if (ImGui::ItemAdd(bb, 0))
-	          {
-		          // Draw
-	          	ImGui::GetWindowDrawList()->AddLine(bb.Min, ImVec2(bb.Max.x, bb.Min.y), ImGui::GetColorU32(ImGuiCol_Separator));
-	          }
-          	//ImGui::Separator();
-            ImGui::Dummy(ImVec2(0, 2));
-            ImGui::EndGroup();
-          }
-          // ITEM ACTIONS
-          if (ImGui::IsItemHovered()) {
-            ImGui::BeginTooltip();
-            ImGui::Text("yay");
-            ImGui::EndTooltip();
-          }
-        }
+			    //ImGui::NextColumn();
+			    ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - innerPadding.x - outerPadding.x);
+			    // START BUTTON
+			    ImGui::BeginGroup();
+			    {
+				    ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
+				    ImGui::Spring(1);
+				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
+				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+				    std::string buttonName = "Start##" + header->m_filename;
+				    if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth,0))) {
+					    // TUTORIAL LOADING !!!
+					    auto tutorial = TutorialLoader::loadTutorial(header);
+					    if (tutorial) {
+						    Log::debug("Tutorial " + header->m_title + " loaded");
+						    SetTutorialCommand::dispatch(tutorial);
+						    *this->getShowPtr()                                = false;
+						    *I3T::getWindowPtr<TutorialWindow>()->getShowPtr() = true;
+					    }
+					    else {
+						    Log::info("ERR: Tutorial " + header->m_title + " not loaded");
+					    }
+				    }
+				    ImGui::PopStyleColor();
+				    ImGui::PopFont();
+				    ImGui::Spring(1);
+				    ImGui::EndVertical();
+				    ImGui::EndGroup();
+			    }
+			    //ImGui::Columns(1); // end columns
+			    ImGui::Dummy(ImVec2(0, 2));
+			    // CUSTOM SEPARATOR
+			    float thickness_draw = 1.0f;
+			    float thickness_layout = 0.0f;
+			    ImVec2 sceenPos = ImGui::GetCursorScreenPos();
+			    const ImRect bb(sceenPos, ImVec2(sceenPos.x + ImGui::GetContentRegionAvailWidth() - innerPadding.x, sceenPos.y + thickness_draw));
+			    ImGui::ItemSize(ImVec2(0.0f, thickness_layout));
+			    if (ImGui::ItemAdd(bb, 0))
+			    {
+				    // Draw
+				    ImGui::GetWindowDrawList()->AddLine(bb.Min, ImVec2(bb.Max.x, bb.Min.y), ImGui::GetColorU32(ImGuiCol_Separator));
+			    }
+			    //ImGui::Separator();
+			    ImGui::Dummy(ImVec2(0, 2));
+			    ImGui::EndGroup();
+		    }
+		    // ITEM ACTIONS
+		    //if (ImGui::IsItemHovered()) {
+			   // ImGui::BeginTooltip();
+			   // ImGui::Text("yay");
+			   // ImGui::EndTooltip();
+		    //}
+	    }
 
       ImGui::EndChild(); // right panel
     }

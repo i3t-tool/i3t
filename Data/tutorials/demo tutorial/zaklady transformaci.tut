@@ -44,6 +44,13 @@ multichoice:
 
 --
 
+A helemese, novy vekturek ve workspace.
+
+script:
+  vec3(datavec3(1.0,2.0,3.0), 0, 0, "testicek");
+
+--
+
 input:
   Zadej odpověď na otázku žiovta, vesmíru a vůbec: 
   answers: [42, čtyřicet dva, čtyřicetdva]

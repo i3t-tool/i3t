@@ -11,7 +11,8 @@
 
 #include "Core/Defs.h"
 #include "GUI/Elements/IWindow.h"
-#include "Tutorial/Tutorial.h"
+
+struct Tutorial;
 
 class BeforeCloseCommand : public Command<BeforeCloseCommand>
 {

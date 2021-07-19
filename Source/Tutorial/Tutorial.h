@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include "Commands/ApplicationCommands.h"
+
 // forward declaration from TutorialRenderer.h to avoid cyclic dependency
 class ITutorialRenderer;
 
@@ -126,13 +128,15 @@ struct InputTask : TutorialElement
 };
 
 
+
+
 struct TStep
 {
   TStep() = default;
 
   // std::string m_title; // deprecated
   std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
-	//std::vector<Command>
+	std::string m_scriptToRunWhenShown;
 
   // todo
   // maybe call task?
@@ -146,13 +150,11 @@ struct TutorialHeader
   TutorialHeader(std::string filename,
                  std::string title,
                  std::string description,
-                 std::shared_ptr<GUIImage> thumbnail,
-                 std::string sceneFilename)
+                 std::shared_ptr<GUIImage> thumbnail)
     : m_filename(std::move(filename)),
       m_title(std::move(title)),
       m_description(std::move(description)),
-      m_thumbnailImage(std::move(thumbnail)),
-      m_sceneFilename(std::move(sceneFilename))
+      m_thumbnailImage(std::move(thumbnail))
   {
   }
   ~TutorialHeader() = default;
@@ -161,7 +163,6 @@ struct TutorialHeader
   std::string m_title;
   std::string m_description;
   std::shared_ptr<GUIImage> m_thumbnailImage;
-  std::string m_sceneFilename;
   
 };
 

@@ -19,7 +19,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
   try {
     tutorial_yaml = YAML::LoadFile(path);
   } catch (...) {
-    LOG_ERROR("Tutorial file '" + path + "' not found or YAML header unparsable") //todo change logging
+    Log::fatal("Tutorial file '" + path + "' not found or YAML header unparsable"); 
     return nullptr; // return nothing
   }
   //std::cout << tutorial_yaml << std::endl;
@@ -29,22 +29,22 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
   if (tutorial_yaml["title"])
   {
     title = tutorial_yaml["title"].as<std::string>();
-    LOG_DEBUG(title);
+    Log::debug(title);
   }
   else
   {
-    LOG_ERROR("Tutorial title not specified");
+    Log::fatal("Tutorial title not specified");
   }
   // description
   std::string description = "undefined";
   if (tutorial_yaml["description"])
   {
     description = tutorial_yaml["description"].as<std::string>();
-    LOG_DEBUG(description);
+    Log::debug(description);
   }
   else
   {
-    LOG_ERROR("Tutorial description not specified");
+    Log::fatal("Tutorial description not specified");
   }
   // thumbnail
   std::shared_ptr<GUIImage> thumbnail = nullptr; // dummy image here? - NOPE rather later when rendering and encountering a nullptr (safer in case of loader errors)
@@ -52,34 +52,25 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
     thumbnail = loadImage(getDirectoryPath(path) + tutorial_yaml["thumbnail"].as<std::string>());
   }
   else {
-    LOG_ERROR("Thumbnail not specified");
-  }
-  // scene
-  std::string sceneFile;
-  if (tutorial_yaml["scene"]) {
-    sceneFile = tutorial_yaml["scene"].as<std::string>();
-    LOG_DEBUG(sceneFile);
-  }
-  else
-  {
-    LOG_ERROR("Scene file not specified - setting empty");
+    Log::fatal("Thumbnail not specified");
   }
 	// language
   Language lang = Language::English;
   if (tutorial_yaml["language"]) {
     std::string langStr = tutorial_yaml["language"].as<std::string>();
-    LOG_DEBUG(langStr);
+    Log::debug(langStr);
   	//switch (langStr) {
-  	//	
+  	//	todo
   	//}
   }
   else
   {
-    LOG_ERROR("Language not specified - setting english");
+    Log::info("Language not specified - setting english");
+  	// todo
   }
 
   // we create our tutorial header object on heap, we are using shared ptr, so that when there arent any references, we can eg properly free the loaded image and destroy it
-  return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description), std::move(thumbnail), std::move(sceneFile)); 
+  return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description), std::move(thumbnail)); 
 }
 
 std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
@@ -90,10 +81,13 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     Log::fatal("Tutorial file '" + header->m_filename + "' was not found");
 		return nullptr;  // return nothing
   }
+	// FOR TUT CREATION DEBUG
+	int lineNumber = 0;
 
   // SKIP YAML (MOVE STREAM POINTER PAST IT)
   int yamlSeparatorCount = 0;
   while (yamlSeparatorCount < 2) {
+  	lineNumber++;
     // GET FIRST WORD OF THE LINE AND MOVE TO NEXT ONE
     std::string firstWord;
     tutorialStream >> firstWord;
@@ -125,21 +119,9 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   std::vector<std::string> vectorOfTextsStore;
   int numberStore = -1;
   std::vector<int> vectorOfNumsStore;
- 
 
-  // auto canBeSingleLine = [](blockType_t keyword) -> bool {
-  //   static const std::unordered_set<blockType_t> singleLines {
-  //     EMPTY, STEP_START, TASK, HINT
-  //   };
-  //   return singleLines.find(keyword) != singleLines.end();
-  // };
-  // auto canBeMultiLine = [](blockType_t keyword) -> bool {
-  //   static const std::unordered_set<blockType_t> multiLines {
-  //     TASK, HINT, 
-  //   };
-  //   return singleLines.find(keyword) != singleLines.end();
-  // };
-
+	// -------------------------------------------------------
+	// [FUNC] PREPARING IMAGES
   auto findAndLoadImages = [&](const std::string& string)
   {
     int tmpState = 0; // 0 - start, 1 - [, 2 - ](, 3 - )
@@ -180,6 +162,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     } 
   };
 
+	// [FUNCS] DETERMINING ELEMENT TYPES
   auto isBlockType = [](const std::string& string)
   {
     // is keyword
@@ -188,7 +171,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
         { "hint:", HINT },
         { "choice:", CHOICE },
         { "multichoice:", MULTICHOICE },
-        { "input:", INPUT }
+        { "input:", INPUT },
+    	  { "script:", SCRIPT }
     };
     if (const auto it{ stringToBlockType.find(string) }; it != std::end(stringToBlockType)) {
       return it->second;
@@ -196,7 +180,6 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     // is anything else
     return NOT_BLOCK;
   };
-
   auto isSingleLineType = [](const std::string& string)
   {
     // is keyword
@@ -205,7 +188,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
         { "hint:", HINT_SINGLE },
         { "x:", CORRECT_ANSWER },
         { "o:", WRONG_ANSWER },
-        { "answers:", ANSWER_LIST }
+        { "answers:", ANSWER_LIST },
+    	  { "script:", SCRIPT_SIGNLE }
     };
     if (const auto it{ stringToSingleLineType.find(string) }; it != std::end(stringToSingleLineType)) {
       return it->second;
@@ -222,6 +206,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   //  }
   //};
 
+	// [FUNC] FILLING THE STEP CLASS WITH COMPLETED BLOCK ELEMENTS
   auto endCurrentBlock = [&]() -> void {
     switch (currentBlock) {
     case EXPLANATION:
@@ -233,13 +218,20 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     case HINT:
       createHint(steps[currentStep], textStore);
       break;
+		case SCRIPT:
+      addScript(steps[currentStep], textStore);
+    	break;
+		case NOT_BLOCK:
+      //Log::debug("Ending block when NOT_BLOCK");
+      break;
     default:
-      LOG_INFO("Creation of " + std::to_string(currentBlock) + " not implemented yet");
+      Log::info("Creation of " + std::to_string(currentBlock) + " not implemented yet");
     }
     
     currentBlock = NOT_BLOCK;
   };
 
+	// [FUNC] INITIATING BLOCK ELEMENTS
   auto beginBlock = [&](blockType_t blockType) -> void {
     // drop current block if any (safety check)
     if (currentBlock) {
@@ -252,8 +244,10 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     vectorOfTextsStore.clear();
     numberStore = -1;
     vectorOfNumsStore.clear();
+  	currentBlockIndent = -1;
   };
 
+	// [FUNC] FILLING THE STEP CLASS WITH SINGLE-LINE ELEMENTS
   auto handleSingleLine = [&](singleLineType_t type, const std::string& content) -> void {
     // check also for current state, and show error when calling singlelines which do not match
     // nektere pripady ponechavaji state, jine ho musi resetovat!
@@ -270,14 +264,19 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       endCurrentBlock();
       createHint(steps[currentStep], content);
       break;
+    case SCRIPT_SIGNLE:
+      endCurrentBlock();
+      addScript(steps[currentStep], content);
     default:
-      LOG_INFO("Creation of " + std::to_string(type) + " not implemented yet");
+      Log::info("Creation of " + std::to_string(type) + " not implemented yet");
     }
   };
+  // -------------------------------------------------------
 
   // READ LINES
   while (std::getline(tutorialStream, line).good()) {
-    // std::cout << "| " << line << std::endl; // todo logging using info
+  	lineNumber++;
+    Log::info("[{}] {}", lineNumber, line);
 
     // PROCESS LINE
     // make a stream again to be able to move through it
@@ -343,14 +342,22 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       if (!currentBlock) {
         beginBlock(EXPLANATION);
       }
-      // set this block's indent if this is the first line
+      // set this block's indent if this is the first line of it
       if (currentBlockIndent == -1) {
         currentBlockIndent = indent;
       }
-      // skip that many spaces
       // todo temporary
+    	// reset stream to start
+    	lineStream.clear();
       lineStream.seekg(0);
-      skipSpaces(lineStream, indent);
+      // skip at max that many spaces as was on the first line
+    	if (indent - currentBlockIndent >= 0) {
+				Log::info("blockIndent: {}, indent: {}, diff: {}", currentBlockIndent, indent, indent - currentBlockIndent);
+	      skipSpaces(lineStream, currentBlockIndent);
+    	}
+			else {
+    		Log::fatal("Unexpected block indent at line [{}] {}", lineNumber, line);
+			}
       // add to active block
       std::getline(lineStream, restOfLine);
       textStore += restOfLine;
@@ -368,16 +375,13 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 
   // CHECK if parsing ended because of error
   if (!tutorialStream.eof()) { 
-    LOG_ERROR("Tutorial file '" + header->m_filename + "' I/O error");
+    Log::fatal("Tutorial file '" + header->m_filename + "' I/O error");
   }
-
-
   
   // CREATE THE TUTORIAL
   std::shared_ptr<Tutorial> tutorial = std::make_shared<Tutorial>(std::move(header), std::move(steps), std::move(images)); // we create our tutorial object on heap
 
   return tutorial;
-  // OLD NOTE: this will automatically move the unique pointer, no need to worry 
 }
 
 //TutorialLoader::blockType_t TutorialLoader::isKeyword(const std::string& string)
@@ -470,6 +474,10 @@ std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TStep& step, const
   return step.m_content.emplace_back(std::make_shared<InputTask>(question, correctAnswers));
 }
 
+void TutorialLoader::addScript(TStep& step, const std::string& script)
+{
+  step.m_scriptToRunWhenShown += script;
+}
 
   /*
   // nicely fill it at that heap place ^^
@@ -490,25 +498,3 @@ std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TStep& step, const
   step2.m_content.push_back(std::make_unique<TWText>("juj"));
   step2.m_content.push_back(std::make_unique<TWText>("omg"));
   */
-
-// void TutorialLoader::loadImages()
-// {
-//   // todo for cyklus
-//
-// }
-//
-// unsigned int TutorialLoader::loadImageOpenGL(std::string& filename)
-// {
-//   // todo opengl image loading, zvazit co pouzit za knihovnu
-//
-//   // return pgr::createTexture(filename);
-//
-//   return 0;
-// }
-//
-//
-//
-// std::shared_ptr<Tutorial> TutorialLoader::getDummyTutorial(std::string message)
-// {
-//   
-// }

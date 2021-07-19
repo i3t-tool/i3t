@@ -50,7 +50,7 @@ void MainMenuBar::showFileMenu()
 	{
 		// printf("aha!\n");
 		// std::cout << "aha!" << std::endl;
-		fprintf(stdout, "aha\n");
+		//fprintf(stdout, "aha\n");
 
 		if (ImGui::MenuItem("New"))
 		{
