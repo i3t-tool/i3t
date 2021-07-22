@@ -1,12 +1,12 @@
 //saving
 int d0=datascalar(0.000f);
-int n0=scalar(d0,-390,-358,"Float");
-int n1=scalaroper(mul,-278,-352,"float * float");
+int n0=scalar(d0,144,-32,"Float");
+int n1=scalaroper(mul,256,-26,"float * float");
 int d2=datascalar(180.000f);
-int n2=scalar(d2,-278,-262,"Float");
+int n2=scalar(d2,256,64,"Float");
 int d3=datascalar(3.1426f);
-int n3=scalar(d3,-390,-278,"Float");
-int n4=scalaroper(div,-144,-342,"float / float");
+int n3=scalar(d3,144,48,"Float");
+int n4=scalaroper(div,390,-16,"float / float");
 confnode(n0,1,full);
 confnode(n2,0,full);
 confnode(n3,4,full);

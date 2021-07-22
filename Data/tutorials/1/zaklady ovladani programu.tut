@@ -98,12 +98,15 @@ A máme to!
 
 --
 
-V této lekci ses naučil o:
-  * workspace ![Workspace](workspace.png) a viewportu ![Scene Viewport](viewport.png)
+**Lekce splněna!**
+![](checkMark.png)
+
+Shrnutí:
+  * workspace ![Workspace](workspace.png) a viewport ![Scene Viewport](viewport.png)
   * ovládání myší ![levé tlačítko myši](mouseLeft.png) ![prostřední tlačítko myši](mouseMiddle.png) ![pravé tlačítko myši](mouseRight.png) a klávesami
-  * sekvencích, maticích transformací a operátorech
-  * možnostech změny hodnot matic
-  * třech typech spojení ![násobení matic](greenArrow.png) ![předání floatu](darkGreenArrow.png) ![předání matice](redArrow.png)
+  * sekvence, matice transformací a operátory
+  * možnosti změny hodnot matic
+  * tři typy spojení ![násobení matic](greenArrow.png) ![předání floatu](darkGreenArrow.png) ![předání matice](redArrow.png)
   * jejich zapojování a odpojování
 
 Klikni na Finish ![dole](down.png) pro návrat do úvodního okna.

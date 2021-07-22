@@ -129,11 +129,8 @@ void TutorialWindow::render()
   else {
     window_name = "Tutorial - empty###Tutorial window";
   }
-	static bool isFirstTimeOpen = true;
-	if (isFirstTimeOpen) {
-		ImGui::SetNextWindowSize(ImVec2(413,320));
-		isFirstTimeOpen = false;
-	}
+
+  ImGui::SetNextWindowSize(ImVec2(413,320), ImGuiCond_FirstUseEver);
   ImGui::Begin(window_name.c_str(), getShowPtr());
 
   // CREATE IMGUI CONTENT

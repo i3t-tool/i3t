@@ -73,15 +73,15 @@ void Viewport::render()
 
 		auto name = getName("Scene Viewport");
 
-		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar);
+		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags); // | ImGuiWindowFlags_MenuBar);
 		ImGui::PopStyleVar();
 
-		if (ImGui::BeginMenuBar())
-		{
-			showViewportsMenu();
+		//if (ImGui::BeginMenuBar())
+		//{
+		//	showViewportsMenu();
 
-			ImGui::EndMenuBar();
-		}
+		//	ImGui::EndMenuBar();
+		//}
 
 		// get positions of min max points of the window
 		ImVec2 newWcMin = ImGui::GetWindowContentRegionMin();
