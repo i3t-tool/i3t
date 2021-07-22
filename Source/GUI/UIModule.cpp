@@ -36,7 +36,7 @@ void UIModule::init()
 	m_dockableWindows.push_back(std::make_shared<IntroWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
-	m_dockableWindows.push_back(std::make_shared<Console>(true));
+	m_dockableWindows.push_back(std::make_shared<Console>(false));
 	m_dockableWindows.push_back(std::make_shared<LogWindow>());
 
 	m_dockableWindows.push_back(std::make_shared<StyleEditor>());

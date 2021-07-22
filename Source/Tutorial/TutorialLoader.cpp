@@ -110,7 +110,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   std::vector<TStep> steps;  // we will be filling this vector and then creating a tutorial with it
   steps.emplace_back();  // add the first step
   int currentStep = 0;
-  int currentBlockIndent = -1;
+  //int currentBlockIndent = -1;  // deprecated
   blockType_t currentBlock = NOT_BLOCK;
   std::string line;
   // temporaries for accumulating multiple line content:
@@ -203,7 +203,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     vectorOfTextsStore.clear();
     numberStore = -1;
     vectorOfNumsStore.clear();
-  	currentBlockIndent = -1;
+  	// currentBlockIndent = -1; // deprecated
   };
 
 	// [FUNC] FILLING THE STEP CLASS WITH SINGLE-LINE ELEMENTS
@@ -241,9 +241,9 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     // make a stream again to be able to move through it
     std::istringstream lineStream(line); 
     // skip spaces
-    skipSpaces(lineStream);  //NOTE: 
+    skipSpaces(lineStream);  
     // tell how much indentation did we skip
-    int indent = static_cast<int>(lineStream.tellg()); // todo use
+    int indent = static_cast<int>(lineStream.tellg()); 
     // save first word
     std::string firstWord;
     lineStream >> firstWord;
@@ -293,36 +293,32 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
         // todo show errors to creator
       }
     }
-    // handle other text
+    // handle plain text
     else {
       // no current block -> start explanation
       if (!currentBlock) {
         beginBlock(EXPLANATION);
       }
-      // set this block's indent if this is the first line of it
-      if (currentBlockIndent == -1) {
-        currentBlockIndent = indent;
-      }
-      // todo temporary
     	// reset stream to start
     	lineStream.clear();
       lineStream.seekg(0);
-      // skip at max that many spaces as was on the first line
-    	if (indent - currentBlockIndent >= 0) {
-				Log::info("blockIndent: {}, indent: {}, diff: {}", currentBlockIndent, indent, indent - currentBlockIndent);
-	      skipSpaces(lineStream, currentBlockIndent);
+      // block indentation - skip 2 spaces if not simple explanation
+    	if (currentBlock != EXPLANATION) {
+	      if (indent >= 2) {
+		      //Log::info("blockIndent: {}, indent: {}, diff: {}", currentBlockIndent, indent, indent - currentBlockIndent);
+		      skipSpaces(lineStream, 2);
+	      }
+	      else {
+		      Log::info("Unexpected block unindent at line [{}] {}", lineNumber, line);
+	      }
     	}
-			else {
-    		Log::fatal("Unexpected block indent at line [{}] {}", lineNumber, line);
-			}
       // add to active block
       std::getline(lineStream, restOfLine);
       textStore += restOfLine;
       textStore += '\n';
-      //addToCurrentBlock(line);
     }
   }
-	// bug fix todo - if there is a non-empty line just before EOF it wont get added (there has to be eg an empty line after it)
+	// bug fix todo - if there is a non-empty line just before EOF then it wont get added (there has to be eg an empty line after it)
   // FINISH UNFINISHED BLOCKS
 	if (currentBlock != NOT_BLOCK) {
 		endCurrentBlock();

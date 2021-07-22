@@ -1,118 +1,109 @@
 ---
 title: Začínáme s I3T
-description: V této lekci se seznámíš se základními funkcionalitami I3T.
-thumbnail: i3t.png
-scene: empty
+description: V této lekci se seznámíš se základními funkcionalitami a ovládáním I3T.
+thumbnail: cube.png
 language: cs
 ---
 
 Vítej, nový učedníku! 
+
 task:
-  Prohlédni si program, kromě tutoriálu bys vidět dvě okna:
+  Všimni si dvou důležitých oken:
     + Scene Viewport
     + Workspace
 
-Aktuální scénu budeme upravovat ve **workspace** a její 3D náhled z nezávislé kamery si budeme moci prohlížet ve __viewportu__.
+Ve workspace můžeme za pomoci bloků vytvářet scénu. Ve viewportu vidíme její 3D náhled z nezávislé kamery.
 
 --
 
-Takto například může scéna vypadat.
-You can add [links like this one to enkisoftware](https://www.enkisoftware.com/) and lines will wrap well.
-
--- 
-
-Začněme vytvořením krychle.
-
-Klikni *pravým* tlačítkem do wor
-
-Nyní si vyzkoušíme jednoduché manipulace s krychlí. 
-
-Začněme jednoduše...
+Začněme vytvořením pár základních bloků.
 
 task: 
-  Přidej do scény červenou krychli.
-  A ať je pořádná!
+  Kliknutím ![pravé tlačítko myši](mouseRight.png) přidej do workspace model, sequence a transformation->translation
+  ![Model, sekvence a matice translace](addStuff.png)
+
+--
+
+Ještě než se vrhneme na bloky...
+
+task:  
+  Vyzkoušej si:
+    * tažení ![pravé tlačítko myši](mouseRight.png) a ![prostřední tlačítko myši](mouseMiddle.png) ve viewportu
+    * tažení ![pravé tlačítko myši](mouseRight.png) a ![levé tlačítko myši](mouseLeft.png) ve workspace
+    * kolečko myši
+    * šipky na klávesnici ve viewportu
+
+--
+
+Začněme spojovat!
+
+task:  Zkus přijít na to, jak s těmito bloky posunout krychli nahoru ![nahoru](up.png)
+hint:  ![Zapojení bloků](hintPosun.png)
+
+--
+
+Všimni si, že hodnoty v matici můžeme měnit různými způsoby - tažením ![levé tlačítko myši](mouseLeft.png), dvojklikem ![levé tlačítko myši](mouseLeft.png), nebo z výběru po kliknutí ![pravé tlačítko myši](mouseRight.png). V neposlední řadě můžeme použít 3D manipulátory ve viewportu - ty se zobrazí po označení dané matice kliknutím.
+
+task:  Posuň krychli pomocí manipulátorů a pozoruj matici
+task:  Poté zarovnej krychli tak, aby seděla přesně na zemi
 hint: 
-  Pravým tlačítkem klikni do workspace a zvol Object -> Red cube
-  ![Přidání krychle](test.png)
+  Pro zobrazení manipulátorů klikni na okraj matice. 
+  Pro zarovnání dvakrát klikni na prostřední hodnotu a vepiš 1.00, což je půlka hrany krychle.
 
 --
 
-Tato krychle bude naším základem sněhuláka. Budeme chtít mít možnost s ní individuálně hýbat.
+Základem pro transformaci modelů je blok sekvence a spojení typu ![násobení matic](greenArrow.png), které značí násobení maticemi. Sekvence můžeme tímto spojením násobit i mezi sebou. 
 
-task: Přidej nový blok na matice, pojmenuj ho "nohy" a napoj ho na krychli.
+Násobení více matic však nejjednoduššeji provedeme přímo uvnitř sekvence.
 
-hint: Pravým tlačítkem klikni do workspace a zvol Block of matrices. Přejmenuješ ho kliknutím na nadpis. Zapojíš ho přetažením myši od výstupního Matrix X k X u objektu krychle.
-
---
-
-Uválejme je a postavme na zem! Budeme na to používat dvě matice transformací:
-  * Matice změny měřítka vynásobí všechny souřadnice vrcholů danými hodnotami
-  * Matice translace "přičte" ke všem souřadnicím vrcholů dané hodnoty
-
-Skládání (násobení) matic provádíme v pořadí zprava doleva:
-![Postup násobení](poradi.png)
+task:  Zkus do sekvence přidat matici rotace kolem osy Y a krychli pootočit
+hint: 
+  ![klikni pravým](hintRotace.png)
+  ![sekvence s translací a rotací](sequence.png)
 
 --
 
-task:
-  * Změň měřítko "nohou" na trojnásobnou velikost. 
-  * Přidej matici translace a posuň ho tak, aby spodní stěna ležela na úrovni y=0. 
+Představme si, že model potřebujeme pootočit přesně o 82 stupňů. To se blbě odhaduje. 
 
-hint:
-  + Pravým tlačítkem klikni do workspace a zvol Transformations -> Scale -> Uniform scale. 
-  + Vytvořenou matici přetáhni myší do našeho bloku matic. 
-  + Zvětšením čísel na diagonále matice na 3 bys měl pozorovat zvětšení krychle. 
-  + Obdobným způsobem přidej matici Translate.
-  + Přetáhni ji NALEVO od matice Scale, abys posunutí vrcholů krychle uskutečnil až PO jejich přeškálování.
-  + Nastav posunutí v ose y na 1,5 (tedy polovinu výšky přeškálované krychle).
+Na to můžeme využít tzv. operátory a spojení typu ![předání floatu](darkGreenArrow.png) (předání floatu) a ![předání matice](redArrow.png) (předání matice).
 
---
+task:  Přesuň obě matice ze sekvence
+task:  Označ je a klávesou Delete smaž
+task:  Vytvoř operátor transformace rotace okolo Y a pošli jeho výstup ![předání matice](redArrow.png) do sekvence
+hint:  
+  ![přidání operátoru matice rotace](operatorAdd.png)
+  ![operátor matice rotace](operator.png)
 
-Možná tě již napadlo, co by se stalo, kdyby se matice prohodily? Dalo by se s nimi dosáhnut stejného výsledku?
-
-task: 
-  Vzpomeň si, co dělají se souřadnicemi vrcholů jednotlivé transformace, a zkus dostat krychli do stejné polohy, když budou matice přehozené.
-
-hint:
-  Matice přehoď přetažením myší. Kostka poskočí nahoru. To je dané tím, že y souřadnice vrcholů vynásobíme třemi až po tom, co je zvětšíme o 1,5. Naše výsledné posunutí tedy najednou bude o 1,5 x 3, což je 4,5. Pokud chceš v tomto případě dosáhnout posunutí o 1,5, je třeba posunout jen o 0,5, jelikož 0,5 x 3 nám dá chtěných 1,5.
+Všimni si, že blok sekvence v tomto případě slouží pouze jako prostředník k vynásobení modelu maticí.
 
 --
 
-Když již víme, jak kostky umisťovat i zvětšovat. Pokračujme ve sněhulákovi. 
+task:  
+  Vytvoř operátor floatu, předej ho operátoru rotace a zkus s ním hýbat
+  ![zapojení](floatOp.png)
 
-task:
-  + Stejným způsobem přidej kostku zelenou a vytvoř pro ni blok transformací s názvem „střed“. 
-  + Zvětši ji 2x a posuň ji tak, aby stála na kostce červené.
-
-hint:
-  Postupujme v pořadí nejprve zvětšení, a poté posunutí (zprava doleva). 
-    * V matici Scale nastav hodnoty na 2 - strana kostky tedy bude velká dva.
-    * Červená kostka končí ve výšce tři, zelenou kostku budeme tedy posouvat po ose y minimálně o tři. 
-    * Kostka má však původně střed v nule, a tak je třeba posunout jí ještě o polovinu její výšky, tedy o jedna. 
-    * Nastav tedy v matici Translate hodnotu u osy y na 4. 
-  Kostky by měly hezky stát na sobě.
+Skvěle, nyní můžeme lépe otáčet s modelem! Jak si ale můžeš všimnout, zadávání není ve stupních, ale v radiánech...
 
 --
 
-Blížíme se do finále…
+Napravme to jednoduchým převodem! Ve workspace by se ti měly objevit nové bloky, pokud je nevidíš, oddal si zobrazení.
 
-task:
-  Jako hlavu přidej kostku modrou a postav ji na kostku zelenou. Její blok transformací pojmenuj „hlava“. Velikost ponechej původní.
+script: append("Data/tutorials/1/degreesToRadians.c");
 
-hint:
-  Tentokráte můžeme vynechat matici Scale. Ničemu ale nevadí, pokud ji opět použijeme a ponecháme hodnoty na 1. Posunutí v matici Translate spočteme jako výška červené + výška zelené + půlka výšky modré, tedy 3 + 2 + 0,5 = 5,5.
+task: Posuň a napoj vložené bloky místo původního float operátoru (předchozí spojení můžeš zrušit označením ![levé tlačítko myši](mouseLeft.png) a klávesou Delete nebo napojením nového)
+task: Nastav úhel na 82 stupňů
+hint: ![výsledek](result.png)
 
---
-
-A máme sněhuláka! Hotovi však ještě nejsme – představte si situaci, kdy bychom chtěli sněhuláka uchopit jako jeden objekt a celého ho někam přesunout, zvětšit, či pootočit. Měnit jednotlivé transformace by bylo zdlouhavé, můžeme to však udělat mnohem jednodušeji – přinásobit ke všem částem další matice transformace.
-
-task:
-  Vlevo ve workspace si vytvoř nový blok matic, pojmenuj ho „sněhulák“ a napoj jeho výstup na vstupy všech našich bloků. Zkus pak zmenšit celého sněhuláka na poloviční velikost a posunout ho na pozici x=3 a z=5.
-
-hint:
-  Pro spojení bloků přetáhni myší od nápisu Matrix X k nápisu X Matrix u bloků jednotlivých částí. Poté stačí už jen do bloku „sněhulák“ přidat matici Scale nastavenou na 0,5 a následně matici Translate s hodnotami 3, 0 a 5. Matice bloků se pronásobí mezi sebou, a jednotlivé vrcholy kostek tak na závěr projdou i těmito transformacemi. Když pak vememe například červenou kostku, můžeme si představit, že je postupně: zvětšena 3x -> posunuta po ose y o 1,5 -> zmenšena na 0,5x -> posunuta po ose x o 3 a po ose z o 5. 
+A máme to!
 
 --
 
-A je to! Během tutoriálu jsme prošli, jak vytvářet a naplňovat bloky matic, a jak je propojovat mezi sebou tak, abychom dosáhli požadovaných transformací. Pokud chceš, můžeš si na závěr vyzkoušet se sněhulákem zatočit a sledovat, jaký má rotace efekt, podle toho, jestli se umístí před posunutí, anebo za posunutí.
+V této lekci ses naučil o:
+  * workspace ![Workspace](workspace.png) a viewportu ![Scene Viewport](viewport.png)
+  * ovládání myší ![levé tlačítko myši](mouseLeft.png) ![prostřední tlačítko myši](mouseMiddle.png) ![pravé tlačítko myši](mouseRight.png) a klávesami
+  * sekvencích, maticích transformací a operátorech
+  * možnostech změny hodnot matic
+  * třech typech spojení ![násobení matic](greenArrow.png) ![předání floatu](darkGreenArrow.png) ![předání matice](redArrow.png)
+  * jejich zapojování a odpojování
+
+Klikni na Finish ![dole](down.png) pro návrat do úvodního okna.

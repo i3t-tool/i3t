@@ -481,6 +481,7 @@ inline void RenderLine( const char* markdown_, Line& line_, TextRegion& textRegi
 	{ 
 		indentStart = 1; 
 	}
+  // todo zvazit ordered list indent
 	for( int j = indentStart; j < line_.leadSpaceCount / 2; ++j )    // add indents
 	{
 		ImGui::Indent();
@@ -671,7 +672,7 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
 				link.url.stop             = i;
 				line.isUnorderedListStart = false; // the following text shouldn't have bullets
 				line.isOrderedListStart = false; // the following text shouldn't have numbering
-				ImGui::SameLine( 0.0f, 0.0f );
+				ImGui::SameLine( 0.0f, 0.0f );  // need this here to also reset cursor to current place (probably)
 				if( link.isImage )   // it's an image, render it.
 				{
 					bool drawnImage      = false;
@@ -682,6 +683,10 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
 						useLinkCallback = imageData.useLinkCallback;
 						if( imageData.isValid )
 						{
+							//// CUSTOM CODE avoiding sameline when the picture doesnt fit and there was a text before it todo nepovedlo se - zmensuje to misto toho obrazek na novem radku
+							//if (imageData.size.x + ImGui::GetStyle().ItemSpacing.x > ImGui::GetContentRegionAvail().x) {
+							//	ImGui::NewLine();
+							//}
 							ImGui::Image( imageData.user_texture_id, imageData.size, imageData.uv0, imageData.uv1, imageData.tint_col, imageData.border_col );
 							drawnImage = true;
 						}
@@ -706,7 +711,7 @@ inline void Markdown( const char* markdown_, size_t markdownLength_, const Markd
 				{
 					textRegion.RenderLinkTextWrapped( markdown_ + link.text.start, markdown_ + link.text.start + link.text.size(), link, markdown_, mdConfig_, &linkHoverStart, false );
 				}
-				ImGui::SameLine( 0.0f, 0.0f );
+				ImGui::SameLine( 0.0f, 2.0f);
 				// reset the link by reinitializing it
 				link                    = Link();
 				line.lastRenderPosition = i;
@@ -954,13 +959,14 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 			else
 			{
 				// strong emphasis
-				fmt = markdownFormatInfo_.config->headingFormats[ MarkdownConfig::NUMHEADINGS - 1 ];
+				fmt = markdownFormatInfo_.config->headingFormats[0];
 				if( start_ )
 				{
 					if( fmt.font )
 					{
 						ImGui::PushFont( fmt.font );
 					}
+					ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
 				}
 				else
 				{
@@ -968,6 +974,7 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 					{
 						ImGui::PopFont();
 					}
+					ImGui::PopStyleColor();
 				}
 			}
 			break;

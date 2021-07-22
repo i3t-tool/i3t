@@ -38,83 +38,27 @@ const int SIMPLE_SPACE = 10;
 const int SMALL_SPACE = 5;
 const int CONTROLS_SIZE_Y = 100;
 
-// TEMPORARY TODO
-std::shared_ptr<Tutorial> TutorialWindow::m_tutorial;
-inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
-{
-  std::string imageFilename(data_.link, data_.linkLength);
-
-  // try to find the texture, if it isnt loaded, then load it
-  std::shared_ptr<GUIImage> img = nullptr;
-
-  if (m_tutorial != nullptr) {
-  	// image already loaded
-    if ( m_tutorial->m_filenameToImage.contains(imageFilename)) {
-      img = m_tutorial->m_filenameToImage[imageFilename];
-    }
-  	// image not yet loaded
-		else {
-			Log::info("Loading image " + imageFilename);
-      img = TutorialLoader::loadImage(TutorialLoader::getDirectory(m_tutorial->m_header->m_filename) + imageFilename);
-			m_tutorial->m_filenameToImage[imageFilename] = img; // save for future use
-    }
-  }
-  else {
-    Log::fatal("Tutorial is nullptr");
-  }
-  
-  ImGui::MarkdownImageData imageData;
-	// nullptr check (todo possibly use a dummy image)
-	if (img != nullptr) {
-		imageData = { true, false, (ImTextureID)img->m_texID, ImVec2(img->m_width, img->m_height)};
-	}
-	else {
-		imageData = { false, false, nullptr, ImVec2( 10.0f, 10.0f ) };
-	}
-
-  // For image resize when available size.x > image width, add
-  ImVec2 const contentSize = ImGui::GetContentRegionAvail();
-  if( imageData.size.x > contentSize.x )
-  {
-    float const ratio = imageData.size.y/imageData.size.x;
-    imageData.size.x = contentSize.x;
-    imageData.size.y = contentSize.x*ratio;
-  }
-
-  return imageData;
-}
-
 // TUTORIAL WINDOW FUNCTIONS
 //---
 
+// INIT
 TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 {
   m_tutorial = nullptr;
   m_current_step = 0;
 
   SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
-	  setTutorial(std::move(tutorial));
+	  setTutorial(std::move(tutorial));  // COMMAND
   });
-
-  //// TEMPORARY todo
-  //std::shared_ptr<TutorialHeader> dummy_header = std::make_shared<TutorialHeader>("none");
-  //setTutorial(dummy_header);
 }
 
 void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 {
-  m_mdConfig = ImGui::MarkdownConfig{nullptr, ImGui::defaultMarkdownTooltipCallback, ImageCallback, "link", { { Application::get().getUI()->getTheme().get(EFont::Button), true }, { nullptr, true }, { nullptr, false } }, nullptr };
-	// temporarily moved here from constructor since exception at font loading
+	// MARKDOWN CONFIG - (temporarily?) moved here from constructor since exception at font loading
+  m_mdConfig = ImGui::MarkdownConfig{nullptr, ImGui::defaultMarkdownTooltipCallback, ImageCallback, "link", { { Application::get().getUI()->getTheme().get(EFont::TaskTitle), true }, { nullptr, true }, { nullptr, false } }, nullptr };
 	
-  m_tutorial = std::move(tutorial);
-	// btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
+  m_tutorial = std::move(tutorial);  // btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
 	setStep(0);
-
-	// todo make a utility function for this
-  //std::cout << m_tutorial->m_header->m_filename;
-  //std::filesystem::path p(m_tutorial->m_header->m_filename);
-  //m_current_dir = p.parent_path().string() + "/";
-  //std::cout << m_current_dir;
 }
 
 void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader>& header)
@@ -185,7 +129,11 @@ void TutorialWindow::render()
   else {
     window_name = "Tutorial - empty###Tutorial window";
   }
-  ImGui::SetNextWindowSize(ImVec2(400,320));
+	static bool isFirstTimeOpen = true;
+	if (isFirstTimeOpen) {
+		ImGui::SetNextWindowSize(ImVec2(413,320));
+		isFirstTimeOpen = false;
+	}
   ImGui::Begin(window_name.c_str(), getShowPtr());
 
   // CREATE IMGUI CONTENT
@@ -223,7 +171,7 @@ void TutorialWindow::renderTutorialHeader()
   	ImGui::PopStyleColor();
   }
   // vertical spacing after title
-  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
+  ImGui::Dummy(ImVec2(0.0f, 2*SIMPLE_SPACE)); 
   //ImGui::EndChild();
 }
 
@@ -340,6 +288,7 @@ void TutorialWindow::renderTutorialControls()
 void TutorialWindow::renderExplanation(Explanation* explanation)
 {
   ImGui::Markdown( explanation->m_content.c_str(), explanation->m_content.length(), m_mdConfig);
+	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
 }
 
 void TutorialWindow::renderChoiceTask(ChoiceTask* choice)
@@ -356,8 +305,6 @@ void TutorialWindow::renderInputTask(InputTask* input)
 
 void TutorialWindow::renderTask(Task* task)
 {
-  ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
-
 	// pokus o jine pozadi
 	//ImVec2 cursorPos = ImGui::GetCursorScreenPos();
   //float bgSizeY = ImGui::CalcTextSize(task->m_content.c_str()).y;
@@ -448,5 +395,53 @@ void TutorialWindow::renderHint(Hint* hint)
 	//else {
 	//	ImGui::Text("closed");
 	//}
+	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE)); 
+}
+
+
+// TODO (later when moving from imgui markdown to a custom solution) - make it not static again
+std::shared_ptr<Tutorial> TutorialWindow::m_tutorial;
+inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
+{
+  std::string imageFilename(data_.link, data_.linkLength);
+
+  // try to find the texture, if it isnt loaded, then load it
+  std::shared_ptr<GUIImage> img = nullptr;
+
+  if (m_tutorial != nullptr) {
+  	// image already loaded
+    if ( m_tutorial->m_filenameToImage.contains(imageFilename)) {
+      img = m_tutorial->m_filenameToImage[imageFilename];
+    }
+  	// image not yet loaded
+		else {
+			Log::info("Loading image " + imageFilename);
+      img = TutorialLoader::loadImage(TutorialLoader::getDirectory(m_tutorial->m_header->m_filename) + imageFilename);
+			m_tutorial->m_filenameToImage[imageFilename] = img; // save for future use
+    }
+  }
+  else {
+    Log::fatal("Tutorial is nullptr");
+  }
+  
+  ImGui::MarkdownImageData imageData;
+	// nullptr check (todo possibly use a dummy image)
+	if (img != nullptr) {
+		imageData = { true, false, (ImTextureID)img->m_texID, ImVec2(img->m_width, img->m_height)};
+	}
+	else {
+		imageData = { false, false, nullptr, ImVec2( 10.0f, 10.0f ) };
+	}
+
+  // For image resize when available size.x > image width, add
+  ImVec2 const contentSize = ImGui::GetContentRegionAvail();
+  if( imageData.size.x > contentSize.x )
+  {
+    float const ratio = imageData.size.y/imageData.size.x;
+    imageData.size.x = contentSize.x;
+    imageData.size.y = contentSize.x*ratio;
+  }
+
+  return imageData;
 }
 
