@@ -282,14 +282,18 @@ typedef void MarkdownTooltipCallback( MarkdownTooltipCallbackData data );
 
 inline void defaultMarkdownTooltipCallback( MarkdownTooltipCallbackData data_ )
 {
+	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_WHITE);
 	if( data_.linkData.isImage )
 	{
-		ImGui::SetTooltip( "%.*s", data_.linkData.linkLength, data_.linkData.link );
+		if(data_.linkData.textLength > 0) {
+			ImGui::SetTooltip( "%.*s", data_.linkData.textLength, data_.linkData.text );
+		}
 	}
 	else
 	{
 		ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon, data_.linkData.linkLength, data_.linkData.link );
 	}
+	ImGui::PopStyleColor();
 }
 
 typedef MarkdownImageData MarkdownImageCallback( MarkdownLinkCallbackData data );

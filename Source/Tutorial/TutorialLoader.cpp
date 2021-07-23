@@ -184,7 +184,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       //Log::debug("Ending block when NOT_BLOCK");
       break;
     default:
-      Log::info("Creation of " + std::to_string(currentBlock) + " not implemented yet");
+      Log::info("Creation of tutorial block element " + std::to_string(currentBlock) + " not implemented yet");
     }
     
     currentBlock = NOT_BLOCK;
@@ -226,8 +226,9 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
     case SCRIPT_SIGNLE:
       endCurrentBlock();
       addScript(steps[currentStep], content);
+    	break;
     default:
-      Log::info("Creation of " + std::to_string(type) + " not implemented yet");
+      Log::info("Creation of single-line tutorial element " + std::to_string(type) + " not implemented yet");
     }
   };
   // -------------------------------------------------------
@@ -235,7 +236,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
   // READ LINES
   while (std::getline(tutorialStream, line).good()) {
   	lineNumber++;
-    Log::info("[{}] {}", lineNumber, line);
+    //Log::info("[{}] {}", lineNumber, line);
 
     // PROCESS LINE
     // make a stream again to be able to move through it

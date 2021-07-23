@@ -124,13 +124,15 @@ void TutorialWindow::render()
   // BEGIN WINDOW
   std::string window_name;
   if (m_tutorial != nullptr) {
-    window_name = "Tutorial - " + m_tutorial->m_header->m_title + "###Tutorial window";
+    //window_name = "Tutorial - " + m_tutorial->m_header->m_title + "###Tutorial window";
+    window_name = "Tutorial";
   }
   else {
-    window_name = "Tutorial - empty###Tutorial window";
+    //window_name = "Tutorial - empty###Tutorial window";
+    window_name = "Tutorial";
   }
 
-  ImGui::SetNextWindowSize(ImVec2(413,320), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(400,620), ImGuiCond_FirstUseEver);
   ImGui::Begin(window_name.c_str(), getShowPtr());
 
   // CREATE IMGUI CONTENT
@@ -236,7 +238,7 @@ void TutorialWindow::renderTutorialControls()
 		// BUTTONS
 		// Back button
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ]);
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 		if (m_current_step != 0) {
 			if (ImGui::Button("< Back", ImVec2(40, 0)))
@@ -253,7 +255,7 @@ void TutorialWindow::renderTutorialControls()
 		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
 		// Next button
 		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
+		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
 		if (m_current_step < m_tutorial->getStepCount() - 1) {
 			if (ImGui::Button("Next", ImVec2(-1, 0)))
 			{
@@ -324,7 +326,7 @@ void TutorialWindow::renderTask(Task* task)
   float       size      = ImGui::GetFontSize() - ImGui::GetStyle().FramePadding.y * 2.0; // zde velikost potrebujeme
   ImVec2      drawPos = ImGui::GetCursorScreenPos() + ImVec2(0, ImGui::GetStyle().FramePadding.y);
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
-  draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + size, drawPos.y + size), IM_COL32(8, 187, 230, 255));
+  draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + size, drawPos.y + size), IM_COL32(14, 98, 175, 255));
 	ImGui::Dummy(ImVec2(size, size));
 	ImGui::SameLine();
 	
