@@ -12,7 +12,7 @@ TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 	auto translationNode = Builder::createTransform<Translation>();
 
 	// Invalid coordinates.
-	auto result = translationNode->setValue(-2.0f, {0, 3});
+	auto result = translationNode->setValue(generateFloat(), {0, 3});
 
 	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
 	EXPECT_EQ(ETransformState::Valid, translationNode->isValid());
