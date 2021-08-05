@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+#include "glm/gtx/matrix_interpolation.hpp"
 
 #include "Core/Defs.h"
 
@@ -64,6 +65,19 @@ static glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float alpha)
 	glm::vec3 inter = a * (1.0f - alpha);
 	inter = inter + b * alpha;
 	return inter;
+}
+
+FORCE_INLINE glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false)
+{
+	if (!useQuat)
+	{
+		return glm::interpolate(lhs, rhs, alpha);
+	}
+	auto q1 = glm::quat_cast(lhs);
+	auto q2 = glm::quat_cast(rhs);
+	auto result = glm::mix(q1, q2, alpha);
+
+	return glm::mat4_cast(result);
 }
 
 /**

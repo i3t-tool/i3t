@@ -16,6 +16,15 @@ FORCE_INLINE bool isTransform(NodePtr& node)
 	return it != g_transforms.end();
 }
 
+template <typename Node>
+FORCE_INLINE bool isRot(Node&& node)
+{
+	static_assert(std::is_base_of_v<NodeBase, Node>);
+
+	auto& type = node->getOperation()->keyWord;
+	return type == "EulerX" || type == "EulerY" || type == "EulerZ" || type == "AxisAngle";
+}
+
 enum class ETransformState
 {
 	Invalid = 0,

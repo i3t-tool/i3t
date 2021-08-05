@@ -355,7 +355,7 @@ void MatrixTracker::track()
 		// Empty sequence cannot be tracked.
 		return;
 	}
-	// Iterator now points on the sequences root.
+	// Iterator now points to the sequences root.
 
 	float matFactor    = 1.0f / (float) matricesCount;
 	int matricesBefore = (int) (m_param * (float) matricesCount);
@@ -390,8 +390,7 @@ void MatrixTracker::track()
 			--it;
 
 			rhs = (*it)->getData().getMat4();
-			// \todo MH interpolate rotations with quat.
-			result = result * glm::interpolate(lhs, rhs, interpParam);
+			result = result * Math::lerp(lhs, rhs, interpParam, isRot(*it));
 		}
 	}
 	else
@@ -409,8 +408,7 @@ void MatrixTracker::track()
 		}
 		//++it;
 		rhs = (*it)->getData().getMat4();
-		// \todo MH interpolate rotations with quat.
-		auto mat = glm::interpolate(lhs, rhs, 1.0f - interpParam);
+		auto mat = Math::lerp(lhs, rhs, 1.0f - interpParam, isRot(*it));
 		result = mat * result;
 	}
 
