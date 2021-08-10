@@ -1,4 +1,5 @@
 #pragma once
+
 #include "WorkspaceNodeWithCoreData.h"
 
 struct WorkspaceFloatArgs

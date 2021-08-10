@@ -81,7 +81,6 @@ void WorkspaceNode::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, 
 
 void WorkspaceNode::drawHeader(util::NodeBuilder& builder)
 {
-
 	Theme& t = I3T::getTheme();
 	m_color	 = t.getHeader();
 	builder.Header(m_color);

@@ -60,6 +60,10 @@ enum class EColor
 	InnerMatrixMulPin,
 	InnerScreenPin,
 
+	// Sequence
+	NodeBgSequence,
+	NodeHeaderSequence,
+
 	// 3. Operator
 	NodeBgOperator,
 	NodeHeaderOperator,
@@ -73,6 +77,8 @@ enum class EColor
 	FloatBgTransformation,
 	FloatBgTransformationActive,
 	FloatBgTransformationHovered,
+
+	Nodes_Font,
 
 	// 5. Popups
 	Nodes_ConnectionPossible,
@@ -205,7 +211,14 @@ public:
 	void initFonts();
 
 private:
+	/**
+	 * Style based on Folta/Zadina style.
+	 */
 	void initClassicProperties();
+
+	/**
+	 * Style based on Pilka design.
+	 */
 	void initModernProperties();
 
 public:

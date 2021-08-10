@@ -84,7 +84,11 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
 	ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar);
+
+	ImGui::PopStyleVar();
 
 	if (ImGui::BeginMenuBar())
 	{

@@ -105,6 +105,10 @@ void Theme::initClassicProperties()
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
 
 
+	// Sequence
+	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
+	set(EColor::NodeHeaderSequence, ImVec4(0.431f, 0.431f, 0.431f, 1.0f));
+
 	// Folta operator color set
 	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
 	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
@@ -196,15 +200,15 @@ void Theme::initModernProperties()
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 
 	// Node Editor
-	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.00f));
-	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+	set(EColor::Nodes_FloatText, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+	set(EColor::NodeEditorBg, ImVec4(0.298f, 0.298f, 0.298f, 1.00f));
 	set(EColor::Nodes_ConnectionPossible, createColor(0, 255, 0, 255));
 	set(EColor::Nodes_ConnectionNotPossible, createColor(255, 0, 0, 255));
 	set(EColor::Nodes_CreateNode, createColor(32, 45, 32, 180));
 
 	set(EColor::Builder_NodePadding, ImVec4(0, 0, 0, 0));
 
-	//pin colors
+	// Pin colors
 	set(EColor::PulsePin, createColor(164, 58, 190, 255));
 	set(EColor::FloatPin, createColor(58, 144, 66, 255));
 	set(EColor::MatrixPin, createColor(178, 71, 66, 255));
@@ -214,7 +218,7 @@ void Theme::initModernProperties()
 	set(EColor::ScreenPin, createColor(51, 150, 215, 255));
 	set(EColor::MatrixMulPin, createColor(68, 201, 156, 255));
 
-	//pin inner colors
+	// Pin inner colors
 	set(EColor::InnerPulsePin, createColor(255, 255, 255, 255));
 	set(EColor::InnerFloatPin, createColor(255, 255, 255, 255));
 	set(EColor::InnerMatrixPin, createColor(255, 255, 255, 255));
@@ -225,17 +229,21 @@ void Theme::initModernProperties()
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
 
 
-	// Folta operator color set
-	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
+	// Sequence
+	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
+	set(EColor::NodeHeaderSequence, ImVec4(0.431f, 0.431f, 0.431f, 1.0f));
+
+	// Operator
+	set(EColor::NodeBgOperator, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
 	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgOperator, ImVec4(77.0f / 255.0f, 85.0f / 255.0f, 106.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperator, createColor(255, 255, 255, 255));
 	set(EColor::FloatBgOperatorActive, ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgOperatorHovered, ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 
-	// Folta transformation color set
-	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
-	set(EColor::NodeHeaderTranformation, ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgTransformation, ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
+	// Transform
+	set(EColor::NodeBgTransformation, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
+	set(EColor::NodeHeaderTranformation, ImVec4(0.698f, 0.498f, 0.0f, 1.00f));
+	set(EColor::FloatBgTransformation, createColor(255, 255, 255, 255));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
@@ -454,8 +462,9 @@ void Theme::apply()
 	nodesStyle.NodeRounding																					 = m_sizes[ESize::Nodes_Rounding];
 	nodesStyle.NodeBorderWidth																			 = m_sizes[ESize::Nodes_BorderWidth];
 	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
-	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg]		 = m_colors[EColor::NodeEditorBg];
 
+	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg]		 = m_colors[EColor::NodeEditorBg];
+	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Grid]   = m_colors[EColor::NodeEditorBg];
 	//---------------------------------------------------------------------------------------
 }
 
@@ -490,6 +499,7 @@ void Theme::operatorColorTheme()
 
 void Theme::transformationColorTheme()
 {
+	/// \todo MH, SS!
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
 			m_colors[EColor::NodeBgTransformation];
 
@@ -508,6 +518,7 @@ bool isVectorsEqual(ImVec4 a, ImVec4 b)
 
 ImVec4 Theme::getHeader()
 {
+	/// \todo MH, SS!
 	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
 										 m_colors[EColor::NodeBgOperator]))
 	{
