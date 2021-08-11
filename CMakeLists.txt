@@ -257,5 +257,7 @@ set_target_properties(assimp PROPERTIES
 if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Data" "${I3T_OUT_DIR}Data")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/config.yml" "${I3T_OUT_DIR}config.yml")
 endif()
 # =============================================================

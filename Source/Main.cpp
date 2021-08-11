@@ -133,12 +133,10 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
 int main(int argc, char* argv[])
 {
 #ifdef I3T_RELEASE_STANDALONE // variant for standalone release
-	std::string root = "";
+	Config::WORKING_DIRECTORY = "";
 #else // special settings for usage in Visual Studio devenv
-  auto root = I3T_PROJECT_ROOT;
+	Config::WORKING_DIRECTORY = I3T_PROJECT_ROOT;
 #endif
-
-	Config::WORKING_DIRECTORY = root;
 
 	// init the logging library
 	INIT_LOGGER(argc, argv);
