@@ -1,4 +1,4 @@
-#include "IntroWindow.h"
+#include "StartWindow.h"
 
 #include <filesystem>
 
@@ -18,7 +18,7 @@
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"
 
-IntroWindow::IntroWindow(bool show) : IWindow(show)
+StartWindow::StartWindow(bool show) : IWindow(show)
 {
   // load images
   try {
@@ -48,17 +48,20 @@ IntroWindow::IntroWindow(bool show) : IWindow(show)
   reloadTutorials();
 }
 
-void IntroWindow::reloadTutorials()
+void StartWindow::reloadTutorials()
 {
   // preload all tutorials located in TUTORIALS_FOLDER recursively
-  auto path = std::filesystem::path(Config::getAbsolutePath(Config::TUTORIALS_FOLDER));
-  path.make_preferred(); // unifies the directory separator for this platform
-  LOG_INFO("Searching for tutorials in: " + path.string())
+  std::string path = Config::getAbsolutePath(Config::TUTORIALS_FOLDER);
+	if (path[0] == '/') {
+		path.erase(0, 1);
+	}
+  //path.make_preferred(); // unifies the directory separator for this platform
+  Log::info("Searching for tutorials in: " + path);
   auto dir_iterator = std::filesystem::recursive_directory_iterator(path);
   for (auto& entry : dir_iterator) {
     if (entry.path().extension() == ".tut") {
       std::string pathString = entry.path().string();
-      LOG_DEBUG(pathString)
+      Log::info(pathString);
     	// Load header part of tutorial
       if (std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString); header) {
         m_tutorial_headers.push_back(std::move(header));
@@ -70,10 +73,7 @@ void IntroWindow::reloadTutorials()
   }
 }
 
-/**
- * @brief Renders the whole tutorial window
-*/
-void IntroWindow::render()
+void StartWindow::render()
 {
 	// Set initial window size
   ImVec2 windowSize = ImVec2(1020, 600);
@@ -83,25 +83,26 @@ void IntroWindow::render()
     ImGui::SetNextWindowSize(windowSize);
   }
 	// Styling constants todo move all constants here, possibly load from theme or other styling settings
-	const float minWinWidth = 800;
-	const float minWinHeight = 400;
+	const float minWinWidth = 850;
+	const float minWinHeight = 500;
 	const ImVec2 logoOffset = ImVec2(5, -20);
 	const float titleVerticalOffset = 130;
   const float leftBarWidth = 330;
   const float loadBtnWidth = 120;
   const float startNewBtnWidth = loadBtnWidth;
+	const float buttonHeight = 30;
   const float thumbImageSize = 80;
   const float startBtnWidth = 120;
 
 	// todo change all color specifications to Application::get().getUI()->getTheme().get(EColor::DesiredColor)
 	// WINDOW
-  ImGui::PushStyleColor(ImGuiCol_WindowBg , IM_COL32_WHITE);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6);
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
   ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 14);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(minWinWidth, minWinHeight));
   //ImGui::PushStyleColor(ImGuiCol_TitleBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+  ImGui::PushStyleColor(ImGuiCol_WindowBg , IM_COL32_WHITE);
   ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(202, 202, 202, 255));
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(202, 202, 202, 255));
@@ -115,12 +116,12 @@ void IntroWindow::render()
   	ImGui::GetForegroundDrawList()->AddImage((ImTextureID)m_i3tImage->m_texID, logoPos, logoPos + ImVec2(m_i3tImage->m_width, m_i3tImage->m_height));
     // LEFT CHILD WINDOW
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30, 30));
-    ImGui::BeginChild("logo", ImVec2(leftBarWidth, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("left", ImVec2(leftBarWidth, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     {
       ImGui::Dummy(ImVec2(0, titleVerticalOffset));
     	
       // TITLE
-      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::I3TTitle));
+      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeTitle));
       ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
       ImGui::Text("Learn\nTransformations");
       ImGui::PopStyleColor();
@@ -142,9 +143,9 @@ void IntroWindow::render()
 
       ImGui::Dummy(ImVec2(0, 10));
       // DESCRIPTION
-      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::I3TDescription));
+      ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeDescription));
       ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
-      ImGui::TextWrapped("I3T is an educational application which enables the study of 3D transformation and their hierarchy in an illustrative way.");
+      ImGui::TextWrapped("I3T is an educational application which enables the study of 3D transformations and their hierarchy in an illustrative way.");
       ImGui::PopStyleColor();
       ImGui::PopFont();
 
@@ -160,8 +161,7 @@ void IntroWindow::render()
 
     ImGui::SameLine();
 
-    // RIGHT CHILD WINDOW
-  
+		// FOR POSSIBLE DEVELOPMENT OF TABS - TO BE MOVED UNDER "YOUR SCENE"
     //ImGui::Spacing();
     //// TABS
     //if (ImGui::BeginTabBar("TabBar")) 
@@ -169,7 +169,7 @@ void IntroWindow::render()
     //  // TUTORIALS
     //  if (ImGui::BeginTabItem("Tutorials")) 
     //  {
-    //    ---
+    //    // here move the tutorial list and wrap it in a scrollable window / remove scrolling from the upper window
     //    ImGui::EndTabItem();
     //  }
     //  // TEMPLATES
@@ -187,14 +187,15 @@ void IntroWindow::render()
     //  ImGui::EndTabBar();
     //}
       
+    // RIGHT CHILD WINDOW
     const ImVec2 outerPadding = ImVec2(10, 10);
     const ImVec2 innerPadding = ImVec2(10, 10);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, outerPadding);
+    //ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12);
     ImGui::PushStyleColor(ImGuiCol_ChildBg , Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
     ImGui::BeginChild("panel", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
     {
-
-	    // SCENE PICKER CHILD WINDOW
+	    // YOUR SCENE CHILD WINDOW
 	    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, innerPadding);
 	    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6);
 	    ImGui::PushStyleColor(ImGuiCol_ChildBg , IM_COL32_WHITE);
@@ -220,10 +221,10 @@ void IntroWindow::render()
 
 			    ImGui::Dummy(ImVec2(0, 10));
 			    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
-			    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
+			    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemTitle));
 			    ImGui::Text("Your scene");
 			    ImGui::PopFont();
-			    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemDescription));
+			    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemDescription));
 			    ImGui::Text("Start with an empty scene or load your previous work.");
 			    ImGui::PopFont();
 			    ImGui::PopStyleColor();
@@ -232,13 +233,13 @@ void IntroWindow::render()
 			    ImGui::EndVertical();
 			    ImGui::EndGroup();
 		    }
-
 		    //ImGui::GetFontSize()
 		    //ImGui::SetNextItemWidth(100.0f);
-        
 		    //const float itemSpacing = ImGui::GetStyle().
-		    ImGui::SameLine(ImGui::GetContentRegionMax().x - loadBtnWidth);
-		    // BUTTONS
+
+	    	ImGui::SameLine(ImGui::GetContentRegionMax().x - loadBtnWidth);
+
+	    	// BUTTONS
 		    ImGui::BeginGroup();
 		    {
 			    ImGui::BeginVertical("buttons", ImVec2(0, 0));
@@ -247,12 +248,12 @@ void IntroWindow::render()
 			    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
 			    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
 			    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
-			    if (ImGui::Button("New", ImVec2(startNewBtnWidth, 0))) {
+			    if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight))) {
 				    this->hide();
 			    }
 			    //ImGui::SameLine();
 			    ImGui::Dummy(ImVec2(0, 2));
-			    if (ImGui::Button("Load", ImVec2(loadBtnWidth, 0)))
+			    if (ImGui::Button("Load", ImVec2(loadBtnWidth, buttonHeight)))
 			    {
 				    // load from file (taken from main menu bar)
 				    std::string              result;
@@ -292,7 +293,8 @@ void IntroWindow::render()
 
       ImGui::Dummy(ImVec2(0, 5));
     	
-      // TUTORIAL LIST
+
+    	// THE LIST OF TUTORIALS
 	    for (auto& header : m_tutorial_headers)
 	    {
 		    // ITEM
@@ -306,6 +308,7 @@ void IntroWindow::render()
 			    //ImGui::SetColumnWidth(1, titleDescWidth - 2 * ImGui::GetStyle().ColumnsMinSpacing);
 			    //ImGui::SetColumnWidth(2, startBtnWidth);
 
+		    	// THUMBNAIL IMAGE
 			    auto img = header->m_thumbnailImage;
 			    if (img) {
 				    ImGui::Image((ImTextureID)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
@@ -333,13 +336,13 @@ void IntroWindow::render()
 			    {
 				    // TITLE
 				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
-				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemTitle));
+				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemTitle));
 				    ImGui::TextWrapped(header->m_title.c_str());
 				    ImGui::PopStyleColor();
 				    ImGui::PopFont();
 				    // DESCRIPTIONS
 				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
-				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::IntroItemDescription));
+				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemDescription));
 			    	float predictedTextSize = ImGui::CalcTextSize(header->m_description.c_str(), nullptr, false, ImGui::GetContentRegionAvail().x).y;
 			    	bool willTextFit = ImGui::GetContentRegionAvail().y - predictedTextSize >= 0;
 			    	//std::string debug = fmt::format("{} - {} = {}", ImGui::GetContentRegionAvail().y, predictedTextSize, willTextFit);
@@ -375,7 +378,7 @@ void IntroWindow::render()
 				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
 				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
 				    std::string buttonName = "Start##" + header->m_filename;
-				    if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth,0))) {
+				    if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth,buttonHeight))) {
 					    // TUTORIAL LOADING !!!
 					    auto tutorial = TutorialLoader::loadTutorial(header);
 					    if (tutorial) {
@@ -428,9 +431,8 @@ void IntroWindow::render()
   }
   ImGui::PopStyleVar(5);
   ImGui::PopStyleColor(7);
-
 }
 
-void IntroWindow::renderTutorials()
+void StartWindow::renderTutorials()
 {
 }

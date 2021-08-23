@@ -53,7 +53,8 @@ public:
 private:
   static std::shared_ptr<Tutorial> m_tutorial;  //todo temporarily static because of img callback
   //static std::string m_current_dir;
-  int m_current_step;
+  int m_currentStep;
+	float m_progressBarAnimationPosition;
   ImGui::MarkdownConfig m_mdConfig; // todo temporary
   // std::string getAbsolutePathByTutorial(std::string filename);
   void renderTutorialHeader();

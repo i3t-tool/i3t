@@ -15,7 +15,7 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/Scripting.h"
-#include "Windows/IntroWindow.h"
+#include "Windows/StartWindow.h"
 // #include "RecentFiles.h"
 
 using namespace UI;
@@ -184,12 +184,12 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
-		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
+		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		ImGui::MenuItem("Intro window", nullptr, I3T::getWindowPtr<IntroWindow>()->getShowPtr());
+		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
+		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
 		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<Console>()->getShowPtr());
 		ImGui::MenuItem("Log window", nullptr, I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
-		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
 
 		ImGui::EndMenu();
 	}

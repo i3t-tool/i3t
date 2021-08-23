@@ -948,20 +948,21 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 			MarkdownHeadingFormat fmt;
 			// default styling for emphasis uses last headingFormats - for your own styling
 			// implement EMPHASIS in your formatCallback
-			if( markdownFormatInfo_.level == 1 )
-			{
-				// normal emphasis
-				if( start_ )
-				{
-					ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
-				}
-				else
-				{
-					ImGui::PopStyleColor();
-				}              
-			}
-			else
-			{
+			
+			//if( markdownFormatInfo_.level == 1 )
+			//{
+			//	// normal emphasis
+			//	if( start_ )
+			//	{
+			//		ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
+			//	}
+			//	else
+			//	{
+			//		ImGui::PopStyleColor();
+			//	}              
+			//}
+			//else
+			//{
 				// strong emphasis
 				fmt = markdownFormatInfo_.config->headingFormats[0];
 				if( start_ )
@@ -970,7 +971,7 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 					{
 						ImGui::PushFont( fmt.font );
 					}
-					ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
+					//ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
 				}
 				else
 				{
@@ -978,9 +979,9 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 					{
 						ImGui::PopFont();
 					}
-					ImGui::PopStyleColor();
+					//ImGui::PopStyleColor();
 				}
-			}
+			//}
 			break;
 		}
 	case MarkdownFormatType::HEADING:

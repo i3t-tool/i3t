@@ -6,7 +6,7 @@
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
-#include "GUI/Elements/Windows/IntroWindow.h"
+#include "GUI/Elements/Windows/StartWindow.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
@@ -33,7 +33,7 @@ void UIModule::init()
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
-	m_dockableWindows.push_back(std::make_shared<IntroWindow>(true));
+	m_dockableWindows.push_back(std::make_shared<StartWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Console>(false));
@@ -202,27 +202,31 @@ void UIModule::loadFonts()
 
 	ImFontConfig fontCfg;
 	fontCfg.GlyphExtraSpacing.x =
-			-0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirkku
+			-0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirku
 
 	m_fonts = {
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 14.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale,
-																	 nullptr, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale,
-																	 &fontCfg, ranges),
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale,
-																	 nullptr, ranges),
+			// 0
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale, nullptr, ranges),
+			// 1
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale, nullptr, ranges),
+			// 2
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale, nullptr, ranges),
+			// 3
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale, nullptr, ranges),
+		  // 4
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 16.0f * fontScale, nullptr, ranges),
+		  // 5
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale, nullptr, ranges),
+		  // 6
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale, nullptr, ranges),
+		  // 7
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale, &fontCfg, ranges),
+		  // 8
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale, nullptr, ranges),
+			// 9
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 16.0f * fontScale, nullptr, ranges),
+			// 10
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Italic.ttf").c_str(), 16.0f * fontScale, nullptr, ranges),
 	};
 	// io.FontDefault = I3T::getFont(EFont::MenuLarge);
 	io.Fonts->Build();

@@ -260,6 +260,10 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
       currentStep++;
       continue;
     }
+  	// special case for comments
+    if (firstWord == "%") {
+	    continue; // comments do not end blocks
+    }
     // recognize type of line / command
     blockType_t blockType = isBlockType(firstWord);
     singleLineType_t singleLineType = isSingleLineType(firstWord);

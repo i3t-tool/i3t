@@ -561,6 +561,7 @@ void WorkspaceWindow::UpdateTouchAllNodes()
 	for (auto&& workspaceNode : m_workspaceCoreNodes) { workspaceNode->UpdateTouch(deltaTime); }
 }
 
+
 void WorkspaceWindow::checkQueryContextMenus()
 {
 	ne::Suspend();
@@ -590,23 +591,44 @@ void WorkspaceWindow::checkQueryContextMenus()
 		ImGui::Text("Set value...					");
 		ImGui::Separator();
 
-		ImGui::Columns(2, "floatPopupButtons", false);
-		if (ImGui::SmallButton("Radians")) ImGui::OpenPopup("Radians");
-		ImGui::NextColumn();
-		if (ImGui::SmallButton("Degrees")) ImGui::OpenPopup("Degrees");
-		ImGui::Columns(1);
+		static int floatPopupMode = 0;
+		//ImGui::Columns(3, "floatPopupButtons", false);
+		if (ImGui::RadioButton("Radians", floatPopupMode == 0)) {
+			ImGui::OpenPopup("Radians");
+			floatPopupMode = 0;
+		}
+		//ImGui::NextColumn();
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Trigonometry", floatPopupMode == 1)) {
+			ImGui::OpenPopup("Trigonometry");
+			floatPopupMode = 1;
+		}
+		//ImGui::NextColumn();
+		//ImGui::SameLine();
+		//if (ImGui::RadioButton("Degrees", floatPopupMode == 2)) {
+		//	ImGui::OpenPopup("Degrees");
+		//	floatPopupMode = 2;
+		//}
+		//ImGui::Columns(1);
+		
 
 		Ptr<WorkspaceNodeWithCoreData> node = getWorkspaceCoreNodeByID(m_contextNodeId);
 		float													 newValue;
 		bool													 valueChange = false;
 
-		if (ImGui::BeginPopup("Radians"))
+		// Radians
+		if (floatPopupMode == 0)
 		{
-
-			ImGui::Text("Set...                    ");
 			ImGui::Separator();
-			ImGui::Columns(2, "mycolumns2", false); // 2-ways, no border
 
+			ImGui::Columns(1);
+			if (ImGui::Selectable("0"))
+			{
+				newValue		= 0.0f;
+				valueChange = true;
+			}	
+
+			ImGui::Columns(2, "mycolumns1", false); // 2-ways, no border
 			if (ImGui::Selectable("-PI/6"))
 			{
 				newValue		= -M_PI / 6;
@@ -637,13 +659,8 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue		= -3 * M_PI / 2;
 				valueChange = true;
 			}
-			if (ImGui::Selectable("-1"))
-			{
-				newValue		= -1.0f;
-				valueChange = true;
-			}
+			
 			ImGui::NextColumn();
-
 			if (ImGui::Selectable("PI/6"))
 			{
 				newValue		= M_PI / 6;
@@ -674,11 +691,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue		= -3 * M_PI / 2;
 				valueChange = true;
 			}
-			if (ImGui::Selectable("1"))
-			{
-				newValue		= 1.0f;
-				valueChange = true;
-			}
+
+		}
+		// Trigonometric
+		if (floatPopupMode == 1) {
+			ImGui::Separator();
 
 			ImGui::Columns(1);
 
@@ -687,18 +704,11 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue		= 0.0f;
 				valueChange = true;
 			}
-
-			ImGui::EndPopup();
-		}
-		if (ImGui::BeginPopup("Degrees"))
-		{
-
-			ImGui::Text("Set...                                    ");
-			ImGui::Separator();
-			ImGui::Columns(2, "mycolumns", false);
+			
+			ImGui::Columns(2, "mycolumns1", false);
 			if (ImGui::Selectable("-1/2"))
 			{
-				newValue		= -1.0f / 2.0f;
+				newValue		= -0.5f;
 				valueChange = true;
 			}
 			if (ImGui::Selectable("-sqrt(2)/2"))
@@ -711,28 +721,21 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue		= -sqrt(3) / 2;
 				valueChange = true;
 			}
-			if (ImGui::Selectable("-2"))
-			{
-				newValue		= -2.0f;
-				valueChange = true;
-			}
 			if (ImGui::Selectable("-1"))
 			{
 				newValue		= -1.0f;
 				valueChange = true;
 			}
-
+			//if (ImGui::Selectable("-2"))
+			//{
+			//	newValue		= -2.0f;
+			//	valueChange = true;
+			//}
+						
 			ImGui::NextColumn();
-
 			if (ImGui::Selectable("1/2"))
 			{
-				newValue = 1.0f / 2.0f;
-				;
-				valueChange = true;
-			}
-			if (ImGui::Selectable("sqrt(3)/2"))
-			{
-				newValue		= sqrt(3) / 2;
+				newValue		= 0.5f;
 				valueChange = true;
 			}
 			if (ImGui::Selectable("sqrt(2)/2"))
@@ -740,9 +743,9 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue		= sqrt(2) / 2;
 				valueChange = true;
 			}
-			if (ImGui::Selectable("2"))
+			if (ImGui::Selectable("sqrt(3)/2"))
 			{
-				newValue		= 2.0f;
+				newValue		= sqrt(3) / 2;
 				valueChange = true;
 			}
 			if (ImGui::Selectable("1"))
@@ -750,15 +753,90 @@ void WorkspaceWindow::checkQueryContextMenus()
 				newValue		= 1.0f;
 				valueChange = true;
 			}
-			ImGui::Columns(1);
-			if (ImGui::Selectable("0"))
-			{
-				newValue		= 0.0f;
-				valueChange = true;
-			}
-			ImGui::EndPopup();
+			//if (ImGui::Selectable("2"))
+			//{
+			//	newValue		= 2.0f;
+			//	valueChange = true;
+			//}
+			
 		}
+		//// Degrees
+		//if (floatPopupMode == 2)
+		//{
+		//	ImGui::Separator();
+		//	ImGui::Columns(2, "mycolumns2", false);
+		//	if (ImGui::Selectable("-270"))
+		//	{
+		//		newValue		= -270.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("-180"))
+		//	{
+		//		newValue		= -180.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("-90"))
+		//	{
+		//		newValue		= -90.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("-60"))
+		//	{
+		//		newValue		= -60.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("-45"))
+		//	{
+		//		newValue		= -45.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("-30"))
+		//	{
+		//		newValue		= -30.0f;
+		//		valueChange = true;
+		//	}
 
+		//	ImGui::NextColumn();
+
+		//	if (ImGui::Selectable("270"))
+		//	{
+		//		newValue		= 270.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("180"))
+		//	{
+		//		newValue		= 180.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("90"))
+		//	{
+		//		newValue		= 90.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("60"))
+		//	{
+		//		newValue		= 60.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("45"))
+		//	{
+		//		newValue		= 45.0f;
+		//		valueChange = true;
+		//	}
+		//	if (ImGui::Selectable("30"))
+		//	{
+		//		newValue		= 30.0f;
+		//		valueChange = true;
+		//	}
+		//	
+		//	ImGui::Columns(1);
+		//	
+		//	if (ImGui::Selectable("0"))
+		//	{
+		//		newValue		= 0.0f;
+		//		valueChange = true;
+		//	}
+		//}
 
 		if (node->fw.name == "vector4" && valueChange)
 		{
@@ -812,14 +890,13 @@ void WorkspaceWindow::checkQueryContextMenus()
 	if (ImGui::BeginPopup("Create New Node"))
 	{
 		m_newNodePostion = m_rightClickPosition;
-
-		ImGui::Text("add...");
+		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
+		ImGui::Text("Add block...");
+		ImGui::PopFont();
 		ImGui::Separator();
 		if (ImGui::BeginMenu("transformation"))
 		{
 
-			ImGui::Text("add transforamtion");
-			ImGui::Separator();
 			if (ImGui::MenuItem("free"))
 			{
 				m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceTransformationFree>(m_headerBackgroundTexture));
@@ -833,33 +910,31 @@ void WorkspaceWindow::checkQueryContextMenus()
 			if (ImGui::BeginMenu("rotation"))
 			{
 
-				ImGui::Text("add rotation");
-				ImGui::Separator();
-				if (ImGui::MenuItem("eulerAngleX"))
+				if (ImGui::MenuItem("X axis"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerX>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleY"))
+				if (ImGui::MenuItem("Y axis"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerY>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("eulerAngleZ"))
+				if (ImGui::MenuItem("Z axis"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceEulerZ>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("rotate"))
-				{
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAxisAngle>(m_headerBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
-				}
-				if (ImGui::MenuItem("quat"))
-				{
-					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatRot>(m_headerBackgroundTexture));
-					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
-				}
+				//if (ImGui::MenuItem("rotate"))
+				//{
+				//	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceAxisAngle>(m_headerBackgroundTexture));
+				//	ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				//}
+				//if (ImGui::MenuItem("quat"))
+				//{
+				//	m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatRot>(m_headerBackgroundTexture));
+				//	ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
+				//}
 				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("scale"))
@@ -867,7 +942,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 				m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixScale>(m_headerBackgroundTexture));
 				ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 			}
-			if (ImGui::MenuItem("lookAt"))
+			if (ImGui::MenuItem("look at"))
 			{
 				m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceLookAt>(m_headerBackgroundTexture));
 				ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -875,8 +950,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 			if (ImGui::BeginMenu("projection"))
 			{
 
-				ImGui::Text("add projection");
-				ImGui::Separator();
 				if (ImGui::MenuItem("ortho"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceOrtho>(m_headerBackgroundTexture));
@@ -896,32 +969,29 @@ void WorkspaceWindow::checkQueryContextMenus()
 			}
 			ImGui::EndMenu();
 		}
+		
 		if (ImGui::BeginMenu("operator"))
 		{
 
-			ImGui::Text("add operator");
-			ImGui::Separator();
 			if (ImGui::BeginMenu("transformation"))
 			{
 
-				ImGui::Text("transformation operators");
-				ImGui::Separator();
 				if (ImGui::MenuItem("translate"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeTranslation>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("euler AngleX"))
+				if (ImGui::MenuItem("rotate X axis"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerX>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("euler AngleY"))
+				if (ImGui::MenuItem("rotate Y axis"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerY>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("euler AngleZ"))
+				if (ImGui::MenuItem("rotate Z axis"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeEulerZ>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -936,7 +1006,7 @@ void WorkspaceWindow::checkQueryContextMenus()
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeScale>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("ortho"))
+				if (ImGui::MenuItem("orthographic"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeOrtho>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
@@ -951,18 +1021,17 @@ void WorkspaceWindow::checkQueryContextMenus()
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeFrustum>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
-				if (ImGui::MenuItem("lookAt"))
+				if (ImGui::MenuItem("look at"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMakeLookAt>(m_headerBackgroundTexture));
 					ne::SetNodePosition(m_workspaceCoreNodes.back()->getId(), m_newNodePostion);
 				}
 				ImGui::EndMenu();
 			}
+			
 			if (ImGui::BeginMenu("matrix"))
 			{
 
-				ImGui::Text("matrix operators");
-				ImGui::Separator();
 				if (ImGui::MenuItem("matrix"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>(m_headerBackgroundTexture));
@@ -1015,11 +1084,10 @@ void WorkspaceWindow::checkQueryContextMenus()
 				}
 				ImGui::EndMenu();
 			}
+			
 			if (ImGui::BeginMenu("vec3"))
 			{
-
-				ImGui::Text("vec3 operator");
-				ImGui::Separator();
+				
 				if (ImGui::MenuItem("vec3"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceVector3Free>(m_headerBackgroundTexture));
@@ -1075,8 +1143,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 			if (ImGui::BeginMenu("vec4"))
 			{
 
-				ImGui::Text("vec4 operator");
-				ImGui::Separator();
 				if (ImGui::MenuItem("vec4"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceVectorFree>(m_headerBackgroundTexture));
@@ -1123,8 +1189,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 			if (ImGui::BeginMenu("quat"))
 			{
 
-				ImGui::Text("quat operator");
-				ImGui::Separator();
 				if (ImGui::MenuItem("quat"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceQuatFree>(m_headerBackgroundTexture));
@@ -1220,8 +1284,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 			if (ImGui::BeginMenu("float"))
 			{
 
-				ImGui::Text("float operator");
-				ImGui::Separator();
 				if (ImGui::MenuItem("float"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceFloatFree>(m_headerBackgroundTexture));
@@ -1282,8 +1344,6 @@ void WorkspaceWindow::checkQueryContextMenus()
 			if (ImGui::BeginMenu("conversion"))
 			{
 
-				ImGui::Text("conversion operator");
-				ImGui::Separator();
 				if (ImGui::MenuItem("mat -> TR"))
 				{
 					m_workspaceCoreNodes.push_back(std::make_unique<WorkspaceMatrixToTR>(m_headerBackgroundTexture));
