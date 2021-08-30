@@ -36,12 +36,8 @@ struct TutorialElement
   virtual void acceptRenderer(ITutorialRenderer* tutorialRenderer) = 0;
 };
 
-struct Explanation : TutorialElement  // can also contain bullets and other MD syntax for now 
+struct Explanation : TutorialElement 
 {
-  //Explanation()
-  //{
-  //  m_content = "";
-  //}
   Explanation(std::string explanation)
     : TutorialElement(std::move(explanation)) {}
 
@@ -71,10 +67,10 @@ struct Hint : TutorialElement
 {
   Hint(std::string hint)
     : TutorialElement(std::move(hint)),
-      m_collapsed(true)
+      m_expanded(false)
   {
   }
-  bool m_collapsed; // todo future feature
+  bool m_expanded;
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
     tutorialRenderer->renderHint(this);

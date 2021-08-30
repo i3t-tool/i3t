@@ -84,7 +84,7 @@ WorkspaceWindow::~WorkspaceWindow()
 
 void WorkspaceWindow::render()
 {
-	ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar);
+	ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	if (ImGui::BeginMenuBar())
 	{

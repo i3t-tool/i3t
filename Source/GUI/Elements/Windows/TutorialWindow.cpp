@@ -392,13 +392,6 @@ void TutorialWindow::renderHint(Hint* hint)
   // smaller spacing before hints
 	ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE)); 
 	
-	// HELPER VARIABLES
-	static bool toggled = false;  // todo - find a better soluton
-	static int lastStep = m_currentStep;
-	if (lastStep != m_currentStep) {
-		lastStep = m_currentStep;
-		toggled = false;
-	}
 	// QUESTION MARK
   ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
 	//ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(8, 187, 230, 255));
@@ -412,14 +405,14 @@ void TutorialWindow::renderHint(Hint* hint)
 	{
 		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-			toggled = !toggled;
+			hint->m_expanded = !hint->m_expanded;
 		}
 	}
 	ImGui::PopStyleColor();
   ImGui::PopFont();
 	
 	// HINT ITSELF
-  if (toggled) {
+  if (hint->m_expanded) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
     ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialHint));
     //ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
