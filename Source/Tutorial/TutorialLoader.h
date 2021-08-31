@@ -4,7 +4,6 @@
 class TutorialLoader
 {
 public:
-  // todo zmenit na nullptry
   static std::shared_ptr<TutorialHeader> loadTutorialHeader(std::string& path);
   static std::shared_ptr<Tutorial> loadTutorial(std::shared_ptr<TutorialHeader> header);
   /**

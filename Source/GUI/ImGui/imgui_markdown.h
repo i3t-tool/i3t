@@ -315,7 +315,7 @@ struct MarkdownConfig
 {
 	static const int        NUMHEADINGS = 3;
 
-	MarkdownLinkCallback*    linkCallback                  = NULL;
+	MarkdownLinkCallback*		 linkCallback									 = NULL;
 	MarkdownTooltipCallback* tooltipCallback               = NULL;
 	MarkdownImageCallback*   imageCallback                 = NULL;
 	const char*              linkIcon                      = ""; // icon displayd in link tooltip
@@ -1047,3 +1047,4 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 }
 
 }
+

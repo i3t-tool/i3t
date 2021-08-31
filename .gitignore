@@ -36,3 +36,4 @@ Data/imgui.ini
 .vs/
 logs/
 /CMakeSettings.json
+/Data/tutorials/tutorial

@@ -29,6 +29,16 @@
 #include <Core/API.h>
 #include "StartWindow.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#include "Shellapi.h"
+#endif // _WIN32
+
+#ifdef defined(unix) || defined(__unix__) || defined(__unix)
+#define _UNIX
+// todo
+#endif // unix
+
 
 // TUTORIAL GUI PROPERTIES DEFINITIONS
 //---
@@ -56,10 +66,21 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
   });
 }
 
+inline void DefaultLinkCallback(ImGui::MarkdownLinkCallbackData data_)
+{
+	std::string url(data_.link, data_.linkLength);
+	if (!data_.isImage)
+	{
+#ifdef _WIN32
+		ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+#endif // _WIN32
+	}
+}
+
 void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 {
 	// MARKDOWN CONFIG - (temporarily?) moved here from constructor since exception at font loading
-  m_mdConfig = ImGui::MarkdownConfig{nullptr, ImGui::defaultMarkdownTooltipCallback, ImageCallback, "link", { { Application::get().getUI()->getTheme().get(EFont::TutorialAssignment), true }, { nullptr, true }, { nullptr, false } }, nullptr };
+  m_mdConfig = ImGui::MarkdownConfig{DefaultLinkCallback, ImGui::defaultMarkdownTooltipCallback, ImageCallback, "link", { { Application::get().getUI()->getTheme().get(EFont::TutorialAssignment), true }, { nullptr, true }, { nullptr, false } }, nullptr };
 	
   m_tutorial = std::move(tutorial);  // btw if there was a previous shared pointer to another Tutorial, then if it isnt still used anywhere it gets deleted at this reassignment (yay, thats why we are using it! \^^/)
 	m_progressBarAnimationPosition = 0;
