@@ -265,6 +265,15 @@ void WorkspaceNodeWithCoreData::drawDataSetValues_builder(util::NodeBuilder&				
 			index_of_change = i;
 			valueOfChange		= localData;
 		}
+		if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
+		{
+			fw.showMyPopup = true;
+			//fw.id          = fmt::format("##{}:r{}c{}", idOfNode, rows, columns);
+			fw.value       = localData;
+			fw.name        = "float";
+			//fw.columns     = columns;
+			//fw.rows        = rows;
+		}
 	}
 	ImGui::PopItemWidth();
 

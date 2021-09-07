@@ -13,19 +13,19 @@
 
 #include "Tutorial/Tutorial.h"
 
-class IntroWindow : public IWindow
+class StartWindow : public IWindow
 {
 public:
-  I3T_WINDOW(IntroWindow) 
-  IntroWindow(bool show);
+  I3T_WINDOW(StartWindow) 
+  StartWindow(bool show);
 
   /**
-   * \brief get all folders
+   * \brief searches through the tutorial directory and adds all found tutorial files to the window
    */
   void reloadTutorials();
 
   /**
-   * \brief Renders the tutorial window using ImGui.
+   * \brief Renders the Start window using ImGui.
    */
   void render() override;
 

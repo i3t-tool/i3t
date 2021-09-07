@@ -92,18 +92,18 @@ enum class EFont
 {
 	MenuLarge,
 	MenuSmall,
-	TutorialText,
 	Button,
 	Tab,
 	Node,
-	Title,
-	TitleSmall,
-	TaskTitle,
 	Header,
-	I3TTitle,
-	I3TDescription,
-	IntroItemTitle,
-	IntroItemDescription
+	TutorialText,
+	TutorialTitle,
+	TutorialAssignment,
+	TutorialHint,
+	WelcomeTitle,
+	WelcomeDescription,
+	WelcomeItemTitle,
+	WelcomeItemDescription
 };
 
 enum class ESize

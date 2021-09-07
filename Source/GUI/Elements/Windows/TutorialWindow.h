@@ -30,7 +30,7 @@ public:
    * \brief Calls load and parse for a tutorial from file and sets it as the current one to be shown.
    * \param header Ptr to an already loaded tutorial header object describing a specific tutorial.
    */
-  void setTutorial(std::shared_ptr<TutorialHeader> header);
+  void setTutorial(std::shared_ptr<TutorialHeader>& header);
 
     /**
    * \brief Calls load and parse for a tutorial from file and sets it as the current one to be shown.
@@ -43,7 +43,7 @@ public:
    * \param step_number A step number counted from 0.
    * \return true if successful, false if number out of range or no currently set tutorial
    */
-  bool setStep(int step_number);
+  void setStep(int step_number);
 
   /**
    * \brief Renders the tutorial window using ImGui.
@@ -53,7 +53,8 @@ public:
 private:
   static std::shared_ptr<Tutorial> m_tutorial;  //todo temporarily static because of img callback
   //static std::string m_current_dir;
-  int m_current_step;
+  int m_currentStep;
+	float m_progressBarAnimationPosition;
   ImGui::MarkdownConfig m_mdConfig; // todo temporary
   // std::string getAbsolutePathByTutorial(std::string filename);
   void renderTutorialHeader();

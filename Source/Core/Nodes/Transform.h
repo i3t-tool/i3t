@@ -154,10 +154,11 @@ public:
 class EulerRotX : public Transformation
 {
 	float m_initialRot;
+	float m_currentRot;
 
 public:
 	explicit EulerRotX(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
-			: Transformation(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot)
+			: Transformation(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot), m_currentRot(initialRot)
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
@@ -167,8 +168,8 @@ public:
 	ETransformState isValid() const override;
 	void lock() override;
 
-	[[nodiscard]] float getRot() const { return m_initialRot; }
-	float getAngle() const { return m_initialRot; }
+	[[nodiscard]] float getRot() const { return m_currentRot; }
+	float getAngle() const { return m_currentRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -190,10 +191,11 @@ public:
 class EulerRotY : public Transformation
 {
 	float m_initialRot;
+	float m_currentRot;
 
 public:
 	explicit EulerRotY(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
-			: Transformation(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot)
+			: Transformation(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot), m_currentRot(initialRot)
 	{
 		m_initialMap = &map;
 		m_currentMap = &map;
@@ -203,8 +205,8 @@ public:
 	ETransformState isValid() const override;
 	void lock() override;
 
-	[[nodiscard]] float getRot() const { return m_initialRot; }
-	float getAngle() const { return m_initialRot; }
+	[[nodiscard]] float getRot() const { return m_currentRot; }
+	float getAngle() const { return m_currentRot; }
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -226,6 +228,7 @@ public:
 class EulerRotZ : public Transformation
 {
 	float m_initialRot;
+	float m_currentRot;
 
 public:
 	explicit EulerRotZ(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)

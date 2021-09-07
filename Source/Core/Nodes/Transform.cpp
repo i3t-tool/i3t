@@ -192,6 +192,7 @@ void EulerRotX::lock()
 
 ValueSetResult EulerRotX::setValue(float val)
 {
+	m_currentRot = val;
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	notifySequence();
@@ -220,6 +221,7 @@ ValueSetResult EulerRotX::setValue(const glm::mat4& mat)
 
 			if (isValid)
 			{
+				m_currentRot = angleRad;
 				setInternalValue(mat);
 			}
 			else
@@ -285,7 +287,7 @@ ValueSetResult EulerRotX::setValue(float val, glm::ivec2 coords)
 			mat[2][2] = cos;
 		}
 	}
-
+	// todo set current val?
 	setInternalValue(mat);
 	notifySequence();
 
@@ -296,6 +298,7 @@ void EulerRotX::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::eulerAngleX(m_initialRot));
+	m_currentRot = m_initialRot;
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
@@ -319,6 +322,7 @@ void EulerRotY::lock()
 
 ValueSetResult EulerRotY::setValue(float val)
 {
+	m_currentRot = val;
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 1.0f, 0.0f)));
 	notifySequence();
 	return ValueSetResult{};
@@ -343,6 +347,7 @@ ValueSetResult EulerRotY::setValue(const glm::mat4& mat)
 	else if (m_currentMap == &Transform::g_EulerY)
 	{
 		float angleRad = std::asin(mat[2][0]);
+		m_currentRot = angleRad;
 		auto eulerY = glm::eulerAngleY(angleRad);
 
 		if (!Math::eq(eulerY, mat))
@@ -414,6 +419,7 @@ void EulerRotY::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
+	m_currentRot = m_initialRot;
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -437,6 +443,7 @@ void EulerRotZ::lock()
 
 ValueSetResult EulerRotZ::setValue(float val)
 {
+	m_currentRot = val;
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 0.0f, 1.0f)));
 	notifySequence();
 	return ValueSetResult{};
@@ -464,6 +471,7 @@ ValueSetResult EulerRotZ::setValue(const glm::mat4& mat)
 		{
 			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an Euler rot around Z axis."};
 		}
+		m_currentRot = angle;
 		setInternalValue(mat);
 	}
 	notifySequence();
@@ -529,6 +537,7 @@ void EulerRotZ::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
+	m_currentRot = m_initialRot;
 }
 
 //===-- Translation -------------------------------------------------------===//
