@@ -11,7 +11,7 @@
 #include "picoc.h"
 #include "pgr.h"
 
-#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 
 /**
 * \struct Mat4types
@@ -63,7 +63,7 @@ struct NodeLODs {
 * \struct ScriptingData
 * Contains constant variables that are exposed to scripts, that are used as parameters of functions for creating various operators, telling which type of operator should be created.
 * Contains data as vector of mat4, which were created by script. Data are then used by script to init storage of created nodes.
-* 
+*
 */
 struct ScriptingData {
 	Mat4types mat4Types;

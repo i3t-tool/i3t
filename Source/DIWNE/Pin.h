@@ -1,12 +1,9 @@
 #ifndef PIN_H
 #define PIN_H
 
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui.h>
-# define IMGUI_DEFINE_MATH_OPERATORS
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui_internal.h>
-
-#include <../Source/DIWNE/diwne.h>
-#include <../Source/DIWNE/Node.h>
+#include "diwne.h"
+#include "Node.h"
+#include "Link.h"
 
 namespace DIWNE
 {
@@ -15,17 +12,22 @@ class Pin
 {
     public:
         /** Default constructor */
-        Pin();
+        Pin(DIWNE::ID id);
         /** Default destructor */
         virtual ~Pin();
 
-        virtual bool drawPinDiwne();
-        virtual bool drawPin();
+        DIWNE::ID const getId() const {return m_idDiwne; };
+
+        bool drawPinDiwne(DIWNE::Diwne &diwne);
+        virtual bool pinContent(DIWNE::Diwne &diwne) {return false;};
+
 
     protected:
 
     private:
-        ImRect m_pinRect;
+        DIWNE::ID m_idDiwne;
+        ImRect m_pinRectDiwne;
+        DIWNE::Link m_linkDiwne;
 };
 
 } /* namespace DIWNE */

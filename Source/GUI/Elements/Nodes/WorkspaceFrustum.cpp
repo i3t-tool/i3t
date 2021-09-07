@@ -3,42 +3,40 @@
 //
 
 #include "WorkspaceFrustum.h"
-
-WorkspaceFrustum::WorkspaceFrustum(ImTextureID headerBackground, WorkspaceFrustumArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
+WorkspaceFrustum::WorkspaceFrustum()
+    :   WorkspaceMatrix4x4(Core::Builder::createTransform<Core::Frustum>())
 {}
 
-WorkspaceFrustum::WorkspaceFrustum(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Frustum>(), headerLabel, nodeLabel)
-{}
-
-void WorkspaceFrustum::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspaceFrustum::drawDataSetValues(DIWNE::Diwne &diwne)
 {
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-  drawDataSetValues_builder(builder,
+  Ptr<Core::Frustum> nodebase = m_nodebase->as<Core::Frustum>();
+
+  return drawDataSetValues_builder(diwne,
                             {   "left",
                                 "right",
                                 "bottom",
                                 "top",
                                 "near",
                                 "far"},
-                            {   [this](){return m_nodebase->as<Core::Frustum>()->getLeft();},
-                                [this](){return m_nodebase->as<Core::Frustum>()->getRight();},
-                                [this](){return m_nodebase->as<Core::Frustum>()->getBottom();},
-                                [this](){return m_nodebase->as<Core::Frustum>()->getTop();},
-                                [this](){return m_nodebase->as<Core::Frustum>()->getNear();},
-                                [this](){return m_nodebase->as<Core::Frustum>()->getFar();} },
-                            {   [this](float v){return m_nodebase->as<Core::Frustum>()->setLeft(v);},
-                                [this](float v){return m_nodebase->as<Core::Frustum>()->setRight(v);},
-                                [this](float v){return m_nodebase->as<Core::Frustum>()->setBottom(v);},
-                                [this](float v){return m_nodebase->as<Core::Frustum>()->setTop(v);},
-                                [this](float v){return m_nodebase->as<Core::Frustum>()->setNear(v);},
-                                [this](float v){return m_nodebase->as<Core::Frustum>()->setFar(v);}},
-                            {   1, /* \todo JH some better way how determine what element from DataMap should be used? */
+                            {   [nodebase](){return nodebase->getLeft();},
+                                [nodebase](){return nodebase->getRight();},
+                                [nodebase](){return nodebase->getBottom();},
+                                [nodebase](){return nodebase->getTop();},
+                                [nodebase](){return nodebase->getNear();},
+                                [nodebase](){return nodebase->getFar();} },
+                            {   [nodebase](float v){return nodebase->setLeft(v);},
+                                [nodebase](float v){return nodebase->setRight(v);},
+                                [nodebase](float v){return nodebase->setBottom(v);},
+                                [nodebase](float v){return nodebase->setTop(v);},
+                                [nodebase](float v){return nodebase->setNear(v);},
+                                [nodebase](float v){return nodebase->setFar(v);}},
+                            {   1, /* \todo JH use CoreMap */
                                 1,
                                 1,
                                 1,
                                 1,
                                 1}
   );
+
 }

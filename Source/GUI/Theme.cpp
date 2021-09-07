@@ -1,6 +1,6 @@
 #include "Theme.h"
 
-#include "imgui_node_editor.h"
+//#include "imgui_node_editor.h"
 
 #include "Config.h"
 #include "Core/API.h"
@@ -449,13 +449,14 @@ void Theme::apply()
 
 	// SS, MH please check this
 	//---------------------------------------------------------------------------------------
+	/* \todo JH repaire
 	auto& nodesStyle = ax::NodeEditor::GetStyle();
 
 	nodesStyle.NodeRounding																					 = m_sizes[ESize::Nodes_Rounding];
 	nodesStyle.NodeBorderWidth																			 = m_sizes[ESize::Nodes_BorderWidth];
 	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
 	nodesStyle.Colors[ax::NodeEditor::StyleColor::StyleColor_Bg]		 = m_colors[EColor::NodeEditorBg];
-
+    */
 	//---------------------------------------------------------------------------------------
 }
 
@@ -479,6 +480,7 @@ std::map<ESizeVec2, const char*>& Theme::getSizeVecNames() { return g_SizeVecNam
 
 void Theme::operatorColorTheme()
 {
+    /* \todo JH repaire
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -486,10 +488,12 @@ void Theme::operatorColorTheme()
 	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgOperator];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgOperatorHovered];
 	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgOperatorActive];
+	*/
 }
 
 void Theme::transformationColorTheme()
 {
+    /* \todo JH repaire
 	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
 			m_colors[EColor::NodeBgTransformation];
 
@@ -498,6 +502,7 @@ void Theme::transformationColorTheme()
 	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgTransformation];
 	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgTransformationHovered];
 	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgTransformationActive];
+	*/
 }
 
 bool isVectorsEqual(ImVec4 a, ImVec4 b)
@@ -508,6 +513,7 @@ bool isVectorsEqual(ImVec4 a, ImVec4 b)
 
 ImVec4 Theme::getHeader()
 {
+    /* \todo JH repaire
 	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
 										 m_colors[EColor::NodeBgOperator]))
 	{
@@ -518,7 +524,27 @@ ImVec4 Theme::getHeader()
 	{
 		return m_colors[EColor::NodeHeaderTranformation];
 	}
-	return ImVec4(0, 0, 0, 0);
+	*/
+	return m_colors[EColor::NodeHeaderTranformation];
+	//return ImVec4(0, 0, 0, 0);
+}
+
+ImVec4 Theme::getBg()
+{
+    /* \todo JH repaire
+	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
+										 m_colors[EColor::NodeBgOperator]))
+	{
+		return m_colors[EColor::NodeHeaderOperator];
+	}
+	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
+										 m_colors[EColor::NodeBgTransformation]))
+	{
+		return m_colors[EColor::NodeHeaderTranformation];
+	}
+	*/
+	return m_colors[EColor::NodeBgTransformation];
+	//return ImVec4(0, 0, 0, 0);
 }
 
 void Theme::returnFloatColorToDefault()

@@ -4,7 +4,7 @@
 #include "Transforms.h"
 
 #include "Config.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 #include "Source/GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
 #include "Source/Core/Nodes/GraphManager.h"
 #include "Source/Core/Input/InputManager.h"
@@ -58,13 +58,13 @@ World::World(){
         }
     }
 
-    this->sceneRoot = new GameObject(gridMesh,&World::shader0,0); 
+    this->sceneRoot = new GameObject(gridMesh,&World::shader0,0);
     this->sceneRoot->color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     this->sceneRoot->addComponent(new Renderer(Renderer::DRAW_LINES));
 
     GameObject* camera = new GameObject();
     camera->transform(glm::vec3(0.0f, 5.0f, 10.0f),glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.0f, 0.0f, 0.0f),-30.0f);
-    camera->addComponent(new Camera(60.0f, this->sceneRoot)); 
+    camera->addComponent(new Camera(60.0f, this->sceneRoot));
     camera->addComponent(new CameraControl());
     this->camControl=(CameraControl*)camera->getComponent(CameraControl::componentType());
 
@@ -73,8 +73,8 @@ World::World(){
 }
 
 bool World::init(){
-    World::shader0 =         loadShader(Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str()); 
-    World::shaderHandle =    loadShader(Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str()); 
+    World::shader0 =         loadShader(Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str());
+    World::shaderHandle =    loadShader(Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),  Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str());
     World::shaderProj =      loadShader(Config::getAbsolutePath("Data/shaders/viewproj-vs.glsl").c_str(),Config::getAbsolutePath("Data/shaders/viewproj-fs.glsl").c_str());
 
     if (World::shader0.program * World::shaderHandle.program *World::shaderProj.program * World::shaderProj.program == 0){
@@ -133,7 +133,7 @@ void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,st
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
-    
+
     if(this->manipulators.count(keyword)==1){
         activeManipulator = &(this->manipulators[keyword]);
         if(showManipulators){activeManipulator->component->m_isActive=true;}

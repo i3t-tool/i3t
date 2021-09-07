@@ -3,28 +3,15 @@
 //
 
 #pragma once
-#include "WorkspaceNodeWithCoreData.h"
-
-struct WorkspaceCycleArgs
-{
-  WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default Cycle header";
-  std::string nodeLabel = "default Cycle label";
-  Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle();
-};
-
+#include "WorkspaceElementsWithCoreData.h"
 class WorkspaceCycle : public WorkspaceNodeWithCoreData
 {
 public:
-  WorkspaceCycle(ImTextureID headerBackground, WorkspaceCycleArgs const& args);
-  WorkspaceCycle(ImTextureID headerBackground, Ptr<Core::Cycle> nodebase = nullptr, std::string headerLabel = "Cycle", std::string nodeLabel = "Cycle");
-
+  WorkspaceCycle();
 	bool isCycle();
 
-  void drawDataSetValues(util::NodeBuilder& builder);
-  void drawDataFull(util::NodeBuilder& builder, int index);
-  void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+  bool drawDataFull(DIWNE::Diwne& diwne, int index);
 
-	int maxLenghtOfData();
+    int maxLenghtOfData(int index=0);
 };
 

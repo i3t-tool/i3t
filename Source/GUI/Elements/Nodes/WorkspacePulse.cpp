@@ -4,35 +4,16 @@
 
 #include "WorkspacePulse.h"
 
-WorkspacePulse::WorkspacePulse(ImTextureID headerBackground, WorkspacePulseArgs const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, { .levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+WorkspacePulse::WorkspacePulse()
+    : WorkspaceNodeWithCoreData(Core::Builder::createNode<ENodeType::Pulse>())
 {
-  fw.showMyPopup = false;
-  fw.id = "";
-  fw.value = NAN;
-  fw.name = "pulse";
-  fw.rows = 0;
-  fw.columns = 0;
   setDataItemsWidth();
 }
 
-WorkspacePulse::WorkspacePulse(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceNodeWithCoreData(headerBackground, Core::Builder::createNode<ENodeType::Pulse>(), headerLabel, nodeLabel)
-{
-  fw.showMyPopup = false;
-  fw.id = "";
-  fw.value = NAN;
-  fw.name = "pulse";
-  fw.rows = 0;
-  fw.columns = 0;
-  setDataItemsWidth();
-}
-
-
-void WorkspacePulse::drawDataFull(util::NodeBuilder& builder, int index)
+bool WorkspacePulse::drawDataFull(DIWNE::Diwne& diwne, int index)
 {
 
-  ImGui::PushItemWidth(m_dataItemsWidth);
+  ImGui::PushItemWidth(getDataItemsWidth(diwne));
 
 	if (ImGui::Button("Pulse"))
 	{
@@ -40,14 +21,11 @@ void WorkspacePulse::drawDataFull(util::NodeBuilder& builder, int index)
 	}
 
   ImGui::PopItemWidth();
+  return false;
 
 }
 
-void WorkspacePulse::drawDataSetValues(util::NodeBuilder& builder){
-    drawDataFull(builder, 0);
-}
-
-int WorkspacePulse::maxLenghtOfData()
+int WorkspacePulse::maxLenghtOfData(int index)
 {
   return 1;
 }

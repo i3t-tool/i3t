@@ -11,7 +11,7 @@
 #include "../../../World/Select.h"
 #include "../../../World/World.h"
 
-#include "../Nodes/WorkspaceNodeWithCoreData.h"
+#include "../Nodes/WorkspaceElementsWithCoreData.h"
 
 #include "World/Components.h"
 #include "World/HardcodedMeshes.h"

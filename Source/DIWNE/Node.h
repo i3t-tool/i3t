@@ -1,12 +1,8 @@
 #ifndef NODE_H
 #define NODE_H
 
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui.h>
-# define IMGUI_DEFINE_MATH_OPERATORS
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui_internal.h>
-
-#include <../Source/DIWNE/diwne.h>
-#include <../Source/DIWNE/Pin.h>
+#include "diwne.h"
+#include "Pin.h"
 
 namespace DIWNE
 {
@@ -25,15 +21,15 @@ class Node
 {
     public:
         /** Default constructor */
-        Node(DIWNE::Diwne *diwne);
+        Node(DIWNE::ID id);
         /** Default destructor */
         virtual ~Node();
 
 
-        /** Copy constructor
-         *  \param other Object to copy from
-         */
-        Node(const Node& other);
+//        /** Copy constructor
+//         *  \param other Object to copy from
+//         */
+//        Node(const Node& other);
 
         /** Assignment operator
          *  \param other Object to assign from
@@ -41,39 +37,55 @@ class Node
          */
         Node& operator=(const Node& other);
 
-
-        virtual bool drawNodeDiwne();
-        virtual bool drawTopDiwne();
-        virtual bool drawLeftDiwne();
-        virtual bool drawMiddleDiwne();
-        virtual bool drawRightDiwne();
-        virtual bool drawBottomDiwne();
+        DIWNE::ID const getId() const {return m_idDiwne; };
 
         void synchronizeSizeRectangles();
 
-        virtual bool drawTop();
-        virtual bool drawLeft();
-        virtual bool drawMiddle();
-        virtual bool drawRight();
-        virtual bool drawBottom();
+        bool drawNodeDiwne(DIWNE::Diwne &diwne);
+        bool drawTopDiwne(DIWNE::Diwne &diwne);
+        bool drawLeftDiwne(DIWNE::Diwne &diwne);
+        bool drawMiddleDiwne(DIWNE::Diwne &diwne);
+        bool drawRightDiwne(DIWNE::Diwne &diwne);
+        bool drawBottomDiwne(DIWNE::Diwne &diwne);
 
-        ImRect getNodeRect() {return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
+        virtual bool topContent(DIWNE::Diwne &diwne);
+        virtual bool leftContent(DIWNE::Diwne &diwne);
+        virtual bool middleContent(DIWNE::Diwne &diwne);
+        virtual bool rightContent(DIWNE::Diwne &diwne);
+        virtual bool bottomContent(DIWNE::Diwne &diwne);
 
-        DIWNE::Diwne *m_diwne;  /*! \brief diwne to which node belong */
+        bool nodePopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring);
+        virtual void nodePopupContent();
+
+        void setNodePositionDiwne(ImVec2 const& position) {m_nodePosition = position; };
+        ImVec2 getNodePositionDiwne() const { return m_nodePosition; };
+        void translateNodePositionDiwne(ImVec2 const amount) {m_nodePosition+=amount; };
+
+        ImRect getNodeRectDiwne() { synchronizeSizeRectangles(); return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
+        ImVec2 getNodeRectSizeDiwne() { synchronizeSizeRectangles(); return m_bottomRectDiwne.Max-m_topRectDiwne.Min;};
 
     protected:
 
+        ImVec2 m_nodePosition; /* can be public */
 
-
+        /* Border rects of node - are computed every frame based on node content and m_nodePosition */
         ImRect  m_topRectDiwne
               , m_leftRectDiwne
               , m_middleRectDiwne
               , m_rightRectDiwne
               , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
 
-        DIWNE::Pin *m_pin;
+        bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
+
+        DIWNE::Pin *m_pin1; /*for debug*/
+        DIWNE::Pin *m_pin2;
 
     private:
+        DIWNE::ID m_idDiwne;
+
+        void setNodeRectsPositionDiwne(ImVec2 const& position);
+        void translateNodeRectsDiwne(ImVec2 const& amount);
+        //void translateNodeRectsDiwneZoomed(DIWNE::Diwne const &diwne, ImVec2 const& amount);
 
 
 };

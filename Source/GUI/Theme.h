@@ -262,6 +262,7 @@ public:
 	void returnFloatColorToDefault();
 
 	ImVec4 getHeader();
+	ImVec4 getBg();
 
 private:
 	template <typename E, typename T>

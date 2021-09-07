@@ -4,27 +4,18 @@ namespace DIWNE
 {
 
 
-Node::Node(DIWNE::Diwne *diwne)
+Node::Node(DIWNE::ID id) /* FLT_MAX for first frame - draw node anywhere it is and thus got its real size*/
     : m_topRectDiwne(ImRect(100,100,0,0))
     , m_leftRectDiwne(ImRect(0,0,0,0))
     , m_middleRectDiwne(ImRect(0,0,0,0))
     , m_rightRectDiwne(ImRect(0,0,0,0))
-    , m_bottomRectDiwne(ImRect(0,0,300,300))
-    , m_diwne(diwne)
-{
-    m_pin = new DIWNE::Pin();
-}
+    , m_bottomRectDiwne(ImRect(0,0,FLT_MAX, FLT_MAX))
+    , m_idDiwne(id)
+{}
 
 Node::~Node()
-{
-    //dtor
-    delete m_pin;
-}
+{}
 
-Node::Node(const Node& other)
-{
-    //copy ctor
-}
 
 Node& Node::operator=(const Node& rhs)
 {
@@ -33,136 +24,162 @@ Node& Node::operator=(const Node& rhs)
     return *this;
 }
 
-bool Node::drawNodeDiwne()
+bool Node::drawNodeDiwne(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
     bool interaction_happen = false;
-    ImRect workAreaDiwne = m_diwne->getWorkAreaDiwne();
-    if ( this->getNodeRect().Overlaps(workAreaDiwne) )
+
+    setNodeRectsPositionDiwne(getNodePositionDiwne()*diwne.getWorkAreaZoomDiwne());
+
+    ImRect nodeRectDiwne = getNodeRectDiwne();
+
+    if ( nodeRectDiwne.Overlaps( diwne.getWorkAreaDiwne() ) )
     {
-        ImRect nodeOnScreen = ImRect( m_diwne->diwne2screen( m_topRectDiwne.Min )
-                                    , m_diwne->diwne2screen( m_bottomRectDiwne.Max ) );
+        ImRect nodeOnWorkArea = ImRect( diwne.diwne2workArea_noZoom( m_topRectDiwne.Min )
+                                    , diwne.diwne2workArea_noZoom( m_bottomRectDiwne.Max ) );
 
 
         /* debug - whole node */
-        ImGui::GetWindowDrawList()->AddRect(nodeOnScreen.Min, nodeOnScreen.Max, ImColor(0,255,0), 0, ImDrawCornerFlags_None, 2);
+        diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(0,255,0), 0, ImDrawCornerFlags_None, 2);
 
 
         /* Set cursor to position of node */
-        ImGui::SetCursorScreenPos(nodeOnScreen.Min);
+        ImGui::SetCursorScreenPos(diwne.workArea2screen(nodeOnWorkArea.Min));
 
+        putInvisibleButtonUnder(fmt::format("NodeIB{}", m_idDiwne), getNodeRectSizeDiwne());
+        if (ImGui::IsItemActive())
+        {
+            translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
+        }
 
         ImGui::BeginGroup(); /* Begin of node */
 
-            inner_interaction_happen |= drawTopDiwne();
+            inner_interaction_happen |= drawTopDiwne(diwne);
 
             ImGui::BeginHorizontal("LeftMiddleRightDiwne");
-                inner_interaction_happen |= drawLeftDiwne();
-                inner_interaction_happen |= drawMiddleDiwne();
-                inner_interaction_happen |= drawRightDiwne();
+                inner_interaction_happen |= drawLeftDiwne(diwne);
+                inner_interaction_happen |= drawMiddleDiwne(diwne);
+                inner_interaction_happen |= drawRightDiwne(diwne);
             ImGui::EndHorizontal(); /* Left-Middle-Right */
 
-            inner_interaction_happen |= drawBottomDiwne();
+            inner_interaction_happen |= drawBottomDiwne(diwne);
+
+        /* debug */
+        ImGui::Text(fmt::format( "NodeDiwne : {}-{}  -  {}-{}\nNodeWA    : {}-{}  -  {}-{}\nNodeScreen: {}-{}  -  {}-{}\n",
+                                 nodeRectDiwne.Min.x, nodeRectDiwne.Min.y, nodeRectDiwne.Max.x, nodeRectDiwne.Max.y,
+                                 diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y, diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
+                                 diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
 
         ImGui::EndGroup(); /* End of node */
-        interaction_happen = ImGui::IsItemHovered();
-
         synchronizeSizeRectangles();
+
+
+        interaction_happen = ImGui::IsItemHovered(); /* for debug */
+        if (!inner_interaction_happen)
+        {
+            inner_interaction_happen |= nodePopupDiwne(diwne, fmt::format("nodeContextPopup{}", m_idDiwne));
+        }
+
 
         if (!inner_interaction_happen && interaction_happen)
         {
             /* debug - whole node */
-            ImGui::GetWindowDrawList()->AddRect( m_diwne->diwne2screen(m_topRectDiwne.Min)
-                                            , m_diwne->diwne2screen(m_bottomRectDiwne.Max), ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);
+            diwne.AddRectDiwne( m_topRectDiwne.Min
+                        , m_bottomRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);
         }
 
+    }
+    else
+    {
+        ImGui::Text(fmt::format("Node is outside of WorkAreaDiwne {} {}", nodeRectDiwne.Min.x, nodeRectDiwne.Min.y ).c_str()); /* debug */
     }
     return inner_interaction_happen || interaction_happen;
 }
 
-bool Node::drawTopDiwne()
+bool Node::drawTopDiwne(DIWNE::Diwne &diwne)
 {
     /* debug - top of node */
-    ImGui::GetWindowDrawList()->AddRect( m_diwne->diwne2screen(m_topRectDiwne.Min)
-                                        , m_diwne->diwne2screen(m_topRectDiwne.Max), ImColor(0,0,255), 0, ImDrawCornerFlags_None, 2);
+    diwne.AddRectDiwne( m_topRectDiwne.Min
+                , m_topRectDiwne.Max, ImColor(0,0,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
     ImGui::BeginHorizontal("TopDiwne");
-        inner_interaction_happen |= drawTop();
+        inner_interaction_happen |= topContent(diwne);
     ImGui::EndHorizontal();
 
-    m_topRectDiwne.Max = m_diwne->screen2diwne( ImGui::GetItemRectMax() );
+    m_topRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     return inner_interaction_happen;
 }
 
-bool Node::drawLeftDiwne()
+bool Node::drawLeftDiwne(DIWNE::Diwne &diwne)
 {
     /* debug - top of node */
-    ImGui::GetWindowDrawList()->AddRect( m_diwne->diwne2screen(m_leftRectDiwne.Min)
-                                        , m_diwne->diwne2screen(m_leftRectDiwne.Max), ImColor(0,255,255), 0, ImDrawCornerFlags_None, 2);
+    diwne.AddRectDiwne( m_leftRectDiwne.Min
+                , m_leftRectDiwne.Max, ImColor(0,255,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
         ImGui::BeginVertical("LeftDiwne");
-            inner_interaction_happen |= drawLeft();
+            inner_interaction_happen |= leftContent(diwne);
         ImGui::EndVertical();
 
-        m_leftRectDiwne.Min = m_diwne->screen2diwne( ImGui::GetItemRectMin() );
-        m_leftRectDiwne.Max = m_diwne->screen2diwne( ImGui::GetItemRectMax() );
+        m_leftRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+        m_leftRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     return inner_interaction_happen;
 }
-bool Node::drawMiddleDiwne()
+bool Node::drawMiddleDiwne(DIWNE::Diwne &diwne)
 {
     /* debug - top of node */
-    ImGui::GetWindowDrawList()->AddRect( m_diwne->diwne2screen(m_middleRectDiwne.Min)
-                                        , m_diwne->diwne2screen(m_middleRectDiwne.Max), ImColor(255,0,255), 0, ImDrawCornerFlags_None, 2);
+    diwne.AddRectDiwne(m_middleRectDiwne.Min
+                , m_middleRectDiwne.Max, ImColor(255,0,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
         ImGui::BeginVertical("MiddleDiwne");
-            inner_interaction_happen |= drawMiddle();
+            inner_interaction_happen |= middleContent(diwne);
         ImGui::EndVertical();
 
-        m_middleRectDiwne.Min = m_diwne->screen2diwne( ImGui::GetItemRectMin() );
-        m_middleRectDiwne.Max = m_diwne->screen2diwne( ImGui::GetItemRectMax() );
+        m_middleRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+        m_middleRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     return inner_interaction_happen;
 }
-bool Node::drawRightDiwne()
+bool Node::drawRightDiwne(DIWNE::Diwne &diwne)
 {
     /* debug - top of node */
-    ImGui::GetWindowDrawList()->AddRect( m_diwne->diwne2screen(m_rightRectDiwne.Min)
-                                        , m_diwne->diwne2screen(m_rightRectDiwne.Max), ImColor(255,255,0), 0, ImDrawCornerFlags_None, 2);
+    diwne.AddRectDiwne(m_rightRectDiwne.Min
+                ,m_rightRectDiwne.Max, ImColor(255,255,0), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
         ImGui::BeginVertical("RightDiwne");
-            inner_interaction_happen |= drawRight();
+            inner_interaction_happen |= rightContent(diwne);
         ImGui::EndVertical();
 
-        m_rightRectDiwne.Min = m_diwne->screen2diwne( ImGui::GetItemRectMin() );
-        m_rightRectDiwne.Max = m_diwne->screen2diwne( ImGui::GetItemRectMax() );
+        m_rightRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+        m_rightRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
 
     return inner_interaction_happen;
 
 }
-bool Node::drawBottomDiwne()
+bool Node::drawBottomDiwne(DIWNE::Diwne &diwne)
 {
     /* debug - top of node */
-    ImGui::GetWindowDrawList()->AddRect( m_diwne->diwne2screen(m_bottomRectDiwne.Min)
-                                        , m_diwne->diwne2screen(m_bottomRectDiwne.Max), ImColor(255,255,255), 0, ImDrawCornerFlags_None, 2);
+    diwne.AddRectDiwne(m_bottomRectDiwne.Min
+                , m_bottomRectDiwne.Max, ImColor(255,255,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
         ImGui::BeginHorizontal("BottomDiwne");
-            inner_interaction_happen |= drawBottom();
+            inner_interaction_happen |= bottomContent(diwne);
         ImGui::EndHorizontal();
 
-        m_bottomRectDiwne.Min = m_diwne->screen2diwne( ImGui::GetItemRectMin() );
-        m_bottomRectDiwne.Max = m_diwne->screen2diwne( ImGui::GetItemRectMax() );
+        m_bottomRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+        m_bottomRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
 
     return inner_interaction_happen;
 }
 
 void Node::synchronizeSizeRectangles()
 {
-    m_bottomRectDiwne.Max.x = std::max(m_bottomRectDiwne.Max.x, m_rightRectDiwne.Max.x);
+    m_bottomRectDiwne.Max.x = std::max(m_topRectDiwne.Max.x, std::max(m_rightRectDiwne.Max.x, m_bottomRectDiwne.Max.x));
 
+    /* \todo JH maybe increase width of middle instead of right? */
     m_rightRectDiwne.Max.x = m_bottomRectDiwne.Max.x;
     m_rightRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
 
@@ -173,40 +190,76 @@ void Node::synchronizeSizeRectangles()
     m_topRectDiwne.Max.x = m_bottomRectDiwne.Max.x;
 }
 
-bool Node::drawTop(){return false;}
-bool Node::drawLeft()
+void Node::setNodeRectsPositionDiwne(ImVec2 const& position)
+{
+    translateNodeRectsDiwne(position - m_topRectDiwne.Min);
+}
+
+//void Node::translateNodeRectsDiwneZoomed(DIWNE::Diwne const &diwne, ImVec2 const& distance)
+//{
+//    float zoomDiwne = diwne.getWorkAreaZoomDiwne();
+//    translateNodeRectsDiwne(ImVec2(distance.x/zoomDiwne, distance.y/zoomDiwne));
+//}
+
+void Node::translateNodeRectsDiwne(ImVec2 const& distance)
+{
+    m_topRectDiwne.Translate(distance);
+    m_leftRectDiwne.Translate(distance);
+    m_middleRectDiwne.Translate(distance);
+    m_rightRectDiwne.Translate(distance);
+    m_bottomRectDiwne.Translate(distance);
+}
+
+bool Node::topContent(DIWNE::Diwne &diwne){return false;}
+bool Node::leftContent(DIWNE::Diwne &diwne)
 {
     bool interaction_happen = false;
     ImGui::Spring(1, 3);
 
 
-    interaction_happen |= m_pin->drawPinDiwne();
-    interaction_happen |= m_pin->drawPinDiwne();
+    interaction_happen |= m_pin1->drawPinDiwne(diwne);
+    interaction_happen |= m_pin2->drawPinDiwne(diwne);
 
     ImGui::Spring(2, 0);
     return interaction_happen;
 }
 
-bool Node::drawRight()
+bool Node::rightContent(DIWNE::Diwne &diwne){return false;}
+bool Node::middleContent(DIWNE::Diwne &diwne){return false;}
+bool Node::bottomContent(DIWNE::Diwne &diwne){return false;}
+
+bool Node::nodePopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring)
 {
     bool interaction_happen = false;
-    ImGui::Spring(1, 0);
-    ImGui::Text("Zkušební Right");
-    ImGui::Text("Zkušební Right");
-    ImGui::Spring(2, 0);
-    return interaction_happen;
+
+    ImGui::SetNextWindowPos(diwne.getPopupPosition());
+    if (ImGui::BeginPopupContextItem(popupIDstring.c_str()))
+	{
+	    interaction_happen = true;
+	    /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not (zoomed) diwne */
+        diwne.transformMouseFromDiwneToImGui();
+
+
+        /* debug */
+        ImGui::Text("Diwne ID: %i", m_idDiwne);
+        ImGui::Separator();
+
+        nodePopupContent();
+
+		ImGui::EndPopup();
+	}
+	return interaction_happen;
+
 }
 
-bool Node::drawMiddle()
+void Node::nodePopupContent()
 {
-    bool interaction_happen = false;
-    ImGui::Spring(1, 0);
-    ImGui::Text("Zkušební Middle");
-    ImGui::Text("Zkušební Middle");
-    ImGui::Spring(2, 0);
-    return interaction_happen;
-}
+ //
+//		if (context_node->isTransformation()) { context_node->drawMenuSetDataMap(); }
+//		context_node->drawMenuLevelOfDetail();
+//		context_node->drawMenuSetPrecision();
 
-bool Node::drawBottom(){return false;}
+		if (ImGui::MenuItem("Increment id (haha just for test)")) { m_idDiwne++;}
+}
 
 } /* namespace DIWNE */

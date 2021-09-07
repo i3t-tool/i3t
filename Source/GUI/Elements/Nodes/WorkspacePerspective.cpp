@@ -4,33 +4,31 @@
 
 #include "WorkspacePerspective.h"
 
-WorkspacePerspective::WorkspacePerspective(ImTextureID headerBackground, WorkspacePerspectiveArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
+WorkspacePerspective::WorkspacePerspective()
+    :   WorkspaceMatrix4x4(Core::Builder::createTransform<Core::PerspectiveProj>())
 {}
 
-WorkspacePerspective::WorkspacePerspective(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::PerspectiveProj>(), headerLabel, nodeLabel)
-{}
 
-void WorkspacePerspective::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspacePerspective::drawDataSetValues(DIWNE::Diwne &diwne)
 {
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-  drawDataSetValues_builder(builder,
+  Ptr<Core::PerspectiveProj> nodebase = m_nodebase->as<Core::PerspectiveProj>();
+  return drawDataSetValues_builder(diwne,
                             {   "FOW",
                                 "Aspect",
                                 "ZNear",
                                 "ZFar" },
-                            {   [this](){return m_nodebase->as<Core::PerspectiveProj>()->getFOW();},
-                                [this](){return m_nodebase->as<Core::PerspectiveProj>()->getAspect();},
-                                [this](){return m_nodebase->as<Core::PerspectiveProj>()->getZNear();},
-                                [this](){return m_nodebase->as<Core::PerspectiveProj>()->getZFar();} },
-                            {   [this](float v){return m_nodebase->as<Core::PerspectiveProj>()->setFOW(v);},
-                                [this](float v){return m_nodebase->as<Core::PerspectiveProj>()->setAspect(v);},
-                                [this](float v){return m_nodebase->as<Core::PerspectiveProj>()->setZNear(v);},
-                                [this](float v){return m_nodebase->as<Core::PerspectiveProj>()->setZFar(v);} },
+                            {   [nodebase](){return nodebase->getFOW();},
+                                [nodebase](){return nodebase->getAspect();},
+                                [nodebase](){return nodebase->getZNear();},
+                                [nodebase](){return nodebase->getZFar();} },
+                            {   [nodebase](float v){return nodebase->setFOW(v);},
+                                [nodebase](float v){return nodebase->setAspect(v);},
+                                [nodebase](float v){return nodebase->setZNear(v);},
+                                [nodebase](float v){return nodebase->setZFar(v);} },
                             {   1, /* \todo JH some better way how determine what element from DataMap should be used? */
                                 1,
-	                              1,
+                                1,
                                 1 }
   );
 }

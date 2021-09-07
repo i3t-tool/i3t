@@ -1,52 +1,57 @@
 #include "Pin.h"
 
-
 namespace DIWNE
 {
 
-Pin::Pin()
-{
-    //ctor
-}
+Pin::Pin(DIWNE::ID id)
+    : m_idDiwne(id)
+    , m_linkDiwne(id)
+    , m_pinRectDiwne(ImRect(0,0,1,1)) /* can not have zero size because of InvisibleButton */
+{ }
 
 Pin::~Pin()
 {
     //dtor
 }
 
-bool Pin::drawPinDiwne()
+bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
 {
     bool interaction_happen = false;
     bool inner_interaction_happen = false;
 
-    ImGui::BeginGroup();
-        inner_interaction_happen |= drawPin();
-    ImGui::EndGroup();
+    putInvisibleButtonUnder(fmt::format("Pin{}", m_idDiwne).c_str(), m_pinRectDiwne.GetSize() );
+    if (ImGui::IsItemActive())
+    {
+        diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
+        ImVec2 origin = diwne.screen2workArea( ImGui::GetIO().MouseClickedPos[0]);
+        ImVec2 actual = diwne.screen2workArea( ImGui::GetIO().MousePos);
 
-//    m_pinRect.Min = m_diwne->screen2diwne( ImGui::GetItemRectMin() );
-//    m_pinRect.Max = m_diwne->screen2diwne( ImGui::GetItemRectMax() );
+        diwne.getHelperLinkPointer()->setLinkEndpointsDiwne(origin, actual);
+        diwne.getHelperLinkPointer()->drawLinkDiwne(diwne);
+        //diwne.AddBezierCurveScreen(origin, ImVec2(origin.x-200, origin.y), ImVec2(actual.x+200, actual.y), actual, ImGui::GetColorU32(ImGuiCol_Button), 10.0f); // Draw a line between the button and the mouse cursor
+    }
+
+
+
+
+    /* debug - whole pin */
+    diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
+
+    ImGui::BeginHorizontal(fmt::format("pin{}", m_idDiwne).c_str());
+        inner_interaction_happen |= pinContent(diwne);
+    ImGui::EndHorizontal();
+    m_pinRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+    m_pinRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
 
     interaction_happen = ImGui::IsItemHovered();
 
+    /* debug */
     if (!inner_interaction_happen && interaction_happen)
     {
             ImGui::Text("Pin is hoovered");
     }
 
     return inner_interaction_happen || interaction_happen;
-}
-
-bool Pin::drawPin()
-{
-    bool interaction_happen = false;
-
-    // \todo JH ImageButton(ImTextureID user_texture_id, const ImVec2& size, const ImVec2& uv0 = ImVec2(0,0),  const ImVec2& uv1 = ImVec2(1,1), int frame_padding = -1, const ImVec4& bg_col = ImVec4(0,0,0,0), const ImVec4& tint_col = ImVec4(1,1,1,1));
-    if(ImGui::Button("Input1", ImVec2(50,50)))
-    {
-        interaction_happen = true;
-        ImGui::Text("Clicked");
-    }
-    return interaction_happen;
 }
 
 } /* namespace DIWNE */

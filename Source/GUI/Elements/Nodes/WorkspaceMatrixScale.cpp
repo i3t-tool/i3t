@@ -1,20 +1,17 @@
 #include "WorkspaceMatrixScale.h"
 
-WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, WorkspaceMatrixScaleArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+WorkspaceMatrixScale::WorkspaceMatrixScale()
+    :   WorkspaceMatrix4x4(Core::Builder::createTransform<Core::Scale>())
 {}
 
-WorkspaceMatrixScale::WorkspaceMatrixScale(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::Scale>(), headerLabel, nodeLabel){
-}
-
-void WorkspaceMatrixScale::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspaceMatrixScale::drawDataSetValues(DIWNE::Diwne &diwne)
 {
+    Ptr<Core::Scale> nodebase = m_nodebase->as<Core::Scale>();
     const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-    drawDataSetValues_builder(builder,
-                                {   "scale" },
-                                {   [this](){return m_nodebase->as<Core::Scale>()->getX();} },
-                                {   [this](float v){return m_nodebase->as<Core::Scale>()->setX(v);}},
+    return drawDataSetValues_builder(diwne,
+                                {   "scale" }, /* \todo labels from settings */
+                                {   [nodebase](){return nodebase->getX();} },
+                                {   [nodebase](float v){return nodebase->setX(v);}},
                                 {   coreMap[0*4+0] /* \todo JH some better way how determine what element from DataMap should be used? */}
                             );
 }

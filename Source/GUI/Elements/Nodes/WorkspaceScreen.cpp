@@ -4,8 +4,8 @@
 
 #include "WorkspaceScreen.h"
 
-WorkspaceScreen::WorkspaceScreen(ImTextureID headerBackground, WorkspaceScreenArgs const& args)
-		: WorkspaceFloat(headerBackground, {.levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+WorkspaceScreen::WorkspaceScreen()
+		: WorkspaceFloat(Core::Builder::createNode<ENodeType::Screen>())
 {
 	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -15,27 +15,11 @@ WorkspaceScreen::WorkspaceScreen(ImTextureID headerBackground, WorkspaceScreenAr
 
 }
 
-WorkspaceScreen::WorkspaceScreen(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-		: WorkspaceFloat(headerBackground, Core::Builder::createNode<ENodeType::Screen>(), headerLabel, nodeLabel)
+
+bool WorkspaceScreen::drawDataFull(DIWNE::Diwne& diwne, int index)
 {
 
-	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	rend = new RenderTexture(&renderTexture, 256, 256);
-	cam = new Camera(60.0f, Application::get().world()->sceneRoot,rend);
-	cam->update();
-
-}
-
-void WorkspaceScreen::drawDataSetValues(util::NodeBuilder& builder)
-{
-	drawDataFull(builder,0);
-}
-
-void WorkspaceScreen::drawDataFull(util::NodeBuilder& builder, int index)
-{
-
-	if(m_workspaceInputsProperties[0]->getCorePin().isPluggedIn()){
+	if(m_workspaceInputs[0]->getCorePin().isPluggedIn()){
 		glm::mat4 camera = Core::GraphManager::getParent(m_nodebase)->getData(2).getMat4();
 
 		cam->m_perspective = camera;
@@ -43,5 +27,6 @@ void WorkspaceScreen::drawDataFull(util::NodeBuilder& builder, int index)
 
 		ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
 	}
+	return false;
 
 }
