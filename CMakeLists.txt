@@ -18,15 +18,17 @@ endif()
 configure_file(Source/ConfigVersion.h.in Source/ConfigVersion.h)
 
 # Specifies where build system should find header files.
+# TODO -> MH use target_include_directories.
 include_directories(Source/)
 include_directories(Dependencies/assimp/include)
-include_directories(Dependencies/jsonlib/single_include)
 include_directories(Dependencies/glfw/include)
 include_directories(Dependencies/glm)
+include_directories(Dependencies/jsonlib/single_include)
 include_directories(Dependencies/imgui/examples)
 include_directories(Dependencies/imgui_node_editor)
 include_directories(Dependencies/imgui_node_editor/external/imgui)
 include_directories(Dependencies/imgui_markdown)
+include_directories(Dependencies/magic_enum/include)
 include_directories(Dependencies/pgr-framework/include)
 include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)

@@ -36,7 +36,7 @@ WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, WorkspaceTr
 
 WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
 		//TODO change create Node when MH make Trackball in Core.
-		: WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::Matrix>(), headerLabel, nodeLabel){
+		: WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MatrixToMatrix>(), headerLabel, nodeLabel){
 
 	buttonSize = ImVec2(
 			m_dataItemsWidth*4.0f/3.0f,

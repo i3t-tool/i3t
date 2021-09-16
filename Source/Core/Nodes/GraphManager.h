@@ -21,42 +21,44 @@ namespace Core
 {
 namespace Builder
 {
-/**
+	/**
  * Create new node.
  *
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <ENodeType T> FORCE_INLINE Ptr<NodeBase> createNode()
-{
-	bool shouldUnlockAllValues =
-			T == ENodeType::Float || T == ENodeType::Vector3 || T == ENodeType::Vector4 || T == ENodeType::Matrix;
-	auto ret = std::make_shared<NodeImpl<T>>();
-	ret->init();
-	if (shouldUnlockAllValues)
-		ret->setDataMap(&Transform::g_Free);
+	template <ENodeType T>
+	FORCE_INLINE Ptr<NodeBase> createNode()
+	{
+		// \todo MH
+		bool shouldUnlockAllValues = T == ENodeType::FloatToFloat || T == ENodeType::Vector3ToVector3 ||
+				T == ENodeType::Vector4ToVector4 || T == ENodeType::MatrixToMatrix;
+		auto ret = std::make_shared<NodeImpl<T>>();
+		ret->init();
+		if (shouldUnlockAllValues) ret->setDataMap(&Transform::g_Free);
 
-	ret->updateValues(0);
-	return ret;
-}
+		ret->updateValues(0);
+		return ret;
+	}
 
-Ptr<Core::Sequence> FORCE_INLINE createSequence()
-{
-	auto ret = std::make_shared<Core::Sequence>();
-	ret->init();
-	ret->createComponents();
-	ret->updateValues(0);
-	return ret;
-}
+	Ptr<Core::Sequence> FORCE_INLINE createSequence()
+	{
+		auto ret = std::make_shared<Core::Sequence>();
+		ret->init();
+		ret->createComponents();
+		ret->updateValues(0);
+		return ret;
+	}
 
-template <typename T, typename... Args> Ptr<T> FORCE_INLINE createTransform(Args&&... args)
-{
-	static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
-	auto ret = std::make_shared<T>(std::forward<Args>(args)...);
-	ret->init();
-	ret->reset();
-	return ret;
-}
+	template <typename T, typename... Args>
+	Ptr<T> FORCE_INLINE createTransform(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
+		auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+		ret->init();
+		ret->reset();
+		return ret;
+	}
 } // namespace Builder
 
 class GraphManager
@@ -65,6 +67,18 @@ class GraphManager
 	static std::vector<Ptr<Cycle>> m_cycles;
 
 public:
+	template <ENodeType T>
+	static Ptr<NodeBase> createNode()
+	{
+		return Builder::createNode<T>();
+	}
+
+	template <typename T, typename... Args>
+	static Ptr<T> createTransform(Args&&... args)
+	{
+		return Builder::createTransform<T>(std::forward<Args>(args)...);
+	}
+
 	static CameraPtr createCamera();
 
 	/**
@@ -118,12 +132,12 @@ public:
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
 	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
-	                                          unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+																						unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
 	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
-	                                                            unsigned nodeOutputIndex = 0);
+																															unsigned nodeOutputIndex = 0);
 	[[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node,
-	                                                             unsigned nodeInputIndex = 0);
+																															 unsigned nodeInputIndex = 0);
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(const NodePtr& node);
@@ -164,8 +178,8 @@ public:
 	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
 
 	static const Operation* getOperation(const Pin* pin);
-	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
-	static bool arePlugged(const Pin& input, const Pin& output);
+	static bool							areFromSameNode(const Pin* lhs, const Pin* rhs);
+	static bool							arePlugged(const Pin& input, const Pin& output);
 };
 
 using gm = GraphManager;
@@ -230,14 +244,13 @@ public:
 
 class MatrixTracker
 {
-	glm::mat4 m_interpolatedMatrix;
-	float m_param = 0.0f;
-	bool m_isReversed = false;
+	glm::mat4		m_interpolatedMatrix;
+	float				m_param			 = 0.0f;
+	bool				m_isReversed = false;
 	SequencePtr m_beginSequence;
 
 public:
-	explicit MatrixTracker(const SequencePtr& beginSequence)
-			: m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
+	explicit MatrixTracker(const SequencePtr& beginSequence) : m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
 	{}
 
 	const glm::mat4& getInterpolatedMatrix() { return m_interpolatedMatrix; }

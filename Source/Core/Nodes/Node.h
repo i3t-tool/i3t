@@ -59,10 +59,12 @@ inline constexpr size_t I3T_DATA2 = 2;
 namespace Core
 {
 class Pin;
+class NodeVisitor;
 
 /**
  * Base class interface for all boxes.
- * \image html baseOperator.png
+ *
+ * \todo Decompose class to smaller interfaces.
  */
 class NodeBase : public std::enable_shared_from_this<NodeBase>
 {
@@ -71,94 +73,6 @@ class NodeBase : public std::enable_shared_from_this<NodeBase>
 public:
 	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
 	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
-
-	class Strategy;
-
-	/**
-	 * Class which composes
-	 */
-	class PinView
-	{
-		using value			= Pin;
-		using pointer		= Pin*;
-		using reference = Pin&;
-
-	public:
-		class Iterator
-		{
-		public:
-			Iterator(Ptr<Strategy> strategy, Ptr<NodeBase> node, int index);
-
-			reference		operator*() const;
-			pointer			operator->();
-			Iterator&		operator++();
-			Iterator		operator++(int);
-			Iterator&		operator=(const Iterator&) = default;
-			friend bool operator==(const Iterator& a, const Iterator& b) { return a.m_index == b.m_index; };
-			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.m_index != b.m_index; };
-
-		protected:
-			int						m_index;
-			Ptr<NodeBase> m_node;
-			Ptr<Strategy> m_strategy;
-		};
-
-	public:
-		PinView(Ptr<Strategy> strategy, Ptr<NodeBase> node) : m_strategy(strategy), m_node(node){};
-		Pin&		 operator[](size_t i) const;
-		Iterator begin() const;
-		Iterator end() const;
-		bool		 empty() const;
-		size_t	 size() const;
-
-	private:
-		Ptr<NodeBase> m_node;
-		Ptr<Strategy> m_strategy;
-	};
-
-
-	class Strategy : public std::enable_shared_from_this<Strategy>
-	{
-	public:
-			Strategy(Ptr<NodeBase> node) : m_node(node) {};
-			Ptr<Strategy> getThis() { return shared_from_this(); }
-
-			virtual PinView::Iterator begin()						= 0;
-			virtual PinView::Iterator end()							= 0;
-			virtual bool							empty()						= 0;
-			virtual size_t						size()						= 0;
-			virtual Pin&							get(size_t index) = 0;
-
-	protected:
-			Ptr<NodeBase> m_node;
-	};
-
-	class InputStrategy : public Strategy
-	{
-	public:
-		InputStrategy(Ptr<NodeBase> node) :
-					Strategy(node) {}
-
-		virtual PinView::Iterator begin();
-		virtual PinView::Iterator end();
-		virtual bool							empty();
-		virtual size_t						size();
-		virtual Pin&							get(size_t index);
-	};
-
-	class OutputStrategy : public Strategy
-	{
-	public:
-		OutputStrategy(Ptr<NodeBase> node) :
-					Strategy(node) {}
-
-		virtual PinView::Iterator begin();
-		virtual PinView::Iterator end();
-		virtual bool							empty();
-		virtual size_t						size();
-		virtual Pin&							get(size_t index);
-	};
-
 
 protected:
 	ID m_id{};
@@ -228,7 +142,7 @@ protected:
 	 * Get data storage for read and write purposes. No written value validation
 	 * is performed.
 	 *
-	 * Overriden in Sequence class.
+	 * Overridden in Sequence class.
 	 */
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
@@ -347,6 +261,94 @@ public:
 	const Transform::DataMap&																	 getDataMapRef() { return *m_currentMap; }
 	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps() { return m_operation->validDatamaps; };
 
+	class Strategy;
+
+	//===----------------------------------------------------------------------===//
+	/**
+	 * Class which composes
+	 */
+	class PinView
+	{
+		using value			= Pin;
+		using pointer		= Pin*;
+		using reference = Pin&;
+
+	public:
+		class Iterator
+		{
+		public:
+			Iterator(Ptr<Strategy> strategy, Ptr<NodeBase> node, int index);
+
+			reference		operator*() const;
+			pointer			operator->();
+			Iterator&		operator++();
+			Iterator		operator++(int);
+			Iterator&		operator=(const Iterator&) = default;
+			friend bool operator==(const Iterator& a, const Iterator& b) { return a.m_index == b.m_index; };
+			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.m_index != b.m_index; };
+
+		protected:
+			int						m_index;
+			Ptr<NodeBase> m_node;
+			Ptr<Strategy> m_strategy;
+		};
+
+	public:
+		PinView(Ptr<Strategy> strategy, Ptr<NodeBase> node) : m_strategy(strategy), m_node(node){};
+		Pin&		 operator[](size_t i) const;
+		Iterator begin() const;
+		Iterator end() const;
+		bool		 empty() const;
+		size_t	 size() const;
+
+	private:
+		Ptr<NodeBase> m_node;
+		Ptr<Strategy> m_strategy;
+	};
+
+
+	class Strategy : public std::enable_shared_from_this<Strategy>
+	{
+	public:
+		Strategy(Ptr<NodeBase> node) : m_node(node) {};
+		Ptr<Strategy> getThis() { return shared_from_this(); }
+
+		virtual PinView::Iterator begin()						= 0;
+		virtual PinView::Iterator end()							= 0;
+		virtual bool							empty()						= 0;
+		virtual size_t						size()						= 0;
+		virtual Pin&							get(size_t index) = 0;
+
+	protected:
+		Ptr<NodeBase> m_node;
+	};
+
+	class InputStrategy : public Strategy
+	{
+	public:
+		InputStrategy(Ptr<NodeBase> node) :
+				Strategy(node) {}
+
+		virtual PinView::Iterator begin();
+		virtual PinView::Iterator end();
+		virtual bool							empty();
+		virtual size_t						size();
+		virtual Pin&							get(size_t index);
+	};
+
+	class OutputStrategy : public Strategy
+	{
+	public:
+		OutputStrategy(Ptr<NodeBase> node) :
+				Strategy(node) {}
+
+		virtual PinView::Iterator begin();
+		virtual PinView::Iterator end();
+		virtual bool							empty();
+		virtual size_t						size();
+		virtual Pin&							get(size_t index);
+	};
+
 	[[nodiscard]] const PinView getInputPins();
 	[[nodiscard]] const PinView getOutputPins();
 
@@ -411,6 +413,8 @@ protected:
 
 		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
 	};
+
+	virtual void accept(NodeVisitor& visitor);
 
 protected:
 	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);

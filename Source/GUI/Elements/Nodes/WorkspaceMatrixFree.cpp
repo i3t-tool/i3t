@@ -5,7 +5,7 @@ WorkspaceMatrixFree::WorkspaceMatrixFree(ImTextureID headerBackground, Workspace
 {}
 
 WorkspaceMatrixFree::WorkspaceMatrixFree(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::Matrix>(), headerLabel, nodeLabel){
+    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MatrixToMatrix>(), headerLabel, nodeLabel){
 }
 
 void WorkspaceMatrixFree::drawDataSetValues(util::NodeBuilder& builder)

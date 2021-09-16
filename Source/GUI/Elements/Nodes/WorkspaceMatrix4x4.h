@@ -7,7 +7,7 @@ struct WorkspaceMatrix4x4Args
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Matrix4x4 header";
     std::string nodeLabel = "Matrix 4x4";
-    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Matrix>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MatrixToMatrix>();
 };
 
 /*! \class WorkspaceMatrix4x4 virtual class for all Nodes with Matrix4x4 Core data*/

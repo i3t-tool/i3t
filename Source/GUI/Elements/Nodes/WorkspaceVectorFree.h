@@ -6,7 +6,7 @@ struct WorkspaceVectorFreeArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Vector header";
     std::string nodeLabel = "default Vector label";
-    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector4>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector4ToVector4>();
 };
 
 class WorkspaceVectorFree : public WorkspaceVector4

@@ -5,7 +5,7 @@ WorkspaceVectorFree::WorkspaceVectorFree(ImTextureID headerBackground, Workspace
 {}
 
 WorkspaceVectorFree::WorkspaceVectorFree(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceVector4(headerBackground, Core::Builder::createNode<ENodeType::Vector4>(), headerLabel, nodeLabel)
+    : WorkspaceVector4(headerBackground, Core::Builder::createNode<ENodeType::Vector4ToVector4>(), headerLabel, nodeLabel)
 {}
 
 void WorkspaceVectorFree::drawDataSetValues(util::NodeBuilder& builder)

@@ -1,6 +1,7 @@
 #include "Node.h"
 
 #include "Core/Nodes/GraphManager.h"
+#include "Core/Nodes/NodeVisitor.h"
 #include "Logger/Logger.h"
 #include "Logger/LoggerInternal.h"
 
@@ -116,19 +117,16 @@ void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node) { pin.m_master = node; 
 
 void NodeBase::pulse(size_t index)
 {
-  setInternalValue(true, index);
-  setInternalValue(false, index);
+	setInternalValue(true, index);
+	setInternalValue(false, index);
 }
 
 bool NodeBase::shouldPulse(size_t inputIndex, size_t outputIndex)
 {
-	auto outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
-	auto& storage = getIn(inputIndex).getStorage(outputPinIndex);
+	auto	outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
+	auto& storage				 = getIn(inputIndex).getStorage(outputPinIndex);
 
-	if (getIn(inputIndex).isPluggedIn() && storage.isPulseTriggered())
-	{
-    return true;
-	}
+	if (getIn(inputIndex).isPluggedIn() && storage.isPulseTriggered()) { return true; }
 	return false;
 }
 
@@ -141,9 +139,15 @@ void NodeBase::setDataMap(const Transform::DataMap* map)
 	if (it != validMaps.end()) m_currentMap = map;
 }
 
-const NodeBase::PinView NodeBase::getInputPins() { return PinView(std::make_shared<InputStrategy>(getPtr()), getPtr()); }
+const NodeBase::PinView NodeBase::getInputPins()
+{
+	return PinView(std::make_shared<InputStrategy>(getPtr()), getPtr());
+}
 
-const NodeBase::PinView NodeBase::getOutputPins() { return PinView(std::make_shared<OutputStrategy>(getPtr()), getPtr()); }
+const NodeBase::PinView NodeBase::getOutputPins()
+{
+	return PinView(std::make_shared<OutputStrategy>(getPtr()), getPtr());
+}
 
 NodeBase::PinView NodeBase::getInputPinsRef() { return PinView(std::make_shared<InputStrategy>(getPtr()), getPtr()); }
 
@@ -167,7 +171,7 @@ void NodeBase::spreadSignal(size_t outIndex)
 
 	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
 	{
-    // I3T_DEBUG_LOG("Spreading signal from {}:{} to {}:{}.", getSig(), outIndex, inPin->m_master->getSig(), inPin->getSig());
+		// I3T_DEBUG_LOG("Spreading signal from {}:{} to {}:{}.", getSig(), outIndex, inPin->m_master->getSig(), inPin->getSig());
 		inPin->m_master->receiveSignal(outIndex);
 	}
 }
@@ -192,6 +196,8 @@ bool NodeBase::areInputsPlugged(int numInputs)
 }
 
 bool NodeBase::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
+
+void NodeBase::accept(NodeVisitor& visitor) { visitor.visit(getPtr()); }
 
 ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 {
@@ -267,7 +273,7 @@ void NodeBase::unplugInput(size_t index)
 								"The node's input pin that you want to unplug does not exists.");
 
 	// auto* otherPin = m_inputs[index].m_input;
-	auto inputs    = getInputPinsRef();
+	auto	inputs	 = getInputPinsRef();
 	auto* otherPin = inputs[index].m_input;
 
 	if (otherPin)

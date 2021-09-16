@@ -6,7 +6,7 @@ struct WorkspaceFloatFreeArgs
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Float header";
     std::string nodeLabel = "default Float label";
-    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Float>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::FloatToFloat>();
 };
 
 class WorkspaceFloatFree : public WorkspaceFloat

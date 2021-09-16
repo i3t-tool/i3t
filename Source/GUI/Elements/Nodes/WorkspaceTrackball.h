@@ -17,7 +17,7 @@ struct WorkspaceTrackballArgs
 	std::string nodeLabel = "Trackball";
 	//TODO uncomment when MH make trackball in Core
 	//Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Trackball>();
-	Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Matrix>();
+	Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::MatrixToMatrix>();
 };
 
 class WorkspaceTrackball : public WorkspaceMatrix4x4

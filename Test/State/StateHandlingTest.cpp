@@ -1,44 +1,54 @@
 #include "gtest/gtest.h"
 
+#include "Core/Nodes/GraphManager.h"
+
+#include "State/DumpVisitor.h"
 #include "State/Manager.h"
 #include "State/Stateful.h"
+
+using namespace Core;
 
 class Workspace : public IStateful
 {
 public:
-	void setManager(StateManager* manager) { m_manager = manager; }
+	Workspace()
+	{
+		m_nodes = {
+			GraphManager::createNode<ENodeType::Vector3>(),
+		};
+	}
 
 	Memento getState() override
 	{
-		return Memento(m_state);
+		DumpVisitor visitor;
+
+		State state;
+		for (const auto& node : m_nodes)
+		{
+			state.push_back(visitor.dump(node));
+		}
+
+		return Memento(state);
 	}
 
 	void setState(const Memento& memento) override
 	{
-		m_state = memento.getSnapshot();
+		// m_state = memento.getSnapshot();
 	}
 
 	void save()
 	{
-		m_manager->takeSnapshot();
-	}
-
-	void setValue(const std::string& val)
-	{
-		m_state.push_back(val);
-		save();
+		StateManager::instance().takeSnapshot();
 	}
 
 private:
-	StateManager* m_manager;
-	State m_state;
+	std::vector<Core::NodePtr> m_nodes;
 };
 
 TEST(StateHandlingTest, OperationsAreSupported)
 {
 	Workspace workspace;
-	StateManager manager(&workspace);
-	workspace.setManager(&manager);
+	StateManager::instance().setOriginator(&workspace);
 
 	std::vector<std::string> state;
 
@@ -48,7 +58,7 @@ TEST(StateHandlingTest, OperationsAreSupported)
 		auto data = std::string(1, c);
 		state.push_back(data);
 
-		workspace.setValue(data);
+		// workspace.setValue(data);
 	}
 	EXPECT_TRUE(workspace.getState().getSnapshot().size() == 10);
 }

@@ -6,7 +6,7 @@ struct WorkspaceVector3Args
     WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
     std::string headerLabel = "default Vector3 header";
     std::string nodeLabel = "Vec3";
-    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector3>();
+    Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
 };
 
 class WorkspaceVector3 : public WorkspaceNodeWithCoreData

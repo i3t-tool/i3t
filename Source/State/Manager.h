@@ -2,23 +2,27 @@
 
 #include <optional>
 
+#include "Core/Defs.h"
+
 #include "Memento.h"
 
 class IStateful;
 
-class StateManager
+/**
+ *
+ */
+class StateManager : public Singleton<StateManager>
 {
 public:
-	explicit StateManager(IStateful* originator) : m_originator(originator) {}
-
+	void setOriginator(IStateful* originator) { m_originator = originator; }
 	void takeSnapshot();
 	void undo();
 	void redo();
 
-	std::optional<Memento> getCurrentState() const;
+	[[nodiscard]] std::optional<Memento> getCurrentState() const;
 
 private:
-	bool hasNewestState() const;
+	[[nodiscard]] bool hasNewestState() const;
 
 	int m_currentStateIdx = -1;
 	IStateful* m_originator;

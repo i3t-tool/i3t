@@ -1341,7 +1341,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::FloatToFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1349,7 +1349,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int input
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1357,7 +1357,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inp
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Quat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1365,7 +1365,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Quat>::updateValues(int inputI
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
