@@ -1,8 +1,8 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "diwne.h"
-#include "Pin.h"
+
+#include "diwne_include.h"
 
 namespace DIWNE
 {
@@ -76,9 +76,6 @@ class Node
               , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
 
         bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
-
-        DIWNE::Pin *m_pin1; /*for debug*/
-        DIWNE::Pin *m_pin2;
 
     private:
         DIWNE::ID m_idDiwne;

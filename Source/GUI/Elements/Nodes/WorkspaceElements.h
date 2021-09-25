@@ -22,9 +22,7 @@
 #include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
 #include "GUI/NodeEditorUtilities/Widgets.h"
 
-#include <../Source/DIWNE/diwne.h>
-#include <../Source/DIWNE/Node.h>
-#include <../Source/DIWNE/Pin.h>
+#include "DIWNE/diwne_include.h"
 
 class WorkspaceLinkProperties;
 class WorkspacePinProperties;
@@ -101,23 +99,7 @@ public:
 	void setLabel(std::string label) { m_label = label; };
 };
 
-///*! \class WorkspaceLinkProperties
-//    \brief Information of Link for graphic
-// */
-//class WorkspaceLinkProperties
-//{
-//protected:
-//	const ne::LinkId m_id;
-//	ImColor					 m_color;
-//	float						 m_thickness;
-//
-//public:
-//	WorkspaceLinkProperties(ne::LinkId const id);
-//
-//	ne::LinkId const getId() const;
-//	ImColor const		 getColor() const;
-//	float const			 getThickness() const;
-//};
+
 
 /* static functions */
 extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);

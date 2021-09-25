@@ -1,13 +1,11 @@
 #ifndef PIN_H
 #define PIN_H
 
-#include "diwne.h"
-#include "Node.h"
-#include "Link.h"
+
+//#include "diwne_include.h"
 
 namespace DIWNE
 {
-
 class Pin
 {
     public:
@@ -19,15 +17,24 @@ class Pin
         DIWNE::ID const getId() const {return m_idDiwne; };
 
         bool drawPinDiwne(DIWNE::Diwne &diwne);
+
         virtual bool pinContent(DIWNE::Diwne &diwne) {return false;};
 
+        virtual bool pinActiveCheck(DIWNE::Diwne &diwne);
+        virtual void pinActiveProcess(DIWNE::Diwne &diwne);
+
+        virtual bool pinConnectLinkCheck(DIWNE::Diwne &diwne);
+        virtual void pinConnectLinkProcess(DIWNE::Diwne &diwne)=0;
+
+        ImVec2 getCenter() const {return m_pinRectDiwne.GetCenter(); };
+        virtual ImVec2 getLinkConnectionPoint() const {return getCenter(); };
 
     protected:
-
-    private:
         DIWNE::ID m_idDiwne;
         ImRect m_pinRectDiwne;
-        DIWNE::Link m_linkDiwne;
+
+    private:
+
 };
 
 } /* namespace DIWNE */

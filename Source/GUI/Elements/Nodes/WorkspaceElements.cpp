@@ -75,17 +75,6 @@ WorkspacePin::WorkspacePin(DIWNE::ID id, std::string label)
 {}
 
 
-//WorkspaceLinkProperties::WorkspaceLinkProperties(const ne::LinkId id) :
-//		m_id(id), m_color(I3T::getColor(EColor::MatrixPin)), m_thickness(I3T::getSize(ESize::Nodes_LinkThickness))
-//{}
-//
-//ne::LinkId const WorkspaceLinkProperties::getId() const { return m_id; }
-//ImColor const		 WorkspaceLinkProperties::getColor() const { return m_color; }
-//float const			 WorkspaceLinkProperties::getThickness() const { return m_thickness; }
-
-
-
-
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
 

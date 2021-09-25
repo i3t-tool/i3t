@@ -10,8 +10,9 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "DIWNE/diwne.h"
-#include "DIWNE/Node.h"
+#include "DIWNE/diwne_include.h"
+//#include "DIWNE/diwne.h"
+//#include "DIWNE/Node.h"
 
 #include <algorithm>
 #include <map>
@@ -77,6 +78,9 @@ public:
 	Ptr<WorkspaceCorePin> m_pinPropertiesForNewNodeLink = nullptr;
 	bool m_createNewNode = false;
 
+    WorkspaceCoreLink *m_creatingLink;
+    WorkspaceCorePin *m_linkCreatingPin;
+
 	//ImVec2 m_openPopupMenuPosition = ImVec2(100,100); /* \todo JH some better default value - maybe little bit unused, but for certainty */
 	ImVec2 m_rightClickPosition = ImVec2(100,100);
 	ImVec2 m_newNodePostion = ImVec2(100,100);
@@ -102,7 +106,7 @@ public:
     template<typename T>
     void inline addNodeToPositionOfPopup()
     {
-        addNodeToPosition<T>(getPopupPosition());
+        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
     }
 
 

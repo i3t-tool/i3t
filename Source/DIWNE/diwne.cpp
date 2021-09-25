@@ -1,22 +1,21 @@
-#include "diwne.h"
+#include "diwne_include.h"
 
 namespace DIWNE
 {
 
 
-Diwne::Diwne(SettingsDiwne const & settingsDiwne)
+Diwne::Diwne(SettingsDiwne const & settingsDiwne, void *customData)
     : m_workAreaDiwne( settingsDiwne.workAreaDiwne.Min
                       ,settingsDiwne.workAreaDiwne.Max)
     , m_workAreaZoomDiwne(settingsDiwne.workAreaInitialZoomDiwne)
     , m_zoomWheelSenzitivity(settingsDiwne.zoomWheelSenzitivity)
     , m_mouseLocation(ImGuiLocation)
     , m_helperLink(0)
+    , m_customData(customData)
 {}
 
 Diwne::~Diwne()
-{
-    delete m_helperLink;
-}
+{}
 
 void Diwne::Begin(const char* imgui_id)
 {
@@ -117,8 +116,15 @@ void Diwne::End()
     /* debug - whole child "canvas" */
     idl->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
 
+    if (m_diwneAction == DiwneAction::NewLink)
+    {
+        //m_helperLink.setLinkEndpointsDiwne(getActivePin<>()->getLinkConnectionPoint(), screen2workArea(ImGui::GetMousePos()));
+        m_helperLink.drawLinkDiwne(*this);
+    }
+
 //    transformMouseFromDiwneToImGui();
 
+    m_previousFrameDiwneAction = m_diwneAction;
     m_backgroundPopupRaise = false;
     m_workAreaZoomChangeDiwne = 0;
 
@@ -245,7 +251,7 @@ void Diwne::DrawIconCircle(ImDrawList* idl,
 {
     ImVec2 center = ImVec2((topLeft.x+bottomRight.x)/2, (topLeft.y+bottomRight.y)/2);
     float radius = std::min(bottomRight.x-topLeft.x, bottomRight.y-topLeft.y)/2;
-    float thicknes = 5; /* \todo JH from settings_diwne */
+    float thicknes = 1; /* \todo JH from settings_diwne */
 
     idl->AddCircleFilled(center, radius, ShapeColor);
     if (!filled)
@@ -260,7 +266,7 @@ void Diwne::DrawIconRectangle(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
 {
-    ImVec2 thicknes = ImVec2(5,5); /* \todo JH from settings_diwne */
+    ImVec2 thicknes = ImVec2(1,1); /* \todo JH from settings_diwne */
     float rounding = 0; /* \todo JH from settings_diwne */
 
     idl->AddRectFilled(topLeft, bottomRight, ShapeColor, rounding);
@@ -275,7 +281,7 @@ void Diwne::DrawIconTriangleLeft(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
 {
-    float thicknes = 5; /* \todo JH from settings_diwne */
+    float thicknes = 1; /* \todo JH from settings_diwne */
 
     idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), ImVec2(topLeft.x, (topLeft.y+bottomRight.y)/2), bottomRight, ShapeColor);
     if (!filled)
@@ -289,7 +295,7 @@ void Diwne::DrawIconTriangleRight(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
 {
-    float thicknes = 5; /* \todo JH from settings_diwne */
+    float thicknes = 1; /* \todo JH from settings_diwne */
 
     idl->AddTriangleFilled(topLeft, ImVec2(bottomRight.x, (topLeft.y+bottomRight.y)/2), ImVec2(topLeft.x, bottomRight.y), ShapeColor);
     if (!filled)
@@ -303,7 +309,7 @@ void Diwne::DrawIconCross(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
 {
-    float thicknesShape = 10, thicknesInner = 5; /* \todo JH from settings_diwne */
+    float thicknesShape = 4, thicknesInner = 2; /* \todo JH from settings_diwne */
     float thicknesDiff = (thicknesShape-thicknesInner)/2;
     ImVec2 thicknesDiffVec = ImVec2(thicknesDiff, thicknesDiff);
 
@@ -433,6 +439,32 @@ ImVec2 Diwne::screen2diwne_noZoom(const ImVec2 & point) const
 ImVec2 Diwne::diwne2screen_noZoom(const ImVec2 & point) const
 {
     return workArea2screen(diwne2workArea_noZoom(point));
+}
+
+void Diwne::showPopUpLabel(std::string label, ImColor color)
+{
+    ImGui::BeginTooltip();
+
+    ImGui::TextColored(color, label.c_str());
+
+    ImGui::EndTooltip();
+
+
+//	const char* label_c = label.c_str();
+//	ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+//	ImVec2 labelSize = ImGui::CalcTextSize(label_c);
+//
+//	ImVec2 padding = ImGui::GetStyle().FramePadding;
+//	ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
+//
+//	ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+//
+//	ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
+//	ImVec2 rectMax = ImGui::GetCursorScreenPos() + labelSize + padding;
+//
+//	ImDrawList* drawList = ImGui::GetWindowDrawList();
+//	drawList->AddRectFilled(rectMin, rectMax, color, labelSize.y * 0.15f); /* \todo JH remove constant here */
+//	ImGui::TextUnformatted(label_c);
 }
 
 

@@ -1,29 +1,13 @@
 #ifndef DIWNE_H
 #define DIWNE_H
 
-#include "spdlog/fmt/fmt.h"
-#include <limits>
 
-//------------------------------------------------------------------------------
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui.h>
-# define IMGUI_DEFINE_MATH_OPERATORS
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui_internal.h>
-//# include "../Dependencies/imgui_node_editor/external/imgui/imgui_extra_math.h"
-//# include "../Dependencies/imgui_node_editor/external/imgui/imgui_bezier_math.h"
-//# include "../Dependencies/imgui_node_editor/external/imgui/imgui_canvas.h"
+#include "diwne_include.h"
 
-//# include <vector>
-//# include <string>
-
-
-//------------------------------------------------------------------------------
 
 /* ImDrawList functions works in screen coordinates */
 namespace DIWNE
 {
-
-class Link;
-
 
 typedef unsigned int ID;
 
@@ -62,7 +46,7 @@ class Diwne
 {
     public:
         /** Default constructor */
-        Diwne(DIWNE::SettingsDiwne const & settingsDiwne);
+        Diwne(DIWNE::SettingsDiwne const & settingsDiwne, void *customData);
         /** Default destructor */
         virtual ~Diwne();
 
@@ -191,13 +175,38 @@ class Diwne
         DiwneAction getDiwneAction() const {return m_diwneAction;};
         void setDiwneAction(DiwneAction action){m_diwneAction = action;};
 
-        DIWNE::Link* getHelperLinkPointer(){return m_helperLink;};
+        DiwneAction getPreviousFrameDiwneAction() const {return m_previousFrameDiwneAction;};
+
+        DIWNE::Link& getHelperLink(){return m_helperLink;};
+
+        template <typename T>
+        T* getLastActivePin()
+        {
+            static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
+            return dynamic_cast<T*>(m_lastActivePin);
+        }
+
+        //DIWNE::Pin* getActivePin() const {return m_activePin;};
+
+        template <typename T>
+        void setLastActivePin(T* pin)
+        {
+            static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
+            m_lastActivePin = pin;
+        }
+        //void setActivePin(DIWNE::Pin* pin){m_activePin = pin;};
+
+        void * m_customData;
+
+        void showPopUpLabel(std::string label, ImColor color);
 
 
     protected:
         bool m_inner_interaction_happen = false;
-        DiwneAction m_diwneAction = None;
-        DIWNE::Link* const m_helperLink;
+        DiwneAction m_diwneAction = None, m_previousFrameDiwneAction = None;
+
+        DIWNE::Pin* m_lastActivePin = nullptr;
+        DIWNE::Link m_helperLink; /* for showing link that is in process of creating */
 
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */

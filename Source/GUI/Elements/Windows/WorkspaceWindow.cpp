@@ -10,7 +10,7 @@ static DIWNE::SettingsDiwne settingsDiwne;
 
 WorkspaceWindow::WorkspaceWindow(bool show)
     :	IWindow(show)
-    ,   Diwne(settingsDiwne)
+    ,   Diwne(settingsDiwne, this)
     ,   m_wholeApplication(Application::get())
     ,   ConstTouchTime(1.0f)
     //,   m_headerBackgroundTexture( (ImTextureID) (intptr_t) pgr::createTexture(Config::getAbsolutePath("Data/textures/blueprint_background.png"), true)) // \TODO load texture OR making a simple rectangle
@@ -575,10 +575,10 @@ void WorkspaceWindow::render()
 
     if(first_frame){
         first_frame = false;
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixTranslation>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(100,100));
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMakeTranslation>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(300,300));
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
     }
 
 	Begin("DIWNE Workspace");
@@ -885,24 +885,7 @@ void WorkspaceWindow::render()
 //	return allSelectedCoreNodes;
 //}
 
-//void WorkspaceWindow::showPopUpLabel(std::string label, ImColor color)
-//{
-//	const char* label_c = label.c_str();
-//	ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-//	ImVec2 labelSize = ImGui::CalcTextSize(label_c);
-//
-//	ImVec2 padding = ImGui::GetStyle().FramePadding;
-//	ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
-//
-//	ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-//
-//	ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
-//	ImVec2 rectMax = ImGui::GetCursorScreenPos() + labelSize + padding;
-//
-//	ImDrawList* drawList = ImGui::GetWindowDrawList();
-//	drawList->AddRectFilled(rectMin, rectMax, color, labelSize.y * 0.15f); /* \todo JH remove constant here */
-//	ImGui::TextUnformatted(label_c);
-//}
+
 
 //void WorkspaceWindow::checkQueryElementsCreating()
 //{
