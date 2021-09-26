@@ -31,6 +31,7 @@ protected:
 	float   m_inactiveMark;
     FloatPopupMode m_floatPopupMode;
     WorkspaceLevelOfDetail m_levelOfDetail;
+    bool m_toDelete;
 
     Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
                                                 WorkspaceNodeWithCoreData is owner
@@ -42,7 +43,6 @@ public:
 	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceOutputs;
 
 
-public:
 //	floatWindow fw; /* \todo create it protected */
 
 //	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
@@ -108,6 +108,11 @@ public:
 	void drawMenuLevelOfDetail();
 	void drawMenuSetDataMap();
 	void drawMenuSetPrecision();
+
+	virtual void nodePopupContent();
+
+	bool getToDelete() const {return m_toDelete;};
+
 };
 
 class WorkspaceCoreOutputPin;

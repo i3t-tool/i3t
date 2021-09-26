@@ -34,6 +34,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebas
     ,   m_inactiveMark(0.7f) /* \todo JH default 0 ; 0.7 for testing */
     ,   m_levelOfDetail(WorkspaceLevelOfDetail::Full) /* \todo JH default value from some setting */
     ,   m_floatPopupMode(Radians) /* \todo JH default value from some setting */
+    ,   m_toDelete(false)
 {
 	const auto& inputPins	 = m_nodebase->getInputPins();
 	const auto& outputPins = m_nodebase->getOutputPins();
@@ -318,6 +319,14 @@ void WorkspaceNodeWithCoreData::drawMenuLevelOfDetail()
 		}
 		ImGui::EndMenu();
 	}
+}
+
+void WorkspaceNodeWithCoreData::nodePopupContent()
+{
+    drawMenuSetDataMap();
+    drawMenuLevelOfDetail();
+    drawMenuSetPrecision();
+    if (ImGui::MenuItem("Delete")) { m_toDelete = true; }
 }
 
 
@@ -658,6 +667,7 @@ bool WorkspaceNodeWithCoreData::middleContent(DIWNE::Diwne &diwne)
 //		WorkspacePinProperties(id, label),
 //		m_pin(pin), m_node(node)
 //{}
+
 
 WorkspaceCorePin::WorkspaceCorePin(     DIWNE::ID const id
                                                        ,    Core::Pin const& pin

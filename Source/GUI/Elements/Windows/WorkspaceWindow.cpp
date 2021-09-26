@@ -583,7 +583,10 @@ void WorkspaceWindow::render()
 
 	Begin("DIWNE Workspace");
 
-
+    m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+                                              [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {return node->getToDelete();}
+                                              ),
+                              m_workspaceCoreNodes.end());
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
     {
         m_inner_interaction_happen |= workspaceCoreNode->drawNodeDiwne(*this);

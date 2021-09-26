@@ -64,6 +64,9 @@ class Node
         ImRect getNodeRectDiwne() { synchronizeSizeRectangles(); return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
         ImVec2 getNodeRectSizeDiwne() { synchronizeSizeRectangles(); return m_bottomRectDiwne.Max-m_topRectDiwne.Min;};
 
+        bool getSelected() const {return m_selected;};
+        void setSelected(bool selected) {m_selected = selected;};
+
     protected:
 
         ImVec2 m_nodePosition; /* can be public */
@@ -76,6 +79,8 @@ class Node
               , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
 
         bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
+        bool m_selected;
+        bool m_translated;
 
     private:
         DIWNE::ID m_idDiwne;

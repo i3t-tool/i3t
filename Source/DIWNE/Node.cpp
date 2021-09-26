@@ -11,6 +11,8 @@ Node::Node(DIWNE::ID id) /* FLT_MAX for first frame - draw node anywhere it is a
     , m_rightRectDiwne(ImRect(0,0,0,0))
     , m_bottomRectDiwne(ImRect(0,0,FLT_MAX, FLT_MAX))
     , m_idDiwne(id)
+    , m_selected(false)
+    , m_translated(false)
 {}
 
 Node::~Node()
@@ -49,8 +51,21 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne)
         putInvisibleButtonUnder(fmt::format("NodeIB{}", m_idDiwne), getNodeRectSizeDiwne());
         if (ImGui::IsItemActive())
         {
-            translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
+            if (ImGui::IsMouseDragging(0))
+            {
+                translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
+                m_translated = true;
+            }
         }
+        else if (ImGui::IsItemHovered())
+        {
+            if (ImGui::IsMouseReleased(0))
+            {
+                if (m_translated) m_translated = false;
+                else getSelected() ? setSelected(false) : setSelected(true);
+            }
+        }
+
 
         ImGui::PushID(fmt::format("Node{}", m_idDiwne).c_str());
         ImGui::BeginGroup(); /* Begin of node */
@@ -76,10 +91,16 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne)
         synchronizeSizeRectangles();
 
 
+        if (getSelected())
+        {
+            diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,255,0), 0, ImDrawCornerFlags_None, 5); /* \todo JH color and width from settings */
+        }
+
+
         interaction_happen = ImGui::IsItemHovered(); /* for debug */
         if (!inner_interaction_happen)
         {
-            inner_interaction_happen |= nodePopupDiwne(diwne, fmt::format("nodeContextPopup{}", m_idDiwne));
+            inner_interaction_happen |= nodePopupDiwne(diwne, fmt::format("nodePopup{}", m_idDiwne));
         }
 
 
@@ -245,12 +266,7 @@ bool Node::nodePopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring)
 
 void Node::nodePopupContent()
 {
- //
-//		if (context_node->isTransformation()) { context_node->drawMenuSetDataMap(); }
-//		context_node->drawMenuLevelOfDetail();
-//		context_node->drawMenuSetPrecision();
-
-		if (ImGui::MenuItem("Increment id (haha just for test)")) { m_idDiwne++;}
+    if (ImGui::MenuItem("Override this method with content of your node popup menu")) {}
 }
 
 } /* namespace DIWNE */
