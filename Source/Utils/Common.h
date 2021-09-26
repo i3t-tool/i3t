@@ -19,4 +19,6 @@ long GetTime();
 long GetRealTime();
 float TimeDiff(long time1, long time2);
 
+
+
 #endif

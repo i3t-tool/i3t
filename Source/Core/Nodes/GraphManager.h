@@ -16,11 +16,19 @@
 #include "Operations.h"
 #include "Sequence.h"
 #include "Transform.h"
+#include "Node.h"
+
 
 namespace Core
 {
 namespace Builder
 {
+	constexpr inline bool isEditableOperatorType(ENodeType type)
+	{
+		return type == ENodeType::FloatToFloat || type == ENodeType::Vector3ToVector3 ||
+				type == ENodeType::Vector4ToVector4 || type == ENodeType::MatrixToMatrix;
+	}
+
 	/**
  * Create new node.
  *
@@ -31,8 +39,7 @@ namespace Builder
 	FORCE_INLINE Ptr<NodeBase> createNode()
 	{
 		// \todo MH
-		bool shouldUnlockAllValues = T == ENodeType::FloatToFloat || T == ENodeType::Vector3ToVector3 ||
-				T == ENodeType::Vector4ToVector4 || T == ENodeType::MatrixToMatrix;
+		bool shouldUnlockAllValues = isEditableOperatorType(T);
 		auto ret = std::make_shared<NodeImpl<T>>();
 		ret->init();
 		if (shouldUnlockAllValues) ret->setDataMap(&Transform::g_Free);

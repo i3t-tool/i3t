@@ -96,4 +96,9 @@ private:
 	void updateValue(float increment);
 
 };
+
+FORCE_INLINE bool isCycle(const NodePtr& node)
+{
+	return node->getOperation()->keyWord == g_CycleProperties.keyWord;
+}
 } // namespace Core

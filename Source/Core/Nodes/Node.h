@@ -17,6 +17,11 @@
 #include "NodeData.h"
 #include "Operations.h"
 
+namespace Core
+{
+constexpr inline size_t MAX_NODES_COUNT = 1024;
+}
+
 enum class ENodePlugResult
 {
 	Ok = 0,
@@ -134,7 +139,7 @@ public:
 
 	[[nodiscard]] ID getId() const;
 
-	const Operation* const getOperation() { return m_operation; }
+	const Operation* getOperation() const { return m_operation; }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:
@@ -226,8 +231,6 @@ public:
 	void pulse(size_t index);
 
 protected:
-	void setPinOwner(Pin& pin, Ptr<NodeBase> node);
-
 	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 	/**
@@ -451,7 +454,7 @@ class Pin
 	const bool m_isInput;
 
 	/// Owner of the pin.
-	Ptr<NodeBase> m_master;
+	NodeBase* m_master;
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component
@@ -468,17 +471,17 @@ class Pin
 	const EValueType m_valueType = EValueType::Pulse;
 
 public:
-	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index) :
-			m_valueType(valueType), m_isInput(isInput), m_master(owner), m_index(index)
-	{
-		m_id = IdGenerator::next();
-	}
+	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index);
+	~Pin();
 
 	[[nodiscard]] ID getId() const { return m_id; }
 
 	[[nodiscard]] int getIndex() const { return m_index; }
 
-	[[nodiscard]] NodePtr getOwner() const { return m_master; };
+	[[nodiscard]] NodePtr getOwner() const
+	{
+		return m_master->getPtr();
+	};
 
 	[[nodiscard]] const Pin* getParentPin() const
 	{
@@ -509,7 +512,7 @@ public:
 
 	const char* getLabel() const
 	{
-		auto*				op		= m_master->getOperation();
+		auto*				op		= getOwner()->getOperation();
 		const char* label = nullptr;
 
 		if (m_isInput)
@@ -528,7 +531,7 @@ public:
 
 	std::string getSig()
 	{
-		return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), m_master->getSig(), m_index);
+		return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
 	};
 
 	[[nodiscard]] EValueType getType() const { return m_valueType; }
@@ -542,4 +545,12 @@ public:
 
 	[[nodiscard]] bool isInput() const { return m_isInput; }
 };
+
+FORCE_INLINE const bool isOperator(const NodePtr& node)
+{
+	constexpr auto& operators = magic_enum::enum_names<ENodeType>();
+	auto it = std::find(operators.begin(), operators.end(), node->getOperation()->keyWord);
+	auto result = it != operators.end();
+	return result;
+}
 } // namespace Core

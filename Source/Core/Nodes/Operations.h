@@ -59,6 +59,13 @@ struct Operation
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
 	const std::vector<const Core::Transform::DataMap*> validDatamaps = {&Core::Transform::g_AllLocked};
 
+	/*
+	Operation(const Operation&) = delete;
+	Operation(const Operation&&) = delete;
+	Operation& operator=(const Operation&) = delete;
+	Operation& operator=(const Operation&&) = delete;
+	 */
+
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes) :

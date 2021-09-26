@@ -14,7 +14,7 @@ public:
 	Workspace()
 	{
 		m_nodes = {
-			GraphManager::createNode<ENodeType::Vector3>(),
+			GraphManager::createNode<ENodeType::Vector3ToVector3>(),
 		};
 	}
 
@@ -23,10 +23,7 @@ public:
 		DumpVisitor visitor;
 
 		State state;
-		for (const auto& node : m_nodes)
-		{
-			state.push_back(visitor.dump(node));
-		}
+		state.push_back(visitor.dump(m_nodes));
 
 		return Memento(state);
 	}

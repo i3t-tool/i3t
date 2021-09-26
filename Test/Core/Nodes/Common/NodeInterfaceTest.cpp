@@ -121,7 +121,7 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
 	auto inputSeq = Builder::createSequence();
 	auto mySeq    = Builder::createSequence();
-	auto mat      = Builder::createNode<ENodeType::Matrix>();
+	auto mat      = Builder::createNode<ENodeType::MatrixToMatrix>();
 
 	plug_expectOk(inputSeq, mySeq, 0, 0);
 	plug_expectOk(mat, mySeq, 0, 1);

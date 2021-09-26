@@ -10,7 +10,7 @@ using namespace Core;
 
 TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 {
-	auto vec3 = Core::Builder::createNode<ENodeType::Vector3>();
+	auto vec3 = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
 	auto initialTranslation = generateVec3();
 
 	auto makeTranslation = Core::Builder::createNode<ENodeType::MakeTranslation>();
@@ -25,7 +25,7 @@ TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 
 TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 {
-	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
+	auto floatNode = Core::Builder::createNode<ENodeType::FloatToFloat>();
 	auto rotRads = generateFloat();
 
 	auto makeRotX = Core::Builder::createNode<ENodeType::MakeEulerX>();
@@ -48,8 +48,8 @@ TEST(MakeTransformTest, MakeEulerRotsNodeShouldBeValid)
 
 TEST(MakeTransformTest, MakeAxisRotShouldBeValid)
 {
-	auto floatNode = Core::Builder::createNode<ENodeType::Float>();
-	auto axisNode = Core::Builder::createNode<ENodeType::Vector3>();
+	auto floatNode = Core::Builder::createNode<ENodeType::FloatToFloat>();
+	auto axisNode = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
 	float rotRads = generateFloat();
 	auto axis = generateVec3();
 
@@ -102,9 +102,9 @@ TEST(MakeTransformTest, MakeLookAtShouldBeValid)
 {
 	auto makeLookAtNode = Builder::createNode<ENodeType::MakeLookAt>();
 
-	auto vec1 = Builder::createNode<ENodeType::Vector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3>();
+	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
 
 	plug_expectOk(vec1, makeLookAtNode, 0, 0);
 	plug_expectOk(vec2, makeLookAtNode, 0, 1);

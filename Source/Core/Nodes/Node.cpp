@@ -7,6 +7,8 @@
 
 using namespace Core;
 
+static IdGenerator generator;
+
 NodeBase::PinView::Iterator::Iterator(Ptr<Strategy> strategy, Ptr<NodeBase> node, int index)
 {
 	m_strategy = strategy;
@@ -80,11 +82,15 @@ size_t Node::OutputStrategy::size() { return m_node->m_operation->outputTypes.si
 Pin& Node::OutputStrategy::get(size_t index) { return m_node->getOut(index); }
 
 
-NodeBase::~NodeBase() { unplugAll(); }
+NodeBase::~NodeBase()
+{
+	unplugAll();
+	generator.returnId(m_id);
+}
 
 void NodeBase::init()
 {
-	m_id = IdGenerator::next();
+	m_id = generator.next();
 
 	// Create input pins.
 	for (int i = 0; i < m_operation->numberOfInputs; i++)
@@ -112,8 +118,6 @@ void NodeBase::init()
 }
 
 ID NodeBase::getId() const { return m_id; }
-
-void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node) { pin.m_master = node; }
 
 void NodeBase::pulse(size_t index)
 {
@@ -226,13 +230,13 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 	}
 
 	// cycle detector
-	auto toFind = inp->m_master; // INPUT
+	auto toFind = inp->getOwner(); // INPUT
 
 	// stack in vector - TOS is at the vector back.
 	std::vector<Ptr<NodeBase>> stack;
 
 	// PUSH(output) insert element at end.
-	stack.push_back(out->m_master);
+	stack.push_back(out->getOwner());
 
 	while (!stack.empty())
 	{
@@ -247,7 +251,7 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 			if (pin.isPluggedIn())
 			{
 				Pin* ct = pin.m_input;
-				stack.push_back(ct->m_master);
+				stack.push_back(ct->getOwner());
 			}
 		}
 	}
@@ -309,6 +313,18 @@ void NodeBase::unplugOutput(size_t index)
 	for (const auto& otherPin : pin.m_outputs) otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
+}
+
+
+Pin::Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index) :
+		m_valueType(valueType), m_isInput(isInput), m_master(owner.get()), m_index(index)
+{
+	m_id = generator.next();
+}
+
+Pin::~Pin()
+{
+	generator.returnId(m_id);
 }
 
 const DataStore& Pin::getStorage(unsigned int id)

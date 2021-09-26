@@ -9,7 +9,7 @@
 
 namespace Core
 {
-FORCE_INLINE bool isTransform(NodePtr& node)
+FORCE_INLINE bool isTransform(const NodePtr& node)
 {
 	auto it = std::find_if(g_transforms.begin(), g_transforms.end(),
 	                       [&node](const Operation& o) { return o.keyWord == node->getOperation()->keyWord; });

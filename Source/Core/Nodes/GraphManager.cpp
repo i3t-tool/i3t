@@ -116,7 +116,7 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
 		return nullptr;
 	}
 
-	auto expected = pins[index].m_input->m_master;
+	auto expected = pins[index].m_input->getOwner();
 
 	if (expected->m_owner != nullptr)
 	{
@@ -149,7 +149,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase
 	auto pin = node->getOutputPins()[index];
 	auto othersInputs = pin.getOutComponents();
 	for (const auto& other : othersInputs)
-		result.push_back(other->m_master);
+		result.push_back(other->getOwner());
 
 	return result;
 }

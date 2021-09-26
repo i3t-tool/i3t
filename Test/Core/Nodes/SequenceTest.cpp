@@ -85,7 +85,7 @@ TEST(SequenceTest, InternalValueCanBeReadByOperator)
 {
 	auto seq = arrangeSequence();
 	auto matMulMatNode = Core::Builder::createNode<ENodeType::MatrixMulMatrix>();
-	auto identityMatNode = Core::Builder::createNode<ENodeType::Matrix>();
+	auto identityMatNode = Core::Builder::createNode<ENodeType::MatrixToMatrix>();
 
 	{
 		setValue_expectOk(identityMatNode, glm::mat4(1.0f));
@@ -106,7 +106,7 @@ TEST(SequenceTest, InternalValueCanBeSetFromOutside)
 {
 	auto seq = arrangeSequence();
 
-	auto matNode = Builder::createNode<ENodeType::Matrix>();
+	auto matNode = Builder::createNode<ENodeType::MatrixToMatrix>();
 	setValue_expectOk(matNode, generateMat4());
 
 	plug_expectOk(matNode, seq, I3T_OUTPUT0, I3T_SEQ_IN_MAT);
@@ -149,7 +149,7 @@ TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInpu
 {
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
-	auto mat = Builder::createNode<ENodeType::Matrix>();
+	auto mat = Builder::createNode<ENodeType::MatrixToMatrix>();
 
 	plug_expectOk(seq1, seq2, I3T_SEQ_OUT_MUL, I3T_SEQ_IN_MUL);
 

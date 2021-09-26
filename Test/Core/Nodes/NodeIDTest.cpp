@@ -13,7 +13,9 @@ void testId(ax::NodeEditor::NodeId id)
 
 TEST(NodeIDTest, IDCanBeConvertedToNodeEditorIDs)
 {
-	auto id = IdGenerator::next();
+	IdGenerator generator;
+
+	auto id = generator.next();
 
 	testId(id);
 

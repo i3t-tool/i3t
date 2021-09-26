@@ -1,0 +1,47 @@
+#include "gtest/gtest.h"
+
+#include "Core/Nodes/GraphManager.h"
+#include "State/DumpVisitor.h"
+
+#include "Core/Nodes/Utils.h"
+
+TEST(DumpVisitor, GivesExpectedOutputForOperator)
+{
+	DumpVisitor visitor;
+
+	auto result = visitor.dump({ Core::GraphManager::createNode<ENodeType::FloatToFloat>() });
+
+	std::string expected = fmt::format("- {}"
+																		 "    position: [0.0, 0.0]",
+																		 1);
+	std::string pica = "";
+}
+
+TEST(DumpVisitor, SimpleSceneGetsSerializedCorrectly)
+{
+	auto float1 = Core::GraphManager::createNode<ENodeType::FloatToFloat>();
+	auto float2 = Core::GraphManager::createNode<ENodeType::FloatToFloat>();
+
+	plug_expectOk(float1, float2, 0, 0);
+
+	std::string expectedOutput = fmt::format(""
+	"operators:\n"
+	"  - id: {}\n"
+	"    type: FloatToFloat\n"
+	"    position: [0.0, 0.0]\n"
+	"    value: 0.0\n"
+	"  - id: {}\n"
+	"    type: FloatToFloat\n"
+	"    position: [0.0, 0.0]\n"
+	"    value: 0.0\n"
+	"edges:\n"
+	"  - [{}, {}, {}, {}]",
+	float1->getId(), float2->getId(),
+  float1->getId(), 0, float2->getId(), 0);
+
+	DumpVisitor visitor;
+
+	auto result = visitor.dump({ float1, float2 });
+
+	EXPECT_EQ(result, expectedOutput);
+}
