@@ -131,6 +131,8 @@ private:
 	 */
 	void onClose();
 
+	void onSave();
+
 	/**
 	 * \brief	Updates the world and the mouse button state, mouseDelta, mousePrev and throws JUST_Pressed to PRESSED
 	 * 			PreUpdate, world update, update

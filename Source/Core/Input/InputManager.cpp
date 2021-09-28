@@ -16,9 +16,16 @@ constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys
 
 ImGuiConfigFlags g_mousedFlags;
 
+InputController InputManager::s_globalInputController;
+
 void InputManager::init()
 {
 	InputBindings::init();
+}
+
+void InputManager::bindGlobalAction(const char* action, EKeyState state, KeyCallback fn)
+{
+	s_globalInputController.bindAction(action, state, fn);
 }
 
 void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersList mods)
@@ -195,6 +202,35 @@ void InputManager::preUpdate()
 	m_mouseButtonState.middle = isKeyPressed(Keys::mouseMiddle);
 }
 
+void InputManager::processEvents(InputController& controller)
+{
+	for (const auto& [action, state, callback] : controller.m_actions)
+	{
+		auto& keys = InputBindings::m_inputActions[action];
+		for (const auto& [key, mods] : keys)
+		{
+			// Check if key is in desired state.
+			bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
+														m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
+													 areModifiersActive(mods);
+
+			if (shouldProcess) callback();
+		}
+	}
+
+	for (const auto& [action, callback] : controller.m_axis)
+	{
+		auto keys = InputBindings::m_inputAxis[action];
+		for (const auto& [key, scale, mods] : keys)
+		{
+			bool shouldProcess =
+					(m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
+
+			if (shouldProcess) callback(scale);
+		}
+	}
+}
+
 void InputManager::update()
 {
 	m_mouseXDelta = m_mouseX - m_mouseXPrev;
@@ -211,33 +247,10 @@ void InputManager::update()
 	// mouseXDelta = 0;
 	// mouseYDelta = 0;
 
+	processEvents(s_globalInputController);
 	if (m_focusedWindow)
 	{
-		for (const auto& [action, state, callback] : m_focusedWindow->Input.m_actions)
-		{
-			auto& keys = InputBindings::m_inputActions[action];
-			for (const auto& [key, mods] : keys)
-			{
-				// Check if key is in desired state.
-				bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
-				                      m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
-				                     areModifiersActive(mods);
-
-				if (shouldProcess) callback();
-			}
-		}
-
-		for (const auto& [action, callback] : m_focusedWindow->Input.m_axis)
-		{
-			auto keys = InputBindings::m_inputAxis[action];
-			for (const auto& [key, scale, mods] : keys)
-			{
-				bool shouldProcess =
-						(m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
-
-				if (shouldProcess) callback(scale);
-			}
-		}
+		processEvents(m_focusedWindow->Input);
 	}
 
 	// Process keys.

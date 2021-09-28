@@ -84,8 +84,12 @@ Pin& Node::OutputStrategy::get(size_t index) { return m_node->getOut(index); }
 
 NodeBase::~NodeBase()
 {
-	unplugAll();
 	generator.returnId(m_id);
+}
+
+void NodeBase::finalize()
+{
+	unplugAll();
 }
 
 void NodeBase::init()

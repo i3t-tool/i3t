@@ -30,6 +30,9 @@ class InputController
 public:
 	InputController();
 
+	/**
+	 * See InputBindings.cpp file for default actions.
+	 */
 	void bindAction(const char* name, EKeyState state, KeyCallback fn);
 	void bindAxis(const char* name, AxisCallback fn);
 };

@@ -5,13 +5,15 @@
 
 #include "Core/Nodes/NodeVisitor.h"
 
+/// \todo MH Rename this file.
+
 struct NodeData
 {
 	std::string node;
 	std::vector<std::string> edges;
 };
 
-class SceneData
+class SceneRawData
 {
 public:
 	void addOperator(const NodeData& data)
@@ -37,9 +39,28 @@ private:
 	std::vector<std::string> edges;
 };
 
+struct SceneData
+{
+	std::vector<Core::NodePtr> operators;
+
+	Core::NodePtr findNode(Core::ID id)
+	{
+		for (auto& node : operators)
+		{
+			if (node->getId() == id)
+			{
+				return node;
+			}
+		}
+		return nullptr;
+	}
+};
+
 class DumpVisitor : public Core::NodeVisitor
 {
 public:
+	DumpVisitor();
+
 	/**
 	 * Get string representation of current scene.
 	 *
@@ -68,5 +89,9 @@ private:
 	void visit(const Core::NodePtr& node) override;
 
 	/// Stores last scene representation.
-	SceneData m_sceneData;
+	SceneRawData m_sceneData;
+
+	static bool m_isInitialized;
 };
+
+SceneData load(const std::string& rawScene);

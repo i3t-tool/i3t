@@ -94,7 +94,7 @@ public:
 		}
 	}
 
-	template <typename T> Ptr<IWindow> getWindowPtr() { return findWindow<T>(m_dockableWindows); }
+	template <typename T> Ptr<T> getWindowPtr() { return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows)); }
 
 private:
 	void setFocusedWindow();

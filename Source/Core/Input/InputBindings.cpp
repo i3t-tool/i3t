@@ -18,6 +18,8 @@ void InputBindings::init()
 	InputManager::setInputAction("duplicate", Keys::mouseLeft, { Keys::ctrll });
 	InputManager::setInputAction("delete", Keys::del);
 
+	InputManager::setInputAction("save", Keys::s, { Keys::ctrll });
+
 	InputManager::setInputAxis("scroll", 1.0f,  Keys::mouseScrlUp);
 	InputManager::setInputAxis("scroll", -1.0f, Keys::mouseScrlDown);
 	InputManager::setInputAxis("pan", 1.0f, Keys::mouseMiddle);

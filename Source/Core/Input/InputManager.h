@@ -85,6 +85,8 @@ public:
 	static void init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
 
+	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
+
 	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
 	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
 
@@ -122,8 +124,10 @@ public:
 		m_keyMap[code] = JUST_DOWN;
 	}
 
+	//===----------------------------------------------------------------------===//
 	static bool isActionTriggered(const char* name, EKeyState state);
 	static bool isAxisActive(const char* name);
+	//===----------------------------------------------------------------------===//
 
 	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 
@@ -167,6 +171,11 @@ public:
 	//@}
 
 	/**
+	 * Process action and axis events.
+	 */
+	 static void processEvents(InputController& controller);
+
+	/**
 	 * \brief Updates \a mouseDelta and \a mousePrev, and updates the stored statuses of the keys in the \a keyMap array
 	 * (JUST_UP -> UP, JUST_DOWN -> DOWN).
 	 */
@@ -199,4 +208,7 @@ public:
 	 * \return GLFW window.
 	 */
 	static GLFWwindow* getCurrentViewport();
+
+private:
+	static InputController s_globalInputController;
 };

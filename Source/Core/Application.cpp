@@ -12,6 +12,7 @@
 #include "Loader/ConfigLoader.h"
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
+#include "State/DumpVisitor.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
@@ -35,6 +36,10 @@ void Application::init()
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 
   InputManager::init();
+
+	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&](){
+		onSave();
+	});
 }
 
 void Application::initModules()
@@ -165,6 +170,27 @@ void Application::onBeforeClose()
 void Application::onClose()
 {
 	m_bShouldClose = true;
+}
+
+void Application::onSave()
+{
+	Log::info("Save state!");
+	auto workspace = getUI()->getWindowPtr<WorkspaceWindow>();
+	auto& nodes = workspace->m_workspaceCoreNodes;
+
+	std::vector<Core::NodePtr> operators;
+	for (const auto& node : nodes)
+	{
+		if (Core::isOperator(node->getNodebase()))
+		{
+			operators.push_back(node->getNodebase());
+		}
+	}
+
+	DumpVisitor visitor;
+	std::string rawState = visitor.dump(operators);
+
+	Log::info(rawState);
 }
 
 void Application::enqueueCommand(ICommand* command)

@@ -108,8 +108,17 @@ protected:
 	NodeBase(const Operation* operation) : m_operation(operation) {}
 
 public:
-	/** Delete node and unplug its all inputs and outputs. */
+	/**
+	 * Delete node.
+	 *
+	 * \pre All inputs and outputs must be unplugged (call Node::finalize function)!
+	 */
 	virtual ~NodeBase();
+
+	/**
+	 * Prepares node for its destruction, after that destructor can be called.
+	 */
+	void finalize();
 
 	const Pin& getInPin(int index) { return getInputPins()[index]; }
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }

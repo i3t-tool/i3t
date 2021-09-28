@@ -104,6 +104,19 @@ auto n(T val)
 	return std::string(magic_enum::enum_name(val));
 }
 
+template <typename T>
+constexpr T enumVal(const std::string& str)
+{
+	constexpr auto& enumEntries = magic_enum::enum_entries<T>();
+	for (const auto& entry : enumEntries)
+	{
+		if constexpr(entry.first == str)
+		{
+			return entry.first;
+		}
+	}
+}
+
 #define COND_TO_DEG(x)                                                                                                 \
 	(SetupForm::radians ? (x)                                                                                            \
 											: glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
