@@ -534,6 +534,31 @@ void WorkspaceWindow::popupBackgroundContent()
 
 		ImGui::Separator();
 
+		if (ImGui::BeginMenu("Delete"))
+			{
+				if (ImGui::MenuItem("All nodes"))
+				{
+				    m_workspaceCoreNodes.clear();
+				}
+				if (ImGui::MenuItem("All links"))
+				{
+				    /* \todo JH - disconnect all */
+				}
+				if (ImGui::MenuItem("Selected nodes"))
+				{
+                    m_workspaceCoreNodes.erase(
+                        std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+                                      [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {return node->getSelected();}
+                                      ),
+                          m_workspaceCoreNodes.end());
+				}
+				if (ImGui::MenuItem("Selected links"))
+				{
+				    /* \todo JH */
+				}
+				ImGui::EndMenu();
+			}
+
 //		if (ImGui::BeginMenu("selection"))
 //		{
 //

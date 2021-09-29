@@ -26,8 +26,8 @@
 
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/IWindow.h"
-#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
-#include "GUI/NodeEditorUtilities/Widgets.h"
+// #include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
+// #include "GUI/NodeEditorUtilities/Widgets.h"
 
 #include "GUI/Elements/Nodes/WorkspaceCamera.h"
 

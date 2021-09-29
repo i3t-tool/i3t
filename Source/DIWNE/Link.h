@@ -29,8 +29,13 @@ class Link
         void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end) {m_startDiwne = start; m_endDiwne = end; };
         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart; m_endControlOffsetDiwne = controlEnd; };
 
-    protected:
+        void setSelected(bool selected) {m_selected = selected;};
+        bool getSelected() const {return m_selected;};
 
+        bool linkPopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring);
+        virtual void linkPopupContent();
+    protected:
+        bool m_selected;
 
     private:
         DIWNE::ID m_idDiwne;

@@ -65,6 +65,11 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebas
 	}
 }
 
+WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
+{
+    /* \todo call finalize of core node here */
+}
+
 bool WorkspaceNodeWithCoreData::topContent(DIWNE::Diwne &diwne)
 {
     WorkspaceNode::topContent(diwne);
@@ -326,7 +331,10 @@ void WorkspaceNodeWithCoreData::nodePopupContent()
     drawMenuSetDataMap();
     drawMenuLevelOfDetail();
     drawMenuSetPrecision();
-    if (ImGui::MenuItem("Delete")) { m_toDelete = true; }
+    if (ImGui::MenuItem("Delete")) {
+            m_toDelete = true;
+
+    }
 }
 
 

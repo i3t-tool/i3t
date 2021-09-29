@@ -261,7 +261,6 @@ bool Node::nodePopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring)
 		ImGui::EndPopup();
 	}
 	return interaction_happen;
-
 }
 
 void Node::nodePopupContent()
