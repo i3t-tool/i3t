@@ -4,16 +4,8 @@
 
 #include "WorkspaceQuatFree.h"
 
-WorkspaceQuatFree::WorkspaceQuatFree(ImTextureID headerBackground, WorkspaceQuatFreeArgs const& args)
-    : WorkspaceQuat(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=args.nodebase})
+WorkspaceQuatFree::WorkspaceQuatFree()
+    : WorkspaceQuat(Core::Builder::createNode<ENodeType::QuatToQuat>())
 {}
 
-WorkspaceQuatFree::WorkspaceQuatFree(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceQuat(headerBackground, Core::Builder::createNode<ENodeType::QuatToQuat>(), headerLabel, nodeLabel)
-{}
-
-void WorkspaceQuatFree::drawDataSetValues(util::NodeBuilder& builder)
-{
-  drawDataFull(builder,0);
-}
 

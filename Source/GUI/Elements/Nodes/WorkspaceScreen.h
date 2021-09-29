@@ -10,25 +10,16 @@
 #include <World/RenderTexture.h>
 #include "Core/Nodes/GraphManager.h"
 
-struct WorkspaceScreenArgs
+class WorkspaceScreen : public WorkspaceFloat /* \todo JH really float?*/
 {
-	WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-	std::string headerLabel = "default Screen header";
-	std::string nodeLabel = "Screen";
-	Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Screen>();
-};
-
-class WorkspaceScreen : public WorkspaceFloat
-{
-public:
-
-	GLuint renderTexture;
+    GLuint renderTexture;
 	RenderTexture* rend;
 	Camera* cam;
+public:
 
-	WorkspaceScreen(ImTextureID headerBackground, WorkspaceScreenArgs const& args);
-	WorkspaceScreen(ImTextureID headerBackground, std::string headerLabel = "Screen", std::string nodeLabel = "Screen");
 
-	void drawDataSetValues(util::NodeBuilder& builder);
-	void drawDataFull(util::NodeBuilder& builder, int index);
+
+	WorkspaceScreen();
+
+	bool drawDataFull(DIWNE::Diwne& diwne, int index);
 };

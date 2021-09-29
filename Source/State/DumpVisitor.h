@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Core/Nodes/NodeVisitor.h"
-#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 
 /// \todo MH Rename this file.
 using NodeClass = std::shared_ptr<WorkspaceNodeWithCoreData>;

@@ -9,8 +9,10 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_node_editor.h>
-#include <imgui_node_editor_internal.h>
+
+#include "DIWNE/diwne_include.h"
+//#include "DIWNE/diwne.h"
+//#include "DIWNE/Node.h"
 
 #include <algorithm>
 #include <map>
@@ -24,21 +26,33 @@
 
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/IWindow.h"
-#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
-#include "GUI/NodeEditorUtilities/Widgets.h"
+// #include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
+// #include "GUI/NodeEditorUtilities/Widgets.h"
 
 #include "GUI/Elements/Nodes/WorkspaceCamera.h"
-#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 
-namespace ne = ax::NodeEditor;
-namespace util = ax::NodeEditor::Utilities;
+#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
+
+
+#include "GUI/Elements/Nodes/SingleInclude.h"
+
+
+#include <glm/glm.hpp>
+
+#include "Core/API.h"
+#include "Core/Input/InputManager.h"
+#include "Logger/Logger.h"
+#include "Scripting/Scripting.h"
+
+//namespace ne = ax::NodeEditor;
+//namespace util = ax::NodeEditor::Utilities;
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
 /*! \class class for Workspace window object
     \brief Store everything what Workspace window need
 */
-class WorkspaceWindow : public IWindow
+class WorkspaceWindow : public IWindow, protected DIWNE::Diwne
 {
 public:
 	I3T_WINDOW(WorkspaceWindow)
@@ -47,24 +61,32 @@ public:
 	virtual ~WorkspaceWindow();
 
 	Application& m_wholeApplication;
-	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene - its wrapper for api functions only */
-	ne::Detail::EditorContext* m_ne_usable; /*! \brief On this object you can call inner functions */
+//	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene - its wrapper for api functions only */
+//	ne::Detail::EditorContext* m_ne_usable; /*! \brief On this object you can call inner functions */
+
+//    DIWNE::Diwne m_diwne;
+    void popupBackgroundContent();
+
+    bool first_frame = true;
 
 	ImTextureID m_headerBackgroundTexture;
 
-	util::NodeBuilder m_nodeBuilderContext;
+//	util::NodeBuilder m_nodeBuilderContext;
 
 	/* \todo JH better name for this atributes - for better description what they do... */
-	Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewLink = nullptr;
-	Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewNodeLink = nullptr;
+	Ptr<WorkspaceCorePin> m_pinPropertiesForNewLink = nullptr;
+	Ptr<WorkspaceCorePin> m_pinPropertiesForNewNodeLink = nullptr;
 	bool m_createNewNode = false;
+
+    WorkspaceCoreLink *m_creatingLink;
+    WorkspaceCorePin *m_linkCreatingPin;
 
 	//ImVec2 m_openPopupMenuPosition = ImVec2(100,100); /* \todo JH some better default value - maybe little bit unused, but for certainty */
 	ImVec2 m_rightClickPosition = ImVec2(100,100);
 	ImVec2 m_newNodePostion = ImVec2(100,100);
-	ne::NodeId m_contextNodeId = 0;
-	ne::LinkId m_contextLinkId = 0;
-	ne::PinId  m_contextPinId = 0;
+//	ne::NodeId m_contextNodeId = 0;
+//	ne::LinkId m_contextLinkId = 0;
+//	ne::PinId  m_contextPinId = 0;
 
 	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
@@ -72,7 +94,23 @@ public:
 	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
 	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
-	ne::Detail::Node *m_draged_node_nodeeditor;
+//	ne::Detail::Node *m_draged_node_nodeeditor;
+
+    template<typename T>
+    void inline addNodeToPosition(ImVec2 const position)
+    {
+        m_workspaceCoreNodes.push_back(std::make_shared<T>());
+		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
+    }
+
+    template<typename T>
+    void inline addNodeToPositionOfPopup()
+    {
+        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+    }
+
+
+
 
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
@@ -83,40 +121,40 @@ public:
 	std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
 	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
 
-	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
-	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);
+//	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
+//	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);
+//
+//	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
 
-	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
+//	void manipulatorStartCheck3D();
+//
+//	void checkUserActions();
+//
+//	void checkQueryElements();
+//	void checkQueryElementsCreating();
+//	void checkQueryLinkCreate();
+//	void checkQueryNodeCreate();
+//	void checkQueryElementsDeleting();
+//	void checkQueryLinkDelete();
+//	void checkQueryNodeDelete();
+//
+////	void NodeDelete(ne::NodeId nodeId);
+//
+//	void selectAll();
+//	void invertSelection();
+//
+//	//void checkQueryContextMenus();
+//
+//	void shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
+//	void shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
+//	void shiftSelectedNodesToFront();
+//	void shiftTransformationInSequenceNodesToFront();
+//
+//	void showPopUpLabel(std::string label, ImColor color);
+//
+//	void UpdateTouchAllNodes();
 
-	void manipulatorStartCheck3D();
-
-	void checkUserActions();
-
-	void checkQueryElements();
-	void checkQueryElementsCreating();
-	void checkQueryLinkCreate();
-	void checkQueryNodeCreate();
-	void checkQueryElementsDeleting();
-	void checkQueryLinkDelete();
-	void checkQueryNodeDelete();
-
-	void NodeDelete(ne::NodeId nodeId);
-
-	void selectAll();
-	void invertSelection();
-
-	void checkQueryContextMenus();
-
-	void shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
-	void shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
-	void shiftSelectedNodesToFront();
-	void shiftTransformationInSequenceNodesToFront();
-
-	void showPopUpLabel(std::string label, ImColor color);
-
-	void UpdateTouchAllNodes();
-
-	void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+//	void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	void render();
 
@@ -130,3 +168,6 @@ public:
 	private:
 		void showEditMenu();
 };
+
+/* >>>>> STATIC FUNCTIONS <<<<< */
+//extern void backgroundPopupContent(DIWNE::Diwne &diwne, std::vector<Ptr<WorkspaceNodeWithCoreData>> &workspaceCoreNodes);

@@ -11,7 +11,7 @@
 
 #include "picoc.h"
 
-#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
+#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 
 #define PICOC_STACK_SIZE (32 * 1024) /* space for the the stack */
 

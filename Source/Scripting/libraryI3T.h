@@ -11,29 +11,29 @@
 #include "picoc.h"
 #include "pgr.h"
 /**
-* 
+*
 * LOADING, ADDING NEW FUNCTIONS
-*	libraryI3T.cpp -> 
+*	libraryI3T.cpp ->
 *		Create function with following prototype
 *			void f(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
 *		Add pair (example, you may define any function prototype you want, however, number of parameters is limited to PARAMETER_MAX (Dependencies/picoc/platform.h))
 *			{ f,     "int f(int,int,int,char*);" }
 *		to existing array
 *			struct LibraryFunction platformLibraryI3T[]
-*		Function 
+*		Function
 *			void platformLibraryInitI3T(Picoc *pc)
 *		is called on picoc init functions (Scripting.h, Scripting.cpp). This function begins with
 *			IncludeRegister(pc, "I3T.h", nullptr, platformLibraryI3T, defs)
-*		which adds the array to picoc 
+*		which adds the array to picoc
 *		Then definitions of constats, accessible in scripting, follow:
 *			VariableDefinePlatformVar(pc, nullptr, "free", &pc->IntType, (union AnyValue *)&scriptingData.mat4Types.free, false);
-*		This call defines variable 
+*		This call defines variable
 			const int free=scriptingData.mat4Types.free;
 		accessible in script. (last parameter writeable=false)
 *	libraryI3T.h ->
 *		Here you may define custom constants and global variables, accessible in script
 *		struct ScriptingData contains all of these variables and also vector of mat4,
-*		which is only used on script execution, during which the vector is filled by script (functions datavec3, datascalar, etc...) and then 
+*		which is only used on script execution, during which the vector is filled by script (functions datavec3, datascalar, etc...) and then
 *		created matricies can accessed by other functions of the script.
 * SAVING
 *   Scripting.cpp ->
@@ -41,18 +41,19 @@
 *			bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace)
 *			bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _workspace,int at)
 *		These functions fprintf's c script directly into target file on disc.
-*		The first one calls the second, and the second may also call itself recursively. The second serves for saving nodes only - 
+*		The first one calls the second, and the second may also call itself recursively. The second serves for saving nodes only -
 *		nodes may contain other nodes (Sequence, camera), thus the recursive calling.
-*		If you want to save non-node related stuff, do it in the first functions, because the second may be called multiple times during 
+*		If you want to save non-node related stuff, do it in the first functions, because the second may be called multiple times during
 *		saving process.
 *		If you want to save nodes, do it in the second function. The functions consist form huge if-else structure, which switches by
-*		node keyword (WorkspaceNodeWithCoreData->Core::NodeBase->Operation->keyWord), in each branch functions for saving given node and 
+*		node keyword (WorkspaceNodeWithCoreData->Core::NodeBase->Operation->keyWord), in each branch functions for saving given node and
 *		its inner state are fprintfed.
-*		
-*		
-* 
-* 
+*
+*
+*
+*
 */
+#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 
 /**
 * \struct Mat4types
@@ -108,7 +109,7 @@ struct CamAddModes{
 * \struct ScriptingData
 * Contains constant variables that are exposed to scripts, that are used as parameters of functions for creating various operators, telling which type of operator should be created.
 * Contains data as vector of mat4, which were created by script. Data are then used by script to init storage of created nodes.
-* 
+*
 */
 struct ScriptingData {
 	Mat4types mat4Types;
@@ -120,7 +121,7 @@ struct ScriptingData {
 	NodeLODs nodeLODs;
 	CamAddModes camAddModes;
 	std::vector<glm::mat4>nodeData;///<Vector of data as mat4, that were created by script. Serves as temporary static storage. Not needed after script is executed.
-	//std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
 };
 
 ScriptingData*getScriptingData();

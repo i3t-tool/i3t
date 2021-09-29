@@ -28,11 +28,11 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
 		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase(); //printf("a\n");
-		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId()); //printf("b\n");
+		ImVec2						pos			= nodebasedata->getNodeRectDiwne().Min; //printf("b\n");
 		const Core::Transform::DataMap&	data	= nodebase->getDataMapRef(); //printf("c\n");
 		const Operation*			operation	= nodebase->getOperation(); //printf("d\n");
 		const char*					keyword		= operation->keyWord.c_str(); //printf("e\n");
-		std::string					label		= nodebasedata->getHeaderLabel(); //printf("f\n");
+		std::string					label		= nodebasedata->getTopLabel(); //printf("f\n");
 
 		//mat4 transform
 		if (strcmp(keyword, "Scale") == 0) {
@@ -241,7 +241,7 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 		}
 		else if (strcmp(keyword, "MixVector") == 0) {
 			fprintf(f, "int n%d=vec4oper(mix,%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
-		}		
+		}
 		//quat
 		else if (strcmp(keyword, "QuatToQuat") == 0) {
 			glm::vec4 vec = nodebase->getData().getVec4();
@@ -437,50 +437,14 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 //	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
 		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase(); //printf("a\n");
-		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId()); //printf("b\n");
+		ImVec2						pos			= nodebasedata->getNodePositionDiwne(); //printf("b\n");
 		const Core::Transform::DataMap&	data	= nodebase->getDataMapRef(); //printf("c\n");
 		const Operation*			operation	= nodebase->getOperation(); //printf("d\n");
 		const char*					keyword		= operation->keyWord.c_str(); //printf("e\n");
-		std::string					label		= nodebasedata->getHeaderLabel(); //printf("f\n");
+		std::string					label		= nodebasedata->getTopLabel(); //printf("f\n");
 		//sequence
 		if (strcmp(keyword, "Sequence") == 0) {
 
-			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
-			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
-
-			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=seq->getInnerWorkspaceNodes();
-			saveWorkspace(f,&ctx,maxIndex);
-			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
-				fprintf(f, "bool sa%d_%d=seqadd(n%d,n%d);\n", i+at, j, i+at,j);
-			}
-		}
-		else if (strcmp(keyword, "Camera") == 0) {
-			WorkspaceCamera*cam=(WorkspaceCamera*)nodebasedata;
-			fprintf(f, "int n%d=camera(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
-
-			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=cam->getProjection()->getInnerWorkspaceNodes();
-			saveWorkspace(f,&ctx,maxIndex);
-			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
-				fprintf(f, "bool cp%d_%d=camadd(n%d,n%d,proj);\n", i+at, j, i+at,j);
-			}
-
-			ctx=cam->getView()->getInnerWorkspaceNodes();
-			saveWorkspace(f,&ctx,maxIndex);
-			for(int j=maxIndex-ctx.size();j< maxIndex;j++){
-				fprintf(f, "bool cv%d_%d=camadd(n%d,n%d,view);\n", i+at, j, i+at,j);
-			}
-		}
-	}
-	for (int i = 0; i < _workspace->size(); i++) {
-		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
-		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase(); //printf("a\n");
-		ImVec2						pos			= ne::GetNodePosition(nodebasedata->getId()); //printf("b\n");
-		const Core::Transform::DataMap&	data	= nodebase->getDataMapRef(); //printf("c\n");
-		const Operation*			operation	= nodebase->getOperation(); //printf("d\n");
-		const char*					keyword		= operation->keyWord.c_str(); //printf("e\n");
-		std::string					label		= nodebasedata->getHeaderLabel(); //printf("f\n");
-		//sequence
-		if (strcmp(keyword, "Sequence") == 0) {
 			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
 			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", i+at, (int)pos[0], (int)pos[1], label.c_str());
 
@@ -510,7 +474,7 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData*  nodebasedata = _workspace->at(i).get(); //printf("i\n");
 		Ptr<Core::NodeBase>			nodebase = nodebasedata->getNodebase();
-		ImVec2						pos = ne::GetNodePosition(nodebasedata->getId());
+		ImVec2						pos = nodebasedata->getNodeRectDiwne().Min;
 		const Core::Transform::DataMap&	data = nodebase->getDataMapRef();
 		const Operation*			operation = nodebase->getOperation();
 		const char* keyword =		operation->keyWord.c_str(); //printf("k\n");
@@ -528,6 +492,30 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 				if (parent.get() == (_workspace->at(j).get())->getNodebase().get()) {parentindex = j;}
 			}
 			if(parentindex>-1&& i > -1 && indexout > -1 && indexin > -1){fprintf(f,"bool p%d_%d=plugnodes(n%d,n%d,%d,%d);\n",i+at,indexin, parentindex,i+at,indexout,indexin);}
+		}
+	}
+	/// \nevim
+	for (int i = 0; i < _workspace->size(); i++) {
+		WorkspaceNodeWithCoreData*  nodebasedata= _workspace->at(i).get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData are also graphic informations, data are in Ptr<Core::NodeBase> */
+		Ptr<Core::NodeBase>			nodebase	= nodebasedata->getNodebase(); //printf("a\n");
+		ImVec2						pos			= nodebasedata->getNodeRectDiwne().Min; //printf("b\n");
+		const Core::Transform::DataMap&	data	= nodebase->getDataMapRef(); //printf("c\n");
+		const Operation*			operation	= nodebase->getOperation(); //printf("d\n");
+		const char*					keyword		= operation->keyWord.c_str(); //printf("e\n");
+		std::string					label		= nodebasedata->getTopLabel(); //printf("f\n");
+		//sequence
+		if (strcmp(keyword, "Sequence") == 0) {
+
+			WorkspaceSequence*seq=(WorkspaceSequence*)nodebasedata;
+			std::vector<Ptr<WorkspaceNodeWithCoreData>> ctx=seq->getInnerWorkspaceNodes();
+			saveWorkspace(f,&ctx,at+i);
+			//at+=ctx.size();
+			int seqpos= i + at + (int)ctx.size();
+			fprintf(f, "int n%d=sequence(%d,%d,\"%s\");\n", seqpos, (int)pos[0], (int)pos[1], label.c_str());
+			for(int j=0;j<ctx.size();j++){
+				fprintf(f, "bool sa%d_%d=seqadd(n%d,n%d);\n", seqpos,i+at, seqpos,i+at);
+				at++;
+			}
 		}
 	}
 	return true;

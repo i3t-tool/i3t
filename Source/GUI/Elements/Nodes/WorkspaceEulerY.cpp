@@ -4,21 +4,19 @@
 
 #include "WorkspaceEulerY.h"
 
-WorkspaceEulerY::WorkspaceEulerY(ImTextureID headerBackground, WorkspaceEulerYArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
+WorkspaceEulerY::WorkspaceEulerY()
+    :   WorkspaceMatrix4x4(Core::Builder::createTransform<Core::EulerRotY>())
 {}
 
-WorkspaceEulerY::WorkspaceEulerY(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::EulerRotY>(), headerLabel, nodeLabel)
-{}
-
-void WorkspaceEulerY::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspaceEulerY::drawDataSetValues(DIWNE::Diwne &diwne)
 {
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-  drawDataSetValues_builder(builder,
+  Ptr<Core::EulerRotY> nodebase = m_nodebase->as<Core::EulerRotY>();
+
+  return drawDataSetValues_builder(diwne,
                             { "angle" },
-                            { [this]() {return m_nodebase->as<Core::EulerRotY>()->getAngle(); } },
-                            { [this](float v) {return m_nodebase->as<Core::EulerRotY>()->setValue(v); } },
-                            {1}
+                            { [nodebase]() {return nodebase->getAngle(); } },
+                            { [nodebase](float v) {return nodebase->setValue(v); } },
+                            {1} /* \todo JH use coreMap */
   );
 }

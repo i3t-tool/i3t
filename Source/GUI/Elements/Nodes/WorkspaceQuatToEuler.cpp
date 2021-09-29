@@ -4,16 +4,6 @@
 
 #include "WorkspaceQuatToEuler.h"
 
-WorkspaceQuatToEuler::WorkspaceQuatToEuler(ImTextureID headerBackground, WorkspaceQuatToEulerArgs const& args)
-    : WorkspaceFloat(headerBackground, {.levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+WorkspaceQuatToEuler::WorkspaceQuatToEuler()
+    : WorkspaceFloat(Core::Builder::createNode<ENodeType::QuatToEuler>())
 {}
-
-WorkspaceQuatToEuler::WorkspaceQuatToEuler(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceFloat(headerBackground, Core::Builder::createNode<ENodeType::QuatToEuler>(), headerLabel, nodeLabel)
-{}
-
-void WorkspaceQuatToEuler::drawDataSetValues(util::NodeBuilder& builder)
-{
-	//todo
-	drawDataFull(builder,0);
-}

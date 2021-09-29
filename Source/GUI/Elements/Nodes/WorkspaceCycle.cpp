@@ -4,37 +4,15 @@
 
 #include "WorkspaceCycle.h"
 
-WorkspaceCycle::WorkspaceCycle(ImTextureID headerBackground, WorkspaceCycleArgs const& args) :
-		WorkspaceNodeWithCoreData(headerBackground,
-															{.levelOfDetail = args.levelOfDetail,
-															 .headerLabel		= args.headerLabel,
-															 .nodeLabel			= args.nodeLabel,
-															 .nodebase			= args.nodebase})
+WorkspaceCycle::WorkspaceCycle() :
+		WorkspaceNodeWithCoreData(Core::GraphManager::createCycle())
 {
-	fw.showMyPopup = false;
-	fw.id					 = "";
-	fw.value			 = NAN;
-	fw.name				 = "WorkspaceCycle";
-	setDataItemsWidth();
-}
-
-WorkspaceCycle::WorkspaceCycle(ImTextureID headerBackground, Ptr<Core::Cycle> nodebase, std::string headerLabel,
-															 std::string nodeLabel) :
-		WorkspaceNodeWithCoreData(headerBackground, nodebase == nullptr ? Core::GraphManager::createCycle() : nodebase,
-															headerLabel, nodeLabel)
-{
-	fw.showMyPopup = false;
-	fw.id					 = "";
-	fw.value			 = NAN;
-	fw.name				 = "WorkspaceCycle";
 	setDataItemsWidth();
 }
 
 bool WorkspaceCycle::isCycle() { return true; }
 
-void WorkspaceCycle::drawDataSetValues(util::NodeBuilder& builder) { drawDataFull(builder, 0); }
-
-void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
+bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 {
 	if (index == -1)
 	{ // -> draw middle
@@ -83,20 +61,12 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 		//const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier(); // wrong
 		const float coreData		 = m_nodebase->as<Core::Cycle>()->getManualStep();
 		float				localData		 = coreData;
-		const auto	idOfNode		 = m_id.Get();
 		bool				valueChanged = false;
 
 		ImGui::PushItemWidth(2 * button_sz.x + 4 * I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
 
 
-		valueChanged |= drawDragFloatWithMap_Inline(&localData, 1, fmt::format("##{}:{}", idOfNode, index));
-
-		if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
-		{
-			fw.showMyPopup = true;
-			fw.id					 = fmt::format("##{}", idOfNode);
-			fw.value			 = localData;
-		}
+		drawDragFloatWithMap_Inline(diwne, valueChanged, localData, 1, fmt::format("##{}:{}", getId(), index));
 
 		if (valueChanged)
 		{
@@ -132,26 +102,19 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 	else if (index == 0)
 	{
 		const float											coreData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
-		int const												idOfNode = this->m_id.Get();
 		const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
 
 		bool	valueChanged = false;
 		float localData;
 
-		ImGui::PushItemWidth(m_dataItemsWidth);
+		ImGui::PushItemWidth(getDataItemsWidth(diwne));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		localData = coreData;
-		valueChanged |= drawDragFloatWithMap_Inline(
-				&localData, coreMap[0], fmt::format("##{}:{}", idOfNode, index)); /* datamap value 1 is changeable */
+		drawDragFloatWithMap_Inline(diwne, valueChanged,
+				localData, coreMap[0], fmt::format("##{}:{}", getId(), index)); /* datamap value 1 is changeable */
 
-		if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
-		{
-			fw.showMyPopup = true;
-			fw.id					 = fmt::format("##{}", idOfNode);
-			fw.value			 = localData;
-		}
 
 
 		ImGui::PopStyleVar();
@@ -165,126 +128,127 @@ void WorkspaceCycle::drawDataFull(util::NodeBuilder& builder, int index)
 			setDataItemsWidth();
 		}
 	}
+	return false;
 }
 
-void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
-																	Core::Pin* newLinkPin)
+//void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
+//																	Core::Pin* newLinkPin)
+//{
+//
+//	float alpha = ImGui::GetStyle().Alpha;
+//
+//	builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
+//
+//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+//
+//	ImGui::BeginVertical(pinProp->getId().AsPointer());
+//	ImGui::Spring(1);
+//
+//	// color.Value.w = alpha / 255.0f;
+//	ax::Widgets::Icon(pinProp->getIconSize(), WorkspacePinShape[pinProp->getType()],
+//										pinProp->isConnected(), // SS add global variable. User test change or not.
+//										I3T::getColor(WorkspacePinColor[pinProp->getType()]),
+//										I3T::getColor(WorkspaceInnerPinColor[pinProp->getType()]));
+//
+//	ImGui::Spring(1);
+//	ImGui::EndVertical();
+//
+//	if (pinProp->getShowLabel())
+//	{
+//		if (pinProp->getLabel().empty())
+//		{ //it's never empty :(
+//
+//			auto label = pinProp->getCorePin().getLabel();
+//			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
+//					label == "pulse")
+//			{
+//				ImGui::TextUnformatted("");
+//			}
+//			else
+//			{
+//				ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+//				ImGui::TextUnformatted(label);
+//			}
+//		}
+//		else
+//		{
+//
+//			auto label = pinProp->getLabel();
+//			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
+//					label == "pulse")
+//			{
+//				ImGui::TextUnformatted("");
+//			}
+//			else
+//			{
+//				ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+//				ImGui::TextUnformatted(label.c_str());
+//			}
+//		}
+//	}
+//
+//	float														coreData = NAN;
+//	const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
+//	switch (pinProp->getIndex())
+//	{
+//	case 0:
+//		coreData = m_nodebase->as<Core::Cycle>()->getFrom();
+//		break;
+//	case 1:
+//		coreData = m_nodebase->as<Core::Cycle>()->getTo();
+//		break;
+//	case 2:
+//		//coreData = m_nodebase->as<Core::Cycle>()->getManualStep();
+//		coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
+//		break;
+//	default:
+//		break;
+//	}
+//
+//	int const idOfNode = this->m_id.Get();
+//
+//	bool	valueChanged = false;
+//	float localData;
+//
+//	ImGui::PushItemWidth(getDataItemsWidth(diwne));
+//	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+//	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+//
+//	localData = coreData;
+//
+//	if (!isnan(localData))
+//	{
+//		drawDragFloatWithMap_Inline(valueChanged,
+//				localData, coreMap[0],
+//				fmt::format("##{}:{}", idOfNode, pinProp->getIndex())); /* datamap value 1 is changeable */
+//	}
+//
+//	if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
+//	{
+//		fw.showMyPopup = true;
+//		fw.id					 = fmt::format("##{}", idOfNode);
+//		fw.value			 = localData;
+//	}
+//
+//
+//	ImGui::PopStyleVar();
+//	ImGui::PopStyleVar();
+//	ImGui::PopItemWidth();
+//
+//	if (valueChanged)
+//	{
+//		m_nodebase->setValue(localData);
+//		setDataItemsWidth();
+//	}
+//
+//
+//	ImGui::PopStyleVar();
+//	builder.EndInput();
+//}
+
+int WorkspaceCycle::maxLenghtOfData(int index)
 {
-
-	float alpha = ImGui::GetStyle().Alpha;
-
-	builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
-
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-
-	ImGui::BeginVertical(pinProp->getId().AsPointer());
-	ImGui::Spring(1);
-
-	// color.Value.w = alpha / 255.0f;
-	ax::Widgets::Icon(pinProp->getIconSize(), WorkspacePinShape[pinProp->getType()],
-										pinProp->isConnected(), // SS add global variable. User test change or not.
-										I3T::getColor(WorkspacePinColor[pinProp->getType()]),
-										I3T::getColor(WorkspaceInnerPinColor[pinProp->getType()]));
-
-	ImGui::Spring(1);
-	ImGui::EndVertical();
-
-	if (pinProp->getShowLabel())
-	{
-		if (pinProp->getLabel().empty())
-		{ //it's never empty :(
-
-			auto label = pinProp->getCorePin().getLabel();
-			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-					label == "pulse")
-			{
-				ImGui::TextUnformatted("");
-			}
-			else
-			{
-				ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-				ImGui::TextUnformatted(label);
-			}
-		}
-		else
-		{
-
-			auto label = pinProp->getLabel();
-			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-					label == "pulse")
-			{
-				ImGui::TextUnformatted("");
-			}
-			else
-			{
-				ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-				ImGui::TextUnformatted(label.c_str());
-			}
-		}
-	}
-
-	float														coreData = NAN;
-	const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
-	switch (pinProp->getIndex())
-	{
-	case 0:
-		coreData = m_nodebase->as<Core::Cycle>()->getFrom();
-		break;
-	case 1:
-		coreData = m_nodebase->as<Core::Cycle>()->getTo();
-		break;
-	case 2:
-		//coreData = m_nodebase->as<Core::Cycle>()->getManualStep();
-		coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
-		break;
-	default:
-		break;
-	}
-
-	int const idOfNode = this->m_id.Get();
-
-	bool	valueChanged = false;
-	float localData;
-
-	ImGui::PushItemWidth(m_dataItemsWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
-
-	localData = coreData;
-
-	if (!isnan(localData))
-	{
-		valueChanged |= drawDragFloatWithMap_Inline(
-				&localData, coreMap[0],
-				fmt::format("##{}:{}", idOfNode, pinProp->getIndex())); /* datamap value 1 is changeable */
-	}
-
-	if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
-	{
-		fw.showMyPopup = true;
-		fw.id					 = fmt::format("##{}", idOfNode);
-		fw.value			 = localData;
-	}
-
-
-	ImGui::PopStyleVar();
-	ImGui::PopStyleVar();
-	ImGui::PopItemWidth();
-
-	if (valueChanged)
-	{
-		m_nodebase->setValue(localData);
-		setDataItemsWidth();
-	}
-
-
-	ImGui::PopStyleVar();
-	builder.EndInput();
-}
-
-int WorkspaceCycle::maxLenghtOfData()
-{
-	float m = std::max({m_nodebase->as<Core::Cycle>()->getFrom(), m_nodebase->as<Core::Cycle>()->getTo(),
-											m_nodebase->as<Core::Cycle>()->getManualStep(), m_nodebase->as<Core::Cycle>()->getMultiplier()});
+    Ptr<Core::Cycle> nodebase = m_nodebase->as<Core::Cycle>();
+	float m = std::max({nodebase->getFrom(), nodebase->getTo(), nodebase->getManualStep(), nodebase->getMultiplier()});
 	return numberOfCharWithDecimalPoint(m, m_numberOfVisibleDecimal);
 }

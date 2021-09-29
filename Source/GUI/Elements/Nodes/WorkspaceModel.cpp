@@ -12,23 +12,16 @@ const char* g_meshesNames[] = {
 		"axes"
 };
 
-WorkspaceModel::WorkspaceModel(ImTextureID headerBackground, const WorkspaceModelArgs& args)
-	: WorkspaceNodeWithCoreData(headerBackground, { .levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+WorkspaceModel::WorkspaceModel()
+	: WorkspaceNodeWithCoreData(Core::Builder::createNode<ENodeType::Model>())
 {
 	init();
 	setDataItemsWidth();
 }
 
-WorkspaceModel::WorkspaceModel(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-	: WorkspaceNodeWithCoreData(headerBackground, Core::Builder::createNode<ENodeType::Model>(), headerLabel, nodeLabel)
+bool WorkspaceModel::drawDataFull(DIWNE::Diwne& diwne, int index)
 {
-	init();
-	setDataItemsWidth();
-}
-
-void WorkspaceModel::drawDataFull(util::NodeBuilder& builder, int index)
-{
-	ImGui::PushItemWidth(m_dataItemsWidth);
+	ImGui::PushItemWidth(getDataItemsWidth(diwne));
 
 	if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames, IM_ARRAYSIZE(g_meshesNames)))
 	{
@@ -36,23 +29,19 @@ void WorkspaceModel::drawDataFull(util::NodeBuilder& builder, int index)
 	}
 
 	ImGui::PopItemWidth();
+	return false;
 }
 
-void WorkspaceModel::drawDataSetValues(util::NodeBuilder& builder)
-{
-	drawDataFull(builder, 0);
-}
-
-int	 WorkspaceModel::maxLenghtOfData() { return 1; }
+int	 WorkspaceModel::maxLenghtOfData(int index) { return 1; }
 
 void WorkspaceModel::init()
 {
-	fw.showMyPopup = false;
-	fw.id = "";
-	fw.value = NAN;
-	fw.name = "pulse";
-	fw.rows = 0;
-	fw.columns = 0;
+//	fw.showMyPopup = false;
+//	fw.id = "";
+//	fw.value = NAN;
+//	fw.name = "pulse";
+//	fw.rows = 0;
+//	fw.columns = 0;
 
 	auto* object = App::get().world()->addModel("CubeGray");
 	m_nodebase->setValue(static_cast<void*>(object));

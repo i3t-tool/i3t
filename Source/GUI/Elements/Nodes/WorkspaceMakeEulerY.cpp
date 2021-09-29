@@ -1,17 +1,13 @@
 #include "WorkspaceMakeEulerY.h"
 
-WorkspaceMakeEulerY::WorkspaceMakeEulerY(ImTextureID headerBackground, WorkspaceMakeEulerYArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, { .levelOfDetail = args.levelOfDetail, .headerLabel = args.headerLabel, .nodeLabel = args.nodeLabel, .nodebase = args.nodebase })
+WorkspaceMakeEulerY::WorkspaceMakeEulerY()
+    :   WorkspaceMatrix4x4(Core::Builder::createNode<ENodeType::MakeEulerY>())
 {}
 
-WorkspaceMakeEulerY::WorkspaceMakeEulerY(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createNode<ENodeType::MakeEulerY>(), headerLabel, nodeLabel)
-{}
-
-void WorkspaceMakeEulerY::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspaceMakeEulerY::drawDataSetValues(DIWNE::Diwne &diwne)
 {
     const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-    drawDataSetValues_builder(builder,
+    return drawDataSetValues_builder(diwne,
         //SS todo
         { "00", "02", "20", "22" },
         { [this]() {return get00(); }, [this]() {return get02(); }, [this]() {return get20(); } , [this]() {return get22(); } },
@@ -26,6 +22,7 @@ void WorkspaceMakeEulerY::drawDataSetValues(util::NodeBuilder& builder)
 }
 
 
+/* \todo Move those to core and create setters */
 float WorkspaceMakeEulerY::get00()
 {
     return m_nodebase->getData().getMat4()[0][0];

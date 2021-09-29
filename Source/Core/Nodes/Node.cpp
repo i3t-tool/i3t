@@ -209,6 +209,7 @@ void NodeBase::accept(NodeVisitor& visitor) { visitor.visit(getPtr()); }
 
 ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 {
+    /* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
 	auto* inp = input;
 	if (!inp) return ENodePlugResult::Err_NonexistentPin;
 

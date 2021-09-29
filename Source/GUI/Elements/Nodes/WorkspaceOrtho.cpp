@@ -4,36 +4,34 @@
 
 #include "WorkspaceOrtho.h"
 
-WorkspaceOrtho::WorkspaceOrtho(ImTextureID headerBackground, WorkspaceOrthoArgs const& args)
-    : WorkspaceMatrix4x4(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::Builder::createTransform<Core::Translation>() })
+WorkspaceOrtho::WorkspaceOrtho()
+    :   WorkspaceMatrix4x4(Core::Builder::createTransform<Core::OrthoProj>())
 {}
 
-WorkspaceOrtho::WorkspaceOrtho(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceMatrix4x4(headerBackground, Core::Builder::createTransform<Core::OrthoProj>(), headerLabel, nodeLabel)
-{}
-
-void WorkspaceOrtho::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspaceOrtho::drawDataSetValues(DIWNE::Diwne &diwne)
 {
   const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-  drawDataSetValues_builder(builder,
+  Ptr<Core::OrthoProj> nodebase = m_nodebase->as<Core::OrthoProj>();
+
+  return drawDataSetValues_builder(diwne,
                             {   "left",
                                 "right",
                                 "bottom",
                                 "top",
                                 "near",
                                 "far"},
-                            {   [this](){return m_nodebase->as<Core::OrthoProj>()->getLeft();},
-                                [this](){return m_nodebase->as<Core::OrthoProj>()->getRight();},
-                                [this](){return m_nodebase->as<Core::OrthoProj>()->getBottom();},
-                                [this](){return m_nodebase->as<Core::OrthoProj>()->getTop();},
-                                [this](){return m_nodebase->as<Core::OrthoProj>()->getNear();},
-                                [this](){return m_nodebase->as<Core::OrthoProj>()->getFar();} },
-                            {   [this](float v){return m_nodebase->as<Core::OrthoProj>()->setLeft(v);},
-                                [this](float v){return m_nodebase->as<Core::OrthoProj>()->setRight(v);},
-                                [this](float v){return m_nodebase->as<Core::OrthoProj>()->setBottom(v);},
-                                [this](float v){return m_nodebase->as<Core::OrthoProj>()->setTop(v);},
-                                [this](float v){return m_nodebase->as<Core::OrthoProj>()->setNear(v);},
-                                [this](float v){return m_nodebase->as<Core::OrthoProj>()->setFar(v);}},
+                            {   [nodebase](){return nodebase->getLeft();},
+                                [nodebase](){return nodebase->getRight();},
+                                [nodebase](){return nodebase->getBottom();},
+                                [nodebase](){return nodebase->getTop();},
+                                [nodebase](){return nodebase->getNear();},
+                                [nodebase](){return nodebase->getFar();} },
+                            {   [nodebase](float v){return nodebase->setLeft(v);},
+                                [nodebase](float v){return nodebase->setRight(v);},
+                                [nodebase](float v){return nodebase->setBottom(v);},
+                                [nodebase](float v){return nodebase->setTop(v);},
+                                [nodebase](float v){return nodebase->setNear(v);},
+                                [nodebase](float v){return nodebase->setFar(v);}},
                             {   1, /* \todo JH some better way how determine what element from DataMap should be used? */
                                 1,
                                 1,
