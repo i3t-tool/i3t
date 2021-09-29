@@ -1,13 +1,14 @@
 #ifndef DIWNE_INCLUDE_H
 #define DIWNE_INCLUDE_H
 
-#include "spdlog/fmt/fmt.h"
 #include <limits>
 
+#include "spdlog/fmt/fmt.h"
+
 //------------------------------------------------------------------------------
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui.h>
+# include <imgui.h>
 # define IMGUI_DEFINE_MATH_OPERATORS
-# include <../Dependencies/imgui_node_editor/external/imgui/imgui_internal.h>
+# include <imgui_internal.h>
 //# include "../Dependencies/imgui_node_editor/external/imgui/imgui_extra_math.h"
 //# include "../Dependencies/imgui_node_editor/external/imgui/imgui_bezier_math.h"
 //# include "../Dependencies/imgui_node_editor/external/imgui/imgui_canvas.h"

@@ -72,11 +72,13 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne)
 
             inner_interaction_happen |= drawTopDiwne(diwne);
 
-            ImGui::BeginHorizontal("LeftMiddleRight");
-                inner_interaction_happen |= drawLeftDiwne(diwne);
-                inner_interaction_happen |= drawMiddleDiwne(diwne);
+						ImGui::PushID("LeftMiddleRight");
+            ImGui::BeginGroup();
+                inner_interaction_happen |= drawLeftDiwne(diwne);   ImGui::SameLine();
+                inner_interaction_happen |= drawMiddleDiwne(diwne); ImGui::SameLine();
                 inner_interaction_happen |= drawRightDiwne(diwne);
-            ImGui::EndHorizontal(); /* Left-Middle-Right */
+            ImGui::EndGroup(); /* Left-Middle-Right */
+						ImGui::PopID();
 
             inner_interaction_happen |= drawBottomDiwne(diwne);
 
@@ -126,9 +128,11 @@ bool Node::drawTopDiwne(DIWNE::Diwne &diwne)
                 , m_topRectDiwne.Max, ImColor(0,0,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
-    ImGui::BeginHorizontal("Top");
+		ImGui::PushID("Top");
+    ImGui::BeginGroup();
         inner_interaction_happen |= topContent(diwne);
-    ImGui::EndHorizontal();
+    ImGui::EndGroup();
+		ImGui::PopID();
 
     m_topRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     return inner_interaction_happen;
@@ -140,10 +144,12 @@ bool Node::drawLeftDiwne(DIWNE::Diwne &diwne)
     diwne.AddRectDiwne( m_leftRectDiwne.Min
                 , m_leftRectDiwne.Max, ImColor(0,255,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
-
-        ImGui::BeginVertical("Left");
+		
+				ImGui::PushID("Left");
+        ImGui::BeginGroup();
             inner_interaction_happen |= leftContent(diwne);
-        ImGui::EndVertical();
+        ImGui::EndGroup();
+				ImGui::PopID();
 
         m_leftRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_leftRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
@@ -156,9 +162,11 @@ bool Node::drawMiddleDiwne(DIWNE::Diwne &diwne)
                 , m_middleRectDiwne.Max, ImColor(255,0,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
-        ImGui::BeginVertical("Middle");
+				ImGui::PushID("Middle");
+        ImGui::BeginGroup();
             inner_interaction_happen |= middleContent(diwne);
-        ImGui::EndVertical();
+        ImGui::EndGroup();
+				ImGui::PopID();
 
         m_middleRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_middleRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
@@ -171,9 +179,11 @@ bool Node::drawRightDiwne(DIWNE::Diwne &diwne)
                 ,m_rightRectDiwne.Max, ImColor(255,255,0), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
-        ImGui::BeginVertical("Right");
+				ImGui::PushID("Right");
+        ImGui::BeginGroup();
             inner_interaction_happen |= rightContent(diwne);
-        ImGui::EndVertical();
+        ImGui::EndGroup();
+				ImGui::PopID();
 
         m_rightRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_rightRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
@@ -188,9 +198,11 @@ bool Node::drawBottomDiwne(DIWNE::Diwne &diwne)
                 , m_bottomRectDiwne.Max, ImColor(255,255,255), 0, ImDrawCornerFlags_None, 2);
     bool inner_interaction_happen = false;
 
-        ImGui::BeginHorizontal("Bottom");
+				ImGui::PushID("Bottom");
+        ImGui::BeginGroup();
             inner_interaction_happen |= bottomContent(diwne);
-        ImGui::EndHorizontal();
+        ImGui::EndGroup();
+				ImGui::PopID();
 
         m_bottomRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_bottomRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );

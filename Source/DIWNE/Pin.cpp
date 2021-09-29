@@ -43,7 +43,8 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
     /* debug - whole pin */
     diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
 
-    ImGui::BeginHorizontal(fmt::format("Pin{}", m_idDiwne).c_str());
+		ImGui::PushID(fmt::format("Pin{}", m_idDiwne).c_str());
+    ImGui::BeginGroup();
         inner_interaction_happen |= pinContent(diwne);
 
             /* debug */
@@ -52,7 +53,8 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
                 /* debug - whole pin */
                 diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);
         }
-    ImGui::EndHorizontal();
+    ImGui::EndGroup();
+		ImGui::PopID();
     m_pinRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
     m_pinRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
 

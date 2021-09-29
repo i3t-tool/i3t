@@ -37,7 +37,7 @@ bool WorkspaceVector4::drawDataFull(DIWNE::Diwne& diwne, int index)
 //		Nodebase->setValue(valueOfChange, {columnOfChange});
 	}
 
-	ImGui::Spring(0);
+	// ImGui::Spring(0);
 	return inner_interaction_happen;
 }
 

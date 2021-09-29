@@ -78,7 +78,7 @@ bool WorkspaceNodeWithCoreData::topContent(DIWNE::Diwne &diwne)
         diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,255,255),
                     DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
                     ImVec2(20,20), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
-        ImGui::Spring(0);
+        // ImGui::Spring(0);
     }
 		return false;
 }
@@ -277,7 +277,7 @@ bool WorkspaceNodeWithCoreData::drawDataSetValues_builder(  DIWNE::Diwne &diwne
 		setDataItemsWidth();
 	}
 
-	ImGui::Spring(0);
+	// ImGui::Spring(0);
 	return inner_interaction_happen;
 }
 
@@ -401,7 +401,7 @@ bool WorkspaceNodeWithCoreData::drawData(DIWNE::Diwne &diwne, int index)
 bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 {
 	ImGui::TextUnformatted(m_middleLabel.c_str());
-	ImGui::Spring(0);
+	// ImGui::Spring(0);
 	return false;
 }
 
@@ -418,7 +418,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 //
 //		ImGui::BeginVertical(pinProp->getId().AsPointer());
-//		ImGui::Spring(1);
+//		// ImGui::Spring(1);
 //
 //		EColor type			 = WorkspacePinColor[pinProp->getType()];
 //		EColor innerType = WorkspaceInnerPinColor[pinProp->getType()];
@@ -426,7 +426,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //		ax::Widgets::Icon(I3T::getSize(ESizeVec2::Nodes_IconSize), WorkspacePinShape[pinProp->getType()],
 //											pinProp->isConnected(), // SS User test change or not.
 //											I3T::getColor(type), I3T::getColor(innerType));
-//		ImGui::Spring(1);
+//		// ImGui::Spring(1);
 //		ImGui::EndVertical();
 //
 //
@@ -443,7 +443,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //				}
 //				else
 //				{
-//					ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+//					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
 //					ImGui::TextUnformatted(label);
 //				}
 //			}
@@ -458,7 +458,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //				}
 //				else
 //				{
-//					ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+//					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
 //					ImGui::TextUnformatted(label.c_str());
 //				}
 //			}
@@ -483,7 +483,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //            drawInputPin(builder, pinProp, newLinkPin);
 //        }
 //	}
-//	ImGui::Spring(2);
+//	// ImGui::Spring(2);
 //    for (auto const & pinProp : m_workspaceInputsProperties)
 //	{
 //	    if(pinProp->getType() != EValueType::Matrix)
@@ -495,11 +495,11 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //	if (!isTransformation() && !isTrackball())
 //	{
 //		ImGui::BeginVertical(m_nodebase->getId());
-//		ImGui::Spring(1);
+//		// ImGui::Spring(1);
 //
 //		for (auto const& pinProp : m_workspaceInputsProperties) { drawInputPin(builder, pinProp, newLinkPin); }
 //
-//		ImGui::Spring(1);
+//		// ImGui::Spring(1);
 //		ImGui::EndVertical();
 //	}
 //}
@@ -520,7 +520,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //		ImGui::EndVertical();
 //	}
 //
-//	ImGui::Spring(1);
+//	// ImGui::Spring(1);
 //	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 //
 //
@@ -538,9 +538,9 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //			}
 //			else
 //			{
-//				ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
+//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
 //				ImGui::TextUnformatted(label);
-//				ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
+//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
 //			}
 //		}
 //		else
@@ -554,14 +554,14 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //			}
 //			else
 //			{
-//				ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
+//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
 //				ImGui::TextUnformatted(label.c_str());
-//				ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
+//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
 //			}
 //		}
 //	}
 //
-//	ImGui::Spring(1);
+//	// ImGui::Spring(1);
 //
 //	//TODO better way to solve this?
 //	if (isCycle() && pinProp->getIndex() > 0)
@@ -592,22 +592,22 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //	{
 //		if (isTransformation())
 //		{
-//			ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
+//			// ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
 //			ImGui::BeginVertical(m_nodebase->getId());
 //			drawData(builder, 0);
 //			ImGui::EndVertical();
 //		}
 //		else if (isTrackball())
 //		{
-//			ImGui::Spring(1, I3T::getSize(ESize::Nodes_leftSideSpacing));
+//			// ImGui::Spring(1, I3T::getSize(ESize::Nodes_leftSideSpacing));
 //			drawData(builder, -1); // for trackball
 //		}
 //		else
 //		{
 //			builder.Middle();
-//			ImGui::Spring(1);
+//			// ImGui::Spring(1);
 //			drawData(builder, -1); // for cycle
-//			ImGui::Spring(1);
+//			// ImGui::Spring(1);
 //		}
 //	}
 //}
@@ -620,21 +620,21 @@ bool WorkspaceNodeWithCoreData::middleContent(DIWNE::Diwne &diwne)
 //	{
 //		if (isTransformation())
 //		{
-//			ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
+//			// ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
 //			ImGui::BeginVertical(m_nodebase->getId());
 //			inner_interaction_happen |= drawData(diwne, 0);
 //			ImGui::EndVertical();
 //		}
 //		else if (isTrackball())
 //		{
-//			ImGui::Spring(1, I3T::getSize(ESize::Nodes_leftSideSpacing));
+//			// ImGui::Spring(1, I3T::getSize(ESize::Nodes_leftSideSpacing));
 //			inner_interaction_happen |= drawData(diwne, -1); // for trackball
 //		}
 //		else
 //		{
-//			ImGui::Spring(1);
+//			// ImGui::Spring(1);
 //			inner_interaction_happen |= drawData(diwne, -1); // for cycle
-//			ImGui::Spring(1);
+//			// ImGui::Spring(1);
 //		}
 //	}
 	inner_interaction_happen |= drawData(diwne, 0);
@@ -651,7 +651,7 @@ bool WorkspaceNodeWithCoreData::middleContent(DIWNE::Diwne &diwne)
 //            drawOutputPin(builder, pinProp, newLinkPin);
 //        }
 //	}
-//	ImGui::Spring(2);
+//	// ImGui::Spring(2);
 //    for (auto const & pinProp : m_workspaceOutputsProperties)
 //	{
 //	    if(pinProp->getType() != EValueType::Matrix)
@@ -696,7 +696,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
 //		ImGui::BeginVertical(pinProp->getId().AsPointer());
-//		ImGui::Spring(1);
+//		// ImGui::Spring(1);
 
 		/* \todo JH store this in Theme ?*/
         DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
@@ -711,7 +711,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
                         isConnected());
 
 
-//		ImGui::Spring(1);
+//		// ImGui::Spring(1);
 //		ImGui::EndVertical();
 
 
@@ -728,7 +728,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 				}
 				else
 				{
-					ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
 					ImGui::TextUnformatted(label);
 				}
 			}
@@ -743,7 +743,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 				}
 				else
 				{
-					ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
 					ImGui::TextUnformatted(label.c_str());
 				}
 			}

@@ -61,6 +61,6 @@ bool WorkspaceQuatRot::drawDataFull(DIWNE::Diwne &diwne, int index){
   ImGui::PopStyleVar();
   ImGui::PopItemWidth();
 
-  ImGui::Spring(0);
+  // ImGui::Spring(0);
   return inner_interaction_happen;
 }

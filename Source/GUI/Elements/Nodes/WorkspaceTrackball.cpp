@@ -236,7 +236,8 @@ bool WorkspaceTrackball::drawDataFull(DIWNE::Diwne& diwne, int index){
 
 
 		//Buttons
-		ImGui::BeginVertical("Trackball_Buttons");
+		/// \todo JH
+		// ImGui::BeginVertical("Trackball_Buttons");
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 

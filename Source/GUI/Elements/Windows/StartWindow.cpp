@@ -216,8 +216,8 @@ void StartWindow::render()
 		    //ImGui::AlignTextToFramePadding();
 		    ImGui::BeginGroup();
 		    {
-			    ImGui::BeginVertical("yourScene", ImVec2(0, 0));
-			    ImGui::Spring(1);  // not working
+			    // ImGui::BeginVertical("yourScene", ImVec2(0, 0));
+			    // ImGui::Spring(1);  // not working
 
 			    ImGui::Dummy(ImVec2(0, 10));
 			    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
@@ -229,8 +229,8 @@ void StartWindow::render()
 			    ImGui::PopFont();
 			    ImGui::PopStyleColor();
 
-			    ImGui::Spring(1);  // not working
-			    ImGui::EndVertical();
+			    // ImGui::Spring(1);  // not working
+			    // ImGui::EndVertical();
 			    ImGui::EndGroup();
 		    }
 		    //ImGui::GetFontSize()
@@ -242,8 +242,8 @@ void StartWindow::render()
 	    	// BUTTONS
 		    ImGui::BeginGroup();
 		    {
-			    ImGui::BeginVertical("buttons", ImVec2(0, 0));
-			    ImGui::Spring(1);
+			    // ImGui::BeginVertical("buttons", ImVec2(0, 0));
+			    // ImGui::Spring(1);
 
 			    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
 			    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
@@ -282,8 +282,8 @@ void StartWindow::render()
 			    ImGui::PopStyleColor(2);
 			    ImGui::PopFont();
 
-			    ImGui::Spring(1);
-			    ImGui::EndVertical();
+			    // ImGui::Spring(1);
+			    // ImGui::EndVertical();
 			    ImGui::EndGroup();
 		    }
 		    ImGui::EndChild(); // SCENE PICKER
@@ -373,8 +373,8 @@ void StartWindow::render()
 			    // START BUTTON
 			    ImGui::BeginGroup();
 			    {
-				    ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
-				    ImGui::Spring(1);
+				    // ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
+				    // ImGui::Spring(1);
 				    ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
 				    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
 				    std::string buttonName = "Start##" + header->m_filename;
@@ -393,8 +393,8 @@ void StartWindow::render()
 				    }
 				    ImGui::PopStyleColor();
 				    ImGui::PopFont();
-				    ImGui::Spring(1);
-				    ImGui::EndVertical();
+				    // ImGui::Spring(1);
+				    // ImGui::EndVertical();
 				    ImGui::EndGroup();
 			    }
 			    //ImGui::Columns(1); // end columns

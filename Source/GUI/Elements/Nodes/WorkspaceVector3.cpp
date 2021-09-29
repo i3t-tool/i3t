@@ -37,7 +37,7 @@ bool WorkspaceVector3::drawDataFull(DIWNE::Diwne& diwne, int index)
 	    setDataItemsWidth();
 	}
 
-	ImGui::Spring(0);
+	// ImGui::Spring(0);
 
 	return inner_interaction_happen;
 }

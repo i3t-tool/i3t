@@ -24,9 +24,7 @@ include_directories(Dependencies/assimp/include)
 include_directories(Dependencies/glfw/include)
 include_directories(Dependencies/glm)
 include_directories(Dependencies/jsonlib/single_include)
-include_directories(Dependencies/imgui/examples)
-# include_directories(Dependencies/imgui_node_editor)
-include_directories(Dependencies/imgui_node_editor/external/imgui)
+include_directories(Dependencies/imgui)
 include_directories(Dependencies/imgui_markdown)
 include_directories(Dependencies/magic_enum/include)
 include_directories(Dependencies/pgr-framework/include)
@@ -139,13 +137,11 @@ endmacro()
 # ======== Source groups ======================================
 # Add ImGui source files.
 set(I3T_IMGUI_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_internal.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_demo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_draw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_widgets.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imconfig.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_demo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp)
 
 file(GLOB_RECURSE I3T_SOURCE
     "Source/*.h"
@@ -157,18 +153,6 @@ file(GLOB_RECURSE I3T_SOURCE
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 
 list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
-
-# Add ImGui_node_editor source files.
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.h)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.cpp)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_bezier_math.h)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_canvas.cpp)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_canvas.h)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_extra_math.h)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor_api.cpp)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor_internal.h)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/crude_json.h)
-# list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/crude_json.cpp)
 # =============================================================
 
 # ======== Configuration for building tests.  =================

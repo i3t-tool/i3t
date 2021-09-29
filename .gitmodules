@@ -32,12 +32,14 @@
 [submodule "Dependencies/imgui_markdown_extended"]
 	path = Dependencies/imgui_markdown_extended
 	url = https://github.com/Mizumaky/imgui_markdown_extended
-[submodule "Dependencies/imgui_node_editor"]
-	path = Dependencies/imgui_node_editor
-	url = https://gitlab.fel.cvut.cz/hericmar/imgui-node-editor.git
 [submodule "Dependencies/preprocessor"]
 	path = Dependencies/preprocessor
 	url = https://github.com/boostorg/preprocessor.git
 [submodule "Dependencies/magic_enum"]
 	path = Dependencies/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
+[submodule "Dependencies/imgui"]
+	path = Dependencies/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+

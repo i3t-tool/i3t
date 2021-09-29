@@ -14,7 +14,7 @@ class MainMenuBar
 {
 public:
 	MainMenuBar();
-	~MainMenuBar(){};
+	virtual ~MainMenuBar(){};
 	void render();
 
 private:

@@ -29,7 +29,7 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     ImVec2 controlPointEnd = m_endDiwne + m_endControlOffsetDiwne;
 
     ImVec2 mousePosDiwne = diwne.screen2diwne_noZoom( ImGui::GetIO().MousePos );
-    ImVec2 closestPointOnLink = ImBezierClosestPointCasteljau(m_startDiwne, controlPointStart, controlPointEnd, m_endDiwne
+    ImVec2 closestPointOnLink = ImBezierCubicClosestPointCasteljau(m_startDiwne, controlPointStart, controlPointEnd, m_endDiwne
                                              , mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
     ImVec2 diff = closestPointOnLink - mousePosDiwne;
     float diffLenghtSquare = diff.x*diff.x + diff.y*diff.y;

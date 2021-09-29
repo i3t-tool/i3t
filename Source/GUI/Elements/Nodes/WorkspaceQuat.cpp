@@ -52,7 +52,7 @@ WorkspaceQuat::WorkspaceQuat(Ptr<Core::NodeBase> nodebase)
 //    setDataItemsWidth();
 //  }
 //
-//  ImGui::Spring(0);
+//  // ImGui::Spring(0);
 //}
 
 bool WorkspaceQuat::drawDataFull(DIWNE::Diwne &diwne, int index)
@@ -88,7 +88,7 @@ bool WorkspaceQuat::drawDataFull(DIWNE::Diwne &diwne, int index)
     setDataItemsWidth();
   }
 
-  ImGui::Spring(0);
+  // ImGui::Spring(0);
   return inner_interaction_happen;
 }
 

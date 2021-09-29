@@ -48,9 +48,9 @@ bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
-	ImGui::Spring(0, I3T::getSize(ESize::Nodes_HeaderLabelIndent)); // 0 - spring will always have zero size - left align the header
+	// ImGui::Spring(0, I3T::getSize(ESize::Nodes_HeaderLabelIndent)); // 0 - spring will always have zero size - left align the header
 	ImGui::TextUnformatted(m_topLabel.c_str());
-	ImGui::Spring(10);	 // 1 - power of the current spring = 1, use default spacing .x or .y
+	// ImGui::Spring(10);	 // 1 - power of the current spring = 1, use default spacing .x or .y
 
     return interaction_happen;
 }
