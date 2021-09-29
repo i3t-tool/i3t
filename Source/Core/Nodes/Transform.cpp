@@ -4,6 +4,11 @@
 
 using namespace Core;
 
+bool Transformation::isLocked() const
+{
+	return m_currentMap == &Transform::g_Free;
+}
+
 void Transformation::lock()
 {
 	m_currentMap = &Transform::g_AllLocked;

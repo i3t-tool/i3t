@@ -179,7 +179,7 @@ Pin& Sequence::getOut(size_t i)
 void Sequence::createComponents()
 {
 	m_storage = std::make_shared<Sequence::Storage>();
-	//m_storage->init();
+	m_storage->m_id = getId();
 
 	m_storage->m_inputs.emplace_back(EValueType::Matrix, true, m_storage->getPtr(), 1);
 	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 1);
@@ -190,7 +190,7 @@ void Sequence::createComponents()
 
 
 	m_multiplier = std::make_shared<Sequence::Multiplier>();
-	//m_multiplier->init();
+	m_multiplier->m_id = getId();
 
 	m_multiplier->m_inputs.emplace_back(EValueType::MatrixMul, true, m_multiplier->getPtr(), 0);
 

@@ -14,6 +14,11 @@ std::string toString(const glm::vec4& vec)
 	return fmt::format("[{}, {}, {}, {}]", vec.x, vec.y, vec.z, vec.w);
 }
 
+std::string toString(const glm::quat& quat)
+{
+	return fmt::format("[{}, {}, {}, {}]", quat.x, quat.y, quat.z, quat.w);
+}
+
 std::string toString(const glm::mat4& mat)
 {
 	return fmt::format("[{}, {}, {}, {}]", toString(mat[0]), toString(mat[1]), toString(mat[2]), toString(mat[3]));

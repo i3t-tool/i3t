@@ -48,6 +48,7 @@ public:
 	int getCurrentIndex() const { return m_currentIndex; }
 
 	virtual ETransformState isValid() const { return ETransformState::Unknown; }
+	bool isLocked() const;
 	virtual void lock();
 	virtual void unlock();
 	bool hasSynergies() const { return m_hasEnabledSynergies; }

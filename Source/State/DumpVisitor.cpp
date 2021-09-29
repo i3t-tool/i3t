@@ -36,6 +36,7 @@ std::string dumpValue(EValueType value, const Core::NodePtr& node)
 		str = Utils::toString(node->getData().getMat4());
 		break;
 	case EValueType::Quat:
+		str = Utils::toString(node->getData().getQuat());
 		break;
 	case EValueType::MatrixMul:
 		break;
@@ -61,6 +62,52 @@ std::string dumpEdge(const Core::Pin& pin)
 										 pin.getIndex());
 }
 
+std::string dumpTransformIds(const Core::SequencePtr& sequence)
+{
+	std::vector<std::string> transformIds;
+	for (const auto& transform : sequence->getMatrices()) { transformIds.push_back(std::to_string(transform->getId())); }
+	return "[" + Utils::concat(transformIds, ", ") + "]";
+}
+
+std::string dumpCycle(const Core::Cycle& cycle)
+{
+	return fmt::format("");
+}
+
+NodeData dumpCamera(const Core::CameraPtr& camera)
+{
+	static std::string formatString = std::string(g_baseFormatString) +
+			"    proj_transforms: {}\n"
+			"    view_transforms: {}\n";
+
+	std::string projTransforms = dumpTransformIds(camera->getProj());
+	std::string viewTransforms = dumpTransformIds(camera->getView());
+
+	NodeData data;
+	data.node = fmt::format(formatString, camera->getId(), camera->getOperation()->keyWord,
+													projTransforms, viewTransforms);
+	for (const auto& in : camera->getInputPins())
+	{
+		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
+	}
+	return data;
+}
+
+NodeData dumpSequence(const Core::SequencePtr& sequence)
+{
+	static std::string formatString = std::string(g_baseFormatString) + "    transforms: {}\n";
+
+	std::string transforms = dumpTransformIds(sequence);
+
+	NodeData data;
+	data.node = fmt::format(formatString, sequence->getId(), sequence->getOperation()->keyWord, transforms);
+	for (const auto& in : sequence->getInputPins())
+	{
+		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
+	}
+	return data;
+}
+
 /**
  * \param node
  * \return Nested block in YAML format.
@@ -74,7 +121,8 @@ NodeData dumpOperator(const Core::NodePtr& node)
 
 	/// \todo MH consider multiple editable inputs for operator.
 	static std::string formatString = std::string(g_baseFormatString) + "    value: {}\n";
-	NodeData					 data;
+
+	NodeData data;
 	data.node = fmt::format(formatString, node->getId(), node->getOperation()->keyWord,
 													dumpValue(node->getOutPin(0).getType(), node));
 
@@ -86,13 +134,19 @@ NodeData dumpOperator(const Core::NodePtr& node)
 	return data;
 }
 
-std::string dumpCycle(const Core::Cycle& cycle) { return fmt::format(""); }
-
-std::string dumpTransform(const Core::TransformPtr& transform)
+NodeData dumpTransform(const Core::TransformPtr& transform)
 {
-	return fmt::format("- {}:"
-										 "    synergies: {}"
-										 "    locked: {}");
+	static std::string formatString = std::string(g_baseFormatString) +
+			"    value: {}\n"
+			"    synergies: {}\n"
+			"    locked: {}\n";
+
+	auto sequence = transform->getCurrentSequence();
+
+	NodeData data;
+	data.node = fmt::format(formatString, transform->getId(), transform->getOperation()->keyWord,
+													dumpValue(EValueType::Matrix, transform), transform->hasSynergies(), transform->isLocked());
+	return data;
 }
 
 std::string SceneRawData::toString() const
@@ -101,6 +155,15 @@ std::string SceneRawData::toString() const
 
 	result += "operators:\n";
 	for (const auto& op : operators) { result += op; }
+
+	result += "transforms:\n";
+	for (const auto& transform : transforms) { result += transform; }
+
+	result += "sequences:\n";
+	for (const auto& sequence : sequences) { result += sequence; }
+
+	result += "cameras:\n";
+	for (const auto& camera : cameras) { result += camera; }
 
 	result += "edges:\n";
 	result += Utils::concat(edges, "\n");
@@ -115,10 +178,7 @@ void do_for()
 {
 	Core::GraphManager::createNode<static_cast<ENodeType>(N)>();
 
-	if constexpr (N < Max)
-	{
-		do_for<N + 1, Max>();
-	}
+	if constexpr (N < Max) { do_for<N + 1, Max>(); }
 }
 
 bool DumpVisitor::m_isInitialized = false;
@@ -139,13 +199,13 @@ DumpVisitor::DumpVisitor()
 	}
 }
 
-std::string DumpVisitor::dump(const std::vector<Core::NodePtr>& nodes)
+std::string DumpVisitor::dump(const std::vector<NodeClass>& nodes)
 {
 	m_sceneData.clear();
 
 	for (const auto& node : nodes)
 	{
-		node->accept(*this); // calls visit(node) and populates m_result variable.
+		node->getNodebase()->accept(*this); // calls visit(node) and populates m_result variable.
 	}
 
 	return m_sceneData.toString();
@@ -156,16 +216,23 @@ void DumpVisitor::visit(const Core::NodePtr& node)
 	if (Core::isSequence(node))
 	{
 		// Dump sequence and its transforms.
+		m_sceneData.addSequence(dumpSequence(node->as<Core::Sequence>()));
+		for (const auto& transform : node->as<Core::Sequence>()->getMatrices())
+		{
+			m_sceneData.addTransform(dumpTransform(transform));
+		}
 	}
 	else if (node->getOperation() == &Core::g_CycleProperties)
 	{}
 	else if (node->getOperation() == &Core::g_cameraProperties)
 	{
 		// Dump camera sequences.
+		m_sceneData.addCamera(dumpCamera(node->as<Core::Camera>()));
 	}
 	else if (Core::isTransform(node))
 	{
 		// Dump orphaned transform.
+		m_sceneData.addTransform(dumpTransform(node->as<Core::Transformation>()));
 	}
 	else if (Core::isOperator(node))
 	{
@@ -197,7 +264,7 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene)
 	for (auto i = 0L; i < edges.size(); i++)
 	{
 		auto edge = edges[i];
-		if (edge.size() != 4) continue;  // Edge is not valid.
+		if (edge.size() != 4) continue; // Edge is not valid.
 
 		auto lhs = scene.findNode(edge[0].as<unsigned int>());
 		auto rhs = scene.findNode(edge[2].as<unsigned int>());

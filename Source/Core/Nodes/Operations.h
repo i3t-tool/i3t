@@ -467,7 +467,7 @@ static const Operation g_CycleProperties = {"Cycle",
 inline const Operation g_sequence = {
 		"Sequence", "seq", 2, matrixMulAndMatrixInput, 3, {EValueType::MatrixMul, EValueType::Matrix, EValueType::Matrix}};
 
-static const Operation g_cameraProperties = {
+inline const Operation g_cameraProperties = {
 		"Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
 
 static const std::vector<Operation> g_transforms = {

@@ -178,17 +178,8 @@ void Application::onSave()
 	auto workspace = getUI()->getWindowPtr<WorkspaceWindow>();
 	auto& nodes = workspace->m_workspaceCoreNodes;
 
-	std::vector<Core::NodePtr> operators;
-	for (const auto& node : nodes)
-	{
-		if (Core::isOperator(node->getNodebase()))
-		{
-			operators.push_back(node->getNodebase());
-		}
-	}
-
 	DumpVisitor visitor;
-	std::string rawState = visitor.dump(operators);
+	std::string rawState = visitor.dump(nodes);
 
 	Log::info(rawState);
 }

@@ -4,8 +4,10 @@
 #include <vector>
 
 #include "Core/Nodes/NodeVisitor.h"
+#include "GUI/Elements/Nodes/WorkspaceNodeWithCoreData.h"
 
 /// \todo MH Rename this file.
+using NodeClass = std::shared_ptr<WorkspaceNodeWithCoreData>;
 
 struct NodeData
 {
@@ -19,11 +21,21 @@ public:
 	void addOperator(const NodeData& data)
 	{
 		operators.push_back(data.node);
+		addEdges(data.edges);
+	}
 
-		for (const auto& edge : data.edges)
-		{
-			edges.push_back(edge);
-		}
+	void addTransform(const NodeData& data) { transforms.push_back(data.node); }
+
+	void addSequence(const NodeData& data)
+	{
+		sequences.push_back(data.node);
+		addEdges(data.edges);
+	}
+
+	void addCamera(const NodeData& data)
+	{
+		cameras.push_back(data.node);
+		addEdges(data.edges);
 	}
 
 	void clear()
@@ -31,17 +43,28 @@ public:
 		operators.clear();
 	}
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 
 private:
+	void addEdges(const std::vector<std::string>& aEdges)
+	{
+		for (const auto& edge : aEdges)
+		{
+			edges.push_back(edge);
+		}
+	}
+
 	std::vector<std::string> operators;
-	// std::vector<NodeData> transforms;
+	std::vector<std::string> transforms;
+	std::vector<std::string> sequences;
+	std::vector<std::string> cameras;
 	std::vector<std::string> edges;
 };
 
 struct SceneData
 {
 	std::vector<Core::NodePtr> operators;
+	std::vector<Core::TransformPtr> transforms;
 
 	Core::NodePtr findNode(Core::ID id)
 	{
@@ -79,7 +102,7 @@ public:
 	 *   - [1, 0, 4, 0]
 	 * \endcode
 	 */
-	std::string dump(const std::vector<Core::NodePtr>& nodes);
+	std::string dump(const std::vector<NodeClass>& nodes);
 
 private:
 	/**
