@@ -8,6 +8,12 @@ Nejprve je nutno stáhnout zdrojový kód. Přepínač `--recursive` zajistí to
 git clone --recursive https://gitlab.fel.cvut.cz/i3t-diplomky/i3t-bunny.git
 ````
 
+Nebyly-li všechny submoduly inicializovány nebo byl-li nějaký v nové verzi
+odebrán, je nutné je znovu inicializovat.
+````shell
+git submodule update --init --recursive
+````
+
 ## Instalace potřebných závislotí
 ### Linux (aptitude)
 ````shell

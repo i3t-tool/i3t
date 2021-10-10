@@ -7,10 +7,9 @@ Naší ambicí je, aby fungoval na všech uvedených platformách.
 
 | Platforma  | Arch.       | Konfigurace | CMake generátor      | Kompilátor | Stav  |
 |------------|-------------|-------------|----------------------|------------|-------|
-| Windows    | Win32, x64  | Debug       | Visual Studio        | cl.exe     | ✅    |
-| Windows    | Win32, x64  | Debug       | NMake Makefiles      | cl.exe     | ✅    |
-| Unix-like  | x86/x64     | Debug       | Unix Makefiles       | g++        | ✅    |
-| Unix-like  | x86/x64     | -           | Default              | clang      | ❓    |
+| Windows    | Win32, x64  | Všechny     | Visual Studio        | cl.exe     | ✅    |
+| Windows    | Win32, x64  | Všechny     | NMake Makefiles      | cl.exe     | ✅    |
+| Unix-like  | x86/x64     | Všechny     | Unix Makefiles       | g++, clang | ✅    |
 
 Pro sestavení postupujte prosím dle [návodu](Docs/Build.md).
 

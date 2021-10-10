@@ -12,7 +12,7 @@ namespace Core
 FORCE_INLINE bool isTransform(const NodePtr& node)
 {
 	auto it = std::find_if(g_transforms.begin(), g_transforms.end(),
-	                       [&node](const Operation& o) { return o.keyWord == node->getOperation()->keyWord; });
+	                       [&node](const std::pair<Operation, std::map<std::string, EValueType>>& pair) { return pair.first.keyWord == node->getOperation()->keyWord; });
 	return it != g_transforms.end();
 }
 
@@ -54,6 +54,17 @@ public:
 	bool hasSynergies() const { return m_hasEnabledSynergies; }
 	void disableSynergies() { m_hasEnabledSynergies = false; }
 	void enableSynergies() { m_hasEnabledSynergies = true; }
+
+protected:
+	using ValueMap = std::map<std::string, std::string>;
+
+public:
+	/**
+	 *
+	 * \return A map of valueName and value pairs.
+	 */
+	virtual ValueMap getDefaultValues() { return ValueMap(); }
+	virtual void setDefaultValues() {};
 
 protected:
 	explicit Transformation(const Operation* transformType) : NodeBase(transformType) {}
@@ -135,6 +146,8 @@ public:
 
 	void reset() override;
 
+	ValueMap getDefaultValues() override;
+
 	float getX();
 	float getY();
 	float getZ();
@@ -168,6 +181,8 @@ public:
 
 	ETransformState isValid() const override;
 	void lock() override;
+
+	ValueMap getDefaultValues() override;
 
 	[[nodiscard]] float getRot() const { return m_currentRot; }
 	float getAngle() const { return m_currentRot; }
@@ -206,6 +221,8 @@ public:
 	ETransformState isValid() const override;
 	void lock() override;
 
+	ValueMap getDefaultValues() override;
+
 	[[nodiscard]] float getRot() const { return m_currentRot; }
 	float getAngle() const { return m_currentRot; }
 
@@ -243,6 +260,8 @@ public:
 	ETransformState isValid() const override;
 	void lock() override;
 
+	ValueMap getDefaultValues() override;
+
 	float getAngle() const { return m_initialRot; }
 	[[nodiscard]] float getRot() const { return m_initialRot; }
 
@@ -270,6 +289,8 @@ public:
 
 	ETransformState isValid() const override;
 	void lock() override;
+
+	ValueMap getDefaultValues() override;
 
 	float getX();
 	float getY();
@@ -304,6 +325,8 @@ public:
 
 	ETransformState isValid() const override;
 
+	ValueMap getDefaultValues() override;
+
 	float getRot() const { return m_initialRads; };
 	const glm::vec3& getAxis() const { return m_initialAxis; };
 
@@ -330,6 +353,8 @@ public:
 	}
 
 	ETransformState isValid() const override;
+
+	ValueMap getDefaultValues() override;
 
 	const glm::quat& getQuat() const { return m_initialQuat; };
 	const glm::quat& getNormalized() const;
@@ -361,6 +386,8 @@ public:
 
 	ETransformState isValid() const override;
 	void lock() override;
+
+	ValueMap getDefaultValues() override;
 
 	float getLeft() const { return m_left; }
 	float getRight() const { return m_right; }
@@ -402,6 +429,8 @@ public:
 	ETransformState isValid() const override;
 	void lock() override;
 
+	ValueMap getDefaultValues() override;
+
 	float getFOW() const { return m_initialFOW; }
 	float getAspect() const { return m_initialAspect; }
 	float getZNear() const { return m_initialZNear; }
@@ -438,6 +467,8 @@ public:
 
 	ETransformState isValid() const override;
 	void lock() override;
+
+	ValueMap getDefaultValues() override;
 
 	float getLeft() const { return m_left; }
 	float getRight() const { return m_right; }
@@ -478,6 +509,8 @@ public:
 	}
 
 	ETransformState isValid() const override;
+
+	ValueMap getDefaultValues() override;
 
 	void reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;

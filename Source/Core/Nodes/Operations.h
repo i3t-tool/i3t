@@ -3,6 +3,7 @@
  */
 #pragma once
 
+#include <map>
 #include <sstream>
 
 #include "glm/gtx/euler_angles.hpp"
@@ -335,27 +336,29 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MatrixMulVector), "mat * vec4", 2, matrixVectorInput, 1, vectorInput}, // mat * vec4
 		{n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1,
 		 vectorInput}, // vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice???
-		{n(ENodeType::MatrixMulFloat), "float * mat", 2, floatMatrixInput, 1, matrixInput},										// float * mat
-		{n(ENodeType::VectorDotVector), "vec4 . vec4", 2, twoVectorInput, 1, floatInput},											// vec4 . vec4
-		{n(ENodeType::VectorAddVector), "vec4 + vec4", 2, twoVectorInput, 1, vectorInput},										// vec4 + vec4
-		{n(ENodeType::VectorSubVector), "vec4 - vec4", 2, twoVectorInput, 1, vectorInput},										// vec4 - vec4
-		{n(ENodeType::VectorMulFloat), "float * vec4", 2, floatVectorInput, 1, vectorInput},									// float * vec4
-		{n(ENodeType::VectorPerspectiveDivision), "perspective division", 1, vectorInput, 1, vectorInput},		// perspective division
-		{n(ENodeType::NormalizeVector), "normalize vec4", 1, vectorInput, 1, vectorInput},										// normalize vec4
+		{n(ENodeType::MatrixMulFloat), "float * mat", 2, floatMatrixInput, 1, matrixInput},	 // float * mat
+		{n(ENodeType::VectorDotVector), "vec4 . vec4", 2, twoVectorInput, 1, floatInput},		 // vec4 . vec4
+		{n(ENodeType::VectorAddVector), "vec4 + vec4", 2, twoVectorInput, 1, vectorInput},	 // vec4 + vec4
+		{n(ENodeType::VectorSubVector), "vec4 - vec4", 2, twoVectorInput, 1, vectorInput},	 // vec4 - vec4
+		{n(ENodeType::VectorMulFloat), "float * vec4", 2, floatVectorInput, 1, vectorInput}, // float * vec4
+		{n(ENodeType::VectorPerspectiveDivision), "perspective division", 1, vectorInput, 1,
+		 vectorInput},																																		 // perspective division
+		{n(ENodeType::NormalizeVector), "normalize vec4", 1, vectorInput, 1, vectorInput}, // normalize vec4
 		{n(ENodeType::MixVector), "mix vec4", 3, twoVectorFloatInput, 1, vectorInput, NO_TAG, mixInputNames}, // mix vec4
 		{n(ENodeType::Vector3CrossVector3), "vec3 x vec3", 2, twoVector3Input, 1, vector3Input},							// vec3 x vec3
 		{n(ENodeType::Vector3DotVector3), "vec3 . vec3", 2, twoVector3Input, 1, floatInput},									// vec3 . vec3
 		{n(ENodeType::Vector3AddVector3), "vec3 + vec3", 2, twoVector3Input, 1, vector3Input},								// vec3 + vec3
 		{n(ENodeType::Vector3SubVector3), "vec3 - vec3", 2, twoVector3Input, 1, vector3Input},								// vec3 - vec3
-		{n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVectorInput, 1, vector3Input},								// float * vec3
-		{n(ENodeType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1, vector3Input},									// normalize vec3
-		{n(ENodeType::Vector3Length), "lengthvec3", 1, vector3Input, 1, floatInput, "l = sqrt(x*x + y*y + z*z)"}, // lengthvec3
+		{n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVectorInput, 1, vector3Input}, // float * vec3
+		{n(ENodeType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1, vector3Input},	 // normalize vec3
+		{n(ENodeType::Vector3Length), "lengthvec3", 1, vector3Input, 1, floatInput,
+		 "l = sqrt(x*x + y*y + z*z)"}, // lengthvec3
 		{n(ENodeType::ShowVector3), "show vec3", 1, vector3Input, 1, matrixInput,
 		 "Create the matrix transforming vector [1, 0, 0] to the input vector. Should be used with bind objects / basic "
-		 "/ vectors."},																																							 // show vec3
+		 "/ vectors."}, // show vec3
 		{n(ENodeType::MixVector3), "mix vec3", 3, twoVector3FloatInput, 1, vector3Input, NO_TAG, mixInputNames}, // mix vec3
-		{n(ENodeType::ConjQuat), "quat conjugate", 1, quatInput, 1, quatInput},																	 // quat conjugate
-		{n(ENodeType::FloatVecToQuat), "quatfloat, vec3", 2, floatVector3Input, 1, quatInput},									 // quatfloat, vec3
+		{n(ENodeType::ConjQuat), "quat conjugate", 1, quatInput, 1, quatInput},								 // quat conjugate
+		{n(ENodeType::FloatVecToQuat), "quatfloat, vec3", 2, floatVector3Input, 1, quatInput}, // quatfloat, vec3
 		{n(ENodeType::AngleAxisToQuat), "quatangle, axis", 3, twoFloatVector3Input, 1, quatInput, NO_TAG,
 		 AngleAxisToQuatInputNames}, // quatangle, axis
 		{n(ENodeType::VecVecToQuat), "quatvec3, vec3", 2, twoVector3Input, 1, floatInput,
@@ -363,28 +366,36 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::QuatToFloatVec), "quat -> float, vec3", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,
 		 QuatToFloatVecInputNames}, // quat -> float, vec3
 		{n(ENodeType::QuatToAngleAxis), "quat -> angle, axis", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,
-		 AngleAxisInputNames},																																				// quat -> angle, axis
-		{n(ENodeType::QuatToEuler), "quat -> euler", 1, quatInput, 3, threeFloatInput},														// quat -> euler
-		{n(ENodeType::EulerToQuat), "euler -> quat", 3, threeFloatInput, 1, quatInput, NO_TAG, {"x", "y", "z"}},	// euler -> quat
-		{n(ENodeType::QuatInverse), "inverse quat", 1, quatInput, 1, quatInput},																	// inverse quat
-		{n(ENodeType::QuatSlerp), "quat slerp", 3, twoQuatFloatInput, 1, quatInput},															// quat slerp
-		{n(ENodeType::QuatLongWaySlerp), "quat long way slerp", 3, twoQuatFloatInput, 1, quatInput},							// quat long way slerp
-		{n(ENodeType::QuatLerp), "quat lerp", 3, twoQuatFloatInput, 1, quatInput},																// quat lerp
-		{n(ENodeType::FloatMulQuat), "float * quat", 2, floatQuatInput, 1, quatInput},														// float * quat
-		{n(ENodeType::QuatMulQuat), "quat * quat", 2, twoQuatInput, 1, quatInput},																// quat * quat
-		{n(ENodeType::QuatVecConjQuat), "qvq*", 2, quatVector3Input, 1, vector3Input},														// qvq*
-		{n(ENodeType::QuatLength), "lengthquat", 1, quatInput, 1, floatInput, "l = sqrt(w*w + x*x + y*y + z*z)"}, // lengthquat
+		 AngleAxisInputNames},																													// quat -> angle, axis
+		{n(ENodeType::QuatToEuler), "quat -> euler", 1, quatInput, 3, threeFloatInput}, // quat -> euler
+		{n(ENodeType::EulerToQuat),
+		 "euler -> quat",
+		 3,
+		 threeFloatInput,
+		 1,
+		 quatInput,
+		 NO_TAG,
+		 {"x", "y", "z"}},																																					 // euler -> quat
+		{n(ENodeType::QuatInverse), "inverse quat", 1, quatInput, 1, quatInput},										 // inverse quat
+		{n(ENodeType::QuatSlerp), "quat slerp", 3, twoQuatFloatInput, 1, quatInput},								 // quat slerp
+		{n(ENodeType::QuatLongWaySlerp), "quat long way slerp", 3, twoQuatFloatInput, 1, quatInput}, // quat long way slerp
+		{n(ENodeType::QuatLerp), "quat lerp", 3, twoQuatFloatInput, 1, quatInput},									 // quat lerp
+		{n(ENodeType::FloatMulQuat), "float * quat", 2, floatQuatInput, 1, quatInput},							 // float * quat
+		{n(ENodeType::QuatMulQuat), "quat * quat", 2, twoQuatInput, 1, quatInput},									 // quat * quat
+		{n(ENodeType::QuatVecConjQuat), "qvq*", 2, quatVector3Input, 1, vector3Input},							 // qvq*
+		{n(ENodeType::QuatLength), "lengthquat", 1, quatInput, 1, floatInput,
+		 "l = sqrt(w*w + x*x + y*y + z*z)"}, // lengthquat
 		{n(ENodeType::ClampFloat), "clamp float", 3, threeFloatInput, 1, floatInput,
-		 "Clamp val to <min, max> interval.\n Default min = 0 and max = 1", ClampFloatInputNames}, // clamp float
-		{n(ENodeType::FloatMulFloat), "float * float", 2, twoFloatInput, 1, floatInput},											 // float * float
-		{n(ENodeType::FloatDivFloat), "float / float", 2, twoFloatInput, 1, floatInput},											 // float / float
-		{n(ENodeType::FloatAddFloat), "float + float", 2, twoFloatInput, 1, floatInput},											 // float + float
-		{n(ENodeType::FloatPowFloat), "float ^ float", 2, twoFloatInput, 1, floatInput},											 // float ^ float
-		{n(ENodeType::MixFloat), "mix float", 3, threeFloatInput, 1, floatInput, NO_TAG, mixInputNames},			 // mix float
-		{n(ENodeType::FloatSinCos), "sin&cosfloat", 1, floatInput, 2, twoFloatInput},													 // sin&cosfloat
-		{n(ENodeType::ASinACos), "asin&acosfloat", 1, floatInput, 2, twoFloatInput},													 // asin&acosfloat
-		{n(ENodeType::Signum), "signum", 1, floatInput, 1, floatInput},																				 // signum
-		{n(ENodeType::MatrixToVectors), "mat -> vecs", 1, matrixInput, 4, fourVectorInput},										 // mat -> vecs
+		 "Clamp val to <min, max> interval.\n Default min = 0 and max = 1", ClampFloatInputNames},			 // clamp float
+		{n(ENodeType::FloatMulFloat), "float * float", 2, twoFloatInput, 1, floatInput},								 // float * float
+		{n(ENodeType::FloatDivFloat), "float / float", 2, twoFloatInput, 1, floatInput},								 // float / float
+		{n(ENodeType::FloatAddFloat), "float + float", 2, twoFloatInput, 1, floatInput},								 // float + float
+		{n(ENodeType::FloatPowFloat), "float ^ float", 2, twoFloatInput, 1, floatInput},								 // float ^ float
+		{n(ENodeType::MixFloat), "mix float", 3, threeFloatInput, 1, floatInput, NO_TAG, mixInputNames}, // mix float
+		{n(ENodeType::FloatSinCos), "sin&cosfloat", 1, floatInput, 2, twoFloatInput},										 // sin&cosfloat
+		{n(ENodeType::ASinACos), "asin&acosfloat", 1, floatInput, 2, twoFloatInput},										 // asin&acosfloat
+		{n(ENodeType::Signum), "signum", 1, floatInput, 1, floatInput},																	 // signum
+		{n(ENodeType::MatrixToVectors), "mat -> vecs", 1, matrixInput, 4, fourVectorInput},							 // mat -> vecs
 		{n(ENodeType::Vectors3ToMatrix), "vecs3 -> mat", 4, fourVector3Input, 1, matrixInput, NO_TAG,
 		 Vectors3ToMatrixInputNames}, // vecs3 -> mat
 		{n(ENodeType::VectorsToMatrix), "vecs4 -> mat", 4, fourVectorInput, 1, matrixInput, NO_TAG,
@@ -392,22 +403,24 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MatrixToFloats), "mat -> floats", 1, matrixInput, 16, sixteenFloatInput, NO_TAG, DEFAULT_NAMES,
 		 matrixIndexNames()}, // mat -> floats
 		{n(ENodeType::FloatsToMatrix), "floats -> mat", 16, sixteenFloatInput, 1, matrixInput, NO_TAG,
-		 matrixIndexNames()},																																			 // floats -> mat
+		 matrixIndexNames()}, // floats -> mat
 		{n(ENodeType::MatrixToTR), "mat -> TR", 1, matrixInput, 2, twoMatrixInput, NO_TAG, DEFAULT_NAMES, tr}, // mat -> TR
 		{n(ENodeType::TRToMatrix), "TR -> mat", 2, twoMatrixInput, 1, matrixInput, NO_TAG, tr},								 // TR -> mat
-		{n(ENodeType::MatrixToQuat), "mat -> quat", 1, matrixInput, 1, quatInput},														 // mat -> quat
-		{n(ENodeType::QuatToMatrix), "quat -> mat", 1, quatInput, 1, matrixInput},														 // quat -> mat
+		{n(ENodeType::MatrixToQuat), "mat -> quat", 1, matrixInput, 1, quatInput}, // mat -> quat
+		{n(ENodeType::QuatToMatrix), "quat -> mat", 1, quatInput, 1, matrixInput}, // quat -> mat
 		{n(ENodeType::VectorToFloats), "vec4 -> floats", 1, vectorInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES,
-		 xyzw},																																								 // vec4 -> float
+		 xyzw},																																														 // vec4 -> float
 		{n(ENodeType::FloatsToVector), "floats -> vec4", 4, fourFloatInput, 1, vectorInput, NO_TAG, xyzw}, // floats -> vec4
 		{n(ENodeType::Vector3ToFloats), "vec3 -> floats", 1, vector3Input, 3, threeFloatInput, NO_TAG, DEFAULT_NAMES,
-		 xyz},																																														// vec3 -> floats
-		{n(ENodeType::FloatsToVector3), "floats -> vec3", 3, threeFloatInput, 1, vector3Input, NO_TAG, xyz},					// floats -> vec3
-		{n(ENodeType::VectorToVector3), "vec4 -> vec3", 1, vectorInput, 1, vector3Input},															// vec4 -> vec3
-		{n(ENodeType::Vector3ToVector), "vec3 -> vec4", 1, vector3Input, 1, vectorInput},															// vec3 -> vec4
-		{n(ENodeType::QuatToFloats), "quat -> floats", 1, quatInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES, xyzw}, // quat -> floats
-		{n(ENodeType::FloatsToQuat), "floats -> quat", 4, fourFloatInput, 1, quatInput, NO_TAG, xyzw},								// floats -> quat
-		{n(ENodeType::NormalizeQuat), "normalize quat", 1, quatInput, 1, quatInput},																	// normalize quat
+		 xyz}, // vec3 -> floats
+		{n(ENodeType::FloatsToVector3), "floats -> vec3", 3, threeFloatInput, 1, vector3Input, NO_TAG,
+		 xyz},																																						// floats -> vec3
+		{n(ENodeType::VectorToVector3), "vec4 -> vec3", 1, vectorInput, 1, vector3Input}, // vec4 -> vec3
+		{n(ENodeType::Vector3ToVector), "vec3 -> vec4", 1, vector3Input, 1, vectorInput}, // vec3 -> vec4
+		{n(ENodeType::QuatToFloats), "quat -> floats", 1, quatInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES,
+		 xyzw},																																												 // quat -> floats
+		{n(ENodeType::FloatsToQuat), "floats -> quat", 4, fourFloatInput, 1, quatInput, NO_TAG, xyzw}, // floats -> quat
+		{n(ENodeType::NormalizeQuat), "normalize quat", 1, quatInput, 1, quatInput},									 // normalize quat
 
 		// Value nodes.
 		{n(ENodeType::FloatToFloat), "float", 1, floatInput, 1, floatInput, Core::defaultDataMaps},
@@ -419,19 +432,24 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::Model), "model", 1, matrixMulInput, 0, {}},
 
 		// Transform matrices constructors
-		{n(ENodeType::MakeTranslation), "translate constructor", 1, vector3Input, 1, matrixInput},										 // translate
-		{n(ENodeType::MakeEulerX), "eulerAngleX constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
-		{n(ENodeType::MakeEulerY), "eulerAngleY constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
-		{n(ENodeType::MakeEulerZ), "eulerAngleZ constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleZ
-		{n(ENodeType::MakeScale), "scale constructor", 1, vector3Input, 1, matrixInput},															 // scale
+		{n(ENodeType::MakeTranslation), "translate constructor", 1, vector3Input, 1, matrixInput}, // translate
+		{n(ENodeType::MakeEulerX), "eulerAngleX constructor", 1, floatInput, 1, matrixInput, NO_TAG,
+		 eulerInputNames}, // eulerAngleX
+		{n(ENodeType::MakeEulerY), "eulerAngleY constructor", 1, floatInput, 1, matrixInput, NO_TAG,
+		 eulerInputNames}, // eulerAngleY
+		{n(ENodeType::MakeEulerZ), "eulerAngleZ constructor", 1, floatInput, 1, matrixInput, NO_TAG,
+		 eulerInputNames},																															 // eulerAngleZ
+		{n(ENodeType::MakeScale), "scale constructor", 1, vector3Input, 1, matrixInput}, // scale
 		{n(ENodeType::MakeAxisAngle), "rotate constructor", 2, floatVector3Input, 1, matrixInput, NO_TAG,
-		 AngleAxisInputNames},																																								 // rotate
-		{n(ENodeType::MakeOrtho), "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // ortho
+		 AngleAxisInputNames}, // rotate
+		{n(ENodeType::MakeOrtho), "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
+		 orthoFrustrumInputNames}, // ortho
 		{n(ENodeType::MakePerspective), "perspective constructor", 4, fourFloatInput, 1, matrixInput, NO_TAG,
 		 PerspectiveInputNames}, // perspective
 		{n(ENodeType::MakeFrustum), "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
-		 orthoFrustrumInputNames},																																						// frustrum
-		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
+		 orthoFrustrumInputNames}, // frustrum
+		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG,
+		 lookAtInputNames}, // lookAt
 
 		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}},
 		{n(ENodeType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};
@@ -470,25 +488,71 @@ inline const Operation g_sequence = {
 inline const Operation g_cameraProperties = {
 		"Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
 
-static const std::vector<Operation> g_transforms = {
-		{n(ETransformType::Free), "free", defaultDataMaps},
-		{n(ETransformType::Translation), "translate", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate}},
-		{n(ETransformType::EulerX), "eulerAngleX", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX}},
-		{n(ETransformType::EulerY), "eulerAngleY", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY}},
-		{n(ETransformType::EulerZ), "eulerAngleZ", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ}},
-		{n(ETransformType::Scale), "scale", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale}},
-		{n(ETransformType::AxisAngle), "rotate", defaultDataMaps},
-		{n(ETransformType::Quat), "quat", defaultDataMaps},
-		{n(ETransformType::Ortho), "ortho", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho}},
-		{n(ETransformType::Perspective), "perspective", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective}},
-		{n(ETransformType::Frustum), "frustum", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum}},
-		{n(ETransformType::LookAt), "lookAt", defaultDataMaps},
+static const std::vector<std::pair<Operation, std::map<std::string, EValueType>>> g_transforms = {
+		{{n(ETransformType::Free), "free", defaultDataMaps}, {}},
+		{{n(ETransformType::Translation),
+			"translate",
+			{&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate}},
+		 {{"translation", EValueType::Vec3}}},
+		{{n(ETransformType::EulerX), "eulerAngleX", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX}},
+		 {{"rotation", EValueType::Float}}},
+		{{n(ETransformType::EulerY), "eulerAngleY", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY}},
+		 {{"rotation", EValueType::Float}}},
+		{{n(ETransformType::EulerZ), "eulerAngleZ", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ}},
+		 {{"rotation", EValueType::Float}}},
+		{{n(ETransformType::Scale), "scale", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale}},
+		 {{"scale", EValueType::Vec3}}},
+		{{n(ETransformType::AxisAngle), "rotate", defaultDataMaps},
+		 {{"axis", EValueType::Vec3}, {"rotation", EValueType::Float}}},
+		{{n(ETransformType::Quat), "quat", defaultDataMaps}, {{"quat", EValueType::Quat}}},
+		{{n(ETransformType::Ortho), "ortho", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho}},
+		 {{"left", EValueType::Float},
+			{"right", EValueType::Float},
+			{"bottom", EValueType::Float},
+			{"top", EValueType::Float},
+			{"near", EValueType::Float},
+			{"far", EValueType::Float}}},
+		{{n(ETransformType::Perspective),
+			"perspective",
+			{&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective}},
+		 {{"fov", EValueType::Float},
+			{"aspect", EValueType::Float},
+			{"zNear", EValueType::Float},
+			{"zFar", EValueType::Float}}},
+		{{n(ETransformType::Frustum), "frustum", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum}},
+		 {{"left", EValueType::Float},
+			{"right", EValueType::Float},
+			{"bottom", EValueType::Float},
+			{"top", EValueType::Float},
+			{"near", EValueType::Float},
+			{"far", EValueType::Float}}},
+		{{n(ETransformType::LookAt), "lookAt", defaultDataMaps},
+		 {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}},
 };
 
 FORCE_INLINE const Operation* getOperationProps(ENodeType type) { return &operations[static_cast<size_t>(type)]; }
 
 FORCE_INLINE const Operation* getTransformProps(ETransformType type)
 {
-	return &g_transforms[static_cast<unsigned>(type)];
+	for (const auto& transformProps : g_transforms)
+	{
+		if (transformProps.first.keyWord == n(type)) { return &transformProps.first; }
+	}
+	return nullptr;
+}
+
+FORCE_INLINE const auto& getTransformDefaults(const std::string& keyWord)
+{
+	static std::map<std::string, EValueType> noDefaults;
+	for (const auto& transformProps : g_transforms)
+	{
+		if (transformProps.first.keyWord == keyWord) { return transformProps.second; }
+	}
+	return noDefaults;
+}
+
+FORCE_INLINE const auto& getTransformDefaults(ETransformType type)
+{
+	return getTransformDefaults(n(type));
 }
 }; // namespace Core

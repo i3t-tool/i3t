@@ -69,10 +69,7 @@ std::string dumpTransformIds(const Core::SequencePtr& sequence)
 	return "[" + Utils::concat(transformIds, ", ") + "]";
 }
 
-std::string dumpCycle(const Core::Cycle& cycle)
-{
-	return fmt::format("");
-}
+std::string dumpCycle(const Core::Cycle& cycle) { return fmt::format(""); }
 
 NodeData dumpCamera(const Core::CameraPtr& camera)
 {
@@ -84,8 +81,8 @@ NodeData dumpCamera(const Core::CameraPtr& camera)
 	std::string viewTransforms = dumpTransformIds(camera->getView());
 
 	NodeData data;
-	data.node = fmt::format(formatString, camera->getId(), camera->getOperation()->keyWord,
-													projTransforms, viewTransforms);
+	data.node =
+			fmt::format(formatString, camera->getId(), camera->getOperation()->keyWord, projTransforms, viewTransforms);
 	for (const auto& in : camera->getInputPins())
 	{
 		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
@@ -134,7 +131,7 @@ NodeData dumpOperator(const Core::NodePtr& node)
 	return data;
 }
 
-NodeData dumpTransform(const Core::TransformPtr& transform)
+std::optional<NodeData> dumpTransform(const Core::TransformPtr& transform)
 {
 	static std::string formatString = std::string(g_baseFormatString) +
 			"    value: {}\n"
@@ -146,6 +143,21 @@ NodeData dumpTransform(const Core::TransformPtr& transform)
 	NodeData data;
 	data.node = fmt::format(formatString, transform->getId(), transform->getOperation()->keyWord,
 													dumpValue(EValueType::Matrix, transform), transform->hasSynergies(), transform->isLocked());
+
+	auto				defaultValues = transform->getDefaultValues();
+	const auto& expectedKeys	= Core::getTransformDefaults(transform->getOperation()->keyWord);
+
+	for (auto& [key, _] : expectedKeys)  // validate values
+	{
+		if (defaultValues.count(key) == 0)
+		{
+			Log::error("Member function of transform '{}' does not export default value with key '{}'.",
+								 transform->getOperation()->keyWord, key);
+			return std::nullopt;
+		}
+	}
+	data.node += "    defaults: {" + Utils::concat(Utils::concat(defaultValues, ": "), ", ") + "}\n";
+
 	return data;
 }
 
@@ -155,18 +167,23 @@ std::string SceneRawData::toString() const
 
 	result += "operators:\n";
 	for (const auto& op : operators) { result += op; }
+	if (operators.empty()) result += "    {}\n";
 
 	result += "transforms:\n";
 	for (const auto& transform : transforms) { result += transform; }
+	if (transforms.empty()) result += "    {}\n";
 
 	result += "sequences:\n";
 	for (const auto& sequence : sequences) { result += sequence; }
+	if (sequences.empty()) result += "    {}\n";
 
 	result += "cameras:\n";
 	for (const auto& camera : cameras) { result += camera; }
+	if (cameras.empty()) result += "    {}\n";
 
 	result += "edges:\n";
-	result += Utils::concat(edges, "\n");
+	if (edges.empty()) result += "    {}\n";
+	else result += Utils::concat(edges, "\n");
 
 	return result;
 }
@@ -219,7 +236,9 @@ void DumpVisitor::visit(const Core::NodePtr& node)
 		m_sceneData.addSequence(dumpSequence(node->as<Core::Sequence>()));
 		for (const auto& transform : node->as<Core::Sequence>()->getMatrices())
 		{
-			m_sceneData.addTransform(dumpTransform(transform));
+			auto result = dumpTransform(transform);
+
+			if (result.has_value()) m_sceneData.addTransform(*result);
 		}
 	}
 	else if (node->getOperation() == &Core::g_CycleProperties)
@@ -232,7 +251,9 @@ void DumpVisitor::visit(const Core::NodePtr& node)
 	else if (Core::isTransform(node))
 	{
 		// Dump orphaned transform.
-		m_sceneData.addTransform(dumpTransform(node->as<Core::Transformation>()));
+		auto result = dumpTransform(node->as<Core::Transformation>());
+
+		if (result.has_value()) m_sceneData.addTransform(*result);
 	}
 	else if (Core::isOperator(node))
 	{

@@ -1,5 +1,6 @@
 .idea/
 /Docs/Doxygen/html/
+*.swp
 
 *.sln
 *.vcxproj

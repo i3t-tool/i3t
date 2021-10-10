@@ -1,6 +1,7 @@
 #include "Transform.h"
 
 #include "Logger/Logger.h"
+#include "Utils/Format.h"
 
 using namespace Core;
 
@@ -146,6 +147,11 @@ void Scale::reset()
 	setInternalValue(glm::scale(m_initialScale));
 }
 
+Transformation::ValueMap Scale::getDefaultValues()
+{
+	return {{"scale", Utils::toString(m_initialScale)}};
+}
+
 float Scale::getX()
 {
 	return getInternalData().getMat4()[0][0];
@@ -193,6 +199,11 @@ ETransformState EulerRotX::isValid() const
 void EulerRotX::lock()
 {
 	m_currentMap = &Transform::g_EulerX;
+}
+
+Transformation::ValueMap EulerRotX::getDefaultValues()
+{
+	return {{"rotation", Utils::toString(m_initialRot)}};
 }
 
 ValueSetResult EulerRotX::setValue(float val)
@@ -325,6 +336,11 @@ void EulerRotY::lock()
     m_currentMap = &Transform::g_EulerY;
 }
 
+Transformation::ValueMap EulerRotY::getDefaultValues()
+{
+	return {{"rotation", Utils::toString(m_initialRot)}};
+}
+
 ValueSetResult EulerRotY::setValue(float val)
 {
 	m_currentRot = val;
@@ -446,6 +462,11 @@ void EulerRotZ::lock()
     m_currentMap = &Transform::g_EulerZ;
 }
 
+Transformation::ValueMap EulerRotZ::getDefaultValues()
+{
+	return {{"rotation", Utils::toString(m_initialRot)}};
+}
+
 ValueSetResult EulerRotZ::setValue(float val)
 {
 	m_currentRot = val;
@@ -563,6 +584,11 @@ void Translation::lock()
 	m_currentMap = &Transform::g_Translate;
 }
 
+Transformation::ValueMap Translation::getDefaultValues()
+{
+	return {{"translation", Utils::toString(m_initialTrans)}};
+}
+
 ValueSetResult Translation::setValue(float val)
 {
 	return setValue(glm::vec3(val));
@@ -658,6 +684,11 @@ ETransformState AxisAngleRot::isValid() const
 	return ETransformState::Unknown;
 }
 
+Transformation::ValueMap AxisAngleRot::getDefaultValues()
+{
+	return {{"axis", Utils::toString(m_initialAxis)}, {"rotation", Utils::toString(m_initialRads)}};
+}
+
 void AxisAngleRot::reset()
 {
 	m_currentMap = m_initialMap;
@@ -695,6 +726,11 @@ ETransformState QuatRot::isValid() const
 	return ETransformState::Unknown;
 }
 
+Transformation::ValueMap QuatRot::getDefaultValues()
+{
+	return {{"quat", Utils::toString(m_initialQuat)}};
+}
+
 void QuatRot::reset()
 {
 	notifySequence();
@@ -729,6 +765,18 @@ ETransformState OrthoProj::isValid() const
 void OrthoProj::lock()
 {
     m_currentMap = &Transform::g_Ortho;
+}
+
+Transformation::ValueMap OrthoProj::getDefaultValues()
+{
+	return {
+			{"left", Utils::toString(m_left)},
+			{"right", Utils::toString(m_right)},
+			{"bottom", Utils::toString(m_bottom)},
+			{"top", Utils::toString(m_top)},
+			{"near", Utils::toString(m_near)},
+			{"far", Utils::toString(m_far)},
+	};
 }
 
 void OrthoProj::reset()
@@ -803,6 +851,16 @@ void PerspectiveProj::lock()
     m_currentMap = &Transform::g_Perspective;
 }
 
+Transformation::ValueMap PerspectiveProj::getDefaultValues()
+{
+	return {
+			{"fov", Utils::toString(m_initialFOW)},
+			{"aspect", Utils::toString(m_initialAspect)},
+			{"zNear", Utils::toString(m_initialZNear)},
+			{"zFar", Utils::toString(m_initialZFar)},
+	};
+}
+
 ValueSetResult PerspectiveProj::setFOW(float v)
 {
 	m_initialFOW = v;
@@ -859,6 +917,18 @@ ETransformState Frustum::isValid() const
 void Frustum::lock()
 {
     m_currentMap = &Transform::g_Frustum;
+}
+
+Transformation::ValueMap Frustum::getDefaultValues()
+{
+	return {
+			{"left", Utils::toString(m_left)},
+			{"right", Utils::toString(m_right)},
+			{"bottom", Utils::toString(m_bottom)},
+			{"top", Utils::toString(m_top)},
+			{"near", Utils::toString(m_near)},
+			{"far", Utils::toString(m_far)},
+	};
 }
 
 void Frustum::reset()
@@ -927,6 +997,15 @@ ValueSetResult Frustum::setFar(float val)
 ETransformState LookAt::isValid() const
 {
 	return ETransformState::Unknown;
+}
+
+Transformation::ValueMap LookAt::getDefaultValues()
+{
+	return {
+			{"eye", Utils::toString(m_initialEye)},
+			{"center", Utils::toString(m_initialCenter)},
+			{"up", Utils::toString(m_initialUp)},
+	};
 }
 
 void LookAt::reset()
