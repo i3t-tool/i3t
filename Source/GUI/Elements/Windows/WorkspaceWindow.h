@@ -29,12 +29,12 @@
 // #include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
 // #include "GUI/NodeEditorUtilities/Widgets.h"
 
-#include "GUI/Elements/Nodes/WorkspaceCamera.h"
+//#include "GUI/Elements/Nodes/WorkspaceCamera.h"
 
-#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
+//#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 
 
-#include "GUI/Elements/Nodes/SingleInclude.h"
+#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
 
 
 #include <glm/glm.hpp>
@@ -52,7 +52,7 @@ typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 /*! \class class for Workspace window object
     \brief Store everything what Workspace window need
 */
-class WorkspaceWindow : public IWindow, protected DIWNE::Diwne
+class WorkspaceWindow : public IWindow, public DIWNE::Diwne
 {
 public:
 	I3T_WINDOW(WorkspaceWindow)
@@ -91,25 +91,36 @@ public:
 	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
 
-	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
+//	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
 	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
 //	ne::Detail::Node *m_draged_node_nodeeditor;
 
-    template<typename T>
+    template<class T>
     void inline addNodeToPosition(ImVec2 const position)
     {
         m_workspaceCoreNodes.push_back(std::make_shared<T>());
 		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
     }
 
-    template<typename T>
+    template<class T>
     void inline addNodeToPositionOfPopup()
     {
         addNodeToPosition<T>(screen2diwne(getPopupPosition()));
     }
 
-
+//    template<class C, typename T>
+//    void inline addNodeToPosition(ImVec2 const position)
+//    {
+//        m_workspaceCoreNodes.push_back(std::make_shared<T>());
+//		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
+//    }
+//
+//    template<class C, typename T>
+//    void inline addNodeToPositionOfPopup()
+//    {
+//        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+//    }
 
 
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
@@ -118,8 +129,8 @@ public:
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
 
-	std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
-	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
+//	std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
+//	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
 
 //	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
 //	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);

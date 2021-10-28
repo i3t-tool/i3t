@@ -89,7 +89,7 @@ void WorkspaceWindow::popupBackgroundContent()
 			}
 			if (ImGui::MenuItem("translation"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceMatrixTranslation>();
+			    addNodeToPositionOfPopup<WorkspaceTransformationTranslation>();
 			}
 
 			if (ImGui::BeginMenu("rotation"))
@@ -97,47 +97,47 @@ void WorkspaceWindow::popupBackgroundContent()
 
 				if (ImGui::MenuItem("eulerAngleX"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceEulerX>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationEulerX>();
 				}
 				if (ImGui::MenuItem("eulerAngleY"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceEulerY>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationEulerY>();
 				}
 				if (ImGui::MenuItem("eulerAngleZ"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceEulerZ>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationEulerZ>();
 				}
-				if (ImGui::MenuItem("rotate"))
+				if (ImGui::MenuItem("axisAngle"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceAxisAngle>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationAxisAngle>();
 				}
 				if (ImGui::MenuItem("quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatRot>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationQuaternion>();
 				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("scale"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceMatrixScale>();
+			    addNodeToPositionOfPopup<WorkspaceTransformationScale>();
 			}
 			if (ImGui::MenuItem("lookAt"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceLookAt>();
+			    addNodeToPositionOfPopup<WorkspaceTransformationLookAt>();
 			}
 			if (ImGui::BeginMenu("projection"))
 			{
 				if (ImGui::MenuItem("ortho"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceOrtho>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationOrthoProjection>();
 				}
 				if (ImGui::MenuItem("perspective"))
 				{
-                    addNodeToPositionOfPopup<WorkspacePerspective>();
+                    addNodeToPositionOfPopup<WorkspaceTransformationPerspective>();
 				}
 				if (ImGui::MenuItem("frustrum"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFrustum>();
+				    addNodeToPositionOfPopup<WorkspaceTransformationFrustum>();
 				}
 				ImGui::EndMenu();
 			}
@@ -149,131 +149,131 @@ void WorkspaceWindow::popupBackgroundContent()
 			{
 				if (ImGui::MenuItem("translate"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeTranslation>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeTranslation>>();
 				}
 				if (ImGui::MenuItem("euler AngleX"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeEulerX>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeEulerX>>();
 				}
 				if (ImGui::MenuItem("euler AngleY"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeEulerY>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeEulerY>>();
 				}
 				if (ImGui::MenuItem("euler AngleZ"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeEulerZ>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeEulerZ>>();
 				}
 				if (ImGui::MenuItem("rotate"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeAxisAngle>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeAxisAngle>>();
 				}
 				if (ImGui::MenuItem("scale"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeScale>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeScale>>();
 				}
 				if (ImGui::MenuItem("ortho"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeOrtho>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeOrtho>>();
 				}
 				if (ImGui::MenuItem("perspective"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakePerspective>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakePerspective>>();
 				}
 				if (ImGui::MenuItem("frustrum"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeFrustum>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeFrustum>>();
 				}
 				if (ImGui::MenuItem("lookAt"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMakeLookAt>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeLookAt>>();
 				}
 				ImGui::EndMenu();
 			}
-			if (ImGui::BeginMenu("matrix"))
-			{
-				if (ImGui::MenuItem("matrix"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixFree>();
-				}
-				if (ImGui::MenuItem("trackball"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceTrackball>();
-				}
-				if (ImGui::MenuItem("inversion"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixInversion>();
-				}
-				if (ImGui::MenuItem("transpose"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixTranspose>();
-				}
-				if (ImGui::MenuItem("determinant"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceDeterminant>();
-				}
-				if (ImGui::MenuItem("mat * mat"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixMulMatrix>();
-				}
-				if (ImGui::MenuItem("mat + mat"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixAddMatrix>();
-				}
-				if (ImGui::MenuItem("mat * vec4"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixMulVector>();
-				}
-				if (ImGui::MenuItem("vec4 * mat"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceVectorMulMatrix>();
-				}
-				if (ImGui::MenuItem("float * mat"))
-				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixMulFloat>();
-				}
-				ImGui::EndMenu();
-			}
+//			if (ImGui::BeginMenu("matrix"))
+//			{
+//				if (ImGui::MenuItem("matrix"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixFree>();
+//				}
+//				if (ImGui::MenuItem("trackball"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceTrackball>();
+//				}
+//				if (ImGui::MenuItem("inversion"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixInversion>();
+//				}
+//				if (ImGui::MenuItem("transpose"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixTranspose>();
+//				}
+//				if (ImGui::MenuItem("determinant"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceDeterminant>();
+//				}
+//				if (ImGui::MenuItem("mat * mat"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixMulMatrix>();
+//				}
+//				if (ImGui::MenuItem("mat + mat"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixAddMatrix>();
+//				}
+//				if (ImGui::MenuItem("mat * vec4"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixMulVector>();
+//				}
+//				if (ImGui::MenuItem("vec4 * mat"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceVectorMulMatrix>();
+//				}
+//				if (ImGui::MenuItem("float * mat"))
+//				{
+//				    addNodeToPositionOfPopup<WorkspaceMatrixMulFloat>();
+//				}
+//				ImGui::EndMenu();
+//			}
 			if (ImGui::BeginMenu("vec3"))
 			{
 				if (ImGui::MenuItem("vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3Free>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3ToVector3>>();
 				}
 				if (ImGui::MenuItem("show vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceShowVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ShowVector3>>();
 				}
 				if (ImGui::MenuItem("vec3 x vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3CrossVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3CrossVector3>>();
 				}
 				if (ImGui::MenuItem("vec3 . vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3DotVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3DotVector3>>();
 				}
 				if (ImGui::MenuItem("vec3 + vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3AddVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3AddVector3>>();
 				}
 				if (ImGui::MenuItem("vec3 - vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3SubVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3SubVector3>>();
 				}
 				if (ImGui::MenuItem("float * vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3MulFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3MulFloat>>();
 				}
 				if (ImGui::MenuItem("normalize vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceNormalizeVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::NormalizeVector3>>();
 				}
 				if (ImGui::MenuItem("length(vec3)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3Length>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3Length>>();
 				}
 				if (ImGui::MenuItem("mix vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMixVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MixVector3>>();
 				}
 				ImGui::EndMenu();
 			}
@@ -281,35 +281,35 @@ void WorkspaceWindow::popupBackgroundContent()
 			{
 				if (ImGui::MenuItem("vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorFree>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector4ToVector4>>();
 				}
 				if (ImGui::MenuItem("vec4 . vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorDotVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorDotVector>>();
 				}
 				if (ImGui::MenuItem("vec4 + vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorAddVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorAddVector>>();
 				}
 				if (ImGui::MenuItem("vec4 - vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorSubVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorSubVector>>();
 				}
 				if (ImGui::MenuItem("float * vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorMulFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorMulFloat>>();
 				}
 				if (ImGui::MenuItem("normalize vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceNormalizeVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::NormalizeVector>>();
 				}
 				if (ImGui::MenuItem("perspective division"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorPerspectiveDivision>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorPerspectiveDivision>>();
 				}
 				if (ImGui::MenuItem("mix vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMixVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MixVector>>();
 				}
 				ImGui::EndMenu();
 			}
@@ -317,75 +317,75 @@ void WorkspaceWindow::popupBackgroundContent()
 			{
 				if (ImGui::MenuItem("quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatFree>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToQuat>>();
 				}
 				if (ImGui::MenuItem("quat(float, vec3)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatVecToQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatVecToQuat>>();
 				}
 				if (ImGui::MenuItem("quat(angle, axis)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceAngleAxisToQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::AngleAxisToQuat>>();
 				}
 				if (ImGui::MenuItem("quat(vec3, vec3)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVecVecToQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VecVecToQuat>>();
 				}
 				if (ImGui::MenuItem("quat -> float, vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatToFloatVec>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToFloatVec>>();
 				}
 				if (ImGui::MenuItem("quat -> angle, axis"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatToAngleAxis>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToAngleAxis>>();
 				}
 				if (ImGui::MenuItem("float * quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatMulQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatMulQuat>>();
 				}
 				if (ImGui::MenuItem("quat * quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatMulQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatMulQuat>>();
 				}
 				if (ImGui::MenuItem("quat -> euler"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatToEuler>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToEuler>>();
 				}
 				if (ImGui::MenuItem("euler -> quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceEulerToQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::EulerToQuat>>();
 				}
 				if (ImGui::MenuItem("slerp"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatSlerp>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatSlerp>>();
 				}
 				if (ImGui::MenuItem("long way slerp"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatLongWaySlerp>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatLongWaySlerp>>();
 				}
 				if (ImGui::MenuItem("lerp"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatLerp>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatLerp>>();
 				}
 				if (ImGui::MenuItem("quat conjugate"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceConjQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ConjQuat>>();
 				}
 				if (ImGui::MenuItem("qvq*"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatVecConjQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatVecConjQuat>>();
 				}
 				if (ImGui::MenuItem("inverse quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatInverse>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatInverse>>();
 				}
 				if (ImGui::MenuItem("normalize quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceNormalizeQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::NormalizeQuat>>();
 				}
 				if (ImGui::MenuItem("length(quat)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatLength>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatLength>>();
 				}
 				ImGui::EndMenu();
 			}
@@ -393,47 +393,47 @@ void WorkspaceWindow::popupBackgroundContent()
 			{
 				if (ImGui::MenuItem("float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatFree>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatToFloat>>();
 				}
 				if (ImGui::MenuItem("clamp float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceClampFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ClampFloat>>();
 				}
-				if (ImGui::MenuItem("float cycle"))
+				if (ImGui::MenuItem("float cycle")) /* \todo JH ??? */
 				{
-				    addNodeToPositionOfPopup<WorkspaceCycle>();
+				    // addNodeToPositionOfPopup<WorkspaceCycle>();
 				}
 				if (ImGui::MenuItem("float * float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatMulFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatMulFloat>>();
 				}
 				if (ImGui::MenuItem("float / float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatDivFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatDivFloat>>();
 				}
 				if (ImGui::MenuItem("float + float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatAddFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatAddFloat>>();
 				}
 				if (ImGui::MenuItem("float ^ float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatPowFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatPowFloat>>();
 				}
 				if (ImGui::MenuItem("mix float"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMixFloat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MixFloat>>();
 				}
 				if (ImGui::MenuItem("sin & cos(float)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatSinCos>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatSinCos>>();
 				}
 				if (ImGui::MenuItem("asin & acos(float)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceASinACos>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ASinACos>>();
 				}
 				if (ImGui::MenuItem("signum"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceSignum>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Signum>>();
 				}
 				ImGui::EndMenu();
 			}
@@ -441,96 +441,96 @@ void WorkspaceWindow::popupBackgroundContent()
 			{
 				if (ImGui::MenuItem("mat -> TR"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixToTR>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToTR>>();
 				}
 				if (ImGui::MenuItem("TR -> mat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTRToMatrix>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::TRToMatrix>>();
 				}
 				if (ImGui::MenuItem("mat -> vecs4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixToVectors>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToVectors>>();
 				}
 				if (ImGui::MenuItem("mat -> quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixToQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToQuat>>();
 				}
 				if (ImGui::MenuItem("mat -> floats"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceMatrixToFloats>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToFloats>>();
 				}
 				if (ImGui::MenuItem("vecs4 -> mat"))
 				{
-                    addNodeToPositionOfPopup<WorkspaceVectorsToMatrix>();
+                    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorsToMatrix>>();
 				}
 				if (ImGui::MenuItem("vec4 -> vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorToVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorToVector3>>();
 				}
 				if (ImGui::MenuItem("vec4 -> floats"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectorToFloats>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorToFloats>>();
 				}
 				if (ImGui::MenuItem("vecs3 -> mat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVectors3ToMatrix>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vectors3ToMatrix>>();
 				}
 				if (ImGui::MenuItem("vec3 -> vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3ToVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3ToVector>>();
 				}
 				if (ImGui::MenuItem("vec3 -> floats"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceVector3ToFloats>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3ToFloats>>();
 				}
 				if (ImGui::MenuItem("quat -> mat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatToMatrix>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToMatrix>>();
 				}
 				if (ImGui::MenuItem("quat -> floats"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceQuatToFloats>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToFloats>>();
 				}
 				if (ImGui::MenuItem("floats -> mat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatsToMatrix>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToMatrix>>();
 				}
 				if (ImGui::MenuItem("floats -> vec4"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatsToVector>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToVector>>();
 				}
 				if (ImGui::MenuItem("floats -> vec3"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatsToVector3>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToVector3>>();
 				}
 				if (ImGui::MenuItem("floats -> quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceFloatsToQuat>();
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToQuat>>();
 				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::MenuItem("sequence"))
-		{
-		    addNodeToPositionOfPopup<WorkspaceSequence>();
-		}
-		if (ImGui::MenuItem("camera"))
-		{
-		    addNodeToPositionOfPopup<WorkspaceCamera>();
-		}
-		if (ImGui::MenuItem("model"))
-		{
-		    addNodeToPositionOfPopup<WorkspaceModel>();
-		}
-		if (ImGui::MenuItem("pulse"))
-		{
-		    addNodeToPositionOfPopup<WorkspacePulse>();
-		}
-		if (ImGui::MenuItem("screen"))
-		{
-		    addNodeToPositionOfPopup<WorkspaceScreen>();
-		}
+//		if (ImGui::MenuItem("sequence"))
+//		{
+//		    addNodeToPositionOfPopup<WorkspaceSequence>();
+//		}
+//		if (ImGui::MenuItem("camera"))
+//		{
+//		    addNodeToPositionOfPopup<WorkspaceCamera>();
+//		}
+//		if (ImGui::MenuItem("model"))
+//		{
+//		    addNodeToPositionOfPopup<WorkspaceModel>();
+//		}
+//		if (ImGui::MenuItem("pulse"))
+//		{
+//		    addNodeToPositionOfPopup<WorkspacePulse>();
+//		}
+//		if (ImGui::MenuItem("screen"))
+//		{
+//		    addNodeToPositionOfPopup<WorkspaceScreen>();
+//		}
 
 		ImGui::Separator();
 
@@ -594,27 +594,44 @@ void WorkspaceWindow::render()
 		ImGui::EndMenuBar();
 	}
 
-
-
 	//UpdateTouchAllNodes();
 
     if(first_frame){
         first_frame = false;
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>());
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+
+
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceMatrixFree>());
+
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+
+
+
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1200,300));
+//
+//        std::shared_ptr<WorkspaceSequence> seq = std::static_pointer_cast<WorkspaceSequence>(m_workspaceCoreNodes.back());
+//        std::shared_ptr<WorkspaceTransformationFree> trans = std::make_shared<WorkspaceTransformationFree>();
+//        trans->setNodePositionDiwne(ImVec2(1200,500));
+//        std::shared_ptr<WorkspaceTransformationFree> trans2 = std::make_shared<WorkspaceTransformationFree>();
+//        trans2->setNodePositionDiwne(ImVec2(1400,500));
+//        seq->pushNode(trans, 0);
+//        seq->pushNode(trans2, 1);
     }
 
 	Begin("DIWNE Workspace");
 
     m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-                                              [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {return node->getToDelete();}
+                                              [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspaceWindow();}
                                               ),
                               m_workspaceCoreNodes.end());
 	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
     {
-        m_inner_interaction_happen |= workspaceCoreNode->drawNodeDiwne(*this);
+        if (workspaceCoreNode != nullptr) m_inner_interaction_happen |= workspaceCoreNode->drawNodeDiwne(*this); /* nullptr can happen if moving to sequence */
+
     }
 
 //    if (m_diwne.getBackgroudPopupRaise())
@@ -638,40 +655,31 @@ void WorkspaceWindow::render()
 //			t.returnFloatColorToDefault();
 //		}
 //
-//		/* put and pop to/from Sequence */
-//		ne::Detail::DragAction* drag_action =
-//				m_ne_usable->GetCurrentAction() != nullptr ? m_ne_usable->GetCurrentAction()->AsDrag() : nullptr;
-//		if (drag_action && drag_action->IsDragging())
+////		/* put and pop to/from Sequence */
+//		if (m_diwneAction == DIWNE::DiwneAction::DragNode)
 //		{
-//			m_draged_nodes =
-//					getSelectedWorkspaceCoreNodes(); /* \todo JH selected node does not have to be same as draged one */
-//			/*TODO SS camera fail here. node editor marks different object as dragged one than the actual one.
-//			it results that we cannot find workspacenode by id because we have the wrong id*/
-//			m_draged_node_nodeeditor = drag_action->m_DraggedObject->AsNode();
-//			if (m_draged_node_nodeeditor)
+//		    WorkspaceNodeWithCoreData *node = (WorkspaceNodeWithCoreData *)m_draged_node; /* \todo JH better way to cast */
+//			if (node != nullptr) /* should not be never if DiwneAction::DragNode is set */
 //			{
-//				//TODO nullptr check
-//				m_draged_node = getWorkspaceCoreNodeByID(m_draged_node_nodeeditor->ID().AsNodeId());
-//				if (m_draged_node->isTransformation())
+//				if (node->isTransformation())
 //				{
-//					Theme& t = I3T::getTheme();
-//					t.transformationColorTheme();
-//
-//					if (m_draged_node->inSequence())
-//					{
-//						Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(m_draged_node);
-//						assert(workspace_sequence != nullptr);
-//
-//						workspace_sequence->popNode(m_draged_node);
-//						m_workspaceCoreNodes.push_back(m_draged_node);
-//					}
+////					Theme& t = I3T::getTheme();
+////					t.transformationColorTheme();
+////					if (node->inSequence())
+////					{
+////						Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(node);
+////						assert(workspace_sequence != nullptr);
+////
+////						workspace_sequence->popNode(node);
+////						m_workspaceCoreNodes.push_back(node);
+////					}
 //
 //					int position_in_sequence;
 //					m_all_sequences = getSequenceNodes();
 //					for (Ptr<WorkspaceSequence>& sequence : m_all_sequences)
 //					{
-//						ImVec2 nodeTopMiddlePosition = ne::GetNodePosition(m_draged_node->getId());
-//						ImVec2 nodeSize							 = ne::GetNodeSize(m_draged_node->getId());
+//						ImVec2 nodeTopMiddlePosition = ne::GetNodePosition(node->getId());
+//						ImVec2 nodeSize							 = ne::GetNodeSize(node->getId());
 //						nodeTopMiddlePosition.x += nodeSize.x / 2;
 //
 //						position_in_sequence =
@@ -681,10 +689,10 @@ void WorkspaceWindow::render()
 //
 //						if (position_in_sequence >= 0)
 //						{
-//							sequence->setWidthOfDummy(ne::GetNodeSize(m_draged_node->getId()).x);
+//							sequence->setWidthOfDummy(ne::GetNodeSize(node->getId()).x);
 //							if (ImGui::IsMouseReleased(0))
 //							{
-//								sequence->pushNode(m_draged_node, position_in_sequence);
+//								sequence->pushNode(node, position_in_sequence);
 //								m_workspaceCoreNodes.erase(std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 //																												[this](Ptr<WorkspaceNodeWithCoreData> const& w_node) -> bool {
 //																													return w_node->getId() == m_draged_node->getId();

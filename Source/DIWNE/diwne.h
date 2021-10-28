@@ -31,7 +31,8 @@ enum MouseLocation /* \todo maybe unused with current zoom politics */
 enum DiwneAction
 {
     None,
-    NewLink
+    NewLink,
+    DragNode
 };
 
 struct SettingsDiwne
@@ -200,6 +201,8 @@ class Diwne
 
         void showPopUpLabel(std::string label, ImColor color);
 
+        std::shared_ptr<DIWNE::Node> m_draged_node; /* \todo JH make protected */
+
 
     protected:
         bool m_inner_interaction_happen = false;
@@ -207,6 +210,7 @@ class Diwne
 
         DIWNE::Pin* m_lastActivePin = nullptr;
         DIWNE::Link m_helperLink; /* for showing link that is in process of creating */
+
 
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */

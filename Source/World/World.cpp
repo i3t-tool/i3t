@@ -4,8 +4,9 @@
 #include "Transforms.h"
 
 #include "Config.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+//#include "Source/GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
+//#include "Source/GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
+#include "Source/GUI/Elements/Nodes/WorkspaceTransformation.h"
 #include "Source/Core/Nodes/GraphManager.h"
 #include "Source/Core/Input/InputManager.h"
 
@@ -123,7 +124,7 @@ void World::sceneSetView(glm::vec3 dir, bool world) {
 void World::sceneZoom(float val) {
     camControl->setScroll(val);
 }
-void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent) {
+void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>*matnode,std::shared_ptr<Core::Sequence>*parent) {
     //printf("manipulatorsSetMatrix 0x%p,0x%p\n",matnode,parent);
     if(activeManipulator!=nullptr){activeManipulator->component->m_isActive=false;activeManipulator=nullptr;}
     if(matnode==nullptr){return;}

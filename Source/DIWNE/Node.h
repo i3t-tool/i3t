@@ -17,7 +17,7 @@ namespace DIWNE
  *  |     Bottom      |
  *  -------------------
  */
-class Node
+class Node : public std::enable_shared_from_this<Node>
 {
     public:
         /** Default constructor */
@@ -41,12 +41,13 @@ class Node
 
         void synchronizeSizeRectangles();
 
-        bool drawNodeDiwne(DIWNE::Diwne &diwne);
+        bool drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere = false);
         bool drawTopDiwne(DIWNE::Diwne &diwne);
         bool drawLeftDiwne(DIWNE::Diwne &diwne);
         bool drawMiddleDiwne(DIWNE::Diwne &diwne);
         bool drawRightDiwne(DIWNE::Diwne &diwne);
         bool drawBottomDiwne(DIWNE::Diwne &diwne);
+
 
         virtual bool topContent(DIWNE::Diwne &diwne);
         virtual bool leftContent(DIWNE::Diwne &diwne);
@@ -88,6 +89,7 @@ class Node
         void setNodeRectsPositionDiwne(ImVec2 const& position);
         void translateNodeRectsDiwne(ImVec2 const& amount);
         //void translateNodeRectsDiwneZoomed(DIWNE::Diwne const &diwne, ImVec2 const& amount);
+        bool m_isHeld;
 
 
 };

@@ -31,32 +31,16 @@ protected:
 	float   m_inactiveMark;
     FloatPopupMode m_floatPopupMode;
     WorkspaceLevelOfDetail m_levelOfDetail;
-    bool m_toDelete;
 
     Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
                                                 WorkspaceNodeWithCoreData is owner
                                            */
 public:
 
-//	std::vector<Ptr<WorkspaceLink>>       m_workspaceLinks;
-	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceInputs;
-	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceOutputs;
-
-
-//	floatWindow fw; /* \todo create it protected */
-
-//	WorkspaceNodeWithCoreData(ImTextureID headerBackground, WorkspaceNodeWithCoreDataArgs const& args);
-//	WorkspaceNodeWithCoreData(ImTextureID headerBackground, Ptr<Core::NodeBase> nodebase = nullptr,
-//														std::string headerLabel = "With Core Data", std::string nodeLabel = "With Core Data");
-
 	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase);
 	~WorkspaceNodeWithCoreData();
 
 	Ptr<Core::NodeBase> const getNodebase() const;
-
-//	std::vector<Ptr<WorkspaceLink>> const&		getLinks() const;
-	std::vector<Ptr<WorkspaceCorePin>> const& getInputs() const;
-	std::vector<Ptr<WorkspaceCorePin>> const& getOutputs() const;
 
 	virtual bool isCamera();
 	virtual bool isCycle();
@@ -66,12 +50,13 @@ public:
 	virtual bool isQuatToAngleAxis();
 	bool            isTransformation();
 
-	virtual bool inSequence();
-
 	int getNumberOfVisibleDecimal();
 	int setNumberOfVisibleDecimal(int value);
 
-	virtual int maxLenghtOfData(int index=0) = 0;
+	FloatPopupMode getFloatPopupMode() {return m_floatPopupMode;};
+	void setFloatPopupMode(FloatPopupMode mode){m_floatPopupMode = mode;};
+
+	virtual int maxLenghtOfData() = 0;
 
 	float getDataItemsWidth(DIWNE::Diwne &diwne);
 	float setDataItemsWidth();
@@ -82,37 +67,18 @@ public:
 	Core::Transform::DataMap const* setDataMap(const Core::Transform::DataMap* mapToSet);
 	Core::Transform::DataMap const* getDataMap();
 
-	bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, bool& valueChanged, float& value, int const mapValue, std::string const label);
+	bool drawDataLabel(DIWNE::Diwne &diwne);
 
-    virtual bool drawDataSetValues_builder( DIWNE::Diwne &diwne, std::vector<std::string> const& labels,
-																				 std::vector<getter_function_pointer> const& getters,
-																				 std::vector<setter_function_pointer> const& setters,
-																				 std::vector<unsigned char> const& datamap_values);
-
-//	virtual void drawInputLinks();
-
-	virtual bool dataAreValid() {return true;};
-
-    virtual bool drawData(DIWNE::Diwne &diwne, int index);
-
-    virtual bool drawDataFull(DIWNE::Diwne &diwne, int index=0) = 0;
-	virtual bool inline drawDataSetValues(DIWNE::Diwne &diwne){ return drawDataFull(diwne); };
-	virtual bool drawDataLabel(DIWNE::Diwne &diwne);
 
 	/* DIWNE function */
     virtual bool topContent(DIWNE::Diwne &diwne);
-	virtual bool leftContent(DIWNE::Diwne &diwne);
-	virtual bool middleContent(DIWNE::Diwne &diwne);
-	virtual bool rightContent(DIWNE::Diwne &diwne);
 
 
-	void drawMenuLevelOfDetail();
-	void drawMenuSetDataMap();
+	virtual void drawMenuLevelOfDetail()=0;
 	void drawMenuSetPrecision();
 
 	virtual void nodePopupContent();
 
-	bool getToDelete() const {return m_toDelete;};
 
 };
 
@@ -166,7 +132,7 @@ public:
 	bool			 isConnected() const;
 
 	/* DIWNE function */
-	bool pinContent(DIWNE::Diwne &diwne);
+	virtual bool pinContent(DIWNE::Diwne &diwne);
 
 	void pinActiveProcess(DIWNE::Diwne &diwne);
 
@@ -183,20 +149,93 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
     public:
         WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
+        ImVec2 getLinkConnectionPoint() const {return ImVec2(m_pinRectDiwne.Min.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
 {
     public:
         WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-
-//        virtual void pinConnectLinkProcess(DIWNE::Diwne &diwne);
- //       void pinActiveProcess(DIWNE::Diwne &diwne);
-
         ImVec2 getLinkConnectionPoint() const {return ImVec2(m_pinRectDiwne.Max.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
+};
+
+class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
+{
+    public:
+        WorkspaceCoreOutputPinWithData(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        virtual int maxLengthOfData() = 0;
+};
+
+class WorkspaceCoreOutputPinMatrix4x4 : public WorkspaceCoreOutputPinWithData
+{
+    public:
+        WorkspaceCoreOutputPinMatrix4x4(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
+};
+
+class WorkspaceCoreOutputPinVector4 : public WorkspaceCoreOutputPinWithData
+{
+    public:
+        WorkspaceCoreOutputPinVector4(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
+};
+
+class WorkspaceCoreOutputPinVector3 : public WorkspaceCoreOutputPinWithData
+{
+    public:
+        WorkspaceCoreOutputPinVector3(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
+};
+
+class WorkspaceCoreOutputPinFloat : public WorkspaceCoreOutputPinWithData
+{
+    public:
+        WorkspaceCoreOutputPinFloat(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
+};
+
+class WorkspaceCoreOutputPinQuaternion : public WorkspaceCoreOutputPinWithData
+{
+    public:
+        WorkspaceCoreOutputPinQuaternion(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
 };
 
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
+extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, bool& valueChanged, float& value, int const mapValue, std::string const label);
 extern void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& valueSelected);
+
+extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange );
+extern int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
+
+extern bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec4& valueOfChange);
+extern int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal);
+
+extern bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec3& valueOfChange);
+extern int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal);
+
+extern bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, float& valueOfChange);
+extern int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal);
+
+extern bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::quat& valueOfChange);
+extern int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal);
+
+extern void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node, std::vector<WorkspaceLevelOfDetail> const & levels_of_detail);
+
+
+
+
 

@@ -1,13 +1,19 @@
 #include "WorkspaceSequence.h"
+#include "../Windows/WorkspaceWindow.h"
 
-WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase)
+WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/)
     :   WorkspaceNodeWithCoreData(nodebase)
-
-{}
+{
+}
 
 bool WorkspaceSequence::isSequence()
 {
     return true;
+}
+
+void WorkspaceSequence::drawMenuLevelOfDetail()
+{
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
 
 int WorkspaceSequence::getInnerPosition(ImVec2 point)
@@ -47,29 +53,46 @@ int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
 
-    auto node_iter = std::find_if(  m_workspaceTransformation.begin(),
-                                    m_workspaceTransformation.end(),
-                                    [node](Ptr<WorkspaceNodeWithCoreData> const &in_node) -> bool { return node->getId() == in_node->getId(); }); /* \todo check adress of nodes directly */
+    auto node_iter = std::find_if(  m_workspaceInnerTransformations.begin(),
+                                    m_workspaceInnerTransformations.end(),
+                                    [node](Ptr<WorkspaceNodeWithCoreData> const &in_node) -> bool { return node == in_node; }); /* \todo check adress of nodes directly */
 
-    if (node_iter != m_workspaceTransformation.end())
+    if (node_iter != m_workspaceInnerTransformations.end())
     {
-        int index = node_iter-m_workspaceTransformation.begin();
-        m_workspaceTransformation.erase(node_iter);
+        int index = node_iter-m_workspaceInnerTransformations.begin();
+        m_workspaceInnerTransformations.erase(node_iter);
         m_nodebase->as<Core::Sequence>()->popMatrix(index);
     }
 }
 
 void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 {
-    if(node->isTransformation() && 0 <= index && index <= m_workspaceTransformation.size())
+    Ptr<WorkspaceTransformation> node_t = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
+    if(node_t->isTransformation() && 0 <= index && index <= m_workspaceInnerTransformations.size())
     {
-        m_workspaceTransformation.insert(m_workspaceTransformation.begin()+index, node);
-        m_nodebase->as<Core::Sequence>()->addMatrix(node->getNodebase()->as<Core::Transformation>(), index);
+        node_t->setRemoveFromSequence(false);
+        m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin()+index, node_t);
+        /* \tod JH check return value if so */
+        m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
+    }
+}
+
+void WorkspaceSequence::moveNodeToSequenceWithCheck(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
+{
+    if (ImGui::IsMouseReleased(0))
+    {
+        pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
+        dragedNode->setRemoveFromWorkspaceWindow(true);
+//        std::vector<Ptr<WorkspaceNodeWithCoreData>> &ww_nodes = static_cast<WorkspaceWindow&>(diwne).m_workspaceCoreNodes;
+//        ww_nodes.erase(std::remove_if(ww_nodes.begin(),
+//                                      ww_nodes.end(),
+//                                      [this](Ptr<WorkspaceNodeWithCoreData> node){return node.get() == this;}),
+//                       ww_nodes.end());
     }
 }
 
 
-std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceTransformation; }
+std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceInnerTransformations; }
 
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
 
@@ -122,28 +145,47 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_positi
 bool WorkspaceSequence::drawDataFull(DIWNE::Diwne &diwne, int index)
 {
     bool inner_interaction_happen = false;
+    int position_of_dummy_data = -1; /* -1 means not in Sequence */
+    Ptr<WorkspaceTransformation> dragedNode;
 
-    int i = 0;
-    for( auto const & transformation : m_workspaceTransformation )
+    if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
-        if(m_position_of_dummy_data == i)
+        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_node);
+        if (dragedNode != nullptr) /* only transformation can be in Seqeuence*/
         {
-            ImGui::Dummy(m_sizeOfDummy);
+            position_of_dummy_data = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
         }
 
-        inner_interaction_happen |= transformation->drawNodeDiwne(diwne);
+    }
+
+    int i = 0, max = m_workspaceInnerTransformations.size()-1;
+    for( auto const & transformation : m_workspaceInnerTransformations )
+    {
+        if(position_of_dummy_data == i)
+        {
+            ImGui::Dummy(m_sizeOfDummy); /* \todo JH size of dummy from settings */
+            ImGui::SameLine();
+            moveNodeToSequenceWithCheck(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), i);
+        }
+
+        //transformation->setNodePositionDiwne( diwne.screen2diwne(ImGui::GetCursorScreenPos()) );
+        inner_interaction_happen |= transformation->drawNodeDiwne(diwne, true);
+        //if (i < max) ImGui::SameLine();
+        ImGui::SameLine();
+        //ImGui::SetCursorScreenPos(diwne.diwne2screen(transformation->getNodeRectDiwne().GetTR()));
 
         i++;
     }
-    if (m_position_of_dummy_data == i) /* add dummy after last inner */
+    if (position_of_dummy_data == i) /* add dummy after last inner */
     {
         ImGui::Dummy(m_sizeOfDummy);
+        moveNodeToSequenceWithCheck(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), i);
     }
 
     return inner_interaction_happen;
 }
 
-int WorkspaceSequence::maxLenghtOfData(int index)
+int WorkspaceSequence::maxLenghtOfData()
 {
     Debug::Assert(false, "Calling WorkspaceSequence::maxLenghtOfData() make no sense because every included Transformation has its own independent data");
     return -1; /* should be unused */
