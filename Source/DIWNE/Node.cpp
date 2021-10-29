@@ -96,46 +96,49 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                                  diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
 
         ImGui::EndGroup(); /* End of node */
+        ImGui::SetItemAllowOverlap();
+
         ImGui::PopID();
-        if (!inner_interaction_happen && ImGui::IsItemClicked(0))
+        if (!inner_interaction_happen)
         {
-            m_isHeld = true;
-        }
+            if (ImGui::IsItemClicked(0)) {m_isHeld = true;}
 
-        if (!inner_interaction_happen && m_isHeld) /* be aware of same button for clicked and dragging and released*/
-        {
-            interaction_happen = true;
-            if (ImGui::IsMouseDragging(0))
+            if (m_isHeld) /* be aware of same button for clicked and dragging and released*/
             {
-                translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
-                m_translated = true;
-                diwne.m_draged_node = shared_from_this();
-                diwne.setDiwneAction(DiwneAction::DragNode);
+                interaction_happen = true;
+                if (ImGui::IsMouseDragging(0))
+                {
+                    translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
+                    m_translated = true;
+                    diwne.m_draged_node = shared_from_this();
+                    diwne.setDiwneAction(DiwneAction::DragNode);
+                }
+
+                if (ImGui::IsMouseReleased(0))
+                {
+                    if (m_translated)
+                    {
+                            m_translated = false;
+                            diwne.m_draged_node = nullptr;
+                            diwne.setDiwneAction(DiwneAction::None);
+                    }
+                    else {m_selected = !m_selected;}
+
+                    m_isHeld = false;
+                }
             }
 
-            if (ImGui::IsMouseReleased(0))
-            {
-                if (m_translated){
-                        m_translated = false;
-                 diwne.m_draged_node = nullptr;
-                  diwne.setDiwneAction(DiwneAction::None); }
-                else getSelected() ? setSelected(false) : setSelected(true);
-
-                m_isHeld = false;
-            }
         }
 
         synchronizeSizeRectangles();
 
-
-
-        if (getSelected())
+        if (m_selected)
         {
             diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,255,0), 0, ImDrawCornerFlags_None, 5); /* \todo JH color and width from settings */
         }
 
 
-        interaction_happen = ImGui::IsItemHovered(); /* for debug */
+        interaction_happen |= ImGui::IsItemHovered(); /* for debug */
         if (!inner_interaction_happen)
         {
             inner_interaction_happen |= nodePopupDiwne(diwne, fmt::format("nodePopup{}", m_idDiwne));

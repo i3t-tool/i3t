@@ -802,7 +802,7 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int numberOfVisibleDecimal
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
 
-	// \todo JH is it done? make step a configurable constant.
+	// \todo JH is it done? make step a configurable constant - same or smaller than dragStep - other way drag is fired when step is not fired...
 	valueChanged = ImGui::DragFloat(
 			label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 			1.0f); /* if power >1.0f the number changes logarithmic */
