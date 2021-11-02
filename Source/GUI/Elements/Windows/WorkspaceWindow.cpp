@@ -519,18 +519,18 @@ void WorkspaceWindow::popupBackgroundContent()
 //		{
 //		    addNodeToPositionOfPopup<WorkspaceCamera>();
 //		}
-//		if (ImGui::MenuItem("model"))
-//		{
-//		    addNodeToPositionOfPopup<WorkspaceModel>();
-//		}
-//		if (ImGui::MenuItem("pulse"))
-//		{
-//		    addNodeToPositionOfPopup<WorkspacePulse>();
-//		}
-//		if (ImGui::MenuItem("screen"))
-//		{
-//		    addNodeToPositionOfPopup<WorkspaceScreen>();
-//		}
+		if (ImGui::MenuItem("model"))
+		{
+		    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Model>>();
+		}
+		if (ImGui::MenuItem("pulse"))
+		{
+		    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Pulse>>();
+		}
+		if (ImGui::MenuItem("screen"))
+		{
+		    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Screen>>();
+		}
 
 		ImGui::Separator();
 

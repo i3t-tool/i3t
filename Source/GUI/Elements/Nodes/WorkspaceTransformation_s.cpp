@@ -61,7 +61,6 @@ WorkspaceTransformationScale::WorkspaceTransformationScale() : WorkspaceTransfor
 bool WorkspaceTransformationScale::drawDataSetValues(DIWNE::Diwne &diwne)
 {
     Ptr<Core::Scale> nodebase = m_nodebase->as<Core::Scale>();
-    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     return drawDataSetValues_builder(diwne,
                                 {   "X", "Y", "Z" },
                                 {   [nodebase](){return nodebase->getX();},
@@ -78,7 +77,6 @@ WorkspaceTransformationQuaternion::WorkspaceTransformationQuaternion() : Workspa
 bool WorkspaceTransformationQuaternion::drawDataFull(DIWNE::Diwne &diwne)
 {
     Ptr<Core::Scale> nodebase = m_nodebase->as<Core::Scale>();
-    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
     bool valueChanged = false;
     glm::quat localData;
 

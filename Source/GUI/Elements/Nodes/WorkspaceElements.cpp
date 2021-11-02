@@ -20,7 +20,7 @@ std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground = {
 
 std::map<EValueType, DIWNE::IconType> WorkspacePinShapeForeground = {
 		{EValueType::Float,     DIWNE::IconType::TriangleRight},  {EValueType::Matrix, DIWNE::IconType::TriangleRight},
-		{EValueType::MatrixMul, DIWNE::IconType::TriangleRight},  {EValueType::Pulse,  DIWNE::IconType::TriangleRight},
+		{EValueType::MatrixMul, DIWNE::IconType::Cross},          {EValueType::Pulse,  DIWNE::IconType::TriangleRight},
 		{EValueType::Quat,      DIWNE::IconType::TriangleRight},  {EValueType::Screen, DIWNE::IconType::TriangleRight},
 		{EValueType::Vec3,      DIWNE::IconType::TriangleRight},  {EValueType::Vec4,   DIWNE::IconType::TriangleRight}};
 

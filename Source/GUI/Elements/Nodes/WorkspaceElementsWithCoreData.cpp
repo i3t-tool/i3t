@@ -517,8 +517,6 @@ void WorkspaceCorePin::pinActiveProcess(DIWNE::Diwne &diwne)
     diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
 }
 
-
-
 void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
 {
     WorkspaceCorePin *input, *output;
@@ -578,13 +576,8 @@ bool WorkspaceCoreOutputPinWithData::pinContent(DIWNE::Diwne &diwne)
     return WorkspaceCorePin::pinContent(diwne);
 }
 
-int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
-{
-    WorkspaceNodeWithCoreData &node = getNode();
-    return maxLenghtOfData4x4(node.getNodebase()->getData().getMat4(), node.getNumberOfVisibleDecimal());
-}
+/* >>>> Pin types <<<< */
 
-/* DIWNE function */
 bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
 {
     bool valueChanged = false, interaction_happen = false;
@@ -605,6 +598,12 @@ bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
         node.setDataItemsWidth();
     }
     return interaction_happen;
+}
+
+int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
+{
+    WorkspaceNodeWithCoreData &node = getNode();
+    return maxLenghtOfData4x4(node.getNodebase()->getData().getMat4(), node.getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
@@ -709,23 +708,42 @@ bool WorkspaceCoreOutputPinQuaternion::pinContent(DIWNE::Diwne &diwne)
     }
     return interaction_happen;
 }
+
 int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 {
     WorkspaceNodeWithCoreData &node = getNode();
     return maxLenghtOfDataQuaternion(node.getNodebase()->getData().getQuat(), node.getNumberOfVisibleDecimal());
 }
 
-//void WorkspaceCoreOutputPin::pinActiveProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceCorePin::pinActiveProcess(diwne);
-//    diwne.setActivePin<WorkspaceCoreOutputPin>(this);
-//}
+bool WorkspaceCoreOutputPinPulse::pinContent(DIWNE::Diwne &diwne)
+{
+    ImGui::Button(fmt::format("Pulse##n{}:p{}", getNode().getId(), m_idDiwne).c_str());
+    return ImGui::IsItemHovered() && ImGui::IsMouseReleased(0);
+}
+int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
-///* run if pinConnectLinkCheck() return true */
-//void WorkspaceCoreOutputPin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceCorePin::pinConnectLinkProcess(diwne, *(diwne.getActivePin<WorkspaceCoreInputPin>()), *this);
-//}
+WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
+ : WorkspaceCoreOutputPinWithData(id, pin, node)
+{
+    glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    rend = new RenderTexture(&renderTexture, 256, 256);
+    cam = new Camera(60.0f, Application::get().world()->sceneRoot ,rend);
+    cam->update();
+}
+bool WorkspaceCoreOutputPinScreen::pinContent(DIWNE::Diwne &diwne)
+{
+    if(getCorePin().isPluggedIn()){
+        glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4();
+
+        cam->m_perspective = camera;
+        cam->update();
+
+        ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
+    }
+    return false;
+}
+int WorkspaceCoreOutputPinScreen::maxLengthOfData() {return 0;} /* no data with length here*/
 
 /* >>>> WorkspaceCoreInputPin <<<< */
 
@@ -734,19 +752,7 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const
     , m_link(id, this)
 {}
 
-//void WorkspaceCoreInputPin::pinActiveProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceCorePin::pinActiveProcess(diwne);
-//    diwne.setActivePin<WorkspaceCoreInputPin>(this);
-//}
-
-///* run if pinConnectLinkCheck() return true */
-//void WorkspaceCoreInputPin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceWindow* ww = (WorkspaceWindow*)diwne.m_customData;
-//    WorkspaceCorePin::pinConnectLinkProcess(diwne, *this, *(diwne.getActivePin<WorkspaceCoreOutputPin>()));
-//}
-
+/* >>>> WorkspaceCoreLink <<<< */
 
 WorkspaceCoreLink::WorkspaceCoreLink(DIWNE::ID id, WorkspaceCoreInputPin *endPin)
     : DIWNE::Link(id)
@@ -1161,13 +1167,8 @@ int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal)
     return numberOfCharWithDecimalPoint( data, numberOfVisibleDecimal );
 }
 
-
 bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::quat& valueOfChange)
 {
-	// SS WIP
-//  const glm::quat& coreData = m_nodebase->getData(index).getQuat();
-//  const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
-
     bool inner_interaction_happen = false;
     bool actualValueChanged = false;
 

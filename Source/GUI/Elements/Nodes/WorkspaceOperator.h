@@ -17,10 +17,20 @@ public:
 
         for (Core::Pin const& pin : inputPins)
         {
-            m_workspaceInputs.push_back(
-                std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
-                                                        ,   pin
-                                                        ,   *this));
+            if(pin.getType() == EValueType::MatrixMul)
+            {
+                m_workspaceInputs.push_back(
+                    std::make_unique<WorkspaceCoreInputPinMatrixMul>(    pin.getId()
+                                                                    ,   pin
+                                                                    ,   *this));
+            }else
+            {
+                m_workspaceInputs.push_back(
+                    std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
+                                                            ,   pin
+                                                            ,   *this));
+            }
+
         }
 
         for (Core::Pin const& pin : outputPins)
@@ -51,6 +61,24 @@ public:
                     m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinQuaternion>( pin.getId()
                                                                                                 ,   pin
                                                                                                 ,   *this));
+                    break;
+                case EValueType::Pulse:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinPulse>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::MatrixMul:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrixMul>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Screen:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinScreen>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Ptr:
+                    /* Pin with type Ptr have no graphic representation */
                     break;
                 default:
                     Debug::Assert(false , "Unknown Pin type in Operator constructor");
@@ -107,8 +135,6 @@ public:
 
         WorkspaceNodeWithCoreData::nodePopupContent();
     }
-
-
 
     int maxLenghtOfData()
     {

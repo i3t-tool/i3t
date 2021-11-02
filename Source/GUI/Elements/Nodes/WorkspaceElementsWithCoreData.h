@@ -7,6 +7,11 @@
 #include "Core/Input/InputManager.h"
 #include "spdlog/fmt/fmt.h"
 
+#include <World/Components/Camera.h>
+#include <World/Components/Renderer.h>
+#include <World/HardcodedMeshes.h>
+#include <World/RenderTexture.h>
+
 class WorkspaceCorePin;
 class WorkspaceLink;
 class WorkspaceWindow;
@@ -212,6 +217,42 @@ class WorkspaceCoreOutputPinQuaternion : public WorkspaceCoreOutputPinWithData
         bool pinContent(DIWNE::Diwne &diwne);
         int maxLengthOfData();
 };
+
+class WorkspaceCoreOutputPinPulse : public WorkspaceCoreOutputPinWithData
+{
+    public:
+        WorkspaceCoreOutputPinPulse(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
+};
+
+class WorkspaceCoreOutputPinScreen : public WorkspaceCoreOutputPinWithData
+{
+    private:
+        GLuint renderTexture;
+        RenderTexture* rend;
+        Camera* cam;
+    public:
+        WorkspaceCoreOutputPinScreen(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+
+        bool pinContent(DIWNE::Diwne &diwne);
+        int maxLengthOfData();
+};
+
+/* MatrixMulPin is Output and Input because of different  getLinkConnectionPoint()  function */
+class WorkspaceCoreOutputPinMatrixMul : public WorkspaceCoreOutputPin
+{
+    public:
+        WorkspaceCoreOutputPinMatrixMul(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPin(id, pin, node) {};
+};
+
+class WorkspaceCoreInputPinMatrixMul : public WorkspaceCoreInputPin
+{
+    public:
+        WorkspaceCoreInputPinMatrixMul(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreInputPin(id, pin, node) {};
+};
+
 
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
