@@ -511,10 +511,10 @@ void WorkspaceWindow::popupBackgroundContent()
 			}
 			ImGui::EndMenu();
 		}
-//		if (ImGui::MenuItem("sequence"))
-//		{
-//		    addNodeToPositionOfPopup<WorkspaceSequence>();
-//		}
+		if (ImGui::MenuItem("sequence"))
+		{
+		    addNodeToPositionOfPopup<WorkspaceSequence>();
+		}
 //		if (ImGui::MenuItem("camera"))
 //		{
 //		    addNodeToPositionOfPopup<WorkspaceCamera>();
@@ -598,12 +598,12 @@ void WorkspaceWindow::render()
 
     if(first_frame){
         first_frame = false;
-//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
-//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
-
-
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+
+
+        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
         m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
@@ -623,6 +623,9 @@ void WorkspaceWindow::render()
     }
 
 	Begin("DIWNE Workspace");
+	if (m_diwneAction == DIWNE::DiwneAction::DragNode) ImGui::Text("Dragging node");
+	if (m_diwneAction == DIWNE::DiwneAction::None) ImGui::Text("NoneAction");
+	if (m_diwneAction == DIWNE::DiwneAction::NewLink) ImGui::Text("New link");
 
     m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
                                               [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspaceWindow();}
@@ -632,6 +635,16 @@ void WorkspaceWindow::render()
     {
         if (workspaceCoreNode != nullptr) m_inner_interaction_happen |= workspaceCoreNode->drawNodeDiwne(*this); /* nullptr can happen if moving to sequence */
 
+    }
+
+    if (m_diwneAction == DIWNE::DiwneAction::DragNode)
+    {
+        Ptr<WorkspaceTransformation> tr = std::dynamic_pointer_cast<WorkspaceTransformation>(m_draged_node);
+        if (tr)
+        {
+            std::vector<ImVec2> interaction_points = tr->getInteractionPointsWithSequence();
+            ImGui::Text(fmt::format("{}:{} {}:{} {}:{}", interaction_points[0].x, interaction_points[0].y, interaction_points[1].x, interaction_points[1].y, interaction_points[2].x, interaction_points[2].y).c_str());
+        }
     }
 
 //    if (m_diwne.getBackgroudPopupRaise())

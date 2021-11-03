@@ -101,7 +101,7 @@ std::vector<ImVec2> WorkspaceTransformation::getInteractionPointsWithSequence()
     ImVec2 size = getNodeRectSizeDiwne();
     ImVec2 topMiddle = position; topMiddle.x += size.x/2;
     ImVec2 middle = position + size/2;
-    ImVec2 bottomMiddle = topMiddle; bottomMiddle.y + size.y;
+    ImVec2 bottomMiddle = topMiddle; bottomMiddle.y += size.y;
     return {topMiddle, middle, bottomMiddle};
 }
 

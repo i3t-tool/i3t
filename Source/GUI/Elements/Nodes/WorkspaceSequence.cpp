@@ -4,7 +4,83 @@
 WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/)
     :   WorkspaceNodeWithCoreData(nodebase)
 {
-}
+        const auto& inputPins   = m_nodebase->getInputPins();
+        const auto& outputPins  = m_nodebase->getOutputPins();
+
+        m_workspaceInputs.reserve(inputPins.size());
+        m_workspaceOutputs.reserve(outputPins.size());
+
+        for (Core::Pin const& pin : inputPins)
+        {
+            if(pin.getType() == EValueType::MatrixMul)
+            {
+                m_workspaceInputs.push_back(
+                    std::make_unique<WorkspaceCoreInputPinMatrixMul>(    pin.getId()
+                                                                    ,   pin
+                                                                    ,   *this));
+            }else
+            {
+                m_workspaceInputs.push_back(
+                    std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
+                                                            ,   pin
+                                                            ,   *this));
+            }
+
+        }
+
+        for (Core::Pin const& pin : outputPins)
+        {
+            switch (pin.getType())
+            {
+                case EValueType::Matrix:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrix4x4>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Vec4:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector4>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Vec3:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector3>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Float:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinFloat>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Quat:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinQuaternion>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Pulse:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinPulse>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::MatrixMul:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrixMul>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Screen:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinScreen>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Ptr:
+                    /* Pin with type Ptr have no graphic representation */
+                    break;
+                default:
+                    Debug::Assert(false , "Unknown Pin type in Sequence constructor");
+            }
+
+        }
+    }
 
 bool WorkspaceSequence::isSequence()
 {
@@ -16,20 +92,29 @@ void WorkspaceSequence::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
 
-int WorkspaceSequence::getInnerPosition(ImVec2 point)
+int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
 {
     ImRect rect = getNodeRectDiwne();
-    if (!rect.Contains(point))
+    bool any_in = false;
+    ImVec2 in_point;
+    for(auto const & point : points)
     {
-        return -1;
+        if (rect.Contains(point))
+        {
+            in_point = point;
+            any_in = true;
+        }
     }
+
+    if (!any_in) return -1;
+
 
     rect.Max.x = rect.Min.x; /* squeeze rect at begin -> then in cycle shift rect and check point position */
     int i = 0;
     for (auto const & innerNode : getInnerWorkspaceNodes())
     {
         rect.Max.x = innerNode->getNodeRectDiwne().GetCenter().x;
-        if(rect.Contains(point))
+        if(rect.Contains(in_point))
         {
             return i;
         }
@@ -37,17 +122,6 @@ int WorkspaceSequence::getInnerPosition(ImVec2 point)
         i++;
     }
     return i;
-}
-
-int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
-{
-    int position = -1; /* position of first found point that match */
-    for(auto const & point : points)
-    {
-        position = getInnerPosition(point);
-        if (position > -1){return position;}
-    }
-    return position;
 }
 
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
@@ -68,7 +142,7 @@ void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 {
     Ptr<WorkspaceTransformation> node_t = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
-    if(node_t->isTransformation() && 0 <= index && index <= m_workspaceInnerTransformations.size())
+    if(node_t != nullptr && 0 <= index && index <= m_workspaceInnerTransformations.size())
     {
         node_t->setRemoveFromSequence(false);
         m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin()+index, node_t);
@@ -142,11 +216,20 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_positi
 //        }
 //}
 
-bool WorkspaceSequence::drawDataFull(DIWNE::Diwne &diwne, int index)
+bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
     int position_of_dummy_data = -1; /* -1 means not in Sequence */
     Ptr<WorkspaceTransformation> dragedNode;
+
+    if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+    {
+        diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg())); /* \todo JH Sequence background from settings*/
+
+        ImGui::TextUnformatted(m_middleLabel.c_str());
+        return false;
+    }
 
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
@@ -155,33 +238,63 @@ bool WorkspaceSequence::drawDataFull(DIWNE::Diwne &diwne, int index)
         {
             position_of_dummy_data = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
         }
-
     }
 
-    int i = 0, max = m_workspaceInnerTransformations.size()-1;
+    int i = 0, push_index = -1, max = m_workspaceInnerTransformations.size()-1;
     for( auto const & transformation : m_workspaceInnerTransformations )
     {
         if(position_of_dummy_data == i)
         {
             ImGui::Dummy(m_sizeOfDummy); /* \todo JH size of dummy from settings */
             ImGui::SameLine();
-            moveNodeToSequenceWithCheck(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), i);
+            if (ImGui::IsMouseReleased(0))
+            {
+                push_index = i;
+            }
         }
 
-        //transformation->setNodePositionDiwne( diwne.screen2diwne(ImGui::GetCursorScreenPos()) );
         inner_interaction_happen |= transformation->drawNodeDiwne(diwne, true);
-        //if (i < max) ImGui::SameLine();
         ImGui::SameLine();
-        //ImGui::SetCursorScreenPos(diwne.diwne2screen(transformation->getNodeRectDiwne().GetTR()));
 
         i++;
     }
     if (position_of_dummy_data == i) /* add dummy after last inner */
     {
         ImGui::Dummy(m_sizeOfDummy);
-        moveNodeToSequenceWithCheck(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), i);
+        if (ImGui::IsMouseReleased(0))
+        {
+            push_index = i;
+        }
+    }
+    if (push_index >= 0)
+    {
+        moveNodeToSequenceWithCheck(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
     }
 
+    return inner_interaction_happen;
+}
+
+bool WorkspaceSequence::leftContent(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    for (auto const& pin : m_workspaceInputs) {
+        inner_interaction_happen |= pin->drawPinDiwne(diwne);
+        if (pin->isConnected())
+        {
+            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
+            WorkspaceCoreLink * lin = &(in->getLink());
+            inner_interaction_happen |= lin->drawLinkDiwne(diwne);
+        }
+    }
+    return inner_interaction_happen;
+}
+
+bool WorkspaceSequence::rightContent(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    for (auto const& pin : m_workspaceOutputs) {
+        inner_interaction_happen |= pin->drawPinDiwne(diwne);
+    }
     return inner_interaction_happen;
 }
 
