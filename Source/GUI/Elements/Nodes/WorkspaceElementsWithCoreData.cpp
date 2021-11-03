@@ -124,6 +124,7 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_
 bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 {
     ImGui::Text(m_middleLabel.c_str()); /* \todo JH label from core or from user */
+    return false;
 }
 
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()

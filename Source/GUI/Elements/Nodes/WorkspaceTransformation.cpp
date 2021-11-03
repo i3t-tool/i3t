@@ -118,7 +118,7 @@ bool WorkspaceTransformation::drawDataFull(DIWNE::Diwne &diwne)
         m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
         setDataItemsWidth();
     }
-
+    return interaction_happen;
 }
 
 int WorkspaceTransformation::maxLenghtOfData()

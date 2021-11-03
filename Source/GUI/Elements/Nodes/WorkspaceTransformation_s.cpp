@@ -77,10 +77,10 @@ WorkspaceTransformationQuaternion::WorkspaceTransformationQuaternion() : Workspa
 bool WorkspaceTransformationQuaternion::drawDataFull(DIWNE::Diwne &diwne)
 {
     Ptr<Core::Scale> nodebase = m_nodebase->as<Core::Scale>();
-    bool valueChanged = false;
+    bool valueChanged = false, interaction_happen;
     glm::quat localData;
 
-    drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getFloatPopupMode(), m_nodebase->getData().getQuat(), m_nodebase->getDataMapRef(), getDataItemsWidth(diwne),
+    interaction_happen = drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getFloatPopupMode(), m_nodebase->getData().getQuat(), m_nodebase->getDataMapRef(), getDataItemsWidth(diwne),
                        valueChanged, localData);
 
     if (valueChanged)
@@ -88,6 +88,7 @@ bool WorkspaceTransformationQuaternion::drawDataFull(DIWNE::Diwne &diwne)
         m_nodebase->setValue(localData);
         setDataItemsWidth();
     }
+    return interaction_happen;
 }
 int WorkspaceTransformationQuaternion::maxLenghtOfData()
 {
