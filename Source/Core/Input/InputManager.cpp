@@ -28,6 +28,14 @@ void InputManager::bindGlobalAction(const char* action, EKeyState state, KeyCall
 	s_globalInputController.bindAction(action, state, fn);
 }
 
+void InputManager::triggerAction(const char* action, EKeyState state)
+{
+	s_globalInputController.triggerAction(action, state);
+
+	if (s_activeInput)
+		s_activeInput->triggerAction(action, state);
+}
+
 void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersList mods)
 {
 	if (!InputBindings::isActionCreated(name))
@@ -53,6 +61,18 @@ bool InputManager::areModifiersActive(Modifiers mods)
 	active &= mods[2] ? isKeyPressed(Keys::Code::shiftl) : true;
 
 	return active;
+}
+
+void InputManager::setActiveInput(InputController* input)
+{
+	I3T_ASSERT(input != nullptr);
+	s_activeInput = input;
+}
+
+bool InputManager::isInputActive(InputController* input)
+{
+	I3T_ASSERT(input != nullptr);
+	return s_activeInput == input;
 }
 
 bool InputManager::isActionTriggered(const char* name, EKeyState state)
@@ -149,8 +169,8 @@ void InputManager::processViewportEvents()
 	if (!ImGui::IsWindowFocused() || !ImGui::IsWindowHovered())
 	  return;
 	*/
-	if (!isFocused<UI::Viewport>())
-		return;
+	// if (!isFocused<UI::Viewport>())
+	// 		return;
 
 	// Check left, right and middle button.
 	for (int i = 0; i < IM_MOUSE_KEYS_COUNT; i++)
@@ -248,10 +268,8 @@ void InputManager::update()
 	// mouseYDelta = 0;
 
 	processEvents(s_globalInputController);
-	if (m_focusedWindow)
-	{
-		processEvents(m_focusedWindow->Input);
-	}
+	if (s_activeInput)
+		processEvents(*s_activeInput);
 
 	// Process keys.
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
@@ -725,7 +743,7 @@ MouseButtonState InputManager::m_mouseButtonState;
 std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
 std::vector<InputController*> InputManager::m_inputControllers;
-Ptr<IWindow> InputManager::m_focusedWindow;
+InputController* InputManager::s_activeInput = nullptr;
 
 bool InputManager::m_ignoreImGuiEvents = false;
 glm::vec2 InputManager::m_mouseOffset;

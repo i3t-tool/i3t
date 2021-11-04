@@ -15,6 +15,7 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/Scripting.h"
+#include "State/Manager.h"
 #include "Windows/StartWindow.h"
 // #include "RecentFiles.h"
 
@@ -32,6 +33,7 @@ void MainMenuBar::render()
 		ImGui::PushFont(I3T::getFont(EFont::MenuLarge));
 
 		showFileMenu();
+		showEditMenu();
 		showWindowsMenu();
 		showHelpMenu();
 
@@ -173,6 +175,23 @@ void MainMenuBar::showFileMenu()
 		if (ImGui::MenuItem("Exit"))
 		{
 			BeforeCloseCommand::dispatch();
+		}
+
+		ImGui::EndMenu();
+	}
+}
+
+void MainMenuBar::showEditMenu()
+{
+	if (ImGui::BeginMenu("Edit"))
+	{
+		if (ImGui::MenuItem("Undo", nullptr, false, StateManager::instance().canUndo()))
+		{
+			InputManager::triggerAction("undo", EKeyState::Pressed);
+		}
+		if (ImGui::MenuItem("Redo", nullptr, false, StateManager::instance().canRedo()))
+		{
+			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
 
 		ImGui::EndMenu();

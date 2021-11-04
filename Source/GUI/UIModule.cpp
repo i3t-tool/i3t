@@ -6,8 +6,8 @@
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
-#include "GUI/Elements/Windows/StartWindow.h"
 #include "GUI/Elements/Windows/LogWindow.h"
+#include "GUI/Elements/Windows/StartWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
@@ -18,6 +18,7 @@
 #include "Loader/ConfigLoader.h"
 #include "Loader/ThemeLoader.h"
 #include "Logger/Logger.h"
+#include "State/DumpVisitor.h"
 #include "Utils/Filesystem.h"
 
 using namespace UI;
@@ -26,7 +27,9 @@ UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
-	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) { InputManager::setFocusedWindow(window); });
+	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) {
+		InputManager::setActiveInput(&(window->getInput()));
+	});
 
 	Theme::initNames();
 
@@ -130,6 +133,30 @@ void UIModule::beginFrame()
 
 void UIModule::onClose() {}
 
+Memento UIModule::getState()
+{
+	auto& nodes = getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes;
+
+	DumpVisitor visitor;
+	std::string rawState = visitor.dump(nodes);
+
+	return Memento({ rawState });
+}
+
+void UIModule::setState(const Memento& memento)
+{
+	auto& nodes = getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes;
+	nodes.clear();
+
+	auto& rawScene = memento.getSnapshot().front();
+
+	auto sceneData = loadScene(rawScene);
+	for (auto& op : sceneData.operators)
+	{
+		nodes.push_back(op);
+	}
+}
+
 void UIModule::loadThemes()
 {
 	std::string themesDir = Config::getAbsolutePath("Data/themes");
@@ -147,10 +174,7 @@ void UIModule::loadThemes()
 			bool canLoadTheme = true;
 			for (auto i = 0L; i < defaultThemesCount; ++i)
 			{
-				if (m_allThemes[i].getName() == (*theme).getName())
-				{
-					canLoadTheme = false;
-				}
+				if (m_allThemes[i].getName() == (*theme).getName()) { canLoadTheme = false; }
 			}
 
 			if (canLoadTheme)
@@ -166,10 +190,7 @@ void UIModule::loadThemes()
 		}
 	}
 
-	if (!canLoadDefault)
-	{
-		setTheme(m_allThemes.front());
-	}
+	if (!canLoadDefault) { setTheme(m_allThemes.front()); }
 }
 
 void UIModule::reloadThemes()
@@ -206,27 +227,38 @@ void UIModule::loadFonts()
 
 	m_fonts = {
 			// 0
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale,
+																	 nullptr, ranges),
 			// 1
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale,
+																	 nullptr, ranges),
 			// 2
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale,
+																	 nullptr, ranges),
 			// 3
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale, nullptr, ranges),
-		  // 4
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 16.0f * fontScale, nullptr, ranges),
-		  // 5
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale, nullptr, ranges),
-		  // 6
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale, nullptr, ranges),
-		  // 7
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale, &fontCfg, ranges),
-		  // 8
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale,
+																	 nullptr, ranges),
+			// 4
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 16.0f * fontScale,
+																	 nullptr, ranges),
+			// 5
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale,
+																	 nullptr, ranges),
+			// 6
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale,
+																	 nullptr, ranges),
+			// 7
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale,
+																	 &fontCfg, ranges),
+			// 8
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale,
+																	 nullptr, ranges),
 			// 9
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 16.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 16.0f * fontScale,
+																	 nullptr, ranges),
 			// 10
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Italic.ttf").c_str(), 16.0f * fontScale, nullptr, ranges),
+			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Italic.ttf").c_str(), 16.0f * fontScale,
+																	 nullptr, ranges),
 	};
 	// io.FontDefault = I3T::getFont(EFont::MenuLarge);
 	io.Fonts->Build();
@@ -288,7 +320,7 @@ void UIModule::queryCameraState()
 	/// \todo This code causes dockspace crash.
 	return;
 
-	if (!InputManager::isFocused<UI::Viewport>()) return;
+	if (!InputManager::isInputActive(getWindowPtr<UI::Viewport>()->getInputPtr())) return;
 
 	// ORBIT camera rotation
 	if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Pressed))
@@ -337,15 +369,15 @@ void UIModule::setFocusedWindow()
 {
 	// Get window ids.
 	ImGuiContext& g								= *GImGui;
-	ImGuiIO& io = g.IO;
+	ImGuiIO&			io							= g.IO;
 	const char*		hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
-	const char*		activeWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+	const char*		activeWindowID	= g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 	const char*		navWindowID			= g.NavWindow ? g.NavWindow->Name : "";
 
 	// Check for hovered window.
 	if (strlen(hoveredWindowID) != 0)
 	{
-		auto activeID  = makeIDNice(activeWindowID);
+		auto activeID	 = makeIDNice(activeWindowID);
 		auto hoveredID = makeIDNice(hoveredWindowID);
 		auto navID		 = makeIDNice(navWindowID);
 
@@ -359,9 +391,9 @@ void UIModule::setFocusedWindow()
 
 			// Check if window can be focused (no menu is active).
 			if (String::contains(navID, "Menu_") || String::contains(navID, "Popup_") || String::contains(navID, "Combo_"))
-      {
-        shouldSetFocus = false;
-      }
+			{
+				shouldSetFocus = false;
+			}
 			if (!activeID.empty() && activeID != hoveredID)
 			{
 				shouldSetFocus = false;

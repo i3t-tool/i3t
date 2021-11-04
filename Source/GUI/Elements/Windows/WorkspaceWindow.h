@@ -43,6 +43,7 @@
 #include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
+#include "State/Manager.h"
 
 //namespace ne = ax::NodeEditor;
 //namespace util = ax::NodeEditor::Utilities;
@@ -94,23 +95,21 @@ public:
 	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
 	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
-//	ne::Detail::Node *m_draged_node_nodeeditor;
+	//	ne::Detail::Node *m_draged_node_nodeeditor;
 
-    template<typename T>
-    void inline addNodeToPosition(ImVec2 const position)
-    {
-        m_workspaceCoreNodes.push_back(std::make_shared<T>());
+	template<typename T>
+	void inline addNodeToPosition(ImVec2 const position)
+	{
+		m_workspaceCoreNodes.push_back(std::make_shared<T>());
 		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
-    }
+	}
 
-    template<typename T>
-    void inline addNodeToPositionOfPopup()
-    {
-        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
-    }
-
-
-
+	template<typename T>
+	void inline addNodeToPositionOfPopup()
+	{
+		addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+		StateManager::instance().takeSnapshot();
+	}
 
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 

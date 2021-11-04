@@ -13,6 +13,7 @@
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
 #include "State/DumpVisitor.h"
+#include "State/Manager.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
@@ -36,9 +37,18 @@ void Application::init()
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 
   InputManager::init();
+	StateManager::instance().setOriginator(m_ui);
 
 	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&](){
 		onSave();
+	});
+	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&](){
+		Log::info("undo triggered");
+		StateManager::instance().undo();
+	});
+	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&](){
+		Log::info("redo triggered");
+		StateManager::instance().redo();
 	});
 }
 

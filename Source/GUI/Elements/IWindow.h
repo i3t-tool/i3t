@@ -37,6 +37,7 @@ public:
 	 * Returns window input controller.
 	 */
 	InputController& getInput() { return Input; }
+	InputController* getInputPtr() { return &Input; }
 
 protected:
 	friend class Application;

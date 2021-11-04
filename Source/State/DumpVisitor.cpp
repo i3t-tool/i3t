@@ -303,7 +303,7 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene)
 	}
 }
 
-SceneData load(const std::string& rawScene)
+SceneData loadScene(const std::string& rawScene)
 {
 	SceneData scene;
 

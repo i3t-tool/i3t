@@ -35,4 +35,9 @@ public:
 	 */
 	void bindAction(const char* name, EKeyState state, KeyCallback fn);
 	void bindAxis(const char* name, AxisCallback fn);
+
+	/**
+	 * Make action active.
+	 */
+	void triggerAction(const char* name, EKeyState state);
 };

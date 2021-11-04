@@ -21,6 +21,7 @@ private:
 	bool m_showDemoWindow;
 
 	void showFileMenu();
+	void showEditMenu();
 	void showWindowsMenu();
 	void showHelpMenu();
 };

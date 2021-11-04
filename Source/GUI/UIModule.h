@@ -7,6 +7,7 @@
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "GUI/Elements/IWindow.h"
+#include "State/Stateful.h"
 #include "Theme.h"
 
 static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
@@ -41,7 +42,7 @@ template <typename T> inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWind
 	return result;
 }
 
-class UIModule final : public Module
+class UIModule final : public Module, IStateful
 {
 	friend class Application;
 
@@ -52,6 +53,10 @@ class UIModule final : public Module
 	void init() override;
 	void beginFrame() override;
 	void onClose() override;
+
+	// State functions
+	Memento getState() override;
+	void setState(const Memento &) override;
 
 public:
 	Theme& getTheme()

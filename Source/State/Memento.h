@@ -9,7 +9,7 @@ class Memento
 {
 public:
 	explicit Memento(const State& state);
-	State getSnapshot() const { return m_state; }
+	const State& getSnapshot() const { return m_state; }
 
 private:
 	State m_state;

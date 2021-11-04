@@ -35,6 +35,8 @@ void InputBindings::init()
 	InputManager::setInputAction("KeyWorld_mouseRotate", Keys::mouseRight);
 	InputManager::setInputAction("Key_undo", Keys::b);
 	InputManager::setInputAction("Key_redo", Keys::n);
+	InputManager::setInputAction("undo", Keys::b, { Keys::ctrll });
+	InputManager::setInputAction("redo", Keys::n, { Keys::ctrll });
 
 	InputManager::setInputAction("test", Keys::t);
 	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});

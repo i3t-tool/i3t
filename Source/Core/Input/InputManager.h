@@ -15,7 +15,6 @@
 #include "glm/vec2.hpp"
 
 #include "Core/Defs.h"
-#include "GUI/Elements/IWindow.h"
 #include "InputBindings.h"
 #include "InputController.h"
 #include "KeyCodes.h"
@@ -79,13 +78,15 @@ public:
 
 private:
 	static std::vector<InputController*> m_inputControllers;
-	static Ptr<IWindow> m_focusedWindow;
+	// static Ptr<IWindow> m_focusedWindow;
 
 public:
 	static void init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
 
 	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
+
+	static void triggerAction(const char* action, EKeyState state);
 
 	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
 	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
@@ -99,8 +100,16 @@ public:
 	 *
 	 * \warning Focused window must be set from ImGui Context.
 	 */
-	static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
+	// static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
 
+	/**
+	 * Set active input controller (for focused window).
+	 */
+	static void setActiveInput(InputController* input);
+
+	static bool isInputActive(InputController* input);
+
+	/*
 	template <typename T> static bool isFocused()
 	{
 		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
@@ -109,6 +118,7 @@ public:
 			return strcmp(m_focusedWindow->getID(), T::ID) == 0;
 		return false;
 	}
+	 */
 
 public:
 	//@{
@@ -211,4 +221,5 @@ public:
 
 private:
 	static InputController s_globalInputController;
+	static InputController* s_activeInput;
 };
