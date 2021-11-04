@@ -34,35 +34,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebas
     ,   m_inactiveMark(0.7f) /* \todo JH default 0 ; 0.7 for testing */
     ,   m_levelOfDetail(WorkspaceLevelOfDetail::Full) /* \todo JH default value from some setting */
     ,   m_floatPopupMode(Radians) /* \todo JH default value from some setting */
-    ,   m_toDelete(false)
 {
-	const auto& inputPins	 = m_nodebase->getInputPins();
-	const auto& outputPins = m_nodebase->getOutputPins();
 
-//	m_workspaceLinksProperties.reserve(inputPins.size());
-	m_workspaceInputs.reserve(inputPins.size());
-	m_workspaceOutputs.reserve(outputPins.size());
-
-	for (Core::Pin const& pin : inputPins)
-	{
-		m_workspaceInputs.push_back(
-            std::make_unique<WorkspaceCoreInputPin>( pin.getId()
-                                            //,   pin.getLabel() //, fmt::format("##{}", pin.getIndex())
-                                            ,   pin
-                                            ,   *this));
-
-//		m_workspaceLinksProperties.push_back(
-//            std::make_unique<WorkspaceLinkProperties>(pin.getId()));
-	}
-
-	for (Core::Pin const& pin : outputPins)
-	{
-		m_workspaceOutputs.push_back(
-				std::make_unique<WorkspaceCoreOutputPin>( pin.getId()
-                                                //,   pin.getLabel() //, fmt::format("##{}", pin.getIndex())
-                                                ,   pin
-                                                ,   *this));
-	}
 }
 
 WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
@@ -72,41 +45,18 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent(DIWNE::Diwne &diwne)
 {
-    WorkspaceNode::topContent(diwne);
-    if (!dataAreValid())
+    if(!m_topLabel.empty())
     {
-        diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,255,255),
-                    DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
-                    ImVec2(20,20), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
-        // ImGui::Spring(0);
+        ImGui::TextUnformatted(m_topLabel.c_str());
+    }else
+    {
+        ImGui::TextUnformatted("Empty topLabel -> read it from Core"); /* \todo JH */
     }
-		return false;
+
+    return false;
 }
 
-bool WorkspaceNodeWithCoreData::leftContent(DIWNE::Diwne &diwne)
-{
-    bool inner_interaction_happen = false;
-    for (auto const& pin : m_workspaceInputs) {
-            inner_interaction_happen |= pin->drawPinDiwne(diwne);
-            if (pin->isConnected())
-            {
-            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
-            WorkspaceCoreLink * lin = &(in->getLink());
-            inner_interaction_happen |= lin->drawLinkDiwne(diwne);
 
-            }
-
-
-    }
-    return inner_interaction_happen;
-}
-
-bool WorkspaceNodeWithCoreData::rightContent(DIWNE::Diwne &diwne)
-{
-    bool inner_interaction_happen = false;
-    for (auto const& pin : m_workspaceOutputs) { inner_interaction_happen |= pin->drawPinDiwne(diwne); }
-    return inner_interaction_happen;
-}
 
 Ptr<Core::NodeBase> const WorkspaceNodeWithCoreData::getNodebase() const { return m_nodebase; }
 
@@ -114,20 +64,7 @@ Ptr<Core::NodeBase> const WorkspaceNodeWithCoreData::getNodebase() const { retur
 //{
 //	return m_workspaceLinksProperties;
 //}
-std::vector<Ptr<WorkspaceCorePin>> const& WorkspaceNodeWithCoreData::getInputs() const
-{
-	return m_workspaceInputs;
-}
-std::vector<Ptr<WorkspaceCorePin>> const& WorkspaceNodeWithCoreData::getOutputs() const
-{
-	return m_workspaceOutputs;
-}
 
-bool WorkspaceNodeWithCoreData::inSequence()
-{
-	if (isTransformation()) { return m_nodebase->as<Core::Transformation>()->isInSequence(); }
-	return false;
-}
 
 bool WorkspaceNodeWithCoreData::isSequence() { return m_nodebase->getOperation() == NULL; }
 
@@ -183,115 +120,11 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::setLevelOfDetail(WorkspaceLeve
 
 WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_levelOfDetail; }
 
-bool WorkspaceNodeWithCoreData::drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, bool& valueChanged, float& value, int const mapValue, std::string const label)
+
+bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 {
-	bool inactive = (mapValue == 0 || mapValue == 255)
-			? true
-			: false; /* \todo JH some other type than just active/inactive will be here - maybe */
-	/* \todo JH some graphical mark for "hard-coded" values (diagonal 1 in translation (255 Map value) for example) ? */
-    bool inner_interaction_happen = false, valueChangedByPopup = false;
-
-	if (inactive)
-	{
-		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-	}
-
-	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
-	auto	io	 = ImGui::GetIO();
-	/// \todo No need for this code. DragFloat step is handled by ImGui by default.
-	/*
-	if(InputManager::isKeyPressed(Keys::ctrll) || InputManager::isKeyPressed(Keys::ctrlr)){
-    step = I3T::getSize(ESize::Nodes_CtrlMultiplicator) * step;
-	}else if(InputManager::isKeyPressed(Keys::altl) || InputManager::isKeyPressed(Keys::altr)){
-		step = I3T::getSize(ESize::Nodes_ALTMultiplicator) * step;
-  }else if(InputManager::isKeyPressed(Keys::shiftl) || InputManager::isKeyPressed(Keys::shiftr)){
-		step = I3T::getSize(ESize::Nodes_SHIFTMultiplicator) * step;
-  }
-	 */
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
-
-	// \todo JH is it done? make step a configurable constant.
-	valueChanged = ImGui::DragFloat(
-			label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", getNumberOfVisibleDecimal()).c_str(),
-			1.0f); /* if power >1.0f the number changes logarithmic */
-    ImGui::SetItemAllowOverlap();
-
-    if (!inactive)
-	{
-		//inner_interaction_happen |= diwne.popupFloatDiwne(diwne, label, value, valueChangedByPopup);
-		inner_interaction_happen |= diwne.popupDiwneItem(label, &popupFloatContent, m_floatPopupMode, value, valueChangedByPopup);
-		valueChanged |= valueChangedByPopup;
-	}
-
-	if (inactive)
-	{
-		ImGui::PopItemFlag();
-		ImGui::PopStyleVar();
-	}
-
-	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
-
-	return inner_interaction_happen;
-}
-
-bool WorkspaceNodeWithCoreData::drawDataSetValues_builder(  DIWNE::Diwne &diwne
-                                                        ,   std::vector<std::string> const& labels
-                                                        ,   std::vector<getter_function_pointer> const& getters
-                                                        ,   std::vector<setter_function_pointer> const& setters
-                                                        ,   std::vector<unsigned char> const& datamap_values)
-{
-    int number_of_values = labels.size();
-	Debug::Assert(number_of_values==getters.size()
-               && number_of_values==setters.size()
-               && number_of_values==datamap_values.size() , "drawDataSetValues_builder: All vectors (labels, getters, setters, datamap) must have same size.");
-
-	bool	valueChanged = false, actual_value_changed = false, inner_interaction_happen = false;
-	int		index_of_change;
-	float valueOfChange, localData; /* user can change just one value at the moment */
-
-	ImGui::PushItemWidth(getDataItemsWidth(diwne));
-	for (int i = 0; i < number_of_values; i++)
-	{
-		ImGui::TextUnformatted(labels[i].c_str());
-
-		ImGui::SameLine(50); /* \todo JH why 50? what is it */
-
-		localData = getters[i]();
-
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, actual_value_changed, localData, datamap_values[i], fmt::format("##{}:ch{}", getId(), i));
-		if (actual_value_changed){
-
-            valueChanged = true;
-			index_of_change = i;
-			valueOfChange = localData;
-		}
-	}
-	ImGui::PopItemWidth();
-
-	if (valueChanged)
-	{
-		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value of setter */
-		setDataItemsWidth();
-	}
-
-	// ImGui::Spring(0);
-	return inner_interaction_happen;
-}
-
-void WorkspaceNodeWithCoreData::drawMenuSetDataMap()
-{
-	if (ImGui::BeginMenu("Set datamap"))
-	{
-		for (Core::Transform::DataMap const* datamap : m_nodebase->getValidDataMaps())
-		{
-			if (ImGui::MenuItem(WorkspaceDatamapName[datamap].c_str())) { setDataMap(datamap); }
-		}
-
-		ImGui::EndMenu();
-	}
+    ImGui::Text(m_middleLabel.c_str()); /* \todo JH label from core or from user */
+    return false;
 }
 
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
@@ -308,34 +141,14 @@ void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 	}
 }
 
-void WorkspaceNodeWithCoreData::drawMenuLevelOfDetail()
-{
-	if (ImGui::BeginMenu("Level of detail"))
-	{
-		ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[m_levelOfDetail]).c_str());
-		ImGui::Separator();
-
-		for (auto const& [levelOfDetail, LoDname] : WorkspaceLevelOfDetailName)
-		{
-			if (!isTransformation() && levelOfDetail == WorkspaceLevelOfDetail::SetValues) { continue; }
-			else
-			{
-				if (ImGui::MenuItem(LoDname.c_str())) { m_levelOfDetail = setLevelOfDetail(levelOfDetail); }
-			}
-		}
-		ImGui::EndMenu();
-	}
-}
 
 void WorkspaceNodeWithCoreData::nodePopupContent()
 {
-    drawMenuSetDataMap();
-    drawMenuLevelOfDetail();
-    drawMenuSetPrecision();
-    if (ImGui::MenuItem("Delete")) {
-            m_toDelete = true;
 
-    }
+    drawMenuSetPrecision();
+    drawMenuLevelOfDetail();
+
+    WorkspaceNode::nodePopupContent();
 }
 
 
@@ -354,56 +167,6 @@ void WorkspaceNodeWithCoreData::nodePopupContent()
 //		}
 //	}
 //}
-
-
-bool WorkspaceNodeWithCoreData::drawData(DIWNE::Diwne &diwne, int index)
-{
-    bool inner_interaction_happen = false;
-	switch (m_levelOfDetail)
-	{
-	case WorkspaceLevelOfDetail::Full:
-		inner_interaction_happen = drawDataFull(diwne, index);
-		break;
-	case WorkspaceLevelOfDetail::SetValues:
-		inner_interaction_happen = drawDataSetValues(diwne);
-		break;
-	case WorkspaceLevelOfDetail::Label:
-		inner_interaction_happen = drawDataLabel(diwne);
-		break;
-
-	default:
-		Debug::Assert(false , "drawData: Unknown m_levelOfDetail");
-        inner_interaction_happen = drawDataFull(diwne, index);
-	}
-
-	/*if (m_inactiveMark != 0)
-    {
-        ImVec2 start = ne::GetNodePosition(m_id);
-        ImVec2 size = ne::GetNodeSize(m_id);
-        ImVec2 end = start + size;
-        if(m_inactiveMark > 0)
-        {
-            end.x -= (1-m_inactiveMark)*size.x;
-        }
-        else
-        {
-            start.x += m_inactiveMark*size.x;
-        }
-
-        //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
-        //ImGui::Dummy(const ImVec2& size);
-        ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
-    }*/
-    return inner_interaction_happen;
-}
-
-
-bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
-{
-	ImGui::TextUnformatted(m_middleLabel.c_str());
-	// ImGui::Spring(0);
-	return false;
-}
 
 
 //void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
@@ -613,33 +376,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 //}
 
 
-bool WorkspaceNodeWithCoreData::middleContent(DIWNE::Diwne &diwne)
-{
-    bool inner_interaction_happen = false;
-//	if (isTransformation() || isCycle() || isTrackball())
-//	{
-//		if (isTransformation())
-//		{
-//			// ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
-//			ImGui::BeginVertical(m_nodebase->getId());
-//			inner_interaction_happen |= drawData(diwne, 0);
-//			ImGui::EndVertical();
-//		}
-//		else if (isTrackball())
-//		{
-//			// ImGui::Spring(1, I3T::getSize(ESize::Nodes_leftSideSpacing));
-//			inner_interaction_happen |= drawData(diwne, -1); // for trackball
-//		}
-//		else
-//		{
-//			// ImGui::Spring(1);
-//			inner_interaction_happen |= drawData(diwne, -1); // for cycle
-//			// ImGui::Spring(1);
-//		}
-//	}
-	inner_interaction_happen |= drawData(diwne, 0);
-	return inner_interaction_happen;
-}
+
 
 ///* \todo use newLinkPin arg*/
 //void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
@@ -781,8 +518,6 @@ void WorkspaceCorePin::pinActiveProcess(DIWNE::Diwne &diwne)
     diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
 }
 
-
-
 void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
 {
     WorkspaceCorePin *input, *output;
@@ -833,17 +568,183 @@ WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin con
     : WorkspaceCorePin(id, pin, node)
 {}
 
-//void WorkspaceCoreOutputPin::pinActiveProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceCorePin::pinActiveProcess(diwne);
-//    diwne.setActivePin<WorkspaceCoreOutputPin>(this);
-//}
+WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
+    : WorkspaceCoreOutputPin(id, pin, node)
+{}
 
-///* run if pinConnectLinkCheck() return true */
-//void WorkspaceCoreOutputPin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceCorePin::pinConnectLinkProcess(diwne, *(diwne.getActivePin<WorkspaceCoreInputPin>()), *this);
-//}
+bool WorkspaceCoreOutputPinWithData::pinContent(DIWNE::Diwne &diwne)
+{
+    return WorkspaceCorePin::pinContent(diwne);
+}
+
+/* >>>> Pin types <<<< */
+
+bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
+{
+    bool valueChanged = false, interaction_happen = false;
+    int rowOfChange, columnOfChange;
+    float valueOfChange;
+    WorkspaceNodeWithCoreData &node = getNode();
+
+    interaction_happen = drawData4x4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+                                    node.getNodebase()->getData().getMat4(), node.getNodebase()->getDataMapRef(),
+                                    node.getDataItemsWidth(diwne), valueChanged, rowOfChange, columnOfChange, valueOfChange );
+
+    ImGui::SameLine();
+
+    interaction_happen |= WorkspaceCoreOutputPinWithData::pinContent(diwne);
+    if (valueChanged)
+    {
+        node.getNodebase()->setValue(valueOfChange, {columnOfChange, rowOfChange});
+        node.setDataItemsWidth();
+    }
+    return interaction_happen;
+}
+
+int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
+{
+    WorkspaceNodeWithCoreData &node = getNode();
+    return maxLenghtOfData4x4(node.getNodebase()->getData().getMat4(), node.getNumberOfVisibleDecimal());
+}
+
+bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
+{
+    bool valueChanged = false, interaction_happen = false;
+    int rowOfChange, columnOfChange;
+    glm::vec4 valueOfChange;
+    WorkspaceNodeWithCoreData &node = getNode();
+
+    interaction_happen = drawDataVec4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+                                    node.getNodebase()->getData().getVec4(), node.getNodebase()->getDataMapRef(),
+                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+
+    ImGui::SameLine();
+
+    interaction_happen |= WorkspaceCoreOutputPinWithData::pinContent(diwne);
+    if (valueChanged)
+    {
+        node.getNodebase()->setValue(valueOfChange);
+        node.setDataItemsWidth();
+    }
+    return interaction_happen;
+}
+int WorkspaceCoreOutputPinVector4::maxLengthOfData()
+{
+    WorkspaceNodeWithCoreData &node = getNode();
+    return maxLenghtOfDataVec4(node.getNodebase()->getData().getVec4(), node.getNumberOfVisibleDecimal());
+}
+
+bool WorkspaceCoreOutputPinVector3::pinContent(DIWNE::Diwne &diwne)
+{
+    bool valueChanged = false, interaction_happen = false;
+    int rowOfChange, columnOfChange;
+    glm::vec3 valueOfChange;
+    WorkspaceNodeWithCoreData &node = getNode();
+
+    interaction_happen = drawDataVec3(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+                                    node.getNodebase()->getData().getVec3(), node.getNodebase()->getDataMapRef(),
+                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+
+    ImGui::SameLine();
+
+    interaction_happen |= WorkspaceCoreOutputPinWithData::pinContent(diwne);
+    if (valueChanged)
+    {
+        node.getNodebase()->setValue(valueOfChange);
+        node.setDataItemsWidth();
+    }
+    return interaction_happen;
+}
+int WorkspaceCoreOutputPinVector3::maxLengthOfData()
+{
+    WorkspaceNodeWithCoreData &node = getNode();
+    return maxLenghtOfDataVec3(node.getNodebase()->getData().getVec3(), node.getNumberOfVisibleDecimal());
+}
+
+bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
+{
+    bool valueChanged = false, interaction_happen = false;
+    int rowOfChange, columnOfChange;
+    float valueOfChange;
+    WorkspaceNodeWithCoreData &node = getNode();
+
+    interaction_happen = drawDataFloat(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+                                    node.getNodebase()->getData().getFloat(), node.getNodebase()->getDataMapRef(),
+                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+
+    ImGui::SameLine();
+
+    interaction_happen |= WorkspaceCoreOutputPinWithData::pinContent(diwne);
+    if (valueChanged)
+    {
+        node.getNodebase()->setValue(valueOfChange);
+        node.setDataItemsWidth();
+    }
+    return interaction_happen;
+}
+int WorkspaceCoreOutputPinFloat::maxLengthOfData()
+{
+    WorkspaceNodeWithCoreData &node = getNode();
+    return maxLenghtOfDataFloat(node.getNodebase()->getData().getFloat(), node.getNumberOfVisibleDecimal());
+}
+
+bool WorkspaceCoreOutputPinQuaternion::pinContent(DIWNE::Diwne &diwne)
+{
+    bool valueChanged = false, interaction_happen = false;
+    int rowOfChange, columnOfChange;
+    glm::quat valueOfChange;
+    WorkspaceNodeWithCoreData &node = getNode();
+
+    interaction_happen = drawDataQuaternion(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+                                    node.getNodebase()->getData().getQuat(), node.getNodebase()->getDataMapRef(),
+                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+
+    ImGui::SameLine();
+
+    interaction_happen |= WorkspaceCoreOutputPinWithData::pinContent(diwne);
+    if (valueChanged)
+    {
+        node.getNodebase()->setValue(valueOfChange);
+        node.setDataItemsWidth();
+    }
+    return interaction_happen;
+}
+
+int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
+{
+    WorkspaceNodeWithCoreData &node = getNode();
+    return maxLenghtOfDataQuaternion(node.getNodebase()->getData().getQuat(), node.getNumberOfVisibleDecimal());
+}
+
+bool WorkspaceCoreOutputPinPulse::pinContent(DIWNE::Diwne &diwne)
+{
+    ImGui::Button(fmt::format("Pulse##n{}:p{}", getNode().getId(), m_idDiwne).c_str());
+    return ImGui::IsItemHovered() && ImGui::IsMouseReleased(0);
+}
+int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
+
+WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
+ : WorkspaceCoreOutputPinWithData(id, pin, node)
+{
+    glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    rend = new RenderTexture(&renderTexture, 256, 256);
+    cam = new Camera(60.0f, Application::get().world()->sceneRoot ,rend);
+    cam->update();
+}
+bool WorkspaceCoreOutputPinScreen::pinContent(DIWNE::Diwne &diwne)
+{
+    if(getCorePin().isPluggedIn()){
+        glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4();
+
+        cam->m_perspective = camera;
+        cam->update();
+
+        ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
+    }
+    return false;
+}
+int WorkspaceCoreOutputPinScreen::maxLengthOfData() {return 0;} /* no data with length here*/
 
 /* >>>> WorkspaceCoreInputPin <<<< */
 
@@ -852,19 +753,7 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const
     , m_link(id, this)
 {}
 
-//void WorkspaceCoreInputPin::pinActiveProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceCorePin::pinActiveProcess(diwne);
-//    diwne.setActivePin<WorkspaceCoreInputPin>(this);
-//}
-
-///* run if pinConnectLinkCheck() return true */
-//void WorkspaceCoreInputPin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
-//{
-//    WorkspaceWindow* ww = (WorkspaceWindow*)diwne.m_customData;
-//    WorkspaceCorePin::pinConnectLinkProcess(diwne, *this, *(diwne.getActivePin<WorkspaceCoreOutputPin>()));
-//}
-
+/* >>>> WorkspaceCoreLink <<<< */
 
 WorkspaceCoreLink::WorkspaceCoreLink(DIWNE::ID id, WorkspaceCoreInputPin *endPin)
     : DIWNE::Link(id)
@@ -888,6 +777,63 @@ void WorkspaceCoreLink::updateControlPointsOffsets(){
 }
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
+/* \todo JH correct order of arguments to make sense */
+
+bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, bool& valueChanged, float& value, int const mapValue, std::string const label)
+{
+	bool inactive = (mapValue == 0 || mapValue == 255)
+			? true
+			: false; /* \todo JH some other type than just active/inactive will be here - maybe */
+	/* \todo JH some graphical mark for "hard-coded" values (diagonal 1 in translation (255 Map value) for example) ? */
+    bool inner_interaction_happen = false, valueChangedByPopup = false;
+
+	if (inactive)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	}
+
+	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
+	auto	io	 = ImGui::GetIO();
+	/// \todo No need for this code. DragFloat step is handled by ImGui by default.
+	/*
+	if(InputManager::isKeyPressed(Keys::ctrll) || InputManager::isKeyPressed(Keys::ctrlr)){
+    step = I3T::getSize(ESize::Nodes_CtrlMultiplicator) * step;
+	}else if(InputManager::isKeyPressed(Keys::altl) || InputManager::isKeyPressed(Keys::altr)){
+		step = I3T::getSize(ESize::Nodes_ALTMultiplicator) * step;
+  }else if(InputManager::isKeyPressed(Keys::shiftl) || InputManager::isKeyPressed(Keys::shiftr)){
+		step = I3T::getSize(ESize::Nodes_SHIFTMultiplicator) * step;
+  }
+	 */
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
+
+	// \todo JH is it done? make step a configurable constant - same or smaller than dragStep - other way drag is fired when step is not fired...
+	valueChanged = ImGui::DragFloat(
+			label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
+			1.0f); /* if power >1.0f the number changes logarithmic */
+    ImGui::SetItemAllowOverlap();
+
+    if (ImGui::IsItemClicked(0)) inner_interaction_happen = true;
+
+    if (!inactive)
+	{
+		//inner_interaction_happen |= diwne.popupFloatDiwne(diwne, label, value, valueChangedByPopup);
+		inner_interaction_happen |= diwne.popupDiwneItem(label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+		valueChanged |= valueChangedByPopup;
+	}
+
+	if (inactive)
+	{
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
+	}
+
+	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
+
+	return inner_interaction_happen || valueChanged;
+}
 
 void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& valueSelected)
 {
@@ -1048,3 +994,241 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
     }
 }
 
+bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange )
+{
+    bool inner_interaction_happen = false;
+    bool actualValueChanged = false;
+    float localData; /* user can change just one value at the moment */
+    //const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
+    //const Core::Transform::DataMap& dataMap = m_nodebase->getDataMapRef();
+
+    //ImGui::PushItemWidth(getDataItemsWidth(diwne));
+    ImGui::PushItemWidth(dataWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+    valueChanged = false;
+    /* Drawing is row-wise */
+    for (int rows = 0; rows < 4; rows++)
+    {
+      for (int columns = 0; columns < 4; columns++)
+      {
+
+        localData = data[columns][rows]; /* Data are column-wise */
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, localData, dataMap[columns * 4 + rows],
+                                        fmt::format("##{}:r{}c{}", node_id, rows, columns));
+        if (actualValueChanged)
+        {
+            valueChanged = true;
+            columnOfChange = columns;
+            rowOfChange = rows;
+            valueOfChange = localData;
+        }
+        if(columns != 3)
+        {
+            ImGui::SameLine();
+        }
+      }
+    }
+
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopItemWidth();
+
+//    if (valueChanged)
+//    {
+//      m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
+//      setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
+//    }
+
+    return inner_interaction_happen;
+}
+
+int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
+{
+    int act, maximal = 0;
+    for(int column = 0; column < 4; column++)
+    {
+        for(int row = 0; row < 4; row++)
+        {
+            act = numberOfCharWithDecimalPoint( data[column][row], numberOfVisibleDecimal);
+            if(act > maximal)
+            {
+                maximal = act;
+            }
+        }
+    }
+    return maximal;
+}
+
+bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec4& valueOfChange)
+{
+//    const glm::vec4& coreData = m_nodebase->getData(index).getVec4();
+//    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
+
+    bool  actualValueChanged = false;
+    bool inner_interaction_happen = false;
+    glm::vec4 localData;
+
+    ImGui::PushItemWidth(dataWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+    valueChanged = false;
+    for (int columns = 0; columns < 4; columns++)
+    {
+        localData[columns] = data[columns];
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, localData[columns], dataMap[columns], fmt::format("##{}:{}", node_id, columns));
+        if(actualValueChanged) valueChanged = true;
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopItemWidth();
+
+    return inner_interaction_happen;
+}
+
+int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal)
+{
+    int act, maximal = 0;
+
+    for(int column=0; column < 4; column++)
+    {
+        act = numberOfCharWithDecimalPoint( data[column], numberOfVisibleDecimal );
+        if(act > maximal)
+        {
+            maximal = act;
+        }
+    }
+
+    return maximal;
+}
+
+bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec3& valueOfChange)
+{
+    bool  actualValueChanged = false;
+    bool inner_interaction_happen = false;
+    glm::vec3 localData;
+
+    ImGui::PushItemWidth(dataWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+    valueChanged = false;
+    for (int columns = 0; columns < 3; columns++)
+    {
+        localData[columns] = data[columns];
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, localData[columns], dataMap[columns], fmt::format("##{}:{}", node_id, columns));
+        if(actualValueChanged) valueChanged = true;
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopItemWidth();
+
+    return inner_interaction_happen;
+}
+int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal)
+{
+    int act, maximal = 0;
+
+    for(int column=0; column < 3; column++)
+    {
+        act = numberOfCharWithDecimalPoint( data[column], numberOfVisibleDecimal );
+        if(act > maximal)
+        {
+            maximal = act;
+        }
+    }
+
+    return maximal;
+}
+
+bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, float& valueOfChange)
+{
+    bool inner_interaction_happen = false;
+    glm::vec3 localData;
+
+    ImGui::PushItemWidth(dataWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+    valueChanged = false;
+
+    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, valueChanged, valueOfChange, dataMap[0], fmt::format("##{}:_", node_id));
+
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopItemWidth();
+
+    return inner_interaction_happen;
+
+}
+int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal)
+{
+    return numberOfCharWithDecimalPoint( data, numberOfVisibleDecimal );
+}
+
+bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::quat& valueOfChange)
+{
+    bool inner_interaction_happen = false;
+    bool actualValueChanged = false;
+
+    ImGui::PushItemWidth(dataWidth);
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+  for (int columns = 0; columns < 4; columns++)
+  {
+    valueOfChange[columns] = data[columns];
+    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, valueOfChange[columns], dataMap[columns], fmt::format("##{}:{}", node_id, columns));
+    if (actualValueChanged) valueChanged = true;
+    if (columns < 3) ImGui::SameLine();
+
+  }
+  ImGui::PopStyleVar();
+  ImGui::PopStyleVar();
+  ImGui::PopItemWidth();
+
+//  if (valueChanged)
+//  {
+//    m_nodebase->setValue(localData);
+//    setDataItemsWidth();
+//  }
+
+  // ImGui::Spring(0);
+  return inner_interaction_happen;
+}
+
+int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal)
+{
+	// SS WIP
+  int act, maximal = 0;
+
+//  const glm::quat& coreData = m_nodebase->getData().getQuat();
+
+  for(int column=0; column < 4; column++)
+  {
+    act = numberOfCharWithDecimalPoint( data[column], numberOfVisibleDecimal );
+    if(act > maximal)
+    {
+      maximal = act;
+    }
+  }
+
+  return maximal;
+}
+
+void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node, std::vector<WorkspaceLevelOfDetail> const & levels_of_detail)
+{
+    if (ImGui::BeginMenu("Level of detail"))
+	{
+		ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[node->getLevelOfDetail()]).c_str());
+		ImGui::Separator();
+
+		for (auto const& levelOfDetail : levels_of_detail)
+		{
+            if (ImGui::MenuItem(WorkspaceLevelOfDetailName[levelOfDetail].c_str())) { node->setLevelOfDetail(levelOfDetail); }
+		}
+		ImGui::EndMenu();
+	}
+}

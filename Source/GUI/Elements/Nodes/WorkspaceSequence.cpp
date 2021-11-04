@@ -1,29 +1,66 @@
 #include "WorkspaceSequence.h"
+#include "../Windows/WorkspaceWindow.h"
 
-WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase)
+WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/)
     :   WorkspaceNodeWithCoreData(nodebase)
+{
+        const auto& inputPins   = m_nodebase->getInputPins();
+        const auto& outputPins  = m_nodebase->getOutputPins();
 
-{}
+        m_workspaceInputs.reserve(inputPins.size());
+        m_workspaceOutputs.reserve(outputPins.size());
+
+        for (Core::Pin const& pin : inputPins)
+        {
+                m_workspaceInputs.push_back(
+                    std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
+                                                            ,   pin
+                                                            ,   *this));
+
+        }
+
+        for (Core::Pin const& pin : outputPins)
+        {
+            m_workspaceOutputs.push_back(
+                    std::make_unique<WorkspaceCoreOutputPin>(    pin.getId()
+                                                            ,   pin
+                                                            ,   *this));
+        }
+    }
 
 bool WorkspaceSequence::isSequence()
 {
     return true;
 }
 
-int WorkspaceSequence::getInnerPosition(ImVec2 point)
+void WorkspaceSequence::drawMenuLevelOfDetail()
+{
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+}
+
+int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
 {
     ImRect rect = getNodeRectDiwne();
-    if (!rect.Contains(point))
+    bool any_in = false;
+    ImVec2 in_point;
+    for(auto const & point : points)
     {
-        return -1;
+        if (rect.Contains(point))
+        {
+            in_point = point;
+            any_in = true;
+        }
     }
+
+    if (!any_in) return -1;
+
 
     rect.Max.x = rect.Min.x; /* squeeze rect at begin -> then in cycle shift rect and check point position */
     int i = 0;
     for (auto const & innerNode : getInnerWorkspaceNodes())
     {
         rect.Max.x = innerNode->getNodeRectDiwne().GetCenter().x;
-        if(rect.Contains(point))
+        if(rect.Contains(in_point))
         {
             return i;
         }
@@ -33,117 +70,141 @@ int WorkspaceSequence::getInnerPosition(ImVec2 point)
     return i;
 }
 
-int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
-{
-    int position = -1; /* position of first found point that match */
-    for(auto const & point : points)
-    {
-        position = getInnerPosition(point);
-        if (position > -1){return position;}
-    }
-    return position;
-}
-
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
 
-    auto node_iter = std::find_if(  m_workspaceTransformation.begin(),
-                                    m_workspaceTransformation.end(),
-                                    [node](Ptr<WorkspaceNodeWithCoreData> const &in_node) -> bool { return node->getId() == in_node->getId(); }); /* \todo check adress of nodes directly */
+    auto node_iter = std::find_if(  m_workspaceInnerTransformations.begin(),
+                                    m_workspaceInnerTransformations.end(),
+                                    [node](Ptr<WorkspaceNodeWithCoreData> const &in_node) -> bool { return node == in_node; }); /* \todo check adress of nodes directly */
 
-    if (node_iter != m_workspaceTransformation.end())
+    if (node_iter != m_workspaceInnerTransformations.end())
     {
-        int index = node_iter-m_workspaceTransformation.begin();
-        m_workspaceTransformation.erase(node_iter);
+        int index = node_iter-m_workspaceInnerTransformations.begin();
+        std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter)->setRemoveFromSequence(true);
+        m_workspaceInnerTransformations.erase(node_iter);
         m_nodebase->as<Core::Sequence>()->popMatrix(index);
     }
 }
 
 void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 {
-    if(node->isTransformation() && 0 <= index && index <= m_workspaceTransformation.size())
+    Ptr<WorkspaceTransformation> node_t = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
+    if(node_t != nullptr && 0 <= index && index <= m_workspaceInnerTransformations.size())
     {
-        m_workspaceTransformation.insert(m_workspaceTransformation.begin()+index, node);
-        m_nodebase->as<Core::Sequence>()->addMatrix(node->getNodebase()->as<Core::Transformation>(), index);
+        node_t->setRemoveFromSequence(false);
+        m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin()+index, node_t);
+        /* \tod JH check return value if so */
+        m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
     }
 }
 
+void WorkspaceSequence::moveNodeToSequence(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
+{
+    pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
+    dragedNode->setRemoveFromWorkspaceWindow(true);
+}
 
-std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceTransformation; }
+void WorkspaceSequence::moveNodeToWorkspaceWindow(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> node)
+{
+    node->setRemoveFromWorkspaceWindow(false);
+    popNode(node);
+    dynamic_cast<WorkspaceWindow&>(diwne).m_workspaceCoreNodes.push_back(node);
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceInnerTransformations; }
 
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
 
-//void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
-//{
-//    builder.Begin(m_id);
-//	drawHeader(builder);
-//	drawInputs(builder, newLinkPin);
-//    drawData(builder,0);
-//	drawOutputs(builder, newLinkPin);
-//	builder.End();
-//
-//        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x+5,builder.HeaderMax.y-builder.HeaderMin.y+1);  /* \todo JH add shift based on size of header and inputs pins */
-//        m_dataRect = ImRect(dataLeftTop, dataLeftTop);
-//
-//        int i = 0;
-//        for( auto const & transformation : m_workspaceTransformation )
-//        {
-//            if(m_position_of_dummy_data == i)
-//            {
-//                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
-//            }else
-//            {
-//                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
-//            }
-//
-//            Theme& t = I3T::getTheme();
-//            t.transformationColorTheme();
-//
-//            transformation->drawNode(builder, nullptr, false);
-//
-//						ImVec2 sizeofNode = ImGui::GetItemRectSize();
-//						float y = sizeofNode.y - 4* I3T::getSize(ESizeVec2::Nodes_IconSize).y +1;
-//						float height = m_dataRect.Max.y - m_dataRect.Min.y;
-//						if(y > height || i == 0){
-//
-//							m_dataRect.Max.y += y - height;
-//						}
-//						m_dataRect.Max.x += sizeofNode.x;
-//
-//
-//            i++;
-//        }
-//        if (m_position_of_dummy_data == i) /* add dummy after last inner */
-//        {
-//            m_dataRect.Add(m_dataRect.Max + ImVec2(m_widthOfDummy, 0));
-//        }
-//}
-
-bool WorkspaceSequence::drawDataFull(DIWNE::Diwne &diwne, int index)
+bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
+    int position_of_dummy_data = -1; /* -1 means not in Sequence */
+    Ptr<WorkspaceTransformation> dragedNode;
 
-    int i = 0;
-    for( auto const & transformation : m_workspaceTransformation )
+    if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
     {
-        if(m_position_of_dummy_data == i)
+        diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg())); /* \todo JH Sequence background from settings*/
+
+        ImGui::TextUnformatted(m_middleLabel.c_str());
+        return false;
+    }
+
+    if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+    {
+        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_node);
+        if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
-            ImGui::Dummy(m_sizeOfDummy);
+            if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
+            {
+                moveNodeToWorkspaceWindow(diwne, dragedNode);
+            }
+            position_of_dummy_data = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
+        }
+    }
+
+    int i = 0, push_index = -1, max = m_workspaceInnerTransformations.size()-1;
+    for( auto const & transformation : m_workspaceInnerTransformations )
+    {
+        if(position_of_dummy_data == i)
+        {
+            ImGui::Dummy(m_sizeOfDummy); /* \todo JH size of dummy from settings */
+            ImGui::SameLine();
+            if (ImGui::IsMouseReleased(0))
+            {
+                push_index = i;
+            }
         }
 
-        inner_interaction_happen |= transformation->drawNodeDiwne(diwne);
+        inner_interaction_happen |= transformation->drawNodeDiwne(diwne, true);
+        ImGui::SameLine();
 
         i++;
     }
-    if (m_position_of_dummy_data == i) /* add dummy after last inner */
+    if (position_of_dummy_data == i) /* add dummy after last inner */
     {
         ImGui::Dummy(m_sizeOfDummy);
+        if (ImGui::IsMouseReleased(0))
+        {
+            push_index = i;
+        }
+    }
+    if (push_index >= 0)
+    {
+        if (ImGui::IsMouseReleased(0))
+        {
+            moveNodeToSequence(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+        }
     }
 
     return inner_interaction_happen;
 }
 
-int WorkspaceSequence::maxLenghtOfData(int index)
+bool WorkspaceSequence::leftContent(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    for (auto const& pin : m_workspaceInputs) {
+        inner_interaction_happen |= pin->drawPinDiwne(diwne);
+        if (pin->isConnected())
+        {
+            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
+            WorkspaceCoreLink * lin = &(in->getLink());
+            inner_interaction_happen |= lin->drawLinkDiwne(diwne);
+        }
+    }
+    return inner_interaction_happen;
+}
+
+bool WorkspaceSequence::rightContent(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    for (auto const& pin : m_workspaceOutputs) {
+        inner_interaction_happen |= pin->drawPinDiwne(diwne);
+    }
+    return inner_interaction_happen;
+}
+
+int WorkspaceSequence::maxLenghtOfData()
 {
     Debug::Assert(false, "Calling WorkspaceSequence::maxLenghtOfData() make no sense because every included Transformation has its own independent data");
     return -1; /* should be unused */

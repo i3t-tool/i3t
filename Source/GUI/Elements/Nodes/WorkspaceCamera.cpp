@@ -11,6 +11,11 @@ bool WorkspaceCamera::isCamera()
     return true;
 }
 
+void WorkspaceCamera::drawMenuLevelOfDetail()
+{
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+}
+
 //void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
 //{
 //    builder.Begin(m_id);
@@ -75,7 +80,7 @@ bool WorkspaceCamera::middleContent(DIWNE::Diwne &diwne)
 	return inner_interaction_happen;
 }
 
-int WorkspaceCamera::maxLenghtOfData(int index)
+int WorkspaceCamera::maxLenghtOfData()
 {
     Debug::Assert(false, "Calling WorkspaceCamera::maxLenghtOfData() make no sense because every included Sequention has its own independent data");
     return -1; /* should be unused */

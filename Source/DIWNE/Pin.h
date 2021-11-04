@@ -34,6 +34,7 @@ class Pin
         ImRect m_pinRectDiwne;
 
     private:
+        bool m_isHeld;
 
 };
 

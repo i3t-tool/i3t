@@ -20,7 +20,9 @@ public:
 
     bool middleContent(DIWNE::Diwne &diwne);
 
-	int maxLenghtOfData(int index=0);
+    void drawMenuLevelOfDetail();
+
+	int maxLenghtOfData();
 };
 
 

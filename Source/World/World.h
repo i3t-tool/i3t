@@ -10,12 +10,14 @@
  */
 //---------------
 #include "pgr.h"
-#include "GameObject.h"
+//#include "GameObject.h"
+
+//
 
 #include <map>
 #include <memory>
 
-class WorkspaceMatrix4x4;
+class WorkspaceTransformation;
 class GameObject;
 class Component;
 class CameraControl;
@@ -57,7 +59,7 @@ public:
 
     /// calls start() on each component in scene
     /**
-    
+
     */
     void onStart();
     /// Render scene
@@ -72,7 +74,7 @@ public:
     void sceneZoom(float val);
 
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
-    void manipulatorsSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
+    void manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>matnode,std::shared_ptr<Core::Sequence>parent);
 
     void manipulatorsSetVisible(bool visible);
     bool manipulatorsGetVisible();

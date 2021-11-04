@@ -20,7 +20,7 @@ std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground = {
 
 std::map<EValueType, DIWNE::IconType> WorkspacePinShapeForeground = {
 		{EValueType::Float,     DIWNE::IconType::TriangleRight},  {EValueType::Matrix, DIWNE::IconType::TriangleRight},
-		{EValueType::MatrixMul, DIWNE::IconType::TriangleRight},  {EValueType::Pulse,  DIWNE::IconType::TriangleRight},
+		{EValueType::MatrixMul, DIWNE::IconType::Cross},          {EValueType::Pulse,  DIWNE::IconType::TriangleRight},
 		{EValueType::Quat,      DIWNE::IconType::TriangleRight},  {EValueType::Screen, DIWNE::IconType::TriangleRight},
 		{EValueType::Vec3,      DIWNE::IconType::TriangleRight},  {EValueType::Vec4,   DIWNE::IconType::TriangleRight}};
 
@@ -29,6 +29,7 @@ std::map<EValueType, EColor> WorkspacePinColorForeground = {
 		{EValueType::MatrixMul, EColor::InnerMatrixMulPin}, {EValueType::Pulse, EColor::InnerPulsePin},
 		{EValueType::Quat,      EColor::InnerQuatPin},      {EValueType::Screen,EColor::InnerScreenPin},
 		{EValueType::Vec3,      EColor::InnerVec3Pin},      {EValueType::Vec4,  EColor::InnerVec4Pin}};
+
 
 std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
 		{WorkspaceLevelOfDetail::Full, "Full"},
@@ -39,6 +40,7 @@ WorkspaceNode::WorkspaceNode(DIWNE::ID id, std::string const topLabel, std::stri
     :   DIWNE::Node(id)
     ,   m_topLabel(topLabel)
     ,   m_middleLabel(middleLabel)
+    ,   m_removeFromWorkspaceWindow(false)
 {}
 
 bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
@@ -62,9 +64,22 @@ bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
     diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()));
 
-	ImGui::TextUnformatted(m_topLabel.c_str());
+	ImGui::TextUnformatted(m_middleLabel.c_str());
 
     return interaction_happen;
+}
+
+
+void WorkspaceNode::drawMenuDelete()
+{
+    if (ImGui::MenuItem("Delete")) {
+            m_removeFromWorkspaceWindow = true;
+    }
+}
+
+void WorkspaceNode::nodePopupContent()
+{
+    drawMenuDelete();
 }
 
 

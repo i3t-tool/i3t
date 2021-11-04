@@ -6,6 +6,7 @@ namespace DIWNE
 Pin::Pin(DIWNE::ID id)
     : m_idDiwne(id)
     , m_pinRectDiwne(ImRect(0,0,1,1)) /* can not have zero size because of InvisibleButton */
+    , m_isHeld(false)
 { }
 
 Pin::~Pin()
@@ -18,24 +19,24 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
     bool interaction_happen = false;
     bool inner_interaction_happen = false;
 
-    putInvisibleButtonUnder(fmt::format("PinIB{}", m_idDiwne).c_str(), m_pinRectDiwne.GetSize() );
-
-    if (pinActiveCheck(diwne))
-    {
-        pinActiveProcess(diwne);
-    }
-    else /* pin is not active */
-    {
-        if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
-        {
-            diwne.setDiwneAction(DIWNE::DiwneAction::None);
-        }
-    }
-
-    if (pinConnectLinkCheck(diwne))
-    {
-        pinConnectLinkProcess(diwne);
-    }
+//    putInvisibleButtonUnder(fmt::format("PinIB{}", m_idDiwne).c_str(), m_pinRectDiwne.GetSize() );
+//
+//    if (pinActiveCheck(diwne))
+//    {
+//        pinActiveProcess(diwne);
+//    }
+//    else /* pin is not active */
+//    {
+//        if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
+//        {
+//            diwne.setDiwneAction(DIWNE::DiwneAction::None);
+//        }
+//    }
+//
+//    if (pinConnectLinkCheck(diwne))
+//    {
+//        pinConnectLinkProcess(diwne);
+//    }
 
 
     interaction_happen = ImGui::IsItemHovered(); /* debug interaction move to function */
@@ -55,6 +56,33 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
         }
     ImGui::EndGroup();
 		ImGui::PopID();
+    if (!inner_interaction_happen && ImGui::IsItemClicked(0))
+    {
+        m_isHeld = true;
+    }
+
+    if (m_isHeld)
+    {
+        interaction_happen = true;
+        if (ImGui::IsMouseDragging(0))
+        {
+            pinActiveProcess(diwne);
+        }else if (ImGui::IsMouseReleased(0))
+        {
+            if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
+            {
+                diwne.setDiwneAction(DIWNE::DiwneAction::None);
+            }
+            m_isHeld = false;
+        }
+    }
+    else /* pin is not held */
+    {
+        if (pinConnectLinkCheck(diwne))
+        {
+            pinConnectLinkProcess(diwne);
+        }
+    }
     m_pinRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
     m_pinRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
 

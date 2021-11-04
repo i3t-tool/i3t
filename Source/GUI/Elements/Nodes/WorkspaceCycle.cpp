@@ -12,6 +12,11 @@ WorkspaceCycle::WorkspaceCycle() :
 
 bool WorkspaceCycle::isCycle() { return true; }
 
+void WorkspaceCycle::drawMenuLevelOfDetail()
+{
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+}
+
 bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 {
 	if (index == -1)
@@ -66,7 +71,7 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		ImGui::PushItemWidth(2 * button_sz.x + 4 * I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
 
 
-		drawDragFloatWithMap_Inline(diwne, valueChanged, localData, 1, fmt::format("##{}:{}", getId(), index));
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, valueChanged, localData, 1, fmt::format("##{}:{}", getId(), index));
 
 		if (valueChanged)
 		{
@@ -101,7 +106,7 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 	}
 	else if (index == 0)
 	{
-		const float											coreData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
+		const float coreData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
 		const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
 
 		bool	valueChanged = false;
@@ -112,7 +117,7 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		localData = coreData;
-		drawDragFloatWithMap_Inline(diwne, valueChanged,
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, valueChanged,
 				localData, coreMap[0], fmt::format("##{}:{}", getId(), index)); /* datamap value 1 is changeable */
 
 

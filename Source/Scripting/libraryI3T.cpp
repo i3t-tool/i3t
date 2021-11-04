@@ -717,7 +717,9 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
     WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
 
-    seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
+    //seq->pushNode(workspace->at(nodeindex),seq->getInnerWorkspaceNodes().size());
+    seq->pushNode(std::static_pointer_cast<WorkspaceTransformation>(workspace->at(nodeindex)),seq->getInnerWorkspaceNodes().size());
+
     workspace->erase(workspace->begin()+nodeindex);
 
     returnValue->Val->Integer = true;
@@ -746,12 +748,12 @@ void camAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     WorkspaceNodeWithCoreData* node = workspace->at(nodeindex).get();
 
     if(mode==scriptingData.camAddModes.proj){
-        cam->getProjection()->pushNode(workspace->at(nodeindex), cam->getProjection()->getInnerWorkspaceNodes().size());
+        cam->getProjection()->pushNode(std::static_pointer_cast<WorkspaceTransformation>(workspace->at(nodeindex)), cam->getProjection()->getInnerWorkspaceNodes().size());
         workspace->erase(workspace->begin() + nodeindex);
         returnValue->Val->Integer = true;
     }
     else if(mode==scriptingData.camAddModes.view){
-        cam->getView()->pushNode(workspace->at(nodeindex), cam->getView()->getInnerWorkspaceNodes().size());
+        cam->getView()->pushNode(std::static_pointer_cast<WorkspaceTransformation>(workspace->at(nodeindex)), cam->getView()->getInnerWorkspaceNodes().size());
         workspace->erase(workspace->begin() + nodeindex);
         returnValue->Val->Integer = true;
     }

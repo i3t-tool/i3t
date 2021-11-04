@@ -81,6 +81,14 @@ public:
 	/* DIWNE function */
     virtual bool topContent(DIWNE::Diwne &diwne);
     virtual bool middleContent(DIWNE::Diwne &diwne);
+
+    bool m_removeFromWorkspaceWindow;
+    bool getRemoveFromWorkspaceWindow() const {return m_removeFromWorkspaceWindow;};
+	void setRemoveFromWorkspaceWindow(bool value) {m_removeFromWorkspaceWindow=value;};
+
+
+	virtual void drawMenuDelete();
+	virtual void nodePopupContent();
 };
 
 class WorkspacePin : public DIWNE::Pin

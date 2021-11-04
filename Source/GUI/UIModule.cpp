@@ -36,7 +36,7 @@ void UIModule::init()
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
-	m_dockableWindows.push_back(std::make_shared<StartWindow>(true));
+//	m_dockableWindows.push_back(std::make_shared<StartWindow>(true)); /* \todo JH not work */
 	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Console>(false));

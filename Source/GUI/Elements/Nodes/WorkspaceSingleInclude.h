@@ -1,5 +1,8 @@
 #include "WorkspaceTransformation_s.h"
 #include "WorkspaceOperator.h"
+#include "WorkspaceSequence.h"
+#include "WorkspaceCamera.h"
+
 //
 ////transformations{
 //#include "WorkspaceAxisAngle.h"
