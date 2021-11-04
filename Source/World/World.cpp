@@ -124,13 +124,13 @@ void World::sceneSetView(glm::vec3 dir, bool world) {
 void World::sceneZoom(float val) {
     camControl->setScroll(val);
 }
-void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>*matnode,std::shared_ptr<Core::Sequence>*parent) {
+void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>matnode,std::shared_ptr<Core::Sequence>parent) {
     //printf("manipulatorsSetMatrix 0x%p,0x%p\n",matnode,parent);
     if(activeManipulator!=nullptr){activeManipulator->component->m_isActive=false;activeManipulator=nullptr;}
     if(matnode==nullptr){return;}
-    if(matnode->get()==nullptr){return;}
+    //if(matnode->get()==nullptr){return;}
 
-    Ptr<Core::NodeBase>	        nodebase    = matnode->get()->getNodebase();
+    Ptr<Core::NodeBase>	        nodebase    = matnode->getNodebase();
     const Core::Transform::DataMap*	data	= nodebase->getDataMap(); //printf("a");
 	const Operation*			operation	= nodebase->getOperation(); //printf("b");
 	const char*					keyword		= nodebase->getOperation()->keyWord.c_str(); //printf("c");
@@ -139,7 +139,7 @@ void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>*matno
         activeManipulator = &(this->manipulators[keyword]);
         if(showManipulators){activeManipulator->component->m_isActive=true;}
         *(activeManipulator->editedNode)=nodebase;
-        if(parent!=nullptr){if(parent->get()!=nullptr){*(activeManipulator->parent)=*parent;}}
+        if(parent!=nullptr){/*if(parent->get()!=nullptr){*/(activeManipulator->parent)=&parent;} //} /* \todo JH maybe repaire pointers? */
     }
     //else{printf("No manipulators\n"); }
     //printf("operation %s\n",keyword);

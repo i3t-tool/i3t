@@ -175,3 +175,8 @@ bool WorkspaceTransformation::isInSequence()
 	return m_nodebase->as<Core::Transformation>()->isInSequence();
 }
 
+Ptr<Core::NodeBase> WorkspaceTransformation::getNodebaseSequence()
+{
+	return m_nodebase->as<Core::Transformation>()->getCurrentSequence();
+}
+

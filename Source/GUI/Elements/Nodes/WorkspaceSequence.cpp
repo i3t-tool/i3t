@@ -12,73 +12,19 @@ WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Build
 
         for (Core::Pin const& pin : inputPins)
         {
-            if(pin.getType() == EValueType::MatrixMul)
-            {
-                m_workspaceInputs.push_back(
-                    std::make_unique<WorkspaceCoreInputPinMatrixMul>(    pin.getId()
-                                                                    ,   pin
-                                                                    ,   *this));
-            }else
-            {
                 m_workspaceInputs.push_back(
                     std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
                                                             ,   pin
                                                             ,   *this));
-            }
 
         }
 
         for (Core::Pin const& pin : outputPins)
         {
-            switch (pin.getType())
-            {
-                case EValueType::Matrix:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrix4x4>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Vec4:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector4>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Vec3:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector3>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Float:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinFloat>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Quat:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinQuaternion>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Pulse:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinPulse>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::MatrixMul:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrixMul>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Screen:
-                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinScreen>( pin.getId()
-                                                                                                ,   pin
-                                                                                                ,   *this));
-                    break;
-                case EValueType::Ptr:
-                    /* Pin with type Ptr have no graphic representation */
-                    break;
-                default:
-                    Debug::Assert(false , "Unknown Pin type in Sequence constructor");
-            }
-
+            m_workspaceOutputs.push_back(
+                    std::make_unique<WorkspaceCoreOutputPin>(    pin.getId()
+                                                            ,   pin
+                                                            ,   *this));
         }
     }
 
@@ -134,6 +80,7 @@ void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
     if (node_iter != m_workspaceInnerTransformations.end())
     {
         int index = node_iter-m_workspaceInnerTransformations.begin();
+        std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter)->setRemoveFromSequence(true);
         m_workspaceInnerTransformations.erase(node_iter);
         m_nodebase->as<Core::Sequence>()->popMatrix(index);
     }
@@ -151,70 +98,22 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
     }
 }
 
-void WorkspaceSequence::moveNodeToSequenceWithCheck(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
+void WorkspaceSequence::moveNodeToSequence(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
 {
-    if (ImGui::IsMouseReleased(0))
-    {
-        pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
-        dragedNode->setRemoveFromWorkspaceWindow(true);
-//        std::vector<Ptr<WorkspaceNodeWithCoreData>> &ww_nodes = static_cast<WorkspaceWindow&>(diwne).m_workspaceCoreNodes;
-//        ww_nodes.erase(std::remove_if(ww_nodes.begin(),
-//                                      ww_nodes.end(),
-//                                      [this](Ptr<WorkspaceNodeWithCoreData> node){return node.get() == this;}),
-//                       ww_nodes.end());
-    }
+    pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
+    dragedNode->setRemoveFromWorkspaceWindow(true);
 }
 
+void WorkspaceSequence::moveNodeToWorkspaceWindow(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> node)
+{
+    node->setRemoveFromWorkspaceWindow(false);
+    popNode(node);
+    dynamic_cast<WorkspaceWindow&>(diwne).m_workspaceCoreNodes.push_back(node);
+}
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceInnerTransformations; }
 
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
-
-//void WorkspaceSequence::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
-//{
-//    builder.Begin(m_id);
-//	drawHeader(builder);
-//	drawInputs(builder, newLinkPin);
-//    drawData(builder,0);
-//	drawOutputs(builder, newLinkPin);
-//	builder.End();
-//
-//        ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(I3T::getSize(ESizeVec2::Nodes_IconSize).x+5,builder.HeaderMax.y-builder.HeaderMin.y+1);  /* \todo JH add shift based on size of header and inputs pins */
-//        m_dataRect = ImRect(dataLeftTop, dataLeftTop);
-//
-//        int i = 0;
-//        for( auto const & transformation : m_workspaceTransformation )
-//        {
-//            if(m_position_of_dummy_data == i)
-//            {
-//                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
-//            }else
-//            {
-//                ne::SetNodePosition(transformation->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
-//            }
-//
-//            Theme& t = I3T::getTheme();
-//            t.transformationColorTheme();
-//
-//            transformation->drawNode(builder, nullptr, false);
-//
-//						ImVec2 sizeofNode = ImGui::GetItemRectSize();
-//						float y = sizeofNode.y - 4* I3T::getSize(ESizeVec2::Nodes_IconSize).y +1;
-//						float height = m_dataRect.Max.y - m_dataRect.Min.y;
-//						if(y > height || i == 0){
-//
-//							m_dataRect.Max.y += y - height;
-//						}
-//						m_dataRect.Max.x += sizeofNode.x;
-//
-//
-//            i++;
-//        }
-//        if (m_position_of_dummy_data == i) /* add dummy after last inner */
-//        {
-//            m_dataRect.Add(m_dataRect.Max + ImVec2(m_widthOfDummy, 0));
-//        }
-//}
 
 bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 {
@@ -234,8 +133,12 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
         dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_node);
-        if (dragedNode != nullptr) /* only transformation can be in Seqeuence*/
+        if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
+            if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
+            {
+                moveNodeToWorkspaceWindow(diwne, dragedNode);
+            }
             position_of_dummy_data = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
         }
     }
@@ -268,7 +171,10 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     }
     if (push_index >= 0)
     {
-        moveNodeToSequenceWithCheck(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+        if (ImGui::IsMouseReleased(0))
+        {
+            moveNodeToSequence(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+        }
     }
 
     return inner_interaction_happen;

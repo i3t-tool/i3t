@@ -74,7 +74,7 @@ public:
     void sceneZoom(float val);
 
     ///Activate manipulators in scene (viewport) for givent type of workspace matrix
-    void manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>*matnode,std::shared_ptr<Core::Sequence>*parent);
+    void manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>matnode,std::shared_ptr<Core::Sequence>parent);
 
     void manipulatorsSetVisible(bool visible);
     bool manipulatorsGetVisible();

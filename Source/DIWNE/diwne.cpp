@@ -127,6 +127,7 @@ void Diwne::End()
     m_previousFrameDiwneAction = m_diwneAction;
     m_backgroundPopupRaise = false;
     m_workAreaZoomChangeDiwne = 0;
+    m_nodesSelectionChanged = false;
 
     ImGui::EndChild();
 }

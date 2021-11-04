@@ -12,6 +12,8 @@ class WorkspaceTransformation : public WorkspaceNodeWithCoreData
 	bool getRemoveFromSequence() const {return m_removeFromSequence;};
 	void setRemoveFromSequence(bool value) {m_removeFromSequence=value;};
 	bool isInSequence();
+	Ptr<Core::NodeBase> getNodebaseSequence();
+
 
     virtual bool dataAreValid() {return true;}; /* \todo JH query to core */
 

@@ -27,7 +27,8 @@ public:
     void popNode(Ptr<WorkspaceNodeWithCoreData> node);
     void pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index = 0);
 
-    void moveNodeToSequenceWithCheck(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index);
+    void moveNodeToSequence(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index=0);
+    void moveNodeToWorkspaceWindow(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode);
 
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;

@@ -81,20 +81,12 @@ public:
     WorkspaceCoreLink *m_creatingLink;
     WorkspaceCorePin *m_linkCreatingPin;
 
-	//ImVec2 m_openPopupMenuPosition = ImVec2(100,100); /* \todo JH some better default value - maybe little bit unused, but for certainty */
 	ImVec2 m_rightClickPosition = ImVec2(100,100);
 	ImVec2 m_newNodePostion = ImVec2(100,100);
-//	ne::NodeId m_contextNodeId = 0;
-//	ne::LinkId m_contextLinkId = 0;
-//	ne::PinId  m_contextPinId = 0;
 
-	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
-//	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
-	//Ptr<WorkspaceNodeWithCoreData> m_draged_node;
-//	ne::Detail::Node *m_draged_node_nodeeditor;
 
     template<class T>
     void inline addNodeToPosition(ImVec2 const position)
@@ -137,7 +129,7 @@ public:
 //
 //	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
 
-//	void manipulatorStartCheck3D();
+	void manipulatorStartCheck3D();
 //
 //	void checkUserActions();
 //

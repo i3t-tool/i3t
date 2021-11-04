@@ -122,7 +122,7 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                             diwne.m_draged_node = nullptr;
                             diwne.setDiwneAction(DiwneAction::None);
                     }
-                    else {m_selected = !m_selected;}
+                    else {m_selected = !m_selected; diwne.setNodesSelectionChanged(true);}
 
                     m_isHeld = false;
                 }
