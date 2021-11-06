@@ -586,9 +586,9 @@ bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
     float valueOfChange;
     WorkspaceNodeWithCoreData &node = getNode();
 
-    interaction_happen = drawData4x4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+    interaction_happen = drawData4x4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
                                     node.getNodebase()->getData().getMat4(), node.getNodebase()->getDataMapRef(),
-                                    node.getDataItemsWidth(diwne), valueChanged, rowOfChange, columnOfChange, valueOfChange );
+                                    valueChanged, rowOfChange, columnOfChange, valueOfChange );
 
     ImGui::SameLine();
 
@@ -614,9 +614,10 @@ bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
     glm::vec4 valueOfChange;
     WorkspaceNodeWithCoreData &node = getNode();
 
-    interaction_happen = drawDataVec4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+    interaction_happen = drawDataVec4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
                                     node.getNodebase()->getData().getVec4(), node.getNodebase()->getDataMapRef(),
-                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+                                    valueChanged, valueOfChange );
+
 
     ImGui::SameLine();
 
@@ -628,6 +629,7 @@ bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
     }
     return interaction_happen;
 }
+
 int WorkspaceCoreOutputPinVector4::maxLengthOfData()
 {
     WorkspaceNodeWithCoreData &node = getNode();
@@ -641,9 +643,9 @@ bool WorkspaceCoreOutputPinVector3::pinContent(DIWNE::Diwne &diwne)
     glm::vec3 valueOfChange;
     WorkspaceNodeWithCoreData &node = getNode();
 
-    interaction_happen = drawDataVec3(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+    interaction_happen = drawDataVec3(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
                                     node.getNodebase()->getData().getVec3(), node.getNodebase()->getDataMapRef(),
-                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+                                    valueChanged, valueOfChange );
 
     ImGui::SameLine();
 
@@ -655,6 +657,7 @@ bool WorkspaceCoreOutputPinVector3::pinContent(DIWNE::Diwne &diwne)
     }
     return interaction_happen;
 }
+
 int WorkspaceCoreOutputPinVector3::maxLengthOfData()
 {
     WorkspaceNodeWithCoreData &node = getNode();
@@ -668,9 +671,9 @@ bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
     float valueOfChange;
     WorkspaceNodeWithCoreData &node = getNode();
 
-    interaction_happen = drawDataFloat(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+    interaction_happen = drawDataFloat(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
                                     node.getNodebase()->getData().getFloat(), node.getNodebase()->getDataMapRef(),
-                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+                                    valueChanged, valueOfChange );
 
     ImGui::SameLine();
 
@@ -682,6 +685,7 @@ bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
     }
     return interaction_happen;
 }
+
 int WorkspaceCoreOutputPinFloat::maxLengthOfData()
 {
     WorkspaceNodeWithCoreData &node = getNode();
@@ -695,9 +699,9 @@ bool WorkspaceCoreOutputPinQuaternion::pinContent(DIWNE::Diwne &diwne)
     glm::quat valueOfChange;
     WorkspaceNodeWithCoreData &node = getNode();
 
-    interaction_happen = drawDataQuaternion(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
-                                    node.getNodebase()->getData().getQuat(), node.getNodebase()->getDataMapRef(),
-                                    node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
+    interaction_happen = drawDataQuaternion(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
+                                            node.getNodebase()->getData().getQuat(), node.getNodebase()->getDataMapRef(),
+                                            valueChanged, valueOfChange );
 
     ImGui::SameLine();
 
@@ -777,9 +781,7 @@ void WorkspaceCoreLink::updateControlPointsOffsets(){
 }
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
-/* \todo JH correct order of arguments to make sense */
-
-bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, bool& valueChanged, float& value, int const mapValue, std::string const label)
+bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, int const mapValue, bool& valueChanged)
 {
 	bool inactive = (mapValue == 0 || mapValue == 255)
 			? true
@@ -794,17 +796,7 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int numberOfVisibleDecimal
 	}
 
 	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
-	auto	io	 = ImGui::GetIO();
-	/// \todo No need for this code. DragFloat step is handled by ImGui by default.
-	/*
-	if(InputManager::isKeyPressed(Keys::ctrll) || InputManager::isKeyPressed(Keys::ctrlr)){
-    step = I3T::getSize(ESize::Nodes_CtrlMultiplicator) * step;
-	}else if(InputManager::isKeyPressed(Keys::altl) || InputManager::isKeyPressed(Keys::altr)){
-		step = I3T::getSize(ESize::Nodes_ALTMultiplicator) * step;
-  }else if(InputManager::isKeyPressed(Keys::shiftl) || InputManager::isKeyPressed(Keys::shiftr)){
-		step = I3T::getSize(ESize::Nodes_SHIFTMultiplicator) * step;
-  }
-	 */
+
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
@@ -994,15 +986,13 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
     }
 }
 
-bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange )
+/* \todo JH to docs - valueOfChange will be set to data and than (possibly) changed by user interaction */
+bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange )
 {
     bool inner_interaction_happen = false;
     bool actualValueChanged = false;
     float localData; /* user can change just one value at the moment */
-    //const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
-    //const Core::Transform::DataMap& dataMap = m_nodebase->getDataMapRef();
 
-    //ImGui::PushItemWidth(getDataItemsWidth(diwne));
     ImGui::PushItemWidth(dataWidth);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
@@ -1015,8 +1005,8 @@ bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDeci
       {
 
         localData = data[columns][rows]; /* Data are column-wise */
-        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, localData, dataMap[columns * 4 + rows],
-                                        fmt::format("##{}:r{}c{}", node_id, rows, columns));
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:r{}c{}", node_id, rows, columns),
+                                                                localData, dataMap[columns * 4 + rows], actualValueChanged);
         if (actualValueChanged)
         {
             valueChanged = true;
@@ -1034,12 +1024,6 @@ bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDeci
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopItemWidth();
-
-//    if (valueChanged)
-//    {
-//      m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-//      setDataItemsWidth(); /* \todo JH maybe somehow wrap setValue to Core and set Items Width */
-//    }
 
     return inner_interaction_happen;
 }
@@ -1061,14 +1045,13 @@ int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
     return maximal;
 }
 
-bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec4& valueOfChange)
+bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::vec4& valueOfChange)
 {
 //    const glm::vec4& coreData = m_nodebase->getData(index).getVec4();
 //    const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
 
     bool  actualValueChanged = false;
     bool inner_interaction_happen = false;
-    glm::vec4 localData;
 
     ImGui::PushItemWidth(dataWidth);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
@@ -1077,8 +1060,9 @@ bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDec
     valueChanged = false;
     for (int columns = 0; columns < 4; columns++)
     {
-        localData[columns] = data[columns];
-        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, localData[columns], dataMap[columns], fmt::format("##{}:{}", node_id, columns));
+        valueOfChange[columns] = data[columns]; /* \todo JH copy whole data directly - not in for*/
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, columns),
+                                                                valueOfChange[columns], dataMap[columns], actualValueChanged);
         if(actualValueChanged) valueChanged = true;
     }
     ImGui::PopStyleVar();
@@ -1104,11 +1088,10 @@ int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal)
     return maximal;
 }
 
-bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec3& valueOfChange)
+bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::vec3& valueOfChange)
 {
     bool  actualValueChanged = false;
     bool inner_interaction_happen = false;
-    glm::vec3 localData;
 
     ImGui::PushItemWidth(dataWidth);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
@@ -1117,8 +1100,9 @@ bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDec
     valueChanged = false;
     for (int columns = 0; columns < 3; columns++)
     {
-        localData[columns] = data[columns];
-        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, localData[columns], dataMap[columns], fmt::format("##{}:{}", node_id, columns));
+        valueOfChange[columns] = data[columns];
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, columns),
+                                                                valueOfChange[columns], dataMap[columns], actualValueChanged);;
         if(actualValueChanged) valueChanged = true;
     }
     ImGui::PopStyleVar();
@@ -1143,18 +1127,19 @@ int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal)
     return maximal;
 }
 
-bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, float& valueOfChange)
+bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, float& valueOfChange)
 {
     bool inner_interaction_happen = false;
-    glm::vec3 localData;
+
 
     ImGui::PushItemWidth(dataWidth);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
     valueChanged = false;
-
-    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, valueChanged, valueOfChange, dataMap[0], fmt::format("##{}:_", node_id));
+    valueOfChange = data;
+    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:_", node_id),
+                                                                valueOfChange, dataMap[0], valueChanged);
 
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
@@ -1168,7 +1153,7 @@ int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal)
     return numberOfCharWithDecimalPoint( data, numberOfVisibleDecimal );
 }
 
-bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::quat& valueOfChange)
+bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::quat& valueOfChange)
 {
     bool inner_interaction_happen = false;
     bool actualValueChanged = false;
@@ -1177,34 +1162,27 @@ bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisi
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
-  for (int columns = 0; columns < 4; columns++)
-  {
-    valueOfChange[columns] = data[columns];
-    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, actualValueChanged, valueOfChange[columns], dataMap[columns], fmt::format("##{}:{}", node_id, columns));
-    if (actualValueChanged) valueChanged = true;
-    if (columns < 3) ImGui::SameLine();
+	valueChanged = false;
+    for (int columns = 0; columns < 4; columns++)
+    {
+        valueOfChange[columns] = data[columns];
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:{}", node_id, columns),
+                                                                valueOfChange[columns], dataMap[columns], actualValueChanged);
 
-  }
-  ImGui::PopStyleVar();
-  ImGui::PopStyleVar();
-  ImGui::PopItemWidth();
+        if (actualValueChanged) valueChanged = true;
+        if (columns < 3) ImGui::SameLine();
 
-//  if (valueChanged)
-//  {
-//    m_nodebase->setValue(localData);
-//    setDataItemsWidth();
-//  }
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopItemWidth();
 
-  // ImGui::Spring(0);
   return inner_interaction_happen;
 }
 
 int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal)
 {
-	// SS WIP
   int act, maximal = 0;
-
-//  const glm::quat& coreData = m_nodebase->getData().getQuat();
 
   for(int column=0; column < 4; column++)
   {

@@ -71,7 +71,8 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		ImGui::PushItemWidth(2 * button_sz.x + 4 * I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
 
 
-		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, valueChanged, localData, 1, fmt::format("##{}:{}", getId(), index));
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), index),
+                                    localData, 1, valueChanged);
 
 		if (valueChanged)
 		{
@@ -117,9 +118,8 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 		localData = coreData;
-		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, valueChanged,
-				localData, coreMap[0], fmt::format("##{}:{}", getId(), index)); /* datamap value 1 is changeable */
-
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), index),
+                                    localData, coreMap[0], valueChanged);
 
 
 		ImGui::PopStyleVar();
