@@ -45,6 +45,7 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent(DIWNE::Diwne &diwne)
 {
+
     if(!m_topLabel.empty())
     {
         ImGui::TextUnformatted(m_topLabel.c_str());
@@ -441,10 +442,11 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
         DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
 		ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
 
+        float padding = 2*diwne.getWorkAreaZoomDiwne(); /* \todo JH padding of inner shape in icon to Theme? */
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
                         iconTypeFg, iconColorFg, iconColorFg,
-                        I3T::getSize(ESizeVec2::Nodes_IconSize),
-                        ImVec4(2,2,2,2), /* \todo JH padding of inner shape in icon to Theme? */
+                        I3T::getSize(ESizeVec2::Nodes_IconSize)*diwne.getWorkAreaZoomDiwne(),
+                        ImVec4(padding, padding, padding, padding),
                         isConnected());
 
 
@@ -544,10 +546,9 @@ void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
     switch (Core::GraphManager::isPlugCorrect(coreInput,coreOutput))
     {
     case ENodePlugResult::Ok:
-        diwne.showPopUpLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
+        diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
         if (!ImGui::GetIO().MouseDown[0])
         {
-            //getLink().setStartPin((WorkspaceCoreOutputPin*)ww.m_linkCreatingPin);
             if (ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
                                                                 coreOutput->getIndex(), coreInput->getIndex()))
             {
@@ -560,7 +561,7 @@ void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
         break;
     /* \todo JH react informatively to other result too */
     default:
-        diwne.showPopUpLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+        diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
     }
 }
 

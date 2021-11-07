@@ -199,7 +199,7 @@ class Diwne
 
         void * m_customData;
 
-        void showPopUpLabel(std::string label, ImColor color);
+        void showTooltipLabel(std::string label, ImColor color);
 
         std::shared_ptr<DIWNE::Node> m_draged_node; /* \todo JH make protected */
 

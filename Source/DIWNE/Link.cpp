@@ -67,10 +67,11 @@ bool Link::linkPopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring)
             /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not (zoomed) diwne */
             diwne.transformMouseFromDiwneToImGui();
 
-
+#ifdef DIWNE_DEBUG
             /* debug */
             ImGui::Text("Diwne ID: %i", m_idDiwne);
             ImGui::Separator();
+#endif // DIWNE_DEBUG
 
             linkPopupContent();
 

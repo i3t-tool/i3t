@@ -24,6 +24,9 @@ bool WorkspaceTransformation::topContent(DIWNE::Diwne &diwne)
 bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
+    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
 	switch (m_levelOfDetail)
 	{
 	case WorkspaceLevelOfDetail::Full:

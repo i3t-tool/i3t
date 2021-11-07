@@ -2,6 +2,7 @@
     \brief Drawing and manipulation with Workspace.
 */
 #include "WorkspaceWindow.h"
+#define WORKSPACE_DEBUG 1
 
 
 static DIWNE::SettingsDiwne settingsDiwne;
@@ -605,8 +606,8 @@ void WorkspaceWindow::render()
         //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
         //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
+        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
 
 
 
@@ -623,9 +624,11 @@ void WorkspaceWindow::render()
     }
 
 	Begin("DIWNE Workspace");
+#ifdef DIWNE_DEBUG
 	if (m_diwneAction == DIWNE::DiwneAction::DragNode) ImGui::Text("Dragging node");
 	if (m_diwneAction == DIWNE::DiwneAction::None) ImGui::Text("NoneAction");
 	if (m_diwneAction == DIWNE::DiwneAction::NewLink) ImGui::Text("New link");
+#endif // DIWNE_DEBUG
 
     m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
                                               [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspaceWindow();}
@@ -637,6 +640,7 @@ void WorkspaceWindow::render()
 
     }
 
+#ifdef DIWNE_DEBUG
     if (m_diwneAction == DIWNE::DiwneAction::DragNode)
     {
         Ptr<WorkspaceTransformation> tr = std::dynamic_pointer_cast<WorkspaceTransformation>(m_draged_node);
@@ -646,6 +650,7 @@ void WorkspaceWindow::render()
             ImGui::Text(fmt::format("{}:{} {}:{} {}:{}", interaction_points[0].x, interaction_points[0].y, interaction_points[1].x, interaction_points[1].y, interaction_points[2].x, interaction_points[2].y).c_str());
         }
     }
+#endif // DIWNE_DEBUG
 
 //    if (m_diwne.getBackgroudPopupRaise())
 //    {

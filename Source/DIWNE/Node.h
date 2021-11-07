@@ -48,7 +48,9 @@ class Node : public std::enable_shared_from_this<Node>
         bool drawRightDiwne(DIWNE::Diwne &diwne);
         bool drawBottomDiwne(DIWNE::Diwne &diwne);
 
+        virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne) {return false;};
 
+        virtual bool drawNodeBackground(DIWNE::Diwne &diwne) {return false;};
         virtual bool topContent(DIWNE::Diwne &diwne);
         virtual bool leftContent(DIWNE::Diwne &diwne);
         virtual bool middleContent(DIWNE::Diwne &diwne);
