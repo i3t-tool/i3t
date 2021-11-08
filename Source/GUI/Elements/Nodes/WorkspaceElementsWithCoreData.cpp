@@ -825,6 +825,10 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 
 	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
 
+	/* \todo JH this is not very elegant ... */
+	/* \todo JH hack for not change value if for example dragging node from position over DragFloat */
+    if ( diwne.getDiwneAction() != DIWNE::DiwneAction::None || diwne.getPreviousFrameDiwneAction() != DIWNE::DiwneAction::None){valueChanged = false;}
+
 	return inner_interaction_happen || valueChanged;
 }
 

@@ -140,7 +140,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
-        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_node);
+        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_hold_node);
         if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
             if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
@@ -155,6 +155,10 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
         }
     }
 
+    m_workspaceInnerTransformations.erase(std::remove_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
+                                                          [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return std::dynamic_pointer_cast<WorkspaceTransformation>(node)->getRemoveFromSequence();}
+                                                          ),
+                                            m_workspaceInnerTransformations.end());
 
     int i = 0, push_index = -1;
     for( auto const & transformation : m_workspaceInnerTransformations )

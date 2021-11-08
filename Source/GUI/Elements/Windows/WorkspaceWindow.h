@@ -61,8 +61,6 @@ public:
 	virtual ~WorkspaceWindow();
 
 	Application& m_wholeApplication;
-//	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene - its wrapper for api functions only */
-//	ne::Detail::EditorContext* m_ne_usable; /*! \brief On this object you can call inner functions */
 
 //    DIWNE::Diwne m_diwne;
     void popupBackgroundContent();
@@ -71,7 +69,7 @@ public:
 
 	ImTextureID m_headerBackgroundTexture;
 
-//	util::NodeBuilder m_nodeBuilderContext;
+
 
 	/* \todo JH better name for this atributes - for better description what they do... */
 	Ptr<WorkspaceCorePin> m_pinPropertiesForNewLink = nullptr;
@@ -148,11 +146,10 @@ public:
 //
 //	//void checkQueryContextMenus();
 //
-//	void shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
-//	void shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
-//	void shiftSelectedNodesToFront();
-//	void shiftTransformationInSequenceNodesToFront();
-//
+	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
+	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
+	void shiftDragedOrHoldNodeToEnd();
+
 //	void showPopUpLabel(std::string label, ImColor color);
 //
 //	void UpdateTouchAllNodes();

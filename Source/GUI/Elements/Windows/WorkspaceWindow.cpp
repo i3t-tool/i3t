@@ -18,41 +18,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 //		,m_nodeBuilderContext(util::NodeBuilder(m_headerBackgroundTexture, 64, 64))
 {
 
-	/* Setting of configuration from blueprint-example */
-//	ne::Config config;											 /* \todo used only once in ed::CreateEditor() ? */
-//	config.SettingsFile = "Blueprints.json"; /* \todo Rename to some more tight filename*/
-																					 /* \todo Setting of load and store functions
-	                                         //    config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t
-	                                         //    {
-	                                         //        auto node = FindNode(nodeId);
-	                                         //        if (!node)
-	                                         //            return 0;
-	                                         //
-	                                         //        if (data != nullptr)
-	                                         //            memcpy(data, node->State.data(), node->State.size());
-	                                         //        return node->State.size();
-	                                         //    };
-	                                         //
-	                                         //    config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason,
-	                                         void* userPointer) -> bool
-	                                         //    {
-	                                         //        auto node = FindNode(nodeId);
-	                                         //        if (!node)
-	                                         //            return false;
-	                                         //
-	                                         //        node->State.assign(data, size);
-	                                         //
-	                                         //        TouchNode(nodeId);
-	                                         //
-	                                         //        return true;
-	                                         //    };
-	                                         */
-
-//	m_nodeEditorContext = ne::CreateEditor(&config);
-//	ne::SetCurrentEditor(m_nodeEditorContext);
-//	m_ne_usable = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(m_nodeEditorContext);
-
-	// Input actions for workspace window.
+// Input actions for workspace window.
 //	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { selectAll(); });
 //	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { invertSelection(); });
 //	Input.bindAction("navigateToContent", EKeyState::Pressed, [&]() { ne::NavigateToContent(); });
@@ -547,11 +513,20 @@ void WorkspaceWindow::popupBackgroundContent()
 				}
 				if (ImGui::MenuItem("Selected nodes"))
 				{
-                    m_workspaceCoreNodes.erase(
-                        std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-                                      [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {return node->getSelected();}
-                                      ),
-                          m_workspaceCoreNodes.end());
+				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                    {
+                        if (workspaceCoreNode->getSelected()){ workspaceCoreNode->setRemoveFromWorkspaceWindow(true); }
+
+                        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
+                        if (seq != nullptr)
+                        {
+                            for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+                            {
+                                if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
+                            }
+                        }
+
+                    }
 				}
 				if (ImGui::MenuItem("Selected links"))
 				{
@@ -606,8 +581,11 @@ void WorkspaceWindow::render()
         //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
         //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
-        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
-        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(800,200));
 
 
 
@@ -643,7 +621,7 @@ void WorkspaceWindow::render()
 #ifdef DIWNE_DEBUG
     if (m_diwneAction == DIWNE::DiwneAction::DragNode)
     {
-        Ptr<WorkspaceTransformation> tr = std::dynamic_pointer_cast<WorkspaceTransformation>(m_draged_node);
+        Ptr<WorkspaceTransformation> tr = std::dynamic_pointer_cast<WorkspaceTransformation>(m_draged_hold_node);
         if (tr)
         {
             std::vector<ImVec2> interaction_points = tr->getInteractionPointsWithSequence();
@@ -652,80 +630,7 @@ void WorkspaceWindow::render()
     }
 #endif // DIWNE_DEBUG
 
-//    if (m_diwne.getBackgroudPopupRaise())
-//    {
-//        m_diwne.popupDiwneRaise("BackgroundPopup", &backgroundPopupContent, m_diwne, m_workspaceCoreNodes);
-//    }
 
-//	ne::Begin("Node editor");
-//	{
-//		ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
-//
-//		for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-//		{
-//			Theme& t = I3T::getTheme();
-//			if (workspaceCoreNode->isTransformation()) { t.transformationColorTheme(); }
-//			else
-//			{
-//				t.operatorColorTheme();
-//			}
-//			workspaceCoreNode->drawNode(m_nodeBuilderContext, nullptr);
-//			t.returnFloatColorToDefault();
-//		}
-//
-////		/* put and pop to/from Sequence */
-//		if (m_diwneAction == DIWNE::DiwneAction::DragNode)
-//		{
-//		    WorkspaceNodeWithCoreData *node = (WorkspaceNodeWithCoreData *)m_draged_node; /* \todo JH better way to cast */
-//			if (node != nullptr) /* should not be never if DiwneAction::DragNode is set */
-//			{
-//				if (node->isTransformation())
-//				{
-////					Theme& t = I3T::getTheme();
-////					t.transformationColorTheme();
-////					if (node->inSequence())
-////					{
-////						Ptr<WorkspaceSequence> workspace_sequence = getSequenceOfWorkspaceNode(node);
-////						assert(workspace_sequence != nullptr);
-////
-////						workspace_sequence->popNode(node);
-////						m_workspaceCoreNodes.push_back(node);
-////					}
-//
-//					int position_in_sequence;
-//					m_all_sequences = getSequenceNodes();
-//					for (Ptr<WorkspaceSequence>& sequence : m_all_sequences)
-//					{
-//						ImVec2 nodeTopMiddlePosition = ne::GetNodePosition(node->getId());
-//						ImVec2 nodeSize							 = ne::GetNodeSize(node->getId());
-//						nodeTopMiddlePosition.x += nodeSize.x / 2;
-//
-//						position_in_sequence =
-//								sequence->getInnerPosition({nodeTopMiddlePosition, nodeTopMiddlePosition + ImVec2(0, nodeSize.y / 2),
-//																						nodeTopMiddlePosition + ImVec2(0, nodeSize.y)});
-//						sequence->setPostionOfDummyData(position_in_sequence);
-//
-//						if (position_in_sequence >= 0)
-//						{
-//							sequence->setWidthOfDummy(ne::GetNodeSize(node->getId()).x);
-//							if (ImGui::IsMouseReleased(0))
-//							{
-//								sequence->pushNode(node, position_in_sequence);
-//								m_workspaceCoreNodes.erase(std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-//																												[this](Ptr<WorkspaceNodeWithCoreData> const& w_node) -> bool {
-//																													return w_node->getId() == m_draged_node->getId();
-//																												}));
-//								sequence->setPostionOfDummyData(-1);
-//								break;
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//
-//		/* both connected pins have to be drawn before link is drawn -> therefore separated cycle */
-//		for (auto&& workspaceCoreNode : m_workspaceCoreNodes) { workspaceCoreNode->drawInputLinks(); }
 //
 //		checkUserActions();
 //
@@ -738,6 +643,15 @@ void WorkspaceWindow::render()
 //	ne::End();
 
 	manipulatorStartCheck3D();
+
+	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
+
+    /* hold or drag && in previous frame not hold neither drag */
+	if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode) &&
+         !(m_previousFrameDiwneAction == DIWNE::DiwneAction::DragNode || m_previousFrameDiwneAction == DIWNE::DiwneAction::HoldNode))
+    {
+        shiftDragedOrHoldNodeToEnd();
+    }
 
 	//checkQueryContextMenus();
 
@@ -771,47 +685,56 @@ void WorkspaceWindow::render()
 //	if (ImGui::IsMouseClicked(1)) /* right button */ { m_rightClickPosition = ImGui::GetMousePos(); }
 //}
 //
-//void WorkspaceWindow::shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift)
-//{
-//	for (int i = 0; i < nodesToShift.size(); i++)
-//	{
-//		coreNodeIter ith_selected_node =
-//				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-//										 [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
-//											 return node->getId() == nodesToShift.at(i)->getId();
-//										 });
-//
-//		if (ith_selected_node != m_workspaceCoreNodes.end())
-//		{
-//			std::iter_swap(m_workspaceCoreNodes.begin() + i, ith_selected_node);
-//		}
-//	}
-//}
-//
-//void WorkspaceWindow::shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift)
-//{
-//	for (int i = 0; i < nodesToShift.size(); i++)
-//	{
-//		coreNodeIter ith_selected_node =
-//				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-//										 [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
-//											 return node->getId() == nodesToShift.at(i)->getId();
-//										 });
-//
-//		if (ith_selected_node != m_workspaceCoreNodes.end())
-//		{
-//			std::iter_swap(m_workspaceCoreNodes.end() - 1 - i, ith_selected_node);
-//		}
-//	}
-//}
-//
-///* \todo JH not used now (with change in NodeEditor) - not work yet in all cases - should avoid capturing actions in bottom nodes when overlaping ( https://github.com/thedmd/imgui-node-editor/issues/81 ) */
-//void WorkspaceWindow::shiftSelectedNodesToFront()
-//{
-//	if (ne::HasSelectionChanged()) { shiftNodesToFront(getSelectedWorkspaceCoreNodes()); }
-//}
-//
-//
+void WorkspaceWindow::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
+{
+	for (int i = 0; i < nodesToShift.size(); i++)
+	{
+		coreNodeIter ith_selected_node =
+				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+										 [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+											 return node->getId() == nodesToShift.at(i)->getId();
+										 });
+
+		if (ith_selected_node != m_workspaceCoreNodes.end())
+		{
+			std::iter_swap(m_workspaceCoreNodes.begin() + i, ith_selected_node);
+		}
+	}
+}
+
+void WorkspaceWindow::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
+{
+	for (int i = 0; i < nodesToShift.size(); i++)
+	{
+		coreNodeIter ith_selected_node =
+				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+										 [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+											 return node->getId() == nodesToShift.at(i)->getId();
+										 });
+
+		if (ith_selected_node != m_workspaceCoreNodes.end())
+		{
+			std::iter_swap(m_workspaceCoreNodes.end() - 1 - i, ith_selected_node);
+		}
+	}
+}
+
+void WorkspaceWindow::shiftDragedOrHoldNodeToEnd()
+{
+    if(m_draged_hold_node != nullptr)
+    {
+        coreNodeIter draged_node_it =
+				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+										 [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+											 return node->getId() == this->m_draged_hold_node->getId();
+										 });
+
+		if (draged_node_it != m_workspaceCoreNodes.end())
+		{
+			std::iter_swap(m_workspaceCoreNodes.end() - 1, draged_node_it);
+		}
+    }
+}
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::getSelectedNodes()
 {

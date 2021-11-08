@@ -87,7 +87,11 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
         if (!inner_interaction_happen)
         {
-            if (ImGui::IsItemClicked(0)) { m_isHeld = true; }
+            if (ImGui::IsItemClicked(0)) {
+                m_isHeld = true;
+                diwne.setDiwneAction(DiwneAction::HoldNode);
+                diwne.m_draged_hold_node = shared_from_this();
+            }
 
             if (m_isHeld) /* be aware of same button for clicked and dragging and released*/
             {
@@ -96,7 +100,6 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                 {
                     translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
                     m_translated = true;
-                    diwne.m_draged_node = shared_from_this();
                     diwne.setDiwneAction(DiwneAction::DragNode);
                 }
 
@@ -105,7 +108,7 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                     if (m_translated)
                     {
                             m_translated = false;
-                            diwne.m_draged_node = nullptr;
+                            diwne.m_draged_hold_node = nullptr;
                             diwne.setDiwneAction(DiwneAction::None);
                     }
                     else {m_selected = !m_selected; diwne.setNodesSelectionChanged(true);}
