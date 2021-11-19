@@ -10,12 +10,6 @@ using namespace Core;
 
 std::vector<Ptr<Cycle>> GraphManager::m_cycles;
 
-void tryToDoSequenceProcedure(Ptr<Node> node)
-{
-	if (isSequence(node))
-		node->as<Sequence>()->updatePins();
-}
-
 ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 {
 	auto lhs = input->m_master;
@@ -30,6 +24,7 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 																	 unsigned fromIndex, unsigned myIndex)
 {
+	/// \todo #48 - sequence->getInputPin()[0].owner != sequence.
 	Debug::Assert(rightNode->getInputPins().size() > myIndex, "Node {} does not have input pin with index {}!",
 								rightNode->getSig(), myIndex);
 	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",

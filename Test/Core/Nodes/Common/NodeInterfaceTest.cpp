@@ -105,7 +105,7 @@ TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 
 	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
 
-	EXPECT_EQ(expectedOperation->keyWord, scale->getOperation()->keyWord);
+	EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
 }
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)

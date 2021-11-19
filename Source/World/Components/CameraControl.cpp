@@ -1,11 +1,14 @@
+#include <iostream>
+#include <typeinfo>
+
+#include "Core/API.h"
+
 #include "CameraControl.h"
 #include "../Component.h"
 #include "../Transforms.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
-#include <iostream>
-#include <typeinfo>
 
 const char* CameraControl::s_type = NULL;
 
@@ -16,7 +19,9 @@ CameraControl::CameraControl()
 }
 void CameraControl::update()
 {
-	if (!InputManager::isFocused<UI::Viewport>())
+	/// \todo MH
+	// if (!InputManager::isFocused<UI::Viewport>())
+	if (!InputManager::isInputActive(I3T::getUI()->getWindowPtr<UI::Viewport>()->getInputPtr()))
 		return;
 
 	float x = InputManager::m_mouseXDelta / 8.0f;

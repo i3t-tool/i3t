@@ -1,4 +1,5 @@
 #include "MainMenuBar.h"
+#include <State/DumpVisitor.h>
 
 #include "imgui.h"
 
@@ -15,11 +16,22 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/Scripting.h"
+#include "State/DumpVisitor.h"
 #include "State/Manager.h"
 #include "Windows/StartWindow.h"
 // #include "RecentFiles.h"
 
 using namespace UI;
+
+bool sceneDialog(std::string& result, const std::string& title)
+{
+	std::string root = Config::getAbsolutePath("./");
+	std::vector<std::string> filter;
+	filter.push_back("I3T scene files");
+	filter.push_back("*.scene");
+
+	return SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
+}
 
 MainMenuBar::MainMenuBar()
 {
@@ -78,26 +90,21 @@ void MainMenuBar::showFileMenu()
 
 		if (ImGui::MenuItem("Open"))
 		{
-			std::string result;
-			std::string title = "Open I3T script...";
-			std::string root = Config::getAbsolutePath("./");
-			std::vector<std::string> filter;
-			filter.push_back("C source files");
-			filter.push_back("*.c");
-			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
-
-			auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-			if (!result.empty())
+			std::string sceneFile;
+			bool hasFile = sceneDialog(sceneFile, "Open I3T scene");
+			if (hasFile)
 			{
-				if (ww != NULL)
+				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
+				if (ww)
 				{
 					ww->m_workspaceCoreNodes.clear();
-					loadWorkspace(result.c_str());
+					auto sceneData = loadSceneFromFile(sceneFile);
+
+					ww->m_workspaceCoreNodes.insert(
+							sceneData.nodes.end(), std::begin(sceneData.nodes), std::end(sceneData.nodes));
 				}
 				else
-				{
-					fprintf(stderr, "Open failed:WorkspaceWindow not found\n");
-				}
+					Log::fatal("Open failed: WorkspaceWindow is not loaded.");
 			}
 		}
 
@@ -128,30 +135,20 @@ void MainMenuBar::showFileMenu()
 
 		if (ImGui::MenuItem("Save"))
 		{
-			/// \todo SaveFileDialog, scene name
+			/// \todo MH SaveFileDialog, scene name
 		}
 
 		if (ImGui::MenuItem("Save As"))
 		{
-			std::string result;
-			std::string title = "Save I3T script...";
-			std::string root = Config::getAbsolutePath("./");
-			std::vector<std::string> filter;
-			filter.push_back("C source files");
-			filter.push_back("*.c");
-			bool b = SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
-
-      auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-			if (!result.empty())
+			std::string filename;
+			bool hasFilename = sceneDialog(filename, "Save I3T scene");
+			if (hasFilename)
 			{
-				if (ww != NULL)
-				{
-					saveWorkspace(result.c_str(), &ww->m_workspaceCoreNodes);
-				}
+				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
+				if (ww)
+					saveScene(filename, SceneData{ ww->m_workspaceCoreNodes });
 				else
-				{
-					fprintf(stderr, "Save failed:WorkspaceWindow not found\n");
-				}
+					Log::fatal("Save failed: WorkspaceWindow is not loaded.");
 			}
 		}
 		ImGui::Separator();

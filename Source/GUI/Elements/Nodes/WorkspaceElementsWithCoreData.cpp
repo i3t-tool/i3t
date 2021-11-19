@@ -665,10 +665,10 @@ bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
-    float valueOfChange;
     WorkspaceNodeWithCoreData &node = getNode();
+	float valueOfChange = node.getNodebase()->getData().getFloat();
 
-    interaction_happen = drawDataFloat(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
+	interaction_happen = drawDataFloat(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getFloatPopupMode(),
                                     node.getNodebase()->getData().getFloat(), node.getNodebase()->getDataMapRef(),
                                     node.getDataItemsWidth(diwne), valueChanged, valueOfChange );
 

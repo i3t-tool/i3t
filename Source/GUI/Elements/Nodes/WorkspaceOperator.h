@@ -89,9 +89,16 @@ public:
         setDataItemsWidth();
     }
 
+	//===-- Double dispatch ---------------------------------------------------===//
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()));
+	}
+	//===----------------------------------------------------------------------===//
+
 	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceInputs;
 	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceOutputs;
-    std::vector<Ptr<WorkspaceCorePin>> const& getInputs() const {return m_workspaceInputs;};
+  std::vector<Ptr<WorkspaceCorePin>> const& getInputs() const {return m_workspaceInputs;};
 	std::vector<Ptr<WorkspaceCorePin>> const& getOutputs() const {return m_workspaceOutputs;};
 
     virtual bool leftContent(DIWNE::Diwne &diwne)

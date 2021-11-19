@@ -7,13 +7,14 @@
 
 #include "Core/Nodes/Cycle.h"
 #include "Core/Nodes/GraphManager.h"
+#include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
 
 /// Base format string for node.
 constexpr const char* g_baseFormatString = "  - id: {}\n"
 																					 "    type: {}\n"
-																					 "    position: [0.0, 0.0]\n";
+																					 "    position: [{}, {}]\n";
 
 std::string dumpValue(EValueType value, const Core::NodePtr& node)
 {
@@ -62,17 +63,22 @@ std::string dumpEdge(const Core::Pin& pin)
 										 pin.getIndex());
 }
 
-std::string dumpTransformIds(const Core::SequencePtr& sequence)
+std::string dumpTransformIds(const Ptr<GuiSequence>& sequence)
 {
 	std::vector<std::string> transformIds;
-	for (const auto& transform : sequence->getMatrices()) { transformIds.push_back(std::to_string(transform->getId())); }
+	auto& transforms = sequence->getNodebase()->as<Core::Sequence>()->getMatrices();
+
+	for (const auto& transform : transforms) { transformIds.push_back(std::to_string(transform->getId())); }
 	return "[" + Utils::concat(transformIds, ", ") + "]";
 }
 
 std::string dumpCycle(const Core::Cycle& cycle) { return fmt::format(""); }
 
-NodeData dumpCamera(const Core::CameraPtr& camera)
+NodeData dumpCamera(const Ptr<GuiCamera>& camera)
 {
+	return NodeData{};
+
+	/*
 	static std::string formatString = std::string(g_baseFormatString) +
 			"    proj_transforms: {}\n"
 			"    view_transforms: {}\n";
@@ -88,16 +94,21 @@ NodeData dumpCamera(const Core::CameraPtr& camera)
 		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
 	}
 	return data;
+	 */
 }
 
-NodeData dumpSequence(const Core::SequencePtr& sequence)
+NodeData dumpSequence(const Ptr<GuiSequence>& guiSequence)
 {
+	auto sequence = guiSequence->getNodebase()->as<Core::Sequence>();
+
 	static std::string formatString = std::string(g_baseFormatString) + "    transforms: {}\n";
 
-	std::string transforms = dumpTransformIds(sequence);
+	std::string transforms = dumpTransformIds(guiSequence);
 
 	NodeData data;
-	data.node = fmt::format(formatString, sequence->getId(), sequence->getOperation()->keyWord, transforms);
+	data.node = fmt::format(formatString, sequence->getId(), sequence->getOperation()->keyWord,
+													guiSequence->getNodePositionDiwne().x, guiSequence->getNodePositionDiwne().y,
+													transforms);
 	for (const auto& in : sequence->getInputPins())
 	{
 		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
@@ -109,19 +120,22 @@ NodeData dumpSequence(const Core::SequencePtr& sequence)
  * \param node
  * \return Nested block in YAML format.
  */
-NodeData dumpOperator(const Core::NodePtr& node)
+NodeData dumpOperator(Ptr<NodeClass> guiNode)
 {
+	auto node = guiNode->getNodebase();
+
 #ifdef I3T_DEBUG
 	auto operatorType = magic_enum::enum_cast<ENodeType>(node->getOperation()->keyWord);
-	I3T_ASSERT(operatorType.has_value());
+	I3T_ASSERT(operatorType.has_value() && "Not an operator class.");
 #endif
 
 	/// \todo MH consider multiple editable inputs for operator.
 	static std::string formatString = std::string(g_baseFormatString) + "    value: {}\n";
 
 	NodeData data;
-	data.node = fmt::format(formatString, node->getId(), node->getOperation()->keyWord,
-													dumpValue(node->getOutPin(0).getType(), node));
+	data.node = fmt::format(formatString, node->getId(), node->getOperation()->keyWord,            // id and type
+													guiNode->getNodePositionDiwne().x, guiNode->getNodePositionDiwne().y,  // position
+													dumpValue(node->getOutPin(0).getType(), node));                        // value
 
 	for (const auto& in : node->getInputPins())
 	{
@@ -131,8 +145,10 @@ NodeData dumpOperator(const Core::NodePtr& node)
 	return data;
 }
 
-std::optional<NodeData> dumpTransform(const Core::TransformPtr& transform)
+std::optional<NodeData> dumpTransform(Ptr<TransformClass> guiTransform)
 {
+	auto transform = guiTransform->getNodebase()->as<Core::Transformation>();
+
 	static std::string formatString = std::string(g_baseFormatString) +
 			"    value: {}\n"
 			"    synergies: {}\n"
@@ -142,7 +158,9 @@ std::optional<NodeData> dumpTransform(const Core::TransformPtr& transform)
 
 	NodeData data;
 	data.node = fmt::format(formatString, transform->getId(), transform->getOperation()->keyWord,
-													dumpValue(EValueType::Matrix, transform), transform->hasSynergies(), transform->isLocked());
+													guiTransform->getNodePositionDiwne().x, guiTransform->getNodePositionDiwne().y,  // position
+													dumpValue(EValueType::Matrix, transform),
+													transform->hasSynergies(), transform->isLocked());
 
 	auto				defaultValues = transform->getDefaultValues();
 	const auto& expectedKeys	= Core::getTransformDefaults(transform->getOperation()->keyWord);
@@ -188,12 +206,13 @@ std::string SceneRawData::toString() const
 	return result;
 }
 
-std::map<std::string_view, std::function<Core::NodePtr()>> createFns;
+std::map<std::string_view, std::function<Ptr<NodeClass>()>> createFns;
 
 template <int N, int Max>
 void do_for()
 {
-	Core::GraphManager::createNode<static_cast<ENodeType>(N)>();
+	// Core::GraphManager::createNode<static_cast<ENodeType>(N)>();
+
 
 	if constexpr (N < Max) { do_for<N + 1, Max>(); }
 }
@@ -216,49 +235,47 @@ DumpVisitor::DumpVisitor()
 	}
 }
 
-std::string DumpVisitor::dump(const std::vector<NodeClass>& nodes)
+std::string DumpVisitor::dump(const std::vector<Ptr<NodeClass>>& nodes)
 {
 	m_sceneData.clear();
 
 	for (const auto& node : nodes)
 	{
-		node->getNodebase()->accept(*this); // calls visit(node) and populates m_result variable.
+		node->accept(*this); // calls visit(node) and populates m_result variable.
 	}
 
 	return m_sceneData.toString();
 }
 
-void DumpVisitor::visit(const Core::NodePtr& node)
+void DumpVisitor::visit(const Ptr<GuiCamera>& node)
 {
-	if (Core::isSequence(node))
-	{
-		// Dump sequence and its transforms.
-		m_sceneData.addSequence(dumpSequence(node->as<Core::Sequence>()));
-		for (const auto& transform : node->as<Core::Sequence>()->getMatrices())
-		{
-			auto result = dumpTransform(transform);
+	// Dump camera sequences.
+	m_sceneData.addCamera(dumpCamera(node));
+}
 
-			if (result.has_value()) m_sceneData.addTransform(*result);
-		}
-	}
-	else if (node->getOperation() == &Core::g_CycleProperties)
-	{}
-	else if (node->getOperation() == &Core::g_cameraProperties)
-	{
-		// Dump camera sequences.
-		m_sceneData.addCamera(dumpCamera(node->as<Core::Camera>()));
-	}
-	else if (Core::isTransform(node))
-	{
-		// Dump orphaned transform.
-		auto result = dumpTransform(node->as<Core::Transformation>());
+void DumpVisitor::visit(const Ptr<GuiCycle>& node)
+{
 
-		if (result.has_value()) m_sceneData.addTransform(*result);
-	}
-	else if (Core::isOperator(node))
-	{
-		m_sceneData.addOperator(dumpOperator(node));
-	}
+}
+
+void DumpVisitor::visit(const Ptr<GuiOperator>& guiNode)
+{
+	auto node = guiNode->getNodebase();
+	m_sceneData.addOperator(dumpOperator(guiNode));
+}
+
+void DumpVisitor::visit(const Ptr<GuiSequence>& node)
+{
+	// Dump sequence and its transforms.
+	m_sceneData.addSequence(dumpSequence(node));
+}
+
+void DumpVisitor::visit(const Ptr<GuiTransform>& node)
+{
+	// Dump orphaned transform.
+	auto result = dumpTransform(node);
+
+	if (result.has_value()) m_sceneData.addTransform(*result);
 }
 
 bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
@@ -266,7 +283,7 @@ bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators
 /**
  * \return nullptr if node can't be created.
  */
-Core::NodePtr createOperator(YAML::Node& node)
+Ptr<NodeClass> createOperator(YAML::Node& node)
 {
 	if (node["type"])
 	{
@@ -294,10 +311,10 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene)
 			auto lhsPin = edge[1].as<unsigned int>();
 			auto rhsPin = edge[3].as<unsigned int>();
 
-			auto plugResult = Core::GraphManager::plug(lhs, rhs, lhsPin, rhsPin);
+			auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
 			if (plugResult != ENodePlugResult::Ok)
 			{
-				Log::info("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getSig(), rhs->getSig(), lhsPin, rhsPin);
+				Log::info("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSig(), rhs->getNodebase()->getSig(), lhsPin, rhsPin);
 			}
 		}
 	}
@@ -316,11 +333,34 @@ SceneData loadScene(const std::string& rawScene)
 		{
 			auto opNode = operators[i];
 			auto op			= createOperator(opNode);
-			if (op) scene.operators.push_back(op);
+			if (op) scene.nodes.push_back(op);
 		}
 
 		// Connect all nodes.
 		connectNodes(sceneData, scene);
 	}
 	return scene;
+}
+
+SceneData loadSceneFromFile(const std::string& sceneFile)
+{
+	std::ifstream f(sceneFile);
+	std::string rawScene;
+	if (f)
+	{
+		std::ostringstream ss;
+		ss << f.rdbuf(); // reading data
+		rawScene = ss.str();
+	}
+	return loadScene(rawScene);
+}
+
+bool saveScene(const std::string& filename, const SceneData& scene)
+{
+	DumpVisitor visitor;
+	std::string rawState = visitor.dump(scene.nodes);
+	std::ofstream f(filename + ".scene");
+	f << rawState;
+
+	return true;
 }

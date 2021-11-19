@@ -1,15 +1,24 @@
 #pragma once
+
 #include "WorkspaceElementsWithCoreData.h"
 #include "WorkspaceSequence.h"
 
 #include "Core/Nodes/GraphManager.h"
+
 class WorkspaceCamera : public WorkspaceNodeWithCoreData
 {
 protected:
     Ptr<WorkspaceSequence> m_projection = nullptr;
     Ptr<WorkspaceSequence> m_view = nullptr;
 public:
-    WorkspaceCamera();
+	WorkspaceCamera();
+
+	//===-- Double dispatch ---------------------------------------------------===//
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+	}
+	//===----------------------------------------------------------------------===//
 
     bool isCamera();
 

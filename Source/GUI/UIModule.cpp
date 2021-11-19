@@ -19,6 +19,7 @@
 #include "Loader/ThemeLoader.h"
 #include "Logger/Logger.h"
 #include "State/DumpVisitor.h"
+#include "State/Manager.h"
 #include "Utils/Filesystem.h"
 
 using namespace UI;
@@ -151,7 +152,7 @@ void UIModule::setState(const Memento& memento)
 	auto& rawScene = memento.getSnapshot().front();
 
 	auto sceneData = loadScene(rawScene);
-	for (auto& op : sceneData.operators)
+	for (auto& op : sceneData.nodes)
 	{
 		nodes.push_back(op);
 	}

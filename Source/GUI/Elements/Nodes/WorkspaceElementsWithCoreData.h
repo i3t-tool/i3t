@@ -1,11 +1,14 @@
 #pragma once
 
+#include <string>
+
+#include "spdlog/fmt/fmt.h"
+
 #include "WorkspaceElements.h"
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
-
-#include <string>
 #include "Core/Input/InputManager.h"
-#include "spdlog/fmt/fmt.h"
+
+#include "State/NodeVisitor.h"
 
 #include <World/Components/Camera.h>
 #include <World/Components/Renderer.h>
@@ -27,23 +30,25 @@ typedef std::function<float()> getter_function_pointer;
 typedef std::function<ValueSetResult(float)> setter_function_pointer;
 
 
-
-class WorkspaceNodeWithCoreData : public WorkspaceNode
+class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 {
 protected:
 	int     m_numberOfVisibleDecimal;
 	float   m_dataItemsWidth;
 	float   m_inactiveMark;
-    FloatPopupMode m_floatPopupMode;
-    WorkspaceLevelOfDetail m_levelOfDetail;
+	FloatPopupMode m_floatPopupMode;
+	WorkspaceLevelOfDetail m_levelOfDetail;
 
-    Ptr<Core::NodeBase> const m_nodebase; /*! \brief reference to Core
-                                                WorkspaceNodeWithCoreData is owner
-                                           */
+	/**
+	 * \brief reference to Core
+	 *
+	 * WorkspaceNodeWithCoreData is owner
+	 */
+	Ptr<Core::NodeBase> const m_nodebase;
+
 public:
-
 	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase);
-	~WorkspaceNodeWithCoreData();
+	~WorkspaceNodeWithCoreData() override;
 
 	Ptr<Core::NodeBase> const getNodebase() const;
 
@@ -53,7 +58,7 @@ public:
 	virtual bool isTrackball();
 	virtual bool isQuatToFloatVec();
 	virtual bool isQuatToAngleAxis();
-	bool            isTransformation();
+	bool         isTransformation();
 
 	int getNumberOfVisibleDecimal();
 	int setNumberOfVisibleDecimal(int value);
@@ -73,7 +78,6 @@ public:
 	Core::Transform::DataMap const* getDataMap();
 
 	bool drawDataLabel(DIWNE::Diwne &diwne);
-
 
 	/* DIWNE function */
     virtual bool topContent(DIWNE::Diwne &diwne);

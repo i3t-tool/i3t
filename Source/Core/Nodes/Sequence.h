@@ -11,16 +11,16 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
-inline constexpr size_t I3T_SEQ_IN_MUL = 0;
-inline constexpr size_t I3T_SEQ_IN_MAT = 1;
+inline constexpr size_t I3T_SEQ_IN_MUL = 0;  // owned by multiplier
+inline constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
 
-inline constexpr size_t I3T_SEQ_OUT_MUL = 0;
-inline constexpr size_t I3T_SEQ_OUT_MAT = 1;
-inline constexpr size_t I3T_SEQ_OUT_MOD = 2;
+inline constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
+inline constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
+inline constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by storage
 
 inline constexpr size_t I3T_SEQ_MUL = 0;
-inline constexpr size_t I3T_SEQ_MAT = 1;
-inline constexpr size_t I3T_SEQ_MOD = 2;
+inline constexpr size_t I3T_SEQ_MAT = 1;  // local transform
+inline constexpr size_t I3T_SEQ_MOD = 2;  // world transform
 
 /**
  * Sequence of matrices.
@@ -61,6 +61,10 @@ class Sequence : public NodeBase
 		Ptr<Transformation> popMatrix(const int index);
 		void swap(int from, int to);
 
+		/**
+		 * Updates local transform.
+		 * @param inputIndex
+		 */
 		void updateValues(int inputIndex) override;
 	};
 
@@ -77,6 +81,10 @@ class Sequence : public NodeBase
 		Pin& getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
 
+		/**
+		 * Updates mul. output and world transform.
+		 * @param inputIndex
+		 */
 		void updateValues(int inputIndex) override;
 	};
 
@@ -132,12 +140,6 @@ public:
 	[[nodiscard]] Ptr<Transformation> popMatrix(const int index) { return m_storage->popMatrix(index); }
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
-
-	/**
-	 * Keep storage and multipliers pins at same state as sequences pins are.
-	 */
-	void updatePins();
-	void resetInputPin(std::vector<Pin*>& outputsOfPin, Pin* newInput);
 
 	void updateValues(int inputIndex) override;
 

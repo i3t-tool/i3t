@@ -3,11 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "Core/Nodes/NodeVisitor.h"
-
+#include "State/NodeVisitor.h"
 #include "State/SceneData.h"
 
-class DumpVisitor : public Core::NodeVisitor
+class DumpVisitor : public NodeVisitor
 {
 public:
 	DumpVisitor();
@@ -30,14 +29,18 @@ public:
 	 *   - [1, 0, 4, 0]
 	 * \endcode
 	 */
-	std::string dump(const std::vector<NodeClass>& nodes);
+	std::string dump(const std::vector<Ptr<NodeClass>>& nodes);
 
 private:
 	/**
 	 * Visit node and save its data to m_visitedNodesData member variable.
 	 * \param node
 	 */
-	void visit(const Core::NodePtr& node) override;
+	void visit(const Ptr<GuiCamera>& node) override;
+	void visit(const Ptr<GuiCycle>& node) override;
+	void visit(const Ptr<GuiOperator> &node) override;
+	void visit(const Ptr<GuiSequence> &node) override;
+	void visit(const Ptr<GuiTransform> &node) override;
 
 	/// Stores last scene representation.
 	SceneRawData m_sceneData;
@@ -45,4 +48,8 @@ private:
 	static bool m_isInitialized;
 };
 
-SceneData load(const std::string& rawScene);
+/// \todo MH move somewhere else.
+SceneData loadScene(const std::string& rawScene);
+
+SceneData loadSceneFromFile(const std::string& sceneFile);
+bool saveScene(const std::string& filename, const SceneData& scene);

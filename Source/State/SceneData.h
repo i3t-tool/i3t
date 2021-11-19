@@ -1,16 +1,20 @@
 #pragma once
 
 #include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
+#include "GUI/Elements/Nodes/WorkspaceTransformation.h"
 
-/// \todo MH Rename this file.
-using NodeClass = std::shared_ptr<WorkspaceNodeWithCoreData>;
+/// GUI nodes
+using NodeClass      = WorkspaceNodeWithCoreData;
+using TransformClass = WorkspaceTransformation;
 
+/// Node data as string
 struct NodeData
 {
 	std::string node;
 	std::vector<std::string> edges;
 };
 
+/// Whole scene in text format.
 class SceneRawData
 {
 public:
@@ -59,18 +63,14 @@ private:
 
 struct SceneData
 {
-	std::vector<Core::NodePtr> operators;
-	std::vector<Core::TransformPtr> transforms;
+	std::vector<Ptr<NodeClass>> nodes;
 
-	Core::NodePtr findNode(Core::ID id)
+	Ptr<NodeClass> findNode(Core::ID id)
 	{
-		for (auto& node : operators)
-		{
+		for (auto& node : nodes)
 			if (node->getId() == id)
-			{
 				return node;
-			}
-		}
+
 		return nullptr;
 	}
 };

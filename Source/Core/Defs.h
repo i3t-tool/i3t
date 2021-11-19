@@ -20,6 +20,8 @@ namespace fs = std::filesystem;
 
 constexpr const size_t MAX_PATH_LENGTH = 4096L;
 
+#define I3T_CONST inline constexpr
+
 /// Inlining macro.
 #ifdef _MSC_VER
 #define FORCE_INLINE __forceinline

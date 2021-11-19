@@ -1,7 +1,6 @@
 #include "Node.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "Core/Nodes/NodeVisitor.h"
 #include "Logger/Logger.h"
 #include "Logger/LoggerInternal.h"
 
@@ -205,8 +204,6 @@ bool NodeBase::areInputsPlugged(int numInputs)
 
 bool NodeBase::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
 
-void NodeBase::accept(NodeVisitor& visitor) { visitor.visit(getPtr()); }
-
 ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 {
     /* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
@@ -332,12 +329,22 @@ Pin::~Pin()
 	generator.returnId(m_id);
 }
 
+const DataStore& Pin::data()
+{
+	if (m_isInput)
+		return m_input->data();
+  else
+	  return m_master->getData(m_index);
+}
+
 const DataStore& Pin::getStorage(unsigned int id)
 {
 	if (m_isInput)
 	{
 		// Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-		return m_input->m_master->getData(id);
+		// return m_input->m_master->getData(id);
+		// Get input data from parent output pin.
+		return m_input->data();
 	}
 	else
 	{

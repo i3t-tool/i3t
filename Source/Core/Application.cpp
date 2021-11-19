@@ -190,7 +190,6 @@ void Application::onSave()
 
 	DumpVisitor visitor;
 	std::string rawState = visitor.dump(nodes);
-
 	Log::info(rawState);
 }
 

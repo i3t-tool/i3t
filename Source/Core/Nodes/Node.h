@@ -426,8 +426,6 @@ protected:
 		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
 	};
 
-	virtual void accept(NodeVisitor& visitor);
-
 protected:
 	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 
@@ -510,6 +508,11 @@ public:
 	 * \return Input pins of connected nodes.
 	 */
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
+
+	/**
+	 * @return Storage which belongs to this pin.
+	 */
+	[[nodiscard]] const DataStore& data();
 
 	/**
 	 * Get stored data based on pin type.
