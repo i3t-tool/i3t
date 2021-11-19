@@ -115,38 +115,55 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWo
 
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
 
+bool WorkspaceSequence::topContent(DIWNE::Diwne &diwne)
+{
+    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
+    return WorkspaceNodeWithCoreData::topContent(diwne);
+}
+
 bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
-    int position_of_dummy_data = -1; /* -1 means not in Sequence */
+    int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
     Ptr<WorkspaceTransformation> dragedNode;
+
+    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
     {
-        diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg())); /* \todo JH Sequence background from settings*/
-
         ImGui::TextUnformatted(m_middleLabel.c_str());
         return false;
     }
 
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
-        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_node);
+        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_hold_node);
         if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
             if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
             {
                 moveNodeToWorkspaceWindow(diwne, dragedNode);
             }
-            position_of_dummy_data = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
+            position_of_draged_node_in_sequence = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
+#ifdef WORKSPACE_DEBUG
+            ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence))
+#endif // WORKSPACE_DEBUG
+
         }
     }
 
-    int i = 0, push_index = -1, max = m_workspaceInnerTransformations.size()-1;
+    m_workspaceInnerTransformations.erase(std::remove_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
+                                                          [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return std::dynamic_pointer_cast<WorkspaceTransformation>(node)->getRemoveFromSequence();}
+                                                          ),
+                                            m_workspaceInnerTransformations.end());
+
+    int i = 0, push_index = -1;
     for( auto const & transformation : m_workspaceInnerTransformations )
     {
-        if(position_of_dummy_data == i)
+        if(position_of_draged_node_in_sequence == i)
         {
             ImGui::Dummy(m_sizeOfDummy); /* \todo JH size of dummy from settings */
             ImGui::SameLine();
@@ -161,21 +178,19 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 
         i++;
     }
-    if (position_of_dummy_data == i) /* add dummy after last inner */
+    if ( i == 0 || position_of_draged_node_in_sequence == i ) /* add dummy after last inner or if sequence is empty */
     {
-        ImGui::Dummy(m_sizeOfDummy);
-        if (ImGui::IsMouseReleased(0))
+        ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy : m_sizeOfDummy/2 ); /* smaller dummy if dragged node is not over Sequence */
+        if (ImGui::IsMouseReleased(0) && position_of_draged_node_in_sequence >= 0 )
         {
             push_index = i;
         }
     }
     if (push_index >= 0)
     {
-        if (ImGui::IsMouseReleased(0))
-        {
-            moveNodeToSequence(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
-        }
+        moveNodeToSequence(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
     }
+
 
     return inner_interaction_happen;
 }
@@ -183,6 +198,9 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 bool WorkspaceSequence::leftContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
+    diwne.AddRectFilledDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
     for (auto const& pin : m_workspaceInputs) {
         inner_interaction_happen |= pin->drawPinDiwne(diwne);
         if (pin->isConnected())
@@ -198,6 +216,9 @@ bool WorkspaceSequence::leftContent(DIWNE::Diwne &diwne)
 bool WorkspaceSequence::rightContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
+    diwne.AddRectFilledDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
     for (auto const& pin : m_workspaceOutputs) {
         inner_interaction_happen |= pin->drawPinDiwne(diwne);
     }

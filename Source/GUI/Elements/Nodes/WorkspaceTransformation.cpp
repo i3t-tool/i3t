@@ -24,6 +24,9 @@ bool WorkspaceTransformation::topContent(DIWNE::Diwne &diwne)
 bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
+    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
 	switch (m_levelOfDetail)
 	{
 	case WorkspaceLevelOfDetail::Full:
@@ -110,9 +113,10 @@ bool WorkspaceTransformation::drawDataFull(DIWNE::Diwne &diwne)
      bool valueChanged = false, interaction_happen = false;
      int rowOfChange, columnOfChange;
      float valueOfChange;
-     interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, m_floatPopupMode,
-                                        m_nodebase->getData().getMat4(), m_nodebase->getDataMapRef(),
-                                        getDataItemsWidth(diwne), valueChanged, rowOfChange, columnOfChange, valueOfChange );
+     interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(diwne), m_floatPopupMode,
+                                    m_nodebase->getData().getMat4(), m_nodebase->getDataMapRef(),
+                                    valueChanged, rowOfChange, columnOfChange, valueOfChange );
+
     if (valueChanged)
     {
         m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
@@ -150,7 +154,9 @@ bool WorkspaceTransformation::drawDataSetValues_builder(  DIWNE::Diwne &diwne
 
 		localData = getters[i]();
 
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), actual_value_changed, localData, 1, fmt::format("##{}:ch{}", getId(), i));
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", getId(), i), localData, 1, actual_value_changed);
+
+
 		if (actual_value_changed){
 
             valueChanged = true;

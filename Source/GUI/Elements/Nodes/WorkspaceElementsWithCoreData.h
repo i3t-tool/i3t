@@ -63,7 +63,7 @@ public:
 	int getNumberOfVisibleDecimal();
 	int setNumberOfVisibleDecimal(int value);
 
-	FloatPopupMode getFloatPopupMode() {return m_floatPopupMode;};
+	FloatPopupMode& getFloatPopupMode() {return m_floatPopupMode;};
 	void setFloatPopupMode(FloatPopupMode mode){m_floatPopupMode = mode;};
 
 	virtual int maxLenghtOfData() = 0;
@@ -260,22 +260,22 @@ class WorkspaceCoreInputPinMatrixMul : public WorkspaceCoreInputPin
 
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
-extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, bool& valueChanged, float& value, int const mapValue, std::string const label);
+extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, int const mapValue, bool& valueChanged);
 extern void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& valueSelected);
 
-extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange );
+extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange );
 extern int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
-extern bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec4& valueOfChange);
+extern bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::vec4& valueOfChange);
 extern int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal);
 
-extern bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::vec3& valueOfChange);
+extern bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::vec3& valueOfChange);
 extern int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal);
 
-extern bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, float& valueOfChange);
+extern bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, float& valueOfChange);
 extern int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal);
 
-extern bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDecimals, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, float dataWidth, bool& valueChanged, glm::quat& valueOfChange);
+extern bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::quat& valueOfChange);
 extern int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal);
 
 extern void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node, std::vector<WorkspaceLevelOfDetail> const & levels_of_detail);

@@ -1,5 +1,7 @@
 #include "diwne_include.h"
 
+// #define DIWNE_DEBUG
+
 namespace DIWNE
 {
 
@@ -39,34 +41,11 @@ void Diwne::Begin(const char* imgui_id)
             //ImGui::PushClipRect(m_workAreaScreen.Min, transformFromImGuiToDiwne(m_workAreaScreen.Max)- windowPadding, false);
             //ImGui::PushClipRect(ImVec2(200, 200), ImVec2(800, 800), false);
 
-//            if (m_workAreaZoomDiwne < 1)
-//            {
-//                ImGuiWindow *window = windowDiwne;
-//                while(window)
-//                {
-//                    for(auto& rect : window->DrawList->_ClipRectStack )
-//                    {
-//                        rect = transformFromImGuiToDiwne(rect);
-//                    }
-//                    window->ClipRect = window->DrawList->_ClipRectStack.back();
-//                    window = window->ParentWindow;
-//                }
-//            }
-
-            for(auto& rect : parent_window->DrawList->_ClipRectStack )
-            {
-                ImGui::Text(fmt::format("ParentClipRect: {} _ {} _ {} _ {} ",rect.x, rect.y, rect.z, rect.w).c_str());
-            }
-            for(auto& rect : idl->_ClipRectStack )
-            {
-                ImGui::Text(fmt::format("ClipRect: {} _ {} _ {} _ {} ",rect.x, rect.y, rect.z, rect.w).c_str());
-            }
-
+#ifdef DIWNE_DEBUG
             ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
             ImGui::Text(fmt::format("ParentWindowClipRect: {} _ {} _ {} _ {} ",parent_window->ClipRect.Min.x, parent_window->ClipRect.Min.y, parent_window->ClipRect.Max.x, parent_window->ClipRect.Max.y).c_str());
-
             ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",ImGui::GetCurrentWindow()->ClipRect.Min.x, ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x, ImGui::GetCurrentWindow()->ClipRect.Max.y).c_str());
-
+#endif // DIWNE_DEBUG
 
 
         putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
@@ -87,34 +66,32 @@ void Diwne::Begin(const char* imgui_id)
         }
         m_inner_interaction_happen = false;
 
-        /* debug */
+#ifdef DIWNE_DEBUG
         ImRect workAreaScreen = getWorkAreaScreen();
         ImRect workAreaDiwne = getWorkAreaDiwne();
         ImGui::SetCursorScreenPos(workAreaScreen.Min + ImVec2(0,200));
         ImGui::Text(fmt::format("WADiwne: {}-{}  -  {}-{}\nWAScreen: {}-{}  -  {}-{}", workAreaDiwne.Min.x, workAreaDiwne.Min.y, workAreaDiwne.Max.x, workAreaDiwne.Max.y,
                             workAreaScreen.Min.x, workAreaScreen.Min.y, workAreaScreen.Max.x, workAreaScreen.Max.y).c_str());
         ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
+#endif // DIWNE_DEBUG
 
         setPopupPosition(ImGui::GetIO().MouseClickedPos[1]); /* must be before transformation mouse to Diwne because popup is new independent window */
 //        transformMouseFromImGuiToDiwne();
 
+#ifdef DIWNE_DEBUG
         ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
-
         ImGui::Text(fmt::format("MousePosActual: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
         ImGui::Text(fmt::format("Zoom: {}", m_workAreaZoomDiwne).c_str());
+#endif // DIWNE_DEBUG
 
 }
 
 void Diwne::End()
 {
-    ImDrawList *idl = ImGui::GetWindowDrawList();
-//    for (auto &vertex : idl->VtxBuffer)
-//    {
-//        vertex.pos = transformFromDiwneToImGui(vertex.pos);
-//    }
-
+#ifdef DIWNE_DEBUG
     /* debug - whole child "canvas" */
-    idl->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
+    ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
+#endif // DIWNE_DEBUG
 
     if (m_diwneAction == DiwneAction::NewLink)
     {
@@ -393,23 +370,12 @@ ImVec2 Diwne::workArea2screen(const ImVec2 & point) const
 
 ImVec2 Diwne::diwne2workArea(const ImVec2 & point) const
 {
-//    ImVec2 const shifted = diwne2workArea_noZoom(point);
-//    return ImVec2(shifted.x*m_workAreaZoomDiwne,
-//                  shifted.y*m_workAreaZoomDiwne);
-
-
-        return diwne2workArea_noZoom(point)*m_workAreaZoomDiwne;
-
+    return diwne2workArea_noZoom(point)*m_workAreaZoomDiwne;
 }
 
 ImVec2 Diwne::workArea2diwne(const ImVec2 & point) const
 {
-//    ImVec2 const zoomed = ImVec2(point.x/m_workAreaZoomDiwne, point.y/m_workAreaZoomDiwne);
-//    return workArea2diwne_noZoom(zoomed);
-
-
-        return workArea2diwne_noZoom(point/m_workAreaZoomDiwne);
-
+    return workArea2diwne_noZoom(point/m_workAreaZoomDiwne);
 }
 
 ImVec2 Diwne::screen2diwne(const ImVec2 & point) const
@@ -442,213 +408,16 @@ ImVec2 Diwne::diwne2screen_noZoom(const ImVec2 & point) const
     return workArea2screen(diwne2workArea_noZoom(point));
 }
 
-void Diwne::showPopUpLabel(std::string label, ImColor color)
+void Diwne::showTooltipLabel(std::string label, ImColor color)
 {
     ImGui::BeginTooltip();
 
     ImGui::TextColored(color, label.c_str());
 
     ImGui::EndTooltip();
-
-
-//	const char* label_c = label.c_str();
-//	ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-//	ImVec2 labelSize = ImGui::CalcTextSize(label_c);
-//
-//	ImVec2 padding = ImGui::GetStyle().FramePadding;
-//	ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
-//
-//	ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-//
-//	ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
-//	ImVec2 rectMax = ImGui::GetCursorScreenPos() + labelSize + padding;
-//
-//	ImDrawList* drawList = ImGui::GetWindowDrawList();
-//	drawList->AddRectFilled(rectMin, rectMax, color, labelSize.y * 0.15f); /* \todo JH remove constant here */
-//	ImGui::TextUnformatted(label_c);
 }
 
 
-//
-///* \todo JH make one popupDiwne function that take other (content) function as argument - content function is variadic  */
-//bool Diwne::popupFloatDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring, float& selectedValue, bool& valueSelected )
-//{
-//    bool interaction_happen = false;
-//    valueSelected = false;
-//
-//    ImGui::SetNextWindowPos(diwne.getPopupPosition());
-//    if (ImGui::BeginPopupContextItem(popupIDstring.c_str()))
-//	{
-//	    interaction_happen = true;
-//	    /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not from (zoomed) diwne */
-//        diwne.transformMouseFromDiwneToImGui();
-//
-//        popupFloatContent(selectedValue, valueSelected);
-//
-//		ImGui::EndPopup();
-//	}
-//	return interaction_happen;
-//
-//}
-//
-//void Diwne::popupFloatContent(float& selectedValue, bool& valueSelected)
-//{
-//    ImGui::Text("Set value...                ");
-//    ImGui::Separator();
-//
-//    if (ImGui::RadioButton("Radians", m_floatPopupMode == FloatPopupMode::Radians)){m_floatPopupMode = FloatPopupMode::Radians;} ImGui::SameLine();
-//    if (ImGui::RadioButton("Degrees", m_floatPopupMode == FloatPopupMode::Degree)){m_floatPopupMode = FloatPopupMode::Degree;}
-//
-//    if (m_floatPopupMode == FloatPopupMode::Radians)
-//    {
-//        ImGui::Columns(2, "floatPopupColumnsRadians", false); // 2-ways, no border
-//
-//        if (ImGui::Selectable("-PI/6"))
-//        {
-//            selectedValue		= -M_PI / 6;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-PI/4"))
-//        {
-//            selectedValue		= -M_PI / 4;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-PI/3"))
-//        {
-//            selectedValue		= -M_PI / 3;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-PI/2"))
-//        {
-//            selectedValue		= -M_PI / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-PI"))
-//        {
-//            selectedValue		= -M_PI;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-3PI/2"))
-//        {
-//            selectedValue		= -3 * M_PI / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-1"))
-//        {
-//            selectedValue		= -1.0f;
-//            valueSelected = true;
-//        }
-//        ImGui::NextColumn();
-//
-//        if (ImGui::Selectable("PI/6"))
-//        {
-//            selectedValue		= M_PI / 6;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("PI/4"))
-//        {
-//            selectedValue		= M_PI / 4;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("PI/3"))
-//        {
-//            selectedValue		= M_PI / 3;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("PI/2"))
-//        {
-//            selectedValue		= M_PI / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("PI"))
-//        {
-//            selectedValue		= M_PI;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("3PI/2"))
-//        {
-//            selectedValue		= -3 * M_PI / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("1"))
-//        {
-//            selectedValue		= 1.0f;
-//            valueSelected = true;
-//        }
-//
-//        ImGui::Columns(1);
-//
-//        if (ImGui::Selectable("0"))
-//        {
-//            selectedValue		= 0.0f;
-//            valueSelected = true;
-//        }
-//    }
-//    else if (m_floatPopupMode == FloatPopupMode::Degree)
-//    {
-//        ImGui::Columns(2, "floatPopupColumnsDegrees", false);
-//        if (ImGui::Selectable("-1/2"))
-//        {
-//            selectedValue		= -1.0f / 2.0f;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-sqrt(2)/2"))
-//        {
-//            selectedValue		= -sqrt(2) / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-sqrt(3)/2"))
-//        {
-//            selectedValue		= -sqrt(3) / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-2"))
-//        {
-//            selectedValue		= -2.0f;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("-1"))
-//        {
-//            selectedValue		= -1.0f;
-//            valueSelected = true;
-//        }
-//
-//        ImGui::NextColumn();
-//
-//        if (ImGui::Selectable("1/2"))
-//        {
-//            selectedValue = 1.0f / 2.0f;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("sqrt(3)/2"))
-//        {
-//            selectedValue		= sqrt(3) / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("sqrt(2)/2"))
-//        {
-//            selectedValue		= sqrt(2) / 2;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("2"))
-//        {
-//            selectedValue		= 2.0f;
-//            valueSelected = true;
-//        }
-//        if (ImGui::Selectable("1"))
-//        {
-//            selectedValue		= 1.0f;
-//            valueSelected = true;
-//        }
-//        ImGui::Columns(1);
-//        if (ImGui::Selectable("0"))
-//        {
-//            selectedValue		= 0.0f;
-//            valueSelected = true;
-//        }
-//
-//    }
-//}
 
 /* >>>> STATIC FUNCTIONS <<<< */
 bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size)
@@ -656,10 +425,6 @@ bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size)
         bool clicked = ImGui::InvisibleButton(imguiID.c_str(), size );
         ImGui::SetItemAllowOverlap(); /* Maybe some investigation if something like button is draw above */
         ImGui::SetCursorScreenPos(ImGui::GetItemRectMin());
-
-        /* debug */
-        if (clicked) ImGui::Text("Background clicked");
-
         return clicked;
 }
 

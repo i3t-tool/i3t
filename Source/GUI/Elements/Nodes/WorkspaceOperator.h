@@ -101,6 +101,15 @@ public:
   std::vector<Ptr<WorkspaceCorePin>> const& getInputs() const {return m_workspaceInputs;};
 	std::vector<Ptr<WorkspaceCorePin>> const& getOutputs() const {return m_workspaceOutputs;};
 
+	virtual bool topContent(DIWNE::Diwne &diwne)
+	{
+	    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
+	    return WorkspaceNodeWithCoreData::topContent(diwne);
+	}
+
+
     virtual bool leftContent(DIWNE::Diwne &diwne)
     {
         bool inner_interaction_happen = false;

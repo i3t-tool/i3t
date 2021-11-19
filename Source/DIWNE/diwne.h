@@ -32,6 +32,7 @@ enum DiwneAction
 {
     None,
     NewLink,
+    HoldNode,
     DragNode
 };
 
@@ -199,9 +200,9 @@ class Diwne
 
         void * m_customData;
 
-        void showPopUpLabel(std::string label, ImColor color);
+        void showTooltipLabel(std::string label, ImColor color);
 
-        std::shared_ptr<DIWNE::Node> m_draged_node; /* \todo JH make protected */
+        std::shared_ptr<DIWNE::Node> m_draged_hold_node; /* \todo JH make protected */
 
 
         void setNodesSelectionChanged(bool value){m_nodesSelectionChanged = value;};

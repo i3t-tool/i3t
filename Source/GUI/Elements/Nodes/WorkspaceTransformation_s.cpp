@@ -80,8 +80,9 @@ bool WorkspaceTransformationQuaternion::drawDataFull(DIWNE::Diwne &diwne)
     bool valueChanged = false, interaction_happen;
     glm::quat localData;
 
-    interaction_happen = drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getFloatPopupMode(), m_nodebase->getData().getQuat(), m_nodebase->getDataMapRef(), getDataItemsWidth(diwne),
-                       valueChanged, localData);
+    interaction_happen = drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getDataItemsWidth(diwne), getFloatPopupMode(),
+                                            m_nodebase->getData().getQuat(), m_nodebase->getDataMapRef(),
+                                            valueChanged, localData);
 
     if (valueChanged)
     {
