@@ -1,32 +1,10 @@
 #include "WorkspaceSequence.h"
 #include "../Windows/WorkspaceWindow.h"
 
-WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/)
-    :   WorkspaceNodeWithCoreData(nodebase)
-{
-        const auto& inputPins   = m_nodebase->getInputPins();
-        const auto& outputPins  = m_nodebase->getOutputPins();
-
-        m_workspaceInputs.reserve(inputPins.size());
-        m_workspaceOutputs.reserve(outputPins.size());
-
-        for (Core::Pin const& pin : inputPins)
-        {
-                m_workspaceInputs.push_back(
-                    std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
-                                                            ,   pin
-                                                            ,   *this));
-
-        }
-
-        for (Core::Pin const& pin : outputPins)
-        {
-            m_workspaceOutputs.push_back(
-                    std::make_unique<WorkspaceCoreOutputPin>(    pin.getId()
-                                                            ,   pin
-                                                            ,   *this));
-        }
-    }
+WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/, bool drawPins/*=true*/)
+    :   WorkspaceNodeWithCoreDataWithPins(nodebase, false)
+    ,   m_drawPins(drawPins)
+{}
 
 bool WorkspaceSequence::isSequence()
 {
@@ -149,7 +127,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
             }
             position_of_draged_node_in_sequence = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
 #ifdef WORKSPACE_DEBUG
-            ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence))
+            ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
 #endif // WORKSPACE_DEBUG
 
         }
@@ -195,35 +173,6 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     return inner_interaction_happen;
 }
 
-bool WorkspaceSequence::leftContent(DIWNE::Diwne &diwne)
-{
-    bool inner_interaction_happen = false;
-    diwne.AddRectFilledDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
-
-    for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawPinDiwne(diwne);
-        if (pin->isConnected())
-        {
-            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
-            WorkspaceCoreLink * lin = &(in->getLink());
-            inner_interaction_happen |= lin->drawLinkDiwne(diwne);
-        }
-    }
-    return inner_interaction_happen;
-}
-
-bool WorkspaceSequence::rightContent(DIWNE::Diwne &diwne)
-{
-    bool inner_interaction_happen = false;
-    diwne.AddRectFilledDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
-
-    for (auto const& pin : m_workspaceOutputs) {
-        inner_interaction_happen |= pin->drawPinDiwne(diwne);
-    }
-    return inner_interaction_happen;
-}
 
 int WorkspaceSequence::maxLenghtOfData()
 {

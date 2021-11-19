@@ -2,13 +2,15 @@
 
 #include "WorkspaceElementsWithCoreData.h"
 
-class WorkspaceModel : public WorkspaceNodeWithCoreData
+class WorkspaceModel : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
   WorkspaceModel();
 
   bool drawDataFull(DIWNE::Diwne& diwne, int index);
-	int maxLenghtOfData(int index);
+	int maxLenghtOfData();
+	bool middleContent(DIWNE::Diwne& diwne);
+	void drawMenuLevelOfDetail();
 
 private:
 	int m_currentModelIdx = 0;

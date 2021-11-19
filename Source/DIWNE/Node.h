@@ -39,7 +39,7 @@ class Node : public std::enable_shared_from_this<Node>
 
         DIWNE::ID const getId() const {return m_idDiwne; };
 
-        void synchronizeSizeRectangles();
+        void updateSizeRectangles();
 
         bool drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere = false);
         bool drawTopDiwne(DIWNE::Diwne &diwne);
@@ -64,8 +64,8 @@ class Node : public std::enable_shared_from_this<Node>
         ImVec2 getNodePositionDiwne() const { return m_nodePosition; };
         void translateNodePositionDiwne(ImVec2 const amount) {m_nodePosition+=amount; };
 
-        ImRect getNodeRectDiwne() { synchronizeSizeRectangles(); return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
-        ImVec2 getNodeRectSizeDiwne() { synchronizeSizeRectangles(); return m_bottomRectDiwne.Max-m_topRectDiwne.Min;};
+        ImRect getNodeRectDiwne() { updateSizeRectangles(); return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
+        ImVec2 getNodeRectSizeDiwne() { updateSizeRectangles(); return m_bottomRectDiwne.Max-m_topRectDiwne.Min;};
 
         bool getSelected() const {return m_selected;};
         void setSelected(bool selected) {m_selected = selected;};
@@ -80,6 +80,14 @@ class Node : public std::enable_shared_from_this<Node>
               , m_middleRectDiwne
               , m_rightRectDiwne
               , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
+
+//        ImRect  m_topRectDiwne_temp
+//              , m_leftRectDiwne_temp
+//              , m_middleRectDiwne_temp
+//              , m_rightRectDiwne_temp
+//              , m_bottomRectDiwne_temp; /*! \brief Rectangle of parts of node in diwne */
+
+        float m_middleDummyWidthForAlign;
 
         bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
         bool m_selected;

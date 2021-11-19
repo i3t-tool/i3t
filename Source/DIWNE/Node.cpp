@@ -10,6 +10,12 @@ Node::Node(DIWNE::ID id) /* FLT_MAX for first frame - draw node anywhere it is a
     , m_middleRectDiwne(ImRect(0,0,0,0))
     , m_rightRectDiwne(ImRect(0,0,0,0))
     , m_bottomRectDiwne(ImRect(0,0,FLT_MAX, FLT_MAX))
+//    , m_topRectDiwne_temp(ImRect(100,100,0,0))
+//    , m_leftRectDiwne_temp(ImRect(0,0,0,0))
+//    , m_middleRectDiwne_temp(ImRect(0,0,0,0))
+//    , m_rightRectDiwne_temp(ImRect(0,0,0,0))
+//    , m_bottomRectDiwne_temp(ImRect(0,0,FLT_MAX, FLT_MAX))
+    , m_middleDummyWidthForAlign(0)
     , m_idDiwne(id)
     , m_selected(false)
     , m_translated(false)
@@ -34,6 +40,8 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
     if (drawHere) setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
     setNodeRectsPositionDiwne(getNodePositionDiwne()*diwne.getWorkAreaZoomDiwne()); /*draw here change location*/
+
+//    m_topRectDiwne_temp.Min = m_topRectDiwne.Max;
 
     ImRect nodeRectDiwne = getNodeRectDiwne();
 
@@ -119,7 +127,7 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
         }
 
-        synchronizeSizeRectangles();
+        updateSizeRectangles();
 
         if (m_selected)
         {
@@ -168,7 +176,9 @@ bool Node::drawTopDiwne(DIWNE::Diwne &diwne)
     ImGui::EndGroup();
 		ImGui::PopID();
 
+//    m_topRectDiwne_temp.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     m_topRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+
     return inner_interaction_happen;
 }
 
@@ -187,8 +197,10 @@ bool Node::drawLeftDiwne(DIWNE::Diwne &diwne)
         ImGui::EndGroup();
 				ImGui::PopID();
 
-        m_leftRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
-        m_leftRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+//        m_leftRectDiwne_temp.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+//        m_leftRectDiwne_temp.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+    m_leftRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+    m_leftRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     return inner_interaction_happen;
 }
 bool Node::drawMiddleDiwne(DIWNE::Diwne &diwne)
@@ -206,9 +218,10 @@ bool Node::drawMiddleDiwne(DIWNE::Diwne &diwne)
         ImGui::EndGroup();
 				ImGui::PopID();
 
+//        m_middleRectDiwne_temp.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+//        m_middleRectDiwne_temp.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
         m_middleRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_middleRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
-
     return inner_interaction_happen;
 }
 bool Node::drawRightDiwne(DIWNE::Diwne &diwne)
@@ -226,9 +239,10 @@ bool Node::drawRightDiwne(DIWNE::Diwne &diwne)
         ImGui::EndGroup();
 				ImGui::PopID();
 
+//        m_rightRectDiwne_temp.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+//        m_rightRectDiwne_temp.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
         m_rightRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_rightRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
-
     return inner_interaction_happen;
 
 }
@@ -247,26 +261,57 @@ bool Node::drawBottomDiwne(DIWNE::Diwne &diwne)
         ImGui::EndGroup();
 				ImGui::PopID();
 
+//        m_bottomRectDiwne_temp.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+//        m_bottomRectDiwne_temp.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
         m_bottomRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_bottomRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
 
     return inner_interaction_happen;
 }
 
-void Node::synchronizeSizeRectangles()
+void Node::updateSizeRectangles()
 {
-    m_bottomRectDiwne.Max.x = std::max(m_topRectDiwne.Max.x, std::max(m_rightRectDiwne.Max.x, m_bottomRectDiwne.Max.x));
+    float topWidth = m_topRectDiwne.GetWidth();
+    float rightWidth = m_rightRectDiwne.GetWidth();
+    float centerWidth = m_leftRectDiwne.GetWidth()+m_middleRectDiwne.GetWidth()+rightWidth;
+    float bottomWidth = m_bottomRectDiwne.GetWidth();
+    float maxWidth = std::max(centerWidth, std::max(topWidth, bottomWidth));
 
-    m_rightRectDiwne.Min.x += (m_bottomRectDiwne.Max.x - m_rightRectDiwne.Max.x); /* shift right content to the most right place */
-    m_rightRectDiwne.Max.x = m_bottomRectDiwne.Max.x;
-    m_rightRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
-
-    m_middleRectDiwne.Max.x = m_rightRectDiwne.Min.x;
-    m_middleRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
+    m_topRectDiwne.Max.x = m_topRectDiwne.Min.x + maxWidth;
 
     m_leftRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
 
-    m_topRectDiwne.Max.x = m_bottomRectDiwne.Max.x;
+    m_middleDummyWidthForAlign = maxWidth - centerWidth; /* how much shift right content for right-align */
+    m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth; /* top.max.x is most right point here */
+    m_middleRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
+
+    m_rightRectDiwne.Min.x = m_middleRectDiwne.Max.x; /* shift right content to the most right place */
+    m_rightRectDiwne.Max.x = m_topRectDiwne.Max.x;
+    m_rightRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
+
+    m_bottomRectDiwne.Max.x = m_topRectDiwne.Max.x;
+
+
+//    m_topRectDiwne.Min = m_topRectDiwne_temp.Min;
+//    m_topRectDiwne.Max.y = m_topRectDiwne_temp.Max.y;
+//    m_topRectDiwne.Max.x = std::max(m_topRectDiwne_temp.Max.x, std::max(m_rightRectDiwne_temp.Max.x, m_bottomRectDiwne_temp.Max.x)); /* compute most right point */
+//
+//    m_leftRectDiwne.Min = m_leftRectDiwne_temp.Min;
+//    m_leftRectDiwne.Max.x = m_leftRectDiwne_temp.Max.x;
+//    m_leftRectDiwne.Max.y = m_bottomRectDiwne_temp.Min.y;
+//
+//    m_rightRectDiwne.Min.x += (m_topRectDiwne.Max.x - m_rightRectDiwne_temp.Max.x); /* shift right content to the most right place */
+//    m_rightRectDiwne.Min.y = m_rightRectDiwne_temp.Min.y;
+//    m_rightRectDiwne.Max.x = m_topRectDiwne.Max.x;
+//    m_rightRectDiwne.Max.y = m_bottomRectDiwne_temp.Min.y;
+//
+//    m_middleRectDiwne.Min = m_middleRectDiwne_temp.Min;
+//    m_middleRectDiwne.Max.x = m_rightRectDiwne.Min.x;
+//    m_middleRectDiwne.Max.y = m_bottomRectDiwne_temp.Min.y;
+//
+//    m_bottomRectDiwne.Min = m_bottomRectDiwne_temp.Min;
+//    m_bottomRectDiwne.Max.x = m_topRectDiwne.Max.x;
+//    m_bottomRectDiwne.Max.y = m_bottomRectDiwne_temp.Max.y;
 }
 
 void Node::setNodeRectsPositionDiwne(ImVec2 const& position)

@@ -781,6 +781,170 @@ void WorkspaceCoreLink::updateControlPointsOffsets(){
     setLinkControlpointsOffsetDiwne(ImVec2(offset,0), ImVec2(-offset,0));
 }
 
+WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(Ptr<Core::NodeBase> nodebase, bool showDataOnPins/*=true*/)
+ : WorkspaceNodeWithCoreData(nodebase)
+    , m_showDataOnPins(showDataOnPins)
+{
+    const auto& inputPins   = m_nodebase->getInputPins();
+    const auto& outputPins  = m_nodebase->getOutputPins();
+
+    m_workspaceInputs.reserve(inputPins.size());
+    m_workspaceOutputs.reserve(outputPins.size());
+
+    for (Core::Pin const& pin : inputPins)
+    {
+        switch(pin.getType())
+        {
+            case EValueType::MatrixMul:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinMatrixMul>(    pin.getId()
+//                                                                ,   pin
+//                                                                ,   *this));
+                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
+                                                                ,   pin
+                                                                ,   *this));
+            break;
+//            case EValueType::Vec4:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinVector4>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::Vec3:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinVector3>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::Float:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinFloat>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::Quat:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinQuaternion>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::Pulse:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinPulse>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::MatrixMul:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinMatrixMul>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::Screen:
+//                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPinScreen>( pin.getId()
+//                                                                                            ,   pin
+//                                                                                            ,   *this));
+//                break;
+//            case EValueType::Ptr:
+//                /* Pin with type Ptr have no graphic representation */
+//                break;
+            default:
+                m_workspaceInputs.push_back(std::make_unique<WorkspaceCoreInputPin>(    pin.getId()
+                                                                ,   pin
+                                                                ,   *this));
+                //Debug::Assert(false , "Unknown Pin type while loading input pins from Core to Workspace");
+        }
+    }
+    if (!m_showDataOnPins) /* sequence do not show data in output pins */
+    {
+        for (Core::Pin const& pin : outputPins)
+        {
+            m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPin>( pin.getId()
+                                                                                            ,   pin
+                                                                                            ,   *this));
+        }
+    }else
+    {
+
+        for (Core::Pin const& pin : outputPins)
+        {
+            switch (pin.getType())
+            {
+                case EValueType::Matrix:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrix4x4>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Vec4:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector4>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Vec3:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector3>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Float:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinFloat>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Quat:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinQuaternion>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Pulse:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinPulse>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::MatrixMul:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrixMul>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Screen:
+                    m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinScreen>( pin.getId()
+                                                                                                ,   pin
+                                                                                                ,   *this));
+                    break;
+                case EValueType::Ptr:
+                    /* Pin with type Ptr have no graphic representation */
+                    break;
+                default:
+                    Debug::Assert(false , "Unknown Pin type while loading output pins from Core to Workspace");
+            }
+
+        }
+    }
+
+}
+
+bool WorkspaceNodeWithCoreDataWithPins::leftContent(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    diwne.AddRectFilledDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
+    for (auto const& pin : m_workspaceInputs) {
+        inner_interaction_happen |= pin->drawPinDiwne(diwne);
+        if (pin->isConnected())
+        {
+            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
+            WorkspaceCoreLink * lin = &(in->getLink());
+            inner_interaction_happen |= lin->drawLinkDiwne(diwne);
+        }
+    }
+    return inner_interaction_happen;
+}
+
+bool WorkspaceNodeWithCoreDataWithPins::rightContent(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    diwne.AddRectFilledDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
+    for (auto const& pin : m_workspaceOutputs) {
+        inner_interaction_happen |= pin->drawPinDiwne(diwne);
+    }
+    return inner_interaction_happen;
+}
+
 /* >>>>> STATIC FUNCTIONS <<<<< */
 bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, int const mapValue, bool& valueChanged)
 {
@@ -801,6 +965,10 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
+	style.Colors[ImGuiCol_FrameBg] = I3T::getColor(EColor::FloatBg);
+	style.Colors[ImGuiCol_FrameBgHovered] = I3T::getColor(EColor::FloatBgHovered);
+	style.Colors[ImGuiCol_FrameBgActive] = I3T::getColor(EColor::FloatBgActive);
+
 
 	// \todo JH is it done? make step a configurable constant - same or smaller than dragStep - other way drag is fired when step is not fired...
 	valueChanged = ImGui::DragFloat(
@@ -991,6 +1159,16 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
     }
 }
 
+//void WorkspaceWithPins::loadWorkspacePinsFromCorePins(Core::NodeBase::PinView const & coreInputPins, Core::NodeBase::PinView const & coreOutputPins)
+//{
+//
+//}
+
+void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::NodeBase::PinView const & coreInputPins, Core::NodeBase::PinView const & coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)
+{
+/* when you create new pin type - add it to both, input and output part */
+
+}
 /* \todo JH to docs - valueOfChange will be set to data and than (possibly) changed by user interaction */
 bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange )
 {

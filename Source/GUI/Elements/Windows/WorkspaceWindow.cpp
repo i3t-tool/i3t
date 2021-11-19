@@ -2,8 +2,6 @@
     \brief Drawing and manipulation with Workspace.
 */
 #include "WorkspaceWindow.h"
-#define WORKSPACE_DEBUG 1
-
 
 static DIWNE::SettingsDiwne settingsDiwne;
 
@@ -482,13 +480,13 @@ void WorkspaceWindow::popupBackgroundContent()
 		{
 		    addNodeToPositionOfPopup<WorkspaceSequence>();
 		}
-//		if (ImGui::MenuItem("camera"))
-//		{
-//		    addNodeToPositionOfPopup<WorkspaceCamera>();
-//		}
+		if (ImGui::MenuItem("camera"))
+		{
+		    addNodeToPositionOfPopup<WorkspaceCamera>();
+		}
 		if (ImGui::MenuItem("model"))
 		{
-		    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Model>>();
+		    addNodeToPositionOfPopup<WorkspaceModel>();
 		}
 		if (ImGui::MenuItem("pulse"))
 		{
@@ -574,18 +572,18 @@ void WorkspaceWindow::render()
 
     if(first_frame){
         first_frame = false;
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
-
-
-        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
         //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
 
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(800,200));
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+
+        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
+        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+
+        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceTransformationFree>());
+        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(800,200));
 
 
 
@@ -600,6 +598,26 @@ void WorkspaceWindow::render()
 //        seq->pushNode(trans, 0);
 //        seq->pushNode(trans2, 1);
     }
+
+//    static float value = 0;
+//    static ImVec2 text_position = ImVec2(300, 100);
+//    static bool moving_text = false;
+//
+//    ImGui::SetCursorPos(ImVec2(100, 100));
+//    ImGui::PushItemWidth(50);
+//    ImGui::DragFloat("df", &value);
+//    ImGui::SetItemAllowOverlap();
+//    ImGui::PopItemWidth();
+//
+//    ImGui::SetCursorPos(text_position);
+//    ImGui::Text("This text is Group and drag flat is really DragFloat or Group - in my case. ");
+//    if (ImGui::IsItemClicked(0)) { moving_text = true; }
+//    if (ImGui::IsMouseReleased(0)) { moving_text = false; }
+//    if (moving_text && ImGui::IsMouseDragging(0))
+//    {
+//        text_position.x += ImGui::GetMouseDragDelta(0).x;
+//        ImGui::ResetMouseDragDelta(0);
+//    }
 
 	Begin("DIWNE Workspace");
 #ifdef DIWNE_DEBUG
