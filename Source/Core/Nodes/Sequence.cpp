@@ -29,8 +29,8 @@ Pin& Sequence::Storage::getOut(size_t i)
 /// \todo MH Check if this function should be used.
 DataStore& Sequence::Storage::getInternalData(size_t index)
 {
-	// return m_owner->as<Sequence>()->getInternalData(index);
-	return m_internalData[index];
+	return m_owner->as<Sequence>()->getInternalData(index);
+	// return m_internalData[index];
 }
 
 void Sequence::Storage::updateValues(int inputIndex)

@@ -329,7 +329,7 @@ Pin::~Pin()
 	generator.returnId(m_id);
 }
 
-const DataStore& Pin::data()
+const DataStore& Pin::data() const
 {
 	if (m_isInput)
 		return m_input->data();

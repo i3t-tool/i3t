@@ -30,7 +30,7 @@ namespace Builder
 	}
 
 	/**
- * Create new node.
+ * Create new operator.
  *
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.

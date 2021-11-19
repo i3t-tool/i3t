@@ -512,7 +512,7 @@ public:
 	/**
 	 * @return Storage which belongs to this pin.
 	 */
-	[[nodiscard]] const DataStore& data();
+	[[nodiscard]] const DataStore& data() const;
 
 	/**
 	 * Get stored data based on pin type.

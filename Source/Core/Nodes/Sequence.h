@@ -16,7 +16,7 @@ inline constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
 
 inline constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
 inline constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
-inline constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by storage
+inline constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by multiplier
 
 inline constexpr size_t I3T_SEQ_MUL = 0;
 inline constexpr size_t I3T_SEQ_MAT = 1;  // local transform
