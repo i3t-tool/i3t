@@ -20,6 +20,6 @@ void main(){
 
 	n=(VNmatrix*vec4(norm,0.0)).xyz;
 	//normn=(VNmatrix*vec4(norm,0.0)).xyz;//norm
-	//normn=normalize(normn);  //PF - normal length is shortened during interpolation - must be normaized in FS	
+	//normn=normalize(normn);  //PF - normal length is shortened during the interpolation - must be normalized in FS	
 
 }
