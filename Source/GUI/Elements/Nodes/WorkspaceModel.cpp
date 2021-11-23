@@ -65,7 +65,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	//ImVec2 m_textureSize {2,2};
 
 
-	static float val = 0;
+
 	
 	
 	ImGui::PushItemWidth(50);
