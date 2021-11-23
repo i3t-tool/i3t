@@ -25,15 +25,15 @@ RenderTexture::RenderTexture(GLuint* colorAttachment, int w, int h){
 	/*glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
 	GLenum g=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	switch (g){
-		case GL_FRAMEBUFFER_UNDEFINED:						printf("undefined\n");break;
+		case GL_FRAMEBUFFER_UNDEFINED:									printf("undefined\n");break;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:			printf("incomplete attachment\n");break;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:	printf("missing attachment\n");break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:			printf("incomplete draw buffer\n");break;
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:			printf("incomplete read buffer\n");break;
-		case GL_FRAMEBUFFER_UNSUPPORTED:					printf("unsupported\n");break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:								printf("unsupported\n");break;
 		case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:			printf("incomplete multisample\n");break;
 		case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:		printf("incomplete layer targets\n");break;
-		case GL_FRAMEBUFFER_COMPLETE:						printf("complete\n");break;
+		case GL_FRAMEBUFFER_COMPLETE:										printf("complete\n");break;
 		default:printf("--%d\n",g);break;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);CHECK_GL_ERROR();*/
