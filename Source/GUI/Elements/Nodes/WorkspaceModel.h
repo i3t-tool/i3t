@@ -21,11 +21,15 @@ public:
 	void drawMenuLevelOfDetail();  //todo 
 
 private:
-	GameObject *m_currentModelGameObject = nullptr;  // model associated with this box
-	
-  GLuint m_textureID = 0;        // rendered m_textureID (COLOR_ATTACHMENT0 in m_fbo)
-  ImVec2 m_textureSize = {1,1};
-	Camera *m_camera;              // local camera for model rendering in the box
+	// GameObject models:
+	// todo - add the resource manager for models and textures
+	GameObject *m_sceneModel = nullptr;     // model in the 3D scene (in the hierarchical scene graph)
+	GameObject *m_workspaceModel = nullptr; // model in the workspace (as a preview in the box)
+
+	// variables of the workspace box 
+  GLuint m_textureID = 0;           // rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
+  ImVec2 m_textureSize = {84,100};  // initial render texture size - should be large enough or changed during zoom
+	Camera *m_camera;                 // local camera for model rendering in the box
 
   float val = 0;   // temporary variable for testing
 

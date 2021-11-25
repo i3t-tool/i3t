@@ -1,7 +1,9 @@
 #include "WorkspaceModel.h"
 
 #include "World/HardcodedMeshes.h"
-#include "World/RenderTexture.h"    // FBO 
+#include "World/RenderTexture.h"    // FBO
+
+#undef TEST
 
 const pgr::MeshData* g_meshes[] = {  //todo - remove
 		&unitcubeMesh,
@@ -13,22 +15,24 @@ const char* g_meshesNames[] = {  //todo - remove
 		"axes"
 };
 
+const float angleX = 30.0;  //degree
+const float angleY = 55.0;  //degree
 
 WorkspaceModel::WorkspaceModel()
 	: WorkspaceNodeWithCoreDataWithPins(Core::Builder::createNode<ENodeType::Model>())
 {
 	init();
 	//setDataItemsWidth();
-	//std::cout<<"Model created"<<std::endl;
-	printf("Model created\n");
 }
+
 WorkspaceModel::~WorkspaceModel()
 {
 	// delete model from the World
-	App::get().world()->removeModel(m_currentModelGameObject);
-	//std::cout<<"Model deleted"<<std::endl;
-  printf("Model deleted\n");
+	App::get().world()->removeModel(m_sceneModel);
 
+	// delete local workspace model 
+	if(m_workspaceModel)
+		delete(m_workspaceModel);
 }
 
 //bool WorkspaceModel::drawDataFull(DIWNE::Diwne& diwne, int index)
@@ -47,54 +51,56 @@ WorkspaceModel::~WorkspaceModel()
 void WorkspaceModel::init()
 {
 
-	auto* object = App::get().world()->addModel("CubeGray");
-	m_nodebase->setValue(static_cast<void*>(object));  //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
-	m_currentModelGameObject = object;
+	auto* object = App::get().world()->addModel("CubeGray");   // object added into the scene graph
+	m_sceneModel = object;
 
+	// second object just for preview in this box in the Workspace
+	m_workspaceModel=new GameObject(unitcubeMesh, &World::shader0, World::textures["cube"]);
+  m_workspaceModel->addComponent(new Renderer());
+
+	// nice initial transformation
+	m_workspaceModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
+  m_workspaceModel->rotate(glm::vec3(0,1,0),angleY);
+  m_workspaceModel->rotate(glm::vec3(1,0,0),angleX);
+
+  // pass object pointer to the core 
+	m_nodebase->setValue(static_cast<void*>(object));  //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
 }
+
 
 bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 {
+
+#ifdef TEST
 	ImGui::Text("Nad texturou      ");
 
-	//GLuint texture[2*2];
-	//texture[0] = 0;
-	//texture[1] = 1;
-	//texture[2] = 1;
-	//texture[3] = 0;
-	//ImVec2 m_textureSize {2,2};
-
-
-
-	
-	
 	ImGui::PushItemWidth(50);
 	ImGui::InputFloat("Float:", &val);  //DragFloat("float: ", &val, 0.1f,0.0f, 1.0f);
 	ImGui::PopItemWidth();
-
+#endif
+	
 	// Lazy texture creation
   if(!m_textureID) {
-  	int w = 84;
-  	int h = 104;
-			
-
-  	//RenderTexture::RenderTexture(GLuint* colorAttachment, int w, int h
-		renderTexture = new RenderTexture( &m_textureID, w, h);  // create and get the FBO and color Attachment for rendering
-  	m_textureSize = {float(w),float(h)};
-
+		renderTexture = new RenderTexture( &m_textureID, m_textureSize.x, m_textureSize.y);  // create and get the FBO and color Attachment for rendering
+  	
+#ifdef TEST
   	// block of control checks
   	m_fbo = renderTexture->getFbo();
   	GLuint color = renderTexture->getColor();  //todo getColorAttachmentID
   	IM_ASSERT(renderTexture->getColor() == m_textureID);
   	IM_ASSERT(renderTexture->getWidth() == w);
   	IM_ASSERT(renderTexture->getHeight() == h);
-
+#endif
+  	
  		// Create camera rendering to the user-defined framebuffer 
- 		// Camera(float viewingAngle, GameObject* sceneRoot,RenderTexture*renderTarget);
- 		m_camera = new Camera(60.0f, m_currentModelGameObject, renderTexture);
+ 		// Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget);
+ 		// m_camera = new Camera(60.0f, m_sceneModel, renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
+  	m_camera = new Camera(60.0f, m_workspaceModel, renderTexture); // version with the additional object just for this box in the workspace
+ 		// m_camera->m_perspective = glm::perspective(glm::radians(60.0f), float(m_textureSize.x) / float(m_textureSize.y), 0.2f, 1000.0f);
+    
 	}
-
-#if 1	
+	
+#ifdef TEST
 	// Trial draw to new fbo - works fine, but I should use camera
 	GLint viewport[4];  // 3D view viewport
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -107,25 +113,23 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3] );
 #endif
 	
-  const float angleX = 30.0;  //degree
-	const float angleY = 55.0;  //degree
 	//const float angleZ = 45.0;  //degree
-	m_currentModelGameObject->translate(glm::vec3(0.0f, 0.0f, -4.5));
-  m_currentModelGameObject->rotate(glm::vec3(0,1,0),angleY);
-  m_currentModelGameObject->rotate(glm::vec3(1,0,0),angleX);
+	//m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
+ // m_sceneModel->rotate(glm::vec3(0,1,0),angleY);
+ // m_sceneModel->rotate(glm::vec3(1,0,0),angleX);
 	
 		m_camera->update();
 	
-	m_currentModelGameObject->rotate(glm::vec3(1,0,0),-angleX);
-	m_currentModelGameObject->rotate(glm::vec3(0,1,0),-angleY);
-	m_currentModelGameObject->translate(glm::vec3(0.0f, 0.0f, 4.5));
+	//m_sceneModel->rotate(glm::vec3(1,0,0),-angleX);
+	//m_sceneModel->rotate(glm::vec3(0,1,0),-angleY);
+	//m_sceneModel->translate(glm::vec3(0.0f, 0.0f, 4.5));
 
 	// \todo correct image size in the box
 	//float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
 	//float imageWidth = m_textureSize.x + 2 * padding;
 
 	//ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
-	//texture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));
+	//texture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));  // fixed texture may be enough
 	//ImGui::Image((ImTextureID)texture, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
 
@@ -137,7 +141,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	//m_nodebase->setValue(static_cast<void*>(object));
 	//}
 	
-	ImGui::Text("Pod texturou");
+	//ImGui::Text("Pod texturou");
 	
   return false;
 }
