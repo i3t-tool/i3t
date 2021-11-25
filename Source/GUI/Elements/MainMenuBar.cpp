@@ -23,7 +23,7 @@
 
 using namespace UI;
 
-bool sceneDialog(std::string& result, const std::string& title)
+bool saveSceneDialog(std::string& result, const std::string& title)
 {
 	std::string root = Config::getAbsolutePath("./");
 	std::vector<std::string> filter;
@@ -31,6 +31,16 @@ bool sceneDialog(std::string& result, const std::string& title)
 	filter.push_back("*.scene");
 
 	return SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
+}
+
+bool openSceneDialog(std::string& result, const std::string& title)
+{
+	std::string root = Config::getAbsolutePath("./");
+	std::vector<std::string> filter;
+	filter.push_back("I3T scene files");
+	filter.push_back("*.scene");
+
+	return SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 }
 
 MainMenuBar::MainMenuBar()
@@ -91,17 +101,23 @@ void MainMenuBar::showFileMenu()
 		if (ImGui::MenuItem("Open"))
 		{
 			std::string sceneFile;
-			bool hasFile = sceneDialog(sceneFile, "Open I3T scene");
+			bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
 			if (hasFile)
 			{
 				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 				if (ww)
 				{
 					ww->m_workspaceCoreNodes.clear();
-					auto sceneData = loadSceneFromFile(sceneFile);
 
+					// \todo MH - Nodes in scene data are no longer needed, is that true?
+					// auto sceneData = loadSceneFromFile(sceneFile);
+					loadSceneFromFile(sceneFile);
+
+					// \todo MH - See upper todo.
+					/*
 					ww->m_workspaceCoreNodes.insert(
 							sceneData.nodes.end(), std::begin(sceneData.nodes), std::end(sceneData.nodes));
+					*/
 				}
 				else
 					Log::fatal("Open failed: WorkspaceWindow is not loaded.");
@@ -141,7 +157,7 @@ void MainMenuBar::showFileMenu()
 		if (ImGui::MenuItem("Save As"))
 		{
 			std::string filename;
-			bool hasFilename = sceneDialog(filename, "Save I3T scene");
+			bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
 			if (hasFilename)
 			{
 				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
@@ -200,7 +216,7 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
-		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		// ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());

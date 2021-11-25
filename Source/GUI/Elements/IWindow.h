@@ -17,13 +17,18 @@ public:                                                                         
 	[[nodiscard]] const char* getID() const override { return ID; }
 
 /**
- * ImGui GUI element abstract class.
+ * ImGui GUI Window abstract class.
+ *
+ * \see ~IWindow for lifecycle information.
  */
 class IWindow
 {
 public:
 	explicit IWindow(bool show = false) : m_show(show) {}
 
+	/**
+	 * \pre Window cannot be destroyed at runtime. It may cause crash.
+	 */
 	virtual ~IWindow() = default;
 	virtual void render() = 0;
 	virtual const char* getID() const = 0;

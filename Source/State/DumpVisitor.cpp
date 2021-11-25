@@ -8,6 +8,7 @@
 #include "Core/Nodes/Cycle.h"
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
+#include "GUI//Elements/Windows/WorkspaceWindow.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
 
@@ -206,13 +207,15 @@ std::string SceneRawData::toString() const
 	return result;
 }
 
-std::map<std::string_view, std::function<Ptr<NodeClass>()>> createFns;
+/// \see addNodeToPosition(ImVec2 const)
+std::map<std::string_view, std::function<void(ImVec2 const)>> createFns;
 
 template <int N, int Max>
 void do_for()
 {
-	// Core::GraphManager::createNode<static_cast<ENodeType>(N)>();
+	constexpr auto enumValue = static_cast<ENodeType>(N);
 
+	createFns[magic_enum::enum_name(enumValue)] = WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
 
 	if constexpr (N < Max) { do_for<N + 1, Max>(); }
 }
@@ -222,7 +225,6 @@ bool DumpVisitor::m_isInitialized = false;
 void initCreateFns()
 {
 	constexpr std::size_t count = magic_enum::enum_count<ENodeType>() - 1;
-
 	do_for<0, count>();
 }
 
@@ -280,20 +282,22 @@ void DumpVisitor::visit(const Ptr<GuiTransform>& node)
 
 bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
 
-/**
- * \return nullptr if node can't be created.
- */
-Ptr<NodeClass> createOperator(YAML::Node& node)
+void createOperator(YAML::Node& node)
 {
 	if (node["type"])
 	{
 		auto enumVal = node["type"].as<std::string>();
 
-		if (!createFns.contains(enumVal)) return nullptr;
+		if (!createFns.contains(enumVal))
+		{
+			Log::error("Does not know how to load {} operator from file.", enumVal);
+		}
 
-		return createFns[enumVal]();
+		auto posX = node["position"][0].as<float>();
+		auto posY = node["position"][1].as<float>();
+
+		createFns[enumVal](ImVec2{ posX, posY });
 	}
-	return nullptr;
 }
 
 void connectNodes(YAML::Node& sceneData, SceneData& scene)
@@ -324,6 +328,9 @@ SceneData loadScene(const std::string& rawScene)
 {
 	SceneData scene;
 
+	/// \todo MH
+	DumpVisitor visitor;
+
 	auto sceneData = YAML::Load(rawScene);
 	if (isParsedSceneValid(sceneData))
 	{
@@ -332,8 +339,10 @@ SceneData loadScene(const std::string& rawScene)
 		for (auto i = 0L; i < operators.size(); i++)
 		{
 			auto opNode = operators[i];
-			auto op			= createOperator(opNode);
-			if (op) scene.nodes.push_back(op);
+
+			createOperator(opNode);
+			
+			// if (op) scene.nodes.push_back(op);
 		}
 
 		// Connect all nodes.

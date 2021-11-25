@@ -7,6 +7,8 @@
 
 static DIWNE::SettingsDiwne settingsDiwne;
 
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::m_workspaceCoreNodes;
+
 // using namespace Core;
 
 WorkspaceWindow::WorkspaceWindow(bool show)

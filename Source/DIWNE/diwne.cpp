@@ -33,6 +33,7 @@ void Diwne::Begin(const char* imgui_id)
 
         idl->_FringeScale = 1/m_workAreaZoomDiwne;
 
+				// \todo JH - Causes crash during scrolling.
         ImGui::SetWindowFontScale(m_workAreaZoomDiwne);
 
             ImGui::Text("\n\n");

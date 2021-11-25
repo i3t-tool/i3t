@@ -58,7 +58,7 @@ public:
 	I3T_WINDOW(WorkspaceWindow)
 
 	explicit WorkspaceWindow(bool show);
-	virtual ~WorkspaceWindow();
+	~WorkspaceWindow() override;
 
 	Application& m_wholeApplication;
 
@@ -82,16 +82,23 @@ public:
 	ImVec2 m_rightClickPosition = ImVec2(100,100);
 	ImVec2 m_newNodePostion = ImVec2(100,100);
 
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
+	/**
+	 * \brief All WorkspaceNodes
+	 *
+	 * \todo Needs to be static.
+	 * \todo Move this variable somewhere else.
+	 */
+	static std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
+
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
-
-    template<class T>
-    void inline addNodeToPosition(ImVec2 const position)
-    {
-        m_workspaceCoreNodes.push_back(std::make_shared<T>());
+	/// \todo JH, MH - Needs to be accessed by scene loader, but it may be weird that the loader needs to have reference to the Workspace.
+	template <class T>
+	static void inline addNodeToPosition(ImVec2 const position)
+	{
+		m_workspaceCoreNodes.push_back(std::make_shared<T>());
 		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
-    }
+	}
 
     template<class T>
     void inline addNodeToPositionOfPopup()

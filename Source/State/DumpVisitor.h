@@ -49,7 +49,14 @@ private:
 };
 
 /// \todo MH move somewhere else.
+/// \todo MH make function internal.
 SceneData loadScene(const std::string& rawScene);
 
+/**
+ * Loads scene to the Workspace Window.
+ * @param rawScene
+ * @return
+ */
 SceneData loadSceneFromFile(const std::string& sceneFile);
+
 bool saveScene(const std::string& filename, const SceneData& scene);
