@@ -549,5 +549,3 @@ public:
 	ValueSetResult setUp(const glm::vec3& up);
 };
 }
-
-#include "Transform.inl"

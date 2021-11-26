@@ -5,22 +5,22 @@
 
 namespace Core
 {
-inline bool Transformation::isLocked() const
+bool Transformation::isLocked() const
 {
 	return m_currentMap == &Transform::g_Free;
 }
 
-inline void Transformation::lock()
+void Transformation::lock()
 {
 	m_currentMap = &Transform::g_AllLocked;
 }
 
-inline void Transformation::unlock()
+void Transformation::unlock()
 {
 	m_currentMap = &Transform::g_Free;
 }
 
-inline void Transformation::notifySequence()
+void Transformation::notifySequence()
 {
 	if (m_currentSequence)
 	{
@@ -30,7 +30,7 @@ inline void Transformation::notifySequence()
 
 //===----------------------------------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::Scale>::isValid() const
+ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 {
 	bool result = Transform::cmp(&Transform::g_Scale, m_internalData[0].getMat4());
 	if (hasSynergies())
@@ -42,18 +42,18 @@ inline ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 	return ETransformState(result);
 }
 
-inline void TransformImpl<ETransformType::Scale>::lock()
+void TransformImpl<ETransformType::Scale>::lock()
 {
 	m_currentMap = &Transform::g_Scale;
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
 {
 	notifySequence();
 	return NodeBase::setValue(glm::vec3(val));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& vec)
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& vec)
 {
 	if (hasSynergies())
 	{
@@ -74,12 +74,12 @@ inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec)
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec)
 {
 	return setValue(glm::vec3(vec));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::mat4& mat)
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::mat4& mat)
 {
 	if (m_currentMap == &Transform::g_Scale)
 	{
@@ -113,7 +113,7 @@ inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
 {
 	if (m_currentMap == &Transform::g_Free)
 	{
@@ -142,50 +142,50 @@ inline ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline void TransformImpl<ETransformType::Scale>::reset()
+void TransformImpl<ETransformType::Scale>::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::scale(m_initialScale));
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::Scale>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::Scale>::getDefaultValues()
 {
 	return {{"scale", Utils::toString(m_initialScale)}};
 }
 
-inline float TransformImpl<ETransformType::Scale>::getX()
+float TransformImpl<ETransformType::Scale>::getX()
 {
 	return getInternalData().getMat4()[0][0];
 }
 
-inline float TransformImpl<ETransformType::Scale>::getY()
+float TransformImpl<ETransformType::Scale>::getY()
 {
 	return getInternalData().getMat4()[1][1];
 }
 
-inline float TransformImpl<ETransformType::Scale>::getZ()
+float TransformImpl<ETransformType::Scale>::getZ()
 {
 	return getInternalData().getMat4()[2][2];
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setX(float v)
+ValueSetResult TransformImpl<ETransformType::Scale>::setX(float v)
 {
 	return setValue(v, {0, 0});
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setY(float v)
+ValueSetResult TransformImpl<ETransformType::Scale>::setY(float v)
 {
 	return setValue(v, {1, 1});
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Scale>::setZ(float v)
+ValueSetResult TransformImpl<ETransformType::Scale>::setZ(float v)
 {
 	return setValue(v, {2, 2});
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
+ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 {
 	auto& mat = m_internalData[0].getMat4();
 	bool result = Transform::isMatValid(&Transform::g_EulerX, mat);;
@@ -198,17 +198,17 @@ inline ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 	return ETransformState(result);
 }
 
-inline void TransformImpl<ETransformType::EulerX>::lock()
+void TransformImpl<ETransformType::EulerX>::lock()
 {
 	m_currentMap = &Transform::g_EulerX;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::EulerX>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::EulerX>::getDefaultValues()
 {
 	return {{"rotation", Utils::toString(m_initialRot)}};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
+ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
 {
 	m_currentRot = val;
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
@@ -217,17 +217,17 @@ inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec3& val)
+ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec3& val)
 {
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec4& val)
+ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec4& val)
 {
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::mat4& mat)
+ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::mat4& mat)
 {
 	if (m_currentMap == &Transform::g_EulerX)
 	{
@@ -258,7 +258,7 @@ inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm:
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -312,7 +312,7 @@ inline ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val,
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline void TransformImpl<ETransformType::EulerX>::reset()
+void TransformImpl<ETransformType::EulerX>::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::eulerAngleX(m_initialRot));
@@ -320,7 +320,7 @@ inline void TransformImpl<ETransformType::EulerX>::reset()
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
-inline ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
+ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 {
 	auto& mat = m_internalData[0].getMat4();
 	bool result = Transform::isMatValid(&Transform::g_EulerY, mat);
@@ -333,17 +333,17 @@ inline ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 	return ETransformState(result);
 }
 
-inline void TransformImpl<ETransformType::EulerY>::lock()
+void TransformImpl<ETransformType::EulerY>::lock()
 {
 	m_currentMap = &Transform::g_EulerY;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::EulerY>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::EulerY>::getDefaultValues()
 {
 	return {{"rotation", Utils::toString(m_initialRot)}};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
+ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
 {
 	m_currentRot = val;
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 1.0f, 0.0f)));
@@ -351,17 +351,17 @@ inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec3& val)
+ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec3& val)
 {
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& val)
+ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& val)
 {
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::mat4& mat)
+ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::mat4& mat)
 {
 	/// \todo MH Validation is not always correct.
 
@@ -384,7 +384,7 @@ inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm:
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -438,7 +438,7 @@ inline ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val,
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline void TransformImpl<ETransformType::EulerY>::reset()
+void TransformImpl<ETransformType::EulerY>::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
@@ -447,7 +447,7 @@ inline void TransformImpl<ETransformType::EulerY>::reset()
 
 //===-- Euler rotation around Z axis --------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
+ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 {
 	auto& mat = m_internalData[0].getMat4();
 	bool result = Transform::isMatValid(&Transform::g_EulerZ, mat);
@@ -460,17 +460,17 @@ inline ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 	return ETransformState(result);
 }
 
-inline void TransformImpl<ETransformType::EulerZ>::lock()
+void TransformImpl<ETransformType::EulerZ>::lock()
 {
 	m_currentMap = &Transform::g_EulerZ;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::EulerZ>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::EulerZ>::getDefaultValues()
 {
 	return {{"rotation", Utils::toString(m_initialRot)}};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
+ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
 {
 	m_currentRot = val;
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -478,17 +478,17 @@ inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec3& val)
+ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec3& val)
 {
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& val)
+ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& val)
 {
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::mat4& mat)
+ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::mat4& mat)
 {
 	if (m_currentMap == &Transform::g_Free)
 		setInternalValue(mat);
@@ -508,7 +508,7 @@ inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm:
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -562,7 +562,7 @@ inline ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val,
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline void TransformImpl<ETransformType::EulerZ>::reset()
+void TransformImpl<ETransformType::EulerZ>::reset()
 {
 	setDataMap(m_initialMap);
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -571,7 +571,7 @@ inline void TransformImpl<ETransformType::EulerZ>::reset()
 
 //===-- Translation -------------------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::Translation>::isValid() const
+ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 {
 	bool result = Transform::isMatValid(&Transform::g_Translate, m_internalData[0].getMat4());
 	if (hasSynergies())
@@ -583,22 +583,22 @@ inline ETransformState TransformImpl<ETransformType::Translation>::isValid() con
 	return ETransformState(result);
 }
 
-inline void TransformImpl<ETransformType::Translation>::lock()
+void TransformImpl<ETransformType::Translation>::lock()
 {
 	m_currentMap = &Transform::g_Translate;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::Translation>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::Translation>::getDefaultValues()
 {
 	return {{"translation", Utils::toString(m_initialTrans)}};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)
 {
 	return setValue(glm::vec3(val));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 {
 	setInternalValue(glm::translate(vec));
 	notifySequence();
@@ -606,12 +606,12 @@ inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec4& vec)
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec4& vec)
 {
 	return setValue(glm::vec3(vec));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::mat4& mat)
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::mat4& mat)
 {
 	if (m_currentMap == &Transform::g_Translate)
 	{
@@ -634,7 +634,7 @@ inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -646,79 +646,79 @@ inline ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline void TransformImpl<ETransformType::Translation>::reset()
+void TransformImpl<ETransformType::Translation>::reset()
 {
 	setDataMap(m_initialMap);
 	setValue(glm::translate(m_initialTrans));
 }
 
-inline float TransformImpl<ETransformType::Translation>::getX()
+float TransformImpl<ETransformType::Translation>::getX()
 {
 	return getInternalData().getMat4()[3][0];
 }
 
-inline float TransformImpl<ETransformType::Translation>::getY()
+float TransformImpl<ETransformType::Translation>::getY()
 {
 	return getInternalData().getMat4()[3][1];
 }
 
-inline float TransformImpl<ETransformType::Translation>::getZ()
+float TransformImpl<ETransformType::Translation>::getZ()
 {
 	return getInternalData().getMat4()[3][2];
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setX(float v)
+ValueSetResult TransformImpl<ETransformType::Translation>::setX(float v)
 {
 	return setValue(v, {3, 0});
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setY(float v)
+ValueSetResult TransformImpl<ETransformType::Translation>::setY(float v)
 {
 	return setValue(v, {3, 1});
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Translation>::setZ(float v)
+ValueSetResult TransformImpl<ETransformType::Translation>::setZ(float v)
 {
 	return setValue(v, {3, 2});
 }
 
 //===-- Axis angle rotation -----------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
+ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 {
 	return ETransformState::Unknown;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::AxisAngle>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::AxisAngle>::getDefaultValues()
 {
 	return {{"axis", Utils::toString(m_initialAxis)}, {"rotation", Utils::toString(m_initialRads)}};
 }
 
-inline void TransformImpl<ETransformType::AxisAngle>::reset()
+void TransformImpl<ETransformType::AxisAngle>::reset()
 {
 	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
+ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
 {
 	return setRot(rads);
 }
 
-inline ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec3& axis)
+ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec3& axis)
 {
 	return setAxis(axis);
 }
 
-inline ValueSetResult TransformImpl<ETransformType::AxisAngle>::setRot(float rads)
+ValueSetResult TransformImpl<ETransformType::AxisAngle>::setRot(float rads)
 {
 	m_initialRads = rads;
 	setInternalValue(glm::rotate(rads, m_initialAxis));
 	return ValueSetResult();
 }
 
-inline ValueSetResult TransformImpl<ETransformType::AxisAngle>::setAxis(const glm::vec3& axis)
+ValueSetResult TransformImpl<ETransformType::AxisAngle>::setAxis(const glm::vec3& axis)
 {
 	m_initialAxis = axis;
 	setInternalValue(glm::rotate(m_initialRads, axis));
@@ -727,28 +727,28 @@ inline ValueSetResult TransformImpl<ETransformType::AxisAngle>::setAxis(const gl
 
 //===-- Quaternion rotation -----------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::Quat>::isValid() const
+ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 {
 	return ETransformState::Unknown;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::Quat>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::Quat>::getDefaultValues()
 {
 	return {{"quat", Utils::toString(m_initialQuat)}};
 }
 
-inline void TransformImpl<ETransformType::Quat>::reset()
+void TransformImpl<ETransformType::Quat>::reset()
 {
 	notifySequence();
 	setInternalValue(glm::toMat4(m_normalized));
 }
 
-inline const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const
+const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const
 {
 	return m_normalized;
 };
 
-inline ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
+ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 {
 	m_initialQuat = q;
 	m_normalized = glm::normalize(q);
@@ -756,7 +756,7 @@ inline ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::q
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
+ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
 {
 	glm::quat q(vec);
 	return setValue(glm::quat(q));
@@ -769,12 +769,12 @@ ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 	return ETransformState(Transform::isMatValid(&Transform::g_Ortho, m_internalData[0].getMat4()));
 }
 
-inline void TransformImpl<ETransformType::Ortho>::lock()
+void TransformImpl<ETransformType::Ortho>::lock()
 {
 	m_currentMap = &Transform::g_Ortho;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::Ortho>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::Ortho>::getDefaultValues()
 {
 	return {
 			{"left", Utils::toString(m_left)},
@@ -786,14 +786,14 @@ inline Transformation::ValueMap TransformImpl<ETransformType::Ortho>::getDefault
 	};
 }
 
-inline void TransformImpl<ETransformType::Ortho>::reset()
+void TransformImpl<ETransformType::Ortho>::reset()
 {
 	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -805,42 +805,42 @@ inline ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setLeft(float val)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setLeft(float val)
 {
 	m_left = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setRight(float val)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setRight(float val)
 {
 	m_right = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setBottom(float val)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setBottom(float val)
 {
 	m_bottom = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setTop(float val)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setTop(float val)
 {
 	m_top = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setNear(float val)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setNear(float val)
 {
 	m_near = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Ortho>::setFar(float val)
+ValueSetResult TransformImpl<ETransformType::Ortho>::setFar(float val)
 {
 	m_far = val;
 	reset();
@@ -849,17 +849,17 @@ inline ValueSetResult TransformImpl<ETransformType::Ortho>::setFar(float val)
 
 //===-- Perspective -------------------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
+ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 {
 	return ETransformState(Transform::isMatValid(&Transform::g_Perspective, m_internalData[0].getMat4()));;
 }
 
-inline void TransformImpl<ETransformType::Perspective>::lock()
+void TransformImpl<ETransformType::Perspective>::lock()
 {
 	m_currentMap = &Transform::g_Perspective;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::Perspective>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::Perspective>::getDefaultValues()
 {
 	return {
 			{"fov", Utils::toString(m_initialFOW)},
@@ -869,42 +869,42 @@ inline Transformation::ValueMap TransformImpl<ETransformType::Perspective>::getD
 	};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Perspective>::setFOW(float v)
+ValueSetResult TransformImpl<ETransformType::Perspective>::setFOW(float v)
 {
 	m_initialFOW = v;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Perspective>::setAspect(float v)
+ValueSetResult TransformImpl<ETransformType::Perspective>::setAspect(float v)
 {
 	m_initialAspect = v;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Perspective>::setZNear(float v)
+ValueSetResult TransformImpl<ETransformType::Perspective>::setZNear(float v)
 {
 	m_initialZNear = v;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Perspective>::setZFar(float v)
+ValueSetResult TransformImpl<ETransformType::Perspective>::setZFar(float v)
 {
 	m_initialZFar = v;
 	reset();
 	return ValueSetResult{};
 }
 
-inline void TransformImpl<ETransformType::Perspective>::reset()
+void TransformImpl<ETransformType::Perspective>::reset()
 {
 	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -918,17 +918,17 @@ inline ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float
 
 //===-- Frusum ------------------------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
+ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 {
 	return ETransformState(Transform::isMatValid(&Transform::g_Frustum, m_internalData[0].getMat4()));
 }
 
-inline void TransformImpl<ETransformType::Frustum>::lock()
+void TransformImpl<ETransformType::Frustum>::lock()
 {
 	m_currentMap = &Transform::g_Frustum;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::Frustum>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::Frustum>::getDefaultValues()
 {
 	return {
 			{"left", Utils::toString(m_left)},
@@ -940,14 +940,14 @@ inline Transformation::ValueMap TransformImpl<ETransformType::Frustum>::getDefau
 	};
 }
 
-inline void TransformImpl<ETransformType::Frustum>::reset()
+void TransformImpl<ETransformType::Frustum>::reset()
 {
 	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::frustum(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -959,42 +959,42 @@ inline ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setLeft(float val)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setLeft(float val)
 {
 	m_left = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setRight(float val)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setRight(float val)
 {
 	m_right = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setBottom(float val)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setBottom(float val)
 {
 	m_bottom = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setTop(float val)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setTop(float val)
 {
 	m_top = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setNear(float val)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setNear(float val)
 {
 	m_near = val;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::Frustum>::setFar(float val)
+ValueSetResult TransformImpl<ETransformType::Frustum>::setFar(float val)
 {
 	m_far = val;
 	reset();
@@ -1003,12 +1003,12 @@ inline ValueSetResult TransformImpl<ETransformType::Frustum>::setFar(float val)
 
 //===-- Look At -----------------------------------------------------------===//
 
-inline ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
+ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 {
 	return ETransformState::Unknown;
 }
 
-inline Transformation::ValueMap TransformImpl<ETransformType::LookAt>::getDefaultValues()
+Transformation::ValueMap TransformImpl<ETransformType::LookAt>::getDefaultValues()
 {
 	return {
 			{"eye", Utils::toString(m_initialEye)},
@@ -1017,14 +1017,14 @@ inline Transformation::ValueMap TransformImpl<ETransformType::LookAt>::getDefaul
 	};
 }
 
-inline void TransformImpl<ETransformType::LookAt>::reset()
+void TransformImpl<ETransformType::LookAt>::reset()
 {
 	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::lookAt(m_initialEye, m_initialCenter, m_initialUp));
 }
 
-inline ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val, glm::ivec2 coords)
+ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val, glm::ivec2 coords)
 {
 	if (!coordsAreValid(coords, m_currentMap))
 	{
@@ -1036,21 +1036,21 @@ inline ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val,
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::LookAt>::setEye(const glm::vec3& eye)
+ValueSetResult TransformImpl<ETransformType::LookAt>::setEye(const glm::vec3& eye)
 {
 	m_initialEye = eye;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::LookAt>::setCenter(const glm::vec3& center)
+ValueSetResult TransformImpl<ETransformType::LookAt>::setCenter(const glm::vec3& center)
 {
 	m_initialCenter = center;
 	reset();
 	return ValueSetResult{};
 }
 
-inline ValueSetResult TransformImpl<ETransformType::LookAt>::setUp(const glm::vec3& up)
+ValueSetResult TransformImpl<ETransformType::LookAt>::setUp(const glm::vec3& up)
 {
 	m_initialUp = up;
 	reset();
