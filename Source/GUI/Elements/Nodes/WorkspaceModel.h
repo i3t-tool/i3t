@@ -37,7 +37,5 @@ private:
 	GLuint m_fbo = 0;              // FBO for texture rendering - needed obly for additional rendering to the m_textureID
 	RenderTexture *renderTexture;  // needed when creating camera only, can be a local variable
 
-	int m_currentModelIdx = 0;     //todo  what is it for?
-
 	void init();
 };
