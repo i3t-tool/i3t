@@ -193,7 +193,7 @@ void ScaleManipulator::update() {
 	///
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
-	Core::Scale*editedscale=(Core::Scale*)m_editednode.get();
+	auto* editedscale= (Core::TransformImpl<ETransformType::Scale>*) m_editednode.get();
 	editedscale->setX(m_edited[0][0]);
 	editedscale->setY(m_edited[1][1]);
 	editedscale->setZ(m_edited[2][2]);
