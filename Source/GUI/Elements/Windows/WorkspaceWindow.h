@@ -6,8 +6,7 @@
  */
 #pragma once
 
-#define WORKSPACE_DEBUG 1
-#define DIWNE_DEBUG 1
+//#define WORKSPACE_DEBUG 1
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>

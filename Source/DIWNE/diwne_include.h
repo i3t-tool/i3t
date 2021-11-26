@@ -1,6 +1,8 @@
 #ifndef DIWNE_INCLUDE_H
 #define DIWNE_INCLUDE_H
 
+//#define DIWNE_DEBUG
+
 #include <limits>
 
 #include "spdlog/fmt/fmt.h"

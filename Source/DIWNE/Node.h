@@ -12,7 +12,7 @@ namespace DIWNE
  *  -------------------
  *  |      Top        |
  *  -------------------
- *  |Left|Middle|Right|
+ *  |Left|Middle|Right|    -> |L|M|R| == Center
  *  -------------------
  *  |     Bottom      |
  *  -------------------
@@ -50,7 +50,8 @@ class Node : public std::enable_shared_from_this<Node>
 
         virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne) {return false;};
 
-        virtual bool drawNodeBackground(DIWNE::Diwne &diwne) {return false;};
+        virtual bool drawNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
+        virtual bool drawNodeAfterContent(DIWNE::Diwne &diwne) {return false;};
         virtual bool topContent(DIWNE::Diwne &diwne);
         virtual bool leftContent(DIWNE::Diwne &diwne);
         virtual bool middleContent(DIWNE::Diwne &diwne);
@@ -60,34 +61,32 @@ class Node : public std::enable_shared_from_this<Node>
         bool nodePopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring);
         virtual void nodePopupContent();
 
-        void setNodePositionDiwne(ImVec2 const& position) {m_nodePosition = position; };
-        ImVec2 getNodePositionDiwne() const { return m_nodePosition; };
-        void translateNodePositionDiwne(ImVec2 const amount) {m_nodePosition+=amount; };
+        void setNodePositionDiwne(ImVec2 const& position) {m_nodePositionDiwne = position; setNodeRectsPositionDiwne(position);};
+        ImVec2 getNodePositionDiwne() const { return m_nodePositionDiwne; };
+        void translateNodePositionDiwne(ImVec2 const amount) {m_nodePositionDiwne+=amount; translateNodeRectsDiwne(amount); };
 
-        ImRect getNodeRectDiwne() { updateSizeRectangles(); return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
-        ImVec2 getNodeRectSizeDiwne() { updateSizeRectangles(); return m_bottomRectDiwne.Max-m_topRectDiwne.Min;};
+        ImRect getNodeRectDiwne() { return m_wholeNodeRectDiwne;};
+        ImVec2 getNodeRectSizeDiwne() { return m_wholeNodeRectDiwne.GetSize();};
 
         bool getSelected() const {return m_selected;};
         void setSelected(bool selected) {m_selected = selected;};
 
+        void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign = v;}; /* from 0==left to 1==right */
+
     protected:
 
-        ImVec2 m_nodePosition; /* can be public */
+        ImVec2 m_nodePositionDiwne; /* can be public */
 
-        /* Border rects of node - are computed every frame based on node content and m_nodePosition */
+        /* Border rects of node - are computed every frame based on node content and m_nodePositionDiwne */
         ImRect  m_topRectDiwne
               , m_leftRectDiwne
               , m_middleRectDiwne
               , m_rightRectDiwne
-              , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
+              , m_bottomRectDiwne /*! \brief Rectangle of parts of node in diwne */
+              , m_wholeNodeRectDiwne; /* possible ImGui padding between parts of node -> it is easier to store this value than compute it */
 
-//        ImRect  m_topRectDiwne_temp
-//              , m_leftRectDiwne_temp
-//              , m_middleRectDiwne_temp
-//              , m_rightRectDiwne_temp
-//              , m_bottomRectDiwne_temp; /*! \brief Rectangle of parts of node in diwne */
 
-        float m_middleDummyWidthForAlign;
+        float m_centerDummySpace;
 
         bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
         bool m_selected;
@@ -100,6 +99,8 @@ class Node : public std::enable_shared_from_this<Node>
         void translateNodeRectsDiwne(ImVec2 const& amount);
         //void translateNodeRectsDiwneZoomed(DIWNE::Diwne const &diwne, ImVec2 const& amount);
         bool m_isHeld;
+
+        float m_middleAlign;
 
 
 };
