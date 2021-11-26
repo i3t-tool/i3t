@@ -140,6 +140,13 @@ public:
 	const Pin& getInPin(int index) { return getInputPins()[index]; }
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
+	[[nodiscard]] ConstPinListRef getInputPins() const  { return m_inputs; }
+	[[nodiscard]] ConstPinListRef getOutputPins() const { return m_outputs; }
+
+protected:
+	[[nodiscard]] PinListRef getInputPinsRef()  { return m_inputs; }
+	[[nodiscard]] PinListRef getOutputPinsRef() { return m_outputs; }
+
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:
 	/**
@@ -163,18 +170,6 @@ public:
 	 * \return Struct which holds data
 	 */
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
-
-private:
-	template <typename T>
-	ValueSetResult setValueEx(T&& val)
-	{
-		if (m_currentMap == &Transform::g_AllLocked)
-			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
-
-		setInternalValue(val);
-
-		return ValueSetResult{};
-	}
 
 public:
 	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
@@ -223,11 +218,19 @@ public:
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
-	void pulse(size_t index);
+private:
+	template <typename T>
+	ValueSetResult setValueEx(T&& val)
+	{
+		if (m_currentMap == &Transform::g_AllLocked)
+			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
+
+		setInternalValue(val);
+
+		return ValueSetResult{};
+	}
 
 protected:
-	bool shouldPulse(size_t inputIndex, size_t outputIndex);
-
 	/**
 	 * Sets node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
@@ -249,6 +252,12 @@ protected:
 	}
 
 public:
+	void pulse(size_t index);
+
+protected:
+	bool shouldPulse(size_t inputIndex, size_t outputIndex);
+
+public:
 	virtual void reset() {}
 
 	void setDataMap(const Transform::DataMap* map);
@@ -258,13 +267,6 @@ public:
 	/// \todo MH will be removed.
 	const Transform::DataMap&																	 getDataMapRef() { return *m_currentMap; }
 	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps() { return m_operation->validDatamaps; };
-
-	[[nodiscard]] ConstPinListRef getInputPins() const  { return m_inputs; }
-	[[nodiscard]] ConstPinListRef getOutputPins() const { return m_outputs; }
-
-protected:
-	[[nodiscard]] PinListRef getInputPinsRef()  { return m_inputs; }
-	[[nodiscard]] PinListRef getOutputPinsRef() { return m_outputs; }
 
 	public:
 	//===----------------------------------------------------------------------===//

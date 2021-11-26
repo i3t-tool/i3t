@@ -4,8 +4,6 @@
 
 using namespace Core;
 
-/* node-editor use 0 as invalid id. see: https://github.com/thedmd/imgui-node-editor/issues/47*/
-
 IdGenerator::IdGenerator()
 {
 	for (int i = 1; i < Core::MAX_NODES_COUNT; ++i)
