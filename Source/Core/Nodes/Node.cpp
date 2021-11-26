@@ -8,90 +8,17 @@ using namespace Core;
 
 static IdGenerator generator;
 
-NodeBase::PinView::Iterator::Iterator(Ptr<Strategy> strategy, Ptr<NodeBase> node, int index)
-{
-	m_strategy = strategy;
-	m_node		 = node;
-	m_index		 = index;
-}
-
-NodeBase::PinView::reference NodeBase::PinView::Iterator::operator*() const { return m_strategy->get(m_index); }
-
-NodeBase::PinView::pointer NodeBase::PinView::Iterator::operator->() { return &m_strategy->get(m_index); }
-
-NodeBase::PinView::Iterator& NodeBase::PinView::Iterator::operator++()
-{
-	m_index++;
-	return *this;
-}
-
-NodeBase::PinView::Iterator NodeBase::PinView::Iterator::operator++(int)
-{
-	NodeBase::PinView::Iterator tmp = *this;
-	++(*this);
-	return tmp;
-}
-
-Pin& NodeBase::PinView::operator[](size_t i) const { return m_strategy->get(i); }
-
-NodeBase::PinView::Iterator NodeBase::PinView::begin() const { return m_strategy->begin(); }
-
-NodeBase::PinView::Iterator NodeBase::PinView::end() const { return m_strategy->end(); }
-
-bool NodeBase::PinView::empty() const { return m_strategy->empty(); }
-
-size_t NodeBase::PinView::size() const { return m_strategy->size(); }
-
-
-Node::PinView::Iterator Node::InputStrategy::begin()
-{
-	if (empty()) { return NodeBase::PinView::Iterator(getThis(), m_node, -1); }
-	return NodeBase::PinView::Iterator(getThis(), m_node, 0);
-}
-
-Node::PinView::Iterator Node::InputStrategy::end()
-{
-	if (m_node->m_operation->inputTypes.empty()) { return NodeBase::PinView::Iterator(getThis(), m_node, -1); }
-	return NodeBase::PinView::Iterator(getThis(), m_node, static_cast<int>(size()));
-}
-
-bool Node::InputStrategy::empty() { return m_node->m_operation->inputTypes.empty(); }
-
-size_t Node::InputStrategy::size() { return m_node->m_operation->inputTypes.size(); }
-
-Pin& Node::InputStrategy::get(size_t index) { return m_node->getIn(index); }
-
-
-Node::PinView::Iterator Node::OutputStrategy::begin()
-{
-	if (empty()) { return NodeBase::PinView::Iterator(getThis(), m_node, -1); }
-	return NodeBase::PinView::Iterator(getThis(), m_node, 0);
-}
-
-Node::PinView::Iterator Node::OutputStrategy::end()
-{
-	if (empty()) { return NodeBase::PinView::Iterator(getThis(), m_node, -1); }
-	return NodeBase::PinView::Iterator(getThis(), m_node, static_cast<int>(size()));
-}
-
-bool Node::OutputStrategy::empty() { return m_node->m_operation->outputTypes.empty(); }
-
-size_t Node::OutputStrategy::size() { return m_node->m_operation->outputTypes.size(); }
-
-Pin& Node::OutputStrategy::get(size_t index) { return m_node->getOut(index); }
-
-
-NodeBase::~NodeBase()
+Node::~Node()
 {
 	generator.returnId(m_id);
 }
 
-void NodeBase::finalize()
+void Node::finalize()
 {
 	unplugAll();
 }
 
-void NodeBase::init()
+void Node::init()
 {
 	m_id = generator.next();
 
@@ -120,15 +47,15 @@ void NodeBase::init()
 	}
 }
 
-ID NodeBase::getId() const { return m_id; }
+ID Node::getId() const { return m_id; }
 
-void NodeBase::pulse(size_t index)
+void Node::pulse(size_t index)
 {
 	setInternalValue(true, index);
 	setInternalValue(false, index);
 }
 
-bool NodeBase::shouldPulse(size_t inputIndex, size_t outputIndex)
+bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
 {
 	auto	outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
 	auto& storage				 = getIn(inputIndex).getStorage(outputPinIndex);
@@ -137,7 +64,7 @@ bool NodeBase::shouldPulse(size_t inputIndex, size_t outputIndex)
 	return false;
 }
 
-void NodeBase::setDataMap(const Transform::DataMap* map)
+void Node::setDataMap(const Transform::DataMap* map)
 {
 	// PerspectiveProj;
 	auto& validMaps = getValidDataMaps();
@@ -146,21 +73,7 @@ void NodeBase::setDataMap(const Transform::DataMap* map)
 	if (it != validMaps.end()) m_currentMap = map;
 }
 
-const NodeBase::PinView NodeBase::getInputPins()
-{
-	return PinView(std::make_shared<InputStrategy>(getPtr()), getPtr());
-}
-
-const NodeBase::PinView NodeBase::getOutputPins()
-{
-	return PinView(std::make_shared<OutputStrategy>(getPtr()), getPtr());
-}
-
-NodeBase::PinView NodeBase::getInputPinsRef() { return PinView(std::make_shared<InputStrategy>(getPtr()), getPtr()); }
-
-NodeBase::PinView NodeBase::getOutputPinsRef() { return PinView(std::make_shared<OutputStrategy>(getPtr()), getPtr()); }
-
-void NodeBase::spreadSignal()
+void Node::spreadSignal()
 {
 	for (auto& operatorOutput : getOutputPinsRef())
 	{
@@ -172,7 +85,7 @@ void NodeBase::spreadSignal()
 	}
 }
 
-void NodeBase::spreadSignal(size_t outIndex)
+void Node::spreadSignal(size_t outIndex)
 {
 	if (getOutputPinsRef().empty()) return;
 
@@ -183,7 +96,7 @@ void NodeBase::spreadSignal(size_t outIndex)
 	}
 }
 
-void NodeBase::receiveSignal(int inputIndex)
+void Node::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
 
@@ -191,7 +104,7 @@ void NodeBase::receiveSignal(int inputIndex)
 	// spreadSignal();
 }
 
-bool NodeBase::areInputsPlugged(int numInputs)
+bool Node::areInputsPlugged(int numInputs)
 {
 	Debug::Assert(m_inputs.size() >= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
 
@@ -202,9 +115,9 @@ bool NodeBase::areInputsPlugged(int numInputs)
 	return result;
 }
 
-bool NodeBase::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
+bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
 
-ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
+ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 {
     /* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
 	auto* inp = input;
@@ -235,7 +148,7 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 	auto toFind = inp->getOwner(); // INPUT
 
 	// stack in vector - TOS is at the vector back.
-	std::vector<Ptr<NodeBase>> stack;
+	std::vector<Ptr<Node>> stack;
 
 	// PUSH(output) insert element at end.
 	stack.push_back(out->getOwner());
@@ -266,14 +179,14 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 	return ENodePlugResult::Ok;
 }
 
-void NodeBase::unplugAll()
+void Node::unplugAll()
 {
 	for (size_t i = 0L; i < m_inputs.size(); ++i) { unplugInput(i); }
 
 	for (size_t i = 0L; i < m_outputs.size(); ++i) { unplugOutput(i); }
 }
 
-void NodeBase::unplugInput(size_t index)
+void Node::unplugInput(size_t index)
 {
 	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
 								"The node's input pin that you want to unplug does not exists.");
@@ -303,7 +216,7 @@ void NodeBase::unplugInput(size_t index)
 	}
 }
 
-void NodeBase::unplugOutput(size_t index)
+void Node::unplugOutput(size_t index)
 {
 	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
 								"The node's output pin that you want to unplug does not exists.");
@@ -318,7 +231,7 @@ void NodeBase::unplugOutput(size_t index)
 }
 
 
-Pin::Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index) :
+Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index) :
 		m_valueType(valueType), m_isInput(isInput), m_master(owner.get()), m_index(index)
 {
 	m_id = generator.next();

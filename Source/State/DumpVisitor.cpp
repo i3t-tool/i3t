@@ -341,8 +341,6 @@ SceneData loadScene(const std::string& rawScene)
 			auto opNode = operators[i];
 
 			createOperator(opNode);
-			
-			// if (op) scene.nodes.push_back(op);
 		}
 
 		// Connect all nodes.

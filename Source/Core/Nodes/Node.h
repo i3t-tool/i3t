@@ -64,79 +64,29 @@ inline constexpr size_t I3T_DATA2 = 2;
 namespace Core
 {
 class Pin;
-class NodeVisitor;
 
 /**
  * Base class interface for all boxes.
- *
- * \todo Decompose class to smaller interfaces.
  */
-class NodeBase : public std::enable_shared_from_this<NodeBase>
+class Node : public std::enable_shared_from_this<Node>
 {
 	friend class GraphManager;
 
-public:
-	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
-	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
+	using PinListRef      = std::vector<Pin>&;
+	using ConstPinListRef = const std::vector<Pin>&;
 
+	//===-- Lifecycle functions -----------------------------------------------===//
 protected:
-	ID m_id{};
-
-	/// Outputs of the box: output tabs with glyphs.
-	std::vector<Pin> m_outputs;
-
-	/// Results of operations.
-	std::vector<DataStore> m_internalData;
-
-	const Transform::DataMap* m_initialMap{};
-	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
-
 	/**
-	 * Owner of the node, sequence or camera, otherwise null.
-	 */
-	Ptr<NodeBase> m_owner = nullptr;
-
-	/**
-	 * Operator node properties.
-	 */
-	const Operation* m_operation = nullptr;
-
-	/// Inputs of the box: Input tabs with glyphs.
-	std::vector<Pin> m_inputs;
-
-protected:
-	NodeBase(const Operation* operation) : m_operation(operation) {}
-
-public:
-	/**
-	 * Delete node.
+	 * Node is never constructed directory.
 	 *
-	 * \pre All inputs and outputs must be unplugged (call Node::finalize function)!
+	 * \see init() function for pin and data storage initialization
+	 *
+	 * \param operation Node properties.
 	 */
-	virtual ~NodeBase();
-
-	/**
-	 * Prepares node for its destruction, after that destructor can be called.
-	 */
-	void finalize();
-
-	const Pin& getInPin(int index) { return getInputPins()[index]; }
-	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
-
-protected:
-	Pin& getInPinRef(int index) { return getInputPinsRef()[index]; }
-	Pin& getOutPinRef(int index) { return getOutputPinsRef()[index]; }
+	Node(const Operation* operation) : m_operation(operation) {}
 
 public:
-	Ptr<NodeBase> getPtr() { return shared_from_this(); }
-
-	template <typename T>
-	Ptr<T> as()
-	{
-		static_assert(std::is_base_of_v<NodeBase, T>, "T must be derived from NodeBase class.");
-		return std::dynamic_pointer_cast<T>(shared_from_this());
-	}
-
 	/**
 	 * Initialize node inputs and outputs according to preset node type.
 	 *
@@ -146,9 +96,49 @@ public:
 	 */
 	void init();
 
-	[[nodiscard]] ID getId() const;
+	/**
+	 * Delete node.
+	 *
+	 * \pre All inputs and outputs must be unplugged (calls Node::finalize function)!
+	 */
+	virtual ~Node();
+
+	/**
+	 * Prepares node for its destruction, after that destructor can be called.
+	 */
+	void finalize();
+
+	//===-- Helper functions --------------------------------------------------===//
+
+	/**
+	 * \return Application unique ID.
+	 */
+	ID getId() const;
 
 	const Operation* getOperation() const { return m_operation; }
+
+	/**
+	 * Get reference to this node instance.
+	 *
+	 * Note that this operation may be slower. A new shared pointer must be created,
+	 * it obtains atomic counter increment.
+	 */
+	Ptr<Node> getPtr() { return shared_from_this(); }
+
+	template <typename T>
+	Ptr<T> as()
+	{
+		static_assert(std::is_base_of_v<Node, T>, "T must be derived from NodeBase class.");
+		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) && "Cannot cast to Ptr<T>.");
+		return std::dynamic_pointer_cast<T>(shared_from_this());
+	}
+
+public:
+	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
+	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
+
+	const Pin& getInPin(int index) { return getInputPins()[index]; }
+	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:
@@ -204,13 +194,9 @@ public:
 	 * \param val
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
-
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
-
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
-
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q) { return setValueEx(q); }
-
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
 
 	/**
@@ -273,100 +259,12 @@ public:
 	const Transform::DataMap&																	 getDataMapRef() { return *m_currentMap; }
 	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps() { return m_operation->validDatamaps; };
 
-	class Strategy;
-
-	//===----------------------------------------------------------------------===//
-	/**
-	 * Class which composes
-	 */
-	class PinView
-	{
-		using value			= Pin;
-		using pointer		= Pin*;
-		using reference = Pin&;
-
-	public:
-		class Iterator
-		{
-		public:
-			Iterator(Ptr<Strategy> strategy, Ptr<NodeBase> node, int index);
-
-			reference		operator*() const;
-			pointer			operator->();
-			Iterator&		operator++();
-			Iterator		operator++(int);
-			Iterator&		operator=(const Iterator&) = default;
-			friend bool operator==(const Iterator& a, const Iterator& b) { return a.m_index == b.m_index; };
-			friend bool operator!=(const Iterator& a, const Iterator& b) { return a.m_index != b.m_index; };
-
-		protected:
-			int						m_index;
-			Ptr<NodeBase> m_node;
-			Ptr<Strategy> m_strategy;
-		};
-
-	public:
-		PinView(Ptr<Strategy> strategy, Ptr<NodeBase> node) : m_strategy(strategy), m_node(node){};
-		Pin&		 operator[](size_t i) const;
-		Iterator begin() const;
-		Iterator end() const;
-		bool		 empty() const;
-		size_t	 size() const;
-
-	private:
-		Ptr<NodeBase> m_node;
-		Ptr<Strategy> m_strategy;
-	};
-
-
-	class Strategy : public std::enable_shared_from_this<Strategy>
-	{
-	public:
-		Strategy(Ptr<NodeBase> node) : m_node(node) {};
-		Ptr<Strategy> getThis() { return shared_from_this(); }
-
-		virtual PinView::Iterator begin()						= 0;
-		virtual PinView::Iterator end()							= 0;
-		virtual bool							empty()						= 0;
-		virtual size_t						size()						= 0;
-		virtual Pin&							get(size_t index) = 0;
-
-	protected:
-		Ptr<NodeBase> m_node;
-	};
-
-	class InputStrategy : public Strategy
-	{
-	public:
-		InputStrategy(Ptr<NodeBase> node) :
-				Strategy(node) {}
-
-		virtual PinView::Iterator begin();
-		virtual PinView::Iterator end();
-		virtual bool							empty();
-		virtual size_t						size();
-		virtual Pin&							get(size_t index);
-	};
-
-	class OutputStrategy : public Strategy
-	{
-	public:
-		OutputStrategy(Ptr<NodeBase> node) :
-				Strategy(node) {}
-
-		virtual PinView::Iterator begin();
-		virtual PinView::Iterator end();
-		virtual bool							empty();
-		virtual size_t						size();
-		virtual Pin&							get(size_t index);
-	};
-
-	[[nodiscard]] const PinView getInputPins();
-	[[nodiscard]] const PinView getOutputPins();
+	[[nodiscard]] ConstPinListRef getInputPins() const  { return m_inputs; }
+	[[nodiscard]] ConstPinListRef getOutputPins() const { return m_outputs; }
 
 protected:
-	[[nodiscard]] PinView getInputPinsRef();
-	[[nodiscard]] PinView getOutputPinsRef();
+	[[nodiscard]] PinListRef getInputPinsRef()  { return m_inputs; }
+	[[nodiscard]] PinListRef getOutputPinsRef() { return m_outputs; }
 
 	public:
 	//===----------------------------------------------------------------------===//
@@ -414,6 +312,10 @@ protected:
 	bool areAllInputsPlugged();
 
 	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
+
+	/**
+	 * \warning Only for test purposes. May be removed anytime.
+	 */
 	std::string getSig()
 	{
 		std::string masterSig;
@@ -433,10 +335,35 @@ private:
 	void unplugAll();
 	void unplugInput(size_t index);
 	void unplugOutput(size_t index);
+
+protected:
+	ID m_id{};
+
+	/// Operator node properties.
+	const Operation* m_operation = nullptr;
+
+	/// Inputs of the box: Input tabs with glyphs.
+	std::vector<Pin> m_inputs;
+
+	/// Outputs of the box: output tabs with glyphs.
+	std::vector<Pin> m_outputs;
+
+	/// Results of operations.
+	std::vector<DataStore> m_internalData;
+
+	const Transform::DataMap* m_initialMap{};
+	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
+
+	/**
+	 * Owner of the node, used in complex type of nodes, such as sequence or camera.
+	 */
+	Ptr<Node> m_owner = nullptr;
 };
 
-using Node		= NodeBase;
-using NodePtr = Ptr<Node>;
+using NodePtr  = Ptr<Node>;
+
+/// \warning Will be removed, use Node type instead.
+using NodeBase = Node;
 
 
 /**
@@ -447,35 +374,10 @@ using NodePtr = Ptr<Node>;
 class Pin
 {
 	friend class GraphManager;
-	friend class NodeBase;
+	friend class Node;
 
 	/// \todo MH do not access pin directly.
 	friend class Sequence;
-
-	ID m_id;
-
-	/// Index within a node.
-	int m_index = -1;
-
-	/// Pin type.
-	const bool m_isInput;
-
-	/// Owner of the pin.
-	NodeBase* m_master;
-
-	/**
-	 * The box can have a single parent. Therefore, just a single input component
-	 * (a single connected wire) to output tab of the parent node).
-	 */
-	Pin* m_input = nullptr;
-
-	/**
-	 * Child boxes in the scene graph (coming out to the right).
-	 * A pointer to input pins of boxes connected to this box output.
-	 */
-	std::vector<Pin*> m_outputs;
-
-	const EValueType m_valueType = EValueType::Pulse;
 
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index);
@@ -510,7 +412,7 @@ public:
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
 
 	/**
-	 * @return Storage which belongs to this pin.
+	 * \return Storage which belongs to this pin.
 	 */
 	[[nodiscard]] const DataStore& data() const;
 
@@ -541,6 +443,7 @@ public:
 		return label;
 	}
 
+	/// Only for test purposes, it can be removed anytime.
 	std::string getSig()
 	{
 		return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
@@ -556,6 +459,32 @@ public:
 	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
 
 	[[nodiscard]] bool isInput() const { return m_isInput; }
+
+private:
+	ID m_id;
+
+	/// Index within a node.
+	int m_index = -1;
+
+	/// Pin type.
+	const bool m_isInput;
+
+	/// Owner of the pin.
+	NodeBase* m_master;
+
+	/**
+	 * The box can have a single parent. Therefore, just a single input component
+	 * (a single connected wire) to output tab of the parent node).
+	 */
+	Pin* m_input = nullptr;
+
+	/**
+	 * Child boxes in the scene graph (coming out to the right).
+	 * A pointer to input pins of boxes connected to this box output.
+	 */
+	std::vector<Pin*> m_outputs;
+
+	const EValueType m_valueType = EValueType::Pulse;
 };
 
 FORCE_INLINE const bool isOperator(const NodePtr& node)

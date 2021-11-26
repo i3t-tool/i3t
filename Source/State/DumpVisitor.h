@@ -38,9 +38,9 @@ private:
 	 */
 	void visit(const Ptr<GuiCamera>& node) override;
 	void visit(const Ptr<GuiCycle>& node) override;
-	void visit(const Ptr<GuiOperator> &node) override;
-	void visit(const Ptr<GuiSequence> &node) override;
-	void visit(const Ptr<GuiTransform> &node) override;
+	void visit(const Ptr<GuiOperator>& node) override;
+	void visit(const Ptr<GuiSequence>& node) override;
+	void visit(const Ptr<GuiTransform>& node) override;
 
 	/// Stores last scene representation.
 	SceneRawData m_sceneData;

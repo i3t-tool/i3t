@@ -32,7 +32,7 @@ enum class ETransformState
 	Unknown
 };
 
-class Transformation : public NodeBase
+class Transformation : public Node
 {
 	friend class Storage;
 

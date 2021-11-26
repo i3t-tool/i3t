@@ -8,7 +8,7 @@ typedef unsigned int ID;
 
 class IdGenerator
 {
-	friend class NodeBase;
+	friend class Node;
 	friend class Pin;
 
 public:

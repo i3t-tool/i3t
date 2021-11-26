@@ -19,7 +19,7 @@ namespace Core
  *
  * \tparam T Type of node to be created.
  */
-template <ENodeType T> class NodeImpl : public NodeBase
+template <ENodeType T> class NodeImpl : public Node
 {
 public:
 	/**
