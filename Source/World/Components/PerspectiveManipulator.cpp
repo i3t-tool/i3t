@@ -87,7 +87,7 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 }
 void PerspectiveManipulator::update(){
 	if(m_editednode==nullptr){return;}
-	Core::PerspectiveProj*editedpersp=(Core::PerspectiveProj*)m_editednode.get();
+	auto* editedpersp = (Core::TransformImpl<ETransformType::Perspective>*)m_editednode.get();
 	m_edited=m_editednode->getData().getMat4();
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);

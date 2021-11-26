@@ -2,11 +2,8 @@
 
 #include "Core/Nodes/GraphManager.h"
 #include "Logger/Logger.h"
-#include "Logger/LoggerInternal.h"
 
 using namespace Core;
-
-static IdGenerator generator;
 
 Node::~Node()
 {
@@ -228,39 +225,4 @@ void Node::unplugOutput(size_t index)
 	for (const auto& otherPin : pin.m_outputs) otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
-}
-
-
-Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index) :
-		m_valueType(valueType), m_isInput(isInput), m_master(owner.get()), m_index(index)
-{
-	m_id = generator.next();
-}
-
-Pin::~Pin()
-{
-	generator.returnId(m_id);
-}
-
-const DataStore& Pin::data() const
-{
-	if (m_isInput)
-		return m_input->data();
-  else
-	  return m_master->getData(m_index);
-}
-
-const DataStore& Pin::getStorage(unsigned int id)
-{
-	if (m_isInput)
-	{
-		// Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-		// return m_input->m_master->getData(id);
-		// Get input data from parent output pin.
-		return m_input->data();
-	}
-	else
-	{
-		return m_master->getData(id);
-	}
 }

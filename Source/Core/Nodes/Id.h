@@ -21,4 +21,6 @@ private:
 
 	std::list<unsigned int> m_ids;
 };
+
+static inline IdGenerator generator;
 } // namespace Core

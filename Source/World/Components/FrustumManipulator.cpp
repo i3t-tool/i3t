@@ -88,7 +88,7 @@ void FrustumManipulator::render(glm::mat4*parent,bool renderTransparent){
 }
 void FrustumManipulator::update(){
 	if(m_editednode==nullptr){return;}
-	Core::Frustum*editedfrustum=(Core::Frustum*)m_editednode.get();
+	auto* editedfrustum = (Core::TransformImpl<ETransformType::Frustum>*)m_editednode.get();
 	m_edited=m_editednode->getData().getMat4();
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);

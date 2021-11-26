@@ -54,12 +54,15 @@ bool saveWorkspace(FILE* f, std::vector<Ptr<WorkspaceNodeWithCoreData>> * _works
 			fprintf(f, "int n%d=mat4(free,d%d,%d,%d,\"%s\");\n", i+at, i+at, (int)pos[0], (int)pos[1], label.c_str());
 		}
 		else if (strcmp(keyword, "LookAt") == 0) {
+			/// \todo MH
+			/*
 			Core::LookAt* lookat = (Core::LookAt*)(nodebase.get());
 			glm::mat3 m = glm::mat3(0.0f);
 			m[0]=lookat->getCenter();m[1]=lookat->getEye();m[2]=lookat->getUp();
 			fprintf(f, "int d%d=datamat4(%0.3ff,%0.3ff,%0.3ff,0.0f, %0.3ff,%0.3ff,%0.3ff,0.0f, %0.3ff,%0.3ff,%0.3ff,0.0f, 0.0f,0.0f,0.0f,0.0f);\n", i+at,
 				m[0][0],m[0][1],m[0][2], m[1][0],m[1][1],m[1][2], m[2][0],m[2][1],m[2][2]);
 			fprintf(f, "int n%d=mat4(lookat,d%d,%d,%d,\"%s\");\n", i+at, i+at, (int)pos[0], (int)pos[1], label.c_str());
+			 */
 		}
 		else if (strcmp(keyword, "EulerX") == 0) {
 			glm::mat4 m = nodebase->getData().getMat4();

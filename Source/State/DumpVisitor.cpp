@@ -5,6 +5,7 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "Core/Nodes/Caller.h"
 #include "Core/Nodes/Cycle.h"
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
@@ -209,15 +210,16 @@ std::string SceneRawData::toString() const
 
 /// \see addNodeToPosition(ImVec2 const)
 std::map<std::string_view, std::function<void(ImVec2 const)>> createFns;
+std::map<std::string_view, std::function<void(ImVec2 const)>> createTransformFns;
 
 template <int N, int Max>
-void do_for()
+void doForOperator()
 {
 	constexpr auto enumValue = static_cast<ENodeType>(N);
 
 	createFns[magic_enum::enum_name(enumValue)] = WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
 
-	if constexpr (N < Max) { do_for<N + 1, Max>(); }
+	if constexpr (N < Max) { doForOperator<N + 1, Max>(); }
 }
 
 bool DumpVisitor::m_isInitialized = false;
@@ -225,7 +227,16 @@ bool DumpVisitor::m_isInitialized = false;
 void initCreateFns()
 {
 	constexpr std::size_t count = magic_enum::enum_count<ENodeType>() - 1;
-	do_for<0, count>();
+	doForOperator<0, count>();
+
+	// \todo MH - transformValue to string
+	/*
+	constexpr auto& transformValues = magic_enum::enum_values<ETransformType>();
+	for (const auto& transformValue : transformValues)
+		Core::forTransform(transformValue, []() {
+			createTransformFns[magic_enum::enum_name(transformValue)] =
+		});
+	 */
 }
 
 DumpVisitor::DumpVisitor()

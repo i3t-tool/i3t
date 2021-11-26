@@ -54,8 +54,6 @@ SceneData loadScene(const std::string& rawScene);
 
 /**
  * Loads scene to the Workspace Window.
- * @param rawScene
- * @return
  */
 SceneData loadSceneFromFile(const std::string& sceneFile);
 
