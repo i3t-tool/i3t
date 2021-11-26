@@ -72,6 +72,7 @@ class Node : public std::enable_shared_from_this<Node>
 {
 	friend class GraphManager;
 
+public:
 	using PinListRef      = std::vector<Pin>&;
 	using ConstPinListRef = const std::vector<Pin>&;
 

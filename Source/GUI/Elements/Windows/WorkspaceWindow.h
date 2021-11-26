@@ -6,13 +6,13 @@
  */
 #pragma once
 
+//#define WORKSPACE_DEBUG 1
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 
 #include "DIWNE/diwne_include.h"
-//#include "DIWNE/diwne.h"
-//#include "DIWNE/Node.h"
 
 #include <algorithm>
 #include <map>
@@ -26,13 +26,6 @@
 
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/IWindow.h"
-// #include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
-// #include "GUI/NodeEditorUtilities/Widgets.h"
-
-//#include "GUI/Elements/Nodes/WorkspaceCamera.h"
-
-//#include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
-
 
 #include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
 

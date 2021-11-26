@@ -7,7 +7,8 @@ uniform vec4 light;
 uniform vec4 color=vec4(1.0,1.0,1.0,1.0);
 uniform vec3 ldir=vec3(0.25,1.0,0.5);
 
-smooth in vec3 normn;//camera space normal
+//smooth in vec3 normn;//camera space normal
+smooth in vec3 n;//camera space normal
 smooth in vec3 pos;//glob pos
 smooth in vec2 coord;//uv
 
@@ -18,6 +19,7 @@ vec3 cpos=pos+camera;
 
 void main(){
 	vec3 lvec=normalize(ldir);
+	vec3 normn = normalize(n); //PF
 	fragmentColor=texture(tex0,vec2(coord.x,coord.y),-0.5)*color;
 
 	ambient= ambient*fragmentColor.rgb;

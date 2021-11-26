@@ -13,10 +13,10 @@ const char* g_meshesNames[] = {
 };
 
 WorkspaceModel::WorkspaceModel()
-	: WorkspaceNodeWithCoreData(Core::Builder::createNode<ENodeType::Model>())
+	: WorkspaceNodeWithCoreDataWithPins(Core::Builder::createNode<ENodeType::Model>())
 {
 	init();
-	setDataItemsWidth();
+	//setDataItemsWidth();
 }
 
 bool WorkspaceModel::drawDataFull(DIWNE::Diwne& diwne, int index)
@@ -32,8 +32,6 @@ bool WorkspaceModel::drawDataFull(DIWNE::Diwne& diwne, int index)
 	return false;
 }
 
-int	 WorkspaceModel::maxLenghtOfData(int index) { return 1; }
-
 void WorkspaceModel::init()
 {
 //	fw.showMyPopup = false;
@@ -45,4 +43,21 @@ void WorkspaceModel::init()
 
 	auto* object = App::get().world()->addModel("CubeGray");
 	m_nodebase->setValue(static_cast<void*>(object));
+}
+
+bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
+{
+    ImGui::Text("Speciální text v model");
+   return false;
+}
+
+int WorkspaceModel::maxLenghtOfData()
+{
+    Debug::Assert(false, "Calling WorkspaceModel::maxLenghtOfData() make no sense because Model has no float data to show");
+    return -1; /* should be unused */
+}
+
+void WorkspaceModel::drawMenuLevelOfDetail()
+{
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }

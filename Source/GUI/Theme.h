@@ -35,6 +35,7 @@ enum class EColor
 
 	TutorialBgColor,
 
+	/* \todo JH MH - no need to use this Node_editor specific properties */
 	// Node editor properties.
 	// 1. General
 	NodeEditorBg,

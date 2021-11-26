@@ -5,11 +5,14 @@ namespace DIWNE
 
 
 Node::Node(DIWNE::ID id) /* FLT_MAX for first frame - draw node anywhere it is and thus got its real size*/
-    : m_topRectDiwne(ImRect(100,100,0,0))
+    : m_wholeNodeRectDiwne(ImRect(-FLT_MAX,-FLT_MAX,FLT_MAX,FLT_MAX))
+    , m_topRectDiwne(ImRect(0,0,0,0))
     , m_leftRectDiwne(ImRect(0,0,0,0))
     , m_middleRectDiwne(ImRect(0,0,0,0))
     , m_rightRectDiwne(ImRect(0,0,0,0))
-    , m_bottomRectDiwne(ImRect(0,0,FLT_MAX, FLT_MAX))
+    , m_bottomRectDiwne(ImRect(0,0,0,0))
+    , m_centerDummySpace(0)
+    , m_middleAlign(0.5)
     , m_idDiwne(id)
     , m_selected(false)
     , m_translated(false)
@@ -32,15 +35,18 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
     bool inner_interaction_happen = false;
     bool interaction_happen = false;
 
-    if (drawHere) setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
-    setNodeRectsPositionDiwne(getNodePositionDiwne()*diwne.getWorkAreaZoomDiwne()); /*draw here change location*/
+    if (drawHere)
+    {
+        setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
+        setNodeRectsPositionDiwne(getNodePositionDiwne()*diwne.getWorkAreaZoomDiwne()); /*draw here change location*/
+    }
+
+//    m_topRectDiwne_temp.Min = m_topRectDiwne.Max;
 
     ImRect nodeRectDiwne = getNodeRectDiwne();
 
     if ( nodeRectDiwne.Overlaps( diwne.getWorkAreaDiwne() ) )
     {
-        ImRect nodeOnWorkArea = ImRect( diwne.diwne2workArea_noZoom( m_topRectDiwne.Min )
-                                    , diwne.diwne2workArea_noZoom( m_bottomRectDiwne.Max ) );
 
 #ifdef DIWNE_DEBUG
         /* debug - whole node */
@@ -48,21 +54,21 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 #endif // DIWNE_DEBUG
 
         /* Set cursor to position of node */
-        if (!drawHere) ImGui::SetCursorScreenPos(diwne.workArea2screen(nodeOnWorkArea.Min));
+        if (!drawHere) ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
 
         ImGui::PushID(fmt::format("Node{}", m_idDiwne).c_str());
         ImGui::BeginGroup(); /* Begin of node */
 
-            inner_interaction_happen |= drawNodeBackground(diwne);
+            inner_interaction_happen |= drawNodeBeforeContent(diwne);
 
             inner_interaction_happen |= drawTopDiwne(diwne);
 
 						ImGui::PushID("LeftMiddleRight");
             ImGui::BeginGroup();
                 inner_interaction_happen |= drawLeftDiwne(diwne);
-                   ImGui::SameLine();
+                   ImGui::SameLine(); ImGui::Indent(m_centerDummySpace*m_middleAlign);
                 inner_interaction_happen |= drawMiddleDiwne(diwne);
-                    ImGui::SameLine();
+                    ImGui::SameLine(); ImGui::Indent(m_centerDummySpace*(1-m_middleAlign));
                 inner_interaction_happen |= drawRightDiwne(diwne);
             ImGui::EndGroup(); /* Left-Middle-Right */
 						ImGui::PopID();
@@ -76,9 +82,14 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                                  diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y, diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
                                  diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
 #endif // DIWNE_DEBUG
-
+            inner_interaction_happen |= drawNodeAfterContent(diwne);
         ImGui::EndGroup(); /* End of node */
         ImGui::PopID();
+
+        /* Min of whole node is position of node... */
+        m_wholeNodeRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+        m_wholeNodeRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+
         ImGui::SetItemAllowOverlap();
 
         if (ImGui::IsItemHovered()) {
@@ -119,7 +130,7 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
         }
 
-        synchronizeSizeRectangles();
+        updateSizeRectangles();
 
         if (m_selected)
         {
@@ -168,7 +179,9 @@ bool Node::drawTopDiwne(DIWNE::Diwne &diwne)
     ImGui::EndGroup();
 		ImGui::PopID();
 
+    m_topRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
     m_topRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+
     return inner_interaction_happen;
 }
 
@@ -187,8 +200,8 @@ bool Node::drawLeftDiwne(DIWNE::Diwne &diwne)
         ImGui::EndGroup();
 				ImGui::PopID();
 
-        m_leftRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
-        m_leftRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+    m_leftRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
+    m_leftRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
     return inner_interaction_happen;
 }
 bool Node::drawMiddleDiwne(DIWNE::Diwne &diwne)
@@ -199,7 +212,6 @@ bool Node::drawMiddleDiwne(DIWNE::Diwne &diwne)
                 , m_middleRectDiwne.Max, ImColor(255,0,255), 0, ImDrawCornerFlags_None, 2);
 #endif // DIWNE_DEBUG
     bool inner_interaction_happen = false;
-
 				ImGui::PushID("Middle");
         ImGui::BeginGroup();
             inner_interaction_happen |= middleContent(diwne);
@@ -228,7 +240,6 @@ bool Node::drawRightDiwne(DIWNE::Diwne &diwne)
 
         m_rightRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
         m_rightRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
-
     return inner_interaction_happen;
 
 }
@@ -253,25 +264,35 @@ bool Node::drawBottomDiwne(DIWNE::Diwne &diwne)
     return inner_interaction_happen;
 }
 
-void Node::synchronizeSizeRectangles()
+void Node::updateSizeRectangles()
 {
-    m_bottomRectDiwne.Max.x = std::max(m_topRectDiwne.Max.x, std::max(m_rightRectDiwne.Max.x, m_bottomRectDiwne.Max.x));
+    setNodeRectsPositionDiwne(m_nodePositionDiwne);
 
-    m_rightRectDiwne.Min.x += (m_bottomRectDiwne.Max.x - m_rightRectDiwne.Max.x); /* shift right content to the most right place */
-    m_rightRectDiwne.Max.x = m_bottomRectDiwne.Max.x;
-    m_rightRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
+    float rightWidth = m_rightRectDiwne.GetWidth();
+    float centerWidth = m_leftRectDiwne.GetWidth()+m_middleRectDiwne.GetWidth()+rightWidth;
+    float maxWidth = m_wholeNodeRectDiwne.GetWidth();
+    float height = m_wholeNodeRectDiwne.GetHeight();
+    ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
+    float bottomYOfCentre = m_bottomRectDiwne.Min.y - spacing.y;
 
-    m_middleRectDiwne.Max.x = m_rightRectDiwne.Min.x;
-    m_middleRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
+    m_topRectDiwne.Max.x = m_wholeNodeRectDiwne.Max.x;
 
-    m_leftRectDiwne.Max.y = m_bottomRectDiwne.Min.y;
+    m_leftRectDiwne.Max.y = bottomYOfCentre;
 
-    m_topRectDiwne.Max.x = m_bottomRectDiwne.Max.x;
+    m_centerDummySpace = maxWidth - centerWidth - spacing.x*2; /* how much shift right content for right-align, space is between left-middle and middle-right */
+    m_middleRectDiwne.Min.x = m_leftRectDiwne.Min.x + spacing.x;
+    m_middleRectDiwne.Max.x = m_wholeNodeRectDiwne.Max.x - rightWidth - spacing.x; /* space between middle-right */
+    m_middleRectDiwne.Max.y = bottomYOfCentre;
+
+    m_rightRectDiwne.Max.y = bottomYOfCentre;
+
+    m_bottomRectDiwne.Max.x = m_wholeNodeRectDiwne.Max.x;
+
 }
 
 void Node::setNodeRectsPositionDiwne(ImVec2 const& position)
 {
-    translateNodeRectsDiwne(position - m_topRectDiwne.Min);
+    translateNodeRectsDiwne(position - m_wholeNodeRectDiwne.Min);
 }
 
 //void Node::translateNodeRectsDiwneZoomed(DIWNE::Diwne const &diwne, ImVec2 const& distance)
@@ -282,6 +303,7 @@ void Node::setNodeRectsPositionDiwne(ImVec2 const& position)
 
 void Node::translateNodeRectsDiwne(ImVec2 const& distance)
 {
+    m_wholeNodeRectDiwne.Translate(distance);
     m_topRectDiwne.Translate(distance);
     m_leftRectDiwne.Translate(distance);
     m_middleRectDiwne.Translate(distance);

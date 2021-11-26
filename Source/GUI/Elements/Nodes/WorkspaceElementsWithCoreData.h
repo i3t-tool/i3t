@@ -163,6 +163,7 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
 {
+protected:
     public:
         WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         ImVec2 getLinkConnectionPoint() const {return ImVec2(m_pinRectDiwne.Max.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
@@ -257,9 +258,30 @@ class WorkspaceCoreInputPinMatrixMul : public WorkspaceCoreInputPin
         WorkspaceCoreInputPinMatrixMul(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreInputPin(id, pin, node) {};
 };
 
+class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
+{
+    protected:
+        std::vector<Ptr<WorkspaceCoreInputPin>>    m_workspaceInputs;
+        std::vector<Ptr<WorkspaceCoreOutputPin>>    m_workspaceOutputs;
+        bool m_showDataOnPins;
 
+	public:
+        std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const {return m_workspaceInputs;};
+        std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const {return m_workspaceOutputs;};
+
+        WorkspaceNodeWithCoreDataWithPins(Ptr<Core::NodeBase> nodebase, bool showDataOnPins=true);
+
+    virtual bool leftContent(DIWNE::Diwne &diwne);
+    virtual bool rightContent(DIWNE::Diwne &diwne);
+
+
+};
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
+/* \todo maybe create from this function class "WithPins" and inherit other class from "WithPins" */
+extern void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::ConstPinListRef coreInputPins, Core::Node::ConstPinListRef coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins);
+
+
 extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, int const mapValue, bool& valueChanged);
 extern void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& valueSelected);
 
