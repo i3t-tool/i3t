@@ -731,10 +731,13 @@ int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with l
 WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
  : WorkspaceCoreOutputPinWithData(id, pin, node)
 {
-    glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    rend = new RenderTexture(&renderTexture, 256, 256);
-    cam = new Camera(60.0f, Application::get().world()->sceneRoot ,rend);
+	  // tohle nema smysl tady - muselo by se v camera update, resp. v render()
+    //glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);	
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	  //todo - size dle velikosti krabicky a dle zoomu
+    rend = new RenderTexture(&renderTexture, 256, 256);   // create FBO and texture as attachment
+    cam = new Camera(60.0f, Application::get().world()->sceneRoot, rend);  // connet textre with camera
     cam->update();
 }
 bool WorkspaceCoreOutputPinScreen::pinContent(DIWNE::Diwne &diwne)
@@ -745,7 +748,8 @@ bool WorkspaceCoreOutputPinScreen::pinContent(DIWNE::Diwne &diwne)
         cam->m_perspective = camera;
         cam->update();
 
-        ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
+        //ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
+    	  ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture), I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize), ImVec2(0.0f,1.0f), ImVec2(1,0)); //vertiocal flip
     }
     return false;
 }
