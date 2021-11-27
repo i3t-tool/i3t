@@ -14,7 +14,10 @@ WorkspaceScreen::WorkspaceScreen()
 
 WorkspaceScreen::~WorkspaceScreen()
 {
-
+	if(renderTexture)
+		delete(renderTexture);
+	if(m_camera)
+		delete(m_camera);
 }
 
 
@@ -24,6 +27,7 @@ void WorkspaceScreen::init()
 
 	//Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget);
 	m_camera = new Camera(60.0f, Application::get().world()->sceneRoot, renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
+
 	printf("Screen initialized\n");
 }
 
@@ -31,20 +35,9 @@ void WorkspaceScreen::init()
 bool WorkspaceScreen::middleContent(DIWNE::Diwne& diwne)
 {
 
-#ifdef TEST
-	ImGui::Text("Nad texturou      ");
-
-	ImGui::PushItemWidth(50);
-	ImGui::InputFloat("Float:", &val);  //DragFloat("float: ", &val, 0.1f,0.0f, 1.0f);
-	ImGui::PopItemWidth();
-#endif
-
-	//m_camera->
 	m_camera->update();
 
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
-	
-	//ImGui::Text("Pod texturou");
 	
   return false;
 }
