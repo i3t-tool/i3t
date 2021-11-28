@@ -41,6 +41,8 @@ struct SettingsDiwne
     ImRect workAreaDiwne = ImRect(0,0,0,0); /* only .Min is really used - .Max is based on size of window */
     float workAreaInitialZoomDiwne = 1;
     float zoomWheelSenzitivity = 8; /* Higher number -> smaller change */
+    float minWorkAreaZoom = 0.25;
+    float maxWorkAreaZoom = 4;
 //    FloatPopupMode floatPopupMode = Radians;
 };
 
@@ -67,6 +69,7 @@ class Diwne
         ImRect getWorkAreaDiwne() const {return m_workAreaDiwne;};
         ImRect getWorkAreaScreen() const {return m_workAreaScreen;};
         float getWorkAreaZoomDiwne() const {return m_workAreaZoomDiwne;};
+        void setWorkAreaZoomDiwne(float val=1);
         bool getBackgroudPopupRaise() const {return m_backgroundPopupRaise;};
 
 
@@ -104,7 +107,6 @@ class Diwne
 
         void AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All) const;
         void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All, float thickness = 1.0f) const;
-        void AddBezierCurveScreen(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) const;
         void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) const;
 
 
@@ -208,7 +210,6 @@ class Diwne
         void setNodesSelectionChanged(bool value){m_nodesSelectionChanged = value;};
         bool getNodesSelectionChanged(){return m_nodesSelectionChanged;};
 
-
     protected:
         bool m_inner_interaction_happen = false;
         DiwneAction m_diwneAction = None, m_previousFrameDiwneAction = None;
@@ -223,6 +224,7 @@ class Diwne
     ImRect m_workAreaDiwne;  /*! \brief Rectangle of work area on diwne - .Min is set by user, .Max is computed from m_workAreaScreen */
     float m_workAreaZoomDiwne, m_workAreaZoomChangeDiwne;
     float m_zoomWheelSenzitivity; /* Higher number -> smaller change */
+    float m_minWorkAreaZoom, m_maxWorkAreaZoom;
 
     bool m_backgroundPopupRaise = false;
 

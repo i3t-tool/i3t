@@ -158,7 +158,7 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
     public:
         WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
-        ImVec2 getLinkConnectionPoint() const {return ImVec2(m_pinRectDiwne.Min.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
+        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_pinRectDiwne.Min.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
@@ -166,7 +166,7 @@ class WorkspaceCoreOutputPin : public WorkspaceCorePin
 protected:
     public:
         WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-        ImVec2 getLinkConnectionPoint() const {return ImVec2(m_pinRectDiwne.Max.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
+        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_pinRectDiwne.Max.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
 };
 
 class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
@@ -245,7 +245,7 @@ class WorkspaceCoreOutputPinScreen : public WorkspaceCoreOutputPinWithData
         int maxLengthOfData();
 };
 
-/* MatrixMulPin is Output and Input because of different  getLinkConnectionPoint()  function */
+/* MatrixMulPin is Output and Input because of different  getLinkConnectionPointDiwne()  function */
 class WorkspaceCoreOutputPinMatrixMul : public WorkspaceCoreOutputPin
 {
     public:

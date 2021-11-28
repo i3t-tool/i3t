@@ -39,7 +39,7 @@ class Node : public std::enable_shared_from_this<Node>
 
         DIWNE::ID const getId() const {return m_idDiwne; };
 
-        void updateSizeRectangles();
+        void updateSizeRectangles(DIWNE::Diwne &diwne);
 
         bool drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere = false);
         bool drawTopDiwne(DIWNE::Diwne &diwne);
@@ -65,8 +65,8 @@ class Node : public std::enable_shared_from_this<Node>
         ImVec2 getNodePositionDiwne() const { return m_nodePositionDiwne; };
         void translateNodePositionDiwne(ImVec2 const amount) {m_nodePositionDiwne+=amount; translateNodeRectsDiwne(amount); };
 
-        ImRect getNodeRectDiwne() { return m_wholeNodeRectDiwne;};
-        ImVec2 getNodeRectSizeDiwne() { return m_wholeNodeRectDiwne.GetSize();};
+        ImRect getNodeRectDiwne() { return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
+        ImVec2 getNodeRectSizeDiwne() { return m_bottomRectDiwne.Max - m_topRectDiwne.Min;};
 
         bool getSelected() const {return m_selected;};
         void setSelected(bool selected) {m_selected = selected;};
@@ -82,8 +82,7 @@ class Node : public std::enable_shared_from_this<Node>
               , m_leftRectDiwne
               , m_middleRectDiwne
               , m_rightRectDiwne
-              , m_bottomRectDiwne /*! \brief Rectangle of parts of node in diwne */
-              , m_wholeNodeRectDiwne; /* possible ImGui padding between parts of node -> it is easier to store this value than compute it */
+              , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
 
 
         float m_centerDummySpace;
@@ -97,7 +96,6 @@ class Node : public std::enable_shared_from_this<Node>
 
         void setNodeRectsPositionDiwne(ImVec2 const& position);
         void translateNodeRectsDiwne(ImVec2 const& amount);
-        //void translateNodeRectsDiwneZoomed(DIWNE::Diwne const &diwne, ImVec2 const& amount);
         bool m_isHeld;
 
         float m_middleAlign;

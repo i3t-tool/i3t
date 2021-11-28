@@ -43,12 +43,12 @@ WorkspaceNode::WorkspaceNode(DIWNE::ID id, std::string const topLabel, std::stri
     ,   m_removeFromWorkspaceWindow(false)
 {}
 
-bool WorkspaceNode::drawNodeBackground(DIWNE::Diwne &diwne)
+bool WorkspaceNode::drawNodeBeforeContent(DIWNE::Diwne &diwne)
 {
     /* \todo JH background by settings in different type of nodes */
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(ImVec4(0,50,255,255)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+                             ImGui::ColorConvertFloat4ToU32(ImVec4(0,255,0,255)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
     return false;
 }
 

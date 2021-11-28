@@ -79,7 +79,7 @@ public:
     void setMiddleLabel(std::string label){m_middleLabel = label;};
 
 	/* DIWNE function */
-	virtual bool drawNodeBackground(DIWNE::Diwne &diwne);
+	virtual bool drawNodeBeforeContent(DIWNE::Diwne &diwne);
     virtual bool topContent(DIWNE::Diwne &diwne);
     virtual bool middleContent(DIWNE::Diwne &diwne);
 

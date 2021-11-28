@@ -515,8 +515,8 @@ void WorkspaceCorePin::pinActiveProcess(DIWNE::Diwne &diwne)
 {
     DIWNE::Pin::pinActiveProcess(diwne);
     diwne.setLastActivePin<WorkspaceCorePin>(this);
-    ImVec2 origin =  getLinkConnectionPoint();
-    ImVec2 actual = diwne.screen2diwne_noZoom( ImGui::GetIO().MousePos );
+    ImVec2 origin =  getLinkConnectionPointDiwne();
+    ImVec2 actual = diwne.screen2diwne( ImGui::GetIO().MousePos );
     diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
 }
 
@@ -732,7 +732,7 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::ID const id, C
  : WorkspaceCoreOutputPinWithData(id, pin, node)
 {
 	  // tohle nema smysl tady - muselo by se v camera update, resp. v render()
-    //glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);	
+    //glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	  //todo - size dle velikosti krabicky a dle zoomu
@@ -774,8 +774,8 @@ void WorkspaceCoreLink::updateEndpoints(){
     ImVec2 start, end;
     WorkspaceCoreOutputPin* startPin = getStartPin();
     WorkspaceCoreInputPin* endPin = getEndPin();
-    if(startPin)    start = startPin->getLinkConnectionPoint();
-    if(endPin)  end = endPin->getLinkConnectionPoint();
+    if(startPin)    start = startPin->getLinkConnectionPointDiwne();
+    if(endPin)  end = endPin->getLinkConnectionPointDiwne();
     setLinkEndpointsDiwne(start, end);
 }
 
