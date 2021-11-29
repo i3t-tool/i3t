@@ -26,8 +26,8 @@ class Pin
         virtual bool pinConnectLinkCheck(DIWNE::Diwne &diwne);
         virtual void pinConnectLinkProcess(DIWNE::Diwne &diwne)=0;
 
-        ImVec2 getCenter() const {return m_pinRectDiwne.GetCenter(); };
-        virtual ImVec2 getLinkConnectionPoint() const {return getCenter(); };
+        ImVec2 getCenterDiwne() const {return m_pinRectDiwne.GetCenter(); };
+        virtual ImVec2 getLinkConnectionPointDiwne() const {return getCenterDiwne(); };
 
     protected:
         DIWNE::ID m_idDiwne;

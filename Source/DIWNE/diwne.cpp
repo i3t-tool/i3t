@@ -11,6 +11,8 @@ Diwne::Diwne(SettingsDiwne const & settingsDiwne, void *customData)
                       ,settingsDiwne.workAreaDiwne.Max)
     , m_workAreaZoomDiwne(settingsDiwne.workAreaInitialZoomDiwne)
     , m_zoomWheelSenzitivity(settingsDiwne.zoomWheelSenzitivity)
+    , m_minWorkAreaZoom(settingsDiwne.minWorkAreaZoom)
+    , m_maxWorkAreaZoom(settingsDiwne.maxWorkAreaZoom)
     , m_mouseLocation(ImGuiLocation)
     , m_helperLink(0)
     , m_customData(customData)
@@ -54,13 +56,13 @@ void Diwne::Begin(const char* imgui_id)
         {
             if (ImGui::IsItemActive())
             {
-               translateWorkAreaDiwne(ImVec2(-ImGui::GetIO().MouseDelta.x, -ImGui::GetIO().MouseDelta.y));
+               translateWorkAreaDiwneZoomed(ImGui::GetIO().MouseDelta*-1);
             }
 
             float mouseWheel = ImGui::GetIO().MouseWheel;
             if (ImGui::IsItemHovered() && mouseWheel != 0)
             {
-                m_workAreaZoomDiwne += mouseWheel/m_zoomWheelSenzitivity;
+                setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
             }
 
             popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
@@ -110,8 +112,17 @@ void Diwne::End()
     ImGui::EndChild();
 }
 
+void Diwne::setWorkAreaZoomDiwne(float val/*=1*/)
+{
+    if (val < m_minWorkAreaZoom) m_workAreaZoomDiwne = m_minWorkAreaZoom;
+    else if (val > m_maxWorkAreaZoom) m_workAreaZoomDiwne = m_maxWorkAreaZoom;
+    else m_workAreaZoomDiwne = val;
+}
 
 
+
+
+/* \todo JH some policy what point in WorkArea hold position on screen - probably CoursorPosition */
 void Diwne::updateWorkAreaRectangles()
 {
     ImVec2 windowPos = ImGui::GetWindowPos(); /* \todo JH return negative number while sub-window can not move outside from aplication window */
@@ -120,7 +131,7 @@ void Diwne::updateWorkAreaRectangles()
     m_workAreaScreen.Min = windowPos;
     m_workAreaScreen.Max = windowPos + windowSize;
 
-    m_workAreaDiwne.Max = m_workAreaDiwne.Min + windowSize; // /m_workAreaZoomDiwne;
+    m_workAreaDiwne.Max = m_workAreaDiwne.Min + windowSize/m_workAreaZoomDiwne;
 }
 
 
@@ -189,8 +200,8 @@ void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 c
 {
     ImDrawList *idl = ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with correct Clip rect for drawing of manual shapes, but be careful with order of drew elements */
     idl->AddRectFilled
-        ( diwne2screen_noZoom(p_min)
-        , diwne2screen_noZoom(p_max)
+        ( diwne2screen(p_min)
+        , diwne2screen(p_max)
         , col, rounding, rounding_corners );
 }
 
@@ -198,8 +209,8 @@ void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, fl
 {
     ImDrawList *idl = ImGui::GetWindowDrawList();
     idl->AddRect
-        ( diwne2screen_noZoom(p_min)
-        , diwne2screen_noZoom(p_max)
+        ( diwne2screen(p_min)
+        , diwne2screen(p_max)
         , col, rounding, rounding_corners, thickness );
 }
 
@@ -207,21 +218,11 @@ void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2
 {
     ImDrawList *idl = ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with correct Clip rect for drawing of manual shapes, but be careful with order of drew elements */
 
-    idl->AddBezierCurve(diwne2screen_noZoom(p1)
-                        , diwne2screen_noZoom(p2)
-                        , diwne2screen_noZoom(p3)
-                        , diwne2screen_noZoom(p4)
+    idl->AddBezierCurve(diwne2screen(p1)
+                        , diwne2screen(p2)
+                        , diwne2screen(p3)
+                        , diwne2screen(p4)
                         , col, thickness, num_segments);
-}
-
-void Diwne::AddBezierCurveScreen(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments) const
-{
-    ImDrawList *idl = ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with correct Clip rect for drawing of manual shapes, but be careful with order of drew elements */
-//    idl->PushClipRect(m_workAreaScreen.Min, m_workAreaScreen.Max, false);
-
-    idl->AddBezierCurve(p1, p2, p3, p4, col, thickness, num_segments);
-
-//    idl->PopClipRect();
 }
 
 void Diwne::DrawIconCircle(ImDrawList* idl,

@@ -515,8 +515,8 @@ void WorkspaceCorePin::pinActiveProcess(DIWNE::Diwne &diwne)
 {
     DIWNE::Pin::pinActiveProcess(diwne);
     diwne.setLastActivePin<WorkspaceCorePin>(this);
-    ImVec2 origin =  getLinkConnectionPoint();
-    ImVec2 actual = diwne.screen2diwne_noZoom( ImGui::GetIO().MousePos );
+    ImVec2 origin =  getLinkConnectionPointDiwne();
+    ImVec2 actual = diwne.screen2diwne( ImGui::GetIO().MousePos );
     diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
 }
 
@@ -588,7 +588,7 @@ bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
     WorkspaceNodeWithCoreData &node = getNode();
 
     interaction_happen = drawData4x4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
-                                    node.getNodebase()->getData().getMat4(), node.getNodebase()->getDataMapRef(),
+                                    getCorePin().data().getMat4(), node.getNodebase()->getDataMapRef(),
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
 
     ImGui::SameLine();
@@ -596,6 +596,7 @@ bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
     interaction_happen |= WorkspaceCoreOutputPinWithData::pinContent(diwne);
     if (valueChanged)
     {
+        /* \todo JM MH set values to given (this) pin*/
         node.getNodebase()->setValue(valueOfChange, {columnOfChange, rowOfChange});
         node.setDataItemsWidth();
     }
@@ -604,8 +605,7 @@ bool WorkspaceCoreOutputPinMatrix4x4::pinContent(DIWNE::Diwne &diwne)
 
 int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
 {
-    WorkspaceNodeWithCoreData &node = getNode();
-    return maxLenghtOfData4x4(node.getNodebase()->getData().getMat4(), node.getNumberOfVisibleDecimal());
+    return maxLenghtOfData4x4(getCorePin().data().getMat4(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
@@ -616,7 +616,7 @@ bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
     WorkspaceNodeWithCoreData &node = getNode();
 
     interaction_happen = drawDataVec4(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
-                                    node.getNodebase()->getData().getVec4(), node.getNodebase()->getDataMapRef(),
+                                    getCorePin().data().getVec4(), node.getNodebase()->getDataMapRef(),
                                     valueChanged, valueOfChange );
 
 
@@ -633,8 +633,7 @@ bool WorkspaceCoreOutputPinVector4::pinContent(DIWNE::Diwne &diwne)
 
 int WorkspaceCoreOutputPinVector4::maxLengthOfData()
 {
-    WorkspaceNodeWithCoreData &node = getNode();
-    return maxLenghtOfDataVec4(node.getNodebase()->getData().getVec4(), node.getNumberOfVisibleDecimal());
+    return maxLenghtOfDataVec4(getCorePin().data().getVec4(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinVector3::pinContent(DIWNE::Diwne &diwne)
@@ -645,7 +644,7 @@ bool WorkspaceCoreOutputPinVector3::pinContent(DIWNE::Diwne &diwne)
     WorkspaceNodeWithCoreData &node = getNode();
 
     interaction_happen = drawDataVec3(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
-                                    node.getNodebase()->getData().getVec3(), node.getNodebase()->getDataMapRef(),
+                                    getCorePin().data().getVec3(), node.getNodebase()->getDataMapRef(),
                                     valueChanged, valueOfChange );
 
     ImGui::SameLine();
@@ -661,8 +660,7 @@ bool WorkspaceCoreOutputPinVector3::pinContent(DIWNE::Diwne &diwne)
 
 int WorkspaceCoreOutputPinVector3::maxLengthOfData()
 {
-    WorkspaceNodeWithCoreData &node = getNode();
-    return maxLenghtOfDataVec3(node.getNodebase()->getData().getVec3(), node.getNumberOfVisibleDecimal());
+    return maxLenghtOfDataVec3(getCorePin().data().getVec3(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
@@ -673,7 +671,7 @@ bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
     WorkspaceNodeWithCoreData &node = getNode();
 
     interaction_happen = drawDataFloat(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
-                                    node.getNodebase()->getData().getFloat(), node.getNodebase()->getDataMapRef(),
+                                    getCorePin().data().getFloat(), node.getNodebase()->getDataMapRef(),
                                     valueChanged, valueOfChange );
 
     ImGui::SameLine();
@@ -689,8 +687,7 @@ bool WorkspaceCoreOutputPinFloat::pinContent(DIWNE::Diwne &diwne)
 
 int WorkspaceCoreOutputPinFloat::maxLengthOfData()
 {
-    WorkspaceNodeWithCoreData &node = getNode();
-    return maxLenghtOfDataFloat(node.getNodebase()->getData().getFloat(), node.getNumberOfVisibleDecimal());
+    return maxLenghtOfDataFloat(getCorePin().data().getFloat(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinQuaternion::pinContent(DIWNE::Diwne &diwne)
@@ -701,7 +698,7 @@ bool WorkspaceCoreOutputPinQuaternion::pinContent(DIWNE::Diwne &diwne)
     WorkspaceNodeWithCoreData &node = getNode();
 
     interaction_happen = drawDataQuaternion(diwne, node.getId(), node.getNumberOfVisibleDecimal(), node.getDataItemsWidth(diwne), node.getFloatPopupMode(),
-                                            node.getNodebase()->getData().getQuat(), node.getNodebase()->getDataMapRef(),
+                                            getCorePin().data().getQuat(), node.getNodebase()->getDataMapRef(),
                                             valueChanged, valueOfChange );
 
     ImGui::SameLine();
@@ -717,8 +714,7 @@ bool WorkspaceCoreOutputPinQuaternion::pinContent(DIWNE::Diwne &diwne)
 
 int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 {
-    WorkspaceNodeWithCoreData &node = getNode();
-    return maxLenghtOfDataQuaternion(node.getNodebase()->getData().getQuat(), node.getNumberOfVisibleDecimal());
+    return maxLenghtOfDataQuaternion(getCorePin().data().getQuat(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinPulse::pinContent(DIWNE::Diwne &diwne)
@@ -732,7 +728,7 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::ID const id, C
  : WorkspaceCoreOutputPinWithData(id, pin, node)
 {
 	  // tohle nema smysl tady - muselo by se v camera update, resp. v render()
-    //glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);	
+    //glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	  //todo - size dle velikosti krabicky a dle zoomu
@@ -743,7 +739,7 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::ID const id, C
 bool WorkspaceCoreOutputPinScreen::pinContent(DIWNE::Diwne &diwne)
 {
     if(getCorePin().isPluggedIn()){
-        glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4();
+        glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4(); /* JH why magic 2? */
 
         cam->m_perspective = camera;
         cam->update();
@@ -774,8 +770,8 @@ void WorkspaceCoreLink::updateEndpoints(){
     ImVec2 start, end;
     WorkspaceCoreOutputPin* startPin = getStartPin();
     WorkspaceCoreInputPin* endPin = getEndPin();
-    if(startPin)    start = startPin->getLinkConnectionPoint();
-    if(endPin)  end = endPin->getLinkConnectionPoint();
+    if(startPin)    start = startPin->getLinkConnectionPointDiwne();
+    if(endPin)  end = endPin->getLinkConnectionPointDiwne();
     setLinkEndpointsDiwne(start, end);
 }
 

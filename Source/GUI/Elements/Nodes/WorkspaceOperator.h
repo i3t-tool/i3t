@@ -18,11 +18,6 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceInputs;
-	std::vector<Ptr<WorkspaceCorePin>>    m_workspaceOutputs;
-  std::vector<Ptr<WorkspaceCorePin>> const& getInputs() const {return m_workspaceInputs;};
-	std::vector<Ptr<WorkspaceCorePin>> const& getOutputs() const {return m_workspaceOutputs;};
-
 	virtual bool topContent(DIWNE::Diwne &diwne)
 	{
 	    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,

@@ -99,20 +99,6 @@ public:
         addNodeToPosition<T>(screen2diwne(getPopupPosition()));
     }
 
-//    template<class C, typename T>
-//    void inline addNodeToPosition(ImVec2 const position)
-//    {
-//        m_workspaceCoreNodes.push_back(std::make_shared<T>());
-//		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
-//    }
-//
-//    template<class C, typename T>
-//    void inline addNodeToPositionOfPopup()
-//    {
-//        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
-//    }
-
-
 	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
 
 	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */

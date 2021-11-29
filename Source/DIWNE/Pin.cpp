@@ -64,8 +64,8 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
             pinConnectLinkProcess(diwne);
         }
     }
-    m_pinRectDiwne.Min = diwne.screen2diwne_noZoom( ImGui::GetItemRectMin() );
-    m_pinRectDiwne.Max = diwne.screen2diwne_noZoom( ImGui::GetItemRectMax() );
+    m_pinRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
+    m_pinRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
     return inner_interaction_happen || interaction_happen;
 }
