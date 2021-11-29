@@ -4,6 +4,7 @@
 #include "World/RenderTexture.h"    // FBO
 
 #undef TEST
+#define TEST1
 
 const pgr::MeshData* g_meshes[] = {  //todo - remove
 		&unitcubeMesh,
@@ -29,10 +30,16 @@ WorkspaceModel::~WorkspaceModel()
 {
 	// delete model from the World
 	App::get().world()->removeModel(m_sceneModel);
-
+	
 	// delete local workspace model 
 	if(m_workspaceModel)
 		delete(m_workspaceModel);
+
+	if(renderTexture)
+		delete(renderTexture);
+
+	if(m_camera)
+		delete(m_camera);
 }
 
 //bool WorkspaceModel::drawDataFull(DIWNE::Diwne& diwne, int index)
@@ -73,12 +80,27 @@ void WorkspaceModel::init()
 bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 {
 
-#ifdef TEST
+	
+	bool interaction_happen = false;
+
+#ifdef TEST1
 	ImGui::Text("Nad texturou      ");
 
 	ImGui::PushItemWidth(50);
-	ImGui::InputFloat("Float:", &val);  //DragFloat("float: ", &val, 0.1f,0.0f, 1.0f);
+	interaction_happen = ImGui::DragFloat("float: ", &val, 0.01f,-1.0f, 1.0f);
 	ImGui::PopItemWidth();
+#endif	
+
+#if 1
+	auto pin = m_nodebase->getInPin(0);
+	//const DataStore& data;
+	
+	//if(pin.isPluggedIn())
+		//data = pin.data();
+	//else
+	//	auto data = nullptr;
+	
+	//auto data = m_nodebase->getInPin(0).data();
 #endif
 	
 	// Lazy texture creation
@@ -119,7 +141,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	//m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
  // m_sceneModel->rotate(glm::vec3(0,1,0),angleY);
  // m_sceneModel->rotate(glm::vec3(1,0,0),angleX);
-	
+	m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -val));
 		m_camera->update();
 	
 	//m_sceneModel->rotate(glm::vec3(1,0,0),-angleX);
@@ -145,7 +167,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	
 	//ImGui::Text("Pod texturou");
 	
-  return false;
+  return interaction_happen;
 }
 
 int WorkspaceModel::maxLenghtOfData()  //todo
