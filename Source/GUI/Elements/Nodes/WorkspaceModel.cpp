@@ -63,7 +63,9 @@ void WorkspaceModel::init()
   m_workspaceModel->rotate(glm::vec3(0,1,0),angleY);
   m_workspaceModel->rotate(glm::vec3(1,0,0),angleX);
 
-  // pass object pointer to the core 
+  // pass object pointer to the core
+	// to remove the warning:
+	ValueSetResult result = 
 	m_nodebase->setValue(static_cast<void*>(object));  //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
 }
 
@@ -81,7 +83,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	
 	// Lazy texture creation
   if(!m_textureID) {
-		renderTexture = new RenderTexture( &m_textureID, m_textureSize.x, m_textureSize.y);  // create and get the FBO and color Attachment for rendering
+		renderTexture = new RenderTexture( &m_textureID, static_cast<int>(m_textureSize.x), static_cast<int>(m_textureSize.y));  // create and get the FBO and color Attachment for rendering
   	
 #ifdef TEST
   	// block of control checks
@@ -130,7 +132,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 
 	//ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 	//texture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));  // fixed texture may be enough
-	//ImGui::Image((ImTextureID)texture, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
+	//ImGui::Image((ImTextureID)m_textureID, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
 
 	//if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames, IM_ARRAYSIZE(g_meshesNames)))
