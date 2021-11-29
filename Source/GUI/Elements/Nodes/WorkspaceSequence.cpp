@@ -143,7 +143,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     {
         if(position_of_draged_node_in_sequence == i)
         {
-            ImGui::Dummy(m_sizeOfDummy); /* \todo JH size of dummy from settings */
+            ImGui::Dummy(m_sizeOfDummy*diwne.getWorkAreaZoomDiwne()); /* \todo JH size of dummy from settings */
             ImGui::SameLine();
             if (ImGui::IsMouseReleased(0))
             {
@@ -158,7 +158,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     }
     if ( i == 0 || position_of_draged_node_in_sequence == i ) /* add dummy after last inner or if sequence is empty */
     {
-        ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy : m_sizeOfDummy/2 ); /* smaller dummy if dragged node is not over Sequence */
+        ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy*diwne.getWorkAreaZoomDiwne() : m_sizeOfDummy*diwne.getWorkAreaZoomDiwne()/2 ); /* smaller dummy if dragged node is not over Sequence */
         if (ImGui::IsMouseReleased(0) && position_of_draged_node_in_sequence >= 0 )
         {
             push_index = i;
