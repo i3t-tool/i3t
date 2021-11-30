@@ -44,6 +44,7 @@ bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
         inner_interaction_happen = drawDataFull(diwne);
 	}
 
+        /* to drawNodeAfterContent */
 	/*if (m_inactiveMark != 0)
     {
         ImVec2 start = ne::GetNodePosition(m_id);

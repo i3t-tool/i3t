@@ -28,12 +28,12 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     ImVec2 controlPointStart = m_startDiwne + m_startControlOffsetDiwne;
     ImVec2 controlPointEnd = m_endDiwne + m_endControlOffsetDiwne;
 
-    ImVec2 mousePosDiwne = diwne.screen2diwne_noZoom( ImGui::GetIO().MousePos );
+    ImVec2 mousePosDiwne = diwne.screen2diwne( ImGui::GetIO().MousePos );
     ImVec2 closestPointOnLink = ImBezierCubicClosestPointCasteljau(m_startDiwne, controlPointStart, controlPointEnd, m_endDiwne
                                              , mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
     ImVec2 diff = closestPointOnLink - mousePosDiwne;
     float diffLenghtSquare = diff.x*diff.x + diff.y*diff.y;
-    if (diffLenghtSquare < interactionWidth*interactionWidth + m_thickness) /* hoovered */
+    if (diffLenghtSquare < interactionWidth*interactionWidth + m_thickness) /* hoovered */ /* \todo JH WorkAreaZoom */
     {
         alpha = 255; /* \todo JH to settings? */
         interaction_happen = true;

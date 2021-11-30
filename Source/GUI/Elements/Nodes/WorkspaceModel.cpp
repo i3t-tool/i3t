@@ -4,6 +4,7 @@
 #include "World/RenderTexture.h"    // FBO
 
 #undef TEST
+#define TEST1
 
 const pgr::MeshData* g_meshes[] = {  //todo - remove
 		&unitcubeMesh,
@@ -29,10 +30,16 @@ WorkspaceModel::~WorkspaceModel()
 {
 	// delete model from the World
 	App::get().world()->removeModel(m_sceneModel);
-
+	
 	// delete local workspace model 
 	if(m_workspaceModel)
 		delete(m_workspaceModel);
+
+	if(renderTexture)
+		delete(renderTexture);
+
+	if(m_camera)
+		delete(m_camera);
 }
 
 //bool WorkspaceModel::drawDataFull(DIWNE::Diwne& diwne, int index)
@@ -63,7 +70,9 @@ void WorkspaceModel::init()
   m_workspaceModel->rotate(glm::vec3(0,1,0),angleY);
   m_workspaceModel->rotate(glm::vec3(1,0,0),angleX);
 
-  // pass object pointer to the core 
+  // pass object pointer to the core
+	// to remove the warning:
+	ValueSetResult result = 
 	m_nodebase->setValue(static_cast<void*>(object));  //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
 }
 
@@ -71,17 +80,32 @@ void WorkspaceModel::init()
 bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 {
 
-#ifdef TEST
+	
+	bool interaction_happen = false;
+
+#ifdef TEST1
 	ImGui::Text("Nad texturou      ");
 
 	ImGui::PushItemWidth(50);
-	ImGui::InputFloat("Float:", &val);  //DragFloat("float: ", &val, 0.1f,0.0f, 1.0f);
+	interaction_happen = ImGui::DragFloat("float: ", &val, 0.01f,-1.0f, 1.0f);
 	ImGui::PopItemWidth();
+#endif	
+
+#if 1
+	auto pin = m_nodebase->getInPin(0);
+	//const DataStore& data;
+	
+	//if(pin.isPluggedIn())
+		//data = pin.data();
+	//else
+	//	auto data = nullptr;
+	
+	//auto data = m_nodebase->getInPin(0).data();
 #endif
 	
 	// Lazy texture creation
   if(!m_textureID) {
-		renderTexture = new RenderTexture( &m_textureID, m_textureSize.x, m_textureSize.y);  // create and get the FBO and color Attachment for rendering
+		renderTexture = new RenderTexture( &m_textureID, static_cast<int>(m_textureSize.x), static_cast<int>(m_textureSize.y));  // create and get the FBO and color Attachment for rendering
   	
 #ifdef TEST
   	// block of control checks
@@ -117,7 +141,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	//m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
  // m_sceneModel->rotate(glm::vec3(0,1,0),angleY);
  // m_sceneModel->rotate(glm::vec3(1,0,0),angleX);
-	
+	m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -val));
 		m_camera->update();
 	
 	//m_sceneModel->rotate(glm::vec3(1,0,0),-angleX);
@@ -130,7 +154,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 
 	//ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 	//texture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));  // fixed texture may be enough
-	//ImGui::Image((ImTextureID)texture, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
+	//ImGui::Image((ImTextureID)m_textureID, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
 
 	//if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames, IM_ARRAYSIZE(g_meshesNames)))
@@ -143,7 +167,7 @@ bool WorkspaceModel::middleContent(DIWNE::Diwne& diwne)
 	
 	//ImGui::Text("Pod texturou");
 	
-  return false;
+  return interaction_happen;
 }
 
 int WorkspaceModel::maxLenghtOfData()  //todo

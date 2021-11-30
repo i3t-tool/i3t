@@ -3,6 +3,7 @@
 #include "WorkspaceSequence.h"
 #include "WorkspaceCamera.h"
 #include "WorkspaceModel.h"
+#include "WorkspaceScreen.h"
 
 //
 ////transformations{

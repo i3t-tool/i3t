@@ -86,7 +86,7 @@ public:
     ///Remove GameObject from scene (viewport window)
     bool removeModel(GameObject*);
 
-    GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
+    GameObject* sceneRoot = nullptr; ///<root of scene of this world. Scene is a tree of GameObjects.
     std::map<std::string,Manipulator>manipulators;///<Properites of manipulator components
 
     ///load HC shaders, textures. Must be called before any instance of World is created.
