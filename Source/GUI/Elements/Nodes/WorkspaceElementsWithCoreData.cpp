@@ -429,12 +429,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 {
 		float alpha = ImGui::GetStyle().Alpha;
 
-		//builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
-
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-
-//		ImGui::BeginVertical(pinProp->getId().AsPointer());
-//		// ImGui::Spring(1);
 
 		/* \todo JH store this in Theme ?*/
         DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
@@ -448,10 +443,6 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
                         I3T::getSize(ESizeVec2::Nodes_IconSize)*diwne.getWorkAreaZoomDiwne(),
                         ImVec4(padding, padding, padding, padding),
                         isConnected());
-
-
-//		// ImGui::Spring(1);
-//		ImGui::EndVertical();
 
 
 		if (getShowLabel())
@@ -1182,6 +1173,7 @@ bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisib
 
     valueChanged = false;
     /* Drawing is row-wise */
+    ImGui::BeginGroup();
     for (int rows = 0; rows < 4; rows++)
     {
       for (int columns = 0; columns < 4; columns++)
@@ -1203,6 +1195,7 @@ bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisib
         }
       }
     }
+    ImGui::EndGroup();
 
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
@@ -1241,6 +1234,7 @@ bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisi
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
     valueChanged = false;
+    ImGui::BeginGroup();
     for (int columns = 0; columns < 4; columns++)
     {
         valueOfChange[columns] = data[columns]; /* \todo JH copy whole data directly - not in for*/
@@ -1248,6 +1242,7 @@ bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisi
                                                                 valueOfChange[columns], dataMap[columns], actualValueChanged);
         if(actualValueChanged) valueChanged = true;
     }
+    ImGui::EndGroup();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopItemWidth();
@@ -1281,6 +1276,7 @@ bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDec
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
     valueChanged = false;
+    ImGui::BeginGroup();
     for (int columns = 0; columns < 3; columns++)
     {
         valueOfChange[columns] = data[columns];
@@ -1288,6 +1284,7 @@ bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID node_id, int numberOfVisibleDec
                                                                 valueOfChange[columns], dataMap[columns], actualValueChanged);;
         if(actualValueChanged) valueChanged = true;
     }
+    ImGui::EndGroup();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopItemWidth();
@@ -1346,6 +1343,7 @@ bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 	valueChanged = false;
+	ImGui::BeginGroup();
     for (int columns = 0; columns < 4; columns++)
     {
         valueOfChange[columns] = data[columns];
@@ -1356,6 +1354,7 @@ bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const 
         if (columns < 3) ImGui::SameLine();
 
     }
+    ImGui::EndGroup();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopItemWidth();

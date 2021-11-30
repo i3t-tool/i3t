@@ -358,8 +358,6 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 //    idl->PopClipRect();
 
     ImGui::Dummy(size);
-
-
 }
 
 ImVec2 Diwne::screen2workArea(const ImVec2 & point) const

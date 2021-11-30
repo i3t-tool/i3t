@@ -37,7 +37,6 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
     if (drawHere)
     {
         setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
-        setNodeRectsPositionDiwne(getNodePositionDiwne()*diwne.getWorkAreaZoomDiwne()); /*draw here change location*/
     }
 
 //    m_topRectDiwne_temp.Min = m_topRectDiwne.Max;
@@ -67,9 +66,11 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 						ImGui::PushID("LeftMiddleRight");
             ImGui::BeginGroup();
                 inner_interaction_happen |= drawLeftDiwne(diwne);
-                   ImGui::SameLine(); if(m_centerDummySpace > 0) ImGui::Indent(m_centerDummySpace*m_middleAlign*diwne.getWorkAreaZoomDiwne());
+                   ImGui::SameLine();
+                   if(m_centerDummySpace > 0){ ImGui::Indent((m_leftRectDiwne.GetWidth() + m_centerDummySpace*m_middleAlign)*diwne.getWorkAreaZoomDiwne() + ImGui::GetStyle().ItemSpacing.x ); } /* spacing is already zoomed in BeginDiwne */
                 inner_interaction_happen |= drawMiddleDiwne(diwne);
-                    ImGui::SameLine(); if(m_centerDummySpace > 0) ImGui::Indent(m_centerDummySpace*(1-m_middleAlign)*diwne.getWorkAreaZoomDiwne());
+                    ImGui::SameLine();
+                    if(m_centerDummySpace > 0){ ImGui::Indent((m_middleRectDiwne.GetWidth() + m_centerDummySpace*(1-m_middleAlign))*diwne.getWorkAreaZoomDiwne() + ImGui::GetStyle().ItemSpacing.x ); }
                 inner_interaction_happen |= drawRightDiwne(diwne);
             ImGui::EndGroup(); /* Left-Middle-Right */
 						ImGui::PopID();
@@ -282,8 +283,9 @@ void Node::updateSizeRectangles(DIWNE::Diwne &diwne)
     m_leftRectDiwne.Max.y = bottomYOfCentre;
 
     m_centerDummySpace = maxWidth - centerWidth; /* how much shift middle or right content for right-alignation */
-    m_middleRectDiwne.Min.x = m_leftRectDiwne.Min.x + spacing.x;
-    m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth - spacing.x; /* space between middle-right */
+    /* \todo JH span graphic of middle backgrount to fill middle of node or left it just around middle content?
+    m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x + spacing.x;
+    m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth - spacing.x;*/ /* space between middle-right */
     m_middleRectDiwne.Max.y = bottomYOfCentre;
 
     m_rightRectDiwne.Max.y = bottomYOfCentre;

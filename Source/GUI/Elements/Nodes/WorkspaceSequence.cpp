@@ -116,6 +116,12 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
         return false;
     }
 
+    if (getInputs().at(1)->isConnected() ) /* \todo JH MH better selection of copy pin? */
+    {
+        ImGui::TextUnformatted("Here draw input data...");
+        return false;
+    }
+
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
         dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_hold_node);
