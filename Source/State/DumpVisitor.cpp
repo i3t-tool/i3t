@@ -5,11 +5,11 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "Core/Nodes/Caller.h"
+#include "GuiAdapter.h"
 #include "Core/Nodes/Cycle.h"
 #include "Core/Nodes/GraphManager.h"
-#include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI//Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
 
@@ -217,27 +217,32 @@ void doForOperator()
 {
 	constexpr auto enumValue = static_cast<ENodeType>(N);
 
-	createFns[magic_enum::enum_name(enumValue)] = WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
+	createFns[magic_enum::enum_name(enumValue)]
+			= WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
 
 	if constexpr (N < Max) { doForOperator<N + 1, Max>(); }
 }
 
-bool DumpVisitor::m_isInitialized = false;
+template <int N, int Max>
+void doForTransform()
+{
+	constexpr auto enumValue = static_cast<ETransformType>(N);
+
+	createTransformFns[magic_enum::enum_name(enumValue)] = createTransform<enumValue>;
+
+	if constexpr (N < Max) { doForTransform<N + 1, Max>(); }
+}
 
 void initCreateFns()
 {
-	constexpr std::size_t count = magic_enum::enum_count<ENodeType>() - 1;
-	doForOperator<0, count>();
+	constexpr std::size_t operatorCount = magic_enum::enum_count<ENodeType>() - 1;
+	doForOperator<0, operatorCount>();
 
-	// \todo MH - transformValue to string
-	/*
-	constexpr auto& transformValues = magic_enum::enum_values<ETransformType>();
-	for (const auto& transformValue : transformValues)
-		Core::forTransform(transformValue, []() {
-			createTransformFns[magic_enum::enum_name(transformValue)] =
-		});
-	 */
+	constexpr std::size_t transformCount = magic_enum::enum_count<ETransformType>() - 1;
+	doForTransform<0, transformCount>();
 }
+
+bool DumpVisitor::m_isInitialized = false;
 
 DumpVisitor::DumpVisitor()
 {
@@ -311,6 +316,24 @@ void createOperator(YAML::Node& node)
 	}
 }
 
+void parseTransform(YAML::Node& node)
+{
+	if (node["type"])
+	{
+		auto enumVal = node["type"].as<std::string>();
+
+		if (!createTransformFns.contains(enumVal))
+		{
+			Log::error("Does not know how to load {} transform from file.", enumVal);
+		}
+
+		auto posX = node["position"][0].as<float>();
+		auto posY = node["position"][1].as<float>();
+
+		createTransformFns[enumVal](ImVec2{ posX, posY });
+	}
+}
+
 void connectNodes(YAML::Node& sceneData, SceneData& scene)
 {
 	auto edges = sceneData["edges"];
@@ -347,12 +370,13 @@ SceneData loadScene(const std::string& rawScene)
 	{
 		// Process operators.
 		auto operators = sceneData["operators"];
-		for (auto i = 0L; i < operators.size(); i++)
-		{
-			auto opNode = operators[i];
+		for (auto&& op : operators)
+			createOperator(op);
 
-			createOperator(opNode);
-		}
+		// PRocess transforms
+		auto transforms = sceneData["transforms"];
+		for (auto&& transform : transforms)
+			parseTransform(transform);
 
 		// Connect all nodes.
 		connectNodes(sceneData, scene);

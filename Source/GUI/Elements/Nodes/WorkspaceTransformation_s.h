@@ -1,4 +1,5 @@
 #pragma once
+
 #include "WorkspaceTransformation.h"
 
 class WorkspaceTransformationFree : public WorkspaceTransformation { public: WorkspaceTransformationFree(); };
