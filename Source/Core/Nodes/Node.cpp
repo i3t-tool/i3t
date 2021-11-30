@@ -204,9 +204,7 @@ void Node::unplugInput(size_t index)
 			otherPinOutputs.erase(it);
 		}
 		else
-		{
-			Debug::Assert(false, "Can't find pointer to input pin in other node outputs.");
-		}
+			I3T_ABORT("Can't find pointer to input pin in other node outputs.");
 
 		auto& myPin		= inputs[index];
 		myPin.m_input = nullptr;

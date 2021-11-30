@@ -199,6 +199,11 @@ public:
 	static const Operation* getOperation(const Pin* pin);
 	static bool							areFromSameNode(const Pin* lhs, const Pin* rhs);
 	static bool							arePlugged(const Pin& input, const Pin& output);
+
+	/**
+	 * \todo MH - There may be ID collisions.
+	 */
+	static void changeId(Core::NodePtr node, Core::ID newId);
 };
 
 using gm = GraphManager;

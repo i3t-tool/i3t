@@ -87,10 +87,14 @@ public:
 
 	/// \todo JH, MH - Needs to be accessed by scene loader, but it may be weird that the loader needs to have reference to the Workspace.
 	template <class T>
-	static void inline addNodeToPosition(ImVec2 const position)
+	static auto inline addNodeToPosition(ImVec2 const position)
 	{
-		m_workspaceCoreNodes.push_back(std::make_shared<T>());
-		m_workspaceCoreNodes.back()->setNodePositionDiwne( position );
+		auto node = std::make_shared<T>();
+
+		node->setNodePositionDiwne( position );
+		m_workspaceCoreNodes.push_back(node);
+
+		return node;
 	}
 
     template<class T>

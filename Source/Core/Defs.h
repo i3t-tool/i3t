@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <cassert>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
@@ -43,6 +44,7 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 
 #ifdef I3T_DEBUG
 #define I3T_ASSERT(cond) assert(cond)
+#define I3T_ABORT(message) assert(false && message)
 #else
 #define I3T_ASSERT(cond, description)
 #endif

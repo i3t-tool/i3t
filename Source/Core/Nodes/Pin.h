@@ -9,6 +9,8 @@ namespace Core
  * Pin used for connecting nodes.
  *
  * OperatorCurveTab from I3T v1.
+ *
+ * \todo MH - Remove ID.
  */
 class Pin
 {
