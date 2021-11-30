@@ -132,11 +132,11 @@ void Application::logicUpdate()
 
 void Application::finalize()
 {
-	delete m_world;
+	for (auto& module : m_modules)
+		module->onClose();
 
 	World::end();
-
-	glfwTerminate();
+	delete m_world;
 }
 
 bool Application::initI3T()

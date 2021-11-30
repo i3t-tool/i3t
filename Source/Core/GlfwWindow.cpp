@@ -47,6 +47,11 @@ void GlfwWindow::init()
 	 */
 }
 
+GlfwWindow::~GlfwWindow()
+{
+	glfwTerminate();
+}
+
 GLFWwindow* GlfwWindow::get()
 {
 	return m_mainWindow;
