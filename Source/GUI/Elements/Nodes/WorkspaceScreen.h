@@ -5,6 +5,7 @@
  * \author Petr Felkel, MartinHerich
  * \brief screen box in the workspace
  * Based on WorkspaceScreen
+ *
  */
 //---------------
 #include "WorkspaceElementsWithCoreData.h"
