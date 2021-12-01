@@ -118,8 +118,13 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
 
     if (getInputs().at(1)->isConnected() ) /* \todo JH MH better selection of copy pin? */
     {
-        ImGui::TextUnformatted("Here draw input data...");
-        return false;
+        //ImGui::TextUnformatted("Here draw input data...");
+        bool valueChanged = false;
+        int rowOfChange, columnOfChange;
+        float valueOfChange;
+        return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(diwne), m_floatPopupMode,
+                                    m_nodebase->getData(2).getMat4(), m_nodebase->getDataMapRef(),
+                                    valueChanged, rowOfChange, columnOfChange, valueOfChange );
     }
 
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)

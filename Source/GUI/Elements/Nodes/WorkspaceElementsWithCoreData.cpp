@@ -422,6 +422,8 @@ WorkspaceCorePin::WorkspaceCorePin(     DIWNE::ID const id
     :   WorkspacePin(id, "")
     ,   m_pin(pin)
     ,   m_node(node)
+    ,   m_connectionPoint(ImVec2(0,0))
+    ,   m_iconRect(ImRect(0,0,0,0))
 {}
 
 /* DIWNE function */
@@ -444,6 +446,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
                         ImVec4(padding, padding, padding, padding),
                         isConnected());
 
+        m_iconRect = ImRect( diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
 
 		if (getShowLabel())
 		{
@@ -543,10 +546,12 @@ void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
             if (ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
                                                                 coreOutput->getIndex(), coreInput->getIndex()))
             {
-                WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
-                WorkspaceCoreLink *lin = &(in->getLink());
-                WorkspaceCoreOutputPin* ou = dynamic_cast<WorkspaceCoreOutputPin*>(output);
-                lin->setStartPin(ou);
+                dynamic_cast<WorkspaceCoreInputPin*>(input)->setConnectedOutput(dynamic_cast<WorkspaceCoreOutputPin*>(output));
+
+//                WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
+//                WorkspaceCoreLink *lin = &(in->getLink());
+//                WorkspaceCoreOutputPin* ou = dynamic_cast<WorkspaceCoreOutputPin*>(output);
+//                lin->setStartPin(ou);
             }
         }
         break;
@@ -749,6 +754,10 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const
     , m_link(id, this)
 {}
 
+void WorkspaceCoreInputPin::setConnectedOutput(WorkspaceCoreOutputPin* ou)
+{
+    m_link.setStartPin(ou);
+}
 /* >>>> WorkspaceCoreLink <<<< */
 
 WorkspaceCoreLink::WorkspaceCoreLink(DIWNE::ID id, WorkspaceCoreInputPin *endPin)

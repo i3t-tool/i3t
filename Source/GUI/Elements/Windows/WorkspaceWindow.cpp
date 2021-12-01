@@ -578,8 +578,8 @@ void WorkspaceWindow::render()
         //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
 
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
+        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
     }
 

@@ -5,17 +5,19 @@ namespace DIWNE
 
 
 Node::Node(DIWNE::ID id) /* FLT_MAX for first frame - draw node anywhere it is and thus got its real size*/
-    : m_topRectDiwne(ImRect(-FLT_MAX,-FLT_MAX,0,0))
+    : m_topRectDiwne(ImRect(0,0,0,0))
     , m_leftRectDiwne(ImRect(0,0,0,0))
     , m_middleRectDiwne(ImRect(0,0,0,0))
     , m_rightRectDiwne(ImRect(0,0,0,0))
-    , m_bottomRectDiwne(ImRect(0,0,FLT_MAX,FLT_MAX))
+    , m_bottomRectDiwne(ImRect(0,0,0,0))
     , m_centerDummySpace(0)
     , m_middleAlign(0.5)
     , m_idDiwne(id)
     , m_selected(false)
     , m_translated(false)
     , m_isHeld(false)
+    , m_firstDraw(true)
+    , m_nodeInteractionAllowed(false)
 {}
 
 Node::~Node()
@@ -43,14 +45,9 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
     ImRect nodeRectDiwne = getNodeRectDiwne();
 
-    if ( nodeRectDiwne.Overlaps( diwne.getWorkAreaDiwne() ) )
+    if ( m_firstDraw || nodeRectDiwne.Overlaps( diwne.getWorkAreaDiwne() ) )
     {
-
-#ifdef DIWNE_DEBUG
-        /* debug - whole node */
-        diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 8);
-#endif // DIWNE_DEBUG
-
+        if(m_firstDraw) m_firstDraw=false;
         /* Set cursor to position of node */
         if (!drawHere) ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
         /* or node to position of cursor */
@@ -59,7 +56,7 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
         ImGui::PushID(fmt::format("Node{}", m_idDiwne).c_str());
         ImGui::BeginGroup(); /* Begin of node */
 
-            inner_interaction_happen |= drawNodeBeforeContent(diwne);
+            inner_interaction_happen |= processNodeBeforeContent(diwne);
 
             inner_interaction_happen |= drawTopDiwne(diwne);
 
@@ -77,24 +74,28 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
             inner_interaction_happen |= drawBottomDiwne(diwne);
 
-#ifdef DIWNE_DEBUG
-        /* debug */
-        ImGui::Text(fmt::format( "D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}",
-                                 nodeRectDiwne.Min.x, nodeRectDiwne.Min.y, nodeRectDiwne.Max.x, nodeRectDiwne.Max.y,
-                                 diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y, diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
-                                 diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
-#endif // DIWNE_DEBUG
-            inner_interaction_happen |= drawNodeAfterContent(diwne);
+            updateSizeRectangles(diwne);
+
+            inner_interaction_happen |= processNodeAfterContent(diwne);
         ImGui::EndGroup(); /* End of node */
         ImGui::PopID();
 
         ImGui::SetItemAllowOverlap();
 
+        nodeRectDiwne = getNodeRectDiwne(); /* update */
+
         if (ImGui::IsItemHovered()) {
             diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,255,255), 0, ImDrawCornerFlags_None, 3);
+
+            if (ImGui::IsMouseDown(0))
+            {
+                interaction_happen = true;
+            }
         }
 
-        if (!inner_interaction_happen)
+
+
+        if ( (!inner_interaction_happen && m_nodeInteractionAllowed) || m_isHeld)
         {
             if (ImGui::IsItemClicked(0)) {
                 m_isHeld = true;
@@ -116,19 +117,21 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                 {
                     if (m_translated)
                     {
-                            m_translated = false;
-                            diwne.m_draged_hold_node = nullptr;
-                            diwne.setDiwneAction(DiwneAction::None);
+                        m_translated = false;
+                        diwne.m_draged_hold_node = nullptr;
+                        diwne.setDiwneAction(DiwneAction::None);
                     }
-                    else {m_selected = !m_selected; diwne.setNodesSelectionChanged(true);}
+                    else
+                    {
+                        m_selected = !m_selected;
+                        diwne.setNodesSelectionChanged(true);
+                    }
 
                     m_isHeld = false;
                 }
             }
 
         }
-
-        updateSizeRectangles(diwne);
 
         if (m_selected)
         {
@@ -140,8 +143,19 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
             inner_interaction_happen |= nodePopupDiwne(diwne, fmt::format("nodePopup{}", m_idDiwne));
         }
 
+#ifdef DIWNE_DEBUG
+        /* debug */
+        ImGui::Text(fmt::format( "D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}",
+                                 nodeRectDiwne.Min.x, nodeRectDiwne.Min.y, nodeRectDiwne.Max.x, nodeRectDiwne.Max.y,
+                                 diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y, diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
+                                 diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
+#endif // DIWNE_DEBUG
 
 #ifdef DIWNE_DEBUG
+
+        /* debug - whole node */
+        diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 8);
+
         if (!inner_interaction_happen && ImGui::IsItemHovered())
         {
             /* debug - whole node */
@@ -179,7 +193,7 @@ bool Node::drawTopDiwne(DIWNE::Diwne &diwne)
 #endif // DIWNE_DEBUG
 
     /* top.Min is position of node */
-    //m_topRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
+    m_topRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
     m_topRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
     return inner_interaction_happen;
