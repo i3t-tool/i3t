@@ -19,6 +19,9 @@ public:
 	 * Exit the program if a window cannot be created.
 	 */
 	void init();
+
+	~GlfwWindow();
+
 	void setTitle(const char* title);
 	void swapBuffers();
 	GLFWwindow* get();

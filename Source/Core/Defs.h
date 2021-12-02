@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <cassert>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
@@ -43,6 +44,7 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 
 #ifdef I3T_DEBUG
 #define I3T_ASSERT(cond) assert(cond)
+#define I3T_ABORT(message) assert(false && message)
 #else
 #define I3T_ASSERT(cond, description)
 #endif
@@ -122,3 +124,25 @@ constexpr T enumVal(const std::string& str)
 #define COND_TO_DEG(x)                                                                                                 \
 	(SetupForm::radians ? (x)                                                                                            \
 											: glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
+
+//===----------------------------------------------------------------------===//
+
+// https://newbedev.com/find-out-whether-a-c-object-is-callable
+template <typename T>
+constexpr bool noarg_callable_impl(
+		typename std::enable_if<bool(sizeof((std::declval<T>()(),0)))>::type*)
+{
+	return true;
+}
+
+template<typename T>
+constexpr bool noarg_callable_impl(...)
+{
+	return false;
+}
+
+template<typename T>
+constexpr bool is_noarg_callable()
+{
+	return noarg_callable_impl<T>(nullptr);
+}

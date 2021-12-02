@@ -121,7 +121,7 @@ void OrthoManipulator::render(glm::mat4*parent,bool renderTransparent){
 }
 void OrthoManipulator::update(){
 	if(m_editednode==nullptr){return;}
-	Core::OrthoProj*editedortho=(Core::OrthoProj*)m_editednode.get();
+	auto* editedortho = (Core::TransformImpl<ETransformType::Ortho>*) m_editednode.get();
 	m_edited=m_editednode->getData().getMat4();
 
 	unsigned char sel =Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);

@@ -43,7 +43,7 @@ void LookAtManipulator::GUI() {
 	if(pos.y<-5.0f){return;}
 	ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
 
-	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();
+	auto* editedlookat = (Core::TransformImpl<ETransformType::LookAt>*) m_editednode.get();
 	glm::vec3 center= editedlookat->getCenter();
 	glm::vec3 eye= editedlookat->getEye();
 
@@ -97,7 +97,7 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 void LookAtManipulator::update() {
 	if(m_editednode==nullptr){return;}
 	m_edited=glm::inverse(m_editednode->getData().getMat4());
-	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();
+	auto* editedlookat = (Core::TransformImpl<ETransformType::LookAt>*) m_editednode.get();
 	glm::vec3 center= editedlookat->getCenter();
 	glm::vec3 eye= editedlookat->getEye();
 	///

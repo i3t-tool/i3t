@@ -239,9 +239,9 @@ enum class ETransformType
 	Free = 0,       // PREP-
 	Translation,    // PREP-
 	EulerX,         // PREP-
-    EulerY,         // PREP-
-    EulerZ,         // PREP-
-    Scale,          // PREP-
+	EulerY,         // PREP-
+	EulerZ,         // PREP-
+	Scale,          // PREP-
 	AxisAngle,      // PREP-
 	Quat,           // PREP-
 	Ortho,          // PREP-

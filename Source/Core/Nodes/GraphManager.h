@@ -57,11 +57,22 @@ namespace Builder
 		return ret;
 	}
 
+	/// \todo MH - Will be removed
+	/*
 	template <typename T, typename... Args>
 	Ptr<T> FORCE_INLINE createTransform(Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
 		auto ret = std::make_shared<T>(std::forward<Args>(args)...);
+		ret->init();
+		ret->reset();
+		return ret;
+	}
+	 */
+	template <ETransformType T>
+	Ptr<Transformation> FORCE_INLINE createTransform()
+	{
+		auto ret = std::make_shared<TransformImpl<T>>();
 		ret->init();
 		ret->reset();
 		return ret;
@@ -188,6 +199,11 @@ public:
 	static const Operation* getOperation(const Pin* pin);
 	static bool							areFromSameNode(const Pin* lhs, const Pin* rhs);
 	static bool							arePlugged(const Pin& input, const Pin& output);
+
+	/**
+	 * \todo MH - There may be ID collisions.
+	 */
+	static void changeId(Core::NodePtr node, Core::ID newId);
 };
 
 using gm = GraphManager;

@@ -15,10 +15,11 @@ public:
 	IdGenerator();
 	ID next();
 	void markAsUsed(unsigned int id);
-
-private:
 	void returnId(unsigned int id);
 
+private:
 	std::list<unsigned int> m_ids;
 };
+
+static inline IdGenerator generator;
 } // namespace Core

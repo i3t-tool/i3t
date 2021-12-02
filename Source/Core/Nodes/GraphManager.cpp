@@ -173,6 +173,13 @@ bool GraphManager::arePlugged(const Pin& input, const Pin& output)
 	return input.getParentPin() == &output;
 }
 
+void GraphManager::changeId(Core::NodePtr node, Core::ID newId)
+{
+	Core::generator.returnId(node->getId());
+	Core::generator.markAsUsed(newId);
+	node->m_id = newId;
+}
+
 SequenceTree::SequenceTree(Ptr<NodeBase> sequence)
 {
 	m_beginSequence = toSequence(sequence);

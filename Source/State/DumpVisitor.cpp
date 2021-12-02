@@ -5,10 +5,11 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "GuiAdapter.h"
 #include "Core/Nodes/Cycle.h"
 #include "Core/Nodes/GraphManager.h"
-#include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI//Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
 
@@ -208,25 +209,44 @@ std::string SceneRawData::toString() const
 }
 
 /// \see addNodeToPosition(ImVec2 const)
-std::map<std::string_view, std::function<void(ImVec2 const)>> createFns;
+std::map<
+    std::string_view,
+		std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
+		> createFns;
+std::map<
+    std::string_view,
+		std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
+		> createTransformFns;
 
 template <int N, int Max>
-void do_for()
+void doForOperator()
 {
 	constexpr auto enumValue = static_cast<ENodeType>(N);
+	createFns[magic_enum::enum_name(enumValue)]
+			= WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
 
-	createFns[magic_enum::enum_name(enumValue)] = WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
-
-	if constexpr (N < Max) { do_for<N + 1, Max>(); }
+	if constexpr (N < Max) { doForOperator<N + 1, Max>(); }
 }
 
-bool DumpVisitor::m_isInitialized = false;
+template <int N, int Max>
+void doForTransform()
+{
+	constexpr auto enumValue = static_cast<ETransformType>(N);
+	createTransformFns[magic_enum::enum_name(enumValue)] = createTransform<enumValue>;
+
+	if constexpr (N < Max) { doForTransform<N + 1, Max>(); }
+}
 
 void initCreateFns()
 {
-	constexpr std::size_t count = magic_enum::enum_count<ENodeType>() - 1;
-	do_for<0, count>();
+	constexpr std::size_t operatorCount = magic_enum::enum_count<ENodeType>() - 1;
+	doForOperator<0, operatorCount>();
+
+	constexpr std::size_t transformCount = magic_enum::enum_count<ETransformType>() - 1;
+	doForTransform<0, transformCount>();
 }
+
+bool DumpVisitor::m_isInitialized = false;
 
 DumpVisitor::DumpVisitor()
 {
@@ -282,7 +302,9 @@ void DumpVisitor::visit(const Ptr<GuiTransform>& node)
 
 bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
 
-void createOperator(YAML::Node& node)
+//===-- Builders ----------------------------------------------------------===//
+
+void buildOperator(YAML::Node& node)
 {
 	if (node["type"])
 	{
@@ -293,23 +315,61 @@ void createOperator(YAML::Node& node)
 			Log::error("Does not know how to load {} operator from file.", enumVal);
 		}
 
+		auto id = node["id"].as<int>();
+
 		auto posX = node["position"][0].as<float>();
 		auto posY = node["position"][1].as<float>();
 
-		createFns[enumVal](ImVec2{ posX, posY });
+		auto op = createFns[enumVal](ImVec2{ posX, posY });
+
+		Core::GraphManager::changeId(op->getNodebase(), id);
 	}
+}
+
+void buildTransform(YAML::Node& node)
+{
+	if (node["type"])
+	{
+		auto enumVal = node["type"].as<std::string>();
+
+		if (!createTransformFns.contains(enumVal))
+		{
+			Log::error("Does not know how to load {} transform from file.", enumVal);
+		}
+
+		auto id = node["id"].as<int>();
+
+		auto posX = node["position"][0].as<float>();
+		auto posY = node["position"][1].as<float>();
+
+		auto transform = createTransformFns[enumVal](ImVec2{ posX, posY });
+
+		Core::GraphManager::changeId(transform->getNodebase(), id);
+	}
+}
+
+GuiNodePtr findNode(std::vector<GuiNodePtr>& nodes, Core::ID id)
+{
+	for (const auto& node : nodes)
+	{
+		if (node->getNodebase()->getId() == id)
+			return node;
+	}
+	return nullptr;
 }
 
 void connectNodes(YAML::Node& sceneData, SceneData& scene)
 {
 	auto edges = sceneData["edges"];
-	for (auto i = 0L; i < edges.size(); i++)
+	for (auto&& edge : edges)
 	{
-		auto edge = edges[i];
 		if (edge.size() != 4) continue; // Edge is not valid.
 
-		auto lhs = scene.findNode(edge[0].as<unsigned int>());
-		auto rhs = scene.findNode(edge[2].as<unsigned int>());
+		/// \todo Keep scene in separate struct.
+		auto& nodes = I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes;
+
+		auto lhs = findNode(nodes, edge[0].as<unsigned int>());
+		auto rhs = findNode(nodes, edge[2].as<unsigned int>());
 		if (lhs && rhs)
 		{
 			auto lhsPin = edge[1].as<unsigned int>();
@@ -336,12 +396,11 @@ SceneData loadScene(const std::string& rawScene)
 	{
 		// Process operators.
 		auto operators = sceneData["operators"];
-		for (auto i = 0L; i < operators.size(); i++)
-		{
-			auto opNode = operators[i];
+		for (auto&& op : operators) buildOperator(op);
 
-			createOperator(opNode);
-		}
+		// Process transforms
+		auto transforms = sceneData["transforms"];
+		for (auto&& transform : transforms) buildTransform(transform);
 
 		// Connect all nodes.
 		connectNodes(sceneData, scene);

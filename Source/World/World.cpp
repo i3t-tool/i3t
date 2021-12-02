@@ -174,7 +174,10 @@ GameObject* World::addModel(const char* name) {
     return g;
 }
 bool World::removeModel(GameObject*g) {
-    return this->sceneRoot->rmChild(g,true);
+  /// \todo PF, MH - scene root is not defined.
+	if (sceneRoot == nullptr) return false;
+
+	return this->sceneRoot->rmChild(g,true);
 }
 void World::onStart(){
     this->started=true;

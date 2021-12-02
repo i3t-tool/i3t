@@ -132,7 +132,15 @@ void UIModule::beginFrame()
 	}
 }
 
-void UIModule::onClose() {}
+void UIModule::onClose()
+{
+	/// \todo MH - This may not be sufficient.
+	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
+	workspace->m_workspaceCoreNodes.clear();
+
+	m_windows.clear();
+	m_dockableWindows.clear();
+}
 
 Memento UIModule::getState()
 {

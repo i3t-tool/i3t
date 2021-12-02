@@ -16,6 +16,7 @@
 #include "Id.h"
 #include "NodeData.h"
 #include "Operations.h"
+#include "Pin.h"
 
 namespace Core
 {
@@ -87,6 +88,13 @@ protected:
 	 */
 	Node(const Operation* operation) : m_operation(operation) {}
 
+	/**
+	 * Delete node.
+	 *
+	 * \pre All inputs and outputs must be unplugged (calls Node::finalize function)!
+	 */
+	virtual ~Node();
+
 public:
 	/**
 	 * Initialize node inputs and outputs according to preset node type.
@@ -96,13 +104,6 @@ public:
 	 * \todo MH Override in derived classes (Sequence).
 	 */
 	void init();
-
-	/**
-	 * Delete node.
-	 *
-	 * \pre All inputs and outputs must be unplugged (calls Node::finalize function)!
-	 */
-	virtual ~Node();
 
 	/**
 	 * Prepares node for its destruction, after that destructor can be called.
@@ -269,9 +270,7 @@ public:
 	const Transform::DataMap&																	 getDataMapRef() { return *m_currentMap; }
 	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps() { return m_operation->validDatamaps; };
 
-	public:
-	//===----------------------------------------------------------------------===//
-
+public:
 	//===-- Values updating functions. ----------------------------------------===//
 	/**
 	 * Computes new values of outputs based on inputs.
@@ -367,134 +366,4 @@ using NodePtr  = Ptr<Node>;
 
 /// \warning Will be removed, use Node type instead.
 using NodeBase = Node;
-
-
-/**
- * Pin used for connecting nodes.
- *
- * OperatorCurveTab from I3T v1.
- */
-class Pin
-{
-	friend class GraphManager;
-	friend class Node;
-
-	/// \todo MH do not access pin directly.
-	friend class Sequence;
-
-public:
-	Pin(EValueType valueType, bool isInput, Ptr<NodeBase> owner, int index);
-	~Pin();
-
-	[[nodiscard]] ID getId() const { return m_id; }
-
-	[[nodiscard]] int getIndex() const { return m_index; }
-
-	[[nodiscard]] NodePtr getOwner() const
-	{
-		return m_master->getPtr();
-	};
-
-	[[nodiscard]] const Pin* getParentPin() const
-	{
-		if (m_isInput)
-		{
-			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-			return m_input;
-		}
-		else
-		{
-			Debug::Assert(false, "Output pin can not have a parent pin!");
-			return nullptr;
-		}
-	}
-
-	/**
-	 * \return Input pins of connected nodes.
-	 */
-	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
-
-	/**
-	 * \return Storage which belongs to this pin.
-	 */
-	[[nodiscard]] const DataStore& data() const;
-
-	/**
-	 * Get stored data based on pin type.
-	 *
-	 * \returns data storage owner by node connected to this input pin. If pin is output pin,
-	 *          it returns data storage of pin owner.
-	 */
-	[[nodiscard]] const DataStore& getStorage(unsigned id = 0);
-
-	const char* getLabel() const
-	{
-		auto*				op		= getOwner()->getOperation();
-		const char* label = nullptr;
-
-		if (m_isInput)
-		{
-			if (!op->defaultInputNames.empty()) { label = op->defaultInputNames[m_index].c_str(); }
-		}
-		else
-		{
-			if (!op->defaultOutputNames.empty()) { label = op->defaultOutputNames[m_index].c_str(); }
-		}
-
-		if (label == nullptr) { label = defaultIoNames[static_cast<size_t>(m_valueType)]; }
-
-		return label;
-	}
-
-	/// Only for test purposes, it can be removed anytime.
-	std::string getSig()
-	{
-		return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
-	};
-
-	[[nodiscard]] EValueType getType() const { return m_valueType; }
-
-	/**
-	 * Query if input of this object is plugged to any parent output.
-	 *
-	 * \return True if plugged to parent, false if not.
-	 */
-	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
-
-	[[nodiscard]] bool isInput() const { return m_isInput; }
-
-private:
-	ID m_id;
-
-	/// Index within a node.
-	int m_index = -1;
-
-	/// Pin type.
-	const bool m_isInput;
-
-	/// Owner of the pin.
-	NodeBase* m_master;
-
-	/**
-	 * The box can have a single parent. Therefore, just a single input component
-	 * (a single connected wire) to output tab of the parent node).
-	 */
-	Pin* m_input = nullptr;
-
-	/**
-	 * Child boxes in the scene graph (coming out to the right).
-	 * A pointer to input pins of boxes connected to this box output.
-	 */
-	std::vector<Pin*> m_outputs;
-
-	const EValueType m_valueType = EValueType::Pulse;
-};
-
-FORCE_INLINE const bool isOperator(const NodePtr& node)
-{
-	constexpr auto& operators = magic_enum::enum_names<ENodeType>();
-	auto it = std::find(operators.begin(), operators.end(), node->getOperation()->keyWord);
-	auto result = it != operators.end();
-	return result;
-}
 } // namespace Core

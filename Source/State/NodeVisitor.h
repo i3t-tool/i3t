@@ -15,6 +15,8 @@ using GuiOperator  = WorkspaceNodeWithCoreData;
 using GuiTransform = WorkspaceTransformation;
 using GuiSequence  = WorkspaceSequence;
 
+using GuiNodePtr = std::shared_ptr<WorkspaceNodeWithCoreData>;
+
 class NodeVisitor
 {
 public:
