@@ -6,7 +6,6 @@
 #include "yaml-cpp/yaml.h"
 
 #include "GuiAdapter.h"
-#include "Core/Nodes/Cycle.h"
 #include "Core/Nodes/GraphManager.h"
 #include "GUI//Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
@@ -17,6 +16,8 @@
 constexpr const char* g_baseFormatString = "  - id: {}\n"
 																					 "    type: {}\n"
 																					 "    position: [{}, {}]\n";
+
+std::optional<NodeData> dumpTransform(Ptr<TransformClass> guiTransform);
 
 std::string dumpValue(EValueType value, const Core::NodePtr& node)
 {
@@ -290,6 +291,10 @@ void DumpVisitor::visit(const Ptr<GuiSequence>& node)
 {
 	// Dump sequence and its transforms.
 	m_sceneData.addSequence(dumpSequence(node));
+
+	for (const auto& transform : node->getInnerWorkspaceNodes())
+		if (auto result = dumpTransform(std::static_pointer_cast<GuiTransform>(transform)))
+			m_sceneData.addTransform(*result);
 }
 
 void DumpVisitor::visit(const Ptr<GuiTransform>& node)
@@ -302,6 +307,15 @@ void DumpVisitor::visit(const Ptr<GuiTransform>& node)
 
 bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
 
+GuiNodePtr findNode(std::vector<GuiNodePtr>& nodes, Core::ID id)
+{
+	for (const auto& node : nodes)
+		if (node->getNodebase()->getId() == id)
+			return node;
+
+	return nullptr;
+}
+
 //===-- Builders ----------------------------------------------------------===//
 
 void buildOperator(YAML::Node& node)
@@ -311,9 +325,7 @@ void buildOperator(YAML::Node& node)
 		auto enumVal = node["type"].as<std::string>();
 
 		if (!createFns.contains(enumVal))
-		{
 			Log::error("Does not know how to load {} operator from file.", enumVal);
-		}
 
 		auto id = node["id"].as<int>();
 
@@ -333,9 +345,7 @@ void buildTransform(YAML::Node& node)
 		auto enumVal = node["type"].as<std::string>();
 
 		if (!createTransformFns.contains(enumVal))
-		{
 			Log::error("Does not know how to load {} transform from file.", enumVal);
-		}
 
 		auto id = node["id"].as<int>();
 
@@ -348,14 +358,32 @@ void buildTransform(YAML::Node& node)
 	}
 }
 
-GuiNodePtr findNode(std::vector<GuiNodePtr>& nodes, Core::ID id)
+/// Should be called after processing transformation.
+void buildSequence(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
 {
-	for (const auto& node : nodes)
+	if (node["type"])
 	{
-		if (node->getNodebase()->getId() == id)
-			return node;
+		auto enumVal = node["type"].as<std::string>();
+		I3T_ASSERT(enumVal == Core::g_sequence.keyWord);
+
+		auto id = node["id"].as<int>();
+
+		auto posX = node["position"][0].as<float>();
+		auto posY = node["position"][1].as<float>();
+
+		auto sequence = I3T::getWindowPtr<WorkspaceWindow>()->addNodeToPosition<WorkspaceSequence>({ posX, posY });
+
+		auto transformIds = node["transforms"]; // = createTransformFns[enumVal](ImVec2{ posX, posY });
+		for (auto&& transformIdRaw : transformIds)
+		{
+			auto transformId = transformIdRaw.as<int>();
+			auto transform = findNode(workspaceNodes, transformId);
+			if (transform)
+				sequence->moveNodeToSequence(transform);
+		}
+
+		Core::GraphManager::changeId(sequence->getNodebase(), id);
 	}
-	return nullptr;
 }
 
 void connectNodes(YAML::Node& sceneData, SceneData& scene)
@@ -377,9 +405,7 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene)
 
 			auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
 			if (plugResult != ENodePlugResult::Ok)
-			{
 				Log::info("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSig(), rhs->getNodebase()->getSig(), lhsPin, rhsPin);
-			}
 		}
 	}
 }
@@ -401,6 +427,10 @@ SceneData loadScene(const std::string& rawScene)
 		// Process transforms
 		auto transforms = sceneData["transforms"];
 		for (auto&& transform : transforms) buildTransform(transform);
+
+		auto sequences = sceneData["sequences"];
+		for (auto&& sequence : sequences)
+			buildSequence(sequence, I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
 
 		// Connect all nodes.
 		connectNodes(sceneData, scene);

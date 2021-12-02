@@ -9,13 +9,14 @@ class WorkspaceNodeWithCoreData;
 class WorkspaceSequence;
 class WorkspaceTransformation;
 
+using GuiNode      = WorkspaceNodeWithCoreData;
 using GuiCamera    = WorkspaceCamera;
 using GuiCycle     = WorkspaceCycle;
 using GuiOperator  = WorkspaceNodeWithCoreData;
 using GuiTransform = WorkspaceTransformation;
 using GuiSequence  = WorkspaceSequence;
 
-using GuiNodePtr = std::shared_ptr<WorkspaceNodeWithCoreData>;
+using GuiNodePtr = std::shared_ptr<GuiNode>;
 
 class NodeVisitor
 {

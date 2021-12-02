@@ -76,6 +76,12 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
     }
 }
 
+void WorkspaceSequence::moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
+{
+	pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
+	dragedNode->setRemoveFromWorkspaceWindow(true);
+}
+
 void WorkspaceSequence::moveNodeToSequence(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
 {
     pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
