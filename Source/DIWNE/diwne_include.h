@@ -1,7 +1,7 @@
 #ifndef DIWNE_INCLUDE_H
 #define DIWNE_INCLUDE_H
 
-//#define DIWNE_DEBUG
+#define DIWNE_DEBUG
 
 #include <limits>
 
@@ -11,12 +11,6 @@
 # include <imgui.h>
 # define IMGUI_DEFINE_MATH_OPERATORS
 # include <imgui_internal.h>
-//# include "../Dependencies/imgui_node_editor/external/imgui/imgui_extra_math.h"
-//# include "../Dependencies/imgui_node_editor/external/imgui/imgui_bezier_math.h"
-//# include "../Dependencies/imgui_node_editor/external/imgui/imgui_canvas.h"
-
-//# include <vector>
-//# include <string>
 
 namespace DIWNE
 {

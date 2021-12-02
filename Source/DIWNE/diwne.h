@@ -231,6 +231,10 @@ class Diwne
     ImVec2 m_popupPosition;
     MouseLocation m_mouseLocation;
 
+
+    /* restore information */
+    ImVec2 m_StoreItemSpacing;
+
 };
 
 

@@ -33,10 +33,11 @@ void Diwne::Begin(const char* imgui_id)
             /* \todo window draw list as variable (constant) in diwne */
         AddRectDiwne(m_workAreaDiwne.Min, m_workAreaDiwne.Max, ImColor(0,255,0), 0, ImDrawCornerFlags_None, 20);
 
+        /* zoom */
         idl->_FringeScale = 1/m_workAreaZoomDiwne;
-
-				// \todo JH - Causes crash during scrolling.
         ImGui::SetWindowFontScale(m_workAreaZoomDiwne);
+        m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
+        ImGui::GetStyle().ItemSpacing *= m_workAreaZoomDiwne;
 
             ImGui::Text("\n\n");
 
@@ -103,11 +104,12 @@ void Diwne::End()
     }
 
 //    transformMouseFromDiwneToImGui();
-
+    ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
     m_previousFrameDiwneAction = m_diwneAction;
     m_backgroundPopupRaise = false;
     m_workAreaZoomChangeDiwne = 0;
     m_nodesSelectionChanged = false;
+
 
     ImGui::EndChild();
 }
@@ -356,8 +358,6 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 //    idl->PopClipRect();
 
     ImGui::Dummy(size);
-
-
 }
 
 ImVec2 Diwne::screen2workArea(const ImVec2 & point) const

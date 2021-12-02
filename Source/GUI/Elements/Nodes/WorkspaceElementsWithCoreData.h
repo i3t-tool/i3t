@@ -118,9 +118,10 @@ class WorkspaceCorePin : public WorkspacePin
 protected:
 	Core::Pin const&            m_pin;
 	WorkspaceNodeWithCoreData&  m_node;
+	ImVec2 m_connectionPoint;
+	ImRect m_iconRect;
 
-//    ,   m_iconSize(I3T::getSize(ESizeVec2::Nodes_IconSize))
-//    ,   m_color(I3T::getColor(EColor::MatrixPin))
+
 
 public:
     WorkspaceCorePin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
@@ -158,7 +159,8 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
     public:
         WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
-        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_pinRectDiwne.Min.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
+        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRect.Min.x, (m_iconRect.Min.y+m_iconRect.Max.y)/2); };
+        void setConnectedOutput(WorkspaceCoreOutputPin* ou);
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
@@ -166,7 +168,7 @@ class WorkspaceCoreOutputPin : public WorkspaceCorePin
 protected:
     public:
         WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_pinRectDiwne.Max.x, (m_pinRectDiwne.Min.y+m_pinRectDiwne.Max.y)/2); };
+        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRect.Max.x, (m_iconRect.Min.y+m_iconRect.Max.y)/2); };
 };
 
 class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
@@ -279,7 +281,7 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
 /* \todo maybe create from this function class "WithPins" and inherit other class from "WithPins" */
-extern void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::ConstPinListRef coreInputPins, Core::Node::ConstPinListRef coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins);
+//extern void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::ConstPinListRef coreInputPins, Core::Node::ConstPinListRef coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins);
 
 
 extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, int const mapValue, bool& valueChanged);

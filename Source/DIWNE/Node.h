@@ -50,8 +50,8 @@ class Node : public std::enable_shared_from_this<Node>
 
         virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne) {return false;};
 
-        virtual bool drawNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
-        virtual bool drawNodeAfterContent(DIWNE::Diwne &diwne) {return false;};
+        virtual bool processNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
+        virtual bool processNodeAfterContent(DIWNE::Diwne &diwne) {return false;};
         virtual bool topContent(DIWNE::Diwne &diwne);
         virtual bool leftContent(DIWNE::Diwne &diwne);
         virtual bool middleContent(DIWNE::Diwne &diwne);
@@ -90,6 +90,7 @@ class Node : public std::enable_shared_from_this<Node>
         bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
         bool m_selected;
         bool m_translated;
+        bool m_nodeInteractionAllowed;
 
     private:
         DIWNE::ID m_idDiwne;
@@ -98,7 +99,10 @@ class Node : public std::enable_shared_from_this<Node>
         void translateNodeRectsDiwne(ImVec2 const& amount);
         bool m_isHeld;
 
+
         float m_middleAlign;
+
+        float m_firstDraw; /* you have to draw node anywhere it is in first frame after you created it -> for obtain its real size */
 
 
 };

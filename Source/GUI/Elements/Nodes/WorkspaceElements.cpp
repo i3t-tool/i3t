@@ -79,6 +79,13 @@ bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
     return interaction_happen;
 }
 
+bool WorkspaceNode::processNodeAfterContent(DIWNE::Diwne &diwne)
+{
+    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(ImGui::GetMousePos()));
+    return false;
+}
+
+
 
 void WorkspaceNode::drawMenuDelete()
 {

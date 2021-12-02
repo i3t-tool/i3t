@@ -83,6 +83,8 @@ public:
     virtual bool topContent(DIWNE::Diwne &diwne);
     virtual bool middleContent(DIWNE::Diwne &diwne);
 
+    virtual bool processNodeAfterContent(DIWNE::Diwne &diwne);
+
     bool m_removeFromWorkspaceWindow;
     bool getRemoveFromWorkspaceWindow() const {return m_removeFromWorkspaceWindow;};
 	void setRemoveFromWorkspaceWindow(bool value) {m_removeFromWorkspaceWindow=value;};
