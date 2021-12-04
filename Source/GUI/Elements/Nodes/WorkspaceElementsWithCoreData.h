@@ -141,6 +141,8 @@ public:
 	EValueType getType() const;
 	bool			 isConnected() const;
 
+	virtual bool processPinIcon(WorkspaceWindow &workspace){return false;};
+
 	/* DIWNE function */
 	virtual bool pinContent(DIWNE::Diwne &diwne);
 
@@ -161,6 +163,10 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
         WorkspaceCoreLink& getLink() {return m_link;};
         ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRect.Min.x, (m_iconRect.Min.y+m_iconRect.Max.y)/2); };
         void setConnectedOutput(WorkspaceCoreOutputPin* ou);
+        bool processPinIcon();
+
+        /* DIWNE function */
+        virtual bool pinContent(DIWNE::Diwne &diwne);
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin

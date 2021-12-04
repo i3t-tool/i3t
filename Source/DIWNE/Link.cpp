@@ -28,7 +28,7 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     ImVec2 controlPointStart = m_startDiwne + m_startControlOffsetDiwne;
     ImVec2 controlPointEnd = m_endDiwne + m_endControlOffsetDiwne;
 
-    ImVec2 mousePosDiwne = diwne.screen2diwne( ImGui::GetIO().MousePos );
+    ImVec2 mousePosDiwne = diwne.screen2diwne( diwne.bypassGetMousePos() );
     ImVec2 closestPointOnLink = ImBezierCubicClosestPointCasteljau(m_startDiwne, controlPointStart, controlPointEnd, m_endDiwne
                                              , mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
     ImVec2 diff = closestPointOnLink - mousePosDiwne;
@@ -37,8 +37,8 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     {
         alpha = 255; /* \todo JH to settings? */
         interaction_happen = true;
-        if (ImGui::IsMouseReleased(0)) {getSelected() ? setSelected(false) : setSelected(true);}
-        if (ImGui::IsMouseReleased(1)) {
+        if (diwne.bypassIsMouseReleased0()) {getSelected() ? setSelected(false) : setSelected(true);}
+        if (diwne.bypassIsMouseReleased1()) {
                 ImGui::OpenPopup(popupID.c_str()); /* link is not ImGui item - so we can not use ImGui::BeginPopupContextItem */
         }
     }

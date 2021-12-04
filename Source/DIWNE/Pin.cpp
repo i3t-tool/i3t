@@ -37,7 +37,7 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
     }
 #endif // DIWNE_DEBUG
 
-    if (!inner_interaction_happen && ImGui::IsItemClicked(0))
+    if (!inner_interaction_happen && diwne.bypassItemClicked0())
     {
         m_isHeld = true;
     }
@@ -45,10 +45,10 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
     if (m_isHeld)
     {
         interaction_happen = true;
-        if (ImGui::IsMouseDragging(0))
+        if (diwne.bypassIsMouseDragging0())
         {
             pinActiveProcess(diwne);
-        }else if (ImGui::IsMouseReleased(0))
+        }else if (diwne.bypassIsMouseReleased0())
         {
             if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
             {
@@ -72,7 +72,7 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
 
 bool Pin::pinActiveCheck(DIWNE::Diwne &diwne)
 {
-    return ImGui::IsItemActive();
+    return diwne.bypassIsItemActive();
 }
 
 void Pin::pinActiveProcess(DIWNE::Diwne &diwne)
@@ -82,7 +82,7 @@ void Pin::pinActiveProcess(DIWNE::Diwne &diwne)
 
 bool Pin::pinConnectLinkCheck(DIWNE::Diwne &diwne)
 {
-    return (diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink || diwne.getPreviousFrameDiwneAction() == DIWNE::DiwneAction::NewLink) && ImGui::IsItemHovered() && diwne.getLastActivePin<DIWNE::Pin>() != this;
+    return (diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink || diwne.getPreviousFrameDiwneAction() == DIWNE::DiwneAction::NewLink) && diwne.bypassIsItemHoovered() && diwne.getLastActivePin<DIWNE::Pin>() != this;
 }
 
 } /* namespace DIWNE */

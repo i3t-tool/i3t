@@ -635,6 +635,8 @@ void WorkspaceWindow::render()
         shiftDragedOrHoldNodeToEnd();
     }
 
+
+
 	//checkQueryContextMenus();
 
     End();

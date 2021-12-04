@@ -430,6 +430,7 @@ WorkspaceCorePin::WorkspaceCorePin(     DIWNE::ID const id
 bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 {
 		float alpha = ImGui::GetStyle().Alpha;
+		bool interaction_happen = false;
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
@@ -439,14 +440,18 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
         DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
 		ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
 
+		ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize)*diwne.getWorkAreaZoomDiwne();
+
         float padding = 2*diwne.getWorkAreaZoomDiwne(); /* \todo JH padding of inner shape in icon to Theme? */
+
+        DIWNE::putInvisibleButtonUnder(fmt::format("icon:{}",getId()), iconSize)
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
                         iconTypeFg, iconColorFg, iconColorFg,
-                        I3T::getSize(ESizeVec2::Nodes_IconSize)*diwne.getWorkAreaZoomDiwne(),
+                        iconSize,
                         ImVec4(padding, padding, padding, padding),
                         isConnected());
-
         m_iconRect = ImRect( diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+        interaction_happen |= processPinIcon(dynamic_cast<WorkspaceWindow>(diwne));
 
 		if (getShowLabel())
 		{
@@ -483,7 +488,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 		}
 
 		ImGui::PopStyleVar();
-		return false;
+		return interaction_happen;
 }
 
 
@@ -757,6 +762,11 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const
 void WorkspaceCoreInputPin::setConnectedOutput(WorkspaceCoreOutputPin* ou)
 {
     m_link.setStartPin(ou);
+}
+
+bool WorkspaceCoreInputPin::processPinIcon(WorkspaceWindow &workspace)
+{
+    return false /* \todo JH new link here */
 }
 /* >>>> WorkspaceCoreLink <<<< */
 

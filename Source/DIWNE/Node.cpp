@@ -41,8 +41,6 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
         setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
     }
 
-//    m_topRectDiwne_temp.Min = m_topRectDiwne.Max;
-
     ImRect nodeRectDiwne = getNodeRectDiwne();
 
     if ( m_firstDraw || nodeRectDiwne.Overlaps( diwne.getWorkAreaDiwne() ) )
@@ -84,36 +82,34 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 
         nodeRectDiwne = getNodeRectDiwne(); /* update */
 
-        if (ImGui::IsItemHovered()) {
+        if (diwne.bypassIsItemHoovered()) {
             diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,255,255), 0, ImDrawCornerFlags_None, 3);
 
-            if (ImGui::IsMouseDown(0))
+            if (diwne.bypassIsMouseDown0())
             {
                 interaction_happen = true;
             }
         }
 
-
-
         if ( (!inner_interaction_happen && m_nodeInteractionAllowed) || m_isHeld)
         {
-            if (ImGui::IsItemClicked(0)) {
+            if (diwne.bypassIsMouseDown0()) {
                 m_isHeld = true;
                 diwne.setDiwneAction(DiwneAction::HoldNode);
                 diwne.m_draged_hold_node = shared_from_this();
             }
 
-            if (m_isHeld) /* be aware of same button for clicked and dragging and released*/
+            if (m_isHeld) /* be aware of same button for clicked and dragging and released \todo JH bypass it by "manipulateNode" function */
             {
                 interaction_happen = true;
-                if (ImGui::IsMouseDragging(0))
+                if (diwne.bypassIsMouseDragging0())
                 {
-                    translateNodePositionDiwne(ImGui::GetIO().MouseDelta/diwne.getWorkAreaZoomDiwne());
+                    translateNodePositionDiwne(diwne.bypassGetMouseDelta()/diwne.getWorkAreaZoomDiwne());
                     m_translated = true;
                     diwne.setDiwneAction(DiwneAction::DragNode);
                 }
 
-                if (ImGui::IsMouseReleased(0))
+                if (diwne.bypassIsMouseReleased0())
                 {
                     if (m_translated)
                     {
@@ -125,6 +121,7 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
                     {
                         m_selected = !m_selected;
                         diwne.setNodesSelectionChanged(true);
+                        //diwne.setDiwneAction(DiwneAction::CopySelected);
                     }
 
                     m_isHeld = false;

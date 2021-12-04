@@ -57,11 +57,11 @@ void Diwne::Begin(const char* imgui_id)
         {
             if (ImGui::IsItemActive())
             {
-               translateWorkAreaDiwneZoomed(ImGui::GetIO().MouseDelta*-1);
+               translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
             }
 
-            float mouseWheel = ImGui::GetIO().MouseWheel;
-            if (ImGui::IsItemHovered() && mouseWheel != 0)
+            float mouseWheel = bypassGetMouseWheel();
+            if (bypassIsItemHoovered() && mouseWheel != 0)
             {
                 setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
             }
@@ -79,8 +79,7 @@ void Diwne::Begin(const char* imgui_id)
         ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
 #endif // DIWNE_DEBUG
 
-        setPopupPosition(ImGui::GetIO().MouseClickedPos[1]); /* must be before transformation mouse to Diwne because popup is new independent window */
-//        transformMouseFromImGuiToDiwne();
+        setPopupPosition(bypassMouseClickedPos1());
 
 #ifdef DIWNE_DEBUG
         ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
@@ -103,7 +102,6 @@ void Diwne::End()
         m_helperLink.drawLinkDiwne(*this);
     }
 
-//    transformMouseFromDiwneToImGui();
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
     m_previousFrameDiwneAction = m_diwneAction;
     m_backgroundPopupRaise = false;
@@ -409,6 +407,28 @@ ImVec2 Diwne::diwne2screen_noZoom(const ImVec2 & point) const
 {
     return workArea2screen(diwne2workArea_noZoom(point));
 }
+
+bool Diwne::bypassItemClicked0() {return ImGui::IsItemClicked(0);}
+bool Diwne::bypassItemClicked1() {return ImGui::IsItemClicked(1);}
+bool Diwne::bypassItemClicked2() {return ImGui::IsItemClicked(2);}
+bool Diwne::bypassIsMouseDown0() {return ImGui::IsMouseDown(0);}
+bool Diwne::bypassIsMouseDown1() {return ImGui::IsMouseDown(1);}
+bool Diwne::bypassIsMouseDown2() {return ImGui::IsMouseDown(2);}
+bool Diwne::bypassIsMouseReleased0() {return ImGui::IsMouseReleased(0);}
+bool Diwne::bypassIsMouseReleased1() {return ImGui::IsMouseReleased(1);}
+bool Diwne::bypassIsMouseReleased2() {return ImGui::IsMouseReleased(2);}
+ImVec2 Diwne::bypassMouseClickedPos0() {return ImGui::GetIO().MouseClickedPos[0];}
+ImVec2 Diwne::bypassMouseClickedPos1() {return ImGui::GetIO().MouseClickedPos[1];}
+ImVec2 Diwne::bypassMouseClickedPos2() {return ImGui::GetIO().MouseClickedPos[2];}
+bool Diwne::bypassIsItemHoovered() {return ImGui::IsItemHovered();}
+bool Diwne::bypassIsItemActive() {return ImGui::IsItemActive();}
+bool Diwne::bypassIsMouseDragging0() {return ImGui::IsMouseDragging(0);}
+bool Diwne::bypassIsMouseDragging1() {return ImGui::IsMouseDragging(1);}
+bool Diwne::bypassIsMouseDragging2() {return ImGui::IsMouseDragging(2);}
+ImVec2 Diwne::bypassGetMouseDelta() {return ImGui::GetIO().MouseDelta;}
+ImVec2 Diwne::bypassGetMousePos() {return ImGui::GetIO().MousePos;}
+float Diwne::bypassGetMouseWheel() {return ImGui::GetIO().MouseWheel;}
+
 
 void Diwne::showTooltipLabel(std::string label, ImColor color)
 {

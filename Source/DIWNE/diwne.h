@@ -210,6 +210,33 @@ class Diwne
         void setNodesSelectionChanged(bool value){m_nodesSelectionChanged = value;};
         bool getNodesSelectionChanged(){return m_nodesSelectionChanged;};
 
+        virtual bool bypassItemClicked0();
+        virtual bool bypassItemClicked1();
+        virtual bool bypassItemClicked2();
+        virtual bool bypassIsMouseDown0();
+        virtual bool bypassIsMouseDown1();
+        virtual bool bypassIsMouseDown2();
+        virtual ImVec2 bypassMouseClickedPos0();
+        virtual ImVec2 bypassMouseClickedPos1();
+        virtual ImVec2 bypassMouseClickedPos2();
+        virtual bool bypassIsMouseReleased0();
+        virtual bool bypassIsMouseReleased1();
+        virtual bool bypassIsMouseReleased2();
+        virtual bool bypassIsItemHoovered();
+        virtual bool bypassIsItemActive();
+        virtual bool bypassIsMouseDragging0();
+        virtual bool bypassIsMouseDragging1();
+        virtual bool bypassIsMouseDragging2();
+        virtual ImVec2 bypassGetMouseDelta();
+        virtual ImVec2 bypassGetMousePos();
+        virtual float bypassGetMouseWheel();
+
+
+
+
+
+
+
     protected:
         bool m_inner_interaction_happen = false;
         DiwneAction m_diwneAction = None, m_previousFrameDiwneAction = None;
@@ -218,6 +245,7 @@ class Diwne
         DIWNE::Link m_helperLink; /* for showing link that is in process of creating */
 
         bool m_nodesSelectionChanged = false;
+
 
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */

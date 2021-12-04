@@ -123,7 +123,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
         int rowOfChange, columnOfChange;
         float valueOfChange;
         return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(diwne), m_floatPopupMode,
-                                    m_nodebase->getData(2).getMat4(), m_nodebase->getDataMapRef(),
+                                    m_nodebase->getData(0).getMat4(), m_nodebase->getDataMapRef(),
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
     }
 
