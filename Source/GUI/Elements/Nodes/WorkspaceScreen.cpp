@@ -42,7 +42,7 @@ bool WorkspaceScreen::middleContent(DIWNE::Diwne& diwne)
 
 	/* \todo JH PF lots of bug here - just for first testing/using...; better place; ImageButton / DiwneIcon */
 	float buttonWidth = 20;
-	ImGui::Indent(m_textureSize.x - buttonWidth);
+	ImGui::Indent(std::max(0.0f, m_textureSize.x - buttonWidth));
 	ImGui::Button("resize_button", ImVec2(buttonWidth, 20));
     if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
     {

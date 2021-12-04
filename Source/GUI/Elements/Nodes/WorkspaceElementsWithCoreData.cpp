@@ -540,12 +540,6 @@ void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
 
     Core::Pin const* coreInput = &(input->getCorePin());
     Core::Pin const* coreOutput = &(output->getCorePin());
-//    if (! coreInput->isInput() ) /* todo JH move this to Core::isPlugCorrect and Core::Plug? */
-//    {
-//        Core::Pin const* tmp = coreInput;
-//        coreInput = coreOutput;
-//        coreOutput = tmp;
-//    }
 
     switch (Core::GraphManager::isPlugCorrect(coreInput,coreOutput))
     {
@@ -553,16 +547,7 @@ void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
         diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
         if (!ImGui::GetIO().MouseDown[0])
         {
-            if (ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
-                                                                coreOutput->getIndex(), coreInput->getIndex()))
-            {
-                dynamic_cast<WorkspaceCoreInputPin*>(input)->setConnectedOutput(dynamic_cast<WorkspaceCoreOutputPin*>(output));
-
-//                WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
-//                WorkspaceCoreLink *lin = &(in->getLink());
-//                WorkspaceCoreOutputPin* ou = dynamic_cast<WorkspaceCoreOutputPin*>(output);
-//                lin->setStartPin(ou);
-            }
+            dynamic_cast<WorkspaceCoreInputPin*>(input)->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
         }
         break;
     /* \todo JH react informatively to other result too */
@@ -764,7 +749,7 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const
     , m_link(id, this)
 {}
 
-void WorkspaceCoreInputPin::setConnectedOutput(WorkspaceCoreOutputPin* ou)
+void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou)
 {
     m_link.setStartPin(ou);
 }
@@ -775,6 +760,26 @@ bool WorkspaceCoreInputPin::processPinIcon(WorkspaceWindow &workspace)
     /* \todo Create construtor of this type and connect */
     return false;
 }
+
+void WorkspaceCoreInputPin::unplug()
+{
+    Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
+    m_link.setStartPin(nullptr);
+}
+
+void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
+{
+    Core::Pin const* coreInput = &(getCorePin());
+    Core::Pin const* coreOutput = &(ou->getCorePin());
+
+    if (ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
+                                                        coreOutput->getIndex(), coreInput->getIndex()))
+    {
+        setConnectedWorkspaceOutput(ou);
+    }
+}
+
+
 
 bool WorkspaceCoreInputPin::pinContent(DIWNE::Diwne &diwne)
 {
@@ -787,6 +792,18 @@ WorkspaceCoreLink::WorkspaceCoreLink(DIWNE::ID id, WorkspaceCoreInputPin *endPin
     , m_endPin(endPin)
     , m_startPin(nullptr)
 {}
+
+void WorkspaceCoreLink::unplug()
+{
+    m_endPin->unplug();
+    m_startPin = nullptr;
+}
+
+void WorkspaceCoreLink::linkPopupContent()
+{
+    if (ImGui::MenuItem("Delete")) {unplug();}
+}
+
 
 void WorkspaceCoreLink::updateEndpoints(){
     ImVec2 start, end;

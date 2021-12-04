@@ -7,6 +7,7 @@
 #include "WorkspaceElements.h"
 #include "Core/Nodes/Transform.h" /* building transformations nodes*/
 #include "Core/Input/InputManager.h"
+#include "Core/Nodes/GraphManager.h"
 
 #include "State/NodeVisitor.h"
 
@@ -105,6 +106,9 @@ public:
     WorkspaceCoreOutputPin* getStartPin() const {return m_startPin;};
     WorkspaceCoreInputPin* const getEndPin() const {return m_endPin;};
     void setStartPin(WorkspaceCoreOutputPin *startPin) {m_startPin = startPin;};
+    void unplug();
+
+    virtual void linkPopupContent();
 
     void updateEndpoints();
     void updateControlPointsOffsets();
@@ -162,8 +166,12 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
         WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
         ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRect.Min.x, (m_iconRect.Min.y+m_iconRect.Max.y)/2); };
-        void setConnectedOutput(WorkspaceCoreOutputPin* ou);
+        void setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou);
         bool processPinIcon(WorkspaceWindow& workspace);
+
+        void unplug();
+        void plug(WorkspaceCoreOutputPin* ou);
+
 
         /* DIWNE function */
         virtual bool pinContent(DIWNE::Diwne &diwne);
@@ -184,6 +192,7 @@ class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
 
         bool pinContent(DIWNE::Diwne &diwne);
         virtual int maxLengthOfData() = 0;
+
 };
 
 class WorkspaceCoreOutputPinMatrix4x4 : public WorkspaceCoreOutputPinWithData
@@ -281,7 +290,6 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 
     virtual bool leftContent(DIWNE::Diwne &diwne);
     virtual bool rightContent(DIWNE::Diwne &diwne);
-
 
 };
 

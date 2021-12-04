@@ -510,28 +510,58 @@ void WorkspaceWindow::popupBackgroundContent()
 				}
 				if (ImGui::MenuItem("All links"))
 				{
-				    /* \todo JH - disconnect all */
+				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                    {
+                        Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                        if (node != nullptr)
+                        {
+                            for (auto && pin : node->getInputs())
+                            {
+                                pin->unplug();
+                            }
+                        }
+                    }
 				}
 				if (ImGui::MenuItem("Selected nodes"))
 				{
 				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
                     {
-                        if (workspaceCoreNode->getSelected()){ workspaceCoreNode->setRemoveFromWorkspaceWindow(true); }
-
-                        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
-                        if (seq != nullptr)
+                        if (workspaceCoreNode->getSelected())
                         {
-                            for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+                            workspaceCoreNode->setRemoveFromWorkspaceWindow(true);
+                        }
+                        else
+                        {
+                            Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
+                            if (seq != nullptr)
                             {
-                                if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
+                                for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+                                {
+                                    if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
+                                }
                             }
                         }
+
+
 
                     }
 				}
 				if (ImGui::MenuItem("Selected links"))
 				{
-				    /* \todo JH */
+				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                    {
+                        Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                        if (node != nullptr)
+                        {
+                            for (auto && pin : node->getInputs())
+                            {
+                                if (pin->getLink().getSelected())
+                                {
+                                    pin->unplug();
+                                }
+                            }
+                        }
+                    }
 				}
 				ImGui::EndMenu();
 			}
@@ -579,8 +609,14 @@ void WorkspaceWindow::render()
         //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
 
-        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
-        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+
+        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
+        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
 
     }
 
