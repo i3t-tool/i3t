@@ -496,7 +496,8 @@ void WorkspaceWindow::popupBackgroundContent()
 		}
 		if (ImGui::MenuItem("screen"))
 		{
-		    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Screen>>();
+		    //addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Screen>>();
+			addNodeToPositionOfPopup<WorkspaceScreen>();  //PF before merge node_editor and develop
 		}
 
 		ImGui::Separator();

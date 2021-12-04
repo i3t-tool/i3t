@@ -99,7 +99,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth(DIWNE::Diwne &diwne) { return
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-	float size				 = ImGui::GetFontSize();
+	float size				 = ImGui::GetFontSize();   // get current font size (= height in pixels) of current font with current scale applied
 	float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
 	m_dataItemsWidth = (float) (maxLenghtOfData()) * oneCharWidth + 2 * padding;
 	return m_dataItemsWidth;
