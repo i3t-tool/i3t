@@ -444,14 +444,14 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 
         float padding = 2*diwne.getWorkAreaZoomDiwne(); /* \todo JH padding of inner shape in icon to Theme? */
 
-        DIWNE::putInvisibleButtonUnder(fmt::format("icon:{}",getId()), iconSize)
+        DIWNE::putInvisibleButtonUnder(fmt::format("IB_icon:{}",getId()), iconSize);
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
                         iconTypeFg, iconColorFg, iconColorFg,
                         iconSize,
                         ImVec4(padding, padding, padding, padding),
                         isConnected());
         m_iconRect = ImRect( diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
-        interaction_happen |= processPinIcon(dynamic_cast<WorkspaceWindow>(diwne));
+        interaction_happen |= processPinIcon(dynamic_cast<WorkspaceWindow&>(diwne));
 
 		if (getShowLabel())
 		{
@@ -489,6 +489,11 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 
 		ImGui::PopStyleVar();
 		return interaction_happen;
+}
+
+bool WorkspaceCorePin::processPinIcon(WorkspaceWindow &workspace)
+{
+    return false; /* \todo JH new link here */
 }
 
 
@@ -766,7 +771,14 @@ void WorkspaceCoreInputPin::setConnectedOutput(WorkspaceCoreOutputPin* ou)
 
 bool WorkspaceCoreInputPin::processPinIcon(WorkspaceWindow &workspace)
 {
-    return false /* \todo JH new link here */
+    WorkspaceCorePin::processPinIcon(workspace);
+    /* \todo Create construtor of this type and connect */
+    return false;
+}
+
+bool WorkspaceCoreInputPin::pinContent(DIWNE::Diwne &diwne)
+{
+    return WorkspaceCorePin::pinContent(diwne);
 }
 /* >>>> WorkspaceCoreLink <<<< */
 

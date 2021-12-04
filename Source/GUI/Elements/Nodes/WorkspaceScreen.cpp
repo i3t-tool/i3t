@@ -39,7 +39,21 @@ bool WorkspaceScreen::middleContent(DIWNE::Diwne& diwne)
 	m_camera->update();
 
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
-	
+
+	/* \todo JH PF lots of bug here - just for first testing/using...; better place; ImageButton / DiwneIcon */
+	float buttonWidth = 20;
+	ImGui::Indent(m_textureSize.x - buttonWidth);
+	ImGui::Button("resize_button", ImVec2(buttonWidth, 20));
+    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+    {
+        ImVec2 dragDelta = ImGui::GetMouseDragDelta();
+        m_textureSize.x = std::max(buttonWidth, m_textureSize.x+dragDelta.x); /* button should fit into middle... */
+        m_textureSize.y = std::max(0.0f, m_textureSize.y+dragDelta.y);
+
+
+        ImGui::ResetMouseDragDelta(0);
+    }
+
   return false;
 }
 
