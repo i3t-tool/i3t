@@ -39,7 +39,7 @@ private:
 
 	// can be removed if no direct rendering to the texture m_textureID
 	GLuint m_fbo = 0;              // FBO for texture rendering - needed obly for additional rendering to the m_textureID
-	RenderTexture *renderTexture;  // needed when creating camera only, can be a local variable
+	RenderTexture *m_renderTexture;  // needed when creating camera only, can be a local variable
 
 	void init();
 };

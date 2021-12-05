@@ -15,8 +15,8 @@ WorkspaceScreen::WorkspaceScreen()
 
 WorkspaceScreen::~WorkspaceScreen()
 {
-	if(renderTexture)
-		delete(renderTexture);
+	if(m_renderTexture)
+		delete(m_renderTexture);
 	if(m_camera)
 		delete(m_camera);
 }
@@ -24,10 +24,10 @@ WorkspaceScreen::~WorkspaceScreen()
 
 void WorkspaceScreen::init()
 {
-	renderTexture = new RenderTexture( &m_textureID, static_cast<int>(m_textureSize.x), static_cast<int>(m_textureSize.y));  // create and get the FBO and color Attachment for rendering
+	m_renderTexture = new RenderTexture( &m_textureID, static_cast<int>(m_textureSize.x), static_cast<int>(m_textureSize.y));  // create and get the FBO and color Attachment for rendering
 
 	//Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget);
-	m_camera = new Camera(60.0f, Application::get().world()->sceneRoot, renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
+	m_camera = new Camera(60.0f, Application::get().world()->sceneRoot, m_renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
 
 	printf("Screen initialized\n");
 }
@@ -50,8 +50,11 @@ bool WorkspaceScreen::middleContent(DIWNE::Diwne& diwne)
         m_textureSize.x = std::max(buttonWidth, m_textureSize.x+dragDelta.x); /* button should fit into middle... */
         m_textureSize.y = std::max(0.0f, m_textureSize.y+dragDelta.y);
 
-
         ImGui::ResetMouseDragDelta(0);
+
+    		m_renderTexture->resize(m_textureSize.x, m_textureSize.y);
+    	
+    	  return true;
     }
 
   return false;
