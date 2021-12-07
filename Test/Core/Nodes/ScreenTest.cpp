@@ -12,7 +12,10 @@ TEST(ScreenTest, _)
 	auto screen = Builder::createNode<ENodeType::Screen>();
 	auto camera = GraphManager::createCamera();
 
-	auto t1 = Builder::createTransform<LookAt>(generateVec3(), generateVec3());
+	auto t1 = Builder::createTransform<ETransformType::LookAt>();
+	t1->setEye(generateVec3());
+	t1->setCenter(generateVec3());
+
 	camera->getView()->addMatrix(t1);
 
 	// Check if camera contains t1.

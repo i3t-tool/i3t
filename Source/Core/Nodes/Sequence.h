@@ -25,13 +25,13 @@ inline constexpr size_t I3T_SEQ_MOD = 2;  // world transform
 /**
  * Sequence of matrices.
  *
- * -----------------------
- * |             0 mul   |
- * | 0 mul       1 mat   |
- * | 1 mat       2 model |
- * -----------------------
+ * +---------------------------+
+ * |               <M> 0 mul   |
+ * | 0 mul <M>     <S> 1 mat   |
+ * | 1 mat <S>     <M> 2 model |
+ * +---------------------------+
  */
-class Sequence : public NodeBase
+class Sequence : public Node
 {
 	friend class GraphManager;
 

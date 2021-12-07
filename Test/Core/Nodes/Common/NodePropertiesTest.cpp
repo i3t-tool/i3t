@@ -6,7 +6,7 @@ using namespace Core;
 
 TEST(NodePropertiesTest, InvalidMapShouldNotBeSet)
 {
-	auto projNode = Builder::createTransform<PerspectiveProj>();
+	auto projNode = Builder::createTransform<ETransformType::Perspective>();
 
 	projNode->setDataMap(&Transform::g_EulerY);
 

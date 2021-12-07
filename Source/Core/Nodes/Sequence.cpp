@@ -181,7 +181,7 @@ Sequence::Sequence() : NodeBase(&g_sequence)
 
 Pin& Sequence::getIn(size_t i)
 {
-	assert(i < g_sequence.inputTypes.size() && "Illegal index.");
+	I3T_ASSERT(i < g_sequence.inputTypes.size() && "Illegal index.");
 
 	if (i == I3T_SEQ_IN_MAT)
 		return m_storage->m_inputs[i];
@@ -190,7 +190,7 @@ Pin& Sequence::getIn(size_t i)
 
 Pin& Sequence::getOut(size_t i)
 {
-	assert(i < g_sequence.outputTypes.size() && "Illegal index.");
+	I3T_ASSERT(i < g_sequence.outputTypes.size() && "Illegal index.");
 
 	if (i == I3T_SEQ_OUT_MUL || i == I3T_SEQ_OUT_MOD)
 		return m_multiplier->m_outputs[i];

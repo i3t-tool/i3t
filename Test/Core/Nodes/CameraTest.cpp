@@ -11,8 +11,8 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 	auto cameraNode = GraphManager::createCamera();
 	auto screenNode = Builder::createNode<ENodeType::Screen>();
 
-	auto perspectiveProj = Builder::createTransform<PerspectiveProj>();
-	auto lookAt = Builder::createTransform<LookAt>();
+	auto perspectiveProj = Builder::createTransform<ETransformType::Perspective>();
+	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
 
 	cameraNode->getProj()->addMatrix(perspectiveProj);
 	cameraNode->getView()->addMatrix(lookAt);

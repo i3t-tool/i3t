@@ -24,7 +24,7 @@ TEST(SequenceTest, SequenceCanContainMatrices)
 TEST(SequenceTest, AddMatrixToTail)
 {
 	auto seq = Builder::createSequence();
-	auto mat = Builder::createTransform<Free>();
+	auto mat = Builder::createTransform<ETransformType::Free>();
 
 	seq->addMatrix(mat);
 	EXPECT_EQ(1, seq->getMatrices().size());

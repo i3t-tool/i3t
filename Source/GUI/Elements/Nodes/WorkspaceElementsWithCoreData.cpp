@@ -859,6 +859,10 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(Ptr<Core::N
     }else
     {
 
+			auto outs = nodebase->getOutputPins();
+			auto outsBegin = outs.begin();
+			auto outsEnd   = outs.end();
+
         for (Core::Pin const& pin : outputPins)
         {
             switch (pin.getType())
@@ -1164,7 +1168,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
 //
 //}
 
-void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::ConstPinListRef coreInputPins, Core::Node::ConstPinListRef coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)
+void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::PinView coreInputPins, Core::Node::PinView coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)
 {
 /* when you create new pin type - add it to both, input and output part */
 

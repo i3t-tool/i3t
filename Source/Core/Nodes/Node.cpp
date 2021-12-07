@@ -5,6 +5,64 @@
 
 using namespace Core;
 
+Node::PinView Node::PinView::begin() const
+{
+	return Node::PinView(strategy, node, 0);
+}
+
+Node::PinView Node::PinView::end() const
+{
+	return Node::PinView(strategy, node, size());
+}
+
+size_t Node::PinView::size() const
+{
+	if (strategy == Node::PinView::EStrategy::Input)
+		return node->m_operation->inputTypes.size();
+	return node->m_operation->outputTypes.size();
+}
+
+bool Node::PinView::empty() const
+{
+	return size() == 0;
+}
+
+Node::PinView& Node::PinView::operator++()
+{
+	index++;
+
+	return *this;
+}
+
+const Pin& Node::PinView::operator*()
+{
+	return (*this)[index];
+}
+
+bool Node::PinView::operator==(const PinView& view) const
+{
+	return index == view.index;
+}
+
+bool Node::PinView::operator!=(const PinView& view) const
+{
+	return !(*this == view);
+}
+
+Pin& Node::PinView::operator[](size_t i)
+{
+	if (strategy == Node::PinView::EStrategy::Input)
+		return node->getIn(i);
+	return node->getOut(i);
+}
+
+const Pin& Node::PinView::operator[](size_t i) const
+{
+	if (strategy == Node::PinView::EStrategy::Input)
+		return node->getIn(i);
+	return node->getOut(i);
+}
+
 Node::~Node()
 {
 	generator.returnId(m_id);
@@ -86,11 +144,10 @@ void Node::spreadSignal(size_t outIndex)
 {
 	if (getOutputPinsRef().empty()) return;
 
-	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
-	{
-		// I3T_DEBUG_LOG("Spreading signal from {}:{} to {}:{}.", getSig(), outIndex, inPin->m_master->getSig(), inPin->getSig());
+	auto& outputPin = getOut(outIndex);
+
+	for (auto* inPin : outputPin.getOutComponents())
 		inPin->m_master->receiveSignal(outIndex);
-	}
 }
 
 void Node::receiveSignal(int inputIndex)

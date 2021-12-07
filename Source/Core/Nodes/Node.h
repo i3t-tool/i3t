@@ -74,8 +74,47 @@ class Node : public std::enable_shared_from_this<Node>
 	friend class GraphManager;
 
 public:
-	using PinListRef      = std::vector<Pin>&;
-	using ConstPinListRef = const std::vector<Pin>&;
+	struct PinView
+	{
+		enum class EStrategy
+		{
+			Output,
+			Input
+		};
+
+		PinView() = default;
+		PinView(EStrategy strategy, Ptr<Node> node)
+		{
+			this->strategy = strategy;
+			this->node     = node;
+		}
+
+		PinView(EStrategy strategy, Ptr<Node> node, int index)
+		{
+			this->strategy = strategy;
+			this->node     = node;
+			this->index    = index;
+		}
+
+		PinView begin() const;
+		PinView end() const;
+
+		size_t size() const;
+		bool   empty() const;
+
+		PinView& operator++();
+		const Pin& operator*();
+		bool operator==(const PinView& view) const;
+		bool operator!=(const PinView& view) const;
+
+		Pin& operator[](size_t i);
+		const Pin& operator[](size_t i) const;
+
+	private:
+		EStrategy strategy;
+		Ptr<Node> node;
+		int index;
+	};
 
 	//===-- Lifecycle functions -----------------------------------------------===//
 protected:
@@ -139,15 +178,18 @@ public:
 	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
 	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
 
+	/// \deprecated Will be removed
 	const Pin& getInPin(int index) { return getInputPins()[index]; }
+
+	/// \deprecated Will be removed
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
-	[[nodiscard]] ConstPinListRef getInputPins() const  { return m_inputs; }
-	[[nodiscard]] ConstPinListRef getOutputPins() const { return m_outputs; }
+	[[nodiscard]] PinView getInputPins()  { return PinView(PinView::EStrategy::Input, shared_from_this()); }
+	[[nodiscard]] PinView getOutputPins() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 protected:
-	[[nodiscard]] PinListRef getInputPinsRef()  { return m_inputs; }
-	[[nodiscard]] PinListRef getOutputPinsRef() { return m_outputs; }
+	[[nodiscard]] PinView getInputPinsRef()  { return PinView(PinView::EStrategy::Input, shared_from_this()); }
+	[[nodiscard]] PinView getOutputPinsRef() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 protected:

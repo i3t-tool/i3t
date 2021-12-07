@@ -69,10 +69,10 @@ namespace Builder
 		return ret;
 	}
 	 */
-	template <ETransformType T>
-	Ptr<Transformation> FORCE_INLINE createTransform()
+	template <ETransformType T, typename... Args>
+	Ptr<TransformImpl<T>> FORCE_INLINE createTransform(Args&&... args)
 	{
-		auto ret = std::make_shared<TransformImpl<T>>();
+		auto ret = std::make_shared<TransformImpl<T>>(std::forward<Args>(args)...);
 		ret->init();
 		ret->reset();
 		return ret;
@@ -122,6 +122,7 @@ public:
 	 * \param output Pin of left node.
 	 */
 	static ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
+	static ENodePlugResult isPlugCorrect(Pin& input, Pin& output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
 	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);

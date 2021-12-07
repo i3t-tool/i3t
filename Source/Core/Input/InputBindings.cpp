@@ -18,7 +18,10 @@ void InputBindings::init()
 	InputManager::setInputAction("duplicate", Keys::mouseLeft, { Keys::ctrll });
 	InputManager::setInputAction("delete", Keys::del);
 
+	InputManager::setInputAction("undo", Keys::b, { Keys::ctrll });
+	InputManager::setInputAction("redo", Keys::n, { Keys::ctrll });
 	InputManager::setInputAction("save", Keys::s, { Keys::ctrll });
+	InputManager::setInputAction("saveAs", Keys::s, { Keys::ctrll, Keys::shiftl });
 
 	InputManager::setInputAxis("scroll", 1.0f,  Keys::mouseScrlUp);
 	InputManager::setInputAxis("scroll", -1.0f, Keys::mouseScrlDown);
@@ -31,17 +34,15 @@ void InputBindings::init()
 	InputManager::setInputAxis("moveRight", 1.0f, Keys::d);
 	InputManager::setInputAxis("moveRight", -1.0f, Keys::a);
 
-	InputManager::setInputAction("KeyWorld_mousePan", Keys::mouseMiddle);
-	InputManager::setInputAction("KeyWorld_mouseRotate", Keys::mouseRight);
-	InputManager::setInputAction("Key_undo", Keys::b);
-	InputManager::setInputAction("Key_redo", Keys::n);
-	InputManager::setInputAction("undo", Keys::b, { Keys::ctrll });
-	InputManager::setInputAction("redo", Keys::n, { Keys::ctrll });
+	InputManager::setInputAction("KeyWorld_mousePan", Keys::mouseMiddle);    /// \todo Will be removed
+	InputManager::setInputAction("KeyWorld_mouseRotate", Keys::mouseRight);  /// \todo Will be removed
+	InputManager::setInputAction("Key_undo", Keys::b);                       /// \todo Will be removed
+	InputManager::setInputAction("Key_redo", Keys::n);                       /// \todo Will be removed
 
-	InputManager::setInputAction("test", Keys::t);
-	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});
-	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});
-	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});
+	InputManager::setInputAction("test", Keys::t);                                     /// \todo Will be removed
+	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});  /// \todo Will be removed
+	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});            /// \todo Will be removed
+	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});                  /// \todo Will be removed
 
 	/*
 	InputManager::setInputAxis("MouseScroll", 1.0f, Keys::mouseScrlUp);

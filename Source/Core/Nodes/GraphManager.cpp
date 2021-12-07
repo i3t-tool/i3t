@@ -16,6 +16,11 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 	return lhs->isPlugCorrect(input, output);
 }
 
+ENodePlugResult GraphManager::isPlugCorrect(Pin& input, Pin& output)
+{
+	return isPlugCorrect(&input, &output);
+}
+
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
 {
 	return GraphManager::plug(lhs, rhs, 0, 0);
@@ -24,23 +29,23 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
 																	 unsigned fromIndex, unsigned myIndex)
 {
-	/// \todo #48 - sequence->getInputPin()[0].owner != sequence.
 	Debug::Assert(rightNode->getInputPins().size() > myIndex, "Node {} does not have input pin with index {}!",
 								rightNode->getSig(), myIndex);
 	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",
 								leftNode->getSig(), fromIndex);
 
-	// I3T_DEBUG_LOG("Plugging {}:{} to {}:{}.", leftNode->getSig(), leftNode->getOut(fromIndex).getSig(), rightNode->getSig(), rightNode->getIn(myIndex).getSig());
-
-	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
+	auto result = isPlugCorrect(&rightNode->getIn(myIndex), &leftNode->getOut(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
 
+	auto& output = leftNode->getOut(fromIndex);
+	auto& input  = rightNode->getIn(myIndex);
+
 	// Insert to toPlug output pin outputs this operator input pin.
-	leftNode->getOutputPinsRef()[fromIndex].m_outputs.push_back(&(rightNode->getInputPinsRef()[myIndex]));
+	output.m_outputs.push_back(&input);
 
 	// Attach given operator output pin to this operator input pin.
-	rightNode->getInputPinsRef()[myIndex].m_input = &leftNode->getOutputPinsRef()[fromIndex];
+	input.m_input = &output;
 
 	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
 	{

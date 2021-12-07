@@ -101,7 +101,7 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 
 TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 {
-	auto scale = Core::Builder::createTransform<Scale>();
+	auto scale = Core::Builder::createTransform<ETransformType::Scale>();
 
 	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
 

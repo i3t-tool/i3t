@@ -12,7 +12,7 @@ using namespace Core;
 
 TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 {
-	auto rotXNode = Builder::createTransform<EulerRotX>();
+	auto rotXNode = Builder::createTransform<ETransformType::EulerX>();
 
 	{
 		// mat[1][1], cos(T)
@@ -66,7 +66,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 
 TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState)
 {
-	auto rot = Builder::createTransform<EulerRotX>();
+	auto rot = Builder::createTransform<ETransformType::EulerX>();
 	rot->disableSynergies();
 
 	auto rads = generateFloat();
@@ -78,7 +78,7 @@ TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState)
 
 TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
 {
-	auto rot = Builder::createTransform<EulerRotX>();
+	auto rot = Builder::createTransform<ETransformType::EulerX>();
 	rot->unlock();
 
 	auto rads = generateFloat();
@@ -115,7 +115,7 @@ TEST(GLM, GetAngleFromEulerX)
 TEST(EulerXTest, SetMatrixShuldBeValid)
 {
 	float initialRad = glm::radians(generateFloat());
-	auto eulerX = Builder::createTransform<EulerRotX>(initialRad);
+	auto eulerX = Builder::createTransform<ETransformType::EulerX>(initialRad);
 
 	auto mat = glm::eulerAngleX(generateFloat());
 
@@ -132,7 +132,7 @@ TEST(EulerXTest, SetMatrixShuldBeValid)
 
 TEST(EulerYTest, OneValueSet)
 {
-	auto rotYNode = Core::Builder::createTransform<EulerRotY>();
+	auto rotYNode = Core::Builder::createTransform<ETransformType::EulerY>();
 
 	{
 		// mat[0][0], cos(T)
@@ -221,7 +221,7 @@ TEST(EulerYTest, SetMatrixShouldBeValid)
 
 TEST(EulerZTest, OneValueSet)
 {
-	auto rotZNode = Core::Builder::createTransform<EulerRotZ>();
+	auto rotZNode = Core::Builder::createTransform<ETransformType::EulerZ>();
 
 	{
 		// mat[0][0], cos(T)
@@ -282,7 +282,7 @@ TEST(GLM, GetAngleFromEulerZ)
 TEST(EulerZTest, SetMatrixShouldBeValid)
 {
   float initialRad = glm::radians(generateFloat());
-  auto eulerZ = Builder::createTransform<EulerRotZ>(initialRad);
+  auto eulerZ = Builder::createTransform<ETransformType::EulerZ>(initialRad);
 
   auto mat = glm::eulerAngleZ(generateFloat());
 
@@ -300,9 +300,9 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
 TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 {
   std::array<NodePtr, 3> rots = {
-      Builder::createTransform<EulerRotX>(),
-      Builder::createTransform<EulerRotY>(),
-      Builder::createTransform<EulerRotZ>(),
+      Builder::createTransform<ETransformType::EulerX>(),
+      Builder::createTransform<ETransformType::EulerY>(),
+      Builder::createTransform<ETransformType::EulerZ>(),
   };
   auto angle = glm::radians(85.0f);
   std::array<glm::mat4, 3> expectedMatrices = {
@@ -322,7 +322,7 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 
 TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 {
-	auto axisAngle = Builder::createTransform<AxisAngleRot>();
+	auto axisAngle = Builder::createTransform<ETransformType::AxisAngle>();
 
 	auto rads = generateFloat();
 	auto axis = generateVec3();
@@ -344,7 +344,7 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 
 TEST(QuatRotTest, RotShouldBeValid)
 {
-	auto rot = Builder::createTransform<QuatRot>();
+	auto rot = Builder::createTransform<ETransformType::Quat>();
 
 	auto vec = generateVec3();
 	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z);
@@ -356,7 +356,7 @@ TEST(QuatRotTest, RotShouldBeValid)
 
 TEST(QuatRotTest, NodeValueShouldBeNormalized)
 {
-	auto rot = Builder::createTransform<QuatRot>();
+	auto rot = Builder::createTransform<ETransformType::Quat>();
 
   auto vec = generateVec4();
   auto quat = glm::quat(vec.x, vec.y, vec.z, vec.w);

@@ -29,17 +29,17 @@ TestTree arrangeSequenceTree()
 
 	std::vector<Ptr<Transformation>> matrices = {
 			// sequence 1
-			Builder::createTransform<EulerRotX>(),
-			Builder::createTransform<Scale>(),
-			Builder::createTransform<Translation>(),
+			Builder::createTransform<ETransformType::EulerX>(),
+			Builder::createTransform<ETransformType::Scale>(),
+			Builder::createTransform<ETransformType::Translation>(),
 
 			// sequence 2
-			Builder::createTransform<Scale>(),
-			Builder::createTransform<Translation>(),
+			Builder::createTransform<ETransformType::Scale>(),
+			Builder::createTransform<ETransformType::Translation>(),
 
 			// sequence 3
-			Builder::createTransform<Scale>(),
-			Builder::createTransform<Translation>(),
+			Builder::createTransform<ETransformType::Scale>(),
+			Builder::createTransform<ETransformType::Translation>(),
 	};
 
 	plug_expectOk(root, branch1, 0, 0);
