@@ -73,8 +73,8 @@ class Diwne
         bool getBackgroudPopupRaise() const {return m_backgroundPopupRaise;};
 
 
-        float getWorkAreaZoomChangeDiwne() const {return m_workAreaZoomChangeDiwne; };
-        void setWorkAreaZoomChangeDiwne(float change) { m_workAreaZoomChangeDiwne = change; };
+        float getWorkAreaZoomDeltaDiwne() const {return m_workAreaZoomDeltaDiwne; };
+        void setWorkAreaZoomDeltaDiwne(float change=1) { m_workAreaZoomDeltaDiwne = change; };
 
 
 
@@ -148,7 +148,7 @@ class Diwne
             {
                 interaction_happen = true;
                 /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not from (zoomed) diwne */
-                transformMouseFromDiwneToImGui();
+                //transformMouseFromDiwneToImGui();
 
                 popupContent(std::forward<Args>(args)...);
 
@@ -222,7 +222,6 @@ class Diwne
         virtual bool bypassIsMouseReleased0();
         virtual bool bypassIsMouseReleased1();
         virtual bool bypassIsMouseReleased2();
-        virtual bool bypassIsItemHoovered();
         virtual bool bypassIsItemActive();
         virtual bool bypassIsMouseDragging0();
         virtual bool bypassIsMouseDragging1();
@@ -230,10 +229,6 @@ class Diwne
         virtual ImVec2 bypassGetMouseDelta();
         virtual ImVec2 bypassGetMousePos();
         virtual float bypassGetMouseWheel();
-
-
-
-
 
 
 
@@ -250,7 +245,7 @@ class Diwne
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */
     ImRect m_workAreaDiwne;  /*! \brief Rectangle of work area on diwne - .Min is set by user, .Max is computed from m_workAreaScreen */
-    float m_workAreaZoomDiwne, m_workAreaZoomChangeDiwne;
+    float m_workAreaZoomDiwne, m_workAreaZoomDeltaDiwne;
     float m_zoomWheelSenzitivity; /* Higher number -> smaller change */
     float m_minWorkAreaZoom, m_maxWorkAreaZoom;
 

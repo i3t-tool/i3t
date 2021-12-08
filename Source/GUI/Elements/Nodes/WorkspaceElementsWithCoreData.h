@@ -149,11 +149,8 @@ public:
 
 	/* DIWNE function */
 	virtual bool pinContent(DIWNE::Diwne &diwne);
-
-	void pinActiveProcess(DIWNE::Diwne &diwne);
-
-	//void pinConnectLinkProcess(DIWNE::Diwne &diwne, WorkspaceCoreInputPin& input, WorkspaceCoreOutputPin& output);
-	void pinConnectLinkProcess(DIWNE::Diwne &diwne);
+	virtual bool processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+	virtual bool processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
 };
 
@@ -290,6 +287,8 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 
     virtual bool leftContent(DIWNE::Diwne &diwne);
     virtual bool rightContent(DIWNE::Diwne &diwne);
+
+    virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne);
 
 };
 

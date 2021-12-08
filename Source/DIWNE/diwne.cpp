@@ -45,13 +45,6 @@ void Diwne::Begin(const char* imgui_id)
             //ImGui::PushClipRect(m_workAreaScreen.Min, transformFromImGuiToDiwne(m_workAreaScreen.Max)- windowPadding, false);
             //ImGui::PushClipRect(ImVec2(200, 200), ImVec2(800, 800), false);
 
-#ifdef DIWNE_DEBUG
-            ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
-            ImGui::Text(fmt::format("ParentWindowClipRect: {} _ {} _ {} _ {} ",parent_window->ClipRect.Min.x, parent_window->ClipRect.Min.y, parent_window->ClipRect.Max.x, parent_window->ClipRect.Max.y).c_str());
-            ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",ImGui::GetCurrentWindow()->ClipRect.Min.x, ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x, ImGui::GetCurrentWindow()->ClipRect.Max.y).c_str());
-#endif // DIWNE_DEBUG
-
-
         putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
         if (!m_inner_interaction_happen)
         {
@@ -61,7 +54,7 @@ void Diwne::Begin(const char* imgui_id)
             }
 
             float mouseWheel = bypassGetMouseWheel();
-            if (bypassIsItemHoovered() && mouseWheel != 0)
+            if (/*ImGui::IsItemHovered() &&*/ mouseWheel != 0)
             {
                 setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
             }
@@ -70,18 +63,20 @@ void Diwne::Begin(const char* imgui_id)
         }
         m_inner_interaction_happen = false;
 
+        setPopupPosition(bypassMouseClickedPos1());
+
 #ifdef DIWNE_DEBUG
+        ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
+        ImGui::Text(fmt::format("ParentWindowClipRect: {} _ {} _ {} _ {} ",parent_window->ClipRect.Min.x, parent_window->ClipRect.Min.y, parent_window->ClipRect.Max.x, parent_window->ClipRect.Max.y).c_str());
+        ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",ImGui::GetCurrentWindow()->ClipRect.Min.x, ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x, ImGui::GetCurrentWindow()->ClipRect.Max.y).c_str());
+
         ImRect workAreaScreen = getWorkAreaScreen();
         ImRect workAreaDiwne = getWorkAreaDiwne();
         ImGui::SetCursorScreenPos(workAreaScreen.Min + ImVec2(0,200));
         ImGui::Text(fmt::format("WADiwne: {}-{}  -  {}-{}\nWAScreen: {}-{}  -  {}-{}", workAreaDiwne.Min.x, workAreaDiwne.Min.y, workAreaDiwne.Max.x, workAreaDiwne.Max.y,
                             workAreaScreen.Min.x, workAreaScreen.Min.y, workAreaScreen.Max.x, workAreaScreen.Max.y).c_str());
         ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
-#endif // DIWNE_DEBUG
 
-        setPopupPosition(bypassMouseClickedPos1());
-
-#ifdef DIWNE_DEBUG
         ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
         ImGui::Text(fmt::format("MousePosActual: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
         ImGui::Text(fmt::format("Zoom: {}", m_workAreaZoomDiwne).c_str());
@@ -105,7 +100,7 @@ void Diwne::End()
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
     m_previousFrameDiwneAction = m_diwneAction;
     m_backgroundPopupRaise = false;
-    m_workAreaZoomChangeDiwne = 0;
+    m_workAreaZoomDeltaDiwne = 1; /* 1 means no change - by Zoom you multiply in most cases */
     m_nodesSelectionChanged = false;
 
 
@@ -114,9 +109,11 @@ void Diwne::End()
 
 void Diwne::setWorkAreaZoomDiwne(float val/*=1*/)
 {
-    if (val < m_minWorkAreaZoom) m_workAreaZoomDiwne = m_minWorkAreaZoom;
-    else if (val > m_maxWorkAreaZoom) m_workAreaZoomDiwne = m_maxWorkAreaZoom;
+    double old = m_workAreaZoomDiwne;
+    if (val < m_minWorkAreaZoom){ m_workAreaZoomDiwne = m_minWorkAreaZoom; }
+    else if (val > m_maxWorkAreaZoom){ m_workAreaZoomDiwne = m_maxWorkAreaZoom; }
     else m_workAreaZoomDiwne = val;
+    if (old!=m_workAreaZoomDiwne) {setWorkAreaZoomDeltaDiwne((double)m_workAreaZoomDiwne/old);} /* \todo JH dangerous division of floats... */
 }
 
 
@@ -222,7 +219,7 @@ void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2
                         , diwne2screen(p2)
                         , diwne2screen(p3)
                         , diwne2screen(p4)
-                        , col, thickness, num_segments);
+                        , col, thickness*m_workAreaZoomDiwne, num_segments);
 }
 
 void Diwne::DrawIconCircle(ImDrawList* idl,
@@ -420,7 +417,6 @@ bool Diwne::bypassIsMouseReleased2() {return ImGui::IsMouseReleased(2);}
 ImVec2 Diwne::bypassMouseClickedPos0() {return ImGui::GetIO().MouseClickedPos[0];}
 ImVec2 Diwne::bypassMouseClickedPos1() {return ImGui::GetIO().MouseClickedPos[1];}
 ImVec2 Diwne::bypassMouseClickedPos2() {return ImGui::GetIO().MouseClickedPos[2];}
-bool Diwne::bypassIsItemHoovered() {return ImGui::IsItemHovered();}
 bool Diwne::bypassIsItemActive() {return ImGui::IsItemActive();}
 bool Diwne::bypassIsMouseDragging0() {return ImGui::IsMouseDragging(0);}
 bool Diwne::bypassIsMouseDragging1() {return ImGui::IsMouseDragging(1);}
