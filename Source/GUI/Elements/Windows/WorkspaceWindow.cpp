@@ -42,6 +42,20 @@ WorkspaceWindow::~WorkspaceWindow()
 
 }
 
+bool WorkspaceWindow::processDiwneBackground()
+{
+    bool interaction_happen = false;
+    interaction_happen |= Diwne::processDiwneBackground();
+
+    if(!m_inner_interaction_happen)
+    {
+        if ( bypassIsMouseDragging1() )
+        {
+            ImGui::Text("Drawing selcting rectangle");
+        }
+    }
+}
+
 void WorkspaceWindow::popupBackgroundContent()
 {
 
@@ -497,7 +511,7 @@ void WorkspaceWindow::popupBackgroundContent()
 		if (ImGui::MenuItem("screen"))
 		{
 		    //addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Screen>>();
-			addNodeToPositionOfPopup<WorkspaceScreen>();  //PF
+			addNodeToPositionOfPopup<WorkspaceScreen>();  //PF before merge node_editor and develop
 		}
 
 		ImGui::Separator();
@@ -510,28 +524,58 @@ void WorkspaceWindow::popupBackgroundContent()
 				}
 				if (ImGui::MenuItem("All links"))
 				{
-				    /* \todo JH - disconnect all */
+				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                    {
+                        Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                        if (node != nullptr)
+                        {
+                            for (auto && pin : node->getInputs())
+                            {
+                                pin->unplug();
+                            }
+                        }
+                    }
 				}
 				if (ImGui::MenuItem("Selected nodes"))
 				{
 				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
                     {
-                        if (workspaceCoreNode->getSelected()){ workspaceCoreNode->setRemoveFromWorkspaceWindow(true); }
-
-                        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
-                        if (seq != nullptr)
+                        if (workspaceCoreNode->getSelected())
                         {
-                            for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+                            workspaceCoreNode->setRemoveFromWorkspaceWindow(true);
+                        }
+                        else
+                        {
+                            Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
+                            if (seq != nullptr)
                             {
-                                if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
+                                for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+                                {
+                                    if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
+                                }
                             }
                         }
+
+
 
                     }
 				}
 				if (ImGui::MenuItem("Selected links"))
 				{
-				    /* \todo JH */
+				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                    {
+                        Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                        if (node != nullptr)
+                        {
+                            for (auto && pin : node->getInputs())
+                            {
+                                if (pin->getLink().getSelected())
+                                {
+                                    pin->unplug();
+                                }
+                            }
+                        }
+                    }
 				}
 				ImGui::EndMenu();
 			}
@@ -575,12 +619,18 @@ void WorkspaceWindow::render()
 
     if(first_frame){
         first_frame = false;
-        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
-        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
 
-        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
-        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+//
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+//
+//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
+//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
 
     }
 
@@ -635,6 +685,8 @@ void WorkspaceWindow::render()
     {
         shiftDragedOrHoldNodeToEnd();
     }
+
+
 
 	//checkQueryContextMenus();
 

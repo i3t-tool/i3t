@@ -42,6 +42,12 @@
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
+enum WorkspaceWindowAction
+{
+    None,
+    NewNode
+};
+
 /*! \class class for Workspace window object
     \brief Store everything what Workspace window need
 */
@@ -58,22 +64,24 @@ public:
 //    DIWNE::Diwne m_diwne;
     void popupBackgroundContent();
 
+    bool processDiwneBackground();
+
     bool first_frame = true;
 
-	ImTextureID m_headerBackgroundTexture;
+//	ImTextureID m_headerBackgroundTexture;
 
 
 
 	/* \todo JH better name for this atributes - for better description what they do... */
-	Ptr<WorkspaceCorePin> m_pinPropertiesForNewLink = nullptr;
-	Ptr<WorkspaceCorePin> m_pinPropertiesForNewNodeLink = nullptr;
-	bool m_createNewNode = false;
+//	Ptr<WorkspaceCorePin> m_pinPropertiesForNewLink = nullptr;
+//	Ptr<WorkspaceCorePin> m_pinPropertiesForNewNodeLink = nullptr;
+//	bool m_createNewNode = false;
 
     WorkspaceCoreLink *m_creatingLink;
     WorkspaceCorePin *m_linkCreatingPin;
 
 	ImVec2 m_rightClickPosition = ImVec2(100,100);
-	ImVec2 m_newNodePostion = ImVec2(100,100);
+//	ImVec2 m_newNodePostion = ImVec2(100,100);
 
 	/**
 	 * \brief All WorkspaceNodes

@@ -36,6 +36,8 @@ enum DiwneAction
     DragNode
 };
 
+static float s_linkInteractionWidth;
+
 struct SettingsDiwne
 {
     ImRect workAreaDiwne = ImRect(0,0,0,0); /* only .Min is really used - .Max is based on size of window */
@@ -43,6 +45,7 @@ struct SettingsDiwne
     float zoomWheelSenzitivity = 8; /* Higher number -> smaller change */
     float minWorkAreaZoom = 0.25;
     float maxWorkAreaZoom = 4;
+    float linkInteractionWidth = 10;
 //    FloatPopupMode floatPopupMode = Radians;
 };
 
@@ -73,11 +76,7 @@ class Diwne
         bool getBackgroudPopupRaise() const {return m_backgroundPopupRaise;};
 
 
-        float getWorkAreaZoomChangeDiwne() const {return m_workAreaZoomChangeDiwne; };
-        void setWorkAreaZoomChangeDiwne(float change) { m_workAreaZoomChangeDiwne = change; };
-
-
-
+        float getWorkAreaZoomDeltaDiwne() const {return m_workAreaZoomDeltaDiwne; };
 
 
         ImVec2 getPopupPosition() const {return m_popupPosition;};
@@ -109,6 +108,10 @@ class Diwne
         void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All, float thickness = 1.0f) const;
         void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) const;
 
+        // padding - top, right, bottom, left
+        bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
+                         DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
+                         ImVec2 size, ImVec4 padding, bool filledm, std::string const id) const;
 
         // padding - top, right, bottom, left
         void DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
@@ -148,7 +151,7 @@ class Diwne
             {
                 interaction_happen = true;
                 /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not from (zoomed) diwne */
-                transformMouseFromDiwneToImGui();
+                //transformMouseFromDiwneToImGui();
 
                 popupContent(std::forward<Args>(args)...);
 
@@ -210,6 +213,33 @@ class Diwne
         void setNodesSelectionChanged(bool value){m_nodesSelectionChanged = value;};
         bool getNodesSelectionChanged(){return m_nodesSelectionChanged;};
 
+        virtual bool bypassItemClicked0();
+        virtual bool bypassItemClicked1();
+        virtual bool bypassItemClicked2();
+        virtual bool bypassIsMouseDown0();
+        virtual bool bypassIsMouseDown1();
+        virtual bool bypassIsMouseDown2();
+        virtual ImVec2 bypassMouseClickedPos0();
+        virtual ImVec2 bypassMouseClickedPos1();
+        virtual ImVec2 bypassMouseClickedPos2();
+        virtual bool bypassIsMouseReleased0();
+        virtual bool bypassIsMouseReleased1();
+        virtual bool bypassIsMouseReleased2();
+        virtual bool bypassIsItemActive();
+        virtual bool bypassIsMouseDragging0();
+        virtual bool bypassIsMouseDragging1();
+        virtual bool bypassIsMouseDragging2();
+        virtual ImVec2 bypassGetMouseDragDelta0();
+        virtual ImVec2 bypassGetMouseDragDelta1();
+        virtual ImVec2 bypassGetMouseDragDelta2();
+        virtual ImVec2 bypassGetMouseDelta();
+        virtual ImVec2 bypassGetMousePos();
+        virtual float bypassGetMouseWheel();
+
+        virtual bool processDiwneBackground();
+
+
+
     protected:
         bool m_inner_interaction_happen = false;
         DiwneAction m_diwneAction = None, m_previousFrameDiwneAction = None;
@@ -219,10 +249,11 @@ class Diwne
 
         bool m_nodesSelectionChanged = false;
 
+
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */
     ImRect m_workAreaDiwne;  /*! \brief Rectangle of work area on diwne - .Min is set by user, .Max is computed from m_workAreaScreen */
-    float m_workAreaZoomDiwne, m_workAreaZoomChangeDiwne;
+    float m_workAreaZoomDiwne, m_workAreaZoomDeltaDiwne;
     float m_zoomWheelSenzitivity; /* Higher number -> smaller change */
     float m_minWorkAreaZoom, m_maxWorkAreaZoom;
 
@@ -231,6 +262,7 @@ class Diwne
     ImVec2 m_popupPosition;
     MouseLocation m_mouseLocation;
 
+    void setWorkAreaZoomDeltaDiwne(float change=1) { m_workAreaZoomDeltaDiwne = change; };
 
     /* restore information */
     ImVec2 m_StoreItemSpacing;

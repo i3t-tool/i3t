@@ -17,8 +17,11 @@ public:
   GLuint getFbo();
   int getWidth();
   int getHeight();
+  void resize(int newWidth, int newHeight);
 	
 private:
+	bool checkFramebuffer();
+	
   int m_width;              // rendered texture width
   int m_height;             // rendered texture height
   GLuint m_colorTexture;    // texture attached to GL_COLOR_ATTACHMENT0

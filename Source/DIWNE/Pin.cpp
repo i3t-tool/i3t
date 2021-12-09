@@ -18,10 +18,7 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
 {
     bool interaction_happen = false;
     bool inner_interaction_happen = false;
-#ifdef DIWNE_DEBUG
-    /* debug - whole pin */
-    diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
-#endif // DIWNE_DEBUG
+
 
     ImGui::PushID(fmt::format("Pin{}", m_idDiwne).c_str());
     ImGui::BeginGroup();
@@ -29,60 +26,93 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
     ImGui::EndGroup();
     ImGui::PopID();
 
-#ifdef DIWNE_DEBUG
-    /* debug */
-    if (!inner_interaction_happen && ImGui::IsItemHovered())
-    {
-        diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);
-    }
-#endif // DIWNE_DEBUG
-
-    if (!inner_interaction_happen && ImGui::IsItemClicked(0))
-    {
-        m_isHeld = true;
-    }
-
-    if (m_isHeld)
-    {
-        interaction_happen = true;
-        if (ImGui::IsMouseDragging(0))
-        {
-            pinActiveProcess(diwne);
-        }else if (ImGui::IsMouseReleased(0))
-        {
-            if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
-            {
-                diwne.setDiwneAction(DIWNE::DiwneAction::None);
-            }
-            m_isHeld = false;
-        }
-    }
-    else /* pin is not held */
-    {
-        if (pinConnectLinkCheck(diwne))
-        {
-            pinConnectLinkProcess(diwne);
-        }
-    }
     m_pinRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
     m_pinRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
+
+    interaction_happen |= processPin(diwne, inner_interaction_happen);
+
+#ifdef DIWNE_DEBUG
+    diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
+    if (!inner_interaction_happen && ImGui::IsItemHovered()) {diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);}
+#endif // DIWNE_DEBUG
 
     return inner_interaction_happen || interaction_happen;
 }
 
-bool Pin::pinActiveCheck(DIWNE::Diwne &diwne)
+bool Pin::bypassPinHoveredAction() {return ImGui::IsItemHovered();}
+bool Pin::bypassPinHoldAction() {return ImGui::IsMouseClicked(0) && bypassPinHoveredAction();}
+bool Pin::bypassPinUnholdAction() {return !ImGui::IsMouseDown(0);}
+bool Pin::bypassPinRaisePopupAction() {return ImGui::IsMouseReleased(1) && bypassPinHoveredAction();}
+bool Pin::bypassPinConnectLinkAction(DIWNE::Diwne &diwne)
 {
-    return ImGui::IsItemActive();
+    return (diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink || diwne.getPreviousFrameDiwneAction() == DIWNE::DiwneAction::NewLink) && bypassPinHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>() != this;
 }
 
-void Pin::pinActiveProcess(DIWNE::Diwne &diwne)
+bool Pin::processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
+    if (m_isHeld && diwne.bypassIsMouseDragging0())
+    {
+        diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
+        return true;
+    }
+    return false;
 }
 
-bool Pin::pinConnectLinkCheck(DIWNE::Diwne &diwne)
+bool Pin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    return (diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink || diwne.getPreviousFrameDiwneAction() == DIWNE::DiwneAction::NewLink) && ImGui::IsItemHovered() && diwne.getLastActivePin<DIWNE::Pin>() != this;
+    bool interaction_happen = false;
+
+    interaction_happen |= processPinHovered(diwne, inner_interaction_happen);
+
+    interaction_happen |= m_isHeld ? processPinUnhold(diwne, inner_interaction_happen) : processPinHold(diwne, inner_interaction_happen);
+    interaction_happen |= m_isHeld;
+
+    interaction_happen |= m_isHeld ? processPinNewLink(diwne, inner_interaction_happen) : processPinConnectLink(diwne, inner_interaction_happen);
+
+    return interaction_happen;
+}
+
+bool Pin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    if (!m_isHeld && bypassPinConnectLinkAction(diwne))
+    {
+        /* here it is when goal pin is hovered */
+        return true;
+    }
+    return false;
+}
+
+bool Pin::processPinHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    if(bypassPinHoveredAction())
+    {
+        diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);
+    }
+    return false;
+}
+
+bool Pin::processPinHold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    if (!inner_interaction_happen && bypassPinHoldAction())
+    {
+        m_isHeld = true;
+        return true;
+    }
+    return false;
+}
+
+bool Pin::processPinUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    if (!inner_interaction_happen && bypassPinUnholdAction())
+    {
+        if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
+        {
+            diwne.setDiwneAction(DIWNE::DiwneAction::None);
+        }
+        m_isHeld = false;
+        return true;
+    }
+    return false;
 }
 
 } /* namespace DIWNE */

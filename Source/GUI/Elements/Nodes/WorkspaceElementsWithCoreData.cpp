@@ -430,6 +430,7 @@ WorkspaceCorePin::WorkspaceCorePin(     DIWNE::ID const id
 bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 {
 		float alpha = ImGui::GetStyle().Alpha;
+		bool interaction_happen = false;
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
@@ -439,14 +440,18 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
         DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
 		ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
 
+		ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize)*diwne.getWorkAreaZoomDiwne();
+
         float padding = 2*diwne.getWorkAreaZoomDiwne(); /* \todo JH padding of inner shape in icon to Theme? */
+
+        DIWNE::putInvisibleButtonUnder(fmt::format("IB_icon:{}",getId()), iconSize);
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
                         iconTypeFg, iconColorFg, iconColorFg,
-                        I3T::getSize(ESizeVec2::Nodes_IconSize)*diwne.getWorkAreaZoomDiwne(),
+                        iconSize,
                         ImVec4(padding, padding, padding, padding),
                         isConnected());
-
         m_iconRect = ImRect( diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+        interaction_happen |= processPinIcon(dynamic_cast<WorkspaceWindow&>(diwne));
 
 		if (getShowLabel())
 		{
@@ -483,7 +488,12 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 		}
 
 		ImGui::PopStyleVar();
-		return false;
+		return interaction_happen;
+}
+
+bool WorkspaceCorePin::processPinIcon(WorkspaceWindow &workspace)
+{
+    return false; /* \todo JH new link here */
 }
 
 
@@ -505,61 +515,59 @@ bool WorkspaceCorePin::isConnected() const
 	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
 }
 
-void WorkspaceCorePin::pinActiveProcess(DIWNE::Diwne &diwne)
+bool WorkspaceCorePin::processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    DIWNE::Pin::pinActiveProcess(diwne);
-    diwne.setLastActivePin<WorkspaceCorePin>(this);
-    ImVec2 origin =  getLinkConnectionPointDiwne();
-    ImVec2 actual = diwne.screen2diwne( ImGui::GetIO().MousePos );
-    diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
+    if (m_isHeld && diwne.bypassIsMouseDragging0())
+    {
+        diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
+        diwne.setLastActivePin<WorkspaceCorePin>(this);
+        ImVec2 origin =  getLinkConnectionPointDiwne();
+        ImVec2 actual = diwne.screen2diwne( ImGui::GetIO().MousePos );
+        diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
+        return true;
+    }
+    return false;
+
 }
 
-void WorkspaceCorePin::pinConnectLinkProcess(DIWNE::Diwne &diwne)
+bool WorkspaceCorePin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    WorkspaceCorePin *input, *output;
-    if (getKind() == PinKind::Input)
+    if (!m_isHeld && bypassPinConnectLinkAction(diwne))
     {
-        input = this;
-        output = diwne.getLastActivePin<WorkspaceCorePin>();
-    }
-    else
-    {
-        input = diwne.getLastActivePin<WorkspaceCorePin>();
-        output = this;
-    }
-
-    Core::Pin const* coreInput = &(input->getCorePin());
-    Core::Pin const* coreOutput = &(output->getCorePin());
-//    if (! coreInput->isInput() ) /* todo JH move this to Core::isPlugCorrect and Core::Plug? */
-//    {
-//        Core::Pin const* tmp = coreInput;
-//        coreInput = coreOutput;
-//        coreOutput = tmp;
-//    }
-
-    switch (Core::GraphManager::isPlugCorrect(coreInput,coreOutput))
-    {
-    case ENodePlugResult::Ok:
-        diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
-        if (!ImGui::GetIO().MouseDown[0])
+        /* here it is when goal pin is hoovered */
+        WorkspaceCorePin *input, *output;
+        if (getKind() == PinKind::Input)
         {
-            if (ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
-                                                                coreOutput->getIndex(), coreInput->getIndex()))
-            {
-                dynamic_cast<WorkspaceCoreInputPin*>(input)->setConnectedOutput(dynamic_cast<WorkspaceCoreOutputPin*>(output));
-
-//                WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
-//                WorkspaceCoreLink *lin = &(in->getLink());
-//                WorkspaceCoreOutputPin* ou = dynamic_cast<WorkspaceCoreOutputPin*>(output);
-//                lin->setStartPin(ou);
-            }
+            input = this;
+            output = diwne.getLastActivePin<WorkspaceCorePin>();
         }
-        break;
-    /* \todo JH react informatively to other result too */
-    default:
-        diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+        else
+        {
+            input = diwne.getLastActivePin<WorkspaceCorePin>();
+            output = this;
+        }
+
+        Core::Pin const* coreInput = &(input->getCorePin());
+        Core::Pin const* coreOutput = &(output->getCorePin());
+
+        switch (Core::GraphManager::isPlugCorrect(coreInput,coreOutput))
+        {
+            case ENodePlugResult::Ok:
+                diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
+                if (!ImGui::GetIO().MouseDown[0])
+                {
+                    dynamic_cast<WorkspaceCoreInputPin*>(input)->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
+                }
+                break;
+            /* \todo JH react informatively to other result too */
+            default:
+                diwne.showTooltipLabel("Connection not possible", I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+        }
+        return true;
     }
+    return false;
 }
+
 
 WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
     : WorkspaceCorePin(id, pin, node)
@@ -754,9 +762,41 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const
     , m_link(id, this)
 {}
 
-void WorkspaceCoreInputPin::setConnectedOutput(WorkspaceCoreOutputPin* ou)
+void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou)
 {
     m_link.setStartPin(ou);
+}
+
+bool WorkspaceCoreInputPin::processPinIcon(WorkspaceWindow &workspace)
+{
+    WorkspaceCorePin::processPinIcon(workspace);
+    /* \todo Create construtor of this type and connect */
+    return false;
+}
+
+void WorkspaceCoreInputPin::unplug()
+{
+    Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
+    m_link.setStartPin(nullptr);
+}
+
+void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
+{
+    Core::Pin const* coreInput = &(getCorePin());
+    Core::Pin const* coreOutput = &(ou->getCorePin());
+
+    if (ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
+                                                        coreOutput->getIndex(), coreInput->getIndex()))
+    {
+        setConnectedWorkspaceOutput(ou);
+    }
+}
+
+
+
+bool WorkspaceCoreInputPin::pinContent(DIWNE::Diwne &diwne)
+{
+    return WorkspaceCorePin::pinContent(diwne);
 }
 /* >>>> WorkspaceCoreLink <<<< */
 
@@ -765,6 +805,18 @@ WorkspaceCoreLink::WorkspaceCoreLink(DIWNE::ID id, WorkspaceCoreInputPin *endPin
     , m_endPin(endPin)
     , m_startPin(nullptr)
 {}
+
+void WorkspaceCoreLink::unplug()
+{
+    m_endPin->unplug();
+    m_startPin = nullptr;
+}
+
+void WorkspaceCoreLink::linkPopupContent()
+{
+    if (ImGui::MenuItem("Delete")) {unplug();}
+}
+
 
 void WorkspaceCoreLink::updateEndpoints(){
     ImVec2 start, end;
@@ -917,6 +969,22 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(Ptr<Core::N
         }
     }
 
+}
+
+bool WorkspaceNodeWithCoreDataWithPins::processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = false;
+    for (auto const& pin : m_workspaceInputs) {
+        if (pin->isConnected())
+        {
+            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
+            if (in->getLink().isLinkOnWorkArea(diwne))
+            {
+                inner_interaction_happen |= in->getLink().drawLinkDiwne(diwne);
+            }
+        }
+    }
+    return inner_interaction_happen;
 }
 
 bool WorkspaceNodeWithCoreDataWithPins::leftContent(DIWNE::Diwne &diwne)

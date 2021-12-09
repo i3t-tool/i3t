@@ -49,16 +49,31 @@ class Node : public std::enable_shared_from_this<Node>
         bool drawBottomDiwne(DIWNE::Diwne &diwne);
 
         virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne) {return false;};
+        virtual bool processNodeOnWorkspace(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
-        virtual bool processNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
-        virtual bool processNodeAfterContent(DIWNE::Diwne &diwne) {return false;};
+        virtual bool bypassNodeHoveredAction();
+        virtual bool bypassNodeSelectAction();
+        virtual bool bypassNodeUnselectAction();
+        virtual bool bypassNodeHoldAction();
+        virtual bool bypassNodeUnholdAction();
+        virtual bool bypassNodeRaisePopupAction();
+
+        bool processNodeHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        bool processNodeSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        bool processNodeUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        bool processNodeHold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        bool processNodeUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        bool processNodeDrag(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+
+        virtual bool processInNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
+        virtual bool processInNodeAfterContent(DIWNE::Diwne &diwne);
         virtual bool topContent(DIWNE::Diwne &diwne);
         virtual bool leftContent(DIWNE::Diwne &diwne);
         virtual bool middleContent(DIWNE::Diwne &diwne);
         virtual bool rightContent(DIWNE::Diwne &diwne);
         virtual bool bottomContent(DIWNE::Diwne &diwne);
 
-        bool nodePopupDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring);
+        bool processNodePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual void nodePopupContent();
 
         void setNodePositionDiwne(ImVec2 const& position) {m_nodePositionDiwne = position; setNodeRectsPositionDiwne(position);};
@@ -98,6 +113,8 @@ class Node : public std::enable_shared_from_this<Node>
         void setNodeRectsPositionDiwne(ImVec2 const& position);
         void translateNodeRectsDiwne(ImVec2 const& amount);
         bool m_isHeld;
+
+        std::string const m_popupID; /* \todo JH MH PF how to initialize const char* with id of Node included? */
 
 
         float m_middleAlign;
