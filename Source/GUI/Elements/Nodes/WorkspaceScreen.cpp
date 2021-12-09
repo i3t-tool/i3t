@@ -35,29 +35,62 @@ void WorkspaceScreen::init()
 
 bool WorkspaceScreen::middleContent(DIWNE::Diwne& diwne)
 {
-
+    bool interaction_happen = false, resize_texture = false;
+    ImVec2 dragDelta;
+    ImVec2 buttonSize = ImVec2(20,20); /* \todo JH MH from setting */
 	m_camera->update();
 
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
+	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize*diwne.getWorkAreaZoomDiwne(), ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
 
-	/* \todo JH PF lots of bug here - just for first testing/using...; better place; ImageButton / DiwneIcon */
-	float buttonWidth = 20;
-	ImGui::Indent(std::max(0.0f, m_textureSize.x - buttonWidth));
-	ImGui::Button("resize_button", ImVec2(buttonWidth, 20));
-    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	cursorPos.y -= (buttonSize.y*diwne.getWorkAreaZoomDiwne() + ImGui::GetStyle().ItemSpacing.y);
+	ImGui::SetCursorScreenPos(cursorPos);
+
+	interaction_happen |= diwne.IconButton(DIWNE::IconType::Rectangle, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
+                                         DIWNE::IconType::Cross, ImColor(100,100,150,150), ImColor(100,100,150,150),
+                                         buttonSize*diwne.getWorkAreaZoomDiwne(), ImVec4(2,2,2,2)/**diwne.getWorkAreaZoomDiwne()*/, true, fmt::format("screenButton:{}left", getId()));
+    ImGui::SameLine();
+
+    if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
     {
-        ImVec2 dragDelta = ImGui::GetMouseDragDelta();
-        m_textureSize.x = std::max(buttonWidth, m_textureSize.x+dragDelta.x); /* button should fit into middle... */
-        m_textureSize.y = std::max(0.0f, m_textureSize.y+dragDelta.y);
+        interaction_happen = true;
+        resize_texture = true;
+
+        dragDelta = diwne.bypassGetMouseDragDelta0()/diwne.getWorkAreaZoomDiwne();
+
+        ImVec2 nodePos = getNodePositionDiwne(); nodePos.x += dragDelta.x;
+        setNodePositionDiwne(nodePos);
+
+        dragDelta.x *= -1; /* for same code (sign) in if(resize_texture) */
+
+
+    }
+
+	ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoomDiwne()));
+
+    interaction_happen |= diwne.IconButton(DIWNE::IconType::Rectangle, ImColor(100,50,50,150), ImColor(100,50,50,150),
+                                         DIWNE::IconType::Cross, ImColor(100,100,150,150), ImColor(100,100,150,150),
+                                         buttonSize*diwne.getWorkAreaZoomDiwne(), ImVec4(2,2,2,2)/**diwne.getWorkAreaZoomDiwne()*/, true, fmt::format("screenButton:{}right", getId()));
+
+    if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
+    {
+        interaction_happen = true;
+        resize_texture = true;
+
+        dragDelta = diwne.bypassGetMouseDragDelta0()/diwne.getWorkAreaZoomDiwne();
+    }
+
+    if(resize_texture)
+    {
+        m_textureSize.x = std::max(2*(buttonSize.x+ImGui::GetStyle().ItemSpacing.x/diwne.getWorkAreaZoomDiwne()), m_textureSize.x + dragDelta.x); /* button should fit into middle... */
+        m_textureSize.y = std::max(buttonSize.y+ImGui::GetStyle().ItemSpacing.y/diwne.getWorkAreaZoomDiwne(), m_textureSize.y + dragDelta.y);
 
         ImGui::ResetMouseDragDelta(0);
 
-    		m_renderTexture->resize(m_textureSize.x, m_textureSize.y);
-    	
-    	  return true;
+        m_renderTexture->resize(m_textureSize.x*diwne.getWorkAreaZoomDiwne(), m_textureSize.y*diwne.getWorkAreaZoomDiwne());
     }
 
-  return false;
+  return interaction_happen;
 }
 
 int WorkspaceScreen::maxLenghtOfData()  //todo

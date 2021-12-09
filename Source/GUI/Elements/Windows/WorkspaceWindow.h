@@ -64,6 +64,8 @@ public:
 //    DIWNE::Diwne m_diwne;
     void popupBackgroundContent();
 
+    bool processDiwneBackground();
+
     bool first_frame = true;
 
 //	ImTextureID m_headerBackgroundTexture;

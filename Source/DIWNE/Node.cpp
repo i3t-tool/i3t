@@ -167,7 +167,7 @@ bool Node::processNodeUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen
 
 bool Node::processNodeDrag(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (m_isHeld && diwne.bypassIsMouseDragging0())
+    if (!inner_interaction_happen && m_isHeld && diwne.bypassIsMouseDragging0())
     {
         translateNodePositionDiwne(diwne.bypassGetMouseDelta()/diwne.getWorkAreaZoomDiwne());
         m_translated = true;
@@ -180,11 +180,6 @@ bool Node::processNodeDrag(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 bool Node::processNodeOnWorkspace(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
     bool interaction_happen = false;
-
-    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(1))
-    {
-        printf("Node released");
-    }
 
     interaction_happen |= processNodeHovered(diwne, inner_interaction_happen);
 

@@ -16,10 +16,35 @@ Diwne::Diwne(SettingsDiwne const & settingsDiwne, void *customData)
     , m_mouseLocation(ImGuiLocation)
     , m_helperLink(0)
     , m_customData(customData)
-{}
+{
+    s_linkInteractionWidth = settingsDiwne.linkInteractionWidth;
+}
 
 Diwne::~Diwne()
 {}
+
+bool Diwne::processDiwneBackground()
+{
+    if (!m_inner_interaction_happen)
+    {
+        if (bypassIsItemActive())
+        {
+           translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
+        }
+
+        float mouseWheel = bypassGetMouseWheel();
+        if (/*ImGui::IsItemHovered() &&*/ mouseWheel != 0)
+        {
+            setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
+        }
+
+        popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
+    }
+    m_inner_interaction_happen = false;
+
+    setPopupPosition(bypassMouseClickedPos1());
+
+}
 
 void Diwne::Begin(const char* imgui_id)
 {
@@ -46,24 +71,7 @@ void Diwne::Begin(const char* imgui_id)
             //ImGui::PushClipRect(ImVec2(200, 200), ImVec2(800, 800), false);
 
         putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
-        if (!m_inner_interaction_happen)
-        {
-            if (ImGui::IsItemActive())
-            {
-               translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
-            }
-
-            float mouseWheel = bypassGetMouseWheel();
-            if (/*ImGui::IsItemHovered() &&*/ mouseWheel != 0)
-            {
-                setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
-            }
-
-            popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
-        }
-        m_inner_interaction_happen = false;
-
-        setPopupPosition(bypassMouseClickedPos1());
+        processDiwneBackground();
 
 #ifdef DIWNE_DEBUG
         ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
@@ -113,7 +121,11 @@ void Diwne::setWorkAreaZoomDiwne(float val/*=1*/)
     if (val < m_minWorkAreaZoom){ m_workAreaZoomDiwne = m_minWorkAreaZoom; }
     else if (val > m_maxWorkAreaZoom){ m_workAreaZoomDiwne = m_maxWorkAreaZoom; }
     else m_workAreaZoomDiwne = val;
-    if (old!=m_workAreaZoomDiwne) {setWorkAreaZoomDeltaDiwne((double)m_workAreaZoomDiwne/old);} /* \todo JH dangerous division of floats... */
+    if (old!=m_workAreaZoomDiwne)
+    {
+        setWorkAreaZoomDeltaDiwne((double)m_workAreaZoomDiwne/old);
+        s_linkInteractionWidth = (float)((double)s_linkInteractionWidth/(double)getWorkAreaZoomDeltaDiwne());
+    } /* \todo JH dangerous division of floats... */
 }
 
 
@@ -300,6 +312,24 @@ void Diwne::DrawIconCross(ImDrawList* idl,
 
 }
 
+bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
+                         DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
+                         ImVec2 size, ImVec4 padding, bool filled, std::string const id) const
+{
+    ImVec2 initPos = ImGui::GetCursorScreenPos();
+
+    DrawIcon(bgIconType, bgShapeColor, bgInnerColor,
+             fgIconType, fgShapeColor, fgInnerColor,
+             size, padding, filled);
+
+    ImGui::SetCursorScreenPos(initPos);
+    bool result = ImGui::InvisibleButton(id.c_str(), size);
+    ImGui::SetItemAllowOverlap();
+    return result;
+
+
+}
+
 void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
                      DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
                      ImVec2 size, ImVec4 padding, bool filled) const
@@ -421,6 +451,9 @@ bool Diwne::bypassIsItemActive() {return ImGui::IsItemActive();}
 bool Diwne::bypassIsMouseDragging0() {return ImGui::IsMouseDragging(0);}
 bool Diwne::bypassIsMouseDragging1() {return ImGui::IsMouseDragging(1);}
 bool Diwne::bypassIsMouseDragging2() {return ImGui::IsMouseDragging(2);}
+ImVec2 Diwne::bypassGetMouseDragDelta0() {return ImGui::GetMouseDragDelta(0);}
+ImVec2 Diwne::bypassGetMouseDragDelta1() {return ImGui::GetMouseDragDelta(1);}
+ImVec2 Diwne::bypassGetMouseDragDelta2() {return ImGui::GetMouseDragDelta(2);}
 ImVec2 Diwne::bypassGetMouseDelta() {return ImGui::GetIO().MouseDelta;}
 ImVec2 Diwne::bypassGetMousePos() {return ImGui::GetIO().MousePos;}
 float Diwne::bypassGetMouseWheel() {return ImGui::GetIO().MouseWheel;}

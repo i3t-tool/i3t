@@ -3,8 +3,6 @@
 
 #include "diwne_include.h"
 
-static float interactionWidth = 20;
-
 namespace DIWNE
 {
 class Link

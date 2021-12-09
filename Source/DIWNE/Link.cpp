@@ -55,7 +55,7 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     return interaction_happen || inner_interaction_happen;
 }
 
-bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (interactionWidth*interactionWidth + m_thickness);}
+bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness);}
 bool Link::bypassLinkSelectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
 bool Link::bypassLinkUnselectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
 bool Link::bypassLinkHoldAction() {return ImGui::IsMouseClicked(0) && bypassLinkHoveredAction();}
@@ -78,11 +78,11 @@ bool Link::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happe
 {
     if (bypassLinkHoveredAction())
     {
-        m_color.Value.w = 255; /* \todo JH alpha to settings? */
+        m_color.Value.w = 1; /* \todo JH alpha to settings? */
         return true;
     }else
     {
-        m_color.Value.w = 150; /* \todo JH alpha to settings? */
+        m_color.Value.w = 0.5; /* \todo JH alpha to settings? */
     }
     return false;
 }

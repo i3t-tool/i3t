@@ -42,6 +42,20 @@ WorkspaceWindow::~WorkspaceWindow()
 
 }
 
+bool WorkspaceWindow::processDiwneBackground()
+{
+    bool interaction_happen = false;
+    interaction_happen |= Diwne::processDiwneBackground();
+
+    if(!m_inner_interaction_happen)
+    {
+        if ( bypassIsMouseDragging1() )
+        {
+            ImGui::Text("Drawing selcting rectangle");
+        }
+    }
+}
+
 void WorkspaceWindow::popupBackgroundContent()
 {
 
@@ -605,18 +619,18 @@ void WorkspaceWindow::render()
 
     if(first_frame){
         first_frame = false;
-        //m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceSequence>());
-        //m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
-
-
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
-        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
-        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
 
-        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
-        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+//
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+//
+//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
+//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
 
     }
 
