@@ -22,7 +22,7 @@ class Link
         virtual void updateControlPointsOffsets(){};
         void updateControlPoints(){ m_controlPointStartDiwne=m_startDiwne+m_startControlOffsetDiwne; m_controlPointEndDiwne=m_endDiwne+m_endControlOffsetDiwne;};
 
-        float updateSquareDistanceMouseFromLink(DIWNE::Diwne &diwne);
+        void updateSquareDistanceMouseFromLink(DIWNE::Diwne &diwne);
 
 
         ImVec2 getStartpoint(){return m_startDiwne;};

@@ -44,6 +44,7 @@ bool Diwne::processDiwneBackground()
 
     setPopupPosition(bypassMouseClickedPos1());
 
+		return false;
 }
 
 void Diwne::Begin(const char* imgui_id)

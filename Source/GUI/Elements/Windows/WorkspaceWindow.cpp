@@ -54,6 +54,8 @@ bool WorkspaceWindow::processDiwneBackground()
             ImGui::Text("Drawing selcting rectangle");
         }
     }
+
+		return interaction_happen;
 }
 
 void WorkspaceWindow::popupBackgroundContent()
