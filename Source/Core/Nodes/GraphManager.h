@@ -26,7 +26,7 @@ namespace Builder
 	constexpr inline bool isEditableOperatorType(ENodeType type)
 	{
 		return type == ENodeType::FloatToFloat || type == ENodeType::Vector3ToVector3 ||
-				type == ENodeType::Vector4ToVector4 || type == ENodeType::MatrixToMatrix;
+				type == ENodeType::Vector4ToVector4 || type == ENodeType::MatrixToMatrix || type == ENodeType::Screen;
 	}
 
 	/**
@@ -39,10 +39,11 @@ namespace Builder
 	FORCE_INLINE Ptr<NodeBase> createNode()
 	{
 		// \todo MH
-		bool shouldUnlockAllValues = isEditableOperatorType(T);
+		constexpr bool shouldUnlockAllValues = isEditableOperatorType(T);
 		auto ret = std::make_shared<NodeImpl<T>>();
 		ret->init();
-		if (shouldUnlockAllValues) ret->setDataMap(&Transform::g_Free);
+		if constexpr (shouldUnlockAllValues)
+			ret->setDataMap(&Transform::g_Free);
 
 		ret->updateValues(0);
 		return ret;

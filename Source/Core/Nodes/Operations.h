@@ -451,7 +451,7 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG,
 		 lookAtInputNames}, // lookAt
 
-		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}},
+		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}, Core::defaultDataMaps},
 		{n(ENodeType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};
 
 namespace Core

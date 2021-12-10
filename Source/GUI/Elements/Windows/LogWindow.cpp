@@ -14,6 +14,18 @@ LogWindow::LogWindow()
 	Input.bindAxis("MyTestAxis", [](float val) {
 	  Log::info("MyTestAxis triggered: {}!", val);
   });
+
+	Input.bindAction("scrollUp", EKeyState::Pressed, []() {
+		Log::info("scrollUp");
+	});
+
+	Input.bindAction("scrollDown", EKeyState::Pressed, []() {
+		Log::info("scrollDown");
+	});
+
+	Input.bindAxis("scroll", [](float val) {
+		Log::info("scroll: {}", val);
+	});
 }
 
 void LogWindow::render()

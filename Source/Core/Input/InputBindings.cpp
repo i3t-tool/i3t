@@ -23,6 +23,9 @@ void InputBindings::init()
 	InputManager::setInputAction("save", Keys::s, { Keys::ctrll });
 	InputManager::setInputAction("saveAs", Keys::s, { Keys::ctrll, Keys::shiftl });
 
+	InputManager::setInputAction("scrollUp", Keys::mouseScrlUp);
+	InputManager::setInputAction("scrollDown", Keys::mouseScrlDown);
+
 	InputManager::setInputAxis("scroll", 1.0f,  Keys::mouseScrlUp);
 	InputManager::setInputAxis("scroll", -1.0f, Keys::mouseScrlDown);
 	InputManager::setInputAxis("pan", 1.0f, Keys::mouseMiddle);
