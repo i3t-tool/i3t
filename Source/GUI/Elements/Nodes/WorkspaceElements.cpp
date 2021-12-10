@@ -1,6 +1,6 @@
-
-
 #include "WorkspaceElements.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+
 
 
 /// \todo Remove these.
@@ -43,7 +43,7 @@ WorkspaceNode::WorkspaceNode(DIWNE::ID id, std::string const topLabel, std::stri
     ,   m_removeFromWorkspaceWindow(false)
 {}
 
-bool WorkspaceNode::drawNodeBeforeContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::processInNodeBeforeContent(DIWNE::Diwne &diwne)
 {
     /* \todo JH background by settings in different type of nodes */
     /* whole node background */
@@ -79,9 +79,23 @@ bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
     return interaction_happen;
 }
 
-bool WorkspaceNode::processNodeAfterContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
 {
-    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(ImGui::GetMousePos()));
+    WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
+    /* \todo JH work in progress... not unselect nodes when overlap them and then unoverlaped */
+    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull){ /* this if is here just for debug -> you can set breakpoint to row below */
+    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull && ww.m_selectionRectangeDiwne.Contains(getNodeRectDiwne()) )
+    {
+        m_selected = true;
+    }
+    }
+
+    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch && ww.m_selectionRectangeDiwne.Overlaps(getNodeRectDiwne()) )
+    {
+        m_selected = true;
+    }
+
+    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
     return false;
 }
 

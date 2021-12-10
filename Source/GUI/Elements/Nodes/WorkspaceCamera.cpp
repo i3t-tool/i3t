@@ -25,7 +25,7 @@ bool WorkspaceCamera::middleContent(DIWNE::Diwne &diwne)
 }
 
 bool WorkspaceCamera::leftContent(DIWNE::Diwne &diwne){return false;};
-bool WorkspaceCamera::rightContent(DIWNE::Diwne &diwne){return WorkspaceNodeWithCoreDataWithPins::leftContent(diwne);}; /* draw camera pin on opposite side */
+bool WorkspaceCamera::rightContent(DIWNE::Diwne &diwne){return WorkspaceNodeWithCoreDataWithPins::rightContent(diwne);}; /* draw camera pin on opposite side */
 
 int WorkspaceCamera::maxLenghtOfData()
 {

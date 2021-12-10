@@ -20,7 +20,7 @@ Link::~Link()
 //dtor
 }
 
-float Link::updateSquareDistanceMouseFromLink(DIWNE::Diwne &diwne)
+void Link::updateSquareDistanceMouseFromLink(DIWNE::Diwne &diwne)
 {
     ImVec2 mousePosDiwne = diwne.screen2diwne( diwne.bypassGetMousePos() );
     ImVec2 closestPointOnLink = ImBezierCubicClosestPointCasteljau(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne
@@ -55,7 +55,7 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     return interaction_happen || inner_interaction_happen;
 }
 
-bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness);}
+bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
 bool Link::bypassLinkSelectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
 bool Link::bypassLinkUnselectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
 bool Link::bypassLinkHoldAction() {return ImGui::IsMouseClicked(0) && bypassLinkHoveredAction();}
@@ -111,6 +111,7 @@ bool Link::linkContent(DIWNE::Diwne &diwne)
 {
     if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, ImColor(150,150,0), m_thickness+4 ); }/* \todo color of selected and thicknes of selected mark to settings */
     diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_color, m_thickness);
+    return false;
 }
 
 bool Link::processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)

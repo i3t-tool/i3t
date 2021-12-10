@@ -34,7 +34,7 @@ Node& Node::operator=(const Node& rhs)
 
 bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
 {
-    bool inner_interaction_happen = false, interaction_happen;
+    bool inner_interaction_happen = false, interaction_happen = false;
 
     if (drawHere)
     {

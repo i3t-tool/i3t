@@ -14,6 +14,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
     ,   Diwne(settingsDiwne, this)
     ,   m_wholeApplication(Application::get())
     ,   ConstTouchTime(1.0f)
+    ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
+    ,   m_workspaceWindowAction(WorkspaceWindowAction::None)
     //,   m_headerBackgroundTexture( (ImTextureID) (intptr_t) pgr::createTexture(Config::getAbsolutePath("Data/textures/blueprint_background.png"), true)) // \TODO load texture OR making a simple rectangle
 //		,m_nodeBuilderContext(util::NodeBuilder(m_headerBackgroundTexture, 64, 64))
 {
@@ -42,23 +44,74 @@ WorkspaceWindow::~WorkspaceWindow()
 
 }
 
-bool WorkspaceWindow::processDiwneBackground()
+/* be careful for same mouse button in this functions */
+bool WorkspaceWindow::bypassDiwneSelectionRectangleAction() {return bypassDiwneHoveredAction() && bypassIsMouseDragging1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 WorkspaceWindow::bypassDiwneGetSelectionRectangleStartPosition() {return bypassMouseClickedPos1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 WorkspaceWindow::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+
+
+bool WorkspaceWindow::processSelectionRectangle()
+{
+    if(!m_inner_interaction_happen && bypassDiwneSelectionRectangleAction())
+    {
+        ImVec2 startPos = screen2diwne(bypassDiwneGetSelectionRectangleStartPosition());
+        ImVec2 dragDelta = bypassDiwneGetSelectionRectangleSize()*getWorkAreaZoomDiwne();
+
+        if(dragDelta.x > 0)
+        {
+            m_workspaceWindowAction = WorkspaceWindowAction::SelectionRectFull;
+            m_selectionRectangeDiwne.Min.x = startPos.x;
+            m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
+        }else
+        {
+            m_workspaceWindowAction = WorkspaceWindowAction::SelectionRectTouch;
+            m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
+            m_selectionRectangeDiwne.Max.x = startPos.x;
+        }
+
+        if(dragDelta.y > 0)
+        {
+            m_selectionRectangeDiwne.Min.y = startPos.y;
+            m_selectionRectangeDiwne.Max.y = startPos.y + dragDelta.y;
+        }else
+        {
+            m_selectionRectangeDiwne.Min.y = startPos.y + dragDelta.y;
+            m_selectionRectangeDiwne.Max.y = startPos.y;
+        }
+
+        AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max,
+                           dragDelta.x > 0 ? ImColor(0,100,0,100) : ImColor(0,0,100,100));
+
+        return true;
+    }
+    return false;
+}
+
+bool WorkspaceWindow::processDiwne()
 {
     bool interaction_happen = false;
-    interaction_happen |= Diwne::processDiwneBackground();
 
-    if(!m_inner_interaction_happen)
+
+    interaction_happen |= processSelectionRectangle();
+
+    interaction_happen |= Diwne::processDiwne();
+
+        manipulatorStartCheck3D();
+
+	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
+
+    /* hold or drag && in previous frame not hold neither drag */
+	if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode) &&
+         !(m_previousFrameDiwneAction == DIWNE::DiwneAction::DragNode || m_previousFrameDiwneAction == DIWNE::DiwneAction::HoldNode))
     {
-        if ( bypassIsMouseDragging1() )
-        {
-            ImGui::Text("Drawing selcting rectangle");
-        }
+        shiftDragedOrHoldNodeToEnd();
     }
+
+    return interaction_happen;
 }
 
 void WorkspaceWindow::popupBackgroundContent()
 {
-
         ImGui::Text("add...");
 		ImGui::Separator();
 		if (ImGui::BeginMenu("transformation"))
@@ -510,8 +563,7 @@ void WorkspaceWindow::popupBackgroundContent()
 		}
 		if (ImGui::MenuItem("screen"))
 		{
-		    //addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Screen>>();
-			addNodeToPositionOfPopup<WorkspaceScreen>();  //PF before merge node_editor and develop
+			addNodeToPositionOfPopup<WorkspaceScreen>();
 		}
 
 		ImGui::Separator();
@@ -601,24 +653,31 @@ void WorkspaceWindow::popupBackgroundContent()
 
 }
 
-void WorkspaceWindow::render()
+void WorkspaceWindow::BeginDiwne(const char* id)
 {
-    /* Draw to window only if is visible - call ImGui::End() everytime */
-	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+#ifdef WORKSPACE_DEBUG
+    if (m_workspaceWindowAction == WorkspaceWindowAction::None) ImGui::Text("WorkspaceWindowAction::None");
+    if (m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull) ImGui::Text("WorkspaceWindowAction::SelectionRectFull");
+    if (m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch) ImGui::Text("WorkspaceWindowAction::SelectionRectTouch");
+
+    if (m_diwneAction == DIWNE::DiwneAction::DragNode)
     {
+        Ptr<WorkspaceTransformation> tr = std::dynamic_pointer_cast<WorkspaceTransformation>(m_draged_hold_node);
+        if (tr)
+        {
+            std::vector<ImVec2> interaction_points = tr->getInteractionPointsWithSequence();
+            ImGui::Text(fmt::format("{}:{} {}:{} {}:{}", interaction_points[0].x, interaction_points[0].y, interaction_points[1].x, interaction_points[1].y, interaction_points[2].x, interaction_points[2].y).c_str());
+        }
+    }
+
+    ImGui::TextUnformatted(fmt::format("WorkspaceNodes: {}", m_workspaceCoreNodes.size()).c_str());
+#endif // WORKSPACE_DEBUG
 
 
-	if (ImGui::BeginMenuBar())
-	{
-		showEditMenu();
+    m_workspaceWindowAction = WorkspaceWindowAction::None;
 
-		ImGui::EndMenuBar();
-	}
-
-	//UpdateTouchAllNodes();
-
-    if(first_frame){
-        first_frame = false;
+    if(m_first_frame){
+        m_first_frame = false;
         m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
@@ -631,66 +690,37 @@ void WorkspaceWindow::render()
 //
 //        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
 //        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
-
     }
 
-	Begin("DIWNE Workspace");
-#ifdef DIWNE_DEBUG
-	if (m_diwneAction == DIWNE::DiwneAction::DragNode) ImGui::Text("Dragging node");
-	if (m_diwneAction == DIWNE::DiwneAction::None) ImGui::Text("NoneAction");
-	if (m_diwneAction == DIWNE::DiwneAction::NewLink) ImGui::Text("New link");
-#endif // DIWNE_DEBUG
+	Diwne::BeginDiwne(id);
 
-    m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-                                              [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspaceWindow();}
-                                              ),
-                              m_workspaceCoreNodes.end());
-	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+}
+
+void WorkspaceWindow::render()
+{
+    /* Draw to window only if is visible - call ImGui::End() everytime */
+	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
     {
-        if (workspaceCoreNode != nullptr) m_inner_interaction_happen |= workspaceCoreNode->drawNodeDiwne(*this); /* nullptr can happen if moving to sequence */
 
-    }
-
-#ifdef DIWNE_DEBUG
-    if (m_diwneAction == DIWNE::DiwneAction::DragNode)
-    {
-        Ptr<WorkspaceTransformation> tr = std::dynamic_pointer_cast<WorkspaceTransformation>(m_draged_hold_node);
-        if (tr)
+        if (ImGui::BeginMenuBar())
         {
-            std::vector<ImVec2> interaction_points = tr->getInteractionPointsWithSequence();
-            ImGui::Text(fmt::format("{}:{} {}:{} {}:{}", interaction_points[0].x, interaction_points[0].y, interaction_points[1].x, interaction_points[1].y, interaction_points[2].x, interaction_points[2].y).c_str());
+            showEditMenu();
+            ImGui::EndMenuBar();
         }
-    }
-#endif // DIWNE_DEBUG
 
+        BeginDiwne("DIWNE Workspace");
 
-//
-//		checkUserActions();
-//
-//		checkQueryElements();
-//
-//		checkQueryContextMenus();
-//
-//		ImGui::SetCursorScreenPos(cursorTopLeft);
-//	}
-//	ne::End();
+            m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+                                                      [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspaceWindow();}
+                                                      ),
+                                      m_workspaceCoreNodes.end());
+            for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+            {
+                if (workspaceCoreNode != nullptr) m_inner_interaction_happen |= workspaceCoreNode->drawNodeDiwne(*this); /* nullptr can happen if moving to sequence */
 
-	manipulatorStartCheck3D();
+            }
 
-	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
-
-    /* hold or drag && in previous frame not hold neither drag */
-	if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode) &&
-         !(m_previousFrameDiwneAction == DIWNE::DiwneAction::DragNode || m_previousFrameDiwneAction == DIWNE::DiwneAction::HoldNode))
-    {
-        shiftDragedOrHoldNodeToEnd();
-    }
-
-
-
-	//checkQueryContextMenus();
-
-    End();
+        EndDiwne();
 
     }ImGui::End();
 }

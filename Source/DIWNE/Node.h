@@ -65,6 +65,9 @@ class Node : public std::enable_shared_from_this<Node>
         bool processNodeUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         bool processNodeDrag(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
+        bool processNodePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        virtual void nodePopupContent();
+
         virtual bool processInNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
         virtual bool processInNodeAfterContent(DIWNE::Diwne &diwne);
         virtual bool topContent(DIWNE::Diwne &diwne);
@@ -73,8 +76,7 @@ class Node : public std::enable_shared_from_this<Node>
         virtual bool rightContent(DIWNE::Diwne &diwne);
         virtual bool bottomContent(DIWNE::Diwne &diwne);
 
-        bool processNodePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual void nodePopupContent();
+
 
         void setNodePositionDiwne(ImVec2 const& position) {m_nodePositionDiwne = position; setNodeRectsPositionDiwne(position);};
         ImVec2 getNodePositionDiwne() const { return m_nodePositionDiwne; };

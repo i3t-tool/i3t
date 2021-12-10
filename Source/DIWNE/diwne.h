@@ -33,7 +33,8 @@ enum DiwneAction
     None,
     NewLink,
     HoldNode,
-    DragNode
+    DragNode,
+    HoldWorkarea
 };
 
 static float s_linkInteractionWidth;
@@ -45,7 +46,7 @@ struct SettingsDiwne
     float zoomWheelSenzitivity = 8; /* Higher number -> smaller change */
     float minWorkAreaZoom = 0.25;
     float maxWorkAreaZoom = 4;
-    float linkInteractionWidth = 10;
+    //float linkInteractionWidth = 10;
 //    FloatPopupMode floatPopupMode = Radians;
 };
 
@@ -60,12 +61,12 @@ class Diwne
         /**
         * Call it between ImGui::Begin() and ImGui::End() to update information for this frame
         */
-        void Begin(const char* id);
+        virtual void BeginDiwne(const char* id);
 
         /**
         * Call it between ImGui::Begin() and ImGui::End() to process actions in this frame
         */
-        void End();
+        virtual void EndDiwne();
 
         void updateWorkAreaRectangles(); /*! \brief Update position and size of work area on screen and on diwne */
 
@@ -73,10 +74,9 @@ class Diwne
         ImRect getWorkAreaScreen() const {return m_workAreaScreen;};
         float getWorkAreaZoomDiwne() const {return m_workAreaZoomDiwne;};
         void setWorkAreaZoomDiwne(float val=1);
-        bool getBackgroudPopupRaise() const {return m_backgroundPopupRaise;};
 
 
-        float getWorkAreaZoomDeltaDiwne() const {return m_workAreaZoomDeltaDiwne; };
+        //float getWorkAreaZoomDeltaDiwne() const {return m_workAreaZoomDeltaDiwne; };
 
 
         ImVec2 getPopupPosition() const {return m_popupPosition;};
@@ -143,21 +143,26 @@ class Diwne
 
 
         template <typename... Args>
-        bool popupDiwneItem(std::string const popupIDstring, void (*popupContent)(Args...), Args&&... args) {
+        bool popupDiwneItem(std::string const popupID, void (*popupContent)(Args...), Args&&... args) {
             bool interaction_happen = false;
 
-            ImGui::SetNextWindowPos(getPopupPosition());
-            if (ImGui::BeginPopupContextItem(popupIDstring.c_str()))
+            /* pass Raise function as argument */
+            if (bypassDiwneRaisePopupAction()){ImGui::OpenPopup(popupID.c_str());}
+
+            if(ImGui::IsPopupOpen(popupID.c_str()))
             {
-                interaction_happen = true;
-                /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not from (zoomed) diwne */
-                //transformMouseFromDiwneToImGui();
+                ImGui::SetNextWindowPos(getPopupPosition());
+                if (ImGui::BeginPopup(popupID.c_str()))
+                {
+                        interaction_happen = true;
 
-                popupContent(std::forward<Args>(args)...);
+                        popupContent(std::forward<Args>(args)...);
 
-                ImGui::EndPopup();
-            }
-            return interaction_happen;
+                        ImGui::EndPopup();
+                    }
+
+                }
+                return interaction_happen;
         }
 
 //        template <typename... Args>
@@ -236,7 +241,22 @@ class Diwne
         virtual ImVec2 bypassGetMousePos();
         virtual float bypassGetMouseWheel();
 
-        virtual bool processDiwneBackground();
+        virtual bool bypassDiwneRaisePopupAction();
+        virtual bool bypassDiwneHoveredAction();
+        virtual bool bypassDiwneHoldAction();
+        virtual bool bypassDiwneUnholdAction();
+
+        virtual bool bypassDiwneSetPopupPositionAction();
+        virtual ImVec2 bypassDiwneGetPopupNewPositionAction();
+
+        virtual bool processDiwne();
+
+        virtual bool processDiwneDrag();
+        virtual bool processDiwneHold();
+        virtual bool processDiwneUnhold();
+        virtual bool processDiwneZoom();
+        virtual bool processDiwnePopupDiwne();
+        virtual bool processDiwneSetPopupPosition();
 
 
 
@@ -253,16 +273,15 @@ class Diwne
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */
     ImRect m_workAreaDiwne;  /*! \brief Rectangle of work area on diwne - .Min is set by user, .Max is computed from m_workAreaScreen */
-    float m_workAreaZoomDiwne, m_workAreaZoomDeltaDiwne;
+    float m_workAreaZoomDiwne/*, m_workAreaZoomDeltaDiwne*/;
     float m_zoomWheelSenzitivity; /* Higher number -> smaller change */
     float m_minWorkAreaZoom, m_maxWorkAreaZoom;
 
-    bool m_backgroundPopupRaise = false;
 
     ImVec2 m_popupPosition;
     MouseLocation m_mouseLocation;
 
-    void setWorkAreaZoomDeltaDiwne(float change=1) { m_workAreaZoomDeltaDiwne = change; };
+    //void setWorkAreaZoomDeltaDiwne(float change=1) { m_workAreaZoomDeltaDiwne = change; };
 
     /* restore information */
     ImVec2 m_StoreItemSpacing;
