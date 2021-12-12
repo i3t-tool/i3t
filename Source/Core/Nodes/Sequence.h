@@ -88,10 +88,6 @@ class Sequence : public Node
 		void updateValues(int inputIndex) override;
 	};
 
-
-	/// \todo MH use Node::m_owner!
-	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
-
 	Ptr<Storage>    m_storage;
 	Ptr<Multiplier> m_multiplier;
 
@@ -144,7 +140,6 @@ public:
 	void updateValues(int inputIndex) override;
 
 private:
-	void notifyParent();
 	void receiveSignal(int inputIndex) override;
 };
 

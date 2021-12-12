@@ -1464,7 +1464,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inpu
 {
 	if (areAllInputsPlugged())
 	{
-		// setInternalValue(m_inputs[0].getStorage(1).getMat4());
+		setInternalValue(m_inputs[inputIndex].getStorage(1).getMat4());
 	}
 }
 

@@ -209,7 +209,8 @@ public:
 			break;
 		case EValueType::Ptr:
 		case EValueType::Screen:
-			setValue((void*)nullptr);
+			// setValue((void*)nullptr);
+			setValue(glm::mat4(1.0f));
 			break;
 		case EValueType::Float:
 			setValue(0.0f);

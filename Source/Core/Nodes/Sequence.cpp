@@ -92,7 +92,7 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t i
 	seq->m_multiplier->updateValues(-1);
 
 	// If sequence is sub-node of camera node.
-	seq->notifyParent();
+	seq->notifyOwner();
 
 	return ValueSetResult{};
 }
@@ -110,7 +110,7 @@ Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 	updateValues(-1);
 	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-	m_owner->as<Sequence>()->notifyParent();
+	m_owner->as<Sequence>()->notifyOwner();
 
 	return result;
 }
@@ -123,7 +123,7 @@ void Sequence::Storage::swap(int from, int to)
 	updateValues(-1);
 	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 
-	m_owner->as<Sequence>()->notifyParent();
+	m_owner->as<Sequence>()->notifyOwner();
 
 	std::swap(m_matrices[from], m_matrices[to]);
 }
@@ -171,6 +171,8 @@ void Sequence::Multiplier::updateValues(int inputIndex)
 
 	// Model matrix
 	setInternalValue(result, I3T_SEQ_MOD);
+
+	notifyOwner();
 }
 
 //===-- Sequence ----------------------------------------------------------===//
@@ -254,15 +256,9 @@ void Sequence::updateValues(int inputIndex)
 		m_storage->updateValues(inputIndex);
 		m_multiplier->updateValues(inputIndex);
 	}
-}
 
-void Sequence::notifyParent()
-{
-	if (m_parent)
-	{
-		m_parent->spreadSignal();
-		m_parent->updateValues(0);
-	}
+	if (m_owner)
+		notifyOwner();
 }
 
 void Sequence::receiveSignal(int inputIndex)

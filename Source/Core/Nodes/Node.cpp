@@ -5,27 +5,17 @@
 
 using namespace Core;
 
-Node::PinView Node::PinView::begin() const
-{
-	return Node::PinView(strategy, node, 0);
-}
+Node::PinView Node::PinView::begin() const { return Node::PinView(strategy, node, 0); }
 
-Node::PinView Node::PinView::end() const
-{
-	return Node::PinView(strategy, node, size());
-}
+Node::PinView Node::PinView::end() const { return Node::PinView(strategy, node, size()); }
 
 size_t Node::PinView::size() const
 {
-	if (strategy == Node::PinView::EStrategy::Input)
-		return node->m_operation->inputTypes.size();
+	if (strategy == Node::PinView::EStrategy::Input) return node->m_operation->inputTypes.size();
 	return node->m_operation->outputTypes.size();
 }
 
-bool Node::PinView::empty() const
-{
-	return size() == 0;
-}
+bool Node::PinView::empty() const { return size() == 0; }
 
 Node::PinView& Node::PinView::operator++()
 {
@@ -34,44 +24,27 @@ Node::PinView& Node::PinView::operator++()
 	return *this;
 }
 
-const Pin& Node::PinView::operator*()
-{
-	return (*this)[index];
-}
+const Pin& Node::PinView::operator*() { return (*this)[index]; }
 
-bool Node::PinView::operator==(const PinView& view) const
-{
-	return index == view.index;
-}
+bool Node::PinView::operator==(const PinView& view) const { return index == view.index; }
 
-bool Node::PinView::operator!=(const PinView& view) const
-{
-	return !(*this == view);
-}
+bool Node::PinView::operator!=(const PinView& view) const { return !(*this == view); }
 
 Pin& Node::PinView::operator[](size_t i)
 {
-	if (strategy == Node::PinView::EStrategy::Input)
-		return node->getIn(i);
+	if (strategy == Node::PinView::EStrategy::Input) return node->getIn(i);
 	return node->getOut(i);
 }
 
 const Pin& Node::PinView::operator[](size_t i) const
 {
-	if (strategy == Node::PinView::EStrategy::Input)
-		return node->getIn(i);
+	if (strategy == Node::PinView::EStrategy::Input) return node->getIn(i);
 	return node->getOut(i);
 }
 
-Node::~Node()
-{
-	generator.returnId(m_id);
-}
+Node::~Node() { generator.returnId(m_id); }
 
-void Node::finalize()
-{
-	unplugAll();
-}
+void Node::finalize() { unplugAll(); }
 
 void Node::init()
 {
@@ -99,6 +72,17 @@ void Node::init()
 			m_internalData.emplace_back(m_operation->inputTypes[0]);
 		else
 			m_internalData.emplace_back(EValueType::Matrix);
+	}
+}
+
+void Node::notifyOwner()
+{
+	if (m_owner)
+	{
+		m_owner->spreadSignal();
+
+		// \todo MH Which index should be used when notifying parent node?
+		m_owner->updateValues(0);
 	}
 }
 
@@ -146,8 +130,7 @@ void Node::spreadSignal(size_t outIndex)
 
 	auto& outputPin = getOut(outIndex);
 
-	for (auto* inPin : outputPin.getOutComponents())
-		inPin->m_master->receiveSignal(outIndex);
+	for (auto* inPin : outputPin.getOutComponents()) inPin->m_master->receiveSignal(outIndex);
 }
 
 void Node::receiveSignal(int inputIndex)
@@ -173,7 +156,7 @@ bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOf
 
 ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 {
-    /* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
+	/* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
 	auto* inp = input;
 	if (!inp) return ENodePlugResult::Err_NonexistentPin;
 

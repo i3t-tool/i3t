@@ -216,6 +216,11 @@ public:
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 public:
+	void setOwner(Ptr<Node> owner) { m_owner = owner; }
+
+	void notifyOwner();
+
+public:
 	[[nodiscard]] virtual ValueSetResult setValue(void* ptr)
 	{
 		m_internalData[0].setValue(ptr);
@@ -287,6 +292,10 @@ protected:
 	{
 		getInternalData(index).setValue(value);
 		spreadSignal(index);
+
+		/// \todo MH
+		// if (m_owner)
+			// m_owner->updateValues(-1);
 	}
 
 	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)

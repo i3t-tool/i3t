@@ -1,11 +1,10 @@
 #include "WorkspaceScreen.h"
 
-
 //#include "World/HardcodedMeshes.h"
+#include "Utils/Format.h"
 #include "World/RenderTexture.h"    // FBO
 
 #define TEST
-
 
 WorkspaceScreen::WorkspaceScreen()
 	: WorkspaceNodeWithCoreDataWithPins(Core::Builder::createNode<ENodeType::Screen>())
@@ -35,14 +34,19 @@ void WorkspaceScreen::init()
 
 bool WorkspaceScreen::middleContent(DIWNE::Diwne& diwne)
 {
-    bool interaction_happen = false, resize_texture = false;
-    ImVec2 dragDelta;
-    ImVec2 buttonSize = ImVec2(20,20); /* \todo JH MH from setting */
+	bool interaction_happen = false, resize_texture = false;
+	ImVec2 dragDelta;
+	ImVec2 buttonSize = ImVec2(20,20); /* \todo JH MH from setting */
+
+	// \todo
+	m_camera->m_perspective = getNodebase()->getData().getMat4();
 	m_camera->update();
+
+	ImGui::TextUnformatted(Utils::toString(m_camera->m_perspective).c_str());
 
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize*diwne.getWorkAreaZoomDiwne(), ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
 
-    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 	cursorPos.y -= (buttonSize.y*diwne.getWorkAreaZoomDiwne() + ImGui::GetStyle().ItemSpacing.y);
 	ImGui::SetCursorScreenPos(cursorPos);
 

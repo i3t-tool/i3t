@@ -50,9 +50,9 @@ struct Operation
 
 	const std::string							 keyWord;
 	const std::string							 defaultLabel;
-	const int											 numberOfInputs;
+	const int											 numberOfInputs;  ///< \todo MH Remove, size is known at compile time.
 	const std::vector<EValueType>	 inputTypes;
-	const int											 numberOfOutputs;
+	const int											 numberOfOutputs;  ///< \todo MH Remove, size is known at compile time.
 	const std::vector<EValueType>	 outputTypes;
 	const std::string							 defaultTagText		 = NO_TAG;
 	const std::vector<std::string> defaultInputNames = DEFAULT_NAMES; // if the names are not the names of the OpValueType
@@ -451,7 +451,7 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG,
 		 lookAtInputNames}, // lookAt
 
-		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 1, {EValueType::Float}, Core::defaultDataMaps},
+		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}, Core::defaultDataMaps},
 		{n(ENodeType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};
 
 namespace Core

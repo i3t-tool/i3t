@@ -18,14 +18,18 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 
 bool WorkspaceCamera::middleContent(DIWNE::Diwne &diwne)
 {
-    bool inner_interaction_happen = false;
+	bool inner_interaction_happen = false;
+
 	inner_interaction_happen |= m_projection->drawNodeDiwne(diwne, true); ImGui::SameLine();
+
 	inner_interaction_happen |= m_view->drawNodeDiwne(diwne, true);
 	return inner_interaction_happen;
 }
 
-bool WorkspaceCamera::leftContent(DIWNE::Diwne &diwne){return false;};
-bool WorkspaceCamera::rightContent(DIWNE::Diwne &diwne){return WorkspaceNodeWithCoreDataWithPins::leftContent(diwne);}; /* draw camera pin on opposite side */
+bool WorkspaceCamera::leftContent(DIWNE::Diwne& diwne) { return false; }
+
+/* draw camera pin on opposite side */
+bool WorkspaceCamera::rightContent(DIWNE::Diwne& diwne) { return WorkspaceNodeWithCoreDataWithPins::rightContent(diwne); }
 
 int WorkspaceCamera::maxLenghtOfData()
 {

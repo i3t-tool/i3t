@@ -305,8 +305,7 @@ inline CameraPtr GraphManager::createCamera()
 {
 	auto ret = std::make_shared<Core::Camera>();
 	ret->init();
-	ret->m_proj->m_parent = ret;
-	ret->m_view->m_parent = ret;
+	ret->createComponents();
 	ret->updateValues(0);
 
 	return ret;
