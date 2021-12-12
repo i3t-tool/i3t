@@ -172,50 +172,50 @@ void WorkspaceWindow::popupBackgroundContent()
 				}
 				ImGui::EndMenu();
 			}
-//			if (ImGui::BeginMenu("matrix"))
-//			{
-//				if (ImGui::MenuItem("matrix"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixFree>();
-//				}
-//				if (ImGui::MenuItem("trackball"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceTrackball>();
-//				}
-//				if (ImGui::MenuItem("inversion"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixInversion>();
-//				}
-//				if (ImGui::MenuItem("transpose"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixTranspose>();
-//				}
-//				if (ImGui::MenuItem("determinant"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceDeterminant>();
-//				}
-//				if (ImGui::MenuItem("mat * mat"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixMulMatrix>();
-//				}
-//				if (ImGui::MenuItem("mat + mat"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixAddMatrix>();
-//				}
-//				if (ImGui::MenuItem("mat * vec4"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixMulVector>();
-//				}
-//				if (ImGui::MenuItem("vec4 * mat"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceVectorMulMatrix>();
-//				}
-//				if (ImGui::MenuItem("float * mat"))
-//				{
-//				    addNodeToPositionOfPopup<WorkspaceMatrixMulFloat>();
-//				}
-//				ImGui::EndMenu();
-//			}
+			if (ImGui::BeginMenu("matrix"))
+			{
+				if (ImGui::MenuItem("matrix"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::MatrixToMatrix>>();
+				}
+				if (ImGui::MenuItem("trackball"))
+				{
+				    // addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::Trackball>>();
+				}
+				if (ImGui::MenuItem("inversion"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::Inversion>>();
+				}
+				if (ImGui::MenuItem("transpose"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::Transpose>>();
+				}
+				if (ImGui::MenuItem("determinant"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::Determinant>>();
+				}
+				if (ImGui::MenuItem("mat * mat"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::MatrixMulMatrix>>();
+				}
+				if (ImGui::MenuItem("mat + mat"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::MatrixAddMatrix>>();
+				}
+				if (ImGui::MenuItem("mat * vec4"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::MatrixMulVector>>();
+				}
+				if (ImGui::MenuItem("vec4 * mat"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<EOperatorType::VectorMulMatrix>>();
+				}
+				if (ImGui::MenuItem("float * mat"))
+				{
+				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixMulFloat>>();
+				}
+				ImGui::EndMenu();
+			}
 			if (ImGui::BeginMenu("vec3"))
 			{
 				if (ImGui::MenuItem("vec3"))

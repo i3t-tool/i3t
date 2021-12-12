@@ -231,7 +231,7 @@ enum class ENodeType
 
 	// SS trackball (trackcube) is done, waiting for Core
 };
-
+using EOperatorType = ENodeType;
 
 enum class ETransformType
 {
