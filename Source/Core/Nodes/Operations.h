@@ -3,6 +3,7 @@
  */
 #pragma once
 
+#include <bitset>
 #include <map>
 #include <sstream>
 
@@ -60,12 +61,9 @@ struct Operation
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
 	const std::vector<const Core::Transform::DataMap*> validDatamaps = {&Core::Transform::g_AllLocked};
 
-	/*
-	Operation(const Operation&) = delete;
-	Operation(const Operation&&) = delete;
-	Operation& operator=(const Operation&) = delete;
-	Operation& operator=(const Operation&&) = delete;
-	 */
+	Operation(const std::string& keyWord, const std::string& defaultLabel)
+			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(0), numberOfOutputs(0)
+	{}
 
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
@@ -488,66 +486,154 @@ inline const Operation g_sequence = {
 inline const Operation g_cameraProperties = {
 		"Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
 
-static const std::vector<std::pair<Operation, std::map<std::string, EValueType>>> g_transforms = {
-		{{n(ETransformType::Free), "free", defaultDataMaps}, {}},
-		{{n(ETransformType::Translation),
-			"translate",
-			{&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Translate}},
-		 {{"translation", EValueType::Vec3}}},
-		{{n(ETransformType::EulerX), "eulerAngleX", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerX}},
-		 {{"rotation", EValueType::Float}}},
-		{{n(ETransformType::EulerY), "eulerAngleY", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerY}},
-		 {{"rotation", EValueType::Float}}},
-		{{n(ETransformType::EulerZ), "eulerAngleZ", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_EulerZ}},
-		 {{"rotation", EValueType::Float}}},
-		{{n(ETransformType::Scale), "scale", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Scale}},
-		 {{"scale", EValueType::Vec3}}},
-		{{n(ETransformType::AxisAngle), "rotate", defaultDataMaps},
-		 {{"axis", EValueType::Vec3}, {"rotation", EValueType::Float}}},
-		{{n(ETransformType::Quat), "quat", defaultDataMaps}, {{"quat", EValueType::Quat}}},
-		{{n(ETransformType::Ortho), "ortho", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Ortho}},
-		 {{"left", EValueType::Float},
-			{"right", EValueType::Float},
-			{"bottom", EValueType::Float},
-			{"top", EValueType::Float},
-			{"near", EValueType::Float},
-			{"far", EValueType::Float}}},
-		{{n(ETransformType::Perspective),
-			"perspective",
-			{&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Perspective}},
-		 {{"fov", EValueType::Float},
-			{"aspect", EValueType::Float},
-			{"zNear", EValueType::Float},
-			{"zFar", EValueType::Float}}},
-		{{n(ETransformType::Frustum), "frustum", {&Transform::g_AllLocked, &Transform::g_Free, &Transform::g_Frustum}},
-		 {{"left", EValueType::Float},
-			{"right", EValueType::Float},
-			{"bottom", EValueType::Float},
-			{"top", EValueType::Float},
-			{"near", EValueType::Float},
-			{"far", EValueType::Float}}},
-		{{n(ETransformType::LookAt), "lookAt", defaultDataMaps},
-		 {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}},
+//===-- TRANSFORMS --------------------------------------------------------===//
+
+using TransformMask = std::bitset<16>;
+
+struct TransformOperation
+{
+	Operation                         operation;
+	TransformMask                     mask;
+	std::map<std::string, EValueType> defaultValuesTypes;
+};
+
+/// All entries must be in the same order as ETransformType enum entries.
+static const std::vector<TransformOperation> g_transforms = {
+		{
+				{n(ETransformType::Free), "free"},
+				0b1111111111111111,
+				{}
+		},
+		{
+				{n(ETransformType::Translation), "translate"},
+				0b1111111111111111,
+		 		{{"translation", EValueType::Vec3}}
+		},
+		{
+				{n(ETransformType::EulerX), "eulerAngleX"},
+				0b1111111111111111,
+				{{"rotation", EValueType::Float}}
+		},
+		{
+				{n(ETransformType::EulerY), "eulerAngleY"},
+				0b1111111111111111,
+				{{"rotation", EValueType::Float}}
+		},
+		{
+				{n(ETransformType::EulerZ), "eulerAngleZ"},
+				0b1111111111111111,
+				{{"rotation", EValueType::Float}}
+		},
+		{
+				{n(ETransformType::Scale), "scale"},
+				0b1111111111111111,
+				{{"scale", EValueType::Vec3}}
+		},
+		{
+				{n(ETransformType::AxisAngle), "rotate"},
+				0b1111111111111111,
+				{{"axis", EValueType::Vec3}, {"rotation", EValueType::Float}}
+		},
+		{
+				{n(ETransformType::Quat), "quat"},
+				0b1111111111111111,
+				{{"quat", EValueType::Quat}}
+		},
+		{
+				{n(ETransformType::Ortho), "ortho"},
+				0b1111111111111111,
+				{
+						{"left", EValueType::Float},
+						{"right", EValueType::Float},
+						{"bottom", EValueType::Float},
+						{"top", EValueType::Float},
+						{"near", EValueType::Float},
+						{"far", EValueType::Float}
+				}
+		},
+		{
+				{n(ETransformType::Perspective), "perspective"},
+				0b1111111111111111,
+				{
+						{"fov", EValueType::Float},
+						{"aspect", EValueType::Float},
+						{"zNear", EValueType::Float},
+						{"zFar", EValueType::Float}
+				}
+		},
+		{
+				{n(ETransformType::Frustum), "frustum"},
+				0b1111111111111111,
+				{
+						{"left", EValueType::Float},
+						{"right", EValueType::Float},
+						{"bottom", EValueType::Float},
+						{"top", EValueType::Float},
+						{"near", EValueType::Float},
+						{"far", EValueType::Float}
+				}
+		},
+		{
+				{n(ETransformType::LookAt), "lookAt"},
+				0b1111111111111111,
+				{
+						{"eye", EValueType::Vec3},
+						{"center", EValueType::Vec3},
+						{"up", EValueType::Vec3}
+				}
+		},
 };
 
 FORCE_INLINE const Operation* getOperationProps(ENodeType type) { return &operations[static_cast<size_t>(type)]; }
 
+FORCE_INLINE const TransformOperation& getTransformOperation(ETransformType type)
+{
+	return g_transforms[static_cast<size_t>(type)];
+}
+
 FORCE_INLINE const Operation* getTransformProps(ETransformType type)
 {
+	/*
 	for (const auto& transformProps : g_transforms)
 	{
 		if (transformProps.first.keyWord == n(type)) { return &transformProps.first; }
 	}
 	return nullptr;
+	 */
+	return &getTransformOperation(type).operation;
 }
 
-FORCE_INLINE const auto& getTransformDefaults(const std::string& keyWord)
+FORCE_INLINE const std::map<std::string, EValueType>& getTransformDefaults(const std::string& keyWord)
 {
-	static std::map<std::string, EValueType> noDefaults;
+	/*
 	for (const auto& transformProps : g_transforms)
 	{
 		if (transformProps.first.keyWord == keyWord) { return transformProps.second; }
 	}
+	return noDefaults;
+	 	 */
+	static std::map<std::string, EValueType> noDefaults;
+
+	auto type = magic_enum::enum_cast<ETransformType>(keyWord);
+	if (type.has_value())
+		return getTransformOperation(*type).defaultValuesTypes;
+	return noDefaults;
+}
+
+FORCE_INLINE const TransformMask& getTransformMap(const std::string& keyWord)
+{
+	/*
+	for (const auto& transformProps : g_transforms)
+	{
+		if (transformProps.first.keyWord == keyWord) { return transformProps.second; }
+	}
+	return noDefaults;
+	 	 */
+	static TransformMask noDefaults = 0b1111111111111111;
+
+	auto type = magic_enum::enum_cast<ETransformType>(keyWord);
+	if (type.has_value())
+		return getTransformOperation(*type).mask;
 	return noDefaults;
 }
 

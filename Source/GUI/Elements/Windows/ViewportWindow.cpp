@@ -125,11 +125,15 @@ void Viewport::render()
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rboMain);
 
 			// resize all other things
+			/// \todo Remove
 			InputManager::setScreenSize((int) width, (int) height);
+			/// \todo Remove
 			Config::WIN_HEIGHT = height;
+			/// \todo Remove
 			Config::WIN_WIDTH	 = width;
 
 			// set viewport size to be sure
+			/// \todo Remove
 			glViewport(0, 0, width, height);
 
 			/*GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);

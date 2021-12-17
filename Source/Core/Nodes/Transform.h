@@ -11,9 +11,14 @@ namespace Core
 {
 FORCE_INLINE bool isTransform(const NodePtr& node)
 {
+	/*
 	auto it = std::find_if(g_transforms.begin(), g_transforms.end(),
 	                       [&node](const std::pair<Operation, std::map<std::string, EValueType>>& pair) { return pair.first.keyWord == node->getOperation()->keyWord; });
 	return it != g_transforms.end();
+	 */
+	auto& keyWord = node->getOperation()->keyWord;
+	auto type     = magic_enum::enum_cast<ETransformType>(keyWord);
+	return type.has_value();
 }
 
 template <typename Node>
@@ -32,11 +37,17 @@ enum class ETransformState
 	Unknown
 };
 
+enum class EValueState
+{
+	FreeEditable,
+	EditableSyn,
+	Locked,
+	LockedSyn,
+};
+
 class Transformation : public Node
 {
 	friend class Storage;
-
-	bool m_hasEnabledSynergies = true;
 
 	/// \todo MH Use Node::m_owner.
 	Ptr<NodeBase> m_currentSequence = nullptr;
@@ -46,6 +57,8 @@ public:
 	bool isInSequence() { return m_currentSequence != nullptr; }
 	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
 	int getCurrentIndex() const { return m_currentIndex; }
+
+	EValueState getValueState(glm::ivec2 coords);
 
 	virtual ETransformState isValid() const { return ETransformState::Unknown; }
 	bool isLocked() const;
@@ -89,6 +102,10 @@ public:
 		m_currentSequence = s;
 		m_currentIndex = index;
 	}
+
+private:
+	bool m_hasEnabledSynergies = true;
+	bool m_isLocked            = true;
 };
 using TransformPtr = Ptr<Transformation>;
 

@@ -5,6 +5,14 @@
 
 namespace Core
 {
+EValueState Transformation::getValueState(glm::ivec2 coords)
+{
+	const int idx = coords.y * 4 + coords.x;
+	auto& map = getTransformMap(getOperation()->keyWord);
+
+	return map[idx]
+}
+
 bool Transformation::isLocked() const
 {
 	return m_currentMap == &Transform::g_Free;
