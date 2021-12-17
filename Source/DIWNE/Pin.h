@@ -37,6 +37,9 @@ class Pin
         virtual bool processPinUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual bool processPinHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
+        virtual bool processPinPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        virtual void pinPopupContent();
+
     protected:
         DIWNE::ID m_idDiwne;
         ImRect m_pinRectDiwne;
@@ -44,8 +47,15 @@ class Pin
 
     private:
 
+        std::string const m_popupID; /* \todo JH MH PF how to initialize const char* with id of Node included? */
+
 
 };
+
+static void expandPopupBackgroundContent(DIWNE::Pin &this_object)
+{
+    this_object.pinPopupContent();
+}
 
 } /* namespace DIWNE */
 

@@ -7,6 +7,7 @@ Pin::Pin(DIWNE::ID id)
     : m_idDiwne(id)
     , m_pinRectDiwne(ImRect(0,0,1,1)) /* can not have zero size because of InvisibleButton */
     , m_isHeld(false)
+    , m_popupID(fmt::format("pinPopup{}", id))
 { }
 
 Pin::~Pin()
@@ -69,6 +70,8 @@ bool Pin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 
     interaction_happen |= m_isHeld ? processPinNewLink(diwne, inner_interaction_happen) : processPinConnectLink(diwne, inner_interaction_happen);
 
+    interaction_happen |= processPinPopupDiwne(diwne, inner_interaction_happen);
+
     return interaction_happen;
 }
 
@@ -113,6 +116,20 @@ bool Pin::processPinUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
         return true;
     }
     return false;
+}
+
+bool Pin::processPinPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    if(!inner_interaction_happen && bypassPinRaisePopupAction())
+    {
+        ImGui::OpenPopup(m_popupID.c_str());
+    }
+    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
+}
+
+void Pin::pinPopupContent()
+{
+    if (ImGui::MenuItem("Override this method with content of your pin popup menu")) {}
 }
 
 } /* namespace DIWNE */

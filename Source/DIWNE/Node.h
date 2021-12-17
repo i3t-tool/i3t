@@ -126,6 +126,11 @@ class Node : public std::enable_shared_from_this<Node>
 
 };
 
+static void expandPopupBackgroundContent(DIWNE::Node &this_object)
+{
+    this_object.nodePopupContent();
+}
+
 } /* namespace DIWNE */
 
 

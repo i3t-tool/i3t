@@ -68,6 +68,11 @@ class Link
         bool m_translated;
 };
 
+static void expandPopupBackgroundContent(DIWNE::Link &this_object)
+{
+    this_object.linkPopupContent();
+}
+
 } /* namespace DIWNE */
 
 

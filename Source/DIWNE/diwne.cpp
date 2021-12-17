@@ -25,7 +25,7 @@ Diwne::~Diwne()
 
 bool Diwne::bypassDiwneHoveredAction() {return ImGui::IsItemHovered();}
 bool Diwne::bypassDiwneRaisePopupAction() {return ImGui::IsMouseReleased(1);}
-bool Diwne::bypassDiwneHoldAction() {return ImGui::IsMouseClicked(0);}
+bool Diwne::bypassDiwneHoldAction() {return ImGui::IsMouseClicked(0) && bypassDiwneHoveredAction();}
 bool Diwne::bypassDiwneUnholdAction() {return !ImGui::IsMouseDown(0);}
 
 bool Diwne::bypassDiwneSetPopupPositionAction() {return ImGui::IsMouseReleased(1);}
@@ -33,7 +33,7 @@ ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos()
 
 bool Diwne::processDiwneHold()
 {
-    if (!m_inner_interaction_happen && bypassDiwneHoldAction())
+    if (!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen && bypassDiwneHoldAction())
     {
         setDiwneAction(DiwneAction::HoldWorkarea);
         return true;
@@ -53,7 +53,8 @@ bool Diwne::processDiwneUnhold()
 
 bool Diwne::processDiwneDrag()
 {
-    if(!m_inner_interaction_happen && m_diwneAction == DiwneAction::HoldWorkarea && bypassIsMouseDragging0())
+    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
+        && m_diwneAction == DiwneAction::HoldWorkarea && bypassIsMouseDragging0())
     {
         translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
         return true;
@@ -64,7 +65,8 @@ bool Diwne::processDiwneDrag()
 bool Diwne::processDiwneZoom()
 {
     float mouseWheel = bypassGetMouseWheel();
-    if(!m_inner_interaction_happen && mouseWheel != 0 && bypassDiwneHoveredAction())
+    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
+        && mouseWheel != 0 && bypassDiwneHoveredAction())
     {
         setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
         return true;
@@ -75,14 +77,13 @@ bool Diwne::processDiwneZoom()
 /* this function use template usable in other Elements too -> revise it */
 bool Diwne::processDiwnePopupDiwne()
 {
-    if(m_diwneAction == DiwneAction::None && bypassDiwneRaisePopupAction())
+    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
+        && m_previousFrameDiwneAction == DiwneAction::None && m_diwneAction == DiwneAction::None
+         && bypassDiwneRaisePopupAction())
     {
-        //            /* pass Raise function as argument */
-//            if (bypassDiwneRaisePopupAction()){ImGui::OpenPopup(popupID.c_str());}
         ImGui::OpenPopup("BackgroundPopup");
-
     }
-    popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
+    return popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
 
 }
 
@@ -147,6 +148,7 @@ void Diwne::BeginDiwne(const char* imgui_id)
         if (m_diwneAction == DIWNE::DiwneAction::HoldWorkarea) ImGui::Text("DiwneAction: HoldWorkarea");
 
         m_inner_interaction_happen ? ImGui::Text("inner_interaction happen") : ImGui::Text("inner_interaction not happen");
+        m_previousFrame_inner_interaction_happen ? ImGui::Text("prev inner_interaction happen") : ImGui::Text("prev inner_interaction not happen");
 
 #endif // DIWNE_DEBUG
 
@@ -160,6 +162,7 @@ void Diwne::EndDiwne()
 
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
     m_previousFrameDiwneAction = m_diwneAction;
+    m_previousFrame_inner_interaction_happen = m_inner_interaction_happen;
 
     ImGui::EndChild();
 }

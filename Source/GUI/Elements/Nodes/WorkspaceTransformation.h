@@ -32,6 +32,7 @@ public:
 
 	int maxLenghtOfData();
 
+    bool processInNodeBeforeContent(DIWNE::Diwne &diwne);
 	bool topContent(DIWNE::Diwne& diwne);
 	bool middleContent(DIWNE::Diwne& diwne);
 	void nodePopupContent();

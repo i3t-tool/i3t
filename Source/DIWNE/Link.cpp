@@ -116,31 +116,11 @@ bool Link::linkContent(DIWNE::Diwne &diwne)
 
 bool Link::processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    bool interaction_happen = false;
-
-    if (bypassLinkRaisePopupAction()){ImGui::OpenPopup(m_popupID.c_str());}
-
-    if(ImGui::IsPopupOpen(m_popupID.c_str()))
+    if(!inner_interaction_happen && bypassLinkRaisePopupAction())
     {
-        ImGui::SetNextWindowPos(diwne.getPopupPosition());
-	    if (ImGui::BeginPopup(m_popupID.c_str()) ) /* link is not ImGui item - so we can not use ImGui::BeginPopupContextItem */
-        {
-            interaction_happen = true;
-
-#ifdef DIWNE_DEBUG
-            /* debug */
-            ImGui::Text("Debug Diwne ID: %i", m_idDiwne);
-            ImGui::Separator();
-#endif // DIWNE_DEBUG
-
-            linkPopupContent();
-
-            ImGui::EndPopup();
-        }
+        ImGui::OpenPopup(m_popupID.c_str());
     }
-
-	return interaction_happen;
-
+    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
 }
 
 void Link::linkPopupContent()

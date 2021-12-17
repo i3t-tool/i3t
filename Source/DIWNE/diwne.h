@@ -147,7 +147,7 @@ class Diwne
             bool interaction_happen = false;
 
             /* pass Raise function as argument */
-            if (bypassDiwneRaisePopupAction()){ImGui::OpenPopup(popupID.c_str());}
+            //if (bypassDiwneRaisePopupAction()){ImGui::OpenPopup(popupID.c_str());}
 
             if(ImGui::IsPopupOpen(popupID.c_str()))
             {
@@ -261,7 +261,7 @@ class Diwne
 
 
     protected:
-        bool m_inner_interaction_happen = false;
+        bool m_inner_interaction_happen = false, m_previousFrame_inner_interaction_happen = false;
         DiwneAction m_diwneAction = None, m_previousFrameDiwneAction = None;
 
         DIWNE::Pin* m_lastActivePin = nullptr;

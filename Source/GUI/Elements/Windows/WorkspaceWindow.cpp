@@ -92,7 +92,7 @@ bool WorkspaceWindow::processDiwne()
     bool interaction_happen = false;
 
 
-    interaction_happen |= processSelectionRectangle();
+    m_inner_interaction_happen |= processSelectionRectangle();
 
     interaction_happen |= Diwne::processDiwne();
 
