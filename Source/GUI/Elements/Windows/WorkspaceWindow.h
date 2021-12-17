@@ -6,7 +6,7 @@
  */
 #pragma once
 
-//#define WORKSPACE_DEBUG 1
+#define WORKSPACE_DEBUG 1
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -37,15 +37,14 @@
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
 
-//namespace ne = ax::NodeEditor;
-//namespace util = ax::NodeEditor::Utilities;
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
 enum WorkspaceWindowAction
 {
     None,
-    NewNode
+    SelectionRectFull,
+    SelectionRectTouch
 };
 
 /*! \class class for Workspace window object
@@ -64,9 +63,14 @@ public:
 //    DIWNE::Diwne m_diwne;
     void popupBackgroundContent();
 
-    bool processDiwneBackground();
+    bool processDiwne();
+    void BeginDiwne(const char* id);
 
-    bool first_frame = true;
+    bool m_first_frame = true;
+
+    ImRect m_selectionRectangeDiwne;
+    WorkspaceWindowAction m_workspaceWindowAction;
+
 
 //	ImTextureID m_headerBackgroundTexture;
 
@@ -144,6 +148,13 @@ public:
 //
 //	//void checkQueryContextMenus();
 //
+
+    bool bypassDiwneSelectionRectangleAction();
+    ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
+    ImVec2 bypassDiwneGetSelectionRectangleSize();
+
+    bool processSelectionRectangle();
+
 	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftDragedOrHoldNodeToEnd();

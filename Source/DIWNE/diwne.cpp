@@ -17,101 +17,154 @@ Diwne::Diwne(SettingsDiwne const & settingsDiwne, void *customData)
     , m_helperLink(0)
     , m_customData(customData)
 {
-    s_linkInteractionWidth = settingsDiwne.linkInteractionWidth;
+    //s_linkInteractionWidth = settingsDiwne.linkInteractionWidth;
 }
 
 Diwne::~Diwne()
 {}
 
-bool Diwne::processDiwneBackground()
+bool Diwne::bypassDiwneHoveredAction() {return ImGui::IsItemHovered();}
+bool Diwne::bypassDiwneRaisePopupAction() {return ImGui::IsMouseReleased(1);}
+bool Diwne::bypassDiwneHoldAction() {return ImGui::IsMouseClicked(0) && bypassDiwneHoveredAction();}
+bool Diwne::bypassDiwneUnholdAction() {return !ImGui::IsMouseDown(0);}
+
+bool Diwne::bypassDiwneSetPopupPositionAction() {return ImGui::IsMouseReleased(1);}
+ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos();}
+
+bool Diwne::processDiwneHold()
 {
-    if (!m_inner_interaction_happen)
+    if (!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen && bypassDiwneHoldAction())
     {
-        if (bypassIsItemActive())
-        {
-           translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
-        }
-
-        float mouseWheel = bypassGetMouseWheel();
-        if (/*ImGui::IsItemHovered() &&*/ mouseWheel != 0)
-        {
-            setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
-        }
-
-        popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
+        setDiwneAction(DiwneAction::HoldWorkarea);
+        return true;
     }
-    m_inner_interaction_happen = false;
+    return false;
+}
 
-    setPopupPosition(bypassMouseClickedPos1());
+bool Diwne::processDiwneUnhold()
+{
+    if (bypassDiwneUnholdAction())
+    {
+        setDiwneAction(DiwneAction::None);
+        return true;
+    }
+    return false;
+}
+
+bool Diwne::processDiwneDrag()
+{
+    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
+        && m_diwneAction == DiwneAction::HoldWorkarea && bypassIsMouseDragging0())
+    {
+        translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
+        return true;
+    }
+    return false;
+}
+
+bool Diwne::processDiwneZoom()
+{
+    float mouseWheel = bypassGetMouseWheel();
+    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
+        && mouseWheel != 0 && bypassDiwneHoveredAction())
+    {
+        setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
+        return true;
+    }
+    return false;
+}
+
+/* this function use template usable in other Elements too -> revise it */
+bool Diwne::processDiwnePopupDiwne()
+{
+    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
+        && m_previousFrameDiwneAction == DiwneAction::None && m_diwneAction == DiwneAction::None
+         && bypassDiwneRaisePopupAction())
+    {
+        ImGui::OpenPopup("BackgroundPopup");
+    }
+    return popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
+
+}
+
+bool Diwne::processDiwneSetPopupPosition()
+{
+    if(m_diwneAction == DiwneAction::None && bypassDiwneSetPopupPositionAction())
+    {
+        setPopupPosition(bypassDiwneGetPopupNewPositionAction());
+        return true;
+    }
+    return false;
+}
+
+bool Diwne::processDiwne()
+{
+    if (m_diwneAction == DiwneAction::NewLink)
+    {
+        m_helperLink.drawLinkDiwne(*this);
+    }
+
+    m_diwneAction == DiwneAction::HoldWorkarea ? processDiwneUnhold() : processDiwneHold();
+    processDiwneDrag();
+    processDiwneZoom();
+
+    processDiwneSetPopupPosition();
+    processDiwnePopupDiwne();
 
 		return false;
 }
 
-void Diwne::Begin(const char* imgui_id)
+void Diwne::BeginDiwne(const char* imgui_id)
 {
     ImGui::BeginChild(imgui_id, ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-        ImGuiWindow *windowDiwne = ImGui::GetCurrentWindow();
-        ImDrawList *idl = windowDiwne->DrawList;
 
-        ImGuiWindow *parent_window = ImGui::GetCurrentWindow()->ParentWindow;
         updateWorkAreaRectangles();
-
-            /* \todo window draw list as variable (constant) in diwne */
-        AddRectDiwne(m_workAreaDiwne.Min, m_workAreaDiwne.Max, ImColor(0,255,0), 0, ImDrawCornerFlags_None, 20);
+        m_inner_interaction_happen = false;
+        m_nodesSelectionChanged = false;
 
         /* zoom */
-        idl->_FringeScale = 1/m_workAreaZoomDiwne;
+        ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoomDiwne;
         ImGui::SetWindowFontScale(m_workAreaZoomDiwne);
         m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
         ImGui::GetStyle().ItemSpacing *= m_workAreaZoomDiwne;
 
-            ImGui::Text("\n\n");
-
-            ImVec2 windowPadding = ImGui::GetStyle().WindowPadding + ImGui::GetStyle().WindowPadding; /* \todo JH somehow get width of border (included manipulable part)*/ windowPadding.x/=m_workAreaZoomDiwne; windowPadding.y/=m_workAreaZoomDiwne;
-            //ImGui::PushClipRect(m_workAreaScreen.Min, transformFromImGuiToDiwne(m_workAreaScreen.Max)- windowPadding, false);
-            //ImGui::PushClipRect(ImVec2(200, 200), ImVec2(800, 800), false);
-
-        putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
-        processDiwneBackground();
-
 #ifdef DIWNE_DEBUG
+        ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
+
         ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
-        ImGui::Text(fmt::format("ParentWindowClipRect: {} _ {} _ {} _ {} ",parent_window->ClipRect.Min.x, parent_window->ClipRect.Min.y, parent_window->ClipRect.Max.x, parent_window->ClipRect.Max.y).c_str());
         ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",ImGui::GetCurrentWindow()->ClipRect.Min.x, ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x, ImGui::GetCurrentWindow()->ClipRect.Max.y).c_str());
 
         ImRect workAreaScreen = getWorkAreaScreen();
         ImRect workAreaDiwne = getWorkAreaDiwne();
-        ImGui::SetCursorScreenPos(workAreaScreen.Min + ImVec2(0,200));
         ImGui::Text(fmt::format("WADiwne: {}-{}  -  {}-{}\nWAScreen: {}-{}  -  {}-{}", workAreaDiwne.Min.x, workAreaDiwne.Min.y, workAreaDiwne.Max.x, workAreaDiwne.Max.y,
                             workAreaScreen.Min.x, workAreaScreen.Min.y, workAreaScreen.Max.x, workAreaScreen.Max.y).c_str());
         ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
 
         ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
-        ImGui::Text(fmt::format("MousePosActual: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
         ImGui::Text(fmt::format("Zoom: {}", m_workAreaZoomDiwne).c_str());
+
+        if (m_diwneAction == DIWNE::DiwneAction::None) ImGui::Text("DiwneAction: None");
+        if (m_diwneAction == DIWNE::DiwneAction::NewLink) ImGui::Text("DiwneAction: NewLink");
+        if (m_diwneAction == DIWNE::DiwneAction::HoldNode) ImGui::Text("DiwneAction: HoldNode");
+        if (m_diwneAction == DIWNE::DiwneAction::DragNode) ImGui::Text("DiwneAction: DragNode");
+        if (m_diwneAction == DIWNE::DiwneAction::HoldWorkarea) ImGui::Text("DiwneAction: HoldWorkarea");
+
+        m_inner_interaction_happen ? ImGui::Text("inner_interaction happen") : ImGui::Text("inner_interaction not happen");
+        m_previousFrame_inner_interaction_happen ? ImGui::Text("prev inner_interaction happen") : ImGui::Text("prev inner_interaction not happen");
+
 #endif // DIWNE_DEBUG
+
+        putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
+        processDiwne();
 
 }
 
-void Diwne::End()
+void Diwne::EndDiwne()
 {
-#ifdef DIWNE_DEBUG
-    /* debug - whole child "canvas" */
-    ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
-#endif // DIWNE_DEBUG
-
-    if (m_diwneAction == DiwneAction::NewLink)
-    {
-        //m_helperLink.setLinkEndpointsDiwne(getActivePin<>()->getLinkConnectionPoint(), screen2workArea(ImGui::GetMousePos()));
-        m_helperLink.drawLinkDiwne(*this);
-    }
 
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
     m_previousFrameDiwneAction = m_diwneAction;
-    m_backgroundPopupRaise = false;
-    m_workAreaZoomDeltaDiwne = 1; /* 1 means no change - by Zoom you multiply in most cases */
-    m_nodesSelectionChanged = false;
-
+    m_previousFrame_inner_interaction_happen = m_inner_interaction_happen;
 
     ImGui::EndChild();
 }
@@ -122,11 +175,11 @@ void Diwne::setWorkAreaZoomDiwne(float val/*=1*/)
     if (val < m_minWorkAreaZoom){ m_workAreaZoomDiwne = m_minWorkAreaZoom; }
     else if (val > m_maxWorkAreaZoom){ m_workAreaZoomDiwne = m_maxWorkAreaZoom; }
     else m_workAreaZoomDiwne = val;
-    if (old!=m_workAreaZoomDiwne)
-    {
-        setWorkAreaZoomDeltaDiwne((double)m_workAreaZoomDiwne/old);
-        s_linkInteractionWidth = (float)((double)s_linkInteractionWidth/(double)getWorkAreaZoomDeltaDiwne());
-    } /* \todo JH dangerous division of floats... */
+//    if (old!=m_workAreaZoomDiwne)
+//    {
+//        setWorkAreaZoomDeltaDiwne((double)m_workAreaZoomDiwne/old);
+//        s_linkInteractionWidth = (float)((double)s_linkInteractionWidth/(double)getWorkAreaZoomDeltaDiwne());
+//    } /* \todo JH dangerous division of floats... */
 }
 
 
@@ -206,7 +259,7 @@ void Diwne::translateWorkAreaDiwne(ImVec2 const &distance)
 }
 
 
-void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners) const
+void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding/*=0.0f*/, ImDrawCornerFlags rounding_corners/*=ImDrawCornerFlags_All*/) const
 {
     ImDrawList *idl = ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with correct Clip rect for drawing of manual shapes, but be careful with order of drew elements */
     idl->AddRectFilled
@@ -215,7 +268,7 @@ void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 c
         , col, rounding, rounding_corners );
 }
 
-void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners, float thickness) const
+void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding/*=0.0f*/, ImDrawCornerFlags rounding_corners/*=ImDrawCornerFlags_All*/, float thickness/*=1.0f*/) const
 {
     ImDrawList *idl = ImGui::GetWindowDrawList();
     idl->AddRect
@@ -224,7 +277,7 @@ void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, fl
         , col, rounding, rounding_corners, thickness );
 }
 
-void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments) const
+void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments/*=0*/) const
 {
     ImDrawList *idl = ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with correct Clip rect for drawing of manual shapes, but be careful with order of drew elements */
 

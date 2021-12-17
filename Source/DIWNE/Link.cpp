@@ -55,7 +55,7 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     return interaction_happen || inner_interaction_happen;
 }
 
-bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness);}
+bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
 bool Link::bypassLinkSelectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
 bool Link::bypassLinkUnselectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
 bool Link::bypassLinkHoldAction() {return ImGui::IsMouseClicked(0) && bypassLinkHoveredAction();}
@@ -111,37 +111,16 @@ bool Link::linkContent(DIWNE::Diwne &diwne)
 {
     if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, ImColor(150,150,0), m_thickness+4 ); }/* \todo color of selected and thicknes of selected mark to settings */
     diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_color, m_thickness);
-
-		return false;
+    return false;
 }
 
 bool Link::processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    bool interaction_happen = false;
-
-    if (bypassLinkRaisePopupAction()){ImGui::OpenPopup(m_popupID.c_str());}
-
-    if(ImGui::IsPopupOpen(m_popupID.c_str()))
+    if(!inner_interaction_happen && bypassLinkRaisePopupAction())
     {
-        ImGui::SetNextWindowPos(diwne.getPopupPosition());
-	    if (ImGui::BeginPopup(m_popupID.c_str()) ) /* link is not ImGui item - so we can not use ImGui::BeginPopupContextItem */
-        {
-            interaction_happen = true;
-
-#ifdef DIWNE_DEBUG
-            /* debug */
-            ImGui::Text("Debug Diwne ID: %i", m_idDiwne);
-            ImGui::Separator();
-#endif // DIWNE_DEBUG
-
-            linkPopupContent();
-
-            ImGui::EndPopup();
-        }
+        ImGui::OpenPopup(m_popupID.c_str());
     }
-
-	return interaction_happen;
-
+    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
 }
 
 void Link::linkPopupContent()

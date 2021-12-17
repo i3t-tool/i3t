@@ -4,11 +4,19 @@ WorkspaceTransformation::WorkspaceTransformation(Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNodeWithCoreData(nodebase)
 {}
 
+bool WorkspaceTransformation::processInNodeBeforeContent(DIWNE::Diwne &diwne)
+{
+    /* whole node background */
+    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBgTransformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+    return false;
+}
+
 bool WorkspaceTransformation::topContent(DIWNE::Diwne &diwne)
 {
     /* \todo JH get Transformation header Theme here */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     WorkspaceNodeWithCoreData::topContent(diwne);
 
@@ -24,8 +32,8 @@ bool WorkspaceTransformation::topContent(DIWNE::Diwne &diwne)
 bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
-    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+    //diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
+    //                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
 	switch (m_levelOfDetail)
 	{
@@ -114,9 +122,14 @@ bool WorkspaceTransformation::drawDataFull(DIWNE::Diwne &diwne)
      bool valueChanged = false, interaction_happen = false;
      int rowOfChange, columnOfChange;
      float valueOfChange;
+
+     ImGui::PushStyleColor( ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)) );
+
      interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(diwne), m_floatPopupMode,
                                     m_nodebase->getData().getMat4(), m_nodebase->getDataMapRef(),
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
+
+    ImGui::PopStyleColor();
 
     if (valueChanged)
     {
