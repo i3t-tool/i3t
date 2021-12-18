@@ -82,20 +82,20 @@ bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
 bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
 {
     WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
-    /* \todo JH work in progress... not unselect nodes when overlap them and then unoverlaped ? */
+
+    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
 
     if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull)
     {
         m_selected = ww.m_selectionRectangeDiwne.Contains(getNodeRectDiwne()) ? true : false;
+        m_nodeInteractionAllowed |= false;
     }
-
 
     if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch )
     {
         m_selected = ww.m_selectionRectangeDiwne.Overlaps(getNodeRectDiwne()) ? true : false;
+        m_nodeInteractionAllowed = false;
     }
-
-    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
 
     return DIWNE::Node::processInNodeAfterContent(diwne);
 }

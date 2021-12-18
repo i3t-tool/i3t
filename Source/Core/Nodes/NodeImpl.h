@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <variant>
 
-#include "Node.h"
+#include "Core/Nodes/Node.h"
 
 #include "World/GameObject.h"
 

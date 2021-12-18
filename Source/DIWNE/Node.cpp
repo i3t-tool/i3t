@@ -181,16 +181,18 @@ bool Node::processNodeOnWorkspace(DIWNE::Diwne &diwne, bool& inner_interaction_h
 {
     bool interaction_happen = false;
 
-    interaction_happen |= processNodeHovered(diwne, inner_interaction_happen);
+    if(m_nodeInteractionAllowed){
+        interaction_happen |= processNodeHovered(diwne, inner_interaction_happen);
 
-    interaction_happen |= m_selected ? processNodeUnselected(diwne, inner_interaction_happen) : processNodeSelected(diwne, inner_interaction_happen);
+        interaction_happen |= m_selected ? processNodeUnselected(diwne, inner_interaction_happen) : processNodeSelected(diwne, inner_interaction_happen);
 
-    interaction_happen |= m_isHeld ? processNodeUnhold(diwne, inner_interaction_happen) : processNodeHold(diwne, inner_interaction_happen);
-    interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */
+        interaction_happen |= m_isHeld ? processNodeUnhold(diwne, inner_interaction_happen) : processNodeHold(diwne, inner_interaction_happen);
+        interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */
 
-    interaction_happen |= processNodeDrag(diwne, inner_interaction_happen);
+        interaction_happen |= processNodeDrag(diwne, inner_interaction_happen);
 
-    inner_interaction_happen |= processNodePopupDiwne(diwne, inner_interaction_happen);
+        inner_interaction_happen |= processNodePopupDiwne(diwne, inner_interaction_happen);
+    }
 
 #ifdef DIWNE_DEBUG
     ImRect nodeRectDiwne = getNodeRectDiwne();

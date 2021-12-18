@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Id.h"
-#include "NodeData.h"
+#include "Core/Nodes/Id.h"
+#include "Core/Nodes/NodeData.h"
 
 namespace Core
 {
@@ -12,6 +12,8 @@ namespace Core
  *
  * \todo MH - Remove ID.
  */
+class Node; /* JH without this it is not compile: unknown ty*/
+
 class Pin
 {
 	friend class GraphManager;
