@@ -22,6 +22,7 @@
 //#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
 //#include "GUI/NodeEditorUtilities/Widgets.h"
 
+
 #include "DIWNE/diwne_include.h"
 
 class WorkspaceLinkProperties;
@@ -79,15 +80,16 @@ public:
     void setMiddleLabel(std::string label){m_middleLabel = label;};
 
 	/* DIWNE function */
-	virtual bool drawNodeBeforeContent(DIWNE::Diwne &diwne);
+	virtual bool processInNodeBeforeContent(DIWNE::Diwne &diwne);
     virtual bool topContent(DIWNE::Diwne &diwne);
     virtual bool middleContent(DIWNE::Diwne &diwne);
-
-    virtual bool processNodeAfterContent(DIWNE::Diwne &diwne);
+    virtual bool processInNodeAfterContent(DIWNE::Diwne &diwne);
 
     bool m_removeFromWorkspaceWindow;
     bool getRemoveFromWorkspaceWindow() const {return m_removeFromWorkspaceWindow;};
 	void setRemoveFromWorkspaceWindow(bool value) {m_removeFromWorkspaceWindow=value;};
+
+
 
 
 	virtual void drawMenuDelete();

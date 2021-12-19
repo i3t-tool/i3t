@@ -369,32 +369,11 @@ bool Node::bottomContent(DIWNE::Diwne &diwne){return false;}
 
 bool Node::processNodePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (inner_interaction_happen) return false;
-    bool interaction_happen = false;
-
-    if (bypassNodeRaisePopupAction()){ImGui::OpenPopup(m_popupID.c_str());}
-
-    if(ImGui::IsPopupOpen(m_popupID.c_str()))
+    if(!inner_interaction_happen && bypassNodeRaisePopupAction())
     {
-        ImGui::SetNextWindowPos(diwne.getPopupPosition());
-        if (ImGui::BeginPopup(m_popupID.c_str()))
-        {
-            interaction_happen = true;
-            /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not (zoomed) diwne */
-            //diwne.transformMouseFromDiwneToImGui();
-
-    #ifdef DIWNE_DEBUG
-            /* debug */
-            ImGui::Text("Diwne ID: %i", m_idDiwne);
-            ImGui::Separator();
-    #endif // DIWNE_DEBUG
-
-            nodePopupContent();
-
-            ImGui::EndPopup();
-        }
+        ImGui::OpenPopup(m_popupID.c_str());
     }
-	return interaction_happen;
+    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
 }
 
 void Node::nodePopupContent()

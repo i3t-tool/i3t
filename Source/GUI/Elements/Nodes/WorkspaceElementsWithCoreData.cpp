@@ -1035,11 +1035,11 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
 
 
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
-	style.Colors[ImGuiCol_FrameBg] = I3T::getColor(EColor::FloatBg);
-	style.Colors[ImGuiCol_FrameBgHovered] = I3T::getColor(EColor::FloatBgHovered);
-	style.Colors[ImGuiCol_FrameBgActive] = I3T::getColor(EColor::FloatBgActive);
+//	ImGuiStyle& style = ImGui::GetStyle();
+//	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Nodes_FloatText);
+//	style.Colors[ImGuiCol_FrameBg] = I3T::getColor(EColor::FloatBg);
+//	style.Colors[ImGuiCol_FrameBgHovered] = I3T::getColor(EColor::FloatBgHovered);
+//	style.Colors[ImGuiCol_FrameBgActive] = I3T::getColor(EColor::FloatBgActive);
 
 
 	// \todo JH is it done? make step a configurable constant - same or smaller than dragStep - other way drag is fired when step is not fired...
@@ -1063,7 +1063,7 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 		ImGui::PopStyleVar();
 	}
 
-	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
+//	style.Colors[ImGuiCol_Text] = I3T::getColor(EColor::Text);
 
 	/* \todo JH this is not very elegant ... */
 	/* \todo JH hack for not change value if for example dragging node from position over DragFloat */
