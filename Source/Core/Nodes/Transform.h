@@ -104,7 +104,7 @@ template <>
 class TransformImpl<ETransformType::Free> : public Transformation
 {
 public:
-	TransformImpl<ETransformType::Free>() : Transformation(getTransformProps(ETransformType::Free))
+	TransformImpl() : Transformation(getTransformProps(ETransformType::Free))
 	{
 		m_currentMap = &Transform::g_Free;
 		m_initialMap = &Transform::g_Free;
@@ -181,7 +181,7 @@ class TransformImpl<ETransformType::EulerX> : public Transformation
 	float m_currentRot;
 
 public:
-	explicit TransformImpl<ETransformType::EulerX>(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
+	explicit TransformImpl(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
 			: Transformation(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot), m_currentRot(initialRot)
 	{
 		m_initialMap = &map;
@@ -221,7 +221,7 @@ class TransformImpl<ETransformType::EulerY> : public Transformation
 	float m_currentRot;
 
 public:
-	explicit TransformImpl<ETransformType::EulerY>(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
+	explicit TransformImpl(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
 			: Transformation(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot), m_currentRot(initialRot)
 	{
 		m_initialMap = &map;
@@ -261,7 +261,7 @@ class TransformImpl<ETransformType::EulerZ> : public Transformation
 	float m_currentRot;
 
 public:
-	explicit TransformImpl<ETransformType::EulerZ>(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)
+	explicit TransformImpl(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)
 			: Transformation(getTransformProps(ETransformType::EulerZ)), m_initialRot(initialRot)
 	{
 		m_initialMap = &map;
@@ -293,7 +293,7 @@ class TransformImpl<ETransformType::Translation> : public Transformation
 	glm::vec3 m_initialTrans;
 
 public:
-	explicit TransformImpl<ETransformType::Translation>(glm::vec3 initialTrans = glm::vec3(0.0f),
+	explicit TransformImpl(glm::vec3 initialTrans = glm::vec3(0.0f),
 	                     const Transform::DataMap& map = Transform::g_Translate)
 			: Transformation(getTransformProps(ETransformType::Translation)), m_initialTrans(initialTrans)
 	{
@@ -332,7 +332,7 @@ class TransformImpl<ETransformType::AxisAngle> : public Transformation
 	glm::vec3 m_initialAxis;
 
 public:
-	explicit TransformImpl<ETransformType::AxisAngle>(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
+	explicit TransformImpl(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
 	{
 		m_initialMap = &Transform::g_AllLocked;
@@ -363,7 +363,7 @@ class TransformImpl<ETransformType::Quat> : public Transformation
 	glm::quat m_normalized;
 
 public:
-	explicit TransformImpl<ETransformType::Quat>(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
+	explicit TransformImpl(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::Quat))
 	{
 		m_initialQuat = q;
@@ -394,7 +394,7 @@ class TransformImpl<ETransformType::Ortho> : public Transformation
 	float m_far;
 
 public:
-	explicit TransformImpl<ETransformType::Ortho>(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
+	explicit TransformImpl(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	          float far = 10.0f)
 			: Transformation(getTransformProps(ETransformType::Ortho)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
@@ -438,7 +438,7 @@ class TransformImpl<ETransformType::Perspective> : public Transformation
 	float m_initialZFar;
 
 public:
-	explicit TransformImpl<ETransformType::Perspective>(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
+	explicit TransformImpl(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
 			: Transformation(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
 				m_initialZNear(zNear), m_initialZFar(zFar)
 	{
@@ -479,7 +479,7 @@ class TransformImpl<ETransformType::Frustum> : public Transformation
 	float m_far;
 
 public:
-	explicit TransformImpl<ETransformType::Frustum>(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
+	explicit TransformImpl(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
 	        float far = 10.0f)
 			: Transformation(getTransformProps(ETransformType::Frustum)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
@@ -524,7 +524,7 @@ class TransformImpl<ETransformType::LookAt> : public Transformation
 	glm::vec3 m_initialUp;
 
 public:
-	explicit TransformImpl<ETransformType::LookAt>(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
+	explicit TransformImpl(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
 	       const glm::vec3& up = {0.0f, 1.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
 				m_initialUp(up)

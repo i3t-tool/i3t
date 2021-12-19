@@ -5,6 +5,8 @@
 
 namespace Core
 {
+class Node;
+
 /**
  * Pin used for connecting nodes.
  *
