@@ -16,6 +16,7 @@ Diwne::Diwne(SettingsDiwne const & settingsDiwne, void *customData)
     , m_mouseLocation(ImGuiLocation)
     , m_helperLink(0)
     , m_customData(customData)
+    , m_popupID(settingsDiwne.backgroundPopupID)
 {
     //s_linkInteractionWidth = settingsDiwne.linkInteractionWidth;
 }
@@ -75,15 +76,16 @@ bool Diwne::processDiwneZoom()
 }
 
 /* this function use template usable in other Elements too -> revise it */
-bool Diwne::processDiwnePopupDiwne()
+bool Diwne::processDiwneRaisePopupDiwne()
 {
     if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
         && m_previousFrameDiwneAction == DiwneAction::None && m_diwneAction == DiwneAction::None
          && bypassDiwneRaisePopupAction())
     {
-        ImGui::OpenPopup("BackgroundPopup");
+        ImGui::OpenPopup(m_popupID.c_str());
+        return true;
     }
-    return popupDiwneItem("BackgroundPopup", &expandPopupBackgroundContent, *this );
+    return false;
 
 }
 
@@ -99,17 +101,18 @@ bool Diwne::processDiwneSetPopupPosition()
 
 bool Diwne::processDiwne()
 {
-    if (m_diwneAction == DiwneAction::NewLink)
-    {
-        m_helperLink.drawLinkDiwne(*this);
-    }
-
-    m_diwneAction == DiwneAction::HoldWorkarea ? processDiwneUnhold() : processDiwneHold();
-    processDiwneDrag();
-    processDiwneZoom();
-
     processDiwneSetPopupPosition();
-    processDiwnePopupDiwne();
+
+    if (m_diwneAction == DiwneAction::NewLink) m_helperLink.drawLinkDiwne(*this);
+
+    if (!m_inner_interaction_happen)
+    {
+        m_diwneAction == DiwneAction::HoldWorkarea ? processDiwneUnhold() : processDiwneHold();
+        processDiwneDrag();
+        processDiwneZoom();
+        processDiwneRaisePopupDiwne();
+    }
+    popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
 
 		return false;
 }
@@ -121,6 +124,10 @@ void Diwne::BeginDiwne(const char* imgui_id)
         updateWorkAreaRectangles();
         m_inner_interaction_happen = false;
         m_nodesSelectionChanged = false;
+
+        ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
+        ImGui::PushID("BackgroundDiwne");
+        ImGui::BeginGroup();
 
         /* zoom */
         ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoomDiwne;
@@ -154,13 +161,17 @@ void Diwne::BeginDiwne(const char* imgui_id)
 
 #endif // DIWNE_DEBUG
 
-        putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
-        processDiwne();
+//        putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
+//        processDiwne();
 
 }
 
 void Diwne::EndDiwne()
 {
+    ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window to Group */
+    ImGui::EndGroup(); /* "BackgroundDiwne" */
+    ImGui::PopID();
+    processDiwne();
 
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
     m_previousFrameDiwneAction = m_diwneAction;
@@ -175,11 +186,6 @@ void Diwne::setWorkAreaZoomDiwne(float val/*=1*/)
     if (val < m_minWorkAreaZoom){ m_workAreaZoomDiwne = m_minWorkAreaZoom; }
     else if (val > m_maxWorkAreaZoom){ m_workAreaZoomDiwne = m_maxWorkAreaZoom; }
     else m_workAreaZoomDiwne = val;
-//    if (old!=m_workAreaZoomDiwne)
-//    {
-//        setWorkAreaZoomDeltaDiwne((double)m_workAreaZoomDiwne/old);
-//        s_linkInteractionWidth = (float)((double)s_linkInteractionWidth/(double)getWorkAreaZoomDeltaDiwne());
-//    } /* \todo JH dangerous division of floats... */
 }
 
 
@@ -489,9 +495,9 @@ ImVec2 Diwne::diwne2screen_noZoom(const ImVec2 & point) const
     return workArea2screen(diwne2workArea_noZoom(point));
 }
 
-bool Diwne::bypassItemClicked0() {return ImGui::IsItemClicked(0);}
-bool Diwne::bypassItemClicked1() {return ImGui::IsItemClicked(1);}
-bool Diwne::bypassItemClicked2() {return ImGui::IsItemClicked(2);}
+bool Diwne::bypassIsItemClicked0() {return ImGui::IsItemClicked(0);}
+bool Diwne::bypassIsItemClicked1() {return ImGui::IsItemClicked(1);}
+bool Diwne::bypassIsItemClicked2() {return ImGui::IsItemClicked(2);}
 bool Diwne::bypassIsMouseDown0() {return ImGui::IsMouseDown(0);}
 bool Diwne::bypassIsMouseDown1() {return ImGui::IsMouseDown(1);}
 bool Diwne::bypassIsMouseDown2() {return ImGui::IsMouseDown(2);}

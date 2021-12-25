@@ -18,10 +18,18 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
+	virtual bool processInNodeBeforeContent(DIWNE::Diwne &diwne)
+    {
+        /* whole node background */
+        diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+                                 ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBgOperator)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+        return false;
+    }
+
 	virtual bool topContent(DIWNE::Diwne &diwne)
 	{
 	    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderOperator)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
 	    return WorkspaceNodeWithCoreData::topContent(diwne);
 	}

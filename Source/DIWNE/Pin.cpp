@@ -44,7 +44,7 @@ bool Pin::bypassPinHoveredAction() {return ImGui::IsItemHovered();}
 bool Pin::bypassPinHoldAction() {return ImGui::IsMouseClicked(0) && bypassPinHoveredAction();}
 bool Pin::bypassPinUnholdAction() {return !ImGui::IsMouseDown(0);}
 bool Pin::bypassPinRaisePopupAction() {return ImGui::IsMouseReleased(1) && bypassPinHoveredAction();}
-bool Pin::bypassPinConnectLinkAction(DIWNE::Diwne &diwne)
+bool Pin::bypassPinPreconnectLinkAction(DIWNE::Diwne &diwne)
 {
     return (diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink || diwne.getPreviousFrameDiwneAction() == DIWNE::DiwneAction::NewLink) && bypassPinHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>() != this;
 }
@@ -77,7 +77,7 @@ bool Pin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 
 bool Pin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!m_isHeld && bypassPinConnectLinkAction(diwne))
+    if (!m_isHeld && bypassPinPreconnectLinkAction(diwne))
     {
         /* here it is when goal pin is hovered */
         return true;

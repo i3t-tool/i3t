@@ -7,12 +7,14 @@ Link::Link(DIWNE::ID id)
     : m_idDiwne(id)
     , m_thickness(10)
     , m_color(ImColor(150,75,100,150))
+    , m_selectedColor(ImColor(150,75,100,255))
     , m_startDiwne(ImVec2(0,0))
     , m_endDiwne(ImVec2(0,0))
     , m_startControlOffsetDiwne(ImVec2(10,0)) /* \todo JH minimal control points offset to settings */
     , m_endControlOffsetDiwne(ImVec2(-10,0))
     , m_popupID(fmt::format("linkPopup{}",id))
     , m_translated(false)
+    , m_just_pluged(false)
 {}
 
 Link::~Link()
@@ -52,6 +54,7 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
 
     interaction_happen = processLink(diwne, inner_interaction_happen);
 
+    m_just_pluged = false;
     return interaction_happen || inner_interaction_happen;
 }
 
@@ -89,7 +92,7 @@ bool Link::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happe
 
 bool Link::processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!m_selected && !m_translated && !inner_interaction_happen && bypassLinkSelectAction())
+    if (!m_selected && !m_translated && !m_just_pluged && !inner_interaction_happen && bypassLinkSelectAction())
     {
         m_selected = true;
         return true;
@@ -99,7 +102,7 @@ bool Link::processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happ
 
 bool Link::processLinkUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (m_selected && !m_translated && !inner_interaction_happen && bypassLinkUnselectAction())
+    if (m_selected && !m_translated && !m_just_pluged && !inner_interaction_happen && bypassLinkUnselectAction())
     {
         m_selected = false;
         return true;
@@ -109,7 +112,7 @@ bool Link::processLinkUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_ha
 
 bool Link::linkContent(DIWNE::Diwne &diwne)
 {
-    if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, ImColor(150,150,0), m_thickness+4 ); }/* \todo color of selected and thicknes of selected mark to settings */
+    if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_selectedColor, m_thickness+4 ); }/* \todo color of selected and thicknes of selected mark to settings */
     diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_color, m_thickness);
     return false;
 }

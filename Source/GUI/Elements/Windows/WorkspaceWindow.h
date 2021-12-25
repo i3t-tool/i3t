@@ -65,11 +65,12 @@ public:
 
     bool processDiwne();
     void BeginDiwne(const char* id);
+    void EndDiwne();
 
     bool m_first_frame = true;
 
     ImRect m_selectionRectangeDiwne;
-    WorkspaceWindowAction m_workspaceWindowAction;
+    WorkspaceWindowAction m_workspaceWindowAction, m_workspaceWindowPreviousFrameAction;
 
 
 //	ImTextureID m_headerBackgroundTexture;

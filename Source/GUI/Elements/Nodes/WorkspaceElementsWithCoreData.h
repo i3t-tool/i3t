@@ -53,14 +53,6 @@ public:
 
 	Ptr<Core::NodeBase> const getNodebase() const;
 
-	virtual bool isCamera();
-	virtual bool isCycle();
-	virtual bool isSequence();
-	virtual bool isTrackball();
-	virtual bool isQuatToFloatVec();
-	virtual bool isQuatToAngleAxis();
-	bool         isTransformation();
-
 	int getNumberOfVisibleDecimal();
 	int setNumberOfVisibleDecimal(int value);
 
@@ -109,6 +101,8 @@ public:
     void unplug();
 
     virtual void linkPopupContent();
+    virtual bool linkContent(DIWNE::Diwne &diwne);
+    bool processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
     void updateEndpoints();
     void updateControlPointsOffsets();
@@ -123,7 +117,7 @@ protected:
 	Core::Pin const&            m_pin;
 	WorkspaceNodeWithCoreData&  m_node;
 	ImVec2 m_connectionPoint;
-	ImRect m_iconRect;
+	ImRect m_iconRectDiwne;
 
 
 
@@ -131,26 +125,23 @@ public:
     WorkspaceCorePin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
 	Core::Pin const& getCorePin() const;
-	//ne::PinId const	 getParentPinId() const;
 
 	WorkspaceCorePin& getParentPin() const;
 
 	WorkspaceNodeWithCoreData& getNode() const;
 
-//		ImVec2 const		getIconSize() const { return m_iconSize; };
-//	ImColor const		getColor() const { return m_color; };
 
 	int				 getIndex() const;
 	PinKind		 getKind() const;
 	EValueType getType() const;
 	bool			 isConnected() const;
 
-	virtual bool processPinIcon(WorkspaceWindow &workspace);
-
 	/* DIWNE function */
 	virtual bool pinContent(DIWNE::Diwne &diwne);
 	virtual bool processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 	virtual bool processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+
+	virtual bool bypassPinHoveredAction(DIWNE::Diwne &diwne);
 
 };
 
@@ -162,16 +153,15 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
     public:
         WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
-        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRect.Min.x, (m_iconRect.Min.y+m_iconRect.Max.y)/2); };
+        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2); };
         void setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou);
-        bool processPinIcon(WorkspaceWindow& workspace);
 
         void unplug();
         void plug(WorkspaceCoreOutputPin* ou);
 
-
         /* DIWNE function */
         virtual bool pinContent(DIWNE::Diwne &diwne);
+        virtual bool processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
@@ -179,7 +169,7 @@ class WorkspaceCoreOutputPin : public WorkspaceCorePin
 protected:
     public:
         WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRect.Max.x, (m_iconRect.Min.y+m_iconRect.Max.y)/2); };
+        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2); };
 };
 
 class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin

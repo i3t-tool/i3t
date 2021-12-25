@@ -28,7 +28,7 @@ class Pin
         virtual bool bypassPinHoldAction();
         virtual bool bypassPinUnholdAction();
         virtual bool bypassPinRaisePopupAction();
-        virtual bool bypassPinConnectLinkAction(DIWNE::Diwne &diwne);
+        virtual bool bypassPinPreconnectLinkAction(DIWNE::Diwne &diwne);
 
         virtual bool processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual bool processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);

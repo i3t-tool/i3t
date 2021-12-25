@@ -74,9 +74,13 @@ void Theme::initClassicProperties()
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 
+	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
+	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
+
+
 	// Node Editor
-	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.00f));
-	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+//	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.00f));
+//	set(EColor::NodeEditorBg, ImVec4(112.0f / 255.0f, 112.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 	set(EColor::Nodes_ConnectionPossible, createColor(0, 255, 0, 255));
 	set(EColor::Nodes_ConnectionNotPossible, createColor(255, 0, 0, 255));
 	set(EColor::Nodes_CreateNode, createColor(32, 45, 32, 180));
@@ -102,6 +106,11 @@ void Theme::initClassicProperties()
 	set(EColor::InnerVec4Pin, createColor(255, 255, 255, 255));
 	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
+
+
+	// General unspecified node
+	set(EColor::NodeBg, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
+	set(EColor::NodeHeader, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
 
 
 	// Folta operator color set
@@ -143,7 +152,6 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_BorderWidth]						= 0.0f;
 	m_sizes[ESize::Nodes_LabelIndent]						= 3.0f;
 	m_sizes[ESize::Nodes_HeaderLabelIndent]			= 2.0f;
-	m_sizes[ESize::Nodes_LinkThickness]					= 3.0f;
 	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
 	m_sizes[ESize::Nodes_TrackBallSensitivity]	= 5.0f;
 
@@ -160,6 +168,15 @@ void Theme::initClassicProperties()
 
 	m_sizes[ESize::Nodes_leftSideSpacing]	 = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
+
+	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
+	m_sizes[ESize::Default_InactiveMark] = 0.7f; /* \todo JH 0.7 for testing - probably 0.0 will be here... */
+
+	m_sizes[ESize::Links_ControlpointsPositionFraction] = 0.2f;
+	m_sizes[ESize::Links_ControlpointsPositionMin] = 50.0f;
+	m_sizes[ESize::Links_Thickness] = 5.0;
+	m_sizes[ESize::Links_ThicknessSelectedBorder] = 2.0;
+
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
@@ -195,9 +212,12 @@ void Theme::initModernProperties()
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 
+    set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
+	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
+
 	// Node Editor
-	set(EColor::Nodes_FloatText, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-	set(EColor::NodeEditorBg, ImVec4(0.298f, 0.298f, 0.298f, 1.00f));
+//	set(EColor::Nodes_FloatText, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+//	set(EColor::NodeEditorBg, ImVec4(0.298f, 0.298f, 0.298f, 1.00f));
 	set(EColor::Nodes_ConnectionPossible, createColor(0, 255, 0, 255));
 	set(EColor::Nodes_ConnectionNotPossible, createColor(255, 0, 0, 255));
 	set(EColor::Nodes_CreateNode, createColor(32, 45, 32, 180));
@@ -223,6 +243,10 @@ void Theme::initModernProperties()
 	set(EColor::InnerVec4Pin, createColor(255, 255, 255, 255));
 	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
+
+    // General unspecified node
+	set(EColor::NodeBg, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
+	set(EColor::NodeHeader, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
 
 
 	// Sequence
@@ -268,7 +292,6 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Nodes_BorderWidth]						= 0.0f;
 	m_sizes[ESize::Nodes_LabelIndent]						= 3.0f;
 	m_sizes[ESize::Nodes_HeaderLabelIndent]			= 2.0f;
-	m_sizes[ESize::Nodes_LinkThickness]					= 3.0f;
 	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
 	m_sizes[ESize::Nodes_TrackBallSensitivity]	= 5.0f;
 
@@ -285,6 +308,14 @@ void Theme::initModernProperties()
 
 	m_sizes[ESize::Nodes_leftSideSpacing]	 = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
+
+	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
+	m_sizes[ESize::Default_InactiveMark] = 0.7f; /* \todo JH 0.7 for testing - probably 0.0 will be here... */
+
+    m_sizes[ESize::Links_ControlpointsPositionFraction] = 0.2f;
+	m_sizes[ESize::Links_ControlpointsPositionMin] = 50.0f;
+	m_sizes[ESize::Links_Thickness] = 5.0;
+	m_sizes[ESize::Links_ThicknessSelectedBorder] = 2.0;
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
@@ -326,11 +357,15 @@ void Theme::initNames()
 	g_ColorNames[EColor::ActiveColor]				= "glob_Active Color";
 	g_ColorNames[EColor::TabColor]					= "glob_Tab Color";
 
+	g_ColorNames[EColor::SelectionRectFull]			= "glob_Selection rectangle full";
+	g_ColorNames[EColor::SelectionRectTouch]		= "glob_Selection rectangle touch";
+
+
 	// Node editor colors.
 	// 1. General
-	g_ColorNames[EColor::NodeEditorBg]		= "ngen_Node Editor Background";
-	g_ColorNames[EColor::NodeHeader]			= "ngen_Node Editor Header";
-	g_ColorNames[EColor::Nodes_FloatText] = "ngen_Text in cells";
+//	g_ColorNames[EColor::NodeEditorBg]		= "ngen_Node Editor Background";
+//	g_ColorNames[EColor::NodeHeader]			= "ngen_Node Editor Header";
+//	g_ColorNames[EColor::Nodes_FloatText] = "ngen_Text in cells";
 
 	// 2. Pins
 	g_ColorNames[EColor::PulsePin]	= "npin_Pulse Pin";
@@ -349,6 +384,11 @@ void Theme::initNames()
 	g_ColorNames[EColor::InnerQuatPin]			= "npin_Inner Color Quat";
 	g_ColorNames[EColor::InnerMatrixMulPin] = "npin_Inner Color MatrixMul";
 	g_ColorNames[EColor::InnerScreenPin]		= "npin_Inner Color Screen";
+
+
+	// General unspecified node
+	g_ColorNames[EColor::NodeBg]				 = "nops_General node Background";
+	g_ColorNames[EColor::NodeHeader]		 = "nops_General node Header";
 
 	// 3. Operator
 	g_ColorNames[EColor::NodeBgOperator]				 = "nops_Operator Background";
@@ -381,7 +421,6 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Nodes_LabelIndent]						= "ngen_Pin labels Indent";
 	g_SizeNames[ESize::Nodes_HeaderLabelIndent]			= "ngen_Header Label Indent";
-	g_SizeNames[ESize::Nodes_LinkThickness]					= "ngen_Link Thickness";
 	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "ngen_Trackball button height";
 	g_SizeNames[ESize::Nodes_TrackBallSensitivity]	= "ngen_Trackball Sensitivity";
 
@@ -398,6 +437,16 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Nodes_leftSideSpacing]	 = "ngen_Nodes left side spacing";
 	g_SizeNames[ESize::Nodes_rightSideSpacing] = "ngen_Nodes right side spacing";
+
+	g_SizeNames[ESize::Default_VisiblePrecision]	 = "ngen_Nodes default visible precision";
+	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes default inactive part marker";
+
+    g_SizeNames[ESize::Links_ControlpointsPositionFraction] = "ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance";
+	g_SizeNames[ESize::Links_ControlpointsPositionMin] = "ngen_Link minimal x distance between controlpoint and start/end of link";
+	g_SizeNames[ESize::Links_Thickness]            = "ngen_Link Thickness";
+	g_SizeNames[ESize::Links_ThicknessSelectedBorder]   = "ngen_Link Additional thickness when selected";
+
+
 
 
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
@@ -485,32 +534,33 @@ std::map<ESize, const char*>& Theme::getSizeNames() { return g_SizeNames; }
 
 std::map<ESizeVec2, const char*>& Theme::getSizeVecNames() { return g_SizeVecNames; }
 
-void Theme::operatorColorTheme()
-{
-    /* \todo JH repaire
-	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
-
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgOperator];
-	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgOperatorHovered];
-	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgOperatorActive];
-	*/
-}
-
-void Theme::transformationColorTheme()
-{
-    /* \todo JH repaire
-	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
-			m_colors[EColor::NodeBgTransformation];
-
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgTransformation];
-	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgTransformationHovered];
-	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgTransformationActive];
-	*/
-}
+// JH unused
+//void Theme::operatorColorTheme()
+//{
+//    /* \todo JH repaire
+//	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] = m_colors[EColor::NodeBgOperator];
+//
+//	ImGuiStyle& style = ImGui::GetStyle();
+//
+//	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgOperator];
+//	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgOperatorHovered];
+//	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgOperatorActive];
+//	*/
+//}
+//
+//void Theme::transformationColorTheme()
+//{
+//    /* \todo JH repaire
+//	ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg] =
+//			m_colors[EColor::NodeBgTransformation];
+//
+//	ImGuiStyle& style = ImGui::GetStyle();
+//
+//	style.Colors[ImGuiCol_FrameBg]				= m_colors[EColor::FloatBgTransformation];
+//	style.Colors[ImGuiCol_FrameBgHovered] = m_colors[EColor::FloatBgTransformationHovered];
+//	style.Colors[ImGuiCol_FrameBgActive]	= m_colors[EColor::FloatBgTransformationActive];
+//	*/
+//}
 
 bool isVectorsEqual(ImVec4 a, ImVec4 b)
 {
@@ -518,41 +568,43 @@ bool isVectorsEqual(ImVec4 a, ImVec4 b)
 	return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w ? true : false;
 }
 
-ImVec4 Theme::getHeader()
-{
-    /* \todo JH repaire
-	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-										 m_colors[EColor::NodeBgOperator]))
-	{
-		return m_colors[EColor::NodeHeaderOperator];
-	}
-	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-										 m_colors[EColor::NodeBgTransformation]))
-	{
-		return m_colors[EColor::NodeHeaderTranformation];
-	}
-	*/
-	return m_colors[EColor::NodeHeaderTranformation];
-	//return ImVec4(0, 0, 0, 0);
-}
+// JH unused
+//ImVec4 Theme::getHeader()
+//{
+//    /* \todo JH repaire
+//	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
+//										 m_colors[EColor::NodeBgOperator]))
+//	{
+//		return m_colors[EColor::NodeHeaderOperator];
+//	}
+//	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
+//										 m_colors[EColor::NodeBgTransformation]))
+//	{
+//		return m_colors[EColor::NodeHeaderTranformation];
+//	}
+//	*/
+//	return m_colors[EColor::NodeHeaderTranformation];
+//	//return ImVec4(0, 0, 0, 0);
+//}
+//
+//ImVec4 Theme::getBg()
+//{
+//    /* \todo JH repaire
+//	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
+//										 m_colors[EColor::NodeBgOperator]))
+//	{
+//		return m_colors[EColor::NodeHeaderOperator];
+//	}
+//	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
+//										 m_colors[EColor::NodeBgTransformation]))
+//	{
+//		return m_colors[EColor::NodeHeaderTranformation];
+//	}
+//	*/
+//	return m_colors[EColor::NodeBgTransformation];
+//	//return ImVec4(0, 0, 0, 0);
+//}
 
-ImVec4 Theme::getBg()
-{
-    /* \todo JH repaire
-	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-										 m_colors[EColor::NodeBgOperator]))
-	{
-		return m_colors[EColor::NodeHeaderOperator];
-	}
-	if (isVectorsEqual(ax::NodeEditor::GetStyle().Colors[ax::NodeEditor::StyleColor::StyleColor_NodeBg],
-										 m_colors[EColor::NodeBgTransformation]))
-	{
-		return m_colors[EColor::NodeHeaderTranformation];
-	}
-	*/
-	return m_colors[EColor::NodeBgTransformation];
-	//return ImVec4(0, 0, 0, 0);
-}
 
 void Theme::returnFloatColorToDefault()
 {

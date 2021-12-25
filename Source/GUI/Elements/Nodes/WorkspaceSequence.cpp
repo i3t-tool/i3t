@@ -99,10 +99,19 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWo
 
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
 
+
+bool WorkspaceSequence::processInNodeBeforeContent(DIWNE::Diwne &diwne)
+{
+    /* whole node background */
+    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBgTransformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+    return false;
+}
+
 bool WorkspaceSequence::topContent(DIWNE::Diwne &diwne)
 {
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     return WorkspaceNodeWithCoreData::topContent(diwne);
 }
@@ -112,9 +121,6 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     bool inner_interaction_happen = false;
     int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
     Ptr<WorkspaceTransformation> dragedNode;
-
-    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
     {

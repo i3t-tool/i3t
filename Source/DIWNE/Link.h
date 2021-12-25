@@ -27,6 +27,8 @@ class Link
 
         ImVec2 getStartpoint(){return m_startDiwne;};
         ImVec2 getEndpoint(){return m_endDiwne;};
+        ImVec2 getStartControlPoint(){return m_controlPointStartDiwne;};
+        ImVec2 getEndControlPoint(){return m_controlPointEndDiwne;};
 
         void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end) {m_startDiwne = start; m_endDiwne = end; };
         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart; m_endControlOffsetDiwne = controlEnd; };
@@ -53,15 +55,17 @@ class Link
         virtual bool processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual bool processLinkUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
+        bool m_just_pluged;
+
     protected:
         bool m_selected;
+        ImColor m_color, m_selectedColor;
 
     private:
         DIWNE::ID m_idDiwne;
         ImVec2 m_startDiwne, m_endDiwne;
         ImVec2 m_startControlOffsetDiwne, m_endControlOffsetDiwne;
         ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
-        ImColor m_color;
         float m_squaredDistanceMouseFromLink;
         float m_thickness;
         std::string const m_popupID;

@@ -46,6 +46,7 @@ struct SettingsDiwne
     float zoomWheelSenzitivity = 8; /* Higher number -> smaller change */
     float minWorkAreaZoom = 0.25;
     float maxWorkAreaZoom = 4;
+    std::string const backgroundPopupID = "backgroundPopup";
     //float linkInteractionWidth = 10;
 //    FloatPopupMode floatPopupMode = Radians;
 };
@@ -218,9 +219,9 @@ class Diwne
         void setNodesSelectionChanged(bool value){m_nodesSelectionChanged = value;};
         bool getNodesSelectionChanged(){return m_nodesSelectionChanged;};
 
-        virtual bool bypassItemClicked0();
-        virtual bool bypassItemClicked1();
-        virtual bool bypassItemClicked2();
+        virtual bool bypassIsItemClicked0();
+        virtual bool bypassIsItemClicked1();
+        virtual bool bypassIsItemClicked2();
         virtual bool bypassIsMouseDown0();
         virtual bool bypassIsMouseDown1();
         virtual bool bypassIsMouseDown2();
@@ -255,7 +256,7 @@ class Diwne
         virtual bool processDiwneHold();
         virtual bool processDiwneUnhold();
         virtual bool processDiwneZoom();
-        virtual bool processDiwnePopupDiwne();
+        virtual bool processDiwneRaisePopupDiwne();
         virtual bool processDiwneSetPopupPosition();
 
 
@@ -276,6 +277,7 @@ class Diwne
     float m_workAreaZoomDiwne/*, m_workAreaZoomDeltaDiwne*/;
     float m_zoomWheelSenzitivity; /* Higher number -> smaller change */
     float m_minWorkAreaZoom, m_maxWorkAreaZoom;
+    std::string const m_popupID;
 
 
     ImVec2 m_popupPosition;

@@ -29,11 +29,11 @@ std::vector<Core::Transform::DataMap const*> WorkspaceDatamapMenuList = {
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNode(nodebase->getId(), nodebase->getOperation()->keyWord, nodebase->getOperation()->defaultLabel )
     ,   m_nodebase(nodebase)
-    ,   m_numberOfVisibleDecimal(1) /* \todo JH default number from some setting */
-    ,   m_dataItemsWidth(25.0f) /* \todo JH default number from some setting - just for safe if someone not call setDataItemsWidth() in construktor of child class... */
-    ,   m_inactiveMark(0.7f) /* \todo JH default 0 ; 0.7 for testing */
-    ,   m_levelOfDetail(WorkspaceLevelOfDetail::Full) /* \todo JH default value from some setting */
-    ,   m_floatPopupMode(Radians) /* \todo JH default value from some setting */
+    ,   m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision))
+    ,   m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth)) /* just for safe if someone not call setDataItemsWidth() in constructor of child class... */
+    ,   m_inactiveMark(I3T::getTheme().get(ESize::Default_InactiveMark))
+    ,   m_levelOfDetail(WorkspaceLevelOfDetail::Full)
+    ,   m_floatPopupMode(Radians)
 {
 
 }
@@ -51,7 +51,7 @@ bool WorkspaceNodeWithCoreData::topContent(DIWNE::Diwne &diwne)
         ImGui::TextUnformatted(m_topLabel.c_str());
     }else
     {
-        ImGui::TextUnformatted("Empty topLabel -> read it from Core"); /* \todo JH */
+        ImGui::TextUnformatted(m_nodebase->getLabel());
     }
 
     return false;
@@ -61,30 +61,7 @@ bool WorkspaceNodeWithCoreData::topContent(DIWNE::Diwne &diwne)
 
 Ptr<Core::NodeBase> const WorkspaceNodeWithCoreData::getNodebase() const { return m_nodebase; }
 
-//std::vector<Ptr<WorkspaceLinkProperties>> const& WorkspaceNodeWithCoreData::getLinksProperties() const
-//{
-//	return m_workspaceLinksProperties;
-//}
 
-
-bool WorkspaceNodeWithCoreData::isSequence() { return m_nodebase->getOperation() == NULL; }
-
-bool WorkspaceNodeWithCoreData::isQuatToFloatVec() { return false; }
-
-bool WorkspaceNodeWithCoreData::isQuatToAngleAxis() { return false; }
-
-bool WorkspaceNodeWithCoreData::isCamera() { return false; }
-
-bool WorkspaceNodeWithCoreData::isCycle() { return false; }
-
-bool WorkspaceNodeWithCoreData::isTrackball() { return false; }
-
-bool WorkspaceNodeWithCoreData::isTransformation()
-{
-	//SS remove if when the problem with dragged node in camera will be solved
-	if (this != NULL) { return m_nodebase->as<Core::Transformation>() != nullptr; }
-	return false;
-}
 
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal() { return m_numberOfVisibleDecimal; }
 
@@ -124,7 +101,13 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_
 
 bool WorkspaceNodeWithCoreData::drawDataLabel(DIWNE::Diwne &diwne)
 {
-    ImGui::Text(m_middleLabel.c_str()); /* \todo JH label from core or from user */
+    if(!m_middleLabel.empty())
+    {
+        ImGui::TextUnformatted(m_middleLabel.c_str());
+    }else
+    {
+        ImGui::TextUnformatted(m_nodebase->getLabel());
+    }
     return false;
 }
 
@@ -134,7 +117,7 @@ void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 	{
 		ImGui::TextUnformatted(fmt::format("Actual precision: {}", getNumberOfVisibleDecimal()).c_str());
 		ImGui::Separator();
-		for (int i = 0; i < 5; i++) /* \todo JH some better setter for precision */
+		for (int i = 0; i < 5; i++) /* \todo JH, MH some better setter for precision - allowed values in settings? */
 		{
 			if (ImGui::MenuItem(fmt::format("{}", i).c_str())) { setNumberOfVisibleDecimal(i); }
 		}
@@ -153,277 +136,14 @@ void WorkspaceNodeWithCoreData::nodePopupContent()
 }
 
 
-
-//void WorkspaceNodeWithCoreData::drawInputLinks()
-//{
-//	for (std::pair<corePinPropIter, linkPropIter> elem(m_workspaceInputsProperties.begin(),
-//																										 m_workspaceLinksProperties.begin());
-//			 elem.first != m_workspaceInputsProperties.end() && elem.second != m_workspaceLinksProperties.end();
-//			 ++elem.first, ++elem.second)
-//	{
-//		if (elem.first->get()->isConnected())
-//		{
-//			ne::Link(elem.second->get()->getId(), elem.first->get()->getParentPinId(), elem.first->get()->getId(),
-//							 I3T::getColor(WorkspacePinColor[elem.first->get()->getType()]), elem.second->get()->getThickness());
-//		}
-//	}
-//}
-
-
-//void WorkspaceNodeWithCoreData::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
-//																						 Core::Pin* newLinkPin)
-//{
-//	if (!isTransformation())
-//	{
-//		float alpha = ImGui::GetStyle().Alpha;
-//
-//		builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
-//
-//		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-//
-//		ImGui::BeginVertical(pinProp->getId().AsPointer());
-//		// ImGui::Spring(1);
-//
-//		EColor type			 = WorkspacePinColor[pinProp->getType()];
-//		EColor innerType = WorkspaceInnerPinColor[pinProp->getType()];
-//
-//		ax::Widgets::Icon(I3T::getSize(ESizeVec2::Nodes_IconSize), WorkspacePinShape[pinProp->getType()],
-//											pinProp->isConnected(), // SS User test change or not.
-//											I3T::getColor(type), I3T::getColor(innerType));
-//		// ImGui::Spring(1);
-//		ImGui::EndVertical();
-//
-//
-//		if (pinProp->getShowLabel() && !isSequence() && !isCamera())
-//		{
-//			if (pinProp->getLabel().empty())
-//			{ //it's never empty :(
-//
-//				auto label = pinProp->getCorePin().getLabel();
-//				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-//						label == "pulse")
-//				{
-//					ImGui::TextUnformatted("");
-//				}
-//				else
-//				{
-//					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-//					ImGui::TextUnformatted(label);
-//				}
-//			}
-//			else
-//			{
-//
-//				auto label = pinProp->getLabel();
-//				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-//						label == "pulse")
-//				{
-//					ImGui::TextUnformatted("");
-//				}
-//				else
-//				{
-//					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-//					ImGui::TextUnformatted(label.c_str());
-//				}
-//			}
-//		}
-//
-//		ImGui::PopStyleVar();
-//		builder.EndInput();
-//	}
-//}
-
-
-
-
-//
-///* \todo use newLinkPin arg*/
-//void WorkspaceNodeWithCoreData::drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
-//{
-//	/*for (auto const & pinProp : m_workspaceInputsProperties)
-//	{
-//	    if(pinProp->getType() == EValueType::Matrix)
-//        {
-//            drawInputPin(builder, pinProp, newLinkPin);
-//        }
-//	}
-//	// ImGui::Spring(2);
-//    for (auto const & pinProp : m_workspaceInputsProperties)
-//	{
-//	    if(pinProp->getType() != EValueType::Matrix)
-//        {
-//            drawInputPin(builder, pinProp, newLinkPin);
-//        }
-//	}*/
-//
-//	if (!isTransformation() && !isTrackball())
-//	{
-//		ImGui::BeginVertical(m_nodebase->getId());
-//		// ImGui::Spring(1);
-//
-//		for (auto const& pinProp : m_workspaceInputsProperties) { drawInputPin(builder, pinProp, newLinkPin); }
-//
-//		// ImGui::Spring(1);
-//		ImGui::EndVertical();
-//	}
-//}
-
-//void WorkspaceNodeWithCoreData::drawOutputPin(util::NodeBuilder&										 builder,
-//																							Ptr<WorkspaceCorePinProperties> const& pinProp, Core::Pin* newLinkPin,
-//																							int outputIndex)
-//{
-//	float alpha = ImGui::GetStyle().Alpha;
-//
-//
-//	builder.Output(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
-//
-//	if (!isTransformation() && !isCamera() && !isSequence())
-//	{ //is Operator
-//		ImGui::BeginVertical(pinProp->getNode().getId().AsPointer());
-//		drawData(builder, outputIndex);
-//		ImGui::EndVertical();
-//	}
-//
-//	// ImGui::Spring(1);
-//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-//
-//
-//	//label
-//	if (pinProp->getShowLabel() && !isSequence() && !isCamera())
-//	{
-//		if (pinProp->getLabel().empty())
-//		{ //it's never empty :(
-//
-//			auto label = pinProp->getCorePin().getLabel();
-//			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-//					label == "pulse")
-//			{
-//				ImGui::TextUnformatted("");
-//			}
-//			else
-//			{
-//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
-//				ImGui::TextUnformatted(label);
-//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
-//			}
-//		}
-//		else
-//		{
-//
-//			auto label = pinProp->getLabel();
-//			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-//					label == "pulse")
-//			{
-//				ImGui::TextUnformatted("");
-//			}
-//			else
-//			{
-//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
-//				ImGui::TextUnformatted(label.c_str());
-//				// ImGui::Spring(1, I3T::getSize(ESize::Nodes_LabelIndent));
-//			}
-//		}
-//	}
-//
-//	// ImGui::Spring(1);
-//
-//	//TODO better way to solve this?
-//	if (isCycle() && pinProp->getIndex() > 0)
-//	{
-//		ImGuiWindow* window = ImGui::GetCurrentWindowRead();
-//		ne::PinRect(ImVec2(window->DC.LastItemRect.Min.x + I3T::getSize(ESizeVec2::Nodes_IconSize).x,
-//											 window->DC.LastItemRect.Min.y),
-//								ImVec2(window->DC.LastItemRect.Max.x + I3T::getSize(ESizeVec2::Nodes_IconSize).x,
-//											 window->DC.LastItemRect.Max.y));
-//	}
-//
-//	//Icon
-//	EColor type			 = WorkspacePinColor[pinProp->getType()];
-//	EColor innerType = WorkspaceInnerPinColor[pinProp->getType()];
-//
-//	ax::Widgets::Icon(I3T::getSize(ESizeVec2::Nodes_IconSize), WorkspacePinShape[pinProp->getType()], false,
-//										I3T::getColor(type), I3T::getColor(innerType));
-//
-//	ImGui::PopStyleVar();
-//	builder.EndOutput();
-//
-//	if (isTrackball()) { ImGui::EndVertical(); }
-//}
-//
-//void WorkspaceNodeWithCoreData::drawMiddle(util::NodeBuilder& builder)
-//{
-//	if (isTransformation() || isCycle() || isTrackball())
-//	{
-//		if (isTransformation())
-//		{
-//			// ImGui::Spring(2, I3T::getSize(ESize::Nodes_leftSideSpacing)); //spring from left side. right side in builder.cpp
-//			ImGui::BeginVertical(m_nodebase->getId());
-//			drawData(builder, 0);
-//			ImGui::EndVertical();
-//		}
-//		else if (isTrackball())
-//		{
-//			// ImGui::Spring(1, I3T::getSize(ESize::Nodes_leftSideSpacing));
-//			drawData(builder, -1); // for trackball
-//		}
-//		else
-//		{
-//			builder.Middle();
-//			// ImGui::Spring(1);
-//			drawData(builder, -1); // for cycle
-//			// ImGui::Spring(1);
-//		}
-//	}
-//}
-
-
-
-
-///* \todo use newLinkPin arg*/
-//void WorkspaceNodeWithCoreData::drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)
-//{
-//	/*for (auto const & pinProp : m_workspaceOutputsProperties)
-//	{
-//	    if(pinProp->getType() == EValueType::Matrix)
-//        {
-//            drawOutputPin(builder, pinProp, newLinkPin);
-//        }
-//	}
-//	// ImGui::Spring(2);
-//    for (auto const & pinProp : m_workspaceOutputsProperties)
-//	{
-//	    if(pinProp->getType() != EValueType::Matrix)
-//        {
-//            drawOutputPin(builder, pinProp, newLinkPin);
-//        }
-//	}*/
-//
-//	if (!isTransformation())
-//	{
-//		for (auto const& pinProp : m_workspaceOutputsProperties)
-//		{
-//			drawOutputPin(builder, pinProp, newLinkPin, pinProp->getIndex());
-//		}
-//	}
-//}
-
-
-
-//WorkspaceCorePinProperties::WorkspaceCorePinProperties(ne::PinId const id, std::string label, Core::Pin const& pin,
-//																											 WorkspaceNodeWithCoreData& node) :
-//		WorkspacePinProperties(id, label),
-//		m_pin(pin), m_node(node)
-//{}
-
-
-WorkspaceCorePin::WorkspaceCorePin(     DIWNE::ID const id
-                                                       ,    Core::Pin const& pin
-                                                       ,    WorkspaceNodeWithCoreData& node)
+WorkspaceCorePin::WorkspaceCorePin( DIWNE::ID const id
+                                   ,Core::Pin const& pin
+                                   ,WorkspaceNodeWithCoreData& node)
     :   WorkspacePin(id, "")
     ,   m_pin(pin)
     ,   m_node(node)
     ,   m_connectionPoint(ImVec2(0,0))
-    ,   m_iconRect(ImRect(0,0,0,0))
+    ,   m_iconRectDiwne(ImRect(0,0,0,0))
 {}
 
 /* DIWNE function */
@@ -450,8 +170,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
                         iconSize,
                         ImVec4(padding, padding, padding, padding),
                         isConnected());
-        m_iconRect = ImRect( diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
-        interaction_happen |= processPinIcon(dynamic_cast<WorkspaceWindow&>(diwne));
+        m_iconRectDiwne = ImRect( diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
 
 		if (getShowLabel())
 		{
@@ -491,19 +210,16 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 		return interaction_happen;
 }
 
-bool WorkspaceCorePin::processPinIcon(WorkspaceWindow &workspace)
+bool WorkspaceCorePin::bypassPinHoveredAction(DIWNE::Diwne &diwne)
 {
-    return false; /* \todo JH new link here */
+    return m_iconRectDiwne.Contains(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
 }
-
 
 Core::Pin const& WorkspaceCorePin::getCorePin() const { return m_pin; }
 
 WorkspaceNodeWithCoreData& WorkspaceCorePin::getNode() const { return m_node; }
 
 int WorkspaceCorePin::getIndex() const { return m_pin.getIndex(); }
-
-//ne::PinId const WorkspaceCorePinProperties::getParentPinId() const { return ne::PinId(m_pin.getParentPin()->getId()); }
 
 PinKind WorkspaceCorePin::getKind() const { return m_pin.isInput() ? PinKind::Input : PinKind::Output; }
 
@@ -532,7 +248,7 @@ bool WorkspaceCorePin::processPinNewLink(DIWNE::Diwne &diwne, bool& inner_intera
 
 bool WorkspaceCorePin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!m_isHeld && bypassPinConnectLinkAction(diwne))
+    if (!m_isHeld && bypassPinPreconnectLinkAction(diwne))
     {
         /* here it is when goal pin is hoovered */
         WorkspaceCorePin *input, *output;
@@ -554,9 +270,10 @@ bool WorkspaceCorePin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_in
         {
             case ENodePlugResult::Ok:
                 diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
-                if (!ImGui::GetIO().MouseDown[0])
+                if (bypassPinUnholdAction())
                 {
-                    dynamic_cast<WorkspaceCoreInputPin*>(input)->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
+                    WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
+                    in->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
                 }
                 break;
             /* \todo JH react informatively to other result too */
@@ -767,13 +484,6 @@ void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* 
     m_link.setStartPin(ou);
 }
 
-bool WorkspaceCoreInputPin::processPinIcon(WorkspaceWindow &workspace)
-{
-    WorkspaceCorePin::processPinIcon(workspace);
-    /* \todo Create construtor of this type and connect */
-    return false;
-}
-
 void WorkspaceCoreInputPin::unplug()
 {
     Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
@@ -789,14 +499,24 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
                                                         coreOutput->getIndex(), coreInput->getIndex()))
     {
         setConnectedWorkspaceOutput(ou);
+        m_link.m_just_pluged = true;
     }
 }
-
-
 
 bool WorkspaceCoreInputPin::pinContent(DIWNE::Diwne &diwne)
 {
     return WorkspaceCorePin::pinContent(diwne);
+}
+
+bool WorkspaceCoreInputPin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    bool interaction_happen = false;
+    if (bypassPinHoveredAction(diwne) && bypassPinUnholdAction())
+    {
+        interaction_happen = true;
+        ImGui::TextUnformatted("Creating new node with type of this input pin");
+    }
+    return interaction_happen || DIWNE::Pin::processPin(diwne, inner_interaction_happen);
 }
 /* >>>> WorkspaceCoreLink <<<< */
 
@@ -828,9 +548,38 @@ void WorkspaceCoreLink::updateEndpoints(){
 }
 
 void WorkspaceCoreLink::updateControlPointsOffsets(){
-    float offset = (getEndpoint().x-getStartpoint().x)*0.2;  /* \todo minimum control point offset and fraction (0.2) from settings */
-    if (offset < 50) offset = 50;
+    float offset = (getEndpoint().x-getStartpoint().x)*I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
+    if (offset < I3T::getTheme().get(ESize::Links_ControlpointsPositionMin)) offset = I3T::getTheme().get(ESize::Links_ControlpointsPositionMin);
     setLinkControlpointsOffsetDiwne(ImVec2(offset,0), ImVec2(-offset,0));
+}
+
+
+bool WorkspaceCoreLink::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+{
+    if (bypassLinkHoveredAction())
+    {
+        m_color.Value.w = 1; /* \todo JH alpha to settings? */
+        return true;
+    }else
+    {
+        m_color.Value.w = 0.4; /* \todo JH alpha to settings? */
+    }
+    return false;
+}
+
+bool WorkspaceCoreLink::linkContent(DIWNE::Diwne &diwne)
+{
+    ImColor col = ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(WorkspacePinColorBackground[m_endPin->getType()])); /* \todo JH make precessBeforeLinkContetn function */
+    m_color.Value.x = col.Value.x; m_color.Value.y = col.Value.y; m_color.Value.z = col.Value.z;
+    if (m_selected)
+    {
+        m_selectedColor = col;
+        m_selectedColor.Value.w = 0.7;
+        diwne.AddBezierCurveDiwne(getStartpoint(), getStartControlPoint(), getEndControlPoint(), getEndpoint(), m_selectedColor, I3T::getTheme().get(ESize::Links_Thickness)+I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder) );
+    }
+
+    diwne.AddBezierCurveDiwne(getStartpoint(), getStartControlPoint(), getEndControlPoint(), getEndpoint(), m_color, I3T::getTheme().get(ESize::Links_Thickness));
+    return false;
 }
 
 WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(Ptr<Core::NodeBase> nodebase, bool showDataOnPins/*=true*/)
@@ -900,7 +649,7 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(Ptr<Core::N
                 //Debug::Assert(false , "Unknown Pin type while loading input pins from Core to Workspace");
         }
     }
-    if (!m_showDataOnPins) /* sequence do not show data in output pins */
+    if (!m_showDataOnPins) /* for example sequence do not show data in output pins */
     {
         for (Core::Pin const& pin : outputPins)
         {
@@ -990,8 +739,6 @@ bool WorkspaceNodeWithCoreDataWithPins::processNodeOutsideOfWorkspace(DIWNE::Diw
 bool WorkspaceNodeWithCoreDataWithPins::leftContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
-    diwne.AddRectFilledDiwne(m_leftRectDiwne.Min, m_leftRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     for (auto const& pin : m_workspaceInputs) {
         inner_interaction_happen |= pin->drawPinDiwne(diwne);
@@ -1008,8 +755,6 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent(DIWNE::Diwne &diwne)
 bool WorkspaceNodeWithCoreDataWithPins::rightContent(DIWNE::Diwne &diwne)
 {
     bool inner_interaction_happen = false;
-    diwne.AddRectFilledDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     for (auto const& pin : m_workspaceOutputs) {
         inner_interaction_happen |= pin->drawPinDiwne(diwne);
@@ -1048,11 +793,11 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 			1.0f); /* if power >1.0f the number changes logarithmic */
     ImGui::SetItemAllowOverlap();
 
-    if (ImGui::IsItemClicked(0)) inner_interaction_happen = true;
+    if (diwne.bypassIsItemActive())
+        inner_interaction_happen = true;
 
     if (!inactive)
 	{
-		//inner_interaction_happen |= diwne.popupFloatDiwne(diwne, label, value, valueChangedByPopup);
 		inner_interaction_happen |= diwne.popupDiwneItem(label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
 		valueChanged |= valueChangedByPopup;
 	}
@@ -1230,11 +975,6 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
 
     }
 }
-
-//void WorkspaceWithPins::loadWorkspacePinsFromCorePins(Core::NodeBase::PinView const & coreInputPins, Core::NodeBase::PinView const & coreOutputPins)
-//{
-//
-//}
 
 void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::PinView coreInputPins, Core::Node::PinView coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)
 {

@@ -4,7 +4,7 @@ namespace DIWNE
 {
 
 
-Node::Node(DIWNE::ID id) /* FLT_MAX for first frame - draw node anywhere it is and thus got its real size*/
+Node::Node(DIWNE::ID id)
     : m_topRectDiwne(ImRect(0,0,0,0))
     , m_leftRectDiwne(ImRect(0,0,0,0))
     , m_middleRectDiwne(ImRect(0,0,0,0))
@@ -191,8 +191,9 @@ bool Node::processNodeOnWorkspace(DIWNE::Diwne &diwne, bool& inner_interaction_h
 
         interaction_happen |= processNodeDrag(diwne, inner_interaction_happen);
 
-        inner_interaction_happen |= processNodePopupDiwne(diwne, inner_interaction_happen);
+        inner_interaction_happen |= processNodeRaisePopupDiwne(diwne, inner_interaction_happen);
     }
+    diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this ); /* imgui always check whether popup with given id is open */
 
 #ifdef DIWNE_DEBUG
     ImRect nodeRectDiwne = getNodeRectDiwne();
@@ -369,13 +370,14 @@ bool Node::rightContent(DIWNE::Diwne &diwne){return false;}
 bool Node::middleContent(DIWNE::Diwne &diwne){return false;}
 bool Node::bottomContent(DIWNE::Diwne &diwne){return false;}
 
-bool Node::processNodePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+bool Node::processNodeRaisePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
     if(!inner_interaction_happen && bypassNodeRaisePopupAction())
     {
         ImGui::OpenPopup(m_popupID.c_str());
+        return true;
     }
-    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
+    return false;
 }
 
 void Node::nodePopupContent()

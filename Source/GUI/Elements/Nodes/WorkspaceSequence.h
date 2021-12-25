@@ -35,6 +35,7 @@ public:
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;
 
+    bool processInNodeBeforeContent(DIWNE::Diwne &diwne);
     bool topContent(DIWNE::Diwne &diwne);
     bool middleContent(DIWNE::Diwne &diwne);
 

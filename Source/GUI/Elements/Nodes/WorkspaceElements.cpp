@@ -48,7 +48,7 @@ bool WorkspaceNode::processInNodeBeforeContent(DIWNE::Diwne &diwne)
     /* \todo JH background by settings in different type of nodes */
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(ImVec4(0,255,0,255)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBg)), I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_All);
     return false;
 }
 
@@ -58,11 +58,8 @@ bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
     bool interaction_happen = false;
 
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
-
-	// ImGui::Spring(0, I3T::getSize(ESize::Nodes_HeaderLabelIndent)); // 0 - spring will always have zero size - left align the header
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeader)), I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
 	ImGui::TextUnformatted(m_topLabel.c_str());
-	// ImGui::Spring(10);	 // 1 - power of the current spring = 1, use default spacing .x or .y
 
     return interaction_happen;
 }
@@ -70,9 +67,6 @@ bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
 bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
 {
     bool interaction_happen = false;
-
-    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()));
 
 	ImGui::TextUnformatted(m_middleLabel.c_str());
 
@@ -83,15 +77,15 @@ bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
 {
     WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
 
-    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
+    m_nodeInteractionAllowed = m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
 
-    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull)
+    if ( ww.m_workspaceWindowPreviousFrameAction == WorkspaceWindowAction::SelectionRectFull || ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull)
     {
         m_selected = ww.m_selectionRectangeDiwne.Contains(getNodeRectDiwne()) ? true : false;
-        m_nodeInteractionAllowed |= false;
+        m_nodeInteractionAllowed = false;
     }
 
-    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch )
+    if (ww.m_workspaceWindowPreviousFrameAction == WorkspaceWindowAction::SelectionRectTouch || ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch )
     {
         m_selected = ww.m_selectionRectangeDiwne.Overlaps(getNodeRectDiwne()) ? true : false;
         m_nodeInteractionAllowed = false;
@@ -105,7 +99,7 @@ bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
 void WorkspaceNode::drawMenuDelete()
 {
     if (ImGui::MenuItem("Delete")) {
-            m_removeFromWorkspaceWindow = true;
+        m_removeFromWorkspaceWindow = true;
     }
 }
 

@@ -35,12 +35,9 @@ enum class EColor
 
 	TutorialBgColor,
 
-	/* \todo JH MH - no need to use this Node_editor specific properties */
-	// Node editor properties.
-	// 1. General
-	NodeEditorBg,
-	NodeHeader,
-	Nodes_FloatText,
+    SelectionRectFull,
+    SelectionRectTouch,
+
 
 	// 2. Pins
 	PulsePin,
@@ -60,6 +57,10 @@ enum class EColor
 	InnerQuatPin,
 	InnerMatrixMulPin,
 	InnerScreenPin,
+
+	// General unspecified node
+	NodeBg,
+	NodeHeader,
 
 	// Sequence
 	NodeBgSequence,
@@ -87,6 +88,8 @@ enum class EColor
 	Nodes_CreateNode,
 
 	Builder_NodePadding, // not a color but i need a vec4
+
+	Links_SelectedBorder
 };
 
 enum class EFont
@@ -115,7 +118,6 @@ enum class ESize
 	Nodes_BorderWidth,
 	Nodes_LabelIndent,
 	Nodes_HeaderLabelIndent,
-	Nodes_LinkThickness,
 	Nodes_trackballButtonHeight,
 	Nodes_TrackBallSensitivity,
 
@@ -132,6 +134,17 @@ enum class ESize
 
 	Nodes_leftSideSpacing,
 	Nodes_rightSideSpacing,
+
+	Links_ControlpointsPositionFraction,
+	Links_ControlpointsPositionMin,
+	Links_Thickness,
+	Links_ThicknessSelectedBorder,
+	Links_OffsetFraction,
+	Links_OffsetMin,
+
+	Default_VisiblePrecision,
+	Default_InactiveMark
+
 };
 
 enum class ESizeVec2
@@ -271,12 +284,14 @@ public:
 	Sizes& getSizesRef() { return m_sizes; }
 	SizesVec& getSizesVecRef() { return m_sizesVec2; }
 
-	void operatorColorTheme();
-	void transformationColorTheme();
+// JH unused -> maybe for "InputItems" only - drag float etc... but probably not needed
+//	void operatorColorTheme();
+//	void transformationColorTheme();
 	void returnFloatColorToDefault();
 
-	ImVec4 getHeader();
-	ImVec4 getBg();
+// JH unused
+//	ImVec4 getHeader();
+//	ImVec4 getBg();
 
 private:
 	template <typename E, typename T>

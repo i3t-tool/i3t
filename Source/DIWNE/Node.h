@@ -65,7 +65,7 @@ class Node : public std::enable_shared_from_this<Node>
         bool processNodeUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         bool processNodeDrag(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
-        bool processNodePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        bool processNodeRaisePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual void nodePopupContent();
 
         virtual bool processInNodeBeforeContent(DIWNE::Diwne &diwne) {return false;};
@@ -108,13 +108,13 @@ class Node : public std::enable_shared_from_this<Node>
         bool m_selected;
         bool m_translated;
         bool m_nodeInteractionAllowed;
+        bool m_isHeld;
 
     private:
         DIWNE::ID m_idDiwne;
 
         void setNodeRectsPositionDiwne(ImVec2 const& position);
         void translateNodeRectsDiwne(ImVec2 const& amount);
-        bool m_isHeld;
 
         std::string const m_popupID; /* \todo JH MH PF how to initialize const char* with id of Node included? */
 

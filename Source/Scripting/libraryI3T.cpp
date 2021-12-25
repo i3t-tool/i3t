@@ -711,8 +711,8 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
 
     if(seqindex<0||seqindex>=workspace->size()){returnValue->Val->Integer=false;return;}
     if(nodeindex<0||nodeindex>=workspace->size()){returnValue->Val->Integer=false;return;}
-    if(!workspace->at(seqindex)->isSequence()){returnValue->Val->Integer=false;return;}
-    if(!workspace->at(nodeindex)->isTransformation()){returnValue->Val->Integer=false;return;}
+    if(!std::static_pointer_cast<WorkspaceSequence>(workspace->at(seqindex))){returnValue->Val->Integer=false;return;}
+    if(!std::static_pointer_cast<WorkspaceTransformation>(workspace->at(nodeindex))){returnValue->Val->Integer=false;return;}
 
     WorkspaceSequence*seq=(WorkspaceSequence*)workspace->at(seqindex).get();
     WorkspaceNodeWithCoreData*node=workspace->at(nodeindex).get();
@@ -741,8 +741,8 @@ void camAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
 
     if (camindex < 0 || camindex >= workspace->size()) { returnValue->Val->Integer = false; return; }
     if (nodeindex < 0 || nodeindex >= workspace->size()) { returnValue->Val->Integer = false; return; }
-    if (!workspace->at(camindex)->isCamera()) { returnValue->Val->Integer = false; return; }
-    if (!workspace->at(nodeindex)->isTransformation()) { returnValue->Val->Integer = false; return; }
+    if (!std::static_pointer_cast<WorkspaceCamera>(workspace->at(camindex))) { returnValue->Val->Integer = false; return; }
+    if (!std::static_pointer_cast<WorkspaceTransformation>(workspace->at(nodeindex))) { returnValue->Val->Integer = false; return; }
 
     WorkspaceCamera* cam = (WorkspaceCamera*)workspace->at(camindex).get();
     WorkspaceNodeWithCoreData* node = workspace->at(nodeindex).get();
