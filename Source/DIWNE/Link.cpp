@@ -58,12 +58,12 @@ bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
     return interaction_happen || inner_interaction_happen;
 }
 
-bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
-bool Link::bypassLinkSelectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
-bool Link::bypassLinkUnselectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
-bool Link::bypassLinkHoldAction() {return ImGui::IsMouseClicked(0) && bypassLinkHoveredAction();}
-bool Link::bypassLinkUnholdAction() {return !ImGui::IsMouseDown(0);}
-bool Link::bypassLinkRaisePopupAction() {return ImGui::IsMouseReleased(1) && bypassLinkHoveredAction();}
+bool Link::bypassLinkHoveredAction(DIWNE::Diwne &diwne) {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
+bool Link::bypassLinkSelectAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction(diwne);}
+bool Link::bypassLinkUnselectAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction(diwne);}
+bool Link::bypassLinkHoldAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseClicked(0) && bypassLinkHoveredAction(diwne);}
+bool Link::bypassLinkUnholdAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(0);}
+bool Link::bypassLinkRaisePopupAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(1) && bypassLinkHoveredAction(diwne);}
 
 bool Link::processLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
@@ -79,7 +79,7 @@ bool Link::processLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 
 bool Link::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (bypassLinkHoveredAction())
+    if (bypassLinkHoveredAction(diwne))
     {
         m_color.Value.w = 1; /* \todo JH alpha to settings? */
         return true;
@@ -92,7 +92,7 @@ bool Link::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happe
 
 bool Link::processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!m_selected && !m_translated && !m_just_pluged && !inner_interaction_happen && bypassLinkSelectAction())
+    if (!m_selected && !m_translated && !m_just_pluged && !inner_interaction_happen && bypassLinkSelectAction(diwne))
     {
         m_selected = true;
         return true;
@@ -102,7 +102,7 @@ bool Link::processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happ
 
 bool Link::processLinkUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (m_selected && !m_translated && !m_just_pluged && !inner_interaction_happen && bypassLinkUnselectAction())
+    if (m_selected && !m_translated && !m_just_pluged && !inner_interaction_happen && bypassLinkUnselectAction(diwne))
     {
         m_selected = false;
         return true;
@@ -119,7 +119,7 @@ bool Link::linkContent(DIWNE::Diwne &diwne)
 
 bool Link::processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if(!inner_interaction_happen && bypassLinkRaisePopupAction())
+    if(!inner_interaction_happen && bypassLinkRaisePopupAction(diwne))
     {
         ImGui::OpenPopup(m_popupID.c_str());
     }

@@ -101,16 +101,16 @@ bool Node::processInNodeAfterContent(DIWNE::Diwne &diwne)
     return false;
 }
 
-bool Node::bypassNodeHoveredAction() {return ImGui::IsItemHovered();}
-bool Node::bypassNodeSelectAction() {return ImGui::IsMouseReleased(0) && bypassNodeHoveredAction();}
-bool Node::bypassNodeUnselectAction() {return ImGui::IsMouseReleased(0) && bypassNodeHoveredAction();}
-bool Node::bypassNodeHoldAction() {return ImGui::IsMouseClicked(0) && bypassNodeHoveredAction();}
-bool Node::bypassNodeUnholdAction() {return !ImGui::IsMouseDown(0);}
-bool Node::bypassNodeRaisePopupAction() {return ImGui::IsMouseReleased(1) && bypassNodeHoveredAction();}
+bool Node::bypassNodeHoveredAction(DIWNE::Diwne &diwne) {return ImGui::IsItemHovered();}
+bool Node::bypassNodeSelectAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(0) && bypassNodeHoveredAction(diwne);}
+bool Node::bypassNodeUnselectAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(0) && bypassNodeHoveredAction(diwne);}
+bool Node::bypassNodeHoldAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseClicked(0) && bypassNodeHoveredAction(diwne);}
+bool Node::bypassNodeUnholdAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(0);}
+bool Node::bypassNodeRaisePopupAction(DIWNE::Diwne &diwne) {return ImGui::IsMouseReleased(1) && bypassNodeHoveredAction(diwne);}
 
 bool Node::processNodeHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (bypassNodeHoveredAction())
+    if (bypassNodeHoveredAction(diwne))
     {
         ImRect nodeRectDiwne = getNodeRectDiwne();
         diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,255,255), 0, ImDrawCornerFlags_None, 3*diwne.getWorkAreaZoomDiwne());
@@ -120,7 +120,7 @@ bool Node::processNodeHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happe
 
 bool Node::processNodeSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!m_selected && !m_translated && !inner_interaction_happen && bypassNodeSelectAction())
+    if (!m_selected && !m_translated && !inner_interaction_happen && bypassNodeSelectAction(diwne))
     {
         m_selected = true;
         diwne.setNodesSelectionChanged(true);
@@ -131,7 +131,7 @@ bool Node::processNodeSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happ
 
 bool Node::processNodeUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (m_selected && !m_translated && !inner_interaction_happen && bypassNodeUnselectAction())
+    if (m_selected && !m_translated && !inner_interaction_happen && bypassNodeUnselectAction(diwne))
     {
         m_selected = false;
         diwne.setNodesSelectionChanged(true);
@@ -142,7 +142,7 @@ bool Node::processNodeUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_ha
 
 bool Node::processNodeHold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!inner_interaction_happen && bypassNodeHoldAction())
+    if (!inner_interaction_happen && bypassNodeHoldAction(diwne))
     {
         m_isHeld = true;
         diwne.setDiwneAction(DiwneAction::HoldNode);
@@ -154,7 +154,7 @@ bool Node::processNodeHold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 
 bool Node::processNodeUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (!inner_interaction_happen && bypassNodeUnholdAction())
+    if (!inner_interaction_happen && bypassNodeUnholdAction(diwne))
     {
         m_isHeld = false;
         m_translated = false;
@@ -372,7 +372,7 @@ bool Node::bottomContent(DIWNE::Diwne &diwne){return false;}
 
 bool Node::processNodeRaisePopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if(!inner_interaction_happen && bypassNodeRaisePopupAction())
+    if(!inner_interaction_happen && bypassNodeRaisePopupAction(diwne))
     {
         ImGui::OpenPopup(m_popupID.c_str());
         return true;

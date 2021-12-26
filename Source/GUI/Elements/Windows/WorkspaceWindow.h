@@ -44,7 +44,8 @@ enum WorkspaceWindowAction
 {
     None,
     SelectionRectFull,
-    SelectionRectTouch
+    SelectionRectTouch,
+    CreateAndPlugTypeConstructor
 };
 
 /*! \class class for Workspace window object
@@ -72,16 +73,6 @@ public:
     ImRect m_selectionRectangeDiwne;
     WorkspaceWindowAction m_workspaceWindowAction, m_workspaceWindowPreviousFrameAction;
 
-
-//	ImTextureID m_headerBackgroundTexture;
-
-
-
-	/* \todo JH better name for this atributes - for better description what they do... */
-//	Ptr<WorkspaceCorePin> m_pinPropertiesForNewLink = nullptr;
-//	Ptr<WorkspaceCorePin> m_pinPropertiesForNewNodeLink = nullptr;
-//	bool m_createNewNode = false;
-
     WorkspaceCoreLink *m_creatingLink;
     WorkspaceCorePin *m_linkCreatingPin;
 
@@ -97,6 +88,15 @@ public:
 	static std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
+
+	bool processCreateAndPlugTypeConstructor();
+
+	template <typename T>
+    void addTypeConstructorNode()
+    {
+        addNodeToPosition<T>( m_linkCreatingPin->getLinkConnectionPointDiwne() + ImVec2(-100,0) ); /* \todo JH shift to Theme */
+        static_cast<WorkspaceCoreInputPin*>(m_linkCreatingPin)->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getOutputs().at(0).get()); /* \todo JH always 0 with type constructor? */
+    }
 
 	/// \todo JH, MH - Needs to be accessed by scene loader, but it may be weird that the loader needs to have reference to the Workspace.
 	template <class T>

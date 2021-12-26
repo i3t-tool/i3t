@@ -24,10 +24,10 @@ class Pin
         virtual ImVec2 getLinkConnectionPointDiwne() const {return getCenterDiwne(); };
 
 
-        virtual bool bypassPinHoveredAction();
-        virtual bool bypassPinHoldAction();
-        virtual bool bypassPinUnholdAction();
-        virtual bool bypassPinRaisePopupAction();
+        virtual bool bypassPinHoveredAction(DIWNE::Diwne &diwne);
+        virtual bool bypassPinHoldAction(DIWNE::Diwne &diwne);
+        virtual bool bypassPinUnholdAction(DIWNE::Diwne &diwne);
+        virtual bool bypassPinRaisePopupAction(DIWNE::Diwne &diwne);
         virtual bool bypassPinPreconnectLinkAction(DIWNE::Diwne &diwne);
 
         virtual bool processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen);

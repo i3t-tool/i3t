@@ -212,7 +212,7 @@ bool WorkspaceCorePin::pinContent(DIWNE::Diwne &diwne)
 
 bool WorkspaceCorePin::bypassPinHoveredAction(DIWNE::Diwne &diwne)
 {
-    return m_iconRectDiwne.Contains(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
+    return m_iconRectDiwne.Contains(diwne.screen2diwne(ImGui::GetMousePos()));
 }
 
 Core::Pin const& WorkspaceCorePin::getCorePin() const { return m_pin; }
@@ -270,7 +270,7 @@ bool WorkspaceCorePin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_in
         {
             case ENodePlugResult::Ok:
                 diwne.showTooltipLabel("Connection possible", I3T::getColor(EColor::Nodes_ConnectionPossible));
-                if (bypassPinUnholdAction())
+                if (bypassPinUnholdAction(diwne))
                 {
                     WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
                     in->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
@@ -511,10 +511,14 @@ bool WorkspaceCoreInputPin::pinContent(DIWNE::Diwne &diwne)
 bool WorkspaceCoreInputPin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
     bool interaction_happen = false;
-    if (bypassPinHoveredAction(diwne) && bypassPinUnholdAction())
+    if (bypassPinHoveredAction(diwne)){
+    if (bypassPinHoveredAction(diwne) && bypassPinUnholdAction(diwne))
     {
         interaction_happen = true;
-        ImGui::TextUnformatted("Creating new node with type of this input pin");
+        WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
+        ww.m_workspaceWindowAction = WorkspaceWindowAction::CreateAndPlugTypeConstructor;
+        ww.m_linkCreatingPin = this;
+    }
     }
     return interaction_happen || DIWNE::Pin::processPin(diwne, inner_interaction_happen);
 }
@@ -556,7 +560,7 @@ void WorkspaceCoreLink::updateControlPointsOffsets(){
 
 bool WorkspaceCoreLink::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
-    if (bypassLinkHoveredAction())
+    if (bypassLinkHoveredAction(diwne))
     {
         m_color.Value.w = 1; /* \todo JH alpha to settings? */
         return true;

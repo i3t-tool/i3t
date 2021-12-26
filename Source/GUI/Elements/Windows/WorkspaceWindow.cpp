@@ -88,11 +88,41 @@ bool WorkspaceWindow::processSelectionRectangle()
     return false;
 }
 
+bool WorkspaceWindow::processCreateAndPlugTypeConstructor()
+{
+
+    if (m_workspaceWindowAction == WorkspaceWindowAction::CreateAndPlugTypeConstructor)
+    {
+        switch (m_linkCreatingPin->getType())
+        {
+            case EValueType::Matrix:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::MatrixToMatrix>>();
+                break;
+            case EValueType::Vec3:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::Vector3ToVector3>>();
+                break;
+            case EValueType::Vec4:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::Vector4ToVector4>>();
+                break;
+            case EValueType::Quat:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::QuatToQuat>>();
+                break;
+            case EValueType::Float:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::FloatToFloat>>();
+                break;
+        }
+        return true;
+    }
+    return false;
+}
+
 bool WorkspaceWindow::processDiwne()
 {
     bool interaction_happen = false;
 
     m_inner_interaction_happen |= processSelectionRectangle();
+
+    m_inner_interaction_happen |= processCreateAndPlugTypeConstructor();
 
     interaction_happen |= Diwne::processDiwne();
 

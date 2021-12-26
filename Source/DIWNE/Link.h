@@ -42,12 +42,12 @@ class Link
         bool processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual void linkPopupContent();
 
-        virtual bool bypassLinkHoveredAction();
-        virtual bool bypassLinkSelectAction();
-        virtual bool bypassLinkUnselectAction();
-        virtual bool bypassLinkHoldAction();
-        virtual bool bypassLinkUnholdAction();
-        virtual bool bypassLinkRaisePopupAction();
+        virtual bool bypassLinkHoveredAction(DIWNE::Diwne &diwne);
+        virtual bool bypassLinkSelectAction(DIWNE::Diwne &diwne);
+        virtual bool bypassLinkUnselectAction(DIWNE::Diwne &diwne);
+        virtual bool bypassLinkHoldAction(DIWNE::Diwne &diwne);
+        virtual bool bypassLinkUnholdAction(DIWNE::Diwne &diwne);
+        virtual bool bypassLinkRaisePopupAction(DIWNE::Diwne &diwne);
 
         virtual bool processLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 

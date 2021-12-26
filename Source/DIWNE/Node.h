@@ -51,12 +51,12 @@ class Node : public std::enable_shared_from_this<Node>
         virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne) {return false;};
         virtual bool processNodeOnWorkspace(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
 
-        virtual bool bypassNodeHoveredAction();
-        virtual bool bypassNodeSelectAction();
-        virtual bool bypassNodeUnselectAction();
-        virtual bool bypassNodeHoldAction();
-        virtual bool bypassNodeUnholdAction();
-        virtual bool bypassNodeRaisePopupAction();
+        virtual bool bypassNodeHoveredAction(DIWNE::Diwne &diwne);
+        virtual bool bypassNodeSelectAction(DIWNE::Diwne &diwne);
+        virtual bool bypassNodeUnselectAction(DIWNE::Diwne &diwne);
+        virtual bool bypassNodeHoldAction(DIWNE::Diwne &diwne);
+        virtual bool bypassNodeUnholdAction(DIWNE::Diwne &diwne);
+        virtual bool bypassNodeRaisePopupAction(DIWNE::Diwne &diwne);
 
         bool processNodeHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         bool processNodeSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
