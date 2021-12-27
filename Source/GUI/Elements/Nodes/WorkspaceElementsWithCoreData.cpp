@@ -578,7 +578,10 @@ bool WorkspaceCoreLink::linkContent(DIWNE::Diwne &diwne)
     if (m_selected)
     {
         m_selectedColor = col;
-        m_selectedColor.Value.w = 0.7;
+        m_selectedColor.Value.x += 20;
+        m_selectedColor.Value.y += 20;
+        m_selectedColor.Value.z += 20;
+        m_selectedColor.Value.w = 0.8;
         diwne.AddBezierCurveDiwne(getStartpoint(), getStartControlPoint(), getEndControlPoint(), getEndpoint(), m_selectedColor, I3T::getTheme().get(ESize::Links_Thickness)+I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder) );
     }
 

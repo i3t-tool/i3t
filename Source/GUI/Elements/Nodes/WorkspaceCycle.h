@@ -4,15 +4,22 @@
 
 #pragma once
 #include "WorkspaceElementsWithCoreData.h"
-class WorkspaceCycle : public WorkspaceNodeWithCoreData
+class WorkspaceCycle : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-  WorkspaceCycle();
+    //===-- Double dispatch ---------------------------------------------------===//
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<WorkspaceCycle>(shared_from_this()));
+	}
+	//===----------------------------------------------------------------------===//
+
+  WorkspaceCycle(Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(), bool drawPins=true);
 	bool isCycle();
 
-  bool drawDataFull(DIWNE::Diwne& diwne, int index);
+  bool middleContent(DIWNE::Diwne& diwne);
   void drawMenuLevelOfDetail();
 
-    int maxLenghtOfData(int index=0);
+    int maxLenghtOfData();
 };
 

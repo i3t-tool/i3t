@@ -4,10 +4,10 @@
 
 #include "WorkspaceCycle.h"
 
-WorkspaceCycle::WorkspaceCycle() :
-		WorkspaceNodeWithCoreData(Core::GraphManager::createCycle())
+WorkspaceCycle::WorkspaceCycle(Ptr<Core::NodeBase> nodebase/*=Core::GraphManager::createCycle()*/, bool drawPins/*=true*/)
+    :   WorkspaceNodeWithCoreDataWithPins(nodebase, drawPins)
 {
-	setDataItemsWidth();
+	setDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node and run settings data width in it */
 }
 
 bool WorkspaceCycle::isCycle() { return true; }
@@ -17,10 +17,16 @@ void WorkspaceCycle::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
 
-bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
+bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
 {
-	if (index == -1)
-	{ // -> draw middle
+
+    if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+    {
+        ImGui::TextUnformatted(m_middleLabel.c_str());
+        return false;
+    }
+	//if (index == -1)
+	//{ // -> draw middle
 		//BUTTONS
 		ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize);
 
@@ -63,15 +69,14 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		ImGui::SameLine();
 
 		// Multiplier = step for a single tick
-		//const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier(); // wrong
-		const float coreData		 = m_nodebase->as<Core::Cycle>()->getManualStep();
-		float				localData		 = coreData;
+		const float coreData_manStep		 = m_nodebase->as<Core::Cycle>()->getManualStep();
+		float				localData		 = coreData_manStep;
 		bool				valueChanged = false;
 
 		ImGui::PushItemWidth(2 * button_sz.x + 4 * I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
 
 
-		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), index),
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 0),
                                     localData, 1, valueChanged);
 
 		if (valueChanged)
@@ -104,21 +109,22 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		}
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
-	}
-	else if (index == 0)
-	{
-		const float coreData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
+	//}
+	//else if (index == 0)
+	//{
+		const float coreData_float = m_nodebase->as<Core::Cycle>()->getData().getFloat();
 		const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
 
-		bool	valueChanged = false;
-		float localData;
+//		bool	valueChanged = false;
+//		float localData;
+        valueChanged = false;
 
 		ImGui::PushItemWidth(getDataItemsWidth(diwne));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
-		localData = coreData;
-		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), index),
+		localData = coreData_float;
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 1),
                                     localData, coreMap[0], valueChanged);
 
 
@@ -132,7 +138,7 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 			m_nodebase->setValue(localData);
 			setDataItemsWidth();
 		}
-	}
+	//}
 	return false;
 }
 
@@ -251,9 +257,11 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 //	builder.EndInput();
 //}
 
-int WorkspaceCycle::maxLenghtOfData(int index)
+int WorkspaceCycle::maxLenghtOfData()
 {
     Ptr<Core::Cycle> nodebase = m_nodebase->as<Core::Cycle>();
-	float m = std::max({nodebase->getFrom(), nodebase->getTo(), nodebase->getManualStep(), nodebase->getMultiplier()});
-	return numberOfCharWithDecimalPoint(m, m_numberOfVisibleDecimal);
+	return std::max({numberOfCharWithDecimalPoint(nodebase->getFrom(), m_numberOfVisibleDecimal)
+                    , numberOfCharWithDecimalPoint(nodebase->getTo(), m_numberOfVisibleDecimal)
+                    , numberOfCharWithDecimalPoint(nodebase->getManualStep(), m_numberOfVisibleDecimal)
+                    , numberOfCharWithDecimalPoint(nodebase->getMultiplier(), m_numberOfVisibleDecimal)});
 }

@@ -109,8 +109,8 @@ void Theme::initClassicProperties()
 
 
 	// General unspecified node
-	set(EColor::NodeBg, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
-	set(EColor::NodeHeader, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
+	set(EColor::NodeBg, createColor(255, 200, 50, 255));
+	set(EColor::NodeHeader, createColor(255, 200, 0, 255));
 
 
 	// Folta operator color set
@@ -245,8 +245,8 @@ void Theme::initModernProperties()
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
 
     // General unspecified node
-	set(EColor::NodeBg, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
-	set(EColor::NodeHeader, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
+	set(EColor::NodeBg, createColor(255, 200, 50, 255));
+	set(EColor::NodeHeader, createColor(255, 200, 0, 255));
 
 
 	// Sequence

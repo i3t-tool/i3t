@@ -162,6 +162,9 @@ void WorkspaceWindow::BeginDiwne(const char* id)
         m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceScreen>());
         m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
 
+        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceCycle>());
+        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(400,200));
+
 
 //        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
 //        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
@@ -659,9 +662,9 @@ void WorkspaceWindow::popupBackgroundContent()
 				{
 				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ClampFloat>>();
 				}
-				if (ImGui::MenuItem("float cycle")) /* \todo JH ??? */
+				if (ImGui::MenuItem("float cycle"))
 				{
-				    // addNodeToPositionOfPopup<WorkspaceCycle>();
+				    addNodeToPositionOfPopup<WorkspaceCycle>();
 				}
 				if (ImGui::MenuItem("float * float"))
 				{
