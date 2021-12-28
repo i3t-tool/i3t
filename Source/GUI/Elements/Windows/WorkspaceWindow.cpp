@@ -13,7 +13,6 @@ WorkspaceWindow::WorkspaceWindow(bool show)
     :	IWindow(show)
     ,   Diwne(settingsDiwne, this)
     ,   m_wholeApplication(Application::get())
-    ,   ConstTouchTime(1.0f)
     ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
     ,   m_workspaceWindowAction(WorkspaceWindowAction::None)
     ,   m_workspaceWindowPreviousFrameAction(WorkspaceWindowAction::None)
@@ -111,6 +110,8 @@ bool WorkspaceWindow::processCreateAndPlugTypeConstructor()
                 addTypeConstructorNode<WorkspaceOperator<ENodeType::FloatToFloat>>();
                 break;
         }
+        /* \todo JH MH remove this after make addNodeToPosition() memeber of WorkspaceWindow -> and call it in addNodeToPosition() */
+        m_workspaceCoreNodes.back()->drawNodeDiwne(*this); /* \todo JH MH danger here - if in function addNodeToPosition() node will not be added to end -> than it will be still blink */
         return true;
     }
     return false;

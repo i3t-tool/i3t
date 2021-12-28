@@ -34,7 +34,8 @@ std::map<EValueType, EColor> WorkspacePinColorForeground = {
 std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
 		{WorkspaceLevelOfDetail::Full, "Full"},
 		{WorkspaceLevelOfDetail::SetValues, "Set values"},
-		{WorkspaceLevelOfDetail::Label, "Label"}};
+		{WorkspaceLevelOfDetail::Label, "Label"},
+		{WorkspaceLevelOfDetail::LightCycle, "Light cycle"}};
 
 WorkspaceNode::WorkspaceNode(DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
     :   DIWNE::Node(id)

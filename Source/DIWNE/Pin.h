@@ -19,9 +19,7 @@ class Pin
         bool drawPinDiwne(DIWNE::Diwne &diwne);
         virtual bool pinContent(DIWNE::Diwne &diwne) {return false;};
 
-
-        ImVec2 getCenterDiwne() const {return m_pinRectDiwne.GetCenter(); };
-        virtual ImVec2 getLinkConnectionPointDiwne() const {return getCenterDiwne(); };
+        virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
 
 
         virtual bool bypassPinHoveredAction(DIWNE::Diwne &diwne);
@@ -40,10 +38,18 @@ class Pin
         virtual bool processPinPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
         virtual void pinPopupContent();
 
+        virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
+
+        ImRect getPinRectDiwne() const {return m_pinRectDiwne;};
+
     protected:
         DIWNE::ID m_idDiwne;
         ImRect m_pinRectDiwne;
         bool m_isHeld;
+        ImVec2 m_connectionPointDiwne;
+
+        /* intended to use when Pin is drawn (use properties dependent on drawing) - setConnectionPointDiwne is "hard" setting */
+        virtual void updateConnectionPointDiwne(DIWNE::Diwne &diwne) {m_connectionPointDiwne = m_pinRectDiwne.GetCenter();}
 
     private:
 

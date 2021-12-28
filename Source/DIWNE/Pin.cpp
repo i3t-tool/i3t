@@ -6,6 +6,7 @@ namespace DIWNE
 Pin::Pin(DIWNE::ID id)
     : m_idDiwne(id)
     , m_pinRectDiwne(ImRect(0,0,1,1)) /* can not have zero size because of InvisibleButton */
+    , m_connectionPointDiwne(ImVec2(0,0))
     , m_isHeld(false)
     , m_popupID(fmt::format("pinPopup{}", id))
 { }
@@ -30,12 +31,15 @@ bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
     m_pinRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
     m_pinRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
+    updateConnectionPointDiwne(diwne);
+
     interaction_happen |= processPin(diwne, inner_interaction_happen);
 
 #ifdef DIWNE_DEBUG
     diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
     if (!inner_interaction_happen && ImGui::IsItemHovered()) {diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);}
 #endif // DIWNE_DEBUG
+
 
     return inner_interaction_happen || interaction_happen;
 }

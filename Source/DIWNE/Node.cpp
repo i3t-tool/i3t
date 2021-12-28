@@ -16,7 +16,7 @@ Node::Node(DIWNE::ID id)
     , m_selected(false)
     , m_translated(false)
     , m_isHeld(false)
-    , m_firstDraw(true)
+    , m_drawAnywhere(true)
     , m_nodeInteractionAllowed(false)
     , m_popupID(fmt::format("nodePopup{}", id))
 {}
@@ -41,9 +41,9 @@ bool Node::drawNodeDiwne(DIWNE::Diwne &diwne, bool drawHere/*= false*/)
         setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
     }
 
-    if ( m_firstDraw || getNodeRectDiwne().Overlaps( diwne.getWorkAreaDiwne() ) )
+    if ( m_drawAnywhere || getNodeRectDiwne().Overlaps( diwne.getWorkAreaDiwne() ) )
     {
-        if(m_firstDraw) m_firstDraw=false;
+        if(m_drawAnywhere) m_drawAnywhere=false;
         /* Set cursor to position of node */
         if (!drawHere) ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
 

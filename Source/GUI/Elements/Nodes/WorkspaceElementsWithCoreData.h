@@ -116,7 +116,6 @@ class WorkspaceCorePin : public WorkspacePin
 protected:
 	Core::Pin const&            m_pin;
 	WorkspaceNodeWithCoreData&  m_node;
-	ImVec2 m_connectionPoint;
 	ImRect m_iconRectDiwne;
 
 
@@ -153,11 +152,13 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
     public:
         WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
-        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2); };
+        void updateConnectionPointDiwne(DIWNE::Diwne &diwne) {m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2);};
         void setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou);
 
         void unplug();
         void plug(WorkspaceCoreOutputPin* ou);
+
+        bool drawPin(DIWNE::Diwne &diwne);
 
         /* DIWNE function */
         virtual bool pinContent(DIWNE::Diwne &diwne);
@@ -169,7 +170,7 @@ class WorkspaceCoreOutputPin : public WorkspaceCorePin
 protected:
     public:
         WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-        ImVec2 getLinkConnectionPointDiwne() const {return ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2); };
+        void updateConnectionPointDiwne(DIWNE::Diwne &diwne) {m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2);};
 };
 
 class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
@@ -230,7 +231,8 @@ class WorkspaceCoreOutputPinQuaternion : public WorkspaceCoreOutputPinWithData
 class WorkspaceCoreOutputPinPulse : public WorkspaceCoreOutputPinWithData
 {
     public:
-        WorkspaceCoreOutputPinPulse(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+        std::string m_buttonText;
+        WorkspaceCoreOutputPinPulse(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {m_buttonText = m_pin.getLabel();};
 
         bool pinContent(DIWNE::Diwne &diwne);
         int maxLengthOfData();

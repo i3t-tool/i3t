@@ -90,6 +90,8 @@ class Node : public std::enable_shared_from_this<Node>
 
         void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign = v;}; /* from 0==left to 1==right */
 
+        float m_drawAnywhere; /* you have to draw node anywhere for example in first frame after you created it -> for obtain its real size */
+
     protected:
 
         ImVec2 m_nodePositionDiwne; /* can be public */
@@ -120,9 +122,6 @@ class Node : public std::enable_shared_from_this<Node>
 
 
         float m_middleAlign;
-
-        float m_firstDraw; /* you have to draw node anywhere it is in first frame after you created it -> for obtain its real size */
-
 
 };
 

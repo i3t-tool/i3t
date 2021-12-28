@@ -42,7 +42,8 @@ enum class WorkspaceLevelOfDetail
 {
 	Full,
 	SetValues,
-	Label
+	Label,
+	LightCycle
 };
 
 enum FloatPopupMode

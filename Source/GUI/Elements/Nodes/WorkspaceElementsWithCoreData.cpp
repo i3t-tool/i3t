@@ -142,7 +142,6 @@ WorkspaceCorePin::WorkspaceCorePin( DIWNE::ID const id
     :   WorkspacePin(id, "")
     ,   m_pin(pin)
     ,   m_node(node)
-    ,   m_connectionPoint(ImVec2(0,0))
     ,   m_iconRectDiwne(ImRect(0,0,0,0))
 {}
 
@@ -440,8 +439,11 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::pinContent(DIWNE::Diwne &diwne)
 {
-    ImGui::Button(fmt::format("Pulse##n{}:p{}", getNode().getId(), m_idDiwne).c_str());
-    return ImGui::IsItemHovered() && ImGui::IsMouseReleased(0);
+    ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
+    ImGui::SameLine();
+
+    return WorkspaceCoreOutputPinWithData::pinContent(diwne);
+    //return ImGui::IsItemHovered() && ImGui::IsMouseReleased(0);
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
@@ -490,6 +492,17 @@ void WorkspaceCoreInputPin::unplug()
     m_link.setStartPin(nullptr);
 }
 
+
+bool WorkspaceCoreInputPin::drawPin(DIWNE::Diwne &diwne)
+{
+    bool inner_interaction_happen = drawPinDiwne(diwne);
+    if (isConnected())
+    {
+        inner_interaction_happen |= getLink().drawLinkDiwne(diwne);
+    }
+    return inner_interaction_happen;
+}
+
 void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
 {
     Core::Pin const* coreInput = &(getCorePin());
@@ -505,20 +518,20 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
 
 bool WorkspaceCoreInputPin::pinContent(DIWNE::Diwne &diwne)
 {
-    return WorkspaceCorePin::pinContent(diwne);
+    float inner_interaction_happen = WorkspaceCorePin::pinContent(diwne);
+    ImGui::SameLine(); ImGui::TextUnformatted(m_pin.getLabel());
+    return inner_interaction_happen;
 }
 
 bool WorkspaceCoreInputPin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
 {
     bool interaction_happen = false;
-    if (bypassPinHoveredAction(diwne)){
-    if (bypassPinHoveredAction(diwne) && bypassPinUnholdAction(diwne))
+    if (diwne.getDiwneAction() != DIWNE::DiwneAction::NewLink && diwne.getPreviousFrameDiwneAction() != DIWNE::DiwneAction::NewLink && bypassPinHoveredAction(diwne) && bypassPinUnholdAction(diwne))
     {
         interaction_happen = true;
         WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
         ww.m_workspaceWindowAction = WorkspaceWindowAction::CreateAndPlugTypeConstructor;
         ww.m_linkCreatingPin = this;
-    }
     }
     return interaction_happen || DIWNE::Pin::processPin(diwne, inner_interaction_happen);
 }
@@ -748,13 +761,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent(DIWNE::Diwne &diwne)
     bool inner_interaction_happen = false;
 
     for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawPinDiwne(diwne);
-        if (pin->isConnected())
-        {
-            Ptr<WorkspaceCoreInputPin> in = std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
-            WorkspaceCoreLink * lin = &(in->getLink());
-            inner_interaction_happen |= lin->drawLinkDiwne(diwne);
-        }
+        inner_interaction_happen |= pin->drawPin(diwne);
     }
     return inner_interaction_happen;
 }

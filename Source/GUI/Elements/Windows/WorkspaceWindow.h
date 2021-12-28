@@ -61,7 +61,6 @@ public:
 
 	Application& m_wholeApplication;
 
-//    DIWNE::Diwne m_diwne;
     void popupBackgroundContent();
 
     bool processDiwne();
@@ -77,7 +76,6 @@ public:
     WorkspaceCorePin *m_linkCreatingPin;
 
 	ImVec2 m_rightClickPosition = ImVec2(100,100);
-//	ImVec2 m_newNodePostion = ImVec2(100,100);
 
 	/**
 	 * \brief All WorkspaceNodes
@@ -99,13 +97,17 @@ public:
     }
 
 	/// \todo JH, MH - Needs to be accessed by scene loader, but it may be weird that the loader needs to have reference to the Workspace.
+	/// it is not weird - Workspace is main (only) owner of nodes -> whatever happens with nodes have to go through Workspace
+	/// ja to rikal na zacatku :-D ze ma byt Core uplne samsostatna jednotka... - teoreticky muze byt nekolik / zadny workspacu (pracovnich ploch) a kdyz bude funkce staticka, tak neni jasne, kam se ma vlastne node pridat - seznam nodu nemusi byt jen jeden...
 	template <class T>
-	static auto inline addNodeToPosition(ImVec2 const position)
+	static auto inline addNodeToPosition(ImVec2 const position) /* \todo JH MH - no static should be here */
+    //auto inline addNodeToPosition(ImVec2 const position)
 	{
 		auto node = std::make_shared<T>();
 
 		node->setNodePositionDiwne( position );
 		m_workspaceCoreNodes.push_back(node);
+		// \todo JH MH m_workspaceCoreNodes.back()->drawNodeDiwne(*this); /* draw node here for avoid blinking when automated creating and pluging node */
 
 		return node;
 	}
@@ -116,39 +118,9 @@ public:
         addNodeToPosition<T>(screen2diwne(getPopupPosition()));
     }
 
-	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
-
-	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
-
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
 
-//	std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
-//	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
-
-//	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
-//	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);
-//
-//	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
-
 	void manipulatorStartCheck3D();
-//
-//	void checkUserActions();
-//
-//	void checkQueryElements();
-//	void checkQueryElementsCreating();
-//	void checkQueryLinkCreate();
-//	void checkQueryNodeCreate();
-//	void checkQueryElementsDeleting();
-//	void checkQueryLinkDelete();
-//	void checkQueryNodeDelete();
-//
-////	void NodeDelete(ne::NodeId nodeId);
-//
-//	void selectAll();
-//	void invertSelection();
-//
-//	//void checkQueryContextMenus();
-//
 
     bool bypassDiwneSelectionRectangleAction();
     ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
@@ -159,12 +131,6 @@ public:
 	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftDragedOrHoldNodeToEnd();
-
-//	void showPopUpLabel(std::string label, ImColor color);
-//
-//	void UpdateTouchAllNodes();
-
-//	void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	void render();
 

@@ -14,50 +14,177 @@ bool WorkspaceCycle::isCycle() { return true; }
 
 void WorkspaceCycle::drawMenuLevelOfDetail()
 {
-	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::LightCycle, WorkspaceLevelOfDetail::Label});
+}
+
+bool WorkspaceCycle::buttonPlayPause(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("P/P", button_sz))
+    {
+        if (m_nodebase->as<Core::Cycle>()->isRunning())
+        {
+            m_nodebase->as<Core::Cycle>()->pause();
+        }
+        else
+        {
+            m_nodebase->as<Core::Cycle>()->play();
+        }
+        return true;
+    }
+    return false;
+}
+
+bool WorkspaceCycle::buttonStopAndReset(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("SaR", button_sz))
+    {
+        m_nodebase->as<Core::Cycle>()->stopAndReset();
+        return true;
+    }
+    return false;
+}
+
+bool WorkspaceCycle::buttonStepBack(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("SB", button_sz))
+    {
+        m_nodebase->as<Core::Cycle>()->stepBack();
+        return true;
+    }
+    return false;
+}
+
+bool WorkspaceCycle::buttonStepNext(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("SN", button_sz))
+    {
+        m_nodebase->as<Core::Cycle>()->stepNext();
+        return true;
+    }
+    return false;
+}
+
+bool WorkspaceCycle::leftContent(DIWNE::Diwne& diwne)
+{
+    bool inner_interaction_happen = false;
+
+    ImRect nodeRect; /* just declaration before switch */
+    ImVec2 pinConnectionPoint;
+
+    switch (m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Label:
+        nodeRect = getNodeRectDiwne();
+        pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceInputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+            if (pin->isConnected())
+            {
+                inner_interaction_happen |= pin->getLink().drawLinkDiwne(diwne);
+            }
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::LightCycle:
+
+
+        for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
+        {
+            m_workspaceInputs.at(i)->drawPin(diwne);
+        }
+
+        for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP, Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
+        {
+            Ptr<WorkspaceCoreInputPin> const pin = m_workspaceInputs.at(i);
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+            if (pin->isConnected())
+            {
+                inner_interaction_happen |= pin->getLink().drawLinkDiwne(diwne);
+            }
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::Full:
+        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent(diwne);
+        break;
+    }
+
+    return inner_interaction_happen;
+}
+
+bool WorkspaceCycle::rightContent(DIWNE::Diwne& diwne)
+{
+    bool inner_interaction_happen = false;
+
+    ImRect nodeRect; /* just declaration before switch */
+    ImVec2 pinConnectionPoint;
+
+    switch (m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Label:
+        nodeRect = getNodeRectDiwne();
+        pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceOutputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::LightCycle:
+
+        for (auto const i : {Core::I3T_CYCLE_OUT_VAL})
+        {
+            m_workspaceOutputs.at(i)->drawPinDiwne(diwne);
+        }
+
+        for (auto const i : {Core::I3T_CYCLE_OUT_PLAY, Core::I3T_CYCLE_OUT_PAUSE, Core::I3T_CYCLE_OUT_STOP, Core::I3T_CYCLE_OUT_PREV, Core::I3T_CYCLE_OUT_NEXT, Core::I3T_CYCLE_OUT_END})
+        {
+            m_workspaceOutputs.at(i)->setConnectionPointDiwne(pinConnectionPoint);
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::Full:
+        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::rightContent(diwne);
+        break;
+    }
+
+    return inner_interaction_happen;
 }
 
 bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
 {
+    // \todo Add icons to buttons
+    // "⯈/❙❙" "◼" "❙⯇" "⯈❙"
+    //std::u8string string = u8"⯈";
+    //std::u8string string = u8"ěščřžýáíé";
+    //std::string s(string.cbegin(), string.cend());
 
-    if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+
+    bool inner_interaction_happen = false;
+    ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoomDiwne();
+
+    switch (m_levelOfDetail)
     {
+    case WorkspaceLevelOfDetail::Label:
+
         ImGui::TextUnformatted(m_middleLabel.c_str());
-        return false;
-    }
-	//if (index == -1)
-	//{ // -> draw middle
-		//BUTTONS
-		ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize);
 
-		auto cycle = m_nodebase->as<Core::Cycle>();
+        break;
+    case WorkspaceLevelOfDetail::LightCycle:
 
-		// \todo Add icons to buttons
-		// "⯈/❙❙" "◼" "❙⯇" "⯈❙"
-		//std::u8string string = u8"⯈";
-		//std::u8string string = u8"ěščřžýáíé";
-		//std::string s(string.cbegin(), string.cend());
+        inner_interaction_happen |= buttonPlayPause(button_sz);
+        ImGui::SameLine(); inner_interaction_happen |= buttonStopAndReset(button_sz);
 
-		if (ImGui::Button("P/P", button_sz))
-		{
-			if (m_nodebase->as<Core::Cycle>()->isRunning())
-			{
-				m_nodebase->as<Core::Cycle>()->pause();
-			}
-			else
-			{
-				m_nodebase->as<Core::Cycle>()->play();
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("SaR", button_sz)) { m_nodebase->as<Core::Cycle>()->stopAndReset(); }
-		ImGui::SameLine();
-		if (ImGui::Button("SB", button_sz)) { m_nodebase->as<Core::Cycle>()->stepBack(); }
-		ImGui::SameLine();
-		if (ImGui::Button("SN", button_sz)) { m_nodebase->as<Core::Cycle>()->stepNext(); }
+        break;
+    case WorkspaceLevelOfDetail::Full:
 
+        inner_interaction_happen |= buttonPlayPause(button_sz); ImGui::SameLine();
+		inner_interaction_happen |= buttonStopAndReset(button_sz); ImGui::SameLine();
+		inner_interaction_happen |= buttonStepBack(button_sz); ImGui::SameLine();
+		inner_interaction_happen |= buttonStepNext(button_sz);
+
+		/* =================================== */
 		// Mode select
-		int mode = static_cast<int>(cycle->getMode());
+		int mode = static_cast<int>(m_nodebase->as<Core::Cycle>()->getMode());
 
 		//TODO is there a way to calculate how much space take radio button with text?
 
@@ -109,9 +236,7 @@ bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
 		}
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
-	//}
-	//else if (index == 0)
-	//{
+
 		const float coreData_float = m_nodebase->as<Core::Cycle>()->getData().getFloat();
 		const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
 
@@ -138,8 +263,10 @@ bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
 			m_nodebase->setValue(localData);
 			setDataItemsWidth();
 		}
-	//}
-	return false;
+
+        break;
+    }
+    return inner_interaction_happen;
 }
 
 //void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
