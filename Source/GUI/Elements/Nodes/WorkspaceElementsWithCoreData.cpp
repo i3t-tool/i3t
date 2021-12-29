@@ -812,6 +812,8 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 
     if (!inactive)
 	{
+	    if (diwne.bypassDiwneHoveredAction() && diwne.bypassDiwneRaisePopupAction()) ImGui::OpenPopup(label.c_str()); /* redesign opening popup as in nodes, pins etc...  */
+
 		inner_interaction_happen |= diwne.popupDiwneItem(label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
 		valueChanged |= valueChangedByPopup;
 	}
