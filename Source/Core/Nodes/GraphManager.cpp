@@ -52,8 +52,6 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 		leftNode->spreadSignal(fromIndex);
 	}
 
-	rightNode->setDataMap(&Transform::g_AllLocked);
-
 	return ENodePlugResult::Ok;
 }
 
@@ -72,16 +70,11 @@ ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>&
 void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
 	node.get()->unplugAll();
-	node->setDataMap(&Transform::g_Free);
-	// tryToDoSequenceProcedure(node);
 }
 
 void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
-	// tryToDoSequenceProcedure(node);
-	if (getAllInputNodes(node).empty())
-		node->setDataMap(node->m_initialMap);  // \todo???
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)

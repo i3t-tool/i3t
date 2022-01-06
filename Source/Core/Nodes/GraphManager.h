@@ -42,8 +42,6 @@ namespace Builder
 		constexpr bool shouldUnlockAllValues = isEditableOperatorType(T);
 		auto ret = std::make_shared<NodeImpl<T>>();
 		ret->init();
-		if constexpr (shouldUnlockAllValues)
-			ret->setDataMap(&Transform::g_Free);
 
 		ret->updateValues(0);
 		return ret;
@@ -71,7 +69,7 @@ namespace Builder
 	}
 	 */
 	template <ETransformType T, typename... Args>
-	Ptr<TransformImpl<T>> FORCE_INLINE createTransform(Args&&... args)
+	Ptr<Transformation> FORCE_INLINE createTransform(Args&&... args)
 	{
 		auto ret = std::make_shared<TransformImpl<T>>(std::forward<Args>(args)...);
 		ret->init();
@@ -314,7 +312,6 @@ inline CameraPtr GraphManager::createCamera()
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {
 	auto ret = std::make_shared<Core::Cycle>();
-	ret->setDataMap(&Transform::g_Free);
 	ret->init();
 	ret->updateValues(-1);
 	ret->stopAndReset();

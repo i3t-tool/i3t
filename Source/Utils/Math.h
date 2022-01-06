@@ -7,8 +7,7 @@
  * \author Michal Folta, CTU Prague
  */
 //---------------------------------------------------------------------------
-#ifndef _MATHUTILS_H_
-#define _MATHUTILS_H_
+#pragma once
 
 #include <random>
 #include <vector>
@@ -20,10 +19,11 @@
 
 namespace Math
 {
-static constexpr float epsilon = 0.000001f;
 
 FORCE_INLINE bool eq(float lhs, float rhs)
 {
+	static constexpr float epsilon = 0.000001f;
+
 	return abs(lhs - rhs) < epsilon;
 }
 
@@ -179,5 +179,3 @@ static void prefixSum(std::vector<int>& arr)
 	arr.push_back(tmp);
 }
 }; // namespace Math
-
-#endif

@@ -42,8 +42,8 @@ struct ValueSetResult
 		Err_LogicError
 	};
 
-	const Status			status;
-	const std::string message;
+	Status			status;
+	std::string message;
 
 	ValueSetResult() : status(Status::Ok), message("") {}
 
@@ -237,10 +237,10 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
+	[[nodiscard]] virtual ValueSetResult setValue(float val)            { return setValueEx(val); }
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q) { return setValueEx(q); }
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q)   { return setValueEx(q); }
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
 
 	/**
@@ -268,11 +268,12 @@ public:
 	}
 
 private:
+	/// Sets value of index 0
 	template <typename T>
 	ValueSetResult setValueEx(T&& val)
 	{
-		if (m_currentMap == &Transform::g_AllLocked)
-			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Values are locked."};
+		if (getIn(0).isPluggedIn())
+			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Cannot directly set value, input pin is connected."};
 
 		setInternalValue(val);
 
@@ -283,7 +284,7 @@ protected:
 	/**
 	 * Sets node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
-	 *    by compiler.
+	 *    by compiler (C++17).
 	 * \param value Value to set.
 	 * \param index Index of DataStore (if the node stores more than one value)
 	 */
@@ -313,13 +314,9 @@ protected:
 public:
 	virtual void reset() {}
 
-	void setDataMap(const Transform::DataMap* map);
-
-	const Transform::DataMap* getDataMap() { return m_currentMap; }
-
 	/// \todo MH will be removed.
-	const Transform::DataMap&																	 getDataMapRef() { return *m_currentMap; }
-	[[nodiscard]] const std::vector<const Transform::DataMap*> getValidDataMaps() { return m_operation->validDatamaps; };
+	static const Transform::DataMap* getDataMap();
+	static const Transform::DataMap& getDataMapRef();
 
 public:
 	//===-- Values updating functions. ----------------------------------------===//
@@ -403,9 +400,6 @@ protected:
 
 	/// Results of operations.
 	std::vector<DataStore> m_internalData;
-
-	const Transform::DataMap* m_initialMap{};
-	const Transform::DataMap* m_currentMap = &Transform::g_AllLocked;
 
 	/**
 	 * Owner of the node, used in complex type of nodes, such as sequence or camera.

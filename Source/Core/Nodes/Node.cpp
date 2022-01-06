@@ -103,15 +103,6 @@ bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
 	return false;
 }
 
-void Node::setDataMap(const Transform::DataMap* map)
-{
-	// PerspectiveProj;
-	auto& validMaps = getValidDataMaps();
-	auto	it = std::find_if(validMaps.begin(), validMaps.end(), [&](const Transform::DataMap* m) { return m == map; });
-
-	if (it != validMaps.end()) m_currentMap = map;
-}
-
 void Node::spreadSignal()
 {
 	for (auto& operatorOutput : getOutputPinsRef())
@@ -263,4 +254,20 @@ void Node::unplugOutput(size_t index)
 	for (const auto& otherPin : pin.m_outputs) otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
+}
+
+const Transform::DataMap* Node::getDataMap()
+{
+	static std::array<const unsigned char, 16> mapData = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	static Transform::DataMap map(mapData);
+
+	return &map;
+}
+
+const Transform::DataMap& Node::getDataMapRef()
+{
+	static std::array<const unsigned char, 16> mapData = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	static Transform::DataMap map(mapData);
+
+	return map;
 }

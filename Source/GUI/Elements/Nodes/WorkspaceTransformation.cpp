@@ -83,6 +83,7 @@ void WorkspaceTransformation::nodePopupContent()
 
 void WorkspaceTransformation::drawMenuSetDataMap()
 {
+	/*
 	if (ImGui::BeginMenu("Set datamap"))
 	{
 		for (Core::Transform::DataMap const* datamap : m_nodebase->getValidDataMaps())
@@ -92,6 +93,7 @@ void WorkspaceTransformation::drawMenuSetDataMap()
 
 		ImGui::EndMenu();
 	}
+	 */
 }
 
 void WorkspaceTransformation::drawMenuLevelOfDetail()

@@ -36,13 +36,6 @@ static const std::vector<std::string> matrixIndexNames()
 	return names;
 }
 
-namespace Core
-{
-using ValidDataMaps = std::vector<const Transform::DataMap*>;
-
-static const ValidDataMaps defaultDataMaps = {&Transform::g_AllLocked, &Transform::g_Free};
-} // namespace Core
-
 using PinGroup = std::vector<EValueType>;
 
 struct Operation
@@ -59,7 +52,6 @@ struct Operation
 	const std::vector<std::string> defaultInputNames = DEFAULT_NAMES; // if the names are not the names of the OpValueType
 	const std::vector<std::string> defaultOutputNames =
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
-	const std::vector<const Core::Transform::DataMap*> validDatamaps = {&Core::Transform::g_AllLocked};
 
 	Operation(const std::string& keyWord, const std::string& defaultLabel)
 			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(0), numberOfOutputs(0)
@@ -76,21 +68,11 @@ struct Operation
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
-						const std::vector<std::string>&											defaultInputNames,
-						const std::vector<const Core::Transform::DataMap*>& validDatamaps) :
+						const std::vector<std::string>&											defaultInputNames) :
 			keyWord(keyWord),
 			defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
 			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
-			defaultInputNames(defaultInputNames), validDatamaps(validDatamaps)
-	{}
-
-	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
-						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
-						const std::vector<EValueType>&											outputTypes,
-						const std::vector<const Core::Transform::DataMap*>& validDatamaps) :
-			keyWord(keyWord),
-			defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
-			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), validDatamaps(validDatamaps)
+			defaultInputNames(defaultInputNames)
 	{}
 
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
@@ -105,16 +87,6 @@ struct Operation
 
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
-						const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
-						const std::vector<std::string>& defaultInputNames) :
-			keyWord(keyWord),
-			defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
-			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
-			defaultInputNames(defaultInputNames)
-	{}
-
-	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
-						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes, const std::string& defaultTagText) :
 			keyWord(keyWord),
 			defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
@@ -122,16 +94,9 @@ struct Operation
 	{}
 
 	Operation(const std::string& keyWord, const std::string& defaultLabel,
-						const std::vector<const Core::Transform::DataMap*>& validDatamaps) :
+						const std::vector<std::string>&	defaultInputNames) :
 			keyWord(keyWord),
-			defaultLabel(defaultLabel), validDatamaps(validDatamaps), numberOfInputs(0), numberOfOutputs(0)
-	{}
-
-	Operation(const std::string& keyWord, const std::string& defaultLabel,
-						const std::vector<std::string>&											defaultInputNames,
-						const std::vector<const Core::Transform::DataMap*>& validDatamaps) :
-			keyWord(keyWord),
-			defaultLabel(defaultLabel), defaultInputNames(defaultInputNames), validDatamaps(validDatamaps), numberOfInputs(0),
+			defaultLabel(defaultLabel), defaultInputNames(defaultInputNames), numberOfInputs(0),
 			numberOfOutputs(0)
 	{}
 };
@@ -421,11 +386,11 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::NormalizeQuat), "normalize quat", 1, quatInput, 1, quatInput},									 // normalize quat
 
 		// Value nodes.
-		{n(ENodeType::FloatToFloat), "float", 1, floatInput, 1, floatInput, Core::defaultDataMaps},
-		{n(ENodeType::Vector3ToVector3), "vec3", 1, vector3Input, 1, vector3Input, Core::defaultDataMaps},
-		{n(ENodeType::Vector4ToVector4), "vec4", 1, vectorInput, 1, vectorInput, Core::defaultDataMaps},
-		{n(ENodeType::MatrixToMatrix), "mat", 1, matrixInput, 1, matrixInput, Core::defaultDataMaps},
-		{n(ENodeType::QuatToQuat), "quat", 1, {EValueType::Quat}, 1, {EValueType::Quat}, Core::defaultDataMaps},
+		{n(ENodeType::FloatToFloat), "float", 1, floatInput, 1, floatInput},
+		{n(ENodeType::Vector3ToVector3), "vec3", 1, vector3Input, 1, vector3Input},
+		{n(ENodeType::Vector4ToVector4), "vec4", 1, vectorInput, 1, vectorInput},
+		{n(ENodeType::MatrixToMatrix), "mat", 1, matrixInput, 1, matrixInput},
+		{n(ENodeType::QuatToQuat), "quat", 1, {EValueType::Quat}, 1, {EValueType::Quat}},
 
 		{n(ENodeType::Model), "model", 1, matrixMulInput, 0, {}},
 
@@ -449,7 +414,7 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG,
 		 lookAtInputNames}, // lookAt
 
-		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}, Core::defaultDataMaps},
+		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}},
 		{n(ENodeType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};
 
 namespace Core
@@ -497,51 +462,54 @@ struct TransformOperation
 	std::map<std::string, EValueType> defaultValuesTypes;
 };
 
+constexpr TransformMask g_AllLocked   = 0b0000000000000000;
+constexpr TransformMask g_AllUnlocked = 0b1111111111111111;
+
 /// All entries must be in the same order as ETransformType enum entries.
 static const std::vector<TransformOperation> g_transforms = {
 		{
 				{n(ETransformType::Free), "free"},
-				0b1111111111111111,
+				g_AllUnlocked,
 				{}
 		},
 		{
 				{n(ETransformType::Translation), "translate"},
-				0b1111111111111111,
+				0b0001000100010000,
 		 		{{"translation", EValueType::Vec3}}
 		},
 		{
 				{n(ETransformType::EulerX), "eulerAngleX"},
-				0b1111111111111111,
+				0b0000011001100000,
 				{{"rotation", EValueType::Float}}
 		},
 		{
 				{n(ETransformType::EulerY), "eulerAngleY"},
-				0b1111111111111111,
+				0b101000001010000,
 				{{"rotation", EValueType::Float}}
 		},
 		{
 				{n(ETransformType::EulerZ), "eulerAngleZ"},
-				0b1111111111111111,
+				0b1100110000000000,
 				{{"rotation", EValueType::Float}}
 		},
 		{
 				{n(ETransformType::Scale), "scale"},
-				0b1111111111111111,
+				0b1000010000100000,
 				{{"scale", EValueType::Vec3}}
 		},
 		{
 				{n(ETransformType::AxisAngle), "rotate"},
-				0b1111111111111111,
+				g_AllLocked,
 				{{"axis", EValueType::Vec3}, {"rotation", EValueType::Float}}
 		},
 		{
 				{n(ETransformType::Quat), "quat"},
-				0b1111111111111111,
+				g_AllLocked,
 				{{"quat", EValueType::Quat}}
 		},
 		{
 				{n(ETransformType::Ortho), "ortho"},
-				0b1111111111111111,
+				0b1001010100110000,
 				{
 						{"left", EValueType::Float},
 						{"right", EValueType::Float},
@@ -553,7 +521,7 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Perspective), "perspective"},
-				0b1111111111111111,
+				0b1000010000110010,
 				{
 						{"fov", EValueType::Float},
 						{"aspect", EValueType::Float},
@@ -563,19 +531,19 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Frustum), "frustum"},
-				0b1111111111111111,
+				0b1010011000110010,
 				{
-						{"left", EValueType::Float},
-						{"right", EValueType::Float},
+						{"left",   EValueType::Float},
+						{"right",  EValueType::Float},
 						{"bottom", EValueType::Float},
-						{"top", EValueType::Float},
-						{"near", EValueType::Float},
-						{"far", EValueType::Float}
+						{"top",    EValueType::Float},
+						{"near",   EValueType::Float},
+						{"far",    EValueType::Float}
 				}
 		},
 		{
 				{n(ETransformType::LookAt), "lookAt"},
-				0b1111111111111111,
+				g_AllLocked,
 				{
 						{"eye", EValueType::Vec3},
 						{"center", EValueType::Vec3},
@@ -593,25 +561,11 @@ FORCE_INLINE const TransformOperation& getTransformOperation(ETransformType type
 
 FORCE_INLINE const Operation* getTransformProps(ETransformType type)
 {
-	/*
-	for (const auto& transformProps : g_transforms)
-	{
-		if (transformProps.first.keyWord == n(type)) { return &transformProps.first; }
-	}
-	return nullptr;
-	 */
 	return &getTransformOperation(type).operation;
 }
 
 FORCE_INLINE const std::map<std::string, EValueType>& getTransformDefaults(const std::string& keyWord)
 {
-	/*
-	for (const auto& transformProps : g_transforms)
-	{
-		if (transformProps.first.keyWord == keyWord) { return transformProps.second; }
-	}
-	return noDefaults;
-	 	 */
 	static std::map<std::string, EValueType> noDefaults;
 
 	auto type = magic_enum::enum_cast<ETransformType>(keyWord);
@@ -622,19 +576,17 @@ FORCE_INLINE const std::map<std::string, EValueType>& getTransformDefaults(const
 
 FORCE_INLINE const TransformMask& getTransformMap(const std::string& keyWord)
 {
-	/*
-	for (const auto& transformProps : g_transforms)
-	{
-		if (transformProps.first.keyWord == keyWord) { return transformProps.second; }
-	}
-	return noDefaults;
-	 	 */
 	static TransformMask noDefaults = 0b1111111111111111;
 
 	auto type = magic_enum::enum_cast<ETransformType>(keyWord);
 	if (type.has_value())
 		return getTransformOperation(*type).mask;
 	return noDefaults;
+}
+
+FORCE_INLINE const TransformMask& getTransformMap(ETransformType transformType)
+{
+	return getTransformOperation(transformType).mask;
 }
 
 FORCE_INLINE const auto& getTransformDefaults(ETransformType type)

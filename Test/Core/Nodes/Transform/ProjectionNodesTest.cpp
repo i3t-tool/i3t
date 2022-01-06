@@ -16,38 +16,6 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 	EXPECT_EQ(expectedMat, resultMat);
 }
 
-TEST(OrthoProjTest, GettersAndSettersShouldBeOk)
-{
-	auto ortho = Builder::createTransform<ETransformType::Ortho>();
-
-	float left = generateFloat();
-	float right = generateFloat();
-	float bottom = generateFloat();
-	float top = generateFloat();
-	float near = generateFloat();
-	float far = generateFloat();
-
-	ortho->setLeft(left);
-	EXPECT_EQ(left, ortho->getLeft());
-
-	ortho->setRight(right);
-	EXPECT_EQ(right, ortho->getRight());
-
-	ortho->setBottom(bottom);
-	EXPECT_EQ(bottom, ortho->getBottom());
-
-	ortho->setTop(top);
-	EXPECT_EQ(top, ortho->getTop());
-
-	ortho->setNear(near);
-	EXPECT_EQ(near, ortho->getNear());
-
-	ortho->setFar(far);
-	EXPECT_EQ(far, ortho->getFar());
-
-	EXPECT_EQ(glm::ortho(left, right, bottom, top, near, far), ortho->getData().getMat4());
-}
-
 //--- Perspective -------------------------------------------------------------
 
 TEST(PerspectiveProjTest, ShouldBeOk)
@@ -62,7 +30,8 @@ TEST(PerspectiveProjTest, ShouldBeOk)
 
 TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 {
-	auto perspective = Builder::createTransform<ETransformType::Perspective>();
+	auto perspective = Builder::createTransform<ETransformType::Perspective>()
+	    ->as<TransformImpl<ETransformType::Perspective>>();
 
 	float FOW = generateFloat();
 	float aspect = generateFloat();
@@ -97,7 +66,8 @@ TEST(FrustumTest, ShouldBeOk)
 
 TEST(FrustumTest, GettersAndSettersShouldBeOk)
 {
-	auto frustum = Builder::createTransform<ETransformType::Frustum>();
+	auto frustum = Builder::createTransform<ETransformType::Frustum>()
+	    ->as<TransformImpl<ETransformType::Frustum>>();
 
 	float left = generateFloat();
 	float right = generateFloat();
@@ -142,7 +112,8 @@ TEST(LookAtTest, ShouldBeOk)
 
 TEST(LookAtTest, GettersAndSettersShouldBeOk)
 {
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
+	auto lookAt = Builder::createTransform<ETransformType::LookAt>()
+	    ->as<TransformImpl<ETransformType::LookAt>>();
 
 	auto eye = generateVec3();
 	lookAt->setEye(eye);

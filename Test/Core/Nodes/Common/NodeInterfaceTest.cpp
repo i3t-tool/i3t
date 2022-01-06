@@ -99,6 +99,7 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 	EXPECT_EQ(3, GraphManager::getOutputNodes(root, 0).size());
 }
 
+/*
 TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 {
 	auto scale = Core::Builder::createTransform<ETransformType::Scale>();
@@ -107,6 +108,7 @@ TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 
 	EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
 }
+ */
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
 {

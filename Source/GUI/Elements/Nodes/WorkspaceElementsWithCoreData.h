@@ -20,9 +20,6 @@ class WorkspaceCorePin;
 class WorkspaceLink;
 class WorkspaceWindow;
 
-extern std::map<Core::Transform::DataMap const*, std::string> WorkspaceDatamapName;
-extern std::vector<Core::Transform::DataMap const*> WorkspaceDatamapMenuList;
-
 typedef std::vector<Core::Pin>::const_iterator corePinIter;
 typedef std::vector<Ptr<WorkspaceCorePin>>::const_iterator workspacePinIter;
 typedef std::vector<Ptr<WorkspaceLink>>::const_iterator workspaceLinkIter;

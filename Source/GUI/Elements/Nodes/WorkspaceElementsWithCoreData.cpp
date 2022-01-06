@@ -4,7 +4,8 @@
 
 
 
-/// \todo Will be removed.
+/// \todo Will be removed, Core::Transform maps are not more accessible.
+/*
 std::map<Core::Transform::DataMap const*, std::string> WorkspaceDatamapName = {
 		{&Core::Transform::g_Free, "Free"},
 		{&Core::Transform::g_Scale, "Scale"},
@@ -24,6 +25,7 @@ std::vector<Core::Transform::DataMap const*> WorkspaceDatamapMenuList = {
 		&Core::Transform::g_EulerX, &Core::Transform::g_EulerY, &Core::Transform::g_EulerZ, &Core::Transform::g_Translate,
 		&Core::Transform::g_AllLocked, &Core::Transform::g_Ortho, &Core::Transform::g_Frustum,
 		&Core::Transform::g_Perspective};
+*/
 // endtodo
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase)
@@ -107,11 +109,14 @@ float WorkspaceNodeWithCoreData::setDataItemsWidth()
 
 Core::Transform::DataMap const* WorkspaceNodeWithCoreData::setDataMap(Core::Transform::DataMap const* mapToSet)
 {
-	m_nodebase->setDataMap(mapToSet);
+	// m_nodebase->setDataMap(mapToSet);
 	return getDataMap();
 }
 
-Core::Transform::DataMap const* WorkspaceNodeWithCoreData::getDataMap() { return m_nodebase->getDataMap(); }
+Core::Transform::DataMap const* WorkspaceNodeWithCoreData::getDataMap()
+{
+	return m_nodebase->getDataMap();
+}
 
 WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail)
 {

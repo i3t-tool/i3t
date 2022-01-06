@@ -9,7 +9,8 @@ using namespace Core;
 
 TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 {
-	auto translationNode = Builder::createTransform<ETransformType::Translation>();
+	auto translationNode = Builder::createTransform<ETransformType::Translation>()
+	    ->as<TransformImpl<ETransformType::Translation>>();
 
 	// Invalid coordinates.
 	auto result = translationNode->setValue(generateFloat(), {0, 3});
@@ -47,7 +48,8 @@ TEST(TranslationTest, Unlocked_InvalidValues_InvalidState)
 
 TEST(TranslationTest, GettersAndSetterShouldBeOk)
 {
-  auto translation = Builder::createTransform<ETransformType::Translation>();
+  auto translation = Builder::createTransform<ETransformType::Translation>()
+			->as<TransformImpl<ETransformType::Translation>>();
 
 	auto vec = generateVec3();
 

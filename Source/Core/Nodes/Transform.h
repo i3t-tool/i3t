@@ -37,13 +37,19 @@ enum class ETransformState
 	Unknown
 };
 
+/// b1, b2 - b1 is editable bit, b2 is synergies bit
 enum class EValueState
 {
-	FreeEditable,
-	EditableSyn,
-	Locked,
-	LockedSyn,
+	Editable    = 0x0002,  ///< 10
+	EditableSyn = 0x0003,  ///< 11
+	Locked      = 0x0000,  ///< 00
+	LockedSyn   = 0x0001,  ///< 01
 };
+
+inline bool canEditValue(EValueState valueState)
+{
+	return valueState == EValueState::Editable || valueState == EValueState::EditableSyn;
+}
 
 class Transformation : public Node
 {
@@ -54,19 +60,30 @@ class Transformation : public Node
 	int m_currentIndex = -1;
 
 public:
-	bool isInSequence() { return m_currentSequence != nullptr; }
-	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
-	int getCurrentIndex() const { return m_currentIndex; }
+	bool          isInSequence()          { return m_currentSequence != nullptr; }
+	Ptr<NodeBase> getCurrentSequence()    { return m_currentSequence; }
+	int           getCurrentIndex() const { return m_currentIndex; }
 
 	EValueState getValueState(glm::ivec2 coords);
 
+	// ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	// virtual ValueSetResult onSetValue(float val, glm::ivec2 coords) {}
+
 	virtual ETransformState isValid() const { return ETransformState::Unknown; }
 	bool isLocked() const;
-	virtual void lock();
-	virtual void unlock();
+	void lock();
+	void unlock();
 	bool hasSynergies() const { return m_hasEnabledSynergies; }
-	void disableSynergies() { m_hasEnabledSynergies = false; }
-	void enableSynergies() { m_hasEnabledSynergies = true; }
+	void disableSynergies()   { m_hasEnabledSynergies = false; }
+	void enableSynergies()    { m_hasEnabledSynergies = true; }
+
+	void resetModifiers()
+	{
+		m_isLocked            = true;
+		m_hasEnabledSynergies = true;
+	}
+
+	ValueSetResult setValue(const glm::mat4& mat) override;
 
 protected:
 	using ValueMap = std::map<std::string, std::string>;
@@ -77,7 +94,7 @@ public:
 	 * \return A map of valueName and value pairs.
 	 */
 	virtual ValueMap getDefaultValues() { return ValueMap(); }
-	virtual void setDefaultValues() {};
+	virtual void     setDefaultValues() {};
 
 protected:
 	explicit Transformation(const Operation* transformType) : NodeBase(transformType) {}
@@ -88,22 +105,22 @@ public:
 	void nullSequence()
 	{
 		m_currentSequence = nullptr;
-		m_currentIndex = -1;
+		m_currentIndex    = -1;
 	}
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
 	{
 		m_currentSequence = s;
-		m_currentIndex = index;
+		m_currentIndex    = index;
 	}
 
 	void setSequence(Ptr<NodeBase>& s, int index)
 	{
 		m_currentSequence = s;
-		m_currentIndex = index;
+		m_currentIndex    = index;
 	}
 
-private:
+protected:
 	bool m_hasEnabledSynergies = true;
 	bool m_isLocked            = true;
 };
@@ -113,7 +130,6 @@ using TransformPtr = Ptr<Transformation>;
 template <ETransformType T>
 class TransformImpl : public Transformation
 {
-
 };
 
 
@@ -123,18 +139,9 @@ class TransformImpl<ETransformType::Free> : public Transformation
 public:
 	TransformImpl() : Transformation(getTransformProps(ETransformType::Free))
 	{
-		m_currentMap = &Transform::g_Free;
-		m_initialMap = &Transform::g_Free;
 	}
 
 	ETransformState isValid() const override { return ETransformState::Valid; }
-
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
-	{
-		setInternalValue(mat);
-		notifySequence();
-		return ValueSetResult{};
-	}
 
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
 	{
@@ -153,21 +160,17 @@ class TransformImpl<ETransformType::Scale> : public Transformation
 	glm::vec3 m_initialScale;
 
 public:
-	explicit TransformImpl(glm::vec3 initialScale = glm::vec3(1.0f), const Transform::DataMap& map = Transform::g_Scale)
+	explicit TransformImpl(glm::vec3 initialScale = glm::vec3(1.0f))
 			: Transformation(getTransformProps(ETransformType::Scale)), m_initialScale(initialScale)
 	{
-		m_initialMap = &map;
-		m_currentMap = &map;
 		enableSynergies();
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void reset() override;
@@ -198,16 +201,13 @@ class TransformImpl<ETransformType::EulerX> : public Transformation
 	float m_currentRot;
 
 public:
-	explicit TransformImpl(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
+	explicit TransformImpl(float initialRot = 0.0f)
 			: Transformation(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot), m_currentRot(initialRot)
 	{
-		m_initialMap = &map;
-		m_currentMap = &map;
 		enableSynergies();
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
@@ -217,7 +217,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void reset() override;
@@ -238,16 +237,13 @@ class TransformImpl<ETransformType::EulerY> : public Transformation
 	float m_currentRot;
 
 public:
-	explicit TransformImpl(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
+	explicit TransformImpl(float initialRot = 0.0f)
 			: Transformation(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot), m_currentRot(initialRot)
 	{
-		m_initialMap = &map;
-		m_currentMap = &map;
 		enableSynergies();
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
@@ -257,7 +253,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void reset() override;
@@ -278,16 +273,13 @@ class TransformImpl<ETransformType::EulerZ> : public Transformation
 	float m_currentRot;
 
 public:
-	explicit TransformImpl(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)
+	explicit TransformImpl(float initialRot = 0.0f)
 			: Transformation(getTransformProps(ETransformType::EulerZ)), m_initialRot(initialRot)
 	{
-		m_initialMap = &map;
-		m_currentMap = &map;
 		enableSynergies();
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
@@ -297,7 +289,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void reset() override;
@@ -310,16 +301,12 @@ class TransformImpl<ETransformType::Translation> : public Transformation
 	glm::vec3 m_initialTrans;
 
 public:
-	explicit TransformImpl(glm::vec3 initialTrans = glm::vec3(0.0f),
-	                     const Transform::DataMap& map = Transform::g_Translate)
+	explicit TransformImpl(glm::vec3 initialTrans = glm::vec3(0.0f))
 			: Transformation(getTransformProps(ETransformType::Translation)), m_initialTrans(initialTrans)
 	{
-		m_initialMap = &map;
-		m_currentMap = &map;
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
@@ -334,7 +321,6 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void reset() override;
@@ -345,22 +331,20 @@ public:
 template <>
 class TransformImpl<ETransformType::AxisAngle> : public Transformation
 {
-	float m_initialRads;
+	float     m_initialRads;
 	glm::vec3 m_initialAxis;
 
 public:
 	explicit TransformImpl(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
 			: Transformation(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
 	{
-		m_initialMap = &Transform::g_AllLocked;
-		m_currentMap = m_initialMap;
 	}
 
 	ETransformState isValid() const override;
 
 	ValueMap getDefaultValues() override;
 
-	float getRot() const { return m_initialRads; };
+	float getRot() const             { return m_initialRads; };
 	const glm::vec3& getAxis() const { return m_initialAxis; };
 
 	ValueSetResult setRot(float rads);
@@ -384,7 +368,7 @@ public:
 			: Transformation(getTransformProps(ETransformType::Quat))
 	{
 		m_initialQuat = q;
-		m_normalized = glm::normalize(q);
+		m_normalized  = glm::normalize(q);
 	}
 
 	ETransformState isValid() const override;
@@ -416,21 +400,18 @@ public:
 			: Transformation(getTransformProps(ETransformType::Ortho)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
 	{
-		m_initialMap = &Transform::g_Ortho;
-		m_currentMap = m_initialMap;
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
-	float getLeft() const { return m_left; }
-	float getRight() const { return m_right; }
+	float getLeft() const   { return m_left; }
+	float getRight() const  { return m_right; }
 	float getBottom() const { return m_bottom; }
-	float getTop() const { return m_top; }
-	float getNear() const { return m_near; }
-	float getFar() const { return m_far; }
+	float getTop() const    { return m_top; }
+	float getNear() const   { return m_near; }
+	float getFar() const    { return m_far; }
 
 	ValueSetResult setLeft(float val);
 	ValueSetResult setRight(float val);
@@ -459,20 +440,16 @@ public:
 			: Transformation(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
 				m_initialZNear(zNear), m_initialZFar(zFar)
 	{
-		m_initialMap = &Transform::g_Perspective;
-		m_currentMap = &Transform::g_Perspective;
-		m_currentMap = m_initialMap;
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
-	float getFOW() const { return m_initialFOW; }
+	float getFOW() const    { return m_initialFOW; }
 	float getAspect() const { return m_initialAspect; }
-	float getZNear() const { return m_initialZNear; }
-	float getZFar() const { return m_initialZFar; }
+	float getZNear() const  { return m_initialZNear; }
+	float getZFar() const   { return m_initialZFar; }
 
 	ValueSetResult setFOW(float v);
 	ValueSetResult setAspect(float v);
@@ -501,12 +478,9 @@ public:
 			: Transformation(getTransformProps(ETransformType::Frustum)), m_left(left), m_right(right), m_bottom(bottom),
 				m_top(top), m_near(near), m_far(far)
 	{
-		m_initialMap = &Transform::g_Frustum;
-		m_currentMap = m_initialMap;
 	}
 
 	ETransformState isValid() const override;
-	void lock() override;
 
 	ValueMap getDefaultValues() override;
 
@@ -546,8 +520,6 @@ public:
 			: Transformation(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
 				m_initialUp(up)
 	{
-		m_initialMap = &Transform::g_AllLocked;
-		m_currentMap = m_initialMap;
 	}
 
 	ETransformState isValid() const override;

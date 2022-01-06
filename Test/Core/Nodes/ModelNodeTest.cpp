@@ -13,7 +13,7 @@ TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 	// auto sequence = arrangeSequence();
 	auto sequence = Builder::createSequence();
 	auto transform = Builder::createTransform<ETransformType::Translation>();
-	transform->setValue(generateVec3());
+	transform->as<Node>()->setValue(generateVec3());
 
 	sequence->addMatrix(transform);
 

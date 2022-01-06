@@ -322,7 +322,8 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 
 TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 {
-	auto axisAngle = Builder::createTransform<ETransformType::AxisAngle>();
+	auto axisAngle = Builder::createTransform<ETransformType::AxisAngle>()
+	    ->as<TransformImpl<ETransformType::AxisAngle>>();
 
 	auto rads = generateFloat();
 	auto axis = generateVec3();
@@ -344,7 +345,8 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 
 TEST(QuatRotTest, RotShouldBeValid)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()
+	    ->as<TransformImpl<ETransformType::Quat>>();
 
 	auto vec = generateVec3();
 	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z);
@@ -356,7 +358,8 @@ TEST(QuatRotTest, RotShouldBeValid)
 
 TEST(QuatRotTest, NodeValueShouldBeNormalized)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()
+	    ->as<TransformImpl<ETransformType::Quat>>();
 
   auto vec = generateVec4();
   auto quat = glm::quat(vec.x, vec.y, vec.z, vec.w);

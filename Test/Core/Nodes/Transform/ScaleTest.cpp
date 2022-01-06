@@ -63,7 +63,8 @@ TEST(ScaleTest, NonUniform_SetFreeTransform_NotPermitted)
 TEST(ScaleTest, Uniform_WithNonUniformValues_IsInvalid)
 {
 	// Create non-uniform scale.
-	auto scale = Builder::createTransform<ETransformType::Scale>();
+	auto scale = Builder::createTransform<ETransformType::Scale>()
+	    ->as<TransformImpl<ETransformType::Scale>>();
 	scale->disableSynergies();
 
 	setValue_expectOk(scale, generateVec3());
@@ -90,11 +91,10 @@ TEST(ScaleTest, ResetToInitialValues)
 
 	// Create non-uniform scale
 	auto scaleNode = Core::Builder::createTransform<ETransformType::Scale>(scale);
-	EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Scale);
+	EXPECT_TRUE(scaleNode->hasSynergies());
 
 	// Set free transformation node.
 	scaleNode->unlock();
-	EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Free);
 
 	glm::mat4 mat(1.0f);
 	mat[1][3] = 165.0f;
@@ -108,7 +108,7 @@ TEST(ScaleTest, ResetToInitialValues)
 	{
 		// Reset to initial values and state.
 		scaleNode->reset();
-		EXPECT_EQ(scaleNode->getDataMap(), &Transform::g_Scale);
+		EXPECT_TRUE(scaleNode->hasSynergies());
 
 		auto expected = glm::scale(scale);
 		auto actual = scaleNode->getData().getMat4();
@@ -123,8 +123,8 @@ TEST(ScaleTest, UniformScaleSynergies)
 	auto scale = glm::vec3(scaleValue);
 	auto scaleMat = glm::scale(scale);
 
-	auto scaleNode = Builder::createTransform<ETransformType::Scale>(scale);
-	scaleNode->enableSynergies();
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>(scale)
+	    ->as<TransformImpl<ETransformType::Scale>>();
 
 	{
 		// Invalid coordinates.
@@ -143,11 +143,10 @@ TEST(ScaleTest, UniformScaleSynergies)
 
 TEST(ScaleTest, GettersAndSetterShouldBeOk)
 {
-  auto scale = Core::Builder::createTransform<ETransformType::Scale>();
-	scale->enableSynergies();
+  auto scale = Core::Builder::createTransform<ETransformType::Scale>()
+      ->as<TransformImpl<ETransformType::Scale>>();
 
   auto vec = generateVec3();
-
   {
 		// Uniform scale.
     scale->setX(vec.x);

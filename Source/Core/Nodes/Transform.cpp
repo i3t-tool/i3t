@@ -5,27 +5,168 @@
 
 namespace Core
 {
+//===-- Value masks -------------------------------------------------------===//
+
+using ValueMask = std::array<uint8_t, 16>;
+
+constexpr uint8_t VM_ZERO = 0;
+constexpr uint8_t VM_ONE  = 1;
+constexpr uint8_t VM_ANY  = 2;
+
+constexpr ValueMask g_ScaleMask = {
+		VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
+		VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+};
+
+constexpr ValueMask g_TranslateMask = {
+		VM_ONE,  VM_ZERO, VM_ZERO, VM_ANY,
+		VM_ZERO, VM_ONE,  VM_ZERO, VM_ANY,
+		VM_ZERO, VM_ZERO, VM_ONE,  VM_ANY,
+		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+};
+
+constexpr ValueMask g_RotateXMask = {
+		VM_ONE,  VM_ZERO, VM_ZERO, VM_ZERO,
+		VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO,
+		VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+};
+
+constexpr ValueMask g_RotateYMask = {
+		VM_ANY,  VM_ZERO, VM_ANY,  VM_ZERO,
+		VM_ZERO, VM_ONE,  VM_ZERO, VM_ZERO,
+		VM_ANY,  VM_ZERO, VM_ANY,  VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+};
+
+constexpr ValueMask g_RotateZMask = {
+		VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO,
+		VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ONE,  VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+};
+
+constexpr ValueMask g_OrthoMask = {
+		VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,
+		VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+		VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
+		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+};
+
+constexpr ValueMask g_PerspectiveMask = {
+		VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
+		VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
+		VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO,
+};
+
+constexpr ValueMask g_FrustumMask = {
+		VM_ANY,  VM_ZERO, VM_ANY, VM_ZERO,
+		VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,
+		VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO,
+};
+
+constexpr bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value)
+{
+	const uint8_t maskValue = mask[coords.x * 4 + coords.y];
+
+	return maskValue == VM_ANY && Math::eq((float) maskValue, value);
+}
+
+constexpr bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
+{
+	for (int c = 0; c < 4; ++c)
+	{
+		for (int r = 0; r < 4; ++r)
+		{
+			const float value = matrix[c][r];
+
+			if (!validateValue(mask, { c, r }, value))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 EValueState Transformation::getValueState(glm::ivec2 coords)
 {
-	const int idx = coords.y * 4 + coords.x;
+	const int idx = 15 - (coords.y * 4 + coords.x);  // flip idx (little endian)
 	auto& map = getTransformMap(getOperation()->keyWord);
 
-	return map[idx]
+	std::bitset<2> bitResult;
+	bitResult[1 - 0] = map[idx] || !m_isLocked;            // editable bit
+	bitResult[1 - 1] = map[idx] && m_hasEnabledSynergies;  // synergies bit
+
+	auto result = bitResult.to_ulong();
+
+	return static_cast<EValueState>(result);
 }
+
+/*
+ValueSetResult Transformation::setValue(float val, glm::ivec2 coords)
+{
+	if (!validateValue(getTransformMap(getOperation()->keyWord), coords, val))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
+	return onSetValue(val, coords);
+}
+ */
+
+//===----------------------------------------------------------------------===//
 
 bool Transformation::isLocked() const
 {
-	return m_currentMap == &Transform::g_Free;
+	return m_isLocked;
 }
 
 void Transformation::lock()
 {
-	m_currentMap = &Transform::g_AllLocked;
+	// m_currentMap = &Transform::g_AllLocked;
+	m_isLocked = true;
 }
 
 void Transformation::unlock()
 {
-	m_currentMap = &Transform::g_Free;
+	// m_currentMap = &Transform::g_Free;
+	m_isLocked = false;
+}
+
+ValueSetResult Transformation::setValue(const glm::mat4& mat)
+{
+	ValueSetResult result;
+
+	for (int c = 0; c < 4; ++c)
+	{
+		for (int r = 0; r < 4; ++r)
+		{
+			auto coords           = glm::ivec2(c, r);
+			const auto valueState = getValueState(coords);
+
+			if (canEditValue(valueState))
+			{
+				const float val = mat[c][r];
+
+				// MSVC was unable to compile this expresion without using Node::
+				result = Node::setValue(val, coords);
+
+				if (result.status != ValueSetResult::Status::Ok)
+				{
+					notifySequence();
+
+					return result;
+				}
+			}
+		}
+	}
+	notifySequence();
+
+	return ValueSetResult{};
 }
 
 void Transformation::notifySequence()
@@ -40,7 +181,8 @@ void Transformation::notifySequence()
 
 ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 {
-	bool result = Transform::cmp(&Transform::g_Scale, m_internalData[0].getMat4());
+
+	bool result = validateValues(g_ScaleMask, m_internalData[0].getMat4());
 	if (hasSynergies())
 	{
 		auto& mat = m_internalData[0].getMat4();
@@ -48,11 +190,6 @@ ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 	}
 
 	return ETransformState(result);
-}
-
-void TransformImpl<ETransformType::Scale>::lock()
-{
-	m_currentMap = &Transform::g_Scale;
 }
 
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
@@ -87,54 +224,14 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& v
 	return setValue(glm::vec3(vec));
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::mat4& mat)
-{
-	if (m_currentMap == &Transform::g_Scale)
-	{
-		if (hasSynergies())
-		{
-			if (Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]))
-			{
-				setInternalValue(mat);
-			}
-			else
-				return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-															"Given matrix does not represent uniform scale."};
-		}
-		if (Transform::cmp(m_currentMap, mat))
-		{
-			setInternalValue(mat);
-		}
-		else
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Given matrix does not represent scale."};
-		}
-	}
-	else if (m_currentMap == &Transform::g_Free)
-	{
-		// Free transformation is set.
-		setInternalValue(mat);
-	}
-	notifySequence();
-
-	return ValueSetResult{ValueSetResult::Status::Ok};
-}
-
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
 {
-	if (m_currentMap == &Transform::g_Free)
-	{
-		// Free transformation is set.
-		setInternalValue(val, coords);
-	}
-
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_ScaleMask, coords, val))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (m_currentMap == &Transform::g_Scale)
+	if (getValueState(coords) == EValueState::Editable)
 	{
 		if (hasSynergies())
 		{
@@ -145,14 +242,16 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 			setInternalValue(val, coords);
 		}
 	}
-
 	notifySequence();
+
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
 void TransformImpl<ETransformType::Scale>::reset()
 {
-	setDataMap(m_initialMap);
+	m_hasEnabledSynergies = true;
+	m_isLocked            = true;
+
 	setInternalValue(glm::scale(m_initialScale));
 }
 
@@ -195,8 +294,8 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setZ(float v)
 
 ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 {
-	auto& mat = m_internalData[0].getMat4();
-	bool result = Transform::isMatValid(&Transform::g_EulerX, mat);;
+	auto& mat   = m_internalData[0].getMat4();
+	bool result = validateValues(g_RotateXMask, mat);
 
 	float angle = std::atan2(-mat[2][1], mat[2][2]);
 	auto expectedMat = glm::eulerAngleX(angle);
@@ -204,11 +303,6 @@ ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 	result = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
-}
-
-void TransformImpl<ETransformType::EulerX>::lock()
-{
-	m_currentMap = &Transform::g_EulerX;
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::EulerX>::getDefaultValues()
@@ -235,42 +329,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::vec4& 
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(const glm::mat4& mat)
-{
-	if (m_currentMap == &Transform::g_EulerX)
-	{
-		if (Transform::isMatValid(m_currentMap, mat))
-		{
-			float angleRad = std::atan2(-mat[2][1], mat[2][2]);
-
-			bool isValid = Math::eq(glm::eulerAngleX(angleRad), mat);
-
-			if (isValid)
-			{
-				m_currentRot = angleRad;
-				setInternalValue(mat);
-			}
-			else
-			{
-				return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-															"Given matrix is not Euler rot. around X axis."};
-			}
-		}
-	}
-	else if (m_currentMap == &Transform::g_Free)
-	{
-		setInternalValue(mat);
-	}
-	notifySequence();
-
-	return ValueSetResult{ValueSetResult::Status::Ok};
-}
-
 ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_RotateXMask, coords, val))
 	{
-		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
 	if (!Math::withinInterval(val, -1.0f, 1.0f))
@@ -322,7 +385,9 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerX>::reset()
 {
-	setDataMap(m_initialMap);
+	m_hasEnabledSynergies = true;
+	m_isLocked            = true;
+
 	setInternalValue(glm::eulerAngleX(m_initialRot));
 	m_currentRot = m_initialRot;
 }
@@ -330,8 +395,8 @@ void TransformImpl<ETransformType::EulerX>::reset()
 //===-- Euler rotation around Y axis --------------------------------------===//
 ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 {
-	auto& mat = m_internalData[0].getMat4();
-	bool result = Transform::isMatValid(&Transform::g_EulerY, mat);
+	auto& mat   = m_internalData[0].getMat4();
+	bool result = validateValues(g_RotateYMask, mat);
 
 	float angle = std::asin(mat[2][0]);
 	auto expectedMat = glm::eulerAngleY(angle);
@@ -339,11 +404,6 @@ ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 	result = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
-}
-
-void TransformImpl<ETransformType::EulerY>::lock()
-{
-	m_currentMap = &Transform::g_EulerY;
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::EulerY>::getDefaultValues()
@@ -369,32 +429,9 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& 
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::mat4& mat)
-{
-	/// \todo MH Validation is not always correct.
-
-	if (m_currentMap == &Transform::g_Free)
-		setInternalValue(mat);
-	else if (m_currentMap == &Transform::g_EulerY)
-	{
-		float angleRad = std::asin(mat[2][0]);
-		m_currentRot = angleRad;
-		auto eulerY = glm::eulerAngleY(angleRad);
-
-		if (!Math::eq(eulerY, mat))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an Euler rot around Y axis."};
-		}
-		setInternalValue(mat);
-	}
-	notifySequence();
-
-	return ValueSetResult{ValueSetResult::Status::Ok};
-}
-
 ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_RotateYMask, coords, val))
 	{
 		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
@@ -448,7 +485,6 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerY>::reset()
 {
-	setDataMap(m_initialMap);
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
 	m_currentRot = m_initialRot;
 }
@@ -457,8 +493,8 @@ void TransformImpl<ETransformType::EulerY>::reset()
 
 ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 {
-	auto& mat = m_internalData[0].getMat4();
-	bool result = Transform::isMatValid(&Transform::g_EulerZ, mat);
+	auto& mat   = m_internalData[0].getMat4();
+	bool result = validateValues(g_RotateZMask, mat);
 
 	float angle = glm::atan(mat[0][1], mat[0][0]);
 	auto expectedMat = glm::eulerAngleZ(angle);
@@ -466,11 +502,6 @@ ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 	result = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
-}
-
-void TransformImpl<ETransformType::EulerZ>::lock()
-{
-	m_currentMap = &Transform::g_EulerZ;
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::EulerZ>::getDefaultValues()
@@ -496,29 +527,9 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& 
 	return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation for rotation matrix"};
 }
 
-ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::mat4& mat)
-{
-	if (m_currentMap == &Transform::g_Free)
-		setInternalValue(mat);
-	else if (m_currentMap == &Transform::g_EulerZ)
-	{
-		float angle = glm::atan(mat[0][1], mat[0][0]);
-		auto eulerZ = glm::eulerAngleZ(angle);
-		if (!Math::eq(eulerZ, mat))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an Euler rot around Z axis."};
-		}
-		m_currentRot = angle;
-		setInternalValue(mat);
-	}
-	notifySequence();
-
-	return ValueSetResult{ValueSetResult::Status::Ok};
-}
-
 ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_RotateZMask, coords, val))
 	{
 		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
@@ -572,7 +583,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerZ>::reset()
 {
-	setDataMap(m_initialMap);
+	resetModifiers();
 	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
 	m_currentRot = m_initialRot;
 }
@@ -581,7 +592,7 @@ void TransformImpl<ETransformType::EulerZ>::reset()
 
 ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 {
-	bool result = Transform::isMatValid(&Transform::g_Translate, m_internalData[0].getMat4());
+	bool result = validateValues(g_TranslateMask, m_internalData[0].getMat4());
 	if (hasSynergies())
 	{
 		auto& mat = m_internalData[0].getMat4();
@@ -589,11 +600,6 @@ ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 	}
 
 	return ETransformState(result);
-}
-
-void TransformImpl<ETransformType::Translation>::lock()
-{
-	m_currentMap = &Transform::g_Translate;
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::Translation>::getDefaultValues()
@@ -619,32 +625,9 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::v
 	return setValue(glm::vec3(vec));
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::mat4& mat)
-{
-	if (m_currentMap == &Transform::g_Translate)
-	{
-		if (Transform::isMatValid(m_currentMap, mat))
-		{
-			setInternalValue(mat);
-		}
-		else
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Cannot set given matrix, because it not represents translation."};
-		}
-	}
-	else if (m_currentMap == &Transform::g_Free)
-	{
-		setInternalValue(mat);
-	}
-	notifySequence();
-
-	return ValueSetResult{ValueSetResult::Status::Ok};
-}
-
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_TranslateMask, coords, val))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
@@ -656,8 +639,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 
 void TransformImpl<ETransformType::Translation>::reset()
 {
-	setDataMap(m_initialMap);
-	setValue(glm::translate(m_initialTrans));
+	setInternalValue(glm::translate(m_initialTrans));
 }
 
 float TransformImpl<ETransformType::Translation>::getX()
@@ -704,7 +686,6 @@ Transformation::ValueMap TransformImpl<ETransformType::AxisAngle>::getDefaultVal
 
 void TransformImpl<ETransformType::AxisAngle>::reset()
 {
-	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
 }
@@ -774,12 +755,9 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& ve
 
 ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 {
-	return ETransformState(Transform::isMatValid(&Transform::g_Ortho, m_internalData[0].getMat4()));
-}
-
-void TransformImpl<ETransformType::Ortho>::lock()
-{
-	m_currentMap = &Transform::g_Ortho;
+	return ETransformState(
+			validateValues(g_OrthoMask, m_internalData[0].getMat4())
+	);
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::Ortho>::getDefaultValues()
@@ -796,14 +774,13 @@ Transformation::ValueMap TransformImpl<ETransformType::Ortho>::getDefaultValues(
 
 void TransformImpl<ETransformType::Ortho>::reset()
 {
-	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_OrthoMask, coords, val))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."};
 	}
@@ -859,12 +836,9 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setFar(float val)
 
 ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 {
-	return ETransformState(Transform::isMatValid(&Transform::g_Perspective, m_internalData[0].getMat4()));;
-}
-
-void TransformImpl<ETransformType::Perspective>::lock()
-{
-	m_currentMap = &Transform::g_Perspective;
+	return ETransformState(
+			validateValues(g_PerspectiveMask, m_internalData[0].getMat4())
+	);
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::Perspective>::getDefaultValues()
@@ -907,14 +881,13 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setZFar(float v)
 
 void TransformImpl<ETransformType::Perspective>::reset()
 {
-	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
 }
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_PerspectiveMask, coords, val))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
@@ -928,12 +901,9 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 
 ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 {
-	return ETransformState(Transform::isMatValid(&Transform::g_Frustum, m_internalData[0].getMat4()));
-}
-
-void TransformImpl<ETransformType::Frustum>::lock()
-{
-	m_currentMap = &Transform::g_Frustum;
+	return ETransformState(
+			validateValues(g_FrustumMask, m_internalData[0].getMat4())
+	);
 }
 
 Transformation::ValueMap TransformImpl<ETransformType::Frustum>::getDefaultValues()
@@ -950,14 +920,13 @@ Transformation::ValueMap TransformImpl<ETransformType::Frustum>::getDefaultValue
 
 void TransformImpl<ETransformType::Frustum>::reset()
 {
-	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::frustum(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (!validateValue(g_FrustumMask, coords, val))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
@@ -1027,14 +996,13 @@ Transformation::ValueMap TransformImpl<ETransformType::LookAt>::getDefaultValues
 
 void TransformImpl<ETransformType::LookAt>::reset()
 {
-	m_currentMap = m_initialMap;
 	notifySequence();
 	setInternalValue(glm::lookAt(m_initialEye, m_initialCenter, m_initialUp));
 }
 
 ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val, glm::ivec2 coords)
 {
-	if (!coordsAreValid(coords, m_currentMap))
+	if (isLocked())
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}

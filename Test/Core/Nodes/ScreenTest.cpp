@@ -12,7 +12,7 @@ TEST(ScreenTest, _)
 	auto screen = Builder::createNode<ENodeType::Screen>();
 	auto camera = GraphManager::createCamera();
 
-	auto t1 = Builder::createTransform<ETransformType::LookAt>();
+	auto t1 = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();
 	t1->setEye(generateVec3());
 	t1->setCenter(generateVec3());
 
