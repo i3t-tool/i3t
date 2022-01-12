@@ -6,14 +6,20 @@ using namespace Core;
 
 IdGenerator::IdGenerator()
 {
-	for (int i = 1; i < Core::MAX_NODES_COUNT; ++i)
+	m_ids.resize(Core::MAX_NODES_COUNT);
+
+	auto it  = m_ids.begin();
+	auto val = 1;
+	while (it != m_ids.end())
 	{
-		m_ids.push_back(i);
+		*it = val;
+		it++; val++;
 	}
 }
 
 ID IdGenerator::next()
 {
+	I3T_ASSERT(!m_ids.empty() && "List is empty!");
 	auto result = m_ids.front();
 	m_ids.pop_front();
 
@@ -27,5 +33,7 @@ void IdGenerator::markAsUsed(unsigned int id)
 
 void IdGenerator::returnId(unsigned int id)
 {
-	m_ids.push_back(id);
+	auto back = m_ids.end();
+	back--;
+	*back = id;
 }
