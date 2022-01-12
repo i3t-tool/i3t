@@ -7,8 +7,6 @@ namespace Core
 {
 //===-- Value masks -------------------------------------------------------===//
 
-using ValueMask = std::array<uint8_t, 16>;
-
 constexpr uint8_t VM_ZERO = 0;
 constexpr uint8_t VM_ONE  = 1;
 constexpr uint8_t VM_ANY  = 2;
@@ -73,7 +71,10 @@ constexpr bool validateValue(const ValueMask& mask, glm::ivec2 coords, float val
 {
 	const uint8_t maskValue = mask[coords.x * 4 + coords.y];
 
-	return maskValue == VM_ANY && Math::eq((float) maskValue, value);
+	if (maskValue == VM_ANY)
+		return true;
+
+	return Math::eq((float) maskValue, value);
 }
 
 constexpr bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
@@ -95,12 +96,12 @@ constexpr bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 
 EValueState Transformation::getValueState(glm::ivec2 coords)
 {
-	const int idx = 15 - (coords.y * 4 + coords.x);  // flip idx (little endian)
+	const int idx = coords.x * 4 + coords.y;
 	auto& map = getTransformMap(getOperation()->keyWord);
 
 	std::bitset<2> bitResult;
-	bitResult[1 - 0] = map[idx] || !m_isLocked;            // editable bit
-	bitResult[1 - 1] = map[idx] && m_hasEnabledSynergies;  // synergies bit
+	bitResult[0] = map[idx] && m_hasEnabledSynergies;  // synergies bit
+	bitResult[1] = map[idx] || !m_isLocked;            // editable bit
 
 	auto result = bitResult.to_ulong();
 
@@ -153,7 +154,7 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 				const float val = mat[c][r];
 
 				// MSVC was unable to compile this expresion without using Node::
-				result = Node::setValue(val, coords);
+				result = setValue(val, coords);
 
 				if (result.status != ValueSetResult::Status::Ok)
 				{
@@ -177,12 +178,19 @@ void Transformation::notifySequence()
 	}
 }
 
+bool Transformation::canSetValue(const ValueMask& mask, glm::ivec2 coords, float value)
+{
+	const auto valueState = getValueState(coords);
+
+	return canEditValue(valueState) && validateValue(mask, coords, value);
+}
+
 //===----------------------------------------------------------------------===//
 
 ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 {
-
 	bool result = validateValues(g_ScaleMask, m_internalData[0].getMat4());
+
 	if (hasSynergies())
 	{
 		auto& mat = m_internalData[0].getMat4();
@@ -195,6 +203,7 @@ ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
 {
 	notifySequence();
+
 	return NodeBase::setValue(glm::vec3(val));
 }
 
@@ -231,7 +240,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (getValueState(coords) == EValueState::Editable)
+	if (canEditValue(getValueState(coords)))
 	{
 		if (hasSynergies())
 		{
@@ -627,7 +636,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::v
 
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, glm::ivec2 coords)
 {
-	if (!validateValue(g_TranslateMask, coords, val))
+	if (!canSetValue(g_TranslateMask, coords, val))
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}

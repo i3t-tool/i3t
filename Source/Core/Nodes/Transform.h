@@ -51,6 +51,8 @@ inline bool canEditValue(EValueState valueState)
 	return valueState == EValueState::Editable || valueState == EValueState::EditableSyn;
 }
 
+using ValueMask = std::array<uint8_t, 16>;
+
 class Transformation : public Node
 {
 	friend class Storage;
@@ -84,6 +86,7 @@ public:
 	}
 
 	ValueSetResult setValue(const glm::mat4& mat) override;
+	ValueSetResult setValue(float, glm::ivec2) override { return ValueSetResult{}; }
 
 protected:
 	using ValueMap = std::map<std::string, std::string>;
@@ -99,6 +102,8 @@ public:
 protected:
 	explicit Transformation(const Operation* transformType) : NodeBase(transformType) {}
 	void notifySequence();
+
+	bool canSetValue(const ValueMask& mask, glm::ivec2 coords, float value);
 
 public:
 	/// \todo MH these should not be public.

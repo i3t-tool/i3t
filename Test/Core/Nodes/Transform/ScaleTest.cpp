@@ -40,23 +40,11 @@ TEST(ScaleTest, UniformScale_SetInvalidValue_ShouldNotBePermited)
 	auto scale = Builder::createTransform<ETransformType::Scale>();
 	scale->enableSynergies();
 
-	// Set new non-uniform scale, action should not be permitted.
+	// Set new non-uniform scale, action is possible but the result can be undefined.
+	// In the case of uniform scaling value on main diagonal will be 1.0f.
 	auto result = scale->setValue(glm::scale(glm::vec3(1.0f, 5.0f, 3.0f)));
 
-	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
-	EXPECT_EQ(ETransformState::Valid, scale->isValid());
-}
-
-TEST(ScaleTest, NonUniform_SetFreeTransform_NotPermitted)
-{
-	// Create non-uniform scale.
-	auto scale = Builder::createTransform<ETransformType::Scale>();
-	scale->disableSynergies();
-	auto mat = createFreeTransform();
-
-	auto result = scale->setValue(mat);
-
-	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
+	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 	EXPECT_EQ(ETransformState::Valid, scale->isValid());
 }
 
@@ -77,9 +65,10 @@ TEST(ScaleTest, Unlocked_SetFreeTransform_InvalidState)
 {
 	// Create non-uniform scale and unlock it.
 	auto scale = Builder::createTransform<ETransformType::Scale>();
+	scale->disableSynergies();
 	scale->unlock();
-	auto mat = createFreeTransform();
 
+	auto mat = createFreeTransform();
 	setValue_expectOk(scale, mat);
 
 	EXPECT_EQ(ETransformState::Invalid, scale->isValid());
