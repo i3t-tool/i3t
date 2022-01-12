@@ -136,7 +136,7 @@ void UIModule::onClose()
 {
 	/// \todo MH - This may not be sufficient.
 	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
-	workspace->m_workspaceCoreNodes.clear();
+	workspace->getNodeEditor().m_workspaceCoreNodes.clear();
 
 	m_windows.clear();
 	m_dockableWindows.clear();
@@ -144,7 +144,7 @@ void UIModule::onClose()
 
 Memento UIModule::getState()
 {
-	auto& nodes = getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes;
+	auto& nodes = getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 
 	DumpVisitor visitor;
 	std::string rawState = visitor.dump(nodes);
@@ -154,7 +154,7 @@ Memento UIModule::getState()
 
 void UIModule::setState(const Memento& memento)
 {
-	auto& nodes = getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes;
+	auto& nodes = getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 	nodes.clear();
 
 	auto& rawScene = memento.getSnapshot().front();

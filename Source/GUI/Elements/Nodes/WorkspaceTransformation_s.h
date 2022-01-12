@@ -2,19 +2,19 @@
 
 #include "WorkspaceTransformation.h"
 
-class WorkspaceTransformationFree : public WorkspaceTransformation { public: WorkspaceTransformationFree(); };
-class WorkspaceTransformationAxisAngle : public WorkspaceTransformation { public: WorkspaceTransformationAxisAngle(); };
-class WorkspaceTransformationLookAt : public WorkspaceTransformation { public: WorkspaceTransformationLookAt(); };
+class WorkspaceTransformationFree : public WorkspaceTransformation { public: WorkspaceTransformationFree(DIWNE::Diwne& diwne); };
+class WorkspaceTransformationAxisAngle : public WorkspaceTransformation { public: WorkspaceTransformationAxisAngle(DIWNE::Diwne& diwne); };
+class WorkspaceTransformationLookAt : public WorkspaceTransformation { public: WorkspaceTransformationLookAt(DIWNE::Diwne& diwne); };
 
-class WorkspaceTransformationTranslation : public WorkspaceTransformation { public: WorkspaceTransformationTranslation(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationEulerX : public WorkspaceTransformation { public: WorkspaceTransformationEulerX(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationEulerY : public WorkspaceTransformation { public: WorkspaceTransformationEulerY(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationEulerZ : public WorkspaceTransformation { public: WorkspaceTransformationEulerZ(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationScale : public WorkspaceTransformation { public: WorkspaceTransformationScale(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationOrthoProjection : public WorkspaceTransformation { public: WorkspaceTransformationOrthoProjection(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationPerspective : public WorkspaceTransformation { public: WorkspaceTransformationPerspective(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
-class WorkspaceTransformationFrustum : public WorkspaceTransformation { public: WorkspaceTransformationFrustum(); bool drawDataSetValues(DIWNE::Diwne &diwne); };
+class WorkspaceTransformationTranslation : public WorkspaceTransformation { public: WorkspaceTransformationTranslation(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationEulerX : public WorkspaceTransformation { public: WorkspaceTransformationEulerX(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationEulerY : public WorkspaceTransformation { public: WorkspaceTransformationEulerY(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationEulerZ : public WorkspaceTransformation { public: WorkspaceTransformationEulerZ(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationScale : public WorkspaceTransformation { public: WorkspaceTransformationScale(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationOrthoProjection : public WorkspaceTransformation { public: WorkspaceTransformationOrthoProjection(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationPerspective : public WorkspaceTransformation { public: WorkspaceTransformationPerspective(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
+class WorkspaceTransformationFrustum : public WorkspaceTransformation { public: WorkspaceTransformationFrustum(DIWNE::Diwne& diwne); bool drawDataSetValues(); };
 
-class WorkspaceTransformationQuaternion : public WorkspaceTransformation { public: WorkspaceTransformationQuaternion(); bool drawDataFull(DIWNE::Diwne &diwne); int maxLenghtOfData(); };
+class WorkspaceTransformationQuaternion : public WorkspaceTransformation { public: WorkspaceTransformationQuaternion(DIWNE::Diwne& diwne); bool drawDataFull(); int maxLenghtOfData(); };
 
 

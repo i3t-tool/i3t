@@ -1,16 +1,16 @@
 #include "WorkspaceTransformation_s.h"
 
-WorkspaceTransformationFree::WorkspaceTransformationFree() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Free>()){setDataItemsWidth();}
+WorkspaceTransformationFree::WorkspaceTransformationFree(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Free>()){setDataItemsWidth();}
 
-WorkspaceTransformationAxisAngle::WorkspaceTransformationAxisAngle() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::AxisAngle>()){setDataItemsWidth();}
+WorkspaceTransformationAxisAngle::WorkspaceTransformationAxisAngle(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::AxisAngle>()){setDataItemsWidth();}
 
-WorkspaceTransformationLookAt::WorkspaceTransformationLookAt() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::LookAt>()){setDataItemsWidth();}
+WorkspaceTransformationLookAt::WorkspaceTransformationLookAt(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::LookAt>()){setDataItemsWidth();}
 
-WorkspaceTransformationTranslation::WorkspaceTransformationTranslation() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Translation>()){setDataItemsWidth();}
-bool WorkspaceTransformationTranslation::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationTranslation::WorkspaceTransformationTranslation(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Translation>()){setDataItemsWidth();}
+bool WorkspaceTransformationTranslation::drawDataSetValues()
 {
     auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Translation>>();
-    return drawDataSetValues_builder(diwne,
+    return drawDataSetValues_builder(
                                 {   "x", /* \todo labels from settings? */
                                     "y",
                                     "z" },
@@ -24,44 +24,44 @@ bool WorkspaceTransformationTranslation::drawDataSetValues(DIWNE::Diwne &diwne)
 }
 
 /* \todo JH three rotations can be templated -> update addNodeToPosition() too */
-WorkspaceTransformationEulerX::WorkspaceTransformationEulerX() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::EulerX>()){setDataItemsWidth();}
-bool WorkspaceTransformationEulerX::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationEulerX::WorkspaceTransformationEulerX(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::EulerX>()){setDataItemsWidth();}
+bool WorkspaceTransformationEulerX::drawDataSetValues()
 {
   auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::EulerX>>();
-  return drawDataSetValues_builder(diwne,
+  return drawDataSetValues_builder(
                             { "angle x" },
                             { [nodebase]() {return nodebase->getAngle(); } },
                             { [nodebase](float v) {return nodebase->setValue(v); } }
                             );
 }
 
-WorkspaceTransformationEulerY::WorkspaceTransformationEulerY() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::EulerY>()){setDataItemsWidth();}
-bool WorkspaceTransformationEulerY::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationEulerY::WorkspaceTransformationEulerY(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::EulerY>()){setDataItemsWidth();}
+bool WorkspaceTransformationEulerY::drawDataSetValues()
 {
   auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::EulerY>>();
-  return drawDataSetValues_builder(diwne,
+  return drawDataSetValues_builder(
                             { "angle y" },
                             { [nodebase]() {return nodebase->getAngle(); } },
                             { [nodebase](float v) {return nodebase->setValue(v); } }
                             );
 }
 
-WorkspaceTransformationEulerZ::WorkspaceTransformationEulerZ() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::EulerZ>()){setDataItemsWidth();}
-bool WorkspaceTransformationEulerZ::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationEulerZ::WorkspaceTransformationEulerZ(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::EulerZ>()){setDataItemsWidth();}
+bool WorkspaceTransformationEulerZ::drawDataSetValues()
 {
   auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::EulerZ>>();
-  return drawDataSetValues_builder(diwne,
+  return drawDataSetValues_builder(
                             { "angle z" },
                             { [nodebase]() {return nodebase->getAngle(); } },
                             { [nodebase](float v) {return nodebase->setValue(v); } }
                             );
 }
 
-WorkspaceTransformationScale::WorkspaceTransformationScale() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Scale>()){setDataItemsWidth();}
-bool WorkspaceTransformationScale::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationScale::WorkspaceTransformationScale(DIWNE::Diwne &diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Scale>()){setDataItemsWidth();}
+bool WorkspaceTransformationScale::drawDataSetValues()
 {
     auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
-    return drawDataSetValues_builder(diwne,
+    return drawDataSetValues_builder(
                                 {   "X", "Y", "Z" },
                                 {   [nodebase](){return nodebase->getX();},
                                     [nodebase](){return nodebase->getY();},
@@ -73,14 +73,14 @@ bool WorkspaceTransformationScale::drawDataSetValues(DIWNE::Diwne &diwne)
 }
 
 
-WorkspaceTransformationQuaternion::WorkspaceTransformationQuaternion() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Quat>()){setDataItemsWidth();}
-bool WorkspaceTransformationQuaternion::drawDataFull(DIWNE::Diwne &diwne)
+WorkspaceTransformationQuaternion::WorkspaceTransformationQuaternion(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Quat>()){setDataItemsWidth();}
+bool WorkspaceTransformationQuaternion::drawDataFull()
 {
     auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
     bool valueChanged = false, interaction_happen;
     glm::quat localData;
 
-    interaction_happen = drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getDataItemsWidth(diwne), getFloatPopupMode(),
+    interaction_happen = drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getDataItemsWidth(), getFloatPopupMode(),
                                             m_nodebase->getData().getQuat(), m_nodebase->getDataMapRef(),
                                             valueChanged, localData);
 
@@ -96,11 +96,11 @@ int WorkspaceTransformationQuaternion::maxLenghtOfData()
     return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(), m_numberOfVisibleDecimal);
 }
 
-WorkspaceTransformationOrthoProjection::WorkspaceTransformationOrthoProjection() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Ortho>()){setDataItemsWidth();}
-bool WorkspaceTransformationOrthoProjection::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationOrthoProjection::WorkspaceTransformationOrthoProjection(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Ortho>()){setDataItemsWidth();}
+bool WorkspaceTransformationOrthoProjection::drawDataSetValues()
 {
   auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Ortho>>();
-  return drawDataSetValues_builder(diwne,
+  return drawDataSetValues_builder(
                             {   "left",
                                 "right",
                                 "bottom",
@@ -122,11 +122,11 @@ bool WorkspaceTransformationOrthoProjection::drawDataSetValues(DIWNE::Diwne &diw
   );
 }
 
-WorkspaceTransformationPerspective::WorkspaceTransformationPerspective() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Perspective>()){setDataItemsWidth();}
-bool WorkspaceTransformationPerspective::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationPerspective::WorkspaceTransformationPerspective(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Perspective>()){setDataItemsWidth();}
+bool WorkspaceTransformationPerspective::drawDataSetValues()
 {
   auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Perspective>>();
-  return drawDataSetValues_builder(diwne,
+  return drawDataSetValues_builder(
                             {   "FOW",
                                 "Aspect",
                                 "ZNear",
@@ -142,11 +142,11 @@ bool WorkspaceTransformationPerspective::drawDataSetValues(DIWNE::Diwne &diwne)
   );
 }
 
-WorkspaceTransformationFrustum::WorkspaceTransformationFrustum() : WorkspaceTransformation(Core::Builder::createTransform<ETransformType::Frustum>()){setDataItemsWidth();}
-bool WorkspaceTransformationFrustum::drawDataSetValues(DIWNE::Diwne &diwne)
+WorkspaceTransformationFrustum::WorkspaceTransformationFrustum(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Frustum>()){setDataItemsWidth();}
+bool WorkspaceTransformationFrustum::drawDataSetValues()
 {
   auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Frustum>>();
-  return drawDataSetValues_builder(diwne,
+  return drawDataSetValues_builder(
                             {   "left",
                                 "right",
                                 "bottom",

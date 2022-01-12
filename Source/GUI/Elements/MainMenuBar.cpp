@@ -107,7 +107,7 @@ void MainMenuBar::showFileMenu()
 				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 				if (ww)
 				{
-					ww->m_workspaceCoreNodes.clear();
+					ww->getNodeEditor().m_workspaceCoreNodes.clear();
 
 					// \todo MH - Nodes in scene data are no longer needed, is that true?
 					// auto sceneData = loadSceneFromFile(sceneFile);
@@ -162,7 +162,7 @@ void MainMenuBar::showFileMenu()
 			{
 				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 				if (ww)
-					saveScene(filename, SceneData{ ww->m_workspaceCoreNodes });
+					saveScene(filename, SceneData{ ww->getNodeEditor().m_workspaceCoreNodes });
 				else
 					Log::fatal("Save failed: WorkspaceWindow is not loaded.");
 			}

@@ -1,42 +1,41 @@
 #ifndef PIN_H
 #define PIN_H
 
-
-//#include "diwne_include.h"
+#include "diwne_include.h"
 
 namespace DIWNE
 {
-class Pin
+class Pin : public DiwneObject
 {
     public:
         /** Default constructor */
-        Pin(DIWNE::ID id);
+        Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne="DiwnePin");
         /** Default destructor */
-        virtual ~Pin();
+        virtual ~Pin(){};
 
         DIWNE::ID const getId() const {return m_idDiwne; };
 
-        bool drawPinDiwne(DIWNE::Diwne &diwne);
-        virtual bool pinContent(DIWNE::Diwne &diwne) {return false;};
+        virtual bool content() {ImGui::TextUnformatted(fmt::format("{} content", m_labelDiwne).c_str()); return false;};
+
+        virtual void begin();
+        virtual void end();
+        virtual bool afterEndDiwne();
 
         virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
 
+        virtual bool bypassPinLinkConnectionPreparedAction();
 
-        virtual bool bypassPinHoveredAction(DIWNE::Diwne &diwne);
-        virtual bool bypassPinHoldAction(DIWNE::Diwne &diwne);
-        virtual bool bypassPinUnholdAction(DIWNE::Diwne &diwne);
-        virtual bool bypassPinRaisePopupAction(DIWNE::Diwne &diwne);
-        virtual bool bypassPinPreconnectLinkAction(DIWNE::Diwne &diwne);
+        virtual bool processDrag();
+        virtual bool processPin_Pre_ConnectLink();
+        virtual bool processConnectionPrepared();
+        virtual bool processHovered();
 
-        virtual bool processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processPinHold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processPinUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processPinHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+//        virtual bool processSelect();
+//        virtual bool processUnselect();
+//
+//        virtual bool processHold();
+//        virtual bool processUnHold();
 
-        virtual bool processPinPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual void pinPopupContent();
 
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 
@@ -49,7 +48,7 @@ class Pin
         ImVec2 m_connectionPointDiwne;
 
         /* intended to use when Pin is drawn (use properties dependent on drawing) - setConnectionPointDiwne is "hard" setting */
-        virtual void updateConnectionPointDiwne(DIWNE::Diwne &diwne) {m_connectionPointDiwne = m_pinRectDiwne.GetCenter();}
+        virtual void updateConnectionPointDiwne() {m_connectionPointDiwne = m_pinRectDiwne.GetCenter();}
 
     private:
 
@@ -57,11 +56,6 @@ class Pin
 
 
 };
-
-static void expandPopupBackgroundContent(DIWNE::Pin &this_object)
-{
-    this_object.pinPopupContent();
-}
 
 } /* namespace DIWNE */
 

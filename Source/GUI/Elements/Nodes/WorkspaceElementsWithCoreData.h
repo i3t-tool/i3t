@@ -48,7 +48,7 @@ protected:
 	Ptr<Core::NodeBase> const m_nodebase;
 
 public:
-	WorkspaceNodeWithCoreData(Ptr<Core::NodeBase> nodebase);
+	WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase);
 	~WorkspaceNodeWithCoreData() override;
 
 	Ptr<Core::NodeBase> const getNodebase() const;
@@ -61,7 +61,7 @@ public:
 
 	virtual int maxLenghtOfData() = 0;
 
-	float getDataItemsWidth(DIWNE::Diwne &diwne);
+	float getDataItemsWidth();
 	float setDataItemsWidth();
 
 	WorkspaceLevelOfDetail setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail);
@@ -70,16 +70,16 @@ public:
 	Core::Transform::DataMap const* setDataMap(const Core::Transform::DataMap* mapToSet);
 	Core::Transform::DataMap const* getDataMap();
 
-	bool drawDataLabel(DIWNE::Diwne &diwne);
+	bool drawDataLabel();
 
 	/* DIWNE function */
-    virtual bool topContent(DIWNE::Diwne &diwne);
+    virtual bool topContent();
 
 
 	virtual void drawMenuLevelOfDetail()=0;
 	void drawMenuSetPrecision();
 
-	virtual void nodePopupContent();
+	virtual void popupContent();
 
 
 };
@@ -93,16 +93,15 @@ protected:
     WorkspaceCoreOutputPin *m_startPin;
     WorkspaceCoreInputPin * const m_endPin;
 public:
-	WorkspaceCoreLink(DIWNE::ID id, WorkspaceCoreInputPin *endPin);
+	WorkspaceCoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, WorkspaceCoreInputPin *endPin);
 
     WorkspaceCoreOutputPin* getStartPin() const {return m_startPin;};
     WorkspaceCoreInputPin* const getEndPin() const {return m_endPin;};
     void setStartPin(WorkspaceCoreOutputPin *startPin) {m_startPin = startPin;};
     void unplug();
 
-    virtual void linkPopupContent();
-    virtual bool linkContent(DIWNE::Diwne &diwne);
-    bool processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+    virtual void popupContent();
+    virtual bool initialize();
 
     void updateEndpoints();
     void updateControlPointsOffsets();
@@ -121,7 +120,7 @@ protected:
 
 
 public:
-    WorkspaceCorePin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+    WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
 	Core::Pin const& getCorePin() const;
 
@@ -136,11 +135,11 @@ public:
 	bool			 isConnected() const;
 
 	/* DIWNE function */
-	virtual bool pinContent(DIWNE::Diwne &diwne);
-	virtual bool processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-	virtual bool processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+	virtual bool content();
+	virtual bool processDrag();
+	virtual bool processConnectionPrepared();
 
-	virtual bool bypassPinHoveredAction(DIWNE::Diwne &diwne);
+	virtual bool bypassHoveredAction();
 
 };
 
@@ -150,81 +149,80 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
     protected:
         WorkspaceCoreLink m_link;
     public:
-        WorkspaceCoreInputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+        WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
         WorkspaceCoreLink& getLink() {return m_link;};
-        void updateConnectionPointDiwne(DIWNE::Diwne &diwne) {m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2);};
+        void updateConnectionPointDiwne() {m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2);};
         void setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou);
 
         void unplug();
         void plug(WorkspaceCoreOutputPin* ou);
 
-        bool drawPin(DIWNE::Diwne &diwne);
+        bool drawDiwne();
 
         /* DIWNE function */
-        virtual bool pinContent(DIWNE::Diwne &diwne);
-        virtual bool processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        virtual bool content();
+        virtual bool afterEnd();
+        virtual bool processCreateAndPlugConstrutorNode();
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin
 {
 protected:
     public:
-        WorkspaceCoreOutputPin(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-        void updateConnectionPointDiwne(DIWNE::Diwne &diwne) {m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2);};
+        WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+        void updateConnectionPointDiwne() {m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y+m_iconRectDiwne.Max.y)/2);};
 };
 
 class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
 {
     public:
-        WorkspaceCoreOutputPinWithData(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+        WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
-        bool pinContent(DIWNE::Diwne &diwne);
         virtual int maxLengthOfData() = 0;
-
 };
 
 class WorkspaceCoreOutputPinMatrix4x4 : public WorkspaceCoreOutputPinWithData
 {
     public:
-        WorkspaceCoreOutputPinMatrix4x4(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+        WorkspaceCoreOutputPinMatrix4x4(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
 class WorkspaceCoreOutputPinVector4 : public WorkspaceCoreOutputPinWithData
 {
     public:
-        WorkspaceCoreOutputPinVector4(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+        WorkspaceCoreOutputPinVector4(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
 class WorkspaceCoreOutputPinVector3 : public WorkspaceCoreOutputPinWithData
 {
     public:
-        WorkspaceCoreOutputPinVector3(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+        WorkspaceCoreOutputPinVector3(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
 class WorkspaceCoreOutputPinFloat : public WorkspaceCoreOutputPinWithData
 {
     public:
-        WorkspaceCoreOutputPinFloat(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+        WorkspaceCoreOutputPinFloat(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
 class WorkspaceCoreOutputPinQuaternion : public WorkspaceCoreOutputPinWithData
 {
     public:
-        WorkspaceCoreOutputPinQuaternion(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {};
+        WorkspaceCoreOutputPinQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
@@ -232,9 +230,9 @@ class WorkspaceCoreOutputPinPulse : public WorkspaceCoreOutputPinWithData
 {
     public:
         std::string m_buttonText;
-        WorkspaceCoreOutputPinPulse(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(id, pin, node) {m_buttonText = m_pin.getLabel();};
+        WorkspaceCoreOutputPinPulse(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {m_buttonText = m_pin.getLabel();};
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
@@ -245,23 +243,23 @@ class WorkspaceCoreOutputPinScreen : public WorkspaceCoreOutputPinWithData
         RenderTexture* rend;
         Camera* cam;
     public:
-        WorkspaceCoreOutputPinScreen(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+        WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
-        bool pinContent(DIWNE::Diwne &diwne);
+        bool content();
         int maxLengthOfData();
 };
 
-/* MatrixMulPin is Output and Input because of different  getLinkConnectionPointDiwne()  function */
+/* MatrixMulPin is Output and Input because of different getLinkConnectionPointDiwne()  function */
 class WorkspaceCoreOutputPinMatrixMul : public WorkspaceCoreOutputPin
 {
     public:
-        WorkspaceCoreOutputPinMatrixMul(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPin(id, pin, node) {};
+        WorkspaceCoreOutputPinMatrixMul(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPin(diwne, id, pin, node) {};
 };
 
 class WorkspaceCoreInputPinMatrixMul : public WorkspaceCoreInputPin
 {
     public:
-        WorkspaceCoreInputPinMatrixMul(DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreInputPin(id, pin, node) {};
+        WorkspaceCoreInputPinMatrixMul(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreInputPin(diwne, id, pin, node) {};
 };
 
 class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
@@ -275,12 +273,12 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
         std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const {return m_workspaceInputs;};
         std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const {return m_workspaceOutputs;};
 
-        WorkspaceNodeWithCoreDataWithPins(Ptr<Core::NodeBase> nodebase, bool showDataOnPins=true);
+        WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase, bool showDataOnPins=true);
 
-    virtual bool leftContent(DIWNE::Diwne &diwne);
-    virtual bool rightContent(DIWNE::Diwne &diwne);
+    virtual bool leftContent();
+    virtual bool rightContent();
 
-    virtual bool processNodeOutsideOfWorkspace(DIWNE::Diwne &diwne);
+    virtual bool finalize();
 
 };
 

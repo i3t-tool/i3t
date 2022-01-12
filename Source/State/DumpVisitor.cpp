@@ -224,7 +224,7 @@ void doForOperator()
 {
 	constexpr auto enumValue = static_cast<ENodeType>(N);
 	createFns[magic_enum::enum_name(enumValue)]
-			= WorkspaceWindow::addNodeToPosition<WorkspaceOperator<enumValue>>;
+			= addNodeToNodeEditor<WorkspaceOperator<enumValue>>;
 
 	if constexpr (N < Max) { doForOperator<N + 1, Max>(); }
 }
@@ -371,7 +371,7 @@ void buildSequence(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
 		auto posX = node["position"][0].as<float>();
 		auto posY = node["position"][1].as<float>();
 
-		auto sequence = I3T::getWindowPtr<WorkspaceWindow>()->addNodeToPosition<WorkspaceSequence>({ posX, posY });
+		auto sequence = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().addNodeToPosition<WorkspaceSequence>({ posX, posY });
 
 		auto transformIds = node["transforms"]; // = createTransformFns[enumVal](ImVec2{ posX, posY });
 		for (auto&& transformIdRaw : transformIds)
@@ -394,7 +394,7 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene)
 		if (edge.size() != 4) continue; // Edge is not valid.
 
 		/// \todo Keep scene in separate struct.
-		auto& nodes = I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes;
+		auto& nodes = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 
 		auto lhs = findNode(nodes, edge[0].as<unsigned int>());
 		auto rhs = findNode(nodes, edge[2].as<unsigned int>());
@@ -430,7 +430,7 @@ SceneData loadScene(const std::string& rawScene)
 
 		auto sequences = sceneData["sequences"];
 		for (auto&& sequence : sequences)
-			buildSequence(sequence, I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+			buildSequence(sequence, I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 
 		// Connect all nodes.
 		connectNodes(sceneData, scene);

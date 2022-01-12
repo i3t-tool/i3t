@@ -40,50 +40,34 @@
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
-enum WorkspaceWindowAction
+enum WorkspaceDiwneAction
 {
     None,
-    SelectionRectFull,
-    SelectionRectTouch,
     CreateAndPlugTypeConstructor
 };
 
-/*! \class class for Workspace window object
-    \brief Store everything what Workspace window need
-*/
-class WorkspaceWindow : public IWindow, public DIWNE::Diwne
+class WorkspaceDiwne : public DIWNE::Diwne
 {
-public:
-	I3T_WINDOW(WorkspaceWindow)
+    friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
 
-	explicit WorkspaceWindow(bool show);
-	~WorkspaceWindow() override;
+    public: /* \todo JH make some protected etc... */
+    WorkspaceDiwne(DIWNE::SettingsDiwne const &settingsDiwne);
 
-	Application& m_wholeApplication;
+    void popupContent();
 
-    void popupBackgroundContent();
+    bool beforeBegin();
+    bool beforeContent();
+    bool content();
+    bool afterEnd();
+    void allowInteraction();
 
-    bool processDiwne();
-    void BeginDiwne(const char* id);
-    void EndDiwne();
+    WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
 
-    bool m_first_frame = true;
-
-    ImRect m_selectionRectangeDiwne;
-    WorkspaceWindowAction m_workspaceWindowAction, m_workspaceWindowPreviousFrameAction;
-
-    WorkspaceCoreLink *m_creatingLink;
-    WorkspaceCorePin *m_linkCreatingPin;
-
-	ImVec2 m_rightClickPosition = ImVec2(100,100);
-
-	/**
-	 * \brief All WorkspaceNodes
-	 *
-	 * \todo Needs to be static.
-	 * \todo Move this variable somewhere else.
-	 */
-	static std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
+	/** * \brief All WorkspaceNodes
+        * \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
+	 **/
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> const & getAllNodes() {return m_workspaceCoreNodes;};
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
@@ -92,45 +76,58 @@ public:
 	template <typename T>
     void addTypeConstructorNode()
     {
-        addNodeToPosition<T>( m_linkCreatingPin->getLinkConnectionPointDiwne() + ImVec2(-100,0) ); /* \todo JH shift to Theme */
-        static_cast<WorkspaceCoreInputPin*>(m_linkCreatingPin)->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getOutputs().at(0).get()); /* \todo JH always 0 with type constructor? */
+        WorkspaceCoreInputPin *pin = getLastActivePin<WorkspaceCoreInputPin>();
+        addNodeToPosition<T>( pin->getLinkConnectionPointDiwne() + ImVec2(-100,0) ); /* \todo JH shift to Theme */
+        pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getOutputs().at(0).get()); /* \todo JH always 0 with type constructor? */
     }
 
-	/// \todo JH, MH - Needs to be accessed by scene loader, but it may be weird that the loader needs to have reference to the Workspace.
-	/// it is not weird - Workspace is main (only) owner of nodes -> whatever happens with nodes have to go through Workspace
-	/// ja to rikal na zacatku :-D ze ma byt Core uplne samsostatna jednotka... - teoreticky muze byt nekolik / zadny workspacu (pracovnich ploch) a kdyz bude funkce staticka, tak neni jasne, kam se ma vlastne node pridat - seznam nodu nemusi byt jen jeden...
 	template <class T>
-	static auto inline addNodeToPosition(ImVec2 const position) /* \todo JH MH - no static should be here */
-    //auto inline addNodeToPosition(ImVec2 const position)
+	auto inline addNodeToPosition(ImVec2 const position=ImVec2(0,0))
 	{
-		auto node = std::make_shared<T>();
+		auto node = std::make_shared<T>(*this);
 
 		node->setNodePositionDiwne( position );
 		m_workspaceCoreNodes.push_back(node);
-		// \todo JH MH m_workspaceCoreNodes.back()->drawNodeDiwne(*this); /* draw node here for avoid blinking when automated creating and pluging node */
+		m_workspaceCoreNodes.back()->drawNodeDiwne();
 
 		return node;
 	}
 
     template<class T>
-    void inline addNodeToPositionOfPopup()
+    auto inline addNodeToPositionOfPopup()
     {
-        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+        return addNodeToPosition<T>(screen2diwne(getPopupPosition()));
     }
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
 
 	void manipulatorStartCheck3D();
 
-    bool bypassDiwneSelectionRectangleAction();
-    ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
-    ImVec2 bypassDiwneGetSelectionRectangleSize();
-
-    bool processSelectionRectangle();
-
-	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
+    void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftDragedOrHoldNodeToEnd();
+};
+
+/*! \class class for Workspace window object
+    \brief Store everything what Workspace window need
+*/
+class WorkspaceWindow : public IWindow
+{
+public:
+	I3T_WINDOW(WorkspaceWindow)
+
+	explicit WorkspaceWindow(bool show);
+	~WorkspaceWindow() override {};
+
+	static WorkspaceDiwne m_workspaceDiwne;
+	WorkspaceDiwne& getNodeEditor(){return m_workspaceDiwne;};
+
+	Application& m_wholeApplication;
+
+    bool m_first_frame;
+
+    //ImVec2 m_rightClickPosition = ImVec2(100,100);
+
 
 	void render();
 
@@ -146,4 +143,10 @@ public:
 };
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
+
+template <typename T>
+auto inline addNodeToNodeEditor(ImVec2 const position=ImVec2(0,0))
+{
+    return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<T>(position);
+}
 //extern void backgroundPopupContent(DIWNE::Diwne &diwne, std::vector<Ptr<WorkspaceNodeWithCoreData>> &workspaceCoreNodes);

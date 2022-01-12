@@ -109,7 +109,7 @@ void StartWindow::render()
   ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(202, 202, 202, 255));
   ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(202, 202, 202, 255));
   ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
-  ImGui::Begin("##Intro", getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse); 
+  ImGui::Begin("##Intro", getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
   {
     // LOGO I3T
     ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;
@@ -119,7 +119,7 @@ void StartWindow::render()
     ImGui::BeginChild("left", ImVec2(leftBarWidth, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     {
       ImGui::Dummy(ImVec2(0, titleVerticalOffset));
-    	
+
       // TITLE
       ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeTitle));
       ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
@@ -164,29 +164,29 @@ void StartWindow::render()
 		// FOR POSSIBLE DEVELOPMENT OF TABS - TO BE MOVED UNDER "YOUR SCENE"
     //ImGui::Spacing();
     //// TABS
-    //if (ImGui::BeginTabBar("TabBar")) 
+    //if (ImGui::BeginTabBar("TabBar"))
     //{
     //  // TUTORIALS
-    //  if (ImGui::BeginTabItem("Tutorials")) 
+    //  if (ImGui::BeginTabItem("Tutorials"))
     //  {
     //    // here move the tutorial list and wrap it in a scrollable window / remove scrolling from the upper window
     //    ImGui::EndTabItem();
     //  }
     //  // TEMPLATES
-    //  if (ImGui::BeginTabItem("Templates")) 
+    //  if (ImGui::BeginTabItem("Templates"))
     //  {
     //    ImGui::Text("List of preset scene files");
     //    ImGui::EndTabItem();
     //  }
     //  // RECENT
-    //  if (ImGui::BeginTabItem("Recent")) 
+    //  if (ImGui::BeginTabItem("Recent"))
     //  {
     //    ImGui::Text("List of recent files files");
     //    ImGui::EndTabItem();
     //  }
     //  ImGui::EndTabBar();
     //}
-      
+
     // RIGHT CHILD WINDOW
     const ImVec2 outerPadding = ImVec2(10, 10);
     const ImVec2 innerPadding = ImVec2(10, 10);
@@ -209,7 +209,7 @@ void StartWindow::render()
 			    ImGui::Image((ImTextureID)m_folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 		    }
 		    else {
-            
+
 		    }
 		    ImGui::SameLine();
 		    // YOUR SCENE TEXT
@@ -266,7 +266,7 @@ void StartWindow::render()
 				    auto ww      = I3T::getWindowPtr<WorkspaceWindow>();
 				    if (ww != nullptr) {
 					    if (success && !result.empty()) {
-						    ww->m_workspaceCoreNodes.clear();
+						    ww->getNodeEditor().m_workspaceCoreNodes.clear();
 						    loadWorkspace(result.c_str());
 					    }
 							else {
@@ -292,7 +292,7 @@ void StartWindow::render()
 	    ImGui::PopStyleVar(2);
 
       ImGui::Dummy(ImVec2(0, 5));
-    	
+
 
     	// THE LIST OF TUTORIALS
 	    for (auto& header : m_tutorial_headers)
@@ -356,7 +356,7 @@ void StartWindow::render()
 						    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_WHITE);
 						    ImGui::TextUnformatted(header->m_description.c_str());
 						    ImGui::PopTextWrapPos();
-						    ImGui::PopStyleColor();	
+						    ImGui::PopStyleColor();
 						    ImGui::EndTooltip();
 					    }
 				    }

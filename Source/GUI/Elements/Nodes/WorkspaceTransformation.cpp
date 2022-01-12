@@ -1,10 +1,10 @@
 #include "WorkspaceTransformation.h"
 
-WorkspaceTransformation::WorkspaceTransformation(Ptr<Core::NodeBase> nodebase)
-    :   WorkspaceNodeWithCoreData(nodebase)
+WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
+    :   WorkspaceNodeWithCoreData(diwne, nodebase)
 {}
 
-bool WorkspaceTransformation::processInNodeBeforeContent(DIWNE::Diwne &diwne)
+bool WorkspaceTransformation::processBeforeContent()
 {
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
@@ -12,13 +12,13 @@ bool WorkspaceTransformation::processInNodeBeforeContent(DIWNE::Diwne &diwne)
     return false;
 }
 
-bool WorkspaceTransformation::topContent(DIWNE::Diwne &diwne)
+bool WorkspaceTransformation::topContent()
 {
     /* \todo JH get Transformation header Theme here */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
-    WorkspaceNodeWithCoreData::topContent(diwne);
+    WorkspaceNodeWithCoreData::topContent();
 
     if (!dataAreValid())
     {
@@ -29,7 +29,7 @@ bool WorkspaceTransformation::topContent(DIWNE::Diwne &diwne)
 	return false;
 }
 
-bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
+bool WorkspaceTransformation::middleContent()
 {
     bool inner_interaction_happen = false;
     //diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
@@ -38,18 +38,18 @@ bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
 	switch (m_levelOfDetail)
 	{
 	case WorkspaceLevelOfDetail::Full:
-		inner_interaction_happen = drawDataFull(diwne);
+		inner_interaction_happen = drawDataFull();
 		break;
 	case WorkspaceLevelOfDetail::SetValues:
-		inner_interaction_happen = drawDataSetValues(diwne);
+		inner_interaction_happen = drawDataSetValues();
 		break;
 	case WorkspaceLevelOfDetail::Label:
-		inner_interaction_happen = drawDataLabel(diwne);
+		inner_interaction_happen = drawDataLabel();
 		break;
 
 	default:
 		Debug::Assert(false , "drawData: Unknown m_levelOfDetail");
-        inner_interaction_happen = drawDataFull(diwne);
+        inner_interaction_happen = drawDataFull();
 	}
 
         /* to drawNodeAfterContent */
@@ -74,11 +74,11 @@ bool WorkspaceTransformation::middleContent(DIWNE::Diwne &diwne)
     return inner_interaction_happen;
 }
 
-void WorkspaceTransformation::nodePopupContent()
+void WorkspaceTransformation::popupContent()
 {
     drawMenuSetDataMap();
 
-    WorkspaceNodeWithCoreData::nodePopupContent();
+    WorkspaceNodeWithCoreData::popupContent();
 }
 
 void WorkspaceTransformation::drawMenuSetDataMap()
@@ -117,7 +117,7 @@ std::vector<ImVec2> WorkspaceTransformation::getInteractionPointsWithSequence()
     return {topMiddle, middle, bottomMiddle};
 }
 
-bool WorkspaceTransformation::drawDataFull(DIWNE::Diwne &diwne)
+bool WorkspaceTransformation::drawDataFull()
 {
      bool valueChanged = false, interaction_happen = false;
      int rowOfChange, columnOfChange;
@@ -125,7 +125,7 @@ bool WorkspaceTransformation::drawDataFull(DIWNE::Diwne &diwne)
 
      ImGui::PushStyleColor( ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)) );
 
-     interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(diwne), m_floatPopupMode,
+     interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
                                     m_nodebase->getData().getMat4(), m_nodebase->getDataMapRef(),
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
 
@@ -144,8 +144,7 @@ int WorkspaceTransformation::maxLenghtOfData()
     return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
-bool WorkspaceTransformation::drawDataSetValues_builder(  DIWNE::Diwne &diwne
-                                                        ,   std::vector<std::string> const& labels
+bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
                                                         ,   std::vector<getter_function_pointer> const& getters
                                                         ,   std::vector<setter_function_pointer> const& setters
                                                         /*,   std::vector<unsigned char> const& datamap_values*/)
@@ -159,7 +158,7 @@ bool WorkspaceTransformation::drawDataSetValues_builder(  DIWNE::Diwne &diwne
 	int		index_of_change;
 	float valueOfChange, localData; /* user can change just one value at the moment */
 
-	ImGui::PushItemWidth(getDataItemsWidth(diwne));
+	ImGui::PushItemWidth(getDataItemsWidth());
 	for (int i = 0; i < number_of_values; i++)
 	{
 		ImGui::TextUnformatted(labels[i].c_str());

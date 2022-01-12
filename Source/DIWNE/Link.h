@@ -5,24 +5,25 @@
 
 namespace DIWNE
 {
-class Link
+class Link : public DiwneObject
 {
     public:
-        Link(DIWNE::ID id);
+        Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne="DiwneLink");
 
         /** Default destructor */
-        virtual ~Link();
+        virtual ~Link(){};
 
-        DIWNE::ID const getId() const {return m_idDiwne; };
-
-        bool drawLinkDiwne(DIWNE::Diwne &diwne);
-        virtual bool linkContent(DIWNE::Diwne &diwne);
+        virtual bool initialize();
+        virtual bool initializeDiwne();
+        virtual void begin(){};
+        virtual void end(){};
+        virtual bool content();
 
         virtual void updateEndpoints(){};
         virtual void updateControlPointsOffsets(){};
         void updateControlPoints(){ m_controlPointStartDiwne=m_startDiwne+m_startControlOffsetDiwne; m_controlPointEndDiwne=m_endDiwne+m_endControlOffsetDiwne;};
 
-        void updateSquareDistanceMouseFromLink(DIWNE::Diwne &diwne);
+        void updateSquareDistanceMouseFromLink();
 
 
         ImVec2 getStartpoint(){return m_startDiwne;};
@@ -33,49 +34,24 @@ class Link
         void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end) {m_startDiwne = start; m_endDiwne = end; };
         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart; m_endControlOffsetDiwne = controlEnd; };
 
-        void setSelected(bool selected) {m_selected = selected;};
-        bool getSelected() const {return m_selected;};
-
         /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not vissible*/
-        bool isLinkOnWorkArea(DIWNE::Diwne &diwne);
+        bool isLinkOnWorkArea();
 
-        bool processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual void linkPopupContent();
-
-        virtual bool bypassLinkHoveredAction(DIWNE::Diwne &diwne);
-        virtual bool bypassLinkSelectAction(DIWNE::Diwne &diwne);
-        virtual bool bypassLinkUnselectAction(DIWNE::Diwne &diwne);
-        virtual bool bypassLinkHoldAction(DIWNE::Diwne &diwne);
-        virtual bool bypassLinkUnholdAction(DIWNE::Diwne &diwne);
-        virtual bool bypassLinkRaisePopupAction(DIWNE::Diwne &diwne);
-
-        virtual bool processLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-
-        virtual bool processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
-        virtual bool processLinkUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen);
+        virtual bool bypassHoveredAction();
 
         bool m_just_pluged;
 
     protected:
-        bool m_selected;
         ImColor m_color, m_selectedColor;
+        float m_thickness, m_thickness_selected_border;
 
     private:
-        DIWNE::ID m_idDiwne;
         ImVec2 m_startDiwne, m_endDiwne;
         ImVec2 m_startControlOffsetDiwne, m_endControlOffsetDiwne;
         ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
         float m_squaredDistanceMouseFromLink;
-        float m_thickness;
-        std::string const m_popupID;
-        bool m_translated;
-};
 
-static void expandPopupBackgroundContent(DIWNE::Link &this_object)
-{
-    this_object.linkPopupContent();
-}
+};
 
 } /* namespace DIWNE */
 

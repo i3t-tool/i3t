@@ -37,14 +37,14 @@ std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
 		{WorkspaceLevelOfDetail::Label, "Label"},
 		{WorkspaceLevelOfDetail::LightCycle, "Light cycle"}};
 
-WorkspaceNode::WorkspaceNode(DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
-    :   DIWNE::Node(id)
+WorkspaceNode::WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
+    :   DIWNE::Node(diwne, id)
     ,   m_topLabel(topLabel)
     ,   m_middleLabel(middleLabel)
     ,   m_removeFromWorkspaceWindow(false)
 {}
 
-bool WorkspaceNode::processInNodeBeforeContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::beforeContent()
 {
     /* \todo JH background by settings in different type of nodes */
     /* whole node background */
@@ -54,7 +54,7 @@ bool WorkspaceNode::processInNodeBeforeContent(DIWNE::Diwne &diwne)
 }
 
 
-bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::topContent()
 {
     bool interaction_happen = false;
 
@@ -65,7 +65,7 @@ bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
     return interaction_happen;
 }
 
-bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::middleContent()
 {
     bool interaction_happen = false;
 
@@ -74,25 +74,24 @@ bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
     return interaction_happen;
 }
 
-bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
+
+void WorkspaceNode::allowInteraction(){m_interactionAllowed = !m_inner_interaction_happen && m_nodeInteractionAllowed && (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()))); }
+bool WorkspaceNode::afterContent()
 {
-    WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
-
-    m_nodeInteractionAllowed = m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
-
-    if ( ww.m_workspaceWindowPreviousFrameAction == WorkspaceWindowAction::SelectionRectFull || ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull)
+    if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
     {
-        m_selected = ww.m_selectionRectangeDiwne.Contains(getNodeRectDiwne()) ? true : false;
+        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : false;
         m_nodeInteractionAllowed = false;
+    }else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch )
+    {
+        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : false;
+        m_nodeInteractionAllowed = false;
+    } else
+    {
+        m_nodeInteractionAllowed = true;
     }
 
-    if (ww.m_workspaceWindowPreviousFrameAction == WorkspaceWindowAction::SelectionRectTouch || ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch )
-    {
-        m_selected = ww.m_selectionRectangeDiwne.Overlaps(getNodeRectDiwne()) ? true : false;
-        m_nodeInteractionAllowed = false;
-    }
-
-    return DIWNE::Node::processInNodeAfterContent(diwne);
+    return false;
 }
 
 
@@ -104,14 +103,14 @@ void WorkspaceNode::drawMenuDelete()
     }
 }
 
-void WorkspaceNode::nodePopupContent()
+void WorkspaceNode::popupContent()
 {
     drawMenuDelete();
 }
 
 
-WorkspacePin::WorkspacePin(DIWNE::ID id, std::string label)
-    :   DIWNE::Pin(id)
+WorkspacePin::WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label)
+    :   DIWNE::Pin(diwne, id)
     ,   m_label(label)
     ,   m_showLabel(false)
 {}

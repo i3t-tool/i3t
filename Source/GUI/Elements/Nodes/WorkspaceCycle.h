@@ -14,7 +14,7 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-  WorkspaceCycle(Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(), bool drawPins=true);
+  WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(), bool drawPins=true);
 	bool isCycle();
 
     bool buttonStepNext(ImVec2 const &  button_sz);
@@ -22,9 +22,9 @@ public:
     bool buttonStopAndReset(ImVec2 const &  button_sz);
     bool buttonPlayPause(ImVec2 const &  button_sz);
 
-  bool middleContent(DIWNE::Diwne& diwne);
-  bool leftContent(DIWNE::Diwne& diwne);
-  bool rightContent(DIWNE::Diwne& diwne);
+  bool middleContent();
+  bool leftContent();
+  bool rightContent();
 
   void drawMenuLevelOfDetail();
 

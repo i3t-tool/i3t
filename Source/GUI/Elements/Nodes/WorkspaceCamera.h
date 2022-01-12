@@ -11,7 +11,7 @@ protected:
     Ptr<WorkspaceSequence> m_projection = nullptr;
     Ptr<WorkspaceSequence> m_view = nullptr;
 public:
-	WorkspaceCamera();
+	WorkspaceCamera(DIWNE::Diwne& diwne);
 
 	//===-- Double dispatch ---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
@@ -27,14 +27,14 @@ public:
 
     //bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no data */
 
-    bool middleContent(DIWNE::Diwne &diwne);
+    bool middleContent();
 
     void drawMenuLevelOfDetail();
 
 	int maxLenghtOfData();
 
-	bool leftContent(DIWNE::Diwne &diwne);
-	bool rightContent(DIWNE::Diwne &diwne);
+//	bool leftContent(DIWNE::Diwne &diwne);
+//	bool rightContent(DIWNE::Diwne &diwne);
 };
 
 

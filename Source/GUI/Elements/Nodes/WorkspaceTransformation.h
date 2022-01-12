@@ -4,7 +4,7 @@
 class WorkspaceTransformation : public WorkspaceNodeWithCoreData
 {
 public:
-	WorkspaceTransformation(Ptr<Core::NodeBase> nodebase);
+	WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase);
 
 	//===-- Double dispatch ---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
@@ -27,21 +27,21 @@ public:
 
 	virtual void drawMenuSetDataMap();
 
-	virtual bool drawDataFull(DIWNE::Diwne& diwne);
-	virtual bool inline drawDataSetValues(DIWNE::Diwne& diwne) { return drawDataFull(diwne); };
+	virtual bool drawDataFull();
+	virtual bool inline drawDataSetValues() { return drawDataFull(); };
 
 	int maxLenghtOfData();
 
-    bool processInNodeBeforeContent(DIWNE::Diwne &diwne);
-	bool topContent(DIWNE::Diwne& diwne);
-	bool middleContent(DIWNE::Diwne& diwne);
-	void nodePopupContent();
+    bool processBeforeContent();
+	bool topContent();
+	bool middleContent();
+	void popupContent();
 	void drawMenuLevelOfDetail();
 	void drawMenuDelete();
 
 
-	virtual bool drawDataSetValues_builder(DIWNE::Diwne& diwne, std::vector<std::string> const& labels,
-																				 std::vector<getter_function_pointer> const& getters,
-																				 std::vector<setter_function_pointer> const& setters
-																				 /*,   std::vector<unsigned char> const& datamap_values*/);
+	virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
+                                            std::vector<getter_function_pointer> const& getters,
+                                            std::vector<setter_function_pointer> const& setters
+                                             /*,   std::vector<unsigned char> const& datamap_values*/);
 };

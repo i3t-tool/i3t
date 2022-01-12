@@ -1,195 +1,207 @@
 #include "diwne_include.h"
 
-// #define DIWNE_DEBUG
-
 namespace DIWNE
 {
 
+/* ===================== */
+/* ===== D i w n e ===== */
+/* ===================== */
 
-Diwne::Diwne(SettingsDiwne const & settingsDiwne, void *customData)
-    : m_workAreaDiwne( settingsDiwne.workAreaDiwne.Min
-                      ,settingsDiwne.workAreaDiwne.Max)
-    , m_workAreaZoomDiwne(settingsDiwne.workAreaInitialZoomDiwne)
-    , m_zoomWheelSenzitivity(settingsDiwne.zoomWheelSenzitivity)
-    , m_minWorkAreaZoom(settingsDiwne.minWorkAreaZoom)
-    , m_maxWorkAreaZoom(settingsDiwne.maxWorkAreaZoom)
-    , m_mouseLocation(ImGuiLocation)
-    , m_helperLink(0)
-    , m_customData(customData)
-    , m_popupID(settingsDiwne.backgroundPopupID)
-{
-    //s_linkInteractionWidth = settingsDiwne.linkInteractionWidth;
-}
+Diwne::Diwne(SettingsDiwne const & settingsDiwne)
+    :   DiwneObject(*this, settingsDiwne.editorId, settingsDiwne.editorlabel)
+    ,   m_workAreaDiwne( settingsDiwne.workAreaDiwne.Min
+                        ,settingsDiwne.workAreaDiwne.Max)
+    ,   m_minWorkAreaZoom(settingsDiwne.minWorkAreaZoom)
+    ,   m_maxWorkAreaZoom(settingsDiwne.maxWorkAreaZoom)
 
-Diwne::~Diwne()
+    ,   m_workAreaZoom(settingsDiwne.workAreaInitialZoom)
+    ,   m_zoomWheelReverseSenzitivity(settingsDiwne.zoomWheelReverseSenzitivity)
+
+    ,   m_lastActivePin(nullptr)
+    ,   m_helperLink(diwne, 0)
+
+    ,   m_diwneAction(None)
+    ,   m_diwneAction_previousFrame(m_diwneAction)
+
+    ,   m_nodesSelectionChanged(false)
+    ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
+    ,   m_selectionRectangeTouchColor(settingsDiwne.selectionRectTouchColor)
+    ,   m_selectionRectangeFullColor(settingsDiwne.selectionRectFullColor)
+    ,   m_popupPosition(settingsDiwne.initPopupPosition)
 {}
 
-bool Diwne::bypassDiwneHoveredAction() {return ImGui::IsItemHovered();}
-bool Diwne::bypassDiwneRaisePopupAction() {return ImGui::IsMouseReleased(1);}
-bool Diwne::bypassDiwneHoldAction() {return ImGui::IsMouseClicked(0) && bypassDiwneHoveredAction();}
-bool Diwne::bypassDiwneUnholdAction() {return !ImGui::IsMouseDown(0);}
-
-bool Diwne::bypassDiwneSetPopupPositionAction() {return ImGui::IsMouseReleased(1);}
-ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos();}
-
-bool Diwne::processDiwneHold()
+bool Diwne::initializeDiwne()
 {
-    if (!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen && bypassDiwneHoldAction())
+    m_drawing = ImGui::BeginChild(m_labelDiwne.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    m_diwneAction = DiwneAction::None;
+    return initialize();
+}
+
+bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/wiki/Call_super */
+{
+    updateWorkAreaRectangles();
+    m_interactionAllowed = true;
+    m_nodesSelectionChanged = false;
+
+    /* zoom */
+    ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoom;
+    ImGui::SetWindowFontScale(m_workAreaZoom);
+    m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
+    ImGui::GetStyle().ItemSpacing *= m_workAreaZoom;
+
+    return beforeBegin();
+}
+
+void Diwne::begin()
+{
+    ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
+    ImGui::PushID(m_labelDiwne.c_str());
+    ImGui::BeginGroup();
+
+#ifdef DIWNE_DEBUG
+    ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
+    ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x, m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y,
+                        m_workAreaScreen.Min.x, m_workAreaScreen.Min.y, m_workAreaScreen.Max.x, m_workAreaScreen.Max.y).c_str());
+
+    ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
+    ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
+    ImGui::Text(fmt::format("Zoom: {}", m_workAreaZoom).c_str());
+
+    ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
+    ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",ImGui::GetCurrentWindow()->ClipRect.Min.x, ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x, ImGui::GetCurrentWindow()->ClipRect.Max.y).c_str());
+
+    switch (m_diwneAction_previousFrame)
     {
-        setDiwneAction(DiwneAction::HoldWorkarea);
+        case DiwneAction::None: ImGui::Text("PrevDiwneAction: None"); break;
+        case DiwneAction::NewLink: ImGui::Text("PrevDiwneAction: NewLink"); break;
+        case DiwneAction::HoldNode: ImGui::Text("PrevDiwneAction: HoldNode"); break;
+        case DiwneAction::DragNode: ImGui::Text("PrevDiwneAction: DragNode"); break;
+        case DiwneAction::HoldWorkarea: ImGui::Text("PrevDiwneAction: HoldWorkarea"); break;
+        case DiwneAction::DragWorkarea: ImGui::Text("PrevDiwneAction: DragWorkarea"); break;
+        case DiwneAction::SelectionRectFull: ImGui::Text("PrevDiwneAction: SelectionRectFull"); break;
+        case DiwneAction::SelectionRectTouch: ImGui::Text("PrevDiwneAction: SelectionRectTouch"); break;
+    }
+#endif // DIWNE_DEBUG
+}
+
+bool Diwne::afterContentDiwne()
+{
+    bool interaction_happen = false;
+    if (m_diwneAction == DiwneAction::NewLink)
+    {
+        interaction_happen |= m_helperLink.drawDiwne();
+    }
+    interaction_happen |= afterContent();
+    return interaction_happen;
+}
+
+void Diwne::end()
+{
+    ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
+    ImGui::EndGroup();
+    ImGui::PopID();
+}
+
+bool Diwne::afterEndDiwne()
+{
+    bool interaction_happen = false;
+
+    interaction_happen |= processDiwneZoom();
+    interaction_happen |= processSelectionRectangle();
+    interaction_happen |= DiwneObject::afterEndDiwne();
+
+    ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
+    m_diwneAction_previousFrame = m_diwneAction;
+
+    return interaction_happen;
+}
+
+bool Diwne::finalizeDiwne()
+{
+    bool interaction_happen = finalize();
+    ImGui::EndChild();
+    return interaction_happen;
+}
+
+bool Diwne::processSelectionRectangle()
+{
+    if(m_interactionAllowed && bypassSelectionRectangleAction())
+    {
+        ImVec2 startPos = bypassDiwneGetSelectionRectangleStartPosition();
+        ImVec2 dragDelta = bypassDiwneGetSelectionRectangleSize();
+        ImColor color;
+
+        if(dragDelta.x > 0)
+        {
+            setDiwneAction(DiwneAction::SelectionRectFull);
+            m_selectionRectangeDiwne.Min.x = startPos.x;
+            m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
+            color = m_selectionRectangeFullColor;
+        }else
+        {
+            setDiwneAction(DiwneAction::SelectionRectTouch);
+            m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
+            m_selectionRectangeDiwne.Max.x = startPos.x;
+            color = m_selectionRectangeTouchColor;
+        }
+
+        if(dragDelta.y > 0)
+        {
+            m_selectionRectangeDiwne.Min.y = startPos.y;
+            m_selectionRectangeDiwne.Max.y = startPos.y + dragDelta.y;
+        }else
+        {
+            m_selectionRectangeDiwne.Min.y = startPos.y + dragDelta.y;
+            m_selectionRectangeDiwne.Max.y = startPos.y;
+        }
+
+        AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
+
         return true;
     }
     return false;
 }
 
-bool Diwne::processDiwneUnhold()
+bool Diwne::processHold()
 {
-    if (bypassDiwneUnholdAction())
-    {
-        setDiwneAction(DiwneAction::None);
-        return true;
-    }
-    return false;
+    setDiwneAction(DiwneAction::HoldWorkarea);
+    return true;
 }
 
-bool Diwne::processDiwneDrag()
+bool Diwne::processUnhold()
 {
-    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
-        && m_diwneAction == DiwneAction::HoldWorkarea && bypassIsMouseDragging0())
-    {
-        translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
-        return true;
-    }
-    return false;
+    setDiwneAction(DiwneAction::None);
+    return true;
+}
+
+bool Diwne::processDrag()
+{
+    translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
+    return true;
+}
+
+bool Diwne::processZoom()
+{
+    setWorkAreaZoom( m_workAreaZoom + bypassGetZoomDelta() );
+    return true;
 }
 
 bool Diwne::processDiwneZoom()
 {
-    float mouseWheel = bypassGetMouseWheel();
-    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
-        && mouseWheel != 0 && bypassDiwneHoveredAction())
+    if (m_interactionAllowed && bypassZoomAction())
     {
-        setWorkAreaZoomDiwne(m_workAreaZoomDiwne + mouseWheel/m_zoomWheelSenzitivity);
-        return true;
+        return processZoom();
     }
     return false;
 }
 
-/* this function use template usable in other Elements too -> revise it */
-bool Diwne::processDiwneRaisePopupDiwne()
+void Diwne::setWorkAreaZoom(float val/*=1*/)
 {
-    if(!m_inner_interaction_happen && !m_previousFrame_inner_interaction_happen
-        && m_previousFrameDiwneAction == DiwneAction::None && m_diwneAction == DiwneAction::None
-         && bypassDiwneRaisePopupAction())
-    {
-        ImGui::OpenPopup(m_popupID.c_str());
-        return true;
-    }
-    return false;
-
+    double old = m_workAreaZoom;
+    if (val < m_minWorkAreaZoom){ m_workAreaZoom = m_minWorkAreaZoom; }
+    else if (val > m_maxWorkAreaZoom){ m_workAreaZoom = m_maxWorkAreaZoom; }
+    else m_workAreaZoom = val;
 }
-
-bool Diwne::processDiwneSetPopupPosition()
-{
-    if(m_diwneAction == DiwneAction::None && bypassDiwneSetPopupPositionAction())
-    {
-        setPopupPosition(bypassDiwneGetPopupNewPositionAction());
-        return true;
-    }
-    return false;
-}
-
-bool Diwne::processDiwne()
-{
-    processDiwneSetPopupPosition();
-
-    if (m_diwneAction == DiwneAction::NewLink) m_helperLink.drawLinkDiwne(*this);
-
-    if (!m_inner_interaction_happen)
-    {
-        m_diwneAction == DiwneAction::HoldWorkarea ? processDiwneUnhold() : processDiwneHold();
-        processDiwneDrag();
-        processDiwneZoom();
-        processDiwneRaisePopupDiwne();
-    }
-    popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
-
-		return false;
-}
-
-void Diwne::BeginDiwne(const char* imgui_id)
-{
-    ImGui::BeginChild(imgui_id, ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-        updateWorkAreaRectangles();
-        m_inner_interaction_happen = false;
-        m_nodesSelectionChanged = false;
-
-        ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
-        ImGui::PushID("BackgroundDiwne");
-        ImGui::BeginGroup();
-
-        /* zoom */
-        ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoomDiwne;
-        ImGui::SetWindowFontScale(m_workAreaZoomDiwne);
-        m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
-        ImGui::GetStyle().ItemSpacing *= m_workAreaZoomDiwne;
-
-#ifdef DIWNE_DEBUG
-        ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
-
-        ImGui::Text(fmt::format("WindowPadding: {}_{} ",ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y).c_str());
-        ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",ImGui::GetCurrentWindow()->ClipRect.Min.x, ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x, ImGui::GetCurrentWindow()->ClipRect.Max.y).c_str());
-
-        ImRect workAreaScreen = getWorkAreaScreen();
-        ImRect workAreaDiwne = getWorkAreaDiwne();
-        ImGui::Text(fmt::format("WADiwne: {}-{}  -  {}-{}\nWAScreen: {}-{}  -  {}-{}", workAreaDiwne.Min.x, workAreaDiwne.Min.y, workAreaDiwne.Max.x, workAreaDiwne.Max.y,
-                            workAreaScreen.Min.x, workAreaScreen.Min.y, workAreaScreen.Max.x, workAreaScreen.Max.y).c_str());
-        ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
-
-        ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
-        ImGui::Text(fmt::format("Zoom: {}", m_workAreaZoomDiwne).c_str());
-
-        if (m_diwneAction == DIWNE::DiwneAction::None) ImGui::Text("DiwneAction: None");
-        if (m_diwneAction == DIWNE::DiwneAction::NewLink) ImGui::Text("DiwneAction: NewLink");
-        if (m_diwneAction == DIWNE::DiwneAction::HoldNode) ImGui::Text("DiwneAction: HoldNode");
-        if (m_diwneAction == DIWNE::DiwneAction::DragNode) ImGui::Text("DiwneAction: DragNode");
-        if (m_diwneAction == DIWNE::DiwneAction::HoldWorkarea) ImGui::Text("DiwneAction: HoldWorkarea");
-
-        m_inner_interaction_happen ? ImGui::Text("inner_interaction happen") : ImGui::Text("inner_interaction not happen");
-        m_previousFrame_inner_interaction_happen ? ImGui::Text("prev inner_interaction happen") : ImGui::Text("prev inner_interaction not happen");
-
-#endif // DIWNE_DEBUG
-
-//        putInvisibleButtonUnder("BackgroundDiwne", m_workAreaScreen.GetSize());
-//        processDiwne();
-
-}
-
-void Diwne::EndDiwne()
-{
-    ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window to Group */
-    ImGui::EndGroup(); /* "BackgroundDiwne" */
-    ImGui::PopID();
-    processDiwne();
-
-    ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
-    m_previousFrameDiwneAction = m_diwneAction;
-    m_previousFrame_inner_interaction_happen = m_inner_interaction_happen;
-
-    ImGui::EndChild();
-}
-
-void Diwne::setWorkAreaZoomDiwne(float val/*=1*/)
-{
-    double old = m_workAreaZoomDiwne;
-    if (val < m_minWorkAreaZoom){ m_workAreaZoomDiwne = m_minWorkAreaZoom; }
-    else if (val > m_maxWorkAreaZoom){ m_workAreaZoomDiwne = m_maxWorkAreaZoom; }
-    else m_workAreaZoomDiwne = val;
-}
-
-
-
 
 /* \todo JH some policy what point in WorkArea hold position on screen - probably CoursorPosition */
 void Diwne::updateWorkAreaRectangles()
@@ -200,19 +212,19 @@ void Diwne::updateWorkAreaRectangles()
     m_workAreaScreen.Min = windowPos;
     m_workAreaScreen.Max = windowPos + windowSize;
 
-    m_workAreaDiwne.Max = m_workAreaDiwne.Min + windowSize/m_workAreaZoomDiwne;
+    m_workAreaDiwne.Max = m_workAreaDiwne.Min + windowSize/m_workAreaZoom;
 }
 
 
 
 ImVec2 Diwne::transformFromImGuiToDiwne(const ImVec2& point) const
 {
-    return workArea2screen(screen2workArea(point) / m_workAreaZoomDiwne); /* basically just zoom */
+    return workArea2screen(screen2workArea(point) / m_workAreaZoom); /* basically just zoom */
 }
 
 ImVec2 Diwne::transformFromDiwneToImGui(const ImVec2& point) const
 {
-    return workArea2screen(screen2workArea(point) * m_workAreaZoomDiwne); /* basically just zoom */
+    return workArea2screen(screen2workArea(point) * m_workAreaZoom); /* basically just zoom */
 }
 
 ImVec4 Diwne::transformFromImGuiToDiwne(const ImVec4& rect) const
@@ -229,34 +241,9 @@ ImVec4 Diwne::transformFromDiwneToImGui(const ImVec4& rect) const
     return ImVec4(topleft.x, topleft.y, bottomright.x, bottomright.y);
 }
 
-void Diwne::transformMouseFromImGuiToDiwne()
-{
-    if (m_mouseLocation == ImGuiLocation)
-    {
-        m_mouseLocation = DiwneLocation;
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.MousePos = transformFromImGuiToDiwne(io.MousePos);
-        for (int i=0;i<5;i++) io.MouseClickedPos[i] = transformFromImGuiToDiwne(io.MouseClickedPos[i]);
-    }
-}
-
-void Diwne::transformMouseFromDiwneToImGui()
-{
-    if (m_mouseLocation == DiwneLocation)
-    {
-        m_mouseLocation = ImGuiLocation;
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.MousePos = transformFromDiwneToImGui(io.MousePos);
-        for (int i=0;i<5;i++) io.MouseClickedPos[i] = transformFromDiwneToImGui(io.MouseClickedPos[i]);
-    }
-
-}
-
 void Diwne::translateWorkAreaDiwneZoomed(ImVec2 const &distance)
 {
-    translateWorkAreaDiwne(ImVec2(distance.x/m_workAreaZoomDiwne, distance.y/m_workAreaZoomDiwne));
+    translateWorkAreaDiwne(ImVec2(distance.x/m_workAreaZoom, distance.y/m_workAreaZoom));
 }
 
 void Diwne::translateWorkAreaDiwne(ImVec2 const &distance)
@@ -291,7 +278,7 @@ void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2
                         , diwne2screen(p2)
                         , diwne2screen(p3)
                         , diwne2screen(p4)
-                        , col, thickness*m_workAreaZoomDiwne, num_segments);
+                        , col, thickness*m_workAreaZoom, num_segments);
 }
 
 void Diwne::DrawIconCircle(ImDrawList* idl,
@@ -400,8 +387,6 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
     ImVec2 inner_icon_min = icon_min + ImVec2(padding.x, padding.w);
     ImVec2 inner_icon_max = icon_max - ImVec2(padding.z, padding.y);
 
-//    idl->PushClipRect(m_workAreaScreen.Min, m_workAreaScreen.Max, false);
-
     switch(bgIconType)
     {
     case Circle:
@@ -440,9 +425,7 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
         break;
     }
 
-//    idl->PopClipRect();
-
-    ImGui::Dummy(size);
+    ImGui::Dummy(size); /* \todo JH maybe InvisibleButton */
 }
 
 ImVec2 Diwne::screen2workArea(const ImVec2 & point) const
@@ -457,12 +440,12 @@ ImVec2 Diwne::workArea2screen(const ImVec2 & point) const
 
 ImVec2 Diwne::diwne2workArea(const ImVec2 & point) const
 {
-    return diwne2workArea_noZoom(point)*m_workAreaZoomDiwne;
+    return diwne2workArea_noZoom(point)*m_workAreaZoom;
 }
 
 ImVec2 Diwne::workArea2diwne(const ImVec2 & point) const
 {
-    return workArea2diwne_noZoom(point/m_workAreaZoomDiwne);
+    return workArea2diwne_noZoom(point/m_workAreaZoom);
 }
 
 ImVec2 Diwne::screen2diwne(const ImVec2 & point) const
@@ -501,6 +484,9 @@ bool Diwne::bypassIsItemClicked2() {return ImGui::IsItemClicked(2);}
 bool Diwne::bypassIsMouseDown0() {return ImGui::IsMouseDown(0);}
 bool Diwne::bypassIsMouseDown1() {return ImGui::IsMouseDown(1);}
 bool Diwne::bypassIsMouseDown2() {return ImGui::IsMouseDown(2);}
+bool Diwne::bypassIsMouseClicked0(){return ImGui::IsMouseClicked(0);}
+bool Diwne::bypassIsMouseClicked1(){return ImGui::IsMouseClicked(1);}
+bool Diwne::bypassIsMouseClicked2(){return ImGui::IsMouseClicked(2);}
 bool Diwne::bypassIsMouseReleased0() {return ImGui::IsMouseReleased(0);}
 bool Diwne::bypassIsMouseReleased1() {return ImGui::IsMouseReleased(1);}
 bool Diwne::bypassIsMouseReleased2() {return ImGui::IsMouseReleased(2);}
@@ -517,18 +503,18 @@ ImVec2 Diwne::bypassGetMouseDragDelta2() {return ImGui::GetMouseDragDelta(2);}
 ImVec2 Diwne::bypassGetMouseDelta() {return ImGui::GetIO().MouseDelta;}
 ImVec2 Diwne::bypassGetMousePos() {return ImGui::GetIO().MousePos;}
 float Diwne::bypassGetMouseWheel() {return ImGui::GetIO().MouseWheel;}
+float Diwne::bypassGetZoomDelta() {return bypassGetMouseWheel()/m_zoomWheelReverseSenzitivity;}
 
+bool Diwne::bypassZoomAction() {return bypassHoveredAction() && diwne.bypassGetZoomDelta() != 0;}
+bool Diwne::bypassDiwneSetPopupPositionAction() {return bypassIsMouseClicked1();}
+ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos();}
+/* be careful for same mouse button in this functions */
+bool Diwne::bypassSelectionRectangleAction() {return bypassHoveredAction() && bypassIsMouseDragging1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos1());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta1()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImRect Diwne::getSelectionRectangleDiwne(){return m_selectionRectangeDiwne;}
 
-void Diwne::showTooltipLabel(std::string label, ImColor color)
-{
-    ImGui::BeginTooltip();
-
-    ImGui::TextColored(color, label.c_str());
-
-    ImGui::EndTooltip();
-}
-
-
+bool Diwne::bypassRaisePopupAction(){return m_diwneAction == DiwneAction::None && m_diwneAction_previousFrame == DiwneAction::None && DiwneObject::bypassRaisePopupAction();}
 
 /* >>>> STATIC FUNCTIONS <<<< */
 bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size)

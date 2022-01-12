@@ -13,7 +13,7 @@
 class WorkspaceScreen : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-  WorkspaceScreen();
+  WorkspaceScreen(DIWNE::Diwne& diwne);
 	~WorkspaceScreen();
 
 	//===-- Double dispatch ---------------------------------------------------===//
@@ -23,9 +23,9 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-  //bool drawDataFull(DIWNE::Diwne& diwne, int index);
+  //bool drawDataFull(, int index);
 	int maxLenghtOfData();  //todo
-	bool middleContent(DIWNE::Diwne& diwne);  // the most important function
+	bool middleContent();  // the most important function
 	void drawMenuLevelOfDetail();  //todo
 
 private:

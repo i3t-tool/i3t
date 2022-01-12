@@ -5,8 +5,8 @@ template <ENodeType T>
 class WorkspaceOperator : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-    WorkspaceOperator()
-        :   WorkspaceNodeWithCoreDataWithPins(Core::Builder::createNode<T>())
+    WorkspaceOperator(DIWNE::Diwne& diwne)
+        :   WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<T>())
     {
         setDataItemsWidth();
     }
@@ -18,7 +18,7 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	virtual bool processInNodeBeforeContent(DIWNE::Diwne &diwne)
+	virtual bool processBeforeContent()
     {
         /* whole node background */
         diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
@@ -26,15 +26,15 @@ public:
         return false;
     }
 
-	virtual bool topContent(DIWNE::Diwne &diwne)
+	virtual bool topContent()
 	{
 	    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderOperator)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
-	    return WorkspaceNodeWithCoreData::topContent(diwne);
+	    return WorkspaceNodeWithCoreData::topContent();
 	}
 
-    virtual bool inline middleContent(DIWNE::Diwne &diwne)
+    virtual bool inline middleContent()
     {
         return false;
     }

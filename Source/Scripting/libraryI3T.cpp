@@ -29,7 +29,7 @@ void mat4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
 	if(type==scriptingData.mat4Types.determinant){
 		workspace->push_back(std::make_unique<WorkspaceDeterminant>((ImTextureID)0, l));
@@ -121,7 +121,7 @@ void mat4(struct ParseState* parser, struct Value* returnValue, struct Value** p
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
 	if (type == scriptingData.mat4Types.scale) {
 		workspace->push_back(std::make_unique<WorkspaceMatrixScale>((ImTextureID)0, l));
@@ -215,7 +215,7 @@ void vec4(struct ParseState* parser, struct Value* returnValue, struct Value** p
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
 	workspace->push_back(std::make_unique<WorkspaceVectorFree>((ImTextureID)0, l));
     if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec4)mat[0]);}
@@ -245,7 +245,7 @@ void vec3(struct ParseState* parser, struct Value* returnValue, struct Value** p
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
 	workspace->push_back(std::make_unique<WorkspaceVector3Free>((ImTextureID)0, l));
     if(datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue((glm::vec3)mat[0]);}
@@ -270,7 +270,7 @@ void vec4oper(struct ParseState* parser, struct Value* returnValue, struct Value
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     if (type == scriptingData.vecOperators.dot) {
         workspace->push_back(std::make_unique<WorkspaceVectorDotVector>((ImTextureID)0, l));
@@ -316,7 +316,7 @@ void vec3oper(struct ParseState* parser, struct Value* returnValue, struct Value
         if(param[3]->Val->Pointer!=nullptr){l = (char*)param[3]->Val->Pointer;}
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     if(type == scriptingData.vecOperators.cross){
         workspace->push_back(std::make_unique<WorkspaceVector3CrossVector3>((ImTextureID)0, l));
@@ -372,7 +372,7 @@ void scalar(struct ParseState* parser, struct Value* returnValue, struct Value**
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     workspace->push_back(std::make_unique<WorkspaceFloatFree>((ImTextureID)0, l));
     if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0][0]);}
@@ -397,7 +397,7 @@ void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Val
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     if (type == scriptingData.floatOperators.asinacos) {
         workspace->push_back(std::make_unique<WorkspaceASinACos>((ImTextureID)0, l));
@@ -452,7 +452,7 @@ void convertor(struct ParseState* parser, struct Value* returnValue, struct Valu
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     if (type == scriptingData.convertors.mat_tr) {
         workspace->push_back(std::make_unique<WorkspaceMatrixToTR>((ImTextureID)0, l));
@@ -532,7 +532,7 @@ void quat(struct ParseState* parser, struct Value* returnValue, struct Value** p
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 
     returnValue->Val->Integer =- 1; return;
     //workspace->push_back(std::make_unique<WorkspaceQuatFree>((ImTextureID)0, l));
@@ -557,7 +557,7 @@ void quatoper(struct ParseState* parser, struct Value* returnValue, struct Value
         y = param[2]->Val->Integer;
         if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
     }
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     if (type == scriptingData.quatOperators.scalarvec3_quat) {
         workspace->push_back(std::make_unique<WorkspaceFloatVecToQuat>((ImTextureID)0, l));
@@ -629,7 +629,7 @@ void sequence(struct ParseState* parser, struct Value* returnValue, struct Value
         if (param[2]->Val->Pointer != nullptr) { l = (char*)param[2]->Val->Pointer; }
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 /* \todo JH repaire
     workspace->push_back(std::make_unique<WorkspaceSequence>((ImTextureID)0, nullptr,l));
 
@@ -653,9 +653,9 @@ void camera(struct ParseState* parser, struct Value* returnValue, struct Value**
         if (param[2]->Val->Pointer != nullptr) { l = (char*)param[2]->Val->Pointer; }
     }
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 
-    workspace->push_back(std::make_unique<WorkspaceCamera>());
+    workspace->push_back(std::make_unique<WorkspaceCamera>(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor())); /* \todo use addNodeToPosition*/
 
     workspace->back()->setNodePositionDiwne(ImVec2((float)x, (float)y));
     if (numArgs == 0) {
@@ -675,7 +675,7 @@ void plugNodes(struct ParseState* parser, struct Value* returnValue, struct Valu
     int inputindex= param[3]->Val->Integer;
     int indexa=-1;
     int indexb=-1;
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
         if(workspace->at(i)->getNodebase()->getId()==ida){indexa=i;break;}
     }
@@ -701,7 +701,7 @@ void seqAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     int seqindex=-1,nodeindex=-1;
     //int at =param[2]->Val->Integer;
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
         if(workspace->at(i)->getNodebase()->getId()==seqid){seqindex=i;break;}
     }
@@ -731,7 +731,7 @@ void camAdd(struct ParseState* parser, struct Value* returnValue, struct Value**
     int camindex = -1, nodeindex = -1;
     //int at =param[2]->Val->Integer;
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
     for (int i = 0; i < workspace->size(); i++) {
         if (workspace->at(i)->getNodebase()->getId() == camid) { camindex = i; break; }
     }
@@ -766,7 +766,7 @@ void unplugInput(struct ParseState* parser, struct Value* returnValue, struct Va
     int inputindex= param[1]->Val->Integer;
     int indexa=-1;
 
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
         if(workspace->at(i)->getNodebase()->getId()==ida){indexa=i;break;}
     }
@@ -782,7 +782,7 @@ void getNodeByName(struct ParseState* parser, struct Value* returnValue, struct 
     char* label=(char*)param[0]->Val->Pointer;
     int occurances=0;
     returnValue->Val->Integer=-1;
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
         if (strcmp(workspace->at(i).get()->getTopLabel().c_str(),label)==0) {occurances++;}
     }
@@ -804,7 +804,7 @@ void getNodeByName(struct ParseState* parser, struct Value* returnValue, struct 
 void deleteNode(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs){
     int id=param[0]->Val->Integer;
     int index=-1;
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
 
     for(int i=0;i<workspace->size();i++){
         if(workspace->at(i)->getNodebase()->getId()==id){index=i;break;}
@@ -821,7 +821,7 @@ void confNode(struct ParseState* parser, struct Value* returnValue, struct Value
     int precision=param[1]->Val->Integer;
     int lod=param[2]->Val->Integer;
     int index=-1;
-    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->m_workspaceCoreNodes);
+    std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace=&(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
     for(int i=0;i<workspace->size();i++){
         if(workspace->at(i)->getNodebase()->getId()==id){index=i;break;}
     }
@@ -863,18 +863,18 @@ void loadW(struct ParseState* parser, struct Value* returnValue, struct Value** 
     std::string filename= Config::getAbsolutePath((char*)param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != nullptr) {ww->m_workspaceCoreNodes.clear(); status=loadWorkspace(filename.c_str()); }
+    if (ww != nullptr) {ww->getNodeEditor().m_workspaceCoreNodes.clear(); status=loadWorkspace(filename.c_str()); }
     returnValue->Val->Integer=status;
 }
 void appendW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     std::string filename= Config::getAbsolutePath((char*)param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    int len=(int)ww->m_workspaceCoreNodes.size();
+    int len=(int)ww->getNodeEditor().m_workspaceCoreNodes.size();
     if (ww != nullptr) {status=loadWorkspace(filename.c_str()); }
 
 // \todo JH repaire    ne::ClearSelection();
-    for(int i=len;i<(int)ww->m_workspaceCoreNodes.size();i++){
+    for(int i=len;i<(int)ww->getNodeEditor().m_workspaceCoreNodes.size();i++){
 // \todo Jh repaire        ne::SelectNode(ww->m_workspaceCoreNodes[i]->getId(),true);
     }
 
@@ -884,7 +884,7 @@ void saveW(struct ParseState* parser, struct Value* returnValue, struct Value** 
     std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
     auto ww = I3T::getWindowPtr<WorkspaceWindow>();
     bool status=false;
-    if (ww != nullptr) {status=saveWorkspace(filename.c_str(), &ww->m_workspaceCoreNodes); }
+    if (ww != nullptr) {status=saveWorkspace(filename.c_str(), &ww->getNodeEditor().m_workspaceCoreNodes); }
     returnValue->Val->Integer = status;
 }
 void saveSelW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {

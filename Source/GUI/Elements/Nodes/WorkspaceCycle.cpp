@@ -4,8 +4,8 @@
 
 #include "WorkspaceCycle.h"
 
-WorkspaceCycle::WorkspaceCycle(Ptr<Core::NodeBase> nodebase/*=Core::GraphManager::createCycle()*/, bool drawPins/*=true*/)
-    :   WorkspaceNodeWithCoreDataWithPins(nodebase, drawPins)
+WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase/*=Core::GraphManager::createCycle()*/, bool drawPins/*=true*/)
+    :   WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
 {
 	setDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node and run settings data width in it */
 }
@@ -64,7 +64,7 @@ bool WorkspaceCycle::buttonStepNext(ImVec2 const &  button_sz)
     return false;
 }
 
-bool WorkspaceCycle::leftContent(DIWNE::Diwne& diwne)
+bool WorkspaceCycle::leftContent()
 {
     bool inner_interaction_happen = false;
 
@@ -80,7 +80,7 @@ bool WorkspaceCycle::leftContent(DIWNE::Diwne& diwne)
             pin->setConnectionPointDiwne(pinConnectionPoint);
             if (pin->isConnected())
             {
-                inner_interaction_happen |= pin->getLink().drawLinkDiwne(diwne);
+                inner_interaction_happen |= pin->getLink().drawDiwne();
             }
         }
 
@@ -90,7 +90,7 @@ bool WorkspaceCycle::leftContent(DIWNE::Diwne& diwne)
 
         for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
         {
-            m_workspaceInputs.at(i)->drawPin(diwne);
+            m_workspaceInputs.at(i)->drawDiwne();
         }
 
         for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP, Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
@@ -99,20 +99,20 @@ bool WorkspaceCycle::leftContent(DIWNE::Diwne& diwne)
             pin->setConnectionPointDiwne(pinConnectionPoint);
             if (pin->isConnected())
             {
-                inner_interaction_happen |= pin->getLink().drawLinkDiwne(diwne);
+                inner_interaction_happen |= pin->getLink().drawDiwne();
             }
         }
 
         break;
     case WorkspaceLevelOfDetail::Full:
-        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent(diwne);
+        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent();
         break;
     }
 
     return inner_interaction_happen;
 }
 
-bool WorkspaceCycle::rightContent(DIWNE::Diwne& diwne)
+bool WorkspaceCycle::rightContent()
 {
     bool inner_interaction_happen = false;
 
@@ -133,7 +133,7 @@ bool WorkspaceCycle::rightContent(DIWNE::Diwne& diwne)
 
         for (auto const i : {Core::I3T_CYCLE_OUT_VAL})
         {
-            m_workspaceOutputs.at(i)->drawPinDiwne(diwne);
+            m_workspaceOutputs.at(i)->drawDiwne();
         }
 
         for (auto const i : {Core::I3T_CYCLE_OUT_PLAY, Core::I3T_CYCLE_OUT_PAUSE, Core::I3T_CYCLE_OUT_STOP, Core::I3T_CYCLE_OUT_PREV, Core::I3T_CYCLE_OUT_NEXT, Core::I3T_CYCLE_OUT_END})
@@ -143,14 +143,14 @@ bool WorkspaceCycle::rightContent(DIWNE::Diwne& diwne)
 
         break;
     case WorkspaceLevelOfDetail::Full:
-        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::rightContent(diwne);
+        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::rightContent();
         break;
     }
 
     return inner_interaction_happen;
 }
 
-bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
+bool WorkspaceCycle::middleContent()
 {
     // \todo Add icons to buttons
     // "⯈/❙❙" "◼" "❙⯇" "⯈❙"
@@ -160,7 +160,7 @@ bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
 
 
     bool inner_interaction_happen = false;
-    ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoomDiwne();
+    ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoom();
 
     switch (m_levelOfDetail)
     {
@@ -244,7 +244,7 @@ bool WorkspaceCycle::middleContent(DIWNE::Diwne& diwne)
 //		float localData;
         valueChanged = false;
 
-		ImGui::PushItemWidth(getDataItemsWidth(diwne));
+		ImGui::PushItemWidth(getDataItemsWidth());
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
