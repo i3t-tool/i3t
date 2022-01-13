@@ -34,7 +34,7 @@ class Link : public DiwneObject
         void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end) {m_startDiwne = start; m_endDiwne = end; };
         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart; m_endControlOffsetDiwne = controlEnd; };
 
-        /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not vissible*/
+        /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
         bool isLinkOnWorkArea();
 
         virtual bool bypassHoveredAction();

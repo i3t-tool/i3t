@@ -58,6 +58,7 @@ class WorkspaceDiwne : public DIWNE::Diwne
     bool beforeBegin();
     bool beforeContent();
     bool content();
+    bool afterContent();
     bool afterEnd();
     void allowInteraction();
 

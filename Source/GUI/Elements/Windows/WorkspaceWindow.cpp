@@ -611,7 +611,8 @@ bool WorkspaceDiwne::content()
 
 void WorkspaceDiwne::allowInteraction(){m_interactionAllowed = (!m_inner_interaction_happen || m_workspaceDiwneAction == WorkspaceDiwneAction::CreateAndPlugTypeConstructor); }
 
-bool WorkspaceDiwne::afterEnd()
+
+bool WorkspaceDiwne::afterContent()
 {
     bool interaction_happen = false;
     interaction_happen |= processCreateAndPlugTypeConstructor();
@@ -627,16 +628,19 @@ bool WorkspaceDiwne::afterEnd()
     {
         shiftDragedOrHoldNodeToEnd();
     }
-
-    m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
     return interaction_happen;
+}
+
+bool WorkspaceDiwne::afterEnd()
+{
+    m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
+    return false;
 }
 
 
 
 bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
 {
-
     if (m_workspaceDiwneAction == WorkspaceDiwneAction::CreateAndPlugTypeConstructor)
     {
         switch (getLastActivePin<WorkspaceCoreInputPin>()->getType())
@@ -657,8 +661,6 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
                 addTypeConstructorNode<WorkspaceOperator<ENodeType::FloatToFloat>>();
                 break;
         }
-//        /* \todo JH MH remove this after make addNodeToPosition() member of WorkspaceDiwne -> and call it in addNodeToPosition() */
-//        m_workspaceCoreNodes.back()->drawNodeDiwne(); /* \todo JH MH danger here - if in function addNodeToPosition() node will not be added to end -> than it will be still blink */
         return true;
     }
     return false;
@@ -745,12 +747,8 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 /* ========================================== */
 WorkspaceWindow::WorkspaceWindow(bool show)
     :	IWindow(show)
-//    ,   m_workspaceDiwne(settingsDiwne)
     ,   m_first_frame(true)
     ,   m_wholeApplication(Application::get())
-
-    //,   m_headerBackgroundTexture( (ImTextureID) (intptr_t) pgr::createTexture(Config::getAbsolutePath("Data/textures/blueprint_background.png"), true)) // \TODO load texture OR making a simple rectangle
-//		,m_nodeBuilderContext(util::NodeBuilder(m_headerBackgroundTexture, 64, 64))
 {
 
 // Input actions for workspace window.
@@ -815,13 +813,6 @@ void WorkspaceWindow::render()
 //	return nullptr;
 //}
 //
-//void WorkspaceWindow::checkUserActions()
-//{
-//	if (ImGui::IsMouseClicked(1)) /* right button */ { m_rightClickPosition = ImGui::GetMousePos(); }
-//}
-//
-
-
 
 //std::vector<Ptr<WorkspaceSequence>> WorkspaceWindow::getSequenceNodes()
 //{
