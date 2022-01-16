@@ -19,8 +19,8 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 bool WorkspaceCamera::middleContent()
 {
     bool inner_interaction_happen = false;
-	inner_interaction_happen |= m_projection->drawNodeDiwne(true); ImGui::SameLine();
-	inner_interaction_happen |= m_view->drawNodeDiwne(true);
+	inner_interaction_happen |= m_projection->drawNodeDiwne<WorkspaceSequence>(true); ImGui::SameLine();
+	inner_interaction_happen |= m_view->drawNodeDiwne<WorkspaceSequence>(true);
 	return inner_interaction_happen;
 }
 

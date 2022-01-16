@@ -16,7 +16,7 @@ namespace DIWNE
  *  |     Bottom      |
  *  -------------------
  */
-class Node : public DiwneObject, public std::enable_shared_from_this<Node>
+class Node : public DiwneObject
 {
     public:
         /** Default constructor */
@@ -46,8 +46,44 @@ class Node : public DiwneObject, public std::enable_shared_from_this<Node>
         virtual bool content();
         virtual void end();
         virtual bool afterContentDiwne();
+        virtual bool afterEndDiwne();
 
-        bool drawNodeDiwne(bool drawHere = false);
+        template< typename T >
+        bool drawNodeDiwne(bool drawHere=false, bool with_interaction=true)
+        {
+            m_drawOnCursorPos = drawHere;
+            bool interaction_happen = drawDiwne(with_interaction);
+
+            if(interaction_happen)
+            {
+               diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
+               if (!(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode)) diwne.setDiwneAction(DiwneAction::InteractingNodeContent);
+            }
+
+            return interaction_happen;
+        }
+
+        /* use for pre-draw node on top (draw it first on botom) -> catch interaction and stole interaction of other elements  */
+        template< typename T >
+        bool pre_drawNodeDiwne(bool drawHere=false)
+        {
+            m_drawOnCursorPos = drawHere;
+            bool interaction_happen = drawNodeDiwne<T>(drawHere, true);
+            m_drawing_without_interaction = true; /* for next (view only) drawing */
+
+
+#ifdef DIWNE_DEBUG
+    diwne.AddRectDiwne(getNodePositionDiwne(), getNodePositionDiwne()+getNodeRectSizeDiwne()
+                       , ImColor(0,0,0,100), 0, ImDrawCornerFlags_None, 10);
+#endif // DIWNE_DEBUG
+            ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+            ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
+
+            return interaction_happen;
+        }
+
+//        bool pre_drawNodeDiwne(bool drawHere = false);
+//        bool drawNodeDiwne(bool drawHere = false);
         bool topContentDiwne();
         bool leftContentDiwne();
         bool middleContentDiwne();
@@ -77,8 +113,6 @@ class Node : public DiwneObject, public std::enable_shared_from_this<Node>
         bool getSelected() const {return m_selected;};
         void setSelected(bool selected) {m_selected = selected;};
 
-        void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign = v;}; /* from 0==left to 1==right */
-
         float m_drawAnywhere; /* you have to draw node anywhere for example in first frame after you created it -> for obtain its real size */
 
     protected:
@@ -94,18 +128,15 @@ class Node : public DiwneObject, public std::enable_shared_from_this<Node>
 
         float m_centerDummySpace;
 
-        bool m_popupPositionSet; /* \todo I need something like NULL ImVec2 if possible... */
         bool m_nodeInteractionAllowed;
         bool m_drawOnCursorPos;
+        bool m_drawing_without_interaction; /* used for draw top node (and interact with it) */
 
     private:
         DIWNE::ID m_idDiwne;
 
         void setNodeRectsPositionDiwne(ImVec2 const& position);
         void translateNodeRectsDiwne(ImVec2 const& amount);
-
-        float m_middleAlign;
-
 };
 
 } /* namespace DIWNE */

@@ -5,7 +5,7 @@
 
 static DIWNE::SettingsDiwne settingsDiwne;
 
-WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(settingsDiwne);
+WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(&settingsDiwne);
 
 
 //std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::m_workspaceDiwne::m_workspaceCoreNodes;
@@ -15,7 +15,7 @@ WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(settingsDiwne);
 /* ======================================== */
 /* ===== W o r k s p a c e  D i w n e ===== */
 /* ======================================== */
-WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne const &settingsDiwne)
+WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     :   Diwne(settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
@@ -597,12 +597,16 @@ bool WorkspaceDiwne::content()
                                               [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspace();}
                                               ),
                               m_workspaceCoreNodes.end());
+
+    /* two or more Nodes -> draw node on top two times (first for catch interaction, last for draw it on top) */
+    if (m_workspaceCoreNodes.size() > 1){ interaction_happen |= m_workspaceCoreNodes.back()->pre_drawNodeDiwne<WorkspaceNodeWithCoreData>();}
     for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
     {
-        if (workspaceCoreNode != nullptr) interaction_happen |= workspaceCoreNode->drawNodeDiwne(); /* nullptr can happen if moving to sequence */
+        if (workspaceCoreNode != nullptr) interaction_happen |= workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(false, !interaction_happen); /* nullptr can happen if moving to sequence */
     }
-    if (interaction_happen)
-        ImGui::Text("Workspace: Interaction with nodes happen");
+#ifdef WORKSPACE_DEBUG
+    if (interaction_happen) ImGui::Text("Workspace: Interaction with nodes happen");
+#endif // WORKSPACE_DEBUG
 
     m_interactionAllowed = !interaction_happen;
 
@@ -622,11 +626,11 @@ bool WorkspaceDiwne::afterContent()
 
 	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
 
-    /* hold or drag && in previous frame not hold neither drag */
-	if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode) &&
-         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode))
+    /* hold or drag or interactiong && in previous frame not hold neither drag neither interacting */
+	if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingNodeContent) &&
+         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingNodeContent))
     {
-        shiftDragedOrHoldNodeToEnd();
+        shiftInteractingNodeToEnd();
     }
     return interaction_happen;
 }
@@ -700,14 +704,14 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 	}
 }
 
-void WorkspaceDiwne::shiftDragedOrHoldNodeToEnd()
+void WorkspaceDiwne::shiftInteractingNodeToEnd()
 {
-    if(m_draged_hold_node != nullptr)
+    if(mp_lastActiveNode != nullptr)
     {
         coreNodeIter draged_node_it =
 				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 										 [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
-											 return node->getId() == this->m_draged_hold_node->getId();
+											 return node->getId() == this->mp_lastActiveNode->getId();
 										 });
 
 		if (draged_node_it != m_workspaceCoreNodes.end())

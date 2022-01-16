@@ -28,11 +28,14 @@ class Diwne;
 }
 
 #include "DiwneObject.h"
+
+
 #include "Link.h"
+#include "diwne.h"
+
 #include "Pin.h"
 #include "Node.h"
 
-#include "diwne.h"
 
 
 

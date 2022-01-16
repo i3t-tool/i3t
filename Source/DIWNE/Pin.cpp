@@ -40,13 +40,13 @@ bool Pin::afterEndDiwne()
 
 bool Pin::bypassPinLinkConnectionPreparedAction()
 {
-    return !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && bypassHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>() != this;
+    return !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && bypassHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>().get() != this;
 }
 
 bool Pin::processDrag()
 {
     diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
-    diwne.setLastActivePin(this);
+    diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
     return true;
 }
 
@@ -60,12 +60,6 @@ bool Pin::processPin_Pre_ConnectLink()
     }
     return false;
 }
-
-//bool Pin::processSelect(){return false;};
-//bool Pin::processUnselect(){return false;};
-//
-//bool Pin::processHold(){return false;};
-//bool Pin::processUnHold(){return false;};
 
 bool Pin::processHovered()
 {

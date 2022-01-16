@@ -86,6 +86,7 @@ public:
     virtual bool topContent();
     virtual bool middleContent();
     virtual bool afterContent();
+    virtual bool finalize() override;
 
     bool m_removeFromWorkspaceWindow;
     bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};

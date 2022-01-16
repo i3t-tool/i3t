@@ -7,17 +7,15 @@ namespace DIWNE
 /* ===== D i w n e ===== */
 /* ===================== */
 
-Diwne::Diwne(SettingsDiwne const & settingsDiwne)
-    :   DiwneObject(*this, settingsDiwne.editorId, settingsDiwne.editorlabel)
-    ,   m_workAreaDiwne( settingsDiwne.workAreaDiwne.Min
-                        ,settingsDiwne.workAreaDiwne.Max)
-    ,   m_minWorkAreaZoom(settingsDiwne.minWorkAreaZoom)
-    ,   m_maxWorkAreaZoom(settingsDiwne.maxWorkAreaZoom)
+Diwne::Diwne(SettingsDiwne* settingsDiwne)
+    :   DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel)
+    ,   mp_settingsDiwne(settingsDiwne)
+    ,   m_workAreaDiwne( settingsDiwne->workAreaDiwne.Min
+                        ,settingsDiwne->workAreaDiwne.Max)
 
-    ,   m_workAreaZoom(settingsDiwne.workAreaInitialZoom)
-    ,   m_zoomWheelReverseSenzitivity(settingsDiwne.zoomWheelReverseSenzitivity)
+    ,   m_workAreaZoom(settingsDiwne->workAreaInitialZoom)
 
-    ,   m_lastActivePin(nullptr)
+    ,   mp_lastActivePin(nullptr)
     ,   m_helperLink(diwne, 0)
 
     ,   m_diwneAction(None)
@@ -25,15 +23,16 @@ Diwne::Diwne(SettingsDiwne const & settingsDiwne)
 
     ,   m_nodesSelectionChanged(false)
     ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
-    ,   m_selectionRectangeTouchColor(settingsDiwne.selectionRectTouchColor)
-    ,   m_selectionRectangeFullColor(settingsDiwne.selectionRectFullColor)
-    ,   m_popupPosition(settingsDiwne.initPopupPosition)
+
+    ,   m_popupPosition(settingsDiwne->initPopupPosition)
+    ,   m_popupDrawn(false)
 {}
 
 bool Diwne::initializeDiwne()
 {
-    m_drawing = ImGui::BeginChild(m_labelDiwne.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     m_diwneAction = DiwneAction::None;
+    m_popupDrawn = false;
     return initialize();
 }
 
@@ -55,7 +54,7 @@ bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/
 void Diwne::begin()
 {
     ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
-    ImGui::PushID(m_labelDiwne.c_str());
+    ImGui::PushID(mp_settingsDiwne->editorlabel.c_str());
     ImGui::BeginGroup();
 
 #ifdef DIWNE_DEBUG
@@ -136,13 +135,13 @@ bool Diwne::processSelectionRectangle()
             setDiwneAction(DiwneAction::SelectionRectFull);
             m_selectionRectangeDiwne.Min.x = startPos.x;
             m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
-            color = m_selectionRectangeFullColor;
+            color = mp_settingsDiwne->selectionRectFullColor;
         }else
         {
             setDiwneAction(DiwneAction::SelectionRectTouch);
             m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
             m_selectionRectangeDiwne.Max.x = startPos.x;
-            color = m_selectionRectangeTouchColor;
+            color = mp_settingsDiwne->selectionRectTouchColor;
         }
 
         if(dragDelta.y > 0)
@@ -198,8 +197,8 @@ bool Diwne::processDiwneZoom()
 void Diwne::setWorkAreaZoom(float val/*=1*/)
 {
     double old = m_workAreaZoom;
-    if (val < m_minWorkAreaZoom){ m_workAreaZoom = m_minWorkAreaZoom; }
-    else if (val > m_maxWorkAreaZoom){ m_workAreaZoom = m_maxWorkAreaZoom; }
+    if (val < mp_settingsDiwne->minWorkAreaZoom){ m_workAreaZoom = mp_settingsDiwne->minWorkAreaZoom; }
+    else if (val > mp_settingsDiwne->maxWorkAreaZoom){ m_workAreaZoom = mp_settingsDiwne->maxWorkAreaZoom; }
     else m_workAreaZoom = val;
 }
 
@@ -371,7 +370,7 @@ bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor
 
     ImGui::SetCursorScreenPos(initPos);
     bool result = ImGui::InvisibleButton(id.c_str(), size);
-    ImGui::SetItemAllowOverlap();
+//    ImGui::SetItemAllowOverlap();
     return result;
 
 
@@ -503,7 +502,7 @@ ImVec2 Diwne::bypassGetMouseDragDelta2() {return ImGui::GetMouseDragDelta(2);}
 ImVec2 Diwne::bypassGetMouseDelta() {return ImGui::GetIO().MouseDelta;}
 ImVec2 Diwne::bypassGetMousePos() {return ImGui::GetIO().MousePos;}
 float Diwne::bypassGetMouseWheel() {return ImGui::GetIO().MouseWheel;}
-float Diwne::bypassGetZoomDelta() {return bypassGetMouseWheel()/m_zoomWheelReverseSenzitivity;}
+float Diwne::bypassGetZoomDelta() {return bypassGetMouseWheel()/mp_settingsDiwne->zoomWheelReverseSenzitivity;}
 
 bool Diwne::bypassZoomAction() {return bypassHoveredAction() && diwne.bypassGetZoomDelta() != 0;}
 bool Diwne::bypassDiwneSetPopupPositionAction() {return bypassIsMouseClicked1();}

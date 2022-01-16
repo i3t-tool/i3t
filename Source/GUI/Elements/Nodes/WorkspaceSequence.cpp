@@ -135,7 +135,7 @@ bool WorkspaceSequence::middleContent()
 
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
     {
-        dragedNode = std::dynamic_pointer_cast<WorkspaceTransformation>(diwne.m_draged_hold_node);
+        dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
         if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
             if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
@@ -168,7 +168,7 @@ bool WorkspaceSequence::middleContent()
             }
         }
 
-        inner_interaction_happen |= transformation->drawNodeDiwne(true);
+        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(true);
         ImGui::SameLine();
 
         i++;

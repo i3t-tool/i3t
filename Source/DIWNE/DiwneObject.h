@@ -6,7 +6,7 @@ namespace DIWNE
 /* ================================== */
 /* ===== D i w n e  O b j e c t ===== */
 /* ================================== */
-class DiwneObject
+class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
 public: /* \todo JH some atributes should be private/protected */
     DIWNE::Diwne& diwne;
@@ -23,7 +23,7 @@ public: /* \todo JH some atributes should be private/protected */
 
     virtual void popupContent();
 
-    virtual bool drawDiwne();
+    virtual bool drawDiwne(bool with_interaction=true);
     virtual bool initialize(); /* set m_drawing inside -> whether draw object or not if this can happen (m_drawing = true is default) */
     virtual bool initializeDiwne();
     virtual bool beforeBegin();

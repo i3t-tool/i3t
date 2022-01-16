@@ -30,13 +30,6 @@ class Pin : public DiwneObject
         virtual bool processConnectionPrepared();
         virtual bool processHovered();
 
-//        virtual bool processSelect();
-//        virtual bool processUnselect();
-//
-//        virtual bool processHold();
-//        virtual bool processUnHold();
-
-
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 
         ImRect getPinRectDiwne() const {return m_pinRectDiwne;};

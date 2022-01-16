@@ -94,6 +94,14 @@ bool WorkspaceNode::afterContent()
     return false;
 }
 
+bool WorkspaceNode::finalize()
+{
+    if(bypassHoldAction() || bypassSelectAction() || bypassRaisePopupAction())
+    {
+        return getNodeRectDiwne().Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
+    }
+    return false;
+}
 
 
 void WorkspaceNode::drawMenuDelete()
