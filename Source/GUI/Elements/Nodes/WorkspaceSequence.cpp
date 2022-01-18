@@ -53,7 +53,7 @@ void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 
     auto node_iter = std::find_if(  m_workspaceInnerTransformations.begin(),
                                     m_workspaceInnerTransformations.end(),
-                                    [node](Ptr<WorkspaceNodeWithCoreData> const &in_node) -> bool { return node == in_node; }); /* \todo check adress of nodes directly */
+                                    [node](Ptr<WorkspaceNodeWithCoreData> const &in_node) -> bool { return node == in_node; });
 
     if (node_iter != m_workspaceInnerTransformations.end())
     {
@@ -71,7 +71,7 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
     {
         node_t->setRemoveFromSequence(false);
         m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin()+index, node_t);
-        /* \tod JH check return value if so */
+        /* \todo JH check return value if so */
         m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
     }
 }
@@ -133,20 +133,15 @@ bool WorkspaceSequence::middleContent()
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
     }
 
-    if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+    if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode || diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
     {
         dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
         if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
-            if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
-            {
-                moveNodeToWorkspace(dragedNode);
-            }
             position_of_draged_node_in_sequence = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
 #ifdef WORKSPACE_DEBUG
             ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
 #endif // WORKSPACE_DEBUG
-
         }
     }
 
@@ -160,15 +155,14 @@ bool WorkspaceSequence::middleContent()
     {
         if(position_of_draged_node_in_sequence == i)
         {
-            ImGui::Dummy(m_sizeOfDummy*diwne.getWorkAreaZoom()); /* \todo JH size of dummy from settings */
+            ImGui::Dummy(m_sizeOfDummy*diwne.getWorkAreaZoom());
             ImGui::SameLine();
-            if (ImGui::IsMouseReleased(0))
+            if (dragedNode->bypassUnholdAction())
             {
                 push_index = i;
             }
         }
-
-        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(true);
+        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(true, m_drawWithInteraction);
         ImGui::SameLine();
 
         i++;
@@ -176,7 +170,9 @@ bool WorkspaceSequence::middleContent()
     if ( i == 0 || position_of_draged_node_in_sequence == i ) /* add dummy after last inner or if sequence is empty */
     {
         ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy*diwne.getWorkAreaZoom() : m_sizeOfDummy*diwne.getWorkAreaZoom()/2 ); /* smaller dummy if dragged node is not over Sequence */
-        if (ImGui::IsMouseReleased(0) && position_of_draged_node_in_sequence >= 0 )
+        if (ImGui::IsMouseReleased(0))
+            ImGui::Text("Released");
+        if (dragedNode && dragedNode->bypassUnholdAction() && position_of_draged_node_in_sequence >= 0 )
         {
             push_index = i;
         }
@@ -184,6 +180,19 @@ bool WorkspaceSequence::middleContent()
     if (push_index >= 0)
     {
         moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+    }
+
+    /* pop NodeFrom Sequence */
+    if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode/* || diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode*/)
+    {
+        dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
+        if (dragedNode != nullptr) /* only transformation can be in Sequence*/
+        {
+            if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
+            {
+                moveNodeToWorkspace(dragedNode);
+            }
+        }
     }
 
 

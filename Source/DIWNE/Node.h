@@ -46,7 +46,6 @@ class Node : public DiwneObject
         virtual bool content();
         virtual void end();
         virtual bool afterContentDiwne();
-        virtual bool afterEndDiwne();
 
         template< typename T >
         bool drawNodeDiwne(bool drawHere=false, bool with_interaction=true)

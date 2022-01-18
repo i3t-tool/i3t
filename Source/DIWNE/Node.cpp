@@ -15,7 +15,6 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="Di
     , m_drawAnywhere(true)
     , m_nodeInteractionAllowed(false)
     , m_drawOnCursorPos(false)
-    , m_drawing_without_interaction(false)
 {}
 
 Node& Node::operator=(const Node& rhs)
@@ -132,19 +131,6 @@ bool Node::afterContentDiwne()
     }
     return DiwneObject::afterContentDiwne();
 }
-
-bool Node::afterEndDiwne()
-{
-//    if (m_drawing_without_interaction)
-//    {
-//        m_drawing_without_interaction = false; /* just on draw without interaction */
-//        return false;
-//    }else
-//    {
-        return DiwneObject::afterEndDiwne();
-//    }
-}
-
 
 bool Node::processHovered()
 {

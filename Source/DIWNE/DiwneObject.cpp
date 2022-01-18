@@ -18,11 +18,13 @@ DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const la
     ,   m_isDraged(false)
     ,   m_selected(false)
     ,   m_drawing(true)
+    ,   m_drawWithInteraction(true)
 {}
 
 bool DiwneObject::drawDiwne(bool with_interaction/*=true*/)
 {
     m_inner_interaction_happen = false;
+    m_drawWithInteraction = with_interaction;
     m_inner_interaction_happen |= initializeDiwne();
     if (m_drawing)
     {
@@ -34,7 +36,7 @@ bool DiwneObject::drawDiwne(bool with_interaction/*=true*/)
         m_inner_interaction_happen |= afterContentDiwne();
 
 #ifdef DIWNE_DEBUG
-    with_interaction ? ImGui::Text("With    interaction") : ImGui::Text("Without interation");
+    m_drawWithInteraction ? ImGui::Text("With    interaction") : ImGui::Text("Without interation");
     m_interactionAllowed ? ImGui::Text("Interaction allowed") : ImGui::Text("Interaction not allowed");
     ImGui::TextUnformatted(m_labelDiwne.c_str());
     if (m_isHeld) ImGui::TextUnformatted("Held");
@@ -42,7 +44,7 @@ bool DiwneObject::drawDiwne(bool with_interaction/*=true*/)
     if (m_selected) ImGui::TextUnformatted("Selected");
 #endif // DIWNE_DEBUG
         end();
-        if(with_interaction) m_inner_interaction_happen |= afterEndDiwne();
+        if(m_drawWithInteraction) m_inner_interaction_happen |= afterEndDiwne();
     }
     m_inner_interaction_happen |= finalizeDiwne();
 

@@ -13,7 +13,7 @@ public: /* \todo JH some atributes should be private/protected */
     DIWNE::ID const m_idDiwne;
     std::string const m_labelDiwne;
     std::string const m_popupIDDiwne;
-    bool m_drawing, m_interactionAllowed, m_inner_interaction_happen;
+    bool m_drawing, m_interactionAllowed, m_inner_interaction_happen, m_drawWithInteraction;
     bool m_isHeld, m_isDraged, m_selected, m_hovered;
 
     DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne);
