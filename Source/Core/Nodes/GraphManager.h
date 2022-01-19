@@ -15,9 +15,8 @@
 #include "NodeImpl.h"
 #include "Operations.h"
 #include "Sequence.h"
-#include "Transform.h"
+#include "TransformImpl.h"
 #include "Node.h"
-
 
 namespace Core
 {
@@ -71,6 +70,7 @@ namespace Builder
 	template <ETransformType T, typename... Args>
 	Ptr<Transformation> FORCE_INLINE createTransform(Args&&... args)
 	{
+		const auto defaultValues = getTransformDefaults(T);
 		auto ret = std::make_shared<TransformImpl<T>>(std::forward<Args>(args)...);
 		ret->init();
 		ret->reset();
@@ -199,11 +199,6 @@ public:
 	static const Operation* getOperation(const Pin* pin);
 	static bool							areFromSameNode(const Pin* lhs, const Pin* rhs);
 	static bool							arePlugged(const Pin& input, const Pin& output);
-
-	/**
-	 * \todo MH - There may be ID collisions.
-	 */
-	static void changeId(Core::NodePtr node, Core::ID newId);
 };
 
 using gm = GraphManager;

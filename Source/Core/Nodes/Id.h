@@ -1,6 +1,6 @@
 #pragma once
 
-#include <list>
+#include <stack>
 
 namespace Core
 {
@@ -18,8 +18,6 @@ public:
 	void returnId(unsigned int id);
 
 private:
-	std::list<unsigned int> m_ids;
+	std::stack<unsigned int> m_ids;
 };
-
-static inline IdGenerator generator;
 } // namespace Core

@@ -334,7 +334,7 @@ void buildOperator(YAML::Node& node)
 
 		auto op = createFns[enumVal](ImVec2{ posX, posY });
 
-		Core::GraphManager::changeId(op->getNodebase(), id);
+		op->getNodebase()->changeId(id);
 	}
 }
 
@@ -354,7 +354,7 @@ void buildTransform(YAML::Node& node)
 
 		auto transform = createTransformFns[enumVal](ImVec2{ posX, posY });
 
-		Core::GraphManager::changeId(transform->getNodebase(), id);
+		transform->getNodebase()->changeId(id);
 	}
 }
 
@@ -382,7 +382,7 @@ void buildSequence(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
 				sequence->moveNodeToSequence(transform);
 		}
 
-		Core::GraphManager::changeId(sequence->getNodebase(), id);
+		sequence->getNodebase()->changeId(id);
 	}
 }
 

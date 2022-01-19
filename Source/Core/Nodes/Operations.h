@@ -457,9 +457,11 @@ using TransformMask = std::bitset<16>;
 
 struct TransformOperation
 {
-	Operation                         operation;
-	TransformMask                     mask;
-	std::map<std::string, EValueType> defaultValuesTypes;
+	using ValueMap = std::map<std::string, EValueType>;
+
+	Operation     operation;
+	TransformMask mask;
+	ValueMap      defaultValuesTypes;
 };
 
 constexpr TransformMask g_AllLocked   = 0b0000000000000000;

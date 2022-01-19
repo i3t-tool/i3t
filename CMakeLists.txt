@@ -52,6 +52,7 @@ add_definitions(-DI3T_PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 if (MSVC)
     # Enable multi-processor compilation for MSVC.
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
     message(STATUS "MSVC: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
     message(STATUS "MSVC: CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")

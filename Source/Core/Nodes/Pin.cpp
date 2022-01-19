@@ -4,6 +4,8 @@
 
 namespace Core
 {
+static IdGenerator generator;
+
 Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index) :
 		m_valueType(valueType), m_isInput(isInput), m_master(owner.get()), m_index(index)
 {

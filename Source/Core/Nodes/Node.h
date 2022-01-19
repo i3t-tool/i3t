@@ -156,6 +156,11 @@ public:
 	 */
 	ID getId() const;
 
+	/**
+	 * @param newId Make sure the new ID is not used by another node.
+	 */
+	void changeId(ID newId);
+
 	const Operation* getOperation() const { return m_operation; }
 
 	/**

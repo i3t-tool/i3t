@@ -5,6 +5,8 @@
 
 using namespace Core;
 
+static IdGenerator generator;
+
 Node::PinView Node::PinView::begin() const { return Node::PinView(strategy, node, 0); }
 
 Node::PinView Node::PinView::end() const { return Node::PinView(strategy, node, size()); }
@@ -87,6 +89,14 @@ void Node::notifyOwner()
 }
 
 ID Node::getId() const { return m_id; }
+
+void Node::changeId(ID newId)
+{
+	generator.returnId(m_id);
+	generator.markAsUsed(newId);
+
+	m_id = newId;
+}
 
 void Node::pulse(size_t index)
 {

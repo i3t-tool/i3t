@@ -78,17 +78,17 @@ TEST(ScaleTest, ResetToInitialValues)
 {
 	auto scale = generateVec3();
 
-	// Create non-uniform scale
-	auto scaleNode = Core::Builder::createTransform<ETransformType::Scale>(scale);
-	EXPECT_TRUE(scaleNode->hasSynergies());
+	// Create non-uniform scale with initial value.
+	auto scaleNode = Core::Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
+	scaleNode->setDefaultValue("scale", scale);
 
 	// Set free transformation node.
-	scaleNode->unlock();
+	scaleNode->free();
 
 	glm::mat4 mat(1.0f);
 	mat[1][3] = 165.0f;
 
-	setValue_expectOk(scaleNode, mat);
+	setValue_expectOk(scaleNode->as<Transformation>(), mat);
 	{
 		auto data = scaleNode->getData().getMat4();
 
@@ -112,7 +112,7 @@ TEST(ScaleTest, UniformScaleSynergies)
 	auto scale = glm::vec3(scaleValue);
 	auto scaleMat = glm::scale(scale);
 
-	auto scaleNode = Builder::createTransform<ETransformType::Scale>(scale)
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>()
 	    ->as<TransformImpl<ETransformType::Scale>>();
 
 	{
