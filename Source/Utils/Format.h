@@ -1,6 +1,12 @@
 #pragma once
 
+#include <map>
+#include <sstream>
+
+#include "glm/glm.hpp"
 #include "spdlog/fmt/fmt.h"
+
+#include "Core/Nodes/NodeData.h"
 
 namespace Utils
 {
@@ -51,4 +57,6 @@ inline std::vector<std::string> concat(const std::map<std::string, std::string>&
 	}
 	return vec;
 }
+
+std::vector<std::string> concat(const std::map<std::string, DataStore>& map, const std::string& delimiter);
 }

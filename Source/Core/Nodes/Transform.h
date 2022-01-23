@@ -71,6 +71,8 @@ class Transformation : public Node
 	friend class GraphManager;
 	friend class Storage;
 
+	using DefaultValues = std::map<std::string, Data>;
+
 public:
 	explicit Transformation(const TransformOperation& transformType);
 
@@ -87,7 +89,7 @@ public:
 	//===----------------------------------------------------------------------===//
 
 	/// Get default value which transform can hold.
-	const Data& getDefaultValue(const std::string& name);
+	const Data& getDefaultValue(const std::string& name) const;
 
 	template <typename T>
 	void setDefaultValue(const std::string& name, T&& val)
@@ -95,6 +97,13 @@ public:
 		m_defaultValues.at(name).setValue(val);
 		reset();
 	}
+
+	/**
+	 * \return A map of valueName and value pairs.
+	 */
+	TransformOperation::ValueMap getDefaultTypes();
+	DefaultValues getDefaultValues();
+	void          setDefaultValues(const DefaultValues& values) {};
 
 	EValueState getValueState(glm::ivec2 coords);
 
@@ -128,14 +137,6 @@ public:
 protected:
 	using ValueMap = std::map<std::string, std::string>;
 
-public:
-	/**
-	 *
-	 * \return A map of valueName and value pairs.
-	 */
-	virtual ValueMap getDefaultValues() { return ValueMap(); }
-	virtual void		 setDefaultValues(){};
-
 protected:
 	void notifySequence();
 
@@ -162,7 +163,7 @@ public:
 	}
 
 protected:
-	std::map<std::string, Data> m_defaultValues;
+	DefaultValues m_defaultValues;
 
 	bool m_hasEnabledSynergies = true;
 	bool m_isLocked						 = true;

@@ -139,11 +139,6 @@ void TransformImpl<ETransformType::Scale>::reset()
 	setInternalValue(glm::scale(scale));
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::Scale>::getDefaultValues()
-{
-	return {{"scale", Utils::toString(m_initialScale)}};
-}
-
 float TransformImpl<ETransformType::Scale>::getX()
 {
 	return getInternalData().getMat4()[0][0];
@@ -189,14 +184,9 @@ ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 	return ETransformState(result);
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::EulerX>::getDefaultValues()
-{
-	return {{"rotation", Utils::toString(m_initialRot)}};
-}
-
 ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
 {
-	m_currentRot = val;
+	setDefaultValue("rotation", val);
 	setInternalValue(glm::rotate(val, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	notifySequence();
@@ -273,8 +263,7 @@ void TransformImpl<ETransformType::EulerX>::reset()
 	m_hasEnabledSynergies = true;
 	m_isLocked            = true;
 
-	setInternalValue(glm::eulerAngleX(m_initialRot));
-	m_currentRot = m_initialRot;
+	setInternalValue(glm::eulerAngleX(getDefaultValue("rotation").getFloat()));
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
@@ -291,16 +280,12 @@ ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 	return ETransformState(result);
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::EulerY>::getDefaultValues()
-{
-	return {{"rotation", Utils::toString(m_initialRot)}};
-}
-
 ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
 {
-	m_currentRot = val;
+	setDefaultValue("rotation", val);
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 1.0f, 0.0f)));
 	notifySequence();
+
 	return ValueSetResult{};
 }
 
@@ -370,8 +355,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerY>::reset()
 {
-	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 1.0f, 0.0f)));
-	m_currentRot = m_initialRot;
+	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -388,17 +372,12 @@ ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 
 	return ETransformState(result);
 }
-
-Transformation::ValueMap TransformImpl<ETransformType::EulerZ>::getDefaultValues()
-{
-	return {{"rotation", Utils::toString(m_initialRot)}};
-}
-
 ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
 {
-	m_currentRot = val;
+	setDefaultValue("rotation", val);
 	setInternalValue(glm::rotate(val, glm::vec3(0.0f, 0.0f, 1.0f)));
 	notifySequence();
+
 	return ValueSetResult{};
 }
 
@@ -469,8 +448,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 void TransformImpl<ETransformType::EulerZ>::reset()
 {
 	resetModifiers();
-	setInternalValue(glm::rotate(m_initialRot, glm::vec3(0.0f, 0.0f, 1.0f)));
-	m_currentRot = m_initialRot;
+	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
 }
 
 //===-- Translation -------------------------------------------------------===//
@@ -485,11 +463,6 @@ ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 	}
 
 	return ETransformState(result);
-}
-
-Transformation::ValueMap TransformImpl<ETransformType::Translation>::getDefaultValues()
-{
-	return {{"translation", Utils::toString(m_initialTrans)}};
 }
 
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)
@@ -524,7 +497,10 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 
 void TransformImpl<ETransformType::Translation>::reset()
 {
-	setInternalValue(glm::translate(m_initialTrans));
+	setInternalValue(glm::translate(
+			getDefaultValue("translation").getVec3()
+	));
+	notifySequence();
 }
 
 float TransformImpl<ETransformType::Translation>::getX()
@@ -564,15 +540,13 @@ ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 	return ETransformState::Unknown;
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::AxisAngle>::getDefaultValues()
-{
-	return {{"axis", Utils::toString(m_initialAxis)}, {"rotation", Utils::toString(m_initialRads)}};
-}
-
 void TransformImpl<ETransformType::AxisAngle>::reset()
 {
+	setInternalValue(glm::rotate(
+			getDefaultValue("rotation").getFloat(),
+			getDefaultValue("axis").getVec3()
+	));
 	notifySequence();
-	setInternalValue(glm::rotate(m_initialRads, m_initialAxis));
 }
 
 ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
@@ -587,15 +561,15 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 
 ValueSetResult TransformImpl<ETransformType::AxisAngle>::setRot(float rads)
 {
-	m_initialRads = rads;
-	setInternalValue(glm::rotate(rads, m_initialAxis));
+	setDefaultValue("rotation", rads);
+
 	return ValueSetResult();
 }
 
 ValueSetResult TransformImpl<ETransformType::AxisAngle>::setAxis(const glm::vec3& axis)
 {
-	m_initialAxis = axis;
-	setInternalValue(glm::rotate(m_initialRads, axis));
+	setDefaultValue("axis", axis);
+
 	return ValueSetResult();
 }
 
@@ -606,15 +580,10 @@ ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 	return ETransformState::Unknown;
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::Quat>::getDefaultValues()
-{
-	return {{"quat", Utils::toString(m_initialQuat)}};
-}
-
 void TransformImpl<ETransformType::Quat>::reset()
 {
-	notifySequence();
 	setInternalValue(glm::toMat4(m_normalized));
+	notifySequence();
 }
 
 const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const
@@ -627,6 +596,7 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 	m_initialQuat = q;
 	m_normalized = glm::normalize(q);
 	setInternalValue(glm::toMat4(m_normalized));
+
 	return ValueSetResult{};
 }
 
@@ -645,22 +615,17 @@ ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 	);
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::Ortho>::getDefaultValues()
-{
-	return {
-			{"left", Utils::toString(m_left)},
-			{"right", Utils::toString(m_right)},
-			{"bottom", Utils::toString(m_bottom)},
-			{"top", Utils::toString(m_top)},
-			{"near", Utils::toString(m_near)},
-			{"far", Utils::toString(m_far)},
-	};
-}
-
 void TransformImpl<ETransformType::Ortho>::reset()
 {
+	setInternalValue(glm::ortho(
+			getDefaultValue("left").getFloat(),
+			getDefaultValue("right").getFloat(),
+			getDefaultValue("bottom").getFloat(),
+			getDefaultValue("top").getFloat(),
+			getDefaultValue("near").getFloat(),
+			getDefaultValue("far").getFloat()
+	));
 	notifySequence();
-	setInternalValue(glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
@@ -677,43 +642,43 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setLeft(float val)
 {
-	m_left = val;
-	reset();
+	setDefaultValue("left", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setRight(float val)
 {
-	m_right = val;
-	reset();
+	setDefaultValue("right", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setBottom(float val)
 {
-	m_bottom = val;
-	reset();
+	setDefaultValue("bottom", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setTop(float val)
 {
-	m_top = val;
-	reset();
+	setDefaultValue("top", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setNear(float val)
 {
-	m_near = val;
-	reset();
+	setDefaultValue("near", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setFar(float val)
 {
-	m_far = val;
-	reset();
+	setDefaultValue("far", val);
+
 	return ValueSetResult{};
 }
 
@@ -726,48 +691,43 @@ ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 	);
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::Perspective>::getDefaultValues()
-{
-	return {
-			{"fov", Utils::toString(m_initialFOW)},
-			{"aspect", Utils::toString(m_initialAspect)},
-			{"zNear", Utils::toString(m_initialZNear)},
-			{"zFar", Utils::toString(m_initialZFar)},
-	};
-}
-
 ValueSetResult TransformImpl<ETransformType::Perspective>::setFOW(float v)
 {
-	m_initialFOW = v;
-	reset();
+	setDefaultValue("fow", v);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setAspect(float v)
 {
-	m_initialAspect = v;
-	reset();
+	setDefaultValue("aspect", v);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setZNear(float v)
 {
-	m_initialZNear = v;
-	reset();
+	setDefaultValue("zNear", v);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setZFar(float v)
 {
-	m_initialZFar = v;
-	reset();
+	setDefaultValue("zFar", v);
+
 	return ValueSetResult{};
 }
 
 void TransformImpl<ETransformType::Perspective>::reset()
 {
+	setInternalValue(glm::perspective(
+			getDefaultValue("fow").getFloat(),
+			getDefaultValue("aspect").getFloat(),
+			getDefaultValue("zNear").getFloat(),
+			getDefaultValue("zFar").getFloat()
+	));
 	notifySequence();
-	setInternalValue(glm::perspective(m_initialFOW, m_initialAspect, m_initialZNear, m_initialZFar));
 }
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
@@ -791,22 +751,17 @@ ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 	);
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::Frustum>::getDefaultValues()
-{
-	return {
-			{"left", Utils::toString(m_left)},
-			{"right", Utils::toString(m_right)},
-			{"bottom", Utils::toString(m_bottom)},
-			{"top", Utils::toString(m_top)},
-			{"near", Utils::toString(m_near)},
-			{"far", Utils::toString(m_far)},
-	};
-}
-
 void TransformImpl<ETransformType::Frustum>::reset()
 {
+	setInternalValue(glm::frustum(
+			getDefaultValue("left").getFloat(),
+			getDefaultValue("right").getFloat(),
+			getDefaultValue("bottom").getFloat(),
+			getDefaultValue("top").getFloat(),
+			getDefaultValue("near").getFloat(),
+			getDefaultValue("far").getFloat()
+	));
 	notifySequence();
-	setInternalValue(glm::frustum(m_left, m_right, m_bottom, m_top, m_near, m_far));
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
@@ -823,43 +778,43 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setLeft(float val)
 {
-	m_left = val;
-	reset();
+	setDefaultValue("left", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setRight(float val)
 {
-	m_right = val;
-	reset();
+	setDefaultValue("right", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setBottom(float val)
 {
-	m_bottom = val;
-	reset();
+	setDefaultValue("bottom", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setTop(float val)
 {
-	m_top = val;
-	reset();
+	setDefaultValue("top", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setNear(float val)
 {
-	m_near = val;
-	reset();
+	setDefaultValue("near", val);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setFar(float val)
 {
-	m_far = val;
-	reset();
+	setDefaultValue("far", val);
+
 	return ValueSetResult{};
 }
 
@@ -870,19 +825,14 @@ ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 	return ETransformState::Unknown;
 }
 
-Transformation::ValueMap TransformImpl<ETransformType::LookAt>::getDefaultValues()
-{
-	return {
-			{"eye", Utils::toString(m_initialEye)},
-			{"center", Utils::toString(m_initialCenter)},
-			{"up", Utils::toString(m_initialUp)},
-	};
-}
-
 void TransformImpl<ETransformType::LookAt>::reset()
 {
+	setInternalValue(glm::lookAt(
+			getDefaultValue("eye").getVec3(),
+			getDefaultValue("center").getVec3(),
+			getDefaultValue("up").getVec3()
+	));
 	notifySequence();
-	setInternalValue(glm::lookAt(m_initialEye, m_initialCenter, m_initialUp));
 }
 
 ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val, glm::ivec2 coords)
@@ -899,22 +849,22 @@ ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val, glm::i
 
 ValueSetResult TransformImpl<ETransformType::LookAt>::setEye(const glm::vec3& eye)
 {
-	m_initialEye = eye;
-	reset();
+	setDefaultValue("eye", eye);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::LookAt>::setCenter(const glm::vec3& center)
 {
-	m_initialCenter = center;
-	reset();
+	setDefaultValue("center", center);
+
 	return ValueSetResult{};
 }
 
 ValueSetResult TransformImpl<ETransformType::LookAt>::setUp(const glm::vec3& up)
 {
-	m_initialUp = up;
-	reset();
+	setDefaultValue("up", up);
+
 	return ValueSetResult{};
 }
 }

@@ -43,15 +43,27 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 Transformation::Transformation(const TransformOperation& transformType)
 		: NodeBase(&(transformType.operation))
 {
+	m_internalData.push_back(DataStore(EValueType::Matrix));
+
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
 		m_defaultValues[key] = Data(valueType);
 	}
 }
 
-const Data& Transformation::getDefaultValue(const std::string& name)
+const Data& Transformation::getDefaultValue(const std::string& name) const
 {
 	return m_defaultValues.at(name);
+}
+
+TransformOperation::ValueMap Transformation::getDefaultTypes()
+{
+	return getTransformDefaults(getOperation()->keyWord);
+}
+
+Transformation::DefaultValues Transformation::getDefaultValues()
+{
+	return m_defaultValues;
 }
 
 EValueState Transformation::getValueState(glm::ivec2 coords)

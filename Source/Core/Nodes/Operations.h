@@ -525,7 +525,7 @@ static const std::vector<TransformOperation> g_transforms = {
 				{n(ETransformType::Perspective), "perspective"},
 				0b1000010000110010,
 				{
-						{"fov", EValueType::Float},
+						{"fow", EValueType::Float},
 						{"aspect", EValueType::Float},
 						{"zNear", EValueType::Float},
 						{"zFar", EValueType::Float}
