@@ -55,25 +55,14 @@ namespace Builder
 		return ret;
 	}
 
-	/// \todo MH - Will be removed
-	/*
-	template <typename T, typename... Args>
-	Ptr<T> FORCE_INLINE createTransform(Args&&... args)
-	{
-		static_assert(std::is_base_of_v<Transformation, T>, "T is not derived from Transformation class.");
-		auto ret = std::make_shared<T>(std::forward<Args>(args)...);
-		ret->init();
-		ret->reset();
-		return ret;
-	}
-	 */
-	template <ETransformType T, typename... Args>
-	Ptr<Transformation> FORCE_INLINE createTransform(Args&&... args)
+	template <ETransformType T>
+	Ptr<Transformation> FORCE_INLINE createTransform()
 	{
 		const auto defaultValues = getTransformDefaults(T);
-		auto ret = std::make_shared<TransformImpl<T>>(std::forward<Args>(args)...);
+		auto ret = std::make_shared<TransformImpl<T>>();
 		ret->init();
-		ret->reset();
+		ret->createDefaults();
+		// ret->reset();
 		return ret;
 	}
 } // namespace Builder

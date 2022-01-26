@@ -8,7 +8,13 @@ using namespace Core;
 
 TEST(OrthoProjTest, ShouldContainBeOk)
 {
-	auto ortho = Builder::createTransform<ETransformType::Ortho>(-10.0f, 10.0f, -5.0f, 5.0f, 1.0f, 100.0f);
+	auto ortho = Builder::createTransform<ETransformType::Ortho>();
+	ortho->setDefaultValue("left", -10.0f);
+	ortho->setDefaultValue("right", 10.0f);
+	ortho->setDefaultValue("bottom", -5.0f);
+	ortho->setDefaultValue("top", 5.0f);
+	ortho->setDefaultValue("near", 1.0f);
+	ortho->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::ortho(-10.0f, 10.0f, -5.0f, 5.0f, 1.0f, 100.0f);
 	auto resultMat = ortho->getData().getMat4();
@@ -20,7 +26,11 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 
 TEST(PerspectiveProjTest, ShouldBeOk)
 {
-	auto perspective = Builder::createTransform<ETransformType::Perspective>(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
+	auto perspective = Builder::createTransform<ETransformType::Perspective>();
+	perspective->setDefaultValue("fov", glm::radians(150.0f));
+	perspective->setDefaultValue("aspect", 1.5f);
+	perspective->setDefaultValue("zNear", 0.01f);
+	perspective->setDefaultValue("zFar", 100.0f);
 
 	auto expectedMat = glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
 	auto resultMat = perspective->getData().getMat4();
@@ -33,13 +43,13 @@ TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 	auto perspective = Builder::createTransform<ETransformType::Perspective>()
 	    ->as<TransformImpl<ETransformType::Perspective>>();
 
-	float FOW = generateFloat();
+	float FOV = generateFloat();
 	float aspect = generateFloat();
 	float nearZ = generateFloat();
 	float farZ = generateFloat();
 
-	perspective->setFOW(FOW);
-	EXPECT_EQ(FOW, perspective->getFOW());
+	perspective->setFOV(FOV);
+	EXPECT_EQ(FOV, perspective->getFOV());
 
 	perspective->setAspect(aspect);
 	EXPECT_EQ(aspect, perspective->getAspect());
@@ -50,13 +60,19 @@ TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 	perspective->setZFar(farZ);
 	EXPECT_EQ(farZ, perspective->getZFar());
 
-	EXPECT_EQ(glm::perspective(FOW, aspect, nearZ, farZ), perspective->getData().getMat4());
+	EXPECT_EQ(glm::perspective(FOV, aspect, nearZ, farZ), perspective->getData().getMat4());
 }
 
 //--- Frustum -----------------------------------------------------------------
 TEST(FrustumTest, ShouldBeOk)
 {
-	auto frustum = Builder::createTransform<ETransformType::Frustum>(-15.0f, 15.0f, -10.0f, 10.0f, 0.01f, 100.0f);
+	auto frustum = Builder::createTransform<ETransformType::Frustum>();
+	frustum->setDefaultValue("left", -15.0f);
+	frustum->setDefaultValue("right", 15.0f);
+	frustum->setDefaultValue("bottom", -10.0f);
+	frustum->setDefaultValue("top", 10.0f);
+	frustum->setDefaultValue("near", 0.01f);
+	frustum->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::frustum(-15.0f, 15.0f, -10.0f, 10.0f, 0.01f, 100.0f);
 	auto resultMat = frustum->getData().getMat4();
@@ -100,8 +116,10 @@ TEST(FrustumTest, GettersAndSettersShouldBeOk)
 //--- Look At -----------------------------------------------------------------
 TEST(LookAtTest, ShouldBeOk)
 {
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f},
-	                                               glm::vec3{0.0f, 1.0f, 0.0f});
+	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
+	lookAt->setDefaultValue("eye", glm::vec3{ -10.0f, 5.0f, 1.0f });
+	lookAt->setDefaultValue("center", glm::vec3{ 10.0f, 8.0f, -4.0f });
+	lookAt->setDefaultValue("up", glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	auto expectedMat =
 			glm::lookAt(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f}, glm::vec3{0.0f, 1.0f, 0.0f});

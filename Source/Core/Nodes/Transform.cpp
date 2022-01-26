@@ -44,6 +44,12 @@ Transformation::Transformation(const TransformOperation& transformType)
 		: NodeBase(&(transformType.operation))
 {
 	m_internalData.push_back(DataStore(EValueType::Matrix));
+}
+
+void Transformation::createDefaults()
+{
+	const auto& opName        = getOperation()->keyWord;
+	const auto& transformType = getTransformOperation(magic_enum::enum_cast<ETransformType>(opName).value());
 
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{

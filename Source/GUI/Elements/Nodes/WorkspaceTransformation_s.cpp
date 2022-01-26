@@ -131,11 +131,11 @@ bool WorkspaceTransformationPerspective::drawDataSetValues(DIWNE::Diwne &diwne)
                                 "Aspect",
                                 "ZNear",
                                 "ZFar" },
-                            {   [nodebase](){return nodebase->getFOW();},
+                            {   [nodebase](){return nodebase->getFOV();},
                                 [nodebase](){return nodebase->getAspect();},
                                 [nodebase](){return nodebase->getZNear();},
                                 [nodebase](){return nodebase->getZFar();} },
-                            {   [nodebase](float v){return nodebase->setFOW(v);},
+                            {   [nodebase](float v){return nodebase->setFOV(v);},
                                 [nodebase](float v){return nodebase->setAspect(v);},
                                 [nodebase](float v){return nodebase->setZNear(v);},
                                 [nodebase](float v){return nodebase->setZFar(v);} }

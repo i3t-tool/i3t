@@ -12,7 +12,7 @@
 #include "glm/gtx/transform.hpp"
 
 #include "Core/Defs.h"
-#include "Core/Nodes/Node.h"
+// #include "Core/Nodes/Node.h"
 
 #include "NodeData.h"
 
@@ -525,7 +525,7 @@ static const std::vector<TransformOperation> g_transforms = {
 				{n(ETransformType::Perspective), "perspective"},
 				0b1000010000110010,
 				{
-						{"fow", EValueType::Float},
+						{"fov", EValueType::Float},
 						{"aspect", EValueType::Float},
 						{"zNear", EValueType::Float},
 						{"zFar", EValueType::Float}
@@ -595,4 +595,6 @@ FORCE_INLINE const auto& getTransformDefaults(ETransformType type)
 {
 	return getTransformDefaults(n(type));
 }
+
+const TransformOperation& getTransformProps(const Operation* op);
 }; // namespace Core

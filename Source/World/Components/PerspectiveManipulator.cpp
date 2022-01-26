@@ -190,7 +190,7 @@ void PerspectiveManipulator::update(){
 		//printf("%f\n",m_height);
 	//printf("%f\n",pheight);
 	///
-	editedpersp->setFOW(glm::radians(m_angle));
+	editedpersp->setFOV(glm::radians(m_angle));
 	editedpersp->setAspect(m_aspect);
 	editedpersp->setZNear(m_near);
 	editedpersp->setZFar(m_far);

@@ -14,9 +14,7 @@ template <>
 class TransformImpl<ETransformType::Free> : public Transformation
 {
 public:
-	TransformImpl() : Transformation(getTransformOperation(ETransformType::Free))
-	{
-	}
+	TransformImpl() : Transformation(getTransformOperation(ETransformType::Free)) {}
 
 	ETransformState isValid() const override { return ETransformState::Valid; }
 
@@ -71,11 +69,10 @@ template <>
 class TransformImpl<ETransformType::EulerX> : public Transformation
 {
 public:
-	explicit TransformImpl(float initialRot = 0.0f)
+	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::EulerX))
 	{
 		enableSynergies();
-		setDefaultValue("rotation", initialRot);
 	}
 
 	ETransformState isValid() const override;
@@ -102,11 +99,10 @@ template <>
 class TransformImpl<ETransformType::EulerY> : public Transformation
 {
 public:
-	explicit TransformImpl(float initialRot = 0.0f)
+	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::EulerY))
 	{
 		enableSynergies();
-		setDefaultValue("rotation", initialRot);
 	}
 
 	ETransformState isValid() const override;
@@ -133,11 +129,10 @@ template <>
 class TransformImpl<ETransformType::EulerZ> : public Transformation
 {
 public:
-	explicit TransformImpl(float initialRot = 0.0f)
+	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::EulerZ))
 	{
 		enableSynergies();
-		setDefaultValue("rotation", initialRot);
 	}
 
 	ETransformState isValid() const override;
@@ -157,11 +152,8 @@ template <>
 class TransformImpl<ETransformType::Translation> : public Transformation
 {
 public:
-	explicit TransformImpl(glm::vec3 initialTrans = glm::vec3(0.0f))
-			: Transformation(getTransformOperation(ETransformType::Translation))
-	{
-		setDefaultValue("translation", initialTrans);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::Translation)) {}
 
 	ETransformState isValid() const override;
 
@@ -187,12 +179,8 @@ template <>
 class TransformImpl<ETransformType::AxisAngle> : public Transformation
 {
 public:
-	explicit TransformImpl(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
-			: Transformation(getTransformOperation(ETransformType::AxisAngle))
-	{
-		setDefaultValue("rotation", rads);
-		setDefaultValue("axis", axis);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::AxisAngle)) {}
 
 	ETransformState isValid() const override;
 
@@ -216,12 +204,8 @@ class TransformImpl<ETransformType::Quat> : public Transformation
 	glm::quat m_normalized;
 
 public:
-	explicit TransformImpl(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
-			: Transformation(getTransformOperation(ETransformType::Quat))
-	{
-		m_initialQuat = q;
-		m_normalized  = glm::normalize(q);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::Quat)) {}
 
 	ETransformState isValid() const override;
 
@@ -238,17 +222,8 @@ template <>
 class TransformImpl<ETransformType::Ortho> : public Transformation
 {
 public:
-	explicit TransformImpl(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
-												 float far = 10.0f)
-			: Transformation(getTransformOperation(ETransformType::Ortho))
-	{
-		setDefaultValue("left", left);
-		setDefaultValue("right", right);
-		setDefaultValue("bottom", bottom);
-		setDefaultValue("top", top);
-		setDefaultValue("near", near);
-		setDefaultValue("far", far);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::Ortho)) {}
 
 	ETransformState isValid() const override;
 
@@ -277,23 +252,17 @@ template <>
 class TransformImpl<ETransformType::Perspective> : public Transformation
 {
 public:
-	explicit TransformImpl(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
-			: Transformation(getTransformOperation(ETransformType::Perspective))
-	{
-		setDefaultValue("fow", fow);
-		setDefaultValue("aspect", aspect);
-		setDefaultValue("zNear", zNear);
-		setDefaultValue("zFar", zFar);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::Perspective)) {}
 
 	ETransformState isValid() const override;
 
-	float getFOW() const    { return getDefaultValue("fow").getFloat(); }
+	float getFOV() const    { return getDefaultValue("fov").getFloat(); }
 	float getAspect() const { return getDefaultValue("aspect").getFloat(); }
 	float getZNear() const  { return getDefaultValue("zNear").getFloat(); }
 	float getZFar() const   { return getDefaultValue("zFar").getFloat(); }
 
-	ValueSetResult setFOW(float v);
+	ValueSetResult setFOV(float v);
 	ValueSetResult setAspect(float v);
 	ValueSetResult setZNear(float v);
 	ValueSetResult setZFar(float v);
@@ -308,17 +277,8 @@ template <>
 class TransformImpl<ETransformType::Frustum> : public Transformation
 {
 public:
-	explicit TransformImpl(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
-												 float far = 10.0f)
-			: Transformation(getTransformOperation(ETransformType::Frustum))
-	{
-		setDefaultValue("left", left);
-		setDefaultValue("right", right);
-		setDefaultValue("bottom", bottom);
-		setDefaultValue("top", top);
-		setDefaultValue("near", near);
-		setDefaultValue("far", far);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::Frustum)) {}
 
 	ETransformState isValid() const override;
 
@@ -349,14 +309,8 @@ template <>
 class TransformImpl<ETransformType::LookAt> : public Transformation
 {
 public:
-	explicit TransformImpl(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
-												 const glm::vec3& up = {0.0f, 1.0f, 0.0f})
-			: Transformation(getTransformOperation(ETransformType::LookAt))
-	{
-		setDefaultValue("eye", eye);
-		setDefaultValue("center", center);
-		setDefaultValue("up", up);
-	}
+	explicit TransformImpl()
+			: Transformation(getTransformOperation(ETransformType::LookAt)) {}
 
 	ETransformState isValid() const override;
 

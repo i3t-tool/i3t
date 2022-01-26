@@ -691,9 +691,9 @@ ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 	);
 }
 
-ValueSetResult TransformImpl<ETransformType::Perspective>::setFOW(float v)
+ValueSetResult TransformImpl<ETransformType::Perspective>::setFOV(float v)
 {
-	setDefaultValue("fow", v);
+	setDefaultValue("fov", v);
 
 	return ValueSetResult{};
 }
@@ -722,7 +722,7 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setZFar(float v)
 void TransformImpl<ETransformType::Perspective>::reset()
 {
 	setInternalValue(glm::perspective(
-			getDefaultValue("fow").getFloat(),
+			getDefaultValue("fov").getFloat(),
 			getDefaultValue("aspect").getFloat(),
 			getDefaultValue("zNear").getFloat(),
 			getDefaultValue("zFar").getFloat()

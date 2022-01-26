@@ -25,10 +25,10 @@ MyTree arrange()
 	auto ret = MyTree{
 			Builder::createSequence(),
 			Builder::createSequence(),
-			Builder::createTransform<ETransformType::Translation>(generateVec3()),
-			Builder::createTransform<ETransformType::Translation>(generateVec3()),
-			Builder::createTransform<ETransformType::Translation>(generateVec3()),
-			Builder::createTransform<ETransformType::Translation>(generateVec3()),
+			Builder::createTransform<ETransformType::Translation>(),
+			Builder::createTransform<ETransformType::Translation>(),
+			Builder::createTransform<ETransformType::Translation>(),
+			Builder::createTransform<ETransformType::Translation>(),
 	};
 
 	ret.s1->addMatrix(ret.mat1);

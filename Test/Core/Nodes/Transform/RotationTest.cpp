@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include <Core/Nodes/Utils.h>
 
 #include "Core/Nodes/GraphManager.h"
+#include "Core/Nodes/Utils.h"
 
 #include "Generator.h"
 #include "../Utils.h"
@@ -115,17 +115,18 @@ TEST(GLM, GetAngleFromEulerX)
 TEST(EulerXTest, SetMatrixShuldBeValid)
 {
 	float initialRad = glm::radians(generateFloat());
-	auto eulerX = Builder::createTransform<ETransformType::EulerX>(initialRad);
+	auto eulerX = Builder::createTransform<ETransformType::EulerX>();
+	eulerX->setDefaultValue("rotation", initialRad);
 
 	auto mat = glm::eulerAngleX(generateFloat());
 
 	setValue_expectOk(eulerX, mat);
-	EXPECT_EQ(mat, eulerX->getData().getMat4());
+	EXPECT_TRUE(Math::eq(mat, eulerX->getData().getMat4()));
 
 	eulerX->reset();
 	auto expectedMat = glm::eulerAngleX(initialRad);
-	auto currentMat = eulerX->getData().getMat4();
-	EXPECT_EQ(expectedMat, currentMat);
+	auto currentMat  = eulerX->getData().getMat4();
+	EXPECT_TRUE(Math::eq(expectedMat, currentMat));
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
@@ -282,7 +283,8 @@ TEST(GLM, GetAngleFromEulerZ)
 TEST(EulerZTest, SetMatrixShouldBeValid)
 {
   float initialRad = glm::radians(generateFloat());
-  auto eulerZ = Builder::createTransform<ETransformType::EulerZ>(initialRad);
+  auto eulerZ = Builder::createTransform<ETransformType::EulerZ>();
+	eulerZ->setDefaultValue("rotation", initialRad);
 
   auto mat = glm::eulerAngleZ(generateFloat());
 

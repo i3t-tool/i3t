@@ -76,6 +76,12 @@ class Transformation : public Node
 public:
 	explicit Transformation(const TransformOperation& transformType);
 
+	//===-- Construct functions -----------------------------------------------===//
+
+	void createDefaults();
+
+	//===----------------------------------------------------------------------===//
+
 private:
 	/// \todo MH Use Node::m_owner.
 	Ptr<NodeBase> m_currentSequence = nullptr;
@@ -102,8 +108,7 @@ public:
 	 * \return A map of valueName and value pairs.
 	 */
 	TransformOperation::ValueMap getDefaultTypes();
-	DefaultValues getDefaultValues();
-	void          setDefaultValues(const DefaultValues& values) {};
+	DefaultValues                getDefaultValues();
 
 	EValueState getValueState(glm::ivec2 coords);
 
