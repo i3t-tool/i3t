@@ -4,54 +4,187 @@
 
 #include "WorkspaceCycle.h"
 
-WorkspaceCycle::WorkspaceCycle() :
-		WorkspaceNodeWithCoreData(Core::GraphManager::createCycle())
+WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase/*=Core::GraphManager::createCycle()*/, bool drawPins/*=true*/)
+    :   WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
 {
-	setDataItemsWidth();
+	setDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node and run settings data width in it */
 }
 
 bool WorkspaceCycle::isCycle() { return true; }
 
 void WorkspaceCycle::drawMenuLevelOfDetail()
 {
-	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::LightCycle, WorkspaceLevelOfDetail::Label});
 }
 
-bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
+bool WorkspaceCycle::buttonPlayPause(ImVec2 const &  button_sz)
 {
-	if (index == -1)
-	{ // -> draw middle
-		//BUTTONS
-		ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize);
+    if (ImGui::Button("P/P", button_sz))
+    {
+        if (m_nodebase->as<Core::Cycle>()->isRunning())
+        {
+            m_nodebase->as<Core::Cycle>()->pause();
+        }
+        else
+        {
+            m_nodebase->as<Core::Cycle>()->play();
+        }
+        return true;
+    }
+    return false;
+}
 
-		auto cycle = m_nodebase->as<Core::Cycle>();
+bool WorkspaceCycle::buttonStopAndReset(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("SaR", button_sz))
+    {
+        m_nodebase->as<Core::Cycle>()->stopAndReset();
+        return true;
+    }
+    return false;
+}
 
-		// \todo Add icons to buttons
-		// "⯈/❙❙" "◼" "❙⯇" "⯈❙"
-		//std::u8string string = u8"⯈";
-		//std::u8string string = u8"ěščřžýáíé";
-		//std::string s(string.cbegin(), string.cend());
+bool WorkspaceCycle::buttonStepBack(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("SB", button_sz))
+    {
+        m_nodebase->as<Core::Cycle>()->stepBack();
+        return true;
+    }
+    return false;
+}
 
-		if (ImGui::Button("P/P", button_sz))
-		{
-			if (m_nodebase->as<Core::Cycle>()->isRunning())
-			{
-				m_nodebase->as<Core::Cycle>()->pause();
-			}
-			else
-			{
-				m_nodebase->as<Core::Cycle>()->play();
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("SaR", button_sz)) { m_nodebase->as<Core::Cycle>()->stopAndReset(); }
-		ImGui::SameLine();
-		if (ImGui::Button("SB", button_sz)) { m_nodebase->as<Core::Cycle>()->stepBack(); }
-		ImGui::SameLine();
-		if (ImGui::Button("SN", button_sz)) { m_nodebase->as<Core::Cycle>()->stepNext(); }
+bool WorkspaceCycle::buttonStepNext(ImVec2 const &  button_sz)
+{
+    if (ImGui::Button("SN", button_sz))
+    {
+        m_nodebase->as<Core::Cycle>()->stepNext();
+        return true;
+    }
+    return false;
+}
 
+bool WorkspaceCycle::leftContent()
+{
+    bool inner_interaction_happen = false;
+
+    ImRect nodeRect; /* just declaration before switch */
+    ImVec2 pinConnectionPoint;
+
+    switch (m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Label:
+        nodeRect = getNodeRectDiwne();
+        pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceInputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+            if (pin->isConnected())
+            {
+                inner_interaction_happen |= pin->getLink().drawDiwne();
+            }
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::LightCycle:
+
+
+        for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
+        {
+            m_workspaceInputs.at(i)->drawDiwne();
+        }
+
+        for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP, Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
+        {
+            Ptr<WorkspaceCoreInputPin> const pin = m_workspaceInputs.at(i);
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+            if (pin->isConnected())
+            {
+                inner_interaction_happen |= pin->getLink().drawDiwne();
+            }
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::Full:
+        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent();
+        break;
+    }
+
+    return inner_interaction_happen;
+}
+
+bool WorkspaceCycle::rightContent()
+{
+    bool inner_interaction_happen = false;
+
+    ImRect nodeRect; /* just declaration before switch */
+    ImVec2 pinConnectionPoint;
+
+    switch (m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Label:
+        nodeRect = getNodeRectDiwne();
+        pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceOutputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::LightCycle:
+
+        for (auto const i : {Core::I3T_CYCLE_OUT_VAL})
+        {
+            m_workspaceOutputs.at(i)->drawDiwne();
+        }
+
+        for (auto const i : {Core::I3T_CYCLE_OUT_PLAY, Core::I3T_CYCLE_OUT_PAUSE, Core::I3T_CYCLE_OUT_STOP, Core::I3T_CYCLE_OUT_PREV, Core::I3T_CYCLE_OUT_NEXT, Core::I3T_CYCLE_OUT_END})
+        {
+            m_workspaceOutputs.at(i)->setConnectionPointDiwne(pinConnectionPoint);
+        }
+
+        break;
+    case WorkspaceLevelOfDetail::Full:
+        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::rightContent();
+        break;
+    }
+
+    return inner_interaction_happen;
+}
+
+bool WorkspaceCycle::middleContent()
+{
+    // \todo Add icons to buttons
+    // "⯈/❙❙" "◼" "❙⯇" "⯈❙"
+    //std::u8string string = u8"⯈";
+    //std::u8string string = u8"ěščřžýáíé";
+    //std::string s(string.cbegin(), string.cend());
+
+
+    bool inner_interaction_happen = false;
+    ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoom();
+
+    switch (m_levelOfDetail)
+    {
+    case WorkspaceLevelOfDetail::Label:
+
+        ImGui::TextUnformatted(m_middleLabel.c_str());
+
+        break;
+    case WorkspaceLevelOfDetail::LightCycle:
+
+        inner_interaction_happen |= buttonPlayPause(button_sz);
+        ImGui::SameLine(); inner_interaction_happen |= buttonStopAndReset(button_sz);
+
+        break;
+    case WorkspaceLevelOfDetail::Full:
+
+        inner_interaction_happen |= buttonPlayPause(button_sz); ImGui::SameLine();
+		inner_interaction_happen |= buttonStopAndReset(button_sz); ImGui::SameLine();
+		inner_interaction_happen |= buttonStepBack(button_sz); ImGui::SameLine();
+		inner_interaction_happen |= buttonStepNext(button_sz);
+
+		/* =================================== */
 		// Mode select
-		int mode = static_cast<int>(cycle->getMode());
+		int mode = static_cast<int>(m_nodebase->as<Core::Cycle>()->getMode());
 
 		//TODO is there a way to calculate how much space take radio button with text?
 
@@ -63,15 +196,14 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		ImGui::SameLine();
 
 		// Multiplier = step for a single tick
-		//const float coreData		 = m_nodebase->as<Core::Cycle>()->getMultiplier(); // wrong
-		const float coreData		 = m_nodebase->as<Core::Cycle>()->getManualStep();
-		float				localData		 = coreData;
+		const float coreData_manStep		 = m_nodebase->as<Core::Cycle>()->getManualStep();
+		float				localData		 = coreData_manStep;
 		bool				valueChanged = false;
 
 		ImGui::PushItemWidth(2 * button_sz.x + 4 * I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
 
 
-		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), index),
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 0),
                                     localData, 1, valueChanged);
 
 		if (valueChanged)
@@ -104,21 +236,20 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 		}
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
-	}
-	else if (index == 0)
-	{
-		const float coreData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
+
+		const float coreData_float = m_nodebase->as<Core::Cycle>()->getData().getFloat();
 		const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
 
-		bool	valueChanged = false;
-		float localData;
+//		bool	valueChanged = false;
+//		float localData;
+        valueChanged = false;
 
-		ImGui::PushItemWidth(getDataItemsWidth(diwne));
+		ImGui::PushItemWidth(getDataItemsWidth());
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
-		localData = coreData;
-		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), index),
+		localData = coreData_float;
+		drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 1),
                                     localData, coreMap[0], valueChanged);
 
 
@@ -132,8 +263,10 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 			m_nodebase->setValue(localData);
 			setDataItemsWidth();
 		}
-	}
-	return false;
+
+        break;
+    }
+    return inner_interaction_happen;
 }
 
 //void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
@@ -251,9 +384,11 @@ bool WorkspaceCycle::drawDataFull(DIWNE::Diwne& diwne, int index)
 //	builder.EndInput();
 //}
 
-int WorkspaceCycle::maxLenghtOfData(int index)
+int WorkspaceCycle::maxLenghtOfData()
 {
     Ptr<Core::Cycle> nodebase = m_nodebase->as<Core::Cycle>();
-	float m = std::max({nodebase->getFrom(), nodebase->getTo(), nodebase->getManualStep(), nodebase->getMultiplier()});
-	return numberOfCharWithDecimalPoint(m, m_numberOfVisibleDecimal);
+	return std::max({numberOfCharWithDecimalPoint(nodebase->getFrom(), m_numberOfVisibleDecimal)
+                    , numberOfCharWithDecimalPoint(nodebase->getTo(), m_numberOfVisibleDecimal)
+                    , numberOfCharWithDecimalPoint(nodebase->getManualStep(), m_numberOfVisibleDecimal)
+                    , numberOfCharWithDecimalPoint(nodebase->getMultiplier(), m_numberOfVisibleDecimal)});
 }

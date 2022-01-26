@@ -1,9 +1,9 @@
 #include "WorkspaceCamera.h"
 
-WorkspaceCamera::WorkspaceCamera()
-    :   WorkspaceNodeWithCoreDataWithPins(Core::GraphManager::createCamera(), false)
-    ,   m_projection(std::make_shared<WorkspaceSequence>( m_nodebase->as<Core::Camera>()->getProj() ) )
-    ,   m_view (std::make_shared<WorkspaceSequence>( m_nodebase->as<Core::Camera>()->getView() ) )
+WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
+    :   WorkspaceNodeWithCoreDataWithPins(diwne, Core::GraphManager::createCamera(), false)
+    ,   m_projection(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getProj() ) )
+    ,   m_view (std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView() ) )
 {}
 
 bool WorkspaceCamera::isCamera()
@@ -16,16 +16,16 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
 
-bool WorkspaceCamera::middleContent(DIWNE::Diwne &diwne)
+bool WorkspaceCamera::middleContent()
 {
     bool inner_interaction_happen = false;
-	inner_interaction_happen |= m_projection->drawNodeDiwne(diwne, true); ImGui::SameLine();
-	inner_interaction_happen |= m_view->drawNodeDiwne(diwne, true);
+	inner_interaction_happen |= m_projection->drawNodeDiwne(true); ImGui::SameLine();
+	inner_interaction_happen |= m_view->drawNodeDiwne(true);
 	return inner_interaction_happen;
 }
 
-bool WorkspaceCamera::leftContent(DIWNE::Diwne &diwne){return false;};
-bool WorkspaceCamera::rightContent(DIWNE::Diwne &diwne){return WorkspaceNodeWithCoreDataWithPins::rightContent(diwne);}; /* draw camera pin on opposite side */
+//bool WorkspaceCamera::leftContent(){return false;};
+//bool WorkspaceCamera::rightContent(){return WorkspaceNodeWithCoreDataWithPins::rightContent();}; /* draw camera pin on opposite side */
 
 int WorkspaceCamera::maxLenghtOfData()
 {

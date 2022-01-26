@@ -11,7 +11,7 @@ protected:
     bool m_drawPins;
     std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceInnerTransformations;
 public:
-	WorkspaceSequence(Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(), bool drawPins=true);
+	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(), bool drawPins=true);
 
 	//===-- Double dispatch ---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
@@ -30,13 +30,13 @@ public:
     void pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index = 0);
 
     void moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode, int index=0);
-    void moveNodeToSequence(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index=0);
-    void moveNodeToWorkspaceWindow(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode);
+    void moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> dragedNode);
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;
 
-    bool topContent(DIWNE::Diwne &diwne);
-    bool middleContent(DIWNE::Diwne &diwne);
+    bool processBeforeContent();
+    bool topContent();
+    bool middleContent();
 
     void drawMenuLevelOfDetail();
 

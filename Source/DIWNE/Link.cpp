@@ -3,33 +3,29 @@
 namespace DIWNE
 {
 /* \todo JH constants from settings */
-Link::Link(DIWNE::ID id)
-    : m_idDiwne(id)
+Link::Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="DiwneLink"*/)
+    : DiwneObject(diwne, id, labelDiwne)
     , m_thickness(10)
+    , m_thickness_selected_border(4)
     , m_color(ImColor(150,75,100,150))
+    , m_selectedColor(ImColor(150,75,100,255))
     , m_startDiwne(ImVec2(0,0))
     , m_endDiwne(ImVec2(0,0))
     , m_startControlOffsetDiwne(ImVec2(10,0)) /* \todo JH minimal control points offset to settings */
     , m_endControlOffsetDiwne(ImVec2(-10,0))
-    , m_popupID(fmt::format("linkPopup{}",id))
-    , m_translated(false)
+    , m_just_pluged(false)
 {}
 
-Link::~Link()
-{
-//dtor
-}
-
-void Link::updateSquareDistanceMouseFromLink(DIWNE::Diwne &diwne)
+void Link::updateSquareDistanceMouseFromLink()
 {
     ImVec2 mousePosDiwne = diwne.screen2diwne( diwne.bypassGetMousePos() );
     ImVec2 closestPointOnLink = ImBezierCubicClosestPointCasteljau(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne
                                              , mousePosDiwne, ImGui::GetStyle().CurveTessellationTol);
-    ImVec2 diff = (closestPointOnLink - mousePosDiwne)/diwne.getWorkAreaZoomDiwne();
+    ImVec2 diff = (closestPointOnLink - mousePosDiwne)/diwne.getWorkAreaZoom();
     m_squaredDistanceMouseFromLink = diff.x*diff.x + diff.y*diff.y;
 }
 
-bool Link::isLinkOnWorkArea(DIWNE::Diwne &diwne)
+bool Link::isLinkOnWorkArea()
 {
     return diwne.getWorkAreaDiwne().Overlaps(ImRect(
         std::min(std::min(m_controlPointStartDiwne.x, m_startDiwne.x), std::min(m_controlPointEndDiwne.x, m_endDiwne.x)),
@@ -39,93 +35,28 @@ bool Link::isLinkOnWorkArea(DIWNE::Diwne &diwne)
                                              );
 }
 
-bool Link::drawLinkDiwne(DIWNE::Diwne &diwne)
+bool Link::initialize()
 {
-    bool inner_interaction_happen = false, interaction_happen = false;
-
+     m_color.Value.w = m_hovered ? 1 : 0.5; /* \todo JH alpha to settings? */
+     return false;
+}
+bool Link::initializeDiwne()
+{
     updateEndpoints();
     updateControlPointsOffsets();
     updateControlPoints();
-    updateSquareDistanceMouseFromLink(diwne);
+    updateSquareDistanceMouseFromLink();
 
-    inner_interaction_happen = linkContent(diwne);
-
-    interaction_happen = processLink(diwne, inner_interaction_happen);
-
-    return interaction_happen || inner_interaction_happen;
+    return initialize();
 }
 
-bool Link::bypassLinkHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
-bool Link::bypassLinkSelectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
-bool Link::bypassLinkUnselectAction() {return ImGui::IsMouseReleased(0) && bypassLinkHoveredAction();}
-bool Link::bypassLinkHoldAction() {return ImGui::IsMouseClicked(0) && bypassLinkHoveredAction();}
-bool Link::bypassLinkUnholdAction() {return !ImGui::IsMouseDown(0);}
-bool Link::bypassLinkRaisePopupAction() {return ImGui::IsMouseReleased(1) && bypassLinkHoveredAction();}
+bool Link::bypassHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
 
-bool Link::processLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+bool Link::content()
 {
-    bool interaction_happen = false;
-    interaction_happen |= processLinkHovered(diwne, inner_interaction_happen);
-
-    interaction_happen |= m_selected ? processLinkUnselected(diwne, inner_interaction_happen) : processLinkSelected(diwne, inner_interaction_happen);
-
-    interaction_happen |= processLinkPopupDiwne(diwne, inner_interaction_happen);
-
-    return interaction_happen;
-}
-
-bool Link::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if (bypassLinkHoveredAction())
-    {
-        m_color.Value.w = 1; /* \todo JH alpha to settings? */
-        return true;
-    }else
-    {
-        m_color.Value.w = 0.5; /* \todo JH alpha to settings? */
-    }
-    return false;
-}
-
-bool Link::processLinkSelected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if (!m_selected && !m_translated && !inner_interaction_happen && bypassLinkSelectAction())
-    {
-        m_selected = true;
-        return true;
-    }
-    return false;
-}
-
-bool Link::processLinkUnselected(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if (m_selected && !m_translated && !inner_interaction_happen && bypassLinkUnselectAction())
-    {
-        m_selected = false;
-        return true;
-    }
-    return false;
-}
-
-bool Link::linkContent(DIWNE::Diwne &diwne)
-{
-    if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, ImColor(150,150,0), m_thickness+4 ); }/* \todo color of selected and thicknes of selected mark to settings */
+    if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_selectedColor, m_thickness+m_thickness_selected_border ); }
     diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_color, m_thickness);
     return false;
-}
-
-bool Link::processLinkPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if(!inner_interaction_happen && bypassLinkRaisePopupAction())
-    {
-        ImGui::OpenPopup(m_popupID.c_str());
-    }
-    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
-}
-
-void Link::linkPopupContent()
-{
-    if (ImGui::MenuItem("Override this method with content of your link popup menu")) {}
 }
 
 } /* namespace DIWNE */

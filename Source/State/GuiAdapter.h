@@ -7,27 +7,27 @@ template <ETransformType T>
 auto createTransform(ImVec2 const position)
 {
 	if constexpr (T == ETransformType::Free)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationFree>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationFree>(position);
 	else if constexpr (T == ETransformType::Translation)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationTranslation>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationTranslation>(position);
 	else if constexpr (T == ETransformType::EulerX)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationEulerX>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationEulerX>(position);
 	else if constexpr (T == ETransformType::EulerY)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationEulerY>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationEulerY>(position);
 	else if constexpr (T == ETransformType::EulerZ)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationEulerZ>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationEulerZ>(position);
 	else if constexpr (T == ETransformType::Scale)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationScale>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationScale>(position);
 	else if constexpr (T == ETransformType::AxisAngle)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationAxisAngle>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationAxisAngle>(position);
 	else if constexpr (T == ETransformType::Quat)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationQuaternion>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationQuaternion>(position);
 	else if constexpr (T == ETransformType::Ortho)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationOrthoProjection>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationOrthoProjection>(position);
 	else if constexpr (T == ETransformType::Perspective)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationPerspective>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationPerspective>(position);
 	else if constexpr (T == ETransformType::Frustum)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationFrustum>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationFrustum>(position);
 	else if constexpr (T == ETransformType::LookAt)
-		return WorkspaceWindow::addNodeToPosition<WorkspaceTransformationLookAt>(position);
+		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationLookAt>(position);
 }

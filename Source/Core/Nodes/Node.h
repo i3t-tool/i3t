@@ -13,10 +13,10 @@
 #include <vector>
 
 #include "Core/Defs.h"
-#include "Id.h"
-#include "NodeData.h"
-#include "Operations.h"
-#include "Pin.h"
+#include "Core/Nodes/Id.h"
+#include "Core/Nodes/NodeData.h"
+#include "Core/Nodes/Operations.h"
+#include "Core/Nodes/Pin.h"
 
 namespace Core
 {

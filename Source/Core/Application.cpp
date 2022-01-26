@@ -185,8 +185,8 @@ void Application::onClose()
 void Application::onSave()
 {
 	Log::info("Save state!");
-	auto workspace = getUI()->getWindowPtr<WorkspaceWindow>();
-	auto& nodes = workspace->m_workspaceCoreNodes;
+	auto workspace = getUI()->getWindowPtr<WorkspaceWindow>()->getNodeEditor();
+	auto& nodes = workspace.m_workspaceCoreNodes;
 
 	DumpVisitor visitor;
 	std::string rawState = visitor.dump(nodes);

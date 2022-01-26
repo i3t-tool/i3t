@@ -40,130 +40,95 @@
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
-enum WorkspaceWindowAction
+enum WorkspaceDiwneAction
 {
     None,
-    SelectionRectFull,
-    SelectionRectTouch
+    CreateAndPlugTypeConstructor
 };
 
-/*! \class class for Workspace window object
-    \brief Store everything what Workspace window need
-*/
-class WorkspaceWindow : public IWindow, public DIWNE::Diwne
+class WorkspaceDiwne : public DIWNE::Diwne
 {
-public:
-	I3T_WINDOW(WorkspaceWindow)
+    friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
 
-	explicit WorkspaceWindow(bool show);
-	~WorkspaceWindow() override;
+    public: /* \todo JH make some protected etc... */
+    WorkspaceDiwne(DIWNE::SettingsDiwne const &settingsDiwne);
 
-	Application& m_wholeApplication;
+    void popupContent();
 
-//    DIWNE::Diwne m_diwne;
-    void popupBackgroundContent();
+    bool beforeBegin();
+    bool beforeContent();
+    bool content();
+    bool afterContent();
+    bool afterEnd();
+    void allowInteraction();
 
-    bool processDiwne();
-    void BeginDiwne(const char* id);
+    WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
 
-    bool m_first_frame = true;
-
-    ImRect m_selectionRectangeDiwne;
-    WorkspaceWindowAction m_workspaceWindowAction;
-
-
-//	ImTextureID m_headerBackgroundTexture;
-
-
-
-	/* \todo JH better name for this atributes - for better description what they do... */
-//	Ptr<WorkspaceCorePin> m_pinPropertiesForNewLink = nullptr;
-//	Ptr<WorkspaceCorePin> m_pinPropertiesForNewNodeLink = nullptr;
-//	bool m_createNewNode = false;
-
-    WorkspaceCoreLink *m_creatingLink;
-    WorkspaceCorePin *m_linkCreatingPin;
-
-	ImVec2 m_rightClickPosition = ImVec2(100,100);
-//	ImVec2 m_newNodePostion = ImVec2(100,100);
-
-	/**
-	 * \brief All WorkspaceNodes
-	 *
-	 * \todo Needs to be static.
-	 * \todo Move this variable somewhere else.
-	 */
-	static std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
+	/** * \brief All WorkspaceNodes
+        * \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
+	 **/
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> const & getAllNodes() {return m_workspaceCoreNodes;};
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
-	/// \todo JH, MH - Needs to be accessed by scene loader, but it may be weird that the loader needs to have reference to the Workspace.
+	bool processCreateAndPlugTypeConstructor();
+
+	template <typename T>
+    void addTypeConstructorNode()
+    {
+        WorkspaceCoreInputPin *pin = getLastActivePin<WorkspaceCoreInputPin>();
+        addNodeToPosition<T>( pin->getLinkConnectionPointDiwne() + ImVec2(-100,0) ); /* \todo JH shift to Theme */
+        pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getOutputs().at(0).get()); /* \todo JH always 0 with type constructor? */
+    }
+
 	template <class T>
-	static auto inline addNodeToPosition(ImVec2 const position)
+	auto inline addNodeToPosition(ImVec2 const position=ImVec2(0,0))
 	{
-		auto node = std::make_shared<T>();
+		auto node = std::make_shared<T>(*this);
 
 		node->setNodePositionDiwne( position );
 		m_workspaceCoreNodes.push_back(node);
+		m_workspaceCoreNodes.back()->drawNodeDiwne();
 
 		return node;
 	}
 
     template<class T>
-    void inline addNodeToPositionOfPopup()
+    auto inline addNodeToPositionOfPopup()
     {
-        addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+        return addNodeToPosition<T>(screen2diwne(getPopupPosition()));
     }
-
-	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
-
-	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
 
-//	std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
-//	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
-
-//	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
-//	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);
-//
-//	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
-
 	void manipulatorStartCheck3D();
-//
-//	void checkUserActions();
-//
-//	void checkQueryElements();
-//	void checkQueryElementsCreating();
-//	void checkQueryLinkCreate();
-//	void checkQueryNodeCreate();
-//	void checkQueryElementsDeleting();
-//	void checkQueryLinkDelete();
-//	void checkQueryNodeDelete();
-//
-////	void NodeDelete(ne::NodeId nodeId);
-//
-//	void selectAll();
-//	void invertSelection();
-//
-//	//void checkQueryContextMenus();
-//
 
-    bool bypassDiwneSelectionRectangleAction();
-    ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
-    ImVec2 bypassDiwneGetSelectionRectangleSize();
-
-    bool processSelectionRectangle();
-
-	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
+    void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftDragedOrHoldNodeToEnd();
+};
 
-//	void showPopUpLabel(std::string label, ImColor color);
-//
-//	void UpdateTouchAllNodes();
+/*! \class class for Workspace window object
+    \brief Store everything what Workspace window need
+*/
+class WorkspaceWindow : public IWindow
+{
+public:
+	I3T_WINDOW(WorkspaceWindow)
 
-//	void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
+	explicit WorkspaceWindow(bool show);
+	~WorkspaceWindow() override {};
+
+	static WorkspaceDiwne m_workspaceDiwne;
+	WorkspaceDiwne& getNodeEditor(){return m_workspaceDiwne;};
+
+	Application& m_wholeApplication;
+
+    bool m_first_frame;
+
+    //ImVec2 m_rightClickPosition = ImVec2(100,100);
+
 
 	void render();
 
@@ -179,4 +144,10 @@ public:
 };
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
+
+template <typename T>
+auto inline addNodeToNodeEditor(ImVec2 const position=ImVec2(0,0))
+{
+    return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<T>(position);
+}
 //extern void backgroundPopupContent(DIWNE::Diwne &diwne, std::vector<Ptr<WorkspaceNodeWithCoreData>> &workspaceCoreNodes);

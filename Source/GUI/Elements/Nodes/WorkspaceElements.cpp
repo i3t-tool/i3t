@@ -34,70 +34,64 @@ std::map<EValueType, EColor> WorkspacePinColorForeground = {
 std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
 		{WorkspaceLevelOfDetail::Full, "Full"},
 		{WorkspaceLevelOfDetail::SetValues, "Set values"},
-		{WorkspaceLevelOfDetail::Label, "Label"}};
+		{WorkspaceLevelOfDetail::Label, "Label"},
+		{WorkspaceLevelOfDetail::LightCycle, "Light cycle"}};
 
-WorkspaceNode::WorkspaceNode(DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
-    :   DIWNE::Node(id)
+WorkspaceNode::WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel, std::string const middleLabel)
+    :   DIWNE::Node(diwne, id)
     ,   m_topLabel(topLabel)
     ,   m_middleLabel(middleLabel)
     ,   m_removeFromWorkspaceWindow(false)
 {}
 
-bool WorkspaceNode::processInNodeBeforeContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::beforeContent()
 {
     /* \todo JH background by settings in different type of nodes */
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(ImVec4(0,255,0,255)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBg)), I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_All);
     return false;
 }
 
 
-bool WorkspaceNode::topContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::topContent()
 {
     bool interaction_happen = false;
 
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
-
-	// ImGui::Spring(0, I3T::getSize(ESize::Nodes_HeaderLabelIndent)); // 0 - spring will always have zero size - left align the header
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeader)), I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
 	ImGui::TextUnformatted(m_topLabel.c_str());
-	// ImGui::Spring(10);	 // 1 - power of the current spring = 1, use default spacing .x or .y
 
     return interaction_happen;
 }
 
-bool WorkspaceNode::middleContent(DIWNE::Diwne &diwne)
+bool WorkspaceNode::middleContent()
 {
     bool interaction_happen = false;
-
-    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()));
 
 	ImGui::TextUnformatted(m_middleLabel.c_str());
 
     return interaction_happen;
 }
 
-bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
+
+void WorkspaceNode::allowInteraction(){m_interactionAllowed = !m_inner_interaction_happen && m_nodeInteractionAllowed && (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()))); }
+bool WorkspaceNode::afterContent()
 {
-    WorkspaceWindow& ww = dynamic_cast<WorkspaceWindow&>(diwne);
-    /* \todo JH work in progress... not unselect nodes when overlap them and then unoverlaped ? */
-
-    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectFull)
+    if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
     {
-        m_selected = ww.m_selectionRectangeDiwne.Contains(getNodeRectDiwne()) ? true : false;
+        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : false;
+        m_nodeInteractionAllowed = false;
+    }else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch )
+    {
+        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : false;
+        m_nodeInteractionAllowed = false;
+    } else
+    {
+        m_nodeInteractionAllowed = true;
     }
 
-
-    if (ww.m_workspaceWindowAction == WorkspaceWindowAction::SelectionRectTouch )
-    {
-        m_selected = ww.m_selectionRectangeDiwne.Overlaps(getNodeRectDiwne()) ? true : false;
-    }
-
-    m_nodeInteractionAllowed = m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
-
-    return DIWNE::Node::processInNodeAfterContent(diwne);
+    return false;
 }
 
 
@@ -105,18 +99,18 @@ bool WorkspaceNode::processInNodeAfterContent(DIWNE::Diwne &diwne)
 void WorkspaceNode::drawMenuDelete()
 {
     if (ImGui::MenuItem("Delete")) {
-            m_removeFromWorkspaceWindow = true;
+        m_removeFromWorkspaceWindow = true;
     }
 }
 
-void WorkspaceNode::nodePopupContent()
+void WorkspaceNode::popupContent()
 {
     drawMenuDelete();
 }
 
 
-WorkspacePin::WorkspacePin(DIWNE::ID id, std::string label)
-    :   DIWNE::Pin(id)
+WorkspacePin::WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label)
+    :   DIWNE::Pin(diwne, id)
     ,   m_label(label)
     ,   m_showLabel(false)
 {}

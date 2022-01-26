@@ -6,7 +6,7 @@ namespace Core
 {
 inline constexpr size_t I3T_CYCLE_IN_FROM  = 0;
 inline constexpr size_t I3T_CYCLE_IN_TO		 = 1;
-inline constexpr size_t I3T_CYCLE_IN_MULT  = 2;
+inline constexpr size_t I3T_CYCLE_IN_MULT  = 2; /* JH is not step + instead of *  ??? */
 inline constexpr size_t I3T_CYCLE_IN_PLAY  = 3;
 inline constexpr size_t I3T_CYCLE_IN_PAUSE = 4;
 inline constexpr size_t I3T_CYCLE_IN_STOP	 = 5;

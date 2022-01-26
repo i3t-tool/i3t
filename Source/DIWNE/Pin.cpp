@@ -3,133 +3,75 @@
 namespace DIWNE
 {
 
-Pin::Pin(DIWNE::ID id)
-    : m_idDiwne(id)
+Pin::Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="DiwnePin"*/)
+    : DiwneObject(diwne, id, labelDiwne)
     , m_pinRectDiwne(ImRect(0,0,1,1)) /* can not have zero size because of InvisibleButton */
-    , m_isHeld(false)
-    , m_popupID(fmt::format("pinPopup{}", id))
+    , m_connectionPointDiwne(ImVec2(0,0))
 { }
 
-Pin::~Pin()
+void Pin::begin()
 {
-    //dtor
+    ImGui::PushID(m_labelDiwne.c_str());
+    ImGui::BeginGroup();
 }
 
-bool Pin::drawPinDiwne(DIWNE::Diwne &diwne)
+void Pin::end()
 {
-    bool interaction_happen = false;
-    bool inner_interaction_happen = false;
-
-
-    ImGui::PushID(fmt::format("Pin{}", m_idDiwne).c_str());
-    ImGui::BeginGroup();
-        inner_interaction_happen |= pinContent(diwne);
     ImGui::EndGroup();
     ImGui::PopID();
+}
 
+bool Pin::afterEndDiwne()
+{
+    bool interaction_happen = false;
     m_pinRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
     m_pinRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
-
-    interaction_happen |= processPin(diwne, inner_interaction_happen);
+    updateConnectionPointDiwne();
 
 #ifdef DIWNE_DEBUG
     diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
-    if (!inner_interaction_happen && ImGui::IsItemHovered()) {diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);}
+    if (!m_interactionAllowed && bypassHoveredAction()) {diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);}
 #endif // DIWNE_DEBUG
 
-    return inner_interaction_happen || interaction_happen;
-}
-
-bool Pin::bypassPinHoveredAction() {return ImGui::IsItemHovered();}
-bool Pin::bypassPinHoldAction() {return ImGui::IsMouseClicked(0) && bypassPinHoveredAction();}
-bool Pin::bypassPinUnholdAction() {return !ImGui::IsMouseDown(0);}
-bool Pin::bypassPinRaisePopupAction() {return ImGui::IsMouseReleased(1) && bypassPinHoveredAction();}
-bool Pin::bypassPinConnectLinkAction(DIWNE::Diwne &diwne)
-{
-    return (diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink || diwne.getPreviousFrameDiwneAction() == DIWNE::DiwneAction::NewLink) && bypassPinHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>() != this;
-}
-
-bool Pin::processPinNewLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if (m_isHeld && diwne.bypassIsMouseDragging0())
-    {
-        diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
-        return true;
-    }
-    return false;
-}
-
-bool Pin::processPin(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    bool interaction_happen = false;
-
-    interaction_happen |= processPinHovered(diwne, inner_interaction_happen);
-
-    interaction_happen |= m_isHeld ? processPinUnhold(diwne, inner_interaction_happen) : processPinHold(diwne, inner_interaction_happen);
-    interaction_happen |= m_isHeld;
-
-    interaction_happen |= m_isHeld ? processPinNewLink(diwne, inner_interaction_happen) : processPinConnectLink(diwne, inner_interaction_happen);
-
-    interaction_happen |= processPinPopupDiwne(diwne, inner_interaction_happen);
-
+    if (m_interactionAllowed) interaction_happen |= processPin_Pre_ConnectLink();
+    interaction_happen |= DiwneObject::afterEndDiwne();
     return interaction_happen;
 }
 
-bool Pin::processPinConnectLink(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+bool Pin::bypassPinLinkConnectionPreparedAction()
 {
-    if (!m_isHeld && bypassPinConnectLinkAction(diwne))
+    return !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && bypassHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>() != this;
+}
+
+bool Pin::processDrag()
+{
+    diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
+    diwne.setLastActivePin(this);
+    return true;
+}
+
+bool Pin::processConnectionPrepared() {ImGui::TextUnformatted("Prepared for connecting link"); return true;}
+
+bool Pin::processPin_Pre_ConnectLink()
+{
+    if (bypassPinLinkConnectionPreparedAction())
     {
-        /* here it is when goal pin is hovered */
-        return true;
+        return processConnectionPrepared();
     }
     return false;
 }
 
-bool Pin::processPinHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
+//bool Pin::processSelect(){return false;};
+//bool Pin::processUnselect(){return false;};
+//
+//bool Pin::processHold(){return false;};
+//bool Pin::processUnHold(){return false;};
+
+bool Pin::processHovered()
 {
-    if(bypassPinHoveredAction())
-    {
-        diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);
-    }
+    diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2*diwne.getWorkAreaZoom());
     return false;
 }
 
-bool Pin::processPinHold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if (!inner_interaction_happen && bypassPinHoldAction())
-    {
-        m_isHeld = true;
-        return true;
-    }
-    return false;
-}
-
-bool Pin::processPinUnhold(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if (!inner_interaction_happen && bypassPinUnholdAction())
-    {
-        if(diwne.getDiwneAction() == DIWNE::DiwneAction::NewLink && diwne.getLastActivePin<DIWNE::Pin>() == this) /* link was drawn from this pin and now is not */
-        {
-            diwne.setDiwneAction(DIWNE::DiwneAction::None);
-        }
-        m_isHeld = false;
-        return true;
-    }
-    return false;
-}
-
-bool Pin::processPinPopupDiwne(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-{
-    if(!inner_interaction_happen && bypassPinRaisePopupAction())
-    {
-        ImGui::OpenPopup(m_popupID.c_str());
-    }
-    return diwne.popupDiwneItem(m_popupID, &expandPopupBackgroundContent, *this );
-}
-
-void Pin::pinPopupContent()
-{
-    if (ImGui::MenuItem("Override this method with content of your pin popup menu")) {}
-}
 
 } /* namespace DIWNE */

@@ -29,5 +29,5 @@
 //
 //	bool isTrackball();
 //
-//    bool drawDataFull(DIWNE::Diwne& diwne, int index);
+//    bool drawDataFull(, int index);
 //};

@@ -1,8 +1,8 @@
 #include "WorkspaceSequence.h"
 #include "../Windows/WorkspaceWindow.h"
 
-WorkspaceSequence::WorkspaceSequence(Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/, bool drawPins/*=true*/)
-    :   WorkspaceNodeWithCoreDataWithPins(nodebase, false)
+WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase/*= Core::Builder::createSequence()*/, bool drawPins/*=true*/)
+    :   WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false)
     ,   m_drawPins(drawPins)
 {}
 
@@ -78,43 +78,43 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 
 void WorkspaceSequence::moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
 {
-	pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
-	dragedNode->setRemoveFromWorkspaceWindow(true);
-}
-
-void WorkspaceSequence::moveNodeToSequence(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
-{
     pushNode(dragedNode, index); /*\ todo JH check if push is OK -> if not, not remove node from vector in window*/
-    dragedNode->setRemoveFromWorkspaceWindow(true);
+    dragedNode->setRemoveFromWorkspace(true);
 }
 
-void WorkspaceSequence::moveNodeToWorkspaceWindow(DIWNE::Diwne &diwne, Ptr<WorkspaceNodeWithCoreData> node)
+void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node)
 {
-    node->setRemoveFromWorkspaceWindow(false);
+    node->setRemoveFromWorkspace(false);
+    dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
     popNode(node);
-    dynamic_cast<WorkspaceWindow&>(diwne).m_workspaceCoreNodes.push_back(node);
 }
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWorkspaceNodes() const  { return m_workspaceInnerTransformations; }
 
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
 
-bool WorkspaceSequence::topContent(DIWNE::Diwne &diwne)
-{
-    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
-                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getHeader()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
-    return WorkspaceNodeWithCoreData::topContent(diwne);
+bool WorkspaceSequence::processBeforeContent()
+{
+    /* whole node background */
+    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBgTransformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+    return false;
 }
 
-bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
+bool WorkspaceSequence::topContent()
+{
+    diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
+
+    return WorkspaceNodeWithCoreData::topContent();
+}
+
+bool WorkspaceSequence::middleContent()
 {
     bool inner_interaction_happen = false;
     int position_of_draged_node_in_sequence = -1; /* -1 means not in Sequence */
     Ptr<WorkspaceTransformation> dragedNode;
-
-    diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-                             ImGui::ColorConvertFloat4ToU32(I3T::getTheme().getBg()), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
     {
@@ -128,7 +128,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
         bool valueChanged = false;
         int rowOfChange, columnOfChange;
         float valueOfChange;
-        return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(diwne), m_floatPopupMode,
+        return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
                                     m_nodebase->getData(0).getMat4(), m_nodebase->getDataMapRef(),
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
     }
@@ -140,7 +140,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
         {
             if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
             {
-                moveNodeToWorkspaceWindow(diwne, dragedNode);
+                moveNodeToWorkspace(dragedNode);
             }
             position_of_draged_node_in_sequence = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
 #ifdef WORKSPACE_DEBUG
@@ -160,7 +160,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     {
         if(position_of_draged_node_in_sequence == i)
         {
-            ImGui::Dummy(m_sizeOfDummy*diwne.getWorkAreaZoomDiwne()); /* \todo JH size of dummy from settings */
+            ImGui::Dummy(m_sizeOfDummy*diwne.getWorkAreaZoom()); /* \todo JH size of dummy from settings */
             ImGui::SameLine();
             if (ImGui::IsMouseReleased(0))
             {
@@ -168,14 +168,14 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
             }
         }
 
-        inner_interaction_happen |= transformation->drawNodeDiwne(diwne, true);
+        inner_interaction_happen |= transformation->drawNodeDiwne(true);
         ImGui::SameLine();
 
         i++;
     }
     if ( i == 0 || position_of_draged_node_in_sequence == i ) /* add dummy after last inner or if sequence is empty */
     {
-        ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy*diwne.getWorkAreaZoomDiwne() : m_sizeOfDummy*diwne.getWorkAreaZoomDiwne()/2 ); /* smaller dummy if dragged node is not over Sequence */
+        ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy*diwne.getWorkAreaZoom() : m_sizeOfDummy*diwne.getWorkAreaZoom()/2 ); /* smaller dummy if dragged node is not over Sequence */
         if (ImGui::IsMouseReleased(0) && position_of_draged_node_in_sequence >= 0 )
         {
             push_index = i;
@@ -183,7 +183,7 @@ bool WorkspaceSequence::middleContent(DIWNE::Diwne &diwne)
     }
     if (push_index >= 0)
     {
-        moveNodeToSequence(diwne, std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+        moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
     }
 
 
