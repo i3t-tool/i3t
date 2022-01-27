@@ -9,17 +9,11 @@ TEST(DefaultValueTest, Example)
 {
 	auto axisAngle = Core::Builder::createTransform<ETransformType::AxisAngle>();
 
-	// get transform properties
-	const auto& props = Core::getTransformProps(axisAngle->getOperation());
-
 	// iterate through all its default values
-	for (const auto& [key, valueType] : props.defaultValuesTypes)
+	for (auto& [key, valueStore] : axisAngle->getDefaultValues())
 	{
-		// get a DataStore for a given key
-		const auto& valueStore = axisAngle->getDefaultValue(key);
-
 		// There are only four types of default values - float, vec3, vec4, and quaternion.
-		switch (valueType)
+		switch (valueStore.opValueType)
 		// or switch (valueStore.opValueType)
 		{
 		case EValueType::Float:
