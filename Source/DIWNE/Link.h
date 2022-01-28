@@ -24,6 +24,13 @@ class Link : public DiwneObject
 
         void updateSquareDistanceMouseFromLink();
 
+        virtual ImRect getRectDiwne() const {return ImRect(
+        std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+        std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
+        std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+        std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+                                             };
+
 
         ImVec2 getStartpoint(){return m_startDiwne;};
         ImVec2 getEndpoint(){return m_endDiwne;};
@@ -35,7 +42,11 @@ class Link : public DiwneObject
         /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
         bool isLinkOnWorkArea();
 
-        virtual bool bypassHoveredAction();
+        virtual bool bypassFocusAction();
+        virtual bool bypassFocusForInteractionAction();
+
+        virtual bool processObjectFocused();
+        virtual bool processObjectFocusedForInteraction();
 
         bool m_just_pluged;
 

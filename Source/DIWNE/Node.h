@@ -16,6 +16,13 @@ namespace DIWNE
  *  |     Bottom      |
  *  -------------------
  */
+
+enum DrawModeNodePosition
+{
+    OnCoursorPosition,
+    OnItsPosition
+};
+
 class Node : public DiwneObject
 {
     public:
@@ -40,56 +47,39 @@ class Node : public DiwneObject
 
         void updateSizes();
 
-        virtual bool initializeDiwne();
+        virtual bool allowDrawing();
         virtual bool beforeBeginDiwne();
         virtual void begin();
         virtual bool content();
         virtual void end();
-        virtual bool afterContentDiwne();
+        virtual bool afterEndDiwne();
 
         template< typename T >
-        bool drawNodeDiwne(bool drawHere=false, bool with_interaction=true)
+        bool drawNodeDiwne(DrawModeNodePosition nodePosMode=DrawModeNodePosition::OnItsPosition, DrawMode drawMode=DrawMode::Interacting)
         {
-            m_drawOnCursorPos = drawHere;
-            bool interaction_happen = drawDiwne(with_interaction);
+            m_nodePosMode = nodePosMode;
+            m_drawMode = drawMode;
 
-            if(interaction_happen)
+            bool interaction_happen = drawDiwne(drawMode);
+
+            if(drawMode == DrawMode::Interacting && interaction_happen)
             {
                diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-               if (!(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode)) diwne.setDiwneAction(DiwneAction::InteractingNodeContent);
+               if (!(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode || diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneAction() == DiwneAction::FocusOnObject)) diwne.setDiwneAction(DiwneAction::InteractingContent);
             }
 
             return interaction_happen;
         }
 
-        /* use for pre-draw node on top (draw it first on botom) -> catch interaction and stole interaction of other elements  */
-        template< typename T >
-        bool pre_drawNodeDiwne(bool drawHere=false)
-        {
-            m_drawOnCursorPos = drawHere;
-            bool interaction_happen = drawNodeDiwne<T>(drawHere, true);
-            m_drawing_without_interaction = true; /* for next (view only) drawing */
-
-
-#ifdef DIWNE_DEBUG
-    diwne.AddRectDiwne(getNodePositionDiwne(), getNodePositionDiwne()+getNodeRectSizeDiwne()
-                       , ImColor(0,0,0,100), 0, ImDrawCornerFlags_None, 10);
-#endif // DIWNE_DEBUG
-            ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-            ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
-
-            return interaction_happen;
-        }
-
-//        bool pre_drawNodeDiwne(bool drawHere = false);
-//        bool drawNodeDiwne(bool drawHere = false);
         bool topContentDiwne();
         bool leftContentDiwne();
         bool middleContentDiwne();
         bool rightContentDiwne();
         bool bottomContentDiwne();
 
-        virtual bool processHovered();
+        virtual ImRect getRectDiwne() const {return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
+
+        virtual bool processFocusedForInteraction();
         virtual bool processSelected();
         virtual bool processUnselected();
         virtual bool processHold();
@@ -126,10 +116,8 @@ class Node : public DiwneObject
               , m_bottomRectDiwne; /*! \brief Rectangle of parts of node in diwne */
 
         float m_centerDummySpace;
-
-        bool m_nodeInteractionAllowed;
-        bool m_drawOnCursorPos;
-        bool m_drawing_without_interaction; /* used for draw top node (and interact with it) */
+        DrawModeNodePosition m_nodePosMode;
+        DrawMode m_drawMode;
 
     private:
         DIWNE::ID m_idDiwne;

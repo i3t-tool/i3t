@@ -4,7 +4,10 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
     :   WorkspaceNodeWithCoreDataWithPins(diwne, Core::GraphManager::createCamera(), false)
     ,   m_projection(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getProj() ) )
     ,   m_view (std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView() ) )
-{}
+{
+    (m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
+}
+
 
 bool WorkspaceCamera::isCamera()
 {
@@ -19,8 +22,8 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 bool WorkspaceCamera::middleContent()
 {
     bool inner_interaction_happen = false;
-	inner_interaction_happen |= m_projection->drawNodeDiwne<WorkspaceSequence>(true); ImGui::SameLine();
-	inner_interaction_happen |= m_view->drawNodeDiwne<WorkspaceSequence>(true);
+	inner_interaction_happen |= m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode); ImGui::SameLine();
+	inner_interaction_happen |= m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
 	return inner_interaction_happen;
 }
 

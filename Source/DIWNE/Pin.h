@@ -19,7 +19,9 @@ class Pin : public DiwneObject
 
         virtual void begin();
         virtual void end();
+        virtual void updateSizes();
         virtual bool afterEndDiwne();
+
 
         virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
 
@@ -28,11 +30,11 @@ class Pin : public DiwneObject
         virtual bool processDrag();
         virtual bool processPin_Pre_ConnectLink();
         virtual bool processConnectionPrepared();
-        virtual bool processHovered();
+        virtual bool processFocusedForInteraction();
 
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 
-        ImRect getPinRectDiwne() const {return m_pinRectDiwne;};
+        virtual ImRect getRectDiwne() const {return m_pinRectDiwne;};
 
     protected:
         DIWNE::ID m_idDiwne;

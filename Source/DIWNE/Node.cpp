@@ -13,8 +13,8 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="Di
     , m_bottomRectDiwne(ImRect(0,0,0,0))
     , m_centerDummySpace(0)
     , m_drawAnywhere(true)
-    , m_nodeInteractionAllowed(false)
-    , m_drawOnCursorPos(false)
+    , m_nodePosMode(OnItsPosition)
+    , m_drawMode(Interacting)
 {}
 
 Node& Node::operator=(const Node& rhs)
@@ -24,49 +24,29 @@ Node& Node::operator=(const Node& rhs)
     return *this;
 }
 
-//template< typename T >
-//bool Node::drawNodeDiwne(bool drawHere/*= false*/)
-//{
-//    m_drawOnCursorPos = drawHere;
-//    bool interaction_happen = drawDiwne();
-//
-//    if(interaction_happen && !(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode || diwne.getDiwneAction() == DiwneAction::InteractingNodeContent))
-//    {
-//       diwne.setLastActiveNode<T>(shared_from_this());
-//       diwne.setDiwneAction(DiwneAction::InteractingNodeContent);
-//    }
-//
-//    return interaction_happen;
-//}
-
-///* use for pre-draw node on top (draw it first on botom) -> catch interaction and stole interaction of other elements  */
-//bool Node::pre_drawNodeDiwne(bool drawHere/*= false*/)
-//{
-//    m_drawOnCursorPos = drawHere;
-//    bool interaction_happen = drawDiwne();
-//
-//    ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-//    ImGui::InvisibleButton("IBBlockingOtherInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
-//
-//    return interaction_happen;
-//}
-
-bool Node::initializeDiwne()
-{
-    if ( m_drawAnywhere || getNodeRectDiwne().Overlaps( diwne.getWorkAreaDiwne() ) )
-    {
-        m_drawing = true;
-        if(m_drawAnywhere) m_drawAnywhere=false;
-    }else
-    {
-        m_drawing = false;
-    }
-    return initialize();
-}
+bool Node::allowDrawing() {return m_drawAnywhere || getRectDiwne().Overlaps( diwne.getWorkAreaDiwne() ); }
 
 bool Node::beforeBeginDiwne()
 {
-    m_drawOnCursorPos ? setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos())) : ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
+    switch(m_nodePosMode)
+    {
+    case DrawModeNodePosition::OnItsPosition:
+        ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
+        break;
+    case DrawModeNodePosition::OnCoursorPosition:
+        setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
+        break;
+    }
+    if(m_drawAnywhere) m_drawAnywhere=false;
+
+    if (m_drawMode == DrawMode::JustDraw)
+    {
+        /* InvisibleButton stole all interaction with any other ImGui elements */
+        ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+        ImGui::InvisibleButton("IBBlockingImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
+        ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+    }
+
     return beforeBegin();
 }
 
@@ -85,12 +65,6 @@ void Node::end()
                              diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y, diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
                              diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
 
-    diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,0,0,100), 0, ImDrawCornerFlags_None, 2);
-
-    if (m_interactionAllowed && bypassHoveredAction())
-    {
-        diwne.AddRectDiwne( m_topRectDiwne.Min, m_bottomRectDiwne.Max, ImColor(0,0,0,100), 0, ImDrawCornerFlags_None, 2);
-    }
 #endif // DIWNE_DEBUG
     ImGui::EndGroup(); /* End of node */
     ImGui::PopID();
@@ -122,21 +96,33 @@ bool Node::content()
     return interaction_happen;
 }
 
-bool Node::afterContentDiwne()
+
+bool Node::afterEndDiwne()
 {
+    if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
+    {
+        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : false;
+    }else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch )
+    {
+        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : false;
+    }
+
     if (m_selected)
     {
-        ImRect nodeRectDiwne = getNodeRectDiwne();
-        diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+        diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
     }
-    return DiwneObject::afterContentDiwne();
+
+    /* always block interactions with other nodes */
+    ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+    ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
+
+    return DiwneObject::afterEndDiwne();
 }
 
-bool Node::processHovered()
+bool Node::processFocusedForInteraction()
 {
-    ImRect nodeRectDiwne = getNodeRectDiwne();
-    diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, diwne.mp_settingsDiwne->nodeHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->nodeHoveredBorderThicknessDiwne*diwne.getWorkAreaZoom());
-    return false;
+    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->nodeHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->nodeHoveredBorderThicknessDiwne);
+    return true;
 }
 
 bool Node::processSelected()
@@ -270,6 +256,7 @@ bool Node::bottomContentDiwne()
 
 void Node::updateSizes()
 {
+    /* \todo can use ImGui::ItemMax/Min */
     setNodeRectsPositionDiwne(m_nodePositionDiwne);
     ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.getWorkAreaZoom(); /* in BeginDiwne() is ItemSpacing scaled */
 

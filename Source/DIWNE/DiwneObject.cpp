@@ -12,21 +12,22 @@ DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const la
     ,   m_idDiwne(id)
     ,   m_labelDiwne(fmt::format("{}:{}", labelDiwne, m_idDiwne))
     ,   m_popupIDDiwne(fmt::format("popup_{}", m_labelDiwne))
-    ,   m_interactionAllowed(true)
     ,   m_inner_interaction_happen(false)
     ,   m_isHeld(false)
     ,   m_isDraged(false)
     ,   m_selected(false)
-    ,   m_drawing(true)
-    ,   m_drawWithInteraction(true)
+    ,   m_focusedForInteraction(false)
+    ,   m_focused(false)
+    ,   m_drawMode(DrawMode::Interacting)
 {}
 
-bool DiwneObject::drawDiwne(bool with_interaction/*=true*/)
+bool DiwneObject::allowDrawing(){return true;}
+bool DiwneObject::drawDiwne(DrawMode drawMode/*=DrawMode::Interacting*/)
 {
     m_inner_interaction_happen = false;
-    m_drawWithInteraction = with_interaction;
+    m_drawMode = drawMode;
     m_inner_interaction_happen |= initializeDiwne();
-    if (m_drawing)
+    if (allowDrawing())
     {
         m_inner_interaction_happen |= beforeBeginDiwne();
         begin();
@@ -36,24 +37,28 @@ bool DiwneObject::drawDiwne(bool with_interaction/*=true*/)
         m_inner_interaction_happen |= afterContentDiwne();
 
 #ifdef DIWNE_DEBUG
-    m_drawWithInteraction ? ImGui::Text("With    interaction") : ImGui::Text("Without interation");
-    m_interactionAllowed ? ImGui::Text("Interaction allowed") : ImGui::Text("Interaction not allowed");
-    ImGui::TextUnformatted(m_labelDiwne.c_str());
-    if (m_isHeld) ImGui::TextUnformatted("Held");
-    if (m_isDraged) ImGui::TextUnformatted("Dragged");
-    if (m_selected) ImGui::TextUnformatted("Selected");
+        switch (m_drawMode) {case DrawMode::Interacting: ImGui::Text("Interacting mode"); break;
+                             case DrawMode::JustDraw:    ImGui::Text("JustDraw mode");    break;}
+        ImGui::TextUnformatted(m_labelDiwne.c_str());
+        if (m_isHeld) ImGui::TextUnformatted("Held");
+        if (m_isDraged) ImGui::TextUnformatted("Dragged");
+        if (m_selected) ImGui::TextUnformatted("Selected");
 #endif // DIWNE_DEBUG
         end();
-        if(m_drawWithInteraction) m_inner_interaction_happen |= afterEndDiwne();
+        updateSizes();
+#ifdef DIWNE_DEBUG
+        diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255,0,0,50), 0, ImDrawCornerFlags_None, 3);
+#endif // DIWNE_DEBUG
+        m_inner_interaction_happen |= afterEndDiwne();
+        m_inner_interaction_happen |= processInteractionsDiwne();
     }
     m_inner_interaction_happen |= finalizeDiwne();
 
     return m_inner_interaction_happen;
 }
 
-/* no Diwne initialization */
 bool DiwneObject::initialize(){return false;}
-bool DiwneObject::initializeDiwne(){return initialize();}
+bool DiwneObject::initializeDiwne(){m_focused=false; m_focusedForInteraction=false; return initialize();}
 
 bool DiwneObject::beforeBegin(){return false;}
 bool DiwneObject::beforeBeginDiwne(){return beforeBegin();}
@@ -64,28 +69,37 @@ bool DiwneObject::beforeContentDiwne(){return beforeContent();}
 void DiwneObject::updateSizes(){}
 
 bool DiwneObject::content(){ImGui::TextUnformatted(fmt::format("{} object content", m_labelDiwne).c_str()); return false;}
-bool DiwneObject::contentDiwne(){bool interaction_happen = content(); updateSizes(); return interaction_happen;}
+bool DiwneObject::contentDiwne(){return content();}
 
 
 bool DiwneObject::afterContent(){return false;}
 bool DiwneObject::afterContentDiwne(){return afterContent();}
 
-void DiwneObject::allowInteraction(){m_interactionAllowed = !m_inner_interaction_happen; }
 bool DiwneObject::afterEnd(){return false;}
-bool DiwneObject::afterEndDiwne()
+bool DiwneObject::afterEndDiwne(){return afterEnd();}
+
+bool DiwneObject::allowInteraction(){return m_drawMode == DrawMode::Interacting && diwne.getDiwneAction() != DiwneAction::SelectionRectFull && diwne.getDiwneAction() != DiwneAction::SelectionRectTouch && (m_isHeld || (!m_inner_interaction_happen && (diwne.getDiwneAction() != DiwneAction::FocusOnObject || m_focusedForInteraction || m_focused) && bypassFocusForInteractionAction())); }
+
+bool DiwneObject::processInteractions(){return false;}
+bool DiwneObject::processInteractionsDiwne()
 {
     bool interaction_happen = false;
-    allowInteraction();
-    if (m_interactionAllowed)
+
+    /* order is important */
+    interaction_happen |= processObjectFocused();
+    if (allowInteraction())
     {
-        /* order is important */
-        interaction_happen |= processObjectHovered();
+        interaction_happen |= processObjectFocusedForInteraction();
         interaction_happen |= processRaisePopupDiwne();
         interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();
         interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
-        interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */
+        if (m_isHeld){interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */ diwne.setDiwneAction(DiwneAction::HoldNode);}
         interaction_happen |= processObjectDrag();
-        interaction_happen |= afterEnd();
+        interaction_happen |= processInteractions();
+#ifdef DIWNE_DEBUG
+        if(m_focused) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,50), 0, ImDrawCornerFlags_None, 10);}
+        if(m_focusedForInteraction) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,255), 0, ImDrawCornerFlags_None, 10);}
+#endif // DIWNE_DEBUG
     }
     interaction_happen |= processShowPopupDiwne();
     return interaction_happen;
@@ -94,23 +108,38 @@ bool DiwneObject::afterEndDiwne()
 bool DiwneObject::finalize(){return false;}
 bool DiwneObject::finalizeDiwne(){return finalize();}
 
-bool DiwneObject::bypassRaisePopupAction(){return diwne.bypassIsMouseReleased1() && bypassHoveredAction();}
-bool DiwneObject::bypassHoveredAction(){return ImGui::IsItemHovered();} /* you have to override this if your object is not ImGui item (like Link) */
-bool DiwneObject::bypassHoldAction(){return diwne.bypassIsMouseClicked0() && bypassHoveredAction();}
+bool DiwneObject::bypassRaisePopupAction(){return diwne.bypassIsMouseReleased1();}
+bool DiwneObject::bypassFocusAction(){return ImGui::IsItemHovered();} /* block interaction with other elements; you have to override this if your object is not ImGui item (like Link) */
+bool DiwneObject::bypassFocusForInteractionAction(){return ImGui::IsItemHovered();} /* you have to override this if your object is not ImGui item (like Link) */
+bool DiwneObject::bypassHoldAction(){return diwne.bypassIsMouseClicked0();}
 bool DiwneObject::bypassUnholdAction(){return diwne.bypassIsMouseReleased0();}
-bool DiwneObject::bypassSelectAction(){return diwne.bypassIsMouseReleased0() && bypassHoveredAction();}
-bool DiwneObject::bypassUnselectAction(){return diwne.bypassIsMouseReleased0() && bypassHoveredAction();}
+bool DiwneObject::bypassSelectAction(){return diwne.bypassIsMouseReleased0();}
+bool DiwneObject::bypassUnselectAction(){return diwne.bypassIsMouseReleased0();}
 bool DiwneObject::bypassDragAction(){return diwne.bypassIsMouseDragging0();};
 
-bool DiwneObject::processHovered() {return false; /* Hovering usually do not block other interaction */}
-bool DiwneObject::processObjectHovered()
+bool DiwneObject::processFocused() {return true;}
+bool DiwneObject::processObjectFocused()
 {
-    if (bypassHoveredAction())
+    if (m_drawMode == DrawMode::Interacting && diwne.getDiwneAction() != DiwneAction::SelectionRectFull && diwne.getDiwneAction() != DiwneAction::SelectionRectTouch && !m_inner_interaction_happen && (diwne.getDiwneAction() != DiwneAction::FocusOnObject || m_focused) && bypassFocusAction())
     {
-        m_hovered = true;
-        return processHovered();
+        m_focused = true;
+        diwne.setDiwneAction(DiwneAction::FocusOnObject);
+        return processFocused();
     }
-    else{m_hovered = false;}
+    else{m_focused = false;}
+    return false;
+}
+
+bool DiwneObject::processFocusedForInteraction() {return true;}
+bool DiwneObject::processObjectFocusedForInteraction()
+{
+    if (bypassFocusForInteractionAction())
+    {
+        m_focusedForInteraction = true;
+        diwne.setDiwneAction(DiwneAction::FocusOnObject);
+        return processFocusedForInteraction();
+    }
+    else{m_focusedForInteraction = false;}
     return false;
 }
 
@@ -172,7 +201,7 @@ bool DiwneObject::processObjectUnselect()
 
 bool DiwneObject::processRaisePopupDiwne()
 {
-    if(bypassRaisePopupAction())
+    if(bypassRaisePopupAction() && !diwne.blockPopup())
     {
         diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
         ImGui::OpenPopup(m_popupIDDiwne.c_str());
@@ -198,9 +227,13 @@ void DiwneObject::popupContent(){ if(ImGui::MenuItem("Override this method with 
 
 void DiwneObject::showTooltipLabel(std::string const& label, ImColor const&& color)
 {
-    ImGui::BeginTooltip();
-        ImGui::TextColored(color, label.c_str());
-    ImGui::EndTooltip();
+    if(!diwne.m_tooltipDrawn)
+    {
+        diwne.m_tooltipDrawn = true;
+        ImGui::BeginTooltip();
+            ImGui::TextColored(color, label.c_str());
+        ImGui::EndTooltip();
+    }
 }
 
 } /* namespace DIWNE */

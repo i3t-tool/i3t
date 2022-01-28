@@ -139,7 +139,7 @@ public:
 	virtual bool processDrag();
 	virtual bool processConnectionPrepared();
 
-	virtual bool bypassHoveredAction();
+	virtual bool bypassFocusForInteractionAction();
 
 };
 

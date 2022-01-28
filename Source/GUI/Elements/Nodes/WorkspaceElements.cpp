@@ -75,33 +75,19 @@ bool WorkspaceNode::middleContent()
 }
 
 
-void WorkspaceNode::allowInteraction(){m_interactionAllowed = !m_inner_interaction_happen && m_nodeInteractionAllowed && (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()))); }
-bool WorkspaceNode::afterContent()
+bool WorkspaceNode::bypassFocusForInteractionAction()
 {
-    if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
-    {
-        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : false;
-        m_nodeInteractionAllowed = false;
-    }else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch )
-    {
-        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : false;
-        m_nodeInteractionAllowed = false;
-    } else
-    {
-        m_nodeInteractionAllowed = true;
-    }
-
-    return false;
+    return diwne.getDiwneAction() != DIWNE::DiwneAction::SelectionRectFull && diwne.getDiwneAction() != DIWNE::DiwneAction::SelectionRectTouch && (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
 }
 
-bool WorkspaceNode::finalize()
-{
-    if(bypassHoldAction() || bypassSelectAction() || bypassRaisePopupAction())
-    {
-        return getNodeRectDiwne().Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
-    }
-    return false;
-}
+//bool WorkspaceNode::finalize()
+//{
+//    if(bypassHoldAction() || bypassSelectAction() || bypassRaisePopupAction())
+//    {
+//        return getNodeRectDiwne().Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
+//    }
+//    return m_hovered; /* hovering block interaction with other nodes and with background */
+//}
 
 
 void WorkspaceNode::drawMenuDelete()

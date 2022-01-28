@@ -94,7 +94,7 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWo
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData) {m_position_of_dummy_data = positionOfDummyData;}
 
 
-bool WorkspaceSequence::processBeforeContent()
+bool WorkspaceSequence::beforeContent()
 {
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
@@ -136,9 +136,13 @@ bool WorkspaceSequence::middleContent()
     if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode || diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
     {
         dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
-        if (dragedNode != nullptr) /* only transformation can be in Sequence*/
+        if (dragedNode != nullptr && (dragedNode->aboveSequence == 0 || dragedNode->aboveSequence == getIdDiwne())) /* only transformation can be in Sequence && not above other sequence */
         {
             position_of_draged_node_in_sequence = getInnerPosition( dragedNode->getInteractionPointsWithSequence() );
+            if (position_of_draged_node_in_sequence >= 0)
+            {
+                dragedNode->aboveSequence = getIdDiwne(); /* reset in transformation beforeBegin */
+            }
 #ifdef WORKSPACE_DEBUG
             ImGui::Text(fmt::format("Draged node in Sequence: {}", position_of_draged_node_in_sequence).c_str());
 #endif // WORKSPACE_DEBUG
@@ -162,22 +166,20 @@ bool WorkspaceSequence::middleContent()
                 push_index = i;
             }
         }
-        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(true, m_drawWithInteraction);
+        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
         ImGui::SameLine();
 
         i++;
     }
-    if ( i == 0 || position_of_draged_node_in_sequence == i ) /* add dummy after last inner or if sequence is empty */
+    if ( i==0 || position_of_draged_node_in_sequence == i ) /* add dummy after last inner or if empty */
     {
-        ImGui::Dummy( position_of_draged_node_in_sequence >= 0 ? m_sizeOfDummy*diwne.getWorkAreaZoom() : m_sizeOfDummy*diwne.getWorkAreaZoom()/2 ); /* smaller dummy if dragged node is not over Sequence */
-        if (ImGui::IsMouseReleased(0))
-            ImGui::Text("Released");
+        ImGui::Dummy(position_of_draged_node_in_sequence == i ? m_sizeOfDummy*diwne.getWorkAreaZoom() : m_sizeOfDummy*diwne.getWorkAreaZoom()/2 ); /* smaller dummy if dragged node is not over Sequence */
         if (dragedNode && dragedNode->bypassUnholdAction() && position_of_draged_node_in_sequence >= 0 )
         {
             push_index = i;
         }
     }
-    if (push_index >= 0)
+    if (push_index >= 0 && !dragedNode->isInSequence()) /* already in sequence if second drawing or other sequence */
     {
         moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
     }

@@ -21,26 +21,26 @@ void Pin::end()
     ImGui::PopID();
 }
 
+void Pin::updateSizes()
+{
+    m_pinRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
+    m_pinRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
+
+    updateConnectionPointDiwne();
+}
+
 bool Pin::afterEndDiwne()
 {
     bool interaction_happen = false;
-    m_pinRectDiwne.Min = diwne.screen2diwne( ImGui::GetItemRectMin() );
-    m_pinRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
-    updateConnectionPointDiwne();
 
-#ifdef DIWNE_DEBUG
-    diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(255,150,150), 0, ImDrawCornerFlags_None, 5);
-    if (!m_interactionAllowed && bypassHoveredAction()) {diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2);}
-#endif // DIWNE_DEBUG
-
-    if (m_interactionAllowed) interaction_happen |= processPin_Pre_ConnectLink();
+    interaction_happen |= processPin_Pre_ConnectLink();
     interaction_happen |= DiwneObject::afterEndDiwne();
     return interaction_happen;
 }
 
 bool Pin::bypassPinLinkConnectionPreparedAction()
 {
-    return !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && bypassHoveredAction() && diwne.getLastActivePin<DIWNE::Pin>().get() != this;
+    return allowInteraction() && !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && diwne.getLastActivePin<DIWNE::Pin>().get() != this;
 }
 
 bool Pin::processDrag()
@@ -61,10 +61,10 @@ bool Pin::processPin_Pre_ConnectLink()
     return false;
 }
 
-bool Pin::processHovered()
+bool Pin::processFocusedForInteraction()
 {
-    diwne.AddRectDiwne(m_pinRectDiwne.Min, m_pinRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2*diwne.getWorkAreaZoom());
-    return false;
+    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->pinHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->pinHoveredBorderThicknessDiwne);
+    return true;
 }
 
 

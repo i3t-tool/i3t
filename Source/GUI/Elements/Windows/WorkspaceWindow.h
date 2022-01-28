@@ -60,7 +60,7 @@ class WorkspaceDiwne : public DIWNE::Diwne
     bool content();
     bool afterContent();
     bool afterEnd();
-    void allowInteraction();
+    bool allowInteraction();
 
     WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
 

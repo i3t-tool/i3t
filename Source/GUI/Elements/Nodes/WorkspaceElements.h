@@ -81,12 +81,11 @@ public:
     void setMiddleLabel(std::string label){m_middleLabel = label;};
 
 	/* DIWNE function */
-	virtual void allowInteraction();
+	virtual bool bypassFocusForInteractionAction();
 	virtual bool beforeContent();
     virtual bool topContent();
     virtual bool middleContent();
-    virtual bool afterContent();
-    virtual bool finalize() override;
+    // virtual bool finalize() override;
 
     bool m_removeFromWorkspaceWindow;
     bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};

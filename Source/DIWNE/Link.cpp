@@ -27,18 +27,13 @@ void Link::updateControlPoints()
 
 bool Link::isLinkOnWorkArea()
 {
-    return diwne.getWorkAreaDiwne().Overlaps(ImRect(
-        std::min(std::min(m_controlPointStartDiwne.x, m_startDiwne.x), std::min(m_controlPointEndDiwne.x, m_endDiwne.x)),
-        std::min(std::min(m_controlPointStartDiwne.y, m_startDiwne.y), std::min(m_controlPointEndDiwne.y, m_endDiwne.y)),
-        std::max(std::max(m_controlPointStartDiwne.x, m_startDiwne.x), std::max(m_controlPointEndDiwne.x, m_endDiwne.x)),
-        std::max(std::max(m_controlPointStartDiwne.y, m_startDiwne.y), std::max(m_controlPointEndDiwne.y, m_endDiwne.y)))
-                                             );
+    return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne());
 }
 
 bool Link::initialize()
 {
-     diwne.mp_settingsDiwne->linkColor.Value.w = m_hovered ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
-     diwne.mp_settingsDiwne->linkColorSelected.Value.w = m_hovered ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered : diwne.mp_settingsDiwne->linkAlphaSelected;
+     diwne.mp_settingsDiwne->linkColor.Value.w = m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
+     diwne.mp_settingsDiwne->linkColorSelected.Value.w = m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered : diwne.mp_settingsDiwne->linkAlphaSelected;
 
      return false;
 }
@@ -51,7 +46,32 @@ bool Link::initializeDiwne()
     return initialize();
 }
 
-bool Link::bypassHoveredAction() {return m_squaredDistanceMouseFromLink < (diwne.mp_settingsDiwne->linkThicknessDiwne*diwne.mp_settingsDiwne->linkThicknessDiwne);}
+bool Link::bypassFocusAction() {return m_squaredDistanceMouseFromLink < (diwne.mp_settingsDiwne->linkThicknessDiwne*diwne.mp_settingsDiwne->linkThicknessDiwne);}
+bool Link::bypassFocusForInteractionAction() {return bypassFocusAction();}
+
+bool Link::processObjectFocused()
+{
+    if (diwne.getDiwneAction() != DiwneAction::FocusOnObject && diwne.getDiwneAction() != DiwneAction::NewLink && bypassFocusAction())
+    {
+        m_focused = true;
+        diwne.setDiwneAction(DiwneAction::FocusOnObject);
+        return processFocused();
+    }
+    else{m_focused = false;}
+    return false;
+}
+
+bool Link::processObjectFocusedForInteraction()
+{
+    if (diwne.getDiwneAction() != DiwneAction::FocusOnObject && diwne.getDiwneAction() != DiwneAction::NewLink && bypassFocusAction())
+    {
+        m_focused = true;
+        diwne.setDiwneAction(DiwneAction::FocusOnObject);
+        return processFocused();
+    }
+    else{m_focused = false;}
+    return false;
+}
 
 bool Link::content()
 {

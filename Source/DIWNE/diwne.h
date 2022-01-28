@@ -34,14 +34,16 @@ enum DiwneAction
 
     HoldNode,
     DragNode,
-    InteractingNodeContent,
+    InteractingContent, /* for other unspecified interactions */
+
+    FocusOnObject,
 
     HoldPin,
     DragPin,
 
     NewLink,
     HoldLink,
-    DragLink,
+    DragLink, /* dragging already existing/connected link */
 
     HoldWorkarea,
     DragWorkarea,
@@ -103,6 +105,12 @@ struct SettingsDiwne
     float nodeHoveredBorderThicknessDiwne = 2;
     float middleAlign = 0.5;
 
+    ImColor pinHoveredBorderColor = ImColor(100,100,0,255);
+    float pinHoveredBorderThicknessDiwne = 2;
+
+    ImColor backgroundHoveredBorderColor = ImColor(100,100,0,255);
+    float backgroundHoveredBorderThicknessDiwne = 2;
+
     float linkInteractionWidthDiwne = 10;
     float linkThicknessDiwne = 10;
     float linkThicknessSelectedBorderDiwne = 4;
@@ -132,12 +140,19 @@ class Diwne : public DiwneObject
         virtual ~Diwne(){};
 
         virtual bool initializeDiwne();
+        virtual bool allowDrawing();
         virtual bool beforeBeginDiwne();
         virtual void begin();
         virtual bool afterContentDiwne();
         virtual void end();
         virtual bool afterEndDiwne();
+        virtual bool allowInteraction();
+        virtual bool processInteractionsDiwne();
         virtual bool finalizeDiwne();
+
+        bool blockPopup();
+
+        virtual ImRect getRectDiwne() const {return getWorkAreaDiwne();};
 
         virtual bool processHold();
         virtual bool processUnhold();
@@ -280,13 +295,15 @@ class Diwne : public DiwneObject
         virtual bool processZoom();
         virtual bool processDiwneZoom();
         virtual bool processSelectionRectangle();
+        virtual bool processFocused();
+        virtual bool processFocusedForInteraction();
 
         virtual bool bypassRaisePopupAction();
 
 
         DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-        bool m_popupDrawn;
+        bool m_popupDrawn, m_tooltipDrawn;
 
 
     protected:
@@ -301,6 +318,8 @@ class Diwne : public DiwneObject
         ImRect m_selectionRectangeDiwne;
 
         ImColor m_selectionRectangeTouchColor, m_selectionRectangeFullColor;
+
+        bool m_drawing, m_interactionAllowed;
 
 
     private:
