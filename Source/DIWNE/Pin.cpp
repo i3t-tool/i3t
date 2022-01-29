@@ -29,18 +29,23 @@ void Pin::updateSizes()
     updateConnectionPointDiwne();
 }
 
-bool Pin::afterEndDiwne()
+bool Pin::processInteractionsDiwne()
 {
     bool interaction_happen = false;
 
-    interaction_happen |= processPin_Pre_ConnectLink();
-    interaction_happen |= DiwneObject::afterEndDiwne();
+    if ( m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* want to process if other element interacting (creating new link) */
+    {
+        interaction_happen |= processPin_Pre_ConnectLink();
+    }
+
+    interaction_happen |= DiwneObject::processInteractionsDiwne(); /* Selection rectangle block showing popup etc. */
+
     return interaction_happen;
 }
 
 bool Pin::bypassPinLinkConnectionPreparedAction()
 {
-    return allowInteraction() && !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && diwne.getLastActivePin<DIWNE::Pin>().get() != this;
+    return !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && diwne.getLastActivePin<DIWNE::Pin>().get() != this;
 }
 
 bool Pin::processDrag()

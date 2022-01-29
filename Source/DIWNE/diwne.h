@@ -19,39 +19,6 @@ namespace DIWNE
 
 typedef std::function<void(...)> popupContent_function_pointer;
 
-enum IconType
-{
-    Circle,
-    Rectangle,
-    TriangleLeft,
-    TriangleRight,
-    Cross
-};
-
-enum DiwneAction
-{
-    None,
-
-    HoldNode,
-    DragNode,
-    InteractingContent, /* for other unspecified interactions */
-
-    FocusOnObject,
-
-    HoldPin,
-    DragPin,
-
-    NewLink,
-    HoldLink,
-    DragLink, /* dragging already existing/connected link */
-
-    HoldWorkarea,
-    DragWorkarea,
-
-    SelectionRectFull,
-    SelectionRectTouch
-};
-
 /* ===================== */
 /* ===== p o p u p ===== */
 /* ===================== */
@@ -138,6 +105,9 @@ class Diwne : public DiwneObject
 
         /** Default destructor */
         virtual ~Diwne(){};
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldWorkarea;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragWorkarea;};
+
 
         virtual bool initializeDiwne();
         virtual bool allowDrawing();
@@ -146,11 +116,11 @@ class Diwne : public DiwneObject
         virtual bool afterContentDiwne();
         virtual void end();
         virtual bool afterEndDiwne();
-        virtual bool allowInteraction();
         virtual bool processInteractionsDiwne();
         virtual bool finalizeDiwne();
 
         bool blockPopup();
+        virtual bool allowInteraction();
 
         virtual ImRect getRectDiwne() const {return getWorkAreaDiwne();};
 
@@ -298,12 +268,11 @@ class Diwne : public DiwneObject
         virtual bool processFocused();
         virtual bool processFocusedForInteraction();
 
-        virtual bool bypassRaisePopupAction();
 
 
         DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-        bool m_popupDrawn, m_tooltipDrawn;
+        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused;
 
 
     protected:

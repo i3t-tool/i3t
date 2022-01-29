@@ -45,6 +45,7 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool afterContentDiwne();
     virtual void end()=0;
     virtual void updateSizes();
+    virtual bool allowFocus();
     virtual bool allowInteraction();
     virtual bool afterEnd();
     virtual bool afterEndDiwne();
@@ -54,6 +55,8 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool finalizeDiwne();
 
     virtual ImRect getRectDiwne() const = 0;
+    virtual DIWNE::DiwneAction getHoldActionType() const = 0;
+    virtual DIWNE::DiwneAction getDragActionType() const = 0;
 
     virtual bool bypassRaisePopupAction();
     virtual bool bypassFocusAction();

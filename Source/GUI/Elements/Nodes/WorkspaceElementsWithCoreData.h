@@ -161,7 +161,7 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
 
         /* DIWNE function */
         virtual bool content();
-        virtual bool afterEnd();
+        virtual bool processInteractions();
         virtual bool processCreateAndPlugConstrutorNode();
 };
 

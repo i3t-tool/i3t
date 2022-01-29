@@ -39,39 +39,20 @@ bool Link::initialize()
 }
 bool Link::initializeDiwne()
 {
+    bool interaction_happen = initialize();
     updateEndpoints();
     updateControlPoints();
     updateSquareDistanceMouseFromLink();
+    return interaction_happen;
+}
 
-    return initialize();
+bool Link::allowFocus()
+{
+    return diwne.getDiwneAction() != DiwneAction::DragNode && DiwneObject::allowFocus();
 }
 
 bool Link::bypassFocusAction() {return m_squaredDistanceMouseFromLink < (diwne.mp_settingsDiwne->linkThicknessDiwne*diwne.mp_settingsDiwne->linkThicknessDiwne);}
 bool Link::bypassFocusForInteractionAction() {return bypassFocusAction();}
-
-bool Link::processObjectFocused()
-{
-    if (diwne.getDiwneAction() != DiwneAction::FocusOnObject && diwne.getDiwneAction() != DiwneAction::NewLink && bypassFocusAction())
-    {
-        m_focused = true;
-        diwne.setDiwneAction(DiwneAction::FocusOnObject);
-        return processFocused();
-    }
-    else{m_focused = false;}
-    return false;
-}
-
-bool Link::processObjectFocusedForInteraction()
-{
-    if (diwne.getDiwneAction() != DiwneAction::FocusOnObject && diwne.getDiwneAction() != DiwneAction::NewLink && bypassFocusAction())
-    {
-        m_focused = true;
-        diwne.setDiwneAction(DiwneAction::FocusOnObject);
-        return processFocused();
-    }
-    else{m_focused = false;}
-    return false;
-}
 
 bool Link::content()
 {
@@ -79,5 +60,7 @@ bool Link::content()
     diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, diwne.mp_settingsDiwne->linkColor, diwne.mp_settingsDiwne->linkThicknessDiwne);
     return false;
 }
+
+
 
 } /* namespace DIWNE */

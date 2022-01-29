@@ -20,6 +20,7 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
 
     ,   m_diwneAction(None)
     ,   m_diwneAction_previousFrame(m_diwneAction)
+    ,   m_objectFocused(false)
 
     ,   m_nodesSelectionChanged(false)
     ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
@@ -27,6 +28,7 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
     ,   m_popupPosition(settingsDiwne->initPopupPosition)
     ,   m_popupDrawn(false)
     ,   m_tooltipDrawn(false)
+
 {}
 
 bool Diwne::allowDrawing(){return m_drawing;}
@@ -35,19 +37,15 @@ bool Diwne::initializeDiwne()
 {
     m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     m_diwneAction = DiwneAction::None;
-    m_popupDrawn = false;
-    m_tooltipDrawn = false;
+    m_popupDrawn = m_tooltipDrawn = m_objectFocused = false;
     return initialize();
 }
-
-bool Diwne::allowInteraction(){return m_interactionAllowed;}
 
 bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/wiki/Call_super */
 {
     updateWorkAreaRectangles();
     m_interactionAllowed = true;
     m_nodesSelectionChanged = false;
-    m_diwneAction = DiwneAction::None;
 
     /* zoom */
     ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoom;
@@ -118,20 +116,19 @@ void Diwne::end()
 bool Diwne::afterEndDiwne()
 {
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
-    return false;
+    return DiwneObject::afterEndDiwne();
 }
 
 bool Diwne::processInteractionsDiwne()
 {
     bool interaction_happen = false;
-
-
-    interaction_happen |= DiwneObject::processInteractionsDiwne();
-    if (allowInteraction() || m_diwneAction == DiwneAction::FocusOnObject)
+    if ( m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction (focus on node) is no problem with this actions */
     {
         interaction_happen |= processDiwneZoom();
         interaction_happen |= processSelectionRectangle();
     }
+
+    interaction_happen |= DiwneObject::processInteractionsDiwne();
 
     return interaction_happen;
 }
@@ -149,6 +146,7 @@ bool Diwne::blockPopup()
     return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch || m_diwneAction_previousFrame == DiwneAction::SelectionRectFull || m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
 }
 
+bool Diwne::allowInteraction(){return m_interactionAllowed && DiwneObject::allowInteraction();}
 
 bool Diwne::processSelectionRectangle()
 {
@@ -217,7 +215,9 @@ bool Diwne::processDrag()
 
 bool Diwne::processZoom()
 {
+    ImVec2 mousePosDiwne = screen2diwne(bypassGetMousePos());
     setWorkAreaZoom( m_workAreaZoom + bypassGetZoomDelta() );
+    translateWorkAreaDiwne(mousePosDiwne-screen2diwne(bypassGetMousePos()));
     return true;
 }
 
@@ -549,10 +549,6 @@ ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diw
 ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta1()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImRect Diwne::getSelectionRectangleDiwne(){return m_selectionRectangeDiwne;}
 
-bool Diwne::bypassRaisePopupAction()
-{
-    return ((m_diwneAction == DiwneAction::None && m_diwneAction_previousFrame == DiwneAction::None) || m_focused || m_focusedForInteraction) && DiwneObject::bypassRaisePopupAction();
-}
 
 /* >>>> STATIC FUNCTIONS <<<< */
 bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size)

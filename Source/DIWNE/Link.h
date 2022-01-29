@@ -18,6 +18,9 @@ class Link : public DiwneObject
         virtual void begin(){};
         virtual void end(){};
         virtual bool content();
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldLink;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragLink;};
+
 
         virtual void updateEndpoints(){};
         void updateControlPoints();
@@ -42,11 +45,10 @@ class Link : public DiwneObject
         /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
         bool isLinkOnWorkArea();
 
+        virtual bool allowFocus();
         virtual bool bypassFocusAction();
         virtual bool bypassFocusForInteractionAction();
 
-        virtual bool processObjectFocused();
-        virtual bool processObjectFocusedForInteraction();
 
         bool m_just_pluged;
 

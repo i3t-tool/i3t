@@ -17,6 +17,39 @@ namespace DIWNE
 
 typedef unsigned int ID;
 
+enum IconType
+{
+    Circle,
+    Rectangle,
+    TriangleLeft,
+    TriangleRight,
+    Cross
+};
+
+enum DiwneAction
+{
+    None,
+
+    HoldNode,
+    DragNode,
+    InteractingContent, /* for other unspecified interactions */
+
+    FocusOnObject,
+
+    HoldPin,
+    DragPin,
+
+    NewLink,
+    HoldLink,
+    DragLink, /* dragging already existing/connected link */
+
+    HoldWorkarea,
+    DragWorkarea,
+
+    SelectionRectFull,
+    SelectionRectTouch
+};
+
 class DiwneObject;
 
 class Node;

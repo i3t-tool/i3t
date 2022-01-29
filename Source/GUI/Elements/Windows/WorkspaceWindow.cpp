@@ -622,8 +622,6 @@ bool WorkspaceDiwne::content()
     return interaction_happen;
 }
 
-bool WorkspaceDiwne::allowInteraction(){return m_interactionAllowed && (!m_inner_interaction_happen || m_workspaceDiwneAction == WorkspaceDiwneAction::CreateAndPlugTypeConstructor); }
-
 
 bool WorkspaceDiwne::afterContent()
 {
@@ -635,9 +633,9 @@ bool WorkspaceDiwne::afterContent()
 
 	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
 
-    /* hold or drag or interacting && in previous frame not hold neither drag neither interacting */
-if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingContent) &&
-         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent))
+    /* hold or drag or interacting or new_link && in previous frame not hold neither drag neither interacting neither new_link */
+    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink) &&
+         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink))
     {
         shiftInteractingNodeToEnd();
     }

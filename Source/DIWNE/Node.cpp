@@ -45,6 +45,7 @@ bool Node::beforeBeginDiwne()
         ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
         ImGui::InvisibleButton("IBBlockingImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
         ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+        ImGui::PushID("JustDraw");
     }
 
     return beforeBegin();
@@ -68,7 +69,6 @@ void Node::end()
 #endif // DIWNE_DEBUG
     ImGui::EndGroup(); /* End of node */
     ImGui::PopID();
-//    ImGui::SetItemAllowOverlap();
 }
 
 bool Node::content()
@@ -110,6 +110,11 @@ bool Node::afterEndDiwne()
     if (m_selected)
     {
         diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+    }
+
+    if (m_drawMode == DrawMode::JustDraw)
+    {
+        ImGui::PopID(); /* ImGui::PushID("JustDraw"); in beforeBeginDiwne() */
     }
 
     /* always block interactions with other nodes */

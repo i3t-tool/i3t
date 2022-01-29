@@ -45,6 +45,10 @@ class Node : public DiwneObject
 
         DIWNE::ID const getId() const {return m_idDiwne; };
 
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldNode;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragNode;};
+
+
         void updateSizes();
 
         virtual bool allowDrawing();

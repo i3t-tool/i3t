@@ -17,10 +17,13 @@ class Pin : public DiwneObject
 
         virtual bool content() {ImGui::TextUnformatted(fmt::format("{} content", m_labelDiwne).c_str()); return false;};
 
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldPin;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragPin;};
+
         virtual void begin();
         virtual void end();
         virtual void updateSizes();
-        virtual bool afterEndDiwne();
+        virtual bool processInteractionsDiwne();
 
 
         virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
