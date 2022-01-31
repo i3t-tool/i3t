@@ -62,6 +62,7 @@
 // - negeneruje pdb
 
 #include <string>
+#include <unordered_map>
 
 #include "pgr.h"
 
@@ -137,6 +138,9 @@ int main(int argc, char* argv[])
 #else // special settings for usage in Visual Studio devenv
 	Config::WORKING_DIRECTORY = I3T_PROJECT_ROOT;
 #endif
+
+	std::unordered_map<int, int> map;
+	map[10] = 20;
 
 	// init the logging library
 	INIT_LOGGER(argc, argv);

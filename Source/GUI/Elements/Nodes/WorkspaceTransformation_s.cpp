@@ -60,7 +60,27 @@ bool WorkspaceTransformationEulerZ::drawDataSetValues()
 WorkspaceTransformationScale::WorkspaceTransformationScale(DIWNE::Diwne &diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Scale>()){setDataItemsWidth();}
 bool WorkspaceTransformationScale::drawDataSetValues()
 {
-    auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
+	auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
+
+	for (auto& [key, valueStore] : nodebase->getDefaultValues())
+	{
+		switch (valueStore.opValueType)
+		{
+		case EValueType::Vec3:
+		{
+			auto localData = valueStore.getVec3();
+
+			if (ImGui::DragFloat3(key.c_str(), &localData[0]))
+			{
+				nodebase->setDefaultValue(key, localData);
+				return true;
+			}
+		}
+		}
+	}
+	return false;
+
+	/*
     return drawDataSetValues_builder(
                                 {   "X", "Y", "Z" },
                                 {   [nodebase](){return nodebase->getX();},
@@ -70,6 +90,7 @@ bool WorkspaceTransformationScale::drawDataSetValues()
                                     [nodebase](float v){return nodebase->setY(v);},
                                     [nodebase](float v){return nodebase->setZ(v);} }
                             );
+                            */
 }
 
 

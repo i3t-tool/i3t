@@ -108,7 +108,7 @@ public:
 	 * \return A map of valueName and value pairs.
 	 */
 	TransformOperation::ValueMap getDefaultTypes();
-	DefaultValues                getDefaultValues();
+	DefaultValues&               getDefaultValues();
 
 	EValueState getValueState(glm::ivec2 coords);
 

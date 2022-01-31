@@ -67,7 +67,7 @@ TransformOperation::ValueMap Transformation::getDefaultTypes()
 	return getTransformDefaults(getOperation()->keyWord);
 }
 
-Transformation::DefaultValues Transformation::getDefaultValues()
+Transformation::DefaultValues& Transformation::getDefaultValues()
 {
 	return m_defaultValues;
 }
