@@ -5,14 +5,8 @@ namespace DIWNE
 /* \todo JH constants from settings */
 Link::Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="DiwneLink"*/)
     : DiwneObject(diwne, id, labelDiwne)
-    , m_thickness(10)
-    , m_thickness_selected_border(4)
-    , m_color(ImColor(150,75,100,150))
-    , m_selectedColor(ImColor(150,75,100,255))
-    , m_startDiwne(ImVec2(0,0))
+    , m_startDiwne(ImVec2(0,0)) /* only initialize value - see initializeDiwne() */
     , m_endDiwne(ImVec2(0,0))
-    , m_startControlOffsetDiwne(ImVec2(10,0)) /* \todo JH minimal control points offset to settings */
-    , m_endControlOffsetDiwne(ImVec2(-10,0))
     , m_just_pluged(false)
 {}
 
@@ -25,38 +19,48 @@ void Link::updateSquareDistanceMouseFromLink()
     m_squaredDistanceMouseFromLink = diff.x*diff.x + diff.y*diff.y;
 }
 
+void Link::updateControlPoints()
+{
+    m_controlPointStartDiwne=m_startDiwne+diwne.mp_settingsDiwne->linkStartControlOffsetDiwne;
+    m_controlPointEndDiwne=m_endDiwne+diwne.mp_settingsDiwne->linkEndControlOffsetDiwne;
+}
+
 bool Link::isLinkOnWorkArea()
 {
-    return diwne.getWorkAreaDiwne().Overlaps(ImRect(
-        std::min(std::min(m_controlPointStartDiwne.x, m_startDiwne.x), std::min(m_controlPointEndDiwne.x, m_endDiwne.x)),
-        std::min(std::min(m_controlPointStartDiwne.y, m_startDiwne.y), std::min(m_controlPointEndDiwne.y, m_endDiwne.y)),
-        std::max(std::max(m_controlPointStartDiwne.x, m_startDiwne.x), std::max(m_controlPointEndDiwne.x, m_endDiwne.x)),
-        std::max(std::max(m_controlPointStartDiwne.y, m_startDiwne.y), std::max(m_controlPointEndDiwne.y, m_endDiwne.y)))
-                                             );
+    return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne());
 }
 
 bool Link::initialize()
 {
-     m_color.Value.w = m_hovered ? 1 : 0.5; /* \todo JH alpha to settings? */
+     diwne.mp_settingsDiwne->linkColor.Value.w = m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered : diwne.mp_settingsDiwne->linkAlpha;
+     diwne.mp_settingsDiwne->linkColorSelected.Value.w = m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered : diwne.mp_settingsDiwne->linkAlphaSelected;
+
      return false;
 }
 bool Link::initializeDiwne()
 {
+    bool interaction_happen = initialize();
     updateEndpoints();
-    updateControlPointsOffsets();
     updateControlPoints();
     updateSquareDistanceMouseFromLink();
-
-    return initialize();
+    return interaction_happen;
 }
 
-bool Link::bypassHoveredAction() {return m_squaredDistanceMouseFromLink < (m_thickness*m_thickness);}
+bool Link::allowFocus()
+{
+    return diwne.getDiwneAction() != DiwneAction::DragNode && DiwneObject::allowFocus();
+}
+
+bool Link::bypassFocusAction() {return m_squaredDistanceMouseFromLink < (diwne.mp_settingsDiwne->linkThicknessDiwne*diwne.mp_settingsDiwne->linkThicknessDiwne);}
+bool Link::bypassFocusForInteractionAction() {return bypassFocusAction();}
 
 bool Link::content()
 {
-    if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_selectedColor, m_thickness+m_thickness_selected_border ); }
-    diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, m_color, m_thickness);
+    if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, diwne.mp_settingsDiwne->linkColorSelected, diwne.mp_settingsDiwne->linkThicknessDiwne+diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne ); }
+    diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, diwne.mp_settingsDiwne->linkColor, diwne.mp_settingsDiwne->linkThicknessDiwne);
     return false;
 }
+
+
 
 } /* namespace DIWNE */

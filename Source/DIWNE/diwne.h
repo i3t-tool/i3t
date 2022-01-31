@@ -3,6 +3,15 @@
 
 #include "diwne_include.h"
 
+/* ================================================== */
+/* ===== I M P O R T A N T  (TRICKY)  N O T E S ===== */
+/* ================================================== */
+/* * 1) Node on top has to be drawn two times (first and last) - first for catch interaction, last for draw it on top of other elements
+
+
+*/
+
+
 
 /* ImDrawList functions works in screen coordinates */
 namespace DIWNE
@@ -10,39 +19,13 @@ namespace DIWNE
 
 typedef std::function<void(...)> popupContent_function_pointer;
 
-enum IconType
-{
-    Circle,
-    Rectangle,
-    TriangleLeft,
-    TriangleRight,
-    Cross
-};
-
-enum DiwneAction
-{
-    None,
-    NewLink,
-    HoldNode,
-    DragNode,
-    HoldPin,
-    DragPin,
-    HoldLink,
-    DragLink,
-    HoldWorkarea,
-    DragWorkarea,
-    SelectionRectFull,
-    SelectionRectTouch
-};
-
-static float s_linkInteractionWidth;
-
 /* ===================== */
 /* ===== p o p u p ===== */
 /* ===================== */
-template<typename T>
-//typename std::enable_if<std::is_base_of<DiwneObject, T>::value>::type>
-static void expandPopupContent(T& object) /* for memeber popupContent() functions */
+static bool s_popupContentDrawn = false; /* only one popup content per frame (avoid double-content on DragFloat popup) */
+
+template<typename T, std::enable_if<std::is_base_of<DiwneObject, T>::value, bool>::type = true >
+static void expandPopupContent(T& object) /* for popupContent() functions of member of class */
 {
     object.popupContent();
 }
@@ -59,34 +42,57 @@ static bool popupDiwne(std::string const popupID, ImVec2 const & popupPos, void 
             interaction_happen = true;
 
             popupContent(std::forward<Args>(args)...);
-            //expandPopupContent(std::forward<Args>(args)...);
 
             ImGui::EndPopup();
         }
     }
-    return interaction_happen;
+    return interaction_happen || s_popupContentDrawn;
 }
-
 
 struct SettingsDiwne
 {
-    DIWNE::ID editorId = 0;
+    DIWNE::ID const editorId = 0;
     std::string const editorlabel = "diwneBackground";
-
-    ImRect workAreaDiwne = ImRect(0,0,0,0); /* only initial value */
+    ImRect const workAreaDiwne = ImRect(0,0,0,0); /* only initial value - mostly based on window size ( see updateWorkAreaRectangles() ) */
 
     float minWorkAreaZoom = 0.25;
     float maxWorkAreaZoom = 4;
     float workAreaInitialZoom = 1;
-
     float zoomWheelReverseSenzitivity = 8; /* Higher number -> smaller change, can not be 0 */
 
-    float linkInteractionWidth = 10;
     ImVec2 initPopupPosition = ImVec2(0,0);
 
     ImColor selectionRectFullColor = ImColor(0,255,0,100);
     ImColor selectionRectTouchColor = ImColor(0,0,255,100);
+
+    ImColor itemSelectedBorderColor = ImColor(100,100,0,255);
+    float itemSelectedBorderThicknessDiwne = 5;
+
+    ImColor nodeHoveredBorderColor = ImColor(100,100,0,255);
+    float nodeHoveredBorderThicknessDiwne = 2;
+    float middleAlign = 0.5;
+
+    ImColor pinHoveredBorderColor = ImColor(100,100,0,255);
+    float pinHoveredBorderThicknessDiwne = 2;
+
+    ImColor backgroundHoveredBorderColor = ImColor(100,100,0,255);
+    float backgroundHoveredBorderThicknessDiwne = 2;
+
+    float linkInteractionWidthDiwne = 10;
+    float linkThicknessDiwne = 10;
+    float linkThicknessSelectedBorderDiwne = 4;
+    ImColor linkColor = ImColor(150,75,100,150);
+    ImColor linkColorSelected = ImColor(150,75,100,200);
+    ImVec2 linkStartControlOffsetDiwne = ImVec2(10,0);
+    ImVec2 linkEndControlOffsetDiwne = ImVec2(-10,0);
+    float linkAlphaHovered = 1;
+    float linkAlpha = 0.5;
+    float linkAlphaSelectedHovered = 1;
+    float linkAlphaSelected = 0.5;
 };
+// \todo JH void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign = v;}; /* from 0==left to 1==right */
+//         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart; m_endControlOffsetDiwne = controlEnd; };
+
 
 /* ===================== */
 /* ===== D i w n e ===== */
@@ -95,18 +101,28 @@ class Diwne : public DiwneObject
 {
     public:
         /** Default constructor */
-        Diwne(DIWNE::SettingsDiwne const & settingsDiwne);
+        Diwne(DIWNE::SettingsDiwne* settingsDiwne);
 
         /** Default destructor */
         virtual ~Diwne(){};
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldWorkarea;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragWorkarea;};
+
 
         virtual bool initializeDiwne();
+        virtual bool allowDrawing();
         virtual bool beforeBeginDiwne();
         virtual void begin();
         virtual bool afterContentDiwne();
         virtual void end();
         virtual bool afterEndDiwne();
+        virtual bool processInteractionsDiwne();
         virtual bool finalizeDiwne();
+
+        bool blockPopup();
+        virtual bool allowInteraction();
+
+        virtual ImRect getRectDiwne() const {return getWorkAreaDiwne();};
 
         virtual bool processHold();
         virtual bool processUnhold();
@@ -118,10 +134,6 @@ class Diwne : public DiwneObject
         ImRect getWorkAreaScreen() const {return m_workAreaScreen;};
         float getWorkAreaZoom() const {return m_workAreaZoom;};
         void setWorkAreaZoom(float val=1);
-
-
-        //float getWorkAreaZoomDeltaDiwne() const {return m_workAreaZoomDeltaDiwne; };
-
 
         ImVec2 const & getPopupPosition() const {return m_popupPosition;};
         void setPopupPosition(ImVec2 position) {m_popupPosition = position;};
@@ -176,48 +188,6 @@ class Diwne : public DiwneObject
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
 
-//        bool popupFloatDiwne(DIWNE::Diwne &diwne, std::string const popupIDstring, float& selectedValue, bool& valueSelected);
-//        virtual void popupFloatContent(float& selectedValue, bool& valueSelected);
-
-        //virtual void popupContent(){if(ImGui::MenuItem("DiwneBGPopup")){}};
-
-//        template <typename... Args>
-//        bool popupDiwneItem(std::string const popupID, void (*popupContent)(Args...), Args&&... args) {
-//            bool interaction_happen = false;
-//
-//            if(ImGui::IsPopupOpen(popupID.c_str()))
-//            {
-//                ImGui::SetNextWindowPos(getPopupPosition()); /* if popup position will be passed as argument, function can be static */
-//                if (ImGui::BeginPopup(popupID.c_str()))
-//                {
-//                    interaction_happen = true;
-//
-//                    popupContent(std::forward<Args>(args)...);
-//
-//                    ImGui::EndPopup();
-//                }
-//            }
-//            return interaction_happen;
-//        }
-
-//        template <typename... Args>
-//        bool popupDiwneRaise(std::string const popupIDstring, void (*popupContent)(Args...), Args&&... args) {
-//            bool interaction_happen = false;
-//
-//            ImGui::OpenPopup(popupIDstring.c_str());
-//            ImGui::SetNextWindowPos(getPopupPosition());
-//            if (ImGui::BeginPopup(popupIDstring.c_str()))
-//            {
-//                interaction_happen = true;
-//                /* Popup is new window so MousePos and MouseClickedPos is from ImGui, not from (zoomed) diwne */
-//                transformMouseFromDiwneToImGui();
-//
-//                popupContent(std::forward<Args>(args)...);
-//
-//                ImGui::EndPopup();
-//            }
-//            return interaction_happen;
-//        }
 
         DiwneAction getDiwneAction() const {return m_diwneAction;};
         void setDiwneAction(DiwneAction action){m_diwneAction = action;};
@@ -227,21 +197,32 @@ class Diwne : public DiwneObject
         DIWNE::Link& getHelperLink(){return m_helperLink;};
 
         template <typename T>
-        T* getLastActivePin()
+        std::shared_ptr<T> getLastActivePin()
         {
             static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
-            return dynamic_cast<T*>(m_lastActivePin);
+            return std::dynamic_pointer_cast<T>(mp_lastActivePin);
         }
 
         template <typename T>
-        void setLastActivePin(T* pin)
+        void setLastActivePin(std::shared_ptr<T> pin)
         {
             static_assert(std::is_base_of_v<DIWNE::Pin, T>, "Pin must be derived from DIWNE::Pin class.");
-            m_lastActivePin = pin;
+            mp_lastActivePin = pin;
         }
 
-        std::shared_ptr<DIWNE::Node> m_draged_hold_node; /* \todo JH make protected */
+        template <typename T>
+        std::shared_ptr<T> getLastActiveNode()
+        {
+            static_assert(std::is_base_of_v<DIWNE::Node, T>/* || std::is_same<T, std::nullptr_t>::value*/, "Node must be derived from DIWNE::Node class.");
+            return std::dynamic_pointer_cast<T>(mp_lastActiveNode);
+        }
 
+        template <typename T>
+        void setLastActiveNode(std::shared_ptr<T> node)
+        {
+            static_assert(std::is_base_of_v<DIWNE::Node, T>/* || std::is_same<T, std::nullptr_t>::value*/, "Node must be derived from DIWNE::Node class.");
+            mp_lastActiveNode = node;
+        }
 
         void setNodesSelectionChanged(bool value){m_nodesSelectionChanged = value;};
         bool getNodesSelectionChanged(){return m_nodesSelectionChanged;};
@@ -284,14 +265,22 @@ class Diwne : public DiwneObject
         virtual bool processZoom();
         virtual bool processDiwneZoom();
         virtual bool processSelectionRectangle();
+        virtual bool processFocused();
+        virtual bool processFocusedForInteraction();
 
-        virtual bool bypassRaisePopupAction();
+
+
+        DIWNE::SettingsDiwne* mp_settingsDiwne;
+
+        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused;
 
 
     protected:
         DiwneAction m_diwneAction, m_diwneAction_previousFrame;
 
-        DIWNE::Pin* m_lastActivePin;
+        std::shared_ptr<DIWNE::Pin> mp_lastActivePin;
+        std::shared_ptr<DIWNE::Node> mp_lastActiveNode;
+
         DIWNE::Link m_helperLink; /* for showing link that is in process of creating */
 
         bool m_nodesSelectionChanged;
@@ -299,15 +288,17 @@ class Diwne : public DiwneObject
 
         ImColor m_selectionRectangeTouchColor, m_selectionRectangeFullColor;
 
+        bool m_drawing, m_interactionAllowed;
+
 
     private:
     ImRect m_workAreaScreen;     /*! \brief Rectangle of work area on screen */
     ImRect m_workAreaDiwne;  /*! \brief Rectangle of work area on diwne - .Min is set by user, .Max is computed from m_workAreaScreen */
-    float m_workAreaZoom/*, m_workAreaZoomDeltaDiwne*/;
-    float m_zoomWheelReverseSenzitivity; /* Higher number -> smaller change */
-    float m_minWorkAreaZoom, m_maxWorkAreaZoom;
+    float m_workAreaZoom;
 
     ImVec2 m_popupPosition;
+
+
 
     /* restore information */
     ImVec2 m_StoreItemSpacing;

@@ -17,9 +17,14 @@ class Pin : public DiwneObject
 
         virtual bool content() {ImGui::TextUnformatted(fmt::format("{} content", m_labelDiwne).c_str()); return false;};
 
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldPin;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragPin;};
+
         virtual void begin();
         virtual void end();
-        virtual bool afterEndDiwne();
+        virtual void updateSizes();
+        virtual bool processInteractionsDiwne();
+
 
         virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
 
@@ -28,18 +33,11 @@ class Pin : public DiwneObject
         virtual bool processDrag();
         virtual bool processPin_Pre_ConnectLink();
         virtual bool processConnectionPrepared();
-        virtual bool processHovered();
-
-//        virtual bool processSelect();
-//        virtual bool processUnselect();
-//
-//        virtual bool processHold();
-//        virtual bool processUnHold();
-
+        virtual bool processFocusedForInteraction();
 
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 
-        ImRect getPinRectDiwne() const {return m_pinRectDiwne;};
+        virtual ImRect getRectDiwne() const {return m_pinRectDiwne;};
 
     protected:
         DIWNE::ID m_idDiwne;

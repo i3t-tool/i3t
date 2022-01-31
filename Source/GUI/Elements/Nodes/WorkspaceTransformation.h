@@ -19,6 +19,7 @@ public:
 	bool getRemoveFromSequence() const { return m_removeFromSequence; };
 	void setRemoveFromSequence(bool value) { m_removeFromSequence = value; };
 	bool isInSequence();
+	DIWNE::ID aboveSequence;
 
 	Ptr<Core::NodeBase> getNodebaseSequence();
 
@@ -32,7 +33,8 @@ public:
 
 	int maxLenghtOfData();
 
-    bool processBeforeContent();
+	bool beforeBegin();
+    bool beforeContent();
 	bool topContent();
 	bool middleContent();
 	void popupContent();

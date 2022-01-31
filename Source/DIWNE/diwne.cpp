@@ -7,33 +7,37 @@ namespace DIWNE
 /* ===== D i w n e ===== */
 /* ===================== */
 
-Diwne::Diwne(SettingsDiwne const & settingsDiwne)
-    :   DiwneObject(*this, settingsDiwne.editorId, settingsDiwne.editorlabel)
-    ,   m_workAreaDiwne( settingsDiwne.workAreaDiwne.Min
-                        ,settingsDiwne.workAreaDiwne.Max)
-    ,   m_minWorkAreaZoom(settingsDiwne.minWorkAreaZoom)
-    ,   m_maxWorkAreaZoom(settingsDiwne.maxWorkAreaZoom)
+Diwne::Diwne(SettingsDiwne* settingsDiwne)
+    :   DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel)
+    ,   mp_settingsDiwne(settingsDiwne)
+    ,   m_workAreaDiwne( settingsDiwne->workAreaDiwne.Min
+                        ,settingsDiwne->workAreaDiwne.Max)
 
-    ,   m_workAreaZoom(settingsDiwne.workAreaInitialZoom)
-    ,   m_zoomWheelReverseSenzitivity(settingsDiwne.zoomWheelReverseSenzitivity)
+    ,   m_workAreaZoom(settingsDiwne->workAreaInitialZoom)
 
-    ,   m_lastActivePin(nullptr)
+    ,   mp_lastActivePin(nullptr)
     ,   m_helperLink(diwne, 0)
 
     ,   m_diwneAction(None)
     ,   m_diwneAction_previousFrame(m_diwneAction)
+    ,   m_objectFocused(false)
 
     ,   m_nodesSelectionChanged(false)
     ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
-    ,   m_selectionRectangeTouchColor(settingsDiwne.selectionRectTouchColor)
-    ,   m_selectionRectangeFullColor(settingsDiwne.selectionRectFullColor)
-    ,   m_popupPosition(settingsDiwne.initPopupPosition)
+
+    ,   m_popupPosition(settingsDiwne->initPopupPosition)
+    ,   m_popupDrawn(false)
+    ,   m_tooltipDrawn(false)
+
 {}
+
+bool Diwne::allowDrawing(){return m_drawing;}
 
 bool Diwne::initializeDiwne()
 {
-    m_drawing = ImGui::BeginChild(m_labelDiwne.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     m_diwneAction = DiwneAction::None;
+    m_popupDrawn = m_tooltipDrawn = m_objectFocused = false;
     return initialize();
 }
 
@@ -55,7 +59,7 @@ bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/
 void Diwne::begin()
 {
     ImGui::SetCursorScreenPos(m_workAreaScreen.Min);
-    ImGui::PushID(m_labelDiwne.c_str());
+    ImGui::PushID(mp_settingsDiwne->editorlabel.c_str());
     ImGui::BeginGroup();
 
 #ifdef DIWNE_DEBUG
@@ -80,6 +84,13 @@ void Diwne::begin()
         case DiwneAction::DragWorkarea: ImGui::Text("PrevDiwneAction: DragWorkarea"); break;
         case DiwneAction::SelectionRectFull: ImGui::Text("PrevDiwneAction: SelectionRectFull"); break;
         case DiwneAction::SelectionRectTouch: ImGui::Text("PrevDiwneAction: SelectionRectTouch"); break;
+        case DiwneAction::InteractingContent: ImGui::Text("PrevDiwneAction: InteractingContent"); break;
+        case DiwneAction::FocusOnObject: ImGui::Text("PrevDiwneAction: FocusOnObject"); break;
+        case DiwneAction::HoldPin: ImGui::Text("PrevDiwneAction: HoldPin"); break;
+        case DiwneAction::DragPin: ImGui::Text("PrevDiwneAction: DragPin"); break;
+        case DiwneAction::HoldLink: ImGui::Text("PrevDiwneAction: HoldLink"); break;
+        case DiwneAction::DragLink: ImGui::Text("PrevDiwneAction: DragLink"); break;
+        default: ImGui::Text("PrevDiwneAction: Unknown");
     }
 #endif // DIWNE_DEBUG
 }
@@ -89,7 +100,7 @@ bool Diwne::afterContentDiwne()
     bool interaction_happen = false;
     if (m_diwneAction == DiwneAction::NewLink)
     {
-        interaction_happen |= m_helperLink.drawDiwne();
+        interaction_happen |= m_helperLink.drawDiwne(JustDraw);
     }
     interaction_happen |= afterContent();
     return interaction_happen;
@@ -104,14 +115,20 @@ void Diwne::end()
 
 bool Diwne::afterEndDiwne()
 {
-    bool interaction_happen = false;
-
-    interaction_happen |= processDiwneZoom();
-    interaction_happen |= processSelectionRectangle();
-    interaction_happen |= DiwneObject::afterEndDiwne();
-
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
-    m_diwneAction_previousFrame = m_diwneAction;
+    return DiwneObject::afterEndDiwne();
+}
+
+bool Diwne::processInteractionsDiwne()
+{
+    bool interaction_happen = false;
+    if ( m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction (focus on node) is no problem with this actions */
+    {
+        interaction_happen |= processDiwneZoom();
+        interaction_happen |= processSelectionRectangle();
+    }
+
+    interaction_happen |= DiwneObject::processInteractionsDiwne();
 
     return interaction_happen;
 }
@@ -119,13 +136,21 @@ bool Diwne::afterEndDiwne()
 bool Diwne::finalizeDiwne()
 {
     bool interaction_happen = finalize();
+    m_diwneAction_previousFrame = m_diwneAction;
     ImGui::EndChild();
     return interaction_happen;
 }
 
+bool Diwne::blockPopup()
+{
+    return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch || m_diwneAction_previousFrame == DiwneAction::SelectionRectFull || m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
+}
+
+bool Diwne::allowInteraction(){return m_interactionAllowed && DiwneObject::allowInteraction();}
+
 bool Diwne::processSelectionRectangle()
 {
-    if(m_interactionAllowed && bypassSelectionRectangleAction())
+    if(bypassSelectionRectangleAction())
     {
         ImVec2 startPos = bypassDiwneGetSelectionRectangleStartPosition();
         ImVec2 dragDelta = bypassDiwneGetSelectionRectangleSize();
@@ -136,13 +161,13 @@ bool Diwne::processSelectionRectangle()
             setDiwneAction(DiwneAction::SelectionRectFull);
             m_selectionRectangeDiwne.Min.x = startPos.x;
             m_selectionRectangeDiwne.Max.x = startPos.x + dragDelta.x;
-            color = m_selectionRectangeFullColor;
+            color = mp_settingsDiwne->selectionRectFullColor;
         }else
         {
             setDiwneAction(DiwneAction::SelectionRectTouch);
             m_selectionRectangeDiwne.Min.x = startPos.x + dragDelta.x;
             m_selectionRectangeDiwne.Max.x = startPos.x;
-            color = m_selectionRectangeTouchColor;
+            color = mp_settingsDiwne->selectionRectTouchColor;
         }
 
         if(dragDelta.y > 0)
@@ -161,6 +186,14 @@ bool Diwne::processSelectionRectangle()
     }
     return false;
 }
+
+bool Diwne::processFocused()
+{
+    diwne.AddRectDiwne(m_workAreaDiwne.Min, m_workAreaDiwne.Max, diwne.mp_settingsDiwne->backgroundHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->backgroundHoveredBorderThicknessDiwne);
+    return false;
+}
+
+bool Diwne::processFocusedForInteraction() {return processFocused(); }
 
 bool Diwne::processHold()
 {
@@ -182,13 +215,15 @@ bool Diwne::processDrag()
 
 bool Diwne::processZoom()
 {
+    ImVec2 mousePosDiwne = screen2diwne(bypassGetMousePos());
     setWorkAreaZoom( m_workAreaZoom + bypassGetZoomDelta() );
+    translateWorkAreaDiwne(mousePosDiwne-screen2diwne(bypassGetMousePos()));
     return true;
 }
 
 bool Diwne::processDiwneZoom()
 {
-    if (m_interactionAllowed && bypassZoomAction())
+    if (bypassZoomAction())
     {
         return processZoom();
     }
@@ -198,8 +233,8 @@ bool Diwne::processDiwneZoom()
 void Diwne::setWorkAreaZoom(float val/*=1*/)
 {
     double old = m_workAreaZoom;
-    if (val < m_minWorkAreaZoom){ m_workAreaZoom = m_minWorkAreaZoom; }
-    else if (val > m_maxWorkAreaZoom){ m_workAreaZoom = m_maxWorkAreaZoom; }
+    if (val < mp_settingsDiwne->minWorkAreaZoom){ m_workAreaZoom = mp_settingsDiwne->minWorkAreaZoom; }
+    else if (val > mp_settingsDiwne->maxWorkAreaZoom){ m_workAreaZoom = mp_settingsDiwne->maxWorkAreaZoom; }
     else m_workAreaZoom = val;
 }
 
@@ -267,7 +302,7 @@ void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, fl
     idl->AddRect
         ( diwne2screen(p_min)
         , diwne2screen(p_max)
-        , col, rounding, rounding_corners, thickness );
+        , col, rounding, rounding_corners, thickness*m_workAreaZoom );
 }
 
 void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments/*=0*/) const
@@ -371,7 +406,7 @@ bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor
 
     ImGui::SetCursorScreenPos(initPos);
     bool result = ImGui::InvisibleButton(id.c_str(), size);
-    ImGui::SetItemAllowOverlap();
+//    ImGui::SetItemAllowOverlap();
     return result;
 
 
@@ -503,18 +538,17 @@ ImVec2 Diwne::bypassGetMouseDragDelta2() {return ImGui::GetMouseDragDelta(2);}
 ImVec2 Diwne::bypassGetMouseDelta() {return ImGui::GetIO().MouseDelta;}
 ImVec2 Diwne::bypassGetMousePos() {return ImGui::GetIO().MousePos;}
 float Diwne::bypassGetMouseWheel() {return ImGui::GetIO().MouseWheel;}
-float Diwne::bypassGetZoomDelta() {return bypassGetMouseWheel()/m_zoomWheelReverseSenzitivity;}
+float Diwne::bypassGetZoomDelta() {return bypassGetMouseWheel()/mp_settingsDiwne->zoomWheelReverseSenzitivity;}
 
-bool Diwne::bypassZoomAction() {return bypassHoveredAction() && diwne.bypassGetZoomDelta() != 0;}
+bool Diwne::bypassZoomAction() {return bypassFocusForInteractionAction() && diwne.bypassGetZoomDelta() != 0;}
 bool Diwne::bypassDiwneSetPopupPositionAction() {return bypassIsMouseClicked1();}
 ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos();}
 /* be careful for same mouse button in this functions */
-bool Diwne::bypassSelectionRectangleAction() {return bypassHoveredAction() && bypassIsMouseDragging1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+bool Diwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && bypassIsMouseDragging1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos1());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta1()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImRect Diwne::getSelectionRectangleDiwne(){return m_selectionRectangeDiwne;}
 
-bool Diwne::bypassRaisePopupAction(){return m_diwneAction == DiwneAction::None && m_diwneAction_previousFrame == DiwneAction::None && DiwneObject::bypassRaisePopupAction();}
 
 /* >>>> STATIC FUNCTIONS <<<< */
 bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size)

@@ -51,7 +51,7 @@ class WorkspaceDiwne : public DIWNE::Diwne
     friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
 
     public: /* \todo JH make some protected etc... */
-    WorkspaceDiwne(DIWNE::SettingsDiwne const &settingsDiwne);
+    WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
 
     void popupContent();
 
@@ -60,7 +60,6 @@ class WorkspaceDiwne : public DIWNE::Diwne
     bool content();
     bool afterContent();
     bool afterEnd();
-    void allowInteraction();
 
     WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
 
@@ -77,7 +76,7 @@ class WorkspaceDiwne : public DIWNE::Diwne
 	template <typename T>
     void addTypeConstructorNode()
     {
-        WorkspaceCoreInputPin *pin = getLastActivePin<WorkspaceCoreInputPin>();
+        WorkspaceCoreInputPin *pin = getLastActivePin<WorkspaceCoreInputPin>().get();
         addNodeToPosition<T>( pin->getLinkConnectionPointDiwne() + ImVec2(-100,0) ); /* \todo JH shift to Theme */
         pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getOutputs().at(0).get()); /* \todo JH always 0 with type constructor? */
     }
@@ -89,7 +88,7 @@ class WorkspaceDiwne : public DIWNE::Diwne
 
 		node->setNodePositionDiwne( position );
 		m_workspaceCoreNodes.push_back(node);
-		m_workspaceCoreNodes.back()->drawNodeDiwne();
+		m_workspaceCoreNodes.back()->drawNodeDiwne<WorkspaceNodeWithCoreData>();
 
 		return node;
 	}
@@ -106,7 +105,7 @@ class WorkspaceDiwne : public DIWNE::Diwne
 
     void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
-	void shiftDragedOrHoldNodeToEnd();
+	void shiftInteractingNodeToEnd();
 };
 
 /*! \class class for Workspace window object

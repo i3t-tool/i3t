@@ -215,9 +215,9 @@ bool WorkspaceCorePin::content()
 		return interaction_happen;
 }
 
-bool WorkspaceCorePin::bypassHoveredAction()
+bool WorkspaceCorePin::bypassFocusForInteractionAction()
 {
-    return m_iconRectDiwne.Contains(diwne.screen2diwne(ImGui::GetMousePos()));
+    return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
 }
 
 Core::Pin const& WorkspaceCorePin::getCorePin() const { return m_pin; }
@@ -240,7 +240,13 @@ bool WorkspaceCorePin::processDrag()
 {
     ImVec2 origin =  getLinkConnectionPointDiwne();
     ImVec2 actual = diwne.screen2diwne( ImGui::GetIO().MousePos );
-    diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
+
+    if (getKind() == PinKind::Output) diwne.getHelperLink().setLinkEndpointsDiwne(origin, actual);
+    else diwne.getHelperLink().setLinkEndpointsDiwne(actual, origin);
+
+    diwne.mp_settingsDiwne->linkColor = ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(WorkspacePinColorBackground[getType()]));
+    diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
+
     return Pin::processDrag();
 }
 
@@ -251,11 +257,11 @@ bool WorkspaceCorePin::processConnectionPrepared()
     if (getKind() == PinKind::Input)
     {
         input = this;
-        output = diwne.getLastActivePin<WorkspaceCorePin>();
+        output = diwne.getLastActivePin<WorkspaceCorePin>().get();
     }
     else
     {
-        input = diwne.getLastActivePin<WorkspaceCorePin>();
+        input = diwne.getLastActivePin<WorkspaceCorePin>().get();
         output = this;
     }
 
@@ -488,7 +494,7 @@ bool WorkspaceCoreInputPin::drawDiwne()
     bool inner_interaction_happen = WorkspaceCorePin::drawDiwne();
     if (isConnected())
     {
-        inner_interaction_happen |= getLink().drawDiwne();
+        inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
     }
     return inner_interaction_happen;
 }
@@ -515,18 +521,20 @@ bool WorkspaceCoreInputPin::content()
 
 bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
 {
-    if (diwne.getDiwneAction() != DIWNE::DiwneAction::NewLink && diwne.getDiwneActionPreviousFrame() != DIWNE::DiwneAction::NewLink && bypassHoveredAction() && bypassUnholdAction())
+    if (bypassFocusForInteractionAction() && bypassUnholdAction())
     {
         dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction = WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
-        diwne.setLastActivePin(this);
+        diwne.setLastActivePin<WorkspaceCoreInputPin>(std::static_pointer_cast<WorkspaceCoreInputPin>(shared_from_this()));
         return true;
     }
     return false;
 }
 
-bool WorkspaceCoreInputPin::afterEnd()
+bool WorkspaceCoreInputPin::processInteractions()
 {
-    return processCreateAndPlugConstrutorNode();
+    bool interaction_happen = processCreateAndPlugConstrutorNode();
+    interaction_happen = WorkspaceCorePin::processInteractions();
+    return interaction_happen;
 }
 /* >>>> WorkspaceCoreLink <<<< */
 
@@ -552,45 +560,34 @@ void WorkspaceCoreLink::updateEndpoints(){
     ImVec2 start, end;
     WorkspaceCoreOutputPin* startPin = getStartPin();
     WorkspaceCoreInputPin* endPin = getEndPin();
-    if(startPin)    start = startPin->getLinkConnectionPointDiwne();
-    if(endPin)  end = endPin->getLinkConnectionPointDiwne();
+    if(startPin) start = startPin->getLinkConnectionPointDiwne();
+    if(endPin) end = endPin->getLinkConnectionPointDiwne();
     setLinkEndpointsDiwne(start, end);
 }
 
 void WorkspaceCoreLink::updateControlPointsOffsets(){
     float offset = (getEndpoint().x-getStartpoint().x)*I3T::getTheme().get(ESize::Links_ControlpointsPositionFraction);
     if (offset < I3T::getTheme().get(ESize::Links_ControlpointsPositionMin)) offset = I3T::getTheme().get(ESize::Links_ControlpointsPositionMin);
-    setLinkControlpointsOffsetDiwne(ImVec2(offset,0), ImVec2(-offset,0));
+    diwne.mp_settingsDiwne->linkStartControlOffsetDiwne =  ImVec2(offset,0);
+    diwne.mp_settingsDiwne->linkEndControlOffsetDiwne =  ImVec2(-offset,0);
 }
 
 
-//bool WorkspaceCoreLink::processLinkHovered(DIWNE::Diwne &diwne, bool& inner_interaction_happen)
-//{
-//    if (bypassLinkHoveredAction(diwne))
-//    {
-//        m_color.Value.w = 1; /* \todo JH alpha to settings? */
-//        return true;
-//    }else
-//    {
-//        m_color.Value.w = 0.4; /* \todo JH alpha to settings? */
-//    }
-//    return false;
-//}
-
 bool WorkspaceCoreLink::initialize()
 {
-    ImColor col = ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(WorkspacePinColorBackground[m_endPin->getType()]));
-    m_color.Value.x = col.Value.x; m_color.Value.y = col.Value.y; m_color.Value.z = col.Value.z;
-    m_thickness = I3T::getTheme().get(ESize::Links_Thickness);
+    updateControlPointsOffsets();
+
+    diwne.mp_settingsDiwne->linkColor = ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(WorkspacePinColorBackground[m_endPin->getType()]));
+    diwne.mp_settingsDiwne->linkThicknessDiwne = I3T::getTheme().get(ESize::Links_Thickness);
 
     if (m_selected)
     {
-        m_thickness_selected_border = I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder);
-        m_selectedColor = col;
-        m_selectedColor.Value.x += 20; /* \todo JH selected border color to settings */
-        m_selectedColor.Value.y += 20;
-        m_selectedColor.Value.z += 20;
-        m_selectedColor.Value.w = 0.8;
+        diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne = I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder);
+        diwne.mp_settingsDiwne->linkColorSelected = diwne.mp_settingsDiwne->linkColor;
+        diwne.mp_settingsDiwne->linkColorSelected.Value.x += 0.2; /* \todo JH selected border color to settings */
+        diwne.mp_settingsDiwne->linkColorSelected.Value.y += 0.2;
+        diwne.mp_settingsDiwne->linkColorSelected.Value.z += 0.2;
+        diwne.mp_settingsDiwne->linkColorSelected.Value.w = 0.8;
     }
     return false;
 }
@@ -738,7 +735,7 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwn
 bool WorkspaceNodeWithCoreDataWithPins::finalize()
 {
     bool inner_interaction_happen = false;
-    if (!m_drawing)
+    if (!allowDrawing())
     {
         for (auto const& pin : m_workspaceInputs)
         {
@@ -752,6 +749,7 @@ bool WorkspaceNodeWithCoreDataWithPins::finalize()
             }
         }
     }
+    inner_interaction_happen |= WorkspaceNodeWithCoreData::finalize();
     return inner_interaction_happen;
 }
 
@@ -804,17 +802,21 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 	valueChanged = ImGui::DragFloat(
 			label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 			1.0f); /* if power >1.0f the number changes logarithmic */
-    ImGui::SetItemAllowOverlap();
+    //ImGui::SetItemAllowOverlap();
 
     if (diwne.bypassIsItemActive())
         inner_interaction_happen = true;
 
-    if (!inactive)
+    if (!inactive && !diwne.m_popupDrawn)
 	{
-	    if (diwne.bypassHoveredAction() && diwne.bypassRaisePopupAction()) ImGui::OpenPopup(label.c_str());
+	    if (diwne.bypassFocusAction() && diwne.bypassRaisePopupAction()) /* \todo JH focus and raise should be static -> now is intertwined with diwne */
+        {
+            ImGui::OpenPopup(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup);
+            diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
+        }
 
-		//inner_interaction_happen |= diwne.popupDiwneItem(label, &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
-		inner_interaction_happen |= DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+        diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+		inner_interaction_happen |= diwne.m_popupDrawn;
 
 		valueChanged |= valueChangedByPopup;
 	}
@@ -829,7 +831,7 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 
 	/* \todo JH this is not very elegant ... */
 	/* \todo JH hack for not change value if for example dragging node from position over DragFloat */
-    if ( diwne.getDiwneAction() != DIWNE::DiwneAction::None || diwne.getDiwneActionPreviousFrame() != DIWNE::DiwneAction::None){valueChanged = false;}
+//    if ( diwne.getDiwneAction() != DIWNE::DiwneAction::None || diwne.getDiwneActionPreviousFrame() != DIWNE::DiwneAction::None){valueChanged = false;}
 
 	return inner_interaction_happen || valueChanged;
 }

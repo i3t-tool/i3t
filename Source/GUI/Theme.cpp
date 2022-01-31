@@ -107,6 +107,7 @@ void Theme::initClassicProperties()
 	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
 
+	set(EColor::Item_SelectedBorder, createColor(100, 100, 0, 255));
 
 	// General unspecified node
 	set(EColor::NodeBg, createColor(255, 200, 50, 255));
@@ -243,6 +244,8 @@ void Theme::initModernProperties()
 	set(EColor::InnerVec4Pin, createColor(255, 255, 255, 255));
 	set(EColor::InnerScreenPin, createColor(255, 255, 255, 255));
 	set(EColor::InnerMatrixMulPin, createColor(255, 255, 255, 255));
+
+	set(EColor::Item_SelectedBorder, createColor(100, 100, 0, 255));
 
     // General unspecified node
 	set(EColor::NodeBg, createColor(255, 200, 50, 255));
@@ -385,6 +388,8 @@ void Theme::initNames()
 	g_ColorNames[EColor::InnerMatrixMulPin] = "npin_Inner Color MatrixMul";
 	g_ColorNames[EColor::InnerScreenPin]		= "npin_Inner Color Screen";
 
+
+	g_ColorNames[EColor::Item_SelectedBorder]		 = "nops_Item selected border";
 
 	// General unspecified node
 	g_ColorNames[EColor::NodeBg]				 = "nops_General node Background";

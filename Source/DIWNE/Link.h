@@ -18,12 +18,21 @@ class Link : public DiwneObject
         virtual void begin(){};
         virtual void end(){};
         virtual bool content();
+        DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldLink;};
+        DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragLink;};
+
 
         virtual void updateEndpoints(){};
-        virtual void updateControlPointsOffsets(){};
-        void updateControlPoints(){ m_controlPointStartDiwne=m_startDiwne+m_startControlOffsetDiwne; m_controlPointEndDiwne=m_endDiwne+m_endControlOffsetDiwne;};
+        void updateControlPoints();
 
         void updateSquareDistanceMouseFromLink();
+
+        virtual ImRect getRectDiwne() const {return ImRect(
+        std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+        std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
+        std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+        std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+                                             };
 
 
         ImVec2 getStartpoint(){return m_startDiwne;};
@@ -32,22 +41,21 @@ class Link : public DiwneObject
         ImVec2 getEndControlPoint(){return m_controlPointEndDiwne;};
 
         void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end) {m_startDiwne = start; m_endDiwne = end; };
-        void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart; m_endControlOffsetDiwne = controlEnd; };
 
         /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
         bool isLinkOnWorkArea();
 
-        virtual bool bypassHoveredAction();
+        virtual bool allowFocus();
+        virtual bool bypassFocusAction();
+        virtual bool bypassFocusForInteractionAction();
+
 
         bool m_just_pluged;
 
     protected:
-        ImColor m_color, m_selectedColor;
-        float m_thickness, m_thickness_selected_border;
 
     private:
         ImVec2 m_startDiwne, m_endDiwne;
-        ImVec2 m_startControlOffsetDiwne, m_endControlOffsetDiwne;
         ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
         float m_squaredDistanceMouseFromLink;
 

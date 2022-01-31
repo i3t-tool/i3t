@@ -18,7 +18,7 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	virtual bool processBeforeContent()
+	virtual bool beforeContent()
     {
         /* whole node background */
         diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
@@ -59,5 +59,38 @@ public:
             maxLen = std::max(maxLen, std::dynamic_pointer_cast<WorkspaceCoreOutputPinWithData>(pin)->maxLengthOfData());
         }
         return maxLen;
+    }
+};
+
+class WorkspaceAngleAxisToQuat : public WorkspaceOperator<ENodeType::AngleAxisToQuat>
+{
+public:
+    int m_mode;
+    WorkspaceAngleAxisToQuat(DIWNE::Diwne& diwne)
+        :   WorkspaceOperator<ENodeType::AngleAxisToQuat>(diwne)
+        ,   m_mode(0)
+    {}
+
+    bool leftContent()
+    {
+        bool interaction_happen = false;
+
+        interaction_happen |= ImGui::RadioButton("A", &m_mode, 0); ImGui::SameLine();
+        interaction_happen |= ImGui::RadioButton("A/2", &m_mode, 1);
+
+        if (interaction_happen) /* mode changed */
+        {
+            if(m_workspaceInputs.at(1-m_mode)->isConnected()) /* previous mode pin is connected */
+            {
+                /* connect visible pin and unplug hidden one */
+                m_workspaceInputs.at(m_mode).get()->plug(m_workspaceInputs.at(1-m_mode)->getLink().getStartPin());
+                m_workspaceInputs.at(1-m_mode)->unplug();
+            }
+        }
+
+        interaction_happen |= m_workspaceInputs.at(m_mode)->drawDiwne();
+        interaction_happen |= m_workspaceInputs.at(2)->drawDiwne();
+
+        return interaction_happen;
     }
 };

@@ -3,18 +3,25 @@
 namespace DIWNE
 {
 
+enum DrawMode
+{
+    JustDraw,
+    Interacting
+};
+
 /* ================================== */
 /* ===== D i w n e  O b j e c t ===== */
 /* ================================== */
-class DiwneObject
+class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
 public: /* \todo JH some atributes should be private/protected */
     DIWNE::Diwne& diwne;
     DIWNE::ID const m_idDiwne;
     std::string const m_labelDiwne;
     std::string const m_popupIDDiwne;
-    bool m_drawing, m_interactionAllowed, m_inner_interaction_happen;
-    bool m_isHeld, m_isDraged, m_selected, m_hovered;
+    bool m_inner_interaction_happen;
+    DrawMode m_drawMode;
+    bool m_isHeld, m_isDraged, m_selected, m_focusedForInteraction, m_focused;
 
     DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne);
     virtual ~DiwneObject(){};
@@ -23,7 +30,8 @@ public: /* \todo JH some atributes should be private/protected */
 
     virtual void popupContent();
 
-    virtual bool drawDiwne();
+    virtual bool allowDrawing();
+    virtual bool drawDiwne(DrawMode drawMode=DrawMode::Interacting);
     virtual bool initialize(); /* set m_drawing inside -> whether draw object or not if this can happen (m_drawing = true is default) */
     virtual bool initializeDiwne();
     virtual bool beforeBegin();
@@ -36,16 +44,23 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool afterContent();
     virtual bool afterContentDiwne();
     virtual void end()=0;
-    virtual void allowInteraction(); /* set m_allowInteraction for settings of interaction - called before afterEndDiwne() */
+    virtual void updateSizes();
+    virtual bool allowFocus();
+    virtual bool allowInteraction();
     virtual bool afterEnd();
     virtual bool afterEndDiwne();
+    virtual bool processInteractions();
+    virtual bool processInteractionsDiwne();
     virtual bool finalize();
     virtual bool finalizeDiwne();
 
-    virtual void updateSizes();
+    virtual ImRect getRectDiwne() const = 0;
+    virtual DIWNE::DiwneAction getHoldActionType() const = 0;
+    virtual DIWNE::DiwneAction getDragActionType() const = 0;
 
     virtual bool bypassRaisePopupAction();
-    virtual bool bypassHoveredAction();
+    virtual bool bypassFocusAction();
+    virtual bool bypassFocusForInteractionAction();
     virtual bool bypassHoldAction();
     virtual bool bypassUnholdAction();
     virtual bool bypassSelectAction();
@@ -60,9 +75,11 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool processUnhold();
     virtual bool processSelect();
     virtual bool processUnselect();
-    virtual bool processHovered();
+    virtual bool processFocused();
+    virtual bool processFocusedForInteraction();
 
-    virtual bool processObjectHovered();
+    virtual bool processObjectFocused();
+    virtual bool processObjectFocusedForInteraction();
     virtual bool processObjectHold();
     virtual bool processObjectUnhold();
     virtual bool processObjectDrag();

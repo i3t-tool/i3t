@@ -58,6 +58,8 @@ enum class EColor
 	InnerMatrixMulPin,
 	InnerScreenPin,
 
+	Item_SelectedBorder,
+
 	// General unspecified node
 	NodeBg,
 	NodeHeader,
@@ -88,8 +90,6 @@ enum class EColor
 	Nodes_CreateNode,
 
 	Builder_NodePadding, // not a color but i need a vec4
-
-	Links_SelectedBorder
 };
 
 enum class EFont

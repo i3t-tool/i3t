@@ -12,10 +12,9 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="Di
     , m_rightRectDiwne(ImRect(0,0,0,0))
     , m_bottomRectDiwne(ImRect(0,0,0,0))
     , m_centerDummySpace(0)
-    , m_middleAlign(0.5)
     , m_drawAnywhere(true)
-    , m_nodeInteractionAllowed(false)
-    , m_drawOnCursorPos(false)
+    , m_nodePosMode(OnItsPosition)
+    , m_drawMode(Interacting)
 {}
 
 Node& Node::operator=(const Node& rhs)
@@ -25,28 +24,30 @@ Node& Node::operator=(const Node& rhs)
     return *this;
 }
 
-bool Node::drawNodeDiwne(bool drawHere/*= false*/)
-{
-    m_drawOnCursorPos = drawHere;
-    return drawDiwne();
-}
-
-bool Node::initializeDiwne()
-{
-    if ( m_drawAnywhere || getNodeRectDiwne().Overlaps( diwne.getWorkAreaDiwne() ) )
-    {
-        m_drawing = true;
-        if(m_drawAnywhere) m_drawAnywhere=false;
-    }else
-    {
-        m_drawing = false;
-    }
-    return initialize();
-}
+bool Node::allowDrawing() {return m_drawAnywhere || getRectDiwne().Overlaps( diwne.getWorkAreaDiwne() ); }
 
 bool Node::beforeBeginDiwne()
 {
-    m_drawOnCursorPos ? setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos())) : ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
+    switch(m_nodePosMode)
+    {
+    case DrawModeNodePosition::OnItsPosition:
+        ImGui::SetCursorScreenPos(diwne.diwne2screen(m_nodePositionDiwne));
+        break;
+    case DrawModeNodePosition::OnCoursorPosition:
+        setNodePositionDiwne(diwne.screen2diwne(ImGui::GetCursorScreenPos()));
+        break;
+    }
+    if(m_drawAnywhere) m_drawAnywhere=false;
+
+    if (m_drawMode == DrawMode::JustDraw)
+    {
+        /* InvisibleButton stole all interaction with any other ImGui elements */
+        ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+        ImGui::InvisibleButton("IBBlockingImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
+        ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+        ImGui::PushID("JustDraw");
+    }
+
     return beforeBegin();
 }
 
@@ -65,16 +66,9 @@ void Node::end()
                              diwne.diwne2workArea(nodeRectDiwne.Min).x, diwne.diwne2workArea(nodeRectDiwne.Min).y, diwne.diwne2workArea(nodeRectDiwne.Max).x, diwne.diwne2workArea(nodeRectDiwne.Max).y,
                              diwne.diwne2screen(nodeRectDiwne.Min).x, diwne.diwne2screen(nodeRectDiwne.Min).y, diwne.diwne2screen(nodeRectDiwne.Max).x, diwne.diwne2screen(nodeRectDiwne.Max).y).c_str());
 
-    diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,0,0,100), 0, ImDrawCornerFlags_None, 2);
-
-    if (m_interactionAllowed && bypassHoveredAction())
-    {
-        diwne.AddRectDiwne( m_topRectDiwne.Min, m_bottomRectDiwne.Max, ImColor(0,0,0,100), 0, ImDrawCornerFlags_None, 2);
-    }
 #endif // DIWNE_DEBUG
     ImGui::EndGroup(); /* End of node */
     ImGui::PopID();
-    ImGui::SetItemAllowOverlap();
 }
 
 bool Node::content()
@@ -88,35 +82,52 @@ bool Node::content()
         interaction_happen |= leftContentDiwne();
         ImGui::SameLine();
 
-        if(m_centerDummySpace > 0){ ImGui::Indent((m_leftRectDiwne.GetWidth() + m_centerDummySpace*m_middleAlign)*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.x ); } /* spacing is already zoomed in Diwne */
+        if(m_centerDummySpace > 0){ ImGui::Indent((m_leftRectDiwne.GetWidth() + m_centerDummySpace*diwne.mp_settingsDiwne->middleAlign)*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.x ); } /* spacing is already zoomed in Diwne */
         interaction_happen |= middleContentDiwne();
         ImGui::SameLine();
 
-        if(m_centerDummySpace > 0){ ImGui::Indent((m_middleRectDiwne.GetWidth() + m_centerDummySpace*(1-m_middleAlign))*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.x ); }
+        if(m_centerDummySpace > 0){ ImGui::Indent((m_middleRectDiwne.GetWidth() + m_centerDummySpace*(1-diwne.mp_settingsDiwne->middleAlign))*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.x ); }
         interaction_happen |= rightContentDiwne();
 
-    ImGui::EndGroup(); /* Left-Middle-Right */
+    ImGui::EndGroup(); /* Center */
     ImGui::PopID();
 
     interaction_happen |= bottomContentDiwne();
     return interaction_happen;
 }
 
-bool Node::afterContentDiwne()
+
+bool Node::afterEndDiwne()
 {
+    if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
+    {
+        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : false;
+    }else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch )
+    {
+        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : false;
+    }
+
     if (m_selected)
     {
-        ImRect nodeRectDiwne = getNodeRectDiwne();
-        diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(255,255,0), 0, ImDrawCornerFlags_None, 5); /* \todo JH color and width from settings */
+        diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
     }
-    return DiwneObject::afterContentDiwne();
+
+    if (m_drawMode == DrawMode::JustDraw)
+    {
+        ImGui::PopID(); /* ImGui::PushID("JustDraw"); in beforeBeginDiwne() */
+    }
+
+    /* always block interactions with other nodes */
+    ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
+    ImGui::InvisibleButton("IBBlockingOtherImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
+
+    return DiwneObject::afterEndDiwne();
 }
 
-bool Node::processHovered()
+bool Node::processFocusedForInteraction()
 {
-    ImRect nodeRectDiwne = getNodeRectDiwne();
-    diwne.AddRectDiwne(nodeRectDiwne.Min, nodeRectDiwne.Max, ImColor(0,0,0), 0, ImDrawCornerFlags_None, 2*diwne.getWorkAreaZoom());
-    return false;
+    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->nodeHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->nodeHoveredBorderThicknessDiwne);
+    return true;
 }
 
 bool Node::processSelected()
@@ -134,13 +145,11 @@ bool Node::processUnselected()
 bool Node::processHold()
 {
     diwne.setDiwneAction(DiwneAction::HoldNode);
-    diwne.m_draged_hold_node = shared_from_this();
     return true;
 }
 
 bool Node::processUnhold()
 {
-    diwne.m_draged_hold_node = nullptr;
     diwne.setDiwneAction(DiwneAction::None);
     return true;
 }
@@ -252,6 +261,7 @@ bool Node::bottomContentDiwne()
 
 void Node::updateSizes()
 {
+    /* \todo can use ImGui::ItemMax/Min */
     setNodeRectsPositionDiwne(m_nodePositionDiwne);
     ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.getWorkAreaZoom(); /* in BeginDiwne() is ItemSpacing scaled */
 

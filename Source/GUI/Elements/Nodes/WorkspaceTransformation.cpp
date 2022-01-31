@@ -2,9 +2,15 @@
 
 WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNodeWithCoreData(diwne, nodebase)
+    ,   aboveSequence(0)
 {}
+bool WorkspaceTransformation::beforeBegin()
+{
+    aboveSequence = 0; /* 0 is none */
+    return WorkspaceNodeWithCoreData::beforeBegin();
+}
 
-bool WorkspaceTransformation::processBeforeContent()
+bool WorkspaceTransformation::beforeContent()
 {
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,

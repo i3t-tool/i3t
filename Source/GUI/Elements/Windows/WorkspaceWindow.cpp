@@ -5,7 +5,7 @@
 
 static DIWNE::SettingsDiwne settingsDiwne;
 
-WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(settingsDiwne);
+WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(&settingsDiwne);
 
 
 //std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::m_workspaceDiwne::m_workspaceCoreNodes;
@@ -15,7 +15,7 @@ WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(settingsDiwne);
 /* ======================================== */
 /* ===== W o r k s p a c e  D i w n e ===== */
 /* ======================================== */
-WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne const &settingsDiwne)
+WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     :   Diwne(settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
@@ -277,7 +277,8 @@ void WorkspaceDiwne::popupContent()
 				}
 				if (ImGui::MenuItem("quat(angle, axis)"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::AngleAxisToQuat>>();
+				    //addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::AngleAxisToQuat>>();
+				    addNodeToPositionOfPopup<WorkspaceAngleAxisToQuat>();
 				}
 				if (ImGui::MenuItem("quat(vec3, vec3)"))
 				{
@@ -597,19 +598,29 @@ bool WorkspaceDiwne::content()
                                               [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspace();}
                                               ),
                               m_workspaceCoreNodes.end());
-    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+
+    /* draw nodes from back to begin (front to back) for catch interactions in right order */
+    for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
     {
-        if (workspaceCoreNode != nullptr) interaction_happen |= workspaceCoreNode->drawNodeDiwne(); /* nullptr can happen if moving to sequence */
+        if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, interaction_happen ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting); /* if interaction happen in one node -> no interaction in another */
     }
-    if (interaction_happen)
-        ImGui::Text("Workspace: Interaction with nodes happen");
+
+    /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
+    if (m_workspaceCoreNodes.size() > 0)
+    {
+        for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+        {
+            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence */
+        }
+    }
+#ifdef WORKSPACE_DEBUG
+    if (interaction_happen) ImGui::Text("Workspace: Interaction with nodes happen");
+#endif // WORKSPACE_DEBUG
 
     m_interactionAllowed = !interaction_happen;
 
     return interaction_happen;
 }
-
-void WorkspaceDiwne::allowInteraction(){m_interactionAllowed = (!m_inner_interaction_happen || m_workspaceDiwneAction == WorkspaceDiwneAction::CreateAndPlugTypeConstructor); }
 
 
 bool WorkspaceDiwne::afterContent()
@@ -622,11 +633,11 @@ bool WorkspaceDiwne::afterContent()
 
 	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
 
-    /* hold or drag && in previous frame not hold neither drag */
-	if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode) &&
-         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode))
+    /* hold or drag or interacting or new_link && in previous frame not hold neither drag neither interacting neither new_link */
+    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink) &&
+         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink))
     {
-        shiftDragedOrHoldNodeToEnd();
+        shiftInteractingNodeToEnd();
     }
     return interaction_happen;
 }
@@ -636,8 +647,6 @@ bool WorkspaceDiwne::afterEnd()
     m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
     return false;
 }
-
-
 
 bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
 {
@@ -700,19 +709,19 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 	}
 }
 
-void WorkspaceDiwne::shiftDragedOrHoldNodeToEnd()
+void WorkspaceDiwne::shiftInteractingNodeToEnd()
 {
-    if(m_draged_hold_node != nullptr)
+    if(mp_lastActiveNode != nullptr)
     {
         coreNodeIter draged_node_it =
 				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 										 [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
-											 return node->getId() == this->m_draged_hold_node->getId();
+											 return node->getId() == this->mp_lastActiveNode->getId();
 										 });
 
-		if (draged_node_it != m_workspaceCoreNodes.end())
+		if (draged_node_it != m_workspaceCoreNodes.end() && draged_node_it != m_workspaceCoreNodes.end()-1)
 		{
-			std::iter_swap(m_workspaceCoreNodes.end() - 1, draged_node_it);
+			std::rotate(draged_node_it, draged_node_it+1,  m_workspaceCoreNodes.end());
 		}
     }
 }
@@ -767,9 +776,11 @@ void WorkspaceWindow::render()
     {
         if(m_first_frame){
             m_first_frame = false;
-            m_workspaceDiwne.addNodeToPosition<WorkspaceScreen>(ImVec2(700,200));
+            //m_workspaceDiwne.addNodeToPosition<WorkspaceScreen>(ImVec2(700,200));
 
-            m_workspaceDiwne.addNodeToPosition<WorkspaceCycle>(ImVec2(400,200));
+            //m_workspaceDiwne.addNodeToPosition<WorkspaceCycle>(ImVec2(400,200));
+
+            m_workspaceDiwne.addNodeToPosition<WorkspaceAngleAxisToQuat>(ImVec2(400,200));
 
 
     //        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
