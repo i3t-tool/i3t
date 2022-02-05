@@ -582,12 +582,14 @@ bool WorkspaceDiwne::beforeBegin()
 
 bool WorkspaceDiwne::beforeContent()
 {
-#ifdef WORKSPACE_DEBUG
+#ifdef DIWNE_DEBUG
+DIWNE_DEBUG({
     if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::None) ImGui::Text("WorkspaceWindowAction::None");
     if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::CreateAndPlugTypeConstructor) ImGui::Text("WorkspaceWindowPrevAction::CreateAndPlugTypeConstructor");
 
     ImGui::TextUnformatted(fmt::format("WorkspaceNodes: {}", m_workspaceCoreNodes.size()).c_str());
-#endif // WORKSPACE_DEBUG
+});
+#endif // DIWNE_DEBUG
     return false;
 }
 
@@ -600,9 +602,11 @@ bool WorkspaceDiwne::content()
                               m_workspaceCoreNodes.end());
 
     /* draw nodes from back to begin (front to back) for catch interactions in right order */
+    int prev_size = m_workspaceCoreNodes.size();
     for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
     {
         if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, interaction_happen ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting); /* if interaction happen in one node -> no interaction in another */
+        if (prev_size != m_workspaceCoreNodes.size()) break; /* when pop from Sequence size of m_workspaceCoreNodes is affected and iterator invalidated (at least with MVSC) */
     }
 
     /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
@@ -613,9 +617,12 @@ bool WorkspaceDiwne::content()
             if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence */
         }
     }
-#ifdef WORKSPACE_DEBUG
-    if (interaction_happen) ImGui::Text("Workspace: Interaction with nodes happen");
-#endif // WORKSPACE_DEBUG
+
+#ifdef DIWNE_DEBUG
+DIWNE_DEBUG({
+    if (interaction_happen){ ImGui::Text("Workspace: Interaction with nodes happen");}
+});
+#endif // DIWNE_DEBUG
 
     m_interactionAllowed = !interaction_happen;
 
@@ -634,8 +641,8 @@ bool WorkspaceDiwne::afterContent()
 	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
 
     /* hold or drag or interacting or new_link && in previous frame not hold neither drag neither interacting neither new_link */
-    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink) &&
-         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink))
+    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink || m_diwneAction == DIWNE::DiwneAction::TouchNode) &&
+         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink || m_diwneAction_previousFrame == DIWNE::DiwneAction::TouchNode))
     {
         shiftInteractingNodeToEnd();
     }
@@ -716,7 +723,7 @@ void WorkspaceDiwne::shiftInteractingNodeToEnd()
         coreNodeIter draged_node_it =
 				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 										 [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
-											 return node->getId() == this->mp_lastActiveNode->getId();
+											 return node.get() == this->mp_lastActiveNode.get();
 										 });
 
 		if (draged_node_it != m_workspaceCoreNodes.end() && draged_node_it != m_workspaceCoreNodes.end()-1)

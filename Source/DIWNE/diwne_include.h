@@ -10,10 +10,15 @@
 
 
 
-#define DIWNE_DEBUG
+#define DIWNE_DEBUG(debugCode) do{ if(DIWNE::s_diwneDebug_on){ debugCode } }while(0) /* do-while only for code-technical reason */
+
 
 namespace DIWNE
 {
+
+#ifdef DIWNE_DEBUG
+    static bool s_diwneDebug_on = true;
+#endif // DIWNE_DEBUG
 
 typedef unsigned int ID;
 
@@ -42,6 +47,8 @@ enum DiwneAction
     NewLink,
     HoldLink,
     DragLink, /* dragging already existing/connected link */
+
+    TouchNode,
 
     HoldWorkarea,
     DragWorkarea,

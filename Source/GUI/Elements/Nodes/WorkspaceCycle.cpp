@@ -86,12 +86,13 @@ bool WorkspaceCycle::leftContent()
 
         break;
     case WorkspaceLevelOfDetail::LightCycle:
-
-
+        nodeRect = getNodeRectDiwne();
         for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
         {
             m_workspaceInputs.at(i)->drawDiwne();
         }
+
+        pinConnectionPoint = ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y)/2);
 
         for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP, Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
         {
