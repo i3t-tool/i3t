@@ -3,7 +3,6 @@
 namespace DIWNE
 {
 
-
 Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="DiwneNode"*/)
     : DiwneObject(diwne, id, labelDiwne)
     , m_topRectDiwne(ImRect(0,0,0,0))
@@ -60,7 +59,7 @@ void Node::begin()
 void Node::end()
 {
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((diwne), {
     ImRect nodeRectDiwne = getNodeRectDiwne();
     ImGui::Text(fmt::format( "D:{}-{}-{}-{}\nWA:{}-{}-{}-{}\nS:{}-{}-{}-{}",
                              nodeRectDiwne.Min.x, nodeRectDiwne.Min.y, nodeRectDiwne.Max.x, nodeRectDiwne.Max.y,
@@ -192,7 +191,7 @@ bool Node::topContentDiwne()
     m_topRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((diwne), {
     diwne.AddRectDiwne( m_topRectDiwne.Min, m_topRectDiwne.Max, ImColor(0,0,255,100), 0, ImDrawCornerFlags_None, 2);
 }); /* close of macro */
 #endif // DIWNE_DEBUG
@@ -214,7 +213,7 @@ bool Node::leftContentDiwne()
     m_leftRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((diwne), {
     diwne.AddRectDiwne( m_leftRectDiwne.Min, m_leftRectDiwne.Max, ImColor(0,0,255,100), 0, ImDrawCornerFlags_None, 2);
 }); /* close of macro */
 #endif // DIWNE_DEBUG
@@ -234,7 +233,7 @@ bool Node::middleContentDiwne()
         m_middleRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((diwne), {
     diwne.AddRectDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max, ImColor(0,0,255,100), 0, ImDrawCornerFlags_None, 2);
 }); /* close of macro */
 #endif // DIWNE_DEBUG
@@ -255,7 +254,7 @@ bool Node::rightContentDiwne()
         m_rightRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((diwne), {
     diwne.AddRectDiwne(m_rightRectDiwne.Min, m_rightRectDiwne.Max, ImColor(0,0,255,100), 0, ImDrawCornerFlags_None, 2);
 }); /* close of macro */
 #endif // DIWNE_DEBUG
@@ -277,7 +276,7 @@ bool Node::bottomContentDiwne()
         m_bottomRectDiwne.Max = diwne.screen2diwne( ImGui::GetItemRectMax() );
 
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((diwne), {
     diwne.AddRectDiwne(m_bottomRectDiwne.Min, m_bottomRectDiwne.Max, ImColor(0,0,255,100), 0, ImDrawCornerFlags_None, 2);
 }); /* close of macro */
 #endif // DIWNE_DEBUG

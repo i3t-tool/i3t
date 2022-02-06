@@ -3,6 +3,10 @@
 */
 #include "WorkspaceWindow.h"
 
+#ifdef DIWNE_DEBUG
+    bool s_diwneDebug_on;
+#endif // DIWNE_DEBUG
+
 static DIWNE::SettingsDiwne settingsDiwne;
 
 WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(&settingsDiwne);
@@ -583,7 +587,7 @@ bool WorkspaceDiwne::beforeBegin()
 bool WorkspaceDiwne::beforeContent()
 {
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((*this), {
     if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::None) ImGui::Text("WorkspaceWindowAction::None");
     if (m_workspaceDiwneActionPreviousFrame == WorkspaceDiwneAction::CreateAndPlugTypeConstructor) ImGui::Text("WorkspaceWindowPrevAction::CreateAndPlugTypeConstructor");
 
@@ -603,10 +607,12 @@ bool WorkspaceDiwne::content()
 
     /* draw nodes from back to begin (front to back) for catch interactions in right order */
     int prev_size = m_workspaceCoreNodes.size();
+    DIWNE::DrawMode draw_mode = DIWNE::DrawMode::Interacting;
     for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
     {
-        if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, interaction_happen ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting); /* if interaction happen in one node -> no interaction in another */
-        if (prev_size != m_workspaceCoreNodes.size()) break; /* when pop from Sequence size of m_workspaceCoreNodes is affected and iterator invalidated (at least with MVSC) */
+        draw_mode = interaction_happen ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting; /* if interaction happen in one node -> no interaction in another */
+        if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, draw_mode);
+        if (prev_size != m_workspaceCoreNodes.size()) break; /* when pop from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
     }
 
     /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
@@ -614,12 +620,12 @@ bool WorkspaceDiwne::content()
     {
         for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
         {
-            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence */
+            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence - maybe unused here */
         }
     }
 
 #ifdef DIWNE_DEBUG
-DIWNE_DEBUG({
+DIWNE_DEBUG((*this), {
     if (interaction_happen){ ImGui::Text("Workspace: Interaction with nodes happen");}
 });
 #endif // DIWNE_DEBUG
@@ -641,8 +647,18 @@ bool WorkspaceDiwne::afterContent()
 	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
 
     /* hold or drag or interacting or new_link && in previous frame not hold neither drag neither interacting neither new_link */
-    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode || m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink || m_diwneAction == DIWNE::DiwneAction::TouchNode) &&
-         !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink || m_diwneAction_previousFrame == DIWNE::DiwneAction::TouchNode))
+    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode
+          || m_diwneAction == DIWNE::DiwneAction::HoldNode
+          || m_diwneAction == DIWNE::DiwneAction::InteractingContent
+          || m_diwneAction == DIWNE::DiwneAction::NewLink
+          || m_diwneAction == DIWNE::DiwneAction::TouchNode)
+        /*&&
+        !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode
+          || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode
+          || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent
+          || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink
+          || m_diwneAction_previousFrame == DIWNE::DiwneAction::TouchNode) */ // for example with pushing to sequence in prev_frame we hold/drag node and than interact content of sequence -> it is hard to cover all possibilities
+        )
     {
         shiftInteractingNodeToEnd();
     }
@@ -718,7 +734,7 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 
 void WorkspaceDiwne::shiftInteractingNodeToEnd()
 {
-    if(mp_lastActiveNode != nullptr)
+    if(mp_lastActiveNode != nullptr && mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
     {
         coreNodeIter draged_node_it =
 				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),

@@ -63,8 +63,8 @@ void Diwne::begin()
     ImGui::BeginGroup();
 
 #ifdef DIWNE_DEBUG
-ImGui::Checkbox("Show debug texts", &s_diwneDebug_on);
-DIWNE_DEBUG({
+ImGui::Checkbox("Show debug texts", &(m_diwneDebug_on));
+DIWNE_DEBUG((*this), {
     ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
     ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x, m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y,
                         m_workAreaScreen.Min.x, m_workAreaScreen.Min.y, m_workAreaScreen.Max.x, m_workAreaScreen.Max.y).c_str());

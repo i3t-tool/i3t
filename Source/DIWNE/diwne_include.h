@@ -8,17 +8,10 @@
 # define IMGUI_DEFINE_MATH_OPERATORS
 # include <imgui_internal.h>
 
-
-
-#define DIWNE_DEBUG(debugCode) do{ if(DIWNE::s_diwneDebug_on){ debugCode } }while(0) /* do-while only for code-technical reason */
-
+#define DIWNE_DEBUG(node_editor, debugCode) do{ if(node_editor.m_diwneDebug_on){ debugCode } }while(0) /* do-while only for code-technical reason */
 
 namespace DIWNE
 {
-
-#ifdef DIWNE_DEBUG
-    static bool s_diwneDebug_on = true;
-#endif // DIWNE_DEBUG
 
 typedef unsigned int ID;
 
