@@ -12,16 +12,10 @@ Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index) :
 	m_id = generator.next();
 }
 
-Pin::~Pin()
-{
-	generator.returnId(m_id);
-}
-
 [[nodiscard]] Ptr<Node> Pin::getOwner() const
 {
 	return m_master->getPtr();
 };
-
 
 const DataStore& Pin::data() const
 {
@@ -68,5 +62,10 @@ const char* Pin::getLabel() const
 std::string Pin::getSig()
 {
 	return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
+}
+
+void Pin::destroy()
+{
+	generator.returnId(m_id);
 }
 }

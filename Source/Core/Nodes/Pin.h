@@ -26,7 +26,6 @@ class Pin
 
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index);
-	~Pin();
 
 	[[nodiscard]] ID getId() const { return m_id; }
 
@@ -107,5 +106,7 @@ private:
 	std::vector<Pin*> m_outputs;
 
 	const EValueType m_valueType = EValueType::Pulse;
+
+	void destroy();
 };
 }

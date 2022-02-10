@@ -17,6 +17,8 @@
 #include "Sequence.h"
 #include "TransformImpl.h"
 #include "Node.h"
+#include "Pin.h"
+
 
 namespace Core
 {

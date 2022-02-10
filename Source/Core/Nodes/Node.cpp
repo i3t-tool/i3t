@@ -44,7 +44,16 @@ const Pin& Node::PinView::operator[](size_t i) const
 	return node->getOut(i);
 }
 
-Node::~Node() { generator.returnId(m_id); }
+Node::~Node()
+{
+	generator.returnId(m_id);
+
+	for (auto& input : m_inputs)
+		input.destroy();
+
+	for (auto& output : m_outputs)
+		output.destroy();
+}
 
 void Node::finalize() { unplugAll(); }
 
