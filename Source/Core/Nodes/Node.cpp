@@ -84,6 +84,10 @@ void Node::init()
 		else
 			m_internalData.emplace_back(EValueType::Matrix);
 	}
+
+	if (m_operation->isConstructor)
+		for (int i = 0; i < m_operation->numberOfOutputs; i++)
+			m_OperatorState.push_back(EValueState::Editable);
 }
 
 void Node::notifyOwner()
@@ -105,6 +109,11 @@ void Node::changeId(ID newId)
 	generator.markAsUsed(newId);
 
 	m_id = newId;
+}
+
+EValueState Node::getState(size_t pinIndex)
+{
+	return m_OperatorState[pinIndex];
 }
 
 void Node::pulse(size_t index)
@@ -228,9 +237,37 @@ ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 
 void Node::unplugAll()
 {
-	for (size_t i = 0L; i < m_inputs.size(); ++i) { unplugInput(i); }
+	for (size_t i = 0L; i < m_inputs.size(); ++i)
+	{
+		unplugInput(i);
+	}
 
-	for (size_t i = 0L; i < m_outputs.size(); ++i) { unplugOutput(i); }
+	for (size_t i = 0L; i < m_outputs.size(); ++i)
+	{
+		for (const auto& connected : m_outputs[i].m_outputs)
+		{
+			unplugOutput(i);
+
+			const auto node = connected->m_master;
+			if (node->m_operation->isConstructor)
+			{
+				bool allUnplugged = true;
+
+				for (const auto& input : node->m_inputs)
+				{
+					if (input.isPluggedIn())
+					{
+						allUnplugged = false;
+						break;
+					}
+				}
+
+				if (allUnplugged)
+					for (auto& state : node->m_OperatorState)
+						state = EValueState::Editable;
+			}
+		}
+	}
 }
 
 void Node::unplugInput(size_t index)
@@ -258,6 +295,23 @@ void Node::unplugInput(size_t index)
 
 		auto& myPin		= inputs[index];
 		myPin.m_input = nullptr;
+	}
+
+	if (m_operation->isConstructor)
+	{
+		bool allUnplugged = true;
+
+		for (const auto& input : m_inputs)
+		{
+			if (input.isPluggedIn())
+			{
+				allUnplugged = false;
+				break;
+			}
+		}
+
+		if (allUnplugged)
+			for (auto& state : m_OperatorState) state = EValueState::Editable;
 	}
 }
 

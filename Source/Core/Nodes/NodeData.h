@@ -48,6 +48,18 @@ enum class EValueType
 	Ptr,
 };
 
+namespace Core
+{
+/// b1, b2 - b1 is editable bit, b2 is synergies bit
+enum class EValueState
+{
+	Editable		= 0x0002, ///< 10
+	EditableSyn = 0x0003, ///< 11
+	Locked			= 0x0000, ///< 00
+	LockedSyn		= 0x0001, ///< 01
+};
+}
+
 const std::string& valueTypeToString(EValueType type);
 
 /**

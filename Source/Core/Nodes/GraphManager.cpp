@@ -47,6 +47,9 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	// Attach given operator output pin to this operator input pin.
 	input.m_input = &output;
 
+	for (auto& state : rightNode->m_OperatorState)
+		state = EValueState::Locked;
+
 	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
 	{
 		leftNode->spreadSignal(fromIndex);
