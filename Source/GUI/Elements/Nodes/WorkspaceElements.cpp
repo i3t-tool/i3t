@@ -46,7 +46,6 @@ WorkspaceNode::WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string cons
 
 bool WorkspaceNode::beforeContent()
 {
-    /* \todo JH background by settings in different type of nodes */
     /* whole node background */
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBg)), I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_All);
@@ -79,16 +78,6 @@ bool WorkspaceNode::bypassFocusForInteractionAction()
 {
     return diwne.getDiwneAction() != DIWNE::DiwneAction::SelectionRectFull && diwne.getDiwneAction() != DIWNE::DiwneAction::SelectionRectTouch && (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
 }
-
-//bool WorkspaceNode::finalize()
-//{
-//    if(bypassHoldAction() || bypassSelectAction() || bypassRaisePopupAction())
-//    {
-//        return getNodeRectDiwne().Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
-//    }
-//    return m_hovered; /* hovering block interaction with other nodes and with background */
-//}
-
 
 void WorkspaceNode::drawMenuDelete()
 {

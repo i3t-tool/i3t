@@ -39,18 +39,24 @@ bool DiwneObject::drawDiwne(DrawMode drawMode/*=DrawMode::Interacting*/)
         m_inner_interaction_happen |= afterContentDiwne();
 
 #ifdef DIWNE_DEBUG
+DIWNE_DEBUG((diwne), {
         switch (m_drawMode) {case DrawMode::Interacting: ImGui::Text("Interacting mode"); break;
                              case DrawMode::JustDraw:    ImGui::Text("JustDraw mode");    break;}
         ImGui::TextUnformatted(m_labelDiwne.c_str());
         if (m_isHeld) ImGui::TextUnformatted("Held");
         if (m_isDraged) ImGui::TextUnformatted("Dragged");
         if (m_selected) ImGui::TextUnformatted("Selected");
+}); /* close of macro */
 #endif // DIWNE_DEBUG
+
         end();
         updateSizes();
 #ifdef DIWNE_DEBUG
+DIWNE_DEBUG((diwne), {
         diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255,0,0,50), 0, ImDrawCornerFlags_None, 3);
+}); /* close of macro */
 #endif // DIWNE_DEBUG
+
         m_inner_interaction_happen |= afterEndDiwne();
         m_inner_interaction_happen |= processInteractionsDiwne();
     }
@@ -132,8 +138,10 @@ bool DiwneObject::processInteractionsDiwne()
         interaction_happen |= processInteractions();
     }
 #ifdef DIWNE_DEBUG
+DIWNE_DEBUG((diwne), {
     if(m_focused) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,50), 0, ImDrawCornerFlags_None, 15);}
     if(m_focusedForInteraction) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,255), 0, ImDrawCornerFlags_None, 10);}
+}); /* close of macro */
 #endif // DIWNE_DEBUG
     interaction_happen |= processShowPopupDiwne();
     return interaction_happen;

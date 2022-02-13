@@ -4,30 +4,6 @@
 
 
 
-/// \todo Will be removed, Core::Transform maps are not more accessible.
-/*
-std::map<Core::Transform::DataMap const*, std::string> WorkspaceDatamapName = {
-		{&Core::Transform::g_Free, "Free"},
-		{&Core::Transform::g_Scale, "Scale"},
-		//{&Core::Transform::g_UniformScale, "Uniform scale"},
-		{&Core::Transform::g_EulerX, "EulerX"},
-		{&Core::Transform::g_EulerY, "EulerY"},
-		{&Core::Transform::g_EulerZ, "EulerZ"},
-		{&Core::Transform::g_Translate, "Translate"},
-		{&Core::Transform::g_AllLocked, "Locked"},
-		{&Core::Transform::g_Ortho, "Ortho"},
-		{&Core::Transform::g_Frustum, "Frustum"},
-		{&Core::Transform::g_Perspective, "Perspective"}};
-
-std::vector<Core::Transform::DataMap const*> WorkspaceDatamapMenuList = {
-		&Core::Transform::g_Free, &Core::Transform::g_Scale,
-		//&Core::Transform::g_UniformScale,
-		&Core::Transform::g_EulerX, &Core::Transform::g_EulerY, &Core::Transform::g_EulerZ, &Core::Transform::g_Translate,
-		&Core::Transform::g_AllLocked, &Core::Transform::g_Ortho, &Core::Transform::g_Frustum,
-		&Core::Transform::g_Perspective};
-*/
-// endtodo
-
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNode(diwne, nodebase->getId(), nodebase->getOperation()->keyWord, nodebase->getOperation()->defaultLabel )
     ,   m_nodebase(nodebase)

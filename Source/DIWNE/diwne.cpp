@@ -63,6 +63,8 @@ void Diwne::begin()
     ImGui::BeginGroup();
 
 #ifdef DIWNE_DEBUG
+ImGui::Checkbox("Show debug texts", &(m_diwneDebug_on));
+DIWNE_DEBUG((*this), {
     ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255,0,0), 0, ImDrawCornerFlags_None, 10);
     ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x, m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y,
                         m_workAreaScreen.Min.x, m_workAreaScreen.Min.y, m_workAreaScreen.Max.x, m_workAreaScreen.Max.y).c_str());
@@ -92,6 +94,8 @@ void Diwne::begin()
         case DiwneAction::DragLink: ImGui::Text("PrevDiwneAction: DragLink"); break;
         default: ImGui::Text("PrevDiwneAction: Unknown");
     }
+
+}); /* close of macro */
 #endif // DIWNE_DEBUG
 }
 
@@ -122,13 +126,14 @@ bool Diwne::afterEndDiwne()
 bool Diwne::processInteractionsDiwne()
 {
     bool interaction_happen = false;
+
+    interaction_happen |= DiwneObject::processInteractionsDiwne();
+
     if ( m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction (focus on node) is no problem with this actions */
     {
         interaction_happen |= processDiwneZoom();
         interaction_happen |= processSelectionRectangle();
     }
-
-    interaction_happen |= DiwneObject::processInteractionsDiwne();
 
     return interaction_happen;
 }

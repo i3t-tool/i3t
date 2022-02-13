@@ -179,23 +179,29 @@ bool WorkspaceSequence::middleContent()
             push_index = i;
         }
     }
-    if (push_index >= 0 && !dragedNode->isInSequence()) /* already in sequence if second drawing or other sequence */
-    {
-        moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
-    }
-
-    /* pop NodeFrom Sequence */
-    if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode/* || diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode*/)
-    {
-        dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
-        if (dragedNode != nullptr) /* only transformation can be in Sequence*/
+//    if (m_drawMode == DIWNE::DrawMode::Interacting)
+//    {
+        if ( push_index >= 0 && !dragedNode->isInSequence()) /* already in sequence if second drawing or other sequence */
         {
-            if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
+            moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+            inner_interaction_happen |= true;
+        }
+
+        /* pop NodeFrom Sequence */
+        if ( m_drawMode == DIWNE::DrawMode::Interacting &&  diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+        {
+            dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
+            if (dragedNode != nullptr) /* only transformation can be in Sequence*/
             {
-                moveNodeToWorkspace(dragedNode);
+                if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
+                {
+                    moveNodeToWorkspace(dragedNode);
+                    inner_interaction_happen |= true;
+                }
             }
         }
-    }
+//    }
+
 
 
     return inner_interaction_happen;

@@ -66,10 +66,10 @@ class Node : public DiwneObject
 
             bool interaction_happen = drawDiwne(drawMode);
 
-            if(drawMode == DrawMode::Interacting && interaction_happen)
+            if(/*drawMode == DrawMode::Interacting && */interaction_happen)
             {
                diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-               if (!(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode || diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneAction() == DiwneAction::FocusOnObject)) diwne.setDiwneAction(DiwneAction::InteractingContent);
+               if (!(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode || diwne.getDiwneAction() == DiwneAction::TouchNode || diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneAction() == DiwneAction::FocusOnObject)) diwne.setDiwneAction(DiwneAction::InteractingContent);
             }
 
             return interaction_happen;
@@ -83,12 +83,15 @@ class Node : public DiwneObject
 
         virtual ImRect getRectDiwne() const {return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
 
+        virtual bool processFocused();
         virtual bool processFocusedForInteraction();
         virtual bool processSelected();
         virtual bool processUnselected();
         virtual bool processHold();
         virtual bool processUnhold();
         virtual bool processDrag();
+
+        virtual bool bypassTouchAction();
 
         virtual bool topContent();
         virtual bool leftContent();
@@ -124,7 +127,6 @@ class Node : public DiwneObject
         DrawMode m_drawMode;
 
     private:
-        DIWNE::ID m_idDiwne;
 
         void setNodeRectsPositionDiwne(ImVec2 const& position);
         void translateNodeRectsDiwne(ImVec2 const& amount);

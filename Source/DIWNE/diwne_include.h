@@ -8,9 +8,7 @@
 # define IMGUI_DEFINE_MATH_OPERATORS
 # include <imgui_internal.h>
 
-
-
-#define DIWNE_DEBUG
+#define DIWNE_DEBUG(node_editor, debugCode) do{ if(node_editor.m_diwneDebug_on){ debugCode } }while(0) /* do-while only for code-technical reason */
 
 namespace DIWNE
 {
@@ -42,6 +40,8 @@ enum DiwneAction
     NewLink,
     HoldLink,
     DragLink, /* dragging already existing/connected link */
+
+    TouchNode,
 
     HoldWorkarea,
     DragWorkarea,
