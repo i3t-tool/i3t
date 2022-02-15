@@ -13,13 +13,13 @@
 #include "imgui.h"
 
 #include "Core/Defs.h"
-#include "Core/GlfwWindow.h"
+#include "Core/Window.h"
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
 class Module;
 class ICommand;
-class GlfwWindow;
+class Window;
 class MainMenuBar;
 class World;
 class Scripting;
@@ -102,7 +102,7 @@ private:
 	World* m_world;
 	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
-	GlfwWindow* m_window;
+	Window* m_window;
 
 	/// Array of commands which the application is going to process in its main loop.
 	std::vector<ICommand*> m_commands;

@@ -10,7 +10,7 @@
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-class GlfwWindow
+class Window
 {
 public:
 	/**
@@ -20,7 +20,7 @@ public:
 	 */
 	void init();
 
-	~GlfwWindow();
+	~Window();
 
 	void setTitle(const char* title);
 	void swapBuffers();

@@ -79,25 +79,23 @@ std::string dumpCycle(const Core::Cycle& cycle) { return fmt::format(""); }
 
 NodeData dumpCamera(const Ptr<GuiCamera>& camera)
 {
-	return NodeData{};
-
-	/*
 	static std::string formatString = std::string(g_baseFormatString) +
 			"    proj_transforms: {}\n"
 			"    view_transforms: {}\n";
 
-	std::string projTransforms = dumpTransformIds(camera->getProj());
+	std::string projTransforms = dumpTransformIds(camera->getProjection());
 	std::string viewTransforms = dumpTransformIds(camera->getView());
 
+    const auto& node = camera->getNodebase();
 	NodeData data;
-	data.node =
-			fmt::format(formatString, camera->getId(), camera->getOperation()->keyWord, projTransforms, viewTransforms);
-	for (const auto& in : camera->getInputPins())
+	data.node = fmt::format(formatString, camera->getId(), node->getOperation()->keyWord,
+                            camera->getNodePositionDiwne().x, camera->getNodePositionDiwne().y,
+                            projTransforms, viewTransforms);
+	for (const auto& in : node->getInputPins())
 	{
 		if (in.isPluggedIn()) data.edges.push_back(dumpEdge(in));
 	}
 	return data;
-	 */
 }
 
 NodeData dumpSequence(const Ptr<GuiSequence>& guiSequence)
@@ -212,12 +210,13 @@ std::string SceneRawData::toString() const
 /// \see addNodeToPosition(ImVec2 const)
 std::map<
     std::string_view,
-		std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
-		> createFns;
+	std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
+> createFns;
+
 std::map<
     std::string_view,
-		std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
-		> createTransformFns;
+	std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
+> createTransformFns;
 
 template <int N, int Max>
 void doForOperator()
@@ -247,6 +246,8 @@ void initCreateFns()
 	doForTransform<0, transformCount>();
 }
 
+//===-- Visitors ----------------------------------------------------------===//
+
 bool DumpVisitor::m_isInitialized = false;
 
 DumpVisitor::DumpVisitor()
@@ -274,6 +275,14 @@ void DumpVisitor::visit(const Ptr<GuiCamera>& node)
 {
 	// Dump camera sequences.
 	m_sceneData.addCamera(dumpCamera(node));
+
+	for (const auto& transform : node->getProjection()->getInnerWorkspaceNodes())
+		if (auto result = dumpTransform(std::static_pointer_cast<GuiTransform>(transform)))
+			m_sceneData.addTransform(*result);
+
+	for (const auto& transform : node->getView()->getInnerWorkspaceNodes())
+		if (auto result = dumpTransform(std::static_pointer_cast<GuiTransform>(transform)))
+			m_sceneData.addTransform(*result);
 }
 
 void DumpVisitor::visit(const Ptr<GuiCycle>& node)
@@ -307,6 +316,8 @@ void DumpVisitor::visit(const Ptr<GuiTransform>& node)
 
 bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
 
+//===-- Builder helpers ---------------------------------------------------===//
+
 GuiNodePtr findNode(std::vector<GuiNodePtr>& nodes, Core::ID id)
 {
 	for (const auto& node : nodes)
@@ -314,6 +325,23 @@ GuiNodePtr findNode(std::vector<GuiNodePtr>& nodes, Core::ID id)
 			return node;
 
 	return nullptr;
+}
+
+void insertTransformsToSequence(YAML::Node& transformIds, Ptr<GuiSequence> sequence, std::vector<GuiNodePtr>& nodes)
+{
+	int i = 0;
+
+	for (auto&& transformIdRaw : transformIds)
+	{
+		auto transformId = transformIdRaw.as<int>();
+		auto transform = findNode(nodes, transformId);
+
+		if (transform)
+		{
+			sequence->moveNodeToSequence(transform, i);
+			++i;
+		}
+	}
 }
 
 //===-- Builders ----------------------------------------------------------===//
@@ -335,6 +363,29 @@ void buildOperator(YAML::Node& node)
 		auto op = createFns[enumVal](ImVec2{ posX, posY });
 
 		op->getNodebase()->changeId(id);
+	}
+}
+
+void buildCamera(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
+{
+	if (node["type"])
+	{
+		auto enumVal = node["type"].as<std::string>();
+
+		auto id = node["id"].as<int>();
+
+		auto posX = node["position"][0].as<float>();
+		auto posY = node["position"][1].as<float>();
+
+		auto camera = addNodeToNodeEditor<WorkspaceCamera>(ImVec2{ posX, posY });
+
+		auto projTransforms = node["proj_transforms"];
+		insertTransformsToSequence(projTransforms, camera->getProjection(), workspaceNodes);
+
+		auto viewTransforms = node["view_transforms"];
+		insertTransformsToSequence(viewTransforms, camera->getView(), workspaceNodes);
+
+		camera->getNodebase()->changeId(id);
 	}
 }
 
@@ -373,18 +424,14 @@ void buildSequence(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
 
 		auto sequence = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().addNodeToPosition<WorkspaceSequence>({ posX, posY });
 
-		auto transformIds = node["transforms"]; // = createTransformFns[enumVal](ImVec2{ posX, posY });
-		for (auto&& transformIdRaw : transformIds)
-		{
-			auto transformId = transformIdRaw.as<int>();
-			auto transform = findNode(workspaceNodes, transformId);
-			if (transform)
-				sequence->moveNodeToSequence(transform);
-		}
+		auto transformIds = node["transforms"];
+		insertTransformsToSequence(transformIds, sequence, workspaceNodes);
 
 		sequence->getNodebase()->changeId(id);
 	}
 }
+
+//===----------------------------------------------------------------------===//
 
 void connectNodes(YAML::Node& sceneData, SceneData& scene)
 {
@@ -414,6 +461,8 @@ SceneData loadScene(const std::string& rawScene)
 {
 	SceneData scene;
 
+	auto& workspaceNodes = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+
 	/// \todo MH
 	DumpVisitor visitor;
 
@@ -430,7 +479,11 @@ SceneData loadScene(const std::string& rawScene)
 
 		auto sequences = sceneData["sequences"];
 		for (auto&& sequence : sequences)
-			buildSequence(sequence, I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
+			buildSequence(sequence, workspaceNodes);
+
+		auto cameras = sceneData["cameras"];
+		for (auto&& camera : cameras)
+			buildCamera(camera, workspaceNodes);
 
 		// Connect all nodes.
 		connectNodes(sceneData, scene);
@@ -455,7 +508,7 @@ bool saveScene(const std::string& filename, const SceneData& scene)
 {
 	DumpVisitor visitor;
 	std::string rawState = visitor.dump(scene.nodes);
-	std::ofstream f(filename + ".scene");
+	std::ofstream f(filename);
 	f << rawState;
 
 	return true;

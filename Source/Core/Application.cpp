@@ -60,7 +60,7 @@ void Application::initModules()
 
 void Application::initWindow()
 {
-	m_window = new GlfwWindow();
+	m_window = new Window();
 	m_window->init();
 }
 

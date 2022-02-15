@@ -160,6 +160,12 @@ void MainMenuBar::showFileMenu()
 			bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
 			if (hasFilename)
 			{
+				fs::path path(filename);
+				if (path.extension().string() != ".scene")
+				{
+					filename += ".scene";
+				}
+
 				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 				if (ww)
 					saveScene(filename, SceneData{ ww->getNodeEditor().m_workspaceCoreNodes });

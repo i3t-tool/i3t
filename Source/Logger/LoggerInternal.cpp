@@ -7,7 +7,7 @@
 #include "spdlog/sinks/ostream_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
 
-#include "Core/GlfwWindow.h"
+#include "Core/Window.h"
 
 Logger& Logger::getInstance()
 {

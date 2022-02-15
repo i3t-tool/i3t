@@ -1,4 +1,4 @@
-#include "GlfwWindow.h"
+#include "Window.h"
 
 #include <pgr.h>
 
@@ -10,7 +10,7 @@ void glfwErrorCallback(int error, const char* description)
 	pgr::dieWithError(description);
 }
 
-void GlfwWindow::init()
+void Window::init()
 {
 	// GLFW initialization. -----------------------------------------------------
 	glfwSetErrorCallback(glfwErrorCallback);
@@ -47,22 +47,22 @@ void GlfwWindow::init()
 	 */
 }
 
-GlfwWindow::~GlfwWindow()
+Window::~Window()
 {
 	glfwTerminate();
 }
 
-GLFWwindow* GlfwWindow::get()
+GLFWwindow* Window::get()
 {
 	return m_mainWindow;
 }
 
-void GlfwWindow::setTitle(const char* title)
+void Window::setTitle(const char* title)
 {
 	glfwSetWindowTitle(m_mainWindow, title);
 }
 
-void GlfwWindow::swapBuffers()
+void Window::swapBuffers()
 {
 	glfwSwapBuffers(m_mainWindow);
 }

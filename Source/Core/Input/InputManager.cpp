@@ -4,7 +4,7 @@
 #include <imgui_internal.h>
 
 #include "Core/Application.h"
-#include "Core/GlfwWindow.h"
+#include "Core/Window.h"
 #include "InputBindings.h"
 #include "Logger/LoggerInternal.h"
 
