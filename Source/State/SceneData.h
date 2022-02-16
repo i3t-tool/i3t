@@ -3,10 +3,6 @@
 #include "GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
 
-/// GUI nodes
-using NodeClass      = WorkspaceNodeWithCoreData;
-using TransformClass = WorkspaceTransformation;
-
 /// Node data as string
 struct NodeData
 {
@@ -17,6 +13,8 @@ struct NodeData
 /// Whole scene in text format.
 class SceneRawData
 {
+	using RawData = std::vector<std::string>;
+
 public:
 	void addOperator(const NodeData& data)
 	{
@@ -38,6 +36,12 @@ public:
 		addEdges(data.edges);
 	}
 
+	void addScreen(const NodeData& data)
+	{
+		screens.push_back(data.node);
+		addEdges(data.edges);
+	}
+
 	void clear()
 	{
 		operators.clear();
@@ -54,18 +58,19 @@ private:
 		}
 	}
 
-	std::vector<std::string> operators;
-	std::vector<std::string> transforms;
-	std::vector<std::string> sequences;
-	std::vector<std::string> cameras;
-	std::vector<std::string> edges;
+	RawData operators;
+	RawData transforms;
+	RawData sequences;
+	RawData cameras;
+	RawData screens;
+	RawData edges;
 };
 
 struct SceneData
 {
-	std::vector<Ptr<NodeClass>> nodes;
+	std::vector<Ptr<GuiNode>> nodes;
 
-	Ptr<NodeClass> findNode(Core::ID id)
+	Ptr<GuiNode> findNode(Core::ID id)
 	{
 		for (auto& node : nodes)
 			if (node->getId() == id)

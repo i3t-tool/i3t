@@ -2,7 +2,7 @@
 //
 //#include "Core/Nodes/GraphManager.h"
 //
-//#include "State/DumpVisitor.h"
+//#include "State/SerializationVisitor.h"
 //#include "State/Manager.h"
 //#include "State/Stateful.h"
 //
@@ -20,7 +20,7 @@
 //
 //	Memento getState() override
 //	{
-//		DumpVisitor visitor;
+//		SerializationVisitor visitor;
 //
 //		State state;
 //		state.push_back(visitor.dump(m_nodes)); // \todo JH not work

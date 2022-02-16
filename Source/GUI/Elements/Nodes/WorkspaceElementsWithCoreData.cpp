@@ -1,8 +1,8 @@
 #include "WorkspaceElementsWithCoreData.h"
 
+#include "State/StateManager.h"
+
 #include "../Windows/WorkspaceWindow.h"
-
-
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNode(diwne, nodebase->getId(), nodebase->getOperation()->keyWord, nodebase->getOperation()->defaultLabel )
@@ -780,22 +780,27 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 			1.0f); /* if power >1.0f the number changes logarithmic */
     //ImGui::SetItemAllowOverlap();
 
-    if (diwne.bypassIsItemActive())
-        inner_interaction_happen = true;
+	if (diwne.bypassIsItemActive())
+			inner_interaction_happen = true;
 
-    if (!inactive && !diwne.m_popupDrawn)
+	if (!inactive && !diwne.m_popupDrawn)
 	{
-	    if (diwne.bypassFocusAction() && diwne.bypassRaisePopupAction()) /* \todo JH focus and raise should be static -> now is intertwined with diwne */
-        {
-            ImGui::OpenPopup(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup);
-            diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
-        }
+		if (diwne.bypassFocusAction() && diwne.bypassRaisePopupAction()) /* \todo JH focus and raise should be static -> now is intertwined with diwne */
+		{
+			ImGui::OpenPopup(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup);
+			diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
+		}
 
-        diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+		diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
 		inner_interaction_happen |= diwne.m_popupDrawn;
 
 		valueChanged |= valueChangedByPopup;
 	}
+
+	/// TEST /////////////////////////////////////////////////
+	if (valueChanged)
+		StateManager::instance().takeSnapshot();
+	//////////////////////////////////////////////////////////
 
 	if (inactive)
 	{

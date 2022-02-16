@@ -12,7 +12,7 @@ class BeforeCloseModal : public IWindow
 public:
 	I3T_WINDOW(BeforeCloseModal)
 
-	BeforeCloseModal(){};
+	BeforeCloseModal() = default;
 
 	/**
 	 * Show Close? modal centered in main window.

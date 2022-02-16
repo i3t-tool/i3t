@@ -2,7 +2,7 @@
 
 // Project includes
 #include "Core/Nodes/GraphManager.h"
-#include "State/DumpVisitor.h"
+#include "State/SerializationVisitor.h"
 
 // Test includes
 #include "Utils.h"
@@ -13,7 +13,7 @@
 //	auto sceneRepr = createTestOperators();
 //	auto sceneData = load(sceneRepr);
 //
-//	DumpVisitor visitor;
+//	SerializationVisitor visitor;
 //	auto expectedSceneRepr = visitor.dump({ sceneData.operators }); // \todo JH not work
 //
 //	EXPECT_EQ(expectedSceneRepr, sceneRepr);

@@ -14,8 +14,9 @@
 
 #include "Core/Defs.h"
 #include "Core/Window.h"
+#include "State/Stateful.h"
 
-constexpr const char* ImGui_GLSLVersion = "#version 140";
+constexpr const char* g_baseTitle = "I3T - An Interactive Tool for Teaching Transformations";
 
 class Module;
 class ICommand;
@@ -29,7 +30,7 @@ class UIModule;
  * Application class.
  * A wrapper for UI windows.
  */
-class Application
+class Application : public IStateful
 {
 public:
 	Application();
@@ -46,11 +47,21 @@ public:
 	static Application& get();
 	UIModule* getUI();
 
+	//===----------------------------------------------------------------------===//
+
 	/**
 	 * Init OpenGL stuffs before display loop.
 	 * Taken from Muller GLFW. Initializes ImGui and I3T stuffs.
 	 */
 	void initWindow();
+
+	GLFWwindow* mainWindow();
+
+	const std::string& getTitle();
+
+	void setTitle(const std::string& title);
+
+	//===----------------------------------------------------------------------===//
 
 	/**
 	 * Enter main loop.
@@ -65,7 +76,6 @@ public:
 	void run();
 
 	World* world();
-	GLFWwindow* mainWindow();
 
 	/**
 	 * Issue command.
@@ -86,11 +96,20 @@ public:
 	 */
 	bool initI3T();
 
+	//===-- State functions ---------------------------------------------------===//
+
+	Memento getState() override;
+
+	void setState(const Memento &) override;
+
+	//===----------------------------------------------------------------------===//
+
 private:
 	static Application s_instance;
 
 	UIModule* m_ui;
 	std::vector<Module*> m_modules;
+
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback resulting in no
 	 * 			window update.
@@ -130,8 +149,6 @@ private:
 	 * Shutdown whole application.
 	 */
 	void onClose();
-
-	void onSave();
 
 	/**
 	 * \brief	Updates the world and the mouse button state, mouseDelta, mousePrev and throws JUST_Pressed to PRESSED

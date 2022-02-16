@@ -1,4 +1,4 @@
-#include "DumpVisitor.h"
+#include "SerializationVisitor.h"
 
 #include <numeric>
 #include <unordered_map>
@@ -7,17 +7,17 @@
 
 #include "GuiAdapter.h"
 #include "Core/Nodes/GraphManager.h"
-#include "GUI//Elements/Windows/WorkspaceWindow.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
+#include "Core/Nodes/Operations.h"
 
 /// Base format string for node.
 constexpr const char* g_baseFormatString = "  - id: {}\n"
 																					 "    type: {}\n"
 																					 "    position: [{}, {}]\n";
 
-std::optional<NodeData> dumpTransform(Ptr<TransformClass> guiTransform);
+std::optional<NodeData> dumpTransform(Ptr<GuiTransform> guiTransform);
 
 std::string dumpValue(EValueType value, const Core::NodePtr& node)
 {
@@ -121,7 +121,7 @@ NodeData dumpSequence(const Ptr<GuiSequence>& guiSequence)
  * \param node
  * \return Nested block in YAML format.
  */
-NodeData dumpOperator(Ptr<NodeClass> guiNode)
+NodeData dumpOperator(Ptr<GuiNode> guiNode)
 {
 	auto node = guiNode->getNodebase();
 
@@ -146,7 +146,7 @@ NodeData dumpOperator(Ptr<NodeClass> guiNode)
 	return data;
 }
 
-std::optional<NodeData> dumpTransform(Ptr<TransformClass> guiTransform)
+std::optional<NodeData> dumpTransform(Ptr<GuiTransform> guiTransform)
 {
 	auto transform = guiTransform->getNodebase()->as<Core::Transformation>();
 
@@ -180,6 +180,18 @@ std::optional<NodeData> dumpTransform(Ptr<TransformClass> guiTransform)
 	return data;
 }
 
+std::optional<NodeData> dumpScreen(Ptr<GuiScreen> guiScreen)
+{
+	auto coreNode = guiScreen->getNodebase();
+
+	static std::string formatString = std::string(g_baseFormatString) +
+			"    size: {}\n";
+
+	return dumpOperator(guiScreen);
+}
+
+//===----------------------------------------------------------------------===//
+
 std::string SceneRawData::toString() const
 {
 	std::string result;
@@ -200,12 +212,18 @@ std::string SceneRawData::toString() const
 	for (const auto& camera : cameras) { result += camera; }
 	if (cameras.empty()) result += "    {}\n";
 
+	result += "screens:\n";
+	for (const auto& screen : screens) { result += screen; }
+	if (screens.empty()) result += "    {}\n";
+
 	result += "edges:\n";
 	if (edges.empty()) result += "    {}\n";
 	else result += Utils::concat(edges, "\n");
 
 	return result;
 }
+
+//===----------------------------------------------------------------------===//
 
 /// \see addNodeToPosition(ImVec2 const)
 std::map<
@@ -248,9 +266,9 @@ void initCreateFns()
 
 //===-- Visitors ----------------------------------------------------------===//
 
-bool DumpVisitor::m_isInitialized = false;
+bool SerializationVisitor::m_isInitialized = false;
 
-DumpVisitor::DumpVisitor()
+SerializationVisitor::SerializationVisitor()
 {
 	if (!m_isInitialized)
 	{
@@ -259,7 +277,7 @@ DumpVisitor::DumpVisitor()
 	}
 }
 
-std::string DumpVisitor::dump(const std::vector<Ptr<NodeClass>>& nodes)
+std::string SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
 {
 	m_sceneData.clear();
 
@@ -271,7 +289,7 @@ std::string DumpVisitor::dump(const std::vector<Ptr<NodeClass>>& nodes)
 	return m_sceneData.toString();
 }
 
-void DumpVisitor::visit(const Ptr<GuiCamera>& node)
+void SerializationVisitor::visit(const Ptr<GuiCamera>& node)
 {
 	// Dump camera sequences.
 	m_sceneData.addCamera(dumpCamera(node));
@@ -285,18 +303,18 @@ void DumpVisitor::visit(const Ptr<GuiCamera>& node)
 			m_sceneData.addTransform(*result);
 }
 
-void DumpVisitor::visit(const Ptr<GuiCycle>& node)
+void SerializationVisitor::visit(const Ptr<GuiCycle>& node)
 {
 
 }
 
-void DumpVisitor::visit(const Ptr<GuiOperator>& guiNode)
+void SerializationVisitor::visit(const Ptr<GuiOperator>& guiNode)
 {
 	auto node = guiNode->getNodebase();
 	m_sceneData.addOperator(dumpOperator(guiNode));
 }
 
-void DumpVisitor::visit(const Ptr<GuiSequence>& node)
+void SerializationVisitor::visit(const Ptr<GuiSequence>& node)
 {
 	// Dump sequence and its transforms.
 	m_sceneData.addSequence(dumpSequence(node));
@@ -306,12 +324,18 @@ void DumpVisitor::visit(const Ptr<GuiSequence>& node)
 			m_sceneData.addTransform(*result);
 }
 
-void DumpVisitor::visit(const Ptr<GuiTransform>& node)
+void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
 {
 	// Dump orphaned transform.
 	auto result = dumpTransform(node);
 
 	if (result.has_value()) m_sceneData.addTransform(*result);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
+{
+	if (auto result = dumpScreen(node))
+		m_sceneData.addScreen(*result);
 }
 
 bool isParsedSceneValid(YAML::Node& parsedScene) { return parsedScene["operators"] && parsedScene["edges"]; }
@@ -342,6 +366,34 @@ void insertTransformsToSequence(YAML::Node& transformIds, Ptr<GuiSequence> seque
 			++i;
 		}
 	}
+}
+
+template <typename Node>
+glm::vec3 buildVec3(Node&& node)
+{
+	auto vec = node.as<std::vector<float>>();
+
+	return glm::make_vec3(vec.data());
+}
+
+template <typename Node>
+glm::vec4 buildVec4(Node&& node)
+{
+	auto vec = node.as<std::vector<float>>();
+
+	return glm::make_vec4(vec.data());
+}
+
+glm::mat4 buildMat4(YAML::Node& node)
+{
+	glm::mat4 result;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		result[i] = buildVec4(node[i]);
+	}
+
+	return result;
 }
 
 //===-- Builders ----------------------------------------------------------===//
@@ -405,7 +457,44 @@ void buildTransform(YAML::Node& node)
 
 		auto transform = createTransformFns[enumVal](ImVec2{ posX, posY });
 
-		transform->getNodebase()->changeId(id);
+		auto coreTransform = transform->getNodebase()->as<Core::Transformation>();
+
+		// transform default values
+		const auto& transformDefaults = Core::getTransformDefaults(enumVal);
+		// for (auto&& [key, val] : node["defaults"])
+		for (auto it = node["defaults"].begin(); it != node["defaults"].end(); ++it)
+		{
+			auto key = it->first.as<std::string>();
+			auto val = it->second;
+
+			auto type = transformDefaults.at(key);
+			switch (type)
+			{
+			case EValueType::Float:
+				coreTransform->setDefaultValue(key, val.as<float>());
+				break;
+			case EValueType::Vec3:
+				coreTransform->setDefaultValue(key, buildVec3(val));
+				break;
+			case EValueType::Quat:
+			{
+				const auto vec4 = buildVec4(val);
+				coreTransform->setDefaultValue(key,glm::make_quat(glm::value_ptr(vec4)));
+				break;
+			}
+			default:
+				break;
+			}
+			// coreTransform->setDefaultValue(keyStr, node["defaults"][key]);
+		}
+
+		auto valueNode = node["value"];
+		coreTransform->setValue(buildMat4(valueNode));
+
+		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies();
+		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();
+
+		coreTransform->changeId(id);
 	}
 }
 
@@ -431,20 +520,32 @@ void buildSequence(YAML::Node& node, std::vector<GuiNodePtr>& workspaceNodes)
 	}
 }
 
+void buildScreen(YAML::Node& node)
+{
+	if (node["type"])
+	{
+		auto id = node["id"].as<int>();
+
+		auto posX = node["position"][0].as<float>();
+		auto posY = node["position"][1].as<float>();
+
+		auto screen = addNodeToNodeEditor<GuiScreen>(ImVec2{ posX, posY });
+
+		screen->getNodebase()->changeId(id);
+	}
+}
+
 //===----------------------------------------------------------------------===//
 
-void connectNodes(YAML::Node& sceneData, SceneData& scene)
+void connectNodes(YAML::Node& sceneData, SceneData& scene, GuiNodes& workspaceNodes)
 {
 	auto edges = sceneData["edges"];
 	for (auto&& edge : edges)
 	{
 		if (edge.size() != 4) continue; // Edge is not valid.
 
-		/// \todo Keep scene in separate struct.
-		auto& nodes = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
-
-		auto lhs = findNode(nodes, edge[0].as<unsigned int>());
-		auto rhs = findNode(nodes, edge[2].as<unsigned int>());
+		auto lhs = findNode(workspaceNodes, edge[0].as<unsigned int>());
+		auto rhs = findNode(workspaceNodes, edge[2].as<unsigned int>());
 		if (lhs && rhs)
 		{
 			auto lhsPin = edge[1].as<unsigned int>();
@@ -457,14 +558,12 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene)
 	}
 }
 
-SceneData loadScene(const std::string& rawScene)
+SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes)
 {
 	SceneData scene;
 
-	auto& workspaceNodes = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
-
 	/// \todo MH
-	DumpVisitor visitor;
+	SerializationVisitor visitor;
 
 	auto sceneData = YAML::Load(rawScene);
 	if (isParsedSceneValid(sceneData))
@@ -485,31 +584,12 @@ SceneData loadScene(const std::string& rawScene)
 		for (auto&& camera : cameras)
 			buildCamera(camera, workspaceNodes);
 
+		auto screens = sceneData["screens"];
+		for (auto&& screen : screens)
+			buildScreen(screen);
+
 		// Connect all nodes.
-		connectNodes(sceneData, scene);
+		connectNodes(sceneData, scene, workspaceNodes);
 	}
 	return scene;
-}
-
-SceneData loadSceneFromFile(const std::string& sceneFile)
-{
-	std::ifstream f(sceneFile);
-	std::string rawScene;
-	if (f)
-	{
-		std::ostringstream ss;
-		ss << f.rdbuf(); // reading data
-		rawScene = ss.str();
-	}
-	return loadScene(rawScene);
-}
-
-bool saveScene(const std::string& filename, const SceneData& scene)
-{
-	DumpVisitor visitor;
-	std::string rawState = visitor.dump(scene.nodes);
-	std::ofstream f(filename);
-	f << rawState;
-
-	return true;
 }

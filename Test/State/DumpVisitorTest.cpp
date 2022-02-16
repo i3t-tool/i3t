@@ -1,13 +1,13 @@
 #include "gtest/gtest.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "State/DumpVisitor.h"
+#include "State/SerializationVisitor.h"
 
 #include "Core/Nodes/Utils.h"
 
-//TEST(DumpVisitor, GivesExpectedOutputForOperator)
+//TEST(SerializationVisitor, GivesExpectedOutputForOperator)
 //{
-//	DumpVisitor visitor;
+//	SerializationVisitor visitor;
 //
 //	auto result = visitor.dump({ Core::GraphManager::createNode<ENodeType::FloatToFloat>() }); // \todo JH not work
 //
@@ -17,7 +17,7 @@
 //	std::string pica = "";
 //}
 
-//TEST(DumpVisitor, SimpleSceneGetsSerializedCorrectly)
+//TEST(SerializationVisitor, SimpleSceneGetsSerializedCorrectly)
 //{
 //	auto float1 = Core::GraphManager::createNode<ENodeType::FloatToFloat>();
 //	auto float2 = Core::GraphManager::createNode<ENodeType::FloatToFloat>();
@@ -39,7 +39,7 @@
 //	float1->getId(), float2->getId(),
 //  float1->getId(), 0, float2->getId(), 0);
 //
-//	DumpVisitor visitor;
+//	SerializationVisitor visitor;
 //
 //	auto result = visitor.dump({ float1, float2 }); /* \todo JH not work */
 //

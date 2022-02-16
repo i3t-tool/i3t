@@ -6,10 +6,10 @@
 #include "State/NodeVisitor.h"
 #include "State/SceneData.h"
 
-class DumpVisitor : public NodeVisitor
+class SerializationVisitor : public NodeVisitor
 {
 public:
-	DumpVisitor();
+	SerializationVisitor();
 
 	/**
 	 * Get string representation of current scene.
@@ -29,7 +29,7 @@ public:
 	 *   - [1, 0, 4, 0]
 	 * \endcode
 	 */
-	std::string dump(const std::vector<Ptr<NodeClass>>& nodes);
+	std::string dump(const std::vector<Ptr<GuiNode>>& nodes);
 
 private:
 	/**
@@ -41,6 +41,7 @@ private:
 	void visit(const Ptr<GuiOperator>& node) override;
 	void visit(const Ptr<GuiSequence>& node) override;
 	void visit(const Ptr<GuiTransform>& node) override;
+	void visit(const Ptr<GuiScreen>& node) override;
 
 	/// Stores last scene representation.
 	SceneRawData m_sceneData;
@@ -48,13 +49,7 @@ private:
 	static bool m_isInitialized;
 };
 
-/// \todo MH move somewhere else.
-/// \todo MH make function internal.
-SceneData loadScene(const std::string& rawScene);
-
 /**
- * Loads scene to the Workspace Window.
+ * Creates all nodes in the workspace.
  */
-SceneData loadSceneFromFile(const std::string& sceneFile);
-
-bool saveScene(const std::string& filename, const SceneData& scene);
+SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);
