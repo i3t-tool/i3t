@@ -104,6 +104,14 @@ class WorkspaceDiwne : public DIWNE::Diwne
     void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftInteractingNodeToEnd();
+
+	void selectAll();
+
+
+	bool bypassZoomAction();
+	bool bypassDragAction();
+	bool bypassHoldAction();
+    bool bypassUnholdAction();
 };
 
 /*! \class class for Workspace window object

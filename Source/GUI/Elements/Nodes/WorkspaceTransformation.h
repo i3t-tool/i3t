@@ -46,4 +46,8 @@ public:
                                             std::vector<getter_function_pointer> const& getters,
                                             std::vector<setter_function_pointer> const& setters
                                              /*,   std::vector<unsigned char> const& datamap_values*/);
+
+    virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
+                                            std::vector<float*> const& local_data,
+                                            bool &value_changed);
 };

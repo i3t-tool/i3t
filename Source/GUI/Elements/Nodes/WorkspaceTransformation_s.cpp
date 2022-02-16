@@ -60,9 +60,10 @@ bool WorkspaceTransformationEulerZ::drawDataSetValues()
 WorkspaceTransformationScale::WorkspaceTransformationScale(DIWNE::Diwne &diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<ETransformType::Scale>()){setDataItemsWidth();}
 bool WorkspaceTransformationScale::drawDataSetValues()
 {
+    bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
 
-	for (auto& [key, valueStore] : nodebase->getDefaultValues())
+	for (auto& [key, valueStore] : nodebase->getDefaultValues()) /* více typů dat */
 	{
 		switch (valueStore.opValueType)
 		{
@@ -70,15 +71,18 @@ bool WorkspaceTransformationScale::drawDataSetValues()
 		{
 			auto localData = valueStore.getVec3();
 
-			if (ImGui::DragFloat3(key.c_str(), &localData[0]))
+            inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()) } /* \todo MH all/whole labels from core? */
+                                                        ,   {&localData[0], &localData[1], &localData[2]}
+                                                        ,   value_changed);
+			if (value_changed)
 			{
 				nodebase->setDefaultValue(key, localData);
-				return true;
+				setDataItemsWidth();
 			}
 		}
 		}
 	}
-	return false;
+	return inner_interaction_happen;
 
 	/*
     return drawDataSetValues_builder(
@@ -102,7 +106,7 @@ bool WorkspaceTransformationQuaternion::drawDataFull()
     glm::quat localData;
 
     interaction_happen = drawDataQuaternion(diwne, getId(), getNumberOfVisibleDecimal(), getDataItemsWidth(), getFloatPopupMode(),
-                                            m_nodebase->getData().getQuat(), m_nodebase->getDataMapRef(),
+                                            m_nodebase->getData().getQuat(), {m_nodebase->as<Core::Transformation>()->getValueState({0,0}), m_nodebase->as<Core::Transformation>()->getValueState({1,0}), m_nodebase->as<Core::Transformation>()->getValueState({2,0}), m_nodebase->as<Core::Transformation>()->getValueState({3,0})},
                                             valueChanged, localData);
 
     if (valueChanged)

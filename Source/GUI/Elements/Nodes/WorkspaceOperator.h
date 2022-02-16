@@ -65,30 +65,29 @@ public:
 class WorkspaceAngleAxisToQuat : public WorkspaceOperator<ENodeType::AngleAxisToQuat>
 {
 public:
-    int m_mode;
+    bool m_halfAngle;
     WorkspaceAngleAxisToQuat(DIWNE::Diwne& diwne)
         :   WorkspaceOperator<ENodeType::AngleAxisToQuat>(diwne)
-        ,   m_mode(0)
+        ,   m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
     {}
 
     bool leftContent()
     {
         bool interaction_happen = false;
 
-        interaction_happen |= ImGui::RadioButton("A", &m_mode, 0); ImGui::SameLine();
-        interaction_happen |= ImGui::RadioButton("A/2", &m_mode, 1);
+        interaction_happen |= ImGui::Checkbox("/2", &m_halfAngle);
 
         if (interaction_happen) /* mode changed */
         {
-            if(m_workspaceInputs.at(1-m_mode)->isConnected()) /* previous mode pin is connected */
+            if(m_workspaceInputs.at(m_halfAngle?0:1)->isConnected()) /* previous mode pin is connected */
             {
                 /* connect visible pin and unplug hidden one */
-                m_workspaceInputs.at(m_mode).get()->plug(m_workspaceInputs.at(1-m_mode)->getLink().getStartPin());
-                m_workspaceInputs.at(1-m_mode)->unplug();
+                m_workspaceInputs.at(m_halfAngle?1:0).get()->plug(m_workspaceInputs.at(m_halfAngle?0:1)->getLink().getStartPin());
+                m_workspaceInputs.at(m_halfAngle?0:1)->unplug();
             }
         }
 
-        interaction_happen |= m_workspaceInputs.at(m_mode)->drawDiwne();
+        interaction_happen |= m_workspaceInputs.at(m_halfAngle?1:0)->drawDiwne();
         interaction_happen |= m_workspaceInputs.at(2)->drawDiwne();
 
         return interaction_happen;

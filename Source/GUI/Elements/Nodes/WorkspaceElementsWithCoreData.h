@@ -283,23 +283,26 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 /* \todo maybe create from this function class "WithPins" and inherit other class from "WithPins" */
 //extern void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::ConstPinListRef coreInputPins, Core::Node::ConstPinListRef coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins);
 
+extern bool bypassFloatFocusAction();
+extern bool bypassFloatRaisePopupAction();
 
-extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, int const mapValue, bool& valueChanged);
+extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, Core::EValueState const& valueState, bool& valueChanged);
 extern void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& valueSelected);
 
-extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange );
+extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data, std::array<std::array<Core::EValueState, 4> const, 4> const& dataState, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange );
+//extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float& valueOfChange );
 extern int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
-extern bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec4& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::vec4& valueOfChange);
+extern bool drawDataVec4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec4& data, std::array<Core::EValueState, 4> const& dataState, bool& valueChanged, glm::vec4& valueOfChange);
 extern int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal);
 
-extern bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec3& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::vec3& valueOfChange);
+extern bool drawDataVec3(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec3& data, std::array<Core::EValueState, 3> const& dataState, bool& valueChanged, glm::vec3& valueOfChange);
 extern int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal);
 
-extern bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const float& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, float& valueOfChange);
+extern bool drawDataFloat(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode& floatPopupMode, const float& data, Core::EValueState const& dataState, bool& valueChanged, float& valueOfChange);
 extern int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal);
 
-extern bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data, const Core::Transform::DataMap& dataMap, bool& valueChanged, glm::quat& valueOfChange);
+extern bool drawDataQuaternion(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals, float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data, std::array<Core::EValueState, 4> const& dataState, bool& valueChanged, glm::quat& valueOfChange);
 extern int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal);
 
 extern void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node, std::vector<WorkspaceLevelOfDetail> const & levels_of_detail);

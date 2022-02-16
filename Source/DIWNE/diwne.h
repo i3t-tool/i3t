@@ -62,7 +62,7 @@ struct SettingsDiwne
 
     ImVec2 initPopupPosition = ImVec2(0,0);
 
-    ImColor selectionRectFullColor = ImColor(0,255,0,100);
+    ImColor selectionRectFullColor = ImColor(0,255,0,100); /* \todo JH recomandation is not to store ImColor, but ImU32 or ImVec4 */
     ImColor selectionRectTouchColor = ImColor(0,0,255,100);
 
     ImColor itemSelectedBorderColor = ImColor(100,100,0,255);

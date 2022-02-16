@@ -24,7 +24,25 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
 
-{}
+{
+}
+
+void WorkspaceDiwne::selectAll()
+{
+    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+    {
+        workspaceCoreNode->setSelected(true);
+
+        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
+        if (seq != nullptr)
+        {
+            for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+            {
+                nodeInSequence->setSelected(true);
+            }
+        }
+    }
+}
 
 //AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max,
 //                           dragDelta.x > 0 ? ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::SelectionRectFull)) : ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::SelectionRectTouch)) );
@@ -491,6 +509,17 @@ void WorkspaceDiwne::popupContent()
 
 		ImGui::Separator();
 
+		if (ImGui::BeginMenu("Select"))
+        {
+            if (ImGui::MenuItem("All nodes"))
+            {
+                selectAll();
+            }
+        ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
+
 		if (ImGui::BeginMenu("Delete"))
 			{
 				if (ImGui::MenuItem("All nodes"))
@@ -630,7 +659,7 @@ DIWNE_DEBUG((*this), {
 });
 #endif // DIWNE_DEBUG
 
-    m_interactionAllowed = !interaction_happen;
+    m_interactionAllowed = /*!interaction_happen*/ true;
 
     return interaction_happen;
 }
@@ -773,6 +802,11 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	}
 }
 
+bool WorkspaceDiwne::bypassZoomAction(){ return InputManager::isAxisActive("scroll") != 0; }
+bool WorkspaceDiwne::bypassDragAction(){ return InputManager::isAxisActive("pan") != 0; }
+bool WorkspaceDiwne::bypassHoldAction(){return InputManager::isAxisActive("pan") != 0;}
+bool WorkspaceDiwne::bypassUnholdAction(){return InputManager::isAxisActive("pan") == 0;}
+
 
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */
@@ -782,14 +816,21 @@ WorkspaceWindow::WorkspaceWindow(bool show)
     ,   m_first_frame(true)
     ,   m_wholeApplication(Application::get())
 {
+    // Input actions for workspace window.
+	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { m_workspaceDiwne.selectAll(); });
 
-// Input actions for workspace window.
-//	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { selectAll(); });
+	InputManager::isActionTriggered("raisePopup", EKeyState::Released);
+
+	InputManager::isAxisActive("dragElement");
+	InputManager::isAxisActive("dragEditor");
+
 //	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { invertSelection(); });
 //	Input.bindAction("navigateToContent", EKeyState::Pressed, [&]() { ne::NavigateToContent(); });
 //	Input.bindAction("center", EKeyState::Pressed, [&]() { ne::NavigateToSelection(); });
-
 }
+
+
+
 
 
 void WorkspaceWindow::render()
