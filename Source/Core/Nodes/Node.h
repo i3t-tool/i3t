@@ -176,10 +176,17 @@ public:
 	{
 		static_assert(std::is_base_of_v<Node, T>, "T must be derived from NodeBase class.");
 		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) && "Cannot cast to Ptr<T>.");
+
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
 
-public:
+	//===----------------------------------------------------------------------===//
+	/// \todo Break chain Node -> Transform.
+	std::vector<EValueState> m_OperatorState;
+
+	EValueState getState(size_t pinIndex = 0);
+	//===----------------------------------------------------------------------===//
+
 	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
 	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
 
@@ -389,6 +396,10 @@ protected:
 private:
 	void unplugAll();
 	void unplugInput(size_t index);
+
+private:
+	void onUnplugInput(size_t index);
+
 	void unplugOutput(size_t index);
 
 protected:

@@ -19,7 +19,7 @@ public:
 	//===-- Double dispatch ---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
-		// visitor.visit(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+		visitor.visit(std::static_pointer_cast<WorkspaceScreen>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 

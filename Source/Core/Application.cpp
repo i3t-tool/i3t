@@ -12,8 +12,8 @@
 #include "Loader/ConfigLoader.h"
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
-#include "State/DumpVisitor.h"
-#include "State/Manager.h"
+#include "State/SerializationVisitor.h"
+#include "State/StateManager.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
@@ -37,18 +37,15 @@ void Application::init()
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 
   InputManager::init();
-	StateManager::instance().setOriginator(m_ui);
+	StateManager::instance().setOriginator(this);
 
-	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&](){
-		onSave();
-	});
 	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&](){
-		Log::info("undo triggered");
-		StateManager::instance().undo();
+			Log::info("undo triggered");
+			StateManager::instance().undo();
 	});
 	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&](){
-		Log::info("redo triggered");
-		StateManager::instance().redo();
+			Log::info("redo triggered");
+			StateManager::instance().redo();
 	});
 }
 
@@ -58,11 +55,30 @@ void Application::initModules()
 		m->init();
 }
 
+//===----------------------------------------------------------------------===//
+
 void Application::initWindow()
 {
-	m_window = new GlfwWindow();
+	m_window = new Window();
 	m_window->init();
 }
+
+GLFWwindow* Application::mainWindow()
+{
+	return m_window->get();
+}
+
+const std::string& Application::getTitle()
+{
+	return m_window->getTitle();
+}
+
+void Application::setTitle(const std::string& title)
+{
+	m_window->setTitle(title.c_str());
+}
+
+//===----------------------------------------------------------------------===//
 
 void Application::run()
 {
@@ -74,7 +90,6 @@ void Application::run()
 		for (auto& command : m_commands)
 		{
 			command->execute();
-			delete command;
 		}
 		m_commands.clear();
 
@@ -95,15 +110,6 @@ void Application::onDisplay()
 	if (m_isPaused)
 	  return; // True to stop display update. Set by main.setPause(), not used now.
 	 */
-
-	/// \todo Window title change on scene or workspace change.
-	std::stringstream ss;
-	// ss << Config::WIN_TITLE;
-	// PF XX for video capture
-	ss << Config::WIN_TITLE;
-
-	// glfwSetWindowTitle(m_window->get(), ss.str().c_str());
-	m_window->setTitle(ss.str().c_str());
 
 	/// \todo after pressing quit, it still updates the logic and fails on nonexistent camera in Scene::keyUpdate()
 	/// \todo move the logic Update to the timer
@@ -152,6 +158,30 @@ bool Application::initI3T()
 	return b;
 }
 
+//===-- State functions ---------------------------------------------------===//
+
+Memento Application::getState()
+{
+	auto& nodes = m_ui->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+
+	SerializationVisitor visitor;
+	std::string rawState = visitor.dump(nodes);
+
+	return Memento({ rawState });
+}
+
+void Application::setState(const Memento& memento)
+{
+	auto& nodes = m_ui->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+	nodes.clear();
+
+	auto& rawScene = memento.getSnapshot().front();
+
+	StateManager::instance().loadScene(rawScene);
+}
+
+//===----------------------------------------------------------------------===//
+
 Application& Application::get()
 {
 	return s_instance;
@@ -167,11 +197,6 @@ World* Application::world()
 	return m_world;
 }
 
-GLFWwindow* Application::mainWindow()
-{
-	return m_window->get();
-}
-
 void Application::onBeforeClose()
 {
 	m_ui->showUniqueWindow<BeforeCloseModal>();
@@ -180,17 +205,6 @@ void Application::onBeforeClose()
 void Application::onClose()
 {
 	m_bShouldClose = true;
-}
-
-void Application::onSave()
-{
-	Log::info("Save state!");
-	auto workspace = getUI()->getWindowPtr<WorkspaceWindow>()->getNodeEditor();
-	auto& nodes = workspace.m_workspaceCoreNodes;
-
-	DumpVisitor visitor;
-	std::string rawState = visitor.dump(nodes);
-	Log::info(rawState);
 }
 
 void Application::enqueueCommand(ICommand* command)

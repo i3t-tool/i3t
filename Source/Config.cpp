@@ -233,7 +233,6 @@ std::string Config::DEF_DESC =
 bool Config::SHOW_CONSOLE = false;
 bool Config::FULLSCREEN = false;
 
-std::string Config::WIN_TITLE = "I3T - An Interactive Tool for Teaching Transformations";
 int Config::WIN_WIDTH = 1400;
 int Config::WIN_HEIGHT = 900;
 

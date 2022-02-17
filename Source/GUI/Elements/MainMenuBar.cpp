@@ -1,5 +1,4 @@
 #include "MainMenuBar.h"
-#include <State/DumpVisitor.h>
 
 #include "imgui.h"
 
@@ -16,36 +15,82 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Scripting/Scripting.h"
-#include "State/DumpVisitor.h"
-#include "State/Manager.h"
+#include "State/SerializationVisitor.h"
+#include "State/StateManager.h"
 #include "Windows/StartWindow.h"
 // #include "RecentFiles.h"
 
 using namespace UI;
 
-bool saveSceneDialog(std::string& result, const std::string& title)
+static bool saveSceneDialog(std::string& result, const std::string& title)
 {
 	std::string root = Config::getAbsolutePath("./");
-	std::vector<std::string> filter;
-	filter.push_back("I3T scene files");
-	filter.push_back("*.scene");
+	static std::vector<std::string> filter = {
+			"I3T scene files",
+			"*.scene"
+	};
 
 	return SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
 }
 
-bool openSceneDialog(std::string& result, const std::string& title)
+static bool openSceneDialog(std::string& result, const std::string& title)
 {
 	std::string root = Config::getAbsolutePath("./");
-	std::vector<std::string> filter;
-	filter.push_back("I3T scene files");
-	filter.push_back("*.scene");
+	static std::vector<std::string> filter = {
+			"I3T scene files",
+			"*.scene"
+	};
 
 	return SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 }
 
+static void saveAs()
+{
+	std::string filename;
+	bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
+	if (hasFilename)
+	{
+		fs::path path(filename);
+		if (path.extension().string() != ".scene")
+		{
+			filename += ".scene";
+		}
+
+		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
+
+		StateManager::instance().saveScene(filename);
+		StateManager::instance().setScene(filename);
+	}
+}
+
+static void save()
+{
+	auto& sm = StateManager::instance();
+
+	if (sm.hasScene())
+		sm.saveScene();
+	else
+		saveAs();
+}
+
+static void open()
+{
+	std::string sceneFile;
+	bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
+	if (hasFile)
+	{
+		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
+		StateManager::instance().loadScene(sceneFile);
+	}
+}
+
+//===----------------------------------------------------------------------===//
+
 MainMenuBar::MainMenuBar()
 {
-	m_showDemoWindow = false;
+	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&](){
+		save();
+	});
 }
 
 void MainMenuBar::render()
@@ -72,10 +117,6 @@ void MainMenuBar::showFileMenu()
 {
 	if (ImGui::BeginMenu("File"))
 	{
-		// printf("aha!\n");
-		// std::cout << "aha!" << std::endl;
-		//fprintf(stdout, "aha\n");
-
 		if (ImGui::MenuItem("New"))
 		{
 			// TabSpace::onOpenScene(TabSpace::RESET);
@@ -85,88 +126,24 @@ void MainMenuBar::showFileMenu()
 		if (ImGui::BeginMenu("Recent"))
 		{
 			/// \todo Handle recent files.
-			/*
-			for (const std::string& recentFile : RecentFiles::getRecentFiles())
-			{
-			  std::filesystem::path path = std::filesystem::path(recentFile);
-			  if (ImGui::MenuItem(path.filename().string().c_str()))
-			  {
-			    TabSpace::onOpenScene(path.string(), TabSpace::OPEN_PATH);
-			  }
-			}
-			 */
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::MenuItem("Open"))
 		{
-			std::string sceneFile;
-			bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
-			if (hasFile)
-			{
-				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-				if (ww)
-				{
-					ww->getNodeEditor().m_workspaceCoreNodes.clear();
-
-					// \todo MH - Nodes in scene data are no longer needed, is that true?
-					// auto sceneData = loadSceneFromFile(sceneFile);
-					loadSceneFromFile(sceneFile);
-
-					// \todo MH - See upper todo.
-					/*
-					ww->m_workspaceCoreNodes.insert(
-							sceneData.nodes.end(), std::begin(sceneData.nodes), std::end(sceneData.nodes));
-					*/
-				}
-				else
-					Log::fatal("Open failed: WorkspaceWindow is not loaded.");
-			}
+			open();
 		}
-
-		if (ImGui::MenuItem("Append"))
-		{
-			std::string result;
-			std::string title = "Open I3T script...";
-			std::string root = Config::getAbsolutePath("./");
-			std::vector<std::string> filter;
-			filter.push_back("C source files");
-			filter.push_back("*.c");
-			bool b = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
-
-      auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-			if (!result.empty())
-			{
-				if (ww != NULL)
-				{
-					loadWorkspace(result.c_str());
-				}
-				else
-				{
-					fprintf(stderr, "Append failed:WorkspaceWindow not found\n");
-				}
-			}
-		}
-		ImGui::Separator();
 
 		if (ImGui::MenuItem("Save"))
 		{
-			/// \todo MH SaveFileDialog, scene name
+			save();
 		}
 
 		if (ImGui::MenuItem("Save As"))
 		{
-			std::string filename;
-			bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
-			if (hasFilename)
-			{
-				auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-				if (ww)
-					saveScene(filename, SceneData{ ww->getNodeEditor().m_workspaceCoreNodes });
-				else
-					Log::fatal("Save failed: WorkspaceWindow is not loaded.");
-			}
+			saveAs();
 		}
+
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Import Content"))
@@ -174,15 +151,14 @@ void MainMenuBar::showFileMenu()
 			/// \todo Import custom content? Use Utils/System.h.
 			// Reader::openContentDialog();
 		}
+
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Setup"))
 		{
-			// TabSpace::showSetupForm();
-			// App::get().enqueueWindow(SetupDialog::id, &m_setupDialog);
-			// App::get().enqueueWindow(SetupDialog::id, std::make_unique<SetupDialog>());
 			I3T::getUI()->showUniqueWindow<SetupDialog>();
 		}
+
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Exit"))
@@ -216,7 +192,6 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
-		// ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
@@ -233,16 +208,11 @@ void MainMenuBar::showHelpMenu()
 	{
 		if (ImGui::MenuItem("Description"))
 		{
-			// App::get().enqueueWindow(DescriptionDialog::id, &m_descriptionDialog);
-			// App::get().enqueueWindow(DescriptionDialog::id, std::make_unique<DescriptionDialog>());
 			I3T::getUI()->showUniqueWindow<DescriptionDialog>();
 		}
 
 		if (ImGui::MenuItem("About"))
 		{
-			// TabSpace::showAboutForm();
-			// App::get().enqueueWindow(AboutDialog::id, &m_aboutDialog);
-			// App::get().enqueueWindow(AboutDialog::id, std::make_unique<SetupDialog>());
 			I3T::getUI()->showUniqueWindow<AboutDialog>();
 		}
 

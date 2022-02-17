@@ -10,6 +10,8 @@
 #include "State/Stateful.h"
 #include "Theme.h"
 
+constexpr const char* ImGui_GLSLVersion = "#version 140";
+
 static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
 		static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
@@ -42,7 +44,7 @@ template <typename T> inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWind
 	return result;
 }
 
-class UIModule final : public Module, IStateful
+class UIModule final : public Module
 {
 	friend class Application;
 
@@ -53,10 +55,6 @@ class UIModule final : public Module, IStateful
 	void init() override;
 	void beginFrame() override;
 	void onClose() override;
-
-	// State functions
-	Memento getState() override;
-	void setState(const Memento &) override;
 
 public:
 	Theme& getTheme()

@@ -837,35 +837,40 @@ void WorkspaceWindow::render()
 {
     /* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
-    {
-        if(m_first_frame){
-            m_first_frame = false;
-            //m_workspaceDiwne.addNodeToPosition<WorkspaceScreen>(ImVec2(700,200));
+	{
+		if(m_first_frame)
+		{
+			m_first_frame = false;
+			//m_workspaceDiwne.addNodeToPosition<WorkspaceScreen>(ImVec2(700,200));
 
-            //m_workspaceDiwne.addNodeToPosition<WorkspaceCycle>(ImVec2(400,200));
+			//m_workspaceDiwne.addNodeToPosition<WorkspaceCycle>(ImVec2(400,200));
 
-            m_workspaceDiwne.addNodeToPosition<WorkspaceAngleAxisToQuat>(ImVec2(400,200));
+			// m_workspaceDiwne.addNodeToPosition<WorkspaceAngleAxisToQuat>(ImVec2(400,200));
+
+			// m_workspaceDiwne.addNodeToPosition<WorkspaceCamera>(ImVec2(400,200));
+			m_workspaceDiwne.addNodeToPosition<WorkspaceSequence>(ImVec2(400,200));
 
 
-    //        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
-    //        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
-    //
-    //        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
-    //        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
-    //
-    //        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
-    //        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
-        }
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
+//
+//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
+//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
+//
+//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
+//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
+		}
 
-        if (ImGui::BeginMenuBar())
-        {
-            showEditMenu();
-            ImGui::EndMenuBar();
-        }
+		if (ImGui::BeginMenuBar())
+		{
+			showEditMenu();
+			ImGui::EndMenuBar();
+		}
 
-        m_workspaceDiwne.drawDiwne();
+		m_workspaceDiwne.drawDiwne();
 
-    }ImGui::End();
+	}
+	ImGui::End();
 }
 
 //Ptr<WorkspaceSequence> WorkspaceWindow::getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node)

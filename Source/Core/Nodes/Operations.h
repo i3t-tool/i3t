@@ -53,6 +53,8 @@ struct Operation
 	const std::vector<std::string> defaultOutputNames =
 			DEFAULT_NAMES; // if the names are not the names of the OpValueType
 
+	const bool isConstructor = false;
+
 	Operation(const std::string& keyWord, const std::string& defaultLabel)
 			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(0), numberOfOutputs(0)
 	{}
@@ -62,6 +64,14 @@ struct Operation
 						const std::vector<EValueType>& outputTypes) :
 			keyWord(keyWord),
 			defaultLabel(defaultLabel), numberOfInputs(numberOfInputs), inputTypes(inputTypes),
+			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes)
+	{}
+
+	Operation(const std::string& keyWord, const std::string& defaultLabel, bool isConstructor, int numberOfInputs,
+						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
+						const std::vector<EValueType>& outputTypes) :
+			keyWord(keyWord), defaultLabel(defaultLabel), isConstructor(isConstructor),
+			numberOfInputs(numberOfInputs), inputTypes(inputTypes),
 			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes)
 	{}
 
@@ -386,11 +396,11 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::NormalizeQuat), "normalize quat", 1, quatInput, 1, quatInput},									 // normalize quat
 
 		// Value nodes.
-		{n(ENodeType::FloatToFloat), "float", 1, floatInput, 1, floatInput},
-		{n(ENodeType::Vector3ToVector3), "vec3", 1, vector3Input, 1, vector3Input},
-		{n(ENodeType::Vector4ToVector4), "vec4", 1, vectorInput, 1, vectorInput},
-		{n(ENodeType::MatrixToMatrix), "mat", 1, matrixInput, 1, matrixInput},
-		{n(ENodeType::QuatToQuat), "quat", 1, {EValueType::Quat}, 1, {EValueType::Quat}},
+		{n(ENodeType::FloatToFloat), "float", true, 1, floatInput, 1, floatInput },
+		{n(ENodeType::Vector3ToVector3), "vec3", true, 1, vector3Input, 1, vector3Input },
+		{n(ENodeType::Vector4ToVector4), "vec4", true, 1, vectorInput, 1, vectorInput },
+		{n(ENodeType::MatrixToMatrix), "mat", true, 1, matrixInput, 1, matrixInput },
+		{n(ENodeType::QuatToQuat), "quat", true, 1, {EValueType::Quat}, 1, {EValueType::Quat} },
 
 		{n(ENodeType::Model), "model", 1, matrixMulInput, 0, {}},
 

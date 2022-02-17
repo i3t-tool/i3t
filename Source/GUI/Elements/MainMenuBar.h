@@ -14,11 +14,12 @@ class MainMenuBar
 {
 public:
 	MainMenuBar();
-	virtual ~MainMenuBar(){};
+	virtual ~MainMenuBar() = default;
+
 	void render();
 
 private:
-	bool m_showDemoWindow;
+	bool m_showDemoWindow = false;
 
 	void showFileMenu();
 	void showEditMenu();

@@ -3,9 +3,17 @@
 #include <imgui.h>
 
 #include "Commands/ApplicationCommands.h"
+#include "State/StateManager.h"
 
 void BeforeCloseModal::render()
 {
+	/// \todo This is quick hotfix.
+	if (!StateManager::instance().isDirty())
+	{
+		CloseCommand::dispatch();
+		return;
+	}
+
 	ImGui::OpenPopup("Close?###%s");
 
 	// Always center this window when appearing
@@ -25,6 +33,10 @@ void BeforeCloseModal::render()
 
 		if (ImGui::Button("Save and quit", ImVec2(100, 0)))
 		{
+			StateManager::instance().saveScene();
+
+			InputManager::triggerAction("save", EKeyState::Pressed);
+
 			HideWindowCommand::dispatch(ID);
 			CloseCommand::dispatch();
 

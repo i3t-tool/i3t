@@ -47,7 +47,6 @@ struct Config
 	static bool SHOW_CONSOLE; ///< True to show, false to hide the console
 	static bool FULLSCREEN;   ///< True to fullscreen
 
-	static std::string WIN_TITLE; ///< The window title
 	static int WIN_WIDTH;         ///< Width of the window - this is not a constant - set on onReshape in main.cpp
 	static int WIN_HEIGHT;        ///< Height of the window - this is not a constant - set on onReshape in main.cpp
 

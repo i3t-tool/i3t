@@ -18,8 +18,8 @@
 #include "Loader/ConfigLoader.h"
 #include "Loader/ThemeLoader.h"
 #include "Logger/Logger.h"
-#include "State/DumpVisitor.h"
-#include "State/Manager.h"
+#include "State/SerializationVisitor.h"
+#include "State/StateManager.h"
 #include "Utils/Filesystem.h"
 
 using namespace UI;
@@ -140,30 +140,6 @@ void UIModule::onClose()
 
 	m_windows.clear();
 	m_dockableWindows.clear();
-}
-
-Memento UIModule::getState()
-{
-	auto& nodes = getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
-
-	DumpVisitor visitor;
-	std::string rawState = visitor.dump(nodes);
-
-	return Memento({ rawState });
-}
-
-void UIModule::setState(const Memento& memento)
-{
-	auto& nodes = getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
-	nodes.clear();
-
-	auto& rawScene = memento.getSnapshot().front();
-
-	auto sceneData = loadScene(rawScene);
-	for (auto& op : sceneData.nodes)
-	{
-		nodes.push_back(op);
-	}
 }
 
 void UIModule::loadThemes()

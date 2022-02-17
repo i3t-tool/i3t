@@ -1,8 +1,8 @@
 #include "WorkspaceElementsWithCoreData.h"
 
+#include "State/StateManager.h"
+
 #include "../Windows/WorkspaceWindow.h"
-
-
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNode(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation()->defaultLabel )
@@ -795,10 +795,10 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 			label.c_str(), &value, step, 0.0f, 0.0f, fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
 			1.0f); /* if power >1.0f the number changes logarithmic */
 
-    if (diwne.bypassIsItemActive())
-        inner_interaction_happen = true;
+	if (diwne.bypassIsItemActive())
+			inner_interaction_happen = true;
 
-    if (!inactive && !diwne.m_popupDrawn)
+	if (!inactive && !diwne.m_popupDrawn)
 	{
 	    if (bypassFloatFocusAction && bypassFloatRaisePopupAction())
         {
@@ -806,11 +806,16 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
             diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
         }
 
-        diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
+		diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value, valueChangedByPopup);
 		inner_interaction_happen |= diwne.m_popupDrawn;
 
 		valueChanged |= valueChangedByPopup;
 	}
+
+	/// TEST /////////////////////////////////////////////////
+	if (valueChanged)
+		StateManager::instance().takeSnapshot();
+	//////////////////////////////////////////////////////////
 
 	if (inactive)
 	{

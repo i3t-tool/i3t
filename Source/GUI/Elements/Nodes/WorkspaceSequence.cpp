@@ -66,14 +66,14 @@ void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 
 void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 {
-    Ptr<WorkspaceTransformation> node_t = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
-    if(node_t != nullptr && 0 <= index && index <= m_workspaceInnerTransformations.size())
-    {
-        node_t->setRemoveFromSequence(false);
-        m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin()+index, node_t);
-        /* \todo JH check return value if so */
-        m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
-    }
+	Ptr<WorkspaceTransformation> node_t = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
+	if (node_t != nullptr && 0 <= index && index <= m_workspaceInnerTransformations.size())
+	{
+		node_t->setRemoveFromSequence(false);
+		m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin() + index, node_t);
+		/* \todo JH check return value if so */
+		m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
+	}
 }
 
 void WorkspaceSequence::moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode, int index)
