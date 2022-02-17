@@ -64,6 +64,7 @@ namespace Builder
 		auto ret = std::make_shared<TransformImpl<T>>();
 		ret->init();
 		ret->createDefaults();
+		ret->initDefaults();
 		// ret->reset();
 		return ret;
 	}
