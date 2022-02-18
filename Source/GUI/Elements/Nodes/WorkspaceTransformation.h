@@ -37,6 +37,8 @@ public:
     bool beforeContent();
 	bool topContent();
 	bool middleContent();
+	bool afterContent();
+
 	void popupContent();
 	void drawMenuLevelOfDetail();
 	void drawMenuDelete();

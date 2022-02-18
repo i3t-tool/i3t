@@ -103,6 +103,7 @@ bool DiwneObject::allowFocus()
       && !(diwne.getDiwneActionPreviousFrame() == DiwneAction::SelectionRectTouch || diwne.getDiwneActionPreviousFrame() == DiwneAction::SelectionRectFull);
 }
 
+bool DiwneObject::processInteractionsAlways(){return processShowPopupDiwne();}
 bool DiwneObject::processInteractions(){return false;}
 bool DiwneObject::processInteractionsDiwne()
 {
@@ -143,7 +144,8 @@ DIWNE_DEBUG((diwne), {
     if(m_focusedForInteraction) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,255), 0, ImDrawCornerFlags_None, 10);}
 }); /* close of macro */
 #endif // DIWNE_DEBUG
-    interaction_happen |= processShowPopupDiwne();
+
+    interaction_happen |= processInteractionsAlways();
     return interaction_happen;
 }
 

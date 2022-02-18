@@ -58,12 +58,16 @@ bool WorkspaceTransformation::middleContent()
         inner_interaction_happen = drawDataFull();
 	}
 
-        /* to drawNodeAfterContent */
-	/*if (m_inactiveMark != 0)
+    return inner_interaction_happen;
+}
+
+bool WorkspaceTransformation::afterContent()
+{
+    if (m_inactiveMark != 0)
     {
-        ImVec2 start = ne::GetNodePosition(m_id);
-        ImVec2 size = ne::GetNodeSize(m_id);
-        ImVec2 end = start + size;
+        ImVec2 start = m_middleRectDiwne.Min;
+        ImVec2 end = m_middleRectDiwne.Max;
+        ImVec2 size = end-start;
         if(m_inactiveMark > 0)
         {
             end.x -= (1-m_inactiveMark)*size.x;
@@ -73,11 +77,8 @@ bool WorkspaceTransformation::middleContent()
             start.x += m_inactiveMark*size.x;
         }
 
-        //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
-        //ImGui::Dummy(const ImVec2& size);
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
-    }*/
-    return inner_interaction_happen;
+    }
 }
 
 void WorkspaceTransformation::popupContent()

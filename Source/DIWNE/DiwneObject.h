@@ -50,6 +50,7 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool afterEnd();
     virtual bool afterEndDiwne();
     virtual bool processInteractions();
+    virtual bool processInteractionsAlways();
     virtual bool processInteractionsDiwne();
     virtual bool finalize();
     virtual bool finalizeDiwne();

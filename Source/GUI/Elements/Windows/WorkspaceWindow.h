@@ -105,13 +105,30 @@ class WorkspaceDiwne : public DIWNE::Diwne
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftInteractingNodeToEnd();
 
-	void selectAll();
+	void processDragAllSelectedNodes();
 
+	void selectAll();
+	void invertSelection();
+	void zoomToAll();
+    void zoomToSelected();
+    ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
+    void zoomToRectangle(ImRect const& rect);
+
+    //bool bypassFocusForInteractionAction();
+
+    void deleteSelectedNodes();
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodesInnerIncluded();
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllNodesInnerIncluded();
 
 	bool bypassZoomAction();
 	bool bypassDragAction();
 	bool bypassHoldAction();
     bool bypassUnholdAction();
+
+    bool bypassSelectionRectangleAction();
+    ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
+    ImVec2 bypassDiwneGetSelectionRectangleSize();
 };
 
 /*! \class class for Workspace window object

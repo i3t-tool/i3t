@@ -44,7 +44,7 @@ bool Node::beforeBeginDiwne()
         ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
         ImGui::InvisibleButton("IBBlockingImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
         ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-        ImGui::PushID("JustDraw");
+        //ImGui::PushID("JustDraw");
     }
 
     return beforeBegin();
@@ -115,7 +115,7 @@ bool Node::afterEndDiwne()
 
     if (m_drawMode == DrawMode::JustDraw)
     {
-        ImGui::PopID(); /* ImGui::PushID("JustDraw"); in beforeBeginDiwne() */
+        //ImGui::PopID(); /* ImGui::PushID("JustDraw"); in beforeBeginDiwne() */
     }
 
     /* always block interactions with other nodes */

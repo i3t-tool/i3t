@@ -78,6 +78,13 @@ public:
 
 	virtual void popupContent();
 
+	bool bypassDragAction();
+    bool bypassHoldAction();
+    bool bypassUnholdAction();
+    bool bypassSelectAction();
+    bool bypassUnselectAction();
+    bool bypassTouchAction();
+
 
 };
 
@@ -160,6 +167,12 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
         virtual bool content();
         virtual bool processInteractions();
         virtual bool processCreateAndPlugConstrutorNode();
+        bool processUnplug();
+
+        bool bypassUnplugAction();
+        bool bypassCreateAndPlugConstrutorNodeAction();
+
+
 };
 
 class WorkspaceCoreOutputPin : public WorkspaceCorePin

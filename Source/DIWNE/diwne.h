@@ -22,7 +22,7 @@ typedef std::function<void(...)> popupContent_function_pointer;
 /* ===================== */
 /* ===== p o p u p ===== */
 /* ===================== */
-static bool s_popupContentDrawn = false; /* only one popup content per frame (avoid double-content on DragFloat popup) */
+//static bool s_popupContentDrawn = false; /* only one popup content per frame (avoid double-content on DragFloat popup) */
 
 template<typename T, std::enable_if<std::is_base_of<DiwneObject, T>::value, bool>::type = true >
 static void expandPopupContent(T& object) /* for popupContent() functions of member of class */
@@ -46,7 +46,7 @@ static bool popupDiwne(std::string const popupID, ImVec2 const & popupPos, void 
             ImGui::EndPopup();
         }
     }
-    return interaction_happen || s_popupContentDrawn;
+    return interaction_happen/* || s_popupContentDrawn*/;
 }
 
 struct SettingsDiwne
