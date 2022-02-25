@@ -71,6 +71,8 @@ public:
 
 	void createDefaults();
 
+	virtual void initDefaults() {}
+
 	//===----------------------------------------------------------------------===//
 
 private:

@@ -156,52 +156,53 @@ int WorkspaceTransformation::maxLenghtOfData()
     return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
-bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
-                                                        ,   std::vector<getter_function_pointer> const& getters
-                                                        ,   std::vector<setter_function_pointer> const& setters
-                                                        /*,   std::vector<unsigned char> const& datamap_values*/)
-{
-    int number_of_values = labels.size();
-	Debug::Assert(number_of_values==getters.size()
-               && number_of_values==setters.size()
-               /*&& number_of_values==datamap_values.size()*/ , "drawDataSetValues_builder: All vectors (labels, getters, setters) must have same size.");
+//bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
+//                                                        ,   std::vector<getter_function_pointer> const& getters
+//                                                        ,   std::vector<setter_function_pointer> const& setters
+//                                                        /*,   std::vector<unsigned char> const& datamap_values*/)
+//{
+//    int number_of_values = labels.size();
+//	Debug::Assert(number_of_values==getters.size()
+//               && number_of_values==setters.size()
+//               /*&& number_of_values==datamap_values.size()*/ , "drawDataSetValues_builder: All vectors (labels, getters, setters) must have same size.");
+//
+//	bool	valueChanged = false, actual_value_changed = false, inner_interaction_happen = false;
+//	int		index_of_change;
+//	float valueOfChange, localData; /* user can change just one value at the moment */
+//
+//	ImGui::PushItemWidth(getDataItemsWidth());
+//	for (int i = 0; i < number_of_values; i++)
+//	{
+//		ImGui::TextUnformatted(labels[i].c_str());
+//
+//		ImGui::SameLine(50); /* \todo JH why 50 ?*/
+//
+//		localData = getters[i]();
+//
+//		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", getId(), i), localData, Core::EValueState::Editable, actual_value_changed);
+//
+//
+//		if (actual_value_changed){
+//
+//            valueChanged = true;
+//			index_of_change = i;
+//			valueOfChange = localData;
+//		}
+//	}
+//	ImGui::PopItemWidth();
+//
+//	if (valueChanged)
+//	{
+//		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value of setter */
+//		setDataItemsWidth();
+//	}
+//
+//	// ImGui::Spring(0);
+//	return inner_interaction_happen;
+//}
 
-	bool	valueChanged = false, actual_value_changed = false, inner_interaction_happen = false;
-	int		index_of_change;
-	float valueOfChange, localData; /* user can change just one value at the moment */
 
-	ImGui::PushItemWidth(getDataItemsWidth());
-	for (int i = 0; i < number_of_values; i++)
-	{
-		ImGui::TextUnformatted(labels[i].c_str());
-
-		ImGui::SameLine(50); /* \todo JH why 50 ?*/
-
-		localData = getters[i]();
-
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", getId(), i), localData, Core::EValueState::Editable, actual_value_changed);
-
-
-		if (actual_value_changed){
-
-            valueChanged = true;
-			index_of_change = i;
-			valueOfChange = localData;
-		}
-	}
-	ImGui::PopItemWidth();
-
-	if (valueChanged)
-	{
-		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value of setter */
-		setDataItemsWidth();
-	}
-
-	// ImGui::Spring(0);
-	return inner_interaction_happen;
-}
-
-bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
+bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
                                                         ,   std::vector<float*> const& local_data
                                                         ,   bool &value_changed)
 {
@@ -216,10 +217,10 @@ bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::str
 	{
 		ImGui::TextUnformatted(labels[i].c_str());
 
-		ImGui::SameLine(50); /* \todo JH space between elemets from settings */
+		ImGui::SameLine();
 
         /* \todo JH dataState "1" from settings */
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, i), *local_data[i], Core::EValueState::Editable, actual_value_changed);
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], Core::EValueState::EditableSyn, actual_value_changed);
         value_changed |= actual_value_changed;
 
 	}

@@ -103,11 +103,11 @@ void WorkspaceDiwne::popupContent()
             /* \todo JH can be done by for-cycle if somewhere is list of types with group (transformation, operator, ...) and label*/
 			if (ImGui::MenuItem("free"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationFree>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Free>>();
 			}
 			if (ImGui::MenuItem("translation"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationTranslation>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Translation>>();
 			}
 
 			if (ImGui::BeginMenu("rotation"))
@@ -115,47 +115,47 @@ void WorkspaceDiwne::popupContent()
 
 				if (ImGui::MenuItem("eulerAngleX"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationEulerX>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerX>>();
 				}
 				if (ImGui::MenuItem("eulerAngleY"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationEulerY>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerY>>();
 				}
 				if (ImGui::MenuItem("eulerAngleZ"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationEulerZ>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerZ>>();
 				}
 				if (ImGui::MenuItem("axisAngle"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationAxisAngle>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::AxisAngle>>();
 				}
 				if (ImGui::MenuItem("quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationQuaternion>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Quat>>();
 				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("scale"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationScale>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
 			}
 			if (ImGui::MenuItem("lookAt"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationLookAt>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::LookAt>>();
 			}
 			if (ImGui::BeginMenu("projection"))
 			{
 				if (ImGui::MenuItem("ortho"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationOrthoProjection>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Ortho>>();
 				}
 				if (ImGui::MenuItem("perspective"))
 				{
-                    addNodeToPositionOfPopup<WorkspaceTransformationPerspective>();
+                    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Perspective>>();
 				}
 				if (ImGui::MenuItem("frustrum"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationFrustum>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Frustum>>();
 				}
 				ImGui::EndMenu();
 			}

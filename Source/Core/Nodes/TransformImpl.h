@@ -39,6 +39,11 @@ public:
 		enableSynergies();
 	}
 
+	void initDefaults() override
+	{
+		setDefaultValue("scale", glm::vec3{ 1.0f, 1.0f, 1.0f });
+	}
+
 	ETransformState isValid() const override;
 
 	[[nodiscard]] ValueSetResult setValue(float val) override;
@@ -182,6 +187,11 @@ public:
 	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::AxisAngle)) {}
 
+	void initDefaults() override
+	{
+		setDefaultValue("axis", glm::vec3{ 0.0f, 1.0f, 0.0f });
+	}
+
 	ETransformState isValid() const override;
 
 	float getRot() const             { return getDefaultValue("rotation").getFloat(); };
@@ -218,12 +228,23 @@ public:
 	void reset() override;
 };
 
+
 template <>
 class TransformImpl<ETransformType::Ortho> : public Transformation
 {
 public:
 	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::Ortho)) {}
+
+	void initDefaults() override
+	{
+		setDefaultValue("left", -5.0f);
+		setDefaultValue("right", 5.0f);
+		setDefaultValue("bottom", -5.0f);
+		setDefaultValue("top", 5.0f);
+		setDefaultValue("near", 1.0f);
+		setDefaultValue("far", 10.0f);
+	}
 
 	ETransformState isValid() const override;
 
@@ -255,6 +276,14 @@ public:
 	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::Perspective)) {}
 
+	void initDefaults() override
+	{
+		setDefaultValue("fov", glm::radians(70.0f));
+		setDefaultValue("aspect", 1.33f);
+		setDefaultValue("zNear", 1.0f);
+		setDefaultValue("zFar", 10.0f);
+	}
+
 	ETransformState isValid() const override;
 
 	float getFOV() const    { return getDefaultValue("fov").getFloat(); }
@@ -279,6 +308,16 @@ class TransformImpl<ETransformType::Frustum> : public Transformation
 public:
 	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::Frustum)) {}
+
+	void initDefaults() override
+	{
+		setDefaultValue("left", -5.0f);
+		setDefaultValue("right", 5.0f);
+		setDefaultValue("bottom", -5.0f);
+		setDefaultValue("top", 5.0f);
+		setDefaultValue("near", 1.0f);
+		setDefaultValue("far", 10.0f);
+	}
 
 	ETransformState isValid() const override;
 
@@ -311,6 +350,13 @@ class TransformImpl<ETransformType::LookAt> : public Transformation
 public:
 	explicit TransformImpl()
 			: Transformation(getTransformOperation(ETransformType::LookAt)) {}
+
+	void initDefaults() override
+	{
+		setDefaultValue("eye", glm::vec3{ 0.0, 0.0, 10.0 });
+		setDefaultValue("center", glm::vec3{ 0.0, 0.0, 0.0 });
+		setDefaultValue("up", glm::vec3{ 0.0, 1.0, 0.0 });
+	}
 
 	ETransformState isValid() const override;
 

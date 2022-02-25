@@ -31,7 +31,7 @@ public:
 	virtual bool drawDataFull();
 	virtual bool inline drawDataSetValues() { return drawDataFull(); };
 
-	int maxLenghtOfData();
+	virtual int maxLenghtOfData();
 
 	bool beforeBegin();
     bool beforeContent();
@@ -43,11 +43,11 @@ public:
 	void drawMenuLevelOfDetail();
 	void drawMenuDelete();
 
-
-	virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
-                                            std::vector<getter_function_pointer> const& getters,
-                                            std::vector<setter_function_pointer> const& setters
-                                             /*,   std::vector<unsigned char> const& datamap_values*/);
+//
+//	virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
+//                                            std::vector<getter_function_pointer> const& getters,
+//                                            std::vector<setter_function_pointer> const& setters
+//                                             /*,   std::vector<unsigned char> const& datamap_values*/);
 
     virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
                                             std::vector<float*> const& local_data,
