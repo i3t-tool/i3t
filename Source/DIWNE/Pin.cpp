@@ -5,7 +5,7 @@ namespace DIWNE
 
 Pin::Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="DiwnePin"*/)
     : DiwneObject(diwne, id, labelDiwne)
-    , m_pinRectDiwne(ImRect(0,0,1,1)) /* can not have zero size because of InvisibleButton */
+    , m_pinRectDiwne(ImRect(0,0,0,0))
     , m_connectionPointDiwne(ImVec2(0,0))
 { }
 
@@ -29,24 +29,44 @@ void Pin::updateSizes()
     updateConnectionPointDiwne();
 }
 
-bool Pin::processInteractionsDiwne()
+bool Pin::processInteractionsAlways()
 {
     bool interaction_happen = false;
 
-    if ( m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* want to process if other element interacting (creating new link) */
-    {
-        interaction_happen |= processPin_Pre_ConnectLink();
-    }
+    interaction_happen |= processPin_Pre_ConnectLinkDiwne();
+    interaction_happen |= DiwneObject::processInteractionsAlways(); /* Selection rectangle block showing popup etc. */
 
-    interaction_happen |= DiwneObject::processInteractionsDiwne(); /* Selection rectangle block showing popup etc. */
 
     return interaction_happen;
 }
 
 bool Pin::bypassPinLinkConnectionPreparedAction()
 {
-    return !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) && diwne.getLastActivePin<DIWNE::Pin>().get() != this;
+    return bypassFocusForInteractionAction();
 }
+
+bool Pin::allowProcessPin_Pre_ConnectLink()
+{
+    return m_focusedForInteraction && !m_isHeld && (diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) /*&& diwne.getLastActivePin<DIWNE::Pin>().get() != this*/;
+}
+
+bool Pin::processPin_Pre_ConnectLinkDiwne()
+{
+    if (bypassPinLinkConnectionPreparedAction() && allowProcessPin_Pre_ConnectLink() )
+    {
+        return processConnectionPrepared();
+    }
+    return false;
+}
+
+bool Pin::processConnectionPrepared() {ImGui::TextUnformatted("Prepared for connecting link"); return true;}
+
+
+//bool Pin::processFocusedForInteraction()
+//{
+//    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->pinHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->pinHoveredBorderThicknessDiwne);
+//    return true;
+//}
 
 bool Pin::processDrag()
 {
@@ -54,23 +74,5 @@ bool Pin::processDrag()
     diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
     return true;
 }
-
-bool Pin::processConnectionPrepared() {ImGui::TextUnformatted("Prepared for connecting link"); return true;}
-
-bool Pin::processPin_Pre_ConnectLink()
-{
-    if (bypassPinLinkConnectionPreparedAction())
-    {
-        return processConnectionPrepared();
-    }
-    return false;
-}
-
-bool Pin::processFocusedForInteraction()
-{
-    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->pinHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->pinHoveredBorderThicknessDiwne);
-    return true;
-}
-
 
 } /* namespace DIWNE */

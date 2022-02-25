@@ -21,6 +21,7 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
     ,   m_diwneAction(None)
     ,   m_diwneAction_previousFrame(m_diwneAction)
     ,   m_objectFocused(false)
+    ,   m_objectInteracted(false)
 
     ,   m_nodesSelectionChanged(false)
     ,   m_selectionRectangeDiwne(ImRect(0,0,0,0))
@@ -31,13 +32,15 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
 
 {}
 
+DiwneAction Diwne::getDiwneActionActive() const {return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction; }
+
 bool Diwne::allowDrawing(){return m_drawing;}
 
 bool Diwne::initializeDiwne()
 {
     m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     m_diwneAction = DiwneAction::None;
-    m_popupDrawn = m_tooltipDrawn = m_objectFocused = false;
+    m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_objectInteracted = false;
     return initialize();
 }
 
@@ -123,6 +126,11 @@ bool Diwne::afterEndDiwne()
     return DiwneObject::afterEndDiwne();
 }
 
+bool Diwne::processInteractions()
+{
+    return processDiwneSelectionRectangle();
+}
+
 bool Diwne::processInteractionsDiwne()
 {
     bool interaction_happen = false;
@@ -132,7 +140,6 @@ bool Diwne::processInteractionsDiwne()
     if ( m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction (focus on node) is no problem with this actions */
     {
         interaction_happen |= processDiwneZoom();
-        interaction_happen |= processSelectionRectangle();
     }
 
     return interaction_happen;
@@ -146,16 +153,24 @@ bool Diwne::finalizeDiwne()
     return interaction_happen;
 }
 
-bool Diwne::blockPopup()
+bool Diwne::blockRaisePopup()
 {
     return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch || m_diwneAction_previousFrame == DiwneAction::SelectionRectFull || m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
 }
 
-bool Diwne::allowInteraction(){return m_interactionAllowed && DiwneObject::allowInteraction();}
+//bool Diwne::allowInteraction(){return m_interactionAllowed && DiwneObject::allowInteraction();}
 
-bool Diwne::processSelectionRectangle()
+/* be careful for same mouse button in this functions */
+bool Diwne::allowProcessSelectionRectangle(){return getDiwneAction() != HoldLink && getDiwneAction() != HoldNode && getDiwneAction() != HoldPin
+                                                && getDiwneAction() != DragLink && getDiwneAction() != DragNode && getDiwneAction() != DragPin
+                                                && getDiwneAction() != NewLink;}
+bool Diwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && bypassIsMouseDragging1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos1());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta1()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+
+bool Diwne::processDiwneSelectionRectangle()
 {
-    if(bypassSelectionRectangleAction())
+    if(bypassSelectionRectangleAction() && allowProcessSelectionRectangle())
     {
         ImVec2 startPos = bypassDiwneGetSelectionRectangleStartPosition();
         ImVec2 dragDelta = bypassDiwneGetSelectionRectangleSize();
@@ -200,18 +215,6 @@ bool Diwne::processFocused()
 
 bool Diwne::processFocusedForInteraction() {return processFocused(); }
 
-bool Diwne::processHold()
-{
-    setDiwneAction(DiwneAction::HoldWorkarea);
-    return true;
-}
-
-bool Diwne::processUnhold()
-{
-    setDiwneAction(DiwneAction::None);
-    return true;
-}
-
 bool Diwne::processDrag()
 {
     translateWorkAreaDiwneZoomed(bypassGetMouseDelta()*-1);
@@ -228,7 +231,7 @@ bool Diwne::processZoom()
 
 bool Diwne::processDiwneZoom()
 {
-    if (bypassZoomAction())
+    if (bypassZoomAction() && allowProcessZoom())
     {
         return processZoom();
     }
@@ -545,13 +548,11 @@ ImVec2 Diwne::bypassGetMousePos() {return ImGui::GetIO().MousePos;}
 float Diwne::bypassGetMouseWheel() {return ImGui::GetIO().MouseWheel;}
 float Diwne::bypassGetZoomDelta() {return bypassGetMouseWheel()/mp_settingsDiwne->zoomWheelReverseSenzitivity;}
 
-bool Diwne::bypassZoomAction() {return bypassFocusForInteractionAction() && diwne.bypassGetZoomDelta() != 0;}
+bool Diwne::allowProcessZoom(){return true;}
+bool Diwne::bypassZoomAction() {return diwne.bypassGetZoomDelta() != 0;}
 bool Diwne::bypassDiwneSetPopupPositionAction() {return bypassIsMouseClicked1();}
 ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos();}
-/* be careful for same mouse button in this functions */
-bool Diwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && bypassIsMouseDragging1();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos1());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
-ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta1()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+
 ImRect Diwne::getSelectionRectangleDiwne(){return m_selectionRectangeDiwne;}
 
 

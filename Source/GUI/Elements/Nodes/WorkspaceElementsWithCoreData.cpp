@@ -16,7 +16,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
 
 }
 
-bool WorkspaceNodeWithCoreData::bypassDragAction(){return InputManager::isAxisActive("drag") != 0 && (InputManager::m_mouseXDelta!=0 || InputManager::m_mouseXDelta!=0);}
+bool WorkspaceNodeWithCoreData::bypassDragAction(){return InputManager::isAxisActive("drag") != 0 && (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold || InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold);}
 bool WorkspaceNodeWithCoreData::bypassHoldAction(){return InputManager::isActionTriggered("hold", EKeyState::Pressed);}
 bool WorkspaceNodeWithCoreData::bypassUnholdAction(){return InputManager::isActionTriggered("hold", EKeyState::Released);}
 bool WorkspaceNodeWithCoreData::bypassSelectAction(){return InputManager::isActionTriggered("select", EKeyState::Released);}
@@ -482,9 +482,9 @@ void WorkspaceCoreInputPin::unplug()
 }
 
 
-bool WorkspaceCoreInputPin::drawDiwne()
+bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode/*=DIWNE::DrawMode::Interacting*/)
 {
-    bool inner_interaction_happen = WorkspaceCorePin::drawDiwne();
+    bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
     if (isConnected())
     {
         inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
@@ -513,9 +513,10 @@ bool WorkspaceCoreInputPin::content()
 }
 
 bool WorkspaceCoreInputPin::bypassCreateAndPlugConstrutorNodeAction(){return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);}
+bool WorkspaceCoreInputPin::allowCreateAndPlugConstrutorNodeAction(){return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && bypassFocusForInteractionAction();}
 bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
 {
-    if (bypassFocusForInteractionAction() && bypassCreateAndPlugConstrutorNodeAction())
+    if (allowCreateAndPlugConstrutorNodeAction() && bypassCreateAndPlugConstrutorNodeAction())
     {
         dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction = WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
         diwne.setLastActivePin<WorkspaceCoreInputPin>(std::static_pointer_cast<WorkspaceCoreInputPin>(shared_from_this()));
@@ -741,6 +742,8 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwn
 bool WorkspaceNodeWithCoreDataWithPins::finalize()
 {
     bool inner_interaction_happen = false;
+    WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
+
     if (!allowDrawing())
     {
         for (auto const& pin : m_workspaceInputs)
@@ -751,6 +754,7 @@ bool WorkspaceNodeWithCoreDataWithPins::finalize()
                 if (in->getLink().isLinkOnWorkArea())
                 {
                     inner_interaction_happen |= in->getLink().drawDiwne();
+                    wd.m_linksToDraw.push_back(&pin->getLink());
                 }
             }
         }
@@ -762,9 +766,11 @@ bool WorkspaceNodeWithCoreDataWithPins::finalize()
 bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 {
     bool inner_interaction_happen = false;
+    WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
     for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawDiwne();
+        inner_interaction_happen |= pin->drawDiwne((m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw);
+        if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
     }
     return inner_interaction_happen;
 }
@@ -774,16 +780,11 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
     bool inner_interaction_happen = false;
 
     for (auto const& pin : m_workspaceOutputs) {
-        inner_interaction_happen |= pin->drawDiwne();
+        inner_interaction_happen |= pin->drawDiwne((m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw);
     }
     return inner_interaction_happen;
 }
 
-
-/*	Editable		= 0x0002, ///< 10
-	EditableSyn = 0x0003, ///< 11
-	Locked			= 0x0000, ///< 00
-	LockedSyn		= 0x0001, ///< 01*/
 /* >>>>> STATIC FUNCTIONS <<<<< */
 bool bypassFloatFocusAction() {return ImGui::IsItemHovered();}
 bool bypassFloatRaisePopupAction() {return InputManager::isActionTriggered("raisePopup", EKeyState::Released);}

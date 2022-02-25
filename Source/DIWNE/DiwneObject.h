@@ -21,7 +21,7 @@ public: /* \todo JH some atributes should be private/protected */
     std::string const m_popupIDDiwne;
     bool m_inner_interaction_happen;
     DrawMode m_drawMode;
-    bool m_isHeld, m_isDraged, m_selected, m_focusedForInteraction, m_focused;
+    bool m_isHeld, m_isDraged, m_selected, m_focusedForInteraction, m_focused, m_isActive;
 
     DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne);
     virtual ~DiwneObject(){};
@@ -45,7 +45,6 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool afterContentDiwne();
     virtual void end()=0;
     virtual void updateSizes();
-    virtual bool allowFocus();
     virtual bool allowInteraction();
     virtual bool afterEnd();
     virtual bool afterEndDiwne();
@@ -78,6 +77,15 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool processUnselect();
     virtual bool processFocused();
     virtual bool processFocusedForInteraction();
+
+    virtual bool allowProcessFocused();
+    virtual bool allowProcessFocusedForInteraction();
+    virtual bool allowProcessHold();
+    virtual bool allowProcessUnhold();
+    virtual bool allowProcessDrag();
+    virtual bool allowProcessSelect();
+    virtual bool allowProcessUnselect();
+    virtual bool allowProcessRaisePopup();
 
     virtual bool processObjectFocused();
     virtual bool processObjectFocusedForInteraction();

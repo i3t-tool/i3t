@@ -161,7 +161,7 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
         void unplug();
         void plug(WorkspaceCoreOutputPin* ou);
 
-        bool drawDiwne();
+        bool drawDiwne(DIWNE::DrawMode=DIWNE::DrawMode::Interacting);
 
         /* DIWNE function */
         virtual bool content();
@@ -170,6 +170,7 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
         bool processUnplug();
 
         bool bypassUnplugAction();
+        bool allowCreateAndPlugConstrutorNodeAction();
         bool bypassCreateAndPlugConstrutorNodeAction();
 
 

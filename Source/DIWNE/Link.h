@@ -45,7 +45,6 @@ class Link : public DiwneObject
         /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
         bool isLinkOnWorkArea();
 
-        virtual bool allowFocus();
         virtual bool bypassFocusAction();
         virtual bool bypassFocusForInteractionAction();
 

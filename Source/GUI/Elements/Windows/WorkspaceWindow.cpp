@@ -653,6 +653,7 @@ void WorkspaceDiwne::popupContent()
 bool WorkspaceDiwne::beforeBegin()
 {
     m_workspaceDiwneAction = WorkspaceDiwneAction::None;
+    m_linksToDraw.clear();
 
     return false;
 }
@@ -678,24 +679,35 @@ bool WorkspaceDiwne::content()
                                               ),
                               m_workspaceCoreNodes.end());
 
+    int node_count = m_workspaceCoreNodes.size();
+    m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count );
+
     /* draw nodes from back to begin (front to back) for catch interactions in right order */
     int prev_size = m_workspaceCoreNodes.size();
     DIWNE::DrawMode draw_mode = DIWNE::DrawMode::Interacting;
     for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
     {
-        draw_mode = interaction_happen ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting; /* if interaction happen in one node -> no interaction in another */
+        m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+        draw_mode = /*interaction_happen ? DIWNE::DrawMode::JustDraw : */DIWNE::DrawMode::Interacting; /* if interaction happen in one node -> no interaction in another */
         if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, draw_mode);
         if (prev_size != m_workspaceCoreNodes.size()) break; /* when pop from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
     }
 
-    /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
-    if (m_workspaceCoreNodes.size() > 0)
-    {
-        for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-        {
-            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence - maybe unused here */
-        }
-    }
+    m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+
+//    /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
+//    if (m_workspaceCoreNodes.size() > 0)
+//    {
+//        for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+//        {
+//            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence - maybe unused here */
+//        }
+//    }
+//
+//    for (auto link : m_linksToDraw)
+//    {
+//        interaction_happen |= link->drawDiwne();
+//    }
 
 #ifdef DIWNE_DEBUG
 DIWNE_DEBUG((*this), {
@@ -703,7 +715,7 @@ DIWNE_DEBUG((*this), {
 });
 #endif // DIWNE_DEBUG
 
-    m_interactionAllowed = /*!interaction_happen*/ true;
+    m_interactionAllowed = !interaction_happen;
 
     return interaction_happen;
 }
@@ -895,14 +907,19 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	}
 }
 
+//bool WorkspaceDiwne::allowInteraction()
+//{
+//    m_isHeldDiwne::allowInteraction()
+//}
+
 bool WorkspaceDiwne::bypassZoomAction(){ return InputManager::isAxisActive("scroll") != 0; }
 bool WorkspaceDiwne::bypassDragAction(){ return InputManager::isAxisActive("pan") != 0; }
 bool WorkspaceDiwne::bypassHoldAction(){return InputManager::isAxisActive("pan") != 0;}
 bool WorkspaceDiwne::bypassUnholdAction(){return InputManager::isAxisActive("pan") == 0;}
 
 /* \todo JH better way to get start pos and size of rectangle */
-//bool WorkspaceDiwne::bypassFocusForInteractionAction(){Diwne::bypassFocusForInteractionAction() && getDiwneAction() != DIWNE::DiwneAction::DragNode && getDiwneAction() != DIWNE::DiwneAction::NewLink;}
-bool WorkspaceDiwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && InputManager::isAxisActive("selectionRectangle") != 0  && (InputManager::m_mouseXDelta!=0 || InputManager::m_mouseXDelta!=0);} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+/* *3 for avoid switch to Selection rect when node in sequence -> some bug... */
+bool WorkspaceDiwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && InputManager::isAxisActive("selectionRectangle") != 0  && (InputManager::m_mouseXDragDelta > 3*ImGui::GetIO().MouseDragThreshold || InputManager::m_mouseYDragDelta > 3*ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta > 3*ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseYDragDelta > 3*ImGui::GetIO().MouseDragThreshold);} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos0());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta0()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 

@@ -61,7 +61,7 @@ void InputBindings::init()
 	//InputManager::setInputAction("center", Keys::d); /* \todo JH what is center? */
 
 
-    InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseRight);
+    InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseLeft);
 
 	InputManager::setInputAction("unplugInputPin", Keys::mouseLeft);
 	InputManager::setInputAction("hold", Keys::mouseLeft);

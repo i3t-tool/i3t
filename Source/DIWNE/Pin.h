@@ -23,17 +23,19 @@ class Pin : public DiwneObject
         virtual void begin();
         virtual void end();
         virtual void updateSizes();
-        virtual bool processInteractionsDiwne();
+        virtual bool processInteractionsAlways();
 
 
         virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
 
-        virtual bool bypassPinLinkConnectionPreparedAction();
-
         virtual bool processDrag();
-        virtual bool processPin_Pre_ConnectLink();
+
+        virtual bool processPin_Pre_ConnectLinkDiwne();
+        virtual bool bypassPinLinkConnectionPreparedAction();
+        virtual bool allowProcessPin_Pre_ConnectLink();
         virtual bool processConnectionPrepared();
-        virtual bool processFocusedForInteraction();
+
+        //virtual bool processFocusedForInteraction();
 
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 

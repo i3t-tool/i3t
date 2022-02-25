@@ -46,10 +46,6 @@ bool Link::initializeDiwne()
     return interaction_happen;
 }
 
-bool Link::allowFocus()
-{
-    return diwne.getDiwneAction() != DiwneAction::DragNode && DiwneObject::allowFocus();
-}
 
 bool Link::bypassFocusAction() {return m_squaredDistanceMouseFromLink < (diwne.mp_settingsDiwne->linkThicknessDiwne*diwne.mp_settingsDiwne->linkThicknessDiwne);}
 bool Link::bypassFocusForInteractionAction() {return bypassFocusAction();}
