@@ -84,7 +84,7 @@ void Application::run()
 {
 	while (!m_bShouldClose)
 	{
-    glfwWaitEvents();
+    glfwPollEvents();
 
     // Process commands.
 		for (auto& command : m_commands)

@@ -368,16 +368,28 @@ void insertTransformsToSequence(YAML::Node& transformIds, Ptr<GuiSequence> seque
 	}
 }
 
-template <typename Node>
-glm::vec3 buildVec3(Node&& node)
+glm::vec3 buildVec3(YAML::Node& node)
 {
 	auto vec = node.as<std::vector<float>>();
 
 	return glm::make_vec3(vec.data());
 }
 
-template <typename Node>
-glm::vec4 buildVec4(Node&& node)
+glm::vec3 buildVec3(YAML::Node&& node)
+{
+	auto vec = node.as<std::vector<float>>();
+
+	return glm::make_vec3(vec.data());
+}
+
+glm::vec4 buildVec4(YAML::Node& node)
+{
+	auto vec = node.as<std::vector<float>>();
+
+	return glm::make_vec4(vec.data());
+}
+
+glm::vec4 buildVec4(YAML::Node&& node)
 {
 	auto vec = node.as<std::vector<float>>();
 
@@ -389,9 +401,17 @@ glm::mat4 buildMat4(YAML::Node& node)
 	glm::mat4 result;
 
 	for (int i = 0; i < 4; ++i)
-	{
 		result[i] = buildVec4(node[i]);
-	}
+
+	return result;
+}
+
+glm::mat4 buildMat4(YAML::Node&& node)
+{
+	glm::mat4 result;
+
+	for (int i = 0; i < 4; ++i)
+		result[i] = buildVec4(node[i]);
 
 	return result;
 }
@@ -413,6 +433,36 @@ void buildOperator(YAML::Node& node)
 		auto posY = node["position"][1].as<float>();
 
 		auto op = createFns[enumVal](ImVec2{ posX, posY });
+		auto coreNode = op->getNodebase();
+
+		const auto* props = coreNode->getOperation();
+
+		ValueSetResult valueResult;
+
+		if (props->isConstructor)
+		{
+			const auto outputType = props->outputTypes[0];
+
+			switch (outputType)
+			{
+			case EValueType::Float:
+				valueResult = coreNode->setValue(node["value"].as<float>());
+				break;
+			case EValueType::Vec3:
+				valueResult = coreNode->setValue(buildVec3(node["value"]));
+				break;
+			case EValueType::Vec4:
+				valueResult = coreNode->setValue(buildVec4(node["value"]));
+				break;
+			case EValueType::Matrix:
+				valueResult = coreNode->setValue(buildMat4(node["value"]));
+				break;
+			default:
+				break;
+			}
+		}
+
+		I3T_ASSERT(valueResult.status == ValueSetResult::Status::Ok);
 
 		op->getNodebase()->changeId(id);
 	}
@@ -488,8 +538,7 @@ void buildTransform(YAML::Node& node)
 			// coreTransform->setDefaultValue(keyStr, node["defaults"][key]);
 		}
 
-		auto valueNode = node["value"];
-		coreTransform->setValue(buildMat4(valueNode));
+		coreTransform->setValue(buildMat4(node["value"]));
 
 		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies();
 		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();

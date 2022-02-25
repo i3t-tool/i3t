@@ -88,6 +88,9 @@ void Node::init()
 	if (m_operation->isConstructor)
 		for (int i = 0; i < m_operation->numberOfOutputs; i++)
 			m_OperatorState.push_back(EValueState::Editable);
+	else
+		for (int i = 0; i < m_operation->numberOfOutputs; i++)
+			m_OperatorState.push_back(EValueState::Locked);
 }
 
 void Node::notifyOwner()
