@@ -28,7 +28,7 @@ std::string dumpValue(EValueType value, const Core::NodePtr& node)
 	case EValueType::Pulse:
 		break;
 	case EValueType::Float:
-		str = fmt::format("{}", node->getData().getFloat());
+		str = Utils::toString(node->getData().getFloat());
 		break;
 	case EValueType::Vec3:
 		str = Utils::toString(node->getData().getVec3());
@@ -43,9 +43,7 @@ std::string dumpValue(EValueType value, const Core::NodePtr& node)
 		str = Utils::toString(node->getData().getQuat());
 		break;
 	case EValueType::MatrixMul:
-		break;
 	case EValueType::Screen:
-		break;
 	case EValueType::Ptr:
 		break;
 	}
