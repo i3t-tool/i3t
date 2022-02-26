@@ -487,7 +487,8 @@ bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode/*=DIWNE::DrawMode
     bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
     if (isConnected())
     {
-        inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
+        //inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
+        static_cast<WorkspaceDiwne&>(diwne).m_linksToDraw.push_back(&getLink());
     }
     return inner_interaction_happen;
 }
@@ -512,8 +513,8 @@ bool WorkspaceCoreInputPin::content()
     return inner_interaction_happen;
 }
 
-bool WorkspaceCoreInputPin::bypassCreateAndPlugConstrutorNodeAction(){return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);}
-bool WorkspaceCoreInputPin::allowCreateAndPlugConstrutorNodeAction(){return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && bypassFocusForInteractionAction();}
+bool WorkspaceCoreInputPin::bypassCreateAndPlugConstrutorNodeAction(){return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed);}
+bool WorkspaceCoreInputPin::allowCreateAndPlugConstrutorNodeAction(){return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;}
 bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
 {
     if (allowCreateAndPlugConstrutorNodeAction() && bypassCreateAndPlugConstrutorNodeAction())
@@ -538,9 +539,11 @@ bool WorkspaceCoreInputPin::processUnplug()
 
 bool WorkspaceCoreInputPin::processInteractions()
 {
-    bool interaction_happen = processCreateAndPlugConstrutorNode();
+    bool interaction_happen = WorkspaceCorePin::processInteractions();
     interaction_happen |= processUnplug();
-    interaction_happen = WorkspaceCorePin::processInteractions();
+    if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed))
+        int i =7;
+    interaction_happen |= processCreateAndPlugConstrutorNode();
     return interaction_happen;
 }
 /* >>>> WorkspaceCoreLink <<<< */

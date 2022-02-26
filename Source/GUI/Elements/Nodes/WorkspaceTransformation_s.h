@@ -12,6 +12,11 @@ WorkspaceTransformation_s(DIWNE::Diwne& diwne)
         setDataItemsWidth();
     }
 
+virtual Core::ETransformState dataAreValid() override
+{
+    return m_nodebase->as<Core::TransformImpl<T>>()->isValid();
+}
+
 int maxLenghtOfData()
 {
     if (ETransformType::Quat == T)

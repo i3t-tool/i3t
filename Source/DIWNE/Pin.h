@@ -19,6 +19,7 @@ class Pin : public DiwneObject
 
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldPin;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragPin;};
+        DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchPin;};
 
         virtual void begin();
         virtual void end();
@@ -34,8 +35,6 @@ class Pin : public DiwneObject
         virtual bool bypassPinLinkConnectionPreparedAction();
         virtual bool allowProcessPin_Pre_ConnectLink();
         virtual bool processConnectionPrepared();
-
-        //virtual bool processFocusedForInteraction();
 
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 

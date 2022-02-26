@@ -50,6 +50,19 @@ bool Link::initializeDiwne()
 bool Link::bypassFocusAction() {return m_squaredDistanceMouseFromLink < (diwne.mp_settingsDiwne->linkThicknessDiwne*diwne.mp_settingsDiwne->linkThicknessDiwne);}
 bool Link::bypassFocusForInteractionAction() {return bypassFocusAction();}
 
+bool Link::processFocused()
+{
+    if (bypassTouchAction()) {diwne.setDiwneAction(getTouchActionType());}
+    diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, diwne.mp_settingsDiwne->objectFocusBorderColor, diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
+    return true;
+}
+
+bool Link::processFocusedForInteraction()
+{
+    diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor, diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
+    return true;
+}
+
 bool Link::content()
 {
     if (m_selected){diwne.AddBezierCurveDiwne(m_startDiwne, m_controlPointStartDiwne, m_controlPointEndDiwne, m_endDiwne, diwne.mp_settingsDiwne->linkColorSelected, diwne.mp_settingsDiwne->linkThicknessDiwne+diwne.mp_settingsDiwne->linkThicknessSelectedBorderDiwne ); }

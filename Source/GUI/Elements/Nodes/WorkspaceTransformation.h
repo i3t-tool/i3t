@@ -24,7 +24,7 @@ public:
 	Ptr<Core::NodeBase> getNodebaseSequence();
 
 
-	virtual bool dataAreValid() { return true; }; /* \todo JH query to core */
+	virtual Core::ETransformState dataAreValid() { return Core::ETransformState::Valid; };
 
 	virtual void drawMenuSetDataMap();
 

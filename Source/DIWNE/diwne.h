@@ -68,15 +68,22 @@ struct SettingsDiwne
     ImColor itemSelectedBorderColor = ImColor(100,100,0,255);
     float itemSelectedBorderThicknessDiwne = 5;
 
-    ImColor nodeHoveredBorderColor = ImColor(100,100,0,255);
-    float nodeHoveredBorderThicknessDiwne = 2;
+    ImColor objectFocusBorderColor = ImColor(0,0,0,100);
+    float objectFocusBorderThicknessDiwne = 3;
+    ImColor objectFocusForInteractionBorderColor = ImColor(0,0,0,255);
+    float objectFocusForInteractionBorderThicknessDiwne = 3;
+
+
     float middleAlign = 0.5;
 
     ImColor pinHoveredBorderColor = ImColor(100,100,0,255);
     float pinHoveredBorderThicknessDiwne = 2;
-
+    ImColor nodeHoveredBorderColor = ImColor(100,100,0,255);
+    float nodeHoveredBorderThicknessDiwne = 2;
     ImColor backgroundHoveredBorderColor = ImColor(100,100,0,255);
     float backgroundHoveredBorderThicknessDiwne = 2;
+
+
 
     float linkInteractionWidthDiwne = 10;
     float linkThicknessDiwne = 10;
@@ -110,6 +117,7 @@ class Diwne : public DiwneObject
         virtual ~Diwne(){};
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldWorkarea;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragWorkarea;};
+        DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchWorkarea;};
 
 
         virtual bool initializeDiwne();
@@ -274,14 +282,9 @@ class Diwne : public DiwneObject
         virtual ImVec2 bypassDiwneGetSelectionRectangleSize();
         virtual bool processDiwneSelectionRectangle();
 
-        virtual bool processFocused();
-        virtual bool processFocusedForInteraction();
-
-
-
         DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused, m_objectInteracted;
+        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused;
 
 
     protected:

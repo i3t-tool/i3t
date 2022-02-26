@@ -57,7 +57,6 @@ void InputBindings::init()
 	// Workspace window actions.
 	InputManager::setInputAction("selectAll", Keys::a, {Keys::ctrll});
 	InputManager::setInputAction("invertSelection", Keys::i, {Keys::ctrll});
-	//InputManager::setInputAction("navigateToContent", Keys::s, {Keys::ctrll}); /* \todo JH same as zoom to all ? */
 	//InputManager::setInputAction("center", Keys::d); /* \todo JH what is center? */
 
 

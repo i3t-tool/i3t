@@ -27,24 +27,24 @@ enum IconType
 enum DiwneAction
 {
     None,
+    FocusOnObject,
+    InteractingContent, /* for other unspecified interactions */
+    NewLink,
 
     HoldNode,
-    DragNode,
-    InteractingContent, /* for other unspecified interactions */
-
-    FocusOnObject,
-
     HoldPin,
-    DragPin,
-
-    NewLink,
     HoldLink,
+    HoldWorkarea,
+
+    DragNode,
+    DragPin,
     DragLink, /* dragging already existing/connected link */
+    DragWorkarea,
 
     TouchNode,
-
-    HoldWorkarea,
-    DragWorkarea,
+    TouchPin,
+    TouchLink,
+    TouchWorkarea,
 
     SelectionRectFull,
     SelectionRectTouch

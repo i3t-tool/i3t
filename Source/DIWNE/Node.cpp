@@ -110,54 +110,21 @@ bool Node::afterEndDiwne()
     return DiwneObject::afterEndDiwne();
 }
 
-bool Node::bypassTouchAction()
-{
-   return diwne.bypassIsMouseClicked0();
-}
-
-bool Node::processFocused()
-{
-    if (bypassTouchAction())
-    {
-        diwne.setDiwneAction(DIWNE::DiwneAction::TouchNode);
-    }
-    return true;
-}
-
-bool Node::processFocusedForInteraction()
-{
-    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->nodeHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->nodeHoveredBorderThicknessDiwne);
-    return true;
-}
-
-bool Node::processSelected()
+bool Node::processSelect()
 {
     diwne.setNodesSelectionChanged(true);
     return true;
 }
 
-bool Node::processUnselected()
+bool Node::processUnselect()
 {
     diwne.setNodesSelectionChanged(true);
-    return true;
-}
-
-bool Node::processHold()
-{
-    diwne.setDiwneAction(DiwneAction::HoldNode);
-    return true;
-}
-
-bool Node::processUnhold()
-{
-    diwne.setDiwneAction(DiwneAction::None);
     return true;
 }
 
 bool Node::processDrag()
 {
     translateNodePositionDiwne(diwne.bypassGetMouseDelta()/diwne.getWorkAreaZoom());
-    diwne.setDiwneAction(DiwneAction::DragNode);
     return true;
 }
 

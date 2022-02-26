@@ -57,6 +57,7 @@ public: /* \todo JH some atributes should be private/protected */
     virtual ImRect getRectDiwne() const = 0;
     virtual DIWNE::DiwneAction getHoldActionType() const = 0;
     virtual DIWNE::DiwneAction getDragActionType() const = 0;
+    virtual DIWNE::DiwneAction getTouchActionType() const = 0;
 
     virtual bool bypassRaisePopupAction();
     virtual bool bypassFocusAction();
@@ -66,6 +67,7 @@ public: /* \todo JH some atributes should be private/protected */
     virtual bool bypassSelectAction();
     virtual bool bypassUnselectAction();
     virtual bool bypassDragAction();
+    virtual bool bypassTouchAction();
 
     virtual bool processRaisePopupDiwne();
     virtual bool processShowPopupDiwne();

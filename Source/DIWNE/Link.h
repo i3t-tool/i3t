@@ -20,6 +20,7 @@ class Link : public DiwneObject
         virtual bool content();
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldLink;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragLink;};
+        DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchLink;};
 
 
         virtual void updateEndpoints(){};
@@ -48,6 +49,8 @@ class Link : public DiwneObject
         virtual bool bypassFocusAction();
         virtual bool bypassFocusForInteractionAction();
 
+        virtual bool processFocusedForInteraction();
+        virtual bool processFocused();
 
         bool m_just_pluged;
 
