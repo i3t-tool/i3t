@@ -308,18 +308,18 @@ void UIModule::queryCameraState()
 	if (!InputManager::isInputActive(getWindowPtr<UI::Viewport>()->getInputPtr())) return;
 
 	// ORBIT camera rotation
-	if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Pressed))
+	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
 	{
 		InputManager::beginCameraControl();
 	}
-	if (InputManager::isActionTriggered("KeyWorld_mouseRotate", EKeyState::Released))
+	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
 	{
 		InputManager::endCameraControl();
 	}
 
 	// CAMERA PANNING - set a new orbit center
-	if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Pressed)) { InputManager::beginCameraControl(); }
-	if (InputManager::isActionTriggered("KeyWorld_mousePan", EKeyState::Released)) { InputManager::endCameraControl(); }
+	if (InputManager::isActionTriggered("pan", EKeyState::Pressed)) { InputManager::beginCameraControl(); }
+	if (InputManager::isActionTriggered("pan", EKeyState::Released)) { InputManager::endCameraControl(); }
 }
 
 /**

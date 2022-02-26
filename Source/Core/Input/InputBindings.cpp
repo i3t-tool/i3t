@@ -38,15 +38,13 @@ void InputBindings::init()
 	InputManager::setInputAxis("moveRight", 1.0f, Keys::d);
 	InputManager::setInputAxis("moveRight", -1.0f, Keys::a);
 
-	InputManager::setInputAction("KeyWorld_mousePan", Keys::mouseMiddle);    /// \todo Will be removed
-	InputManager::setInputAction("KeyWorld_mouseRotate", Keys::mouseRight);  /// \todo Will be removed
-	InputManager::setInputAction("Key_undo", Keys::b);                       /// \todo Will be removed
-	InputManager::setInputAction("Key_redo", Keys::n);                       /// \todo Will be removed
-
-	InputManager::setInputAction("test", Keys::t);                                     /// \todo Will be removed
+#ifdef I3T_DEBUG
+	InputManager::setInputAction("test", Keys::t);                                           /// \todo Will be removed
+	InputManager::setInputAction("TestMouseCtrlAction", Keys::mouseLeft, { Keys::ctrll });  /// \todo Will be removed
 	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});  /// \todo Will be removed
-	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});            /// \todo Will be removed
-	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});                  /// \todo Will be removed
+	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});       /// \todo Will be removed
+	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});           /// \todo Will be removed
+#endif
 
 	/*
 	InputManager::setInputAxis("MouseScroll", 1.0f, Keys::mouseScrlUp);
@@ -76,7 +74,7 @@ void InputBindings::init()
 	InputManager::setInputAction("select", Keys::mouseLeft);
 
 	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});
-    InputManager::setInputAction("unplugInput", Keys::mouseLeft);
+	InputManager::setInputAction("unplugInput", Keys::mouseLeft);
 
 	InputManager::setInputAction("touch", Keys::mouseLeft);
 

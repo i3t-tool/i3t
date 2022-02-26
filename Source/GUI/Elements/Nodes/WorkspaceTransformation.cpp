@@ -79,6 +79,7 @@ bool WorkspaceTransformation::afterContent()
 
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
     }
+		return true;
 }
 
 void WorkspaceTransformation::popupContent()
