@@ -259,6 +259,16 @@ void InputManager::update()
 	m_mouseXPrev = m_mouseX;
 	m_mouseYPrev = m_mouseY;
 
+	/* \todo JH probably very naive */
+	if (isMouseDown())
+    {
+        m_mouseXDragDelta += m_mouseXDelta;
+        m_mouseYDragDelta += m_mouseYDelta;
+    }else
+    {
+        m_mouseXDragDelta = m_mouseYDragDelta = 0;
+    }
+
 	double x = 0, y = 0;
 	glfwGetCursorPos(Application::get().mainWindow(), &x, &y);
 
@@ -754,6 +764,9 @@ float InputManager::m_mouseYPrev = 0;
 
 float InputManager::m_mouseXDelta = 0;
 float InputManager::m_mouseYDelta = 0;
+
+float InputManager::m_mouseXDragDelta = 0;
+float InputManager::m_mouseYDragDelta = 0;
 
 int InputManager::m_winWidth = 0;
 int InputManager::m_winHeight = 0;

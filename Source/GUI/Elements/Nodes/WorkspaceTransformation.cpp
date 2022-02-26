@@ -58,12 +58,16 @@ bool WorkspaceTransformation::middleContent()
         inner_interaction_happen = drawDataFull();
 	}
 
-        /* to drawNodeAfterContent */
-	/*if (m_inactiveMark != 0)
+    return inner_interaction_happen;
+}
+
+bool WorkspaceTransformation::afterContent()
+{
+    if (m_inactiveMark != 0)
     {
-        ImVec2 start = ne::GetNodePosition(m_id);
-        ImVec2 size = ne::GetNodeSize(m_id);
-        ImVec2 end = start + size;
+        ImVec2 start = m_middleRectDiwne.Min;
+        ImVec2 end = m_middleRectDiwne.Max;
+        ImVec2 size = end-start;
         if(m_inactiveMark > 0)
         {
             end.x -= (1-m_inactiveMark)*size.x;
@@ -73,11 +77,8 @@ bool WorkspaceTransformation::middleContent()
             start.x += m_inactiveMark*size.x;
         }
 
-        //mGui::PushStyleColor(ImGuiColor, ImVec4(164, 171, 190, 1));
-        //ImGui::Dummy(const ImVec2& size);
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
-    }*/
-    return inner_interaction_happen;
+    }
 }
 
 void WorkspaceTransformation::popupContent()
@@ -134,7 +135,10 @@ bool WorkspaceTransformation::drawDataFull()
      ImGui::PushStyleColor( ImGuiCol_FrameBg, ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::FloatBg)) );
 
      interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-                                    m_nodebase->getData().getMat4(), m_nodebase->getDataMapRef(),
+                                    m_nodebase->getData().getMat4(), {m_nodebase->as<Core::Transformation>()->getValueState({0, 0}), m_nodebase->as<Core::Transformation>()->getValueState({1, 0}), m_nodebase->as<Core::Transformation>()->getValueState({2, 0}), m_nodebase->as<Core::Transformation>()->getValueState({3, 0}),
+                                                                      m_nodebase->as<Core::Transformation>()->getValueState({0, 1}), m_nodebase->as<Core::Transformation>()->getValueState({1, 1}), m_nodebase->as<Core::Transformation>()->getValueState({2, 1}), m_nodebase->as<Core::Transformation>()->getValueState({3, 1}),
+                                                                      m_nodebase->as<Core::Transformation>()->getValueState({0, 2}), m_nodebase->as<Core::Transformation>()->getValueState({1, 2}), m_nodebase->as<Core::Transformation>()->getValueState({2, 2}), m_nodebase->as<Core::Transformation>()->getValueState({3, 2}),
+                                                                      m_nodebase->as<Core::Transformation>()->getValueState({0, 3}), m_nodebase->as<Core::Transformation>()->getValueState({1, 3}), m_nodebase->as<Core::Transformation>()->getValueState({2, 3}), m_nodebase->as<Core::Transformation>()->getValueState({3, 3})},
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
 
     ImGui::PopStyleColor();
@@ -152,48 +156,76 @@ int WorkspaceTransformation::maxLenghtOfData()
     return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
-bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
-                                                        ,   std::vector<getter_function_pointer> const& getters
-                                                        ,   std::vector<setter_function_pointer> const& setters
-                                                        /*,   std::vector<unsigned char> const& datamap_values*/)
+//bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
+//                                                        ,   std::vector<getter_function_pointer> const& getters
+//                                                        ,   std::vector<setter_function_pointer> const& setters
+//                                                        /*,   std::vector<unsigned char> const& datamap_values*/)
+//{
+//    int number_of_values = labels.size();
+//	Debug::Assert(number_of_values==getters.size()
+//               && number_of_values==setters.size()
+//               /*&& number_of_values==datamap_values.size()*/ , "drawDataSetValues_builder: All vectors (labels, getters, setters) must have same size.");
+//
+//	bool	valueChanged = false, actual_value_changed = false, inner_interaction_happen = false;
+//	int		index_of_change;
+//	float valueOfChange, localData; /* user can change just one value at the moment */
+//
+//	ImGui::PushItemWidth(getDataItemsWidth());
+//	for (int i = 0; i < number_of_values; i++)
+//	{
+//		ImGui::TextUnformatted(labels[i].c_str());
+//
+//		ImGui::SameLine(50); /* \todo JH why 50 ?*/
+//
+//		localData = getters[i]();
+//
+//		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", getId(), i), localData, Core::EValueState::Editable, actual_value_changed);
+//
+//
+//		if (actual_value_changed){
+//
+//            valueChanged = true;
+//			index_of_change = i;
+//			valueOfChange = localData;
+//		}
+//	}
+//	ImGui::PopItemWidth();
+//
+//	if (valueChanged)
+//	{
+//		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value of setter */
+//		setDataItemsWidth();
+//	}
+//
+//	// ImGui::Spring(0);
+//	return inner_interaction_happen;
+//}
+
+
+bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
+                                                        ,   std::vector<float*> const& local_data
+                                                        ,   bool &value_changed)
 {
     int number_of_values = labels.size();
-	Debug::Assert(number_of_values==getters.size()
-               && number_of_values==setters.size()
-               /*&& number_of_values==datamap_values.size()*/ , "drawDataSetValues_builder: All vectors (labels, getters, setters) must have same size.");
+	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_builder: All vectors (labels, local_data) must have same size.");
 
-	bool	valueChanged = false, actual_value_changed = false, inner_interaction_happen = false;
-	int		index_of_change;
-	float valueOfChange, localData; /* user can change just one value at the moment */
+	value_changed = false;
+	bool inner_interaction_happen = false, actual_value_changed = false;
 
 	ImGui::PushItemWidth(getDataItemsWidth());
 	for (int i = 0; i < number_of_values; i++)
 	{
 		ImGui::TextUnformatted(labels[i].c_str());
 
-		ImGui::SameLine(50); /* \todo JH why 50? what is it */
+		ImGui::SameLine();
 
-		localData = getters[i]();
+        /* \todo JH dataState "1" from settings */
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], Core::EValueState::EditableSyn, actual_value_changed);
+        value_changed |= actual_value_changed;
 
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", getId(), i), localData, 1, actual_value_changed);
-
-
-		if (actual_value_changed){
-
-            valueChanged = true;
-			index_of_change = i;
-			valueOfChange = localData;
-		}
 	}
 	ImGui::PopItemWidth();
 
-	if (valueChanged)
-	{
-		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value of setter */
-		setDataItemsWidth();
-	}
-
-	// ImGui::Spring(0);
 	return inner_interaction_happen;
 }
 

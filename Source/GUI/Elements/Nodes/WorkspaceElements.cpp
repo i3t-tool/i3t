@@ -73,6 +73,10 @@ bool WorkspaceNode::middleContent()
     return interaction_happen;
 }
 
+bool WorkspaceNode::leftContent(){return false;}
+bool WorkspaceNode::rightContent(){return false;}
+bool WorkspaceNode::bottomContent(){return false;}
+
 
 bool WorkspaceNode::bypassFocusForInteractionAction()
 {

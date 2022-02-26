@@ -49,7 +49,10 @@ class WorkspaceDiwne : public DIWNE::Diwne
     friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
 
     public: /* \todo JH make some protected etc... */
+
     WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+
+    ImDrawListSplitter m_channelSplitter;
 
     void popupContent();
 
@@ -68,6 +71,8 @@ class WorkspaceDiwne : public DIWNE::Diwne
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> const & getAllNodes() {return m_workspaceCoreNodes;};
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
+
+	std::vector<WorkspaceCoreLink*> m_linksToDraw;
 
 	bool processCreateAndPlugTypeConstructor();
 
@@ -104,6 +109,31 @@ class WorkspaceDiwne : public DIWNE::Diwne
     void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const & nodesToShift);
 	void shiftInteractingNodeToEnd();
+
+	void processDragAllSelectedNodes();
+
+	void selectAll();
+	void invertSelection();
+	void zoomToAll();
+    void zoomToSelected();
+    ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
+    void zoomToRectangle(ImRect const& rect);
+
+    void deleteSelectedNodes();
+
+    //bool allowInteraction();
+
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodesInnerIncluded();
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllNodesInnerIncluded();
+
+	bool bypassZoomAction();
+	bool bypassDragAction();
+	bool bypassHoldAction();
+    bool bypassUnholdAction();
+
+    bool bypassSelectionRectangleAction() override;
+    ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
+    ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 };
 
 /*! \class class for Workspace window object

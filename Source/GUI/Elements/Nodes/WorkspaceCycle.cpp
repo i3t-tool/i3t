@@ -205,7 +205,7 @@ bool WorkspaceCycle::middleContent()
 
 
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 0),
-                                    localData, 1, valueChanged);
+                                    localData, Core::EValueState::Editable , valueChanged);
 
 		if (valueChanged)
 		{
@@ -251,7 +251,7 @@ bool WorkspaceCycle::middleContent()
 
 		localData = coreData_float;
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 1),
-                                    localData, coreMap[0], valueChanged);
+                                    localData, Core::EValueState::Editable, valueChanged); /* \todo MH PF Always editable?*/
 
 
 		ImGui::PopStyleVar();

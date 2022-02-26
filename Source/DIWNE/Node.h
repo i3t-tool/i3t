@@ -69,7 +69,11 @@ class Node : public DiwneObject
             if(/*drawMode == DrawMode::Interacting && */interaction_happen)
             {
                diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-               if (!(diwne.getDiwneAction() == DiwneAction::DragNode || diwne.getDiwneAction() == DiwneAction::HoldNode || diwne.getDiwneAction() == DiwneAction::TouchNode || diwne.getDiwneAction() == DiwneAction::NewLink || diwne.getDiwneAction() == DiwneAction::FocusOnObject)) diwne.setDiwneAction(DiwneAction::InteractingContent);
+               if (/*!(diwne.getDiwneAction() == DiwneAction::DragNode
+                      || diwne.getDiwneAction() == DiwneAction::HoldNode
+                      || diwne.getDiwneAction() == DiwneAction::TouchNode
+                      || diwne.getDiwneAction() == DiwneAction::NewLink
+                      || diwne.getDiwneAction() == DiwneAction::FocusOnObject)*/ diwne.getDiwneActionActive()==DiwneAction::None /* no specific action */){ diwne.setDiwneAction(DiwneAction::InteractingContent);}
             }
 
             return interaction_happen;
@@ -124,7 +128,6 @@ class Node : public DiwneObject
 
         float m_centerDummySpace;
         DrawModeNodePosition m_nodePosMode;
-        DrawMode m_drawMode;
 
     private:
 

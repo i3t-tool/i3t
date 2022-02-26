@@ -24,10 +24,74 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
 
-{}
+{
+}
 
-//AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max,
-//                           dragDelta.x > 0 ? ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::SelectionRectFull)) : ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::SelectionRectTouch)) );
+void WorkspaceDiwne::selectAll()
+{
+    for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+    {
+        workspaceCoreNode->setSelected(true);
+    }
+}
+
+void WorkspaceDiwne::invertSelection()
+{
+    for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+    {
+        workspaceCoreNode->setSelected(!workspaceCoreNode->getSelected());
+    }
+}
+
+void WorkspaceDiwne::zoomToAll()
+{
+    zoomToRectangle(getOverNodesRectangleDiwne(getAllNodesInnerIncluded()));
+}
+
+void WorkspaceDiwne::zoomToSelected()
+{
+    zoomToRectangle(getOverNodesRectangleDiwne(getSelectedNodesInnerIncluded()));
+}
+
+
+ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes)
+{
+    ImRect rect = ImRect(0,0,0,0);
+    if (nodes.size() == 0) {return rect;}
+    if (nodes.size() == 1) {return nodes.at(0)->getRectDiwne();}
+
+    rect = nodes.at(0)->getRectDiwne();
+    for (auto&& workspaceCoreNode : nodes)
+    {
+       rect.Add(workspaceCoreNode->getRectDiwne());
+    }
+    return rect;
+}
+
+void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
+{
+    if (rect.Min.x == 0 && rect.Min.y == 0 && rect.Max.x == 0 && rect.Max.y == 0) return;
+
+    ImRect waScreen = getWorkAreaScreen();
+    float heightZoom = waScreen.GetHeight()/rect.GetHeight(), widthZoom = waScreen.GetWidth()/rect.GetWidth();
+    setWorkAreaZoom( std::min(heightZoom, widthZoom) );
+
+    translateWorkAreaDiwne(rect.Min - getWorkAreaDiwne().Min);
+}
+
+void WorkspaceDiwne::deleteSelectedNodes()
+{
+    for (auto&& workspaceCoreNode : getSelectedNodesInnerIncluded())
+    {
+        workspaceCoreNode->setRemoveFromWorkspace(true);
+
+        Ptr<WorkspaceTransformation> trn = std::dynamic_pointer_cast<WorkspaceTransformation>(workspaceCoreNode);
+        if (trn != nullptr)
+        {
+            trn->setRemoveFromSequence(true);
+        }
+    }
+}
 
 
 void WorkspaceDiwne::popupContent()
@@ -39,11 +103,11 @@ void WorkspaceDiwne::popupContent()
             /* \todo JH can be done by for-cycle if somewhere is list of types with group (transformation, operator, ...) and label*/
 			if (ImGui::MenuItem("free"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationFree>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Free>>();
 			}
 			if (ImGui::MenuItem("translation"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationTranslation>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Translation>>();
 			}
 
 			if (ImGui::BeginMenu("rotation"))
@@ -51,47 +115,47 @@ void WorkspaceDiwne::popupContent()
 
 				if (ImGui::MenuItem("eulerAngleX"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationEulerX>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerX>>();
 				}
 				if (ImGui::MenuItem("eulerAngleY"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationEulerY>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerY>>();
 				}
 				if (ImGui::MenuItem("eulerAngleZ"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationEulerZ>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerZ>>();
 				}
 				if (ImGui::MenuItem("axisAngle"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationAxisAngle>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::AxisAngle>>();
 				}
 				if (ImGui::MenuItem("quat"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationQuaternion>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Quat>>();
 				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("scale"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationScale>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
 			}
 			if (ImGui::MenuItem("lookAt"))
 			{
-			    addNodeToPositionOfPopup<WorkspaceTransformationLookAt>();
+			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::LookAt>>();
 			}
 			if (ImGui::BeginMenu("projection"))
 			{
 				if (ImGui::MenuItem("ortho"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationOrthoProjection>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Ortho>>();
 				}
 				if (ImGui::MenuItem("perspective"))
 				{
-                    addNodeToPositionOfPopup<WorkspaceTransformationPerspective>();
+                    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Perspective>>();
 				}
 				if (ImGui::MenuItem("frustrum"))
 				{
-				    addNodeToPositionOfPopup<WorkspaceTransformationFrustum>();
+				    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Frustum>>();
 				}
 				ImGui::EndMenu();
 			}
@@ -491,6 +555,17 @@ void WorkspaceDiwne::popupContent()
 
 		ImGui::Separator();
 
+		if (ImGui::BeginMenu("Select"))
+        {
+            if (ImGui::MenuItem("All nodes"))
+            {
+                selectAll();
+            }
+        ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
+
 		if (ImGui::BeginMenu("Delete"))
 			{
 				if (ImGui::MenuItem("All nodes"))
@@ -530,8 +605,6 @@ void WorkspaceDiwne::popupContent()
                                 }
                             }
                         }
-
-
 
                     }
 				}
@@ -580,6 +653,7 @@ void WorkspaceDiwne::popupContent()
 bool WorkspaceDiwne::beforeBegin()
 {
     m_workspaceDiwneAction = WorkspaceDiwneAction::None;
+    m_linksToDraw.clear();
 
     return false;
 }
@@ -605,24 +679,35 @@ bool WorkspaceDiwne::content()
                                               ),
                               m_workspaceCoreNodes.end());
 
+    int node_count = m_workspaceCoreNodes.size();
+    m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count );
+
     /* draw nodes from back to begin (front to back) for catch interactions in right order */
     int prev_size = m_workspaceCoreNodes.size();
     DIWNE::DrawMode draw_mode = DIWNE::DrawMode::Interacting;
     for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
     {
-        draw_mode = interaction_happen ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting; /* if interaction happen in one node -> no interaction in another */
+        m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+        draw_mode = /*interaction_happen ? DIWNE::DrawMode::JustDraw : */DIWNE::DrawMode::Interacting; /* if interaction happen in one node -> no interaction in another */
         if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, draw_mode);
         if (prev_size != m_workspaceCoreNodes.size()) break; /* when pop from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
     }
 
-    /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
-    if (m_workspaceCoreNodes.size() > 0)
-    {
-        for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-        {
-            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence - maybe unused here */
-        }
-    }
+    m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+
+//    /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
+//    if (m_workspaceCoreNodes.size() > 0)
+//    {
+//        for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+//        {
+//            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence - maybe unused here */
+//        }
+//    }
+//
+//    for (auto link : m_linksToDraw)
+//    {
+//        interaction_happen |= link->drawDiwne();
+//    }
 
 #ifdef DIWNE_DEBUG
 DIWNE_DEBUG((*this), {
@@ -646,22 +731,18 @@ bool WorkspaceDiwne::afterContent()
 
 	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
 
-    /* hold or drag or interacting or new_link && in previous frame not hold neither drag neither interacting neither new_link */
+    /* hold or drag or interacting or new_link  */
     if ( (m_diwneAction == DIWNE::DiwneAction::DragNode
           || m_diwneAction == DIWNE::DiwneAction::HoldNode
           || m_diwneAction == DIWNE::DiwneAction::InteractingContent
           || m_diwneAction == DIWNE::DiwneAction::NewLink
           || m_diwneAction == DIWNE::DiwneAction::TouchNode)
-        /*&&
-        !(m_diwneAction_previousFrame == DIWNE::DiwneAction::DragNode
-          || m_diwneAction_previousFrame == DIWNE::DiwneAction::HoldNode
-          || m_diwneAction_previousFrame == DIWNE::DiwneAction::InteractingContent
-          || m_diwneAction_previousFrame == DIWNE::DiwneAction::NewLink
-          || m_diwneAction_previousFrame == DIWNE::DiwneAction::TouchNode) */ // for example with pushing to sequence in prev_frame we hold/drag node and than interact content of sequence -> it is hard to cover all possibilities
         )
     {
         shiftInteractingNodeToEnd();
     }
+
+    if (m_diwneAction == DIWNE::DiwneAction::DragNode && getLastActiveNode<WorkspaceNodeWithCoreData>()->getSelected() ) {processDragAllSelectedNodes();}
     return interaction_happen;
 }
 
@@ -669,6 +750,14 @@ bool WorkspaceDiwne::afterEnd()
 {
     m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
     return false;
+}
+
+void WorkspaceDiwne::processDragAllSelectedNodes()
+{
+    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+    {
+        if (workspaceCoreNode->getSelected() && workspaceCoreNode != getLastActiveNode<WorkspaceNodeWithCoreData>()) workspaceCoreNode->processDrag();
+    }
 }
 
 bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
@@ -696,6 +785,51 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
         return true;
     }
     return false;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getSelectedNodesInnerIncluded()
+{
+   std::vector<Ptr<WorkspaceNodeWithCoreData>> selected;
+   	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+    {
+        if(workspaceCoreNode->getSelected()) {selected.push_back(workspaceCoreNode);}
+    }
+    return selected;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllNodesInnerIncluded()
+{
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> allNodes;
+	for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+    {
+        allNodes.push_back(workspaceCoreNode);
+
+        /* inner of Sequence */
+        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
+        if (seq != nullptr)
+        {
+            for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+            {
+                allNodes.push_back(nodeInSequence);
+            }
+        }
+
+        /* inner of Sequences in Camera */
+        Ptr<WorkspaceCamera> cam = std::dynamic_pointer_cast<WorkspaceCamera>(workspaceCoreNode);
+        if (cam != nullptr)
+        {
+            for (auto&& nodeInSequence : cam->getProjection()->getInnerWorkspaceNodes())
+            {
+                allNodes.push_back(nodeInSequence);
+            }
+            for (auto&& nodeInSequence : cam->getView()->getInnerWorkspaceNodes())
+            {
+                allNodes.push_back(nodeInSequence);
+            }
+        }
+    }
+
+	return allNodes;
 }
 
 void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
@@ -773,6 +907,22 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	}
 }
 
+//bool WorkspaceDiwne::allowInteraction()
+//{
+//    m_isHeldDiwne::allowInteraction()
+//}
+
+bool WorkspaceDiwne::bypassZoomAction(){ return InputManager::isAxisActive("scroll") != 0; }
+bool WorkspaceDiwne::bypassDragAction(){ return InputManager::isAxisActive("pan") != 0; }
+bool WorkspaceDiwne::bypassHoldAction(){return InputManager::isAxisActive("pan") != 0;}
+bool WorkspaceDiwne::bypassUnholdAction(){return InputManager::isAxisActive("pan") == 0;}
+
+/* \todo JH better way to get start pos and size of rectangle */
+/* *3 for avoid switch to Selection rect when node in sequence -> some bug... */
+bool WorkspaceDiwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && InputManager::isAxisActive("selectionRectangle") != 0  && (InputManager::m_mouseXDragDelta > 3*ImGui::GetIO().MouseDragThreshold || InputManager::m_mouseYDragDelta > 3*ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta > 3*ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseYDragDelta > 3*ImGui::GetIO().MouseDragThreshold);} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos0());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta0()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+
 
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */
@@ -782,14 +932,25 @@ WorkspaceWindow::WorkspaceWindow(bool show)
     ,   m_first_frame(true)
     ,   m_wholeApplication(Application::get())
 {
+    // Input actions for workspace window.
+	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { m_workspaceDiwne.selectAll(); });
+	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { m_workspaceDiwne.invertSelection(); });
+	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() { m_workspaceDiwne.zoomToAll(); });
+	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { m_workspaceDiwne.zoomToSelected(); });
+	Input.bindAction("delete", EKeyState::Pressed, [&]() { m_workspaceDiwne.deleteSelectedNodes(); });
 
-// Input actions for workspace window.
-//	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { selectAll(); });
-//	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { invertSelection(); });
-//	Input.bindAction("navigateToContent", EKeyState::Pressed, [&]() { ne::NavigateToContent(); });
-//	Input.bindAction("center", EKeyState::Pressed, [&]() { ne::NavigateToSelection(); });
 
+
+/*
+	InputManager::isActionTriggered("raisePopup", EKeyState::Released);
+
+	InputManager::isAxisActive("dragElement");
+	InputManager::isAxisActive("dragEditor");
+*/
 }
+
+
+
 
 
 void WorkspaceWindow::render()
@@ -831,6 +992,8 @@ void WorkspaceWindow::render()
 	}
 	ImGui::End();
 }
+
+
 
 //Ptr<WorkspaceSequence> WorkspaceWindow::getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node)
 //{

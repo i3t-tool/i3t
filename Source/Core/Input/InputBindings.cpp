@@ -17,6 +17,7 @@ void InputBindings::init()
 	InputManager::setInputAction("duplicate", Keys::d, { Keys::ctrll });
 	InputManager::setInputAction("duplicate", Keys::mouseLeft, { Keys::ctrll });
 	InputManager::setInputAction("delete", Keys::del);
+	//InputManager::setInputAction("delete", Keys::backspace);
 
 	InputManager::setInputAction("undo", Keys::b, { Keys::ctrll });
 	InputManager::setInputAction("redo", Keys::n, { Keys::ctrll });
@@ -52,11 +53,35 @@ void InputBindings::init()
 	setAxisKey("MouseScroll", -1.0f, Keys::mouseScrlDown);
 	 */
 
+
 	// Workspace window actions.
-	InputManager::setInputAction("selectAll", Keys::a);
-	InputManager::setInputAction("invertSelection", Keys::i);
-	InputManager::setInputAction("navigateToContent", Keys::s);
-	InputManager::setInputAction("center", Keys::d);
+	InputManager::setInputAction("selectAll", Keys::a, {Keys::ctrll});
+	InputManager::setInputAction("invertSelection", Keys::i, {Keys::ctrll});
+	//InputManager::setInputAction("navigateToContent", Keys::s, {Keys::ctrll}); /* \todo JH same as zoom to all ? */
+	//InputManager::setInputAction("center", Keys::d); /* \todo JH what is center? */
+
+
+    InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseLeft);
+
+	InputManager::setInputAction("unplugInputPin", Keys::mouseLeft);
+	InputManager::setInputAction("hold", Keys::mouseLeft);
+	InputManager::setInputAxis("drag", 1.0f, Keys::mouseLeft);
+	InputManager::setInputAction("zoomToAll", Keys::a, {Keys::shiftl});
+	InputManager::setInputAction("zoomToSelected", Keys::x, {Keys::shiftl});
+
+	//InputManager::setInputAction("unselectAll", Keys::mouseLeft);
+	InputManager::setInputAction("unselectAll", Keys::esc);
+	InputManager::setInputAction("NOTunselectAll", Keys::mouseLeft, {Keys::ctrll});
+	InputManager::setInputAction("NOTunselectAll", Keys::mouseLeft, {Keys::shiftl});
+	InputManager::setInputAction("select", Keys::mouseLeft);
+
+	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});
+    InputManager::setInputAction("unplugInput", Keys::mouseLeft);
+
+	InputManager::setInputAction("touch", Keys::mouseLeft);
+
+	InputManager::setInputAction("raisePopup", Keys::mouseRight);
+
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)

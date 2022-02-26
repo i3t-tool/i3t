@@ -13,7 +13,6 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="Di
     , m_centerDummySpace(0)
     , m_drawAnywhere(true)
     , m_nodePosMode(OnItsPosition)
-    , m_drawMode(Interacting)
 {}
 
 Node& Node::operator=(const Node& rhs)
@@ -37,15 +36,6 @@ bool Node::beforeBeginDiwne()
         break;
     }
     if(m_drawAnywhere) m_drawAnywhere=false;
-
-    if (m_drawMode == DrawMode::JustDraw)
-    {
-        /* InvisibleButton stole all interaction with any other ImGui elements */
-        ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-        ImGui::InvisibleButton("IBBlockingImGuiInteractions", getNodeRectSizeDiwne()*diwne.getWorkAreaZoom());
-        ImGui::SetCursorScreenPos(diwne.diwne2screen(getNodePositionDiwne()));
-        ImGui::PushID("JustDraw");
-    }
 
     return beforeBegin();
 }
@@ -111,11 +101,6 @@ bool Node::afterEndDiwne()
     if (m_selected)
     {
         diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
-    }
-
-    if (m_drawMode == DrawMode::JustDraw)
-    {
-        ImGui::PopID(); /* ImGui::PushID("JustDraw"); in beforeBeginDiwne() */
     }
 
     /* always block interactions with other nodes */

@@ -75,6 +75,7 @@ public:
 	static glm::vec2 m_mouseOffset;
 	static float m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
 	static float m_mouseXDelta, m_mouseYDelta;
+	static float m_mouseXDragDelta, m_mouseYDragDelta;
 
 private:
 	static std::vector<InputController*> m_inputControllers;

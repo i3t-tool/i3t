@@ -22,7 +22,7 @@ typedef std::function<void(...)> popupContent_function_pointer;
 /* ===================== */
 /* ===== p o p u p ===== */
 /* ===================== */
-static bool s_popupContentDrawn = false; /* only one popup content per frame (avoid double-content on DragFloat popup) */
+//static bool s_popupContentDrawn = false; /* only one popup content per frame (avoid double-content on DragFloat popup) */
 
 template<typename T, std::enable_if<std::is_base_of<DiwneObject, T>::value, bool>::type = true >
 static void expandPopupContent(T& object) /* for popupContent() functions of member of class */
@@ -46,7 +46,7 @@ static bool popupDiwne(std::string const popupID, ImVec2 const & popupPos, void 
             ImGui::EndPopup();
         }
     }
-    return interaction_happen || s_popupContentDrawn;
+    return interaction_happen/* || s_popupContentDrawn*/;
 }
 
 struct SettingsDiwne
@@ -62,7 +62,7 @@ struct SettingsDiwne
 
     ImVec2 initPopupPosition = ImVec2(0,0);
 
-    ImColor selectionRectFullColor = ImColor(0,255,0,100);
+    ImColor selectionRectFullColor = ImColor(0,255,0,100); /* \todo JH recomandation is not to store ImColor, but ImU32 or ImVec4 */
     ImColor selectionRectTouchColor = ImColor(0,0,255,100);
 
     ImColor itemSelectedBorderColor = ImColor(100,100,0,255);
@@ -122,14 +122,14 @@ class Diwne : public DiwneObject
         virtual bool processInteractionsDiwne();
         virtual bool finalizeDiwne();
 
-        bool blockPopup();
-        virtual bool allowInteraction();
+        bool blockRaisePopup();
+//        virtual bool allowInteraction();
 
         virtual ImRect getRectDiwne() const {return getWorkAreaDiwne();};
 
-        virtual bool processHold();
-        virtual bool processUnhold();
         virtual bool processDrag();
+
+        virtual bool processInteractions();
 
         void updateWorkAreaRectangles(); /*! \brief Update position and size of work area on screen and on diwne */
 
@@ -197,6 +197,8 @@ class Diwne : public DiwneObject
 
         DiwneAction getDiwneActionPreviousFrame() const {return m_diwneAction_previousFrame;};
 
+        DiwneAction getDiwneActionActive() const;
+
         DIWNE::Link& getHelperLink(){return m_helperLink;};
 
         template <typename T>
@@ -257,17 +259,21 @@ class Diwne : public DiwneObject
         virtual float bypassGetMouseWheel();
         virtual float bypassGetZoomDelta();
 
-        virtual bool bypassZoomAction();
         virtual bool bypassDiwneSetPopupPositionAction();
         virtual ImVec2 bypassDiwneGetPopupNewPositionAction();
-        virtual bool bypassSelectionRectangleAction();
-        ImRect getSelectionRectangleDiwne();
-        ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
-        ImVec2 bypassDiwneGetSelectionRectangleSize();
 
+        virtual bool allowProcessZoom();
+        virtual bool bypassZoomAction();
         virtual bool processZoom();
         virtual bool processDiwneZoom();
-        virtual bool processSelectionRectangle();
+
+        virtual bool allowProcessSelectionRectangle();
+        virtual bool bypassSelectionRectangleAction();
+        ImRect getSelectionRectangleDiwne();
+        virtual ImVec2 bypassDiwneGetSelectionRectangleStartPosition();
+        virtual ImVec2 bypassDiwneGetSelectionRectangleSize();
+        virtual bool processDiwneSelectionRectangle();
+
         virtual bool processFocused();
         virtual bool processFocusedForInteraction();
 
@@ -275,7 +281,7 @@ class Diwne : public DiwneObject
 
         DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused;
+        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused, m_objectInteracted;
 
 
     protected:
@@ -301,7 +307,7 @@ class Diwne : public DiwneObject
 
     ImVec2 m_popupPosition;
 
-
+    ImDrawListSplitter m_splitter;
 
     /* restore information */
     ImVec2 m_StoreItemSpacing;

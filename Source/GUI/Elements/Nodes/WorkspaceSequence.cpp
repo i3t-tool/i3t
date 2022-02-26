@@ -124,12 +124,14 @@ bool WorkspaceSequence::middleContent()
 
     if (getInputs().at(1)->isConnected() ) /* \todo JH MH better selection of copy pin? */
     {
-        //ImGui::TextUnformatted("Here draw input data...");
         bool valueChanged = false;
         int rowOfChange, columnOfChange;
         float valueOfChange;
         return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-                                    m_nodebase->getData(0).getMat4(), m_nodebase->getDataMapRef(),
+                                    m_nodebase->getData(0).getMat4(), {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+                                                                       Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+                                                                       Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+                                                                       Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked} ,
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
     }
 
@@ -166,6 +168,10 @@ bool WorkspaceSequence::middleContent()
                 push_index = i;
             }
         }
+
+        /* \todo some better selected transformation/nodes politic (when dragging, pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark action to do and in WorkspaceDiwne react to this action  */
+        transformation->setSelected(false);
+
         inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
         ImGui::SameLine();
 
@@ -179,28 +185,26 @@ bool WorkspaceSequence::middleContent()
             push_index = i;
         }
     }
-//    if (m_drawMode == DIWNE::DrawMode::Interacting)
-//    {
-        if ( push_index >= 0 && !dragedNode->isInSequence()) /* already in sequence if second drawing or other sequence */
-        {
-            moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
-            inner_interaction_happen |= true;
-        }
 
-        /* pop NodeFrom Sequence */
-        if ( m_drawMode == DIWNE::DrawMode::Interacting &&  diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+    if ( push_index >= 0 /*&& !dragedNode->isInSequence()*/) /* already in sequence if second drawing or other sequence */
+    {
+        moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
+        inner_interaction_happen |= true;
+    }
+
+    /* pop NodeFrom Sequence */
+    if ( m_drawMode == DIWNE::DrawMode::Interacting &&  diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode)
+    {
+        dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
+        if (dragedNode != nullptr) /* only transformation can be in Sequence*/
         {
-            dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
-            if (dragedNode != nullptr) /* only transformation can be in Sequence*/
+            if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
             {
-                if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
-                {
-                    moveNodeToWorkspace(dragedNode);
-                    inner_interaction_happen |= true;
-                }
+                moveNodeToWorkspace(dragedNode);
+                inner_interaction_happen |= true;
             }
         }
-//    }
+    }
 
 
 

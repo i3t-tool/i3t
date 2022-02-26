@@ -82,10 +82,15 @@ public:
 	virtual bool beforeContent();
     virtual bool topContent();
     virtual bool middleContent();
+    virtual bool leftContent();
+    virtual bool rightContent();
+    virtual bool bottomContent();
 
     bool m_removeFromWorkspaceWindow;
     bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};
 	void setRemoveFromWorkspace(bool value) {m_removeFromWorkspaceWindow=value;};
+
+
 
 
 

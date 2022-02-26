@@ -368,9 +368,12 @@ void insertTransformsToSequence(YAML::Node& transformIds, Ptr<GuiSequence> seque
 
 glm::vec3 buildVec3(YAML::Node& node)
 {
-	auto vec = node.as<std::vector<float>>();
+	return glm::make_vec3(node.as<std::vector<float>>().data());
+}
 
-	return glm::make_vec3(vec.data());
+glm::vec4 buildVec4(YAML::Node& node)
+{
+	return glm::make_vec4(node.as<std::vector<float> >().data());
 }
 
 glm::vec3 buildVec3(YAML::Node&& node)
@@ -380,18 +383,9 @@ glm::vec3 buildVec3(YAML::Node&& node)
 	return glm::make_vec3(vec.data());
 }
 
-glm::vec4 buildVec4(YAML::Node& node)
-{
-	auto vec = node.as<std::vector<float>>();
-
-	return glm::make_vec4(vec.data());
-}
-
 glm::vec4 buildVec4(YAML::Node&& node)
 {
-	auto vec = node.as<std::vector<float>>();
-
-	return glm::make_vec4(vec.data());
+	return glm::make_vec4(node.as<std::vector<float> >().data());
 }
 
 glm::mat4 buildMat4(YAML::Node& node)
