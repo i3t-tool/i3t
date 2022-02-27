@@ -32,12 +32,12 @@ bool WorkspaceTransformation::topContent()
     case Core::ETransformState::Invalid:
         diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,255,255),
             DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
-            ImVec2(20,20), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+            ImVec2(ImGui::GetFontSize(),ImGui::GetFontSize()), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
         break;
     case Core::ETransformState::Unknown:
-        diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,255,0), ImColor(255,255,255),
-            DIWNE::IconType::Cross, ImColor(255,255,0), ImColor(255,255,255),
-            ImVec2(20,20), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+        diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,255), ImColor(0,255,255),
+            DIWNE::IconType::Cross, ImColor(255,0,255), ImColor(0,255,255),
+            ImVec2(ImGui::GetFontSize(),ImGui::GetFontSize()), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
         break;
     }
 	return false;
@@ -71,7 +71,7 @@ bool WorkspaceTransformation::middleContent()
 
 bool WorkspaceTransformation::afterContent()
 {
-    if (m_inactiveMark != 0)
+    if (m_inactiveMark != 0) /* \todo JH MH? kde prosím přečtu tracking? */
     {
         ImVec2 start = m_middleRectDiwne.Min;
         ImVec2 end = m_middleRectDiwne.Max;
@@ -87,6 +87,7 @@ bool WorkspaceTransformation::afterContent()
 
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
     }
+    return false;
 }
 
 void WorkspaceTransformation::popupContent()

@@ -189,6 +189,10 @@ class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin
     public:
         WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
+        virtual bool content();
+
+
+        virtual bool drawData() = 0;
         virtual int maxLengthOfData() = 0;
 };
 
@@ -197,7 +201,7 @@ class WorkspaceCoreOutputPinMatrix4x4 : public WorkspaceCoreOutputPinWithData
     public:
         WorkspaceCoreOutputPinMatrix4x4(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
@@ -206,7 +210,7 @@ class WorkspaceCoreOutputPinVector4 : public WorkspaceCoreOutputPinWithData
     public:
         WorkspaceCoreOutputPinVector4(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
@@ -215,7 +219,7 @@ class WorkspaceCoreOutputPinVector3 : public WorkspaceCoreOutputPinWithData
     public:
         WorkspaceCoreOutputPinVector3(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
@@ -224,7 +228,7 @@ class WorkspaceCoreOutputPinFloat : public WorkspaceCoreOutputPinWithData
     public:
         WorkspaceCoreOutputPinFloat(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
@@ -233,7 +237,7 @@ class WorkspaceCoreOutputPinQuaternion : public WorkspaceCoreOutputPinWithData
     public:
         WorkspaceCoreOutputPinQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {};
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
@@ -243,7 +247,7 @@ class WorkspaceCoreOutputPinPulse : public WorkspaceCoreOutputPinWithData
         std::string m_buttonText;
         WorkspaceCoreOutputPinPulse(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node) : WorkspaceCoreOutputPinWithData(diwne, id, pin, node) {m_buttonText = m_pin.getLabel();};
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
@@ -256,11 +260,11 @@ class WorkspaceCoreOutputPinScreen : public WorkspaceCoreOutputPinWithData
     public:
         WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
-        bool content();
+        bool drawData();
         int maxLengthOfData();
 };
 
-/* MatrixMulPin is Output and Input because of different getLinkConnectionPointDiwne()  function */
+/* MatrixMulPin is Output and Input because of different getLinkConnectionPointDiwne() function */
 class WorkspaceCoreOutputPinMatrixMul : public WorkspaceCoreOutputPin
 {
     public:

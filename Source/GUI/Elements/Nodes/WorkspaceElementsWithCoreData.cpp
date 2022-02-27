@@ -278,9 +278,17 @@ WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diw
     : WorkspaceCoreOutputPin(diwne, id, pin, node)
 {}
 
+bool WorkspaceCoreOutputPinWithData::content()
+{
+    bool interaction_happen = false;
+    if (getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::Full){interaction_happen |= drawData(); ImGui::SameLine();}
+    interaction_happen |= WorkspaceCoreOutputPin::content();
+    return interaction_happen;
+}
+
 /* >>>> Pin types <<<< */
 
-bool WorkspaceCoreOutputPinMatrix4x4::content()
+bool WorkspaceCoreOutputPinMatrix4x4::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -295,10 +303,6 @@ bool WorkspaceCoreOutputPinMatrix4x4::content()
                                                                     valState, valState, valState, valState,
                                                                     valState, valState, valState, valState},
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
-
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         /* \todo JM MH set values to given (this) pin*/
@@ -313,7 +317,7 @@ int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
     return maxLenghtOfData4x4(getCorePin().data().getMat4(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinVector4::content()
+bool WorkspaceCoreOutputPinVector4::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -326,10 +330,6 @@ bool WorkspaceCoreOutputPinVector4::content()
                                     getCorePin().data().getVec4(), {valState, valState, valState, valState},
                                     valueChanged, valueOfChange );
 
-
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -343,7 +343,7 @@ int WorkspaceCoreOutputPinVector4::maxLengthOfData()
     return maxLenghtOfDataVec4(getCorePin().data().getVec4(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinVector3::content()
+bool WorkspaceCoreOutputPinVector3::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -355,9 +355,6 @@ bool WorkspaceCoreOutputPinVector3::content()
                                     getCorePin().data().getVec3(), {valState, valState, valState},
                                     valueChanged, valueOfChange );
 
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -371,7 +368,7 @@ int WorkspaceCoreOutputPinVector3::maxLengthOfData()
     return maxLenghtOfDataVec3(getCorePin().data().getVec3(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinFloat::content()
+bool WorkspaceCoreOutputPinFloat::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -382,9 +379,6 @@ bool WorkspaceCoreOutputPinFloat::content()
                                     getCorePin().data().getFloat(), node.getNodebase()->getState(getIndex()),
                                     valueChanged, valueOfChange );
 
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -398,7 +392,7 @@ int WorkspaceCoreOutputPinFloat::maxLengthOfData()
     return maxLenghtOfDataFloat(getCorePin().data().getFloat(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinQuaternion::content()
+bool WorkspaceCoreOutputPinQuaternion::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -410,9 +404,6 @@ bool WorkspaceCoreOutputPinQuaternion::content()
                                             getCorePin().data().getQuat(), {valState, valState, valState, valState},
                                             valueChanged, valueOfChange );
 
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -426,13 +417,9 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
     return maxLenghtOfDataQuaternion(getCorePin().data().getQuat(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinPulse::content()
+bool WorkspaceCoreOutputPinPulse::drawData()
 {
-    ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
-    ImGui::SameLine();
-
-    return WorkspaceCoreOutputPinWithData::content();
-    //return ImGui::IsItemHovered() && ImGui::IsMouseReleased(0);
+    return ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
@@ -448,7 +435,7 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, 
     cam = new Camera(60.0f, Application::get().world()->sceneRoot, rend);  // connet textre with camera
     cam->update();
 }
-bool WorkspaceCoreOutputPinScreen::content()
+bool WorkspaceCoreOutputPinScreen::drawData()
 {
     if(getCorePin().isPluggedIn()){
         glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4(); /* JH why magic 2? */
@@ -457,7 +444,7 @@ bool WorkspaceCoreOutputPinScreen::content()
         cam->update();
 
         //ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
-    	  ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture), I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize), ImVec2(0.0f,1.0f), ImVec2(1,0)); //vertiocal flip
+    	  ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture), I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize)*diwne.getWorkAreaZoom(), ImVec2(0.0f,1.0f), ImVec2(1,0)); //vertiocal flip
     }
     return false;
 }
@@ -772,7 +759,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
     WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
     for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawDiwne((m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw);
+        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
         if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
     }
     return inner_interaction_happen;
@@ -783,7 +770,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
     bool inner_interaction_happen = false;
 
     for (auto const& pin : m_workspaceOutputs) {
-        inner_interaction_happen |= pin->drawDiwne((m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw);
+        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
     }
     return inner_interaction_happen;
 }

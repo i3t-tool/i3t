@@ -43,14 +43,6 @@ public:
     {
         drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
     }
-//
-//    void nodePopupContent()
-//    {
-//
-//        drawMenuLevelOfDetail();
-//
-//        WorkspaceNodeWithCoreData::nodePopupContent();
-//    }
 
     int maxLenghtOfData()
     {

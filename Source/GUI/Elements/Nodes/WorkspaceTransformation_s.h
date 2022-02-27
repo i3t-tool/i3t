@@ -19,9 +19,9 @@ virtual Core::ETransformState dataAreValid() override
 
 int maxLenghtOfData()
 {
-    if (ETransformType::Quat == T)
-        return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(), m_numberOfVisibleDecimal);
-    else
+//    if (ETransformType::Quat == T)
+//        return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(), m_numberOfVisibleDecimal);
+//    else
         return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 
 }
