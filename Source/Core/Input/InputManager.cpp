@@ -87,14 +87,14 @@ bool InputManager::isActionTriggered(const char* name, EKeyState state)
 	{
 		for (auto action : keys)
 		{
-			result |= isKeyJustUp(action.code);
+			result |= isKeyJustUp(action.code) && areModifiersActive(action.modifiers);
 		}
 	}
 	if (state == EKeyState::Pressed)
 	{
 		for (auto action : keys)
 		{
-			result |= isKeyJustPressed(action.code);
+			result |= isKeyJustPressed(action.code) && areModifiersActive(action.modifiers);
 		}
 	}
 

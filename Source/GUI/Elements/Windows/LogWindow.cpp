@@ -24,7 +24,7 @@ LogWindow::LogWindow()
 	////
 
 	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
-		Log::info("(mouse click + left ctrl) pressed");
+		Log::info("bind: (mouse click + left ctrl) pressed");
 	});
 
 	Input.bindAction("scrollUp", EKeyState::Pressed, []() {
@@ -80,6 +80,11 @@ void LogWindow::render()
 	// Set scroll to bottom of the child window.
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 		ImGui::SetScrollHereY(1.0f);
+
+	if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released))
+	{
+		Log::info("query: (mouse click + left ctrl) pressed");
+	}
 
 	ImGui::EndChild();
 
