@@ -530,7 +530,7 @@ void buildTransform(YAML::Node& node)
 			// coreTransform->setDefaultValue(keyStr, node["defaults"][key]);
 		}
 
-		coreTransform->setValue(buildMat4(node["value"]));
+		coreTransform->getInternalData(0).setValue(buildMat4(node["value"]));
 
 		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies();
 		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();
