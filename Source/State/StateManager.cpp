@@ -19,7 +19,19 @@ void StateManager::takeSnapshot()
 	I3T_ASSERT(m_originator != nullptr && "Originator is unset!");
 
 	m_mementos.push_back(m_originator->getState());
-	m_currentStateIdx = m_mementos.size() - 1;
+
+	if (m_currentStateIdx < m_mementos.size() - 1)
+	{
+		// Override existing state: undo, undo, takeSnapshot.
+		m_mementos[++m_currentStateIdx] = m_originator->getState();
+		m_mementos.resize(m_currentStateIdx + 1);
+	}
+	else
+	{
+		// Push new state.
+		m_mementos.push_back(m_originator->getState());
+		m_currentStateIdx = m_mementos.size() - 1;
+	}
 
 	setUnsavedWindowTitle();
 }
@@ -33,6 +45,8 @@ void StateManager::undo()
 	auto memento = m_mementos[--m_currentStateIdx];
 
 	m_originator->setState(memento);
+
+	setUnsavedWindowTitle();
 }
 
 void StateManager::redo()
@@ -43,6 +57,8 @@ void StateManager::redo()
 
 	auto memento = m_mementos[++m_currentStateIdx];
 	m_originator->setState(memento);
+
+	setUnsavedWindowTitle();
 }
 
 bool StateManager::canUndo() const

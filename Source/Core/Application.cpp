@@ -188,7 +188,7 @@ void Application::onStateChange(const std::string& winTitlePostfix)
 {
 	std::string newTitle;
 	if (StateManager::instance().hasScene())
-		newTitle = std::string(g_baseTitle) + StateManager::instance().scenePath().string() + winTitlePostfix;
+		newTitle = std::string(g_baseTitle) + " - " + StateManager::instance().scenePath().string() + winTitlePostfix;
 	else
 		newTitle = std::string(g_baseTitle) + winTitlePostfix;
 
