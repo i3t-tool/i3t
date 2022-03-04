@@ -715,10 +715,9 @@ bool WorkspaceDiwne::afterContent()
     manipulatorStartCheck3D();
 
     /* selection will be active in next frame */
-    if (InputManager::isActionTriggered("NOTunselectAll", EKeyState::Pressed)) {
+    if (InputManager::isActionTriggered("NOTunselectAll", EKeyState::Released)) {
             setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
     }
-
 	if (getNodesSelectionChanged())
 	{
         shiftNodesToEnd(getSelectedNodes());
