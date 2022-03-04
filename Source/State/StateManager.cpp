@@ -63,7 +63,7 @@ void StateManager::redo()
 
 bool StateManager::canUndo() const
 {
-	return m_currentStateIdx > 0;
+	return m_currentStateIdx > 1;
 }
 
 bool StateManager::canRedo() const
