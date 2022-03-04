@@ -53,6 +53,9 @@ void Application::initModules()
 {
 	for (auto* m : m_modules)
 		m->init();
+
+	if (!StateManager::instance().hasScene())
+		StateManager::instance().createEmptyScene();
 }
 
 //===----------------------------------------------------------------------===//
@@ -178,7 +181,18 @@ void Application::setState(const Memento& memento)
 
 	auto& rawScene = memento.getSnapshot().front();
 
-	StateManager::instance().loadScene(rawScene);
+	buildScene(rawScene, nodes);
+}
+
+void Application::onStateChange(const std::string& winTitlePostfix)
+{
+	std::string newTitle;
+	if (StateManager::instance().hasScene())
+		newTitle = std::string(g_baseTitle) + StateManager::instance().scenePath().string() + winTitlePostfix;
+	else
+		newTitle = std::string(g_baseTitle) + winTitlePostfix;
+
+	m_window->setTitle(newTitle.c_str());
 }
 
 //===----------------------------------------------------------------------===//

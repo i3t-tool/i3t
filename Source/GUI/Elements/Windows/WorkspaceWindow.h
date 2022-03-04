@@ -20,21 +20,20 @@
 #include <utility>
 #include <vector>
 
-#include "Config.h"
-
-#include "Core/Nodes/GraphManager.h"
-#include "GUI/Elements/IWindow.h"
-
-#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
-
-
 #include <glm/glm.hpp>
+
+#include "Config.h"
 
 #include "Core/API.h"
 #include "Core/Input/InputManager.h"
+#include "Core/Nodes/GraphManager.h"
+
+#include "GUI/Elements/IWindow.h"
+#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
+
 #include "Logger/Logger.h"
 #include "Scripting/Scripting.h"
-
+#include "State/StateManager.h"
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
@@ -99,7 +98,12 @@ class WorkspaceDiwne : public DIWNE::Diwne
     template<class T>
     auto inline addNodeToPositionOfPopup()
     {
-        return addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+			auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+			/// TEST /////////////////////////////////////////////////
+			StateManager::instance().takeSnapshot();
+			//////////////////////////////////////////////////////////
+
+			return result;
     }
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();

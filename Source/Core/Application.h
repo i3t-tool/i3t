@@ -102,6 +102,8 @@ public:
 
 	void setState(const Memento &) override;
 
+	void onStateChange(const std::string &winTitlePostfix) override;
+
 	//===----------------------------------------------------------------------===//
 
 private:

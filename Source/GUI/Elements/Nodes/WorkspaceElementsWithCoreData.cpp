@@ -840,11 +840,6 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 		valueChanged |= valueChangedByPopup;
 	}
 
-	/// TEST /////////////////////////////////////////////////
-	if (valueChanged)
-		StateManager::instance().takeSnapshot();
-	//////////////////////////////////////////////////////////
-
 	if (inactive)
 	{
 		ImGui::PopItemFlag();
