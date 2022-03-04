@@ -40,8 +40,9 @@ typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
 enum WorkspaceDiwneAction
 {
-    None,
-    CreateAndPlugTypeConstructor
+    None
+    , CreateAndPlugTypeConstructor
+    , NOTunselectAllNodes
 };
 
 class WorkspaceDiwne : public DIWNE::Diwne
@@ -63,6 +64,10 @@ class WorkspaceDiwne : public DIWNE::Diwne
     bool afterEnd();
 
     WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
+    void setWorkspaceDiwneAction(WorkspaceDiwneAction wda) {m_workspaceDiwneAction = wda;}
+    WorkspaceDiwneAction getWorkspaceDiwneAction() {return m_workspaceDiwneAction;}
+    WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame() {return m_workspaceDiwneActionPreviousFrame;}
+    WorkspaceDiwneAction getWorkspaceDiwneActionActive() const {return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame : m_workspaceDiwneAction; }
 
 	/** * \brief All WorkspaceNodes
         * \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)

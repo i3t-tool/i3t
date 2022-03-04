@@ -714,11 +714,16 @@ bool WorkspaceDiwne::afterContent()
     /* ===== reaction to actions ===== */
     manipulatorStartCheck3D();
 
+    /* selection will be active in next frame */
+    if (InputManager::isActionTriggered("NOTunselectAll", EKeyState::Pressed)) {
+            setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
+    }
+
 	if (getNodesSelectionChanged())
 	{
         shiftNodesToEnd(getSelectedNodes());
 
-        if ( ! InputManager::isActionTriggered("NOTunselectAll", EKeyState::Pressed)) /* \todo JH not work */
+        if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes) /* \todo JH not work - in debug fame by frame work, but not without breakpoints... */
         {
             for (auto node : getAllNodesInnerIncluded())
             {

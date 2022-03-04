@@ -97,7 +97,7 @@ void WorkspaceTransformation::popupContent()
     WorkspaceNodeWithCoreData::popupContent();
 }
 
-void WorkspaceTransformation::drawMenuSetDataMap() /* \todo JH lock/unlock disable/synergies */
+void WorkspaceTransformation::drawMenuSetDataMap()
 {
 
     if (ImGui::BeginMenu("Set datamap"))
