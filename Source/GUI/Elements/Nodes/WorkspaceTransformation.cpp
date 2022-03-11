@@ -99,17 +99,17 @@ void WorkspaceTransformation::popupContent()
 
 void WorkspaceTransformation::drawMenuSetDataMap()
 {
-
-    if (ImGui::BeginMenu("Set datamap"))
-    {
-        if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock")){m_nodebase->as<Core::Transformation>()->unlock();} }
-        else                                                  { if(ImGui::MenuItem("Lock")){m_nodebase->as<Core::Transformation>()->lock();} }
+/* MenuItem(const char* label, const char* shortcut = NULL, bool selected = false, bool enabled = true); */
+//    if (ImGui::BeginMenu("Set datamap"))
+//    {
+        if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
+        else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
 
         if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies")){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
         else                                                      { if(ImGui::MenuItem("Enable synergies")){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
 
-    ImGui::EndMenu();
-    }
+//    ImGui::EndMenu();
+//    }
 
 
 }
@@ -184,8 +184,7 @@ bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::str
 
 		ImGui::SameLine();
 
-        /* \todo JH dataState "1" from settings */
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], Core::EValueState::EditableSyn, actual_value_changed);
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
         value_changed |= actual_value_changed;
 
 	}

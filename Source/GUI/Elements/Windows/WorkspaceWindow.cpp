@@ -555,37 +555,8 @@ void WorkspaceDiwne::popupContent()
 
 		ImGui::Separator();
 
-		if (ImGui::BeginMenu("Select"))
-        {
-            if (ImGui::MenuItem("All nodes"))
-            {
-                selectAll();
-            }
-        ImGui::EndMenu();
-        }
-
-        ImGui::Separator();
-
 		if (ImGui::BeginMenu("Delete"))
         {
-            if (ImGui::MenuItem("All nodes"))
-            {
-                m_workspaceCoreNodes.clear();
-            }
-            if (ImGui::MenuItem("All links"))
-            {
-                for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-                {
-                    Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
-                    if (node != nullptr)
-                    {
-                        for (auto && pin : node->getInputs())
-                        {
-                            pin->unplug();
-                        }
-                    }
-                }
-            }
             if (ImGui::MenuItem("Selected nodes"))
             {
                 for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
@@ -608,6 +579,7 @@ void WorkspaceDiwne::popupContent()
 
                 }
             }
+
             if (ImGui::MenuItem("Selected links"))
             {
                 for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
@@ -625,18 +597,38 @@ void WorkspaceDiwne::popupContent()
                     }
                 }
             }
+
+            if (ImGui::MenuItem("All nodes"))
+            {
+                m_workspaceCoreNodes.clear();
+            }
+
+            if (ImGui::MenuItem("All links"))
+            {
+                for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                {
+                    Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                    if (node != nullptr)
+                    {
+                        for (auto && pin : node->getInputs())
+                        {
+                            pin->unplug();
+                        }
+                    }
+                }
+            }
             ImGui::EndMenu();
         }
 
         ImGui::Separator();
 
-		if (ImGui::BeginMenu("selection"))
+		if (ImGui::BeginMenu("Selection"))
 		{
 			if (ImGui::MenuItem("select all", "ctrl+a")) { selectAll(); }
 			if (ImGui::MenuItem("invert", "ctrl+i")) { invertSelection(); }
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("zoom"))
+		if (ImGui::BeginMenu("Zoom"))
 		{
 			if (ImGui::MenuItem("to all", "lshift+a")) { zoomToAll(); }
 			if (ImGui::MenuItem("to selection", "lshift+x")) { zoomToSelected(); }
@@ -648,6 +640,7 @@ bool WorkspaceDiwne::beforeBegin()
 {
     m_workspaceDiwneAction = WorkspaceDiwneAction::None;
     m_linksToDraw.clear();
+    m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
 
     return false;
 }
@@ -715,7 +708,7 @@ bool WorkspaceDiwne::afterContent()
     manipulatorStartCheck3D();
 
     /* selection will be active in next frame */
-    if (InputManager::isActionTriggered("NOTunselectAll", EKeyState::Released)) {
+    if (InputManager::isAxisActive("NOTunselectAll")) {
             setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
     }
 	if (getNodesSelectionChanged())

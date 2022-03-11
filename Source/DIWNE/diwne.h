@@ -284,7 +284,7 @@ class Diwne : public DiwneObject
 
         DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused;
+        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused, m_allowUnselectingNodes;
 
 
     protected:

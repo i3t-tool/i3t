@@ -80,7 +80,7 @@ bool WorkspaceNode::bottomContent(){return false;}
 
 bool WorkspaceNode::bypassFocusForInteractionAction()
 {
-    return /*diwne.getDiwneAction() != DIWNE::DiwneAction::SelectionRectFull && diwne.getDiwneAction() != DIWNE::DiwneAction::SelectionRectTouch &&*/ (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
+    return (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
 }
 
 void WorkspaceNode::drawMenuDelete()

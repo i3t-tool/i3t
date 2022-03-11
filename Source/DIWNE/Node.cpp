@@ -92,10 +92,10 @@ bool Node::afterEndDiwne()
 {
     if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
     {
-        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : false;
+        m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : diwne.m_allowUnselectingNodes ? false : m_selected;
     }else if (diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectTouch || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch )
     {
-        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : false;
+        m_selected = diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true : diwne.m_allowUnselectingNodes ? false : m_selected;
     }
 
     if (m_selected)
