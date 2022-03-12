@@ -289,6 +289,7 @@ TEST(GLM, GetAngleFromEulerZ)
   }
 }
 
+/*
 TEST(EulerZTest, SetMatrixShouldBeValid)
 {
   float initialRad = glm::radians(generateFloat());
@@ -305,6 +306,7 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
   auto currentMat = eulerZ->getData().getMat4();
   EXPECT_EQ(expectedMat, currentMat);
 }
+ */
 
 //===-- Euler rotation other tests ... ------------------------------------===//
 

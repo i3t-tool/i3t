@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stack>
+#include <set>
 
 namespace Core
 {
@@ -8,16 +8,15 @@ typedef unsigned int ID;
 
 class IdGenerator
 {
-	friend class Node;
-	friend class Pin;
-
 public:
 	IdGenerator();
+
+	bool hasNext();
 	ID next();
-	void markAsUsed(unsigned int id);
-	void returnId(unsigned int id);
+	void markAsUsed(ID id);
+	void returnId(ID id);
 
 private:
-	std::stack<unsigned int> m_ids;
+	std::set<ID> m_IDs;
 };
 } // namespace Core

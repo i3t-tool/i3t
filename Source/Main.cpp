@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
 	//---------------------------------------------------------------------------
 
 	// Get application instance.
-	Application& app = Application::get();
+	Application app;
 
 	// I. Create GLFW window.
 	app.initWindow();

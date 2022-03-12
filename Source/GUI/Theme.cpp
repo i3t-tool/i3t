@@ -521,7 +521,10 @@ void Theme::apply()
 	//---------------------------------------------------------------------------------------
 }
 
-ImFont* Theme::get(EFont font) { return I3T::getUI()->getFonts()[m_fontsAssoc[font]]; }
+ImFont* Theme::get(EFont font)
+{
+	return I3T::getUI()->getFonts()[m_fontsAssoc[font]];
+}
 
 const char* Theme::getCategoryName(const std::string& key)
 {

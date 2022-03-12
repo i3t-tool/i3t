@@ -107,7 +107,7 @@ class Diwne : public DiwneObject
         Diwne(DIWNE::SettingsDiwne* settingsDiwne);
 
         /** Default destructor */
-        virtual ~Diwne(){};
+        virtual ~Diwne() = default;
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldWorkarea;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragWorkarea;};
 

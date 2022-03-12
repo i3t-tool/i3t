@@ -43,13 +43,15 @@ enum WorkspaceDiwneAction
     CreateAndPlugTypeConstructor
 };
 
+extern class WorkspaceDiwne* g_workspaceDiwne;
+
 class WorkspaceDiwne : public DIWNE::Diwne
 {
-    friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
+	friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
 
-    public: /* \todo JH make some protected etc... */
-
-    WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+public:
+	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+	~WorkspaceDiwne() override;
 
     ImDrawListSplitter m_channelSplitter;
 
@@ -149,16 +151,15 @@ public:
 	I3T_WINDOW(WorkspaceWindow)
 
 	explicit WorkspaceWindow(bool show);
-	~WorkspaceWindow() override {};
+	~WorkspaceWindow() override;
 
-	static WorkspaceDiwne m_workspaceDiwne;
-	WorkspaceDiwne& getNodeEditor(){return m_workspaceDiwne;};
+	WorkspaceDiwne& getNodeEditor();
 
 	Application& m_wholeApplication;
 
-    bool m_first_frame;
+	bool m_first_frame;
 
-    //ImVec2 m_rightClickPosition = ImVec2(100,100);
+	//ImVec2 m_rightClickPosition = ImVec2(100,100);
 
 
 	void render();
@@ -179,6 +180,6 @@ public:
 template <typename T>
 auto inline addNodeToNodeEditor(ImVec2 const position=ImVec2(0,0))
 {
-    return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<T>(position);
+    return g_workspaceDiwne->addNodeToPosition<T>(position);
 }
 //extern void backgroundPopupContent(DIWNE::Diwne &diwne, std::vector<Ptr<WorkspaceNodeWithCoreData>> &workspaceCoreNodes);

@@ -22,12 +22,22 @@ double lastFrameSeconds = 0.0;  //PF changed to double
 
 Application::Application()
 {
+	if (s_instance == nullptr)
+		s_instance = this;
+
 	m_isPaused = false;
 
-	m_ui = new UIModule();
-	m_modules.push_back(m_ui);
+	m_modules.push_back(new UIModule());
 
 	m_scriptInterpreter = new Scripting();
+}
+
+Application::~Application()
+{
+	for (auto* module : m_modules)
+	{
+		delete module;
+	}
 }
 
 void Application::init()
@@ -166,7 +176,7 @@ bool Application::initI3T()
 
 Memento Application::getState()
 {
-	auto& nodes = m_ui->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+	auto& nodes = getUI()->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 
 	SerializationVisitor visitor;
 	std::string rawState = visitor.dump(nodes);
@@ -176,7 +186,7 @@ Memento Application::getState()
 
 void Application::setState(const Memento& memento)
 {
-	auto& nodes = m_ui->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+	auto& nodes = getUI()->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 	nodes.clear();
 
 	auto& rawScene = memento.getSnapshot().front();
@@ -199,12 +209,12 @@ void Application::onStateChange(const std::string& winTitlePostfix)
 
 Application& Application::get()
 {
-	return s_instance;
+	return *s_instance;
 }
 
 UIModule* Application::getUI()
 {
-	return m_ui;
+	return (UIModule*) m_modules[0];
 }
 
 World* Application::world()
@@ -214,7 +224,7 @@ World* Application::world()
 
 void Application::onBeforeClose()
 {
-	m_ui->showUniqueWindow<BeforeCloseModal>();
+	getUI()->showUniqueWindow<BeforeCloseModal>();
 }
 
 void Application::onClose()
@@ -228,4 +238,4 @@ void Application::enqueueCommand(ICommand* command)
 }
 
 // Statics
-Application Application::s_instance;
+Application* Application::s_instance = nullptr;

@@ -108,7 +108,6 @@ ID Node::getId() const { return m_id; }
 
 void Node::changeId(ID newId)
 {
-	generator.returnId(m_id);
 	generator.markAsUsed(newId);
 
 	m_id = newId;
