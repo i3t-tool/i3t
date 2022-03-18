@@ -11,8 +11,6 @@ class Node;
  * Pin used for connecting nodes.
  *
  * OperatorCurveTab from I3T v1.
- *
- * \todo MH - Remove ID.
  */
 class Node; /* JH without this it is not compile: unknown ty*/
 

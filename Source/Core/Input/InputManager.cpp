@@ -518,7 +518,6 @@ void InputManager::keyUp(int keyReleased)
 
 	switch (keyReleased)
 	{
-		/// \todo Will this be used?
 		// alphabet a-z
 	case GLFW_KEY_A:
 		setUnpressed(Keys::a);

@@ -10,9 +10,7 @@ enum class EKeyState
 class Keys final
 {
 public:
-	/** Codes representing keys on the keyboard and mouse (letters, numbers, functional keys, arrows, ... )
-	  \todo Add handling of Ctrl-C, Ctrl-V, ...
-	  */
+	/** Codes representing keys on the keyboard and mouse (letters, numbers, functional keys, arrows, ... ) */
 	enum Code
 	{
 		a = 0,

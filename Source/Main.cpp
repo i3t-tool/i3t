@@ -182,8 +182,6 @@ int main(int argc, char* argv[])
 	if (scnFlag)
 		Config::LOAD_SCENE = scn;
 
-	/// \todo Window icon!
-
 	/// \todo Run app in fullscreen mode.
 	// if (Config::FULLSCREEN)
 	//  glutFullScreen();

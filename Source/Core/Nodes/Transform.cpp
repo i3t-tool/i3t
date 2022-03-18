@@ -44,6 +44,7 @@ Transformation::Transformation(const TransformOperation& transformType)
 		: NodeBase(&(transformType.operation))
 {
 	m_internalData.push_back(DataStore(EValueType::Matrix));
+	m_savedData = DataStore(EValueType::Matrix);
 }
 
 void Transformation::createDefaults()
