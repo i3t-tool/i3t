@@ -106,6 +106,21 @@ void Transformation::unlock()
 	m_isLocked = false;
 }
 
+void Transformation::saveValues()
+{
+	m_savedData = getData(0);
+
+	m_hasSavedData = true;
+}
+
+void Transformation::reloadValues()
+{
+	if (!m_hasSavedData)
+		return;
+
+	setInternalValue(m_savedData.getMat4(), 0);
+}
+
 ValueSetResult Transformation::setValue(const glm::mat4& mat)
 {
 	ValueSetResult result;

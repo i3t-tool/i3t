@@ -82,10 +82,10 @@ public:
 		return Builder::createNode<T>();
 	}
 
-	template <typename T, typename... Args>
-	static Ptr<T> createTransform(Args&&... args)
+	template <ETransformType T>
+	static Ptr<Transformation> createTransform()
 	{
-		return Builder::createTransform<T>(std::forward<Args>(args)...);
+		return Builder::createTransform<T>();
 	}
 
 	static CameraPtr createCamera();
