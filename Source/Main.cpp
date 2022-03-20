@@ -182,15 +182,13 @@ int main(int argc, char* argv[])
 	if (scnFlag)
 		Config::LOAD_SCENE = scn;
 
-	/// \todo Window icon!
-
 	/// \todo Run app in fullscreen mode.
 	// if (Config::FULLSCREEN)
 	//  glutFullScreen();
 	//---------------------------------------------------------------------------
 
 	// Get application instance.
-	Application& app = Application::get();
+	Application app;
 
 	// I. Create GLFW window.
 	app.initWindow();

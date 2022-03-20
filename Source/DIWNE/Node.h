@@ -17,6 +17,8 @@ namespace DIWNE
  *  -------------------
  */
 
+/*! \brief Used when one node is inside of other -> inner node is drawn OnCoursorPosition when outer node is draw
+ */
 enum DrawModeNodePosition
 {
     OnCoursorPosition,
@@ -105,7 +107,7 @@ class Node : public DiwneObject
         bool getSelected() const {return m_selected;};
         void setSelected(bool selected) {m_selected = selected;};
 
-        float m_drawAnywhere; /* you have to draw node anywhere for example in first frame after you created it -> for obtain its real size */
+        float m_drawAnywhere; /*!< you have to draw node anywhere for example in first frame after you created it -> for obtain its real size */
 
     protected:
 

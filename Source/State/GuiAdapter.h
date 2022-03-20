@@ -6,7 +6,7 @@
 template <ETransformType T>
 auto createTransform(ImVec2 const position) /* \todo JH unused now? */
 {
-    return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformation_s<T>>(position);
+    return g_workspaceDiwne->addNodeToPosition<WorkspaceTransformation_s<T>>(position);
 //	if constexpr (T == ETransformType::Free)
 //		return WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationFree>(position);
 //	else if constexpr (T == ETransformType::Translation)

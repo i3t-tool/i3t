@@ -1,61 +1,44 @@
-//#include "gtest/gtest.h"
-//
-//#include "Core/Nodes/GraphManager.h"
-//
-//#include "State/SerializationVisitor.h"
-//#include "State/Manager.h"
-//#include "State/Stateful.h"
-//
-//using namespace Core;
-//
-//class Workspace : public IStateful
-//{
-//public:
-//	Workspace()
-//	{
-//		m_nodes = {
-//			GraphManager::createNode<ENodeType::Vector3ToVector3>(),
-//		};
-//	}
-//
-//	Memento getState() override
-//	{
-//		SerializationVisitor visitor;
-//
-//		State state;
-//		state.push_back(visitor.dump(m_nodes)); // \todo JH not work
-//
-//		return Memento(state);
-//	}
-//
-//	void setState(const Memento& memento) override
-//	{
-//		// m_state = memento.getSnapshot();
-//	}
-//
-//	void save()
-//	{
-//		StateManager::instance().takeSnapshot();
-//	}
-//
-//private:
-//	std::vector<Core::NodePtr> m_nodes;
-//};
-//
-//TEST(StateHandlingTest, OperationsAreSupported)
-//{
-//	Workspace workspace;
-//	StateManager::instance().setOriginator(&workspace);
-//
-//	std::vector<std::string> state;
-//
-//	for (char i = 0; i < 10; ++i)
-//	{
-//		char c = 0x61 + i;
-//		auto data = std::string(1, c);
-//		state.push_back(data);
-//
-//		// workspace.setValue(data);
-//	}
-//	EXPECT_TRUE(workspace.getState().getSnapshot().size() == 10);
-//}
+#include "gtest/gtest.h"
+
+#include "State/StateManager.h"
+#include "State/Stateful.h"
+
+class TestWorkspace : public IStateful
+{
+public:
+	Memento getState() override
+	{
+		State state;
+		return Memento{state};
+	}
+
+	void setState(const Memento& state) override {}
+
+	void onStateChange(const std::string &winTitlePostfix) override {}
+};
+
+TEST(StateHandlingTest, UndoRedo)
+{
+	TestWorkspace workspace;
+
+	StateManager::instance().setOriginator(&workspace);
+	StateManager::instance().createEmptyScene();
+
+	EXPECT_FALSE(StateManager::instance().canUndo());
+	EXPECT_FALSE(StateManager::instance().canRedo());
+
+	StateManager::instance().takeSnapshot();
+
+	EXPECT_TRUE(StateManager::instance().canUndo());
+	EXPECT_FALSE(StateManager::instance().canRedo());
+
+	StateManager::instance().undo();
+
+	EXPECT_FALSE(StateManager::instance().canUndo());
+	EXPECT_TRUE(StateManager::instance().canRedo());
+
+	StateManager::instance().redo();
+
+	EXPECT_TRUE(StateManager::instance().canUndo());
+	EXPECT_FALSE(StateManager::instance().canRedo());
+}

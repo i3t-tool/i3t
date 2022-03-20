@@ -204,13 +204,13 @@ protected:
 	[[nodiscard]] PinView getOutputPinsRef() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
-protected:
 	/**
 	 * Get data storage for read and write purposes. No written value validation
 	 * is performed.
 	 *
 	 * Overridden in Sequence class.
 	 */
+public:
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
 		assert(index < m_internalData.size() && "Desired data storage does not exist!");
@@ -218,7 +218,6 @@ protected:
 		return m_internalData[index];
 	}
 
-public:
 	/**
 	 * Get Node contents, read only.
 	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).

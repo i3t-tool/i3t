@@ -99,7 +99,6 @@ bool DiwneObject::processInteractionsDiwne()
 {
     bool interaction_happen = false;
 
-
     if (m_drawMode == Interacting && !m_inner_interaction_happen)
     {
         interaction_happen |= processObjectFocused();
@@ -120,17 +119,8 @@ bool DiwneObject::processInteractionsDiwne()
             interaction_happen |= processObjectDrag();
             interaction_happen |= processInteractions();
         }
-//#ifdef DIWNE_DEBUG
-//DIWNE_DEBUG((diwne), {
-//    if(m_focused) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,50), 0, ImDrawCornerFlags_None, 15);}
-//    if(m_focusedForInteraction) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(0,0,0,255), 0, ImDrawCornerFlags_None, 10);}
-//}); /* close of macro */
-//#endif // DIWNE_DEBUG
 
         interaction_happen |= processInteractionsAlways();
-
-
-
     }
 #ifdef DIWNE_DEBUG
 DIWNE_DEBUG((diwne), {
@@ -159,9 +149,10 @@ bool DiwneObject::processFocused()
     diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->objectFocusBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
     return true;
 }
-bool DiwneObject::allowProcessFocused(){return m_isActive || (!diwne.m_objectFocused /* only one object can be focused */
-                                                                && !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch)
-                                                                && (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */ ))
+bool DiwneObject::allowProcessFocused(){return m_isActive /* object is active from previous frame */
+                                                || (!diwne.m_objectFocused /* only one object can be focused */
+                                                    && !(diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) /* not stole focus from selecting action */
+                                                    && (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */ ))
                                         ;}
 
 bool DiwneObject::processObjectFocused()

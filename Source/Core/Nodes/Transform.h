@@ -20,6 +20,7 @@ FORCE_INLINE bool isTransform(const NodePtr& node)
 	 */
 	auto& keyWord = node->getOperation()->keyWord;
 	auto	type		= magic_enum::enum_cast<ETransformType>(keyWord);
+
 	return type.has_value();
 }
 
@@ -165,6 +166,9 @@ protected:
 
 	bool m_hasEnabledSynergies = true;
 	bool m_isLocked						 = true;
+
+private:
+	DataStore m_savedData;
 };
 
 using TransformPtr = Ptr<Transformation>;

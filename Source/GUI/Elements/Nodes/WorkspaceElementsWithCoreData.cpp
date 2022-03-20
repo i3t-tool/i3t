@@ -153,8 +153,7 @@ bool WorkspaceCorePin::content()
 
         float padding = 2*diwne.getWorkAreaZoom(); /* \todo JH padding of inner shape in icon to Theme? */
 
-        //DIWNE::putInvisibleButtonUnder(fmt::format("IB_icon:{}",getId()), iconSize);
-		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
+        diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
                         iconTypeFg, iconColorFg, iconColorFg,
                         iconSize,
                         ImVec4(padding, padding, padding, padding),
@@ -829,11 +828,6 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleD
 
 		valueChanged |= valueChangedByPopup;
 	}
-
-	/// TEST /////////////////////////////////////////////////
-	if (valueChanged)
-		StateManager::instance().takeSnapshot();
-	//////////////////////////////////////////////////////////
 
 	if (inactive)
 	{

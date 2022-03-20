@@ -9,13 +9,29 @@
 constexpr const char* g_unsavedPostfix = " - Unsaved";
 constexpr const char* g_savedPostfix   = " - Saved";
 
+StateManager::StateManager()
+{
+	resetState();
+}
+
 void StateManager::takeSnapshot()
 {
 	I3T_ASSERT(m_originator != nullptr && "Originator is unset!");
 
 	m_mementos.push_back(m_originator->getState());
 
-	m_currentStateIdx = m_mementos.size() - 1;
+	if (m_currentStateIdx < m_mementos.size() - 1)
+	{
+		// Override existing state: undo, undo, takeSnapshot.
+		m_mementos[++m_currentStateIdx] = m_originator->getState();
+		m_mementos.resize(m_currentStateIdx + 1);
+	}
+	else
+	{
+		// Push new state.
+		m_mementos.push_back(m_originator->getState());
+		m_currentStateIdx = m_mementos.size() - 1;
+	}
 
 	setUnsavedWindowTitle();
 }
@@ -26,10 +42,11 @@ void StateManager::undo()
 
 	if (!canUndo()) return;
 
-	auto memento = m_mementos[m_currentStateIdx];
+	auto memento = m_mementos[--m_currentStateIdx];
 
 	m_originator->setState(memento);
-	--m_currentStateIdx;
+
+	setUnsavedWindowTitle();
 }
 
 void StateManager::redo()
@@ -38,31 +55,40 @@ void StateManager::redo()
 
 	if (!canRedo()) return;
 
-	++m_currentStateIdx;  // move cursor to the next state
-	auto memento = m_mementos[m_currentStateIdx];
+	auto memento = m_mementos[++m_currentStateIdx];
 	m_originator->setState(memento);
+
+	setUnsavedWindowTitle();
 }
 
 bool StateManager::canUndo() const
 {
-	return !m_mementos.empty() && m_currentStateIdx >= 0;
+	return m_currentStateIdx > 1;
 }
 
 bool StateManager::canRedo() const
 {
-	return !m_mementos.empty() && m_currentStateIdx != m_mementos.size() - 1;
+	return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx;
 }
 
-std::optional<Memento> StateManager::getCurrentState() const
+Memento StateManager::getCurrentState() const
 {
-	if (m_currentStateIdx == -1) return std::nullopt;
 	return m_mementos[m_currentStateIdx];
+}
+
+void StateManager::createEmptyScene()
+{
+	resetState();
+	takeSnapshot();
 }
 
 //===-- Files manipulation functions --------------------------------------===//
 
 bool StateManager::loadScene(const fs::path& scene)
 {
+	resetState();
+	takeSnapshot();
+
 	auto& workspaceNodes =
 			I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 	workspaceNodes.clear();
@@ -118,12 +144,7 @@ void StateManager::setUnsavedWindowTitle()
 {
 	if (!m_dirty)
 	{
-		const auto& title = App::get().getTitle();
-		std::string currentTitle = title;
-		if (ends_with(currentTitle, g_savedPostfix))
-			currentTitle = std::string(title.begin(), title.end() - strlen(g_savedPostfix));
-
-		App::get().setTitle(currentTitle + g_unsavedPostfix);
+		m_originator->onStateChange(g_unsavedPostfix);
 	}
 
 	m_dirty = true;
@@ -133,16 +154,11 @@ void StateManager::setSavedWindowTitle()
 {
 	if (m_dirty)
 	{
-		const auto& title = App::get().getTitle();
-		auto currentTitle = title;
-		if (ends_with(currentTitle, g_unsavedPostfix))
-			currentTitle = std::string(title.begin(), title.end() - strlen(g_unsavedPostfix));
-
-		App::get().setTitle(currentTitle + g_savedPostfix);
+		m_originator->onStateChange(g_savedPostfix);
 	}
 	else
 	{
-		App::get().setTitle(std::string(g_baseTitle) + " - " + m_currentScene.filename().string());
+		m_originator->onStateChange("");
 	}
 
 	m_dirty = false;
@@ -151,4 +167,12 @@ void StateManager::setSavedWindowTitle()
 bool StateManager::hasNewestState() const
 {
 	return m_currentStateIdx == m_mementos.size() - 1;
+}
+
+void StateManager::resetState()
+{
+	m_currentStateIdx = -1;
+	m_dirty           = false;
+
+	m_mementos.clear();
 }

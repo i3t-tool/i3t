@@ -34,6 +34,7 @@ class Application : public IStateful
 {
 public:
 	Application();
+	~Application();
 
 	/**
 	 * \fn	void finalize()
@@ -102,12 +103,13 @@ public:
 
 	void setState(const Memento &) override;
 
+	void onStateChange(const std::string &winTitlePostfix) override;
+
 	//===----------------------------------------------------------------------===//
 
 private:
-	static Application s_instance;
+	static Application* s_instance;
 
-	UIModule* m_ui;
 	std::vector<Module*> m_modules;
 
 	/**

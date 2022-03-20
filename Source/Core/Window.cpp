@@ -1,6 +1,7 @@
 #include "Window.h"
 
 #include <pgr.h>
+#include "stb_image.h"
 
 #include "Commands/ApplicationCommands.h"
 #include "Logger/LoggerInternal.h"
@@ -40,6 +41,16 @@ void Window::init()
 	}
 
 	setTitle(g_baseTitle);
+
+	int x, y, channels;
+	constexpr int desiredChannels = 4;
+	auto* pixels = stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(), &x, &y, &channels, desiredChannels);
+	if (pixels)
+	{
+		GLFWimage image{ x, y, pixels };
+		glfwSetWindowIcon(m_mainWindow, 1, &image);
+	}
+	stbi_image_free(pixels);
 
 	glfwMakeContextCurrent(m_mainWindow);
 	glfwSwapInterval(1); // Enable vsync.

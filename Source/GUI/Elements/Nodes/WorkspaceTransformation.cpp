@@ -1,5 +1,7 @@
 #include "WorkspaceTransformation.h"
 
+#include "State/StateManager.h"
+
 WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNodeWithCoreData(diwne, nodebase)
     ,   aboveSequence(0)
@@ -157,6 +159,9 @@ bool WorkspaceTransformation::drawDataFull()
     if (valueChanged)
     {
         m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
+				/// TEST /////////////////////////////////////////////////
+				StateManager::instance().takeSnapshot();
+				//////////////////////////////////////////////////////////
         setDataItemsWidth();
     }
     return interaction_happen;

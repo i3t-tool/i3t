@@ -46,7 +46,6 @@ bool Diwne::initializeDiwne()
 bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/wiki/Call_super */
 {
     updateWorkAreaRectangles();
-    m_interactionAllowed = true;
     m_nodesSelectionChanged = false;
 
     /* zoom */
@@ -156,8 +155,6 @@ bool Diwne::blockRaisePopup()
 {
     return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch || m_diwneAction_previousFrame == DiwneAction::SelectionRectFull || m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
 }
-
-//bool Diwne::allowInteraction(){return m_interactionAllowed && DiwneObject::allowInteraction();}
 
 /* be careful for same mouse button in this functions */
 bool Diwne::allowProcessSelectionRectangle(){return m_focusedForInteraction;}
@@ -543,15 +540,5 @@ bool Diwne::bypassDiwneSetPopupPositionAction() {return bypassIsMouseClicked1();
 ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() {return bypassGetMousePos();}
 
 ImRect Diwne::getSelectionRectangleDiwne(){return m_selectionRectangeDiwne;}
-
-
-/* >>>> STATIC FUNCTIONS <<<< */
-bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size)
-{
-        bool clicked = ImGui::InvisibleButton(imguiID.c_str(), size );
-        ImGui::SetItemAllowOverlap(); /* Maybe some investigation if something like button is draw above */
-        ImGui::SetCursorScreenPos(ImGui::GetItemRectMin());
-        return clicked;
-}
 
 } /* namespace DIWNE */

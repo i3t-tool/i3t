@@ -9,8 +9,7 @@
 
 static DIWNE::SettingsDiwne settingsDiwne;
 
-WorkspaceDiwne WorkspaceWindow::m_workspaceDiwne(&settingsDiwne);
-
+WorkspaceDiwne* g_workspaceDiwne = nullptr;
 
 //std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceWindow::m_workspaceDiwne::m_workspaceCoreNodes;
 
@@ -25,6 +24,11 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
 
 {
+}
+
+WorkspaceDiwne::~WorkspaceDiwne()
+{
+	m_workspaceCoreNodes.clear();
 }
 
 void WorkspaceDiwne::selectAll()
@@ -660,6 +664,12 @@ DIWNE_DEBUG((*this), {
 
 bool WorkspaceDiwne::content()
 {
+	if (m_workspaceCoreNodes.empty())
+	{
+		/// \todo Cannot draw with empty workspace -> `m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count );` exception.
+		return false;
+	}
+
     bool interaction_happen = false;
     m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
                                               [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool { return node->getRemoveFromWorkspace();}
@@ -691,9 +701,6 @@ bool WorkspaceDiwne::content()
         m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 
     }
-
-
-    m_interactionAllowed = !interaction_happen;
 
     return interaction_happen;
 }
@@ -919,40 +926,41 @@ ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetM
 /* ========================================== */
 WorkspaceWindow::WorkspaceWindow(bool show)
     :	IWindow(show)
-    ,   m_first_frame(true)
     ,   m_wholeApplication(Application::get())
 {
-    // Input actions for workspace window.
-	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { m_workspaceDiwne.selectAll(); });
-	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { m_workspaceDiwne.invertSelection(); });
-	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() { m_workspaceDiwne.zoomToAll(); });
-	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { m_workspaceDiwne.zoomToSelected(); });
-	Input.bindAction("delete", EKeyState::Pressed, [&]() { m_workspaceDiwne.deleteSelectedNodes(); });
+	g_workspaceDiwne = new WorkspaceDiwne(&settingsDiwne);
 
+	// Input actions for workspace window.
+	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->selectAll(); });
+	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { g_workspaceDiwne->invertSelection(); });
+	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToAll(); });
+	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToSelected(); });
+	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteSelectedNodes(); });
 }
 
+WorkspaceWindow::~WorkspaceWindow()
+{
+	g_workspaceDiwne->m_workspaceCoreNodes.clear();
+	delete g_workspaceDiwne;
+}
 
-
-
+WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
+{
+	return *g_workspaceDiwne;
+}
 
 void WorkspaceWindow::render()
 {
     /* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{
-		if(m_first_frame)
-		{
-			m_first_frame = false;
-		}
-
 		if (ImGui::BeginMenuBar())
 		{
 			showEditMenu();
 			ImGui::EndMenuBar();
 		}
 
-		m_workspaceDiwne.drawDiwne();
-
+		g_workspaceDiwne->drawDiwne();
 	}
 	ImGui::End();
 }

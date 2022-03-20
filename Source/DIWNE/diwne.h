@@ -3,33 +3,30 @@
 
 #include "diwne_include.h"
 
-/* ================================================== */
-/* ===== I M P O R T A N T  (TRICKY)  N O T E S ===== */
-/* ================================================== */
-/* * 1) Node on top has to be drawn two times (first and last) - first for catch interaction, last for draw it on top of other elements
-
-
-*/
-
-
 
 /* ImDrawList functions works in screen coordinates */
 namespace DIWNE
 {
 
-typedef std::function<void(...)> popupContent_function_pointer;
-
-/* ===================== */
-/* ===== p o p u p ===== */
-/* ===================== */
-//static bool s_popupContentDrawn = false; /* only one popup content per frame (avoid double-content on DragFloat popup) */
+typedef std::function<void(...)> popupContent_function_pointer; /*!< \brief you can pass any arguments to you function with popup menu content */
 
 template<typename T, std::enable_if<std::is_base_of<DiwneObject, T>::value, bool>::type = true >
-static void expandPopupContent(T& object) /* for popupContent() functions of member of class */
+static void expandPopupContent(T& object) /*!< \brief used for popupContent() functions that are of member of class */
 {
     object.popupContent();
 }
 
+
+/*! \brief Function showing popup
+ *  It open ImGui popup on given position, fill in your content and close it
+ *
+ * \param popupID is identification of popup that have been raised (so is open and should be drawn)
+ * \param popupPos position of popup in screen coords
+ * \param popupContent is function with content of popup - it can take any (number of) arguments
+ * \param args arguments that will be passed to popupContent function
+ * \return true if popup is drawn, false otherwise
+ *
+ */
 template <typename... Args>
 static bool popupDiwne(std::string const popupID, ImVec2 const & popupPos, void (*popupContent)(Args...), Args&&... args) {
     bool interaction_happen = false;
@@ -46,21 +43,23 @@ static bool popupDiwne(std::string const popupID, ImVec2 const & popupPos, void 
             ImGui::EndPopup();
         }
     }
-    return interaction_happen/* || s_popupContentDrawn*/;
+    return interaction_happen;
 }
 
+/*! \brief Storage of all values
+ */
 struct SettingsDiwne
 {
-    DIWNE::ID const editorId = 0;
-    std::string const editorlabel = "diwneBackground";
-    ImRect const workAreaDiwne = ImRect(0,0,0,0); /* only initial value - mostly based on window size ( see updateWorkAreaRectangles() ) */
+    DIWNE::ID const editorId = 0; /*!< as well as all other DiwneObject, Diwne has to have id too */
+    std::string const editorlabel = "diwneBackground"; /*!< as well as all other DiwneObject, Diwne has to have identification label too */
+    ImRect const workAreaDiwne = ImRect(0,0,0,0); /*!< workarea in Diwne coordinates (so what part of infinite space of node editor is on window) only initial value - mostly based on window size ( \see updateWorkAreaRectangles() ) */
 
-    float minWorkAreaZoom = 0.25;
-    float maxWorkAreaZoom = 4;
-    float workAreaInitialZoom = 1;
-    float zoomWheelReverseSenzitivity = 8; /* Higher number -> smaller change, can not be 0 */
+    float minWorkAreaZoom = 0.25; /*!< minimal value of zoom */
+    float maxWorkAreaZoom = 4;  /*!< maximal value of zoom */
+    float workAreaInitialZoom = 1;  /*!< initial value of zoom */
+    float zoomWheelReverseSenzitivity = 8; /*!< Higher number -> smaller change, can not be 0 */
 
-    ImVec2 initPopupPosition = ImVec2(0,0);
+    ImVec2 initPopupPosition = ImVec2(0,0); /*!< where to show popup when not set later */
 
     ImColor selectionRectFullColor = ImColor(0,255,0,100); /* \todo JH recomandation is not to store ImColor, but ImU32 or ImVec4 */
     ImColor selectionRectTouchColor = ImColor(0,0,255,100);
@@ -73,8 +72,7 @@ struct SettingsDiwne
     ImColor objectFocusForInteractionBorderColor = ImColor(0,0,0,255);
     float objectFocusForInteractionBorderThicknessDiwne = 3;
 
-
-    float middleAlign = 0.5;
+    float middleAlign = 0.5; /*!< value < 0 , 1 > where is horizontal position of middle of nodes */
 
     ImColor pinHoveredBorderColor = ImColor(100,100,0,255);
     float pinHoveredBorderThicknessDiwne = 2;
@@ -82,8 +80,6 @@ struct SettingsDiwne
     float nodeHoveredBorderThicknessDiwne = 2;
     ImColor backgroundHoveredBorderColor = ImColor(100,100,0,255);
     float backgroundHoveredBorderThicknessDiwne = 2;
-
-
 
     float linkInteractionWidthDiwne = 10;
     float linkThicknessDiwne = 10;
@@ -104,17 +100,23 @@ struct SettingsDiwne
 /* ===================== */
 /* ===== D i w n e ===== */
 /* ===================== */
+
+/*! \brief Object of node editor
+ *  In ancestor of this object you will probably store your nodes (links, pins)
+ *  It store inter-object interactions
+ *  Every DiwneObject has reference to this object
+ */
 class Diwne : public DiwneObject
 {
     public:
 #ifdef DIWNE_DEBUG
         bool m_diwneDebug_on = true;
 #endif // DIWNE_DEBUG
-        /** Default constructor */
+        /*! Default constructor */
         Diwne(DIWNE::SettingsDiwne* settingsDiwne);
 
         /** Default destructor */
-        virtual ~Diwne(){};
+        virtual ~Diwne() = default;
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldWorkarea;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragWorkarea;};
         DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchWorkarea;};
@@ -130,8 +132,7 @@ class Diwne : public DiwneObject
         virtual bool processInteractionsDiwne();
         virtual bool finalizeDiwne();
 
-        bool blockRaisePopup();
-//        virtual bool allowInteraction();
+        bool blockRaisePopup(); /*!< sometimes we do not want to raise popup - here specify it ( now it is when selecting action run ) */
 
         virtual ImRect getRectDiwne() const {return getWorkAreaDiwne();};
 
@@ -168,33 +169,93 @@ class Diwne : public DiwneObject
         ImVec2 screen2diwne_noZoom(const ImVec2 & point) const;
         ImVec2 diwne2screen_noZoom(const ImVec2 & point) const;
 
+
+        /*! \brief Draw filled rectangle to window ImDrawlist
+         *
+         * \param p_min const ImVec2& in diwne coords
+         * \param p_max const ImVec2& in diwne coords
+         * \param col ImU32
+         * \param 0.0f float rounding
+         * \param ImDrawCornerFlags_All ImDrawCornerFlags rounding_corners
+         * \return void
+         *
+         */
         void AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All) const;
+        /*! \brief Draw rectangle to window ImDrawlist \see AddRectFilledDiwne
+         */
         void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All, float thickness = 1.0f) const;
+        /*! \brief Draw Bezier (not Bezier really) curve to window ImDrawList
+         *
+         * \param p1 const ImVec2& start point in diwne coords
+         * \param p2 const ImVec2& start control point in diwne coords
+         * \param p3 const ImVec2& end control point in diwne coords
+         * \param p4 const ImVec2& end point in diwne coords
+         * \param col ImU32
+         * \param thickness float
+         * \param 0 int num_segments with zero ImGui use some optimal? value
+         * \return void
+         *
+         */
         void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) const;
 
-        // padding - top, right, bottom, left
+        /*! \brief Add ImGui Button with icon on it \see DrawIcon()
+         * \return true if interaction with button happen, false otherwise
+         */
         bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
                          DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
                          ImVec2 size, ImVec4 padding, bool filledm, std::string const id) const;
 
         // padding - top, right, bottom, left
+        /*! \brief Draw Icon combined from two part (foreground and background) to window ImDrawList
+         *
+         * \param DIWNE::IconType bgIconType type of background shape
+         * \param ImColor bgShapeColor color of background shape
+         * \param ImColor bgInnerColor color of middle of background shape
+         * \param DIWNE::IconType fgIconType type of foreground shape
+         * \param ImColor fgShapeColor color of foreground shape
+         * \param ImColor fgInnerColor color of middle of foreground shape
+         * \param ImVec2 size of icon
+         * \param ImVec4 padding of bg shape and fg shape (top, right, bottom, left)
+         * \param bool filled true if not use inner colors
+         * \return void
+         *
+         */
         void DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
                      DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor,
                      ImVec2 size, ImVec4 padding, bool filled) const;
 
 
+        /*! \brief Draw circle icon
+         *
+         * \param ImDrawList* idl where to draw
+         * \param ImColor ShapeColor color of whole shape (border line if not filled)
+         * \param ImColor InnerColor color of inner (middle) of shape
+         * \param ImVec2 topLeft position of icon in screen coords
+         * \param ImVec2 bottomRight position of icon in screen coords
+         * \param bool filled false if use InnerColor in middle
+         * \return void
+         *
+         */
         void DrawIconCircle(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+        /*! \brief \see DrawIconCircle
+         */
         void DrawIconRectangle(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+        /*! \brief \see DrawIconCircle
+         */
         void DrawIconTriangleLeft(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+        /*! \brief \see DrawIconCircle
+         */
         void DrawIconTriangleRight(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+        /*! \brief \see DrawIconCircle
+         */
         void DrawIconCross(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
@@ -284,7 +345,7 @@ class Diwne : public DiwneObject
 
         DIWNE::SettingsDiwne* mp_settingsDiwne;
 
-        bool m_popupDrawn, m_tooltipDrawn, m_objectFocused, m_allowUnselectingNodes;
+        bool m_popupDrawn/*!< not draw popup two times \todo maybe unused when every object is drawn just one time */, m_tooltipDrawn /*!< not draw tooltip two times \todo maybe unused when every object is drawn just one time */, m_objectFocused/*!< only one object can be focused */, m_allowUnselectingNodes/*!< for example when holding ctrl nodes not going unselected when sleection rect get out of them */;
 
 
     protected:
@@ -293,14 +354,14 @@ class Diwne : public DiwneObject
         std::shared_ptr<DIWNE::Pin> mp_lastActivePin;
         std::shared_ptr<DIWNE::Node> mp_lastActiveNode;
 
-        DIWNE::Link m_helperLink; /* for showing link that is in process of creating */
+        DIWNE::Link m_helperLink; /*!< for showing link that is in process of creating */
 
         bool m_nodesSelectionChanged;
-        ImRect m_selectionRectangeDiwne;
 
+        ImRect m_selectionRectangeDiwne;
         ImColor m_selectionRectangeTouchColor, m_selectionRectangeFullColor;
 
-        bool m_drawing, m_interactionAllowed;
+        bool m_drawing/*!< store whether ImGui window is ready to draw to it */;
 
 
     private:
@@ -310,16 +371,12 @@ class Diwne : public DiwneObject
 
     ImVec2 m_popupPosition;
 
-    ImDrawListSplitter m_splitter;
+    ImDrawListSplitter m_splitter; /*! \brief Every nodes should be draw to its own channel */
 
     /* restore information */
-    ImVec2 m_StoreItemSpacing;
+    ImVec2 m_StoreItemSpacing; /*! \brief For restore value after this window is done */
 
 };
-
-
-/* >>>> STATIC FUNCTIONS <<<< */
-extern bool putInvisibleButtonUnder(std::string const imguiID, ImVec2 const &size);
 
 } /* namespace DIWNE */
 

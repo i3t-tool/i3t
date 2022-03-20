@@ -1,11 +1,13 @@
 #pragma once
 
-#include <optional>
+#include <deque>
 
 #include "Core/Defs.h"
 
 #include "Memento.h"
 #include "SceneData.h"
+
+constexpr int MAX_STATES = 32;
 
 class IStateful;
 
@@ -15,6 +17,7 @@ class IStateful;
 class StateManager : public Singleton<StateManager>
 {
 public:
+	StateManager();
 	void setOriginator(IStateful* originator) { m_originator = originator; }
 	void takeSnapshot();
 	void undo();
@@ -23,19 +26,25 @@ public:
 	[[nodiscard]] bool canUndo() const;
 	[[nodiscard]] bool canRedo() const;
 
-	[[nodiscard]] std::optional<Memento> getCurrentState() const;
+	[[nodiscard]] Memento getCurrentState() const;
 
 	bool isDirty() const { return m_dirty; }
+
+	/// \pre m_originator is set.
+	void createEmptyScene();
 
 	//===-- Files manipulation functions --------------------------------------===//
 
 	bool loadScene(const fs::path& scene);
+	// SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);
 
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
 
 	void setScene(const fs::path& scene);
+
 	bool hasScene() { return !m_currentScene.empty(); }
+	auto scenePath() { return m_currentScene; }
 
 	//===----------------------------------------------------------------------===//
 
@@ -43,12 +52,15 @@ private:
 	void setUnsavedWindowTitle();
 	void setSavedWindowTitle();
 
+	void resetState();
+
 	[[nodiscard]] bool hasNewestState() const;
 
 	fs::path m_currentScene;
 	bool m_dirty = false;
 
-	int m_currentStateIdx = -1;
 	IStateful* m_originator;
-	std::vector<Memento> m_mementos;
+
+	int m_currentStateIdx;
+	std::deque<Memento> m_mementos;
 };
