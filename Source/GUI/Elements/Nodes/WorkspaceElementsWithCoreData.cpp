@@ -851,87 +851,77 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
     ImGui::Separator();
 
     if (ImGui::RadioButton("Radians", popupMode == FloatPopupMode::Radians)){popupMode = FloatPopupMode::Radians;} ImGui::SameLine();
-    if (ImGui::RadioButton("Degrees", popupMode == FloatPopupMode::Degree)){popupMode = FloatPopupMode::Degree;}
-
+    if (ImGui::RadioButton("Degrees", popupMode == FloatPopupMode::Degree)){popupMode = FloatPopupMode::Degree;} ImGui::SameLine();
+    if (ImGui::RadioButton("General", popupMode == FloatPopupMode::GeneralNumbers)){popupMode = FloatPopupMode::GeneralNumbers;}
     if (popupMode == FloatPopupMode::Radians)
     {
         ImGui::Columns(2, "floatPopupColumnsRadians", false); // 2-ways, no border
 
-        if (ImGui::Selectable("-PI/6"))
+        if (ImGui::Selectable("-PI/6 (-30°)"))
         {
             selectedValue		= -M_PI / 6;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI/4"))
+        if (ImGui::Selectable("-PI/4 (-45°)"))
         {
             selectedValue		= -M_PI / 4;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI/3"))
+        if (ImGui::Selectable("-PI/3 (-60°)"))
         {
             selectedValue		= -M_PI / 3;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI/2"))
+        if (ImGui::Selectable("-PI/2 (-90°)"))
         {
             selectedValue		= -M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI"))
+        if (ImGui::Selectable("-PI (-180°)"))
         {
             selectedValue		= -M_PI;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-3PI/2"))
+        if (ImGui::Selectable("-3PI/2 (-270°)"))
         {
             selectedValue		= -3 * M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-1"))
-        {
-            selectedValue		= -1.0f;
-            valueSelected = true;
-        }
+
         ImGui::NextColumn();
 
-        if (ImGui::Selectable("PI/6"))
+        if (ImGui::Selectable("PI/6 (30°)"))
         {
             selectedValue		= M_PI / 6;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI/4"))
+        if (ImGui::Selectable("PI/4 (45°)"))
         {
             selectedValue		= M_PI / 4;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI/3"))
+        if (ImGui::Selectable("PI/3 (60°)"))
         {
             selectedValue		= M_PI / 3;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI/2"))
+        if (ImGui::Selectable("PI/2 (90°)"))
         {
             selectedValue		= M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI"))
+        if (ImGui::Selectable("PI (180°)"))
         {
             selectedValue		= M_PI;
             valueSelected = true;
         }
-        if (ImGui::Selectable("3PI/2"))
+        if (ImGui::Selectable("3PI/2 (270°)"))
         {
             selectedValue		= -3 * M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("1"))
-        {
-            selectedValue		= 1.0f;
-            valueSelected = true;
-        }
 
         ImGui::Columns(1);
-
         if (ImGui::Selectable("0"))
         {
             selectedValue		= 0.0f;
@@ -956,11 +946,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
             selectedValue		= -sqrt(3) / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-2"))
-        {
-            selectedValue		= -2.0f;
-            valueSelected = true;
-        }
+
         if (ImGui::Selectable("-1"))
         {
             selectedValue		= -1.0f;
@@ -974,14 +960,52 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
             selectedValue = 1.0f / 2.0f;
             valueSelected = true;
         }
+        if (ImGui::Selectable("sqrt(2)/2"))
+        {
+            selectedValue		= sqrt(2) / 2;
+            valueSelected = true;
+        }
         if (ImGui::Selectable("sqrt(3)/2"))
         {
             selectedValue		= sqrt(3) / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("sqrt(2)/2"))
+
+        if (ImGui::Selectable("1"))
         {
-            selectedValue		= sqrt(2) / 2;
+            selectedValue		= 1.0f;
+            valueSelected = true;
+        }
+        ImGui::Columns(1);
+        if (ImGui::Selectable("0"))
+        {
+            selectedValue		= 0.0f;
+            valueSelected = true;
+        }
+    }
+    else if (popupMode == FloatPopupMode::GeneralNumbers)
+    {
+        ImGui::Columns(2, "floatPopupColumnsDegrees", false);
+        if (ImGui::Selectable("-3"))
+        {
+            selectedValue		= -3.0f;
+            valueSelected = true;
+        }
+        if (ImGui::Selectable("-2"))
+        {
+            selectedValue		= -2.0f;
+            valueSelected = true;
+        }
+        if (ImGui::Selectable("-1"))
+        {
+            selectedValue		= -1.0f;
+            valueSelected = true;
+        }
+
+        ImGui::NextColumn();
+        if (ImGui::Selectable("3"))
+        {
+            selectedValue		= 3.0f;
             valueSelected = true;
         }
         if (ImGui::Selectable("2"))
@@ -994,14 +1018,19 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
             selectedValue		= 1.0f;
             valueSelected = true;
         }
+
         ImGui::Columns(1);
         if (ImGui::Selectable("0"))
         {
             selectedValue		= 0.0f;
             valueSelected = true;
         }
-
     }
+
+
+
+
+
 }
 
 void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::PinView coreInputPins, Core::Node::PinView coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)

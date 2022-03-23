@@ -72,7 +72,6 @@ public:
 	/* DIWNE function */
     virtual bool topContent();
 
-
 	virtual void drawMenuLevelOfDetail()=0;
 	void drawMenuSetPrecision();
 

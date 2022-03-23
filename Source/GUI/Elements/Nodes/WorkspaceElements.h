@@ -46,7 +46,8 @@ enum class WorkspaceLevelOfDetail
 enum FloatPopupMode
 {
     Radians,
-    Degree
+    Degree,
+    GeneralNumbers
 };
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
@@ -89,11 +90,6 @@ public:
     bool m_removeFromWorkspaceWindow;
     bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};
 	void setRemoveFromWorkspace(bool value) {m_removeFromWorkspaceWindow=value;};
-
-
-
-
-
 
 	virtual void drawMenuDelete();
 	virtual void popupContent();
