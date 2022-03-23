@@ -32,15 +32,16 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
+    ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1)); ImGui::SameLine();
     if(!m_topLabel.empty())
     {
+// \todo -> see https://github.com/ocornut/imgui/blob/master/misc/cpp/imgui_stdlib.cpp for using with string        ImGui::SelectableInput("row", &entity.is_selected, entity.name, ImGuiSelectableFlags_None);
+
         ImGui::TextUnformatted(m_topLabel.c_str());
     }else
     {
         ImGui::TextUnformatted(m_nodebase->getLabel());
-
     }
-    /*addJesteNeco() or overide topContent() with WorkspaceNodeWithCoreData::topContent(); inside*/
     return false;
 }
 
@@ -62,7 +63,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth *
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-	float size				 = ImGui::GetFontSize();   // get current font size (= height in pixels) of current font with current scale applied
+	float size				 = ImGui::GetFontSize();   // /* \todo JH get width */ get current font size (= height in pixels) of current font with current scale applied
 	float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
 	m_dataItemsWidth = (float) (maxLenghtOfData()) * oneCharWidth + 2 * padding;
 	return m_dataItemsWidth;
@@ -102,13 +103,13 @@ bool WorkspaceNodeWithCoreData::drawDataLabel()
 
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 {
-	if (ImGui::BeginMenu("Precision"))
+	if (ImGui::BeginMenu("Decimal digits"))
 	{
-		ImGui::TextUnformatted(fmt::format("Actual precision: {}", getNumberOfVisibleDecimal()).c_str());
-		ImGui::Separator();
+		//ImGui::TextUnformatted(fmt::format("Actual Decimal digits: {}", getNumberOfVisibleDecimal()).c_str());
+		//ImGui::Separator();
 		for (int i = 0; i < 5; i++) /* \todo JH, MH some better setter for precision - allowed values in settings? */
 		{
-			if (ImGui::MenuItem(fmt::format("{}", i).c_str())) { setNumberOfVisibleDecimal(i); }
+			if (ImGui::MenuItem(fmt::format("{}", i).c_str(), NULL, getNumberOfVisibleDecimal()==i, true)) { setNumberOfVisibleDecimal(i); }
 		}
 		ImGui::EndMenu();
 	}
@@ -120,6 +121,8 @@ void WorkspaceNodeWithCoreData::popupContent()
 
     drawMenuSetPrecision();
     drawMenuLevelOfDetail();
+
+    if(ImGui::MenuItem("Duplicate")) {ImGui::TextUnformatted("I can not duplicate yet :-(");} /* \todo Duplicate node */
 
     WorkspaceNode::popupContent();
 }
@@ -1262,12 +1265,12 @@ void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node, std::vec
 {
     if (ImGui::BeginMenu("Level of detail"))
 	{
-		ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[node->getLevelOfDetail()]).c_str());
-		ImGui::Separator();
+		//ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[node->getLevelOfDetail()]).c_str());
+		//ImGui::Separator();
 
 		for (auto const& levelOfDetail : levels_of_detail)
 		{
-            if (ImGui::MenuItem(WorkspaceLevelOfDetailName[levelOfDetail].c_str())) { node->setLevelOfDetail(levelOfDetail); }
+            if (ImGui::MenuItem(WorkspaceLevelOfDetailName[levelOfDetail].c_str(), NULL, node->getLevelOfDetail()==levelOfDetail, true )) { node->setLevelOfDetail(levelOfDetail); }
 		}
 		ImGui::EndMenu();
 	}

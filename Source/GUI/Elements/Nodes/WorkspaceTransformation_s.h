@@ -26,6 +26,25 @@ int maxLenghtOfData()
 
 }
 
+void drawMenuLevelOfDetail()
+{
+    if (ETransformType::Free == T)
+    {
+        drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+                                      {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+    }
+    else
+    {
+        drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+                                    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::SetValues, WorkspaceLevelOfDetail::Label});
+    }
+
+//    drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+//                                  (ETransformType::Free == T) ? {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label}
+//                                                              : {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::SetValues, WorkspaceLevelOfDetail::Label});
+
+}
+
 bool drawDataSetValues()
 {
     bool inner_interaction_happen = false, value_changed = false;

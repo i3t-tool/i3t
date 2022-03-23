@@ -34,12 +34,12 @@ bool WorkspaceTransformation::topContent()
     case Core::ETransformState::Invalid:
         diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,255,255),
             DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
-            ImVec2(ImGui::GetFontSize(),ImGui::GetFontSize()), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+            ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
         break;
     case Core::ETransformState::Unknown:
         diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,255), ImColor(0,255,255),
             DIWNE::IconType::Cross, ImColor(255,0,255), ImColor(0,255,255),
-            ImVec2(ImGui::GetFontSize(),ImGui::GetFontSize()), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+            ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
         break;
     }
 	return false;
@@ -95,30 +95,30 @@ bool WorkspaceTransformation::afterContent()
 void WorkspaceTransformation::popupContent()
 {
     drawMenuSetDataMap();
+    drawMenuStorevalues();
 
     WorkspaceNodeWithCoreData::popupContent();
 }
 
-void WorkspaceTransformation::drawMenuSetDataMap()
+void WorkspaceTransformation::drawMenuStorevalues()
 {
-/* MenuItem(const char* label, const char* shortcut = NULL, bool selected = false, bool enabled = true); */
-//    if (ImGui::BeginMenu("Set datamap"))
-//    {
-        if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
-        else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
+    if(ImGui::BeginMenu("Value"))
+    {
+        if(ImGui::MenuItem("Reset")) {}
+        if(ImGui::MenuItem("Store")) {}
+        if(ImGui::MenuItem("Restore")) {}
 
-        if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies")){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
-        else                                                      { if(ImGui::MenuItem("Enable synergies")){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
-
-//    ImGui::EndMenu();
-//    }
-
-
+        ImGui::EndMenu();
+    }
 }
 
-void WorkspaceTransformation::drawMenuLevelOfDetail()
+void WorkspaceTransformation::drawMenuSetDataMap()
 {
-	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::SetValues, WorkspaceLevelOfDetail::Label});
+    if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
+    else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
+
+    if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
+    else                                                      { if(ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
 }
 
 void WorkspaceTransformation::drawMenuDelete()

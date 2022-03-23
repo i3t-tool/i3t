@@ -59,6 +59,7 @@ bool WorkspaceNode::topContent()
 
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeader)), I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+    ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1)); ImGui::SameLine();
 	ImGui::TextUnformatted(m_topLabel.c_str());
 
     return interaction_happen;
@@ -112,9 +113,9 @@ int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
 
 	if (value < 0)
 	{
-		result++; /* sign */
 		value = -value;
 	}
+	result++; /* always space for sign to avoid changing size of / alternatively move it inside if above */
 
 	int_value = (int) value;
 	while (int_value >= border)

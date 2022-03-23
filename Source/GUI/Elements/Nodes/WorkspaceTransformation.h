@@ -40,8 +40,9 @@ public:
 	bool afterContent();
 
 	void popupContent();
-	void drawMenuLevelOfDetail();
+	virtual void drawMenuLevelOfDetail()=0;
 	void drawMenuDelete();
+	void drawMenuStorevalues();
 
 //
 //	virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
