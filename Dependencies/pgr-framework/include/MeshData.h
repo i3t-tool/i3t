@@ -21,6 +21,7 @@ struct MeshData {
 };
 
 // all meshes are stored including normals and texture coordinates
+// x,y,z, nx,ny,nz, s,t
 
 /// plain cube (all faces have the same uv mapping)
 extern const MeshData cubeData;
