@@ -69,7 +69,7 @@ class Pin;
 /**
  * Base class interface for all boxes.
  */
-class Node : public std::enable_shared_from_this<Node>
+class Node : public ICloneable<Node>, public std::enable_shared_from_this<Node>
 {
 	friend class GraphManager;
 

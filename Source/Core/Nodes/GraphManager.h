@@ -19,57 +19,8 @@
 #include "Node.h"
 #include "Pin.h"
 
-
 namespace Core
 {
-namespace Builder
-{
-	constexpr inline bool isEditableOperatorType(ENodeType type)
-	{
-		return type == ENodeType::FloatToFloat || type == ENodeType::Vector3ToVector3 ||
-				type == ENodeType::Vector4ToVector4 || type == ENodeType::MatrixToMatrix || type == ENodeType::Screen;
-	}
-
-	/**
- * Create new operator.
- *
- * \tparam T Operation type from OperationType enum.
- * \return Unique pointer to newly created logic operator.
- */
-	template <ENodeType T>
-	FORCE_INLINE Ptr<NodeBase> createNode()
-	{
-		// \todo MH
-		constexpr bool shouldUnlockAllValues = isEditableOperatorType(T);
-		auto ret = std::make_shared<NodeImpl<T>>();
-		ret->init();
-
-		ret->updateValues(0);
-		return ret;
-	}
-
-	Ptr<Core::Sequence> FORCE_INLINE createSequence()
-	{
-		auto ret = std::make_shared<Core::Sequence>();
-		ret->init();
-		ret->createComponents();
-		ret->updateValues(0);
-		return ret;
-	}
-
-	template <ETransformType T>
-	Ptr<Transformation> FORCE_INLINE createTransform()
-	{
-		const auto defaultValues = getTransformDefaults(T);
-		auto ret = std::make_shared<TransformImpl<T>>();
-		ret->init();
-		ret->createDefaults();
-		ret->initDefaults();
-		// ret->reset();
-		return ret;
-	}
-} // namespace Builder
-
 class GraphManager
 {
 	/// References to created cycle nodes which need to be regularly updated.
@@ -288,20 +239,12 @@ private:
 
 inline CameraPtr GraphManager::createCamera()
 {
-	auto ret = std::make_shared<Core::Camera>();
-	ret->init();
-	ret->createComponents();
-	ret->updateValues(0);
-
-	return ret;
+	return Builder::createCamera();
 }
 
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {
-	auto ret = std::make_shared<Core::Cycle>();
-	ret->init();
-	ret->updateValues(-1);
-	ret->stopAndReset();
+	auto ret = Builder::createCycle();
 
 	m_cycles.push_back(ret);
 

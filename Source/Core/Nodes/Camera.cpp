@@ -5,6 +5,16 @@
 
 using namespace Core;
 
+Ptr<Camera> Builder::createCamera()
+{
+	auto ret = std::make_shared<Core::Camera>();
+	ret->init();
+	ret->createComponents();
+	ret->updateValues(0);
+
+	return ret;
+}
+
 Camera::Camera() : NodeBase(&g_cameraProperties) {}
 
 void Camera::createComponents()
@@ -17,6 +27,11 @@ void Camera::createComponents()
 
 	if (GraphManager::plug(m_proj, m_view) != ENodePlugResult::Ok)
 		Log::debug("Components of a sequence could not be connected.");
+}
+
+Ptr<Node> Camera::clone()
+{
+	return Builder::createCamera();
 }
 
 void Camera::updateValues(int inputIndex)

@@ -5,6 +5,13 @@
 
 namespace Core
 {
+class Camera;
+
+namespace Builder
+{
+	Ptr<Camera> createCamera();
+}
+
 /**
  * Camera has following outputs:
  * 0 -> screen output
@@ -20,6 +27,8 @@ class Camera : public Node
 
 public:
 	Camera();
+
+	Ptr<Node> clone() override;
 
 	void createComponents();
 

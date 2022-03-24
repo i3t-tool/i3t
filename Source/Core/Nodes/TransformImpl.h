@@ -4,10 +4,39 @@
 
 namespace Core
 {
+#define I3T_TRANSFORM_CLONE(T)                                                                                      \
+	Ptr<Node> clone() override                                                                                           \
+	{                                                                                                                    \
+		auto node = Builder::createTransform<T>();                                                                         \
+                                                                                                                       \
+		isLocked() ? node->lock() : node->unlock();                                                                        \
+		hasSynergies() ? node->enableSynergies() : node->disableSynergies();                                               \
+                                                                                                                       \
+		node->setDefaultValues(getDefaultValues());                                                                        \
+		node->setValue(getData(0).getMat4());                                                                              \
+                                                                                                                       \
+		return node;                                                                                                       \
+	}
+
+namespace Builder
+{
+	template <ETransformType T>
+	Ptr<Transformation> createTransform()
+	{
+		const auto defaultValues = getTransformDefaults(T);
+		auto			 ret					 = std::make_shared<TransformImpl<T>>();
+		ret->init();
+		ret->createDefaults();
+		ret->initDefaults();
+
+		return ret;
+	}
+} // namespace Builder
+
+
 template <ETransformType T>
 class TransformImpl : public Transformation
-{
-};
+{};
 
 
 template <>
@@ -15,6 +44,8 @@ class TransformImpl<ETransformType::Free> : public Transformation
 {
 public:
 	TransformImpl() : Transformation(getTransformOperation(ETransformType::Free)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::Free)
 
 	ETransformState isValid() const override { return ETransformState::Valid; }
 
@@ -33,16 +64,11 @@ template <>
 class TransformImpl<ETransformType::Scale> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::Scale))
-	{
-		enableSynergies();
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Scale)) { enableSynergies(); }
 
-	void initDefaults() override
-	{
-		setDefaultValue("scale", glm::vec3{ 1.0f, 1.0f, 1.0f });
-	}
+	I3T_TRANSFORM_CLONE(ETransformType::Scale)
+
+	void initDefaults() override { setDefaultValue("scale", glm::vec3{1.0f, 1.0f, 1.0f}); }
 
 	ETransformState isValid() const override;
 
@@ -74,11 +100,9 @@ template <>
 class TransformImpl<ETransformType::EulerX> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::EulerX))
-	{
-		enableSynergies();
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerX)) { enableSynergies(); }
+
+	I3T_TRANSFORM_CLONE(ETransformType::EulerX)
 
 	ETransformState isValid() const override;
 
@@ -104,11 +128,9 @@ template <>
 class TransformImpl<ETransformType::EulerY> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::EulerY))
-	{
-		enableSynergies();
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerY)) { enableSynergies(); }
+
+	I3T_TRANSFORM_CLONE(ETransformType::EulerY)
 
 	ETransformState isValid() const override;
 
@@ -134,11 +156,9 @@ template <>
 class TransformImpl<ETransformType::EulerZ> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::EulerZ))
-	{
-		enableSynergies();
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerZ)) { enableSynergies(); }
+
+	I3T_TRANSFORM_CLONE(ETransformType::EulerZ)
 
 	ETransformState isValid() const override;
 
@@ -157,8 +177,9 @@ template <>
 class TransformImpl<ETransformType::Translation> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::Translation)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Translation)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::Translation)
 
 	ETransformState isValid() const override;
 
@@ -184,17 +205,15 @@ template <>
 class TransformImpl<ETransformType::AxisAngle> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::AxisAngle)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::AxisAngle)) {}
 
-	void initDefaults() override
-	{
-		setDefaultValue("axis", glm::vec3{ 0.0f, 1.0f, 0.0f });
-	}
+	I3T_TRANSFORM_CLONE(ETransformType::AxisAngle)
+
+	void initDefaults() override { setDefaultValue("axis", glm::vec3{0.0f, 1.0f, 0.0f}); }
 
 	ETransformState isValid() const override;
 
-	float getRot() const             { return getDefaultValue("rotation").getFloat(); };
+	float						 getRot() const { return getDefaultValue("rotation").getFloat(); };
 	const glm::vec3& getAxis() const { return getDefaultValue("axis").getVec3(); };
 
 	ValueSetResult setRot(float rads);
@@ -214,8 +233,9 @@ class TransformImpl<ETransformType::Quat> : public Transformation
 	glm::quat m_normalized;
 
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::Quat)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::Quat)
 
 	ETransformState isValid() const override;
 
@@ -233,8 +253,9 @@ template <>
 class TransformImpl<ETransformType::Ortho> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::Ortho)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Ortho)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::Ortho)
 
 	void initDefaults() override
 	{
@@ -273,8 +294,9 @@ template <>
 class TransformImpl<ETransformType::Perspective> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::Perspective)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Perspective)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::Perspective)
 
 	void initDefaults() override
 	{
@@ -286,10 +308,10 @@ public:
 
 	ETransformState isValid() const override;
 
-	float getFOV() const    { return getDefaultValue("fov").getFloat(); }
+	float getFOV() const { return getDefaultValue("fov").getFloat(); }
 	float getAspect() const { return getDefaultValue("aspect").getFloat(); }
-	float getZNear() const  { return getDefaultValue("zNear").getFloat(); }
-	float getZFar() const   { return getDefaultValue("zFar").getFloat(); }
+	float getZNear() const { return getDefaultValue("zNear").getFloat(); }
+	float getZFar() const { return getDefaultValue("zFar").getFloat(); }
 
 	ValueSetResult setFOV(float v);
 	ValueSetResult setAspect(float v);
@@ -306,8 +328,9 @@ template <>
 class TransformImpl<ETransformType::Frustum> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::Frustum)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Frustum)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::Frustum)
 
 	void initDefaults() override
 	{
@@ -348,19 +371,20 @@ template <>
 class TransformImpl<ETransformType::LookAt> : public Transformation
 {
 public:
-	explicit TransformImpl()
-			: Transformation(getTransformOperation(ETransformType::LookAt)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::LookAt)) {}
+
+	I3T_TRANSFORM_CLONE(ETransformType::LookAt)
 
 	void initDefaults() override
 	{
-		setDefaultValue("eye", glm::vec3{ 0.0, 0.0, 10.0 });
-		setDefaultValue("center", glm::vec3{ 0.0, 0.0, 0.0 });
-		setDefaultValue("up", glm::vec3{ 0.0, 1.0, 0.0 });
+		setDefaultValue("eye", glm::vec3{0.0, 0.0, 10.0});
+		setDefaultValue("center", glm::vec3{0.0, 0.0, 0.0});
+		setDefaultValue("up", glm::vec3{0.0, 1.0, 0.0});
 	}
 
 	ETransformState isValid() const override;
 
-	void reset() override;
+	void					 reset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	const glm::vec3& getEye() { return getDefaultValue("eye").getVec3(); }
@@ -371,4 +395,4 @@ public:
 	ValueSetResult setCenter(const glm::vec3& center);
 	ValueSetResult setUp(const glm::vec3& up);
 };
-}
+} // namespace Core

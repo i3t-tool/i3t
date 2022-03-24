@@ -95,6 +95,8 @@ public:
 	template <typename T>
 	void setDefaultValue(const std::string& name, T&& val)
 	{
+		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
+
 		m_defaultValues.at(name).setValue(val);
 		reset();
 	}
@@ -104,6 +106,8 @@ public:
 	 */
 	TransformOperation::ValueMap getDefaultTypes();
 	DefaultValues&               getDefaultValues();
+
+	void setDefaultValues(const DefaultValues& values) { m_defaultValues = values; }
 
 	EValueState getValueState(glm::ivec2 coords);
 
