@@ -125,11 +125,21 @@ public:
 		disableSynergies();
 	}
 
+	//===----------------------------------------------------------------------===//
+
+	bool hasSavedValue() const { return m_hasSavedData; }
+
 	/** Save current values of the transformation for future reloading. */
-	void saveValues();
+	void saveValue();
 
 	/** Restore saved values if they exist. */
-	void reloadValues();
+	void reloadValue();
+
+	const glm::mat4& getSavedValue() const;
+
+	void setSavedValue(const glm::mat4& values);
+
+	//===----------------------------------------------------------------------===//
 
 	void resetModifiers()
 	{

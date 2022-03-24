@@ -14,12 +14,12 @@ TEST(TransformControlsTest, _)
 	translation->setDefaultValue("translation", generateVec3());
 	auto expectedValues = translation->getData().getMat4();
 
-	translation->saveValues();
+	translation->saveValue();
 
 	translation->unlock();
 	setValue_expectOk(translation, 5.0f, { 1, 1 });
 
-	translation->reloadValues();
+	translation->reloadValue();
 
 	EXPECT_TRUE(Math::eq(expectedValues, translation->getData().getMat4()));
 }
