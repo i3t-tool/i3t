@@ -1274,7 +1274,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToVector3>::updateValues
 // Vector3ToVector
 template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector>::updateValues(int inputIndex)
 {
-	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
+	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())   //PF: BUG, this box has just one input, but should have TWO
 	{
 		setInternalValue(glm::vec4(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getFloat()));
 	}
