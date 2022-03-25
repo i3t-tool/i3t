@@ -27,12 +27,20 @@ bool WorkspaceTransformation::topContent()
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
     WorkspaceNodeWithCoreData::topContent();
+    ImGui::SameLine();
 
-    if (!dataAreValid())
+    switch (dataAreValid())
     {
+    case Core::ETransformState::Invalid:
         diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,255,255),
-                    DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
-                    ImVec2(20,20), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+            DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
+            ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+        break;
+    case Core::ETransformState::Unknown:
+        diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,255), ImColor(0,255,255),
+            DIWNE::IconType::Cross, ImColor(255,0,255), ImColor(0,255,255),
+            ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+        break;
     }
 	return false;
 }
@@ -65,7 +73,7 @@ bool WorkspaceTransformation::middleContent()
 
 bool WorkspaceTransformation::afterContent()
 {
-    if (m_inactiveMark != 0)
+    if (m_inactiveMark != 0) /* \todo JH MH? kde prosím přečtu tracking? */
     {
         ImVec2 start = m_middleRectDiwne.Min;
         ImVec2 end = m_middleRectDiwne.Max;
@@ -81,34 +89,36 @@ bool WorkspaceTransformation::afterContent()
 
         ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
     }
-		return true;
+    return false;
 }
 
 void WorkspaceTransformation::popupContent()
 {
     drawMenuSetDataMap();
+    drawMenuStorevalues();
 
     WorkspaceNodeWithCoreData::popupContent();
 }
 
-void WorkspaceTransformation::drawMenuSetDataMap()
+void WorkspaceTransformation::drawMenuStorevalues()
 {
-	/*
-	if (ImGui::BeginMenu("Set datamap"))
-	{
-		for (Core::Transform::DataMap const* datamap : m_nodebase->getValidDataMaps())
-		{
-			if (ImGui::MenuItem(WorkspaceDatamapName[datamap].c_str())) { setDataMap(datamap); }
-		}
+    if(ImGui::BeginMenu("Value"))
+    {
+        if(ImGui::MenuItem("Reset")) {}
+        if(ImGui::MenuItem("Store")) {}
+        if(ImGui::MenuItem("Restore")) {}
 
-		ImGui::EndMenu();
-	}
-	 */
+        ImGui::EndMenu();
+    }
 }
 
-void WorkspaceTransformation::drawMenuLevelOfDetail()
+void WorkspaceTransformation::drawMenuSetDataMap()
 {
-	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::SetValues, WorkspaceLevelOfDetail::Label});
+    if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
+    else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
+
+    if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
+    else                                                      { if(ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
 }
 
 void WorkspaceTransformation::drawMenuDelete()
@@ -162,52 +172,6 @@ int WorkspaceTransformation::maxLenghtOfData()
     return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
-//bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels
-//                                                        ,   std::vector<getter_function_pointer> const& getters
-//                                                        ,   std::vector<setter_function_pointer> const& setters
-//                                                        /*,   std::vector<unsigned char> const& datamap_values*/)
-//{
-//    int number_of_values = labels.size();
-//	Debug::Assert(number_of_values==getters.size()
-//               && number_of_values==setters.size()
-//               /*&& number_of_values==datamap_values.size()*/ , "drawDataSetValues_builder: All vectors (labels, getters, setters) must have same size.");
-//
-//	bool	valueChanged = false, actual_value_changed = false, inner_interaction_happen = false;
-//	int		index_of_change;
-//	float valueOfChange, localData; /* user can change just one value at the moment */
-//
-//	ImGui::PushItemWidth(getDataItemsWidth());
-//	for (int i = 0; i < number_of_values; i++)
-//	{
-//		ImGui::TextUnformatted(labels[i].c_str());
-//
-//		ImGui::SameLine(50); /* \todo JH why 50 ?*/
-//
-//		localData = getters[i]();
-//
-//		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", getId(), i), localData, Core::EValueState::Editable, actual_value_changed);
-//
-//
-//		if (actual_value_changed){
-//
-//            valueChanged = true;
-//			index_of_change = i;
-//			valueOfChange = localData;
-//		}
-//	}
-//	ImGui::PopItemWidth();
-//
-//	if (valueChanged)
-//	{
-//		setters[index_of_change](valueOfChange); /* \todo JH react to different returned value of setter */
-//		setDataItemsWidth();
-//	}
-//
-//	// ImGui::Spring(0);
-//	return inner_interaction_happen;
-//}
-
-
 bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
                                                         ,   std::vector<float*> const& local_data
                                                         ,   bool &value_changed)
@@ -225,8 +189,7 @@ bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::str
 
 		ImGui::SameLine();
 
-        /* \todo JH dataState "1" from settings */
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], Core::EValueState::EditableSyn, actual_value_changed);
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
         value_changed |= actual_value_changed;
 
 	}

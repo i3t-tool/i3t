@@ -21,6 +21,8 @@ const float angleY = 55.0;  //degree
 
 WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
 	: WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<ENodeType::Model>())
+	, m_axisOn(false)
+	, m_showModel(false)
 {
 	init();
 	//setDataItemsWidth();
@@ -40,6 +42,23 @@ WorkspaceModel::~WorkspaceModel()
 
 	if(m_camera)
 		delete(m_camera);
+}
+
+void WorkspaceModel::popupContent_axis_showmodel()
+{
+
+    if (ImGui::MenuItem(fmt::format("Switch axis {}", m_axisOn?"off":"on").c_str())) {
+        m_axisOn = !m_axisOn;
+    }
+    if (ImGui::MenuItem(fmt::format("{} model", m_showModel?"Hide":"Show").c_str())) {
+        m_showModel = !m_showModel;
+    }
+}
+
+void WorkspaceModel::popupContent()
+{
+    WorkspaceNodeWithCoreDataWithPins::popupContent();
+    popupContent_axis_showmodel();
 }
 
 //bool WorkspaceModel::drawDataFull(, int index)

@@ -19,6 +19,7 @@ class Pin : public DiwneObject
 
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldPin;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragPin;};
+        DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchPin;};
 
         virtual void begin();
         virtual void end();
@@ -30,30 +31,26 @@ class Pin : public DiwneObject
 
         virtual bool processDrag();
 
+        /*! \brief Wrapper is run when new link is created and goal pin is hovered but action not released yet
+         *
+         * \return virtual bool
+         *
+         */
         virtual bool processPin_Pre_ConnectLinkDiwne();
         virtual bool bypassPinLinkConnectionPreparedAction();
         virtual bool allowProcessPin_Pre_ConnectLink();
-        virtual bool processConnectionPrepared();
 
-        //virtual bool processFocusedForInteraction();
+        virtual bool processConnectionPrepared();/*!< your content/actions when new link hovered goal pin but not released yet */
 
         virtual void setConnectionPointDiwne(ImVec2 value) {m_connectionPointDiwne = value;};
 
         virtual ImRect getRectDiwne() const {return m_pinRectDiwne;};
 
     protected:
-        DIWNE::ID m_idDiwne;
         ImRect m_pinRectDiwne;
-        bool m_isHeld;
-        ImVec2 m_connectionPointDiwne;
+        ImVec2 m_connectionPointDiwne; /*!< point of link connection to this pin */
 
-        /* intended to use when Pin is drawn (use properties dependent on drawing) - setConnectionPointDiwne is "hard" setting */
-        virtual void updateConnectionPointDiwne() {m_connectionPointDiwne = m_pinRectDiwne.GetCenter();}
-
-    private:
-
-        std::string const m_popupID; /* \todo JH MH PF how to initialize const char* with id of Node included? */
-
+        virtual void updateConnectionPointDiwne() {m_connectionPointDiwne = m_pinRectDiwne.GetCenter();} /*!< intended to use when Pin is drawn (use properties dependent on drawing) - setConnectionPointDiwne is "hard" setting */
 
 };
 

@@ -27,6 +27,11 @@ public:
 	bool middleContent();  // the most important function
 	void drawMenuLevelOfDetail();  //todo
 
+	void popupContent();
+	void popupContent_axis_showmodel();
+
+	bool m_axisOn, m_showModel;
+
 private:
 	// GameObject models:
 	// todo - add the resource manager for models and textures

@@ -32,6 +32,8 @@ public:
     void moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode, int index=0);
     void moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> dragedNode);
 
+    int setNumberOfVisibleDecimal(int value);
+
     std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;
 
     bool beforeContent();

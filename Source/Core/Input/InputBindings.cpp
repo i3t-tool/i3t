@@ -20,7 +20,9 @@ void InputBindings::init()
 	//InputManager::setInputAction("delete", Keys::backspace);
 
 	InputManager::setInputAction("undo", Keys::b, { Keys::ctrll });
+	InputManager::setInputAction("undo", Keys::z, { Keys::ctrll });
 	InputManager::setInputAction("redo", Keys::n, { Keys::ctrll });
+	InputManager::setInputAction("redo", Keys::y, { Keys::ctrll });
 	InputManager::setInputAction("save", Keys::s, { Keys::ctrll });
 	InputManager::setInputAction("saveAs", Keys::s, { Keys::ctrll, Keys::shiftl });
 
@@ -55,7 +57,6 @@ void InputBindings::init()
 	// Workspace window actions.
 	InputManager::setInputAction("selectAll", Keys::a, {Keys::ctrll});
 	InputManager::setInputAction("invertSelection", Keys::i, {Keys::ctrll});
-	//InputManager::setInputAction("navigateToContent", Keys::s, {Keys::ctrll}); /* \todo JH same as zoom to all ? */
 	//InputManager::setInputAction("center", Keys::d); /* \todo JH what is center? */
 
 
@@ -69,8 +70,8 @@ void InputBindings::init()
 
 	//InputManager::setInputAction("unselectAll", Keys::mouseLeft);
 	InputManager::setInputAction("unselectAll", Keys::esc);
-	InputManager::setInputAction("NOTunselectAll", Keys::mouseLeft, {Keys::ctrll});
-	InputManager::setInputAction("NOTunselectAll", Keys::mouseLeft, {Keys::shiftl});
+	InputManager::setInputAxis("NOTunselectAll",1.0f, Keys::ctrll);
+	InputManager::setInputAxis("NOTunselectAll",1.0f, Keys::shiftl);
 	InputManager::setInputAction("select", Keys::mouseLeft);
 
 	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});

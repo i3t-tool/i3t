@@ -61,13 +61,6 @@ bool Pin::processPin_Pre_ConnectLinkDiwne()
 
 bool Pin::processConnectionPrepared() {ImGui::TextUnformatted("Prepared for connecting link"); return true;}
 
-
-//bool Pin::processFocusedForInteraction()
-//{
-//    diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->pinHoveredBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->pinHoveredBorderThicknessDiwne);
-//    return true;
-//}
-
 bool Pin::processDrag()
 {
     diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);

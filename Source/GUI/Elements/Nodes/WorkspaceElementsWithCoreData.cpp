@@ -32,15 +32,16 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
+    ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1)); ImGui::SameLine();
     if(!m_topLabel.empty())
     {
+// \todo -> see https://github.com/ocornut/imgui/blob/master/misc/cpp/imgui_stdlib.cpp for using with string        ImGui::SelectableInput("row", &entity.is_selected, entity.name, ImGuiSelectableFlags_None);
+
         ImGui::TextUnformatted(m_topLabel.c_str());
     }else
     {
         ImGui::TextUnformatted(m_nodebase->getLabel());
-
     }
-    /*addJesteNeco() or overide topContent() with WorkspaceNodeWithCoreData::topContent(); inside*/
     return false;
 }
 
@@ -62,7 +63,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth *
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-	float size				 = ImGui::GetFontSize();   // get current font size (= height in pixels) of current font with current scale applied
+	float size				 = ImGui::GetFontSize();   // /* \todo JH get width */ get current font size (= height in pixels) of current font with current scale applied
 	float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
 	m_dataItemsWidth = (float) (maxLenghtOfData()) * oneCharWidth + 2 * padding;
 	return m_dataItemsWidth;
@@ -102,13 +103,13 @@ bool WorkspaceNodeWithCoreData::drawDataLabel()
 
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 {
-	if (ImGui::BeginMenu("Precision"))
+	if (ImGui::BeginMenu("Decimal digits"))
 	{
-		ImGui::TextUnformatted(fmt::format("Actual precision: {}", getNumberOfVisibleDecimal()).c_str());
-		ImGui::Separator();
+		//ImGui::TextUnformatted(fmt::format("Actual Decimal digits: {}", getNumberOfVisibleDecimal()).c_str());
+		//ImGui::Separator();
 		for (int i = 0; i < 5; i++) /* \todo JH, MH some better setter for precision - allowed values in settings? */
 		{
-			if (ImGui::MenuItem(fmt::format("{}", i).c_str())) { setNumberOfVisibleDecimal(i); }
+			if (ImGui::MenuItem(fmt::format("{}", i).c_str(), NULL, getNumberOfVisibleDecimal()==i, true)) { setNumberOfVisibleDecimal(i); }
 		}
 		ImGui::EndMenu();
 	}
@@ -120,6 +121,8 @@ void WorkspaceNodeWithCoreData::popupContent()
 
     drawMenuSetPrecision();
     drawMenuLevelOfDetail();
+
+    if(ImGui::MenuItem("Duplicate")) {ImGui::TextUnformatted("I can not duplicate yet :-(");} /* \todo Duplicate node */
 
     WorkspaceNode::popupContent();
 }
@@ -153,8 +156,7 @@ bool WorkspaceCorePin::content()
 
         float padding = 2*diwne.getWorkAreaZoom(); /* \todo JH padding of inner shape in icon to Theme? */
 
-        //DIWNE::putInvisibleButtonUnder(fmt::format("IB_icon:{}",getId()), iconSize);
-		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
+        diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg,
                         iconTypeFg, iconColorFg, iconColorFg,
                         iconSize,
                         ImVec4(padding, padding, padding, padding),
@@ -278,9 +280,17 @@ WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diw
     : WorkspaceCoreOutputPin(diwne, id, pin, node)
 {}
 
+bool WorkspaceCoreOutputPinWithData::content()
+{
+    bool interaction_happen = false;
+    if (getNode().getLevelOfDetail() == WorkspaceLevelOfDetail::Full){interaction_happen |= drawData(); ImGui::SameLine();}
+    interaction_happen |= WorkspaceCoreOutputPin::content();
+    return interaction_happen;
+}
+
 /* >>>> Pin types <<<< */
 
-bool WorkspaceCoreOutputPinMatrix4x4::content()
+bool WorkspaceCoreOutputPinMatrix4x4::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -295,10 +305,6 @@ bool WorkspaceCoreOutputPinMatrix4x4::content()
                                                                     valState, valState, valState, valState,
                                                                     valState, valState, valState, valState},
                                     valueChanged, rowOfChange, columnOfChange, valueOfChange );
-
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         /* \todo JM MH set values to given (this) pin*/
@@ -313,7 +319,7 @@ int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
     return maxLenghtOfData4x4(getCorePin().data().getMat4(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinVector4::content()
+bool WorkspaceCoreOutputPinVector4::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -326,10 +332,6 @@ bool WorkspaceCoreOutputPinVector4::content()
                                     getCorePin().data().getVec4(), {valState, valState, valState, valState},
                                     valueChanged, valueOfChange );
 
-
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -343,7 +345,7 @@ int WorkspaceCoreOutputPinVector4::maxLengthOfData()
     return maxLenghtOfDataVec4(getCorePin().data().getVec4(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinVector3::content()
+bool WorkspaceCoreOutputPinVector3::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -355,9 +357,6 @@ bool WorkspaceCoreOutputPinVector3::content()
                                     getCorePin().data().getVec3(), {valState, valState, valState},
                                     valueChanged, valueOfChange );
 
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -371,7 +370,7 @@ int WorkspaceCoreOutputPinVector3::maxLengthOfData()
     return maxLenghtOfDataVec3(getCorePin().data().getVec3(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinFloat::content()
+bool WorkspaceCoreOutputPinFloat::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -382,9 +381,6 @@ bool WorkspaceCoreOutputPinFloat::content()
                                     getCorePin().data().getFloat(), node.getNodebase()->getState(getIndex()),
                                     valueChanged, valueOfChange );
 
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -398,7 +394,7 @@ int WorkspaceCoreOutputPinFloat::maxLengthOfData()
     return maxLenghtOfDataFloat(getCorePin().data().getFloat(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinQuaternion::content()
+bool WorkspaceCoreOutputPinQuaternion::drawData()
 {
     bool valueChanged = false, interaction_happen = false;
     int rowOfChange, columnOfChange;
@@ -410,9 +406,6 @@ bool WorkspaceCoreOutputPinQuaternion::content()
                                             getCorePin().data().getQuat(), {valState, valState, valState, valState},
                                             valueChanged, valueOfChange );
 
-    ImGui::SameLine();
-
-    interaction_happen |= WorkspaceCoreOutputPinWithData::content();
     if (valueChanged)
     {
         node.getNodebase()->setValue(valueOfChange);
@@ -426,13 +419,9 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
     return maxLenghtOfDataQuaternion(getCorePin().data().getQuat(), getNode().getNumberOfVisibleDecimal());
 }
 
-bool WorkspaceCoreOutputPinPulse::content()
+bool WorkspaceCoreOutputPinPulse::drawData()
 {
-    ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
-    ImGui::SameLine();
-
-    return WorkspaceCoreOutputPinWithData::content();
-    //return ImGui::IsItemHovered() && ImGui::IsMouseReleased(0);
+    return ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
@@ -448,7 +437,7 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, 
     cam = new Camera(60.0f, Application::get().world()->sceneRoot, rend);  // connet textre with camera
     cam->update();
 }
-bool WorkspaceCoreOutputPinScreen::content()
+bool WorkspaceCoreOutputPinScreen::drawData()
 {
     if(getCorePin().isPluggedIn()){
         glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4(); /* JH why magic 2? */
@@ -457,7 +446,7 @@ bool WorkspaceCoreOutputPinScreen::content()
         cam->update();
 
         //ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f), ImVec2(1,0));
-    	  ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture), I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize), ImVec2(0.0f,1.0f), ImVec2(1,0)); //vertiocal flip
+    	  ImGui::Image(reinterpret_cast<ImTextureID>(renderTexture), I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize)*diwne.getWorkAreaZoom(), ImVec2(0.0f,1.0f), ImVec2(1,0)); //vertiocal flip
     }
     return false;
 }
@@ -487,7 +476,8 @@ bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode/*=DIWNE::DrawMode
     bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
     if (isConnected())
     {
-        inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
+        //inner_interaction_happen |= getLink().drawDiwne(m_drawMode);
+        static_cast<WorkspaceDiwne&>(diwne).m_linksToDraw.push_back(&getLink());
     }
     return inner_interaction_happen;
 }
@@ -512,8 +502,8 @@ bool WorkspaceCoreInputPin::content()
     return inner_interaction_happen;
 }
 
-bool WorkspaceCoreInputPin::bypassCreateAndPlugConstrutorNodeAction(){return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);}
-bool WorkspaceCoreInputPin::allowCreateAndPlugConstrutorNodeAction(){return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && bypassFocusForInteractionAction();}
+bool WorkspaceCoreInputPin::bypassCreateAndPlugConstrutorNodeAction(){return InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed);}
+bool WorkspaceCoreInputPin::allowCreateAndPlugConstrutorNodeAction(){return diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink && m_focusedForInteraction;}
 bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
 {
     if (allowCreateAndPlugConstrutorNodeAction() && bypassCreateAndPlugConstrutorNodeAction())
@@ -538,9 +528,11 @@ bool WorkspaceCoreInputPin::processUnplug()
 
 bool WorkspaceCoreInputPin::processInteractions()
 {
-    bool interaction_happen = processCreateAndPlugConstrutorNode();
+    bool interaction_happen = WorkspaceCorePin::processInteractions();
     interaction_happen |= processUnplug();
-    interaction_happen = WorkspaceCorePin::processInteractions();
+    if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed))
+        int i =7;
+    interaction_happen |= processCreateAndPlugConstrutorNode();
     return interaction_happen;
 }
 /* >>>> WorkspaceCoreLink <<<< */
@@ -769,7 +761,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
     WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
     for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawDiwne((m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw);
+        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
         if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
     }
     return inner_interaction_happen;
@@ -780,7 +772,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
     bool inner_interaction_happen = false;
 
     for (auto const& pin : m_workspaceOutputs) {
-        inner_interaction_happen |= pin->drawDiwne((m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw);
+        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
     }
     return inner_interaction_happen;
 }
@@ -862,87 +854,77 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
     ImGui::Separator();
 
     if (ImGui::RadioButton("Radians", popupMode == FloatPopupMode::Radians)){popupMode = FloatPopupMode::Radians;} ImGui::SameLine();
-    if (ImGui::RadioButton("Degrees", popupMode == FloatPopupMode::Degree)){popupMode = FloatPopupMode::Degree;}
-
+    if (ImGui::RadioButton("Degrees", popupMode == FloatPopupMode::Degree)){popupMode = FloatPopupMode::Degree;} ImGui::SameLine();
+    if (ImGui::RadioButton("General", popupMode == FloatPopupMode::GeneralNumbers)){popupMode = FloatPopupMode::GeneralNumbers;}
     if (popupMode == FloatPopupMode::Radians)
     {
         ImGui::Columns(2, "floatPopupColumnsRadians", false); // 2-ways, no border
 
-        if (ImGui::Selectable("-PI/6"))
+        if (ImGui::Selectable("-PI/6 (-30°)"))
         {
             selectedValue		= -M_PI / 6;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI/4"))
+        if (ImGui::Selectable("-PI/4 (-45°)"))
         {
             selectedValue		= -M_PI / 4;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI/3"))
+        if (ImGui::Selectable("-PI/3 (-60°)"))
         {
             selectedValue		= -M_PI / 3;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI/2"))
+        if (ImGui::Selectable("-PI/2 (-90°)"))
         {
             selectedValue		= -M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-PI"))
+        if (ImGui::Selectable("-PI (-180°)"))
         {
             selectedValue		= -M_PI;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-3PI/2"))
+        if (ImGui::Selectable("-3PI/2 (-270°)"))
         {
             selectedValue		= -3 * M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-1"))
-        {
-            selectedValue		= -1.0f;
-            valueSelected = true;
-        }
+
         ImGui::NextColumn();
 
-        if (ImGui::Selectable("PI/6"))
+        if (ImGui::Selectable("PI/6 (30°)"))
         {
             selectedValue		= M_PI / 6;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI/4"))
+        if (ImGui::Selectable("PI/4 (45°)"))
         {
             selectedValue		= M_PI / 4;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI/3"))
+        if (ImGui::Selectable("PI/3 (60°)"))
         {
             selectedValue		= M_PI / 3;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI/2"))
+        if (ImGui::Selectable("PI/2 (90°)"))
         {
             selectedValue		= M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("PI"))
+        if (ImGui::Selectable("PI (180°)"))
         {
             selectedValue		= M_PI;
             valueSelected = true;
         }
-        if (ImGui::Selectable("3PI/2"))
+        if (ImGui::Selectable("3PI/2 (270°)"))
         {
             selectedValue		= -3 * M_PI / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("1"))
-        {
-            selectedValue		= 1.0f;
-            valueSelected = true;
-        }
 
         ImGui::Columns(1);
-
         if (ImGui::Selectable("0"))
         {
             selectedValue		= 0.0f;
@@ -967,11 +949,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
             selectedValue		= -sqrt(3) / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("-2"))
-        {
-            selectedValue		= -2.0f;
-            valueSelected = true;
-        }
+
         if (ImGui::Selectable("-1"))
         {
             selectedValue		= -1.0f;
@@ -985,14 +963,52 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
             selectedValue = 1.0f / 2.0f;
             valueSelected = true;
         }
+        if (ImGui::Selectable("sqrt(2)/2"))
+        {
+            selectedValue		= sqrt(2) / 2;
+            valueSelected = true;
+        }
         if (ImGui::Selectable("sqrt(3)/2"))
         {
             selectedValue		= sqrt(3) / 2;
             valueSelected = true;
         }
-        if (ImGui::Selectable("sqrt(2)/2"))
+
+        if (ImGui::Selectable("1"))
         {
-            selectedValue		= sqrt(2) / 2;
+            selectedValue		= 1.0f;
+            valueSelected = true;
+        }
+        ImGui::Columns(1);
+        if (ImGui::Selectable("0"))
+        {
+            selectedValue		= 0.0f;
+            valueSelected = true;
+        }
+    }
+    else if (popupMode == FloatPopupMode::GeneralNumbers)
+    {
+        ImGui::Columns(2, "floatPopupColumnsDegrees", false);
+        if (ImGui::Selectable("-3"))
+        {
+            selectedValue		= -3.0f;
+            valueSelected = true;
+        }
+        if (ImGui::Selectable("-2"))
+        {
+            selectedValue		= -2.0f;
+            valueSelected = true;
+        }
+        if (ImGui::Selectable("-1"))
+        {
+            selectedValue		= -1.0f;
+            valueSelected = true;
+        }
+
+        ImGui::NextColumn();
+        if (ImGui::Selectable("3"))
+        {
+            selectedValue		= 3.0f;
             valueSelected = true;
         }
         if (ImGui::Selectable("2"))
@@ -1005,14 +1021,19 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
             selectedValue		= 1.0f;
             valueSelected = true;
         }
+
         ImGui::Columns(1);
         if (ImGui::Selectable("0"))
         {
             selectedValue		= 0.0f;
             valueSelected = true;
         }
-
     }
+
+
+
+
+
 }
 
 void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::PinView coreInputPins, Core::Node::PinView coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)
@@ -1244,12 +1265,12 @@ void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node, std::vec
 {
     if (ImGui::BeginMenu("Level of detail"))
 	{
-		ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[node->getLevelOfDetail()]).c_str());
-		ImGui::Separator();
+		//ImGui::TextUnformatted(fmt::format("Actual level: {}", WorkspaceLevelOfDetailName[node->getLevelOfDetail()]).c_str());
+		//ImGui::Separator();
 
 		for (auto const& levelOfDetail : levels_of_detail)
 		{
-            if (ImGui::MenuItem(WorkspaceLevelOfDetailName[levelOfDetail].c_str())) { node->setLevelOfDetail(levelOfDetail); }
+            if (ImGui::MenuItem(WorkspaceLevelOfDetailName[levelOfDetail].c_str(), NULL, node->getLevelOfDetail()==levelOfDetail, true )) { node->setLevelOfDetail(levelOfDetail); }
 		}
 		ImGui::EndMenu();
 	}

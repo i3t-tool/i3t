@@ -15,16 +15,16 @@ class Link : public DiwneObject
 
         virtual bool initialize();
         virtual bool initializeDiwne();
-        virtual void begin(){};
+        virtual void begin(){}; /*!< link is not ImGui element - it is just picture of line */
         virtual void end(){};
         virtual bool content();
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldLink;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragLink;};
+        DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchLink;};
 
 
         virtual void updateEndpoints(){};
         void updateControlPoints();
-
         void updateSquareDistanceMouseFromLink();
 
         virtual ImRect getRectDiwne() const {return ImRect(
@@ -42,14 +42,15 @@ class Link : public DiwneObject
 
         void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end) {m_startDiwne = start; m_endDiwne = end; };
 
-        /* in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
-        bool isLinkOnWorkArea();
+        bool isLinkOnWorkArea(); /*!< in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
 
         virtual bool bypassFocusAction();
         virtual bool bypassFocusForInteractionAction();
 
+        virtual bool processFocusedForInteraction();
+        virtual bool processFocused();
 
-        bool m_just_pluged;
+        bool m_just_pluged /*!< not select link when just pluged */;
 
     protected:
 

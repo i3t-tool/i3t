@@ -39,8 +39,9 @@ typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
 enum WorkspaceDiwneAction
 {
-    None,
-    CreateAndPlugTypeConstructor
+    None
+    , CreateAndPlugTypeConstructor
+    , NOTunselectAllNodes
 };
 
 extern class WorkspaceDiwne* g_workspaceDiwne;
@@ -64,6 +65,10 @@ public:
     bool afterEnd();
 
     WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
+    void setWorkspaceDiwneAction(WorkspaceDiwneAction wda) {m_workspaceDiwneAction = wda;}
+    WorkspaceDiwneAction getWorkspaceDiwneAction() {return m_workspaceDiwneAction;}
+    WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame() {return m_workspaceDiwneActionPreviousFrame;}
+    WorkspaceDiwneAction getWorkspaceDiwneActionActive() const {return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame : m_workspaceDiwneAction; }
 
 	/** * \brief All WorkspaceNodes
         * \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
@@ -92,7 +97,6 @@ public:
 
 		node->setNodePositionDiwne( position );
 		m_workspaceCoreNodes.push_back(node);
-		m_workspaceCoreNodes.back()->drawNodeDiwne<WorkspaceNodeWithCoreData>();
 
 		return node;
 	}
@@ -157,11 +161,6 @@ public:
 
 	Application& m_wholeApplication;
 
-	bool m_first_frame;
-
-	//ImVec2 m_rightClickPosition = ImVec2(100,100);
-
-
 	void render();
 
 	bool Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1, float min_size2,
@@ -182,4 +181,3 @@ auto inline addNodeToNodeEditor(ImVec2 const position=ImVec2(0,0))
 {
     return g_workspaceDiwne->addNodeToPosition<T>(position);
 }
-//extern void backgroundPopupContent(DIWNE::Diwne &diwne, std::vector<Ptr<WorkspaceNodeWithCoreData>> &workspaceCoreNodes);

@@ -12,12 +12,36 @@ WorkspaceTransformation_s(DIWNE::Diwne& diwne)
         setDataItemsWidth();
     }
 
+virtual Core::ETransformState dataAreValid() override
+{
+    return m_nodebase->as<Core::TransformImpl<T>>()->isValid();
+}
+
 int maxLenghtOfData()
 {
-    if (ETransformType::Quat == T)
-        return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(), m_numberOfVisibleDecimal);
-    else
+//    if (ETransformType::Quat == T)
+//        return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(), m_numberOfVisibleDecimal);
+//    else
         return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
+
+}
+
+void drawMenuLevelOfDetail()
+{
+    if (ETransformType::Free == T)
+    {
+        drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+                                      {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+    }
+    else
+    {
+        drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+                                    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::SetValues, WorkspaceLevelOfDetail::Label});
+    }
+
+//    drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+//                                  (ETransformType::Free == T) ? {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label}
+//                                                              : {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::SetValues, WorkspaceLevelOfDetail::Label});
 
 }
 

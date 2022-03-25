@@ -211,6 +211,16 @@ bool WorkspaceSequence::middleContent()
     return inner_interaction_happen;
 }
 
+int WorkspaceSequence::setNumberOfVisibleDecimal(int value)
+{
+    for( auto const & transformation : m_workspaceInnerTransformations )
+    {
+        transformation->setNumberOfVisibleDecimal(value);
+    }
+
+  return 999;
+}
+
 
 int WorkspaceSequence::maxLenghtOfData()
 {

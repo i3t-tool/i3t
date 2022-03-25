@@ -17,6 +17,8 @@ namespace DIWNE
  *  -------------------
  */
 
+/*! \brief Used when one node is inside of other -> inner node is drawn OnCoursorPosition when outer node is draw
+ */
 enum DrawModeNodePosition
 {
     OnCoursorPosition,
@@ -47,6 +49,7 @@ class Node : public DiwneObject
 
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldNode;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragNode;};
+        DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchNode;};
 
 
         void updateSizes();
@@ -66,14 +69,10 @@ class Node : public DiwneObject
 
             bool interaction_happen = drawDiwne(drawMode);
 
-            if(/*drawMode == DrawMode::Interacting && */interaction_happen)
+            if(interaction_happen)
             {
                diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
-               if (/*!(diwne.getDiwneAction() == DiwneAction::DragNode
-                      || diwne.getDiwneAction() == DiwneAction::HoldNode
-                      || diwne.getDiwneAction() == DiwneAction::TouchNode
-                      || diwne.getDiwneAction() == DiwneAction::NewLink
-                      || diwne.getDiwneAction() == DiwneAction::FocusOnObject)*/ diwne.getDiwneActionActive()==DiwneAction::None /* no specific action */){ diwne.setDiwneAction(DiwneAction::InteractingContent);}
+               if (diwne.getDiwneActionActive()==DiwneAction::None || diwne.getDiwneActionActive()==DiwneAction::InteractingContent /* no specific action */){ diwne.setDiwneAction(DiwneAction::InteractingContent);}
             }
 
             return interaction_happen;
@@ -87,15 +86,10 @@ class Node : public DiwneObject
 
         virtual ImRect getRectDiwne() const {return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);};
 
-        virtual bool processFocused();
-        virtual bool processFocusedForInteraction();
-        virtual bool processSelected();
-        virtual bool processUnselected();
-        virtual bool processHold();
-        virtual bool processUnhold();
-        virtual bool processDrag();
+        virtual bool processSelect();
+        virtual bool processUnselect();
 
-        virtual bool bypassTouchAction();
+        virtual bool processDrag();
 
         virtual bool topContent();
         virtual bool leftContent();
@@ -113,7 +107,7 @@ class Node : public DiwneObject
         bool getSelected() const {return m_selected;};
         void setSelected(bool selected) {m_selected = selected;};
 
-        float m_drawAnywhere; /* you have to draw node anywhere for example in first frame after you created it -> for obtain its real size */
+        float m_drawAnywhere; /*!< you have to draw node anywhere for example in first frame after you created it -> for obtain its real size */
 
     protected:
 

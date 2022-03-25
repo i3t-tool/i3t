@@ -559,105 +559,92 @@ void WorkspaceDiwne::popupContent()
 
 		ImGui::Separator();
 
-		if (ImGui::BeginMenu("Select"))
-        {
-            if (ImGui::MenuItem("All nodes"))
-            {
-                selectAll();
-            }
-        ImGui::EndMenu();
-        }
-
-        ImGui::Separator();
-
 		if (ImGui::BeginMenu("Delete"))
-			{
-				if (ImGui::MenuItem("All nodes"))
-				{
-				    m_workspaceCoreNodes.clear();
-				}
-				if (ImGui::MenuItem("All links"))
-				{
-				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+        {
+            if (ImGui::MenuItem("Selected nodes"))
+            {
+                for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                {
+                    if (workspaceCoreNode->getSelected())
                     {
-                        Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
-                        if (node != nullptr)
+                        workspaceCoreNode->setRemoveFromWorkspace(true);
+                    }
+                    else
+                    {
+                        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
+                        if (seq != nullptr)
                         {
-                            for (auto && pin : node->getInputs())
+                            for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
+                            {
+                                if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            if (ImGui::MenuItem("Selected links"))
+            {
+                for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                {
+                    Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                    if (node != nullptr)
+                    {
+                        for (auto && pin : node->getInputs())
+                        {
+                            if (pin->getLink().getSelected())
                             {
                                 pin->unplug();
                             }
                         }
                     }
-				}
-				if (ImGui::MenuItem("Selected nodes"))
-				{
-				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-                    {
-                        if (workspaceCoreNode->getSelected())
-                        {
-                            workspaceCoreNode->setRemoveFromWorkspace(true);
-                        }
-                        else
-                        {
-                            Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(workspaceCoreNode);
-                            if (seq != nullptr)
-                            {
-                                for (auto&& nodeInSequence : seq->getInnerWorkspaceNodes())
-                                {
-                                    if (nodeInSequence->getSelected()){ std::dynamic_pointer_cast<WorkspaceTransformation>(nodeInSequence)->setRemoveFromSequence(true); }
-                                }
-                            }
-                        }
+                }
+            }
 
-                    }
-				}
-				if (ImGui::MenuItem("Selected links"))
-				{
-				    for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+            if (ImGui::MenuItem("All nodes"))
+            {
+                m_workspaceCoreNodes.clear();
+            }
+
+            if (ImGui::MenuItem("All links"))
+            {
+                for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
+                {
+                    Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
+                    if (node != nullptr)
                     {
-                        Ptr<WorkspaceNodeWithCoreDataWithPins> node = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(workspaceCoreNode);
-                        if (node != nullptr)
+                        for (auto && pin : node->getInputs())
                         {
-                            for (auto && pin : node->getInputs())
-                            {
-                                if (pin->getLink().getSelected())
-                                {
-                                    pin->unplug();
-                                }
-                            }
+                            pin->unplug();
                         }
                     }
-				}
-				ImGui::EndMenu();
-			}
+                }
+            }
+            ImGui::EndMenu();
+        }
 
-//		if (ImGui::BeginMenu("selection"))
-//		{
-//
-//			ImGui::Text("selection");
-//			ImGui::Separator();
-//			if (ImGui::MenuItem("select all", "a")) { selectAll(); }
-//			if (ImGui::MenuItem("invert", "i")) { invertSelection(); }
-//			ImGui::EndMenu();
-//		}
-//		if (ImGui::BeginMenu("zoom"))
-//		{
-//
-//			ImGui::Text("zoom");
-//			ImGui::Separator();
-//			if (ImGui::MenuItem("to all", "s")) { ne::NavigateToContent(); }
-//			if (ImGui::MenuItem("to selection", "d")) { ne::NavigateToSelection(); }
-//			ImGui::EndMenu();
-//		}
+        ImGui::Separator();
 
-
+		if (ImGui::BeginMenu("Selection"))
+		{
+			if (ImGui::MenuItem("select all", "ctrl+a")) { selectAll(); }
+			if (ImGui::MenuItem("invert", "ctrl+i")) { invertSelection(); }
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Zoom"))
+		{
+			if (ImGui::MenuItem("to all", "lshift+a")) { zoomToAll(); }
+			if (ImGui::MenuItem("to selection", "lshift+x")) { zoomToSelected(); }
+			ImGui::EndMenu();
+		}
 }
 
 bool WorkspaceDiwne::beforeBegin()
 {
     m_workspaceDiwneAction = WorkspaceDiwneAction::None;
     m_linksToDraw.clear();
+    m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
 
     return false;
 }
@@ -689,43 +676,31 @@ bool WorkspaceDiwne::content()
                                               ),
                               m_workspaceCoreNodes.end());
 
-    int node_count = m_workspaceCoreNodes.size();
-    m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count );
-
-    /* draw nodes from back to begin (front to back) for catch interactions in right order */
-    int prev_size = m_workspaceCoreNodes.size();
-    DIWNE::DrawMode draw_mode = DIWNE::DrawMode::Interacting;
-    for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
+    int number_of_nodes = m_workspaceCoreNodes.size();
+    int node_count = number_of_nodes;
+    if(number_of_nodes > 0)
     {
-        m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
-        draw_mode = /*interaction_happen ? DIWNE::DrawMode::JustDraw : */DIWNE::DrawMode::Interacting; /* if interaction happen in one node -> no interaction in another */
-        if ((*it) != nullptr) interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, draw_mode);
-        if (prev_size != m_workspaceCoreNodes.size()) break; /* when pop from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
+        m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count+1 /*+1 for links channel on top */ );
+
+        /* draw nodes from back to begin (front to back) for catch interactions in right order */
+        int prev_size = m_workspaceCoreNodes.size();
+        for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
+        {
+            m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+            if ((*it) != nullptr){ interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::Interacting); }
+            if (prev_size != m_workspaceCoreNodes.size()) break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
+        }
+
+        /* draw links on top */
+        m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes);
+        for (auto link : m_linksToDraw)
+        {
+            interaction_happen |= link->drawDiwne();
+        }
+
+        m_channelSplitter.Merge(ImGui::GetWindowDrawList());
+
     }
-
-    m_channelSplitter.Merge(ImGui::GetWindowDrawList());
-
-//    /* two or more Nodes -> draw nodes two times (first for catch interaction, second for draw it in right order (with no interaction)) */
-//    if (m_workspaceCoreNodes.size() > 0)
-//    {
-//        for (auto&& workspaceCoreNode : m_workspaceCoreNodes)
-//        {
-//            if (workspaceCoreNode != nullptr) workspaceCoreNode->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::JustDraw); /* nullptr can happen if moving to sequence - maybe unused here */
-//        }
-//    }
-//
-//    for (auto link : m_linksToDraw)
-//    {
-//        interaction_happen |= link->drawDiwne();
-//    }
-
-#ifdef DIWNE_DEBUG
-DIWNE_DEBUG((*this), {
-    if (interaction_happen){ ImGui::Text("Workspace: Interaction with nodes happen");}
-});
-#endif // DIWNE_DEBUG
-
-    m_interactionAllowed = !interaction_happen;
 
     return interaction_happen;
 }
@@ -739,14 +714,31 @@ bool WorkspaceDiwne::afterContent()
     /* ===== reaction to actions ===== */
     manipulatorStartCheck3D();
 
-	if (getNodesSelectionChanged()) {shiftNodesToEnd(getSelectedNodes());}
+    /* selection will be active in next frame */
+    if (InputManager::isAxisActive("NOTunselectAll")) {
+            setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
+    }
+	if (getNodesSelectionChanged())
+	{
+        shiftNodesToEnd(getSelectedNodes());
+
+        if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes) /* \todo JH not work - in debug fame by frame work, but not without breakpoints... */
+        {
+            for (auto node : getAllNodesInnerIncluded())
+            {
+                if(node != getLastActiveNode<WorkspaceNodeWithCoreData>()) node->setSelected(false);
+            }
+        }
+    }
 
     /* hold or drag or interacting or new_link  */
-    if ( (m_diwneAction == DIWNE::DiwneAction::DragNode
+    if ( (   m_diwneAction == DIWNE::DiwneAction::DragNode
           || m_diwneAction == DIWNE::DiwneAction::HoldNode
           || m_diwneAction == DIWNE::DiwneAction::InteractingContent
           || m_diwneAction == DIWNE::DiwneAction::NewLink
-          || m_diwneAction == DIWNE::DiwneAction::TouchNode)
+          || m_diwneAction == DIWNE::DiwneAction::TouchNode
+          || m_diwneAction == DIWNE::DiwneAction::TouchPin
+          )
         )
     {
         shiftInteractingNodeToEnd();
@@ -917,11 +909,6 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	}
 }
 
-//bool WorkspaceDiwne::allowInteraction()
-//{
-//    m_isHeldDiwne::allowInteraction()
-//}
-
 bool WorkspaceDiwne::bypassZoomAction(){ return InputManager::isAxisActive("scroll") != 0; }
 bool WorkspaceDiwne::bypassDragAction(){ return InputManager::isAxisActive("pan") != 0; }
 bool WorkspaceDiwne::bypassHoldAction(){return InputManager::isAxisActive("pan") != 0;}
@@ -929,7 +916,7 @@ bool WorkspaceDiwne::bypassUnholdAction(){return InputManager::isAxisActive("pan
 
 /* \todo JH better way to get start pos and size of rectangle */
 /* *3 for avoid switch to Selection rect when node in sequence -> some bug... */
-bool WorkspaceDiwne::bypassSelectionRectangleAction() {return bypassFocusForInteractionAction() && InputManager::isAxisActive("selectionRectangle") != 0  && (InputManager::m_mouseXDragDelta > 3*ImGui::GetIO().MouseDragThreshold || InputManager::m_mouseYDragDelta > 3*ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta > 3*ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseYDragDelta > 3*ImGui::GetIO().MouseDragThreshold);} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+bool WorkspaceDiwne::bypassSelectionRectangleAction() {return InputManager::isAxisActive("selectionRectangle") != 0 /* && (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold || InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold)*/;} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos0());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta0()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 
@@ -939,7 +926,6 @@ ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetM
 /* ========================================== */
 WorkspaceWindow::WorkspaceWindow(bool show)
     :	IWindow(show)
-    ,   m_first_frame(true)
     ,   m_wholeApplication(Application::get())
 {
 	g_workspaceDiwne = new WorkspaceDiwne(&settingsDiwne);
@@ -968,31 +954,6 @@ void WorkspaceWindow::render()
     /* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{
-		if(m_first_frame)
-		{
-			m_first_frame = false;
-			//m_workspaceDiwne.addNodeToPosition<WorkspaceScreen>(ImVec2(700,200));
-
-			//m_workspaceDiwne.addNodeToPosition<WorkspaceCycle>(ImVec2(400,200));
-
-			// m_workspaceDiwne.addNodeToPosition<WorkspaceAngleAxisToQuat>(ImVec2(400,200));
-
-			// m_workspaceDiwne.addNodeToPosition<WorkspaceCamera>(ImVec2(400,200));
-
-			// Should not be created without taking a state snapshot.
-			// g_workspaceDiwne->addNodeToPosition<WorkspaceSequence>(ImVec2(400,200));
-
-
-//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::VectorToVector3>>());
-//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(700,200));
-//
-//        m_workspaceCoreNodes.push_back(std::make_shared<WorkspaceOperator<ENodeType::MakeTranslation>>());
-//        m_workspaceCoreNodes.back()->setNodePositionDiwne(ImVec2(1000,200));
-//
-//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())->getInputs().at(0)->plug(
-//        std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.front())->getOutputs().at(0).get() );
-		}
-
 		if (ImGui::BeginMenuBar())
 		{
 			showEditMenu();
@@ -1003,50 +964,6 @@ void WorkspaceWindow::render()
 	}
 	ImGui::End();
 }
-
-
-
-//Ptr<WorkspaceSequence> WorkspaceWindow::getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node)
-//{
-//	Ptr<Core::Transformation> transfomation_nodebase = node->getNodebase()->as<Core::Transformation>();
-//	if (transfomation_nodebase)
-//	{
-//		Ptr<Core::NodeBase> sequence_nodebase = transfomation_nodebase->getCurrentSequence();
-//		if (sequence_nodebase)
-//		{
-//			for (Ptr<WorkspaceNodeWithCoreData> const& workspace_node : m_workspaceCoreNodes)
-//			{
-//				if (workspace_node->isSequence() && workspace_node->getNodebase() == sequence_nodebase)
-//				{
-//					return std::dynamic_pointer_cast<WorkspaceSequence>(workspace_node);
-//				}
-//			}
-//		}
-//	}
-//	return nullptr;
-//}
-//
-
-//std::vector<Ptr<WorkspaceSequence>> WorkspaceWindow::getSequenceNodes()
-//{
-//	std::vector<Ptr<WorkspaceSequence>> allSequenceNodes;
-//	Ptr<WorkspaceNodeWithCoreData>			temp;
-//
-//	for (Ptr<WorkspaceNodeWithCoreData> const& node : m_workspaceCoreNodes)
-//	{
-//		temp = getWorkspaceCoreNodeByID(node->getId());
-//		if (temp->isSequence()) { allSequenceNodes.push_back(std::dynamic_pointer_cast<WorkspaceSequence>(temp)); }
-//		else if (temp->isCamera())
-//		{
-//			Ptr<WorkspaceCamera> temp_camera = std::dynamic_pointer_cast<WorkspaceCamera>(temp);
-//			allSequenceNodes.push_back(temp_camera->getProjection());
-//			allSequenceNodes.push_back(temp_camera->getView());
-//		}
-//	}
-//
-//	return allSequenceNodes;
-//}
-//
 
 void WorkspaceWindow::showEditMenu()
 {
