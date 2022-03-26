@@ -27,6 +27,7 @@ DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const la
 bool DiwneObject::allowDrawing(){return true;}
 bool DiwneObject::drawDiwne(DrawMode drawMode/*=DrawMode::Interacting*/)
 {
+    m_inner_interaction_happen_previous_draw = m_inner_interaction_happen;
     m_inner_interaction_happen = false;
     m_drawMode = drawMode;
     m_inner_interaction_happen |= initializeDiwne();
@@ -101,25 +102,28 @@ bool DiwneObject::processInteractionsDiwne()
 
     if (m_drawMode == Interacting && !m_inner_interaction_happen)
     {
-        interaction_happen |= processObjectFocused();
-        interaction_happen |= processObjectFocusedForInteraction();
-
-        if (m_focused) /* diwne.m_objectFocused is checked in allowFocusedForInteraction() too */
+        if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
         {
-            diwne.m_objectFocused = true;
-            if ( diwne.getDiwneActionActive() == None || diwne.getDiwneActionActive() == FocusOnObject) diwne.setDiwneAction(FocusOnObject);
-        }
+            interaction_happen |= processObjectFocused();
+            interaction_happen |= processObjectFocusedForInteraction();
 
-        if (allowInteraction())
-        {
-            interaction_happen |= processRaisePopupDiwne();
-            interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();
-            interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
-            if (m_isHeld){interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */ diwne.setDiwneAction(getHoldActionType());}
-            interaction_happen |= processObjectDrag();
-            interaction_happen |= processInteractions();
-        }
+            if (m_focused) /* diwne.m_objectFocused is checked in allowFocusedForInteraction() too */
+            {
+                diwne.m_objectFocused = true;
+                if ( diwne.getDiwneActionActive() == None || diwne.getDiwneActionActive() == FocusOnObject) diwne.setDiwneAction(FocusOnObject);
+            }
 
+            if (allowInteraction())
+            {
+                interaction_happen |= processRaisePopupDiwne();
+                interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();
+                interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
+                if (m_isHeld){interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */ diwne.setDiwneAction(getHoldActionType());}
+                interaction_happen |= processObjectDrag();
+                interaction_happen |= processInteractions();
+            }
+
+        }
         interaction_happen |= processInteractionsAlways();
     }
 #ifdef DIWNE_DEBUG

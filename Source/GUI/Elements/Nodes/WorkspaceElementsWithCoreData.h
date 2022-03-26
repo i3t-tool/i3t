@@ -51,7 +51,7 @@ public:
 	Ptr<Core::NodeBase> const getNodebase() const;
 
 	int getNumberOfVisibleDecimal();
-	virtual int setNumberOfVisibleDecimal(int value);
+	virtual void setNumberOfVisibleDecimal(int value);
 
 	FloatPopupMode& getFloatPopupMode() {return m_floatPopupMode;};
 	void setFloatPopupMode(FloatPopupMode mode){m_floatPopupMode = mode;};

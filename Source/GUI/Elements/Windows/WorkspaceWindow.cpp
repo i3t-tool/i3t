@@ -689,6 +689,11 @@ bool WorkspaceDiwne::content()
             m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
             if ((*it) != nullptr){ interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::Interacting); }
             if (prev_size != m_workspaceCoreNodes.size()) break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
+
+            if ( (*it)->interactionEndInLastDraw() )
+            {
+                StateManager::instance().takeSnapshot();
+            }
         }
 
         /* draw links on top */

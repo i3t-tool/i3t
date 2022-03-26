@@ -211,7 +211,7 @@ bool WorkspaceSequence::middleContent()
     return inner_interaction_happen;
 }
 
-int WorkspaceSequence::setNumberOfVisibleDecimal(int value)
+void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
 {
     for( auto const & transformation : m_workspaceInnerTransformations )
     {

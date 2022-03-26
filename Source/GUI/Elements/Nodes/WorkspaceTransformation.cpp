@@ -22,11 +22,11 @@ bool WorkspaceTransformation::beforeContent()
 
 bool WorkspaceTransformation::topContent()
 {
-    /* \todo JH get Transformation header Theme here */
+    bool interaction_happen = false;
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
-    WorkspaceNodeWithCoreData::topContent();
+    interaction_happen |= WorkspaceNodeWithCoreData::topContent();
     ImGui::SameLine();
 
     switch (dataAreValid())
@@ -42,14 +42,12 @@ bool WorkspaceTransformation::topContent()
             ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
         break;
     }
-	return false;
+	return interaction_happen;
 }
 
 bool WorkspaceTransformation::middleContent()
 {
     bool inner_interaction_happen = false;
-    //diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-    //                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
 	switch (m_levelOfDetail)
 	{
