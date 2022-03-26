@@ -217,8 +217,6 @@ void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
     {
         transformation->setNumberOfVisibleDecimal(value);
     }
-
-  return 999;
 }
 
 

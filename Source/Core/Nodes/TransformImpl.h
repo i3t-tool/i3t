@@ -18,6 +18,10 @@ namespace Core
 		return node;                                                                                                       \
 	}
 
+template <ETransformType T>
+class TransformImpl : public Transformation
+{};
+
 namespace Builder
 {
 	template <ETransformType T>
@@ -33,10 +37,6 @@ namespace Builder
 	}
 } // namespace Builder
 
-
-template <ETransformType T>
-class TransformImpl : public Transformation
-{};
 
 
 template <>
