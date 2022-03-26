@@ -175,6 +175,11 @@ std::optional<NodeData> dumpTransform(Ptr<GuiTransform> guiTransform)
 	}
 	data.node += "    defaults: {" + Utils::concat(Utils::concat(defaultValues, ": "), ", ") + "}\n";
 
+	if (transform->hasSavedValue())
+	{
+		data.node += "    saved_value: " + Utils::toString(transform->getSavedValue());
+	}
+
 	return data;
 }
 
@@ -531,6 +536,10 @@ void buildTransform(YAML::Node& node)
 		}
 
 		coreTransform->getInternalData(0).setValue(buildMat4(node["value"]));
+
+		if (node["saved_value"])
+		{ coreTransform->setSavedValue(buildMat4(node["saved_value"]));
+		}
 
 		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies();
 		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();

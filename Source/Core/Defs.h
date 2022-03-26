@@ -94,6 +94,14 @@ T& Singleton<T>::instance()
 }
 
 
+template <typename BaseClass>
+class ICloneable
+{
+public:
+	virtual Ptr<BaseClass> clone() = 0;
+};
+
+
 /// Enum utils
 
 /**
@@ -125,24 +133,3 @@ constexpr T enumVal(const std::string& str)
 	(SetupForm::radians ? (x)                                                                                            \
 											: glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
 
-//===----------------------------------------------------------------------===//
-
-// https://newbedev.com/find-out-whether-a-c-object-is-callable
-template <typename T>
-constexpr bool noarg_callable_impl(
-		typename std::enable_if<bool(sizeof((std::declval<T>()(),0)))>::type*)
-{
-	return true;
-}
-
-template<typename T>
-constexpr bool noarg_callable_impl(...)
-{
-	return false;
-}
-
-template<typename T>
-constexpr bool is_noarg_callable()
-{
-	return noarg_callable_impl<T>(nullptr);
-}

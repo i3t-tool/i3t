@@ -11,16 +11,23 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
-inline constexpr size_t I3T_SEQ_IN_MUL = 0;  // owned by multiplier
-inline constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
+constexpr size_t I3T_SEQ_IN_MUL = 0;  // owned by multiplier
+constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
 
-inline constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
-inline constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
-inline constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
+constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by multiplier
 
-inline constexpr size_t I3T_SEQ_MUL = 0;
-inline constexpr size_t I3T_SEQ_MAT = 1;  // local transform
-inline constexpr size_t I3T_SEQ_MOD = 2;  // world transform
+constexpr size_t I3T_SEQ_MUL = 0;
+constexpr size_t I3T_SEQ_MAT = 1;  // local transform
+constexpr size_t I3T_SEQ_MOD = 2;  // world transform
+
+class Sequence;
+
+namespace Builder
+{
+	Ptr<Sequence> createSequence();
+} // namespace Builder
 
 /**
  * Sequence of matrices.
@@ -52,6 +59,13 @@ class Sequence : public Node
 	public:
 		Storage();
 
+		Ptr<Node> clone() override
+		{
+			I3T_ABORT("Don't clone this class!");
+
+			return nullptr;
+		}
+
 		Pin& getIn(size_t i) override;
 		Pin& getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
@@ -77,6 +91,13 @@ class Sequence : public Node
 	public:
 		Multiplier();
 
+		Ptr<Node> clone() override
+		{
+			I3T_ABORT("Don't clone this class!");
+
+			return nullptr;
+		}
+
 		Pin& getIn(size_t i) override;
 		Pin& getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
@@ -93,6 +114,8 @@ class Sequence : public Node
 
 public:
 	Sequence();
+
+	Ptr<Node> clone() override;
 
 	Pin& getIn(size_t i) override;
 	Pin& getOut(size_t i) override;

@@ -97,7 +97,6 @@ public:
 
 		node->setNodePositionDiwne( position );
 		m_workspaceCoreNodes.push_back(node);
-		m_workspaceCoreNodes.back()->drawNodeDiwne<WorkspaceNodeWithCoreData>();
 
 		return node;
 	}

@@ -4,24 +4,31 @@
 
 namespace Core
 {
-inline constexpr size_t I3T_CYCLE_IN_FROM  = 0;
-inline constexpr size_t I3T_CYCLE_IN_TO		 = 1;
-inline constexpr size_t I3T_CYCLE_IN_MULT  = 2; /* JH is not step + instead of *  ??? */
-inline constexpr size_t I3T_CYCLE_IN_PLAY  = 3;
-inline constexpr size_t I3T_CYCLE_IN_PAUSE = 4;
-inline constexpr size_t I3T_CYCLE_IN_STOP	 = 5;
-inline constexpr size_t I3T_CYCLE_IN_PREV	 = 6;
-inline constexpr size_t I3T_CYCLE_IN_NEXT	 = 7;
+constexpr size_t I3T_CYCLE_IN_FROM  = 0;
+constexpr size_t I3T_CYCLE_IN_TO    = 1;
+constexpr size_t I3T_CYCLE_IN_MULT  = 2; /* JH is not step + instead of *  ??? */
+constexpr size_t I3T_CYCLE_IN_PLAY  = 3;
+constexpr size_t I3T_CYCLE_IN_PAUSE = 4;
+constexpr size_t I3T_CYCLE_IN_STOP  = 5;
+constexpr size_t I3T_CYCLE_IN_PREV  = 6;
+constexpr size_t I3T_CYCLE_IN_NEXT  = 7;
 
-inline constexpr size_t I3T_CYCLE_OUT_VAL   = 0;
-inline constexpr size_t I3T_CYCLE_OUT_PLAY  = 1;
-inline constexpr size_t I3T_CYCLE_OUT_PAUSE = 2;
-inline constexpr size_t I3T_CYCLE_OUT_STOP	= 3;
-inline constexpr size_t I3T_CYCLE_OUT_PREV	= 4;
-inline constexpr size_t I3T_CYCLE_OUT_NEXT	= 5;
-inline constexpr size_t I3T_CYCLE_OUT_END		= 6;
+constexpr size_t I3T_CYCLE_OUT_VAL   = 0;
+constexpr size_t I3T_CYCLE_OUT_PLAY  = 1;
+constexpr size_t I3T_CYCLE_OUT_PAUSE = 2;
+constexpr size_t I3T_CYCLE_OUT_STOP  = 3;
+constexpr size_t I3T_CYCLE_OUT_PREV  = 4;
+constexpr size_t I3T_CYCLE_OUT_NEXT  = 5;
+constexpr size_t I3T_CYCLE_OUT_END   = 6;
 
-class Cycle : public NodeBase
+class Cycle;
+
+namespace Builder
+{
+	Ptr<class Cycle> createCycle();
+}
+
+class Cycle : public Node
 {
 public:
 	enum class EMode
@@ -45,6 +52,9 @@ private:
 
 public:
 	Cycle() : NodeBase(&g_CycleProperties) {}
+
+	Ptr<Node> clone() override;
+
 	void update(double seconds);  //< seconds means time delta from the last update
 
 	void play();

@@ -3,6 +3,21 @@
 
 using namespace Core;
 
+Ptr<Cycle> Builder::createCycle()
+{
+	auto ret = std::make_shared<Cycle>();
+	ret->init();
+	ret->updateValues(-1);
+	ret->stopAndReset();
+
+	return ret;
+}
+
+Ptr<Node> Cycle::clone()
+{
+	return Builder::createCycle();
+}
+
 void Cycle::update(double seconds)
 {
 	if (m_isRunning)

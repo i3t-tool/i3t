@@ -91,9 +91,12 @@ public:
 	/// Get default value which transform can hold.
 	const Data& getDefaultValue(const std::string& name) const;
 
+	/** You can find transform default values names and types at the file Core/Nodes/Operation.h. */
 	template <typename T>
 	void setDefaultValue(const std::string& name, T&& val)
 	{
+		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
+
 		m_defaultValues.at(name).setValue(val);
 		reset();
 	}
@@ -103,6 +106,8 @@ public:
 	 */
 	TransformOperation::ValueMap getDefaultTypes();
 	DefaultValues&               getDefaultValues();
+
+	void setDefaultValues(const DefaultValues& values) { m_defaultValues = values; }
 
 	EValueState getValueState(glm::ivec2 coords);
 
@@ -123,6 +128,22 @@ public:
 		unlock();
 		disableSynergies();
 	}
+
+	//===----------------------------------------------------------------------===//
+
+	bool hasSavedValue() const { return m_hasSavedData; }
+
+	/** Save current values of the transformation for future reloading. */
+	void saveValue();
+
+	/** Restore saved values if they exist. */
+	void reloadValue();
+
+	const glm::mat4& getSavedValue() const;
+
+	void setSavedValue(const glm::mat4& values);
+
+	//===----------------------------------------------------------------------===//
 
 	void resetModifiers()
 	{
@@ -168,6 +189,7 @@ protected:
 	bool m_isLocked						 = true;
 
 private:
+	bool      m_hasSavedData = false;
 	DataStore m_savedData;
 };
 

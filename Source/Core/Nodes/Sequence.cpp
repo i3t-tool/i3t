@@ -4,6 +4,16 @@
 
 using namespace Core;
 
+Ptr<Sequence> Builder::createSequence()
+{
+	auto ret = std::make_shared<Sequence>();
+	ret->init();
+	ret->createComponents();
+	ret->updateValues(0);
+
+	return ret;
+}
+
 //===-- Storage -----------------------------------------------------------===//
 
 const Operation g_storageOp = {
@@ -174,6 +184,11 @@ void Sequence::Multiplier::updateValues(int inputIndex)
 
 Sequence::Sequence() : NodeBase(&g_sequence)
 {
+}
+
+Ptr<Node> Sequence::clone()
+{
+	return Builder::createSequence();
 }
 
 Pin& Sequence::getIn(size_t i)

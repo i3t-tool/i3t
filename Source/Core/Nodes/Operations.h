@@ -244,11 +244,11 @@ static const std::vector<EValueType> quatInput		= {EValueType::Quat};
 static const std::vector<EValueType> twoMatrixInput	 = {EValueType::Matrix, EValueType::Matrix};
 static const std::vector<EValueType> twoVectorInput	 = {EValueType::Vec4, EValueType::Vec4};
 static const std::vector<EValueType> twoVector3Input = {EValueType::Vec3, EValueType::Vec3};
-static const std::vector<EValueType> twoQuatInput		 = {EValueType::Quat, EValueType::Quat};
 static const std::vector<EValueType> twoFloatInput	 = {EValueType::Float, EValueType::Float};
+static const std::vector<EValueType> twoQuatInput		 = {EValueType::Quat, EValueType::Quat};
 
-static const std::vector<EValueType> threeFloatInput	 = {EValueType::Float, EValueType::Float, EValueType::Float};
 static const std::vector<EValueType> threeVector3Input = {EValueType::Vec3, EValueType::Vec3, EValueType::Vec3};
+static const std::vector<EValueType> threeFloatInput	 = {EValueType::Float, EValueType::Float, EValueType::Float};
 
 static const std::vector<EValueType> fourVectorInput	= {EValueType::Vec4, EValueType::Vec4, EValueType::Vec4,
 																												 EValueType::Vec4};
@@ -272,8 +272,9 @@ static const std::vector<EValueType> twoQuatFloatInput		= {EValueType::Quat, EVa
 
 static const std::vector<EValueType> matrixVectorInput = {EValueType::Matrix, EValueType::Vec4};
 static const std::vector<EValueType> vectorMatrixInput = {EValueType::Vec4, EValueType::Matrix};
+static const std::vector<EValueType> vector3FloatInput = {EValueType::Vec3, EValueType::Float};
 static const std::vector<EValueType> floatMatrixInput	 = {EValueType::Float, EValueType::Matrix};
-static const std::vector<EValueType> floatVectorInput	 = {EValueType::Float, EValueType::Vec3};
+static const std::vector<EValueType> floatVectorInput	 = {EValueType::Float, EValueType::Vec4}; // PF: vec3 changed to vec4
 static const std::vector<EValueType> floatVector3Input = {EValueType::Float, EValueType::Vec3};
 static const std::vector<EValueType> floatQuatInput		 = {EValueType::Float, EValueType::Quat};
 static const std::vector<EValueType> quatVector3Input	 = {EValueType::Quat, EValueType::Vec3};
@@ -307,15 +308,13 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MatrixMulMatrix), "mat * mat", 2, twoMatrixInput, 1, matrixInput},		 // mat * mat
 		{n(ENodeType::MatrixAddMatrix), "mat + mat", 2, twoMatrixInput, 1, matrixInput},		 // mat + mat
 		{n(ENodeType::MatrixMulVector), "mat * vec4", 2, matrixVectorInput, 1, vectorInput}, // mat * vec4
-		{n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1,
-		 vectorInput}, // vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice???
+		{n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1, vectorInput}, // vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice??? -- násobení vektoru maticí zprava
 		{n(ENodeType::MatrixMulFloat), "float * mat", 2, floatMatrixInput, 1, matrixInput},	 // float * mat
 		{n(ENodeType::VectorDotVector), "vec4 . vec4", 2, twoVectorInput, 1, floatInput},		 // vec4 . vec4
 		{n(ENodeType::VectorAddVector), "vec4 + vec4", 2, twoVectorInput, 1, vectorInput},	 // vec4 + vec4
 		{n(ENodeType::VectorSubVector), "vec4 - vec4", 2, twoVectorInput, 1, vectorInput},	 // vec4 - vec4
 		{n(ENodeType::VectorMulFloat), "float * vec4", 2, floatVectorInput, 1, vectorInput}, // float * vec4
-		{n(ENodeType::VectorPerspectiveDivision), "perspective division", 1, vectorInput, 1,
-		 vectorInput},																																		 // perspective division
+		{n(ENodeType::VectorPerspectiveDivision), "perspective division", 1, vectorInput, 1, vectorInput},																																		 // perspective division
 		{n(ENodeType::NormalizeVector), "normalize vec4", 1, vectorInput, 1, vectorInput}, // normalize vec4
 		{n(ENodeType::MixVector), "mix vec4", 3, twoVectorFloatInput, 1, vectorInput, NO_TAG, mixInputNames}, // mix vec4
 		{n(ENodeType::Vector3CrossVector3), "vec3 x vec3", 2, twoVector3Input, 1, vector3Input},							// vec3 x vec3
@@ -324,31 +323,18 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::Vector3SubVector3), "vec3 - vec3", 2, twoVector3Input, 1, vector3Input},								// vec3 - vec3
 		{n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVectorInput, 1, vector3Input}, // float * vec3
 		{n(ENodeType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1, vector3Input},	 // normalize vec3
-		{n(ENodeType::Vector3Length), "lengthvec3", 1, vector3Input, 1, floatInput,
-		 "l = sqrt(x*x + y*y + z*z)"}, // lengthvec3
-		{n(ENodeType::ShowVector3), "show vec3", 1, vector3Input, 1, matrixInput,
-		 "Create the matrix transforming vector [1, 0, 0] to the input vector. Should be used with bind objects / basic "
+		{n(ENodeType::Vector3Length), "lengthvec3", 1, vector3Input, 1, floatInput, "l = sqrt(x*x + y*y + z*z)"}, // lengthvec3
+		{n(ENodeType::ShowVector3), "show vec3", 1, vector3Input, 1, matrixInput, "Create the matrix transforming vector [1, 0, 0] to the input vector. Should be used with bind objects / basic "
 		 "/ vectors."}, // show vec3
 		{n(ENodeType::MixVector3), "mix vec3", 3, twoVector3FloatInput, 1, vector3Input, NO_TAG, mixInputNames}, // mix vec3
 		{n(ENodeType::ConjQuat), "quat conjugate", 1, quatInput, 1, quatInput},								 // quat conjugate
 		{n(ENodeType::FloatVecToQuat), "quatfloat, vec3", 2, floatVector3Input, 1, quatInput}, // quatfloat, vec3
-		{n(ENodeType::AngleAxisToQuat), "quatangle, axis", 3, twoFloatVector3Input, 1, quatInput, NO_TAG,
-		 AngleAxisToQuatInputNames}, // quatangle, axis
-		{n(ENodeType::VecVecToQuat), "quatvec3, vec3", 2, twoVector3Input, 1, floatInput,
-		 "Input vector's are normalized."}, // quatvec3, vec3
-		{n(ENodeType::QuatToFloatVec), "quat -> float, vec3", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,
-		 QuatToFloatVecInputNames}, // quat -> float, vec3
-		{n(ENodeType::QuatToAngleAxis), "quat -> angle, axis", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,
-		 AngleAxisInputNames},																													// quat -> angle, axis
+		{n(ENodeType::AngleAxisToQuat), "quatangle, axis", 3, twoFloatVector3Input, 1, quatInput, NO_TAG, AngleAxisToQuatInputNames}, // quatangle, axis
+		{n(ENodeType::VecVecToQuat), "quatvec3, vec3", 2, twoVector3Input, 1, quatInput, "Input vector's are normalized."}, // quatvec3, vec3   //PF: floatInput changed to quatInput
+		{n(ENodeType::QuatToFloatVec), "quat -> float, vec3", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES,  QuatToFloatVecInputNames}, // quat -> float, vec3
+		{n(ENodeType::QuatToAngleAxis), "quat -> angle, axis", 1, quatInput, 2, floatVector3Input, NO_TAG, DEFAULT_NAMES, AngleAxisInputNames},																													// quat -> angle, axis
 		{n(ENodeType::QuatToEuler), "quat -> euler", 1, quatInput, 3, threeFloatInput}, // quat -> euler
-		{n(ENodeType::EulerToQuat),
-		 "euler -> quat",
-		 3,
-		 threeFloatInput,
-		 1,
-		 quatInput,
-		 NO_TAG,
-		 {"x", "y", "z"}},																																					 // euler -> quat
+		{n(ENodeType::EulerToQuat), "euler -> quat", 3, threeFloatInput, 1, quatInput, NO_TAG, {"x", "y", "z"}},																																					 // euler -> quat
 		{n(ENodeType::QuatInverse), "inverse quat", 1, quatInput, 1, quatInput},										 // inverse quat
 		{n(ENodeType::QuatSlerp), "quat slerp", 3, twoQuatFloatInput, 1, quatInput},								 // quat slerp
 		{n(ENodeType::QuatLongWaySlerp), "quat long way slerp", 3, twoQuatFloatInput, 1, quatInput}, // quat long way slerp
@@ -356,10 +342,8 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::FloatMulQuat), "float * quat", 2, floatQuatInput, 1, quatInput},							 // float * quat
 		{n(ENodeType::QuatMulQuat), "quat * quat", 2, twoQuatInput, 1, quatInput},									 // quat * quat
 		{n(ENodeType::QuatVecConjQuat), "qvq*", 2, quatVector3Input, 1, vector3Input},							 // qvq*
-		{n(ENodeType::QuatLength), "lengthquat", 1, quatInput, 1, floatInput,
-		 "l = sqrt(w*w + x*x + y*y + z*z)"}, // lengthquat
-		{n(ENodeType::ClampFloat), "clamp float", 3, threeFloatInput, 1, floatInput,
-		 "Clamp val to <min, max> interval.\n Default min = 0 and max = 1", ClampFloatInputNames},			 // clamp float
+		{n(ENodeType::QuatLength), "lengthquat", 1, quatInput, 1, floatInput, "l = sqrt(w*w + x*x + y*y + z*z)"}, // lengthquat
+		{n(ENodeType::ClampFloat), "clamp float", 3, threeFloatInput, 1, floatInput, "Clamp val to <min, max> interval.\n Default min = 0 and max = 1", ClampFloatInputNames},			 // clamp float
 		{n(ENodeType::FloatMulFloat), "float * float", 2, twoFloatInput, 1, floatInput},								 // float * float
 		{n(ENodeType::FloatDivFloat), "float / float", 2, twoFloatInput, 1, floatInput},								 // float / float
 		{n(ENodeType::FloatAddFloat), "float + float", 2, twoFloatInput, 1, floatInput},								 // float + float
@@ -369,29 +353,22 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::ASinACos), "asin&acosfloat", 1, floatInput, 2, twoFloatInput},										 // asin&acosfloat
 		{n(ENodeType::Signum), "signum", 1, floatInput, 1, floatInput},																	 // signum
 		{n(ENodeType::MatrixToVectors), "mat -> vecs", 1, matrixInput, 4, fourVectorInput},							 // mat -> vecs
-		{n(ENodeType::Vectors3ToMatrix), "vecs3 -> mat", 4, fourVector3Input, 1, matrixInput, NO_TAG,
-		 Vectors3ToMatrixInputNames}, // vecs3 -> mat
-		{n(ENodeType::VectorsToMatrix), "vecs4 -> mat", 4, fourVectorInput, 1, matrixInput, NO_TAG,
-		 VectorsToMatrixInputNames}, // vecs4 -> mat
-		{n(ENodeType::MatrixToFloats), "mat -> floats", 1, matrixInput, 16, sixteenFloatInput, NO_TAG, DEFAULT_NAMES,
-		 matrixIndexNames()}, // mat -> floats
-		{n(ENodeType::FloatsToMatrix), "floats -> mat", 16, sixteenFloatInput, 1, matrixInput, NO_TAG,
-		 matrixIndexNames()}, // floats -> mat
+		{n(ENodeType::Vectors3ToMatrix), "vecs3 -> mat", 4, fourVector3Input, 1, matrixInput, NO_TAG, Vectors3ToMatrixInputNames}, // vecs3 -> mat
+		{n(ENodeType::VectorsToMatrix), "vecs4 -> mat", 4, fourVectorInput, 1, matrixInput, NO_TAG,  VectorsToMatrixInputNames}, // vecs4 -> mat
+		{n(ENodeType::MatrixToFloats), "mat -> floats", 1, matrixInput, 16, sixteenFloatInput, NO_TAG, DEFAULT_NAMES,  matrixIndexNames()}, // mat -> floats
+		{n(ENodeType::FloatsToMatrix), "floats -> mat", 16, sixteenFloatInput, 1, matrixInput, NO_TAG, matrixIndexNames()}, // floats -> mat
 		{n(ENodeType::MatrixToTR), "mat -> TR", 1, matrixInput, 2, twoMatrixInput, NO_TAG, DEFAULT_NAMES, tr}, // mat -> TR
 		{n(ENodeType::TRToMatrix), "TR -> mat", 2, twoMatrixInput, 1, matrixInput, NO_TAG, tr},								 // TR -> mat
 		{n(ENodeType::MatrixToQuat), "mat -> quat", 1, matrixInput, 1, quatInput}, // mat -> quat
 		{n(ENodeType::QuatToMatrix), "quat -> mat", 1, quatInput, 1, matrixInput}, // quat -> mat
-		{n(ENodeType::VectorToFloats), "vec4 -> floats", 1, vectorInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES,
-		 xyzw},																																														 // vec4 -> float
+		{n(ENodeType::VectorToFloats), "vec4 -> floats", 1, vectorInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES, xyzw},																																														 // vec4 -> float
 		{n(ENodeType::FloatsToVector), "floats -> vec4", 4, fourFloatInput, 1, vectorInput, NO_TAG, xyzw}, // floats -> vec4
-		{n(ENodeType::Vector3ToFloats), "vec3 -> floats", 1, vector3Input, 3, threeFloatInput, NO_TAG, DEFAULT_NAMES,
-		 xyz}, // vec3 -> floats
-		{n(ENodeType::FloatsToVector3), "floats -> vec3", 3, threeFloatInput, 1, vector3Input, NO_TAG,
-		 xyz},																																						// floats -> vec3
+		{n(ENodeType::Vector3ToFloats), "vec3 -> floats", 1, vector3Input, 3, threeFloatInput, NO_TAG, DEFAULT_NAMES, xyz}, // vec3 -> floats
+		{n(ENodeType::FloatsToVector3), "floats -> vec3", 3, threeFloatInput, 1, vector3Input, NO_TAG, xyz},																																						// floats -> vec3
 		{n(ENodeType::VectorToVector3), "vec4 -> vec3", 1, vectorInput, 1, vector3Input}, // vec4 -> vec3
-		{n(ENodeType::Vector3ToVector), "vec3 -> vec4", 1, vector3Input, 1, vectorInput}, // vec3 -> vec4
-		{n(ENodeType::QuatToFloats), "quat -> floats", 1, quatInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES,
-		 xyzw},																																												 // quat -> floats
+		//
+		{n(ENodeType::Vector3ToVector), "vec3 -> vec4", 2, vector3FloatInput, 1, vectorInput}, // vec3 -> vec4
+		{n(ENodeType::QuatToFloats), "quat -> floats", 1, quatInput, 4, fourFloatInput, NO_TAG, DEFAULT_NAMES, xyzw},																																												 // quat -> floats
 		{n(ENodeType::FloatsToQuat), "floats -> quat", 4, fourFloatInput, 1, quatInput, NO_TAG, xyzw}, // floats -> quat
 		{n(ENodeType::NormalizeQuat), "normalize quat", 1, quatInput, 1, quatInput},									 // normalize quat
 
@@ -406,23 +383,15 @@ static const std::vector<Operation> operations = {
 
 		// Transform matrices constructors
 		{n(ENodeType::MakeTranslation), "translate constructor", 1, vector3Input, 1, matrixInput}, // translate
-		{n(ENodeType::MakeEulerX), "eulerAngleX constructor", 1, floatInput, 1, matrixInput, NO_TAG,
-		 eulerInputNames}, // eulerAngleX
-		{n(ENodeType::MakeEulerY), "eulerAngleY constructor", 1, floatInput, 1, matrixInput, NO_TAG,
-		 eulerInputNames}, // eulerAngleY
-		{n(ENodeType::MakeEulerZ), "eulerAngleZ constructor", 1, floatInput, 1, matrixInput, NO_TAG,
-		 eulerInputNames},																															 // eulerAngleZ
+		{n(ENodeType::MakeEulerX), "eulerAngleX constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
+		{n(ENodeType::MakeEulerY), "eulerAngleY constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
+		{n(ENodeType::MakeEulerZ), "eulerAngleZ constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},																															 // eulerAngleZ
 		{n(ENodeType::MakeScale), "scale constructor", 1, vector3Input, 1, matrixInput}, // scale
-		{n(ENodeType::MakeAxisAngle), "rotate constructor", 2, floatVector3Input, 1, matrixInput, NO_TAG,
-		 AngleAxisInputNames}, // rotate
-		{n(ENodeType::MakeOrtho), "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
-		 orthoFrustrumInputNames}, // ortho
-		{n(ENodeType::MakePerspective), "perspective constructor", 4, fourFloatInput, 1, matrixInput, NO_TAG,
-		 PerspectiveInputNames}, // perspective
-		{n(ENodeType::MakeFrustum), "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG,
-		 orthoFrustrumInputNames}, // frustrum
-		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG,
-		 lookAtInputNames}, // lookAt
+		{n(ENodeType::MakeAxisAngle), "rotate constructor", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames}, // rotate
+		{n(ENodeType::MakeOrtho), "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // ortho
+		{n(ENodeType::MakePerspective), "perspective constructor", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNames}, // perspective
+		{n(ENodeType::MakeFrustum), "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustrum
+		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
 		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}},
 		{n(ENodeType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};
