@@ -207,7 +207,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulMatrix>::updateValues
 	}
 	else
 	{
-		setInternalValue(glm::mat4());
+		//setInternalValue(glm::mat4());
+		setInternalValue(glm::vec4()); // PF - should be vector, not matrix
 	}
 }
 
@@ -548,7 +549,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ConjQuat>::updateValues(int in
 // FloatVecToQuat
 template <> FORCE_INLINE void NodeImpl<ENodeType::FloatVecToQuat>::updateValues(int inputIndex)
 {
-	glm::quat tmp = glm::quat(); // PF (1,0,0,0) if (nothing connected) w=1; else w=0;
+	// PF (1,0,0,0) if (nothing connected) w=1; else w=0;
 
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
