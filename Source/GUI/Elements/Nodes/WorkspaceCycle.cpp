@@ -3,6 +3,7 @@
  */
 
 #include "WorkspaceCycle.h"
+#include "../Windows/WorkspaceWindow.h"
 
 WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase/*=Core::GraphManager::createCycle()*/, bool drawPins/*=true*/)
     :   WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
@@ -17,9 +18,9 @@ void WorkspaceCycle::drawMenuLevelOfDetail()
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::LightCycle, WorkspaceLevelOfDetail::Label});
 }
 
-bool WorkspaceCycle::buttonPlayPause(ImVec2 const &  button_sz)
+bool WorkspaceCycle::buttonPlayPause()
 {
-    if (ImGui::Button("P/P", button_sz))
+    if (ImGui::SmallButton("P/P"))
     {
         if (m_nodebase->as<Core::Cycle>()->isRunning())
         {
@@ -34,9 +35,9 @@ bool WorkspaceCycle::buttonPlayPause(ImVec2 const &  button_sz)
     return false;
 }
 
-bool WorkspaceCycle::buttonStopAndReset(ImVec2 const &  button_sz)
+bool WorkspaceCycle::buttonStopAndReset()
 {
-    if (ImGui::Button("SaR", button_sz))
+    if (ImGui::SmallButton("SaR"))
     {
         m_nodebase->as<Core::Cycle>()->stopAndReset();
         return true;
@@ -44,9 +45,9 @@ bool WorkspaceCycle::buttonStopAndReset(ImVec2 const &  button_sz)
     return false;
 }
 
-bool WorkspaceCycle::buttonStepBack(ImVec2 const &  button_sz)
+bool WorkspaceCycle::buttonStepBack()
 {
-    if (ImGui::Button("SB", button_sz))
+    if (ImGui::SmallButton("SB"))
     {
         m_nodebase->as<Core::Cycle>()->stepBack();
         return true;
@@ -54,9 +55,9 @@ bool WorkspaceCycle::buttonStepBack(ImVec2 const &  button_sz)
     return false;
 }
 
-bool WorkspaceCycle::buttonStepNext(ImVec2 const &  button_sz)
+bool WorkspaceCycle::buttonStepNext()
 {
-    if (ImGui::Button("SN", button_sz))
+    if (ImGui::SmallButton("SN"))
     {
         m_nodebase->as<Core::Cycle>()->stepNext();
         return true;
@@ -68,46 +69,27 @@ bool WorkspaceCycle::leftContent()
 {
     bool inner_interaction_happen = false;
 
-    ImRect nodeRect; /* just declaration before switch */
-    ImVec2 pinConnectionPoint;
-
-    switch (m_levelOfDetail)
+    if (m_levelOfDetail ==  WorkspaceLevelOfDetail::LightCycle)
     {
-    case WorkspaceLevelOfDetail::Label:
-        nodeRect = getNodeRectDiwne();
-        pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
-        for (auto const& pin : m_workspaceInputs) {
-            pin->setConnectionPointDiwne(pinConnectionPoint);
-            if (pin->isConnected())
-            {
-                inner_interaction_happen |= pin->getLink().drawDiwne();
-            }
-        }
-
-        break;
-    case WorkspaceLevelOfDetail::LightCycle:
-        nodeRect = getNodeRectDiwne();
         for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
         {
             m_workspaceInputs.at(i)->drawDiwne();
         }
 
-        pinConnectionPoint = ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y)/2);
+        WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
+        ImRect nodeRect = getNodeRectDiwne();
+        ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y)/2);
 
         for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP, Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
         {
             Ptr<WorkspaceCoreInputPin> const pin = m_workspaceInputs.at(i);
             pin->setConnectionPointDiwne(pinConnectionPoint);
-            if (pin->isConnected())
-            {
-                inner_interaction_happen |= pin->getLink().drawDiwne();
-            }
+            if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
         }
-
-        break;
-    case WorkspaceLevelOfDetail::Full:
-        inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent();
-        break;
+    }
+    else
+    {
+       inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent();
     }
 
     return inner_interaction_happen;
@@ -116,36 +98,25 @@ bool WorkspaceCycle::leftContent()
 bool WorkspaceCycle::rightContent()
 {
     bool inner_interaction_happen = false;
-
-    ImRect nodeRect; /* just declaration before switch */
-    ImVec2 pinConnectionPoint;
-
-    switch (m_levelOfDetail)
+    if (m_levelOfDetail ==  WorkspaceLevelOfDetail::LightCycle)
     {
-    case WorkspaceLevelOfDetail::Label:
-        nodeRect = getNodeRectDiwne();
-        pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
-        for (auto const& pin : m_workspaceOutputs) {
-            pin->setConnectionPointDiwne(pinConnectionPoint);
-        }
-
-        break;
-    case WorkspaceLevelOfDetail::LightCycle:
-
         for (auto const i : {Core::I3T_CYCLE_OUT_VAL})
         {
             m_workspaceOutputs.at(i)->drawDiwne();
         }
 
+        WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
+        ImRect nodeRect = getNodeRectDiwne();
+        ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y)/2);
+
         for (auto const i : {Core::I3T_CYCLE_OUT_PLAY, Core::I3T_CYCLE_OUT_PAUSE, Core::I3T_CYCLE_OUT_STOP, Core::I3T_CYCLE_OUT_PREV, Core::I3T_CYCLE_OUT_NEXT, Core::I3T_CYCLE_OUT_END})
         {
             m_workspaceOutputs.at(i)->setConnectionPointDiwne(pinConnectionPoint);
         }
-
-        break;
-    case WorkspaceLevelOfDetail::Full:
+    }
+    else
+    {
         inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::rightContent();
-        break;
     }
 
     return inner_interaction_happen;
@@ -161,27 +132,53 @@ bool WorkspaceCycle::middleContent()
 
 
     bool inner_interaction_happen = false;
-    ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoom();
+    //ImVec2 button_sz = I3T::getSize(ESizeVec2::Nodes_FloatCycleButtonSize)*diwne.getWorkAreaZoom();
+    float localData;
+    bool valueChanged;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
     switch (m_levelOfDetail)
     {
-    case WorkspaceLevelOfDetail::Label:
-
-        ImGui::TextUnformatted(m_middleLabel.c_str());
-
-        break;
     case WorkspaceLevelOfDetail::LightCycle:
 
-        inner_interaction_happen |= buttonPlayPause(button_sz);
-        ImGui::SameLine(); inner_interaction_happen |= buttonStopAndReset(button_sz);
+        inner_interaction_happen |= buttonPlayPause(); ImGui::SameLine();
+        inner_interaction_happen |= buttonStopAndReset();
+
+        valueChanged = false;
+        localData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
+        ImGui::SetNextItemWidth(getDataItemsWidth());
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}Value", getId()),
+                                    localData, /* m_nodebase->as<Core::Cycle>()->getValueState({0, 0}) - not work */ Core::EValueState::Editable, valueChanged); /* \todo MH PF Always editable?*/
+        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Value");}
+        if (valueChanged)
+        {
+            //ask MH \\ \todo SetValue does not call setDirectionMultiplier()
+            m_nodebase->setValue(localData);
+            setDataItemsWidth();
+        }
 
         break;
     case WorkspaceLevelOfDetail::Full:
 
-        inner_interaction_happen |= buttonPlayPause(button_sz); ImGui::SameLine();
-		inner_interaction_happen |= buttonStopAndReset(button_sz); ImGui::SameLine();
-		inner_interaction_happen |= buttonStepBack(button_sz); ImGui::SameLine();
-		inner_interaction_happen |= buttonStepNext(button_sz);
+        inner_interaction_happen |= buttonPlayPause(); ImGui::SameLine();
+		inner_interaction_happen |= buttonStopAndReset(); ImGui::SameLine();
+		inner_interaction_happen |= buttonStepBack(); ImGui::SameLine();
+		inner_interaction_happen |= buttonStepNext();
+
+		valueChanged = false;
+        localData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
+        ImGui::SetNextItemWidth(getDataItemsWidth());
+        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}Value", getId()),
+                                    localData, /* m_nodebase->as<Core::Cycle>()->getValueState({0, 0}) - not work */ Core::EValueState::Editable, valueChanged); /* \todo MH PF Always editable?*/
+        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Value");}
+        if (valueChanged)
+        {
+            //ask MH \\ \todo SetValue does not call setDirectionMultiplier()
+            m_nodebase->setValue(localData);
+            setDataItemsWidth();
+        }
 
 		/* =================================== */
 		// Mode select
@@ -189,201 +186,107 @@ bool WorkspaceCycle::middleContent()
 
 		//TODO is there a way to calculate how much space take radio button with text?
 
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(button_sz.x - 10.0f, 0.0f));
-
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {I3T::getSize(ESizeVec2::Nodes_FloatPadding).x, button_sz.y / 16});
-
-		ImGui::RadioButton("Once", &mode, 0);
-		ImGui::SameLine();
-
-		// Multiplier = step for a single tick
-		const float coreData_manStep		 = m_nodebase->as<Core::Cycle>()->getManualStep();
-		float				localData		 = coreData_manStep;
-		bool				valueChanged = false;
-
-		ImGui::PushItemWidth(2 * button_sz.x + 4 * I3T::getSize(ESizeVec2::Nodes_ItemsSpacing).x + 1.0f);
-
-
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 0),
-                                    localData, Core::EValueState::Editable , valueChanged);
-
-		if (valueChanged)
-		{
-			//m_nodebase->as<Core::Cycle>()->setMultiplier(localData); //wrong
-			m_nodebase->as<Core::Cycle>()->setManualStep(localData); //PF
-			setDataItemsWidth();
-		}
-
-		ImGui::PopItemWidth();
-
-		ImGui::RadioButton("Repeat", &mode, 1);
-		ImGui::RadioButton("Ping-Pong", &mode, 2);
-
-		switch (mode)
+		ImGui::BeginTable(fmt::format("{}mode",getId()).c_str(), 4, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit );
+            ImGui::TableNextRow();
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("One");
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("Rep");
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("Ping");
+//  //              ImGui::TableNextColumn();
+//  //                  ImGui::TextUnformatted("Val");
+            ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                    ImGui::RadioButton("##Once", &mode, 0); if (ImGui::IsItemHovered()){ImGui::SetTooltip("Once");}
+                ImGui::TableNextColumn();
+                    ImGui::RadioButton("##Repeat", &mode, 1); if (ImGui::IsItemHovered()){ImGui::SetTooltip("Repeat");}
+                ImGui::TableNextColumn();
+                    ImGui::RadioButton("##Ping", &mode, 2); if (ImGui::IsItemHovered()){ImGui::SetTooltip("Ping-pong");}
+        ImGui::EndTable();
+        switch (mode)
 		{
 		case 0:
 			m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Once);
 			break;
-
 		case 1:
 			m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::Repeat);
 			break;
-
 		case 2:
 			m_nodebase->as<Core::Cycle>()->setMode(Core::Cycle::EMode::PingPong);
 			break;
-		default:
+        default:
 			break;
 		}
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar();
 
-		const float coreData_float = m_nodebase->as<Core::Cycle>()->getData().getFloat();
-		const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
-
-//		bool	valueChanged = false;
-//		float localData;
-        valueChanged = false;
-
-		ImGui::PushItemWidth(getDataItemsWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
-
-		localData = coreData_float;
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}:{}", getId(), 1),
-                                    localData, Core::EValueState::Editable, valueChanged); /* \todo MH PF Always editable?*/
-
-
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar();
-		ImGui::PopItemWidth();
-
-		if (valueChanged)
-		{
-			//ask MH \\ \todo SetValue does not call setDirectionMultiplier()
-			m_nodebase->setValue(localData);
-			setDataItemsWidth();
-		}
-
+		ImGui::BeginTable(fmt::format("{}controlValues",getId()).c_str(), 2, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ); /* \todo JH Flags */
+//            ImGui::TableNextRow();
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("From");
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("To");
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("Step");
+//                ImGui::TableNextColumn();
+//                    ImGui::TextUnformatted("Man.");
+            ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                    localData = m_nodebase->as<Core::Cycle>()->getFrom();
+                    valueChanged = false;
+                    ImGui::SetNextItemWidth(getDataItemsWidth());
+                    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}from", getId()),
+                                                localData, Core::EValueState::Editable , valueChanged);
+                    if (ImGui::IsItemHovered()){ImGui::SetTooltip("From");}
+                    if (valueChanged)
+                    {
+                        m_nodebase->as<Core::Cycle>()->setFrom(localData);
+                        setDataItemsWidth();
+                    }
+                ImGui::TableNextColumn();
+                    localData   = m_nodebase->as<Core::Cycle>()->getTo();
+                    valueChanged = false;
+                    ImGui::SetNextItemWidth(getDataItemsWidth());
+                    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()),
+                                                localData, Core::EValueState::Editable , valueChanged);
+                    if (ImGui::IsItemHovered()){ImGui::SetTooltip("To");}
+                    if (valueChanged)
+                    {
+                        m_nodebase->as<Core::Cycle>()->setTo(localData);
+                        setDataItemsWidth();
+                    }
+            ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                    localData   = m_nodebase->as<Core::Cycle>()->getMultiplier();
+                    valueChanged = false;
+                    ImGui::SetNextItemWidth(getDataItemsWidth());
+                    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()),
+                                                localData, Core::EValueState::Editable , valueChanged);
+                    if (ImGui::IsItemHovered()){ImGui::SetTooltip("Step");}
+                    if (valueChanged)
+                    {
+                        m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
+                        setDataItemsWidth();
+                    }
+                ImGui::TableNextColumn();
+                    localData   = m_nodebase->as<Core::Cycle>()->getManualStep();
+                    valueChanged = false;
+                    ImGui::SetNextItemWidth(getDataItemsWidth());
+                    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}manstep", getId()),
+                                                localData, Core::EValueState::Editable , valueChanged);
+                    if (ImGui::IsItemHovered()){ImGui::SetTooltip("Step for manual Next/Prev");}
+                    if (valueChanged)
+                    {
+                        m_nodebase->as<Core::Cycle>()->setManualStep(localData);
+                        setDataItemsWidth();
+                    }
+        ImGui::EndTable();
         break;
     }
+
+    ImGui::PopStyleVar(2);
     return inner_interaction_happen;
 }
 
-//void WorkspaceCycle::drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const& pinProp,
-//																	Core::Pin* newLinkPin)
-//{
-//
-//	float alpha = ImGui::GetStyle().Alpha;
-//
-//	builder.Input(pinProp->getId(), I3T::getColor(WorkspacePinColor[pinProp->getType()]));
-//
-//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-//
-//	ImGui::BeginVertical(pinProp->getId().AsPointer());
-//	ImGui::Spring(1);
-//
-//	// color.Value.w = alpha / 255.0f;
-//	ax::Widgets::Icon(pinProp->getIconSize(), WorkspacePinShape[pinProp->getType()],
-//										pinProp->isConnected(), // SS add global variable. User test change or not.
-//										I3T::getColor(WorkspacePinColor[pinProp->getType()]),
-//										I3T::getColor(WorkspaceInnerPinColor[pinProp->getType()]));
-//
-//	ImGui::Spring(1);
-//	ImGui::EndVertical();
-//
-//	if (pinProp->getShowLabel())
-//	{
-//		if (pinProp->getLabel().empty())
-//		{ //it's never empty :(
-//
-//			auto label = pinProp->getCorePin().getLabel();
-//			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-//					label == "pulse")
-//			{
-//				ImGui::TextUnformatted("");
-//			}
-//			else
-//			{
-//				ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-//				ImGui::TextUnformatted(label);
-//			}
-//		}
-//		else
-//		{
-//
-//			auto label = pinProp->getLabel();
-//			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-//					label == "pulse")
-//			{
-//				ImGui::TextUnformatted("");
-//			}
-//			else
-//			{
-//				ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-//				ImGui::TextUnformatted(label.c_str());
-//			}
-//		}
-//	}
-//
-//	float														coreData = NAN;
-//	const Core::Transform::DataMap& coreMap	 = m_nodebase->getDataMapRef();
-//	switch (pinProp->getIndex())
-//	{
-//	case 0:
-//		coreData = m_nodebase->as<Core::Cycle>()->getFrom();
-//		break;
-//	case 1:
-//		coreData = m_nodebase->as<Core::Cycle>()->getTo();
-//		break;
-//	case 2:
-//		//coreData = m_nodebase->as<Core::Cycle>()->getManualStep();
-//		coreData = m_nodebase->as<Core::Cycle>()->getMultiplier();
-//		break;
-//	default:
-//		break;
-//	}
-//
-//	int const idOfNode = this->m_id.Get();
-//
-//	bool	valueChanged = false;
-//	float localData;
-//
-//	ImGui::PushItemWidth(getDataItemsWidth(diwne));
-//	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-//	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
-//
-//	localData = coreData;
-//
-//	if (!isnan(localData))
-//	{
-//		drawDragFloatWithMap_Inline(valueChanged,
-//				localData, coreMap[0],
-//				fmt::format("##{}:{}", idOfNode, pinProp->getIndex())); /* datamap value 1 is changeable */
-//	}
-//
-//	if (ImGui::IsMouseReleased(1) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup))
-//	{
-//		fw.showMyPopup = true;
-//		fw.id					 = fmt::format("##{}", idOfNode);
-//		fw.value			 = localData;
-//	}
-//
-//
-//	ImGui::PopStyleVar();
-//	ImGui::PopStyleVar();
-//	ImGui::PopItemWidth();
-//
-//	if (valueChanged)
-//	{
-//		m_nodebase->setValue(localData);
-//		setDataItemsWidth();
-//	}
-//
-//
-//	ImGui::PopStyleVar();
-//	builder.EndInput();
-//}
 
 int WorkspaceCycle::maxLenghtOfData()
 {

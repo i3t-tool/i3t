@@ -419,7 +419,7 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::drawData()
 {
-    return ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
+    return ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
@@ -592,6 +592,7 @@ bool WorkspaceCoreLink::initialize()
 WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase, bool showDataOnPins/*=true*/)
     : WorkspaceNodeWithCoreData(diwne, nodebase)
     , m_showDataOnPins(showDataOnPins)
+    , m_minRightAlignOfRightPins(0)
 {
     const auto& inputPins   = m_nodebase->getInputPins();
     const auto& outputPins  = m_nodebase->getOutputPins();
@@ -758,9 +759,21 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
     bool inner_interaction_happen = false;
     WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
-    for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
-        if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
+    if(m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+    {
+        ImRect nodeRect = getNodeRectDiwne();
+        ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceInputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+            if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
+        }
+    }
+    else
+    {
+        for (auto const& pin : m_workspaceInputs) {
+            inner_interaction_happen |= pin->drawDiwne();
+            if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
+        }
     }
     return inner_interaction_happen;
 }
@@ -768,9 +781,24 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 {
     bool inner_interaction_happen = false;
-
-    for (auto const& pin : m_workspaceOutputs) {
-        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
+    if(m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+    {
+        ImRect nodeRect = getNodeRectDiwne();
+        ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceOutputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+        }
+    }
+    else
+    {
+        float act_align, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets smaller (for example when switch from precision 2 to precision 0) */
+        m_minRightAlignOfRightPins = FLT_MAX;
+        for (auto const& pin : m_workspaceOutputs) {
+            act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth())*diwne.getWorkAreaZoom()); /* no shift to left */
+            m_minRightAlignOfRightPins = std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching between two node sizes */
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align - prev_minRightAlign ); /* right align if not all output pins have same width */
+            inner_interaction_happen |= pin->drawDiwne();
+        }
     }
     return inner_interaction_happen;
 }

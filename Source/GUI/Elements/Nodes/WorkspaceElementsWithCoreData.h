@@ -278,6 +278,8 @@ class WorkspaceCoreInputPinMatrixMul : public WorkspaceCoreInputPin
 
 class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 {
+    private:
+        float m_minRightAlignOfRightPins;
     protected:
         std::vector<Ptr<WorkspaceCoreInputPin>>    m_workspaceInputs;
         std::vector<Ptr<WorkspaceCoreOutputPin>>    m_workspaceOutputs;

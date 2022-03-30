@@ -50,7 +50,11 @@ bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/
 
     /* zoom */
     ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoom;
-    ImGui::SetWindowFontScale(m_workAreaZoom);
+//    ImGui::SetWindowFontScale(m_workAreaZoom);
+    m_StoreFontScale = ImGui::GetFont()->Scale;
+    ImGui::GetFont()->Scale = m_workAreaZoom;
+    ImGui::PushFont(NULL);
+
     m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
     ImGui::GetStyle().ItemSpacing *= m_workAreaZoom;
 
@@ -121,6 +125,10 @@ void Diwne::end()
 bool Diwne::afterEndDiwne()
 {
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
+
+    ImGui::GetFont()->Scale = m_StoreFontScale;
+    ImGui::PopFont();
+
     return DiwneObject::afterEndDiwne();
 }
 

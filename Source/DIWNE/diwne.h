@@ -375,6 +375,7 @@ class Diwne : public DiwneObject
 
     /* restore information */
     ImVec2 m_StoreItemSpacing; /*! \brief For restore value after this window is done */
+    float m_StoreFontScale; /*! \brief For restore value after this window is done */
 
 };
 
