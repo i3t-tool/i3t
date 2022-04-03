@@ -35,13 +35,17 @@ bool WorkspaceNodeWithCoreData::topContent()
 {
     if (m_topLabel.empty()) {m_topLabel = m_nodebase->getLabel();}
     ImGui::Indent(ImGui::GetStyle().ItemSpacing.x);
+    const char* topLabel = m_topLabel.c_str();
 
-    ImGui::PushItemWidth(ImGui::CalcTextSize(&(*m_topLabel.begin()), &(*m_topLabel.end())).x+5); /* +5 for reserve if not computed well */
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0,0,0,0.5));
+    ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel+strlen(topLabel)).x+5); /* +5 for reserve if not computed well */
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0,0,0,0)); /* invisible bg */
     bool interaction_happen = ImGui::InputText(fmt::format("##{}topLabel",m_labelDiwne).c_str(), &(this->m_topLabel) );
+    interaction_happen |= ImGui::IsItemActive();
     ImGui::PopStyleColor();
     ImGui::PopItemWidth();
-    return interaction_happen || ImGui::IsItemActive();
+    ImGui::SameLine();
+    ImGui::Dummy(ImVec2(1,1)); /* dummy for snap some item for same space on left and right of label  */
+    return interaction_happen;
 }
 
 
@@ -89,13 +93,6 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_
 
 bool WorkspaceNodeWithCoreData::drawDataLabel()
 {
-    if(!m_middleLabel.empty())
-    {
-        ImGui::TextUnformatted(m_middleLabel.c_str());
-    }else
-    {
-        ImGui::TextUnformatted(m_nodebase->getLabel());
-    }
     return false;
 }
 
@@ -260,6 +257,7 @@ bool WorkspaceCorePin::processConnectionPrepared()
             {
                 WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
                 in->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
+                diwne.m_takeSnap = true;
             }
             break;
         /* \todo JH react informatively to other result too */
@@ -466,6 +464,7 @@ void WorkspaceCoreInputPin::unplug()
 {
     Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
     m_link.setStartPin(nullptr);
+    diwne.m_takeSnap = true;
 }
 
 
@@ -508,6 +507,7 @@ bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
     {
         dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction = WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
         diwne.setLastActivePin<WorkspaceCoreInputPin>(std::static_pointer_cast<WorkspaceCoreInputPin>(shared_from_this()));
+        diwne.m_takeSnap = true;
         return true;
     }
     return false;
@@ -528,8 +528,6 @@ bool WorkspaceCoreInputPin::processInteractions()
 {
     bool interaction_happen = WorkspaceCorePin::processInteractions();
     interaction_happen |= processUnplug();
-    if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed))
-        int i =7;
     interaction_happen |= processCreateAndPlugConstrutorNode();
     return interaction_happen;
 }

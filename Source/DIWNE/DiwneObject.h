@@ -27,7 +27,6 @@ public: /* \todo JH some atributes should be private/protected */
     bool m_inner_interaction_happen, m_inner_interaction_happen_previous_draw; /*!< If some interaction happen with inner elements (DragFloat, Button, ...) it block interaction with this object */
     DrawMode m_drawMode; /*!< \see enum DrawMode */
     bool m_isHeld /*!< Is object held. When dragged it is still held. */, m_isDraged /*!< Is object draged */, m_selected /*!< Is object selected */, m_focusedForInteraction /*!< Is object focus on area that allow interaction with object */, m_focused /*!< Is object focused anywhere (and for example can not be focus other underlying object) */, m_isActive /*!< Something happen with object */;
-
     /*! \brief Constructor
      *
      * \param diwne is node editor object that this object belongs to

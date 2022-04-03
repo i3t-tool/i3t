@@ -684,16 +684,18 @@ bool WorkspaceDiwne::content()
 
         /* draw nodes from back to begin (front to back) for catch interactions in right order */
         int prev_size = m_workspaceCoreNodes.size();
+        bool takeSnap = false;
         for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
         {
             m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
             if ((*it) != nullptr){ interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::Interacting); }
             if (prev_size != m_workspaceCoreNodes.size()) break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
 
-            if ( (*it)->interactionEndInLastDraw() )
-            {
-                StateManager::instance().takeSnapshot();
-            }
+        }
+
+        if(m_takeSnap)
+        {
+            StateManager::instance().takeSnapshot();
         }
 
         /* draw links on top */
@@ -727,7 +729,7 @@ bool WorkspaceDiwne::afterContent()
 	{
         shiftNodesToEnd(getSelectedNodes());
 
-        if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes) /* \todo JH not work - in debug fame by frame work, but not without breakpoints... */
+        if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes && getDiwneActionActive() != DIWNE::DiwneAction::SelectionRectFull && getDiwneActionActive() != DIWNE::DiwneAction::SelectionRectTouch)
         {
             for (auto node : getAllNodesInnerIncluded())
             {
@@ -787,6 +789,9 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
                 break;
             case EValueType::Float:
                 addTypeConstructorNode<WorkspaceOperator<ENodeType::FloatToFloat>>();
+                break;
+            case EValueType::Pulse:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::Pulse>>();
                 break;
         }
         return true;

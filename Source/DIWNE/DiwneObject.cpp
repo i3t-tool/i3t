@@ -212,6 +212,7 @@ bool DiwneObject::processObjectUnhold()
     if (bypassUnholdAction() && allowProcessUnhold())
     {
         m_isHeld = false;
+        if (m_isDraged){diwne.m_takeSnap = true;}
         m_isDraged = false;
         return processUnhold();
     }
@@ -238,6 +239,7 @@ bool DiwneObject::processObjectSelect()
     if (bypassSelectAction() && allowProcessSelect())
     {
         m_selected = true;
+        diwne.m_takeSnap = true;
         return processSelect();
     }
     return false;
@@ -250,6 +252,7 @@ bool DiwneObject::processObjectUnselect()
     if (bypassUnselectAction() && allowProcessUnselect())
     {
         m_selected = false;
+        diwne.m_takeSnap = true;
         return processUnselect();
     }
     return false;

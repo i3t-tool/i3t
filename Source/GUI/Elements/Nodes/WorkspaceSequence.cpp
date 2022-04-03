@@ -118,7 +118,6 @@ bool WorkspaceSequence::middleContent()
 
     if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
     {
-        ImGui::TextUnformatted(m_middleLabel.c_str());
         return false;
     }
 

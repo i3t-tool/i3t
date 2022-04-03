@@ -29,6 +29,8 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
     ,   m_popupDrawn(false)
     ,   m_tooltipDrawn(false)
 
+    ,   m_takeSnap(false)
+
 {}
 
 DiwneAction Diwne::getDiwneActionActive() const {return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction; }
@@ -39,7 +41,7 @@ bool Diwne::initializeDiwne()
 {
     m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     m_diwneAction = DiwneAction::None;
-    m_popupDrawn = m_tooltipDrawn = m_objectFocused = false;
+    m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
     return initialize();
 }
 
@@ -331,8 +333,6 @@ void Diwne::DrawIconCircle(ImDrawList* idl,
     {
         idl->AddCircleFilled(center, radius-thicknes, InnerColor);
     }
-
-
 }
 
 void Diwne::DrawIconRectangle(ImDrawList* idl,

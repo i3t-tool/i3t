@@ -61,8 +61,8 @@ struct SettingsDiwne
 
     ImVec2 initPopupPosition = ImVec2(0,0); /*!< where to show popup when not set later */
 
-    ImColor selectionRectFullColor = ImColor(0,255,0,100); /* \todo JH recomandation is not to store ImColor, but ImU32 or ImVec4 */
-    ImColor selectionRectTouchColor = ImColor(0,0,255,100);
+    ImColor selectionRectFullColor = ImColor(0,0,255,100); /* \todo JH recomandation is not to store ImColor, but ImU32 or ImVec4 */
+    ImColor selectionRectTouchColor = ImColor(0,255,0,100);
 
     ImColor itemSelectedBorderColor = ImColor(100,100,0,255);
     float itemSelectedBorderThicknessDiwne = 5;
@@ -120,6 +120,8 @@ class Diwne : public DiwneObject
         DIWNE::DiwneAction getHoldActionType() const final {return DiwneAction::HoldWorkarea;};
         DIWNE::DiwneAction getDragActionType() const final {return DiwneAction::DragWorkarea;};
         DIWNE::DiwneAction getTouchActionType() const final {return DiwneAction::TouchWorkarea;};
+
+        bool m_takeSnap;
 
 
         virtual bool initializeDiwne();

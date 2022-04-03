@@ -219,7 +219,7 @@ bool WorkspaceCycle::middleContent()
 			break;
 		}
 
-		ImGui::BeginTable(fmt::format("{}controlValues",getId()).c_str(), 2, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ); /* \todo JH Flags */
+		ImGui::BeginTable(fmt::format("{}controlValues",getId()).c_str(), 2, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit );
 //            ImGui::TableNextRow();
 //                ImGui::TableNextColumn();
 //                    ImGui::TextUnformatted("From");
@@ -235,7 +235,7 @@ bool WorkspaceCycle::middleContent()
                     valueChanged = false;
                     ImGui::SetNextItemWidth(getDataItemsWidth());
                     inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}from", getId()),
-                                                localData, Core::EValueState::Editable , valueChanged);
+                                                localData, m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable , valueChanged);
                     if (ImGui::IsItemHovered()){ImGui::SetTooltip("From");}
                     if (valueChanged)
                     {
@@ -247,7 +247,7 @@ bool WorkspaceCycle::middleContent()
                     valueChanged = false;
                     ImGui::SetNextItemWidth(getDataItemsWidth());
                     inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()),
-                                                localData, Core::EValueState::Editable , valueChanged);
+                                                localData, m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable , valueChanged);
                     if (ImGui::IsItemHovered()){ImGui::SetTooltip("To");}
                     if (valueChanged)
                     {
@@ -260,7 +260,7 @@ bool WorkspaceCycle::middleContent()
                     valueChanged = false;
                     ImGui::SetNextItemWidth(getDataItemsWidth());
                     inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()),
-                                                localData, Core::EValueState::Editable , valueChanged);
+                                                localData, m_workspaceInputs.at(Core::I3T_CYCLE_IN_MULT)->isConnected() ? Core::EValueState::Locked : Core::EValueState::Editable , valueChanged);
                     if (ImGui::IsItemHovered()){ImGui::SetTooltip("Step");}
                     if (valueChanged)
                     {
@@ -272,7 +272,7 @@ bool WorkspaceCycle::middleContent()
                     valueChanged = false;
                     ImGui::SetNextItemWidth(getDataItemsWidth());
                     inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}manstep", getId()),
-                                                localData, Core::EValueState::Editable , valueChanged);
+                                                localData, Core::EValueState::Editable, valueChanged);
                     if (ImGui::IsItemHovered()){ImGui::SetTooltip("Step for manual Next/Prev");}
                     if (valueChanged)
                     {

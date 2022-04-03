@@ -90,6 +90,7 @@ bool Node::content()
 
 bool Node::afterEndDiwne()
 {
+    bool prev_selected = m_selected;
     if ( diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::SelectionRectFull || diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
     {
         m_selected = diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true : diwne.m_allowUnselectingNodes ? false : m_selected;
@@ -101,6 +102,12 @@ bool Node::afterEndDiwne()
     if (m_selected)
     {
         diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0, ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+    }
+
+    if (prev_selected != m_selected)
+    {
+        diwne.m_takeSnap = true;
+        diwne.setNodesSelectionChanged(true);
     }
 
     /* always block interactions with other nodes */
