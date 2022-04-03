@@ -417,7 +417,12 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::drawData()
 {
-    return ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
+    if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str()))
+    {
+      getNode().getNodebase()->pulse(getIndex());
+      return true;
+    }
+    return false;
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
