@@ -171,7 +171,7 @@ bool WorkspaceSequence::middleContent()
         /* \todo some better selected transformation/nodes politic (when dragging, pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark action to do and in WorkspaceDiwne react to this action  */
         transformation->setSelected(false);
 
-        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_isHeld || m_drawMode==DIWNE::DrawMode::JustDraw ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting);
         ImGui::SameLine();
 
         i++;
@@ -185,7 +185,7 @@ bool WorkspaceSequence::middleContent()
         }
     }
 
-    if ( push_index >= 0 /*&& !dragedNode->isInSequence()*/) /* already in sequence if second drawing or other sequence */
+    if ( push_index >= 0)
     {
         moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
         inner_interaction_happen |= true;
@@ -200,7 +200,7 @@ bool WorkspaceSequence::middleContent()
             if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
             {
                 moveNodeToWorkspace(dragedNode);
-                inner_interaction_happen |= true;
+                inner_interaction_happen = false; /* do not set sequence as interacting node -> draged transformation should be only interacting */
             }
         }
     }
