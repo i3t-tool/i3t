@@ -126,7 +126,7 @@ bool DiwneObject::processInteractionsDiwne()
         }
         interaction_happen |= processInteractionsAlways();
     }
-    if(m_inner_interaction_happen){diwne.m_objectFocused=true;} /* any inner interaction (imgui too) block other DiwneObject to focus */
+    if(m_inner_interaction_happen && !diwne.getDiwneActionActive() == DIWNE::DiwneAction::NewLink){diwne.m_objectFocused=true;} /* any inner interaction (imgui too) block other DiwneObject to focus */
 #ifdef DIWNE_DEBUG
 DIWNE_DEBUG((diwne), {
     if (m_isActive) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255,0,255,255), 0, ImDrawCornerFlags_None, 5);};

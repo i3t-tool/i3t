@@ -846,6 +846,7 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllNodesInnerIncl
 
 void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
 {
+
 	for (int i = 0; i < nodesToShift.size(); i++)
 	{
 		coreNodeIter ith_selected_node =
@@ -863,7 +864,12 @@ void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData
 
 void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
 {
-	for (int i = 0; i < nodesToShift.size(); i++)
+    int node_num = nodesToShift.size();
+//    str2.erase(std::remove_if(str2.begin(),
+//                              str2.end(),
+//                              [](unsigned char x){return std::isspace(x);})
+//    a.erase(std::remove_if(a.begin(), a.end(), predicate), a.end());
+	for (int i = 0; i < node_num; i++)
 	{
 		coreNodeIter ith_selected_node =
 				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
@@ -873,7 +879,7 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
-			std::iter_swap(m_workspaceCoreNodes.end() - 1 - i, ith_selected_node);
+			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
 		}
 	}
 }
