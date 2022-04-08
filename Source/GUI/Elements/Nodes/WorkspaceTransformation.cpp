@@ -46,6 +46,7 @@ bool WorkspaceTransformation::topContent()
 //    /* right align */
 //    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, getNodeRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x /*actual free space*/ - iconSize.x - m_topOversizeSpace)*diwne.getWorkAreaZoom());
 
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY()+ImGui::GetStyle().FramePadding.y);
         switch (dataAreValid())
         {
         case Core::ETransformState::Invalid:
