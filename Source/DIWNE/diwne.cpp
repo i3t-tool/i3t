@@ -30,8 +30,9 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
     ,   m_tooltipDrawn(false)
 
     ,   m_takeSnap(false)
-
-{}
+{
+    m_selectable = false;
+}
 
 DiwneAction Diwne::getDiwneActionActive() const {return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction; }
 

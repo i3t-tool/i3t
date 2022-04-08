@@ -793,6 +793,9 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
             case EValueType::Pulse:
                 addTypeConstructorNode<WorkspaceOperator<ENodeType::Pulse>>();
                 break;
+            case EValueType::Screen:
+                addTypeConstructorNode<WorkspaceCamera>();
+                break;
         }
         return true;
     }

@@ -26,6 +26,7 @@ public: /* \todo JH some atributes should be private/protected */
     std::string const m_popupIDDiwne; /*!< Used for identifying what element raise popup */
     bool m_inner_interaction_happen, m_inner_interaction_happen_previous_draw; /*!< If some interaction happen with inner elements (DragFloat, Button, ...) it block interaction with this object */
     DrawMode m_drawMode; /*!< \see enum DrawMode */
+    bool m_selectable;
     bool m_isHeld /*!< Is object held. When dragged it is still held. */, m_isDraged /*!< Is object draged */, m_selected /*!< Is object selected */, m_focusedForInteraction /*!< Is object focus on area that allow interaction with object */, m_focused /*!< Is object focused anywhere (and for example can not be focus other underlying object) */, m_isActive /*!< Something happen with object */;
     /*! \brief Constructor
      *
@@ -44,7 +45,7 @@ public: /* \todo JH some atributes should be private/protected */
      *
      * \param selected is new state of object
      */
-    void setSelected(bool const selected) {m_selected = selected;};
+    void setSelected(bool const selected) {m_selected = m_selectable ? selected : false;};
 
     /*! \brief Getter
      * \return actual selection state of object

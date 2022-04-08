@@ -22,6 +22,7 @@ DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const la
     ,   m_focused(false)
     ,   m_isActive(false)
     ,   m_drawMode(DrawMode::Interacting)
+    ,   m_selectable(true)
 {}
 
 bool DiwneObject::allowDrawing(){return true;}
@@ -116,7 +117,7 @@ bool DiwneObject::processInteractionsDiwne()
             if (allowInteraction())
             {
                 interaction_happen |= processRaisePopupDiwne();
-                interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();
+                if (m_selectable) {interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();}
                 interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
                 if (m_isHeld){interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */ diwne.setDiwneAction(getHoldActionType());}
                 interaction_happen |= processObjectDrag();
@@ -239,7 +240,7 @@ bool DiwneObject::processObjectSelect()
 {
     if (bypassSelectAction() && allowProcessSelect())
     {
-        m_selected = true;
+        setSelected(true);
         diwne.m_takeSnap = true;
         return processSelect();
     }
@@ -252,7 +253,7 @@ bool DiwneObject::processObjectUnselect()
 {
     if (bypassUnselectAction() && allowProcessUnselect())
     {
-        m_selected = false;
+        setSelected(false);
         diwne.m_takeSnap = true;
         return processUnselect();
     }
