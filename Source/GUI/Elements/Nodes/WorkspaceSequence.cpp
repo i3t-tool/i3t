@@ -85,6 +85,7 @@ void WorkspaceSequence::moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> draged
 void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node)
 {
     node->setRemoveFromWorkspace(false);
+    node->m_selectable = true;
     dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
     popNode(node);
 }
@@ -168,10 +169,12 @@ bool WorkspaceSequence::middleContent()
             }
         }
 
-        /* \todo some better selected transformation/nodes politic (when dragging, pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark action to do and in WorkspaceDiwne react to this action  */
-        transformation->setSelected(false);
 
+        transformation->m_selectable = false;
+        transformation->setSelected(false);
+        /* \todo some better selected transformation/nodes politic (when dragging, pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark action to do and in WorkspaceDiwne react to this action  */
         inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_isHeld || m_drawMode==DIWNE::DrawMode::JustDraw ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting);
+
         ImGui::SameLine();
 
         i++;

@@ -6,6 +6,8 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
     ,   m_view (std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView() ) )
 {
     (m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
+    m_projection->m_selectable = false;
+    m_view->m_selectable = false;
 }
 
 

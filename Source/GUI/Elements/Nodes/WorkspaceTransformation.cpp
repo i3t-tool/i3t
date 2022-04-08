@@ -120,9 +120,9 @@ void WorkspaceTransformation::drawMenuStorevalues()
 {
     if(ImGui::BeginMenu("Value"))
     {
-        if(ImGui::MenuItem("Reset")) {}
-        if(ImGui::MenuItem("Store")) {}
-        if(ImGui::MenuItem("Restore")) {}
+        if(ImGui::MenuItem("Reset - nenašel jsem fci k zavolání")) { }
+        if(ImGui::MenuItem("Store")) { m_nodebase->as<Core::Transformation>()->saveValue();}
+        if(ImGui::MenuItem("Restore")) { m_nodebase->as<Core::Transformation>()->reloadValue();}
 
         ImGui::EndMenu();
     }
