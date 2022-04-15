@@ -50,6 +50,8 @@ bool drawDataSetValues()
     bool inner_interaction_happen = false, value_changed = false;
     auto nodebase = m_nodebase->as<Core::TransformImpl<T>>();
 
+    m_nodebase->as<Core::Transformation>()->enableSynergies();
+
     for (auto& [key, valueStore] : nodebase->getDefaultValues())
     {
         switch (valueStore.opValueType)
@@ -132,3 +134,101 @@ void WorkspaceTransformation_s<ETransformType::Free>::drawMenuSetDataMap()
     ImGui::MenuItem("Lock", NULL, false, false); /* no change DataMap in Free transformation */
     ImGui::MenuItem("Enable synergies", NULL, false, false);
 }
+
+template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
+void WorkspaceTransformation_s<ETransformType::Scale>::drawMenuSetDataMap()
+{
+    if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
+    else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
+
+
+    if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail()!=WorkspaceLevelOfDetail::Label)){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
+    else                                                      { if(ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail()!=WorkspaceLevelOfDetail::Label)){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
+
+}
+
+template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
+bool WorkspaceTransformation_s<ETransformType::Scale>::drawDataSetValues()
+{
+    bool inner_interaction_happen = false, value_changed = false;
+    auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
+    for (auto& [key, valueStore] : nodebase->getDefaultValues())
+    {
+        switch (valueStore.opValueType)
+        {
+            case EValueType::Vec3:
+            {
+                auto localData = valueStore.getVec3();
+
+                if (m_nodebase->as<Core::Transformation>()->hasSynergies()) /* uniform */
+                {
+                    inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{}",key.c_str())} /* \todo MH all/whole labels from core? */
+                                                                ,   {&localData[0]}
+                                                                ,   value_changed);
+                    if (value_changed)
+                    {
+                        localData[1] = localData[2] = localData[0]; /* \todo JH MH do this in core -> something like setUniformScale */
+                        nodebase->setDefaultValue(key, localData);
+                        setDataItemsWidth();
+                    }
+                }
+                else /* non-uniform */
+                {
+                    inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()) } /* \todo MH all/whole labels from core? */
+                                                                ,   {&localData[0], &localData[1], &localData[2]}
+                                                                ,   value_changed);
+                    if (value_changed)
+                    {
+                        nodebase->setDefaultValue(key, localData);
+                        setDataItemsWidth();
+                    }
+                }
+            break;
+            }
+            default:
+                I3T_ASSERT(false && "Unknow data type in Scale Transform");
+        }
+    }
+    return inner_interaction_happen;
+}
+
+template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
+bool WorkspaceTransformation_s<ETransformType::LookAt>::drawDataSetValues()
+{
+    bool inner_interaction_happen = false, value_changed = false;
+    auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::LookAt>>();
+    int index_of_change;
+
+    std::string cornerLabel = "";
+    std::vector<std::string> rowLabels = {"X", "Y", "Z"};
+    std::vector<std::string> columnLabels;
+    std::vector<glm::vec3> local_data;
+
+    /* \todo JH, MH some way how to not compute this every frame? */
+    int i = 0;
+    for (auto& [key, valueStore] : nodebase->getDefaultValues())
+    {
+        columnLabels.push_back(key);
+        local_data.push_back( valueStore.getVec3());
+    }
+
+
+    inner_interaction_happen |= drawDataSetValuesTable_builder( cornerLabel,
+                                                                columnLabels,
+                                                                rowLabels,
+                                                                {   &local_data[0][0], &local_data[1][0], &local_data[2][0],
+                                                                    &local_data[0][1], &local_data[1][1], &local_data[2][1],
+                                                                    &local_data[0][2], &local_data[1][2], &local_data[2][2]},
+                                                                value_changed,
+                                                                index_of_change);
+    if (value_changed)
+    {
+        index_of_change %= columnLabels.size(); /* move to index of nodebase data column */
+        nodebase->setDefaultValue(columnLabels[index_of_change], local_data[index_of_change]);
+        setDataItemsWidth();
+    }
+
+    return inner_interaction_happen;
+}
+
+

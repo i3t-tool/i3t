@@ -176,9 +176,9 @@ bool WorkspaceTransformation::drawDataFull()
     if (valueChanged)
     {
         m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-				/// TEST /////////////////////////////////////////////////
-				StateManager::instance().takeSnapshot();
-				//////////////////////////////////////////////////////////
+//				/// TEST ///////////////////////////////////////////////// /* snap is taken in the end of frame */
+//				StateManager::instance().takeSnapshot();
+//				//////////////////////////////////////////////////////////
         setDataItemsWidth();
     }
     return interaction_happen;
@@ -211,6 +211,62 @@ bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::str
 
 	}
 	ImGui::PopItemWidth();
+
+	return inner_interaction_happen;
+}
+
+bool WorkspaceTransformation::drawDataSetValuesTable_builder( std::string const cornerLabel,
+                                                                std::vector<std::string> const& columnLabels,
+                                                                std::vector<std::string> const& rowLabels,
+                                                                std::vector<float*> const& local_data,
+                                                                bool &value_changed,
+                                                                int& index_of_change)
+{
+    int number_of_values = columnLabels.size() * rowLabels.size();
+	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValuesTable_builder: columnLabels.size() * rowLabels.size() must be equal to local_data.size()");
+
+	value_changed = false;
+	bool inner_interaction_happen = false, actual_value_changed = false;
+
+
+    if (ImGui::BeginTable(fmt::format("##{}{}_4x4",cornerLabel,getIdDiwne()).c_str(), columnLabels.size()+1, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ))
+    {
+        /* header labels */
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(cornerLabel.c_str());
+        for (int columns = 0; columns < columnLabels.size(); columns++)
+        {
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(columnLabels[columns].c_str());
+        }
+
+        for (int rows = 0; rows < rowLabels.size(); rows++)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(rowLabels[rows].c_str());
+
+
+            for (int columns = 0; columns < columnLabels.size(); columns++)
+            {
+                ImGui::TableNextColumn();
+
+                ImGui::PushItemWidth(getDataItemsWidth());
+                inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
+                                                                        *(local_data[rows*columnLabels.size()+columns]), m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
+
+                ImGui::PopItemWidth();
+                if(actual_value_changed)
+                {
+                    index_of_change = rows*columnLabels.size()+columns;
+                    value_changed |= actual_value_changed;
+                }
+            }
+
+        }
+        ImGui::EndTable();
+    }
 
 	return inner_interaction_happen;
 }

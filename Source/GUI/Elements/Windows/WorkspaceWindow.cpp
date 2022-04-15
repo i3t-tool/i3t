@@ -144,6 +144,11 @@ void WorkspaceDiwne::popupContent()
 			{
 			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
 			}
+            if (ImGui::MenuItem("non-uniform scale"))
+            {
+                addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
+                m_workspaceCoreNodes.back()->getNodebase()->as<Core::Transformation>()->disableSynergies();
+            }
 			if (ImGui::MenuItem("lookAt"))
 			{
 			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::LookAt>>();
