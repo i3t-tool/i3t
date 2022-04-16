@@ -13,8 +13,8 @@ TEST(ScreenTest, _)
 	auto camera = GraphManager::createCamera();
 
 	auto t1 = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();
-	t1->setEye(generateVec3());
-	t1->setCenter(generateVec3());
+	t1->setDefaultValue("eye", generateVec3());
+	t1->setDefaultValue("center", generateVec3());
 
 	camera->getView()->addMatrix(t1);
 

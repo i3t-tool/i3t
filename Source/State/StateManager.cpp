@@ -1,5 +1,7 @@
 #include "StateManager.h"
 
+#include "yaml-cpp/yaml.h"
+
 #include "Stateful.h"
 #include "SerializationVisitor.h"
 
@@ -9,9 +11,44 @@
 constexpr const char* g_unsavedPostfix = " - Unsaved";
 constexpr const char* g_savedPostfix   = " - Saved";
 
+static std::vector<std::string> readRecentFiles()
+{
+	std::vector<std::string> result;
+
+	const auto recentPath = Config::getAbsolutePath("Data/internal/recent.dat");
+
+	if (!doesFileExists(recentPath))
+	{
+		LOG_WARN("Cannot load recent files from \"Data/internal/recent.dat\".");
+	}
+
+	try
+	{
+		auto data = YAML::Load(recentPath);
+
+		auto s = data["files"].size();
+
+		if (data["files"])
+		{
+			for (auto&& file : data["files"])
+			{
+				result.push_back(file.as<std::string>());
+			}
+		}
+	}
+	catch (...)
+	{
+		LOG_WARN("Cannot load recent files from \"Data/internal/recent.dat\".");
+	}
+
+	return result;
+}
+
 StateManager::StateManager()
 {
 	resetState();
+
+	m_recentFiles = readRecentFiles();
 }
 
 void StateManager::takeSnapshot()

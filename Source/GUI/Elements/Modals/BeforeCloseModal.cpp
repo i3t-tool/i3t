@@ -33,14 +33,16 @@ void BeforeCloseModal::render()
 
 		if (ImGui::Button("Save and quit", ImVec2(100, 0)))
 		{
-			StateManager::instance().saveScene();
-
 			InputManager::triggerAction("save", EKeyState::Pressed);
 
-			HideWindowCommand::dispatch(ID);
-			CloseCommand::dispatch();
+			if (!StateManager::instance().isDirty())
+			{
+				// save was successful
+				HideWindowCommand::dispatch(ID);
+				CloseCommand::dispatch();
 
-			ImGui::CloseCurrentPopup();
+				ImGui::CloseCurrentPopup();
+			}
 		}
 		ImGui::SetItemDefaultFocus();
 

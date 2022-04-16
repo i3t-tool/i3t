@@ -8,6 +8,7 @@
 #include "pgr.h"
 #include "Core/Input/InputManager.h"
 #include "imgui.h"
+#include "Core/Nodes/TransformImpl.h"
 #include <typeinfo>
 
 const char* PerspectiveManipulator::s_type=nullptr;
@@ -85,6 +86,7 @@ void PerspectiveManipulator::render(glm::mat4*parent,bool renderTransparent){
 		glDepthRange(0.0, 1.0);
 	}
 }
+
 void PerspectiveManipulator::update(){
 	if(m_editednode==nullptr){return;}
 	auto* editedpersp = (Core::TransformImpl<ETransformType::Perspective>*)m_editednode.get();
@@ -190,9 +192,10 @@ void PerspectiveManipulator::update(){
 		//printf("%f\n",m_height);
 	//printf("%f\n",pheight);
 	///
-	editedpersp->setFOV(glm::radians(m_angle));
-	editedpersp->setAspect(m_aspect);
-	editedpersp->setZNear(m_near);
-	editedpersp->setZFar(m_far);
+	editedpersp->setDefaultValue("fov", glm::radians(m_angle));
+	editedpersp->setDefaultValue("aspect", m_aspect);
+	editedpersp->setDefaultValue("zNear", m_near);
+	editedpersp->setDefaultValue("zFar", m_far);
+
 	m_edited=m_editednode->getData().getMat4();
 }

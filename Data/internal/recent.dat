@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-D:\Documents\PGR\I3T\i3t\data\scenes\TESTTEST.scn
-D.scn
-=======
-C:\Users\mmull\Projects\I3T project 2.0\i3t\data\scenes\myQuat.scn
->>>>>>> fcb148dba4ef1c8ab2996becd90ff2cc859557c7
-D:\Documents\PGR\I3T\i3t\data\scenes\05_lookAt.scn
-D:\Documents\PGR\I3T\i3t\data\scenes\lookAt_manual.scn
-D:\Documents\PGR\I3T\i3t\data\scenes\02_sceneGraph.scn
-D:\Documents\PGR\I3T\i3t\data\scenes\test.scn
-D:\Documents\PGR\I3T\i3t\data\scenes\00_01_tutorial_modelMatrix.scn
-D:\Documents\PGR\I3T\i3t\data\scenes\04_gimbalLock-YZX.scn
+files:
+  - D:\Documents\PGR\I3T\i3t\data\scenes\05_lookAt.scn
+  - D:\Documents\PGR\I3T\i3t\data\scenes\lookAt_manual.scn
+  - D:\Documents\PGR\I3T\i3t\data\scenes\02_sceneGraph.scn
+  - D:\Documents\PGR\I3T\i3t\data\scenes\test.scn
+  - D:\Documents\PGR\I3T\i3t\data\scenes\00_01_tutorial_modelMatrix.scn
+  - D:\Documents\PGR\I3T\i3t\data\scenes\04_gimbalLock-YZX.scn

@@ -48,17 +48,17 @@ TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 	float nearZ = generateFloat();
 	float farZ = generateFloat();
 
-	perspective->setFOV(FOV);
-	EXPECT_EQ(FOV, perspective->getFOV());
+	perspective->setDefaultValue("fov", FOV);
+	EXPECT_EQ(FOV, perspective->getDefaultValue("fov").getFloat());
 
-	perspective->setAspect(aspect);
-	EXPECT_EQ(aspect, perspective->getAspect());
+	perspective->setDefaultValue("aspect", aspect);
+	EXPECT_EQ(aspect, perspective->getDefaultValue("aspect").getFloat());
 
-	perspective->setZNear(nearZ);
-	EXPECT_EQ(nearZ, perspective->getZNear());
+	perspective->setDefaultValue("zNear", nearZ);
+	EXPECT_EQ(nearZ, perspective->getDefaultValue("zNear").getFloat());
 
-	perspective->setZFar(farZ);
-	EXPECT_EQ(farZ, perspective->getZFar());
+	perspective->setDefaultValue("zFar", farZ);
+	EXPECT_EQ(farZ, perspective->getDefaultValue("zFar").getFloat());
 
 	EXPECT_EQ(glm::perspective(FOV, aspect, nearZ, farZ), perspective->getData().getMat4());
 }
@@ -92,23 +92,23 @@ TEST(FrustumTest, GettersAndSettersShouldBeOk)
 	float near = generateFloat();
 	float far = generateFloat();
 
-	frustum->setLeft(left);
-	EXPECT_EQ(left, frustum->getLeft());
+	frustum->setDefaultValue("left", left);
+	EXPECT_EQ(left, frustum->getDefaultValue("left").getFloat());
 
-	frustum->setRight(right);
-	EXPECT_EQ(right, frustum->getRight());
+	frustum->setDefaultValue("right", right);
+	EXPECT_EQ(right, frustum->getDefaultValue("right").getFloat());
 
-	frustum->setBottom(bottom);
-	EXPECT_EQ(bottom, frustum->getBottom());
+	frustum->setDefaultValue("bottom", bottom);
+	EXPECT_EQ(bottom, frustum->getDefaultValue("bottom").getFloat());
 
-	frustum->setTop(top);
-	EXPECT_EQ(top, frustum->getTop());
+	frustum->setDefaultValue("top", top);
+	EXPECT_EQ(top, frustum->getDefaultValue("top").getFloat());
 
-	frustum->setNear(near);
-	EXPECT_EQ(near, frustum->getNear());
+	frustum->setDefaultValue("near", near);
+	EXPECT_EQ(near, frustum->getDefaultValue("near").getFloat());
 
-	frustum->setFar(far);
-	EXPECT_EQ(far, frustum->getFar());
+	frustum->setDefaultValue("far", far);
+	EXPECT_EQ(far, frustum->getDefaultValue("far").getFloat());
 
 	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far), frustum->getData().getMat4());
 }
@@ -134,16 +134,16 @@ TEST(LookAtTest, GettersAndSettersShouldBeOk)
 	    ->as<TransformImpl<ETransformType::LookAt>>();
 
 	auto eye = generateVec3();
-	lookAt->setEye(eye);
-	EXPECT_EQ(eye, lookAt->getEye());
+	lookAt->setDefaultValue("eye", eye);
+	EXPECT_EQ(eye, lookAt->getDefaultValue("eye").getVec3());
 
 	auto center = generateVec3();
-	lookAt->setCenter(center);
-	EXPECT_EQ(center, lookAt->getCenter());
+	lookAt->setDefaultValue("center", center);
+	EXPECT_EQ(center, lookAt->getDefaultValue("center").getVec3());
 
 	auto up = generateVec3();
-	lookAt->setUp(up);
-	EXPECT_EQ(up, lookAt->getUp());
+	lookAt->setDefaultValue("up", up);
+	EXPECT_EQ(up, lookAt->getDefaultValue("up").getVec3());
 
 	EXPECT_EQ(glm::lookAt(eye, center, up), lookAt->getData().getMat4());
 }

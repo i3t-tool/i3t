@@ -138,18 +138,14 @@ TEST(ScaleTest, GettersAndSetterShouldBeOk)
   auto vec = generateVec3();
   {
 		// Uniform scale.
-    scale->setX(vec.x);
-    scale->setY(vec.y);
-    scale->setZ(vec.z);
+    scale->setDefaultValue("scale", vec);
 
     EXPECT_EQ(glm::scale(glm::vec3{vec.z, vec.z, vec.z}), scale->getData().getMat4());
 	}
   {
 		scale->disableSynergies();
 
-    scale->setX(vec.x);
-    scale->setY(vec.y);
-    scale->setZ(vec.z);
+		scale->setDefaultValue("scale", vec);
 
     EXPECT_EQ(glm::scale(vec), scale->getData().getMat4());
 	}

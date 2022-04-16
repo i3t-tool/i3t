@@ -6,7 +6,7 @@
 #include "../Component.h"
 #include "../GameObject.h"
 
-#include "Source/Core/Nodes/Node.h"
+#include "Core/Nodes/Node.h"
 
 class PerspectiveManipulator :public Component
 {

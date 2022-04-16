@@ -197,11 +197,12 @@ void OrthoManipulator::update(){
 	//printf("%f\n",pheight);
 	///
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->get()->setValue((glm::vec3)m_edited[3]);}
-	editedortho->setLeft(m_left);
-	editedortho->setRight(m_right);
-	editedortho->setTop(m_top);
-	editedortho->setBottom(m_bottom);
-	editedortho->setNear(m_near);
-	editedortho->setFar(m_far);
+	editedortho->setDefaultValue("left", m_left);
+	editedortho->setDefaultValue("right", m_right);
+	editedortho->setDefaultValue("top", m_top);
+	editedortho->setDefaultValue("bottom", m_bottom);
+	editedortho->setDefaultValue("near", m_near);
+	editedortho->setDefaultValue("far", m_far);
+
 	m_edited=m_editednode->getData().getMat4();
 }

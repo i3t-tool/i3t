@@ -48,6 +48,12 @@ public:
 
 	//===----------------------------------------------------------------------===//
 
+	//===-- Recent files ------------------------------------------------------===//
+
+	const std::vector<std::string>& getRecentFiles() { return m_recentFiles; }
+
+	//===----------------------------------------------------------------------===//
+
 private:
 	void setUnsavedWindowTitle();
 	void setSavedWindowTitle();
@@ -63,4 +69,6 @@ private:
 
 	int m_currentStateIdx;
 	std::deque<Memento> m_mementos;
+
+	std::vector<std::string> m_recentFiles;
 };

@@ -53,9 +53,7 @@ TEST(TranslationTest, GettersAndSetterShouldBeOk)
 
 	auto vec = generateVec3();
 
-	translation->setX(vec.x);
-	translation->setY(vec.y);
-	translation->setZ(vec.z);
+	translation->setDefaultValue("translation", vec);
 
 	EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
 }

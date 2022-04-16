@@ -345,11 +345,11 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 
   {
     setValue_expectOk(axisAngle, rads);
-		EXPECT_EQ(rads, axisAngle->getRot());
+		EXPECT_EQ(rads, axisAngle->getDefaultValue("rotation").getFloat());
   }
   {
     setValue_expectOk(axisAngle, axis);
-    EXPECT_EQ(axis, axisAngle->getAxis());
+    EXPECT_EQ(axis, axisAngle->getDefaultValue("axis").getVec3());
   }
 	EXPECT_EQ(expectedMat, axisAngle->getData().getMat4());
 }

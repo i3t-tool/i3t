@@ -8,6 +8,8 @@
 #include "glm/gtx/norm.hpp"
 #include "imgui.h"
 #include "ManipulatorUtil.h"
+#include "Core/Nodes/Transform.h"
+#include "Core/Nodes/TransformImpl.h"
 
 #include <typeinfo>
 
@@ -194,7 +196,7 @@ void ScaleManipulator::update() {
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
 	auto* editedscale= (Core::TransformImpl<ETransformType::Scale>*) m_editednode.get();
-	editedscale->setX(m_edited[0][0]);
-	editedscale->setY(m_edited[1][1]);
-	editedscale->setZ(m_edited[2][2]);
+
+	glm::vec3 scale = { m_edited[0][0], m_edited[1][1], m_edited[2][2] };
+	editedscale->setDefaultValue("scale", scale);
 }

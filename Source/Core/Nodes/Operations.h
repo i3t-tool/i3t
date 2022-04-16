@@ -308,7 +308,7 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::MatrixMulMatrix), "mat * mat", 2, twoMatrixInput, 1, matrixInput},		 // mat * mat
 		{n(ENodeType::MatrixAddMatrix), "mat + mat", 2, twoMatrixInput, 1, matrixInput},		 // mat + mat
 		{n(ENodeType::MatrixMulVector), "mat * vec4", 2, matrixVectorInput, 1, vectorInput}, // mat * vec4
-		{n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1, vectorInput}, // vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice??? -- n·sobenÌ vektoru maticÌ zprava
+		{n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1, vectorInput}, // vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice??? -- n√°soben√≠ vektoru matic√≠ zprava
 		{n(ENodeType::MatrixMulFloat), "float * mat", 2, floatMatrixInput, 1, matrixInput},	 // float * mat
 		{n(ENodeType::VectorDotVector), "vec4 . vec4", 2, twoVectorInput, 1, floatInput},		 // vec4 . vec4
 		{n(ENodeType::VectorAddVector), "vec4 + vec4", 2, twoVectorInput, 1, vectorInput},	 // vec4 + vec4

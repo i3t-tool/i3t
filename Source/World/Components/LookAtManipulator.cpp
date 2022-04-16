@@ -8,6 +8,7 @@
 #include "glm/gtx/norm.hpp"
 #include "imgui.h"
 #include "ManipulatorUtil.h"
+#include "Core/Nodes/TransformImpl.h"
 
 const char* LookAtManipulator::s_type = nullptr;
 
@@ -44,8 +45,8 @@ void LookAtManipulator::GUI() {
 	ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
 
 	auto* editedlookat = (Core::TransformImpl<ETransformType::LookAt>*) m_editednode.get();
-	glm::vec3 center= editedlookat->getCenter();
-	glm::vec3 eye= editedlookat->getEye();
+	glm::vec3 center= editedlookat->getDefaultValue("center").getVec3();
+	glm::vec3 eye= editedlookat->getDefaultValue("eye").getVec3();
 
 	if(m_editmode==LookAtManipulator::EDIT_CENTER){ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", center[0], center[1], center[2]);}
 	else{ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", eye[0], eye[1], eye[2]);}
@@ -98,8 +99,8 @@ void LookAtManipulator::update() {
 	if(m_editednode==nullptr){return;}
 	m_edited=glm::inverse(m_editednode->getData().getMat4());
 	auto* editedlookat = (Core::TransformImpl<ETransformType::LookAt>*) m_editednode.get();
-	glm::vec3 center= editedlookat->getCenter();
-	glm::vec3 eye= editedlookat->getEye();
+	glm::vec3 center= editedlookat->getDefaultValue("center").getVec3();
+	glm::vec3 eye= editedlookat->getDefaultValue("eye").getVec3();
 	///
 	bool transactionBegin=false;
 
@@ -183,16 +184,16 @@ void LookAtManipulator::update() {
 
 	///
 	if(m_editmode==LookAtManipulator::EDIT_CENTER){
-		editedlookat->setCenter((glm::vec3)posh);
+		editedlookat->setDefaultValue("center", (glm::vec3)posh);
 		//printf("cur %f %f %f,, set %f %f %f\n",center[0],center[1],center[2],posh[0],posh[1],posh[2]);
 	}
 	else{
-		editedlookat->setEye((glm::vec3)posh);
+		editedlookat->setDefaultValue("eye", (glm::vec3)posh);
 		//printf("cur %f %f %f,, set %f %f %f\n",eye[0],eye[1],eye[2],posh[0],posh[1],posh[2]);
 	}
 	m_edited=glm::inverse(m_editednode->getData().getMat4());
-	center= editedlookat->getCenter();
-	eye= editedlookat->getEye();
+	center= editedlookat->getDefaultValue("center").getVec3();
+	eye= editedlookat->getDefaultValue("eye").getVec3();
 
 	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
 	if(m_editmode==LookAtManipulator::EDIT_CENTER){m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(eye-center,0.0f));}

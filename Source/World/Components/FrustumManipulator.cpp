@@ -8,6 +8,7 @@
 #include "pgr.h"
 #include "Core/Input/InputManager.h"
 #include "imgui.h"
+#include "Core/Nodes/TransformImpl.h"
 
 #include <typeinfo>
 
@@ -178,11 +179,12 @@ void FrustumManipulator::update(){
 		//printf("%f\n",m_height);
 	//printf("%f\n",pheight);
 	///
-	editedfrustum->setLeft(m_left);
-	editedfrustum->setRight(m_right);
-	editedfrustum->setTop(m_top);
-	editedfrustum->setBottom(m_bottom);
-	editedfrustum->setNear(m_near);
-	editedfrustum->setFar(m_far);
+	editedfrustum->setDefaultValue("left", m_left);
+	editedfrustum->setDefaultValue("right", m_right);
+	editedfrustum->setDefaultValue("top", m_top);
+	editedfrustum->setDefaultValue("bottom", m_bottom);
+	editedfrustum->setDefaultValue("near", m_near);
+	editedfrustum->setDefaultValue("far", m_far);
+
 	m_edited=m_editednode->getData().getMat4();
 }
