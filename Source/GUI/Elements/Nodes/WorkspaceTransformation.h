@@ -20,6 +20,7 @@ public:
 	void setRemoveFromSequence(bool value) { m_removeFromSequence = value; };
 	bool isInSequence();
 	DIWNE::ID aboveSequence;
+	float m_topOversizeSpace;
 
 	Ptr<Core::NodeBase> getNodebaseSequence();
 
@@ -43,6 +44,8 @@ public:
 	virtual void drawMenuLevelOfDetail()=0;
 	void drawMenuDelete();
 	void drawMenuStorevalues();
+
+	void updateSizes();
 
 //
 //	virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,

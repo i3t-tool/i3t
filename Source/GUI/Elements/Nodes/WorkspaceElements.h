@@ -45,9 +45,8 @@ enum class WorkspaceLevelOfDetail
 
 enum FloatPopupMode
 {
-    Radians,
-    Degree,
-    GeneralNumbers
+    Angle,
+    Value
 };
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;

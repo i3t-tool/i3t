@@ -14,6 +14,8 @@
 
 namespace Core
 {
+template <ENodeType T> class NodeImpl;
+
 namespace Builder
 {
 	/**

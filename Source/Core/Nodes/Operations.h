@@ -382,16 +382,17 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::Model), "model", 1, matrixMulInput, 0, {}},
 
 		// Transform matrices constructors
-		{n(ENodeType::MakeTranslation), "translate constructor", 1, vector3Input, 1, matrixInput}, // translate
-		{n(ENodeType::MakeEulerX), "eulerAngleX constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
-		{n(ENodeType::MakeEulerY), "eulerAngleY constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
-		{n(ENodeType::MakeEulerZ), "eulerAngleZ constructor", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},																															 // eulerAngleZ
-		{n(ENodeType::MakeScale), "scale constructor", 1, vector3Input, 1, matrixInput}, // scale
-		{n(ENodeType::MakeAxisAngle), "rotate constructor", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames}, // rotate
-		{n(ENodeType::MakeOrtho), "ortho constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // ortho
-		{n(ENodeType::MakePerspective), "perspective constructor", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNames}, // perspective
-		{n(ENodeType::MakeFrustum), "frustum constructor", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustrum
-		{n(ENodeType::MakeLookAt), "lookAt constructor", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
+    // PF: I have deleted the world constructor from all operators
+		{n(ENodeType::MakeTranslation), "translate", 1, vector3Input, 1, matrixInput}, // translate
+		{n(ENodeType::MakeEulerX), "eulerAngleX", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
+		{n(ENodeType::MakeEulerY), "eulerAngleY", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
+		{n(ENodeType::MakeEulerZ), "eulerAngleZ", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames},																															 // eulerAngleZ
+		{n(ENodeType::MakeScale), "scale", 1, vector3Input, 1, matrixInput}, // scale
+		{n(ENodeType::MakeAxisAngle), "rotate", 2, floatVector3Input, 1, matrixInput, NO_TAG, AngleAxisInputNames}, // rotate
+		{n(ENodeType::MakeOrtho), "ortho", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // ortho
+		{n(ENodeType::MakePerspective), "perspective", 4, fourFloatInput, 1, matrixInput, NO_TAG, PerspectiveInputNames}, // perspective
+		{n(ENodeType::MakeFrustum), "frustum", 6, sixFloatInput, 1, matrixInput, NO_TAG, orthoFrustrumInputNames}, // frustrum
+		{n(ENodeType::MakeLookAt), "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
 		{n(ENodeType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}},
 		{n(ENodeType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};

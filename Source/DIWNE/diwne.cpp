@@ -29,7 +29,10 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
     ,   m_popupDrawn(false)
     ,   m_tooltipDrawn(false)
 
-{}
+    ,   m_takeSnap(false)
+{
+    m_selectable = false;
+}
 
 DiwneAction Diwne::getDiwneActionActive() const {return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction; }
 
@@ -39,7 +42,7 @@ bool Diwne::initializeDiwne()
 {
     m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0,0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     m_diwneAction = DiwneAction::None;
-    m_popupDrawn = m_tooltipDrawn = m_objectFocused = false;
+    m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
     return initialize();
 }
 
@@ -50,7 +53,11 @@ bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/
 
     /* zoom */
     ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1/m_workAreaZoom;
-    ImGui::SetWindowFontScale(m_workAreaZoom);
+//    ImGui::SetWindowFontScale(m_workAreaZoom);
+    m_StoreFontScale = ImGui::GetFont()->Scale;
+    ImGui::GetFont()->Scale = m_workAreaZoom;
+    ImGui::PushFont(NULL);
+
     m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
     ImGui::GetStyle().ItemSpacing *= m_workAreaZoom;
 
@@ -121,6 +128,10 @@ void Diwne::end()
 bool Diwne::afterEndDiwne()
 {
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
+
+    ImGui::GetFont()->Scale = m_StoreFontScale;
+    ImGui::PopFont();
+
     return DiwneObject::afterEndDiwne();
 }
 
@@ -323,8 +334,6 @@ void Diwne::DrawIconCircle(ImDrawList* idl,
     {
         idl->AddCircleFilled(center, radius-thicknes, InnerColor);
     }
-
-
 }
 
 void Diwne::DrawIconRectangle(ImDrawList* idl,

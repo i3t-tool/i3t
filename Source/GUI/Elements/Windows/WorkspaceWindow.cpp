@@ -684,11 +684,18 @@ bool WorkspaceDiwne::content()
 
         /* draw nodes from back to begin (front to back) for catch interactions in right order */
         int prev_size = m_workspaceCoreNodes.size();
+        bool takeSnap = false;
         for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
         {
             m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
             if ((*it) != nullptr){ interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::Interacting); }
             if (prev_size != m_workspaceCoreNodes.size()) break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
+
+        }
+
+        if(m_takeSnap)
+        {
+            StateManager::instance().takeSnapshot();
         }
 
         /* draw links on top */
@@ -722,7 +729,7 @@ bool WorkspaceDiwne::afterContent()
 	{
         shiftNodesToEnd(getSelectedNodes());
 
-        if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes) /* \todo JH not work - in debug fame by frame work, but not without breakpoints... */
+        if (getWorkspaceDiwneActionActive() != WorkspaceDiwneAction::NOTunselectAllNodes && getDiwneActionActive() != DIWNE::DiwneAction::SelectionRectFull && getDiwneActionActive() != DIWNE::DiwneAction::SelectionRectTouch)
         {
             for (auto node : getAllNodesInnerIncluded())
             {
@@ -783,6 +790,12 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
             case EValueType::Float:
                 addTypeConstructorNode<WorkspaceOperator<ENodeType::FloatToFloat>>();
                 break;
+            case EValueType::Pulse:
+                addTypeConstructorNode<WorkspaceOperator<ENodeType::Pulse>>();
+                break;
+            case EValueType::Screen:
+                addTypeConstructorNode<WorkspaceCamera>();
+                break;
         }
         return true;
     }
@@ -836,6 +849,7 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllNodesInnerIncl
 
 void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
 {
+
 	for (int i = 0; i < nodesToShift.size(); i++)
 	{
 		coreNodeIter ith_selected_node =
@@ -853,7 +867,12 @@ void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData
 
 void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const &nodesToShift)
 {
-	for (int i = 0; i < nodesToShift.size(); i++)
+    int node_num = nodesToShift.size();
+//    str2.erase(std::remove_if(str2.begin(),
+//                              str2.end(),
+//                              [](unsigned char x){return std::isspace(x);})
+//    a.erase(std::remove_if(a.begin(), a.end(), predicate), a.end());
+	for (int i = 0; i < node_num; i++)
 	{
 		coreNodeIter ith_selected_node =
 				std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
@@ -863,7 +882,7 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
-			std::iter_swap(m_workspaceCoreNodes.end() - 1 - i, ith_selected_node);
+			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
 		}
 	}
 }

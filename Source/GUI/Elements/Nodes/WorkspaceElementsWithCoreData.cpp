@@ -1,5 +1,7 @@
 #include "WorkspaceElementsWithCoreData.h"
 
+#include "misc/cpp/imgui_stdlib.h" /* for changable text */
+
 #include "State/StateManager.h"
 
 #include "../Windows/WorkspaceWindow.h"
@@ -11,9 +13,8 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
     ,   m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth)) /* just for safe if someone not call setDataItemsWidth() in constructor of child class... */
     ,   m_inactiveMark(I3T::getTheme().get(ESize::Default_InactiveMark))
     ,   m_levelOfDetail(WorkspaceLevelOfDetail::Full)
-    ,   m_floatPopupMode(Radians)
+    ,   m_floatPopupMode(Angle)
 {
-
 }
 
 bool WorkspaceNodeWithCoreData::bypassDragAction(){return InputManager::isAxisActive("drag") != 0 && (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold || InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold || -InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold);}
@@ -32,17 +33,19 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
-    ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1)); ImGui::SameLine();
-    if(!m_topLabel.empty())
-    {
-// \todo -> see https://github.com/ocornut/imgui/blob/master/misc/cpp/imgui_stdlib.cpp for using with string        ImGui::SelectableInput("row", &entity.is_selected, entity.name, ImGuiSelectableFlags_None);
+    if (m_topLabel.empty()) {m_topLabel = m_nodebase->getLabel();}
+    ImGui::Indent(ImGui::GetStyle().ItemSpacing.x);
+    const char* topLabel = m_topLabel.c_str();
 
-        ImGui::TextUnformatted(m_topLabel.c_str());
-    }else
-    {
-        ImGui::TextUnformatted(m_nodebase->getLabel());
-    }
-    return false;
+    ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel+strlen(topLabel)).x+5); /* +5 for reserve if not computed well */
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0,0,0,0)); /* invisible bg */
+    bool interaction_happen = ImGui::InputText(fmt::format("##{}topLabel",m_labelDiwne).c_str(), &(this->m_topLabel) );
+    interaction_happen |= ImGui::IsItemActive();
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    ImGui::Dummy(ImVec2(1,1)); /* dummy for snap some item for same space on left and right of label  */
+    return interaction_happen;
 }
 
 
@@ -52,11 +55,10 @@ Ptr<Core::NodeBase> const WorkspaceNodeWithCoreData::getNodebase() const { retur
 
 int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal() { return m_numberOfVisibleDecimal; }
 
-int WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
+void WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 {
 	m_numberOfVisibleDecimal = (value >= 0 ? value : 0);
 	setDataItemsWidth();
-	return m_numberOfVisibleDecimal;
 }
 
 float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth * diwne.getWorkAreaZoom(); }
@@ -91,13 +93,6 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_
 
 bool WorkspaceNodeWithCoreData::drawDataLabel()
 {
-    if(!m_middleLabel.empty())
-    {
-        ImGui::TextUnformatted(m_middleLabel.c_str());
-    }else
-    {
-        ImGui::TextUnformatted(m_nodebase->getLabel());
-    }
     return false;
 }
 
@@ -262,6 +257,7 @@ bool WorkspaceCorePin::processConnectionPrepared()
             {
                 WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
                 in->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
+                diwne.m_takeSnap = true;
             }
             break;
         /* \todo JH react informatively to other result too */
@@ -421,7 +417,12 @@ int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 
 bool WorkspaceCoreOutputPinPulse::drawData()
 {
-    return ImGui::Button(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str());
+    if (ImGui::SmallButton(fmt::format("{}##n{}:p{}", m_buttonText, getNode().getId(), m_idDiwne).c_str()))
+    {
+      getNode().getNodebase()->pulse(getIndex());
+      return true;
+    }
+    return false;
 }
 int WorkspaceCoreOutputPinPulse::maxLengthOfData() {return 0;} /* no data with length here*/
 
@@ -468,6 +469,7 @@ void WorkspaceCoreInputPin::unplug()
 {
     Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
     m_link.setStartPin(nullptr);
+    diwne.m_takeSnap = true;
 }
 
 
@@ -510,6 +512,7 @@ bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
     {
         dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction = WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
         diwne.setLastActivePin<WorkspaceCoreInputPin>(std::static_pointer_cast<WorkspaceCoreInputPin>(shared_from_this()));
+        diwne.m_takeSnap = true;
         return true;
     }
     return false;
@@ -530,8 +533,6 @@ bool WorkspaceCoreInputPin::processInteractions()
 {
     bool interaction_happen = WorkspaceCorePin::processInteractions();
     interaction_happen |= processUnplug();
-    if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Pressed))
-        int i =7;
     interaction_happen |= processCreateAndPlugConstrutorNode();
     return interaction_happen;
 }
@@ -594,6 +595,7 @@ bool WorkspaceCoreLink::initialize()
 WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase, bool showDataOnPins/*=true*/)
     : WorkspaceNodeWithCoreData(diwne, nodebase)
     , m_showDataOnPins(showDataOnPins)
+    , m_minRightAlignOfRightPins(0)
 {
     const auto& inputPins   = m_nodebase->getInputPins();
     const auto& outputPins  = m_nodebase->getOutputPins();
@@ -760,9 +762,21 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
     bool inner_interaction_happen = false;
     WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
-    for (auto const& pin : m_workspaceInputs) {
-        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
-        if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
+    if(m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+    {
+        ImRect nodeRect = getNodeRectDiwne();
+        ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceInputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+            if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
+        }
+    }
+    else
+    {
+        for (auto const& pin : m_workspaceInputs) {
+            inner_interaction_happen |= pin->drawDiwne();
+            if (pin->isConnected()){wd.m_linksToDraw.push_back(&pin->getLink());}
+        }
     }
     return inner_interaction_happen;
 }
@@ -770,9 +784,24 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 {
     bool inner_interaction_happen = false;
-
-    for (auto const& pin : m_workspaceOutputs) {
-        inner_interaction_happen |= pin->drawDiwne(/*(m_drawMode==DIWNE::DrawMode::Interacting || diwne.getDiwneAction()==DIWNE::DiwneAction::NewLink)?DIWNE::DrawMode::Interacting:DIWNE::DrawMode::JustDraw*/);
+    if(m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+    {
+        ImRect nodeRect = getNodeRectDiwne();
+        ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
+        for (auto const& pin : m_workspaceOutputs) {
+            pin->setConnectionPointDiwne(pinConnectionPoint);
+        }
+    }
+    else
+    {
+        float act_align, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets smaller (for example when switch from precision 2 to precision 0) */
+        m_minRightAlignOfRightPins = FLT_MAX;
+        for (auto const& pin : m_workspaceOutputs) {
+            act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth())*diwne.getWorkAreaZoom()); /* no shift to left */
+            m_minRightAlignOfRightPins = std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching between two node sizes */
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align - prev_minRightAlign ); /* right align if not all output pins have same width */
+            inner_interaction_happen |= pin->drawDiwne();
+        }
     }
     return inner_interaction_happen;
 }
@@ -853,187 +882,210 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
     ImGui::Text("Set value...                ");
     ImGui::Separator();
 
-    if (ImGui::RadioButton("Radians", popupMode == FloatPopupMode::Radians)){popupMode = FloatPopupMode::Radians;} ImGui::SameLine();
-    if (ImGui::RadioButton("Degrees", popupMode == FloatPopupMode::Degree)){popupMode = FloatPopupMode::Degree;} ImGui::SameLine();
-    if (ImGui::RadioButton("General", popupMode == FloatPopupMode::GeneralNumbers)){popupMode = FloatPopupMode::GeneralNumbers;}
-    if (popupMode == FloatPopupMode::Radians)
+    if (ImGui::RadioButton("Angle", popupMode == FloatPopupMode::Angle)){popupMode = FloatPopupMode::Angle;} ImGui::SameLine();
+    if (ImGui::RadioButton("Value", popupMode == FloatPopupMode::Value)){popupMode = FloatPopupMode::Value;}
+
+    if (popupMode == FloatPopupMode::Angle)
     {
-        ImGui::Columns(2, "floatPopupColumnsRadians", false); // 2-ways, no border
+        if (ImGui::BeginTable("##Angle", 2))
+        {
 
-        if (ImGui::Selectable("-PI/6 (-30°)"))
-        {
-            selectedValue		= -M_PI / 6;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-PI/4 (-45°)"))
-        {
-            selectedValue		= -M_PI / 4;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-PI/3 (-60°)"))
-        {
-            selectedValue		= -M_PI / 3;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-PI/2 (-90°)"))
-        {
-            selectedValue		= -M_PI / 2;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-PI (-180°)"))
-        {
-            selectedValue		= -M_PI;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-3PI/2 (-270°)"))
-        {
-            selectedValue		= -3 * M_PI / 2;
-            valueSelected = true;
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-PI/6 (-30°)"))
+            {
+                selectedValue		= -M_PI / 6;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("PI/6 (30°)"))
+            {
+                selectedValue		= M_PI / 6;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-PI/4 (-45°)"))
+            {
+                selectedValue		= -M_PI / 4;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("PI/4 (45°)"))
+            {
+                selectedValue		= M_PI / 4;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-PI/3 (-60°)"))
+            {
+                selectedValue		= -M_PI / 3;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("PI/3 (-60°)"))
+            {
+                selectedValue		= M_PI / 3;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-PI/2 (-90°)"))
+            {
+                selectedValue		= -M_PI / 2;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("PI/2 (-90°)"))
+            {
+                selectedValue		= M_PI / 2;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-PI (-180°)"))
+            {
+                selectedValue		= -M_PI;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("PI (-180°)"))
+            {
+                selectedValue		= M_PI;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-3PI/2 (-270°)"))
+            {
+                selectedValue		= -3 * M_PI / 2;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("3PI/2 (-270°)"))
+            {
+                selectedValue		= 3 * M_PI / 2;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("0"))
+            {
+                selectedValue		= 0;
+                valueSelected = true;
+            }
+
+            ImGui::EndTable();
         }
 
-        ImGui::NextColumn();
+    }
+    else if (popupMode == FloatPopupMode::Value)
+    {
+        if (ImGui::BeginTable("##Values", 2))
+        {
 
-        if (ImGui::Selectable("PI/6 (30°)"))
-        {
-            selectedValue		= M_PI / 6;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("PI/4 (45°)"))
-        {
-            selectedValue		= M_PI / 4;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("PI/3 (60°)"))
-        {
-            selectedValue		= M_PI / 3;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("PI/2 (90°)"))
-        {
-            selectedValue		= M_PI / 2;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("PI (180°)"))
-        {
-            selectedValue		= M_PI;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("3PI/2 (270°)"))
-        {
-            selectedValue		= -3 * M_PI / 2;
-            valueSelected = true;
-        }
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-1/2"))
+            {
+                selectedValue		= -1.0f / 2.0f;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("1/2"))
+            {
+                selectedValue		= 1.0f / 2.0f;
+                valueSelected = true;
+            }
 
-        ImGui::Columns(1);
-        if (ImGui::Selectable("0"))
-        {
-            selectedValue		= 0.0f;
-            valueSelected = true;
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-sqrt(2)/2"))
+            {
+                selectedValue		= -sqrt(2)/2;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("sqrt(2)/2"))
+            {
+                selectedValue		= sqrt(2)/2;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-sqrt(3)/2"))
+            {
+                selectedValue		= -sqrt(3)/2;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("sqrt(3)/2"))
+            {
+                selectedValue		= sqrt(3)/2;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-1"))
+            {
+                selectedValue		= -1;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("1"))
+            {
+                selectedValue		= 1;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-2"))
+            {
+                selectedValue		= -2;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("2"))
+            {
+                selectedValue		= 2;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("-3"))
+            {
+                selectedValue		= -3;
+                valueSelected = true;
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("3"))
+            {
+                selectedValue		= 3;
+                valueSelected = true;
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable("0"))
+            {
+                selectedValue		= 0;
+                valueSelected = true;
+            }
+
+            ImGui::EndTable();
         }
     }
-    else if (popupMode == FloatPopupMode::Degree)
-    {
-        ImGui::Columns(2, "floatPopupColumnsDegrees", false);
-        if (ImGui::Selectable("-1/2"))
-        {
-            selectedValue		= -1.0f / 2.0f;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-sqrt(2)/2"))
-        {
-            selectedValue		= -sqrt(2) / 2;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-sqrt(3)/2"))
-        {
-            selectedValue		= -sqrt(3) / 2;
-            valueSelected = true;
-        }
-
-        if (ImGui::Selectable("-1"))
-        {
-            selectedValue		= -1.0f;
-            valueSelected = true;
-        }
-
-        ImGui::NextColumn();
-
-        if (ImGui::Selectable("1/2"))
-        {
-            selectedValue = 1.0f / 2.0f;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("sqrt(2)/2"))
-        {
-            selectedValue		= sqrt(2) / 2;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("sqrt(3)/2"))
-        {
-            selectedValue		= sqrt(3) / 2;
-            valueSelected = true;
-        }
-
-        if (ImGui::Selectable("1"))
-        {
-            selectedValue		= 1.0f;
-            valueSelected = true;
-        }
-        ImGui::Columns(1);
-        if (ImGui::Selectable("0"))
-        {
-            selectedValue		= 0.0f;
-            valueSelected = true;
-        }
-    }
-    else if (popupMode == FloatPopupMode::GeneralNumbers)
-    {
-        ImGui::Columns(2, "floatPopupColumnsDegrees", false);
-        if (ImGui::Selectable("-3"))
-        {
-            selectedValue		= -3.0f;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-2"))
-        {
-            selectedValue		= -2.0f;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("-1"))
-        {
-            selectedValue		= -1.0f;
-            valueSelected = true;
-        }
-
-        ImGui::NextColumn();
-        if (ImGui::Selectable("3"))
-        {
-            selectedValue		= 3.0f;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("2"))
-        {
-            selectedValue		= 2.0f;
-            valueSelected = true;
-        }
-        if (ImGui::Selectable("1"))
-        {
-            selectedValue		= 1.0f;
-            valueSelected = true;
-        }
-
-        ImGui::Columns(1);
-        if (ImGui::Selectable("0"))
-        {
-            selectedValue		= 0.0f;
-            valueSelected = true;
-        }
-    }
-
-
-
-
-
 }
 
 void loadWorkspacePinsFromCorePins(WorkspaceNodeWithCoreData& workspaceNode, Core::Node::PinView coreInputPins, Core::Node::PinView coreOutputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceInputPins, std::vector<Ptr<WorkspaceCorePin>> & workspaceOutputPins)
@@ -1055,30 +1107,57 @@ bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int numberOfVisib
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
     valueChanged = false;
+
     /* Drawing is row-wise */
     ImGui::BeginGroup();
     for (int rows = 0; rows < 4; rows++)
     {
-      for (int columns = 0; columns < 4; columns++)
-      {
+        if (rows == 1) ImGui::SetCursorPosY(ImGui::GetCursorPosY()-ImGui::GetStyle().ItemSpacing.y); /*\todo JH hard to say why...*/
+        for (int columns = 0; columns < 4; columns++)
+        {
+            localData = data[columns][rows]; /* Data are column-wise */
 
-        localData = data[columns][rows]; /* Data are column-wise */
-        inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:r{}c{}", node_id, rows, columns),
-                                                                localData, dataState[rows][columns], actualValueChanged);
-        if (actualValueChanged)
-        {
-            valueChanged = true;
-            columnOfChange = columns; /* \todo JH row, columns and value maybe unused -> changes possible directly in (not const) passed local_data from calling function */
-            rowOfChange = rows;
-            valueOfChange = localData;
+            inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:r{}c{}", node_id, rows, columns),
+                                                                    localData, dataState[rows][columns], actualValueChanged);
+
+            if (actualValueChanged)
+            {
+                valueChanged = true;
+                columnOfChange = columns; /* \todo JH row, columns and value maybe unused -> changes possible directly in (not const) passed local_data from calling function */
+                rowOfChange = rows;
+                valueOfChange = localData;
+            }
+
+            if (columns < 3) {ImGui::SameLine();}
         }
-        if(columns != 3)
-        {
-            ImGui::SameLine();
-        }
-      }
     }
     ImGui::EndGroup();
+//    if (ImGui::BeginTable(fmt::format("##{}_4x4",node_id).c_str(), 4, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
+//    {
+//        for (int rows = 0; rows < 4; rows++)
+//        {
+//            ImGui::TableNextRow();
+//            for (int columns = 0; columns < 4; columns++)
+//            {
+//                ImGui::TableNextColumn();
+//                localData = data[columns][rows]; /* Data are column-wise */
+//
+//                ImGui::PushItemWidth(dataWidth); /* \todo JH maybe some better settings of width */
+//                inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:r{}c{}", node_id, rows, columns),
+//                                                                        localData, dataState[rows][columns], actualValueChanged);
+//
+//                ImGui::PopItemWidth();
+//                if (actualValueChanged)
+//                {
+//                    valueChanged = true;
+//                    columnOfChange = columns; /* \todo JH row, columns and value maybe unused -> changes possible directly in (not const) passed local_data from calling function */
+//                    rowOfChange = rows;
+//                    valueOfChange = localData;
+//                }
+//            }
+//        }
+//        ImGui::EndTable();
+//    }
 
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();

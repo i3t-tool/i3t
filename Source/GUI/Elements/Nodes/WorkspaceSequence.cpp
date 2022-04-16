@@ -85,6 +85,7 @@ void WorkspaceSequence::moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> draged
 void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node)
 {
     node->setRemoveFromWorkspace(false);
+    node->m_selectable = true;
     dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
     popNode(node);
 }
@@ -118,7 +119,6 @@ bool WorkspaceSequence::middleContent()
 
     if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
     {
-        ImGui::TextUnformatted(m_middleLabel.c_str());
         return false;
     }
 
@@ -169,10 +169,12 @@ bool WorkspaceSequence::middleContent()
             }
         }
 
-        /* \todo some better selected transformation/nodes politic (when dragging, pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark action to do and in WorkspaceDiwne react to this action  */
-        transformation->setSelected(false);
 
-        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+        transformation->m_selectable = false;
+        transformation->setSelected(false);
+        /* \todo some better selected transformation/nodes politic (when dragging, pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark action to do and in WorkspaceDiwne react to this action  */
+        inner_interaction_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_isHeld || m_drawMode==DIWNE::DrawMode::JustDraw ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting);
+
         ImGui::SameLine();
 
         i++;
@@ -186,7 +188,7 @@ bool WorkspaceSequence::middleContent()
         }
     }
 
-    if ( push_index >= 0 /*&& !dragedNode->isInSequence()*/) /* already in sequence if second drawing or other sequence */
+    if ( push_index >= 0)
     {
         moveNodeToSequence(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(dragedNode), push_index);
         inner_interaction_happen |= true;
@@ -201,7 +203,7 @@ bool WorkspaceSequence::middleContent()
             if (dragedNode->isInSequence() && dragedNode->getNodebaseSequence() == m_nodebase)
             {
                 moveNodeToWorkspace(dragedNode);
-                inner_interaction_happen |= true;
+                inner_interaction_happen = false; /* do not set sequence as interacting node -> draged transformation should be only interacting */
             }
         }
     }
@@ -211,14 +213,12 @@ bool WorkspaceSequence::middleContent()
     return inner_interaction_happen;
 }
 
-int WorkspaceSequence::setNumberOfVisibleDecimal(int value)
+void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
 {
     for( auto const & transformation : m_workspaceInnerTransformations )
     {
         transformation->setNumberOfVisibleDecimal(value);
     }
-
-  return 999;
 }
 
 

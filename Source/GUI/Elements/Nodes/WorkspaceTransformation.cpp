@@ -5,7 +5,16 @@
 WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNodeWithCoreData(diwne, nodebase)
     ,   aboveSequence(0)
+    ,   m_topOversizeSpace(0)
 {}
+
+void WorkspaceTransformation::updateSizes()
+{
+    /* right align - have to be computed before DIWNE::Node::updateSizes(), because after that are sizes updated */
+    m_topOversizeSpace = std::max(0.0f, m_topRectDiwne.GetWidth() - std::max(m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() + m_rightRectDiwne.GetWidth() + ImGui::GetStyle().ItemSpacing.x * 2 / diwne.getWorkAreaZoom() /* space is between left-middle and middle-right, spacing is scaled in begin of frame */,
+                                                                      m_bottomRectDiwne.GetWidth()));
+    WorkspaceNodeWithCoreData::updateSizes();
+}
 bool WorkspaceTransformation::beforeBegin()
 {
     aboveSequence = 0; /* 0 is none */
@@ -22,34 +31,41 @@ bool WorkspaceTransformation::beforeContent()
 
 bool WorkspaceTransformation::topContent()
 {
-    /* \todo JH get Transformation header Theme here */
+    bool interaction_happen = false;
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
                              ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeaderTranformation)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
-    WorkspaceNodeWithCoreData::topContent();
+    interaction_happen |= WorkspaceNodeWithCoreData::topContent();
     ImGui::SameLine();
 
-    switch (dataAreValid())
+    if (dataAreValid()!=Core::ETransformState::Valid)
     {
-    case Core::ETransformState::Invalid:
-        diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,255,255),
-            DIWNE::IconType::Cross, ImColor(255,0,0), ImColor(255,255,255),
-            ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
-        break;
-    case Core::ETransformState::Unknown:
-        diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,255), ImColor(0,255,255),
-            DIWNE::IconType::Cross, ImColor(255,0,255), ImColor(0,255,255),
-            ImVec2(ImGui::GetFontSize()/2,ImGui::GetFontSize()/2), ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
-        break;
+        ImVec2 iconSize = ImVec2(ImGui::GetFontSize(),ImGui::GetFontSize());
+//     \todo JH Right Align
+//    ImGui::SetCursorPosX(ImGui::GetCursorPosX()-ImGui::GetStyle().ItemSpacing.x-1); /* remove spacing after Dummy in WorkspaceNodeWithCoreData::topContent() */
+//    /* right align */
+//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, getNodeRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x /*actual free space*/ - iconSize.x - m_topOversizeSpace)*diwne.getWorkAreaZoom());
+
+        switch (dataAreValid())
+        {
+        case Core::ETransformState::Invalid:
+            diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,0,0),
+                DIWNE::IconType::Cross, ImColor(255,255,255), ImColor(255,255,255),
+                iconSize, ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+            break;
+        case Core::ETransformState::Unknown:
+            diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,255), ImColor(255,0,255),
+                DIWNE::IconType::Cross, ImColor(0,255,255), ImColor(0,255,255),
+                iconSize, ImVec4(5,5,5,5), false ); /* \todo JH Icon setting from Theme? */
+            break;
+        }
     }
-	return false;
+	return interaction_happen;
 }
 
 bool WorkspaceTransformation::middleContent()
 {
     bool inner_interaction_happen = false;
-    //diwne.AddRectFilledDiwne(m_middleRectDiwne.Min, m_middleRectDiwne.Max,
-    //                         ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::)), 5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take from Theme?*/
 
 	switch (m_levelOfDetail)
 	{
@@ -104,9 +120,9 @@ void WorkspaceTransformation::drawMenuStorevalues()
 {
     if(ImGui::BeginMenu("Value"))
     {
-        if(ImGui::MenuItem("Reset")) {}
-        if(ImGui::MenuItem("Store")) {}
-        if(ImGui::MenuItem("Restore")) {}
+        if(ImGui::MenuItem("Reset - nenašel jsem fci k zavolání")) { }
+        if(ImGui::MenuItem("Store")) { m_nodebase->as<Core::Transformation>()->saveValue();}
+        if(ImGui::MenuItem("Restore")) { m_nodebase->as<Core::Transformation>()->reloadValue();}
 
         ImGui::EndMenu();
     }

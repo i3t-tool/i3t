@@ -51,7 +51,7 @@ public:
 	Ptr<Core::NodeBase> const getNodebase() const;
 
 	int getNumberOfVisibleDecimal();
-	virtual int setNumberOfVisibleDecimal(int value);
+	virtual void setNumberOfVisibleDecimal(int value);
 
 	FloatPopupMode& getFloatPopupMode() {return m_floatPopupMode;};
 	void setFloatPopupMode(FloatPopupMode mode){m_floatPopupMode = mode;};
@@ -278,6 +278,8 @@ class WorkspaceCoreInputPinMatrixMul : public WorkspaceCoreInputPin
 
 class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 {
+    private:
+        float m_minRightAlignOfRightPins;
     protected:
         std::vector<Ptr<WorkspaceCoreInputPin>>    m_workspaceInputs;
         std::vector<Ptr<WorkspaceCoreOutputPin>>    m_workspaceOutputs;

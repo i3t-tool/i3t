@@ -604,6 +604,8 @@ void connectNodes(YAML::Node& sceneData, SceneData& scene, GuiNodes& workspaceNo
 			auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
 			if (plugResult != ENodePlugResult::Ok)
 				Log::info("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSig(), rhs->getNodebase()->getSig(), lhsPin, rhsPin);
+            else
+                std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(rhs)->getInputs().at(rhsPin)->setConnectedWorkspaceOutput(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(lhs)->getOutputs().at(lhsPin).get());
 		}
 	}
 }

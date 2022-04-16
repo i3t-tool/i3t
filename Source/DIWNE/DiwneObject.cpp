@@ -22,11 +22,13 @@ DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const la
     ,   m_focused(false)
     ,   m_isActive(false)
     ,   m_drawMode(DrawMode::Interacting)
+    ,   m_selectable(true)
 {}
 
 bool DiwneObject::allowDrawing(){return true;}
 bool DiwneObject::drawDiwne(DrawMode drawMode/*=DrawMode::Interacting*/)
 {
+    m_inner_interaction_happen_previous_draw = m_inner_interaction_happen;
     m_inner_interaction_happen = false;
     m_drawMode = drawMode;
     m_inner_interaction_happen |= initializeDiwne();
@@ -101,27 +103,31 @@ bool DiwneObject::processInteractionsDiwne()
 
     if (m_drawMode == Interacting && !m_inner_interaction_happen)
     {
-        interaction_happen |= processObjectFocused();
-        interaction_happen |= processObjectFocusedForInteraction();
-
-        if (m_focused) /* diwne.m_objectFocused is checked in allowFocusedForInteraction() too */
+        if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
         {
-            diwne.m_objectFocused = true;
-            if ( diwne.getDiwneActionActive() == None || diwne.getDiwneActionActive() == FocusOnObject) diwne.setDiwneAction(FocusOnObject);
-        }
+            interaction_happen |= processObjectFocused();
+            interaction_happen |= processObjectFocusedForInteraction();
 
-        if (allowInteraction())
-        {
-            interaction_happen |= processRaisePopupDiwne();
-            interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();
-            interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
-            if (m_isHeld){interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */ diwne.setDiwneAction(getHoldActionType());}
-            interaction_happen |= processObjectDrag();
-            interaction_happen |= processInteractions();
-        }
+            if (m_focused) /* diwne.m_objectFocused is checked in allowFocusedForInteraction() too */
+            {
+                diwne.m_objectFocused = true;
+                if ( diwne.getDiwneActionActive() == None || diwne.getDiwneActionActive() == FocusOnObject) diwne.setDiwneAction(FocusOnObject);
+            }
 
+            if (allowInteraction())
+            {
+                interaction_happen |= processRaisePopupDiwne();
+                if (m_selectable) {interaction_happen |= m_selected ? processObjectUnselect() : processObjectSelect();}
+                interaction_happen |= m_isHeld ? processObjectUnhold() : processObjectHold();
+                if (m_isHeld){interaction_happen |= m_isHeld; /* holding (not only change in hold state) is interaction */ diwne.setDiwneAction(getHoldActionType());}
+                interaction_happen |= processObjectDrag();
+                interaction_happen |= processInteractions();
+            }
+
+        }
         interaction_happen |= processInteractionsAlways();
     }
+    if(m_inner_interaction_happen && !diwne.getDiwneActionActive() == DIWNE::DiwneAction::NewLink){diwne.m_objectFocused=true;} /* any inner interaction (imgui too) block other DiwneObject to focus */
 #ifdef DIWNE_DEBUG
 DIWNE_DEBUG((diwne), {
     if (m_isActive) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255,0,255,255), 0, ImDrawCornerFlags_None, 5);};
@@ -208,6 +214,7 @@ bool DiwneObject::processObjectUnhold()
     if (bypassUnholdAction() && allowProcessUnhold())
     {
         m_isHeld = false;
+        if (m_isDraged){diwne.m_takeSnap = true;}
         m_isDraged = false;
         return processUnhold();
     }
@@ -233,7 +240,8 @@ bool DiwneObject::processObjectSelect()
 {
     if (bypassSelectAction() && allowProcessSelect())
     {
-        m_selected = true;
+        setSelected(true);
+        diwne.m_takeSnap = true;
         return processSelect();
     }
     return false;
@@ -245,7 +253,8 @@ bool DiwneObject::processObjectUnselect()
 {
     if (bypassUnselectAction() && allowProcessUnselect())
     {
-        m_selected = false;
+        setSelected(false);
+        diwne.m_takeSnap = true;
         return processUnselect();
     }
     return false;

@@ -17,10 +17,10 @@ public:
   WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(), bool drawPins=true);
 	bool isCycle();
 
-    bool buttonStepNext(ImVec2 const &  button_sz);
-    bool buttonStepBack(ImVec2 const &  button_sz);
-    bool buttonStopAndReset(ImVec2 const &  button_sz);
-    bool buttonPlayPause(ImVec2 const &  button_sz);
+    bool buttonStepNext();
+    bool buttonStepBack();
+    bool buttonStopAndReset();
+    bool buttonPlayPause();
 
   bool middleContent();
   bool leftContent();

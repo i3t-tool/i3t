@@ -122,4 +122,13 @@ bool drawDataSetValues()
     return inner_interaction_happen;
 }
 
+void drawMenuSetDataMap() {WorkspaceTransformation::drawMenuSetDataMap();} /* thus we can specify it for ETransformType::Free  */
+
 };
+
+template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
+void WorkspaceTransformation_s<ETransformType::Free>::drawMenuSetDataMap()
+{
+    ImGui::MenuItem("Lock", NULL, false, false); /* no change DataMap in Free transformation */
+    ImGui::MenuItem("Enable synergies", NULL, false, false);
+}
