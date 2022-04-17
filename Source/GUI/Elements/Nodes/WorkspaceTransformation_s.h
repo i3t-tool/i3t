@@ -50,76 +50,80 @@ bool drawDataSetValues()
     bool inner_interaction_happen = false, value_changed = false;
     auto nodebase = m_nodebase->as<Core::TransformImpl<T>>();
 
-    m_nodebase->as<Core::Transformation>()->enableSynergies();
+    //  m_nodebase->as<Core::Transformation>()->enableSynergies(); // ??? JH should be here ?
 
-    for (auto& [key, valueStore] : nodebase->getDefaultValues())
+    if (ImGui::BeginTable(fmt::format("##LoD{}",getIdDiwne()).c_str(), 2 /* label, value */, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ))
     {
-        switch (valueStore.opValueType)
+        for (auto& [key, valueStore] : nodebase->getDefaultValues())
         {
-            case EValueType::Vec3:
+            switch (valueStore.opValueType)
             {
-                auto localData = valueStore.getVec3();
-
-                inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()) } /* \todo MH all/whole labels from core? */
-                                                            ,   {&localData[0], &localData[1], &localData[2]}
-                                                            ,   value_changed);
-                if (value_changed)
+                case EValueType::Vec3:
                 {
-                    nodebase->setDefaultValue(key, localData);
-                    setDataItemsWidth();
-                }
-            break;
-            }
-            case EValueType::Vec4:
-            {
-                auto localData = valueStore.getVec4();
+                    auto localData = valueStore.getVec3();
 
-                inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()), fmt::format("{} W",key.c_str()) } /* \todo MH all/whole labels from core? */
-                                                            ,   {&localData[0], &localData[1], &localData[2], &localData[3]}
-                                                            ,   value_changed);
-                if (value_changed)
-                {
-                    nodebase->setDefaultValue(key, localData);
-                    setDataItemsWidth();
+                    inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()) } /* \todo MH all/whole labels from core? */
+                                                                ,   {&localData[0], &localData[1], &localData[2]}
+                                                                ,   value_changed);
+                    if (value_changed)
+                    {
+                        nodebase->setDefaultValue(key, localData);
+                        setDataItemsWidth();
+                    }
+                break;
                 }
-            break;
-            }
-            case EValueType::Quat:
-            {
-                auto localData = valueStore.getQuat();
+                case EValueType::Vec4:
+                {
+                    auto localData = valueStore.getVec4();
 
-                inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()), fmt::format("{} W",key.c_str()) } /* \todo MH all/whole labels from core? */
-                                                            ,   {&localData[0], &localData[1], &localData[2], &localData[3]}
-                                                            ,   value_changed);
-                if (value_changed)
-                {
-                    nodebase->setDefaultValue(key, localData);
-                    setDataItemsWidth();
+                    inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()), fmt::format("{} W",key.c_str()) } /* \todo MH all/whole labels from core? */
+                                                                ,   {&localData[0], &localData[1], &localData[2], &localData[3]}
+                                                                ,   value_changed);
+                    if (value_changed)
+                    {
+                        nodebase->setDefaultValue(key, localData);
+                        setDataItemsWidth();
+                    }
+                break;
                 }
-            break;
-            }
-            case EValueType::Matrix:
-            {
-                inner_interaction_happen |= drawDataFull();
-            break;
-            }
-            case EValueType::Float:
-            {
-                auto localData = valueStore.getFloat();
+                case EValueType::Quat:
+                {
+                    auto localData = valueStore.getQuat();
 
-                inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{}",key.c_str()) }
-                                                            ,   {&localData}
-                                                            ,   value_changed);
-                if (value_changed)
-                {
-                    nodebase->setDefaultValue(key, localData);
-                    setDataItemsWidth();
+                    inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()), fmt::format("{} W",key.c_str()) } /* \todo MH all/whole labels from core? */
+                                                                ,   {&localData[0], &localData[1], &localData[2], &localData[3]}
+                                                                ,   value_changed);
+                    if (value_changed)
+                    {
+                        nodebase->setDefaultValue(key, localData);
+                        setDataItemsWidth();
+                    }
+                break;
                 }
-            break;
+                case EValueType::Matrix:
+                {
+                    inner_interaction_happen |= drawDataFull();
+                break;
+                }
+                case EValueType::Float:
+                {
+                    auto localData = valueStore.getFloat();
+
+                    inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{}",key.c_str()) }
+                                                                ,   {&localData}
+                                                                ,   value_changed);
+                    if (value_changed)
+                    {
+                        nodebase->setDefaultValue(key, localData);
+                        setDataItemsWidth();
+                    }
+                break;
+                }
+                default:
+                    inner_interaction_happen |= drawDataFull();
             }
-            default:
-                inner_interaction_happen |= drawDataFull();
         }
+    ImGui::EndTable();
     }
     return inner_interaction_happen;
 }
@@ -152,42 +156,46 @@ bool WorkspaceTransformation_s<ETransformType::Scale>::drawDataSetValues()
 {
     bool inner_interaction_happen = false, value_changed = false;
     auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
-    for (auto& [key, valueStore] : nodebase->getDefaultValues())
+    if (ImGui::BeginTable(fmt::format("##LoD{}",getIdDiwne()).c_str(), 2 /* label, value */, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ))
     {
-        switch (valueStore.opValueType)
+        for (auto& [key, valueStore] : nodebase->getDefaultValues())
         {
-            case EValueType::Vec3:
+            switch (valueStore.opValueType)
             {
-                auto localData = valueStore.getVec3();
+                case EValueType::Vec3:
+                {
+                    auto localData = valueStore.getVec3();
 
-                if (m_nodebase->as<Core::Transformation>()->hasSynergies()) /* uniform */
-                {
-                    inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{}",key.c_str())} /* \todo MH all/whole labels from core? */
-                                                                ,   {&localData[0]}
-                                                                ,   value_changed);
-                    if (value_changed)
+                    if (m_nodebase->as<Core::Transformation>()->hasSynergies()) /* uniform */
                     {
-                        localData[1] = localData[2] = localData[0]; /* \todo JH MH do this in core -> something like setUniformScale */
-                        nodebase->setDefaultValue(key, localData);
-                        setDataItemsWidth();
+                        inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{}",key.c_str())} /* \todo MH all/whole labels from core? */
+                                                                    ,   {&localData[0]}
+                                                                    ,   value_changed);
+                        if (value_changed)
+                        {
+                            localData[1] = localData[2] = localData[0]; /* \todo JH MH do this in core -> something like setUniformScale */
+                            nodebase->setDefaultValue(key, localData);
+                            setDataItemsWidth();
+                        }
                     }
-                }
-                else /* non-uniform */
-                {
-                    inner_interaction_happen |= drawDataSetValues_builder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()) } /* \todo MH all/whole labels from core? */
-                                                                ,   {&localData[0], &localData[1], &localData[2]}
-                                                                ,   value_changed);
-                    if (value_changed)
+                    else /* non-uniform */
                     {
-                        nodebase->setDefaultValue(key, localData);
-                        setDataItemsWidth();
+                        inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{} X",key.c_str()), fmt::format("{} Y",key.c_str()), fmt::format("{} Z",key.c_str()) } /* \todo MH all/whole labels from core? */
+                                                                    ,   {&localData[0], &localData[1], &localData[2]}
+                                                                    ,   value_changed);
+                        if (value_changed)
+                        {
+                            nodebase->setDefaultValue(key, localData);
+                            setDataItemsWidth();
+                        }
                     }
+                break;
                 }
-            break;
+                default:
+                    I3T_ASSERT(false && "Unknow data type in Scale Transform");
             }
-            default:
-                I3T_ASSERT(false && "Unknow data type in Scale Transform");
         }
+        ImGui::EndTable();
     }
     return inner_interaction_happen;
 }

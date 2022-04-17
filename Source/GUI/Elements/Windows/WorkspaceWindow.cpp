@@ -938,7 +938,10 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
             Ptr<WorkspaceTransformation> selected_transformation = std::dynamic_pointer_cast<WorkspaceTransformation>(selected_nodes[0]);
             if (selected_transformation != nullptr){ Application::get().world()->manipulatorsSetMatrix(selected_transformation, nullptr); } /* \todo JH why not pass sequence of transformation? */
         }
-
+        else
+        {
+            Application::get().world()->manipulatorsSetMatrix(nullptr, nullptr);
+        }
 	}
 }
 
