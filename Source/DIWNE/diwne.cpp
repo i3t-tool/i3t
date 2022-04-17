@@ -135,6 +135,12 @@ bool Diwne::afterEndDiwne()
     return DiwneObject::afterEndDiwne();
 }
 
+bool Diwne::allowProcessFocused(){return m_isActive /* object is active from previous frame */
+                                                || (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch)
+                                                || (!diwne.m_objectFocused /* only one object can be focused */
+                                                    && (diwne.getDiwneAction() == None || diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */ ))
+                                        ;}
+
 bool Diwne::processInteractions()
 {
     return processDiwneSelectionRectangle();

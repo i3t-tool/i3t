@@ -337,6 +337,7 @@ class Diwne : public DiwneObject
         virtual bool bypassZoomAction();
         virtual bool processZoom();
         virtual bool processDiwneZoom();
+        virtual bool allowProcessFocused();
 
         virtual bool allowProcessSelectionRectangle();
         virtual bool bypassSelectionRectangleAction();

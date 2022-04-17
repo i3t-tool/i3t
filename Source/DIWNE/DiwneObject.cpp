@@ -28,6 +28,7 @@ DiwneObject::DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const la
 bool DiwneObject::allowDrawing(){return true;}
 bool DiwneObject::drawDiwne(DrawMode drawMode/*=DrawMode::Interacting*/)
 {
+    bool other_object_focused = diwne.m_objectFocused;
     m_inner_interaction_happen_previous_draw = m_inner_interaction_happen;
     m_inner_interaction_happen = false;
     m_drawMode = drawMode;
@@ -65,7 +66,7 @@ DIWNE_DEBUG((diwne), {
     }
     m_inner_interaction_happen |= finalizeDiwne();
 
-    m_isActive = m_inner_interaction_happen;
+    m_isActive = other_object_focused ? false : m_inner_interaction_happen;
     return m_inner_interaction_happen;
 }
 
@@ -127,7 +128,7 @@ bool DiwneObject::processInteractionsDiwne()
         }
         interaction_happen |= processInteractionsAlways();
     }
-    if(m_inner_interaction_happen && !diwne.getDiwneActionActive() == DIWNE::DiwneAction::NewLink){diwne.m_objectFocused=true;} /* any inner interaction (imgui too) block other DiwneObject to focus */
+    if(m_inner_interaction_happen && diwne.getDiwneActionActive() != DIWNE::DiwneAction::NewLink){diwne.m_objectFocused=true;} /* any inner interaction (imgui too) block other DiwneObject to focus */
 #ifdef DIWNE_DEBUG
 DIWNE_DEBUG((diwne), {
     if (m_isActive) {diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, ImColor(255,0,255,255), 0, ImDrawCornerFlags_None, 5);};

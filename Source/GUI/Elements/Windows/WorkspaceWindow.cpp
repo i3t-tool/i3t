@@ -22,6 +22,7 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     :   Diwne(settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
+    ,   m_resizeDataWidth(false)
 
 {
 }
@@ -143,6 +144,11 @@ void WorkspaceDiwne::popupContent()
 			{
 			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
 			}
+            if (ImGui::MenuItem("non-uniform scale"))
+            {
+                addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
+                m_workspaceCoreNodes.back()->getNodebase()->as<Core::Transformation>()->disableSynergies();
+            }
 			if (ImGui::MenuItem("lookAt"))
 			{
 			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::LookAt>>();
@@ -645,6 +651,14 @@ bool WorkspaceDiwne::beforeBegin()
     m_workspaceDiwneAction = WorkspaceDiwneAction::None;
     m_linksToDraw.clear();
     m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
+    if(m_resizeDataWidth)
+    {
+        m_resizeDataWidth = false;
+        for(auto node : getAllNodesInnerIncluded())
+        {
+            node->setDataItemsWidth();
+        }
+    }
 
     return false;
 }
@@ -939,6 +953,11 @@ bool WorkspaceDiwne::bypassSelectionRectangleAction() {return InputManager::isAx
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos0());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta0()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 
+bool WorkspaceDiwne::processZoom()
+{
+    m_resizeDataWidth = true;
+    return Diwne::processZoom();
+}
 
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */

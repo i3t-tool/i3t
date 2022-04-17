@@ -61,7 +61,7 @@ void WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 	setDataItemsWidth();
 }
 
-float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth * diwne.getWorkAreaZoom(); }
+float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth; }
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {

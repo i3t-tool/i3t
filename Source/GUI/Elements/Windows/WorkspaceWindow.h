@@ -141,9 +141,13 @@ public:
 	bool bypassHoldAction();
     bool bypassUnholdAction();
 
+    bool processZoom() override;
+
     bool bypassSelectionRectangleAction() override;
     ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
     ImVec2 bypassDiwneGetSelectionRectangleSize() override;
+
+    bool m_resizeDataWidth;
 };
 
 /*! \class class for Workspace window object
