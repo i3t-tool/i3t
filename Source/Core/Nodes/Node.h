@@ -211,6 +211,7 @@ protected:
 	 * Overridden in Sequence class.
 	 */
 public:
+	/// \todo Make this function non public.
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
 		assert(index < m_internalData.size() && "Desired data storage does not exist!");
@@ -278,10 +279,16 @@ public:
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
-private:
-	/// Sets value of index 0
 	template <typename T>
-	ValueSetResult setValueEx(T&& val)
+	[[nodiscard]] ValueSetResult setValue(unsigned index, T&& value)
+	{
+		return setValueEx(std::forward(value), index);
+	}
+
+private:
+	/// Sets value of pin at \p index position.
+	template <typename T>
+	ValueSetResult setValueEx(T&& val, unsigned index = 0)
 	{
 		if (getIn(0).isPluggedIn())
 			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Cannot directly set value, input pin is connected."};
