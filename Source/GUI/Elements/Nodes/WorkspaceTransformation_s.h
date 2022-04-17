@@ -201,6 +201,18 @@ bool WorkspaceTransformation_s<ETransformType::Scale>::drawDataSetValues()
 }
 
 template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
+void WorkspaceTransformation_s<ETransformType::LookAt>::drawMenuSetDataMap()
+{
+    if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
+    else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
+
+    /* \todo JH after hasSynergies in core could be aggregated with other drawMenuSetDataMap() functions */
+    if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies", NULL, false, false)){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
+    else                                                      { if(ImGui::MenuItem("Enable synergies", NULL, false, false)){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
+
+}
+
+template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
 bool WorkspaceTransformation_s<ETransformType::LookAt>::drawDataSetValues()
 {
     bool inner_interaction_happen = false, value_changed = false;

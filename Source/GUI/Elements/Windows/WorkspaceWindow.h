@@ -79,6 +79,7 @@ public:
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
 	std::vector<WorkspaceCoreLink*> m_linksToDraw;
+	std::vector<WorkspaceCoreLink> m_linksCameraToSequence;
 
 	bool processCreateAndPlugTypeConstructor();
 
@@ -136,6 +137,9 @@ public:
     std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodesInnerIncluded();
     std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllNodesInnerIncluded();
 
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllCameras();
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllInputFreeSequence();
+
 	bool bypassZoomAction();
 	bool bypassDragAction();
 	bool bypassHoldAction();
@@ -148,6 +152,7 @@ public:
     ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 
     bool m_resizeDataWidth;
+    bool m_reconnectCameraToSequence;
 };
 
 /*! \class class for Workspace window object

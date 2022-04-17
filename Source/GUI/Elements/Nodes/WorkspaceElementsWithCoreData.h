@@ -159,6 +159,7 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
 
         void unplug();
         void plug(WorkspaceCoreOutputPin* ou);
+        bool m_connection_changed;
 
         bool drawDiwne(DIWNE::DrawMode=DIWNE::DrawMode::Interacting);
 
