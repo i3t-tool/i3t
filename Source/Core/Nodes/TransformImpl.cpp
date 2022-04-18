@@ -205,10 +205,10 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// -sin(T)
 			mat[2][1] = -val;
-			halphspaceSign.sin = glm::sign(val);
+			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (halphspaceSign.cos < 0.0f)
+			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
 			mat[2][2] = cos;
@@ -218,10 +218,10 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 			// cos(T)
 			mat[1][1] = val;
 			mat[2][2] = val;
-			halphspaceSign.cos = glm::sign(val);
+			halfspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
-			if (halphspaceSign.sin < 0.0f)
+			if (halfspaceSign.sin < 0.0f)
 				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[1][2] = sin;
 			mat[2][1] = -sin;
@@ -230,10 +230,10 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[1][2] = -val;
-			halphspaceSign.sin = glm::sign(-val);
+			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (halphspaceSign.cos < 0.0f)
+			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
 			mat[2][2] = cos;
@@ -335,10 +335,10 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		{
 			// -sin(T)
 			mat[2][0] = -val;
-			halphspaceSign.sin = glm::sign(-val);
+			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (halphspaceSign.cos < 0.0f)
+			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[2][2] = cos;
@@ -348,10 +348,10 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 			// cos(T)
 			mat[0][0] = val;
 			mat[2][2] = val;
-			halphspaceSign.cos = glm::sign(val);
+			halfspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
-			if (halphspaceSign.sin < 0.0f)
+			if (halfspaceSign.sin < 0.0f)
 				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][2] = -sin;
 			mat[2][0] = sin;
@@ -360,10 +360,10 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[0][2] = -val;
-			halphspaceSign.sin = glm::sign(val);
+			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (halphspaceSign.cos < 0.0f)
+			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[2][2] = cos;
@@ -438,10 +438,10 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		{
 			// -sin(T)
 			mat[1][0]					 = -val;
-			halphspaceSign.sin = glm::sign(val);
+			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (halphspaceSign.cos < 0.0f)
+			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;
@@ -451,10 +451,10 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 			// cos(T)
 			mat[0][0]					 = val;
 			mat[1][1]					 = val;
-			halphspaceSign.cos = glm::sign(val);
+			halfspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
-			if (halphspaceSign.sin < 0.0f)
+			if (halfspaceSign.sin < 0.0f)
 				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][1] = sin;
 			mat[1][0] = -sin;
@@ -463,10 +463,10 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[0][1]					 = -val;
-			halphspaceSign.sin = glm::sign(-val);
+			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (halphspaceSign.cos < 0.0f)
+			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;

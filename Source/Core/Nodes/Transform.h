@@ -159,7 +159,7 @@ public:
 	{
 		float cos;
 		float sin;
-	} halphspaceSign;   // remember the quadrant for eulerRotations
+	} halfspaceSign;   // remember the quadrant for eulerRotations
 	//===----------------------------------------------------------------------===//
 
 
