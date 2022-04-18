@@ -4,7 +4,7 @@
 
 namespace Core
 {
-#define I3T_TRANSFORM_CLONE(T)                                                                                      \
+#define I3T_TRANSFORM_CLONE(T)                                                                                         \
 	Ptr<Node> clone() override                                                                                           \
 	{                                                                                                                    \
 		auto node = Builder::createTransform<T>();                                                                         \

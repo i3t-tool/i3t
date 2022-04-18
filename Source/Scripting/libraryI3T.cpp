@@ -365,27 +365,30 @@ void scalar(struct ParseState* parser, struct Value* returnValue, struct Value**
     if (numArgs == 4) {
         x = param[1]->Val->Integer;
         y = param[2]->Val->Integer;
-        if (param[3]->Val->Pointer != nullptr) { l = (char*)param[3]->Val->Pointer; }
+        if (param[3]->Val->Pointer != nullptr)
+				{
+					l = (char*)param[3]->Val->Pointer;
+				}
     }
 
-    float datavalid=false;
+    float datavalid = false;
     glm::mat4 mat = glm::mat4(1.0f);
     if (dataindex > -1 && dataindex < scriptingData.nodeData.size()) { mat = scriptingData.nodeData[dataindex];datavalid=true; }
 
     std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace = &(I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes);
-/* \todo JH repaire
-    workspace->push_back(std::make_unique<WorkspaceFloatFree>((ImTextureID)0, l));
-    if (datavalid){ValueSetResult result = (workspace->back().get())->getNodebase().get()->setValue(mat[0][0]);}
+		auto node = addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>({ (float) x, (float) y });
 
-    ne::SetNodePosition(workspace->back()->getId(), ImVec2((float)x, (float)y));
+		if (datavalid) {
+			ValueSetResult result = node->getNodebase()->setValue(mat[0][0]);
+		}
+
     if (numArgs == 1) {
-        ne::CenterNodeOnScreen(workspace->back()->getId());
         char label[100] = { 0 };
-        sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(), workspace->back()->getNodebase()->getOperation()->keyWord.c_str());
-        workspace->back()->getHeaderLabel() = label;
+        sprintf(label, "#%02u %s", node->getNodebase()->getId(), node->getNodebase()->getOperation()->keyWord.c_str());
+				node->setTopLabel(label);
     }
-*/
-    returnValue->Val->Integer = workspace->back()->getNodebase()->getId();
+
+    returnValue->Val->Integer = node->getNodebase()->getId();
 }
 void scalaroper(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) {
     int type = param[0]->Val->Integer;

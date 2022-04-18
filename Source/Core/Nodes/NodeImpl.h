@@ -27,7 +27,7 @@ namespace Builder
 	template <ENodeType T>
 	Ptr<NodeBase> createNode()
 	{
-		auto ret = std::make_shared<NodeImpl<T>>();
+		auto ret = std::make_shared<::Core::NodeImpl<T>>();
 		ret->init();
 
 		ret->updateValues(0);

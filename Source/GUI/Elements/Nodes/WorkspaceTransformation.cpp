@@ -104,7 +104,7 @@ bool WorkspaceTransformation::afterContent()
             start.x += m_inactiveMark*size.x;
         }
 
-        ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0,0,0,0.5) );
+        ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0.f, 0.f, 0.f, 0.5f) );
     }
     return false;
 }
@@ -121,9 +121,12 @@ void WorkspaceTransformation::drawMenuStorevalues()
 {
     if(ImGui::BeginMenu("Value"))
     {
-        if(ImGui::MenuItem("Reset - nenašel jsem fci k zavolání")) { }
+        if(ImGui::MenuItem("Reset")) { m_nodebase->as<Core::Transformation>()->reset(); }
         if(ImGui::MenuItem("Store")) { m_nodebase->as<Core::Transformation>()->saveValue();}
-        if(ImGui::MenuItem("Restore")) { m_nodebase->as<Core::Transformation>()->reloadValue();}
+        if (ImGui::MenuItem("Restore", nullptr, false, m_nodebase->as<Core::Transformation>()->hasSavedValue()))
+				{
+					m_nodebase->as<Core::Transformation>()->reloadValue();
+				}
 
         ImGui::EndMenu();
     }
