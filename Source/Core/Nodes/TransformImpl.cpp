@@ -251,20 +251,31 @@ ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 	auto& mat   = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateYMask, mat);
 
-  // PF This may be a redundant check }checked below as a whole matrix)
+  // PF This may be a redundant check (checked below as a whole matrix)
   result = result && 
 	    glm::epsilonEqual(mat[0][0], mat[2][2], glm::epsilon<float>()) && // cos = cos,
 		  glm::epsilonEqual(mat[2][0],-mat[0][2], glm::epsilon<float>());   // sin = - (-sin)
 
   // PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
 #if 0
+  // Variant 1 - manually
 	float angle        = std::acos(mat[0][0]); 
 	float signAngleSin = glm::sign(std::asin(mat[2][0]));
 
 	if (signAngleSin < 0)
 		angle += M_PI;
 #else
-	float angle = glm::orientedAngle(glm::vec2(1.0f, 0.0f), glm::vec2(mat[0][0], mat[2][0]));
+  // Variant 2 - using glm in 2D
+  // more simple check as angle between two vectors
+	float angle = glm::orientedAngle(glm::vec2(1.0f, 0.0f), glm::vec2(mat[0][0], mat[2][0]));  // simpler 2D encoding from axis X to Z
+
+  // Variant 3 - using glm in 3D - would work for rotation around vector also 
+	// float angle = glm::orientedAngle(
+	// glm::vec3(1.0f, 0.0f, 0.0f),						  // from x axis
+	// glm::vec3(mat[0][0], 0.0f, -mat[2][0]),		// to rotated vector around Y: (cos, 0, -sin)
+	// glm::vec3(0.0f, 1.0f, 0.0f));				  // axis from X to -Z
+	//
+  // For rotation around X and Z, there will be no minus sign by mat[2][0].
 #endif
 
 	auto expectedMat = glm::eulerAngleY(angle);
