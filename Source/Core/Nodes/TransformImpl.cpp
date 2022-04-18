@@ -1,6 +1,15 @@
 #include "TransformImpl.h"
 
+#include <math.h>
+
+//#include "pgr.h"
 #include "Utils/Format.h"
+#include<glm/gtx/vector_angle.hpp>
+
+#ifndef M_PI
+/// define Pi for compatibility issues (MSVC vs GCC)
+#define M_PI 3.14159f
+#endif
 
 namespace Core
 {
@@ -242,7 +251,22 @@ ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 	auto& mat   = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateYMask, mat);
 
-	float angle = std::asin(mat[2][0]);
+  // PF This may be a redundant check }checked below as a whole matrix)
+  result = result && 
+	    glm::epsilonEqual(mat[0][0], mat[2][2], glm::epsilon<float>()) && // cos = cos,
+		  glm::epsilonEqual(mat[2][0],-mat[0][2], glm::epsilon<float>());   // sin = - (-sin)
+
+  // PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
+#if 0
+	float angle        = std::acos(mat[0][0]); 
+	float signAngleSin = glm::sign(std::asin(mat[2][0]));
+
+	if (signAngleSin < 0)
+		angle += M_PI;
+#else
+	float angle = glm::orientedAngle(glm::vec2(1.0f, 0.0f), glm::vec2(mat[0][0], mat[2][0]));
+#endif
+
 	auto expectedMat = glm::eulerAngleY(angle);
 
 	result = result && Math::eq(expectedMat, mat);
