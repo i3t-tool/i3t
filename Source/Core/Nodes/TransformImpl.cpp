@@ -411,6 +411,11 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 
 	auto mat = getData().getMat4();
 
+  // PF: better would be to remember the half-space also on the border. Value zero flips sign and interaction changes its direction.
+  // It would need an instance variable for each box
+  const float signSin = glm::sign(mat[0][1]); // to allow negative sin values while changing cos
+	const float signCos = glm::sign(mat[0][0]); // to allow negative cos values while changing sin
+
 	mat[coords.x][coords.y] = val;
 	if (hasSynergies())
 	{
@@ -420,6 +425,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 			mat[1][0] = -val;
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (signCos < 0.0f) cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation 
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
@@ -428,8 +434,9 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 			// cos(T)
 			mat[0][0] = val;
 			mat[1][1] = val;
-
+	  
 			auto sin = sqrt(1.0f - (val * val));
+			if (signSin < 0.0f) sin *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation 
 			mat[0][1] = sin;
 			mat[1][0] = -sin;
 		}
@@ -439,6 +446,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 			mat[0][1] = -val;
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (signCos < 0.0f) cos *= -1.0f;  // allow negative cos values while changing sin - avoid jump in rotation 
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
