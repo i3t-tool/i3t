@@ -154,6 +154,15 @@ public:
 	ValueSetResult setValue(const glm::mat4& mat) override;
 	ValueSetResult setValue(float, glm::ivec2) override { return ValueSetResult{}; }
 
+	//===----------------------------------------------------------------------===//
+	struct
+	{
+		float cos;
+		float sin;
+	} halphspaceSign;   // remember the quadrant for eulerRotations
+	//===----------------------------------------------------------------------===//
+
+
 protected:
 	using ValueMap = std::map<std::string, std::string>;
 

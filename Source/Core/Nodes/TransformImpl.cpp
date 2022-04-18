@@ -205,8 +205,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// -sin(T)
 			mat[2][1] = -val;
+			halphspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halphspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
 			mat[2][2] = cos;
 		}
@@ -215,8 +218,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 			// cos(T)
 			mat[1][1] = val;
 			mat[2][2] = val;
+			halphspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
+			if (halphspaceSign.sin < 0.0f)
+				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[1][2] = sin;
 			mat[2][1] = -sin;
 		}
@@ -224,8 +230,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[1][2] = -val;
+			halphspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halphspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
 			mat[2][2] = cos;
 		}
@@ -311,23 +320,26 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (!Math::withinInterval(val, -1.0f, 1.0f))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-													"Value must be within [-1.0, 1.0] interval."};
-	}
-
 	auto mat = getData().getMat4();
-
 	mat[coords.x][coords.y] = val;
+
 	if (hasSynergies())
 	{
+		if (!Math::withinInterval(val, -1.0f, 1.0f))
+		{
+			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+														"Value must be within [-1.0, 1.0] interval."};
+		}
+
 		if (coords == glm::ivec2(0, 2))
 		{
 			// -sin(T)
 			mat[2][0] = -val;
+			halphspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halphspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[2][2] = cos;
 		}
@@ -336,8 +348,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 			// cos(T)
 			mat[0][0] = val;
 			mat[2][2] = val;
+			halphspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
+			if (halphspaceSign.sin < 0.0f)
+				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][2] = -sin;
 			mat[2][0] = sin;
 		}
@@ -345,8 +360,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[0][2] = -val;
+			halphspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halphspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[2][2] = cos;
 		}
@@ -403,50 +421,53 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (!Math::withinInterval(val, -1.0f, 1.0f))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-													"Value must be within [-1.0, 1.0] interval."};
-	}
-
+  // PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
+  
 	auto mat = getData().getMat4();
-
-  // PF: better would be to remember the half-space also on the border. Value zero flips sign and interaction changes its direction.
-  // It would need an instance variable for each box
-  const float signSin = glm::sign(mat[0][1]); // to allow negative sin values while changing cos
-	const float signCos = glm::sign(mat[0][0]); // to allow negative cos values while changing sin
-
 	mat[coords.x][coords.y] = val;
+
 	if (hasSynergies())
 	{
+		if (!Math::withinInterval(val, -1.0f, 1.0f))
+		{
+			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+														"Value must be within [-1.0, 1.0] interval."};
+		}
+
 		if (coords == glm::ivec2(0, 1))
 		{
 			// -sin(T)
-			mat[1][0] = -val;
+			mat[1][0]					 = -val;
+			halphspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (signCos < 0.0f) cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation 
+			if (halphspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
 		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
 		{
 			// cos(T)
-			mat[0][0] = val;
-			mat[1][1] = val;
-	  
+			mat[0][0]					 = val;
+			mat[1][1]					 = val;
+			halphspaceSign.cos = glm::sign(val);
+
 			auto sin = sqrt(1.0f - (val * val));
-			if (signSin < 0.0f) sin *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation 
+			if (halphspaceSign.sin < 0.0f)
+				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][1] = sin;
 			mat[1][0] = -sin;
 		}
 		else if (coords == glm::ivec2(1, 0))
 		{
 			// sin(T)
-			mat[0][1] = -val;
+			mat[0][1]					 = -val;
+			halphspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
-			if (signCos < 0.0f) cos *= -1.0f;  // allow negative cos values while changing sin - avoid jump in rotation 
+			if (halphspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
