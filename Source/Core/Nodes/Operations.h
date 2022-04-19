@@ -466,7 +466,7 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::EulerY), "eulerAngleY"},
-				0b101000001010000,
+				0b1010000010100000,
 				{{"rotation", EValueType::Float}}
 		},
 		{
