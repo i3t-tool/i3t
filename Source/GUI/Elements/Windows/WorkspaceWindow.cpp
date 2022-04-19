@@ -22,6 +22,7 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     :   Diwne(settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
+    ,   m_resizeDataWidth(false)
 
 {
 }
@@ -143,6 +144,11 @@ void WorkspaceDiwne::popupContent()
 			{
 			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
 			}
+//            if (ImGui::MenuItem("non-uniform scale"))
+//            {
+//                addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
+//                m_workspaceCoreNodes.back()->getNodebase()->as<Core::Transformation>()->disableSynergies();
+//            }
 			if (ImGui::MenuItem("lookAt"))
 			{
 			    addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::LookAt>>();
@@ -645,6 +651,15 @@ bool WorkspaceDiwne::beforeBegin()
     m_workspaceDiwneAction = WorkspaceDiwneAction::None;
     m_linksToDraw.clear();
     m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
+    m_reconnectCameraToSequence = false;
+    if(m_resizeDataWidth)
+    {
+        m_resizeDataWidth = false;
+        for(auto node : getAllNodesInnerIncluded())
+        {
+            node->setDataItemsWidth();
+        }
+    }
 
     return false;
 }
@@ -698,6 +713,9 @@ bool WorkspaceDiwne::content()
             StateManager::instance().takeSnapshot();
         }
 
+
+
+
         /* draw links on top */
         m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes);
         for (auto link : m_linksToDraw)
@@ -705,11 +723,53 @@ bool WorkspaceDiwne::content()
             interaction_happen |= link->drawDiwne();
         }
 
+        /* Cameras To Sequences links */
+        std::vector<Ptr<WorkspaceNodeWithCoreData>> all_cameras = getAllCameras();
+        if(all_cameras.size() > 0)
+        {
+            std::vector<Ptr<WorkspaceNodeWithCoreData>> all_inputFree_Sequence = getAllInputFreeSequence();
+            if(all_inputFree_Sequence.size() > 0)
+            {
+                Ptr<DIWNE::Link> link = std::make_shared<DIWNE::Link>(diwne, INT_MAX, "TemporalLink");
+                for(auto const& camera : all_cameras)
+                {
+                    Ptr<WorkspaceNodeWithCoreDataWithPins> cameraWithPins = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(camera);
+                    for(auto const& sequence : all_inputFree_Sequence)
+                    {
+                        link->setLinkEndpointsDiwne(cameraWithPins->getOutputs()[0]->getLinkConnectionPointDiwne(), /* \todo JH Always 0? */
+                                                   std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(sequence)->getInputs()[0]->getLinkConnectionPointDiwne());
+                        link->drawDiwne(DIWNE::DrawMode::JustDraw);
+                    }
+                }
+            }
+        }
+
         m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 
     }
 
     return interaction_happen;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllCameras()
+{
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> cameras;
+    for (auto const& node : m_workspaceCoreNodes)
+    {
+        if (std::dynamic_pointer_cast<WorkspaceCamera>(node)){cameras.push_back(node);};
+    }
+    return cameras;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllInputFreeSequence()
+{
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> sequences;
+    for (auto const& node : m_workspaceCoreNodes)
+    {
+        Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
+        if (seq && !seq->getInputs()[0]->isConnected()){sequences.push_back(node);}; /* \todo JH Always 0? */
+    }
+    return sequences;
 }
 
 
@@ -924,7 +984,10 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
             Ptr<WorkspaceTransformation> selected_transformation = std::dynamic_pointer_cast<WorkspaceTransformation>(selected_nodes[0]);
             if (selected_transformation != nullptr){ Application::get().world()->manipulatorsSetMatrix(selected_transformation, nullptr); } /* \todo JH why not pass sequence of transformation? */
         }
-
+        else
+        {
+            Application::get().world()->manipulatorsSetMatrix(nullptr, nullptr);
+        }
 	}
 }
 
@@ -939,6 +1002,11 @@ bool WorkspaceDiwne::bypassSelectionRectangleAction() {return InputManager::isAx
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleStartPosition() {return screen2diwne(bypassMouseClickedPos0());} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize() {return bypassGetMouseDragDelta0()/getWorkAreaZoom();} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
 
+bool WorkspaceDiwne::processZoom()
+{
+    m_resizeDataWidth = true;
+    return Diwne::processZoom();
+}
 
 /* ========================================== */
 /* ===== W o r k s p a c e  W i n d o w ===== */

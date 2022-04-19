@@ -103,6 +103,15 @@ bool WorkspaceSequence::beforeContent()
     return false;
 }
 
+bool WorkspaceSequence::afterContent()
+{
+//    for (WorkspaceCoreInputPin & inputPin : getInputs())
+//    {
+//        if (inputPin.m_connection_changed){dynamic_cast<WorkspaceDiwne&>(diwne).m_reconnectCameraToSequence = true;}
+//    }
+    return false;
+}
+
 bool WorkspaceSequence::topContent()
 {
     diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,

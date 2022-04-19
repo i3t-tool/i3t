@@ -46,6 +46,7 @@ bool WorkspaceTransformation::topContent()
 //    /* right align */
 //    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, getNodeRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x /*actual free space*/ - iconSize.x - m_topOversizeSpace)*diwne.getWorkAreaZoom());
 
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY()+ImGui::GetStyle().FramePadding.y);
         switch (dataAreValid())
         {
         case Core::ETransformState::Invalid:
@@ -178,9 +179,9 @@ bool WorkspaceTransformation::drawDataFull()
     if (valueChanged)
     {
         m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
-				/// TEST /////////////////////////////////////////////////
-				StateManager::instance().takeSnapshot();
-				//////////////////////////////////////////////////////////
+//				/// TEST ///////////////////////////////////////////////// /* snap is taken in the end of frame */
+//				StateManager::instance().takeSnapshot();
+//				//////////////////////////////////////////////////////////
         setDataItemsWidth();
     }
     return interaction_happen;
@@ -191,28 +192,93 @@ int WorkspaceTransformation::maxLenghtOfData()
     return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
-bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
-                                                        ,   std::vector<float*> const& local_data
-                                                        ,   bool &value_changed)
+bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
+                                                                ,   std::vector<float*> const& local_data
+                                                                ,   bool &value_changed)
 {
     int number_of_values = labels.size();
-	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_builder: All vectors (labels, local_data) must have same size.");
+	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_InsideTablebuilder: All vectors (labels, local_data) must have same size.");
 
 	value_changed = false;
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
-	ImGui::PushItemWidth(getDataItemsWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+	ImGui::TableNextRow();
+
 	for (int i = 0; i < number_of_values; i++)
 	{
+	    ImGui::TableNextColumn();
 		ImGui::TextUnformatted(labels[i].c_str());
+		ImGui::TableNextColumn();
 
-		ImGui::SameLine();
-
+        ImGui::PushItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
         value_changed |= actual_value_changed;
-
+        ImGui::PopItemWidth();
 	}
-	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar(2);
+
+	return inner_interaction_happen;
+}
+
+bool WorkspaceTransformation::drawDataSetValuesTable_builder( std::string const cornerLabel,
+                                                                std::vector<std::string> const& columnLabels,
+                                                                std::vector<std::string> const& rowLabels,
+                                                                std::vector<float*> const& local_data,
+                                                                bool &value_changed,
+                                                                int& index_of_change)
+{
+    int number_of_values = columnLabels.size() * rowLabels.size();
+	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValuesTable_builder: columnLabels.size() * rowLabels.size() must be equal to local_data.size()");
+
+	value_changed = false;
+	bool inner_interaction_happen = false, actual_value_changed = false;
+
+
+    if (ImGui::BeginTable(fmt::format("##{}{}",cornerLabel,getIdDiwne()).c_str(), columnLabels.size()+1, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ))
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+        /* header labels */
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(cornerLabel.c_str());
+        for (int columns = 0; columns < columnLabels.size(); columns++)
+        {
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(columnLabels[columns].c_str());
+        }
+
+        for (int rows = 0; rows < rowLabels.size(); rows++)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(rowLabels[rows].c_str());
+
+
+            for (int columns = 0; columns < columnLabels.size(); columns++)
+            {
+                ImGui::TableNextColumn();
+
+                ImGui::PushItemWidth(getDataItemsWidth());
+                inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
+                                                                        *(local_data[rows*columnLabels.size()+columns]), m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
+
+                ImGui::PopItemWidth();
+                if(actual_value_changed)
+                {
+                    index_of_change = rows*columnLabels.size()+columns;
+                    value_changed |= actual_value_changed;
+                }
+            }
+
+        }
+        ImGui::PopStyleVar(2);
+        ImGui::EndTable();
+    }
 
 	return inner_interaction_happen;
 }
