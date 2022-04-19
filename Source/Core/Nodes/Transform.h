@@ -129,6 +129,14 @@ public:
 		disableSynergies();
 	}
 
+	void reset() override
+	{
+		onReset();
+		notifySequence();
+	}
+
+	virtual void onReset() {}
+
 	//===----------------------------------------------------------------------===//
 
 	bool hasSavedValue() const { return m_hasSavedData; }
@@ -162,13 +170,9 @@ public:
 	} halfspaceSign;   // remember the quadrant for eulerRotations
 	//===----------------------------------------------------------------------===//
 
-
-protected:
-	using ValueMap = std::map<std::string, std::string>;
-
-protected:
 	void notifySequence();
 
+protected:
 	bool canSetValue(const ValueMask& mask, glm::ivec2 coords, float value);
 
 public:

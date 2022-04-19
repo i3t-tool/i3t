@@ -205,3 +205,52 @@ TEST(SequenceTest, ThreeSequencesComposeMatrices)
     EXPECT_EQ(expectedMat, seq3->getData().getMat4());
   }
 }
+
+TEST(SequenceTest, MultipleNotifyKeepsSameValue)
+{
+	auto seq = Builder::createSequence();
+	auto transform = GraphManager::createTransform<ETransformType::Free>();
+	const auto initialValue = transform->getData().getMat4();
+
+	auto newValue = generateMat4();
+	transform->setValue(newValue);
+
+	EXPECT_FALSE(Math::eq(initialValue, newValue));
+
+	seq->addMatrix(transform);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		transform->notifySequence();
+	}
+
+	EXPECT_TRUE(Math::eq(seq->getData().getMat4(), newValue));
+}
+
+TEST(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
+{
+	auto seq = Builder::createSequence();
+	auto transform = GraphManager::createTransform<ETransformType::Free>();
+	seq->addMatrix(transform);
+
+	transform->unlock();
+
+	auto initial = seq->getData().getMat4();
+
+	transform->setValue(glm::translate(generateVec3()));
+
+	auto beforeReset = seq->getData().getMat4();
+	auto stored = seq->getData().getMat4();
+	EXPECT_FALSE(Math::eq(initial, beforeReset));
+
+	transform->saveValue();
+	transform->reset();
+
+	auto afterReset = seq->getData().getMat4();
+	EXPECT_TRUE(Math::eq(initial, afterReset));
+
+	transform->reloadValue();
+	auto afterRestore = seq->getData().getMat4();
+	EXPECT_FALSE(Math::eq(afterReset, afterRestore));
+	EXPECT_TRUE(Math::eq(stored, afterRestore));
+}

@@ -119,6 +119,7 @@ void Transformation::reloadValue()
 		return;
 
 	setInternalValue(m_savedData.getMat4(), 0);
+	notifySequence();
 }
 
 const glm::mat4& Transformation::getSavedValue() const
