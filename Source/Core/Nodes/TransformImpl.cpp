@@ -1,6 +1,15 @@
 #include "TransformImpl.h"
 
+#include <math.h>
+
+//#include "pgr.h"
 #include "Utils/Format.h"
+#include<glm/gtx/vector_angle.hpp>
+
+#ifndef M_PI
+/// define Pi for compatibility issues (MSVC vs GCC)
+#define M_PI 3.14159f
+#endif
 
 namespace Core
 {
@@ -130,7 +139,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-void TransformImpl<ETransformType::Scale>::reset()
+void TransformImpl<ETransformType::Scale>::onReset()
 {
 //	m_hasEnabledSynergies = true; // JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
 //	m_isLocked            = true;
@@ -196,8 +205,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// -sin(T)
 			mat[2][1] = -val;
+			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halfspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
 			mat[2][2] = cos;
 		}
@@ -206,8 +218,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 			// cos(T)
 			mat[1][1] = val;
 			mat[2][2] = val;
+			halfspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
+			if (halfspaceSign.sin < 0.0f)
+				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[1][2] = sin;
 			mat[2][1] = -sin;
 		}
@@ -215,8 +230,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[1][2] = -val;
+			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halfspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
 			mat[2][2] = cos;
 		}
@@ -228,7 +246,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-void TransformImpl<ETransformType::EulerX>::reset()
+void TransformImpl<ETransformType::EulerX>::onReset()
 {
 	m_hasEnabledSynergies = true;
 	m_isLocked            = true;
@@ -242,7 +260,33 @@ ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 	auto& mat   = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateYMask, mat);
 
-	float angle = std::asin(mat[2][0]);
+  // PF This may be a redundant check (checked below as a whole matrix)
+  result = result && 
+	    glm::epsilonEqual(mat[0][0], mat[2][2], glm::epsilon<float>()) && // cos = cos,
+		  glm::epsilonEqual(mat[2][0],-mat[0][2], glm::epsilon<float>());   // sin = - (-sin)
+
+  // PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
+#if 0
+  // Variant 1 - manually
+	float angle        = std::acos(mat[0][0]); 
+	float signAngleSin = glm::sign(std::asin(mat[2][0]));
+
+	if (signAngleSin < 0)
+		angle += M_PI;
+#else
+  // Variant 2 - using glm in 2D
+  // more simple check as angle between two vectors
+	float angle = glm::orientedAngle(glm::vec2(1.0f, 0.0f), glm::vec2(mat[0][0], mat[2][0]));  // simpler 2D encoding from axis X to Z
+
+  // Variant 3 - using glm in 3D - would work for rotation around vector also 
+	// float angle = glm::orientedAngle(
+	// glm::vec3(1.0f, 0.0f, 0.0f),						  // from x axis
+	// glm::vec3(mat[0][0], 0.0f, -mat[2][0]),		// to rotated vector around Y: (cos, 0, -sin)
+	// glm::vec3(0.0f, 1.0f, 0.0f));				  // axis from X to -Z
+	//
+  // For rotation around X and Z, there will be no minus sign by mat[2][0].
+#endif
+
 	auto expectedMat = glm::eulerAngleY(angle);
 
 	result = result && Math::eq(expectedMat, mat);
@@ -276,23 +320,26 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (!Math::withinInterval(val, -1.0f, 1.0f))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-													"Value must be within [-1.0, 1.0] interval."};
-	}
-
 	auto mat = getData().getMat4();
-
 	mat[coords.x][coords.y] = val;
+
 	if (hasSynergies())
 	{
+		if (!Math::withinInterval(val, -1.0f, 1.0f))
+		{
+			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+														"Value must be within [-1.0, 1.0] interval."};
+		}
+
 		if (coords == glm::ivec2(0, 2))
 		{
 			// -sin(T)
 			mat[2][0] = -val;
+			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halfspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[2][2] = cos;
 		}
@@ -301,8 +348,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 			// cos(T)
 			mat[0][0] = val;
 			mat[2][2] = val;
+			halfspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
+			if (halfspaceSign.sin < 0.0f)
+				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][2] = -sin;
 			mat[2][0] = sin;
 		}
@@ -310,8 +360,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[0][2] = -val;
+			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halfspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[2][2] = cos;
 		}
@@ -323,7 +376,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-void TransformImpl<ETransformType::EulerY>::reset()
+void TransformImpl<ETransformType::EulerY>::onReset()
 {
 	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
 }
@@ -368,42 +421,53 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (!Math::withinInterval(val, -1.0f, 1.0f))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-													"Value must be within [-1.0, 1.0] interval."};
-	}
-
+  // PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
+  
 	auto mat = getData().getMat4();
-
 	mat[coords.x][coords.y] = val;
+
 	if (hasSynergies())
 	{
+		if (!Math::withinInterval(val, -1.0f, 1.0f))
+		{
+			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+														"Value must be within [-1.0, 1.0] interval."};
+		}
+
 		if (coords == glm::ivec2(0, 1))
 		{
 			// -sin(T)
-			mat[1][0] = -val;
+			mat[1][0]					 = -val;
+			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halfspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
 		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
 		{
 			// cos(T)
-			mat[0][0] = val;
-			mat[1][1] = val;
+			mat[0][0]					 = val;
+			mat[1][1]					 = val;
+			halfspaceSign.cos = glm::sign(val);
 
 			auto sin = sqrt(1.0f - (val * val));
+			if (halfspaceSign.sin < 0.0f)
+				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][1] = sin;
 			mat[1][0] = -sin;
 		}
 		else if (coords == glm::ivec2(1, 0))
 		{
 			// sin(T)
-			mat[0][1] = -val;
+			mat[0][1]					 = -val;
+			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
+			if (halfspaceSign.cos < 0.0f)
+				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
@@ -415,7 +479,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-void TransformImpl<ETransformType::EulerZ>::reset()
+void TransformImpl<ETransformType::EulerZ>::onReset()
 {
 	resetModifiers();
 	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -465,7 +529,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-void TransformImpl<ETransformType::Translation>::reset()
+void TransformImpl<ETransformType::Translation>::onReset()
 {
 	setInternalValue(glm::translate(
 			getDefaultValue("translation").getVec3()
@@ -480,7 +544,7 @@ ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 	return ETransformState::Unknown;
 }
 
-void TransformImpl<ETransformType::AxisAngle>::reset()
+void TransformImpl<ETransformType::AxisAngle>::onReset()
 {
 	setInternalValue(glm::rotate(
 			getDefaultValue("rotation").getFloat(),
@@ -510,7 +574,7 @@ ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 	return ETransformState::Unknown;
 }
 
-void TransformImpl<ETransformType::Quat>::reset()
+void TransformImpl<ETransformType::Quat>::onReset()
 {
 	setInternalValue(glm::toMat4(m_normalized));
 	notifySequence();
@@ -545,7 +609,7 @@ ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 	);
 }
 
-void TransformImpl<ETransformType::Ortho>::reset()
+void TransformImpl<ETransformType::Ortho>::onReset()
 {
 	setInternalValue(glm::ortho(
 			getDefaultValue("left").getFloat(),
@@ -579,7 +643,7 @@ ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 	);
 }
 
-void TransformImpl<ETransformType::Perspective>::reset()
+void TransformImpl<ETransformType::Perspective>::onReset()
 {
 	setInternalValue(glm::perspective(
 			getDefaultValue("fov").getFloat(),
@@ -611,7 +675,7 @@ ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 	);
 }
 
-void TransformImpl<ETransformType::Frustum>::reset()
+void TransformImpl<ETransformType::Frustum>::onReset()
 {
 	setInternalValue(glm::frustum(
 			getDefaultValue("left").getFloat(),
@@ -643,7 +707,7 @@ ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 	return ETransformState::Unknown;
 }
 
-void TransformImpl<ETransformType::LookAt>::reset()
+void TransformImpl<ETransformType::LookAt>::onReset()
 {
 	setInternalValue(glm::lookAt(
 			getDefaultValue("eye").getVec3(),

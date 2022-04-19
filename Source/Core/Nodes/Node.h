@@ -31,6 +31,7 @@ enum class ENodePlugResult
 	Err_Loopback,					 /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
+	Err_DisabledPin
 };
 
 struct ValueSetResult
@@ -280,9 +281,9 @@ public:
 	}
 
 	template <typename T>
-	[[nodiscard]] ValueSetResult setValue(unsigned index, T&& value)
+	[[nodiscard]] ValueSetResult setValue(const T& value, unsigned index)
 	{
-		return setValueEx(std::forward(value), index);
+		return setValueEx(value, index);
 	}
 
 private:
@@ -290,9 +291,6 @@ private:
 	template <typename T>
 	ValueSetResult setValueEx(T&& val, unsigned index = 0)
 	{
-		if (getIn(0).isPluggedIn())
-			return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Cannot directly set value, input pin is connected."};
-
 		setInternalValue(val);
 
 		return ValueSetResult{};

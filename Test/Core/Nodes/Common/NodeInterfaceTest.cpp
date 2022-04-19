@@ -139,3 +139,11 @@ TEST(NodeInterfaceTest, GetNodesConnectedToNonexistentOutputPin)
 
 	EXPECT_THROW(gm::getOutputNodes(seq, 10).empty(), std::exception);
 }
+
+TEST(NodeInterfaceTest, SetValueWithIndex)
+{
+	auto screen = GraphManager::createNode<ENodeType::Screen>();
+
+	auto result = screen->setValue((float) 1920 / 1080, I3T_OUTPUT1);
+	EXPECT_EQ(result.status, ValueSetResult::Status::Ok);
+}

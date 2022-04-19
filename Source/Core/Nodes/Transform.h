@@ -129,6 +129,14 @@ public:
 		disableSynergies();
 	}
 
+	void reset() override
+	{
+		onReset();
+		notifySequence();
+	}
+
+	virtual void onReset() {}
+
 	//===----------------------------------------------------------------------===//
 
 	bool hasSavedValue() const { return m_hasSavedData; }
@@ -154,12 +162,17 @@ public:
 	ValueSetResult setValue(const glm::mat4& mat) override;
 	ValueSetResult setValue(float, glm::ivec2) override { return ValueSetResult{}; }
 
-protected:
-	using ValueMap = std::map<std::string, std::string>;
+	//===----------------------------------------------------------------------===//
+	struct
+	{
+		float cos;
+		float sin;
+	} halfspaceSign;   // remember the quadrant for eulerRotations
+	//===----------------------------------------------------------------------===//
 
-protected:
 	void notifySequence();
 
+protected:
 	bool canSetValue(const ValueMask& mask, glm::ivec2 coords, float value);
 
 public:

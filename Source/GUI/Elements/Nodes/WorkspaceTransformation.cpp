@@ -192,28 +192,34 @@ int WorkspaceTransformation::maxLenghtOfData()
     return maxLenghtOfData4x4( m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
-bool WorkspaceTransformation::drawDataSetValues_builder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
-                                                        ,   std::vector<float*> const& local_data
-                                                        ,   bool &value_changed)
+bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(    std::vector<std::string> const& labels /* labels have to be unique in node - otherwise change label passed to drawDragFloatWithMap_Inline() below */
+                                                                ,   std::vector<float*> const& local_data
+                                                                ,   bool &value_changed)
 {
     int number_of_values = labels.size();
-	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_builder: All vectors (labels, local_data) must have same size.");
+	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_InsideTablebuilder: All vectors (labels, local_data) must have same size.");
 
 	value_changed = false;
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
-	ImGui::PushItemWidth(getDataItemsWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+
+	ImGui::TableNextRow();
+
 	for (int i = 0; i < number_of_values; i++)
 	{
+	    ImGui::TableNextColumn();
 		ImGui::TextUnformatted(labels[i].c_str());
+		ImGui::TableNextColumn();
 
-		ImGui::SameLine();
-
+        ImGui::PushItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
         value_changed |= actual_value_changed;
-
+        ImGui::PopItemWidth();
 	}
-	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar(2);
 
 	return inner_interaction_happen;
 }
@@ -232,8 +238,10 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder( std::string const 
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
 
-    if (ImGui::BeginTable(fmt::format("##{}{}_4x4",cornerLabel,getIdDiwne()).c_str(), columnLabels.size()+1, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ))
+    if (ImGui::BeginTable(fmt::format("##{}{}",cornerLabel,getIdDiwne()).c_str(), columnLabels.size()+1, ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit ))
     {
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
         /* header labels */
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
@@ -268,6 +276,7 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder( std::string const 
             }
 
         }
+        ImGui::PopStyleVar(2);
         ImGui::EndTable();
     }
 

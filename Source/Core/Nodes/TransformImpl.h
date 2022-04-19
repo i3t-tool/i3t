@@ -56,7 +56,7 @@ public:
 		return ValueSetResult{};
 	}
 
-	void reset() override { setInternalValue(glm::mat4(1.0f)); };
+	void onReset() override { setInternalValue(glm::mat4(1.0f)); };
 };
 
 
@@ -77,7 +77,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 /**
@@ -103,7 +103,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 /**
@@ -129,7 +129,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 /**
@@ -155,7 +155,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 
@@ -174,7 +174,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 //===-- Other transformations ---------------------------------------------===//
@@ -194,7 +194,7 @@ public:
 	ValueSetResult setValue(float rads) override;
 	ValueSetResult setValue(const glm::vec3& axis) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 
@@ -217,7 +217,7 @@ public:
 	ValueSetResult setValue(const glm::quat& vec) override;
 	ValueSetResult setValue(const glm::vec4& vec) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 
@@ -244,7 +244,7 @@ public:
 	/// No synergies required.
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 
@@ -268,7 +268,7 @@ public:
 
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void reset() override;
+	void onReset() override;
 };
 
 
@@ -292,7 +292,7 @@ public:
 
 	ETransformState isValid() const override;
 
-	void reset() override;
+	void onReset() override;
 
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 };
@@ -318,7 +318,7 @@ public:
 
 	ETransformState isValid() const override;
 
-	void           reset() override;
+	void           onReset() override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 };
 } // namespace Core

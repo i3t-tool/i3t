@@ -27,6 +27,8 @@ void Camera::createComponents()
 
 	if (GraphManager::plug(m_proj, m_view) != ENodePlugResult::Ok)
 		Log::debug("Components of a sequence could not be connected.");
+
+	getOutputPins()[I3T_CAMERA_OUT_MUL].setDisabled(true);
 }
 
 Ptr<Node> Camera::clone()
