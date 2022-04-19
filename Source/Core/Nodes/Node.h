@@ -31,6 +31,7 @@ enum class ENodePlugResult
 	Err_Loopback,					 /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
+	Err_DisabledPin
 };
 
 struct ValueSetResult

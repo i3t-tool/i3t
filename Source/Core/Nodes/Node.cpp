@@ -177,6 +177,9 @@ bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOf
 
 ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 {
+	if (input->isDisabled() || output->isDisabled())
+		return ENodePlugResult::Err_DisabledPin;
+
 	/* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
 	auto* inp = input;
 	if (!inp) return ENodePlugResult::Err_NonexistentPin;

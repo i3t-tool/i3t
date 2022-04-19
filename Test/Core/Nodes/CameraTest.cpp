@@ -28,8 +28,8 @@ TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
 	auto camera   = GraphManager::createCamera();
 	auto sequence = Builder::createSequence();
 
-	EXPECT_TRUE(camera->getOutPin(0).isDisabled());
+	EXPECT_TRUE(camera->getOutPin(I3T_CAMERA_OUT_MUL).isDisabled());
 
-	const auto result = GraphManager::plug(camera, sequence, 0, 0);
-	EXPECT_NE(result, ENodePlugResult::Ok);
+	const auto result = GraphManager::plug(camera, sequence, I3T_CAMERA_OUT_MUL, I3T_SEQ_IN_MUL);
+	EXPECT_EQ(result, ENodePlugResult::Err_DisabledPin);
 }
