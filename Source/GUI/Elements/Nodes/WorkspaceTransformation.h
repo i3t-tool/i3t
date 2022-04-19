@@ -47,13 +47,13 @@ public:
 
 	void updateSizes();
 
-//
-//	virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
-//                                            std::vector<getter_function_pointer> const& getters,
-//                                            std::vector<setter_function_pointer> const& setters
-//                                             /*,   std::vector<unsigned char> const& datamap_values*/);
-
-    virtual bool drawDataSetValues_builder( std::vector<std::string> const& labels,
+    virtual bool drawDataSetValues_InsideTablebuilder( std::vector<std::string> const& labels,
                                             std::vector<float*> const& local_data,
                                             bool &value_changed);
+    virtual bool drawDataSetValuesTable_builder( std::string const cornerLabel,
+                                                std::vector<std::string> const& columnLabels,
+                                                std::vector<std::string> const& rowLabels,
+                                                std::vector<float*> const& local_data,
+                                                bool &value_changed,
+                                                int&index_of_change);
 };

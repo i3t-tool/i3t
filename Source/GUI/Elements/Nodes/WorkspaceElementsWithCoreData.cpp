@@ -61,7 +61,7 @@ void WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 	setDataItemsWidth();
 }
 
-float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth * diwne.getWorkAreaZoom(); }
+float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth; }
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
@@ -470,11 +470,13 @@ void WorkspaceCoreInputPin::unplug()
     Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
     m_link.setStartPin(nullptr);
     diwne.m_takeSnap = true;
+    m_connection_changed = true;
 }
 
 
 bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode/*=DIWNE::DrawMode::Interacting*/)
 {
+    m_connection_changed = false;
     bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
     if (isConnected())
     {
@@ -494,6 +496,7 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
     {
         setConnectedWorkspaceOutput(ou);
         m_link.m_just_pluged = true;
+        m_connection_changed = true;
     }
 }
 
