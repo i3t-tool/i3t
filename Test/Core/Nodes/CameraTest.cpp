@@ -22,3 +22,14 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 	auto expectedPV = perspectiveProj->getData().getMat4() * lookAt->getData().getMat4();
 	EXPECT_EQ(expectedPV, cameraNode->getData(1).getMat4());
 }
+
+TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
+{
+	auto camera   = GraphManager::createCamera();
+	auto sequence = Builder::createSequence();
+
+	EXPECT_TRUE(camera->getOutPin(0).isDisabled());
+
+	const auto result = GraphManager::plug(camera, sequence, 0, 0);
+	EXPECT_NE(result, ENodePlugResult::Ok);
+}
