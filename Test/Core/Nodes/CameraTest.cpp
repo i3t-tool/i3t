@@ -17,6 +17,15 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 	cameraNode->getProj()->addMatrix(perspectiveProj);
 	cameraNode->getView()->addMatrix(lookAt);
 
+	EXPECT_TRUE(Math::eq(
+			cameraNode->getProj()->getData(I3T_SEQ_OUT_MAT).getMat4(),
+			perspectiveProj->getData().getMat4()
+	));
+	EXPECT_TRUE(Math::eq(
+			cameraNode->getView()->getData(I3T_SEQ_OUT_MAT).getMat4(),
+			lookAt->getData().getMat4()
+	));
+
 	plug_expectOk(cameraNode, screenNode, 0, 0);
 
 	auto expectedPV = perspectiveProj->getData().getMat4() * lookAt->getData().getMat4();
