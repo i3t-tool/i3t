@@ -130,6 +130,11 @@ public:
     ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
     void zoomToRectangle(ImRect const& rect);
 
+    void trackingLeft();
+    void trackingRight();
+    void trackingSwitch();
+    void trackingSwitchOff();
+
     void deleteSelectedNodes();
 
     //bool allowInteraction();
@@ -153,6 +158,9 @@ public:
 
     bool m_resizeDataWidth;
     bool m_reconnectCameraToSequence;
+
+    bool m_trackingIsOn, m_trackingFromLeft;
+    WorkspaceTransformation *m_trackingFirstTransformation;
 };
 
 /*! \class class for Workspace window object

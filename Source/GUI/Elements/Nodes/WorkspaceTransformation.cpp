@@ -1,6 +1,7 @@
 #include "WorkspaceTransformation.h"
 
 #include "State/StateManager.h"
+#include "../Windows/WorkspaceWindow.h"
 
 WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     :   WorkspaceNodeWithCoreData(diwne, nodebase)
@@ -92,22 +93,34 @@ bool WorkspaceTransformation::middleContent()
 
 bool WorkspaceTransformation::afterContent()
 {
-    if (m_inactiveMark != 0) /* \todo JH MH? kde prosím přečtu tracking? */
+    if (dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingIsOn && dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFirstTransformation == this)
     {
-        ImVec2 start = m_middleRectDiwne.Min;
-        ImVec2 end = m_middleRectDiwne.Max;
-        ImVec2 size = end-start;
-        if(m_inactiveMark > 0)
+        ImVec2 topleft = m_middleRectDiwne.Min;
+        ImVec2 bottomright = m_middleRectDiwne.Max;
+        if (m_inactiveMark != 0) /* \todo JH MH? kde prosím přečtu tracking? */
         {
-            end.x -= (1-m_inactiveMark)*size.x;
+
+            ImVec2 size = bottomright-topleft;
+            if(dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft)
+            {
+                bottomright.x -= (1-m_inactiveMark)*size.x;
+            }
+            else
+            {
+                topleft.x += m_inactiveMark*size.x;
+            }
+            diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
+            //ImGui::GetWindowDrawList()->AddRectFilled( topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.5f) );
         }
-        else
-        {
-            start.x += m_inactiveMark*size.x;
-        }
-        diwne.AddRectFilledDiwne(start, end, ImColor(0.f, 0.f, 0.f, 0.3f));
-        //ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0.f, 0.f, 0.f, 0.5f) );
+
+        ImVec2 markCenter = ImVec2(dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft ? bottomright.x : topleft.x,
+                                    m_middleRectDiwne.GetCenter().y);
+        ImVec2 markSize = ImVec2(50,50); /* \todo JH settings?*/
+
+        diwne.AddRectFilledDiwne(markCenter-markSize/2, markCenter+markSize/2, ImColor(1.0f, 1.0f, 0.0f, 0.5f) );
+
     }
+
     return false;
 }
 
@@ -115,6 +128,7 @@ void WorkspaceTransformation::popupContent()
 {
     drawMenuSetDataMap();
     drawMenuStorevalues();
+    drawMenuTracking();
 
     WorkspaceNodeWithCoreData::popupContent();
 }
@@ -148,6 +162,15 @@ void WorkspaceTransformation::drawMenuDelete()
     if (ImGui::MenuItem("Delete")) {
             m_removeFromWorkspaceWindow = true;
             m_removeFromSequence = true;
+    }
+}
+
+void WorkspaceTransformation::drawMenuTracking()
+{
+    if (ImGui::MenuItem("Switch tracking on", NULL, false, !dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingIsOn))
+    {
+            dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingIsOn = true;
+            dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFirstTransformation = this;
     }
 }
 

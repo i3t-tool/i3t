@@ -37,6 +37,7 @@ bool WorkspaceScreen::middleContent()
 	bool interaction_happen = false, resize_texture = false;
 	ImVec2 dragDelta;
 	ImVec2 buttonSize = ImVec2(20,20); /* \todo JH MH from setting */
+	float buttonIconPadding = 0;// not used 2*diwne.getWorkAreaZoom();
 
 	// \todo
 	m_camera->m_perspective = getNodebase()->getData().getMat4();
@@ -44,7 +45,7 @@ bool WorkspaceScreen::middleContent()
 
 	ImGui::TextUnformatted(Utils::toString(m_camera->m_perspective).c_str());
 
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertiocal flip
+	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertical flip
 
 	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 	cursorPos.y -= (buttonSize.y*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.y);
@@ -52,7 +53,7 @@ bool WorkspaceScreen::middleContent()
 
 	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownLeft, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
                                          DIWNE::IconType::TriangleDownLeft, ImColor(100,100,150,150), ImColor(100,100,150,150),
-                                         buttonSize*diwne.getWorkAreaZoom(), ImVec4(2,2,2,2)/**diwne.getWorkAreaZoom()*/, true, fmt::format("screenButton:{}left", getId()));
+                                         buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}left", getId()));
     ImGui::SameLine();
 
     if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
@@ -66,15 +67,13 @@ bool WorkspaceScreen::middleContent()
         setNodePositionDiwne(nodePos);
 
         dragDelta.x *= -1; /* for same code (sign) in if(resize_texture) */
-
-
     }
 
 	ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
 
     interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
                                          DIWNE::IconType::TriangleDownRight, ImColor(100,100,150,150), ImColor(100,100,150,150),
-                                         buttonSize*diwne.getWorkAreaZoom(), ImVec4(2,2,2,2)/**diwne.getWorkAreaZoomDiwne()*/, true, fmt::format("screenButton:{}right", getId()));
+                                         buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}right", getId()));
 
     if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
     {

@@ -23,6 +23,9 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     ,   m_workspaceDiwneAction(WorkspaceDiwneAction::None)
     ,   m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None)
     ,   m_resizeDataWidth(false)
+    ,   m_trackingIsOn(false)
+    ,   m_trackingFromLeft(true)
+    ,   m_trackingFirstTransformation(nullptr)
 
 {
 }
@@ -56,6 +59,23 @@ void WorkspaceDiwne::zoomToAll()
 void WorkspaceDiwne::zoomToSelected()
 {
     zoomToRectangle(getOverNodesRectangleDiwne(getSelectedNodesInnerIncluded()));
+}
+
+void WorkspaceDiwne::trackingLeft()
+{
+    m_trackingFirstTransformation->inactiveMarcToLeft(); /* \todo JH what step? */
+}
+void WorkspaceDiwne::trackingRight()
+{
+     m_trackingFirstTransformation->inactiveMarcToRight(); /* \todo JH what step? */
+}
+void WorkspaceDiwne::trackingSwitch()
+{
+    m_trackingFromLeft = !m_trackingFromLeft;
+}
+void WorkspaceDiwne::trackingSwitchOff()
+{
+    m_trackingIsOn = false;
 }
 
 
@@ -1029,6 +1049,12 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToAll(); });
 	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToSelected(); });
 	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteSelectedNodes(); });
+
+	Input.bindAction("trackingLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingLeft(); });
+	Input.bindAction("trackingRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingRight(); });
+	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitch(); });
+	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
+
 }
 
 WorkspaceWindow::~WorkspaceWindow()
