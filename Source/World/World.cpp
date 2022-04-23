@@ -201,7 +201,10 @@ void World::onGUI(){
 Shader World::loadShader(const char* vs_name, const char* fs_name){
     Shader shader = {0,0,0,0,0,0,0,0,0};
     GLuint gl_shader = 0;
-    GLuint shaders[] = {pgr::createShaderFromFile(GL_VERTEX_SHADER, vs_name),pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fs_name), 0};
+    GLuint shaders[] = {
+    	pgr::createShaderFromFile(GL_VERTEX_SHADER, vs_name),
+    	pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fs_name),
+    	0};
     if (shaders[0]*shaders[1] == 0){return shader;}
 
     shader.program =  pgr::createProgram(shaders);
