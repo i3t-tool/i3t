@@ -692,35 +692,41 @@ bool WorkspaceDiwne::content()
                               m_workspaceCoreNodes.end());
 
     int number_of_nodes = m_workspaceCoreNodes.size();
-    int node_count = number_of_nodes;
+    int node_count = number_of_nodes-1; /* -1 for space for top node drawn above links */
     if(number_of_nodes > 0)
     {
-        m_channelSplitter.Split(ImGui::GetWindowDrawList(), node_count+1 /*+1 for links channel on top */ );
+        m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes+1 /*+1 for links channel on top */ );
 
         /* draw nodes from back to begin (front to back) for catch interactions in right order */
         int prev_size = m_workspaceCoreNodes.size();
         bool takeSnap = false;
         for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
         {
-            m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+            if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
+            {
+                m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes); /* top node is above links */
+            }
+            else
+            {
+                m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), --node_count);
+            }
+
             if ((*it) != nullptr){ interaction_happen |= (*it)->drawNodeDiwne<WorkspaceNodeWithCoreData>(DIWNE::DrawModeNodePosition::OnItsPosition, DIWNE::DrawMode::Interacting); }
             if (prev_size != m_workspaceCoreNodes.size()) break; /* when push/pop to/from Sequence size of m_workspaceCoreNodes is affected and iterator is invalidated (at least with MVSC) */
 
         }
 
-        if(m_takeSnap)
-        {
-            StateManager::instance().takeSnapshot();
-        }
-
-
-
-
-        /* draw links on top */
-        m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes);
+        /* draw links under last (on top) node */
+        m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes-1);
         for (auto link : m_linksToDraw)
         {
             interaction_happen |= link->drawDiwne();
+        }
+
+
+        if(m_takeSnap)
+        {
+            StateManager::instance().takeSnapshot();
         }
 
         /* Cameras To Sequences links */
@@ -778,9 +784,6 @@ bool WorkspaceDiwne::afterContent()
     bool interaction_happen = false;
     interaction_happen |= processCreateAndPlugTypeConstructor();
 
-    /* ===== reaction to actions ===== */
-    manipulatorStartCheck3D();
-
     /* selection will be active in next frame */
     if (InputManager::isAxisActive("NOTunselectAll")) {
             setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
@@ -797,6 +800,9 @@ bool WorkspaceDiwne::afterContent()
             }
         }
     }
+
+    /* ===== reaction to actions ===== */
+    manipulatorStartCheck3D();
 
     /* hold or drag or interacting or new_link  */
     if ( (   m_diwneAction == DIWNE::DiwneAction::DragNode

@@ -65,7 +65,7 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth; 
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
-	float size				 = ImGui::GetFontSize();   // /* \todo JH get width */ get current font size (= height in pixels) of current font with current scale applied
+	float size				 = ImGui::GetFontSize();   // /* \todo JH do not know why return incorrect value when zoom and than add node, but after changing value return correct one...  get width */ get current font size (= height in pixels) of current font with current scale applied
 	float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
 	m_dataItemsWidth = (float) (maxLenghtOfData()) * oneCharWidth + 2 * padding;
 	return m_dataItemsWidth;
@@ -133,15 +133,15 @@ WorkspaceCorePin::WorkspaceCorePin( DIWNE::Diwne& diwne
     ,   m_iconRectDiwne(ImRect(0,0,0,0))
 {}
 
-bool WorkspaceCorePin::allowInteraction()
-{
-    return m_pin->isEnabled();
-}
-
-bool WorkspaceCorePin::allowProcessFocused()
-{
-    return m_pin->isEnabled();
-}
+//bool WorkspaceCorePin::allowInteraction()
+//{
+//    return m_pin->isEnabled();
+//}
+//
+//bool WorkspaceCorePin::allowProcessFocused()
+//{
+//    return m_pin->isEnabled();
+//}
 
 /* DIWNE function */
 bool WorkspaceCorePin::content()
@@ -801,7 +801,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
     {
         ImRect nodeRect = getNodeRectDiwne();
         ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y)/2);
-        for (auto const& pin : m_workspaceOutputs) {
+        for (auto const& pin : getOutputs()) {
             pin->setConnectionPointDiwne(pinConnectionPoint);
         }
     }
@@ -809,7 +809,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
     {
         float act_align, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets smaller (for example when switch from precision 2 to precision 0) */
         m_minRightAlignOfRightPins = FLT_MAX;
-        for (auto const& pin : m_workspaceOutputs) {
+        for (auto const& pin : getOutputsToShow()) {
             act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth())*diwne.getWorkAreaZoom()); /* no shift to left */
             m_minRightAlignOfRightPins = std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching between two node sizes */
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align - prev_minRightAlign ); /* right align if not all output pins have same width */

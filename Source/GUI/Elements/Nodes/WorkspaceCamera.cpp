@@ -8,6 +8,8 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
     (m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
     m_projection->m_selectable = false;
     m_view->m_selectable = false;
+
+    getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 }
 
 
@@ -34,8 +36,9 @@ bool WorkspaceCamera::middleContent()
 
 int WorkspaceCamera::maxLenghtOfData()
 {
-    Debug::Assert(false, "Calling WorkspaceCamera::maxLenghtOfData() make no sense because every included Sequention has its own independent data");
-    return -1; /* should be unused */
+//    Debug::Assert(false, "Calling WorkspaceCamera::maxLenghtOfData() make no sense because every included Sequention has its own independent data");
+//    return -1; /* should be unused */
+    return 0; /* \todo JH not sure where it is used... fall on zoom with Camera on Workspace */
 }
 
 

@@ -50,8 +50,8 @@ bool WorkspaceScreen::middleContent()
 	cursorPos.y -= (buttonSize.y*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.y);
 	ImGui::SetCursorScreenPos(cursorPos);
 
-	interaction_happen |= diwne.IconButton(DIWNE::IconType::Rectangle, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
-                                         DIWNE::IconType::Cross, ImColor(100,100,150,150), ImColor(100,100,150,150),
+	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownLeft, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
+                                         DIWNE::IconType::TriangleDownLeft, ImColor(100,100,150,150), ImColor(100,100,150,150),
                                          buttonSize*diwne.getWorkAreaZoom(), ImVec4(2,2,2,2)/**diwne.getWorkAreaZoom()*/, true, fmt::format("screenButton:{}left", getId()));
     ImGui::SameLine();
 
@@ -72,8 +72,8 @@ bool WorkspaceScreen::middleContent()
 
 	ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
 
-    interaction_happen |= diwne.IconButton(DIWNE::IconType::Rectangle, ImColor(100,50,50,150), ImColor(100,50,50,150),
-                                         DIWNE::IconType::Cross, ImColor(100,100,150,150), ImColor(100,100,150,150),
+    interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
+                                         DIWNE::IconType::TriangleDownRight, ImColor(100,100,150,150), ImColor(100,100,150,150),
                                          buttonSize*diwne.getWorkAreaZoom(), ImVec4(2,2,2,2)/**diwne.getWorkAreaZoomDiwne()*/, true, fmt::format("screenButton:{}right", getId()));
 
     if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
@@ -94,7 +94,7 @@ bool WorkspaceScreen::middleContent()
         m_renderTexture->resize(m_textureSize.x*diwne.getWorkAreaZoom(), m_textureSize.y*diwne.getWorkAreaZoom());
         getNodebase()->setValue(m_textureSize.x/m_textureSize.y, 1); /* \todo Jh always 1? */
     }
-    
+
   getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);  // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
 
   return interaction_happen;
@@ -102,8 +102,9 @@ bool WorkspaceScreen::middleContent()
 
 int WorkspaceScreen::maxLenghtOfData()  //todo
 {
-    Debug::Assert(false, "TODO Calling WorkspaceScreen::maxLenghtOfData() makes no sense - really?!?!?!!");
-    return -1; /* should be unused */
+//    Debug::Assert(false, "TODO Calling WorkspaceScreen::maxLenghtOfData() makes no sense - really?!?!?!!");
+//    return -1; /* should be unused */
+    return numberOfCharWithDecimalPoint( getOutputs()[1]->getCorePin().data().getFloat(), getNumberOfVisibleDecimal()); /* \todo JH not 1 but some Core::Pin_Code */
 }
 
 void WorkspaceScreen::drawMenuLevelOfDetail() //todo

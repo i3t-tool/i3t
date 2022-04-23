@@ -125,8 +125,8 @@ protected:
 public:
     WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
-    bool allowInteraction() const override;
-    bool allowProcessFocused() const override;
+//    bool allowInteraction() const override;
+//    bool allowProcessFocused() const override;
 
 	Core::Pin const& getCorePin() const;
 
@@ -292,6 +292,8 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 	public:
         std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const {return m_workspaceInputs;};
         std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const {return m_workspaceOutputs;};
+
+        virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const {return getOutputs();};
 
         WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase, bool showDataOnPins=true);
 

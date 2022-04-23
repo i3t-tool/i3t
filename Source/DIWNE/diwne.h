@@ -262,6 +262,14 @@ class Diwne : public DiwneObject
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
 
+        void DrawIconTriangleDownLeft(ImDrawList* idl,
+                      ImColor ShapeColor, ImColor InnerColor,
+                      ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+
+        void DrawIconTriangleDownRight(ImDrawList* idl,
+                      ImColor ShapeColor, ImColor InnerColor,
+                      ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+
 
         DiwneAction getDiwneAction() const {return m_diwneAction;};
         void setDiwneAction(DiwneAction action){m_diwneAction = action;};

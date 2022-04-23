@@ -28,6 +28,8 @@ public:
 	bool middleContent();   // the most important function
 	void drawMenuLevelOfDetail();  //todo
 
+	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const {return {getOutputs()[1]};}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
+
 private:
 
 	// variables of the workspace box

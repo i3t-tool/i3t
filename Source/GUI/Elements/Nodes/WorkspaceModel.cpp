@@ -191,8 +191,9 @@ bool WorkspaceModel::middleContent()
 
 int WorkspaceModel::maxLenghtOfData()  //todo
 {
-    Debug::Assert(false, "Calling WorkspaceModel::maxLenghtOfData() make no sense because Model has no float data to show");
-    return -1; /* should be unused */
+//    Debug::Assert(false, "Calling WorkspaceModel::maxLenghtOfData() make no sense because Model has no float data to show");
+//    return -1; /* should be unused */
+    return 0; /* \todo JH not sure where it is used... fall on zoom with Model on Workspace */
 }
 
 void WorkspaceModel::drawMenuLevelOfDetail() //todo

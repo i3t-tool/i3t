@@ -6,7 +6,9 @@ WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::
     :   WorkspaceNodeWithCoreData(diwne, nodebase)
     ,   aboveSequence(0)
     ,   m_topOversizeSpace(0)
-{}
+{
+    setDataItemsWidth();
+}
 
 void WorkspaceTransformation::updateSizes()
 {
