@@ -125,6 +125,9 @@ protected:
 public:
     WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
 
+    bool allowInteraction() const override;
+    bool allowProcessFocused() const override;
+
 	Core::Pin const& getCorePin() const;
 
 	WorkspaceCorePin& getParentPin() const;

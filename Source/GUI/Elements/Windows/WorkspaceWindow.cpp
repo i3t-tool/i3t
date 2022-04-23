@@ -736,8 +736,8 @@ bool WorkspaceDiwne::content()
                     Ptr<WorkspaceNodeWithCoreDataWithPins> cameraWithPins = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(camera);
                     for(auto const& sequence : all_inputFree_Sequence)
                     {
-                        link->setLinkEndpointsDiwne(cameraWithPins->getOutputs()[0]->getLinkConnectionPointDiwne(), /* \todo JH Always 0? */
-                                                   std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(sequence)->getInputs()[0]->getLinkConnectionPointDiwne());
+                        link->setLinkEndpointsDiwne(cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
+                                                   std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(sequence)->getInputs()[Core::I3T_SEQ_IN_MUL]->getLinkConnectionPointDiwne());
                         link->drawDiwne(DIWNE::DrawMode::JustDraw);
                     }
                 }

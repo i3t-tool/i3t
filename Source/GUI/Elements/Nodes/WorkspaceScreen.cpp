@@ -24,10 +24,10 @@ WorkspaceScreen::~WorkspaceScreen()
 void WorkspaceScreen::init()
 {
 	m_renderTexture = new RenderTexture( &m_textureID, static_cast<int>(m_textureSize.x), static_cast<int>(m_textureSize.y));  // create and get the FBO and color Attachment for rendering
-
 	//Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget);
 	m_camera = new Camera(60.0f, Application::get().world()->sceneRoot, m_renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
 
+	getNodebase()->setValue(m_textureSize.x/m_textureSize.y, 1); /* \todo Jh always 1? */
 	printf("Screen initialized\n");
 }
 
@@ -92,6 +92,7 @@ bool WorkspaceScreen::middleContent()
         ImGui::ResetMouseDragDelta(0);
 
         m_renderTexture->resize(m_textureSize.x*diwne.getWorkAreaZoom(), m_textureSize.y*diwne.getWorkAreaZoom());
+        getNodebase()->setValue(m_textureSize.x/m_textureSize.y, 1); /* \todo Jh always 1? */
     }
     
   getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);  // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
