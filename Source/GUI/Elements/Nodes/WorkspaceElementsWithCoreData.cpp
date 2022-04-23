@@ -133,6 +133,16 @@ WorkspaceCorePin::WorkspaceCorePin( DIWNE::Diwne& diwne
     ,   m_iconRectDiwne(ImRect(0,0,0,0))
 {}
 
+bool WorkspaceCorePin::allowInteraction()
+{
+    return m_pin->isEnabled();
+}
+
+bool WorkspaceCorePin::allowProcessFocused()
+{
+    return m_pin->isEnabled();
+}
+
 /* DIWNE function */
 bool WorkspaceCorePin::content()
 {
