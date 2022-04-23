@@ -93,6 +93,8 @@ bool WorkspaceScreen::middleContent()
 
         m_renderTexture->resize(m_textureSize.x*diwne.getWorkAreaZoom(), m_textureSize.y*diwne.getWorkAreaZoom());
     }
+    
+  getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);  // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
 
   return interaction_happen;
 }
