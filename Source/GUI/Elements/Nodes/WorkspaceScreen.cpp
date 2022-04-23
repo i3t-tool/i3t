@@ -54,6 +54,9 @@ bool WorkspaceScreen::middleContent()
 	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownLeft, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
                                          DIWNE::IconType::TriangleDownLeft, ImColor(100,100,150,150), ImColor(100,100,150,150),
                                          buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}left", getId()));
+	// mouse cursor 5 "ResizeNESW"
+	if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(5);
+
     ImGui::SameLine();
 
     if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
@@ -71,9 +74,11 @@ bool WorkspaceScreen::middleContent()
 
 	ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
 
-    interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
+  interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
                                          DIWNE::IconType::TriangleDownRight, ImColor(100,100,150,150), ImColor(100,100,150,150),
                                          buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}right", getId()));
+  // mouse cursor  6 "ResizeNWSE"
+	if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(6);
 
     if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
     {
