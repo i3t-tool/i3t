@@ -10,7 +10,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
     :   WorkspaceNode(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation()->defaultLabel )
     ,   m_nodebase(nodebase)
     ,   m_numberOfVisibleDecimal(I3T::getTheme().get(ESize::Default_VisiblePrecision))
-    ,   m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth)) /* just for safe if someone not call setDataItemsWidth() in constructor of child class... */
+    ,   m_dataItemsWidth(I3T::getTheme().get(ESize::Nodes_FloatWidth)*diwne.getWorkAreaZoom()) /* just for safe if someone not call setDataItemsWidth() in constructor of child class... */
     ,   m_inactiveMark(I3T::getTheme().get(ESize::Default_InactiveMark))
     ,   m_levelOfDetail(WorkspaceLevelOfDetail::Full)
     ,   m_floatPopupMode(Angle)
@@ -939,7 +939,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
                 valueSelected = true;
             }
             ImGui::TableNextColumn();
-            if (ImGui::Selectable("PI/3 (-60°)"))
+            if (ImGui::Selectable("PI/3 (60°)"))
             {
                 selectedValue		= M_PI / 3;
                 valueSelected = true;
@@ -953,7 +953,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
                 valueSelected = true;
             }
             ImGui::TableNextColumn();
-            if (ImGui::Selectable("PI/2 (-90°)"))
+            if (ImGui::Selectable("PI/2 (90°)"))
             {
                 selectedValue		= M_PI / 2;
                 valueSelected = true;
@@ -967,7 +967,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
                 valueSelected = true;
             }
             ImGui::TableNextColumn();
-            if (ImGui::Selectable("PI (-180°)"))
+            if (ImGui::Selectable("PI (180°)"))
             {
                 selectedValue		= M_PI;
                 valueSelected = true;
@@ -981,7 +981,7 @@ void popupFloatContent(FloatPopupMode &popupMode, float& selectedValue, bool& va
                 valueSelected = true;
             }
             ImGui::TableNextColumn();
-            if (ImGui::Selectable("3PI/2 (-270°)"))
+            if (ImGui::Selectable("3PI/2 (270°)"))
             {
                 selectedValue		= 3 * M_PI / 2;
                 valueSelected = true;

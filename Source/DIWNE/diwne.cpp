@@ -131,6 +131,7 @@ bool Diwne::afterEndDiwne()
 
     ImGui::PopFont();
     ImGui::GetFont()->Scale = m_StoreFontScale;
+//    ImGui::PushFont(NULL);
 
     return DiwneObject::afterEndDiwne();
 }
