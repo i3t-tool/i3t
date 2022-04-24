@@ -52,63 +52,63 @@ bool WorkspaceScreen::middleContent()
 	ImGui::SetCursorScreenPos(cursorPos);
 
 	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownLeft, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
-                                         DIWNE::IconType::TriangleDownLeft, ImColor(100,100,150,150), ImColor(100,100,150,150),
-                                         buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}left", getId()));
+																				 DIWNE::IconType::TriangleDownLeft, ImColor(100,100,150,150), ImColor(100,100,150,150),
+																				 buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}left", getId()));
 	// mouse cursor 5 "ResizeNESW"
 	if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(5);
 
-    ImGui::SameLine();
+		ImGui::SameLine();
 
-    if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
-    {
-        interaction_happen = true;
-        resize_texture = true;
+		if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
+		{
+				interaction_happen = true;
+				resize_texture = true;
 
-        dragDelta = diwne.bypassGetMouseDragDelta0()/diwne.getWorkAreaZoom();
+				dragDelta = diwne.bypassGetMouseDragDelta0()/diwne.getWorkAreaZoom();
 
-        ImVec2 nodePos = getNodePositionDiwne(); nodePos.x += dragDelta.x;
-        setNodePositionDiwne(nodePos);
+				ImVec2 nodePos = getNodePositionDiwne(); nodePos.x += dragDelta.x;
+				setNodePositionDiwne(nodePos);
 
-        dragDelta.x *= -1; /* for same code (sign) in if(resize_texture) */
-    }
+				dragDelta.x *= -1; /* for same code (sign) in if(resize_texture) */
+		}
 
 	ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
 
-  interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
-                                         DIWNE::IconType::TriangleDownRight, ImColor(100,100,150,150), ImColor(100,100,150,150),
-                                         buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}right", getId()));
-  // mouse cursor  6 "ResizeNWSE"
+	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
+																				 DIWNE::IconType::TriangleDownRight, ImColor(100,100,150,150), ImColor(100,100,150,150),
+																				 buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}right", getId()));
+	// mouse cursor  6 "ResizeNWSE"
 	if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(6);
 
-    if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
-    {
-        interaction_happen = true;
-        resize_texture = true;
+		if (diwne.bypassIsItemActive() && diwne.bypassIsMouseDragging0())
+		{
+				interaction_happen = true;
+				resize_texture = true;
 
-        dragDelta = diwne.bypassGetMouseDragDelta0()/diwne.getWorkAreaZoom();
-    }
+				dragDelta = diwne.bypassGetMouseDragDelta0()/diwne.getWorkAreaZoom();
+		}
 
-    if(resize_texture)
-    {
-        m_textureSize.x = std::max(2*(buttonSize.x+ImGui::GetStyle().ItemSpacing.x/diwne.getWorkAreaZoom()), m_textureSize.x + dragDelta.x); /* button should fit into middle... */
-        m_textureSize.y = std::max(buttonSize.y+ImGui::GetStyle().ItemSpacing.y/diwne.getWorkAreaZoom(), m_textureSize.y + dragDelta.y);
+		if(resize_texture)
+		{
+				m_textureSize.x = std::max(2*(buttonSize.x+ImGui::GetStyle().ItemSpacing.x/diwne.getWorkAreaZoom()), m_textureSize.x + dragDelta.x); /* button should fit into middle... */
+				m_textureSize.y = std::max(buttonSize.y+ImGui::GetStyle().ItemSpacing.y/diwne.getWorkAreaZoom(), m_textureSize.y + dragDelta.y);
 
-        ImGui::ResetMouseDragDelta(0);
+				ImGui::ResetMouseDragDelta(0);
 
-        m_renderTexture->resize(m_textureSize.x*diwne.getWorkAreaZoom(), m_textureSize.y*diwne.getWorkAreaZoom());
-        getNodebase()->setValue(m_textureSize.x/m_textureSize.y, 1); /* \todo Jh always 1? */
-    }
+				m_renderTexture->resize(m_textureSize.x*diwne.getWorkAreaZoom(), m_textureSize.y*diwne.getWorkAreaZoom());
+				getNodebase()->setValue(m_textureSize.x/m_textureSize.y, 1); /* \todo Jh always 1? */
+		}
 
-  getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);  // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
+	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);  // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
 
-  return interaction_happen;
+	return interaction_happen;
 }
 
 int WorkspaceScreen::maxLenghtOfData()  //todo
 {
 //    Debug::Assert(false, "TODO Calling WorkspaceScreen::maxLenghtOfData() makes no sense - really?!?!?!!");
 //    return -1; /* should be unused */
-    return numberOfCharWithDecimalPoint( getOutputs()[1]->getCorePin().data().getFloat(), getNumberOfVisibleDecimal()); /* \todo JH not 1 but some Core::Pin_Code */
+		return numberOfCharWithDecimalPoint( getOutputs()[1]->getCorePin().data().getFloat(), getNumberOfVisibleDecimal()); /* \todo JH not 1 but some Core::Pin_Code */
 }
 
 void WorkspaceScreen::drawMenuLevelOfDetail() //todo
