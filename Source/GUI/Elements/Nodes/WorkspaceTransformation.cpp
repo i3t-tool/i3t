@@ -103,8 +103,10 @@ bool WorkspaceTransformation::afterContent()
         {
             start.x += m_inactiveMark*size.x;
         }
+
+        // show the tracking rectangle
         diwne.AddRectFilledDiwne(start, end, ImColor(0.f, 0.f, 0.f, 0.3f));
-        //ImGui::GetWindowDrawList()->AddRectFilled( start, end, ImColor(0.f, 0.f, 0.f, 0.5f) );
+
     }
     return false;
 }
