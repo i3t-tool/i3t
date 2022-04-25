@@ -9,6 +9,7 @@ class WorkspaceNodeWithCoreData;
 class WorkspaceSequence;
 class WorkspaceTransformation;
 class WorkspaceScreen;
+class WorkspaceModel;
 
 using GuiNode      = WorkspaceNodeWithCoreData;
 using GuiCamera    = WorkspaceCamera;
@@ -17,6 +18,7 @@ using GuiOperator  = WorkspaceNodeWithCoreData; /* JH WorkspaceOperator can be h
 using GuiTransform = WorkspaceTransformation;
 using GuiSequence  = WorkspaceSequence;
 using GuiScreen    = WorkspaceScreen;
+using GuiModel     = WorkspaceModel;
 
 using GuiNodePtr = std::shared_ptr<GuiNode>;
 
@@ -31,6 +33,7 @@ public:
 	virtual void visit(const Ptr<GuiSequence>& node)  {};
 	virtual void visit(const Ptr<GuiTransform>& node) {};
 	virtual void visit(const Ptr<GuiScreen>& node)    {};
+	virtual void visit(const Ptr<GuiModel>& node)    {};
 };
 
 class IVisitable

@@ -131,10 +131,21 @@ NodeData dumpOperator(Ptr<GuiNode> guiNode)
 	/// \todo MH consider multiple editable inputs for operator.
 	static std::string formatString = std::string(g_baseFormatString) + "    value: {}\n";
 
+	static std::string noOutputValueFormatString = std::string(g_baseFormatString);
+
 	NodeData data;
-	data.node = fmt::format(formatString, node->getId(), node->getOperation()->keyWord,            // id and type
-													guiNode->getNodePositionDiwne().x, guiNode->getNodePositionDiwne().y,  // position
-													dumpValue(node->getOutPin(0).getType(), node));                        // value
+
+	if (!node->getOutputPins().empty())
+	{
+		data.node = fmt::format(formatString, node->getId(), node->getOperation()->keyWord,            // id and type
+														guiNode->getNodePositionDiwne().x, guiNode->getNodePositionDiwne().y,  // position
+														dumpValue(node->getOutPin(0).getType(), node));                        // value
+	}
+	else
+	{
+		data.node = fmt::format(noOutputValueFormatString, node->getId(), node->getOperation()->keyWord,
+														guiNode->getNodePositionDiwne().x, guiNode->getNodePositionDiwne().y);
+	}
 
 	for (const auto& in : node->getInputPins())
 	{
@@ -193,6 +204,10 @@ std::optional<NodeData> dumpScreen(Ptr<GuiScreen> guiScreen)
 	return dumpOperator(guiScreen);
 }
 
+std::optional<NodeData> dumpModel(const Ptr<GuiModel>& guiModel) {
+	return dumpOperator(guiModel);
+}
+
 //===----------------------------------------------------------------------===//
 
 std::string SceneRawData::toString() const
@@ -231,7 +246,7 @@ std::string SceneRawData::toString() const
 /// \see addNodeToPosition(ImVec2 const)
 std::map<
     std::string_view,
-	std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
+    std::function<Ptr<WorkspaceNodeWithCoreData>(ImVec2 const)>
 > createFns;
 
 std::map<
@@ -276,6 +291,7 @@ SerializationVisitor::SerializationVisitor()
 	if (!m_isInitialized)
 	{
 		initCreateFns();
+		createFns[n(ENodeType::Model)] = addNodeToNodeEditor<WorkspaceModel>;
 		m_isInitialized = true;
 	}
 }
@@ -338,6 +354,12 @@ void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
 void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 {
 	if (auto result = dumpScreen(node))
+		m_sceneData.addScreen(*result);
+}
+
+void SerializationVisitor::visit(const Ptr<GuiModel>& node)
+{
+	if (auto result = dumpModel(node))
 		m_sceneData.addScreen(*result);
 }
 
@@ -460,6 +482,10 @@ void buildOperator(YAML::Node& node)
 		}
 
 		I3T_ASSERT(valueResult.status == ValueSetResult::Status::Ok);
+
+		if (coreNode->getOperation()->keyWord == n(ENodeType::Model)) {
+			// op->initialize();
+		}
 
 		op->getNodebase()->changeId(id);
 	}
