@@ -291,8 +291,7 @@ private:
 	template <typename T>
 	ValueSetResult setValueEx(T&& val, unsigned index = 0)
 	{
-		setInternalValue(val, index);   //PF
-
+		setInternalValue(val, index);
 		return ValueSetResult{};
 	}
 

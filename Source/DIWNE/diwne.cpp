@@ -56,7 +56,7 @@ bool Diwne::beforeBeginDiwne() /* \todo JH redesign to https://en.wikipedia.org/
 //    ImGui::SetWindowFontScale(m_workAreaZoom);
     m_StoreFontScale = ImGui::GetFont()->Scale;
     ImGui::GetFont()->Scale = m_workAreaZoom;
-    ImGui::PushFont(NULL);
+    ImGui::PushFont(ImGui::GetFont());
 
     m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
     ImGui::GetStyle().ItemSpacing *= m_workAreaZoom;
@@ -129,8 +129,9 @@ bool Diwne::afterEndDiwne()
 {
     ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
 
-    ImGui::GetFont()->Scale = m_StoreFontScale;
     ImGui::PopFont();
+    ImGui::GetFont()->Scale = m_StoreFontScale;
+//    ImGui::PushFont(NULL);
 
     return DiwneObject::afterEndDiwne();
 }
@@ -385,6 +386,35 @@ void Diwne::DrawIconTriangleRight(ImDrawList* idl,
 
 }
 
+void Diwne::DrawIconTriangleDownRight(ImDrawList* idl,
+                      ImColor ShapeColor, ImColor InnerColor,
+                      ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
+{
+    float thicknes = 1; /* \todo JH from settings_diwne */
+
+    idl->AddTriangleFilled(ImVec2(topLeft.x, bottomRight.y), bottomRight, ImVec2(bottomRight.x, topLeft.y), ShapeColor);
+
+    if (!filled)
+    {
+        idl->AddTriangleFilled(ImVec2(topLeft.x+2*thicknes, bottomRight.y-thicknes), bottomRight-ImVec2(thicknes, thicknes), ImVec2(bottomRight.x-2*thicknes, topLeft.y+thicknes), InnerColor);
+    }
+
+}
+
+void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl,
+                      ImColor ShapeColor, ImColor InnerColor,
+                      ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
+{
+    float thicknes = 1; /* \todo JH from settings_diwne */
+
+    idl->AddTriangleFilled(topLeft, ImVec2(topLeft.x, bottomRight.y), bottomRight, ShapeColor);
+    if (!filled)
+    {
+        idl->AddTriangleFilled(topLeft+ImVec2(thicknes, 2*thicknes), ImVec2(topLeft.x+thicknes, bottomRight.y-thicknes), bottomRight-ImVec2(2*thicknes, thicknes), InnerColor);
+    }
+
+}
+
 void Diwne::DrawIconCross(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const
@@ -448,6 +478,12 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
     case Cross:
         DrawIconCross(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
         break;
+    case TriangleDownLeft:
+        DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+        break;
+    case TriangleDownRight:
+        DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+        break;
     }
 
     switch(fgIconType)
@@ -466,6 +502,12 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
         break;
     case Cross:
         DrawIconCross(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
+        break;
+    case TriangleDownLeft:
+        DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+        break;
+    case TriangleDownRight:
+        DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
         break;
     }
 

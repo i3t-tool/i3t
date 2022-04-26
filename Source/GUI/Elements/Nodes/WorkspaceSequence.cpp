@@ -233,8 +233,9 @@ void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
 
 int WorkspaceSequence::maxLenghtOfData()
 {
-    Debug::Assert(false, "Calling WorkspaceSequence::maxLenghtOfData() make no sense because every included Transformation has its own independent data");
-    return -1; /* should be unused */
+//    Debug::Assert(false, "Calling WorkspaceSequence::maxLenghtOfData() make no sense because every included Transformation has its own independent data");
+//    return -1; /* should be unused */
+    return 0; /* \todo JH not sure where it is used... fall on zoom with Sequention on Workspace */
 }
 
 

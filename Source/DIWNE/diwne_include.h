@@ -51,6 +51,8 @@ enum IconType
     Rectangle,
     TriangleLeft,
     TriangleRight,
+    TriangleDownLeft,
+    TriangleDownRight,
     Cross
 };
 

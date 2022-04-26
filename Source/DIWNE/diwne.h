@@ -36,6 +36,8 @@ static bool popupDiwne(std::string const popupID, ImVec2 const & popupPos, void 
         ImGui::SetNextWindowPos(popupPos);
         if (ImGui::BeginPopup(popupID.c_str()))
         {
+            //float oldSize = ImGui::GetFontSize();
+            /* \todo create somewhere pre loaded font of desired size and push/pop then here */
             interaction_happen = true;
 
             popupContent(std::forward<Args>(args)...);
@@ -259,6 +261,14 @@ class Diwne : public DiwneObject
         /*! \brief \see DrawIconCircle
          */
         void DrawIconCross(ImDrawList* idl,
+                      ImColor ShapeColor, ImColor InnerColor,
+                      ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+
+        void DrawIconTriangleDownLeft(ImDrawList* idl,
+                      ImColor ShapeColor, ImColor InnerColor,
+                      ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
+
+        void DrawIconTriangleDownRight(ImDrawList* idl,
                       ImColor ShapeColor, ImColor InnerColor,
                       ImVec2 topLeft, ImVec2 bottomRight, bool filled ) const;
 

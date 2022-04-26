@@ -56,6 +56,9 @@ public:
 	FloatPopupMode& getFloatPopupMode() {return m_floatPopupMode;};
 	void setFloatPopupMode(FloatPopupMode mode){m_floatPopupMode = mode;};
 
+	float inactiveMarcToLeft(float step=0.1){return m_inactiveMark-=step;};
+	float inactiveMarcToRight(float step=0.1){return m_inactiveMark+=step;};
+
 	virtual int maxLenghtOfData() = 0;
 
 	float getDataItemsWidth();
@@ -124,6 +127,9 @@ protected:
 
 public:
     WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
+
+//    bool allowInteraction() const override;
+//    bool allowProcessFocused() const override;
 
 	Core::Pin const& getCorePin() const;
 
@@ -289,6 +295,8 @@ class WorkspaceNodeWithCoreDataWithPins : public WorkspaceNodeWithCoreData
 	public:
         std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const {return m_workspaceInputs;};
         std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const {return m_workspaceOutputs;};
+
+        virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const {return getOutputs();};
 
         WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase, bool showDataOnPins=true);
 
