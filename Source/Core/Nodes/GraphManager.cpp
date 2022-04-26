@@ -2,13 +2,24 @@
 
 #include <algorithm>
 
-#include "glm/gtx/matrix_interpolation.hpp"
-
 #include "Logger/Logger.h"
 
 using namespace Core;
 
-std::vector<Ptr<Cycle>> GraphManager::m_cycles;
+GraphManager* GraphManager::s_self = nullptr;
+
+void GraphManager::init()
+{
+	s_self = new GraphManager;
+}
+
+void GraphManager::destroy()
+{
+	if (s_self != nullptr)
+	{
+		delete s_self;
+	}
+}
 
 ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 {
@@ -152,7 +163,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase
 
 void GraphManager::update(double tick)
 {
-	for (auto& cycle : m_cycles)
+	for (auto& cycle : s_self->m_cycles)
 		cycle->update(tick);
 }
 

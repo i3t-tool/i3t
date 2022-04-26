@@ -5,7 +5,7 @@
 
 using namespace Core;
 
-TEST(PulseTest, PulseNodeCanTriggerCycle)
+TEST_F(CycleTestFixture, PulseNodeCanTriggerCycle)
 {
 	auto pulse = Builder::createNode<ENodeType::Pulse>();
 	auto cycle = GraphManager::createCycle();

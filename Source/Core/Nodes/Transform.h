@@ -98,7 +98,7 @@ public:
 		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
 
 		m_defaultValues.at(name).setValue(val);
-		reset(); // JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
+		reset();
 	}
 
 	/**
@@ -135,6 +135,7 @@ public:
 		notifySequence();
 	}
 
+	/// \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
 	virtual void onReset() {}
 
 	//===----------------------------------------------------------------------===//
