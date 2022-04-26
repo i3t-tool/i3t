@@ -26,3 +26,17 @@ inline void plug_expectOk(T1&& lhs, T2&& rhs, int leftIndex = 0, int rightIndex 
 	auto plugResult = GraphManager::plug(std::forward<T1>(lhs), std::forward<T2>(rhs), leftIndex, rightIndex);
 	EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 }
+
+class CycleTestFixture : public ::testing::Test
+{
+protected:
+	static void SetUpTestSuite()
+	{
+		GraphManager::init();
+	}
+
+	static void TearDownTestSuite()
+	{
+		GraphManager::destroy();
+	}
+};

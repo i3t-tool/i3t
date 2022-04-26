@@ -10,6 +10,7 @@ using namespace Core;
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
+/*
 TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 {
 	auto rotXNode = Builder::createTransform<ETransformType::EulerX>();
@@ -63,6 +64,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
 	}
 }
+ */
 
 /// \todo Fix this test.
 /*
@@ -140,6 +142,7 @@ TEST(EulerXTest, SetMatrixShuldBeValid)
 
 //===-- Euler rotation around Y axis --------------------------------------===//
 
+/*
 TEST(EulerYTest, OneValueSet)
 {
 	auto rotYNode = Core::Builder::createTransform<ETransformType::EulerY>();
@@ -187,6 +190,7 @@ TEST(EulerYTest, OneValueSet)
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
 }
+ */
 
 /*
 /// \todo MH GLM_GetAngleFromEulerY won't pass.
@@ -228,6 +232,8 @@ TEST(EulerYTest, SetMatrixShouldBeValid)
  */
 
 //===-- Euler rotation around Z axis --------------------------------------===//
+
+/*
 
 TEST(EulerZTest, OneValueSet)
 {
@@ -274,6 +280,7 @@ TEST(EulerZTest, OneValueSet)
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
 }
+ */
 
 TEST(GLM, GetAngleFromEulerZ)
 {

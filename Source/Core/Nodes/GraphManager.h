@@ -21,12 +21,22 @@
 
 namespace Core
 {
+/**
+ * You must manage GraphManager lifecycle.
+ * \code
+ * GraphManager::init();
+ *
+ * // interaction with GraphManager
+ *
+ * GraphManager::destroy();
+ * \endcode
+ */
 class GraphManager
 {
-	/// References to created cycle nodes which need to be regularly updated.
-	static std::vector<Ptr<Cycle>> m_cycles;
-
 public:
+	static void init();
+	static void destroy();
+
 	template <ENodeType T>
 	static Ptr<NodeBase> createNode()
 	{
@@ -51,7 +61,7 @@ public:
 	 */
 	static void update(double tick);
 
-	[[nodiscard]] static std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
+	[[nodiscard]] std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
 
 	/**
 	 * Is used to check before connecting to avoid cycles in the node graph.
@@ -142,6 +152,12 @@ public:
 	static const Operation* getOperation(const Pin* pin);
 	static bool							areFromSameNode(const Pin* lhs, const Pin* rhs);
 	static bool							arePlugged(const Pin& input, const Pin& output);
+
+private:
+	static GraphManager* s_self;
+
+	/// References to created cycle nodes which need to be regularly updated.
+	std::vector<Ptr<Cycle>> m_cycles;
 };
 
 using gm = GraphManager;
@@ -246,7 +262,7 @@ inline Ptr<Core::Cycle> GraphManager::createCycle()
 {
 	auto ret = Builder::createCycle();
 
-	m_cycles.push_back(ret);
+	s_self->m_cycles.push_back(ret);
 
 	return ret;
 }

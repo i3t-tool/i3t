@@ -144,7 +144,14 @@ void TransformImpl<ETransformType::Scale>::onReset()
 //	m_hasEnabledSynergies = true; // JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
 //	m_isLocked            = true;
 
-	const auto& scale = getDefaultValue("scale").getVec3();
+	auto scale = getDefaultValue("scale").getVec3();
+
+	if (m_hasEnabledSynergies)
+	{
+		scale.y = scale.x;
+		scale.z = scale.x;
+	}
+
 	setInternalValue(glm::scale(scale));
 }
 
