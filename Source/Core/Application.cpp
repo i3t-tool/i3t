@@ -30,6 +30,8 @@ Application::Application()
 	m_modules.push_back(new UIModule());
 
 	m_scriptInterpreter = new Scripting();
+
+	Core::GraphManager::init();
 }
 
 Application::~Application()
