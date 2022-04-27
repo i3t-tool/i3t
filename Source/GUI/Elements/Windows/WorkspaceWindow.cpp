@@ -753,13 +753,15 @@ bool WorkspaceDiwne::content()
         std::vector<Ptr<WorkspaceNodeWithCoreData>> all_cameras = getAllCameras();
         if(all_cameras.size() > 0)
         {
+            Ptr<DIWNE::Link> link = std::make_shared<DIWNE::Link>(diwne, INT_MAX, "TemporalLink");
+            Ptr<WorkspaceNodeWithCoreDataWithPins> cameraWithPins;
+
             std::vector<Ptr<WorkspaceNodeWithCoreData>> all_inputFree_Sequence = getAllInputFreeSequence();
             if(all_inputFree_Sequence.size() > 0)
             {
-                Ptr<DIWNE::Link> link = std::make_shared<DIWNE::Link>(diwne, INT_MAX, "TemporalLink");
                 for(auto const& camera : all_cameras)
                 {
-                    Ptr<WorkspaceNodeWithCoreDataWithPins> cameraWithPins = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(camera);
+                    cameraWithPins = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(camera);
                     for(auto const& sequence : all_inputFree_Sequence)
                     {
                         link->setLinkEndpointsDiwne(cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
@@ -768,6 +770,23 @@ bool WorkspaceDiwne::content()
                     }
                 }
             }
+
+            std::vector<Ptr<WorkspaceNodeWithCoreData>> all_inputFree_Model = getAllInputFreeModel();
+            if(all_inputFree_Model.size() > 0)
+            {
+                for(auto const& camera : all_cameras)
+                {
+                    cameraWithPins = std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(camera);
+                    for(auto const& model : all_inputFree_Model)
+                    {
+                        link->setLinkEndpointsDiwne(cameraWithPins->getOutputs()[Core::I3T_CAMERA_OUT_MUL]->getLinkConnectionPointDiwne(),
+                                                   std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(model)->getInputs()[0 /*\todo JH Some constant from core here*/]->getLinkConnectionPointDiwne());
+                        link->drawDiwne(DIWNE::DrawMode::JustDraw);
+                    }
+                }
+            }
+
+
         }
 
         m_channelSplitter.Merge(ImGui::GetWindowDrawList());
@@ -796,6 +815,17 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllInputFreeSeque
         if (seq && !seq->getInputs()[0]->isConnected()){sequences.push_back(node);}; /* \todo JH Always 0? */
     }
     return sequences;
+}
+
+std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllInputFreeModel()
+{
+    std::vector<Ptr<WorkspaceNodeWithCoreData>> models;
+    for (auto const& node : m_workspaceCoreNodes)
+    {
+        Ptr<WorkspaceModel> model = std::dynamic_pointer_cast<WorkspaceModel>(node);
+        if (model && !model->getInputs()[0]->isConnected()){models.push_back(node);}; /* \todo JH Always 0? */
+    }
+    return models;
 }
 
 
