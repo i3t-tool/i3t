@@ -45,15 +45,32 @@ bool WorkspaceScreen::middleContent()
 
 	ImGui::TextUnformatted(Utils::toString(m_camera->m_perspective).c_str());
 
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertical flip
+	//#define IM_FLOOR(_VAL) ((float) (int) (_VAL))    
+	#define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y)))
+	float	 zoom							 = diwne.getWorkAreaZoom();
+	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom());
+	ImVec2 zoomedButtonSize = FLOOR_VEC2(buttonSize * diwne.getWorkAreaZoom());
 
-	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-	cursorPos.y -= (buttonSize.y*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.y);
+
+	ImVec2 topLeftCursorPos = FLOOR_VEC2(ImGui::GetCursorScreenPos());
+	// ---------- Texture Image ------------
+	//ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f), ImVec2(1.0f,0.0f)); //vertical flip
+	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), zoomedTextureSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f)); //vertical flip
+
+
+	// ---------- Left button ------------
+	//ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	//cursorPos.y -= (buttonSize.y*diwne.getWorkAreaZoom() + ImGui::GetStyle().ItemSpacing.y);
+
+	ImVec2 cursorPos = topLeftCursorPos;
+	cursorPos.y += zoomedTextureSize.y - zoomedButtonSize.y;
+
+
 	ImGui::SetCursorScreenPos(cursorPos);
 
 	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownLeft, ImColor(100,50,50,150), ImColor(100,50,50,150), /* \todo JH MH constants to setting */
 																				 DIWNE::IconType::TriangleDownLeft, ImColor(100,100,150,150), ImColor(100,100,150,150),
-																				 buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}left", getId()));
+																				 zoomedButtonSize, ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}left", getId()));
 	// mouse cursor 5 "ResizeNESW"
 	if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(5);
 
@@ -72,11 +89,19 @@ bool WorkspaceScreen::middleContent()
 				dragDelta.x *= -1; /* for same code (sign) in if(resize_texture) */
 		}
 
-	ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
+	// ---------- Right button ------------
+	//ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
+	//ImGui::Indent(std::max(0.0f, (m_textureSize.x - buttonSize.x)*diwne.getWorkAreaZoom()));
+
+	cursorPos = topLeftCursorPos + zoomedTextureSize - zoomedButtonSize;
+	//cursorPos.y += zoomedTextureSize.y - zoomedButtonSize.y;
+	//cursorPos.x += zoomedTextureSize.x - zoomedButtonSize.x;
+
+	ImGui::SetCursorScreenPos(cursorPos);
 
 	interaction_happen |= diwne.IconButton(DIWNE::IconType::TriangleDownRight, ImColor(100,50,50,150), ImColor(100,50,50,150),
 																				 DIWNE::IconType::TriangleDownRight, ImColor(100,100,150,150), ImColor(100,100,150,150),
-																				 buttonSize*diwne.getWorkAreaZoom(), ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}right", getId()));
+																				 zoomedButtonSize, ImVec4(buttonIconPadding,buttonIconPadding,buttonIconPadding,buttonIconPadding), true, fmt::format("screenButton:{}right", getId()));
 	// mouse cursor  6 "ResizeNWSE"
 	if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(6);
 
