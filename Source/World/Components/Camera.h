@@ -49,9 +49,9 @@ public:
 
 	bool m_processView=true;
 	float m_angle = 60.0f;
-	RenderTexture* m_fbo=NULL;///<if fbo is NULL, then render on screen, assuming that screen fbo is binded
-	glm::mat4x4 m_perspective; ///< Perspective matrix
-	GameObject* m_sceneRoot = NULL;///< this scene tree will be rendered by camera
+	RenderTexture* m_fbo				= NULL; ///< if (fbo is NULL) then render on the screen, assuming that the screen fbo is bounded
+	glm::mat4x4		 m_perspective;				///< Perspective matrix
+	GameObject*		 m_sceneRoot = NULL;  ///< this scene tree will be rendered by this camera
 
 private:
 	static const char* s_type;
