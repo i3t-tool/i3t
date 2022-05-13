@@ -3,28 +3,31 @@
 //
 
 #pragma once
-#include "WorkspaceNodeWithCoreData.h"
-
-struct WorkspaceCycleArgs
-{
-  WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-  std::string headerLabel = "default Cycle header";
-  std::string nodeLabel = "default Cycle label";
-  Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle();
-};
-
-class WorkspaceCycle : public WorkspaceNodeWithCoreData
+#include "WorkspaceElementsWithCoreData.h"
+class WorkspaceCycle : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-  WorkspaceCycle(ImTextureID headerBackground, WorkspaceCycleArgs const& args);
-  WorkspaceCycle(ImTextureID headerBackground, Ptr<Core::Cycle> nodebase = nullptr, std::string headerLabel = "Cycle", std::string nodeLabel = "Cycle");
+    //===-- Double dispatch ---------------------------------------------------===//
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<WorkspaceCycle>(shared_from_this()));
+	}
+	//===----------------------------------------------------------------------===//
 
+  WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(), bool drawPins=true);
 	bool isCycle();
 
-  void drawDataSetValues(util::NodeBuilder& builder);
-  void drawDataFull(util::NodeBuilder& builder, int index);
-  void drawInputPin(util::NodeBuilder& builder, Ptr<WorkspaceCorePinProperties> const & pinProp, Core::Pin* newLinkPin);
+    bool buttonStepNext();
+    bool buttonStepBack();
+    bool buttonStopAndReset();
+    bool buttonPlayPause();
 
-	int maxLenghtOfData();
+  bool middleContent();
+  bool leftContent();
+  bool rightContent();
+
+  void drawMenuLevelOfDetail();
+
+    int maxLenghtOfData();
 };
 

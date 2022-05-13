@@ -7,9 +7,12 @@
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "GUI/Elements/IWindow.h"
+#include "State/Stateful.h"
 #include "Theme.h"
 
-static const ImGuiWindowFlags_ g_WindowFlags = ImGuiWindowFlags_NoCollapse;
+constexpr const char* ImGui_GLSLVersion = "#version 140";
+
+static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
 		static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
 
@@ -23,7 +26,7 @@ template <typename T> constexpr inline void checkWindowType()
 inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& dockableWindows)
 {
 	Ptr<IWindow> result = nullptr;
-	for (auto w : dockableWindows)
+	for (const auto& w : dockableWindows)
 		if (strcmp(w->getID(), ID) == 0)
 			result = w;
 
@@ -54,14 +57,17 @@ class UIModule final : public Module
 	void onClose() override;
 
 public:
-	Theme& getTheme() { return m_currentTheme; }
+	Theme& getTheme()
+	{
+		auto* curr = m_currentTheme;
+		return *curr;
+	}
 	std::vector<Theme>& getThemes() { return m_allThemes; }
 
 	void loadThemes();
 	void reloadThemes();
 
 	void setTheme(const Theme& theme);
-	void setDefaultTheme(Theme& theme);
 
 	Fonts& getFonts() { return m_fonts; }
 	void loadFonts();
@@ -91,7 +97,7 @@ public:
 		}
 	}
 
-	template <typename T> Ptr<IWindow> getWindowPtr() { return findWindow<T>(m_dockableWindows); }
+	template <typename T> Ptr<T> getWindowPtr() { return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows)); }
 
 private:
 	void setFocusedWindow();
@@ -108,7 +114,7 @@ private:
 
 	std::map<std::string, Ptr<IWindow>> m_windows;
 
-	Theme m_currentTheme;
+	Theme* m_currentTheme;
 	std::vector<Theme> m_allThemes;
 
 	Fonts m_fonts;

@@ -12,11 +12,21 @@ inline bool doesFileExists(const char* filename)
 	return (stat(filename, &buffer) == 0);
 }
 
+/**
+ *
+ * @param path Absolute
+ * @return
+ */
 inline bool doesFileExists(const std::string& path)
 {
 	return doesFileExists(path.c_str());
 }
 
+/**
+ *
+ * @param path Absolute
+ * @return
+ */
 inline bool doesFileExists(fs::path& path)
 {
 	return doesFileExists(path.string().c_str());

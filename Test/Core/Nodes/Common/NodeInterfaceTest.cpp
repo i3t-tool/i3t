@@ -11,8 +11,11 @@ float initialRot = glm::radians(60.0f);
 auto initialScale = glm::vec3(1.0f, 2.0f, 3.0f);
 auto initialTransl = glm::vec3(-1.0f, 2.0f, 5.0f);
 
-Ptr<NodeBase> scale1, scale2, rotX, translation;
-Ptr<NodeBase> mul1, mul2, mul3;
+struct TestData
+{
+	Ptr<NodeBase> scale1, scale2, rotX, translation;
+	Ptr<NodeBase> mul1, mul2, mul3;
+};
 
 /**
  * Build simple node graph.
@@ -21,28 +24,30 @@ Ptr<NodeBase> mul1, mul2, mul3;
  *             |        |        |
  *            rotX   scale2  translation
  */
-Ptr<NodeBase> prepareEnvironment()
+TestData prepareEnvironment()
 {
-  scale1 = Builder::createNode<ENodeType::MakeScale>();
-  rotX = Builder::createNode<ENodeType::MakeEulerX>();
-  scale2 = Builder::createNode<ENodeType::MakeScale>();
-  translation = Builder::createNode<ENodeType::MakeTranslation>();
+	TestData ctx;
+
+	ctx.scale1 = Builder::createNode<ENodeType::MakeScale>();
+	ctx.rotX = Builder::createNode<ENodeType::MakeEulerX>();
+	ctx.scale2 = Builder::createNode<ENodeType::MakeScale>();
+	ctx.translation = Builder::createNode<ENodeType::MakeTranslation>();
 
 	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be complete yet!)
-  mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
-  mul2 = Builder::createNode<ENodeType::MatrixMulMatrix>();
-  mul3 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+	ctx.mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+	ctx.mul2 = Builder::createNode<ENodeType::MatrixMulMatrix>();
+	ctx.mul3 = Builder::createNode<ENodeType::MatrixMulMatrix>();
 
-  plug_expectOk(scale1, mul1, 0, 0);
-  plug_expectOk(rotX, mul1, 0, 1);
+  plug_expectOk(ctx.scale1, ctx.mul1, 0, 0);
+  plug_expectOk(ctx.rotX, ctx.mul1, 0, 1);
 
-  plug_expectOk(mul1, mul2, 0, 0);
-  plug_expectOk(scale2, mul2, 0, 1);
+  plug_expectOk(ctx.mul1, ctx.mul2, 0, 0);
+  plug_expectOk(ctx.scale2, ctx.mul2, 0, 1);
 
-  plug_expectOk(mul2, mul3, 0, 0);
-  plug_expectOk(translation, mul3, 0, 1);
+  plug_expectOk(ctx.mul2, ctx.mul3, 0, 0);
+  plug_expectOk(ctx.translation, ctx.mul3, 0, 1);
 
-	return mul3;
+	return ctx;
 }
 
 Ptr<NodeBase> getRoot(Ptr<NodeBase> node)
@@ -83,7 +88,9 @@ TEST(NodeInterfaceTest, GetParentOfNonexistentPin_ShouldReturnNull)
 TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResults)
 {
 	// Last node is mul3
-	auto lastNode = prepareEnvironment();
+	auto ctx = prepareEnvironment();
+
+	auto lastNode = ctx.mul3;
 	auto lastNodeInputs = GraphManager::getAllInputNodes(lastNode);
 	EXPECT_EQ(2, lastNodeInputs.size());
 	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
@@ -99,14 +106,16 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 	EXPECT_EQ(3, GraphManager::getOutputNodes(root, 0).size());
 }
 
+/*
 TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 {
-	auto scale = Core::Builder::createTransform<Scale>();
+	auto scale = Core::Builder::createTransform<ETransformType::Scale>();
 
 	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
 
-	EXPECT_EQ(expectedOperation->keyWord, scale->getOperation()->keyWord);
+	EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
 }
+ */
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
 {
@@ -120,11 +129,11 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnec
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
 	auto inputSeq = Builder::createSequence();
-	auto mySeq = Builder::createSequence();
-	auto free = Builder::createNode<ENodeType::Matrix>();
+	auto mySeq    = Builder::createSequence();
+	auto mat      = Builder::createNode<ENodeType::MatrixToMatrix>();
 
 	plug_expectOk(inputSeq, mySeq, 0, 0);
-	plug_expectOk(free, mySeq, 0, 1);
+	plug_expectOk(mat, mySeq, 0, 1);
 
 	auto result = GraphManager::getAllInputNodes(mySeq);
 
@@ -136,4 +145,12 @@ TEST(NodeInterfaceTest, GetNodesConnectedToNonexistentOutputPin)
 	auto seq = Builder::createSequence();
 
 	EXPECT_THROW(gm::getOutputNodes(seq, 10).empty(), std::exception);
+}
+
+TEST(NodeInterfaceTest, SetValueWithIndex)
+{
+	auto screen = GraphManager::createNode<ENodeType::Screen>();
+
+	auto result = screen->setValue((float) 1920 / 1080, I3T_OUTPUT1);
+	EXPECT_EQ(result.status, ValueSetResult::Status::Ok);
 }

@@ -11,18 +11,42 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
-namespace SequenceInternals
-{
+constexpr size_t I3T_SEQ_IN_MUL = 0;  // owned by multiplier
+constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
 
-}
+constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
+constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by multiplier
+
+constexpr size_t I3T_SEQ_MUL = 0;
+constexpr size_t I3T_SEQ_MAT = 1;  // local transform
+constexpr size_t I3T_SEQ_MOD = 2;  // world transform
+
+class Sequence;
+
+namespace Builder
+{
+	Ptr<Sequence> createSequence();
+} // namespace Builder
 
 /**
  * Sequence of matrices.
+ *
+ * +---------------------------+
+ * |               <M> 0 mul   |
+ * | 0 mul <M>     <S> 1 mat   |
+ * | 1 mat <S>     <M> 2 model |
+ * +---------------------------+
  */
-class Sequence : public NodeBase
+class Sequence : public Node
 {
 	friend class GraphManager;
-	using Matrix = NodeBase;
+
+	using Matrix       = NodeBase;
+	using SequencePins = std::vector<Pin>;
+
+	friend class Multiplier;
+	friend class Storage;
 
 	/** Structure for storing transform matrices. */
 	class Storage : public Node
@@ -33,15 +57,31 @@ class Sequence : public NodeBase
 		Matrices m_matrices;
 
 	public:
-		Storage() : Node(nullptr) {}
+		Storage();
+
+		Ptr<Node> clone() override
+		{
+			I3T_ABORT("Don't clone this class!");
+
+			return nullptr;
+		}
+
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
+		DataStore& getInternalData(size_t index = 0) override;
 
 		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
 		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 		Ptr<Transformation> popMatrix(const int index);
 		void swap(int from, int to);
 
+		/**
+		 * Updates local transform.
+		 * @param inputIndex
+		 */
 		void updateValues(int inputIndex) override;
 	};
+
 
 	/** Structure which represents sequences multiplication. */
 	class Multiplier : public Node
@@ -49,19 +89,36 @@ class Sequence : public NodeBase
 		friend class Core::Sequence;
 
 	public:
-		Multiplier() : Node(nullptr) {}
+		Multiplier();
 
+		Ptr<Node> clone() override
+		{
+			I3T_ABORT("Don't clone this class!");
+
+			return nullptr;
+		}
+
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
+		DataStore& getInternalData(size_t index = 0) override;
+
+		/**
+		 * Updates mul. output and world transform.
+		 * @param inputIndex
+		 */
 		void updateValues(int inputIndex) override;
 	};
 
-	/// \todo MH use Node::m_owner!
-	NodePtr m_parent = nullptr; ///< Node which owns the sequence.
-
-	Ptr<Storage> m_storage;
+	Ptr<Storage>    m_storage;
 	Ptr<Multiplier> m_multiplier;
 
 public:
 	Sequence();
+
+	Ptr<Node> clone() override;
+
+	Pin& getIn(size_t i) override;
+	Pin& getOut(size_t i) override;
 
 	void createComponents();
 
@@ -83,7 +140,7 @@ public:
 
 	DataStore& getInternalData(size_t index = 0) override;
 
-	const Matrices& getMatrices() { return m_storage->m_matrices; }
+	const Matrices& getMatrices() const { return m_storage->m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -103,16 +160,9 @@ public:
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
 
-	/**
-	 * Keep storage and multipliers pins at same state as sequences pins are.
-	 */
-	void updatePins();
-	void resetInputPin(std::vector<Pin*>& outputsOfPin, Pin* newInput);
-
 	void updateValues(int inputIndex) override;
 
 private:
-	void notifyParent();
 	void receiveSignal(int inputIndex) override;
 };
 

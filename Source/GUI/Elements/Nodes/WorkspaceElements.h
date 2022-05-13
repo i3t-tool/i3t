@@ -1,67 +1,26 @@
 #pragma once
 
-#include "GUI/Elements/IWindow.h"
-
-#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
-#include "GUI/NodeEditorUtilities/Widgets.h"
-
-#include <glm/glm.hpp>
-
-#include "../../../Core/Nodes/GraphManager.h"
-#include "../../../Core/Nodes/Node.h"
-#include "../../../Core/Nodes/NodeImpl.h"
-#include "Config.h"
-#include "Core/Application.h"
-#include "GUI/Elements/Nodes/WorkspaceElements.h"
-#include "pgr.h"
-#include <memory>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include <imgui_internal.h>
-#include <imgui_node_editor.h>
-#include <imgui_node_editor_internal.h>
-#include <Core/API.h>
-
 #include <algorithm>
+#include <initializer_list>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <initializer_list>
 
-/* >>> Static function <<< */ //{
+#include <string>
+#include "spdlog/fmt/fmt.h"
 
-/*! \fn static inline ImRect ImGui_GetItemRect()
-    \brief Get ImRect of last  ( \todo active/added ?) item
-    \return ImRect : New ImRect with position and size of last item
-*/
-static inline ImRect ImGui_GetItemRect()
-{
-	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
-}
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_internal.h"
 
-/*! \fn static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
-    \brief Enlarge given ImRect (create new / enlarge given ?)
-     \param[in/out?] rect ImRect& for enlarge
-     \param[in] x float value added to left and right
-     \param[in] y float value added to up an d down
-    \return ImRect New
-*/
-static inline ImRect ImRect_Expanded(const ImRect& rect, float x, float y)
-{
-	auto result = rect;
-	result.Min.x -= x;
-	result.Min.y -= y;
-	result.Max.x += x;
-	result.Max.y += y;
-	return result;
-}
-//} /* >>> Static functions - end <<< */
+#include "Config.h"
+#include "Core/API.h"
+#include "Core/Nodes/GraphManager.h"
+#include "GUI/Elements/IWindow.h"
 
-using ax::Widgets::IconType;
-namespace util = ax::NodeEditor::Utilities;
-
-namespace ne = ax::NodeEditor; /* /ed/ is used in imgui_node_editor.cpp for some other namespace - so for clearity I use /ne/ */
+#include "DIWNE/diwne_include.h"
 
 class WorkspaceLinkProperties;
 class WorkspacePinProperties;
@@ -75,111 +34,84 @@ enum class PinKind
 	Input
 };
 
+
 enum class WorkspaceLevelOfDetail
 {
-    Full,
-    SetValues,
-    Label
+	Full,
+	SetValues,
+	Label,
+	LightCycle
+};
+
+enum FloatPopupMode
+{
+    Angle,
+    Value
 };
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
 
-extern std::map<EValueType, EColor> WorkspacePinColor;
-extern std::map<EValueType, IconType> WorkspacePinShape;
-extern std::map<EValueType, EColor> WorkspaceInnerPinColor;
+/* DIWNE - \todo JH to remove, but I need something what use instead -> from Type get Shape and Color */
+extern std::map<EValueType, EColor> WorkspacePinColorBackground;
+
+extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground;
+
+extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeForeground;
+
+extern std::map<EValueType, EColor> WorkspacePinColorForeground;
+
+// endtodo
 
 
-/* This allow (almost) named argument to constructor: https://en.cppreference.com/w/cpp/language/aggregate_initialization */
-struct WorkspaceNodeArgs
-{
-    std::string headerLabel = "default WorkspaceNode header";
-    std::string nodeLabel = "Node";
-    /* \todo JH it will be nice, if we are able give some default headerBackground here ... */
-};
-
-class WorkspaceNode
-{
-protected:
-	const ne::NodeId m_id;
-	std::string m_label;
-
-	ImColor m_color; /*! \brief Color of Node */
-	ImVec2 m_size;   /*! \brief Size of box */ /* \todo JH I think this is useless */
-	float m_touchTime;
-
-	std::string m_headerLabel;
-	ImTextureID m_headerBackground;
-
-public:
-    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, WorkspaceNodeArgs const& args);
-    WorkspaceNode(ne::NodeId const id, ImTextureID headerBackground, std::string headerLabel = "Node", std::string nodeLabel = "Node");
-
-    ne::NodeId const getId() const;
-
-    virtual std::string getHeaderLabel();
-    virtual ImTextureID getHeaderBackground();
-
-	virtual void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin=nullptr, bool withPins=true);
-
-	virtual void drawHeader(util::NodeBuilder& builder);
-	virtual void drawInputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-	virtual void drawData(util::NodeBuilder& builder, int index)=0;
-	virtual void drawOutputs(util::NodeBuilder& builder, Core::Pin* newLinkPin)=0;
-  virtual void drawMiddle(util::NodeBuilder& builder)=0;
-
-	/*! \fn void TouchNode(const float constTouchTime) \todo for what is it ?
-	\brief update TouchTime
-	*/
-	void TouchNode(const float constTouchTime);
-
-	void UpdateTouch(const float constDeltaTime);
-
-	float GetTouchProgress(const float constTouchTime);
-
-	virtual bool dataAreValid();
-
-};
-
-class WorkspacePinProperties
+class WorkspaceNode : public DIWNE::Node
 {
 protected:
-	ne::PinId const m_id; /*! \brief unique (among Pins) identificator */
-
-    bool m_showLabel;
-	std::string m_label;    /*! \brief Name of Pin */
-	ImVec2 m_iconSize; /*! \brief Size of Pin icon */
-    ImColor m_color;
-
+    std::string m_topLabel;
+    std::string m_middleLabel;
 public:
-    WorkspacePinProperties(ne::PinId const id, std::string label);
+    WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel="Header", std::string const middleLabel="Content");
 
-    ne::PinId const getId() const;
-    ImVec2 const getIconSize() const;
-    ImColor const getColor() const;
+    std::string getTopLabel(){return m_topLabel;};
+    std::string getMiddleLabel(){return m_middleLabel;};
 
-    bool getShowLabel() const;
-    std::string const getLabel() const;
+    void setTopLabel(std::string label){m_topLabel = label;};
+    void setMiddleLabel(std::string label){m_middleLabel = label;};
+
+	/* DIWNE function */
+	virtual bool bypassFocusForInteractionAction();
+	virtual bool beforeContent();
+    virtual bool topContent();
+    virtual bool middleContent();
+    virtual bool leftContent();
+    virtual bool rightContent();
+    virtual bool bottomContent();
+
+    bool m_removeFromWorkspaceWindow;
+    bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};
+	void setRemoveFromWorkspace(bool value) {m_removeFromWorkspaceWindow=value;};
+
+	virtual void drawMenuDelete();
+	virtual void popupContent();
 };
 
-/*! \class WorkspaceLinkProperties
-    \brief Information of Link for graphic
- */
-class WorkspaceLinkProperties
+class WorkspacePin : public DIWNE::Pin
 {
 protected:
-	const ne::LinkId m_id;
-	ImColor m_color;
-	float m_thickness;
+	bool        m_showLabel;
+	std::string m_label;		/*! \brief Name of Pin */
 
 public:
-	WorkspaceLinkProperties(ne::LinkId const id);
+    WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label);
 
-	ne::LinkId const getId() const;
-	ImColor const getColor() const;
-	float const getThickness() const;
+	bool getShowLabel() const { return m_showLabel; };
+	std::string const getLabel() const { return m_label; };
 
+    void setShowLabel(bool showLabel) { m_showLabel = showLabel; };
+	void setLabel(std::string label) { m_label = label; };
 };
 
+
+
+/* static functions */
 extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
-
 

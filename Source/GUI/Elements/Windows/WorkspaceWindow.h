@@ -1,279 +1,207 @@
 /**
- * \file	GUI/Elements/Windows/WorkspaceWindow.h
+ * \file	  GUI/Elements/Windows/WorkspaceWindow.h
+ * \authors Sofie Sasorina, Jaroslav Holecek
  *
  *  A Workspace window elements declaration.
  */
 #pragma once
 
-#include "GUI/Elements/IWindow.h"
-
-#include "GUI/NodeEditorUtilities/Builders.h" /* \todo soubor s malym pismenkem na zacatku neexistuje - porad mi to prosim neprepisujte :-D */
-#include "GUI/NodeEditorUtilities/Widgets.h"
-
-#include <glm/glm.hpp>
-
-#include "../../../Core/Nodes/GraphManager.h"
-#include "../../../Core/Nodes/Node.h"
-#include "../../../Core/Nodes/NodeImpl.h"
-#include "Config.h"
-#include "Core/Application.h"
-
-#include "Core/Input/InputManager.h"
-#include "Scripting/Scripting.h"
-
-#include "../Nodes/WorkspaceNodeWithCoreData.h"
-#include "Core/API.h"
-
-#include "../Nodes/WorkspaceCamera.h"
-
-//transformations{
-#include "../Nodes/WorkspaceAxisAngle.h"
-#include "../Nodes/WorkspaceEulerX.h"
-#include "../Nodes/WorkspaceEulerY.h"
-#include "../Nodes/WorkspaceEulerZ.h"
-#include "../Nodes/WorkspaceFrustum.h"
-#include "../Nodes/WorkspaceLookAt.h"
-#include "../Nodes/WorkspaceMatrixScale.h"
-#include "../Nodes/WorkspaceMatrixTranslation.h"
-#include "../Nodes/WorkspaceOrtho.h"
-#include "../Nodes/WorkspacePerspective.h"
-#include "../Nodes/WorkspaceSequence.h"
-#include "../Nodes/WorkspaceTransformationFree.h"
-#include "../Nodes/WorkspaceQuatRot.h"
-//} transformations end
-
-//operators {
-
-//	transformations{
-#include "../Nodes/WorkspaceMakeAxisAngle.h"
-#include "../Nodes/WorkspaceMakeEulerX.h"
-#include "../Nodes/WorkspaceMakeEulerY.h"
-#include "../Nodes/WorkspaceMakeEulerZ.h"
-#include "../Nodes/WorkspaceMakeFrustum.h"
-#include "../Nodes/WorkspaceMakeLookAt.h"
-#include "../Nodes/WorkspaceMakeOrtho.h"
-#include "../Nodes/WorkspaceMakePerspective.h"
-#include "../Nodes/WorkspaceMakeScale.h"
-#include "../Nodes/WorkspaceMakeTranslation.h"
-//	} transformations end
-
-//	matrix{
-#include "../Nodes/WorkspaceMatrixFree.h"
-#include "../Nodes/WorkspaceMatrixInversion.h"
-#include "../Nodes/WorkspaceMatrixMulMatrix.h"
-#include "../Nodes/WorkspaceMatrixTranspose.h"
-#include "../Nodes/WorkspaceDeterminant.h"
-#include "../Nodes/WorkspaceMatrixAddMatrix.h"
-#include "../Nodes/WorkspaceMatrixMulFloat.h"
-#include "../Nodes/WorkspaceMatrixMulVector.h"
-#include "../Nodes/WorkspaceVectorMulMatrix.h"
-#include "../Nodes/WorkspaceTrackball.h"
-//	} matrix end
-
-//	vec4{
-#include "../Nodes/WorkspaceVectorFree.h"
-#include "../Nodes/WorkspaceNormalizeVector.h"
-#include "../Nodes/WorkspaceVectorDotVector.h"
-#include "../Nodes/WorkspaceVectorAddVector.h"
-#include "../Nodes/WorkspaceVectorSubVector.h"
-#include "../Nodes/WorkspaceVectorMulFloat.h"
-#include "../Nodes/WorkspaceVectorPerspectiveDivision.h"
-#include "../Nodes/WorkspaceMixVector.h"
-//	} vec4 end
-
-//	vec3{
-#include "../Nodes/WorkspaceVector3Free.h"
-#include "../Nodes/WorkspaceNormalizeVector3.h"
-#include "../Nodes/WorkspaceVector3CrossVector3.h"
-#include "../Nodes/WorkspaceVector3DotVector3.h"
-#include "../Nodes/WorkspaceVector3AddVector3.h"
-#include "../Nodes/WorkspaceVector3SubVector3.h"
-#include "../Nodes/WorkspaceVector3MulFloat.h"
-#include "../Nodes/WorkspaceVector3Length.h"
-#include "../Nodes/WorkspaceShowVector3.h"
-#include "../Nodes/WorkspaceMixVector3.h"
-//	} vec4 end
-
-//	float{
-#include "../Nodes/WorkspaceFloatFree.h"
-#include "../Nodes/WorkspaceClampFloat.h"
-#include "../Nodes/WorkspaceFloatMulFloat.h"
-#include "../Nodes/WorkspaceFloatDivFloat.h"
-#include "../Nodes/WorkspaceFloatAddFloat.h"
-#include "../Nodes/WorkspaceFloatPowFloat.h"
-#include "../Nodes/WorkspaceMixFloat.h"
-#include "../Nodes/WorkspaceSignum.h"
-#include "../Nodes/WorkspaceFloatSinCos.h"
-#include "../Nodes/WorkspaceASinACos.h"
-#include "../Nodes/WorkspaceCycle.h"
-//	} float end
-
-//	quat{
-#include "../Nodes/WorkspaceQuatVecConjQuat.h"
-#include "../Nodes/WorkspaceQuatLength.h"
-#include "../Nodes/WorkspaceQuatFree.h"
-#include "../Nodes/WorkspaceFloatVecToQuat.h"
-#include "../Nodes/WorkspaceAngleAxisToQuat.h"
-#include "../Nodes/WorkspaceVecVecToQuat.h"
-#include "../Nodes/WorkspaceFloatMulQuat.h"
-#include "../Nodes/WorkspaceQuatMulQuat.h"
-#include "../Nodes/WorkspaceEulerToQuat.h"
-#include "../Nodes/WorkspaceQuatSlerp.h"
-#include "../Nodes/WorkspaceQuatLerp.h"
-#include "../Nodes/WorkspaceQuatLongWaySlerp.h"
-#include "../Nodes/WorkspaceConjQuat.h"
-#include "../Nodes/WorkspaceQuatInverse.h"
-#include "../Nodes/WorkspaceNormalizeQuat.h"
-#include "../Nodes/WorkspaceQuatToFloatVec.h"
-#include "../Nodes/WorkspaceQuatToAngleAxis.h"
-//	} quat end
-
-//  conversion{
-#include "../Nodes/WorkspaceFloatsToMatrix.h"
-#include "../Nodes/WorkspaceFloatsToVector.h"
-#include "../Nodes/WorkspaceFloatsToVector3.h"
-#include "../Nodes/WorkspaceQuatToMatrix.h"
-#include "../Nodes/WorkspaceTRToMatrix.h"
-#include "../Nodes/WorkspaceVector3ToVector.h"
-#include "../Nodes/WorkspaceVectors3ToMatrix.h"
-#include "../Nodes/WorkspaceVectorsToMatrix.h"
-#include "../Nodes/WorkspaceVectorToVector3.h"
-#include "../Nodes/WorkspaceQuatToEuler.h"
-#include "../Nodes/WorkspaceVectorToFloats.h"
-#include "../Nodes/WorkspaceVector3ToFloats.h"
-#include "../Nodes/WorkspaceQuatToFloats.h"
-#include "../Nodes/WorkspaceMatrixToFloats.h"
-#include "../Nodes/WorkspaceMatrixToTR.h"
-#include "../Nodes/WorkspaceMatrixToVectors.h"
-#include "../Nodes/WorkspaceMatrixToQuat.h"
-#include "../Nodes/WorkspaceFloatsToQuat.h"
-//  }
-//}operators end
-
-#include "../Nodes/WorkspaceScreen.h"
-#include "../Nodes/WorkspacePulse.h"
-
-#include "Core/Input/InputManager.h"
-#include "Scripting/Scripting.h"
-
-#include <math.h>
-
-
-
-#include "pgr.h"
-#include <memory>
-
 #define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_node_editor.h>
-#include <imgui_node_editor_internal.h>
+
+#include "DIWNE/diwne_include.h"
 
 #include <algorithm>
 #include <map>
+#include <math.h>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-// using namespace ax;
-// using ax::Widgets::IconType;
+#include <glm/glm.hpp>
 
-namespace ne = ax::NodeEditor;
-namespace util = ax::NodeEditor::Utilities;
+#include "Config.h"
 
+#include "Core/API.h"
+#include "Core/Input/InputManager.h"
+#include "Core/Nodes/GraphManager.h"
+
+#include "GUI/Elements/IWindow.h"
+#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
+
+#include "Logger/Logger.h"
+#include "Scripting/Scripting.h"
+#include "State/StateManager.h"
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
 
+enum WorkspaceDiwneAction
+{
+	None,
+	CreateAndPlugTypeConstructor,
+	NOTunselectAllNodes
+};
+
+extern class WorkspaceDiwne* g_workspaceDiwne;
+
+class WorkspaceDiwne : public DIWNE::Diwne
+{
+	friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
+
+public:
+	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
+	~WorkspaceDiwne() override;
+
+	ImDrawListSplitter m_channelSplitter;
+
+	void popupContent();
+
+	bool beforeBegin();
+	bool beforeContent();
+	bool content();
+	bool afterContent();
+	bool afterEnd();
+
+	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
+	void								 setWorkspaceDiwneAction(WorkspaceDiwneAction wda) { m_workspaceDiwneAction = wda; }
+	WorkspaceDiwneAction getWorkspaceDiwneAction() { return m_workspaceDiwneAction; }
+	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame() { return m_workspaceDiwneActionPreviousFrame; }
+	WorkspaceDiwneAction getWorkspaceDiwneActionActive() const
+	{
+		return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame
+																																: m_workspaceDiwneAction;
+	}
+
+	/** * \brief All WorkspaceNodes
+				* \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
+	 **/
+	std::vector<Ptr<WorkspaceNodeWithCoreData>>				 m_workspaceCoreNodes;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getAllNodes() { return m_workspaceCoreNodes; };
+
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
+
+	std::vector<WorkspaceCoreLink*> m_linksToDraw;
+	std::vector<WorkspaceCoreLink>	m_linksCameraToSequence;
+
+	bool processCreateAndPlugTypeConstructor();
+
+	template <typename T>
+	void addTypeConstructorNode()
+	{
+		WorkspaceCoreInputPin* pin = getLastActivePin<WorkspaceCoreInputPin>().get();
+		addNodeToPosition<T>(pin->getLinkConnectionPointDiwne() + ImVec2(-100, 0)); /* \todo JH shift to Theme */
+		pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())
+									->getOutputs()
+									.at(0)
+									.get()); /* \todo JH always 0 with type constructor? */
+	}
+
+	template <class T>
+	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0))
+	{
+		auto node = std::make_shared<T>(*this);
+
+		node->setNodePositionDiwne(position);
+		m_workspaceCoreNodes.push_back(node);
+
+		return node;
+	}
+
+	template <class T>
+	auto inline addNodeToPositionOfPopup()
+	{
+		auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+		/// TEST /////////////////////////////////////////////////
+		StateManager::instance().takeSnapshot();
+		//////////////////////////////////////////////////////////
+
+		return result;
+	}
+
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
+
+	void manipulatorStartCheck3D();
+
+	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
+	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
+	void shiftInteractingNodeToEnd();
+
+	void processDragAllSelectedNodes();
+
+	void	 selectAll();
+	void	 invertSelection();
+	void	 zoomToAll();
+	void	 zoomToSelected();
+	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
+	void	 zoomToRectangle(ImRect const& rect);
+
+	void trackingLeft();
+	void trackingRight();
+	void trackingSwitch();
+	void trackingSwitchOff();
+
+	void deleteSelectedNodes();
+
+	//bool allowInteraction();
+
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodesInnerIncluded();
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllNodesInnerIncluded();
+
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllCameras();
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllInputFreeSequence();
+
+	bool bypassZoomAction();
+	bool bypassDragAction();
+	bool bypassHoldAction();
+	bool bypassUnholdAction();
+
+	bool processZoom() override;
+
+	bool	 bypassSelectionRectangleAction() override;
+	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
+	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
+
+	bool m_resizeDataWidth;
+	bool m_reconnectCameraToSequence;
+
+	bool										 m_trackingIsOn, m_trackingFromLeft;
+	WorkspaceTransformation* m_trackingFirstTransformation;
+};
+
 /*! \class class for Workspace window object
-    \brief Store everything what Workspace window need
+		\brief Store everything what Workspace window need
 */
 class WorkspaceWindow : public IWindow
 {
 public:
 	I3T_WINDOW(WorkspaceWindow)
 
+	explicit WorkspaceWindow(bool show);
+	~WorkspaceWindow() override;
+
+	WorkspaceDiwne& getNodeEditor();
+
 	Application& m_wholeApplication;
-	ne::EditorContext* m_nodeEditorContext; /*! \brief Object for store workspace scene - its wrapper for api functions only */
-	ne::Detail::EditorContext* m_ne_usable; /*! \brief On this object you can call inner functions */
-
-	ImTextureID m_headerBackgroundTexture;
-
-	util::NodeBuilder m_nodeBuilderContext;
-
-    /* \todo JH better name for this atributes - for better description what they do... */
-    Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewLink = nullptr;
-    Ptr<WorkspaceCorePinProperties> m_pinPropertiesForNewNodeLink = nullptr;
-    bool m_createNewNode = false;
-
-    //ImVec2 m_openPopupMenuPosition = ImVec2(100,100); /* \todo JH some better default value - maybe little bit unused, but for certainty */
-    ImVec2 m_rightClickPosition = ImVec2(100,100);
-    ImVec2 m_newNodePostion = ImVec2(100,100);
-    ne::NodeId m_contextNodeId = 0;
-    ne::LinkId m_contextLinkId = 0;
-    ne::PinId  m_contextPinId = 0;
-
-	// static std::vector<Namespace*> s_Nodes; /*! \brief All Nodes */
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes; /*! \brief All WorkspaceNodes */
-
-	std::vector<Ptr<WorkspaceSequence>> m_all_sequences;
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_draged_nodes;
-	Ptr<WorkspaceNodeWithCoreData> m_draged_node;
-	ne::Detail::Node *m_draged_node_nodeeditor;
-
-	ImTextureID HeaderBackground; /* ImTextureID is not id, but void* - so whatever application needs */
-
-	const float ConstTouchTime; /*! \brief \TODO: take values from (move to) Const.h */
-
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
-
-    std::vector<Ptr<WorkspaceSequence>> getSequenceNodes();
-	Ptr<WorkspaceSequence> getSequenceOfWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> node);
-
-	WorkspaceWindow(bool show);
-	~WorkspaceWindow();
-
-	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByID(ne::NodeId const id);
-	Ptr<WorkspaceNodeWithCoreData> getWorkspaceCoreNodeByPinID(ne::PinId const id);
-
-	Ptr<WorkspaceCorePinProperties> getWorkspacePinPropertiesByID(ne::PinId const id);
-
-	void manipulatorStartCheck3D();
-
-	void checkUserActions();
-
-    void checkQueryElements();
-    void checkQueryElementsCreating();
-    void checkQueryLinkCreate();
-    void checkQueryNodeCreate();
-    void checkQueryElementsDeleting();
-    void checkQueryLinkDelete();
-    void checkQueryNodeDelete();
-
-    void NodeDelete(ne::NodeId nodeId);
-
-		void selectAll();
-		void invertSelection();
-
-    void checkQueryContextMenus();
-
-    void shiftNodesToFront(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
-    void shiftNodesToBack(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodesToShift);
-    void shiftSelectedNodesToFront();
-    void shiftTransformationInSequenceNodesToFront();
-
-
-
-    void showPopUpLabel(std::string label, ImColor color);
-
-    void UpdateTouchAllNodes();
-
-	void WorkspaceDrawNodes(util::NodeBuilder& builder, Core::Pin* newLinkPin);
 
 	void render();
 
 	bool Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1, float min_size2,
-	              float splitter_long_axis_size = -1.0f);
+								float splitter_long_axis_size = -1.0f);
 
 	void ShowLeftPane(float paneWidth);
 
 	void ShowStyleEditor(bool* show = nullptr);
+
+private:
+	void showEditMenu();
 };
+
+/* >>>>> STATIC FUNCTIONS <<<<< */
+
+template <typename T>
+auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
+{
+	return g_workspaceDiwne->addNodeToPosition<T>(position);
+}

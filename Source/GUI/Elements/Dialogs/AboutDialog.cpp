@@ -26,7 +26,7 @@ void AboutDialog::render()
 		ImGui::TextWrapped(Config::INFO_TEXT.c_str());
 		ImGui::Text("");
 
-		ImGui::PushFont(I3T::getFont(EFont::TitleSmall));
+		ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
 		ImGui::Text("Supervisor:");
 		ImGui::PopFont();
 
@@ -36,7 +36,7 @@ void AboutDialog::render()
 
 		/// \todo Add interactive link to http://www.i3t-tool.org/.
 
-		ImGui::PushFont(I3T::getFont(EFont::TitleSmall));
+		ImGui::PushFont(I3T::getFont(EFont::TutorialAssignment));
 		ImGui::Text("Authors:");
 		ImGui::PopFont();
 
@@ -51,16 +51,13 @@ void AboutDialog::render()
 
 		ImGui::Separator();
 
-		ImGui::BeginHorizontal("AboutFooter", ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
-		ImGui::Spring(0.0f);
+		// ImGui::BeginHorizontal("AboutFooter", ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
 		ImGui::Text(Config::VERSION.c_str());
-		ImGui::Spring();
 		if (ImGui::Button("OK", ImVec2{100.0f, 0.0f}))
 		{
 			HideWindowCommand::dispatch(ID);
 		}
-		ImGui::Spring(0.0f);
-		ImGui::EndHorizontal();
+		// ImGui::EndHorizontal();
 	}
 	ImGui::End();
 }

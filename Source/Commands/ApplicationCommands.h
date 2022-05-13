@@ -8,7 +8,11 @@
 #pragma once
 
 #include "Command.h"
-#include "Tutorial/Tutorial.h"
+
+#include "Core/Defs.h"
+#include "GUI/Elements/IWindow.h"
+
+struct Tutorial;
 
 class BeforeCloseCommand : public Command<BeforeCloseCommand>
 {
@@ -23,6 +27,10 @@ class HideWindowCommand : public Command<HideWindowCommand, std::string>
 };
 
 class ConsoleCommand : public Command<ConsoleCommand, std::string>
+{
+};
+
+class SetFocusedWindowCommand : public Command<SetFocusedWindowCommand, Ptr<IWindow>>
 {
 };
 

@@ -17,10 +17,10 @@ inline std::tuple<std::array<float, Size>, std::array<Ptr<NodeBase>, Size>> gene
 	std::array<float, Size> inputValues;
 	std::array<Ptr<Core::NodeBase>, Size> inputNodes;
 
-	for (size_t i = 0; i < Size; ++i)
+	for (unsigned int i = 0; i < Size; ++i)
 	{
 		inputValues[i] = generateFloat();
-		inputNodes[i] = Builder::createNode<ENodeType::Float>();
+		inputNodes[i] = Builder::createNode<ENodeType::FloatToFloat>();
 		auto valueSetResult = inputNodes[i]->setValue(inputValues[i]);
 		auto plugResult = GraphManager::plug(inputNodes[i], node, 0, i);
 		EXPECT_EQ(ValueSetResult::Status::Ok, valueSetResult.status);

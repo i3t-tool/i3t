@@ -5,8 +5,6 @@
  */
 #pragma once
 
-#include <GUI/UIModule.h>
-#include <World/Components/Camera.h>
 #include <array>
 #include <map>
 #include <vector>
@@ -15,29 +13,28 @@
 #include "imgui.h"
 
 #include "Core/Defs.h"
-#include "Core/GlfwWindow.h"
-#include "GUI/Elements/IWindow.h"
+#include "Core/Window.h"
+#include "State/Stateful.h"
 
-#include "World/World.h"
-
-constexpr const char* ImGui_GLSLVersion = "#version 140";
+constexpr const char* g_baseTitle = "I3T - An Interactive Tool for Teaching Transformations";
 
 class Module;
 class ICommand;
-class GlfwWindow;
+class Window;
 class MainMenuBar;
 class World;
-class World;
 class Scripting;
+class UIModule;
 
 /**
  * Application class.
  * A wrapper for UI windows.
  */
-class Application
+class Application : public IStateful
 {
 public:
 	Application();
+	~Application();
 
 	/**
 	 * \fn	void finalize()
@@ -51,11 +48,21 @@ public:
 	static Application& get();
 	UIModule* getUI();
 
+	//===----------------------------------------------------------------------===//
+
 	/**
 	 * Init OpenGL stuffs before display loop.
 	 * Taken from Muller GLFW. Initializes ImGui and I3T stuffs.
 	 */
 	void initWindow();
+
+	GLFWwindow* mainWindow();
+
+	const std::string& getTitle();
+
+	void setTitle(const std::string& title);
+
+	//===----------------------------------------------------------------------===//
 
 	/**
 	 * Enter main loop.
@@ -69,8 +76,7 @@ public:
 	 */
 	void run();
 
-	World* world2();
-	GLFWwindow* mainWindow();
+	World* world();
 
 	/**
 	 * Issue command.
@@ -91,11 +97,21 @@ public:
 	 */
 	bool initI3T();
 
-private:
-	static Application s_instance;
+	//===-- State functions ---------------------------------------------------===//
 
-	UIModule* m_ui;
+	Memento getState() override;
+
+	void setState(const Memento &) override;
+
+	void onStateChange(const std::string &winTitlePostfix) override;
+
+	//===----------------------------------------------------------------------===//
+
+private:
+	static Application* s_instance;
+
 	std::vector<Module*> m_modules;
+
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback resulting in no
 	 * 			window update.
@@ -107,7 +123,7 @@ private:
 	World* m_world;
 	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
-	GlfwWindow* m_window;
+	Window* m_window;
 
 	/// Array of commands which the application is going to process in its main loop.
 	std::vector<ICommand*> m_commands;

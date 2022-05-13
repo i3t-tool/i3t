@@ -46,6 +46,7 @@ unsigned char Select::getStencilAt(int x, int y, int r, int filter){
             dist+=tmp*tmp;
             pos=w*i+j;
             read[pos] = read[pos] & 255;
+            //if(read[pos]!=0){printf("hit %f\n",dist); }
             if (dist < closest && Select::stencilRef[read[pos]] != false && read[pos] != filter){closest = dist;stencilnum = read[pos];}
         }
     }

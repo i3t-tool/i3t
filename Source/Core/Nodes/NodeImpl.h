@@ -8,18 +8,39 @@
 #include <type_traits>
 #include <variant>
 
-#include "Node.h"
+#include "Core/Nodes/Node.h"
 
 #include "World/GameObject.h"
 
 namespace Core
 {
+template <ENodeType T> class NodeImpl;
+
+namespace Builder
+{
+	/**
+	 * Create new operator.
+	 *
+	 * \tparam T Operation type from OperationType enum.
+	 * \return Unique pointer to newly created logic operator.
+	 */
+	template <ENodeType T>
+	Ptr<NodeBase> createNode()
+	{
+		auto ret = std::make_shared<::Core::NodeImpl<T>>();
+		ret->init();
+
+		ret->updateValues(0);
+		return ret;
+	}
+}
+
 /**
  * Implementation of NodeBase class.
  *
  * \tparam T Type of node to be created.
  */
-template <ENodeType T> class NodeImpl : public NodeBase
+template <ENodeType T> class NodeImpl : public Node
 {
 public:
 	/**
@@ -33,6 +54,21 @@ public:
 	 */
 	NodeImpl();
 	~NodeImpl() override = default;
+
+	Ptr<Node> clone() override
+	{
+		auto node = Builder::createNode<T>();
+
+		if (m_operation->isConstructor)
+		{
+			for (auto i = 0L; i < m_internalData.size(); ++i)
+			{
+				node->getInternalData() = m_internalData[i];
+			}
+		}
+
+		return node;
+	}
 
 	/**
 	 * Implementation of virtual function NodeBase::updateValues(int).
@@ -55,6 +91,7 @@ template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[static_cas
 
 template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
 {
+	I3T_ABORT("This function should be specialized!");
 }
 
 // inversion
@@ -62,24 +99,24 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Inversion>::updateValues(int i
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::inverse(m_inputs[0].getStorage().getMat4()));
+		setInternalValue(glm::inverse(m_inputs[0].getStorage().getMat4()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
-// tranpose
+// transpose
 template <> FORCE_INLINE void NodeImpl<ENodeType::Transpose>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::transpose(m_inputs[0].getStorage().getMat4()));
+		setInternalValue(glm::transpose(m_inputs[0].getStorage().getMat4()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
@@ -88,11 +125,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Determinant>::updateValues(int
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::determinant(m_inputs[0].getStorage().getMat4()));
+		setInternalValue(glm::determinant(m_inputs[0].getStorage().getMat4()));
 	}
 	else
 	{
-		m_internalData[0].setValue(1.0f);
+		setInternalValue(1.0f);
 	}
 }
 
@@ -103,19 +140,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulMatrix>::updateValues
 	{
 		auto mat1 = m_inputs[0].getStorage().getMat4();
 		auto mat2 = m_inputs[1].getStorage().getMat4();
-		m_internalData[0].setValue(mat1 * mat2);
+		setInternalValue(mat1 * mat2);
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4());
+		setInternalValue(m_inputs[0].getStorage().getMat4());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getMat4());
+		setInternalValue(m_inputs[1].getStorage().getMat4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
@@ -124,19 +161,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixAddMatrix>::updateValues
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4() + m_inputs[1].getStorage().getMat4());
+		setInternalValue(m_inputs[0].getStorage().getMat4() + m_inputs[1].getStorage().getMat4());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4());
+		setInternalValue(m_inputs[0].getStorage().getMat4());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getMat4());
+		setInternalValue(m_inputs[1].getStorage().getMat4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
@@ -145,15 +182,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulVector>::updateValues
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4() * m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getMat4() * m_inputs[1].getStorage().getVec4());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[1].getStorage().getVec4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -164,15 +201,16 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulMatrix>::updateValues
 	{
 		glm::vec4 vec = m_inputs[0].getStorage().getVec4();
 		glm::mat4 mat = m_inputs[1].getStorage().getMat4();
-		m_internalData[0].setValue(vec * mat);
+		setInternalValue(vec * mat);
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getVec4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		//setInternalValue(glm::mat4());
+		setInternalValue(glm::vec4()); // PF - should be vector, not matrix
 	}
 }
 
@@ -183,19 +221,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulFloat>::updateValues(
 	{
 		glm::mat4 mat = m_inputs[0].getStorage().getMat4();
 		float num = m_inputs[1].getStorage().getFloat();
-		m_internalData[0].setValue(num * mat);
+		setInternalValue(num * mat);
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat() * glm::mat4());
+		setInternalValue(m_inputs[0].getStorage().getFloat() * glm::mat4());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getMat4());
+		setInternalValue(m_inputs[1].getStorage().getMat4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
@@ -205,11 +243,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorDotVector>::updateValues
 	{
 		auto vec1 = m_inputs[0].getStorage().getVec4();
 		auto vec2 = m_inputs[1].getStorage().getVec4();
-		m_internalData[0].setValue(glm::dot(vec1, vec2));
+		setInternalValue(glm::dot(vec1, vec2));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -218,19 +256,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorAddVector>::updateValues
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4() + m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getVec4() + m_inputs[1].getStorage().getVec4());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getVec4());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[1].getStorage().getVec4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -239,19 +277,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorSubVector>::updateValues
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4() - m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getVec4() - m_inputs[1].getStorage().getVec4());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getVec4());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[1].getStorage().getVec4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -260,15 +298,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulFloat>::updateValues(
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec4() * m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[1].getStorage().getVec4() * m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[1].getStorage().getVec4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -278,11 +316,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorPerspectiveDivision>::up
 	if (m_inputs[0].isPluggedIn())
 	{
 		glm::vec4 in = m_inputs[0].getStorage().getVec4();
-		m_internalData[0].setValue(glm::vec4(in.x / in.w, in.y / in.w, in.z / in.w, 1.0f));
+		setInternalValue(glm::vec4(in.x / in.w, in.y / in.w, in.z / in.w, 1.0f));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -291,11 +329,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeVector>::updateValues
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::normalize(m_inputs[0].getStorage().getVec4()));
+		setInternalValue(glm::normalize(m_inputs[0].getStorage().getVec4()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -304,20 +342,20 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MixVector>::updateValues(int i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::mix(m_inputs[0].getStorage().getVec4(), m_inputs[1].getStorage().getVec4(),
-		                                    m_inputs[2].getStorage().getFloat()));
+		setInternalValue(glm::mix(m_inputs[0].getStorage().getVec4(), m_inputs[1].getStorage().getVec4(),
+															m_inputs[2].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4());
+		setInternalValue(m_inputs[0].getStorage().getVec4());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec4());
+		setInternalValue(m_inputs[1].getStorage().getVec4());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -326,19 +364,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3CrossVector3>::updateVa
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::cross(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3()));
+		setInternalValue(glm::cross(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[1].getStorage().getVec3());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -348,11 +386,12 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3DotVector3>::updateValu
 	{
 		auto vec1 = m_inputs[0].getStorage().getVec3();
 		auto vec2 = m_inputs[1].getStorage().getVec3();
-		m_internalData[0].setValue(glm::dot(vec1, vec2));
+
+		setInternalValue(glm::dot(vec1, vec2));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -361,19 +400,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3AddVector3>::updateValu
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3() + m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3() + m_inputs[1].getStorage().getVec3());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[1].getStorage().getVec3());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -382,19 +421,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3SubVector3>::updateValu
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3() - m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3() - m_inputs[1].getStorage().getVec3());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[1].getStorage().getVec3());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -403,15 +442,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3MulFloat>::updateValues
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec3() * m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[1].getStorage().getVec3() * m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[1].getStorage().getVec3());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -420,11 +459,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeVector3>::updateValue
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::normalize(m_inputs[0].getStorage().getVec3()));
+		setInternalValue(glm::normalize(m_inputs[0].getStorage().getVec3()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -433,11 +472,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3Length>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::length(m_inputs[0].getStorage().getVec3()));
+		setInternalValue(glm::length(m_inputs[0].getStorage().getVec3()));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -447,7 +486,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ShowVector3>::updateValues(int
 	if (m_inputs[0].isPluggedIn())
 	{
 
-		// m_internalData[0].setValue(glm::normalize(m_inputs[0].getStorage().getVec3()));
+		// setInternalValue(glm::normalize(m_inputs[0].getStorage().getVec3()));
 
 		glm::mat4 m = glm::mat4();
 
@@ -466,11 +505,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ShowVector3>::updateValues(int
 		}
 		m[0] = glm::vec4(m_inputs[0].getStorage().getVec3(), 0.0f);
 
-		m_internalData[0].setValue(m);
+		setInternalValue(m);
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
@@ -479,20 +518,20 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MixVector3>::updateValues(int 
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::mix(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
-		                                    m_inputs[2].getStorage().getFloat()));
+		setInternalValue(glm::mix(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
+															m_inputs[2].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getVec3());
+		setInternalValue(m_inputs[1].getStorage().getVec3());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -501,77 +540,77 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ConjQuat>::updateValues(int in
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::conjugate(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::conjugate(m_inputs[0].getStorage().getQuat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
 // FloatVecToQuat
 template <> FORCE_INLINE void NodeImpl<ENodeType::FloatVecToQuat>::updateValues(int inputIndex)
 {
-	glm::quat tmp = glm::quat(); // PF (1,0,0,0) if (nothing connected) w=1; else w=0;
+	// PF (1,0,0,0) if (nothing connected) w=1; else w=0;
 
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::quat(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
+		setInternalValue(glm::quat(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getVec3()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::quat(m_inputs[0].getStorage().getFloat(), glm::vec3()));
+		setInternalValue(glm::quat(m_inputs[0].getStorage().getFloat(), glm::vec3()));
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::quat(0.0f, m_inputs[1].getStorage().getVec3()));
+		setInternalValue(glm::quat(0.0f, m_inputs[1].getStorage().getVec3()));
 	}
 	else
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 }
 
 // AngleAxisToQuat
 template <> FORCE_INLINE void NodeImpl<ENodeType::AngleAxisToQuat>::updateValues(int inputIndex)
 {
 	/*
-	\todo
-	if (m_inputs[0].isPluggedIn()) {
-	  m_inputs[0].setVisible(true);
-	  m_inputs[1]->setVisible(false);
-	}
-	else
-	if (m_inputs[1].isPluggedIn()) {
-	  m_inputs[1]->setVisible(true);
-	  m_inputs[0]->setVisible(false);
-	}
-	else {
-	  m_inputs[0]->setVisible(true);
-	  m_inputs[1]->setVisible(true);
-	}
-	 */
+\todo
+if (m_inputs[0].isPluggedIn()) {
+	m_inputs[0].setVisible(true);
+	m_inputs[1]->setVisible(false);
+}
+else
+if (m_inputs[1].isPluggedIn()) {
+	m_inputs[1]->setVisible(true);
+	m_inputs[0]->setVisible(false);
+}
+else {
+	m_inputs[0]->setVisible(true);
+	m_inputs[1]->setVisible(true);
+}
+ */
 
 	// angle - is divided by 2 in angleAxes
 	if (m_inputs[0].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		m_internalData[0].setValue(
+		setInternalValue(
 				glm::angleAxis(m_inputs[0].getStorage().getFloat(), glm::normalize(m_inputs[2].getStorage().getVec3())));
 	}
 	else if (m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 		// angle / 2  - given a halfAngle - multiply by 2, as needed by angleAxis
 
-		m_internalData[0].setValue(glm::angleAxis(m_inputs[1].getStorage().getFloat() * 2.0f,
-		                                          glm::normalize(m_inputs[2].getStorage().getVec3())));
+		setInternalValue(glm::angleAxis(m_inputs[1].getStorage().getFloat() * 2.0f,
+																		glm::normalize(m_inputs[2].getStorage().getVec3())));
 	}
 	else if (m_inputs[2].isPluggedIn())
 	{
-		// m_internalData[0].setValue(glm::quat(0.0f, m_inputs[2].getStorage().getVec3()));
-		m_internalData[0].setValue(glm::angleAxis(
+		// setInternalValue(glm::quat(0.0f, m_inputs[2].getStorage().getVec3()));
+		setInternalValue(glm::angleAxis(
 				0.0f, glm::normalize(m_inputs[2].getStorage().getVec3()))); // bud zadat 1.0f, nebo angleAxis(0.0f,...)
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -580,12 +619,12 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VecVecToQuat>::updateValues(in
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::quat(glm::normalize(m_inputs[0].getStorage().getVec3()),
-		                                     glm::normalize(m_inputs[1].getStorage().getVec3())));
+		setInternalValue(glm::quat(glm::normalize(m_inputs[0].getStorage().getVec3()),
+															 glm::normalize(m_inputs[1].getStorage().getVec3())));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -594,13 +633,13 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToFloatVec>::updateValues(
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getQuat()[3]); // w
-		m_internalData[1].setValue(m_inputs[0].getStorage().getVec3());    //(x,y,z)
+		setInternalValue(m_inputs[0].getStorage().getQuat()[3]); // w
+		setInternalValue(m_inputs[0].getStorage().getVec3(), 1);    //(x,y,z)
 	}
 	else
 	{
-		m_internalData[0].setValue(1.0f); // PF - to return a unit quaternion
-		m_internalData[1].setValue(glm::vec3(0.0f, 0.0f, 0.0f));
+		setInternalValue(1.0f); // PF - to return a unit quaternion
+		setInternalValue(glm::vec3(0.0f, 0.0f, 0.0f), 1);
 	}
 }
 
@@ -611,17 +650,16 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToAngleAxis>::updateValues
 	if (m_inputs[0].isPluggedIn())
 	{
 
-		// if (SetupForm::radians)	m_internalData[0].setValue(glm::angle(m_inputs[0].getStorage().getQuat()));
-		// else m_internalData[0].setValue(glm::degrees(glm::angle(m_inputs[0].getStorage().getQuat())));
+		// if (SetupForm::radians)	setInternalValue(glm::angle(m_inputs[0].getStorage().getQuat()));
+		// else setInternalValue(glm::degrees(glm::angle(m_inputs[0].getStorage().getQuat())));
 
-		m_internalData[0].setValue(glm::angle(m_inputs[0].getStorage().getQuat()));
-
-		m_internalData[1].setValue(glm::axis(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::angle(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::axis(m_inputs[0].getStorage().getQuat()), 1);
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
-		m_internalData[1].setValue(glm::vec3()); // (0,0,1)
+		setInternalValue(0.0f);
+		setInternalValue(glm::vec3(), 1); // (0,0,1)
 	}
 }
 
@@ -634,15 +672,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToEuler>::updateValues(int
 
 		glm::vec3 e = glm::eulerAngles(m_inputs[0].getStorage().getQuat());
 
-		m_internalData[0].setValue(e.x);
-		m_internalData[1].setValue(e.y);
-		m_internalData[2].setValue(e.z);
+		setInternalValue(e.x);
+		setInternalValue(e.y, 1);
+		setInternalValue(e.z, 2);
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
-		m_internalData[1].setValue(0.0f);
-		m_internalData[2].setValue(0.0f);
+		setInternalValue(0.0f);
+		setInternalValue(0.0f, 1);
+		setInternalValue(0.0f, 2);
 	}
 }
 
@@ -652,13 +690,13 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerToQuat>::updateValues(int
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 
-		m_internalData[0].setValue(
+		setInternalValue(
 				glm::quat(glm::vec3(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                        m_inputs[2].getStorage().getFloat())));
+														m_inputs[2].getStorage().getFloat())));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -667,11 +705,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatInverse>::updateValues(int
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::inverse(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::inverse(m_inputs[0].getStorage().getQuat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -680,14 +718,14 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatSlerp>::updateValues(int i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		// m_internalData[0].setValue(glm::mix(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
+		// setInternalValue(glm::mix(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
 		// m_inputs[2].getStorage().getFloat()));
-		m_internalData[0].setValue(glm::slerp(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
-		                                      m_inputs[2].getStorage().getFloat()));
+		setInternalValue(glm::slerp(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
+																m_inputs[2].getStorage().getFloat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -724,7 +762,7 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 	{
 		// Linear interpolation
 		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
-		                        glm::mix(x.z, z.z, a));
+														glm::mix(x.z, z.z, a));
 	}
 	else
 	{
@@ -735,7 +773,7 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 		return glm::tquat<T, P>(
 				glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
 				glm::mix(x.z, z.z,
-		             a)); // tohle je určitě špatně - je to tu jen abych to zkompiloval - má tu být to o řádek výš
+								 a)); // tohle je určitě špatně - je to tu jen abych to zkompiloval - má tu být to o řádek výš
 	}
 }
 
@@ -744,14 +782,14 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLongWaySlerp>::updateValue
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		// m_internalData[0].setValue(glm::mix(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
+		// setInternalValue(glm::mix(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
 		// m_inputs[2].getStorage().getFloat()));
-		m_internalData[0].setValue(longWaySlerp(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
-		                                        m_inputs[2].getStorage().getFloat()));
+		setInternalValue(longWaySlerp(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
+																	m_inputs[2].getStorage().getFloat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -762,19 +800,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLerp>::updateValues(int in
 	{
 
 		float w = glm::mix(m_inputs[0].getStorage().getQuat().w, m_inputs[1].getStorage().getQuat().w,
-		                   m_inputs[2].getStorage().getFloat());
+											 m_inputs[2].getStorage().getFloat());
 		float x = glm::mix(m_inputs[0].getStorage().getQuat().x, m_inputs[1].getStorage().getQuat().x,
-		                   m_inputs[2].getStorage().getFloat());
+											 m_inputs[2].getStorage().getFloat());
 		float y = glm::mix(m_inputs[0].getStorage().getQuat().y, m_inputs[1].getStorage().getQuat().y,
-		                   m_inputs[2].getStorage().getFloat());
+											 m_inputs[2].getStorage().getFloat());
 		float z = glm::mix(m_inputs[0].getStorage().getQuat().z, m_inputs[1].getStorage().getQuat().z,
-		                   m_inputs[2].getStorage().getFloat());
+											 m_inputs[2].getStorage().getFloat());
 
-		m_internalData[0].setValue(glm::quat(w, x, y, z));
+		setInternalValue(glm::quat(w, x, y, z));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -783,19 +821,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatMulQuat>::updateValues(in
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat() * m_inputs[1].getStorage().getQuat());
+		setInternalValue(m_inputs[0].getStorage().getFloat() * m_inputs[1].getStorage().getQuat());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{ // predpoklada quat (1,0,0,0)
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat() * glm::quat());
+		setInternalValue(m_inputs[0].getStorage().getFloat() * glm::quat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getQuat()); // PF new predpoklada float == 1
+		setInternalValue(m_inputs[1].getStorage().getQuat()); // PF new predpoklada float == 1
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -804,19 +842,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatMulQuat>::updateValues(int
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getQuat() * m_inputs[1].getStorage().getQuat());
+		setInternalValue(m_inputs[0].getStorage().getQuat() * m_inputs[1].getStorage().getQuat());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getQuat());
+		setInternalValue(m_inputs[0].getStorage().getQuat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getQuat());
+		setInternalValue(m_inputs[1].getStorage().getQuat());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -826,25 +864,25 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatVecConjQuat>::updateValues
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
 		// chybna varianta - - nasobi qv jako (quat * vec3) * conj(q), tj. 2x za sebou vec3 * quat -> otoci o 2x uhel
-		// m_internalData[0].setValue(m_inputs[0].getStorage().getQuat() * m_inputs[1].getStorage().getVec3() *
+		// setInternalValue(m_inputs[0].getStorage().getQuat() * m_inputs[1].getStorage().getVec3() *
 		// glm::conjugate(m_inputs[0].getStorage().getQuat())); // chyba
 
 		// spravna varianta, vycislujici vzorec qvq* jako q * quat(v) * q*
-		m_internalData[0].setValue(m_inputs[0].getStorage().getQuat() *
-		                           glm::quat(0.0f, m_inputs[1].getStorage().getVec3()) *
-		                           glm::conjugate(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(m_inputs[0].getStorage().getQuat() *
+										 glm::quat(0.0f, m_inputs[1].getStorage().getVec3()) *
+										 glm::conjugate(m_inputs[0].getStorage().getQuat()));
 
 		// spravna varianta vyuzivajici glm::rotate
-		// m_internalData[0].setValue(m_inputs[0].getStorage().getQuat() * m_inputs[1].getStorage().getVec3() );   // 1x
+		// setInternalValue(m_inputs[0].getStorage().getQuat() * m_inputs[1].getStorage().getVec3() );   // 1x
 		// q * v
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getQuat());
+		setInternalValue(m_inputs[0].getStorage().getQuat());
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -853,11 +891,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLength>::updateValues(int 
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::length(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::length(m_inputs[0].getStorage().getQuat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -866,26 +904,26 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ClampFloat>::updateValues(int 
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::clamp(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                                      m_inputs[2].getStorage().getFloat()));
+		setInternalValue(glm::clamp(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+																m_inputs[2].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(
+		setInternalValue(
 				glm::clamp(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(), 1.0f));
 	}
 	else if (m_inputs[0].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		m_internalData[0].setValue(
+		setInternalValue(
 				glm::clamp(m_inputs[0].getStorage().getFloat(), 0.0f, m_inputs[2].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::clamp(m_inputs[0].getStorage().getFloat(), 0.0f, 1.0f));
+		setInternalValue(glm::clamp(m_inputs[0].getStorage().getFloat(), 0.0f, 1.0f));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -894,19 +932,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatMulFloat>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat() * m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat() * m_inputs[1].getStorage().getFloat());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[1].getStorage().getFloat());
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -915,19 +953,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatDivFloat>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat() / m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat() / m_inputs[1].getStorage().getFloat());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(1.0f / m_inputs[1].getStorage().getFloat());
+		setInternalValue(1.0f / m_inputs[1].getStorage().getFloat());
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 // FloatAddFloat
@@ -935,19 +973,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatAddFloat>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat() + m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat() + m_inputs[1].getStorage().getFloat());
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[1].getStorage().getFloat());
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -956,19 +994,19 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatPowFloat>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(pow(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat()));
+		setInternalValue(pow(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[1].getStorage().getFloat());
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -977,20 +1015,20 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MixFloat>::updateValues(int in
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::mix(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                                    m_inputs[2].getStorage().getFloat()));
+		setInternalValue(glm::mix(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
+															m_inputs[2].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat());
 	}
 	else if (m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[1].getStorage().getFloat());
+		setInternalValue(m_inputs[1].getStorage().getFloat());
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -999,13 +1037,13 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatSinCos>::updateValues(int
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(sin(m_inputs[0].getStorage().getFloat()));
-		m_internalData[1].setValue(cos(m_inputs[0].getStorage().getFloat()));
+		setInternalValue(sin(m_inputs[0].getStorage().getFloat()));
+		setInternalValue(cos(m_inputs[0].getStorage().getFloat()), 1);
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
-		m_internalData[0].setValue(1.0f);
+		setInternalValue(0.0f);
+		setInternalValue(1.0f, 1);
 	}
 }
 
@@ -1014,13 +1052,13 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ASinACos>::updateValues(int in
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(asin(m_inputs[0].getStorage().getFloat()));
-		m_internalData[1].setValue(acos(m_inputs[0].getStorage().getFloat()));
+		setInternalValue(asin(m_inputs[0].getStorage().getFloat()));
+		setInternalValue(acos(m_inputs[0].getStorage().getFloat()), 1);
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
-		m_internalData[0].setValue(1.0f);
+		setInternalValue(0.0f);
+		setInternalValue(1.0f, 1);
 	}
 }
 
@@ -1030,11 +1068,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Signum>::updateValues(int inpu
 	if (m_inputs[0].isPluggedIn())
 	{
 		float inputValue = m_inputs[0].getStorage().getFloat();
-		m_internalData[0].setValue((inputValue > 0) ? 1.0f : ((inputValue < 0) ? -1.0f : 0.0f));
+		setInternalValue((inputValue > 0) ? 1.0f : ((inputValue < 0) ? -1.0f : 0.0f));
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
+		setInternalValue(0.0f);
 	}
 }
 
@@ -1043,17 +1081,17 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToVectors>::updateValues
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getMat4()[0]);
-		m_internalData[1].setValue(m_inputs[0].getStorage().getMat4()[1]);
-		m_internalData[2].setValue(m_inputs[0].getStorage().getMat4()[2]);
-		m_internalData[3].setValue(m_inputs[0].getStorage().getMat4()[3]);
+		setInternalValue(m_inputs[0].getStorage().getMat4()[0]);
+		setInternalValue(m_inputs[0].getStorage().getMat4()[1], 1);
+		setInternalValue(m_inputs[0].getStorage().getMat4()[2], 2);
+		setInternalValue(m_inputs[0].getStorage().getMat4()[3], 3);
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
-		m_internalData[1].setValue(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
-		m_internalData[2].setValue(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-		m_internalData[3].setValue(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		setInternalValue(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
+		setInternalValue(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), 1);
+		setInternalValue(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 2);
+		setInternalValue(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), 3);
 	}
 }
 
@@ -1071,7 +1109,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vectors3ToMatrix>::updateValue
 	if (m_inputs[3].isPluggedIn())
 		tmp[3] = glm::vec4(m_inputs[3].getStorage().getVec3(), 1.0f);
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // VectorsToMatrix
@@ -1088,7 +1126,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorsToMatrix>::updateValues
 	if (m_inputs[3].isPluggedIn())
 		tmp[3] = m_inputs[3].getStorage().getVec4();
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // MatrixToFloats
@@ -1124,7 +1162,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToMatrix>::updateValues(
 		}
 	}
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // MatrixToTR
@@ -1132,15 +1170,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToTR>::updateValues(int 
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[1].setValue(glm::mat4(glm::mat3(m_inputs[0].getStorage().getMat4())));
 		glm::mat4 T = glm::mat4();
 		T[3] = glm::vec4(glm::vec3(m_inputs[0].getStorage().getMat4()[3]), 1.0f);
-		m_internalData[0].setValue(T);
+		setInternalValue(T);
+		setInternalValue(glm::mat4(glm::mat3(m_inputs[0].getStorage().getMat4())), 1);
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
-		m_internalData[1].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
+		setInternalValue(glm::mat4(), 1);
 	}
 }
 
@@ -1161,7 +1199,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::TRToMatrix>::updateValues(int 
 		tmp[2] = glm::vec4(glm::vec3(m_inputs[1].getStorage().getMat4()[2]), 0.0f);
 	}
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // MatrixToQuat
@@ -1169,11 +1207,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToQuat>::updateValues(in
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::quat_cast(m_inputs[0].getStorage().getMat4()));
+		setInternalValue(glm::quat_cast(m_inputs[0].getStorage().getMat4()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
@@ -1182,11 +1220,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToMatrix>::updateValues(in
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::mat4_cast(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::mat4_cast(m_inputs[0].getStorage().getQuat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::mat4());
+		setInternalValue(glm::mat4());
 	}
 }
 
@@ -1195,17 +1233,17 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToFloats>::updateValues(
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec4()[0]);
-		m_internalData[1].setValue(m_inputs[0].getStorage().getVec4()[1]);
-		m_internalData[2].setValue(m_inputs[0].getStorage().getVec4()[2]);
-		m_internalData[3].setValue(m_inputs[0].getStorage().getVec4()[3]);
+		setInternalValue(m_inputs[0].getStorage().getVec4()[0]);
+		setInternalValue(m_inputs[0].getStorage().getVec4()[1], 1);
+		setInternalValue(m_inputs[0].getStorage().getVec4()[2], 2);
+		setInternalValue(m_inputs[0].getStorage().getVec4()[3], 3);
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
-		m_internalData[1].setValue(0.0f);
-		m_internalData[2].setValue(0.0f);
-		m_internalData[3].setValue(0.0f);
+		setInternalValue(0.0f);
+		setInternalValue(0.0f, 1);
+		setInternalValue(0.0f, 2);
+		setInternalValue(0.0f, 3);
 	}
 }
 
@@ -1223,7 +1261,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToVector>::updateValues(
 	if (m_inputs[3].isPluggedIn())
 		tmp[3] = m_inputs[3].getStorage().getFloat();
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // VectorTVector3ToFloatsoFloats
@@ -1231,15 +1269,15 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToFloats>::updateValues
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3()[0]);
-		m_internalData[1].setValue(m_inputs[0].getStorage().getVec3()[1]);
-		m_internalData[2].setValue(m_inputs[0].getStorage().getVec3()[2]);
+		setInternalValue(m_inputs[0].getStorage().getVec3()[0]);
+		setInternalValue(m_inputs[0].getStorage().getVec3()[1], 1);
+		setInternalValue(m_inputs[0].getStorage().getVec3()[2], 2);
 	}
 	else
 	{
-		m_internalData[0].setValue(0.0f);
-		m_internalData[1].setValue(0.0f);
-		m_internalData[2].setValue(0.0f);
+		setInternalValue(0.0f);
+		setInternalValue(0.0f, 1);
+		setInternalValue(0.0f, 2);
 	}
 }
 
@@ -1255,7 +1293,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToVector3>::updateValues
 	if (m_inputs[2].isPluggedIn())
 		tmp[2] = m_inputs[2].getStorage().getFloat();
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // VectorToVector3
@@ -1263,11 +1301,11 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToVector3>::updateValues
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::vec3(m_inputs[0].getStorage().getVec4()));
+		setInternalValue(glm::vec3(m_inputs[0].getStorage().getVec4()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec3());
+		setInternalValue(glm::vec3());
 	}
 }
 
@@ -1276,16 +1314,16 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector>::updateValues
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::vec4(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getFloat()));
+		setInternalValue(glm::vec4(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::vec4(m_inputs[0].getStorage().getVec3(), 0.0f)); // PF implicitne pro vektor se
-		                                                                                 // w=0
+		setInternalValue(glm::vec4(m_inputs[0].getStorage().getVec3(), 0.0f)); // PF implicitne pro vektor se
+																																					 // w=0
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::vec4());
+		setInternalValue(glm::vec4());
 	}
 }
 
@@ -1294,17 +1332,17 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToFloats>::updateValues(in
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getQuat()[0]);
-		m_internalData[1].setValue(m_inputs[0].getStorage().getQuat()[1]);
-		m_internalData[2].setValue(m_inputs[0].getStorage().getQuat()[2]);
-		m_internalData[3].setValue(m_inputs[0].getStorage().getQuat()[3]);
+		setInternalValue(m_inputs[0].getStorage().getQuat()[0]);
+		setInternalValue(m_inputs[0].getStorage().getQuat()[1], 1);
+		setInternalValue(m_inputs[0].getStorage().getQuat()[2], 2);
+		setInternalValue(m_inputs[0].getStorage().getQuat()[3], 3);
 	}
 	else
 	{
-		m_internalData[0].setValue(1.0f); // PF - to return a unit quaternion
-		m_internalData[1].setValue(0.0f);
-		m_internalData[2].setValue(0.0f);
-		m_internalData[3].setValue(0.0f);
+		setInternalValue(1.0f); // PF - to return a unit quaternion
+		setInternalValue(0.0f, 1);
+		setInternalValue(0.0f, 2);
+		setInternalValue(0.0f, 3);
 	}
 }
 
@@ -1325,7 +1363,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToQuat>::updateValues(in
 	if (m_inputs[3].isPluggedIn())
 		tmp[3] = m_inputs[3].getStorage().getFloat(); // w
 
-	m_internalData[0].setValue(tmp);
+	setInternalValue(tmp);
 }
 
 // NormalizeQuat
@@ -1333,43 +1371,43 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(glm::normalize(m_inputs[0].getStorage().getQuat()));
+		setInternalValue(glm::normalize(m_inputs[0].getStorage().getQuat()));
 	}
 	else
 	{
-		m_internalData[0].setValue(glm::quat());
+		setInternalValue(glm::quat());
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Float>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::FloatToFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getFloat());
+		setInternalValue(m_inputs[0].getStorage().getFloat());
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage().getVec3());
+		setInternalValue(m_inputs[0].getStorage().getVec3());
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Quat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getQuat());
+		setInternalValue(m_inputs[0].getStorage(inputIndex).getQuat());
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Matrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		m_internalData[0].setValue(m_inputs[0].getStorage(inputIndex).getMat4());
+		setInternalValue(m_inputs[0].getStorage(inputIndex).getMat4());
 	}
 }
 
@@ -1377,7 +1415,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int input
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		auto targetStorage = m_inputs[0].getStorage();
+		auto& targetStorage = m_inputs[0].getStorage();
 		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation = targetStorage.getMat4();
 	}
 }
@@ -1414,6 +1452,14 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerZ>::updateValues(int 
 	}
 }
 
+template <> FORCE_INLINE void NodeImpl<ENodeType::MakeScale>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		setInternalValue(glm::scale(m_inputs[0].getStorage().getVec3()));
+	}
+}
+
 template <> FORCE_INLINE void NodeImpl<ENodeType::MakeAxisAngle>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
@@ -1427,8 +1473,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeOrtho>::updateValues(int i
 	if (areAllInputsPlugged())
 	{
 		setInternalValue(glm::ortho(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                            m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
-		                            m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
+																m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+																m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
 	}
 }
 
@@ -1437,7 +1483,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakePerspective>::updateValues
 	if (areAllInputsPlugged())
 	{
 		setInternalValue(glm::perspective(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                                  m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
+																			m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat()));
 	}
 }
 
@@ -1446,8 +1492,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeFrustum>::updateValues(int
 	if (areAllInputsPlugged())
 	{
 		setInternalValue(glm::frustum(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-		                              m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
-		                              m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
+																	m_inputs[2].getStorage().getFloat(), m_inputs[3].getStorage().getFloat(),
+																	m_inputs[4].getStorage().getFloat(), m_inputs[5].getStorage().getFloat()));
 	}
 }
 
@@ -1456,7 +1502,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int 
 	if (areAllInputsPlugged())
 	{
 		setInternalValue(glm::lookAt(m_inputs[0].getStorage().getVec3(), m_inputs[1].getStorage().getVec3(),
-		                             m_inputs[2].getStorage().getVec3()));
+																 m_inputs[2].getStorage().getVec3()));
 	}
 }
 
@@ -1464,18 +1510,18 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inpu
 {
 	if (areAllInputsPlugged())
 	{
-		// setInternalValue(m_inputs[0].getStorage(1).getMat4());
+		setInternalValue(m_inputs[inputIndex].getStorage(1).getMat4());
 	}
 }
 
 template <> FORCE_INLINE void NodeImpl<ENodeType::Pulse>::updateValues(int inputIndex)
 {
 	/*
-	if (m_outputs[0].isPluggedIn())
-	{
-		int pinIndex = m_outputs[0].getOutComponents()[0]->getIndex();
-		m_outputs[0].getOutComponents()[0]->getOwner()->updateValues(pinIndex);
-	}
-	 */
+if (m_outputs[0].isPluggedIn())
+{
+	int pinIndex = m_outputs[0].getOutComponents()[0]->getIndex();
+	m_outputs[0].getOutComponents()[0]->getOwner()->updateValues(pinIndex);
+}
+ */
 }
 } // namespace Core

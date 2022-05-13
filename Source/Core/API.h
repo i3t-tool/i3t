@@ -13,14 +13,29 @@ inline UIModule* getUI()
 	return App::get().getUI();
 }
 
+inline std::vector<Theme>& getThemes()
+{
+	return getUI()->getThemes();
+}
+
 inline Theme& getTheme()
 {
 	return getUI()->getTheme();
 }
 
-inline std::vector<Theme>& getThemes()
+/**
+ * Change properties of the given theme.
+ * @param theme
+ */
+template <typename Theme_>
+inline void emplaceTheme(Theme_&& theme)
 {
-	return getUI()->getThemes();
+	auto& allThemes = I3T::getThemes();
+	auto it = std::find_if(allThemes.begin(), allThemes.end(), [](Theme& theme) {
+		return theme.getName() == I3T::getTheme().getName();
+	});
+	*it = theme;
+	I3T::getUI()->setTheme(*it);
 }
 
 inline ImFont* getFont(EFont font)

@@ -1,8 +1,40 @@
+#include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <type_traits>
 
 #include "Core/Defs.h"
+
+namespace String
+{
+inline bool contains(const std::string& str, const std::string& substr)
+{
+	size_t index;
+
+	// Check if window can be focused (no menu is active).
+	if ((index = str.find(substr, 0L)) != std::string::npos)
+	{
+		if (index == 0) { return true; }
+	}
+	return false;
+}
+}
+
+namespace Utils
+{
+template <typename A, typename Predicate>
+inline int indexOf(A&& array, Predicate p)
+{
+	auto it = std::find_if(array.begin(), array.end(), p);
+	if (it != array.end())
+	{
+		return std::distance(array.begin(), it);
+	}
+	return -1;
+}
+}
+
 
 /**
  * Convert enum to integer (or any other underlying type

@@ -1,38 +1,40 @@
 #pragma once
-#include "WorkspaceNodeWithCoreData.h"
+
+#include "WorkspaceElementsWithCoreData.h"
 #include "WorkspaceSequence.h"
 
 #include "Core/Nodes/GraphManager.h"
 
-
-struct WorkspaceCameraArgs
-{
-    WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-    std::string headerLabel = "default Camera header";
-    std::string nodeLabel = "Camera";
-};
-
-class WorkspaceCamera : public WorkspaceNodeWithCoreData
+class WorkspaceCamera : public WorkspaceNodeWithCoreDataWithPins
 {
 protected:
-    ImRect m_dataRect; /* is set in every frame - depend on levelOfDetail and content of inner Sequences */
     Ptr<WorkspaceSequence> m_projection = nullptr;
     Ptr<WorkspaceSequence> m_view = nullptr;
 public:
-	WorkspaceCamera(ImTextureID headerBackground, WorkspaceCameraArgs const& args);
-    WorkspaceCamera(ImTextureID headerBackground, std::string headerLabel = "Camera", std::string nodeLabel = "Camera");
+	WorkspaceCamera(DIWNE::Diwne& diwne);
+
+	//===-- Double dispatch ---------------------------------------------------===//
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<WorkspaceCamera>(shared_from_this()));
+	}
+	//===----------------------------------------------------------------------===//
 
     bool isCamera();
-    ImVec2 getDataSize();
 
-    Ptr<WorkspaceSequence> const& getProjection() const;
-    Ptr<WorkspaceSequence> const& getView() const;
+    Ptr<WorkspaceSequence> const& getProjection() const {return m_projection;};
+    Ptr<WorkspaceSequence> const& getView() const {return m_view;};
 
-    void drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin=nullptr, bool withPins=true);
-	void drawDataFull(util::NodeBuilder& builder, int index);
-    void drawDataSetValues(util::NodeBuilder& builder);
+    //bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no data */
+
+    bool middleContent();
+
+    void drawMenuLevelOfDetail();
 
 	int maxLenghtOfData();
+
+//	bool leftContent(DIWNE::Diwne &diwne);
+//	bool rightContent(DIWNE::Diwne &diwne);
 };
 
 

@@ -10,8 +10,15 @@
 #include <utility>
 #include <vector>
 
+#include "Commands/ApplicationCommands.h"
+
 // forward declaration from TutorialRenderer.h to avoid cyclic dependency
 class ITutorialRenderer;
+
+enum class Language
+{
+	English, Czech
+};
 
 struct TutorialElement
 {
@@ -29,12 +36,8 @@ struct TutorialElement
   virtual void acceptRenderer(ITutorialRenderer* tutorialRenderer) = 0;
 };
 
-struct Explanation : TutorialElement  // can also contain bullets and other MD syntax for now 
+struct Explanation : TutorialElement 
 {
-  //Explanation()
-  //{
-  //  m_content = "";
-  //}
   Explanation(std::string explanation)
     : TutorialElement(std::move(explanation)) {}
 
@@ -64,10 +67,10 @@ struct Hint : TutorialElement
 {
   Hint(std::string hint)
     : TutorialElement(std::move(hint)),
-      m_collapsed(true)
+      m_expanded(false)
   {
   }
-  bool m_collapsed; // todo future feature
+  bool m_expanded;
   void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
   {
     tutorialRenderer->renderHint(this);
@@ -121,21 +124,21 @@ struct InputTask : TutorialElement
 };
 
 
+
+
 struct TStep
 {
   TStep() = default;
 
   // std::string m_title; // deprecated
   std::vector<std::shared_ptr<TutorialElement>> m_content; // NOTE: need a pointer to avoid object slicing
+	std::string m_scriptToRunWhenShown;
 
   // todo
   // maybe call task?
   // tasks - ptrs to all task widgets
   // questions - ptrss to all question widgets
   // isCompleted - true if all tasks and questions completed (also check in each update vs check after every change)
-
-  // old HACK - using unique pointers because I need pointers in general in order to avoid slicing of subclass objects (TWText,...) into the base class (TWidget) when storing them in this vector.
-  // also, it is preffered to have steps also as unique pointers, 
 };
 
 struct TutorialHeader
@@ -143,13 +146,11 @@ struct TutorialHeader
   TutorialHeader(std::string filename,
                  std::string title,
                  std::string description,
-                 std::shared_ptr<GUIImage> thumbnail,
-                 std::string sceneFilename)
+                 std::shared_ptr<GUIImage> thumbnail)
     : m_filename(std::move(filename)),
       m_title(std::move(title)),
       m_description(std::move(description)),
-      m_thumbnailImage(std::move(thumbnail)),
-      m_sceneFilename(std::move(sceneFilename))
+      m_thumbnailImage(std::move(thumbnail))
   {
   }
   ~TutorialHeader() = default;
@@ -158,7 +159,6 @@ struct TutorialHeader
   std::string m_title;
   std::string m_description;
   std::shared_ptr<GUIImage> m_thumbnailImage;
-  std::string m_sceneFilename;
   
 };
 

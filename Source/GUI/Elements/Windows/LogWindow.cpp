@@ -7,6 +7,7 @@
 
 LogWindow::LogWindow()
 {
+#ifdef I3T_DEBUG
 	Input.bindAction("MyTestAction", EKeyState::Pressed, [] {
     Log::info("MyTestAction triggered!");
 	});
@@ -14,6 +15,30 @@ LogWindow::LogWindow()
 	Input.bindAxis("MyTestAxis", [](float val) {
 	  Log::info("MyTestAxis triggered: {}!", val);
   });
+
+	////
+	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
+		const auto isActionTriggered = InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
+		Log::info("InputManager::isActionTriggered(\"createAndPlugConstructor\") = {}", isActionTriggered);
+	});
+	////
+
+	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
+		Log::info("bind: (mouse click + left ctrl) pressed");
+	});
+
+	Input.bindAction("scrollUp", EKeyState::Pressed, []() {
+		Log::info("scrollUp");
+	});
+
+	Input.bindAction("scrollDown", EKeyState::Pressed, []() {
+		Log::info("scrollDown");
+	});
+
+	Input.bindAxis("scroll", [](float val) {
+		Log::info("scroll: {}", val);
+	});
+#endif
 }
 
 void LogWindow::render()
@@ -21,18 +46,6 @@ void LogWindow::render()
 	ImGui::Begin(getName("Log View").c_str(), getShowPtr());
 
 	ImGui::Text("Log output");
-
-	/// \todo MH remove test code.
-  auto cycle = Core::GraphManager::getCycles()[0];
-	auto str = fmt::format("Cycle from {} to {} with update step {}.", cycle->getFrom(), cycle->getTo(), cycle->getMultiplier());
-
-	ImGui::Text(str.c_str());
-	ImGui::Text("%f", cycle->getData().getFloat());
-
-	if (ImGui::Button("Play")) { cycle->play(); } ImGui::SameLine();
-	if (ImGui::Button("Stop")) { cycle->stop(); } ImGui::SameLine();
-	if (ImGui::Button("Prev")) { cycle->stepBack(); } ImGui::SameLine();
-	if (ImGui::Button("Next")) { cycle->stepNext(); }
 
 	/// \todo MH test code, remove
   static bool val = true;
@@ -46,6 +59,7 @@ void LogWindow::render()
 	ImGui::Text("Current keys: %s", s.c_str());
 	if (ImGui::Button("Switch"))
   {
+#ifdef I3T_DEBUG
 		val = !val;
 		if (val)
     {
@@ -57,6 +71,7 @@ void LogWindow::render()
       InputBindings::setActionKey("fire", Keys::Code::v);
       InputBindings::removeActionKey("fire", Keys::Code::b);
 		}
+#endif
 	}
 
 	ImGui::BeginChild(ID);
@@ -65,6 +80,11 @@ void LogWindow::render()
 	// Set scroll to bottom of the child window.
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 		ImGui::SetScrollHereY(1.0f);
+
+	if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released))
+	{
+		Log::info("query: (mouse click + left ctrl) pressed");
+	}
 
 	ImGui::EndChild();
 

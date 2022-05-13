@@ -1,34 +1,49 @@
-//
-// Created by Sofie on 18.05.2021.
-//
 #pragma once
-#include "WorkspaceFloat.h"
+//----------------
+/**
+ * \file WorkspaceScreen.h
+ * \author Petr Felkel, Martin Herich
+ * \brief screen box in the workspace
+ * Based on WorkspaceScreen
+ *
+ */
+//---------------
+#include "WorkspaceElementsWithCoreData.h"
 
-#include <World/Components/Camera.h>
-#include <World/Components/Renderer.h>
-#include <World/HardcodedMeshes.h>
-#include <World/RenderTexture.h>
-#include "Core/Nodes/GraphManager.h"
-
-struct WorkspaceScreenArgs
-{
-	WorkspaceLevelOfDetail levelOfDetail = WorkspaceLevelOfDetail::Full;
-	std::string headerLabel = "default Screen header";
-	std::string nodeLabel = "Screen";
-	Ptr<Core::NodeBase> nodebase = Core::Builder::createNode<ENodeType::Screen>();
-};
-
-class WorkspaceScreen : public WorkspaceFloat
+class WorkspaceScreen : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
+	WorkspaceScreen(DIWNE::Diwne& diwne);
+	~WorkspaceScreen();
 
-	GLuint renderTexture;
-	RenderTexture* rend;
-	Camera* cam;
+	//===-- Double dispatch ---------------------------------------------------===//
+	void accept(NodeVisitor& visitor) override
+	{
+		visitor.visit(std::static_pointer_cast<WorkspaceScreen>(shared_from_this()));
+	}
+	//===----------------------------------------------------------------------===//
 
-	WorkspaceScreen(ImTextureID headerBackground, WorkspaceScreenArgs const& args);
-	WorkspaceScreen(ImTextureID headerBackground, std::string headerLabel = "Screen", std::string nodeLabel = "Screen");
+	//bool drawDataFull(, int index);
+	int	 maxLenghtOfData();				//todo
+	bool middleContent();					// the most important function
+	void drawMenuLevelOfDetail(); //todo
 
-	void drawDataSetValues(util::NodeBuilder& builder);
-	void drawDataFull(util::NodeBuilder& builder, int index);
+	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const
+	{
+		return {getOutputs()[1]};
+	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
+
+private:
+	// variables of the workspace box
+	GLuint	m_textureID		= 0;					// rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
+	ImVec2	m_textureSize = {100, 100}; // initial render texture size - should be large enough or changed during zoom
+	Camera* m_camera;										// local camera for model rendering in the box
+
+	float val = 0; // temporary variable for testing
+
+	// can be removed if no direct rendering to the texture m_textureID
+	GLuint				 m_fbo = 0;				// FBO for texture rendering - needed only for additional rendering to the m_textureID
+	RenderTexture* m_renderTexture; // needed when creating camera only, can be a local variable
+
+	void init();
 };

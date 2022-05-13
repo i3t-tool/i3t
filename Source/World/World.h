@@ -10,15 +10,18 @@
  */
 //---------------
 #include "pgr.h"
-#include "GameObject.h"
+//#include "GameObject.h"
+
+//
 
 #include <map>
 #include <memory>
 
-class WorkspaceMatrix4x4;
+class WorkspaceTransformation;
 class GameObject;
 class Component;
-namespace Core{class NodeBase;class Sequence;}
+class CameraControl;
+namespace Core{class Node; class Sequence;}
 
 struct Shader{
     GLuint program;     ///< GL shader program
@@ -32,11 +35,11 @@ struct Shader{
     GLint attr_uv;      ///<vertice texture coords attribute
 };
 struct Manipulator {
-    Manipulator(std::shared_ptr<Core::NodeBase>*_editedNode,std::shared_ptr<Core::Sequence>*_parent,Component*_component){
+    Manipulator(std::shared_ptr<Core::Node>*_editedNode,std::shared_ptr<Core::Sequence>*_parent,Component*_component){
         editedNode=_editedNode;parent=_parent;component=_component;
     }
     Manipulator(){editedNode=nullptr;parent=nullptr;component=nullptr;}
-    std::shared_ptr<Core::NodeBase>*editedNode;
+    std::shared_ptr<Core::Node>*editedNode;
     std::shared_ptr<Core::Sequence>*parent;
     Component*component;
     //Component*m_gameObject;
@@ -53,14 +56,10 @@ public:
     \return GL shader, 0 if failure
     */
     static Shader loadShader(const char* vs_name,const char* fs_name);
-    /// Initialize scene
-    /**
-    Creates and initializes default scene
-    */
-    static World* loadDefaultScene();
+
     /// calls start() on each component in scene
     /**
-    
+
     */
     void onStart();
     /// Render scene
@@ -68,17 +67,26 @@ public:
     Draws scene, updates global camera matricies, updates scene logic.
     */
     void onUpdate();
-    ///Activate manipulators in scene (viewport) for givent type of workspace matrix
-    void handlesSetMatrix(std::shared_ptr<WorkspaceMatrix4x4>*matnode,std::shared_ptr<Core::Sequence>*parent);
 
-    void tmpDrawNode();
-    void tmpSetNode();
+    void onGUI();
+
+    void sceneSetView(glm::vec3 dir,bool world);
+    void sceneZoom(float val);
+
+    ///Activate manipulators in scene (viewport) for givent type of workspace matrix
+    void manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation>matnode,std::shared_ptr<Core::Sequence>parent);
+
+    void manipulatorsSetVisible(bool visible);
+    bool manipulatorsGetVisible();
+
+    CameraControl*getCameraControl();
 
     ///Add GameObject to scene (viewport window)
     GameObject* addModel(const char* name);
     ///Remove GameObject from scene (viewport window)
     bool removeModel(GameObject*);
-    GameObject* sceneRoot;///<root of scene of this world. Scene is a tree of GameObjects.
+
+    GameObject* sceneRoot = nullptr; ///<root of scene of this world. Scene is a tree of GameObjects.
     std::map<std::string,Manipulator>manipulators;///<Properites of manipulator components
 
     ///load HC shaders, textures. Must be called before any instance of World is created.
@@ -96,16 +104,12 @@ public:
     static Shader shaderHandle;   ///< Handle shader
     static Shader shaderProj; ///< preview projection matrices
 
-    //HC textures
-    static GLuint cubeTexture;
-    static GLuint cubeColorTexture;
-    static GLuint cGridTexture;
-    static GLuint axisTexture;
-    static GLuint whiteTexture;
-
-    //static std::map<const char*, GLuint > textures;
-    //static std::map<const char*, pgr::MeshData > models;
-    
+    static std::map<std::string, GLuint > textures;
+    //static std::map<std::string, pgr::MeshData > models;
 private:
     static bool initializedRender; ///< Was render already initialized?
+    bool started=false;///<Was start() already called on this instance of World?
+    CameraControl*camControl=nullptr;
+    bool showManipulators=true;
+    Manipulator*activeManipulator=nullptr;
 };

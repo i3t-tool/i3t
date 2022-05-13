@@ -49,6 +49,10 @@ FreeManipulator::FreeManipulator(){
 void FreeManipulator::start(){
 
 }
+void FreeManipulator::GUI() {
+	ManipulatorUtil::hint("Use keys S, R, T to switch scale, rotation and translation.\nUse keys X, Y, Z, W or LMB to switch axis.");
+}
+
 void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
@@ -60,7 +64,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	else if(m_editmode==FreeManipulator::EDIT_SCALE){handle=m_scaleh;}
 		
 	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
-	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
+	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 
 	glm::vec4 row4bkp = glm::vec4(m_edited[0][3], m_edited[1][3], m_edited[2][3], m_edited[3][3]);
@@ -106,7 +110,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	setLen((glm::vec3*)&t[0],1.0f+selected*3.0f);setLen((glm::vec3*)&t[1],1.0f+selected*3.0f);
 	m_lineh->transformation=glm::mat4(1.0f);
 	ManipulatorUtil::drawHandle(m_lineh,t,glm::vec4(1.0f,selected+0.2f,1.0f,1.0f),m_stencilaxisw,false,m_hoverhandle);
-
+	
 	if(m_editmode==FreeManipulator::EDIT_SCALE){//override scale handles for free edit
 		scale=glm::scale(scale, glm::vec3(0.09f));		
 		if(m_editaxis==0){
@@ -123,7 +127,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 		}
 		else if(m_editaxis==3){
 			m_uniscaleh->transformation=glm::mat4(1.0f)*scale;
-			ManipulatorUtil::drawHandle(m_uniscaleh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
+			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace,glm::vec4(1.0f,0.2f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
 		}
 	}
 	else{
@@ -140,7 +144,7 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 			m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.0f,1.0f,1.0f,0.6f),m_stencilzy,m_activehandle,m_hoverhandle);
 			m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
-			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.6f),m_stencilzy,m_activehandle,m_hoverhandle);
+			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.6f),m_stencilzx,m_activehandle,m_hoverhandle);
 			m_planeh->transformation=glm::mat4(1.0f)*scale;
 			ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,1.0f,0.0f,0.6f),m_stencilyx,m_activehandle,m_hoverhandle);
 		}
@@ -151,6 +155,10 @@ void FreeManipulator::render(glm::mat4*parent,bool renderTransparent){
 	
 void FreeManipulator::update(){ 
 	if(m_editednode==nullptr){return;}
+	glm::mat4 changed= m_editednode.get()->getData().getMat4();
+	for(int i=0;i<4;i++){
+		for(int j=0;j<4;j++){if(changed[i][j]!=m_edited[i][j]){m_editaxis=i;break;}}//active axis that was changed from workspace
+	}
 	m_edited= m_editednode.get()->getData().getMat4();
 	//printf("4\n");
 	bool transactionBegin=false;
@@ -168,7 +176,7 @@ void FreeManipulator::update(){
 		else if(sel==m_stencilaxisx){ m_hoverhandle=m_stencilaxisx;}
 		else if(sel==m_stencilaxisy){ m_hoverhandle=m_stencilaxisy;}
 		else if(sel==m_stencilaxisz){ m_hoverhandle=m_stencilaxisz;}
-		else if(sel==m_stencilaxisw){ m_hoverhandle=m_stencilaxisx;}
+		else if(sel==m_stencilaxisw){ m_hoverhandle=m_stencilaxisw;}
 	}
 
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
@@ -189,6 +197,8 @@ void FreeManipulator::update(){
 	}
 	//printf("5\n");
 	if (InputManager::isKeyJustUp(Keys::mouseLeft)){m_activehandle=-1;}
+
+	if(m_hoverhandle!=-1||m_activehandle!=-1){ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);}
 		
 	glm::vec4 row4bkp=glm::vec4(m_edited[0][3], m_edited[1][3],m_edited[2][3],m_edited[3][3]);
 	m_edited[0][3]=0.0f;
@@ -196,10 +206,12 @@ void FreeManipulator::update(){
 	m_edited[2][3]=0.0f;
 	m_edited[3][3]=1.0f;
 
+
+
 	if(m_activehandle==-1){
 		if (InputManager::isKeyPressed(Keys::r)){m_editmode = FreeManipulator::EDIT_ROTATION;}
 		else if (InputManager::isKeyPressed(Keys::s)){m_editmode = FreeManipulator::EDIT_SCALE;}
-		else if (InputManager::isKeyPressed(Keys::p)){m_editmode = FreeManipulator::EDIT_POSITION;}
+		else if (InputManager::isKeyPressed(Keys::t)){m_editmode = FreeManipulator::EDIT_POSITION;}
 		
 		if (InputManager::isKeyPressed(Keys::x)){m_editaxis = 0;}
 		else if (InputManager::isKeyPressed(Keys::y)){m_editaxis = 1;}
@@ -336,7 +348,7 @@ void FreeManipulator::update(){
 		if (m_axisnum2 != -1){
 			glm::vec3 pc = planeIntersect((glm::vec3)(m_handlespace[m_axisnum]), (glm::vec3)(m_handlespace[m_axisnum2]), (glm::vec3)(m_handlespace[3]));
 
-			if (world2viewport(pc)[2] < 0.992f) {
+			if (world2viewport(pc)[2] < 0.998f) {
 				//glm::mat4 parent=getFullTransform(m_edited->parent);//TMP
 				//glm::mat4 parent=glm::mat4(1.0f);
 				glm::mat4 parent=getNodeTransform(&m_editednode,&m_parent);
@@ -359,12 +371,12 @@ void FreeManipulator::update(){
 	else if(m_editmode==FreeManipulator::EDIT_SCALE){
 		drag3*=0.005f;
 					
-		if(m_editaxis==3){
-			m_edited[3]+=m_bkp[3]*drag3[2]/glm::length((glm::vec3)m_bkp[3]);
+		if(m_editaxis==3&& glm::length2((glm::vec3)m_bkp[3])>0.0005f){
+			m_edited[3]+=m_bkp[3]*drag3[2]/(glm::length((glm::vec3)m_bkp[3]));
 			m_edited[3][3]=1.0f;
 		}
-		else{
-			m_edited[m_editaxis]+=m_bkp[m_editaxis]*drag3[m_editaxis]/glm::length((glm::vec3)m_bkp[m_editaxis]);
+		else if(glm::length2((glm::vec3)m_bkp[m_editaxis])>0.0005f){
+			m_edited[m_editaxis]+=m_bkp[m_editaxis]*drag3[m_editaxis]/(glm::length((glm::vec3)m_bkp[m_editaxis]));
 		}
 		//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 		//glm::mat4 ftransform=m_edited;

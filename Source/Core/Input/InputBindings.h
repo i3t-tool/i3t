@@ -1,3 +1,6 @@
+/**
+ * \author Martin Herich <hericmar@fel.cvut.cz>
+ */
 #pragma once
 
 #include <array>
@@ -60,6 +63,7 @@ struct InputBindings final
 	using AxesMap = std::unordered_map<std::string, std::vector<AxisMapping>>;
 
 	friend class InputManager;
+
 
 	static void init();
 

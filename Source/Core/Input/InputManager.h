@@ -5,7 +5,7 @@
  * Header for representing keyboard/mouse tracker
  *
  * \date:	2014/11/16, 2020/09/09, 2020/12/07
- * \author: Michal Folta, CTU Prague
+ * \author: Michal Folta, CTU Prague, Martin Herich <hericmar@fel.cvut.cz>
  */
 #pragma once
 
@@ -15,7 +15,7 @@
 #include "glm/vec2.hpp"
 
 #include "Core/Defs.h"
-#include "GUI/Elements/IWindow.h"
+#include "InputBindings.h"
 #include "InputController.h"
 #include "KeyCodes.h"
 
@@ -75,15 +75,19 @@ public:
 	static glm::vec2 m_mouseOffset;
 	static float m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
 	static float m_mouseXDelta, m_mouseYDelta;
+	static float m_mouseXDragDelta, m_mouseYDragDelta;
 
 private:
 	static std::vector<InputController*> m_inputControllers;
-	static Ptr<IWindow> m_hoveredWindow;
-	static Ptr<IWindow> m_focusedWindow;
+	// static Ptr<IWindow> m_focusedWindow;
 
 public:
 	static void init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
+
+	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
+
+	static void triggerAction(const char* action, EKeyState state);
 
 	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
 	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
@@ -93,19 +97,20 @@ public:
 	static bool areModifiersActive(Modifiers mods);
 
 	/**
-	 * Set window within mouse input actions should be listened to.
-	 *
-	 * Hovered window must be set from ImGui Context.
-	 */
-	static void setHoveredWindow(Ptr<IWindow> window) { m_hoveredWindow = window; }
-
-	/**
 	 * Set focused window for key input.
 	 *
-	 * Focused window must be set from ImGui Context.
+	 * \warning Focused window must be set from ImGui Context.
 	 */
-	static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
+	// static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
 
+	/**
+	 * Set active input controller (for focused window).
+	 */
+	static void setActiveInput(InputController* input);
+
+	static bool isInputActive(InputController* input);
+
+	/*
 	template <typename T> static bool isFocused()
 	{
 		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
@@ -114,17 +119,7 @@ public:
 			return strcmp(m_focusedWindow->getID(), T::ID) == 0;
 		return false;
 	}
-
-private:
-	/// \todo MH Is there any need for this function?
-	template <typename T> static bool isActive()
-	{
-		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
-
-		if (m_hoveredWindow)
-			return strcmp(m_hoveredWindow->getID(), T::ID) == 0;
-		return false;
-	}
+	 */
 
 public:
 	//@{
@@ -137,11 +132,13 @@ public:
 	 */
 	static void setPressed(const Keys::Code code)
 	{
-		// if (keyMap[code] != DOWN)
 		m_keyMap[code] = JUST_DOWN;
 	}
 
+	//===----------------------------------------------------------------------===//
 	static bool isActionTriggered(const char* name, EKeyState state);
+	static bool isAxisActive(const char* name);
+	//===----------------------------------------------------------------------===//
 
 	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 
@@ -185,6 +182,11 @@ public:
 	//@}
 
 	/**
+	 * Process action and axis events.
+	 */
+	 static void processEvents(InputController& controller);
+
+	/**
 	 * \brief Updates \a mouseDelta and \a mousePrev, and updates the stored statuses of the keys in the \a keyMap array
 	 * (JUST_UP -> UP, JUST_DOWN -> DOWN).
 	 */
@@ -217,4 +219,8 @@ public:
 	 * \return GLFW window.
 	 */
 	static GLFWwindow* getCurrentViewport();
+
+private:
+	static InputController s_globalInputController;
+	static InputController* s_activeInput;
 };

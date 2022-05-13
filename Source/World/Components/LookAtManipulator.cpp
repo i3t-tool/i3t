@@ -8,6 +8,7 @@
 #include "glm/gtx/norm.hpp"
 #include "imgui.h"
 #include "ManipulatorUtil.h"
+#include "Core/Nodes/TransformImpl.h"
 
 const char* LookAtManipulator::s_type = nullptr;
 
@@ -24,17 +25,36 @@ LookAtManipulator::LookAtManipulator() {
 
 	m_planeh =	new GameObject(quadMesh,		&World::shaderHandle,	0);
 	m_arrowh =	new GameObject(arrowMesh,		&World::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
+	m_cameraico=new GameObject(cameraicoMesh,	&World::shaderHandle,	0);
+	m_cameraico->transform(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.5f),glm::vec3(1.0f, 0.0f, 0.0f), -90.0f);
+	m_cameraico->color=glm::vec4(0.7f,0.7f,0.7f,1.0f);
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::textures["axis"]);	
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
 }
+void LookAtManipulator::GUI() {
+	//if(m_activehandle!=-1){
+	ManipulatorUtil::hint("Move center or eye of LookAt transformation matrix.\nUse keys C, E to switch between center and eye.");
+
+	//char txt[100];
+	//sprintf(txt,"X: %0.3f, Y: %0.3f, Z: %0.3f",m_handlespace[3][0],m_handlespace[3][1],m_handlespace[3][2]);
+	//ManipulatorUtil::hintAt("jj",world2screen((glm::vec3)m_handlespace[3])-glm::vec2(0.0f,20.0f));
+	glm::vec2 pos=world2screen((glm::vec3)m_handlespace[3])-glm::vec2(90.0f,70.0f);
+	if(pos.y<-5.0f){return;}
+	ImGui::SetCursorPos(ImVec2(pos.x, World::height-pos.y));
+
+	auto* editedlookat = (Core::TransformImpl<ETransformType::LookAt>*) m_editednode.get();
+	glm::vec3 center= editedlookat->getDefaultValue("center").getVec3();
+	glm::vec3 eye= editedlookat->getDefaultValue("eye").getVec3();
+
+	if(m_editmode==LookAtManipulator::EDIT_CENTER){ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", center[0], center[1], center[2]);}
+	else{ImGui::Text("X: %0.3f, Y: %0.3f, Z: %0.3f", eye[0], eye[1], eye[2]);}
+	//}
+}
 void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(m_editednode==nullptr){return;}
 	if(!renderTransparent){return;}
-
-	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
-	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
@@ -45,34 +65,42 @@ void LookAtManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	ftransform[3][3]=1.0f;
 
 	glUseProgram(World::shaderHandle.program);
-	glDepthRange(0.0, 0.01);
+	glDepthRange(0.01f, 0.02f);
+
+	float depth=(World::perspective*World::mainCamera*ftransform[3])[2];
+	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 	m_threeaxis->draw(ftransform);
+	m_cameraico->draw(ftransform*scale);
+	glDepthRange(0.0f, 0.01f);
+
+	depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
+	scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 	m_arrowh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_arrowh,getOrtho(m_handlespace,0),glm::vec4(1.0f,0.0f,0.0f,1.0f),m_stencilx,m_activehandle,m_hoverhandle);
 	m_arrowh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_arrowh,getOrtho(m_handlespace,1),glm::vec4(0.0f,1.0f,0.0f,1.0f),m_stencily,m_activehandle,m_hoverhandle);
-	m_arrowh->transformation=glm::mat4(1.0f)*scale;
+	m_arrowh->transformation=scale;
 	ManipulatorUtil::drawHandle(m_arrowh,getOrtho(m_handlespace,2),glm::vec4(0.1f,0.4f,1.0f,1.0f),m_stencilz,m_activehandle,m_hoverhandle);
 			
-	m_planeh->transformation=glm::mat4(1.0f)*scale;
+	m_planeh->transformation=scale;
 	m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(-90.0f),glm::vec3(0.0f,1.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(0.0f,1.0f,1.0f,0.7f),m_stencilzy,m_activehandle,m_hoverhandle);
 	m_planeh->transformation=glm::rotate(glm::mat4(1.0f),glm::radians(90.0f),glm::vec3(1.0f,0.0f,0.0f))*scale;
 	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,0.2f,1.0f,0.7f),m_stencilzx,m_activehandle,m_hoverhandle);
-	m_planeh->transformation=glm::mat4(1.0f)*scale;
+	m_planeh->transformation=scale;
 	ManipulatorUtil::drawHandle(m_planeh,m_handlespace,glm::vec4(1.0f,1.0f,0.0f,0.7f),m_stencilyx,m_activehandle,m_hoverhandle);
 
-	glDepthRange(0.0, 1.0);
+	glDepthRange(0.0f, 1.0f);
 	CHECK_GL_ERROR();
 }
 void LookAtManipulator::update() {
 	if(m_editednode==nullptr){return;}
 	m_edited=glm::inverse(m_editednode->getData().getMat4());
-	Core::LookAt*editedlookat=(Core::LookAt*)m_editednode.get();
-	glm::vec3 center= editedlookat->getCenter();
-	glm::vec3 eye= editedlookat->getEye();
+	auto* editedlookat = (Core::TransformImpl<ETransformType::LookAt>*) m_editednode.get();
+	glm::vec3 center= editedlookat->getDefaultValue("center").getVec3();
+	glm::vec3 eye= editedlookat->getDefaultValue("eye").getVec3();
 	///
 	bool transactionBegin=false;
 
@@ -86,6 +114,9 @@ void LookAtManipulator::update() {
 		else if(sel==m_stencilzy){	m_hoverhandle=m_stencilzy;}
 		else if(sel==m_stencilzx){	m_hoverhandle=m_stencilzx;}
 		else if(sel==m_stencilyx){	m_hoverhandle=m_stencilyx;}
+
+		if(InputManager::isKeyPressed(Keys::e)){m_editmode=LookAtManipulator::EDIT_EYE;}
+		else if(InputManager::isKeyPressed(Keys::c)){m_editmode=LookAtManipulator::EDIT_CENTER;}
 	}
 	if(InputManager::isKeyJustPressed(Keys::mouseLeft)){
 		m_activehandle=-1;
@@ -105,10 +136,11 @@ void LookAtManipulator::update() {
 	//m_handlespace=getNormalized(getFullTransform(m_edited->parent));//TMP
 	//glm::mat4 m=m_edited;*(glm::vec3*)&m[3]+=center;
 	//m_handlespace[3]=getFullTransform(m_edited)[3];//TMP
-	//m_handlespace=glm::mat4(1.0f);
-	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
-	m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(center-eye,0.0f));
 
+	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
+
+	if(m_editmode==LookAtManipulator::EDIT_CENTER){m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(eye-center,0.0f));}
+	else{m_handlespace[3]=m_handlespace*(m_edited[3]);}
 	if(m_activehandle==-1){return;}
 
 	///
@@ -142,14 +174,28 @@ void LookAtManipulator::update() {
 	}
 	else{
 		drag3*=0.006f;
-		m_handlespace[3][m_axisnum]+=drag3[m_axisnum];
+		m_handlespace[3]+= m_handlespace[m_axisnum]*drag3[m_axisnum];
 	}
 	//glm::mat4 m=getFullTransform(this->editedobj->parent);//TMP
 	//glm::mat4 m=glm::mat4(1.0f);//TMP
 	glm::mat4 m=getNodeTransform(&m_editednode,&m_parent);
 	for (int i=0;i<4;i++){if(glm::length2(m[0])<0.0001f){m[i][i]=1.0f;}}//singular matrix is not invertible
 	glm::vec4 posh=(glm::inverse(m)*m_handlespace)[3];
+
 	///
-	editedlookat->setCenter(-glm::vec3(posh)+2.0f*eye);
-	//editedlookat->setCenter(glm::vec3(center));
+	if(m_editmode==LookAtManipulator::EDIT_CENTER){
+		editedlookat->setDefaultValue("center", (glm::vec3)posh);
+		//printf("cur %f %f %f,, set %f %f %f\n",center[0],center[1],center[2],posh[0],posh[1],posh[2]);
+	}
+	else{
+		editedlookat->setDefaultValue("eye", (glm::vec3)posh);
+		//printf("cur %f %f %f,, set %f %f %f\n",eye[0],eye[1],eye[2],posh[0],posh[1],posh[2]);
+	}
+	m_edited=glm::inverse(m_editednode->getData().getMat4());
+	center= editedlookat->getDefaultValue("center").getVec3();
+	eye= editedlookat->getDefaultValue("eye").getVec3();
+
+	m_handlespace=getNodeTransform(&m_editednode,&m_parent);
+	if(m_editmode==LookAtManipulator::EDIT_CENTER){m_handlespace[3]=m_handlespace*(m_edited[3]-glm::vec4(eye-center,0.0f));}
+	else{m_handlespace[3]=m_handlespace*(m_edited[3]);}
 }

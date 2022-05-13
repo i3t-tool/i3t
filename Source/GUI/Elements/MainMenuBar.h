@@ -1,5 +1,6 @@
 /**
  * \file	GUI/Elements/MainMenuBar.h
+ * \author Martin Herich <hericmar@fel.cvut.cz>
  *
  * ImGui menu bar.
  */
@@ -13,19 +14,15 @@ class MainMenuBar
 {
 public:
 	MainMenuBar();
-	~MainMenuBar(){};
+	virtual ~MainMenuBar() = default;
+
 	void render();
 
 private:
-	bool m_showDemoWindow;
-
-	// AboutDialog m_aboutDialog;
-	// DescriptionDialog m_descriptionDialog;
-	// SetupDialog m_setupDialog;
+	bool m_showDemoWindow = false;
 
 	void showFileMenu();
 	void showEditMenu();
 	void showWindowsMenu();
-	void showViewportsMenu();
 	void showHelpMenu();
 };

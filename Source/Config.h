@@ -7,8 +7,8 @@
  * \author 	Michal Folta, CTU Prague
  */
 
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef CONFIG_H_
+#define CONFIG_H_
 
 #include <glm/glm.hpp>
 
@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "GUI/Theme.h"
+#include "Utils/Filesystem.h"
 
 /**
  * A configuration structure.
@@ -47,7 +47,6 @@ struct Config
 	static bool SHOW_CONSOLE; ///< True to show, false to hide the console
 	static bool FULLSCREEN;   ///< True to fullscreen
 
-	static std::string WIN_TITLE; ///< The window title
 	static int WIN_WIDTH;         ///< Width of the window - this is not a constant - set on onReshape in main.cpp
 	static int WIN_HEIGHT;        ///< Height of the window - this is not a constant - set on onReshape in main.cpp
 
@@ -227,11 +226,6 @@ struct Config
 	//@{
 	/** \name Filename manipulations*/
 
-
-	static std::string getAbsolutePath(const std::string& filename)
-	{
-		return getAbsolutePath(filename.c_str());
-	}
 	/**
 	 * Gets absolute path
 	 *
@@ -241,10 +235,13 @@ struct Config
 	 */
 	static std::string getAbsolutePath(const char* filename)
 	{
+		//Defined in compiler, still doesnt exist
+//#define I3T_RELEASE_STANDALONE
 #ifdef I3T_RELEASE_STANDALONE
     std::string path = std::string(filename);
 #else
 		// For debug purposes only.
+		//printf("wd %s\n",WORKING_DIRECTORY.c_str());
 		std::string path = WORKING_DIRECTORY;
 		if (filename[0]!='/') { path.append("/"); }
 		path.append(filename);
@@ -252,6 +249,17 @@ struct Config
 
     return path;
   }
+
+	static std::string getAbsolutePath(const std::string& filename)
+	{
+		return getAbsolutePath(filename.c_str());
+	}
+
+	static std::string getAbsolutePath(fs::path filename)
+	{
+		return getAbsolutePath(filename.string());
+	}
+
 
 	/**
 	 * Gets relative path

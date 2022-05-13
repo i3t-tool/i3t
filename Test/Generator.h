@@ -38,9 +38,9 @@ inline Ptr<Sequence> arrangeSequence(int matrices = 3)
 // Create seq. and matrices.
   auto seq = Core::Builder::createSequence();
 
-  auto mat1 = Core::Builder::createTransform<Free>();
-  auto mat2 = Core::Builder::createTransform<Free>();
-  auto mat3 = Core::Builder::createTransform<Free>();
+  auto mat1 = Core::Builder::createTransform<ETransformType::Free>();
+  auto mat2 = Core::Builder::createTransform<ETransformType::Free>();
+  auto mat3 = Core::Builder::createTransform<ETransformType::Free>();
 
   {
     auto result = mat1->setValue(generateMat4());

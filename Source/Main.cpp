@@ -61,16 +61,16 @@
 // - hleda data v miste, kde je spusten
 // - negeneruje pdb
 
-#include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "pgr.h"
 
 #include "Config.h"
 #include "Core/Defs.h"
+#include "Core/Application.h"
 #include "Logger/LoggerInternal.h"
 #include "Utils/Other.h"
-
 #include "Commands/ApplicationCommands.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 
@@ -134,12 +134,13 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
 int main(int argc, char* argv[])
 {
 #ifdef I3T_RELEASE_STANDALONE // variant for standalone release
-	std::string root = "";
+	Config::WORKING_DIRECTORY = "";
 #else // special settings for usage in Visual Studio devenv
-  auto root = I3T_PROJECT_ROOT;
+	Config::WORKING_DIRECTORY = I3T_PROJECT_ROOT;
 #endif
 
-	Config::WORKING_DIRECTORY = root;
+	std::unordered_map<int, int> map;
+	map[10] = 20;
 
 	// init the logging library
 	INIT_LOGGER(argc, argv);
@@ -174,14 +175,12 @@ int main(int argc, char* argv[])
 		Config::loadFromFile(dcfg);
 	else
 	{
-		Config::loadFromFile(Config::getAbsolutePath("/cfg_default.dcfg"));
+		Config::loadFromFile(Config::getAbsolutePath("cfg_default.dcfg"));
 	}
 	///   - load the scene
 	/// \todo Load scene in App::initI3T().
 	if (scnFlag)
 		Config::LOAD_SCENE = scn;
-
-	/// \todo Window icon!
 
 	/// \todo Run app in fullscreen mode.
 	// if (Config::FULLSCREEN)
@@ -189,7 +188,7 @@ int main(int argc, char* argv[])
 	//---------------------------------------------------------------------------
 
 	// Get application instance.
-	Application& app = Application::get();
+	Application app;
 
 	// I. Create GLFW window.
 	app.initWindow();

@@ -1,5 +1,6 @@
 .idea/
 /Docs/Doxygen/html/
+*.swp
 
 *.sln
 *.vcxproj
@@ -11,6 +12,7 @@ CMakeFiles/
 CMakeDoxyfile.in
 CMakeCache.txt
 Dependencies/picoc/cmake_install.cmake
+*.bak
 
 /Binaries/
 I3T.dir/
@@ -35,3 +37,4 @@ Data/imgui.ini
 .vs/
 logs/
 /CMakeSettings.json
+/Data/tutorials/tutorial

@@ -3,15 +3,25 @@
 #include <vector>
 
 #include "GUI/Elements/IWindow.h"
-#include "GUI/Theme.h"
+
+class Theme;
+
+namespace UI
+{
+void showColors();
+void showDimensions();
 
 class StyleEditor : public IWindow
 {
 public:
-  I3T_WINDOW(StyleEditor)
+I3T_WINDOW(StyleEditor)
 
-  StyleEditor() = default;
+	StyleEditor() = default;
 	~StyleEditor() override = default;
 
 	void render() override;
+
+private:
+	void renderSaveRevertField();
 };
+}

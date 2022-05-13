@@ -1,18 +1,65 @@
 #include "Node.h"
 
 #include "Core/Nodes/GraphManager.h"
-#include "Logger/LoggerInternal.h"
+#include "Logger/Logger.h"
 
 using namespace Core;
 
-NodeBase::~NodeBase()
+static IdGenerator generator;
+
+Node::PinView Node::PinView::begin() const { return Node::PinView(strategy, node, 0); }
+
+Node::PinView Node::PinView::end() const { return Node::PinView(strategy, node, size()); }
+
+size_t Node::PinView::size() const
 {
-	unplugAll();
+	if (strategy == Node::PinView::EStrategy::Input) return node->m_operation->inputTypes.size();
+	return node->m_operation->outputTypes.size();
 }
 
-void NodeBase::init()
+bool Node::PinView::empty() const { return size() == 0; }
+
+Node::PinView& Node::PinView::operator++()
 {
-	m_id = IdGenerator::next();
+	index++;
+
+	return *this;
+}
+
+const Pin& Node::PinView::operator*() { return (*this)[index]; }
+
+bool Node::PinView::operator==(const PinView& view) const { return index == view.index; }
+
+bool Node::PinView::operator!=(const PinView& view) const { return !(*this == view); }
+
+Pin& Node::PinView::operator[](size_t i)
+{
+	if (strategy == Node::PinView::EStrategy::Input) return node->getIn(i);
+	return node->getOut(i);
+}
+
+const Pin& Node::PinView::operator[](size_t i) const
+{
+	if (strategy == Node::PinView::EStrategy::Input) return node->getIn(i);
+	return node->getOut(i);
+}
+
+Node::~Node()
+{
+	generator.returnId(m_id);
+
+	for (auto& input : m_inputs)
+		input.destroy();
+
+	for (auto& output : m_outputs)
+		output.destroy();
+}
+
+void Node::finalize() { unplugAll(); }
+
+void Node::init()
+{
+	m_id = generator.next();
 
 	// Create input pins.
 	for (int i = 0; i < m_operation->numberOfInputs; i++)
@@ -28,113 +75,117 @@ void NodeBase::init()
 	}
 
 	// \todo MH Ugly workaround for Model, Transforms and Screen node, which has no outputs.
+	// \todo MH How to create nodes which have no outputs?
 	if (m_operation->numberOfOutputs == 0)
 	{
-		if (!m_operation->inputTypes.empty())
-		  m_internalData.emplace_back(m_operation->inputTypes[0]);
+		if (m_operation->keyWord == "Model") m_internalData.emplace_back(EValueType::Ptr);
+		else if (!m_operation->inputTypes.empty())
+			m_internalData.emplace_back(m_operation->inputTypes[0]);
 		else
-      m_internalData.emplace_back(EValueType::Matrix);
+			m_internalData.emplace_back(EValueType::Matrix);
+	}
+
+	if (m_operation->isConstructor)
+		for (int i = 0; i < m_operation->numberOfOutputs; i++)
+			m_OperatorState.push_back(EValueState::Editable);
+	else
+		for (int i = 0; i < m_operation->numberOfOutputs; i++)
+			m_OperatorState.push_back(EValueState::Locked);
+}
+
+void Node::notifyOwner()
+{
+	if (m_owner)
+	{
+		m_owner->spreadSignal();
+
+		// \todo MH Which index should be used when notifying parent node?
+		m_owner->updateValues(0);
 	}
 }
 
-ID NodeBase::getId() const
+ID Node::getId() const { return m_id; }
+
+void Node::changeId(ID newId)
 {
-	return m_id;
+	generator.markAsUsed(newId);
+
+	m_id = newId;
 }
 
-void NodeBase::setPinOwner(Pin& pin, Ptr<NodeBase> node)
+EValueState Node::getState(size_t pinIndex)
 {
-	pin.m_master = node;
+	return m_OperatorState[pinIndex];
 }
 
-void NodeBase::setDataMap(const Transform::DataMap* map)
+void Node::pulse(size_t index)
 {
-	// PerspectiveProj;
-	auto& validMaps = getValidDataMaps();
-	auto it = std::find_if(validMaps.begin(), validMaps.end(), [&](const Transform::DataMap* m) { return m == map; });
-
-	if (it != validMaps.end())
-		m_currentMap = map;
+	setInternalValue(true, index);
+	setInternalValue(false, index);
 }
 
-const std::vector<Pin>& NodeBase::getInputPins()
+bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
 {
-	return getInputPinsRef();
+	auto	outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
+	auto& storage				 = getIn(inputIndex).getStorage(outputPinIndex);
+
+	if (getIn(inputIndex).isPluggedIn() && storage.isPulseTriggered()) { return true; }
+	return false;
 }
 
-const std::vector<Pin>& NodeBase::getOutputPins()
-{
-	return getOutputPinsRef();
-}
-
-std::vector<Pin>& NodeBase::getInputPinsRef()
-{
-	return m_inputs;
-}
-
-std::vector<Pin>& NodeBase::getOutputPinsRef()
-{
-	return m_outputs;
-}
-
-void NodeBase::spreadSignal()
+void Node::spreadSignal()
 {
 	for (auto& operatorOutput : getOutputPinsRef())
 	{
 		for (auto* oct : operatorOutput.getOutComponents())
 		{
+			// I3T_DEBUG_LOG("Spreading signal from {} to {}:{}.", getSig(), oct->m_master->getSig(), oct->getSig());
 			oct->m_master->receiveSignal(oct->getIndex());
 		}
 	}
 }
 
-void NodeBase::spreadSignal(int outIndex)
+void Node::spreadSignal(size_t outIndex)
 {
-	if (getOutputPinsRef().empty())
-		return;
+	if (getOutputPinsRef().empty()) return;
 
-	for (auto* inPin : getOutputPinsRef()[outIndex].getOutComponents())
-	{
-		inPin->m_master->receiveSignal(inPin->getIndex());
-	}
+	auto& outputPin = getOut(outIndex);
+
+	for (auto* inPin : outputPin.getOutComponents()) inPin->m_master->receiveSignal(outIndex);
 }
 
-void NodeBase::receiveSignal(int inputIndex)
+void Node::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
 
 	/// \todo MH this call is unnecessary, but SpreadSignalTest.ValuesShouldBeSpreadThroughConnectedNodes fails.
-	spreadSignal();
+	// spreadSignal();
 }
 
-bool NodeBase::areInputsPlugged(int numInputs)
+bool Node::areInputsPlugged(int numInputs)
 {
 	Debug::Assert(m_inputs.size() >= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
 
 	bool result = true;
 
-	for (auto i = 0; i < numInputs; ++i)
-	{
-		result = result && m_inputs[i].isPluggedIn();
-	}
+	for (auto i = 0; i < numInputs; ++i) { result = result && m_inputs[i].isPluggedIn(); }
 
 	return result;
 }
 
-bool NodeBase::areAllInputsPlugged()
-{
-	return areInputsPlugged(m_operation->numberOfInputs);
-}
+bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
 
-ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
+ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 {
+	if (input->isDisabled() || output->isDisabled())
+		return ENodePlugResult::Err_DisabledPin;
+
+	/* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
 	auto* inp = input;
-	if (!inp)
-		return ENodePlugResult::Err_NonexistentPin;
+	if (!inp) return ENodePlugResult::Err_NonexistentPin;
 
 	auto* out = output;
-	if (!out)
-		return ENodePlugResult::Err_NonexistentPin;
+	if (!out) return ENodePlugResult::Err_NonexistentPin;
 
 	if (inp->m_valueType != out->m_valueType)
 	{
@@ -155,13 +206,13 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 	}
 
 	// cycle detector
-	auto toFind = inp->m_master; // INPUT
+	auto toFind = inp->getOwner(); // INPUT
 
 	// stack in vector - TOS is at the vector back.
-	std::vector<Ptr<NodeBase>> stack;
+	std::vector<Ptr<Node>> stack;
 
 	// PUSH(output) insert element at end.
-	stack.push_back(out->m_master);
+	stack.push_back(out->getOwner());
 
 	while (!stack.empty())
 	{
@@ -169,15 +220,14 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 		auto act = stack.back();
 		stack.pop_back();
 
-		if (act == toFind)
-			return ENodePlugResult::Err_Loop;
+		if (act == toFind) return ENodePlugResult::Err_Loop;
 
 		for (auto& pin : act->m_inputs)
 		{
 			if (pin.isPluggedIn())
 			{
 				Pin* ct = pin.m_input;
-				stack.push_back(ct->m_master);
+				stack.push_back(ct->getOwner());
 			}
 		}
 	}
@@ -190,7 +240,7 @@ ENodePlugResult NodeBase::isPlugCorrect(Pin const* input, Pin const* output)
 	return ENodePlugResult::Ok;
 }
 
-void NodeBase::unplugAll()
+void Node::unplugAll()
 {
 	for (size_t i = 0L; i < m_inputs.size(); ++i)
 	{
@@ -199,61 +249,103 @@ void NodeBase::unplugAll()
 
 	for (size_t i = 0L; i < m_outputs.size(); ++i)
 	{
-		unplugOutput(i);
+		for (const auto& connected : m_outputs[i].m_outputs)
+		{
+			unplugOutput(i);
+
+			const auto node = connected->m_master;
+			if (node->m_operation->isConstructor)
+			{
+				bool allUnplugged = true;
+
+				for (const auto& input : node->m_inputs)
+				{
+					if (input.isPluggedIn())
+					{
+						allUnplugged = false;
+						break;
+					}
+				}
+
+				if (allUnplugged)
+					for (auto& state : node->m_OperatorState)
+						state = EValueState::Editable;
+			}
+		}
 	}
 }
 
-void NodeBase::unplugInput(int index)
+void Node::unplugInput(size_t index)
 {
 	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
-	              "The node's input pin that you want to unplug does not exists.");
+								"The node's input pin that you want to unplug does not exists.");
 
-	auto* otherPin = m_inputs[index].m_input;
+	// auto* otherPin = m_inputs[index].m_input;
+	auto	inputs	 = getInputPinsRef();
+	auto* otherPin = inputs[index].m_input;
 
 	if (otherPin)
 	{
 		// Erase pointer to my input pin in connected node outputs.
 		auto& otherPinOutputs = otherPin->m_outputs;
 
-		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &m_inputs[index]);
+		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &inputs[index]);
 		if (it != otherPinOutputs.end())
 		{
 			/// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
 			otherPinOutputs.erase(it);
 		}
 		else
+			I3T_ABORT("Can't find pointer to input pin in other node outputs.");
+
+		auto& myPin		= inputs[index];
+		myPin.m_input = nullptr;
+	}
+
+	if (m_operation->isConstructor)
+	{
+		bool allUnplugged = true;
+
+		for (const auto& input : m_inputs)
 		{
-			Debug::Assert(false, "Can't find pointer to input pin in other node outputs.");
+			if (input.isPluggedIn())
+			{
+				allUnplugged = false;
+				break;
+			}
 		}
 
-		auto& myPin = m_inputs[index];
-		myPin.m_input = nullptr;
+		if (allUnplugged)
+			for (auto& state : m_OperatorState) state = EValueState::Editable;
 	}
 }
 
-void NodeBase::unplugOutput(int index)
+void Node::unplugOutput(size_t index)
 {
 	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
-	              "The node's output pin that you want to unplug does not exists.");
+								"The node's output pin that you want to unplug does not exists.");
 
-	auto& pin = m_outputs[index];
+	// auto& pin = m_outputs[index];
+	auto& pin = getOut(index);
 
 	// Set all connected nodes input as nullptr.
-	for (const auto& otherPin : pin.m_outputs)
-		otherPin->m_input = nullptr;
+	for (const auto& otherPin : pin.m_outputs) otherPin->m_input = nullptr;
 
 	pin.m_outputs.clear();
 }
 
-const DataStore& Pin::getStorage(unsigned int id)
+const Transform::DataMap* Node::getDataMap()
 {
-	if (m_isInput)
-	{
-		// Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
-		return m_input->m_master->getData(id);
-	}
-	else
-	{
-		return m_master->getData(id);
-	}
+	static std::array<const unsigned char, 16> mapData = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	static Transform::DataMap map(mapData);
+
+	return &map;
+}
+
+const Transform::DataMap& Node::getDataMapRef()
+{
+	static std::array<const unsigned char, 16> mapData = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	static Transform::DataMap map(mapData);
+
+	return map;
 }

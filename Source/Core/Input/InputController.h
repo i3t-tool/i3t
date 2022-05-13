@@ -1,8 +1,11 @@
+
 #pragma once
 
 #include <functional>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
-#include "InputBindings.h"
 #include "KeyCodes.h"
 
 using KeyCallback = std::function<void()>;
@@ -18,7 +21,7 @@ class InputController
 		EKeyState state;
 		KeyCallback fn;
 
-		Action(std::string n, EKeyState s, KeyCallback callback) : name(std::move(n)), state(s), fn(callback) {}
+		Action(std::string n, EKeyState s, KeyCallback callback) : name(std::move(n)), state(s), fn(std::move(callback)) {}
 	};
 
 	std::vector<Action> m_actions;
@@ -27,6 +30,14 @@ class InputController
 public:
 	InputController();
 
+	/**
+	 * See InputBindings.cpp file for default actions.
+	 */
 	void bindAction(const char* name, EKeyState state, KeyCallback fn);
 	void bindAxis(const char* name, AxisCallback fn);
+
+	/**
+	 * Make action active.
+	 */
+	void triggerAction(const char* name, EKeyState state);
 };

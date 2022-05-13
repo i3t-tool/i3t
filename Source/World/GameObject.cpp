@@ -72,7 +72,7 @@ GameObject::GameObject(const pgr::MeshData mesh, struct Shader* shader, GLuint t
     this->num_attribs = mesh.nAttribsPerVertex;
     this->shader = ((Shader*)shader);
     this->transformation = glm::mat4(1.0f);
-    this->texture=(texture==0)?World::whiteTexture:texture;
+    this->texture=(texture==0)?World::textures["white"]:texture;
     this->color = glm::vec4(1.0f);
 
     // buffer for vertices
@@ -106,10 +106,54 @@ GameObject::GameObject(const pgr::MeshData mesh, struct Shader* shader, GLuint t
 
     CHECK_GL_ERROR();
 }
-GameObject::~GameObject() {
-    glDeleteBuffers(1,&this->vbo_positions);
-    glDeleteBuffers(1,&this->vbo_indices);
-    glDeleteVertexArrays(1,&this->vao);
+void GameObject::setMeshData(const pgr::MeshData mesh){
+    if (this->vao!=0){
+        glDeleteBuffers(1,&this->vbo_positions);
+        glDeleteBuffers(1,&this->vbo_indices);
+        glDeleteVertexArrays(1,&this->vao);
+    }
+
+    this->num_vertices = mesh.nVertices;
+    this->num_triangles = mesh.nTriangles;
+    this->num_attribs = mesh.nAttribsPerVertex;
+
+    // buffer for vertices
+    glGenBuffers(1, &this->vbo_positions);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vbo_positions);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.nVertices * mesh.nAttribsPerVertex, mesh.verticesInterleaved,GL_STATIC_DRAW);
+
+    // buffer for triangle indices - ELEMENT_ARRAY
+    glGenBuffers(1, &this->vbo_indices);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->vbo_indices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * mesh.nTriangles * 3, mesh.triangles,GL_STATIC_DRAW); // 3-indices per triangle
+
+    ///////////// VAO	////////////
+    glGenVertexArrays(1, &this->vao);
+    glBindVertexArray(this->vao);
+    // vertex positions
+    glBindBuffer(GL_ARRAY_BUFFER, this->vbo_positions);
+    glEnableVertexAttribArray(this->shader->attr_pos);
+    glVertexAttribPointer(this->shader->attr_pos, 3, GL_FLOAT, GL_FALSE, mesh.nAttribsPerVertex * sizeof(float),(void*)(0)); // [xyz][nx,ny,nz][s,t]
+    if (this->shader->attr_norm >= 0){ // norm pos
+        glEnableVertexAttribArray(this->shader->attr_norm);
+        glVertexAttribPointer(this->shader->attr_norm, 3, GL_FLOAT, GL_FALSE, mesh.nAttribsPerVertex * sizeof(float),(void*)(4 * 3)); // [xyz][nx,ny,nz][s,t]
+    }
+    if (this->shader->attr_uv >= 0){ // uv
+        glEnableVertexAttribArray(this->shader->attr_uv);
+        glVertexAttribPointer(this->shader->attr_uv, 2, GL_FLOAT, GL_FALSE, mesh.nAttribsPerVertex * sizeof(float),(void*)(4 * 6)); // [xyz][nx,ny,nz][s,t]
+    }
+    // triangle indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->vbo_indices);
+    glBindVertexArray(0);
+
+    CHECK_GL_ERROR();
+}
+GameObject::~GameObject(){
+    if(this->vao!=0){
+        glDeleteBuffers(1,&this->vbo_positions);
+        glDeleteBuffers(1,&this->vbo_indices);
+        glDeleteVertexArrays(1,&this->vao);
+    }
 }
 glm::mat4 GameObject::inheritedTransform(GameObject* obj){
     glm::mat4 transform = glm::mat4(1.0f);

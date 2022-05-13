@@ -203,10 +203,10 @@ void ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int a
 		InputManager::keyUp(key);
 	}
 
-	// Modifiers are not used.
-	io.KeyCtrl = false;
-	io.KeyShift = false;
-	io.KeyAlt = false;
+	// Modifiers are not reliable across systems.
+	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
 #ifdef _WIN32
 	io.KeySuper = false;
 #else

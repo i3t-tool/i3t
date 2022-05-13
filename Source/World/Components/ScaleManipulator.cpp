@@ -8,6 +8,8 @@
 #include "glm/gtx/norm.hpp"
 #include "imgui.h"
 #include "ManipulatorUtil.h"
+#include "Core/Nodes/Transform.h"
+#include "Core/Nodes/TransformImpl.h"
 
 #include <typeinfo>
 
@@ -34,7 +36,7 @@ ScaleManipulator::ScaleManipulator() {
 	m_planeh =	new GameObject(quadMesh,		&World::shaderHandle,	0);
 	m_scaleh =	new GameObject(scalearrowMesh,	&World::shaderHandle,	0);
 	m_uniscaleh=new GameObject(unitcubeMesh,	&World::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::textures["axis"]);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
@@ -45,7 +47,7 @@ void ScaleManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	if(!renderTransparent){return;}
 
 	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
-	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
+	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
@@ -193,8 +195,8 @@ void ScaleManipulator::update() {
 	///
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1], m_edited[2][2]));}
 	//if(m_editednode!=nullptr){ValueSetResult v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
-	Core::Scale*editedscale=(Core::Scale*)m_editednode.get();
-	editedscale->setX(m_edited[0][0]);
-	editedscale->setY(m_edited[1][1]);
-	editedscale->setZ(m_edited[2][2]);
+	auto* editedscale= (Core::TransformImpl<ETransformType::Scale>*) m_editednode.get();
+
+	glm::vec3 scale = { m_edited[0][0], m_edited[1][1], m_edited[2][2] };
+	editedscale->setDefaultValue("scale", scale);
 }

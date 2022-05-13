@@ -20,17 +20,20 @@ RotationManipulator::RotationManipulator() {
 	m_stencilz = ManipulatorUtil::getStencil(2);
 
 	m_circleh =	new GameObject(unitcircleMesh,	&World::shaderHandle,	0);
-	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::axisTexture);		
+	m_threeaxis=new GameObject(three_axisMesh,	&World::shader0,		World::textures["axis"]);		
 	m_threeaxis->color=glm::vec4(2.0f,2.0f,2.0f,1.0f);
 	m_threeaxis->primitive=GL_LINES;
 	m_edited=glm::mat4(1.0f);
+	
+	m_editednode=Ptr<Core::NodeBase>();
+	m_parent=Ptr<Core::Sequence>();
 }
 void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
-	if(m_editednode==nullptr){return;}
+	if(m_editednode.get()==nullptr){return;}
 	if(!renderTransparent){return;}
 
 	float depth=(World::perspective*World::mainCamera*m_handlespace[3])[2];
-	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.05f+0.5f));
+	glm::mat4 scale=glm::scale(glm::mat4(1.0f), glm::vec3(depth*0.07f+0.5f));
 
 	//glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	//glm::mat4 ftransform=m_edited;//full transform from nodebase
@@ -67,14 +70,26 @@ void RotationManipulator::render(glm::mat4* parent, bool renderTransparent) {
 	CHECK_GL_ERROR();
 }
 void RotationManipulator::update() {
-	if(m_editednode==nullptr){return;}
+	if(m_editednode.get()==nullptr){return;}
 	
 	m_allowedaxis=0;
+	float angle=0.0f;
 	const char*oper= m_editednode->getOperation()->keyWord.c_str();
-	if(strcmp(oper,"EulerX")==0)		{m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();}
-	else if(strcmp(oper,"EulerY")==0)	{m_allowedaxis|=s_y;m_edited=m_editednode->getData().getMat4();}
-	else if(strcmp(oper,"EulerZ")==0)	{m_allowedaxis|=s_z;m_edited=m_editednode->getData().getMat4();}
-	else if(strcmp(oper,"AxisAngle")==0){m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();}
+	if(strcmp(oper,"EulerX")==0)		{
+		m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();
+		//Core::EulerRotX*r=(Core::EulerRotX*)m_editednode.get();
+		//angle=glm::degrees(r->getAngle());
+		//printf("angle %f,,%f\n", angle,r->getAngle());
+	}
+	else if(strcmp(oper,"EulerY")==0)	{
+		m_allowedaxis|=s_y;m_edited=m_editednode->getData().getMat4();
+	}
+	else if(strcmp(oper,"EulerZ")==0)	{
+		m_allowedaxis|=s_z;m_edited=m_editednode->getData().getMat4();
+	}
+	else if(strcmp(oper,"AxisAngle")==0){
+		m_allowedaxis|=s_x;m_edited=m_editednode->getData().getMat4();
+	}
 	else if(strcmp(oper,"Quat")==0){
 		//m_allowedaxis|=s_x|s_y|s_z;
 		//Core::QuatRot* editedquat = (Core::QuatRot*)m_editednode.get();
@@ -128,9 +143,11 @@ void RotationManipulator::update() {
 		glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 		glm::vec3 pc = px*coef[1]+py*coef[2];
-		glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)axes[m_axisnum]));
+		glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)(ortho * axes[m_axisnum])));
+
 		m_dirbkp = glm::normalize(world2screen(p0)-world2screen(p0 + dir3));
 	}
+
 	mov[0]=m_dirbkp;
 	mov[1]=glm::vec2(mov[0][1],-mov[0][0]);
 
@@ -145,6 +162,7 @@ void RotationManipulator::update() {
 	if(InputManager::isKeyPressed(Keys::shiftr)){drag3*=0.25f;}
 
 	///
+	//angle+=drag3[m_axisnum];
 	drag3*=1.0f;
 	glm::mat4 rot=glm::rotate(glm::mat4(1.0f),glm::radians(drag3[m_axisnum]),(glm::vec3)m_edited[m_axisnum]);
 	glm::vec4 bkp=m_edited[3];
@@ -152,8 +170,8 @@ void RotationManipulator::update() {
 	m_edited=rot*m_edited;
 	m_edited[3]=bkp;
 	///
-
-	float angle=0.0f;
+	
+	angle=0.0f;
 	if(m_axisnum==0){
 		glm::vec3 v=(glm::vec3)(m_edited*glm::vec4(0.0f,1.0f,0.0f,0.0f));
 		angle=angle2(v[1],v[2]);
@@ -167,8 +185,15 @@ void RotationManipulator::update() {
 		angle=angle2(v[0],v[1]);
 	}
 	//printf("angle %f, mov %f\n",angle,drag3[m_axisnum]);
+
 	if(strcmp(oper,"Quat")!=0){
 		m_editednode->setValue(glm::radians(angle));
+		/*printf("angle %f, ",angle);
+		Core::EulerRotX* r = (Core::EulerRotX*)m_editednode.get();
+		r->setValue(glm::radians(angle));
+		angle = glm::degrees(r->getAngle());
+		
+		printf("angle %f\n", angle);*/
 	}
 	else {
 

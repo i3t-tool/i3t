@@ -2,22 +2,34 @@
 
 #include <algorithm>
 
-#include "glm/gtx/matrix_interpolation.hpp"
+#include "Logger/Logger.h"
 
 using namespace Core;
 
-std::vector<Ptr<Cycle>> GraphManager::m_cycles;
+GraphManager* GraphManager::s_self = nullptr;
 
-void tryToDoSequenceProcedure(Ptr<Node> node)
+void GraphManager::init()
 {
-	if (isSequence(node))
-		node->as<Sequence>()->updatePins();
+	s_self = new GraphManager;
+}
+
+void GraphManager::destroy()
+{
+	if (s_self != nullptr)
+	{
+		delete s_self;
+	}
 }
 
 ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 {
 	auto lhs = input->m_master;
 	return lhs->isPlugCorrect(input, output);
+}
+
+ENodePlugResult GraphManager::isPlugCorrect(Pin& input, Pin& output)
+{
+	return isPlugCorrect(&input, &output);
 }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
@@ -33,29 +45,26 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Pt
 	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",
 								leftNode->getSig(), fromIndex);
 
-	auto result = isPlugCorrect(&rightNode->getInPin(myIndex), &leftNode->getOutPin(fromIndex));
+	auto result = isPlugCorrect(&rightNode->getIn(myIndex), &leftNode->getOut(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
 
+	auto& output = leftNode->getOut(fromIndex);
+	auto& input  = rightNode->getIn(myIndex);
+
 	// Insert to toPlug output pin outputs this operator input pin.
-	leftNode->getOutputPinsRef()[fromIndex].m_outputs.push_back(&(rightNode->getInputPinsRef()[myIndex]));
+	output.m_outputs.push_back(&input);
 
 	// Attach given operator output pin to this operator input pin.
-	rightNode->getInputPinsRef()[myIndex].m_input = &leftNode->getOutputPinsRef()[fromIndex];
+	input.m_input = &output;
 
-	if (isSequence(leftNode))
-	{
-		leftNode->as<Sequence>()->updatePins();
-	}
-	if (isSequence(rightNode))
-	{
-		rightNode->as<Sequence>()->updatePins();
-	}
+	for (auto& state : rightNode->m_OperatorState)
+		state = EValueState::Locked;
 
 	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
-		leftNode->spreadSignal();
-
-	rightNode->setDataMap(&Transform::g_AllLocked);
+	{
+		leftNode->spreadSignal(fromIndex);
+	}
 
 	return ENodePlugResult::Ok;
 }
@@ -75,22 +84,17 @@ ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>&
 void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
 {
 	node.get()->unplugAll();
-	node->setDataMap(&Transform::g_Free);
-	tryToDoSequenceProcedure(node);
 }
 
 void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugInput(index);
-	tryToDoSequenceProcedure(node);
-	if (getAllInputNodes(node).empty())
-		node->setDataMap(node->m_initialMap);
 }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
 	node.get()->unplugOutput(index);
-	tryToDoSequenceProcedure(node);
+	// tryToDoSequenceProcedure(node);
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)
@@ -119,7 +123,7 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
 		return nullptr;
 	}
 
-	auto expected = pins[index].m_input->m_master;
+	auto expected = pins[index].m_input->getOwner();
 
 	if (expected->m_owner != nullptr)
 	{
@@ -152,14 +156,14 @@ std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase
 	auto pin = node->getOutputPins()[index];
 	auto othersInputs = pin.getOutComponents();
 	for (const auto& other : othersInputs)
-		result.push_back(other->m_master);
+		result.push_back(other->getOwner());
 
 	return result;
 }
 
 void GraphManager::update(double tick)
 {
-	for (auto& cycle : m_cycles)
+	for (auto& cycle : s_self->m_cycles)
 		cycle->update(tick);
 }
 
@@ -190,6 +194,7 @@ SequenceTree::MatrixIterator SequenceTree::begin()
 {
 	auto it = MatrixIterator(m_beginSequence);
 	it.m_tree = this;
+
 	return it;
 }
 
@@ -204,6 +209,7 @@ SequenceTree::MatrixIterator SequenceTree::end()
 
 	auto it = MatrixIterator(cur, nullptr);
 	it.m_tree = this;
+
 	return it;
 }
 
@@ -235,24 +241,28 @@ SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator++()
 SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator++(int)
 {
 	advance();
+
 	return *this;
 }
 
 SequenceTree::MatrixIterator& SequenceTree::MatrixIterator::operator--()
 {
 	withdraw();
+
 	return *this;
 }
 
 SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator--(int)
 {
 	withdraw();
+
 	return *this;
 }
 
 Ptr<NodeBase> SequenceTree::MatrixIterator::operator*() const
 {
 	Debug::Assert(m_currentMatrix != nullptr, "Iterator is at the end!");
+
 	return m_currentMatrix;
 }
 
@@ -329,40 +339,85 @@ void SequenceTree::MatrixIterator::withdraw()
 
 void MatrixTracker::setParam(float param)
 {
+	m_param = glm::clamp(param, 0.0f, 1.0f);
+
+	track();
+}
+
+void MatrixTracker::track()
+{
+	// Create iterator for traversing sequence branch.
 	auto st = SequenceTree(m_beginSequence);
 	auto it = st.begin();
 
-	int matricesCount = 0;	// to root
-    while (it != st.end())
+	// Get matrices count in total.
+	int matricesCount = 0;	// to the root
+	while (it != st.end())
 	{
 		++it;
 		++matricesCount;
 	}
 	if (matricesCount == 0)
-		return;
-
-	glm::mat4 result(1.0f);
-	float requestedMatricesCount = param * matricesCount;
-	int count = (int) requestedMatricesCount;
-	float interpParam;
-	if (count == 0)
-		interpParam = requestedMatricesCount;
-	else
-		interpParam = fmod(requestedMatricesCount, count);
-
-	for (int i = 0; i < count; ++i)
 	{
-    --it;
-    result = result * (*it)->getData().getMat4();
+		// Empty sequence cannot be tracked.
+		return;
+	}
+	// Iterator now points to the sequences root.
+
+	float matFactor    = 1.0f / (float) matricesCount;
+	int matricesBefore = (int) (m_param * (float) matricesCount);
+
+	float interpParam  = fmod(m_param, matFactor) / matFactor;
+	// Handle special cases
+	if (Math::eq(0.0f, m_param))
+	{
+		interpParam = 0.0f;
+	}
+	else if (Math::eq(1.0f, m_param))
+	{
+		interpParam = 1.0f;
 	}
 
-	// Interpolate current matrix.
+	glm::mat4 result(1.0f);
+	glm::mat4 rhs;
 	glm::mat4 lhs(1.0f);
 
-	--it;
-	glm::mat4 rhs = (*it)->getData().getMat4();
+	// Get non-interpolated matrices product.
+	if (m_isReversed)
+	{
+		// From right to left.
+		for (int i = 0; i < matricesBefore; ++i)
+		{
+			--it;
+			result = result * (*it)->getData().getMat4();
+		}
 
-	// \todo MH interpolate rotations with quat.
-	result = result * glm::interpolate(lhs, rhs, interpParam);
+		if (!Math::eq(1.0f, m_param))
+		{
+			--it;
+
+			rhs = (*it)->getData().getMat4();
+			result = result * Math::lerp(lhs, rhs, interpParam, isRot(*it));
+		}
+	}
+	else
+	{
+		// Go to the first matrix
+		while (it != st.begin())
+		{
+			--it;
+		}
+
+		for (int i = 0; i < (matricesCount - matricesBefore - 1); ++i)
+		{
+			result = result * (*it)->getData().getMat4();
+			++it;
+		}
+		//++it;
+		rhs = (*it)->getData().getMat4();
+		auto mat = Math::lerp(lhs, rhs, 1.0f - interpParam, isRot(*it));
+		result = mat * result;
+	}
+
 	m_interpolatedMatrix = result;
 }

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "NodeImpl.h"
+#include <map>
+
+#include "Node.h"
 
 #if defined(WIN32)
 #undef far
@@ -9,445 +11,201 @@
 
 namespace Core
 {
-FORCE_INLINE bool isTransform(NodePtr& node)
+FORCE_INLINE bool isTransform(const NodePtr& node)
 {
+	/*
 	auto it = std::find_if(g_transforms.begin(), g_transforms.end(),
-	                       [&node](const Operation& o) { return o.keyWord == node->getOperation()->keyWord; });
+	                       [&node](const std::pair<Operation, std::map<std::string, EValueType>>& pair) { return pair.first.keyWord == node->getOperation()->keyWord; });
 	return it != g_transforms.end();
+	 */
+	auto& keyWord = node->getOperation()->keyWord;
+	auto	type		= magic_enum::enum_cast<ETransformType>(keyWord);
+
+	return type.has_value();
 }
 
-class Transformation : public NodeBase
+template <typename Node>
+FORCE_INLINE bool isRot(Node&& node)
 {
+	// static_assert(std::is_base_of_v<NodeBase, Node>);
+
+	auto& type = node->getOperation()->keyWord;
+	return type == "EulerX" || type == "EulerY" || type == "EulerZ" || type == "AxisAngle";
+}
+
+enum class ETransformState
+{
+	Invalid = 0,
+	Valid,
+	Unknown
+};
+
+//===-- Value masks -------------------------------------------------------===//
+
+using ValueMask = std::array<uint8_t, 16>;
+
+constexpr uint8_t VM_ZERO = 0;
+constexpr uint8_t VM_ONE  = 1;
+constexpr uint8_t VM_ANY  = 2;
+
+inline bool canEditValue(EValueState valueState)
+{
+	return valueState == EValueState::Editable || valueState == EValueState::EditableSyn;
+}
+
+bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value);
+bool validateValues(const ValueMask& mask, const glm::mat4& matrix);
+
+//===-- Base Transform class ----------------------------------------------===//
+
+class Transformation : public Node
+{
+	friend class GraphManager;
 	friend class Storage;
 
-	bool m_hasEnabledSynergies = true;
-
-	/// \todo MH Use Node::m_owner.
-	Ptr<NodeBase> m_currentSequence = nullptr;
-	int m_currentIndex = -1;
+	using DefaultValues = std::map<std::string, Data>;
 
 public:
-	bool isInSequence() { return m_currentSequence != nullptr; }
-	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
-	int getCurrentIndex() const { return m_currentIndex; }
+	explicit Transformation(const TransformOperation& transformType);
 
-	virtual void lock();
-	virtual void unlock();
-	bool hasSynergies() const { return m_hasEnabledSynergies; }
-	void disableSynergies() { m_hasEnabledSynergies = false; }
-	void enableSynergies() { m_hasEnabledSynergies = true; }
+	//===-- Construct functions -----------------------------------------------===//
+
+	void createDefaults();
+
+	virtual void initDefaults() {}
+
+	//===----------------------------------------------------------------------===//
+
+private:
+	/// \todo MH Use Node::m_owner.
+	Ptr<NodeBase> m_currentSequence = nullptr;
+	int						m_currentIndex		= -1;
+
+public:
+	bool					isInSequence() { return m_currentSequence != nullptr; }
+	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
+	int						getCurrentIndex() const { return m_currentIndex; }
+
+	//===----------------------------------------------------------------------===//
+
+	/// Get default value which transform can hold.
+	const Data& getDefaultValue(const std::string& name) const;
+
+	/** You can find transform default values names and types at the file Core/Nodes/Operation.h. */
+	template <typename T>
+	void setDefaultValue(const std::string& name, T&& val)
+	{
+		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
+
+		m_defaultValues.at(name).setValue(val);
+		reset();
+	}
+
+	/**
+	 * \return A map of valueName and value pairs.
+	 */
+	TransformOperation::ValueMap getDefaultTypes();
+	DefaultValues&               getDefaultValues();
+
+	void setDefaultValues(const DefaultValues& values) { m_defaultValues = values; }
+
+	EValueState getValueState(glm::ivec2 coords);
+
+	//===----------------------------------------------------------------------===//
+
+	// ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	// virtual ValueSetResult onSetValue(float val, glm::ivec2 coords) {}
+
+	virtual ETransformState isValid() const { return ETransformState::Unknown; }
+	bool										isLocked() const;
+	void										lock();
+	void										unlock();
+	bool										hasSynergies() const { return m_hasEnabledSynergies; }
+	void										disableSynergies() { m_hasEnabledSynergies = false; }
+	void										enableSynergies() { m_hasEnabledSynergies = true; }
+	void										free()
+	{
+		unlock();
+		disableSynergies();
+	}
+
+	void reset() override
+	{
+		onReset();
+		notifySequence();
+	}
+
+	/// \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
+	virtual void onReset() {}
+
+	//===----------------------------------------------------------------------===//
+
+	bool hasSavedValue() const { return m_hasSavedData; }
+
+	/** Save current values of the transformation for future reloading. */
+	void saveValue();
+
+	/** Restore saved values if they exist. */
+	void reloadValue();
+
+	const glm::mat4& getSavedValue() const;
+
+	void setSavedValue(const glm::mat4& values);
+
+	//===----------------------------------------------------------------------===//
+
+	void resetModifiers()
+	{
+		m_isLocked						= true;
+		m_hasEnabledSynergies = true;
+	}
+
+	ValueSetResult setValue(const glm::mat4& mat) override;
+	ValueSetResult setValue(float, glm::ivec2) override { return ValueSetResult{}; }
+
+	//===----------------------------------------------------------------------===//
+	struct
+	{
+		float cos;
+		float sin;
+	} halfspaceSign;   // remember the quadrant for eulerRotations
+	//===----------------------------------------------------------------------===//
+
+	void notifySequence();
 
 protected:
-	explicit Transformation(const Operation* transformType) : NodeBase(transformType) {}
-	void notifySequence();
+	bool canSetValue(const ValueMask& mask, glm::ivec2 coords, float value);
 
 public:
 	/// \todo MH these should not be public.
 	void nullSequence()
 	{
 		m_currentSequence = nullptr;
-		m_currentIndex = -1;
+		m_currentIndex		= -1;
 	}
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
 	{
 		m_currentSequence = s;
-		m_currentIndex = index;
+		m_currentIndex		= index;
 	}
 
 	void setSequence(Ptr<NodeBase>& s, int index)
 	{
 		m_currentSequence = s;
-		m_currentIndex = index;
+		m_currentIndex		= index;
 	}
+
+protected:
+	DefaultValues m_defaultValues;
+
+	bool m_hasEnabledSynergies = true;
+	bool m_isLocked						 = true;
+
+private:
+	bool      m_hasSavedData = false;
+	DataStore m_savedData;
 };
 
-
-class Free : public Transformation
-{
-public:
-	Free() : Transformation(getTransformProps(ETransformType::Free))
-	{
-		m_currentMap = &Transform::g_Free;
-		m_initialMap = &Transform::g_Free;
-	}
-
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override
-	{
-		setInternalValue(mat);
-		notifySequence();
-		return ValueSetResult{};
-	}
-
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
-	{
-		setInternalValue(val, coords);
-		notifySequence();
-		return ValueSetResult{};
-	}
-
-	void reset() override { setValue(glm::mat4(1.0f)); };
-};
-
-
-class Scale : public Transformation
-{
-	glm::vec3 m_initialScale;
-
-public:
-	explicit Scale(glm::vec3 initialScale = glm::vec3(1.0f), const Transform::DataMap& map = Transform::g_Scale)
-			: Transformation(getTransformProps(ETransformType::Scale)), m_initialScale(initialScale)
-	{
-		m_initialMap = &map;
-		m_currentMap = &map;
-		enableSynergies();
-	}
-
-	void lock() override;
-
-	[[nodiscard]] ValueSetResult setValue(float val) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4& mat) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-
-	float getX();
-	float getY();
-	float getZ();
-
-	ValueSetResult setX(float v);
-	ValueSetResult setY(float v);
-	ValueSetResult setZ(float v);
-};
-
-/**
- * \code
- *   1      0       0       0
- *   0    cos(T)  -sin(T)   0
- *   0    sin(T)   cos(T)   0
- *   0      0       0       1
- * \endcode
- */
-class EulerRotX : public Transformation
-{
-	float m_initialRot;
-
-public:
-	explicit EulerRotX(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerX)
-			: Transformation(getTransformProps(ETransformType::EulerX)), m_initialRot(initialRot)
-	{
-		m_initialMap = &map;
-		m_currentMap = &map;
-		enableSynergies();
-	}
-
-	void lock() override;
-
-	[[nodiscard]] float getRot() const { return m_initialRot; }
-	float getAngle() const { return m_initialRot; }
-
-	[[nodiscard]] ValueSetResult setValue(float rad) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-};
-
-/**
- * \code
- *  cos(T)   0   sin(T)   0
- *    0      1     0      0
- * -sin(T)   0   cos(T)   0
- *    0      0     0      1
- * \endcode
- */
-class EulerRotY : public Transformation
-{
-	float m_initialRot;
-
-public:
-	explicit EulerRotY(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerY)
-			: Transformation(getTransformProps(ETransformType::EulerY)), m_initialRot(initialRot)
-	{
-		m_initialMap = &map;
-		m_currentMap = &map;
-		enableSynergies();
-	}
-
-	void lock() override;
-
-	[[nodiscard]] float getRot() const { return m_initialRot; }
-	float getAngle() const { return m_initialRot; }
-
-	[[nodiscard]] ValueSetResult setValue(float rad) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-};
-
-/**
- * \code
- *   cos(T)  -sin(T)   0    0
- *   sin(T)   cos(T)   0    0
- *     0        0      1    0
- *     0        0      0    1
- * \endcode
- */
-class EulerRotZ : public Transformation
-{
-	float m_initialRot;
-
-public:
-	explicit EulerRotZ(float initialRot = 0.0f, const Transform::DataMap& map = Transform::g_EulerZ)
-			: Transformation(getTransformProps(ETransformType::EulerZ)), m_initialRot(initialRot)
-	{
-		m_initialMap = &map;
-		m_currentMap = &map;
-		enableSynergies();
-	}
-
-	void lock() override;
-
-	float getAngle() const { return m_initialRot; }
-	[[nodiscard]] float getRot() const { return m_initialRot; }
-
-	[[nodiscard]] ValueSetResult setValue(float rad) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-};
-
-class Translation : public Transformation
-{
-	glm::vec3 m_initialTrans;
-
-public:
-	explicit Translation(glm::vec3 initialTrans = glm::vec3(0.0f),
-	                     const Transform::DataMap& map = Transform::g_Translate)
-			: Transformation(getTransformProps(ETransformType::Translation)), m_initialTrans(initialTrans)
-	{
-		m_initialMap = &map;
-		m_currentMap = &map;
-	}
-
-	void lock() override;
-
-	float getX();
-	float getY();
-	float getZ();
-
-	ValueSetResult setX(float v);
-	ValueSetResult setY(float v);
-	ValueSetResult setZ(float v);
-
-	[[nodiscard]] ValueSetResult setValue(float val) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
-	[[nodiscard]] ValueSetResult setValue(const glm::mat4&) override;
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-};
-
-//===-- Other transformations ---------------------------------------------===//
-class AxisAngleRot : public Transformation
-{
-	float m_initialRads;
-	glm::vec3 m_initialAxis;
-
-public:
-	AxisAngleRot(float rads = glm::radians(70.0f), const glm::vec3& axis = {1.0f, 0.0f, 0.0f})
-			: Transformation(getTransformProps(ETransformType::AxisAngle)), m_initialRads(rads), m_initialAxis(axis)
-	{
-		m_initialMap = &Transform::g_AllLocked;
-		m_currentMap = m_initialMap;
-	}
-
-	float getRot() const { return m_initialRads; };
-	const glm::vec3& getAxis() const { return m_initialAxis; };
-
-	ValueSetResult setRot(float rads);
-	ValueSetResult setAxis(const glm::vec3& axis);
-
-	ValueSetResult setValue(float rads) override;
-	ValueSetResult setValue(const glm::vec3& axis) override;
-
-	void reset() override;
-};
-
-class QuatRot : public Transformation
-{
-	glm::quat m_initialQuat;
-	glm::quat m_normalized;
-
-public:
-	QuatRot(const glm::quat& q = {1.0f, 0.0f, 0.0f, 0.0f})
-			: Transformation(getTransformProps(ETransformType::Quat)), m_initialQuat(q)
-	{
-
-	}
-
-	const glm::quat& getNormalized() const;
-
-	ValueSetResult setValue(const glm::quat& vec);
-	ValueSetResult setValue(const glm::vec4& vec) override;
-
-	void reset() override;
-};
-
-class OrthoProj : public Transformation
-{
-	float m_left;
-	float m_right;
-	float m_bottom;
-	float m_top;
-	float m_near;
-	float m_far;
-
-public:
-	OrthoProj(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
-	          float far = 10.0f)
-			: Transformation(getTransformProps(ETransformType::Ortho)), m_left(left), m_right(right), m_bottom(bottom),
-				m_top(top), m_near(near), m_far(far)
-	{
-		m_initialMap = &Transform::g_Ortho;
-		m_currentMap = m_initialMap;
-	}
-
-	void lock() override;
-
-	float getLeft() const { return m_left; }
-	float getRight() const { return m_right; }
-	float getBottom() const { return m_bottom; }
-	float getTop() const { return m_top; }
-	float getNear() const { return m_near; }
-	float getFar() const { return m_far; }
-
-	ValueSetResult setLeft(float val);
-	ValueSetResult setRight(float val);
-	ValueSetResult setBottom(float val);
-	ValueSetResult setTop(float val);
-	ValueSetResult setNear(float val);
-	ValueSetResult setFar(float val);
-
-	/// No synergies required.
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-};
-
-class PerspectiveProj : public Transformation
-{
-	float m_initialFOW;
-	float m_initialAspect;
-	float m_initialZNear;
-	float m_initialZFar;
-
-public:
-	PerspectiveProj(float fow = glm::radians(70.0f), float aspect = 1.333f, float zNear = 1.0f, float zFar = 10.0f)
-			: Transformation(getTransformProps(ETransformType::Perspective)), m_initialFOW(fow), m_initialAspect(aspect),
-				m_initialZNear(zNear), m_initialZFar(zFar)
-	{
-		m_initialMap = &Transform::g_Perspective;
-		m_currentMap = &Transform::g_Perspective;
-		m_currentMap = m_initialMap;
-	}
-
-	void lock() override;
-
-	float getFOW() { return m_initialFOW; }
-	float getAspect() { return m_initialAspect; }
-	float getZNear() { return m_initialZNear; }
-	float getZFar() { return m_initialZFar; }
-
-	ValueSetResult setFOW(float v);
-	ValueSetResult setAspect(float v);
-	ValueSetResult setZNear(float v);
-	ValueSetResult setZFar(float v);
-
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	void reset() override;
-};
-
-class Frustum : public Transformation
-{
-	float m_left;
-	float m_right;
-	float m_bottom;
-	float m_top;
-	float m_near;
-	float m_far;
-
-public:
-	Frustum(float left = -5.0f, float right = 5.0f, float bottom = -5.0f, float top = 5.0f, float near = 1.0f,
-	        float far = 10.0f)
-			: Transformation(getTransformProps(ETransformType::Frustum)), m_left(left), m_right(right), m_bottom(bottom),
-				m_top(top), m_near(near), m_far(far)
-	{
-		m_initialMap = &Transform::g_Frustum;
-		m_currentMap = m_initialMap;
-	}
-
-	void lock() override;
-
-	float getLeft() { return m_left; }
-	float getRight() { return m_right; }
-	float getBottom() { return m_bottom; }
-	float getTop() { return m_top; }
-	float getNear() { return m_near; }
-	float getFar() { return m_far; }
-
-	ValueSetResult setLeft(float val);
-	ValueSetResult setRight(float val);
-	ValueSetResult setBottom(float val);
-	ValueSetResult setTop(float val);
-	ValueSetResult setNear(float val);
-	ValueSetResult setFar(float val);
-
-	void reset() override;
-
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-};
-
-/**
- * Same as perspective projection node, but all values are locked.
- */
-class LookAt : public Transformation
-{
-	glm::vec3 m_initialEye;
-	glm::vec3 m_initialCenter;
-	glm::vec3 m_initialUp;
-
-public:
-	LookAt(const glm::vec3& eye = {0.0f, 0.0f, 10.0f}, const glm::vec3 center = {0.0f, 0.0f, 0.0f},
-	       const glm::vec3& up = {0.0f, 1.0f, 0.0f})
-			: Transformation(getTransformProps(ETransformType::LookAt)), m_initialEye(eye), m_initialCenter(center),
-				m_initialUp(up)
-	{
-		m_initialMap = &Transform::g_AllLocked;
-		m_currentMap = m_initialMap;
-	}
-
-	void reset() override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
-
-	const glm::vec3& getEye() { return m_initialEye; }
-	const glm::vec3& getCenter() { return m_initialCenter; }
-	const glm::vec3& getUp() { return m_initialUp; }
-
-	ValueSetResult setEye(const glm::vec3& eye);
-	ValueSetResult setCenter(const glm::vec3& center);
-	ValueSetResult setUp(const glm::vec3& up);
-};
-} // namespace Core
+using TransformPtr = Ptr<Transformation>;
+}

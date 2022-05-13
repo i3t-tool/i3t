@@ -18,15 +18,15 @@ endif()
 configure_file(Source/ConfigVersion.h.in Source/ConfigVersion.h)
 
 # Specifies where build system should find header files.
+# TODO -> MH use target_include_directories.
 include_directories(Source/)
 include_directories(Dependencies/assimp/include)
-include_directories(Dependencies/jsonlib/single_include)
 include_directories(Dependencies/glfw/include)
 include_directories(Dependencies/glm)
-include_directories(Dependencies/imgui/examples)
-include_directories(Dependencies/imgui_node_editor)
-include_directories(Dependencies/imgui_node_editor/external/imgui)
+include_directories(Dependencies/jsonlib/single_include)
+include_directories(Dependencies/imgui)
 include_directories(Dependencies/imgui_markdown)
+include_directories(Dependencies/magic_enum/include)
 include_directories(Dependencies/pgr-framework/include)
 include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
@@ -52,6 +52,7 @@ add_definitions(-DI3T_PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 if (MSVC)
     # Enable multi-processor compilation for MSVC.
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
     message(STATUS "MSVC: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
     message(STATUS "MSVC: CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")
@@ -137,13 +138,12 @@ endmacro()
 # ======== Source groups ======================================
 # Add ImGui source files.
 set(I3T_IMGUI_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_internal.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_demo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_draw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imgui_widgets.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/external/imgui/imconfig.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_demo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_draw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_tables.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/imgui_widgets.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui/misc/cpp/imgui_stdlib.cpp)
 
 file(GLOB_RECURSE I3T_SOURCE
     "Source/*.h"
@@ -155,18 +155,6 @@ file(GLOB_RECURSE I3T_SOURCE
 list(REMOVE_ITEM I3T_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.cpp")
 
 list(APPEND I3T_SOURCE "${I3T_IMGUI_SOURCE}")
-
-# Add ImGui_node_editor source files.
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_bezier_math.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_canvas.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_canvas.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_extra_math.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor_api.cpp)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/imgui_node_editor_internal.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/crude_json.h)
-list(APPEND I3T_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/imgui_node_editor/crude_json.cpp)
 # =============================================================
 
 # ======== Configuration for building tests.  =================
@@ -257,5 +245,7 @@ set_target_properties(assimp PROPERTIES
 if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Data" "${I3T_OUT_DIR}Data")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/config.yml" "${I3T_OUT_DIR}config.yml")
 endif()
 # =============================================================

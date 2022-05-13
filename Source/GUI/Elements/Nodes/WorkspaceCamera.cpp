@@ -1,118 +1,44 @@
 #include "WorkspaceCamera.h"
 
-WorkspaceCamera::WorkspaceCamera(ImTextureID headerBackground, WorkspaceCameraArgs const& args)
-    : WorkspaceNodeWithCoreData(headerBackground, {.levelOfDetail=args.levelOfDetail, .headerLabel=args.headerLabel, .nodeLabel=args.nodeLabel, .nodebase=Core::GraphManager::createCamera()})
+WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
+    :   WorkspaceNodeWithCoreDataWithPins(diwne, Core::GraphManager::createCamera(), false)
+    ,   m_projection(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getProj() ) )
+    ,   m_view (std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView() ) )
 {
+    (m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
+    m_projection->m_selectable = false;
+    m_view->m_selectable = false;
 
-	fw.showMyPopup = false;
-	fw.id = "";
-	fw.value = NAN;
-	fw.name = "WorkspaceCamera";
-
-//    m_projection = std::make_shared<WorkspaceSequence>(headerBackground, {.nodebase=m_nodebase->as<Core::Camera>()->getProj()});
-//	m_view = std::make_shared<WorkspaceSequence>(headerBackground, {.nodebase=m_nodebase->as<Core::Camera>()->getView()});
-
-	m_dataRect = ImRect(0,0,0,0); /* init value used just in first frame */
+    getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 }
 
-WorkspaceCamera::WorkspaceCamera(ImTextureID headerBackground, std::string headerLabel, std::string nodeLabel)
-    : WorkspaceNodeWithCoreData(headerBackground, Core::GraphManager::createCamera(), headerLabel, nodeLabel)
-{
-	fw.showMyPopup = false;
-	fw.id = "";
-	fw.value = NAN;
-	fw.name = "WorkspaceSequence";
-
-	m_projection = std::make_shared<WorkspaceSequence>(headerBackground, m_nodebase->as<Core::Camera>()->getProj());
-	m_view = std::make_shared<WorkspaceSequence>(headerBackground, m_nodebase->as<Core::Camera>()->getView());
-
-	m_dataRect = ImRect(0,0,0,0); /* init value used just in first frame */
-}
 
 bool WorkspaceCamera::isCamera()
 {
     return true;
 }
 
-Ptr<WorkspaceSequence> const& WorkspaceCamera::getProjection() const {return m_projection;}
-Ptr<WorkspaceSequence> const& WorkspaceCamera::getView() const {return m_view;}
-
-void WorkspaceCamera::drawNode(util::NodeBuilder& builder, Core::Pin* newLinkPin, bool withPins)
+void WorkspaceCamera::drawMenuLevelOfDetail()
 {
-    builder.Begin(m_id);
-	drawHeader(builder);
-	drawInputs(builder, newLinkPin);
-    drawData(builder, 0);
-	drawOutputs(builder, newLinkPin);
-	builder.End();
-
-		ImVec2 dataLeftTop = ne::GetNodePosition(m_id) + ImVec2(3,builder.HeaderMax.y-builder.HeaderMin.y+1);
-   	m_dataRect = ImRect(dataLeftTop, dataLeftTop);
-
-    ne::SetNodePosition(m_projection->getId(), m_dataRect.Min);
-  Theme& t = I3T::getTheme();
-  if(m_projection->isTransformation()){
-    t.transformationColorTheme();
-  }else
-  {
-    t.operatorColorTheme();
-  }
-	m_projection->drawNode(builder);
-
-	/*if(!m_nodebase->as<Core::Camera>()->getProj()->getMatrices().empty()){
-		const glm::mat4& coreData = m_nodebase->as<Core::Camera>()->getProj()->getMatrices()[0]->getData().getMat4();
-		I3T::getTheme();
-	}*/
-	t.returnFloatColorToDefault();
-
-
-	if(m_projection->getInnerWorkspaceNodes().empty()){
-		m_dataRect.Add(ImGui::GetItemRectMax());
-	}else
-	{
-		m_dataRect.Add(ImGui::GetItemRectMax() + ImVec2(1.5f * I3T::getSize(ESizeVec2::Nodes_IconSize).x, 0));
-	}
-
-	ne::SetNodePosition(m_view->getId(), ImVec2(m_dataRect.Max.x, m_dataRect.Min.y));
-
-  if(m_view->isTransformation()){
-    t.transformationColorTheme();
-  }else
-  {
-    t.operatorColorTheme();
-  }
-	m_view->drawNode(builder);
-  t.returnFloatColorToDefault();
-
-
-	if(m_view->getInnerWorkspaceNodes().empty()){
-		m_dataRect.Add(ImGui::GetItemRectMax());
-	}else
-	{
-		m_dataRect.Add(ImGui::GetItemRectMax() + ImVec2(1.5f * I3T::getSize(ESizeVec2::Nodes_IconSize).x, 0));
-	}
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()), {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
 
-void WorkspaceCamera::drawDataSetValues(util::NodeBuilder& builder)
+bool WorkspaceCamera::middleContent()
 {
-    drawDataFull(builder, 0);
+    bool inner_interaction_happen = false;
+	inner_interaction_happen |= m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode); ImGui::SameLine();
+	inner_interaction_happen |= m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+	return inner_interaction_happen;
 }
 
-
-ImVec2 WorkspaceCamera::getDataSize()
-{
-    return m_dataRect.Max - m_dataRect.Min;
-}
-
-void WorkspaceCamera::drawDataFull(util::NodeBuilder& builder, int index=0)
-{
-    ImGui::Dummy(getDataSize());
-}
+//bool WorkspaceCamera::leftContent(){return false;};
+//bool WorkspaceCamera::rightContent(){return WorkspaceNodeWithCoreDataWithPins::rightContent();}; /* draw camera pin on opposite side */
 
 int WorkspaceCamera::maxLenghtOfData()
 {
-    Debug::Assert(false, "Calling WorkspaceCamera::maxLenghtOfData() make no sense because every included Sequention has its own independent data");
-    return -1; /* should be unused */
+//    Debug::Assert(false, "Calling WorkspaceCamera::maxLenghtOfData() make no sense because every included Sequention has its own independent data");
+//    return -1; /* should be unused */
+    return 0; /* \todo JH not sure where it is used... fall on zoom with Camera on Workspace */
 }
 
 
