@@ -151,6 +151,7 @@ public:
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllCameras();
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllInputFreeSequence();
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllInputFreeModel();
 
 	bool bypassZoomAction();
 	bool bypassDragAction();
