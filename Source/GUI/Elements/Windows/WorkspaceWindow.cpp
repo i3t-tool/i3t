@@ -63,15 +63,24 @@ void WorkspaceDiwne::zoomToSelected()
 
 void WorkspaceDiwne::trackingLeft()
 {
-    m_trackingFirstTransformation->inactiveMarcToLeft(); /* \todo JH what step? */
+    if (m_trackingIsOn)
+    {
+        m_trackingFirstTransformation->inactiveMarcToLeft(); /* \todo JH what step? */
+    }
 }
 void WorkspaceDiwne::trackingRight()
 {
-     m_trackingFirstTransformation->inactiveMarcToRight(); /* \todo JH what step? */
+    if (m_trackingIsOn)
+    {
+        m_trackingFirstTransformation->inactiveMarcToRight(); /* \todo JH what step? */
+    }
 }
 void WorkspaceDiwne::trackingSwitch()
 {
-    m_trackingFromLeft = !m_trackingFromLeft;
+    if (m_trackingIsOn)
+    {
+        m_trackingFromLeft = !m_trackingFromLeft;
+    }
 }
 void WorkspaceDiwne::trackingSwitchOff()
 {
@@ -834,6 +843,8 @@ bool WorkspaceDiwne::afterContent()
     bool interaction_happen = false;
     interaction_happen |= processCreateAndPlugTypeConstructor();
 
+    processTrackingMove();
+
     /* selection will be active in next frame */
     if (InputManager::isAxisActive("NOTunselectAll")) {
             setWorkspaceDiwneAction(WorkspaceDiwneAction::NOTunselectAllNodes);
@@ -1047,6 +1058,21 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	}
 }
 
+void WorkspaceDiwne::processTrackingMove()
+{
+    if (m_trackingIsOn)
+    {
+        if(InputManager::isAxisActive("trackingLeft")!=0) /* \todo JH pass value of ActiveAxis to trackingLeft functions -> use just one tracking function with argument passed from isAxisActive*/
+        {
+            g_workspaceDiwne->trackingLeft();
+        }
+        if(InputManager::isAxisActive("trackingRight")!=0)
+        {
+            g_workspaceDiwne->trackingRight();
+        }
+    }
+}
+
 bool WorkspaceDiwne::bypassZoomAction(){ return InputManager::isAxisActive("scroll") != 0; }
 bool WorkspaceDiwne::bypassDragAction(){ return InputManager::isAxisActive("pan") != 0; }
 bool WorkspaceDiwne::bypassHoldAction(){return InputManager::isAxisActive("pan") != 0;}
@@ -1080,8 +1106,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToSelected(); });
 	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteSelectedNodes(); });
 
-	Input.bindAction("trackingLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingLeft(); });
-	Input.bindAction("trackingRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingRight(); });
+//	Input.bindAction("trackingLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingLeft(); });
+//	Input.bindAction("trackingRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingRight(); });
 	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitch(); });
 	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
 

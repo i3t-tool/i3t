@@ -142,6 +142,8 @@ public:
 	void trackingSwitch();
 	void trackingSwitchOff();
 
+	void processTrackingMove();
+
 	void deleteSelectedNodes();
 
 	//bool allowInteraction();

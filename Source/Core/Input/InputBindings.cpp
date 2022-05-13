@@ -60,8 +60,8 @@ void InputBindings::init()
 	//InputManager::setInputAction("center", Keys::d); /* \todo JH what is center? */
 
 	/* tracking */
-	InputManager::setInputAction("trackingLeft", Keys::left);
-	InputManager::setInputAction("trackingRight", Keys::right);
+	InputManager::setInputAxis("trackingLeft", 1.0f, Keys::left);
+	InputManager::setInputAxis("trackingRight", 1.0f, Keys::right);
 	InputManager::setInputAction("trackingSwitch", Keys::up);
 	InputManager::setInputAction("trackingSwitchOff", Keys::down); /* \todo JH maybe some different key when more than 2 tracking direction? */
 
