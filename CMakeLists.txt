@@ -32,7 +32,7 @@ include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
-include_directories($(OPENGL_INCLUDE_DIRS))
+include_directories(${OPENGL_INCLUDE_DIRS})
 
 # ========== BUILD CONFIGURATION ==============================
 # ---------- Setup compiler parameters. ------------------------

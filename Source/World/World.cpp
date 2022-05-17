@@ -6,9 +6,9 @@
 #include "Config.h"
 //#include "Source/GUI/Elements/Nodes/WorkspaceElementsWithCoreData.h"
 //#include "Source/GUI/Elements/Nodes/WorkspaceMatrix4x4.h"
-#include "Source/GUI/Elements/Nodes/WorkspaceTransformation.h"
-#include "Source/Core/Nodes/GraphManager.h"
-#include "Source/Core/Input/InputManager.h"
+#include "GUI/Elements/Nodes/WorkspaceTransformation.h"
+#include "Core/Nodes/GraphManager.h"
+#include "Core/Input/InputManager.h"
 
 #include <string.h>
 
