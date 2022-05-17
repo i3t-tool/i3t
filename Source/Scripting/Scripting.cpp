@@ -1,10 +1,10 @@
-#include "Dependencies/picoc/picoc.h"
+#include "picoc.h"
 
 #include "Scripting.h"
 #include "libraryI3T.h"
-#include "Source/World/Transforms.h"
+#include "World/Transforms.h"
 #include "Commands/ApplicationCommands.h"
-#include "Source/GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 
 #include <stdlib.h>
 #include <stdio.h>

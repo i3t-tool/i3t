@@ -7,9 +7,11 @@
  * \date 2.3.2021
  */
 //---------------
-#include "GameObject.h"
 #include "pgr.h"
-#include "Source/Core/Nodes/GraphManager.h"
+
+#include "Core/Nodes/GraphManager.h"
+
+#include "GameObject.h"
 
 glm::vec2 world2screen(glm::vec3 pos);					///< Point from world coordinates to screen coordinates (dimensions in pixels)
 glm::vec2 vecWorldscreen(glm::vec3 pos,glm::vec3 dir);	///, Vector from world coordinates to screen coordinates (dimensions in pixels)
