@@ -550,6 +550,7 @@ void TransformImpl<ETransformType::Translation>::onReset()
 ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 {
 	return ETransformState::Unknown;
+	// \todo PF: check if the rotation vector is of non-zero length?
 }
 
 void TransformImpl<ETransformType::AxisAngle>::onReset()
@@ -580,6 +581,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 {
 	return ETransformState::Unknown;
+	// \todo PF: Check, if it is of unit length?
 }
 
 void TransformImpl<ETransformType::Quat>::onReset()
@@ -713,6 +715,8 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 {
 	return ETransformState::Unknown;
+	// \todo PF: check, if center is different than eye, up-vector is not zero,
+	// and up is not collinear with camera direction center - eye
 }
 
 void TransformImpl<ETransformType::LookAt>::onReset()
