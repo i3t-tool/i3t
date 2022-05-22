@@ -14,7 +14,7 @@
 namespace Core
 {
 //===-- Value masks -------------------------------------------------------===//
-
+// Written in ROW order - flipped to COLUMN order in validateValue()!!!!
 constexpr ValueMask g_ScaleMask = {
 		VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
 		VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
@@ -22,7 +22,7 @@ constexpr ValueMask g_ScaleMask = {
 		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
-constexpr ValueMask g_TranslateMask = {
+constexpr ValueMask g_TranslateMask = {  // row-order
 		VM_ONE,  VM_ZERO, VM_ZERO, VM_ANY,
 		VM_ZERO, VM_ONE,  VM_ZERO, VM_ANY,
 		VM_ZERO, VM_ZERO, VM_ONE,  VM_ANY,
@@ -61,14 +61,14 @@ constexpr ValueMask g_PerspectiveMask = {
 		VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
 		VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
 		VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO,
+		VM_ZERO, VM_ZERO, VM_MINUS_ONE,  VM_ZERO,
 };
 
 constexpr ValueMask g_FrustumMask = {
 		VM_ANY,  VM_ZERO, VM_ANY, VM_ZERO,
 		VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO,
 		VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO,
+	  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
 //===----------------------------------------------------------------------===//
@@ -497,11 +497,12 @@ void TransformImpl<ETransformType::EulerZ>::onReset()
 ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 {
 	bool result = validateValues(g_TranslateMask, m_internalData[0].getMat4());
-	if (hasSynergies())
-	{
-		auto& mat = m_internalData[0].getMat4();
-		result = result && Math::eq(mat[3][0], mat[3][1]) && Math::eq(mat[3][1], mat[3][2]);
-	}
+	// PF - err - translate has no synergies
+	//if (hasSynergies())
+	//{
+	//	auto& mat = m_internalData[0].getMat4();
+	//	result = result && Math::eq(mat[3][0], mat[3][1]) && Math::eq(mat[3][1], mat[3][2]);
+	//}
 
 	return ETransformState(result);
 }

@@ -130,7 +130,7 @@ bool drawDataSetValues()
 
 void drawMenuSetDataMap() {WorkspaceTransformation::drawMenuSetDataMap();} /* thus we can specify it for ETransformType::Free  */
 
-};
+} ;
 
 template <> inline /* inline for ability to compile https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects */
 void WorkspaceTransformation_s<ETransformType::Free>::drawMenuSetDataMap()
