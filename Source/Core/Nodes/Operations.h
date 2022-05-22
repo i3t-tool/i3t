@@ -503,7 +503,8 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Perspective), "perspective"},
-				0b1000010000110010,
+				//0b1000010000110010,
+		     0b1000010000110000,    // forbid to edit -1
 				{
 						{"fov", EValueType::Float},
 						{"aspect", EValueType::Float},
@@ -513,7 +514,8 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Frustum), "frustum"},
-				0b1010011000110010,
+				// 0b1010011000110010,       // forbid to edit -1
+				0b1010011000110000, 
 				{
 						{"left",   EValueType::Float},
 						{"right",  EValueType::Float},
