@@ -167,9 +167,9 @@ public:
 	//===----------------------------------------------------------------------===//
 	struct
 	{
-		float cos;
-		float sin;
-	} halfspaceSign;   // remember the quadrant for eulerRotations
+		float cos = 1.0f; // Initially in the first quadrant
+		float sin = 1.0f;
+	} halfspaceSign;    // remember the quadrant for eulerRotations
 	//===----------------------------------------------------------------------===//
 
 	void notifySequence();

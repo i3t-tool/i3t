@@ -199,19 +199,23 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 	}
 
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;
+	mat[coords.x][coords.y] = val;   // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
-		if (!Math::withinInterval(val, -1.0f, 1.0f))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Value must be within [-1.0, 1.0] interval."};
-		}
+		//PF Commented out - the return value is thrown away anyway
+		//if (!Math::withinInterval(val, -1.0f, 1.0f))
+		//{
+		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//												"Value must be within [-1.0, 1.0] interval."};
+		//}
 
+		val = glm::clamp(val, -1.0f, 1.0f);  // \todo PF new, bad habit changing the input parameter
+		
 		if (coords == glm::ivec2(1, 2))
 		{
 			// -sin(T)
+			mat[1][2] =  val; // repair the setup without synergies
 			mat[2][1] = -val;
 			halfspaceSign.sin = glm::sign(val);
 
@@ -238,6 +242,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[1][2] = -val;
+			mat[2][1] =  val;   // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -247,7 +252,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 			mat[2][2] = cos;
 		}
 	}
-	// todo set current val?
+
 	setInternalValue(mat);
 	notifySequence();
 
@@ -304,19 +309,23 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 	}
 
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;
+	mat[coords.x][coords.y] = val;     // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
-		if (!Math::withinInterval(val, -1.0f, 1.0f))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Value must be within [-1.0, 1.0] interval."};
-		}
+		//PF Commented out - the return value is thrown away anyway
+		//if (!Math::withinInterval(val, -1.0f, 1.0f))
+		//{
+		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//												"Value must be within [-1.0, 1.0] interval."};
+		//}
+
+		val = glm::clamp(val, -1.0f, 1.0f); // \todo PF new, bad habit changing the input parameter
 
 		if (coords == glm::ivec2(0, 2))
 		{
 			// -sin(T)
+			mat[0][2]	=  val; // repair the setup without synergies
 			mat[2][0] = -val;
 			halfspaceSign.sin = glm::sign(-val);
 
@@ -343,6 +352,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[0][2] = -val;
+			mat[2][0]	=  val; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -407,20 +417,24 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
   // PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
   
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;
+	mat[coords.x][coords.y] = val;    // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
-		if (!Math::withinInterval(val, -1.0f, 1.0f))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Value must be within [-1.0, 1.0] interval."};
-		}
+		//PF Commented out - the return value is thrown away anyway
+		//if (!Math::withinInterval(val, -1.0f, 1.0f))
+		//{
+		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//												"Value must be within [-1.0, 1.0] interval."};
+		//}
+
+		val = glm::clamp(val, -1.0f, 1.0f); // \todo PF new, bad habit changing the input parameter
 
 		if (coords == glm::ivec2(0, 1))
 		{
 			// -sin(T)
-			mat[1][0]					 = -val;
+			mat[0][1]					= val; // repair the setup without synergies
+			mat[1][0]					= -val;
 			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -445,7 +459,8 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(1, 0))
 		{
 			// sin(T)
-			mat[0][1]					 = -val;
+			mat[0][1]					= -val;
+			mat[1][0]					= val; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
