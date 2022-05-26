@@ -15,6 +15,14 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne/*="Di
     , m_nodePosMode(OnItsPosition)
 {}
 
+Node::~Node()
+{
+    if(m_selected)
+    {
+        diwne.setNodesSelectionChanged(true);
+    }
+}
+
 Node& Node::operator=(const Node& rhs)
 {
     if (this == &rhs) return *this; // handle self assignment

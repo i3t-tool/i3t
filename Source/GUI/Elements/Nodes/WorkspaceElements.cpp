@@ -44,6 +44,11 @@ WorkspaceNode::WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string cons
     ,   m_removeFromWorkspaceWindow(false)
 {}
 
+WorkspaceNode::~WorkspaceNode()
+{
+    diwne.m_takeSnap = true;
+}
+
 bool WorkspaceNode::beforeContent()
 {
     /* whole node background */

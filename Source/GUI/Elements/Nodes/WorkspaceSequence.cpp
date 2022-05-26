@@ -131,13 +131,13 @@ bool WorkspaceSequence::middleContent()
         return false;
     }
 
-    if (getInputs().at(1)->isConnected() ) /* \todo JH MH better selection of copy pin? */
+    if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected() )
     {
         bool valueChanged = false;
         int rowOfChange, columnOfChange;
         float valueOfChange;
         return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-                                    m_nodebase->getData(0).getMat4(), {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+                                    m_nodebase->getData(0).getMat4() /*\todo JM HM better selection (index) of data*/, {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
                                                                        Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
                                                                        Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
                                                                        Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked} ,
@@ -224,17 +224,28 @@ bool WorkspaceSequence::middleContent()
 
 void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
 {
-    for( auto const & transformation : m_workspaceInnerTransformations )
+    if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected() )
     {
-        transformation->setNumberOfVisibleDecimal(value);
+        m_numberOfVisibleDecimal = value;
+        setDataItemsWidth();
+    }else
+    {
+        for( auto const & transformation : m_workspaceInnerTransformations )
+        {
+            transformation->setNumberOfVisibleDecimal(value);
+        }
     }
+
+
 }
 
 
 int WorkspaceSequence::maxLenghtOfData()
 {
-//    Debug::Assert(false, "Calling WorkspaceSequence::maxLenghtOfData() make no sense because every included Transformation has its own independent data");
-//    return -1; /* should be unused */
+    if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected() )
+    {
+        return maxLenghtOfData4x4( m_nodebase->getData(0).getMat4() /*\todo JM HM better selection (index) of data*/, m_numberOfVisibleDecimal);
+    }
     return 0; /* \todo JH not sure where it is used... fall on zoom with Sequention on Workspace */
 }
 

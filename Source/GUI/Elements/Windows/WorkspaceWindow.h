@@ -91,19 +91,26 @@ public:
 	void addTypeConstructorNode()
 	{
 		WorkspaceCoreInputPin* pin = getLastActivePin<WorkspaceCoreInputPin>().get();
-		addNodeToPosition<T>(pin->getLinkConnectionPointDiwne() + ImVec2(-100, 0)); /* \todo JH shift to Theme */
-		pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(m_workspaceCoreNodes.back())
+		auto newNode = addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
+		pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(newNode)
 									->getOutputs()
 									.at(0)
 									.get()); /* \todo JH always 0 with type constructor? */
 	}
 
 	template <class T>
-	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0))
+	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth=false)
 	{
 		auto node = std::make_shared<T>(*this);
 
 		node->setNodePositionDiwne(position);
+
+		if(shiftToLeftByNodeWidth)
+        {
+            node->drawDiwne(); /* for obtain size */
+            node->translateNodePositionDiwne(ImVec2(-node->getNodeRectSizeDiwne().x-10, 0)); /* \todo JH space to Theme */
+        }
+
 		m_workspaceCoreNodes.push_back(node);
 
 		return node;
