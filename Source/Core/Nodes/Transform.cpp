@@ -6,14 +6,14 @@
 namespace Core
 {
 /**
- * @param mask
+ * @param mask   code of possible values (in the ROW order!) -1, 0, 1, ANY
  * @param coords {x, y} x is column and y is row.
- * @param value
- * @return
+ * @param value  value from the matrix to be validated against the mask 
+ * @return true for an allowed value on given position in the matrix
  */
 bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
-	const uint8_t maskValue = mask[coords.y * 4 + coords.x];
+	const int8_t maskValue = mask[coords.y * 4 + coords.x];  //mask is in the ROW order (see Value masks in TransformImpl.cpp)
 
 	if (maskValue == VM_ANY)
 		return true;
@@ -27,7 +27,7 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 	{
 		for (int r = 0; r < 4; ++r)
 		{
-			const float value = matrix[c][r];
+			const float value = matrix[c][r];   /// column order
 
 			if (!validateValue(mask, { c, r }, value))
 			{
@@ -96,13 +96,11 @@ bool Transformation::isLocked() const
 
 void Transformation::lock()
 {
-	// m_currentMap = &Transform::g_AllLocked;
 	m_isLocked = true;
 }
 
 void Transformation::unlock()
 {
-	// m_currentMap = &Transform::g_Free;
 	m_isLocked = false;
 }
 

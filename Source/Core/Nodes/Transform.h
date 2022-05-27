@@ -42,11 +42,12 @@ enum class ETransformState
 
 //===-- Value masks -------------------------------------------------------===//
 
-using ValueMask = std::array<uint8_t, 16>;
+using ValueMask = std::array<int8_t, 16>;
 
-constexpr uint8_t VM_ZERO = 0;
-constexpr uint8_t VM_ONE  = 1;
-constexpr uint8_t VM_ANY  = 2;
+constexpr int8_t VM_ZERO = 0;
+constexpr int8_t VM_ONE  = 1;
+constexpr int8_t VM_ANY  = 2;
+constexpr int8_t VM_MINUS_ONE = -1;
 
 inline bool canEditValue(EValueState valueState)
 {
@@ -199,7 +200,7 @@ public:
 protected:
 	DefaultValues m_defaultValues;
 
-	bool m_hasEnabledSynergies = true;
+	bool m_hasEnabledSynergies = true;  // applicable to eulerAngleXYZ and uniform scale ONLY
 	bool m_isLocked						 = true;
 
 private:
