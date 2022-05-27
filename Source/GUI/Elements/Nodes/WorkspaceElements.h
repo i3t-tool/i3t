@@ -70,6 +70,7 @@ protected:
     std::string m_middleLabel;
 public:
     WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel="Header", std::string const middleLabel="Content");
+    ~WorkspaceNode();
 
     std::string getTopLabel(){return m_topLabel;};
     std::string getMiddleLabel(){return m_middleLabel;};

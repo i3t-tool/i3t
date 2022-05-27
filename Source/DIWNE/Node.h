@@ -31,7 +31,7 @@ class Node : public DiwneObject
         /** Default constructor */
         Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne="DiwneNode");
         /** Default destructor */
-        virtual ~Node(){};
+        virtual ~Node();
 
 
 //        /** Copy constructor

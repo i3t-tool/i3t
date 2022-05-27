@@ -923,6 +923,9 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
             case EValueType::Screen:
                 addTypeConstructorNode<WorkspaceCamera>();
                 break;
+            case EValueType::MatrixMul:
+                addTypeConstructorNode<WorkspaceSequence>();
+                break;
         }
         return true;
     }
