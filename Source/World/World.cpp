@@ -12,8 +12,8 @@
 
 #include <string.h>
 
-glm::mat4 World::perspective = glm::mat4(1.0f);
-glm::mat4 World::mainCamera = glm::mat4(1.0f);
+glm::mat4 World::perspective = glm::mat4(1.0f); //< main camera perspective matrix
+glm::mat4 World::mainCamera = glm::mat4(1.0f);  //< most probably the main camera viewMatrix
 glm::vec3 World::World::mainCamPos = glm::vec3(0.0f);
 float World::height = 10;
 float World::width = 10;
