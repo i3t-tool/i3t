@@ -159,10 +159,11 @@ void TransformImpl<ETransformType::Scale>::onReset()
 
 ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 {
+	// check the basic matrix values 0, 1, -1, any
 	auto& mat   = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateXMask, mat);
 
-	float angle      = std::atan2(-mat[2][1], mat[2][2]);
+	float angle			 = glm::atan(-mat[2][1], mat[2][2]);   // glm::atan executes ::std::atan2
 	auto expectedMat = glm::eulerAngleX(angle);
 
 	result = result && Math::eq(expectedMat, mat);
@@ -198,19 +199,23 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 	}
 
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;
+	mat[coords.x][coords.y] = val;   // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
-		if (!Math::withinInterval(val, -1.0f, 1.0f))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Value must be within [-1.0, 1.0] interval."};
-		}
+		//PF Commented out - the return value is thrown away anyway
+		//if (!Math::withinInterval(val, -1.0f, 1.0f))
+		//{
+		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//												"Value must be within [-1.0, 1.0] interval."};
+		//}
 
+		val = glm::clamp(val, -1.0f, 1.0f);  // \todo PF new, bad habit changing the input parameter
+		
 		if (coords == glm::ivec2(1, 2))
 		{
 			// -sin(T)
+			mat[1][2] =  val; // repair the setup without synergies
 			mat[2][1] = -val;
 			halfspaceSign.sin = glm::sign(val);
 
@@ -237,6 +242,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[1][2] = -val;
+			mat[2][1] =  val;   // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -246,7 +252,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 			mat[2][2] = cos;
 		}
 	}
-	// todo set current val?
+
 	setInternalValue(mat);
 	notifySequence();
 
@@ -262,38 +268,13 @@ void TransformImpl<ETransformType::EulerX>::onReset()
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
+// PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
 ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 {
 	auto& mat   = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateYMask, mat);
 
-  // PF This may be a redundant check (checked below as a whole matrix)
-  result = result && 
-	    glm::epsilonEqual(mat[0][0], mat[2][2], glm::epsilon<float>()) && // cos = cos,
-		  glm::epsilonEqual(mat[2][0],-mat[0][2], glm::epsilon<float>());   // sin = - (-sin)
-
-  // PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
-#if 0
-  // Variant 1 - manually
-	float angle        = std::acos(mat[0][0]); 
-	float signAngleSin = glm::sign(std::asin(mat[2][0]));
-
-	if (signAngleSin < 0)
-		angle += M_PI;
-#else
-  // Variant 2 - using glm in 2D
-  // more simple check as angle between two vectors
-	float angle = glm::orientedAngle(glm::vec2(1.0f, 0.0f), glm::vec2(mat[0][0], mat[2][0]));  // simpler 2D encoding from axis X to Z
-
-  // Variant 3 - using glm in 3D - would work for rotation around vector also 
-	// float angle = glm::orientedAngle(
-	// glm::vec3(1.0f, 0.0f, 0.0f),						  // from x axis
-	// glm::vec3(mat[0][0], 0.0f, -mat[2][0]),		// to rotated vector around Y: (cos, 0, -sin)
-	// glm::vec3(0.0f, 1.0f, 0.0f));				  // axis from X to -Z
-	//
-  // For rotation around X and Z, there will be no minus sign by mat[2][0].
-#endif
-
+ 	float angle			 = glm::atan(mat[2][0], mat[2][2]);    // glm::atan executes ::std::atan2
 	auto expectedMat = glm::eulerAngleY(angle);
 
 	result = result && Math::eq(expectedMat, mat);
@@ -328,19 +309,23 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 	}
 
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;
+	mat[coords.x][coords.y] = val;     // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
-		if (!Math::withinInterval(val, -1.0f, 1.0f))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Value must be within [-1.0, 1.0] interval."};
-		}
+		//PF Commented out - the return value is thrown away anyway
+		//if (!Math::withinInterval(val, -1.0f, 1.0f))
+		//{
+		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//												"Value must be within [-1.0, 1.0] interval."};
+		//}
+
+		val = glm::clamp(val, -1.0f, 1.0f); // \todo PF new, bad habit changing the input parameter
 
 		if (coords == glm::ivec2(0, 2))
 		{
 			// -sin(T)
+			mat[0][2]	=  val; // repair the setup without synergies
 			mat[2][0] = -val;
 			halfspaceSign.sin = glm::sign(-val);
 
@@ -367,6 +352,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		{
 			// sin(T)
 			mat[0][2] = -val;
+			mat[2][0]	=  val; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -395,7 +381,7 @@ ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 	auto& mat   = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateZMask, mat);
 
-	float angle = glm::atan(mat[0][1], mat[0][0]);
+	float angle      = glm::atan(mat[0][1], mat[0][0]);  // glm::atan executes ::std::atan2
 	auto expectedMat = glm::eulerAngleZ(angle);
 
 	result = result && Math::eq(expectedMat, mat);
@@ -431,20 +417,24 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
   // PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
   
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;
+	mat[coords.x][coords.y] = val;    // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
-		if (!Math::withinInterval(val, -1.0f, 1.0f))
-		{
-			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Value must be within [-1.0, 1.0] interval."};
-		}
+		//PF Commented out - the return value is thrown away anyway
+		//if (!Math::withinInterval(val, -1.0f, 1.0f))
+		//{
+		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		//												"Value must be within [-1.0, 1.0] interval."};
+		//}
+
+		val = glm::clamp(val, -1.0f, 1.0f); // \todo PF new, bad habit changing the input parameter
 
 		if (coords == glm::ivec2(0, 1))
 		{
 			// -sin(T)
-			mat[1][0]					 = -val;
+			mat[0][1]					= val; // repair the setup without synergies
+			mat[1][0]					= -val;
 			halfspaceSign.sin = glm::sign(val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -469,7 +459,8 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(1, 0))
 		{
 			// sin(T)
-			mat[0][1]					 = -val;
+			mat[0][1]					= -val;
+			mat[1][0]					= val; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(-val);
 
 			auto cos = sqrt(1.0f - (val * val));
@@ -550,6 +541,7 @@ void TransformImpl<ETransformType::Translation>::onReset()
 ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 {
 	return ETransformState::Unknown;
+	// \todo PF: check if the rotation vector is of non-zero length?
 }
 
 void TransformImpl<ETransformType::AxisAngle>::onReset()
@@ -580,6 +572,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 {
 	return ETransformState::Unknown;
+	// \todo PF: Check, if it is of unit length?
 }
 
 void TransformImpl<ETransformType::Quat>::onReset()
@@ -674,7 +667,7 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 	return ValueSetResult{};
 }
 
-//===-- Frusum ------------------------------------------------------------===//
+//===-- Frustum ------------------------------------------------------------===//
 
 ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 {
@@ -713,6 +706,8 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 {
 	return ETransformState::Unknown;
+	// \todo PF: check, if center is different than eye, up-vector is not zero,
+	// and up is not collinear with camera direction center - eye
 }
 
 void TransformImpl<ETransformType::LookAt>::onReset()

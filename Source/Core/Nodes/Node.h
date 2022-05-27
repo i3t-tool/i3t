@@ -243,10 +243,9 @@ public:
 	}
 
 	/**
-	 * Set a value of node.
-	 *
-	 * Sets value of the first float of DataStore. Derived types may override
-	 * default behaviour.
+	 * Set the value of the node.
+	 * Sets the value of the first float of DataStore. Derived types may override
+	 * the default behavior.
 	 *
 	 * \param val
 	 */
@@ -257,9 +256,8 @@ public:
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
 
 	/**
-	 *
-	 * \param val
-	 * \param coords in column major order, coords.x is column index and coords.y is row index.
+	 * \param val new value
+	 * \param coords in the column major order: coords.x is the column index and coords.y is the row index.
 	 * \return
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
@@ -271,9 +269,8 @@ public:
 
 	/**
 	 * Smart set function, used with constrained transformation for value checking.
-	 *
-	 * \param mask array of 16 chars.
-	 * \param mat
+	 * \param mat 
+	 * \param map array of 16 chars.
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
 	{
@@ -297,7 +294,7 @@ private:
 
 protected:
 	/**
-	 * Sets node value without validation.
+	 * Sets the node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
 	 *    by compiler (C++17).
 	 * \param value Value to set.
@@ -344,7 +341,7 @@ public:
 	 * \todo Is it correct also for multiple edges? If the edges from one module are connected to more than one input,
 	 * and the implementation of updateValues uses the \a inputIndex, only subset of outputs may be updated.
 	 * PF: This method is intended for complex modules to allow for optimization.
-	 * May be replaced by updateValues() or implemented in such a way. Do such optimizable modules exist?
+	 * May be replaced by updateValues() or implemented in such a way. Do such optimize-able modules exist?
 	 *
 	 * \param	inputIndex Index of the modified input (output pin).
 	 */

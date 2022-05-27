@@ -433,6 +433,9 @@ inline const Operation g_cameraProperties = {
 
 //===-- TRANSFORMS --------------------------------------------------------===//
 
+/**
+ * \brief ROW ORDER flags, if the value is editable (may be changed by the mouse drag)
+ */
 using TransformMask = std::bitset<16>;
 
 struct TransformOperation
@@ -456,7 +459,7 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Translation), "translate"},
-				0b0001000100010000,
+				0b0001000100010000,   //the last column
 		 		{{"translation", EValueType::Vec3}}
 		},
 		{
@@ -476,7 +479,7 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Scale), "scale"},
-				0b1000010000100000,
+				0b1000010000100000,  //the diagonal
 				{{"scale", EValueType::Vec3}}
 		},
 		{
