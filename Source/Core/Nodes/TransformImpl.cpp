@@ -210,16 +210,16 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		//												"Value must be within [-1.0, 1.0] interval."};
 		//}
 
-		val = glm::clamp(val, -1.0f, 1.0f);  // \todo PF new, bad habit changing the input parameter
+		const float clampedVal = glm::clamp(val, -1.0f, 1.0f);  
 		
 		if (coords == glm::ivec2(1, 2))
 		{
 			// -sin(T)
-			mat[1][2] =  val; // repair the setup without synergies
-			mat[2][1] = -val;
-			halfspaceSign.sin = glm::sign(val);
+			mat[1][2] =  clampedVal; // repair the setup without synergies
+			mat[2][1] = -clampedVal;
+			halfspaceSign.sin = glm::sign(clampedVal);
 
-			auto cos = sqrt(1.0f - (val * val));
+			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
@@ -228,11 +228,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
 		{
 			// cos(T)
-			mat[1][1] = val;
-			mat[2][2] = val;
-			halfspaceSign.cos = glm::sign(val);
+			mat[1][1] = clampedVal;
+			mat[2][2] = clampedVal;
+			halfspaceSign.cos = glm::sign(clampedVal);
 
-			auto sin = sqrt(1.0f - (val * val));
+			auto sin = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.sin < 0.0f)
 				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[1][2] = sin;
@@ -241,11 +241,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(2, 1))
 		{
 			// sin(T)
-			mat[1][2] = -val;
-			mat[2][1] =  val;   // repair the setup without synergies
-			halfspaceSign.sin = glm::sign(-val);
+			mat[1][2] = -clampedVal;
+			mat[2][1] =  clampedVal;   // repair the setup without synergies
+			halfspaceSign.sin = glm::sign(-clampedVal);
 
-			auto cos = sqrt(1.0f - (val * val));
+			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[1][1] = cos;
@@ -320,16 +320,16 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		//												"Value must be within [-1.0, 1.0] interval."};
 		//}
 
-		val = glm::clamp(val, -1.0f, 1.0f); // \todo PF new, bad habit changing the input parameter
+		const float clampedVal = glm::clamp(val, -1.0f, 1.0f); 
 
 		if (coords == glm::ivec2(0, 2))
 		{
 			// -sin(T)
-			mat[0][2]	=  val; // repair the setup without synergies
-			mat[2][0] = -val;
-			halfspaceSign.sin = glm::sign(-val);
+			mat[0][2]	=  clampedVal; // repair the setup without synergies
+			mat[2][0] = -clampedVal;
+			halfspaceSign.sin = glm::sign(-clampedVal);
 
-			auto cos = sqrt(1.0f - (val * val));
+			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
@@ -338,11 +338,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(2, 2))
 		{
 			// cos(T)
-			mat[0][0] = val;
-			mat[2][2] = val;
-			halfspaceSign.cos = glm::sign(val);
+			mat[0][0] = clampedVal;
+			mat[2][2] = clampedVal;
+			halfspaceSign.cos = glm::sign(clampedVal);
 
-			auto sin = sqrt(1.0f - (val * val));
+			auto sin = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.sin < 0.0f)
 				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][2] = -sin;
@@ -351,11 +351,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(2, 0))
 		{
 			// sin(T)
-			mat[0][2] = -val;
-			mat[2][0]	=  val; // repair the setup without synergies
-			halfspaceSign.sin = glm::sign(val);
+			mat[0][2] = -clampedVal;
+			mat[2][0]	=  clampedVal; // repair the setup without synergies
+			halfspaceSign.sin = glm::sign(clampedVal);
 
-			auto cos = sqrt(1.0f - (val * val));
+			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
@@ -417,7 +417,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
   // PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
   
 	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;    // unlimited value, clamped if synergies
+	mat[coords.x][coords.y] = val;    // unlimited value, clamped if synergies, works in all 4x4 coordinates
 
 	if (hasSynergies())
 	{
@@ -428,16 +428,16 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		//												"Value must be within [-1.0, 1.0] interval."};
 		//}
 
-		val = glm::clamp(val, -1.0f, 1.0f); // \todo PF new, bad habit changing the input parameter
+		const float clampedVal = glm::clamp(val, -1.0f, 1.0f); 
 
 		if (coords == glm::ivec2(0, 1))
 		{
 			// -sin(T)
-			mat[0][1]					= val; // repair the setup without synergies
-			mat[1][0]					= -val;
-			halfspaceSign.sin = glm::sign(val);
+			mat[0][1]					= clampedVal; // repair the setup without synergies
+			mat[1][0]					= -clampedVal;
+			halfspaceSign.sin = glm::sign(clampedVal);
 
-			auto cos = sqrt(1.0f - (val * val));
+			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
@@ -446,11 +446,11 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
 		{
 			// cos(T)
-			mat[0][0]					 = val;
-			mat[1][1]					 = val;
-			halfspaceSign.cos = glm::sign(val);
+			mat[0][0]					 = clampedVal;
+			mat[1][1]					 = clampedVal;
+			halfspaceSign.cos = glm::sign(clampedVal);
 
-			auto sin = sqrt(1.0f - (val * val));
+			auto sin = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.sin < 0.0f)
 				sin *= -1.0f; // allow negative sin values while changing cos - avoid jump in rotation
 			mat[0][1] = sin;
@@ -459,17 +459,18 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(1, 0))
 		{
 			// sin(T)
-			mat[0][1]					= -val;
-			mat[1][0]					= val; // repair the setup without synergies
-			halfspaceSign.sin = glm::sign(-val);
+			mat[0][1]					= -clampedVal;
+			mat[1][0]					= clampedVal; // repair the setup without synergies
+			halfspaceSign.sin = glm::sign(-clampedVal);
 
-			auto cos = sqrt(1.0f - (val * val));
+			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
 			if (halfspaceSign.cos < 0.0f)
 				cos *= -1.0f; // allow negative cos values while changing sin - avoid jump in rotation
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
 	}
+
 
 	setInternalValue(mat);
 	notifySequence();
