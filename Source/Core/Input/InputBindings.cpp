@@ -3,37 +3,37 @@
 #include "InputManager.h"
 
 std::vector<InputBindings::ActionMapping> g_defaultAction;
-std::vector<InputBindings::AxisMapping> g_defaultAxis;
+std::vector<InputBindings::AxisMapping>   g_defaultAxis;
 
 InputBindings::ActionsMap InputBindings::m_inputActions;
-InputBindings::AxesMap InputBindings::m_inputAxis;
+InputBindings::AxesMap    InputBindings::m_inputAxis;
 
 void InputBindings::init()
 {
 	// Default input bindings.
-	InputManager::setInputAction("copy", Keys::c, { Keys::ctrll });
-	InputManager::setInputAction("paste", Keys::v, { Keys::ctrll });
-	InputManager::setInputAction("cut", Keys::x, { Keys::ctrll });
-	InputManager::setInputAction("duplicate", Keys::d, { Keys::ctrll });
-	InputManager::setInputAction("duplicate", Keys::mouseLeft, { Keys::ctrll });
+	InputManager::setInputAction("copy", Keys::c, {Keys::ctrll});
+	InputManager::setInputAction("paste", Keys::v, {Keys::ctrll});
+	InputManager::setInputAction("cut", Keys::x, {Keys::ctrll});
+	InputManager::setInputAction("duplicate", Keys::d, {Keys::ctrll});
+	InputManager::setInputAction("duplicate", Keys::mouseLeft, {Keys::ctrll});
 	InputManager::setInputAction("delete", Keys::del);
 	//InputManager::setInputAction("delete", Keys::backspace);
 
-	InputManager::setInputAction("undo", Keys::b, { Keys::ctrll });
-	InputManager::setInputAction("undo", Keys::z, { Keys::ctrll });
-	InputManager::setInputAction("redo", Keys::n, { Keys::ctrll });
-	InputManager::setInputAction("redo", Keys::y, { Keys::ctrll });
-	InputManager::setInputAction("save", Keys::s, { Keys::ctrll });
-	InputManager::setInputAction("saveAs", Keys::s, { Keys::ctrll, Keys::shiftl });
+	InputManager::setInputAction("undo", Keys::b, {Keys::ctrll});
+	InputManager::setInputAction("undo", Keys::z, {Keys::ctrll});
+	InputManager::setInputAction("redo", Keys::n, {Keys::ctrll});
+	InputManager::setInputAction("redo", Keys::y, {Keys::ctrll});
+	InputManager::setInputAction("save", Keys::s, {Keys::ctrll});
+	InputManager::setInputAction("saveAs", Keys::s, {Keys::ctrll, Keys::shiftl});
 
 	InputManager::setInputAction("scrollUp", Keys::mouseScrlUp);
 	InputManager::setInputAction("scrollDown", Keys::mouseScrlDown);
 
-	InputManager::setInputAxis("scroll", 1.0f,  Keys::mouseScrlUp);
+	InputManager::setInputAxis("scroll", 1.0f, Keys::mouseScrlUp);
 	InputManager::setInputAxis("scroll", -1.0f, Keys::mouseScrlDown);
 	InputManager::setInputAxis("pan", 1.0f, Keys::mouseMiddle);
 	InputManager::setInputAxis("rotate", 1.0f, Keys::mouseRight);
-	InputManager::setInputAxis("rotateAround", 1.0f, Keys::mouseRight, { Keys::altl });
+	InputManager::setInputAxis("rotateAround", 1.0f, Keys::mouseRight, {Keys::altl});
 
 	InputManager::setInputAxis("moveForward", 1.0f, Keys::w);
 	InputManager::setInputAxis("moveForward", -1.0f, Keys::s);
@@ -41,11 +41,11 @@ void InputBindings::init()
 	InputManager::setInputAxis("moveRight", -1.0f, Keys::a);
 
 #ifdef I3T_DEBUG
-	InputManager::setInputAction("test", Keys::t);                                           /// \todo Will be removed
-	InputManager::setInputAction("TestMouseCtrlAction", Keys::mouseLeft, { Keys::ctrll });  /// \todo Will be removed
-	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});  /// \todo Will be removed
-	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});       /// \todo Will be removed
-	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});           /// \todo Will be removed
+	InputManager::setInputAction("test", Keys::t);                                       /// \todo Will be removed
+	InputManager::setInputAction("TestMouseCtrlAction", Keys::mouseLeft, {Keys::ctrll}); /// \todo Will be removed
+	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});    /// \todo Will be removed
+	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});              /// \todo Will be removed
+	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});                    /// \todo Will be removed
 #endif
 
 	/*
@@ -63,11 +63,11 @@ void InputBindings::init()
 	InputManager::setInputAxis("trackingLeft", 1.0f, Keys::left);
 	InputManager::setInputAxis("trackingRight", 1.0f, Keys::right);
 	InputManager::setInputAction("trackingSwitch", Keys::up);
-	InputManager::setInputAction("trackingSwitchOff", Keys::down); /* \todo JH maybe some different key when more than 2 tracking direction? */
+	InputManager::setInputAction("trackingSwitchOff",
+	                             Keys::down); /* \todo JH maybe some different key when more than 2 tracking direction? */
 
 
-
-    InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseLeft);
+	InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseLeft);
 
 	InputManager::setInputAction("unplugInputPin", Keys::mouseLeft);
 	InputManager::setInputAction("hold", Keys::mouseLeft);
@@ -77,8 +77,8 @@ void InputBindings::init()
 
 	//InputManager::setInputAction("unselectAll", Keys::mouseLeft);
 	InputManager::setInputAction("unselectAll", Keys::esc);
-	InputManager::setInputAxis("NOTunselectAll",1.0f, Keys::ctrll);
-	InputManager::setInputAxis("NOTunselectAll",1.0f, Keys::shiftl);
+	InputManager::setInputAxis("NOTunselectAll", 1.0f, Keys::ctrll);
+	InputManager::setInputAxis("NOTunselectAll", 1.0f, Keys::shiftl);
 	InputManager::setInputAction("select", Keys::mouseLeft);
 
 	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});
@@ -87,35 +87,22 @@ void InputBindings::init()
 	InputManager::setInputAction("touch", Keys::mouseLeft);
 
 	InputManager::setInputAction("raisePopup", Keys::mouseRight);
-
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)
 {
-	if (isActionCreated(name))
-	{
-		return m_inputActions[name];
-	}
+	if (isActionCreated(name)) { return m_inputActions[name]; }
 	return g_defaultAction;
 }
 
-bool InputBindings::isActionCreated(const char* name)
-{
-	return m_inputActions.contains(name);
-}
+bool InputBindings::isActionCreated(const char* name) { return m_inputActions.contains(name); }
 
-void InputBindings::setAction(const char* name)
-{
-	m_inputActions[name];
-}
+void InputBindings::setAction(const char* name) { m_inputActions[name]; }
 
 void InputBindings::setActionKey(const char* name, Keys::Code code, ModifiersList modifiers)
 {
 	/// \todo MH Check for conflicts.
-	if (isActionCreated(name))
-	{
-		m_inputActions[name].push_back({code, createModifiers(modifiers)});
-	}
+	if (isActionCreated(name)) { m_inputActions[name].push_back({code, createModifiers(modifiers)}); }
 }
 
 void InputBindings::removeActionKey(const char* name, Keys::Code code)
@@ -128,29 +115,17 @@ void InputBindings::removeActionKey(const char* name, Keys::Code code)
 
 std::vector<InputBindings::AxisMapping> InputBindings::getAxisMapping(const char* name)
 {
-	if (isAxisCreated(name))
-	{
-		return m_inputAxis[name];
-	}
+	if (isAxisCreated(name)) { return m_inputAxis[name]; }
 	return g_defaultAxis;
 }
 
-bool InputBindings::isAxisCreated(const char* name)
-{
-	return m_inputAxis.contains(name);
-}
+bool InputBindings::isAxisCreated(const char* name) { return m_inputAxis.contains(name); }
 
-void InputBindings::setAxis(const char* name)
-{
-	m_inputAxis[name];
-}
+void InputBindings::setAxis(const char* name) { m_inputAxis[name]; }
 
 void InputBindings::setAxisKey(const char* name, float scale, Keys::Code code, ModifiersList modifiers)
 {
-	if (InputBindings::isAxisCreated(name))
-	{
-		m_inputAxis[name].push_back({code, scale, createModifiers(modifiers)});
-	}
+	if (InputBindings::isAxisCreated(name)) { m_inputAxis[name].push_back({code, scale, createModifiers(modifiers)}); }
 }
 
 void InputBindings::removeAxisKey(const char* name, Keys::Code code)

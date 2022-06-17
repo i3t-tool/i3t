@@ -27,7 +27,7 @@ FORCE_INLINE bool isTransform(const NodePtr& node)
 	return it != g_transforms.end();
 	 */
 	auto& keyWord = node->getOperation()->keyWord;
-	auto	type		= magic_enum::enum_cast<ETransformType>(keyWord);
+	auto  type    = magic_enum::enum_cast<ETransformType>(keyWord);
 
 	return type.has_value();
 }
@@ -62,9 +62,10 @@ enum class ETransformState
 using ValueMask = std::array<int8_t, 16>;
 
 constexpr int8_t VM_MINUS_ONE = -1; ///< Fixed matrix element (-1) in ValueMask
-constexpr int8_t VM_ZERO			=  0;	///< Fixed matrix element (0) in ValueMask
-constexpr int8_t VM_ONE				=  1;	///< Fixed matrix element (+1) in ValueMask
-constexpr int8_t VM_ANY				=  2;	///< Editable matrix element in ValueMask - it's range of values may be limited - the limit is checked in setValue() methods
+constexpr int8_t VM_ZERO      = 0;  ///< Fixed matrix element (0) in ValueMask
+constexpr int8_t VM_ONE       = 1;  ///< Fixed matrix element (+1) in ValueMask
+constexpr int8_t VM_ANY =
+    2; ///< Editable matrix element in ValueMask - it's range of values may be limited - the limit is checked in setValue() methods
 
 inline bool canEditValue(EValueState valueState)
 {
@@ -118,8 +119,9 @@ public:
 
 private:
 	/// \todo MH Use Node::m_owner.
-	Ptr<NodeBase> m_currentSequence = nullptr;   ///< pointer to the sequence the transform matrix is in (or nullptr if without)
-	int						m_currentIndex		= -1;        ///< index of the transform in the sequence
+	Ptr<NodeBase> m_currentSequence =
+	    nullptr;             ///< pointer to the sequence the transform matrix is in (or nullptr if without)
+	int m_currentIndex = -1; ///< index of the transform in the sequence
 
 public:
 	bool          isInSequence() const { return m_currentSequence != nullptr; }
@@ -174,11 +176,11 @@ public:
 	bool                    isLocked() const;
 	void                    lock();
 	void                    unlock();
-	bool                    hasMenuSynergies() const { return m_hasMenuSynergies; } // PF TODO should be const for the given Transformation
-	bool                    hasSynergies() const { return m_hasSynergies; }
-	void                    disableSynergies() { m_hasSynergies = false; }
-	void                    enableSynergies() { m_hasSynergies = m_hasMenuSynergies ? true : false; }
-	void                    free()
+	bool hasMenuSynergies() const { return m_hasMenuSynergies; } // PF TODO should be const for the given Transformation
+	bool hasSynergies() const { return m_hasSynergies; }
+	void disableSynergies() { m_hasSynergies = false; }
+	void enableSynergies() { m_hasSynergies = m_hasMenuSynergies ? true : false; }
+	void free()
 	{
 		unlock();
 		disableSynergies();
@@ -221,7 +223,7 @@ public:
 	//void resetModifiers()
 	//{
 	//	m_isLocked						= true;
-	//	//m_hasMenuSynergies = true;  
+	//	//m_hasMenuSynergies = true;
 	//	enableSynergies(); // if (m_hasMenuSynergies) only
 	//}
 
@@ -233,7 +235,7 @@ public:
 	{
 		float cos = 1.0f; // Initially in the first quadrant
 		float sin = 1.0f;
-	} halfspaceSign;    // remember the quadrant for eulerRotations
+	} halfspaceSign; // remember the quadrant for eulerRotations
 	//===----------------------------------------------------------------------===//
 
 	void notifySequence();
@@ -246,19 +248,19 @@ public:
 	void nullSequence()
 	{
 		m_currentSequence = nullptr;
-		m_currentIndex		= -1;
+		m_currentIndex    = -1;
 	}
 
 	void setSequence(Ptr<NodeBase>&& s, int index)
 	{
 		m_currentSequence = s;
-		m_currentIndex		= index;
+		m_currentIndex    = index;
 	}
 
 	void setSequence(Ptr<NodeBase>& s, int index)
 	{
 		m_currentSequence = s;
-		m_currentIndex		= index;
+		m_currentIndex    = index;
 	}
 
 protected:
@@ -281,10 +283,11 @@ protected:
 	 * Scale            yes                 yes                 yes
 	 * EulerX,Y,Z       yes                 yes                 no
 	*/
-	bool m_hasMenuSynergies	= false; 
-	bool m_hasSynergies			= false; ///< applicable for: uniform scale, eulerAngleXYZ, ortho, frustum, and quaternion. All other undefined (false)
+	bool m_hasMenuSynergies = false;
+	bool m_hasSynergies =
+	    false; ///< applicable for: uniform scale, eulerAngleXYZ, ortho, frustum, and quaternion. All other undefined (false)
 
-	bool m_isLocked					= true;
+	bool m_isLocked = true;
 
 private:
 	bool      m_hasSavedData = false;
@@ -292,4 +295,4 @@ private:
 };
 
 using TransformPtr = Ptr<Transformation>;
-}
+} // namespace Core

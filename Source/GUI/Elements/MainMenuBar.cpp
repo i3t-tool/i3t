@@ -24,22 +24,16 @@ using namespace UI;
 
 static bool saveSceneDialog(std::string& result, const std::string& title)
 {
-	std::string root = Config::getAbsolutePath("./");
-	static std::vector<std::string> filter = {
-			"I3T scene files",
-			"*.scene"
-	};
+	std::string                     root   = Config::getAbsolutePath("./");
+	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
 
 	return SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
 }
 
 static bool openSceneDialog(std::string& result, const std::string& title)
 {
-	std::string root = Config::getAbsolutePath("./");
-	static std::vector<std::string> filter = {
-			"I3T scene files",
-			"*.scene"
-	};
+	std::string                     root   = Config::getAbsolutePath("./");
+	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
 
 	return SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
 }
@@ -47,14 +41,11 @@ static bool openSceneDialog(std::string& result, const std::string& title)
 static void saveAs()
 {
 	std::string filename;
-	bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
+	bool        hasFilename = saveSceneDialog(filename, "Save I3T scene");
 	if (hasFilename)
 	{
 		fs::path path(filename);
-		if (path.extension().string() != ".scene")
-		{
-			filename += ".scene";
-		}
+		if (path.extension().string() != ".scene") { filename += ".scene"; }
 
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 
@@ -67,8 +58,7 @@ static void save()
 {
 	auto& sm = StateManager::instance();
 
-	if (sm.hasScene())
-		sm.saveScene();
+	if (sm.hasScene()) sm.saveScene();
 	else
 		saveAs();
 }
@@ -76,7 +66,7 @@ static void save()
 static void open()
 {
 	std::string sceneFile;
-	bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
+	bool        hasFile = openSceneDialog(sceneFile, "Open I3T scene");
 	if (hasFile)
 	{
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
@@ -88,9 +78,7 @@ static void open()
 
 MainMenuBar::MainMenuBar()
 {
-	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&](){
-		save();
-	});
+	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&]() { save(); });
 }
 
 void MainMenuBar::render()
@@ -109,8 +97,7 @@ void MainMenuBar::render()
 	}
 	ImGui::End();
 
-	if (m_showDemoWindow)
-		ImGui::ShowDemoWindow(&m_showDemoWindow);
+	if (m_showDemoWindow) ImGui::ShowDemoWindow(&m_showDemoWindow);
 }
 
 void MainMenuBar::showFileMenu()
@@ -129,20 +116,11 @@ void MainMenuBar::showFileMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::MenuItem("Open"))
-		{
-			open();
-		}
+		if (ImGui::MenuItem("Open")) { open(); }
 
-		if (ImGui::MenuItem("Save"))
-		{
-			save();
-		}
+		if (ImGui::MenuItem("Save")) { save(); }
 
-		if (ImGui::MenuItem("Save As"))
-		{
-			saveAs();
-		}
+		if (ImGui::MenuItem("Save As")) { saveAs(); }
 
 		ImGui::Separator();
 
@@ -154,17 +132,11 @@ void MainMenuBar::showFileMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Setup"))
-		{
-			I3T::getUI()->showUniqueWindow<SetupDialog>();
-		}
+		if (ImGui::MenuItem("Setup")) { I3T::getUI()->showUniqueWindow<SetupDialog>(); }
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Exit"))
-		{
-			BeforeCloseCommand::dispatch();
-		}
+		if (ImGui::MenuItem("Exit")) { BeforeCloseCommand::dispatch(); }
 
 		ImGui::EndMenu();
 	}
@@ -175,13 +147,9 @@ void MainMenuBar::showEditMenu()
 	if (ImGui::BeginMenu("Edit"))
 	{
 		if (ImGui::MenuItem("Undo", nullptr, false, StateManager::instance().canUndo()))
-		{
-			InputManager::triggerAction("undo", EKeyState::Pressed);
-		}
+		{ InputManager::triggerAction("undo", EKeyState::Pressed); }
 		if (ImGui::MenuItem("Redo", nullptr, false, StateManager::instance().canRedo()))
-		{
-			InputManager::triggerAction("redo", EKeyState::Pressed);
-		}
+		{ InputManager::triggerAction("redo", EKeyState::Pressed); }
 
 		ImGui::EndMenu();
 	}
@@ -206,15 +174,9 @@ void MainMenuBar::showHelpMenu()
 {
 	if (ImGui::BeginMenu("Help"))
 	{
-		if (ImGui::MenuItem("Description"))
-		{
-			I3T::getUI()->showUniqueWindow<DescriptionDialog>();
-		}
+		if (ImGui::MenuItem("Description")) { I3T::getUI()->showUniqueWindow<DescriptionDialog>(); }
 
-		if (ImGui::MenuItem("About"))
-		{
-			I3T::getUI()->showUniqueWindow<AboutDialog>();
-		}
+		if (ImGui::MenuItem("About")) { I3T::getUI()->showUniqueWindow<AboutDialog>(); }
 
 		ImGui::Separator();
 

@@ -66,51 +66,51 @@
 
 #include "pgr.h"
 
+#include "Commands/ApplicationCommands.h"
 #include "Config.h"
-#include "Core/Defs.h"
 #include "Core/Application.h"
+#include "Core/Defs.h"
+#include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "Logger/LoggerInternal.h"
 #include "Utils/Other.h"
-#include "Commands/ApplicationCommands.h"
-#include "GUI/Elements/Dialogs/SystemDialogs.h"
 
 int window; ///< current main window
 
 static const std::string DIE_SEND_MAIL =
-		"If it does not help, send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
-		"as they appear in the program console.\n";
+    "If it does not help, send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
+    "as they appear in the program console.\n";
 
 static const std::string DIE_TEXT =
-		"The I3T tool did not start. "
-		"Please try the following steps to solve the problem and if it does not help, "
-		"send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
-		"as they appear in the program console.\n"
-		" \n"
-		"The steps to try:\n"
-		" \n"
-		" - The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime "
-		"libraries"
-		" from https://www.microsoft.com/en-us/download/details.aspx?id=5555 \n"
-		" \n"
-		" - the program is targeted to a Graphics card with OpenGL 3.1. If you have a internal and external GPU,"
-		" switch to the external GPU card. You may need to add transform.exe in the GPU control panel/3D settings"
-		" to the list of progams using the dedicated GPU card.\n";
+    "The I3T tool did not start. "
+    "Please try the following steps to solve the problem and if it does not help, "
+    "send me an email to felkepet@fel.cvut.cz with the snapshot of the program messages "
+    "as they appear in the program console.\n"
+    " \n"
+    "The steps to try:\n"
+    " \n"
+    " - The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime "
+    "libraries"
+    " from https://www.microsoft.com/en-us/download/details.aspx?id=5555 \n"
+    " \n"
+    " - the program is targeted to a Graphics card with OpenGL 3.1. If you have a internal and external GPU,"
+    " switch to the external GPU card. You may need to add transform.exe in the GPU control panel/3D settings"
+    " to the list of progams using the dedicated GPU card.\n";
 
 static const std::string DIE_TEXT_OPENGL_VERSION =
-		"The I3T tool did not start. \n\n"
-		"The program is targeted to a Graphics card with OpenGL 3.1. or higher. If you have a system with two graphics "
-		"cards, internal and external, "
-		" switch to the external GPU card please. You may need to add transform.exe in the GPU control panel/3D settings"
-		" to the list of progams using the dedicated GPU card.\n"
-		" \n" +
-		DIE_SEND_MAIL;
+    "The I3T tool did not start. \n\n"
+    "The program is targeted to a Graphics card with OpenGL 3.1. or higher. If you have a system with two graphics "
+    "cards, internal and external, "
+    " switch to the external GPU card please. You may need to add transform.exe in the GPU control panel/3D settings"
+    " to the list of progams using the dedicated GPU card.\n"
+    " \n" +
+    DIE_SEND_MAIL;
 
 static const std::string DIE_TEXT_PROGRAM_INIT =
-		"The I3T tool did not start. \n\n"
-		"The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime libraries "
-		"from https://www.microsoft.com/en-us/download/details.aspx?id=5555 .\n"
-		" \n" +
-		DIE_SEND_MAIL;
+    "The I3T tool did not start. \n\n"
+    "The program is written in Visual Studio 2010 - you may need to install the Visual studio 2010 runtime libraries "
+    "from https://www.microsoft.com/en-us/download/details.aspx?id=5555 .\n"
+    " \n" +
+    DIE_SEND_MAIL;
 
 // Dal�� sd�len�
 //- jako v�ukov� sc�ny pou�ijte 01xxx ... 0nxxx
@@ -149,38 +149,36 @@ int main(int argc, char* argv[])
 
 	///   - seek command line parameters for config files
 	/* True if the .dcgf file was given as a command line parameter and must be loaded. */
-	bool dcfgFlag = false;
+	bool        dcfgFlag = false;
 	std::string dcfg;
 
 	/* True to load the screen file, the .scn file was given as a command line parameter and must be loaded.*/
-	bool scnFlag = false;
+	bool        scnFlag = false;
 	std::string scn;
 
 	for (int i = 1; i < argc; i++)
 	{
 		if (Config::getFileExtension(argv[i]) == "scn")
 		{
-			scn = argv[i];
+			scn     = argv[i];
 			scnFlag = true;
 		}
 		else if (Config::getFileExtension(argv[i]) == "dcfg")
 		{
-			dcfg = argv[i];
+			dcfg     = argv[i];
 			dcfgFlag = true;
 		}
 	}
 
 	///   - load the configuration file .dcfg
-	if (dcfgFlag)
-		Config::loadFromFile(dcfg);
+	if (dcfgFlag) Config::loadFromFile(dcfg);
 	else
 	{
 		Config::loadFromFile(Config::getAbsolutePath("cfg_default.dcfg"));
 	}
 	///   - load the scene
 	/// \todo Load scene in App::initI3T().
-	if (scnFlag)
-		Config::LOAD_SCENE = scn;
+	if (scnFlag) Config::LOAD_SCENE = scn;
 
 	/// \todo Run app in fullscreen mode.
 	// if (Config::FULLSCREEN)
@@ -195,9 +193,7 @@ int main(int argc, char* argv[])
 
 	// II. PGR and OpenGL initializing.
 	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
-	{
-		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
-	}
+	{ SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION); }
 
 	// Initialize all modules.
 	app.init();

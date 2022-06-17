@@ -18,9 +18,9 @@
 bool loadWorkspace(const char* filename);
 bool saveWorkspace(const char* filename, std::vector<Ptr<WorkspaceNodeWithCoreData>>* _workspace);
 //std::vector<WorkspaceMatrix4x4>* loadWorkspace();
-int	 picocRunInteractive();
-int	 picocRunFile(const char* filename);
-int	 picocRunSource(const char* source);
+int  picocRunInteractive();
+int  picocRunFile(const char* filename);
+int  picocRunSource(const char* source);
 void scriptingHelp(int);
 
 /**
@@ -37,5 +37,5 @@ public:
 
 private:
 	Picoc m_picoc;
-	bool	m_init = false;
+	bool  m_init = false;
 };

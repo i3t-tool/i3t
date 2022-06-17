@@ -48,11 +48,9 @@ Node::~Node()
 {
 	generator.returnId(m_id);
 
-	for (auto& input : m_inputs)
-		input.destroy();
+	for (auto& input : m_inputs) input.destroy();
 
-	for (auto& output : m_outputs)
-		output.destroy();
+	for (auto& output : m_outputs) output.destroy();
 }
 
 void Node::finalize() { unplugAll(); }
@@ -63,9 +61,7 @@ void Node::init()
 
 	// Create input pins.
 	for (int i = 0; i < m_operation->numberOfInputs; i++)
-	{
-		m_inputs.emplace_back(m_operation->inputTypes[i], true, getPtr(), i);
-	}
+	{ m_inputs.emplace_back(m_operation->inputTypes[i], true, getPtr(), i); }
 
 	// Create output pins and data storage for each output.
 	for (int i = 0; i < m_operation->numberOfOutputs; i++)
@@ -86,11 +82,9 @@ void Node::init()
 	}
 
 	if (m_operation->isConstructor)
-		for (int i = 0; i < m_operation->numberOfOutputs; i++)
-			m_OperatorState.push_back(EValueState::Editable);
+		for (int i = 0; i < m_operation->numberOfOutputs; i++) m_OperatorState.push_back(EValueState::Editable);
 	else
-		for (int i = 0; i < m_operation->numberOfOutputs; i++)
-			m_OperatorState.push_back(EValueState::Locked);
+		for (int i = 0; i < m_operation->numberOfOutputs; i++) m_OperatorState.push_back(EValueState::Locked);
 }
 
 void Node::notifyOwner()
@@ -113,10 +107,7 @@ void Node::changeId(ID newId)
 	m_id = newId;
 }
 
-EValueState Node::getState(size_t pinIndex)
-{
-	return m_OperatorState[pinIndex];
-}
+EValueState Node::getState(size_t pinIndex) { return m_OperatorState[pinIndex]; }
 
 void Node::pulse(size_t index)
 {
@@ -126,8 +117,8 @@ void Node::pulse(size_t index)
 
 bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
 {
-	auto	outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
-	auto& storage				 = getIn(inputIndex).getStorage(outputPinIndex);
+	auto  outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
+	auto& storage        = getIn(inputIndex).getStorage(outputPinIndex);
 
 	if (getIn(inputIndex).isPluggedIn() && storage.isPulseTriggered()) { return true; }
 	return false;
@@ -177,8 +168,7 @@ bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOf
 
 ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 {
-	if (input->isDisabled() || output->isDisabled())
-		return ENodePlugResult::Err_DisabledPin;
+	if (input->isDisabled() || output->isDisabled()) return ENodePlugResult::Err_DisabledPin;
 
 	/* \todo JH switch input and output if output is inputPin and input is outputPin here? I have to do it anyway ...*/
 	auto* inp = input;
@@ -242,10 +232,7 @@ ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 
 void Node::unplugAll()
 {
-	for (size_t i = 0L; i < m_inputs.size(); ++i)
-	{
-		unplugInput(i);
-	}
+	for (size_t i = 0L; i < m_inputs.size(); ++i) { unplugInput(i); }
 
 	for (size_t i = 0L; i < m_outputs.size(); ++i)
 	{
@@ -268,8 +255,7 @@ void Node::unplugAll()
 				}
 
 				if (allUnplugged)
-					for (auto& state : node->m_OperatorState)
-						state = EValueState::Editable;
+					for (auto& state : node->m_OperatorState) state = EValueState::Editable;
 			}
 		}
 	}
@@ -278,10 +264,10 @@ void Node::unplugAll()
 void Node::unplugInput(size_t index)
 {
 	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
-								"The node's input pin that you want to unplug does not exists.");
+	              "The node's input pin that you want to unplug does not exists.");
 
 	// auto* otherPin = m_inputs[index].m_input;
-	auto	inputs	 = getInputPinsRef();
+	auto  inputs   = getInputPinsRef();
 	auto* otherPin = inputs[index].m_input;
 
 	if (otherPin)
@@ -298,7 +284,7 @@ void Node::unplugInput(size_t index)
 		else
 			I3T_ABORT("Can't find pointer to input pin in other node outputs.");
 
-		auto& myPin		= inputs[index];
+		auto& myPin   = inputs[index];
 		myPin.m_input = nullptr;
 	}
 
@@ -323,7 +309,7 @@ void Node::unplugInput(size_t index)
 void Node::unplugOutput(size_t index)
 {
 	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
-								"The node's output pin that you want to unplug does not exists.");
+	              "The node's output pin that you want to unplug does not exists.");
 
 	// auto& pin = m_outputs[index];
 	auto& pin = getOut(index);
@@ -336,16 +322,16 @@ void Node::unplugOutput(size_t index)
 
 const Transform::DataMap* Node::getDataMap()
 {
-	static std::array<const unsigned char, 16> mapData = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-	static Transform::DataMap map(mapData);
+	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	static Transform::DataMap                  map(mapData);
 
 	return &map;
 }
 
 const Transform::DataMap& Node::getDataMapRef()
 {
-	static std::array<const unsigned char, 16> mapData = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-	static Transform::DataMap map(mapData);
+	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	static Transform::DataMap                  map(mapData);
 
 	return map;
 }

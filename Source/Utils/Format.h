@@ -14,8 +14,7 @@ inline std::string toString(float fl)
 {
 	std::string str;
 
-	if (std::isnan(fl))
-		str = fl < 0.0f ? "-.NaN" : ".NaN";
+	if (std::isnan(fl)) str = fl < 0.0f ? "-.NaN" : ".NaN";
 	else
 		str = fmt::format("{}", fl);
 
@@ -45,11 +44,10 @@ inline std::string toString(const glm::mat4& mat)
 inline std::string concat(const std::vector<std::string>& entries, const std::string& delimiter)
 {
 	std::stringstream ss;
-	const auto entriesSize = entries.size();
-	for(size_t i = 0; i < entriesSize; ++i)
+	const auto        entriesSize = entries.size();
+	for (size_t i = 0; i < entriesSize; ++i)
 	{
-		if (i != 0)
-			ss << delimiter;
+		if (i != 0) ss << delimiter;
 		ss << entries[i];
 	}
 	return ss.str();
@@ -59,11 +57,10 @@ inline std::vector<std::string> concat(const std::map<std::string, std::string>&
 {
 	std::vector<std::string> vec;
 
-	for (const auto& [key, val]: map)
-		vec.push_back(fmt::format("{}{}{}", key, delimiter, val));
+	for (const auto& [key, val] : map) vec.push_back(fmt::format("{}{}{}", key, delimiter, val));
 
 	return vec;
 }
 
 std::vector<std::string> concat(const std::map<std::string, DataStore>& map, const std::string& delimiter);
-}
+} // namespace Utils

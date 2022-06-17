@@ -8,7 +8,7 @@
 
 #include "KeyCodes.h"
 
-using KeyCallback = std::function<void()>;
+using KeyCallback  = std::function<void()>;
 using AxisCallback = std::function<void(float)>;
 
 class InputController
@@ -18,13 +18,13 @@ class InputController
 	struct Action
 	{
 		std::string name;
-		EKeyState state;
+		EKeyState   state;
 		KeyCallback fn;
 
 		Action(std::string n, EKeyState s, KeyCallback callback) : name(std::move(n)), state(s), fn(std::move(callback)) {}
 	};
 
-	std::vector<Action> m_actions;
+	std::vector<Action>                           m_actions;
 	std::unordered_map<std::string, AxisCallback> m_axis;
 
 public:

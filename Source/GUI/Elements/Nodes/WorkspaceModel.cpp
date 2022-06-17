@@ -7,17 +7,17 @@
 #define TEST1
 
 const pgr::MeshData* g_meshes[] = { //todo - remove
-		&unitcubeMesh, &three_axisMesh};
+    &unitcubeMesh, &three_axisMesh};
 
 const char* g_meshesNames[] = { //todo - remove
-		"cube", "axes"};
+    "cube", "axes"};
 
 const float angleX = 30.0; //degree
 const float angleY = 55.0; //degree
 
 WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne) :
-		WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<ENodeType::Model>()), m_axisOn(false),
-		m_showModel(false)
+    WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<ENodeType::Model>()), m_axisOn(false),
+    m_showModel(false)
 {
 	init();
 	//setDataItemsWidth();
@@ -80,7 +80,7 @@ void WorkspaceModel::init()
 	// pass object pointer to the core
 	// to remove the warning:
 	ValueSetResult result = m_nodebase->setValue(
-			static_cast<void*>(object)); //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
+	    static_cast<void*>(object)); //GameObject object = static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
 }
 
 
@@ -114,12 +114,12 @@ bool WorkspaceModel::middleContent()
 	if (!m_textureID)
 	{
 		renderTexture = new RenderTexture(
-				&m_textureID, static_cast<int>(m_textureSize.x),
-				static_cast<int>(m_textureSize.y)); // create and get the FBO and color Attachment for rendering
+		    &m_textureID, static_cast<int>(m_textureSize.x),
+		    static_cast<int>(m_textureSize.y)); // create and get the FBO and color Attachment for rendering
 
 #ifdef TEST
 		// block of control checks
-		m_fbo				 = renderTexture->getFbo();
+		m_fbo        = renderTexture->getFbo();
 		GLuint color = renderTexture->getColor(); //todo getColorAttachmentID
 		IM_ASSERT(renderTexture->getColor() == m_textureID);
 		IM_ASSERT(renderTexture->getWidth() == w);
@@ -130,7 +130,7 @@ bool WorkspaceModel::middleContent()
 		// Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget);
 		// m_camera = new Camera(60.0f, m_sceneModel, renderTexture);  // version with the object shared with the 3D scene and positioned in the scene graph)
 		m_camera = new Camera(60.0f, m_workspaceModel,
-													renderTexture); // version with the additional object just for this box in the workspace
+		                      renderTexture); // version with the additional object just for this box in the workspace
 		// m_camera->m_perspective = glm::perspective(glm::radians(60.0f), float(m_textureSize.x) / float(m_textureSize.y), 0.2f, 1000.0f);
 	}
 
@@ -166,7 +166,7 @@ bool WorkspaceModel::middleContent()
 	//texture = pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));  // fixed texture may be enough
 	//ImGui::Image((ImTextureID)m_textureID, m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single cube side X+
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize, ImVec2(0.0f, 1.0f),
-							 ImVec2(1.0f, 0.0f)); //vertiocal flip
+	             ImVec2(1.0f, 0.0f)); //vertiocal flip
 
 	//if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames, IM_ARRAYSIZE(g_meshesNames)))
 	//{
@@ -191,5 +191,5 @@ int WorkspaceModel::maxLenghtOfData() //todo
 void WorkspaceModel::drawMenuLevelOfDetail() //todo
 {
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-																{WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }

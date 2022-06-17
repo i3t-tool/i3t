@@ -29,8 +29,8 @@ struct MouseButtonState final
 
 	MouseButtonState()
 	{
-		left = false;
-		right = false;
+		left   = false;
+		right  = false;
 		middle = false;
 	}
 
@@ -71,18 +71,18 @@ public:
 	static MouseButtonState m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed) without modifiers.
 	///< \todo passed to all handlers, but probably not used
 
-	static bool m_ignoreImGuiEvents;
+	static bool      m_ignoreImGuiEvents;
 	static glm::vec2 m_mouseOffset;
-	static float m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
-	static float m_mouseXDelta, m_mouseYDelta;
-	static float m_mouseXDragDelta, m_mouseYDragDelta;
+	static float     m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
+	static float     m_mouseXDelta, m_mouseYDelta;
+	static float     m_mouseXDragDelta, m_mouseYDragDelta;
 
 private:
 	static std::vector<InputController*> m_inputControllers;
 	// static Ptr<IWindow> m_focusedWindow;
 
 public:
-	static void init();
+	static void      init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
 
 	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
@@ -130,10 +130,7 @@ public:
 	 *
 	 * \param	code The enum code of the key.
 	 */
-	static void setPressed(const Keys::Code code)
-	{
-		m_keyMap[code] = JUST_DOWN;
-	}
+	static void setPressed(const Keys::Code code) { m_keyMap[code] = JUST_DOWN; }
 
 	//===----------------------------------------------------------------------===//
 	static bool isActionTriggered(const char* name, EKeyState state);
@@ -169,7 +166,7 @@ public:
 	 */
 	static void setScreenSize(const int width, const int height)
 	{
-		m_winWidth = width;
+		m_winWidth  = width;
 		m_winHeight = height;
 	}
 
@@ -184,7 +181,7 @@ public:
 	/**
 	 * Process action and axis events.
 	 */
-	 static void processEvents(InputController& controller);
+	static void processEvents(InputController& controller);
 
 	/**
 	 * \brief Updates \a mouseDelta and \a mousePrev, and updates the stored statuses of the keys in the \a keyMap array
@@ -221,6 +218,6 @@ public:
 	static GLFWwindow* getCurrentViewport();
 
 private:
-	static InputController s_globalInputController;
+	static InputController  s_globalInputController;
 	static InputController* s_activeInput;
 };

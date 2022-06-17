@@ -43,7 +43,7 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #endif
 
 #ifdef I3T_DEBUG
-#define I3T_ASSERT(cond) assert(cond)
+#define I3T_ASSERT(cond)   assert(cond)
 #define I3T_ABORT(message) assert(false && message)
 #else
 #define I3T_ASSERT(cond, description)
@@ -122,14 +122,10 @@ constexpr T enumVal(const std::string& str)
 	constexpr auto& enumEntries = magic_enum::enum_entries<T>();
 	for (const auto& entry : enumEntries)
 	{
-		if constexpr(entry.first == str)
-		{
-			return entry.first;
-		}
+		if constexpr (entry.first == str) { return entry.first; }
 	}
 }
 
 #define COND_TO_DEG(x)                                                                                                 \
 	(SetupForm::radians ? (x)                                                                                            \
-											: glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
-
+	                    : glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees

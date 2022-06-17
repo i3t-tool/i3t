@@ -46,7 +46,7 @@ public:
 	void finalize();
 
 	static Application& get();
-	UIModule* getUI();
+	UIModule*           getUI();
 
 	//===----------------------------------------------------------------------===//
 
@@ -101,9 +101,9 @@ public:
 
 	Memento getState() override;
 
-	void setState(const Memento &) override;
+	void setState(const Memento&) override;
 
-	void onStateChange(const std::string &winTitlePostfix) override;
+	void onStateChange(const std::string& winTitlePostfix) override;
 
 	//===----------------------------------------------------------------------===//
 
@@ -120,7 +120,7 @@ private:
 
 	bool m_bShouldClose = false;
 
-	World* m_world;
+	World*     m_world;
 	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	Window* m_window;

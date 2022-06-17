@@ -11,13 +11,13 @@
 
 #include "Camera.h"
 #include "Cycle.h"
+#include "Node.h"
 #include "NodeData.h"
 #include "NodeImpl.h"
 #include "Operations.h"
+#include "Pin.h"
 #include "Sequence.h"
 #include "TransformImpl.h"
-#include "Node.h"
-#include "Pin.h"
 
 namespace Core
 {
@@ -102,14 +102,14 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-	 /* \todo JH what about plug(pin, pin) ? Now I just have to read info from Core for pass it back to Core... */
+	/* \todo JH what about plug(pin, pin) ? Now I just have to read info from Core for pass it back to Core... */
 	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
-																						unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+	                                          unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
 	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
-																															unsigned nodeOutputIndex = 0);
+	                                                            unsigned nodeOutputIndex = 0);
 	[[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node,
-																															 unsigned nodeInputIndex = 0);
+	                                                             unsigned nodeInputIndex = 0);
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(const NodePtr& node);
@@ -150,8 +150,8 @@ public:
 	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
 
 	static const Operation* getOperation(const Pin* pin);
-	static bool							areFromSameNode(const Pin* lhs, const Pin* rhs);
-	static bool							arePlugged(const Pin& input, const Pin& output);
+	static bool             areFromSameNode(const Pin* lhs, const Pin* rhs);
+	static bool             arePlugged(const Pin& input, const Pin& output);
 
 private:
 	static GraphManager* s_self;
@@ -222,9 +222,9 @@ public:
 
 class MatrixTracker
 {
-	glm::mat4		m_interpolatedMatrix;
-	float				m_param			 = 0.0f;
-	bool				m_isReversed = false;
+	glm::mat4   m_interpolatedMatrix;
+	float       m_param      = 0.0f;
+	bool        m_isReversed = false;
 	SequencePtr m_beginSequence;
 
 public:
@@ -253,10 +253,7 @@ private:
 };
 
 
-inline CameraPtr GraphManager::createCamera()
-{
-	return Builder::createCamera();
-}
+inline CameraPtr GraphManager::createCamera() { return Builder::createCamera(); }
 
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {

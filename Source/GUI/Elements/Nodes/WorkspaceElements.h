@@ -45,8 +45,8 @@ enum class WorkspaceLevelOfDetail
 
 enum FloatPopupMode
 {
-    Angle,
-    Value
+	Angle,
+	Value
 };
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
@@ -66,30 +66,32 @@ extern std::map<EValueType, EColor> WorkspacePinColorForeground;
 class WorkspaceNode : public DIWNE::Node
 {
 protected:
-    std::string m_topLabel;
-    std::string m_middleLabel;
+	std::string m_topLabel;
+	std::string m_middleLabel;
+
 public:
-    WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel="Header", std::string const middleLabel="Content");
-    ~WorkspaceNode();
+	WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel = "Header",
+	              std::string const middleLabel = "Content");
+	~WorkspaceNode();
 
-    std::string getTopLabel(){return m_topLabel;};
-    std::string getMiddleLabel(){return m_middleLabel;};
+	std::string getTopLabel() { return m_topLabel; };
+	std::string getMiddleLabel() { return m_middleLabel; };
 
-    void setTopLabel(std::string label){m_topLabel = label;};
-    void setMiddleLabel(std::string label){m_middleLabel = label;};
+	void setTopLabel(std::string label) { m_topLabel = label; };
+	void setMiddleLabel(std::string label) { m_middleLabel = label; };
 
 	/* DIWNE function */
 	virtual bool bypassFocusForInteractionAction();
 	virtual bool beforeContent();
-    virtual bool topContent();
-    virtual bool middleContent();
-    virtual bool leftContent();
-    virtual bool rightContent();
-    virtual bool bottomContent();
+	virtual bool topContent();
+	virtual bool middleContent();
+	virtual bool leftContent();
+	virtual bool rightContent();
+	virtual bool bottomContent();
 
-    bool m_removeFromWorkspaceWindow;
-    bool getRemoveFromWorkspace() const {return m_removeFromWorkspaceWindow;};
-	void setRemoveFromWorkspace(bool value) {m_removeFromWorkspaceWindow=value;};
+	bool m_removeFromWorkspaceWindow;
+	bool getRemoveFromWorkspace() const { return m_removeFromWorkspaceWindow; };
+	void setRemoveFromWorkspace(bool value) { m_removeFromWorkspaceWindow = value; };
 
 	virtual void drawMenuDelete();
 	virtual void popupContent();
@@ -99,20 +101,18 @@ class WorkspacePin : public DIWNE::Pin
 {
 protected:
 	bool        m_showLabel;
-	std::string m_label;		/*! \brief Name of Pin */
+	std::string m_label; /*! \brief Name of Pin */
 
 public:
-    WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label);
+	WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label);
 
-	bool getShowLabel() const { return m_showLabel; };
+	bool              getShowLabel() const { return m_showLabel; };
 	std::string const getLabel() const { return m_label; };
 
-    void setShowLabel(bool showLabel) { m_showLabel = showLabel; };
+	void setShowLabel(bool showLabel) { m_showLabel = showLabel; };
 	void setLabel(std::string label) { m_label = label; };
 };
 
 
-
 /* static functions */
 extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
-

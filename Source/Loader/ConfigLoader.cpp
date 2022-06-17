@@ -3,16 +3,15 @@
 #include "yaml-cpp/yaml.h"
 
 #include "Config.h"
-#include "Utils.h"
 #include "Logger/Logger.h"
+#include "Utils.h"
 #include "Utils/Filesystem.h"
 
 void loadConfig()
 {
 	auto configFile = Config::getAbsolutePath("config.yml");
 
-	if (!doesFileExists(configFile))
-		Log::fatal("Unable to load 'config.yml' file.");
+	if (!doesFileExists(configFile)) Log::fatal("Unable to load 'config.yml' file.");
 
 	auto yaml = YAML::LoadFile(configFile);
 

@@ -16,7 +16,7 @@ long GetTime()
 	static struct timeb mtime;
 	//_ftime64_s(&mtime);
 	ftime(&mtime);
-	return (long)(1000 * (1000 * mtime.time + mtime.millitm));
+	return (long) (1000 * (1000 * mtime.time + mtime.millitm));
 }
 
 /**
@@ -34,7 +34,7 @@ long GetRealTime()
 
 	//_ftime64_s(&mtime);
 	ftime(&mtime);
-	return (long)(1000 * (1000 * mtime.time + mtime.millitm));
+	return (long) (1000 * (1000 * mtime.time + mtime.millitm));
 }
 
 /**
@@ -52,6 +52,6 @@ float TimeDiff(long time1, long time2)
 {
 	// in ms
 	const float clk = 1.0e-3f; // ticks per second
-	long t = time2 - time1;
+	long        t   = time2 - time1;
 	return ((t < 0) ? -t : t) * clk;
 }

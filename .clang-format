@@ -46,4 +46,4 @@ TabWidth: 2
 ReflowComments: false
 SpaceAfterCStyleCast: true
 SpacesInContainerLiterals: false
-UseTab: Always
+UseTab: ForIndentation

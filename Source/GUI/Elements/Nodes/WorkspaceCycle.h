@@ -7,27 +7,27 @@
 class WorkspaceCycle : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-    //===-- Double dispatch ---------------------------------------------------===//
+	//===-- Double dispatch ---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
 		visitor.visit(std::static_pointer_cast<WorkspaceCycle>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 
-  WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(), bool drawPins=true);
+	WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createCycle(),
+	               bool drawPins = true);
 	bool isCycle();
 
-    bool buttonStepNext();
-    bool buttonStepBack();
-    bool buttonStopAndReset();
-    bool buttonPlayPause();
+	bool buttonStepNext();
+	bool buttonStepBack();
+	bool buttonStopAndReset();
+	bool buttonPlayPause();
 
-  bool middleContent();
-  bool leftContent();
-  bool rightContent();
+	bool middleContent();
+	bool leftContent();
+	bool rightContent();
 
-  void drawMenuLevelOfDetail();
+	void drawMenuLevelOfDetail();
 
-    int maxLenghtOfData();
+	int maxLenghtOfData();
 };
-

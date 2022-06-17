@@ -80,7 +80,7 @@ public:
 	[[nodiscard]] bool isInput() const { return m_isInput; }
 
 	[[nodiscard]] bool isDisabled() const { return m_isDisabled; }
-	void setDisabled(bool disabled) { m_isDisabled = disabled; }
+	void               setDisabled(bool disabled) { m_isDisabled = disabled; }
 
 private:
 	ID m_id;
@@ -112,4 +112,4 @@ private:
 
 	void destroy();
 };
-}
+} // namespace Core

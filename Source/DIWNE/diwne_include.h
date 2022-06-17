@@ -27,11 +27,15 @@
 #include <limits>
 #include "spdlog/fmt/fmt.h"
 //------------------------------------------------------------------------------
-# include <imgui.h>
-# define IMGUI_DEFINE_MATH_OPERATORS
-# include <imgui_internal.h>
+#include <imgui.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui_internal.h>
 
-#define DIWNE_DEBUG(node_editor, debugCode) do{ if(node_editor.m_diwneDebug_on){ debugCode } }while(0) /* do-while only for code-technical reason */
+#define DIWNE_DEBUG(node_editor, debugCode)                                                                            \
+	do                                                                                                                   \
+	{                                                                                                                    \
+		if (node_editor.m_diwneDebug_on) { debugCode }                                                                     \
+	} while (0) /* do-while only for code-technical reason */
 
 namespace DIWNE
 {
@@ -41,45 +45,45 @@ typedef unsigned int ID;
 /*! \brief Drawing mode of DiwneObject  */
 enum DrawMode
 {
-    JustDraw, /*!< Draw object only - block all (node editor's) interactions */
-    Interacting /*!< Usual mode - draw and allow interaction too */
+	JustDraw,   /*!< Draw object only - block all (node editor's) interactions */
+	Interacting /*!< Usual mode - draw and allow interaction too */
 };
 
 enum IconType
 {
-    Circle,
-    Rectangle,
-    TriangleLeft,
-    TriangleRight,
-    TriangleDownLeft,
-    TriangleDownRight,
-    Cross
+	Circle,
+	Rectangle,
+	TriangleLeft,
+	TriangleRight,
+	TriangleDownLeft,
+	TriangleDownRight,
+	Cross
 };
 
 enum DiwneAction
 {
-    None,
-    FocusOnObject,
-    InteractingContent, /* for other unspecified interactions */
-    NewLink,
+	None,
+	FocusOnObject,
+	InteractingContent, /* for other unspecified interactions */
+	NewLink,
 
-    HoldNode,
-    HoldPin,
-    HoldLink,
-    HoldWorkarea,
+	HoldNode,
+	HoldPin,
+	HoldLink,
+	HoldWorkarea,
 
-    DragNode,
-    DragPin,
-    DragLink, /* dragging already existing/connected link */
-    DragWorkarea,
+	DragNode,
+	DragPin,
+	DragLink, /* dragging already existing/connected link */
+	DragWorkarea,
 
-    TouchNode,
-    TouchPin,
-    TouchLink,
-    TouchWorkarea,
+	TouchNode,
+	TouchPin,
+	TouchLink,
+	TouchWorkarea,
 
-    SelectionRectFull,
-    SelectionRectTouch
+	SelectionRectFull,
+	SelectionRectTouch
 };
 
 class DiwneObject;
@@ -90,7 +94,7 @@ class Link;
 
 class Diwne;
 
-}
+} // namespace DIWNE
 
 #include "DiwneObject.h"
 
@@ -98,7 +102,7 @@ class Diwne;
 #include "Link.h"
 #include "diwne.h"
 
-#include "Pin.h"
 #include "Node.h"
+#include "Pin.h"
 
 #endif // DIWNE_INCLUDE_H

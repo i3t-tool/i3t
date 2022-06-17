@@ -3,9 +3,9 @@
 #include <math.h>
 
 //#include "pgr.h"
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp> // Euler angle rotations
 #include "Utils/Format.h"
-#include<glm/gtx/vector_angle.hpp>  // Euler angle rotations
-#include<glm/gtx/rotate_vector.hpp>
 
 #ifndef M_PI
 /// define Pi for compatibility issues (MSVC vs GCC)
@@ -17,73 +17,54 @@ namespace Core
 //===-- Value masks -------------------------------------------------------===//
 // Written in ROW order - flipped to COLUMN order in validateValue()!!!!
 constexpr ValueMask g_ScaleMask = {
-		VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
-		VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
+    VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
-constexpr ValueMask g_TranslateMask = {  // row-order
-		VM_ONE,  VM_ZERO, VM_ZERO, VM_ANY,
-		VM_ZERO, VM_ONE,  VM_ZERO, VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ONE,  VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+constexpr ValueMask g_TranslateMask = {
+    // row-order
+    VM_ONE,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ONE,  VM_ZERO, VM_ANY,
+    VM_ZERO, VM_ZERO, VM_ONE,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_RotateXMask = {
-		VM_ONE,  VM_ZERO, VM_ZERO, VM_ZERO,
-		VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO,
-		VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ONE,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO,
+    VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_RotateYMask = {
-		VM_ANY,  VM_ZERO, VM_ANY,  VM_ZERO,
-		VM_ZERO, VM_ONE,  VM_ZERO, VM_ZERO,
-		VM_ANY,  VM_ZERO, VM_ANY,  VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ANY, VM_ZERO, VM_ANY, VM_ZERO, VM_ZERO, VM_ONE,  VM_ZERO, VM_ZERO,
+    VM_ANY, VM_ZERO, VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_RotateZMask = {
-		VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO,
-		VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ONE,  VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO,
+    VM_ZERO, VM_ZERO, VM_ONE,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_AxisAngleMask = {
-		VM_ANY,  VM_ANY,	VM_ANY,	 VM_ZERO,
-	  VM_ANY,	 VM_ANY,	VM_ANY,	 VM_ZERO,
-		VM_ANY,	 VM_ANY,	VM_ANY,	 VM_ZERO,
-		VM_ZERO, VM_ZERO,	VM_ZERO, VM_ONE,
+    VM_ANY, VM_ANY, VM_ANY, VM_ZERO, VM_ANY,  VM_ANY,  VM_ANY,  VM_ZERO,
+    VM_ANY, VM_ANY, VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_OrthoMask = {
-		VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,
-		VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 constexpr ValueMask g_PerspectiveMask = {
-		VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
-		VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
-		VM_ZERO, VM_ZERO, VM_MINUS_ONE,  VM_ZERO,
+    VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO,      VM_ZERO,
+    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
 constexpr ValueMask g_FrustumMask = {
-		VM_ANY,  VM_ZERO, VM_ANY, VM_ZERO,
-		VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO,
-		VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,
-	  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
+    VM_ANY,  VM_ZERO, VM_ANY, VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,       VM_ZERO,
+    VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
 constexpr ValueMask g_LookAtMask = {
-		VM_ANY,	 VM_ZERO, VM_ZERO, VM_ANY,
-	  VM_ZERO, VM_ANY,	VM_ZERO, VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ANY,	 VM_ANY,
-		VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 //===----------------------------------------------------------------------===//
 
@@ -91,10 +72,10 @@ ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 {
 	bool result = validateValues(g_ScaleMask, m_internalData[0].getMat4());
 
-	if (hasSynergies()) 
+	if (hasSynergies())
 	{
 		auto& mat = m_internalData[0].getMat4();
-		result = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
+		result    = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
 	}
 
 	return ETransformState(result);
@@ -111,13 +92,11 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& v
 {
 	if (hasSynergies())
 	{
-		if (Math::areElementsSame(vec))  // todo epsilonEQ would be probably better 
-		{
-			setInternalValue(glm::scale(vec));
-		}
+		if (Math::areElementsSame(vec)) // todo epsilonEQ would be probably better
+		{ setInternalValue(glm::scale(vec)); }
 		else
 			return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-														"Given vector does not have all three values same."};
+			                      "Given vector does not have all three values same."};
 	}
 	else
 	{
@@ -128,10 +107,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& v
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec)
-{
-	return setValue(glm::vec3(vec));
-}
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec) { return setValue(glm::vec3(vec)); }
 
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
 {
@@ -140,10 +116,8 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (hasSynergies() && coords.x == coords.y && coords.x != 3)  // not the bottom-right corner
-	{
-		setInternalValue(glm::scale(glm::vec3(val)));
-	}
+	if (hasSynergies() && coords.x == coords.y && coords.x != 3) // not the bottom-right corner
+	{ setInternalValue(glm::scale(glm::vec3(val))); }
 	else
 	{
 		setInternalValue(val, coords);
@@ -182,11 +156,11 @@ void TransformImpl<ETransformType::Scale>::onReset()
 ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 {
 	// check the basic matrix values 0, 1, -1, any
-	auto& mat   = m_internalData[0].getMat4();
-	bool result = validateValues(g_RotateXMask, mat);
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_RotateXMask, mat);
 
-	float angle			 = glm::atan(-mat[2][1], mat[2][2]);   // glm::atan executes ::std::atan2
-	auto expectedMat = glm::eulerAngleX(angle);
+	float angle       = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
+	auto  expectedMat = glm::eulerAngleX(angle);
 
 	result = result && Math::eq(expectedMat, mat);
 
@@ -220,8 +194,8 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;   // unlimited value, clamped if synergies
+	auto mat                = getData().getMat4();
+	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
@@ -232,13 +206,13 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		//												"Value must be within [-1.0, 1.0] interval."};
 		//}
 
-		const float clampedVal = glm::clamp(val, -1.0f, 1.0f);  
-		
+		const float clampedVal = glm::clamp(val, -1.0f, 1.0f);
+
 		if (coords == glm::ivec2(1, 2))
 		{
 			// -sin(T)
-			mat[1][2] =  clampedVal; // repair the setup without synergies
-			mat[2][1] = -clampedVal;
+			mat[1][2]         = clampedVal; // repair the setup without synergies
+			mat[2][1]         = -clampedVal;
 			halfspaceSign.sin = glm::sign(clampedVal);
 
 			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
@@ -250,8 +224,8 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(1, 1) || coords == glm::ivec2(2, 2))
 		{
 			// cos(T)
-			mat[1][1] = clampedVal;
-			mat[2][2] = clampedVal;
+			mat[1][1]         = clampedVal;
+			mat[2][2]         = clampedVal;
 			halfspaceSign.cos = glm::sign(clampedVal);
 
 			auto sin = sqrt(1.0f - (clampedVal * clampedVal));
@@ -263,8 +237,8 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(2, 1))
 		{
 			// sin(T)
-			mat[1][2] = -clampedVal;
-			mat[2][1] =  clampedVal;   // repair the setup without synergies
+			mat[1][2]         = -clampedVal;
+			mat[2][1]         = clampedVal; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(-clampedVal);
 
 			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
@@ -284,7 +258,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 void TransformImpl<ETransformType::EulerX>::onReset()
 {
 	m_hasSynergies = true;
-	m_isLocked = true;
+	m_isLocked     = true;
 
 	setInternalValue(glm::eulerAngleX(getDefaultValue("rotation").getFloat()));
 	notifySequence();
@@ -294,11 +268,11 @@ void TransformImpl<ETransformType::EulerX>::onReset()
 // PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
 ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 {
-	auto& mat   = m_internalData[0].getMat4();
-	bool result = validateValues(g_RotateYMask, mat);
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_RotateYMask, mat);
 
- 	float angle			 = glm::atan(mat[2][0], mat[2][2]);    // glm::atan executes ::std::atan2
-	auto expectedMat = glm::eulerAngleY(angle);
+	float angle       = glm::atan(mat[2][0], mat[2][2]); // glm::atan executes ::std::atan2
+	auto  expectedMat = glm::eulerAngleY(angle);
 
 	result = result && Math::eq(expectedMat, mat);
 
@@ -327,12 +301,10 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& 
 ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
 {
 	if (!validateValue(g_RotateYMask, coords, val))
-	{
-		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-	}
+	{ ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."}; }
 
-	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;     // unlimited value, clamped if synergies
+	auto mat                = getData().getMat4();
+	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies
 
 	if (hasSynergies())
 	{
@@ -343,13 +315,13 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		//												"Value must be within [-1.0, 1.0] interval."};
 		//}
 
-		const float clampedVal = glm::clamp(val, -1.0f, 1.0f); 
+		const float clampedVal = glm::clamp(val, -1.0f, 1.0f);
 
 		if (coords == glm::ivec2(0, 2))
 		{
 			// -sin(T)
-			mat[0][2]	=  clampedVal; // repair the setup without synergies
-			mat[2][0] = -clampedVal;
+			mat[0][2]         = clampedVal; // repair the setup without synergies
+			mat[2][0]         = -clampedVal;
 			halfspaceSign.sin = glm::sign(-clampedVal);
 
 			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
@@ -361,8 +333,8 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(2, 2))
 		{
 			// cos(T)
-			mat[0][0] = clampedVal;
-			mat[2][2] = clampedVal;
+			mat[0][0]         = clampedVal;
+			mat[2][2]         = clampedVal;
 			halfspaceSign.cos = glm::sign(clampedVal);
 
 			auto sin = sqrt(1.0f - (clampedVal * clampedVal));
@@ -374,8 +346,8 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(2, 0))
 		{
 			// sin(T)
-			mat[0][2] = -clampedVal;
-			mat[2][0]	=  clampedVal; // repair the setup without synergies
+			mat[0][2]         = -clampedVal;
+			mat[2][0]         = clampedVal; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(clampedVal);
 
 			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
@@ -396,8 +368,8 @@ void TransformImpl<ETransformType::EulerY>::onReset()
 {
 	//enableSynergies(); // if (hasSynergies) only - but EulerXYZ and Scale HAVE synergies
 	m_hasSynergies = true;
-	m_isLocked = true;
-	
+	m_isLocked     = true;
+
 	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
 	notifySequence();
 }
@@ -406,11 +378,11 @@ void TransformImpl<ETransformType::EulerY>::onReset()
 
 ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 {
-	auto& mat   = m_internalData[0].getMat4();
-	bool result = validateValues(g_RotateZMask, mat);
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_RotateZMask, mat);
 
-	float angle      = glm::atan(mat[0][1], mat[0][0]);  // glm::atan executes ::std::atan2
-	auto expectedMat = glm::eulerAngleZ(angle);
+	float angle       = glm::atan(mat[0][1], mat[0][0]); // glm::atan executes ::std::atan2
+	auto  expectedMat = glm::eulerAngleZ(angle);
 
 	result = result && Math::eq(expectedMat, mat);
 
@@ -438,14 +410,12 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& 
 ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
 {
 	if (!validateValue(g_RotateZMask, coords, val))
-	{
-		ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
-	}
+	{ ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."}; }
 
-  // PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
-  
-	auto mat = getData().getMat4();
-	mat[coords.x][coords.y] = val;    // unlimited value, clamped if synergies, works in all 4x4 coordinates
+	// PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
+
+	auto mat                = getData().getMat4();
+	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies, works in all 4x4 coordinates
 
 	if (hasSynergies())
 	{
@@ -456,13 +426,13 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		//												"Value must be within [-1.0, 1.0] interval."};
 		//}
 
-		const float clampedVal = glm::clamp(val, -1.0f, 1.0f); 
+		const float clampedVal = glm::clamp(val, -1.0f, 1.0f);
 
 		if (coords == glm::ivec2(0, 1))
 		{
 			// -sin(T)
-			mat[0][1]					= clampedVal; // repair the setup without synergies
-			mat[1][0]					= -clampedVal;
+			mat[0][1]         = clampedVal; // repair the setup without synergies
+			mat[1][0]         = -clampedVal;
 			halfspaceSign.sin = glm::sign(clampedVal);
 
 			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
@@ -474,8 +444,8 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(0, 0) || coords == glm::ivec2(1, 1))
 		{
 			// cos(T)
-			mat[0][0]					 = clampedVal;
-			mat[1][1]					 = clampedVal;
+			mat[0][0]         = clampedVal;
+			mat[1][1]         = clampedVal;
 			halfspaceSign.cos = glm::sign(clampedVal);
 
 			auto sin = sqrt(1.0f - (clampedVal * clampedVal));
@@ -487,8 +457,8 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 		else if (coords == glm::ivec2(1, 0))
 		{
 			// sin(T)
-			mat[0][1]					= -clampedVal;
-			mat[1][0]					= clampedVal; // repair the setup without synergies
+			mat[0][1]         = -clampedVal;
+			mat[1][0]         = clampedVal; // repair the setup without synergies
 			halfspaceSign.sin = glm::sign(-clampedVal);
 
 			auto cos = sqrt(1.0f - (clampedVal * clampedVal));
@@ -510,8 +480,8 @@ void TransformImpl<ETransformType::EulerZ>::onReset()
 {
 	//enableSynergies(); // if (hasSynergies) only - but EulerXYZ and Scale HAVE synergies
 	m_hasSynergies = true;
-	m_isLocked = true;
-	
+	m_isLocked     = true;
+
 	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
 	notifySequence();
 }
@@ -531,10 +501,7 @@ ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 	return ETransformState(result);
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)  
-{
-	return setValue(glm::vec3(val));
-}
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val) { return setValue(glm::vec3(val)); }
 
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 {
@@ -565,9 +532,7 @@ void TransformImpl<ETransformType::Translation>::onReset()
 {
 	m_isLocked = true;
 
-	setInternalValue(glm::translate(
-			getDefaultValue("translation").getVec3()
-	));
+	setInternalValue(glm::translate(getDefaultValue("translation").getVec3()));
 	notifySequence();
 }
 
@@ -576,37 +541,34 @@ void TransformImpl<ETransformType::Translation>::onReset()
 ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 { // \todo - test after working edit during unlock
 
-	auto& mat		 = m_internalData[0].getMat4();
-	bool	result = validateValues(g_AxisAngleMask, mat);
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_AxisAngleMask, mat);
 
 	// det = +-1
 	result = result && Math::eq(abs(glm::determinant(mat)), 1.0f); // math::eq
 
 	// axis <> vec3(0) = the rotation vector is of non-zero length
 	glm::vec3 ax = getDefaultValue("axis").getVec3();
-	result			 = result && glm::dot(ax, ax ) != 0.0f;
+	result       = result && glm::dot(ax, ax) != 0.0f;
 
 	// expected matrix
-	float angle = getDefaultValue("rotation").getFloat();
-	auto	expectedMat = glm::rotate(angle, ax);
+	float angle       = getDefaultValue("rotation").getFloat();
+	auto  expectedMat = glm::rotate(angle, ax);
 
-  result = result && Math::eq(expectedMat, mat);
+	result = result && Math::eq(expectedMat, mat);
 
 	// translation is not zero
 	return ETransformState(result);
 
 	//return ETransformState::Unknown;
 }
-	
+
 
 void TransformImpl<ETransformType::AxisAngle>::onReset()
 {
 	m_isLocked = true;
 
-	setInternalValue(glm::rotate(
-			getDefaultValue("rotation").getFloat(),
-			getDefaultValue("axis").getVec3()
-	));
+	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), getDefaultValue("axis").getVec3()));
 	notifySequence();
 }
 
@@ -629,18 +591,17 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 {
 	// any linear transformation (3x3) may be a rotation
-	auto& mat		 = m_internalData[0].getMat4();
-	bool	result = validateValues(g_AxisAngleMask, mat);  
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_AxisAngleMask, mat);
 
 	// Check, if the quaternion is of unit length?
 	glm::quat quaternion = getDefaultValue("quat").getQuat();
-	result			 = result && glm::dot(quaternion, quaternion) == 1.0f; 
+	result               = result && glm::dot(quaternion, quaternion) == 1.0f;
 
 	// \todo check the angle too
 
 	return ETransformState(result);
 	//return ETransformState::Unknown;
-	
 }
 
 void TransformImpl<ETransformType::Quat>::onReset()
@@ -652,15 +613,12 @@ void TransformImpl<ETransformType::Quat>::onReset()
 	notifySequence();
 }
 
-const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const
-{
-	return m_normalized;
-};
+const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const { return m_normalized; };
 
 ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 {
 	m_initialQuat = q;
-	m_normalized = glm::normalize(q);
+	m_normalized  = glm::normalize(q);
 	setInternalValue(glm::toMat4(m_normalized));
 
 	return ValueSetResult{};
@@ -676,48 +634,41 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& ve
 
 ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 {
-	auto& mat		 = m_internalData[0].getMat4();
-	bool	result = validateValues(g_OrthoMask, mat);
-	
-	float left	 = getDefaultValue("left").getFloat();
-	float right	 = getDefaultValue("right").getFloat();
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_OrthoMask, mat);
+
+	float left   = getDefaultValue("left").getFloat();
+	float right  = getDefaultValue("right").getFloat();
 	float bottom = getDefaultValue("bottom").getFloat();
-	float top		 = getDefaultValue("top").getFloat();
-	float near	 = getDefaultValue("near").getFloat();
-	float far		 = getDefaultValue("far").getFloat();
+	float top    = getDefaultValue("top").getFloat();
+	float near   = getDefaultValue("near").getFloat();
+	float far    = getDefaultValue("far").getFloat();
 
 	// simple check of the frustum borders
 	result = result && (left < right) && (bottom < top) && (near < far);
 
 	// expected matrix
 	auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
-	result					 = result && Math::eq(expectedMat, mat);
+	result           = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
 }
 
 void TransformImpl<ETransformType::Ortho>::onReset()
 {
-	m_isLocked = true; 
+	m_isLocked = true;
 	//m_hasSynergies = true;  // symmetrical frustum
 
-	setInternalValue(glm::ortho(
-			getDefaultValue("left").getFloat(),
-			getDefaultValue("right").getFloat(),
-			getDefaultValue("bottom").getFloat(),
-			getDefaultValue("top").getFloat(),
-			getDefaultValue("near").getFloat(),
-			getDefaultValue("far").getFloat()
-	));
+	setInternalValue(glm::ortho(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
+	                            getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
+	                            getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
 	notifySequence();
 }
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
 {
 	if (!validateValue(g_OrthoMask, coords, val))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."};
-	}
+	{ return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."}; }
 	setInternalValue(val, coords);
 	notifySequence();
 
@@ -728,13 +679,13 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 
 ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 {
-	auto& mat		 = m_internalData[0].getMat4();
-	bool	result = validateValues(g_PerspectiveMask, mat); //checks -1 in the last row too
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_PerspectiveMask, mat); //checks -1 in the last row too
 
-	float fov		 = getDefaultValue("fov").getFloat();
+	float fov    = getDefaultValue("fov").getFloat();
 	float aspect = getDefaultValue("aspect").getFloat();
-	float near	 = getDefaultValue("zNear").getFloat();
-	float far		 = getDefaultValue("zFar").getFloat();
+	float near   = getDefaultValue("zNear").getFloat();
+	float far    = getDefaultValue("zFar").getFloat();
 
 	result = result && (near != 0.0f);
 	result = result && (far > near);
@@ -743,31 +694,25 @@ ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 
 	// expected matrix
 	auto expectedMat = glm::perspective(fov, aspect, near, far);
-	result					 = result && Math::eq(expectedMat, mat);
+	result           = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
 }
 
 void TransformImpl<ETransformType::Perspective>::onReset()
 {
-	m_isLocked = true;
+	m_isLocked     = true;
 	m_hasSynergies = true; // symmetrical frustum
 
-	setInternalValue(glm::perspective(
-			getDefaultValue("fov").getFloat(),
-			getDefaultValue("aspect").getFloat(),
-			getDefaultValue("zNear").getFloat(),
-			getDefaultValue("zFar").getFloat()
-	));
+	setInternalValue(glm::perspective(getDefaultValue("fov").getFloat(), getDefaultValue("aspect").getFloat(),
+	                                  getDefaultValue("zNear").getFloat(), getDefaultValue("zFar").getFloat()));
 	notifySequence();
 }
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
 {
 	if (!validateValue(g_PerspectiveMask, coords, val))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
-	}
+	{ return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
 	setInternalValue(val, coords);
 	notifySequence();
 
@@ -778,15 +723,15 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 
 ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 {
-	auto& mat		 = m_internalData[0].getMat4();
-	bool	result = validateValues(g_FrustumMask, mat);  //checks -1 in the last row too
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_FrustumMask, mat); //checks -1 in the last row too
 
 	float left   = getDefaultValue("left").getFloat();
 	float right  = getDefaultValue("right").getFloat();
 	float bottom = getDefaultValue("bottom").getFloat();
-	float top		 = getDefaultValue("top").getFloat();
-	float near	 = getDefaultValue("near").getFloat();
-	float far		 = getDefaultValue("far").getFloat();
+	float top    = getDefaultValue("top").getFloat();
+	float near   = getDefaultValue("near").getFloat();
+	float far    = getDefaultValue("far").getFloat();
 
 	// simple check of the frustum borders
 	result = result && (left < right) && (bottom < top) && (near < far);
@@ -794,33 +739,26 @@ ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 
 	// expected matrix
 	auto expectedMat = glm::frustum(left, right, bottom, top, near, far);
-	result					 = result && Math::eq(expectedMat, mat);
+	result           = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
 }
 
 void TransformImpl<ETransformType::Frustum>::onReset()
 {
-	m_isLocked						= true;
+	m_isLocked     = true;
 	m_hasSynergies = true; // symmetrical frustum
 
-	setInternalValue(glm::frustum(
-			getDefaultValue("left").getFloat(),
-			getDefaultValue("right").getFloat(),
-			getDefaultValue("bottom").getFloat(),
-			getDefaultValue("top").getFloat(),
-			getDefaultValue("near").getFloat(),
-			getDefaultValue("far").getFloat()
-	));
+	setInternalValue(glm::frustum(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
+	                              getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
+	                              getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
 	notifySequence();
 }
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 {
 	if (!validateValue(g_FrustumMask, coords, val))
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
-	}
+	{ return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
 	setInternalValue(val, coords);
 	notifySequence();
 
@@ -831,60 +769,51 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 
 ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 {
-	auto& mat		 = m_internalData[0].getMat4();
-	bool	result = validateValues(g_LookAtMask, mat); //checks -1 in the last row too
+	auto& mat    = m_internalData[0].getMat4();
+	bool  result = validateValues(g_LookAtMask, mat); //checks -1 in the last row too
 
 	// check, if center is different than eye, up-vector is not zero,
 	// and up is not collinear with camera direction center - eye
 
-	glm::vec3 eye		 = getDefaultValue("eye").getVec3();
+	glm::vec3 eye    = getDefaultValue("eye").getVec3();
 	glm::vec3 center = getDefaultValue("center").getVec3();
-	glm::vec3 up		 = getDefaultValue("up").getVec3();
+	glm::vec3 up     = getDefaultValue("up").getVec3();
 
-		// expected matrix
+	// expected matrix
 	auto expectedMat = glm::lookAt(eye, center, up);
-	result					 = result && Math::eq(expectedMat, mat);
+	result           = result && Math::eq(expectedMat, mat);
 
-  // definition parameters
-	glm::vec3 direction			= center - eye;
-	float			directionSize = glm::dot(direction, direction);
-	float			upSize				= glm::dot(up, up);
-	if ( (directionSize == 0.0f) || (upSize == 0.0f))
-	{
-		result = false;
-	}
+	// definition parameters
+	glm::vec3 direction     = center - eye;
+	float     directionSize = glm::dot(direction, direction);
+	float     upSize        = glm::dot(up, up);
+	if ((directionSize == 0.0f) || (upSize == 0.0f)) { result = false; }
 	else
 	{
-		direction /= glm::sqrt(directionSize);  //normalize
-		up		    /= glm::sqrt(upSize);
-		result = result && (glm::dot(direction, up) != 1.0f);  // not parallel
+		direction /= glm::sqrt(directionSize); //normalize
+		up /= glm::sqrt(upSize);
+		result = result && (glm::dot(direction, up) != 1.0f); // not parallel
 	}
-	
+
 	return ETransformState(result);
 }
 
 void TransformImpl<ETransformType::LookAt>::onReset()
 {
-	m_isLocked						= true;
+	m_isLocked = true;
 	//m_hasSynergies = true; // no meaning now
 
-	setInternalValue(glm::lookAt(
-			getDefaultValue("eye").getVec3(),
-			getDefaultValue("center").getVec3(),
-			getDefaultValue("up").getVec3()
-	));
+	setInternalValue(glm::lookAt(getDefaultValue("eye").getVec3(), getDefaultValue("center").getVec3(),
+	                             getDefaultValue("up").getVec3()));
 	notifySequence();
 }
 
 ValueSetResult TransformImpl<ETransformType::LookAt>::setValue(float val, glm::ivec2 coords)
 {
-	if (isLocked())
-	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
-	}
+	if (isLocked()) { return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
 	setInternalValue(val, coords);
 	notifySequence();
 
 	return ValueSetResult{};
 }
-}
+} // namespace Core

@@ -49,10 +49,10 @@ IMGUI_IMPL_API void ImGui_ImplOpenGL3_DestroyDeviceObjects();
 // you are likely to get a crash in ImGui_ImplOpenGL3_Init().
 // You can explicitly select a loader by using one of the '#define IMGUI_IMPL_OPENGL_LOADER_XXX' in imconfig.h or
 // compiler command-line.
-#if !defined(IMGUI_IMPL_OPENGL_ES2) && !defined(IMGUI_IMPL_OPENGL_ES3) && !defined(IMGUI_IMPL_OPENGL_LOADER_GL3W) && \
-		!defined(IMGUI_IMPL_OPENGL_LOADER_GLEW) && !defined(IMGUI_IMPL_OPENGL_LOADER_GLAD) &&                            \
-		!defined(IMGUI_IMPL_OPENGL_LOADER_GLAD2) && !defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING2) &&                     \
-		!defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING3) && !defined(IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
+#if !defined(IMGUI_IMPL_OPENGL_ES2) && !defined(IMGUI_IMPL_OPENGL_ES3) && !defined(IMGUI_IMPL_OPENGL_LOADER_GL3W) &&   \
+    !defined(IMGUI_IMPL_OPENGL_LOADER_GLEW) && !defined(IMGUI_IMPL_OPENGL_LOADER_GLAD) &&                              \
+    !defined(IMGUI_IMPL_OPENGL_LOADER_GLAD2) && !defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING2) &&                       \
+    !defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING3) && !defined(IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
 
 // Try to detect GLES on matching platforms
 #if defined(__APPLE__)

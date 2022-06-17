@@ -14,9 +14,9 @@ void showDimensions();
 class StyleEditor : public IWindow
 {
 public:
-I3T_WINDOW(StyleEditor)
+	I3T_WINDOW(StyleEditor)
 
-	StyleEditor() = default;
+	StyleEditor()           = default;
 	~StyleEditor() override = default;
 
 	void render() override;
@@ -24,4 +24,4 @@ I3T_WINDOW(StyleEditor)
 private:
 	void renderSaveRevertField();
 };
-}
+} // namespace UI

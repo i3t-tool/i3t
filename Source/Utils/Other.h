@@ -19,7 +19,7 @@ inline bool contains(const std::string& str, const std::string& substr)
 	}
 	return false;
 }
-}
+} // namespace String
 
 namespace Utils
 {
@@ -27,13 +27,10 @@ template <typename A, typename Predicate>
 inline int indexOf(A&& array, Predicate p)
 {
 	auto it = std::find_if(array.begin(), array.end(), p);
-	if (it != array.end())
-	{
-		return std::distance(array.begin(), it);
-	}
+	if (it != array.end()) { return std::distance(array.begin(), it); }
 	return -1;
 }
-}
+} // namespace Utils
 
 
 /**
@@ -43,22 +40,23 @@ inline int indexOf(A&& array, Predicate p)
  * \param e enum instance
  * \return enum underlying type.
  */
-template <typename E> constexpr auto toUnderlying(E e) noexcept
+template <typename E>
+constexpr auto toUnderlying(E e) noexcept
 {
 	return static_cast<std::underlying_type_t<E>>(e);
 }
 
 struct COutRedirect
 {
-  COutRedirect() { m_default = std::cout.rdbuf(m_buffer.rdbuf()); }
+	COutRedirect() { m_default = std::cout.rdbuf(m_buffer.rdbuf()); }
 
-  ~COutRedirect() { std::cout.rdbuf(m_default); }
+	~COutRedirect() { std::cout.rdbuf(m_default); }
 
-  std::stringstream& GetBuffer() { return m_buffer; }
+	std::stringstream& GetBuffer() { return m_buffer; }
 
-  std::string GetStr() { return m_buffer.str(); }
+	std::string GetStr() { return m_buffer.str(); }
 
 private:
-  std::stringstream m_buffer;
-  std::streambuf* m_default;
+	std::stringstream m_buffer;
+	std::streambuf*   m_default;
 };

@@ -52,10 +52,7 @@ void SetupDialog::render()
 		  TabSpace::setToDegrees();
 		  */
 
-		if (ImGui::Button("OK"))
-		{
-			HideWindowCommand::dispatch(ID);
-		}
+		if (ImGui::Button("OK")) { HideWindowCommand::dispatch(ID); }
 	}
 	ImGui::End();
 

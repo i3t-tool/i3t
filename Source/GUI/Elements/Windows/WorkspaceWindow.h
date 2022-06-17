@@ -65,51 +65,51 @@ public:
 	bool afterEnd();
 
 	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
-	void								 setWorkspaceDiwneAction(WorkspaceDiwneAction wda) { m_workspaceDiwneAction = wda; }
+	void                 setWorkspaceDiwneAction(WorkspaceDiwneAction wda) { m_workspaceDiwneAction = wda; }
 	WorkspaceDiwneAction getWorkspaceDiwneAction() { return m_workspaceDiwneAction; }
 	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame() { return m_workspaceDiwneActionPreviousFrame; }
 	WorkspaceDiwneAction getWorkspaceDiwneActionActive() const
 	{
 		return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame
-																																: m_workspaceDiwneAction;
+		                                                            : m_workspaceDiwneAction;
 	}
 
 	/** * \brief All WorkspaceNodes
 				* \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
 	 **/
-	std::vector<Ptr<WorkspaceNodeWithCoreData>>				 m_workspaceCoreNodes;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>>        m_workspaceCoreNodes;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getAllNodes() { return m_workspaceCoreNodes; };
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
 	std::vector<WorkspaceCoreLink*> m_linksToDraw;
-	std::vector<WorkspaceCoreLink>	m_linksCameraToSequence;
+	std::vector<WorkspaceCoreLink>  m_linksCameraToSequence;
 
 	bool processCreateAndPlugTypeConstructor();
 
 	template <typename T>
 	void addTypeConstructorNode()
 	{
-		WorkspaceCoreInputPin* pin = getLastActivePin<WorkspaceCoreInputPin>().get();
-		auto newNode = addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
+		WorkspaceCoreInputPin* pin     = getLastActivePin<WorkspaceCoreInputPin>().get();
+		auto                   newNode = addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
 		pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(newNode)
-									->getOutputs()
-									.at(0)
-									.get()); /* \todo JH always 0 with type constructor? */
+		              ->getOutputs()
+		              .at(0)
+		              .get()); /* \todo JH always 0 with type constructor? */
 	}
 
 	template <class T>
-	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth=false)
+	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
 	{
 		auto node = std::make_shared<T>(*this);
 
 		node->setNodePositionDiwne(position);
 
-		if(shiftToLeftByNodeWidth)
-        {
-            node->drawDiwne(); /* for obtain size */
-            node->translateNodePositionDiwne(ImVec2(-node->getNodeRectSizeDiwne().x-10, 0)); /* \todo JH space to Theme */
-        }
+		if (shiftToLeftByNodeWidth)
+		{
+			node->drawDiwne();                                                                 /* for obtain size */
+			node->translateNodePositionDiwne(ImVec2(-node->getNodeRectSizeDiwne().x - 10, 0)); /* \todo JH space to Theme */
+		}
 
 		m_workspaceCoreNodes.push_back(node);
 
@@ -137,12 +137,12 @@ public:
 
 	void processDragAllSelectedNodes();
 
-	void	 selectAll();
-	void	 invertSelection();
-	void	 zoomToAll();
-	void	 zoomToSelected();
+	void   selectAll();
+	void   invertSelection();
+	void   zoomToAll();
+	void   zoomToSelected();
 	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
-	void	 zoomToRectangle(ImRect const& rect);
+	void   zoomToRectangle(ImRect const& rect);
 
 	void trackingLeft();
 	void trackingRight();
@@ -169,14 +169,14 @@ public:
 
 	bool processZoom() override;
 
-	bool	 bypassSelectionRectangleAction() override;
+	bool   bypassSelectionRectangleAction() override;
 	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
 	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 
 	bool m_resizeDataWidth;
 	bool m_reconnectCameraToSequence;
 
-	bool										 m_trackingIsOn, m_trackingFromLeft;
+	bool                     m_trackingIsOn, m_trackingFromLeft;
 	WorkspaceTransformation* m_trackingFirstTransformation;
 };
 
@@ -198,7 +198,7 @@ public:
 	void render();
 
 	bool Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1, float min_size2,
-								float splitter_long_axis_size = -1.0f);
+	              float splitter_long_axis_size = -1.0f);
 
 	void ShowLeftPane(float paneWidth);
 

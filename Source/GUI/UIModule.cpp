@@ -28,16 +28,15 @@ UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
-	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) {
-		InputManager::setActiveInput(&(window->getInput()));
-	});
+	SetFocusedWindowCommand::addListener(
+	    [](Ptr<IWindow> window) { InputManager::setActiveInput(&(window->getInput())); });
 
 	Theme::initNames();
 
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
-//	m_dockableWindows.push_back(std::make_shared<StartWindow>(true));
+	//	m_dockableWindows.push_back(std::make_shared<StartWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Viewport>(true, App::get().world()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Console>(false));
@@ -53,8 +52,8 @@ void UIModule::init()
 	ImGuiIO& io = ImGui::GetIO();
 	(void) io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;		// Enable Multi-Viewport / Platform Windows
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Setup Dear ImGui style
@@ -65,12 +64,12 @@ void UIModule::init()
 	ImGuiStyle& style = ImGui::GetStyle();
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
-		style.WindowRounding							= 0.0f;
+		style.WindowRounding              = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f; // disable alpha
 	}
 
 	// Allocate path to the imgui ini file on heap.
-	auto* path		 = new std::string(Config::getAbsolutePath("Data/imgui.ini"));
+	auto* path     = new std::string(Config::getAbsolutePath("Data/imgui.ini"));
 	io.IniFilename = path->c_str();
 
 	loadFonts();
@@ -200,50 +199,50 @@ void UIModule::loadFonts()
 	float fontScale = 1.2f;
 
 	const ImWchar ranges[] = {
-			0x0020, 0x00FF, // Basic Latin + Latin Supplement
-			0x0080, 0x07FF, // Czech
-			0x25FC, 0x2BC8, //media buttons
-			0,
+	    0x0020, 0x00FF, // Basic Latin + Latin Supplement
+	    0x0080, 0x07FF, // Czech
+	    0x25FC, 0x2BC8, //media buttons
+	    0,
 	};
 
 	ImFontConfig fontCfg;
 	fontCfg.GlyphExtraSpacing.x =
-			-0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirku
+	    -0.5f; // Font v navrhu ma mensi mezery mezi pismeny - bez toho nevychazi na spravnou sirku
 
 	m_fonts = {
-			// 0
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale,
-																	 nullptr, ranges),
-			// 1
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale,
-																	 nullptr, ranges),
-			// 2
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale,
-																	 nullptr, ranges),
-			// 3
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale,
-																	 nullptr, ranges),
-			// 4
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 16.0f * fontScale,
-																	 nullptr, ranges),
-			// 5
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale,
-																	 nullptr, ranges),
-			// 6
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale,
-																	 nullptr, ranges),
-			// 7
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale,
-																	 &fontCfg, ranges),
-			// 8
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale,
-																	 nullptr, ranges),
-			// 9
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 16.0f * fontScale,
-																	 nullptr, ranges),
-			// 10
-			io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Italic.ttf").c_str(), 16.0f * fontScale,
-																	 nullptr, ranges),
+	    // 0
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 14.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 1
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 12.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 2
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 12.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 3
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 24.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 4
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 16.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 5
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Bold.ttf").c_str(), 20.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 6
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 18.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 7
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Ubuntu-Bold.ttf").c_str(), 33.5f * fontScale,
+	                                 &fontCfg, ranges),
+	    // 8
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 17.5f * fontScale,
+	                                 nullptr, ranges),
+	    // 9
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Regular.ttf").c_str(), 16.0f * fontScale,
+	                                 nullptr, ranges),
+	    // 10
+	    io.Fonts->AddFontFromFileTTF(Config::getAbsolutePath("Data/fonts/Roboto-Italic.ttf").c_str(), 16.0f * fontScale,
+	                                 nullptr, ranges),
 	};
 	// io.FontDefault = I3T::getFont(EFont::MenuLarge);
 	io.Fonts->Build();
@@ -252,9 +251,9 @@ void UIModule::loadFonts()
 void UIModule::buildDockspace()
 {
 	// create dockspace -----------------------------
-	static bool								opt_fullscreen_persistant = true;
-	bool											opt_fullscreen						= opt_fullscreen_persistant;
-	static ImGuiDockNodeFlags dockspace_flags						= ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_NoWindowMenuButton;
+	static bool               opt_fullscreen_persistant = true;
+	bool                      opt_fullscreen            = opt_fullscreen_persistant;
+	static ImGuiDockNodeFlags dockspace_flags           = ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_NoWindowMenuButton;
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
@@ -268,7 +267,7 @@ void UIModule::buildDockspace()
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		window_flags |=
-				ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
 
@@ -308,14 +307,8 @@ void UIModule::queryCameraState()
 	if (!InputManager::isInputActive(getWindowPtr<UI::Viewport>()->getInputPtr())) return;
 
 	// ORBIT camera rotation
-	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
-	{
-		InputManager::beginCameraControl();
-	}
-	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
-	{
-		InputManager::endCameraControl();
-	}
+	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed)) { InputManager::beginCameraControl(); }
+	if (InputManager::isActionTriggered("rotate", EKeyState::Released)) { InputManager::endCameraControl(); }
 
 	// CAMERA PANNING - set a new orbit center
 	if (InputManager::isActionTriggered("pan", EKeyState::Pressed)) { InputManager::beginCameraControl(); }
@@ -353,18 +346,18 @@ std::string makeIDNice(const char* ID)
 void UIModule::setFocusedWindow()
 {
 	// Get window ids.
-	ImGuiContext& g								= *GImGui;
-	ImGuiIO&			io							= g.IO;
-	const char*		hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
-	const char*		activeWindowID	= g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
-	const char*		navWindowID			= g.NavWindow ? g.NavWindow->Name : "";
+	ImGuiContext& g               = *GImGui;
+	ImGuiIO&      io              = g.IO;
+	const char*   hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
+	const char*   activeWindowID  = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
+	const char*   navWindowID     = g.NavWindow ? g.NavWindow->Name : "";
 
 	// Check for hovered window.
 	if (strlen(hoveredWindowID) != 0)
 	{
-		auto activeID	 = makeIDNice(activeWindowID);
+		auto activeID  = makeIDNice(activeWindowID);
 		auto hoveredID = makeIDNice(hoveredWindowID);
-		auto navID		 = makeIDNice(navWindowID);
+		auto navID     = makeIDNice(navWindowID);
 
 		auto window = findWindow(hoveredID.c_str(), m_dockableWindows);
 
@@ -376,9 +369,7 @@ void UIModule::setFocusedWindow()
 
 			// Check if window can be focused (no menu is active).
 			if (String::contains(navID, "Menu_") || String::contains(navID, "Popup_") || String::contains(navID, "Combo_"))
-			{
-				shouldSetFocus = false;
-			}
+			{ shouldSetFocus = false; }
 			if (!activeID.empty() && activeID != hoveredID)
 			{
 				shouldSetFocus = false;

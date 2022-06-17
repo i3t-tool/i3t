@@ -5,10 +5,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Application.h"
 
-DescriptionDialog::DescriptionDialog()
-{
-	m_isEditState = false;
-}
+DescriptionDialog::DescriptionDialog() { m_isEditState = false; }
 
 void DescriptionDialog::render()
 {
@@ -44,10 +41,7 @@ void DescriptionDialog::render()
 	if (!m_isEditState)
 	{
 		ImGui::SameLine();
-		if (ImGui::Button("Edit"))
-		{
-			m_isEditState = true;
-		}
+		if (ImGui::Button("Edit")) { m_isEditState = true; }
 	}
 
 	ImGui::End();

@@ -53,10 +53,7 @@ void AboutDialog::render()
 
 		// ImGui::BeginHorizontal("AboutFooter", ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
 		ImGui::Text(Config::VERSION.c_str());
-		if (ImGui::Button("OK", ImVec2{100.0f, 0.0f}))
-		{
-			HideWindowCommand::dispatch(ID);
-		}
+		if (ImGui::Button("OK", ImVec2{100.0f, 0.0f})) { HideWindowCommand::dispatch(ID); }
 		// ImGui::EndHorizontal();
 	}
 	ImGui::End();

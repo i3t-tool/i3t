@@ -37,7 +37,7 @@ struct Config
 	static std::string WEB_LINK;        ///< The web link to the thesis page
 	static std::string OFFICIAL_SITE;   ///< The official site
 	static std::string INFO_TEXT;       ///< The information text \todo Add year and note of the continual development.
-	static glm::vec3 LINK_COLOR;
+	static glm::vec3   LINK_COLOR;
 	///< The url link (mailTo: and http:) color used in aboutForm.h \todo Move to the config structure
 	static std::string DEF_DESC;
 	///< Information describing the definition - initial state of the scene description \todo Update to contain all key
@@ -47,8 +47,8 @@ struct Config
 	static bool SHOW_CONSOLE; ///< True to show, false to hide the console
 	static bool FULLSCREEN;   ///< True to fullscreen
 
-	static int WIN_WIDTH;         ///< Width of the window - this is not a constant - set on onReshape in main.cpp
-	static int WIN_HEIGHT;        ///< Height of the window - this is not a constant - set on onReshape in main.cpp
+	static int WIN_WIDTH;  ///< Width of the window - this is not a constant - set on onReshape in main.cpp
+	static int WIN_HEIGHT; ///< Height of the window - this is not a constant - set on onReshape in main.cpp
 
 	static int REFRESHTIME; ///< The refreshtime
 
@@ -63,14 +63,14 @@ struct Config
 	static float CAM_ROLL_SENSITIVITY;     ///< The camera roll sensitivity
 	static float CAM_LERP_DISTTOSTEP_KOEF; ///< The camera linearly interpolate disttostep koef
 
-  // content
-  static std::string CONTENT_FILE;
-  ///< The content file, such as \\data\\content.cnt, enumerating the \\data\\*.cfg files (textures, materials (Phong
-  ///< parameters + textures),  geometries (models), and objects (combines names, geometries and textures to groups of
-  ///< named objects))
-  static std::string LOAD_SCENE; ///< The load scene
-  static std::string TUTORIALS_FOLDER;
-  static std::string TEXTURE_FOLDER;
+	// content
+	static std::string CONTENT_FILE;
+	///< The content file, such as \\data\\content.cnt, enumerating the \\data\\*.cfg files (textures, materials (Phong
+	///< parameters + textures),  geometries (models), and objects (combines names, geometries and textures to groups of
+	///< named objects))
+	static std::string LOAD_SCENE; ///< The load scene
+	static std::string TUTORIALS_FOLDER;
+	static std::string TEXTURE_FOLDER;
 
 	static std::string DEFAULT_THEME;
 
@@ -238,27 +238,21 @@ struct Config
 		//Defined in compiler, still doesnt exist
 //#define I3T_RELEASE_STANDALONE
 #ifdef I3T_RELEASE_STANDALONE
-    std::string path = std::string(filename);
+		std::string path = std::string(filename);
 #else
 		// For debug purposes only.
 		//printf("wd %s\n",WORKING_DIRECTORY.c_str());
 		std::string path = WORKING_DIRECTORY;
-		if (filename[0]!='/') { path.append("/"); }
+		if (filename[0] != '/') { path.append("/"); }
 		path.append(filename);
 #endif
 
-    return path;
-  }
-
-	static std::string getAbsolutePath(const std::string& filename)
-	{
-		return getAbsolutePath(filename.c_str());
+		return path;
 	}
 
-	static std::string getAbsolutePath(fs::path filename)
-	{
-		return getAbsolutePath(filename.string());
-	}
+	static std::string getAbsolutePath(const std::string& filename) { return getAbsolutePath(filename.c_str()); }
+
+	static std::string getAbsolutePath(fs::path filename) { return getAbsolutePath(filename.string()); }
 
 
 	/**
@@ -271,10 +265,9 @@ struct Config
 	 */
 	static bool getRelativePath(std::string absPath, std::string& result)
 	{
-		auto pos = (unsigned)absPath.find(WORKING_DIRECTORY);
+		auto pos = (unsigned) absPath.find(WORKING_DIRECTORY);
 
-		if (pos != 0)
-			return false;
+		if (pos != 0) return false;
 
 		result = absPath.substr(WORKING_DIRECTORY.size(), absPath.size());
 
@@ -292,8 +285,7 @@ struct Config
 	{
 		size_t l = filename.find_last_of('/');
 
-		if (l == std::string::npos)
-			return filename;
+		if (l == std::string::npos) return filename;
 		return filename.substr(l + 1, filename.size());
 	}
 
@@ -308,8 +300,7 @@ struct Config
 	{
 		size_t l = filename.find_last_of(".");
 
-		if (l == std::string::npos)
-			return filename;
+		if (l == std::string::npos) return filename;
 		return filename.substr(l + 1, filename.size());
 	}
 
@@ -322,8 +313,7 @@ struct Config
 	 */
 	static bool isPathRelative(std::string path)
 	{
-		if (path.size() == 0)
-			return false;
+		if (path.size() == 0) return false;
 		return (path[0] == '/');
 	}
 

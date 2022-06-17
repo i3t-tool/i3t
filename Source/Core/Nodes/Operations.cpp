@@ -9,4 +9,4 @@ const TransformOperation& getTransformProps(const Operation* op)
 
 	return getTransformOperation(transformTypeResult.value());
 }
-}
+} // namespace Core

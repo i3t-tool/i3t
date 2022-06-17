@@ -30,4 +30,4 @@ std::vector<std::string> concat(const std::map<std::string, DataStore>& map, con
 	}
 	return vec;
 }
-}
+} // namespace Utils

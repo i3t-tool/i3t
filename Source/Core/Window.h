@@ -25,9 +25,9 @@ public:
 	void init();
 
 	const std::string& getTitle();
-	void setTitle(const char* title);
+	void               setTitle(const char* title);
 
-	void swapBuffers();
+	void        swapBuffers();
 	GLFWwindow* get();
 
 private:

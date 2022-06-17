@@ -11,16 +11,16 @@ namespace Core
 {
 using Matrices = std::vector<Ptr<Transformation>>;
 
-constexpr size_t I3T_SEQ_IN_MUL = 0;  // owned by multiplier
-constexpr size_t I3T_SEQ_IN_MAT = 1;  // owned by storage
+constexpr size_t I3T_SEQ_IN_MUL = 0; // owned by multiplier
+constexpr size_t I3T_SEQ_IN_MAT = 1; // owned by storage
 
-constexpr size_t I3T_SEQ_OUT_MUL = 0;  // owned by multiplier
-constexpr size_t I3T_SEQ_OUT_MAT = 1;  // owned by storage
-constexpr size_t I3T_SEQ_OUT_MOD = 2;  // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MUL = 0; // owned by multiplier
+constexpr size_t I3T_SEQ_OUT_MAT = 1; // owned by storage
+constexpr size_t I3T_SEQ_OUT_MOD = 2; // owned by multiplier
 
 constexpr size_t I3T_SEQ_MUL = 0;
-constexpr size_t I3T_SEQ_MAT = 1;  // local transform
-constexpr size_t I3T_SEQ_MOD = 2;  // world transform
+constexpr size_t I3T_SEQ_MAT = 1; // local transform
+constexpr size_t I3T_SEQ_MOD = 2; // world transform
 
 class Sequence;
 
@@ -66,14 +66,14 @@ class Sequence : public Node
 			return nullptr;
 		}
 
-		Pin& getIn(size_t i) override;
-		Pin& getOut(size_t i) override;
+		Pin&       getIn(size_t i) override;
+		Pin&       getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
 
-		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
-		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+		ValueSetResult      addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
+		ValueSetResult      addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 		Ptr<Transformation> popMatrix(const int index);
-		void swap(int from, int to);
+		void                swap(int from, int to);
 
 		/**
 		 * Updates local transform.
@@ -98,8 +98,8 @@ class Sequence : public Node
 			return nullptr;
 		}
 
-		Pin& getIn(size_t i) override;
-		Pin& getOut(size_t i) override;
+		Pin&       getIn(size_t i) override;
+		Pin&       getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
 
 		/**
@@ -168,16 +168,14 @@ private:
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
 {
-	if (node == nullptr)
-		return nullptr;
+	if (node == nullptr) return nullptr;
 	return node->as<Sequence>();
 }
 
 FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
 {
 	glm::mat4 result(1.0f);
-	for (const auto& mat : matrices)
-		result *= mat->getData().getMat4();
+	for (const auto& mat : matrices) result *= mat->getData().getMat4();
 	return result;
 }
 
@@ -185,7 +183,7 @@ using SequencePtr = Ptr<Sequence>;
 
 FORCE_INLINE bool isSequence(const NodePtr& p)
 {
-	auto* op = p->getOperation();
+	auto* op       = p->getOperation();
 	auto* expected = &g_sequence;
 	return p->getOperation() == &g_sequence;
 }

@@ -28,7 +28,7 @@ enum class ENodePlugResult
 	Ok = 0,
 	Err_MismatchedPinTypes,
 	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
-	Err_Loopback,					 /// Same nodes.
+	Err_Loopback,          /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
 	Err_DisabledPin
@@ -43,7 +43,7 @@ struct ValueSetResult
 		Err_LogicError
 	};
 
-	Status			status;
+	Status      status;
 	std::string message;
 
 	ValueSetResult() : status(Status::Ok), message("") {}
@@ -103,18 +103,18 @@ public:
 		size_t size() const;
 		bool   empty() const;
 
-		PinView& operator++();
+		PinView&   operator++();
 		const Pin& operator*();
-		bool operator==(const PinView& view) const;
-		bool operator!=(const PinView& view) const;
+		bool       operator==(const PinView& view) const;
+		bool       operator!=(const PinView& view) const;
 
-		Pin& operator[](size_t i);
+		Pin&       operator[](size_t i);
 		const Pin& operator[](size_t i) const;
 
 	private:
 		EStrategy strategy;
 		Ptr<Node> node;
-		int index;
+		int       index;
 	};
 
 	//===-- Lifecycle functions -----------------------------------------------===//
@@ -197,11 +197,11 @@ public:
 	/// \deprecated Will be removed
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
-	[[nodiscard]] PinView getInputPins()  { return PinView(PinView::EStrategy::Input, shared_from_this()); }
+	[[nodiscard]] PinView getInputPins() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
 	[[nodiscard]] PinView getOutputPins() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 protected:
-	[[nodiscard]] PinView getInputPinsRef()  { return PinView(PinView::EStrategy::Input, shared_from_this()); }
+	[[nodiscard]] PinView getInputPinsRef() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
 	[[nodiscard]] PinView getOutputPinsRef() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 	//===-- Obtaining value functions. ----------------------------------------===//
@@ -249,10 +249,10 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val)            { return setValueEx(val); }
+	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q)   { return setValueEx(q); }
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q) { return setValueEx(q); }
 	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
 
 	/**
@@ -308,7 +308,7 @@ protected:
 
 		/// \todo MH
 		// if (m_owner)
-			// m_owner->updateValues(-1);
+		// m_owner->updateValues(-1);
 	}
 
 	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
@@ -382,10 +382,7 @@ public:
 	{
 		std::string masterSig;
 
-		if (m_owner)
-		{
-			masterSig = " of (" + m_owner->getSig() + ")";
-		}
+		if (m_owner) { masterSig = " of (" + m_owner->getSig() + ")"; }
 
 		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
 	};
@@ -423,7 +420,7 @@ protected:
 	Ptr<Node> m_owner = nullptr;
 };
 
-using NodePtr  = Ptr<Node>;
+using NodePtr = Ptr<Node>;
 
 /// \warning Will be removed, use Node type instead.
 using NodeBase = Node;

@@ -35,8 +35,8 @@ enum class EColor
 
 	TutorialBgColor,
 
-    SelectionRectFull,
-    SelectionRectTouch,
+	SelectionRectFull,
+	SelectionRectTouch,
 
 
 	// 2. Pins
@@ -168,26 +168,23 @@ enum class ESizeVec2
 	Builder_ItemSpacing,
 };
 
-constexpr inline EColor asColor(EValueType type)
-{
-	return EColor(type);
-}
+constexpr inline EColor asColor(EValueType type) { return EColor(type); }
 
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	ImVec4 color;
-	color.x = (float)r / 255.0f;
-	color.y = (float)g / 255.0f;
-	color.z = (float)b / 255.0f;
-	color.w = (float)a / 255.0f;
+	color.x = (float) r / 255.0f;
+	color.y = (float) g / 255.0f;
+	color.z = (float) b / 255.0f;
+	color.w = (float) a / 255.0f;
 
 	return color;
 }
 
-template <typename T> const char* enumToStr(std::map<T, const char*>& map, T en)
+template <typename T>
+const char* enumToStr(std::map<T, const char*>& map, T en)
 {
-	if (!map.contains(en))
-		return nullptr;
+	if (!map.contains(en)) return nullptr;
 	return map[en];
 }
 
@@ -207,8 +204,8 @@ public:
 private:
 	std::string m_name = "default";
 
-	Colors m_colors;
-	Sizes m_sizes;
+	Colors   m_colors;
+	Sizes    m_sizes;
 	SizesVec m_sizesVec2;
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
@@ -251,8 +248,7 @@ public:
 
 	const ImVec4& get(EColor color)
 	{
-		if (m_colors.count(color) == 0)
-			return m_defaultColor;
+		if (m_colors.count(color) == 0) return m_defaultColor;
 
 		return m_colors[color];
 	}
@@ -267,10 +263,10 @@ public:
 		return m_sizesVec2[sizeVec];
 	}
 
-	static const char* getCategoryName(const std::string& key);
-	static CategoryNames& getCategoryNames();
-	static std::map<EColor, const char*>& getColorNames();
-	static std::map<ESize, const char*>& getSizeNames();
+	static const char*                       getCategoryName(const std::string& key);
+	static CategoryNames&                    getCategoryNames();
+	static std::map<EColor, const char*>&    getColorNames();
+	static std::map<ESize, const char*>&     getSizeNames();
 	static std::map<ESizeVec2, const char*>& getSizeVecNames();
 
 	const std::string& getName() const { return m_name; }
@@ -278,26 +274,25 @@ public:
 	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 
 	[[nodiscard]] const Colors& getColors() const { return m_colors; }
-	Colors& getColorsRef() { return m_colors; }
-	void setColors(const Colors& colors) { m_colors = colors; }
+	Colors&                     getColorsRef() { return m_colors; }
+	void                        setColors(const Colors& colors) { m_colors = colors; }
 
-	Sizes& getSizesRef() { return m_sizes; }
+	Sizes&    getSizesRef() { return m_sizes; }
 	SizesVec& getSizesVecRef() { return m_sizesVec2; }
 
-// JH unused -> maybe for "InputItems" only - drag float etc... but probably not needed
-//	void operatorColorTheme();
-//	void transformationColorTheme();
+	// JH unused -> maybe for "InputItems" only - drag float etc... but probably not needed
+	//	void operatorColorTheme();
+	//	void transformationColorTheme();
 	void returnFloatColorToDefault();
 
-// JH unused
-//	ImVec4 getHeader();
-//	ImVec4 getBg();
+	// JH unused
+	//	ImVec4 getHeader();
+	//	ImVec4 getBg();
 
 private:
 	template <typename E, typename T>
 	void copyProperties(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
 	{
-		for (const auto [key, val] : source)
-			target[key] = val;
+		for (const auto [key, val] : source) target[key] = val;
 	}
 };

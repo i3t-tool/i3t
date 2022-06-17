@@ -33,25 +33,16 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs)
 	{
 		for (int j = 0; j < 4; ++j)
 		{
-			if (!Math::eq(lhs[i][j], rhs[i][j]))
-			{
-				return false;
-			}
+			if (!Math::eq(lhs[i][j], rhs[i][j])) { return false; }
 		}
 	}
 
 	return true;
 }
 
-FORCE_INLINE bool areElementsSame(const glm::vec3 vec)
-{
-	return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]);
-}
+FORCE_INLINE bool areElementsSame(const glm::vec3 vec) { return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]); }
 
-FORCE_INLINE bool withinInterval(float val, float from, float to)
-{
-	return from <= val && val <= to;
-}
+FORCE_INLINE bool withinInterval(float val, float from, float to) { return from <= val && val <= to; }
 
 /**
  * \brief Linear interpolation between two vectors vec3 \a a and \a b
@@ -63,18 +54,15 @@ FORCE_INLINE bool withinInterval(float val, float from, float to)
 static glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float alpha)
 {
 	glm::vec3 inter = a * (1.0f - alpha);
-	inter = inter + b * alpha;
+	inter           = inter + b * alpha;
 	return inter;
 }
 
 FORCE_INLINE glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false)
 {
-	if (!useQuat)
-	{
-		return glm::interpolate(lhs, rhs, alpha);
-	}
-	auto q1 = glm::quat_cast(lhs);
-	auto q2 = glm::quat_cast(rhs);
+	if (!useQuat) { return glm::interpolate(lhs, rhs, alpha); }
+	auto q1     = glm::quat_cast(lhs);
+	auto q2     = glm::quat_cast(rhs);
 	auto result = glm::mix(q1, q2, alpha);
 
 	return glm::mat4_cast(result);
@@ -90,8 +78,8 @@ FORCE_INLINE glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float al
 static glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float alpha)
 {
 	glm::vec4 inter = a * (1.0f - alpha);
-	inter.a = a.w;
-	inter = inter + b * alpha;
+	inter.a         = a.w;
+	inter           = inter + b * alpha;
 	return inter;
 }
 
@@ -114,38 +102,26 @@ static glm::mat4 lerp(glm::mat4 a, glm::mat4 b, float alpha)
 	return res;
 }
 
-static float smoothAlpha(const float a)
-{
-	return ((6 * a - 15) * a + 10) * a * a * a;
-}
+static float smoothAlpha(const float a) { return ((6 * a - 15) * a + 10) * a * a * a; }
 
 /**
  * \brief Random float from interval 0 .. 0.999
  * \return random float
  */
-static float randomf()
-{
-	return (float)((rand() % 1000) / 1000.0f);
-}
+static float randomf() { return (float) ((rand() % 1000) / 1000.0f); }
 
 /**
  * \brief Random float from interval -0.5 .. +0.499
  * \return random float
  */
-static float randomfHalf()
-{
-	return -0.5f + randomf();
-}
+static float randomfHalf() { return -0.5f + randomf(); }
 
 /**
  * \brief Random integer from interval 0..\a topNotInclude
  * \param topNotInclude
  * \return Random integer
  */
-static int randomi(const int topNotInclude)
-{
-	return rand() % topNotInclude;
-}
+static int randomi(const int topNotInclude) { return rand() % topNotInclude; }
 
 /**
  * \brief Random integer from interval \a downIncluded .. \a topNotInclude
@@ -153,28 +129,21 @@ static int randomi(const int topNotInclude)
  * \param topNotInclude max) generated value
  * \return Random integer
  */
-static int randomi(const int downIncluded, const int topNotInclude)
-{
-	return rand() % topNotInclude + downIncluded;
-}
+static int randomi(const int downIncluded, const int topNotInclude) { return rand() % topNotInclude + downIncluded; }
 
-static glm::vec3 randomVec()
-{
-	return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf()));
-}
+static glm::vec3 randomVec() { return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf())); }
 
 static void prefixSum(std::vector<int>& arr)
 {
-	if (arr.empty())
-		return;
+	if (arr.empty()) return;
 
 	int tmp = arr[0];
-	arr[0] = 0;
+	arr[0]  = 0;
 	for (unsigned int i = 1; i < arr.size(); i++)
 	{
-		int t = arr[i];
+		int t  = arr[i];
 		arr[i] = arr[i - 1] + tmp;
-		tmp = t;
+		tmp    = t;
 	}
 	arr.push_back(tmp);
 }

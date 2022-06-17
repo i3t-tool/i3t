@@ -12,7 +12,7 @@ public:
 	IdGenerator();
 
 	bool hasNext();
-	ID next();
+	ID   next();
 	void markAsUsed(ID id);
 	void returnId(ID id);
 

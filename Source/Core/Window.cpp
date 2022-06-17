@@ -6,15 +6,9 @@
 #include "Commands/ApplicationCommands.h"
 #include "Logger/LoggerInternal.h"
 
-void glfwErrorCallback(int error, const char* description)
-{
-	pgr::dieWithError(description);
-}
+void glfwErrorCallback(int error, const char* description) { pgr::dieWithError(description); }
 
-Window::~Window()
-{
-	glfwTerminate();
-}
+Window::~Window() { glfwTerminate(); }
 
 void Window::init()
 {
@@ -31,8 +25,7 @@ void Window::init()
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
-	m_mainWindow =
-			glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, g_baseTitle, nullptr, nullptr);
+	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, g_baseTitle, nullptr, nullptr);
 
 	if (m_mainWindow == nullptr)
 	{
@@ -42,12 +35,13 @@ void Window::init()
 
 	setTitle(g_baseTitle);
 
-	int x, y, channels;
+	int           x, y, channels;
 	constexpr int desiredChannels = 4;
-	auto* pixels = stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(), &x, &y, &channels, desiredChannels);
+	auto*         pixels =
+	    stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(), &x, &y, &channels, desiredChannels);
 	if (pixels)
 	{
-		GLFWimage image{ x, y, pixels };
+		GLFWimage image{x, y, pixels};
 		glfwSetWindowIcon(m_mainWindow, 1, &image);
 	}
 	stbi_image_free(pixels);
@@ -65,15 +59,9 @@ void Window::init()
 	 */
 }
 
-GLFWwindow* Window::get()
-{
-	return m_mainWindow;
-}
+GLFWwindow* Window::get() { return m_mainWindow; }
 
-const std::string& Window::getTitle()
-{
-	return m_title;
-}
+const std::string& Window::getTitle() { return m_title; }
 
 void Window::setTitle(const char* title)
 {
@@ -81,7 +69,4 @@ void Window::setTitle(const char* title)
 	glfwSetWindowTitle(m_mainWindow, title);
 }
 
-void Window::swapBuffers()
-{
-	glfwSwapBuffers(m_mainWindow);
-}
+void Window::swapBuffers() { glfwSwapBuffers(m_mainWindow); }

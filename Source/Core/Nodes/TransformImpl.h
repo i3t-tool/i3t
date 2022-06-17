@@ -29,8 +29,8 @@ namespace Builder
 	template <ETransformType T>
 	Ptr<Transformation> createTransform()
 	{
- 		//const auto defaultValues = getTransformDefaults(T);  //\todo PF - not used????
-		auto       ret           = std::make_shared<TransformImpl<T>>();
+		//const auto defaultValues = getTransformDefaults(T);  //\todo PF - not used????
+		auto ret = std::make_shared<TransformImpl<T>>();
 		ret->init();
 		ret->createDefaults();
 		ret->initDefaults();
@@ -38,7 +38,6 @@ namespace Builder
 		return ret;
 	}
 } // namespace Builder
-
 
 
 template <>
@@ -88,7 +87,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
-	[[nodiscard]] void setDefaultUniformScale(float val);
+	[[nodiscard]] void           setDefaultUniformScale(float val);
 
 	void onReset() override;
 };
@@ -233,8 +232,8 @@ public:
 	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat))
 	{
 		m_hasMenuSynergies = true;
-		enableSynergies();   ///> PF: enableSynergies(); // means normalize for quaternion
-	} 
+		enableSynergies(); ///> PF: enableSynergies(); // means normalize for quaternion
+	}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Quat)
 

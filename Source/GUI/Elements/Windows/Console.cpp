@@ -3,9 +3,9 @@
 #include "imgui.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/API.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/IWindow.h"
-#include "Core/API.h"
 
 using namespace UI;
 
@@ -13,7 +13,7 @@ using namespace UI;
 char command[MAX_COMMAND_SIZE];
 //char command2[MAX_COMMAND_SIZE];
 std::vector<glm::ivec2> commands;
-int selected=0;
+int                     selected = 0;
 
 Console::Console(bool show) : IWindow(show)
 {
@@ -25,12 +25,15 @@ Console::Console(bool show) : IWindow(show)
 	*/
 }
 
-int history(ImGuiInputTextCallbackData*d) {
-	if(d->EventKey==ImGuiKey_UpArrow){
-		Ptr<Console> console=I3T::getWindowPtr<Console>();
+int history(ImGuiInputTextCallbackData* d)
+{
+	if (d->EventKey == ImGuiKey_UpArrow)
+	{
+		Ptr<Console> console = I3T::getWindowPtr<Console>();
 		console->onUpKey();
 	}
-	else if(d->EventKey == ImGuiKey_DownArrow) {
+	else if (d->EventKey == ImGuiKey_DownArrow)
+	{
 		Ptr<Console> console = I3T::getWindowPtr<Console>();
 		console->onDownKey();
 	}
@@ -52,29 +55,35 @@ void Console::render()
 	ImGui::TextUnformatted(m_buffer.str().c_str());
 
 	// Set scroll to bottom of the child window.
-	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-		ImGui::SetScrollHereY(1.0f);
+	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
 
 	ImGui::EndChild();
 
 	ImGui::Separator();
 
-	const ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue|ImGuiInputTextFlags_CallbackHistory;
+	const ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 	//ImGuiInputTextCallback in=[this]{return this->h();};
 
 	if (ImGui::InputText("Input", command, 1024, inputTextFlags, &history))
 	{
-		bool nonwhite=false;
-		int len=(int)strlen(command);
-		for(int i=0;i<len;i++){if(command[i]!='\t'&&command[i]!=' '){nonwhite=true;break;}}
-		if(nonwhite){commands.push_back(glm::ivec2(m_buffer.str().size(), len));}
-		selected=(int)commands.size();
+		bool nonwhite = false;
+		int  len      = (int) strlen(command);
+		for (int i = 0; i < len; i++)
+		{
+			if (command[i] != '\t' && command[i] != ' ')
+			{
+				nonwhite = true;
+				break;
+			}
+		}
+		if (nonwhite) { commands.push_back(glm::ivec2(m_buffer.str().size(), len)); }
+		selected = (int) commands.size();
 
 		m_buffer << command << "\n";
 
 		ConsoleCommand::dispatch(command);
 
-        strcpy(command, "");
+		strcpy(command, "");
 		ImGui::SetKeyboardFocusHere(-1);
 	}
 
@@ -83,12 +92,16 @@ void Console::render()
 
 void Console::onUpKey()
 {
-	if(commands.size()>0){
+	if (commands.size() > 0)
+	{
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected--;
-		if(selected<0){selected=0;}
-		else if(selected>=commands.size()){selected=(int)commands.size()-1;}
-		std::string ss=str.substr(commands[selected][0], commands[selected][1]);
+		if (selected < 0) { selected = 0; }
+		else if (selected >= commands.size())
+		{
+			selected = (int) commands.size() - 1;
+		}
+		std::string ss = str.substr(commands[selected][0], commands[selected][1]);
 
 		memcpy(command, ss.c_str(), ss.size());
 		command[ss.size()] = '\0';
@@ -99,14 +112,17 @@ void Console::onUpKey()
 
 void Console::onDownKey()
 {
-	if (commands.size() > 0) {
+	if (commands.size() > 0)
+	{
 		std::string str = m_stdoutCapture.GetBuffer().str();
 		selected++;
 		if (selected < 0) { selected = 0; }
-		else if (selected >= commands.size()) {
+		else if (selected >= commands.size())
+		{
 			command[0] = '\0';
 		}
-		else{
+		else
+		{
 			std::string ss = str.substr(commands[selected][0], commands[selected][1]);
 			memcpy(command, ss.c_str(), ss.size());
 			command[ss.size()] = '\0';

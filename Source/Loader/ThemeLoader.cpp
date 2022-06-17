@@ -13,10 +13,7 @@ std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 {
 	for (const auto& [key, val] : map)
 	{
-		if (strcmp(val, name.c_str()) == 0)
-		{
-			return key;
-		}
+		if (strcmp(val, name.c_str()) == 0) { return key; }
 	}
 	return std::nullopt;
 }
@@ -72,7 +69,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 		{
 			out << YAML::Key << *str;
 			out << YAML::Value;
-			dumpVec4(out, (const float*)&val);
+			dumpVec4(out, (const float*) &val);
 		}
 	}
 	out << YAML::EndMap;
@@ -111,15 +108,14 @@ void saveTheme(const fs::path& path, Theme& theme)
 
 std::optional<Theme> loadTheme(const fs::path& path)
 {
-	if (!doesFileExists(path.string().c_str()))
-		return std::nullopt;
+	if (!doesFileExists(path.string().c_str())) return std::nullopt;
 
 	auto yaml = YAML::LoadFile(path.string());
 
 	auto name = path.stem().string();
 
-	Theme::Colors colors;
-	Theme::Sizes sizes;
+	Theme::Colors   colors;
+	Theme::Sizes    sizes;
 	Theme::SizesVec sizesVec;
 
 	if (yaml["colors"])
@@ -129,10 +125,7 @@ std::optional<Theme> loadTheme(const fs::path& path)
 		{
 			auto node = it->second.as<YAML::Node>();
 
-			if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
-			{
-				colors[*en] = parseVec4(node);
-			}
+			if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>())) { colors[*en] = parseVec4(node); }
 		}
 	}
 	if (yaml["sizes"])
@@ -141,9 +134,7 @@ std::optional<Theme> loadTheme(const fs::path& path)
 		for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end(); ++it)
 		{
 			if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
-			{
-				sizes[*en] = it->second.as<float>();
-			}
+			{ sizes[*en] = it->second.as<float>(); }
 		}
 	}
 	if (yaml["size vectors"])
@@ -154,9 +145,7 @@ std::optional<Theme> loadTheme(const fs::path& path)
 			auto node = it->second.as<YAML::Node>();
 
 			if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
-			{
-				sizesVec[*en] = parseVec2(node);
-			}
+			{ sizesVec[*en] = parseVec2(node); }
 		}
 	}
 

@@ -10,8 +10,8 @@
 
 using namespace UI;
 
-constexpr float	 DRAG_FLOAT_WIDTH = 100.0f;
-constexpr size_t BUFF_LEN					= 4096;
+constexpr float  DRAG_FLOAT_WIDTH = 100.0f;
+constexpr size_t BUFF_LEN         = 4096;
 
 char g_newThemeName[BUFF_LEN];
 char g_saveMessageBuff[BUFF_LEN];
@@ -73,7 +73,7 @@ void StyleEditor::renderSaveRevertField()
 	// Save current theme to file.
 	if (ImGui::Button("Save"))
 	{
-		auto path		 = std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
+		auto path    = std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
 		auto absPath = Config::getAbsolutePath(path);
 		if (doesFileExists(absPath)) { strcpy(g_saveMessageBuff, "Theme with this name already exists."); }
 		else

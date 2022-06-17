@@ -18,10 +18,7 @@ ImGuiConfigFlags g_mousedFlags;
 
 InputController InputManager::s_globalInputController;
 
-void InputManager::init()
-{
-	InputBindings::init();
-}
+void InputManager::init() { InputBindings::init(); }
 
 void InputManager::bindGlobalAction(const char* action, EKeyState state, KeyCallback fn)
 {
@@ -32,25 +29,18 @@ void InputManager::triggerAction(const char* action, EKeyState state)
 {
 	s_globalInputController.triggerAction(action, state);
 
-	if (s_activeInput)
-		s_activeInput->triggerAction(action, state);
+	if (s_activeInput) s_activeInput->triggerAction(action, state);
 }
 
 void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersList mods)
 {
-	if (!InputBindings::isActionCreated(name))
-	{
-		InputBindings::m_inputActions.insert({name, {}});
-	}
+	if (!InputBindings::isActionCreated(name)) { InputBindings::m_inputActions.insert({name, {}}); }
 	InputBindings::m_inputActions[name].push_back({code, createModifiers(mods)});
 }
 
 void InputManager::setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods)
 {
-	if (!InputBindings::isAxisCreated(action))
-	{
-		InputBindings::m_inputAxis.insert({action, {}});
-	}
+	if (!InputBindings::isAxisCreated(action)) { InputBindings::m_inputAxis.insert({action, {}}); }
 	InputBindings::m_inputAxis[action].push_back({code, scale, createModifiers(mods)});
 }
 
@@ -77,25 +67,18 @@ bool InputManager::isInputActive(InputController* input)
 
 bool InputManager::isActionTriggered(const char* name, EKeyState state)
 {
-	if (!InputBindings::m_inputActions.contains(name))
-		return false;
+	if (!InputBindings::m_inputActions.contains(name)) return false;
 
 	auto& keys = InputBindings::m_inputActions[name];
 
 	bool result = false;
 	if (state == EKeyState::Released)
 	{
-		for (auto action : keys)
-		{
-			result |= isKeyJustUp(action.code) && areModifiersActive(action.modifiers);
-		}
+		for (auto action : keys) { result |= isKeyJustUp(action.code) && areModifiersActive(action.modifiers); }
 	}
 	if (state == EKeyState::Pressed)
 	{
-		for (auto action : keys)
-		{
-			result |= isKeyJustPressed(action.code) && areModifiersActive(action.modifiers);
-		}
+		for (auto action : keys) { result |= isKeyJustPressed(action.code) && areModifiersActive(action.modifiers); }
 	}
 
 	return result;
@@ -103,16 +86,12 @@ bool InputManager::isActionTriggered(const char* name, EKeyState state)
 
 bool InputManager::isAxisActive(const char* name)
 {
-	if (!InputBindings::m_inputAxis.contains(name))
-		return false;
+	if (!InputBindings::m_inputAxis.contains(name)) return false;
 
 	auto& axes = InputBindings::m_inputAxis[name];
 	for (const auto& a : axes)
 	{
-		if (isKeyPressed(a.code))
-		{
-			return true;
-		}
+		if (isKeyPressed(a.code)) { return true; }
 	}
 	return false;
 }
@@ -121,10 +100,7 @@ bool InputManager::isMouseClicked()
 {
 	for (int i = 0; i < IM_MOUSE_KEYS_COUNT; i++)
 	{
-		if (ImGui::IsMouseClicked(i))
-		{
-			return true;
-		}
+		if (ImGui::IsMouseClicked(i)) { return true; }
 	}
 	return false;
 }
@@ -133,10 +109,7 @@ bool InputManager::isMouseDown()
 {
 	for (int i = 0; i < IM_MOUSE_KEYS_COUNT; i++)
 	{
-		if (ImGui::IsMouseDown(i))
-		{
-			return true;
-		}
+		if (ImGui::IsMouseDown(i)) { return true; }
 	}
 	return false;
 }
@@ -177,8 +150,7 @@ void InputManager::processViewportEvents()
 	{
 		if (ImGui::IsMouseClicked(i))
 		{
-			LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX),
-			                      std::to_string(m_mouseY));
+			LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX), std::to_string(m_mouseY));
 			setPressed(imGuiMouseKeys[i]);
 		}
 
@@ -200,7 +172,7 @@ void InputManager::beginCameraControl()
 	m_ignoreImGuiEvents = true;
 
 	// Tell ImGui to don't capture mouse position. No widgets will be set to the hovered state.
-	auto& io = ImGui::GetIO();
+	auto& io      = ImGui::GetIO();
 	g_mousedFlags = io.ConfigFlags; // Store current IO configuration flags.
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
 }
@@ -211,14 +183,14 @@ void InputManager::endCameraControl()
 
 	m_ignoreImGuiEvents = false;
 
-	auto& io = ImGui::GetIO();
+	auto& io       = ImGui::GetIO();
 	io.ConfigFlags = g_mousedFlags;
 }
 
 void InputManager::preUpdate()
 {
-	m_mouseButtonState.left = isKeyPressed(Keys::mouseLeft);
-	m_mouseButtonState.right = isKeyPressed(Keys::mouseRight);
+	m_mouseButtonState.left   = isKeyPressed(Keys::mouseLeft);
+	m_mouseButtonState.right  = isKeyPressed(Keys::mouseRight);
 	m_mouseButtonState.middle = isKeyPressed(Keys::mouseMiddle);
 }
 
@@ -231,8 +203,8 @@ void InputManager::processEvents(InputController& controller)
 		{
 			// Check if key is in desired state.
 			bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
-														m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
-													 areModifiersActive(mods);
+			                      m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
+			    areModifiersActive(mods);
 
 			if (shouldProcess) callback();
 		}
@@ -244,7 +216,7 @@ void InputManager::processEvents(InputController& controller)
 		for (const auto& [key, scale, mods] : keys)
 		{
 			bool shouldProcess =
-					(m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
+			    (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
 
 			if (shouldProcess) callback(scale);
 		}
@@ -261,13 +233,14 @@ void InputManager::update()
 
 	/* \todo JH probably very naive */
 	if (isMouseDown())
-    {
-        m_mouseXDragDelta += m_mouseXDelta;
-        m_mouseYDragDelta += m_mouseYDelta;
-    }else
-    {
-        m_mouseXDragDelta = m_mouseYDragDelta = 0;
-    }
+	{
+		m_mouseXDragDelta += m_mouseXDelta;
+		m_mouseYDragDelta += m_mouseYDelta;
+	}
+	else
+	{
+		m_mouseXDragDelta = m_mouseYDragDelta = 0;
+	}
 
 	double x = 0, y = 0;
 	glfwGetCursorPos(Application::get().mainWindow(), &x, &y);
@@ -278,16 +251,12 @@ void InputManager::update()
 	// mouseYDelta = 0;
 
 	processEvents(s_globalInputController);
-	if (s_activeInput)
-		processEvents(*s_activeInput);
+	if (s_activeInput) processEvents(*s_activeInput);
 
 	// Process keys.
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
-		if (it->second == JUST_UP)
-		{
-			m_keyMap[it->first] = UP;
-		}
+		if (it->second == JUST_UP) { m_keyMap[it->first] = UP; }
 		else if (it->second == JUST_DOWN)
 		{
 			m_keyMap[it->first] = DOWN;
@@ -295,7 +264,7 @@ void InputManager::update()
 	}
 
 	/// \todo MH mouse scroll release.
-	m_keyMap[Keys::Code::mouseScrlUp] = KeyState::UP;
+	m_keyMap[Keys::Code::mouseScrlUp]   = KeyState::UP;
 	m_keyMap[Keys::Code::mouseScrlDown] = KeyState::UP;
 }
 
@@ -732,15 +701,13 @@ void InputManager::keyUp(int keyReleased)
 GLFWwindow* InputManager::getCurrentViewport()
 {
 	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-	ImGuiContext* g = ImGui::GetCurrentContext(); // Get current/last moused viewport.
+	ImGuiContext*    g          = ImGui::GetCurrentContext(); // Get current/last moused viewport.
 
 	GLFWwindow* window = nullptr;
 	for (int n = 0; n < platformIO.Viewports.Size; n++)
 	{
 		if (platformIO.Viewports[n]->ID == g->MouseViewport->ID)
-		{
-			window = (GLFWwindow*)platformIO.Viewports[n]->PlatformHandle;
-		}
+		{ window = (GLFWwindow*) platformIO.Viewports[n]->PlatformHandle; }
 	}
 
 	return window;
@@ -752,14 +719,14 @@ MouseButtonState InputManager::m_mouseButtonState;
 std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
 std::vector<InputController*> InputManager::m_inputControllers;
-InputController* InputManager::s_activeInput = nullptr;
+InputController*              InputManager::s_activeInput = nullptr;
 
-bool InputManager::m_ignoreImGuiEvents = false;
+bool      InputManager::m_ignoreImGuiEvents = false;
 glm::vec2 InputManager::m_mouseOffset;
-float InputManager::m_mouseX = 0;
-float InputManager::m_mouseY = 0;
-float InputManager::m_mouseXPrev = 0;
-float InputManager::m_mouseYPrev = 0;
+float     InputManager::m_mouseX     = 0;
+float     InputManager::m_mouseY     = 0;
+float     InputManager::m_mouseXPrev = 0;
+float     InputManager::m_mouseYPrev = 0;
 
 float InputManager::m_mouseXDelta = 0;
 float InputManager::m_mouseYDelta = 0;
@@ -767,5 +734,5 @@ float InputManager::m_mouseYDelta = 0;
 float InputManager::m_mouseXDragDelta = 0;
 float InputManager::m_mouseYDragDelta = 0;
 
-int InputManager::m_winWidth = 0;
+int InputManager::m_winWidth  = 0;
 int InputManager::m_winHeight = 0;

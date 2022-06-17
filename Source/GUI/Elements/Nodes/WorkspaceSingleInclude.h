@@ -1,9 +1,9 @@
-#include "WorkspaceTransformation_s.h"
 #include "WorkspaceOperator.h"
+#include "WorkspaceTransformation_s.h"
 
-#include "WorkspaceSequence.h"
 #include "WorkspaceCamera.h"
 #include "WorkspaceModel.h"
 #include "WorkspaceScreen.h"
+#include "WorkspaceSequence.h"
 
 #include "WorkspaceCycle.h"

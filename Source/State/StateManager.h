@@ -63,11 +63,11 @@ private:
 	[[nodiscard]] bool hasNewestState() const;
 
 	fs::path m_currentScene;
-	bool m_dirty = false;
+	bool     m_dirty = false;
 
 	IStateful* m_originator;
 
-	int m_currentStateIdx;
+	int                 m_currentStateIdx;
 	std::deque<Memento> m_mementos;
 
 	std::vector<std::string> m_recentFiles;

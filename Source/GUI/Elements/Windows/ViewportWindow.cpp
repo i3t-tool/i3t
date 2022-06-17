@@ -105,7 +105,7 @@ void Viewport::render()
 			m_wcMin = newWcMin;
 			m_wcMax = newWcMax;
 
-			int width	 = static_cast<int>(abs(m_wcMax.x - m_wcMin.x));
+			int width  = static_cast<int>(abs(m_wcMax.x - m_wcMin.x));
 			int height = static_cast<int>(abs(m_wcMax.y - m_wcMin.y));
 
 			// create new image in our texture
@@ -130,7 +130,7 @@ void Viewport::render()
 			/// \todo Remove
 			Config::WIN_HEIGHT = height;
 			/// \todo Remove
-			Config::WIN_WIDTH	 = width;
+			Config::WIN_WIDTH = width;
 
 			// set viewport size to be sure
 			/// \todo Remove
@@ -164,8 +164,8 @@ void Viewport::render()
 
 		// add the texture to this's window drawList
 		ImGui::GetWindowDrawList()->AddImage(
-				(void*) (intptr_t) m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0, 1),
-				ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
+		    (void*) (intptr_t) m_texColBufMain, m_wcMin, m_wcMax, ImVec2(0, 1),
+		    ImVec2(1, 0)); // the uv coordinates flips the picture, since it was upside down at first
 
 		m_world->onGUI();
 		ImGui::End();
@@ -223,17 +223,16 @@ void Viewport::showViewportsMenu()
 		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
 		if (ImGui::MenuItem(action))
 		{
-			w->getCameraControl()->m_rotateAroundCenter=!w->getCameraControl()->m_rotateAroundCenter;
+			w->getCameraControl()->m_rotateAroundCenter = !w->getCameraControl()->m_rotateAroundCenter;
 			// Num 0
 			// App::get().world()->scene->setCamToCenter();
 		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("Manipulators")) {
-		const char*action=w->manipulatorsGetVisible()?"Hide":"Show";
-		if (ImGui::MenuItem(action)) {
-			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());
-		}
+	if (ImGui::BeginMenu("Manipulators"))
+	{
+		const char* action = w->manipulatorsGetVisible() ? "Hide" : "Show";
+		if (ImGui::MenuItem(action)) { w->manipulatorsSetVisible(!w->manipulatorsGetVisible()); }
 		ImGui::EndMenu();
 	}
 }

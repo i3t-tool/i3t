@@ -26,7 +26,7 @@ class DataMap
 public:
 	DataMap(std::array<const unsigned char, 16> data) : m_data(data){};
 	DataMap(const DataMap&) = delete;
-	DataMap(DataMap&&) = delete;
+	DataMap(DataMap&&)      = delete;
 	DataMap& operator=(const DataMap&) = delete;
 	DataMap& operator=(DataMap&&) = delete;
 
@@ -60,12 +60,12 @@ namespace Core
  */
 enum class EValueState
 {
-	Editable		= 0x0002, ///< 10
+	Editable    = 0x0002, ///< 10
 	EditableSyn = 0x0003, ///< 11
-	Locked			= 0x0000, ///< 00
-	LockedSyn		= 0x0001, ///< 01
+	Locked      = 0x0000, ///< 00
+	LockedSyn   = 0x0001, ///< 01
 };
-}
+} // namespace Core
 
 /**
  * \brief string name of the wire type
@@ -94,13 +94,13 @@ public:
 
 	explicit DataStore(EValueType valueType);
 
- 	[[nodiscard]] bool isPulseTriggered() const { return std::get<bool>(m_value); }
+	[[nodiscard]] bool isPulseTriggered() const { return std::get<bool>(m_value); }
 
 	[[nodiscard]] const glm::mat4& getMat4() const { return std::get<glm::mat4>(m_value); }
-	[[nodiscard]] glm::mat4&       getMat4Ref()    { return std::get<glm::mat4>(m_value); }
+	[[nodiscard]] glm::mat4&       getMat4Ref() { return std::get<glm::mat4>(m_value); }
 
 	[[nodiscard]] const glm::vec3& getVec3() const { return std::get<glm::vec3>(m_value); }
-	[[nodiscard]] glm::vec3&       getVec3Ref()    { return std::get<glm::vec3>(m_value); }
+	[[nodiscard]] glm::vec3&       getVec3Ref() { return std::get<glm::vec3>(m_value); }
 
 	[[nodiscard]] const glm::vec4& getVec4() const { return std::get<glm::vec4>(m_value); }
 
@@ -110,7 +110,11 @@ public:
 
 	[[nodiscard]] void* getPointer() const { return std::get<void*>(m_value); }
 
-	template <typename T> void setValue(T&& val) { m_value = val; }
+	template <typename T>
+	void setValue(T&& val)
+	{
+		m_value = val;
+	}
 };
 
 namespace Core

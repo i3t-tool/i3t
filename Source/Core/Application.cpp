@@ -18,12 +18,11 @@
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
 
-double lastFrameSeconds = 0.0;  //PF changed to double
+double lastFrameSeconds = 0.0; //PF changed to double
 
 Application::Application()
 {
-	if (s_instance == nullptr)
-		s_instance = this;
+	if (s_instance == nullptr) s_instance = this;
 
 	m_isPaused = false;
 
@@ -36,10 +35,7 @@ Application::Application()
 
 Application::~Application()
 {
-	for (auto* module : m_modules)
-	{
-		delete module;
-	}
+	for (auto* module : m_modules) { delete module; }
 }
 
 void Application::init()
@@ -48,26 +44,24 @@ void Application::init()
 	CloseCommand::addListener([this] { onClose(); });
 	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 
-  InputManager::init();
+	InputManager::init();
 	StateManager::instance().setOriginator(this);
 
-	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&](){
-			Log::info("undo triggered");
-			StateManager::instance().undo();
+	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
+		Log::info("undo triggered");
+		StateManager::instance().undo();
 	});
-	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&](){
-			Log::info("redo triggered");
-			StateManager::instance().redo();
+	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
+		Log::info("redo triggered");
+		StateManager::instance().redo();
 	});
 }
 
 void Application::initModules()
 {
-	for (auto* m : m_modules)
-		m->init();
+	for (auto* m : m_modules) m->init();
 
-	if (!StateManager::instance().hasScene())
-		StateManager::instance().createEmptyScene();
+	if (!StateManager::instance().hasScene()) StateManager::instance().createEmptyScene();
 }
 
 //===----------------------------------------------------------------------===//
@@ -78,20 +72,11 @@ void Application::initWindow()
 	m_window->init();
 }
 
-GLFWwindow* Application::mainWindow()
-{
-	return m_window->get();
-}
+GLFWwindow* Application::mainWindow() { return m_window->get(); }
 
-const std::string& Application::getTitle()
-{
-	return m_window->getTitle();
-}
+const std::string& Application::getTitle() { return m_window->getTitle(); }
 
-void Application::setTitle(const std::string& title)
-{
-	m_window->setTitle(title.c_str());
-}
+void Application::setTitle(const std::string& title) { m_window->setTitle(title.c_str()); }
 
 //===----------------------------------------------------------------------===//
 
@@ -99,20 +84,17 @@ void Application::run()
 {
 	while (!m_bShouldClose)
 	{
-    //glfwWaitEvents();
-    glfwPollEvents();
+		//glfwWaitEvents();
+		glfwPollEvents();
 
-    // Process commands.
-		for (auto& command : m_commands)
-		{
-			command->execute();
-		}
+		// Process commands.
+		for (auto& command : m_commands) { command->execute(); }
 		m_commands.clear();
 
 		double current = glfwGetTime();
-		double delta = current - lastFrameSeconds;
+		double delta   = current - lastFrameSeconds;
 		Core::GraphManager::update(delta);
-    lastFrameSeconds = current;
+		lastFrameSeconds = current;
 
 		// Update and display.
 		onDisplay();
@@ -131,11 +113,9 @@ void Application::onDisplay()
 	/// \todo move the logic Update to the timer
 	// TIME_STEP_ACU -= TIME_STEP;
 
-	for (auto* m : m_modules)
-		m->beginFrame();
+	for (auto* m : m_modules) m->beginFrame();
 
-	for (auto* m : m_modules)
-		m->endFrame();
+	for (auto* m : m_modules) m->endFrame();
 
 	// Input update must be called after rendering.
 	logicUpdate();
@@ -154,8 +134,7 @@ void Application::logicUpdate()
 
 void Application::finalize()
 {
-	for (auto& module : m_modules)
-		module->onClose();
+	for (auto& module : m_modules) module->onClose();
 
 	World::end();
 	delete m_world;
@@ -167,7 +146,7 @@ bool Application::initI3T()
 	loadConfig();
 
 	// new scene scheme
-	bool b = World::init();//getchar(); printf("b\n");
+	bool b  = World::init(); //getchar(); printf("b\n");
 	m_world = new World();
 	m_world->onStart();
 	//getchar(); printf("c\n");
@@ -181,9 +160,9 @@ Memento Application::getState()
 	auto& nodes = getUI()->getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
 
 	SerializationVisitor visitor;
-	std::string rawState = visitor.dump(nodes);
+	std::string          rawState = visitor.dump(nodes);
 
-	return Memento({ rawState });
+	return Memento({rawState});
 }
 
 void Application::setState(const Memento& memento)
@@ -209,35 +188,17 @@ void Application::onStateChange(const std::string& winTitlePostfix)
 
 //===----------------------------------------------------------------------===//
 
-Application& Application::get()
-{
-	return *s_instance;
-}
+Application& Application::get() { return *s_instance; }
 
-UIModule* Application::getUI()
-{
-	return (UIModule*) m_modules[0];
-}
+UIModule* Application::getUI() { return (UIModule*) m_modules[0]; }
 
-World* Application::world()
-{
-	return m_world;
-}
+World* Application::world() { return m_world; }
 
-void Application::onBeforeClose()
-{
-	getUI()->showUniqueWindow<BeforeCloseModal>();
-}
+void Application::onBeforeClose() { getUI()->showUniqueWindow<BeforeCloseModal>(); }
 
-void Application::onClose()
-{
-	m_bShouldClose = true;
-}
+void Application::onClose() { m_bShouldClose = true; }
 
-void Application::enqueueCommand(ICommand* command)
-{
-	m_commands.push_back(command);
-}
+void Application::enqueueCommand(ICommand* command) { m_commands.push_back(command); }
 
 // Statics
 Application* Application::s_instance = nullptr;

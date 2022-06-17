@@ -27,12 +27,11 @@
 struct TextureRecord
 {
 	TextureRecord() : flag(false), textureId(0) // PF initialization added
-	{
-	}
+	{}
 
 	TextureRecord(const bool _flag, const GLuint _textureId)
 	{
-		flag = _flag;
+		flag      = _flag;
 		textureId = _textureId;
 	}
 
@@ -59,9 +58,7 @@ public:
 	static void endTextures()
 	{
 		for (std::map<std::string, TextureRecord>::const_iterator it = textures.begin(); it != textures.end(); ++it)
-		{
-			glDeleteTextures(1, &(it->second.textureId));
-		}
+		{ glDeleteTextures(1, &(it->second.textureId)); }
 		textures.clear();
 	}
 
@@ -71,9 +68,7 @@ public:
 	static void endHCTextures()
 	{
 		for (std::map<std::string, TextureRecord>::const_iterator it = hcTextures.begin(); it != hcTextures.end(); ++it)
-		{
-			glDeleteTextures(1, &(it->second.textureId));
-		}
+		{ glDeleteTextures(1, &(it->second.textureId)); }
 		hcTextures.clear();
 	}
 
@@ -95,10 +90,7 @@ public:
 		}
 
 		GLuint t = pgr::createTexture(path); // load texture from file
-		if (t == 0)
-		{
-			std::cout << "texture load error: " << path << std::endl;
-		}
+		if (t == 0) { std::cout << "texture load error: " << path << std::endl; }
 		else
 		{
 			textures[name] = TextureRecord(true, t);
@@ -124,10 +116,7 @@ public:
 		}
 
 		GLuint t = pgr::createTexture(path);
-		if (t == 0)
-		{
-			std::cout << "texture load error: " << path << std::endl;
-		}
+		if (t == 0) { std::cout << "texture load error: " << path << std::endl; }
 		else
 		{
 			hcTextures[name] = TextureRecord(true, t);
@@ -160,9 +149,7 @@ public:
 	static void markAllUnflag()
 	{
 		for (std::map<std::string, TextureRecord>::iterator it = textures.begin(); it != textures.end(); ++it)
-		{
-			it->second.flag = false;
-		}
+		{ it->second.flag = false; }
 	}
 
 	/**
@@ -171,9 +158,7 @@ public:
 	static void markAllHCUnflag()
 	{
 		for (std::map<std::string, TextureRecord>::iterator it = hcTextures.begin(); it != hcTextures.end(); ++it)
-		{
-			it->second.flag = false;
-		}
+		{ it->second.flag = false; }
 	}
 
 	/**

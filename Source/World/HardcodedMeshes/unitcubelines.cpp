@@ -1,34 +1,27 @@
 #include "../HardcodedMeshes.h"
 const unsigned int cubelinesNAttribsPerVertex = 8;
-const unsigned int cubelinesNVertices = 24;
-const unsigned int cubelinesNTriangles = 12;
-const float cubelinesVertices[] = {
-  1.0f,1.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.666667f,
-  1.0f,-1.0f,-1.0f,0.0f,0.0f,-1.0f,0.333333f,0.666667f,
-  -1.0f,-1.0f,-1.0f,0.0f,0.0f,-1.0f,0.333333f,1.0f,
-  -1.0f,1.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,1.0f,
-  
-  1.0f,1.0f,1.0f,0.0f,-0.0f,1.0f,0.333333f,0.333333f,
-  -1.0f,1.0f,1.0f,0.0f,-0.0f,1.0f,0.333333f,0.666667f,
-  -1.0f,-1.0f,1.0f,0.0f,-0.0f,1.0f,0.0f,0.666667f,
-  1.0f,-1.0f,1.0f,0.0f,-0.0f,1.0f,0.0f,0.333333f,
-  
-  1.0f,1.0f,-1.0f,1.0f,-0.0f,0.0f,0.666667f,0.333333f,
-  1.0f,1.0f,1.0f,1.0f,-0.0f,0.0f,0.333333f,0.333333f,
-  1.0f,-1.0f,1.0f,1.0f,-0.0f,0.0f,0.333333f,0.0f,
-  1.0f,-1.0f,-1.0f,1.0f,-0.0f,0.0f,0.666667f,0.0f,
-  1.0f,-1.0f,-1.0f,-0.0f,-1.0f,-0.0f,0.0f,0.333333f,
-  1.0f,-1.0f,1.0f,-0.0f,-1.0f,-0.0f,0.0f,0.0f,
-  -1.0f,-1.0f,1.0f,-0.0f,-1.0f,-0.0f,0.333333f,0.0f,
-  -1.0f,-1.0f,-1.0f,-0.0f,-1.0f,-0.0f,0.333333f,0.333333f,
-  -1.0f,-1.0f,-1.0f,-1.0f,0.0f,-0.0f,1.0f,0.333333f,
-  -1.0f,-1.0f,1.0f,-1.0f,0.0f,-0.0f,0.666667f,0.333333f,
-  -1.0f,1.0f,1.0f,-1.0f,0.0f,-0.0f,0.666667f,0.0f,
-  -1.0f,1.0f,-1.0f,-1.0f,0.0f,-0.0f,1.0f,0.0f,
-  1.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.333333f,0.333333f,
-  1.0f,1.0f,-1.0f,0.0f,1.0f,0.0f,0.666667f,0.333333f,
-  -1.0f,1.0f,-1.0f,0.0f,1.0f,0.0f,0.666667f,0.666667f,
-  -1.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.333333f,0.666667f,
+const unsigned int cubelinesNVertices         = 24;
+const unsigned int cubelinesNTriangles        = 12;
+const float        cubelinesVertices[]        = {
+    1.0f,  1.0f,  -1.0f,     0.0f,      0.0f,  -1.0f, 0.0f,      0.666667f, 1.0f,  -1.0f, -1.0f,     0.0f,
+    0.0f,  -1.0f, 0.333333f, 0.666667f, -1.0f, -1.0f, -1.0f,     0.0f,      0.0f,  -1.0f, 0.333333f, 1.0f,
+    -1.0f, 1.0f,  -1.0f,     0.0f,      0.0f,  -1.0f, 0.0f,      1.0f,
+
+    1.0f,  1.0f,  1.0f,      0.0f,      -0.0f, 1.0f,  0.333333f, 0.333333f, -1.0f, 1.0f,  1.0f,      0.0f,
+    -0.0f, 1.0f,  0.333333f, 0.666667f, -1.0f, -1.0f, 1.0f,      0.0f,      -0.0f, 1.0f,  0.0f,      0.666667f,
+    1.0f,  -1.0f, 1.0f,      0.0f,      -0.0f, 1.0f,  0.0f,      0.333333f,
+
+    1.0f,  1.0f,  -1.0f,     1.0f,      -0.0f, 0.0f,  0.666667f, 0.333333f, 1.0f,  1.0f,  1.0f,      1.0f,
+    -0.0f, 0.0f,  0.333333f, 0.333333f, 1.0f,  -1.0f, 1.0f,      1.0f,      -0.0f, 0.0f,  0.333333f, 0.0f,
+    1.0f,  -1.0f, -1.0f,     1.0f,      -0.0f, 0.0f,  0.666667f, 0.0f,      1.0f,  -1.0f, -1.0f,     -0.0f,
+    -1.0f, -0.0f, 0.0f,      0.333333f, 1.0f,  -1.0f, 1.0f,      -0.0f,     -1.0f, -0.0f, 0.0f,      0.0f,
+    -1.0f, -1.0f, 1.0f,      -0.0f,     -1.0f, -0.0f, 0.333333f, 0.0f,      -1.0f, -1.0f, -1.0f,     -0.0f,
+    -1.0f, -0.0f, 0.333333f, 0.333333f, -1.0f, -1.0f, -1.0f,     -1.0f,     0.0f,  -0.0f, 1.0f,      0.333333f,
+    -1.0f, -1.0f, 1.0f,      -1.0f,     0.0f,  -0.0f, 0.666667f, 0.333333f, -1.0f, 1.0f,  1.0f,      -1.0f,
+    0.0f,  -0.0f, 0.666667f, 0.0f,      -1.0f, 1.0f,  -1.0f,     -1.0f,     0.0f,  -0.0f, 1.0f,      0.0f,
+    1.0f,  1.0f,  1.0f,      0.0f,      1.0f,  0.0f,  0.333333f, 0.333333f, 1.0f,  1.0f,  -1.0f,     0.0f,
+    1.0f,  0.0f,  0.666667f, 0.333333f, -1.0f, 1.0f,  -1.0f,     0.0f,      1.0f,  0.0f,  0.666667f, 0.666667f,
+    -1.0f, 1.0f,  1.0f,      0.0f,      1.0f,  0.0f,  0.333333f, 0.666667f,
 }; // end unitcubeVertices
 
 const unsigned cubelinesTriangles[] = {
@@ -55,4 +48,5 @@ const unsigned cubelinesTriangles[] = {
 	0,0,0,0,0,0,0,0,
 	0,0,0,0,			//4*8+4=36
 }; // end
-pgr::MeshData cubelinesMesh = {cubelinesNVertices,cubelinesNTriangles,cubelinesNAttribsPerVertex,cubelinesVertices,cubelinesTriangles };
+pgr::MeshData cubelinesMesh = {cubelinesNVertices, cubelinesNTriangles, cubelinesNAttribsPerVertex, cubelinesVertices,
+                               cubelinesTriangles};

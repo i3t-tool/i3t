@@ -3,8 +3,5 @@
 template <typename T>
 void getValue(YAML::Node&& node, T& t)
 {
-	if (node)
-	{
-		t = node.as<T>();
-	}
+	if (node) { t = node.as<T>(); }
 }
