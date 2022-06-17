@@ -122,7 +122,7 @@ TEST(GLM, GetAngleFromEulerX)
 
 /// \todo Fix this test.
 /*
-TEST(EulerXTest, SetMatrixShuldBeValid)
+TEST(EulerXTest, SetMatrixShouldBeValid)
 {
 	float initialRad = glm::radians(generateFloat());
 	auto eulerX = Builder::createTransform<ETransformType::EulerX>();

@@ -41,7 +41,7 @@ bool WorkspaceTransformation::topContent()
     interaction_happen |= WorkspaceNodeWithCoreData::topContent();
     ImGui::SameLine();
 
-    if (dataAreValid()!=Core::ETransformState::Valid)
+    if (isMatrixValid()!=Core::ETransformState::Valid)
     {
         ImVec2 iconSize = ImVec2(ImGui::GetFontSize(),ImGui::GetFontSize());
 //     \todo JH Right Align
@@ -50,7 +50,7 @@ bool WorkspaceTransformation::topContent()
 //    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, getNodeRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x /*actual free space*/ - iconSize.x - m_topOversizeSpace)*diwne.getWorkAreaZoom());
 
         ImGui::SetCursorPosY(ImGui::GetCursorPosY()+ImGui::GetStyle().FramePadding.y);
-        switch (dataAreValid())
+        switch (isMatrixValid())
         {
         case Core::ETransformState::Invalid:
             diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255,0,0), ImColor(255,0,0),
@@ -148,13 +148,19 @@ void WorkspaceTransformation::drawMenuStorevalues()
     }
 }
 
-void WorkspaceTransformation::drawMenuSetDataMap()
+/// used for translate, axisAngle, lookAt, and perspective
+void WorkspaceTransformation::drawMenuSetDataMap()  
 {
-    if(m_nodebase->as<Core::Transformation>()->isLocked()){ if(ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->unlock();} }
-    else                                                  { if(ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->lock();} }
+	bool fullLOD								 = (getLevelOfDetail() == WorkspaceLevelOfDetail::Full);
+	bool enableLockMenuItem			 = fullLOD;
+	bool enableSynergiesMenuItem = fullLOD && (m_nodebase->as<Core::Transformation>()->hasMenuSynergies());  // only some transformations have the possibility to set synergies
 
-    if(m_nodebase->as<Core::Transformation>()->hasSynergies()){ if(ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->disableSynergies();} }
-    else                                                      { if(ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail()==WorkspaceLevelOfDetail::Full)){m_nodebase->as<Core::Transformation>()->enableSynergies();} }
+	if (m_nodebase->as<Core::Transformation>()->isLocked()) {	if(ImGui::MenuItem("Unlock", NULL, false, enableLockMenuItem)) { m_nodebase->as<Core::Transformation>()->unlock(); } }
+  else                                                    { if(ImGui::MenuItem("Lock",   NULL, false, enableLockMenuItem)) { m_nodebase->as<Core::Transformation>()->lock();} }
+
+	if (m_nodebase->as<Core::Transformation>()->hasSynergies()){ if (ImGui::MenuItem("Disable synergies", NULL, false, enableSynergiesMenuItem)) {	m_nodebase->as<Core::Transformation>()->disableSynergies();	} }
+	else																											 { if (ImGui::MenuItem("Enable synergies",  NULL, false, enableSynergiesMenuItem)) {	m_nodebase->as<Core::Transformation>()->enableSynergies(); } }
+		
 }
 
 void WorkspaceTransformation::drawMenuDelete()
@@ -221,42 +227,42 @@ bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(    std::vect
                                                                 ,   std::vector<float*> const& local_data
                                                                 ,   bool &value_changed)
 {
-    int number_of_values = labels.size();
-	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_InsideTablebuilder: All vectors (labels, local_data) must have same size.");
+  int number_of_values = labels.size();
+  Debug::Assert(number_of_values==local_data.size(), "drawDataSetValues_InsideTablebuilder: All vectors (labels, local_data) must have same size.");
 
-	value_changed = false;
-	bool inner_interaction_happen = false, actual_value_changed = false;
+  value_changed = false;
+  bool inner_interaction_happen = false, actual_value_changed = false;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
-	ImGui::TableNextRow();
+  ImGui::TableNextRow();
 
-	for (int i = 0; i < number_of_values; i++)
-	{
-	    ImGui::TableNextColumn();
-		ImGui::TextUnformatted(labels[i].c_str());
-		ImGui::TableNextColumn();
+  for (int i = 0; i < number_of_values; i++)
+  {
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(labels[i].c_str());
+    ImGui::TableNextColumn();
 
-        ImGui::PushItemWidth(getDataItemsWidth());
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
+    ImGui::PushItemWidth(getDataItemsWidth());
+    inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]), *local_data[i], m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn : Core::EValueState::Editable, actual_value_changed);
         value_changed |= actual_value_changed;
         ImGui::PopItemWidth();
-	}
+  }
 
-	ImGui::PopStyleVar(2);
+  ImGui::PopStyleVar(2);
 
-	return inner_interaction_happen;
+  return inner_interaction_happen;
 }
 
-bool WorkspaceTransformation::drawDataSetValuesTable_builder( std::string const cornerLabel,
-                                                                std::vector<std::string> const& columnLabels,
-                                                                std::vector<std::string> const& rowLabels,
-                                                                std::vector<float*> const& local_data,
-                                                                bool &value_changed,
-                                                                int& index_of_change)
+bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const               cornerLabel,
+                                                             std::vector<std::string> const& columnLabels,
+                                                             std::vector<std::string> const& rowLabels,
+                                                             std::vector<float*> const& local_data, 
+                                                             bool& value_changed,
+                                                             int& index_of_change)
 {
-    int number_of_values = columnLabels.size() * rowLabels.size();
+  int number_of_values = columnLabels.size() * rowLabels.size();
 	Debug::Assert(number_of_values==local_data.size(), "drawDataSetValuesTable_builder: columnLabels.size() * rowLabels.size() must be equal to local_data.size()");
 
 	value_changed = false;

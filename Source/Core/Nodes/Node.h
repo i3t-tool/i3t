@@ -137,7 +137,7 @@ protected:
 
 public:
 	/**
-	 * Initialize node inputs and outputs according to preset node type.
+	 * Initialize node id, inputs, and outputs according to the preset node type.
 	 *
 	 * Called in create node function.
 	 *
@@ -146,7 +146,7 @@ public:
 	void init();
 
 	/**
-	 * Prepares node for its destruction, after that destructor can be called.
+	 * Prepares node for its destruction, after that the destructor can be called.
 	 */
 	void finalize();
 

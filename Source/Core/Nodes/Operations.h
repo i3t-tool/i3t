@@ -38,6 +38,9 @@ static const std::vector<std::string> matrixIndexNames()
 
 using PinGroup = std::vector<EValueType>;
 
+/**
+ * \brief Description of each graph node (operation enum, default label, input and output pin names and types)
+ */
 struct Operation
 {
 	using Pins = std::vector<EValueType>;
@@ -48,17 +51,31 @@ struct Operation
 	const std::vector<EValueType>	 inputTypes;
 	const int											 numberOfOutputs;  ///< \todo MH Remove, size is known at compile time.
 	const std::vector<EValueType>	 outputTypes;
-	const std::string							 defaultTagText		 = NO_TAG;
-	const std::vector<std::string> defaultInputNames = DEFAULT_NAMES; // if the names are not the names of the OpValueType
-	const std::vector<std::string> defaultOutputNames =
-			DEFAULT_NAMES; // if the names are not the names of the OpValueType
+	const std::string							 defaultTagText		  = NO_TAG;
+	const std::vector<std::string> defaultInputNames  = DEFAULT_NAMES; // if the names differ from the names of the OpValueType
+	const std::vector<std::string> defaultOutputNames = DEFAULT_NAMES; // if the names differ from the names of the OpValueType
 
-	const bool isConstructor = false;
+	const bool isConstructor = false; //< this is a standard operator node - processes only the connected pins and has no GUI  editable values
 
+	
+	/**
+	 * \brief Constructor used for definition of editable values in static const std::vector<TransformOperation> g_transforms 
+	 * \param keyWord enum defined in enum class ENodeType
+	 * \param defaultLabel default string label in the workspace \todo Q which one is used - this or the label from 
+	 */
 	Operation(const std::string& keyWord, const std::string& defaultLabel)
 			: keyWord(keyWord), defaultLabel(defaultLabel), numberOfInputs(0), numberOfOutputs(0)
 	{}
 
+	/**
+	 * \brief Constructor for state-less calculating nodes with generic pin names - operators in vector of operations (static const std::vector<Operation> operations)
+	 * \param keyWord enum defined in enum class ENodeType
+	 * \param defaultLabel default string label in the workspace
+	 * \param numberOfInputs \todo to be removed - known in compile time
+	 * \param inputTypes as defined in std::vector<EValueType>
+	 * \param numberOfOutputs \todo to be removed - known in compile time
+	 * \param outputTypes as defined in std::vector<EValueType>
+	 */
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes) :
@@ -67,6 +84,10 @@ struct Operation
 			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes)
 	{}
 
+	/**
+	 * \brief Constructor for Value nodes (float, vec3, vec4, mat, quat). \todo Q There is no contructor for pulse?
+	 * \param isConstructor have true here
+	 */
 	Operation(const std::string& keyWord, const std::string& defaultLabel, bool isConstructor, int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes) :
@@ -75,6 +96,14 @@ struct Operation
 			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes)
 	{}
 
+	
+	
+	/**
+	 * \brief Constructor for Transform matrices constructors
+	 *  (state-less calculating nodes with explicitly defined input pin names)
+	 * \param defaultTagText - used rarely for a hoover tag (mostly used with NO_TAG "" )
+	 * \param defaultInputNames vector of strings with predefined input names
+	 */
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
@@ -84,7 +113,12 @@ struct Operation
 			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText),
 			defaultInputNames(defaultInputNames)
 	{}
-
+	/**
+	 * \brief Constructor for a Cycle node with named inputs and outputs - as static const Operation g_CycleProperties
+	 * \param defaultTagText  - used rarely for a hoover tag (mostly used with NO_TAG "" )
+	 * \param defaultInputNames vector of strings with predefined input names
+	 * \param defaultOutputNames vector of strings with predefined output names
+	 */
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes, const std::string& defaultTagText,
@@ -95,6 +129,11 @@ struct Operation
 			defaultInputNames(defaultInputNames), defaultOutputNames(defaultOutputNames)
 	{}
 
+	/**
+	 * \brief Constructor for a Cycle node with named inputs and outputs - as static const Operation g_CycleProperties
+	 * \param defaultTagText  - used rarely for a hoover tag (mostly used with NO_TAG "" )
+	 * \param defaultInputNames vector of strings with predefined input names
+	 */
 	Operation(const std::string& keyWord, const std::string& defaultLabel, const int numberOfInputs,
 						const std::vector<EValueType>& inputTypes, const int numberOfOutputs,
 						const std::vector<EValueType>& outputTypes, const std::string& defaultTagText) :
@@ -103,12 +142,13 @@ struct Operation
 			numberOfOutputs(numberOfOutputs), outputTypes(outputTypes), defaultTagText(defaultTagText)
 	{}
 
-	Operation(const std::string& keyWord, const std::string& defaultLabel,
-						const std::vector<std::string>&	defaultInputNames) :
-			keyWord(keyWord),
-			defaultLabel(defaultLabel), defaultInputNames(defaultInputNames), numberOfInputs(0),
-			numberOfOutputs(0)
-	{}
+	// \todo NEVER USED
+	//Operation(const std::string& keyWord, const std::string& defaultLabel,
+	//					const std::vector<std::string>&	defaultInputNames) :
+	//		keyWord(keyWord),
+	//		defaultLabel(defaultLabel), defaultInputNames(defaultInputNames), numberOfInputs(0),
+	//		numberOfOutputs(0)
+	//{}
 };
 
 enum class ENodeType
@@ -209,21 +249,21 @@ using EOperatorType = ENodeType;
 enum class ETransformType
 {
 	// This is for a sequence.
-	Free = 0,       // PREP-
-	Translation,    // PREP-
-	EulerX,         // PREP-
-	EulerY,         // PREP-
-	EulerZ,         // PREP-
-	Scale,          // PREP-
-	AxisAngle,      // PREP-
-	Quat,           // PREP-
-	Ortho,          // PREP-
-	Perspective,    // PREP-
-	Frustum,        // PREP-
-	LookAt,         // PREP-
+	Free = 0,       // 0  PREP-
+	Translation,    // 1  PREP-
+	EulerX,         // 2  PREP-
+	EulerY,         // 3  PREP-
+	EulerZ,         // 4  PREP-
+	Scale,          // 5  PREP-
+	AxisAngle,      // 6  PREP-
+	Quat,           // 7  PREP-
+	Ortho,          // 8  PREP-
+	Perspective,    // 9  PREP-
+	Frustum,        // 10 PREP-
+	LookAt,         // 11 PREP-
 };
 
-// pro kazdy OpValueType (NodeData.h) je jeden string
+// default string name of each OpValueType (defined in NodeData.h) 
 static const std::array<const char*, 8> defaultIoNames = {
 		"pulse",	// PULSE		MN dodelat
 		"float",	// Float
@@ -235,6 +275,7 @@ static const std::array<const char*, 8> defaultIoNames = {
 		""				// SCREEN		MN dodelat
 };
 
+// variants of input and output pins
 static const std::vector<EValueType> matrixInput	= {EValueType::Matrix};
 static const std::vector<EValueType> vectorInput	= {EValueType::Vec4};
 static const std::vector<EValueType> vector3Input = {EValueType::Vec3};
@@ -282,6 +323,7 @@ static const std::vector<EValueType> quatVector3Input	 = {EValueType::Quat, EVal
 static const std::vector<EValueType> matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
 static const std::vector<EValueType> matrixMulInput					 = {EValueType::MatrixMul};
 
+// explicitly defined pin names
 static const std::vector<std::string> mixInputNames							 = {"from", "to", "t"};
 static const std::vector<std::string> AngleAxisToQuatInputNames	 = {"angle", "angle / 2", "vec3"};
 static const std::vector<std::string> QuatToFloatVecInputNames	 = {"w", "(x,y,z)"};
@@ -301,6 +343,7 @@ static const std::vector<std::string> lookAtInputNames					 = {"eye", "center", 
  * \brief Table box with configuration parameters
  * \nevim VectorMulMatrix -  vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice???
  */
+
 static const std::vector<Operation> operations = {
 		{n(ENodeType::Inversion), "inversion", 1, matrixInput, 1, matrixInput},							 // inversion
 		{n(ENodeType::Transpose), "transpose", 1, matrixInput, 1, matrixInput},							 // transpose
@@ -382,7 +425,7 @@ static const std::vector<Operation> operations = {
 		{n(ENodeType::Model), "model", 1, matrixMulInput, 0, {}},
 
 		// Transform matrices constructors
-    // PF: I have deleted the world constructor from all operators
+    // PF: I have deleted the world "constructor" from all operatorNames
 		{n(ENodeType::MakeTranslation), "translate", 1, vector3Input, 1, matrixInput}, // translate
 		{n(ENodeType::MakeEulerX), "eulerAngleX", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleX
 		{n(ENodeType::MakeEulerY), "eulerAngleY", 1, floatInput, 1, matrixInput, NO_TAG, eulerInputNames}, // eulerAngleY
@@ -434,13 +477,16 @@ inline const Operation g_cameraProperties = {
 //===-- TRANSFORMS --------------------------------------------------------===//
 
 /**
- * \brief ROW ORDER flags, if the value is editable (may be changed by the mouse drag)
+ * \brief ROW ORDER flags, if the mat4x4 values are editable (i.e., each single value may be changed by the mouse drag or not)
  */
 using TransformMask = std::bitset<16>;
 
+/**
+ * \brief Extends Operation - adds properties to transform nodes
+ */
 struct TransformOperation
 {
-	using ValueMap = std::map<std::string, EValueType>;
+	using ValueMap = std::map<std::string, EValueType>; //< names and types of additional parameters (such as parameters for matrix definition in the middle LOD)
 
 	Operation     operation;
 	TransformMask mask;
@@ -517,7 +563,7 @@ static const std::vector<TransformOperation> g_transforms = {
 		},
 		{
 				{n(ETransformType::Frustum), "frustum"},
-				// 0b1010011000110010,       // forbid to edit -1
+				// 0b1010011000110010,       // forbid to edit -1 in the last row
 				0b1010011000110000, 
 				{
 						{"left",   EValueType::Float},

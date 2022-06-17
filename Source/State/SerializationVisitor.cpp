@@ -161,7 +161,7 @@ std::optional<NodeData> dumpTransform(Ptr<GuiTransform> guiTransform)
 
 	static std::string formatString = std::string(g_baseFormatString) +
 			"    value: {}\n"
-			"    synergies: {}\n"
+			"    synergies: {}\n"  //PF todo hasMenuSynergies
 			"    locked: {}\n";
 
 	auto sequence = transform->getCurrentSequence();
@@ -553,6 +553,7 @@ void buildTransform(YAML::Node& node)
 			{
 				const auto vec4 = buildVec4(val);
 				coreTransform->setDefaultValue(key,glm::make_quat(glm::value_ptr(vec4)));
+				// todo set LOD SetValues
 				break;
 			}
 			default:
@@ -567,8 +568,8 @@ void buildTransform(YAML::Node& node)
 		{ coreTransform->setSavedValue(buildMat4(node["saved_value"]));
 		}
 
-		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies();
-		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();
+		node["synergies"].as<bool>() ? coreTransform->enableSynergies() : coreTransform->disableSynergies(); //PF todo hasSynergies
+		node["locked"].as<bool>()    ? coreTransform->lock() : coreTransform->unlock();  
 
 		coreTransform->changeId(id);
 	}

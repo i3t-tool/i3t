@@ -5,12 +5,6 @@
 
 namespace Core
 {
-/**
- * @param mask   code of possible values (in the ROW order!) -1, 0, 1, ANY
- * @param coords {x, y} x is column and y is row.
- * @param value  value from the matrix to be validated against the mask 
- * @return true for an allowed value on given position in the matrix
- */
 bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
 	const int8_t maskValue = mask[coords.y * 4 + coords.x];  //mask is in the ROW order (see Value masks in TransformImpl.cpp)
@@ -41,7 +35,7 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 //===----------------------------------------------------------------------===//
 
 Transformation::Transformation(const TransformOperation& transformType)
-		: NodeBase(&(transformType.operation))
+		: Node(&(transformType.operation))
 {
 	m_internalData.push_back(DataStore(EValueType::Matrix));
 	m_savedData = DataStore(EValueType::Matrix);
@@ -52,7 +46,7 @@ void Transformation::createDefaults()
 	const auto& opName        = getOperation()->keyWord;
 	const auto& transformType = getTransformOperation(magic_enum::enum_cast<ETransformType>(opName).value());
 
-	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
+ 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
 		m_defaultValues[key] = Data(valueType);
 	}
@@ -79,7 +73,7 @@ EValueState Transformation::getValueState(glm::ivec2 coords)
 	auto& map = getTransformMap(getOperation()->keyWord);
 
 	std::bitset<2> bitResult;
-	bitResult[0] = map[15 - idx] && m_hasEnabledSynergies;  // synergies bit
+	bitResult[0] = map[15 - idx] && m_hasSynergies;  // synergies bit
 	bitResult[1] = map[15 - idx] || !m_isLocked;            // editable bit
 
 	auto result = bitResult.to_ulong();

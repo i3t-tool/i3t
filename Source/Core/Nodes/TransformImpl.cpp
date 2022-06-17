@@ -91,7 +91,7 @@ ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 {
 	bool result = validateValues(g_ScaleMask, m_internalData[0].getMat4());
 
-	if (hasSynergies())
+	if (hasSynergies()) 
 	{
 		auto& mat = m_internalData[0].getMat4();
 		result = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
@@ -111,7 +111,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& v
 {
 	if (hasSynergies())
 	{
-		if (Math::areElementsSame(vec))
+		if (Math::areElementsSame(vec))  // todo epsilonEQ would be probably better 
 		{
 			setInternalValue(glm::scale(vec));
 		}
@@ -140,7 +140,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (hasSynergies() && coords.x == coords.y && coords.x != 3)
+	if (hasSynergies() && coords.x == coords.y && coords.x != 3)  // not the bottom-right corner
 	{
 		setInternalValue(glm::scale(glm::vec3(val)));
 	}
@@ -152,21 +152,29 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
+void TransformImpl<ETransformType::Scale>::setDefaultUniformScale(float val)
+{
+	Transformation::setDefaultValue("scale", glm::vec3(val));
+};
+
 
 void TransformImpl<ETransformType::Scale>::onReset()
 {
-//	m_hasEnabledSynergies = true; // JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
-//	m_isLocked            = true;
+
+	// Do not enable synergies on reset, as it would switch to a uniform scale
+	// m_hasSynergies = true; // PFx: JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
+	m_isLocked = true;
 
 	auto scale = getDefaultValue("scale").getVec3();
 
-	if (m_hasEnabledSynergies)
+	if (m_hasSynergies)
 	{
 		scale.y = scale.x;
 		scale.z = scale.x;
 	}
 
 	setInternalValue(glm::scale(scale));
+	notifySequence();
 }
 
 //===-- Euler rotation around X axis --------------------------------------===//
@@ -275,10 +283,11 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerX>::onReset()
 {
-	m_hasEnabledSynergies = true;
-	m_isLocked            = true;
+	m_hasSynergies = true;
+	m_isLocked = true;
 
 	setInternalValue(glm::eulerAngleX(getDefaultValue("rotation").getFloat()));
+	notifySequence();
 }
 
 //===-- Euler rotation around Y axis --------------------------------------===//
@@ -385,7 +394,12 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerY>::onReset()
 {
+	//enableSynergies(); // if (hasSynergies) only - but EulerXYZ and Scale HAVE synergies
+	m_hasSynergies = true;
+	m_isLocked = true;
+	
 	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 1.0f, 0.0f)));
+	notifySequence();
 }
 
 //===-- Euler rotation around Z axis --------------------------------------===//
@@ -494,8 +508,12 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerZ>::onReset()
 {
-	resetModifiers();
+	//enableSynergies(); // if (hasSynergies) only - but EulerXYZ and Scale HAVE synergies
+	m_hasSynergies = true;
+	m_isLocked = true;
+	
 	setInternalValue(glm::rotate(getDefaultValue("rotation").getFloat(), glm::vec3(0.0f, 0.0f, 1.0f)));
+	notifySequence();
 }
 
 //===-- Translation -------------------------------------------------------===//
@@ -545,6 +563,8 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 
 void TransformImpl<ETransformType::Translation>::onReset()
 {
+	m_isLocked = true;
+
 	setInternalValue(glm::translate(
 			getDefaultValue("translation").getVec3()
 	));
@@ -581,6 +601,8 @@ ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 
 void TransformImpl<ETransformType::AxisAngle>::onReset()
 {
+	m_isLocked = true;
+
 	setInternalValue(glm::rotate(
 			getDefaultValue("rotation").getFloat(),
 			getDefaultValue("axis").getVec3()
@@ -623,6 +645,9 @@ ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 
 void TransformImpl<ETransformType::Quat>::onReset()
 {
+	//m_isLocked = true; quaternion is never locked
+	//m_hasSynergies = true; ///////////////// \todo PF split reset and set
+
 	setInternalValue(glm::toMat4(m_normalized));
 	notifySequence();
 }
@@ -673,6 +698,9 @@ ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 
 void TransformImpl<ETransformType::Ortho>::onReset()
 {
+	m_isLocked = true; 
+	//m_hasSynergies = true;  // symmetrical frustum
+
 	setInternalValue(glm::ortho(
 			getDefaultValue("left").getFloat(),
 			getDefaultValue("right").getFloat(),
@@ -722,6 +750,9 @@ ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 
 void TransformImpl<ETransformType::Perspective>::onReset()
 {
+	m_isLocked = true;
+	m_hasSynergies = true; // symmetrical frustum
+
 	setInternalValue(glm::perspective(
 			getDefaultValue("fov").getFloat(),
 			getDefaultValue("aspect").getFloat(),
@@ -770,6 +801,9 @@ ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 
 void TransformImpl<ETransformType::Frustum>::onReset()
 {
+	m_isLocked						= true;
+	m_hasSynergies = true; // symmetrical frustum
+
 	setInternalValue(glm::frustum(
 			getDefaultValue("left").getFloat(),
 			getDefaultValue("right").getFloat(),
@@ -831,6 +865,9 @@ ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 
 void TransformImpl<ETransformType::LookAt>::onReset()
 {
+	m_isLocked						= true;
+	//m_hasSynergies = true; // no meaning now
+
 	setInternalValue(glm::lookAt(
 			getDefaultValue("eye").getVec3(),
 			getDefaultValue("center").getVec3(),

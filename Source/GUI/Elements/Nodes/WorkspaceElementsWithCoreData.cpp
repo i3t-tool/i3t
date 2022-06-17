@@ -825,22 +825,22 @@ bool bypassFloatRaisePopupAction() {return InputManager::isActionTriggered("rais
 
 bool drawDragFloatWithMap_Inline(DIWNE::Diwne &diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode, std::string const label, float& value, Core::EValueState const& valueState, bool& valueChanged)
 {
-	bool inactive = (valueState == Core::EValueState::Locked || valueState == Core::EValueState::LockedSyn);
-	bool synergies = (valueState == Core::EValueState::EditableSyn || valueState == Core::EValueState::LockedSyn);
-    bool inner_interaction_happen = false, valueChangedByPopup = false;
+  bool inactive = (valueState == Core::EValueState::Locked || valueState == Core::EValueState::LockedSyn);
+  bool synergies = (valueState == Core::EValueState::EditableSyn || valueState == Core::EValueState::LockedSyn);
+  bool inner_interaction_happen = false, valueChangedByPopup = false;
 
-	if (synergies)
-	{
-	    ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0,100,0, 255)); /* \todo Color from settings */
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, IM_COL32(0,100,50, 255));
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, IM_COL32(0,100,100, 255));
+  if (synergies)
+  {
+      ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0,100,0, 255)); /* \todo Color from settings */
+      ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, IM_COL32(0,100,50, 255));
+      ImGui::PushStyleColor(ImGuiCol_FrameBgActive, IM_COL32(0,100,100, 255));
 
-	}
-    if (inactive)
-	{
-		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f); /* \todo JH inactive style from settings */
-	}
+  }
+  if (inactive)
+  {
+    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f); /* \todo JH inactive style from settings */
+  }
 
 	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
 

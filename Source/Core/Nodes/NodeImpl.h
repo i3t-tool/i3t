@@ -752,7 +752,7 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 	// PF force the long way round interpolation
 	if (cosTheta > T(0))
 	{
-		z = -y;
+		z        = -y;
 		cosTheta = -cosTheta;
 	}
 
@@ -761,8 +761,7 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 	if (cosTheta > T(1) - glm::epsilon<T>())
 	{
 		// Linear interpolation
-		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
-														glm::mix(x.z, z.z, a));
+		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a), glm::mix(x.z, z.z, a));
 	}
 	else
 	{
@@ -771,21 +770,22 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 		/// \todo operator* override (float and double?)
 		// return (sin((T(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
 		return glm::tquat<T, P>(
-				glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
-				glm::mix(x.z, z.z,
-								 a)); // tohle je určitě špatně - je to tu jen abych to zkompiloval - má tu být to o řádek výš
+		    glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
+		    glm::mix(x.z, z.z,
+		             a)); // tohle je určitě špatně - je to tu jen abych to zkompiloval - má tu být to o řádek výš
 	}
 }
 
 // QuatLongWaySlerp
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLongWaySlerp>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void NodeImpl<ENodeType::QuatLongWaySlerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 		// setInternalValue(glm::mix(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
 		// m_inputs[2].getStorage().getFloat()));
 		setInternalValue(longWaySlerp(m_inputs[0].getStorage().getQuat(), m_inputs[1].getStorage().getQuat(),
-																	m_inputs[2].getStorage().getFloat()));
+		                              m_inputs[2].getStorage().getFloat()));
 	}
 	else
 	{
@@ -794,19 +794,20 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLongWaySlerp>::updateValue
 }
 
 // QuatLerp
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLerp>::updateValues(int inputIndex)
+template <>
+FORCE_INLINE void NodeImpl<ENodeType::QuatLerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 
 		float w = glm::mix(m_inputs[0].getStorage().getQuat().w, m_inputs[1].getStorage().getQuat().w,
-											 m_inputs[2].getStorage().getFloat());
+		                   m_inputs[2].getStorage().getFloat());
 		float x = glm::mix(m_inputs[0].getStorage().getQuat().x, m_inputs[1].getStorage().getQuat().x,
-											 m_inputs[2].getStorage().getFloat());
+		                   m_inputs[2].getStorage().getFloat());
 		float y = glm::mix(m_inputs[0].getStorage().getQuat().y, m_inputs[1].getStorage().getQuat().y,
-											 m_inputs[2].getStorage().getFloat());
+		                   m_inputs[2].getStorage().getFloat());
 		float z = glm::mix(m_inputs[0].getStorage().getQuat().z, m_inputs[1].getStorage().getQuat().z,
-											 m_inputs[2].getStorage().getFloat());
+		                   m_inputs[2].getStorage().getFloat());
 
 		setInternalValue(glm::quat(w, x, y, z));
 	}

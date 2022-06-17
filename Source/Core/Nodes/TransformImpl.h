@@ -18,6 +18,8 @@ namespace Core
 		return node;                                                                                                       \
 	}
 
+// PF todo hasSynergis only nodes with m_hasMenuSynergies
+
 template <ETransformType T>
 class TransformImpl : public Transformation
 {};
@@ -27,7 +29,7 @@ namespace Builder
 	template <ETransformType T>
 	Ptr<Transformation> createTransform()
 	{
-		const auto defaultValues = getTransformDefaults(T);
+ 		//const auto defaultValues = getTransformDefaults(T);  //\todo PF - not used????
 		auto       ret           = std::make_shared<TransformImpl<T>>();
 		ret->init();
 		ret->createDefaults();
@@ -56,7 +58,13 @@ public:
 		return ValueSetResult{};
 	}
 
-	void onReset() override { setInternalValue(glm::mat4(1.0f)); };
+	void onReset() override
+	{
+		//m_isLocked = true; is never locked
+
+		setInternalValue(glm::mat4(1.0f));
+		notifySequence();
+	};
 };
 
 
@@ -64,7 +72,11 @@ template <>
 class TransformImpl<ETransformType::Scale> : public Transformation
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Scale)) { enableSynergies(); }
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Scale))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();
+	}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Scale)
 
@@ -76,6 +88,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	[[nodiscard]] void setDefaultUniformScale(float val);
 
 	void onReset() override;
 };
@@ -92,7 +105,11 @@ template <>
 class TransformImpl<ETransformType::EulerX> : public Transformation
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerX)) { enableSynergies(); }
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerX))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();
+	}
 
 	I3T_TRANSFORM_CLONE(ETransformType::EulerX)
 
@@ -118,7 +135,11 @@ template <>
 class TransformImpl<ETransformType::EulerY> : public Transformation
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerY)) { enableSynergies(); }
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerY))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();
+	}
 
 	I3T_TRANSFORM_CLONE(ETransformType::EulerY)
 
@@ -144,7 +165,11 @@ template <>
 class TransformImpl<ETransformType::EulerZ> : public Transformation
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerZ)) { enableSynergies(); }
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerZ))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();
+	}
 
 	I3T_TRANSFORM_CLONE(ETransformType::EulerZ)
 
@@ -205,9 +230,19 @@ class TransformImpl<ETransformType::Quat> : public Transformation
 	glm::quat m_normalized;
 
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();   ///> PF: enableSynergies(); // means normalize for quaternion
+	} 
 
 	I3T_TRANSFORM_CLONE(ETransformType::Quat)
+
+	void initDefaults() override
+	{
+		setValue(glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
+		setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
+	}
 
 	ETransformState isValid() const override;
 
@@ -225,7 +260,11 @@ template <>
 class TransformImpl<ETransformType::Ortho> : public Transformation
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Ortho)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Ortho))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();
+	} // PF> enableSynergies(); // means manage symmetric frustum
 
 	I3T_TRANSFORM_CLONE(ETransformType::Ortho)
 
@@ -276,7 +315,11 @@ template <>
 class TransformImpl<ETransformType::Frustum> : public Transformation
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Frustum)) {}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Frustum))
+	{
+		m_hasMenuSynergies = true;
+		enableSynergies();
+	} // PF> enableSynergies(); // means manage symmetric frustum
 
 	I3T_TRANSFORM_CLONE(ETransformType::Frustum)
 
