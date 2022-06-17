@@ -24,8 +24,13 @@ public:
 
 	Ptr<Core::NodeBase> getNodebaseSequence();
 
-
-	virtual Core::ETransformState dataAreValid() { return Core::ETransformState::Valid; };
+	/**
+	 * \brief helper function used for decision about showing the corrupted transform flag in topContent().
+	 * Overriden in WorkspaceTransformation_s.h
+	 *
+	 * \return Core::ETransformState:: Valid, Invalid, or Unknown
+	 */
+	virtual Core::ETransformState isMatrixValid() { return Core::ETransformState::Valid; };
 
 	virtual void drawMenuSetDataMap();
 

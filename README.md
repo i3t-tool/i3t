@@ -69,3 +69,6 @@ private:
 
 #endif // _EDIT_BOX_H_
 ```` 
+
+## Tvorba nových krabiček
+Při tvorbě nových krabiček postupujte [takto](Docs/HowToAddNode.md).

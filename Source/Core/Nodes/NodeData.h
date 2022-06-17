@@ -50,7 +50,14 @@ enum class EValueType
 
 namespace Core
 {
-/// b1, b2 - b1 is editable bit, b2 is synergies bit
+/**
+ * \brief Float value editable tatus: b1, b2 - b1 is editable bit, b2 is synergies bit
+ *
+ * \todo PF:- proc tohle neni po bitech?
+ *    	SynergiesBit = 0x0001,		///< 001
+ *    	EditableBit  = 0x0002,		///< 010
+ *    	PossibleNextBit = 0x0004,	///< 100 ...
+ */
 enum class EValueState
 {
 	Editable		= 0x0002, ///< 10
@@ -60,6 +67,11 @@ enum class EValueState
 };
 }
 
+/**
+ * \brief string name of the wire type
+ * \param type Enum of the value of the wire
+ * \return string name of the wire type
+ */
 const std::string& valueTypeToString(EValueType type);
 
 /**
@@ -71,7 +83,7 @@ const std::string& valueTypeToString(EValueType type);
 class DataStore
 {
 public:
-	EValueType opValueType; ///< wire type, such as FLOAT or MATRIX
+	EValueType opValueType; ///< wire type, such as Float or 4x4 Matrix
 
 protected:
 	std::variant<bool, glm::mat4, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
