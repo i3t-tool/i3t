@@ -153,6 +153,7 @@ struct Operation
 	//{}
 };
 
+//\todo - rename to EOperatorType instead of this:  using EOperatorType = ENodeType;
 enum class ENodeType
 {
 	Inversion,
@@ -246,7 +247,6 @@ enum class ENodeType
 
 	// SS trackball (trackcube) is done, waiting for Core
 };
-using EOperatorType = ENodeType;
 
 enum class ETransformType
 {
@@ -343,19 +343,20 @@ static const std::vector<std::string> PerspectiveInputNames      = {"fovy", "asp
 static const std::vector<std::string> lookAtInputNames           = {"eye", "center", "up"};
 
 /**
- * \brief Table box with configuration parameters
- * \nevim VectorMulMatrix -  vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice???
+ * \brief Table with configuration parameters for OPERATORS
+ * 
+ * \note Warning: C6262: Function uses '23120' bytes of stack> exceeds /analyze>stacksize '16384'..
+ *   This allocation was for a compiler-generated temporary for 'struct Operation [85]' at line 350.
+ *   Consider moving some data to heap.
  */
-
 static const std::vector<Operation> operations = {
     {n(ENodeType::Inversion), "inversion", 1, matrixInput, 1, matrixInput},              // inversion
     {n(ENodeType::Transpose), "transpose", 1, matrixInput, 1, matrixInput},              // transpose
     {n(ENodeType::Determinant), "determinant", 1, matrixInput, 1, floatInput},           // determinant
     {n(ENodeType::MatrixMulMatrix), "mat * mat", 2, twoMatrixInput, 1, matrixInput},     // mat * mat
     {n(ENodeType::MatrixAddMatrix), "mat + mat", 2, twoMatrixInput, 1, matrixInput},     // mat + mat
-    {n(ENodeType::MatrixMulVector), "mat * vec4", 2, matrixVectorInput, 1, vectorInput}, // mat * vec4
-    {n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1,
-     vectorInput}, // vec4 * mat	MN jaky je duvod teto operace a nema byt vysledek matice??? -- násobení vektoru maticí zprava
+    {n(ENodeType::MatrixMulVector), "mat * vec4", 2, matrixVectorInput, 1, vectorInput}, // mat * vec4 (M * column vector)
+    {n(ENodeType::VectorMulMatrix), "vec4 * mat", 2, vectorMatrixInput, 1, vectorInput}, // vec4 * mat	 (row vector * M)
     {n(ENodeType::MatrixMulFloat), "float * mat", 2, floatMatrixInput, 1, matrixInput},  // float * mat
     {n(ENodeType::VectorDotVector), "vec4 . vec4", 2, twoVectorInput, 1, floatInput},    // vec4 . vec4
     {n(ENodeType::VectorAddVector), "vec4 + vec4", 2, twoVectorInput, 1, vectorInput},   // vec4 + vec4
@@ -365,17 +366,16 @@ static const std::vector<Operation> operations = {
      vectorInput},                                                                     // perspective division
     {n(ENodeType::NormalizeVector), "normalize vec4", 1, vectorInput, 1, vectorInput}, // normalize vec4
     {n(ENodeType::MixVector), "mix vec4", 3, twoVectorFloatInput, 1, vectorInput, NO_TAG, mixInputNames}, // mix vec4
-    {n(ENodeType::Vector3CrossVector3), "vec3 x vec3", 2, twoVector3Input, 1, vector3Input},              // vec3 x vec3
-    {n(ENodeType::Vector3DotVector3), "vec3 . vec3", 2, twoVector3Input, 1, floatInput},                  // vec3 . vec3
-    {n(ENodeType::Vector3AddVector3), "vec3 + vec3", 2, twoVector3Input, 1, vector3Input},                // vec3 + vec3
-    {n(ENodeType::Vector3SubVector3), "vec3 - vec3", 2, twoVector3Input, 1, vector3Input},                // vec3 - vec3
-    {n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVectorInput, 1, vector3Input}, // float * vec3
-    {n(ENodeType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1, vector3Input},  // normalize vec3
+    {n(ENodeType::Vector3CrossVector3), "vec3 x vec3", 2, twoVector3Input, 1, vector3Input}, // vec3 x vec3
+    {n(ENodeType::Vector3DotVector3), "vec3 . vec3", 2, twoVector3Input, 1, floatInput},     // vec3 . vec3
+    {n(ENodeType::Vector3AddVector3), "vec3 + vec3", 2, twoVector3Input, 1, vector3Input},   // vec3 + vec3
+    {n(ENodeType::Vector3SubVector3), "vec3 - vec3", 2, twoVector3Input, 1, vector3Input},   // vec3 - vec3
+    {n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVectorInput, 1, vector3Input},   // float * vec3
+    {n(ENodeType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1, vector3Input},    // normalize vec3
     {n(ENodeType::Vector3Length), "lengthvec3", 1, vector3Input, 1, floatInput,
      "l = sqrt(x*x + y*y + z*z)"}, // lengthvec3
     {n(ENodeType::ShowVector3), "show vec3", 1, vector3Input, 1, matrixInput,
-     "Create the matrix transforming vector [1, 0, 0] to the input vector. Should be used with bind objects / basic "
-     "/ vectors."}, // show vec3
+     "Create the matrix rotating vector [1, 0, 0] to the input vector. Should be used for display of rotated vectors."}, // show vec3
     {n(ENodeType::MixVector3), "mix vec3", 3, twoVector3FloatInput, 1, vector3Input, NO_TAG, mixInputNames}, // mix vec3
     {n(ENodeType::ConjQuat), "quat conjugate", 1, quatInput, 1, quatInput},                // quat conjugate
     {n(ENodeType::FloatVecToQuat), "quatfloat, vec3", 2, floatVector3Input, 1, quatInput}, // quatfloat, vec3
@@ -412,8 +412,8 @@ static const std::vector<Operation> operations = {
     {n(ENodeType::FloatAddFloat), "float + float", 2, twoFloatInput, 1, floatInput},                 // float + float
     {n(ENodeType::FloatPowFloat), "float ^ float", 2, twoFloatInput, 1, floatInput},                 // float ^ float
     {n(ENodeType::MixFloat), "mix float", 3, threeFloatInput, 1, floatInput, NO_TAG, mixInputNames}, // mix float
-    {n(ENodeType::FloatSinCos), "sin&cosfloat", 1, floatInput, 2, twoFloatInput},                    // sin&cosfloat
-    {n(ENodeType::ASinACos), "asin&acosfloat", 1, floatInput, 2, twoFloatInput},                     // asin&acosfloat
+    {n(ENodeType::FloatSinCos), "sin & cos(float)", 1, floatInput, 2, twoFloatInput},                // sin&cos(float)
+    {n(ENodeType::ASinACos), "asin & acos(float)", 1, floatInput, 2, twoFloatInput},                 // asin&acos(float)
     {n(ENodeType::Signum), "signum", 1, floatInput, 1, floatInput},                                  // signum
     {n(ENodeType::MatrixToVectors), "mat -> vecs", 1, matrixInput, 4, fourVectorInput},              // mat -> vecs
     {n(ENodeType::Vectors3ToMatrix), "vecs3 -> mat", 4, fourVector3Input, 1, matrixInput, NO_TAG,
@@ -517,9 +517,10 @@ using TransformMask = std::bitset<16>;
  */
 struct TransformOperation
 {
+	/// Names and types of DefaultValues (parameters for matrix definition in the middle LOD, such as fovy in Perspective)
 	using ValueMap = std::map<
 	    std::string,
-	    EValueType>; //< names and types of additional parameters (such as parameters for matrix definition in the middle LOD)
+	    EValueType>; 
 
 	Operation     operation;
 	TransformMask mask;

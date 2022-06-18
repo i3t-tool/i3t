@@ -77,6 +77,7 @@ const std::string& valueTypeToString(EValueType type);
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
+ * and of the value stored in the defaultValues map (such as fovy for Perspective)
  *
  * Old name was Transmitter in I3T v1.
  */
@@ -119,5 +120,8 @@ public:
 
 namespace Core
 {
+/**
+ * \brief A synonym for DataStore - used for storage of DefaultValues[key]
+ */
 using Data = DataStore;
 }

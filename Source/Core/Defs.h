@@ -105,10 +105,10 @@ public:
 /// Enum utils
 
 /**
- * Get string name of enum field.
- * \tparam T
- * \param val
- * \return
+ * Get string name from enum value.
+ * \tparam T enum definition (such as ENodeType or ETransformType)
+ * \param val Enum value
+ * \return String name of the enum value
  */
 template <typename T>
 auto n(T val)

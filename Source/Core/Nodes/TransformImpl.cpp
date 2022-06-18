@@ -116,7 +116,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 
-	if (hasSynergies() && coords.x == coords.y && coords.x != 3) // not the bottom-right corner
+	if (hasSynergies() && coords.x == coords.y && coords.x != 3) // any float on a 3x3 diagonal, not the 4x4 bottom-right corner
 	{ setInternalValue(glm::scale(glm::vec3(val))); }
 	else
 	{
