@@ -152,6 +152,13 @@ public:
 		reset();
 	}
 
+	template <typename T>
+	void setDefaultValueNoUpdate(const std::string& name, T&& val)
+	{
+		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
+
+		m_defaultValues.at(name).setValue(val);
+	}
 	/**
 	 * \return A map of valueName and value pairs.
 	 */

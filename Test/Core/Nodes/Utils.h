@@ -19,6 +19,12 @@ template <typename T> inline void setValue_expectOk(NodePtr node, T&& value, glm
   auto result = node->setValue(std::forward<T>(value), coords);
   EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 }
+template <typename T>
+inline void setValue_expectWrong(NodePtr node, T&& value, glm::ivec2 coords)
+{
+	auto result = node->setValue(std::forward<T>(value), coords);
+	EXPECT_NE(ValueSetResult::Status::Ok, result.status);
+}
 
 template <typename T1, typename T2>
 inline void plug_expectOk(T1&& lhs, T2&& rhs, int leftIndex = 0, int rightIndex = 0)

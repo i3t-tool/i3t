@@ -1,17 +1,3 @@
-/**
- * \file Core/NodesTransformImpl.h
- * \author Martin Herich, hericmar@fel.cvut.cz
- * \updates Petr Felkel, felkepet@fel.cvut.cz
- *
- * \brief Implementation of individual transformation functionality
- *
- * Each transform nodes represent 4x4 transformations. Each has two types of data, describing them:
- *    1. the 4x4 matrix itself (called the inner value and shown in the Full LOD)
- *    2. the value used in glm to define the transformation (called default values and shown in SetValues LOD)
- *
- *
- */
-
 #include "TransformImpl.h"
 
 #include <math.h>
@@ -521,8 +507,14 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val) {
 
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 {
+	I3T_ASSERT(m_hasSynergies ? vec.x == vec.y == vec.z : true);
+	// or
+	if (hasSynergies())
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Use float version when setting with synergies."};
+
 	setInternalValue(glm::translate(vec));
-	m_defaultValues.at("translate").setValue(vec);  // update Defaults
+	//m_defaultValues.at("translation").setValue(vec);  // update Defaults and Matrix
+	setDefaultValueNoUpdate("translation", vec); // update Defaults ONLY
 	notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};

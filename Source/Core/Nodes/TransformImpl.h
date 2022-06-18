@@ -1,3 +1,32 @@
+/**
+ * \file Source/Core/Nodes/TransformImpl.h
+ * \author Martin Herich, hericmar@fel.cvut.cz
+ * \updates Petr Felkel, felkepet@fel.cvut.cz
+ *
+ * \brief Implementation of individual transformation functionality
+ *
+ * Each transform node represents a 4x4 transformations. Each has two types of data, describing them:
+ *    1. the 4x4 matrix itself (called the inner value and shown in the Full LOD)
+ *    2. the value used in glm to define the transformation (called default values and shown in SetValues LOD)
+ *
+ * Changing of data in Full LOD are handled by setValue methods specific for each transform.
+ *
+ * Some transformationn have direct mapping between matrix and Default values.
+ * This mapping can be done in setValues
+ *
+ * Transformation   mapping Matrix to Default
+ * ------------------------------------------------------------------------------
+ * Free             no LOD   - skipped
+ * Translate        direct   - done in setValue
+ * AxisAngle rot    no
+ * LookAt           no
+ * Perspective      indirect
+ * Ortho            indirect
+ * Frustum          indirect
+ * Quat             indirect
+ * Scale            direct
+ * EulerX,Y,Z       indirect
+ */
 #pragma once
 
 #include "Transform.h"
@@ -18,7 +47,7 @@ namespace Core
 		return node;                                                                                                       \
 	}
 
-// PF todo hasSynergis only nodes with m_hasMenuSynergies
+// PF todo: hasSynergies have only nodes with m_hasMenuSynergies
 
 template <ETransformType T>
 class TransformImpl : public Transformation
