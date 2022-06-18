@@ -1,3 +1,17 @@
+/**
+ * \file Core/NodesTransformImpl.h
+ * \author Martin Herich, hericmar@fel.cvut.cz
+ * \updates Petr Felkel, felkepet@fel.cvut.cz
+ *
+ * \brief Implementation of individual transformation functionality
+ *
+ * Each transform nodes represent 4x4 transformations. Each has two types of data, describing them:
+ *    1. the 4x4 matrix itself (called the inner value and shown in the Full LOD)
+ *    2. the value used in glm to define the transformation (called default values and shown in SetValues LOD)
+ *
+ *
+ */
+
 #include "TransformImpl.h"
 
 #include <math.h>
@@ -145,6 +159,8 @@ void TransformImpl<ETransformType::Scale>::onReset()
 	{
 		scale.y = scale.x;
 		scale.z = scale.x;
+		/////setDefaultUniformScale(scale.x);  // infinite recursion
+		m_defaultValues.at("scale").setValue(scale);
 	}
 
 	setInternalValue(glm::scale(scale));
@@ -506,6 +522,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val) {
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 {
 	setInternalValue(glm::translate(vec));
+	m_defaultValues.at("translate").setValue(vec);  // update Defaults
 	notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -523,6 +540,16 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
 	}
 	setInternalValue(val, coords);
+
+	// update Default Values according to the Transform matrix 
+	if (coords.x == 3 && coords.y != 3)  // last T column
+	{
+		auto & mapPos = m_defaultValues.at("translation");
+		glm::vec3 v      = mapPos.getVec3();
+		v[coords.y]      = val;
+		mapPos.setValue(v);
+	}
+
 	notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};

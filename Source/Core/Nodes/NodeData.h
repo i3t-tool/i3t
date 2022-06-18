@@ -51,7 +51,7 @@ enum class EValueType
 namespace Core
 {
 /**
- * \brief Float value editable tatus: b1, b2 - b1 is editable bit, b2 is synergies bit
+ * \brief Float value editable status: b1, b2 - b1 is editable bit, b2 is synergies bit
  *
  * \todo PF:- proc tohle neni po bitech?
  *    	SynergiesBit = 0x0001,		///< 001

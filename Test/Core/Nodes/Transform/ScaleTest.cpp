@@ -155,3 +155,47 @@ TEST(ScaleTest, GettersAndSetterShouldBeOk)
     EXPECT_EQ(glm::scale(vec), scale->getData().getMat4());
 	}
 }
+
+
+//PF -----------------------------------------
+TEST(ScaleTest, ScaleDefaultsSetMatrix)
+{
+	auto scaleValue = generateFloat();
+	auto scaleVector = generateVec3();
+
+///	auto scaleMat   = glm::scale(scale);
+
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>()
+	     ->as<TransformImpl<ETransformType::Scale>>();
+
+	// Uniform scale.
+	// scalar sets matrix
+	{
+		scaleNode->enableSynergies();
+		scaleNode->setDefaultUniformScale(scaleValue);  //scalar
+		EXPECT_NE(scaleNode->getDefaultValue("scale").getVec3(), scaleVector);
+		EXPECT_EQ(scaleNode->getDefaultValue("scale").getVec3(), glm::vec3(scaleValue));  //uniform
+		EXPECT_EQ(glm::scale(glm::vec3(scaleValue)), scaleNode->getData().getMat4());
+	}
+	// vector sets matrix based on .x only
+	{
+		scaleNode->enableSynergies();
+		scaleNode->setDefaultValue("scale", scaleVector); //vector
+
+		auto v = scaleNode->getDefaultValue("scale").getVec3();
+		//EXPECT_NE(v.x, scaleVector.x);
+		EXPECT_EQ(glm::scale(glm::vec3(scaleVector.x)), scaleNode->getData().getMat4());
+	}
+	// vector sets matrix - correct
+	{
+		scaleNode->disableSynergies();
+		scaleNode->setDefaultValue("scale", scaleVector); //vector
+		//EXPECT_EQ(scaleNode->getDefaultValue("scale"), scaleVector);
+		EXPECT_EQ(glm::scale(scaleVector), scaleNode->getData().getMat4());
+	}
+
+}
+//TEST(ScaleTest, ScaleMatrixSetsDefaults)
+//{
+//	
+//}

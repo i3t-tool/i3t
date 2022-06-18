@@ -90,7 +90,12 @@ void Transformation::reloadValue()
 
 const glm::mat4& Transformation::getSavedValue() const { return m_savedData.getMat4(); }
 
-void Transformation::setSavedValue(const glm::mat4& values) { m_savedData.setValue(values); }
+void Transformation::setSavedValue(const glm::mat4& values)
+{
+	m_savedData.setValue(values);
+
+	m_hasSavedData = true; //PF: was missing in comparison to saveValue()
+}
 
 ValueSetResult Transformation::setValue(const glm::mat4& mat)
 {
@@ -107,7 +112,7 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 			{
 				const float val = mat[c][r];
 
-				// MSVC was unable to compile this expresion without using Node::
+				// MSVC was unable to compile this expression without using Node::
 				result = setValue(val, coords);
 
 				if (result.status != ValueSetResult::Status::Ok)
@@ -131,10 +136,15 @@ void Transformation::notifySequence()
 
 bool Transformation::canSetValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
-	const auto valueState = getValueState(coords);
-	const auto isValid    = m_isLocked ? validateValue(mask, coords, value) : true;
+	if (m_isLocked)
+	{
+		const auto valueState = getValueState(coords);
+		const auto isValid    = m_isLocked ? validateValue(mask, coords, value) : true;
 
-	return canEditValue(valueState) && isValid;
+		return canEditValue(valueState) && isValid;
+	}
+	else
+		return true;
 }
 
 //===----------------------------------------------------------------------===//

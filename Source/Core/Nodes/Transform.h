@@ -213,6 +213,10 @@ public:
 
 	const glm::mat4& getSavedValue() const;
 
+	/**
+	 * \brief Save the value, read from YAML
+	 * \param values matrix from YAML
+	 */
 	void setSavedValue(const glm::mat4& values);
 
 	//===----------------------------------------------------------------------===//
@@ -228,7 +232,11 @@ public:
 	//}
 
 	ValueSetResult setValue(const glm::mat4& mat) override;
-	ValueSetResult setValue(float, glm::ivec2) override { return ValueSetResult{}; }
+	ValueSetResult setValue(float, glm::ivec2) override
+	{
+		// called by AxisAngle rotate, 
+		return ValueSetResult{};
+	}
 
 	//===----------------------------------------------------------------------===//
 	struct HalfspaceSign
