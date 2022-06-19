@@ -10,6 +10,15 @@ using namespace Core;
 
 std::default_random_engine& randomEngine();
 
+inline int generateInt(int from = 0, int to = 3)
+{
+	std::mt19937                     mt{std::random_device{}()};
+	std::uniform_int_distribution<> dist(from, to);
+
+	return static_cast<int>(dist(mt));
+}
+
+
 inline float generateFloat(float from = -10.0f, float to = 10.0f)
 {
   std::mt19937 mt{ std::random_device{}() };

@@ -83,7 +83,7 @@ TEST(ScaleTest, ResetToInitialValues)
 	scaleNode->setDefaultValue("scale", scale);
 
 	// Set free transformation node.
-	scaleNode->free();
+	scaleNode->free();  //unlock, disable synergies
 
 	glm::mat4 mat(1.0f);
 	mat[1][3] = 165.0f;
@@ -96,13 +96,14 @@ TEST(ScaleTest, ResetToInitialValues)
 	}
 	{
 		// Reset to initial values and state.
-		scaleNode->reset();
+		//scaleNode->reset();
+		scaleNode->initDefaults();
 
 		/// \todo Should reset on scale node switch its synergies on?
 		// EXPECT_TRUE(scaleNode->hasSynergies());
 
-		auto expected = glm::scale(scale);
-		auto actual = scaleNode->getData().getMat4();
+		auto expected = glm::scale(glm::vec3(1));
+		auto actual   = scaleNode->getData().getMat4();
 
 		EXPECT_TRUE(Math::eq(expected, actual));
 	}
@@ -195,7 +196,46 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 	}
 
 }
-//TEST(ScaleTest, ScaleMatrixSetsDefaults)
-//{
-//	
-//}
+TEST(ScaleTest, ScaleMatrixSetsDefaults_diagonal)
+{
+	auto scaleValue  = generateFloat();
+	//auto scaleVector = generateVec3();
+
+	///	auto scaleMat   = glm::scale(scale);
+
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>()
+	     ->as<TransformImpl<ETransformType::Scale>>();
+	scaleNode->lock();   // should be
+	int coord = generateInt(0,2);
+
+	// synergies set all three scales
+	{
+		scaleNode->enableSynergies();
+
+		auto result = scaleNode->setValue(scaleValue, {coord, coord});
+		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		auto v = scaleNode->getDefaultValue("scale").getVec3();
+		EXPECT_EQ(v.x, scaleValue);
+		EXPECT_EQ(v.y, scaleValue);
+		EXPECT_EQ(v.z, scaleValue);
+	}
+
+	//no-synergies set just one value
+	{
+		scaleNode->disableSynergies();
+		scaleValue = generateFloat();
+
+		auto result = scaleNode->setValue(scaleValue, {coord, coord });
+		EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
+		auto v = scaleNode->getDefaultValue("scale").getVec3();
+		for (int i = 0; i < 3; i++)
+		{
+			if (i == coord) 
+				 EXPECT_EQ(v[i], scaleValue);
+			else
+			{
+				EXPECT_NE(v[i], scaleValue);
+			}
+		}
+	}
+}

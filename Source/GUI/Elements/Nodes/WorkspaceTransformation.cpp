@@ -141,7 +141,10 @@ void WorkspaceTransformation::drawMenuStorevalues()
 {
 	if (ImGui::BeginMenu("Value"))
 	{
-		if (ImGui::MenuItem("Reset")) { m_nodebase->as<Core::Transformation>()->reset(); }
+		if (ImGui::MenuItem("Reset"))
+		{
+			m_nodebase->as<Core::Transformation>()->initDefaults();
+		} //reset()
 		if (ImGui::MenuItem("Store")) { m_nodebase->as<Core::Transformation>()->saveValue(); }
 		if (ImGui::MenuItem("Restore", nullptr, false, m_nodebase->as<Core::Transformation>()->hasSavedValue()))
 		{ m_nodebase->as<Core::Transformation>()->reloadValue(); }

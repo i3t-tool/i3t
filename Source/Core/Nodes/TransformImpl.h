@@ -14,12 +14,13 @@
  * Some transformationn have direct mapping between matrix and Default values.
  * This mapping can be done in setValues
  *
- * Transformation   mapping Matrix to Default
- * ------------------------------------------------------------------------------
- * Free             no LOD   - skipped
- * Translate        direct   - done in setValue
+ * Transformation   mapping Matrix to Default                initDefaults()
+ *                  (FULL->SetValues)                        (menu value/reset)
+ * --------------------------------------------------------------------------------
+ * Free             no Defaults => no InitDefaults & reset    onReset sets identity   DONE
+ * Translate        direct   - done in setValue               own initDefaults(), onReset use default
  * AxisAngle rot    no
- * LookAt           no
+ * LookAt           no       - done, setValue without test, moved to transform
  * Perspective      indirect
  * Ortho            indirect
  * Frustum          indirect
@@ -88,7 +89,7 @@ public:
 
 	void onReset() override
 	{
-		//m_isLocked = true; is never locked
+		//m_isLocked = true; Free is never locked
 
 		setInternalValue(glm::mat4(1.0f));
 		notifySequence();
@@ -108,9 +109,8 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::Scale)
 
-	void initDefaults() override { setDefaultValue("scale", glm::vec3{1.0f, 1.0f, 1.0f}); }
-
 	ETransformState isValid() const override;
+	void            initDefaults() override;
 
 	[[nodiscard]] ValueSetResult setValue(float val) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -142,6 +142,7 @@ public:
 	I3T_TRANSFORM_CLONE(ETransformType::EulerX)
 
 	ETransformState isValid() const override;
+	void            initDefaults() override;
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -172,6 +173,7 @@ public:
 	I3T_TRANSFORM_CLONE(ETransformType::EulerY)
 
 	ETransformState isValid() const override;
+	void            initDefaults() override;
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -202,6 +204,7 @@ public:
 	I3T_TRANSFORM_CLONE(ETransformType::EulerZ)
 
 	ETransformState isValid() const override;
+	void            initDefaults() override;
 
 	[[nodiscard]] ValueSetResult setValue(float rad) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -222,7 +225,9 @@ public:
 
 	ETransformState isValid() const override;
 
-	[[nodiscard]] ValueSetResult setValue(float val) override;
+	void initDefaults() override;
+
+	[[nodiscard]] ValueSetResult setValue(float val) override;  // usefull for init only
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
@@ -240,10 +245,10 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::AxisAngle)
 
-	void initDefaults() override { setDefaultValue("axis", glm::vec3{0.0f, 1.0f, 0.0f}); }
-
 	ETransformState isValid() const override;
 
+	void            initDefaults() override;
+	
 	ValueSetResult setValue(float rads) override;
 	ValueSetResult setValue(const glm::vec3& axis) override;
 
@@ -266,13 +271,9 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::Quat)
 
-	void initDefaults() override
-	{
-		setValue(glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
-		setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
-	}
-
 	ETransformState isValid() const override;
+
+	void initDefaults() override;
 
 	const glm::quat& getQuat() const { return m_initialQuat; };
 	const glm::quat& getNormalized() const;
@@ -296,18 +297,8 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::Ortho)
 
-	void initDefaults() override
-	{
-		setDefaultValue("left", -5.0f);
-		setDefaultValue("right", 5.0f);
-		setDefaultValue("bottom", -5.0f);
-		setDefaultValue("top", 5.0f);
-		setDefaultValue("near", 1.0f);
-		setDefaultValue("far", 10.0f);
-	}
-
 	ETransformState isValid() const override;
-
+	void initDefaults() override;
 	/// No synergies required.
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
@@ -323,15 +314,8 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::Perspective)
 
-	void initDefaults() override
-	{
-		setDefaultValue("fov", glm::radians(70.0f));
-		setDefaultValue("aspect", 1.33f);
-		setDefaultValue("zNear", 1.0f);
-		setDefaultValue("zFar", 10.0f);
-	}
-
 	ETransformState isValid() const override;
+	void initDefaults() override;
 
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
@@ -351,17 +335,9 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::Frustum)
 
-	void initDefaults() override
-	{
-		setDefaultValue("left", -5.0f);
-		setDefaultValue("right", 5.0f);
-		setDefaultValue("bottom", -5.0f);
-		setDefaultValue("top", 5.0f);
-		setDefaultValue("near", 1.0f);
-		setDefaultValue("far", 10.0f);
-	}
-
 	ETransformState isValid() const override;
+
+	void initDefaults() override;
 
 	void onReset() override;
 
@@ -380,16 +356,11 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::LookAt)
 
-	void initDefaults() override
-	{
-		setDefaultValue("eye", glm::vec3{0.0, 0.0, 10.0});
-		setDefaultValue("center", glm::vec3{0.0, 0.0, 0.0});
-		setDefaultValue("up", glm::vec3{0.0, 1.0, 0.0});
-	}
-
 	ETransformState isValid() const override;
 
+	void            initDefaults() override;
+	
 	void           onReset() override;
-	ValueSetResult setValue(float val, glm::ivec2 coords) override;
+	//ValueSetResult setValue(float val, glm::ivec2 coords) override; //PF same as in Transform
 };
 } // namespace Core

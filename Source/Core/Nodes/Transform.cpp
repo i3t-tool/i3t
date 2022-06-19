@@ -129,6 +129,18 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 	return ValueSetResult{};
 }
 
+ValueSetResult Transformation::setValue(float val, glm::ivec2 coords) //PF
+{
+	// called by AxisAngle rotate,
+	if (isLocked()) { return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
+
+	setInternalValue(val, coords);
+	notifySequence();
+
+	return ValueSetResult{};
+}
+
+
 void Transformation::notifySequence()
 {
 	if (m_currentSequence) { m_currentSequence->updateValues(-1); }

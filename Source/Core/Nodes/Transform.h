@@ -111,9 +111,15 @@ public:
 	void createDefaults();
 
 	/**
-	 * \brief Init the (non-zero) second level parameters via their initDefauts (used for )
+	 * \brief Init the (non-zero) second level parameters via their initDefaults (and update the matrix )
+	 * It is overriden in all transforms with default values.
+	 * Resets the matrix to identity for transforms without defaults
 	 */
-	virtual void initDefaults() {}
+	virtual void initDefaults()
+	{
+		//setValue(glm::mat4(1.0f));
+		reset();
+	}
 
 	//===----------------------------------------------------------------------===//
 
@@ -193,14 +199,21 @@ public:
 		disableSynergies();
 	}
 
+	/**
+	 * \brief Resets the matrix to match the Default Values, if exist.
+	 * For transforms with no default values, resets the matrix directly.
+	 * Calls specialized functions onReset(), that perform the matrix setup.
+	 */
 	void reset() override //////*****////
 	{
 		onReset();
-		notifySequence();
+		notifySequence(); //\todo - check notify sequence calls (some are in onReset()) 
 	}
 
 	/**
-	 * \brief Reset the transform matrix visible in LOD::Full (internalValue) according to the defaultValues (from LOD::SetValues)
+	 * \brief Reset the transform matrix visible in LOD::Full (internalValue)
+	 * according to the defaultValues (from LOD::SetValues).
+	 * For transforms with no default values, resets the matrix directly.
 	 *
 	 * \todo The name should be changed to avoid misinterpretation with matrix reset
 	 * \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
@@ -239,12 +252,9 @@ public:
 	//}
 
 	ValueSetResult setValue(const glm::mat4& mat) override;
-	ValueSetResult setValue(float, glm::ivec2) override
-	{
-		// called by AxisAngle rotate, 
-		return ValueSetResult{};
-	}
-
+	//ValueSetResult setValue(float, glm::ivec2) override
+	ValueSetResult setValue(float val, glm::ivec2 coords) override; //PF 
+	
 	//===----------------------------------------------------------------------===//
 	struct HalfspaceSign
 	{
