@@ -118,7 +118,8 @@ public:
 	virtual void initDefaults()
 	{
 		//setValue(glm::mat4(1.0f));
-		reset();
+		// \todo init defaults
+		resetMatrixFromDefaults();
 	}
 
 	//===----------------------------------------------------------------------===//
@@ -154,8 +155,8 @@ public:
 	{
 		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
 
-		m_defaultValues.at(name).setValue(val);
-		reset();
+		m_defaultValues.at(name).setValue(val);  //defaults
+		resetMatrixFromDefaults();  // defaults to matrix
 	}
 
 	template <typename T>
@@ -204,7 +205,7 @@ public:
 	 * For transforms with no default values, resets the matrix directly.
 	 * Calls specialized functions onReset(), that perform the matrix setup.
 	 */
-	void reset() override //////*****////
+	void resetMatrixFromDefaults() override //////*****////
 	{
 		onReset();
 		notifySequence(); //\todo - check notify sequence calls (some are in onReset()) 

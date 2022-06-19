@@ -97,6 +97,7 @@ void Transformation::setSavedValue(const glm::mat4& values)
 	m_hasSavedData = true; //PF: was missing in comparison to saveValue()
 }
 
+// PF todo - check for synergies????
 ValueSetResult Transformation::setValue(const glm::mat4& mat)
 {
 	ValueSetResult result;

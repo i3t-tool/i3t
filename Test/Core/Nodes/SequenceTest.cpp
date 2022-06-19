@@ -244,7 +244,7 @@ TEST(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
 	EXPECT_FALSE(Math::eq(initial, beforeReset));
 
 	transform->saveValue();
-	transform->reset();
+	transform->resetMatrixFromDefaults();
 
 	auto afterReset = seq->getData().getMat4();
 	EXPECT_TRUE(Math::eq(initial, afterReset));

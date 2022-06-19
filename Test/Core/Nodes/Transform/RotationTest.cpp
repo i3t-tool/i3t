@@ -133,7 +133,7 @@ TEST(EulerXTest, SetMatrixShouldBeValid)
 	setValue_expectOk(eulerX, mat);
 	EXPECT_TRUE(Math::eq(mat, eulerX->getData().getMat4()));
 
-	eulerX->reset();
+	eulerX->resetMatrixFromDefaults();
 	auto expectedMat = glm::eulerAngleX(initialRad);
 	auto currentMat  = eulerX->getData().getMat4();
 	EXPECT_TRUE(Math::eq(expectedMat, currentMat));
@@ -223,7 +223,7 @@ TEST(EulerYTest, SetMatrixShouldBeValid)
     EXPECT_EQ(ValueSetResult::Status::Ok, setResult.status);
     EXPECT_EQ(mat, eulerY->getData().getMat4());
 
-    eulerY->reset();
+    eulerY->resetMatrixFromDefaults();
     auto expectedMat = glm::eulerAngleY(initialRad);
     auto currentMat = eulerY->getData().getMat4();
     EXPECT_EQ(expectedMat, currentMat);
@@ -308,7 +308,7 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
   setValue_expectOk(eulerZ, mat);
   EXPECT_EQ(mat, eulerZ->getData().getMat4());
 
-	eulerZ->reset();
+	eulerZ->resetMatrixFromDefaults();
   auto expectedMat = glm::eulerAngleZ(initialRad);
   auto currentMat = eulerZ->getData().getMat4();
   EXPECT_EQ(expectedMat, currentMat);

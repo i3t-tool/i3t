@@ -10,7 +10,9 @@ using namespace Core;
 
 template <typename Node, typename T> inline void setValue_expectOk(const Node& node, T&& value)
 {
+	//PF todo - missing check for synergies
 	auto result = node->setValue(std::forward<T>(value));
+	//auto result = setValue(std::forward<T>(value));
 	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 }
 

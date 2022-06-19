@@ -11,8 +11,21 @@
  *
  * Changing of data in Full LOD are handled by setValue methods specific for each transform.
  *
- * Some transformationn have direct mapping between matrix and Default values.
- * This mapping can be done in setValues
+ * Some transformations have direct mapping between matrix and Default values.
+ * This mapping is handled in setValues():
+ * - the float and vector parameters set directly the default parameter and create a fresh, new matrix
+ * - the version setting a single value on given coordinates are more complicated and depend on lock and synergies.
+ *   Setting an editable value in a locked matrix does not change the matrix validity and therefore
+ *        also sets the default value.
+ *   Unlocked matrix setting may invalidate the matrix. Therefore only the editable values can also set the default value,
+ *        the other values change only the matrix and invalidate it.
+ * - problem remains for matrix parameter
+ *        Setup passes editable value only - the non-editable parameters remain unchanged!
+ *        It uses the setValue of each matrix element, but DOES NOT SET-UP the DEFAULTS
+ *        \todo - where is it used?
+ *        World/Components/FreeManipulator.cpp::561
+ *        State/SerializationVisitor.cpp:445
+ *				Source/Core/Nodes/TransformImpl.h/ I3T_TRANSFORM_CLONE macro
  *
  * Transformation   mapping Matrix to Default                initDefaults()
  *                  (FULL->SetValues)                        (menu value/reset)
@@ -40,13 +53,14 @@ namespace Core
 		auto node = Builder::createTransform<T>();                                                                         \
                                                                                                                        \
 		isLocked() ? node->lock() : node->unlock();                                                                        \
-		hasSynergies() ? node->enableSynergies() : node->disableSynergies();                                               \
-                                                                                                                       \
+		(hasMenuSynergies() && hasSynergies()) ? node->enableSynergies() : node->disableSynergies();                       \
+		                                                                                                                   \
 		node->setDefaultValues(getDefaultValues());                                                                        \
 		node->setValue(getData(0).getMat4());                                                                              \
                                                                                                                        \
 		return node;                                                                                                       \
 	}
+//hasSynergies() ? node->enableSynergies() : node->disableSynergies();                                               \
 
 // PF todo: hasSynergies have only nodes with m_hasMenuSynergies
 
