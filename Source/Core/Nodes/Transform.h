@@ -203,12 +203,12 @@ public:
 	/**
 	 * \brief Resets the matrix to match the Default Values, if exist.
 	 * For transforms with no default values, resets the matrix directly.
-	 * Calls specialized functions onReset(), that perform the matrix setup.
+	 * Calls specialized functions onResetMatrixFromDefaults(), that perform the matrix setup.
 	 */
 	void resetMatrixFromDefaults() override //////*****////
 	{
-		onReset();
-		notifySequence(); //\todo - check notify sequence calls (some are in onReset()) 
+		onResetMatrixFromDefaults();
+		notifySequence(); //\todo - check notify sequence calls (some are in onResetMatrixFromDefaults()) 
 	}
 
 	/**
@@ -220,7 +220,7 @@ public:
 	 * \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
 	 *
    */
-	virtual void onReset() {}
+	virtual void onResetMatrixFromDefaults() {}
 
 	//===----------------------------------------------------------------------===//
 
