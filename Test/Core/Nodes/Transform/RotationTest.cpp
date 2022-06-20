@@ -336,11 +336,11 @@ TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
 
 TEST(EulerXTest, SetMatrixShouldBeValid)
 {
-	float initialRad = glm::radians(generateFloat());
+	float initialRad = generateAngleFromDegs(-90.0f, 90.0f);
 	auto eulerX = Builder::createTransform<ETransformType::EulerX>();
 	eulerX->setDefaultValue("rotation", initialRad);
 
-	auto newRad = glm::radians(generateFloat());
+	auto newRad = generateAngleFromDegs(-90.0f, 90.0f);
 	auto mat = glm::eulerAngleX(newRad);
 
 	setValue_expectOk(eulerX, mat);
@@ -410,12 +410,12 @@ TEST(EulerYTest, OneValueSet)
 TEST(EulerYTest, SetMatrixShouldBeValid)
 {
 	//float initialRad = generateFloat(-(M_PI / 2.0f), M_PI / 2.0f);
-	float initialRad = glm::radians(generateFloat());
+	float initialRad = generateAngleFromDegs(-90.0f, 90.0f);
 	//auto eulerY = Builder::createTransform<EulerRotY>(initialRad);
 	auto eulerY = Builder::createTransform<ETransformType::EulerY>();
 	eulerY->setDefaultValue("rotation", initialRad);
 
-	auto newRad = glm::radians(generateFloat());
+	auto newRad = generateAngleFromDegs(-90.0f, 90.0f);
 	auto mat    = glm::eulerAngleY(newRad);
 
 	setValue_expectOk(eulerY, mat);
@@ -491,11 +491,11 @@ TEST(EulerZTest, OneValueSet)
 
 TEST(EulerZTest, SetMatrixShouldBeValid)
 {
-	float initialRad = glm::radians(generateFloat());
+	float initialRad = generateAngleFromDegs(-90.0f, 90.0f);
 	auto  eulerZ     = Builder::createTransform<ETransformType::EulerZ>();
 	eulerZ->setDefaultValue("rotation", initialRad);
 
-	auto newRad = glm::radians(generateFloat());
+	auto newRad = generateAngleFromDegs(-90.0f, 90.0f);
 	auto mat    = glm::eulerAngleZ(newRad);
 
 	setValue_expectOk(eulerZ, mat);

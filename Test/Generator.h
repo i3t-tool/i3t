@@ -27,6 +27,11 @@ inline float generateFloat(float from = -10.0f, float to = 10.0f)
 	return static_cast<float>(dist(mt));
 }
 
+inline float generateAngleFromDegs(float from = 0.0f, float to = 90.0f)
+{
+	return glm::radians(generateFloat(from, to));
+}
+
 inline glm::vec3 generateVec3()
 {
 	return glm::vec3(generateFloat(), generateFloat(), generateFloat());
