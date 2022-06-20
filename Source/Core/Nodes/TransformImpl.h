@@ -41,8 +41,8 @@
  * Transformation     mapping Matrix to Default                initDefaults()
  * TransformType      (FULL->SetValues)                        (menu value/reset)
  * --------------------------------------------------------------------------------
- *  0 Free             no Defaults => no InitDefaults & reset    onResetMatrixFromDefaults sets identity   DONE
- *  1 Translate        direct   - done in setValue               own initDefaults(), onResetMatrixFromDefaults use default
+ *  0 Free             no Defaults => no InitDefaults & reset    resetMatrixFromDefaults sets identity   DONE
+ *  1 Translate        direct   - done in setValue               own initDefaults(), resetMatrixFromDefaults use default
  *  2 EulerX           indirect
  *  3 EulerY           indirect
  *  4 EulerZ           indirect
@@ -125,7 +125,7 @@ public:
 		return ValueSetResult{};
 	}
 
-	void onResetMatrixFromDefaults() override
+	void resetMatrixFromDefaults() override
 	{
 		//m_isLocked = true; Free is never locked
 
@@ -156,7 +156,8 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 	[[nodiscard]] void           setDefaultUniformScale(float val);
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
+	//void DDDDesetMatrixFromDefaults() override;
 };
 
 /**
@@ -187,7 +188,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 /**
@@ -218,7 +219,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 /**
@@ -249,7 +250,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 
@@ -270,7 +271,7 @@ public:
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 //===-- Other transformations ---------------------------------------------===//
@@ -290,7 +291,7 @@ public:
 	ValueSetResult setValue(float rads) override;
 	ValueSetResult setValue(const glm::vec3& axis) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 
@@ -319,7 +320,7 @@ public:
 	ValueSetResult setValue(const glm::quat& vec) override;
 	ValueSetResult setValue(const glm::vec4& vec) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 
@@ -340,7 +341,7 @@ public:
 	/// No synergies required.
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 
@@ -357,7 +358,7 @@ public:
 
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 };
 
 
@@ -377,7 +378,7 @@ public:
 
 	void initDefaults() override;
 
-	void onResetMatrixFromDefaults() override;
+	void resetMatrixFromDefaults() override;
 
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 };
@@ -398,7 +399,7 @@ public:
 
 	void            initDefaults() override;
 	
-	void           onResetMatrixFromDefaults() override;
+	void           resetMatrixFromDefaults() override;
 	//ValueSetResult setValue(float val, glm::ivec2 coords) override; //PF same as in Transform
 };
 } // namespace Core

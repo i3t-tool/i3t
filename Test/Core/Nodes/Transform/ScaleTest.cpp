@@ -73,6 +73,7 @@ TEST(ScaleTest, ResetToInitialValues)
 		// --------Reset to initial values (identity) and state. -----------------------
 		scaleNode->enableSynergies();
 		scaleNode->initDefaults();            //S(1,1,1)
+		//scaleNode->DDDDesetMatrixFromDefaults(); // locks
 		scaleNode->resetMatrixFromDefaults(); // locks
 
 		/// \todo Should resetMatrixFromDefaults on scale node switch its synergies on?

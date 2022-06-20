@@ -156,7 +156,8 @@ void TransformImpl<ETransformType::Scale>::initDefaults()
 }
 
 
-void TransformImpl<ETransformType::Scale>::onResetMatrixFromDefaults()
+//void TransformImpl<ETransformType::Scale>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::Scale>::resetMatrixFromDefaults()
 {
 
 	// Do not enable synergies on reset, as it would switch to a uniform scale
@@ -288,7 +289,7 @@ void TransformImpl<ETransformType::EulerX>::initDefaults()
 	setDefaultValue("rotation", 0.0f);
 }
 
-void TransformImpl<ETransformType::EulerX>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::EulerX>::resetMatrixFromDefaults()
 {
 	m_hasSynergies = true;
 	m_isLocked     = true;
@@ -402,7 +403,7 @@ void TransformImpl<ETransformType::EulerY>::initDefaults()
 	//Transformation::initDefaults();
 	setDefaultValue("rotation", 0.0f);
 }
-void TransformImpl<ETransformType::EulerY>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::EulerY>::resetMatrixFromDefaults()
 {
 	//enableSynergies(); // if (hasSynergies) only - but EulerXYZ and Scale HAVE synergies
 	m_hasSynergies = true;
@@ -521,7 +522,7 @@ void TransformImpl<ETransformType::EulerZ>::initDefaults()
 	setDefaultValue("rotation", 0.0f);
 }
 
-void TransformImpl<ETransformType::EulerZ>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::EulerZ>::resetMatrixFromDefaults()
 {
 	//enableSynergies(); // if (hasSynergies) only - but EulerXYZ and Scale HAVE synergies
 	m_hasSynergies = true;
@@ -595,7 +596,7 @@ void TransformImpl<ETransformType::Translation>::initDefaults()
 	setDefaultValue("translation", glm::vec3{0.0f, 0.0f, 0.0f});
 }
 
-void TransformImpl<ETransformType::Translation>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::Translation>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
@@ -636,7 +637,7 @@ void TransformImpl<ETransformType::AxisAngle>::initDefaults()
 	setDefaultValue("rotation", 0.0f); // needed for menu reset...  \\todo change rotation to angle
 }
 
-void TransformImpl<ETransformType::AxisAngle>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::AxisAngle>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
@@ -681,7 +682,7 @@ void TransformImpl<ETransformType::Quat>::initDefaults()
 	setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
 }
 
-void TransformImpl<ETransformType::Quat>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()
 {
 	//m_isLocked = true; quaternion is never locked
 	//m_hasSynergies = true; ///////////////// \todo PF split reset and set
@@ -741,7 +742,7 @@ void TransformImpl<ETransformType::Ortho>::initDefaults()
 	setDefaultValue("far", 10.0f);
 }
 
-void TransformImpl<ETransformType::Ortho>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::Ortho>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 	//m_hasSynergies = true;  // symmetrical frustum
@@ -794,7 +795,7 @@ void TransformImpl<ETransformType::Perspective>::initDefaults()
 	setDefaultValue("zFar", 10.0f);
 }
 
-void TransformImpl<ETransformType::Perspective>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
 {
 	m_isLocked     = true;
 	m_hasSynergies = true; // symmetrical frustum
@@ -849,7 +850,7 @@ void TransformImpl<ETransformType::Frustum>::initDefaults()
 	setDefaultValue("far", 10.0f);
 }
 
-void TransformImpl<ETransformType::Frustum>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::Frustum>::resetMatrixFromDefaults()
 {
 	m_isLocked     = true;
 	m_hasSynergies = true; // symmetrical frustum
@@ -909,7 +910,7 @@ void TransformImpl<ETransformType::LookAt>::initDefaults()
 	setDefaultValueNoUpdate("center", glm::vec3{0.0, 0.0, 0.0});
 	setDefaultValue("up", glm::vec3{0.0, 1.0, 0.0});
 }
-void TransformImpl<ETransformType::LookAt>::onResetMatrixFromDefaults()
+void TransformImpl<ETransformType::LookAt>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 	//m_hasSynergies = true; // no meaning now

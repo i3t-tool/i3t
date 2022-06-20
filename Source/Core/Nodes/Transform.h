@@ -119,6 +119,7 @@ public:
 	{
 		//setValue(glm::mat4(1.0f));
 		// \todo init defaults
+		//DDDDesetMatrixFromDefaults();
 		resetMatrixFromDefaults();
 	}
 
@@ -156,7 +157,8 @@ public:
 		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
 
 		m_defaultValues.at(name).setValue(val);  //defaults
-		resetMatrixFromDefaults();  // defaults to matrix
+		//DDDDesetMatrixFromDefaults();  // defaults to matrix
+		resetMatrixFromDefaults(); // defaults to matrix
 	}
 
 	template <typename T>
@@ -207,11 +209,13 @@ public:
 	 *
 	 * The opposite setup - from matrix to Defaults - is done in the setValue() functions
 	 */
-	void resetMatrixFromDefaults() override //////*****////
-	{
-		onResetMatrixFromDefaults();
-		notifySequence(); //\todo - check notify sequence calls (some are in onResetMatrixFromDefaults()) 
-	}
+
+	//void resetMatrixFromDefaults() override //////*****////
+	//virtual void DDDDesetMatrixFromDefaults() //////*****////
+	//{
+	//	resetMatrixFromDefaults();
+	//	notifySequence(); //\todo - check notify sequence calls (some are in resetMatrixFromDefaults()) 
+	//}
 
 	/**
 	 * \brief Reset the transform matrix visible in LOD::Full (internalValue)
@@ -222,7 +226,7 @@ public:
 	 * \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
 	 *
    */
-	virtual void onResetMatrixFromDefaults() = 0;  // PF Pure virtual, defined in TransformImpl for each transformation
+	virtual void resetMatrixFromDefaults() = 0;  // PF Pure virtual, defined in TransformImpl for each transformation
 
 	//===----------------------------------------------------------------------===//
 

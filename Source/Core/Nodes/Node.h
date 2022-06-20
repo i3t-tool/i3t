@@ -324,7 +324,7 @@ protected:
 	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 public:
-	virtual void resetMatrixFromDefaults() {}
+	virtual void resetMatrixFromDefaults() {} // - defined in Transform, calls TransformImpl::onReset...
 
 	/// \todo MH will be removed.
 	static const Transform::DataMap* getDataMap();
