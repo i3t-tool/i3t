@@ -275,12 +275,13 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 			mat[1][1] = cos;
 			mat[2][2] = cos;
 		}
+
+		float angle = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
+		setDefaultValueNoUpdate("rotation", angle);
 	}
 
 	setInternalValue(mat);
 
-	float angle = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
-	setDefaultValueNoUpdate("rotation", angle);
 
 	notifySequence();
 
@@ -394,6 +395,9 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 			mat[0][0] = cos;
 			mat[2][2] = cos;
 		}
+
+		float angle = glm::atan(mat[2][0], mat[2][2]); // glm::atan executes ::std::atan2
+		setDefaultValueNoUpdate("rotation", angle);
 	}
 
 	setInternalValue(mat);
@@ -510,6 +514,8 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 			mat[0][0] = cos;
 			mat[1][1] = cos;
 		}
+		float angle = glm::atan(mat[0][1], mat[0][0]); // glm::atan executes ::std::atan2
+		setDefaultValueNoUpdate("rotation", angle);
 	}
 
 

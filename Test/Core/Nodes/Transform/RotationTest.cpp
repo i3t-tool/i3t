@@ -26,7 +26,7 @@ TEST(GLM, RotateAndEulerAngle_Matrices_ShouldBeSame)
 	EXPECT_EQ(lhs, rhs);
 
 	// ---- EulerZ ----
-	lhs = glm::rotate(initialRad, glm::vec3(1.0f, 0.0f, 1.0f));
+	lhs = glm::rotate(initialRad, glm::vec3(0.0f, 0.0f, 1.0f));
 	rhs = glm::eulerAngleZ(initialRad);
 	EXPECT_EQ(lhs, rhs);
 }
@@ -71,9 +71,179 @@ TEST(GLM, GetAngleFromEulerZ)
 	}
 }
 
+TEST(Euler, X_MatrixToDefaultsUpdateWithSynergies)
+{
+	auto rotXNode = Builder::createTransform<ETransformType::EulerX>();
+	auto angle    = glm::radians(generateFloat(0.0,90));
+	auto  c        = cosf(angle);
+	auto  s        = sinf(angle);
+	float val;
 
+	// with synergies, initial quadrant is the first one (X+,Y+)
+	// The matrix content:
+	rotXNode->setValue(c, {1, 1});
+	val = rotXNode->getData().getMat4()[1][1];
+	EXPECT_TRUE(Math::eq(c, val));
 
+	val = rotXNode->getData().getMat4()[2][2];
+	EXPECT_TRUE(Math::eq(c, val));
 
+	val = rotXNode->getData().getMat4()[2][1];
+	EXPECT_TRUE(Math::eq(-s, val));
+
+	val = rotXNode->getData().getMat4()[1][2];
+	EXPECT_TRUE(Math::eq(s, val));
+
+	// The rotation
+	float r = rotXNode->getDefaultValue("rotation").getFloat();
+	EXPECT_TRUE(Math::eq(r, angle));
+
+	auto expectedMatrix = glm::eulerAngleX(angle);
+	EXPECT_TRUE(Math::eq(expectedMatrix, rotXNode->getData().getMat4()));
+}
+
+TEST(Euler, X_MatrixToDefaultsUpdateWithoutSynergies)
+{
+	auto  rotXNode = Builder::createTransform<ETransformType::EulerX>();
+	auto  angle    = glm::radians(generateFloat(0.0, 90));
+	auto  c        = cosf(angle);
+	auto  s        = sinf(angle);
+	float val;
+
+	// without synergies, initial quadrant is the first one (X+,Y+)
+	rotXNode->disableSynergies();
+	// The matrix content:
+	rotXNode->setValue(c, {1, 1});
+	val = rotXNode->getData().getMat4()[1][1];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotXNode->getData().getMat4()[2][2];
+	EXPECT_TRUE(Math::eq(1.0f, val));
+
+	val = rotXNode->getData().getMat4()[2][1];
+	EXPECT_TRUE(Math::eq(0.0f, val));
+
+	val = rotXNode->getData().getMat4()[1][2];
+	EXPECT_TRUE(Math::eq(0.0f, val));
+
+	// The rotation schould be unchanged
+	float r = rotXNode->getDefaultValue("rotation").getFloat();
+	EXPECT_TRUE(Math::eq(0.0f, r));
+}
+
+TEST(Euler, Y_MatrixToDefaultsUpdateWithSynergies)
+{
+	auto  rotYNode = Builder::createTransform<ETransformType::EulerY>();
+	auto  angle    = glm::radians(generateFloat(0.0, 90));
+	auto  c        = cosf(angle);
+	auto  s        = sinf(angle);
+	float val;
+
+	// with synergies, initial quadrant is the first one (X+,Y+)
+	// The matrix content:
+	rotYNode->setValue(c, {0, 0});
+	val = rotYNode->getData().getMat4()[0][0];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotYNode->getData().getMat4()[2][2];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotYNode->getData().getMat4()[2][0];
+	EXPECT_TRUE(Math::eq(s, val));
+
+	val = rotYNode->getData().getMat4()[0][2];
+	EXPECT_TRUE(Math::eq(-s, val));
+
+	// The rotation
+	float r = rotYNode->getDefaultValue("rotation").getFloat();
+	EXPECT_TRUE(Math::eq(r, angle));
+}
+
+TEST(Euler, Y_MatrixToDefaultsUpdateWithoutSynergies)
+{
+	auto  rotYNode = Builder::createTransform<ETransformType::EulerY>();
+	auto  angle    = glm::radians(generateFloat(0.0, 90));
+	auto  c        = cosf(angle);
+	auto  s        = sinf(angle);
+	float val;
+
+	// without synergies, initial quadrant is the first one (X+,Y+)
+	rotYNode->disableSynergies();
+	// The matrix content:
+	rotYNode->setValue(c, {0, 0});
+	val = rotYNode->getData().getMat4()[0][0];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotYNode->getData().getMat4()[2][2];
+	EXPECT_TRUE(Math::eq(1.0f, val));
+
+	val = rotYNode->getData().getMat4()[2][0];
+	EXPECT_TRUE(Math::eq(0.0f, val));
+
+	val = rotYNode->getData().getMat4()[0][2];
+	EXPECT_TRUE(Math::eq(0.0f, val));
+
+	// The rotation schould be unchanged
+	float r = rotYNode->getDefaultValue("rotation").getFloat();
+	EXPECT_TRUE(Math::eq(0.0f, r));
+}
+
+TEST(Euler, Z_MatrixToDefaultsUpdateWithSynergies)
+{
+	auto  rotZNode = Builder::createTransform<ETransformType::EulerZ>();
+	auto  angle    = glm::radians(generateFloat(0.0, 90));
+	auto  c        = cosf(angle);
+	auto  s        = sinf(angle);
+	float val;
+
+	// with synergies, initial quadrant is the first one (X+,Y+)
+	// The matrix content:
+	rotZNode->setValue(c, {0, 0});
+	val = rotZNode->getData().getMat4()[0][0];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotZNode->getData().getMat4()[1][1];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotZNode->getData().getMat4()[1][0];
+	EXPECT_TRUE(Math::eq(-s, val));
+
+	val = rotZNode->getData().getMat4()[0][1];
+	EXPECT_TRUE(Math::eq(s, val));
+
+	// The rotation
+	float r = rotZNode->getDefaultValue("rotation").getFloat();
+	EXPECT_TRUE(Math::eq(r, angle));
+}
+
+TEST(Euler, Z_MatrixToDefaultsUpdateWithoutSynergies)
+{
+	auto  rotZNode = Builder::createTransform<ETransformType::EulerZ>();
+	auto  angle    = glm::radians(generateFloat(0.0, 90));
+	auto  c        = cosf(angle);
+	auto  s        = sinf(angle);
+	float val;
+
+	// without synergies, initial quadrant is the first one (X+,Y+)
+	rotZNode->disableSynergies();
+	// The matrix content:
+	rotZNode->setValue(c, {0, 0});
+	val = rotZNode->getData().getMat4()[0][0];
+	EXPECT_TRUE(Math::eq(c, val));
+
+	val = rotZNode->getData().getMat4()[1][1];
+	EXPECT_TRUE(Math::eq(1.0f, val));
+
+	val = rotZNode->getData().getMat4()[0][1];
+	EXPECT_TRUE(Math::eq(0.0f, val));
+
+	val = rotZNode->getData().getMat4()[1][0];
+	EXPECT_TRUE(Math::eq(0.0f, val));
+
+	// The rotation schould be unchanged
+	float r = rotZNode->getDefaultValue("rotation").getFloat();
+	EXPECT_TRUE(Math::eq(0.0f, r));
+}
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
@@ -349,6 +519,7 @@ TEST(EulerZTest, SetMatrixShouldBeValid)
 
 TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 {
+	// setting of euler angles to matrices creates the as matrices as rotating around individual axes
   std::array<NodePtr, 3> rots = {
       Builder::createTransform<ETransformType::EulerX>(),
       Builder::createTransform<ETransformType::EulerY>(),
