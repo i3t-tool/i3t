@@ -204,6 +204,8 @@ public:
 	 * \brief Resets the matrix to match the Default Values, if exist.
 	 * For transforms with no default values, resets the matrix directly.
 	 * Calls specialized functions onResetMatrixFromDefaults(), that perform the matrix setup.
+	 *
+	 * The opposite setup - from matrix to Defaults - is done in the setValue() functions
 	 */
 	void resetMatrixFromDefaults() override //////*****////
 	{
@@ -216,11 +218,11 @@ public:
 	 * according to the defaultValues (from LOD::SetValues).
 	 * For transforms with no default values, resets the matrix directly.
 	 *
-	 * \todo The name should be changed to avoid misinterpretation with matrix reset
+	 * The opposite setup - from matrix to Defaults - is done in the setValue() functions
 	 * \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
 	 *
    */
-	virtual void onResetMatrixFromDefaults() {}
+	virtual void onResetMatrixFromDefaults() = 0;  // PF Pure virtual, defined in TransformImpl for each transformation
 
 	//===----------------------------------------------------------------------===//
 
@@ -253,7 +255,6 @@ public:
 	//}
 
 	ValueSetResult setValue(const glm::mat4& mat) override;
-	//ValueSetResult setValue(float, glm::ivec2) override
 	ValueSetResult setValue(float val, glm::ivec2 coords) override; //PF 
 	
 	//===----------------------------------------------------------------------===//

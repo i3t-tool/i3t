@@ -165,8 +165,9 @@ void TransformImpl<ETransformType::Scale>::onResetMatrixFromDefaults()
 
 	auto scale = getDefaultValue("scale").getVec3();
 
-	if (m_hasSynergies)
+	if (m_hasSynergies && !Math::areElementsSame(scale))
 	{
+		// \todo - this should never happen - the synergies must be checked in setValue and in setDefault!!!!!!!!
 		scale.y = scale.x;
 		scale.z = scale.x;
 		/////setDefaultUniformScale(scale.x);  // infinite recursion

@@ -27,19 +27,32 @@
  *        State/SerializationVisitor.cpp:445
  *				Source/Core/Nodes/TransformImpl.h/ I3T_TRANSFORM_CLONE macro
  *
- * Transformation   mapping Matrix to Default                initDefaults()
- *                  (FULL->SetValues)                        (menu value/reset)
+ * Test setValue must check:
+ *    - float  - setDefault + update matrix - respect synergies 
+ *		- vec3   - setDefault + update matrix - respect synergies 
+ *		- vec4   - calls vec3 - OK
+ *		- mat    - selective copy of values respecting TransformMask
+ *		         - not clear, if it clears the rest and respects synergies
+ *		- (float, coord) - set single unlocked matrix element
+ *		                 - when synergies - may update other synergistic elements
+ *		                 .................- must update defaults
+ *		                 - must not change defaults and the matrix when changing non-synergistic element
+ *
+ * Transformation     mapping Matrix to Default                initDefaults()
+ * TransformType      (FULL->SetValues)                        (menu value/reset)
  * --------------------------------------------------------------------------------
- * Free             no Defaults => no InitDefaults & reset    onResetMatrixFromDefaults sets identity   DONE
- * Translate        direct   - done in setValue               own initDefaults(), onResetMatrixFromDefaults use default
- * AxisAngle rot    no
- * LookAt           no       - done, setValue without test, moved to transform
- * Perspective      indirect
- * Ortho            indirect
- * Frustum          indirect
- * Quat             indirect
- * Scale            direct
- * EulerX,Y,Z       indirect
+ *  0 Free             no Defaults => no InitDefaults & reset    onResetMatrixFromDefaults sets identity   DONE
+ *  1 Translate        direct   - done in setValue               own initDefaults(), onResetMatrixFromDefaults use default
+ *  2 EulerX           indirect
+ *  3 EulerY           indirect
+ *  4 EulerZ           indirect
+ *  5 Scale            direct
+ *  6 AxisAngle rot    no
+ *  7 Quat             indirect
+ *  8 Ortho            indirect
+ *  9 Perspective      indirect
+ * 10 Frustum          indirect
+ * 11 LookAt           no       - done, setValue without test, moved to transform
  *
  * What should be tested
  *	setValue(float val)              // sets matrix and single float default (such as rotation angle)
