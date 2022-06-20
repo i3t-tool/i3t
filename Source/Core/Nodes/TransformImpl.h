@@ -43,10 +43,10 @@
  * --------------------------------------------------------------------------------
  *  0 Free             ok    no Defaults => no InitDefaults & reset    resetMatrixFromDefaults sets identity   DONE
  *  1 Translate        ok    direct   - done in setValue               own initDefaults(), resetMatrixFromDefaults use default
- *  2 EulerX                 indirect
- *  3 EulerY           indirect
- *  4 EulerZ           indirect
- *  5 Scale            direct
+ *  2 EulerX           ok    indirect
+ *  3 EulerY           ok    indirect
+ *  4 EulerZ           ok    indirect
+ *  5 Scale            ok    direct
  *  6 AxisAngle rot    no
  *  7 Quat             indirect
  *  8 Ortho            indirect

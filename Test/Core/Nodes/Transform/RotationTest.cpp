@@ -58,6 +58,7 @@ TEST(GLM, GetAngleFromEulerY)
 	}
 }
 
+
 // ---- EulerZ ----
 TEST(GLM, GetAngleFromEulerZ)
 {
@@ -247,7 +248,7 @@ TEST(Euler, Z_MatrixToDefaultsUpdateWithoutSynergies)
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
-/*
+
 TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 {
 	auto rotXNode = Builder::createTransform<ETransformType::EulerX>();
@@ -301,25 +302,25 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
 	}
 }
- */
 
-/// \todo Fix this test.
-/*
 TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState)
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
+
+	// single value invalidates the matrix
 	rot->disableSynergies();
-
 	auto rads = generateFloat();
-
-	setValue_expectOk(rot, glm::sin(rads), {1, 2});
+	setValue_expectOk(rot, glm::sin(rads), {1, 2});  // non-editable value 
 
 	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
-}
- */
 
-/// \todo Fix this test.
-/*
+	// synergies repair the matrix
+	rot->enableSynergies(); 
+	setValue_expectOk(rot, glm::sin(rads), {1, 2}); // non-editable value 
+	EXPECT_EQ(ETransformState::Valid, rot->isValid());
+}
+ 
+
 TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
@@ -331,32 +332,33 @@ TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
 
 	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 }
- */
 
 
-/// \todo Fix this test.
-/*
 TEST(EulerXTest, SetMatrixShouldBeValid)
 {
 	float initialRad = glm::radians(generateFloat());
 	auto eulerX = Builder::createTransform<ETransformType::EulerX>();
 	eulerX->setDefaultValue("rotation", initialRad);
 
-	auto mat = glm::eulerAngleX(generateFloat());
+	auto newRad = glm::radians(generateFloat());
+	auto mat = glm::eulerAngleX(newRad);
 
 	setValue_expectOk(eulerX, mat);
-	EXPECT_TRUE(Math::eq(mat, eulerX->getData().getMat4()));
+
+	EXPECT_TRUE(Math::eq(mat, eulerX->getData().getMat4()));   // get what you set
+	auto storedRad = eulerX->getDefaultValue("rotation").getFloat();
+	EXPECT_FALSE(Math::eq(initialRad, storedRad));  // setValue updated the Default
+	EXPECT_TRUE(Math::eq(newRad, storedRad));
 
 	eulerX->resetMatrixFromDefaults();
-	auto expectedMat = glm::eulerAngleX(initialRad);
-	auto currentMat  = eulerX->getData().getMat4();
-	EXPECT_TRUE(Math::eq(expectedMat, currentMat));
+	const auto expectedMat = glm::eulerAngleX(initialRad);
+	const auto currentMat  = eulerX->getData().getMat4();
+	EXPECT_FALSE(Math::eq(expectedMat, currentMat));  // 
 }
- */
 
 //===-- Euler rotation around Y axis --------------------------------------===//
 
-/*
+
 TEST(EulerYTest, OneValueSet)
 {
 	auto rotYNode = Core::Builder::createTransform<ETransformType::EulerY>();
@@ -404,50 +406,40 @@ TEST(EulerYTest, OneValueSet)
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
 }
- */
 
-/*
-/// \todo MH GLM_GetAngleFromEulerY won't pass.
-TEST(GLM, GetAngleFromEulerY)
-{
-  for (int i = 0; i < 10; ++i)
-  {
-    float initialRad = generateFloat(-(M_PI / 2.0f), M_PI / 2.0f);
-
-    auto mat = glm::eulerAngleY(initialRad);
-
-    // float angle = std::atan2(sqrt(1 - std::pow(mat[2][2], 2)), mat[2][2]);
-    float angle = std::asin(mat[2][0]);
-
-    EXPECT_TRUE(Math::eq(initialRad, angle));
-  }
-}
-
-/// \todo MH EulerYTest_SetMatrixShouldBeValid won't pass.
 TEST(EulerYTest, SetMatrixShouldBeValid)
 {
-	for (int i = 0; i < 10; ++i)
-  {
-    float initialRad = generateFloat(-(M_PI / 2.0f), M_PI / 2.0f);
-    auto eulerY = Builder::createTransform<EulerRotY>(initialRad);
+	//float initialRad = generateFloat(-(M_PI / 2.0f), M_PI / 2.0f);
+	float initialRad = glm::radians(generateFloat());
+	//auto eulerY = Builder::createTransform<EulerRotY>(initialRad);
+	auto eulerY = Builder::createTransform<ETransformType::EulerY>();
+	eulerY->setDefaultValue("rotation", initialRad);
 
-    auto mat = glm::eulerAngleY(generateFloat());
+	auto newRad = glm::radians(generateFloat());
+	auto mat    = glm::eulerAngleY(newRad);
 
-    auto setResult = eulerY->setValue(mat);
-    EXPECT_EQ(ValueSetResult::Status::Ok, setResult.status);
-    EXPECT_EQ(mat, eulerY->getData().getMat4());
+	setValue_expectOk(eulerY, mat);
+	//auto setResult = eulerY->setValue(mat);
 
-    eulerY->resetMatrixFromDefaults();
-    auto expectedMat = glm::eulerAngleY(initialRad);
-    auto currentMat = eulerY->getData().getMat4();
-    EXPECT_EQ(expectedMat, currentMat);
-	}
+	//EXPECT_EQ(mat, eulerY->getData().getMat4());
+	//EXPECT_EQ(ValueSetResult::Status::Ok, setResult.status);
+	EXPECT_TRUE(Math::eq(mat, eulerY->getData().getMat4())); // get what you set
+	auto storedRad = eulerY->getDefaultValue("rotation").getFloat();
+
+	EXPECT_FALSE(Math::eq(initialRad, storedRad)); // setValue updated the Default
+	EXPECT_TRUE(Math::eq(newRad, storedRad));
+
+	eulerY->resetMatrixFromDefaults();
+	auto expectedMat = glm::eulerAngleZ(initialRad);
+	auto currentMat  = eulerY->getData().getMat4();
+	EXPECT_FALSE(Math::eq(expectedMat, currentMat)); //
 }
- */
+
+
+
+
 
 //===-- Euler rotation around Z axis --------------------------------------===//
-
-/*
 
 TEST(EulerZTest, OneValueSet)
 {
@@ -494,26 +486,31 @@ TEST(EulerZTest, OneValueSet)
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
 }
- */
 
-/*
+
+
 TEST(EulerZTest, SetMatrixShouldBeValid)
 {
-  float initialRad = glm::radians(generateFloat());
-  auto eulerZ = Builder::createTransform<ETransformType::EulerZ>();
+	float initialRad = glm::radians(generateFloat());
+	auto  eulerZ     = Builder::createTransform<ETransformType::EulerZ>();
 	eulerZ->setDefaultValue("rotation", initialRad);
 
-  auto mat = glm::eulerAngleZ(generateFloat());
+	auto newRad = glm::radians(generateFloat());
+	auto mat    = glm::eulerAngleZ(newRad);
 
-  setValue_expectOk(eulerZ, mat);
-  EXPECT_EQ(mat, eulerZ->getData().getMat4());
+	setValue_expectOk(eulerZ, mat);
+	//EXPECT_EQ(mat, eulerZ->getData().getMat4());
+	EXPECT_TRUE(Math::eq(mat, eulerZ->getData().getMat4())); // get what you set
+	auto storedRad = eulerZ->getDefaultValue("rotation").getFloat();
+
+	EXPECT_FALSE(Math::eq(initialRad, storedRad)); // setValue updated the Default
+	EXPECT_TRUE(Math::eq(newRad, storedRad));
 
 	eulerZ->resetMatrixFromDefaults();
-  auto expectedMat = glm::eulerAngleZ(initialRad);
-  auto currentMat = eulerZ->getData().getMat4();
-  EXPECT_EQ(expectedMat, currentMat);
+	auto expectedMat = glm::eulerAngleZ(initialRad);
+	auto currentMat  = eulerZ->getData().getMat4();
+	EXPECT_FALSE(Math::eq(expectedMat, currentMat)); //
 }
- */
 
 //===-- Euler rotation other tests ... ------------------------------------===//
 

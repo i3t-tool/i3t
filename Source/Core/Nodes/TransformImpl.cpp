@@ -339,8 +339,11 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(const glm::vec4& 
 
 ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::ivec2 coords)
 {
-	if (!validateValue(g_RotateYMask, coords, val))
-	{ ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."}; }
+	//if (!validateValue(g_RotateYMask, coords, val))
+	if (!canSetValue(g_RotateYMask, coords, val))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
 
 	auto mat                = getData().getMat4();
 	mat[coords.x][coords.y] = val; // unlimited value, clamped if synergies
@@ -456,8 +459,11 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(const glm::vec4& 
 
 ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::ivec2 coords)
 {
-	if (!validateValue(g_RotateZMask, coords, val))
-	{ ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."}; }
+	//if (!validateValue(g_RotateZMask, coords, val))
+	if (!canSetValue(g_RotateZMask, coords, val))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
 
 	// PF: remembering the halfspace sign for each box to avoid jumps during interaction with rotation matrix
 
