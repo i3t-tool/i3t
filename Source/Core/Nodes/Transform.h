@@ -111,16 +111,15 @@ public:
 	void createDefaults();
 
 	/**
-	 * \brief Init the (non-zero) second level parameters via their initDefaults (and update the matrix )
+	 * \brief Init the (non-zero) second level parameters via their initDefaults (and update the matrix).
 	 * It is overriden in all transforms with default values.
-	 * Resets the matrix to identity for transforms without defaults
+	 * This version is for nodes without the default value (now only Free)
+	 * - It resets the matrix to identity.
+	 * - this is done in free->resetMatrixFromDefaults()
 	 */
 	virtual void initDefaults()
 	{
-		//setValue(glm::mat4(1.0f));
-		// \todo init defaults
-		//DDDDesetMatrixFromDefaults();
-		resetMatrixFromDefaults();
+		resetMatrixFromDefaults();  // no defaults => init the matrix to identity
 	}
 
 	//===----------------------------------------------------------------------===//
@@ -156,9 +155,8 @@ public:
 	{
 		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
 
-		m_defaultValues.at(name).setValue(val);  //defaults
-		//DDDDesetMatrixFromDefaults();  // defaults to matrix
-		resetMatrixFromDefaults(); // defaults to matrix
+		m_defaultValues.at(name).setValue(val); // defaults
+		resetMatrixFromDefaults();                 // defaults to matrix
 	}
 
 	template <typename T>
@@ -171,12 +169,12 @@ public:
 	/**
 	 * \return A map of valueName and value pairs.
 	 */
-	TransformOperation::ValueMap getDefaultTypes();
+	TransformOperation::ValueMap getDefaultTypes() const;
 	DefaultValues&               getDefaultValues();
 
 	void setDefaultValues(const DefaultValues& values) { m_defaultValues = values; }
 
-	EValueState getValueState(glm::ivec2 coords);
+	EValueState getValueState(glm::ivec2 coords) const;
 
 	//===----------------------------------------------------------------------===//
 
@@ -203,30 +201,17 @@ public:
 	}
 
 	/**
-	 * \brief Resets the matrix to match the Default Values, if exist.
-	 * For transforms with no default values, resets the matrix directly.
-	 * Calls specialized functions onResetMatrixFromDefaults(), that perform the matrix setup.
-	 *
-	 * The opposite setup - from matrix to Defaults - is done in the setValue() functions
-	 */
-
-	//void resetMatrixFromDefaults() override //////*****////
-	//virtual void DDDDesetMatrixFromDefaults() //////*****////
-	//{
-	//	resetMatrixFromDefaults();
-	//	notifySequence(); //\todo - check notify sequence calls (some are in resetMatrixFromDefaults()) 
-	//}
-
-	/**
 	 * \brief Reset the transform matrix visible in LOD::Full (internalValue)
-	 * according to the defaultValues (from LOD::SetValues).
-	 * For transforms with no default values, resets the matrix directly.
+	 * to match the defaultValues (from LOD::SetValues).
+	 * Specialized functions are created for each Transform type.
+	 * For transforms with no default values (now only Free), resets the matrix directly.
 	 *
 	 * The opposite setup - from matrix to Defaults - is done in the setValue() functions
-	 * \todo JH When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
-	 *
+	 * It should lock the matrix.
+	 * \todo For synergies, it has to be resolved. Most probably, it should leave synergies unchanged.
+	 *       - for Scale When setting X value in non-uniform scale -> this switch to uniform scale (due to enable synergies)
    */
-	virtual void resetMatrixFromDefaults() = 0;  // PF Pure virtual, defined in TransformImpl for each transformation
+	void resetMatrixFromDefaults() override = 0; // PF Pure virtual, defined in TransformImpl for each transformation
 
 	//===----------------------------------------------------------------------===//
 

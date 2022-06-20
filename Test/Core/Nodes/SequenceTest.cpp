@@ -17,7 +17,7 @@ TEST(SequenceTest, SequenceCanContainMatrices)
 		expectedMat *= mat->getData().getMat4();
 	}
 
-	auto currentMat = seq->getData().getMat4();
+	const auto& currentMat = seq->getData().getMat4();
 	EXPECT_EQ(expectedMat, currentMat);
 }
 
@@ -35,8 +35,8 @@ TEST(SequenceTest, MatricesCanBeMoved)
 	auto seq = arrangeSequence();
 
   // Pop first matrices in the sequence.
-  auto mat1 = seq->popMatrix(0);
-  auto mat2 = seq->popMatrix(0);
+	const auto mat1 = seq->popMatrix(0);
+	const auto mat2 = seq->popMatrix(0);
   EXPECT_FALSE(mat1->isInSequence() && mat2->isInSequence());
 
 	{
@@ -239,19 +239,18 @@ TEST(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
 
 	transform->setValue(glm::translate(generateVec3()));
 
-	auto beforeReset = seq->getData().getMat4();
-	auto stored = seq->getData().getMat4();
+	const auto beforeReset = seq->getData().getMat4();
+	const auto stored      = seq->getData().getMat4();
 	EXPECT_FALSE(Math::eq(initial, beforeReset));
 
 	transform->saveValue();
-	//transform->DDDDesetMatrixFromDefaults();
 	transform->resetMatrixFromDefaults();
 
-	auto afterReset = seq->getData().getMat4();
+	const auto afterReset = seq->getData().getMat4();
 	EXPECT_TRUE(Math::eq(initial, afterReset));
 
 	transform->reloadValue();
-	auto afterRestore = seq->getData().getMat4();
+	const auto afterRestore = seq->getData().getMat4();
 	EXPECT_FALSE(Math::eq(afterReset, afterRestore));
 	EXPECT_TRUE(Math::eq(stored, afterRestore));
 }

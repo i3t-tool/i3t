@@ -133,8 +133,8 @@ FORCE_INLINE void NodeImpl<ENodeType::MatrixMulMatrix>::updateValues(int inputIn
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		auto mat1 = m_inputs[0].getStorage().getMat4();
-		auto mat2 = m_inputs[1].getStorage().getMat4();
+		const auto& mat1 = m_inputs[0].getStorage().getMat4();
+		const auto& mat2 = m_inputs[1].getStorage().getMat4();
 		setInternalValue(mat1 * mat2);
 	}
 	else if (m_inputs[0].isPluggedIn())

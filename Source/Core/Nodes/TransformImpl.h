@@ -38,12 +38,12 @@
  *		                 .................- must update defaults
  *		                 - must not change defaults and the matrix when changing non-synergistic element
  *
- * Transformation     mapping Matrix to Default                initDefaults()
- * TransformType      (FULL->SetValues)                        (menu value/reset)
+ * Transformation      done  mapping Matrix to Default                initDefaults()
+ * TransformType             (FULL->SetValues)                        (menu value/reset)
  * --------------------------------------------------------------------------------
- *  0 Free             no Defaults => no InitDefaults & reset    resetMatrixFromDefaults sets identity   DONE
- *  1 Translate        direct   - done in setValue               own initDefaults(), resetMatrixFromDefaults use default
- *  2 EulerX           indirect
+ *  0 Free             ok    no Defaults => no InitDefaults & reset    resetMatrixFromDefaults sets identity   DONE
+ *  1 Translate        ok    direct   - done in setValue               own initDefaults(), resetMatrixFromDefaults use default
+ *  2 EulerX                 indirect
  *  3 EulerY           indirect
  *  4 EulerZ           indirect
  *  5 Scale            direct
@@ -157,7 +157,6 @@ public:
 	[[nodiscard]] void           setDefaultUniformScale(float val);
 
 	void resetMatrixFromDefaults() override;
-	//void DDDDesetMatrixFromDefaults() override;
 };
 
 /**
@@ -266,7 +265,7 @@ public:
 
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(float val) override;  // usefull for init only
+	[[nodiscard]] ValueSetResult setValue(float val) override;  // useful for init only, Translation has no synergies
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;

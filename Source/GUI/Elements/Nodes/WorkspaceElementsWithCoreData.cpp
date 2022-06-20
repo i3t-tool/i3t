@@ -337,7 +337,7 @@ int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
 bool WorkspaceCoreOutputPinVector4::drawData()
 {
 	bool                       valueChanged = false, interaction_happen = false;
-	int                        rowOfChange, columnOfChange;
+	//int                        rowOfChange, columnOfChange;
 	glm::vec4                  valueOfChange;
 	WorkspaceNodeWithCoreData& node = getNode();
 
@@ -363,7 +363,7 @@ int WorkspaceCoreOutputPinVector4::maxLengthOfData()
 bool WorkspaceCoreOutputPinVector3::drawData()
 {
 	bool                       valueChanged = false, interaction_happen = false;
-	int                        rowOfChange, columnOfChange;
+	//int                        rowOfChange, columnOfChange;
 	glm::vec3                  valueOfChange;
 	WorkspaceNodeWithCoreData& node = getNode();
 
@@ -388,7 +388,7 @@ int WorkspaceCoreOutputPinVector3::maxLengthOfData()
 bool WorkspaceCoreOutputPinFloat::drawData()
 {
 	bool                       valueChanged = false, interaction_happen = false;
-	int                        rowOfChange, columnOfChange;
+	//int                        rowOfChange, columnOfChange;
 	float                      valueOfChange;
 	WorkspaceNodeWithCoreData& node = getNode();
 
@@ -412,7 +412,7 @@ int WorkspaceCoreOutputPinFloat::maxLengthOfData()
 bool WorkspaceCoreOutputPinQuaternion::drawData()
 {
 	bool                       valueChanged = false, interaction_happen = false;
-	int                        rowOfChange, columnOfChange;
+	//int                        rowOfChange, columnOfChange;
 	glm::quat                  valueOfChange;
 	WorkspaceNodeWithCoreData& node = getNode();
 
@@ -1029,13 +1029,13 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("-sqrt(2)/2"))
 			{
-				selectedValue = -sqrt(2) / 2;
+				selectedValue = -sqrtf(2.0f) / 2.0f;
 				valueSelected = true;
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("sqrt(2)/2"))
 			{
-				selectedValue = sqrt(2) / 2;
+				selectedValue = sqrtf(2.0f) / 2.0f;
 				valueSelected = true;
 			}
 
@@ -1043,13 +1043,13 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("-sqrt(3)/2"))
 			{
-				selectedValue = -sqrt(3) / 2;
+				selectedValue = -sqrtf(3.0f) / 2.0f;
 				valueSelected = true;
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("sqrt(3)/2"))
 			{
-				selectedValue = sqrt(3) / 2;
+				selectedValue = sqrtf(3.0f) / 2.0f;
 				valueSelected = true;
 			}
 
@@ -1057,13 +1057,13 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("-1"))
 			{
-				selectedValue = -1;
+				selectedValue = -1.0f;
 				valueSelected = true;
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("1"))
 			{
-				selectedValue = 1;
+				selectedValue = 1.0f;
 				valueSelected = true;
 			}
 
@@ -1071,13 +1071,13 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("-2"))
 			{
-				selectedValue = -2;
+				selectedValue = -2.0f;
 				valueSelected = true;
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("2"))
 			{
-				selectedValue = 2;
+				selectedValue = 2.0f;
 				valueSelected = true;
 			}
 
@@ -1085,13 +1085,13 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("-3"))
 			{
-				selectedValue = -3;
+				selectedValue = -3.0f;
 				valueSelected = true;
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("3"))
 			{
-				selectedValue = 3;
+				selectedValue = 3.0f;
 				valueSelected = true;
 			}
 
@@ -1099,7 +1099,7 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("0"))
 			{
-				selectedValue = 0;
+				selectedValue = 0.0f;
 				valueSelected = true;
 			}
 

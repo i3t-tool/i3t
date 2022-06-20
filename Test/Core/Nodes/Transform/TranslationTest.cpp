@@ -69,7 +69,7 @@ TEST(TranslationTest, SetValueInMatrixUpdatesDefaultValue)
 	auto val3 = 3.0f * val;
 
 	// Valid coordinates.
-	translation->setValue(val);  // force synergies?
+	translation->setValue(val);  // force synergies - NO - translation has no synergies
 	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(), glm::vec3(val));  // val -> vec
 
 	translation->setValue(vec);

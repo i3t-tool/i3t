@@ -7,6 +7,73 @@
 #include "../Utils.h"
 
 using namespace Core;
+// ----------------------------------
+// ---- Tests of the definitions ----
+// ----------------------------------
+
+TEST(GLM, RotateAndEulerAngle_Matrices_ShouldBeSame)
+{
+	float initialRad = glm::radians(generateFloat());
+
+  // ---- EulerX ----
+	auto lhs = glm::rotate(initialRad, glm::vec3(1.0f, 0.0f, 0.0f));
+	auto rhs = glm::eulerAngleX(initialRad);
+	EXPECT_EQ(lhs, rhs);
+
+	// ---- EulerY ----
+	lhs = glm::rotate(initialRad, glm::vec3(0.0f, 1.0f, 0.0f));
+	rhs = glm::eulerAngleY(initialRad);
+	EXPECT_EQ(lhs, rhs);
+
+	// ---- EulerZ ----
+	lhs = glm::rotate(initialRad, glm::vec3(1.0f, 0.0f, 1.0f));
+	rhs = glm::eulerAngleZ(initialRad);
+	EXPECT_EQ(lhs, rhs);
+}
+
+
+// angles
+TEST(GLM, GetAngleFromEulerX)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		float initialRad      = glm::radians(generateFloat());
+		auto  eulerXMat       = glm::eulerAngleX(initialRad);
+		float angleFromMatrix = std::atan2(-eulerXMat[2][1], eulerXMat[2][2]);
+
+		EXPECT_TRUE(Math::eq(initialRad, angleFromMatrix));
+	}
+}
+
+// ---- EulerY ----
+TEST(GLM, GetAngleFromEulerY)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		float initialRad      = glm::radians(generateFloat());
+		auto  eulerYMat       = glm::eulerAngleY(initialRad);
+		float angleFromMatrix = std::atan2(eulerYMat[2][0], eulerYMat[2][2]);
+
+		EXPECT_TRUE(Math::eq(initialRad, angleFromMatrix));
+	}
+}
+
+// ---- EulerZ ----
+TEST(GLM, GetAngleFromEulerZ)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		float initialRad      = glm::radians(generateFloat());
+		auto  eulerZMat       = glm::eulerAngleZ(initialRad);
+		float angleFromMatrix = glm::atan(eulerZMat[0][1], eulerZMat[0][0]);
+
+		EXPECT_TRUE(Math::eq(initialRad, angleFromMatrix));
+	}
+}
+
+
+
+
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
@@ -96,29 +163,6 @@ TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
 }
  */
 
-TEST(GLM, RotateXAndEulerAngleXShouldBeSame)
-{
-  float initialRad = glm::radians(generateFloat());
-
-	auto lhs = glm::rotate(initialRad, glm::vec3(1.0f, 0.0f, 0.0f));
-	auto rhs = glm::eulerAngleX(initialRad);
-
-	EXPECT_EQ(lhs, rhs);
-}
-
-TEST(GLM, GetAngleFromEulerX)
-{
-	for (int i = 0; i < 10; ++i)
-  {
-    float initialRad = glm::radians(generateFloat());
-
-    auto eulerXMat = glm::eulerAngleX(initialRad);
-
-    float angle = std::atan2(-eulerXMat[2][1], eulerXMat[2][2]);
-
-    EXPECT_TRUE(Math::eq(initialRad, angle));
-	}
-}
 
 /// \todo Fix this test.
 /*
@@ -281,20 +325,6 @@ TEST(EulerZTest, OneValueSet)
 	}
 }
  */
-
-TEST(GLM, GetAngleFromEulerZ)
-{
-  for (int i = 0; i < 10; ++i)
-  {
-    float initialRad = glm::radians(generateFloat());
-
-    auto mat = glm::eulerAngleZ(initialRad);
-
-    float angle = glm::atan(mat[0][1], mat[0][0]);
-
-    EXPECT_TRUE(Math::eq(initialRad, angle));
-  }
-}
 
 /*
 TEST(EulerZTest, SetMatrixShouldBeValid)

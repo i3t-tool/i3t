@@ -47,11 +47,11 @@ void Transformation::createDefaults()
 
 const Data& Transformation::getDefaultValue(const std::string& name) const { return m_defaultValues.at(name); }
 
-TransformOperation::ValueMap Transformation::getDefaultTypes() { return getTransformDefaults(getOperation()->keyWord); }
+TransformOperation::ValueMap Transformation::getDefaultTypes() const { return getTransformDefaults(getOperation()->keyWord); }
 
 Transformation::DefaultValues& Transformation::getDefaultValues() { return m_defaultValues; }
 
-EValueState Transformation::getValueState(glm::ivec2 coords)
+EValueState Transformation::getValueState(glm::ivec2 coords) const
 {
 	const int idx = coords.y * 4 + coords.x;
 	auto&     map = getTransformMap(getOperation()->keyWord);

@@ -278,6 +278,10 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 	}
 
 	setInternalValue(mat);
+
+	float angle = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
+	setDefaultValueNoUpdate("rotation", angle);
+
 	notifySequence();
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -547,14 +551,13 @@ ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 	return ETransformState(result);
 }
 
-ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val) { return setValue(glm::vec3(val)); }
+ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)
+{
+	return setValue(glm::vec3(val));   // sets the defaults
+}
 
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 {
-	//I3T_ASSERT(m_hasSynergies ? vec.x == vec.y == vec.z : true);
-	//// or
-	//if (hasSynergies())
-	//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Use float version when setting with synergies."};
 
 	setInternalValue(glm::translate(vec));
 	//m_defaultValues.at("translation").setValue(vec);  // update Defaults and Matrix
@@ -583,7 +586,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 		auto & mapPos = m_defaultValues.at("translation");
 		glm::vec3 v      = mapPos.getVec3();
 		v[coords.y]      = val;
-		mapPos.setValue(v);
+		mapPos.setValue(v);   // direct set of the default value
 	}
 
 	notifySequence();
