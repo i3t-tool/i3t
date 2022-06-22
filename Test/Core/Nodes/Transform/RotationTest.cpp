@@ -72,7 +72,7 @@ TEST(GLM, GetAngleFromEulerZ)
 	}
 }
 
-TEST(Euler, X_MatrixToDefaultsUpdateWithSynergies)
+TEST(EulerXTest, MatrixToDefaultsUpdateWithSynergies)
 {
 	auto rotXNode = Builder::createTransform<ETransformType::EulerX>();
 	auto angle    = glm::radians(generateFloat(0.0,90));
@@ -103,7 +103,7 @@ TEST(Euler, X_MatrixToDefaultsUpdateWithSynergies)
 	EXPECT_TRUE(Math::eq(expectedMatrix, rotXNode->getData().getMat4()));
 }
 
-TEST(Euler, X_MatrixToDefaultsUpdateWithoutSynergies)
+TEST(EulerXTest, MatrixToDefaultsUpdateWithoutSynergies)
 {
 	auto  rotXNode = Builder::createTransform<ETransformType::EulerX>();
 	auto  angle    = glm::radians(generateFloat(0.0, 90));
@@ -132,7 +132,7 @@ TEST(Euler, X_MatrixToDefaultsUpdateWithoutSynergies)
 	EXPECT_TRUE(Math::eq(0.0f, r));
 }
 
-TEST(Euler, Y_MatrixToDefaultsUpdateWithSynergies)
+TEST(EulerYTest, MatrixToDefaultsUpdateWithSynergies)
 {
 	auto  rotYNode = Builder::createTransform<ETransformType::EulerY>();
 	auto  angle    = glm::radians(generateFloat(0.0, 90));
@@ -160,7 +160,7 @@ TEST(Euler, Y_MatrixToDefaultsUpdateWithSynergies)
 	EXPECT_TRUE(Math::eq(r, angle));
 }
 
-TEST(Euler, Y_MatrixToDefaultsUpdateWithoutSynergies)
+TEST(EulerYTest, MatrixToDefaultsUpdateWithoutSynergies)
 {
 	auto  rotYNode = Builder::createTransform<ETransformType::EulerY>();
 	auto  angle    = glm::radians(generateFloat(0.0, 90));
@@ -189,7 +189,7 @@ TEST(Euler, Y_MatrixToDefaultsUpdateWithoutSynergies)
 	EXPECT_TRUE(Math::eq(0.0f, r));
 }
 
-TEST(Euler, Z_MatrixToDefaultsUpdateWithSynergies)
+TEST(EulerZTest, MatrixToDefaultsUpdateWithSynergies)
 {
 	auto  rotZNode = Builder::createTransform<ETransformType::EulerZ>();
 	auto  angle    = glm::radians(generateFloat(0.0, 90));
@@ -217,7 +217,7 @@ TEST(Euler, Z_MatrixToDefaultsUpdateWithSynergies)
 	EXPECT_TRUE(Math::eq(r, angle));
 }
 
-TEST(Euler, Z_MatrixToDefaultsUpdateWithoutSynergies)
+TEST(EulerZTest, MatrixToDefaultsUpdateWithoutSynergies)
 {
 	auto  rotZNode = Builder::createTransform<ETransformType::EulerZ>();
 	auto  angle    = glm::radians(generateFloat(0.0, 90));
@@ -326,7 +326,7 @@ TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
 	rot->unlock();
 
-	auto rads = generateFloat();
+	auto rads = generateAngleFromDegs(0.0f,360.0f);
 
 	setValue_expectOk(rot, glm::sin(rads), {2, 3});
 
@@ -486,8 +486,6 @@ TEST(EulerZTest, OneValueSet)
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
 	}
 }
-
-
 
 TEST(EulerZTest, SetMatrixShouldBeValid)
 {

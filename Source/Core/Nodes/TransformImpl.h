@@ -47,12 +47,12 @@
  *  3 EulerY           ok    indirect
  *  4 EulerZ           ok    indirect
  *  5 Scale            ok    direct
- *  6 AxisAngle rot    no
+ *  6 AxisAngle rot    no synergies
  *  7 Quat             indirect
  *  8 Ortho            indirect
  *  9 Perspective      indirect
  * 10 Frustum          indirect
- * 11 LookAt           no       - done, setValue without test, moved to transform
+ * 11 LookAt           no synergies       TODO isValid - setValue without test, moved to transform
  *
  * What should be tested
  *	setValue(float val)              // sets matrix and single float default (such as rotation angle)
