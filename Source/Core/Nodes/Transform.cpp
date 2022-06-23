@@ -85,6 +85,7 @@ void Transformation::reloadValue()
 	if (!m_hasSavedData) return;
 
 	setInternalValue(m_savedData.getMat4(), 0);
+	//////setValue(m_savedData.getMat4());  //// PF NOW
 	notifySequence();
 }
 

@@ -558,19 +558,93 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 }
 
 //===-- Quaternion rotation test ------------------------------------------===//
-
-TEST(QuatRotTest, RotShouldBeValid)
+/* To test:
+ * - isValid  --- norm = 1  (platí i pro nesmyslnou matici)
+ * - hasMenuSynergies - true
+ *   po nahrání - hasSynergies true - jednotkový
+ * - setValue(float) - nastaví úhel, nemìní osu
+ * - setValue(vec3)  - nastaví osu, nemìní úhel
+ * - setValue(vec4)  - quat + setInternalValue(toMat4)
+ * - setValue(quat)  - quat + setInternalValue(toMat4)
+ * - setValue(mat)   - setInternalValue(mat) - setDefaultValue(toQuat)
+ */
+TEST(QuatRotTest, NewQuatShouldBeValid)
 {
 	auto rot = Builder::createTransform<ETransformType::Quat>()
 	    ->as<TransformImpl<ETransformType::Quat>>();
 
-	auto vec = generateVec3();
-	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z);
+	// initial value is ok - initDefaults()
+	const glm::quat quat0 = rot->getDefaultValue("quat").getQuat();
+	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat0)));
+
+	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_TRUE(rot->hasSynergies());
+
+}
+TEST(QuatRotTest, ShouldHandleSynergies_setValue)
+{
+	auto rot = Builder::createTransform<ETransformType::Quat>()
+	->as<TransformImpl<ETransformType::Quat>>();
+
+	// setValue WITH SYNERGIES - should normalize
+	auto vec  = generateVec3();
+	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
 
 	setValue_expectOk(rot, quat);
 
-	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat)));
+	EXPECT_EQ(rot->isValid(),ETransformState::Valid);     // of unit size
+	EXPECT_EQ(rot->getQuat(), rot->getNormalized());      //normalized default = m_normalized
+
+	//EXPECT_EQ(glm::length2(rot->getNormalized()), 1.0f);  //normalized default |q| == 1.0
+	EXPECT_TRUE(Math::isNormalized(rot->getNormalized()));
+	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat))); //sam matrix
+
+	// setValue WITHOUT SYNERGIES - should NOT normalize
+	rot->disableSynergies();  // not of unit length
+	vec  = generateVec3();
+	quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+
+	setValue_expectOk(rot, quat);
+
+	EXPECT_NE(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default is left non-normalized
+	auto L = rot->getData().getMat4();
+	auto R = glm::toMat4(glm::normalize(quat));
+	EXPECT_EQ(L, R); //the matrix is set correctly based on normalized quaternion
 }
+
+TEST(QuatRotTest, ShouldHandleSynergies_setDefaultValue)
+{
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
+
+	// setValue WITH SYNERGIES - should normalize
+	auto vec  = generateVec3();
+	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+
+	rot->setDefaultValue("quat", quat);  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   //normalized default = m_normalized
+
+	//EXPECT_EQ(glm::length2(rot->getNormalized()), 1.0f);  //normalized default |q| == 1.0
+	EXPECT_TRUE(Math::isNormalized(rot->getNormalized()));
+	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat))); //sam matrix
+
+	// setValue WITHOUT SYNERGIES - should NOT normalize
+	rot->disableSynergies(); // not of unit length
+	vec  = generateVec3();
+	quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+
+	rot->setDefaultValue("quat", quat); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	
+	EXPECT_NE(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default is left non-normalized
+	auto L = rot->getData().getMat4();
+	auto R = glm::toMat4(glm::normalize(quat));
+	EXPECT_EQ(L, R); //the matrix is set correctly based on normalized quaternion
+}
+
+
 
 TEST(QuatRotTest, NodeValueShouldBeNormalized)
 {

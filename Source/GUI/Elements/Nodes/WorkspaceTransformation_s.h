@@ -96,7 +96,7 @@ public:
 				}
 				case EValueType::Quat:
 				{
-					auto localData = valueStore.getQuat();
+					auto localData = valueStore.getQuat();  // the default "quat" value
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
 					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()), fmt::format("{} Z", key.c_str()),

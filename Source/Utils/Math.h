@@ -11,6 +11,7 @@
 
 #include <random>
 #include <vector>
+#include <glm/gtx/norm.hpp>
 
 #include "glm/glm.hpp"
 #include "glm/gtx/matrix_interpolation.hpp"
@@ -27,6 +28,35 @@ FORCE_INLINE bool eq(float lhs, float rhs)
 	return abs(lhs - rhs) < epsilon;
 }
 
+FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3 rhs)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+			if (!Math::eq(lhs[i], rhs[i])) { return false; }
+	}
+
+	return true;
+}
+FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4 rhs)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		if (!Math::eq(lhs[i], rhs[i])) { return false; }
+	}
+
+	return true;
+}\
+
+FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat rhs)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		if (!Math::eq(lhs[i], rhs[i])) { return false; }
+	}
+
+	return true;
+}\
+
 FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs)
 {
 	for (int i = 0; i < 4; ++i)
@@ -38,6 +68,12 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs)
 	}
 
 	return true;
+}
+
+template <typename T>
+bool isNormalized(const T& val)
+{
+	return eq(glm::length2(val),1.0f);
 }
 
 FORCE_INLINE bool areElementsSame(const glm::vec3 vec) { return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]); }

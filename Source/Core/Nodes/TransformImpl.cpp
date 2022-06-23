@@ -1,6 +1,7 @@
 #include "TransformImpl.h"
 
 #include <math.h>
+#include "Utils/Math.h"
 
 //#include "pgr.h"
 #include <glm/gtx/rotate_vector.hpp>
@@ -676,24 +677,32 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 
 //===-- Quaternion rotation -----------------------------------------------===//
 
+// todo - what should isValid without synergies return ofr |q| != 1?
 ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 {
+	// matrix
 	// any linear transformation (3x3) may be a rotation
 	auto& mat    = m_internalData[0].getMat4();
-	bool  result = validateValues(g_AxisAngleMask, mat);
 
-	// Check, if the quaternion is of unit length?
-	glm::quat quaternion = getDefaultValue("quat").getQuat();
-	result               = result && glm::dot(quaternion, quaternion) == 1.0f;
+	bool  result = validateValues(g_AxisAngleMask, mat);   // 3x3 rotational matrix
+	result = result && Math::eq(glm::determinant(mat), 1.0f);  // det == 1
 
-	// \todo check the angle too
+
+	// Check, if the default quaternion is of unit length?
+	const glm::quat quaternion = getDefaultValue("quat").getQuat();
+	//result = result && glm::dot(quaternion, quaternion) == 1.0f;
+	result = result && Math::isNormalized(quaternion);
+
+	// normalized helper
+	result = result && Math::eq(m_normalized, glm::normalize(quaternion));  
+
+	// \todo check the angle too...
 
 	return ETransformState(result);
 	//return ETransformState::Unknown;
 }
 void TransformImpl<ETransformType::Quat>::initDefaults()
 {
-	setValue(glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
 	setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
 }
 
@@ -702,17 +711,41 @@ void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()
 	//m_isLocked = true; quaternion is never locked
 	//m_hasSynergies = true; ///////////////// \todo PF split reset and set
 
-	setInternalValue(glm::toMat4(m_normalized));
+	auto& q = getDefaultValue("quat").getQuat();  //default - to be checked for synergies and eventually replaced by normalized
+	m_normalized = glm::normalize(q);
+
+	// normalization if hasSynergies()
+	if (hasSynergies()) 
+		setDefaultValueNoUpdate("quat", m_normalized);
+
+	setInternalValue(glm::toMat4(m_normalized));  //matrix
 	notifySequence();
 }
 
+const glm::quat& TransformImpl<ETransformType::Quat>::getQuat() const
+{
+	//todo možná spíš nechat return getDefaultValue("quat").getQuat();, aby to skokem nemìnilo obsah
+	//if (hasSynergies()) 
+	//	return m_normalized;
+	//else
+	return getDefaultValue("quat").getQuat();
+};
+	
+
 const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const { return m_normalized; };
+
 
 ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 {
-	m_initialQuat = q;
+	////m_initialQuat = q;
 	m_normalized  = glm::normalize(q);
-	setInternalValue(glm::toMat4(m_normalized));
+
+	if (hasSynergies()) 
+		setDefaultValueNoUpdate("quat", m_normalized); // probably not normalized
+	else
+		setDefaultValueNoUpdate("quat", q);   // probably not normalized
+
+	setInternalValue(glm::toMat4(m_normalized));   //matrix
 
 	return ValueSetResult{};
 }

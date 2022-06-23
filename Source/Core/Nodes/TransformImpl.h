@@ -62,7 +62,7 @@
  *	setValue(float val, glm::ivec2 coords);  // setup of a single matrix value - the most complicated
  *	                                         //    must check lock and synergies and set default if possible
  *	setValue(glm::mat4& m)           // partially copies the given matrix - the editable coords only
- *	                                 //    todo - does not respect the synergies - It is used in FreeManipulator.cpp,
+ *	                                 //    todo - setVakue(mat) does not respect the synergies - It is used in FreeManipulator.cpp,
  *	                                 //    SerializationVisitor, and I3T_TRANSFORM_CLONE macro.
  */
 #pragma once
@@ -294,26 +294,42 @@ public:
 };
 
 
+/**
+ * \brief Quaternion class
+ * Quaternion represents the matrix, crated from quaternion.
+ * The inner matrix is always created from a normalized quaternion, so it should always represent a rotation.
+ * The default value (LOD SetValue) is either a normalized quaternion (when set with synergies enabled),
+ * or a not-normalized quaternion (when set with synergies disabled).
+ * isValid() checks the normality of the default quaternion (and matrix determinant, which should be 1 all the times).
+ */
 template <>
 class TransformImpl<ETransformType::Quat> : public Transformation
 {
-	glm::quat m_initialQuat;
-	glm::quat m_normalized;
+	//glm::quat m_initialQuat;  // stored as the defaultValue "quat"
+	glm::quat m_normalized;  
 
 public:
 	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat))
 	{
 		m_hasMenuSynergies = true;
-		enableSynergies(); ///> PF: enableSynergies(); // means normalize for quaternion
+		enableSynergies(); ///> PF: enableSynergies(); means "normalize" the set quaternion
 	}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Quat)
 
+	/**
+	 * \brief Is the quaternion normalized?
+	 * \return true if the default "quat" is of unit length
+	 */
 	ETransformState isValid() const override;
 
 	void initDefaults() override;
 
-	const glm::quat& getQuat() const { return m_initialQuat; };
+	/**
+	 * \brief returns the quaternion or normalized quaternion when synergies
+	 * \return quaternion
+	 */
+	const glm::quat& getQuat() const;
 	const glm::quat& getNormalized() const;
 
 	ValueSetResult setValue(const glm::quat& vec) override;
