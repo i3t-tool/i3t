@@ -48,7 +48,7 @@
  *  4 EulerZ           ok    indirect
  *  5 Scale            ok    direct
  *  6 AxisAngle rot    no synergies
- *  7 Quat             indirect
+ *  7 Quat             ok
  *  8 Ortho            indirect
  *  9 Perspective      indirect
  * 10 Frustum          indirect
@@ -64,6 +64,8 @@
  *	setValue(glm::mat4& m)           // partially copies the given matrix - the editable coords only
  *	                                 //    todo - setVakue(mat) does not respect the synergies - It is used in FreeManipulator.cpp,
  *	                                 //    SerializationVisitor, and I3T_TRANSFORM_CLONE macro.
+ *	setDefaultValue - now just sets something, but omits synergies. For quat it is done in resetMatrixFromDefault.
+ *	                  Is it the right place?
  */
 #pragma once
 
