@@ -989,7 +989,7 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 	//auto expectedMat = glm::lookAt(eye, center, up);
 	//result           = result && Math::eq(expectedMat, mat);
 
-	return result;
+  return result;
 }
 
 void TransformImpl<ETransformType::LookAt>::initDefaults()
