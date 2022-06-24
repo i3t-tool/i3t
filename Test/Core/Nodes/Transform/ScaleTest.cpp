@@ -329,7 +329,7 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 	{
 		scaleNode->enableSynergies();
 		scaleNode->setDefaultUniformScale(scaleValue);  //scalar
-		EXPECT_NE(scaleNode->getDefaultValue("scale").getVec3(), scaleVector);
+		EXPECT_NE(scaleNode->getDefaultValue("scale").getVec3(), scaleVector);  // different vector is different
 		EXPECT_EQ(scaleNode->getDefaultValue("scale").getVec3(), glm::vec3(scaleValue));  //uniform
 		EXPECT_EQ(glm::scale(glm::vec3(scaleValue)), scaleNode->getData().getMat4());
 	}
@@ -339,10 +339,13 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 		scaleNode->setDefaultValue("scale", scaleVector); //vector
 
 		auto v = scaleNode->getDefaultValue("scale").getVec3();
-		//EXPECT_NE(v.x, scaleVector.x);
-		EXPECT_EQ(glm::scale(glm::vec3(scaleVector.x)), scaleNode->getData().getMat4());
+		EXPECT_NE(v, scaleVector);  // v should be a uniform scale
+
+		EXPECT_EQ(v.x, scaleVector.x);         // uniform scale based on .x
+		EXPECT_EQ(v, glm::vec3(scaleVector.x)); // uniform scale based on .x
+		EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleVector.x)), scaleNode->getData().getMat4()));
 	}
-	// vector sets matrix - correct
+	// vector sets matrix - correct 
 	{
 		scaleNode->disableSynergies();
 		scaleNode->setDefaultValue("scale", scaleVector); //vector

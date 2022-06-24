@@ -303,32 +303,47 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 	}
 }
 
-TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState)
+TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState) // fails
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
 
 	// single value invalidates the matrix
+
 	rot->disableSynergies();
-	auto rads = generateFloat();
-	setValue_expectOk(rot, glm::sin(rads), {1, 2});  // non-editable value 
+
+	auto wrongVal = generateFloat(-1.0f, 1.0f);
+	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
 	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 
 	// synergies repair the matrix
 	rot->enableSynergies(); 
-	setValue_expectOk(rot, glm::sin(rads), {1, 2}); // non-editable value 
+	setValue_expectOk(rot, wrongVal, {1, 2});  // synergies will use this as sin(angle)
 	EXPECT_EQ(ETransformState::Valid, rot->isValid());
+}
+
+TEST(EulerXTest, Unlocked_InvalidState) 
+{
+	auto rot = Builder::createTransform<ETransformType::EulerX>();
+
+	// single value invalidates the matrix
+
+	rot->unlock();
+
+	setValue_expectOk(rot, 2.0f, {1, 0}); // non-editable value
+
+	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 }
  
 
-TEST(EulerXTest, Unlocked_WrongValue_InvalidState)
+TEST(EulerXTest, Unlocked_WrongValue_InvalidState) // fails
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
 	rot->unlock();
 
 	auto rads = generateAngleFromDegs(0.0f,360.0f);
 
-	setValue_expectOk(rot, glm::sin(rads), {2, 3});
+	setValue_expectOk(rot, glm::sin(rads), {2, 3}); //
 
 	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 }
@@ -562,8 +577,10 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
  * - isValid  --- norm = 1  (platí i pro nesmyslnou matici)
  * - hasMenuSynergies - true
  *   po nahrání - hasSynergies true - jednotkový
- * - setValue(vec4)  - quat + setInternalValue(toMat4)
+ * - setValue(vec4)  - quat + setInternalValue(toMat4)   /// does not work - do not use it
  * - setValue(quat)  - quat + setInternalValue(toMat4)
+ *
+ * quat representation (w,x,y,z) or (s, v) - scalar + vector
  */
 TEST(QuatRotTest, NewQuat__HasSynergies_isValid_isNormalized)
 {
@@ -638,8 +655,8 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 
 
 	// setValue WITH SYNERGIES - should normalize (change) also the default
-	auto vec  = generateVec3();
-	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized quat + synergies=> normalized default 
+	auto vec  = generateVec4();
+	auto quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized quat + synergies=> normalized default 
 
 	rot->setDefaultValue("quat", quat);  // set NOT normalized - must be normalized
 
@@ -654,8 +671,8 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 	
 	// setValue WITHOUT SYNERGIES - should NOT normalize
 	rot->disableSynergies(); // not of unit length
-	vec  = generateVec3();
-	quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+	vec  = generateVec4();
+	quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
 
 	rot->setDefaultValue("quat", quat); // set NOT normalized - must be left not normalized
 	
@@ -672,19 +689,23 @@ TEST(QuatRotTest, setValueVec4versusQuat)
 {
 	//auto vec = generateVec4();
 	auto vec            = glm::vec4(1, 2, 3, 4);
-	auto vecNormalized  = glm::normalize(vec);
+	glm::vec4 vecNormalized  = glm::normalize(vec);
 	auto quat           = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized
 	auto quatNormalized = glm::normalize(quat);
 
-	auto quatVec = glm::quat(vec);
-	auto quatVecNormalized = glm::normalize(quatVec);
+	auto quatVec = glm::quat(vec); // uses vec4 as axis and vec3 angle
+	//auto quatVecNormalized = glm::normalize(quatVec);
+	//auto vecWXYZ               = glm::vec4(vec.w, vec.x, vec.y, vec.z);
+	//auto vecWXYZNormalized     = glm::normalize(vecWXYZ);        
+	//auto quatVecWXYZ           = glm::quat(vecWXYZ);
+	//auto quatVecWXYZNormalized = glm::normalize(quatVecWXYZ);
 
-	auto vecWXYZ               = glm::vec4(vec.w, vec.x, vec.y, vec.z);
-	auto vecWXYZNormalized     = glm::normalize(vecWXYZ);        
-	auto quatVecWXYZ           = glm::quat(vecWXYZ);
-	auto quatVecWXYZNormalized = glm::normalize(quatVecWXYZ);
-	
-	EXPECT_NE(quat, quatVec);
+	EXPECT_NE(quat, quatVec); // uses vec4 as axis and vec3 angle
+
+	EXPECT_EQ(quat.x, vec.x);
+	EXPECT_EQ(quat.y, vec.y);
+	EXPECT_EQ(quat.z, vec.z);
+	EXPECT_EQ(quat.w, vec.w);
 	/*
 	 * vec	{x=4.84617853 r=4.84617853 s=4.84617853 ...}	glm::vec<4,float,0>
 	 * vecNormalized	{x=0.457824409 r=0.457824409 s=0.457824409 ...}	glm::vec<4,float,0>
