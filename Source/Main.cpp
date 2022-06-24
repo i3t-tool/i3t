@@ -13,13 +13,13 @@
  * href="http://dcgi.fel.cvut.cz/">Department of Computer Graphics and Interaction</a>, FEL, CTU in Prague. The
  * development continues... The tool homepage: http://www.i3t-tool.org/.
  *
- * 	\section Layout The layout of the GUI
- * 	The scene is divided into two parts - the 3D scene preview and a workspace with the scene graph boxes.
- * 	- 3D scene is defined in the class World and rendered using the class Scene.
- * 	- The workspace is stored in tabGroup.layers[1].tabs.
- * 	TabGroup is the root of all GUI objects.
+ *  \section Layout The layout of the GUI
+ *  The scene is divided into two parts - the 3D scene preview and a workspace with the scene graph boxes.
+ *  - 3D scene is defined in the class World and rendered using the class Scene.
+ *  - The workspace is stored in tabGroup.layers[1].tabs.
+ *  TabGroup is the root of all GUI objects.
  *
- * 	\section Engine Engine
+ *  \section Engine Engine
  *
  *
  *  \section Logic Logic
