@@ -562,101 +562,169 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
  * - isValid  --- norm = 1  (platí i pro nesmyslnou matici)
  * - hasMenuSynergies - true
  *   po nahrání - hasSynergies true - jednotkový
- * - setValue(float) - nastaví úhel, nemìní osu
- * - setValue(vec3)  - nastaví osu, nemìní úhel
  * - setValue(vec4)  - quat + setInternalValue(toMat4)
  * - setValue(quat)  - quat + setInternalValue(toMat4)
- * - setValue(mat)   - setInternalValue(mat) - setDefaultValue(toQuat)
  */
-TEST(QuatRotTest, NewQuatShouldBeValid)
+TEST(QuatRotTest, NewQuat__HasSynergies_isValid_isNormalized)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	    ->as<TransformImpl<ETransformType::Quat>>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
 
-	// initial value is ok - initDefaults()
+
+	EXPECT_TRUE(rot->hasSynergies());
+	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   // normalized default = m_normalized
+
+	// matrix is OK
 	const glm::quat quat0 = rot->getDefaultValue("quat").getQuat();
 	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat0)));
+}
+
+TEST(QuatRotTest, getNormalized_returns_normalized)
+{
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
+
+	// setValue WITH SYNERGIES - should normalize regardless of synergies
+	auto vec  = generateVec4();
+	auto quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+
+	setValue_expectOk(rot, quat);
+
+	EXPECT_TRUE(Math::isNormalized(rot->getNormalized()));
+
+	// setValue WITHOUT SYNERGIES - should NOT normalize, ne NOT valid
+	rot->disableSynergies(); // not of unit length
+	vec  = generateVec4();
+	quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+	setValue_expectOk(rot, quat);
+
+	EXPECT_TRUE(Math::isNormalized(rot->getNormalized()));
+}
+
+TEST(QuatRotTest, HandlingSynergies_setValueQuat)
+{
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
+
+
+	// setValue WITH SYNERGIES - should normalize, be valid
+	auto vec  = generateVec4();
+	auto quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+
+	setValue_expectOk(rot, quat);                   // synergies=> normalized
 
 	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
-	EXPECT_TRUE(rot->hasSynergies());
+	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   // default quat is normalized (default = m_normalized)
 
-}
-TEST(QuatRotTest, ShouldHandleSynergies_setValue)
-{
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	->as<TransformImpl<ETransformType::Quat>>();
+	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat))); //same matrix as from normalized
 
-	// setValue WITH SYNERGIES - should normalize
-	auto vec  = generateVec3();
-	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
 
-	setValue_expectOk(rot, quat);
+	// setValue WITHOUT SYNERGIES - should NOT normalize, ne NOT valid
+	rot->disableSynergies(); // not of unit length
+	vec  = generateVec4();
+	quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized 
 
-	EXPECT_EQ(rot->isValid(),ETransformState::Valid);     // of unit size
-	EXPECT_EQ(rot->getQuat(), rot->getNormalized());      //normalized default = m_normalized
+	setValue_expectOk(rot, quat);              // NO synergies=> left not normalized
 
-	//EXPECT_EQ(glm::length2(rot->getNormalized()), 1.0f);  //normalized default |q| == 1.0
-	EXPECT_TRUE(Math::isNormalized(rot->getNormalized()));
-	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat))); //sam matrix
+	EXPECT_NE(rot->isValid(), ETransformState::Valid); // NOT of unit size
+	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default quat is left non-normalized
 
-	// setValue WITHOUT SYNERGIES - should NOT normalize
-	rot->disableSynergies();  // not of unit length
-	vec  = generateVec3();
-	quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
-
-	setValue_expectOk(rot, quat);
-
-	EXPECT_NE(rot->isValid(), ETransformState::Valid); // of unit size
-	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default is left non-normalized
 	auto L = rot->getData().getMat4();
 	auto R = glm::toMat4(glm::normalize(quat));
 	EXPECT_EQ(L, R); //the matrix is set correctly based on normalized quaternion
 }
 
-TEST(QuatRotTest, ShouldHandleSynergies_setDefaultValue)
+TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 {
 	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
 
-	// setValue WITH SYNERGIES - should normalize
+
+	// setValue WITH SYNERGIES - should normalize (change) also the default
 	auto vec  = generateVec3();
-	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
+	auto quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized quat + synergies=> normalized default 
 
-	rot->setDefaultValue("quat", quat);  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	rot->setDefaultValue("quat", quat);  // set NOT normalized - must be normalized
 
+	EXPECT_TRUE(rot->hasSynergies());
 	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
-	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   //normalized default = m_normalized
+	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   // normalized default = m_normalized
 
 	//EXPECT_EQ(glm::length2(rot->getNormalized()), 1.0f);  //normalized default |q| == 1.0
 	EXPECT_TRUE(Math::isNormalized(rot->getNormalized()));
 	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat))); //sam matrix
 
+	
 	// setValue WITHOUT SYNERGIES - should NOT normalize
 	rot->disableSynergies(); // not of unit length
 	vec  = generateVec3();
 	quat = glm::quat(1.0f, vec.x, vec.y, vec.z); // not normalized + synergies=> normalized
 
-	rot->setDefaultValue("quat", quat); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	rot->setDefaultValue("quat", quat); // set NOT normalized - must be left not normalized
 	
-	EXPECT_NE(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_FALSE(rot->hasSynergies());
+	EXPECT_NE(rot->isValid(), ETransformState::Valid); // not of unit size
 	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default is left non-normalized
+
 	auto L = rot->getData().getMat4();
 	auto R = glm::toMat4(glm::normalize(quat));
 	EXPECT_EQ(L, R); //the matrix is set correctly based on normalized quaternion
 }
 
-
-
-TEST(QuatRotTest, NodeValueShouldBeNormalized)
+TEST(QuatRotTest, setValueVec4versusQuat)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	    ->as<TransformImpl<ETransformType::Quat>>();
+	//auto vec = generateVec4();
+	auto vec            = glm::vec4(1, 2, 3, 4);
+	auto vecNormalized  = glm::normalize(vec);
+	auto quat           = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized
+	auto quatNormalized = glm::normalize(quat);
 
-  auto vec = generateVec4();
-  auto quat = glm::quat(vec.x, vec.y, vec.z, vec.w);
+	auto quatVec = glm::quat(vec);
+	auto quatVecNormalized = glm::normalize(quatVec);
 
-	setValue_expectOk(rot, quat);
-
-	auto normalized = glm::normalize(quat);
-
-  EXPECT_EQ(normalized, rot->getNormalized());
+	auto vecWXYZ               = glm::vec4(vec.w, vec.x, vec.y, vec.z);
+	auto vecWXYZNormalized     = glm::normalize(vecWXYZ);        
+	auto quatVecWXYZ           = glm::quat(vecWXYZ);
+	auto quatVecWXYZNormalized = glm::normalize(quatVecWXYZ);
+	
+	EXPECT_NE(quat, quatVec);
+	/*
+	 * vec	{x=4.84617853 r=4.84617853 s=4.84617853 ...}	glm::vec<4,float,0>
+	 * vecNormalized	{x=0.457824409 r=0.457824409 s=0.457824409 ...}	glm::vec<4,float,0>
+	 * quat	{x=4.84617853 y=-8.96076679 z=-0.264633060 ...}	glm::qua<float,0>
+	 * quatNormalized	{x=0.457824409 y=-0.846534610 z=-0.0250002090 ...}	glm::qua<float,0>
+	 *
+	 * quatVecWXYZ	{x=-0.260383546 y=0.704501808 z=-0.251635522 ...}	glm::qua<float,0>
+	 * quatVecWXYZNormalized	{x=-0.260383546 y=0.704501808 z=-0.251635522 ...}	glm::qua<float,0>
+	 * quatVec	{x=-0.246685773 y=-0.706250250 z=-0.657858253 ...}	glm::qua<float,0>
+	 * quatVecNormalized	{x=-0.246685773 y=-0.706250250 z=-0.657858253 ...}	glm::qua<float,0>
+	 */
 }
+
+//TEST(QuatRotTest, setValueVec4)
+//{
+//	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
+//
+//
+//	// setValue WITH SYNERGIES - should normalize, be valid
+//	auto vec = generateVec4();
+//
+//	setValue_expectOk(rot, vec);    // setting quat(vec4) NORMALIZES THE QUATERNION
+//
+//
+//	auto quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized
+//	EXPECT_NE(rot->getQuat(), quat);
+//	auto A = rot->getQuat();
+//	auto B = glm::normalize(quat);
+//	EXPECT_EQ(rot->getQuat(), glm::normalize(quat));
+//
+//	// setValue WITHOUT SYNERGIES - should NOT normalize, ne NOT valid
+//	rot->disableSynergies(); // not of unit length
+//
+//	setValue_expectOk(rot, vec);
+//
+//	quat = glm::quat(vec.w, vec.x, vec.y, vec.z); // not normalized
+//	EXPECT_EQ(rot->getQuat(), quat);
+//
+//
+//}
+
+
+
