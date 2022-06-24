@@ -377,6 +377,9 @@ glm::vec3 buildVec3(YAML::Node& node) { return glm::make_vec3(node.as<std::vecto
 
 glm::vec4 buildVec4(YAML::Node& node) { return glm::make_vec4(node.as<std::vector<float>>().data()); }
 
+glm::quat buildQuat(YAML::Node& node) { return glm::make_quat(node.as<std::vector<float>>().data()); }
+
+
 glm::vec3 buildVec3(YAML::Node&& node)
 {
 	auto vec = node.as<std::vector<float>>();
@@ -385,6 +388,13 @@ glm::vec3 buildVec3(YAML::Node&& node)
 }
 
 glm::vec4 buildVec4(YAML::Node&& node) { return glm::make_vec4(node.as<std::vector<float>>().data()); }
+
+glm::quat buildQuat(YAML::Node&& node)
+{
+	return glm::make_quat(node.as<std::vector<float>>().data());
+}
+
+
 
 glm::mat4 buildMat4(YAML::Node& node)
 {
@@ -500,6 +510,10 @@ void buildTransform(YAML::Node& node)
 
 		auto coreTransform = transform->getNodebase()->as<Core::Transformation>();
 
+		// PF: moved above setValues - necessary for correct reading of nodes without synergies
+		// as setValue() calls resetMatrixFormDefaults() that normalizes, e.g, the quaternion
+		node["synergies"].as<bool>() ? coreTransform->enableSynergies()
+		                             : coreTransform->disableSynergies(); //PF todo hasSynergies
 		// transform default values
 		const auto& transformDefaults = Core::getTransformDefaults(enumVal);
 		// for (auto&& [key, val] : node["defaults"])
@@ -519,9 +533,14 @@ void buildTransform(YAML::Node& node)
 				break;
 			case EValueType::Quat:
 			{
-				const auto vec4 = buildVec4(val);
-				coreTransform->setDefaultValue(key, glm::make_quat(glm::value_ptr(vec4)));
+				//const auto vec4 = buildVec4(val);
+				//coreTransform->setDefaultValue(key, glm::make_quat(glm::value_ptr(vec4)));
+				const auto quat = buildQuat(val);
+				coreTransform->setDefaultValue(key, quat);
+				///const auto quat = glm::quat(val[3], val[2], val[1], val[0]);
+
 				// todo set LOD SetValues
+				
 				break;
 			}
 			default:
@@ -534,8 +553,6 @@ void buildTransform(YAML::Node& node)
 
 		if (node["saved_value"]) { coreTransform->setSavedValue(buildMat4(node["saved_value"])); }
 
-		node["synergies"].as<bool>() ? coreTransform->enableSynergies()
-		                             : coreTransform->disableSynergies(); //PF todo hasSynergies
 		node["locked"].as<bool>() ? coreTransform->lock() : coreTransform->unlock();
 
 		coreTransform->changeId(id);
