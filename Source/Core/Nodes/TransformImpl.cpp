@@ -54,8 +54,10 @@ constexpr ValueMask g_OrthoMask = {
 };
 
 constexpr ValueMask g_PerspectiveMask = {
-    VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO, VM_ZERO, VM_ANY,  VM_ZERO,      VM_ZERO,
-    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
+    VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
+	  VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
+    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
+	  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
 constexpr ValueMask g_FrustumMask = {
@@ -63,10 +65,15 @@ constexpr ValueMask g_FrustumMask = {
     VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
+//constexpr ValueMask g_LookAtMask = {
+//    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+//    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+//};
 constexpr ValueMask g_LookAtMask = {
-    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
-    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+    VM_ANY,  VM_ANY,  VM_ANY, VM_ANY, VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
+    VM_ANY, VM_ANY, VM_ANY, VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
+
 //===----------------------------------------------------------------------===//
 
 ETransformState TransformImpl<ETransformType::Scale>::isValid() const
@@ -803,8 +810,11 @@ void TransformImpl<ETransformType::Ortho>::resetMatrixFromDefaults()
 
 ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::ivec2 coords)
 {
-	if (!validateValue(g_OrthoMask, coords, val))
-	{ return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Not an editable field."}; }
+	if (!canSetValue(g_OrthoMask, coords, val))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
+
 	setInternalValue(val, coords);
 	notifySequence();
 
@@ -815,22 +825,28 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 
 ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 {
+	// Matrix check
 	auto& mat    = m_internalData[0].getMat4();
-	bool  result = validateValues(g_PerspectiveMask, mat); //checks -1 in the last row too
+	bool  result = validateValues(g_PerspectiveMask, mat); //checks 0,0,-1,0 in the last row
+
+	// nonzero scale and z-translate
+	result = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2]!= 0.0f);
+
 
 	float fov    = getDefaultValue("fov").getFloat();
 	float aspect = getDefaultValue("aspect").getFloat();
 	float near   = getDefaultValue("zNear").getFloat();
 	float far    = getDefaultValue("zFar").getFloat();
 
+	// check the defaults
 	result = result && (near != 0.0f);
 	result = result && (far > near);
 	result = result && (aspect > 0.0f);
 	result = result && (fov > 0.0f);
 
-	// expected matrix
-	auto expectedMat = glm::perspective(fov, aspect, near, far);
-	result           = result && Math::eq(expectedMat, mat);
+	// matrix match the defaults 
+	//auto expectedMat = glm::perspective(fov, aspect, near, far);
+	//result           = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
 }
@@ -855,8 +871,11 @@ void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
 
 ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, glm::ivec2 coords)
 {
-	if (!validateValue(g_PerspectiveMask, coords, val))
-	{ return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
+	if (!canSetValue(g_PerspectiveMask, coords, val))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
+	
 	setInternalValue(val, coords);
 	notifySequence();
 
@@ -911,8 +930,11 @@ void TransformImpl<ETransformType::Frustum>::resetMatrixFromDefaults()
 
 ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 {
-	if (!validateValue(g_FrustumMask, coords, val))
-	{ return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
+	if (!canSetValue(g_FrustumMask, coords, val))
+	{
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+	}
+	
 	setInternalValue(val, coords);
 	notifySequence();
 
@@ -923,31 +945,49 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 
 ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 {
-	auto& mat    = m_internalData[0].getMat4();
-	bool  result = validateValues(g_LookAtMask, mat); //checks -1 in the last row too
+	auto& mat = m_internalData[0].getMat4();
+	auto  matL = glm::mat3(mat);        // linear 3x3 part
+	auto  matT = glm::transpose(matL);  // rows to columns
 
-	// check, if center is different than eye, up-vector is not zero,
-	// and up is not collinear with camera direction center - eye
+	//check (0,0,0,1) in the last row only
+	bool  result = validateValues(g_LookAtMask, mat); 
+
+	// check the Linear part - 
+	result = result && Math::eq(glm::determinant(mat), 1.0f);  // linearly independent
+	result = result && Math::eq(glm::length2(matT[0]), 1.0f);  // unit camera axes - rows in linear part
+	result = result && Math::eq(glm::length2(matT[1]), 1.0f);
+	result = result && Math::eq(glm::length2(matT[2]), 1.0f);
+
 
 	glm::vec3 eye    = getDefaultValue("eye").getVec3();
 	glm::vec3 center = getDefaultValue("center").getVec3();
 	glm::vec3 up     = getDefaultValue("up").getVec3();
 
-	// expected matrix
-	auto expectedMat = glm::lookAt(eye, center, up);
-	result           = result && Math::eq(expectedMat, mat);
-
-	// definition parameters
 	glm::vec3 direction     = center - eye;
 	float     directionSize = glm::dot(direction, direction);
 	float     upSize        = glm::dot(up, up);
-	if ((directionSize == 0.0f) || (upSize == 0.0f)) { result = false; }
+
+	// check the definition parameters
+	// check, if center is different than eye or up-vector is not zero,
+	if ((directionSize == 0.0f) || (upSize == 0.0f))
+	{
+		result = false;
+	}
 	else
 	{
 		direction /= glm::sqrt(directionSize); //normalize
 		up /= glm::sqrt(upSize);
+
+		// and up is not collinear with camera direction center - eye
 		result = result && (glm::dot(direction, up) != 1.0f); // not parallel
 	}
+
+	// expected matrix - this is a more rigid test
+	// - good for resetMatrixFromDefaults
+	// - does not allow to edit the matrix in Full mode
+	// todo LookaAt: use the rigid test or not?
+	//auto expectedMat = glm::lookAt(eye, center, up);
+	//result           = result && Math::eq(expectedMat, mat);
 
 	return ETransformState(result);
 }

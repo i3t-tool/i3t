@@ -56,7 +56,9 @@
  * |  8 Ortho         | todo | indirect                               |                                                        |
  * |  9 Perspective   | todo | indirect                               |                                                        |
  * | 10 Frustum       | todo | indirect                               |                                                        |
- * | 11 LookAt        | todo | no synergies                           |      TODO isValid - setValue without test, moved to transform |
+ * | 11 LookAt        | ok   | no mapping                             |  isValid - setValue without test, moved to transform |
+ *
+ * LookAt 	- isValid checks the linear part of the matrix + unit axes and determinant
  *
  * What should be tested
  * ---------------------
