@@ -317,6 +317,10 @@ TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState__WRONG_ON_GITLAB
 	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
 	EXPECT_FALSE(rot->isValid());  //todo PF gitlab returns valid for a corrupted matrix - that is wrong
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8bff8c2 (isValid was changed to return bool and made pure virtual)
 
 	// synergies repair the matrix
 	rot->enableSynergies(); 
