@@ -19,7 +19,7 @@ public:
 	 *
 	 * \return Core::ETransformState:: Valid, Invalid, or Unknown
 	 */
-	virtual Core::ETransformState isMatrixValid() override { return m_nodebase->as<Core::TransformImpl<T>>()->isValid(); }
+	virtual bool isMatrixValid() override { return m_nodebase->as<Core::TransformImpl<T>>()->isValid(); }
 
 	int maxLenghtOfData()
 	{

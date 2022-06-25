@@ -42,7 +42,7 @@ TEST(ScaleTest, NewNodePredicates)
 	EXPECT_TRUE(scale->hasMenuSynergies());
 	EXPECT_TRUE(scale->hasSynergies());
 	EXPECT_TRUE(scale->isLocked());
-	EXPECT_EQ(scale->isValid(), ETransformState::Valid);
+	EXPECT_TRUE(scale->isValid());
 	EXPECT_FALSE(scale->isInSequence());
 }
 TEST(ScaleTest, ResetToInitialValues)
@@ -54,7 +54,7 @@ TEST(ScaleTest, ResetToInitialValues)
 
 	scaleNode->disableSynergies();              // to avoid uniform scale
 	scaleNode->setDefaultValue("scale", scale); // default and matrix
-	EXPECT_EQ(ETransformState::Valid, scaleNode->isValid());
+	EXPECT_TRUE(scaleNode->isValid());
 
 	// Set free transformation node.
 	scaleNode->free(); //unlock, disable synergies
@@ -67,7 +67,7 @@ TEST(ScaleTest, ResetToInitialValues)
 		const glm::mat4 data = scaleNode->getData().getMat4();
 
 		EXPECT_TRUE(Math::eq(data, mat));
-		EXPECT_NE(ETransformState::Valid, scaleNode->isValid());
+		EXPECT_FALSE(scaleNode->isValid());
 	}
 	{
 		// --------Reset to initial values (identity) and state. -----------------------
@@ -95,7 +95,7 @@ TEST(ScaleTest, Unlocked_SetFreeTransform_InvalidState)
 	auto mat = createFreeTransform();
 	setValue_expectOk(scale, mat);
 
-	EXPECT_EQ(ETransformState::Invalid, scale->isValid());
+	EXPECT_FALSE(scale->isValid());
 }
 
 
@@ -119,7 +119,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Mat4_AsTransformation_Ok)
 	setValue_expectOk(scale, glm::scale(scaleValue));
 
 	EXPECT_TRUE(Math::eq(glm::scale(scaleValue), scale->getData().getMat4()));
-	EXPECT_EQ(ETransformState::Valid, scale->isValid());
+	EXPECT_TRUE(scale->isValid());
 }
 
 TEST(ScaleTest, UniformScale_SetInvalidValue_Mat4_AsTransformation_ShouldNotBePermited_butWorks)
@@ -139,7 +139,7 @@ TEST(ScaleTest, UniformScale_SetInvalidValue_Mat4_AsTransformation_ShouldNotBePe
 	auto result = scale->setValue(glm::scale(scaleValue)); // init by a non-uniform matrix -> uniform
 
 	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-	EXPECT_EQ(ETransformState::Valid, scale->isValid()); // is uniform
+	EXPECT_TRUE(scale->isValid()); // is uniform
 
 	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleValue.z)), scale->getData().getMat4())); // last of non-uniform vec3
 	EXPECT_FALSE(Math::eq(glm::scale(scaleValue), scale->getData().getMat4()));             // complete vec3
@@ -160,7 +160,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Float_asScale_Ok)
 	auto result = scale->setValue(val);
 	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(val, val, val)), scale->getData().getMat4()));
-	EXPECT_EQ(ETransformState::Valid, scale->isValid());
+	EXPECT_TRUE(scale->isValid());
 }
 
 
@@ -181,7 +181,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Ok)
 	auto result = scale->setValue(scaleVec3);
 
 	EXPECT_TRUE(Math::eq(glm::scale(scaleVec3), scale->getData().getMat4()));
-	EXPECT_EQ(ETransformState::Valid, scale->isValid());
+	EXPECT_TRUE(scale->isValid());
 }
 TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Wrong)
 {
@@ -206,7 +206,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Wrong)
 	EXPECT_TRUE(Math::eq(before, after));
 	EXPECT_FALSE(Math::eq(glm::scale(scaleVec3), scale->getData().getMat4()));
 	EXPECT_FALSE(Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->getData().getMat4()));
-	EXPECT_EQ(ETransformState::Valid, scale->isValid());  // not changed
+	EXPECT_TRUE(scale->isValid());  // not changed
 }
 
 TEST(ScaleTest, Uniform_WithNonUniformValues_IsInvalid)
@@ -219,7 +219,7 @@ TEST(ScaleTest, Uniform_WithNonUniformValues_IsInvalid)
 	setValue_expectOk(scale, generateVec3());
 
 	scale->enableSynergies();
-	EXPECT_EQ(ETransformState::Invalid, scale->isValid());
+	EXPECT_FALSE(scale->isValid());
 }
 
 // ----	float on coords ----
@@ -242,7 +242,7 @@ TEST(ScaleTest, UniformScaleMatrixValueAndSynergies)
 		const auto data = scaleNode->getData().getMat4();
 
 		EXPECT_EQ(data, scaleMat);
-		EXPECT_EQ(ETransformState::Valid, scaleNode->isValid());
+		EXPECT_TRUE(scaleNode->isValid());
 	}
 }
 TEST(ScaleTest, ScaleMatrixSetsDefaults_diagonal)
