@@ -198,7 +198,7 @@ ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 	float angle       = glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
 	auto  expectedMat = glm::eulerAngleX(angle);
 
-	result = result && Math::eq(expectedMat, mat);
+	result = result && Math::eq(expectedMat, mat);   // todo PF gitlab does not recognize matrix with a wrong element on [1,2] = sin(angle)
 
 	return ETransformState(result);
 }
@@ -235,7 +235,9 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 
 	if (hasSynergies())
 	{
-		//PF Commented out - the return value is thrown away anyway
+		////F Commented out
+		/// 1) the return value is thrown away anyway
+		///	2) should not fail for unlocked transforms
 		//if (!Math::withinInterval(val, -1.0f, 1.0f))
 		//{
 		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
@@ -358,7 +360,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 
 	if (hasSynergies())
 	{
-		//PF Commented out - the return value is thrown away anyway
+		//PF Commented out - se the comment at EulerX
 		//if (!Math::withinInterval(val, -1.0f, 1.0f))
 		//{
 		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
@@ -480,7 +482,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 
 	if (hasSynergies())
 	{
-		//PF Commented out - the return value is thrown away anyway
+		//PF Commented out - se the comment at EulerX
 		//if (!Math::withinInterval(val, -1.0f, 1.0f))
 		//{
 		//	return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,

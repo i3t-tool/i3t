@@ -303,18 +303,21 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 	}
 }
 
-TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState) // fails
+TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState__WRONG_ON_GITLAB) // fails
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
 
-	// single value invalidates the matrix
 
+	// noSynergies => single value invalidates the matrix
 	rot->disableSynergies();
 
 	auto wrongVal = generateFloat(-1.0f, 1.0f);
+	EXPECT_TRUE(Math::withinInterval(wrongVal, -1.0f, 1.0f));
+
 	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
-	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
+	EXPECT_EQ(ETransformState::Invalid, rot->isValid());  //todo PF gitlab returns valid for a corrupted matrix - that is wrong
+
 
 	// synergies repair the matrix
 	rot->enableSynergies(); 
@@ -322,7 +325,7 @@ TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState) // fails
 	EXPECT_EQ(ETransformState::Valid, rot->isValid());
 }
 
-TEST(EulerXTest, Unlocked_InvalidState) 
+TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
 
