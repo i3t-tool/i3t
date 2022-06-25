@@ -76,7 +76,7 @@ constexpr ValueMask g_LookAtMask = {
 
 //===----------------------------------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::Scale>::isValid() const
+bool TransformImpl<ETransformType::Scale>::isValid() const
 {
 	bool result = validateValues(g_ScaleMask, m_internalData[0].getMat4());
 
@@ -86,7 +86,7 @@ ETransformState TransformImpl<ETransformType::Scale>::isValid() const
 		result    = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
 	}
 
-	return ETransformState(result);
+	return result;
 }
 
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
@@ -189,7 +189,7 @@ void TransformImpl<ETransformType::Scale>::resetMatrixFromDefaults()
 
 //===-- Euler rotation around X axis --------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
+bool TransformImpl<ETransformType::EulerX>::isValid() const
 {
 	// check the basic matrix values 0, 1, -1, any
 	auto& mat    = m_internalData[0].getMat4();
@@ -200,7 +200,7 @@ ETransformState TransformImpl<ETransformType::EulerX>::isValid() const
 
 	result = result && Math::eq(expectedMat, mat);   // todo PF gitlab does not recognize matrix with a wrong element on [1,2] = sin(angle)
 
-	return ETransformState(result);
+	return result;
 }
 
 ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val)
@@ -315,7 +315,7 @@ void TransformImpl<ETransformType::EulerX>::resetMatrixFromDefaults()
 
 //===-- Euler rotation around Y axis --------------------------------------===//
 // PF Important - cos returns angles <0, M_PI> only - we have to use sin to get the whole circle
-ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
+bool TransformImpl<ETransformType::EulerY>::isValid() const
 {
 	auto& mat    = m_internalData[0].getMat4();
 	bool  result = validateValues(g_RotateYMask, mat);
@@ -325,7 +325,7 @@ ETransformState TransformImpl<ETransformType::EulerY>::isValid() const
 
 	result = result && Math::eq(expectedMat, mat);
 
-	return ETransformState(result);
+	return result;
 }
 
 ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val)
@@ -436,7 +436,7 @@ void TransformImpl<ETransformType::EulerY>::resetMatrixFromDefaults()
 
 //===-- Euler rotation around Z axis --------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
+bool TransformImpl<ETransformType::EulerZ>::isValid() const
 {
 	auto& mat    = m_internalData[0].getMat4();
 	bool  result = validateValues(g_RotateZMask, mat);
@@ -446,7 +446,7 @@ ETransformState TransformImpl<ETransformType::EulerZ>::isValid() const
 
 	result = result && Math::eq(expectedMat, mat);
 
-	return ETransformState(result);
+	return result;
 }
 ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val)
 {
@@ -560,7 +560,7 @@ void TransformImpl<ETransformType::EulerZ>::resetMatrixFromDefaults()
 
 //===-- Translation -------------------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::Translation>::isValid() const
+bool TransformImpl<ETransformType::Translation>::isValid() const
 {
 	bool result = validateValues(g_TranslateMask, m_internalData[0].getMat4());
 	// PF - err - translate has no synergies
@@ -570,7 +570,7 @@ ETransformState TransformImpl<ETransformType::Translation>::isValid() const
 	//	result = result && Math::eq(mat[3][0], mat[3][1]) && Math::eq(mat[3][1], mat[3][2]);
 	//}
 
-	return ETransformState(result);
+	return result;
 }
 
 ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val)
@@ -631,7 +631,7 @@ void TransformImpl<ETransformType::Translation>::resetMatrixFromDefaults()
 
 //===-- Axis angle rotation -----------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
+bool TransformImpl<ETransformType::AxisAngle>::isValid() const
 { // \todo - test after working edit during unlock
 
 	auto& mat    = m_internalData[0].getMat4();
@@ -651,9 +651,7 @@ ETransformState TransformImpl<ETransformType::AxisAngle>::isValid() const
 	result = result && Math::eq(expectedMat, mat);
 
 	// translation is not zero
-	return ETransformState(result);
-
-	//return ETransformState::Unknown;
+	return result;
 }
 
 void TransformImpl<ETransformType::AxisAngle>::initDefaults() 
@@ -687,7 +685,7 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 //===-- Quaternion rotation -----------------------------------------------===//
 
 // todo - what should isValid without synergies return ofr |q| != 1?
-ETransformState TransformImpl<ETransformType::Quat>::isValid() const
+bool TransformImpl<ETransformType::Quat>::isValid() const
 {
 	// matrix
 	// any linear transformation (3x3) may be a rotation
@@ -707,9 +705,9 @@ ETransformState TransformImpl<ETransformType::Quat>::isValid() const
 
 	// \todo check the angle too...
 
-	return ETransformState(result);
-	//return ETransformState::Unknown;
+	return result;
 }
+
 void TransformImpl<ETransformType::Quat>::initDefaults()
 {
 	setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
@@ -767,7 +765,7 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& ve
 
 //===-- Orthographic projection -------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
+bool TransformImpl<ETransformType::Ortho>::isValid() const
 {
 	auto& mat    = m_internalData[0].getMat4();
 	bool  result = validateValues(g_OrthoMask, mat);
@@ -786,7 +784,7 @@ ETransformState TransformImpl<ETransformType::Ortho>::isValid() const
 	auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
 	result           = result && Math::eq(expectedMat, mat);
 
-	return ETransformState(result);
+	return result;
 }
 
 void TransformImpl<ETransformType::Ortho>::initDefaults()
@@ -825,7 +823,7 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 
 //===-- Perspective -------------------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
+bool TransformImpl<ETransformType::Perspective>::isValid() const
 {
 	// Matrix check
 	auto& mat    = m_internalData[0].getMat4();
@@ -850,7 +848,7 @@ ETransformState TransformImpl<ETransformType::Perspective>::isValid() const
 	//auto expectedMat = glm::perspective(fov, aspect, near, far);
 	//result           = result && Math::eq(expectedMat, mat);
 
-	return ETransformState(result);
+	return result;
 }
 
 void TransformImpl<ETransformType::Perspective>::initDefaults()
@@ -886,7 +884,7 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 
 //===-- Frustum ------------------------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
+bool TransformImpl<ETransformType::Frustum>::isValid() const
 {
 	auto& mat    = m_internalData[0].getMat4();
 	bool  result = validateValues(g_FrustumMask, mat); //checks -1 in the last row too
@@ -906,7 +904,7 @@ ETransformState TransformImpl<ETransformType::Frustum>::isValid() const
 	auto expectedMat = glm::frustum(left, right, bottom, top, near, far);
 	result           = result && Math::eq(expectedMat, mat);
 
-	return ETransformState(result);
+	return result;
 }
 
 void TransformImpl<ETransformType::Frustum>::initDefaults()
@@ -945,7 +943,7 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 
 //===-- Look At -----------------------------------------------------------===//
 
-ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
+bool TransformImpl<ETransformType::LookAt>::isValid() const
 {
 	auto& mat = m_internalData[0].getMat4();
 	auto  matL = glm::mat3(mat);        // linear 3x3 part
@@ -991,7 +989,7 @@ ETransformState TransformImpl<ETransformType::LookAt>::isValid() const
 	//auto expectedMat = glm::lookAt(eye, center, up);
 	//result           = result && Math::eq(expectedMat, mat);
 
-	return ETransformState(result);
+	return result;
 }
 
 void TransformImpl<ETransformType::LookAt>::initDefaults()

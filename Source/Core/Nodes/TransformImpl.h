@@ -125,7 +125,7 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::Free)
 
-  ETransformState isValid() const override { return ETransformState::Valid; }
+  bool  isValid() const override { return true; }
 
   [[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
   {
@@ -156,8 +156,8 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::Scale)
 
-  ETransformState isValid() const override;
-  void            initDefaults() override;
+  bool isValid() const override;
+	void initDefaults() override;
 
   [[nodiscard]] ValueSetResult setValue(float val) override;
   [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -188,8 +188,8 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::EulerX)
 
-  ETransformState isValid() const override;
-  void            initDefaults() override;
+  bool isValid() const override;
+	void initDefaults() override;
 
   [[nodiscard]] ValueSetResult setValue(float rad) override;
   [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -219,8 +219,8 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::EulerY)
 
-  ETransformState isValid() const override;
-  void            initDefaults() override;
+  bool isValid() const override;
+	void initDefaults() override;
 
   [[nodiscard]] ValueSetResult setValue(float rad) override;
   [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -250,8 +250,8 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::EulerZ)
 
-  ETransformState isValid() const override;
-  void            initDefaults() override;
+  bool isValid() const override;
+	void initDefaults() override;
 
   [[nodiscard]] ValueSetResult setValue(float rad) override;
   [[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
@@ -270,8 +270,7 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::Translation)
 
-  ETransformState isValid() const override;
-
+  bool isValid() const override;
   void initDefaults() override;
 
   [[nodiscard]] ValueSetResult setValue(float val) override;  // useful for init only, Translation has no synergies
@@ -292,9 +291,8 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::AxisAngle)
 
-  ETransformState isValid() const override;
-
-  void            initDefaults() override;
+  bool isValid() const override;
+	void initDefaults() override;
   
   ValueSetResult setValue(float rads) override;
   ValueSetResult setValue(const glm::vec3& axis) override;
@@ -330,8 +328,7 @@ public:
    * \brief Is the quaternion normalized?
    * \return true if the default "quat" is of unit length
    */
-  ETransformState isValid() const override;
-
+  bool isValid() const override;
   void initDefaults() override;
 
   /**
@@ -363,7 +360,7 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::Ortho)
 
-  ETransformState isValid() const override;
+  bool isValid() const override;
   void initDefaults() override;
   /// No synergies required.
   ValueSetResult setValue(float val, glm::ivec2 coords) override;
@@ -380,7 +377,7 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::Perspective)
 
-  ETransformState isValid() const override;
+  bool isValid() const override;
   void initDefaults() override;
 
   ValueSetResult setValue(float val, glm::ivec2 coords) override;
@@ -401,8 +398,7 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::Frustum)
 
-  ETransformState isValid() const override;
-
+  bool isValid() const override;
   void initDefaults() override;
 
   void resetMatrixFromDefaults() override;
@@ -422,11 +418,10 @@ public:
 
   I3T_TRANSFORM_CLONE(ETransformType::LookAt)
 
-  ETransformState isValid() const override;
-
-  void            initDefaults() override;
+  bool isValid() const override;
+	void initDefaults() override;
   
-  void           resetMatrixFromDefaults() override;
+  void resetMatrixFromDefaults() override;
   //ValueSetResult setValue(float val, glm::ivec2 coords) override; //PF same as in Transform
 };
 } // namespace Core
