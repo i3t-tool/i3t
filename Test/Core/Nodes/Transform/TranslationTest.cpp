@@ -25,10 +25,10 @@ TEST(TranslationTest, ValidValues_Ok)
 
 	// Valid coordinates.
 	setValue_expectOk(translationNode, -2.0f, {3, 0});
-	setValue_expectOk(translationNode, -2.0f, {3, 1});
-	setValue_expectOk(translationNode, -2.0f, {3, 2});
+	setValue_expectOk(translationNode, -3.0f, {3, 1});
+	setValue_expectOk(translationNode, -4.0f, {3, 2});
 
-	auto translMat = glm::translate(glm::vec3(-2.0f, -2.0f, -2.0f));
+	auto translMat = glm::translate(glm::vec3(-2.0f, -3.0f, -4.0f));
 	auto data = translationNode->getData().getMat4();
 
 	EXPECT_EQ(translMat, data);
@@ -56,4 +56,41 @@ TEST(TranslationTest, GettersAndSetterShouldBeOk)
 	translation->setDefaultValue("translation", vec);
 
 	EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
+}
+
+TEST(TranslationTest, SetValueInMatrixUpdatesDefaultValue)
+{
+	auto translation =
+	    Builder::createTransform<ETransformType::Translation>()->as<TransformImpl<ETransformType::Translation>>();
+
+	auto vec = generateVec3();
+	auto val = generateFloat();
+	auto val2 = 2.0f * val;
+	auto val3 = 3.0f * val;
+
+	// Valid coordinates.
+	translation->setValue(val);  // force synergies - NO - translation has no synergies
+	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(), glm::vec3(val));  // val -> vec
+
+	translation->setValue(vec);
+	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(), vec);  //vec -> vec
+
+	translation->disableSynergies();
+	setValue_expectWrong(translation, val, glm::ivec2(0, 0));  // wrong coord
+
+	translation->setValue(val, glm::ivec2(3,0));   // scale x alone
+	EXPECT_EQ(translation->getDefaultValue("translation").getVec3().x, val); //vec -> vec
+}
+
+TEST(TranslationTest, SetDefaultValueUpdatesMatrix)
+{
+	auto vec = generateVec3();
+	auto val = generateFloat();
+
+	auto translation =
+	    Builder::createTransform<ETransformType::Translation>()->as<TransformImpl<ETransformType::Translation>>();
+
+	translation->setDefaultValue("translation", vec);
+
+  EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
 }

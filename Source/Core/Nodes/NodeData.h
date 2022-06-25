@@ -51,7 +51,7 @@ enum class EValueType
 namespace Core
 {
 /**
- * \brief Float value editable tatus: b1, b2 - b1 is editable bit, b2 is synergies bit
+ * \brief Float value editable status: b1, b2 - b1 is editable bit, b2 is synergies bit
  *
  * \todo PF:- proc tohle neni po bitech?
  *    	SynergiesBit = 0x0001,		///< 001
@@ -77,6 +77,7 @@ const std::string& valueTypeToString(EValueType type);
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
+ * and of the value stored in the defaultValues map (such as fovy for Perspective)
  *
  * Old name was Transmitter in I3T v1.
  */
@@ -119,5 +120,8 @@ public:
 
 namespace Core
 {
+/**
+ * \brief A synonym for DataStore - used for storage of DefaultValues[key]
+ */
 using Data = DataStore;
 }

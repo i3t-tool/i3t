@@ -47,11 +47,11 @@ void Transformation::createDefaults()
 
 const Data& Transformation::getDefaultValue(const std::string& name) const { return m_defaultValues.at(name); }
 
-TransformOperation::ValueMap Transformation::getDefaultTypes() { return getTransformDefaults(getOperation()->keyWord); }
+TransformOperation::ValueMap Transformation::getDefaultTypes() const { return getTransformDefaults(getOperation()->keyWord); }
 
 Transformation::DefaultValues& Transformation::getDefaultValues() { return m_defaultValues; }
 
-EValueState Transformation::getValueState(glm::ivec2 coords)
+EValueState Transformation::getValueState(glm::ivec2 coords) const
 {
 	const int idx = coords.y * 4 + coords.x;
 	auto&     map = getTransformMap(getOperation()->keyWord);
@@ -85,13 +85,20 @@ void Transformation::reloadValue()
 	if (!m_hasSavedData) return;
 
 	setInternalValue(m_savedData.getMat4(), 0);
+	//////setValue(m_savedData.getMat4());  //// PF NOW
 	notifySequence();
 }
 
 const glm::mat4& Transformation::getSavedValue() const { return m_savedData.getMat4(); }
 
-void Transformation::setSavedValue(const glm::mat4& values) { m_savedData.setValue(values); }
+void Transformation::setSavedValue(const glm::mat4& values)
+{
+	m_savedData.setValue(values);
 
+	m_hasSavedData = true; //PF: was missing in comparison to saveValue()
+}
+
+// PF todo - check for synergies????
 ValueSetResult Transformation::setValue(const glm::mat4& mat)
 {
 	ValueSetResult result;
@@ -107,7 +114,7 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 			{
 				const float val = mat[c][r];
 
-				// MSVC was unable to compile this expresion without using Node::
+				// MSVC was unable to compile this expression without using Node::
 				result = setValue(val, coords);
 
 				if (result.status != ValueSetResult::Status::Ok)
@@ -124,6 +131,18 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 	return ValueSetResult{};
 }
 
+ValueSetResult Transformation::setValue(float val, glm::ivec2 coords) //PF
+{
+	// called by AxisAngle rotate,
+	if (isLocked()) { return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"}; }
+
+	setInternalValue(val, coords);
+	notifySequence();
+
+	return ValueSetResult{};
+}
+
+
 void Transformation::notifySequence()
 {
 	if (m_currentSequence) { m_currentSequence->updateValues(-1); }
@@ -131,10 +150,15 @@ void Transformation::notifySequence()
 
 bool Transformation::canSetValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
-	const auto valueState = getValueState(coords);
-	const auto isValid    = m_isLocked ? validateValue(mask, coords, value) : true;
+	if (m_isLocked)
+	{
+		const auto valueState = getValueState(coords);
+		const auto isValid    = m_isLocked ? validateValue(mask, coords, value) : true;
 
-	return canEditValue(valueState) && isValid;
+		return canEditValue(valueState) && isValid;
+	}
+	else
+		return true;
 }
 
 //===----------------------------------------------------------------------===//

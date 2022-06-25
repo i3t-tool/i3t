@@ -13,6 +13,7 @@ CMakeDoxyfile.in
 CMakeCache.txt
 Dependencies/picoc/cmake_install.cmake
 *.bak
+*.lnk
 
 /Binaries/
 I3T.dir/
@@ -38,3 +39,4 @@ Data/imgui.ini
 logs/
 /CMakeSettings.json
 /Data/tutorials/tutorial
+
