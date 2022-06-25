@@ -27,10 +27,10 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 TEST(PerspectiveProjTest, ShouldBeOk)
 {
 	auto perspective = Builder::createTransform<ETransformType::Perspective>();
-	perspective->setDefaultValue("fov", glm::radians(150.0f));
+	perspective->setDefaultValue("fovy", glm::radians(150.0f));
 	perspective->setDefaultValue("aspect", 1.5f);
-	perspective->setDefaultValue("zNear", 0.01f);
-	perspective->setDefaultValue("zFar", 100.0f);
+	perspective->setDefaultValue("near", 0.01f);
+	perspective->setDefaultValue("far", 100.0f);
 
 	auto expectedMat = glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
 	auto resultMat = perspective->getData().getMat4();
@@ -43,24 +43,24 @@ TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 	auto perspective = Builder::createTransform<ETransformType::Perspective>()
 	    ->as<TransformImpl<ETransformType::Perspective>>();
 
-	float FOV = generateFloat();
+	float fovy   = generateFloat();
 	float aspect = generateFloat();
-	float nearZ = generateFloat();
-	float farZ = generateFloat();
+	float nearZ  = generateFloat();
+	float farZ   = generateFloat();
 
-	perspective->setDefaultValue("fov", FOV);
-	EXPECT_EQ(FOV, perspective->getDefaultValue("fov").getFloat());
+	perspective->setDefaultValue("fovy", fovy);
+	EXPECT_EQ(fovy, perspective->getDefaultValue("fovy").getFloat());
 
 	perspective->setDefaultValue("aspect", aspect);
 	EXPECT_EQ(aspect, perspective->getDefaultValue("aspect").getFloat());
 
-	perspective->setDefaultValue("zNear", nearZ);
-	EXPECT_EQ(nearZ, perspective->getDefaultValue("zNear").getFloat());
+	perspective->setDefaultValue("near", nearZ);
+	EXPECT_EQ(nearZ, perspective->getDefaultValue("near").getFloat());
 
-	perspective->setDefaultValue("zFar", farZ);
-	EXPECT_EQ(farZ, perspective->getDefaultValue("zFar").getFloat());
+	perspective->setDefaultValue("far", farZ);
+	EXPECT_EQ(farZ, perspective->getDefaultValue("far").getFloat());
 
-	EXPECT_EQ(glm::perspective(FOV, aspect, nearZ, farZ), perspective->getData().getMat4());
+	EXPECT_EQ(glm::perspective(fovy, aspect, nearZ, farZ), perspective->getData().getMat4());
 }
 
 //--- Frustum -----------------------------------------------------------------

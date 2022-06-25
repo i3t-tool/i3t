@@ -338,8 +338,8 @@ static const std::vector<std::string> xyz                        = {"x", "y", "z
 static const std::vector<std::string> xyzw                       = {"x", "y", "z", "w"};
 static const std::vector<std::string> tr                         = {"T", "R"};
 static const std::vector<std::string> eulerInputNames            = {"angle"};
-static const std::vector<std::string> orthoFrustrumInputNames    = {"left", "right", "bottom", "top", "zNear", "zFar"};
-static const std::vector<std::string> PerspectiveInputNames      = {"fovy", "aspect", "zNear", "zFar"};
+static const std::vector<std::string> orthoFrustrumInputNames    = {"left", "right", "bottom", "top", "near", "far"};
+static const std::vector<std::string> PerspectiveInputNames      = {"fovy", "aspect", "near", "far"};
 static const std::vector<std::string> lookAtInputNames           = {"eye", "center", "up"};
 
 /**
@@ -557,10 +557,10 @@ static const std::vector<TransformOperation> g_transforms = {
     {{n(ETransformType::Perspective), "perspective"},
      //0b1000010000110010,
      0b1000010000110000, // forbid to edit -1 in the last row
-     {{"fov", EValueType::Float},
+     {{"fovy", EValueType::Float},
       {"aspect", EValueType::Float},
-      {"zNear", EValueType::Float},
-      {"zFar", EValueType::Float}}},
+      {"near", EValueType::Float},
+      {"far", EValueType::Float}}},
     {{n(ETransformType::Frustum), "frustum"},
      // 0b1010011000110010,       // forbid to edit -1 in the last row
      0b1010011000110000,

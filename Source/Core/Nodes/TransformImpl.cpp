@@ -833,19 +833,19 @@ bool TransformImpl<ETransformType::Perspective>::isValid() const
 	result = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2]!= 0.0f);
 
 
-	float fov    = getDefaultValue("fov").getFloat();
+	float fovy   = getDefaultValue("fovy").getFloat();
 	float aspect = getDefaultValue("aspect").getFloat();
-	float near   = getDefaultValue("zNear").getFloat();
-	float far    = getDefaultValue("zFar").getFloat();
+	float near   = getDefaultValue("near").getFloat();
+	float far    = getDefaultValue("far").getFloat();
 
 	// check the defaults
 	result = result && (near != 0.0f);
 	result = result && (far > near);
 	result = result && (aspect > 0.0f);
-	result = result && (fov > 0.0f);
+	result = result && (fovy > 0.0f);
 
 	// matrix match the defaults 
-	//auto expectedMat = glm::perspective(fov, aspect, near, far);
+	//auto expectedMat = glm::perspective(fovy, aspect, near, far);
 	//result           = result && Math::eq(expectedMat, mat);
 
 	return result;
@@ -853,10 +853,10 @@ bool TransformImpl<ETransformType::Perspective>::isValid() const
 
 void TransformImpl<ETransformType::Perspective>::initDefaults()
 {
-	setDefaultValue("fov", glm::radians(70.0f));
+	setDefaultValue("fovy", glm::radians(70.0f));
 	setDefaultValue("aspect", 1.33f);
-	setDefaultValue("zNear", 1.0f);
-	setDefaultValue("zFar", 10.0f);
+	setDefaultValue("near", 1.0f);
+	setDefaultValue("far", 10.0f);
 }
 
 void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
@@ -864,8 +864,8 @@ void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
 	m_isLocked     = true;
 	m_hasSynergies = true; // symmetrical frustum
 
-	setInternalValue(glm::perspective(getDefaultValue("fov").getFloat(), getDefaultValue("aspect").getFloat(),
-	                                  getDefaultValue("zNear").getFloat(), getDefaultValue("zFar").getFloat()));
+	setInternalValue(glm::perspective(getDefaultValue("fovy").getFloat(), getDefaultValue("aspect").getFloat(),
+	                                  getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
 	notifySequence();
 }
 

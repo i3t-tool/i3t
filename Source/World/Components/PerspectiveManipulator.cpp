@@ -245,10 +245,10 @@ void PerspectiveManipulator::update()
 	//printf("%f\n",m_height);
 	//printf("%f\n",pheight);
 	///
-	editedpersp->setDefaultValue("fov", glm::radians(m_angle));
+	editedpersp->setDefaultValue("fovy", glm::radians(m_angle));
 	editedpersp->setDefaultValue("aspect", m_aspect);
-	editedpersp->setDefaultValue("zNear", m_near);
-	editedpersp->setDefaultValue("zFar", m_far);
+	editedpersp->setDefaultValue("near", m_near);
+	editedpersp->setDefaultValue("far", m_far);
 
 	m_edited = m_editednode->getData().getMat4();
 }
