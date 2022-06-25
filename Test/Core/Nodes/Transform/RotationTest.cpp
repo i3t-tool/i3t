@@ -348,10 +348,7 @@ TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
 //	setValue_expectOk(rot, glm::sin(rads), {2, 3}); //
 //
 //	EXPECT_FALSE(rot->isValid());
-<<<<<<< HEAD
 //	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
-=======
->>>>>>> 8bff8c2 (isValid was changed to return bool and made pure virtual)
 //}
 
 
