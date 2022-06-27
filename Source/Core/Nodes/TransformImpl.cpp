@@ -832,6 +832,7 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 bool TransformImpl<ETransformType::Perspective>::isValid() const
 {
 	// has no synergies, it is symmetrical
+	// update of far and near has problems with the precision -r rough epsilon introduced
 
 	// rough matrix check
 	auto& mat = m_internalData[0].getMat4();
@@ -855,7 +856,7 @@ bool TransformImpl<ETransformType::Perspective>::isValid() const
 	// matrix match the defaults
 	constexpr float roughEpsilon     = 0.001f;
 	const auto expectedMat = glm::perspective(fovy, aspect, near, far);
-	result                           = result && Math::eq(expectedMat, mat, roughEpsilon);
+	result = result && Math::eq(expectedMat, mat, roughEpsilon);
 
 	return result;
 }
@@ -934,8 +935,16 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 
 bool TransformImpl<ETransformType::Frustum>::isValid() const
 {
+	// synergies force the frustum to be symmetrical (moving of left will update the right, etc)
+	// update of far and near has problems with the precision -r rough epsilon introduced
+
+	// rough matrix check
 	auto& mat    = m_internalData[0].getMat4();
 	bool  result = validateValues(g_FrustumMask, mat); //checks -1 in the last row too
+
+	// nonzero scale and z-translate
+	result       = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2] != 0.0f);
+
 
 	float left   = getDefaultValue("left").getFloat();
 	float right  = getDefaultValue("right").getFloat();
@@ -944,13 +953,14 @@ bool TransformImpl<ETransformType::Frustum>::isValid() const
 	float near   = getDefaultValue("near").getFloat();
 	float far    = getDefaultValue("far").getFloat();
 
-	// simple check of the frustum borders
+	// check the defaults: simple check of the frustum borders
 	result = result && (left < right) && (bottom < top) && (near < far);
 	result = result && (near != 0.0f);
 
-	// expected matrix
+	// matrix match the defaults
+	constexpr float roughEpsilon = 0.001f;
 	auto expectedMat = glm::frustum(left, right, bottom, top, near, far);
-	result           = result && Math::eq(expectedMat, mat);
+	result = result && Math::eq(expectedMat, mat, roughEpsilon);
 
 	return result;
 }
@@ -985,6 +995,53 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 	
 	setInternalValue(val, coords);
 	notifySequence();
+
+	//////--------------------- from
+
+	// update the defaults to match the perspective matrix
+	// m[0,0] = 2n/(R-L)                  => w = R-L, newR = newC * w, newL = (newC-1) * w
+  // m[1,1] = 2n/(T-B)                  =>          
+	// m[2,0] = (R+L)/(R-L)
+	// m[2,1] = (T+B)/(T-B)
+	// m[2,2] = -(f+n)/(f-n) = A    (-1 for infinity f)
+	// m[3,2] = -(2fn)/(f-n) = B    (-2n for infinity f)
+	// m[2,3] = -1
+	// F=cotan(0.5*fovy) = 1 / tan(0.5*fovy)   => FOVY = 2*atan(1/F]
+
+	auto& mat = m_internalData[0].getMat4();
+
+	if (coords == glm::ivec2(0, 0))
+	{
+		//auto newAspect = mat[1][1] / mat[0][0]; // newAspect = (F / newM[0][0])
+		//setDefaultValueNoUpdate("aspect", newAspect);
+	}
+	else if (coords == glm::ivec2(1, 1))
+	{
+		//float near = getDefaultValue("near").getFloat();
+		const auto w = getDefaultValue("left").getFloat() - getDefaultValue("right").getFloat();
+		setDefaultValueNoUpdate("left", (mat[1][1] - 1) * w);  // newL = (newC-1) * w
+		setDefaultValueNoUpdate("right", mat[1][1] * w); // newL = newC * w
+
+		//auto newFovy = 2.0f * atan(1.0f / mat[1][1]);
+		//setDefaultValueNoUpdate("fovy", newFovy);
+	}
+	else if (coords == glm::ivec2(2, 2))
+	{
+		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
+		auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // B / (newA + 1)
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
+	else if (coords == glm::ivec2(3, 2))
+	{
+		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
+		auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // newB / (A + 1)
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
+
+
+	///--------------------------to
 
 	return ValueSetResult{};
 }

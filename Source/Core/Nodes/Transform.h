@@ -276,18 +276,18 @@ protected:
 	 * @brief True for transformations, that support synergies, such as scale, eulerAngleXYZ, ortho, frustum, and quaternion ONLY
 	 *
 	 * Synergies variants
-	 * Transformation   hasMenuSynergies    show in Full LOD    show in SetValues LOD
-	 * ------------------------------------------------------------------------------
-	 * Free             no                  no                  no
-	 * Translate        no                  no                  no
-	 * AxisAngle rot    no                  no                  no
-	 * LookAt           no                  no                  no
-	 * Perspective      no                  no                  no
-	 * Ortho            yes                 no                  yes
-	 * Frustum          yes                 no                  yes
-	 * Quat             yes                 no                  yes
-	 * Scale            yes                 yes                 yes
-	 * EulerX,Y,Z       yes                 yes                 no
+	 * | Transformation | hasMenuSynergies | show in Full LOD | show in SetValues | synergies force |
+	 * | ---------------|------------------|------------------|-------------------|-----------------|
+	 * | Free           | no               | no               | no                |                 |
+	 * | Translate      | no               | no               | no                |                 |
+	 * | AxisAngle rot  | no               | no               | no                |                 |
+	 * | LookAt         | no               | no               | no                |                 |
+	 * | Perspective    | no               | no               | no                |                 |
+	 * | Ortho          | yes              | no               | yes               |                 |
+	 * | Frustum        | yes              | no               | yes               |                 |
+	 * | Quat           | yes              | no               | yes               | unitQuaternion  |
+	 * | Scale          | yes              | yes              | yes               | uniform scale   |
+	 * | EulerX,Y,Z     | yes              | yes              | no                | cos and sins    |
 	*/
 	bool m_hasMenuSynergies = false;
 	bool m_hasSynergies =

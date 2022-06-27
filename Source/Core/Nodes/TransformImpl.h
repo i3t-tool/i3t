@@ -54,11 +54,12 @@
  * |  6 AxisAngle rot | no synergies |                                |                                                        |
  * |  7 Quat          | ok   |                                        |                                                        |
  * |  8 Ortho         | todo | indirect                               |                                                        |
- * |  9 Perspective   | todo | indirect                               |                                                        |
+ * |  9 Perspective   | OK   | direct                                 |                                                        |
  * | 10 Frustum       | todo | indirect                               |                                                        |
  * | 11 LookAt        | ok   | no mapping                             |  isValid - setValue without test, moved to transform |
  *
  * LookAt 	- isValid checks the linear part of the matrix + unit axes and determinant
+ * For Table of synergies see Transform.h:279
  *
  * What should be tested
  * ---------------------
