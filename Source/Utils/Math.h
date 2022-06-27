@@ -21,50 +21,50 @@
 namespace Math
 {
 
-FORCE_INLINE bool eq(float lhs, float rhs)
+FORCE_INLINE bool eq(const float lhs, const float rhs, const float epsilon = 0.000001f)
 {
-	static constexpr float epsilon = 0.000001f;
+	//static constexpr float epsilon = 0.000001f;
 
 	return abs(lhs - rhs) < epsilon;
 }
 
-FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3 rhs)
+FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3 rhs, const float epsilon = 0.000001f)
 {
 	for (int i = 0; i < 3; ++i)
 	{
-			if (!Math::eq(lhs[i], rhs[i])) { return false; }
+		if (!Math::eq(lhs[i], rhs[i], epsilon )) { return false; }
 	}
 
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4 rhs)
+FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4 rhs, const float epsilon = 0.000001f)
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		if (!Math::eq(lhs[i], rhs[i])) { return false; }
+		if (!Math::eq(lhs[i], rhs[i], epsilon)) { return false; }
 	}
 
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat rhs)
+FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat rhs, const float epsilon = 0.000001f)
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		if (!Math::eq(lhs[i], rhs[i])) { return false; }
+		if (!Math::eq(lhs[i], rhs[i], epsilon)) { return false; }
 	}
 
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs)
+FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs, const float epsilon = 0.000001f)
 {
 	for (int i = 0; i < 4; ++i)
 	{
 		for (int j = 0; j < 4; ++j)
 		{
-			if (!Math::eq(lhs[i][j], rhs[i][j])) { return false; }
+			if (!Math::eq(lhs[i][j], rhs[i][j], epsilon)) { return false; }
 		}
 	}
 

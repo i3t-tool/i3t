@@ -11,7 +11,7 @@ TEST(TransformTest, LookAt_SetValue_Ok)
 {
 	// Create uniform scale.
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
-	EXPECT_EQ(ETransformState::Valid, lookAt->isValid());
+	EXPECT_TRUE(lookAt->isValid());
 
 	auto eye    = lookAt->getDefaultValue("eye").getVec3();
 	auto center = lookAt->getDefaultValue("center").getVec3();
@@ -26,12 +26,12 @@ TEST(TransformTest, LookAt_SetValue_Ok)
 	lookAt->lock();
 	auto val = generateFloat();
 	setValue_expectWrong(lookAt, val, {1, 1});  
-	EXPECT_EQ(ETransformState::Valid, lookAt->isValid());
+	EXPECT_TRUE(lookAt->isValid());
 
 	// corrupt the matrix
 	lookAt->unlock();
 	setValue_expectOk(lookAt, val, {1, 1});  
-	EXPECT_NE(ETransformState::Valid, lookAt->isValid());
+	EXPECT_FALSE(lookAt->isValid());
 
 	// expected matrix
 	auto expectedMat = glm::lookAt(eye, center, up);

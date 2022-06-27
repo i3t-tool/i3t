@@ -263,7 +263,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
-		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
+		EXPECT_TRUE(rotXNode->isValid());
 	}
 	{
 		// mat[1][2], sin(T)
@@ -275,7 +275,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
-		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
+		EXPECT_TRUE(rotXNode->isValid());
 	}
 	{
 		// mat[2][1], -sin(T)
@@ -287,7 +287,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
-		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
+		EXPECT_TRUE(rotXNode->isValid());
 	}
 	{
 		// mat[2][2], cos(T)
@@ -299,7 +299,7 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 		auto expectedMat = glm::rotate(rads, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		EXPECT_TRUE(Math::eq(expectedMat, mat));
-		EXPECT_EQ(ETransformState::Valid, rotXNode->isValid());
+		EXPECT_TRUE(rotXNode->isValid());
 	}
 }
 
@@ -316,13 +316,12 @@ TEST(EulerXTest, SynergiesDisabled_OneCorrectValue_InvalidState__WRONG_ON_GITLAB
 
 	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
-	EXPECT_EQ(ETransformState::Invalid, rot->isValid());  //todo PF gitlab returns valid for a corrupted matrix - that is wrong
-
+	EXPECT_FALSE(rot->isValid());  //todo PF gitlab returns valid for a corrupted matrix - that is wrong
 
 	// synergies repair the matrix
 	rot->enableSynergies(); 
 	setValue_expectOk(rot, wrongVal, {1, 2});  // synergies will use this as sin(angle)
-	EXPECT_EQ(ETransformState::Valid, rot->isValid());
+	EXPECT_TRUE(rot->isValid());
 }
 
 TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
@@ -335,7 +334,7 @@ TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
 
 	setValue_expectOk(rot, 2.0f, {1, 0}); // non-editable value
 
-	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
+	EXPECT_FALSE(rot->isValid());
 }
  
 //
@@ -348,6 +347,7 @@ TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
 //
 //	setValue_expectOk(rot, glm::sin(rads), {2, 3}); //
 //
+//	EXPECT_FALSE(rot->isValid());
 //	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 //}
 
@@ -591,7 +591,7 @@ TEST(QuatRotTest, NewQuat__HasSynergies_isValid_isNormalized)
 
 
 	EXPECT_TRUE(rot->hasSynergies());
-	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_TRUE(rot->isValid()); // of unit size
 	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   // normalized default = m_normalized
 
 	// matrix is OK
@@ -631,7 +631,7 @@ TEST(QuatRotTest, HandlingSynergies_setValueQuat)
 
 	setValue_expectOk(rot, quat);                   // synergies=> normalized
 
-	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_TRUE(rot->isValid()); // of unit size
 	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   // default quat is normalized (default = m_normalized)
 
 	EXPECT_EQ(rot->getData().getMat4(), glm::toMat4(glm::normalize(quat))); //same matrix as from normalized
@@ -644,7 +644,7 @@ TEST(QuatRotTest, HandlingSynergies_setValueQuat)
 
 	setValue_expectOk(rot, quat);              // NO synergies=> left not normalized
 
-	EXPECT_NE(rot->isValid(), ETransformState::Valid); // NOT of unit size
+	EXPECT_FALSE(rot->isValid()); // NOT of unit size
 	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default quat is left non-normalized
 
 	auto L = rot->getData().getMat4();
@@ -664,7 +664,7 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 	rot->setDefaultValue("quat", quat);  // set NOT normalized - must be normalized
 
 	EXPECT_TRUE(rot->hasSynergies());
-	EXPECT_EQ(rot->isValid(), ETransformState::Valid); // of unit size
+	EXPECT_TRUE(rot->isValid()); // of unit size
 	EXPECT_EQ(rot->getQuat(), rot->getNormalized());   // normalized default = m_normalized
 
 	//EXPECT_EQ(glm::length2(rot->getNormalized()), 1.0f);  //normalized default |q| == 1.0
@@ -680,7 +680,7 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 	rot->setDefaultValue("quat", quat); // set NOT normalized - must be left not normalized
 	
 	EXPECT_FALSE(rot->hasSynergies());
-	EXPECT_NE(rot->isValid(), ETransformState::Valid); // not of unit size
+	EXPECT_FALSE(rot->isValid()); // not of unit size
 	EXPECT_NE(rot->getQuat(), rot->getNormalized());   // default is left non-normalized
 
 	auto L = rot->getData().getMat4();

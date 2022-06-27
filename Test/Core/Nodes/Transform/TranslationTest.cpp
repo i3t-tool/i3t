@@ -16,7 +16,7 @@ TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 	auto result = translationNode->setValue(generateFloat(), {0, 3});
 
 	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
-	EXPECT_EQ(ETransformState::Valid, translationNode->isValid());
+	EXPECT_TRUE(translationNode->isValid());
 }
 
 TEST(TranslationTest, ValidValues_Ok)
@@ -32,7 +32,7 @@ TEST(TranslationTest, ValidValues_Ok)
 	auto data = translationNode->getData().getMat4();
 
 	EXPECT_EQ(translMat, data);
-	EXPECT_EQ(ETransformState::Valid, translationNode->isValid());
+	EXPECT_TRUE(translationNode->isValid());
 }
 
 TEST(TranslationTest, Unlocked_InvalidValues_InvalidState)
@@ -43,7 +43,7 @@ TEST(TranslationTest, Unlocked_InvalidValues_InvalidState)
 	// Invalid coordinates.
 	setValue_expectOk(translationNode, generateFloat(10.0f, 20.0f), {1, 1});
 
-	EXPECT_EQ(ETransformState::Invalid, translationNode->isValid());
+	EXPECT_FALSE(translationNode->isValid());
 }
 
 TEST(TranslationTest, GettersAndSetterShouldBeOk)

@@ -30,7 +30,7 @@ public:
 	 *
 	 * \return Core::ETransformState:: Valid, Invalid, or Unknown
 	 */
-	virtual Core::ETransformState isMatrixValid() { return Core::ETransformState::Valid; };
+	virtual bool isMatrixValid() = 0; ///{return true;}; // todo = 0
 
 	virtual void drawMenuSetDataMap();
 

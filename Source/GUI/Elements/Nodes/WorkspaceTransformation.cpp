@@ -49,7 +49,7 @@ bool WorkspaceTransformation::topContent()
 	interaction_happen |= WorkspaceNodeWithCoreData::topContent();
 	ImGui::SameLine();
 
-	if (isMatrixValid() != Core::ETransformState::Valid)
+	if (!isMatrixValid()) 
 	{
 		ImVec2 iconSize = ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize());
 		//     \todo JH Right Align
@@ -58,19 +58,14 @@ bool WorkspaceTransformation::topContent()
 		//    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, getNodeRectDiwne().Max.x - diwne.screen2diwne(ImGui::GetCursorPos()).x /*actual free space*/ - iconSize.x - m_topOversizeSpace)*diwne.getWorkAreaZoom());
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y);
-		switch (isMatrixValid())
-		{
-		case Core::ETransformState::Invalid:
-			diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 0), ImColor(255, 0, 0), DIWNE::IconType::Cross,
+		diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 0), ImColor(255, 0, 0), DIWNE::IconType::Cross,
 			               ImColor(255, 255, 255), ImColor(255, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
 			               false); /* \todo JH Icon setting from Theme? */
-			break;
-		case Core::ETransformState::Unknown:
-			diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255), ImColor(255, 0, 255), DIWNE::IconType::Cross,
-			               ImColor(0, 255, 255), ImColor(0, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
-			               false); /* \todo JH Icon setting from Theme? */
-			break;
-		}
+
+		//case Core::ETransformState::Unknown:
+		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255), ImColor(255, 0, 255), DIWNE::IconType::Cross,
+		//	               ImColor(0, 255, 255), ImColor(0, 255, 255), iconSize, ImVec4(5, 5, 5, 5),
+		//	               false); /* \todo JH Icon setting from Theme? */
 	}
 	return interaction_happen;
 }
