@@ -806,7 +806,17 @@ void TransformImpl<ETransformType::Ortho>::initDefaults()
 void TransformImpl<ETransformType::Ortho>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
-	//m_hasSynergies = true;  // symmetrical frustum
+
+	if (hasSynergies())
+	{
+
+		// todo - Ortho - do synergies symmetrically
+		const auto left   = getDefaultValue("left").getFloat();
+		const auto bottom = getDefaultValue("bottom").getFloat();
+
+		if (!Math::eq(left, -getDefaultValue("right").getFloat())) setDefaultValueNoUpdate("right", -left);
+		if (!Math::eq(bottom, -getDefaultValue("top").getFloat())) setDefaultValueNoUpdate("top", -bottom);
+	}
 
 	setInternalValue(glm::ortho(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
 	                            getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
@@ -823,6 +833,100 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 
 	setInternalValue(val, coords);
 	notifySequence();
+
+
+	//////--------------------- from
+
+	// update the defaults to match the perspective matrix
+	// m[0,0] = 2n/(R-L)                  => w = R-L, newR = newC * w, newL = (newC-1) * w
+	// m[1,1] = 2n/(T-B)                  =>
+	// m[2,0] = (R+L)/(R-L)
+	// m[2,1] = (T+B)/(T-B)
+	// m[2,2] = -(f+n)/(f-n) = A    (-1 for infinity f)
+	// m[3,2] = -(2fn)/(f-n) = B    (-2n for infinity f)
+	// m[2,3] = -1
+	// F=cotan(0.5*fovy) = 1 / tan(0.5*fovy)   => FOVY = 2*atan(1/F]
+
+	auto& mat = m_internalData[0].getMat4();
+
+	//if (coords == glm::ivec2(0, 0))
+	//{
+	//	const auto left  = getDefaultValue("left").getFloat();
+	//	const auto right = getDefaultValue("right").getFloat();
+
+	//	const auto sum = getDefaultValue("right").getFloat() + getDefaultValue("left").getFloat();
+	//	//const auto C    = mat[2][0];
+	//	const auto newA = mat[0][0];
+
+	//	if (newA != 0.0f)
+	//	{
+	//		const auto newL = (sum * newA - 2.0f * near) / (2 * newA); // newL =
+	//		const auto newR = sum - newL;
+
+	//		setDefaultValueNoUpdate("left", newL);  // newL =
+	//		setDefaultValueNoUpdate("right", newR); // newR =
+	//	}
+	//}
+	//else if (coords == glm::ivec2(2, 0))
+	//{
+	//	const auto w = getDefaultValue("right").getFloat() - getDefaultValue("left").getFloat();
+
+	//	const auto newL = (mat[2][0] - 1) * w / 2.0f; // newL = (newC-1) * w / 2
+
+	//	setDefaultValueNoUpdate("left", newL);      // newL = (newC-1) * w / 2
+	//	setDefaultValueNoUpdate("right", newL + w); // newR = newL + w
+	//}
+
+
+	//if (coords == glm::ivec2(1, 1))
+	//{
+	//	const auto near   = getDefaultValue("near").getFloat();
+	//	const auto bottom = getDefaultValue("bottom").getFloat();
+	//	const auto top    = getDefaultValue("top").getFloat();
+
+	//	const auto sum = getDefaultValue("top").getFloat() + getDefaultValue("bottom").getFloat();
+	//	//const auto D    = mat[2][1];
+	//	const auto newB = mat[1][1];
+
+	//	if (newB != 0.0f)
+	//	{
+	//		const auto newBot = (sum * newB - 2.0f * near) / (2 * newB); // newL =
+	//		const auto newTop = sum - newB;
+
+	//		setDefaultValueNoUpdate("bottom", newBot); // newL =
+	//		setDefaultValueNoUpdate("top", newTop);    // newR =
+	//	}
+	//}
+	//else if (coords == glm::ivec2(2, 1))
+	//{
+	//	const auto h = getDefaultValue("top").getFloat() - getDefaultValue("bottom").getFloat();
+
+	//	const auto newBot = (mat[2][1] - 1) * h / 2.0f; // newL = (newC-1) * w / 2
+
+	//	setDefaultValueNoUpdate("bottom", newBot);  // newL = (newC-1) * w / 2
+	//	setDefaultValueNoUpdate("top", newBot + h); // newR = newL + w
+	//}
+
+
+	//else if (coords == glm::ivec2(2, 2))
+	//{
+	//	auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
+	//	auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // B / (newA + 1)
+	//	setDefaultValueNoUpdate("near", newNear);
+	//	setDefaultValueNoUpdate("far", newFar);
+	//}
+	//else if (coords == glm::ivec2(3, 2))
+	//{
+	//	auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
+	//	auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // newB / (A + 1)
+	//	setDefaultValueNoUpdate("near", newNear);
+	//	setDefaultValueNoUpdate("far", newFar);
+	//}
+
+
+	///--------------------------to
+
+
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
