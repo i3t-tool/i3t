@@ -53,7 +53,7 @@ constexpr ValueMask g_OrthoMask = {
     VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
-constexpr ValueMask g_PerspectiveMask = {
+constexpr ValueMask g_PerspectiveMask = {  // symmetric perspective = inverse scale + tz + (-1)
     VM_ANY,  VM_ZERO, VM_ZERO, VM_ZERO,
 	  VM_ZERO, VM_ANY,  VM_ZERO, VM_ZERO,
     VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
@@ -61,17 +61,23 @@ constexpr ValueMask g_PerspectiveMask = {
 };
 
 constexpr ValueMask g_FrustumMask = {
-    VM_ANY,  VM_ZERO, VM_ANY, VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,       VM_ZERO,
-    VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
+  VM_ANY,  VM_ZERO, VM_ANY,       VM_ZERO,
+	VM_ZERO, VM_ANY,  VM_ANY,       VM_ZERO,
+  VM_ZERO, VM_ZERO, VM_ANY,       VM_ANY,
+	VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
-//constexpr ValueMask g_LookAtMask = {
-//    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY, VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
-//    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+//constexpr ValueMask g_LookAtMask = { // scale + tranmslation
+//    VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,
+//    VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+//    VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
+//    VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 //};
-constexpr ValueMask g_LookAtMask = {
-    VM_ANY,  VM_ANY,  VM_ANY, VM_ANY, VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
-    VM_ANY, VM_ANY, VM_ANY, VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+constexpr ValueMask g_LookAtMask = {  // rotation + translation 
+  VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
+	VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
+  VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
+	VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
 
 //===----------------------------------------------------------------------===//
@@ -825,10 +831,12 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 
 bool TransformImpl<ETransformType::Perspective>::isValid() const
 {
-	// Matrix check
-	auto& mat    = m_internalData[0].getMat4();
-	bool  result = validateValues(g_PerspectiveMask, mat); //checks 0,0,-1,0 in the last row
+	// has no synergies, it is symmetrical
 
+	// rough matrix check
+	auto& mat = m_internalData[0].getMat4();
+	bool result = validateValues(g_PerspectiveMask, mat); //checks 0,0,-1,0 in the last row
+	
 	// nonzero scale and z-translate
 	result = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2]!= 0.0f);
 
@@ -838,25 +846,26 @@ bool TransformImpl<ETransformType::Perspective>::isValid() const
 	float near   = getDefaultValue("near").getFloat();
 	float far    = getDefaultValue("far").getFloat();
 
-	// check the defaults
+	// check the defaults alone
 	result = result && (near != 0.0f);
 	result = result && (far > near);
 	result = result && (aspect > 0.0f);
 	result = result && (fovy > 0.0f);
 
-	// matrix match the defaults 
-	//auto expectedMat = glm::perspective(fovy, aspect, near, far);
-	//result           = result && Math::eq(expectedMat, mat);
+	// matrix match the defaults
+	constexpr float roughEpsilon     = 0.001f;
+	const auto expectedMat = glm::perspective(fovy, aspect, near, far);
+	result                           = result && Math::eq(expectedMat, mat, roughEpsilon);
 
 	return result;
 }
 
 void TransformImpl<ETransformType::Perspective>::initDefaults()
 {
-	setDefaultValue("fovy", glm::radians(70.0f));
-	setDefaultValue("aspect", 1.33f);
-	setDefaultValue("near", 1.0f);
-	setDefaultValue("far", 10.0f);
+	setDefaultValueNoUpdate("fovy", glm::radians(70.0f));
+	setDefaultValueNoUpdate("aspect", 1.33f);
+	setDefaultValueNoUpdate("near", 1.0f);
+	setDefaultValue("far", 10.0f);   //  update matrix
 }
 
 void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
@@ -878,6 +887,45 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 	
 	setInternalValue(val, coords);
 	notifySequence();
+
+	// update the defaults to match the perspective matrix
+	// m[0,0] = F/aspect                  => newAspect = (F / newM[0][0]),   FOVY = const.
+	// m[1,1] = F                         => newAspect = newM[1,1] / m[0,0], FOVY = 2*atan(1/F] 
+	// m[2,2] = -(f+n)/(f-n) = A
+	// m[3,2] = -(2fn)/(f-n) = B
+	// m[2,3] = -1
+	// F=cotan(0.5*fovy) = 1 / tan(0.5*fovy)   => FOVY = 2*atan(1/F]
+
+	auto& mat  = m_internalData[0].getMat4();
+
+	if (coords == glm::ivec2(0, 0))
+	{
+		auto newAspect = mat[1][1] / mat[0][0];  // newAspect = (F / newM[0][0])
+		setDefaultValueNoUpdate("aspect", newAspect);
+	}
+	else if (coords == glm::ivec2(1, 1))
+	{
+		auto newAspect = mat[1][1] / mat[0][0]; // newAspect = (F / newM[0][0])
+		setDefaultValueNoUpdate("aspect", newAspect);
+
+		auto newFovy = 2.0f * atan(1.0f / mat[1][1]);
+		setDefaultValueNoUpdate("fovy", newFovy);
+	}
+	else if (coords == glm::ivec2(2, 2))
+	{
+		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
+		auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // B / (newA + 1)
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
+	else if (coords == glm::ivec2(3, 2))
+	{
+		auto newNear = mat[3][2] / (mat[2][2] - 1.0f);  // newB / (A - 1)
+		auto newFar  = mat[3][2] / (mat[2][2] + 1.0f);  // newB / (A + 1)
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
+
 
 	return ValueSetResult{};
 }
@@ -947,10 +995,10 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 {
 	auto& mat = m_internalData[0].getMat4();
 	auto  matL = glm::mat3(mat);        // linear 3x3 part
-	auto  matT = glm::transpose(matL);  // rows to columns
+	auto  matT = glm::transpose(matL);  // linear 3x3 part - rows to columns
 
 	//check (0,0,0,1) in the last row only
-	bool  result = validateValues(g_LookAtMask, mat); 
+	bool  result = validateValues(g_LookAtMask, mat); // rotation + translation
 
 	// check the Linear part - 
 	result = result && Math::eq(glm::determinant(mat), 1.0f);  // linearly independent

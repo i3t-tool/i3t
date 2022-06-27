@@ -214,8 +214,8 @@ FORCE_INLINE void NodeImpl<ENodeType::MatrixMulFloat>::updateValues(int inputInd
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		glm::mat4 mat = m_inputs[0].getStorage().getMat4();
-		float     num = m_inputs[1].getStorage().getFloat();
+		float     num = m_inputs[0].getStorage().getFloat();
+		glm::mat4 mat = m_inputs[1].getStorage().getMat4();
 		setInternalValue(num * mat);
 	}
 	else if (m_inputs[0].isPluggedIn())
