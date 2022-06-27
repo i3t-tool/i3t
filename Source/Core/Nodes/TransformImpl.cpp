@@ -978,8 +978,18 @@ void TransformImpl<ETransformType::Frustum>::initDefaults()
 void TransformImpl<ETransformType::Frustum>::resetMatrixFromDefaults()
 {
 	m_isLocked     = true;
-	m_hasSynergies = true; // symmetrical frustum
+	
+	if (hasSynergies())
+	{
 
+		// todo - do it symmetrically
+		const auto left = getDefaultValue("left").getFloat();
+		const auto bottom = getDefaultValue("bottom").getFloat();
+
+		if (!Math::eq(left, -getDefaultValue("right").getFloat())) setDefaultValueNoUpdate("right", -left);
+		if (!Math::eq(bottom, -getDefaultValue("top").getFloat())) setDefaultValueNoUpdate("top", -bottom);
+
+	}
 	setInternalValue(glm::frustum(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
 	                              getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
 	                              getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
@@ -1012,19 +1022,66 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 
 	if (coords == glm::ivec2(0, 0))
 	{
-		//auto newAspect = mat[1][1] / mat[0][0]; // newAspect = (F / newM[0][0])
-		//setDefaultValueNoUpdate("aspect", newAspect);
-	}
-	else if (coords == glm::ivec2(1, 1))
-	{
-		//float near = getDefaultValue("near").getFloat();
-		const auto w = getDefaultValue("left").getFloat() - getDefaultValue("right").getFloat();
-		setDefaultValueNoUpdate("left", (mat[1][1] - 1) * w);  // newL = (newC-1) * w
-		setDefaultValueNoUpdate("right", mat[1][1] * w); // newL = newC * w
+		const auto near  = getDefaultValue("near").getFloat();
+		const auto left  = getDefaultValue("left").getFloat();
+		const auto right = getDefaultValue("right").getFloat();
 
-		//auto newFovy = 2.0f * atan(1.0f / mat[1][1]);
-		//setDefaultValueNoUpdate("fovy", newFovy);
+		const auto sum   = getDefaultValue("right").getFloat() + getDefaultValue("left").getFloat();
+		//const auto C    = mat[2][0];
+		const auto newA  = mat[0][0];
+
+		if (newA != 0.0f)
+		{
+			const auto newL = (sum * newA - 2.0f * near) / (2 * newA); // newL =
+			const auto newR = sum - newL;
+
+			setDefaultValueNoUpdate("left", newL);  // newL =
+			setDefaultValueNoUpdate("right", newR); // newR =
+		}
 	}
+	else if (coords == glm::ivec2(2, 0))
+	{
+		const auto w = getDefaultValue("right").getFloat() - getDefaultValue("left").getFloat();
+
+		const auto newL = (mat[2][0] - 1) * w / 2.0f;   // newL = (newC-1) * w / 2
+		
+		setDefaultValueNoUpdate("left", newL);           // newL = (newC-1) * w / 2
+		setDefaultValueNoUpdate("right", newL + w);  // newR = newL + w
+	}
+
+
+
+
+	if (coords == glm::ivec2(1, 1))
+	{
+		const auto near   = getDefaultValue("near").getFloat();
+		const auto bottom = getDefaultValue("bottom").getFloat();
+		const auto top    = getDefaultValue("top").getFloat();
+
+		const auto sum  = getDefaultValue("top").getFloat() + getDefaultValue("bottom").getFloat();
+		//const auto D    = mat[2][1];
+		const auto newB = mat[1][1];
+
+		if (newB != 0.0f)
+		{
+			const auto newBot = (sum * newB - 2.0f * near) / (2 * newB); // newL =
+			const auto newTop = sum - newB;
+
+			setDefaultValueNoUpdate("bottom", newBot);  // newL =
+			setDefaultValueNoUpdate("top", newTop); // newR =
+		}
+	}
+	else if (coords == glm::ivec2(2, 1))
+	{
+		const auto h = getDefaultValue("top").getFloat() - getDefaultValue("bottom").getFloat();
+
+		const auto newBot = (mat[2][1] - 1) * h / 2.0f; // newL = (newC-1) * w / 2
+
+		setDefaultValueNoUpdate("bottom", newBot);      // newL = (newC-1) * w / 2
+		setDefaultValueNoUpdate("top", newBot + h); // newR = newL + w
+	}
+
+
 	else if (coords == glm::ivec2(2, 2))
 	{
 		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
