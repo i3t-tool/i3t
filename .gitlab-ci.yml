@@ -1,10 +1,4 @@
-# This file is a template, and might need editing before it works on your project.
-# use the official gcc image, based on debian
-# can use verions as well, like gcc:5.2
-# see https://hub.docker.com/_/gcc/
-image: gcc
-before_script:
-  - apt update && apt -y install clang-format cmake git libgl-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libopengl0
+image: cvutdcgi/i3t-ci
 
 stages:
   - build
@@ -16,8 +10,7 @@ build:
   script:
     - mkdir out && cd out 
     - cmake .. 
-    - cmake --build . -j 8 --target I3T
-    - cmake --build . -j 8 --target I3TTest
+    - cmake --build . -j 8 --target I3T I3TTest
   artifacts:
     paths:
       - Binaries
