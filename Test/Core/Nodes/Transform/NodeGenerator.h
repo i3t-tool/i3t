@@ -12,7 +12,8 @@ using namespace Core;
 
 /// Generate and connect float inputs to given node.
 template <size_t Size>
-inline std::tuple<std::array<float, Size>, std::array<Ptr<NodeBase>, Size>> generateFloatInputs(Ptr<Core::NodeBase> node)
+inline std::tuple<std::array<float, Size>, std::array<Ptr<NodeBase>, Size>>
+generateFloatInputs(Ptr<Core::NodeBase> node)
 {
 	std::array<float, Size> inputValues;
 	std::array<Ptr<Core::NodeBase>, Size> inputNodes;

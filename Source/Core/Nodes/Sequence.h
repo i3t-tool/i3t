@@ -26,7 +26,7 @@ class Sequence;
 
 namespace Builder
 {
-	Ptr<Sequence> createSequence();
+Ptr<Sequence> createSequence();
 } // namespace Builder
 
 /**
@@ -42,7 +42,7 @@ class Sequence : public Node
 {
 	friend class GraphManager;
 
-	using Matrix       = NodeBase;
+	using Matrix = NodeBase;
 	using SequencePins = std::vector<Pin>;
 
 	friend class Multiplier;
@@ -66,14 +66,17 @@ class Sequence : public Node
 			return nullptr;
 		}
 
-		Pin&       getIn(size_t i) override;
-		Pin&       getOut(size_t i) override;
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
 
-		ValueSetResult      addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
-		ValueSetResult      addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept
+		{
+			return addMatrix(matrix, 0);
+		};
+		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 		Ptr<Transformation> popMatrix(const int index);
-		void                swap(int from, int to);
+		void swap(int from, int to);
 
 		/**
 		 * Updates local transform.
@@ -81,7 +84,6 @@ class Sequence : public Node
 		 */
 		void updateValues(int inputIndex) override;
 	};
-
 
 	/** Structure which represents sequences multiplication. */
 	class Multiplier : public Node
@@ -98,8 +100,8 @@ class Sequence : public Node
 			return nullptr;
 		}
 
-		Pin&       getIn(size_t i) override;
-		Pin&       getOut(size_t i) override;
+		Pin& getIn(size_t i) override;
+		Pin& getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
 
 		/**
@@ -109,7 +111,7 @@ class Sequence : public Node
 		void updateValues(int inputIndex) override;
 	};
 
-	Ptr<Storage>    m_storage;
+	Ptr<Storage> m_storage;
 	Ptr<Multiplier> m_multiplier;
 
 public:
@@ -151,12 +153,18 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage->m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx)
+	{
+		return m_storage->m_matrices.at(idx);
+	}
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index) { return m_storage->popMatrix(index); }
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index)
+	{
+		return m_storage->popMatrix(index);
+	}
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
 
@@ -168,14 +176,17 @@ private:
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
 {
-	if (node == nullptr) return nullptr;
+	if (node == nullptr)
+		return nullptr;
 	return node->as<Sequence>();
 }
 
-FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+FORCE_INLINE glm::mat4
+getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
 {
 	glm::mat4 result(1.0f);
-	for (const auto& mat : matrices) result *= mat->getData().getMat4();
+	for (const auto& mat : matrices)
+		result *= mat->getData().getMat4();
 	return result;
 }
 
@@ -183,7 +194,7 @@ using SequencePtr = Ptr<Sequence>;
 
 FORCE_INLINE bool isSequence(const NodePtr& p)
 {
-	auto* op       = p->getOperation();
+	auto* op = p->getOperation();
 	auto* expected = &g_sequence;
 	return p->getOperation() == &g_sequence;
 }

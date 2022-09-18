@@ -9,7 +9,7 @@ TEST(GeneratorTest, GeneratorShouldGenerateRandomValues)
 	float next = 0.0f;
 
 	for (int i = 0; i < 10; ++i)
-  {
+	{
 		next = generateFloat();
 		EXPECT_FALSE(Math::eq(prev, next));
 		prev = next;

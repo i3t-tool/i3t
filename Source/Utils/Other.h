@@ -15,7 +15,10 @@ inline bool contains(const std::string& str, const std::string& substr)
 	// Check if window can be focused (no menu is active).
 	if ((index = str.find(substr, 0L)) != std::string::npos)
 	{
-		if (index == 0) { return true; }
+		if (index == 0)
+		{
+			return true;
+		}
 	}
 	return false;
 }
@@ -27,11 +30,13 @@ template <typename A, typename Predicate>
 inline int indexOf(A&& array, Predicate p)
 {
 	auto it = std::find_if(array.begin(), array.end(), p);
-	if (it != array.end()) { return std::distance(array.begin(), it); }
+	if (it != array.end())
+	{
+		return std::distance(array.begin(), it);
+	}
 	return -1;
 }
 } // namespace Utils
-
 
 /**
  * Convert enum to integer (or any other underlying type
@@ -40,8 +45,7 @@ inline int indexOf(A&& array, Predicate p)
  * \param e enum instance
  * \return enum underlying type.
  */
-template <typename E>
-constexpr auto toUnderlying(E e) noexcept
+template <typename E> constexpr auto toUnderlying(E e) noexcept
 {
 	return static_cast<std::underlying_type_t<E>>(e);
 }
@@ -58,5 +62,5 @@ struct COutRedirect
 
 private:
 	std::stringstream m_buffer;
-	std::streambuf*   m_default;
+	std::streambuf* m_default;
 };

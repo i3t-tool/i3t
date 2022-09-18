@@ -15,38 +15,44 @@
 /**
  * Base class for all commands.
  *
- * Any derived command can be accessed by calling DerivedCommandName::addListener(fptr);
- * For more information see <a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">
+ * Any derived command can be accessed by calling
+ * DerivedCommandName::addListener(fptr); For more information see <a
+ * href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">
  * Curiously recurring template pattern (static m_listeners).</a>
  *
  * \tparam Type command derived class (CloseCommand for example)-
  * \tparam Args command argument for callback call.
  */
-template <typename Type, typename... Args>
-class Command : public ICommand
+template <typename Type, typename... Args> class Command : public ICommand
 {
 public:
 	typedef std::function<void(Args&...)> Callback;
 
-	Command()          = default;
+	Command() = default;
 	virtual ~Command() = default;
 
 	/**
 	 * Add a listener for a command.
 	 *
-	 * <b>NEVER</b> use the function from constructor of statically instantiated object.
+	 * <b>NEVER</b> use the function from constructor of statically instantiated
+	 * object.
 	 *
-	 * \param function callback to call when the command is issued. Use std::bind for member function
-	 * of instantiated class or raw function pointer for static member function or plain function.
+	 * \param function callback to call when the command is issued. Use std::bind
+	 * for member function of instantiated class or raw function pointer for
+	 * static member function or plain function.
 	 *
 	 * \todo Check how std::bind handle `this` reference.
 	 */
-	static void addListener(Callback function) { s_listeners.push_back(function); };
+	static void addListener(Callback function)
+	{
+		s_listeners.push_back(function);
+	};
 
 	/**
 	 * Call all callbacks.
 	 *
-	 * Expand m_params tuple as function arguments, <a href="https://stackoverflow.com/a/37100646">link</a>.
+	 * Expand m_params tuple as function arguments, <a
+	 * href="https://stackoverflow.com/a/37100646">link</a>.
 	 */
 	void execute() override
 	{

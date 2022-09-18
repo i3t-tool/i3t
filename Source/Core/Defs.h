@@ -43,7 +43,7 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #endif
 
 #ifdef I3T_DEBUG
-#define I3T_ASSERT(cond)   assert(cond)
+#define I3T_ASSERT(cond) assert(cond)
 #define I3T_ABORT(message) assert(false && message)
 #else
 #define I3T_ASSERT(cond, description)
@@ -55,26 +55,22 @@ template <typename... Args>
 void Assert(bool condition, const std::string& message = "", Args&&... args)
 {
 #ifdef I3T_DEBUG
-	if (!condition) throw std::logic_error(fmt::format(message, std::forward<Args>(args)...));
+	if (!condition)
+		throw std::logic_error(fmt::format(message, std::forward<Args>(args)...));
 #endif
 }
 } // namespace Debug
 
 /// Definition of more friendly shared_ptr usage.
-template <typename T>
-using Ptr = std::shared_ptr<T>;
+template <typename T> using Ptr = std::shared_ptr<T>;
 
 /// Unique pointer shortcut.
-template <typename T>
-using UPtr = std::unique_ptr<T>;
+template <typename T> using UPtr = std::unique_ptr<T>;
 
-template <typename T>
-using WPtr = std::weak_ptr<T>;
-
+template <typename T> using WPtr = std::weak_ptr<T>;
 
 /// Singleton helper class.
-template <typename T>
-class Singleton
+template <typename T> class Singleton
 {
 public:
 	static T& instance();
@@ -86,21 +82,17 @@ protected:
 	Singleton() {}
 };
 
-template <typename T>
-T& Singleton<T>::instance()
+template <typename T> T& Singleton<T>::instance()
 {
 	static const std::unique_ptr<T> instance{new T{}};
 	return *instance;
 }
 
-
-template <typename BaseClass>
-class ICloneable
+template <typename BaseClass> class ICloneable
 {
 public:
 	virtual Ptr<BaseClass> clone() = 0;
 };
-
 
 /// Enum utils
 
@@ -110,22 +102,25 @@ public:
  * \param val Enum value
  * \return String name of the enum value
  */
-template <typename T>
-auto n(T val)
+template <typename T> auto n(T val)
 {
 	return std::string(magic_enum::enum_name(val));
 }
 
-template <typename T>
-constexpr T enumVal(const std::string& str)
+template <typename T> constexpr T enumVal(const std::string& str)
 {
 	constexpr auto& enumEntries = magic_enum::enum_entries<T>();
 	for (const auto& entry : enumEntries)
 	{
-		if constexpr (entry.first == str) { return entry.first; }
+		if constexpr (entry.first == str)
+		{
+			return entry.first;
+		}
 	}
 }
 
-#define COND_TO_DEG(x)                                                                                                 \
-	(SetupForm::radians ? (x)                                                                                            \
-	                    : glm::degrees(x)) ///< Converts from radians to degrees if the application set up for degrees
+#define COND_TO_DEG(x)                                                         \
+	(SetupForm::radians                                                          \
+	     ? (x)                                                                   \
+	     : glm::degrees(x)) ///< Converts from radians to degrees if the
+	                        ///< application set up for degrees

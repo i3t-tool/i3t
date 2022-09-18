@@ -16,9 +16,10 @@ struct TestTree
 };
 
 /**
- *                                         /----- Sequence 2 : | Scal | Tran | (branch1)
- * Sequence 1 : | RotX | Scal | Tran | ----|
- *                                         \----- Sequence 3 : | Scal | Tran | (branch2)
+ *                                         /----- Sequence 2 : | Scal | Tran |
+ * (branch1) Sequence 1 : | RotX | Scal | Tran | ----|
+ *                                         \----- Sequence 3 : | Scal | Tran |
+ * (branch2)
  */
 TestTree arrangeSequenceTree()
 {
@@ -28,22 +29,22 @@ TestTree arrangeSequenceTree()
 	auto branch2 = Builder::createSequence();
 
 	std::vector<Ptr<Transformation>> matrices = {
-			// sequence 1
-			Builder::createTransform<ETransformType::EulerX>(),
-			Builder::createTransform<ETransformType::Scale>(),
-			Builder::createTransform<ETransformType::Translation>(),
+	    // sequence 1
+	    Builder::createTransform<ETransformType::EulerX>(),
+	    Builder::createTransform<ETransformType::Scale>(),
+	    Builder::createTransform<ETransformType::Translation>(),
 
-			// sequence 2
-			Builder::createTransform<ETransformType::Scale>(),
-			Builder::createTransform<ETransformType::Translation>(),
+	    // sequence 2
+	    Builder::createTransform<ETransformType::Scale>(),
+	    Builder::createTransform<ETransformType::Translation>(),
 
-			// sequence 3
-			Builder::createTransform<ETransformType::Scale>(),
-			Builder::createTransform<ETransformType::Translation>(),
+	    // sequence 3
+	    Builder::createTransform<ETransformType::Scale>(),
+	    Builder::createTransform<ETransformType::Translation>(),
 	};
 
 	plug_expectOk(root, branch1, 0, 0);
-  plug_expectOk(root, branch2, 0, 0);
+	plug_expectOk(root, branch2, 0, 0);
 
 	// Add matrices to the sequences.
 	root->addMatrix(matrices[0]);
@@ -57,7 +58,7 @@ TestTree arrangeSequenceTree()
 	branch2->addMatrix(matrices[6]);
 
 	std::vector<NodePtr> expectedMatrices = {
-			matrices[4], matrices[3], matrices[2], matrices[1], matrices[0],
+	    matrices[4], matrices[3], matrices[2], matrices[1], matrices[0],
 	};
 
 	return TestTree{root, branch1, branch2, expectedMatrices};

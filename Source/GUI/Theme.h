@@ -38,7 +38,6 @@ enum class EColor
 	SelectionRectFull,
 	SelectionRectTouch,
 
-
 	// 2. Pins
 	PulsePin,
 	FloatPin,
@@ -144,7 +143,6 @@ enum class ESize
 
 	Default_VisiblePrecision,
 	Default_InactiveMark
-
 };
 
 enum class ESizeVec2
@@ -173,18 +171,18 @@ constexpr inline EColor asColor(EValueType type) { return EColor(type); }
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	ImVec4 color;
-	color.x = (float) r / 255.0f;
-	color.y = (float) g / 255.0f;
-	color.z = (float) b / 255.0f;
-	color.w = (float) a / 255.0f;
+	color.x = (float)r / 255.0f;
+	color.y = (float)g / 255.0f;
+	color.z = (float)b / 255.0f;
+	color.w = (float)a / 255.0f;
 
 	return color;
 }
 
-template <typename T>
-const char* enumToStr(std::map<T, const char*>& map, T en)
+template <typename T> const char* enumToStr(std::map<T, const char*>& map, T en)
 {
-	if (!map.contains(en)) return nullptr;
+	if (!map.contains(en))
+		return nullptr;
 	return map[en];
 }
 
@@ -194,18 +192,19 @@ const char* enumToStr(std::map<T, const char*>& map, T en)
 class Theme
 {
 public:
-	using Colors   = std::unordered_map<EColor, ImVec4>;
-	using Sizes    = std::unordered_map<ESize, float>;
+	using Colors = std::unordered_map<EColor, ImVec4>;
+	using Sizes = std::unordered_map<ESize, float>;
 	using SizesVec = std::unordered_map<ESizeVec2, ImVec2>;
 
-	/// \todo MH - P0919R2 Heterogeneous lookup for unordered containers, C++2a (std::unordered_map cannot be used).
+	/// \todo MH - P0919R2 Heterogeneous lookup for unordered containers, C++2a
+	/// (std::unordered_map cannot be used).
 	using CategoryNames = std::map<std::string, const char*>;
 
 private:
 	std::string m_name = "default";
 
-	Colors   m_colors;
-	Sizes    m_sizes;
+	Colors m_colors;
+	Sizes m_sizes;
 	SizesVec m_sizesVec2;
 
 	ImVec4 m_defaultColor{0.0f, 0.0f, 0.0f, 1.0f};
@@ -214,7 +213,8 @@ private:
 
 public:
 	Theme() = default;
-	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
+	Theme(std::string name, const Colors& colors, const Sizes& sizes,
+	      const SizesVec& sizesVec);
 
 	static Theme createDefaultClassic();
 	static Theme createDefaultModern();
@@ -236,8 +236,8 @@ public:
 	/**
 	 * Function which initializes all style properties names.
 	 *
-	 * \warning All values are kept in a table (key, value). If you want to edit or add new name,
-	 * keep in mind, that name (value) must be unique.
+	 * \warning All values are kept in a table (key, value). If you want to edit
+	 * or add new name, keep in mind, that name (value) must be unique.
 	 */
 	static void initNames();
 
@@ -248,7 +248,8 @@ public:
 
 	const ImVec4& get(EColor color)
 	{
-		if (m_colors.count(color) == 0) return m_defaultColor;
+		if (m_colors.count(color) == 0)
+			return m_defaultColor;
 
 		return m_colors[color];
 	}
@@ -259,28 +260,33 @@ public:
 
 	const ImVec2& get(ESizeVec2 sizeVec)
 	{
-		Debug::Assert(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
+		Debug::Assert(m_sizesVec2.contains(sizeVec),
+		              "This size is not present in the map.");
 		return m_sizesVec2[sizeVec];
 	}
 
-	static const char*                       getCategoryName(const std::string& key);
-	static CategoryNames&                    getCategoryNames();
-	static std::map<EColor, const char*>&    getColorNames();
-	static std::map<ESize, const char*>&     getSizeNames();
+	static const char* getCategoryName(const std::string& key);
+	static CategoryNames& getCategoryNames();
+	static std::map<EColor, const char*>& getColorNames();
+	static std::map<ESize, const char*>& getSizeNames();
 	static std::map<ESizeVec2, const char*>& getSizeVecNames();
 
 	const std::string& getName() const { return m_name; }
 
-	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
+	void set(EColor color, ImVec4 value)
+	{
+		m_colors.insert(std::pair(color, value));
+	}
 
 	[[nodiscard]] const Colors& getColors() const { return m_colors; }
-	Colors&                     getColorsRef() { return m_colors; }
-	void                        setColors(const Colors& colors) { m_colors = colors; }
+	Colors& getColorsRef() { return m_colors; }
+	void setColors(const Colors& colors) { m_colors = colors; }
 
-	Sizes&    getSizesRef() { return m_sizes; }
+	Sizes& getSizesRef() { return m_sizes; }
 	SizesVec& getSizesVecRef() { return m_sizesVec2; }
 
-	// JH unused -> maybe for "InputItems" only - drag float etc... but probably not needed
+	// JH unused -> maybe for "InputItems" only - drag float etc... but probably
+	// not needed
 	//	void operatorColorTheme();
 	//	void transformationColorTheme();
 	void returnFloatColorToDefault();
@@ -291,8 +297,10 @@ public:
 
 private:
 	template <typename E, typename T>
-	void copyProperties(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
+	void copyProperties(std::unordered_map<E, T>& target,
+	                    const std::unordered_map<E, T>& source)
 	{
-		for (const auto [key, val] : source) target[key] = val;
+		for (const auto [key, val] : source)
+			target[key] = val;
 	}
 };

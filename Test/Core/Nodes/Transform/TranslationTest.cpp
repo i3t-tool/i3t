@@ -2,15 +2,15 @@
 
 #include "Core/Nodes/GraphManager.h"
 
-#include "Generator.h"
 #include "../Utils.h"
+#include "Generator.h"
 
 using namespace Core;
 
 TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 {
 	auto translationNode = Builder::createTransform<ETransformType::Translation>()
-	    ->as<TransformImpl<ETransformType::Translation>>();
+	                           ->as<TransformImpl<ETransformType::Translation>>();
 
 	// Invalid coordinates.
 	auto result = translationNode->setValue(generateFloat(), {0, 3});
@@ -21,7 +21,8 @@ TEST(TranslationTest, InvalidValues_ShouldNotBePermitted)
 
 TEST(TranslationTest, ValidValues_Ok)
 {
-	auto translationNode = Builder::createTransform<ETransformType::Translation>();
+	auto translationNode =
+	    Builder::createTransform<ETransformType::Translation>();
 
 	// Valid coordinates.
 	setValue_expectOk(translationNode, -2.0f, {3, 0});
@@ -37,7 +38,8 @@ TEST(TranslationTest, ValidValues_Ok)
 
 TEST(TranslationTest, Unlocked_InvalidValues_InvalidState)
 {
-	auto translationNode = Builder::createTransform<ETransformType::Translation>();
+	auto translationNode =
+	    Builder::createTransform<ETransformType::Translation>();
 	translationNode->unlock();
 
 	// Invalid coordinates.
@@ -48,8 +50,8 @@ TEST(TranslationTest, Unlocked_InvalidValues_InvalidState)
 
 TEST(TranslationTest, GettersAndSetterShouldBeOk)
 {
-  auto translation = Builder::createTransform<ETransformType::Translation>()
-			->as<TransformImpl<ETransformType::Translation>>();
+	auto translation = Builder::createTransform<ETransformType::Translation>()
+	                       ->as<TransformImpl<ETransformType::Translation>>();
 
 	auto vec = generateVec3();
 
@@ -60,8 +62,8 @@ TEST(TranslationTest, GettersAndSetterShouldBeOk)
 
 TEST(TranslationTest, SetValueInMatrixUpdatesDefaultValue)
 {
-	auto translation =
-	    Builder::createTransform<ETransformType::Translation>()->as<TransformImpl<ETransformType::Translation>>();
+	auto translation = Builder::createTransform<ETransformType::Translation>()
+	                       ->as<TransformImpl<ETransformType::Translation>>();
 
 	auto vec = generateVec3();
 	auto val = generateFloat();
@@ -69,17 +71,21 @@ TEST(TranslationTest, SetValueInMatrixUpdatesDefaultValue)
 	auto val3 = 3.0f * val;
 
 	// Valid coordinates.
-	translation->setValue(val);  // force synergies - NO - translation has no synergies
-	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(), glm::vec3(val));  // val -> vec
+	translation->setValue(
+	    val); // force synergies - NO - translation has no synergies
+	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(),
+	          glm::vec3(val)); // val -> vec
 
 	translation->setValue(vec);
-	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(), vec);  //vec -> vec
+	EXPECT_EQ(translation->getDefaultValue("translation").getVec3(),
+	          vec); // vec -> vec
 
 	translation->disableSynergies();
-	setValue_expectWrong(translation, val, glm::ivec2(0, 0));  // wrong coord
+	setValue_expectWrong(translation, val, glm::ivec2(0, 0)); // wrong coord
 
-	translation->setValue(val, glm::ivec2(3,0));   // scale x alone
-	EXPECT_EQ(translation->getDefaultValue("translation").getVec3().x, val); //vec -> vec
+	translation->setValue(val, glm::ivec2(3, 0)); // scale x alone
+	EXPECT_EQ(translation->getDefaultValue("translation").getVec3().x,
+	          val); // vec -> vec
 }
 
 TEST(TranslationTest, SetDefaultValueUpdatesMatrix)
@@ -87,10 +93,10 @@ TEST(TranslationTest, SetDefaultValueUpdatesMatrix)
 	auto vec = generateVec3();
 	auto val = generateFloat();
 
-	auto translation =
-	    Builder::createTransform<ETransformType::Translation>()->as<TransformImpl<ETransformType::Translation>>();
+	auto translation = Builder::createTransform<ETransformType::Translation>()
+	                       ->as<TransformImpl<ETransformType::Translation>>();
 
 	translation->setDefaultValue("translation", vec);
 
-  EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
+	EXPECT_EQ(glm::translate(vec), translation->getData().getMat4());
 }

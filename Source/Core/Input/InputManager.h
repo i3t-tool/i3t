@@ -21,7 +21,8 @@
 
 struct GLFWwindow;
 
-/** State of the three mouse buttons (does not store the state of the modificators */
+/** State of the three mouse buttons (does not store the state of the
+ * modificators */
 struct MouseButtonState final
 {
 	bool left, right, middle; ///< mouse buttons
@@ -29,28 +30,30 @@ struct MouseButtonState final
 
 	MouseButtonState()
 	{
-		left   = false;
-		right  = false;
+		left = false;
+		right = false;
 		middle = false;
 	}
 
 	/**
 	 * \brief Is any mouse button pressed?
-	 * The inner state depends on the Keys::mouseLeft, right, middle. It must be one step behind the reality...
-	 * The inner state is set by InputController::preUpdate(); in  main.cpp: logicUpdate()
-	 * \todo Check - never used
-	 * \return true if any button pressed.
+	 * The inner state depends on the Keys::mouseLeft, right, middle. It must be
+	 * one step behind the reality... The inner state is set by
+	 * InputController::preUpdate(); in  main.cpp: logicUpdate() \todo Check -
+	 * never used \return true if any button pressed.
 	 */
 	bool isPressed() const { return (left || right || middle); }
 };
 //===----------------------------------------------------------------------===//
 
 /**
- * \brief Class handling all GLUT interaction events (mouse and keyboard) and starting the label editor.
+ * \brief Class handling all GLUT interaction events (mouse and keyboard) and
+ * starting the label editor.
  *
- * This class stores state of all keys and mouse buttons in a map \a keyMap - used for controlling all
- * interaction. It also updates the stored statuses of the keys from JUST pressed/released to pressed/release.
- * The update() is called regularly from the end of main.cpp: logicUpdate()
+ * This class stores state of all keys and mouse buttons in a map \a keyMap -
+ * used for controlling all interaction. It also updates the stored statuses of
+ * the keys from JUST pressed/released to pressed/release. The update() is
+ * called regularly from the end of main.cpp: logicUpdate()
  */
 class InputManager final
 {
@@ -61,38 +64,49 @@ public:
 		JUST_UP,
 		DOWN,
 		JUST_DOWN
-	}; ///< state of the key used in keyMap - enum { 0 - up, 1 - just up, 2 - down, 3 - just down}
+	}; ///< state of the key used in keyMap - enum { 0 - up, 1 - just up, 2 -
+	   ///< down, 3 - just down}
 
-	/// States of all keys, modifiers, and mouse buttons - enum value KeyState. changed in update()
+	/// States of all keys, modifiers, and mouse buttons - enum value KeyState.
+	/// changed in update()
 	static std::map<Keys::Code, KeyState> m_keyMap;
 
 	static int m_winWidth, m_winHeight; ///< Window size
 
-	static MouseButtonState m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed) without modifiers.
+	static MouseButtonState
+	    m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed)
+	                        ///< without modifiers.
 	///< \todo passed to all handlers, but probably not used
 
-	static bool      m_ignoreImGuiEvents;
+	static bool m_ignoreImGuiEvents;
 	static glm::vec2 m_mouseOffset;
-	static float     m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
-	static float     m_mouseXDelta, m_mouseYDelta;
-	static float     m_mouseXDragDelta, m_mouseYDragDelta;
+	static float m_mouseX, m_mouseY, m_mouseXPrev,
+	    m_mouseYPrev; ///< mouse cursor position
+	static float m_mouseXDelta, m_mouseYDelta;
+	static float m_mouseXDragDelta, m_mouseYDragDelta;
 
 private:
 	static std::vector<InputController*> m_inputControllers;
 	// static Ptr<IWindow> m_focusedWindow;
 
 public:
-	static void      init();
+	static void init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
 
-	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
+	static void bindGlobalAction(const char* action, EKeyState state,
+	                             KeyCallback fn);
 
 	static void triggerAction(const char* action, EKeyState state);
 
-	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
-	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
+	static void setInputAction(const char* action, Keys::Code code,
+	                           ModifiersList mods = ModifiersList());
+	static void setInputAxis(const char* action, float scale, Keys::Code code,
+	                         ModifiersList mods = ModifiersList());
 
-	static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
+	static void addInputController(InputController* controller)
+	{
+		m_inputControllers.push_back(controller);
+	}
 
 	static bool areModifiersActive(Modifiers mods);
 
@@ -101,7 +115,8 @@ public:
 	 *
 	 * \warning Focused window must be set from ImGui Context.
 	 */
-	// static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
+	// static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow =
+	// window; }
 
 	/**
 	 * Set active input controller (for focused window).
@@ -113,11 +128,12 @@ public:
 	/*
 	template <typename T> static bool isFocused()
 	{
-		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
+	    static_assert(std::is_base_of_v<IWindow, T>, "Template param must be
+	derived from IWindow type.");
 
-		if (m_focusedWindow)
-			return strcmp(m_focusedWindow->getID(), T::ID) == 0;
-		return false;
+	    if (m_focusedWindow)
+	        return strcmp(m_focusedWindow->getID(), T::ID) == 0;
+	    return false;
 	}
 	 */
 
@@ -139,11 +155,20 @@ public:
 
 	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 
-	static bool isKeyPressed(const Keys::Code code) { return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN); }
+	static bool isKeyPressed(const Keys::Code code)
+	{
+		return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN);
+	}
 
-	static bool isKeyJustPressed(const Keys::Code code) { return (m_keyMap[code] == JUST_DOWN); }
+	static bool isKeyJustPressed(const Keys::Code code)
+	{
+		return (m_keyMap[code] == JUST_DOWN);
+	}
 
-	static bool isKeyJustUp(const Keys::Code code) { return (m_keyMap[code] == JUST_UP); }
+	static bool isKeyJustUp(const Keys::Code code)
+	{
+		return (m_keyMap[code] == JUST_UP);
+	}
 
 	/// \returns whether one of three mouse buttons was clicked.
 	static bool isMouseClicked();
@@ -159,21 +184,23 @@ public:
 	static void endCameraControl();
 
 	/**
-	 * Sets screen size - called from GUI::resize(), which is called by main.onReshape()
+	 * Sets screen size - called from GUI::resize(), which is called by
+	 * main.onReshape()
 	 *
 	 * \param width The screen width.
 	 * \param	height The screen height.
 	 */
 	static void setScreenSize(const int width, const int height)
 	{
-		m_winWidth  = width;
+		m_winWidth = width;
 		m_winHeight = height;
 	}
 
 	//@{
 	/** \name Handling the mouse */
 	/**
-	 * \brief Copies state of the mouse buttons from keyMap into bool variables of the mouseButtonState
+	 * \brief Copies state of the mouse buttons from keyMap into bool variables of
+	 * the mouseButtonState
 	 */
 	static void preUpdate();
 	//@}
@@ -184,14 +211,15 @@ public:
 	static void processEvents(InputController& controller);
 
 	/**
-	 * \brief Updates \a mouseDelta and \a mousePrev, and updates the stored statuses of the keys in the \a keyMap array
-	 * (JUST_UP -> UP, JUST_DOWN -> DOWN).
+	 * \brief Updates \a mouseDelta and \a mousePrev, and updates the stored
+	 * statuses of the keys in the \a keyMap array (JUST_UP -> UP, JUST_DOWN ->
+	 * DOWN).
 	 */
 	static void update();
 
 	/**
-	 * Check ImGui mouse input for current window and set mouse cursor position and mouse button map.
-	 * Use this function after ImGui::Begin(...).
+	 * Check ImGui mouse input for current window and set mouse cursor position
+	 * and mouse button map. Use this function after ImGui::Begin(...).
 	 */
 	static void processViewportEvents();
 
@@ -218,6 +246,6 @@ public:
 	static GLFWwindow* getCurrentViewport();
 
 private:
-	static InputController  s_globalInputController;
+	static InputController s_globalInputController;
 	static InputController* s_activeInput;
 };

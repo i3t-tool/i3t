@@ -10,7 +10,9 @@
 AboutDialog::AboutDialog()
 {
 	/// \todo MH Load DCGI logo.
-	// dcgiReg = std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f, 0.0f, 1.0f, 1.0f);
+	// dcgiReg =
+	// std::make_shared<TextureRegion>(TextureLoader::getHCId("dcgiLogo"), 0.0f,
+	// 0.0f, 1.0f, 1.0f);
 }
 
 void AboutDialog::render()
@@ -19,7 +21,8 @@ void AboutDialog::render()
 	{
 		ImGui::Columns(2, NULL, false);
 
-		// ImGui::Image((void*)(intptr_t)dcgiReg->getTexId(), ImVec2(243.0f, 66.0f), ImVec2(0, 1), ImVec2(1, 0));
+		// ImGui::Image((void*)(intptr_t)dcgiReg->getTexId(), ImVec2(243.0f, 66.0f),
+		// ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::NextColumn();
 
@@ -51,9 +54,13 @@ void AboutDialog::render()
 
 		ImGui::Separator();
 
-		// ImGui::BeginHorizontal("AboutFooter", ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
+		// ImGui::BeginHorizontal("AboutFooter",
+		// ImVec2{ImGui::GetWindowContentRegionMax().x, 0.0f});
 		ImGui::Text(Config::VERSION.c_str());
-		if (ImGui::Button("OK", ImVec2{100.0f, 0.0f})) { HideWindowCommand::dispatch(ID); }
+		if (ImGui::Button("OK", ImVec2{100.0f, 0.0f}))
+		{
+			HideWindowCommand::dispatch(ID);
+		}
 		// ImGui::EndHorizontal();
 	}
 	ImGui::End();

@@ -17,11 +17,17 @@ inline bool doesFileExists(const char* filename)
  * @param path Absolute
  * @return
  */
-inline bool doesFileExists(const std::string& path) { return doesFileExists(path.c_str()); }
+inline bool doesFileExists(const std::string& path)
+{
+	return doesFileExists(path.c_str());
+}
 
 /**
  *
  * @param path Absolute
  * @return
  */
-inline bool doesFileExists(fs::path& path) { return doesFileExists(path.string().c_str()); }
+inline bool doesFileExists(fs::path& path)
+{
+	return doesFileExists(path.string().c_str());
+}

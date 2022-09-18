@@ -11,7 +11,8 @@ void loadConfig()
 {
 	auto configFile = Config::getAbsolutePath("config.yml");
 
-	if (!doesFileExists(configFile)) Log::fatal("Unable to load 'config.yml' file.");
+	if (!doesFileExists(configFile))
+		Log::fatal("Unable to load 'config.yml' file.");
 
 	auto yaml = YAML::LoadFile(configFile);
 

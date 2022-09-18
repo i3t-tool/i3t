@@ -10,9 +10,10 @@
 //#include <World/HardcodedMeshes.h>
 //#include <World/RenderTexture.h>
 //
-//class WorkspaceTrackball : public WorkspaceMatrix4x4 /* \todo JH really matrix 4x4 ?*/
+// class WorkspaceTrackball : public WorkspaceMatrix4x4 /* \todo JH really
+// matrix 4x4 ?*/
 //{
-//public:
+// public:
 //    WorkspaceTrackball();
 //
 //	ImVec2 textureSize;

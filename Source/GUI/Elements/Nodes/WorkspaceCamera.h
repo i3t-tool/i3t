@@ -9,15 +9,17 @@ class WorkspaceCamera : public WorkspaceNodeWithCoreDataWithPins
 {
 protected:
 	Ptr<WorkspaceSequence> m_projection = nullptr;
-	Ptr<WorkspaceSequence> m_view       = nullptr;
+	Ptr<WorkspaceSequence> m_view = nullptr;
 
 public:
 	WorkspaceCamera(DIWNE::Diwne& diwne);
 
-	//===-- Double dispatch ---------------------------------------------------===//
+	//===-- Double dispatch
+	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
-		visitor.visit(std::static_pointer_cast<WorkspaceCamera>(shared_from_this()));
+		visitor.visit(
+		    std::static_pointer_cast<WorkspaceCamera>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 
@@ -26,7 +28,8 @@ public:
 	Ptr<WorkspaceSequence> const& getProjection() const { return m_projection; };
 	Ptr<WorkspaceSequence> const& getView() const { return m_view; };
 
-	//bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no data */
+	// bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no
+	// data */
 
 	bool middleContent();
 

@@ -35,7 +35,8 @@ public:
 	{
 		if (m_isInput)
 		{
-			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
+			Debug::Assert(isPluggedIn(),
+			              "This input pin is not plugged to any output pin!");
 			return m_input;
 		}
 		else
@@ -48,7 +49,10 @@ public:
 	/**
 	 * \return Input pins of connected nodes.
 	 */
-	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
+	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const
+	{
+		return m_outputs;
+	}
 
 	/**
 	 * \return Storage which belongs to this pin.
@@ -58,8 +62,8 @@ public:
 	/**
 	 * Get stored data based on pin type.
 	 *
-	 * \returns data storage owner by node connected to this input pin. If pin is output pin,
-	 *          it returns data storage of pin owner.
+	 * \returns data storage owner by node connected to this input pin. If pin is
+	 * output pin, it returns data storage of pin owner.
 	 */
 	[[nodiscard]] const DataStore& getStorage(unsigned id = 0);
 
@@ -80,7 +84,7 @@ public:
 	[[nodiscard]] bool isInput() const { return m_isInput; }
 
 	[[nodiscard]] bool isDisabled() const { return m_isDisabled; }
-	void               setDisabled(bool disabled) { m_isDisabled = disabled; }
+	void setDisabled(bool disabled) { m_isDisabled = disabled; }
 
 private:
 	ID m_id;

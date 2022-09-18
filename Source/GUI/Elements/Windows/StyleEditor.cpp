@@ -10,8 +10,8 @@
 
 using namespace UI;
 
-constexpr float  DRAG_FLOAT_WIDTH = 100.0f;
-constexpr size_t BUFF_LEN         = 4096;
+constexpr float DRAG_FLOAT_WIDTH = 100.0f;
+constexpr size_t BUFF_LEN = 4096;
 
 char g_newThemeName[BUFF_LEN];
 char g_saveMessageBuff[BUFF_LEN];
@@ -32,23 +32,30 @@ void StyleEditor::render()
 			const bool isSelected = (currentThemeIdx == n);
 			if (ImGui::Selectable(I3T::getThemes()[n].getName().c_str(), isSelected))
 			{
-				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) { return t.getName() == curr.getName(); });
+				auto currIndex =
+				    Utils::indexOf(I3T::getThemes(), [&curr](Theme& t)
+				                   { return t.getName() == curr.getName(); });
 				if (n != currIndex)
 				{
 					I3T::getUI()->setTheme(I3T::getThemes()[n]);
-					currentThemeIdx = (int) n;
+					currentThemeIdx = (int)n;
 				}
 			}
 
-			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-			if (isSelected) ImGui::SetItemDefaultFocus();
+			// Set the initial focus when opening the combo (scrolling + keyboard
+			// navigation focus)
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
 		}
 		ImGui::EndCombo();
 	}
 	ImGui::SameLine();
 
 	// Reload themes from Data/themes
-	if (GUI::Button("Refresh")) { I3T::getUI()->reloadThemes(); }
+	if (GUI::Button("Refresh"))
+	{
+		I3T::getUI()->reloadThemes();
+	}
 
 	renderSaveRevertField();
 
@@ -73,9 +80,13 @@ void StyleEditor::renderSaveRevertField()
 	// Save current theme to file.
 	if (ImGui::Button("Save"))
 	{
-		auto path    = std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
+		auto path =
+		    std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
 		auto absPath = Config::getAbsolutePath(path);
-		if (doesFileExists(absPath)) { strcpy(g_saveMessageBuff, "Theme with this name already exists."); }
+		if (doesFileExists(absPath))
+		{
+			strcpy(g_saveMessageBuff, "Theme with this name already exists.");
+		}
 		else
 		{
 			strcpy(g_saveMessageBuff, "Theme saved!");
@@ -87,7 +98,10 @@ void StyleEditor::renderSaveRevertField()
 	// Revert all changes.
 	if (ImGui::Button("Revert changes"))
 	{
-		if (curr.getName() == "classic") { I3T::emplaceTheme(Theme::createDefaultClassic()); }
+		if (curr.getName() == "classic")
+		{
+			I3T::emplaceTheme(Theme::createDefaultClassic());
+		}
 		else if (curr.getName() == "modern")
 		{
 			I3T::emplaceTheme(Theme::createDefaultModern());
@@ -95,7 +109,10 @@ void StyleEditor::renderSaveRevertField()
 		else
 		{
 			auto path = std::string("Data/themes/") + curr.getName() + ".yml";
-			if (auto theme = loadTheme(Config::getAbsolutePath(path))) { I3T::emplaceTheme(*theme); }
+			if (auto theme = loadTheme(Config::getAbsolutePath(path)))
+			{
+				I3T::emplaceTheme(*theme);
+			}
 		}
 	}
 
@@ -122,7 +139,10 @@ void UI::showColors()
 
 		auto& color = curr.getColorsRef()[key];
 		ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
-		if (ImGui::ColorEdit4(str + I3T_PROPERTY_NAME_OFFSET, (float*) (&color))) { curr.apply(); }
+		if (ImGui::ColorEdit4(str + I3T_PROPERTY_NAME_OFFSET, (float*)(&color)))
+		{
+			curr.apply();
+		}
 	}
 }
 
@@ -146,7 +166,11 @@ void UI::showDimensions()
 
 		auto& val = curr.getSizesRef()[key];
 		ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, 0.0f, "%.0f")) { curr.apply(); }
+		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, 0.0f,
+		                     "%.0f"))
+		{
+			curr.apply();
+		}
 	}
 	ImGui::Separator();
 
@@ -161,6 +185,10 @@ void UI::showDimensions()
 
 		auto& val = curr.getSizesVecRef()[key];
 		ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f, 0.0f, "%.0f")) { curr.apply(); }
+		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f,
+		                      0.0f, "%.0f"))
+		{
+			curr.apply();
+		}
 	}
 }

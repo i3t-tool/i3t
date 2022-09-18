@@ -13,7 +13,8 @@ TEST(MakeTransformTest, MakeTranslationNodeShouldBeValid)
 	auto vec3 = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
 	auto initialTranslation = generateVec3();
 
-	auto makeTranslation = Core::Builder::createNode<ENodeType::MakeTranslation>();
+	auto makeTranslation =
+	    Core::Builder::createNode<ENodeType::MakeTranslation>();
 
 	plug_expectOk(vec3, makeTranslation, 0, 0);
 
@@ -71,18 +72,21 @@ TEST(MakeTransformTest, MakeOrthoShouldBeValid)
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeOrthoNode);
 
-	auto expectedOrtho = glm::ortho(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5]);
+	auto expectedOrtho = glm::ortho(inputs[0], inputs[1], inputs[2], inputs[3],
+	                                inputs[4], inputs[5]);
 
 	EXPECT_EQ(expectedOrtho, makeOrthoNode->getData().getMat4());
 }
 
 TEST(MakeTransformTest, MakePerspectiveShouldBeValid)
 {
-	auto makePerspectiveNode = Core::Builder::createNode<ENodeType::MakePerspective>();
+	auto makePerspectiveNode =
+	    Core::Builder::createNode<ENodeType::MakePerspective>();
 
 	auto [inputValues, inputNodes] = generateFloatInputs<4>(makePerspectiveNode);
 
-	auto expectedMat = glm::perspective(inputValues[0], inputValues[1], inputValues[2], inputValues[3]);
+	auto expectedMat = glm::perspective(inputValues[0], inputValues[1],
+	                                    inputValues[2], inputValues[3]);
 
 	EXPECT_EQ(expectedMat, makePerspectiveNode->getData().getMat4());
 }
@@ -93,7 +97,8 @@ TEST(MakeTransformTest, MakeFrustumShouldBeValid)
 
 	auto [inputs, inputNodes] = generateFloatInputs<6>(makeFrustumNode);
 
-	auto expectedOrtho = glm::frustum(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5]);
+	auto expectedOrtho = glm::frustum(inputs[0], inputs[1], inputs[2], inputs[3],
+	                                  inputs[4], inputs[5]);
 
 	EXPECT_EQ(expectedOrtho, makeFrustumNode->getData().getMat4());
 }

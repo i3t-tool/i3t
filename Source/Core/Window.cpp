@@ -1,12 +1,15 @@
 #include "Window.h"
 
-#include <pgr.h>
 #include "stb_image.h"
+#include <pgr.h>
 
 #include "Commands/ApplicationCommands.h"
 #include "Logger/LoggerInternal.h"
 
-void glfwErrorCallback(int error, const char* description) { pgr::dieWithError(description); }
+void glfwErrorCallback(int error, const char* description)
+{
+	pgr::dieWithError(description);
+}
 
 Window::~Window() { glfwTerminate(); }
 
@@ -25,7 +28,8 @@ void Window::init()
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
-	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, g_baseTitle, nullptr, nullptr);
+	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT,
+	                                g_baseTitle, nullptr, nullptr);
 
 	if (m_mainWindow == nullptr)
 	{
@@ -35,10 +39,11 @@ void Window::init()
 
 	setTitle(g_baseTitle);
 
-	int           x, y, channels;
+	int x, y, channels;
 	constexpr int desiredChannels = 4;
-	auto*         pixels =
-	    stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(), &x, &y, &channels, desiredChannels);
+	auto* pixels =
+	    stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(),
+	              &x, &y, &channels, desiredChannels);
 	if (pixels)
 	{
 		GLFWimage image{x, y, pixels};
@@ -49,13 +54,15 @@ void Window::init()
 	glfwMakeContextCurrent(m_mainWindow);
 	glfwSwapInterval(1); // Enable vsync.
 
-	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
+	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window)
+	                           { BeforeCloseCommand::dispatch(); });
 
 	/*
-	glfwSetKeyCallback(m_mainWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-  {
+	glfwSetKeyCallback(m_mainWindow, [](GLFWwindow* window, int key, int scancode,
+	int action, int mods)
+	{
 
-  });
+	});
 	 */
 }
 

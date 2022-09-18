@@ -23,13 +23,16 @@ namespace SystemDialogs
  * \param result Reference to a string which should contain selected file name.
  * \param title Dialog title.
  * \param root Specifies default path for dialog to open.
- * \param filter Specifies which files should be showed in the dialog according to its types.
- *				Pass parameter as a key, value vector {Audio Files", "*.wav *.mp3", "All Files", "*"}.
+ * \param filter Specifies which files should be showed in the dialog according
+ *to its types. Pass parameter as a key, value vector {Audio Files", "*.wav
+ **.mp3", "All Files", "*"}.
  *
  * \return Whether file was selected or not.
  */
-bool OpenSingleFileDialog(std::string& result, const std::string& title, const std::string& root = "",
-                          const std::vector<std::string>& filter = {"All Files", "*"});
+bool OpenSingleFileDialog(std::string& result, const std::string& title,
+                          const std::string& root = "",
+                          const std::vector<std::string>& filter = {"All Files",
+                                                                    "*"});
 
 /**
  * Save single file via system native file dialog.
@@ -41,13 +44,16 @@ bool OpenSingleFileDialog(std::string& result, const std::string& title, const s
  *
  * \return Whether file was selected or not.
  */
-bool SaveSingleFileDialog(std::string& filename, const std::string& title, const std::string& root = "",
-                          const std::vector<std::string>& filter = {"All Files", "*"});
+bool SaveSingleFileDialog(std::string& filename, const std::string& title,
+                          const std::string& root = "",
+                          const std::vector<std::string>& filter = {"All Files",
+                                                                    "*"});
 
 /**
  * Show fatal error message
  *
  * Dialog will block execution of application.
  */
-void FireErrorMessageDialog(const std::string& title, const std::string& message);
+void FireErrorMessageDialog(const std::string& title,
+                            const std::string& message);
 }; // namespace SystemDialogs

@@ -29,9 +29,12 @@ void Cycle::play()
 
 	if (m_mode == EMode::Once)
 	{
-		//revind to start (to m_from) after stop at m_to
-		if ((m_from <= m_to && currentValue >= m_to) || (m_from > m_to && currentValue <= m_to))
-		{ setInternalValue(m_from); }
+		// revind to start (to m_from) after stop at m_to
+		if ((m_from <= m_to && currentValue >= m_to) ||
+		    (m_from > m_to && currentValue <= m_to))
+		{
+			setInternalValue(m_from);
+		}
 	}
 
 	m_isRunning = true;
@@ -47,7 +50,7 @@ void Cycle::pause()
 void Cycle::stopAndReset()
 {
 	m_isRunning = false;
-	setInternalValue(m_from); //PF was missing
+	setInternalValue(m_from); // PF was missing
 
 	pulse(I3T_CYCLE_OUT_STOP);
 }
@@ -108,27 +111,46 @@ void Cycle::updateValues(int inputIndex)
 		setInternalValue(val, I3T_CYCLE_IN_MULT);
 	}
 
-	if (getIn(I3T_CYCLE_IN_PLAY).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex)) { play(); }
-	else if (getIn(I3T_CYCLE_IN_PAUSE).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PAUSE, inputIndex))
+	if (getIn(I3T_CYCLE_IN_PLAY).isPluggedIn() &&
+	    shouldPulse(I3T_CYCLE_IN_PLAY, inputIndex))
+	{
+		play();
+	}
+	else if (getIn(I3T_CYCLE_IN_PAUSE).isPluggedIn() &&
+	         shouldPulse(I3T_CYCLE_IN_PAUSE, inputIndex))
 	{
 		pause();
 	}
-	if (getIn(I3T_CYCLE_IN_STOP).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_STOP, inputIndex)) { stopAndReset(); }
-	if (getIn(I3T_CYCLE_IN_PREV).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_PREV, inputIndex)) { stepBack(); }
-	if (getIn(I3T_CYCLE_IN_NEXT).isPluggedIn() && shouldPulse(I3T_CYCLE_IN_NEXT, inputIndex)) { stepNext(); }
+	if (getIn(I3T_CYCLE_IN_STOP).isPluggedIn() &&
+	    shouldPulse(I3T_CYCLE_IN_STOP, inputIndex))
+	{
+		stopAndReset();
+	}
+	if (getIn(I3T_CYCLE_IN_PREV).isPluggedIn() &&
+	    shouldPulse(I3T_CYCLE_IN_PREV, inputIndex))
+	{
+		stepBack();
+	}
+	if (getIn(I3T_CYCLE_IN_NEXT).isPluggedIn() &&
+	    shouldPulse(I3T_CYCLE_IN_NEXT, inputIndex))
+	{
+		stepNext();
+	}
 }
 
 void Cycle::onCycleFinish() // \todo not used => remove?
-{}
+{
+}
 
 void Cycle::updateValue(float increment)
 {
 	const float currentValue = getData().getFloat();
-	float       newValue     = currentValue + ((m_from <= m_to) ? 1.0f : -1.0f) * m_directionMultiplier * increment;
+	float newValue = currentValue + ((m_from <= m_to) ? 1.0f : -1.0f) *
+	                                    m_directionMultiplier * increment;
 
-
-	// if out of bounds, clamp values to the range <m_from, m_to> or <m_to, m_from>
-	// if(newValue < std::min(m_from, m_to) ||  newValue > std::max(m_from, m_to) )  // probably more readable
+	// if out of bounds, clamp values to the range <m_from, m_to> or <m_to,
+	// m_from> if(newValue < std::min(m_from, m_to) ||  newValue >
+	// std::max(m_from, m_to) )  // probably more readable
 	if (m_from <= m_to && (m_to < newValue || newValue < m_from) ||
 	    m_to < m_from && (m_from < newValue || newValue < m_to))
 	{
@@ -137,7 +159,10 @@ void Cycle::updateValue(float increment)
 		case EMode::Once:
 			pause();
 			// clamp
-			if (m_from <= m_to) { newValue = newValue > m_to ? m_to : m_from; }
+			if (m_from <= m_to)
+			{
+				newValue = newValue > m_to ? m_to : m_from;
+			}
 			else
 			{
 				newValue = newValue < m_to ? m_to : m_from;
@@ -145,9 +170,13 @@ void Cycle::updateValue(float increment)
 			break;
 		case EMode::Repeat:
 			// New iteration.
-			// newValue = m_from < m_to ? m_from : m_to; // + fmod(newValue, m_manualStep);
+			// newValue = m_from < m_to ? m_from : m_to; // + fmod(newValue,
+			// m_manualStep);
 
-			if (m_from <= m_to) { newValue = newValue > m_to ? m_from : m_to; }
+			if (m_from <= m_to)
+			{
+				newValue = newValue > m_to ? m_from : m_to;
+			}
 			else
 			{
 				newValue = newValue < m_to ? m_from : m_to;
@@ -156,10 +185,13 @@ void Cycle::updateValue(float increment)
 			break;
 		case EMode::PingPong:
 
-			//fprintf(stdout, "DirectionMultiplier =%3.f \n",m_directionMultiplier);
+			// fprintf(stdout, "DirectionMultiplier =%3.f \n",m_directionMultiplier);
 
-			if (m_from <= m_to) // and out of the range <m_from, m_to> or <m_to, m_from>
-			{ newValue = newValue > m_to ? m_to : m_from; }
+			if (m_from <=
+			    m_to) // and out of the range <m_from, m_to> or <m_to, m_from>
+			{
+				newValue = newValue > m_to ? m_to : m_from;
+			}
 			else
 			{
 				newValue = newValue > m_from ? m_from : m_to;

@@ -8,33 +8,43 @@
  *
  * Including all libraries and declaration of objects in right order.
  *
- * All functions return true if some interaction happen inside of them (in cascade way from inner elements)
- * All objects have access to one DIWNE::Diwne (and inhereted) object so they can share information if needed
- * Overwrite whatever function you want - be aware of calling (so simply call) overwrited function (of parent class) in your function for maintain all funkcionality
- * Base concept is call-super https://en.wikipedia.org/wiki/Call_super , where you fill in function, that is called in middle of whole code
- * You probably need not overwrite function with "Diwne" in name - they are intended as internal - be very careful when you do it
- * DIWNE offer you only wrappers of ImGui functions - so storing your object and drawing them in some order is up to you \see TODOexample for inspiration
+ * All functions return true if some interaction happen inside of them (in
+ * cascade way from inner elements) All objects have access to one DIWNE::Diwne
+ * (and inhereted) object so they can share information if needed Overwrite
+ * whatever function you want - be aware of calling (so simply call) overwrited
+ * function (of parent class) in your function for maintain all funkcionality
+ * Base concept is call-super https://en.wikipedia.org/wiki/Call_super , where
+ * you fill in function, that is called in middle of whole code You probably
+ * need not overwrite function with "Diwne" in name - they are intended as
+ * internal - be very careful when you do it DIWNE offer you only wrappers of
+ * ImGui functions - so storing your object and drawing them in some order is up
+ * to you \see TODOexample for inspiration
  *
- * See DiwneObject::drawDiwne() for inspect what functions are called when processing object
+ * See DiwneObject::drawDiwne() for inspect what functions are called when
+ * processing object
  *
- * Node editor is infinite surface where you can positioning (and moving) your nodes. When somewhere is used diwne (position, coords etc.) this surface is meant
- * There are "two" workareas coords (in DINWE::Diwne)
- *  1) is position and size of node editor window on screen
- *  2) is position of node editor surface in window
+ * Node editor is infinite surface where you can positioning (and moving) your
+ * nodes. When somewhere is used diwne (position, coords etc.) this surface is
+ * meant There are "two" workareas coords (in DINWE::Diwne) 1) is position and
+ * size of node editor window on screen 2) is position of node editor surface in
+ * window
  *
  */
 
-#include <limits>
 #include "spdlog/fmt/fmt.h"
+#include <limits>
 //------------------------------------------------------------------------------
 #include <imgui.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
 
-#define DIWNE_DEBUG(node_editor, debugCode)                                                                            \
-	do                                                                                                                   \
-	{                                                                                                                    \
-		if (node_editor.m_diwneDebug_on) { debugCode }                                                                     \
+#define DIWNE_DEBUG(node_editor, debugCode)                                    \
+	do                                                                           \
+	{                                                                            \
+		if (node_editor.m_diwneDebug_on)                                           \
+		{                                                                          \
+			debugCode                                                                \
+		}                                                                          \
 	} while (0) /* do-while only for code-technical reason */
 
 namespace DIWNE
@@ -97,7 +107,6 @@ class Diwne;
 } // namespace DIWNE
 
 #include "DiwneObject.h"
-
 
 #include "Link.h"
 #include "diwne.h"

@@ -33,10 +33,12 @@ public:
 	/// \pre m_originator is set.
 	void createEmptyScene();
 
-	//===-- Files manipulation functions --------------------------------------===//
+	//===-- Files manipulation functions
+	//--------------------------------------===//
 
 	bool loadScene(const fs::path& scene);
-	// SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);
+	// SceneData buildScene(const std::string& rawScene, GuiNodes&
+	// workspaceNodes);
 
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
@@ -48,7 +50,8 @@ public:
 
 	//===----------------------------------------------------------------------===//
 
-	//===-- Recent files ------------------------------------------------------===//
+	//===-- Recent files
+	//------------------------------------------------------===//
 
 	const std::vector<std::string>& getRecentFiles() { return m_recentFiles; }
 
@@ -63,11 +66,11 @@ private:
 	[[nodiscard]] bool hasNewestState() const;
 
 	fs::path m_currentScene;
-	bool     m_dirty = false;
+	bool m_dirty = false;
 
 	IStateful* m_originator;
 
-	int                 m_currentStateIdx;
+	int m_currentStateIdx;
 	std::deque<Memento> m_mementos;
 
 	std::vector<std::string> m_recentFiles;

@@ -12,7 +12,8 @@ TEST(DefaultValueTest, Example)
 	// iterate through all its default values
 	for (auto& [key, valueStore] : axisAngle->getDefaultValues())
 	{
-		// There are only four types of default values - float, vec3, vec4, and quaternion.
+		// There are only four types of default values - float, vec3, vec4, and
+		// quaternion.
 		switch (valueStore.opValueType)
 		// or switch (valueStore.opValueType)
 		{
@@ -24,7 +25,7 @@ TEST(DefaultValueTest, Example)
 			/*
 			if (ImGui::DragFloat(key.c_str(), &val))
 			{
-			 	axisAngle->setDefaultValue(key, val);
+			    axisAngle->setDefaultValue(key, val);
 			}
 			 */
 		}
