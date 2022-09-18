@@ -9,7 +9,7 @@
 #include "Utils/Text.h"
 
 constexpr const char* g_unsavedPostfix = " - Unsaved";
-constexpr const char* g_savedPostfix   = " - Saved";
+constexpr const char* g_savedPostfix = " - Saved";
 
 static std::vector<std::string> readRecentFiles()
 {
@@ -17,7 +17,10 @@ static std::vector<std::string> readRecentFiles()
 
 	const auto recentPath = Config::getAbsolutePath("Data/internal/recent.dat");
 
-	if (!doesFileExists(recentPath)) { LOG_WARN("Cannot load recent files from \"Data/internal/recent.dat\"."); }
+	if (!doesFileExists(recentPath))
+	{
+		LOG_WARN("Cannot load recent files from \"Data/internal/recent.dat\".");
+	}
 
 	try
 	{
@@ -27,7 +30,10 @@ static std::vector<std::string> readRecentFiles()
 
 		if (data["files"])
 		{
-			for (auto&& file : data["files"]) { result.push_back(file.as<std::string>()); }
+			for (auto&& file : data["files"])
+			{
+				result.push_back(file.as<std::string>());
+			}
 		}
 	}
 	catch (...)
@@ -71,7 +77,8 @@ void StateManager::undo()
 {
 	I3T_ASSERT(m_originator != nullptr && "Originator is unset!");
 
-	if (!canUndo()) return;
+	if (!canUndo())
+		return;
 
 	auto memento = m_mementos[--m_currentStateIdx];
 
@@ -84,7 +91,8 @@ void StateManager::redo()
 {
 	I3T_ASSERT(m_originator != nullptr && "Originator is unset!");
 
-	if (!canRedo()) return;
+	if (!canRedo())
+		return;
 
 	auto memento = m_mementos[++m_currentStateIdx];
 	m_originator->setState(memento);
@@ -94,9 +102,15 @@ void StateManager::redo()
 
 bool StateManager::canUndo() const { return m_currentStateIdx > 1; }
 
-bool StateManager::canRedo() const { return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx; }
+bool StateManager::canRedo() const
+{
+	return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx;
+}
 
-Memento StateManager::getCurrentState() const { return m_mementos[m_currentStateIdx]; }
+Memento StateManager::getCurrentState() const
+{
+	return m_mementos[m_currentStateIdx];
+}
 
 void StateManager::createEmptyScene()
 {
@@ -111,11 +125,13 @@ bool StateManager::loadScene(const fs::path& scene)
 	resetState();
 	takeSnapshot();
 
-	auto& workspaceNodes = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+	auto& workspaceNodes = I3T::getWindowPtr<WorkspaceWindow>()
+	                           ->getNodeEditor()
+	                           .m_workspaceCoreNodes;
 	workspaceNodes.clear();
 
 	std::ifstream f(scene);
-	std::string   rawScene;
+	std::string rawScene;
 	if (f)
 	{
 		std::ostringstream ss;
@@ -135,11 +151,13 @@ bool StateManager::saveScene() { return saveScene(m_currentScene); }
 
 bool StateManager::saveScene(const fs::path& target)
 {
-	auto& workspaceNodes = I3T::getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+	auto& workspaceNodes = I3T::getWindowPtr<WorkspaceWindow>()
+	                           ->getNodeEditor()
+	                           .m_workspaceCoreNodes;
 
 	SerializationVisitor visitor;
-	std::string          rawState = visitor.dump(workspaceNodes);
-	std::ofstream        f(target);
+	std::string rawState = visitor.dump(workspaceNodes);
+	std::ofstream f(target);
 	f << rawState;
 
 	setSavedWindowTitle();
@@ -149,8 +167,9 @@ bool StateManager::saveScene(const fs::path& target)
 
 void StateManager::setScene(const fs::path& scene)
 {
-	m_currentScene      = scene;
-	const auto newTitle = std::string(g_baseTitle) + ": " + scene.filename().string();
+	m_currentScene = scene;
+	const auto newTitle =
+	    std::string(g_baseTitle) + ": " + scene.filename().string();
 
 	App::get().setTitle(newTitle);
 }
@@ -159,14 +178,20 @@ void StateManager::setScene(const fs::path& scene)
 
 void StateManager::setUnsavedWindowTitle()
 {
-	if (!m_dirty) { m_originator->onStateChange(g_unsavedPostfix); }
+	if (!m_dirty)
+	{
+		m_originator->onStateChange(g_unsavedPostfix);
+	}
 
 	m_dirty = true;
 }
 
 void StateManager::setSavedWindowTitle()
 {
-	if (m_dirty) { m_originator->onStateChange(g_savedPostfix); }
+	if (m_dirty)
+	{
+		m_originator->onStateChange(g_savedPostfix);
+	}
 	else
 	{
 		m_originator->onStateChange("");
@@ -175,12 +200,15 @@ void StateManager::setSavedWindowTitle()
 	m_dirty = false;
 }
 
-bool StateManager::hasNewestState() const { return m_currentStateIdx == m_mementos.size() - 1; }
+bool StateManager::hasNewestState() const
+{
+	return m_currentStateIdx == m_mementos.size() - 1;
+}
 
 void StateManager::resetState()
 {
 	m_currentStateIdx = -1;
-	m_dirty           = false;
+	m_dirty = false;
 
 	m_mementos.clear();
 }

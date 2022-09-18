@@ -3,8 +3,9 @@
  * \author Martin Herich, hericmar@fel.cvut.cz
  * \date 18.11.2020
  *
- * Code taken from (former) Source/operator.h, Source/operatorForm.h and Source/operatorNode.h
- * file which used to define Operator, base class for all boxes.
+ * Code taken from (former) Source/operator.h, Source/operatorForm.h and
+ * Source/operatorNode.h file which used to define Operator, base class for all
+ * boxes.
  */
 #pragma once
 
@@ -27,7 +28,8 @@ enum class ENodePlugResult
 {
 	Ok = 0,
 	Err_MismatchedPinTypes,
-	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju :-) ... */
+	Err_MismatchedPinKind, /* \todo JH snad to tu tím Martinovi nijak nerozbiju
+	                          :-) ... */
 	Err_Loopback,          /// Same nodes.
 	Err_NonexistentPin,
 	Err_Loop,
@@ -43,12 +45,15 @@ struct ValueSetResult
 		Err_LogicError
 	};
 
-	Status      status;
+	Status status;
 	std::string message;
 
 	ValueSetResult() : status(Status::Ok), message("") {}
 
-	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
+	explicit ValueSetResult(Status aStatus, std::string aMessage = "")
+	    : status(aStatus), message(std::move(aMessage))
+	{
+	}
 };
 
 inline constexpr size_t I3T_INPUT0 = 0;
@@ -87,37 +92,38 @@ public:
 		PinView(EStrategy strategy, Ptr<Node> node)
 		{
 			this->strategy = strategy;
-			this->node     = node;
+			this->node = node;
 		}
 
 		PinView(EStrategy strategy, Ptr<Node> node, int index)
 		{
 			this->strategy = strategy;
-			this->node     = node;
-			this->index    = index;
+			this->node = node;
+			this->index = index;
 		}
 
 		PinView begin() const;
 		PinView end() const;
 
 		size_t size() const;
-		bool   empty() const;
+		bool empty() const;
 
-		PinView&   operator++();
+		PinView& operator++();
 		const Pin& operator*();
-		bool       operator==(const PinView& view) const;
-		bool       operator!=(const PinView& view) const;
+		bool operator==(const PinView& view) const;
+		bool operator!=(const PinView& view) const;
 
-		Pin&       operator[](size_t i);
+		Pin& operator[](size_t i);
 		const Pin& operator[](size_t i) const;
 
 	private:
 		EStrategy strategy;
 		Ptr<Node> node;
-		int       index;
+		int index;
 	};
 
-	//===-- Lifecycle functions -----------------------------------------------===//
+	//===-- Lifecycle functions
+	//-----------------------------------------------===//
 protected:
 	/**
 	 * Node is never constructed directory.
@@ -131,7 +137,8 @@ protected:
 	/**
 	 * Delete node.
 	 *
-	 * \pre All inputs and outputs must be unplugged (calls Node::finalize function)!
+	 * \pre All inputs and outputs must be unplugged (calls Node::finalize
+	 * function)!
 	 */
 	virtual ~Node();
 
@@ -150,7 +157,8 @@ public:
 	 */
 	void finalize();
 
-	//===-- Helper functions --------------------------------------------------===//
+	//===-- Helper functions
+	//--------------------------------------------------===//
 
 	/**
 	 * \return Application unique ID.
@@ -167,16 +175,17 @@ public:
 	/**
 	 * Get reference to this node instance.
 	 *
-	 * Note that this operation may be slower. A new shared pointer must be created,
-	 * it obtains atomic counter increment.
+	 * Note that this operation may be slower. A new shared pointer must be
+	 * created, it obtains atomic counter increment.
 	 */
 	Ptr<Node> getPtr() { return shared_from_this(); }
 
-	template <typename T>
-	Ptr<T> as()
+	template <typename T> Ptr<T> as()
 	{
-		static_assert(std::is_base_of_v<Node, T>, "T must be derived from NodeBase class.");
-		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) && "Cannot cast to Ptr<T>.");
+		static_assert(std::is_base_of_v<Node, T>,
+		              "T must be derived from NodeBase class.");
+		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) &&
+		           "Cannot cast to Ptr<T>.");
 
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
@@ -197,14 +206,27 @@ public:
 	/// \deprecated Will be removed
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
-	[[nodiscard]] PinView getInputPins() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
-	[[nodiscard]] PinView getOutputPins() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
+	[[nodiscard]] PinView getInputPins()
+	{
+		return PinView(PinView::EStrategy::Input, shared_from_this());
+	}
+	[[nodiscard]] PinView getOutputPins()
+	{
+		return PinView(PinView::EStrategy::Output, shared_from_this());
+	}
 
 protected:
-	[[nodiscard]] PinView getInputPinsRef() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
-	[[nodiscard]] PinView getOutputPinsRef() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
+	[[nodiscard]] PinView getInputPinsRef()
+	{
+		return PinView(PinView::EStrategy::Input, shared_from_this());
+	}
+	[[nodiscard]] PinView getOutputPinsRef()
+	{
+		return PinView(PinView::EStrategy::Output, shared_from_this());
+	}
 
-	//===-- Obtaining value functions. ----------------------------------------===//
+	//===-- Obtaining value functions.
+	//----------------------------------------===//
 	/**
 	 * Get data storage for read and write purposes. No written value validation
 	 * is performed.
@@ -215,15 +237,16 @@ public:
 	/// \todo Make this function non public.
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
-		assert(index < m_internalData.size() && "Desired data storage does not exist!");
+		assert(index < m_internalData.size() &&
+		       "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
 
 	/**
 	 * Get Node contents, read only.
-	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for two vectors).
-	 *              Value of field[0] is returned if this parameter omitted)
+	 * \param index Index of the internal modifiable data field (e.g, 0 or 1 for
+	 * two vectors). Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data
 	 */
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
@@ -249,32 +272,49 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q) { return setValueEx(q); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
+	[[nodiscard]] virtual ValueSetResult setValue(float val)
+	{
+		return setValueEx(val);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
+	{
+		return setValueEx(vec);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
+	{
+		return setValueEx(vec);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q)
+	{
+		return setValueEx(q);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
+	{
+		return setValueEx(mat);
+	}
 
 	/**
 	 * \param val new value
-	 * \param coords in the column major order: coords.x is the column index and coords.y is the row index.
-	 * \return
+	 * \param coords in the column major order: coords.x is the column index and
+	 * coords.y is the row index. \return
 	 */
 	[[nodiscard]] virtual ValueSetResult setValue(float val, glm::ivec2 coords)
 	{
 		setInternalValue(val, coords);
 		return ValueSetResult{};
-		// return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
+		// return ValueSetResult{ValueSetResult::Status::Err_LogicError,
+		// "Unsupported operation on non transform object."};
 	}
 
 	/**
-	 * Smart set function, used with constrained transformation for value checking.
-	 * \param mat 
-	 * \param map array of 16 chars.
+	 * Smart set function, used with constrained transformation for value
+	 * checking. \param mat \param map array of 16 chars.
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat,
+	                                              const Transform::DataMap& map)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
+		return ValueSetResult{ValueSetResult::Status::Err_LogicError,
+		                      "Unsupported operation on non transform object."};
 	}
 
 	template <typename T>
@@ -285,8 +325,7 @@ public:
 
 private:
 	/// Sets value of pin at \p index position.
-	template <typename T>
-	ValueSetResult setValueEx(T&& val, unsigned index = 0)
+	template <typename T> ValueSetResult setValueEx(T&& val, unsigned index = 0)
 	{
 		setInternalValue(val, index);
 		return ValueSetResult{};
@@ -295,13 +334,11 @@ private:
 protected:
 	/**
 	 * Sets the node value without validation.
-	 * \tparam T Value type, no need to specify it in angle brackets, it will be deduced
-	 *    by compiler (C++17).
-	 * \param value Value to set.
-	 * \param index Index of DataStore (if the node stores more than one value)
+	 * \tparam T Value type, no need to specify it in angle brackets, it will be
+	 * deduced by compiler (C++17). \param value Value to set. \param index Index
+	 * of DataStore (if the node stores more than one value)
 	 */
-	template <typename T>
-	void setInternalValue(const T& value, size_t index = 0)
+	template <typename T> void setInternalValue(const T& value, size_t index = 0)
 	{
 		getInternalData(index).setValue(value);
 		spreadSignal(index);
@@ -324,24 +361,28 @@ protected:
 	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 public:
-	virtual void resetMatrixFromDefaults() {} // - defined in Transform, calls TransformImpl::onReset...
+	virtual void resetMatrixFromDefaults() {
+	} // - defined in Transform, calls TransformImpl::onReset...
 
 	/// \todo MH will be removed.
 	static const Transform::DataMap* getDataMap();
 	static const Transform::DataMap& getDataMapRef();
 
 public:
-	//===-- Values updating functions. ----------------------------------------===//
+	//===-- Values updating functions.
+	//----------------------------------------===//
 	/**
 	 * Computes new values of outputs based on inputs.
 	 *
 	 * Encodes the box function by updating the output values for a
 	 * given \a inputIndex - fired by receiveSignal().
 	 *
-	 * \todo Is it correct also for multiple edges? If the edges from one module are connected to more than one input,
-	 * and the implementation of updateValues uses the \a inputIndex, only subset of outputs may be updated.
+	 * \todo Is it correct also for multiple edges? If the edges from one module
+	 * are connected to more than one input, and the implementation of
+	 * updateValues uses the \a inputIndex, only subset of outputs may be updated.
 	 * PF: This method is intended for complex modules to allow for optimization.
-	 * May be replaced by updateValues() or implemented in such a way. Do such optimize-able modules exist?
+	 * May be replaced by updateValues() or implemented in such a way. Do such
+	 * optimize-able modules exist?
 	 *
 	 * \param	inputIndex Index of the modified input (output pin).
 	 */
@@ -357,15 +398,17 @@ public:
 	/**
 	 * Implements the operator reaction to the change of its \a inputIndex input.
 	 *
-	 * 1. Forces the operator to recompute its outputs based on the changed input \a
-	 *    inputIndex by calling updateValues() and <BR>
+	 * 1. Forces the operator to recompute its outputs based on the changed input
+	 * \a inputIndex by calling updateValues() and <BR>
 	 * 2. Spread signal to the connected children by spreadSignal().
 	 *
 	 * This method is called by the spreadSignal() of the parent box in the
 	 * scene graph. The computation may be restricted by internal bool value
-	 * \a restrictedOutput to a single previously defined output index \a restrictedOutputIndex.
+	 * \a restrictedOutput to a single previously defined output index \a
+	 * restrictedOutputIndex.
 	 *
-	 * \param	inputIndex	Index of the input that was changed and that forces the operator to recompute its outputs.
+	 * \param	inputIndex	Index of the input that was changed and that forces the
+	 * operator to recompute its outputs.
 	 */
 	virtual void receiveSignal(int inputIndex);
 	//===----------------------------------------------------------------------===//
@@ -382,7 +425,10 @@ public:
 	{
 		std::string masterSig;
 
-		if (m_owner) { masterSig = " of (" + m_owner->getSig() + ")"; }
+		if (m_owner)
+		{
+			masterSig = " of (" + m_owner->getSig() + ")";
+		}
 
 		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
 	};
@@ -415,7 +461,8 @@ protected:
 	std::vector<DataStore> m_internalData;
 
 	/**
-	 * Owner of the node, used in complex type of nodes, such as sequence or camera.
+	 * Owner of the node, used in complex type of nodes, such as sequence or
+	 * camera.
 	 */
 	Ptr<Node> m_owner = nullptr;
 };

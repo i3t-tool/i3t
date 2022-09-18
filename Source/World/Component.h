@@ -17,17 +17,17 @@ class GameObject;
 class Component
 {
 public:
-	virtual void        start();
-	virtual void        update();
-	virtual void        GUI();
-	virtual void        render(glm::mat4* parent, bool renderTransparent);
+	virtual void start();
+	virtual void update();
+	virtual void GUI();
+	virtual void render(glm::mat4* parent, bool renderTransparent);
 	virtual const char* getComponentType();
 
 	GameObject* m_gameObject;
-	bool        m_isActive;
+	bool m_isActive;
 
 protected:
 	static const char* s_type;
-	const char*        m_type;
+	const char* m_type;
 	Component();
 };

@@ -9,7 +9,8 @@ using namespace Core;
 
 TEST(TransformControlsTest, _)
 {
-	auto translation = GraphManager::createTransform<ETransformType::Translation>();
+	auto translation =
+	    GraphManager::createTransform<ETransformType::Translation>();
 
 	translation->setDefaultValue("translation", generateVec3());
 	auto expectedValues = translation->getData().getMat4();
@@ -17,7 +18,7 @@ TEST(TransformControlsTest, _)
 	translation->saveValue();
 
 	translation->unlock();
-	setValue_expectOk(translation, 5.0f, { 1, 1 });
+	setValue_expectOk(translation, 5.0f, {1, 1});
 
 	translation->reloadValue();
 

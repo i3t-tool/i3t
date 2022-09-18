@@ -18,13 +18,14 @@ inline Theme& getTheme() { return getUI()->getTheme(); }
  * Change properties of the given theme.
  * @param theme
  */
-template <typename Theme_>
-inline void emplaceTheme(Theme_&& theme)
+template <typename Theme_> inline void emplaceTheme(Theme_&& theme)
 {
 	auto& allThemes = I3T::getThemes();
-	auto  it        = std::find_if(allThemes.begin(), allThemes.end(),
-                         [](Theme& theme) { return theme.getName() == I3T::getTheme().getName(); });
-	*it             = theme;
+	auto it = std::find_if(allThemes.begin(), allThemes.end(),
+	                       [](Theme& theme) {
+		                       return theme.getName() == I3T::getTheme().getName();
+	                       });
+	*it = theme;
 	I3T::getUI()->setTheme(*it);
 }
 
@@ -41,11 +42,11 @@ inline const ImVec2& getSize(ESizeVec2 size) { return getTheme().get(size); }
  * \tparam T window type
  * \return shared pointer to window of type T.
  */
-template <typename T>
-Ptr<T> getWindowPtr()
+template <typename T> Ptr<T> getWindowPtr()
 {
 	Ptr<IWindow> ptr;
-	if ((ptr = getUI()->getWindowPtr<T>()) == nullptr) return nullptr;
+	if ((ptr = getUI()->getWindowPtr<T>()) == nullptr)
+		return nullptr;
 	return std::dynamic_pointer_cast<T>(ptr);
 }
 } // namespace I3T

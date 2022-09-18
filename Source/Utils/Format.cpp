@@ -2,7 +2,8 @@
 
 namespace Utils
 {
-std::vector<std::string> concat(const std::map<std::string, DataStore>& map, const std::string& delimiter)
+std::vector<std::string> concat(const std::map<std::string, DataStore>& map,
+                                const std::string& delimiter)
 {
 	std::vector<std::string> vec;
 	for (const auto& [key, val] : map)

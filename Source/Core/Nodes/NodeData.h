@@ -26,7 +26,7 @@ class DataMap
 public:
 	DataMap(std::array<const unsigned char, 16> data) : m_data(data){};
 	DataMap(const DataMap&) = delete;
-	DataMap(DataMap&&)      = delete;
+	DataMap(DataMap&&) = delete;
 	DataMap& operator=(const DataMap&) = delete;
 	DataMap& operator=(DataMap&&) = delete;
 
@@ -43,7 +43,8 @@ enum class EValueType
 	Vec4,
 	Matrix,
 	Quat,
-	MatrixMul, ///< connection of sequences in the scene graph - represents a matrix multiplication
+	MatrixMul, ///< connection of sequences in the scene graph - represents a
+	           ///< matrix multiplication
 	Screen,    ///< projection and camera view transformation
 	Ptr,
 };
@@ -51,7 +52,8 @@ enum class EValueType
 namespace Core
 {
 /**
- * \brief Float value editable status: b1, b2 - b1 is editable bit, b2 is synergies bit
+ * \brief Float value editable status: b1, b2 - b1 is editable bit, b2 is
+ * synergies bit
  *
  * \todo PF:- proc tohle neni po bitech?
  *    	SynergiesBit = 0x0001,		///< 001
@@ -60,10 +62,10 @@ namespace Core
  */
 enum class EValueState
 {
-	Editable    = 0x0002, ///< 10
+	Editable = 0x0002,    ///< 10
 	EditableSyn = 0x0003, ///< 11
-	Locked      = 0x0000, ///< 00
-	LockedSyn   = 0x0001, ///< 01
+	Locked = 0x0000,      ///< 00
+	LockedSyn = 0x0001,   ///< 01
 };
 } // namespace Core
 
@@ -77,7 +79,8 @@ const std::string& valueTypeToString(EValueType type);
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
- * and of the value stored in the defaultValues map (such as fovy for Perspective)
+ * and of the value stored in the defaultValues map (such as fovy for
+ * Perspective)
  *
  * Old name was Transmitter in I3T v1.
  */
@@ -87,35 +90,48 @@ public:
 	EValueType opValueType; ///< wire type, such as Float or 4x4 Matrix
 
 protected:
-	std::variant<bool, glm::mat4, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
+	std::variant<bool, glm::mat4, glm::vec3, glm::vec4, glm::quat, float, void*>
+	    m_value;
 
 public:
-	/** Default constructor constructs a signal of type OpValueType::MATRIX and undefined value (a unit matrix) */
+	/** Default constructor constructs a signal of type OpValueType::MATRIX and
+	 * undefined value (a unit matrix) */
 	DataStore() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
 
 	explicit DataStore(EValueType valueType);
 
-	[[nodiscard]] bool isPulseTriggered() const { return std::get<bool>(m_value); }
+	[[nodiscard]] bool isPulseTriggered() const
+	{
+		return std::get<bool>(m_value);
+	}
 
-	[[nodiscard]] const glm::mat4& getMat4() const { return std::get<glm::mat4>(m_value); }
-	[[nodiscard]] glm::mat4&       getMat4Ref() { return std::get<glm::mat4>(m_value); }
+	[[nodiscard]] const glm::mat4& getMat4() const
+	{
+		return std::get<glm::mat4>(m_value);
+	}
+	[[nodiscard]] glm::mat4& getMat4Ref() { return std::get<glm::mat4>(m_value); }
 
-	[[nodiscard]] const glm::vec3& getVec3() const { return std::get<glm::vec3>(m_value); }
-	[[nodiscard]] glm::vec3&       getVec3Ref() { return std::get<glm::vec3>(m_value); }
+	[[nodiscard]] const glm::vec3& getVec3() const
+	{
+		return std::get<glm::vec3>(m_value);
+	}
+	[[nodiscard]] glm::vec3& getVec3Ref() { return std::get<glm::vec3>(m_value); }
 
-	[[nodiscard]] const glm::vec4& getVec4() const { return std::get<glm::vec4>(m_value); }
+	[[nodiscard]] const glm::vec4& getVec4() const
+	{
+		return std::get<glm::vec4>(m_value);
+	}
 
-	[[nodiscard]] const glm::quat& getQuat() const { return std::get<glm::quat>(m_value); }
+	[[nodiscard]] const glm::quat& getQuat() const
+	{
+		return std::get<glm::quat>(m_value);
+	}
 
 	[[nodiscard]] float getFloat() const { return std::get<float>(m_value); }
 
 	[[nodiscard]] void* getPointer() const { return std::get<void*>(m_value); }
 
-	template <typename T>
-	void setValue(T&& val)
-	{
-		m_value = val;
-	}
+	template <typename T> void setValue(T&& val) { m_value = val; }
 };
 
 namespace Core
@@ -124,4 +140,4 @@ namespace Core
  * \brief A synonym for DataStore - used for storage of DefaultValues[key]
  */
 using Data = DataStore;
-}
+} // namespace Core

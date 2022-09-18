@@ -7,8 +7,8 @@ TEST(PinViewTest, RangeFor)
 	auto node = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
 
 	auto outputs = node->getOutputPins();
-	auto begin   = outputs.begin();
-	auto end     = outputs.end();
+	auto begin = outputs.begin();
+	auto end = outputs.end();
 
 	int i = 0;
 

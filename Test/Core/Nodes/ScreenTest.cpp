@@ -12,7 +12,8 @@ TEST(ScreenTest, _)
 	auto screen = Builder::createNode<ENodeType::Screen>();
 	auto camera = GraphManager::createCamera();
 
-	auto t1 = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();
+	auto t1 = Builder::createTransform<ETransformType::LookAt>()
+	              ->as<TransformImpl<ETransformType::LookAt>>();
 	t1->setDefaultValue("eye", generateVec3());
 	t1->setDefaultValue("center", generateVec3());
 
@@ -30,8 +31,6 @@ TEST(ScreenTest, _)
 	EXPECT_EQ(camera, parent->as<Camera>());
 
 	// Get camera transform from screen node.
-	EXPECT_TRUE(Math::eq(
-			camera->getData(2).getMat4(),
-			GraphManager::getParent(screen)->getData(2).getMat4()
-	));
+	EXPECT_TRUE(Math::eq(camera->getData(2).getMat4(),
+	                     GraphManager::getParent(screen)->getData(2).getMat4()));
 }

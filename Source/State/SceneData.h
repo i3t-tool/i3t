@@ -6,7 +6,7 @@
 /// Node data as string
 struct NodeData
 {
-	std::string              node;
+	std::string node;
 	std::vector<std::string> edges;
 };
 
@@ -49,7 +49,10 @@ public:
 private:
 	void addEdges(const std::vector<std::string>& aEdges)
 	{
-		for (const auto& edge : aEdges) { edges.push_back(edge); }
+		for (const auto& edge : aEdges)
+		{
+			edges.push_back(edge);
+		}
 	}
 
 	RawData operators;
@@ -67,7 +70,8 @@ struct SceneData
 	Ptr<GuiNode> findNode(Core::ID id)
 	{
 		for (auto& node : nodes)
-			if (node->getId() == id) return node;
+			if (node->getId() == id)
+				return node;
 
 		return nullptr;
 	}

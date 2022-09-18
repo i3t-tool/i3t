@@ -8,23 +8,34 @@
 LogWindow::LogWindow()
 {
 #ifdef I3T_DEBUG
-	Input.bindAction("MyTestAction", EKeyState::Pressed, [] { Log::info("MyTestAction triggered!"); });
+	Input.bindAction("MyTestAction", EKeyState::Pressed,
+	                 [] { Log::info("MyTestAction triggered!"); });
 
-	Input.bindAxis("MyTestAxis", [](float val) { Log::info("MyTestAxis triggered: {}!", val); });
+	Input.bindAxis("MyTestAxis", [](float val)
+	               { Log::info("MyTestAxis triggered: {}!", val); });
 
 	////
-	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
-		const auto isActionTriggered = InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
-		Log::info("InputManager::isActionTriggered(\"createAndPlugConstructor\") = {}", isActionTriggered);
-	});
+	Input.bindAction("createAndPlugConstructor", EKeyState::Released,
+	                 []
+	                 {
+		                 const auto isActionTriggered =
+		                     InputManager::isActionTriggered(
+		                         "createAndPlugConstructor", EKeyState::Released);
+		                 Log::info("InputManager::isActionTriggered("
+		                           "\"createAndPlugConstructor\") = {}",
+		                           isActionTriggered);
+	                 });
 	////
 
 	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed,
-	                 [] { Log::info("bind: (mouse click + left ctrl) pressed"); });
+	                 []
+	                 { Log::info("bind: (mouse click + left ctrl) pressed"); });
 
-	Input.bindAction("scrollUp", EKeyState::Pressed, []() { Log::info("scrollUp"); });
+	Input.bindAction("scrollUp", EKeyState::Pressed,
+	                 []() { Log::info("scrollUp"); });
 
-	Input.bindAction("scrollDown", EKeyState::Pressed, []() { Log::info("scrollDown"); });
+	Input.bindAction("scrollDown", EKeyState::Pressed,
+	                 []() { Log::info("scrollDown"); });
 
 	Input.bindAxis("scroll", [](float val) { Log::info("scroll: {}", val); });
 #endif
@@ -42,7 +53,10 @@ void LogWindow::render()
 	ImGui::Text("Switch fire action key");
 	ImGui::SameLine();
 	std::string s;
-	for (auto action : InputBindings::getActionMapping("fire")) { s += std::to_string(action.code); }
+	for (auto action : InputBindings::getActionMapping("fire"))
+	{
+		s += std::to_string(action.code);
+	}
 	ImGui::Text("Current keys: %s", s.c_str());
 	if (ImGui::Button("Switch"))
 	{
@@ -65,10 +79,14 @@ void LogWindow::render()
 	ImGui::TextUnformatted(Logger::getInstance().getBuffer().str().c_str());
 
 	// Set scroll to bottom of the child window.
-	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
+	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+		ImGui::SetScrollHereY(1.0f);
 
-	if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released))
-	{ Log::info("query: (mouse click + left ctrl) pressed"); }
+	if (InputManager::isActionTriggered("createAndPlugConstructor",
+	                                    EKeyState::Released))
+	{
+		Log::info("query: (mouse click + left ctrl) pressed");
+	}
 
 	ImGui::EndChild();
 

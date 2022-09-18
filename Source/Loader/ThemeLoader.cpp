@@ -13,7 +13,10 @@ std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 {
 	for (const auto& [key, val] : map)
 	{
-		if (strcmp(val, name.c_str()) == 0) { return key; }
+		if (strcmp(val, name.c_str()) == 0)
+		{
+			return key;
+		}
 	}
 	return std::nullopt;
 }
@@ -69,7 +72,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 		{
 			out << YAML::Key << *str;
 			out << YAML::Value;
-			dumpVec4(out, (const float*) &val);
+			dumpVec4(out, (const float*)&val);
 		}
 	}
 	out << YAML::EndMap;
@@ -94,7 +97,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 		{
 			out << YAML::Key << *str;
 			out << YAML::Value;
-			dumpVec2(out, (const float*) &val);
+			dumpVec2(out, (const float*)&val);
 		}
 	}
 	out << YAML::EndMap;
@@ -108,44 +111,58 @@ void saveTheme(const fs::path& path, Theme& theme)
 
 std::optional<Theme> loadTheme(const fs::path& path)
 {
-	if (!doesFileExists(path.string().c_str())) return std::nullopt;
+	if (!doesFileExists(path.string().c_str()))
+		return std::nullopt;
 
 	auto yaml = YAML::LoadFile(path.string());
 
 	auto name = path.stem().string();
 
-	Theme::Colors   colors;
-	Theme::Sizes    sizes;
+	Theme::Colors colors;
+	Theme::Sizes sizes;
 	Theme::SizesVec sizesVec;
 
 	if (yaml["colors"])
 	{
 		auto yamlColors = yaml["colors"];
-		for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end(); ++it)
+		for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end();
+		     ++it)
 		{
 			auto node = it->second.as<YAML::Node>();
 
-			if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>())) { colors[*en] = parseVec4(node); }
+			if (auto en =
+			        strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
+			{
+				colors[*en] = parseVec4(node);
+			}
 		}
 	}
 	if (yaml["sizes"])
 	{
 		auto yamlSizes = yaml["sizes"];
-		for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end(); ++it)
+		for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end();
+		     ++it)
 		{
-			if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
-			{ sizes[*en] = it->second.as<float>(); }
+			if (auto en =
+			        strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
+			{
+				sizes[*en] = it->second.as<float>();
+			}
 		}
 	}
 	if (yaml["size vectors"])
 	{
 		auto yamlSizeVec = yaml["size vectors"];
-		for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end(); ++it)
+		for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end();
+		     ++it)
 		{
 			auto node = it->second.as<YAML::Node>();
 
-			if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
-			{ sizesVec[*en] = parseVec2(node); }
+			if (auto en =
+			        strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
+			{
+				sizesVec[*en] = parseVec2(node);
+			}
 		}
 	}
 

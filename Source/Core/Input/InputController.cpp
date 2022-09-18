@@ -5,14 +5,17 @@
 
 InputController::InputController() { InputManager::addInputController(this); }
 
-void InputController::bindAction(const char* name, EKeyState state, KeyCallback fn)
+void InputController::bindAction(const char* name, EKeyState state,
+                                 KeyCallback fn)
 {
-	if (InputBindings::isActionCreated(name)) m_actions.emplace_back(Action{name, state, fn});
+	if (InputBindings::isActionCreated(name))
+		m_actions.emplace_back(Action{name, state, fn});
 }
 
 void InputController::bindAxis(const char* name, AxisCallback fn)
 {
-	if (InputBindings::isAxisCreated(name)) m_axis.insert({name, fn});
+	if (InputBindings::isAxisCreated(name))
+		m_axis.insert({name, fn});
 }
 
 void InputController::triggerAction(const char* name, EKeyState state)

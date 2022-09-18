@@ -33,19 +33,20 @@ TestData prepareEnvironment()
 	ctx.scale2 = Builder::createNode<ENodeType::MakeScale>();
 	ctx.translation = Builder::createNode<ENodeType::MakeTranslation>();
 
-	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be complete yet!)
+	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be
+	// complete yet!)
 	ctx.mul1 = Builder::createNode<ENodeType::MatrixMulMatrix>();
 	ctx.mul2 = Builder::createNode<ENodeType::MatrixMulMatrix>();
 	ctx.mul3 = Builder::createNode<ENodeType::MatrixMulMatrix>();
 
-  plug_expectOk(ctx.scale1, ctx.mul1, 0, 0);
-  plug_expectOk(ctx.rotX, ctx.mul1, 0, 1);
+	plug_expectOk(ctx.scale1, ctx.mul1, 0, 0);
+	plug_expectOk(ctx.rotX, ctx.mul1, 0, 1);
 
-  plug_expectOk(ctx.mul1, ctx.mul2, 0, 0);
-  plug_expectOk(ctx.scale2, ctx.mul2, 0, 1);
+	plug_expectOk(ctx.mul1, ctx.mul2, 0, 0);
+	plug_expectOk(ctx.scale2, ctx.mul2, 0, 1);
 
-  plug_expectOk(ctx.mul2, ctx.mul3, 0, 0);
-  plug_expectOk(ctx.translation, ctx.mul3, 0, 1);
+	plug_expectOk(ctx.mul2, ctx.mul3, 0, 0);
+	plug_expectOk(ctx.translation, ctx.mul3, 0, 1);
 
 	return ctx;
 }
@@ -54,10 +55,10 @@ Ptr<NodeBase> getRoot(Ptr<NodeBase> node)
 {
 	auto parent = GraphManager::getParent(node);
 	if (parent == nullptr)
-  {
-    return node;
+	{
+		return node;
 	}
-  return getRoot(parent);
+	return getRoot(parent);
 }
 
 TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
@@ -85,7 +86,8 @@ TEST(NodeInterfaceTest, GetParentOfNonexistentPin_ShouldReturnNull)
 	EXPECT_EQ(nullptr, gm::getParent(seq, -10));
 }
 
-TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResults)
+TEST(NodeIntefaceTest,
+     GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResults)
 {
 	// Last node is mul3
 	auto ctx = prepareEnvironment();
@@ -96,8 +98,8 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
 
 	auto root = getRoot(lastNode);
-  auto anotherMatNode1 = Builder::createNode<ENodeType::MatrixAddMatrix>();
-  auto anotherMatNode2 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+	auto anotherMatNode1 = Builder::createNode<ENodeType::MatrixAddMatrix>();
+	auto anotherMatNode2 = Builder::createNode<ENodeType::MatrixAddMatrix>();
 	plug_expectOk(root, anotherMatNode1, 0, 0);
 	plug_expectOk(root, anotherMatNode2, 0, 0);
 
@@ -109,15 +111,17 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 /*
 TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 {
-	auto scale = Core::Builder::createTransform<ETransformType::Scale>();
+    auto scale = Core::Builder::createTransform<ETransformType::Scale>();
 
-	auto* expectedOperation = &g_transforms[static_cast<size_t>(ETransformType::Scale)];
+    auto* expectedOperation =
+&g_transforms[static_cast<size_t>(ETransformType::Scale)];
 
-	EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
+    EXPECT_EQ(expectedOperation->first.keyWord, scale->getOperation()->keyWord);
 }
  */
 
-TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
+TEST(NodeInterfaceTest,
+     GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
 {
 	auto seq = Builder::createSequence();
 
@@ -129,8 +133,8 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnec
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
 	auto inputSeq = Builder::createSequence();
-	auto mySeq    = Builder::createSequence();
-	auto mat      = Builder::createNode<ENodeType::MatrixToMatrix>();
+	auto mySeq = Builder::createSequence();
+	auto mat = Builder::createNode<ENodeType::MatrixToMatrix>();
 
 	plug_expectOk(inputSeq, mySeq, 0, 0);
 	plug_expectOk(mat, mySeq, 0, 1);
@@ -151,6 +155,6 @@ TEST(NodeInterfaceTest, SetValueWithIndex)
 {
 	auto screen = GraphManager::createNode<ENodeType::Screen>();
 
-	auto result = screen->setValue((float) 1920 / 1080, I3T_OUTPUT1);
+	auto result = screen->setValue((float)1920 / 1080, I3T_OUTPUT1);
 	EXPECT_EQ(result.status, ValueSetResult::Status::Ok);
 }

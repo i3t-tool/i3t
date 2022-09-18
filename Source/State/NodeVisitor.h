@@ -11,14 +11,15 @@ class WorkspaceTransformation;
 class WorkspaceScreen;
 class WorkspaceModel;
 
-using GuiNode      = WorkspaceNodeWithCoreData;
-using GuiCamera    = WorkspaceCamera;
-using GuiCycle     = WorkspaceCycle;
-using GuiOperator  = WorkspaceNodeWithCoreData; /* JH WorkspaceOperator can be here? */
+using GuiNode = WorkspaceNodeWithCoreData;
+using GuiCamera = WorkspaceCamera;
+using GuiCycle = WorkspaceCycle;
+using GuiOperator =
+    WorkspaceNodeWithCoreData; /* JH WorkspaceOperator can be here? */
 using GuiTransform = WorkspaceTransformation;
-using GuiSequence  = WorkspaceSequence;
-using GuiScreen    = WorkspaceScreen;
-using GuiModel     = WorkspaceModel;
+using GuiSequence = WorkspaceSequence;
+using GuiScreen = WorkspaceScreen;
+using GuiModel = WorkspaceModel;
 
 using GuiNodePtr = std::shared_ptr<GuiNode>;
 

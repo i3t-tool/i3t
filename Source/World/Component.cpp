@@ -13,10 +13,10 @@ const char* Component::getComponentType()
 Component::Component()
 {
 	// printf("component\n");
-	Component::s_type  = typeid(Component).name();
-	this->m_type       = Component::s_type;
+	Component::s_type = typeid(Component).name();
+	this->m_type = Component::s_type;
 	this->m_gameObject = NULL;
-	this->m_isActive   = true;
+	this->m_isActive = true;
 }
 void Component::GUI()
 { /*printf("Default GUI\n");*/

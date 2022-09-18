@@ -22,12 +22,12 @@ public:
 	void render() override;
 
 private:
-	World*       m_world;
+	World* m_world;
 	unsigned int m_fboMain;
 	unsigned int m_texColBufMain;
 	unsigned int m_rboMain;
-	ImVec2       m_wcMin;
-	ImVec2       m_wcMax;
+	ImVec2 m_wcMin;
+	ImVec2 m_wcMax;
 
 	void showViewportsMenu();
 };

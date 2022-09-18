@@ -14,34 +14,34 @@ public:
 
 	void setState(const Memento& state) override {}
 
-	void onStateChange(const std::string &winTitlePostfix) override {}
+	void onStateChange(const std::string& winTitlePostfix) override {}
 };
 
 /// \todo MH StateHandlingTest
 /*
 TEST(StateHandlingTest, UndoRedo)
 {
-	TestWorkspace workspace;
+    TestWorkspace workspace;
 
-	StateManager::instance().setOriginator(&workspace);
-	StateManager::instance().createEmptyScene();
+    StateManager::instance().setOriginator(&workspace);
+    StateManager::instance().createEmptyScene();
 
-	EXPECT_FALSE(StateManager::instance().canUndo());
-	EXPECT_FALSE(StateManager::instance().canRedo());
+    EXPECT_FALSE(StateManager::instance().canUndo());
+    EXPECT_FALSE(StateManager::instance().canRedo());
 
-	StateManager::instance().takeSnapshot();
+    StateManager::instance().takeSnapshot();
 
-	EXPECT_TRUE(StateManager::instance().canUndo());
-	EXPECT_FALSE(StateManager::instance().canRedo());
+    EXPECT_TRUE(StateManager::instance().canUndo());
+    EXPECT_FALSE(StateManager::instance().canRedo());
 
-	StateManager::instance().undo();
+    StateManager::instance().undo();
 
-	EXPECT_FALSE(StateManager::instance().canUndo());
-	EXPECT_TRUE(StateManager::instance().canRedo());
+    EXPECT_FALSE(StateManager::instance().canUndo());
+    EXPECT_TRUE(StateManager::instance().canRedo());
 
-	StateManager::instance().redo();
+    StateManager::instance().redo();
 
-	EXPECT_TRUE(StateManager::instance().canUndo());
-	EXPECT_FALSE(StateManager::instance().canRedo());
+    EXPECT_TRUE(StateManager::instance().canUndo());
+    EXPECT_FALSE(StateManager::instance().canRedo());
 }
  */

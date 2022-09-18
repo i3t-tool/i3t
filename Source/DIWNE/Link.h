@@ -8,33 +8,46 @@ namespace DIWNE
 class Link : public DiwneObject
 {
 public:
-	Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneLink");
+	Link(DIWNE::Diwne& diwne, DIWNE::ID id,
+	     std::string const labelDiwne = "DiwneLink");
 
 	/** Default destructor */
 	virtual ~Link(){};
 
-	virtual bool       initialize();
-	virtual bool       initializeDiwne();
-	virtual void       begin(){}; /*!< link is not ImGui element - it is just picture of line */
-	virtual void       end(){};
-	virtual bool       content();
-	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldLink; };
-	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragLink; };
-	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchLink; };
-
+	virtual bool initialize();
+	virtual bool initializeDiwne();
+	virtual void
+	begin(){}; /*!< link is not ImGui element - it is just picture of line */
+	virtual void end(){};
+	virtual bool content();
+	DIWNE::DiwneAction getHoldActionType() const final
+	{
+		return DiwneAction::HoldLink;
+	};
+	DIWNE::DiwneAction getDragActionType() const final
+	{
+		return DiwneAction::DragLink;
+	};
+	DIWNE::DiwneAction getTouchActionType() const final
+	{
+		return DiwneAction::TouchLink;
+	};
 
 	virtual void updateEndpoints(){};
-	void         updateControlPoints();
-	void         updateSquareDistanceMouseFromLink();
+	void updateControlPoints();
+	void updateSquareDistanceMouseFromLink();
 
 	virtual ImRect getRectDiwne() const
 	{
-		return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
-		              std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
-		              std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
-		              std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
+		return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x,
+		                        m_controlPointEndDiwne.x, m_endDiwne.x}),
+		              std::min({m_controlPointStartDiwne.y, m_startDiwne.y,
+		                        m_controlPointEndDiwne.y, m_endDiwne.y}),
+		              std::max({m_controlPointStartDiwne.x, m_startDiwne.x,
+		                        m_controlPointEndDiwne.x, m_endDiwne.x}),
+		              std::max({m_controlPointStartDiwne.y, m_startDiwne.y,
+		                        m_controlPointEndDiwne.y, m_endDiwne.y}));
 	};
-
 
 	ImVec2 getStartpoint() { return m_startDiwne; };
 	ImVec2 getEndpoint() { return m_endDiwne; };
@@ -44,11 +57,12 @@ public:
 	void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end)
 	{
 		m_startDiwne = start;
-		m_endDiwne   = end;
+		m_endDiwne = end;
 	};
 
-	bool
-	isLinkOnWorkArea(); /*!< in fact just rectangle (from startPoint to endPoint) check - so could return true while Link is not visible */
+	bool isLinkOnWorkArea(); /*!< in fact just rectangle (from startPoint to
+	                            endPoint) check - so could return true while Link
+	                            is not visible */
 
 	virtual bool bypassFocusAction();
 	virtual bool bypassFocusForInteractionAction();
@@ -62,10 +76,9 @@ protected:
 private:
 	ImVec2 m_startDiwne, m_endDiwne;
 	ImVec2 m_controlPointStartDiwne, m_controlPointEndDiwne;
-	float  m_squaredDistanceMouseFromLink;
+	float m_squaredDistanceMouseFromLink;
 };
 
 } /* namespace DIWNE */
-
 
 #endif // DIWNE_LINK_H

@@ -12,23 +12,27 @@
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
-static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
+static const ImGuiWindowFlags_ g_WindowFlags =
+    static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
-    static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+    static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse |
+                                         ImGuiWindowFlags_NoDocking);
 
 class MainMenuBar;
 
-template <typename T>
-constexpr inline void checkWindowType()
+template <typename T> constexpr inline void checkWindowType()
 {
-	static_assert(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
+	static_assert(std::is_base_of<IWindow, T>::value,
+	              "Type parameter must be derived from IWindow class.");
 }
 
-inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& dockableWindows)
+inline Ptr<IWindow> findWindow(const char* ID,
+                               const std::vector<Ptr<IWindow>>& dockableWindows)
 {
 	Ptr<IWindow> result = nullptr;
 	for (const auto& w : dockableWindows)
-		if (strcmp(w->getID(), ID) == 0) result = w;
+		if (strcmp(w->getID(), ID) == 0)
+			result = w;
 
 	return result;
 }
@@ -40,7 +44,8 @@ inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& dockableWindows)
 
 	auto result = findWindow(T::ID, dockableWindows);
 
-	Debug::Assert(result != nullptr, "Unknown window, does your 'T' have I3T_WINDOW body?");
+	Debug::Assert(result != nullptr,
+	              "Unknown window, does your 'T' have I3T_WINDOW body?");
 
 	return result;
 }
@@ -71,7 +76,7 @@ public:
 	void setTheme(const Theme& theme);
 
 	Fonts& getFonts() { return m_fonts; }
-	void   loadFonts();
+	void loadFonts();
 
 	/**
 	 * Hide and remove window.
@@ -87,8 +92,7 @@ public:
 	 *
 	 * \tparam T window to create. T must be derived from IWindow class.
 	 */
-	template <typename T>
-	void showUniqueWindow()
+	template <typename T> void showUniqueWindow()
 	{
 		checkWindowType<T>();
 
@@ -99,8 +103,7 @@ public:
 		}
 	}
 
-	template <typename T>
-	Ptr<T> getWindowPtr()
+	template <typename T> Ptr<T> getWindowPtr()
 	{
 		return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows));
 	}
@@ -114,13 +117,14 @@ private:
 private:
 	MainMenuBar* m_menu;
 
-	/// Application subwindows/dockable windows such as Viewport, Node editor. A window can be showed or hidden.
-	/// <b>DON'T</b> remove elements from this vector.
+	/// Application subwindows/dockable windows such as Viewport, Node editor. A
+	/// window can be showed or hidden. <b>DON'T</b> remove elements from this
+	/// vector.
 	std::vector<Ptr<IWindow>> m_dockableWindows;
 
 	std::map<std::string, Ptr<IWindow>> m_windows;
 
-	Theme*             m_currentTheme;
+	Theme* m_currentTheme;
 	std::vector<Theme> m_allThemes;
 
 	Fonts m_fonts;
