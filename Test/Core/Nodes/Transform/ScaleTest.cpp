@@ -190,7 +190,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Ok)
 	EXPECT_TRUE(Math::eq(glm::scale(scaleVec3), scale->getData().getMat4()));
 	EXPECT_TRUE(scale->isValid());
 }
-TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Wrong)
+TEST(ScaleTest, DISABLED_UniformScale_SetValidValue_Vec3_asScale_Wrong)
 {
 	// Create a uniform scale.
 	auto scale = Builder::createTransform<ETransformType::Scale>()

@@ -7,7 +7,7 @@
 
 using namespace Core;
 
-TEST(TransformTest, LookAt_SetValue_Ok)
+TEST(TransformTest, DISABLED_LookAt_SetValue_Ok)
 {
 	// Create uniform scale.
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
