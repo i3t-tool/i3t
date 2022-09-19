@@ -45,7 +45,8 @@ inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& dockableWindows)
 	auto result = findWindow(T::ID, dockableWindows);
 
 	Debug::Assert(result != nullptr,
-	              "Unknown window, does your 'T' have I3T_WINDOW body?");
+	              "Unknown window, does your 'T' have I3T_WINDOW body?"
+	              "Did you create your window instance?");
 
 	return result;
 }
