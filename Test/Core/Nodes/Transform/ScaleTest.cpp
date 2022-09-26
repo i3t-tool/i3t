@@ -147,8 +147,6 @@ TEST(
 
 	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleValue.z)),
 	                     scale->getData().getMat4())); // last of non-uniform vec3
-	EXPECT_FALSE(Math::eq(glm::scale(scaleValue),
-	                      scale->getData().getMat4())); // complete vec3
 }
 
 // ----	float ----

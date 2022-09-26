@@ -1,0 +1,589 @@
+contentFiles {
+	contentFile \data\content.cnt
+}
+scene {
+	camera {
+		position -10.5804 -0.718422 4.34746
+		lookAt -0.0509181 -1.0896 2.83304
+		up 0.0541325 0.989523 0.133843
+		orbitCenter -0.0509181 -1.0896 2.83304
+		radians 1
+	}
+	desc {
+Pokus o overeni, ze funkce (q * v) v glm dela tutez rotaci, jako qvq*.
+
+modry - vektor v
+zluty   -  vektor q = osa kvaternionu * sin(uhlu)
+
+zeleny - rotace pomoci funkce v glm
+cerveny - rotace pomoci qvq*
+
+magenta dlouha - uv = q x v  - kolmice na rovinu urcenou q a v
+magenta kratsi - uv * q.w - kolmine na rovinu urcenou q a v, smer dle znamenka q.w
+
+cyan - uuv = q x uv = q x (q x v) - kolmice 
+
+
+template <typename T, precision P>
+GLM_FUNC_QUALIFIER tvec3<T, P> operator*(tquat<T, P> const & q,	tvec3<T, P> const & v)
+{
+        tvec3<T, P> const QuatVector(q.x, q.y, q.z);             // yellow
+        tvec3<T, P> const uv(glm::cross(QuatVector, v));      // magenta
+        tvec3<T, P> const uuv(glm::cross(QuatVector, uv));  // cyan
+
+        return v + ((uv * q.w) + uuv) * static_cast<T>(2);     // zeleny
+//                       ((uv * q.w) + uuv) * static_cast<T>(2);     // bily
+}
+		position 704 533
+}
+transformationSpace {
+	position 3 701
+	projectionPosition 224.394 -1869.25
+	projectionScale 1.22933
+	transformationForm {
+	hint {
+v - input vector
+}
+		position 2074.85 531.548
+		inputsStorage 56 0 
+		inputsMultiOut 19 0 
+		object objects basics vectors blue
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+v + ((uv * q.w) + uuv) * 2 = 
+
+= v + 2 * [ q.w (q x v) + q x (q x v)]}
+		position 2059.7 -180.739
+		inputsStorage 71 0 
+		inputsMultiOut -1 
+		object objects basics vectors green
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+uuv = q x ( q x v)}
+		position 2060.2 -374.348
+		inputsStorage 72 0 
+		inputsMultiOut 15 0 
+		object objects basics vectors cyan
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+uv = q x v}
+		position 2063.74 -921.691
+		inputsStorage 73 0 
+		inputsMultiOut -1 
+		object objects basics vectors magenta
+		transformations {
+		}
+	}
+	transformationForm {
+	hint {
+qvq*}
+		position 2061.58 -1069.08
+		inputsStorage 75 0 
+		inputsMultiOut -1 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1859.85 -1642.06
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 -0.375 0.06 -0.495 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 257.858 -1626.61
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0.015 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1862.17 -375.464
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1862.49 -222.125
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.045 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1864.81 530.358
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1862.65 379.16
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+	hint {
+quaternion axis * sin(angle)
+(q1, q2, q3)}
+		position 2070.36 380.814
+		inputsStorage 76 0 
+		inputsMultiOut 21 0 
+		object objects basics vectors yellow
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2065.67 -772.736
+		inputsStorage 78 0 
+		inputsMultiOut -1 
+		object objects basics vectors magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1855.88 -615.38
+		inputsStorage 82 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2063.16 -25.9376
+		inputsStorage 79 0 
+		inputsMultiOut 31 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1865.95 -26.4246
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2065.33 260.97
+		inputsStorage 80 0 
+		inputsMultiOut 35 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1868.12 260.483
+		inputsStorage -1 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2071.74 116.038
+		inputsStorage 79 0 
+		inputsMultiOut 39 0 
+		object objects basics vectors white
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1866.84 118.116
+		inputsStorage 81 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0.045 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2071.59 -610.045
+		inputsStorage 78 0 
+		inputsMultiOut 27 0 
+		object objects basics vectors magenta
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2056.34 -1225.24
+		inputsStorage 85 0 
+		inputsMultiOut -1 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 2049.21 -1374.27
+		inputsStorage 91 0 
+		inputsMultiOut 47 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1860.47 -1485.64
+		inputsStorage 92 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 1861.81 -1760.21
+		inputsStorage 95 0 
+		inputsMultiOut 11 0 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2050.55 -1648.84
+		inputsStorage 96 0 
+		inputsMultiOut 49 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformationForm {
+		position 1863.15 -2029.33
+		inputsStorage 99 0 
+		inputsMultiOut -1 
+		transformations {
+			translation {
+				params 0 0 0
+				default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				matrix 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+				isLocked 1
+				useSynergies 0
+			}
+		}
+	}
+	transformationForm {
+		position 2051.89 -1917.96
+		inputsStorage 100 0 
+		inputsMultiOut 53 0 
+		object objects basics vectors red
+		transformations {
+		}
+	}
+	transformations {
+	}
+	operators {
+		ShowVector3 {
+			position 1612.7 531.392
+			inputs 60 0  
+		}
+		OrbitRotate {
+			position 574.578 -1493.11
+			inputs  
+			value -0.387703 0.77543 -0.49839 0 0.725453 -0.0768877 -0.683967 0 -0.568689 -0.626737 -0.532728 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		MatrixMulVector {
+			position 444.739 -97.9004
+			inputs 57 0 59 0  
+		}
+		VectorSender {
+			position 320.809 10.6397
+			inputs -1  
+			value 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		VectorToVector3 {
+		hint {
+v - vector being rotated by q}
+			position 603.09 -101.949
+			inputs 58 0  
+		}
+		QuatSender {
+		hint {
+q - quaternion, will rotate the vector v}
+			position 604.651 -1698.35
+			inputs -1  
+			value -0.0949993 3.675 0.06 -1.32 0 1 0 0 0 0 1 0 0 0 0 1
+			manual -0.0949993 3.675 0.06 -1.32 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeQuat {
+			position 257.914 -278.926
+			inputs 61 0  
+		}
+		QuatToFloatVec {
+			position 497.058 -278.926
+			inputs 62 0  
+		}
+		Vector3CrossVector3 {
+		hint {
+uv
+}
+			position 906.181 -215.107
+			inputs 63 1 60 0  
+		}
+		Vector3CrossVector3 {
+		hint {
+uuv
+}
+			position 1082.51 -95.8648
+			inputs 63 1 64 0  
+		}
+		Vector3AddVector3 {
+			position 1419.93 -93.5701
+			inputs 69 0 60 0  
+		}
+		Vector3MulFloat {
+		hint {
+uv * q.w
+}
+			position 1094.32 -199.289
+			inputs 63 0 64 0  
+		}
+		Vector3AddVector3 {
+			position 1257.56 -194.963
+			inputs 67 0 65 0  
+		}
+		Vector3MulFloat {
+			position 1413.89 -221.15
+			inputs 70 0 68 0  
+		}
+		FloatSender {
+			position 1416.46 -283.371
+			inputs -1  
+			value 2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 2 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		ShowVector3 {
+			position 1611.17 -180.772
+			inputs 66 0  
+		}
+		ShowVector3 {
+			position 1609.34 -375.549
+			inputs 65 0  
+		}
+		ShowVector3 {
+			position 1615.21 -924.059
+			inputs 64 0  
+		}
+		QuatVecConjQuat {
+			position 1158.06 -719.931
+			inputs 62 0 60 0  
+		}
+		ShowVector3 {
+			position 1617.73 -1066.78
+			inputs 74 0  
+		}
+		ShowVector3 {
+			position 1611.33 380.781
+			inputs 63 1  
+		}
+		Vector3Length {
+			position 1046.87 -267.76
+			inputs 64 0  
+		}
+		ShowVector3 {
+			position 1617.15 -775.104
+			inputs 67 0  
+		}
+		ShowVector3 {
+			position 1614.63 -25.9706
+			inputs 69 0  
+		}
+		ShowVector3 {
+			position 1616.8 260.937
+			inputs 68 0  
+		}
+		Translation {
+			position 1610.11 106.148
+			inputs 60 0  
+		}
+		Translation {
+			position 1602.39 -624.125
+			inputs 65 0  
+		}
+		Vector3DotVector3 {
+		hint {
+normalize(q) . normalize(v)}
+			position 894.374 -908.949
+			inputs 89 0 86 0  
+		}
+		Vector3MulFloat {
+			position 1041.22 -907.59
+			inputs 83 0 89 0  
+		}
+		ShowVector3 {
+			position 1612.49 -1222.94
+			inputs 84 0  
+		}
+		NormalizeVector3 {
+			position 681.339 -944.164
+			inputs 87 0  
+		}
+		Vector3Sender {
+		hint {
+v
+}
+			position 550.51 -887.66
+			inputs 60 0  
+			value -0.387703 0.77543 -0.49839 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3Sender {
+		hint {
+q}
+			position 448.39 -1049.39
+			inputs 63 1  
+			value -0.0243183 0.940743 0.0153591 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 0.618496 0.590073 -0.518915 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		NormalizeVector3 {
+			position 682.065 -1048.61
+			inputs 88 0  
+		}
+		Vector3SubVector3 {
+		hint {
+(normalize(q) . normalize(v)) q
+prumet v do q}
+			position 1188.47 -1028.05
+			inputs 86 0 84 0  
+		}
+		ShowVector3 {
+			position 1605.36 -1371.97
+			inputs 90 0  
+		}
+		Translation {
+			position 1605.67 -1496.98
+			inputs 84 0  
+		}
+		Vector3MulFloat {
+			position 1053.49 -1268.22
+			inputs 94 0 88 0  
+		}
+		Vector3DotVector3 {
+			position 906.642 -1269.58
+			inputs 88 0 87 0  
+		}
+		Translation {
+			position 1607.01 -1771.55
+			inputs -1  
+		}
+		ShowVector3 {
+			position 1606.7 -1646.54
+			inputs 93 0  
+		}
+		Vector3Sender {
+			position 1308.96 -1847.64
+			inputs -1  
+			value 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			manual 1 0 0 1 0 1 0 0 0 0 1 0 0 0 0 1
+			default 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+		}
+		Vector3SubVector3 {
+			position 1198.01 -1450.14
+			inputs 87 0 93 0  
+		}
+		Translation {
+			position 1608.35 -2040.67
+			inputs -1  
+		}
+		ShowVector3 {
+			position 1608.04 -1915.66
+			inputs 98 0  
+		}
+	}
+}
