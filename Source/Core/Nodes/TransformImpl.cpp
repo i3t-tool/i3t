@@ -1,12 +1,12 @@
 #include "TransformImpl.h"
 
-#include "Utils/Math.h"
 #include <math.h>
+#include "Utils/Math.h"
 
 //#include "pgr.h"
-#include "Utils/Format.h"
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp> // Euler angle rotations
+#include "Utils/Format.h"
 
 #ifndef M_PI
 /// define Pi for compatibility issues (MSVC vs GCC)
@@ -64,30 +64,35 @@ constexpr ValueMask g_FrustumMask = {
     VM_ZERO, VM_ZERO, VM_ANY, VM_ANY,  VM_ZERO, VM_ZERO, VM_MINUS_ONE, VM_ZERO,
 };
 
-// constexpr ValueMask g_LookAtMask = { // scale + tranmslation
-//     VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,
-//     VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
-//     VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
-//     VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
-// };
 constexpr ValueMask g_LookAtMask = {
     // rotation + translation
     VM_ANY, VM_ANY, VM_ANY, VM_ANY, VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
     VM_ANY, VM_ANY, VM_ANY, VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
+// constexpr ValueMask g_LookAtMask = { // scale + translation
+//     VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,
+//     VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
+//     VM_ZERO, VM_ZERO, VM_ANY,  VM_ANY,
+//     VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
+// };
 
 //===----------------------------------------------------------------------===//
 
 bool TransformImpl<ETransformType::Scale>::isValid() const
 {
+	// check the basic matrix values 0, 1, -1, any
 	bool result = validateValues(g_ScaleMask, m_internalData[0].getMat4());
 
 	if (hasSynergies())
 	{
+		// matrix inner consistency
 		auto& mat = m_internalData[0].getMat4();
 		result = result && Math::eq(mat[0][0], mat[1][1]) &&
 		         Math::eq(mat[1][1], mat[2][2]);
 	}
+
+	// consistency with defaults -omitted
+	// consistency defaults <--> matrix   - omitted
 
 	return result;
 }
@@ -150,9 +155,10 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val,
 		else
 		{
 			setInternalValue(val, coords); // single value in matrix
-			auto scale =
-			    getDefaultValue("scale").getVec3(); // change default scale [coords.x]
-			scale[coords.x] = val;
+			auto scale = getDefaultValue("scale")
+			                 .getVec3(); // change single value on index [coords.x] in
+			                             // default scale vector
+			scale[coords.x] = val;       // 0,1,2 as sx, sy, sz
 			setDefaultValueNoUpdate("scale",
 			                        scale); // set default scale without matrix update
 		}
@@ -209,14 +215,21 @@ bool TransformImpl<ETransformType::EulerX>::isValid() const
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateXMask, mat);
 
+	// matrix inner consistency
 	float angle =
 	    glm::atan(-mat[2][1], mat[2][2]); // glm::atan executes ::std::atan2
+	float angle2 =
+	    glm::atan(mat[1][2], mat[1][1]); // glm::atan executes ::std::atan2
+	// result       = result && Math::eq(angle, angle2);
+
 	auto expectedMat = glm::eulerAngleX(angle);
 
-	result =
-	    result && Math::eq(expectedMat,
-	                       mat); // todo PF gitlab does not recognize matrix with
-	                             // a wrong element on [1,2] = sin(angle)
+	// consistency defaults <--> matrix
+	float defaultAngle = getDefaultValue("rotation").getFloat();
+	result = result && Math::eq(angle, defaultAngle);
+
+	expectedMat = glm::eulerAngleX(defaultAngle);
+	result = result && Math::eq(expectedMat, mat);
 
 	return result;
 }
@@ -345,13 +358,26 @@ void TransformImpl<ETransformType::EulerX>::resetMatrixFromDefaults()
 // the whole circle
 bool TransformImpl<ETransformType::EulerY>::isValid() const
 {
+	// check the basic matrix values 0, 1, -1, any
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateYMask, mat);
 
+	// matrix inner consistency
 	float angle =
 	    glm::atan(mat[2][0], mat[2][2]); // glm::atan executes ::std::atan2
+	float angle2 =
+	    glm::atan(-mat[0][2], mat[0][0]); // glm::atan executes ::std::atan2
+	result = result && Math::eq(angle, angle2);
+
 	auto expectedMat = glm::eulerAngleY(angle);
 
+	result = result && Math::eq(expectedMat, mat);
+
+	// consistency defaults <--> matrix
+	float defaultAngle = getDefaultValue("rotation").getFloat();
+	result = result && Math::eq(angle, defaultAngle);
+
+	expectedMat = glm::eulerAngleY(defaultAngle);
 	result = result && Math::eq(expectedMat, mat);
 
 	return result;
@@ -479,13 +505,26 @@ void TransformImpl<ETransformType::EulerY>::resetMatrixFromDefaults()
 
 bool TransformImpl<ETransformType::EulerZ>::isValid() const
 {
+	// check the basic matrix values 0, 1, -1, any
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_RotateZMask, mat);
 
+	// matrix inner consistency
 	float angle =
 	    glm::atan(mat[0][1], mat[0][0]); // glm::atan executes ::std::atan2
+	float angle2 =
+	    glm::atan(-mat[1][0], mat[1][1]); // glm::atan executes ::std::atan2
+	result = result && Math::eq(angle, angle2);
+
 	auto expectedMat = glm::eulerAngleZ(angle);
 
+	result = result && Math::eq(expectedMat, mat);
+
+	// consistency defaults <--> matrix
+	float defaultAngle = getDefaultValue("rotation").getFloat();
+	result = result && Math::eq(angle, defaultAngle);
+
+	expectedMat = glm::eulerAngleZ(defaultAngle);
 	result = result && Math::eq(expectedMat, mat);
 
 	return result;
@@ -694,17 +733,20 @@ void TransformImpl<ETransformType::Translation>::resetMatrixFromDefaults()
 
 bool TransformImpl<ETransformType::AxisAngle>::isValid() const
 { // \todo - test after working edit during unlock
-
+	// check the basic matrix values 0, 1, -1, any
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_AxisAngleMask, mat);
 
+	// matrix inner consistency
 	// det = +-1
 	result = result && Math::eq(abs(glm::determinant(mat)), 1.0f); // math::eq
 
+	// consistency of defaults
 	// axis <> vec3(0) = the rotation vector is of non-zero length
 	glm::vec3 ax = getDefaultValue("axis").getVec3();
 	result = result && glm::dot(ax, ax) != 0.0f;
 
+	// consistency defaults <--> matrix
 	// expected matrix
 	float angle = getDefaultValue("rotation").getFloat();
 	auto expectedMat = glm::rotate(angle, ax);
@@ -752,22 +794,28 @@ TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec3& axis)
 // todo - what should isValid without synergies return ofr |q| != 1?
 bool TransformImpl<ETransformType::Quat>::isValid() const
 {
-	// matrix
+	// check the basic matrix values 0, 1, -1, any
 	// any linear transformation (3x3) may be a rotation
 	auto& mat = m_internalData[0].getMat4();
-
 	bool result = validateValues(g_AxisAngleMask, mat); // 3x3 rotational matrix
+
+	// matrix inner consistency
 	result = result && Math::eq(glm::determinant(mat), 1.0f); // det == 1
 
-	// Check, if the default quaternion is of unit length?
+	// consistency of defaults
+	// 1) Check, if the default quaternion is of unit length?
 	const glm::quat quaternion = getDefaultValue("quat").getQuat();
-	// result = result && glm::dot(quaternion, quaternion) == 1.0f;
+
 	result = result && Math::isNormalized(quaternion);
 
-	// normalized helper
+	// 2) normalized helper
 	result = result && Math::eq(m_normalized, glm::normalize(quaternion));
 
 	// \todo check the angle too...
+	// consistency defaults <--> matrix
+	// matrix from a non-unit quaternion would also be wrong (non-unity of quat is
+	// tested above)
+	result = result && Math::eq(mat, glm::toMat4(quaternion));
 
 	return result;
 }
@@ -835,33 +883,35 @@ TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
 
 bool TransformImpl<ETransformType::Ortho>::isValid() const
 {
+	// rough matrix check
 	auto& mat = m_internalData[0].getMat4();
 	bool result = validateValues(g_OrthoMask, mat);
 
-	float left = getDefaultValue("left").getFloat();
-	float right = getDefaultValue("right").getFloat();
-	float bottom = getDefaultValue("bottom").getFloat();
-	float top = getDefaultValue("top").getFloat();
-	float near = getDefaultValue("near").getFloat();
-	float far = getDefaultValue("far").getFloat();
+	const float left = getDefaultValue("left").getFloat();
+	const float right = getDefaultValue("right").getFloat();
+	const float bottom = getDefaultValue("bottom").getFloat();
+	const float top = getDefaultValue("top").getFloat();
+	const float near = getDefaultValue("near").getFloat();
+	const float far = getDefaultValue("far").getFloat();
 
-	// simple check of the frustum borders
+	// check the defaults: simple check of the frustum borders
 	result = result && (left < right) && (bottom < top) && (near < far);
 
-	// expected matrix
-	auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
-	result = result && Math::eq(expectedMat, mat);
+	// matrix match the defaults
+	constexpr float ROUGH_EPSILON = 0.001f;
+	const auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
+	result = result && Math::eq(expectedMat, mat, ROUGH_EPSILON);
 
 	return result;
 }
 
 void TransformImpl<ETransformType::Ortho>::initDefaults()
 {
-	setDefaultValue("left", -5.0f);
-	setDefaultValue("right", 5.0f);
-	setDefaultValue("bottom", -5.0f);
-	setDefaultValue("top", 5.0f);
-	setDefaultValue("near", 1.0f);
+	setDefaultValueNoUpdate("left", -5.0f);
+	setDefaultValueNoUpdate("right", 5.0f);
+	setDefaultValueNoUpdate("bottom", -5.0f);
+	setDefaultValueNoUpdate("top", 5.0f);
+	setDefaultValueNoUpdate("near", 1.0f);
 	setDefaultValue("far", 10.0f);
 }
 
@@ -901,95 +951,121 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val,
 	setInternalValue(val, coords);
 	notifySequence();
 
-	//////--------------------- from
-
 	// update the defaults to match the perspective matrix
-	// m[0,0] = 2n/(R-L)                  => w = R-L, newR = newC * w, newL =
-	// (newC-1) * w m[1,1] = 2n/(T-B)                  => m[2,0] = (R+L)/(R-L)
-	// m[2,1] = (T+B)/(T-B)
-	// m[2,2] = -(f+n)/(f-n) = A    (-1 for infinity f)
-	// m[3,2] = -(2fn)/(f-n) = B    (-2n for infinity f)
-	// m[2,3] = -1
+	// m[0,0] = 2/(R-L)      => w = R-L, newR = newC * w, newL = (newC-1) * w
+	// m[1,1] = 2/(T-B)      =>
+	// m[2,2] = -2/(f-n)
+	// m[3,0] = -(R+L)/(R-L)
+	// m[3,1] = -(T+B)/(T-B)
+	// m[3,2] = -(f+n)/(f-n)
+	// m[3,3] = 1
 	// F=cotan(0.5*fovy) = 1 / tan(0.5*fovy)   => FOVY = 2*atan(1/F]
 
 	auto& mat = m_internalData[0].getMat4();
 
-	// if (coords == glm::ivec2(0, 0))
-	//{
-	//	const auto left  = getDefaultValue("left").getFloat();
-	//	const auto right = getDefaultValue("right").getFloat();
+	// ROW 0
+	if (coords == glm::ivec2(0, 0)) // fix B, changing A 
+                                        // --- changing scale => changing width
+	{
+		const auto left = getDefaultValue("left").getFloat();
+		const auto right = getDefaultValue("right").getFloat();
 
-	//	const auto sum = getDefaultValue("right").getFloat() +
-	// getDefaultValue("left").getFloat();
-	//	//const auto C    = mat[2][0];
-	//	const auto newA = mat[0][0];
+		const auto width = getDefaultValue("right").getFloat() -
+		                   getDefaultValue("left").getFloat();
+		const auto newA = mat[0][0];
+		if (newA != 0.0f)
+		{
+			const auto newL = (2.0f * left / (width * newA));
+			const auto newR = (2.0f * right / (width * newA));
+			setDefaultValueNoUpdate("left", newL);  // newL =
+			setDefaultValueNoUpdate("right", newR); // newR =
+		}
+	}
 
-	//	if (newA != 0.0f)
-	//	{
-	//		const auto newL = (sum * newA - 2.0f * near) / (2 * newA); // newL =
-	//		const auto newR = sum - newL;
+	if (coords == glm::ivec2(3, 0)) // fix A, changing B
+	{
+		const auto left = getDefaultValue("left").getFloat();
+		const auto right = getDefaultValue("right").getFloat();
 
-	//		setDefaultValueNoUpdate("left", newL);  // newL =
-	//		setDefaultValueNoUpdate("right", newR); // newR =
-	//	}
-	//}
-	// else if (coords == glm::ivec2(2, 0))
-	//{
-	//	const auto w = getDefaultValue("right").getFloat() -
-	// getDefaultValue("left").getFloat();
+		const auto width = getDefaultValue("right").getFloat() -
+		                   getDefaultValue("left").getFloat();
+		const auto newB = mat[3][0];
 
-	//	const auto newL = (mat[2][0] - 1) * w / 2.0f; // newL = (newC-1) * w / 2
+		const auto newL =
+		    (width / 2.0f) * (-1.0f - newB); // newL = (R-L)/2 * (-1-newB)
+		const auto newR =
+		    (width / 2.0f) * (1.0f - newB); // newR = (R-L)/2 * (+1-newB)
+		;
+		// const auto newR = newL + width;
+		setDefaultValueNoUpdate("left", newL);  // newL =
+		setDefaultValueNoUpdate("right", newR); // newR =
+	}
 
-	//	setDefaultValueNoUpdate("left", newL);      // newL = (newC-1) * w / 2
-	//	setDefaultValueNoUpdate("right", newL + w); // newR = newL + w
-	//}
+	// ROW 1
+	if (coords == glm::ivec2(1, 1)) // fix B, changing A 
+                                        // --- changing scale => changing height
+	{
+		const auto bottom = getDefaultValue("bottom").getFloat();
+		const auto top = getDefaultValue("top").getFloat();
 
-	// if (coords == glm::ivec2(1, 1))
-	//{
-	//	const auto near   = getDefaultValue("near").getFloat();
-	//	const auto bottom = getDefaultValue("bottom").getFloat();
-	//	const auto top    = getDefaultValue("top").getFloat();
+		const auto height = getDefaultValue("top").getFloat() -
+		                    getDefaultValue("bottom").getFloat();
+		const auto newA = mat[1][1];
+		if (newA != 0.0f)
+		{
+			const auto newL = (2.0f * bottom / (height * newA));
+			const auto newR = (2.0f * top / (height * newA));
+			setDefaultValueNoUpdate("bottom", newL); // newL =
+			setDefaultValueNoUpdate("top", newR);    // newR =
+		}
+	}
 
-	//	const auto sum = getDefaultValue("top").getFloat() +
-	// getDefaultValue("bottom").getFloat();
-	//	//const auto D    = mat[2][1];
-	//	const auto newB = mat[1][1];
+	if (coords == glm::ivec2(3, 1)) // fix A, changing B
+	{
+		const auto bottom = getDefaultValue("bottom").getFloat();
+		const auto top = getDefaultValue("top").getFloat();
 
-	//	if (newB != 0.0f)
-	//	{
-	//		const auto newBot = (sum * newB - 2.0f * near) / (2 * newB); // newL =
-	//		const auto newTop = sum - newB;
+		const auto height = getDefaultValue("top").getFloat() -
+		                    getDefaultValue("bottom").getFloat();
+		const auto newB = mat[3][1];
 
-	//		setDefaultValueNoUpdate("bottom", newBot); // newL =
-	//		setDefaultValueNoUpdate("top", newTop);    // newR =
-	//	}
-	//}
-	// else if (coords == glm::ivec2(2, 1))
-	//{
-	//	const auto h = getDefaultValue("top").getFloat() -
-	// getDefaultValue("bottom").getFloat();
+		const auto newL =
+		    (height / 2.0f) * (-newB - 1.0f); // newL = (R-L)/2 * (newB-1)
+		// const auto newR = newL + height;
+		const auto newR = newL + height;
+		setDefaultValueNoUpdate("bottom", newL); // newL =
+		setDefaultValueNoUpdate("top", newR);    // newR =
+	}
 
-	//	const auto newBot = (mat[2][1] - 1) * h / 2.0f; // newL = (newC-1) * w / 2
+	// ROW 2
+	else if (coords == glm::ivec2(2, 2)) // Z-scale:   A -> A', B = B'
+	{
+		const auto near = getDefaultValue("near").getFloat();
+		const auto far = getDefaultValue("far").getFloat();
 
-	//	setDefaultValueNoUpdate("bottom", newBot);  // newL = (newC-1) * w / 2
-	//	setDefaultValueNoUpdate("top", newBot + h); // newR = newL + w
-	//}
+		const auto depth =
+		    getDefaultValue("far").getFloat() - getDefaultValue("near").getFloat();
+		const auto newA = mat[2][2];
+		if (newA != 0.0f)
+		{
+			const auto newNear = (-2.0f * near / (depth * newA));
+			const auto newFar = (-2.0f * far / (depth * newA));
 
-	// else if (coords == glm::ivec2(2, 2))
-	//{
-	//	auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
-	//	auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // B / (newA + 1)
-	//	setDefaultValueNoUpdate("near", newNear);
-	//	setDefaultValueNoUpdate("far", newFar);
-	// }
-	// else if (coords == glm::ivec2(3, 2))
-	//{
-	//	auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
-	//	auto newFar  = mat[3][2] / (mat[2][2] + 1.0f); // newB / (A + 1)
-	//	setDefaultValueNoUpdate("near", newNear);
-	//	setDefaultValueNoUpdate("far", newFar);
-	// }
+			setDefaultValueNoUpdate("near", newNear);
+			setDefaultValueNoUpdate("far", newFar);
+		}
+	}
+	else if (coords == glm::ivec2(3, 2)) // Z-offset:   A=A', B -> B'
+	{
+		const auto depth =
+		    getDefaultValue("far").getFloat() - getDefaultValue("near").getFloat();
+		const auto newB = mat[3][2];
 
+		auto newNear = (-depth / 2.0f) * (1.0f + newB); // -1/2 * (f-n) *(1 + newB)
+		auto newFar = (depth / 2.0f) * (1.0f - newB);   //  1/2 * (f-n) *(1 - newB)
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
 	///--------------------------to
 
 	return ValueSetResult{ValueSetResult::Status::Ok};
@@ -1003,26 +1079,27 @@ bool TransformImpl<ETransformType::Perspective>::isValid() const
 	// update of far and near has problems with the precision -r rough epsilon
 	// introduced
 
-	// rough matrix check
+	// check the basic matrix values 0, 1, -1, any
 	auto& mat = m_internalData[0].getMat4();
 	bool result =
 	    validateValues(g_PerspectiveMask, mat); // checks 0,0,-1,0 in the last row
 
-	// nonzero scale and z-translate
+	// matrix inner consistency - nonzero scale and z-translate
 	result = result && (mat[0][0] * mat[1][1] * mat[2][2] * mat[3][2] != 0.0f);
 
+	// consistency of defaults
 	float fovy = getDefaultValue("fovy").getFloat();
 	float aspect = getDefaultValue("aspect").getFloat();
 	float near = getDefaultValue("near").getFloat();
 	float far = getDefaultValue("far").getFloat();
 
-	// check the defaults alone
-	result = result && (near != 0.0f);
+	// result = result && (near != 0.0f);
+	result = result && (near > 0.0f); // stronger condition than  near != 0
 	result = result && (far > near);
 	result = result && (aspect > 0.0f);
 	result = result && (fovy > 0.0f);
 
-	// matrix match the defaults
+	// consistency defaults <--> matrix
 	constexpr float roughEpsilon = 0.001f;
 	const auto expectedMat = glm::perspective(fovy, aspect, near, far);
 	result = result && Math::eq(expectedMat, mat, roughEpsilon);
@@ -1041,7 +1118,8 @@ void TransformImpl<ETransformType::Perspective>::initDefaults()
 void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
-	m_hasSynergies = true; // symmetrical frustum
+	// m_hasSynergies = true; // perspective has a symmetrical frustum from
+	// definition \todo We must decide
 
 	setInternalValue(glm::perspective(
 	    getDefaultValue("fovy").getFloat(), getDefaultValue("aspect").getFloat(),
@@ -1071,12 +1149,12 @@ TransformImpl<ETransformType::Perspective>::setValue(float val,
 
 	auto& mat = m_internalData[0].getMat4();
 
-	if (coords == glm::ivec2(0, 0))
+	if (coords == glm::ivec2(0, 0)) // symmetric scale x
 	{
 		auto newAspect = mat[1][1] / mat[0][0]; // newAspect = (F / newM[0][0])
 		setDefaultValueNoUpdate("aspect", newAspect);
 	}
-	else if (coords == glm::ivec2(1, 1))
+	else if (coords == glm::ivec2(1, 1)) // symmetric scale y
 	{
 		auto newAspect = mat[1][1] / mat[0][0]; // newAspect = (F / newM[0][0])
 		setDefaultValueNoUpdate("aspect", newAspect);
@@ -1084,17 +1162,43 @@ TransformImpl<ETransformType::Perspective>::setValue(float val,
 		auto newFovy = 2.0f * atan(1.0f / mat[1][1]);
 		setDefaultValueNoUpdate("fovy", newFovy);
 	}
-	else if (coords == glm::ivec2(2, 2))
+	else if (coords == glm::ivec2(2, 2)) // Perspective scale Z
 	{
-		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
-		auto newFar = mat[3][2] / (mat[2][2] + 1.0f);  // B / (newA + 1)
+		float newNear = 1.0f, newFar = 10.0f;
+		if (val != 1.0f)
+			newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
+		if (val != -1.0f)
+			newFar = mat[3][2] / (mat[2][2] + 1.0f); // B / (newA + 1)
+
+		// more stable variant??
+		// auto near    = getDefaultValue("near").getFloat();
+		// auto far     = getDefaultValue("far").getFloat();
+		// auto distance = far - near;
+		// auto newA     = mat[2][2];
+
+		// auto newNear = 2.0f * far * near / (distance * (newA - 1.0f));
+		// auto newFar  = 2.0f * far * near / (distance * (newA + 1.0f));
+
+		// std::cerr << "mat22: " << mat[2][2] << "\t";
+		// std::cerr << "mat32: " << mat[3][2] << std::endl;
+
+		// std::cerr << "Near: " << getDefaultValue("near").getFloat() << " -> " <<
+		// newNear << "\t"; std::cerr << "Far : " <<
+		// getDefaultValue("far").getFloat() << " -> " << newFar << std::endl;
 		setDefaultValueNoUpdate("near", newNear);
 		setDefaultValueNoUpdate("far", newFar);
 	}
-	else if (coords == glm::ivec2(3, 2))
+	else if (coords == glm::ivec2(3, 2)) // Perspective offset Z
 	{
-		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
-		auto newFar = mat[3][2] / (mat[2][2] + 1.0f);  // newB / (A + 1)
+		// Problems:
+		// mat[3][2] == 0    => newNear = newFar
+		// mat[2][2] == -1   => infinity newFar
+		// mat[2][2] ==  1   => infinity newNear
+		float newNear = 1.0f, newFar = 10.0f;
+		if (val != 1.0f)
+			newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
+		if (val != -1.0f)
+			newFar = mat[3][2] / (mat[2][2] + 1.0f); // newB / (A + 1)
 		setDefaultValueNoUpdate("near", newNear);
 		setDefaultValueNoUpdate("far", newFar);
 	}
@@ -1131,9 +1235,9 @@ bool TransformImpl<ETransformType::Frustum>::isValid() const
 	result = result && (near != 0.0f);
 
 	// matrix match the defaults
-	constexpr float roughEpsilon = 0.001f;
-	auto expectedMat = glm::frustum(left, right, bottom, top, near, far);
-	result = result && Math::eq(expectedMat, mat, roughEpsilon);
+	constexpr float ROUGH_EPSILON = 0.001f;
+	const auto expectedMat = glm::frustum(left, right, bottom, top, near, far);
+	result = result && Math::eq(expectedMat, mat, ROUGH_EPSILON);
 
 	return result;
 }
@@ -1196,6 +1300,7 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 
 	auto& mat = m_internalData[0].getMat4();
 
+	// ROW 0 - X
 	if (coords == glm::ivec2(0, 0))
 	{
 		const auto near = getDefaultValue("near").getFloat();
@@ -1204,12 +1309,11 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 
 		const auto sum = getDefaultValue("right").getFloat() +
 		                 getDefaultValue("left").getFloat();
-		// const auto C    = mat[2][0];
 		const auto newA = mat[0][0];
 
 		if (newA != 0.0f)
 		{
-			const auto newL = (sum * newA - 2.0f * near) / (2 * newA); // newL =
+			const auto newL = (sum * newA - 2.0f * near) / (2.0f * newA); // newL =
 			const auto newR = sum - newL;
 
 			setDefaultValueNoUpdate("left", newL);  // newL =
@@ -1221,13 +1325,15 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 		const auto w = getDefaultValue("right").getFloat() -
 		               getDefaultValue("left").getFloat();
 
-		const auto newL = (mat[2][0] - 1) * w / 2.0f; // newL = (newC-1) * w / 2
+		const auto newL = (mat[2][0] - 1.0f) * w / 2.0f; // newL = (newC-1) * w / 2
 
 		setDefaultValueNoUpdate("left", newL);      // newL = (newC-1) * w / 2
 		setDefaultValueNoUpdate("right", newL + w); // newR = newL + w
 	}
 
-	if (coords == glm::ivec2(1, 1))
+	// ROW 1 - Y
+	else if (coords == glm::ivec2(1, 1)) // Changing scale in y axis (A), 
+                                             // offset is fixed (B)
 	{
 		const auto near = getDefaultValue("near").getFloat();
 		const auto bottom = getDefaultValue("bottom").getFloat();
@@ -1235,45 +1341,56 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 
 		const auto sum = getDefaultValue("top").getFloat() +
 		                 getDefaultValue("bottom").getFloat();
-		// const auto D    = mat[2][1];
-		const auto newB = mat[1][1];
+		const auto newA = mat[1][1];
 
-		if (newB != 0.0f)
+		if (newA != 0.0f)
 		{
-			const auto newBot = (sum * newB - 2.0f * near) / (2 * newB); // newL =
-			const auto newTop = sum - newB;
+			const auto newBot = (sum * newA - 2.0f * near) / (2.0f * newA); // newL =
+			const auto newTop = sum - newBot;
 
 			setDefaultValueNoUpdate("bottom", newBot); // newL =
 			setDefaultValueNoUpdate("top", newTop);    // newR =
 		}
 	}
-	else if (coords == glm::ivec2(2, 1))
+	else if (coords == glm::ivec2(2, 1)) // Changing offset in y axis (B), scale is fixed (A)
 	{
 		const auto h = getDefaultValue("top").getFloat() -
 		               getDefaultValue("bottom").getFloat();
 
-		const auto newBot = (mat[2][1] - 1) * h / 2.0f; // newL = (newC-1) * w / 2
+		const auto newBot =
+		    (mat[2][1] - 1.0f) * h / 2.0f; // newL = (newC-1) * w / 2
 
 		setDefaultValueNoUpdate("bottom", newBot);  // newL = (newC-1) * w / 2
 		setDefaultValueNoUpdate("top", newBot + h); // newR = newL + w
 	}
 
-	else if (coords == glm::ivec2(2, 2))
+	// ****************************** from
+	// ROW 2 - Z
+	else if (coords == glm::ivec2(2, 2)) // Changing scale in Z-axis (A), 
+                                             // offset is fixed (B)
 	{
-		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
-		auto newFar = mat[3][2] / (mat[2][2] + 1.0f);  // B / (newA + 1)
-		setDefaultValueNoUpdate("near", newNear);
-		setDefaultValueNoUpdate("far", newFar);
-	}
-	else if (coords == glm::ivec2(3, 2))
-	{
-		auto newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
-		auto newFar = mat[3][2] / (mat[2][2] + 1.0f);  // newB / (A + 1)
-		setDefaultValueNoUpdate("near", newNear);
-		setDefaultValueNoUpdate("far", newFar);
-	}
+		float newNear = 1.0f, newFar = 10.0f;
+		if (val != 1.0f)
+			newNear = mat[3][2] / (mat[2][2] - 1.0f); // B / (newA - 1)
+		if (val != -1.0f)
+			newFar = mat[3][2] / (mat[2][2] + 1.0f); // B / (newA + 1)
 
-	///--------------------------to
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
+	// ****************************** to
+
+	else if (coords == glm::ivec2(3, 2)) // Changing offset in Z-axis (B), 
+                                             // scale is fixed (A)
+	{
+		float newNear = 1.0f, newFar = 10.0f;
+		if (val != 1.0f)
+			newNear = mat[3][2] / (mat[2][2] - 1.0f); // newB / (A - 1)
+		if (val != -1.0f)
+			newFar = mat[3][2] / (mat[2][2] + 1.0f); // newB / (A + 1)
+		setDefaultValueNoUpdate("near", newNear);
+		setDefaultValueNoUpdate("far", newFar);
+	}
 
 	return ValueSetResult{};
 }
@@ -1286,10 +1403,12 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 	auto matL = glm::mat3(mat);       // linear 3x3 part
 	auto matT = glm::transpose(matL); // linear 3x3 part - rows to columns
 
+	// check the basic matrix values 0, 1, -1, any
 	// check (0,0,0,1) in the last row only
 	bool result = validateValues(g_LookAtMask, mat); // rotation + translation
 
-	// check the Linear part -
+	// matrix inner consistency
+	// check the Linear part - must have normalized rows }
 	result =
 	    result && Math::eq(glm::determinant(mat), 1.0f); // linearly independent
 	result = result && Math::eq(glm::length2(matT[0]),
@@ -1297,6 +1416,7 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 	result = result && Math::eq(glm::length2(matT[1]), 1.0f);
 	result = result && Math::eq(glm::length2(matT[2]), 1.0f);
 
+	// consistency of defaults
 	glm::vec3 eye = getDefaultValue("eye").getVec3();
 	glm::vec3 center = getDefaultValue("center").getVec3();
 	glm::vec3 up = getDefaultValue("up").getVec3();
@@ -1305,7 +1425,6 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 	float directionSize = glm::dot(direction, direction);
 	float upSize = glm::dot(up, up);
 
-	// check the definition parameters
 	// check, if center is different than eye or up-vector is not zero,
 	if ((directionSize == 0.0f) || (upSize == 0.0f))
 	{
@@ -1320,12 +1439,13 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 		result = result && (glm::dot(direction, up) != 1.0f); // not parallel
 	}
 
-	// expected matrix - this is a more rigid test
-	// - good for resetMatrixFromDefaults
-	// - does not allow to edit the matrix in Full mode
-	// todo LookaAt: use the rigid test or not?
-	// auto expectedMat = glm::lookAt(eye, center, up);
-	// result           = result && Math::eq(expectedMat, mat);
+	// consistency defaults <--> matrix
+	//  expected matrix - this is a more rigid test
+	//  - good for resetMatrixFromDefaults
+	//  - does not allow to edit the matrix in Full mode
+	//  todo LookaAt: use the rigid test or not?
+	auto expectedMat = glm::lookAt(eye, center, up);
+	result = result && Math::eq(expectedMat, mat);
 
 	return result;
 }

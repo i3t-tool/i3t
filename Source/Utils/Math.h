@@ -9,28 +9,28 @@
 //---------------------------------------------------------------------------
 #pragma once
 
-#include <glm/gtx/norm.hpp>
+#include <iostream>
 #include <random>
 #include <vector>
 
 #include "glm/glm.hpp"
 #include "glm/gtx/matrix_interpolation.hpp"
+#include "glm/gtx/norm.hpp"
 
 #include "Core/Defs.h"
 
 namespace Math
 {
+static constexpr float FLT_EPSILON_10 = 10.0f * FLT_EPSILON; // 1.192093 E-6
 
 FORCE_INLINE bool eq(const float lhs, const float rhs,
-                     const float epsilon = 0.000001f)
+                     const float epsilon = FLT_EPSILON_10)
 {
-	// static constexpr float epsilon = 0.000001f;
-
 	return abs(lhs - rhs) < epsilon;
 }
 
-FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3 rhs,
-                     const float epsilon = 0.000001f)
+FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs,
+                     const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -43,8 +43,8 @@ FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3 rhs,
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4 rhs,
-                     const float epsilon = 0.000001f)
+FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs,
+                     const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -57,8 +57,8 @@ FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4 rhs,
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat rhs,
-                     const float epsilon = 0.000001f)
+FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs,
+                     const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -71,15 +71,21 @@ FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat rhs,
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4 rhs,
-                     const float epsilon = 0.000001f)
+FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs,
+                     const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 4; ++i)
 	{
 		for (int j = 0; j < 4; ++j)
 		{
+			if (i == 1 && j == 2)
+				std::cerr << "lhs[" << i << "], [" << j << "] = " << lhs[i][j]
+				          << " != rhs[][] = " << rhs[i][j] << std::endl;
 			if (!Math::eq(lhs[i][j], rhs[i][j], epsilon))
 			{
+				std::cerr << "lhs[" << i << "], [" << j << "] = " << lhs[i][j]
+				          << " != rhs[][] = " << rhs[i][j] << " return false"
+				          << std::endl;
 				return false;
 			}
 		}

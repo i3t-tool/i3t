@@ -6,6 +6,8 @@
 
 using namespace Core;
 
+//--- Ortho -------------------------------------------------------------
+
 TEST(OrthoProjTest, ShouldContainBeOk)
 {
 	auto ortho = Builder::createTransform<ETransformType::Ortho>();
@@ -20,6 +22,31 @@ TEST(OrthoProjTest, ShouldContainBeOk)
 	auto resultMat = ortho->getData().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
+}
+
+TEST(OrthoProjTest, Problem_Set22_changes00)
+{
+	auto ortho = Builder::createTransform<ETransformType::Ortho>();
+	auto mat = ortho->getData().getMat4();
+	ortho->initDefaults();
+
+	auto left = ortho->getDefaultValue("left").getFloat();
+	auto right = ortho->getDefaultValue("right").getFloat();
+	auto bottom = ortho->getDefaultValue("bottom").getFloat();
+	auto top = ortho->getDefaultValue("top").getFloat();
+	auto near = ortho->getDefaultValue("near").getFloat();
+	auto far = ortho->getDefaultValue("far").getFloat();
+
+	auto expectedMat = glm::ortho(left, right, bottom, top, near, far);
+	auto resultMat = ortho->getData().getMat4();
+	EXPECT_EQ(expectedMat, resultMat);
+
+	auto mat00 = mat[0][0];
+	auto mat22 = mat[2][2];
+	ortho->setValue(mat22 + 0.1f, glm::ivec2(2, 2)); // changing zscale
+	auto mat00_after = mat[0][0];
+
+	EXPECT_EQ(mat00, mat00_after); // should not change xscale
 }
 
 //--- Perspective -------------------------------------------------------------
@@ -82,7 +109,7 @@ TEST(FrustumTest, ShouldBeOk)
 	EXPECT_EQ(expectedMat, resultMat);
 }
 
-TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk)
+TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_NoSynergies)
 {
 	auto frustum = Builder::createTransform<ETransformType::Frustum>()
 	                   ->as<TransformImpl<ETransformType::Frustum>>();
@@ -93,6 +120,8 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk)
 	float top = generateFloat();
 	float near = generateFloat();
 	float far = generateFloat();
+
+	frustum->disableSynergies();
 
 	frustum->setDefaultValue("left", left);
 	EXPECT_EQ(left, frustum->getDefaultValue("left").getFloat());
@@ -114,6 +143,51 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk)
 
 	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far),
 	          frustum->getData().getMat4());
+}
+
+TEST(FrustumTest, GettersAndSettersShouldBeOk_Synergies)
+{
+	auto frustum = Builder::createTransform<ETransformType::Frustum>()
+	                   ->as<TransformImpl<ETransformType::Frustum>>();
+
+	float left = generateFloat();
+	float right = generateFloat();
+	float bottom = generateFloat();
+	float top = generateFloat();
+	float near = generateFloat();
+	float far = generateFloat();
+
+	frustum->enableSynergies();
+
+	frustum->setDefaultValue("left", left);
+	EXPECT_EQ(left, frustum->getDefaultValue("left").getFloat());
+	EXPECT_EQ(-left, frustum->getDefaultValue("right").getFloat());
+
+	// frustum->setDefaultValue("right", right);
+	// EXPECT_EQ(right, frustum->getDefaultValue("right").getFloat());
+	// EXPECT_EQ(-right, frustum->getDefaultValue("left").getFloat());
+	// todo - resetMatrixFromDefaults should have a parameter to allow full
+	// symmetry
+
+	frustum->setDefaultValue("bottom", bottom);
+	EXPECT_EQ(bottom, frustum->getDefaultValue("bottom").getFloat());
+	EXPECT_EQ(-bottom, frustum->getDefaultValue("top").getFloat());
+
+	// frustum->setDefaultValue("top", top);
+	// EXPECT_EQ(top, frustum->getDefaultValue("top").getFloat());
+	// EXPECT_EQ(-top, frustum->getDefaultValue("bottom").getFloat());
+	// todo - resetMatrixFromDefaults should have a parameter to allow full
+	// symmetry
+
+	frustum->setDefaultValue("near", near);
+	EXPECT_EQ(near, frustum->getDefaultValue("near").getFloat());
+
+	frustum->setDefaultValue("far", far);
+	EXPECT_EQ(far, frustum->getDefaultValue("far").getFloat());
+
+	// mixture of default values
+	// EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far),
+	// frustum->getData().getMat4());
 }
 
 //--- Look At -----------------------------------------------------------------

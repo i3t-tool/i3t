@@ -2,6 +2,7 @@
 
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Utils.h"
+#include "Utils/Math.h"
 
 #include "../Utils.h"
 #include "Generator.h"
@@ -300,27 +301,69 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
 	}
 }
 
+/**
+ * 1. start with identity -> should be valid
+ * 2. disable Synergies - the other three rotation values remain unchanged
+ * 3. set one of them to different value - the other three remain  unchanged ->
+ *    invalid
+ * 4. enable synergies - all four rotation values should be changed
+ * 5. set one of them to different value - the other three must be updated ->
+ *    valid
+ *
+ * \code
+ *   1      0       0       0
+ *   0    cos(T)  -sin(T)   0
+ *   0   >sin(T)<  cos(T)   0
+ *   0      0       0       1
+ * \endcode
+ */
+
 TEST(
     EulerXTest,
-    DISABLED_SynergiesDisabled_OneCorrectValue_InvalidState__WRONG_ON_GITLAB) // fails
+    DISABLED_Synergies__Disabled_Invalid__Enabled_Valid__WRONG_ON_GITLAB) // fails
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
+
+	EXPECT_TRUE(rot->isValid()); // should be the identity
 
 	// noSynergies => single value invalidates the matrix
 	rot->disableSynergies();
 
-	auto wrongVal = generateFloat(-1.0f, 1.0f);
-	EXPECT_TRUE(Math::withinInterval(wrongVal, -1.0f, 1.0f));
+	// auto wrongVal = generateFloat(-1.0f, 1.0f);
+	// EXPECT_TRUE(Math::withinInterval(wrongVal, -1.0f, 1.0f));
+
+	auto wrongVal = 0.5f; // sin(60degs)
 
 	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
+	std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2]
+	          << ", value should be " << wrongVal << std::endl;
+	std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1]
+	          << ", value should be " << 0.0f << std::endl;
+	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][2], wrongVal));
+	EXPECT_TRUE(
+	    Math::eq(rot->getData().getMat4()[1][1],
+	             1.0f)); // was identity, no synergies => should be unchanged
+
+	std::cerr << "--------------------- START WRONG TEST -------------------"
+	          << std::endl;
 	EXPECT_FALSE(rot->isValid()); // todo PF gitlab returns valid for a corrupted
 	                              // matrix - that is wrong
+	std::cerr << "--------------------- END WRONG TEST ---------------------"
+	          << std::endl;
 
-	// synergies repair the matrix
+	// synergies repair the matrix - update the angle
 	rot->enableSynergies();
 	setValue_expectOk(rot, wrongVal,
 	                  {1, 2}); // synergies will use this as sin(angle)
+
+	std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2]
+	          << ", value should be " << wrongVal << std::endl;
+	std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1]
+	          << ", value should be " << -wrongVal << std::endl;
+
+	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][2], wrongVal));  //  sin
+	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[2][1], -wrongVal)); // -sin
 	EXPECT_TRUE(rot->isValid());
 }
 
@@ -332,7 +375,7 @@ TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
 
 	rot->unlock();
 
-	setValue_expectOk(rot, 2.0f, {1, 0}); // non-editable value
+	setValue_expectOk(rot, 2.0f, {0, 2}); // non-editable value - should be 0
 
 	EXPECT_FALSE(rot->isValid());
 }
@@ -348,7 +391,6 @@ TEST(EulerXTest, Unlocked_InvalidState__WRONG_ON_GITLAB)
 //	setValue_expectOk(rot, glm::sin(rads), {2, 3}); //
 //
 //	EXPECT_FALSE(rot->isValid());
-//	EXPECT_EQ(ETransformState::Invalid, rot->isValid());
 //}
 
 TEST(EulerXTest, SetMatrixShouldBeValid)

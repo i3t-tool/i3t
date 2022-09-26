@@ -1,0 +1,30 @@
+operators:
+  - id: 3
+    type: Model
+    position: [965, 314]
+transforms:
+  - id: 0
+    type: Translation
+    position: [546, 343]
+    value: [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 1.6, 0, 1]]
+    synergies: false
+    locked: true
+    defaults: {translation: [0, 1.6, 0]}
+  - id: 1
+    type: EulerY
+    position: [716, 343]
+    value: [[-0.8, 0, -0.6, 0], [0, 1, 0, 0], [0.6, 0, -0.8, 0], [0, 0, 0, 1]]
+    synergies: true
+    locked: true
+    defaults: {rotation: 2.4980915}
+sequences:
+  - id: 2
+    type: Sequence
+    position: [477, 315]
+    transforms: [0, 1]
+cameras:
+    {}
+screens:
+    {}
+edges:
+  - [2, 0, 3, 0]

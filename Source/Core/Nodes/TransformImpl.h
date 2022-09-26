@@ -1,3 +1,102 @@
+/**
+ * \file Source/Core/Nodes/TransformImpl.h
+
+ * \author Martin Herich, hericmar@fel.cvut.cz and
+ *         Petr Felkel, felkepet@fel.cvut.cz (updates)
+ *
+ * \brief Implementation of individual transformation functionality
+ *
+ * Transform node
+ * ==============
+ * Each transform node represents a 4x4 transformation.
+ * Each has two types of data, describing them:
+ *    1. the 4x4 matrix itself
+ *       (called the inner value and shown in the Full LOD)
+ *    2. the value used in glm to define the transformation
+ *       (called default values and shown in SetValues LOD)
+ *
+ * Changing of data in Full LOD are handled by setValue methods specific for
+ each transform.
+ * Changing of data in Set Values LOD are handled by a global
+ * setDefault("name", value) followed by resetMatrixFromDefaults()
+ *
+ * Some transformations have direct mapping between matrix and Default values.
+ * This mapping is handled in setValues():
+ * - the *float* and *vector* parameters set directly the default parameter and
+ *     create a fresh, new matrix
+ * - the version setting a single *value on given coordinates* are more
+ *     complicated and depend on lock and synergies.
+ *   - Setting an editable value in a *locked matrix* does not change the
+ *        matrix validity and, therefore, also sets the default value.
+ *   - *Unlocked matrix* setting may invalidate the matrix. Therefore only
+ *        the editable values can also set the default value,
+ *        the other values change only the matrix and invalidate it.
+ * - problem remains for *matrix* parameter
+ *        Setup passes editable value only - the non-editable parameters
+ *           remain unchanged!
+ *        It uses the setValue of each matrix element,
+ *           but DOES NOT SET-UP the DEFAULTS
+ *        \todo - where is it used?
+ *        World/Components/FreeManipulator.cpp::561
+ *        State/SerializationVisitor.cpp:445
+ *				Source/Core/Nodes/TransformImpl.h/ I3T_TRANSFORM_CLONE macro
+ *
+ * Test setValue must check:
+ *    - float  - setDefault + update matrix - respect synergies
+ *		- vec3   - setDefault + update matrix - respect synergies
+ *		- vec4   - calls vec3 - OK
+ *		- mat    - selective copy of values respecting TransformMask
+ *		         - not clear, if it clears the rest and respects synergies
+ *		- (float, coord)
+ *		         - set single unlocked matrix element
+ *		         - when synergies - may update other synergistic elements
+ *		                          - must update defaults
+ *		         - must not change defaults and the matrix when changing
+ *		              non-synergistic element
+ *
+ *  Work in progress
+ *	----------------
+ *
+| TransformType    | done | mapping Matrix to Default (FULL->SetValues)| Default->Matrix (menu value/reset)                 |
+ * | -----------------|------|----------------------------------------|--------------------------------------------------------|
+ * |  0 Free          | ok   | no Defaults => no InitDefaults & reset | resetMatrixFromDefaults sets identity   DONE           |
+ * |  1 Translate     | ok   | direct   - done in setValue            | own initDefaults(), resetMatrixFromDefaults use default|
+ * |  2 EulerX        | ok   | indirect                               |                                                        |
+ * |  3 EulerY        | ok   | indirect                               |                                                        |
+ * |  4 EulerZ        | ok   | indirect                               |                                                        |
+ * |  5 Scale         | ok   | direct                                 |                                                        |
+ * |  6 AxisAngle rot | no synergies |                                |                                                        |
+ * |  7 Quat          | ok   |                                        |                                                        |
+ * |  8 Ortho         | todo | indirect                               |                                                        |
+ * |  9 Perspective   | OK   | direct                                 |                                                        |
+ * | 10 Frustum       | todo | indirect                               |                                                        |
+ * | 11 LookAt        | ok   | no mapping                             |  isValid - setValue without test, moved to transform |
+ *
+ * LookAt 	- isValid checks the linear part of the matrix + unit axes and
+ *                determinant 
+ * For Table of synergies see Transform.h:279
+ *
+ * What should be tested
+ * ---------------------
+ *	- setValue(float val)              // sets matrix and single float default
+ *	                                      (such as rotation angle)
+ *	- setValue(const glm::vec3& vec)   // sets matrix and single vec3 default
+ *	                                      (such as rot. axis or scale vector
+ *	                                      - than it must follow the synergies
+ *	- setValue(const glm::vec4& vec)   // calls setValue(vec3)
+ *	- setValue(float val, glm::ivec2 coords);  // sets a single matrix value
+ *                                                - the most complicated set
+ *	                                   //    must check lock and synergies
+ *	                                   //       and set the default if possible
+ *	- setValue(glm::mat4& m)           // partially copies the given matrix
+ *	                                      - the editable coords only
+ *	\todo:
+ *	  - setValue(mat) does not respect the synergies - It is used in
+ *	    FreeManipulator, SerializationVisitor, and I3T_TRANSFORM_CLONE macro.
+ *	- setDefaultValue - now just sets something, but omits the synergies.
+ *	    For quat it is done in resetMatrixFromDefault().
+ *	    Is it the right place?
+ */
 #pragma once
 
 #include "Transform.h"

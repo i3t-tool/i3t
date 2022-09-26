@@ -4,7 +4,7 @@
 #include "World/RenderTexture.h" // FBO
 
 #undef TEST
-#define TEST1
+//#define TEST1
 
 const pgr::MeshData* g_meshes[] = { // todo - remove
     &unitcubeMesh, &three_axisMesh};
