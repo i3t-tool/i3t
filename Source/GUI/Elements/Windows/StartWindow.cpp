@@ -68,25 +68,27 @@ void StartWindow::reloadTutorials()
 	{
 		path.erase(0, 1);
 	}
-	/* \todo NOT work */
-	//  //path.make_preferred(); // unifies the directory separator for this
-	//  platform Log::info("Searching for tutorials in: " + path); auto
-	//  dir_iterator = {""}; /*
-	//  std::filesystem::recursive_directory_iterator(path); \todo JH not work*/
-	//  for (auto& entry : dir_iterator) {
-	//    if (entry.path().extension() == ".tut") {
-	//      std::string pathString = entry.path().string();
-	//      Log::info(pathString);
-	//    	// Load header part of tutorial
-	//      if (std::shared_ptr<TutorialHeader> header =
-	//      TutorialLoader::loadTutorialHeader(pathString); header) {
-	//        m_tutorial_headers.push_back(std::move(header));
-	//      }
-	//      else {
-	//        LOG_ERROR("Tutorial header " + pathString + " not loaded." );
-	//      }
-	//    }
-	//  }
+	Log::info("Searching for tutorials in: " + path);
+	// For all files in path recursively
+	for (auto& entry :
+	     std::filesystem::recursive_directory_iterator(path))
+	{
+		if (entry.path().extension() == ".tut")
+		{
+			std::string pathString = entry.path().string();
+			Log::info(pathString);
+			// Load header part of tutorial
+			if (std::shared_ptr<TutorialHeader> header =
+			TutorialLoader::loadTutorialHeader(pathString); header)
+			{
+				m_tutorial_headers.push_back(std::move(header));
+			}
+			else
+			{
+				LOG_ERROR("Tutorial header " + pathString + " not loaded." );
+			}
+		}
+	}
 }
 
 void StartWindow::render()
