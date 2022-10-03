@@ -145,7 +145,7 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_NoSynergies)
 	          frustum->getData().getMat4());
 }
 
-TEST(FrustumTest, GettersAndSettersShouldBeOk_Synergies)
+TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_Synergies)
 {
 	auto frustum = Builder::createTransform<ETransformType::Frustum>()
 	                   ->as<TransformImpl<ETransformType::Frustum>>();
