@@ -1,0 +1,34 @@
+{
+  "resources": [
+    {
+      "name": "Bunny",
+      "path": "Data/Models/Bunny.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Cube",
+      "path": "Data/Models/Cube.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Duck",
+      "path": "Data/Models/Duck.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Suzanne",
+      "path": "Data/Models/Suzanne.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Teapot",
+      "path": "Data/Models/Teapot.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "ModelShader",
+      "path": "Data/Shaders/Model.glsl",
+      "type": "Shader"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 #include "WorkspaceModel.h"
 
+#include "Core/Resources/ResourceManager.h"
+
 #include "World/HardcodedMeshes.h"
 #include "World/RenderTexture.h" // FBO
 
@@ -16,8 +18,8 @@ const float angleX = 30.0; // degree
 const float angleY = 55.0; // degree
 
 WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
-    : WorkspaceNodeWithCoreDataWithPins(
-          diwne, Core::Builder::createNode<ENodeType::Model>()),
+    : WorkspaceNodeWithCoreDataWithPins(diwne,
+                                        Core::Builder::createModelNode()),
       m_axisOn(false), m_showModel(false)
 {
 	init();
@@ -42,7 +44,6 @@ WorkspaceModel::~WorkspaceModel()
 
 void WorkspaceModel::popupContent_axis_showmodel()
 {
-
 	if (ImGui::MenuItem(
 	        fmt::format("Switch axis {}", m_axisOn ? "off" : "on").c_str()))
 	{
@@ -52,6 +53,16 @@ void WorkspaceModel::popupContent_axis_showmodel()
 	        fmt::format("{} model", m_showModel ? "Hide" : "Show").c_str()))
 	{
 		m_showModel = !m_showModel;
+	}
+
+	for (const auto& [ID, model] :
+	     Core::ResourceManager::instance().defaultModels())
+	{
+		if (ImGui::MenuItem(ID.c_str()))
+		{
+			m_nodebase->as<Core::Model>()->setMesh(const_cast<Core::MeshNode*>(
+			    Core::ResourceManager::instance().getModel(ID)));
+		}
 	}
 }
 
@@ -97,6 +108,13 @@ void WorkspaceModel::init()
 	ValueSetResult result = m_nodebase->setValue(static_cast<void*>(
 	    object)); // GameObject object =
 	              // static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
+
+	/// \todo This is temporary code
+	/*
+	const auto modelNode = m_nodebase->as<Core::Model>();
+	modelNode->setMesh(const_cast<Core::MeshNode*>(
+	    Core::ResourceManager::instance().getModel("Cube")));
+	    */
 }
 
 bool WorkspaceModel::middleContent()

@@ -6,6 +6,14 @@
 namespace pgr {
 namespace sg {
 
+/// definitions for singleton classes
+#define SINGLETON_DEF(cl) \
+cl* cl::m_instance = 0; \
+cl* cl::Instance() { \
+	if(m_instance == 0) m_instance = new cl(); \
+	return m_instance; \
+}
+
 SINGLETON_DEF(TextureManager)
 SINGLETON_DEF(MeshManager)
 SINGLETON_DEF(ShaderManager)

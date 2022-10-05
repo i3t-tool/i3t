@@ -15,15 +15,15 @@ MeshNode::MeshNode(const std::string &name, SceneNode* parent):
 
 MeshNode::~MeshNode() {
   glDeleteVertexArrays( 1, &m_vertexArrayObject );
-  if(m_program)
+  if (m_program)
     ShaderManager::Instance()->release("MeshNode-shader");
 }
 
 void MeshNode::loadProgram() {
-  if(m_program)
+  if (m_program)
     ShaderManager::Instance()->release("MeshNode-shader");
 
-  if(!ShaderManager::Instance()->exists("MeshNode-shader")) {
+  if (!ShaderManager::Instance()->exists("MeshNode-shader")) {
     GLuint shaderList[] = {
       pgr::createShaderFromFile(GL_VERTEX_SHADER,   pgr::frameworkRoot() + "data/sceneGraph/MeshNode.vert"),
       pgr::createShaderFromFile(GL_FRAGMENT_SHADER, pgr::frameworkRoot() + "data/sceneGraph/MeshNode.frag"),
@@ -39,11 +39,11 @@ void MeshNode::loadProgram() {
 }
 
 void MeshNode::setGeometry(MeshGeometry* mesh_p) {
-  if(m_program == 0) {
+  if (m_program == 0) {
     loadProgram();
   }
 
-  if(mesh_p == NULL)
+  if (mesh_p == NULL)
     return;
 
   m_mesh = mesh_p;
@@ -53,14 +53,14 @@ void MeshNode::setGeometry(MeshGeometry* mesh_p) {
   glEnableVertexAttribArray(m_program->m_pos);
   glVertexAttribPointer(m_program->m_pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  if(m_mesh->hasNormals() == true) {
+  if (m_mesh->hasNormals() == true) {
     glBindBuffer(GL_ARRAY_BUFFER, mesh_p->getNormalBuffer());
     glEnableVertexAttribArray(m_program->m_normal);
     glVertexAttribPointer(m_program->m_normal, 3, GL_FLOAT, GL_FALSE, 0, 0);
   }
 
   // todo: up to 4 texture coordinates can be there
-  if(m_mesh->hasTexCoords() == true) {
+  if (m_mesh->hasTexCoords() == true) {
     glBindBuffer(GL_ARRAY_BUFFER, mesh_p->getTexCoordBuffer());
     glEnableVertexAttribArray(m_program->m_texCoord);
     glVertexAttribPointer(m_program->m_texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);   //(str)
@@ -71,7 +71,8 @@ void MeshNode::setGeometry(MeshGeometry* mesh_p) {
   glBindVertexArray( 0 );
 }
 
-void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix) {
+void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix) const
+{
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
   // inherited draw - draws all children
@@ -98,7 +99,7 @@ void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_
   // draw all submeshes = all material groups from SubMeshList
   MeshGeometry::SubMesh* subMesh_p = NULL;
 
-  for(unsigned mat=0; mat<m_mesh->getSubMeshCount(); mat++) {
+  for (unsigned mat=0; mat<m_mesh->getSubMeshCount(); mat++) {
 
     subMesh_p = m_mesh->getSubMesh(mat);
 

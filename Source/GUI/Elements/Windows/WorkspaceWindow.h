@@ -206,13 +206,21 @@ public:
 /*! \class class for Workspace window object
         \brief Store everything what Workspace window need
 */
-class WorkspaceWindow : public IWindow
+class WorkspaceWindow : public IWindow, public IStateful
 {
 public:
 	I3T_WINDOW(WorkspaceWindow)
 
 	explicit WorkspaceWindow(bool show);
 	~WorkspaceWindow() override;
+
+	//
+
+	Memento getState() override;
+
+	void setState(const Memento& memento) override;
+
+	//
 
 	WorkspaceDiwne& getNodeEditor();
 
@@ -234,8 +242,34 @@ private:
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
 
+/// This function takes snapshot of current state.
 template <typename T>
 auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
 {
+	auto result = g_workspaceDiwne->addNodeToPosition<T>(position);
+
+	StateManager::instance().takeSnapshot();
+
+	return result;
+}
+
+template <typename T>
+auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
+{
 	return g_workspaceDiwne->addNodeToPosition<T>(position);
+}
+
+//
+
+bool connectNodesNoSave(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin);
+
+inline bool connectNodes(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
+{
+	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+	if (result)
+	{
+		StateManager::instance().takeSnapshot();
+	}
+
+	return result;
 }

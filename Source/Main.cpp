@@ -161,25 +161,25 @@ int main(int argc, char* argv[])
 	Config::WORKING_DIRECTORY = I3T_PROJECT_ROOT;
 #endif
 
-	std::unordered_map<int, int> map;
-	map[10] = 20;
-
 	// init the logging library
 	INIT_LOGGER(argc, argv);
 
 	LOG_INFO("Working directory is {}.", Config::WORKING_DIRECTORY);
 
+	/// \todo Remove!
 	///   - seek command line parameters for config files
 	/* True if the .dcgf file was given as a command line parameter and must be
 	 * loaded. */
 	bool dcfgFlag = false;
 	std::string dcfg;
 
+	/// \todo Remove!
 	/* True to load the screen file, the .scn file was given as a command line
 	 * parameter and must be loaded.*/
 	bool scnFlag = false;
 	std::string scn;
 
+	/// \todo Remove!
 	for (int i = 1; i < argc; i++)
 	{
 		if (Config::getFileExtension(argv[i]) == "scn")
@@ -194,6 +194,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	/// \todo Remove!
 	///   - load the configuration file .dcfg
 	if (dcfgFlag)
 		Config::loadFromFile(dcfg);
@@ -214,14 +215,9 @@ int main(int argc, char* argv[])
 	// Get application instance.
 	Application app;
 
-	// I. Create GLFW window.
+	/// \todo Move this to Application::init function.
+	// I. Create GLFW window and OpenGL context.
 	app.initWindow();
-
-	// II. PGR and OpenGL initializing.
-	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
-	{
-		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
-	}
 
 	// Initialize all modules.
 	app.init();

@@ -1,12 +1,21 @@
 #pragma once
 
-#include "Memento.h"
+#include "rapidjson/document.h"
+
+using Memento = rapidjson::Document;
 
 class IStateful
 {
 public:
-	virtual Memento getState() = 0;
-	virtual void setState(const Memento&) = 0;
+	virtual Memento getState()
+	{
+		auto memento = Memento{};
+		memento.SetObject();
 
-	virtual void onStateChange(const std::string& winTitlePostfix) = 0;
+		return memento;
+	};
+
+	virtual void setState(const Memento&) {}
+
+	virtual void onStateChange() {}
 };

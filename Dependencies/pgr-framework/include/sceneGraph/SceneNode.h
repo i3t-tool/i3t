@@ -41,7 +41,7 @@ public:
   virtual void update(double elapsed_time);
 
   /// calls draw on child nodes
-  virtual void draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix);
+  virtual void draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix) const;
 
   const SceneNode* parentNode() const { return m_parent; }
   SceneNode* parentNode() { return m_parent; }
@@ -71,8 +71,8 @@ protected:
   SceneNode*  m_parent;
   Children    m_children;
   double      m_time;  // updated in update()
-  glm::mat4   m_global_mat; ///< final global model matrix, calculated in update()
-  glm::mat4   m_local_mat;  ///< local model matrix, derived transformation nodes should calculate it
+  glm::mat4   m_global_mat = glm::mat4(1.0f); ///< final global model matrix, calculated in update()
+  glm::mat4   m_local_mat = glm::mat4(1.0f);  ///< local model matrix, derived transformation nodes should calculate it
 };
 
 } // end namespace sg

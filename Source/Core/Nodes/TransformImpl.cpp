@@ -1,12 +1,12 @@
 #include "TransformImpl.h"
 
-#include <math.h>
 #include "Utils/Math.h"
+#include <math.h>
 
 //#include "pgr.h"
+#include "Utils/Format.h"
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp> // Euler angle rotations
-#include "Utils/Format.h"
 
 #ifndef M_PI
 /// define Pi for compatibility issues (MSVC vs GCC)
@@ -964,8 +964,8 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val,
 	auto& mat = m_internalData[0].getMat4();
 
 	// ROW 0
-	if (coords == glm::ivec2(0, 0)) // fix B, changing A 
-                                        // --- changing scale => changing width
+	if (coords == glm::ivec2(0, 0)) // fix B, changing A
+	                                // --- changing scale => changing width
 	{
 		const auto left = getDefaultValue("left").getFloat();
 		const auto right = getDefaultValue("right").getFloat();
@@ -1002,8 +1002,8 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val,
 	}
 
 	// ROW 1
-	if (coords == glm::ivec2(1, 1)) // fix B, changing A 
-                                        // --- changing scale => changing height
+	if (coords == glm::ivec2(1, 1)) // fix B, changing A
+	                                // --- changing scale => changing height
 	{
 		const auto bottom = getDefaultValue("bottom").getFloat();
 		const auto top = getDefaultValue("top").getFloat();
@@ -1332,8 +1332,8 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 	}
 
 	// ROW 1 - Y
-	else if (coords == glm::ivec2(1, 1)) // Changing scale in y axis (A), 
-                                             // offset is fixed (B)
+	else if (coords == glm::ivec2(1, 1)) // Changing scale in y axis (A),
+	                                     // offset is fixed (B)
 	{
 		const auto near = getDefaultValue("near").getFloat();
 		const auto bottom = getDefaultValue("bottom").getFloat();
@@ -1352,7 +1352,9 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 			setDefaultValueNoUpdate("top", newTop);    // newR =
 		}
 	}
-	else if (coords == glm::ivec2(2, 1)) // Changing offset in y axis (B), scale is fixed (A)
+	else if (coords ==
+	         glm::ivec2(2,
+	                    1)) // Changing offset in y axis (B), scale is fixed (A)
 	{
 		const auto h = getDefaultValue("top").getFloat() -
 		               getDefaultValue("bottom").getFloat();
@@ -1366,8 +1368,8 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 
 	// ****************************** from
 	// ROW 2 - Z
-	else if (coords == glm::ivec2(2, 2)) // Changing scale in Z-axis (A), 
-                                             // offset is fixed (B)
+	else if (coords == glm::ivec2(2, 2)) // Changing scale in Z-axis (A),
+	                                     // offset is fixed (B)
 	{
 		float newNear = 1.0f, newFar = 10.0f;
 		if (val != 1.0f)
@@ -1380,8 +1382,8 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 	}
 	// ****************************** to
 
-	else if (coords == glm::ivec2(3, 2)) // Changing offset in Z-axis (B), 
-                                             // scale is fixed (A)
+	else if (coords == glm::ivec2(3, 2)) // Changing offset in Z-axis (B),
+	                                     // scale is fixed (A)
 	{
 		float newNear = 1.0f, newFar = 10.0f;
 		if (val != 1.0f)

@@ -76,6 +76,7 @@ enum class EValueState
  */
 const std::string& valueTypeToString(EValueType type);
 
+/// \todo MH Add to the Core namespace.
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
@@ -97,6 +98,26 @@ public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and
 	 * undefined value (a unit matrix) */
 	DataStore() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
+
+	explicit DataStore(float val) : opValueType(EValueType::Float)
+	{
+		m_value = val;
+	}
+
+	explicit DataStore(const glm::vec3& val) : opValueType(EValueType::Vec3)
+	{
+		m_value = val;
+	}
+
+	explicit DataStore(const glm::vec4& val) : opValueType(EValueType::Vec4)
+	{
+		m_value = val;
+	}
+
+	explicit DataStore(const glm::mat4& val) : opValueType(EValueType::Matrix)
+	{
+		m_value = val;
+	}
 
 	explicit DataStore(EValueType valueType);
 
@@ -131,7 +152,11 @@ public:
 
 	[[nodiscard]] void* getPointer() const { return std::get<void*>(m_value); }
 
+	//
+
 	template <typename T> void setValue(T&& val) { m_value = val; }
+
+	void setValue(const DataStore& other) { *this = other; }
 };
 
 namespace Core

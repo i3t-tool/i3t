@@ -10,6 +10,14 @@
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
 
+//
+#include "sceneGraph/ShaderProgram.h"
+
+#include "Core/Resources/Mesh.h"
+#include "Core/Resources/ResourceManager.h"
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+//
+
 #include <string.h>
 
 glm::mat4 World::perspective =
@@ -102,14 +110,14 @@ World::World()
 bool World::init()
 {
 	World::shader0 = loadShader(
-	    Config::getAbsolutePath("Data/shaders/simple-vs.glsl").c_str(),
-	    Config::getAbsolutePath("Data/shaders/simple-fs.glsl").c_str());
+	    Config::getAbsolutePath("Data/Shaders/simple-vs.glsl").c_str(),
+	    Config::getAbsolutePath("Data/Shaders/simple-fs.glsl").c_str());
 	World::shaderHandle = loadShader(
-	    Config::getAbsolutePath("Data/shaders/handle-vs.glsl").c_str(),
-	    Config::getAbsolutePath("Data/shaders/handle-fs.glsl").c_str());
+	    Config::getAbsolutePath("Data/Shaders/handle-vs.glsl").c_str(),
+	    Config::getAbsolutePath("Data/Shaders/handle-fs.glsl").c_str());
 	World::shaderProj = loadShader(
-	    Config::getAbsolutePath("Data/shaders/viewproj-vs.glsl").c_str(),
-	    Config::getAbsolutePath("Data/shaders/viewproj-fs.glsl").c_str());
+	    Config::getAbsolutePath("Data/Shaders/viewproj-vs.glsl").c_str(),
+	    Config::getAbsolutePath("Data/Shaders/viewproj-fs.glsl").c_str());
 
 	if (World::shader0.program * World::shaderHandle.program *
 	        World::shaderProj.program * World::shaderProj.program ==
@@ -134,6 +142,7 @@ bool World::init()
 
 	CHECK_GL_ERROR();
 	World::initializedRender = true;
+
 	return true;
 }
 void World::end()
@@ -304,6 +313,7 @@ void World::onStart()
 	this->started = true;
 	startRecursive(this->sceneRoot);
 }
+
 void World::onUpdate()
 {
 	float viewport[4];
@@ -320,7 +330,23 @@ void World::onUpdate()
 	updateRecursive(this->sceneRoot);
 
 	CHECK_GL_ERROR();
+
+	/// \todo New approach
+	/*
+	for (const auto& node : g_workspaceDiwne->m_workspaceCoreNodes)
+	{
+	  const auto maybeModel = std::dynamic_pointer_cast<WorkspaceModel>(node);
+	  if (maybeModel == nullptr)
+	  {
+	    continue;
+	  }
+
+	  const auto modelNode = (*maybeModel->getNodebase()).as<Core::Model>();
+	  modelNode->mesh()->draw(World::mainCamera, World::perspective);
+	}
+	 */
 }
+
 void World::onGUI() { GUIRecursive(this->sceneRoot); }
 
 Shader World::loadShader(const char* vs_name, const char* fs_name)

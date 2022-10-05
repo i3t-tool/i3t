@@ -254,7 +254,6 @@ enum class ENodeType
 	Vector4ToVector4,          // done JH
 	MatrixToMatrix,            // done JH
 	QuatToQuat,                // done SS
-	Model,
 
 	// Transform matrices "constructors"
 	MakeTranslation, // done SS
@@ -571,10 +570,8 @@ static const std::vector<Operation> operations = {
      1,
      {EValueType::Quat}},
 
-    {n(ENodeType::Model), "model", 1, matrixMulInput, 0, {}},
-
     // Transform matrices constructors
-    // PF: I have deleted the world "constructor" from all operatorNames
+    // PF: I have deleted the world constructor from all operators
     {n(ENodeType::MakeTranslation), "translate", 1, vector3Input, 1,
      matrixInput}, // translate
     {n(ENodeType::MakeEulerX), "eulerAngleX", 1, floatInput, 1, matrixInput,
@@ -645,6 +642,10 @@ inline const Operation g_cameraProperties = {
     "Camera", "camera",
     0,        {},
     3,        {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
+
+inline static const Operation g_modelProperties = {
+    "Model", "model", 1, matrixMulInput, 0, {},
+};
 
 //===-- TRANSFORMS --------------------------------------------------------===//
 
@@ -737,9 +738,9 @@ getTransformOperation(ETransformType type)
 	return g_transforms[static_cast<size_t>(type)];
 }
 
-FORCE_INLINE const Operation* getTransformProps(ETransformType type)
+FORCE_INLINE const TransformOperation* getTransformProps(ETransformType type)
 {
-	return &getTransformOperation(type).operation;
+	return &getTransformOperation(type);
 }
 
 FORCE_INLINE const std::map<std::string, EValueType>&

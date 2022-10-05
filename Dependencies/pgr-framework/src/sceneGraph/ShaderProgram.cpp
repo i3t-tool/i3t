@@ -44,17 +44,17 @@ MeshShaderProgram::MeshShaderProgram(GLuint prId):
 
 void MeshShaderProgram::initLocations() {
   // if the shader does not have this uniform - return -1
-  m_pos          =  glGetAttribLocation( m_programId, "position");
-  m_normal       =  glGetAttribLocation( m_programId, "normal");
-  m_texCoord     =  glGetAttribLocation( m_programId, "texCoord");
+  m_pos        = glGetAttribLocation(m_programId, "position");
+  m_normal     = glGetAttribLocation(m_programId, "normal");
+  m_texCoord   = glGetAttribLocation(m_programId, "texCoord");
 
-  m_ambient      =  glGetUniformLocation(m_programId, "material.ambient");
-  m_diffuse      =  glGetUniformLocation(m_programId, "material.diffuse");
-  m_specular     =  glGetUniformLocation(m_programId, "material.specular");
-  m_shininess    =  glGetUniformLocation(m_programId, "material.shininess");
+  m_ambient    = glGetUniformLocation(m_programId, "material.ambient");
+  m_diffuse    = glGetUniformLocation(m_programId, "material.diffuse");
+  m_specular   = glGetUniformLocation(m_programId, "material.specular");
+  m_shininess  = glGetUniformLocation(m_programId, "material.shininess");
 
-  m_texSampler   = glGetUniformLocation(m_programId, "texSampler");
-  m_useTexture   = glGetUniformLocation( m_programId, "useTexture");
+  m_texSampler = glGetUniformLocation(m_programId, "texSampler");
+  m_useTexture = glGetUniformLocation(m_programId, "useTexture");
 
   BasicShaderProgram::initLocations();
 }

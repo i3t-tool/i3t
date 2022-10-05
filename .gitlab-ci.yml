@@ -3,14 +3,15 @@ image: cvutdcgi/i3t-ci
 stages:
   - build
   - test
+  - lint
   - release
 
-build:
+build-app:
   stage: build
   script:
     - mkdir out && cd out 
     - cmake .. 
-    - cmake --build . -j 8 --target I3T I3TTest
+    - cmake --build . -j 8 --target I3T
   artifacts:
     paths:
       - Binaries
@@ -21,16 +22,42 @@ build:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
 
-check format:
+build-tests:
   stage: build
   script:
-    - bash Scripts/CheckFormat.sh
+    - mkdir out && cd out
+    - cmake ..
+    - cmake --build . -j 8 --target I3TTest
+  artifacts:
+    paths:
+      - Binaries
+    expire_in: 1 week
+  cache:
+    paths:
+      - Binaries
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+###
 
 # run tests using the binary built before
 test:
   stage: test
   script:
-    - Binaries/Debug/I3TTest
+    - bash Scripts/RunTests.sh
+  dependencies:
+    - build-tests
+
+###
+
+check format:
+  stage: lint
+  script:
+    - bash Scripts/CheckFormat.sh
+  dependencies:
+    - test
+
+###
 
 release:
   stage: release
@@ -43,3 +70,5 @@ release:
   artifacts:
     paths:
       - Binaries/Release*
+  dependencies:
+    - build-app

@@ -18,6 +18,8 @@ void GraphManager::destroy()
 	}
 }
 
+Ptr<Model> GraphManager::createModel() { return Builder::createModelNode(); }
+
 ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 {
 	auto lhs = input->m_master;

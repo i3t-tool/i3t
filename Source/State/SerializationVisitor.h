@@ -1,15 +1,20 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <vector>
 
+#include "imgui.h"
+
+#include "Core/Nodes/Node.h"
+#include "Core/Nodes/NodeData.h"
 #include "State/NodeVisitor.h"
-#include "State/SceneData.h"
+#include "State/Stateful.h"
 
 class SerializationVisitor : public NodeVisitor
 {
 public:
-	SerializationVisitor();
+	explicit SerializationVisitor(Memento& memento) : m_memento(memento) {}
 
 	/**
 	 * Get string representation of current scene.
@@ -29,7 +34,7 @@ public:
 	 *   - [1, 0, 4, 0]
 	 * \endcode
 	 */
-	std::string dump(const std::vector<Ptr<GuiNode>>& nodes);
+	void dump(const std::vector<Ptr<GuiNode>>& nodes);
 
 private:
 	/**
@@ -44,13 +49,37 @@ private:
 	void visit(const Ptr<GuiScreen>& node) override;
 	void visit(const Ptr<GuiModel>& node) override;
 
-	/// Stores last scene representation.
-	SceneRawData m_sceneData;
+	/// id and position
+	///
+	/// \param target
+	/// \param node
+	///
+	/// \pre target is JSON object
+	void dumpCommon(rapidjson::Value& target, const Ptr<GuiNode>& node);
 
-	static bool m_isInitialized;
+	void dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node);
+	void dumpTransform(rapidjson::Value& target, const Ptr<GuiTransform>& node);
+
+	void addBool(rapidjson::Value& target, const char* key, bool value);
+	void addString(rapidjson::Value& target, const char* key,
+	               const std::string& value);
+	void addVector(rapidjson::Value& target, const char* key, const ImVec2& vec);
+	void addVector(rapidjson::Value& target, const char* key,
+	               const glm::vec3& vec);
+	void addVector(rapidjson::Value& target, const char* key,
+	               const glm::vec4& vec);
+	void addMatrix(rapidjson::Value& target, const char* key,
+	               const glm::mat4& mat);
+	void addData(rapidjson::Value& target, const char* key,
+	             const DataStore& data);
+
+	/// \param target document["edges"] or any JSON array.
+	void addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node);
+
+	Memento& m_memento;
 };
 
 /**
  * Creates all nodes in the workspace.
  */
-SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);
+// SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);

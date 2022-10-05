@@ -11,8 +11,6 @@ void glfwErrorCallback(int error, const char* description)
 	pgr::dieWithError(description);
 }
 
-Window::~Window() { glfwTerminate(); }
-
 void Window::init()
 {
 	glfwSetErrorCallback(glfwErrorCallback);
@@ -29,7 +27,7 @@ void Window::init()
 	glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
 	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT,
-	                                g_baseTitle, nullptr, nullptr);
+	                                g_baseTitle.c_str(), nullptr, nullptr);
 
 	if (m_mainWindow == nullptr)
 	{
@@ -37,7 +35,7 @@ void Window::init()
 		exit(EXIT_FAILURE);
 	}
 
-	setTitle(g_baseTitle);
+	setTitle(g_baseTitle.c_str());
 
 	int x, y, channels;
 	constexpr int desiredChannels = 4;
@@ -56,14 +54,6 @@ void Window::init()
 
 	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window)
 	                           { BeforeCloseCommand::dispatch(); });
-
-	/*
-	glfwSetKeyCallback(m_mainWindow, [](GLFWwindow* window, int key, int scancode,
-	int action, int mods)
-	{
-
-	});
-	 */
 }
 
 GLFWwindow* Window::get() { return m_mainWindow; }
@@ -77,3 +67,5 @@ void Window::setTitle(const char* title)
 }
 
 void Window::swapBuffers() { glfwSwapBuffers(m_mainWindow); }
+
+void Window::finalize() { glfwTerminate(); }
