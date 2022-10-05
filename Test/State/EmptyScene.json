@@ -1,0 +1,12 @@
+{
+    "workspace": {
+        "operators": [],
+        "sequences": [],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [],
+        "transforms": [],
+        "edges": []
+    }
+}

@@ -70,8 +70,7 @@ void StartWindow::reloadTutorials()
 	}
 	Log::info("Searching for tutorials in: " + path);
 	// For all files in path recursively
-	for (auto& entry :
-	     std::filesystem::recursive_directory_iterator(path))
+	for (auto& entry : std::filesystem::recursive_directory_iterator(path))
 	{
 		if (entry.path().extension() == ".tut")
 		{
@@ -79,13 +78,14 @@ void StartWindow::reloadTutorials()
 			Log::info(pathString);
 			// Load header part of tutorial
 			if (std::shared_ptr<TutorialHeader> header =
-			TutorialLoader::loadTutorialHeader(pathString); header)
+			        TutorialLoader::loadTutorialHeader(pathString);
+			    header)
 			{
 				m_tutorial_headers.push_back(std::move(header));
 			}
 			else
 			{
-				LOG_ERROR("Tutorial header " + pathString + " not loaded." );
+				LOG_ERROR("Tutorial header " + pathString + " not loaded.");
 			}
 		}
 	}

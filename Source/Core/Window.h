@@ -15,7 +15,7 @@
 class Window
 {
 public:
-	~Window();
+	~Window() = default;
 
 	/**
 	 * Initialize GLFW window.
@@ -31,6 +31,10 @@ public:
 	GLFWwindow* get();
 
 private:
+	friend class Application;
+
+	void finalize();
+
 	std::string m_title;
 	GLFWwindow* m_mainWindow;
 };

@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/Input/InputManager.h"
 #include "State/StateManager.h"
 
 void BeforeCloseModal::render()

@@ -80,13 +80,26 @@ public:
 
 protected:
 	Singleton() {}
+
+	void release();
+
+	inline static std::unique_ptr<T> m_instance = nullptr;
 };
 
 template <typename T> T& Singleton<T>::instance()
 {
-	static const std::unique_ptr<T> instance{new T{}};
-	return *instance;
+	if (m_instance == nullptr)
+		m_instance = std::make_unique<T>();
+
+	return *m_instance;
 }
+
+template <typename T> void Singleton<T>::release()
+{
+	m_instance.reset(new T{});
+}
+
+//
 
 template <typename BaseClass> class ICloneable
 {
@@ -107,17 +120,15 @@ template <typename T> auto n(T val)
 	return std::string(magic_enum::enum_name(val));
 }
 
-template <typename T> constexpr T enumVal(const std::string& str)
+namespace EnumUtils
 {
-	constexpr auto& enumEntries = magic_enum::enum_entries<T>();
-	for (const auto& entry : enumEntries)
-	{
-		if constexpr (entry.first == str)
-		{
-			return entry.first;
-		}
-	}
+template <typename T> auto name(T val) { return n(val); }
+
+template <typename T> std::optional<T> value(const std::string& str)
+{
+	return magic_enum::enum_cast<T>(str);
 }
+} // namespace EnumUtils
 
 #define COND_TO_DEG(x)                                                         \
 	(SetupForm::radians                                                          \

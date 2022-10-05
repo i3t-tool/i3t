@@ -57,23 +57,28 @@
  *  Work in progress
  *	----------------
  *
-| TransformType    | done | mapping Matrix to Default (FULL->SetValues)| Default->Matrix (menu value/reset)                 |
- * | -----------------|------|----------------------------------------|--------------------------------------------------------|
- * |  0 Free          | ok   | no Defaults => no InitDefaults & reset | resetMatrixFromDefaults sets identity   DONE           |
- * |  1 Translate     | ok   | direct   - done in setValue            | own initDefaults(), resetMatrixFromDefaults use default|
- * |  2 EulerX        | ok   | indirect                               |                                                        |
- * |  3 EulerY        | ok   | indirect                               |                                                        |
- * |  4 EulerZ        | ok   | indirect                               |                                                        |
- * |  5 Scale         | ok   | direct                                 |                                                        |
- * |  6 AxisAngle rot | no synergies |                                |                                                        |
- * |  7 Quat          | ok   |                                        |                                                        |
- * |  8 Ortho         | todo | indirect                               |                                                        |
- * |  9 Perspective   | OK   | direct                                 |                                                        |
- * | 10 Frustum       | todo | indirect                               |                                                        |
- * | 11 LookAt        | ok   | no mapping                             |  isValid - setValue without test, moved to transform |
+| TransformType    | done | mapping Matrix to Default (FULL->SetValues)|
+Default->Matrix (menu value/reset)                 |
+ * |
+-----------------|------|----------------------------------------|--------------------------------------------------------|
+ * |  0 Free          | ok   | no Defaults => no InitDefaults & reset |
+resetMatrixFromDefaults sets identity   DONE           |
+ * |  1 Translate     | ok   | direct   - done in setValue            | own
+initDefaults(), resetMatrixFromDefaults use default|
+ * |  2 EulerX        | ok   | indirect                               | |
+ * |  3 EulerY        | ok   | indirect                               | |
+ * |  4 EulerZ        | ok   | indirect                               | |
+ * |  5 Scale         | ok   | direct                                 | |
+ * |  6 AxisAngle rot | no synergies |                                | |
+ * |  7 Quat          | ok   |                                        | |
+ * |  8 Ortho         | todo | indirect                               | |
+ * |  9 Perspective   | OK   | direct                                 | |
+ * | 10 Frustum       | todo | indirect                               | |
+ * | 11 LookAt        | ok   | no mapping                             |  isValid
+- setValue without test, moved to transform |
  *
  * LookAt 	- isValid checks the linear part of the matrix + unit axes and
- *                determinant 
+ *                determinant
  * For Table of synergies see Transform.h:279
  *
  * What should be tested

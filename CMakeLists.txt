@@ -21,6 +21,7 @@ configure_file(Source/ConfigVersion.h.in Source/ConfigVersion.h)
 # TODO -> MH use target_include_directories.
 include_directories(Source/)
 include_directories(Dependencies/assimp/include)
+include_directories(Dependencies/assimp/contrib/rapidjson/include)
 include_directories(Dependencies/glfw/include)
 include_directories(Dependencies/glm)
 include_directories(Dependencies/jsonlib/single_include)
@@ -109,15 +110,12 @@ set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 set(ASSIMP_BUILD_3DS_IMPORTER ON)
 set(ASSIMP_BUILD_COLLADA_IMPORTER ON)
 set(ASSIMP_BUILD_FBX_IMPORTER ON)
+set(ASSIMP_BUILD_GLTF_IMPORTER ON)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(ASSIMP_BUILD_PLY_IMPORTER ON)
 
 set(ASSIMP_BUILD_ASSIMP_TOOLS CACHE INTERNAL FALSE)
-
 set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
-set(ASSIMP_BUILD_FBX_EXPORTER ON)
-set(ASSIMP_BUILD_OBJ_EXPORTER ON)
-set(ASSIMP_BUILD_PLY_EXPORTER ON)
 # =============================================================
 
 # ======== Project dependencies which should be compiled. =====

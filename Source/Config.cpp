@@ -1,6 +1,45 @@
 #include "Config.h"
 
+#include <fstream>
 #include <istream>
+
+#include "rapidjson/document.h"
+#include "rapidjson/istreamwrapper.h"
+#include "rapidjson/schema.h"
+
+#include "Logger/Logger.h"
+#include "Utils/JSON.h"
+
+Ptr<Configuration> loadConfig(const fs::path& filename)
+{
+	auto conf = std::make_shared<Configuration>();
+
+	const auto result = JSON::parse(
+	    filename, Config::getAbsolutePath("Data/Schemas/Config.schema.json"));
+
+	const auto& d = *result;
+
+	for (const auto& resource : d["resources"].GetArray())
+	{
+		const auto name = std::string(resource["name"].GetString(),
+		                              resource["name"].GetStringLength());
+		const auto path = std::string(resource["path"].GetString(),
+		                              resource["path"].GetStringLength());
+		const auto type = std::string(resource["type"].GetString(),
+		                              resource["type"].GetStringLength());
+
+		const auto maybeType = magic_enum::enum_cast<Core::EResourceType>(type);
+		if (!maybeType.has_value())
+		{
+			Log::error("Resource {} has unknown type!", resource["name"].GetString());
+			continue;
+		}
+
+		conf->Resources.emplace_back(name, path, maybeType.value());
+	}
+
+	return conf;
+}
 
 bool Config::getValue(std::istream& is, const std::string& input,
                       const std::string& attribName, float& val)

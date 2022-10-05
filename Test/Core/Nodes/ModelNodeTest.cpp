@@ -21,7 +21,7 @@ TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 	/// context is not initialized).
 	auto* gameObject = new GameObject();
 
-	auto modelNode = Builder::createNode<ENodeType::Model>();
+	auto modelNode = Builder::createModelNode();
 	setValue_expectOk(modelNode, static_cast<void*>(gameObject));
 
 	auto* gameObjectPtr =

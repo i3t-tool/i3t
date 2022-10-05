@@ -39,10 +39,9 @@ void SceneNode::update(double elapsed_time) { // elapsed time in seconds
   }
 }
 
-void SceneNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix) {
-  for(Children::iterator it = m_children.begin(); it != m_children.end(); ++it) {
-    SceneNode * child = *it;
-    if(child)
+void SceneNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_matrix) const {
+  for (const auto* child : m_children) {
+    if (child)
       child->draw(view_matrix, projection_matrix);
     else
       std::cerr << "node " << m_name << " has NULL child, that should not happen" << std::endl;

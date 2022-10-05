@@ -14,10 +14,19 @@
 
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <vector>
 
+#include "Core/Resources/Resource.h"
 #include "Utils/Filesystem.h"
+
+struct Configuration
+{
+	std::vector<Core::Resource> Resources;
+};
+
+Ptr<Configuration> loadConfig(const fs::path& filename);
 
 /**
  * A configuration structure.

@@ -28,8 +28,8 @@ template <ENodeType T> Ptr<NodeBase> createNode()
 {
 	auto ret = std::make_shared<::Core::NodeImpl<T>>();
 	ret->init();
-
 	ret->updateValues(0);
+
 	return ret;
 }
 } // namespace Builder
@@ -1589,17 +1589,6 @@ NodeImpl<ENodeType::MatrixToMatrix>::updateValues(int inputIndex)
 	if (m_inputs[0].isPluggedIn())
 	{
 		setInternalValue(m_inputs[0].getStorage(inputIndex).getMat4());
-	}
-}
-
-template <>
-FORCE_INLINE void NodeImpl<ENodeType::Model>::updateValues(int inputIndex)
-{
-	if (m_inputs[0].isPluggedIn())
-	{
-		auto& targetStorage = m_inputs[0].getStorage();
-		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation =
-		    targetStorage.getMat4();
 	}
 }
 

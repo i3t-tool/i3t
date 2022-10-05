@@ -1,15 +1,10 @@
 #pragma once
 
 #include <deque>
+#include <vector>
 
 #include "Core/Defs.h"
-
-#include "Memento.h"
-#include "SceneData.h"
-
-constexpr int MAX_STATES = 32;
-
-class IStateful;
+#include "State/Stateful.h"
 
 /**
  * Holds global state and takes state snapshots.
@@ -17,28 +12,44 @@ class IStateful;
 class StateManager : public Singleton<StateManager>
 {
 public:
+	/// Implicitly creates the initial state (Memento with index 0).
+	///
+	/// \warning Class is statically initialized, originators are not set!
 	StateManager();
-	void setOriginator(IStateful* originator) { m_originator = originator; }
+
 	void takeSnapshot();
 	void undo();
 	void redo();
 
+	//
+
+	void setOriginator(IStateful* originator)
+	{
+		m_originators.push_back(originator);
+	}
+
+	//
+
 	[[nodiscard]] bool canUndo() const;
 	[[nodiscard]] bool canRedo() const;
 
-	[[nodiscard]] Memento getCurrentState() const;
+	int getMementosCount() const;
+	int getPossibleUndosCount() const;
+	int getPossibleRedosCount() const;
 
-	bool isDirty() const { return m_dirty; }
+	[[nodiscard]] const Memento& getCurrentState() const;
+
+	bool isDirty() const
+	{
+		return m_savedSceneHash != m_hashes[m_currentStateIdx] && m_dirty;
+	}
 
 	/// \pre m_originator is set.
 	void createEmptyScene();
 
-	//===-- Files manipulation functions
-	//--------------------------------------===//
+	//===-- Files manipulation functions ------------------------------------===//
 
 	bool loadScene(const fs::path& scene);
-	// SceneData buildScene(const std::string& rawScene, GuiNodes&
-	// workspaceNodes);
 
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
@@ -48,30 +59,30 @@ public:
 	bool hasScene() { return !m_currentScene.empty(); }
 	auto scenePath() { return m_currentScene; }
 
-	//===----------------------------------------------------------------------===//
-
-	//===-- Recent files
-	//------------------------------------------------------===//
+	//===-- Recent files ----------------------------------------------------===//
 
 	const std::vector<std::string>& getRecentFiles() { return m_recentFiles; }
 
-	//===----------------------------------------------------------------------===//
+	//===--------------------------------------------------------------------===//
 
 private:
-	void setUnsavedWindowTitle();
-	void setSavedWindowTitle();
+	/// Resets counters, set clean state and takes initial snapshot.
+	void reset();
 
-	void resetState();
+	friend class Application;
 
-	[[nodiscard]] bool hasNewestState() const;
+	void finalize();
 
 	fs::path m_currentScene;
+	long m_savedSceneHash{};
+
 	bool m_dirty = false;
 
-	IStateful* m_originator;
+	std::vector<IStateful*> m_originators;
 
 	int m_currentStateIdx;
 	std::deque<Memento> m_mementos;
+	std::deque<long> m_hashes;
 
 	std::vector<std::string> m_recentFiles;
 };

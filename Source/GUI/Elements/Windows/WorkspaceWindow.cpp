@@ -3,6 +3,11 @@
 */
 #include "WorkspaceWindow.h"
 
+#include "GUI/Elements/Nodes/Builder.h"
+#include "State/NodeDeserializer.h"
+#include "State/SerializationVisitor.h"
+#include "Utils/JSON.h"
+
 #ifdef DIWNE_DEBUG
 bool s_diwneDebug_on;
 #endif // DIWNE_DEBUG
@@ -1303,6 +1308,8 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	                 [&]() { g_workspaceDiwne->trackingSwitch(); });
 	Input.bindAction("trackingSwitchOff", EKeyState::Pressed,
 	                 [&]() { g_workspaceDiwne->trackingSwitchOff(); });
+
+	StateManager::instance().setOriginator(this);
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -1310,6 +1317,115 @@ WorkspaceWindow::~WorkspaceWindow()
 	g_workspaceDiwne->m_workspaceCoreNodes.clear();
 	delete g_workspaceDiwne;
 }
+
+// Node builder functions.
+//
+
+Memento WorkspaceWindow::getState()
+{
+	Memento memento;
+
+	SerializationVisitor visitor(memento);
+	visitor.dump(getNodeEditor().m_workspaceCoreNodes);
+
+	return memento;
+}
+
+void WorkspaceWindow::setState(const Memento& memento)
+{
+	const auto findNode = [](std::vector<GuiNodePtr>& nodes,
+	                         Core::ID id) -> GuiNodePtr
+	{
+		for (const auto& node : nodes)
+			if (node->getNodebase()->getId() == id)
+				return node;
+
+		return nullptr;
+	};
+
+	//
+
+	getNodeEditor().m_workspaceCoreNodes.clear();
+
+	const auto& operators = memento["workspace"]["operators"];
+	for (auto& value : operators.GetArray())
+	{
+		NodeDeserializer::createOperator(value);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["sequences"].GetArray())
+	{
+		NodeDeserializer::createSequence(value);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["cycles"].GetArray())
+	{
+		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
+		NodeDeserializer::assignCommon(value, cycle);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["cameras"].GetArray())
+	{
+		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
+		NodeDeserializer::assignCommon(value, camera);
+
+		const auto& viewValue = value["sequences"].GetArray()[0];
+		NodeDeserializer::assignSequence(viewValue, camera->getView());
+
+		const auto& projValue = value["sequences"].GetArray()[1];
+		NodeDeserializer::assignSequence(projValue, camera->getProjection());
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["screens"].GetArray())
+	{
+		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
+		NodeDeserializer::assignCommon(value, screen);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["models"].GetArray())
+	{
+		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
+		NodeDeserializer::assignCommon(value, model);
+	}
+
+	//
+
+	const auto& transforms = memento["workspace"]["transforms"];
+	for (auto& value : transforms.GetArray())
+	{
+		NodeDeserializer::createTransform(value);
+	}
+
+	// connect edges
+
+	const auto& edges = memento["workspace"]["edges"];
+	auto& workspaceNodes = getNodeEditor().m_workspaceCoreNodes;
+
+	for (auto& edge : edges.GetArray())
+	{
+		auto lhs = findNode(workspaceNodes, edge[0].GetInt());
+		auto rhs = findNode(workspaceNodes, edge[2].GetInt());
+		if (lhs && rhs)
+		{
+			auto lhsPin = edge[1].GetInt();
+			auto rhsPin = edge[3].GetInt();
+
+			connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+		}
+	}
+}
+
+//
 
 WorkspaceDiwne& WorkspaceWindow::getNodeEditor() { return *g_workspaceDiwne; }
 
@@ -1351,5 +1467,32 @@ void WorkspaceWindow::showEditMenu()
 		}
 
 		ImGui::EndMenu();
+	}
+}
+
+//
+
+bool connectNodesNoSave(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
+{
+	auto plugResult = Core::GraphManager::plug(
+	    lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
+	if (plugResult != ENodePlugResult::Ok)
+	{
+		Log::info("Cannot connect pin{} to pin{} of nodes {} and {}",
+		          lhs->getNodebase()->getSig(), rhs->getNodebase()->getSig(),
+		          lhsPin, rhsPin);
+		return false;
+	}
+	else
+	{
+		std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(rhs)
+		    ->getInputs()
+		    .at(rhsPin)
+		    ->setConnectedWorkspaceOutput(
+		        std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(lhs)
+		            ->getOutputs()
+		            .at(lhsPin)
+		            .get());
+		return true;
 	}
 }

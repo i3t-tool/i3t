@@ -5,6 +5,8 @@
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "Core/Module.h"
+#include "Core/Resources/ResourceManager.h"
+#include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
@@ -18,9 +20,13 @@
 #include "Utils/TextureLoader.h"
 #include "World/World.h"
 
+using namespace Core;
+
 double lastFrameSeconds = 0.0; // PF changed to double
 
-Application::Application()
+static Configuration* g_Config = nullptr;
+
+void Application::init()
 {
 	if (s_instance == nullptr)
 		s_instance = this;
@@ -32,25 +38,15 @@ Application::Application()
 	m_scriptInterpreter = new Scripting();
 
 	Core::GraphManager::init();
-}
 
-Application::~Application()
-{
-	for (auto* module : m_modules)
-	{
-		delete module;
-	}
-}
+	//
 
-void Application::init()
-{
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
 	ConsoleCommand::addListener([this](std::string c)
 	                            { m_scriptInterpreter->runCommand(c); });
 
 	InputManager::init();
-	StateManager::instance().setOriginator(this);
 
 	InputManager::bindGlobalAction("undo", EKeyState::Pressed,
 	                               [&]()
@@ -64,23 +60,48 @@ void Application::init()
 		                               Log::info("redo triggered");
 		                               StateManager::instance().redo();
 	                               });
+
+	StateManager::instance().setOriginator(this);
 }
 
 void Application::initModules()
 {
 	for (auto* m : m_modules)
+	{
 		m->init();
+	}
 
-	if (!StateManager::instance().hasScene())
-		StateManager::instance().createEmptyScene();
+	StateManager::instance().createEmptyScene();
 }
 
 //===----------------------------------------------------------------------===//
+
+static const std::string DIE_SEND_MAIL =
+    "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
+    "snapshot of the program messages "
+    "as they appear in the program console.\n";
+
+static const std::string DIE_TEXT_OPENGL_VERSION =
+    "The I3T tool did not start. \n\n"
+    "The program is targeted to a Graphics card with OpenGL 3.1. or higher. If "
+    "you have a system with two graphics "
+    "cards, internal and external, "
+    " switch to the external GPU card please. You may need to add "
+    "transform.exe in the GPU control panel/3D settings"
+    " to the list of programs using the dedicated GPU card.\n"
+    " \n" +
+    DIE_SEND_MAIL;
 
 void Application::initWindow()
 {
 	m_window = new Window();
 	m_window->init();
+
+	// PGR and OpenGL initializing.
+	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
+	{
+		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
+	}
 }
 
 GLFWwindow* Application::mainWindow() { return m_window->get(); }
@@ -161,12 +182,20 @@ void Application::finalize()
 
 	World::end();
 	delete m_world;
+
+	m_window->finalize();
+	StateManager::instance().finalize();
+
+	delete s_instance;
+	s_instance == nullptr;
 }
 
 bool Application::initI3T()
 {
 	// getchar();printf("a\n");
-	loadConfig();
+	// loadConfig();
+	const auto conf = loadConfig(Config::getAbsolutePath("Config.json"));
+	ResourceManager::instance().init(conf->Resources);
 
 	// new scene scheme
 	bool b = World::init(); // getchar(); printf("b\n");
@@ -178,49 +207,39 @@ bool Application::initI3T()
 
 //===-- State functions ---------------------------------------------------===//
 
-Memento Application::getState()
+void Application::onStateChange()
 {
-	auto& nodes = getUI()
-	                  ->getWindowPtr<WorkspaceWindow>()
-	                  ->getNodeEditor()
-	                  .m_workspaceCoreNodes;
+	auto title = g_baseTitle;
 
-	SerializationVisitor visitor;
-	std::string rawState = visitor.dump(nodes);
-
-	return Memento({rawState});
-}
-
-void Application::setState(const Memento& memento)
-{
-	auto& nodes = getUI()
-	                  ->getWindowPtr<WorkspaceWindow>()
-	                  ->getNodeEditor()
-	                  .m_workspaceCoreNodes;
-	nodes.clear();
-
-	auto& rawScene = memento.getSnapshot().front();
-
-	buildScene(rawScene, nodes);
-}
-
-void Application::onStateChange(const std::string& winTitlePostfix)
-{
-	std::string newTitle;
 	if (StateManager::instance().hasScene())
-		newTitle = std::string(g_baseTitle) + " - " +
-		           StateManager::instance().scenePath().string() + winTitlePostfix;
+	{
+		title += ": " + StateManager::instance().scenePath().filename().string();
+	}
 	else
-		newTitle = std::string(g_baseTitle) + winTitlePostfix;
+	{
+		title += ": New Scene";
+	}
 
-	m_window->setTitle(newTitle.c_str());
+	if (StateManager::instance().isDirty())
+	{
+		title += "*";
+	}
+
+	setTitle(title);
 }
 
 //===----------------------------------------------------------------------===//
 
 Application& Application::get() { return *s_instance; }
 
-UIModule* Application::getUI() { return (UIModule*)m_modules[0]; }
+UIModule* Application::getUI()
+{
+	I3T_ASSERT(!m_modules.empty() && dynamic_cast<UIModule*>(m_modules[0]) &&
+	           "Did you initialize the Application properly?");
+
+	/// \todo Unsafe!
+	return (UIModule*)m_modules[0];
+}
 
 World* Application::world() { return m_world; }
 

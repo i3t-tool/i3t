@@ -7,6 +7,7 @@
 
 #include <array>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "gl_core_4_4.h"
@@ -16,7 +17,7 @@
 #include "Core/Window.h"
 #include "State/Stateful.h"
 
-constexpr const char* g_baseTitle =
+static const std::string g_baseTitle =
     "I3T - An Interactive Tool for Teaching Transformations";
 
 class Module;
@@ -34,8 +35,8 @@ class UIModule;
 class Application : public IStateful
 {
 public:
-	Application();
-	~Application();
+	Application() = default;
+	~Application() = default;
 
 	/**
 	 * \fn	void finalize()
@@ -50,7 +51,7 @@ public:
 	static Application& get();
 	UIModule* getUI();
 
-	//===----------------------------------------------------------------------===//
+	//===--------------------------------------------------------------------===//
 
 	/**
 	 * Init OpenGL stuffs before display loop.
@@ -64,7 +65,7 @@ public:
 
 	void setTitle(const std::string& title);
 
-	//===----------------------------------------------------------------------===//
+	//===--------------------------------------------------------------------===//
 
 	/**
 	 * Enter main loop.
@@ -99,16 +100,11 @@ public:
 	 */
 	bool initI3T();
 
-	//===-- State functions
-	//---------------------------------------------------===//
+	//===--------------------------------------------------------------------===//
 
-	Memento getState() override;
+	void onStateChange() override;
 
-	void setState(const Memento&) override;
-
-	void onStateChange(const std::string& winTitlePostfix) override;
-
-	//===----------------------------------------------------------------------===//
+	//===--------------------------------------------------------------------===//
 
 private:
 	static Application* s_instance;
@@ -132,6 +128,7 @@ private:
 	/// loop.
 	std::vector<ICommand*> m_commands;
 
+public:
 	/**
 	 * \brief	GLUT Callback: render the whole I3T window (update the Logic, draw
 	 * 3D scene and 2D workspace)
@@ -142,6 +139,7 @@ private:
 	 */
 	void onDisplay();
 
+private:
 	/**
 	 * Called when BeforeCloseCommand is received.
 	 *

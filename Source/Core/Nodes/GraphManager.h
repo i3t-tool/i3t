@@ -11,6 +11,7 @@
 
 #include "Camera.h"
 #include "Cycle.h"
+#include "Model.h"
 #include "Node.h"
 #include "NodeData.h"
 #include "NodeImpl.h"
@@ -53,6 +54,8 @@ public:
 	 * Create Cycle
 	 */
 	static Ptr<Core::Cycle> createCycle();
+
+	static Ptr<Model> createModel();
 
 	/**
 	 * \param tick in seconds.
