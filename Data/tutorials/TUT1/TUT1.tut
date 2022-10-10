@@ -1,0 +1,112 @@
+---
+title: Začínáme s I3T
+description: V této lekci se seznámíš se základními funkcionalitami a ovládáním I3T.
+thumbnail: logoi3t.png
+language: cs
+---
+
+Vítej v I3T!
+
+Rozhraní programu tvoří tyto dvě okna:
+
+![Viewport a workspace](i3tscreens.png)
+
+*Scene Viewport* ukazuje scénu z nezávislé kamery.
+
+*Workspace* slouží k interakci se scénou pomocí tzv. bloků.
+
+Pojďme si vysvětlit jak s nimi zacházet
+
+--
+*Viewport*
+Viewport zobrazuje scénu (podobně jako Blender nebo Unity)
+![Viewport](viewport.png)
+Ovládání:
+    * Tažením pravým tlačítkem myši  ![pravé tlačítko myši](mouseRight.png)  lze otáčet kamerou
+    * Tažením stisknutým prostředním tlačítkem myši  ![prostřední tlačítko myši](mouseMiddle.png)  lze posouvat kamerou
+    * Kolečko myši slouží k přiblížení a oddálení
+
+--
+*Workspace*
+Workspace používáme k práci se scénou.
+
+Stisknutím pravého tlačítka  ![pravé tlačítko myši](mouseRight.png)  na workspace se ukáže menu.
+![Kontextové menu](menu.png)
+
+To používáme k přidávání *bloků* a interakci s nimi.
+
+--
+*Bloky*
+Bloky jsou základní jednotkou I3T, mohou fungovat jako matice, model, nebo funkce (například cykly).
+
+task:
+  Přidej do workspace tři bloky:
+    * model
+    * sequence
+    * transformation -> scale
+hint: Pravé tlačítko myši na workspace otevírá workspace menu, odtud přidáváme bloky.
+Scéna by po přidání bloků měl vypadat takhle:
+![Model krychle, sekvence a matice transformace velikosti](addStuff.png)
+
+--
+
+Podívejme se na přidané bloky:
+    * Model = model krychle
+    * Sequence = blok který slouží k propojení matice s modelem
+    * Scale = matice operace škálování
+
+![Měly by vypadat takto](3boxes-closeup.png)
+
+Abychom mohli naši krychli škálovat, bude třeba všechny bloky správně propojit.
+
+--
+*Jak propojit bloky?*
+Bloky fungují podobně jako funkce při programování, mají vstupy a výstupy.
+![Blok sekvence](blocks.png)
+
+Barva ikony vstupu a výstupu je datový typ, určuje co lze a co nelze předat bloku.
+Například:
+    * Matice = ![Symbol pro matici](matrixsym.png)
+    * Maticové násobení = ![Symbol pro vektorové násobení](mult.png)
+
+Pojďme se podívat na naše bloky.
+--
+*Model*
+Blok modelu má pouze jeden vstup, konkrétně zelený symbol ![Maticové násobení](mult.png).
+Ten označuje operaci maticového násobení, všechny body modelu se tedy vynásobí maticí danou na vstupu.
+![Blok modelu](model.png)
+--
+*Sekvence*
+Blok sequence má několik vstupů a výstupů, pro nás je ale důležitý hlavně první výstup.
+Jelikož je datový typ stejný jako vstup modelu, můžeme táhnutím myši spojít oba bloky.
+![Sekvence](seq.png)
+--
+*Škálovací matice*
+Blok škálovací matice žádné vstupy ani výstupy nemá.
+Abychom mohli matici jakkoliv použít, je třeba jí vložit do sekvence.
+Toho dosáhneme uchopením bloku za vrchní lištu a přetažením přímo na blok sequence
+![Matice škálování](scale.png)
+--
+Pojďme tedy využít naše znalosti k zvětšení našeho modelu
+task: Propoj matici, sekvenci a model
+Pro kontrolu se lze podívat na hint:
+hint: ![Matice v sekvenci napojené na model](completed.png)
+
+--
+
+task: Nyní zkus změnit jednu z hodnot v matici tím, že na ní klikneš a potáhneš doprava
+
+Tímto tlačítkem můžeš nahlédnout, jestli na to jdeš správně:
+hint: ![Kliknutím na hodnotu v matici a tažením myší vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
+
+--
+
+Gratulace! Už víš základy práce s I3T a můžeš začít s transformacemi!
+![Splněno!](checkbox.png)
+
+Shrnutí:
+  * workspace a viewport
+  * ovládání myší ![levé tlačítko myši](mouseLeft.png) ![prostřední tlačítko myši](mouseMiddle.png) ![pravé tlačítko myši](mouseRight.png)
+  * základy práce s bloky
+
+Klikni na Finish ![](down.png) pro návrat do úvodního okna.

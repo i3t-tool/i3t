@@ -69,6 +69,20 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 	    });
 }
 
+inline void TooltipCallback( ImGui::MarkdownTooltipCallbackData data_ )
+{
+	if( data_.linkData.isImage )
+	{
+		ImGui::SetTooltip( "%.*s", data_.linkData.textLength,
+		                  data_.linkData.text);
+	}
+	else
+	{
+		Log::error("Tooltip_CB - Markdown data doesnt contain image");
+		//ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon, data_.linkData.linkLength, data_.linkData.link );
+	}
+}
+
 inline void DefaultLinkCallback(ImGui::MarkdownLinkCallbackData data_)
 {
 	std::string url(data_.link, data_.linkLength);
@@ -86,7 +100,7 @@ void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 	// exception at font loading
 	m_mdConfig = ImGui::MarkdownConfig{
 	    DefaultLinkCallback,
-	    ImGui::defaultMarkdownTooltipCallback,
+	    TooltipCallback,
 	    ImageCallback,
 	    "link",
 	    {{Application::get().getUI()->getTheme().get(EFont::TutorialAssignment),
@@ -411,10 +425,13 @@ void TutorialWindow::renderTutorialControls()
 void TutorialWindow::renderExplanation(Explanation* explanation)
 {
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+	ImGui::PushStyleColor(ImGuiCol_PopupBg,
+	                      Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushFont(
 	    Application::get().getUI()->getTheme().get(EFont::TutorialText));
 	ImGui::Markdown(explanation->m_content.c_str(),
 	                explanation->m_content.length(), m_mdConfig);
+	ImGui::PopStyleColor();
 	ImGui::PopFont();
 }
 
