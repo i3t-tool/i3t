@@ -78,8 +78,14 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs,
 	{
 		for (int j = 0; j < 4; ++j)
 		{
+			// if (i == 1 && j == 2)
+			//	std::cerr << "lhs[" << i << "], [" << j << "] = " << lhs[i][j]
+			//	          << " != rhs[][] = " << rhs[i][j] << std::endl;
 			if (!Math::eq(lhs[i][j], rhs[i][j], epsilon))
 			{
+				// std::cerr << "lhs[" << i << "], [" << j << "] = " << lhs[i][j]
+				//          << " != rhs[][] = " << rhs[i][j] << " return false"
+				//          << std::endl;
 				return false;
 			}
 		}
