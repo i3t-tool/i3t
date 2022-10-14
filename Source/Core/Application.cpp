@@ -186,8 +186,10 @@ void Application::finalize()
 	m_window->finalize();
 	StateManager::instance().finalize();
 
+	/*
 	delete s_instance;
 	s_instance == nullptr;
+	 */
 }
 
 bool Application::initI3T()

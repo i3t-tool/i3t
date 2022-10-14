@@ -212,9 +212,13 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target,
 	transform.AddMember(
 	    "type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
 
+	//
+
 	if (!coreNode->getDefaultValues().empty())
 	{
 		transform.AddMember("defaultValues",
+		                    rapidjson::Value(rapidjson::kObjectType), alloc);
+		transform.AddMember("savedDefaults",
 		                    rapidjson::Value(rapidjson::kObjectType), alloc);
 	}
 
@@ -223,10 +227,23 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target,
 		addData(transform["defaultValues"], key.c_str(), value);
 	}
 
+	//
+
 	addMatrix(transform, "value", coreNode->getData().getMat4());
 
 	if (coreNode->hasSavedValue())
+	{
 		addMatrix(transform, "savedValue", coreNode->getSavedValue());
+
+		/*
+		for (const auto& [key, value] : coreNode->getDefaultValues())
+		{
+		  addData(transform["savedDefaults"], key.c_str(), value);
+		}
+		 */
+	}
+
+	//
 
 	addBool(transform, "synergies", coreNode->hasSynergies());
 	addBool(transform, "locked", coreNode->isLocked());
