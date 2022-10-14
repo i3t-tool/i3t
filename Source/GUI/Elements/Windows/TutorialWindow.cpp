@@ -69,17 +69,17 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 	    });
 }
 
-inline void TooltipCallback( ImGui::MarkdownTooltipCallbackData data_ )
+inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
 {
-	if( data_.linkData.isImage )
+	if (data_.linkData.isImage)
 	{
-		ImGui::SetTooltip( "%.*s", data_.linkData.textLength,
-		                  data_.linkData.text);
+		ImGui::SetTooltip("%.*s", data_.linkData.textLength, data_.linkData.text);
 	}
 	else
 	{
 		Log::error("Tooltip_CB - Markdown data doesnt contain image");
-		//ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon, data_.linkData.linkLength, data_.linkData.link );
+		// ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon,
+		// data_.linkData.linkLength, data_.linkData.link );
 	}
 }
 
@@ -425,8 +425,9 @@ void TutorialWindow::renderTutorialControls()
 void TutorialWindow::renderExplanation(Explanation* explanation)
 {
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
-	ImGui::PushStyleColor(ImGuiCol_PopupBg,
-	                      Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+	ImGui::PushStyleColor(
+	    ImGuiCol_PopupBg,
+	    Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushFont(
 	    Application::get().getUI()->getTheme().get(EFont::TutorialText));
 	ImGui::Markdown(explanation->m_content.c_str(),

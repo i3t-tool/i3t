@@ -235,6 +235,11 @@ public:
 
 	const glm::mat4& getSavedValue() const;
 
+	const std::map<std::string, DataStore>& getSavedDefaults() const
+	{
+		return m_savedValues;
+	}
+
 	/**
 	 * \brief Save the value, read from YAML
 	 * \param values matrix from YAML
@@ -323,6 +328,7 @@ protected:
 private:
 	bool m_hasSavedData = false;
 	DataStore m_savedData;
+	std::map<std::string, DataStore> m_savedValues;
 };
 
 using TransformPtr = Ptr<Transformation>;

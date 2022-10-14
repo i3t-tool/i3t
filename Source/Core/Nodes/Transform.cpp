@@ -52,6 +52,7 @@ void Transformation::createDefaults()
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
 		m_defaultValues[key] = Data(valueType);
+		m_savedValues[key] = Data(valueType);
 	}
 }
 
@@ -95,6 +96,7 @@ void Transformation::unlock() { m_isLocked = false; }
 void Transformation::saveValue()
 {
 	m_savedData = getData(0);
+	m_savedValues = m_defaultValues;
 
 	m_hasSavedData = true;
 }
@@ -105,7 +107,8 @@ void Transformation::reloadValue()
 		return;
 
 	setInternalValue(m_savedData.getMat4(), 0);
-	//////setValue(m_savedData.getMat4());  //// PF NOW
+	m_defaultValues = m_savedValues;
+	resetMatrixFromDefaults();
 	notifySequence();
 }
 
