@@ -443,7 +443,7 @@ static const std::vector<Operation> operations = {
      vector3Input}, // vec3 + vec3
     {n(ENodeType::Vector3SubVector3), "vec3 - vec3", 2, twoVector3Input, 1,
      vector3Input}, // vec3 - vec3
-    {n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVectorInput, 1,
+    {n(ENodeType::Vector3MulFloat), "float * vec3", 2, floatVector3Input, 1,
      vector3Input}, // float * vec3
     {n(ENodeType::NormalizeVector3), "normalize vec3", 1, vector3Input, 1,
      vector3Input}, // normalize vec3
