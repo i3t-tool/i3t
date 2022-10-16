@@ -516,7 +516,7 @@ static const std::vector<Operation> operations = {
     {n(ENodeType::ASinACos), "asin & acos(float)", 1, floatInput, 2,
      twoFloatInput}, // asin&acos(float)
     {n(ENodeType::Signum), "signum", 1, floatInput, 1, floatInput}, // signum
-    {n(ENodeType::MatrixToVectors), "mat -> vecs", 1, matrixInput, 4,
+    {n(ENodeType::MatrixToVectors), "mat -> vecs4", 1, matrixInput, 4,
      fourVectorInput}, // mat -> vecs
     {n(ENodeType::Vectors3ToMatrix), "vecs3 -> mat", 4, fourVector3Input, 1,
      matrixInput, NO_TAG, Vectors3ToMatrixInputNames}, // vecs3 -> mat
