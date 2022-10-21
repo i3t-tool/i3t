@@ -39,7 +39,7 @@ bool saveWorkspace(FILE* f,
 	{
 		WorkspaceNodeWithCoreData* nodebasedata =
 		    _workspace->at(i)
-		        .get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData
+		        .get(); /* \todo this is confusing - in WorkspaceNodeWithCoreData
 		                   are also graphic informations, data are in
 		                   Ptr<Core::NodeBase> */
 		Ptr<Core::NodeBase> nodebase =
@@ -707,7 +707,7 @@ bool saveWorkspace(FILE* f,
 		//	for (int i = 0; i < _workspace->size(); i++) {
 		WorkspaceNodeWithCoreData* nodebasedata =
 		    _workspace->at(i)
-		        .get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData
+		        .get(); /* \todo this is confusing - in WorkspaceNodeWithCoreData
 		                   are also graphic informations, data are in
 		                   Ptr<Core::NodeBase> */
 		Ptr<Core::NodeBase> nodebase =
@@ -802,7 +802,7 @@ bool saveWorkspace(FILE* f,
 	{
 		WorkspaceNodeWithCoreData* nodebasedata =
 		    _workspace->at(i)
-		        .get(); /* \todo JH this is confusing - in WorkspaceNodeWithCoreData
+		        .get(); /* \todo this is confusing - in WorkspaceNodeWithCoreData
 		                   are also graphic informations, data are in
 		                   Ptr<Core::NodeBase> */
 		Ptr<Core::NodeBase> nodebase =

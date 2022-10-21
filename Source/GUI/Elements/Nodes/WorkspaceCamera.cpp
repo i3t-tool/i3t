@@ -42,11 +42,4 @@ bool WorkspaceCamera::middleContent()
 // WorkspaceNodeWithCoreDataWithPins::rightContent();}; /* draw camera pin on
 // opposite side */
 
-int WorkspaceCamera::maxLenghtOfData()
-{
-	//    Debug::Assert(false, "Calling WorkspaceCamera::maxLenghtOfData() make no
-	//    sense because every included Sequention has its own independent data");
-	//    return -1; /* should be unused */
-	return 0; /* \todo JH not sure where it is used... fall on zoom with Camera on
-	             Workspace */
-}
+int WorkspaceCamera::maxLenghtOfData() { return 0; }

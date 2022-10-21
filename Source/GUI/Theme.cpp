@@ -137,6 +137,31 @@ void Theme::initClassicProperties()
 	    ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
+	set(EColor::Links_selected_colorShift, ImVec4(0.2f, 0.2f, 0.2f, 0.0f));
+
+	set(EColor::Synergies_FloatBg, ImVec4(0.0, 0.4f, 0.0f, 1.0f));
+	set(EColor::Synergies_FloatBgHovered, ImVec4(0.0f, 0.4f, 0.2f, 1.0f));
+	set(EColor::Synergies_FloatBgActive, ImVec4(0.0f, 0.4f, 0.4f, 1.0f));
+
+	set(EColor::Nodes_Screen_resizeBtn_bgShape, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
+
+	set(EColor::Nodes_Transformation_ValidIcon_bgShape,
+	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_bgInner,
+	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgShape,
+	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgInner,
+	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_padding,
+	    ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
+
+	set(EColor::Nodes_Transformation_TrackingColor,
+	    ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
 	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
@@ -178,13 +203,21 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
-	m_sizes[ESize::Default_InactiveMark] =
-	    0.7f; /* \todo JH 0.7 for testing - probably 0.0 will be here... */
+
+	m_sizes[ESize::Default_InactiveMark] = 0.0f;
 
 	m_sizes[ESize::Links_ControlpointsPositionFraction] = 0.2f;
 	m_sizes[ESize::Links_ControlpointsPositionMin] = 50.0f;
 	m_sizes[ESize::Links_Thickness] = 5.0;
 	m_sizes[ESize::Links_ThicknessSelectedBorder] = 2.0;
+
+	m_sizes[ESize::Pins_IconPadding] = 2.0;
+	m_sizes[ESize::Links_selected_alpha] = 0.8;
+
+	m_sizes[ESize::Float_inactive_alphaMultiplicator] = 0.5;
+
+	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
@@ -203,6 +236,15 @@ void Theme::initClassicProperties()
 	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = ImVec2(130.0f, 130.0f);
 
 	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_Screen_resizeButtonSize] = ImVec2(20.f, 20.f);
+
+	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
+
+	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] =
+	    ImVec2(50.f, 50.f);
+
+	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 }
 
 void Theme::initModernProperties()
@@ -280,6 +322,31 @@ void Theme::initModernProperties()
 	    ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
+	set(EColor::Links_selected_colorShift, ImVec4(0.2f, 0.2f, 0.2f, 0.0f));
+
+	set(EColor::Synergies_FloatBg, ImVec4(0.0, 0.4f, 0.0f, 1.0f));
+	set(EColor::Synergies_FloatBgHovered, ImVec4(0.0f, 0.4f, 0.2f, 1.0f));
+	set(EColor::Synergies_FloatBgActive, ImVec4(0.0f, 0.4f, 0.4f, 1.0f));
+
+	set(EColor::Nodes_Screen_resizeBtn_bgShape, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
+
+	set(EColor::Nodes_Transformation_ValidIcon_bgShape,
+	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_bgInner,
+	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgShape,
+	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgInner,
+	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_padding,
+	    ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
+
+	set(EColor::Nodes_Transformation_TrackingColor,
+	    ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
 	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
@@ -321,13 +388,20 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
-	m_sizes[ESize::Default_InactiveMark] =
-	    0.7f; /* \todo JH 0.7 for testing - probably 0.0 will be here... */
+	m_sizes[ESize::Default_InactiveMark] = 0.0f;
 
 	m_sizes[ESize::Links_ControlpointsPositionFraction] = 0.2f;
 	m_sizes[ESize::Links_ControlpointsPositionMin] = 50.0f;
 	m_sizes[ESize::Links_Thickness] = 5.0;
 	m_sizes[ESize::Links_ThicknessSelectedBorder] = 2.0;
+
+	m_sizes[ESize::Pins_IconPadding] = 2.0;
+	m_sizes[ESize::Links_selected_alpha] = 0.8;
+
+	m_sizes[ESize::Float_inactive_alphaMultiplicator] = 0.5;
+
+	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
@@ -346,6 +420,15 @@ void Theme::initModernProperties()
 	m_sizesVec2[ESizeVec2::Nodes_ScreenTextureSize] = ImVec2(130.0f, 130.0f);
 
 	m_sizesVec2[ESizeVec2::Builder_ItemSpacing] = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_Screen_resizeButtonSize] = ImVec2(20.f, 20.f);
+
+	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
+
+	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] =
+	    ImVec2(50.f, 50.f);
+
+	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 }
 
 void Theme::initNames()
@@ -357,6 +440,9 @@ void Theme::initNames()
 	g_CategoryNames["nops_"] = "Node Editor Operators";
 	g_CategoryNames["ntrs_"] = "Node Editor Transformations";
 	g_CategoryNames["npop_"] = "Node Editor Popups";
+	g_CategoryNames["nflo_"] = "Node Editor Floats";
+	g_CategoryNames["nscr_"] = "Node Editor ScreenNode";
+	g_CategoryNames["nlnk_"] = "Node Editor Link";
 
 	// Global colors.
 	g_ColorNames[EColor::Text] = "glob_Text";
@@ -427,11 +513,45 @@ void Theme::initNames()
 	    "npop_Connection is not possible";
 	g_ColorNames[EColor::Nodes_CreateNode] = "npop_Create node popup";
 
+	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
+	g_ColorNames[EColor::Synergies_FloatBg] = "nflo_Synergies_FloatBg";
+	g_ColorNames[EColor::Synergies_FloatBgHovered] =
+	    "nflo_Synergies_FloatBgHovered";
+	g_ColorNames[EColor::Synergies_FloatBgActive] =
+	    "nflo_Synergies_FloatBgActive";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] =
+	    "nscr_Nodes_Screen_resizeBtn_bgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] =
+	    "nscr_Nodes_Screen_resizeBtn_bgInner";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] =
+	    "nscr_Nodes_Screen_resizeBtn_fgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] =
+	    "nscr_Nodes_Screen_resizeBtn_fgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgShape] =
+	    "ntrs_Nodes_Transformation_ValidIcon_bgShape";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgInner] =
+	    "ntrs_Nodes_Transformation_ValidIcon_bgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgShape] =
+	    "ntrs_Nodes_Transformation_ValidIcon_fgShape";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgInner] =
+	    "ntrs_Nodes_Transformation_ValidIcon_fgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_padding] =
+	    "ntrs_Nodes_Transformation_ValidIcon_padding";
+	g_ColorNames[EColor::Nodes_Transformation_TrackingColor] =
+	    "ntrs_Nodes_Transformation_TrackingColor";
+
 	/// \todo ???
 	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a
 	// color!)";
 
 	// Global spacing and other size properties.
+	g_SizeNames[ESize::Float_inactive_alphaMultiplicator] =
+	    "ngen_Float_inactive_alphaMultiplicator";
+
+	g_SizeNames[ESize::Nodes_Operators_Rounding] =
+	    "ngen_Nodes_Operators_Rounding";
+	g_SizeNames[ESize::Nodes_Sequence_Rounding] = "ngen_Nodes_Sequence_Rounding";
+
 	g_SizeNames[ESize::Nodes_Rounding] = "ngen_Nodes Rounding";
 	g_SizeNames[ESize::Nodes_FloatWidth] = "ngen_Nodes Float Width";
 	g_SizeNames[ESize::Nodes_FloatMargin] = "ngen_Nodes Float Margin";
@@ -467,9 +587,22 @@ void Theme::initNames()
 	    "fraction of start to end x distance";
 	g_SizeNames[ESize::Links_ControlpointsPositionMin] =
 	    "ngen_Link minimal x distance between controlpoint and start/end of link";
+
 	g_SizeNames[ESize::Links_Thickness] = "ngen_Link Thickness";
 	g_SizeNames[ESize::Links_ThicknessSelectedBorder] =
 	    "ngen_Link Additional thickness when selected";
+	g_SizeNames[ESize::Links_selected_alpha] = "ngen_Links_selected_alpha";
+
+	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins_IconPadding";
+
+	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] =
+	    "ngen_Nodes_Screen_resizeButtonSize";
+	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] =
+	    "ngen_Nodes_Sequence_DummySpaceSize";
+	g_SizeVecNames[ESizeVec2::Nodes_Transformation_TrackingMarkSize] =
+	    "ngen_Nodes_Transformation_TrackingMarkSize";
+	g_SizeVecNames[ESizeVec2::NewNode_positionShift] =
+	    "ngen_NewNode_positionShift";
 
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
@@ -528,7 +661,7 @@ void Theme::apply()
 
 	// SS, MH please check this
 	//---------------------------------------------------------------------------------------
-	/* \todo JH repaire
+	/* \todo JH \todo JH repaire
 	auto& nodesStyle = ax::NodeEditor::GetStyle();
 
 	nodesStyle.NodeRounding																					 =

@@ -78,34 +78,32 @@ struct SettingsDiwne
 	ImVec2 initPopupPosition =
 	    ImVec2(0, 0); /*!< where to show popup when not set later */
 
-	ImColor selectionRectFullColor =
-	    ImColor(0, 0, 255, 100); /* \todo JH recomandation is not to store
-	                                ImColor, but ImU32 or ImVec4 */
-	ImColor selectionRectTouchColor = ImColor(0, 255, 0, 100);
+	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.35);
+	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.35);
 
-	ImColor itemSelectedBorderColor = ImColor(100, 100, 0, 255);
+	ImVec4 itemSelectedBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
 	float itemSelectedBorderThicknessDiwne = 5;
 
-	ImColor objectFocusBorderColor = ImColor(0, 0, 0, 100);
+	ImVec4 objectFocusBorderColor = ImVec4(0.0, 0.0, 0.0, 0.35);
 	float objectFocusBorderThicknessDiwne = 3;
-	ImColor objectFocusForInteractionBorderColor = ImColor(0, 0, 0, 255);
+	ImVec4 objectFocusForInteractionBorderColor = ImVec4(0.0, 0.0, 0.0, 1.0);
 	float objectFocusForInteractionBorderThicknessDiwne = 3;
 
 	float middleAlign = 0.5; /*!< value < 0 , 1 > where is horizontal position of
 	                            middle of nodes */
 
-	ImColor pinHoveredBorderColor = ImColor(100, 100, 0, 255);
+	ImVec4 pinHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
 	float pinHoveredBorderThicknessDiwne = 2;
-	ImColor nodeHoveredBorderColor = ImColor(100, 100, 0, 255);
+	ImVec4 nodeHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
 	float nodeHoveredBorderThicknessDiwne = 2;
-	ImColor backgroundHoveredBorderColor = ImColor(100, 100, 0, 255);
+	ImVec4 backgroundHoveredBorderColor = ImVec4(0.35, 0.35, 0.0, 1.0);
 	float backgroundHoveredBorderThicknessDiwne = 2;
 
 	float linkInteractionWidthDiwne = 10;
 	float linkThicknessDiwne = 10;
 	float linkThicknessSelectedBorderDiwne = 4;
-	ImColor linkColor = ImColor(150, 75, 100, 150);
-	ImColor linkColorSelected = ImColor(150, 75, 100, 200);
+	ImVec4 linkColor = ImVec4(0.6, 0.3, 0.35, 0.6);
+	ImVec4 linkColorSelected = ImVec4(0.6, 0.3, 0.35, 0.8);
 	ImVec2 linkStartControlOffsetDiwne = ImVec2(10, 0);
 	ImVec2 linkEndControlOffsetDiwne = ImVec2(-10, 0);
 	float linkAlphaHovered = 1;
@@ -113,7 +111,7 @@ struct SettingsDiwne
 	float linkAlphaSelectedHovered = 1;
 	float linkAlphaSelected = 0.5;
 };
-// \todo JH void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign =
+// \todo   void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign =
 // v;}; /* from 0==left to 1==right */
 //         void setLinkControlpointsOffsetDiwne(const ImVec2 controlStart, const
 //         ImVec2 controlEnd) { m_startControlOffsetDiwne = controlStart;
@@ -205,22 +203,23 @@ public:
 	ImVec2 diwne2screen_noZoom(const ImVec2& point) const;
 
 	/*! \brief Draw filled rectangle to window ImDrawlist
-	 *
-	 * \param p_min const ImVec2& in diwne coords
-	 * \param p_max const ImVec2& in diwne coords
-	 * \param col ImU32
-	 * \param 0.0f float rounding
-	 * \param ImDrawCornerFlags_All ImDrawCornerFlags rounding_corners
-	 * \return void
-	 *
-	 */
+
+	       *
+	       * \param p_min const ImVec2& in diwne coords
+	       * \param p_max const ImVec2& in diwne coords
+	       * \param col ImVec4
+	       * \param 0.0f float rounding
+	       * \param ImDrawCornerFlags_All ImDrawCornerFlags rounding_corners
+	       * \return void
+	       *
+	       */
 	void AddRectFilledDiwne(
-	    const ImVec2& p_min, const ImVec2& p_max, ImU32 col,
+	    const ImVec2& p_min, const ImVec2& p_max, ImVec4 col,
 	    float rounding = 0.0f,
 	    ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All) const;
 	/*! \brief Draw rectangle to window ImDrawlist \see AddRectFilledDiwne
 	 */
-	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImU32 col,
+	void AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col,
 	                  float rounding = 0.0f,
 	                  ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All,
 	                  float thickness = 1.0f) const;
@@ -230,14 +229,14 @@ public:
 	 * \param p2 const ImVec2& start control point in diwne coords
 	 * \param p3 const ImVec2& end control point in diwne coords
 	 * \param p4 const ImVec2& end point in diwne coords
-	 * \param col ImU32
+	 * \param col ImVec4
 	 * \param thickness float
 	 * \param 0 int num_segments with zero ImGui use some optimal? value
 	 * \return void
 	 *
 	 */
 	void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3,
-	                         const ImVec2& p4, ImU32 col, float thickness,
+	                         const ImVec2& p4, ImVec4 col, float thickness,
 	                         int num_segments = 0) const;
 
 	/*! \brief Add ImGui Button with icon on it \see DrawIcon()
@@ -281,34 +280,41 @@ public:
 	 *
 	 */
 	void DrawIconCircle(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor,
-	                    ImVec2 topLeft, ImVec2 bottomRight, bool filled) const;
+	                    ImVec2 topLeft, ImVec2 bottomRight, bool filled,
+	                    float thicknes = 1) const;
 	/*! \brief \see DrawIconCircle
 	 */
 	void DrawIconRectangle(ImDrawList* idl, ImColor ShapeColor,
 	                       ImColor InnerColor, ImVec2 topLeft, ImVec2 bottomRight,
-	                       bool filled) const;
+	                       bool filled, ImVec2 thicknes = ImVec2(1, 1),
+	                       float rounding = 0) const;
 	/*! \brief \see DrawIconCircle
 	 */
 	void DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor,
 	                          ImColor InnerColor, ImVec2 topLeft,
-	                          ImVec2 bottomRight, bool filled) const;
+	                          ImVec2 bottomRight, bool filled,
+	                          float thicknes = 1) const;
 	/*! \brief \see DrawIconCircle
 	 */
 	void DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor,
 	                           ImColor InnerColor, ImVec2 topLeft,
-	                           ImVec2 bottomRight, bool filled) const;
+	                           ImVec2 bottomRight, bool filled,
+	                           float thicknes = 1) const;
 	/*! \brief \see DrawIconCircle
 	 */
 	void DrawIconCross(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor,
-	                   ImVec2 topLeft, ImVec2 bottomRight, bool filled) const;
+	                   ImVec2 topLeft, ImVec2 bottomRight, bool filled,
+	                   float thicknesShape = 4, float thicknesInner = 2) const;
 
 	void DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor,
 	                              ImColor InnerColor, ImVec2 topLeft,
-	                              ImVec2 bottomRight, bool filled) const;
+	                              ImVec2 bottomRight, bool filled,
+	                              float thicknes = 1) const;
 
 	void DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor,
 	                               ImColor InnerColor, ImVec2 topLeft,
-	                               ImVec2 bottomRight, bool filled) const;
+	                               ImVec2 bottomRight, bool filled,
+	                               float thicknes = 1) const;
 
 	DiwneAction getDiwneAction() const { return m_diwneAction; };
 	void setDiwneAction(DiwneAction action) { m_diwneAction = action; };

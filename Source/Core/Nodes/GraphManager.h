@@ -105,8 +105,6 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-	/* \todo JH what about plug(pin, pin) ? Now I just have to read info from Core
-	 * for pass it back to Core... */
 	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode,
 	                                          const NodePtr& rightNode,
 	                                          unsigned parentOutputPinIndex,

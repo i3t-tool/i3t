@@ -415,8 +415,8 @@ inline /* inline for ability to compile
 					    {&localData[0]}, value_changed);
 					if (value_changed)
 					{
-						// localData[1] = localData[2] = localData[0]; /* \todo JH MH do
-						// this in core -> something like setUniformScale */
+						// localData[1] = localData[2] = localData[0]; /* \todo JH \todo JH
+						// MH do this in core -> something like setUniformScale */
 						// nodebase->setDefaultValue(key, localData);     // was
 						// nodebase->setDefaultValue(key, localData[0]);  // Sets float
 						// instead of vec3 - may be based on synergies??
@@ -466,7 +466,7 @@ inline /* inline for ability to compile
 	std::vector<std::string> columnLabels;
 	std::vector<glm::vec3> local_data;
 
-	/* \todo JH, MH some way how to not compute this every frame? */
+	/* \todo JH, \todo MH some way how to not compute this every frame? */
 	int i = 0;
 	for (auto& [key, valueStore] : nodebase->getDefaultValues())
 	{

@@ -55,7 +55,7 @@ bool Diwne::initializeDiwne()
 	return initialize();
 }
 
-bool Diwne::beforeBeginDiwne() /* \todo JH redesign to
+bool Diwne::beforeBeginDiwne() /* \todo redesign to
                                   https://en.wikipedia.org/wiki/Call_super */
 {
 	updateWorkAreaRectangles();
@@ -245,15 +245,15 @@ bool Diwne::allowProcessSelectionRectangle() { return m_focusedForInteraction; }
 bool Diwne::bypassSelectionRectangleAction()
 {
 	return bypassIsMouseDragging1();
-} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+} /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 Diwne::bypassDiwneGetSelectionRectangleStartPosition()
 {
 	return screen2diwne(bypassMouseClickedPos1());
-} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+} /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
 ImVec2 Diwne::bypassDiwneGetSelectionRectangleSize()
 {
 	return bypassGetMouseDragDelta1() / getWorkAreaZoom();
-} /* \todo JH I suspect bug if dragging start outside of WorkspaceWindow... */
+} /* \todo I suspect bug if dragging start outside of WorkspaceWindow... */
 
 bool Diwne::processDiwneSelectionRectangle()
 {
@@ -335,8 +335,6 @@ void Diwne::setWorkAreaZoom(float val /*=1*/)
 		m_workAreaZoom = val;
 }
 
-/* \todo JH some policy what point in WorkArea hold position on screen -
- * probably CoursorPosition */
 void Diwne::updateWorkAreaRectangles()
 {
 	ImVec2 windowPos =
@@ -388,54 +386,54 @@ void Diwne::translateWorkAreaDiwne(ImVec2 const& distance)
 }
 
 void Diwne::AddRectFilledDiwne(
-    const ImVec2& p_min, const ImVec2& p_max, ImU32 col,
+    const ImVec2& p_min, const ImVec2& p_max, ImVec4 col,
     float rounding /*=0.0f*/,
     ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/) const
 {
 	ImDrawList* idl =
-	    ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with
-	                                   correct Clip rect for drawing of manual
-	                                   shapes, but be careful with order of drew
-	                                   elements */
-	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), col, rounding,
+	    ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
+	                                   Clip rect for drawing of manual shapes, but
+	                                   be careful with order of drew elements */
+	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max),
+	                   ImGui::ColorConvertFloat4ToU32(col), rounding,
 	                   rounding_corners);
 }
 
 void Diwne::AddRectDiwne(
-    const ImVec2& p_min, const ImVec2& p_max, ImU32 col,
+    const ImVec2& p_min, const ImVec2& p_max, ImVec4 col,
     float rounding /*=0.0f*/,
     ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/,
     float thickness /*=1.0f*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), col, rounding,
-	             rounding_corners, thickness * m_workAreaZoom);
+	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max),
+	             ImGui::ColorConvertFloat4ToU32(col), rounding, rounding_corners,
+	             thickness * m_workAreaZoom);
 }
 
 void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2,
-                                const ImVec2& p3, const ImVec2& p4, ImU32 col,
+                                const ImVec2& p3, const ImVec2& p4, ImVec4 col,
                                 float thickness, int num_segments /*=0*/) const
 {
 	ImDrawList* idl =
-	    ImGui::GetWindowDrawList(); /* \todo JH maybe use other channel with
-	                                   correct Clip rect for drawing of manual
-	                                   shapes, but be careful with order of drew
-	                                   elements */
+	    ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
+	                                   Clip rect for drawing of manual shapes, but
+	                                   be careful with order of drew elements */
 
 	idl->AddBezierCurve(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3),
-	                    diwne2screen(p4), col, thickness * m_workAreaZoom,
-	                    num_segments);
+	                    diwne2screen(p4), ImGui::ColorConvertFloat4ToU32(col),
+	                    thickness * m_workAreaZoom, num_segments);
 }
 
 void Diwne::DrawIconCircle(ImDrawList* idl, ImColor ShapeColor,
                            ImColor InnerColor, ImVec2 topLeft,
-                           ImVec2 bottomRight, bool filled) const
+                           ImVec2 bottomRight, bool filled,
+                           float thicknes /*=1*/) const
 {
 	ImVec2 center =
 	    ImVec2((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
 	float radius =
 	    std::min(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y) / 2;
-	float thicknes = 1; /* \todo JH from settings_diwne */
 
 	idl->AddCircleFilled(center, radius, ShapeColor);
 	if (!filled)
@@ -446,11 +444,10 @@ void Diwne::DrawIconCircle(ImDrawList* idl, ImColor ShapeColor,
 
 void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor ShapeColor,
                               ImColor InnerColor, ImVec2 topLeft,
-                              ImVec2 bottomRight, bool filled) const
+                              ImVec2 bottomRight, bool filled,
+                              ImVec2 thicknes /*=ImVec2(1, 1)*/,
+                              float rounding /*= 0*/) const
 {
-	ImVec2 thicknes = ImVec2(1, 1); /* \todo JH from settings_diwne */
-	float rounding = 0;             /* \todo JH from settings_diwne */
-
 	idl->AddRectFilled(topLeft, bottomRight, ShapeColor, rounding);
 	if (!filled)
 	{
@@ -461,10 +458,9 @@ void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor ShapeColor,
 
 void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor,
                                  ImColor InnerColor, ImVec2 topLeft,
-                                 ImVec2 bottomRight, bool filled) const
+                                 ImVec2 bottomRight, bool filled,
+                                 float thicknes /*= 1*/) const
 {
-	float thicknes = 1; /* \todo JH from settings_diwne */
-
 	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y),
 	                       ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2),
 	                       bottomRight, ShapeColor);
@@ -479,10 +475,9 @@ void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor,
 
 void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor,
                                   ImColor InnerColor, ImVec2 topLeft,
-                                  ImVec2 bottomRight, bool filled) const
+                                  ImVec2 bottomRight, bool filled,
+                                  float thicknes /*= 1*/) const
 {
-	float thicknes = 1; /* \todo JH from settings_diwne */
-
 	idl->AddTriangleFilled(topLeft,
 	                       ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2),
 	                       ImVec2(topLeft.x, bottomRight.y), ShapeColor);
@@ -497,10 +492,9 @@ void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor,
 
 void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor,
                                       ImColor InnerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled) const
+                                      ImVec2 bottomRight, bool filled,
+                                      float thicknes /*= 1*/) const
 {
-	float thicknes = 1; /* \todo JH from settings_diwne */
-
 	idl->AddTriangleFilled(ImVec2(topLeft.x, bottomRight.y), bottomRight,
 	                       ImVec2(bottomRight.x, topLeft.y), ShapeColor);
 
@@ -515,10 +509,9 @@ void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor,
 
 void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor,
                                      ImColor InnerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled) const
+                                     ImVec2 bottomRight, bool filled,
+                                     float thicknes /*= 1*/) const
 {
-	float thicknes = 1; /* \todo JH from settings_diwne */
-
 	idl->AddTriangleFilled(topLeft, ImVec2(topLeft.x, bottomRight.y), bottomRight,
 	                       ShapeColor);
 	if (!filled)
@@ -532,9 +525,10 @@ void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor,
 
 void Diwne::DrawIconCross(ImDrawList* idl, ImColor ShapeColor,
                           ImColor InnerColor, ImVec2 topLeft,
-                          ImVec2 bottomRight, bool filled) const
+                          ImVec2 bottomRight, bool filled,
+                          float thicknesShape /*=4*/,
+                          float thicknesInner /*=2*/) const
 {
-	float thicknesShape = 4, thicknesInner = 2; /* \todo JH from settings_diwne */
 	float thicknesDiff = (thicknesShape - thicknesInner) / 2;
 	ImVec2 thicknesDiffVec = ImVec2(thicknesDiff, thicknesDiff);
 
@@ -640,7 +634,7 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor,
 		break;
 	}
 
-	ImGui::Dummy(size); /* \todo JH maybe InvisibleButton */
+	ImGui::Dummy(size);
 }
 
 ImVec2 Diwne::screen2workArea(const ImVec2& point) const

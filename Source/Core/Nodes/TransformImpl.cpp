@@ -69,6 +69,7 @@ constexpr ValueMask g_LookAtMask = {
     VM_ANY, VM_ANY, VM_ANY, VM_ANY, VM_ANY,  VM_ANY,  VM_ANY,  VM_ANY,
     VM_ANY, VM_ANY, VM_ANY, VM_ANY, VM_ZERO, VM_ZERO, VM_ZERO, VM_ONE,
 };
+
 // constexpr ValueMask g_LookAtMask = { // scale + translation
 //     VM_ANY,  VM_ZERO, VM_ZERO, VM_ANY,
 //     VM_ZERO, VM_ANY,  VM_ZERO, VM_ANY,
@@ -679,6 +680,7 @@ TransformImpl<ETransformType::Translation>::setValue(const glm::vec3& vec)
 	setInternalValue(glm::translate(vec));
 	// m_defaultValues.at("translation").setValue(vec);  // update Defaults and
 	// Matrix
+
 	setDefaultValueNoUpdate("translation", vec); // update Defaults ONLY
 	notifySequence();
 
@@ -703,6 +705,7 @@ TransformImpl<ETransformType::Translation>::setValue(float val,
 	setInternalValue(val, coords);
 
 	// update Default Values according to the Transform matrix
+
 	if (coords.x == 3 && coords.y != 3) // last T column
 	{
 		auto& mapPos = m_defaultValues.at("translation");
@@ -845,10 +848,9 @@ void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()
 
 const glm::quat& TransformImpl<ETransformType::Quat>::getQuat() const
 {
-	// todo mo�n� sp� nechat return getDefaultValue("quat").getQuat();, aby to
-	// skokem nem�nilo obsah if (hasSynergies())
-	//	return m_normalized;
-	// else
+	// todo možná spíš nechat return getDefaultValue("quat").getQuat();, aby to
+	// skokem nemìnilo obsah if (hasSynergies()) 	return m_normalized;
+	//  else
 	return getDefaultValue("quat").getQuat();
 };
 
@@ -1292,6 +1294,7 @@ TransformImpl<ETransformType::Frustum>::setValue(float val, glm::ivec2 coords)
 	// update the defaults to match the perspective matrix
 	// m[0,0] = 2n/(R-L)                  => w = R-L, newR = newC * w, newL =
 	// (newC-1) * w m[1,1] = 2n/(T-B)                  => m[2,0] = (R+L)/(R-L)
+
 	// m[2,1] = (T+B)/(T-B)
 	// m[2,2] = -(f+n)/(f-n) = A    (-1 for infinity f)
 	// m[3,2] = -(2fn)/(f-n) = B    (-2n for infinity f)

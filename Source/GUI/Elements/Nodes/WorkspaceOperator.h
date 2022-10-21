@@ -23,23 +23,19 @@ public:
 	virtual bool beforeContent()
 	{
 		/* whole node background */
-		diwne.AddRectFilledDiwne(
-		    m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-		    ImGui::ColorConvertFloat4ToU32(
-		        I3T::getTheme().get(EColor::NodeBgOperator)),
-		    5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take
-		                                  from Theme?*/
+		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+		                         I3T::getTheme().get(EColor::NodeBgOperator),
+		                         I3T::getSize(ESize::Nodes_Operators_Rounding),
+		                         ImDrawCornerFlags_Top);
 		return false;
 	}
 
 	virtual bool topContent()
 	{
-		diwne.AddRectFilledDiwne(
-		    m_topRectDiwne.Min, m_topRectDiwne.Max,
-		    ImGui::ColorConvertFloat4ToU32(
-		        I3T::getTheme().get(EColor::NodeHeaderOperator)),
-		    5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take
-		                                  from Theme?*/
+		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+		                         I3T::getTheme().get(EColor::NodeHeaderOperator),
+		                         I3T::getSize(ESize::Nodes_Operators_Rounding),
+		                         ImDrawCornerFlags_Top);
 
 		return WorkspaceNodeWithCoreData::topContent();
 	}

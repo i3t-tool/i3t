@@ -5,6 +5,7 @@
 
 /* DIWNE - \todo JH to remove, but I need something what use instead -> from
  * Type get Shape and Color */
+/* \todo MH is it possible to store std::map in Theme? */
 std::map<EValueType, EColor> WorkspacePinColorBackground = {
     {EValueType::Float, EColor::FloatPin},
     {EValueType::Matrix, EColor::MatrixPin},
@@ -64,10 +65,10 @@ WorkspaceNode::~WorkspaceNode() { diwne.m_takeSnap = true; }
 bool WorkspaceNode::beforeContent()
 {
 	/* whole node background */
-	diwne.AddRectFilledDiwne(
-	    m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-	    ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeBg)),
-	    I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_All);
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeBg),
+	                         I3T::getTheme().get(ESize::Nodes_Rounding),
+	                         ImDrawCornerFlags_All);
 	return false;
 }
 
@@ -75,10 +76,10 @@ bool WorkspaceNode::topContent()
 {
 	bool interaction_happen = false;
 
-	diwne.AddRectFilledDiwne(
-	    m_topRectDiwne.Min, m_topRectDiwne.Max,
-	    ImGui::ColorConvertFloat4ToU32(I3T::getTheme().get(EColor::NodeHeader)),
-	    I3T::getTheme().get(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeHeader),
+	                         I3T::getTheme().get(ESize::Nodes_Rounding),
+	                         ImDrawCornerFlags_Top);
 	ImGui::Dummy(ImVec2(ImGui::GetStyle().ItemSpacing.x, 1));
 	ImGui::SameLine();
 	ImGui::TextUnformatted(m_topLabel.c_str());

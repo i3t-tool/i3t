@@ -33,6 +33,10 @@ enum class EColor
 	FloatBgActive,
 	FloatBgHovered,
 
+	Synergies_FloatBg,
+	Synergies_FloatBgActive,
+	Synergies_FloatBgHovered,
+
 	TutorialBgColor,
 
 	SelectionRectFull,
@@ -88,6 +92,23 @@ enum class EColor
 	Nodes_ConnectionNotPossible,
 	Nodes_CreateNode,
 
+	Nodes_Screen_resizeBtn_bgShape,
+	Nodes_Screen_resizeBtn_bgInner,
+
+	Nodes_Screen_resizeBtn_fgShape,
+	Nodes_Screen_resizeBtn_fgInner,
+
+	Nodes_Transformation_TrackingColor,
+
+	Nodes_Transformation_ValidIcon_bgShape,
+	Nodes_Transformation_ValidIcon_bgInner,
+	Nodes_Transformation_ValidIcon_fgShape,
+	Nodes_Transformation_ValidIcon_fgInner,
+	Nodes_Transformation_ValidIcon_padding,
+
+	// 6. Links
+	Links_selected_colorShift,
+
 	Builder_NodePadding, // not a color but i need a vec4
 };
 
@@ -141,6 +162,15 @@ enum class ESize
 	Links_OffsetFraction,
 	Links_OffsetMin,
 
+	Links_selected_alpha,
+
+	Pins_IconPadding,
+
+	Nodes_Operators_Rounding,
+	Nodes_Sequence_Rounding,
+
+	Float_inactive_alphaMultiplicator,
+
 	Default_VisiblePrecision,
 	Default_InactiveMark
 };
@@ -162,6 +192,13 @@ enum class ESizeVec2
 	Nodes_IconSize,
 	Nodes_FloatCycleButtonSize,
 	Nodes_ScreenTextureSize,
+
+	Nodes_Screen_resizeButtonSize,
+	Nodes_Sequence_DummySpaceSize,
+
+	Nodes_Transformation_TrackingMarkSize,
+
+	NewNode_positionShift,
 
 	Builder_ItemSpacing,
 };
