@@ -66,7 +66,7 @@ void WorkspaceDiwne::trackingLeft()
 	if (m_trackingIsOn)
 	{
 		m_trackingFirstTransformation
-		    ->inactiveMarcToLeft(); /* \todo JH what step? */
+		    ->inactiveMarcToLeft(); /* \todo JH \todo MH what step? */
 	}
 }
 void WorkspaceDiwne::trackingRight()
@@ -74,7 +74,7 @@ void WorkspaceDiwne::trackingRight()
 	if (m_trackingIsOn)
 	{
 		m_trackingFirstTransformation
-		    ->inactiveMarcToRight(); /* \todo JH what step? */
+		    ->inactiveMarcToRight(); /* \todo JH  \todo MH what step? */
 	}
 }
 void WorkspaceDiwne::trackingSwitch()
@@ -141,8 +141,8 @@ void WorkspaceDiwne::popupContent()
 	ImGui::Separator();
 	if (ImGui::BeginMenu("transformation"))
 	{
-		/* \todo JH can be done by for-cycle if somewhere is list of types with
-		 * group (transformation, operator, ...) and label*/
+		/* \todo JH  \todo MH can be done by for-cycle if somewhere is list of types
+		 * with group (transformation, operator, ...) and label*/
 		if (ImGui::MenuItem("free"))
 		{
 			addNodeToPositionOfPopup<
@@ -905,7 +905,8 @@ bool WorkspaceDiwne::content()
 						        ->getLinkConnectionPointDiwne(),
 						    std::dynamic_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(
 						        model)
-						        ->getInputs()[0 /*\todo JH Some constant from core here*/]
+						        ->getInputs()
+						            [0 /*\todo JH  \todo MH Some constant from core here*/]
 						        ->getLinkConnectionPointDiwne());
 						link->drawDiwne(DIWNE::DrawMode::JustDraw);
 					}
@@ -943,7 +944,7 @@ WorkspaceDiwne::getAllInputFreeSequence()
 		if (seq && !seq->getInputs()[0]->isConnected())
 		{
 			sequences.push_back(node);
-		}; /* \todo JH Always 0? */
+		}; /* \todo JH  \todo MH Always 0? */
 	}
 	return sequences;
 }
@@ -958,7 +959,7 @@ WorkspaceDiwne::getAllInputFreeModel()
 		if (model && !model->getInputs()[0]->isConnected())
 		{
 			models.push_back(node);
-		}; /* \todo JH Always 0? */
+		}; /* \todo JH  \todo MH Always 0? */
 	}
 	return models;
 }
@@ -1207,7 +1208,8 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 			{
 				Application::get().world()->manipulatorsSetMatrix(
 				    selected_transformation, nullptr);
-			} /* \todo JH why not pass sequence of transformation? */
+			} /* \todo JH \todo MH \todo PF why not pass sequence of transformation?
+			   */
 		}
 		else
 		{
@@ -1220,10 +1222,7 @@ void WorkspaceDiwne::processTrackingMove()
 {
 	if (m_trackingIsOn)
 	{
-		if (InputManager::isAxisActive("trackingLeft") !=
-		    0) /* \todo JH pass value of ActiveAxis to trackingLeft functions -> use
-		          just one tracking function with argument passed from
-		          isAxisActive*/
+		if (InputManager::isAxisActive("trackingLeft") != 0)
 		{
 			g_workspaceDiwne->trackingLeft();
 		}
@@ -1251,8 +1250,6 @@ bool WorkspaceDiwne::bypassUnholdAction()
 	return InputManager::isAxisActive("pan") == 0;
 }
 
-/* \todo JH better way to get start pos and size of rectangle */
-/* *3 for avoid switch to Selection rect when node in sequence -> some bug... */
 bool WorkspaceDiwne::bypassSelectionRectangleAction()
 {
 	return InputManager::isAxisActive("selectionRectangle") !=

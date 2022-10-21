@@ -271,7 +271,7 @@ void InputManager::update()
 	m_mouseXPrev = m_mouseX;
 	m_mouseYPrev = m_mouseY;
 
-	/* \todo JH probably very naive */
+	/* \todo JH \todo MH probably very naive */
 	if (isMouseDown())
 	{
 		m_mouseXDragDelta += m_mouseXDelta;

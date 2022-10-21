@@ -50,8 +50,8 @@ enum FloatPopupMode
 
 extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
 
-/* DIWNE - \todo JH to remove, but I need something what use instead -> from
- * Type get Shape and Color */
+/* DIWNE - \todo JH \todo MH see in .cpp to remove, but I need something what
+ * use instead -> from Type get Shape and Color */
 extern std::map<EValueType, EColor> WorkspacePinColorBackground;
 
 extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground;

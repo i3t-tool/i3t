@@ -324,10 +324,10 @@ void Node::updateSizes()
 	m_centerDummySpace =
 	    maxWidth - centerWidth; /* how much shift middle or right content for
 	                               right-alignation */
-	/* \todo JH span graphic of middle backgrount to fill middle of node or left
-	it just around middle content? m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x
-	+ spacing.x; m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth -
-	spacing.x;*/ /* space between middle-right */
+	/* \todo span graphic of middle backgrount to fill middle of node or left it
+	  just around middle content? m_middleRectDiwne.Min.x = m_leftRectDiwne.Max.x
+	  + spacing.x; m_middleRectDiwne.Max.x = m_topRectDiwne.Max.x - rightWidth -
+	  spacing.x;*/ /* space between middle-right */
 	m_middleRectDiwne.Max.y = bottomYOfCentre;
 
 	m_rightRectDiwne.Max.y = bottomYOfCentre;

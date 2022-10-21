@@ -81,7 +81,6 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 		node_t->setRemoveFromSequence(false);
 		m_workspaceInnerTransformations.insert(
 		    m_workspaceInnerTransformations.begin() + index, node_t);
-		/* \todo JH check return value if so */
 		m_nodebase->as<Core::Sequence>()->addMatrix(
 		    node_t->getNodebase()->as<Core::Transformation>(), index);
 	}
@@ -117,12 +116,11 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 bool WorkspaceSequence::beforeContent()
 {
 	/* whole node background */
-	diwne.AddRectFilledDiwne(
-	    m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-	    ImGui::ColorConvertFloat4ToU32(
-	        I3T::getTheme().get(EColor::NodeBgTransformation)),
-	    5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take
-	                                  from Theme?*/
+
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeBgTransformation),
+	                         I3T::getSize(ESize::Nodes_Sequence_Rounding),
+	                         ImDrawCornerFlags_Top);
 	return false;
 }
 
@@ -139,12 +137,10 @@ bool WorkspaceSequence::afterContent()
 
 bool WorkspaceSequence::topContent()
 {
-	diwne.AddRectFilledDiwne(
-	    m_topRectDiwne.Min, m_topRectDiwne.Max,
-	    ImGui::ColorConvertFloat4ToU32(
-	        I3T::getTheme().get(EColor::NodeHeaderTranformation)),
-	    5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take
-	                                  from Theme?*/
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeHeaderTranformation),
+	                         I3T::getSize(ESize::Nodes_Sequence_Rounding),
+	                         ImDrawCornerFlags_Top);
 
 	return WorkspaceNodeWithCoreData::topContent();
 }
@@ -166,10 +162,11 @@ bool WorkspaceSequence::middleContent()
 		int rowOfChange, columnOfChange;
 		float valueOfChange;
 		return drawData4x4(
+
 		    diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(),
 		    m_floatPopupMode,
 		    m_nodebase->getData(0)
-		        .getMat4() /*\todo JM HM better selection (index) of data*/,
+		        .getMat4() /* \todo JM \todo HM better selection (index) of data*/,
 		    {Core::EValueState::Locked, Core::EValueState::Locked,
 		     Core::EValueState::Locked, Core::EValueState::Locked,
 		     Core::EValueState::Locked, Core::EValueState::Locked,
@@ -222,7 +219,8 @@ bool WorkspaceSequence::middleContent()
 	{
 		if (position_of_draged_node_in_sequence == i)
 		{
-			ImGui::Dummy(m_sizeOfDummy * diwne.getWorkAreaZoom());
+			ImGui::Dummy(I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) *
+			             diwne.getWorkAreaZoom());
 			ImGui::SameLine();
 			if (dragedNode->bypassUnholdAction())
 			{
@@ -251,8 +249,10 @@ bool WorkspaceSequence::middleContent()
 	{
 		ImGui::Dummy(
 		    position_of_draged_node_in_sequence == i
-		        ? m_sizeOfDummy * diwne.getWorkAreaZoom()
-		        : m_sizeOfDummy * diwne.getWorkAreaZoom() /
+		        ? I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) *
+		              diwne.getWorkAreaZoom()
+		        : I3T::getSize(ESizeVec2::Nodes_Sequence_DummySpaceSize) *
+		              diwne.getWorkAreaZoom() /
 		              2); /* smaller dummy if dragged node is not over Sequence */
 		if (dragedNode && dragedNode->bypassUnholdAction() &&
 		    position_of_draged_node_in_sequence >= 0)
@@ -315,6 +315,5 @@ int WorkspaceSequence::maxLenghtOfData()
 		        .getMat4() /*\todo JM HM better selection (index) of data*/,
 		    m_numberOfVisibleDecimal);
 	}
-	return 0; /* \todo JH not sure where it is used... fall on zoom with
-	             Sequention on Workspace */
+	return 0;
 }

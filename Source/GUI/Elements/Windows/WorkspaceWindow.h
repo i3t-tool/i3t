@@ -113,7 +113,7 @@ public:
 		    std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(newNode)
 		        ->getOutputs()
 		        .at(0)
-		        .get()); /* \todo JH always 0 with type constructor? */
+		        .get()); /* \todo JH \todo MH always 0 with type constructor? */
 	}
 
 	template <class T>
@@ -128,8 +128,9 @@ public:
 		{
 			node->drawDiwne(); /* for obtain size */
 			node->translateNodePositionDiwne(
-			    ImVec2(-node->getNodeRectSizeDiwne().x - 10,
-			           0)); /* \todo JH space to Theme */
+			    ImVec2(-node->getNodeRectSizeDiwne().x -
+			               I3T::getSize(ESizeVec2::NewNode_positionShift).x,
+			           I3T::getSize(ESizeVec2::NewNode_positionShift).y));
 		}
 
 		m_workspaceCoreNodes.push_back(node);

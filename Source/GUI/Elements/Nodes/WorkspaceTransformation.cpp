@@ -38,24 +38,20 @@ bool WorkspaceTransformation::beforeBegin()
 bool WorkspaceTransformation::beforeContent()
 {
 	/* whole node background */
-	diwne.AddRectFilledDiwne(
-	    m_topRectDiwne.Min, m_bottomRectDiwne.Max,
-	    ImGui::ColorConvertFloat4ToU32(
-	        I3T::getTheme().get(EColor::NodeBgTransformation)),
-	    5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take
-	                                  from Theme?*/
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeBgTransformation),
+	                         I3T::getSize(ESize::Nodes_Rounding),
+	                         ImDrawCornerFlags_Top);
 	return false;
 }
 
 bool WorkspaceTransformation::topContent()
 {
 	bool interaction_happen = false;
-	diwne.AddRectFilledDiwne(
-	    m_topRectDiwne.Min, m_topRectDiwne.Max,
-	    ImGui::ColorConvertFloat4ToU32(
-	        I3T::getTheme().get(EColor::NodeHeaderTranformation)),
-	    5, ImDrawCornerFlags_Top); /* \todo JH 5 is rounding of corners -> take
-	                                  from Theme?*/
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeHeaderTranformation),
+	                         I3T::getSize(ESize::Nodes_Rounding),
+	                         ImDrawCornerFlags_Top);
 
 	interaction_happen |= WorkspaceNodeWithCoreData::topContent();
 	ImGui::SameLine();
@@ -75,11 +71,14 @@ bool WorkspaceTransformation::topContent()
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
 		                     ImGui::GetStyle().FramePadding.y);
-		diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 0),
-		               ImColor(255, 0, 0), DIWNE::IconType::Cross,
-		               ImColor(255, 255, 255), ImColor(255, 255, 255), iconSize,
-		               ImVec4(5, 5, 5, 5),
-		               false); /* \todo JH Icon setting from Theme? */
+		diwne.DrawIcon(
+		    DIWNE::IconType::Circle,
+		    I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgShape),
+		    I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner),
+		    DIWNE::IconType::Cross,
+		    I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
+		    I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
+		    I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding), false);
 
 		// case Core::ETransformState::Unknown:
 		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
@@ -122,7 +121,8 @@ bool WorkspaceTransformation::afterContent()
 	{
 		ImVec2 topleft = m_middleRectDiwne.Min;
 		ImVec2 bottomright = m_middleRectDiwne.Max;
-		if (m_inactiveMark != 0) /* \todo JH MH? kde prosím přečtu tracking? */
+		if (m_inactiveMark !=
+		    0) /* \todo JH \todo MH? kde prosím přečtu tracking? */
 		{
 			ImVec2 size = bottomright - topleft;
 			if (dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft)
@@ -143,11 +143,12 @@ bool WorkspaceTransformation::afterContent()
 		    dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft ? bottomright.x
 		                                                            : topleft.x,
 		    m_middleRectDiwne.GetCenter().y);
-		ImVec2 markSize = ImVec2(50, 50); /* \todo JH settings?*/
+		ImVec2 markSize =
+		    I3T::getSize(ESizeVec2::Nodes_Transformation_TrackingMarkSize);
 
-		diwne.AddRectFilledDiwne(markCenter - markSize / 2,
-		                         markCenter + markSize / 2,
-		                         ImColor(1.0f, 1.0f, 0.0f, 0.5f));
+		diwne.AddRectFilledDiwne(
+		    markCenter - markSize / 2, markCenter + markSize / 2,
+		    I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 	}
 
 	return false;

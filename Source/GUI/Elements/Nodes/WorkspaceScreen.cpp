@@ -51,7 +51,7 @@ bool WorkspaceScreen::middleContent()
 	bool resize_texture = false; /// the screen size has changed -> update FBO
 	                             /// size too to avoid blurring
 	ImVec2 dragDelta;            /// zoom-scaled mouse move
-	ImVec2 buttonSize = ImVec2(20.f, 20.f); /* \todo JH MH from setting */
+	ImVec2 buttonSize = I3T::getSize(ESizeVec2::Nodes_Screen_resizeButtonSize);
 	float buttonIconPadding = 0.f; /// not used 2*diwne.getWorkAreaZoom();
 
 	// \todo
@@ -95,10 +95,12 @@ bool WorkspaceScreen::middleContent()
 	ImGui::SetCursorScreenPos(cursorPos);
 
 	interaction_happen |= diwne.IconButton(
-	    DIWNE::IconType::TriangleDownLeft, ImColor(100, 50, 50, 150),
-	    ImColor(100, 50, 50, 150), /* \todo JH MH constants to setting */
-	    DIWNE::IconType::TriangleDownLeft, ImColor(100, 100, 150, 150),
-	    ImColor(100, 100, 150, 150), zoomedButtonSize,
+	    DIWNE::IconType::TriangleDownLeft,
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner),
+	    DIWNE::IconType::TriangleDownLeft,
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape),
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner), zoomedButtonSize,
 	    ImVec4(buttonIconPadding, buttonIconPadding, buttonIconPadding,
 	           buttonIconPadding),
 	    true, fmt::format("screenButton:{}left", getId()));
@@ -131,10 +133,13 @@ bool WorkspaceScreen::middleContent()
 	ImGui::SetCursorScreenPos(cursorPos);
 
 	interaction_happen |= diwne.IconButton(
-	    DIWNE::IconType::TriangleDownRight, ImColor(100, 50, 50, 150),
-	    ImColor(100, 50, 50, 150), DIWNE::IconType::TriangleDownRight,
-	    ImColor(100, 100, 150, 150), ImColor(100, 100, 150, 150),
-	    zoomedButtonSize,
+
+	    DIWNE::IconType::TriangleDownRight,
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner),
+	    DIWNE::IconType::TriangleDownRight,
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape),
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner), zoomedButtonSize,
 	    ImVec4(buttonIconPadding, buttonIconPadding, buttonIconPadding,
 	           buttonIconPadding),
 	    true, fmt::format("screenButton:{}right", getId()));
@@ -177,11 +182,10 @@ bool WorkspaceScreen::middleContent()
 
 int WorkspaceScreen::maxLenghtOfData() // todo
 {
-	//    Debug::Assert(false, "TODO Calling WorkspaceScreen::maxLenghtOfData()
-	//    makes no sense - really?!?!?!!"); return -1; /* should be unused */
 	return numberOfCharWithDecimalPoint(
 	    getOutputs()[1]->getCorePin().data().getFloat(),
-	    getNumberOfVisibleDecimal()); /* \todo JH not 1 but some Core::Pin_Code */
+	    getNumberOfVisibleDecimal()); /* \todo JH \todo MH not 1 but some
+	                                     Core::Pin_Code */
 }
 
 void WorkspaceScreen::drawMenuLevelOfDetail() // todo

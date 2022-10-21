@@ -240,7 +240,7 @@ void World::manipulatorsSetMatrix(
 		if (parent != nullptr)
 		{ /*if(parent->get()!=nullptr){*/
 			(activeManipulator->parent) = &parent;
-		} //} /* \todo JH maybe repaire pointers? */
+		} //} /* \todo maybe repaire pointers? */
 	}
 	// else{printf("No manipulators\n"); }
 	// printf("operation %s\n",keyword);

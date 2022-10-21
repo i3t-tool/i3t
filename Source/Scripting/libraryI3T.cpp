@@ -905,8 +905,11 @@ void camera(struct ParseState* parser, struct Value* returnValue,
 	workspace->back()->setNodePositionDiwne(ImVec2((float)x, (float)y));
 	if (numArgs == 0)
 	{
-		/// \todo JH
-		// ne::CenterNodeOnScreen(workspace->back()->getId());
+		workspace->back()->setNodePositionDiwne(I3T::getWindowPtr<WorkspaceWindow>()
+		                                            ->getNodeEditor()
+		                                            .getWorkAreaDiwne()
+		                                            .GetCenter());
+
 		char label[100] = {0};
 		sprintf(label, "#%02u %s", workspace->back()->getNodebase()->getId(),
 		        workspace->back()->getNodebase()->getOperation()->keyWord.c_str());

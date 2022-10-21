@@ -382,6 +382,13 @@ extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne,
 extern void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue,
                               bool& valueSelected);
 
+/** \brief
+ *
+ * \param
+ * \param valueOfChange is set to value setted by user if so - not touched if no
+ * user change heppen \return whether some interaction happen
+ *
+ */
 extern bool drawData4x4(
     DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
     float dataWidth, FloatPopupMode& floatPopupMode, const glm::mat4& data,

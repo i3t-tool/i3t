@@ -2,7 +2,6 @@
 
 namespace DIWNE
 {
-/* \todo JH constants from settings */
 Link::Link(DIWNE::Diwne& diwne, DIWNE::ID id,
            std::string const labelDiwne /*="DiwneLink"*/)
     : DiwneObject(diwne, id, labelDiwne),
@@ -38,10 +37,10 @@ bool Link::isLinkOnWorkArea()
 
 bool Link::initialize()
 {
-	diwne.mp_settingsDiwne->linkColor.Value.w =
+	diwne.mp_settingsDiwne->linkColor.w =
 	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaHovered
 	                            : diwne.mp_settingsDiwne->linkAlpha;
-	diwne.mp_settingsDiwne->linkColorSelected.Value.w =
+	diwne.mp_settingsDiwne->linkColorSelected.w =
 	    m_focusedForInteraction ? diwne.mp_settingsDiwne->linkAlphaSelectedHovered
 	                            : diwne.mp_settingsDiwne->linkAlphaSelected;
 

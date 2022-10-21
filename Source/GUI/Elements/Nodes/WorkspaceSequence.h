@@ -6,7 +6,7 @@ class WorkspaceSequence : public WorkspaceNodeWithCoreDataWithPins
 {
 protected:
 	int m_position_of_dummy_data = -1;
-	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo JH width from some setting */
+	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
 
 	bool m_drawPins;
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceInnerTransformations;

@@ -20,7 +20,7 @@ namespace DIWNE
  */
 class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
-public:                /* \todo JH some atributes should be private/protected */
+public:                /* \todo some atributes should be private/protected */
 	DIWNE::Diwne& diwne; /*!< Every object have access to Diwne - is used for
 	                        share information if needed */
 	DIWNE::ID const m_idDiwne;      /*!< Used for creating ImGui id/labels */

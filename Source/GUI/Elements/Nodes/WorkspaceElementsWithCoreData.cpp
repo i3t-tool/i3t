@@ -150,8 +150,8 @@ void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 	{
 		// ImGui::TextUnformatted(fmt::format("Actual Decimal digits: {}",
 		// getNumberOfVisibleDecimal()).c_str()); ImGui::Separator();
-		for (int i = 0; i < 5; i++) /* \todo JH, MH some better setter for precision
-		                               - allowed values in settings? */
+		for (int i = 0; i < 5; i++) /* \todo JH, \todo MH some better setter for
+		                               precision - allowed values in settings? */
 		{
 			if (ImGui::MenuItem(fmt::format("{}", i).c_str(), NULL,
 			                    getNumberOfVisibleDecimal() == i, true))
@@ -203,7 +203,6 @@ bool WorkspaceCorePin::content()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-	/* \todo JH store this in Theme ?*/
 	DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
 	ImColor iconColorBg = I3T::getColor(WorkspacePinColorBackground[getType()]);
 	DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
@@ -212,8 +211,8 @@ bool WorkspaceCorePin::content()
 	ImVec2 iconSize =
 	    I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
 
-	float padding = 2 * diwne.getWorkAreaZoom(); /* \todo JH padding of inner
-	                                                shape in icon to Theme? */
+	float padding =
+	    I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
 	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg,
 	               iconColorFg, iconSize,
@@ -278,7 +277,7 @@ PinKind WorkspaceCorePin::getKind() const
 
 EValueType WorkspaceCorePin::getType() const { return m_pin.getType(); }
 
-/* \todo JH implement this function in Core? */
+/* \todo JH \todo MH implement this function in Core? */
 bool WorkspaceCorePin::isConnected() const
 {
 	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
@@ -294,8 +293,8 @@ bool WorkspaceCorePin::processDrag()
 	else
 		diwne.getHelperLink().setLinkEndpointsDiwne(actual, origin);
 
-	diwne.mp_settingsDiwne->linkColor = ImGui::ColorConvertFloat4ToU32(
-	    I3T::getTheme().get(WorkspacePinColorBackground[getType()]));
+	diwne.mp_settingsDiwne->linkColor =
+	    I3T::getTheme().get(WorkspacePinColorBackground[getType()]);
 	diwne.mp_settingsDiwne->linkThicknessDiwne =
 	    I3T::getTheme().get(ESize::Links_Thickness);
 
@@ -332,7 +331,31 @@ bool WorkspaceCorePin::processConnectionPrepared()
 			diwne.m_takeSnap = true;
 		}
 		break;
-	/* \todo JH react informatively to other result too */
+
+	case ENodePlugResult::Err_MismatchedPinTypes:
+		diwne.showTooltipLabel("Mismatched pin Types (matrix/float/vec/...)",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case ENodePlugResult::Err_MismatchedPinKind:
+		diwne.showTooltipLabel("Mismatched pin Kinds (in/out)",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case ENodePlugResult::Err_Loopback: /// Same nodes.
+		diwne.showTooltipLabel("Loop to same node",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case ENodePlugResult::Err_NonexistentPin:
+		diwne.showTooltipLabel("Pin not exists :-D",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case ENodePlugResult::Err_Loop:
+		diwne.showTooltipLabel("Unallowed loop",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
+	case ENodePlugResult::Err_DisabledPin:
+		diwne.showTooltipLabel("Pin is desabled :-D",
+		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
+		break;
 	default:
 		diwne.showTooltipLabel("Connection not possible",
 		                       I3T::getColor(EColor::Nodes_ConnectionNotPossible));
@@ -724,8 +747,8 @@ bool WorkspaceCoreLink::initialize()
 {
 	updateControlPointsOffsets();
 
-	diwne.mp_settingsDiwne->linkColor = ImGui::ColorConvertFloat4ToU32(
-	    I3T::getTheme().get(WorkspacePinColorBackground[m_endPin->getType()]));
+	diwne.mp_settingsDiwne->linkColor =
+	    I3T::getTheme().get(WorkspacePinColorBackground[m_endPin->getType()]);
 	diwne.mp_settingsDiwne->linkThicknessDiwne =
 	    I3T::getTheme().get(ESize::Links_Thickness);
 
@@ -735,11 +758,16 @@ bool WorkspaceCoreLink::initialize()
 		    I3T::getTheme().get(ESize::Links_ThicknessSelectedBorder);
 		diwne.mp_settingsDiwne->linkColorSelected =
 		    diwne.mp_settingsDiwne->linkColor;
-		diwne.mp_settingsDiwne->linkColorSelected.Value.x +=
-		    0.2; /* \todo JH selected border color to settings */
-		diwne.mp_settingsDiwne->linkColorSelected.Value.y += 0.2;
-		diwne.mp_settingsDiwne->linkColorSelected.Value.z += 0.2;
-		diwne.mp_settingsDiwne->linkColorSelected.Value.w = 0.8;
+
+		diwne.mp_settingsDiwne->linkColorSelected.x +=
+		    I3T::getColor(EColor::Links_selected_colorShift).x;
+		diwne.mp_settingsDiwne->linkColorSelected.y +=
+		    I3T::getColor(EColor::Links_selected_colorShift).y;
+		diwne.mp_settingsDiwne->linkColorSelected.z +=
+		    I3T::getColor(EColor::Links_selected_colorShift).z;
+
+		diwne.mp_settingsDiwne->linkColorSelected.w =
+		    I3T::getSize(ESize::Links_selected_alpha);
 	}
 	return false;
 }
@@ -1011,18 +1039,21 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne,
 
 	if (synergies)
 	{
-		ImGui::PushStyleColor(
-		    ImGuiCol_FrameBg,
-		    IM_COL32(0, 100, 0, 255)); /* \todo Color from settings */
-		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, IM_COL32(0, 100, 50, 255));
-		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, IM_COL32(0, 100, 100, 255));
+		ImGui::PushStyleColor(ImGuiCol_FrameBg,
+		                      I3T::getColor(EColor::Synergies_FloatBg));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered,
+		                      I3T::getColor(EColor::Synergies_FloatBgHovered));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgActive,
+		                      I3T::getColor(EColor::Synergies_FloatBgActive));
 	}
 	if (inactive)
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha,
-		                    ImGui::GetStyle().Alpha *
-		                        0.5f); /* \todo JH inactive style from settings */
+		ImGui::PushStyleVar(
+		    ImGuiStyleVar_Alpha,
+
+		    ImGui::GetStyle().Alpha *
+		        I3T::getSize(ESize::Float_inactive_alphaMultiplicator));
 	}
 
 	float step = I3T::getSize(ESize::Nodes_dragSpeedDefaulrRatio);
@@ -1037,6 +1068,11 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne,
 
 	// \todo JH is it done? make step a configurable constant - same or smaller
 	// than dragStep - other way drag is fired when step is not fired...
+	valueChanged = ImGui::DragFloat(
+	    label.c_str(), &value, step, 0.0f, 0.0f,
+	    fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
+	    1.0f); /* if power >1.0f the number changes logarithmic */
+
 	valueChanged = ImGui::DragFloat(
 	    label.c_str(), &value, step, 0.0f, 0.0f,
 	    fmt::format("%.{}f", numberOfVisibleDecimals).c_str(),
@@ -1304,8 +1340,6 @@ void loadWorkspacePinsFromCorePins(
 	/* when you create new pin type - add it to both, input and output part */
 }
 
-/* \todo JH to docs - valueOfChange will be set to data and than (possibly)
- * changed by user interaction */
 /* nodebase->getValueState({colum, row}) /* EValueState */
 bool drawData4x4(
     DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals,
@@ -1346,10 +1380,7 @@ bool drawData4x4(
 			if (actualValueChanged)
 			{
 				valueChanged = true;
-				columnOfChange =
-				    columns; /* \todo JH row, columns and value maybe unused -> changes
-				                possible directly in (not const) passed local_data from
-				                calling function */
+				columnOfChange = columns;
 				rowOfChange = rows;
 				valueOfChange = localData;
 			}
@@ -1440,11 +1471,13 @@ bool drawDataVec4(DIWNE::Diwne& diwne, DIWNE::ID const node_id,
 	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 	valueChanged = false;
+	// valueOfChange = data; /* will this work? */
 	ImGui::BeginGroup();
 	for (int columns = 0; columns < 4; columns++)
 	{
 		valueOfChange[columns] =
-		    data[columns]; /* \todo JH copy whole data directly - not in for*/
+		    data[columns]; /* \todo JH \todo MH copy whole data directly - not in
+		                      for see lines above */
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
 		    diwne, numberOfVisibleDecimals, floatPopupMode,
 		    fmt::format("##{}:{}", node_id, columns), valueOfChange[columns],
