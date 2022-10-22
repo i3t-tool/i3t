@@ -506,7 +506,7 @@ void TutorialWindow::renderHint(Hint* hint)
 	// ImGui::SameLine();
 	//  BUTTON
 	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
-	ImGui::Text("Hint");
+	ImGui::Text("Tip");
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
