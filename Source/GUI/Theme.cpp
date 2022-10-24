@@ -74,6 +74,14 @@ void Theme::initClassicProperties()
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
+	set(EColor::TutorialText, createColor(51, 51, 51, 255));
+	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
+	set(EColor::TutorialScrollbarActive, createColor(245, 245, 245, 255));
+	set(EColor::TutorialScrollbarGrab, createColor(232, 232, 232, 255));
+	set(EColor::TutorialScrollbarHovered, createColor(240, 240, 240, 255));
+	set(EColor::TutorialTitleText, createColor(14, 98, 175, 255));
+	set(EColor::TutorialButtonText, createColor(255, 255, 255, 255));
+	set(EColor::TutorialButtonBg, createColor(8, 187, 230, 255));
 
 	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
 	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));

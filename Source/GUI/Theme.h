@@ -38,6 +38,14 @@ enum class EColor
 	Synergies_FloatBgHovered,
 
 	TutorialBgColor,
+	TutorialText,
+	TutorialBarBg,
+	TutorialScrollbarGrab,
+	TutorialScrollbarHovered,
+	TutorialScrollbarActive,
+	TutorialTitleText,
+	TutorialButtonText,
+	TutorialButtonBg,
 
 	SelectionRectFull,
 	SelectionRectTouch,
