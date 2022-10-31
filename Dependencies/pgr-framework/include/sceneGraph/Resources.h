@@ -39,7 +39,8 @@ public:
     return get(name);
   }
 
-	T& get(const std::string& name) {
+	// T& get(const std::string& name) { BUG?
+    T get(const std::string& name) {
 		ResourceIterator it = m_resources.find(name);
 		if (it != m_resources.end()) {
 			it->second.count++;
