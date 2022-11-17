@@ -37,7 +37,8 @@
 #include <imgui.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
-
+//TODO - REDEFINE DIWNE
+/*
 #define DIWNE_DEBUG(node_editor, debugCode)                                    \
 	do                                                                           \
 	{                                                                            \
@@ -45,11 +46,10 @@
 		{                                                                          \
 			debugCode                                                                \
 		}                                                                          \
-	} while (0) /* do-while only for code-technical reason */
-
+	} while (0) // do-while only for code-technical reason
+*/
 namespace DIWNE
 {
-
 typedef unsigned int ID;
 
 /*! \brief Drawing mode of DiwneObject  */
