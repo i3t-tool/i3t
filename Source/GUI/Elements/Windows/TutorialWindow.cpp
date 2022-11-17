@@ -484,11 +484,7 @@ void TutorialWindow::renderTask(Task* task)
 	ImVec2 drawPos =
 	    ImGui::GetCursorScreenPos() + ImVec2(0, ImGui::GetStyle().FramePadding.y);
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
-	ImU32 color = IM_COL32(
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText).x * 255,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText).y * 255,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText).z * 255,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText).w * 255);
+	ImU32 color = ImGui::ColorConvertFloat4ToU32( Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
 	draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y),
 	                         ImVec2(drawPos.x + size, drawPos.y + size),
 	                         color);
