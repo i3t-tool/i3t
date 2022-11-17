@@ -124,15 +124,15 @@ void WorkspaceDiwne::deleteSelectedNodes()
 {
 	for (auto&& workspaceCoreNode : getSelectedNodesInnerIncluded())
 	{
-		workspaceCoreNode->setRemoveFromWorkspace(true);
+		workspaceCoreNode->deleteActionDiwne();
 
 		Ptr<WorkspaceTransformation> trn =
 		    std::dynamic_pointer_cast<WorkspaceTransformation>(workspaceCoreNode);
 		if (trn != nullptr)
 		{
-			trn->setRemoveFromSequence(true);
+			trn->deleteActionDiwne();
 		}
-	}
+}
 }
 
 void WorkspaceDiwne::popupContent()
@@ -660,7 +660,7 @@ void WorkspaceDiwne::popupContent()
 			{
 				if (workspaceCoreNode->getSelected())
 				{
-					workspaceCoreNode->setRemoveFromWorkspace(true);
+					workspaceCoreNode->deleteActionDiwne();
 				}
 				else
 				{
@@ -674,7 +674,7 @@ void WorkspaceDiwne::popupContent()
 							{
 								std::dynamic_pointer_cast<WorkspaceTransformation>(
 								    nodeInSequence)
-								    ->setRemoveFromSequence(true);
+								    ->deleteActionDiwne();
 							}
 						}
 					}
@@ -1199,7 +1199,7 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 	if (getNodesSelectionChanged())
 	{
 		std::vector<Ptr<WorkspaceNodeWithCoreData>> selected_nodes =
-		    getSelectedNodes();
+		    getSelectedNodesInnerIncluded();
 		if (selected_nodes.size() == 1)
 		{
 			Ptr<WorkspaceTransformation> selected_transformation =

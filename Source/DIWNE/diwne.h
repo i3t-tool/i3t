@@ -337,8 +337,10 @@ public:
 
 	template <typename T> void setLastActivePin(std::shared_ptr<T> pin)
 	{
-		static_assert(std::is_base_of_v<DIWNE::Pin, T>,
-		              "Pin must be derived from DIWNE::Pin class.");
+		static_assert(
+                std::is_same<T, std::nullptr_t>::value ||
+                std::is_base_of_v<DIWNE::Pin, T>,
+                "Pin must be derived from DIWNE::Pin class.");
 		mp_lastActivePin = pin;
 	}
 
@@ -354,8 +356,8 @@ public:
 	template <typename T> void setLastActiveNode(std::shared_ptr<T> node)
 	{
 		static_assert(
-		    std::is_base_of_v<DIWNE::Node,
-		                      T> /* || std::is_same<T, std::nullptr_t>::value*/,
+            //std::is_same<T, std::nullptr_t>::value ||
+		    std::is_base_of_v<DIWNE::Node, T>,
 		    "Node must be derived from DIWNE::Node class.");
 		mp_lastActiveNode = node;
 	}

@@ -10,7 +10,8 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id,
       m_middleRectDiwne(ImRect(0, 0, 0, 0)),
       m_rightRectDiwne(ImRect(0, 0, 0, 0)),
       m_bottomRectDiwne(ImRect(0, 0, 0, 0)), m_centerDummySpace(0),
-      m_drawAnywhere(true), m_nodePosMode(OnItsPosition)
+      m_drawAnywhere(true), m_nodePosMode(OnItsPosition),
+      m_toDelete(false)
 {
 }
 
@@ -28,6 +29,17 @@ Node& Node::operator=(const Node& rhs)
 		return *this; // handle self assignment
 	// assignment operator
 	return *this;
+}
+
+void Node::deleteActionDiwne()
+{
+    deleteAction();
+    if ( diwne.getLastActiveNode<DIWNE::Node>().get() == this )
+    {
+        diwne.setLastActiveNode<DIWNE::Node>(nullptr);
+        diwne.setLastActivePin<DIWNE::Pin>(nullptr);
+    }
+    m_toDelete = true;
 }
 
 bool Node::allowDrawing()
