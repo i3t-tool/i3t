@@ -324,8 +324,8 @@ void StartWindow::render()
 						std::string title = "Open I3T script...";
 						std::string root = Config::getAbsolutePath("./");
 						std::vector<std::string> filter;
-						filter.push_back("C source files");
-						filter.push_back("*.c");
+						filter.push_back("I3T scene files");
+						filter.push_back("*.scene");
 						bool success = SystemDialogs::OpenSingleFileDialog(result, title,
 						                                                   root, filter);
 						auto ww = I3T::getWindowPtr<WorkspaceWindow>();
@@ -334,7 +334,7 @@ void StartWindow::render()
 							if (success && !result.empty())
 							{
 								ww->getNodeEditor().m_workspaceCoreNodes.clear();
-								loadWorkspace(result.c_str());
+								StateManager::instance().loadScene(result);
 							}
 							else
 							{
