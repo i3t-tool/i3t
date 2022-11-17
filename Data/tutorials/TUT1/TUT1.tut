@@ -50,7 +50,7 @@ Hlavní rozhraní programu tvoří tyto dvě okna:
 
 *Scene View* ukazuje scénu z nezávislé kamery.
 
-*Workspace* slouží k interakci se scénou pomocí tzv. bloků.
+*Workspace* slouží k interakci se scénou pomocí *stavebních bloků* (také někdy *krabičky*).
 
 *Pojďme si vysvětlit jak s nimi zacházet*
 
@@ -74,7 +74,7 @@ Stisknutím *pravého tlačítka*  ![pravé tlačítko myši](mouseRight.png)  n
 To používáme k přidávání a mazání *bloků* a interakci s nimi.
 
 --
-*Bloky*
+*Stavební bloky*
 *Bloky* jsou základní jednotkou I3T, mohou fungovat jako matice, model, nebo funkce (například cykly).
 
 task:
@@ -83,7 +83,7 @@ task:
     * sequence
     * transformation -> scale
 hint: Pravé tlačítko myši na ploše Workspace otevře menu. V něm vybereme název bloku, který chceme přidat.
-Scéna by po přidání *bloků* měla vypadat asi takhle:
+Scéna by po přidání *bloků* měla vypadat asi takhle (s bloky jde hýbat uchopením za vrchní lištu):
 ![Model krychle, sekvence a matice transformace velikosti](addStuff.png)
 
 --
@@ -126,16 +126,16 @@ Symbol označuje operaci *maticového násobení*, všechny body modelu se tedy 
 Mají podobu matice 4x4:
 ![Matice škálování](scale.png)
 
-Bloky matic žádné *vstupy* ani *výstupy* nemají, abychom mohli *matici* jakkoliv použít, je třeba jí vložit do *sekvence*.
+Bloky matic žádné *vstupy* ani *výstupy* nemají. Abychom mohli *matici* jakkoliv použít, je ji třeba vložit do *sekvence*.
 
-Toho dosáhneme uchopením *bloku* za vrchní lištu a přetažením přímo na blok *sekvence*.
+Toho dosáhneme uchopením matice za vrchní lištu a přetažením přímo na blok *sekvence*.
 
 --
 *Sekvence*
 
 *Blok sekvence* slouží jako obal pro jednu nebo více *matic*.
 
-Má několik *vstupů* a *výstupů*, pro nás je ale důležitý hlavně první výstup zhora ![Maticové násobení](mult.png).
+Má několik *vstupů* a *výstupů*, pro nás je ale důležitý hlavně první výstup shora ![Maticové násobení](mult.png).
 Jelikož je datový typ stejný jako *vstup* modelu, můžeme táhnutím myši spojít oba bloky drátem.
 
 ![Sekvence](seq.png)
@@ -143,30 +143,28 @@ Jelikož je datový typ stejný jako *vstup* modelu, můžeme táhnutím myši s
 --
 *Zvětšení modelu*
 
-Pojďme tedy využít naše znalosti k *zvětšení* našeho modelu
+Pojďme tedy využít naše znalosti ke *zvětšení* našeho modelu
 task: Vlož matici do sekvence a propoj tuto sekvenci s modelem
-Pro kontrolu se lze podívat na *Tip:*
-hint: ![Matice v sekvenci napojené na model](completed.png)
+
+Správně propojené bloky vypadají takhle:
+![Matice v sekvenci napojené na model](completed.png)
 
 --
 
-task: Nyní zkus změnit jednu z hodnot v matici tím, že na ní klikneš a potáhneš doprava
+task: Nyní zkus změnit modře zvýrazněnou hodnotu v matici tím, že na ní klikneš a potáhneš doprava
 
-Tímto tlačítkem můžeš nahlédnout, jestli na to jdeš správně:
-hint:
-    Modře zvýrazněná hodnota je měněnou hodnotou
-    ![Kliknutím na hodnotu v matici a tažením myší vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
+![Kliknutím na hodnotu v matici a tažením myší vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
 
 Hodnoty je taky možné měnit kliknutím myší a přepsáním pomocí klávesnice.
 --
-*Gratulace!*
+*Jupí!*
 Už znáš základy práce s I3T a můžeš začít s *transformacemi*!
 ![Splněno!](checkbox.png)
 
-Shrnutí:
+Co jsme se naučili:
   * *workspace* a *viewport*
   * *ovládání myší* ![levé tlačítko myši](mouseLeft.png) ![prostřední tlačítko myši](mouseMiddle.png) ![pravé tlačítko myši](mouseRight.png)
   * základy práce s *bloky*
 
-Klikni na *Finish* pro návrat do úvodního okna. ![Dole!](down.png)
+Tlačítkem *Finish* se vrátíš do úvodního okna. ![Dole!](down.png)
 

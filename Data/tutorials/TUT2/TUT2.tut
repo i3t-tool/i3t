@@ -163,10 +163,10 @@ task: Nakonec uprav hodnoty v matici translace tak, aby kostka ležela v rohu s�
 ![Kostka posunutá do rohu](translated_cube.png)
 --
 *Ta kostka si to zaslouží!*
-Gratulace! Už víš co dělá jaká transformace!
+Super! Už víš co dělá jaká transformace!
 ![Splněno!](checkbox.png)
 
-Shrnutí:
+Co jsme se dozvěděli:
   * základy práce s *transformacemi*
   * ždibec *matematiky*
   * opakování základů *práce s bloky*
