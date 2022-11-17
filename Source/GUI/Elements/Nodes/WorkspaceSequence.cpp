@@ -97,7 +97,7 @@ void WorkspaceSequence::moveNodeToSequence(
 void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node)
 {
 	node->setRemoveFromWorkspace(false);
-	node->m_selectable = true;
+//	node->m_selectable = true;
 	dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
 	popNode(node);
 }
@@ -203,6 +203,7 @@ bool WorkspaceSequence::middleContent()
 		}
 	}
 
+/*
 	m_workspaceInnerTransformations.erase(
 	    std::remove_if(
 	        m_workspaceInnerTransformations.begin(),
@@ -213,8 +214,20 @@ bool WorkspaceSequence::middleContent()
 		            ->getRemoveFromSequence();
 	        }),
 	    m_workspaceInnerTransformations.end());
+*/ // Better deleting from Sequence -> popMatrix() in popNode() is crucial
+    for (auto const& transformation : m_workspaceInnerTransformations)
+	{
+	    Ptr<WorkspaceTransformation> node_t =
+	    std::dynamic_pointer_cast<WorkspaceTransformation>(transformation);
+	    if (node_t->getRemoveFromSequence())
+        {
+            popNode(transformation);
+            transformation->deleteActionDiwne();
+        }
+	}
 
 	int i = 0, push_index = -1;
+	bool interaction_with_transformation_happen = false;
 	for (auto const& transformation : m_workspaceInnerTransformations)
 	{
 		if (position_of_draged_node_in_sequence == i)
@@ -227,13 +240,15 @@ bool WorkspaceSequence::middleContent()
 				push_index = i;
 			}
 		}
-
+/* with no selection manipulator not work
 		transformation->m_selectable = false;
 		transformation->setSelected(false);
+*/
+
 		/* \todo some better selected transformation/nodes politic (when dragging,
 		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
 		 * action to do and in WorkspaceDiwne react to this action  */
-		inner_interaction_happen |=
+		interaction_with_transformation_happen |=
 		    transformation->drawNodeDiwne<WorkspaceTransformation>(
 		        DIWNE::DrawModeNodePosition::OnCoursorPosition,
 		        m_isHeld || m_drawMode == DIWNE::DrawMode::JustDraw
@@ -244,6 +259,11 @@ bool WorkspaceSequence::middleContent()
 
 		i++;
 	}
+	if (interaction_with_transformation_happen)
+    {
+        inner_interaction_happen = false; /* do not set sequence as interacting node -> selected
+				              transformation should be only interacting */
+    }
 	if (i == 0 || position_of_draged_node_in_sequence ==
 	                  i) /* add dummy after last inner or if empty */
 	{
@@ -286,6 +306,8 @@ bool WorkspaceSequence::middleContent()
 			}
 		}
 	}
+
+
 
 	return inner_interaction_happen;
 }

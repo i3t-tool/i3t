@@ -11,6 +11,11 @@ WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne,
 	setDataItemsWidth();
 }
 
+bool WorkspaceTransformation::allowDrawing()
+{
+    return isInSequence() || WorkspaceNodeWithCoreData::allowDrawing();
+}
+
 void WorkspaceTransformation::updateSizes()
 {
 	/* right align - have to be computed before DIWNE::Node::updateSizes(),
@@ -229,12 +234,17 @@ void WorkspaceTransformation::drawMenuSetDataMap()
 	}
 }
 
+void WorkspaceTransformation::deleteAction()
+{
+    m_removeFromWorkspaceWindow = true;
+    m_removeFromSequence = true;
+}
+
 void WorkspaceTransformation::drawMenuDelete()
 {
 	if (ImGui::MenuItem("Delete"))
 	{
-		m_removeFromWorkspaceWindow = true;
-		m_removeFromSequence = true;
+		deleteActionDiwne();
 	}
 }
 

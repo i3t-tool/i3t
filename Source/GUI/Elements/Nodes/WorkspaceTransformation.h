@@ -46,6 +46,8 @@ public:
 	bool topContent();
 	bool middleContent();
 	bool afterContent();
+	virtual void deleteAction();
+	virtual bool allowDrawing();
 
 	void popupContent();
 	virtual void drawMenuLevelOfDetail() = 0;

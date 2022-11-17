@@ -62,6 +62,8 @@ public:
 	};
 
 	void updateSizes();
+	void deleteActionDiwne();
+	virtual void deleteAction(){};
 
 	virtual bool allowDrawing();
 	virtual bool beforeBeginDiwne();
@@ -80,7 +82,7 @@ public:
 
 		bool interaction_happen = drawDiwne(drawMode);
 
-		if (interaction_happen)
+		if (interaction_happen && !m_toDelete)
 		{
 			diwne.setLastActiveNode<T>(
 			    std::static_pointer_cast<T>(shared_from_this()));
@@ -155,6 +157,7 @@ protected:
 
 	float m_centerDummySpace;
 	DrawModeNodePosition m_nodePosMode;
+	bool m_toDelete;
 
 private:
 	void setNodeRectsPositionDiwne(ImVec2 const& position);

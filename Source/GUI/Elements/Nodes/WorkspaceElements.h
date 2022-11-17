@@ -88,6 +88,7 @@ public:
 	virtual bool leftContent();
 	virtual bool rightContent();
 	virtual bool bottomContent();
+	virtual void deleteAction();
 
 	bool m_removeFromWorkspaceWindow;
 	bool getRemoveFromWorkspace() const { return m_removeFromWorkspaceWindow; };
