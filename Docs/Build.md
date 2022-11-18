@@ -15,7 +15,7 @@ git submodule update --init --recursive
 ````
 
 ## Instalace potřebných závislotí
-### Linux (aptitude)
+### Linux (apt)
 ````shell
 apt install libgl-dev libglx-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev -y
 ````
@@ -27,6 +27,8 @@ jsou obsažené v adresáři `Dependencies/`.
 Adresář, ve kterém je CMake spuštěn se bere jako adresář výstupní, do nejž jsou 
 vygenrovány soubory pro build systémy (Makefile, *.vxproj, ...).
 
+**Kód:** Generování konfigurace pomocí cmake.
+**Pro sestavení distribuovatelné binárky je třeba specifikovat proměnnou `CMAKE_BUILD_TYPE=ReleaseStandalone`.**
 ````shell script
 # In the project root create cmake output directory 'out/' and move into it.
 mkdir out && cd out

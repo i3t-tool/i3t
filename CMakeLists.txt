@@ -247,5 +247,7 @@ if (CMAKE_BUILD_TYPE MATCHES "ReleaseStandalone")
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Data" "${I3T_OUT_DIR}Data")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/config.yml" "${I3T_OUT_DIR}config.yml")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Config.json" "${I3T_OUT_DIR}Config.json")
 endif()
 # =============================================================

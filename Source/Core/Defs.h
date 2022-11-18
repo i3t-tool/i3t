@@ -46,7 +46,8 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #define I3T_ASSERT(cond) assert(cond)
 #define I3T_ABORT(message) assert(false && message)
 #else
-#define I3T_ASSERT(cond, description)
+#define I3T_ASSERT(cond)
+#define I3T_ABORT(message) assert(false && message)
 #endif
 
 namespace Debug
