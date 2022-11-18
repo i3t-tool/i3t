@@ -1574,6 +1574,16 @@ NodeImpl<ENodeType::Vector3ToVector3>::updateValues(int inputIndex)
 }
 
 template <>
+FORCE_INLINE void
+NodeImpl<ENodeType::Vector4ToVector4>::updateValues(int inputIndex)
+{
+	if (m_inputs[0].isPluggedIn())
+	{
+		setInternalValue(m_inputs[0].getStorage().getVec4());
+	}
+}
+
+template <>
 FORCE_INLINE void NodeImpl<ENodeType::QuatToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
