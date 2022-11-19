@@ -4,6 +4,8 @@
 
 class WorkspaceSequence : public WorkspaceNodeWithCoreDataWithPins
 {
+private:
+    bool m_isCameraSequence;
 protected:
 	int m_position_of_dummy_data = -1;
 	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
@@ -15,7 +17,8 @@ public:
 	WorkspaceSequence(
 	    DIWNE::Diwne& diwne,
 	    Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(),
-	    bool drawPins = true);
+	    bool drawPins = true,
+	    bool isCameraSequence = false);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
@@ -31,6 +34,8 @@ public:
 	bool isSequence();
 	int getInnerPosition(ImVec2 point);
 	int getInnerPosition(std::vector<ImVec2> points);
+
+	virtual bool allowDrawing();
 
 	void popNode(Ptr<WorkspaceNodeWithCoreData> node);
 	void pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index = 0);

@@ -4,10 +4,17 @@
 WorkspaceSequence::WorkspaceSequence(
     DIWNE::Diwne& diwne,
     Ptr<Core::NodeBase> nodebase /*= Core::Builder::createSequence()*/,
-    bool drawPins /*=true*/)
+    bool drawPins /*=true*/,
+    bool isCameraSequence /*=false*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false),
-      m_drawPins(drawPins)
+      m_drawPins(drawPins),
+      m_isCameraSequence(isCameraSequence)
 {
+}
+
+bool WorkspaceSequence::allowDrawing()
+{
+    return m_isCameraSequence || WorkspaceNodeWithCoreData::allowDrawing();
 }
 
 bool WorkspaceSequence::isSequence() { return true; }
@@ -66,7 +73,7 @@ void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 		int index = node_iter - m_workspaceInnerTransformations.begin();
 		std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter)
 		    ->setRemoveFromSequence(true);
-		m_workspaceInnerTransformations.erase(node_iter);
+//		m_workspaceInnerTransformations.erase(node_iter); is done in next frame based on setRemoveFromSequence(true)
 		m_nodebase->as<Core::Sequence>()->popMatrix(index);
 	}
 }
@@ -97,9 +104,10 @@ void WorkspaceSequence::moveNodeToSequence(
 void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node)
 {
 	node->setRemoveFromWorkspace(false);
+	dynamic_pointer_cast<WorkspaceTransformation>(node)->setRemoveFromSequence(true);
 //	node->m_selectable = true;
 	dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
-	popNode(node);
+//	popNode(node);
 }
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> const&
@@ -203,28 +211,23 @@ bool WorkspaceSequence::middleContent()
 		}
 	}
 
-/*
+
+    // Better deleting from Sequence -> popMatrix() in popNode() is crucial
 	m_workspaceInnerTransformations.erase(
 	    std::remove_if(
 	        m_workspaceInnerTransformations.begin(),
 	        m_workspaceInnerTransformations.end(),
-	        [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
+	        [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
 	        {
-		        return std::dynamic_pointer_cast<WorkspaceTransformation>(node)
+	            bool remove_from_seq = std::dynamic_pointer_cast<WorkspaceTransformation>(node)
 		            ->getRemoveFromSequence();
+                if (remove_from_seq)
+                {
+                    popNode(node);
+                }
+		        return remove_from_seq;
 	        }),
 	    m_workspaceInnerTransformations.end());
-*/ // Better deleting from Sequence -> popMatrix() in popNode() is crucial
-    for (auto const& transformation : m_workspaceInnerTransformations)
-	{
-	    Ptr<WorkspaceTransformation> node_t =
-	    std::dynamic_pointer_cast<WorkspaceTransformation>(transformation);
-	    if (node_t->getRemoveFromSequence())
-        {
-            popNode(transformation);
-            transformation->deleteActionDiwne();
-        }
-	}
 
 	int i = 0, push_index = -1;
 	bool interaction_with_transformation_happen = false;

@@ -726,7 +726,7 @@ void WorkspaceCoreLink::updateEndpoints()
 	WorkspaceCoreOutputPin* startPin = getStartPin();
 	WorkspaceCoreInputPin* endPin = getEndPin();
 	if (startPin)
-		start = startPin->getLinkConnectionPointDiwne();
+            start = startPin->getLinkConnectionPointDiwne();
 	if (endPin)
 		end = endPin->getLinkConnectionPointDiwne();
 	setLinkEndpointsDiwne(start, end);
