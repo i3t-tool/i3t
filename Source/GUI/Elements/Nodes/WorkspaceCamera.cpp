@@ -4,9 +4,9 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
     : WorkspaceNodeWithCoreDataWithPins(
           diwne, Core::GraphManager::createCamera(), false),
       m_projection(std::make_shared<WorkspaceSequence>(
-          diwne, m_nodebase->as<Core::Camera>()->getProj())),
+          diwne, m_nodebase->as<Core::Camera>()->getProj(), true, true)),
       m_view(std::make_shared<WorkspaceSequence>(
-          diwne, m_nodebase->as<Core::Camera>()->getView()))
+          diwne, m_nodebase->as<Core::Camera>()->getView(), true, true))
 {
 	(m_view->getInputs().at(0).get())
 	    ->plug(m_projection->getOutputs().at(0).get());
