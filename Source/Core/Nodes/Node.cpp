@@ -276,14 +276,17 @@ ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 
 void Node::unplugAll()
 {
-	for (size_t i = 0L; i < m_inputs.size(); ++i)
+	auto inputsView  = getInputPins();
+	auto outputsView = getOutputPins();
+
+	for (size_t i = 0L; i < inputsView.size(); ++i)
 	{
 		unplugInput(i);
 	}
 
-	for (size_t i = 0L; i < m_outputs.size(); ++i)
+	for (size_t i = 0L; i < outputsView.size(); ++i)
 	{
-		for (const auto& connected : m_outputs[i].m_outputs)
+		for (const auto& connected : outputsView[i].m_outputs)
 		{
 			unplugOutput(i);
 
