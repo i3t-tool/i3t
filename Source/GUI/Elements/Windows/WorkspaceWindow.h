@@ -141,12 +141,8 @@ public:
 	template <class T> auto inline addNodeToPositionOfPopup()
 	{
 		auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
-/*
-        /// TEST /////////////////////////////////////////////////
-		StateManager::instance().takeSnapshot();
-		//////////////////////////////////////////////////////////
-*/
-        m_takeSnap = true; /* JH maybe better in place where this function is called*/
+		m_takeSnap =
+		    true; /* JH maybe better in place where this function is called*/
 
 		return result;
 	}
@@ -220,25 +216,20 @@ public:
 
 	//
 
+private:
 	Memento getState() override;
 
 	void setState(const Memento& memento) override;
 
+	void clear() override;
 	//
 
+public:
 	WorkspaceDiwne& getNodeEditor();
 
 	Application& m_wholeApplication;
 
 	void render();
-
-	bool Splitter(bool split_vertically, float thickness, float* size1,
-	              float* size2, float min_size1, float min_size2,
-	              float splitter_long_axis_size = -1.0f);
-
-	void ShowLeftPane(float paneWidth);
-
-	void ShowStyleEditor(bool* show = nullptr);
 
 private:
 	void showEditMenu();

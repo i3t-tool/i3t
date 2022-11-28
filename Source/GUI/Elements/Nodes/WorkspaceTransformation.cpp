@@ -13,7 +13,7 @@ WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne,
 
 bool WorkspaceTransformation::allowDrawing()
 {
-    return isInSequence() || WorkspaceNodeWithCoreData::allowDrawing();
+	return isInSequence() || WorkspaceNodeWithCoreData::allowDrawing();
 }
 
 void WorkspaceTransformation::updateSizes()
@@ -236,8 +236,8 @@ void WorkspaceTransformation::drawMenuSetDataMap()
 
 void WorkspaceTransformation::deleteAction()
 {
-    m_removeFromWorkspaceWindow = true;
-    m_removeFromSequence = true;
+	m_removeFromWorkspaceWindow = true;
+	m_removeFromSequence = true;
 }
 
 void WorkspaceTransformation::drawMenuDelete()

@@ -37,16 +37,16 @@
 #include <imgui.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
-//TODO - REDEFINE DIWNE
+// TODO - REDEFINE DIWNE
 /*
 #define DIWNE_DEBUG(node_editor, debugCode)                                    \
-	do                                                                           \
-	{                                                                            \
-		if (node_editor.m_diwneDebug_on)                                           \
-		{                                                                          \
-			debugCode                                                                \
-		}                                                                          \
-	} while (0) // do-while only for code-technical reason
+  do                                                                           \
+  {                                                                            \
+    if (node_editor.m_diwneDebug_on)                                           \
+    {                                                                          \
+      debugCode                                                                \
+    }                                                                          \
+  } while (0) // do-while only for code-technical reason
 */
 namespace DIWNE
 {

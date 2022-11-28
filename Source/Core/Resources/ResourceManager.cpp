@@ -41,7 +41,9 @@ void ResourceManager::init(const std::vector<Resource>& defaultResources)
 			m_nameToPath.insert({resource.ID, resource.Path.string()});
 
 			MeshNode* model = new MeshNode();
-			pgr::sg::MeshGeometry* mesh_p = (pgr::sg::MeshGeometry*)MeshManager::Instance()->get(m_nameToPath.at(resource.ID));
+			pgr::sg::MeshGeometry* mesh_p =
+			    (pgr::sg::MeshGeometry*)MeshManager::Instance()->get(
+			        m_nameToPath.at(resource.ID));
 			model->setGeometry(mesh_p);
 			m_models.insert({resource.ID, model});
 		}

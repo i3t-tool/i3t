@@ -132,7 +132,7 @@ void WorkspaceDiwne::deleteSelectedNodes()
 		{
 			trn->deleteActionDiwne();
 		}
-}
+	}
 }
 
 void WorkspaceDiwne::popupContent()
@@ -1421,6 +1421,8 @@ void WorkspaceWindow::setState(const Memento& memento)
 		}
 	}
 }
+
+void WorkspaceWindow::clear() { getNodeEditor().m_workspaceCoreNodes.clear(); }
 
 //
 

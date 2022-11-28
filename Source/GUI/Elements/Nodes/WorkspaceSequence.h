@@ -5,7 +5,8 @@
 class WorkspaceSequence : public WorkspaceNodeWithCoreDataWithPins
 {
 private:
-    bool m_isCameraSequence;
+	bool m_isCameraSequence;
+
 protected:
 	int m_position_of_dummy_data = -1;
 	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
@@ -17,8 +18,7 @@ public:
 	WorkspaceSequence(
 	    DIWNE::Diwne& diwne,
 	    Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(),
-	    bool drawPins = true,
-	    bool isCameraSequence = false);
+	    bool drawPins = true, bool isCameraSequence = false);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
