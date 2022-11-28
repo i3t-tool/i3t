@@ -14,6 +14,14 @@
 
 struct Tutorial;
 
+class BeforeNewProjectCommand : public Command<BeforeNewProjectCommand>
+{
+};
+
+class NewProjectCommand : public Command<NewProjectCommand>
+{
+};
+
 class BeforeCloseCommand : public Command<BeforeCloseCommand>
 {
 };

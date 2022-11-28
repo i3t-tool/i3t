@@ -162,6 +162,16 @@ void StateManager::setScene(const fs::path& scene)
 	App::get().setTitle(newTitle);
 }
 
+void StateManager::clear()
+{
+	for (const auto& originator : m_originators)
+	{
+		originator->clear();
+	}
+
+	reset();
+}
+
 //===----------------------------------------------------------------------===//
 
 void StateManager::reset()

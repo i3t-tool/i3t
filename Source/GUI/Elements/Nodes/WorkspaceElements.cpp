@@ -106,10 +106,7 @@ bool WorkspaceNode::bypassFocusForInteractionAction()
 	                        diwne.screen2diwne(diwne.bypassGetMousePos())));
 }
 
-void WorkspaceNode::deleteAction()
-{
-    m_removeFromWorkspaceWindow = true;
-}
+void WorkspaceNode::deleteAction() { m_removeFromWorkspaceWindow = true; }
 
 void WorkspaceNode::drawMenuDelete()
 {

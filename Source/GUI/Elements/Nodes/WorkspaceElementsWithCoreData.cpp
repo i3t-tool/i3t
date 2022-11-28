@@ -726,7 +726,7 @@ void WorkspaceCoreLink::updateEndpoints()
 	WorkspaceCoreOutputPin* startPin = getStartPin();
 	WorkspaceCoreInputPin* endPin = getEndPin();
 	if (startPin)
-            start = startPin->getLinkConnectionPointDiwne();
+		start = startPin->getLinkConnectionPointDiwne();
 	if (endPin)
 		end = endPin->getLinkConnectionPointDiwne();
 	setLinkEndpointsDiwne(start, end);
@@ -935,7 +935,7 @@ bool WorkspaceNodeWithCoreDataWithPins::finalize()
 				    std::dynamic_pointer_cast<WorkspaceCoreInputPin>(pin);
 				if (in->getLink().isLinkOnWorkArea())
 				{
-					//inner_interaction_happen |= in->getLink().drawDiwne();
+					// inner_interaction_happen |= in->getLink().drawDiwne();
 					wd.m_linksToDraw.push_back(&pin->getLink());
 				}
 			}
@@ -969,12 +969,12 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 		for (auto const& pin : m_workspaceInputs)
 		{
 			inner_interaction_happen |= pin->drawDiwne();
-/* is in pin->drawDiwne()
-			if (pin->isconnected())
-			{
-				wd.m_linkstodraw.push_back(&pin->getlink());
-			}
-*/
+			/* is in pin->drawDiwne()
+			      if (pin->isconnected())
+			      {
+			        wd.m_linkstodraw.push_back(&pin->getlink());
+			      }
+			*/
 		}
 	}
 	return inner_interaction_happen;

@@ -65,6 +65,8 @@ public:
 
 	//===--------------------------------------------------------------------===//
 
+	void clear();
+
 private:
 	/// Resets counters, set clean state and takes initial snapshot.
 	void reset();

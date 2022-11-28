@@ -124,7 +124,8 @@ void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
 
 void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 {
-	const auto& coreNode = node->getNodebase()->as<Core::NodeImpl<ENodeType::Screen>>();
+	const auto& coreNode =
+	    node->getNodebase()->as<Core::NodeImpl<ENodeType::Screen>>();
 	auto& alloc = m_memento.GetAllocator();
 	auto& screens = m_memento["workspace"]["screens"];
 	auto& edges = m_memento["workspace"]["edges"];

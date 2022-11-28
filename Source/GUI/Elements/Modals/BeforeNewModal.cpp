@@ -1,4 +1,4 @@
-#include "BeforeCloseModal.h"
+#include "BeforeNewModal.h"
 
 #include <imgui.h>
 
@@ -6,15 +6,18 @@
 #include "Core/Input/InputManager.h"
 #include "State/StateManager.h"
 
-void BeforeCloseModal::render()
+constexpr const char* MODAL_LABEL = "Create new project?###%s";
+
+void BeforeNewModal::render()
 {
 	if (!StateManager::instance().isDirty())
 	{
-		CloseCommand::dispatch();
+		submit();
+
 		return;
 	}
 
-	ImGui::OpenPopup("Close?###%s");
+	ImGui::OpenPopup(MODAL_LABEL);
 
 	// Always center this window when appearing
 	ImVec2 center = ImGui::GetMainViewport()->GetWorkCenter();
@@ -27,21 +30,19 @@ void BeforeCloseModal::render()
 	// parent_size.y * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-	if (ImGui::BeginPopupModal("Close?###%s", nullptr,
+	if (ImGui::BeginPopupModal(MODAL_LABEL, nullptr,
 	                           ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::Text("Any unsaved content will be discarded, are you sure?\n\n");
+		ImGui::Text("Do you want to save current project?\n\n");
 		ImGui::Separator();
 
-		if (ImGui::Button("Save and quit", ImVec2(100, 0)))
+		if (ImGui::Button("Yes", ImVec2(100, 0)))
 		{
 			InputManager::triggerAction("save", EKeyState::Pressed);
 
 			if (!StateManager::instance().isDirty())
 			{
-				// save was successful
-				HideWindowCommand::dispatch(ID);
-				CloseCommand::dispatch();
+				submit();
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -49,21 +50,19 @@ void BeforeCloseModal::render()
 		ImGui::SetItemDefaultFocus();
 
 		ImGui::SameLine();
-		if (ImGui::Button("Quit anyway", ImVec2(100, 0)))
+		if (ImGui::Button("No", ImVec2(100, 0)))
 		{
-			HideWindowCommand::dispatch(ID);
-			CloseCommand::dispatch();
+			submit();
 
 			ImGui::CloseCurrentPopup();
 		}
 
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel", ImVec2(100, 0)))
-		{
-			HideWindowCommand::dispatch(ID);
-
-			ImGui::CloseCurrentPopup();
-		}
 		ImGui::EndPopup();
 	}
+}
+
+void BeforeNewModal::submit()
+{
+	NewProjectCommand::dispatch();
+	HideWindowCommand::dispatch(ID);
 }

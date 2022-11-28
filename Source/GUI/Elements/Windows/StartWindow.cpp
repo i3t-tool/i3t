@@ -70,34 +70,34 @@ void StartWindow::reloadTutorials()
 	}
 
 	if (std::filesystem::exists(path))
-    {
-        Log::info("Searching for tutorials in: " + path);
-        // For all files in path recursively
-        for (auto const& entry : std::filesystem::recursive_directory_iterator(path, std::filesystem::directory_options::skip_permission_denied))
-        {
-            if (entry.path().extension() == ".tut")
-            {
-                std::string pathString = entry.path().string();
-                Log::info(pathString);
-                // Load header part of tutorial
-                if (std::shared_ptr<TutorialHeader> header =
-                        TutorialLoader::loadTutorialHeader(pathString);
-                    header)
-                {
-                    m_tutorial_headers.push_back(std::move(header));
-                }
-                else
-                {
-                    LOG_ERROR("Tutorial header " + pathString + " not loaded.");
-                }
-            }
-        }
-    }
-    else
-    {
-        Log::info("Path for tutorials not found. Searched path: " + path);
-    }
-
+	{
+		Log::info("Searching for tutorials in: " + path);
+		// For all files in path recursively
+		for (auto const& entry : std::filesystem::recursive_directory_iterator(
+		         path, std::filesystem::directory_options::skip_permission_denied))
+		{
+			if (entry.path().extension() == ".tut")
+			{
+				std::string pathString = entry.path().string();
+				Log::info(pathString);
+				// Load header part of tutorial
+				if (std::shared_ptr<TutorialHeader> header =
+				        TutorialLoader::loadTutorialHeader(pathString);
+				    header)
+				{
+					m_tutorial_headers.push_back(std::move(header));
+				}
+				else
+				{
+					LOG_ERROR("Tutorial header " + pathString + " not loaded.");
+				}
+			}
+		}
+	}
+	else
+	{
+		Log::info("Path for tutorials not found. Searched path: " + path);
+	}
 }
 
 void StartWindow::render()

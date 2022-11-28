@@ -18,4 +18,6 @@ public:
 	virtual void setState(const Memento&) {}
 
 	virtual void onStateChange() {}
+
+	virtual void clear() {}
 };

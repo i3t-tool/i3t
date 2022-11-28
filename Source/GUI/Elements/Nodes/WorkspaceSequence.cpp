@@ -4,17 +4,15 @@
 WorkspaceSequence::WorkspaceSequence(
     DIWNE::Diwne& diwne,
     Ptr<Core::NodeBase> nodebase /*= Core::Builder::createSequence()*/,
-    bool drawPins /*=true*/,
-    bool isCameraSequence /*=false*/)
+    bool drawPins /*=true*/, bool isCameraSequence /*=false*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false),
-      m_drawPins(drawPins),
-      m_isCameraSequence(isCameraSequence)
+      m_drawPins(drawPins), m_isCameraSequence(isCameraSequence)
 {
 }
 
 bool WorkspaceSequence::allowDrawing()
 {
-    return m_isCameraSequence || WorkspaceNodeWithCoreData::allowDrawing();
+	return m_isCameraSequence || WorkspaceNodeWithCoreData::allowDrawing();
 }
 
 bool WorkspaceSequence::isSequence() { return true; }
@@ -73,7 +71,8 @@ void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 		int index = node_iter - m_workspaceInnerTransformations.begin();
 		std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter)
 		    ->setRemoveFromSequence(true);
-//		m_workspaceInnerTransformations.erase(node_iter); is done in next frame based on setRemoveFromSequence(true)
+		//		m_workspaceInnerTransformations.erase(node_iter); is done in next
+		//frame based on setRemoveFromSequence(true)
 		m_nodebase->as<Core::Sequence>()->popMatrix(index);
 	}
 }
@@ -104,10 +103,11 @@ void WorkspaceSequence::moveNodeToSequence(
 void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node)
 {
 	node->setRemoveFromWorkspace(false);
-	dynamic_pointer_cast<WorkspaceTransformation>(node)->setRemoveFromSequence(true);
-//	node->m_selectable = true;
+	dynamic_pointer_cast<WorkspaceTransformation>(node)->setRemoveFromSequence(
+	    true);
+	//	node->m_selectable = true;
 	dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceCoreNodes.push_back(node);
-//	popNode(node);
+	//	popNode(node);
 }
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> const&
@@ -211,22 +211,22 @@ bool WorkspaceSequence::middleContent()
 		}
 	}
 
-
-    // Better deleting from Sequence -> popMatrix() in popNode() is crucial
+	// Better deleting from Sequence -> popMatrix() in popNode() is crucial
 	m_workspaceInnerTransformations.erase(
-	    std::remove_if(
-	        m_workspaceInnerTransformations.begin(),
-	        m_workspaceInnerTransformations.end(),
-	        [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-	        {
-	            bool remove_from_seq = std::dynamic_pointer_cast<WorkspaceTransformation>(node)
-		            ->getRemoveFromSequence();
-                if (remove_from_seq)
-                {
-                    popNode(node);
-                }
-		        return remove_from_seq;
-	        }),
+	    std::remove_if(m_workspaceInnerTransformations.begin(),
+	                   m_workspaceInnerTransformations.end(),
+	                   [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
+	                   {
+		                   bool remove_from_seq =
+		                       std::dynamic_pointer_cast<WorkspaceTransformation>(
+		                           node)
+		                           ->getRemoveFromSequence();
+		                   if (remove_from_seq)
+		                   {
+			                   popNode(node);
+		                   }
+		                   return remove_from_seq;
+	                   }),
 	    m_workspaceInnerTransformations.end());
 
 	int i = 0, push_index = -1;
@@ -243,10 +243,10 @@ bool WorkspaceSequence::middleContent()
 				push_index = i;
 			}
 		}
-/* with no selection manipulator not work
-		transformation->m_selectable = false;
-		transformation->setSelected(false);
-*/
+		/* with no selection manipulator not work
+		    transformation->m_selectable = false;
+		    transformation->setSelected(false);
+		*/
 
 		/* \todo some better selected transformation/nodes politic (when dragging,
 		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
@@ -263,10 +263,10 @@ bool WorkspaceSequence::middleContent()
 		i++;
 	}
 	if (interaction_with_transformation_happen)
-    {
-        inner_interaction_happen = false; /* do not set sequence as interacting node -> selected
-				              transformation should be only interacting */
-    }
+	{
+		inner_interaction_happen = false; /* do not set sequence as interacting node
+		              -> selected transformation should be only interacting */
+	}
 	if (i == 0 || position_of_draged_node_in_sequence ==
 	                  i) /* add dummy after last inner or if empty */
 	{
@@ -309,8 +309,6 @@ bool WorkspaceSequence::middleContent()
 			}
 		}
 	}
-
-
 
 	return inner_interaction_happen;
 }

@@ -276,7 +276,7 @@ ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 
 void Node::unplugAll()
 {
-	auto inputsView  = getInputPins();
+	auto inputsView = getInputPins();
 	auto outputsView = getOutputPins();
 
 	for (size_t i = 0L; i < inputsView.size(); ++i)

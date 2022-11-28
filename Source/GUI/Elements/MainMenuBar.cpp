@@ -111,7 +111,7 @@ void MainMenuBar::showFileMenu()
 	{
 		if (ImGui::MenuItem("New"))
 		{
-			// TabSpace::onOpenScene(TabSpace::RESET);
+			BeforeNewProjectCommand::dispatch();
 		}
 		ImGui::Separator();
 

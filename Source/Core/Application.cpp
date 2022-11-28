@@ -9,6 +9,7 @@
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
+#include "GUI/Elements/Modals/BeforeNewModal.h"
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Loader/ConfigLoader.h"
@@ -41,10 +42,17 @@ void Application::init()
 
 	//
 
+	BeforeNewProjectCommand::addListener(
+	    [this]() { getUI()->showUniqueWindow<BeforeNewModal>(); });
+	NewProjectCommand::addListener([]() { StateManager::instance().clear(); });
+
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
+
 	ConsoleCommand::addListener([this](std::string c)
 	                            { m_scriptInterpreter->runCommand(c); });
+
+	//
 
 	InputManager::init();
 
