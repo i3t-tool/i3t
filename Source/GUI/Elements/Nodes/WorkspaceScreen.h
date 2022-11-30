@@ -2,7 +2,7 @@
 //----------------
 /**
  * \file WorkspaceScreen.h
- * \author Petr Felkel, Martin Herich
+ * \author Petr Felkel, Martin Herich, Dan Rakušan
  * \brief screen box in the workspace
  * Based on WorkspaceScreen
  *
@@ -10,8 +10,18 @@
 //---------------
 #include "WorkspaceElementsWithCoreData.h"
 
+#include "Viewport/Framebuffer.h"
+
 class WorkspaceScreen : public WorkspaceNodeWithCoreDataWithPins
 {
+private:
+	// variables of the workspace box
+	GLuint m_textureID = 0; // rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
+	ImVec2 m_textureSize = {100, 100}; // initial render texture size - should be
+	                                   // large enough or changed during zoom
+
+	std::unique_ptr<Vp::Framebuffer> m_framebuffer;
+
 public:
 	WorkspaceScreen(DIWNE::Diwne& diwne);
 	~WorkspaceScreen();
@@ -37,19 +47,5 @@ public:
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
 
 private:
-	// variables of the workspace box
-	GLuint m_textureID = 0; // rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
-	ImVec2 m_textureSize = {100, 100}; // initial render texture size - should be
-	                                   // large enough or changed during zoom
-	Camera* m_camera; // local camera for model rendering in the box
-
-	float val = 0; // temporary variable for testing
-
-	// can be removed if no direct rendering to the texture m_textureID
-	GLuint m_fbo = 0; // FBO for texture rendering - needed only for additional
-	                  // rendering to the m_textureID
-	RenderTexture* m_renderTexture; // needed when creating camera only, can be a
-	                                // local variable
-
 	void init();
 };

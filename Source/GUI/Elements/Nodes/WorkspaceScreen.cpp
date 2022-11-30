@@ -1,7 +1,7 @@
 #include "WorkspaceScreen.h"
 
-//#include "World/HardcodedMeshes.h"
 #include "Utils/Format.h"
+#include "Viewport/Viewport.h"
 #include "World/RenderTexture.h" // FBO
 
 #define TEST
@@ -15,29 +15,17 @@ WorkspaceScreen::WorkspaceScreen(DIWNE::Diwne& diwne)
 
 WorkspaceScreen::~WorkspaceScreen()
 {
-	if (m_renderTexture)
-		delete (m_renderTexture);
-	if (m_camera)
-		delete (m_camera);
+	// Empty
 }
 
 void WorkspaceScreen::init()
 {
-	m_renderTexture = new RenderTexture(
-	    &m_textureID, static_cast<int>(m_textureSize.x),
-	    static_cast<int>(m_textureSize.y)); // create and get the FBO and color
-	                                        // Attachment for rendering
-	// Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture*
-	// renderTarget);
-	m_camera =
-	    new Camera(60.0f, Application::get().world()->sceneRoot,
-	               m_renderTexture); // version with the object shared with the 3D
-	                                 // scene and positioned in the scene graph)
-
+	m_framebuffer = std::make_unique<Vp::Framebuffer>(
+	    m_textureSize.x, m_textureSize.y, false, false);
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y,
 	                        1); /* \todo Jh always 1? */
-	printf("Screen initialized\n");
 }
+
 //  The screen has two triangles for resize:
 //  ----------
 //  |        |
@@ -54,19 +42,33 @@ bool WorkspaceScreen::middleContent()
 	ImVec2 buttonSize = I3T::getSize(ESizeVec2::Nodes_Screen_resizeButtonSize);
 	float buttonIconPadding = 0.f; /// not used 2*diwne.getWorkAreaZoom();
 
-	// \todo
-	m_camera->m_perspective = getNodebase()->getData().getMat4();
-	m_camera->update(); // render the tree bounded to the camera->m_sceneRoot
+	// Get projection and view matrix from screen input
+	std::pair<glm::mat4, glm::mat4> screenValue =
+	    getNodebase()->getData().getScreen();
 
-	ImGui::TextUnformatted(Utils::toString(m_camera->m_perspective).c_str());
+	// Prepare FBO
+	m_framebuffer->start(m_textureSize.x * diwne.getWorkAreaZoom(),
+	                     m_textureSize.y * diwne.getWorkAreaZoom());
+	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y,
+	             Config::BACKGROUND_COLOR.z, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	// Draw scene if screen input is plugged in
+	if (getNodebase()->getInputPins()[0].isPluggedIn())
+	{
+		App::get().viewport()->draw(screenValue.second, screenValue.first,
+		                            {true, false, true, false, false});
+	}
+
+	m_framebuffer->end();
 
 // Problem: ImGui uses int values for DC.CursorPos. Triangle positions not in
 // int coordinates are rounded one pixel out of the texture rectangle solution
 // for zoom > 1: use also floored positions problem remains for zoom <= 1,
 // probably caused by constants used for path thickness
 
-//#define IM_FLOOR(_VAL) ((float) (int) (_VAL))    // this macro is used in
-// ImGui.cpp:8155 for DC.CursorPos
+// #define IM_FLOOR(_VAL) ((float) (int) (_VAL))    // this macro is used in
+//  ImGui.cpp:8155 for DC.CursorPos
 #define FLOOR_VEC2(_VAL)                                                       \
 	(ImVec2((float)(int)((_VAL).x),                                              \
 	        (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
@@ -81,8 +83,9 @@ bool WorkspaceScreen::middleContent()
 	// ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID),
 	// m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f),
 	// ImVec2(1.0f,0.0f)); //vertical flip
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), zoomedTextureSize,
-	             ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f)); // vertical flip
+	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(),
+	             zoomedTextureSize, ImVec2(0.0f, 1.0f),
+	             ImVec2(1.0f, 0.0f)); // vertical flip
 
 	// ---------- Bottom-left button ------------
 	// ImVec2 cursorPos = ImGui::GetCursorScreenPos();
@@ -168,9 +171,6 @@ bool WorkspaceScreen::middleContent()
 		                           m_textureSize.y + dragDelta.y);
 
 		ImGui::ResetMouseDragDelta(0);
-
-		m_renderTexture->resize(m_textureSize.x * diwne.getWorkAreaZoom(),
-		                        m_textureSize.y * diwne.getWorkAreaZoom());
 	}
 
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y,

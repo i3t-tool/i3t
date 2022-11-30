@@ -2,11 +2,18 @@
 
 #include "Config.h"
 
-namespace Core
+using namespace Core;
+
+Resource::Resource(std::string alias, std::string path, ResourceType type)
+    : alias(std::move(alias)), path(path), resourceType(type)
 {
-Resource::Resource(std::string id, fs::path path, EResourceType type)
-    : ID(std::move(id)), Path(Config::getAbsolutePath(path)), Type(type)
-{
-	I3T_ASSERT(doesFileExists(Path) && "File at path must exists!");
+	// Empty
 }
-} // namespace Core
+
+Resource::Resource(std::string alias, size_t hashId, std::string path,
+                   ResourceType type, std::shared_ptr<void> data)
+    : alias(std::move(alias)), hashId(hashId), path(path), resourceType(type),
+      data(data)
+{
+	// Empty
+}

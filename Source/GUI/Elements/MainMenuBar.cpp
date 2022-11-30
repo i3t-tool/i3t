@@ -189,7 +189,7 @@ void MainMenuBar::showWindowsMenu()
 		ImGui::MenuItem("Tutorial window", nullptr,
 		                I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::MenuItem("Scene view window", nullptr,
-		                I3T::getWindowPtr<UI::Viewport>()->getShowPtr());
+		                I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr,
 		                I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
 		ImGui::MenuItem("Console window", nullptr,

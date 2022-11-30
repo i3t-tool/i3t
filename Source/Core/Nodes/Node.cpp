@@ -93,12 +93,14 @@ void Node::init()
 	// no outputs. \todo MH How to create nodes which have no outputs?
 	if (m_operation->numberOfOutputs == 0)
 	{
-		if (m_operation->keyWord == "Model")
-			m_internalData.emplace_back(EValueType::Ptr);
-		else if (!m_operation->inputTypes.empty())
+		if (!m_operation->inputTypes.empty())
+		{
 			m_internalData.emplace_back(m_operation->inputTypes[0]);
+		}
 		else
+		{
 			m_internalData.emplace_back(EValueType::Matrix);
+		}
 	}
 
 	if (m_operation->isConstructor)
@@ -392,4 +394,17 @@ const Transform::DataMap& Node::getDataMapRef()
 	static Transform::DataMap map(mapData);
 
 	return map;
+}
+
+void Node::updateValues(int inputIndex)
+{
+	for (const auto& callback : m_updateCallbacks)
+	{
+		callback();
+	}
+}
+
+void Node::addUpdateCallback(std::function<void()> callback)
+{
+	this->m_updateCallbacks.push_back(callback);
 }

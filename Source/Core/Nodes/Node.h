@@ -9,6 +9,7 @@
  */
 #pragma once
 
+#include <list>
 #include <set>
 #include <utility>
 #include <vector>
@@ -205,21 +206,17 @@ public:
 	/// \deprecated Will be removed
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
-	[[nodiscard]] PinView getInputPins()
-	{
+	[[nodiscard]] PinView getInputPins() {
 		return PinView(PinView::EStrategy::Input, shared_from_this());
-	}
-	[[nodiscard]] PinView getOutputPins()
+	}[[nodiscard]] PinView getOutputPins()
 	{
 		return PinView(PinView::EStrategy::Output, shared_from_this());
 	}
 
 protected:
-	[[nodiscard]] PinView getInputPinsRef()
-	{
+	[[nodiscard]] PinView getInputPinsRef() {
 		return PinView(PinView::EStrategy::Input, shared_from_this());
-	}
-	[[nodiscard]] PinView getOutputPinsRef()
+	}[[nodiscard]] PinView getOutputPinsRef()
 	{
 		return PinView(PinView::EStrategy::Output, shared_from_this());
 	}
@@ -317,14 +314,14 @@ public:
 	}
 
 	template <typename T>
-	[[nodiscard]] ValueSetResult setValue(const T& value, unsigned index)
-	{
+	[[nodiscard]] ValueSetResult setValue(const T& value, unsigned index) {
 		return setValueEx(value, index);
 	}
 
-private:
-	/// Sets value of pin at \p index position.
-	template <typename T> ValueSetResult setValueEx(T&& val, unsigned index = 0)
+	private :
+	    /// Sets value of pin at \p index position.
+	    template <typename T>
+	    ValueSetResult setValueEx(T&& val, unsigned index = 0)
 	{
 		setInternalValue(val, index);
 		return ValueSetResult{};
@@ -383,9 +380,20 @@ public:
 	 * May be replaced by updateValues() or implemented in such a way. Do such
 	 * optimize-able modules exist?
 	 *
+	 * The base class method calls update callbacks registered with
+	 * addUpdateCallback(). So derived methods should also call their base method
+	 * if they want to inform any outside observers.
+	 *
 	 * \param	inputIndex Index of the modified input (output pin).
 	 */
-	virtual void updateValues(int inputIndex = 0) {}
+	virtual void updateValues(int inputIndex = 0);
+
+	/**
+	 * Registers a callback that should get called after any updateValues() call.
+	 * Note that some derived nodes might not always call this callback.
+	 * @param callback Callback to call on value update.
+	 */
+	void addUpdateCallback(std::function<void()> callback);
 
 	/// Spread signal to all outputs.
 	/// \todo Does not use operators for calling each follower just once
@@ -464,6 +472,9 @@ protected:
 	 * camera.
 	 */
 	Ptr<Node> m_owner = nullptr;
+
+	/// List of callbacks to call after updateValues() is called
+	std::list<std::function<void()>> m_updateCallbacks;
 };
 
 using NodePtr = Ptr<Node>;

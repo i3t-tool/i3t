@@ -128,8 +128,9 @@ void InputBindings::removeActionKey(const char* name, Keys::Code code)
 {
 	if (isActionCreated(name))
 	{
-		std::erase_if(m_inputActions[name], [&code](ActionMapping action)
-		              { return code == action.code; });
+		std::erase_if(m_inputActions[name], [&code](ActionMapping action) {
+			return code == action.code;
+		});
 	}
 }
 

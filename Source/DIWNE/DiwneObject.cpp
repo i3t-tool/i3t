@@ -114,6 +114,17 @@ bool DiwneObject::processInteractionsDiwne()
 {
 	bool interaction_happen = false;
 
+	// Logger::getInstance().getConsoleLogger()->info("MouseDown: "
+	// +std::to_string(ImGui::IsMouseDown(0)));
+	// Logger::getInstance().getConsoleLogger()->info("MouseReleased: " +
+	// std::to_string(ImGui::IsMouseReleased(0)));
+	// Logger::getInstance().getConsoleLogger()->info("MouseDragging: " +
+	// std::to_string(ImGui::IsMouseDragging(0)));
+	// Logger::getInstance().getConsoleLogger()->info("MouseClicked: " +
+	// std::to_string(ImGui::IsMouseClicked(0, false)));
+	// Logger::getInstance().getConsoleLogger()->info("MouseClickedRepeat: " +
+	// std::to_string(ImGui::IsMouseClicked(0, true)));
+
 	if (m_drawMode == Interacting && !m_inner_interaction_happen)
 	{
 		if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
@@ -257,8 +268,8 @@ bool DiwneObject::allowProcessFocusedForInteraction()
 }
 bool DiwneObject::processObjectFocusedForInteraction()
 {
-	if ((bypassFocusForInteractionAction() ||
-	     m_isHeld /* between frames mouse can go out of focus scope */) &&
+	/* between frames mouse can go out of focus scope */
+	if ((bypassFocusForInteractionAction() || m_isHeld) &&
 	    allowProcessFocusedForInteraction())
 	{
 		m_focusedForInteraction = true;
@@ -317,6 +328,8 @@ bool DiwneObject::processSelect() { return true; }
 bool DiwneObject::allowProcessSelect() { return m_isHeld && !m_isDraged; }
 bool DiwneObject::processObjectSelect()
 {
+	// TODO: (DR) node is selected on mouse release, might want to select it on
+	// click
 	if (bypassSelectAction() && allowProcessSelect())
 	{
 		setSelected(true);

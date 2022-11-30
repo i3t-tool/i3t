@@ -2,25 +2,14 @@
 
 #include "Core/Resources/ResourceManager.h"
 
-#include "World/HardcodedMeshes.h"
-#include "World/RenderTexture.h" // FBO
+#include "Viewport/Viewport.h"
+#include "Viewport/entity/SceneModel.h"
 
-#undef TEST
-//#define TEST1
-
-const pgr::MeshData* g_meshes[] = { // todo - remove
-    &unitcubeMesh, &three_axisMesh};
-
-const char* g_meshesNames[] = { // todo - remove
-    "cube", "axes"};
-
-const float angleX = 30.0; // degree
-const float angleY = 55.0; // degree
+#include "Utils/Color.h"
+#include "Utils/HSLColor.h"
 
 WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
-    : WorkspaceNodeWithCoreDataWithPins(diwne,
-                                        Core::Builder::createModelNode()),
-      m_axisOn(false), m_showModel(false)
+    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createModelNode())
 {
 	init();
 	// setDataItemsWidth();
@@ -28,42 +17,94 @@ WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
 
 WorkspaceModel::~WorkspaceModel()
 {
-	// delete model from the World
-	App::get().world()->removeModel(m_sceneModel);
-
-	// delete local workspace model
-	if (m_workspaceModel)
-		delete (m_workspaceModel);
-
-	if (renderTexture)
-		delete (renderTexture);
-
-	if (m_camera)
-		delete (m_camera);
+	// TODO: (DR) Not working properly! Not due to the viewport though
+	//	There is an issue with shared_ptr reference counting somewhere in the
+	//DIWNE code 	Perhaps the methods that retrieve selected nodes 	Or the delete
+	//action lambda 	Destructor doesnt get called right away, rather until some
+	//other event happens 	Like hovering over another node with the mouse
+	App::get().viewport()->removeEntity(m_viewportModel);
 }
 
 void WorkspaceModel::popupContent_axis_showmodel()
 {
-	if (ImGui::MenuItem(
-	        fmt::format("Switch axis {}", m_axisOn ? "off" : "on").c_str()))
+	ImGui::Separator();
+
+	if (ImGui::MenuItem("Show axes", NULL, m_axisOn))
 	{
 		m_axisOn = !m_axisOn;
+		m_viewportModel.lock()->m_showAxes = m_axisOn;
 	}
-	if (ImGui::MenuItem(
-	        fmt::format("{} model", m_showModel ? "Hide" : "Show").c_str()))
+	if (ImGui::MenuItem("Show model", NULL, m_showModel))
 	{
 		m_showModel = !m_showModel;
+		m_viewportModel.lock()->m_visible = m_showModel;
 	}
-
-	for (const auto& [ID, model] :
-	     Core::ResourceManager::instance().defaultModels())
+	if (ImGui::BeginMenu("Change model"))
 	{
-		if (ImGui::MenuItem(ID.c_str()))
+		for (const auto& resource :
+		     RMI.getDefaultResources(Core::ResourceType::Model))
 		{
-			m_nodebase->as<Core::Model>()->setMesh(const_cast<Core::MeshNode*>(
-			    Core::ResourceManager::instance().getModel(ID)));
+			if (ImGui::MenuItem(resource.alias.c_str()))
+			{
+				m_viewportModel.lock()->m_mesh = RMI.meshByAlias(resource.alias);
+			}
 		}
+		ImGui::EndMenu();
 	}
+	if (ImGui::BeginMenu("Set tint"))
+	{
+		if (ImGui::MenuItem("None"))
+		{
+			m_tint = glm::vec3(1.0f);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Red"))
+		{
+			m_tint = calculateTint(Color::RED);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Blue"))
+		{
+			m_tint = calculateTint(Color::BLUE);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Green"))
+		{
+			m_tint = calculateTint(Color::GREEN);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Yellow"))
+		{
+			m_tint = calculateTint(Color::YELLOW);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Orange"))
+		{
+			m_tint = calculateTint(Color::ORANGE);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Magenta"))
+		{
+			m_tint = calculateTint(Color::MAGENTA);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		if (ImGui::MenuItem("Teal"))
+		{
+			m_tint = calculateTint(Color::TEAL);
+			m_viewportModel.lock()->m_tint = m_tint;
+		}
+		ImGui::EndMenu();
+	}
+}
+
+glm::vec3 WorkspaceModel::calculateTint(glm::vec3 color)
+{
+	glm::vec3 hsl;
+	rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
+	hsl.y = 0.8;
+	hsl.z = 0.8;
+	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
+	return color;
 }
 
 void WorkspaceModel::popupContent()
@@ -72,153 +113,46 @@ void WorkspaceModel::popupContent()
 	popupContent_axis_showmodel();
 }
 
-// bool WorkspaceModel::drawDataFull(, int index)
-//{
-//	ImGui::PushItemWidth(getDataItemsWidth(diwne));
-//
-//	if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames,
-// IM_ARRAYSIZE(g_meshesNames)))
-//	{
-//		auto* mesh = g_meshes[m_currentModelIdx];
-//	}
-//
-//	ImGui::PopItemWidth();
-//	return false;
-// }
-
 void WorkspaceModel::init()
 {
+	m_viewportModel = App::get().viewport()->createModel();
+	auto modelPtr = m_viewportModel.lock();
+	modelPtr->m_showAxes = m_axisOn;
+	modelPtr->m_visible = m_showModel;
 
-	auto* object = App::get().world()->addModel(
-	    "CubeGray"); // object added into the scene graph
-	m_sceneModel = object;
+	// Callback that gets called when the underlying Model node updates values
+	// The Model node also updates a public model matrix variable which we can
+	// read
+	m_nodebase->addUpdateCallback([this]() {
+		std::shared_ptr<Core::Model> modelNode =
+		    dynamic_pointer_cast<Core::Model>(m_nodebase);
+		if (modelNode)
+		{
+			m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
+		}
+	});
 
-	// second object just for preview in this box in the Workspace
-	m_workspaceModel =
-	    new GameObject(unitcubeMesh, &World::shader0, World::textures["cube"]);
-	m_workspaceModel->addComponent(new Renderer());
-
-	// nice initial transformation
-	m_workspaceModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
-	m_workspaceModel->rotate(glm::vec3(0, 1, 0), angleY);
-	m_workspaceModel->rotate(glm::vec3(1, 0, 0), angleX);
-
-	// pass object pointer to the core
-	// to remove the warning:
-	ValueSetResult result = m_nodebase->setValue(static_cast<void*>(
-	    object)); // GameObject object =
-	              // static_cast<GameObject>(&(m_nodebase->getData().getPointer()));
-
-	/// \todo This is temporary code
-	/*
-	const auto modelNode = m_nodebase->as<Core::Model>();
-	modelNode->setMesh(const_cast<Core::MeshNode*>(
-	    Core::ResourceManager::instance().getModel("Cube")));
-	    */
+	m_framebuffer = std::make_unique<Vp::Framebuffer>(
+	    m_textureSize.x, m_textureSize.y, false, true);
 }
 
 bool WorkspaceModel::middleContent()
 {
-
 	bool interaction_happen = false;
 
-#ifdef TEST1
-	ImGui::Text("Nad texturou      ");
-
-	ImGui::PushItemWidth(50);
-	interaction_happen = ImGui::DragFloat("float: ", &val, 0.01f, -1.0f, 1.0f);
-	ImGui::PopItemWidth();
-#endif
-
-#if 1
-	auto pin = m_nodebase->getInPin(0);
-	// const DataStore& data;
-
-	// if(pin.isPluggedIn())
-	// data = pin.data();
-	// else
-	//	auto data = nullptr;
-
-	// auto data = m_nodebase->getInPin(0).data();
-#endif
-
-	// Lazy texture creation
-	if (!m_textureID)
-	{
-		renderTexture = new RenderTexture(
-		    &m_textureID, static_cast<int>(m_textureSize.x),
-		    static_cast<int>(m_textureSize.y)); // create and get the FBO and color
-		                                        // Attachment for rendering
-
-#ifdef TEST
-		// block of control checks
-		m_fbo = renderTexture->getFbo();
-		GLuint color = renderTexture->getColor(); // todo getColorAttachmentID
-		IM_ASSERT(renderTexture->getColor() == m_textureID);
-		IM_ASSERT(renderTexture->getWidth() == w);
-		IM_ASSERT(renderTexture->getHeight() == h);
-#endif
-
-		// Create camera rendering to the user-defined framebuffer
-		// Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture*
-		// renderTarget); m_camera = new Camera(60.0f, m_sceneModel, renderTexture);
-		// // version with the object shared with the 3D scene and positioned in the
-		// scene graph)
-		m_camera = new Camera(60.0f, m_workspaceModel,
-		                      renderTexture); // version with the additional object
-		                                      // just for this box in the workspace
-		// m_camera->m_perspective = glm::perspective(glm::radians(60.0f),
-		// float(m_textureSize.x) / float(m_textureSize.y), 0.2f, 1000.0f);
-	}
-
-#ifdef TEST
-	// Trial draw to new fbo - works fine, but I should use camera
-	GLint viewport[4]; // 3D view viewport
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glViewport(0, 0, static_cast<GLsizei>(m_textureSize.x),
-	           static_cast<GLsizei>(m_textureSize.y));
-	glClearColor(val, 0.0f, 0.0f, 1.0f);
+	m_framebuffer->start(m_textureSize.x, m_textureSize.y);
+	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y,
+	             Config::BACKGROUND_COLOR.z, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-#endif
+	App::get().viewport()->drawPreview(m_viewportModel, m_textureSize.x,
+	                                   m_textureSize.y);
 
-	// const float angleZ = 45.0;  //degree
-	// m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -4.5));
-	//  m_sceneModel->rotate(glm::vec3(0,1,0),angleY);
-	//  m_sceneModel->rotate(glm::vec3(1,0,0),angleX);
-	m_sceneModel->translate(glm::vec3(0.0f, 0.0f, -val));
-	m_camera->update();
+	m_framebuffer->end();
 
-	// m_sceneModel->rotate(glm::vec3(1,0,0),-angleX);
-	// m_sceneModel->rotate(glm::vec3(0,1,0),-angleY);
-	// m_sceneModel->translate(glm::vec3(0.0f, 0.0f, 4.5));
-
-	// \todo correct image size in the box
-	// float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
-	// float imageWidth = m_textureSize.x + 2 * padding;
-
-	// ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max,
-	// tint_col, border_col); texture =
-	// pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png"));  //
-	// fixed texture may be enough ImGui::Image((ImTextureID)m_textureID,
-	// m_textureSize, ImVec2(1.0/3.0,0.0), ImVec2(2.0/3.0,1.0/3.0) );  // single
-	// cube side X+
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID), m_textureSize,
-	             ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f)); // vertiocal flip
-
-	// if (ImGui::Combo("model", &m_currentModelIdx, g_meshesNames,
-	// IM_ARRAYSIZE(g_meshesNames)))
-	//{
-	//	auto* mesh = g_meshes[m_currentModelIdx];
-
-	//	auto* object = App::get().world()->addModel("CubeGray");
-	// m_nodebase->setValue(static_cast<void*>(object));
-	//}
-
-	// ImGui::Text("Pod texturou");
+	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), m_textureSize,
+	             ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f) // vertical flip
+	);
 
 	return interaction_happen;
 }

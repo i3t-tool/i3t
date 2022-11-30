@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.13) # 3.13 for target_link_options and add_compile_definitions
+cmake_minimum_required(VERSION 3.15) # 3.13 for target_link_options and add_compile_definitions
+                                     # 3.15 to fix a "overriding /W3 with /W4" bug
 
 # Set project name.
 project(I3T VERSION 2.1.0)

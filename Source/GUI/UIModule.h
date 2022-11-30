@@ -111,6 +111,7 @@ public:
 
 private:
 	void setFocusedWindow();
+	Ptr<IWindow> findAnyWindow(std::string ID);
 
 	void buildDockspace();
 	void queryCameraState();

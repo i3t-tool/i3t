@@ -11,25 +11,23 @@ LogWindow::LogWindow()
 	Input.bindAction("MyTestAction", EKeyState::Pressed,
 	                 [] { Log::info("MyTestAction triggered!"); });
 
-	Input.bindAxis("MyTestAxis", [](float val)
-	               { Log::info("MyTestAxis triggered: {}!", val); });
+	Input.bindAxis("MyTestAxis", [](float val) {
+		Log::info("MyTestAxis triggered: {}!", val);
+	});
 
 	////
-	Input.bindAction("createAndPlugConstructor", EKeyState::Released,
-	                 []
-	                 {
-		                 const auto isActionTriggered =
-		                     InputManager::isActionTriggered(
-		                         "createAndPlugConstructor", EKeyState::Released);
-		                 Log::info("InputManager::isActionTriggered("
-		                           "\"createAndPlugConstructor\") = {}",
-		                           isActionTriggered);
-	                 });
+	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
+		const auto isActionTriggered = InputManager::isActionTriggered(
+		    "createAndPlugConstructor", EKeyState::Released);
+		Log::info("InputManager::isActionTriggered("
+		          "\"createAndPlugConstructor\") = {}",
+		          isActionTriggered);
+	});
 	////
 
-	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed,
-	                 []
-	                 { Log::info("bind: (mouse click + left ctrl) pressed"); });
+	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
+		Log::info("bind: (mouse click + left ctrl) pressed");
+	});
 
 	Input.bindAction("scrollUp", EKeyState::Pressed,
 	                 []() { Log::info("scrollUp"); });

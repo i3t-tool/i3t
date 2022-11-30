@@ -213,8 +213,6 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target,
 	transform.AddMember(
 	    "type", rapidjson::Value(props->keyWord.c_str(), alloc).Move(), alloc);
 
-	//
-
 	if (!coreNode->getDefaultValues().empty())
 	{
 		transform.AddMember("defaultValues",

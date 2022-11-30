@@ -1719,7 +1719,7 @@ FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
-		setInternalValue(m_inputs[inputIndex].getStorage(1).getMat4());
+		setInternalValue(m_inputs[inputIndex].getStorage(1).getScreen());
 	}
 }
 

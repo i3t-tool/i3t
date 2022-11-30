@@ -213,6 +213,7 @@ void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset,
 		InputManager::setPressed(Keys::mouseScrlDown);
 		InputManager::setUnpressed(Keys::mouseScrlUp);
 	}
+	InputManager::m_mouseWheelOffset = yoffset;
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseWheelH += (float)xoffset;

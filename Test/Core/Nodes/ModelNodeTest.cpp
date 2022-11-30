@@ -4,6 +4,7 @@
 
 #include "Generator.h"
 #include "Utils.h"
+#include "Viewport/entity/GameObject.h"
 #include "World/GameObject.h"
 
 using namespace Core;
@@ -17,20 +18,17 @@ TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 
 	sequence->addMatrix(transform);
 
-	/// \todo DG/MH GameObject local initialization throws an error (OpenGL
-	/// context is not initialized).
-	auto* gameObject = new GameObject();
+	auto* gameObjectVp = new Vp::GameObject();
 
 	auto modelNode = Builder::createModelNode();
-	setValue_expectOk(modelNode, static_cast<void*>(gameObject));
 
-	auto* gameObjectPtr =
-	    static_cast<GameObject*>(modelNode->getData().getPointer());
-	auto& gameObjectMat = gameObjectPtr->transformation;
+	modelNode->addUpdateCallback([&gameObjectVp, &modelNode]() {
+		gameObjectVp->m_modelMatrix = modelNode->m_modelMatrix;
+	});
 
 	plug_expectOk(sequence, modelNode, 0, 0);
 	{
 		auto expectedMat = getMatProduct(sequence->getMatrices());
-		EXPECT_EQ(expectedMat, gameObjectMat);
+		EXPECT_EQ(expectedMat, gameObjectVp->m_modelMatrix);
 	}
 }

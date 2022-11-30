@@ -153,15 +153,14 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx)
-	{
+	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) {
 		return m_storage->m_matrices.at(idx);
 	}
 
-	/**
-	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
-	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index)
+	    /**
+	     * Pop matrix from a sequence. Caller takes ownership of returned matrix.
+	     */
+	    [[nodiscard]] Ptr<Transformation> popMatrix(const int index)
 	{
 		return m_storage->popMatrix(index);
 	}

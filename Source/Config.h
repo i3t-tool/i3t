@@ -286,6 +286,11 @@ struct Config
 #else
 		// For debug purposes only.
 		// printf("wd %s\n",WORKING_DIRECTORY.c_str());
+		if (strstr(filename, WORKING_DIRECTORY.c_str()) != nullptr)
+		{
+			return std::string(filename);
+		}
+
 		std::string path = WORKING_DIRECTORY;
 		if (filename[0] != '/')
 		{

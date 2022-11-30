@@ -280,14 +280,14 @@ Ptr<NodeBase> SequenceTree::MatrixIterator::operator*() const
 	return m_currentMatrix;
 }
 
-bool SequenceTree::MatrixIterator::operator==(
-    const SequenceTree::MatrixIterator& rhs) const
+bool SequenceTree::MatrixIterator::
+operator==(const SequenceTree::MatrixIterator& rhs) const
 {
 	return m_currentMatrix == rhs.m_currentMatrix;
 }
 
-bool SequenceTree::MatrixIterator::operator!=(
-    const SequenceTree::MatrixIterator& rhs) const
+bool SequenceTree::MatrixIterator::
+operator!=(const SequenceTree::MatrixIterator& rhs) const
 {
 	return m_currentMatrix != rhs.m_currentMatrix;
 }

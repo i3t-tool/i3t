@@ -88,7 +88,8 @@ public:
 			    std::static_pointer_cast<T>(shared_from_this()));
 			if (diwne.getDiwneActionActive() == DiwneAction::None ||
 			    diwne.getDiwneActionActive() ==
-			        DiwneAction::InteractingContent /* no specific action */)
+			        DiwneAction::InteractingContent /* no specific action */
+			)
 			{
 				diwne.setDiwneAction(DiwneAction::InteractingContent);
 			}

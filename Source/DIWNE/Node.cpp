@@ -140,18 +140,18 @@ bool Node::afterEndDiwne()
 		    diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectFull)
 		{
 			setSelected(
-			    diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne()) ? true
-			    : diwne.m_allowUnselectingNodes ? false
-			                                    : m_selected);
+			    diwne.getSelectionRectangleDiwne().Contains(getNodeRectDiwne())
+			        ? true
+			        : diwne.m_allowUnselectingNodes ? false : m_selected);
 		}
 		else if (diwne.getDiwneActionPreviousFrame() ==
 		             DIWNE::DiwneAction::SelectionRectTouch ||
 		         diwne.getDiwneAction() == DIWNE::DiwneAction::SelectionRectTouch)
 		{
 			setSelected(
-			    diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne()) ? true
-			    : diwne.m_allowUnselectingNodes ? false
-			                                    : m_selected);
+			    diwne.getSelectionRectangleDiwne().Overlaps(getNodeRectDiwne())
+			        ? true
+			        : diwne.m_allowUnselectingNodes ? false : m_selected);
 		}
 
 		if (m_selected)
