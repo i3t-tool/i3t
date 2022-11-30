@@ -4,7 +4,6 @@
 
 #include "Core/Nodes/Model.h"
 #include "Core/Nodes/Node.h"
-#include "Core/Resources/Mesh.h"
 
 namespace Core
 {
@@ -13,14 +12,19 @@ class Model : public Node
 public:
 	Model() : Node(&g_modelProperties){};
 
+	/// Latest model matrix value
+	glm::mat4 m_modelMatrix{};
+
 	void updateValues(int inputIndex = 0) override;
 	Ptr<Node> clone() override;
 
-	MeshNode* mesh() const { return m_mesh; }
-	void setMesh(MeshNode* m) { m_mesh = m; }
+	// TODO: (DR) Model needs to hold a reference to a new Viewport object,
+	// ideally somehow abstracted so that layer separation is preserved (unlikely)
+	// MeshNode* mesh() const { return m_mesh; }
+	// void setMesh(MeshNode* m) { m_mesh = m; }
 
 private:
-	MeshNode* m_mesh = nullptr;
+	// MeshNode* m_mesh = nullptr;
 };
 
 namespace Builder

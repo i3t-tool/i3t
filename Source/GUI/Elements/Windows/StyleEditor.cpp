@@ -32,9 +32,9 @@ void StyleEditor::render()
 			const bool isSelected = (currentThemeIdx == n);
 			if (ImGui::Selectable(I3T::getThemes()[n].getName().c_str(), isSelected))
 			{
-				auto currIndex =
-				    Utils::indexOf(I3T::getThemes(), [&curr](Theme& t)
-				                   { return t.getName() == curr.getName(); });
+				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) {
+					return t.getName() == curr.getName();
+				});
 				if (n != currIndex)
 				{
 					I3T::getUI()->setTheme(I3T::getThemes()[n]);

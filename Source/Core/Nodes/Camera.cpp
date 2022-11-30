@@ -38,7 +38,15 @@ void Camera::updateValues(int inputIndex)
 	// glm::mat m = m_proj->getData().getMat4() * m_view->getData().getMat4();
 	glm::mat m = m_view->getData(I3T_OUTPUT2).getMat4();
 
-	setInternalValue(m, 0);
-	setInternalValue(m, 1);
-	setInternalValue(m, 2);
+	glm::mat projMat = m_proj->getData(I3T_OUTPUT1).getMat4();
+	glm::mat viewMat = m_view->getData(I3T_OUTPUT1).getMat4();
+
+	setInternalValue(std::make_pair(projMat, viewMat), 0); // Screen
+	setInternalValue(m, 1);                                // Matrix
+	setInternalValue(m, 2);                                // MatrixMult
+
+	m_projectionMatrix = projMat;
+	m_viewMatrix = viewMat;
+
+	Node::updateValues(inputIndex); // Callback
 }

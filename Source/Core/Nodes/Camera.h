@@ -30,6 +30,11 @@ class Camera : public Node
 	SequencePtr m_view;
 
 public:
+	/// Latest projection matrix value
+	glm::mat4 m_projectionMatrix;
+	/// Latest view matrix value
+	glm::mat4 m_viewMatrix;
+
 	Camera();
 
 	Ptr<Node> clone() override;

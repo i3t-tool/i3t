@@ -802,8 +802,9 @@ bool WorkspaceDiwne::content()
 	bool interaction_happen = false;
 	m_workspaceCoreNodes.erase(
 	    std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-	                   [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-	                   { return node->getRemoveFromWorkspace(); }),
+	                   [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+		                   return node->getRemoveFromWorkspace();
+	                   }),
 	    m_workspaceCoreNodes.end());
 
 	int number_of_nodes = m_workspaceCoreNodes.size();
@@ -1129,8 +1130,9 @@ void WorkspaceDiwne::shiftNodesToBegin(
 	{
 		coreNodeIter ith_selected_node = std::find_if(
 		    m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		    [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-		    { return node->getId() == nodesToShift.at(i)->getId(); });
+		    [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+			    return node->getId() == nodesToShift.at(i)->getId();
+		    });
 
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
@@ -1151,8 +1153,9 @@ void WorkspaceDiwne::shiftNodesToEnd(
 	{
 		coreNodeIter ith_selected_node = std::find_if(
 		    m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		    [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-		    { return node->getId() == nodesToShift.at(i)->getId(); });
+		    [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+			    return node->getId() == nodesToShift.at(i)->getId();
+		    });
 
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
@@ -1167,10 +1170,11 @@ void WorkspaceDiwne::shiftInteractingNodeToEnd()
 	if (mp_lastActiveNode != nullptr &&
 	    mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
 	{
-		coreNodeIter draged_node_it =
-		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                 [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-		                 { return node.get() == this->mp_lastActiveNode.get(); });
+		coreNodeIter draged_node_it = std::find_if(
+		    m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+		    [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+			    return node.get() == this->mp_lastActiveNode.get();
+		    });
 
 		if (draged_node_it != m_workspaceCoreNodes.end() &&
 		    draged_node_it != m_workspaceCoreNodes.end() - 1)
@@ -1331,8 +1335,7 @@ Memento WorkspaceWindow::getState()
 void WorkspaceWindow::setState(const Memento& memento)
 {
 	const auto findNode = [](std::vector<GuiNodePtr>& nodes,
-	                         Core::ID id) -> GuiNodePtr
-	{
+	                         Core::ID id) -> GuiNodePtr {
 		for (const auto& node : nodes)
 			if (node->getNodebase()->getId() == id)
 				return node;

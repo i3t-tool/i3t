@@ -141,6 +141,7 @@ public:
 	template <class T> auto inline addNodeToPositionOfPopup()
 	{
 		auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
+
 		m_takeSnap =
 		    true; /* JH maybe better in place where this function is called*/
 

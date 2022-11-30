@@ -23,35 +23,37 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(
 {
 }
 
-bool WorkspaceNodeWithCoreData::bypassDragAction()
-{
-	return InputManager::isAxisActive("drag") != 0 &&
-	       (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold ||
-	        InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold ||
-	        -InputManager::m_mouseXDragDelta >
-	            ImGui::GetIO().MouseDragThreshold ||
-	        -InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold);
-}
-bool WorkspaceNodeWithCoreData::bypassHoldAction()
-{
-	return InputManager::isActionTriggered("hold", EKeyState::Pressed);
-}
-bool WorkspaceNodeWithCoreData::bypassUnholdAction()
-{
-	return InputManager::isActionTriggered("hold", EKeyState::Released);
-}
-bool WorkspaceNodeWithCoreData::bypassSelectAction()
-{
-	return InputManager::isActionTriggered("select", EKeyState::Released);
-}
-bool WorkspaceNodeWithCoreData::bypassUnselectAction()
-{
-	return InputManager::isActionTriggered("select", EKeyState::Released);
-}
-bool WorkspaceNodeWithCoreData::bypassTouchAction()
-{
-	return InputManager::isActionTriggered("touch", EKeyState::Released);
-}
+// TODO: (DR) Commented out for now, more info in the header file
+// bool WorkspaceNodeWithCoreData::bypassDragAction()
+// {
+// 	return InputManager::isAxisActive("drag") != 0 &&
+// 	       (InputManager::m_mouseXDragDelta > ImGui::GetIO().MouseDragThreshold
+// || 	        InputManager::m_mouseYDragDelta > ImGui::GetIO().MouseDragThreshold ||
+// 	        -InputManager::m_mouseXDragDelta >
+// 	            ImGui::GetIO().MouseDragThreshold ||
+// 	        -InputManager::m_mouseYDragDelta >
+// ImGui::GetIO().MouseDragThreshold);
+// }
+// bool WorkspaceNodeWithCoreData::bypassHoldAction()
+// {
+// 	return InputManager::isActionTriggered("hold", EKeyState::Pressed);
+// }
+// bool WorkspaceNodeWithCoreData::bypassUnholdAction()
+// {
+// 	return InputManager::isActionTriggered("hold", EKeyState::Released);
+// }
+// bool WorkspaceNodeWithCoreData::bypassSelectAction()
+// {
+// 	return InputManager::isActionTriggered("select", EKeyState::Released);
+// }
+// bool WorkspaceNodeWithCoreData::bypassUnselectAction()
+// {
+// 	return InputManager::isActionTriggered("select", EKeyState::Released);
+// }
+// bool WorkspaceNodeWithCoreData::bypassTouchAction()
+// {
+// 	return InputManager::isActionTriggered("touch", EKeyState::Released);
+// }
 
 WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 {
@@ -560,6 +562,9 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(
 	// Config::BACKGROUND_COLOR.z, 1.0f); glClear(GL_COLOR_BUFFER_BIT |
 	// GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+	// TODO: (DR) Maybe remove? Not sure what this is doing, screen is drawn in
+	// the WorkspaceScreen node content
+
 	// todo - size dle velikosti krabicky a dle zoomu
 	rend = new RenderTexture(&renderTexture, 256,
 	                         256); // create FBO and texture as attachment
@@ -569,6 +574,7 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(
 }
 bool WorkspaceCoreOutputPinScreen::drawData()
 {
+	// TODO: (DR) This seems unused?
 	if (getCorePin().isPluggedIn())
 	{
 		glm::mat4 camera = Core::GraphManager::getParent(getNode().getNodebase())

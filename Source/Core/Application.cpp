@@ -19,6 +19,7 @@
 #include "State/StateManager.h"
 #include "Utils/Color.h"
 #include "Utils/TextureLoader.h"
+#include "Viewport/Viewport.h"
 #include "World/World.h"
 
 using namespace Core;
@@ -56,18 +57,14 @@ void Application::init()
 
 	InputManager::init();
 
-	InputManager::bindGlobalAction("undo", EKeyState::Pressed,
-	                               [&]()
-	                               {
-		                               Log::info("undo triggered");
-		                               StateManager::instance().undo();
-	                               });
-	InputManager::bindGlobalAction("redo", EKeyState::Pressed,
-	                               [&]()
-	                               {
-		                               Log::info("redo triggered");
-		                               StateManager::instance().redo();
-	                               });
+	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
+		Log::info("undo triggered");
+		StateManager::instance().undo();
+	});
+	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
+		Log::info("redo triggered");
+		StateManager::instance().redo();
+	});
 
 	StateManager::instance().setOriginator(this);
 }
@@ -178,6 +175,8 @@ void Application::logicUpdate()
 {
 	InputManager::preUpdate(); ///< update the mouse button state
 
+	viewport()->update();
+
 	InputManager::update(); ///< Update mouseDelta, mousePrev, and the stored
 	                        ///< statuses of the keys in the \a keyMap array
 	                        ///< (JUST_UP -> UP, JUST_DOWN -> DOWN).
@@ -190,14 +189,13 @@ void Application::finalize()
 
 	World::end();
 	delete m_world;
+	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
 
 	m_window->finalize();
 	StateManager::instance().finalize();
 
-	/*
-	delete s_instance;
-	s_instance == nullptr;
-	 */
+	// TODO: Investigate why this was here. Was causing an assertion error on
+	// exit. delete s_instance; s_instance == nullptr;
 }
 
 bool Application::initI3T()
@@ -205,13 +203,17 @@ bool Application::initI3T()
 	// getchar();printf("a\n");
 	// loadConfig();
 	const auto conf = loadConfig(Config::getAbsolutePath("Config.json"));
-	ResourceManager::instance().init(conf->Resources);
+	ResourceManager::instance().createDefaultResources(conf->Resources);
 
 	// new scene scheme
 	bool b = World::init(); // getchar(); printf("b\n");
 	m_world = new World();
 	m_world->onStart();
 	// getchar(); printf("c\n");
+
+	m_viewport = new Vp::Viewport();
+	m_viewport->init();
+
 	return b;
 }
 
@@ -252,6 +254,8 @@ UIModule* Application::getUI()
 }
 
 World* Application::world() { return m_world; }
+
+Vp::Viewport* Application::viewport() { return m_viewport; }
 
 void Application::onBeforeClose()
 {

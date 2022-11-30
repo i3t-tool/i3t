@@ -21,6 +21,7 @@ Component::Component()
 void Component::GUI()
 { /*printf("Default GUI\n");*/
 }
+// TODO: Every start implementation is empty? (DR)
 void Component::start()
 { /*printf("Default start\n");*/
 }

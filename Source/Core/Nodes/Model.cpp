@@ -6,20 +6,13 @@ namespace Core
 {
 void Model::updateValues(int inputIndex)
 {
-	/// \todo New approach
-	/*
 	if (m_inputs[0].isPluggedIn())
 	{
-	  auto& targetStorage = m_inputs[0].getStorage();
-	  m_mesh->transform(targetStorage.getMat4());
-	}
-	 */
-
-	if (m_inputs[0].isPluggedIn())
-	{
+		// Models m_modelMatrix value is updated and then can be read from the
+		// Node's update callback
 		auto& targetStorage = m_inputs[0].getStorage();
-		static_cast<GameObject*>(m_internalData[0].getPointer())->transformation =
-		    targetStorage.getMat4();
+		m_modelMatrix = targetStorage.getMat4();
+		Node::updateValues(inputIndex); // Callback
 	}
 }
 

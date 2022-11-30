@@ -28,7 +28,7 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 		const auto type = std::string(resource["type"].GetString(),
 		                              resource["type"].GetStringLength());
 
-		const auto maybeType = magic_enum::enum_cast<Core::EResourceType>(type);
+		const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(type);
 		if (!maybeType.has_value())
 		{
 			Log::error("Resource {} has unknown type!", resource["name"].GetString());

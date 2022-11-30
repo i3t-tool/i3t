@@ -27,12 +27,14 @@ public:
 
 	[[nodiscard]] ID getId() const { return m_id; }
 
-	[[nodiscard]] int getIndex() const { return m_index; }
+	    [[nodiscard]] int getIndex() const
+	{
+		return m_index;
+	}
 
 	[[nodiscard]] Ptr<Node> getOwner() const;
 
-	[[nodiscard]] const Pin* getParentPin() const
-	{
+	[[nodiscard]] const Pin* getParentPin() const {
 		if (m_isInput)
 		{
 			Debug::Assert(isPluggedIn(),
@@ -46,10 +48,10 @@ public:
 		}
 	}
 
-	/**
-	 * \return Input pins of connected nodes.
-	 */
-	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const
+	    /**
+	     * \return Input pins of connected nodes.
+	     */
+	    [[nodiscard]] const std::vector<Pin*>& getOutComponents() const
 	{
 		return m_outputs;
 	}
@@ -74,16 +76,22 @@ public:
 
 	[[nodiscard]] EValueType getType() const { return m_valueType; }
 
-	/**
-	 * Query if input of this object is plugged to any parent output.
-	 *
-	 * \return True if plugged to parent, false if not.
-	 */
-	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
+	    /**
+	     * Query if input of this object is plugged to any parent output.
+	     *
+	     * \return True if plugged to parent, false if not.
+	     */
+	    [[nodiscard]] bool isPluggedIn() const
+	{
+		return m_input != nullptr;
+	}
 
 	[[nodiscard]] bool isInput() const { return m_isInput; }
 
-	[[nodiscard]] bool isDisabled() const { return m_isDisabled; }
+	    [[nodiscard]] bool isDisabled() const
+	{
+		return m_isDisabled;
+	}
 	void setDisabled(bool disabled) { m_isDisabled = disabled; }
 
 private:

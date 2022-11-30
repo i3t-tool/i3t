@@ -28,6 +28,11 @@ class World;
 class Scripting;
 class UIModule;
 
+namespace Vp
+{
+class Viewport;
+}
+
 /**
  * Application class.
  * A wrapper for UI windows.
@@ -81,6 +86,8 @@ public:
 
 	World* world();
 
+	Vp::Viewport* viewport();
+
 	/**
 	 * Issue command.
 	 *
@@ -120,6 +127,8 @@ private:
 	bool m_bShouldClose = false;
 
 	World* m_world;
+	Vp::Viewport* m_viewport;
+
 	Scripting* m_scriptInterpreter;
 	// GLFWwindow* m_window;
 	Window* m_window;

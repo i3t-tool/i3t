@@ -8,24 +8,31 @@
 #include <imgui.h>
 
 #include "GUI/Elements/IWindow.h"
+#include "Viewport/Framebuffer.h"
+#include "Viewport/Viewport.h"
 
 class World;
+namespace Vp
+{
+class Viewport;
+}
 
 namespace UI
 {
-class Viewport : public IWindow
+class ViewportWindow : public IWindow
 {
 public:
-	I3T_WINDOW(Viewport)
+	I3T_WINDOW(ViewportWindow)
 
-	Viewport(bool show, World* world);
+	ViewportWindow(bool show, World* world, Vp::Viewport* viewport);
 	void render() override;
 
 private:
 	World* m_world;
-	unsigned int m_fboMain;
-	unsigned int m_texColBufMain;
-	unsigned int m_rboMain;
+	Vp::Viewport* m_viewport;
+
+	std::unique_ptr<Vp::Framebuffer> m_framebuffer;
+
 	ImVec2 m_wcMin;
 	ImVec2 m_wcMax;
 

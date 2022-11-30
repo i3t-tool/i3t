@@ -156,8 +156,7 @@ public:
 
 	bool isValid() const override { return true; }
 
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
-	{
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override {
 		setInternalValue(val, coords);
 		notifySequence();
 		return ValueSetResult{};

@@ -147,8 +147,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	// -------------------------------------------------------
 
 	// [FUNCS] DETERMINING ELEMENT TYPES
-	auto isBlockType = [](const std::string& string)
-	{
+	auto isBlockType = [](const std::string& string) {
 		// is keyword
 		static const std::unordered_map<std::string, blockType_t>
 		    stringToBlockType = {{"task:", TASK},     {"hint:", HINT},
@@ -162,8 +161,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 		// is anything else
 		return NOT_BLOCK;
 	};
-	auto isSingleLineType = [](const std::string& string)
-	{
+	auto isSingleLineType = [](const std::string& string) {
 		// is keyword
 		static const std::unordered_map<std::string, singleLineType_t>
 		    stringToSingleLineType = {
@@ -189,8 +187,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	//};
 
 	// [FUNC] FILLING THE STEP CLASS WITH COMPLETED BLOCK ELEMENTS
-	auto endCurrentBlock = [&]() -> void
-	{
+	auto endCurrentBlock = [&]() -> void {
 		switch (currentBlock)
 		{
 		case EXPLANATION:
@@ -217,8 +214,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	};
 
 	// [FUNC] INITIATING BLOCK ELEMENTS
-	auto beginBlock = [&](blockType_t blockType) -> void
-	{
+	auto beginBlock = [&](blockType_t blockType) -> void {
 		// drop current block if any (safety check)
 		if (currentBlock)
 		{
@@ -236,8 +232,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 
 	// [FUNC] FILLING THE STEP CLASS WITH SINGLE-LINE ELEMENTS
 	auto handleSingleLine = [&](singleLineType_t type,
-	                            const std::string& content) -> void
-	{
+	                            const std::string& content) -> void {
 		// check also for current state, and show error when calling singlelines
 		// which do not match nektere pripady ponechavaji state, jine ho musi
 		// resetovat!

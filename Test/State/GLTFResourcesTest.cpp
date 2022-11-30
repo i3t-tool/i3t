@@ -44,15 +44,22 @@ TEST(GLTFResourcesTest, DefaultModelAreImported)
 
 	createTestApplication();
 
-	const auto& defaultModels = ResourceManager::instance().defaultModels();
+	const auto& defaultModels =
+	    ResourceManager::instance().getDefaultResources(ResourceType::Model);
 
 	ASSERT_TRUE(defaultModels.size() == g_DefaultModelNames.size());
 
-	int i = 0;
-	for (const auto& [key, model] : defaultModels)
+	for (const auto& name : g_DefaultModelNames)
 	{
-		EXPECT_TRUE(key == g_DefaultModelNames[i]);
-		++i;
+		for (auto& resource : defaultModels)
+		{
+			if (resource.alias == name)
+			{
+				goto outerloop;
+			}
+		}
+		FAIL() << "One of default objects was not loaded";
+	outerloop:;
 	}
 
 	destroyTestApplication();

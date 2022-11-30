@@ -8,8 +8,6 @@
 #include "InputBindings.h"
 #include "Logger/LoggerInternal.h"
 
-#include "GUI/Elements/Windows/ViewportWindow.h"
-
 #define IM_MOUSE_KEYS_COUNT 3
 
 constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight,
@@ -258,7 +256,10 @@ void InputManager::processEvents(InputController& controller)
 			                     areModifiersActive(mods);
 
 			if (shouldProcess)
+			{
+				float s = scale;
 				callback(scale);
+			}
 		}
 	}
 }
@@ -311,6 +312,7 @@ void InputManager::update()
 	/// \todo MH mouse scroll release.
 	m_keyMap[Keys::Code::mouseScrlUp] = KeyState::UP;
 	m_keyMap[Keys::Code::mouseScrlDown] = KeyState::UP;
+	m_mouseWheelOffset = 0;
 }
 
 void InputManager::keyDown(int keyPressed)
@@ -767,6 +769,8 @@ MouseButtonState InputManager::m_mouseButtonState;
 std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
 std::vector<InputController*> InputManager::m_inputControllers;
+Ptr<IWindow> InputManager::m_focusedWindow;
+
 InputController* InputManager::s_activeInput = nullptr;
 
 bool InputManager::m_ignoreImGuiEvents = false;
@@ -781,6 +785,8 @@ float InputManager::m_mouseYDelta = 0;
 
 float InputManager::m_mouseXDragDelta = 0;
 float InputManager::m_mouseYDragDelta = 0;
+
+float InputManager::m_mouseWheelOffset = 0;
 
 int InputManager::m_winWidth = 0;
 int InputManager::m_winHeight = 0;

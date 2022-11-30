@@ -62,11 +62,9 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 	m_tutorial = nullptr;
 	m_currentStep = 0;
 	m_progressBarAnimationPosition = 0;
-	SetTutorialCommand::addListener(
-	    [this](std::shared_ptr<Tutorial> tutorial)
-	    {
-		    setTutorial(std::move(tutorial)); // COMMAND
-	    });
+	SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
+		setTutorial(std::move(tutorial)); // COMMAND
+	});
 }
 
 inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)

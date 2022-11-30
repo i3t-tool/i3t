@@ -26,8 +26,8 @@ DataStore::DataStore(EValueType valueType) : opValueType(valueType)
 		break;
 	case EValueType::Ptr:
 	case EValueType::Screen:
+		setValue(std::make_pair(glm::mat4(1.0f), glm::mat4(1.0f)));
 		// setValue((void*)nullptr);
-		setValue(glm::mat4(1.0f));
 		break;
 	case EValueType::Float:
 		setValue(0.0f);

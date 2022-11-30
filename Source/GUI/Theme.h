@@ -323,8 +323,12 @@ public:
 		m_colors.insert(std::pair(color, value));
 	}
 
-	[[nodiscard]] const Colors& getColors() const { return m_colors; }
-	Colors& getColorsRef() { return m_colors; }
+	[[nodiscard]] const Colors& getColors() const {
+		return m_colors;
+	} Colors& getColorsRef()
+	{
+		return m_colors;
+	}
 	void setColors(const Colors& colors) { m_colors = colors; }
 
 	Sizes& getSizesRef() { return m_sizes; }

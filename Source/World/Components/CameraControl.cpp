@@ -22,7 +22,7 @@ void CameraControl::update()
 	/// \todo MH
 	// if (!InputManager::isFocused<UI::Viewport>())
 	if (!InputManager::isInputActive(
-	        I3T::getUI()->getWindowPtr<UI::Viewport>()->getInputPtr()))
+	        I3T::getUI()->getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
 		return;
 
 	float x = InputManager::m_mouseXDelta / 8.0f;

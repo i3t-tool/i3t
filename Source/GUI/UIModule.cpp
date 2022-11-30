@@ -28,9 +28,9 @@ UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
-	SetFocusedWindowCommand::addListener(
-	    [](Ptr<IWindow> window)
-	    { InputManager::setActiveInput(&(window->getInput())); });
+	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) {
+		InputManager::setActiveInput(&(window->getInput()));
+	});
 
 	Theme::initNames();
 
@@ -38,16 +38,16 @@ void UIModule::init()
 	m_menu = new MainMenuBar();
 	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
 	m_dockableWindows.push_back(std::make_shared<StartWindow>(true));
-	m_dockableWindows.push_back(
-	    std::make_shared<Viewport>(true, App::get().world()));
+	m_dockableWindows.push_back(std::make_shared<ViewportWindow>(
+	    true, App::get().world(), App::get().viewport()));
 	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
 	m_dockableWindows.push_back(std::make_shared<Console>(false));
 	m_dockableWindows.push_back(std::make_shared<LogWindow>());
 
 	m_dockableWindows.push_back(std::make_shared<StyleEditor>());
 
-	HideWindowCommand::addListener([this](const std::string& id)
-	                               { popWindow(id); });
+	HideWindowCommand::addListener(
+	    [this](const std::string& id) { popWindow(id); });
 
 	// Setup Dear ImGui context after OpenGL context.
 	IMGUI_CHECKVERSION();
@@ -344,7 +344,8 @@ void UIModule::queryCameraState()
 	/// \todo This code causes dockspace crash.
 	return;
 
-	if (!InputManager::isInputActive(getWindowPtr<UI::Viewport>()->getInputPtr()))
+	if (!InputManager::isInputActive(
+	        getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
 		return;
 
 	// ORBIT camera rotation
@@ -401,6 +402,9 @@ std::string makeIDNice(const char* ID)
 
 void UIModule::setFocusedWindow()
 {
+	// TODO: (DR) Probably revert this to its original state once mouse wrap is
+	// implemented 	Original state being windows focusing on hover
+
 	// Get window ids.
 	ImGuiContext& g = *GImGui;
 	ImGuiIO& io = g.IO;
@@ -408,53 +412,62 @@ void UIModule::setFocusedWindow()
 	const char* activeWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 	const char* navWindowID = g.NavWindow ? g.NavWindow->Name : "";
 
-	// Check for hovered window.
-	if (strlen(hoveredWindowID) != 0)
+	auto activeID = makeIDNice(activeWindowID);
+	auto hoveredID = makeIDNice(hoveredWindowID);
+	auto navID = makeIDNice(navWindowID);
+
+	// Log::info("Hovered: {}, Active: {}, Nav: {}", hoveredWindowID,
+	// activeWindowID, navWindowID);
+
+	Ptr<IWindow> newFocusedWindow;
+	const char* newFocusedWindowName = nullptr;
+
+	if (strlen(hoveredWindowID) != 0 &&
+	    (ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1) ||
+	     ImGui::IsMouseClicked(2)))
 	{
-		auto activeID = makeIDNice(activeWindowID);
-		auto hoveredID = makeIDNice(hoveredWindowID);
-		auto navID = makeIDNice(navWindowID);
-
-		auto window = findWindow(hoveredID.c_str(), m_dockableWindows);
-
-		if (m_windows.count(hoveredID) != 0)
-		{
-			window = m_windows[hoveredID];
-		};
-
+		// Switch focus to hovered window on any kind of click
+		auto window = findAnyWindow(hoveredID);
 		if (window != nullptr)
 		{
-			bool shouldSetFocus = true;
-
-			// Check if window can be focused (no menu is active).
-			if (String::contains(navID, "Menu_") ||
-			    String::contains(navID, "Popup_") ||
-			    String::contains(navID, "Combo_"))
+			newFocusedWindow = window;
+			newFocusedWindowName = hoveredWindowID;
+		}
+	}
+	else
+	{
+		// Otherwise just update the currently focused window
+		if (strlen(navWindowID) != 0)
+		{
+			auto window = findAnyWindow(navID);
+			if (window != nullptr)
 			{
-				shouldSetFocus = false;
-			}
-			if (!activeID.empty() && activeID != hoveredID)
-			{
-				shouldSetFocus = false;
-
-				if (InputManager::isKeyJustPressed(Keys::mouseRight) ||
-				    InputManager::isKeyJustPressed(Keys::mouseMiddle))
-				{
-					// Un-focus text input.
-					ImGui::SetActiveID(0, g.HoveredWindow);
-					shouldSetFocus = true;
-				}
-			}
-
-			if (shouldSetFocus)
-			{
-				ImGui::SetWindowFocus(g.HoveredWindow->Name);
-
-				// Set focused window input in next frame.
-				SetFocusedWindowCommand::dispatch(window);
+				newFocusedWindow = window;
+				newFocusedWindowName = navWindowID;
 			}
 		}
 	}
+	// Log::info("newFocusedWindowName: {}", newFocusedWindowName);
+	if (newFocusedWindow != nullptr)
+	{
+		if (newFocusedWindow != InputManager::getFocusedWindow())
+		{
+			ImGui::SetWindowFocus(newFocusedWindowName);
+			InputManager::setFocusedWindow(newFocusedWindow);
+			SetFocusedWindowCommand::dispatch(newFocusedWindow);
+		}
+	}
+}
+
+Ptr<IWindow> UIModule::findAnyWindow(std::string ID)
+{
+	Ptr<IWindow> window = findWindow(ID.c_str(), m_dockableWindows);
+
+	if (m_windows.count(ID) != 0)
+	{
+		window = m_windows[ID];
+	};
+	return window;
 }
 
 void UIModule::popWindow(const std::string& windowId)

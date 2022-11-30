@@ -130,7 +130,7 @@ class Diwne : public DiwneObject
 {
 public:
 #ifdef DIWNE_DEBUG
-	bool m_diwneDebug_on = true;
+	bool m_diwneDebug_on = false;
 #endif // DIWNE_DEBUG
 	/*! Default constructor */
 	Diwne(DIWNE::SettingsDiwne* settingsDiwne);

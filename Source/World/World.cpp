@@ -13,8 +13,6 @@
 //
 #include "sceneGraph/ShaderProgram.h"
 
-#include "Core/Resources/Mesh.h"
-#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 //
 

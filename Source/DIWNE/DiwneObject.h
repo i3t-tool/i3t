@@ -36,25 +36,24 @@ public:                /* \todo some atributes should be private/protected */
 	                                                 object */
 	DrawMode m_drawMode;                          /*!< \see enum DrawMode */
 	bool m_selectable;
-	bool m_isHeld /*!< Is object held. When dragged it is still held. */,
-	    m_isDraged /*!< Is object draged */,
-	    m_selected /*!< Is object selected */,
-	    m_focusedForInteraction /*!< Is object focus on area that allow
-	                               interaction with object */
-	    ,
-	    m_focused /*!< Is object focused anywhere (and for example can not be
-	                 focus other underlying object) */
-	    ,
-	    m_isActive /*!< Something happen with object */;
+	bool m_isHeld;   /*!< Is object held. When dragged it is still held. */
+	bool m_isDraged; /*!< Is object draged */
+	bool m_selected; /*!< Is object selected */
+	bool m_focusedForInteraction; /*!< Is object focus on area that allow
+	                                 interaction with object */
+	bool m_focused;  /*!< Is object focused anywhere (and for example can not
+	                    be¨focus other underlying object) */
+	bool m_isActive; /*!< Something happen with object */
+	;
+
 	/*! \brief Constructor
 	 *
 	 * \param diwne is node editor object that this object belongs to
 	 * \param id used to identification
 	 * \param labelDiwne used to identification
 	 */
-
 	DiwneObject(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne);
-	virtual ~DiwneObject(){};
+	virtual ~DiwneObject() = default;
 
 	virtual bool interactionBeginInLastDraw()
 	{
