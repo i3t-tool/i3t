@@ -64,6 +64,7 @@ public:
 	bool content();
 	bool afterContent();
 	bool afterEnd();
+	bool finalize();
 
 	WorkspaceDiwneAction m_workspaceDiwneAction,
 	    m_workspaceDiwneActionPreviousFrame;
@@ -134,6 +135,8 @@ public:
 		}
 
 		m_workspaceCoreNodes.push_back(node);
+		m_takeSnap =
+		    true; /* JH maybe better in place where this function is called*/
 
 		return node;
 	}
@@ -141,10 +144,6 @@ public:
 	template <class T> auto inline addNodeToPositionOfPopup()
 	{
 		auto result = addNodeToPosition<T>(screen2diwne(getPopupPosition()));
-
-		m_takeSnap =
-		    true; /* JH maybe better in place where this function is called*/
-
 		return result;
 	}
 

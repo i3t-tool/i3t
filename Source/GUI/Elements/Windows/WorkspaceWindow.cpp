@@ -854,10 +854,7 @@ bool WorkspaceDiwne::content()
 			interaction_happen |= link->drawDiwne();
 		}
 
-		if (m_takeSnap)
-		{
-			StateManager::instance().takeSnapshot();
-		}
+
 
 		/* Cameras To Sequences links */
 		std::vector<Ptr<WorkspaceNodeWithCoreData>> all_cameras = getAllCameras();
@@ -918,6 +915,11 @@ bool WorkspaceDiwne::content()
 		m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 	}
 
+    /* \todo JH \todo MH maybe some different/other actions */
+	if (m_diwneAction == DIWNE::DiwneAction::InteractingContent)
+	{
+	    m_takeSnap |= interaction_happen;
+	}
 	return interaction_happen;
 }
 
@@ -1020,6 +1022,15 @@ bool WorkspaceDiwne::afterEnd()
 {
 	m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
 	return false;
+}
+
+bool WorkspaceDiwne::finalize()
+{
+    if (m_takeSnap)
+    {
+        StateManager::instance().takeSnapshot();
+    }
+    return false;
 }
 
 void WorkspaceDiwne::processDragAllSelectedNodes()
