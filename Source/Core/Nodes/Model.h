@@ -18,6 +18,8 @@ public:
 	void updateValues(int inputIndex = 0) override;
 	Ptr<Node> clone() override;
 
+	void onUnplugInput(size_t index) override;
+
 	// TODO: (DR) Model needs to hold a reference to a new Viewport object,
 	// ideally somehow abstracted so that layer separation is preserved (unlikely)
 	// MeshNode* mesh() const { return m_mesh; }

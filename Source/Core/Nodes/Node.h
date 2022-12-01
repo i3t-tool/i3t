@@ -447,9 +447,10 @@ private:
 	void unplugAll();
 	void unplugInput(size_t index);
 
-private:
-	void onUnplugInput(size_t index);
+protected:
+	virtual void onUnplugInput(size_t index) {}
 
+private:
 	void unplugOutput(size_t index);
 
 protected:
