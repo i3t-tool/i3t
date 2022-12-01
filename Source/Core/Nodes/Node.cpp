@@ -360,6 +360,8 @@ void Node::unplugInput(size_t index)
 			for (auto& state : m_OperatorState)
 				state = EValueState::Editable;
 	}
+
+	onUnplugInput(index);
 }
 
 void Node::unplugOutput(size_t index)
