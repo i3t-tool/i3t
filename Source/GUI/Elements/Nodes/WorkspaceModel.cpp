@@ -1,5 +1,6 @@
 #include "WorkspaceModel.h"
 
+#include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
 
 #include "Viewport/Viewport.h"
@@ -22,6 +23,10 @@ WorkspaceModel::~WorkspaceModel()
 	//DIWNE code 	Perhaps the methods that retrieve selected nodes 	Or the delete
 	//action lambda 	Destructor doesnt get called right away, rather until some
 	//other event happens 	Like hovering over another node with the mouse
+
+	const auto node = getNodebase()->as<Core::Model>();
+	node->resetModelPosition();
+
 	App::get().viewport()->removeEntity(m_viewportModel);
 }
 

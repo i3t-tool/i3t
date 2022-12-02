@@ -20,6 +20,9 @@ public:
 
 	void onUnplugInput(size_t index) override;
 
+	/// \todo
+	void resetModelPosition();
+
 	// TODO: (DR) Model needs to hold a reference to a new Viewport object,
 	// ideally somehow abstracted so that layer separation is preserved (unlikely)
 	// MeshNode* mesh() const { return m_mesh; }

@@ -11,6 +11,7 @@
 
 #include "Core/Defs.h"
 #include "GUI/Elements/IWindow.h"
+#include "Viewport/entity/Entity.h"
 
 struct Tutorial;
 

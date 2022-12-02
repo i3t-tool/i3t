@@ -20,7 +20,15 @@ Ptr<Node> Model::clone() { return GraphManager::createModel(); }
 
 void Model::onUnplugInput(size_t index)
 {
+	/*
 	m_modelMatrix = glm::mat4(1.0f);
 	Node::updateValues(index);
+	 */
+}
+
+void Model::resetModelPosition()
+{
+	m_modelMatrix = glm::mat4(1.0f);
+	Node::updateValues(0);
 }
 } // namespace Core
