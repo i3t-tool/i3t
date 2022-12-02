@@ -14,13 +14,13 @@
 #include "imgui.h"
 
 #include "Core/Defs.h"
+#include "Core/Module.h"
 #include "Core/Window.h"
 #include "State/Stateful.h"
 
 static const std::string g_baseTitle =
     "I3T - An Interactive Tool for Teaching Transformations";
 
-class Module;
 class ICommand;
 class Window;
 class MainMenuBar;
@@ -114,9 +114,17 @@ public:
 	//===--------------------------------------------------------------------===//
 
 private:
+	template <typename T, typename... Args>
+	static void createModule(Args&&... args);
+
+public:
+	template <typename T>
+	static T& getModule();
+
+private:
 	static Application* s_instance;
 
-	std::vector<Module*> m_modules;
+	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
 
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback
@@ -170,5 +178,32 @@ private:
 	 */
 	void logicUpdate();
 };
+
+template <typename T, typename... Args>
+inline void Application::createModule(Args&&... args)
+{
+	auto& self = Application::get();
+
+	static_assert(std::is_base_of_v<Module, T>, "Class T must be derived from the Module class");
+
+	const auto hash = typeid(T).hash_code();
+
+	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
+}
+
+template <typename T>
+T& Application::getModule()
+{
+	const auto& self = Application::get();
+
+	const auto hash = typeid(T).hash_code();
+
+#ifdef I3T_DEBUG
+	I3T_ASSERT(self.m_modules.count(hash) != 0 && "Module is not created!");
+	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr && "Invalid type.");
+#endif
+
+	return *(T*) self.m_modules.at(hash).get();
+}
 
 typedef Application App;

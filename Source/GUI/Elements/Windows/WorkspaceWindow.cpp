@@ -1028,7 +1028,7 @@ bool WorkspaceDiwne::finalize()
 {
     if (m_takeSnap)
     {
-        StateManager::instance().takeSnapshot();
+        App::getModule<StateManager>().takeSnapshot();
     }
     return false;
 }
@@ -1321,7 +1321,7 @@ WorkspaceWindow::WorkspaceWindow(bool show)
 	Input.bindAction("trackingSwitchOff", EKeyState::Pressed,
 	                 [&]() { g_workspaceDiwne->trackingSwitchOff(); });
 
-	StateManager::instance().setOriginator(this);
+	App::getModule<StateManager>().setOriginator(this);
 }
 
 WorkspaceWindow::~WorkspaceWindow()

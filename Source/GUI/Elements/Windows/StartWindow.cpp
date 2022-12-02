@@ -334,7 +334,7 @@ void StartWindow::render()
 							if (success && !result.empty())
 							{
 								ww->getNodeEditor().m_workspaceCoreNodes.clear();
-								StateManager::instance().loadScene(result);
+								App::getModule<StateManager>().loadScene(result);
 								this->hide();
 							}
 							else

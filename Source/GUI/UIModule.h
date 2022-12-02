@@ -57,8 +57,10 @@ class UIModule final : public Module
 
 	using Fonts = std::vector<ImFont*>;
 
-	UIModule() = default;
+public:
 	~UIModule() override;
+
+private:
 	void init() override;
 	void beginFrame() override;
 	void onClose() override;
@@ -108,6 +110,8 @@ public:
 	{
 		return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows));
 	}
+
+	UIModule() = default;
 
 private:
 	void setFocusedWindow();

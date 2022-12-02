@@ -1,16 +1,18 @@
 #pragma once
 
+#include "Core/Application.h"
 #include "Core/Defs.h"
 #include "Core/Resources/Mesh.h"
 #include "Core/Resources/Resource.h"
 
+#include "Core/Module.h"
 #include "pgr.h"
 
 #include <algorithm>
 #include <set>
 
 #define RM Core::ResourceManager
-#define RMI RM::instance()
+#define RMI App::getModule<RM>()
 
 namespace Core
 {
@@ -44,7 +46,7 @@ class Resource;
  * An RM define is provided to shorten "Core::ResourceManager"
  * An RMI define shortens "Core::ResourceManager::instance()"
  */
-class ResourceManager : public Singleton<ResourceManager>
+class ResourceManager : public Module
 {
 private:
 	/// Map of hashIds and owning resource pointers [hashid, resource]
@@ -57,6 +59,8 @@ private:
 
 public:
 	~ResourceManager();
+
+	static ResourceManager& instance();
 
 	/**
 	 * Loads provided resources and marks them as default.

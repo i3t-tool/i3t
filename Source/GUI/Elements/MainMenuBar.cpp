@@ -52,14 +52,14 @@ static void saveAs()
 
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 
-		StateManager::instance().saveScene(filename);
-		StateManager::instance().setScene(filename);
+		App::getModule<StateManager>().saveScene(filename);
+		App::getModule<StateManager>().setScene(filename);
 	}
 }
 
 static void save()
 {
-	auto& sm = StateManager::instance();
+	auto& sm = App::getModule<StateManager>();
 
 	if (sm.hasScene())
 		sm.saveScene();
@@ -74,7 +74,7 @@ static void open()
 	if (hasFile)
 	{
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-		StateManager::instance().loadScene(sceneFile);
+		App::getModule<StateManager>().loadScene(sceneFile);
 	}
 }
 
@@ -167,12 +167,12 @@ void MainMenuBar::showEditMenu()
 	if (ImGui::BeginMenu("Edit"))
 	{
 		if (ImGui::MenuItem("Undo", nullptr, false,
-		                    StateManager::instance().canUndo()))
+		                    App::getModule<StateManager>().canUndo()))
 		{
 			InputManager::triggerAction("undo", EKeyState::Pressed);
 		}
 		if (ImGui::MenuItem("Redo", nullptr, false,
-		                    StateManager::instance().canRedo()))
+		                    App::getModule<StateManager>().canRedo()))
 		{
 			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}

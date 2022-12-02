@@ -243,7 +243,7 @@ auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
 {
 	auto result = g_workspaceDiwne->addNodeToPosition<T>(position);
 
-	StateManager::instance().takeSnapshot();
+	App::getModule<StateManager>().takeSnapshot();
 
 	return result;
 }
@@ -263,7 +263,7 @@ inline bool connectNodes(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
 	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	if (result)
 	{
-		StateManager::instance().takeSnapshot();
+		App::getModule<StateManager>().takeSnapshot();
 	}
 
 	return result;

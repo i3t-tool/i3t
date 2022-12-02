@@ -177,7 +177,7 @@ Core::Mesh* Shaper::createLineMesh(const std::string& alias)
 		    "Shaper: Can't create line mesh with 0 vertices / colors!");
 	}
 
-	Core::Mesh* mesh = Core::ResourceManager::instance().mesh(
+	Core::Mesh* mesh = RMI.mesh(
 	    alias, Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3,
 	    &getColors()[0], getColors().size() / 3);
 	return mesh;
@@ -191,7 +191,7 @@ Core::Mesh* Shaper::createMesh(const std::string& alias)
 		    "Shaper: Can't create mesh with 0 vertices / colors!");
 	}
 
-	Core::Mesh* mesh = Core::ResourceManager::instance().mesh(
+	Core::Mesh* mesh = RMI.mesh(
 	    alias, Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3,
 	    &getColors()[0], getColors().size() / 3);
 	return mesh;

@@ -35,9 +35,12 @@ void Application::init()
 
 	m_isPaused = false;
 
-	m_modules.push_back(new UIModule());
+	//m_modules.push_back(new UIModule());
+	createModule<ResourceManager>();
+	createModule<UIModule>();
+	createModule<StateManager>();
 
-	m_scriptInterpreter = new Scripting();
+	// m_scriptInterpreter = new Scripting();
 
 	Core::GraphManager::init();
 
@@ -45,7 +48,7 @@ void Application::init()
 
 	BeforeNewProjectCommand::addListener(
 	    [this]() { getUI()->showUniqueWindow<BeforeNewModal>(); });
-	NewProjectCommand::addListener([]() { StateManager::instance().clear(); });
+	NewProjectCommand::addListener([]() { App::getModule<StateManager>().clear(); });
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
@@ -59,24 +62,24 @@ void Application::init()
 
 	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
 		Log::info("undo triggered");
-		StateManager::instance().undo();
+		App::getModule<StateManager>().undo();
 	});
 	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
 		Log::info("redo triggered");
-		StateManager::instance().redo();
+		App::getModule<StateManager>().redo();
 	});
 
-	StateManager::instance().setOriginator(this);
+	App::getModule<StateManager>().setOriginator(this);
 }
 
 void Application::initModules()
 {
-	for (auto* m : m_modules)
+	for (auto& [_, m] : m_modules)
 	{
 		m->init();
 	}
 
-	StateManager::instance().createEmptyScene();
+	App::getModule<StateManager>().createEmptyScene();
 }
 
 //===----------------------------------------------------------------------===//
@@ -158,10 +161,10 @@ void Application::onDisplay()
 	/// the timer
 	// TIME_STEP_ACU -= TIME_STEP;
 
-	for (auto* m : m_modules)
+	for (auto& [_, m] : m_modules)
 		m->beginFrame();
 
-	for (auto* m : m_modules)
+	for (auto& [_, m] : m_modules)
 		m->endFrame();
 
 	// Input update must be called after rendering.
@@ -184,15 +187,15 @@ void Application::logicUpdate()
 
 void Application::finalize()
 {
-	for (auto& module : m_modules)
-		module->onClose();
+	for (auto& [_, m] : m_modules)
+		m->onClose();
 
 	World::end();
 	delete m_world;
 	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
 
 	m_window->finalize();
-	StateManager::instance().finalize();
+	App::getModule<StateManager>().finalize();
 
 	// TODO: Investigate why this was here. Was causing an assertion error on
 	// exit. delete s_instance; s_instance == nullptr;
@@ -203,7 +206,7 @@ bool Application::initI3T()
 	// getchar();printf("a\n");
 	// loadConfig();
 	const auto conf = loadConfig(Config::getAbsolutePath("Config.json"));
-	ResourceManager::instance().createDefaultResources(conf->Resources);
+	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
 
 	// new scene scheme
 	bool b = World::init(); // getchar(); printf("b\n");
@@ -223,16 +226,16 @@ void Application::onStateChange()
 {
 	auto title = g_baseTitle;
 
-	if (StateManager::instance().hasScene())
+	if (App::getModule<StateManager>().hasScene())
 	{
-		title += ": " + StateManager::instance().scenePath().filename().string();
+		title += ": " + App::getModule<StateManager>().scenePath().filename().string();
 	}
 	else
 	{
 		title += ": New Scene";
 	}
 
-	if (StateManager::instance().isDirty())
+	if (App::getModule<StateManager>().isDirty())
 	{
 		title += "*";
 	}
@@ -246,11 +249,7 @@ Application& Application::get() { return *s_instance; }
 
 UIModule* Application::getUI()
 {
-	I3T_ASSERT(!m_modules.empty() && dynamic_cast<UIModule*>(m_modules[0]) &&
-	           "Did you initialize the Application properly?");
-
-	/// \todo Unsafe!
-	return (UIModule*)m_modules[0];
+	return &getModule<UIModule>();
 }
 
 World* Application::world() { return m_world; }

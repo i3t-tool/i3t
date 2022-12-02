@@ -8,7 +8,7 @@
 
 void BeforeCloseModal::render()
 {
-	if (!StateManager::instance().isDirty())
+	if (!App::getModule<StateManager>().isDirty())
 	{
 		CloseCommand::dispatch();
 		return;
@@ -37,7 +37,7 @@ void BeforeCloseModal::render()
 		{
 			InputManager::triggerAction("save", EKeyState::Pressed);
 
-			if (!StateManager::instance().isDirty())
+			if (!App::getModule<StateManager>().isDirty())
 			{
 				// save was successful
 				HideWindowCommand::dispatch(ID);
