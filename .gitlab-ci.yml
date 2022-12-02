@@ -56,6 +56,7 @@ check format:
     - bash Scripts/CheckFormat.sh
   dependencies:
     - test
+  allow_failure: true
 
 ###
 

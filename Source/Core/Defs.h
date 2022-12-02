@@ -70,36 +70,6 @@ template <typename T> using UPtr = std::unique_ptr<T>;
 
 template <typename T> using WPtr = std::weak_ptr<T>;
 
-/// Singleton helper class.
-template <typename T> class Singleton
-{
-public:
-	static T& instance();
-
-	Singleton(const Singleton&) = delete;
-	Singleton& operator=(const Singleton) = delete;
-
-protected:
-	Singleton() {}
-
-	void release();
-
-	inline static std::unique_ptr<T> m_instance = nullptr;
-};
-
-template <typename T> T& Singleton<T>::instance()
-{
-	if (m_instance == nullptr)
-		m_instance = std::make_unique<T>();
-
-	return *m_instance;
-}
-
-template <typename T> void Singleton<T>::release()
-{
-	m_instance.reset(new T{});
-}
-
 //
 
 template <typename BaseClass> class ICloneable

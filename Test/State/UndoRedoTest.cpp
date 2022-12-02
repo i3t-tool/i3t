@@ -20,25 +20,26 @@ TEST(UndoRedoTest, Basic)
 	addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>();
 	const float newValue = 10.0f;
 	setValue_expectOk(nodes[0]->getNodebase(), newValue);
-	StateManager::instance().takeSnapshot();
-	EXPECT_TRUE(StateManager::instance().canUndo());
-	EXPECT_FALSE(StateManager::instance().canRedo());
-	EXPECT_TRUE(StateManager::instance().getMementosCount() == 1 + 2);
+	App::getModule<StateManager>().takeSnapshot();
+	EXPECT_TRUE(App::getModule<StateManager>().canUndo());
+	EXPECT_FALSE(App::getModule<StateManager>().canRedo());
+	EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1 + 2);
 	EXPECT_TRUE(!nodes.empty());
 
-	StateManager::instance().undo(); // set node to initial value
-	StateManager::instance()
-	    .undo(); // set to the initial state (without any nodes)
-	EXPECT_FALSE(StateManager::instance().canUndo());
-	EXPECT_TRUE(StateManager::instance().canRedo());
+	// set node to initial value
+	App::getModule<StateManager>().undo();
+	// set to the initial state (without any nodes)
+	App::getModule<StateManager>().undo();
+	EXPECT_FALSE(App::getModule<StateManager>().canUndo());
+	EXPECT_TRUE(App::getModule<StateManager>().canRedo());
 	EXPECT_TRUE(nodes.empty());
 
-	StateManager::instance().redo();
+	App::getModule<StateManager>().redo();
 	EXPECT_TRUE(nodes.size() == 1);
 
 	setValue_expectOk(nodes[0]->getNodebase(), newValue);
-	StateManager::instance().takeSnapshot();
-	EXPECT_FALSE(StateManager::instance().canRedo());
+	App::getModule<StateManager>().takeSnapshot();
+	EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
 	addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>();
 
@@ -46,21 +47,21 @@ TEST(UndoRedoTest, Basic)
 	EXPECT_EQ(nodes[1]->getNodebase()->getData().getFloat(), newValue);
 	EXPECT_TRUE(nodes[1]->getNodebase()->getIn(0).isPluggedIn());
 
-	StateManager::instance().undo();
+	App::getModule<StateManager>().undo();
 	EXPECT_EQ(nodes[1]->getNodebase()->getData().getFloat(), 0.0f);
 	EXPECT_FALSE(nodes[1]->getNodebase()->getIn(0).isPluggedIn());
 
-	StateManager::instance().redo();
+	App::getModule<StateManager>().redo();
 	EXPECT_EQ(nodes[1]->getNodebase()->getData().getFloat(), newValue);
 	EXPECT_TRUE(nodes[1]->getNodebase()->getIn(0).isPluggedIn());
 
 	//
 
 	int i = 0;
-	int iExpected = StateManager::instance().getMementosCount() - 1;
-	while (StateManager::instance().canUndo())
+	int iExpected = App::getModule<StateManager>().getMementosCount() - 1;
+	while (App::getModule<StateManager>().canUndo())
 	{
-		StateManager::instance().undo();
+		App::getModule<StateManager>().undo();
 		++i;
 	}
 	EXPECT_EQ(iExpected, i);
@@ -69,9 +70,9 @@ TEST(UndoRedoTest, Basic)
 
 	//
 
-	while (StateManager::instance().canRedo())
+	while (App::getModule<StateManager>().canRedo())
 	{
-		StateManager::instance().redo();
+		App::getModule<StateManager>().redo();
 	}
 
 	EXPECT_TRUE(nodes.size() == 2);
@@ -81,10 +82,10 @@ TEST(UndoRedoTest, Basic)
 	addNodeToNodeEditor<WorkspaceOperator<ENodeType::MatrixToMatrix>>();
 	const auto mat = generateMat4();
 	setValue_expectOk(nodes[2]->getNodebase(), mat);
-	StateManager::instance().takeSnapshot();
+	App::getModule<StateManager>().takeSnapshot();
 
-	StateManager::instance().undo();
-	StateManager::instance().redo();
+	App::getModule<StateManager>().undo();
+	App::getModule<StateManager>().redo();
 	EXPECT_TRUE(Math::eq(mat, nodes[2]->getNodebase()->getData().getMat4()));
 
 	destroyTestApplication();

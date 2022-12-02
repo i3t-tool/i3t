@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <string>
 
 inline bool ends_with(std::string const& value, std::string const& ending)
 {

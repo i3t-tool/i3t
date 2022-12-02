@@ -10,7 +10,7 @@ constexpr const char* MODAL_LABEL = "Create new project?###%s";
 
 void BeforeNewModal::render()
 {
-	if (!StateManager::instance().isDirty())
+	if (!App::getModule<StateManager>().isDirty())
 	{
 		submit();
 
@@ -40,7 +40,7 @@ void BeforeNewModal::render()
 		{
 			InputManager::triggerAction("save", EKeyState::Pressed);
 
-			if (!StateManager::instance().isDirty())
+			if (!App::getModule<StateManager>().isDirty())
 			{
 				submit();
 

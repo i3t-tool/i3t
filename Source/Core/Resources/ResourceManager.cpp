@@ -14,6 +14,11 @@ using namespace Core;
 
 ResourceManager::~ResourceManager() { dispose(); }
 
+ResourceManager& ResourceManager::instance()
+{
+	return App::getModule<ResourceManager>();
+}
+
 GLuint ResourceManager::textureByAlias(const std::string& alias)
 {
 	bool success = false;

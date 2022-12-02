@@ -308,7 +308,7 @@ bool WorkspaceTransformation::drawDataFull()
 		m_nodebase->setValue(valueOfChange, {columnOfChange, rowOfChange});
 		//				/// TEST ///////////////////////////////////////////////// /* snap
 		// is taken in the end of frame
-		//*/ 				StateManager::instance().takeSnapshot();
+		//*/ 				App::getModule<StateManager>().takeSnapshot();
 		//				//////////////////////////////////////////////////////////
 		setDataItemsWidth();
 	}

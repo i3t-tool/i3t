@@ -184,4 +184,4 @@ void StateManager::reset()
 	takeSnapshot();
 }
 
-void StateManager::finalize() { release(); }
+void StateManager::finalize() {  }

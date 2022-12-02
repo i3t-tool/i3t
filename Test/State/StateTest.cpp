@@ -34,65 +34,65 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	ASSERT_TRUE(workspace != nullptr);
 
 	// create empty scene
-	StateManager::instance().saveScene(
+	App::getModule<StateManager>().saveScene(
 	    Config::getAbsolutePath("Test/State/EmptyScene.json"));
 
 	{
 		ASSERT_TRUE(getNodes(workspace).empty());
 
-		EXPECT_FALSE(StateManager::instance().canUndo());
-		EXPECT_FALSE(StateManager::instance().canRedo());
+		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
+		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
 		// StateManager contains the initial state only.
-		EXPECT_TRUE(StateManager::instance().getMementosCount() == 1);
+		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
 		nodes.push_back(
 		    addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(
 		        ImVec2(1.0f, 0.0f)));
-		EXPECT_TRUE(StateManager::instance().canUndo());
-		EXPECT_TRUE(StateManager::instance().getPossibleUndosCount() == 1);
+		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
+		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
 
 		nodes.push_back(
 		    addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(
 		        ImVec2(-1.0f, 1.0f)));
-		EXPECT_TRUE(StateManager::instance().canUndo());
-		EXPECT_TRUE(StateManager::instance().getPossibleUndosCount() == 2);
+		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
+		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 2);
 
 		nodes.push_back(
 		    addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(
 		        ImVec2(0.0f, -1.0f)));
-		EXPECT_TRUE(StateManager::instance().canUndo());
-		EXPECT_TRUE(StateManager::instance().getPossibleUndosCount() == 3);
+		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
+		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
 		// workspace contains 3 operators.
 		ASSERT_TRUE(getNodes(workspace).size() == nodes.size());
 
 		connectNodes(nodes[0], nodes[1], 0, 0);
-		EXPECT_TRUE(StateManager::instance().getPossibleUndosCount() == 4);
+		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 4);
 
 		connectNodes(nodes[1], nodes[2], 0, 0);
-		EXPECT_TRUE(StateManager::instance().getPossibleUndosCount() == 5);
+		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 5);
 
-		const bool result = StateManager::instance().saveScene(scenePath);
+		const bool result = App::getModule<StateManager>().saveScene(scenePath);
 		ASSERT_TRUE(result);
 	}
 
 	{
 		// clear all nodes with empty scene file
 
-		const bool result = StateManager::instance().loadScene(emptyScenePath);
+		const bool result = App::getModule<StateManager>().loadScene(emptyScenePath);
 		ASSERT_TRUE(result);
-		EXPECT_FALSE(StateManager::instance().canUndo());
-		EXPECT_FALSE(StateManager::instance().canRedo());
+		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
+		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
 		ASSERT_TRUE(getNodes(workspace).empty());
 	}
 
 	{
-		const bool result = StateManager::instance().loadScene(scenePath);
+		const bool result = App::getModule<StateManager>().loadScene(scenePath);
 		ASSERT_TRUE(result);
-		EXPECT_FALSE(StateManager::instance().canUndo());
-		EXPECT_FALSE(StateManager::instance().canRedo());
+		EXPECT_FALSE(App::getModule<StateManager>().canUndo());
+		EXPECT_FALSE(App::getModule<StateManager>().canRedo());
 
 		// ASSERT_TRUE(getNodes(workspace).size() == nodes.size());
 	}
@@ -111,7 +111,7 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 	ASSERT_TRUE(getNodes(workspace).empty());
 
 	// create empty scene
-	StateManager::instance().saveScene(
+	App::getModule<StateManager>().saveScene(
 	    Config::getAbsolutePath("Test/State/EmptyScene.json"));
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes;
@@ -136,29 +136,29 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 		scaleNode->setDefaultValue("scale", randomVec3);
 		scaleNode->saveValue();
 		scaleNode->setDefaultValue("scale", glm::vec3(1.0f, 1.0f, 1.0f));
-		StateManager::instance().takeSnapshot();
+		App::getModule<StateManager>().takeSnapshot();
 
 		std::static_pointer_cast<WorkspaceSequence>(nodes[2])->moveNodeToSequence(
 		    nodes[1]);
 
 		/// \todo Sequence now contains a transform but the workspace also contains
 		/// it. \todo When to take a snapshot?
-		StateManager::instance().takeSnapshot();
+		App::getModule<StateManager>().takeSnapshot();
 	}
 
 	// due to WorkspaceSequence::setRemoveFromWorkspace
 	for (int i = 0; i < 2; ++i)
 		Application::get().onDisplay();
 
-	StateManager::instance().takeSnapshot();
+	App::getModule<StateManager>().takeSnapshot();
 
 	{
-		const bool result = StateManager::instance().saveScene(scenePath);
+		const bool result = App::getModule<StateManager>().saveScene(scenePath);
 		ASSERT_TRUE(result);
 	}
 
 	{
-		const bool result = StateManager::instance().loadScene(scenePath);
+		const bool result = App::getModule<StateManager>().loadScene(scenePath);
 		ASSERT_TRUE(result);
 	}
 

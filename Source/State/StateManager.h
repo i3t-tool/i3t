@@ -4,12 +4,13 @@
 #include <vector>
 
 #include "Core/Defs.h"
+#include "Core/Module.h"
 #include "State/Stateful.h"
 
 /**
  * Holds global state and takes state snapshots.
  */
-class StateManager : public Singleton<StateManager>
+class StateManager : public Module
 {
 public:
 	/// Implicitly creates the initial state (Memento with index 0).
