@@ -10,15 +10,13 @@ void printMatrix5(glm::mat4 m)
 	printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f "
 	       "%0.3f %0.3f\n\t%0.3f %0.3f %0.3f "
 	       "%0.3f\n\n",
-	       m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], m[2][1], m[3][1],
-	       m[0][2], m[1][2], m[2][2], m[3][2], m[0][3], m[1][3], m[2][3],
-	       m[3][3]);
+	       m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], m[2][1], m[3][1], m[0][2], m[1][2], m[2][2], m[3][2],
+	       m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
 const char* Camera::s_type = NULL;
 
-Camera::Camera(float viewingAngle, GameObject* sceneRoot,
-               RenderTexture* renderTarget)
+Camera::Camera(float viewingAngle, GameObject* sceneRoot, RenderTexture* renderTarget)
 {
 	Camera::s_type = typeid(Camera).name();
 	this->m_type = Camera::s_type;
@@ -28,8 +26,7 @@ Camera::Camera(float viewingAngle, GameObject* sceneRoot,
 	this->m_sceneRoot = sceneRoot;
 	float camw = (float)renderTarget->getWidth();
 	float camh = (float)renderTarget->getHeight();
-	this->m_perspective =
-	    glm::perspective(glm::radians(m_angle), camw / camh, 0.2f, 2000.0f);
+	this->m_perspective = glm::perspective(glm::radians(m_angle), camw / camh, 0.2f, 2000.0f);
 	this->m_fbo = renderTarget;
 	this->m_mainCamera = false;
 }
@@ -42,14 +39,12 @@ Camera::Camera(float viewingAngle, GameObject* sceneRoot)
 	this->m_sceneRoot = sceneRoot;
 	float camw = World::width;
 	float camh = World::height;
-	this->m_perspective =
-	    glm::perspective(glm::radians(m_angle), camw / camh, 0.2f, 2000.0f);
+	this->m_perspective = glm::perspective(glm::radians(m_angle), camw / camh, 0.2f, 2000.0f);
 	this->m_fbo = NULL;
 	this->m_mainCamera = true;
 }
 
-void Camera::renderRecursive(GameObject* obj, glm::mat4 parent,
-                             bool isTranspartentPass)
+void Camera::renderRecursive(GameObject* obj, glm::mat4 parent, bool isTranspartentPass)
 {
 	for (int i = 0; i < obj->components.size(); i++)
 	{
@@ -60,8 +55,7 @@ void Camera::renderRecursive(GameObject* obj, glm::mat4 parent,
 	}
 	for (int i = 0; i < obj->children.size(); i++)
 	{
-		renderRecursive(obj->children[i], parent * obj->transformation,
-		                isTranspartentPass);
+		renderRecursive(obj->children[i], parent * obj->transformation, isTranspartentPass);
 	}
 }
 
@@ -78,8 +72,7 @@ void Camera::update()
 
 	if (this->m_mainCamera)
 	{
-		this->m_perspective = glm::perspective(
-		    glm::radians(m_angle), World::width / World::height, 0.2f, 2000.0f);
+		this->m_perspective = glm::perspective(glm::radians(m_angle), World::width / World::height, 0.2f, 2000.0f);
 		glStencilMask(255);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glClearStencil(0);
@@ -107,8 +100,7 @@ void Camera::update()
 		World::mainCamera = transform;
 	}
 
-	World::mainCamera[3] =
-	    World::mainCamera * glm::vec4(-(glm::vec3)transform[3], 1.0f);
+	World::mainCamera[3] = World::mainCamera * glm::vec4(-(glm::vec3)transform[3], 1.0f);
 	//*(glm::vec3*)(&World::mainCamera[3]) = -(glm::vec3)transform[3];
 
 	renderRecursive(m_sceneRoot, glm::mat4(1.0f), false); // render opaque

@@ -16,8 +16,7 @@ Ptr<Sequence> Builder::createSequence()
 
 //===-- Storage -----------------------------------------------------------===//
 
-const Operation g_storageOp = {
-    "SeqStor", "_", 1, {EValueType::Matrix}, 1, {EValueType::Matrix}};
+const Operation g_storageOp = {"SeqStor", "_", 1, {EValueType::Matrix}, 1, {EValueType::Matrix}};
 
 Sequence::Storage::Storage()
     : // 		Node(&g_storageOp)
@@ -73,8 +72,7 @@ void Sequence::Storage::updateValues(int inputIndex)
 	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
 }
 
-ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix,
-                                            size_t index) noexcept
+ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
 	// insert transform to matrix array
 	index = index > m_matrices.size() ? m_matrices.size() : index;
@@ -98,9 +96,8 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix,
 
 Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 {
-	Debug::Assert(
-	    m_matrices.size() > static_cast<size_t>(index),
-	    "Sequence does not have so many matrices as you are expecting.");
+	Debug::Assert(m_matrices.size() > static_cast<size_t>(index),
+	              "Sequence does not have so many matrices as you are expecting.");
 
 	auto result = std::move(m_matrices.at(index));
 	m_matrices.erase(m_matrices.begin() + index);
@@ -131,9 +128,7 @@ void Sequence::Storage::swap(int from, int to)
 //===-- Multiplier --------------------------------------------------------===//
 
 const Operation g_multiplerOp = {
-    "SeqMul", "_",
-    1,        {EValueType::MatrixMul},
-    2,        {EValueType::MatrixMul, EValueType::Matrix}};
+    "SeqMul", "_", 1, {EValueType::MatrixMul}, 2, {EValueType::MatrixMul, EValueType::Matrix}};
 
 Sequence::Multiplier::Multiplier()
     : // 		Node(&g_multiplerOp)
@@ -204,16 +199,11 @@ void Sequence::createComponents()
 	m_storage = std::make_shared<Sequence::Storage>();
 	m_storage->m_id = getId();
 
-	m_storage->m_inputs.emplace_back(EValueType::MatrixMul, true,
-	                                 m_storage->getPtr(), 0);
-	m_storage->m_inputs.emplace_back(EValueType::Matrix, true,
-	                                 m_storage->getPtr(), 1);
-	m_storage->m_outputs.emplace_back(EValueType::MatrixMul, false,
-	                                  m_storage->getPtr(), 0);
-	m_storage->m_outputs.emplace_back(EValueType::Matrix, false,
-	                                  m_storage->getPtr(), 1);
-	m_storage->m_outputs.emplace_back(EValueType::Matrix, false,
-	                                  m_storage->getPtr(), 2);
+	m_storage->m_inputs.emplace_back(EValueType::MatrixMul, true, m_storage->getPtr(), 0);
+	m_storage->m_inputs.emplace_back(EValueType::Matrix, true, m_storage->getPtr(), 1);
+	m_storage->m_outputs.emplace_back(EValueType::MatrixMul, false, m_storage->getPtr(), 0);
+	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 1);
+	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 2);
 
 	m_storage->m_internalData.emplace_back(EValueType::MatrixMul);
 	m_storage->m_internalData.emplace_back(EValueType::Matrix);
@@ -224,17 +214,12 @@ void Sequence::createComponents()
 	m_multiplier = std::make_shared<Sequence::Multiplier>();
 	m_multiplier->m_id = getId();
 
-	m_multiplier->m_inputs.emplace_back(EValueType::MatrixMul, true,
-	                                    m_multiplier->getPtr(), 0);
-	m_multiplier->m_inputs.emplace_back(EValueType::Matrix, true,
-	                                    m_multiplier->getPtr(), 1);
+	m_multiplier->m_inputs.emplace_back(EValueType::MatrixMul, true, m_multiplier->getPtr(), 0);
+	m_multiplier->m_inputs.emplace_back(EValueType::Matrix, true, m_multiplier->getPtr(), 1);
 
-	m_multiplier->m_outputs.emplace_back(EValueType::MatrixMul, false,
-	                                     m_multiplier->getPtr(), 0);
-	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false,
-	                                     m_multiplier->getPtr(), 1);
-	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false,
-	                                     m_multiplier->getPtr(), 2);
+	m_multiplier->m_outputs.emplace_back(EValueType::MatrixMul, false, m_multiplier->getPtr(), 0);
+	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false, m_multiplier->getPtr(), 1);
+	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false, m_multiplier->getPtr(), 2);
 
 	m_multiplier->m_internalData.emplace_back(EValueType::MatrixMul);
 	m_multiplier->m_internalData.emplace_back(EValueType::Matrix);

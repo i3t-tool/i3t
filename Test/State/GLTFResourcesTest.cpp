@@ -21,14 +21,12 @@ const std::array g_DefaultModelNames = {
 
 TEST(GLTFResourcesTest, AssimpCanImportGLTFFiles)
 {
-	const auto defaultModelsDir =
-	    std::filesystem::path(I3T_PROJECT_ROOT "/Data/Models");
+	const auto defaultModelsDir = std::filesystem::path(I3T_PROJECT_ROOT "/Data/Models");
 
 	for (const auto& defaultFile : g_DefaultModelNames)
 	{
 		Assimp::Importer importer;
-		const auto* scene = importer.ReadFile(
-		    (defaultModelsDir / (defaultFile + ".gltf")).string().c_str(), 0);
+		const auto* scene = importer.ReadFile((defaultModelsDir / (defaultFile + ".gltf")).string().c_str(), 0);
 
 		if (scene == nullptr)
 		{
@@ -44,8 +42,7 @@ TEST(GLTFResourcesTest, DefaultModelAreImported)
 
 	createTestApplication();
 
-	const auto& defaultModels =
-	    ResourceManager::instance().getDefaultResources(ResourceType::Model);
+	const auto& defaultModels = ResourceManager::instance().getDefaultResources(ResourceType::Model);
 
 	ASSERT_TRUE(defaultModels.size() == g_DefaultModelNames.size());
 

@@ -24,8 +24,7 @@ void StateManager::takeSnapshot()
 
 	if (m_originators.empty())
 	{
-		LOG_WARN(
-		    "You have no originators set for the StateManager, is it correct?");
+		LOG_WARN("You have no originators set for the StateManager, is it correct?");
 	}
 
 	for (const auto& originator : m_originators)
@@ -93,17 +92,11 @@ void StateManager::redo()
 
 bool StateManager::canUndo() const { return m_currentStateIdx > 0; }
 
-bool StateManager::canRedo() const
-{
-	return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx;
-}
+bool StateManager::canRedo() const { return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx; }
 
 int StateManager::getMementosCount() const { return m_mementos.size(); }
 
-int StateManager::getPossibleUndosCount() const
-{
-	return m_mementos.size() - 1;
-}
+int StateManager::getPossibleUndosCount() const { return m_mementos.size() - 1; }
 
 int StateManager::getPossibleRedosCount() const
 {
@@ -113,10 +106,7 @@ int StateManager::getPossibleRedosCount() const
 
 //
 
-const Memento& StateManager::getCurrentState() const
-{
-	return m_mementos[m_currentStateIdx];
-}
+const Memento& StateManager::getCurrentState() const { return m_mementos[m_currentStateIdx]; }
 
 void StateManager::createEmptyScene() { reset(); }
 
@@ -124,8 +114,7 @@ void StateManager::createEmptyScene() { reset(); }
 
 bool StateManager::loadScene(const fs::path& scene)
 {
-	const auto maybeScene = JSON::parse(
-	    scene, Config::getAbsolutePath("Data/Schemas/Scene.schema.json"));
+	const auto maybeScene = JSON::parse(scene, Config::getAbsolutePath("Data/Schemas/Scene.schema.json"));
 
 	if (!maybeScene.has_value())
 		return false;
@@ -156,8 +145,7 @@ bool StateManager::saveScene(const fs::path& target)
 void StateManager::setScene(const fs::path& scene)
 {
 	m_currentScene = scene;
-	const auto newTitle =
-	    std::string(g_baseTitle) + ": " + scene.filename().string();
+	const auto newTitle = std::string(g_baseTitle) + ": " + scene.filename().string();
 
 	App::get().setTitle(newTitle);
 }
@@ -184,4 +172,4 @@ void StateManager::reset()
 	takeSnapshot();
 }
 
-void StateManager::finalize() {  }
+void StateManager::finalize() {}

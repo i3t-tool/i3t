@@ -23,14 +23,12 @@ namespace Math
 {
 static constexpr float FLT_EPSILON_10 = 10.0f * FLT_EPSILON; // 1.192093 E-6
 
-FORCE_INLINE bool eq(const float lhs, const float rhs,
-                     const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const float lhs, const float rhs, const float epsilon = FLT_EPSILON_10)
 {
 	return abs(lhs - rhs) < epsilon;
 }
 
-FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs,
-                     const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs, const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -43,8 +41,7 @@ FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs,
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs,
-                     const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs, const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -57,8 +54,7 @@ FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs,
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs,
-                     const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs, const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -71,8 +67,7 @@ FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs,
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs,
-                     const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float epsilon = FLT_EPSILON_10)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -94,20 +89,11 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs,
 	return true;
 }
 
-template <typename T> bool isNormalized(const T& val)
-{
-	return eq(glm::length2(val), 1.0f);
-}
+template <typename T> bool isNormalized(const T& val) { return eq(glm::length2(val), 1.0f); }
 
-FORCE_INLINE bool areElementsSame(const glm::vec3 vec)
-{
-	return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]);
-}
+FORCE_INLINE bool areElementsSame(const glm::vec3 vec) { return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]); }
 
-FORCE_INLINE bool withinInterval(float val, float from, float to)
-{
-	return from <= val && val <= to;
-}
+FORCE_INLINE bool withinInterval(float val, float from, float to) { return from <= val && val <= to; }
 
 /**
  * \brief Linear interpolation between two vectors vec3 \a a and \a b
@@ -123,8 +109,7 @@ static glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float alpha)
 	return inter;
 }
 
-FORCE_INLINE glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs,
-                            float alpha, bool useQuat = false)
+FORCE_INLINE glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false)
 {
 	if (!useQuat)
 	{
@@ -169,10 +154,7 @@ static glm::mat4 lerp(glm::mat4 a, glm::mat4 b, float alpha)
 	return res;
 }
 
-static float smoothAlpha(const float a)
-{
-	return ((6 * a - 15) * a + 10) * a * a * a;
-}
+static float smoothAlpha(const float a) { return ((6 * a - 15) * a + 10) * a * a * a; }
 
 /**
  * \brief Random float from interval 0 .. 0.999
@@ -199,15 +181,9 @@ static int randomi(const int topNotInclude) { return rand() % topNotInclude; }
  * \param topNotInclude max) generated value
  * \return Random integer
  */
-static int randomi(const int downIncluded, const int topNotInclude)
-{
-	return rand() % topNotInclude + downIncluded;
-}
+static int randomi(const int downIncluded, const int topNotInclude) { return rand() % topNotInclude + downIncluded; }
 
-static glm::vec3 randomVec()
-{
-	return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf()));
-}
+static glm::vec3 randomVec() { return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf())); }
 
 static void prefixSum(std::vector<int>& arr)
 {
@@ -225,8 +201,7 @@ static void prefixSum(std::vector<int>& arr)
 	arr.push_back(tmp);
 }
 
-static float range(float value, float low1, float high1, float low2,
-                   float high2)
+static float range(float value, float low1, float high1, float low2, float high2)
 {
 	return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 }

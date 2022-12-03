@@ -7,20 +7,15 @@
 #include "Utils/HSLColor.h"
 
 WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
-    : WorkspaceNodeWithCoreDataWithPins(
-          diwne, Core::GraphManager::createCamera(), false),
-      m_projection(std::make_shared<WorkspaceSequence>(
-          diwne, m_nodebase->as<Core::Camera>()->getProj(), true, true)),
-      m_view(std::make_shared<WorkspaceSequence>(
-          diwne, m_nodebase->as<Core::Camera>()->getView(), true, true))
+    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::GraphManager::createCamera(), false),
+      m_projection(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getProj(), true, true)),
+      m_view(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true, true))
 {
-	(m_view->getInputs().at(0).get())
-	    ->plug(m_projection->getOutputs().at(0).get());
+	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
 	m_projection->m_selectable = false;
 	m_view->m_selectable = false;
 
-	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode =
-	    DIWNE::DrawMode::JustDraw;
+	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 
 	m_viewportCamera = App::get().viewport()->createCamera();
 	auto cameraPtr = m_viewportCamera.lock();
@@ -33,22 +28,20 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	// Callback that gets called when the underlying Camera node updates values
 	// The Camera node also updates public projection and view matrix variables
 	// which we can read
-	m_nodebase->addUpdateCallback([this]() {
-		std::shared_ptr<Core::Camera> cameraNode =
-		    dynamic_pointer_cast<Core::Camera>(m_nodebase);
-		if (cameraNode)
-		{
-			auto viewportCameraPtr = m_viewportCamera.lock();
-			viewportCameraPtr->m_projectionMatrix = cameraNode->m_projectionMatrix;
-			viewportCameraPtr->m_viewMatrix = cameraNode->m_viewMatrix;
-		}
-	});
+	m_nodebase->addUpdateCallback(
+	    [this]()
+	    {
+		    std::shared_ptr<Core::Camera> cameraNode = dynamic_pointer_cast<Core::Camera>(m_nodebase);
+		    if (cameraNode)
+		    {
+			    auto viewportCameraPtr = m_viewportCamera.lock();
+			    viewportCameraPtr->m_projectionMatrix = cameraNode->m_projectionMatrix;
+			    viewportCameraPtr->m_viewMatrix = cameraNode->m_viewMatrix;
+		    }
+	    });
 }
 
-WorkspaceCamera::~WorkspaceCamera()
-{
-	App::get().viewport()->removeEntity(m_viewportCamera);
-}
+WorkspaceCamera::~WorkspaceCamera() { App::get().viewport()->removeEntity(m_viewportCamera); }
 
 void WorkspaceCamera::popupContent()
 {
@@ -135,19 +128,18 @@ glm::vec3 WorkspaceCamera::calculateFrustumColor(glm::vec3 color)
 bool WorkspaceCamera::middleContent()
 {
 	bool inner_interaction_happen = false;
-	inner_interaction_happen |= m_projection->drawNodeDiwne<WorkspaceSequence>(
-	    DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+	inner_interaction_happen |=
+	    m_projection->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
 	ImGui::SameLine();
-	inner_interaction_happen |= m_view->drawNodeDiwne<WorkspaceSequence>(
-	    DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
+	inner_interaction_happen |=
+	    m_view->drawNodeDiwne<WorkspaceSequence>(DIWNE::DrawModeNodePosition::OnCoursorPosition, m_drawMode);
 	return inner_interaction_happen;
 }
 
 void WorkspaceCamera::drawMenuLevelOfDetail()
 {
-	drawMenuLevelOfDetail_builder(
-	    std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-	    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
 
 // bool WorkspaceCamera::leftContent(){return false;};

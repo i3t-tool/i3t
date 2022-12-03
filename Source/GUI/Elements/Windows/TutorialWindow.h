@@ -55,8 +55,7 @@ public:
 	void render() override;
 
 private:
-	static std::shared_ptr<Tutorial>
-	    m_tutorial; // todo temporarily static because of img callback
+	static std::shared_ptr<Tutorial> m_tutorial; // todo temporarily static because of img callback
 	// static std::string m_current_dir;
 	int m_currentStep;
 	float m_progressBarAnimationPosition;
@@ -75,6 +74,5 @@ private:
 	void renderHint(Hint* hint) override;
 
 	// todo temporary rendering of images
-	static inline ImGui::MarkdownImageData
-	ImageCallback(ImGui::MarkdownLinkCallbackData data_);
+	static inline ImGui::MarkdownImageData ImageCallback(ImGui::MarkdownLinkCallbackData data_);
 };

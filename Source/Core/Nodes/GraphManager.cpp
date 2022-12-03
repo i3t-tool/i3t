@@ -26,30 +26,22 @@ ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
 	return lhs->isPlugCorrect(input, output);
 }
 
-ENodePlugResult GraphManager::isPlugCorrect(Pin& input, Pin& output)
-{
-	return isPlugCorrect(&input, &output);
-}
+ENodePlugResult GraphManager::isPlugCorrect(Pin& input, Pin& output) { return isPlugCorrect(&input, &output); }
 
-ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs,
-                                   const Ptr<Core::NodeBase>& rhs)
+ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
 {
 	return GraphManager::plug(lhs, rhs, 0, 0);
 }
 
-ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode,
-                                   const Ptr<Core::NodeBase>& rightNode,
+ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
-	Debug::Assert(rightNode->getInputPins().size() > myIndex,
-	              "Node {} does not have input pin with index {}!",
+	Debug::Assert(rightNode->getInputPins().size() > myIndex, "Node {} does not have input pin with index {}!",
 	              rightNode->getSig(), myIndex);
-	Debug::Assert(leftNode->getOutputPins().size() > fromIndex,
-	              "Node {} does not have output pin with index {}!",
+	Debug::Assert(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with index {}!",
 	              leftNode->getSig(), fromIndex);
 
-	auto result =
-	    isPlugCorrect(&rightNode->getIn(myIndex), &leftNode->getOut(fromIndex));
+	auto result = isPlugCorrect(&rightNode->getIn(myIndex), &leftNode->getOut(fromIndex));
 	if (result != ENodePlugResult::Ok)
 		return result;
 
@@ -73,31 +65,21 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode,
 	return ENodePlugResult::Ok;
 }
 
-ENodePlugResult
-GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq,
-                                     const Ptr<Core::NodeBase>& node,
-                                     unsigned nodeIndex)
+ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
+                                                     unsigned nodeIndex)
 {
 	return plug(node, seq, nodeIndex, 1);
 }
 
-ENodePlugResult
-GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq,
-                                      const Ptr<Core::NodeBase>& node,
-                                      unsigned nodeIndex)
+ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
+                                                      unsigned nodeIndex)
 {
 	return plug(seq, node, 1, nodeIndex);
 }
 
-void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node)
-{
-	node.get()->unplugAll();
-}
+void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node) { node.get()->unplugAll(); }
 
-void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index)
-{
-	node.get()->unplugInput(index);
-}
+void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index) { node.get()->unplugInput(index); }
 
 void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
 {
@@ -143,8 +125,7 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
 	}
 }
 
-std::vector<Ptr<NodeBase>>
-GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
+std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
 {
 	std::vector<Ptr<NodeBase>> result;
 	auto pins = node->getOutputPins();
@@ -157,8 +138,7 @@ GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
 	return result;
 }
 
-std::vector<Ptr<NodeBase>>
-GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
+std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
 {
 	Debug::Assert(node->getOutputPins().size() > index, "Out of range.");
 
@@ -177,15 +157,9 @@ void GraphManager::update(double tick)
 		cycle->update(tick);
 }
 
-const Operation* GraphManager::getOperation(const Pin* pin)
-{
-	return pin->m_master->getOperation();
-}
+const Operation* GraphManager::getOperation(const Pin* pin) { return pin->m_master->getOperation(); }
 
-bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs)
-{
-	return lhs->m_master == rhs->m_master;
-}
+bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs) { return lhs->m_master == rhs->m_master; }
 
 bool GraphManager::arePlugged(const Pin& input, const Pin& output)
 {
@@ -195,10 +169,7 @@ bool GraphManager::arePlugged(const Pin& input, const Pin& output)
 	return input.getParentPin() == &output;
 }
 
-SequenceTree::SequenceTree(Ptr<NodeBase> sequence)
-{
-	m_beginSequence = toSequence(sequence);
-}
+SequenceTree::SequenceTree(Ptr<NodeBase> sequence) { m_beginSequence = toSequence(sequence); }
 
 SequenceTree::MatrixIterator SequenceTree::begin()
 {
@@ -226,20 +197,16 @@ SequenceTree::MatrixIterator SequenceTree::end()
 SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence)
 {
 	m_currentSequence = sequence;
-	m_currentMatrix = sequence->getMatrices().empty()
-	                      ? nullptr
-	                      : sequence->getMatrices().back();
+	m_currentMatrix = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
 }
 
-SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence,
-                                             NodePtr node)
+SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence, NodePtr node)
 {
 	m_currentSequence = sequence;
 	m_currentMatrix = node;
 }
 
-SequenceTree::MatrixIterator::MatrixIterator(
-    const SequenceTree::MatrixIterator& mt)
+SequenceTree::MatrixIterator::MatrixIterator(const SequenceTree::MatrixIterator& mt)
 {
 	m_tree = mt.m_tree;
 	m_currentSequence = mt.m_currentSequence;
@@ -280,14 +247,12 @@ Ptr<NodeBase> SequenceTree::MatrixIterator::operator*() const
 	return m_currentMatrix;
 }
 
-bool SequenceTree::MatrixIterator::
-operator==(const SequenceTree::MatrixIterator& rhs) const
+bool SequenceTree::MatrixIterator::operator==(const SequenceTree::MatrixIterator& rhs) const
 {
 	return m_currentMatrix == rhs.m_currentMatrix;
 }
 
-bool SequenceTree::MatrixIterator::
-operator!=(const SequenceTree::MatrixIterator& rhs) const
+bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator& rhs) const
 {
 	return m_currentMatrix != rhs.m_currentMatrix;
 }
@@ -340,8 +305,7 @@ void SequenceTree::MatrixIterator::withdraw()
 		// Current matrix is last matrix in a sequence. Go to the previous sequence.
 		auto prev = m_tree->m_beginSequence;
 		auto prevsParent = m_tree->m_beginSequence;
-		while ((prevsParent = toSequence(GraphManager::getParent(prev))) !=
-		       m_currentSequence)
+		while ((prevsParent = toSequence(GraphManager::getParent(prev))) != m_currentSequence)
 		{
 			prev = prevsParent;
 		}

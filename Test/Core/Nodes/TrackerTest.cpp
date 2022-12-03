@@ -67,8 +67,7 @@ TEST(TrackerTest, TrackingFromRightToLeft)
 		interp.setParam(trackingParam);
 
 		float interpParam = 1.0f - fmod(trackingParam * 4, 3.0f);
-		auto expected = glm::interpolate(glm::mat4(1.0f),
-		                                 t.mat4->getData().getMat4(), interpParam);
+		auto expected = glm::interpolate(glm::mat4(1.0f), t.mat4->getData().getMat4(), interpParam);
 
 		EXPECT_TRUE(Math::eq(expected, interp.getInterpolatedMatrix()));
 	}
@@ -77,8 +76,7 @@ TEST(TrackerTest, TrackingFromRightToLeft)
 		interp.setParam(trackingParam);
 
 		float interpParam = 1.0f - fmod(trackingParam * 4, 1.0f);
-		auto expected = glm::interpolate(glm::mat4(1.0f),
-		                                 t.mat2->getData().getMat4(), interpParam) *
+		auto expected = glm::interpolate(glm::mat4(1.0f), t.mat2->getData().getMat4(), interpParam) *
 		                t.mat3->getData().getMat4() * t.mat4->getData().getMat4();
 
 		EXPECT_TRUE(Math::eq(expected, interp.getInterpolatedMatrix()));
@@ -87,8 +85,8 @@ TEST(TrackerTest, TrackingFromRightToLeft)
 		float trackingParam = 0.0f;
 		interp.setParam(trackingParam);
 
-		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() *
-		                t.mat3->getData().getMat4() * t.mat4->getData().getMat4();
+		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
+		                t.mat4->getData().getMat4();
 
 		EXPECT_TRUE(Math::eq(expected, interp.getInterpolatedMatrix()));
 	}
@@ -107,8 +105,8 @@ TEST(TrackerTest, TrackingFromLeftToRight)
 		float trackingParam = 1.0f;
 		interp.setParam(trackingParam);
 
-		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() *
-		                t.mat3->getData().getMat4() * t.mat4->getData().getMat4();
+		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
+		                t.mat4->getData().getMat4();
 
 		EXPECT_TRUE(Math::eq(expected, interp.getInterpolatedMatrix()));
 	}
@@ -117,10 +115,8 @@ TEST(TrackerTest, TrackingFromLeftToRight)
 		interp.setParam(trackingParam);
 
 		float interpParam = (abs(trackingParam) - 0.75f) * 4;
-		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() *
-		                t.mat3->getData().getMat4() *
-		                glm::interpolate(glm::mat4(1.0f),
-		                                 t.mat4->getData().getMat4(), interpParam);
+		auto expected = t.mat1->getData().getMat4() * t.mat2->getData().getMat4() * t.mat3->getData().getMat4() *
+		                glm::interpolate(glm::mat4(1.0f), t.mat4->getData().getMat4(), interpParam);
 
 		EXPECT_TRUE(Math::eq(expected, interp.getInterpolatedMatrix()));
 	}
@@ -129,9 +125,8 @@ TEST(TrackerTest, TrackingFromLeftToRight)
 		interp.setParam(trackingParam);
 
 		float interpParam = (abs(trackingParam) - 0.25f) * 4;
-		auto expected = t.mat1->getData().getMat4() *
-		                glm::interpolate(glm::mat4(1.0f),
-		                                 t.mat2->getData().getMat4(), interpParam);
+		auto expected =
+		    t.mat1->getData().getMat4() * glm::interpolate(glm::mat4(1.0f), t.mat2->getData().getMat4(), interpParam);
 
 		EXPECT_TRUE(Math::eq(expected, interp.getInterpolatedMatrix()));
 	}

@@ -24,7 +24,7 @@ class Resource;
 // paths
 // TODO: (DR) Two relative paths may load the same file twice.
 // Config::getAbsolutePath doesn't quite work. 	Any provided path is used as a
-//key, even if the file was loaded from a different path already.
+// key, even if the file was loaded from a different path already.
 // TODO: (DR) Unicode support?
 
 /**
@@ -103,23 +103,21 @@ public:
 	 * Alias is assigned if it doesn't exist.
 	 * @return OpenGL id of the shader object
 	 */
-	GLuint shader(const std::string& alias, const std::string& vertShader,
-	              const std::string& fragShader);
+	GLuint shader(const std::string& alias, const std::string& vertShader, const std::string& fragShader);
 
 	/**
 	 * Get or create shader from files.
 	 * @return OpenGL id of the shader object
 	 */
-	GLuint shaderG(const std::string& vertShader, const std::string& fragShader,
-	               const std::string& geoShader);
+	GLuint shaderG(const std::string& vertShader, const std::string& fragShader, const std::string& geoShader);
 
 	/**
 	 * Get or create shader by alias or files.
 	 * Alias is assigned if it doesn't exist.
 	 * @return OpenGL id of the shader object
 	 */
-	GLuint shaderG(const std::string& alias, const std::string& vertShader,
-	               const std::string& fragShader, const std::string& geoShader);
+	GLuint shaderG(const std::string& alias, const std::string& vertShader, const std::string& fragShader,
+	               const std::string& geoShader);
 
 	/**
 	 * Get existing model using an alias.
@@ -153,9 +151,8 @@ public:
 	 * @param nColors Color array size
 	 * @return Pointer to the Mesh object.
 	 */
-	Mesh* mesh(const std::string& alias, Mesh::PrimitiveType primitiveType,
-	           const float* verts, const unsigned int nVertices,
-	           const float* colors, const unsigned int nColors);
+	Mesh* mesh(const std::string& alias, Mesh::PrimitiveType primitiveType, const float* verts,
+	           const unsigned int nVertices, const float* colors, const unsigned int nColors);
 
 	/**
 	 * Get model by alias or create it using provided indexed vertex data.
@@ -170,9 +167,8 @@ public:
 	 * @param nColors Color array size
 	 * @return Pointer to the Mesh object.
 	 */
-	Mesh* mesh(const std::string& alias, Mesh::PrimitiveType primitiveType,
-	           const float* verts, const unsigned int nVertices,
-	           const unsigned int* indices, const unsigned int nIndices,
+	Mesh* mesh(const std::string& alias, Mesh::PrimitiveType primitiveType, const float* verts,
+	           const unsigned int nVertices, const unsigned int* indices, const unsigned int nIndices,
 	           const float* colors, const unsigned int nColors);
 
 	/**
@@ -194,21 +190,16 @@ private:
 	 * 				  Data ptr == null -> data needs to be created/loaded and alias
 	 * registered afterwards!
 	 */
-	std::shared_ptr<void> getData(const std::string& alias, const size_t id,
-	                              ResourceType type, bool* success);
+	std::shared_ptr<void> getData(const std::string& alias, const size_t id, ResourceType type, bool* success);
 
 	/**
 	 * Assumes alias doesn't exist and the resource does
 	 */
-	void registerAlias(const std::string& alias,
-	                   std::shared_ptr<Resource> resource);
+	void registerAlias(const std::string& alias, std::shared_ptr<Resource> resource);
 
 	GLuint loadTexture(const std::string& path);
-	GLuint loadShader(const std::string& vertShader,
-	                  const std::string& fragShader);
-	GLuint loadShader(const std::string& vertShader,
-	                  const std::string& fragShader,
-	                  const std::string& geoShader);
+	GLuint loadShader(const std::string& vertShader, const std::string& fragShader);
+	GLuint loadShader(const std::string& vertShader, const std::string& fragShader, const std::string& geoShader);
 	Mesh* loadModel(const std::string& path);
 
 	void disposeTexture(GLuint id);

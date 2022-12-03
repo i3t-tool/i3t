@@ -24,30 +24,25 @@ inline std::string toString(float fl)
 
 inline std::string toString(const glm::vec3& vec)
 {
-	return fmt::format("[{}, {}, {}]", toString(vec.x), toString(vec.y),
-	                   toString(vec.z));
+	return fmt::format("[{}, {}, {}]", toString(vec.x), toString(vec.y), toString(vec.z));
 }
 
 inline std::string toString(const glm::vec4& vec)
 {
-	return fmt::format("[{}, {}, {}, {}]", toString(vec.x), toString(vec.y),
-	                   toString(vec.z), toString(vec.w));
+	return fmt::format("[{}, {}, {}, {}]", toString(vec.x), toString(vec.y), toString(vec.z), toString(vec.w));
 }
 
 inline std::string toString(const glm::quat& quat)
 {
-	return fmt::format("[{}, {}, {}, {}]", toString(quat.x), toString(quat.y),
-	                   toString(quat.z), toString(quat.w));
+	return fmt::format("[{}, {}, {}, {}]", toString(quat.x), toString(quat.y), toString(quat.z), toString(quat.w));
 }
 
 inline std::string toString(const glm::mat4& mat)
 {
-	return fmt::format("[{}, {}, {}, {}]", toString(mat[0]), toString(mat[1]),
-	                   toString(mat[2]), toString(mat[3]));
+	return fmt::format("[{}, {}, {}, {}]", toString(mat[0]), toString(mat[1]), toString(mat[2]), toString(mat[3]));
 }
 
-inline std::string concat(const std::vector<std::string>& entries,
-                          const std::string& delimiter)
+inline std::string concat(const std::vector<std::string>& entries, const std::string& delimiter)
 {
 	std::stringstream ss;
 	const auto entriesSize = entries.size();
@@ -60,9 +55,7 @@ inline std::string concat(const std::vector<std::string>& entries,
 	return ss.str();
 }
 
-inline std::vector<std::string>
-concat(const std::map<std::string, std::string>& map,
-       const std::string& delimiter)
+inline std::vector<std::string> concat(const std::map<std::string, std::string>& map, const std::string& delimiter)
 {
 	std::vector<std::string> vec;
 
@@ -72,6 +65,5 @@ concat(const std::map<std::string, std::string>& map,
 	return vec;
 }
 
-std::vector<std::string> concat(const std::map<std::string, DataStore>& map,
-                                const std::string& delimiter);
+std::vector<std::string> concat(const std::map<std::string, DataStore>& map, const std::string& delimiter);
 } // namespace Utils

@@ -3,11 +3,9 @@
 #include "GUI/Elements/Nodes/WorkspaceTransformation_s.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
-template <ETransformType T>
-auto createTransform(ImVec2 const position) /* \todo JH \todo MH unused now? */
+template <ETransformType T> auto createTransform(ImVec2 const position) /* \todo JH \todo MH unused now? */
 {
-	return g_workspaceDiwne->addNodeToPosition<WorkspaceTransformation_s<T>>(
-	    position);
+	return g_workspaceDiwne->addNodeToPosition<WorkspaceTransformation_s<T>>(position);
 	//	if constexpr (T == ETransformType::Free)
 	//		return
 	// WorkspaceWindow::m_workspaceDiwne.addNodeToPosition<WorkspaceTransformationFree>(position);

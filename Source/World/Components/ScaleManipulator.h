@@ -24,8 +24,7 @@ private:
 	static const char* s_type;
 
 	GameObject *m_planeh, *m_scaleh, *m_uniscaleh, *m_threeaxis;
-	char m_stencilx, m_stencily, m_stencilz, m_stencilzx, m_stencilzy,
-	    m_stencilyx, m_stencilxyz;
+	char m_stencilx, m_stencily, m_stencilz, m_stencilzx, m_stencilzy, m_stencilyx, m_stencilxyz;
 	int m_activehandle = -1, m_hoverhandle = -1, m_axisnum = -1, m_axisnum2 = -1;
 	bool m_uniformscale = false;
 	glm::mat4 m_edited;

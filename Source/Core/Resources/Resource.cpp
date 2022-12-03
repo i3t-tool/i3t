@@ -10,10 +10,8 @@ Resource::Resource(std::string alias, std::string path, ResourceType type)
 	// Empty
 }
 
-Resource::Resource(std::string alias, size_t hashId, std::string path,
-                   ResourceType type, std::shared_ptr<void> data)
-    : alias(std::move(alias)), hashId(hashId), path(path), resourceType(type),
-      data(data)
+Resource::Resource(std::string alias, size_t hashId, std::string path, ResourceType type, std::shared_ptr<void> data)
+    : alias(std::move(alias)), hashId(hashId), path(path), resourceType(type), data(data)
 {
 	// Empty
 }

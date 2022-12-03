@@ -10,8 +10,7 @@ public:
 	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
-		visitor.visit(
-		    std::static_pointer_cast<WorkspaceTransformation>(shared_from_this()));
+		visitor.visit(std::static_pointer_cast<WorkspaceTransformation>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 
@@ -57,14 +56,11 @@ public:
 
 	void updateSizes();
 
-	virtual bool
-	drawDataSetValues_InsideTablebuilder(std::vector<std::string> const& labels,
-	                                     std::vector<float*> const& local_data,
-	                                     bool& value_changed);
-	virtual bool
-	drawDataSetValuesTable_builder(std::string const cornerLabel,
-	                               std::vector<std::string> const& columnLabels,
-	                               std::vector<std::string> const& rowLabels,
-	                               std::vector<float*> const& local_data,
-	                               bool& value_changed, int& index_of_change);
+	virtual bool drawDataSetValues_InsideTablebuilder(std::vector<std::string> const& labels,
+	                                                  std::vector<float*> const& local_data, bool& value_changed);
+	virtual bool drawDataSetValuesTable_builder(std::string const cornerLabel,
+	                                            std::vector<std::string> const& columnLabels,
+	                                            std::vector<std::string> const& rowLabels,
+	                                            std::vector<float*> const& local_data, bool& value_changed,
+	                                            int& index_of_change);
 };

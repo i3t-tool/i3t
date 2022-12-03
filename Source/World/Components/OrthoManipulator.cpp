@@ -15,9 +15,8 @@ void printMatrix7(glm::mat4 m)
 	printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f "
 	       "%0.3f %0.3f\n\t%0.3f %0.3f %0.3f "
 	       "%0.3f\n\n",
-	       m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], m[2][1], m[3][1],
-	       m[0][2], m[1][2], m[2][2], m[3][2], m[0][3], m[1][3], m[2][3],
-	       m[3][3]);
+	       m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], m[2][1], m[3][1], m[0][2], m[1][2], m[2][2], m[3][2],
+	       m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
 const char* OrthoManipulator::s_type = nullptr;
@@ -71,9 +70,8 @@ void OrthoManipulator::render(glm::mat4* parent, bool renderTransparent)
 	if (renderTransparent)
 	{
 		glUseProgram(World::shaderProj.program);
-		glUniformMatrix4fv(
-		    glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1,
-		    GL_FALSE, glm::value_ptr(projinv));
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE,
+		                   glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
 		m_frustruml->draw(transform);
 		m_frustrum->draw(transform);
@@ -129,13 +127,11 @@ void OrthoManipulator::render(glm::mat4* parent, bool renderTransparent)
 			glm::vec4 pos = projinv * m_hposs[i];
 			pos /= pos[3];
 
-			float depth =
-			    (World::perspective * World::mainCamera * transform * pos)[2];
+			float depth = (World::perspective * World::mainCamera * transform * pos)[2];
 			m_handle->transformation = glm::mat4(depth * 0.01f + 0.1f);
 			m_handle->transformation[3] = pos;
 
-			ManipulatorUtil::drawHandle(m_handle, transform, m_hposs[i] * m_hposs[i],
-			                            m_stencils.arr[i], m_activehandle,
+			ManipulatorUtil::drawHandle(m_handle, transform, m_hposs[i] * m_hposs[i], m_stencils.arr[i], m_activehandle,
 			                            m_hoverhandle); // hposs*hposs=absolute value
 		}
 
@@ -154,13 +150,11 @@ void OrthoManipulator::update()
 	{
 		return;
 	}
-	auto* editedortho =
-	    (Core::TransformImpl<ETransformType::Ortho>*)m_editednode.get();
+	auto* editedortho = (Core::TransformImpl<ETransformType::Ortho>*)m_editednode.get();
 	m_edited = m_editednode->getData().getMat4();
 
-	unsigned char sel = Select::getStencilAt(
-	    (int)InputManager::m_mouseX,
-	    (int)(World::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =
+	    Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 	m_hoverhandle = -1;
 
 	if (m_activehandle == -1)
@@ -234,15 +228,13 @@ void OrthoManipulator::update()
 	// glm::mat4 handlespace=glm::mat4(1.0f);
 	glm::mat4 handlespace = getNodeTransform(&m_editednode, &m_parent, true);
 	// vecWorldscreen((glm::vec3)m_handlespace[3],(glm::vec3)(m_handlespace*axes[m_axisnum]));
-	glm::vec2 spos1 = world2screen((glm::vec3)(
-	    handlespace[3] +
-	    handlespace * pos)); // position of transformated object on the screen
-	glm::vec2 spos2 = world2screen((glm::vec3)(
-	    handlespace[3] +
-	    handlespace * (pos + axis * axis))); // spos1,spos2 - project two points
-	                                         // on screen - project axis on screen
-	                                         // (axis*axis is absolute value)
-	glm::vec2 dir = spos2 - spos1;           // the axis in screen space
+	glm::vec2 spos1 =
+	    world2screen((glm::vec3)(handlespace[3] + handlespace * pos)); // position of transformated object on the screen
+	glm::vec2 spos2 = world2screen(
+	    (glm::vec3)(handlespace[3] + handlespace * (pos + axis * axis))); // spos1,spos2 - project two points
+	                                                                      // on screen - project axis on screen
+	                                                                      // (axis*axis is absolute value)
+	glm::vec2 dir = spos2 - spos1;                                        // the axis in screen space
 	if (glm::length(dir) < 0.01)
 	{
 		dir[0] = 1.0f;
@@ -251,10 +243,7 @@ void OrthoManipulator::update()
 	glm::mat2 mov = glm::mat2(dir, glm::vec2(dir[1], -dir[0]));
 	mov = glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 
-	glm::vec2 drag2 =
-	    mov *
-	    glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta) *
-	    0.05f;
+	glm::vec2 drag2 = mov * glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta) * 0.05f;
 
 	if (m_activehandle == m_stencils.names.n)
 	{

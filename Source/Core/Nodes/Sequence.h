@@ -70,10 +70,7 @@ class Sequence : public Node
 		Pin& getOut(size_t i) override;
 		DataStore& getInternalData(size_t index = 0) override;
 
-		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept
-		{
-			return addMatrix(matrix, 0);
-		};
+		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
 		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 		Ptr<Transformation> popMatrix(const int index);
 		void swap(int from, int to);
@@ -153,17 +150,12 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) {
-		return m_storage->m_matrices.at(idx);
-	}
+	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage->m_matrices.at(idx); }
 
-	    /**
-	     * Pop matrix from a sequence. Caller takes ownership of returned matrix.
-	     */
-	    [[nodiscard]] Ptr<Transformation> popMatrix(const int index)
-	{
-		return m_storage->popMatrix(index);
-	}
+	/**
+	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
+	 */
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index) { return m_storage->popMatrix(index); }
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
 
@@ -180,8 +172,7 @@ FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
 	return node->as<Sequence>();
 }
 
-FORCE_INLINE glm::mat4
-getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
 {
 	glm::mat4 result(1.0f);
 	for (const auto& mat : matrices)

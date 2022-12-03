@@ -21,9 +21,8 @@ inline Theme& getTheme() { return getUI()->getTheme(); }
 template <typename Theme_> inline void emplaceTheme(Theme_&& theme)
 {
 	auto& allThemes = I3T::getThemes();
-	auto it = std::find_if(allThemes.begin(), allThemes.end(), [](Theme& theme) {
-		return theme.getName() == I3T::getTheme().getName();
-	});
+	auto it = std::find_if(allThemes.begin(), allThemes.end(),
+	                       [](Theme& theme) { return theme.getName() == I3T::getTheme().getName(); });
 	*it = theme;
 	I3T::getUI()->setTheme(*it);
 }

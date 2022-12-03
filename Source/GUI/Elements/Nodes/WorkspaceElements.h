@@ -69,8 +69,7 @@ protected:
 	std::string m_middleLabel;
 
 public:
-	WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id,
-	              std::string const topLabel = "Header",
+	WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel = "Header",
 	              std::string const middleLabel = "Content");
 	~WorkspaceNode();
 
@@ -92,10 +91,7 @@ public:
 
 	bool m_removeFromWorkspaceWindow;
 	bool getRemoveFromWorkspace() const { return m_removeFromWorkspaceWindow; };
-	void setRemoveFromWorkspace(bool value)
-	{
-		m_removeFromWorkspaceWindow = value;
-	};
+	void setRemoveFromWorkspace(bool value) { m_removeFromWorkspaceWindow = value; };
 
 	virtual void drawMenuDelete();
 	virtual void popupContent();
@@ -118,5 +114,4 @@ public:
 };
 
 /* static functions */
-extern int numberOfCharWithDecimalPoint(float value,
-                                        int numberOfVisibleDecimal);
+extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);

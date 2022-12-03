@@ -61,9 +61,8 @@ void FrustumManipulator::render(glm::mat4* parent, bool renderTransparent)
 	if (renderTransparent)
 	{
 		glUseProgram(World::shaderProj.program);
-		glUniformMatrix4fv(
-		    glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1,
-		    GL_FALSE, glm::value_ptr(projinv));
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE,
+		                   glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
 		m_frustruml->draw(transform);
 		m_frustrum->draw(transform);
@@ -89,13 +88,11 @@ void FrustumManipulator::render(glm::mat4* parent, bool renderTransparent)
 				pos = ((pf - pn) * 0.5f + pn);
 			}
 
-			float depth =
-			    (World::perspective * World::mainCamera * transform * pos)[2];
+			float depth = (World::perspective * World::mainCamera * transform * pos)[2];
 			m_handle->transformation = glm::mat4(depth * 0.01f + 0.1f);
 			m_handle->transformation[3] = pos;
 
-			ManipulatorUtil::drawHandle(m_handle, transform, m_hposs[i] * m_hposs[i],
-			                            m_stencils.arr[i], m_activehandle,
+			ManipulatorUtil::drawHandle(m_handle, transform, m_hposs[i] * m_hposs[i], m_stencils.arr[i], m_activehandle,
 			                            m_hoverhandle); // hposs*hposs=absolute value
 		}
 
@@ -115,13 +112,11 @@ void FrustumManipulator::update()
 	{
 		return;
 	}
-	auto* editedfrustum =
-	    (Core::TransformImpl<ETransformType::Frustum>*)m_editednode.get();
+	auto* editedfrustum = (Core::TransformImpl<ETransformType::Frustum>*)m_editednode.get();
 	m_edited = m_editednode->getData().getMat4();
 
-	unsigned char sel = Select::getStencilAt(
-	    (int)InputManager::m_mouseX,
-	    (int)(World::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =
+	    Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 	m_hoverhandle = -1;
 
 	if (m_activehandle == -1)
@@ -192,10 +187,8 @@ void FrustumManipulator::update()
 
 	if (m_hposs[m_axisnum][2] == 0.0f)
 	{ // move side handles to middle - between far plane and near plane
-		glm::vec4 f =
-		    glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], 1.0f, 1.0f);
-		glm::vec4 n =
-		    glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], -1.0f, 1.0f);
+		glm::vec4 f = glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], 1.0f, 1.0f);
+		glm::vec4 n = glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], -1.0f, 1.0f);
 		glm::vec4 pn = (projinv * f) / (projinv * f)[3];
 		glm::vec4 pf = (projinv * n) / (projinv * n)[3];
 
@@ -208,14 +201,12 @@ void FrustumManipulator::update()
 	// glm::mat4 handlespace=glm::mat4(1.0f);
 	glm::mat4 handlespace = getNodeTransform(&m_editednode, &m_parent, true);
 
-	glm::vec2 spos1 = world2screen((glm::vec3)(
-	    handlespace[3] +
-	    handlespace * pos)); // position of transformated object on the screen
-	glm::vec2 spos2 = world2screen((glm::vec3)(
-	    handlespace[3] +
-	    handlespace * (pos + axis * axis))); // spos1,spos2 - project two points
-	                                         // on screen - project axis on screen
-	glm::vec2 dir = spos2 - spos1;           // the axis in screen space
+	glm::vec2 spos1 =
+	    world2screen((glm::vec3)(handlespace[3] + handlespace * pos)); // position of transformated object on the screen
+	glm::vec2 spos2 = world2screen(
+	    (glm::vec3)(handlespace[3] + handlespace * (pos + axis * axis))); // spos1,spos2 - project two points
+	                                                                      // on screen - project axis on screen
+	glm::vec2 dir = spos2 - spos1;                                        // the axis in screen space
 	if (glm::length(dir) < 0.01)
 	{
 		dir[0] = 1.0f;
@@ -224,10 +215,7 @@ void FrustumManipulator::update()
 	glm::mat2 mov = glm::mat2(dir, glm::vec2(dir[1], -dir[0]));
 	mov = glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 
-	glm::vec2 dragfinal =
-	    mov *
-	    glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta) *
-	    0.05f;
+	glm::vec2 dragfinal = mov * glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta) * 0.05f;
 
 	if (m_hposs[m_axisnum][2] == 0.0f)
 	{

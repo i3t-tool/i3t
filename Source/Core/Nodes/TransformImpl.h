@@ -108,19 +108,18 @@ initDefaults(), resetMatrixFromDefaults use default|
 
 namespace Core
 {
-#define I3T_TRANSFORM_CLONE(T)                                                 \
-	Ptr<Node> clone() override                                                   \
-	{                                                                            \
-		auto node = Builder::createTransform<T>();                                 \
-                                                                               \
-		isLocked() ? node->lock() : node->unlock();                                \
-		(hasMenuSynergies() && hasSynergies()) ? node->enableSynergies()           \
-		                                       : node->disableSynergies();         \
-                                                                               \
-		node->setDefaultValues(getDefaultValues());                                \
-		node->setValue(getData(0).getMat4());                                      \
-                                                                               \
-		return node;                                                               \
+#define I3T_TRANSFORM_CLONE(T)                                                                                         \
+	Ptr<Node> clone() override                                                                                           \
+	{                                                                                                                    \
+		auto node = Builder::createTransform<T>();                                                                         \
+                                                                                                                       \
+		isLocked() ? node->lock() : node->unlock();                                                                        \
+		(hasMenuSynergies() && hasSynergies()) ? node->enableSynergies() : node->disableSynergies();                       \
+                                                                                                                       \
+		node->setDefaultValues(getDefaultValues());                                                                        \
+		node->setValue(getData(0).getMat4());                                                                              \
+                                                                                                                       \
+		return node;                                                                                                       \
 	}
 //hasSynergies() ? node->enableSynergies() : node->disableSynergies();                                               \
 
@@ -148,15 +147,14 @@ template <ETransformType T> Ptr<Transformation> createTransform()
 template <> class TransformImpl<ETransformType::Free> : public Transformation
 {
 public:
-	TransformImpl() : Transformation(getTransformOperation(ETransformType::Free))
-	{
-	}
+	TransformImpl() : Transformation(getTransformOperation(ETransformType::Free)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Free)
 
 	bool isValid() const override { return true; }
 
-	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override {
+	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
+	{
 		setInternalValue(val, coords);
 		notifySequence();
 		return ValueSetResult{};
@@ -174,8 +172,7 @@ public:
 template <> class TransformImpl<ETransformType::Scale> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::Scale))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Scale))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -206,8 +203,7 @@ public:
 template <> class TransformImpl<ETransformType::EulerX> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::EulerX))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerX))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -237,8 +233,7 @@ public:
 template <> class TransformImpl<ETransformType::EulerY> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::EulerY))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerY))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -268,8 +263,7 @@ public:
 template <> class TransformImpl<ETransformType::EulerZ> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::EulerZ))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerZ))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -288,22 +282,17 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <>
-class TransformImpl<ETransformType::Translation> : public Transformation
+template <> class TransformImpl<ETransformType::Translation> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::Translation))
-	{
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Translation)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Translation)
 
 	bool isValid() const override;
 	void initDefaults() override;
 
-	[[nodiscard]] ValueSetResult setValue(
-	    float val) override; // useful for init only, Translation has no synergies
+	[[nodiscard]] ValueSetResult setValue(float val) override; // useful for init only, Translation has no synergies
 	[[nodiscard]] ValueSetResult setValue(const glm::vec3& vec) override;
 	[[nodiscard]] ValueSetResult setValue(const glm::vec4& vec) override;
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
@@ -313,14 +302,10 @@ public:
 
 //===-- Other transformations ---------------------------------------------===//
 
-template <>
-class TransformImpl<ETransformType::AxisAngle> : public Transformation
+template <> class TransformImpl<ETransformType::AxisAngle> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::AxisAngle))
-	{
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::AxisAngle)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::AxisAngle)
 
@@ -349,8 +334,7 @@ template <> class TransformImpl<ETransformType::Quat> : public Transformation
 	glm::quat m_normalized;
 
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::Quat))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies(); ///> PF: enableSynergies(); means "normalize" the set
@@ -386,8 +370,7 @@ public:
 template <> class TransformImpl<ETransformType::Ortho> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::Ortho))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Ortho))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -403,14 +386,10 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <>
-class TransformImpl<ETransformType::Perspective> : public Transformation
+template <> class TransformImpl<ETransformType::Perspective> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::Perspective))
-	{
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Perspective)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Perspective)
 
@@ -425,8 +404,7 @@ public:
 template <> class TransformImpl<ETransformType::Frustum> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::Frustum))
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Frustum))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -448,10 +426,7 @@ public:
 template <> class TransformImpl<ETransformType::LookAt> : public Transformation
 {
 public:
-	explicit TransformImpl()
-	    : Transformation(getTransformOperation(ETransformType::LookAt))
-	{
-	}
+	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::LookAt)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::LookAt)
 

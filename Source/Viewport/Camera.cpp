@@ -34,26 +34,20 @@ void Camera::update()
 
 	if (fpsMode)
 	{
-		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationX),
-		                              glm::vec3(0.0f, 1.0f, 0.0f));
-		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationY),
-		                              glm::vec3(0.0f, 0.0f, 1.0f));
+		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationX), glm::vec3(0.0f, 1.0f, 0.0f));
+		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationY), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		const glm::vec4 cameraDir = glm::vec4(-1.0f, 0.0f, 0.0f, 0.0);
 		const glm::vec4 cameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0);
-		const glm::vec3 cameraDirTransformed =
-		    glm::vec3(cameraTransform * cameraDir);
+		const glm::vec3 cameraDirTransformed = glm::vec3(cameraTransform * cameraDir);
 		const glm::vec3 cameraUpTransformed = glm::vec3(cameraTransform * cameraUp);
 		const glm::vec3 cameraCenter = position + cameraDirTransformed;
 
 		// No parent transform, replaced with identity matrices //TODO: (DR) This is
 		// redundant
-		const glm::vec3 cameraPosWorld =
-		    glm::vec3(glm::mat4(1) * glm::vec4(position, 1.0));
-		const glm::vec3 cameraCenterWorld =
-		    glm::vec3(glm::mat4(1) * glm::vec4(cameraCenter, 1.0));
-		const glm::vec3 cameraUpWorld =
-		    glm::vec3(glm::mat4(1) * glm::vec4(cameraUpTransformed, 0.0));
+		const glm::vec3 cameraPosWorld = glm::vec3(glm::mat4(1) * glm::vec4(position, 1.0));
+		const glm::vec3 cameraCenterWorld = glm::vec3(glm::mat4(1) * glm::vec4(cameraCenter, 1.0));
+		const glm::vec3 cameraUpWorld = glm::vec3(glm::mat4(1) * glm::vec4(cameraUpTransformed, 0.0));
 
 		m_projection = createProjectionMatrix(false);
 		m_view = glm::lookAt(cameraPosWorld, cameraCenterWorld, cameraUpWorld);
@@ -65,25 +59,18 @@ void Camera::update()
 	else
 	{
 		cameraTransform = glm::translate(cameraTransform, pivot);
-		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationX),
-		                              glm::vec3(0.0f, 1.0f, 0.0f));
-		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationY),
-		                              glm::vec3(0.0f, 0.0f, 1.0f));
-		cameraTransform =
-		    glm::translate(cameraTransform, glm::vec3(radius, 0.0f, 0.0f));
+		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationX), glm::vec3(0.0f, 1.0f, 0.0f));
+		cameraTransform = glm::rotate(cameraTransform, glm::radians(rotationY), glm::vec3(0.0f, 0.0f, 1.0f));
+		cameraTransform = glm::translate(cameraTransform, glm::vec3(radius, 0.0f, 0.0f));
 
 		const glm::vec4 cameraPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0);
 		const glm::vec4 cameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0);
-		const glm::vec3 cameraPosTransformed =
-		    glm::vec3(cameraTransform * cameraPos);
+		const glm::vec3 cameraPosTransformed = glm::vec3(cameraTransform * cameraPos);
 		const glm::vec3 cameraUpTransformed = glm::vec3(cameraTransform * cameraUp);
 
-		const glm::vec3 cameraPosWorld =
-		    glm::vec3(glm::mat4(1) * glm::vec4(cameraPosTransformed, 1.0));
-		const glm::vec3 cameraPivotWorld =
-		    glm::vec3(glm::mat4(1) * glm::vec4(pivot, 1.0));
-		const glm::vec3 cameraUpWorld =
-		    glm::vec3(glm::mat4(1) * glm::vec4(cameraUpTransformed, 0.0));
+		const glm::vec3 cameraPosWorld = glm::vec3(glm::mat4(1) * glm::vec4(cameraPosTransformed, 1.0));
+		const glm::vec3 cameraPivotWorld = glm::vec3(glm::mat4(1) * glm::vec4(pivot, 1.0));
+		const glm::vec3 cameraUpWorld = glm::vec3(glm::mat4(1) * glm::vec4(cameraUpTransformed, 0.0));
 
 		m_projection = createProjectionMatrix(true);
 
@@ -123,16 +110,17 @@ glm::mat4 Camera::createProjectionMatrix(bool nonShrinking)
 		//		// Method 2
 		//		if (width > height) {
 		//			glm::mat4 projection = glm::perspective(glm::radians(fov), height /
-		//(float)width, zNear, zFar); 			float tmp = projection[0][0]; 			projection[0][0]
-		//= projection[1][1]; 			projection[1][1] = tmp; 			return projection; 		} else {
-		//			return glm::perspective(glm::radians(fov), width / (float)height,
-		//zNear, zFar);
+		//(float)width, zNear, zFar); 			float tmp = projection[0][0];
+		// projection[0][0]
+		//= projection[1][1]; 			projection[1][1] = tmp; 			return projection;
+		//} else { 			return glm::perspective(glm::radians(fov), width /
+		//(float)height,
+		// zNear, zFar);
 		//		}
 	}
 	else
 	{
-		return glm::perspective(glm::radians(fov), width / (float)height, zNear,
-		                        zFar);
+		return glm::perspective(glm::radians(fov), width / (float)height, zNear, zFar);
 	}
 }
 
@@ -148,8 +136,7 @@ void Camera::processInput()
 
 	// TODO: (DR) Make pan speed dependent on window size
 
-	mouseDrag(dx, dy, InputManager::isAxisActive("rotate"),
-	          InputManager::isAxisActive("pan"));
+	mouseDrag(dx, dy, InputManager::isAxisActive("rotate"), InputManager::isAxisActive("pan"));
 	mouseWheel(dScroll);
 
 	dScroll *= 0.88f; // TODO: (DR) Scroll smoothing is fps dependent
@@ -172,8 +159,8 @@ void Camera::mouseDrag(float dx, float dy, bool rotate, bool pan)
 		else
 		{
 			// The code below flips the horizontal rotate direction when the camera
-			// turns "upside-down" That is, when vertical rotation is in the range of >
-			// 90 and < 270 However in case of a continuous mouse drag the direction
+			// turns "upside-down" That is, when vertical rotation is in the range of
+			// > 90 and < 270 However in case of a continuous mouse drag the direction
 			// isn't flipped until the next drag as to not suddenly change direction
 			float rot = fmodf(abs(rotationY), 360.0f);
 			bool upsideDown = rot > 90.0f && rot < 270.0f;

@@ -6,10 +6,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "Logger/LoggerInternal.h"
 
-void glfwErrorCallback(int error, const char* description)
-{
-	pgr::dieWithError(description);
-}
+void glfwErrorCallback(int error, const char* description) { pgr::dieWithError(description); }
 
 void Window::init()
 {
@@ -26,8 +23,7 @@ void Window::init()
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
-	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT,
-	                                g_baseTitle.c_str(), nullptr, nullptr);
+	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, g_baseTitle.c_str(), nullptr, nullptr);
 
 	if (m_mainWindow == nullptr)
 	{
@@ -40,8 +36,7 @@ void Window::init()
 	int x, y, channels;
 	constexpr int desiredChannels = 4;
 	auto* pixels =
-	    stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(),
-	              &x, &y, &channels, desiredChannels);
+	    stbi_load(Config::getAbsolutePath("Data/textures/logoi3t.png").c_str(), &x, &y, &channels, desiredChannels);
 	if (pixels)
 	{
 		GLFWimage image{x, y, pixels};
@@ -52,8 +47,7 @@ void Window::init()
 	glfwMakeContextCurrent(m_mainWindow);
 	glfwSwapInterval(1); // Enable vsync.
 
-	glfwSetWindowCloseCallback(
-	    m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
+	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
 }
 
 GLFWwindow* Window::get() { return m_mainWindow; }

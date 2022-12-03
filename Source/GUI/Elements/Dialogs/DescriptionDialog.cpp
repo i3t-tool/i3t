@@ -13,9 +13,8 @@ void DescriptionDialog::render()
 
 	if (m_isEditState)
 	{
-		ImGui::InputTextMultiline(
-		    "Description##Form", m_descriptionText, IM_ARRAYSIZE(m_descriptionText),
-		    ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), 0);
+		ImGui::InputTextMultiline("Description##Form", m_descriptionText, IM_ARRAYSIZE(m_descriptionText),
+		                          ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), 0);
 	}
 	else
 	{

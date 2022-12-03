@@ -5,10 +5,8 @@
 #include "WorkspaceCycle.h"
 #include "../Windows/WorkspaceWindow.h"
 
-WorkspaceCycle::WorkspaceCycle(
-    DIWNE::Diwne& diwne,
-    Ptr<Core::NodeBase> nodebase /*=Core::GraphManager::createCycle()*/,
-    bool drawPins /*=true*/)
+WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase /*=Core::GraphManager::createCycle()*/,
+                               bool drawPins /*=true*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
 {
 	setDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node
@@ -21,8 +19,7 @@ void WorkspaceCycle::drawMenuLevelOfDetail()
 {
 	drawMenuLevelOfDetail_builder(
 	    std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-	    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::LightCycle,
-	     WorkspaceLevelOfDetail::Label});
+	    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::LightCycle, WorkspaceLevelOfDetail::Label});
 }
 
 bool WorkspaceCycle::buttonPlayPause()
@@ -78,22 +75,18 @@ bool WorkspaceCycle::leftContent()
 
 	if (m_levelOfDetail == WorkspaceLevelOfDetail::LightCycle)
 	{
-		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO,
-		                     Core::I3T_CYCLE_IN_MULT})
+		for (auto const i : {Core::I3T_CYCLE_IN_FROM, Core::I3T_CYCLE_IN_TO, Core::I3T_CYCLE_IN_MULT})
 		{
 			m_workspaceInputs.at(i)->drawDiwne();
 		}
 
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 		ImRect nodeRect = getNodeRectDiwne();
-		ImVec2 pinConnectionPoint = ImVec2(
-		    nodeRect.Min.x,
-		    (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) /
-		        2);
+		ImVec2 pinConnectionPoint =
+		    ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
 
-		for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE,
-		                     Core::I3T_CYCLE_IN_STOP, Core::I3T_CYCLE_IN_PREV,
-		                     Core::I3T_CYCLE_IN_NEXT})
+		for (auto const i : {Core::I3T_CYCLE_IN_PLAY, Core::I3T_CYCLE_IN_PAUSE, Core::I3T_CYCLE_IN_STOP,
+		                     Core::I3T_CYCLE_IN_PREV, Core::I3T_CYCLE_IN_NEXT})
 		{
 			Ptr<WorkspaceCoreInputPin> const pin = m_workspaceInputs.at(i);
 			pin->setConnectionPointDiwne(pinConnectionPoint);
@@ -105,8 +98,7 @@ bool WorkspaceCycle::leftContent()
 	}
 	else
 	{
-		inner_interaction_happen |=
-		    WorkspaceNodeWithCoreDataWithPins::leftContent();
+		inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::leftContent();
 	}
 
 	return inner_interaction_happen;
@@ -124,22 +116,18 @@ bool WorkspaceCycle::rightContent()
 
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 		ImRect nodeRect = getNodeRectDiwne();
-		ImVec2 pinConnectionPoint = ImVec2(
-		    nodeRect.Min.x,
-		    (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) /
-		        2);
+		ImVec2 pinConnectionPoint =
+		    ImVec2(nodeRect.Min.x, (diwne.screen2diwne(ImGui::GetCursorScreenPos()).y + nodeRect.Max.y) / 2);
 
-		for (auto const i : {Core::I3T_CYCLE_OUT_PLAY, Core::I3T_CYCLE_OUT_PAUSE,
-		                     Core::I3T_CYCLE_OUT_STOP, Core::I3T_CYCLE_OUT_PREV,
-		                     Core::I3T_CYCLE_OUT_NEXT, Core::I3T_CYCLE_OUT_END})
+		for (auto const i : {Core::I3T_CYCLE_OUT_PLAY, Core::I3T_CYCLE_OUT_PAUSE, Core::I3T_CYCLE_OUT_STOP,
+		                     Core::I3T_CYCLE_OUT_PREV, Core::I3T_CYCLE_OUT_NEXT, Core::I3T_CYCLE_OUT_END})
 		{
 			m_workspaceOutputs.at(i)->setConnectionPointDiwne(pinConnectionPoint);
 		}
 	}
 	else
 	{
-		inner_interaction_happen |=
-		    WorkspaceNodeWithCoreDataWithPins::rightContent();
+		inner_interaction_happen |= WorkspaceNodeWithCoreDataWithPins::rightContent();
 	}
 
 	return inner_interaction_happen;
@@ -159,10 +147,8 @@ bool WorkspaceCycle::middleContent()
 	float localData;
 	bool valueChanged;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
 
 	switch (m_levelOfDetail)
 	{
@@ -176,11 +162,9 @@ bool WorkspaceCycle::middleContent()
 		localData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
-		    fmt::format("##{}Value", getId()), localData,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}Value", getId()), localData,
 		    /* m_nodebase->as<Core::Cycle>()->getValueState({0, 0}) - not work */
-		    Core::EValueState::Editable,
-		    valueChanged); /* \todo MH PF Always editable?*/
+		    Core::EValueState::Editable, valueChanged); /* \todo MH PF Always editable?*/
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::SetTooltip("Value");
@@ -207,11 +191,9 @@ bool WorkspaceCycle::middleContent()
 		localData = m_nodebase->as<Core::Cycle>()->getData().getFloat();
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
-		    fmt::format("##{}Value", getId()), localData,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}Value", getId()), localData,
 		    /* m_nodebase->as<Core::Cycle>()->getValueState({0, 0}) - not work */
-		    Core::EValueState::Editable,
-		    valueChanged); /* \todo MH PF Always editable?*/
+		    Core::EValueState::Editable, valueChanged); /* \todo MH PF Always editable?*/
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::SetTooltip("Value");
@@ -231,8 +213,7 @@ bool WorkspaceCycle::middleContent()
 		// text?
 
 		ImGui::BeginTable(fmt::format("{}mode", getId()).c_str(), 4,
-		                  ImGuiTableFlags_NoHostExtendX |
-		                      ImGuiTableFlags_SizingFixedFit);
+		                  ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit);
 		ImGui::TableNextRow();
 		//                ImGui::TableNextColumn();
 		//                    ImGui::TextUnformatted("One");
@@ -278,8 +259,7 @@ bool WorkspaceCycle::middleContent()
 		}
 
 		ImGui::BeginTable(fmt::format("{}controlValues", getId()).c_str(), 2,
-		                  ImGuiTableFlags_NoHostExtendX |
-		                      ImGuiTableFlags_SizingFixedFit);
+		                  ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit);
 		//            ImGui::TableNextRow();
 		//                ImGui::TableNextColumn();
 		//                    ImGui::TextUnformatted("From");
@@ -295,11 +275,9 @@ bool WorkspaceCycle::middleContent()
 		valueChanged = false;
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
-		    fmt::format("##{}from", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->isConnected()
-		        ? Core::EValueState::Locked
-		        : Core::EValueState::Editable,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}from", getId()), localData,
+		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_FROM)->isConnected() ? Core::EValueState::Locked
+		                                                                 : Core::EValueState::Editable,
 		    valueChanged);
 		if (ImGui::IsItemHovered())
 		{
@@ -315,11 +293,9 @@ bool WorkspaceCycle::middleContent()
 		valueChanged = false;
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
-		    fmt::format("##{}to", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected()
-		        ? Core::EValueState::Locked
-		        : Core::EValueState::Editable,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}to", getId()), localData,
+		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_TO)->isConnected() ? Core::EValueState::Locked
+		                                                               : Core::EValueState::Editable,
 		    valueChanged);
 		if (ImGui::IsItemHovered())
 		{
@@ -336,11 +312,9 @@ bool WorkspaceCycle::middleContent()
 		valueChanged = false;
 		ImGui::SetNextItemWidth(getDataItemsWidth());
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
-		    fmt::format("##{}step", getId()), localData,
-		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_MULT)->isConnected()
-		        ? Core::EValueState::Locked
-		        : Core::EValueState::Editable,
+		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode, fmt::format("##{}step", getId()), localData,
+		    m_workspaceInputs.at(Core::I3T_CYCLE_IN_MULT)->isConnected() ? Core::EValueState::Locked
+		                                                                 : Core::EValueState::Editable,
 		    valueChanged);
 		if (ImGui::IsItemHovered())
 		{
@@ -355,10 +329,9 @@ bool WorkspaceCycle::middleContent()
 		localData = m_nodebase->as<Core::Cycle>()->getManualStep();
 		valueChanged = false;
 		ImGui::SetNextItemWidth(getDataItemsWidth());
-		inner_interaction_happen |= drawDragFloatWithMap_Inline(
-		    diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
-		    fmt::format("##{}manstep", getId()), localData,
-		    Core::EValueState::Editable, valueChanged);
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
+		                                                        fmt::format("##{}manstep", getId()), localData,
+		                                                        Core::EValueState::Editable, valueChanged);
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::SetTooltip("Step for manual Next/Prev");
@@ -379,12 +352,8 @@ bool WorkspaceCycle::middleContent()
 int WorkspaceCycle::maxLenghtOfData()
 {
 	Ptr<Core::Cycle> nodebase = m_nodebase->as<Core::Cycle>();
-	return std::max({numberOfCharWithDecimalPoint(nodebase->getFrom(),
-	                                              m_numberOfVisibleDecimal),
-	                 numberOfCharWithDecimalPoint(nodebase->getTo(),
-	                                              m_numberOfVisibleDecimal),
-	                 numberOfCharWithDecimalPoint(nodebase->getManualStep(),
-	                                              m_numberOfVisibleDecimal),
-	                 numberOfCharWithDecimalPoint(nodebase->getMultiplier(),
-	                                              m_numberOfVisibleDecimal)});
+	return std::max({numberOfCharWithDecimalPoint(nodebase->getFrom(), m_numberOfVisibleDecimal),
+	                 numberOfCharWithDecimalPoint(nodebase->getTo(), m_numberOfVisibleDecimal),
+	                 numberOfCharWithDecimalPoint(nodebase->getManualStep(), m_numberOfVisibleDecimal),
+	                 numberOfCharWithDecimalPoint(nodebase->getMultiplier(), m_numberOfVisibleDecimal)});
 }

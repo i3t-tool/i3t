@@ -14,19 +14,15 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 {
 	auto conf = std::make_shared<Configuration>();
 
-	const auto result = JSON::parse(
-	    filename, Config::getAbsolutePath("Data/Schemas/Config.schema.json"));
+	const auto result = JSON::parse(filename, Config::getAbsolutePath("Data/Schemas/Config.schema.json"));
 
 	const auto& d = *result;
 
 	for (const auto& resource : d["resources"].GetArray())
 	{
-		const auto name = std::string(resource["name"].GetString(),
-		                              resource["name"].GetStringLength());
-		const auto path = std::string(resource["path"].GetString(),
-		                              resource["path"].GetStringLength());
-		const auto type = std::string(resource["type"].GetString(),
-		                              resource["type"].GetStringLength());
+		const auto name = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
+		const auto path = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
+		const auto type = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
 
 		const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(type);
 		if (!maybeType.has_value())
@@ -41,8 +37,7 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 	return conf;
 }
 
-bool Config::getValue(std::istream& is, const std::string& input,
-                      const std::string& attribName, float& val)
+bool Config::getValue(std::istream& is, const std::string& input, const std::string& attribName, float& val)
 {
 	if (input == attribName)
 	{
@@ -56,8 +51,7 @@ bool Config::getValue(std::istream& is, const std::string& input,
 	return false;
 }
 
-bool Config::getBool(std::istream& is, const std::string& input,
-                     const std::string& attribName, bool& val)
+bool Config::getBool(std::istream& is, const std::string& input, const std::string& attribName, bool& val)
 {
 	if (input == attribName)
 	{
@@ -73,8 +67,7 @@ bool Config::getBool(std::istream& is, const std::string& input,
 	return false;
 }
 
-bool Config::getWord(std::istream& is, const std::string& input,
-                     const std::string& attribName, std::string& val)
+bool Config::getWord(std::istream& is, const std::string& input, const std::string& attribName, std::string& val)
 {
 	if (input == attribName)
 	{
@@ -88,8 +81,7 @@ bool Config::getWord(std::istream& is, const std::string& input,
 	return false;
 }
 
-bool Config::getVec2(std::istream& is, const std::string& input,
-                     const std::string& attribName, glm::vec2& val)
+bool Config::getVec2(std::istream& is, const std::string& input, const std::string& attribName, glm::vec2& val)
 {
 	if (input == attribName)
 	{
@@ -104,8 +96,7 @@ bool Config::getVec2(std::istream& is, const std::string& input,
 	return false;
 }
 
-bool Config::getVec3(std::istream& is, const std::string& input,
-                     const std::string& attribName, glm::vec3& val)
+bool Config::getVec3(std::istream& is, const std::string& input, const std::string& attribName, glm::vec3& val)
 {
 	if (input == attribName)
 	{
@@ -120,8 +111,7 @@ bool Config::getVec3(std::istream& is, const std::string& input,
 	return false;
 }
 
-bool Config::getVec4(std::istream& is, const std::string& input,
-                     const std::string& attribName, glm::vec4& val)
+bool Config::getVec4(std::istream& is, const std::string& input, const std::string& attribName, glm::vec4& val)
 {
 	if (input == attribName)
 	{
@@ -136,15 +126,12 @@ bool Config::getVec4(std::istream& is, const std::string& input,
 	return false;
 }
 
-bool Config::getMat4(std::istream& is, const std::string& input,
-                     const std::string& attribName, glm::mat4& val)
+bool Config::getMat4(std::istream& is, const std::string& input, const std::string& attribName, glm::mat4& val)
 {
 	if (input == attribName)
 	{
-		is >> val[0][0] >> val[1][0] >> val[2][0] >> val[3][0] >> val[0][1] >>
-		    val[1][1] >> val[2][1] >> val[3][1] >> val[0][2] >> val[1][2] >>
-		    val[2][2] >> val[3][2] >> val[0][3] >> val[1][3] >> val[2][3] >>
-		    val[3][3];
+		is >> val[0][0] >> val[1][0] >> val[2][0] >> val[3][0] >> val[0][1] >> val[1][1] >> val[2][1] >> val[3][1] >>
+		    val[0][2] >> val[1][2] >> val[2][2] >> val[3][2] >> val[0][3] >> val[1][3] >> val[2][3] >> val[3][3];
 		if (is.good())
 		{
 			// cout << key << " : " << std::endl;

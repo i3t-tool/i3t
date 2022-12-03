@@ -42,8 +42,7 @@ struct Shader
 };
 struct Manipulator
 {
-	Manipulator(std::shared_ptr<Core::Node>* _editedNode,
-	            std::shared_ptr<Core::Sequence>* _parent, Component* _component)
+	Manipulator(std::shared_ptr<Core::Node>* _editedNode, std::shared_ptr<Core::Sequence>* _parent, Component* _component)
 	{
 		editedNode = _editedNode;
 		parent = _parent;
@@ -91,8 +90,7 @@ public:
 
 	/// Activate manipulators in scene (viewport) for givent type of workspace
 	/// matrix
-	void manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation> matnode,
-	                           std::shared_ptr<Core::Sequence> parent);
+	void manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation> matnode, std::shared_ptr<Core::Sequence> parent);
 
 	void manipulatorsSetVisible(bool visible);
 	bool manipulatorsGetVisible();
@@ -104,10 +102,8 @@ public:
 	/// Remove GameObject from scene (viewport window)
 	bool removeModel(GameObject*);
 
-	GameObject* sceneRoot =
-	    nullptr; ///< root of scene of this world. Scene is a tree of GameObjects.
-	std::map<std::string, Manipulator>
-	    manipulators; ///< Properites of manipulator components
+	GameObject* sceneRoot = nullptr;                 ///< root of scene of this world. Scene is a tree of GameObjects.
+	std::map<std::string, Manipulator> manipulators; ///< Properites of manipulator components
 
 	/// load HC shaders, textures. Must be called before any instance of World is
 	/// created.
@@ -119,12 +115,11 @@ public:
 	static glm::mat4x4 perspective; ///< Main camera perspective matrix, updated
 	                                ///< by Callbacks::onResize. Accessed by
 	                                ///< GameObject::draw(glm::mat4).
-	static glm::mat4x4
-	    mainCamera; ///< Main camera transform, updated by Render::onDisplay.
-	                ///< Accessed by GameObject::draw(glm::mat4).
-	static glm::vec3 mainCamPos; ///< Main camera position before rotation. Needed
-	                             ///< for reflection calculation in fs. Accessed
-	                             ///< by GameObject::draw(glm::mat4).
+	static glm::mat4x4 mainCamera;  ///< Main camera transform, updated by Render::onDisplay.
+	                                ///< Accessed by GameObject::draw(glm::mat4).
+	static glm::vec3 mainCamPos;    ///< Main camera position before rotation. Needed
+	                                ///< for reflection calculation in fs. Accessed
+	                                ///< by GameObject::draw(glm::mat4).
 
 	// HC shaders
 	static Shader shader0;      ///< Default shader
@@ -135,8 +130,7 @@ public:
 	// static std::map<std::string, pgr::MeshData > models;
 private:
 	static bool initializedRender; ///< Was render already initialized?
-	bool started =
-	    false; ///< Was start() already called on this instance of World?
+	bool started = false;          ///< Was start() already called on this instance of World?
 	CameraControl* camControl = nullptr;
 	bool showManipulators = true;
 	Manipulator* activeManipulator = nullptr;

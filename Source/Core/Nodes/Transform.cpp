@@ -7,9 +7,8 @@ namespace Core
 {
 bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
-	const int8_t maskValue =
-	    mask[coords.y * 4 + coords.x]; // mask is in the ROW order (see Value
-	                                   // masks in TransformImpl.cpp)
+	const int8_t maskValue = mask[coords.y * 4 + coords.x]; // mask is in the ROW order (see Value
+	                                                        // masks in TransformImpl.cpp)
 
 	if (maskValue == VM_ANY)
 		return true;
@@ -36,8 +35,7 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
 
 //===----------------------------------------------------------------------===//
 
-Transformation::Transformation(const TransformOperation& transformType)
-    : Node(&(transformType.operation))
+Transformation::Transformation(const TransformOperation& transformType) : Node(&(transformType.operation))
 {
 	m_internalData.push_back(DataStore(EValueType::Matrix));
 	m_savedData = DataStore(EValueType::Matrix);
@@ -46,8 +44,7 @@ Transformation::Transformation(const TransformOperation& transformType)
 void Transformation::createDefaults()
 {
 	const auto& opName = getOperation()->keyWord;
-	const auto& transformType = getTransformOperation(
-	    magic_enum::enum_cast<ETransformType>(opName).value());
+	const auto& transformType = getTransformOperation(magic_enum::enum_cast<ETransformType>(opName).value());
 
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
@@ -56,20 +53,14 @@ void Transformation::createDefaults()
 	}
 }
 
-const Data& Transformation::getDefaultValue(const std::string& name) const
-{
-	return m_defaultValues.at(name);
-}
+const Data& Transformation::getDefaultValue(const std::string& name) const { return m_defaultValues.at(name); }
 
 TransformOperation::ValueMap Transformation::getDefaultTypes() const
 {
 	return getTransformDefaults(getOperation()->keyWord);
 }
 
-Transformation::DefaultValues& Transformation::getDefaultValues()
-{
-	return m_defaultValues;
-}
+Transformation::DefaultValues& Transformation::getDefaultValues() { return m_defaultValues; }
 
 EValueState Transformation::getValueState(glm::ivec2 coords) const
 {
@@ -112,10 +103,7 @@ void Transformation::reloadValue()
 	notifySequence();
 }
 
-const glm::mat4& Transformation::getSavedValue() const
-{
-	return m_savedData.getMat4();
-}
+const glm::mat4& Transformation::getSavedValue() const { return m_savedData.getMat4(); }
 
 void Transformation::setSavedValue(const glm::mat4& values)
 {
@@ -162,8 +150,7 @@ ValueSetResult Transformation::setValue(float val, glm::ivec2 coords) // PF
 	// called by AxisAngle rotate,
 	if (isLocked())
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
-		                      "Invalid position!"};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};
 	}
 
 	setInternalValue(val, coords);
@@ -180,8 +167,7 @@ void Transformation::notifySequence()
 	}
 }
 
-bool Transformation::canSetValue(const ValueMask& mask, glm::ivec2 coords,
-                                 float value)
+bool Transformation::canSetValue(const ValueMask& mask, glm::ivec2 coords, float value)
 {
 	if (m_isLocked)
 	{

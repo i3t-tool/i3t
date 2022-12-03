@@ -318,9 +318,8 @@ TEST(EulerXTest, Synergies_OneCorrectValue_Ok)
  * \endcode
  */
 
-TEST(
-    EulerXTest,
-    DISABLED_Synergies__Disabled_Invalid__Enabled_Valid__WRONG_ON_GITLAB) // fails
+TEST(EulerXTest,
+     DISABLED_Synergies__Disabled_Invalid__Enabled_Valid__WRONG_ON_GITLAB) // fails
 {
 	auto rot = Builder::createTransform<ETransformType::EulerX>();
 
@@ -336,31 +335,23 @@ TEST(
 
 	setValue_expectOk(rot, wrongVal, {1, 2}); // should be sin(of some angle)
 
-	std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2]
-	          << ", value should be " << wrongVal << std::endl;
-	std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1]
-	          << ", value should be " << 0.0f << std::endl;
+	std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2] << ", value should be " << wrongVal << std::endl;
+	std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1] << ", value should be " << 0.0f << std::endl;
 	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][2], wrongVal));
-	EXPECT_TRUE(
-	    Math::eq(rot->getData().getMat4()[1][1],
-	             1.0f)); // was identity, no synergies => should be unchanged
+	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][1],
+	                     1.0f)); // was identity, no synergies => should be unchanged
 
-	std::cerr << "--------------------- START WRONG TEST -------------------"
-	          << std::endl;
+	std::cerr << "--------------------- START WRONG TEST -------------------" << std::endl;
 	EXPECT_FALSE(rot->isValid()); // todo PF gitlab returns valid for a corrupted
 	                              // matrix - that is wrong
-	std::cerr << "--------------------- END WRONG TEST ---------------------"
-	          << std::endl;
+	std::cerr << "--------------------- END WRONG TEST ---------------------" << std::endl;
 
 	// synergies repair the matrix - update the angle
 	rot->enableSynergies();
-	setValue_expectOk(rot, wrongVal,
-	                  {1, 2}); // synergies will use this as sin(angle)
+	setValue_expectOk(rot, wrongVal, {1, 2}); // synergies will use this as sin(angle)
 
-	std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2]
-	          << ", value should be " << wrongVal << std::endl;
-	std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1]
-	          << ", value should be " << -wrongVal << std::endl;
+	std::cerr << "Matrix[1,2] = " << rot->getData().getMat4()[1][2] << ", value should be " << wrongVal << std::endl;
+	std::cerr << "Matrix[2,1] = " << rot->getData().getMat4()[2][1] << ", value should be " << -wrongVal << std::endl;
 
 	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[1][2], wrongVal));  //  sin
 	EXPECT_TRUE(Math::eq(rot->getData().getMat4()[2][1], -wrongVal)); // -sin
@@ -593,8 +584,8 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 
 TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
 {
-	auto axisAngle = Builder::createTransform<ETransformType::AxisAngle>()
-	                     ->as<TransformImpl<ETransformType::AxisAngle>>();
+	auto axisAngle =
+	    Builder::createTransform<ETransformType::AxisAngle>()->as<TransformImpl<ETransformType::AxisAngle>>();
 
 	auto rads = generateFloat();
 	auto axis = generateVec3();
@@ -625,8 +616,7 @@ TEST(AxisAngleTest, RotationMatrixAfterSetValueShouldBeValid)
  */
 TEST(QuatRotTest, NewQuat__HasSynergies_isValid_isNormalized)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	               ->as<TransformImpl<ETransformType::Quat>>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
 
 	EXPECT_TRUE(rot->hasSynergies());
 	EXPECT_TRUE(rot->isValid()); // of unit size
@@ -640,8 +630,7 @@ TEST(QuatRotTest, NewQuat__HasSynergies_isValid_isNormalized)
 
 TEST(QuatRotTest, getNormalized_returns_normalized)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	               ->as<TransformImpl<ETransformType::Quat>>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
 
 	// setValue WITH SYNERGIES - should normalize regardless of synergies
 	auto vec = generateVec4();
@@ -664,8 +653,7 @@ TEST(QuatRotTest, getNormalized_returns_normalized)
 
 TEST(QuatRotTest, HandlingSynergies_setValueQuat)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	               ->as<TransformImpl<ETransformType::Quat>>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
 
 	// setValue WITH SYNERGIES - should normalize, be valid
 	auto vec = generateVec4();
@@ -678,9 +666,8 @@ TEST(QuatRotTest, HandlingSynergies_setValueQuat)
 	EXPECT_EQ(rot->getQuat(), rot->getNormalized()); // default quat is normalized
 	                                                 // (default = m_normalized)
 
-	EXPECT_EQ(
-	    rot->getData().getMat4(),
-	    glm::toMat4(glm::normalize(quat))); // same matrix as from normalized
+	EXPECT_EQ(rot->getData().getMat4(),
+	          glm::toMat4(glm::normalize(quat))); // same matrix as from normalized
 
 	// setValue WITHOUT SYNERGIES - should NOT normalize, ne NOT valid
 	rot->disableSynergies(); // not of unit length
@@ -700,14 +687,12 @@ TEST(QuatRotTest, HandlingSynergies_setValueQuat)
 
 TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 {
-	auto rot = Builder::createTransform<ETransformType::Quat>()
-	               ->as<TransformImpl<ETransformType::Quat>>();
+	auto rot = Builder::createTransform<ETransformType::Quat>()->as<TransformImpl<ETransformType::Quat>>();
 
 	// setValue WITH SYNERGIES - should normalize (change) also the default
 	auto vec = generateVec4();
-	auto quat =
-	    glm::quat(vec.w, vec.x, vec.y,
-	              vec.z); // not normalized quat + synergies=> normalized default
+	auto quat = glm::quat(vec.w, vec.x, vec.y,
+	                      vec.z); // not normalized quat + synergies=> normalized default
 
 	rot->setDefaultValue("quat", quat); // set NOT normalized - must be normalized
 
@@ -728,8 +713,7 @@ TEST(QuatRotTest, HandlingSynergies_setDefaultValue)
 	quat = glm::quat(vec.w, vec.x, vec.y,
 	                 vec.z); // not normalized + synergies=> normalized
 
-	rot->setDefaultValue(
-	    "quat", quat); // set NOT normalized - must be left not normalized
+	rot->setDefaultValue("quat", quat); // set NOT normalized - must be left not normalized
 
 	EXPECT_FALSE(rot->hasSynergies());
 	EXPECT_FALSE(rot->isValid()); // not of unit size

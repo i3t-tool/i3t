@@ -10,8 +10,7 @@
 
 using namespace Vp;
 
-SceneCamera::SceneCamera(Core::Mesh* mesh, PhongShader* shader)
-    : SceneModel(mesh, shader)
+SceneCamera::SceneCamera(Core::Mesh* mesh, PhongShader* shader) : SceneModel(mesh, shader)
 {
 	setDisplayType(DisplayType::Camera);
 }
@@ -36,23 +35,18 @@ void SceneCamera::update(Scene& scene)
 	SceneModel::update(scene);
 }
 
-void SceneCamera::render(glm::mat4 view, glm::mat4 projection)
-{
-	SceneModel::render(view, projection);
-}
+void SceneCamera::render(glm::mat4 view, glm::mat4 projection) { SceneModel::render(view, projection); }
 
 void SceneCamera::onSceneAdd(Vp::Scene& scene)
 {
 	SceneModel::onSceneAdd(scene);
 	auto frustumPtr =
-	    std::make_shared<FrustumObject>(RMI.meshByAlias(Shaper::unitCube),
-	                                    scene.m_viewport->m_frustumShader.get());
+	    std::make_shared<FrustumObject>(RMI.meshByAlias(Shaper::unitCube), scene.m_viewport->m_frustumShader.get());
 	frustumPtr->setColor(m_frustumOutlineColor);
 	m_frustumOutline = scene.addEntity(frustumPtr);
 
 	auto frustumFilledPtr =
-	    std::make_shared<FrustumObject>(RMI.meshByAlias(Shaper::unitCubeFilled),
-	                                    scene.m_viewport->m_frustumShader.get());
+	    std::make_shared<FrustumObject>(RMI.meshByAlias(Shaper::unitCubeFilled), scene.m_viewport->m_frustumShader.get());
 	frustumFilledPtr->setColor(m_frustumColor);
 	frustumFilledPtr->m_opaque = false;
 	frustumFilledPtr->m_opacity = 0.22f;

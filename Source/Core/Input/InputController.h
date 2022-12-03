@@ -21,10 +21,7 @@ class InputController
 		EKeyState state;
 		KeyCallback fn;
 
-		Action(std::string n, EKeyState s, KeyCallback callback)
-		    : name(std::move(n)), state(s), fn(std::move(callback))
-		{
-		}
+		Action(std::string n, EKeyState s, KeyCallback callback) : name(std::move(n)), state(s), fn(std::move(callback)) {}
 	};
 
 	std::vector<Action> m_actions;

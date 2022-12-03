@@ -73,19 +73,14 @@ void PhongShader::bindTextures(Core::Mesh::TextureSet tSet)
 	}
 }
 
-void PhongShader::bindTexture(GLuint textureID, const std::string& type,
-                              int typeIndex, GLuint textureUnit)
+void PhongShader::bindTexture(GLuint textureID, const std::string& type, int typeIndex, GLuint textureUnit)
 {
 	// Activate texture unit
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	// Find appropriate sampler and set its texture unit
-	glUniform1i(
-	    glGetUniformLocation(id, (type + std::to_string(typeIndex)).c_str()),
-	    textureUnit);
+	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex)).c_str()), textureUnit);
 	// Also enable flag saying this sampler is active
-	glUniform1i(glGetUniformLocation(
-	                id, (type + std::to_string(typeIndex) + "_active").c_str()),
-	            GL_TRUE);
+	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex) + "_active").c_str()), GL_TRUE);
 	// Bind the texture to that texture unit
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
@@ -96,36 +91,26 @@ void PhongShader::clearTextures() const
 	type = "diffuse";
 	for (int i = 0; i < MAX_DIFFUSE_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(
-		                id, (type + std::to_string(i) + "_active").c_str()),
-		            GL_FALSE);
+		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "specular";
 	for (int i = 0; i < MAX_SPECULAR_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(
-		                id, (type + std::to_string(i) + "_active").c_str()),
-		            GL_FALSE);
+		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "normal";
 	for (int i = 0; i < MAX_NORMAL_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(
-		                id, (type + std::to_string(i) + "_active").c_str()),
-		            GL_FALSE);
+		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "ao";
 	for (int i = 0; i < MAX_AO_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(
-		                id, (type + std::to_string(i) + "_active").c_str()),
-		            GL_FALSE);
+		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "emission";
 	for (int i = 0; i < MAX_EMISSION_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(
-		                id, (type + std::to_string(i) + "_active").c_str()),
-		            GL_FALSE);
+		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 }

@@ -50,10 +50,7 @@ struct ValueSetResult
 
 	ValueSetResult() : status(Status::Ok), message("") {}
 
-	explicit ValueSetResult(Status aStatus, std::string aMessage = "")
-	    : status(aStatus), message(std::move(aMessage))
-	{
-	}
+	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
 };
 
 inline constexpr size_t I3T_INPUT0 = 0;
@@ -182,10 +179,8 @@ public:
 
 	template <typename T> Ptr<T> as()
 	{
-		static_assert(std::is_base_of_v<Node, T>,
-		              "T must be derived from NodeBase class.");
-		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) &&
-		           "Cannot cast to Ptr<T>.");
+		static_assert(std::is_base_of_v<Node, T>, "T must be derived from NodeBase class.");
+		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) && "Cannot cast to Ptr<T>.");
 
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}
@@ -206,20 +201,12 @@ public:
 	/// \deprecated Will be removed
 	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
 
-	[[nodiscard]] PinView getInputPins() {
-		return PinView(PinView::EStrategy::Input, shared_from_this());
-	}[[nodiscard]] PinView getOutputPins()
-	{
-		return PinView(PinView::EStrategy::Output, shared_from_this());
-	}
+	[[nodiscard]] PinView getInputPins() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
+	[[nodiscard]] PinView getOutputPins() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 protected:
-	[[nodiscard]] PinView getInputPinsRef() {
-		return PinView(PinView::EStrategy::Input, shared_from_this());
-	}[[nodiscard]] PinView getOutputPinsRef()
-	{
-		return PinView(PinView::EStrategy::Output, shared_from_this());
-	}
+	[[nodiscard]] PinView getInputPinsRef() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
+	[[nodiscard]] PinView getOutputPinsRef() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
 
 	//===-- Obtaining value functions.
 	//----------------------------------------===//
@@ -233,8 +220,7 @@ public:
 	/// \todo Make this function non public.
 	virtual DataStore& getInternalData(size_t index = 0)
 	{
-		assert(index < m_internalData.size() &&
-		       "Desired data storage does not exist!");
+		assert(index < m_internalData.size() && "Desired data storage does not exist!");
 
 		return m_internalData[index];
 	}
@@ -268,26 +254,11 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val)
-	{
-		return setValueEx(val);
-	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
-	{
-		return setValueEx(vec);
-	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
-	{
-		return setValueEx(vec);
-	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q)
-	{
-		return setValueEx(q);
-	}
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
-	{
-		return setValueEx(mat);
-	}
+	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q) { return setValueEx(q); }
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
 
 	/**
 	 * \param val new value
@@ -306,22 +277,19 @@ public:
 	 * Smart set function, used with constrained transformation for value
 	 * checking. \param mat \param map array of 16 chars.
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat,
-	                                              const Transform::DataMap& map)
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_LogicError,
-		                      "Unsupported operation on non transform object."};
+		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
 
-	template <typename T>
-	[[nodiscard]] ValueSetResult setValue(const T& value, unsigned index) {
+	template <typename T> [[nodiscard]] ValueSetResult setValue(const T& value, unsigned index)
+	{
 		return setValueEx(value, index);
 	}
 
-	private :
-	    /// Sets value of pin at \p index position.
-	    template <typename T>
-	    ValueSetResult setValueEx(T&& val, unsigned index = 0)
+private:
+	/// Sets value of pin at \p index position.
+	template <typename T> ValueSetResult setValueEx(T&& val, unsigned index = 0)
 	{
 		setInternalValue(val, index);
 		return ValueSetResult{};
@@ -357,8 +325,7 @@ protected:
 	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 public:
-	virtual void resetMatrixFromDefaults() {
-	} // - defined in Transform, calls TransformImpl::onReset...
+	virtual void resetMatrixFromDefaults() {} // - defined in Transform, calls TransformImpl::onReset...
 
 	/// \todo MH will be removed.
 	static const Transform::DataMap* getDataMap();

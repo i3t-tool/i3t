@@ -31,22 +31,14 @@ inline float generateAngleFromDegs(float from = 0.0f, float to = 90.0f)
 	return glm::radians(generateFloat(from, to));
 }
 
-inline glm::vec3 generateVec3()
-{
-	return glm::vec3(generateFloat(), generateFloat(), generateFloat());
-}
+inline glm::vec3 generateVec3() { return glm::vec3(generateFloat(), generateFloat(), generateFloat()); }
 
 inline glm::vec4 generateVec4()
 {
-	return glm::vec4(generateFloat(), generateFloat(), generateFloat(),
-	                 generateFloat());
+	return glm::vec4(generateFloat(), generateFloat(), generateFloat(), generateFloat());
 }
 
-inline glm::mat4 generateMat4()
-{
-	return glm::mat4(generateVec4(), generateVec4(), generateVec4(),
-	                 generateVec4());
-}
+inline glm::mat4 generateMat4() { return glm::mat4(generateVec4(), generateVec4(), generateVec4(), generateVec4()); }
 
 inline Ptr<Sequence> arrangeSequence(int matrices = 3)
 {

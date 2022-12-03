@@ -20,6 +20,5 @@ TEST(Document, MergeObject)
 	Writer<StringBuffer> writer(sb);
 	d1.Accept(writer);
 
-	EXPECT_STREQ("{\"key1\":\"value1\",\"key2\":\"value2\",\"key3\":\"value3\"}",
-	             sb.GetString());
+	EXPECT_STREQ("{\"key1\":\"value1\",\"key2\":\"value2\",\"key3\":\"value3\"}", sb.GetString());
 }

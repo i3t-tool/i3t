@@ -9,10 +9,9 @@ using namespace Core;
 
 #include "ResourceManager.h"
 
-Mesh::Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType,
-           bool useNormals, bool useTexcoords, bool useTangents, bool useColors)
-    : m_primitiveType(primitiveType), m_drawType(drawType),
-      m_useNormals(useNormals), m_useTexcoords(useTexcoords),
+Mesh::Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords,
+           bool useTangents, bool useColors)
+    : m_primitiveType(primitiveType), m_drawType(drawType), m_useNormals(useNormals), m_useTexcoords(useTexcoords),
       m_useTangents(useTangents), m_useColors(useColors)
 {
 	// Empty
@@ -35,9 +34,8 @@ void Mesh::dispose() const
 	}
 }
 
-Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts,
-                   const unsigned int nVertices, const float* colors,
-                   const unsigned int nColors)
+Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+                   const float* colors, const unsigned int nColors)
 {
 	Mesh* mesh = new Mesh(primitiveType, ARRAYS, false, false, false, true);
 
@@ -51,14 +49,12 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts,
 	// vertices
 	glGenBuffers(1, &mesh->m_vertex_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertex_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts,
-	             GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts, GL_STATIC_DRAW);
 
 	// colors
 	glGenBuffers(1, &mesh->m_color_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_color_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors,
-	             GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, GL_STATIC_DRAW);
 
 	createVaoAndBindAttribs(mesh);
 
@@ -71,9 +67,8 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts,
 	return mesh;
 }
 
-Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts,
-                   const unsigned int nVertices, const unsigned int* indices,
-                   const unsigned int nIndices, const float* colors,
+Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+                   const unsigned int* indices, const unsigned int nIndices, const float* colors,
                    const unsigned int nColors)
 {
 	// TODO: (DR) Test
@@ -90,20 +85,17 @@ Mesh* Mesh::create(Mesh::PrimitiveType primitiveType, const float* verts,
 	// vertices
 	glGenBuffers(1, &mesh->m_vertex_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertex_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts,
-	             GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nVertices * 3 * sizeof(float), verts, GL_STATIC_DRAW);
 
 	// colors
 	glGenBuffers(1, &mesh->m_color_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_color_vbo);
-	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors,
-	             GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nColors * 3 * sizeof(float), colors, GL_STATIC_DRAW);
 
 	// EBO
 	glGenBuffers(1, &mesh->m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int),
-	             indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	createVaoAndBindAttribs(mesh);
@@ -131,37 +123,36 @@ Mesh* Mesh::load(const std::string& path)
 	                                // normalize vertices to fit into (-1..1)^3
 
 	// Load asset from the file - you can play with various processing steps
-	const aiScene* scn = importer.ReadFile(
-	    path.c_str(),
-	    0
-	        //| aiProcess_SortByPType             // Sort by primitive type into
-	        //groups. Remove unrequested (all except triangles and polygons).
-	        | aiProcess_Triangulate          // Triangulate polygons (if any).
-	        | aiProcess_PreTransformVertices // Transforms scene hierarchy into
-	                                         // one root with geometry-leafs only.
-	                                         // For more see Doc.
-	        | aiProcess_GenSmoothNormals     // Calculate normals per vertex.
-	        | aiProcess_JoinIdenticalVertices
-	        //| aiProcess_RemoveComponent         // Removes above defined
-	        //components | aiProcess_PreTransformVertices    // Transforms scene
-	        //hierarchy into one root with geometry-leafs only. For more see Doc.
-	        //| aiProcess_ImproveCacheLocality
-	        //| aiProcess_RemoveRedundantMaterials
-	        //| aiProcess_FindDegenerates         // Find degenerated polys and
-	        //convert them into lines/points, which are then removed. |
-	        //aiProcess_FindInvalidData         // In this step we can lost
-	        //normals if they are incorrectly exported from the modeler.
-	        //                                    // Thats why we generate them.
-	        //| aiProcess_GenUVCoords             // Force regenerate
-	        //spherical/cylindrical/planar... coords into UVs.
-	        | aiProcess_TransformUVCoords // Pretransform UV coords with texture
-	                                      // matrix. Like in vertex shaders using
-	                                      // gl_TextureMatrix.
-	                                      //| aiProcess_OptimizeMeshes
-	        | aiProcess_CalcTangentSpace  // Calculate tangents/bitangents per
-	                                      // vertex.
-	        | aiProcess_GenBoundingBoxes  // Generate bounding boxes
-	);
+	const aiScene* scn =
+	    importer.ReadFile(path.c_str(), 0
+	                                        //| aiProcess_SortByPType             // Sort by primitive type into
+	                                        // groups. Remove unrequested (all except triangles and polygons).
+	                                        | aiProcess_Triangulate          // Triangulate polygons (if any).
+	                                        | aiProcess_PreTransformVertices // Transforms scene hierarchy into
+	                                                                         // one root with geometry-leafs only.
+	                                                                         // For more see Doc.
+	                                        | aiProcess_GenSmoothNormals     // Calculate normals per vertex.
+	                                        | aiProcess_JoinIdenticalVertices
+	                                        //| aiProcess_RemoveComponent         // Removes above defined
+	                                        // components | aiProcess_PreTransformVertices    // Transforms scene
+	                                        // hierarchy into one root with geometry-leafs only. For more see Doc.
+	                                        //| aiProcess_ImproveCacheLocality
+	                                        //| aiProcess_RemoveRedundantMaterials
+	                                        //| aiProcess_FindDegenerates         // Find degenerated polys and
+	                                        // convert them into lines/points, which are then removed. |
+	                                        // aiProcess_FindInvalidData         // In this step we can lost
+	                                        // normals if they are incorrectly exported from the modeler.
+	                                        //                                    // Thats why we generate them.
+	                                        //| aiProcess_GenUVCoords             // Force regenerate
+	                                        // spherical/cylindrical/planar... coords into UVs.
+	                                        | aiProcess_TransformUVCoords // Pretransform UV coords with texture
+	                                                                      // matrix. Like in vertex shaders using
+	                                                                      // gl_TextureMatrix.
+	                                                                      //| aiProcess_OptimizeMeshes
+	                                        | aiProcess_CalcTangentSpace  // Calculate tangents/bitangents per
+	                                                                      // vertex.
+	                                        | aiProcess_GenBoundingBoxes  // Generate bounding boxes
+	    );
 
 	if (!scn)
 	{
@@ -185,9 +176,8 @@ Mesh* Mesh::load(const std::string& path)
 	for (unsigned m = 0; m < scn->mNumMeshes; ++m)
 	{
 		// count the overall
-		nVertices += scn->mMeshes[m]->mNumVertices; //   number of vertices
-		nIndices += scn->mMeshes[m]->mNumFaces *
-		            FACE_VERT_COUNT; //   and indices in all THE meshes
+		nVertices += scn->mMeshes[m]->mNumVertices;               //   number of vertices
+		nIndices += scn->mMeshes[m]->mNumFaces * FACE_VERT_COUNT; //   and indices in all THE meshes
 	}
 
 	if ((nVertices == 0) || (nIndices < FACE_VERT_COUNT))
@@ -236,15 +226,13 @@ Mesh* Mesh::load(const std::string& path)
 	float* textureCoords = new float[2 * nVertices]; // 2 floats per vertex (str)
 	float* cur_textureCoord = textureCoords;
 
-	unsigned* indices =
-	    new unsigned[nIndices]; // indices to the vertices of the faces
+	unsigned* indices = new unsigned[nIndices]; // indices to the vertices of the faces
 
 	mesh->m_meshParts.resize(scn->mNumMeshes);
 
 	unsigned startIndex = 0; // for face indexing - index in the array of indexes
-	unsigned baseVertex =
-	    0; // for vertices block (base vertex is added to rellative index in the
-	       // submesh to get absolute index in the array of vertices)
+	unsigned baseVertex = 0; // for vertices block (base vertex is added to rellative index in the
+	                         // submesh to get absolute index in the array of vertices)
 
 	for (unsigned m = 0; m < scn->mNumMeshes; ++m)
 	{
@@ -272,8 +260,8 @@ Mesh* Mesh::load(const std::string& path)
 		// copy the face index triplets (we use triangular faces) to indices
 		for (unsigned j = 0; j < aiMesh->mNumFaces; ++j)
 		{
-			memcpy(&indices[startIndex + j * FACE_VERT_COUNT],
-			       aiMesh->mFaces[j].mIndices, FACE_VERT_COUNT * sizeof(unsigned));
+			memcpy(&indices[startIndex + j * FACE_VERT_COUNT], aiMesh->mFaces[j].mIndices,
+			       FACE_VERT_COUNT * sizeof(unsigned));
 		}
 
 		// Material and textures
@@ -288,10 +276,8 @@ Mesh* Mesh::load(const std::string& path)
 
 		meshPart.boundingBoxMin = convertVec3(aiMesh->mAABB.mMin);
 		meshPart.boundingBoxMax = convertVec3(aiMesh->mAABB.mMax);
-		mesh->m_boundingBoxMin =
-		    vec3min(mesh->m_boundingBoxMin, meshPart.boundingBoxMin);
-		mesh->m_boundingBoxMax =
-		    vec3max(mesh->m_boundingBoxMax, meshPart.boundingBoxMax);
+		mesh->m_boundingBoxMin = vec3min(mesh->m_boundingBoxMin, meshPart.boundingBoxMin);
+		mesh->m_boundingBoxMax = vec3max(mesh->m_boundingBoxMax, meshPart.boundingBoxMax);
 
 		startIndex += aiMesh->mNumFaces * FACE_VERT_COUNT;
 		baseVertex += aiMesh->mNumVertices;
@@ -308,8 +294,7 @@ Mesh* Mesh::load(const std::string& path)
 
 	glGenBuffers(1, &mesh->m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int),
-	             indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	delete[] textureCoords;
@@ -340,28 +325,22 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 	// the input mesh processing. Must be aiString type! subMesh_p->name =
 	// name.data;
 
-	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT,
-	                                   &color)) != AI_SUCCESS)
-		color = aiColor4D(defaultMaterial.ambient.r, defaultMaterial.ambient.g,
-		                  defaultMaterial.ambient.b, 1.0f);
+	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color)) != AI_SUCCESS)
+		color = aiColor4D(defaultMaterial.ambient.r, defaultMaterial.ambient.g, defaultMaterial.ambient.b, 1.0f);
 
 	meshMaterial.ambient[0] = color.r;
 	meshMaterial.ambient[1] = color.g;
 	meshMaterial.ambient[2] = color.b;
 
-	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE,
-	                                   &color)) != AI_SUCCESS)
-		color = aiColor4D(defaultMaterial.diffuse.r, defaultMaterial.diffuse.g,
-		                  defaultMaterial.diffuse.b, 1.0f);
+	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color)) != AI_SUCCESS)
+		color = aiColor4D(defaultMaterial.diffuse.r, defaultMaterial.diffuse.g, defaultMaterial.diffuse.b, 1.0f);
 
 	meshMaterial.diffuse[0] = color.r;
 	meshMaterial.diffuse[1] = color.g;
 	meshMaterial.diffuse[2] = color.b;
 
-	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR,
-	                                   &color)) != AI_SUCCESS)
-		color = aiColor4D(defaultMaterial.specular.r, defaultMaterial.specular.g,
-		                  defaultMaterial.specular.b, 1.0f);
+	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color)) != AI_SUCCESS)
+		color = aiColor4D(defaultMaterial.specular.r, defaultMaterial.specular.g, defaultMaterial.specular.b, 1.0f);
 
 	meshMaterial.specular[0] = color.r;
 	meshMaterial.specular[1] = color.g;
@@ -370,16 +349,13 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 	ai_real shininess, strength;
 	unsigned int max; // changed: to unsigned
 	max = 1;
-	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS,
-	                                        &shininess, &max)) != AI_SUCCESS)
+	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max)) != AI_SUCCESS)
 		shininess = 1.0f;
 	// Presumably we don't want shininess to be < 1.0
 	shininess = std::max(1.0f, shininess);
 
 	max = 1;
-	if ((retValue =
-	         aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS_STRENGTH,
-	                                 &strength, &max)) != AI_SUCCESS)
+	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS_STRENGTH, &strength, &max)) != AI_SUCCESS)
 		strength = defaultMaterial.shininess;
 
 	meshMaterial.shininess = shininess * strength;
@@ -396,9 +372,8 @@ void Mesh::loadTextures(TextureSet& textureSet, const aiMaterial* material)
 	textureSet.normalMap = loadTexture(aiTextureType_NORMALS, material);
 	// Normal map strength
 	float normalStrength;
-	if (aiGetMaterialFloat(material,
-	                       AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0),
-	                       &normalStrength) != AI_SUCCESS)
+	if (aiGetMaterialFloat(material, AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), &normalStrength) !=
+	    AI_SUCCESS)
 	{
 		normalStrength = textureSet.normalStrength;
 	}
@@ -407,16 +382,14 @@ void Mesh::loadTextures(TextureSet& textureSet, const aiMaterial* material)
 	// Specular or roughness
 	textureSet.specularMap = loadTexture(aiTextureType_SPECULAR, material);
 	if (!textureSet.specularMap)
-		textureSet.specularMap =
-		    loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, material);
+		textureSet.specularMap = loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, material);
 
 	// Ambient occlusion
 	textureSet.aoMap = loadTexture(aiTextureType_LIGHTMAP, material);
 	// Ambient occlusion strength
 	float occlusionStrength;
-	if (aiGetMaterialFloat(
-	        material, AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0),
-	        &occlusionStrength) != AI_SUCCESS)
+	if (aiGetMaterialFloat(material, AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), &occlusionStrength) !=
+	    AI_SUCCESS)
 	{
 		occlusionStrength = textureSet.aoStrength;
 	}
@@ -533,16 +506,12 @@ void Mesh::renderMeshPart(const MeshPart& meshPart) const
 		switch (m_primitiveType)
 		{
 		case LINES:
-			glDrawElementsBaseVertex(
-			    GL_LINES, meshPart.nIndices, GL_UNSIGNED_INT,
-			    (void*)(meshPart.startIndex * sizeof(unsigned int)),
-			    meshPart.baseVertex);
+			glDrawElementsBaseVertex(GL_LINES, meshPart.nIndices, GL_UNSIGNED_INT,
+			                         (void*)(meshPart.startIndex * sizeof(unsigned int)), meshPart.baseVertex);
 			break;
 		case TRIANGLES:
-			glDrawElementsBaseVertex(
-			    GL_TRIANGLES, meshPart.nIndices, GL_UNSIGNED_INT,
-			    (void*)(meshPart.startIndex * sizeof(unsigned int)),
-			    meshPart.baseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, meshPart.nIndices, GL_UNSIGNED_INT,
+			                         (void*)(meshPart.startIndex * sizeof(unsigned int)), meshPart.baseVertex);
 			break;
 		default:
 			throw std::invalid_argument("Mesh: Invalid mesh primitive type!");

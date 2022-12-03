@@ -35,14 +35,14 @@ Viewport::~Viewport() = default;
 
 void Viewport::init()
 {
-	m_phongShader = std::make_unique<PhongShader>(RM::instance().shader(
-	    "Data/Shaders/phongVert.glsl", "Data/Shaders/phongFrag.glsl"));
-	m_colorShader = std::make_unique<ColorShader>(RM::instance().shader(
-	    "Data/Shaders/colorVert.glsl", "Data/Shaders/colorFrag.glsl"));
-	m_gridShader = std::make_unique<GridShader>(RM::instance().shader(
-	    "Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl"));
-	m_frustumShader = std::make_unique<FrustumShader>(RM::instance().shader(
-	    "Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl"));
+	m_phongShader = std::make_unique<PhongShader>(
+	    RM::instance().shader("Data/Shaders/phongVert.glsl", "Data/Shaders/phongFrag.glsl"));
+	m_colorShader = std::make_unique<ColorShader>(
+	    RM::instance().shader("Data/Shaders/colorVert.glsl", "Data/Shaders/colorFrag.glsl"));
+	m_gridShader =
+	    std::make_unique<GridShader>(RM::instance().shader("Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl"));
+	m_frustumShader = std::make_unique<FrustumShader>(
+	    RM::instance().shader("Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl"));
 
 	Log::info("Phong shader size: {}", sizeof(*m_phongShader.get()));
 
@@ -58,21 +58,18 @@ void Viewport::init()
 
 void Viewport::draw(int width, int height) { m_mainScene->draw(width, height); }
 
-void Viewport::draw(glm::mat4 view, glm::mat4 projection,
-                    const DisplayOptions& displayOptions)
+void Viewport::draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions)
 {
 	m_mainScene->draw(view, projection, displayOptions);
 }
 
-void Viewport::drawPreview(std::weak_ptr<GameObject> gameObject, int width,
-                           int height)
+void Viewport::drawPreview(std::weak_ptr<GameObject> gameObject, int width, int height)
 {
 	if (auto gameObjectPtr = gameObject.lock())
 	{
 		// Set camera distance
-		float radius = glm::distance(gameObjectPtr->m_mesh->m_boundingBoxMin,
-		                             gameObjectPtr->m_mesh->m_boundingBoxMax) /
-		               2.0f;
+		float radius =
+		    glm::distance(gameObjectPtr->m_mesh->m_boundingBoxMin, gameObjectPtr->m_mesh->m_boundingBoxMax) / 2.0f;
 		m_previewScene->m_camera->setRadius(radius * PREVIEW_RADIUS_FACTOR);
 
 		// Make object visible
@@ -103,8 +100,7 @@ void Viewport::update()
 
 	m_mainScene->update();
 
-	m_previewScene->m_camera->setRotationX(
-	    m_previewScene->m_camera->getRotationX() + PREVIEW_ROTATE_SPEED * dt);
+	m_previewScene->m_camera->setRotationX(m_previewScene->m_camera->getRotationX() + PREVIEW_ROTATE_SPEED * dt);
 }
 
 void Viewport::processInput() { m_mainScene->processInput(); }

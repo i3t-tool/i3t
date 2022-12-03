@@ -40,7 +40,6 @@ protected:
 	 * before binding new set of textures.
 	 */
 	void clearTextures() const;
-	void bindTexture(GLuint textureID, const std::string& type, int typeIndex,
-	                 GLuint textureUnit);
+	void bindTexture(GLuint textureID, const std::string& type, int typeIndex, GLuint textureUnit);
 };
 } // namespace Vp

@@ -5,8 +5,7 @@ class TutorialLoader
 {
 public:
 	static std::shared_ptr<TutorialHeader> loadTutorialHeader(std::string& path);
-	static std::shared_ptr<Tutorial>
-	loadTutorial(std::shared_ptr<TutorialHeader> header);
+	static std::shared_ptr<Tutorial> loadTutorial(std::shared_ptr<TutorialHeader> header);
 	/**
 	 * @brief simple wrapper that tries to load an image
 	 * @param path whole path to the image
@@ -82,22 +81,16 @@ private:
 	 * @return a reference to the shared_ptr of the newly created explanation
 	 * element
 	 */
-	static std::shared_ptr<TutorialElement>&
-	createExplanation(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>&
-	createTask(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>&
-	createHint(TStep& step, const std::string& string);
-	static std::shared_ptr<TutorialElement>&
-	createChoice(TStep& step, const std::string& question,
-	             const std::vector<std::string>& choices, int correctChoice);
-	static std::shared_ptr<TutorialElement>&
-	createMultichoice(TStep& step, const std::string& question,
-	                  std::vector<std::string>& choices,
-	                  const std::vector<int>& correctChoices);
-	static std::shared_ptr<TutorialElement>&
-	createInput(TStep& step, const std::string& question,
-	            const std::unordered_set<std::string>& correctAnswers);
+	static std::shared_ptr<TutorialElement>& createExplanation(TStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createTask(TStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createHint(TStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createChoice(TStep& step, const std::string& question,
+	                                                      const std::vector<std::string>& choices, int correctChoice);
+	static std::shared_ptr<TutorialElement>& createMultichoice(TStep& step, const std::string& question,
+	                                                           std::vector<std::string>& choices,
+	                                                           const std::vector<int>& correctChoices);
+	static std::shared_ptr<TutorialElement>& createInput(TStep& step, const std::string& question,
+	                                                     const std::unordered_set<std::string>& correctAnswers);
 	static void addScript(TStep& step, const std::string& script);
 	// todo possibly make this a templated function
 	// todo maybe accept strings as rvalue references and move it

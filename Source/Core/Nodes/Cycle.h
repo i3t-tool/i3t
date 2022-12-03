@@ -42,8 +42,7 @@ private:
 	float m_from = 0.0f;
 	float m_to = 10.0f;
 	float m_manualStep = 0.1f; //< step after pressing of Prev or Next button
-	float m_multiplier =
-	    0.1f; //< current step for one tick + sign represents the step direction
+	float m_multiplier = 0.1f; //< current step for one tick + sign represents the step direction
 
 	float m_directionMultiplier = 1.0f; //< reverse the increment if (from > to)
 	                                    // and flip in the PingPong mode
@@ -104,16 +103,12 @@ public:
 	 */
 	void setManualStep(float v);
 
-	void
-	updateValues(int inputIndex) override; //< update inner state from connected
-	                                       // inputs (values and pulse inputs)
+	void updateValues(int inputIndex) override; //< update inner state from connected
+	                                            // inputs (values and pulse inputs)
 
 private:
 	void updateValue(float increment);
 };
 
-FORCE_INLINE bool isCycle(const NodePtr& node)
-{
-	return node->getOperation()->keyWord == g_CycleProperties.keyWord;
-}
+FORCE_INLINE bool isCycle(const NodePtr& node) { return node->getOperation()->keyWord == g_CycleProperties.keyWord; }
 } // namespace Core

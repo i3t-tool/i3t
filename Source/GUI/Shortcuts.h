@@ -14,10 +14,7 @@ inline void Text(const char* text, ImFont* font)
 	ImGui::PopFont();
 }
 
-inline void Text(const char* text, EFont font)
-{
-	Text(text, I3T::getFont(font));
-}
+inline void Text(const char* text, EFont font) { Text(text, I3T::getFont(font)); }
 
 inline bool Button(const char* id, bool disabled = false)
 {

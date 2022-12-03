@@ -21,8 +21,7 @@
 
 using namespace UI;
 
-ViewportWindow::ViewportWindow(bool show, World* world2, Vp::Viewport* viewport)
-    : IWindow(show)
+ViewportWindow::ViewportWindow(bool show, World* world2, Vp::Viewport* viewport) : IWindow(show)
 {
 	m_world = world2;
 	m_viewport = viewport;
@@ -49,10 +48,8 @@ ViewportWindow::ViewportWindow(bool show, World* world2, Vp::Viewport* viewport)
 	InputManager::setInputAxis("move", 1.0f, Keys::o);
 	InputManager::setInputAxis("move", -1.0f, Keys::p);
 
-	Input.bindAction("fire", EKeyState::Pressed,
-	                 []() { Log::info("Action fired."); });
-	Input.bindAction("fire", EKeyState::Released,
-	                 []() { Log::info("Action released."); });
+	Input.bindAction("fire", EKeyState::Pressed, []() { Log::info("Action fired."); });
+	Input.bindAction("fire", EKeyState::Released, []() { Log::info("Action released."); });
 	Input.bindAxis("move", [](float val) { Log::info("move: {}", val); });
 	/// todoend
 }
@@ -104,8 +101,7 @@ void ViewportWindow::render()
 		// stuff for it)
 
 		m_framebuffer->start(width, height);
-		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y,
-		             Config::BACKGROUND_COLOR.z, 1.0f);
+		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		if (InputManager::isFocused<UI::ViewportWindow>())
@@ -121,10 +117,9 @@ void ViewportWindow::render()
 
 		CHECK_GL_ERROR();
 
-		ImGui::GetWindowDrawList()->AddImage(
-		    (void*)(intptr_t)m_framebuffer->getColorTexture(), m_wcMin, m_wcMax,
-		    ImVec2(0, 1),
-		    ImVec2(1, 0)); // the uv coordinates flips the picture, since it was
+		ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)m_framebuffer->getColorTexture(), m_wcMin, m_wcMax,
+		                                     ImVec2(0, 1),
+		                                     ImVec2(1, 0)); // the uv coordinates flips the picture, since it was
 		// upside down at first
 
 		ImGui::End();
@@ -179,13 +174,10 @@ void ViewportWindow::showViewportsMenu()
 			// App::get().world()->scene->setCamToCenter();
 		}
 		ImGui::Separator();
-		const char* action = w->getCameraControl()->m_rotateAroundCenter
-		                         ? "Orbit eye"
-		                         : "Orbit center";
+		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
 		if (ImGui::MenuItem(action))
 		{
-			w->getCameraControl()->m_rotateAroundCenter =
-			    !w->getCameraControl()->m_rotateAroundCenter;
+			w->getCameraControl()->m_rotateAroundCenter = !w->getCameraControl()->m_rotateAroundCenter;
 			// Num 0
 			// App::get().world()->scene->setCamToCenter();
 		}

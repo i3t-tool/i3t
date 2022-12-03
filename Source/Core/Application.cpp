@@ -35,7 +35,7 @@ void Application::init()
 
 	m_isPaused = false;
 
-	//m_modules.push_back(new UIModule());
+	// m_modules.push_back(new UIModule());
 	createModule<ResourceManager>();
 	createModule<UIModule>();
 	createModule<StateManager>();
@@ -46,28 +46,30 @@ void Application::init()
 
 	//
 
-	BeforeNewProjectCommand::addListener(
-	    [this]() { getUI()->showUniqueWindow<BeforeNewModal>(); });
+	BeforeNewProjectCommand::addListener([this]() { getUI()->showUniqueWindow<BeforeNewModal>(); });
 	NewProjectCommand::addListener([]() { App::getModule<StateManager>().clear(); });
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
 
-	ConsoleCommand::addListener([this](std::string c)
-	                            { m_scriptInterpreter->runCommand(c); });
+	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
 
 	//
 
 	InputManager::init();
 
-	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
-		Log::info("undo triggered");
-		App::getModule<StateManager>().undo();
-	});
-	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
-		Log::info("redo triggered");
-		App::getModule<StateManager>().redo();
-	});
+	InputManager::bindGlobalAction("undo", EKeyState::Pressed,
+	                               [&]()
+	                               {
+		                               Log::info("undo triggered");
+		                               App::getModule<StateManager>().undo();
+	                               });
+	InputManager::bindGlobalAction("redo", EKeyState::Pressed,
+	                               [&]()
+	                               {
+		                               Log::info("redo triggered");
+		                               App::getModule<StateManager>().redo();
+	                               });
 
 	App::getModule<StateManager>().setOriginator(this);
 }
@@ -84,10 +86,9 @@ void Application::initModules()
 
 //===----------------------------------------------------------------------===//
 
-static const std::string DIE_SEND_MAIL =
-    "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
-    "snapshot of the program messages "
-    "as they appear in the program console.\n";
+static const std::string DIE_SEND_MAIL = "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
+                                         "snapshot of the program messages "
+                                         "as they appear in the program console.\n";
 
 static const std::string DIE_TEXT_OPENGL_VERSION =
     "The I3T tool did not start. \n\n"
@@ -116,10 +117,7 @@ GLFWwindow* Application::mainWindow() { return m_window->get(); }
 
 const std::string& Application::getTitle() { return m_window->getTitle(); }
 
-void Application::setTitle(const std::string& title)
-{
-	m_window->setTitle(title.c_str());
-}
+void Application::setTitle(const std::string& title) { m_window->setTitle(title.c_str()); }
 
 //===----------------------------------------------------------------------===//
 
@@ -247,26 +245,17 @@ void Application::onStateChange()
 
 Application& Application::get() { return *s_instance; }
 
-UIModule* Application::getUI()
-{
-	return &getModule<UIModule>();
-}
+UIModule* Application::getUI() { return &getModule<UIModule>(); }
 
 World* Application::world() { return m_world; }
 
 Vp::Viewport* Application::viewport() { return m_viewport; }
 
-void Application::onBeforeClose()
-{
-	getUI()->showUniqueWindow<BeforeCloseModal>();
-}
+void Application::onBeforeClose() { getUI()->showUniqueWindow<BeforeCloseModal>(); }
 
 void Application::onClose() { m_bShouldClose = true; }
 
-void Application::enqueueCommand(ICommand* command)
-{
-	m_commands.push_back(command);
-}
+void Application::enqueueCommand(ICommand* command) { m_commands.push_back(command); }
 
 // Statics
 Application* Application::s_instance = nullptr;

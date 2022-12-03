@@ -10,8 +10,7 @@
 
 #define IM_MOUSE_KEYS_COUNT 3
 
-constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight,
-                                         Keys::mouseMiddle};
+constexpr Keys::Code imGuiMouseKeys[] = {Keys::mouseLeft, Keys::mouseRight, Keys::mouseMiddle};
 
 ImGuiConfigFlags g_mousedFlags;
 
@@ -19,8 +18,7 @@ InputController InputManager::s_globalInputController;
 
 void InputManager::init() { InputBindings::init(); }
 
-void InputManager::bindGlobalAction(const char* action, EKeyState state,
-                                    KeyCallback fn)
+void InputManager::bindGlobalAction(const char* action, EKeyState state, KeyCallback fn)
 {
 	s_globalInputController.bindAction(action, state, fn);
 }
@@ -33,8 +31,7 @@ void InputManager::triggerAction(const char* action, EKeyState state)
 		s_activeInput->triggerAction(action, state);
 }
 
-void InputManager::setInputAction(const char* name, Keys::Code code,
-                                  ModifiersList mods)
+void InputManager::setInputAction(const char* name, Keys::Code code, ModifiersList mods)
 {
 	if (!InputBindings::isActionCreated(name))
 	{
@@ -43,15 +40,13 @@ void InputManager::setInputAction(const char* name, Keys::Code code,
 	InputBindings::m_inputActions[name].push_back({code, createModifiers(mods)});
 }
 
-void InputManager::setInputAxis(const char* action, float scale,
-                                Keys::Code code, ModifiersList mods)
+void InputManager::setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods)
 {
 	if (!InputBindings::isAxisCreated(action))
 	{
 		InputBindings::m_inputAxis.insert({action, {}});
 	}
-	InputBindings::m_inputAxis[action].push_back(
-	    {code, scale, createModifiers(mods)});
+	InputBindings::m_inputAxis[action].push_back({code, scale, createModifiers(mods)});
 }
 
 bool InputManager::areModifiersActive(Modifiers mods)
@@ -87,16 +82,14 @@ bool InputManager::isActionTriggered(const char* name, EKeyState state)
 	{
 		for (auto action : keys)
 		{
-			result |=
-			    isKeyJustUp(action.code) && areModifiersActive(action.modifiers);
+			result |= isKeyJustUp(action.code) && areModifiersActive(action.modifiers);
 		}
 	}
 	if (state == EKeyState::Pressed)
 	{
 		for (auto action : keys)
 		{
-			result |=
-			    isKeyJustPressed(action.code) && areModifiersActive(action.modifiers);
+			result |= isKeyJustPressed(action.code) && areModifiersActive(action.modifiers);
 		}
 	}
 
@@ -179,15 +172,13 @@ void InputManager::processViewportEvents()
 	{
 		if (ImGui::IsMouseClicked(i))
 		{
-			LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]),
-			                      std::to_string(m_mouseX), std::to_string(m_mouseY));
+			LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX), std::to_string(m_mouseY));
 			setPressed(imGuiMouseKeys[i]);
 		}
 
 		if (ImGui::IsMouseReleased(i))
 		{
-			LOG_EVENT_MOUSE_RELEASE(Keys::getKeyString(imGuiMouseKeys[i]),
-			                        std::to_string(m_mouseX),
+			LOG_EVENT_MOUSE_RELEASE(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX),
 			                        std::to_string(m_mouseY));
 			setUnpressed(imGuiMouseKeys[i]);
 		}
@@ -206,8 +197,7 @@ void InputManager::beginCameraControl()
 	// hovered state.
 	auto& io = ImGui::GetIO();
 	g_mousedFlags = io.ConfigFlags; // Store current IO configuration flags.
-	io.ConfigFlags |=
-	    ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
+	io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoMouseCursorChange;
 }
 
 void InputManager::endCameraControl()
@@ -235,10 +225,8 @@ void InputManager::processEvents(InputController& controller)
 		for (const auto& [key, mods] : keys)
 		{
 			// Check if key is in desired state.
-			bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN &&
-			                          state == EKeyState::Pressed ||
-			                      m_keyMap[key] == KeyState::JUST_UP &&
-			                          state == EKeyState::Released) &&
+			bool shouldProcess = (m_keyMap[key] == KeyState::JUST_DOWN && state == EKeyState::Pressed ||
+			                      m_keyMap[key] == KeyState::JUST_UP && state == EKeyState::Released) &&
 			                     areModifiersActive(mods);
 
 			if (shouldProcess)
@@ -251,9 +239,8 @@ void InputManager::processEvents(InputController& controller)
 		auto keys = InputBindings::m_inputAxis[action];
 		for (const auto& [key, scale, mods] : keys)
 		{
-			bool shouldProcess = (m_keyMap[key] == KeyState::DOWN ||
-			                      m_keyMap[key] == KeyState::JUST_DOWN) &&
-			                     areModifiersActive(mods);
+			bool shouldProcess =
+			    (m_keyMap[key] == KeyState::DOWN || m_keyMap[key] == KeyState::JUST_DOWN) && areModifiersActive(mods);
 
 			if (shouldProcess)
 			{
@@ -296,8 +283,7 @@ void InputManager::update()
 		processEvents(*s_activeInput);
 
 	// Process keys.
-	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin();
-	     it != m_keyMap.end(); ++it)
+	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
 		if (it->second == JUST_UP)
 		{
@@ -748,8 +734,7 @@ void InputManager::keyUp(int keyReleased)
 GLFWwindow* InputManager::getCurrentViewport()
 {
 	ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-	ImGuiContext* g =
-	    ImGui::GetCurrentContext(); // Get current/last moused viewport.
+	ImGuiContext* g = ImGui::GetCurrentContext(); // Get current/last moused viewport.
 
 	GLFWwindow* window = nullptr;
 	for (int n = 0; n < platformIO.Viewports.Size; n++)

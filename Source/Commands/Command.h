@@ -43,10 +43,7 @@ public:
 	 *
 	 * \todo Check how std::bind handle `this` reference.
 	 */
-	static void addListener(Callback function)
-	{
-		s_listeners.push_back(function);
-	};
+	static void addListener(Callback function) { s_listeners.push_back(function); };
 
 	/**
 	 * Call all callbacks.

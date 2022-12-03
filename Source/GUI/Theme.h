@@ -258,8 +258,7 @@ private:
 
 public:
 	Theme() = default;
-	Theme(std::string name, const Colors& colors, const Sizes& sizes,
-	      const SizesVec& sizesVec);
+	Theme(std::string name, const Colors& colors, const Sizes& sizes, const SizesVec& sizesVec);
 
 	static Theme createDefaultClassic();
 	static Theme createDefaultModern();
@@ -305,8 +304,7 @@ public:
 
 	const ImVec2& get(ESizeVec2 sizeVec)
 	{
-		Debug::Assert(m_sizesVec2.contains(sizeVec),
-		              "This size is not present in the map.");
+		Debug::Assert(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
 		return m_sizesVec2[sizeVec];
 	}
 
@@ -318,17 +316,10 @@ public:
 
 	const std::string& getName() const { return m_name; }
 
-	void set(EColor color, ImVec4 value)
-	{
-		m_colors.insert(std::pair(color, value));
-	}
+	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
 
-	[[nodiscard]] const Colors& getColors() const {
-		return m_colors;
-	} Colors& getColorsRef()
-	{
-		return m_colors;
-	}
+	[[nodiscard]] const Colors& getColors() const { return m_colors; }
+	Colors& getColorsRef() { return m_colors; }
 	void setColors(const Colors& colors) { m_colors = colors; }
 
 	Sizes& getSizesRef() { return m_sizes; }
@@ -346,8 +337,7 @@ public:
 
 private:
 	template <typename E, typename T>
-	void copyProperties(std::unordered_map<E, T>& target,
-	                    const std::unordered_map<E, T>& source)
+	void copyProperties(std::unordered_map<E, T>& target, const std::unordered_map<E, T>& source)
 	{
 		for (const auto [key, val] : source)
 			target[key] = val;

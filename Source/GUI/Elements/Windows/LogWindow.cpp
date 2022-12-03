@@ -8,32 +8,28 @@
 LogWindow::LogWindow()
 {
 #ifdef I3T_DEBUG
-	Input.bindAction("MyTestAction", EKeyState::Pressed,
-	                 [] { Log::info("MyTestAction triggered!"); });
+	Input.bindAction("MyTestAction", EKeyState::Pressed, [] { Log::info("MyTestAction triggered!"); });
 
-	Input.bindAxis("MyTestAxis", [](float val) {
-		Log::info("MyTestAxis triggered: {}!", val);
-	});
+	Input.bindAxis("MyTestAxis", [](float val) { Log::info("MyTestAxis triggered: {}!", val); });
 
 	////
-	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
-		const auto isActionTriggered = InputManager::isActionTriggered(
-		    "createAndPlugConstructor", EKeyState::Released);
-		Log::info("InputManager::isActionTriggered("
-		          "\"createAndPlugConstructor\") = {}",
-		          isActionTriggered);
-	});
+	Input.bindAction("createAndPlugConstructor", EKeyState::Released,
+	                 []
+	                 {
+		                 const auto isActionTriggered =
+		                     InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
+		                 Log::info("InputManager::isActionTriggered("
+		                           "\"createAndPlugConstructor\") = {}",
+		                           isActionTriggered);
+	                 });
 	////
 
-	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
-		Log::info("bind: (mouse click + left ctrl) pressed");
-	});
+	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed,
+	                 [] { Log::info("bind: (mouse click + left ctrl) pressed"); });
 
-	Input.bindAction("scrollUp", EKeyState::Pressed,
-	                 []() { Log::info("scrollUp"); });
+	Input.bindAction("scrollUp", EKeyState::Pressed, []() { Log::info("scrollUp"); });
 
-	Input.bindAction("scrollDown", EKeyState::Pressed,
-	                 []() { Log::info("scrollDown"); });
+	Input.bindAction("scrollDown", EKeyState::Pressed, []() { Log::info("scrollDown"); });
 
 	Input.bindAxis("scroll", [](float val) { Log::info("scroll: {}", val); });
 #endif
@@ -80,8 +76,7 @@ void LogWindow::render()
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 		ImGui::SetScrollHereY(1.0f);
 
-	if (InputManager::isActionTriggered("createAndPlugConstructor",
-	                                    EKeyState::Released))
+	if (InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released))
 	{
 		Log::info("query: (mouse click + left ctrl) pressed");
 	}

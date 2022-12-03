@@ -4,8 +4,7 @@
 
 using namespace Vp;
 
-FrustumObject::FrustumObject(Core::Mesh* mesh, FrustumShader* shader)
-    : ColoredObject(mesh, shader)
+FrustumObject::FrustumObject(Core::Mesh* mesh, FrustumShader* shader) : ColoredObject(mesh, shader)
 {
 	m_backFaceCull = true;
 	setDisplayType(DisplayType::Frustum);
@@ -14,8 +13,7 @@ FrustumObject::FrustumObject(Core::Mesh* mesh, FrustumShader* shader)
 void FrustumObject::update(Scene& scene)
 {
 	ColoredObject::update(scene);
-	this->m_modelMatrix =
-	    glm::inverse(m_frustumViewMatrix); // TODO: Test if needed
+	this->m_modelMatrix = glm::inverse(m_frustumViewMatrix); // TODO: Test if needed
 }
 
 void FrustumObject::render(glm::mat4 view, glm::mat4 projection)

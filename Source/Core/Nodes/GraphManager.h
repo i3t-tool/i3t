@@ -38,15 +38,9 @@ public:
 	static void init();
 	static void destroy();
 
-	template <ENodeType T> static Ptr<NodeBase> createNode()
-	{
-		return Builder::createNode<T>();
-	}
+	template <ENodeType T> static Ptr<NodeBase> createNode() { return Builder::createNode<T>(); }
 
-	template <ETransformType T> static Ptr<Transformation> createTransform()
-	{
-		return Builder::createTransform<T>();
-	}
+	template <ETransformType T> static Ptr<Transformation> createTransform() { return Builder::createTransform<T>(); }
 
 	static CameraPtr createCamera();
 
@@ -78,8 +72,7 @@ public:
 	static ENodePlugResult isPlugCorrect(Pin& input, Pin& output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
-	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs,
-	                                          const Ptr<Core::NodeBase>& rhs);
+	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
 
 	/**
 	 * Connect given node output pin to this operator input pin.
@@ -105,17 +98,13 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
-	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode,
-	                                          const NodePtr& rightNode,
-	                                          unsigned parentOutputPinIndex,
-	                                          unsigned myInputPinIndex);
+	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
+	                                          unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 
-	[[nodiscard]] static ENodePlugResult
-	plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
-	                       unsigned nodeOutputIndex = 0);
-	[[nodiscard]] static ENodePlugResult
-	plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node,
-	                        unsigned nodeInputIndex = 0);
+	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
+	                                                            unsigned nodeOutputIndex = 0);
+	[[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node,
+	                                                             unsigned nodeInputIndex = 0);
 
 	/// Unplug all inputs and outputs.
 	static void unplugAll(const NodePtr& node);
@@ -153,8 +142,7 @@ public:
 	/**
 	 * \return All nodes plugged into node input pin on given index.
 	 */
-	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node,
-	                                                 size_t index);
+	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
 
 	static const Operation* getOperation(const Pin* pin);
 	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
@@ -234,8 +222,7 @@ class MatrixTracker
 	SequencePtr m_beginSequence;
 
 public:
-	explicit MatrixTracker(const SequencePtr& beginSequence)
-	    : m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
+	explicit MatrixTracker(const SequencePtr& beginSequence) : m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
 	{
 	}
 
@@ -261,10 +248,7 @@ private:
 	void track();
 };
 
-inline CameraPtr GraphManager::createCamera()
-{
-	return Builder::createCamera();
-}
+inline CameraPtr GraphManager::createCamera() { return Builder::createCamera(); }
 
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {

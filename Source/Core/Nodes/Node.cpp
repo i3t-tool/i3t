@@ -7,15 +7,9 @@ using namespace Core;
 
 static IdGenerator generator;
 
-Node::PinView Node::PinView::begin() const
-{
-	return Node::PinView(strategy, node, 0);
-}
+Node::PinView Node::PinView::begin() const { return Node::PinView(strategy, node, 0); }
 
-Node::PinView Node::PinView::end() const
-{
-	return Node::PinView(strategy, node, size());
-}
+Node::PinView Node::PinView::end() const { return Node::PinView(strategy, node, size()); }
 
 size_t Node::PinView::size() const
 {
@@ -35,15 +29,9 @@ Node::PinView& Node::PinView::operator++()
 
 const Pin& Node::PinView::operator*() { return (*this)[index]; }
 
-bool Node::PinView::operator==(const PinView& view) const
-{
-	return index == view.index;
-}
+bool Node::PinView::operator==(const PinView& view) const { return index == view.index; }
 
-bool Node::PinView::operator!=(const PinView& view) const
-{
-	return !(*this == view);
-}
+bool Node::PinView::operator!=(const PinView& view) const { return !(*this == view); }
 
 Pin& Node::PinView::operator[](size_t i)
 {
@@ -131,10 +119,7 @@ void Node::changeId(ID newId)
 	m_id = newId;
 }
 
-EValueState Node::getState(size_t pinIndex)
-{
-	return m_OperatorState[pinIndex];
-}
+EValueState Node::getState(size_t pinIndex) { return m_OperatorState[pinIndex]; }
 
 void Node::pulse(size_t index)
 {
@@ -189,8 +174,7 @@ void Node::receiveSignal(int inputIndex)
 
 bool Node::areInputsPlugged(int numInputs)
 {
-	Debug::Assert(m_inputs.size() >= static_cast<size_t>(numInputs),
-	              "Input pins subscript is out of range!");
+	Debug::Assert(m_inputs.size() >= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
 
 	bool result = true;
 
@@ -202,10 +186,7 @@ bool Node::areInputsPlugged(int numInputs)
 	return result;
 }
 
-bool Node::areAllInputsPlugged()
-{
-	return areInputsPlugged(m_operation->numberOfInputs);
-}
+bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
 
 ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 {
@@ -316,9 +297,8 @@ void Node::unplugAll()
 
 void Node::unplugInput(size_t index)
 {
-	Debug::Assert(
-	    m_inputs.size() > static_cast<size_t>(index),
-	    "The node's input pin that you want to unplug does not exists.");
+	Debug::Assert(m_inputs.size() > static_cast<size_t>(index),
+	              "The node's input pin that you want to unplug does not exists.");
 
 	// auto* otherPin = m_inputs[index].m_input;
 	auto inputs = getInputPinsRef();
@@ -329,8 +309,7 @@ void Node::unplugInput(size_t index)
 		// Erase pointer to my input pin in connected node outputs.
 		auto& otherPinOutputs = otherPin->m_outputs;
 
-		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(),
-		                    &inputs[index]);
+		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &inputs[index]);
 		if (it != otherPinOutputs.end())
 		{
 			/// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
@@ -366,9 +345,8 @@ void Node::unplugInput(size_t index)
 
 void Node::unplugOutput(size_t index)
 {
-	Debug::Assert(
-	    m_outputs.size() > static_cast<size_t>(index),
-	    "The node's output pin that you want to unplug does not exists.");
+	Debug::Assert(m_outputs.size() > static_cast<size_t>(index),
+	              "The node's output pin that you want to unplug does not exists.");
 
 	// auto& pin = m_outputs[index];
 	auto& pin = getOut(index);
@@ -382,8 +360,7 @@ void Node::unplugOutput(size_t index)
 
 const Transform::DataMap* Node::getDataMap()
 {
-	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1,
-	                                                      1, 1, 1, 1, 1, 1, 1, 1};
+	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 	static Transform::DataMap map(mapData);
 
 	return &map;
@@ -391,8 +368,7 @@ const Transform::DataMap* Node::getDataMap()
 
 const Transform::DataMap& Node::getDataMapRef()
 {
-	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1,
-	                                                      1, 1, 1, 1, 1, 1, 1, 1};
+	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 	static Transform::DataMap map(mapData);
 
 	return map;
@@ -406,7 +382,4 @@ void Node::updateValues(int inputIndex)
 	}
 }
 
-void Node::addUpdateCallback(std::function<void()> callback)
-{
-	this->m_updateCallbacks.push_back(callback);
-}
+void Node::addUpdateCallback(std::function<void()> callback) { this->m_updateCallbacks.push_back(callback); }

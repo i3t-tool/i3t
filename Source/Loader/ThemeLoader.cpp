@@ -8,8 +8,7 @@
 #include "GUI/Theme.h"
 #include "Utils/Filesystem.h"
 
-template <typename T>
-std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
+template <typename T> std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 {
 	for (const auto& [key, val] : map)
 	{
@@ -125,13 +124,11 @@ std::optional<Theme> loadTheme(const fs::path& path)
 	if (yaml["colors"])
 	{
 		auto yamlColors = yaml["colors"];
-		for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end();
-		     ++it)
+		for (YAML::const_iterator it = yamlColors.begin(); it != yamlColors.end(); ++it)
 		{
 			auto node = it->second.as<YAML::Node>();
 
-			if (auto en =
-			        strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
+			if (auto en = strToEnum(Theme::getColorNames(), it->first.as<std::string>()))
 			{
 				colors[*en] = parseVec4(node);
 			}
@@ -140,11 +137,9 @@ std::optional<Theme> loadTheme(const fs::path& path)
 	if (yaml["sizes"])
 	{
 		auto yamlSizes = yaml["sizes"];
-		for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end();
-		     ++it)
+		for (YAML::const_iterator it = yamlSizes.begin(); it != yamlSizes.end(); ++it)
 		{
-			if (auto en =
-			        strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
+			if (auto en = strToEnum(Theme::getSizeNames(), it->first.as<std::string>()))
 			{
 				sizes[*en] = it->second.as<float>();
 			}
@@ -153,13 +148,11 @@ std::optional<Theme> loadTheme(const fs::path& path)
 	if (yaml["size vectors"])
 	{
 		auto yamlSizeVec = yaml["size vectors"];
-		for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end();
-		     ++it)
+		for (YAML::const_iterator it = yamlSizeVec.begin(); it != yamlSizeVec.end(); ++it)
 		{
 			auto node = it->second.as<YAML::Node>();
 
-			if (auto en =
-			        strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
+			if (auto en = strToEnum(Theme::getSizeVecNames(), it->first.as<std::string>()))
 			{
 				sizesVec[*en] = parseVec2(node);
 			}

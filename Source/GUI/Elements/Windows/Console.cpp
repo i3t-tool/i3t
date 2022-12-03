@@ -47,8 +47,7 @@ void Console::render()
 	ImGui::Begin(getName("Console").c_str(), getShowPtr());
 
 	// Reserve enough left-over height for 1 separator + 1 input text
-	const float footerHeightToReserve =
-	    ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
 	ImGui::BeginChild("Output", ImVec2{0, -footerHeightToReserve});
 
 	std::stringstream& m_buffer = m_stdoutCapture.GetBuffer();
@@ -63,9 +62,7 @@ void Console::render()
 
 	ImGui::Separator();
 
-	const ImGuiInputTextFlags inputTextFlags =
-	    ImGuiInputTextFlags_EnterReturnsTrue |
-	    ImGuiInputTextFlags_CallbackHistory;
+	const ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 	// ImGuiInputTextCallback in=[this]{return this->h();};
 
 	if (ImGui::InputText("Input", command, 1024, inputTextFlags, &history))

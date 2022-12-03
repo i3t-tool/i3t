@@ -7,8 +7,7 @@ namespace Core
 static IdGenerator generator;
 
 Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index)
-    : m_valueType(valueType), m_isInput(isInput), m_master(owner.get()),
-      m_index(index)
+    : m_valueType(valueType), m_isInput(isInput), m_master(owner.get()), m_index(index)
 {
 	m_id = generator.next();
 }
@@ -68,8 +67,7 @@ const char* Pin::getLabel() const
 
 std::string Pin::getSig()
 {
-	return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType),
-	                   getOwner()->getSig(), m_index);
+	return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
 }
 
 void Pin::destroy() { generator.returnId(m_id); }

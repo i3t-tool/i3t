@@ -8,12 +8,10 @@ glm::vec2 world2screen(glm::vec3 pos)
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 
-	glm::vec4 pos1 =
-	    World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
+	glm::vec4 pos1 = World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
-	glm::vec2 spos1 =
-	    glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],
-	              (pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
+	glm::vec2 spos1 = glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],
+	                            (pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 	return spos1;
 }
 glm::vec2 vecWorldscreen(glm::vec3 pos, glm::vec3 dir)
@@ -21,26 +19,21 @@ glm::vec2 vecWorldscreen(glm::vec3 pos, glm::vec3 dir)
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 
-	glm::vec4 pos1 =
-	    World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
+	glm::vec4 pos1 = World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
-	glm::vec2 spos1 =
-	    glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],
-	              (pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
+	glm::vec2 spos1 = glm::vec2((pos1[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],
+	                            (pos1[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 
-	glm::vec4 pos2 =
-	    World::perspective * World::mainCamera * glm::vec4(pos + dir, 1.0f);
+	glm::vec4 pos2 = World::perspective * World::mainCamera * glm::vec4(pos + dir, 1.0f);
 	pos2 /= pos2[3];
-	glm::vec2 spos2 =
-	    glm::vec2((pos2[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],
-	              (pos2[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
+	glm::vec2 spos2 = glm::vec2((pos2[0] + 1.0f) * 0.5f * viewport[2] + viewport[0],
+	                            (pos2[1] + 1.0f) * 0.5f * viewport[3] + viewport[1]);
 
 	return spos2 - spos1;
 }
 glm::vec3 world2viewport(glm::vec3 pos)
 {
-	glm::vec4 pos1 =
-	    World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
+	glm::vec4 pos1 = World::perspective * World::mainCamera * glm::vec4(pos, 1.0f);
 	pos1 /= pos1[3];
 	return (glm::vec3)pos1;
 }
@@ -58,9 +51,8 @@ glm::vec3 mouseray(glm::vec2 pos)
 	float viewport[4];
 	glGetFloatv(GL_VIEWPORT, viewport);
 	glm::mat4 inv = glm::inverse(World::perspective * World::mainCamera);
-	glm::vec4 mouse = glm::vec4(
-	    (pos[0] - viewport[0]) / (viewport[2] * 0.5f) - 1.0f,
-	    (pos[1] - viewport[1]) / (viewport[3] * 0.5f) - 1.0f, 0.7f, 1.0f);
+	glm::vec4 mouse = glm::vec4((pos[0] - viewport[0]) / (viewport[2] * 0.5f) - 1.0f,
+	                            (pos[1] - viewport[1]) / (viewport[3] * 0.5f) - 1.0f, 0.7f, 1.0f);
 
 	glm::vec4 world1 = inv * mouse;
 	mouse[2] = 0.9f;
@@ -74,10 +66,8 @@ glm::vec3 mouseray(glm::vec2 pos)
 glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis)
 {
 	float bias = 0.005f * 0.005f;
-	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3,
-	                  (referenceAxis + 2) % 3};
-	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]],
-	                     (glm::vec3)transform[mapaxis[1]],
+	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3, (referenceAxis + 2) % 3};
+	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]], (glm::vec3)transform[mapaxis[1]],
 	                     (glm::vec3)transform[mapaxis[2]]};
 
 	if (glm::length2(axes[0]) < bias)
@@ -107,8 +97,7 @@ glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis)
 	axes[2] = glm::normalize(glm::cross(axes[0], axes[1]));
 
 	glm::mat4 ortho = glm::mat4(1.0f);
-	*((glm::vec3*)(&ortho[mapaxis[0]])) =
-	    axes[0] * glm::length((glm::vec3)transform[mapaxis[0]]);
+	*((glm::vec3*)(&ortho[mapaxis[0]])) = axes[0] * glm::length((glm::vec3)transform[mapaxis[0]]);
 	*((glm::vec3*)(&ortho[mapaxis[1]])) = axes[1];
 	*((glm::vec3*)(&ortho[mapaxis[2]])) = axes[2];
 	*((glm::vec3*)(&ortho[3])) = transform[3];
@@ -117,8 +106,7 @@ glm::mat4 getOrtho(glm::mat4 transform, int referenceAxis)
 glm::mat4 getNormalized(glm::mat4 transform)
 {
 	float bias = 0.005f;
-	glm::vec3 lens = glm::vec3(glm::length((glm::vec3)transform[0]),
-	                           glm::length((glm::vec3)transform[1]),
+	glm::vec3 lens = glm::vec3(glm::length((glm::vec3)transform[0]), glm::length((glm::vec3)transform[1]),
 	                           glm::length((glm::vec3)transform[2]));
 	if (lens[0] < bias)
 	{
@@ -147,10 +135,8 @@ glm::mat4 getNormalized(glm::mat4 transform)
 glm::mat4 getRotation(glm::mat4 transform, int referenceAxis)
 {
 	float bias = 0.005f * 0.005f;
-	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3,
-	                  (referenceAxis + 2) % 3};
-	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]],
-	                     (glm::vec3)transform[mapaxis[1]],
+	int mapaxis[3] = {referenceAxis, (referenceAxis + 1) % 3, (referenceAxis + 2) % 3};
+	glm::vec3 axes[3] = {(glm::vec3)transform[mapaxis[0]], (glm::vec3)transform[mapaxis[1]],
 	                     (glm::vec3)transform[mapaxis[2]]};
 	if (glm::length2(axes[0]) < bias)
 	{
@@ -185,8 +171,7 @@ glm::mat4 getRotation(glm::mat4 transform, int referenceAxis)
 }
 glm::vec3 getScale(glm::mat4 transform)
 {
-	return glm::vec3(glm::length((glm::vec3)transform[0]),
-	                 glm::length((glm::vec3)transform[1]),
+	return glm::vec3(glm::length((glm::vec3)transform[0]), glm::length((glm::vec3)transform[1]),
 	                 glm::length((glm::vec3)transform[2]));
 }
 glm::mat4 getFullTransform(GameObject* obj)
@@ -199,8 +184,7 @@ glm::mat4 getFullTransform(GameObject* obj)
 	}
 	return transform;
 }
-glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node,
-                           const Ptr<Core::Sequence>* parent, bool invLookAt)
+glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node, const Ptr<Core::Sequence>* parent, bool invLookAt)
 {
 	glm::mat4 m = glm::mat4(1.0f);
 	// return m;
@@ -234,8 +218,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node,
 		nodeindex = *it;
 		DataStore d = nodeindex->getData();
 		// printf("mul %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
-		if (strcmp(nodeindex->getOperation()->keyWord.c_str(), "LookAt") == 0 &&
-		    invLookAt)
+		if (strcmp(nodeindex->getOperation()->keyWord.c_str(), "LookAt") == 0 && invLookAt)
 		{
 			m = glm::inverse(d.getMat4()) * m;
 		}
@@ -250,9 +233,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node,
 glm::vec3 planeIntersect(glm::vec3 px, glm::vec3 py, glm::vec3 p0)
 {
 	glm::vec3 t0 = -World::mainCamPos;
-	glm::vec3 tz =
-	    mouseray(world2screen(p0) + glm::vec2(InputManager::m_mouseXDelta,
-	                                          -InputManager::m_mouseYDelta));
+	glm::vec3 tz = mouseray(world2screen(p0) + glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta));
 	glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 	return t0 + tz * coef[0];

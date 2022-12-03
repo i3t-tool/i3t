@@ -46,8 +46,8 @@ struct Config
 	static std::string SUPERVISOR_MAIL; ///< The supervisor's mail
 	static std::string WEB_LINK;        ///< The web link to the thesis page
 	static std::string OFFICIAL_SITE;   ///< The official site
-	static std::string INFO_TEXT; ///< The information text \todo Add year and
-	                              ///< note of the continual development.
+	static std::string INFO_TEXT;       ///< The information text \todo Add year and
+	                                    ///< note of the continual development.
 	static glm::vec3 LINK_COLOR;
 	///< The url link (mailTo: and http:) color used in aboutForm.h \todo Move to
 	///< the config structure
@@ -118,8 +118,7 @@ struct Config
 	 * \return	True if it succeeds to read the attribute value, false if it
 	 * fails.
 	 */
-	static bool getValue(std::istream& is, const std::string& input,
-	                     const std::string& attribName, float& val);
+	static bool getValue(std::istream& is, const std::string& input, const std::string& attribName, float& val);
 
 	/**
 	 * Read a bool of given name from the input stream
@@ -135,8 +134,7 @@ struct Config
 	 * fails.
 	 */
 
-	static bool getBool(std::istream& is, const std::string& input,
-	                    const std::string& attribName, bool& val);
+	static bool getBool(std::istream& is, const std::string& input, const std::string& attribName, bool& val);
 
 	/**
 	 * Read a word (string) of given name from the input stream
@@ -152,8 +150,7 @@ struct Config
 	 * fails.
 	 */
 
-	static bool getWord(std::istream& is, const std::string& input,
-	                    const std::string& attribName, std::string& val);
+	static bool getWord(std::istream& is, const std::string& input, const std::string& attribName, std::string& val);
 
 	/**
 	 * Read vector 2 of given name from the input stream
@@ -169,8 +166,7 @@ struct Config
 	 * fails.
 	 */
 
-	static bool getVec2(std::istream& is, const std::string& input,
-	                    const std::string& attribName, glm::vec2& val);
+	static bool getVec2(std::istream& is, const std::string& input, const std::string& attribName, glm::vec2& val);
 
 	/**
 	 * Read vector 3 of given name from the input stream
@@ -186,8 +182,7 @@ struct Config
 	 * fails.
 	 */
 
-	static bool getVec3(std::istream& is, const std::string& input,
-	                    const std::string& attribName, glm::vec3& val);
+	static bool getVec3(std::istream& is, const std::string& input, const std::string& attribName, glm::vec3& val);
 
 	/**
 	 * Read a vector 4 of given name from the input stream
@@ -203,8 +198,7 @@ struct Config
 	 * fails.
 	 */
 
-	static bool getVec4(std::istream& is, const std::string& input,
-	                    const std::string& attribName, glm::vec4& val);
+	static bool getVec4(std::istream& is, const std::string& input, const std::string& attribName, glm::vec4& val);
 
 	/**
 	 * Read a matrix 4 of given name from the input stream
@@ -220,8 +214,7 @@ struct Config
 	 * fails.
 	 */
 
-	static bool getMat4(std::istream& is, const std::string& input,
-	                    const std::string& attribName, glm::mat4& val);
+	static bool getMat4(std::istream& is, const std::string& input, const std::string& attribName, glm::mat4& val);
 
 	/**
 	 * Skip comments. This routine consumes either a single line comment (starting
@@ -302,15 +295,9 @@ struct Config
 		return path;
 	}
 
-	static std::string getAbsolutePath(const std::string& filename)
-	{
-		return getAbsolutePath(filename.c_str());
-	}
+	static std::string getAbsolutePath(const std::string& filename) { return getAbsolutePath(filename.c_str()); }
 
-	static std::string getAbsolutePath(fs::path filename)
-	{
-		return getAbsolutePath(filename.string());
-	}
+	static std::string getAbsolutePath(fs::path filename) { return getAbsolutePath(filename.string()); }
 
 	/**
 	 * Gets relative path

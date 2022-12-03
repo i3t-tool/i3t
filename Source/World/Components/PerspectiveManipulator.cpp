@@ -60,9 +60,8 @@ void PerspectiveManipulator::render(glm::mat4* parent, bool renderTransparent)
 	if (renderTransparent)
 	{
 		glUseProgram(World::shaderProj.program);
-		glUniformMatrix4fv(
-		    glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1,
-		    GL_FALSE, glm::value_ptr(projinv));
+		glUniformMatrix4fv(glGetUniformLocation(World::shaderProj.program, "P2Matrix"), 1, GL_FALSE,
+		                   glm::value_ptr(projinv));
 		glDisable(GL_CULL_FACE);
 		m_frustruml->draw(transform);
 		m_frustrum->draw(transform);
@@ -88,13 +87,11 @@ void PerspectiveManipulator::render(glm::mat4* parent, bool renderTransparent)
 				pos = ((pf - pn) * 0.5f + pn);
 			}
 
-			float depth =
-			    (World::perspective * World::mainCamera * transform * pos)[2];
+			float depth = (World::perspective * World::mainCamera * transform * pos)[2];
 			m_handle->transformation = glm::mat4(depth * 0.01f + 0.1f);
 			m_handle->transformation[3] = pos;
 
-			ManipulatorUtil::drawHandle(m_handle, transform, m_hposs[i] * m_hposs[i],
-			                            m_stencils.arr[i], m_activehandle,
+			ManipulatorUtil::drawHandle(m_handle, transform, m_hposs[i] * m_hposs[i], m_stencils.arr[i], m_activehandle,
 			                            m_hoverhandle); // hposs*hposs=absolute value
 		}
 
@@ -115,13 +112,11 @@ void PerspectiveManipulator::update()
 	{
 		return;
 	}
-	auto* editedpersp =
-	    (Core::TransformImpl<ETransformType::Perspective>*)m_editednode.get();
+	auto* editedpersp = (Core::TransformImpl<ETransformType::Perspective>*)m_editednode.get();
 	m_edited = m_editednode->getData().getMat4();
 
-	unsigned char sel = Select::getStencilAt(
-	    (int)InputManager::m_mouseX,
-	    (int)(World::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =
+	    Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 	m_hoverhandle = -1;
 
 	if (m_activehandle == -1)
@@ -201,10 +196,8 @@ void PerspectiveManipulator::update()
 
 	if (m_hposs[m_axisnum][2] == 0.0f)
 	{ // move side handles to middle - between far plane and near plane
-		glm::vec4 f =
-		    glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], 1.0f, 1.0f);
-		glm::vec4 n =
-		    glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], -1.0f, 1.0f);
+		glm::vec4 f = glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], 1.0f, 1.0f);
+		glm::vec4 n = glm::vec4(m_hposs[m_axisnum][0], m_hposs[m_axisnum][1], -1.0f, 1.0f);
 		glm::vec4 pn = (projinv * f) / (projinv * f)[3];
 		glm::vec4 pf = (projinv * n) / (projinv * n)[3];
 
@@ -217,14 +210,12 @@ void PerspectiveManipulator::update()
 	// glm::mat4 handlespace=glm::mat4(1.0f);
 	glm::mat4 handlespace = getNodeTransform(&m_editednode, &m_parent, true);
 
-	glm::vec2 spos1 = world2screen((glm::vec3)(
-	    handlespace[3] +
-	    handlespace * pos)); // position of transformated object on the screen
-	glm::vec2 spos2 = world2screen((glm::vec3)(
-	    handlespace[3] +
-	    handlespace * (pos + axis * axis))); // spos1,spos2 - project two points
-	                                         // on screen - project axis on screen
-	glm::vec2 dir = spos2 - spos1;           // the axis in screen space
+	glm::vec2 spos1 =
+	    world2screen((glm::vec3)(handlespace[3] + handlespace * pos)); // position of transformated object on the screen
+	glm::vec2 spos2 = world2screen(
+	    (glm::vec3)(handlespace[3] + handlespace * (pos + axis * axis))); // spos1,spos2 - project two points
+	                                                                      // on screen - project axis on screen
+	glm::vec2 dir = spos2 - spos1;                                        // the axis in screen space
 	if (glm::length(dir) < 0.01)
 	{
 		dir[0] = 1.0f;
@@ -233,10 +224,7 @@ void PerspectiveManipulator::update()
 	glm::mat2 mov = glm::mat2(dir, glm::vec2(dir[1], -dir[0]));
 	mov = glm::inverse(glm::mat2(glm::normalize(mov[0]), glm::normalize(mov[1])));
 
-	glm::vec2 dragfinal =
-	    mov *
-	    glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta) *
-	    0.05f;
+	glm::vec2 dragfinal = mov * glm::vec2(InputManager::m_mouseXDelta, -InputManager::m_mouseYDelta) * 0.05f;
 
 	if (m_activehandle == m_stencils.names.n)
 	{
@@ -249,16 +237,14 @@ void PerspectiveManipulator::update()
 		m_far -= dragfinal[0] * 2.0f;
 		// if(m_far<m_near+1.0f){m_far=m_near+1.0f;}
 	}
-	else if (m_activehandle == m_stencils.names.r ||
-	         m_activehandle == m_stencils.names.l)
+	else if (m_activehandle == m_stencils.names.r || m_activehandle == m_stencils.names.l)
 	{
 		float sign = (float)(m_activehandle == m_stencils.names.r) * 2.0f - 1.0f;
 		m_aspect += sign * dragfinal[0] * 0.12f;
 		// if(m_aspect<0.1f){m_aspect=0.1f;}
 		// else if(m_aspect>10.0f){m_aspect=10.0f;}
 	}
-	else if (m_activehandle == m_stencils.names.t ||
-	         m_activehandle == m_stencils.names.b)
+	else if (m_activehandle == m_stencils.names.t || m_activehandle == m_stencils.names.b)
 	{
 		float sign = (float)(m_activehandle == m_stencils.names.t) * 2.0f - 1.0f;
 
@@ -266,8 +252,7 @@ void PerspectiveManipulator::update()
 		// if(m_angle+amount<1.0f){amount=1.0f-m_angle;}
 		// else if(m_angle+amount>175.0f){amount=175.0f-m_angle;}
 
-		float f = tan(glm::radians((m_angle + amount) * 0.5f)) /
-		          tan(glm::radians(m_angle * 0.5f));
+		float f = tan(glm::radians((m_angle + amount) * 0.5f)) / tan(glm::radians(m_angle * 0.5f));
 
 		float f2 = 1.0f;
 		// if(m_aspect<0.1f*f){f2=10.0f*(m_aspect);}
@@ -276,8 +261,7 @@ void PerspectiveManipulator::update()
 		m_aspect /= f;
 		m_angle += amount;
 		// if(f2!=1.0f){
-		amount = glm::degrees(atan(f2 * tan(glm::radians(m_angle * 0.5f)))) * 2.0f -
-		         m_angle;
+		amount = glm::degrees(atan(f2 * tan(glm::radians(m_angle * 0.5f)))) * 2.0f - m_angle;
 		m_aspect /= f2;
 		m_angle += amount;
 		//}

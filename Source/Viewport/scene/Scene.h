@@ -48,8 +48,7 @@ public:
 	 * @param height
 	 */
 	virtual void draw(int width, int height);
-	virtual void draw(glm::mat4 view, glm::mat4 projection,
-	                  const DisplayOptions& displayOptions = DisplayOptions());
+	virtual void draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions = DisplayOptions());
 
 	/**
 	 * Update entity logic.
@@ -70,9 +69,7 @@ public:
 	 * destroyed afterwards.
 	 * @return A weak pointer to the added entity of said type.
 	 */
-	template <typename T,
-	          typename std::enable_if<std::is_base_of<Entity, T>::value,
-	                                  bool>::type = true>
+	template <typename T, typename std::enable_if<std::is_base_of<Entity, T>::value, bool>::type = true>
 	std::weak_ptr<T> addEntity(std::shared_ptr<T> entity)
 	{
 		m_entities.push_back(entity);
@@ -87,9 +84,7 @@ public:
 	 * @tparam T Any derived type of Entity
 	 * @param entity
 	 */
-	template <typename T,
-	          typename std::enable_if<std::is_base_of<Entity, T>::value,
-	                                  bool>::type = true>
+	template <typename T, typename std::enable_if<std::is_base_of<Entity, T>::value, bool>::type = true>
 	void removeEntity(std::weak_ptr<T> entity)
 	{
 		if (auto entityPtr = entity.lock())

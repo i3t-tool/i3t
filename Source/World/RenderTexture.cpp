@@ -59,14 +59,12 @@ RenderTexture::RenderTexture(GLuint* colorAttachment, int w, int h)
 
 	glGenTextures(1, &m_colorTexture);
 	glBindTexture(GL_TEXTURE_2D, m_colorTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-	             NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-	                       m_colorTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
 
 	glGenRenderbuffers(1, &m_depthStencilRbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilRbo);
@@ -74,8 +72,7 @@ RenderTexture::RenderTexture(GLuint* colorAttachment, int w, int h)
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	// attach it to currently bound framebuffer object
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-	                          GL_RENDERBUFFER, m_depthStencilRbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	checkFramebuffer();
@@ -103,18 +100,15 @@ void RenderTexture::resize(int newWidth, int newHeight)
 		// MAX_RATE)   // both directions
 		if (rateX > MAX_RATE || rateY > MAX_RATE) // only enlarge
 		{
-			printf("(%5.3i, %5.3i) -> (%5.3i, %5.3i)\n", m_width, m_height, newWidth,
-			       newHeight);
+			printf("(%5.3i, %5.3i) -> (%5.3i, %5.3i)\n", m_width, m_height, newWidth, newHeight);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
 			glBindTexture(GL_TEXTURE_2D, m_colorTexture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newWidth, newHeight, 0, GL_RGBA,
-			             GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newWidth, newHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 			glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilRbo);
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newWidth,
-			                      newHeight);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newWidth, newHeight);
 
 			glBindRenderbuffer(GL_RENDERBUFFER, 0);
 

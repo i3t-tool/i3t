@@ -48,8 +48,7 @@ extern class WorkspaceDiwne* g_workspaceDiwne;
 
 class WorkspaceDiwne : public DIWNE::Diwne
 {
-	friend void
-	WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
+	friend void WorkspaceSequence::moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> node);
 
 public:
 	WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne);
@@ -66,25 +65,14 @@ public:
 	bool afterEnd();
 	bool finalize();
 
-	WorkspaceDiwneAction m_workspaceDiwneAction,
-	    m_workspaceDiwneActionPreviousFrame;
-	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda)
-	{
-		m_workspaceDiwneAction = wda;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneAction()
-	{
-		return m_workspaceDiwneAction;
-	}
-	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame()
-	{
-		return m_workspaceDiwneActionPreviousFrame;
-	}
+	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
+	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda) { m_workspaceDiwneAction = wda; }
+	WorkspaceDiwneAction getWorkspaceDiwneAction() { return m_workspaceDiwneAction; }
+	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame() { return m_workspaceDiwneActionPreviousFrame; }
 	WorkspaceDiwneAction getWorkspaceDiwneActionActive() const
 	{
-		return m_workspaceDiwneAction == WorkspaceDiwneAction::None
-		           ? m_workspaceDiwneActionPreviousFrame
-		           : m_workspaceDiwneAction;
+		return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame
+		                                                            : m_workspaceDiwneAction;
 	}
 
 	/** * \brief All WorkspaceNodes
@@ -92,10 +80,7 @@ public:
 	 *Sequence)
 	 **/
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getAllNodes()
-	{
-		return m_workspaceCoreNodes;
-	};
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getAllNodes() { return m_workspaceCoreNodes; };
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
@@ -106,20 +91,16 @@ public:
 
 	template <typename T> void addTypeConstructorNode()
 	{
-		WorkspaceCoreInputPin* pin =
-		    getLastActivePin<WorkspaceCoreInputPin>().get();
-		auto newNode =
-		    addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
-		pin->plug(
-		    std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(newNode)
-		        ->getOutputs()
-		        .at(0)
-		        .get()); /* \todo JH \todo MH always 0 with type constructor? */
+		WorkspaceCoreInputPin* pin = getLastActivePin<WorkspaceCoreInputPin>().get();
+		auto newNode = addNodeToPosition<T>(pin->getLinkConnectionPointDiwne(), true);
+		pin->plug(std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(newNode)
+		              ->getOutputs()
+		              .at(0)
+		              .get()); /* \todo JH \todo MH always 0 with type constructor? */
 	}
 
 	template <class T>
-	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0),
-	                              bool shiftToLeftByNodeWidth = false)
+	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
 	{
 		auto node = std::make_shared<T>(*this);
 
@@ -129,14 +110,12 @@ public:
 		{
 			node->drawDiwne(); /* for obtain size */
 			node->translateNodePositionDiwne(
-			    ImVec2(-node->getNodeRectSizeDiwne().x -
-			               I3T::getSize(ESizeVec2::NewNode_positionShift).x,
+			    ImVec2(-node->getNodeRectSizeDiwne().x - I3T::getSize(ESizeVec2::NewNode_positionShift).x,
 			           I3T::getSize(ESizeVec2::NewNode_positionShift).y));
 		}
 
 		m_workspaceCoreNodes.push_back(node);
-		m_takeSnap =
-		    true; /* JH maybe better in place where this function is called*/
+		m_takeSnap = true; /* JH maybe better in place where this function is called*/
 
 		return node;
 	}
@@ -151,10 +130,8 @@ public:
 
 	void manipulatorStartCheck3D();
 
-	void shiftNodesToBegin(
-	    std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
-	void shiftNodesToEnd(
-	    std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
+	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
+	void shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
 	void shiftInteractingNodeToEnd();
 
 	void processDragAllSelectedNodes();
@@ -163,8 +140,7 @@ public:
 	void invertSelection();
 	void zoomToAll();
 	void zoomToSelected();
-	ImRect
-	getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
+	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
 	void zoomToRectangle(ImRect const& rect);
 
 	void trackingLeft();
@@ -238,8 +214,7 @@ private:
 /* >>>>> STATIC FUNCTIONS <<<<< */
 
 /// This function takes snapshot of current state.
-template <typename T>
-auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
+template <typename T> auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
 {
 	auto result = g_workspaceDiwne->addNodeToPosition<T>(position);
 
@@ -248,8 +223,7 @@ auto inline addNodeToNodeEditor(ImVec2 const position = ImVec2(0, 0))
 	return result;
 }
 
-template <typename T>
-auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
+template <typename T> auto inline addNodeToNodeEditorNoSave(ImVec2 const position = ImVec2(0, 0))
 {
 	return g_workspaceDiwne->addNodeToPosition<T>(position);
 }

@@ -15,7 +15,6 @@ public:
 	void init() override;
 
 	void draw(int width, int height) override;
-	void draw(glm::mat4 view, glm::mat4 projection,
-	          const DisplayOptions& displayOptions = DisplayOptions()) override;
+	void draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions = DisplayOptions()) override;
 };
 } // namespace Vp

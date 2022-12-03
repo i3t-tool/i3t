@@ -21,8 +21,7 @@ void CameraControl::update()
 {
 	/// \todo MH
 	// if (!InputManager::isFocused<UI::Viewport>())
-	if (!InputManager::isInputActive(
-	        I3T::getUI()->getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
+	if (!InputManager::isInputActive(I3T::getUI()->getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
 		return;
 
 	float x = InputManager::m_mouseXDelta / 8.0f;
@@ -31,8 +30,7 @@ void CameraControl::update()
 	// if (InputManager::isKeyPressed(Keys::mouseMiddle))
 	if (InputManager::isAxisActive("pan"))
 	{
-		glm::vec4 move = (getRotation(m_gameObject->transformation, 2) *
-		                      glm::vec4(x, 0.0f, 0.0f, 0.0f) +
+		glm::vec4 move = (getRotation(m_gameObject->transformation, 2) * glm::vec4(x, 0.0f, 0.0f, 0.0f) +
 		                  glm::vec4(0.0f, y, 0.0f, 0.0f)) *
 		                 0.25f;
 		if (InputManager::isKeyPressed(Keys::shiftr))
@@ -43,15 +41,12 @@ void CameraControl::update()
 	}
 	else if (InputManager::isAxisActive("rotate"))
 	{
-		glm::vec3 center = m_rotateAroundCenter
-		                       ? glm::vec3(0.0f)
-		                       : (glm::vec3)m_gameObject->transformation[3];
+		glm::vec3 center = m_rotateAroundCenter ? glm::vec3(0.0f) : (glm::vec3)m_gameObject->transformation[3];
 		// m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0],
 		// -y, (glm::vec3)m_gameObject->transformation[3]);
 		// m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x,
 		// 0.0f*(glm::vec3)m_gameObject->transformation[3]);
-		m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y,
-		                           center);
+		m_gameObject->rotateAround((glm::vec3)m_gameObject->transformation[0], -y, center);
 		m_gameObject->rotateAround(glm::vec3(0.0f, 1.0f, 0.0f), -x, center);
 	}
 
@@ -123,8 +118,7 @@ void CameraControl::setRotation(glm::vec3 dir, bool moveToCenter)
 {
 	m_alpha = 0.0f;
 	m_dir = dir;
-	m_dirbkp = (glm::vec3)(m_gameObject->transformation[3] -
-	                       m_gameObject->transformation[2]);
+	m_dirbkp = (glm::vec3)(m_gameObject->transformation[3] - m_gameObject->transformation[2]);
 	m_posbkp = (glm::vec3)m_gameObject->transformation[3];
 	m_moveToCenter = moveToCenter;
 }
@@ -136,15 +130,13 @@ void CameraControl::rotate()
 		m_alpha = 1.0f;
 	}
 
-	glm::vec3 dir =
-	    getFullTransform(m_gameObject->parent) * glm::vec4(m_dir, 0.0f);
+	glm::vec3 dir = getFullTransform(m_gameObject->parent) * glm::vec4(m_dir, 0.0f);
 	glm::vec3 mixe, mixc;
 
 	if (m_moveToCenter)
 	{
 		mixc = (1 - m_alpha) * m_dirbkp;
-		mixe = m_alpha * glm::normalize(-dir) * glm::length(m_posbkp) +
-		       (1 - m_alpha) * m_posbkp;
+		mixe = m_alpha * glm::normalize(-dir) * glm::length(m_posbkp) + (1 - m_alpha) * m_posbkp;
 	}
 	else
 	{

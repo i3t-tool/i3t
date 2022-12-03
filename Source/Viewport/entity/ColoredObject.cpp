@@ -4,8 +4,7 @@ using namespace Vp;
 
 #include "Viewport/shader/ColorShader.h"
 
-ColoredObject::ColoredObject(Core::Mesh* mesh, ColorShader* shader)
-    : GameObject(mesh, shader)
+ColoredObject::ColoredObject(Core::Mesh* mesh, ColorShader* shader) : GameObject(mesh, shader)
 {
 	// Empty
 }

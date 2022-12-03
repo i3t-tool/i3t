@@ -35,20 +35,18 @@ private:
 	GLuint vao = 0;           ///< GL vertex array object
 
 public:
-	struct Shader* shader; ///< shader program used for rendering of this object
-	int primitive = GL_TRIANGLES; ///< GL_TRIANGLES, GL_LINES, etc...
-	GLuint texture;               ///< GL texture
-	glm::vec4 color;              ///< color,in shader texture*color
-	GameObject* parent = NULL; ///< parent of this object - should not be NULL for
-	                           ///< other objects than scene root
-	std::vector<GameObject*>
-	    children; ///< child objects of this object - relation child-parent is
-	              ///< designed to be traceable in both directions
-	std::vector<Component*>
-	    components; ///< components with functionalities - have render and update
-	                ///< functions, that are called in app loop
-	bool isRender;  ///< enable/disable rendering
-	glm::mat4x4 transformation; ///< transformation matrix of this object
+	struct Shader* shader;              ///< shader program used for rendering of this object
+	int primitive = GL_TRIANGLES;       ///< GL_TRIANGLES, GL_LINES, etc...
+	GLuint texture;                     ///< GL texture
+	glm::vec4 color;                    ///< color,in shader texture*color
+	GameObject* parent = NULL;          ///< parent of this object - should not be NULL for
+	                                    ///< other objects than scene root
+	std::vector<GameObject*> children;  ///< child objects of this object - relation child-parent is
+	                                    ///< designed to be traceable in both directions
+	std::vector<Component*> components; ///< components with functionalities - have render and update
+	                                    ///< functions, that are called in app loop
+	bool isRender;                      ///< enable/disable rendering
+	glm::mat4x4 transformation;         ///< transformation matrix of this object
 
 	/// Unparent this object
 	/**
@@ -62,9 +60,8 @@ public:
 	void addComponent(Component* c);
 	Component* getComponent(const char* type);
 
-	void (*draw_callback)(GameObject* o) =
-	    NULL; ///< if not NULL, this function called before object is drawn (good
-	          ///< for animating, etc...)
+	void (*draw_callback)(GameObject* o) = NULL; ///< if not NULL, this function called before object is drawn (good
+	                                             ///< for animating, etc...)
 	/// Constructor.
 	/**
 	Creates 'blank' object without any geometry.
@@ -98,8 +95,7 @@ public:
 	\param[in] rotAxis Rotation axis
 	\param[in] degrees Angle in degrees
 	*/
-	void transform(glm::vec3 trans, glm::vec3 scale, glm::vec3 rotAxis,
-	               float degrees);
+	void transform(glm::vec3 trans, glm::vec3 scale, glm::vec3 rotAxis, float degrees);
 	/// Translate object
 	/**
 	\param[in] translate Translation

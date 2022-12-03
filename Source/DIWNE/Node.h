@@ -30,8 +30,7 @@ class Node : public DiwneObject
 {
 public:
 	/** Default constructor */
-	Node(DIWNE::Diwne& diwne, DIWNE::ID id,
-	     std::string const labelDiwne = "DiwneNode");
+	Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneNode");
 	/** Default destructor */
 	virtual ~Node();
 
@@ -48,18 +47,9 @@ public:
 
 	DIWNE::ID const getId() const { return m_idDiwne; };
 
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldNode;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragNode;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchNode;
-	};
+	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldNode; };
+	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragNode; };
+	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchNode; };
 
 	void updateSizes();
 	void deleteActionDiwne();
@@ -73,9 +63,8 @@ public:
 	virtual bool afterEndDiwne();
 
 	template <typename T>
-	bool drawNodeDiwne(
-	    DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
-	    DrawMode drawMode = DrawMode::Interacting)
+	bool drawNodeDiwne(DrawModeNodePosition nodePosMode = DrawModeNodePosition::OnItsPosition,
+	                   DrawMode drawMode = DrawMode::Interacting)
 	{
 		m_nodePosMode = nodePosMode;
 		m_drawMode = drawMode;
@@ -84,11 +73,9 @@ public:
 
 		if (interaction_happen && !m_toDelete)
 		{
-			diwne.setLastActiveNode<T>(
-			    std::static_pointer_cast<T>(shared_from_this()));
+			diwne.setLastActiveNode<T>(std::static_pointer_cast<T>(shared_from_this()));
 			if (diwne.getDiwneActionActive() == DiwneAction::None ||
-			    diwne.getDiwneActionActive() ==
-			        DiwneAction::InteractingContent /* no specific action */
+			    diwne.getDiwneActionActive() == DiwneAction::InteractingContent /* no specific action */
 			)
 			{
 				diwne.setDiwneAction(DiwneAction::InteractingContent);
@@ -104,10 +91,7 @@ public:
 	bool rightContentDiwne();
 	bool bottomContentDiwne();
 
-	virtual ImRect getRectDiwne() const
-	{
-		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
-	};
+	virtual ImRect getRectDiwne() const { return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max); };
 
 	virtual bool processSelect();
 	virtual bool processUnselect();
@@ -132,14 +116,8 @@ public:
 		translateNodeRectsDiwne(amount);
 	};
 
-	ImRect getNodeRectDiwne()
-	{
-		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
-	};
-	ImVec2 getNodeRectSizeDiwne()
-	{
-		return m_bottomRectDiwne.Max - m_topRectDiwne.Min;
-	};
+	ImRect getNodeRectDiwne() { return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max); };
+	ImVec2 getNodeRectSizeDiwne() { return m_bottomRectDiwne.Max - m_topRectDiwne.Min; };
 
 	bool getSelected() const { return m_selected; };
 	void setSelected(bool selected) { m_selected = selected; };

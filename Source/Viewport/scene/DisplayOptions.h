@@ -14,8 +14,7 @@ public:
 	bool showFrustum{true};
 
 	DisplayOptions() = default;
-	DisplayOptions(bool showDefault, bool showAxes, bool showGrid,
-	               bool showCamera, bool showFrustum);
+	DisplayOptions(bool showDefault, bool showAxes, bool showGrid, bool showCamera, bool showFrustum);
 
 	bool shouldDraw(const Entity& entity) const;
 };

@@ -30,8 +30,7 @@ void BeforeNewModal::render()
 	// parent_size.y * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-	if (ImGui::BeginPopupModal(MODAL_LABEL, nullptr,
-	                           ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal(MODAL_LABEL, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Do you want to save current project?\n\n");
 		ImGui::Separator();
