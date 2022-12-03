@@ -4,3 +4,5 @@ BreakBeforeBraces: Allman
 PointerAlignment: Left
 TabWidth: 2
 UseTab: ForIndentation
+
+ColumnLimit: 120

@@ -60,12 +60,9 @@ TEST(TextTest, Hash3)
 	b = hash_string("a", "b", std::string());
 	ASSERT_EQ(a, b);
 
-	ASSERT_EQ(hash_string("hey", "there", "test"),
-	          hash_string("hey", "there", "test"));
-	ASSERT_EQ(hash_string("hey", "there", "test"),
-	          hash_string("hey", "there", "test"));
-	ASSERT_EQ(hash_string("hey", "there", "test"),
-	          hash_string("hey", "there", "test"));
+	ASSERT_EQ(hash_string("hey", "there", "test"), hash_string("hey", "there", "test"));
+	ASSERT_EQ(hash_string("hey", "there", "test"), hash_string("hey", "there", "test"));
+	ASSERT_EQ(hash_string("hey", "there", "test"), hash_string("hey", "there", "test"));
 }
 
 TEST(TextTest, Hash2)

@@ -34,7 +34,6 @@ public:
 	 * \param view View use
 	 * \param projection Projection use
 	 */
-	void setWorldTransform(const glm::mat4& model, const glm::mat4& view,
-	                       const glm::mat4& projection);
+	void setWorldTransform(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
 };
 } // namespace Vp

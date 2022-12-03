@@ -9,8 +9,7 @@ TEST(LabelTest, GetLabelReturnNamedPinLabelOnNamedPin)
 	auto node = Builder::createNode<ENodeType::MatrixMulMatrix>();
 
 	const char* label = node->getInputPins()[0].getLabel();
-	const char* expected =
-	    defaultIoNames[static_cast<size_t>(EValueType::Matrix)];
+	const char* expected = defaultIoNames[static_cast<size_t>(EValueType::Matrix)];
 
 	EXPECT_TRUE(strcmp(label, expected) == 0);
 }

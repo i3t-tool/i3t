@@ -25,7 +25,8 @@ private:
 	static const char* s_type;
 
 	GameObject *m_frustrum, *m_frustruml, *m_cameraico, *m_handle;
-	union Stencils {
+	union Stencils
+	{
 		struct N
 		{
 			unsigned char f, n, t, b, r, l;

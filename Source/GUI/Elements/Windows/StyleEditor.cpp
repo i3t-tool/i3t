@@ -32,9 +32,7 @@ void StyleEditor::render()
 			const bool isSelected = (currentThemeIdx == n);
 			if (ImGui::Selectable(I3T::getThemes()[n].getName().c_str(), isSelected))
 			{
-				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) {
-					return t.getName() == curr.getName();
-				});
+				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) { return t.getName() == curr.getName(); });
 				if (n != currIndex)
 				{
 					I3T::getUI()->setTheme(I3T::getThemes()[n]);
@@ -80,8 +78,7 @@ void StyleEditor::renderSaveRevertField()
 	// Save current theme to file.
 	if (ImGui::Button("Save"))
 	{
-		auto path =
-		    std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
+		auto path = std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
 		auto absPath = Config::getAbsolutePath(path);
 		if (doesFileExists(absPath))
 		{
@@ -166,8 +163,7 @@ void UI::showDimensions()
 
 		auto& val = curr.getSizesRef()[key];
 		ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, 0.0f,
-		                     "%.0f"))
+		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, 0.0f, "%.0f"))
 		{
 			curr.apply();
 		}
@@ -185,8 +181,7 @@ void UI::showDimensions()
 
 		auto& val = curr.getSizesVecRef()[key];
 		ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f,
-		                      0.0f, "%.0f"))
+		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f, 0.0f, "%.0f"))
 		{
 			curr.apply();
 		}

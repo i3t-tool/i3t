@@ -23,25 +23,20 @@ void Shaper::initDefaultShapes()
 
 	{
 		glm::vec3 unitCubeArr[24] = {
-		    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, 1.0f, -1.0f),
-		    glm::vec3(1.0f, 1.0f, -1.0f),   glm::vec3(-1.0f, 1.0f, -1.0f),
-		    glm::vec3(-1.0f, 1.0f, -1.0f),  glm::vec3(-1.0f, 1.0f, 1.0f),
-		    glm::vec3(-1.0f, 1.0f, 1.0f),   glm::vec3(1.0f, 1.0f, 1.0f),
-		    glm::vec3(1.0f, -1.0f, 1.0f),   glm::vec3(1.0f, -1.0f, -1.0f),
-		    glm::vec3(1.0f, -1.0f, -1.0f),  glm::vec3(-1.0f, -1.0f, -1.0f),
-		    glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, 1.0f),
-		    glm::vec3(-1.0f, -1.0f, 1.0f),  glm::vec3(1.0f, -1.0f, 1.0f),
-		    glm::vec3(-1.0f, 1.0f, 1.0f),   glm::vec3(-1.0f, -1.0f, 1.0f),
-		    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, -1.0f, 1.0f),
-		    glm::vec3(1.0f, 1.0f, -1.0f),   glm::vec3(1.0f, -1.0f, -1.0f),
-		    glm::vec3(-1.0f, 1.0f, -1.0f),  glm::vec3(-1.0f, -1.0f, -1.0f),
+		    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, 1.0f, -1.0f),  glm::vec3(1.0f, 1.0f, -1.0f),
+		    glm::vec3(-1.0f, 1.0f, -1.0f),  glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(-1.0f, 1.0f, 1.0f),
+		    glm::vec3(-1.0f, 1.0f, 1.0f),   glm::vec3(1.0f, 1.0f, 1.0f),   glm::vec3(1.0f, -1.0f, 1.0f),
+		    glm::vec3(1.0f, -1.0f, -1.0f),  glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, -1.0f),
+		    glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, 1.0f),
+		    glm::vec3(1.0f, -1.0f, 1.0f),   glm::vec3(-1.0f, 1.0f, 1.0f),  glm::vec3(-1.0f, -1.0f, 1.0f),
+		    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, -1.0f, 1.0f),  glm::vec3(1.0f, 1.0f, -1.0f),
+		    glm::vec3(1.0f, -1.0f, -1.0f),  glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, -1.0f),
 		};
 
 		Shaper shaper;
 		for (int i = 0; i < 24; i += 2)
 		{
-			shaper.line(glm::vec3(glm::vec4(unitCubeArr[i], 1.0f)),
-			            glm::vec3(glm::vec4(unitCubeArr[i + 1], 1.0f)));
+			shaper.line(glm::vec3(glm::vec4(unitCubeArr[i], 1.0f)), glm::vec3(glm::vec4(unitCubeArr[i + 1], 1.0f)));
 		}
 		unitCube = "shape_unitCube";
 		shaper.createLineMesh(unitCube);
@@ -128,8 +123,7 @@ void Shaper::line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color)
 	addColor(color);
 }
 
-void Shaper::line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color_a,
-                  const glm::vec3 color_b)
+void Shaper::line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color_a, const glm::vec3 color_b)
 {
 	addVector(a.x, a.y, a.z);
 	addVector(b.x, b.y, b.z);
@@ -137,14 +131,12 @@ void Shaper::line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color_a,
 	addColor(color_b);
 }
 
-void Shaper::quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c,
-                  const glm::vec3 d)
+void Shaper::quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const glm::vec3 d)
 {
 	quad(a, b, c, d, currentColor);
 }
 
-void Shaper::quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c,
-                  const glm::vec3 d, const glm::vec3 color)
+void Shaper::quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const glm::vec3 d, const glm::vec3 color)
 {
 	// Bottom left tris
 	addVector(a);
@@ -173,13 +165,11 @@ Core::Mesh* Shaper::createLineMesh(const std::string& alias)
 {
 	if (getVertices().empty() || getColors().empty())
 	{
-		throw std::runtime_error(
-		    "Shaper: Can't create line mesh with 0 vertices / colors!");
+		throw std::runtime_error("Shaper: Can't create line mesh with 0 vertices / colors!");
 	}
 
-	Core::Mesh* mesh = RMI.mesh(
-	    alias, Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3,
-	    &getColors()[0], getColors().size() / 3);
+	Core::Mesh* mesh = RMI.mesh(alias, Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+	                            getColors().size() / 3);
 	return mesh;
 }
 
@@ -187,12 +177,10 @@ Core::Mesh* Shaper::createMesh(const std::string& alias)
 {
 	if (getVertices().empty() || getColors().empty())
 	{
-		throw std::runtime_error(
-		    "Shaper: Can't create mesh with 0 vertices / colors!");
+		throw std::runtime_error("Shaper: Can't create mesh with 0 vertices / colors!");
 	}
 
-	Core::Mesh* mesh = RMI.mesh(
-	    alias, Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3,
-	    &getColors()[0], getColors().size() / 3);
+	Core::Mesh* mesh = RMI.mesh(alias, Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3,
+	                            &getColors()[0], getColors().size() / 3);
 	return mesh;
 }

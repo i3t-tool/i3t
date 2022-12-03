@@ -30,8 +30,7 @@ protected:
 		m_window->init();
 
 		// PGR and OpenGL initializing.
-		if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR,
-		                     pgr::DEBUG_OFF))
+		if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
 		{
 			Log::error("Failed to initialize opengl / pgr!");
 			FAIL();
@@ -48,35 +47,26 @@ TEST_F(ResourceManagerTest, TextureTest)
 
 	GLuint texture1Id = Core::ResourceManager::instance().texture(texture1);
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
-	ASSERT_EQ(texture1Id,
-	          Core::ResourceManager::instance().texture("Texture1", texture1));
-	ASSERT_EQ(texture1Id,
-	          Core::ResourceManager::instance().texture("Texture1", texture1));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture("Texture1", texture1));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture("Texture1", texture1));
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
-	ASSERT_EQ(texture1Id,
-	          Core::ResourceManager::instance().textureByAlias("Texture1"));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().textureByAlias("Texture1"));
 
-	GLuint texture2Id =
-	    Core::ResourceManager::instance().texture("Texture2", texture2);
+	GLuint texture2Id = Core::ResourceManager::instance().texture("Texture2", texture2);
 	ASSERT_NE(texture1Id, texture2Id);
-	ASSERT_EQ(texture2Id,
-	          Core::ResourceManager::instance().texture("Texture2", texture2));
+	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture("Texture2", texture2));
 	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture(texture2));
 
 	// Attempt alias change (will report error but still return resource)
-	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture(
-	                          "Texture2_newAlias", texture2));
+	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture("Texture2_newAlias", texture2));
 	// Fail to find resource under the "new" alias without specifying path
-	ASSERT_EQ(
-	    0, Core::ResourceManager::instance().textureByAlias("Texture2_newAlias"));
+	ASSERT_EQ(0, Core::ResourceManager::instance().textureByAlias("Texture2_newAlias"));
 	// The original alias remains unchanged
-	ASSERT_EQ(texture2Id,
-	          Core::ResourceManager::instance().texture("Texture2", texture2));
+	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture("Texture2", texture2));
 
 	// Loading existing resource with a different existing alias
 	ASSERT_EQ(0, Core::ResourceManager::instance().texture("Texture1", texture2));
-	ASSERT_EQ(texture1Id,
-	          Core::ResourceManager::instance().texture("Texture1", texture1));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture("Texture1", texture1));
 }
 
 TEST_F(ResourceManagerTest, ShaderTest)
@@ -87,40 +77,27 @@ TEST_F(ResourceManagerTest, ShaderTest)
 	std::string shader2Vert = "Data/Shaders/gridVert.glsl";
 	std::string shader2Frag = "Data/Shaders/gridFrag.glsl";
 
-	GLuint shader1Id =
-	    Core::ResourceManager::instance().shader(shader1Vert, shader1Frag);
-	ASSERT_EQ(shader1Id,
-	          Core::ResourceManager::instance().shader(shader1Vert, shader1Frag));
-	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shader(
-	                         "Shader1", shader1Vert, shader1Frag));
-	ASSERT_EQ(shader1Id,
-	          Core::ResourceManager::instance().shaderByAlias("Shader1"));
+	GLuint shader1Id = Core::ResourceManager::instance().shader(shader1Vert, shader1Frag);
+	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shader(shader1Vert, shader1Frag));
+	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shader("Shader1", shader1Vert, shader1Frag));
+	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shaderByAlias("Shader1"));
 
-	GLuint shader2Id = Core::ResourceManager::instance().shader(
-	    "Shader2", shader2Vert, shader2Frag);
+	GLuint shader2Id = Core::ResourceManager::instance().shader("Shader2", shader2Vert, shader2Frag);
 	ASSERT_NE(shader1Id, shader2Id);
-	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader(
-	                         "Shader2", shader2Vert, shader2Frag));
-	ASSERT_EQ(shader2Id,
-	          Core::ResourceManager::instance().shader(shader2Vert, shader2Frag));
-	ASSERT_EQ(shader2Id,
-	          Core::ResourceManager::instance().shaderByAlias("Shader2"));
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader("Shader2", shader2Vert, shader2Frag));
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader(shader2Vert, shader2Frag));
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shaderByAlias("Shader2"));
 
 	// Attempt alias change (will report error but still return resource)
-	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader(
-	                         "Shader2_newAlias", shader2Vert, shader2Frag));
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader("Shader2_newAlias", shader2Vert, shader2Frag));
 	// Fail to find resource under the "new" alias without specifying path
-	ASSERT_EQ(
-	    0, Core::ResourceManager::instance().shaderByAlias("Shader2_newAlias"));
+	ASSERT_EQ(0, Core::ResourceManager::instance().shaderByAlias("Shader2_newAlias"));
 	// The original alias remains unchanged
-	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader(
-	                         "Shader2", shader2Vert, shader2Frag));
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader("Shader2", shader2Vert, shader2Frag));
 
 	// Loading existing resource with a different existing alias
-	ASSERT_EQ(0, Core::ResourceManager::instance().shader("Shader1", shader2Vert,
-	                                                      shader2Frag));
-	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shader(
-	                         "Shader1", shader1Vert, shader1Frag));
+	ASSERT_EQ(0, Core::ResourceManager::instance().shader("Shader1", shader2Vert, shader2Frag));
+	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shader("Shader1", shader1Vert, shader1Frag));
 }
 
 TEST_F(ResourceManagerTest, TypeMismatchTest)
@@ -134,15 +111,11 @@ TEST_F(ResourceManagerTest, TypeMismatchTest)
 	std::string shader2Vert = "Data/Shaders/gridVert.glsl";
 	std::string shader2Frag = "Data/Shaders/gridFrag.glsl";
 
-	GLuint texture1Id =
-	    Core::ResourceManager::instance().texture("Texture1", texture1);
-	GLuint texture2Id =
-	    Core::ResourceManager::instance().texture("Texture2", texture2);
+	GLuint texture1Id = Core::ResourceManager::instance().texture("Texture1", texture1);
+	GLuint texture2Id = Core::ResourceManager::instance().texture("Texture2", texture2);
 
-	GLuint shader1Id = Core::ResourceManager::instance().shader(
-	    "Shader1", shader1Vert, shader1Frag);
-	GLuint shader2Id = Core::ResourceManager::instance().shader(
-	    "Shader2", shader2Vert, shader2Frag);
+	GLuint shader1Id = Core::ResourceManager::instance().shader("Shader1", shader1Vert, shader1Frag);
+	GLuint shader2Id = Core::ResourceManager::instance().shader("Shader2", shader2Vert, shader2Frag);
 
 	ASSERT_NE(texture1Id, texture2Id);
 	ASSERT_NE(texture1Id, shader1Id);
@@ -150,24 +123,18 @@ TEST_F(ResourceManagerTest, TypeMismatchTest)
 
 	ASSERT_EQ(0, Core::ResourceManager::instance().texture("Shader1", texture2));
 	ASSERT_EQ(0, Core::ResourceManager::instance().texture("Shader2", texture2));
-	ASSERT_EQ(0, Core::ResourceManager::instance().shader("Texture1", shader1Vert,
-	                                                      shader1Frag));
-	ASSERT_EQ(0, Core::ResourceManager::instance().shader("Texture2", shader1Vert,
-	                                                      shader1Frag));
+	ASSERT_EQ(0, Core::ResourceManager::instance().shader("Texture1", shader1Vert, shader1Frag));
+	ASSERT_EQ(0, Core::ResourceManager::instance().shader("Texture2", shader1Vert, shader1Frag));
 
 	ASSERT_EQ(0, Core::ResourceManager::instance().shaderByAlias("Texture1"));
 	ASSERT_EQ(0, Core::ResourceManager::instance().shaderByAlias("Texture2"));
 	ASSERT_EQ(0, Core::ResourceManager::instance().textureByAlias("Shader1"));
 	ASSERT_EQ(0, Core::ResourceManager::instance().textureByAlias("Shader1"));
 
-	ASSERT_EQ(shader1Id,
-	          Core::ResourceManager::instance().shaderByAlias("Shader1"));
-	ASSERT_EQ(shader2Id,
-	          Core::ResourceManager::instance().shaderByAlias("Shader2"));
-	ASSERT_EQ(texture1Id,
-	          Core::ResourceManager::instance().textureByAlias("Texture1"));
-	ASSERT_EQ(texture2Id,
-	          Core::ResourceManager::instance().textureByAlias("Texture2"));
+	ASSERT_EQ(shader1Id, Core::ResourceManager::instance().shaderByAlias("Shader1"));
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shaderByAlias("Shader2"));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().textureByAlias("Texture1"));
+	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().textureByAlias("Texture2"));
 }
 
 TEST_F(ResourceManagerTest, ModelFromFileTest)
@@ -177,35 +144,26 @@ TEST_F(ResourceManagerTest, ModelFromFileTest)
 
 	Core::Mesh* metalBoxMesh = Core::ResourceManager::instance().mesh(metalBox);
 	ASSERT_EQ(metalBoxMesh, Core::ResourceManager::instance().mesh(metalBox));
-	ASSERT_EQ(metalBoxMesh,
-	          Core::ResourceManager::instance().mesh("MetalBox", metalBox));
-	ASSERT_EQ(metalBoxMesh,
-	          Core::ResourceManager::instance().mesh("MetalBox", metalBox));
+	ASSERT_EQ(metalBoxMesh, Core::ResourceManager::instance().mesh("MetalBox", metalBox));
+	ASSERT_EQ(metalBoxMesh, Core::ResourceManager::instance().mesh("MetalBox", metalBox));
 	ASSERT_EQ(metalBoxMesh, Core::ResourceManager::instance().mesh(metalBox));
-	ASSERT_EQ(metalBoxMesh,
-	          Core::ResourceManager::instance().meshByAlias("MetalBox"));
+	ASSERT_EQ(metalBoxMesh, Core::ResourceManager::instance().meshByAlias("MetalBox"));
 
-	Core::Mesh* teapotmesh =
-	    Core::ResourceManager::instance().mesh("Teapot", teapot);
+	Core::Mesh* teapotmesh = Core::ResourceManager::instance().mesh("Teapot", teapot);
 	ASSERT_NE(teapotmesh, metalBoxMesh);
-	ASSERT_EQ(teapotmesh,
-	          Core::ResourceManager::instance().mesh("Teapot", teapot));
+	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().mesh("Teapot", teapot));
 	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().mesh(teapot));
 
 	// Attempt alias change (will report error but still return resource)
-	ASSERT_EQ(teapotmesh,
-	          Core::ResourceManager::instance().mesh("Teapot_new", teapot));
+	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().mesh("Teapot_new", teapot));
 	// Fail to find resource under the "new" alias without specifying path
-	ASSERT_EQ(nullptr,
-	          Core::ResourceManager::instance().meshByAlias("Teapot_new"));
+	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Teapot_new"));
 	// The original alias remains unchanged
-	ASSERT_EQ(teapotmesh,
-	          Core::ResourceManager::instance().meshByAlias("Teapot"));
+	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().meshByAlias("Teapot"));
 
 	// Loading existing resource with a different existing alias
 	ASSERT_EQ(0, Core::ResourceManager::instance().mesh("MetalBox", teapot));
-	ASSERT_EQ(metalBoxMesh,
-	          Core::ResourceManager::instance().mesh("MetalBox", metalBox));
+	ASSERT_EQ(metalBoxMesh, Core::ResourceManager::instance().mesh("MetalBox", metalBox));
 }
 
 TEST_F(ResourceManagerTest, ModelFromDataTest)
@@ -228,8 +186,7 @@ TEST_F(ResourceManagerTest, ModelFromDataTest)
 
 	Core::Mesh* shape1Triangles = shaper.createMesh("Shape1Triangles");
 	ASSERT_EQ(shape1Triangles->m_drawType, Core::Mesh::DrawType::ARRAYS);
-	ASSERT_EQ(shape1Triangles->m_primitiveType,
-	          Core::Mesh::PrimitiveType::TRIANGLES);
+	ASSERT_EQ(shape1Triangles->m_primitiveType, Core::Mesh::PrimitiveType::TRIANGLES);
 	ASSERT_EQ(shape1Triangles->m_nVertices, 6);
 	ASSERT_EQ(shape1Triangles->m_useNormals, false);
 	ASSERT_EQ(shape1Triangles->m_useTexcoords, false);
@@ -239,10 +196,8 @@ TEST_F(ResourceManagerTest, ModelFromDataTest)
 	ASSERT_NE(shape1Lines, shape1Triangles);
 	ASSERT_NE(shape1Lines->m_vao, shape1Triangles->m_vao);
 
-	ASSERT_EQ(shape1Lines,
-	          Core::ResourceManager::instance().meshByAlias("Shape1Lines"));
-	ASSERT_EQ(shape1Triangles,
-	          Core::ResourceManager::instance().meshByAlias("Shape1Triangles"));
+	ASSERT_EQ(shape1Lines, Core::ResourceManager::instance().meshByAlias("Shape1Lines"));
+	ASSERT_EQ(shape1Triangles, Core::ResourceManager::instance().meshByAlias("Shape1Triangles"));
 	ASSERT_NE(Core::ResourceManager::instance().meshByAlias("Shape1Lines"),
 	          Core::ResourceManager::instance().meshByAlias("Shape1Triangles"));
 
@@ -255,9 +210,7 @@ TEST_F(ResourceManagerTest, ModelFromDataTest)
 	// ASSERT_EQ(nullptr,
 	// Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
 	ASSERT_NE(shape1Lines, shaper.createLineMesh("GIBBERISH"));
-	ASSERT_NE(nullptr,
-	          Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
+	ASSERT_NE(nullptr, Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
 
-	ASSERT_EQ(shape1Lines,
-	          Core::ResourceManager::instance().meshByAlias("Shape1Lines"));
+	ASSERT_EQ(shape1Lines, Core::ResourceManager::instance().meshByAlias("Shape1Lines"));
 }

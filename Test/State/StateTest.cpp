@@ -11,10 +11,7 @@
 
 using namespace Core;
 
-const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow)
-{
-	return workspaceWindow->getNodeEditor().getAllNodes();
-}
+const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow) { return workspaceWindow->getNodeEditor().getAllNodes(); }
 
 /// \todo This test may require the OpenGL context!
 TEST(StateTest, SceneCanBeSavedAndLoaded)
@@ -22,8 +19,7 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	createTestApplication();
 
 	const auto scenePath = Config::getAbsolutePath("Test/State/TestScene.json");
-	const auto emptyScenePath =
-	    Config::getAbsolutePath("Test/State/EmptyScene.json");
+	const auto emptyScenePath = Config::getAbsolutePath("Test/State/EmptyScene.json");
 
 	std::vector<Ptr<WorkspaceNodeWithCoreDataWithPins>> nodes;
 
@@ -34,8 +30,7 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	ASSERT_TRUE(workspace != nullptr);
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene(
-	    Config::getAbsolutePath("Test/State/EmptyScene.json"));
+	App::getModule<StateManager>().saveScene(Config::getAbsolutePath("Test/State/EmptyScene.json"));
 
 	{
 		ASSERT_TRUE(getNodes(workspace).empty());
@@ -46,21 +41,15 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 		// StateManager contains the initial state only.
 		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
-		nodes.push_back(
-		    addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(
-		        ImVec2(1.0f, 0.0f)));
+		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
 
-		nodes.push_back(
-		    addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(
-		        ImVec2(-1.0f, 1.0f)));
+		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(ImVec2(-1.0f, 1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 2);
 
-		nodes.push_back(
-		    addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(
-		        ImVec2(0.0f, -1.0f)));
+		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(ImVec2(0.0f, -1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
@@ -111,26 +100,20 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 	ASSERT_TRUE(getNodes(workspace).empty());
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene(
-	    Config::getAbsolutePath("Test/State/EmptyScene.json"));
+	App::getModule<StateManager>().saveScene(Config::getAbsolutePath("Test/State/EmptyScene.json"));
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes;
 
-	nodes.push_back(
-	    addNodeToNodeEditor<WorkspaceTransformation_s<ETransformType::Scale>>());
-	nodes.push_back(
-	    addNodeToNodeEditor<WorkspaceTransformation_s<ETransformType::Free>>());
+	nodes.push_back(addNodeToNodeEditor<WorkspaceTransformation_s<ETransformType::Scale>>());
+	nodes.push_back(addNodeToNodeEditor<WorkspaceTransformation_s<ETransformType::Free>>());
 	nodes.push_back(addNodeToNodeEditor<WorkspaceSequence>());
 
 	const auto randomVec3 = generateVec3();
 
 	{
-		const auto scaleNode =
-		    getNodes(workspace)[0]->getNodebase()->as<Core::Transformation>();
-		const auto freeNode =
-		    getNodes(workspace)[1]->getNodebase()->as<Core::Transformation>();
-		const auto sequenceNode =
-		    getNodes(workspace)[2]->getNodebase()->as<Core::Sequence>();
+		const auto scaleNode = getNodes(workspace)[0]->getNodebase()->as<Core::Transformation>();
+		const auto freeNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transformation>();
+		const auto sequenceNode = getNodes(workspace)[2]->getNodebase()->as<Core::Sequence>();
 
 		scaleNode->disableSynergies();
 		scaleNode->setDefaultValue("scale", randomVec3);
@@ -138,8 +121,7 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 		scaleNode->setDefaultValue("scale", glm::vec3(1.0f, 1.0f, 1.0f));
 		App::getModule<StateManager>().takeSnapshot();
 
-		std::static_pointer_cast<WorkspaceSequence>(nodes[2])->moveNodeToSequence(
-		    nodes[1]);
+		std::static_pointer_cast<WorkspaceSequence>(nodes[2])->moveNodeToSequence(nodes[1]);
 
 		/// \todo Sequence now contains a transform but the workspace also contains
 		/// it. \todo When to take a snapshot?
@@ -167,19 +149,16 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 		Application::get().onDisplay();
 
 	{
-		const auto sequenceNode =
-		    getNodes(workspace)[0]->getNodebase()->as<Core::Sequence>();
+		const auto sequenceNode = getNodes(workspace)[0]->getNodebase()->as<Core::Sequence>();
 
 		EXPECT_TRUE(sequenceNode->getMatrices().size() == 1);
 
 		//
 
-		const auto scaleNode =
-		    getNodes(workspace)[1]->getNodebase()->as<Core::Transformation>();
+		const auto scaleNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transformation>();
 
 		EXPECT_TRUE(scaleNode->hasSavedValue());
-		EXPECT_TRUE(Math::eq(scaleNode->getData().getMat4(),
-		                     glm::scale(glm::vec3(1.0f, 1.0f, 1.0f))));
+		EXPECT_TRUE(Math::eq(scaleNode->getData().getMat4(), glm::scale(glm::vec3(1.0f, 1.0f, 1.0f))));
 		EXPECT_TRUE(!scaleNode->hasSynergies());
 		EXPECT_TRUE(Math::eq(scaleNode->getSavedValue(), glm::scale(randomVec3)));
 	}

@@ -18,10 +18,8 @@
 
 #include <string.h>
 
-glm::mat4 World::perspective =
-    glm::mat4(1.0f); //< main camera perspective matrix
-glm::mat4 World::mainCamera =
-    glm::mat4(1.0f); //< most probably the main camera viewMatrix
+glm::mat4 World::perspective = glm::mat4(1.0f); //< main camera perspective matrix
+glm::mat4 World::mainCamera = glm::mat4(1.0f);  //< most probably the main camera viewMatrix
 glm::vec3 World::World::mainCamPos = glm::vec3(0.0f);
 float World::height = 10;
 float World::width = 10;
@@ -50,38 +48,25 @@ World::World()
 	FrustumManipulator* fm = new FrustumManipulator();
 	RotationManipulator* rm = new RotationManipulator();
 	FreeManipulator* mm = new FreeManipulator();
-	this->manipulators.emplace("Translation",
-	                           Manipulator(&tm->m_editednode, &tm->m_parent, tm));
-	this->manipulators.emplace("Scale",
-	                           Manipulator(&sm->m_editednode, &sm->m_parent, sm));
-	this->manipulators.emplace("LookAt",
-	                           Manipulator(&lm->m_editednode, &lm->m_parent, lm));
-	this->manipulators.emplace("Ortho",
-	                           Manipulator(&om->m_editednode, &om->m_parent, om));
-	this->manipulators.emplace("Perspective",
-	                           Manipulator(&pm->m_editednode, &pm->m_parent, pm));
-	this->manipulators.emplace("Frustum",
-	                           Manipulator(&fm->m_editednode, &fm->m_parent, fm));
-	this->manipulators.emplace("EulerX",
-	                           Manipulator(&rm->m_editednode, &rm->m_parent, rm));
-	this->manipulators.emplace("EulerY",
-	                           Manipulator(&rm->m_editednode, &rm->m_parent, rm));
-	this->manipulators.emplace("EulerZ",
-	                           Manipulator(&rm->m_editednode, &rm->m_parent, rm));
-	this->manipulators.emplace("AxisAngle",
-	                           Manipulator(&rm->m_editednode, &rm->m_parent, rm));
+	this->manipulators.emplace("Translation", Manipulator(&tm->m_editednode, &tm->m_parent, tm));
+	this->manipulators.emplace("Scale", Manipulator(&sm->m_editednode, &sm->m_parent, sm));
+	this->manipulators.emplace("LookAt", Manipulator(&lm->m_editednode, &lm->m_parent, lm));
+	this->manipulators.emplace("Ortho", Manipulator(&om->m_editednode, &om->m_parent, om));
+	this->manipulators.emplace("Perspective", Manipulator(&pm->m_editednode, &pm->m_parent, pm));
+	this->manipulators.emplace("Frustum", Manipulator(&fm->m_editednode, &fm->m_parent, fm));
+	this->manipulators.emplace("EulerX", Manipulator(&rm->m_editednode, &rm->m_parent, rm));
+	this->manipulators.emplace("EulerY", Manipulator(&rm->m_editednode, &rm->m_parent, rm));
+	this->manipulators.emplace("EulerZ", Manipulator(&rm->m_editednode, &rm->m_parent, rm));
+	this->manipulators.emplace("AxisAngle", Manipulator(&rm->m_editednode, &rm->m_parent, rm));
 	// this->manipulators.emplace("Quat",
 	// Manipulator(&rm->m_editednode,&rm->m_parent,rm));
-	this->manipulators.emplace("Free",
-	                           Manipulator(&mm->m_editednode, &mm->m_parent, mm));
+	this->manipulators.emplace("Free", Manipulator(&mm->m_editednode, &mm->m_parent, mm));
 	GameObject* sceneHandles = new GameObject();
 
-	for (std::map<std::string, Manipulator>::const_iterator i =
-	         this->manipulators.cbegin();
+	for (std::map<std::string, Manipulator>::const_iterator i = this->manipulators.cbegin();
 	     i != this->manipulators.cend(); i++)
 	{
-		if (sceneHandles->getComponent(i->second.component->getComponentType()) ==
-		    nullptr)
+		if (sceneHandles->getComponent(i->second.component->getComponentType()) == nullptr)
 		{ // add each manipulator only once (rotation is stored multiple times under
 			// different keys)
 			i->second.component->m_isActive = false;
@@ -94,12 +79,10 @@ World::World()
 	this->sceneRoot->addComponent(new Renderer(Renderer::DRAW_LINES));
 
 	GameObject* camera = new GameObject();
-	camera->transform(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(1.0f, 1.0f, 1.0f),
-	                  glm::vec3(1.0f, 0.0f, 0.0f), -30.0f);
+	camera->transform(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), -30.0f);
 	camera->addComponent(new Camera(60.0f, this->sceneRoot));
 	camera->addComponent(new CameraControl());
-	this->camControl =
-	    (CameraControl*)camera->getComponent(CameraControl::componentType());
+	this->camControl = (CameraControl*)camera->getComponent(CameraControl::componentType());
 
 	this->sceneRoot->addChild(camera, false);
 	this->sceneRoot->addChild(sceneHandles, false);
@@ -107,36 +90,24 @@ World::World()
 
 bool World::init()
 {
-	World::shader0 = loadShader(
-	    Config::getAbsolutePath("Data/Shaders/simple-vs.glsl").c_str(),
-	    Config::getAbsolutePath("Data/Shaders/simple-fs.glsl").c_str());
-	World::shaderHandle = loadShader(
-	    Config::getAbsolutePath("Data/Shaders/handle-vs.glsl").c_str(),
-	    Config::getAbsolutePath("Data/Shaders/handle-fs.glsl").c_str());
-	World::shaderProj = loadShader(
-	    Config::getAbsolutePath("Data/Shaders/viewproj-vs.glsl").c_str(),
-	    Config::getAbsolutePath("Data/Shaders/viewproj-fs.glsl").c_str());
+	World::shader0 = loadShader(Config::getAbsolutePath("Data/Shaders/simple-vs.glsl").c_str(),
+	                            Config::getAbsolutePath("Data/Shaders/simple-fs.glsl").c_str());
+	World::shaderHandle = loadShader(Config::getAbsolutePath("Data/Shaders/handle-vs.glsl").c_str(),
+	                                 Config::getAbsolutePath("Data/Shaders/handle-fs.glsl").c_str());
+	World::shaderProj = loadShader(Config::getAbsolutePath("Data/Shaders/viewproj-vs.glsl").c_str(),
+	                               Config::getAbsolutePath("Data/Shaders/viewproj-fs.glsl").c_str());
 
-	if (World::shader0.program * World::shaderHandle.program *
-	        World::shaderProj.program * World::shaderProj.program ==
-	    0)
+	if (World::shader0.program * World::shaderHandle.program * World::shaderProj.program * World::shaderProj.program == 0)
 	{
 		printf("World::init():cannot load shaders\n");
 		return false;
 	}
 
-	World::textures.emplace("cube", pgr::createTexture(Config::getAbsolutePath(
-	                                    "Data/textures/cube.png")));
-	World::textures.emplace("cube_color",
-	                        pgr::createTexture(Config::getAbsolutePath(
-	                            "Data/textures/cube_color.png")));
-	World::textures.emplace(
-	    "color_grid",
-	    pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png")));
-	World::textures.emplace("axis", pgr::createTexture(Config::getAbsolutePath(
-	                                    "Data/textures/axis.png")));
-	World::textures.emplace("white", pgr::createTexture(Config::getAbsolutePath(
-	                                     "Data/textures/white.png")));
+	World::textures.emplace("cube", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png")));
+	World::textures.emplace("cube_color", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png")));
+	World::textures.emplace("color_grid", pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png")));
+	World::textures.emplace("axis", pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png")));
+	World::textures.emplace("white", pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png")));
 
 	CHECK_GL_ERROR();
 	World::initializedRender = true;
@@ -149,9 +120,7 @@ void World::end()
 	pgr::deleteProgramAndShaders(World::shaderHandle.program);
 	pgr::deleteProgramAndShaders(World::shaderProj.program);
 
-	for (std::map<std::string, GLuint>::const_iterator i =
-	         World::textures.cbegin();
-	     i != World::textures.cend(); i++)
+	for (std::map<std::string, GLuint>::const_iterator i = World::textures.cbegin(); i != World::textures.cend(); i++)
 	{
 		glDeleteTextures(1, &(i->second));
 	}
@@ -200,14 +169,10 @@ void startRecursive(GameObject* root)
 	}
 }
 CameraControl* World::getCameraControl() { return camControl; }
-void World::sceneSetView(glm::vec3 dir, bool world)
-{
-	this->camControl->setRotation(dir, world);
-}
+void World::sceneSetView(glm::vec3 dir, bool world) { this->camControl->setRotation(dir, world); }
 void World::sceneZoom(float val) { camControl->setScroll(val); }
-void World::manipulatorsSetMatrix(
-    std::shared_ptr<WorkspaceTransformation> matnode,
-    std::shared_ptr<Core::Sequence> parent)
+void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation> matnode,
+                                  std::shared_ptr<Core::Sequence> parent)
 {
 	// printf("manipulatorsSetMatrix 0x%p,0x%p\n",matnode,parent);
 	if (activeManipulator != nullptr)
@@ -222,10 +187,9 @@ void World::manipulatorsSetMatrix(
 	// if(matnode->get()==nullptr){return;}
 
 	Ptr<Core::NodeBase> nodebase = matnode->getNodebase();
-	const Core::Transform::DataMap* data = nodebase->getDataMap(); // printf("a");
-	const Operation* operation = nodebase->getOperation();         // printf("b");
-	const char* keyword =
-	    nodebase->getOperation()->keyWord.c_str(); // printf("c");
+	const Core::Transform::DataMap* data = nodebase->getDataMap();   // printf("a");
+	const Operation* operation = nodebase->getOperation();           // printf("b");
+	const char* keyword = nodebase->getOperation()->keyWord.c_str(); // printf("c");
 
 	if (this->manipulators.count(keyword) == 1)
 	{
@@ -263,18 +227,15 @@ GameObject* World::addModel(const char* name)
 	}
 	else if (strcmp("CubeColor", name) == 0)
 	{
-		g = new GameObject(unitcubeMesh, &World::shader0,
-		                   World::textures["cube_color"]);
+		g = new GameObject(unitcubeMesh, &World::shader0, World::textures["cube_color"]);
 	}
 	else if (strcmp("CubeColorGrid", name) == 0)
 	{
-		g = new GameObject(unitcubeMesh, &World::shader0,
-		                   World::textures["color_grid"]);
+		g = new GameObject(unitcubeMesh, &World::shader0, World::textures["color_grid"]);
 	}
 	else if (strcmp("PlainAxis", name) == 0)
 	{
-		g = new GameObject(three_axisMesh, &World::shader0,
-		                   World::textures["axis"]);
+		g = new GameObject(three_axisMesh, &World::shader0, World::textures["axis"]);
 	}
 	else if (strstr("Grid", name) == name)
 	{
@@ -352,8 +313,7 @@ Shader World::loadShader(const char* vs_name, const char* fs_name)
 	Shader shader = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	GLuint gl_shader = 0;
 	GLuint shaders[] = {pgr::createShaderFromFile(GL_VERTEX_SHADER, vs_name),
-	                    pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fs_name),
-	                    0};
+	                    pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fs_name), 0};
 	if (shaders[0] * shaders[1] == 0)
 	{
 		return shader;
@@ -361,8 +321,7 @@ Shader World::loadShader(const char* vs_name, const char* fs_name)
 
 	shader.program = pgr::createProgram(shaders);
 	shader.attr_pos = glGetAttribLocation(shader.program, "position");
-	shader.attr_norm = glGetAttribLocation(
-	    shader.program, "norm"); // printf("%d", this->attr_norm);
+	shader.attr_norm = glGetAttribLocation(shader.program, "norm"); // printf("%d", this->attr_norm);
 	shader.attr_uv = glGetAttribLocation(shader.program, "uv");
 	shader.camera = glGetUniformLocation(shader.program, "camera");
 	shader.color = glGetUniformLocation(shader.program, "color");

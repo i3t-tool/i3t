@@ -76,8 +76,7 @@ public:
 	/**
 	 * Render viewport's main scene with the specified camera matrices.
 	 */
-	void draw(glm::mat4 view, glm::mat4 projection,
-	          const DisplayOptions& displayOptions = DisplayOptions());
+	void draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions = DisplayOptions());
 
 	/**
 	 * Draw a preview of an object.
@@ -88,8 +87,9 @@ public:
 	void update();
 
 	// TODO: (DR) A little issue arises if this method were to be called multiple
-	// times per frame. 	I'm not sure if that ever happens (multiple scene viewports
-	//of the same scene?).
+	// times per frame. 	I'm not sure if that ever happens (multiple scene
+	// viewports
+	// of the same scene?).
 	// 	But if so, then this method needs to be called only once per frame as not
 	// not speed up controls etc. 	(Eg. mouse movement would be processed twice)
 	/**
@@ -106,9 +106,7 @@ public:
 
 	std::weak_ptr<SceneCamera> createCamera();
 
-	template <typename T,
-	          typename std::enable_if<std::is_base_of<Entity, T>::value,
-	                                  bool>::type = true>
+	template <typename T, typename std::enable_if<std::is_base_of<Entity, T>::value, bool>::type = true>
 	void removeEntity(std::weak_ptr<T>& entity)
 	{
 		m_mainScene->removeEntity(entity);

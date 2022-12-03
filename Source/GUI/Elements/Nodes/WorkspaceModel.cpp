@@ -20,9 +20,10 @@ WorkspaceModel::~WorkspaceModel()
 {
 	// TODO: (DR) Not working properly! Not due to the viewport though
 	//	There is an issue with shared_ptr reference counting somewhere in the
-	//DIWNE code 	Perhaps the methods that retrieve selected nodes 	Or the delete
-	//action lambda 	Destructor doesnt get called right away, rather until some
-	//other event happens 	Like hovering over another node with the mouse
+	// DIWNE code 	Perhaps the methods that retrieve selected nodes 	Or the
+	// delete action lambda 	Destructor doesnt get called right away, rather
+	// until some other event happens 	Like hovering over another node with the
+	// mouse
 
 	const auto node = getNodebase()->as<Core::Model>();
 	node->resetModelPosition();
@@ -46,8 +47,7 @@ void WorkspaceModel::popupContent_axis_showmodel()
 	}
 	if (ImGui::BeginMenu("Change model"))
 	{
-		for (const auto& resource :
-		     RMI.getDefaultResources(Core::ResourceType::Model))
+		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
 		{
 			if (ImGui::MenuItem(resource.alias.c_str()))
 			{
@@ -128,17 +128,17 @@ void WorkspaceModel::init()
 	// Callback that gets called when the underlying Model node updates values
 	// The Model node also updates a public model matrix variable which we can
 	// read
-	m_nodebase->addUpdateCallback([this]() {
-		std::shared_ptr<Core::Model> modelNode =
-		    dynamic_pointer_cast<Core::Model>(m_nodebase);
-		if (modelNode)
-		{
-			m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
-		}
-	});
+	m_nodebase->addUpdateCallback(
+	    [this]()
+	    {
+		    std::shared_ptr<Core::Model> modelNode = dynamic_pointer_cast<Core::Model>(m_nodebase);
+		    if (modelNode)
+		    {
+			    m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
+		    }
+	    });
 
-	m_framebuffer = std::make_unique<Vp::Framebuffer>(
-	    m_textureSize.x, m_textureSize.y, false, true);
+	m_framebuffer = std::make_unique<Vp::Framebuffer>(m_textureSize.x, m_textureSize.y, false, true);
 }
 
 bool WorkspaceModel::middleContent()
@@ -146,17 +146,15 @@ bool WorkspaceModel::middleContent()
 	bool interaction_happen = false;
 
 	m_framebuffer->start(m_textureSize.x, m_textureSize.y);
-	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y,
-	             Config::BACKGROUND_COLOR.z, 0.0f);
+	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	App::get().viewport()->drawPreview(m_viewportModel, m_textureSize.x,
-	                                   m_textureSize.y);
+	App::get().viewport()->drawPreview(m_viewportModel, m_textureSize.x, m_textureSize.y);
 
 	m_framebuffer->end();
 
-	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), m_textureSize,
-	             ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f) // vertical flip
+	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
+	             ImVec2(1.0f, 0.0f) // vertical flip
 	);
 
 	return interaction_happen;
@@ -169,7 +167,6 @@ int WorkspaceModel::maxLenghtOfData() // todo
 
 void WorkspaceModel::drawMenuLevelOfDetail() // todo
 {
-	drawMenuLevelOfDetail_builder(
-	    std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-	    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }

@@ -57,8 +57,7 @@ unsigned char Select::getStencilAt(int x, int y, int r, int filter)
 		return 0;
 	}
 
-	unsigned int* read =
-	    (unsigned int*)malloc(size_t(w * h * sizeof(unsigned int)));
+	unsigned int* read = (unsigned int*)malloc(size_t(w * h * sizeof(unsigned int)));
 	glReadPixels(x, y, w, h, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, read);
 
 	unsigned char stencilnum = 0;
@@ -75,8 +74,7 @@ unsigned char Select::getStencilAt(int x, int y, int r, int filter)
 			pos = w * i + j;
 			read[pos] = read[pos] & 255;
 			// if(read[pos]!=0){printf("hit %f\n",dist); }
-			if (dist < closest && Select::stencilRef[read[pos]] != false &&
-			    read[pos] != filter)
+			if (dist < closest && Select::stencilRef[read[pos]] != false && read[pos] != filter)
 			{
 				closest = dist;
 				stencilnum = read[pos];

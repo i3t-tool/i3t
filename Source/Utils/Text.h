@@ -25,20 +25,13 @@ template <typename It> inline std::size_t hash_range(It first, It last)
 	return seed;
 }
 
-inline size_t hash_string(const std::string& a, const std::string& b,
-                          const std::string& c)
+inline size_t hash_string(const std::string& a, const std::string& b, const std::string& c)
 {
 	std::string input[] = {a, b, c};
 	std::sort(input, input + (sizeof(input) / sizeof(*input)));
 	return hash_range(input, input + (sizeof(input) / sizeof(*input)));
 }
 
-inline size_t hash_string(const std::string& a, const std::string& b)
-{
-	return hash_string(a, b, "");
-}
+inline size_t hash_string(const std::string& a, const std::string& b) { return hash_string(a, b, ""); }
 
-inline size_t hash_string(const std::string& a)
-{
-	return hash_string(a, "", "");
-}
+inline size_t hash_string(const std::string& a) { return hash_string(a, "", ""); }

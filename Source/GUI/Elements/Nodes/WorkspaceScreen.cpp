@@ -7,8 +7,7 @@
 #define TEST
 
 WorkspaceScreen::WorkspaceScreen(DIWNE::Diwne& diwne)
-    : WorkspaceNodeWithCoreDataWithPins(
-          diwne, Core::Builder::createNode<ENodeType::Screen>())
+    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<ENodeType::Screen>())
 {
 	init();
 }
@@ -20,10 +19,8 @@ WorkspaceScreen::~WorkspaceScreen()
 
 void WorkspaceScreen::init()
 {
-	m_framebuffer = std::make_unique<Vp::Framebuffer>(
-	    m_textureSize.x, m_textureSize.y, false, false);
-	getNodebase()->setValue(m_textureSize.x / m_textureSize.y,
-	                        1); /* \todo Jh always 1? */
+	m_framebuffer = std::make_unique<Vp::Framebuffer>(m_textureSize.x, m_textureSize.y, false, false);
+	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1); /* \todo Jh always 1? */
 }
 
 //  The screen has two triangles for resize:
@@ -43,21 +40,17 @@ bool WorkspaceScreen::middleContent()
 	float buttonIconPadding = 0.f; /// not used 2*diwne.getWorkAreaZoom();
 
 	// Get projection and view matrix from screen input
-	std::pair<glm::mat4, glm::mat4> screenValue =
-	    getNodebase()->getData().getScreen();
+	std::pair<glm::mat4, glm::mat4> screenValue = getNodebase()->getData().getScreen();
 
 	// Prepare FBO
-	m_framebuffer->start(m_textureSize.x * diwne.getWorkAreaZoom(),
-	                     m_textureSize.y * diwne.getWorkAreaZoom());
-	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y,
-	             Config::BACKGROUND_COLOR.z, 0.0f);
+	m_framebuffer->start(m_textureSize.x * diwne.getWorkAreaZoom(), m_textureSize.y * diwne.getWorkAreaZoom());
+	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Draw scene if screen input is plugged in
 	if (getNodebase()->getInputPins()[0].isPluggedIn())
 	{
-		App::get().viewport()->draw(screenValue.second, screenValue.first,
-		                            {true, false, true, false, false});
+		App::get().viewport()->draw(screenValue.second, screenValue.first, {true, false, true, false, false});
 	}
 
 	m_framebuffer->end();
@@ -69,13 +62,9 @@ bool WorkspaceScreen::middleContent()
 
 // #define IM_FLOOR(_VAL) ((float) (int) (_VAL))    // this macro is used in
 //  ImGui.cpp:8155 for DC.CursorPos
-#define FLOOR_VEC2(_VAL)                                                       \
-	(ImVec2((float)(int)((_VAL).x),                                              \
-	        (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
+#define FLOOR_VEC2(_VAL) (ImVec2((float)(int)((_VAL).x), (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
 	float zoom = diwne.getWorkAreaZoom();
-	ImVec2 zoomedTextureSize = FLOOR_VEC2(
-	    m_textureSize *
-	    diwne.getWorkAreaZoom()); // floored position - same as in ImGui
+	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
 	ImVec2 zoomedButtonSize = FLOOR_VEC2(buttonSize * diwne.getWorkAreaZoom());
 
 	ImVec2 topLeftCursorPos = FLOOR_VEC2(ImGui::GetCursorScreenPos());
@@ -83,8 +72,7 @@ bool WorkspaceScreen::middleContent()
 	// ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID),
 	// m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f),
 	// ImVec2(1.0f,0.0f)); //vertical flip
-	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(),
-	             zoomedTextureSize, ImVec2(0.0f, 1.0f),
+	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
 	             ImVec2(1.0f, 0.0f)); // vertical flip
 
 	// ---------- Bottom-left button ------------
@@ -98,15 +86,11 @@ bool WorkspaceScreen::middleContent()
 	ImGui::SetCursorScreenPos(cursorPos);
 
 	interaction_happen |= diwne.IconButton(
-	    DIWNE::IconType::TriangleDownLeft,
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner),
-	    DIWNE::IconType::TriangleDownLeft,
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape),
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner), zoomedButtonSize,
-	    ImVec4(buttonIconPadding, buttonIconPadding, buttonIconPadding,
-	           buttonIconPadding),
-	    true, fmt::format("screenButton:{}left", getId()));
+	    DIWNE::IconType::TriangleDownLeft, I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner), DIWNE::IconType::TriangleDownLeft,
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape), I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner),
+	    zoomedButtonSize, ImVec4(buttonIconPadding, buttonIconPadding, buttonIconPadding, buttonIconPadding), true,
+	    fmt::format("screenButton:{}left", getId()));
 	// mouse cursor 5 "ResizeNESW"
 	if (ImGui::IsItemHovered())
 		ImGui::SetMouseCursor(5);
@@ -137,15 +121,11 @@ bool WorkspaceScreen::middleContent()
 
 	interaction_happen |= diwne.IconButton(
 
-	    DIWNE::IconType::TriangleDownRight,
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner),
-	    DIWNE::IconType::TriangleDownRight,
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape),
-	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner), zoomedButtonSize,
-	    ImVec4(buttonIconPadding, buttonIconPadding, buttonIconPadding,
-	           buttonIconPadding),
-	    true, fmt::format("screenButton:{}right", getId()));
+	    DIWNE::IconType::TriangleDownRight, I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgShape),
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_bgInner), DIWNE::IconType::TriangleDownRight,
+	    I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgShape), I3T::getColor(EColor::Nodes_Screen_resizeBtn_fgInner),
+	    zoomedButtonSize, ImVec4(buttonIconPadding, buttonIconPadding, buttonIconPadding, buttonIconPadding), true,
+	    fmt::format("screenButton:{}right", getId()));
 	// mouse cursor  6 "ResizeNWSE"
 	if (ImGui::IsItemHovered())
 		ImGui::SetMouseCursor(6);
@@ -162,12 +142,9 @@ bool WorkspaceScreen::middleContent()
 	// todo: check if we should use the floor too
 	if (resize_texture)
 	{
-		m_textureSize.x = std::max(
-		    2 * (buttonSize.x +
-		         ImGui::GetStyle().ItemSpacing.x / diwne.getWorkAreaZoom()),
-		    m_textureSize.x + dragDelta.x); /* button should fit into middle... */
-		m_textureSize.y = std::max(buttonSize.y + ImGui::GetStyle().ItemSpacing.y /
-		                                              diwne.getWorkAreaZoom(),
+		m_textureSize.x = std::max(2 * (buttonSize.x + ImGui::GetStyle().ItemSpacing.x / diwne.getWorkAreaZoom()),
+		                           m_textureSize.x + dragDelta.x); /* button should fit into middle... */
+		m_textureSize.y = std::max(buttonSize.y + ImGui::GetStyle().ItemSpacing.y / diwne.getWorkAreaZoom(),
 		                           m_textureSize.y + dragDelta.y);
 
 		ImGui::ResetMouseDragDelta(0);
@@ -182,15 +159,13 @@ bool WorkspaceScreen::middleContent()
 
 int WorkspaceScreen::maxLenghtOfData() // todo
 {
-	return numberOfCharWithDecimalPoint(
-	    getOutputs()[1]->getCorePin().data().getFloat(),
-	    getNumberOfVisibleDecimal()); /* \todo JH \todo MH not 1 but some
-	                                     Core::Pin_Code */
+	return numberOfCharWithDecimalPoint(getOutputs()[1]->getCorePin().data().getFloat(),
+	                                    getNumberOfVisibleDecimal()); /* \todo JH \todo MH not 1 but some
+	                                                                     Core::Pin_Code */
 }
 
 void WorkspaceScreen::drawMenuLevelOfDetail() // todo
 {
-	drawMenuLevelOfDetail_builder(
-	    std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-	    {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }

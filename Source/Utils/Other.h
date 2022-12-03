@@ -26,8 +26,7 @@ inline bool contains(const std::string& str, const std::string& substr)
 
 namespace Utils
 {
-template <typename A, typename Predicate>
-inline int indexOf(A&& array, Predicate p)
+template <typename A, typename Predicate> inline int indexOf(A&& array, Predicate p)
 {
 	auto it = std::find_if(array.begin(), array.end(), p);
 	if (it != array.end())
@@ -45,10 +44,7 @@ inline int indexOf(A&& array, Predicate p)
  * \param e enum instance
  * \return enum underlying type.
  */
-template <typename E> constexpr auto toUnderlying(E e) noexcept
-{
-	return static_cast<std::underlying_type_t<E>>(e);
-}
+template <typename E> constexpr auto toUnderlying(E e) noexcept { return static_cast<std::underlying_type_t<E>>(e); }
 
 struct COutRedirect
 {

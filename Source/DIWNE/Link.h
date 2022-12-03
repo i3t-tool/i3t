@@ -8,30 +8,19 @@ namespace DIWNE
 class Link : public DiwneObject
 {
 public:
-	Link(DIWNE::Diwne& diwne, DIWNE::ID id,
-	     std::string const labelDiwne = "DiwneLink");
+	Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne = "DiwneLink");
 
 	/** Default destructor */
 	virtual ~Link(){};
 
 	virtual bool initialize();
 	virtual bool initializeDiwne();
-	virtual void
-	begin(){}; /*!< link is not ImGui element - it is just picture of line */
+	virtual void begin(){}; /*!< link is not ImGui element - it is just picture of line */
 	virtual void end(){};
 	virtual bool content();
-	DIWNE::DiwneAction getHoldActionType() const final
-	{
-		return DiwneAction::HoldLink;
-	};
-	DIWNE::DiwneAction getDragActionType() const final
-	{
-		return DiwneAction::DragLink;
-	};
-	DIWNE::DiwneAction getTouchActionType() const final
-	{
-		return DiwneAction::TouchLink;
-	};
+	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldLink; };
+	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragLink; };
+	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchLink; };
 
 	virtual void updateEndpoints(){};
 	void updateControlPoints();
@@ -39,14 +28,10 @@ public:
 
 	virtual ImRect getRectDiwne() const
 	{
-		return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x,
-		                        m_controlPointEndDiwne.x, m_endDiwne.x}),
-		              std::min({m_controlPointStartDiwne.y, m_startDiwne.y,
-		                        m_controlPointEndDiwne.y, m_endDiwne.y}),
-		              std::max({m_controlPointStartDiwne.x, m_startDiwne.x,
-		                        m_controlPointEndDiwne.x, m_endDiwne.x}),
-		              std::max({m_controlPointStartDiwne.y, m_startDiwne.y,
-		                        m_controlPointEndDiwne.y, m_endDiwne.y}));
+		return ImRect(std::min({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+		              std::min({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}),
+		              std::max({m_controlPointStartDiwne.x, m_startDiwne.x, m_controlPointEndDiwne.x, m_endDiwne.x}),
+		              std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
 	};
 
 	ImVec2 getStartpoint() { return m_startDiwne; };

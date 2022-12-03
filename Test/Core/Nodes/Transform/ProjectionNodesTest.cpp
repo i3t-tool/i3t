@@ -59,8 +59,7 @@ TEST(PerspectiveProjTest, ShouldBeOk)
 	perspective->setDefaultValue("near", 0.01f);
 	perspective->setDefaultValue("far", 100.0f);
 
-	auto expectedMat =
-	    glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
+	auto expectedMat = glm::perspective(glm::radians(150.0f), 1.5f, 0.01f, 100.0f);
 	auto resultMat = perspective->getData().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
@@ -68,8 +67,8 @@ TEST(PerspectiveProjTest, ShouldBeOk)
 
 TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 {
-	auto perspective = Builder::createTransform<ETransformType::Perspective>()
-	                       ->as<TransformImpl<ETransformType::Perspective>>();
+	auto perspective =
+	    Builder::createTransform<ETransformType::Perspective>()->as<TransformImpl<ETransformType::Perspective>>();
 
 	float fovy = generateFloat();
 	float aspect = generateFloat();
@@ -88,8 +87,7 @@ TEST(PerspectiveProjTest, GettersAndSettersShouldBeOk)
 	perspective->setDefaultValue("far", farZ);
 	EXPECT_EQ(farZ, perspective->getDefaultValue("far").getFloat());
 
-	EXPECT_EQ(glm::perspective(fovy, aspect, nearZ, farZ),
-	          perspective->getData().getMat4());
+	EXPECT_EQ(glm::perspective(fovy, aspect, nearZ, farZ), perspective->getData().getMat4());
 }
 
 //--- Frustum -----------------------------------------------------------------
@@ -111,8 +109,7 @@ TEST(FrustumTest, ShouldBeOk)
 
 TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_NoSynergies)
 {
-	auto frustum = Builder::createTransform<ETransformType::Frustum>()
-	                   ->as<TransformImpl<ETransformType::Frustum>>();
+	auto frustum = Builder::createTransform<ETransformType::Frustum>()->as<TransformImpl<ETransformType::Frustum>>();
 
 	float left = generateFloat();
 	float right = generateFloat();
@@ -141,14 +138,12 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_NoSynergies)
 	frustum->setDefaultValue("far", far);
 	EXPECT_EQ(far, frustum->getDefaultValue("far").getFloat());
 
-	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far),
-	          frustum->getData().getMat4());
+	EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far), frustum->getData().getMat4());
 }
 
 TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_Synergies)
 {
-	auto frustum = Builder::createTransform<ETransformType::Frustum>()
-	                   ->as<TransformImpl<ETransformType::Frustum>>();
+	auto frustum = Builder::createTransform<ETransformType::Frustum>()->as<TransformImpl<ETransformType::Frustum>>();
 
 	float left = generateFloat();
 	float right = generateFloat();
@@ -199,8 +194,7 @@ TEST(LookAtTest, ShouldBeOk)
 	lookAt->setDefaultValue("up", glm::vec3{0.0f, 1.0f, 0.0f});
 
 	auto expectedMat =
-	    glm::lookAt(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f},
-	                glm::vec3{0.0f, 1.0f, 0.0f});
+	    glm::lookAt(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 	auto resultMat = lookAt->getData().getMat4();
 
 	EXPECT_EQ(expectedMat, resultMat);
@@ -208,8 +202,7 @@ TEST(LookAtTest, ShouldBeOk)
 
 TEST(LookAtTest, GettersAndSettersShouldBeOk)
 {
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>()
-	                  ->as<TransformImpl<ETransformType::LookAt>>();
+	auto lookAt = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();
 
 	auto eye = generateVec3();
 	lookAt->setDefaultValue("eye", eye);

@@ -4,10 +4,7 @@
 
 using namespace Vp;
 
-Cubemap::Cubemap(std::vector<std::string> textures)
-{
-	id = loadTextures(textures);
-}
+Cubemap::Cubemap(std::vector<std::string> textures) { id = loadTextures(textures); }
 
 void Cubemap::bind(GLuint location)
 {

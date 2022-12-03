@@ -15,17 +15,14 @@ protected:
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceInnerTransformations;
 
 public:
-	WorkspaceSequence(
-	    DIWNE::Diwne& diwne,
-	    Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(),
-	    bool drawPins = true, bool isCameraSequence = false);
+	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(),
+	                  bool drawPins = true, bool isCameraSequence = false);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
-		visitor.visit(
-		    std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+		visitor.visit(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 
@@ -40,14 +37,12 @@ public:
 	void popNode(Ptr<WorkspaceNodeWithCoreData> node);
 	void pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index = 0);
 
-	void moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode,
-	                        int index = 0);
+	void moveNodeToSequence(Ptr<WorkspaceNodeWithCoreData> dragedNode, int index = 0);
 	void moveNodeToWorkspace(Ptr<WorkspaceNodeWithCoreData> dragedNode);
 
 	void setNumberOfVisibleDecimal(int value);
 
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> const&
-	getInnerWorkspaceNodes() const;
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;
 
 	bool beforeContent();
 	bool afterContent();

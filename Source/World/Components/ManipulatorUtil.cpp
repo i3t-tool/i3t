@@ -7,8 +7,7 @@
 bool ManipulatorUtil::s_stencilInit = false;
 char ManipulatorUtil::s_stencilArr[7] = {0};
 
-void ManipulatorUtil::drawHandle(GameObject* _handle, glm::mat4 space,
-                                 glm::vec4 color, int stencil, int active,
+void ManipulatorUtil::drawHandle(GameObject* _handle, glm::mat4 space, glm::vec4 color, int stencil, int active,
                                  int hover)
 {
 	float m = 0.0f;
@@ -22,8 +21,7 @@ void ManipulatorUtil::drawHandle(GameObject* _handle, glm::mat4 space,
 	}
 	glStencilMask(255 * (stencil != -1));
 	glStencilFunc(GL_ALWAYS, (unsigned char)stencil, 255);
-	_handle->color =
-	    glm::vec4(1.0f, 1.0f, 1.0f, color[3]) * m + color * (1.0f - m);
+	_handle->color = glm::vec4(1.0f, 1.0f, 1.0f, color[3]) * m + color * (1.0f - m);
 	_handle->draw(space);
 	glStencilMask(0);
 }

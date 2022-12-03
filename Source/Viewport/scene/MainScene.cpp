@@ -35,18 +35,15 @@ void MainScene::init()
 	m_lighting->addLight(sun2);
 
 	Shaper s;
-	s.quad(glm::vec3(-1, 1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, -1, 0),
-	       glm::vec3(1, -1, 0), Color::GREEN);
+	s.quad(glm::vec3(-1, 1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0), Color::GREEN);
 	Core::Mesh* m = s.createMesh("gridScreenQuad");
-	m_gridObject =
-	    std::make_shared<GameObject>(m, m_viewport->m_gridShader.get());
+	m_gridObject = std::make_shared<GameObject>(m, m_viewport->m_gridShader.get());
 	m_gridObject->m_opaque = false;
 }
 
 void MainScene::draw(int width, int height) { Scene::draw(width, height); }
 
-void MainScene::draw(glm::mat4 view, glm::mat4 projection,
-                     const DisplayOptions& displayOptions)
+void MainScene::draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions)
 {
 	Scene::draw(view, projection, displayOptions);
 

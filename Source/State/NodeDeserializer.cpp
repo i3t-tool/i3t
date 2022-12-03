@@ -24,8 +24,7 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 
 	if (value.HasMember("value"))
 	{
-		const auto maybeData =
-		    JSON::getData(value["value"], coreNode->getOperation()->inputTypes[0]);
+		const auto maybeData = JSON::getData(value["value"], coreNode->getOperation()->inputTypes[0]);
 		if (maybeData.has_value())
 		{
 			const auto& data = *maybeData;
@@ -85,12 +84,10 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 
 	assignCommon(value, node);
 
-	value["synergies"].GetBool() ? coreNode->enableSynergies()
-	                             : coreNode->disableSynergies();
+	value["synergies"].GetBool() ? coreNode->enableSynergies() : coreNode->disableSynergies();
 	value["locked"].GetBool() ? coreNode->lock() : coreNode->unlock();
 
-	const auto maybeLOD = EnumUtils::value<WorkspaceLevelOfDetail>(
-	    std::string(value["LOD"].GetString()));
+	const auto maybeLOD = EnumUtils::value<WorkspaceLevelOfDetail>(std::string(value["LOD"].GetString()));
 	if (maybeLOD.has_value())
 	{
 		node->setLevelOfDetail(maybeLOD.value());

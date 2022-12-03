@@ -38,8 +38,7 @@ template <typename Node> FORCE_INLINE bool isRot(Node&& node)
 	// static_assert(std::is_base_of_v<NodeBase, Node>);
 
 	auto& type = node->getOperation()->keyWord;
-	return type == "EulerX" || type == "EulerY" || type == "EulerZ" ||
-	       type == "AxisAngle";
+	return type == "EulerX" || type == "EulerY" || type == "EulerZ" || type == "AxisAngle";
 	// \todo Q: and what about quaternions?
 }
 
@@ -56,14 +55,12 @@ using ValueMask = std::array<int8_t, 16>;
 constexpr int8_t VM_MINUS_ONE = -1; ///< Fixed matrix element (-1) in ValueMask
 constexpr int8_t VM_ZERO = 0;       ///< Fixed matrix element (0) in ValueMask
 constexpr int8_t VM_ONE = 1;        ///< Fixed matrix element (+1) in ValueMask
-constexpr int8_t VM_ANY =
-    2; ///< Editable matrix element in ValueMask - it's range of values may be
-       ///< limited - the limit is checked in setValue() methods
+constexpr int8_t VM_ANY = 2;        ///< Editable matrix element in ValueMask - it's range of values may be
+                                    ///< limited - the limit is checked in setValue() methods
 
 inline bool canEditValue(EValueState valueState)
 {
-	return valueState == EValueState::Editable ||
-	       valueState == EValueState::EditableSyn;
+	return valueState == EValueState::Editable || valueState == EValueState::EditableSyn;
 }
 /**
  * \brief Check single element in the matrix, if it is in the allowed range.
@@ -122,10 +119,9 @@ public:
 
 private:
 	/// \todo MH Use Node::m_owner.
-	Ptr<NodeBase> m_currentSequence =
-	    nullptr; ///< pointer to the sequence the transform matrix is in (or
-	             ///< nullptr if without)
-	int m_currentIndex = -1; ///< index of the transform in the sequence
+	Ptr<NodeBase> m_currentSequence = nullptr; ///< pointer to the sequence the transform matrix is in (or
+	                                           ///< nullptr if without)
+	int m_currentIndex = -1;                   ///< index of the transform in the sequence
 
 public:
 	bool isInSequence() const { return m_currentSequence != nullptr; }
@@ -151,18 +147,15 @@ public:
 	 */
 	template <typename T> void setDefaultValue(const std::string& name, T&& val)
 	{
-		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() &&
-		           "Default value with this name does not exist.");
+		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
 
 		m_defaultValues.at(name).setValue(val); // defaults
 		resetMatrixFromDefaults();              // defaults to matrix
 	}
 
-	template <typename T>
-	void setDefaultValueNoUpdate(const std::string& name, T&& val)
+	template <typename T> void setDefaultValueNoUpdate(const std::string& name, T&& val)
 	{
-		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() &&
-		           "Default value with this name does not exist.");
+		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
 
 		m_defaultValues.at(name).setValue(val);
 	}
@@ -172,10 +165,7 @@ public:
 	TransformOperation::ValueMap getDefaultTypes() const;
 	DefaultValues& getDefaultValues();
 
-	void setDefaultValues(const DefaultValues& values)
-	{
-		m_defaultValues = values;
-	}
+	void setDefaultValues(const DefaultValues& values) { m_defaultValues = values; }
 
 	EValueState getValueState(glm::ivec2 coords) const;
 
@@ -194,10 +184,7 @@ public:
 	bool isLocked() const;
 	void lock();
 	void unlock();
-	bool hasMenuSynergies() const
-	{
-		return m_hasMenuSynergies;
-	} // PF TODO should be const for the given Transformation
+	bool hasMenuSynergies() const { return m_hasMenuSynergies; } // PF TODO should be const for the given Transformation
 	bool hasSynergies() const { return m_hasSynergies; }
 	void disableSynergies() { m_hasSynergies = false; }
 	void enableSynergies() { m_hasSynergies = m_hasMenuSynergies ? true : false; }
@@ -220,8 +207,7 @@ public:
 	 *       - for Scale When setting X value in non-uniform scale -> this switch
 	 * to uniform scale (due to enable synergies)
 	 */
-	void resetMatrixFromDefaults() override =
-	    0; // PF Pure virtual, defined in TransformImpl for each transformation
+	void resetMatrixFromDefaults() override = 0; // PF Pure virtual, defined in TransformImpl for each transformation
 
 	//===----------------------------------------------------------------------===//
 
@@ -235,10 +221,7 @@ public:
 
 	const glm::mat4& getSavedValue() const;
 
-	const std::map<std::string, DataStore>& getSavedDefaults() const
-	{
-		return m_savedValues;
-	}
+	const std::map<std::string, DataStore>& getSavedDefaults() const { return m_savedValues; }
 
 	/**
 	 * \brief Save the value, read from YAML
@@ -319,9 +302,8 @@ protected:
 	 * |
 	 */
 	bool m_hasMenuSynergies = false;
-	bool m_hasSynergies =
-	    false; ///< applicable for: uniform scale, eulerAngleXYZ, ortho, frustum,
-	           ///< and quaternion. All other undefined (false)
+	bool m_hasSynergies = false; ///< applicable for: uniform scale, eulerAngleXYZ, ortho, frustum,
+	                             ///< and quaternion. All other undefined (false)
 
 	bool m_isLocked = true;
 

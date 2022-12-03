@@ -18,8 +18,7 @@
 #include "Core/Window.h"
 #include "State/Stateful.h"
 
-static const std::string g_baseTitle =
-    "I3T - An Interactive Tool for Teaching Transformations";
+static const std::string g_baseTitle = "I3T - An Interactive Tool for Teaching Transformations";
 
 class ICommand;
 class Window;
@@ -114,12 +113,10 @@ public:
 	//===--------------------------------------------------------------------===//
 
 private:
-	template <typename T, typename... Args>
-	static void createModule(Args&&... args);
+	template <typename T, typename... Args> static void createModule(Args&&... args);
 
 public:
-	template <typename T>
-	static T& getModule();
+	template <typename T> static T& getModule();
 
 private:
 	static Application* s_instance;
@@ -179,8 +176,7 @@ private:
 	void logicUpdate();
 };
 
-template <typename T, typename... Args>
-inline void Application::createModule(Args&&... args)
+template <typename T, typename... Args> inline void Application::createModule(Args&&... args)
 {
 	auto& self = Application::get();
 
@@ -191,8 +187,7 @@ inline void Application::createModule(Args&&... args)
 	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
 }
 
-template <typename T>
-T& Application::getModule()
+template <typename T> T& Application::getModule()
 {
 	const auto& self = Application::get();
 
@@ -203,7 +198,7 @@ T& Application::getModule()
 	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr && "Invalid type.");
 #endif
 
-	return *(T*) self.m_modules.at(hash).get();
+	return *(T*)self.m_modules.at(hash).get();
 }
 
 typedef Application App;

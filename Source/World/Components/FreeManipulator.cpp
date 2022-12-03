@@ -17,9 +17,8 @@ void printMatrix4(glm::mat4 m)
 	printf("\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f %0.3f %0.3f\n\t%0.3f %0.3f "
 	       "%0.3f %0.3f\n\t%0.3f %0.3f %0.3f "
 	       "%0.3f\n\n",
-	       m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], m[2][1], m[3][1],
-	       m[0][2], m[1][2], m[2][2], m[3][2], m[0][3], m[1][3], m[2][3],
-	       m[3][3]);
+	       m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], m[2][1], m[3][1], m[0][2], m[1][2], m[2][2], m[3][2],
+	       m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
 const char* FreeManipulator::s_type = nullptr;
@@ -52,9 +51,8 @@ FreeManipulator::FreeManipulator()
 void FreeManipulator::start() {}
 void FreeManipulator::GUI()
 {
-	ManipulatorUtil::hint(
-	    "Use keys S, R, T to switch scale, rotation and translation.\nUse keys "
-	    "X, Y, Z, W or LMB to switch axis.");
+	ManipulatorUtil::hint("Use keys S, R, T to switch scale, rotation and translation.\nUse keys "
+	                      "X, Y, Z, W or LMB to switch axis.");
 }
 
 void FreeManipulator::render(glm::mat4* parent, bool renderTransparent)
@@ -84,19 +82,16 @@ void FreeManipulator::render(glm::mat4* parent, bool renderTransparent)
 	}
 
 	float depth = (World::perspective * World::mainCamera * m_handlespace[3])[2];
-	glm::mat4 scale =
-	    glm::scale(glm::mat4(1.0f), glm::vec3(depth * 0.07f + 0.5f));
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(depth * 0.07f + 0.5f));
 
-	glm::vec4 row4bkp =
-	    glm::vec4(m_edited[0][3], m_edited[1][3], m_edited[2][3], m_edited[3][3]);
+	glm::vec4 row4bkp = glm::vec4(m_edited[0][3], m_edited[1][3], m_edited[2][3], m_edited[3][3]);
 	m_edited[0][3] = 0.0f;
 	m_edited[1][3] = 0.0f;
 	m_edited[2][3] = 0.0f;
 	m_edited[3][3] = 1.0f;
 	// glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 	// glm::mat4 ftransform=m_edited;
-	glm::mat4 ftransform = getNodeTransform(&m_editednode, &m_parent) *
-	                       m_editednode->getData().getMat4();
+	glm::mat4 ftransform = getNodeTransform(&m_editednode, &m_parent) * m_editednode->getData().getMat4();
 	m_edited[0][3] = row4bkp[0];
 	m_edited[1][3] = row4bkp[1];
 	m_edited[2][3] = row4bkp[2];
@@ -109,47 +104,39 @@ void FreeManipulator::render(glm::mat4* parent, bool renderTransparent)
 	t = getOrtho(ftransform, 0);
 	setLen((glm::vec3*)&t[1], 1.0f + selected * 3.0f);
 	setLen((glm::vec3*)&t[2], 1.0f + selected * 3.0f);
-	m_lineh->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f),
-	                                      glm::vec3(0.0f, 1.0f, 0.0f));
-	ManipulatorUtil::drawHandle(
-	    m_lineh, t, glm::vec4(1.0f, selected * 1.5f, selected * 1.5f, 1.0f),
-	    m_stencilaxisx, false, m_hoverhandle);
+	m_lineh->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	ManipulatorUtil::drawHandle(m_lineh, t, glm::vec4(1.0f, selected * 1.5f, selected * 1.5f, 1.0f), m_stencilaxisx,
+	                            false, m_hoverhandle);
 
 	selected = 0.3f * (float)(m_editaxis == 1);
 	t = getOrtho(ftransform, 1);
 	setLen((glm::vec3*)&t[0], 1.0f + selected * 3.0f);
 	setLen((glm::vec3*)&t[2], 1.0f + selected * 3.0f);
-	m_lineh->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f),
-	                                      glm::vec3(1.0f, 0.0f, 0.0f));
-	ManipulatorUtil::drawHandle(
-	    m_lineh, t, glm::vec4(selected * 1.5f, 1.0f, selected * 1.5f, 1.0f),
-	    m_stencilaxisy, false, m_hoverhandle);
+	m_lineh->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	ManipulatorUtil::drawHandle(m_lineh, t, glm::vec4(selected * 1.5f, 1.0f, selected * 1.5f, 1.0f), m_stencilaxisy,
+	                            false, m_hoverhandle);
 
 	selected = 0.3f * (float)(m_editaxis == 2);
 	t = getOrtho(ftransform, 2);
 	setLen((glm::vec3*)&t[0], 1.0f + selected * 3.0f);
 	setLen((glm::vec3*)&t[1], 1.0f + selected * 3.0f);
 	m_lineh->transformation = glm::mat4(1.0f);
-	ManipulatorUtil::drawHandle(
-	    m_lineh, t,
-	    glm::vec4(selected * 0.5f + 0.1f, selected * 0.5f + 0.4f, 1.0f, 1.0f),
-	    m_stencilaxisz, false, m_hoverhandle);
+	ManipulatorUtil::drawHandle(m_lineh, t, glm::vec4(selected * 0.5f + 0.1f, selected * 0.5f + 0.4f, 1.0f, 1.0f),
+	                            m_stencilaxisz, false, m_hoverhandle);
 
 	selected = 0.3f * (float)(m_editaxis == 3);
 	// t=glm::mat4(ftransform[1],ftransform[2],getFullTransform(m_edited->parent)[3]-ftransform[3],
 	// ftransform[3]);//TMP
 	// t=glm::mat4(ftransform[1],ftransform[2],glm::mat4(1.0f)[3]-ftransform[3],
 	// ftransform[3]);//TMP
-	t = glm::mat4(ftransform[1], ftransform[2],
-	              getNodeTransform(&m_editednode, &m_parent)[3] - ftransform[3],
+	t = glm::mat4(ftransform[1], ftransform[2], getNodeTransform(&m_editednode, &m_parent)[3] - ftransform[3],
 	              ftransform[3]); // TMP
 	t = getOrtho(t, 2);
 	setLen((glm::vec3*)&t[0], 1.0f + selected * 3.0f);
 	setLen((glm::vec3*)&t[1], 1.0f + selected * 3.0f);
 	m_lineh->transformation = glm::mat4(1.0f);
-	ManipulatorUtil::drawHandle(m_lineh, t,
-	                            glm::vec4(1.0f, selected + 0.2f, 1.0f, 1.0f),
-	                            m_stencilaxisw, false, m_hoverhandle);
+	ManipulatorUtil::drawHandle(m_lineh, t, glm::vec4(1.0f, selected + 0.2f, 1.0f, 1.0f), m_stencilaxisw, false,
+	                            m_hoverhandle);
 
 	if (m_editmode == FreeManipulator::EDIT_SCALE)
 	{ // override scale handles for free edit
@@ -157,49 +144,38 @@ void FreeManipulator::render(glm::mat4* parent, bool renderTransparent)
 		if (m_editaxis == 0)
 		{
 			m_uniscaleh->transformation = glm::mat4(1.0f) * scale;
-			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace,
-			                            glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), m_stencilx,
+			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), m_stencilx,
 			                            m_activehandle, m_hoverhandle);
 		}
 		else if (m_editaxis == 1)
 		{
 			m_uniscaleh->transformation = glm::mat4(1.0f) * scale;
-			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace,
-			                            glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), m_stencily,
+			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), m_stencily,
 			                            m_activehandle, m_hoverhandle);
 		}
 		else if (m_editaxis == 2)
 		{
 			m_uniscaleh->transformation = glm::mat4(1.0f) * scale;
-			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace,
-			                            glm::vec4(0.1f, 0.4f, 1.0f, 1.0f), m_stencilz,
+			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace, glm::vec4(0.1f, 0.4f, 1.0f, 1.0f), m_stencilz,
 			                            m_activehandle, m_hoverhandle);
 		}
 		else if (m_editaxis == 3)
 		{
 			m_uniscaleh->transformation = glm::mat4(1.0f) * scale;
-			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace,
-			                            glm::vec4(1.0f, 0.2f, 1.0f, 1.0f), m_stencilz,
+			ManipulatorUtil::drawHandle(m_uniscaleh, m_handlespace, glm::vec4(1.0f, 0.2f, 1.0f, 1.0f), m_stencilz,
 			                            m_activehandle, m_hoverhandle);
 		}
 	}
 	else
 	{
-		handle->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f),
-		                                     glm::vec3(0.0f, 1.0f, 0.0f)) *
-		                         scale;
-		ManipulatorUtil::drawHandle(handle, getOrtho(m_handlespace, 0),
-		                            glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), m_stencilx,
+		handle->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * scale;
+		ManipulatorUtil::drawHandle(handle, getOrtho(m_handlespace, 0), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), m_stencilx,
 		                            m_activehandle, m_hoverhandle);
-		handle->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f),
-		                                     glm::vec3(1.0f, 0.0f, 0.0f)) *
-		                         scale;
-		ManipulatorUtil::drawHandle(handle, getOrtho(m_handlespace, 1),
-		                            glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), m_stencily,
+		handle->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * scale;
+		ManipulatorUtil::drawHandle(handle, getOrtho(m_handlespace, 1), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), m_stencily,
 		                            m_activehandle, m_hoverhandle);
 		handle->transformation = glm::mat4(1.0f) * scale;
-		ManipulatorUtil::drawHandle(handle, getOrtho(m_handlespace, 2),
-		                            glm::vec4(0.1f, 0.4f, 1.0f, 1.0f), m_stencilz,
+		ManipulatorUtil::drawHandle(handle, getOrtho(m_handlespace, 2), glm::vec4(0.1f, 0.4f, 1.0f, 1.0f), m_stencilz,
 		                            m_activehandle, m_hoverhandle);
 
 		if (m_editmode == FreeManipulator::EDIT_POSITION)
@@ -207,23 +183,15 @@ void FreeManipulator::render(glm::mat4* parent, bool renderTransparent)
 			m_planeh->transformation = glm::mat4(1.0f) * scale;
 
 			m_planeh->transformation =
-			    glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f),
-			                glm::vec3(0.0f, 1.0f, 0.0f)) *
-			    scale;
-			ManipulatorUtil::drawHandle(m_planeh, m_handlespace,
-			                            glm::vec4(0.0f, 1.0f, 1.0f, 0.6f),
-			                            m_stencilzy, m_activehandle, m_hoverhandle);
-			m_planeh->transformation =
-			    glm::rotate(glm::mat4(1.0f), glm::radians(90.0f),
-			                glm::vec3(1.0f, 0.0f, 0.0f)) *
-			    scale;
-			ManipulatorUtil::drawHandle(m_planeh, m_handlespace,
-			                            glm::vec4(1.0f, 0.2f, 1.0f, 0.6f),
-			                            m_stencilzx, m_activehandle, m_hoverhandle);
+			    glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * scale;
+			ManipulatorUtil::drawHandle(m_planeh, m_handlespace, glm::vec4(0.0f, 1.0f, 1.0f, 0.6f), m_stencilzy,
+			                            m_activehandle, m_hoverhandle);
+			m_planeh->transformation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * scale;
+			ManipulatorUtil::drawHandle(m_planeh, m_handlespace, glm::vec4(1.0f, 0.2f, 1.0f, 0.6f), m_stencilzx,
+			                            m_activehandle, m_hoverhandle);
 			m_planeh->transformation = glm::mat4(1.0f) * scale;
-			ManipulatorUtil::drawHandle(m_planeh, m_handlespace,
-			                            glm::vec4(1.0f, 1.0f, 0.0f, 0.6f),
-			                            m_stencilyx, m_activehandle, m_hoverhandle);
+			ManipulatorUtil::drawHandle(m_planeh, m_handlespace, glm::vec4(1.0f, 1.0f, 0.0f, 0.6f), m_stencilyx,
+			                            m_activehandle, m_hoverhandle);
 		}
 	}
 	glDepthRange(0.0, 1.0);
@@ -251,9 +219,8 @@ void FreeManipulator::update()
 	m_edited = m_editednode.get()->getData().getMat4();
 	// printf("4\n");
 	bool transactionBegin = false;
-	unsigned char sel = Select::getStencilAt(
-	    (int)InputManager::m_mouseX,
-	    (int)(World::height - InputManager::m_mouseY), 3, -1);
+	unsigned char sel =
+	    Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 
 	m_hoverhandle = -1;
 	if (m_activehandle == -1)
@@ -306,9 +273,8 @@ void FreeManipulator::update()
 
 	if (InputManager::isKeyJustPressed(Keys::mouseLeft))
 	{
-		unsigned char sel = Select::getStencilAt(
-		    (int)InputManager::m_mouseX,
-		    (int)(World::height - InputManager::m_mouseY), 3, -1);
+		unsigned char sel =
+		    Select::getStencilAt((int)InputManager::m_mouseX, (int)(World::height - InputManager::m_mouseY), 3, -1);
 		m_activehandle = -1;
 		if (sel == m_stencilx)
 		{
@@ -384,8 +350,7 @@ void FreeManipulator::update()
 		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 	}
 
-	glm::vec4 row4bkp =
-	    glm::vec4(m_edited[0][3], m_edited[1][3], m_edited[2][3], m_edited[3][3]);
+	glm::vec4 row4bkp = glm::vec4(m_edited[0][3], m_edited[1][3], m_edited[2][3], m_edited[3][3]);
 	m_edited[0][3] = 0.0f;
 	m_edited[1][3] = 0.0f;
 	m_edited[2][3] = 0.0f;
@@ -455,9 +420,7 @@ void FreeManipulator::update()
 		if (m_editaxis == 3)
 		{
 			glm::vec4 dir = m[3] - (m * m_bkp)[3];
-			m_handlespace = getRotation(
-			    glm::mat4(glm::vec4(0.0f), glm::vec4(0.0f), -dir, glm::vec4(0.0f)),
-			    2);
+			m_handlespace = getRotation(glm::mat4(glm::vec4(0.0f), glm::vec4(0.0f), -dir, glm::vec4(0.0f)), 2);
 		}
 		else
 		{
@@ -498,13 +461,11 @@ void FreeManipulator::update()
 	glm::vec3 drag3 = glm::vec3(0.0f);
 	glm::mat4 axes = glm::mat4(1.0f);
 	axes[3] = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);
-	glm::vec2 spos1 = world2screen((glm::vec3)(
-	    m_handlespace[3])); // position of transformated object on the screen
-	glm::vec2 spos2 = world2screen((glm::vec3)(
-	    m_handlespace[3] +
-	    m_handlespace * axes[m_axisnum])); // spos1,spos2 - project two points on
-	                                       // screen - project axis on screen
-	glm::vec2 dir = spos2 - spos1;         // the axis in screen space
+	glm::vec2 spos1 = world2screen((glm::vec3)(m_handlespace[3])); // position of transformated object on the screen
+	glm::vec2 spos2 = world2screen(
+	    (glm::vec3)(m_handlespace[3] + m_handlespace * axes[m_axisnum])); // spos1,spos2 - project two points on
+	                                                                      // screen - project axis on screen
+	glm::vec2 dir = spos2 - spos1;                                        // the axis in screen space
 
 	if (m_editmode == FreeManipulator::EDIT_ROTATION)
 	{
@@ -518,13 +479,11 @@ void FreeManipulator::update()
 			// glm::vec3 tz = mouseray(world2screen(p0)
 			// +glm::vec2(InputController::m_mouseXDelta,
 			// -InputController::m_mouseYDelta));
-			glm::vec3 tz = mouseray(glm::vec2(
-			    InputManager::m_mouseX, World::height - InputManager::m_mouseY));
+			glm::vec3 tz = mouseray(glm::vec2(InputManager::m_mouseX, World::height - InputManager::m_mouseY));
 			glm::vec3 coef = glm::inverse(glm::mat3(-tz, px, py)) * (t0 - p0);
 
 			glm::vec3 pc = px * coef[1] + py * coef[2];
-			glm::vec3 dir3 =
-			    glm::normalize(glm::cross(pc, (glm::vec3)axes[m_axisnum]));
+			glm::vec3 dir3 = glm::normalize(glm::cross(pc, (glm::vec3)axes[m_axisnum]));
 			m_dirbkp = glm::normalize(world2screen(p0) - world2screen(p0 + dir3));
 
 			// glm::vec3 dir3 = glm::normalize(glm::cross(pc - (glm::vec3)ortho[3],
@@ -542,11 +501,10 @@ void FreeManipulator::update()
 
 	if (m_axisnum2 != -1)
 	{
-		glm::vec2 spos22 = world2screen((glm::vec3)(
-		    m_handlespace[3] +
-		    m_handlespace * axes[m_axisnum2])); // project two points on screen -
-		                                        // project axis on screen
-		glm::vec2 dir2 = spos22 - spos1;        // the axis in screen space
+		glm::vec2 spos22 =
+		    world2screen((glm::vec3)(m_handlespace[3] + m_handlespace * axes[m_axisnum2])); // project two points on screen
+		                                                                                    // - project axis on screen
+		glm::vec2 dir2 = spos22 - spos1;                                                    // the axis in screen space
 		if (glm::length(dir2) < 0.01)
 		{
 			dir2[1] = 1.0f;
@@ -558,11 +516,9 @@ void FreeManipulator::update()
 
 	glm::vec2 drag, olddrag, dragfinal, mouse;
 
-	mouse =
-	    glm::vec2(InputManager::m_mouseX, World::height - InputManager::m_mouseY);
+	mouse = glm::vec2(InputManager::m_mouseX, World::height - InputManager::m_mouseY);
 	drag = mov * (mouse - spos1);
-	mouse = glm::vec2(InputManager::m_mouseXPrev,
-	                  World::height - InputManager::m_mouseYPrev);
+	mouse = glm::vec2(InputManager::m_mouseXPrev, World::height - InputManager::m_mouseYPrev);
 	olddrag = mov * (mouse - spos1);
 	dragfinal = drag - olddrag;
 
@@ -572,10 +528,8 @@ void FreeManipulator::update()
 		drag3 += ((glm::vec3)axes[m_axisnum2]) * (dragfinal[1]);
 	}
 
-	float depth = glm::length(
-	    World::mainCamPos +
-	    (glm::vec3)m_handlespace[3]); // add, not substract - moving camera is
-	                                  // moving world in opposite direction
+	float depth = glm::length(World::mainCamPos + (glm::vec3)m_handlespace[3]); // add, not substract - moving camera is
+	                                                                            // moving world in opposite direction
 	if (m_editmode != FreeManipulator::EDIT_ROTATION)
 	{
 		drag3 *= depth * 0.5f;
@@ -592,9 +546,7 @@ void FreeManipulator::update()
 	{
 		glm::mat4 r = glm::mat4(m_rotfreebkp[0], m_rotfreebkp[1], m_rotfreebkp[2],
 		                        m_rotfreebkp[2]); // axes of rotation (0,1,2,2)
-		glm::mat4 rot1 =
-		    glm::rotate(glm::mat4(1.0f), glm::radians(drag3[m_axisnum]),
-		                (glm::vec3)r[m_axisnum]);
+		glm::mat4 rot1 = glm::rotate(glm::mat4(1.0f), glm::radians(drag3[m_axisnum]), (glm::vec3)r[m_axisnum]);
 		// printMatrix2(rotfreebkp);
 		m_rotfreebkp = rot1 * m_rotfreebkp;
 		// printMatrix2(rotfreebkp);printf("----------------\n");
@@ -605,8 +557,7 @@ void FreeManipulator::update()
 	{
 		if (m_axisnum2 != -1)
 		{
-			glm::vec3 pc = planeIntersect((glm::vec3)(m_handlespace[m_axisnum]),
-			                              (glm::vec3)(m_handlespace[m_axisnum2]),
+			glm::vec3 pc = planeIntersect((glm::vec3)(m_handlespace[m_axisnum]), (glm::vec3)(m_handlespace[m_axisnum2]),
 			                              (glm::vec3)(m_handlespace[3]));
 
 			if (world2viewport(pc)[2] < 0.998f)
@@ -630,10 +581,8 @@ void FreeManipulator::update()
 		}
 		// glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 		// glm::mat4 ftransform=m_edited;
-		glm::mat4 ftransform = getNodeTransform(&m_editednode, &m_parent) *
-		                       m_editednode->getData().getMat4();
-		m_handlespace[3] =
-		    ftransform[3] + ftransform[m_editaxis] * (float)(m_editaxis != 3);
+		glm::mat4 ftransform = getNodeTransform(&m_editednode, &m_parent) * m_editednode->getData().getMat4();
+		m_handlespace[3] = ftransform[3] + ftransform[m_editaxis] * (float)(m_editaxis != 3);
 		m_handlespace[3][3] = 1.0f;
 	}
 	else if (m_editmode == FreeManipulator::EDIT_SCALE)
@@ -647,15 +596,12 @@ void FreeManipulator::update()
 		}
 		else if (glm::length2((glm::vec3)m_bkp[m_editaxis]) > 0.0005f)
 		{
-			m_edited[m_editaxis] += m_bkp[m_editaxis] * drag3[m_editaxis] /
-			                        (glm::length((glm::vec3)m_bkp[m_editaxis]));
+			m_edited[m_editaxis] += m_bkp[m_editaxis] * drag3[m_editaxis] / (glm::length((glm::vec3)m_bkp[m_editaxis]));
 		}
 		// glm::mat4 ftransform=getFullTransform(m_edited);//TMP
 		// glm::mat4 ftransform=m_edited;
-		glm::mat4 ftransform = getNodeTransform(&m_editednode, &m_parent) *
-		                       m_editednode->getData().getMat4();
-		m_handlespace[3] =
-		    ftransform[3] + ftransform[m_editaxis] * (float)(m_editaxis != 3);
+		glm::mat4 ftransform = getNodeTransform(&m_editednode, &m_parent) * m_editednode->getData().getMat4();
+		m_handlespace[3] = ftransform[3] + ftransform[m_editaxis] * (float)(m_editaxis != 3);
 		m_handlespace[3][3] = 1.0f;
 	}
 

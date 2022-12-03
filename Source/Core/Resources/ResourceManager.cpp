@@ -14,10 +14,7 @@ using namespace Core;
 
 ResourceManager::~ResourceManager() { dispose(); }
 
-ResourceManager& ResourceManager::instance()
-{
-	return App::getModule<ResourceManager>();
-}
+ResourceManager& ResourceManager::instance() { return App::getModule<ResourceManager>(); }
 
 GLuint ResourceManager::textureByAlias(const std::string& alias)
 {
@@ -33,13 +30,9 @@ GLuint ResourceManager::textureByAlias(const std::string& alias)
 	return 0;
 }
 
-GLuint ResourceManager::texture(const std::string& path)
-{
-	return texture(NO_ALIAS, path);
-}
+GLuint ResourceManager::texture(const std::string& path) { return texture(NO_ALIAS, path); }
 
-GLuint ResourceManager::texture(const std::string& alias,
-                                const std::string& path)
+GLuint ResourceManager::texture(const std::string& alias, const std::string& path)
 {
 	size_t id = hash_string(path);
 	bool success = false;
@@ -52,8 +45,7 @@ GLuint ResourceManager::texture(const std::string& alias,
 			GLuint textureId = loadTexture(path);
 			if (textureId)
 			{
-				std::shared_ptr<Resource> textureResource =
-				    std::make_shared<Resource>(alias, path, ResourceType::Texture);
+				std::shared_ptr<Resource> textureResource = std::make_shared<Resource>(alias, path, ResourceType::Texture);
 				textureResource->hashId = id;
 				textureResource->data = std::make_shared<GLuint>(textureId);
 				m_resourceMap.insert(std::make_pair(id, textureResource));
@@ -84,29 +76,23 @@ GLuint ResourceManager::shaderByAlias(const std::string& alias)
 	return 0;
 }
 
-GLuint ResourceManager::shader(const std::string& vertShader,
-                               const std::string& fragShader)
+GLuint ResourceManager::shader(const std::string& vertShader, const std::string& fragShader)
 {
 	return shader(NO_ALIAS, vertShader, fragShader);
 }
 
-GLuint ResourceManager::shader(const std::string& alias,
-                               const std::string& vertShader,
-                               const std::string& fragShader)
+GLuint ResourceManager::shader(const std::string& alias, const std::string& vertShader, const std::string& fragShader)
 {
 	return shaderG(alias, vertShader, fragShader, "");
 }
 
-GLuint ResourceManager::shaderG(const std::string& vertShader,
-                                const std::string& fragShader,
+GLuint ResourceManager::shaderG(const std::string& vertShader, const std::string& fragShader,
                                 const std::string& geoShader)
 {
 	return shaderG(NO_ALIAS, vertShader, fragShader, geoShader);
 }
 
-GLuint ResourceManager::shaderG(const std::string& alias,
-                                const std::string& vertShader,
-                                const std::string& fragShader,
+GLuint ResourceManager::shaderG(const std::string& alias, const std::string& vertShader, const std::string& fragShader,
                                 const std::string& geoShader)
 {
 	size_t id = hash_string(vertShader, fragShader, geoShader);
@@ -120,11 +106,8 @@ GLuint ResourceManager::shaderG(const std::string& alias,
 			GLuint shaderId = loadShader(vertShader, fragShader, geoShader);
 			if (shaderId)
 			{
-				std::string path = "Vert: " + vertShader + "\n" +
-				                   "Frag: " + fragShader + "\n" + "Geo: " + geoShader +
-				                   "\n";
-				std::shared_ptr<Resource> shaderResource =
-				    std::make_shared<Resource>(alias, path, ResourceType::Shader);
+				std::string path = "Vert: " + vertShader + "\n" + "Frag: " + fragShader + "\n" + "Geo: " + geoShader + "\n";
+				std::shared_ptr<Resource> shaderResource = std::make_shared<Resource>(alias, path, ResourceType::Shader);
 				shaderResource->hashId = id;
 				shaderResource->data = std::make_shared<GLuint>(shaderId);
 				m_resourceMap.insert(std::make_pair(id, shaderResource));
@@ -154,10 +137,7 @@ Mesh* ResourceManager::meshByAlias(const std::string& alias)
 	}
 	return nullptr;
 }
-Mesh* ResourceManager::mesh(const std::string& path)
-{
-	return mesh(NO_ALIAS, path);
-}
+Mesh* ResourceManager::mesh(const std::string& path) { return mesh(NO_ALIAS, path); }
 Mesh* ResourceManager::mesh(const std::string& alias, const std::string& path)
 {
 	size_t id = hash_string(path);
@@ -171,8 +151,7 @@ Mesh* ResourceManager::mesh(const std::string& alias, const std::string& path)
 			Mesh* mesh = loadModel(path);
 			if (mesh)
 			{
-				std::shared_ptr<Resource> modelResource =
-				    std::make_shared<Resource>(alias, path, ResourceType::Model);
+				std::shared_ptr<Resource> modelResource = std::make_shared<Resource>(alias, path, ResourceType::Model);
 				modelResource->hashId = id;
 				modelResource->data = std::make_shared<Mesh*>(mesh);
 				m_resourceMap.insert(std::make_pair(id, modelResource));
@@ -189,27 +168,21 @@ Mesh* ResourceManager::mesh(const std::string& alias, const std::string& path)
 	return nullptr;
 }
 
-Mesh* ResourceManager::mesh(const std::string& alias,
-                            Mesh::PrimitiveType primitiveType,
-                            const float* verts, const unsigned int nVertices,
-                            const float* colors, const unsigned int nColors)
+Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primitiveType, const float* verts,
+                            const unsigned int nVertices, const float* colors, const unsigned int nColors)
 {
-	return mesh(alias, primitiveType, verts, nVertices, nullptr, 0, colors,
-	            nColors);
+	return mesh(alias, primitiveType, verts, nVertices, nullptr, 0, colors, nColors);
 }
 
-Mesh* ResourceManager::mesh(const std::string& alias,
-                            Mesh::PrimitiveType primitiveType,
-                            const float* verts, const unsigned int nVertices,
-                            const unsigned int* indices,
-                            const unsigned int nIndices, const float* colors,
-                            const unsigned int nColors)
+Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primitiveType, const float* verts,
+                            const unsigned int nVertices, const unsigned int* indices, const unsigned int nIndices,
+                            const float* colors, const unsigned int nColors)
 {
 	bool useIndices = indices != nullptr && nIndices != 0;
 
 	// TODO: (DR) Compute hash of data arrays as well but only when necessary
 	//	Currently meshes from direct data are thus NOT CACHED AT ALL, perhaps I
-	//didn't think this through enough
+	// didn't think this through enough
 
 	size_t seed = 0;
 	hash_combine(seed, alias); // TODO: (DR) Remove this, hash all the data
@@ -229,17 +202,14 @@ Mesh* ResourceManager::mesh(const std::string& alias,
 		{
 			// Load model
 			std::string dataSummary =
-			    " type: " + std::to_string(static_cast<int>(primitiveType)) +
-			    " vertices: " + std::to_string(nVertices) +
-			    (useIndices ? (" indices: " + std::to_string(nIndices)) : "") +
-			    " colors: " + std::to_string(nColors);
+			    " type: " + std::to_string(static_cast<int>(primitiveType)) + " vertices: " + std::to_string(nVertices) +
+			    (useIndices ? (" indices: " + std::to_string(nIndices)) : "") + " colors: " + std::to_string(nColors);
 			Log::info("[MODEL] Loading model '{}' from data:{}", alias, dataSummary);
 
 			Mesh* mesh = nullptr;
 			if (useIndices)
 			{
-				mesh = Mesh::create(primitiveType, verts, nVertices, indices, nIndices,
-				                    colors, nColors);
+				mesh = Mesh::create(primitiveType, verts, nVertices, indices, nIndices, colors, nColors);
 			}
 			else
 			{
@@ -248,8 +218,7 @@ Mesh* ResourceManager::mesh(const std::string& alias,
 			if (mesh)
 			{
 				std::string path = std::string("Generated from data") + dataSummary;
-				std::shared_ptr<Resource> modelResource =
-				    std::make_shared<Resource>(alias, path, ResourceType::Model);
+				std::shared_ptr<Resource> modelResource = std::make_shared<Resource>(alias, path, ResourceType::Model);
 				modelResource->hashId = id;
 				modelResource->data = std::make_shared<Mesh*>(mesh);
 				m_resourceMap.insert(std::make_pair(id, modelResource));
@@ -297,16 +266,14 @@ std::vector<Resource> ResourceManager::getDefaultResources(ResourceType type)
 		}
 		else
 		{
-			Log::error("[RESOURCE MANAGER] Default resource '{}' doesn't exist!",
-			           alias);
+			Log::error("[RESOURCE MANAGER] Default resource '{}' doesn't exist!", alias);
 		}
 	}
 	return resources;
 }
 
-std::shared_ptr<void> ResourceManager::getData(const std::string& alias,
-                                               const size_t id,
-                                               ResourceType type, bool* success)
+std::shared_ptr<void> ResourceManager::getData(const std::string& alias, const size_t id, ResourceType type,
+                                               bool* success)
 {
 	if (alias.empty())
 	{
@@ -389,8 +356,7 @@ std::shared_ptr<void> ResourceManager::getData(const std::string& alias,
 	}
 }
 
-void ResourceManager::registerAlias(const std::string& alias,
-                                    std::shared_ptr<Resource> resource)
+void ResourceManager::registerAlias(const std::string& alias, std::shared_ptr<Resource> resource)
 {
 	if (!alias.empty())
 	{
@@ -411,13 +377,11 @@ void ResourceManager::registerAlias(const std::string& alias,
 	}
 	else
 	{
-		Log::error("[RESOURCE MANAGER] Cannot register an empty alias! HashID: {}",
-		           resource->hashId);
+		Log::error("[RESOURCE MANAGER] Cannot register an empty alias! HashID: {}", resource->hashId);
 	}
 }
 
-void ResourceManager::createDefaultResources(
-    const std::vector<Resource>& defaultResources)
+void ResourceManager::createDefaultResources(const std::vector<Resource>& defaultResources)
 {
 	for (const auto& resource : defaultResources)
 	{
@@ -452,14 +416,12 @@ GLuint ResourceManager::loadTexture(const std::string& path)
 	return id;
 }
 
-GLuint ResourceManager::loadShader(const std::string& vertShader,
-                                   const std::string& fragShader)
+GLuint ResourceManager::loadShader(const std::string& vertShader, const std::string& fragShader)
 {
 	return loadShader(vertShader, fragShader, "");
 };
 
-GLuint ResourceManager::loadShader(const std::string& vertShader,
-                                   const std::string& fragShader,
+GLuint ResourceManager::loadShader(const std::string& vertShader, const std::string& fragShader,
                                    const std::string& geoShader)
 {
 	std::vector<GLuint> shaderList;
@@ -470,17 +432,14 @@ GLuint ResourceManager::loadShader(const std::string& vertShader,
 	{
 		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}", absVert, absFrag);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
-		shaderList.push_back(
-		    pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
+		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
 	}
 	else
 	{
 		std::string absGeo = Config::getAbsolutePath(geoShader);
-		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}, geo: {}", absVert,
-		          absFrag, absGeo);
+		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
-		shaderList.push_back(
-		    pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
+		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
 		shaderList.push_back(pgr::createShaderFromFile(GL_GEOMETRY_SHADER, absGeo));
 	}
 
@@ -507,10 +466,7 @@ Mesh* ResourceManager::loadModel(const std::string& path)
 
 void ResourceManager::disposeTexture(GLuint id) { glDeleteTextures(1, &id); }
 
-void ResourceManager::disposeShader(GLuint id)
-{
-	pgr::deleteProgramAndShaders(id);
-}
+void ResourceManager::disposeShader(GLuint id) { pgr::deleteProgramAndShaders(id); }
 
 void ResourceManager::disposeModel(Mesh* mesh) { mesh->dispose(); }
 
@@ -521,16 +477,13 @@ void ResourceManager::dispose()
 		switch (entry.second->resourceType)
 		{
 		case ResourceType::Texture:
-			disposeTexture(
-			    *(std::static_pointer_cast<GLuint>(entry.second->data).get()));
+			disposeTexture(*(std::static_pointer_cast<GLuint>(entry.second->data).get()));
 			break;
 		case ResourceType::Shader:
-			disposeShader(
-			    *(std::static_pointer_cast<GLuint>(entry.second->data).get()));
+			disposeShader(*(std::static_pointer_cast<GLuint>(entry.second->data).get()));
 			break;
 		case ResourceType::Model:
-			disposeModel(
-			    *(std::static_pointer_cast<Mesh*>(entry.second->data).get()));
+			disposeModel(*(std::static_pointer_cast<Mesh*>(entry.second->data).get()));
 			break;
 		}
 	}

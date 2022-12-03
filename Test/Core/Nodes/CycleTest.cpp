@@ -15,8 +15,7 @@ TEST_F(CycleTestFixture, CycleIsUpdatetedAndResetAfterMaxValueIsGained)
 	cycle->setTo(1.0f);
 	cycle->setMultiplier(0.1f);
 
-	int expectedUpdates =
-	    (int)((cycle->getTo() / sPerFrame) / cycle->getMultiplier()) + 2;
+	int expectedUpdates = (int)((cycle->getTo() / sPerFrame) / cycle->getMultiplier()) + 2;
 	{
 		// Cycle is not running.
 		for (int i = 1; i < expectedUpdates; ++i)
@@ -92,29 +91,24 @@ TEST_F(CycleTestFixture, TriggerOnPlay)
 	}
 
 	{
-		auto plugResult = GraphManager::plug(cycle1, cycle2, I3T_CYCLE_OUT_PLAY,
-		                                     I3T_CYCLE_IN_PLAY);
+		auto plugResult = GraphManager::plug(cycle1, cycle2, I3T_CYCLE_OUT_PLAY, I3T_CYCLE_IN_PLAY);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 	{
-		auto plugResult = GraphManager::plug(cycle1, cycle3, I3T_CYCLE_OUT_PLAY,
-		                                     I3T_CYCLE_IN_PAUSE);
+		auto plugResult = GraphManager::plug(cycle1, cycle3, I3T_CYCLE_OUT_PLAY, I3T_CYCLE_IN_PAUSE);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 	{
-		auto plugResult = GraphManager::plug(cycle1, cycle4, I3T_CYCLE_OUT_PLAY,
-		                                     I3T_CYCLE_IN_STOP);
+		auto plugResult = GraphManager::plug(cycle1, cycle4, I3T_CYCLE_OUT_PLAY, I3T_CYCLE_IN_STOP);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 	{
-		auto plugResult = GraphManager::plug(cycle1, cycle5, I3T_CYCLE_OUT_PLAY,
-		                                     I3T_CYCLE_IN_PREV);
+		auto plugResult = GraphManager::plug(cycle1, cycle5, I3T_CYCLE_OUT_PLAY, I3T_CYCLE_IN_PREV);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 	{
 
-		auto plugResult = GraphManager::plug(cycle1, cycle6, I3T_CYCLE_OUT_PLAY,
-		                                     I3T_CYCLE_IN_NEXT);
+		auto plugResult = GraphManager::plug(cycle1, cycle6, I3T_CYCLE_OUT_PLAY, I3T_CYCLE_IN_NEXT);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 

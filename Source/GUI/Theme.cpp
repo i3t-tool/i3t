@@ -34,8 +34,7 @@ Theme Theme::createDefaultClassic()
 	return theme;
 }
 
-Theme::Theme(std::string name, const Theme::Colors& colors,
-             const Theme::Sizes& sizes, const Theme::SizesVec& sizesVec)
+Theme::Theme(std::string name, const Theme::Colors& colors, const Theme::Sizes& sizes, const Theme::SizesVec& sizesVec)
 {
 	initClassicProperties();
 
@@ -123,26 +122,17 @@ void Theme::initClassicProperties()
 	set(EColor::NodeHeader, createColor(255, 200, 0, 255));
 
 	// Folta operator color set
-	set(EColor::NodeBgOperator,
-	    ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
-	set(EColor::NodeHeaderOperator,
-	    ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgOperator,
-	    ImVec4(77.0f / 255.0f, 85.0f / 255.0f, 106.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgOperatorActive,
-	    ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgOperatorHovered,
-	    ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperator, ImVec4(77.0f / 255.0f, 85.0f / 255.0f, 106.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperatorActive, ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperatorHovered, ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 
 	// Folta transformation color set
-	set(EColor::NodeBgTransformation,
-	    ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
-	set(EColor::NodeHeaderTranformation,
-	    ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgTransformation,
-	    ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgTransformationActive,
-	    ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
+	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderTranformation, ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgTransformation, ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
 	set(EColor::Links_selected_colorShift, ImVec4(0.2f, 0.2f, 0.2f, 0.0f));
@@ -156,19 +146,13 @@ void Theme::initClassicProperties()
 	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
 	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
 
-	set(EColor::Nodes_Transformation_ValidIcon_bgShape,
-	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_bgInner,
-	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_fgShape,
-	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_fgInner,
-	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_padding,
-	    ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_bgShape, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_bgInner, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgShape, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
 
-	set(EColor::Nodes_Transformation_TrackingColor,
-	    ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
@@ -249,8 +233,7 @@ void Theme::initClassicProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 
-	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] =
-	    ImVec2(50.f, 50.f);
+	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(50.f, 50.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 }
@@ -314,20 +297,16 @@ void Theme::initModernProperties()
 
 	// Operator
 	set(EColor::NodeBgOperator, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
-	set(EColor::NodeHeaderOperator,
-	    ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgOperator, createColor(255, 255, 255, 255));
-	set(EColor::FloatBgOperatorActive,
-	    ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
-	set(EColor::FloatBgOperatorHovered,
-	    ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperatorActive, ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgOperatorHovered, ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 
 	// Transform
 	set(EColor::NodeBgTransformation, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
 	set(EColor::NodeHeaderTranformation, ImVec4(0.698f, 0.498f, 0.0f, 1.00f));
 	set(EColor::FloatBgTransformation, createColor(255, 255, 255, 255));
-	set(EColor::FloatBgTransformationActive,
-	    ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
+	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
 
 	set(EColor::Links_selected_colorShift, ImVec4(0.2f, 0.2f, 0.2f, 0.0f));
@@ -341,19 +320,13 @@ void Theme::initModernProperties()
 	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
 	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
 
-	set(EColor::Nodes_Transformation_ValidIcon_bgShape,
-	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_bgInner,
-	    ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_fgShape,
-	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_fgInner,
-	    ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-	set(EColor::Nodes_Transformation_ValidIcon_padding,
-	    ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_bgShape, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_bgInner, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgShape, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
 
-	set(EColor::Nodes_Transformation_TrackingColor,
-	    ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
@@ -433,8 +406,7 @@ void Theme::initModernProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 
-	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] =
-	    ImVec2(50.f, 50.f);
+	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(50.f, 50.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 }
@@ -499,65 +471,44 @@ void Theme::initNames()
 	g_ColorNames[EColor::NodeBgOperator] = "nops_Operator Background";
 	g_ColorNames[EColor::NodeHeaderOperator] = "nops_Operator Header";
 	g_ColorNames[EColor::FloatBgOperator] = "nops_Operator Float Background";
-	g_ColorNames[EColor::FloatBgOperatorActive] =
-	    "nops_Operator Active Float Background";
-	g_ColorNames[EColor::FloatBgOperatorHovered] =
-	    "nops_Operator Hovered Float Background";
+	g_ColorNames[EColor::FloatBgOperatorActive] = "nops_Operator Active Float Background";
+	g_ColorNames[EColor::FloatBgOperatorHovered] = "nops_Operator Hovered Float Background";
 
 	// 4. Transforms
 	g_ColorNames[EColor::NodeBgTransformation] = "ntrs_Transform Background";
 	g_ColorNames[EColor::NodeHeaderTranformation] = "ntrs_Transform Header";
-	g_ColorNames[EColor::FloatBgTransformation] =
-	    "ntrs_Transform Float Background";
-	g_ColorNames[EColor::FloatBgTransformationActive] =
-	    "ntrs_Transform Float Active";
-	g_ColorNames[EColor::FloatBgTransformationHovered] =
-	    "ntrs_Transform Float Hovered";
+	g_ColorNames[EColor::FloatBgTransformation] = "ntrs_Transform Float Background";
+	g_ColorNames[EColor::FloatBgTransformationActive] = "ntrs_Transform Float Active";
+	g_ColorNames[EColor::FloatBgTransformationHovered] = "ntrs_Transform Float Hovered";
 
 	// 5. Popups
-	g_ColorNames[EColor::Nodes_ConnectionPossible] =
-	    "npop_Connection is possible";
-	g_ColorNames[EColor::Nodes_ConnectionNotPossible] =
-	    "npop_Connection is not possible";
+	g_ColorNames[EColor::Nodes_ConnectionPossible] = "npop_Connection is possible";
+	g_ColorNames[EColor::Nodes_ConnectionNotPossible] = "npop_Connection is not possible";
 	g_ColorNames[EColor::Nodes_CreateNode] = "npop_Create node popup";
 
 	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
 	g_ColorNames[EColor::Synergies_FloatBg] = "nflo_Synergies_FloatBg";
-	g_ColorNames[EColor::Synergies_FloatBgHovered] =
-	    "nflo_Synergies_FloatBgHovered";
-	g_ColorNames[EColor::Synergies_FloatBgActive] =
-	    "nflo_Synergies_FloatBgActive";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] =
-	    "nscr_Nodes_Screen_resizeBtn_bgShape";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] =
-	    "nscr_Nodes_Screen_resizeBtn_bgInner";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] =
-	    "nscr_Nodes_Screen_resizeBtn_fgShape";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] =
-	    "nscr_Nodes_Screen_resizeBtn_fgInner";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgShape] =
-	    "ntrs_Nodes_Transformation_ValidIcon_bgShape";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgInner] =
-	    "ntrs_Nodes_Transformation_ValidIcon_bgInner";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgShape] =
-	    "ntrs_Nodes_Transformation_ValidIcon_fgShape";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgInner] =
-	    "ntrs_Nodes_Transformation_ValidIcon_fgInner";
-	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_padding] =
-	    "ntrs_Nodes_Transformation_ValidIcon_padding";
-	g_ColorNames[EColor::Nodes_Transformation_TrackingColor] =
-	    "ntrs_Nodes_Transformation_TrackingColor";
+	g_ColorNames[EColor::Synergies_FloatBgHovered] = "nflo_Synergies_FloatBgHovered";
+	g_ColorNames[EColor::Synergies_FloatBgActive] = "nflo_Synergies_FloatBgActive";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] = "nscr_Nodes_Screen_resizeBtn_bgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] = "nscr_Nodes_Screen_resizeBtn_bgInner";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] = "nscr_Nodes_Screen_resizeBtn_fgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] = "nscr_Nodes_Screen_resizeBtn_fgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgShape] = "ntrs_Nodes_Transformation_ValidIcon_bgShape";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgInner] = "ntrs_Nodes_Transformation_ValidIcon_bgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgShape] = "ntrs_Nodes_Transformation_ValidIcon_fgShape";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgInner] = "ntrs_Nodes_Transformation_ValidIcon_fgInner";
+	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_padding] = "ntrs_Nodes_Transformation_ValidIcon_padding";
+	g_ColorNames[EColor::Nodes_Transformation_TrackingColor] = "ntrs_Nodes_Transformation_TrackingColor";
 
 	/// \todo ???
 	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a
 	// color!)";
 
 	// Global spacing and other size properties.
-	g_SizeNames[ESize::Float_inactive_alphaMultiplicator] =
-	    "ngen_Float_inactive_alphaMultiplicator";
+	g_SizeNames[ESize::Float_inactive_alphaMultiplicator] = "ngen_Float_inactive_alphaMultiplicator";
 
-	g_SizeNames[ESize::Nodes_Operators_Rounding] =
-	    "ngen_Nodes_Operators_Rounding";
+	g_SizeNames[ESize::Nodes_Operators_Rounding] = "ngen_Nodes_Operators_Rounding";
 	g_SizeNames[ESize::Nodes_Sequence_Rounding] = "ngen_Nodes_Sequence_Rounding";
 
 	g_SizeNames[ESize::Nodes_Rounding] = "ngen_Nodes Rounding";
@@ -567,8 +518,7 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Nodes_LabelIndent] = "ngen_Pin labels Indent";
 	g_SizeNames[ESize::Nodes_HeaderLabelIndent] = "ngen_Header Label Indent";
-	g_SizeNames[ESize::Nodes_trackballButtonHeight] =
-	    "ngen_Trackball button height";
+	g_SizeNames[ESize::Nodes_trackballButtonHeight] = "ngen_Trackball button height";
 	g_SizeNames[ESize::Nodes_TrackBallSensitivity] = "ngen_Trackball Sensitivity";
 
 	g_SizeNames[ESize::Nodes_FloatInnerPadding] = "ngen_Float inner padding";
@@ -585,10 +535,8 @@ void Theme::initNames()
 	g_SizeNames[ESize::Nodes_leftSideSpacing] = "ngen_Nodes left side spacing";
 	g_SizeNames[ESize::Nodes_rightSideSpacing] = "ngen_Nodes right side spacing";
 
-	g_SizeNames[ESize::Default_VisiblePrecision] =
-	    "ngen_Nodes default visible precision";
-	g_SizeNames[ESize::Default_InactiveMark] =
-	    "ngen_Nodes default inactive part marker";
+	g_SizeNames[ESize::Default_VisiblePrecision] = "ngen_Nodes default visible precision";
+	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes default inactive part marker";
 
 	g_SizeNames[ESize::Links_ControlpointsPositionFraction] =
 	    "ngen_Link x distance between controlpoint and start/end of link - "
@@ -597,26 +545,20 @@ void Theme::initNames()
 	    "ngen_Link minimal x distance between controlpoint and start/end of link";
 
 	g_SizeNames[ESize::Links_Thickness] = "ngen_Link Thickness";
-	g_SizeNames[ESize::Links_ThicknessSelectedBorder] =
-	    "ngen_Link Additional thickness when selected";
+	g_SizeNames[ESize::Links_ThicknessSelectedBorder] = "ngen_Link Additional thickness when selected";
 	g_SizeNames[ESize::Links_selected_alpha] = "ngen_Links_selected_alpha";
 
 	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins_IconPadding";
 
-	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] =
-	    "ngen_Nodes_Screen_resizeButtonSize";
-	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] =
-	    "ngen_Nodes_Sequence_DummySpaceSize";
-	g_SizeVecNames[ESizeVec2::Nodes_Transformation_TrackingMarkSize] =
-	    "ngen_Nodes_Transformation_TrackingMarkSize";
-	g_SizeVecNames[ESizeVec2::NewNode_positionShift] =
-	    "ngen_NewNode_positionShift";
+	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes_Screen_resizeButtonSize";
+	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes_Sequence_DummySpaceSize";
+	g_SizeVecNames[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = "ngen_Nodes_Transformation_TrackingMarkSize";
+	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode_positionShift";
 
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";
 
 	g_SizeVecNames[ESizeVec2::Nodes_IconSize] = "ngen_Nodes Icon Size";
-	g_SizeVecNames[ESizeVec2::Nodes_PivotAlignment] =
-	    "ngen_Nodes Pivot Alignment";
+	g_SizeVecNames[ESizeVec2::Nodes_PivotAlignment] = "ngen_Nodes Pivot Alignment";
 	g_SizeVecNames[ESizeVec2::Nodes_PinSpacing] = "ngen_Nodes Pin Spacing";
 	g_SizeVecNames[ESizeVec2::Nodes_ItemsSpacing] = "ngen_Nodes Items Spacing";
 	g_SizeVecNames[ESizeVec2::Nodes_FloatPadding] = "ngen_Nodes Float Padding";
@@ -627,10 +569,8 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Nodes_MiddleSize] = "ngen_Nodes Middle Size";
 	g_SizeVecNames[ESizeVec2::Nodes_OutputSize] = "ngen_Nodes Output Size";
 
-	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] =
-	    "ngen_Nodes Float Cycle button size";
-	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] =
-	    "ngen_Nodes Screen Texture Size";
+	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "ngen_Nodes Float Cycle button size";
+	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "ngen_Nodes Screen Texture Size";
 
 	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "ngen_Builder Item Spacing";
 }
@@ -686,10 +626,7 @@ void Theme::apply()
 	//---------------------------------------------------------------------------------------
 }
 
-ImFont* Theme::get(EFont font)
-{
-	return I3T::getUI()->getFonts()[m_fontsAssoc[font]];
-}
+ImFont* Theme::get(EFont font) { return I3T::getUI()->getFonts()[m_fontsAssoc[font]]; }
 
 const char* Theme::getCategoryName(const std::string& key)
 {
@@ -705,10 +642,7 @@ std::map<EColor, const char*>& Theme::getColorNames() { return g_ColorNames; }
 
 std::map<ESize, const char*>& Theme::getSizeNames() { return g_SizeNames; }
 
-std::map<ESizeVec2, const char*>& Theme::getSizeVecNames()
-{
-	return g_SizeVecNames;
-}
+std::map<ESizeVec2, const char*>& Theme::getSizeVecNames() { return g_SizeVecNames; }
 
 // JH unused
 // void Theme::operatorColorTheme()

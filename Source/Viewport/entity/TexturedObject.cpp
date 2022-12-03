@@ -4,8 +4,7 @@
 
 using namespace Vp;
 
-TexturedObject::TexturedObject(Core::Mesh* mesh, PhongShader* shader)
-    : GameObject(mesh, shader)
+TexturedObject::TexturedObject(Core::Mesh* mesh, PhongShader* shader) : GameObject(mesh, shader)
 {
 	// Empty
 }

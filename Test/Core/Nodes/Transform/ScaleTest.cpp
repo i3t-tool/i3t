@@ -48,8 +48,7 @@ TEST(ScaleTest, ResetToInitialValues)
 	const auto scale = generateVec3();
 
 	// Create non-uniform scale with initial value.
-	auto scaleNode = Core::Builder::createTransform<ETransformType::Scale>()
-	                     ->as<TransformImpl<ETransformType::Scale>>();
+	auto scaleNode = Core::Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scaleNode->disableSynergies();              // to avoid uniform scale
 	scaleNode->setDefaultValue("scale", scale); // default and matrix
@@ -122,9 +121,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Mat4_AsTransformation_Ok)
 	EXPECT_TRUE(scale->isValid());
 }
 
-TEST(
-    ScaleTest,
-    UniformScale_SetInvalidValue_Mat4_AsTransformation_ShouldNotBePermited_butWorks)
+TEST(ScaleTest, UniformScale_SetInvalidValue_Mat4_AsTransformation_ShouldNotBePermited_butWorks)
 {
 	// Create uniform scale.
 	auto scale = Builder::createTransform<ETransformType::Scale>();
@@ -139,8 +136,7 @@ TEST(
 	//------------------------------------------
 	const auto scaleValue = generateVec3(); // non-uniform scale
 	//------------------------------------------
-	auto result = scale->setValue(
-	    glm::scale(scaleValue)); // init by a non-uniform matrix -> uniform
+	auto result = scale->setValue(glm::scale(scaleValue)); // init by a non-uniform matrix -> uniform
 
 	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
 	EXPECT_TRUE(scale->isValid()); // is uniform
@@ -153,8 +149,7 @@ TEST(
 TEST(ScaleTest, UniformScale_SetValidValue_Float_asScale_Ok)
 {
 	// Create a uniform scale.
-	auto scale = Builder::createTransform<ETransformType::Scale>()
-	                 ->as<TransformImpl<ETransformType::Scale>>();
+	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scale->enableSynergies();
 
@@ -163,8 +158,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Float_asScale_Ok)
 	// setValue_expectOk(scale, val);
 	auto result = scale->setValue(val);
 	EXPECT_EQ(ValueSetResult::Status::Ok, result.status);
-	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(val, val, val)),
-	                     scale->getData().getMat4()));
+	EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(val, val, val)), scale->getData().getMat4()));
 	EXPECT_TRUE(scale->isValid());
 }
 
@@ -172,8 +166,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Float_asScale_Ok)
 TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Ok)
 {
 	// Create a uniform scale.
-	auto scale = Builder::createTransform<ETransformType::Scale>()
-	                 ->as<TransformImpl<ETransformType::Scale>>();
+	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scale->enableSynergies();
 
@@ -191,8 +184,7 @@ TEST(ScaleTest, UniformScale_SetValidValue_Vec3_asScale_Ok)
 TEST(ScaleTest, DISABLED_UniformScale_SetValidValue_Vec3_asScale_Wrong)
 {
 	// Create a uniform scale.
-	auto scale = Builder::createTransform<ETransformType::Scale>()
-	                 ->as<TransformImpl<ETransformType::Scale>>();
+	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scale->enableSynergies();
 
@@ -210,16 +202,14 @@ TEST(ScaleTest, DISABLED_UniformScale_SetValidValue_Vec3_asScale_Wrong)
 	// should not be changed
 	EXPECT_TRUE(Math::eq(before, after));
 	EXPECT_FALSE(Math::eq(glm::scale(scaleVec3), scale->getData().getMat4()));
-	EXPECT_FALSE(
-	    Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->getData().getMat4()));
+	EXPECT_FALSE(Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->getData().getMat4()));
 	EXPECT_TRUE(scale->isValid()); // not changed
 }
 
 TEST(ScaleTest, Uniform_WithNonUniformValues_IsInvalid)
 {
 	// Create non-uniform scale.
-	auto scale = Builder::createTransform<ETransformType::Scale>()
-	                 ->as<TransformImpl<ETransformType::Scale>>();
+	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 	scale->disableSynergies();
 
 	setValue_expectOk(scale, generateVec3());
@@ -235,8 +225,7 @@ TEST(ScaleTest, UniformScaleMatrixValueAndSynergies)
 	const auto scale = glm::vec3(scaleValue);
 	const auto scaleMat = glm::scale(scale);
 
-	auto scaleNode = Builder::createTransform<ETransformType::Scale>()
-	                     ->as<TransformImpl<ETransformType::Scale>>();
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	{
 		// Invalid coordinates.
@@ -245,8 +234,7 @@ TEST(ScaleTest, UniformScaleMatrixValueAndSynergies)
 	}
 	{
 		// Valid coordinates.
-		setValue_expectOk(scaleNode, scaleValue,
-		                  {1, 1}); // write the whole diagonal
+		setValue_expectOk(scaleNode, scaleValue, {1, 1}); // write the whole diagonal
 		const auto data = scaleNode->getData().getMat4();
 
 		EXPECT_EQ(data, scaleMat);
@@ -256,8 +244,7 @@ TEST(ScaleTest, UniformScaleMatrixValueAndSynergies)
 TEST(ScaleTest, ScaleMatrixSetsDefaults_diagonal)
 {
 	auto scaleValue = generateFloat();
-	auto scaleNode = Builder::createTransform<ETransformType::Scale>()
-	                     ->as<TransformImpl<ETransformType::Scale>>();
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scaleNode->lock(); // should be
 	int coord = generateInt(0, 2);
@@ -301,8 +288,7 @@ TEST(ScaleTest, ScaleMatrixSetsDefaults_diagonal)
 // ---- scale ----
 TEST(ScaleTest, GettersAndSetterShouldBeOk)
 {
-	auto scale = Core::Builder::createTransform<ETransformType::Scale>()
-	                 ->as<TransformImpl<ETransformType::Scale>>();
+	auto scale = Core::Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	auto vec = generateVec3();
 
@@ -312,8 +298,7 @@ TEST(ScaleTest, GettersAndSetterShouldBeOk)
 
 		scale->setDefaultValue("scale", vec); // default and the matrix
 
-		EXPECT_EQ(glm::scale(glm::vec3{vec.x, vec.x, vec.x}),
-		          scale->getData().getMat4());
+		EXPECT_EQ(glm::scale(glm::vec3{vec.x, vec.x, vec.x}), scale->getData().getMat4());
 	}
 	// non-uniform scale.
 	{
@@ -332,8 +317,7 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 
 	///	auto scaleMat   = glm::scale(scale);
 
-	auto scaleNode = Builder::createTransform<ETransformType::Scale>()
-	                     ->as<TransformImpl<ETransformType::Scale>>();
+	auto scaleNode = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	// Uniform scale.
 	// scalar sets matrix
@@ -344,8 +328,7 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 		          scaleVector); // different vector is different
 		EXPECT_EQ(scaleNode->getDefaultValue("scale").getVec3(),
 		          glm::vec3(scaleValue)); // uniform
-		EXPECT_EQ(glm::scale(glm::vec3(scaleValue)),
-		          scaleNode->getData().getMat4());
+		EXPECT_EQ(glm::scale(glm::vec3(scaleValue)), scaleNode->getData().getMat4());
 	}
 	// vector sets matrix based on .x only
 	{
@@ -357,8 +340,7 @@ TEST(ScaleTest, ScaleDefaultsSetMatrix)
 
 		EXPECT_EQ(v.x, scaleVector.x);          // uniform scale based on .x
 		EXPECT_EQ(v, glm::vec3(scaleVector.x)); // uniform scale based on .x
-		EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleVector.x)),
-		                     scaleNode->getData().getMat4()));
+		EXPECT_TRUE(Math::eq(glm::scale(glm::vec3(scaleVector.x)), scaleNode->getData().getMat4()));
 	}
 	// vector sets matrix - correct
 	{

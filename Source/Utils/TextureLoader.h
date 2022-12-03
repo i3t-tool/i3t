@@ -51,10 +51,8 @@ struct TextureRecord
 class TextureLoader final
 {
 private:
-	static std::map<std::string, TextureRecord>
-	    textures; ///< user loaded textures
-	static std::map<std::string, TextureRecord>
-	    hcTextures; ///< hard coded textures
+	static std::map<std::string, TextureRecord> textures;   ///< user loaded textures
+	static std::map<std::string, TextureRecord> hcTextures; ///< hard coded textures
 
 public:
 	/**
@@ -62,9 +60,7 @@ public:
 	 */
 	static void endTextures()
 	{
-		for (std::map<std::string, TextureRecord>::const_iterator it =
-		         textures.begin();
-		     it != textures.end(); ++it)
+		for (std::map<std::string, TextureRecord>::const_iterator it = textures.begin(); it != textures.end(); ++it)
 		{
 			glDeleteTextures(1, &(it->second.textureId));
 		}
@@ -77,9 +73,7 @@ public:
 	 */
 	static void endHCTextures()
 	{
-		for (std::map<std::string, TextureRecord>::const_iterator it =
-		         hcTextures.begin();
-		     it != hcTextures.end(); ++it)
+		for (std::map<std::string, TextureRecord>::const_iterator it = hcTextures.begin(); it != hcTextures.end(); ++it)
 		{
 			glDeleteTextures(1, &(it->second.textureId));
 		}
@@ -150,30 +144,18 @@ public:
 	 * repository \param name Name (key) of the texture in the repository \return
 	 * OpenGL texture object name
 	 */
-	static GLuint getId(const std::string& name)
-	{
-		return textures[name].textureId;
-	}
+	static GLuint getId(const std::string& name) { return textures[name].textureId; }
 
 	/**
 	 * \brief Replace the OpenGL texture object name in the repository
 	 * \param name Name (key) of the texture in the repository
 	 * \param id New OpenGL texture object name
 	 */
-	static void setTextureID(const std::string& name, const int id)
-	{
-		textures[name].textureId = id;
-	}
+	static void setTextureID(const std::string& name, const int id) { textures[name].textureId = id; }
 
-	static GLuint getHCId(const std::string& name)
-	{
-		return hcTextures[name].textureId;
-	}
+	static GLuint getHCId(const std::string& name) { return hcTextures[name].textureId; }
 
-	static void setHCTextureID(const std::string& name, const int id)
-	{
-		hcTextures[name].textureId = id;
-	}
+	static void setHCTextureID(const std::string& name, const int id) { hcTextures[name].textureId = id; }
 
 	/**
 	 * \brief Set the flag of all textures in the repository (\a textures) to
@@ -182,8 +164,7 @@ public:
 	 */
 	static void markAllUnflag()
 	{
-		for (std::map<std::string, TextureRecord>::iterator it = textures.begin();
-		     it != textures.end(); ++it)
+		for (std::map<std::string, TextureRecord>::iterator it = textures.begin(); it != textures.end(); ++it)
 		{
 			it->second.flag = false;
 		}
@@ -195,8 +176,7 @@ public:
 	 */
 	static void markAllHCUnflag()
 	{
-		for (std::map<std::string, TextureRecord>::iterator it = hcTextures.begin();
-		     it != hcTextures.end(); ++it)
+		for (std::map<std::string, TextureRecord>::iterator it = hcTextures.begin(); it != hcTextures.end(); ++it)
 		{
 			it->second.flag = false;
 		}
@@ -207,9 +187,7 @@ public:
 	 */
 	static void disposeUnflag()
 	{
-		for (std::map<std::string, TextureRecord>::const_iterator it =
-		         textures.begin();
-		     it != textures.end();)
+		for (std::map<std::string, TextureRecord>::const_iterator it = textures.begin(); it != textures.end();)
 		{
 			if (!(it->second).flag)
 			{
@@ -230,9 +208,7 @@ public:
 	 */
 	static void disposeHCUnflag()
 	{
-		for (std::map<std::string, TextureRecord>::const_iterator it =
-		         hcTextures.begin();
-		     it != hcTextures.end();)
+		for (std::map<std::string, TextureRecord>::const_iterator it = hcTextures.begin(); it != hcTextures.end();)
 		{
 			if (!(it->second).flag)
 			{

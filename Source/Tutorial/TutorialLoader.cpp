@@ -10,8 +10,7 @@
 #include <fstream>
 #include <iostream>
 
-std::shared_ptr<TutorialHeader>
-TutorialLoader::loadTutorialHeader(std::string& path)
+std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& path)
 {
 	// PARSE GENERAL INFO (YAML)
 	YAML::Node tutorial_yaml;
@@ -21,8 +20,7 @@ TutorialLoader::loadTutorialHeader(std::string& path)
 	}
 	catch (...)
 	{
-		Log::fatal("Tutorial file '" + path +
-		           "' not found or YAML header unparsable");
+		Log::fatal("Tutorial file '" + path + "' not found or YAML header unparsable");
 		return nullptr; // return nothing
 	}
 	// std::cout << tutorial_yaml << std::endl;
@@ -50,13 +48,11 @@ TutorialLoader::loadTutorialHeader(std::string& path)
 		Log::fatal("Tutorial description not specified");
 	}
 	// thumbnail
-	std::shared_ptr<GUIImage> thumbnail =
-	    nullptr; // dummy image here? - NOPE rather later when rendering and
-	             // encountering a nullptr (safer in case of loader errors)
+	std::shared_ptr<GUIImage> thumbnail = nullptr; // dummy image here? - NOPE rather later when rendering and
+	                                               // encountering a nullptr (safer in case of loader errors)
 	if (tutorial_yaml["thumbnail"])
 	{
-		thumbnail = loadImage(getDirectory(path) +
-		                      tutorial_yaml["thumbnail"].as<std::string>());
+		thumbnail = loadImage(getDirectory(path) + tutorial_yaml["thumbnail"].as<std::string>());
 	}
 	else
 	{
@@ -81,13 +77,11 @@ TutorialLoader::loadTutorialHeader(std::string& path)
 	// we create our tutorial header object on heap, we are using shared ptr, so
 	// that when there arent any references, we can eg properly free the loaded
 	// image and destroy it
-	return std::make_shared<TutorialHeader>(std::move(path), std::move(title),
-	                                        std::move(description),
+	return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description),
 	                                        std::move(thumbnail));
 }
 
-std::shared_ptr<Tutorial>
-TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
+std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 {
 	// CHECK
 	std::ifstream tutorialStream(header->m_filename);
@@ -147,29 +141,26 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	// -------------------------------------------------------
 
 	// [FUNCS] DETERMINING ELEMENT TYPES
-	auto isBlockType = [](const std::string& string) {
+	auto isBlockType = [](const std::string& string)
+	{
 		// is keyword
-		static const std::unordered_map<std::string, blockType_t>
-		    stringToBlockType = {{"task:", TASK},     {"hint:", HINT},
-		                         {"choice:", CHOICE}, {"multichoice:", MULTICHOICE},
-		                         {"input:", INPUT},   {"script:", SCRIPT}};
-		if (const auto it{stringToBlockType.find(string)};
-		    it != std::end(stringToBlockType))
+		static const std::unordered_map<std::string, blockType_t> stringToBlockType = {
+		    {"task:", TASK},   {"hint:", HINT},    {"choice:", CHOICE}, {"multichoice:", MULTICHOICE},
+		    {"input:", INPUT}, {"script:", SCRIPT}};
+		if (const auto it{stringToBlockType.find(string)}; it != std::end(stringToBlockType))
 		{
 			return it->second;
 		}
 		// is anything else
 		return NOT_BLOCK;
 	};
-	auto isSingleLineType = [](const std::string& string) {
+	auto isSingleLineType = [](const std::string& string)
+	{
 		// is keyword
-		static const std::unordered_map<std::string, singleLineType_t>
-		    stringToSingleLineType = {
-		        {"task:", TASK_SINGLE},    {"hint:", HINT_SINGLE},
-		        {"x:", CORRECT_ANSWER},    {"o:", WRONG_ANSWER},
-		        {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE}};
-		if (const auto it{stringToSingleLineType.find(string)};
-		    it != std::end(stringToSingleLineType))
+		static const std::unordered_map<std::string, singleLineType_t> stringToSingleLineType = {
+		    {"task:", TASK_SINGLE}, {"hint:", HINT_SINGLE},    {"x:", CORRECT_ANSWER},
+		    {"o:", WRONG_ANSWER},   {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE}};
+		if (const auto it{stringToSingleLineType.find(string)}; it != std::end(stringToSingleLineType))
 		{
 			return it->second;
 		}
@@ -187,7 +178,8 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	//};
 
 	// [FUNC] FILLING THE STEP CLASS WITH COMPLETED BLOCK ELEMENTS
-	auto endCurrentBlock = [&]() -> void {
+	auto endCurrentBlock = [&]() -> void
+	{
 		switch (currentBlock)
 		{
 		case EXPLANATION:
@@ -206,15 +198,15 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 			// Log::debug("Ending block when NOT_BLOCK");
 			break;
 		default:
-			Log::info("Creation of tutorial block element " +
-			          std::to_string(currentBlock) + " not implemented yet");
+			Log::info("Creation of tutorial block element " + std::to_string(currentBlock) + " not implemented yet");
 		}
 
 		currentBlock = NOT_BLOCK;
 	};
 
 	// [FUNC] INITIATING BLOCK ELEMENTS
-	auto beginBlock = [&](blockType_t blockType) -> void {
+	auto beginBlock = [&](blockType_t blockType) -> void
+	{
 		// drop current block if any (safety check)
 		if (currentBlock)
 		{
@@ -231,8 +223,8 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	};
 
 	// [FUNC] FILLING THE STEP CLASS WITH SINGLE-LINE ELEMENTS
-	auto handleSingleLine = [&](singleLineType_t type,
-	                            const std::string& content) -> void {
+	auto handleSingleLine = [&](singleLineType_t type, const std::string& content) -> void
+	{
 		// check also for current state, and show error when calling singlelines
 		// which do not match nektere pripady ponechavaji state, jine ho musi
 		// resetovat!
@@ -255,8 +247,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 			addScript(steps[currentStep], content);
 			break;
 		default:
-			Log::info("Creation of single-line tutorial element " +
-			          std::to_string(type) + " not implemented yet");
+			Log::info("Creation of single-line tutorial element " + std::to_string(type) + " not implemented yet");
 		}
 	};
 	// -------------------------------------------------------
@@ -359,8 +350,7 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 				}
 				else
 				{
-					Log::info("Unexpected block unindent at line [{}] {}", lineNumber,
-					          line);
+					Log::info("Unexpected block unindent at line [{}] {}", lineNumber, line);
 				}
 			}
 			// add to active block
@@ -386,9 +376,8 @@ TutorialLoader::loadTutorial(std::shared_ptr<TutorialHeader> header)
 	// CREATE THE TUTORIAL
 	std::shared_ptr<Tutorial> tutorial = std::make_shared<Tutorial>(
 	    std::move(header), std::move(steps),
-	    std::unordered_map<
-	        std::string, std::shared_ptr<GUIImage>>()); // we create our tutorial
-	                                                    // object on heap
+	    std::unordered_map<std::string, std::shared_ptr<GUIImage>>()); // we create our tutorial
+	                                                                   // object on heap
 
 	return tutorial;
 }
@@ -447,8 +436,7 @@ void TutorialLoader::skipSpaces(std::istringstream& stream)
 	}
 }
 
-void TutorialLoader::skipSpaces(std::istringstream& stream,
-                                unsigned int maxCount)
+void TutorialLoader::skipSpaces(std::istringstream& stream, unsigned int maxCount)
 {
 	for (int i = 0; i < maxCount; i++)
 	{
@@ -463,55 +451,43 @@ void TutorialLoader::skipSpaces(std::istringstream& stream,
 	}
 }
 
-std::shared_ptr<TutorialElement>&
-TutorialLoader::createExplanation(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createExplanation(TStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Explanation>(string));
 }
 
-std::shared_ptr<TutorialElement>&
-TutorialLoader::createTask(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createTask(TStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Task>(string));
 }
 
-std::shared_ptr<TutorialElement>&
-TutorialLoader::createHint(TStep& step, const std::string& string)
+std::shared_ptr<TutorialElement>& TutorialLoader::createHint(TStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Hint>(string));
 }
 
-std::shared_ptr<TutorialElement>&
-TutorialLoader::createChoice(TStep& step, const std::string& question,
-                             const std::vector<std::string>& choices,
-                             int correctChoice)
+std::shared_ptr<TutorialElement>& TutorialLoader::createChoice(TStep& step, const std::string& question,
+                                                               const std::vector<std::string>& choices,
+                                                               int correctChoice)
 {
-	return step.m_content.emplace_back(
-	    std::make_shared<ChoiceTask>(question, choices, correctChoice));
+	return step.m_content.emplace_back(std::make_shared<ChoiceTask>(question, choices, correctChoice));
 }
 
-std::shared_ptr<TutorialElement>&
-TutorialLoader::createMultichoice(TStep& step, const std::string& question,
-                                  std::vector<std::string>& choices,
-                                  const std::vector<int>& correctChoices)
+std::shared_ptr<TutorialElement>& TutorialLoader::createMultichoice(TStep& step, const std::string& question,
+                                                                    std::vector<std::string>& choices,
+                                                                    const std::vector<int>& correctChoices)
 {
-	return step.m_content.emplace_back(
-	    std::make_shared<MultiChoiceTask>(question, choices, correctChoices));
+	return step.m_content.emplace_back(std::make_shared<MultiChoiceTask>(question, choices, correctChoices));
 }
 
-std::shared_ptr<TutorialElement>& TutorialLoader::createInput(
-    TStep& step, const std::string& question,
-    const std::unordered_set<std::string>& correctAnswers)
+std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TStep& step, const std::string& question,
+                                                              const std::unordered_set<std::string>& correctAnswers)
 {
 	// todo
-	return step.m_content.emplace_back(
-	    std::make_shared<InputTask>(question, correctAnswers));
+	return step.m_content.emplace_back(std::make_shared<InputTask>(question, correctAnswers));
 }
 
-void TutorialLoader::addScript(TStep& step, const std::string& script)
-{
-	step.m_scriptToRunWhenShown += script;
-}
+void TutorialLoader::addScript(TStep& step, const std::string& script) { step.m_scriptToRunWhenShown += script; }
 
 /*
   // nicely fill it at that heap place ^^

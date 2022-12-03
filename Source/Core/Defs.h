@@ -52,8 +52,7 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 
 namespace Debug
 {
-template <typename... Args>
-void Assert(bool condition, const std::string& message = "", Args&&... args)
+template <typename... Args> void Assert(bool condition, const std::string& message = "", Args&&... args)
 {
 #ifdef I3T_DEBUG
 	if (!condition)
@@ -86,23 +85,15 @@ public:
  * \param val Enum value
  * \return String name of the enum value
  */
-template <typename T> auto n(T val)
-{
-	return std::string(magic_enum::enum_name(val));
-}
+template <typename T> auto n(T val) { return std::string(magic_enum::enum_name(val)); }
 
 namespace EnumUtils
 {
 template <typename T> auto name(T val) { return n(val); }
 
-template <typename T> std::optional<T> value(const std::string& str)
-{
-	return magic_enum::enum_cast<T>(str);
-}
+template <typename T> std::optional<T> value(const std::string& str) { return magic_enum::enum_cast<T>(str); }
 } // namespace EnumUtils
 
-#define COND_TO_DEG(x)                                                         \
-	(SetupForm::radians                                                          \
-	     ? (x)                                                                   \
-	     : glm::degrees(x)) ///< Converts from radians to degrees if the
-	                        ///< application set up for degrees
+#define COND_TO_DEG(x)                                                                                                 \
+	(SetupForm::radians ? (x) : glm::degrees(x)) ///< Converts from radians to degrees if the
+	                                             ///< application set up for degrees

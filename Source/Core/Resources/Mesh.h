@@ -130,8 +130,8 @@ public:
 
 private:
 	Mesh() = default;
-	Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType,
-	     bool useNormals, bool useTexcoords, bool useTangents, bool useColors);
+	Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords, bool useTangents,
+	     bool useColors);
 
 public:
 	/**
@@ -158,9 +158,8 @@ public:
 	 * @return Pointer to the new Mesh object (newly allocated, to be managed
 	 * externally)
 	 */
-	static Mesh* create(Mesh::PrimitiveType primitiveType, const float* verts,
-	                    const unsigned int nVertices, const float* colors,
-	                    const unsigned int nColors);
+	static Mesh* create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+	                    const float* colors, const unsigned int nColors);
 
 	/**
 	 * Create mesh from indexed vertices and colors;
@@ -168,9 +167,8 @@ public:
 	 * @return Pointer to the new Mesh object (newly allocated, to be managed
 	 * externally)
 	 */
-	static Mesh* create(Mesh::PrimitiveType primitiveType, const float* verts,
-	                    const unsigned int nVertices, const unsigned int* indices,
-	                    const unsigned int nIndices, const float* colors,
+	static Mesh* create(Mesh::PrimitiveType primitiveType, const float* verts, const unsigned int nVertices,
+	                    const unsigned int* indices, const unsigned int nIndices, const float* colors,
 	                    const unsigned int nColors);
 
 	/**
@@ -188,19 +186,14 @@ private:
 	static void loadMaterial(Material& meshMaterial, const aiMaterial* material);
 	static void createVaoAndBindAttribs(Mesh* mesh);
 
-	static inline glm::vec3 convertVec3(const aiVector3D& v)
-	{
-		return glm::vec3(v.x, v.y, v.z);
-	}
+	static inline glm::vec3 convertVec3(const aiVector3D& v) { return glm::vec3(v.x, v.y, v.z); }
 	static inline glm::vec3 vec3min(const glm::vec3& v1, const glm::vec3& v2)
 	{
-		return glm::vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y),
-		                 std::min(v1.z, v2.z));
+		return glm::vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));
 	}
 	static inline glm::vec3 vec3max(const glm::vec3& v1, const glm::vec3& v2)
 	{
-		return glm::vec3(std::max(v1.x, v2.x), std::max(v1.y, v2.y),
-		                 std::max(v1.z, v2.z));
+		return glm::vec3(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z));
 	}
 };
 } // namespace Core

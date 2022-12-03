@@ -39,8 +39,7 @@ inline void merge(rapidjson::Value& target, rapidjson::Value& source,
 inline bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject,
                   rapidjson::Document::AllocatorType& allocator)
 {
-	for (auto srcIt = srcObject.MemberBegin(); srcIt != srcObject.MemberEnd();
-	     ++srcIt)
+	for (auto srcIt = srcObject.MemberBegin(); srcIt != srcObject.MemberEnd(); ++srcIt)
 	{
 		auto dstIt = dstObject.FindMember(srcIt->name);
 		if (dstIt == dstObject.MemberEnd())
@@ -66,8 +65,7 @@ inline bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject,
 
 			if (srcIt->value.IsArray())
 			{
-				for (auto arrayIt = srcIt->value.Begin(); arrayIt != srcIt->value.End();
-				     ++arrayIt)
+				for (auto arrayIt = srcIt->value.Begin(); arrayIt != srcIt->value.End(); ++arrayIt)
 				{
 					rapidjson::Value dstVal;
 					dstVal.CopyFrom(*arrayIt, allocator);
@@ -89,8 +87,7 @@ inline bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject,
 	return true;
 }
 
-inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc,
-                                                const fs::path& schemaSrc)
+inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
 	I3T_ASSERT(schemaFile.good() && "Cannot open schema file!");
@@ -98,8 +95,7 @@ inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc,
 	rapidjson::Document schemaDocument;
 
 	rapidjson::IStreamWrapper schemaInputStreamWrapper(schemaFile);
-	auto hasError =
-	    schemaDocument.ParseStream(schemaInputStreamWrapper).HasParseError();
+	auto hasError = schemaDocument.ParseStream(schemaInputStreamWrapper).HasParseError();
 	I3T_ASSERT(!hasError && "Cannot parse schema file!");
 
 	rapidjson::SchemaDocument schema(schemaDocument);
@@ -208,8 +204,7 @@ inline glm::mat4 getMat(const rapidjson::Value& value)
 	{
 		const auto& column = value[i].GetArray();
 
-		result[i] = {column[0].GetFloat(), column[1].GetFloat(),
-		             column[2].GetFloat(), column[3].GetFloat()};
+		result[i] = {column[0].GetFloat(), column[1].GetFloat(), column[2].GetFloat(), column[3].GetFloat()};
 	}
 
 	return result;
@@ -217,8 +212,7 @@ inline glm::mat4 getMat(const rapidjson::Value& value)
 
 //
 
-inline std::optional<DataStore> getData(const rapidjson::Value& value,
-                                        EValueType dataType)
+inline std::optional<DataStore> getData(const rapidjson::Value& value, EValueType dataType)
 {
 	switch (dataType)
 	{

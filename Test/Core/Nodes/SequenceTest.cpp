@@ -72,8 +72,7 @@ TEST(SequenceTest, UpdateIsCalledOnMatrixValueChange)
 	auto seq = arrangeSequence();
 
 	auto& matrices = seq->getMatrices();
-	auto firstTwoMatricesProduct =
-	    matrices[0]->getData().getMat4() * matrices[1]->getData().getMat4();
+	auto firstTwoMatricesProduct = matrices[0]->getData().getMat4() * matrices[1]->getData().getMat4();
 	auto mat3NewValue = glm::translate(generateVec3());
 
 	auto& mat = seq->getMatRef(seq->getMatrices().size() - 1);
@@ -92,13 +91,11 @@ TEST(SequenceTest, InternalValueCanBeReadByOperator)
 		setValue_expectOk(identityMatNode, glm::mat4(1.0f));
 	}
 	{
-		auto plugResult =
-		    Core::GraphManager::plugSequenceValueOutput(seq, matMulMatNode);
+		auto plugResult = Core::GraphManager::plugSequenceValueOutput(seq, matMulMatNode);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 	{
-		auto plugResult =
-		    Core::GraphManager::plug(identityMatNode, matMulMatNode, 0, 1);
+		auto plugResult = Core::GraphManager::plug(identityMatNode, matMulMatNode, 0, 1);
 		EXPECT_EQ(ENodePlugResult::Ok, plugResult);
 	}
 
@@ -148,8 +145,7 @@ TEST(SequenceTest, SequenceCantBeSelfPlugged)
  *             \
  *             mat
  */
-TEST(SequenceTest,
-     RightSequenceValueOutputCanBePluggedToParentSequenceValueInput)
+TEST(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueInput)
 {
 	/// \todo MH
 	return;
@@ -163,24 +159,19 @@ TEST(SequenceTest,
 	plug_expectOk(seq2, seq1, I3T_SEQ_OUT_MAT, I3T_SEQ_IN_MAT);
 
 	// Matrix storages should be same.
-	EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(),
-	          seq2->getData(I3T_SEQ_MAT).getMat4());
+	EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(), seq2->getData(I3T_SEQ_MAT).getMat4());
 
 	// seq1 model matrix and seq2 stored matrices product should be same.
-	EXPECT_EQ(seq1->getData(I3T_SEQ_MOD).getMat4(),
-	          seq2->getData(I3T_SEQ_MAT).getMat4());
+	EXPECT_EQ(seq1->getData(I3T_SEQ_MOD).getMat4(), seq2->getData(I3T_SEQ_MAT).getMat4());
 
 	plug_expectOk(seq2, mat, I3T_SEQ_OUT_MAT, I3T_INPUT0);
-	EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(),
-	          mat->getData(I3T_DATA0).getMat4());
+	EXPECT_EQ(seq1->getData(I3T_SEQ_MAT).getMat4(), mat->getData(I3T_DATA0).getMat4());
 
 	// seq2 model matrix should be same as seq1 * seq2
-	EXPECT_EQ(seq2->getData(2).getMat4(),
-	          seq1->getData(1).getMat4() * seq2->getData(1).getMat4());
+	EXPECT_EQ(seq2->getData(2).getMat4(), seq1->getData(1).getMat4() * seq2->getData(1).getMat4());
 }
 
-TEST(SequenceTest,
-     LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput)
+TEST(SequenceTest, LeftSequenceValueOutputCanBePluggedToParentSequenceValueInput)
 {
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
@@ -205,15 +196,13 @@ TEST(SequenceTest, ThreeSequencesComposeMatrices)
 	}
 	{
 		plug_expectOk(seq1, seq2, 0, 0);
-		auto expectedMat =
-		    getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices());
+		auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices());
 		EXPECT_EQ(expectedMat, seq2->getData().getMat4());
 	}
 	{
 		plug_expectOk(seq2, seq3, 0, 0);
-		auto expectedMat = getMatProduct(seq1->getMatrices()) *
-		                   getMatProduct(seq2->getMatrices()) *
-		                   getMatProduct(seq3->getMatrices());
+		auto expectedMat =
+		    getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices()) * getMatProduct(seq3->getMatrices());
 		EXPECT_EQ(expectedMat, seq3->getData().getMat4());
 	}
 }

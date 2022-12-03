@@ -86,8 +86,7 @@ TEST(NodeInterfaceTest, GetParentOfNonexistentPin_ShouldReturnNull)
 	EXPECT_EQ(nullptr, gm::getParent(seq, -10));
 }
 
-TEST(NodeIntefaceTest,
-     GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResults)
+TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResults)
 {
 	// Last node is mul3
 	auto ctx = prepareEnvironment();
@@ -120,8 +119,7 @@ TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 }
  */
 
-TEST(NodeInterfaceTest,
-     GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
+TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
 {
 	auto seq = Builder::createSequence();
 

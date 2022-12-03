@@ -33,8 +33,7 @@ public:
 	//---------------------------------------------------===//
 	void accept(NodeVisitor& visitor) override
 	{
-		visitor.visit(
-		    std::static_pointer_cast<WorkspaceCamera>(shared_from_this()));
+		visitor.visit(std::static_pointer_cast<WorkspaceCamera>(shared_from_this()));
 	}
 	//===----------------------------------------------------------------------===//
 

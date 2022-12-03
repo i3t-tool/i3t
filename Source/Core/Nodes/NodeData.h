@@ -91,74 +91,43 @@ public:
 	EValueType opValueType; ///< wire type, such as Float or 4x4 Matrix
 
 protected:
-	std::variant<bool, glm::mat4, std::pair<glm::mat4, glm::mat4>, glm::vec3,
-	             glm::vec4, glm::quat, float, void*>
-	    m_value;
+	std::variant<bool, glm::mat4, std::pair<glm::mat4, glm::mat4>, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
 
 public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and
 	 * undefined value (a unit matrix) */
 	DataStore() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
 
-	explicit DataStore(float val) : opValueType(EValueType::Float)
-	{
-		m_value = val;
-	}
+	explicit DataStore(float val) : opValueType(EValueType::Float) { m_value = val; }
 
-	explicit DataStore(const glm::vec3& val) : opValueType(EValueType::Vec3)
-	{
-		m_value = val;
-	}
+	explicit DataStore(const glm::vec3& val) : opValueType(EValueType::Vec3) { m_value = val; }
 
-	explicit DataStore(const glm::vec4& val) : opValueType(EValueType::Vec4)
-	{
-		m_value = val;
-	}
+	explicit DataStore(const glm::vec4& val) : opValueType(EValueType::Vec4) { m_value = val; }
 
-	explicit DataStore(const glm::mat4& val) : opValueType(EValueType::Matrix)
-	{
-		m_value = val;
-	}
+	explicit DataStore(const glm::mat4& val) : opValueType(EValueType::Matrix) { m_value = val; }
 
 	explicit DataStore(EValueType valueType);
 
-	[[nodiscard]] bool isPulseTriggered() const {
-		return std::get<bool>(m_value);
-	}
+	[[nodiscard]] bool isPulseTriggered() const { return std::get<bool>(m_value); }
 
-	    [[nodiscard]] const glm::mat4& getMat4() const
-	{
-		return std::get<glm::mat4>(m_value);
-	}
+	[[nodiscard]] const glm::mat4& getMat4() const { return std::get<glm::mat4>(m_value); }
 	[[nodiscard]] glm::mat4& getMat4Ref() { return std::get<glm::mat4>(m_value); }
 
-	    [[nodiscard]] const std::pair<glm::mat4, glm::mat4>& getScreen() const
+	[[nodiscard]] const std::pair<glm::mat4, glm::mat4>& getScreen() const
 	{
 		return std::get<std::pair<glm::mat4, glm::mat4>>(m_value);
 	}
 
-	[[nodiscard]] const glm::vec3& getVec3() const {
-		return std::get<glm::vec3>(m_value);
-	}[[nodiscard]] glm::vec3& getVec3Ref()
-	{
-		return std::get<glm::vec3>(m_value);
-	}
+	[[nodiscard]] const glm::vec3& getVec3() const { return std::get<glm::vec3>(m_value); }
+	[[nodiscard]] glm::vec3& getVec3Ref() { return std::get<glm::vec3>(m_value); }
 
-	[[nodiscard]] const glm::vec4& getVec4() const {
-		return std::get<glm::vec4>(m_value);
-	}
+	[[nodiscard]] const glm::vec4& getVec4() const { return std::get<glm::vec4>(m_value); }
 
-	    [[nodiscard]] const glm::quat& getQuat() const
-	{
-		return std::get<glm::quat>(m_value);
-	}
+	[[nodiscard]] const glm::quat& getQuat() const { return std::get<glm::quat>(m_value); }
 
 	[[nodiscard]] float getFloat() const { return std::get<float>(m_value); }
 
-	    [[nodiscard]] void* getPointer() const
-	{
-		return std::get<void*>(m_value);
-	}
+	[[nodiscard]] void* getPointer() const { return std::get<void*>(m_value); }
 
 	//
 

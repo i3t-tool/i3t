@@ -62,9 +62,11 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 	m_tutorial = nullptr;
 	m_currentStep = 0;
 	m_progressBarAnimationPosition = 0;
-	SetTutorialCommand::addListener([this](std::shared_ptr<Tutorial> tutorial) {
-		setTutorial(std::move(tutorial)); // COMMAND
-	});
+	SetTutorialCommand::addListener(
+	    [this](std::shared_ptr<Tutorial> tutorial)
+	    {
+		    setTutorial(std::move(tutorial)); // COMMAND
+	    });
 }
 
 inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
@@ -96,22 +98,19 @@ void TutorialWindow::setTutorial(std::shared_ptr<Tutorial> tutorial)
 {
 	// MARKDOWN CONFIG - (temporarily?) moved here from constructor since
 	// exception at font loading
-	m_mdConfig = ImGui::MarkdownConfig{
-	    DefaultLinkCallback,
-	    TooltipCallback,
-	    ImageCallback,
-	    "link",
-	    {{Application::get().getUI()->getTheme().get(EFont::TutorialAssignment),
-	      true},
-	     {nullptr, true},
-	     {nullptr, false}},
-	    nullptr};
+	m_mdConfig = ImGui::MarkdownConfig{DefaultLinkCallback,
+	                                   TooltipCallback,
+	                                   ImageCallback,
+	                                   "link",
+	                                   {{Application::get().getUI()->getTheme().get(EFont::TutorialAssignment), true},
+	                                    {nullptr, true},
+	                                    {nullptr, false}},
+	                                   nullptr};
 
-	m_tutorial =
-	    std::move(tutorial); // btw if there was a previous shared pointer to
-	                         // another Tutorial, then if it isnt still used
-	                         // anywhere it gets deleted at this reassignment
-	                         // (yay, thats why we are using it! \^^/)
+	m_tutorial = std::move(tutorial); // btw if there was a previous shared pointer to
+	                                  // another Tutorial, then if it isnt still used
+	                                  // anywhere it gets deleted at this reassignment
+	                                  // (yay, thats why we are using it! \^^/)
 	m_progressBarAnimationPosition = 0;
 	setStep(0);
 }
@@ -144,8 +143,7 @@ void TutorialWindow::setTutorial(std::string path)
 
 void TutorialWindow::setStep(int step_number)
 {
-	if (m_tutorial == nullptr || step_number < 0 ||
-	    step_number >= m_tutorial->getStepCount())
+	if (m_tutorial == nullptr || step_number < 0 || step_number >= m_tutorial->getStepCount())
 	{
 		Log::fatal("Trying to set an invalid step number or tutorial not active");
 	}
@@ -156,8 +154,7 @@ void TutorialWindow::setStep(int step_number)
 		// run script
 		if (!m_tutorial->m_steps[m_currentStep].m_scriptToRunWhenShown.empty())
 		{
-			ConsoleCommand::dispatch(
-			    m_tutorial->m_steps[m_currentStep].m_scriptToRunWhenShown);
+			ConsoleCommand::dispatch(m_tutorial->m_steps[m_currentStep].m_scriptToRunWhenShown);
 		}
 	}
 }
@@ -174,29 +171,17 @@ void TutorialWindow::render()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
 	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize,
-	                    ImVec2(MIN_WIN_WIDTH, MIN_WIN_HEIGHT));
-	ImGui::PushStyleColor(
-	    ImGuiCol_WindowBg,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushStyleColor(
-	    ImGuiCol_ChildBg,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushStyleColor(
-	    ImGuiCol_Text,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialText));
-	ImGui::PushStyleColor(
-	    ImGuiCol_ScrollbarBg,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialBarBg));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(MIN_WIN_WIDTH, MIN_WIN_HEIGHT));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialText));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, Application::get().getUI()->getTheme().get(EColor::TutorialBarBg));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,
-	                      Application::get().getUI()->getTheme().get(
-	                          EColor::TutorialScrollbarGrab));
+	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarGrab));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,
-	                      Application::get().getUI()->getTheme().get(
-	                          EColor::TutorialScrollbarHovered));
+	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarHovered));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,
-	                      Application::get().getUI()->getTheme().get(
-	                          EColor::TutorialScrollbarActive));
+	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarActive));
 	// ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 150, 250, 255));
 	// ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(66, 150, 250, 205));
 	// ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
@@ -256,11 +241,8 @@ void TutorialWindow::renderTutorialHeader()
 	// display title if not "undefined"
 	if (title != "undefined")
 	{
-		ImGui::PushStyleColor(
-		    ImGuiCol_Text,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
-		ImGui::PushFont(
-		    Application::get().getUI()->getTheme().get(EFont::TutorialTitle));
+		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialTitle));
 		ImGui::TextWrapped(title.c_str());
 		ImGui::PopFont();
 		ImGui::PopStyleColor();
@@ -275,13 +257,10 @@ void TutorialWindow::renderTutorialContent()
 	// PUSH STYLE
 	// ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	// BEGIN CHILD
-	ImGui::BeginChild(
-	    "content",
-	    ImVec2(0,
-	           -(CONTROLS_SIZE_Y +
-	             ImGui::GetStyle()
-	                 .ItemSpacing.y))); // be of size: [remaining Y space] -
-	                                    // [planned Y size of contents]
+	ImGui::BeginChild("content",
+	                  ImVec2(0,
+	                         -(CONTROLS_SIZE_Y + ImGui::GetStyle().ItemSpacing.y))); // be of size: [remaining Y space] -
+	                                                                                 // [planned Y size of contents]
 	// btw ImGui::GetContentRegionAvail().y - remaining space Y
 	// ImGui::PopStyleVar();
 
@@ -303,8 +282,7 @@ void TutorialWindow::renderTutorialContent()
 		if (m_tutorial->getStepCount() > 0)
 		{
 			// ITERATE OVER WIDGETS IN CURRENT STEP AND RENDER THEM
-			for (std::shared_ptr<TutorialElement>& widget_uptr :
-			     m_tutorial->m_steps[m_currentStep].m_content)
+			for (std::shared_ptr<TutorialElement>& widget_uptr : m_tutorial->m_steps[m_currentStep].m_content)
 			{
 				widget_uptr->acceptRenderer(this);
 			}
@@ -329,34 +307,24 @@ void TutorialWindow::renderTutorialControls()
 	if (m_tutorial)
 	{
 		// PUSH STYLE
-		ImGui::PushStyleColor(
-		    ImGuiCol_Text,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 		// BEGIN CHILD
 		ImGui::BeginChild("controls", ImVec2(0, 0)); // stretch remaining Y space
 		ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));    // vertical spacing
 
-		ImGui::PushStyleColor(
-		    ImGuiCol_PlotHistogram,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
-		ImGui::PushStyleColor(
-		    ImGuiCol_FrameBg,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialBarBg));
+		ImGui::PushStyleColor(ImGuiCol_PlotHistogram, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, Application::get().getUI()->getTheme().get(EColor::TutorialBarBg));
 
 		const int stepCount = m_tutorial->getStepCount();
-		std::string progressString = std::to_string(m_currentStep + 1) + "/" +
-		                             std::to_string(m_tutorial->getStepCount());
-		ImGui::ProgressBar(m_progressBarAnimationPosition, ImVec2(-1, 20),
-		                   progressString.c_str());
+		std::string progressString = std::to_string(m_currentStep + 1) + "/" + std::to_string(m_tutorial->getStepCount());
+		ImGui::ProgressBar(m_progressBarAnimationPosition, ImVec2(-1, 20), progressString.c_str());
 		// progress animation
 		float animationDiff =
-		    m_progressBarAnimationPosition -
-		    static_cast<float>(m_currentStep + 1) / static_cast<float>(stepCount);
+		    m_progressBarAnimationPosition - static_cast<float>(m_currentStep + 1) / static_cast<float>(stepCount);
 		if (abs(animationDiff) < 0.003)
 		{
 			// snap to position
-			m_progressBarAnimationPosition =
-			    static_cast<float>(m_currentStep + 1) / static_cast<float>(stepCount);
+			m_progressBarAnimationPosition = static_cast<float>(m_currentStep + 1) / static_cast<float>(stepCount);
 		}
 		else
 		{
@@ -371,14 +339,9 @@ void TutorialWindow::renderTutorialControls()
 		// BUTTONS
 		// Back button
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-		ImGui::PushStyleColor(ImGuiCol_Text,
-		                      ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-		ImGui::PushStyleColor(
-		    ImGuiCol_Button,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-		ImGui::PushStyleColor(
-		    ImGuiCol_ButtonHovered,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 		if (m_currentStep != 0)
 		{
 			if (ImGui::Button("< Back", ImVec2(40, NEXT_BUTTON_SIZE_Y)))
@@ -393,20 +356,15 @@ void TutorialWindow::renderTutorialControls()
 		}
 		else
 		{
-			ImGui::Dummy(
-			    ImVec2(1, 1)); // need it for making a space before calling sameline
+			ImGui::Dummy(ImVec2(1, 1)); // need it for making a space before calling sameline
 		}
 		ImGui::PopStyleColor(3);
 
 		// spacing
 		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
 		// Next button
-		ImGui::PushStyleColor(
-		    ImGuiCol_Text,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
-		ImGui::PushStyleColor(
-		    ImGuiCol_Button,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
 		if (m_currentStep < m_tutorial->getStepCount() - 1)
 		{
 			if (ImGui::Button("Next", ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
@@ -443,17 +401,11 @@ void TutorialWindow::renderTutorialControls()
 void TutorialWindow::renderExplanation(Explanation* explanation)
 {
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
-	ImGui::PushStyleColor(
-	    ImGuiCol_TextDisabled,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+	ImGui::PushStyleColor(ImGuiCol_TextDisabled, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
 
-	ImGui::PushStyleColor(
-	    ImGuiCol_PopupBg,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushFont(
-	    Application::get().getUI()->getTheme().get(EFont::TutorialText));
-	ImGui::Markdown(explanation->m_content.c_str(),
-	                explanation->m_content.length(), m_mdConfig);
+	ImGui::PushStyleColor(ImGuiCol_PopupBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialText));
+	ImGui::Markdown(explanation->m_content.c_str(), explanation->m_content.length(), m_mdConfig);
 	ImGui::PopStyleColor(2);
 	ImGui::PopFont();
 }
@@ -485,25 +437,19 @@ void TutorialWindow::renderTask(Task* task)
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 
 	// velikost
-	ImGui::PushFont(
-	    Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
+	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
 
 	// zobrazeni ctverecku
-	float size = ImGui::GetFontSize() - ImGui::GetStyle().FramePadding.y *
-	                                        2.0; // zde velikost potrebujeme
-	ImVec2 drawPos =
-	    ImGui::GetCursorScreenPos() + ImVec2(0, ImGui::GetStyle().FramePadding.y);
+	float size = ImGui::GetFontSize() - ImGui::GetStyle().FramePadding.y * 2.0; // zde velikost potrebujeme
+	ImVec2 drawPos = ImGui::GetCursorScreenPos() + ImVec2(0, ImGui::GetStyle().FramePadding.y);
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
-	ImU32 color = ImGui::ColorConvertFloat4ToU32(
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
-	draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y),
-	                         ImVec2(drawPos.x + size, drawPos.y + size), color);
+	ImU32 color = ImGui::ColorConvertFloat4ToU32(Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+	draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + size, drawPos.y + size), color);
 	ImGui::Dummy(ImVec2(size, size));
 	ImGui::SameLine();
 
 	// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
-	ImGui::Markdown(task->m_content.c_str(), task->m_content.length(),
-	                m_mdConfig);
+	ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
 	// ImGui::PopStyleColor();
 
 	ImGui::PopFont(); // velikost zpet
@@ -521,16 +467,13 @@ void TutorialWindow::renderHint(Hint* hint)
 	ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
 
 	// QUESTION MARK
-	ImGui::PushFont(
-	    Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
+	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
 	// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(8, 187, 230, 255));
 	// ImGui::Text("?");
 	// ImGui::PopStyleColor();
 	// ImGui::SameLine();
 	//  BUTTON
-	ImGui::PushStyleColor(
-	    ImGuiCol_Text,
-	    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
 	ImGui::Text("Tip");
 	if (ImGui::IsItemHovered())
 	{
@@ -546,16 +489,12 @@ void TutorialWindow::renderHint(Hint* hint)
 	// HINT ITSELF
 	if (hint->m_expanded)
 	{
-		ImGui::PushStyleColor(
-		    ImGuiCol_Text,
-		    Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
-		ImGui::PushFont(
-		    Application::get().getUI()->getTheme().get(EFont::TutorialHint));
+		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialHint));
 		// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
 		// ImGui::TextWrapped(tw_hint->m_hint.c_str());
 		// ImGui::Indent();
-		ImGui::Markdown(hint->m_content.c_str(), hint->m_content.length(),
-		                m_mdConfig);
+		ImGui::Markdown(hint->m_content.c_str(), hint->m_content.length(), m_mdConfig);
 		// ImGui::Unindent();
 		ImGui::PopFont();
 		ImGui::PopStyleColor();
@@ -573,8 +512,7 @@ void TutorialWindow::renderHint(Hint* hint)
 // TODO (later when moving from imgui markdown to a custom solution) - make it
 // not static again
 std::shared_ptr<Tutorial> TutorialWindow::m_tutorial;
-inline ImGui::MarkdownImageData
-TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
+inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
 {
 	std::string imageFilename(data_.link, data_.linkLength);
 
@@ -592,9 +530,7 @@ TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
 		else
 		{
 			Log::info("Loading image " + imageFilename);
-			img = TutorialLoader::loadImage(
-			    TutorialLoader::getDirectory(m_tutorial->m_header->m_filename) +
-			    imageFilename);
+			img = TutorialLoader::loadImage(TutorialLoader::getDirectory(m_tutorial->m_header->m_filename) + imageFilename);
 			m_tutorial->m_filenameToImage[imageFilename] = img; // save for future use
 		}
 	}
@@ -607,8 +543,7 @@ TutorialWindow::ImageCallback(ImGui::MarkdownLinkCallbackData data_)
 	// nullptr check (todo possibly use a dummy image)
 	if (img != nullptr)
 	{
-		imageData = {true, false, (ImTextureID)img->m_texID,
-		             ImVec2(img->m_width, img->m_height)};
+		imageData = {true, false, (ImTextureID)img->m_texID, ImVec2(img->m_width, img->m_height)};
 	}
 	else
 	{

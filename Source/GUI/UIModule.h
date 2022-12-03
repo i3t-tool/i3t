@@ -12,22 +12,18 @@
 
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
-static const ImGuiWindowFlags_ g_WindowFlags =
-    static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
+static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
-    static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse |
-                                         ImGuiWindowFlags_NoDocking);
+    static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
 
 class MainMenuBar;
 
 template <typename T> constexpr inline void checkWindowType()
 {
-	static_assert(std::is_base_of<IWindow, T>::value,
-	              "Type parameter must be derived from IWindow class.");
+	static_assert(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
 }
 
-inline Ptr<IWindow> findWindow(const char* ID,
-                               const std::vector<Ptr<IWindow>>& dockableWindows)
+inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& dockableWindows)
 {
 	Ptr<IWindow> result = nullptr;
 	for (const auto& w : dockableWindows)
@@ -37,16 +33,14 @@ inline Ptr<IWindow> findWindow(const char* ID,
 	return result;
 }
 
-template <typename T>
-inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& dockableWindows)
+template <typename T> inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& dockableWindows)
 {
 	checkWindowType<T>();
 
 	auto result = findWindow(T::ID, dockableWindows);
 
-	Debug::Assert(result != nullptr,
-	              "Unknown window, does your 'T' have I3T_WINDOW body?"
-	              "Did you create your window instance?");
+	Debug::Assert(result != nullptr, "Unknown window, does your 'T' have I3T_WINDOW body?"
+	                                 "Did you create your window instance?");
 
 	return result;
 }
@@ -106,10 +100,7 @@ public:
 		}
 	}
 
-	template <typename T> Ptr<T> getWindowPtr()
-	{
-		return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows));
-	}
+	template <typename T> Ptr<T> getWindowPtr() { return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows)); }
 
 	UIModule() = default;
 

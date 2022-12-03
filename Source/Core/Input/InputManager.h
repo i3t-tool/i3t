@@ -74,9 +74,8 @@ public:
 
 	static int m_winWidth, m_winHeight; ///< Window size
 
-	static MouseButtonState
-	    m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed)
-	                        ///< without modifiers.
+	static MouseButtonState m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed)
+	                                            ///< without modifiers.
 	///< \todo passed to all handlers, but probably not used
 
 	static bool m_ignoreImGuiEvents;
@@ -95,20 +94,14 @@ public:
 	static void init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
 
-	static void bindGlobalAction(const char* action, EKeyState state,
-	                             KeyCallback fn);
+	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
 
 	static void triggerAction(const char* action, EKeyState state);
 
-	static void setInputAction(const char* action, Keys::Code code,
-	                           ModifiersList mods = ModifiersList());
-	static void setInputAxis(const char* action, float scale, Keys::Code code,
-	                         ModifiersList mods = ModifiersList());
+	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
+	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
 
-	static void addInputController(InputController* controller)
-	{
-		m_inputControllers.push_back(controller);
-	}
+	static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
 
 	static bool areModifiersActive(Modifiers mods);
 
@@ -117,10 +110,7 @@ public:
 	 *
 	 * \warning Focused window must be set from ImGui Context.
 	 */
-	static void setFocusedWindow(Ptr<IWindow>& window)
-	{
-		m_focusedWindow = window;
-	}
+	static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
 
 	/**
 	 * Set active input controller (for focused window).
@@ -131,8 +121,7 @@ public:
 
 	template <typename T> static bool isFocused()
 	{
-		static_assert(std::is_base_of_v<IWindow, T>,
-		              "Template param must be derived from IWindow type.");
+		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
 
 		if (m_focusedWindow)
 			return strcmp(m_focusedWindow->getID(), T::ID) == 0;
@@ -159,20 +148,11 @@ public:
 
 	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
 
-	static bool isKeyPressed(const Keys::Code code)
-	{
-		return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN);
-	}
+	static bool isKeyPressed(const Keys::Code code) { return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN); }
 
-	static bool isKeyJustPressed(const Keys::Code code)
-	{
-		return (m_keyMap[code] == JUST_DOWN);
-	}
+	static bool isKeyJustPressed(const Keys::Code code) { return (m_keyMap[code] == JUST_DOWN); }
 
-	static bool isKeyJustUp(const Keys::Code code)
-	{
-		return (m_keyMap[code] == JUST_UP);
-	}
+	static bool isKeyJustUp(const Keys::Code code) { return (m_keyMap[code] == JUST_UP); }
 
 	/// \returns whether one of three mouse buttons was clicked.
 	static bool isMouseClicked();

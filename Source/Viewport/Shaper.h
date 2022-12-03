@@ -28,9 +28,8 @@ public:
 private:
 	glm::vec3 currentColor{0.0f}; ///< variable for storage of current draw color
 
-	std::vector<float>
-	    vertices; ///< XYZ points prepared for copying to buffers and drawing
-	std::vector<float> colors; ///< RGB colors prepared for copying to buffers and
+	std::vector<float> vertices; ///< XYZ points prepared for copying to buffers and drawing
+	std::vector<float> colors;   ///< RGB colors prepared for copying to buffers and
 
 	void addVector(const float x, const float y, const float z);
 	void addVector(const glm::vec3 v);
@@ -65,8 +64,7 @@ public:
 	 * \a color for the whole line (both line ends) \param a Start point \param b
 	 * End point \param color_a Start-point color \param color_b End-point color
 	 */
-	void line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color_a,
-	          const glm::vec3 color_b);
+	void line(const glm::vec3 a, const glm::vec3 b, const glm::vec3 color_a, const glm::vec3 color_b);
 
 	/**
 	 * Creates a quad with two triangles. Triangles are CCW acd and adb.
@@ -79,8 +77,7 @@ public:
 	 * @param c Bottom left corner
 	 * @param d Bottom right corner
 	 */
-	void quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c,
-	          const glm::vec3 d);
+	void quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const glm::vec3 d);
 
 	/**
 	 * Creates a quad with two triangles. Triangles are CCW acd and adb.
@@ -94,8 +91,7 @@ public:
 	 * @param d Bottom right corner
 	 * @param color Color of the vertices
 	 */
-	void quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c,
-	          const glm::vec3 d, const glm::vec3 color);
+	void quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const glm::vec3 d, const glm::vec3 color);
 
 	/**
 	 * \brief Clear prepared geometry (vertices and colors).

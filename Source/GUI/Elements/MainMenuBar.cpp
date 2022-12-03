@@ -166,13 +166,11 @@ void MainMenuBar::showEditMenu()
 {
 	if (ImGui::BeginMenu("Edit"))
 	{
-		if (ImGui::MenuItem("Undo", nullptr, false,
-		                    App::getModule<StateManager>().canUndo()))
+		if (ImGui::MenuItem("Undo", nullptr, false, App::getModule<StateManager>().canUndo()))
 		{
 			InputManager::triggerAction("undo", EKeyState::Pressed);
 		}
-		if (ImGui::MenuItem("Redo", nullptr, false,
-		                    App::getModule<StateManager>().canRedo()))
+		if (ImGui::MenuItem("Redo", nullptr, false, App::getModule<StateManager>().canRedo()))
 		{
 			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
@@ -186,16 +184,11 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
-		ImGui::MenuItem("Tutorial window", nullptr,
-		                I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
-		ImGui::MenuItem("Scene view window", nullptr,
-		                I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
-		ImGui::MenuItem("Workspace window", nullptr,
-		                I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
-		ImGui::MenuItem("Console window", nullptr,
-		                I3T::getUI()->getWindowPtr<Console>()->getShowPtr());
-		ImGui::MenuItem("Log window", nullptr,
-		                I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
+		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
+		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
+		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
+		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<Console>()->getShowPtr());
+		ImGui::MenuItem("Log window", nullptr, I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
 
 		ImGui::EndMenu();
 	}
@@ -220,9 +213,7 @@ void MainMenuBar::showHelpMenu()
 		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow))
 		{
 		}
-		if (ImGui::MenuItem(
-		        "Show style editor", nullptr,
-		        I3T::getUI()->getWindowPtr<StyleEditor>()->getShowPtr()))
+		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getUI()->getWindowPtr<StyleEditor>()->getShowPtr()))
 		{
 		}
 

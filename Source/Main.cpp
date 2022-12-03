@@ -86,31 +86,29 @@
 
 int window; ///< current main window
 
-static const std::string DIE_SEND_MAIL =
-    "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
-    "snapshot of the program messages "
-    "as they appear in the program console.\n";
+static const std::string DIE_SEND_MAIL = "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
+                                         "snapshot of the program messages "
+                                         "as they appear in the program console.\n";
 
-static const std::string DIE_TEXT =
-    "The I3T tool did not start. "
-    "Please try the following steps to solve the problem and if it does not "
-    "help, "
-    "send me an email to felkepet@fel.cvut.cz with the snapshot of the program "
-    "messages "
-    "as they appear in the program console.\n"
-    " \n"
-    "The steps to try:\n"
-    " \n"
-    " - The program is written in Visual Studio 2010 - you may need to install "
-    "the Visual studio 2010 runtime "
-    "libraries"
-    " from https://www.microsoft.com/en-us/download/details.aspx?id=5555 \n"
-    " \n"
-    " - the program is targeted to a Graphics card with OpenGL 3.1. If you "
-    "have a internal and external GPU,"
-    " switch to the external GPU card. You may need to add transform.exe in "
-    "the GPU control panel/3D settings"
-    " to the list of progams using the dedicated GPU card.\n";
+static const std::string DIE_TEXT = "The I3T tool did not start. "
+                                    "Please try the following steps to solve the problem and if it does not "
+                                    "help, "
+                                    "send me an email to felkepet@fel.cvut.cz with the snapshot of the program "
+                                    "messages "
+                                    "as they appear in the program console.\n"
+                                    " \n"
+                                    "The steps to try:\n"
+                                    " \n"
+                                    " - The program is written in Visual Studio 2010 - you may need to install "
+                                    "the Visual studio 2010 runtime "
+                                    "libraries"
+                                    " from https://www.microsoft.com/en-us/download/details.aspx?id=5555 \n"
+                                    " \n"
+                                    " - the program is targeted to a Graphics card with OpenGL 3.1. If you "
+                                    "have a internal and external GPU,"
+                                    " switch to the external GPU card. You may need to add transform.exe in "
+                                    "the GPU control panel/3D settings"
+                                    " to the list of progams using the dedicated GPU card.\n";
 
 static const std::string DIE_TEXT_OPENGL_VERSION =
     "The I3T tool did not start. \n\n"

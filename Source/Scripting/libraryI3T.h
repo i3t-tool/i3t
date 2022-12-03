@@ -64,11 +64,9 @@ functions for saving given node and *		its inner state are fprintfed.
  */
 struct Mat4types
 {
-	const int trackball = 1, transpose = 3, determinant = 4, matmulvec = 7,
-	          vecmulmat = 8, floatmulmat = 9;
-	const int scale = 10, translate = 11, rotatex = 12, rotatey = 13,
-	          rotatez = 14, axisangle = 15, ortho = 16, perspective = 17,
-	          frustrum = 18, lookAt = 19;
+	const int trackball = 1, transpose = 3, determinant = 4, matmulvec = 7, vecmulmat = 8, floatmulmat = 9;
+	const int scale = 10, translate = 11, rotatex = 12, rotatey = 13, rotatez = 14, axisangle = 15, ortho = 16,
+	          perspective = 17, frustrum = 18, lookAt = 19;
 	const int free = 20, uniscale = 21;
 };
 /**
@@ -98,24 +96,20 @@ struct FloatOperators
  */
 struct ArithmeticOperators
 {
-	const int add = 300, sub = 301, div = 302, mul = 303, show = 304, mix = 305,
-	          inverse = 306, norm = 307, length = 308;
+	const int add = 300, sub = 301, div = 302, mul = 303, show = 304, mix = 305, inverse = 306, norm = 307, length = 308;
 };
 struct Convertors
 {
-	const int mat_tr = 400, tr_mat = 401, mat_vecs4 = 402, mat_quat = 403,
-	          mat_scalars = 404, vecs4_mat = 405, vec4_vec3 = 406,
-	          vec4_scalars = 407;
-	const int vecs3_mat = 408, vec3_vec4 = 409, vec3_scalars = 410,
-	          quat_mat = 411, quat_scalars = 412, scalars_mat = 413,
+	const int mat_tr = 400, tr_mat = 401, mat_vecs4 = 402, mat_quat = 403, mat_scalars = 404, vecs4_mat = 405,
+	          vec4_vec3 = 406, vec4_scalars = 407;
+	const int vecs3_mat = 408, vec3_vec4 = 409, vec3_scalars = 410, quat_mat = 411, quat_scalars = 412, scalars_mat = 413,
 	          scalars_vec3 = 414, scalars_vec4 = 415, scalars_quat = 416;
 };
 struct QuatOperators
 {
-	const int scalarvec3_quat = 501, angleaxis_quat = 502, vec3vec3_quat = 503,
-	          quat_scalarvec3 = 504, quat_angleaxis = 505, scalarmulquat = 506;
-	const int quat_euler = 507, euler_quat = 508, slerp = 509, longslerp = 510,
-	          lerp = 511, conjugate = 512, qvq = 513;
+	const int scalarvec3_quat = 501, angleaxis_quat = 502, vec3vec3_quat = 503, quat_scalarvec3 = 504,
+	          quat_angleaxis = 505, scalarmulquat = 506;
+	const int quat_euler = 507, euler_quat = 508, slerp = 509, longslerp = 510, lerp = 511, conjugate = 512, qvq = 513;
 };
 /**
  * \struct Node4LODs
@@ -149,10 +143,9 @@ struct ScriptingData
 	QuatOperators quatOperators;
 	NodeLODs nodeLODs;
 	CamAddModes camAddModes;
-	std::vector<glm::mat4>
-	    nodeData; ///< Vector of data as mat4, that were created by script. Serves
-	              ///< as temporary static storage. Not needed after script is
-	              ///< executed.
+	std::vector<glm::mat4> nodeData; ///< Vector of data as mat4, that were created by script. Serves
+	                                 ///< as temporary static storage. Not needed after script is
+	                                 ///< executed.
 	std::vector<Ptr<WorkspaceNodeWithCoreData>>* workspace;
 };
 

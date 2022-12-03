@@ -28,9 +28,6 @@ TEST(CloneNodeTest, TransformCanBeCloned)
 
 	auto cloned = transform->clone();
 
-	EXPECT_EQ(
-	    expectedValue,
-	    cloned->as<Transformation>()->getDefaultValue("translation").getVec3());
-	EXPECT_TRUE(
-	    Math::eq(transform->getData().getMat4(), cloned->getData().getMat4()));
+	EXPECT_EQ(expectedValue, cloned->as<Transformation>()->getDefaultValue("translation").getVec3());
+	EXPECT_TRUE(Math::eq(transform->getData().getMat4(), cloned->getData().getMat4()));
 }

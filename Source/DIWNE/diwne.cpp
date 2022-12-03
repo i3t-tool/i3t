@@ -8,10 +8,8 @@ namespace DIWNE
 /* ===================== */
 
 Diwne::Diwne(SettingsDiwne* settingsDiwne)
-    : DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel),
-      mp_settingsDiwne(settingsDiwne),
-      m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min,
-                      settingsDiwne->workAreaDiwne.Max)
+    : DiwneObject(*this, settingsDiwne->editorId, settingsDiwne->editorlabel), mp_settingsDiwne(settingsDiwne),
+      m_workAreaDiwne(settingsDiwne->workAreaDiwne.Min, settingsDiwne->workAreaDiwne.Max)
 
       ,
       m_workAreaZoom(settingsDiwne->workAreaInitialZoom)
@@ -20,16 +18,13 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
       mp_lastActivePin(nullptr), m_helperLink(diwne, 0)
 
       ,
-      m_diwneAction(None), m_diwneAction_previousFrame(m_diwneAction),
-      m_objectFocused(false)
+      m_diwneAction(None), m_diwneAction_previousFrame(m_diwneAction), m_objectFocused(false)
 
       ,
-      m_nodesSelectionChanged(false),
-      m_selectionRectangeDiwne(ImRect(0, 0, 0, 0))
+      m_nodesSelectionChanged(false), m_selectionRectangeDiwne(ImRect(0, 0, 0, 0))
 
       ,
-      m_popupPosition(settingsDiwne->initPopupPosition), m_popupDrawn(false),
-      m_tooltipDrawn(false)
+      m_popupPosition(settingsDiwne->initPopupPosition), m_popupDrawn(false), m_tooltipDrawn(false)
 
       ,
       m_takeSnap(false)
@@ -39,17 +34,15 @@ Diwne::Diwne(SettingsDiwne* settingsDiwne)
 
 DiwneAction Diwne::getDiwneActionActive() const
 {
-	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame
-	                                          : m_diwneAction;
+	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;
 }
 
 bool Diwne::allowDrawing() { return m_drawing; }
 
 bool Diwne::initializeDiwne()
 {
-	m_drawing = ImGui::BeginChild(
-	    mp_settingsDiwne->editorlabel.c_str(), ImVec2(0, 0), false,
-	    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	m_drawing = ImGui::BeginChild(mp_settingsDiwne->editorlabel.c_str(), ImVec2(0, 0), false,
+	                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	m_diwneAction = DiwneAction::None;
 	m_popupDrawn = m_tooltipDrawn = m_objectFocused = m_takeSnap = false;
 	return initialize();
@@ -83,33 +76,22 @@ void Diwne::begin()
 #ifdef DIWNE_DEBUG
 	ImGui::Checkbox("Show debug texts", &(m_diwneDebug_on));
 	DIWNE_DEBUG((*this), {
-		ImGui::GetWindowDrawList()->AddRect(
-		    m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
-		    ImDrawCornerFlags_None, 10);
-		ImGui::Text(
-		    fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}",
-		                m_workAreaDiwne.Min.x, m_workAreaDiwne.Min.y,
-		                m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y,
-		                m_workAreaScreen.Min.x, m_workAreaScreen.Min.y,
-		                m_workAreaScreen.Max.x, m_workAreaScreen.Max.y)
-		        .c_str());
+		ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
+		                                    ImDrawCornerFlags_None, 10);
+		ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x,
+		                        m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y, m_workAreaScreen.Min.x,
+		                        m_workAreaScreen.Min.y, m_workAreaScreen.Max.x, m_workAreaScreen.Max.y)
+		                .c_str());
 
-		ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x,
-		                        ImGui::GetIO().MousePos.y)
-		                .c_str());
-		ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x,
-		                        getPopupPosition().y)
-		                .c_str());
+		ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
+		ImGui::Text(fmt::format("PopupPos: {}-{}", getPopupPosition().x, getPopupPosition().y).c_str());
 		ImGui::Text(fmt::format("Zoom: {}", m_workAreaZoom).c_str());
 
-		ImGui::Text(fmt::format("WindowPadding: {}_{} ",
-		                        ImGui::GetStyle().WindowPadding.x,
-		                        ImGui::GetStyle().WindowPadding.y)
-		                .c_str());
-		ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ",
-		                        ImGui::GetCurrentWindow()->ClipRect.Min.x,
-		                        ImGui::GetCurrentWindow()->ClipRect.Min.y,
-		                        ImGui::GetCurrentWindow()->ClipRect.Max.x,
+		ImGui::Text(
+		    fmt::format("WindowPadding: {}_{} ", ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y)
+		        .c_str());
+		ImGui::Text(fmt::format("WindowClipRect: {} _ {} _ {} _ {} ", ImGui::GetCurrentWindow()->ClipRect.Min.x,
+		                        ImGui::GetCurrentWindow()->ClipRect.Min.y, ImGui::GetCurrentWindow()->ClipRect.Max.x,
 		                        ImGui::GetCurrentWindow()->ClipRect.Max.y)
 		                .c_str());
 
@@ -177,8 +159,7 @@ bool Diwne::afterContentDiwne()
 
 void Diwne::end()
 {
-	ImGui::SetCursorScreenPos(
-	    m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
+	ImGui::SetCursorScreenPos(m_workAreaScreen.Max); /* for capture whole window/workarea to Group */
 	ImGui::EndGroup();
 	ImGui::PopID();
 }
@@ -197,12 +178,10 @@ bool Diwne::afterEndDiwne()
 bool Diwne::allowProcessFocused()
 {
 	return m_isActive /* object is active from previous frame */
-	       || (diwne.getDiwneActionActive() == SelectionRectFull ||
-	           diwne.getDiwneActionActive() == SelectionRectTouch) ||
+	       || (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) ||
 	       (!diwne.m_objectFocused /* only one object can be focused */
 	        && (diwne.getDiwneAction() == None ||
-	            diwne.getDiwneActionActive() ==
-	                NewLink /* we want focus of other object while new link */));
+	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
 bool Diwne::processInteractions() { return processDiwneSelectionRectangle(); }
@@ -213,10 +192,9 @@ bool Diwne::processInteractionsDiwne()
 
 	interaction_happen |= DiwneObject::processInteractionsDiwne();
 
-	if (m_drawMode == DrawMode::Interacting &&
-	    bypassFocusForInteractionAction()) /* for example inner interaction (focus
-	                                          on node) is no problem with this
-	                                          actions */
+	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction (focus
+	                                                                                 on node) is no problem with this
+	                                                                                 actions */
 	{
 		interaction_happen |= processDiwneZoom();
 	}
@@ -234,8 +212,7 @@ bool Diwne::finalizeDiwne()
 
 bool Diwne::blockRaisePopup()
 {
-	return m_diwneAction == DiwneAction::SelectionRectFull ||
-	       m_diwneAction == DiwneAction::SelectionRectTouch ||
+	return m_diwneAction == DiwneAction::SelectionRectFull || m_diwneAction == DiwneAction::SelectionRectTouch ||
 	       m_diwneAction_previousFrame == DiwneAction::SelectionRectFull ||
 	       m_diwneAction_previousFrame == DiwneAction::SelectionRectTouch;
 }
@@ -289,8 +266,7 @@ bool Diwne::processDiwneSelectionRectangle()
 			m_selectionRectangeDiwne.Max.y = startPos.y;
 		}
 
-		AddRectFilledDiwne(m_selectionRectangeDiwne.Min,
-		                   m_selectionRectangeDiwne.Max, color);
+		AddRectFilledDiwne(m_selectionRectangeDiwne.Min, m_selectionRectangeDiwne.Max, color);
 
 		return true;
 	}
@@ -337,9 +313,8 @@ void Diwne::setWorkAreaZoom(float val /*=1*/)
 
 void Diwne::updateWorkAreaRectangles()
 {
-	ImVec2 windowPos =
-	    ImGui::GetWindowPos(); /* \todo JH return negative number while sub-window
-	                              can not move outside from aplication window */
+	ImVec2 windowPos = ImGui::GetWindowPos(); /* \todo JH return negative number while sub-window
+	                                             can not move outside from aplication window */
 	ImVec2 windowSize = ImGui::GetWindowSize();
 
 	m_workAreaScreen.Min = windowPos;
@@ -350,14 +325,12 @@ void Diwne::updateWorkAreaRectangles()
 
 ImVec2 Diwne::transformFromImGuiToDiwne(const ImVec2& point) const
 {
-	return workArea2screen(screen2workArea(point) /
-	                       m_workAreaZoom); /* basically just zoom */
+	return workArea2screen(screen2workArea(point) / m_workAreaZoom); /* basically just zoom */
 }
 
 ImVec2 Diwne::transformFromDiwneToImGui(const ImVec2& point) const
 {
-	return workArea2screen(screen2workArea(point) *
-	                       m_workAreaZoom); /* basically just zoom */
+	return workArea2screen(screen2workArea(point) * m_workAreaZoom); /* basically just zoom */
 }
 
 ImVec4 Diwne::transformFromImGuiToDiwne(const ImVec4& rect) const
@@ -376,64 +349,45 @@ ImVec4 Diwne::transformFromDiwneToImGui(const ImVec4& rect) const
 
 void Diwne::translateWorkAreaDiwneZoomed(ImVec2 const& distance)
 {
-	translateWorkAreaDiwne(
-	    ImVec2(distance.x / m_workAreaZoom, distance.y / m_workAreaZoom));
+	translateWorkAreaDiwne(ImVec2(distance.x / m_workAreaZoom, distance.y / m_workAreaZoom));
 }
 
-void Diwne::translateWorkAreaDiwne(ImVec2 const& distance)
-{
-	m_workAreaDiwne.Translate(distance);
-}
+void Diwne::translateWorkAreaDiwne(ImVec2 const& distance) { m_workAreaDiwne.Translate(distance); }
 
-void Diwne::AddRectFilledDiwne(
-    const ImVec2& p_min, const ImVec2& p_max, ImVec4 col,
-    float rounding /*=0.0f*/,
-    ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/) const
+void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
+                               ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/) const
 {
-	ImDrawList* idl =
-	    ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
-	                                   Clip rect for drawing of manual shapes, but
-	                                   be careful with order of drew elements */
-	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max),
-	                   ImGui::ColorConvertFloat4ToU32(col), rounding,
+	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
+	                                                 Clip rect for drawing of manual shapes, but
+	                                                 be careful with order of drew elements */
+	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding,
 	                   rounding_corners);
 }
 
-void Diwne::AddRectDiwne(
-    const ImVec2& p_min, const ImVec2& p_max, ImVec4 col,
-    float rounding /*=0.0f*/,
-    ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/,
-    float thickness /*=1.0f*/) const
+void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
+                         ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/, float thickness /*=1.0f*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max),
-	             ImGui::ColorConvertFloat4ToU32(col), rounding, rounding_corners,
-	             thickness * m_workAreaZoom);
+	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding,
+	             rounding_corners, thickness * m_workAreaZoom);
 }
 
-void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2,
-                                const ImVec2& p3, const ImVec2& p4, ImVec4 col,
+void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
                                 float thickness, int num_segments /*=0*/) const
 {
-	ImDrawList* idl =
-	    ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
-	                                   Clip rect for drawing of manual shapes, but
-	                                   be careful with order of drew elements */
+	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
+	                                                 Clip rect for drawing of manual shapes, but
+	                                                 be careful with order of drew elements */
 
-	idl->AddBezierCurve(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3),
-	                    diwne2screen(p4), ImGui::ColorConvertFloat4ToU32(col),
-	                    thickness * m_workAreaZoom, num_segments);
+	idl->AddBezierCurve(diwne2screen(p1), diwne2screen(p2), diwne2screen(p3), diwne2screen(p4),
+	                    ImGui::ColorConvertFloat4ToU32(col), thickness * m_workAreaZoom, num_segments);
 }
 
-void Diwne::DrawIconCircle(ImDrawList* idl, ImColor ShapeColor,
-                           ImColor InnerColor, ImVec2 topLeft,
-                           ImVec2 bottomRight, bool filled,
-                           float thicknes /*=1*/) const
+void Diwne::DrawIconCircle(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                           bool filled, float thicknes /*=1*/) const
 {
-	ImVec2 center =
-	    ImVec2((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
-	float radius =
-	    std::min(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y) / 2;
+	ImVec2 center = ImVec2((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
+	float radius = std::min(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y) / 2;
 
 	idl->AddCircleFilled(center, radius, ShapeColor);
 	if (!filled)
@@ -442,118 +396,91 @@ void Diwne::DrawIconCircle(ImDrawList* idl, ImColor ShapeColor,
 	}
 }
 
-void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor ShapeColor,
-                              ImColor InnerColor, ImVec2 topLeft,
-                              ImVec2 bottomRight, bool filled,
-                              ImVec2 thicknes /*=ImVec2(1, 1)*/,
+void Diwne::DrawIconRectangle(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                              ImVec2 bottomRight, bool filled, ImVec2 thicknes /*=ImVec2(1, 1)*/,
                               float rounding /*= 0*/) const
 {
 	idl->AddRectFilled(topLeft, bottomRight, ShapeColor, rounding);
 	if (!filled)
 	{
-		idl->AddRectFilled(topLeft + thicknes, bottomRight - thicknes, InnerColor,
-		                   rounding);
+		idl->AddRectFilled(topLeft + thicknes, bottomRight - thicknes, InnerColor, rounding);
 	}
 }
 
-void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor,
-                                 ImColor InnerColor, ImVec2 topLeft,
-                                 ImVec2 bottomRight, bool filled,
-                                 float thicknes /*= 1*/) const
+void Diwne::DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                                 ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
 {
-	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y),
-	                       ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2),
+	idl->AddTriangleFilled(ImVec2(bottomRight.x, topLeft.y), ImVec2(topLeft.x, (topLeft.y + bottomRight.y) / 2),
 	                       bottomRight, ShapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(
-		    ImVec2(bottomRight.x - thicknes, topLeft.y + thicknes),
-		    ImVec2(topLeft.x + thicknes, (topLeft.y + bottomRight.y) / 2),
-		    bottomRight - ImVec2(thicknes, thicknes), InnerColor);
+		idl->AddTriangleFilled(ImVec2(bottomRight.x - thicknes, topLeft.y + thicknes),
+		                       ImVec2(topLeft.x + thicknes, (topLeft.y + bottomRight.y) / 2),
+		                       bottomRight - ImVec2(thicknes, thicknes), InnerColor);
 	}
 }
 
-void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor,
-                                  ImColor InnerColor, ImVec2 topLeft,
-                                  ImVec2 bottomRight, bool filled,
-                                  float thicknes /*= 1*/) const
+void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                                  ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
 {
-	idl->AddTriangleFilled(topLeft,
-	                       ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2),
+	idl->AddTriangleFilled(topLeft, ImVec2(bottomRight.x, (topLeft.y + bottomRight.y) / 2),
 	                       ImVec2(topLeft.x, bottomRight.y), ShapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(
-		    topLeft + ImVec2(thicknes, thicknes),
-		    ImVec2(bottomRight.x - thicknes, (topLeft.y + bottomRight.y) / 2),
-		    ImVec2(topLeft.x + thicknes, bottomRight.y - thicknes), InnerColor);
+		idl->AddTriangleFilled(topLeft + ImVec2(thicknes, thicknes),
+		                       ImVec2(bottomRight.x - thicknes, (topLeft.y + bottomRight.y) / 2),
+		                       ImVec2(topLeft.x + thicknes, bottomRight.y - thicknes), InnerColor);
 	}
 }
 
-void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor,
-                                      ImColor InnerColor, ImVec2 topLeft,
-                                      ImVec2 bottomRight, bool filled,
-                                      float thicknes /*= 1*/) const
+void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                                      ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
 {
-	idl->AddTriangleFilled(ImVec2(topLeft.x, bottomRight.y), bottomRight,
-	                       ImVec2(bottomRight.x, topLeft.y), ShapeColor);
+	idl->AddTriangleFilled(ImVec2(topLeft.x, bottomRight.y), bottomRight, ImVec2(bottomRight.x, topLeft.y), ShapeColor);
 
 	if (!filled)
 	{
-		idl->AddTriangleFilled(
-		    ImVec2(topLeft.x + 2 * thicknes, bottomRight.y - thicknes),
-		    bottomRight - ImVec2(thicknes, thicknes),
-		    ImVec2(bottomRight.x - 2 * thicknes, topLeft.y + thicknes), InnerColor);
+		idl->AddTriangleFilled(ImVec2(topLeft.x + 2 * thicknes, bottomRight.y - thicknes),
+		                       bottomRight - ImVec2(thicknes, thicknes),
+		                       ImVec2(bottomRight.x - 2 * thicknes, topLeft.y + thicknes), InnerColor);
 	}
 }
 
-void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor,
-                                     ImColor InnerColor, ImVec2 topLeft,
-                                     ImVec2 bottomRight, bool filled,
-                                     float thicknes /*= 1*/) const
+void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                                     ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
 {
-	idl->AddTriangleFilled(topLeft, ImVec2(topLeft.x, bottomRight.y), bottomRight,
-	                       ShapeColor);
+	idl->AddTriangleFilled(topLeft, ImVec2(topLeft.x, bottomRight.y), bottomRight, ShapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(
-		    topLeft + ImVec2(thicknes, 2 * thicknes),
-		    ImVec2(topLeft.x + thicknes, bottomRight.y - thicknes),
-		    bottomRight - ImVec2(2 * thicknes, thicknes), InnerColor);
+		idl->AddTriangleFilled(topLeft + ImVec2(thicknes, 2 * thicknes),
+		                       ImVec2(topLeft.x + thicknes, bottomRight.y - thicknes),
+		                       bottomRight - ImVec2(2 * thicknes, thicknes), InnerColor);
 	}
 }
 
-void Diwne::DrawIconCross(ImDrawList* idl, ImColor ShapeColor,
-                          ImColor InnerColor, ImVec2 topLeft,
-                          ImVec2 bottomRight, bool filled,
-                          float thicknesShape /*=4*/,
-                          float thicknesInner /*=2*/) const
+void Diwne::DrawIconCross(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft, ImVec2 bottomRight,
+                          bool filled, float thicknesShape /*=4*/, float thicknesInner /*=2*/) const
 {
 	float thicknesDiff = (thicknesShape - thicknesInner) / 2;
 	ImVec2 thicknesDiffVec = ImVec2(thicknesDiff, thicknesDiff);
 
 	idl->AddLine(topLeft, bottomRight, ShapeColor, thicknesShape);
-	idl->AddLine(ImVec2(topLeft.x, bottomRight.y),
-	             ImVec2(bottomRight.x, topLeft.y), ShapeColor, thicknesShape);
+	idl->AddLine(ImVec2(topLeft.x, bottomRight.y), ImVec2(bottomRight.x, topLeft.y), ShapeColor, thicknesShape);
 	if (!filled)
 	{
-		idl->AddLine(topLeft + thicknesDiffVec, bottomRight - thicknesDiffVec,
+		idl->AddLine(topLeft + thicknesDiffVec, bottomRight - thicknesDiffVec, InnerColor, thicknesInner);
+		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknesDiffVec, ImVec2(bottomRight.x, topLeft.y) - thicknesDiffVec,
 		             InnerColor, thicknesInner);
-		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknesDiffVec,
-		             ImVec2(bottomRight.x, topLeft.y) - thicknesDiffVec, InnerColor,
-		             thicknesInner);
 	}
 }
 
-bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor,
-                       ImColor bgInnerColor, DIWNE::IconType fgIconType,
-                       ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
+bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
+                       DIWNE::IconType fgIconType, ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
                        ImVec4 padding, bool filled, std::string const id) const
 {
 	ImVec2 initPos = ImGui::GetCursorScreenPos();
 
-	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor,
-	         fgInnerColor, size, padding, filled);
+	DrawIcon(bgIconType, bgShapeColor, bgInnerColor, fgIconType, fgShapeColor, fgInnerColor, size, padding, filled);
 
 	ImGui::SetCursorScreenPos(initPos);
 	bool result = ImGui::InvisibleButton(id.c_str(), size);
@@ -561,10 +488,8 @@ bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor,
 	return result;
 }
 
-void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor,
-                     ImColor bgInnerColor, DIWNE::IconType fgIconType,
-                     ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size,
-                     ImVec4 padding, bool filled) const
+void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
+                     ImColor fgShapeColor, ImColor fgInnerColor, ImVec2 size, ImVec4 padding, bool filled) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
 	ImVec2 icon_min = ImGui::GetCursorScreenPos();
@@ -578,114 +503,72 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor,
 		DrawIconCircle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	case Rectangle:
-		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max,
-		                  false);
+		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	case TriangleLeft:
-		DrawIconTriangleLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max,
-		                     false);
+		DrawIconTriangleLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	case TriangleRight:
-		DrawIconTriangleRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max,
-		                      false);
+		DrawIconTriangleRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	case Cross:
 		DrawIconCross(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	case TriangleDownLeft:
-		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min,
-		                         icon_max, false);
+		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	case TriangleDownRight:
-		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min,
-		                          icon_max, false);
+		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
 		break;
 	}
 
 	switch (fgIconType)
 	{
 	case Circle:
-		DrawIconCircle(idl, fgShapeColor, fgInnerColor, inner_icon_min,
-		               inner_icon_max, filled);
+		DrawIconCircle(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case Rectangle:
-		DrawIconRectangle(idl, fgShapeColor, fgInnerColor, inner_icon_min,
-		                  inner_icon_max, filled);
+		DrawIconRectangle(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case TriangleLeft:
-		DrawIconTriangleLeft(idl, fgShapeColor, fgInnerColor, inner_icon_min,
-		                     inner_icon_max, filled);
+		DrawIconTriangleLeft(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case TriangleRight:
-		DrawIconTriangleRight(idl, fgShapeColor, fgInnerColor, inner_icon_min,
-		                      inner_icon_max, filled);
+		DrawIconTriangleRight(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case Cross:
-		DrawIconCross(idl, fgShapeColor, fgInnerColor, inner_icon_min,
-		              inner_icon_max, filled);
+		DrawIconCross(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case TriangleDownLeft:
-		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min,
-		                         icon_max, filled);
+		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleDownRight:
-		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min,
-		                          icon_max, filled);
+		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	}
 
 	ImGui::Dummy(size);
 }
 
-ImVec2 Diwne::screen2workArea(const ImVec2& point) const
-{
-	return point - m_workAreaScreen.Min;
-}
+ImVec2 Diwne::screen2workArea(const ImVec2& point) const { return point - m_workAreaScreen.Min; }
 
-ImVec2 Diwne::workArea2screen(const ImVec2& point) const
-{
-	return point + m_workAreaScreen.Min;
-}
+ImVec2 Diwne::workArea2screen(const ImVec2& point) const { return point + m_workAreaScreen.Min; }
 
-ImVec2 Diwne::diwne2workArea(const ImVec2& point) const
-{
-	return diwne2workArea_noZoom(point) * m_workAreaZoom;
-}
+ImVec2 Diwne::diwne2workArea(const ImVec2& point) const { return diwne2workArea_noZoom(point) * m_workAreaZoom; }
 
-ImVec2 Diwne::workArea2diwne(const ImVec2& point) const
-{
-	return workArea2diwne_noZoom(point / m_workAreaZoom);
-}
+ImVec2 Diwne::workArea2diwne(const ImVec2& point) const { return workArea2diwne_noZoom(point / m_workAreaZoom); }
 
-ImVec2 Diwne::screen2diwne(const ImVec2& point) const
-{
-	return workArea2diwne(screen2workArea(point));
-}
+ImVec2 Diwne::screen2diwne(const ImVec2& point) const { return workArea2diwne(screen2workArea(point)); }
 
-ImVec2 Diwne::diwne2screen(const ImVec2& point) const
-{
-	return workArea2screen(diwne2workArea(point));
-}
+ImVec2 Diwne::diwne2screen(const ImVec2& point) const { return workArea2screen(diwne2workArea(point)); }
 
-ImVec2 Diwne::diwne2workArea_noZoom(const ImVec2& point) const
-{
-	return point - m_workAreaDiwne.Min;
-}
+ImVec2 Diwne::diwne2workArea_noZoom(const ImVec2& point) const { return point - m_workAreaDiwne.Min; }
 
-ImVec2 Diwne::workArea2diwne_noZoom(const ImVec2& point) const
-{
-	return point + m_workAreaDiwne.Min;
-}
+ImVec2 Diwne::workArea2diwne_noZoom(const ImVec2& point) const { return point + m_workAreaDiwne.Min; }
 
-ImVec2 Diwne::screen2diwne_noZoom(const ImVec2& point) const
-{
-	return workArea2diwne_noZoom(screen2workArea(point));
-}
+ImVec2 Diwne::screen2diwne_noZoom(const ImVec2& point) const { return workArea2diwne_noZoom(screen2workArea(point)); }
 
-ImVec2 Diwne::diwne2screen_noZoom(const ImVec2& point) const
-{
-	return workArea2screen(diwne2workArea_noZoom(point));
-}
+ImVec2 Diwne::diwne2screen_noZoom(const ImVec2& point) const { return workArea2screen(diwne2workArea_noZoom(point)); }
 
 bool Diwne::bypassIsItemClicked0() { return ImGui::IsItemClicked(0); }
 bool Diwne::bypassIsItemClicked1() { return ImGui::IsItemClicked(1); }
@@ -699,18 +582,9 @@ bool Diwne::bypassIsMouseClicked2() { return ImGui::IsMouseClicked(2); }
 bool Diwne::bypassIsMouseReleased0() { return ImGui::IsMouseReleased(0); }
 bool Diwne::bypassIsMouseReleased1() { return ImGui::IsMouseReleased(1); }
 bool Diwne::bypassIsMouseReleased2() { return ImGui::IsMouseReleased(2); }
-ImVec2 Diwne::bypassMouseClickedPos0()
-{
-	return ImGui::GetIO().MouseClickedPos[0];
-}
-ImVec2 Diwne::bypassMouseClickedPos1()
-{
-	return ImGui::GetIO().MouseClickedPos[1];
-}
-ImVec2 Diwne::bypassMouseClickedPos2()
-{
-	return ImGui::GetIO().MouseClickedPos[2];
-}
+ImVec2 Diwne::bypassMouseClickedPos0() { return ImGui::GetIO().MouseClickedPos[0]; }
+ImVec2 Diwne::bypassMouseClickedPos1() { return ImGui::GetIO().MouseClickedPos[1]; }
+ImVec2 Diwne::bypassMouseClickedPos2() { return ImGui::GetIO().MouseClickedPos[2]; }
 bool Diwne::bypassIsItemActive() { return ImGui::IsItemActive(); }
 bool Diwne::bypassIsMouseDragging0() { return ImGui::IsMouseDragging(0); }
 bool Diwne::bypassIsMouseDragging1() { return ImGui::IsMouseDragging(1); }
@@ -721,21 +595,12 @@ ImVec2 Diwne::bypassGetMouseDragDelta2() { return ImGui::GetMouseDragDelta(2); }
 ImVec2 Diwne::bypassGetMouseDelta() { return ImGui::GetIO().MouseDelta; }
 ImVec2 Diwne::bypassGetMousePos() { return ImGui::GetIO().MousePos; }
 float Diwne::bypassGetMouseWheel() { return ImGui::GetIO().MouseWheel; }
-float Diwne::bypassGetZoomDelta()
-{
-	return bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity;
-}
+float Diwne::bypassGetZoomDelta() { return bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity; }
 
 bool Diwne::allowProcessZoom() { return true; }
 bool Diwne::bypassZoomAction() { return diwne.bypassGetZoomDelta() != 0; }
-bool Diwne::bypassDiwneSetPopupPositionAction()
-{
-	return bypassIsMouseClicked1();
-}
-ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction()
-{
-	return bypassGetMousePos();
-}
+bool Diwne::bypassDiwneSetPopupPositionAction() { return bypassIsMouseClicked1(); }
+ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() { return bypassGetMousePos(); }
 
 ImRect Diwne::getSelectionRectangleDiwne() { return m_selectionRectangeDiwne; }
 

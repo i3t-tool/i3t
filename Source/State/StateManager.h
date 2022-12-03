@@ -24,10 +24,7 @@ public:
 
 	//
 
-	void setOriginator(IStateful* originator)
-	{
-		m_originators.push_back(originator);
-	}
+	void setOriginator(IStateful* originator) { m_originators.push_back(originator); }
 
 	//
 
@@ -40,10 +37,7 @@ public:
 
 	[[nodiscard]] const Memento& getCurrentState() const;
 
-	bool isDirty() const
-	{
-		return m_savedSceneHash != m_hashes[m_currentStateIdx] && m_dirty;
-	}
+	bool isDirty() const { return m_savedSceneHash != m_hashes[m_currentStateIdx] && m_dirty; }
 
 	/// \pre m_originator is set.
 	void createEmptyScene();

@@ -25,7 +25,8 @@ private:
 	static const char* s_type;
 
 	GameObject *m_frustrum, *m_frustruml, *m_cameraico, *m_handle;
-	union Stencils {
+	union Stencils
+	{
 		struct N
 		{
 			unsigned char f, n, t, b, r, l;
@@ -36,6 +37,5 @@ private:
 	int m_activehandle = -1, m_hoverhandle = -1, m_axisnum = 0;
 	glm::mat4 m_edited = glm::mat4(1.0f);
 	// Renderer*icorend;
-	float m_near = -0.0f, m_far = 20.0f, m_left = -10.0f, m_right = 10.0f,
-	      m_top = 10.0f, m_bottom = -10.0f;
+	float m_near = -0.0f, m_far = 20.0f, m_left = -10.0f, m_right = 10.0f, m_top = 10.0f, m_bottom = -10.0f;
 };

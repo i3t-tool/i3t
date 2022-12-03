@@ -46,8 +46,7 @@ void Logger::initLogger(int argc, char* argv[])
 	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
 	sinks[0]->set_pattern("[%l]: %v");
 
-	m_consoleLogger =
-	    std::make_shared<spdlog::logger>("Log", sinks.begin(), sinks.end());
+	m_consoleLogger = std::make_shared<spdlog::logger>("Log", sinks.begin(), sinks.end());
 
 	logger->set_level(spdlog::level::trace);
 	mouseLogger->set_level(spdlog::level::trace);
@@ -75,13 +74,11 @@ void Logger::update()
 	{
 		toggleLoggingLogic();
 	}
-	if (InputManager::isKeyJustPressed(
-	        LoggingToggle::KEY_LoggingToggle_matrixFields))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_matrixFields))
 	{
 		toggleLoggingMatrixFields();
 	}
-	if (InputManager::isKeyJustPressed(
-	        LoggingToggle::KEY_LoggingToggle_mouseMovement))
+	if (InputManager::isKeyJustPressed(LoggingToggle::KEY_LoggingToggle_mouseMovement))
 	{
 		toggleLoggingMouseRaw();
 	}
@@ -93,21 +90,18 @@ void Logger::update()
 			tutorialCount++;
 			stepCount = 1;
 		}
-		LOG_EVENT_TUTORIAL_STEP(std::to_string(tutorialCount),
-		                        std::to_string(stepCount),
+		LOG_EVENT_TUTORIAL_STEP(std::to_string(tutorialCount), std::to_string(stepCount),
 		                        std::string("Dummy tutorial step"));
 		stepCount++;
 	}
 }
 
-void Logger::log(const LoggingOption& logType, const std::string message,
-                 const int numOfArgs, ...)
+void Logger::log(const LoggingOption& logType, const std::string message, const int numOfArgs, ...)
 {
 	va_list args;
 	va_start(args, numOfArgs);
 	vAddToLogBuffer(logType, message, numOfArgs, args);
-	if (logType == LoggingOption::MOUSE_CLICK ||
-	    logType == LoggingOption::MOUSE_MOVEMENT)
+	if (logType == LoggingOption::MOUSE_CLICK || logType == LoggingOption::MOUSE_MOVEMENT)
 	{
 		flushBuffer(mouseLogger);
 	}
@@ -118,27 +112,23 @@ void Logger::log(const LoggingOption& logType, const std::string message,
 	va_end(args);
 }
 
-void Logger::addToLogBuffer(const LoggingOption& logType,
-                            const std::string message, const int numOfArgs, ...)
+void Logger::addToLogBuffer(const LoggingOption& logType, const std::string message, const int numOfArgs, ...)
 {
 	va_list args;
 	va_start(args, numOfArgs);
 	// TODO -> EOL.
-	vAddToLogBuffer(logType, /* spdlog::details::os::default_eol + */ message,
-	                numOfArgs, args);
+	vAddToLogBuffer(logType, /* spdlog::details::os::default_eol + */ message, numOfArgs, args);
 	va_end(args);
 }
 
-void Logger::vAddToLogBuffer(const LoggingOption& logType,
-                             const std::string& message, const int numOfArgs,
+void Logger::vAddToLogBuffer(const LoggingOption& logType, const std::string& message, const int numOfArgs,
                              va_list& arguments)
 {
 	if (logType == LoggingOption::MOUSE_MOVEMENT && isLoggingMouseRaw)
 	{
 		if (shouldLogMouse())
 		{
-			logBuffer.push(
-			    formatMessage(message, vaListToQueue(numOfArgs, arguments)));
+			logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
 		}
 	}
 	else if (logType == LoggingOption::MOUSE_CLICK && isLoggingMouseRaw)
@@ -167,8 +157,7 @@ bool Logger::shouldLogMouse()
 {
 	// Current time in milliseconds.
 	// const int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	const int currentTime =
-	    (int)(glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
+	const int currentTime = (int)(glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
 	bool shouldLog = currentTime - previousTime > MOUSE_MOVEMENT_LOG_INTERVALS;
 	if (shouldLog)
 	{
@@ -206,8 +195,7 @@ void Logger::flushBuffer(std::shared_ptr<spdlog::logger> logger)
 	logger->trace(outMessage.str());
 }
 
-std::string Logger::formatMessage(const std::string& message,
-                                  std::queue<std::string> arguments) const
+std::string Logger::formatMessage(const std::string& message, std::queue<std::string> arguments) const
 {
 	std::ostringstream outMessage;
 	for (int i = 0; i < message.size(); i++)
@@ -225,8 +213,7 @@ std::string Logger::formatMessage(const std::string& message,
 	return outMessage.str();
 }
 
-std::queue<std::string> Logger::vaListToQueue(const int numOfArgs,
-                                              va_list& args)
+std::queue<std::string> Logger::vaListToQueue(const int numOfArgs, va_list& args)
 {
 	std::queue<std::string> argsQueue;
 	for (int i = 0; i < numOfArgs; i++)

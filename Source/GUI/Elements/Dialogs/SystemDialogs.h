@@ -29,10 +29,8 @@ namespace SystemDialogs
  *
  * \return Whether file was selected or not.
  */
-bool OpenSingleFileDialog(std::string& result, const std::string& title,
-                          const std::string& root = "",
-                          const std::vector<std::string>& filter = {"All Files",
-                                                                    "*"});
+bool OpenSingleFileDialog(std::string& result, const std::string& title, const std::string& root = "",
+                          const std::vector<std::string>& filter = {"All Files", "*"});
 
 /**
  * Save single file via system native file dialog.
@@ -44,16 +42,13 @@ bool OpenSingleFileDialog(std::string& result, const std::string& title,
  *
  * \return Whether file was selected or not.
  */
-bool SaveSingleFileDialog(std::string& filename, const std::string& title,
-                          const std::string& root = "",
-                          const std::vector<std::string>& filter = {"All Files",
-                                                                    "*"});
+bool SaveSingleFileDialog(std::string& filename, const std::string& title, const std::string& root = "",
+                          const std::vector<std::string>& filter = {"All Files", "*"});
 
 /**
  * Show fatal error message
  *
  * Dialog will block execution of application.
  */
-void FireErrorMessageDialog(const std::string& title,
-                            const std::string& message);
+void FireErrorMessageDialog(const std::string& title, const std::string& message);
 }; // namespace SystemDialogs

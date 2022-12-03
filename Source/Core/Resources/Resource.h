@@ -38,7 +38,6 @@ public:
 	Resource(std::string alias, std::string path, ResourceType type);
 
 private:
-	Resource(std::string alias, size_t hashId, std::string path,
-	         ResourceType type, std::shared_ptr<void> data);
+	Resource(std::string alias, size_t hashId, std::string path, ResourceType type, std::shared_ptr<void> data);
 };
 } // namespace Core

@@ -3,10 +3,8 @@
 namespace DIWNE
 {
 
-Pin::Pin(DIWNE::Diwne& diwne, DIWNE::ID id,
-         std::string const labelDiwne /*="DiwnePin"*/)
-    : DiwneObject(diwne, id, labelDiwne), m_pinRectDiwne(ImRect(0, 0, 0, 0)),
-      m_connectionPointDiwne(ImVec2(0, 0))
+Pin::Pin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="DiwnePin"*/)
+    : DiwneObject(diwne, id, labelDiwne), m_pinRectDiwne(ImRect(0, 0, 0, 0)), m_connectionPointDiwne(ImVec2(0, 0))
 {
 	m_selectable = false;
 }
@@ -36,34 +34,27 @@ bool Pin::processInteractionsAlways()
 	bool interaction_happen = false;
 
 	interaction_happen |= processPin_Pre_ConnectLinkDiwne();
-	interaction_happen |=
-	    DiwneObject::processInteractionsAlways(); /* Selection rectangle block
-	                                                 showing popup etc. */
+	interaction_happen |= DiwneObject::processInteractionsAlways(); /* Selection rectangle block
+	                                                                   showing popup etc. */
 
 	return interaction_happen;
 }
 
-bool Pin::bypassPinLinkConnectionPreparedAction()
-{
-	return bypassFocusForInteractionAction();
-}
+bool Pin::bypassPinLinkConnectionPreparedAction() { return bypassFocusForInteractionAction(); }
 
 bool Pin::allowProcessPin_Pre_ConnectLink()
 {
 	return m_focusedForInteraction && !m_isHeld &&
 	       (diwne.getDiwneAction() == DiwneAction::NewLink ||
-	        diwne.getDiwneActionPreviousFrame() ==
-	            DiwneAction::
-	                NewLink) /*&&
-	                            diwne.getLastActivePin<DIWNE::Pin>().get()
-	                            != this*/
+	        diwne.getDiwneActionPreviousFrame() == DiwneAction::NewLink) /*&&
+	                                                                        diwne.getLastActivePin<DIWNE::Pin>().get()
+	                                                                        != this*/
 	    ;
 }
 
 bool Pin::processPin_Pre_ConnectLinkDiwne()
 {
-	if (bypassPinLinkConnectionPreparedAction() &&
-	    allowProcessPin_Pre_ConnectLink())
+	if (bypassPinLinkConnectionPreparedAction() && allowProcessPin_Pre_ConnectLink())
 	{
 		return processConnectionPrepared();
 	}
@@ -79,8 +70,7 @@ bool Pin::processConnectionPrepared()
 bool Pin::processDrag()
 {
 	diwne.setDiwneAction(DIWNE::DiwneAction::NewLink);
-	diwne.setLastActivePin(
-	    std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
+	diwne.setLastActivePin(std::static_pointer_cast<DIWNE::Pin>(shared_from_this()));
 	return true;
 }
 

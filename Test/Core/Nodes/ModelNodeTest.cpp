@@ -22,9 +22,8 @@ TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 
 	auto modelNode = Builder::createModelNode();
 
-	modelNode->addUpdateCallback([&gameObjectVp, &modelNode]() {
-		gameObjectVp->m_modelMatrix = modelNode->m_modelMatrix;
-	});
+	modelNode->addUpdateCallback([&gameObjectVp, &modelNode]()
+	                             { gameObjectVp->m_modelMatrix = modelNode->m_modelMatrix; });
 
 	plug_expectOk(sequence, modelNode, 0, 0);
 	{
