@@ -109,7 +109,5 @@ private:
 	std::vector<Pin*> m_outputs;
 
 	const EValueType m_valueType = EValueType::Pulse;
-
-	void destroy();
 };
 } // namespace Core

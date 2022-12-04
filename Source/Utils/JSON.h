@@ -153,6 +153,25 @@ inline bool save(const fs::path& path, const rapidjson::Document& document)
 	return true;
 }
 
+inline std::string toString(const rapidjson::Document& document)
+{
+	try
+	{
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter writer(buffer);
+		document.Accept(writer);
+
+		const char* data = buffer.GetString();
+
+		return std::string(data);
+	}
+	catch (...)
+	{
+	}
+
+	return "";
+}
+
 //
 
 inline ImVec2 getVec2(const rapidjson::Value& value)

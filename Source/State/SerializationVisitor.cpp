@@ -44,6 +44,14 @@ void SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
 
 	for (const auto& node : nodes)
 	{
+		const auto id = node->getNodebase()->getId();
+
+		m_ids.insert(id);
+		m_oldToNewId[id] = id; // will be overwritten by dumpCommon when m_assignNewIds is true.
+	}
+
+	for (const auto& node : nodes)
+	{
 		node->accept(*this);
 	}
 }
@@ -160,7 +168,15 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	const auto& coreNode = node->getNodebase();
 	auto& alloc = m_memento.GetAllocator();
 
-	target.AddMember("id", coreNode->getId(), alloc);
+	auto id = coreNode->getId();
+	if (m_assignNewIds)
+	{
+		const auto oldId = id;
+		id = Core::IdGenerator::next();
+		m_oldToNewId[oldId] = id;
+	}
+
+	target.AddMember("id", id, alloc);
 	addVector(target, "position", node->getNodePositionDiwne());
 }
 
@@ -364,12 +380,18 @@ void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::No
 {
 	for (const auto& input : node->getInputPins())
 	{
-		if (input.isPluggedIn())
+		if (input.isPluggedIn() && m_ids.contains(input.getParentPin()->getOwner()->getId()))
 		{
-			const int fromId = input.getParentPin()->getOwner()->getId();
+			auto fromId = input.getParentPin()->getOwner()->getId();
 			const int fromPin = input.getParentPin()->getIndex();
-			const int toId = node->getId();
+			auto toId = node->getId();
 			const int toPin = input.getIndex();
+
+			if (m_assignNewIds)
+			{
+				fromId = m_oldToNewId.at(fromId);
+				toId = m_oldToNewId.at(toId);
+			}
 
 			rapidjson::Value e(kArrayType);
 

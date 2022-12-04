@@ -47,17 +47,6 @@ const Pin& Node::PinView::operator[](size_t i) const
 	return node->getOut(i);
 }
 
-Node::~Node()
-{
-	generator.returnId(m_id);
-
-	for (auto& input : m_inputs)
-		input.destroy();
-
-	for (auto& output : m_outputs)
-		output.destroy();
-}
-
 void Node::finalize() { unplugAll(); }
 
 void Node::init()
@@ -112,12 +101,7 @@ void Node::notifyOwner()
 
 ID Node::getId() const { return m_id; }
 
-void Node::changeId(ID newId)
-{
-	generator.markAsUsed(newId);
-
-	m_id = newId;
-}
+void Node::changeId(ID newId) { m_id = newId; }
 
 EValueState Node::getState(size_t pinIndex) { return m_OperatorState[pinIndex]; }
 

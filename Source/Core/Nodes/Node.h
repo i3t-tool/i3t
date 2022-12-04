@@ -137,7 +137,7 @@ protected:
 	 * \pre All inputs and outputs must be unplugged (calls Node::finalize
 	 * function)!
 	 */
-	virtual ~Node();
+	virtual ~Node() = default;
 
 public:
 	/**

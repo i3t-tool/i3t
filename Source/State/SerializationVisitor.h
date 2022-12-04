@@ -2,6 +2,7 @@
 
 #include <array>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "imgui.h"
@@ -14,7 +15,9 @@
 class SerializationVisitor : public NodeVisitor
 {
 public:
-	explicit SerializationVisitor(Memento& memento) : m_memento(memento) {}
+	SerializationVisitor(Memento& memento, bool assignNewIds = false) : m_memento(memento), m_assignNewIds(assignNewIds)
+	{
+	}
 
 	/**
 	 * Get string representation of current scene.
@@ -72,6 +75,10 @@ private:
 	void addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node);
 
 	Memento& m_memento;
+	bool m_assignNewIds;
+
+	std::unordered_set<Core::ID> m_ids;
+	std::unordered_map<Core::ID, Core::ID> m_oldToNewId;
 };
 
 /**
