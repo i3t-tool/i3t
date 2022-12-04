@@ -2,6 +2,7 @@
 
 #include "Core/Nodes/Transform.h"
 #include "GUI/Elements/Nodes/Builder.h"
+#include "GUI/Elements/Nodes/Tools.h"
 #include "Utils/JSON.h"
 
 #ifdef WIN32
@@ -13,6 +14,87 @@ static TransformBuilder g_TransformBuilder;
 
 namespace NodeDeserializer
 {
+void createFrom(const Memento& memento)
+{
+	const auto& operators = memento["workspace"]["operators"];
+	for (auto& value : operators.GetArray())
+	{
+		NodeDeserializer::createOperator(value);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["sequences"].GetArray())
+	{
+		NodeDeserializer::createSequence(value);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["cycles"].GetArray())
+	{
+		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
+		NodeDeserializer::assignCommon(value, cycle);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["cameras"].GetArray())
+	{
+		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
+		NodeDeserializer::assignCommon(value, camera);
+
+		const auto& viewValue = value["sequences"].GetArray()[0];
+		NodeDeserializer::assignSequence(viewValue, camera->getView());
+
+		const auto& projValue = value["sequences"].GetArray()[1];
+		NodeDeserializer::assignSequence(projValue, camera->getProjection());
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["screens"].GetArray())
+	{
+		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
+		NodeDeserializer::assignCommon(value, screen);
+	}
+
+	//
+
+	for (auto& value : memento["workspace"]["models"].GetArray())
+	{
+		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
+		NodeDeserializer::assignCommon(value, model);
+	}
+
+	//
+
+	const auto& transforms = memento["workspace"]["transforms"];
+	for (auto& value : transforms.GetArray())
+	{
+		NodeDeserializer::createTransform(value);
+	}
+
+	// connect edges
+
+	const auto& edges = memento["workspace"]["edges"];
+	auto& workspaceNodes =
+	    App::getModule<UIModule>().getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+
+	for (auto& edge : edges.GetArray())
+	{
+		auto lhs = findNodeById(workspaceNodes, edge[0].GetInt());
+		auto rhs = findNodeById(workspaceNodes, edge[2].GetInt());
+		if (lhs && rhs)
+		{
+			auto lhsPin = edge[1].GetInt();
+			auto rhsPin = edge[3].GetInt();
+
+			connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+		}
+	}
+}
+
 Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 {
 	const auto& type = value["type"].GetString();

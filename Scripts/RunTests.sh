@@ -5,7 +5,7 @@ cd "$SCRIPT_DIR" && cd ..
 
 TEST="Binaries/Debug/I3TTest"
 
-$TEST --gtest_filter=*-StateTest.*:GLTFResourcesTest.*:UndoRedoTest.*:ResourceManagerTest.*
+$TEST --gtest_filter=*-StateTest.*:GLTFResourcesTest.*:UndoRedoTest.*:ResourceManagerTest.*:NodeToolsTest.*
 
 if [ -z ${DISPLAY+x} ]; then
   echo "Target does not have any graphical environment!"

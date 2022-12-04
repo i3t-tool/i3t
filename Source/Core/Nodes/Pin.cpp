@@ -69,6 +69,4 @@ std::string Pin::getSig()
 {
 	return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
 }
-
-void Pin::destroy() { generator.returnId(m_id); }
 } // namespace Core

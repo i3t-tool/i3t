@@ -14,7 +14,7 @@ void createTestApplication()
 {
 	if (g_TestApp != nullptr)
 	{
-		g_TestApp->finalize();
+		// g_TestApp->finalize();
 		g_TestApp = nullptr;
 	}
 

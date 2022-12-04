@@ -1,22 +1,18 @@
 #pragma once
 
+#include <cstdint>
 #include <set>
 
 namespace Core
 {
-typedef unsigned int ID;
+using ID = std::int64_t;
 
 class IdGenerator
 {
 public:
-	IdGenerator();
-
-	bool hasNext();
-	ID next();
-	void markAsUsed(ID id);
-	void returnId(ID id);
+	static ID next() { return m_NextId++; }
 
 private:
-	std::set<ID> m_IDs;
+	static ID m_NextId;
 };
 } // namespace Core
