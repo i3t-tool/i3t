@@ -65,7 +65,7 @@ void ViewportWindow::render()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-		auto name = getName("Scene Viewport");
+		auto name = getName("Scene View");
 
 		ImGui::Begin(name.c_str(), getShowPtr(),
 		             g_WindowFlags); // | ImGuiWindowFlags_MenuBar);

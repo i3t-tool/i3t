@@ -29,7 +29,7 @@ Kde jsou úkoly tak jsou často i *Tipy*. Na tipy jde *kliknout*.
 
 hint: Baf! Tady se ti zobrazí nějaká užitečná rada, pokud bys nevěděl jak dál.
 
-Když už chápeš *tasky* a *tipy*, můžeme pokračovat na obrázky.
+Když už chápeš *tipy* a *tasky*, můžeme pokračovat na obrázky.
 --
 *Obrázky*
 
@@ -55,10 +55,10 @@ Hlavní rozhraní programu tvoří tato dvě okna:
 *Pojďme si vysvětlit jak s nimi zacházet*
 
 --
-*Viewport*
+*Scene View*
 
-*Viewport* zobrazuje trojrozměrnou scénu (podobně jako Blender nebo Unity)
-![Viewport](viewport.png)
+*Scene View* zobrazuje trojrozměrnou scénu (podobně jako Blender nebo Unity)
+![Scene View](viewport.png)
 Ovládání:
     * *Tažením pravým tlačítkem* myši  ![pravé tlačítko myši](mouseRight.png) se scénou otáčí
     * *Tažením stisknutým prostředním tlačítkem* myši  ![prostřední tlačítko myši](mouseMiddle.png) se scénou posouvá

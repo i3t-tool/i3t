@@ -102,7 +102,7 @@ Co kdybychom ale chtěli model "roztáhnout" jen podél jedné osy?
 *Nerovnoměrné škálování*
 
 Pokud chceme měnit *velikost* pro každou osu *samostatně*, tak u naší matice musíme *vypnout "synergie"*
-To uděláme kliknutím pravým tlačítkem myši na matici a vybráním možnosti *"disable synergies"*.
+To uděláme kliknutím pravým tlačítkem myši na lištu matice a vybráním možnosti *"disable synergies"*.
 ![Zrušení zámku hodnot](disable_syn.png)
 *Teď už si můžeš vyzkoušet měnit hodnoty po jedné. Vyzkoušej si co to udělá s modelem!*
 

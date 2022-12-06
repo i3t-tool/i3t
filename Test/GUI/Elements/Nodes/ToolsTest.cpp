@@ -18,7 +18,8 @@ TEST(NodeToolsTest, CopyNodes)
 	connectNodes(f2, f3, 0, 0);
 	connectNodes(f3, f4, 0, 0);
 
-	copyNodes({f2, f3});
+	const auto snapshot = copyNodes({f2, f3});
+	pasteNodes(snapshot);
 
 	const auto workspace = App::getModule<UIModule>().getWindowPtr<WorkspaceWindow>();
 	const auto& workspaceNodes = workspace->getNodeEditor().m_workspaceCoreNodes;

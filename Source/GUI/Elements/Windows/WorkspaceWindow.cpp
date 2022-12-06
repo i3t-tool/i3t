@@ -4,6 +4,7 @@
 #include "WorkspaceWindow.h"
 
 #include "GUI/Elements/Nodes/Builder.h"
+#include "GUI/Elements/Nodes/Tools.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 #include "Utils/JSON.h"
@@ -121,6 +122,18 @@ void WorkspaceDiwne::deleteSelectedNodes()
 			trn->deleteActionDiwne();
 		}
 	}
+}
+
+void WorkspaceDiwne::copySelectedNodes()
+{
+	Log::info("Copying nodes");
+	copiedNodes = copyNodes(getSelectedNodesInnerIncluded());
+}
+
+void WorkspaceDiwne::pasteSelectedNodes()
+{
+	Log::info("Pasting nodes");
+	pasteNodes(copiedNodes);
 }
 
 void WorkspaceDiwne::popupContent()
@@ -1170,7 +1183,8 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToAll(); });
 	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToSelected(); });
 	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteSelectedNodes(); });
-
+	Input.bindAction("copy", EKeyState::Pressed, [&]() { g_workspaceDiwne->copySelectedNodes(); });
+	Input.bindAction("paste", EKeyState::Pressed, [&]() { g_workspaceDiwne->pasteSelectedNodes(); });
 	//	Input.bindAction("trackingLeft", EKeyState::Pressed, [&]() {
 	// g_workspaceDiwne->trackingLeft(); }); 	Input.bindAction("trackingRight",
 	// EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingRight(); });
