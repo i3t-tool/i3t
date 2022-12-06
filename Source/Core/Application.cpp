@@ -203,7 +203,7 @@ bool Application::initI3T()
 {
 	// getchar();printf("a\n");
 	// loadConfig();
-	const auto conf = loadConfig(Config::getAbsolutePath("Config.json"));
+	const auto conf = loadConfig("Config.json");
 	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
 
 	// new scene scheme

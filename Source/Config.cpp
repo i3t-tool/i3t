@@ -14,7 +14,7 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 {
 	auto conf = std::make_shared<Configuration>();
 
-	const auto result = JSON::parse(filename, Config::getAbsolutePath("Data/Schemas/Config.schema.json"));
+	const auto result = JSON::parse(filename, "Data/Schemas/Config.schema.json");
 
 	const auto& d = *result;
 
@@ -147,93 +147,7 @@ bool Config::getMat4(std::istream& is, const std::string& input, const std::stri
 	return false;
 }
 
-void Config::skipComments(std::istream& is, std::string input)
-{
-	if (input == "#" || input == "//")
-	{
-		std::string blank;
-		getline(is, blank);
-		// is >> input;
-	}
-
-	if (input == "/*")
-	{
-		while (!is.eof() && input != "*/")
-		{
-			is >> input;
-		}
-	}
-}
-
-void Config::loadFromFile(const std::string filename)
-{
-	std::ifstream is;
-	is.open(filename);
-
-	if (!is.is_open())
-	{
-		std::cout << "can't open config file : " << filename << std::endl;
-		return;
-	}
-
-	std::cout << "load config file " << filename << std::endl;
-
-	std::string input;
-	is >> input;
-	while (!is.eof() && is.good())
-	{
-		float val;
-		std::string word;
-		bool b;
-		glm::vec3 vec;
-
-		skipComments(is, input);
-
-		if (getBool(is, input, "SHOW_CONSOLE", b))
-			SHOW_CONSOLE = b;
-		if (getBool(is, input, "FULLSCREEN", b))
-			FULLSCREEN = b;
-
-		if (getVec3(is, input, "BACKGROUND_COLOR", vec))
-			BACKGROUND_COLOR = vec;
-
-		if (getValue(is, input, "WIN_HEIGHT", val))
-			WIN_HEIGHT = (int)val;
-		if (getValue(is, input, "WIN_WIDTH", val))
-			WIN_WIDTH = (int)val;
-
-		if (getValue(is, input, "CAM_NEAR", val))
-			CAM_NEAR = val;
-		if (getValue(is, input, "CAM_FAR", val))
-			CAM_FAR = val;
-		if (getValue(is, input, "CAM_MOTION_SENSITIVITY", val))
-			CAM_MOTION_SENSITIVITY = val;
-		if (getValue(is, input, "CAM_SCROLL_SENSITIVITY", val))
-			CAM_SCROLL_SENSITIVITY = val;
-		if (getValue(is, input, "MOUSE_SENSITIVITY", val))
-			MOUSE_SENSITIVITY = val;
-
-		// content
-		if (getWord(is, input, "CONTENT_FILE", word))
-			CONTENT_FILE = word;
-		/*
-	if (getWord(is, input, "GUI_CFG", word))
-		TabsConfig::readFromFile(getAbsolutePath(word.c_str()).c_str());
-	 */
-		if (getWord(is, input, "LOAD_SCENE", word))
-			LOAD_SCENE = word;
-		if (getWord(is, input, "TUTORIALS_FOLDER", word))
-			TUTORIALS_FOLDER = word;
-
-		is >> input;
-	}
-
-	is.close();
-}
-
 // statics
-
-std::string Config::WORKING_DIRECTORY;
 
 std::string Config::VERSION = "v006";
 std::string Config::AUTHOR = "Michal Folta";

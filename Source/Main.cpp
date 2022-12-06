@@ -71,6 +71,7 @@
 // - hleda data v miste, kde je spusten
 // - negeneruje pdb
 
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 
@@ -153,62 +154,10 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
  */
 int main(int argc, char* argv[])
 {
-#ifdef I3T_RELEASE_STANDALONE // variant for standalone release
-	Config::WORKING_DIRECTORY = "";
-#else // special settings for usage in Visual Studio devenv
-	Config::WORKING_DIRECTORY = I3T_PROJECT_ROOT;
-#endif
-
 	// init the logging library
 	INIT_LOGGER(argc, argv);
 
-	LOG_INFO("Working directory is {}.", Config::WORKING_DIRECTORY);
-
-	/// \todo Remove!
-	///   - seek command line parameters for config files
-	/* True if the .dcgf file was given as a command line parameter and must be
-	 * loaded. */
-	bool dcfgFlag = false;
-	std::string dcfg;
-
-	/// \todo Remove!
-	/* True to load the screen file, the .scn file was given as a command line
-	 * parameter and must be loaded.*/
-	bool scnFlag = false;
-	std::string scn;
-
-	/// \todo Remove!
-	for (int i = 1; i < argc; i++)
-	{
-		if (Config::getFileExtension(argv[i]) == "scn")
-		{
-			scn = argv[i];
-			scnFlag = true;
-		}
-		else if (Config::getFileExtension(argv[i]) == "dcfg")
-		{
-			dcfg = argv[i];
-			dcfgFlag = true;
-		}
-	}
-
-	/// \todo Remove!
-	///   - load the configuration file .dcfg
-	if (dcfgFlag)
-		Config::loadFromFile(dcfg);
-	else
-	{
-		Config::loadFromFile(Config::getAbsolutePath("cfg_default.dcfg"));
-	}
-	///   - load the scene
-	/// \todo Load scene in App::initI3T().
-	if (scnFlag)
-		Config::LOAD_SCENE = scn;
-
-	/// \todo Run app in fullscreen mode.
-	// if (Config::FULLSCREEN)
-	//  glutFullScreen();
-	//---------------------------------------------------------------------------
+	LOG_INFO("Working directory is {}.", std::filesystem::current_path().string());
 
 	// Get application instance.
 	Application app;

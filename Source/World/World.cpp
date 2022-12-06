@@ -90,12 +90,12 @@ World::World()
 
 bool World::init()
 {
-	World::shader0 = loadShader(Config::getAbsolutePath("Data/Shaders/simple-vs.glsl").c_str(),
-	                            Config::getAbsolutePath("Data/Shaders/simple-fs.glsl").c_str());
-	World::shaderHandle = loadShader(Config::getAbsolutePath("Data/Shaders/handle-vs.glsl").c_str(),
-	                                 Config::getAbsolutePath("Data/Shaders/handle-fs.glsl").c_str());
-	World::shaderProj = loadShader(Config::getAbsolutePath("Data/Shaders/viewproj-vs.glsl").c_str(),
-	                               Config::getAbsolutePath("Data/Shaders/viewproj-fs.glsl").c_str());
+	World::shader0 = loadShader("Data/Shaders/simple-vs.glsl",
+	                            "Data/Shaders/simple-fs.glsl");
+	World::shaderHandle = loadShader("Data/Shaders/handle-vs.glsl",
+	                                 "Data/Shaders/handle-fs.glsl");
+	World::shaderProj = loadShader("Data/Shaders/viewproj-vs.glsl",
+	                               "Data/Shaders/viewproj-fs.glsl");
 
 	if (World::shader0.program * World::shaderHandle.program * World::shaderProj.program * World::shaderProj.program == 0)
 	{
@@ -103,11 +103,11 @@ bool World::init()
 		return false;
 	}
 
-	World::textures.emplace("cube", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube.png")));
-	World::textures.emplace("cube_color", pgr::createTexture(Config::getAbsolutePath("Data/textures/cube_color.png")));
-	World::textures.emplace("color_grid", pgr::createTexture(Config::getAbsolutePath("Data/textures/cGrid.png")));
-	World::textures.emplace("axis", pgr::createTexture(Config::getAbsolutePath("Data/textures/axis.png")));
-	World::textures.emplace("white", pgr::createTexture(Config::getAbsolutePath("Data/textures/white.png")));
+	World::textures.emplace("cube", pgr::createTexture("Data/textures/cube.png"));
+	World::textures.emplace("cube_color", pgr::createTexture("Data/textures/cube_color.png"));
+	World::textures.emplace("color_grid", pgr::createTexture("Data/textures/cGrid.png"));
+	World::textures.emplace("axis", pgr::createTexture("Data/textures/axis.png"));
+	World::textures.emplace("white", pgr::createTexture("Data/textures/white.png"));
 
 	CHECK_GL_ERROR();
 	World::initializedRender = true;

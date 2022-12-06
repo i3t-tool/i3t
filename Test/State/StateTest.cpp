@@ -18,8 +18,8 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 {
 	createTestApplication();
 
-	const auto scenePath = Config::getAbsolutePath("Test/State/TestScene.json");
-	const auto emptyScenePath = Config::getAbsolutePath("Test/State/EmptyScene.json");
+	const auto scenePath = "Test/State/TestScene.json";
+	const auto emptyScenePath = "Test/State/EmptyScene.json";
 
 	std::vector<Ptr<WorkspaceNodeWithCoreDataWithPins>> nodes;
 
@@ -30,7 +30,7 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	ASSERT_TRUE(workspace != nullptr);
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene(Config::getAbsolutePath("Test/State/EmptyScene.json"));
+	App::getModule<StateManager>().saveScene("Test/State/EmptyScene.json");
 
 	{
 		ASSERT_TRUE(getNodes(workspace).empty());
@@ -93,14 +93,14 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 {
 	createTestApplication();
 
-	const auto scenePath = Config::getAbsolutePath("Test/State/TestScene.json");
+	const auto scenePath = "Test/State/TestScene.json";
 
 	const auto workspace = I3T::getUI()->getWindowPtr<WorkspaceWindow>();
 
 	ASSERT_TRUE(getNodes(workspace).empty());
 
 	// create empty scene
-	App::getModule<StateManager>().saveScene(Config::getAbsolutePath("Test/State/EmptyScene.json"));
+	App::getModule<StateManager>().saveScene("Test/State/EmptyScene.json");
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes;
 

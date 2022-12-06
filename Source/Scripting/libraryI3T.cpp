@@ -1225,7 +1225,7 @@ void dataScalar(struct ParseState* parser, struct Value* returnValue, struct Val
 }
 void loadW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
 {
-	std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
+	std::string filename = ((char*)param[0]->Val->Pointer);
 	auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 	bool status = false;
 	if (ww != nullptr)
@@ -1237,7 +1237,7 @@ void loadW(struct ParseState* parser, struct Value* returnValue, struct Value** 
 }
 void appendW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
 {
-	std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
+	std::string filename = ((char*)param[0]->Val->Pointer);
 	auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 	bool status = false;
 	int len = (int)ww->getNodeEditor().m_workspaceCoreNodes.size();
@@ -1257,7 +1257,7 @@ void appendW(struct ParseState* parser, struct Value* returnValue, struct Value*
 }
 void saveW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
 {
-	std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
+	std::string filename = ((char*)param[0]->Val->Pointer);
 	auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 	bool status = false;
 	if (ww != nullptr)
@@ -1268,7 +1268,7 @@ void saveW(struct ParseState* parser, struct Value* returnValue, struct Value** 
 }
 void saveSelW(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
 {
-	std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
+	std::string filename = ((char*)param[0]->Val->Pointer);
 	auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 	bool status = false;
 	// \todo JH repaire    std::vector<Ptr<WorkspaceNodeWithCoreData>>ws=
@@ -1278,7 +1278,7 @@ void saveSelW(struct ParseState* parser, struct Value* returnValue, struct Value
 }
 void runScript(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs)
 {
-	std::string filename = Config::getAbsolutePath((char*)param[0]->Val->Pointer);
+	std::string filename = ((char*)param[0]->Val->Pointer);
 	returnValue->Val->Integer = picocRunFile(filename.c_str()) == 0;
 }
 void help(struct ParseState* parser, struct Value* returnValue, struct Value** param, int numArgs) { scriptingHelp(0); }

@@ -24,18 +24,16 @@ using namespace UI;
 
 static bool saveSceneDialog(std::string& result, const std::string& title)
 {
-	std::string root = Config::getAbsolutePath("./");
 	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
 
-	return SystemDialogs::SaveSingleFileDialog(result, title, root, filter);
+	return SystemDialogs::SaveSingleFileDialog(result, title, "./", filter);
 }
 
 static bool openSceneDialog(std::string& result, const std::string& title)
 {
-	std::string root = Config::getAbsolutePath("./");
 	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
 
-	return SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
+	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 }
 
 static void saveAs()
