@@ -201,8 +201,11 @@ void TutorialWindow::render()
 	}
 
 	// START THE WINDOW
+
 	ImGui::SetNextWindowSize(ImVec2(500, 650), ImGuiCond_FirstUseEver);
+	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
 	ImGui::Begin(window_name.c_str(), getShowPtr());
+	ImGui::PopStyleColor();
 
 	//// ADD A MENU TO GET TO WELCOME WINDOW
 	// ImVec2 center = ImGui::GetCurrentWindow()->MenuBarRect().GetCenter();

@@ -55,6 +55,7 @@ public:
 	~WorkspaceDiwne() override;
 
 	ImDrawListSplitter m_channelSplitter;
+	Memento copiedNodes;
 
 	void popupContent();
 
@@ -126,8 +127,6 @@ public:
 		return result;
 	}
 
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedWorkspaceCoreNodes();
-
 	void manipulatorStartCheck3D();
 
 	void shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData>> const& nodesToShift);
@@ -151,6 +150,8 @@ public:
 	void processTrackingMove();
 
 	void deleteSelectedNodes();
+	void copySelectedNodes();
+	void pasteSelectedNodes();
 
 	// bool allowInteraction();
 

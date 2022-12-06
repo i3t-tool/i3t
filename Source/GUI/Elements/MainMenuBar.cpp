@@ -184,6 +184,7 @@ void MainMenuBar::showWindowsMenu()
 
 	if (ImGui::BeginMenu("Windows"))
 	{
+		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());

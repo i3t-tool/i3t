@@ -433,6 +433,8 @@ void StartWindow::render()
 							auto tutorial = TutorialLoader::loadTutorial(header);
 							if (tutorial)
 							{
+								//TODO - DIALOG WINDOW CONFIRMATION
+								App::getModule<StateManager>().clear();
 								Log::debug("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);
 								*this->getShowPtr() = false;
