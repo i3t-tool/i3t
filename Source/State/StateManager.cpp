@@ -114,7 +114,7 @@ void StateManager::createEmptyScene() { reset(); }
 
 bool StateManager::loadScene(const fs::path& scene)
 {
-	const auto maybeScene = JSON::parse(scene, Config::getAbsolutePath("Data/Schemas/Scene.schema.json"));
+	const auto maybeScene = JSON::parse(scene, "Data/Schemas/Scene.schema.json");
 
 	if (!maybeScene.has_value())
 		return false;

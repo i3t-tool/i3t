@@ -23,7 +23,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 	// load images
 	try
 	{
-		m_dummyImage = std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "dummy.png"));
+		m_dummyImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "dummy.png"));
 	}
 	catch (std::runtime_error& e)
 	{
@@ -32,7 +32,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 	try
 	{
 		m_folderImage =
-		    std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "pilkaFolder.png"));
+		    std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "pilkaFolder.png"));
 	}
 	catch (std::runtime_error& e)
 	{
@@ -41,7 +41,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 	try
 	{
 		m_cvutImage =
-		    std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "cvutLogo.png"));
+		    std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "cvutLogo.png"));
 	}
 	catch (std::runtime_error& e)
 	{
@@ -49,7 +49,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 	}
 	try
 	{
-		m_i3tImage = std::make_shared<GUIImage>(GUIImage(Config::getAbsolutePath(Config::TEXTURE_FOLDER) + "logoi3t.png"));
+		m_i3tImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "logoi3t.png"));
 	}
 	catch (std::runtime_error& e)
 	{
@@ -61,7 +61,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 void StartWindow::reloadTutorials()
 {
 	// preload all tutorials located in TUTORIALS_FOLDER recursively
-	std::string path = Config::getAbsolutePath(Config::TUTORIALS_FOLDER);
+	std::string path = Config::TUTORIALS_FOLDER;
 	if (path[0] == '/')
 	{
 		path.erase(0, 1);
@@ -296,11 +296,10 @@ void StartWindow::render()
 						// load from file (taken from main menu bar)
 						std::string result;
 						std::string title = "Open I3T script...";
-						std::string root = Config::getAbsolutePath("./");
 						std::vector<std::string> filter;
 						filter.push_back("I3T scene files");
 						filter.push_back("*.scene");
-						bool success = SystemDialogs::OpenSingleFileDialog(result, title, root, filter);
+						bool success = SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 						auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 						if (ww != nullptr)
 						{

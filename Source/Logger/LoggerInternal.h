@@ -182,7 +182,7 @@ private:
 
 	int previousTime = 0;
 	const int MOUSE_MOVEMENT_LOG_INTERVALS = 2000;
-	const std::string LOG_STRINGS_PATH = Config::getAbsolutePath("Data/events_definition.json");
+	const std::string LOG_STRINGS_PATH = "Data/events_definition.json";
 
 	int tutorialCount = 1; // #TUTORIAL
 	int stepCount = 1;     // #TUTORIAL

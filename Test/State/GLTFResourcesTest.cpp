@@ -21,7 +21,7 @@ const std::array g_DefaultModelNames = {
 
 TEST(GLTFResourcesTest, AssimpCanImportGLTFFiles)
 {
-	const auto defaultModelsDir = std::filesystem::path(I3T_PROJECT_ROOT "/Data/Models");
+	const auto defaultModelsDir = std::filesystem::path("Data/Models");
 
 	for (const auto& defaultFile : g_DefaultModelNames)
 	{

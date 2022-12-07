@@ -9,7 +9,7 @@
 
 void loadConfig()
 {
-	auto configFile = Config::getAbsolutePath("config.yml");
+	auto configFile = "config.yml";
 
 	if (!doesFileExists(configFile))
 		Log::fatal("Unable to load 'config.yml' file.");
@@ -28,7 +28,7 @@ void saveConfig()
 
 	out << YAML::EndMap;
 
-	std::ofstream outfile(Config::getAbsolutePath("config.yml"));
+	std::ofstream outfile("config.yml");
 	outfile << out.c_str() << "\n";
 	outfile.close();
 }

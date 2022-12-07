@@ -171,6 +171,11 @@ void Logger::loadStrings()
 	std::cout << "Load strings from: " << LOG_STRINGS_PATH << std::endl;
 	nlohmann::json json_strings;
 	std::ifstream i(LOG_STRINGS_PATH);
+	if (!i.good())
+	{
+		std::cerr << "Failed to load logger config from " << LOG_STRINGS_PATH << std::endl;
+	}
+
 	i >> json_strings; // TODO -> throws an exception when file LOG_STRINGS_PATH
 	                   // does not exist.
 

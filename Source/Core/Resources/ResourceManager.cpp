@@ -406,7 +406,7 @@ void ResourceManager::createDefaultResources(const std::vector<Resource>& defaul
 
 GLuint ResourceManager::loadTexture(const std::string& path)
 {
-	std::string absPath = Config::getAbsolutePath(path);
+	std::string absPath = path;
 	Log::info("[TEXTURE] Loading texture file: {}", absPath);
 	GLuint id = pgr::createTexture(absPath);
 	if (id == 0)
@@ -426,8 +426,8 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 {
 	std::vector<GLuint> shaderList;
 
-	std::string absVert = Config::getAbsolutePath(vertShader);
-	std::string absFrag = Config::getAbsolutePath(fragShader);
+	std::string absVert = vertShader;
+	std::string absFrag = fragShader;
 	if (geoShader.empty())
 	{
 		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}", absVert, absFrag);
@@ -436,7 +436,7 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 	}
 	else
 	{
-		std::string absGeo = Config::getAbsolutePath(geoShader);
+		std::string absGeo = geoShader;
 		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
 		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
@@ -454,9 +454,8 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 
 Mesh* ResourceManager::loadModel(const std::string& path)
 {
-	std::string absPath = Config::getAbsolutePath(path);
-	Log::info("[MODEL] Loading model from file: {}", absPath);
-	Mesh* mesh = Mesh::load(absPath);
+	Log::info("[MODEL] Loading model from file: {}", path);
+	Mesh* mesh = Mesh::load(path);
 	if (mesh == nullptr)
 	{
 		Log::error("[MODEL] Failed to load model!");

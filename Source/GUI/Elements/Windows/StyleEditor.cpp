@@ -79,15 +79,14 @@ void StyleEditor::renderSaveRevertField()
 	if (ImGui::Button("Save"))
 	{
 		auto path = std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
-		auto absPath = Config::getAbsolutePath(path);
-		if (doesFileExists(absPath))
+		if (doesFileExists(path))
 		{
 			strcpy(g_saveMessageBuff, "Theme with this name already exists.");
 		}
 		else
 		{
 			strcpy(g_saveMessageBuff, "Theme saved!");
-			saveTheme(absPath, curr);
+			saveTheme(path, curr);
 		}
 	}
 	ImGui::SameLine();
@@ -106,7 +105,7 @@ void StyleEditor::renderSaveRevertField()
 		else
 		{
 			auto path = std::string("Data/themes/") + curr.getName() + ".yml";
-			if (auto theme = loadTheme(Config::getAbsolutePath(path)))
+			if (auto theme = loadTheme(path))
 			{
 				I3T::emplaceTheme(*theme);
 			}

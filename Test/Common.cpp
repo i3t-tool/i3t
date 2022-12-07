@@ -18,12 +18,6 @@ void createTestApplication()
 		g_TestApp = nullptr;
 	}
 
-#ifdef I3T_RELEASE_STANDALONE // variant for standalone release
-	Config::WORKING_DIRECTORY = "";
-#else // special settings for usage in Visual Studio devenv
-	Config::WORKING_DIRECTORY = I3T_PROJECT_ROOT;
-#endif
-
 	int argc = 1;
 	char* argv[] = {(char*)"dummy"};
 	INIT_LOGGER(argc, argv);
