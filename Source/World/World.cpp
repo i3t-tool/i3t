@@ -90,12 +90,9 @@ World::World()
 
 bool World::init()
 {
-	World::shader0 = loadShader("Data/Shaders/simple-vs.glsl",
-	                            "Data/Shaders/simple-fs.glsl");
-	World::shaderHandle = loadShader("Data/Shaders/handle-vs.glsl",
-	                                 "Data/Shaders/handle-fs.glsl");
-	World::shaderProj = loadShader("Data/Shaders/viewproj-vs.glsl",
-	                               "Data/Shaders/viewproj-fs.glsl");
+	World::shader0 = loadShader("Data/Shaders/simple-vs.glsl", "Data/Shaders/simple-fs.glsl");
+	World::shaderHandle = loadShader("Data/Shaders/handle-vs.glsl", "Data/Shaders/handle-fs.glsl");
+	World::shaderProj = loadShader("Data/Shaders/viewproj-vs.glsl", "Data/Shaders/viewproj-fs.glsl");
 
 	if (World::shader0.program * World::shaderHandle.program * World::shaderProj.program * World::shaderProj.program == 0)
 	{

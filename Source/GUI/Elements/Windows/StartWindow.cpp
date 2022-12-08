@@ -31,8 +31,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 	}
 	try
 	{
-		m_folderImage =
-		    std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "pilkaFolder.png"));
+		m_folderImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "pilkaFolder.png"));
 	}
 	catch (std::runtime_error& e)
 	{
@@ -40,8 +39,7 @@ StartWindow::StartWindow(bool show) : IWindow(show)
 	}
 	try
 	{
-		m_cvutImage =
-		    std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "cvutLogo.png"));
+		m_cvutImage = std::make_shared<GUIImage>(GUIImage(Config::TEXTURE_FOLDER + "cvutLogo.png"));
 	}
 	catch (std::runtime_error& e)
 	{
@@ -432,7 +430,7 @@ void StartWindow::render()
 							auto tutorial = TutorialLoader::loadTutorial(header);
 							if (tutorial)
 							{
-								//TODO - DIALOG WINDOW CONFIRMATION
+								// TODO - DIALOG WINDOW CONFIRMATION
 								App::getModule<StateManager>().clear();
 								Log::debug("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);

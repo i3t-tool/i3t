@@ -29,7 +29,4 @@ Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes)
 	return memento;
 }
 
-void pasteNodes(const Memento& memento)
-{
-	NodeDeserializer::createFrom(memento);
-}
+void pasteNodes(const Memento& memento) { NodeDeserializer::createFrom(memento); }

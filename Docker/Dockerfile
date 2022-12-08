@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:stable-slim
 
 RUN apt update && apt install -y \
     clang-format \

@@ -35,8 +35,7 @@ void Window::init()
 
 	int x, y, channels;
 	constexpr int desiredChannels = 4;
-	auto* pixels =
-	    stbi_load("Data/textures/logoi3t.png", &x, &y, &channels, desiredChannels);
+	auto* pixels = stbi_load("Data/textures/logoi3t.png", &x, &y, &channels, desiredChannels);
 	if (pixels)
 	{
 		GLFWimage image{x, y, pixels};
