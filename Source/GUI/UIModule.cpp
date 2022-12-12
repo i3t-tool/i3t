@@ -311,6 +311,7 @@ void UIModule::buildDockspace()
 void UIModule::queryCameraState()
 {
 	/// \todo This code causes dockspace crash.
+	// TODO: (DR) Resolve
 	return;
 
 	if (!InputManager::isInputActive(getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
@@ -371,7 +372,7 @@ std::string makeIDNice(const char* ID)
 void UIModule::setFocusedWindow()
 {
 	// TODO: (DR) Probably revert this to its original state once mouse wrap is
-	// implemented 	Original state being windows focusing on hover
+	// 	implemented 	Original state being windows focusing on hover
 
 	// Get window ids.
 	ImGuiContext& g = *GImGui;

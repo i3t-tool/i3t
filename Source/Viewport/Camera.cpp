@@ -7,6 +7,8 @@
 
 using namespace Vp;
 
+// TODO: (DR) The fps mode here is unused / partially broken, not sure if it will be used
+
 Camera::Camera(glm::mat4 view, glm::mat4 projection)
 {
 	this->m_view = view;
@@ -106,17 +108,19 @@ glm::mat4 Camera::createProjectionMatrix(bool nonShrinking)
 			r *= aspect;
 		}
 		return glm::frustum(l, r, b, t, zNear, zFar);
-
-		//		// Method 2
-		//		if (width > height) {
-		//			glm::mat4 projection = glm::perspective(glm::radians(fov), height /
-		//(float)width, zNear, zFar); 			float tmp = projection[0][0];
-		// projection[0][0]
-		//= projection[1][1]; 			projection[1][1] = tmp; 			return projection;
-		//} else { 			return glm::perspective(glm::radians(fov), width /
-		//(float)height,
-		// zNear, zFar);
-		//		}
+//		// Method 2
+//		if (width > height)
+//		{
+//			glm::mat4 projection = glm::perspective(glm::radians(fov), height / (float)width, zNear, zFar);
+//			float tmp = projection[0][0];
+//			projection[0][0] = projection[1][1];
+//			projection[1][1] = tmp;
+//			return projection;
+//		}
+//		else
+//		{
+//			return glm::perspective(glm::radians(fov), width / (float)height, zNear, zFar);
+//		}
 	}
 	else
 	{
@@ -164,12 +168,12 @@ void Camera::mouseDrag(float dx, float dy, bool rotate, bool pan)
 			// isn't flipped until the next drag as to not suddenly change direction
 			float rot = fmodf(abs(rotationY), 360.0f);
 			bool upsideDown = rot > 90.0f && rot < 270.0f;
-			if (rotate && !isRotating)
+			if (!isRotating)
 			{
 				// Rotation just started
 				rotateStartedUpsideDown = upsideDown;
 			}
-			if (upsideDown && rotateStartedUpsideDown)
+			if (rotateStartedUpsideDown)
 			{
 				dx *= -1;
 			}
