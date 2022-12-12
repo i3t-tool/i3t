@@ -80,8 +80,7 @@ public:
 
 	static bool m_ignoreImGuiEvents;
 	static glm::vec2 m_mouseOffset;
-	static float m_mouseX, m_mouseY, m_mouseXPrev,
-	    m_mouseYPrev; ///< mouse cursor position
+	static float m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
 	static float m_mouseXDelta, m_mouseYDelta;
 	static float m_mouseXDragDelta, m_mouseYDragDelta;
 	static float m_mouseWheelOffset;
@@ -167,6 +166,7 @@ public:
 	/** Unlock the cursor after camera interaction. */
 	static void endCameraControl();
 
+	// TODO: (DR) Unused
 	/**
 	 * Sets screen size - called from GUI::resize(), which is called by
 	 * main.onReshape()

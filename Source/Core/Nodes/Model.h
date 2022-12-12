@@ -22,14 +22,6 @@ public:
 
 	/// \todo
 	void resetModelPosition();
-
-	// TODO: (DR) Model needs to hold a reference to a new Viewport object,
-	// ideally somehow abstracted so that layer separation is preserved (unlikely)
-	// MeshNode* mesh() const { return m_mesh; }
-	// void setMesh(MeshNode* m) { m_mesh = m; }
-
-private:
-	// MeshNode* m_mesh = nullptr;
 };
 
 namespace Builder
