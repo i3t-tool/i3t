@@ -44,7 +44,9 @@ int history(ImGuiInputTextCallbackData* d)
 }
 void Console::render()
 {
+	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 	ImGui::Begin(getName("Console").c_str(), getShowPtr());
+	ImGui::PopStyleColor();
 
 	// Reserve enough left-over height for 1 separator + 1 input text
 	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();

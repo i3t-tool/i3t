@@ -133,7 +133,7 @@ void StartWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(202, 202, 202, 255));
 	ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(202, 202, 202, 255));
 	ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
-	ImGui::Begin("##Intro", getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin(getName("").c_str(), getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
 	{
 		// LOGO I3T
 		ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;

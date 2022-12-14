@@ -107,7 +107,7 @@ void Framebuffer::resize(int width, int height)
 
 	if (width != m_width || height != m_height)
 	{
-		Log::debug("Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height, width, height);
+		//Log::debug("Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height, width, height);
 
 		m_width = width;
 		m_height = height;

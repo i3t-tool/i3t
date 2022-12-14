@@ -1,6 +1,54 @@
+/**
+ * \file        Source\Utils\HSLColor.h
+ * \author      Dan Rakušan <rakusdan@fit.cvut.cz>
+ * \date        30.11.2022
+ *
+ * Utilities for manipulating HSL color
+ */
+
 #pragma once
 
 #include <algorithm>
+#include <math.h>
+
+/**
+ * Utility class for managing a HSL color.
+ * Inspired by https://tips4java.wordpress.com/2009/07/05/hsl-color/
+ */
+class HSLColor
+{
+private:
+	float m_hue, m_saturation, m_lightness;
+
+public:
+	static HSLColor fromRGB(float red, float green, float blue);
+	static HSLColor fromHSL(float hue, float saturation, float lightness);
+
+	std::array<float, 3> getRGB() const;
+	std::array<float, 3> getHSL() const;
+
+	/**
+	 * Creates a darker color.
+	 */
+	HSLColor darken(float factor);
+
+	/**
+	 * Creates a lighter color.
+	 */
+	HSLColor lighten(float factor);
+
+	HSLColor makeComplementary();
+
+	float getHue() const;
+	HSLColor setHue(float mHue);
+	float getSaturation() const;
+	HSLColor setSaturation(float mSaturation);
+	float getLightness() const;
+	HSLColor setLightness(float mLightness);
+
+private:
+	HSLColor(float hue, float saturation, float lightness);
+};
 
 inline void rgbToHsl(float R, float G, float B, float* H, float* S, float* L)
 {

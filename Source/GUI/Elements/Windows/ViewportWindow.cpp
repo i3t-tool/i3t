@@ -67,8 +67,11 @@ void ViewportWindow::render()
 
 		auto name = getName("Scene View");
 
-		ImGui::Begin(name.c_str(), getShowPtr(),
-		             g_WindowFlags); // | ImGuiWindowFlags_MenuBar);
+		ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+
+		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags); // | ImGuiWindowFlags_MenuBar);
+
+		ImGui::PopStyleColor();
 		ImGui::PopStyleVar();
 
 		// if (ImGui::BeginMenuBar())

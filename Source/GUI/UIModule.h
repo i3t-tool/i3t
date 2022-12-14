@@ -10,13 +10,13 @@
 #include "State/Stateful.h"
 #include "Theme.h"
 
+class MainMenuBar;
+
 constexpr const char* ImGui_GLSLVersion = "#version 140";
 
 static const ImGuiWindowFlags_ g_WindowFlags = static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse);
 static constexpr ImGuiWindowFlags_ g_dialogFlags =
     static_cast<const ImGuiWindowFlags_>(0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
-
-class MainMenuBar;
 
 template <typename T> constexpr inline void checkWindowType()
 {
@@ -25,12 +25,15 @@ template <typename T> constexpr inline void checkWindowType()
 
 inline Ptr<IWindow> findWindow(const char* ID, const std::vector<Ptr<IWindow>>& dockableWindows)
 {
-	Ptr<IWindow> result = nullptr;
 	for (const auto& w : dockableWindows)
-		if (strcmp(w->getID(), ID) == 0)
-			result = w;
-
-	return result;
+	{
+		const char* wID = w->getID();
+		if (strcmp(wID, ID) == 0)
+		{
+			return w;
+		}
+	}
+	return nullptr;
 }
 
 template <typename T> inline Ptr<IWindow> findWindow(const std::vector<Ptr<IWindow>>& dockableWindows)
@@ -105,7 +108,7 @@ public:
 	UIModule() = default;
 
 private:
-	void setFocusedWindow();
+	void updateWindowFocus();
 	Ptr<IWindow> findAnyWindow(std::string ID);
 
 	void buildDockspace();

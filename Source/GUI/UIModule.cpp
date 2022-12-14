@@ -21,6 +21,7 @@
 #include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Utils/Filesystem.h"
+#include "Utils/HSLColor.h"
 
 using namespace UI;
 
@@ -116,7 +117,7 @@ void UIModule::beginFrame()
 
 	queryCameraState();
 
-	setFocusedWindow();
+	updateWindowFocus();
 
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();
@@ -299,12 +300,17 @@ void UIModule::buildDockspace()
 	ImGuiIO& io = ImGui::GetIO();
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{
+		// Active tab color is set to a special color for docked windows. It does not affect regular tabs.
+		// This style should be pushed for the dockspace here as well as every docked window Begin()
+		ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		ImGui::PopStyleColor();
 	}
 	else
 	{
 		// exit(EXIT_FAILURE);
+		//TODO: (DR) Handle this with a popup or something? Can it ImGuiConfigFlags_DockingEnable be ever false?
 	}
 }
 
@@ -369,53 +375,65 @@ std::string makeIDNice(const char* ID)
 	return std::string(currID);
 }
 
-void UIModule::setFocusedWindow()
+void UIModule::updateWindowFocus()
 {
-	// TODO: (DR) Probably revert this to its original state once mouse wrap is
-	// 	implemented 	Original state being windows focusing on hover
-
 	// Get window ids.
 	ImGuiContext& g = *GImGui;
-	ImGuiIO& io = g.IO;
-	const char* hoveredWindowID = g.HoveredWindow ? g.HoveredWindow->Name : "";
-	const char* activeWindowID = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
-	const char* navWindowID = g.NavWindow ? g.NavWindow->Name : "";
+	const char* hoveredWindowName = g.HoveredWindow ? g.HoveredWindow->Name : "";
+	const char* navWindowName = g.NavWindow ? g.NavWindow->Name : "";
+	const char* activeWindowName = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 
-	auto activeID = makeIDNice(activeWindowID);
-	auto hoveredID = makeIDNice(hoveredWindowID);
-	auto navID = makeIDNice(navWindowID);
+	auto hoveredWindowID = makeIDNice(hoveredWindowName); // Window the cursor is above (cam be a child window)
+	auto navWindowID = makeIDNice(navWindowName); // Currently focused window (should be a toplevel window)
+	auto activeWindowID = makeIDNice(activeWindowName); // Active = Currently dragging for example
 
-	// Log::info("Hovered: {}, Active: {}, Nav: {}", hoveredWindowID,
-	// activeWindowID, navWindowID);
+	//Log::debug("Hovered: {}, Active: {}, Nav: {}", hoveredWindowName, activeWindowName, navWindowName);
+
+	Ptr<IWindow> hoveredWindow = nullptr;
+	bool allowFocusSwitchToHoveredWindow = !ImGui::IsAnyMouseDown();
+
+	if (strlen(hoveredWindowName) != 0)
+	{
+		auto window = findAnyWindow(hoveredWindowID);
+		if (window != nullptr)
+		{
+			hoveredWindow = window;
+		}
+		else
+		{
+			//Log::debug("Failed to find hovered window {}", hoveredWindowID);
+		}
+	}
 
 	Ptr<IWindow> newFocusedWindow;
 	const char* newFocusedWindowName = nullptr;
 
-	if (strlen(hoveredWindowID) != 0 &&
-	    (ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(2)))
-	{
-		// Switch focus to hovered window on any kind of click
-		auto window = findAnyWindow(hoveredID);
-		if (window != nullptr)
-		{
-			newFocusedWindow = window;
-			newFocusedWindowName = hoveredWindowID;
-		}
+	if (hoveredWindow && allowFocusSwitchToHoveredWindow) {
+		// Switch focus to hovered window
+		newFocusedWindow = hoveredWindow;
+		newFocusedWindowName = hoveredWindowName;
 	}
 	else
 	{
-		// Otherwise just update the currently focused window
-		if (strlen(navWindowID) != 0)
+		// Keep the focus on the currently focused window
+		if (strlen(navWindowName) != 0)
 		{
-			auto window = findAnyWindow(navID);
+			// Otherwise just update the currently focused window
+			auto window = findAnyWindow(navWindowID);
 			if (window != nullptr)
 			{
 				newFocusedWindow = window;
-				newFocusedWindowName = navWindowID;
+				newFocusedWindowName = navWindowName;
+			}
+			else
+			{
+				//Log::debug("Failed to find nav window {}", navWindowID);
 			}
 		}
 	}
-	// Log::info("newFocusedWindowName: {}", newFocusedWindowName);
+
+	// Switch focus if necessary
+	//Log::debug("New focused window: {}", (newFocusedWindowName ? newFocusedWindowName : "null"));
 	if (newFocusedWindow != nullptr)
 	{
 		if (newFocusedWindow != InputManager::getFocusedWindow())

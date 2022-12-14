@@ -28,10 +28,12 @@ enum class EColor
 	MenuBarBackground,
 	PrimaryColor, /// Color of tabs, separators, titles ...
 	ActiveColor,
-	TabColor,
+	TabColor, //TODO: (DR) Unused
 	FloatBg,
 	FloatBgActive,
 	FloatBgHovered,
+
+	DockTabActive,
 
 	Synergies_FloatBg,
 	Synergies_FloatBgActive,
