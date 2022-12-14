@@ -1314,6 +1314,8 @@ WorkspaceDiwne& WorkspaceWindow::getNodeEditor() { return *g_workspaceDiwne; }
 
 void WorkspaceWindow::render()
 {
+
+	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 	/* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(),
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |
@@ -1325,9 +1327,15 @@ void WorkspaceWindow::render()
 			ImGui::EndMenuBar();
 		}
 
-		g_workspaceDiwne->drawDiwne();
+		DIWNE::DrawMode drawMode = DIWNE::DrawMode::JustDraw;
+		if (InputManager::isFocused<WorkspaceWindow>())
+		{
+			drawMode = DIWNE::DrawMode::Interacting;
+		}
+		g_workspaceDiwne->drawDiwne(drawMode);
 	}
 	ImGui::End();
+	ImGui::PopStyleColor();
 }
 
 void WorkspaceWindow::showEditMenu()

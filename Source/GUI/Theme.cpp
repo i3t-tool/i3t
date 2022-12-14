@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "Core/API.h"
+#include "Utils/HSLColor.h"
 
 static Theme::CategoryNames g_CategoryNames;
 static std::map<EColor, const char*> g_ColorNames;
@@ -71,6 +72,9 @@ void Theme::initClassicProperties()
 	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
+
+	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
+	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));
@@ -250,6 +254,10 @@ void Theme::initModernProperties()
 	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
+
+	// Special color for focused docked windows
+	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
+	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 
@@ -433,6 +441,8 @@ void Theme::initNames()
 	g_ColorNames[EColor::PrimaryColor] = "glob_Primary Color (tabs, tiles, ...)";
 	g_ColorNames[EColor::ActiveColor] = "glob_Active Color";
 	g_ColorNames[EColor::TabColor] = "glob_Tab Color";
+
+	g_ColorNames[EColor::DockTabActive] = "glob_Dock Active Color";
 
 	g_ColorNames[EColor::SelectionRectFull] = "glob_Selection rectangle full";
 	g_ColorNames[EColor::SelectionRectTouch] = "glob_Selection rectangle touch";

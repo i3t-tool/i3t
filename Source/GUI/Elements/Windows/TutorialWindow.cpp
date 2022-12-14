@@ -168,6 +168,8 @@ void TutorialWindow::render()
 		        // styles
 
 	// PUSH STYLE
+	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
 	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
@@ -192,12 +194,12 @@ void TutorialWindow::render()
 	{
 		// window_name = "Tutorial - " + m_tutorial->m_header->m_title +
 		// "###Tutorial window";
-		window_name = "Tutorial";
+		window_name = getName("Tutorial");
 	}
 	else
 	{
 		// window_name = "Tutorial - empty###Tutorial window";
-		window_name = "Tutorial";
+		window_name = getName("Tutorial");
 	}
 
 	// START THE WINDOW
@@ -220,6 +222,7 @@ void TutorialWindow::render()
 	// POP STYLE
 	ImGui::PopStyleVar(4);
 	ImGui::PopStyleColor(7);
+	ImGui::PopStyleColor();
 	// END WINDOW
 	ImGui::End();
 }
