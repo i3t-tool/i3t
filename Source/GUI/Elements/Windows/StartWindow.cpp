@@ -14,7 +14,6 @@
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
-#include "Scripting/Scripting.h"
 #include "Tutorial/TutorialLoader.h"
 #include "Utils/Other.h"
 
@@ -133,7 +132,7 @@ void StartWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(202, 202, 202, 255));
 	ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(202, 202, 202, 255));
 	ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
-	ImGui::Begin(getName("").c_str(), getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin(setName("").c_str(), getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
 	{
 		// LOGO I3T
 		ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;
@@ -434,8 +433,11 @@ void StartWindow::render()
 								App::getModule<StateManager>().clear();
 								Log::debug("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);
-								*this->getShowPtr() = false;
-								*I3T::getWindowPtr<TutorialWindow>()->getShowPtr() = true;
+
+								I3T::getUI()->getWindowManager().showWindow(this, false);
+								Ptr<IWindow> tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
+								I3T::getUI()->getWindowManager().showWindow(tutorialWindow.get(), true);
+								I3T::getUI()->getWindowManager().focusWindow(tutorialWindow.get());
 							}
 							else
 							{

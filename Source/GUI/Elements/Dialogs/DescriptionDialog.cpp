@@ -9,7 +9,7 @@ DescriptionDialog::DescriptionDialog() { m_isEditState = false; }
 
 void DescriptionDialog::render()
 {
-	ImGui::Begin(getName("Description").c_str());
+	ImGui::Begin(setName("Description").c_str());
 
 	if (m_isEditState)
 	{

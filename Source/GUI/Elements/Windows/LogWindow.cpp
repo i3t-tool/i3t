@@ -41,7 +41,7 @@ LogWindow::LogWindow()
 void LogWindow::render()
 {
 	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(getName("Log View").c_str(), getShowPtr());
+	ImGui::Begin(setName("Log View").c_str(), getShowPtr());
 	ImGui::PopStyleColor();
 
 	ImGui::Text("Log output");

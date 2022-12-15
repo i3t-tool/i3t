@@ -26,7 +26,7 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 	// Requires the application to be initialized!
 	auto* ui = I3T::getUI();
 	ASSERT_TRUE(ui != nullptr);
-	const auto workspace = ui->getWindowPtr<WorkspaceWindow>();
+	const auto workspace = ui->getWindowManager().getWindowPtr<WorkspaceWindow>();
 	ASSERT_TRUE(workspace != nullptr);
 
 	// create empty scene
@@ -95,7 +95,7 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 
 	const auto scenePath = "Test/State/TestScene.json";
 
-	const auto workspace = I3T::getUI()->getWindowPtr<WorkspaceWindow>();
+	const auto workspace = I3T::getUI()->getWindowManager().getWindowPtr<WorkspaceWindow>();
 
 	ASSERT_TRUE(getNodes(workspace).empty());
 

@@ -78,8 +78,11 @@ void createFrom(const Memento& memento)
 	// connect edges
 
 	const auto& edges = memento["workspace"]["edges"];
-	auto& workspaceNodes =
-	    App::getModule<UIModule>().getWindowPtr<WorkspaceWindow>()->getNodeEditor().m_workspaceCoreNodes;
+	auto& workspaceNodes = App::getModule<UIModule>()
+	                           .getWindowManager()
+	                           .getWindowPtr<WorkspaceWindow>()
+	                           ->getNodeEditor()
+	                           .m_workspaceCoreNodes;
 
 	for (auto& edge : edges.GetArray())
 	{

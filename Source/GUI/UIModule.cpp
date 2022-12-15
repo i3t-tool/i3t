@@ -1,5 +1,8 @@
 #include "UIModule.h"
 
+#include "GUI/ImGui/imgui_impl_glfw.h"
+#include "GUI/ImGui/imgui_impl_opengl3.h"
+
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "Core/Input/InputBindings.h"
@@ -12,15 +15,9 @@
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-
-#include "GUI/ImGui/imgui_impl_glfw.h"
-#include "GUI/ImGui/imgui_impl_opengl3.h"
+#include "GUI/WindowManager.h"
 #include "Loader/ConfigLoader.h"
 #include "Loader/ThemeLoader.h"
-#include "Logger/Logger.h"
-#include "State/SerializationVisitor.h"
-#include "State/StateManager.h"
-#include "Utils/Filesystem.h"
 #include "Utils/HSLColor.h"
 
 using namespace UI;
@@ -29,23 +26,26 @@ UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
-	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window)
-	                                     { InputManager::setActiveInput(&(window->getInput())); });
+	SetFocusedWindowCommand::addListener(
+	    [](Ptr<IWindow> window)
+	    {
+		    InputManager::setActiveInput(&(window->getInput()));
+		    InputManager::setFocusedWindow(window);
+	    });
 
 	Theme::initNames();
 
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
-	m_dockableWindows.push_back(std::make_shared<TutorialWindow>(false));
-	m_dockableWindows.push_back(std::make_shared<StartWindow>(true));
-	m_dockableWindows.push_back(std::make_shared<ViewportWindow>(true, App::get().world(), App::get().viewport()));
-	m_dockableWindows.push_back(std::make_shared<WorkspaceWindow>(true));
-	m_dockableWindows.push_back(std::make_shared<Console>(false));
-	m_dockableWindows.push_back(std::make_shared<LogWindow>());
+	m_windowManager.addWindow(std::make_shared<TutorialWindow>(false));
+	m_windowManager.addWindow(std::make_shared<StartWindow>(true));
+	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, App::get().world(), App::get().viewport()));
+	m_windowManager.addWindow(std::make_shared<WorkspaceWindow>(true));
+	m_windowManager.addWindow(std::make_shared<Console>(false));
+	m_windowManager.addWindow(std::make_shared<LogWindow>());
+	m_windowManager.addWindow(std::make_shared<StyleEditor>());
 
-	m_dockableWindows.push_back(std::make_shared<StyleEditor>());
-
-	HideWindowCommand::addListener([this](const std::string& id) { popWindow(id); });
+	HideWindowCommand::addListener([this](const std::string& id) { m_windowManager.popWindow(id); });
 
 	// Setup Dear ImGui context after OpenGL context.
 	IMGUI_CHECKVERSION();
@@ -89,35 +89,17 @@ void UIModule::beginFrame()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
+	m_windowManager.updateFocus();
+
 	buildDockspace();
 
 	// Render UI elements
 	m_menu->render();
 
-	// Scene is rendered in the Viewport window.
-	// TODO -> Do not render scene in the ViewportWindow class.
-	for (auto element : m_dockableWindows)
-	{
-		if (element->isVisible())
-		{
-			element->render();
-		}
-		// if (InputController::isKeyJustPressed(Keys::f)) { printf("UP
-		// %s\n",element->getID()); }
-	}
-	// if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
-	// Render other windows.
-	for (const auto& [id, w] : m_windows)
-	{
-		if (w->isVisible())
-		{
-			w->render();
-		}
-	}
+	// Draw windows
+	m_windowManager.draw();
 
 	queryCameraState();
-
-	updateWindowFocus();
 
 	// ImGui rendering ----------------------------------------------------------
 	ImGui::Render();
@@ -146,8 +128,7 @@ void UIModule::onClose()
 	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	workspace->getNodeEditor().m_workspaceCoreNodes.clear();
 
-	m_windows.clear();
-	m_dockableWindows.clear();
+	m_windowManager.clear();
 }
 
 void UIModule::loadThemes()
@@ -309,8 +290,7 @@ void UIModule::buildDockspace()
 	}
 	else
 	{
-		// exit(EXIT_FAILURE);
-		//TODO: (DR) Handle this with a popup or something? Can it ImGuiConfigFlags_DockingEnable be ever false?
+		throw std::runtime_error("ImGui Docking is not enabled!");
 	}
 }
 
@@ -320,7 +300,7 @@ void UIModule::queryCameraState()
 	// TODO: (DR) Resolve
 	return;
 
-	if (!InputManager::isInputActive(getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
+	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
 		return;
 
 	// ORBIT camera rotation
@@ -343,123 +323,3 @@ void UIModule::queryCameraState()
 		InputManager::endCameraControl();
 	}
 }
-
-/**
- * Not thread safe (using strtok).
- */
-std::string makeIDNice(const char* ID)
-{
-	// Remove ## or ### from ImGui window name.
-	// auto sanitizedWindowID = ID;
-	// while (*sanitizedWindowID == '#')
-	//  ++sanitizedWindowID;
-
-	std::string IDCopy = std::string(ID);
-
-	if (IDCopy.empty())
-	{
-		return IDCopy;
-	}
-
-	// Get fist part of "window/child-window" id.
-	char* currID = std::strtok(const_cast<char*>(IDCopy.c_str()), "###");
-	char* lastID;
-	while (currID != nullptr)
-	{
-		lastID = currID;
-		currID = std::strtok(nullptr, "###");
-	}
-
-	currID = std::strtok(const_cast<char*>(lastID), "/");
-
-	return std::string(currID);
-}
-
-void UIModule::updateWindowFocus()
-{
-	// Get window ids.
-	ImGuiContext& g = *GImGui;
-	const char* hoveredWindowName = g.HoveredWindow ? g.HoveredWindow->Name : "";
-	const char* navWindowName = g.NavWindow ? g.NavWindow->Name : "";
-	const char* activeWindowName = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
-
-	auto hoveredWindowID = makeIDNice(hoveredWindowName); // Window the cursor is above (cam be a child window)
-	auto navWindowID = makeIDNice(navWindowName); // Currently focused window (should be a toplevel window)
-	auto activeWindowID = makeIDNice(activeWindowName); // Active = Currently dragging for example
-
-	//Log::debug("Hovered: {}, Active: {}, Nav: {}", hoveredWindowName, activeWindowName, navWindowName);
-
-	Ptr<IWindow> hoveredWindow = nullptr;
-	bool allowFocusSwitchToHoveredWindow = !ImGui::IsAnyMouseDown();
-
-	if (strlen(hoveredWindowName) != 0)
-	{
-		auto window = findAnyWindow(hoveredWindowID);
-		if (window != nullptr)
-		{
-			hoveredWindow = window;
-		}
-		else
-		{
-			//Log::debug("Failed to find hovered window {}", hoveredWindowID);
-		}
-	}
-
-	Ptr<IWindow> newFocusedWindow;
-	const char* newFocusedWindowName = nullptr;
-
-	if (hoveredWindow && allowFocusSwitchToHoveredWindow) {
-		// Switch focus to hovered window
-		newFocusedWindow = hoveredWindow;
-		newFocusedWindowName = hoveredWindowName;
-	}
-	else
-	{
-		// Keep the focus on the currently focused window
-		if (strlen(navWindowName) != 0)
-		{
-			// Otherwise just update the currently focused window
-			auto window = findAnyWindow(navWindowID);
-			if (window != nullptr)
-			{
-				newFocusedWindow = window;
-				newFocusedWindowName = navWindowName;
-			}
-			else
-			{
-				//Log::debug("Failed to find nav window {}", navWindowID);
-			}
-		}
-	}
-
-	// Switch focus if necessary
-	//Log::debug("New focused window: {}", (newFocusedWindowName ? newFocusedWindowName : "null"));
-	if (newFocusedWindow != nullptr)
-	{
-		if (newFocusedWindow != InputManager::getFocusedWindow())
-		{
-			ImGui::SetWindowFocus(newFocusedWindowName);
-			InputManager::setFocusedWindow(newFocusedWindow);
-			SetFocusedWindowCommand::dispatch(newFocusedWindow);
-		}
-	}
-}
-
-Ptr<IWindow> UIModule::findAnyWindow(std::string ID)
-{
-	Ptr<IWindow> window = findWindow(ID.c_str(), m_dockableWindows);
-
-	if (m_windows.count(ID) != 0)
-	{
-		window = m_windows[ID];
-	};
-	return window;
-}
-
-void UIModule::popWindow(const std::string& windowId)
-{
-	if (hasWindow(windowId))
-		m_windows.erase(windowId);
-}
-
-bool UIModule::hasWindow(const std::string& id) { return m_windows.count(id); }

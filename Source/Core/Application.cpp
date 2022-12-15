@@ -46,7 +46,7 @@ void Application::init()
 
 	//
 
-	BeforeNewProjectCommand::addListener([this]() { getUI()->showUniqueWindow<BeforeNewModal>(); });
+	BeforeNewProjectCommand::addListener([this]() { getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>(); });
 	NewProjectCommand::addListener([]() { App::getModule<StateManager>().clear(); });
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
@@ -251,7 +251,7 @@ World* Application::world() { return m_world; }
 
 Vp::Viewport* Application::viewport() { return m_viewport; }
 
-void Application::onBeforeClose() { getUI()->showUniqueWindow<BeforeCloseModal>(); }
+void Application::onBeforeClose() { getUI()->getWindowManager().showUniqueWindow<BeforeCloseModal>(); }
 
 void Application::onClose() { m_bShouldClose = true; }
 

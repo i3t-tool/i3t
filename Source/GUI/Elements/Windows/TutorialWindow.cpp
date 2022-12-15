@@ -194,12 +194,12 @@ void TutorialWindow::render()
 	{
 		// window_name = "Tutorial - " + m_tutorial->m_header->m_title +
 		// "###Tutorial window";
-		window_name = getName("Tutorial");
+		window_name = setName("Tutorial");
 	}
 	else
 	{
 		// window_name = "Tutorial - empty###Tutorial window";
-		window_name = getName("Tutorial");
+		window_name = setName("Tutorial");
 	}
 
 	// START THE WINDOW

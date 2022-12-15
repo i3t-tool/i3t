@@ -8,6 +8,7 @@
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 #include "Utils/JSON.h"
+#include "GUI/WindowManager.h"
 
 #ifdef DIWNE_DEBUG
 bool s_diwneDebug_on;
@@ -1317,7 +1318,7 @@ void WorkspaceWindow::render()
 
 	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 	/* Draw to window only if is visible - call ImGui::End() everytime */
-	if (ImGui::Begin(getName("Workspace").c_str(), getShowPtr(),
+	if (ImGui::Begin(setName("Workspace").c_str(), getShowPtr(),
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |
 	                     ImGuiWindowFlags_NoScrollWithMouse))
 	{

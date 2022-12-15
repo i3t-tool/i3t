@@ -14,6 +14,7 @@
 #include "../Nodes/WorkspaceElementsWithCoreData.h"
 
 #include "Viewport/Viewport.h"
+#include "GUI/WindowManager.h"
 #include "World/Components.h"
 #include "World/HardcodedMeshes.h"
 #include "World/RenderTexture.h"
@@ -65,7 +66,7 @@ void ViewportWindow::render()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-		auto name = getName("Scene View");
+		auto name = setName("Scene View");
 
 		ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 
