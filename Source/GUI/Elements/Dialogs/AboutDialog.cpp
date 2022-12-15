@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Core/API.h"
 #include "Utils/TextureLoader.h"
+#include "GUI/WindowManager.h"
 
 AboutDialog::AboutDialog()
 {
@@ -17,7 +18,7 @@ AboutDialog::AboutDialog()
 
 void AboutDialog::render()
 {
-	ImGui::Begin(getName("About").c_str(), nullptr, g_dialogFlags);
+	ImGui::Begin(setName("About").c_str(), nullptr, g_dialogFlags);
 	{
 		ImGui::Columns(2, NULL, false);
 

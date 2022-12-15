@@ -146,7 +146,7 @@ void MainMenuBar::showFileMenu()
 
 		if (ImGui::MenuItem("Setup"))
 		{
-			I3T::getUI()->showUniqueWindow<SetupDialog>();
+			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
 		}
 
 		ImGui::Separator();
@@ -186,8 +186,8 @@ void MainMenuBar::showWindowsMenu()
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::MenuItem("Scene view window", nullptr, I3T::getWindowPtr<UI::ViewportWindow>()->getShowPtr());
 		ImGui::MenuItem("Workspace window", nullptr, I3T::getWindowPtr<WorkspaceWindow>()->getShowPtr());
-		ImGui::MenuItem("Console window", nullptr, I3T::getUI()->getWindowPtr<Console>()->getShowPtr());
-		ImGui::MenuItem("Log window", nullptr, I3T::getUI()->getWindowPtr<LogWindow>()->getShowPtr());
+		ImGui::MenuItem("Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
+		ImGui::MenuItem("Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
 
 		ImGui::EndMenu();
 	}
@@ -199,12 +199,12 @@ void MainMenuBar::showHelpMenu()
 	{
 		if (ImGui::MenuItem("Description"))
 		{
-			I3T::getUI()->showUniqueWindow<DescriptionDialog>();
+			I3T::getUI()->getWindowManager().showUniqueWindow<DescriptionDialog>();
 		}
 
 		if (ImGui::MenuItem("About"))
 		{
-			I3T::getUI()->showUniqueWindow<AboutDialog>();
+			I3T::getUI()->getWindowManager().showUniqueWindow<AboutDialog>();
 		}
 
 		ImGui::Separator();
@@ -212,7 +212,7 @@ void MainMenuBar::showHelpMenu()
 		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow))
 		{
 		}
-		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getUI()->getWindowPtr<StyleEditor>()->getShowPtr()))
+		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
 		{
 		}
 

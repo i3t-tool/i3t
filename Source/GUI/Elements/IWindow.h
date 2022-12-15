@@ -24,6 +24,9 @@ public:                                                                         
 class IWindow
 {
 public:
+	friend class Application;
+	friend class InputManager;
+
 	explicit IWindow(bool show = false) : m_show(show) {}
 
 	/**
@@ -31,12 +34,16 @@ public:
 	 */
 	virtual ~IWindow() = default;
 	virtual void render() = 0;
+
 	virtual const char* getID() const = 0;
+
 	void hide() { m_show = false; }
 	void show() { m_show = true; }
 	bool isVisible() const { return m_show; }
 	bool* getShowPtr() { return &m_show; }
-	std::string getName(const char* name) const { return fmt::format("{}###{}", name, getID()); };
+
+	std::string getName() const;
+	std::string setName(const char* name);
 
 	/**
 	 * Returns window input controller.
@@ -45,8 +52,7 @@ public:
 	InputController* getInputPtr() { return &Input; }
 
 protected:
-	friend class Application;
-	friend class InputManager;
 	bool m_show;
+	std::string m_name;
 	InputController Input;
 };

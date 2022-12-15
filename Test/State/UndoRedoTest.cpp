@@ -12,7 +12,7 @@ TEST(UndoRedoTest, Basic)
 {
 	createTestApplication();
 
-	const auto workspace = I3T::getUI()->getWindowPtr<WorkspaceWindow>();
+	const auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	ASSERT_TRUE(workspace != nullptr);
 	const auto& nodes = workspace->getNodeEditor().getAllNodes();
 	ASSERT_TRUE(nodes.empty());
