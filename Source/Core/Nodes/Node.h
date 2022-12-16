@@ -299,8 +299,9 @@ protected:
 	/**
 	 * Sets the node value without validation.
 	 * \tparam T Value type, no need to specify it in angle brackets, it will be
-	 * deduced by compiler (C++17). \param value Value to set. \param index Index
-	 * of DataStore (if the node stores more than one value)
+	 * deduced by the compiler (C++17).
+	 * \param value Value to set.
+	 * \param index Index of the DataStore (if the node stores more than one value)
 	 */
 	template <typename T> void setInternalValue(const T& value, size_t index = 0)
 	{
