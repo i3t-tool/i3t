@@ -104,9 +104,10 @@ public:
 	void createDefaults();
 
 	/**
-	 * \brief Init the (non-zero) second level parameters via their initDefaults
-	 * (and update the matrix). It is overriden in all transforms with default
-	 * values. This version is for nodes without the default value (now only Free)
+	 * \brief Init the (non-zero) second level parameters (from LOD::SetValues)
+	 * via their initDefaults and update the internal transformation matrix).
+	 * It is overriden in all transforms with their default values.
+	 * This version is for nodes without the default value (now only teh Free node)
 	 * - It resets the matrix to identity.
 	 * - this is done in free->resetMatrixFromDefaults()
 	 */
@@ -137,11 +138,12 @@ public:
 	const Data& getDefaultValue(const std::string& name) const;
 
 	/**
-	 * \brief Setting of current value stored in the transformation (the second
-	 * Level parameters) You can find transform default values names and types at
+	 * \brief Setting of one second level parameter defining the transformation
+	 * (in LOD::SetValues).
+	 * You can find transform names, types, and their default values, in
 	 * the file Core/Nodes/Operation.h. The initial values are hard-wired in
 	 * initDefaults() of TransformImpl<ETransformType...> in TransformImpl.h
-	 * \tparam T Type of the stored value \param val
+	 * \tparam T Type of the stored value \a val
 	 * \param name Name of the parameter (such as Center)
 	 * \param val New value
 	 */
@@ -202,8 +204,9 @@ public:
 	 * directly.
 	 *
 	 * The opposite setup - from matrix to Defaults - is done in the setValue()
-	 * functions It should lock the matrix. \todo For synergies, it has to be
-	 * resolved. Most probably, it should leave synergies unchanged.
+	 * functions. It should also lock the matrix.
+	 * \todo For synergies, it has to be resolved. Most probably, it should
+	 *       leave the synergies unchanged.
 	 *       - for Scale When setting X value in non-uniform scale -> this switch
 	 * to uniform scale (due to enable synergies)
 	 */
