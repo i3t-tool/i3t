@@ -1,6 +1,12 @@
 #version 330 core
 
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+
+// WBOIT
+uniform bool u_wboitFlag = false;
+layout (location = 1) out vec4 AccumulationBuffer;
+layout (location = 2) out float RevealageBuffer;
+// END WBOIT
 
 in vec3 nearPoint;
 in vec3 farPoint;
@@ -32,6 +38,12 @@ vec4 grid(vec3 worldPos) {
 	return color;
 }
 
+float linearize_depth(float d,float zNear,float zFar)
+{
+	float z_n = 2.0 * d - 1.0;
+	return 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+}
+
 void main()
 {
 	float t = -nearPoint.y / (farPoint.y - nearPoint.y);
@@ -48,4 +60,17 @@ void main()
 
 	FragColor = grid(worldPos) * float(t > 0);
 	FragColor.a *= fading;
+
+	// WBOIT
+	if (u_wboitFlag) {
+		float weight = FragColor.a * max(1e-2, min(3e3, 0.03/(1e-5 + pow(gl_FragCoord.z/200, 4))));
+		//		float weight = clamp(pow(min(1.0, FragColor.a * 10.0) + 0.01, 3.0) * 1e8 *
+		//		pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
+
+		// Store accumulation color (RGB) and revealage factor (A)
+		AccumulationBuffer = vec4(FragColor.rgb * FragColor.a * weight, FragColor.a);
+		// Store accumulation alpha (R)
+		RevealageBuffer = FragColor.a * weight;
+	}
+	// END WBOIT
 }

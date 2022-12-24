@@ -139,6 +139,7 @@ void Camera::processInput()
 	}
 
 	// TODO: (DR) Make pan speed dependent on window size
+	// TODO: (DR) Idea: Implement perfect panning on world grid? https://prideout.net/blog/perfect_panning/
 
 	mouseDrag(dx, dy, InputManager::isAxisActive("rotate"), InputManager::isAxisActive("pan"));
 	mouseWheel(dScroll);

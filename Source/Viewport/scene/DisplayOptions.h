@@ -4,9 +4,13 @@ namespace Vp
 {
 class Entity;
 
+/**
+ * Various viewport display settings.
+ */
 class DisplayOptions
 {
 public:
+	// Entity visibility options
 	bool showDefault{true};
 	bool showAxes{true};
 	bool showGrid{true};
@@ -14,7 +18,6 @@ public:
 	bool showFrustum{true};
 
 	DisplayOptions() = default;
-	DisplayOptions(bool showDefault, bool showAxes, bool showGrid, bool showCamera, bool showFrustum);
 
 	bool shouldDraw(const Entity& entity) const;
 };

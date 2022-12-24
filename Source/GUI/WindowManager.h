@@ -1,6 +1,6 @@
 /**
- * \file        Source\GUI\WindowManager.h
- * \author      Dan Rakušan <rakusdan@fit.cvut.cz>
+ * \file        Source/GUI/WindowManager.h
+ * \author      Dan Rakušan <rakusdan(at)fit.cvut.cz>
  * \date        14.12.2022
  *
  * Application window manager.

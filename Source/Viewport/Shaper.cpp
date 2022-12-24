@@ -5,8 +5,10 @@
 #include "Utils/Color.h"
 
 std::string Shaper::xyzAxes;
+std::string Shaper::unitLineCube;
 std::string Shaper::unitCube;
-std::string Shaper::unitCubeFilled;
+std::string Shaper::plane;
+std::string Shaper::screenQuad;
 
 void Shaper::initDefaultShapes()
 {
@@ -20,7 +22,6 @@ void Shaper::initDefaultShapes()
 		xyzAxes = "shape_xyzAxes";
 		shaper.createLineMesh(xyzAxes);
 	}
-
 	{
 		glm::vec3 unitCubeArr[24] = {
 		    glm::vec3(1.0f, 1.0f, 1.0f),    glm::vec3(1.0f, 1.0f, -1.0f),  glm::vec3(1.0f, 1.0f, -1.0f),
@@ -38,10 +39,9 @@ void Shaper::initDefaultShapes()
 		{
 			shaper.line(glm::vec3(glm::vec4(unitCubeArr[i], 1.0f)), glm::vec3(glm::vec4(unitCubeArr[i + 1], 1.0f)));
 		}
-		unitCube = "shape_unitCube";
-		shaper.createLineMesh(unitCube);
+		unitLineCube = "shape_unitCube";
+		shaper.createLineMesh(unitLineCube);
 	}
-
 	{
 		Shaper shaper;
 		glm::vec3 c1 = glm::vec3(-1, 1, -1);
@@ -60,8 +60,25 @@ void Shaper::initDefaultShapes()
 		shaper.quad(c4, c8, c3, c7);
 		shaper.quad(c4, c2, c8, c6);
 
-		unitCubeFilled = "shape_unitCubeFilled";
-		shaper.createMesh(unitCubeFilled);
+		unitCube = "shape_unitCubeFilled";
+		shaper.createMesh(unitCube);
+	}
+	{
+		Shaper shaper;
+		glm::vec3 c1 = glm::vec3(-1, 1, 0);
+		glm::vec3 c2 = glm::vec3(1, 1, 0);
+		glm::vec3 c3 = glm::vec3(-1, -1, 0);
+		glm::vec3 c4 = glm::vec3(1, -1, 0);
+		shaper.quad(c1, c2, c3, c4);
+
+		plane = "shape_plane";
+		shaper.createMesh(plane);
+	}
+	{
+		Shaper s;
+		s.quad(glm::vec3(-1, 1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0), Color::GREEN);
+		screenQuad = "shape_screenQuad";
+		s.createMesh(screenQuad);
 	}
 }
 

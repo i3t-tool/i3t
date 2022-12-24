@@ -12,20 +12,21 @@
 #include <set>
 
 #define RM Core::ResourceManager
-#define RMI App::getModule<RM>()
+#define RMI Core::ResourceManager::instance()
 
 namespace Core
 {
 class Resource;
 
+// TODO: (DR) Move away from Core
 // TODO: (DR) Add clear method
 // TODO: (DR) Add const char* and fs::path argument alternatives
-// TODO: (DR) Maybe use std::filesystem::abs/relative path methods to resolve
-// paths
+// TODO: (DR) Maybe use std::filesystem::abs/relative path methods to resolve paths
 // TODO: (DR) Two relative paths may load the same file twice.
-// Config::getAbsolutePath doesn't quite work. 	Any provided path is used as a
-// key, even if the file was loaded from a different path already.
+// 	Config::getAbsolutePath doesn't quite work.
+// 	Any provided path is used as a key, even if the file was loaded from a different path already.
 // TODO: (DR) Unicode support?
+// TODO: (DR) How to resolve alias conflict? Exception? Silent fail?
 
 /**
  * Resource manager for loading resources from the filesystem.
@@ -198,8 +199,15 @@ private:
 	void registerAlias(const std::string& alias, std::shared_ptr<Resource> resource);
 
 	GLuint loadTexture(const std::string& path);
-	GLuint loadShader(const std::string& vertShader, const std::string& fragShader);
+
+	/**
+	 * @param vertShader Path to vertex shader
+	 * @param fragShader Path to fragment shader
+	 * @param geoShader Optional path to geometry shader, or an empty string
+	 * @return OpenGL id of created shader program
+	 */
 	GLuint loadShader(const std::string& vertShader, const std::string& fragShader, const std::string& geoShader);
+
 	Mesh* loadModel(const std::string& path);
 
 	void disposeTexture(GLuint id);

@@ -23,7 +23,7 @@ public:
 	bool m_axisOn{true};
 	bool m_showCamera{true};
 	bool m_showFrustum{true};
-	bool m_fillFrustum{false};
+	bool m_fillFrustum{true};
 	glm::vec3 m_frustumColor{0.35f, 0.27f, 0.06f};
 
 	WorkspaceCamera(DIWNE::Diwne& diwne);

@@ -8,14 +8,11 @@
 #include <imgui.h>
 
 #include "GUI/Elements/IWindow.h"
-#include "Viewport/Framebuffer.h"
-#include "Viewport/Viewport.h"
+
+#include "Viewport/scene/DisplayOptions.h"
+#include "Viewport/scene/RenderOptions.h"
 
 class World;
-namespace Vp
-{
-class Viewport;
-}
 
 namespace UI
 {
@@ -24,14 +21,14 @@ class ViewportWindow : public IWindow
 public:
 	I3T_WINDOW(ViewportWindow)
 
-	ViewportWindow(bool show, World* world, Vp::Viewport* viewport);
+	ViewportWindow(bool show, World* world);
 	void render() override;
 
 private:
 	World* m_world;
-	Vp::Viewport* m_viewport;
 
-	std::unique_ptr<Vp::Framebuffer> m_framebuffer;
+	Vp::DisplayOptions displayOptions;
+	Vp::RenderOptions renderOptions;
 
 	ImVec2 m_wcMin;
 	ImVec2 m_wcMax;

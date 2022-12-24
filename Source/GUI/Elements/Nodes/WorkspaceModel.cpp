@@ -137,25 +137,25 @@ void WorkspaceModel::init()
 			    m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
 		    }
 	    });
-
-	m_framebuffer = std::make_unique<Vp::Framebuffer>(m_textureSize.x, m_textureSize.y, false, true);
 }
 
 bool WorkspaceModel::middleContent()
 {
 	bool interaction_happen = false;
 
-	m_framebuffer->start(m_textureSize.x, m_textureSize.y);
-	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	Ptr<Vp::Framebuffer> framebuffer =
+	    App::get().viewport()->drawPreview(m_textureSize.x, m_textureSize.y, m_viewportModel).lock();
 
-	App::get().viewport()->drawPreview(m_viewportModel, m_textureSize.x, m_textureSize.y);
-
-	m_framebuffer->end();
-
-	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
-	             ImVec2(1.0f, 0.0f) // vertical flip
-	);
+	if (framebuffer)
+	{
+		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
+		             ImVec2(1.0f, 0.0f) // vertical flip
+		);
+	}
+	else
+	{
+		ImGui::Text("Failed to draw preview!");
+	}
 
 	return interaction_happen;
 }

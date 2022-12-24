@@ -1,8 +1,8 @@
 #include "WorkspaceScreen.h"
 
 #include "Utils/Format.h"
+
 #include "Viewport/Viewport.h"
-#include "World/RenderTexture.h" // FBO
 
 #define TEST
 
@@ -19,8 +19,17 @@ WorkspaceScreen::~WorkspaceScreen()
 
 void WorkspaceScreen::init()
 {
-	m_framebuffer = std::make_unique<Vp::Framebuffer>(m_textureSize.x, m_textureSize.y, false, false);
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1); /* \todo Jh always 1? */
+
+	displayOptions.showAxes = false;
+	displayOptions.showGrid = false;
+	displayOptions.showCamera = false;
+	displayOptions.showFrustum = false;
+
+	renderOptions.multisample = false;
+	renderOptions.framebufferAlpha = false;
+	renderOptions.wboit = false;
+	renderOptions.clearColor = Config::BACKGROUND_COLOR;
 }
 
 //  The screen has two triangles for resize:
@@ -42,18 +51,14 @@ bool WorkspaceScreen::middleContent()
 	// Get projection and view matrix from screen input
 	std::pair<glm::mat4, glm::mat4> screenValue = getNodebase()->getData().getScreen();
 
-	// Prepare FBO
-	m_framebuffer->start(m_textureSize.x * diwne.getWorkAreaZoom(), m_textureSize.y * diwne.getWorkAreaZoom());
-	glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	int width = m_textureSize.x * diwne.getWorkAreaZoom();
+	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-	// Draw scene if screen input is plugged in
-	if (getNodebase()->getInputPins()[0].isPluggedIn())
-	{
-		App::get().viewport()->draw(screenValue.second, screenValue.first, {true, false, true, false, false});
-	}
-
-	m_framebuffer->end();
+	Ptr<Vp::Framebuffer> framebuffer =
+	    App::get()
+	        .viewport()
+	        ->drawScreen(width, height, screenValue.second, screenValue.first, renderOptions, displayOptions)
+	        .lock();
 
 // Problem: ImGui uses int values for DC.CursorPos. Triangle positions not in
 // int coordinates are rounded one pixel out of the texture rectangle solution
@@ -72,8 +77,15 @@ bool WorkspaceScreen::middleContent()
 	// ImGui::Image(reinterpret_cast<ImTextureID>(m_textureID),
 	// m_textureSize*diwne.getWorkAreaZoom(), ImVec2(0.0f, 1.0f),
 	// ImVec2(1.0f,0.0f)); //vertical flip
-	ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
-	             ImVec2(1.0f, 0.0f)); // vertical flip
+	if (framebuffer)
+	{
+		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
+		             ImVec2(1.0f, 0.0f)); // vertical flip
+	}
+	else
+	{
+		ImGui::Text("Failed to draw the screen!");
+	}
 
 	// ---------- Bottom-left button ------------
 	// ImVec2 cursorPos = ImGui::GetCursorScreenPos();

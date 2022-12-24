@@ -23,8 +23,6 @@ void WorldShader::setUniforms()
 	glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, glm::value_ptr(m_view));
 	glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, glm::value_ptr(m_model));
 	glUniformMatrix4fv(normalMatrixId, 1, GL_FALSE, glm::value_ptr(normalMatrix));
-
-	CHECK_GL_ERROR();
 }
 
 void WorldShader::setUniformsPerMeshPart(Core::Mesh::MeshPart& meshPart)

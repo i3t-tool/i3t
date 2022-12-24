@@ -482,7 +482,6 @@ void Mesh::render() const
 		renderMeshPart(meshPart);
 	}
 	glBindVertexArray(0);
-	CHECK_GL_ERROR();
 }
 
 void Mesh::renderMeshPart(const MeshPart& meshPart) const

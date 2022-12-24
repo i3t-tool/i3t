@@ -5,6 +5,7 @@
 namespace Vp
 {
 class PhongShader;
+class ColoredObject;
 
 /**
  * Viewport entity representing a Model node in Core/GUI
@@ -15,7 +16,7 @@ public:
 	bool m_showAxes{true};
 	bool m_transparent{false}; // TODO: Implement
 
-	std::weak_ptr<GameObject> m_axes;
+	std::weak_ptr<ColoredObject> m_axes;
 
 	SceneModel(Core::Mesh* mesh, PhongShader* shader);
 

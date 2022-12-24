@@ -4,12 +4,6 @@
 
 using namespace Vp;
 
-DisplayOptions::DisplayOptions(bool showDefault, bool showAxes, bool showGrid, bool showCamera, bool showFrustum)
-    : showDefault(showDefault), showAxes(showAxes), showGrid(showGrid), showCamera(showCamera), showFrustum(showFrustum)
-{
-	// Empty
-}
-
 bool DisplayOptions::shouldDraw(const Entity& entity) const
 {
 	switch (entity.getDisplayType())
@@ -24,5 +18,7 @@ bool DisplayOptions::shouldDraw(const Entity& entity) const
 		return showCamera;
 	case DisplayType::Frustum:
 		return showFrustum;
+	default:
+		return true;
 	}
 }

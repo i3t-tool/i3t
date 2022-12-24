@@ -4,6 +4,7 @@
 
 #include "Viewport/Shaper.h"
 #include "Viewport/Viewport.h"
+#include "Viewport/entity/ColoredObject.h"
 #include "Viewport/scene/Scene.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/PhongShader.h"
@@ -28,7 +29,8 @@ void SceneModel::update(Scene& scene)
 void SceneModel::onSceneAdd(Scene& scene)
 {
 	TexturedObject::onSceneAdd(scene);
-	auto axes = std::make_shared<GameObject>(RMI.meshByAlias(Shaper::xyzAxes), scene.m_viewport->m_colorShader.get());
+	auto axes = std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::xyzAxes),
+	                                            scene.m_viewport->m_shaders->m_colorShader.get());
 	axes->setDisplayType(DisplayType::Axes);
 	m_axes = scene.addEntity(axes);
 }

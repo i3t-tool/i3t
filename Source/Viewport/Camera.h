@@ -13,7 +13,7 @@ namespace Vp
  *
  * The camera has two modes:
  * 	- Rotate and pan around a pivot point
- * 	- First person mode
+ * 	- First person mode // TODO: (DR) Either remove or actually properly implement
  */
 class Camera
 {

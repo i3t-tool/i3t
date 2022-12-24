@@ -9,30 +9,30 @@
 #include "Logger/Logger.h"
 
 #include "../../../World/Select.h"
-#include "../../../World/World.h"
 
 #include "../Nodes/WorkspaceElementsWithCoreData.h"
 
 #include "GUI/WindowManager.h"
 #include "Viewport/Viewport.h"
+#include "Viewport/framebuffer/Framebuffer.h"
 #include "World/Components.h"
-#include "World/HardcodedMeshes.h"
-#include "World/RenderTexture.h"
 #include "World/World.h"
 
 using namespace UI;
 
-ViewportWindow::ViewportWindow(bool show, World* world2, Vp::Viewport* viewport) : IWindow(show)
+ViewportWindow::ViewportWindow(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
-	m_viewport = viewport;
 	Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
-	m_framebuffer = std::make_unique<Vp::Framebuffer>(100, 100, true);
+	renderOptions.wboit = false;
+	renderOptions.framebufferAlpha = false;
+	renderOptions.multisample = true;
+	renderOptions.clearColor = Config::BACKGROUND_COLOR;
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glEnable(GL_MULTISAMPLE);
-	// glCullFace(GL_BACK); //TODO: (DR) Do we need culling? Maybe add a toggle?
+	// glCullFace(GL_BACK); //TODO: (DR) Do we need culling? Maybe add a toggle? (Handled by
 	// glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
@@ -65,22 +65,18 @@ void ViewportWindow::render()
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-
-		auto name = setName("Scene View");
-
 		ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
-
-		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags); // | ImGuiWindowFlags_MenuBar);
-
+		auto name = setName("Scene View");
+		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
 		ImGui::PopStyleColor();
 		ImGui::PopStyleVar();
 
-		// if (ImGui::BeginMenuBar())
-		//{
-		//	showViewportsMenu();
+		if (ImGui::BeginMenuBar())
+		{
+			showViewportsMenu();
 
-		//	ImGui::EndMenuBar();
-		//}
+			ImGui::EndMenuBar();
+		}
 
 		// TODO: (DR) what is this doing?
 		InputManager::processViewportEvents();
@@ -104,27 +100,57 @@ void ViewportWindow::render()
 		// 1 (did not manage to get it working correctly - too hard to grasp all the
 		// stuff for it)
 
-		m_framebuffer->start(width, height);
-		glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y, Config::BACKGROUND_COLOR.z, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 		if (InputManager::isFocused<UI::ViewportWindow>())
 		{
-			m_viewport->processInput();
+			App::get().viewport()->processInput();
 		}
-		m_viewport->draw(width, height);
+		Ptr<Vp::Framebuffer> framebuffer =
+		    App::get().viewport()->drawViewport(width, height, renderOptions, displayOptions).lock();
 
 		// ImGui::GetForegroundDrawList()->AddRect(m_wcMin, m_wcMax, IM_COL32(255,
 		// 255, 0, 255)); // test
 
-		m_framebuffer->end();
+		if (framebuffer)
+		{
 
-		CHECK_GL_ERROR();
+			// GLuint texture = framebuffer->getColorAttachment(0).m_texture;
+			GLuint texture = framebuffer->getColorTexture();
+			// the uv coordinates flips the picture, since it was upside down at first
+			ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, m_wcMin, m_wcMax, ImVec2(0, 1), ImVec2(1, 0));
 
-		ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)m_framebuffer->getColorTexture(), m_wcMin, m_wcMax,
-		                                     ImVec2(0, 1),
-		                                     ImVec2(1, 0)); // the uv coordinates flips the picture, since it was
-		// upside down at first
+			// WIP code for button popups
+			//			if (ImGui::Button("With a menu.."))
+			//				ImGui::OpenPopup("my_file_popup");
+			//			if (ImGui::BeginPopup("my_file_popup", ImGuiWindowFlags_NoMove))
+			//			{
+			//				ImGui::Text("File yeah");
+			//				bool e = true;
+			//				ImGui::Checkbox("Poggers", &e);
+			////				if (ImGui::BeginMenuBar())
+			////				{
+			////					if (ImGui::BeginMenu("File"))
+			////					{
+			////						ImGui::Text("File yeah");
+			////						bool e = true;
+			////						ImGui::Checkbox("Box", &e);
+			////						ImGui::EndMenu();
+			////					}
+			////					if (ImGui::BeginMenu("Edit"))
+			////					{
+			////						ImGui::MenuItem("Dummy");
+			////						ImGui::EndMenu();
+			////					}
+			////					ImGui::EndMenuBar();
+			////				}
+			//				ImGui::Text("Hello from popup!");
+			//				ImGui::Button("This is a dummy button..");
+			//				ImGui::EndPopup();
+			//			}
+		}
+		else
+		{
+			ImGui::Text("Failed to draw viewport!");
+		}
 
 		ImGui::End();
 	}
@@ -132,68 +158,112 @@ void ViewportWindow::render()
 
 void ViewportWindow::showViewportsMenu()
 {
-	World* w = App::get().world();
-	if (ImGui::BeginMenu("Viewports"))
+	if (ImGui::BeginMenu("Settings"))
 	{
-		// Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
-		if (ImGui::MenuItem("View-x"))
+		ImGui::MenuItem("WBOIT", nullptr, &renderOptions.wboit);
+
+		bool msaaOff = !renderOptions.multisample;
+		bool msaa2x = renderOptions.multisample && renderOptions.samples == 2;
+		bool msaa4x = renderOptions.multisample && renderOptions.samples == 4;
+		bool msaa8x = renderOptions.multisample && renderOptions.samples == 8;
+		if (ImGui::BeginMenu("MSAA"))
 		{
-			// Num 1
-			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), false);
+			if (ImGui::MenuItem("OFF", nullptr, &msaaOff))
+			{
+				renderOptions.multisample = false;
+			}
+			if (ImGui::MenuItem("2x", nullptr, &msaa2x))
+			{
+				renderOptions.multisample = true;
+				renderOptions.samples = 2;
+			}
+			if (ImGui::MenuItem("4x", nullptr, &msaa4x))
+			{
+				renderOptions.multisample = true;
+				renderOptions.samples = 4;
+			}
+			if (ImGui::MenuItem("8x", nullptr, &msaa8x))
+			{
+				renderOptions.multisample = true;
+				renderOptions.samples = 8;
+			}
+			ImGui::EndMenu();
 		}
 
-		if (ImGui::MenuItem("View-y"))
-		{
-			// Num 2
-			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
-		}
-
-		if (ImGui::MenuItem("View-z"))
-		{
-			// Num 3
-			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), false);
-		}
-
-		if (ImGui::MenuItem("World-x"))
-		{
-			// Num 4
-			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), true);
-		}
-
-		if (ImGui::MenuItem("World-y"))
-		{
-			// Num 5
-			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
-		}
-
-		if (ImGui::MenuItem("World-z"))
-		{
-			// Num 6
-			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), true);
-		}
-
-		if (ImGui::MenuItem("Center"))
-		{
-			// Num 0
-			// App::get().world()->scene->setCamToCenter();
-		}
-		ImGui::Separator();
-		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
-		if (ImGui::MenuItem(action))
-		{
-			w->getCameraControl()->m_rotateAroundCenter = !w->getCameraControl()->m_rotateAroundCenter;
-			// Num 0
-			// App::get().world()->scene->setCamToCenter();
-		}
 		ImGui::EndMenu();
 	}
-	if (ImGui::BeginMenu("Manipulators"))
+	if (ImGui::BeginMenu("View"))
 	{
-		const char* action = w->manipulatorsGetVisible() ? "Hide" : "Show";
-		if (ImGui::MenuItem(action))
-		{
-			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());
-		}
+		ImGui::MenuItem("Show objects", nullptr, &displayOptions.showDefault);
+		ImGui::MenuItem("Show axes", nullptr, &displayOptions.showAxes);
+		ImGui::MenuItem("Show grid", nullptr, &displayOptions.showGrid);
+		ImGui::MenuItem("Show cameras", nullptr, &displayOptions.showCamera);
+		ImGui::MenuItem("Show frustums", nullptr, &displayOptions.showFrustum);
 		ImGui::EndMenu();
 	}
+
+	//	World* w = App::get().world();
+	//	if (ImGui::BeginMenu("Viewports"))
+	//	{
+	//		// Ptr<UI::Viewport> ww = I3T::getWindowPtr<UI::Viewport>();
+	//		if (ImGui::MenuItem("View-x"))
+	//		{
+	//			// Num 1
+	//			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), false);
+	//		}
+	//
+	//		if (ImGui::MenuItem("View-y"))
+	//		{
+	//			// Num 2
+	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
+	//		}
+	//
+	//		if (ImGui::MenuItem("View-z"))
+	//		{
+	//			// Num 3
+	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), false);
+	//		}
+	//
+	//		if (ImGui::MenuItem("World-x"))
+	//		{
+	//			// Num 4
+	//			w->getCameraControl()->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), true);
+	//		}
+	//
+	//		if (ImGui::MenuItem("World-y"))
+	//		{
+	//			// Num 5
+	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), true);
+	//		}
+	//
+	//		if (ImGui::MenuItem("World-z"))
+	//		{
+	//			// Num 6
+	//			w->getCameraControl()->setRotation(glm::vec3(0.0f, 0.0f, 1.0f), true);
+	//		}
+	//
+	//		if (ImGui::MenuItem("Center"))
+	//		{
+	//			// Num 0
+	//			// App::get().world()->scene->setCamToCenter();
+	//		}
+	//		ImGui::Separator();
+	//		const char* action = w->getCameraControl()->m_rotateAroundCenter ? "Orbit eye" : "Orbit center";
+	//		if (ImGui::MenuItem(action))
+	//		{
+	//			w->getCameraControl()->m_rotateAroundCenter = !w->getCameraControl()->m_rotateAroundCenter;
+	//			// Num 0
+	//			// App::get().world()->scene->setCamToCenter();
+	//		}
+	//		ImGui::EndMenu();
+	//	}
+	//	if (ImGui::BeginMenu("Manipulators"))
+	//	{
+	//		const char* action = w->manipulatorsGetVisible() ? "Hide" : "Show";
+	//		if (ImGui::MenuItem(action))
+	//		{
+	//			w->manipulatorsSetVisible(!w->manipulatorsGetVisible());
+	//		}
+	//		ImGui::EndMenu();
+	//	}
 }

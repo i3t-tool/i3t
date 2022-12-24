@@ -24,7 +24,7 @@ protected:
 	GLint tintId;
 
 public:
-	glm::vec3 m_tint{1.0f}; // TODO: (DR) Implement model tinting
+	glm::vec3 m_tint{1.0f};
 
 	explicit PhongShader(GLuint id);
 

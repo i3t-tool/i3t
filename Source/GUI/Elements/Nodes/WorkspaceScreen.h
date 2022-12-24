@@ -10,7 +10,8 @@
 //---------------
 #include "WorkspaceElementsWithCoreData.h"
 
-#include "Viewport/Framebuffer.h"
+#include "Viewport/scene/DisplayOptions.h"
+#include "Viewport/scene/RenderOptions.h"
 
 class WorkspaceScreen : public WorkspaceNodeWithCoreDataWithPins
 {
@@ -18,9 +19,10 @@ private:
 	// variables of the workspace box
 	GLuint m_textureID = 0;            // rendered texture name (COLOR_ATTACHMENT0 in m_fbo)
 	ImVec2 m_textureSize = {100, 100}; // initial render texture size - should be
-	                                   // large enough or changed during zoom
+	                                   // large enough or changed during zoo
 
-	std::unique_ptr<Vp::Framebuffer> m_framebuffer;
+	Vp::DisplayOptions displayOptions;
+	Vp::RenderOptions renderOptions;
 
 public:
 	WorkspaceScreen(DIWNE::Diwne& diwne);

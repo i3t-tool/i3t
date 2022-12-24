@@ -3,14 +3,15 @@
 #include <memory>
 #include <vector>
 
-#include "Viewport/Camera.h"
-#include "Viewport/entity/GameObject.h"
-#include "Viewport/scene/DisplayOptions.h"
-#include "Viewport/scene/Lighting.h"
+#include "glm/glm.hpp"
 
 #include "Logger/Logger.h"
 
-#include "glm/glm.hpp"
+#include "Viewport/Camera.h"
+#include "Viewport/entity/GameObject.h"
+#include "Viewport/framebuffer/Framebuffer.h"
+#include "Viewport/scene/DisplayOptions.h"
+#include "Viewport/scene/Lighting.h"
 
 namespace Vp
 {
@@ -18,6 +19,8 @@ class Viewport;
 class Entity;
 class Camera;
 class Lighting;
+class SceneRenderTarget;
+class RenderOptions;
 
 /**
  * A scene representing a "game world" that contains entities and is viewed by a
@@ -34,27 +37,44 @@ public:
 
 protected:
 	std::vector<std::shared_ptr<Entity>> m_entities;
-	std::vector<Entity*> m_delayedRenderEntities; // Temporary list
+
+private:
+	// Temporary lists for transparency sorting
+	std::vector<Entity*> m_unorderedTransparentEntities;
+	std::vector<Entity*> m_explicitTransparencyOrderEntitiesFirst;
+	std::vector<Entity*> m_explicitTransparencyOrderEntitiesLast;
 
 public:
 	explicit Scene(Viewport* viewport);
 	virtual ~Scene() = default;
 
+	/**
+	 * Initialises the scene. Should be called before any draw operations.
+	 */
 	virtual void init(){};
 
 	/**
-	 * Draw the scene.
-	 * @param width
-	 * @param height
+	 * Draw the scene using the scene's camera.
+	 * \param width Width of the
 	 */
-	virtual void draw(int width, int height);
-	virtual void draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions = DisplayOptions());
+	virtual void draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions);
+
+	/**
+	 * Draw the scene using the provided view and projection matrices.
+	 */
+	virtual void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
+	                  const DisplayOptions& displayOptions);
+
+	virtual Ptr<SceneRenderTarget> createRenderTarget(const RenderOptions& options);
 
 	/**
 	 * Update entity logic.
 	 */
 	virtual void update();
 
+	/**
+	 * Update input logic.
+	 */
 	void processInput();
 
 	/**
@@ -97,5 +117,12 @@ public:
 			LOG_ERROR("Scene: Cannot remove a NULL entity!");
 		}
 	}
+
+protected:
+	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);
+	void sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entities);
+
+	void renderSortedTransparentEntities(glm::mat4 view, glm::mat4 projection,
+	                                     const std::vector<Entity*>& entities) const;
 };
 } // namespace Vp
