@@ -21,7 +21,7 @@ protected:
 		INIT_LOGGER(argc, argv);
 
 		m_window = new Window();
-		m_window->init();
+		m_window->init(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, false, true);
 
 		// PGR and OpenGL initializing.
 		if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
