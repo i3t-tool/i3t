@@ -22,7 +22,7 @@ public:
 	 *
 	 * Exit the program if a window cannot be created.
 	 */
-	void init();
+	void init(const int glVersionMajor, const int glVersionMinor, bool glDebug, bool glForwardCompat);
 
 	const std::string& getTitle();
 	void setTitle(const char* title);

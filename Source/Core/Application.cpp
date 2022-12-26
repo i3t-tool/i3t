@@ -104,10 +104,10 @@ static const std::string DIE_TEXT_OPENGL_VERSION =
 void Application::initWindow()
 {
 	m_window = new Window();
-	m_window->init();
+	m_window->init(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, true, true);
 
 	// PGR and OpenGL initializing.
-	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
+	if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_LOW))
 	{
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_OPENGL_VERSION);
 	}
