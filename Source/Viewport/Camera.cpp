@@ -108,19 +108,19 @@ glm::mat4 Camera::createProjectionMatrix(bool nonShrinking)
 			r *= aspect;
 		}
 		return glm::frustum(l, r, b, t, zNear, zFar);
-//		// Method 2
-//		if (width > height)
-//		{
-//			glm::mat4 projection = glm::perspective(glm::radians(fov), height / (float)width, zNear, zFar);
-//			float tmp = projection[0][0];
-//			projection[0][0] = projection[1][1];
-//			projection[1][1] = tmp;
-//			return projection;
-//		}
-//		else
-//		{
-//			return glm::perspective(glm::radians(fov), width / (float)height, zNear, zFar);
-//		}
+		//		// Method 2
+		//		if (width > height)
+		//		{
+		//			glm::mat4 projection = glm::perspective(glm::radians(fov), height / (float)width, zNear, zFar);
+		//			float tmp = projection[0][0];
+		//			projection[0][0] = projection[1][1];
+		//			projection[1][1] = tmp;
+		//			return projection;
+		//		}
+		//		else
+		//		{
+		//			return glm::perspective(glm::radians(fov), width / (float)height, zNear, zFar);
+		//		}
 	}
 	else
 	{

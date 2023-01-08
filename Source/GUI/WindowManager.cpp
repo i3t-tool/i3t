@@ -4,8 +4,8 @@
 #include "imgui_internal.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Logger/Logger.h"
 #include "Core/Application.h"
+#include "Logger/Logger.h"
 
 std::string WindowManager::makeIDNice(const char* ID)
 {
@@ -87,7 +87,7 @@ void WindowManager::updateWindowFocus()
 	const char* navWindowName = g.NavWindow ? g.NavWindow->Name : "";
 	const char* activeWindowName = g.ActiveIdWindow ? g.ActiveIdWindow->Name : "";
 
-	// Log::debug("Hovered: {}, Active: {}, Nav: {}", hoveredWindowName, activeWindowName, navWindowName);
+	// LOG_DEBUG("Hovered: {}, Active: {}, Nav: {}", hoveredWindowName, activeWindowName, navWindowName);
 
 	auto hoveredWindowID = makeIDNice(hoveredWindowName); // Window the cursor is above (cam be a child window)
 	auto navWindowID = makeIDNice(navWindowName);         // Currently focused window (should be a toplevel window)
@@ -105,7 +105,7 @@ void WindowManager::updateWindowFocus()
 		}
 		else
 		{
-			// Log::debug("Failed to find hovered window {}", hoveredWindowID);
+			// LOG_DEBUG("Failed to find hovered window {}", hoveredWindowID);
 		}
 	}
 
@@ -132,13 +132,13 @@ void WindowManager::updateWindowFocus()
 			}
 			else
 			{
-				// Log::debug("Failed to find nav window {}", navWindowID);
+				// LOG_DEBUG("Failed to find nav window {}", navWindowID);
 			}
 		}
 	}
 
 	// Switch focus if necessary
-	//Log::debug("New focused window: {}", (newFocusedWindowName ? newFocusedWindowName : "null"));
+	// LOG_DEBUG("New focused window: {}", (newFocusedWindowName ? newFocusedWindowName : "null"));
 	if (newFocusedWindow != nullptr)
 	{
 		if (newFocusedWindow != InputManager::getFocusedWindow())
@@ -173,7 +173,7 @@ void WindowManager::showWindow(IWindow* window, bool show)
 {
 	if (window == nullptr)
 	{
-		Log::error("Cannot show null window!");
+		LOG_ERROR("Cannot show null window!");
 		return;
 	}
 	*window->getShowPtr() = show;

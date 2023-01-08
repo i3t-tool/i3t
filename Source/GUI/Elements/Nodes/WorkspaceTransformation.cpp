@@ -95,7 +95,7 @@ bool WorkspaceTransformation::middleContent()
 		break;
 
 	default:
-		Debug::Assert(false, "drawData: Unknown m_levelOfDetail");
+		I3T_ABORT("drawData: Unknown m_levelOfDetail");
 		inner_interaction_happen = drawDataFull();
 	}
 
@@ -295,8 +295,8 @@ bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(
     std::vector<float*> const& local_data, bool& value_changed)
 {
 	int number_of_values = labels.size();
-	Debug::Assert(number_of_values == local_data.size(), "drawDataSetValues_InsideTablebuilder: All vectors (labels, "
-	                                                     "local_data) must have same size.");
+	I3T_ASSERT(number_of_values == local_data.size() && "drawDataSetValues_InsideTablebuilder: All vectors (labels, "
+	                                                    "local_data) must have same size.");
 
 	value_changed = false;
 	bool inner_interaction_happen = false, actual_value_changed = false;
@@ -335,8 +335,8 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const c
                                                              int& index_of_change)
 {
 	int number_of_values = columnLabels.size() * rowLabels.size();
-	Debug::Assert(number_of_values == local_data.size(), "drawDataSetValuesTable_builder: columnLabels.size() * "
-	                                                     "rowLabels.size() must be equal to local_data.size()");
+	I3T_ASSERT(number_of_values == local_data.size() && "drawDataSetValuesTable_builder: columnLabels.size() * "
+	                                                    "rowLabels.size() must be equal to local_data.size()");
 
 	value_changed = false;
 	bool inner_interaction_happen = false, actual_value_changed = false;

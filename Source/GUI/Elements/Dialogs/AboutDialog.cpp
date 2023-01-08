@@ -5,8 +5,8 @@
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
 #include "Core/API.h"
-#include "Utils/TextureLoader.h"
 #include "GUI/WindowManager.h"
+#include "Utils/TextureLoader.h"
 
 AboutDialog::AboutDialog()
 {

@@ -1,11 +1,10 @@
-#include "Logger/LoggerInternal.h"
+#include "Logger/Logger.h"
 
-#include <cstdarg>
 #include <sstream>
 
+#include "nlohmann/json.hpp"
 #include "spdlog/sinks/ostream_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
-#include <nlohmann/json.hpp>
 
 #include "Core/Window.h"
 
@@ -30,11 +29,7 @@ std::string Logger::getLogString(const std::string& key) const
 
 void Logger::initLogger(int argc, char* argv[])
 {
-	std::cout << "initializing logger" << std::endl;
-
 	loadStrings();
-
-	std::cout << "After load" << std::endl;
 
 	spdlog::set_pattern("[%l]: %v");
 
@@ -46,13 +41,19 @@ void Logger::initLogger(int argc, char* argv[])
 	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
 	sinks[0]->set_pattern("[%l]: %v");
 
-	m_consoleLogger = std::make_shared<spdlog::logger>("Log", sinks.begin(), sinks.end());
+	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
+	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/main.log"));
 
+	logger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
+	logger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/user_interaction.log"));
 	logger->set_level(spdlog::level::trace);
+
+	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
+	mouseLogger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/mouse_log.log"));
 	mouseLogger->set_level(spdlog::level::trace);
 
 	std::ostringstream init_message;
-	init_message << " >> Strings version: " << getLogString("version") << " <<";
+	init_message << " >> Logger strings version: " << getLogString("version") << " <<";
 
 	logger->trace(getLogString("logInit") + init_message.str());
 	mouseLogger->trace(getLogString("mouseLogInit") + init_message.str());
@@ -96,60 +97,21 @@ void Logger::update()
 	}
 }
 
-void Logger::log(const LoggingOption& logType, const std::string message, const int numOfArgs, ...)
-{
-	va_list args;
-	va_start(args, numOfArgs);
-	vAddToLogBuffer(logType, message, numOfArgs, args);
-	if (logType == LoggingOption::MOUSE_CLICK || logType == LoggingOption::MOUSE_MOVEMENT)
-	{
-		flushBuffer(mouseLogger);
-	}
-	else
-	{
-		flushBuffer(logger);
-	}
-	va_end(args);
-}
-
-void Logger::addToLogBuffer(const LoggingOption& logType, const std::string message, const int numOfArgs, ...)
-{
-	va_list args;
-	va_start(args, numOfArgs);
-	// TODO -> EOL.
-	vAddToLogBuffer(logType, /* spdlog::details::os::default_eol + */ message, numOfArgs, args);
-	va_end(args);
-}
-
-void Logger::vAddToLogBuffer(const LoggingOption& logType, const std::string& message, const int numOfArgs,
-                             va_list& arguments)
+void Logger::addToLogBuffer(const LoggingOption& logType, const std::string& message,
+                            const std::vector<std::string>& args)
 {
 	if (logType == LoggingOption::MOUSE_MOVEMENT && isLoggingMouseRaw)
 	{
 		if (shouldLogMouse())
 		{
-			logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
+			logBuffer.push(formatMessage(message, args));
 		}
 	}
-	else if (logType == LoggingOption::MOUSE_CLICK && isLoggingMouseRaw)
+	else if (logType == LoggingOption::MOUSE_CLICK && isLoggingMouseRaw ||
+	         logType == LoggingOption::LOGIC && isLoggingLogic || logType == LoggingOption::POP_UP && isLoggingPopUps ||
+	         logType == LoggingOption::MATRIX_FIELD && isLoggingMatrixFields || logType == LoggingOption::TUTORIAL)
 	{
-		logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
-	}
-	else if (logType == LoggingOption::LOGIC && isLoggingLogic)
-	{
-		logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
-	}
-	else if (logType == LoggingOption::POP_UP && isLoggingPopUps)
-	{
-		logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
-	}
-	else if (logType == LoggingOption::MATRIX_FIELD && isLoggingMatrixFields)
-	{
-		logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
-	}
-	else if (logType == LoggingOption::TUTORIAL)
-	{
-		logBuffer.push(formatMessage(message, vaListToQueue(numOfArgs, arguments)));
+		logBuffer.push(formatMessage(message, args));
 	}
 }
 
@@ -168,12 +130,12 @@ bool Logger::shouldLogMouse()
 
 void Logger::loadStrings()
 {
-	std::cout << "Load strings from: " << LOG_STRINGS_PATH << std::endl;
+	std::cout << "[info]: Load strings from: " << LOG_STRINGS_PATH << std::endl;
 	nlohmann::json json_strings;
 	std::ifstream i(LOG_STRINGS_PATH);
 	if (!i.good())
 	{
-		std::cerr << "Failed to load logger config from " << LOG_STRINGS_PATH << std::endl;
+		std::cerr << "[error]: Failed to load logger config from " << LOG_STRINGS_PATH << std::endl;
 	}
 
 	i >> json_strings; // TODO -> throws an exception when file LOG_STRINGS_PATH
@@ -198,17 +160,22 @@ void Logger::flushBuffer(std::shared_ptr<spdlog::logger> logger)
 		logBuffer.pop();
 	}
 	logger->trace(outMessage.str());
+	logger->flush();
 }
 
-std::string Logger::formatMessage(const std::string& message, std::queue<std::string> arguments) const
+std::string Logger::formatMessage(const std::string& message, const std::vector<std::string>& args) const
 {
 	std::ostringstream outMessage;
+	int nextArgIdx = 0;
+
 	for (int i = 0; i < message.size(); i++)
 	{
 		if (message[i] == '{' && message[++i] == '}')
 		{
-			outMessage << arguments.front();
-			arguments.pop();
+			outMessage << args[nextArgIdx];
+
+			if (nextArgIdx < args.size() - 1)
+				++nextArgIdx;
 		}
 		else
 		{
@@ -218,38 +185,28 @@ std::string Logger::formatMessage(const std::string& message, std::queue<std::st
 	return outMessage.str();
 }
 
-std::queue<std::string> Logger::vaListToQueue(const int numOfArgs, va_list& args)
-{
-	std::queue<std::string> argsQueue;
-	for (int i = 0; i < numOfArgs; i++)
-	{
-		argsQueue.push(va_arg(args, std::string));
-	}
-	return argsQueue;
-}
-
 void Logger::toggleLoggingPopUps()
 {
 	isLoggingPopUps = !isLoggingPopUps;
-	std::cout << "pop ups logging " << isLoggingPopUps << std::endl;
+	LOG_INFO("pop ups logging {}", isLoggingPopUps);
 }
 
 void Logger::toggleLoggingLogic()
 {
 	isLoggingLogic = !isLoggingLogic;
-	std::cout << "logic logging " << isLoggingLogic << std::endl;
+	LOG_INFO("logic logging {}", isLoggingLogic);
 }
 
 void Logger::toggleLoggingMatrixFields()
 {
 	isLoggingMatrixFields = !isLoggingMatrixFields;
-	std::cout << "matrix fields logging " << isLoggingMatrixFields << std::endl;
+	LOG_INFO("matrix fields logging {}", isLoggingMatrixFields);
 }
 
 void Logger::toggleLoggingMouseRaw()
 {
 	isLoggingMouseRaw = !isLoggingMouseRaw;
-	std::cout << "mouse raw logging " << isLoggingMouseRaw << std::endl;
+	LOG_INFO("mouse raw logging {}", isLoggingMouseRaw);
 }
 
 // Control key definitions

@@ -66,7 +66,7 @@ void StartWindow::reloadTutorials()
 
 	if (std::filesystem::exists(path))
 	{
-		Log::info("Searching for tutorials in: " + path);
+		LOG_INFO("Searching for tutorials in: " + path);
 		// For all files in path recursively
 		for (auto const& entry : std::filesystem::recursive_directory_iterator(
 		         path, std::filesystem::directory_options::skip_permission_denied))
@@ -74,7 +74,7 @@ void StartWindow::reloadTutorials()
 			if (entry.path().extension() == ".tut")
 			{
 				std::string pathString = entry.path().string();
-				Log::info(pathString);
+				LOG_INFO(pathString);
 				// Load header part of tutorial
 				if (std::shared_ptr<TutorialHeader> header = TutorialLoader::loadTutorialHeader(pathString); header)
 				{
@@ -89,7 +89,7 @@ void StartWindow::reloadTutorials()
 	}
 	else
 	{
-		Log::info("Path for tutorials not found. Searched path: " + path);
+		LOG_INFO("Path for tutorials not found. Searched path: " + path);
 	}
 }
 
@@ -308,12 +308,12 @@ void StartWindow::render()
 							}
 							else
 							{
-								Log::info("Opening file unsuccesful");
+								LOG_INFO("Opening file unsuccesful");
 							}
 						}
 						else
 						{
-							Log::fatal("Open failed: WorkspaceWindow not found");
+							LOG_FATAL("Open failed: WorkspaceWindow not found");
 						}
 					}
 					ImGui::PopStyleColor(2);
@@ -431,7 +431,7 @@ void StartWindow::render()
 							{
 								// TODO - DIALOG WINDOW CONFIRMATION
 								App::getModule<StateManager>().clear();
-								Log::debug("Tutorial " + header->m_title + " loaded");
+								LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);
 
 								I3T::getUI()->getWindowManager().showWindow(this, false);
@@ -441,7 +441,7 @@ void StartWindow::render()
 							}
 							else
 							{
-								Log::info("ERR: Tutorial " + header->m_title + " not loaded");
+								LOG_INFO("ERR: Tutorial " + header->m_title + " not loaded");
 							}
 						}
 						ImGui::PopStyleColor();

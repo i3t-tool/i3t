@@ -6,7 +6,7 @@
 #include "Core/Application.h"
 #include "Core/Window.h"
 #include "InputBindings.h"
-#include "Logger/LoggerInternal.h"
+#include "Logger/Logger.h"
 
 #define IM_MOUSE_KEYS_COUNT 3
 

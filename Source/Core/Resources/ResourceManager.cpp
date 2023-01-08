@@ -204,7 +204,7 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 			std::string dataSummary =
 			    " type: " + std::to_string(static_cast<int>(primitiveType)) + " vertices: " + std::to_string(nVertices) +
 			    (useIndices ? (" indices: " + std::to_string(nIndices)) : "") + " colors: " + std::to_string(nColors);
-			Log::info("[MODEL] Loading model '{}' from data:{}", alias, dataSummary);
+			LOG_INFO("[MODEL] Loading model '{}' from data:{}", alias, dataSummary);
 
 			Mesh* mesh = nullptr;
 			if (useIndices)
@@ -244,9 +244,9 @@ void ResourceManager::registerDefault(const std::string& alias)
 	}
 	else
 	{
-		Log::error("[RESOURCE MANAGER] Cannot register default, provided alias "
-		           "'{}' doesn't exist!",
-		           alias);
+		LOG_ERROR("[RESOURCE MANAGER] Cannot register default, provided alias "
+		          "'{}' doesn't exist!",
+		          alias);
 	}
 }
 
@@ -266,7 +266,7 @@ std::vector<Resource> ResourceManager::getDefaultResources(ResourceType type)
 		}
 		else
 		{
-			Log::error("[RESOURCE MANAGER] Default resource '{}' doesn't exist!", alias);
+			LOG_ERROR("[RESOURCE MANAGER] Default resource '{}' doesn't exist!", alias);
 		}
 	}
 	return resources;
@@ -277,9 +277,7 @@ std::shared_ptr<void> ResourceManager::getData(const std::string& alias, const s
 {
 	if (alias.empty())
 	{
-		Log::error("[RESOURCE MANAGER] Cannot retrieve resource under an empty "
-		           "alias! HashID: {} Type: ",
-		           id, type);
+		LOG_ERROR("[RESOURCE MANAGER] Cannot retrieve resource under an empty alias! HashID: {} Type: {}", id, n(type));
 		*success = false;
 		return nullptr;
 	}
@@ -295,17 +293,17 @@ std::shared_ptr<void> ResourceManager::getData(const std::string& alias, const s
 			auto resourcePtr = aliasIt->second.lock();
 			if (resourcePtr->resourceType != type)
 			{
-				Log::error("[RESOURCE MANAGER] Resource of a different type is already "
-				           "aliased under '{}'! (Type {} x {})",
-				           alias, type, resourcePtr->resourceType);
+				LOG_ERROR("[RESOURCE MANAGER] Resource of a different type is already "
+				          "aliased under '{}'! (Type {} x {})",
+				          alias, n(type), n(resourcePtr->resourceType));
 				*success = false;
 				return nullptr;
 			}
 			if (id != NO_HASHID && resourcePtr->hashId != id)
 			{
-				Log::error("[RESOURCE MANAGER] Existing resource has a different hash "
-				           "under the same alias '{}'! (HashID {} x {})",
-				           alias, id, resourcePtr->hashId);
+				LOG_ERROR("[RESOURCE MANAGER] Existing resource has a different hash "
+				          "under the same alias '{}'! (HashID {} x {})",
+				          alias, id, resourcePtr->hashId);
 				*success = false;
 				return nullptr;
 			}
@@ -364,9 +362,9 @@ void ResourceManager::registerAlias(const std::string& alias, std::shared_ptr<Re
 		{
 			if (resource->alias != NO_ALIAS && resource->alias != alias)
 			{
-				Log::error("[RESOURCE MANAGER] Failed to register alias '{}'! Resource "
-				           "already exists under alias '{}'.",
-				           alias, resource->alias);
+				LOG_ERROR("[RESOURCE MANAGER] Failed to register alias '{}'! Resource "
+				          "already exists under alias '{}'.",
+				          alias, resource->alias);
 			}
 			else
 			{
@@ -377,7 +375,7 @@ void ResourceManager::registerAlias(const std::string& alias, std::shared_ptr<Re
 	}
 	else
 	{
-		Log::error("[RESOURCE MANAGER] Cannot register an empty alias! HashID: {}", resource->hashId);
+		LOG_ERROR("[RESOURCE MANAGER] Cannot register an empty alias! HashID: {}", resource->hashId);
 	}
 }
 
@@ -407,11 +405,11 @@ void ResourceManager::createDefaultResources(const std::vector<Resource>& defaul
 GLuint ResourceManager::loadTexture(const std::string& path)
 {
 	std::string absPath = path;
-	Log::info("[TEXTURE] Loading texture file: {}", absPath);
+	LOG_INFO("[TEXTURE] Loading texture file: {}", absPath);
 	GLuint id = pgr::createTexture(absPath);
 	if (id == 0)
 	{
-		Log::error("[TEXTURE] Failed to load texture!");
+		LOG_ERROR("[TEXTURE] Failed to load texture!");
 	}
 	return id;
 }
@@ -430,14 +428,14 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 	std::string absFrag = fragShader;
 	if (geoShader.empty())
 	{
-		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}", absVert, absFrag);
+		LOG_INFO("[SHADER] Loading mesh: vert: {}, frag: {}", absVert, absFrag);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
 		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
 	}
 	else
 	{
 		std::string absGeo = geoShader;
-		Log::info("[SHADER] Loading mesh: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
+		LOG_INFO("[SHADER] Loading mesh: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
 		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
 		shaderList.push_back(pgr::createShaderFromFile(GL_GEOMETRY_SHADER, absGeo));
@@ -447,18 +445,18 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 
 	if (id == 0)
 	{
-		Log::error("[SHADER] Failed to load mesh!");
+		LOG_ERROR("[SHADER] Failed to load mesh!");
 	}
 	return id;
 }
 
 Mesh* ResourceManager::loadModel(const std::string& path)
 {
-	Log::info("[MODEL] Loading model from file: {}", path);
+	LOG_INFO("[MODEL] Loading model from file: {}", path);
 	Mesh* mesh = Mesh::load(path);
 	if (mesh == nullptr)
 	{
-		Log::error("[MODEL] Failed to load model!");
+		LOG_ERROR("[MODEL] Failed to load model!");
 	}
 	return mesh;
 }

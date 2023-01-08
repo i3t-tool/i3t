@@ -34,7 +34,7 @@ void Framebuffer::init(int width, int height)
 {
 	if (isInitialized())
 	{
-		Log::error("Called init() on framebuffer that is already initialized!");
+		LOG_ERROR("Called init() on framebuffer that is already initialized!");
 	}
 
 	m_width = width;
@@ -63,10 +63,10 @@ void Framebuffer::init(int width, int height)
 
 	if (!checkFramebuffer())
 	{
-		Log::error("Bad FBO status on init!");
+		LOG_ERROR("Bad FBO status on init!");
 	}
 
-	Log::debug("Created {}FBO ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
+	LOG_DEBUG("Created {}FBO ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 }
 
 void Framebuffer::start() { return start(m_width, m_height); }
@@ -107,7 +107,8 @@ void Framebuffer::resize(int width, int height)
 
 	if (width != m_width || height != m_height)
 	{
-		//Log::debug("Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height, width, height);
+		// LOG_DEBUG("Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height, width,
+		// height);
 
 		m_width = width;
 		m_height = height;
@@ -119,7 +120,7 @@ void Framebuffer::resize(int width, int height)
 
 		if (!checkFramebuffer())
 		{
-			Log::error("Bad FBO status after resizing!");
+			LOG_ERROR("Bad FBO status after resizing!");
 		}
 
 		// TODO: (DR) Restore resize strategy, is it needed? Profile?
@@ -161,34 +162,34 @@ bool Framebuffer::checkFramebuffer()
 	switch (g)
 	{
 	case GL_FRAMEBUFFER_UNDEFINED:
-		Log::error("FBO undefined");
+		LOG_ERROR("FBO undefined");
 		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-		Log::error("FBO incomplete attachment");
+		LOG_ERROR("FBO incomplete attachment");
 		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-		Log::error("FBO missing attachment");
+		LOG_ERROR("FBO missing attachment");
 		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-		Log::error("FBO incomplete draw buffer");
+		LOG_ERROR("FBO incomplete draw buffer");
 		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-		Log::error("FBO incomplete read buffer");
+		LOG_ERROR("FBO incomplete read buffer");
 		break;
 	case GL_FRAMEBUFFER_UNSUPPORTED:
-		Log::error("FBO unsupported");
+		LOG_ERROR("FBO unsupported");
 		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-		Log::error("FBO incomplete multisample");
+		LOG_ERROR("FBO incomplete multisample");
 		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-		Log::error("FBO incomplete layer targets");
+		LOG_ERROR("FBO incomplete layer targets");
 		break;
 	case GL_FRAMEBUFFER_COMPLETE:
 		result = true;
 		break;
 	default:
-		Log::error("FBO unknown framebuffer status");
+		LOG_ERROR("FBO unknown framebuffer status");
 		printf("--%d\n", g);
 		break;
 	}

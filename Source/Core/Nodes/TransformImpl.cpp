@@ -79,7 +79,6 @@ constexpr ValueMask g_LookAtMask = {
 
 //===----------------------------------------------------------------------===//
 
-
 /**
  * \brief Test scale matrix:
  * (1) only values on diagonal can differ from identity matrix
@@ -97,28 +96,27 @@ bool TransformImpl<ETransformType::Scale>::isValid() const
 		auto& mat = m_internalData[0].getMat4();
 		result = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
 
-    auto& defaultValue = m_defaultValues.at("scale").getVec3();
-    //auto& defaultValue = m_defaultValues["scale"];
+		auto& defaultValue = m_defaultValues.at("scale").getVec3();
+		// auto& defaultValue = m_defaultValues["scale"];
 
-		bool scaleResult = Math::eq(defaultValue[0], defaultValue[1]) &&
-      Math::eq(defaultValue[1], defaultValue[2]);
-    
-    //result = result && Math::eq(defaultValue[0], defaultValue[1]) &&
-    //         Math::eq(defaultValue[1],defaultValue[2]);
+		bool scaleResult = Math::eq(defaultValue[0], defaultValue[1]) && Math::eq(defaultValue[1], defaultValue[2]);
 
-    //debug print
-    //std::cout << "mat[0][0] =" << mat[0][0] << std::endl;
-    //std::cout << "mat[1][1] =" << mat[1][1] << std::endl;
-    //std::cout << "mat[2][2] =" << mat[2][2] << std::endl;
-    //std::cout << "   => Matrix synergies are " << (result ? "valid" : "wrong")
-    //  << std::endl;
+		// result = result && Math::eq(defaultValue[0], defaultValue[1]) &&
+		//          Math::eq(defaultValue[1],defaultValue[2]);
 
-    //std::cout << "Default value scale = (" << defaultValue[0] << ", "
-    //  << defaultValue[1] << ", " << defaultValue[2] << ") " << std::endl;
+		// debug print
+		// std::cout << "mat[0][0] =" << mat[0][0] << std::endl;
+		// std::cout << "mat[1][1] =" << mat[1][1] << std::endl;
+		// std::cout << "mat[2][2] =" << mat[2][2] << std::endl;
+		// std::cout << "   => Matrix synergies are " << (result ? "valid" : "wrong")
+		//   << std::endl;
 
-    // std::cout << "   => Default values synergies are " << (scaleResult ? "valid" : "wrong") << std::endl;
+		// std::cout << "Default value scale = (" << defaultValue[0] << ", "
+		//   << defaultValue[1] << ", " << defaultValue[2] << ") " << std::endl;
 
-    result = result && scaleResult;
+		// std::cout << "   => Default values synergies are " << (scaleResult ? "valid" : "wrong") << std::endl;
+
+		result = result && scaleResult;
 	}
 
 	// consistency with defaults -omitted
@@ -144,7 +142,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& v
 	}
 	else
 	{
-		setInternalValue(glm::scale(vec));            // new matrix ONLY
+		setInternalValue(glm::scale(vec));     // new matrix ONLY
 		setDefaultValueNoUpdate("scale", vec); // update Defaults ONLY - no matrix
 	}
 

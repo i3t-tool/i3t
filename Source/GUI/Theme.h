@@ -28,7 +28,7 @@ enum class EColor
 	MenuBarBackground,
 	PrimaryColor, /// Color of tabs, separators, titles ...
 	ActiveColor,
-	TabColor, //TODO: (DR) Unused
+	TabColor, // TODO: (DR) Unused
 	FloatBg,
 	FloatBgActive,
 	FloatBgHovered,
@@ -306,7 +306,7 @@ public:
 
 	const ImVec2& get(ESizeVec2 sizeVec)
 	{
-		Debug::Assert(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
+		I3T_ASSERT(m_sizesVec2.contains(sizeVec) && "This size is not present in the map.");
 		return m_sizesVec2[sizeVec];
 	}
 

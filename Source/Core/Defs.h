@@ -50,17 +50,6 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #define I3T_ABORT(message) assert(false && message)
 #endif
 
-namespace Debug
-{
-template <typename... Args> void Assert(bool condition, const std::string& message = "", Args&&... args)
-{
-#ifdef I3T_DEBUG
-	if (!condition)
-		throw std::logic_error(fmt::format(message, std::forward<Args>(args)...));
-#endif
-}
-} // namespace Debug
-
 /// Definition of more friendly shared_ptr usage.
 template <typename T> using Ptr = std::shared_ptr<T>;
 

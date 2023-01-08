@@ -82,7 +82,7 @@
 #include "Core/Application.h"
 #include "Core/Defs.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
-#include "Logger/LoggerInternal.h"
+#include "Logger/Logger.h"
 #include "Utils/Other.h"
 
 int window; ///< current main window

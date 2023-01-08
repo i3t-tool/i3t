@@ -4,7 +4,7 @@
 
 #include "Config.h"
 #include "Core/Application.h"
-#include "Logger/LoggerInternal.h"
+#include "Logger/Logger.h"
 
 // using namespace Core;
 

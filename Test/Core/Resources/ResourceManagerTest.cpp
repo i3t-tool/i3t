@@ -5,7 +5,6 @@
 #include "Core/Window.h"
 #include "GLFW/glfw3.h"
 #include "Logger/Logger.h"
-#include "Logger/LoggerInternal.h"
 #include "Utils/Color.h"
 #include "Viewport/Shaper.h"
 
@@ -26,7 +25,7 @@ protected:
 		// PGR and OpenGL initializing.
 		if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
 		{
-			Log::error("Failed to initialize opengl / pgr!");
+			LOG_ERROR("Failed to initialize opengl / pgr!");
 			FAIL();
 		}
 	}
