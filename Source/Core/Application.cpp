@@ -61,13 +61,13 @@ void Application::init()
 	InputManager::bindGlobalAction("undo", EKeyState::Pressed,
 	                               [&]()
 	                               {
-		                               Log::info("undo triggered");
+		                               LOG_INFO("undo triggered");
 		                               App::getModule<StateManager>().undo();
 	                               });
 	InputManager::bindGlobalAction("redo", EKeyState::Pressed,
 	                               [&]()
 	                               {
-		                               Log::info("redo triggered");
+		                               LOG_INFO("redo triggered");
 		                               App::getModule<StateManager>().redo();
 	                               });
 
@@ -154,6 +154,8 @@ void Application::run()
 		double delta = current - lastFrameSeconds;
 		Core::GraphManager::update(delta);
 		lastFrameSeconds = current;
+
+		Logger::getInstance().update();
 
 		// Update and display.
 		onDisplay();

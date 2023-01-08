@@ -48,13 +48,13 @@ void Scene::draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& dis
 	}
 
 	glm::vec3 cameraPos(glm::inverse(view)[3]);
-	// Log::info("Camera pos (V-1): {},{},{}", cameraPos.x, cameraPos.y,
+	// LOG_INFO("Camera pos (V-1): {},{},{}", cameraPos.x, cameraPos.y,
 	// cameraPos.z);
 
 	// Sort non-opaque entities by distance from camera
 	auto sortByDistanceToCamera = [&](Entity* e1, Entity* e2) -> bool
 	{
-		// Log::info("Entity pos: {},{},{}", e1->m_modelMatrix[0][3],
+		// LOG_INFO("Entity pos: {},{},{}", e1->m_modelMatrix[0][3],
 		// e1->m_modelMatrix[1][3], e1->m_modelMatrix[2][3]);
 		glm::vec3 entity1Pos = glm::vec3(e1->m_modelMatrix[0][3], e1->m_modelMatrix[1][3], e1->m_modelMatrix[2][3]);
 		glm::vec3 entity2Pos = glm::vec3(e2->m_modelMatrix[0][3], e2->m_modelMatrix[1][3], e2->m_modelMatrix[2][3]);

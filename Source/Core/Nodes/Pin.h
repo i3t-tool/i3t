@@ -35,12 +35,12 @@ public:
 	{
 		if (m_isInput)
 		{
-			Debug::Assert(isPluggedIn(), "This input pin is not plugged to any output pin!");
+			I3T_ASSERT(isPluggedIn() && "This input pin is not plugged to any output pin!");
 			return m_input;
 		}
 		else
 		{
-			Debug::Assert(false, "Output pin can not have a parent pin!");
+			I3T_ABORT("Output pin cannot have a parent pin!");
 			return nullptr;
 		}
 	}
@@ -65,8 +65,8 @@ public:
 
 	const char* getLabel() const;
 
-	/// Only for test purposes, it can be removed anytime.
-	std::string getSig();
+	/// "pin {index} of {node signature}"
+	std::string getSignature() const;
 
 	[[nodiscard]] EValueType getType() const { return m_valueType; }
 

@@ -5,10 +5,10 @@
 
 #include "GUI/Elements/Nodes/Builder.h"
 #include "GUI/Elements/Nodes/Tools.h"
+#include "GUI/WindowManager.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 #include "Utils/JSON.h"
-#include "GUI/WindowManager.h"
 
 #ifdef DIWNE_DEBUG
 bool s_diwneDebug_on;
@@ -127,13 +127,13 @@ void WorkspaceDiwne::deleteSelectedNodes()
 
 void WorkspaceDiwne::copySelectedNodes()
 {
-	Log::info("Copying nodes");
+	LOG_INFO("Copying nodes");
 	copiedNodes = copyNodes(getSelectedNodesInnerIncluded());
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
 {
-	Log::info("Pasting nodes");
+	LOG_INFO("Pasting nodes");
 	pasteNodes(copiedNodes);
 }
 
@@ -1368,8 +1368,8 @@ bool connectNodesNoSave(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
 	auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
 	if (plugResult != ENodePlugResult::Ok)
 	{
-		Log::info("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSig(),
-		          rhs->getNodebase()->getSig(), lhsPin, rhsPin);
+		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
+		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
 		return false;
 	}
 	else

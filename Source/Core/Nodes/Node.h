@@ -393,19 +393,15 @@ public:
 
 	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
 
-	/**
-	 * \warning Only for test purposes. May be removed anytime.
-	 */
-	std::string getSig()
+	/// "{node type} #{node ID}"
+	std::string getSignature()
 	{
-		std::string masterSig;
-
 		if (m_owner)
 		{
-			masterSig = " of (" + m_owner->getSig() + ")";
+			return fmt::format("{} #{}", m_owner->m_operation->keyWord, m_owner->m_id);
 		}
 
-		return fmt::format("{}#{}{}", m_operation->keyWord, m_id, masterSig);
+		return fmt::format("{} #{}", m_operation->keyWord, m_id);
 	};
 
 protected:

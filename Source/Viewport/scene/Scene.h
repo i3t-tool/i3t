@@ -94,7 +94,7 @@ public:
 		}
 		else
 		{
-			Log::error("Scene: Cannot remove a NULL entity!");
+			LOG_ERROR("Scene: Cannot remove a NULL entity!");
 		}
 	}
 };

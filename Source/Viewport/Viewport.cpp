@@ -44,7 +44,7 @@ void Viewport::init()
 	m_frustumShader = std::make_unique<FrustumShader>(
 	    RM::instance().shader("Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl"));
 
-	Log::info("Phong shader size: {}", sizeof(*m_phongShader.get()));
+	LOG_INFO("Phong shader size: {}", sizeof(*m_phongShader.get()));
 
 	Shaper::initDefaultShapes();
 
@@ -90,7 +90,7 @@ void Viewport::drawPreview(std::weak_ptr<GameObject> gameObject, int width, int 
 	}
 	else
 	{
-		Log::error("Viewport: drawPreview(): Passed game object is NULL!");
+		LOG_ERROR("Viewport: drawPreview(): Passed game object is NULL!");
 	}
 }
 

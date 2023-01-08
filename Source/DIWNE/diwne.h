@@ -1,6 +1,8 @@
 #ifndef DIWNE_H
 #define DIWNE_H
 
+#include <functional>
+
 #include "diwne_include.h"
 
 /* ImDrawList functions works in screen coordinates */

@@ -13,8 +13,8 @@
 
 #include "../Nodes/WorkspaceElementsWithCoreData.h"
 
-#include "Viewport/Viewport.h"
 #include "GUI/WindowManager.h"
+#include "Viewport/Viewport.h"
 #include "World/Components.h"
 #include "World/HardcodedMeshes.h"
 #include "World/RenderTexture.h"
@@ -49,9 +49,9 @@ ViewportWindow::ViewportWindow(bool show, World* world2, Vp::Viewport* viewport)
 	InputManager::setInputAxis("move", 1.0f, Keys::o);
 	InputManager::setInputAxis("move", -1.0f, Keys::p);
 
-	Input.bindAction("fire", EKeyState::Pressed, []() { Log::info("Action fired."); });
-	Input.bindAction("fire", EKeyState::Released, []() { Log::info("Action released."); });
-	Input.bindAxis("move", [](float val) { Log::info("move: {}", val); });
+	Input.bindAction("fire", EKeyState::Pressed, []() { LOG_INFO("Action fired."); });
+	Input.bindAction("fire", EKeyState::Released, []() { LOG_INFO("Action released."); });
+	Input.bindAxis("move", [](float val) { LOG_INFO("move: {}", val); });
 	/// todoend
 }
 

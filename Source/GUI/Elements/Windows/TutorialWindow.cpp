@@ -77,7 +77,7 @@ inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
 	}
 	else
 	{
-		Log::error("Tooltip_CB - Markdown data doesnt contain image");
+		LOG_ERROR("Tooltip_CB - Markdown data doesnt contain image");
 		// ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon,
 		// data_.linkData.linkLength, data_.linkData.link );
 	}
@@ -124,7 +124,7 @@ void TutorialWindow::setTutorial(std::shared_ptr<TutorialHeader>& header)
 	}
 	else
 	{
-		Log::fatal("Tutorial " + header->m_filename + " not loaded.");
+		LOG_FATAL("Tutorial " + header->m_filename + " not loaded.");
 	}
 }
 
@@ -137,7 +137,7 @@ void TutorialWindow::setTutorial(std::string path)
 	}
 	else
 	{
-		Log::fatal("Tutorial header " + path + " not loaded.");
+		LOG_FATAL("Tutorial header " + path + " not loaded.");
 	}
 }
 
@@ -145,7 +145,7 @@ void TutorialWindow::setStep(int step_number)
 {
 	if (m_tutorial == nullptr || step_number < 0 || step_number >= m_tutorial->getStepCount())
 	{
-		Log::fatal("Trying to set an invalid step number or tutorial not active");
+		LOG_FATAL("Trying to set an invalid step number or tutorial not active");
 	}
 	else
 	{
@@ -535,14 +535,14 @@ inline ImGui::MarkdownImageData TutorialWindow::ImageCallback(ImGui::MarkdownLin
 		// image not yet loaded
 		else
 		{
-			Log::info("Loading image " + imageFilename);
+			LOG_INFO("Loading image " + imageFilename);
 			img = TutorialLoader::loadImage(TutorialLoader::getDirectory(m_tutorial->m_header->m_filename) + imageFilename);
 			m_tutorial->m_filenameToImage[imageFilename] = img; // save for future use
 		}
 	}
 	else
 	{
-		Log::fatal("Tutorial is nullptr");
+		LOG_FATAL("Tutorial is nullptr");
 	}
 
 	ImGui::MarkdownImageData imageData;

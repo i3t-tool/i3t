@@ -65,8 +65,5 @@ const char* Pin::getLabel() const
 	return label;
 }
 
-std::string Pin::getSig()
-{
-	return fmt::format("{} [{}, index: {}]", valueTypeToString(m_valueType), getOwner()->getSig(), m_index);
-}
+std::string Pin::getSignature() const { return fmt::format("pin {} of {}", m_index, getOwner()->getSignature()); }
 } // namespace Core

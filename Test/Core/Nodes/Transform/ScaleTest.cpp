@@ -182,35 +182,33 @@ TEST(ScaleTest, UniformScale_SetValidValue__Vec3_Uniform_Ok)
 	EXPECT_TRUE(scale->isValid());
 }
 
-
 // uniform scale will not accept setting via non-uniform vector
 TEST(ScaleTest, UniformScale_SetInvalidValue__Vec3_Non_uniform_fail)
-//TEST(ScaleTest, DISABLED_UniformScale_SetValidValue_Vec3_asScale_Wrong)
+// TEST(ScaleTest, DISABLED_UniformScale_SetValidValue_Vec3_asScale_Wrong)
 {
 	// Create a uniform scale.
 	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
-	scale->enableSynergies();		// should be implicit
-  const auto before = scale->getData().getMat4();
+	scale->enableSynergies(); // should be implicit
+	const auto before = scale->getData().getMat4();
 
 	// Set new uniform scale as vec3
 	// TEST: setting a non-uniform vec3 scale to uniform-scale matrix must fail
 	const auto scaleVec3 = generateVec3();
 
-
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  const auto result = scale->setValue(scaleVec3);		// the test
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
+	// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+	const auto result = scale->setValue(scaleVec3); // the test
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	EXPECT_EQ(ValueSetResult::Status::Err_ConstraintViolation, result.status);
 
 	const auto after = scale->getData().getMat4();
 
-  // And the matrix must remain unchanged (identity matrix remains)
-  EXPECT_TRUE(scale->isValid());					// matrix not changed - validity must remain true 
-  EXPECT_TRUE(Math::eq(before, after));		// the matrix did not change
-  EXPECT_FALSE(Math::eq(glm::scale(scaleVec3), after));	// non-uniform scale matrix was NOT set
-  EXPECT_FALSE(		// we do not use just scale.x as the uniform scale value
-    Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->getData().getMat4()));
+	// And the matrix must remain unchanged (identity matrix remains)
+	EXPECT_TRUE(scale->isValid());                        // matrix not changed - validity must remain true
+	EXPECT_TRUE(Math::eq(before, after));                 // the matrix did not change
+	EXPECT_FALSE(Math::eq(glm::scale(scaleVec3), after)); // non-uniform scale matrix was NOT set
+	EXPECT_FALSE(                                         // we do not use just scale.x as the uniform scale value
+	    Math::eq(glm::scale(glm::vec3(scaleVec3.x)), scale->getData().getMat4()));
 }
 
 // non-uniform scale switched to uniform scale (via enable synergies) invalidates the scale box
@@ -218,11 +216,11 @@ TEST(ScaleTest, Uniform_WithNonUniformValues_IsInvalid)
 {
 	// Create non-uniform scale.
 	auto scale = Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
-  EXPECT_TRUE(scale->isValid()); // it IS uniform
-  scale->disableSynergies();  // -> non-uniform scale
+	EXPECT_TRUE(scale->isValid()); // it IS uniform
+	scale->disableSynergies();     // -> non-uniform scale
 
-  setValue_expectOk(scale, generateVec3()); // should set a non-uniform scale
-  EXPECT_TRUE(scale->isValid());  // with disabled synergies accepts non-uniform vec3 values 
+	setValue_expectOk(scale, generateVec3()); // should set a non-uniform scale
+	EXPECT_TRUE(scale->isValid());            // with disabled synergies accepts non-uniform vec3 values
 
 	scale->enableSynergies();
 	EXPECT_FALSE(scale->isValid()); // should FAIL, as it is not uniform anymore

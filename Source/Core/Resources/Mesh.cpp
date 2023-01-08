@@ -156,13 +156,13 @@ Mesh* Mesh::load(const std::string& path)
 
 	if (!scn)
 	{
-		Log::error(importer.GetErrorString());
+		LOG_ERROR(importer.GetErrorString());
 		return nullptr;
 	}
 
 	if (scn->mNumMeshes < 1)
 	{
-		Log::error("no meshes found in scene" + path);
+		LOG_ERROR("no meshes found in scene" + path);
 		return nullptr;
 	}
 
@@ -182,7 +182,7 @@ Mesh* Mesh::load(const std::string& path)
 
 	if ((nVertices == 0) || (nIndices < FACE_VERT_COUNT))
 	{
-		Log::info("no triangles found in scene " + path);
+		LOG_INFO("no triangles found in scene " + path);
 		return nullptr;
 	}
 
@@ -406,7 +406,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material)
 		aiReturn texFound = material->GetTexture(type, 0, &texPathString);
 		if (texFound != AI_SUCCESS)
 		{
-			Log::error("Mesh: Failed to load texture {}!", type);
+			LOG_ERROR("Mesh: Failed to load texture {}!", type);
 			return 0;
 		}
 

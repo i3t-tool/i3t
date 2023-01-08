@@ -20,7 +20,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	}
 	catch (...)
 	{
-		Log::fatal("Tutorial file '" + path + "' not found or YAML header unparsable");
+		LOG_FATAL("Tutorial file '" + path + "' not found or YAML header unparsable");
 		return nullptr; // return nothing
 	}
 	// std::cout << tutorial_yaml << std::endl;
@@ -30,22 +30,22 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	if (tutorial_yaml["title"])
 	{
 		title = tutorial_yaml["title"].as<std::string>();
-		Log::debug(title);
+		LOG_DEBUG(title);
 	}
 	else
 	{
-		Log::fatal("Tutorial title not specified");
+		LOG_FATAL("Tutorial title not specified");
 	}
 	// description
 	std::string description = "undefined";
 	if (tutorial_yaml["description"])
 	{
 		description = tutorial_yaml["description"].as<std::string>();
-		Log::debug(description);
+		LOG_DEBUG(description);
 	}
 	else
 	{
-		Log::fatal("Tutorial description not specified");
+		LOG_FATAL("Tutorial description not specified");
 	}
 	// thumbnail
 	std::shared_ptr<GUIImage> thumbnail = nullptr; // dummy image here? - NOPE rather later when rendering and
@@ -56,21 +56,21 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	}
 	else
 	{
-		Log::fatal("Thumbnail not specified");
+		LOG_FATAL("Thumbnail not specified");
 	}
 	// language
 	Language lang = Language::English;
 	if (tutorial_yaml["language"])
 	{
 		std::string langStr = tutorial_yaml["language"].as<std::string>();
-		Log::debug(langStr);
+		LOG_DEBUG(langStr);
 		// switch (langStr) {
 		//	todo
 		// }
 	}
 	else
 	{
-		Log::info("Language not specified - setting english");
+		LOG_INFO("Language not specified - setting english");
 		// todo
 	}
 
@@ -87,7 +87,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	std::ifstream tutorialStream(header->m_filename);
 	if (!tutorialStream.good())
 	{
-		Log::fatal("Tutorial file '" + header->m_filename + "' was not found");
+		LOG_FATAL("Tutorial file '" + header->m_filename + "' was not found");
 		return nullptr; // return nothing
 	}
 	// FOR TUT CREATION DEBUG
@@ -112,13 +112,13 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		{
 			if (tutorialStream.eof())
 			{
-				Log::fatal("Tutorial file '" + header->m_filename +
-				           "' missing 2 '---' YAML marks at the beginning of file or "
-				           "no further content behind them");
+				LOG_FATAL("Tutorial file '" + header->m_filename +
+				          "' missing 2 '---' YAML marks at the beginning of file or "
+				          "no further content behind them");
 			}
 			else
 			{
-				Log::fatal("Tutorial file '" + header->m_filename + "' I/O error");
+				LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
 			}
 			return nullptr;
 		}
@@ -195,10 +195,10 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			addScript(steps[currentStep], textStore);
 			break;
 		case NOT_BLOCK:
-			// Log::debug("Ending block when NOT_BLOCK");
+			// LOG_DEBUG("Ending block when NOT_BLOCK");
 			break;
 		default:
-			Log::info("Creation of tutorial block element " + std::to_string(currentBlock) + " not implemented yet");
+			LOG_INFO("Creation of tutorial block element " + std::to_string(currentBlock) + " not implemented yet");
 		}
 
 		currentBlock = NOT_BLOCK;
@@ -247,7 +247,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			addScript(steps[currentStep], content);
 			break;
 		default:
-			Log::info("Creation of single-line tutorial element " + std::to_string(type) + " not implemented yet");
+			LOG_INFO("Creation of single-line tutorial element " + std::to_string(type) + " not implemented yet");
 		}
 	};
 	// -------------------------------------------------------
@@ -256,7 +256,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	while (std::getline(tutorialStream, line).good())
 	{
 		lineNumber++;
-		// Log::info("[{}] {}", lineNumber, line);
+		// LOG_INFO("[{}] {}", lineNumber, line);
 
 		// PROCESS LINE
 		// make a stream again to be able to move through it
@@ -308,7 +308,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			// actually used as block but the type does not allow blocks
 			else if (!blockType)
 			{
-				Log::fatal("NOT A BLOCK COMMAND: " + line);
+				LOG_FATAL("NOT A BLOCK COMMAND: " + line);
 				// todo show errors to creator
 			}
 		}
@@ -324,7 +324,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			// (implicitly by if order)
 			else
 			{
-				Log::fatal("NOT A SINGLELINE COMMAND: " + line);
+				LOG_FATAL("NOT A SINGLELINE COMMAND: " + line);
 				// todo show errors to creator
 			}
 		}
@@ -344,13 +344,13 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			{
 				if (indent >= 2)
 				{
-					// Log::info("blockIndent: {}, indent: {}, diff: {}",
+					// LOG_INFO("blockIndent: {}, indent: {}, diff: {}",
 					// currentBlockIndent, indent, indent - currentBlockIndent);
 					skipSpaces(lineStream, 2);
 				}
 				else
 				{
-					Log::info("Unexpected block unindent at line [{}] {}", lineNumber, line);
+					LOG_INFO("Unexpected block unindent at line [{}] {}", lineNumber, line);
 				}
 			}
 			// add to active block
@@ -370,7 +370,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	// CHECK if parsing ended because of error
 	if (!tutorialStream.eof())
 	{
-		Log::fatal("Tutorial file '" + header->m_filename + "' I/O error");
+		LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
 	}
 
 	// CREATE THE TUTORIAL
@@ -417,7 +417,7 @@ std::shared_ptr<GUIImage> TutorialLoader::loadImage(const std::string& path)
 	}
 	catch (std::runtime_error& e)
 	{
-		Log::fatal(e.what());
+		LOG_FATAL(e.what());
 		return nullptr;
 	}
 }

@@ -4,10 +4,10 @@
 
 #include "Config.h"
 #include "GUI/Shortcuts.h"
+#include "GUI/WindowManager.h"
 #include "Loader/ThemeLoader.h"
 #include "Utils/Filesystem.h"
 #include "Utils/Other.h"
-#include "GUI/WindowManager.h"
 
 using namespace UI;
 

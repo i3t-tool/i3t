@@ -528,6 +528,11 @@ void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* 
 
 void WorkspaceCoreInputPin::unplug()
 {
+	const auto rightNode = getNode().getNodebase();
+	const auto* inputPin = &rightNode->getInputPins()[getIndex()];
+
+	LOG_EVENT_DISCONNECT(inputPin->getParentPin(), inputPin);
+
 	Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
 	m_link.setStartPin(nullptr);
 	diwne.m_takeSnap = true;
@@ -557,6 +562,8 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
 		setConnectedWorkspaceOutput(ou);
 		m_link.m_just_pluged = true;
 		m_connection_changed = true;
+
+		LOG_EVENT_CONNECT(coreOutput, coreInput);
 	}
 }
 
@@ -795,8 +802,8 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwn
 				/* Pin with type Ptr have no graphic representation */
 				break;
 			default:
-				Debug::Assert(false, "Unknown Pin type while loading output pins from "
-				                     "Core to Workspace");
+				I3T_ABORT("Unknown Pin type while loading output pins from "
+				          "Core to Workspace");
 			}
 		}
 	}
