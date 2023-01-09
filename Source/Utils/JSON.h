@@ -87,6 +87,28 @@ inline bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject,
 	return true;
 }
 
+inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc)
+{
+	std::ifstream file(inputSrc);
+	if (!file.good())
+	{
+		LOG_ERROR("Cannot open input file \"{}\"!", inputSrc.string());
+		return std::nullopt;
+	}
+
+	rapidjson::IStreamWrapper inputStreamWrapper(file);
+
+	rapidjson::Document document;
+	const auto hasError = document.ParseStream(inputStreamWrapper).HasParseError();
+	if (hasError)
+	{
+		LOG_ERROR("Cannot parse config file!");
+		return std::nullopt;
+	}
+
+	return document;
+}
+
 inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
@@ -101,22 +123,12 @@ inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const 
 	rapidjson::SchemaDocument schema(schemaDocument);
 	rapidjson::SchemaValidator validator(schema);
 
-	std::ifstream file(inputSrc);
-	if (!file.good())
+	auto maybeDocument = parse(inputSrc);
+	if (!maybeDocument.has_value())
 	{
-		LOG_ERROR("Cannot open input file \"{}\"!", inputSrc.string());
 		return std::nullopt;
 	}
-
-	rapidjson::IStreamWrapper inputStreamWrapper(file);
-
-	rapidjson::Document document;
-	hasError = document.ParseStream(inputStreamWrapper).HasParseError();
-	if (hasError)
-	{
-		LOG_ERROR("Cannot parse config file!");
-		return std::nullopt;
-	}
+	auto document = std::move(maybeDocument.value());
 
 	if (!document.Accept(validator))
 	{
