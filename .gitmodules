@@ -17,10 +17,6 @@
 	path = Dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
 	ignore = dirty
-[submodule "Dependencies/jsonlib"]
-	path = Dependencies/jsonlib
-	url = https://github.com/nlohmann/json.git
-	ignore = dirty
 [submodule "Dependencies/portable-file-dialogs"]
 	path = Dependencies/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs.git

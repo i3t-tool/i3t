@@ -2,11 +2,15 @@
 
 #include <sstream>
 
-#include "nlohmann/json.hpp"
+#ifdef GetObject
+#undef GetObject
+#endif
+
 #include "spdlog/sinks/ostream_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
 
 #include "Core/Window.h"
+#include "Utils/JSON.h"
 
 Logger& Logger::getInstance()
 {
@@ -131,19 +135,17 @@ bool Logger::shouldLogMouse()
 void Logger::loadStrings()
 {
 	std::cout << "[info]: Load strings from: " << LOG_STRINGS_PATH << std::endl;
-	nlohmann::json json_strings;
-	std::ifstream i(LOG_STRINGS_PATH);
-	if (!i.good())
+	const auto maybeDocument = JSON::parse(LOG_STRINGS_PATH);
+
+	if (!maybeDocument.has_value())
 	{
 		std::cerr << "[error]: Failed to load logger config from " << LOG_STRINGS_PATH << std::endl;
+		return;
 	}
 
-	i >> json_strings; // TODO -> throws an exception when file LOG_STRINGS_PATH
-	                   // does not exist.
-
-	for (auto& el : json_strings.items())
-	{
-		logStrings[el.key()] = el.value().get<std::string>();
+	const auto& document = maybeDocument.value();
+	for (const auto& [name, value] : document.GetObject()){
+		logStrings[std::string(name.GetString())] = std::string(value.GetString());
 	}
 }
 
