@@ -4,8 +4,8 @@
 
 #include "Logger/Logger.h"
 
-using namespace Core;
-
+namespace Core
+{
 GraphManager* GraphManager::s_self = nullptr;
 
 void GraphManager::init() { s_self = new GraphManager; }
@@ -316,6 +316,8 @@ void SequenceTree::MatrixIterator::withdraw()
 	}
 }
 
+namespace Details
+{
 void MatrixTracker::setParam(float param)
 {
 	m_param = glm::clamp(param, 0.0f, 1.0f);
@@ -400,3 +402,21 @@ void MatrixTracker::track()
 
 	m_interpolatedMatrix = result;
 }
+} // namespace Details
+
+//----------------------------------------------------------------------------//
+
+MatrixTracker::MatrixTracker(Ptr<Sequence> beginSequence, const std::vector<Ptr<IModelProxy>>& modelsToTrack)
+    : m_trackedModels(modelsToTrack), m_internal({beginSequence})
+{
+}
+
+void MatrixTracker::setParam(float param)
+{
+	m_internal.setParam(param);
+	for (const auto& model : m_trackedModels)
+	{
+		model->update(m_internal.getInterpolatedMatrix());
+	}
+}
+} // namespace Core

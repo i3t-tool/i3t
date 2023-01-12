@@ -135,9 +135,8 @@ public:
 
 	Core::Pin const& getCorePin() const;
 
-	WorkspaceCorePin& getParentPin() const;
-
-	WorkspaceNodeWithCoreData& getNode() const;
+	WorkspaceNodeWithCoreData& getNode() { return m_node; }
+	const WorkspaceNodeWithCoreData& getNode() const { return m_node; };
 
 	int getIndex() const;
 	PinKind getKind() const;

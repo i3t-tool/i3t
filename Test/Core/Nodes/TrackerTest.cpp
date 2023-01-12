@@ -52,7 +52,7 @@ TEST(TrackerTest, TrackingFromRightToLeft)
 	auto t = arrange();
 
 	// Act
-	auto interp = MatrixTracker(t.s2);
+	auto interp = Details::MatrixTracker(t.s2);
 
 	{
 		float trackingParam = 1.0f;
@@ -98,7 +98,7 @@ TEST(TrackerTest, TrackingFromLeftToRight)
 	auto t = arrange();
 
 	// Act
-	auto interp = MatrixTracker(t.s2);
+	auto interp = Details::MatrixTracker(t.s2);
 	interp.setMode(true);
 
 	{
@@ -144,7 +144,7 @@ TEST(TrackerTest, EmptySequenceTrackingShouldGiveSameResult)
 {
 	auto s = Builder::createSequence();
 
-	auto tracker = MatrixTracker(s);
+	auto tracker = Details::MatrixTracker(s);
 
 	for (int i = 0; i < 5; ++i)
 	{

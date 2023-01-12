@@ -1,11 +1,9 @@
-//----------------
 /**
  * \file WorkspaceModel.h
  * \author Martin Herich, Petr Felkel, Dan Rakušan
  * \brief model box in the workspace
  * The initial version with a lot of comments explaining the basics.
  */
-//---------------
 
 #pragma once
 
@@ -31,6 +29,8 @@ public:
 	bool m_showModel{true};
 	glm::vec3 m_tint{1.0f};
 
+	WPtr<Vp::SceneModel> viewportModel() { m_viewportModel; }
+
 	WorkspaceModel(DIWNE::Diwne& diwne);
 	~WorkspaceModel();
 
@@ -51,4 +51,18 @@ public:
 private:
 	void init();
 	glm::vec3 calculateTint(glm::vec3 color);
+};
+
+//----------------------------------------------------------------------------//
+
+class TrackingModelProxy : public Core::IModelProxy
+{
+public:
+	TrackingModelProxy(WorkspaceModel& model);
+	~TrackingModelProxy() override;
+
+private:
+	void update(const glm::mat4& modelMatrix) override;
+
+	WPtr<Vp::SceneModel> m_modelCopy;
 };
