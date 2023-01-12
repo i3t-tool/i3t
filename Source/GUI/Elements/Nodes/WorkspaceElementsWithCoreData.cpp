@@ -231,8 +231,6 @@ bool WorkspaceCorePin::bypassFocusForInteractionAction()
 
 Core::Pin const& WorkspaceCorePin::getCorePin() const { return m_pin; }
 
-WorkspaceNodeWithCoreData& WorkspaceCorePin::getNode() const { return m_node; }
-
 int WorkspaceCorePin::getIndex() const { return m_pin.getIndex(); }
 
 PinKind WorkspaceCorePin::getKind() const { return m_pin.isInput() ? PinKind::Input : PinKind::Output; }

@@ -144,7 +144,8 @@ void Logger::loadStrings()
 	}
 
 	const auto& document = maybeDocument.value();
-	for (const auto& [name, value] : document.GetObject()){
+	for (const auto& [name, value] : document.GetObject())
+	{
 		logStrings[std::string(name.GetString())] = std::string(value.GetString());
 	}
 }

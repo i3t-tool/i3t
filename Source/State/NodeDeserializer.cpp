@@ -86,10 +86,13 @@ void createFrom(const Memento& memento)
 
 	for (auto& edge : edges.GetArray())
 	{
-		auto lhs = findNodeById(workspaceNodes, edge[0].GetInt());
-		auto rhs = findNodeById(workspaceNodes, edge[2].GetInt());
-		if (lhs && rhs)
+		auto maybeLhs = findNodeById(workspaceNodes, edge[0].GetInt());
+		auto maybeRhs = findNodeById(workspaceNodes, edge[2].GetInt());
+		if (maybeLhs.has_value() && maybeRhs.has_value())
 		{
+			const auto lhs = maybeLhs.value();
+			const auto rhs = maybeRhs.value();
+
 			auto lhsPin = edge[1].GetInt();
 			auto rhsPin = edge[3].GetInt();
 

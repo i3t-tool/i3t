@@ -8,6 +8,9 @@
 #pragma once
 
 #include <algorithm>
+#include <vector>
+
+#include "Core/Defs.h"
 
 #include "Camera.h"
 #include "Cycle.h"
@@ -214,6 +217,10 @@ public:
 	MatrixIterator end();
 };
 
+//----------------------------------------------------------------------------//
+
+namespace Details
+{
 class MatrixTracker
 {
 	glm::mat4 m_interpolatedMatrix;
@@ -222,15 +229,41 @@ class MatrixTracker
 	SequencePtr m_beginSequence;
 
 public:
-	explicit MatrixTracker(const SequencePtr& beginSequence) : m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
-	{
-	}
+	MatrixTracker() = default;
+
+	/**
+	 * @param beginSequence
+	 * @param valuesOnly
+	 * 	`true` - Use tracker for interpolating values only.
+	 * 	`false` - Use tracker
+	 */
+	explicit MatrixTracker(Ptr<Sequence> beginSequence) : m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence) {}
 
 	const glm::mat4& getInterpolatedMatrix() { return m_interpolatedMatrix; }
 
 	float getParam() const { return m_param; }
 
 	void setMode(bool reversed) { m_isReversed = reversed; }
+
+	void setParam(float param);
+
+private:
+	void track();
+};
+} // namespace Details
+
+class IModelProxy
+{
+public:
+	virtual ~IModelProxy(){};
+	virtual void update(const glm::mat4& modelMatrix) = 0;
+};
+
+class MatrixTracker
+{
+public:
+	MatrixTracker() = default;
+	MatrixTracker(Ptr<Sequence> beginSequence, const std::vector<Ptr<IModelProxy>>& modelsToTrack);
 
 	/**
 	 * Set interpolation parameter and calculate interpolated matrix product.
@@ -244,9 +277,14 @@ public:
 	 */
 	void setParam(float param);
 
+	float getParam() const { return m_internal.getParam(); }
+
 private:
-	void track();
+	std::vector<Ptr<IModelProxy>> m_trackedModels;
+	Details::MatrixTracker m_internal;
 };
+
+//----------------------------------------------------------------------------//
 
 inline CameraPtr GraphManager::createCamera() { return Builder::createCamera(); }
 
