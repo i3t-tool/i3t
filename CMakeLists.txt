@@ -19,10 +19,11 @@ include_directories(Dependencies/glm)
 include_directories(Dependencies/jsonlib/single_include)
 include_directories(Dependencies/imgui)
 include_directories(Dependencies/imgui_markdown)
+include_directories(Dependencies/lua/lua)
 include_directories(Dependencies/magic_enum/include)
 include_directories(Dependencies/pgr-framework/include)
-include_directories(Dependencies/picoc)
 include_directories(Dependencies/portable-file-dialogs)
+include_directories(Dependencies/sol2/include)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
 include_directories(${OPENGL_INCLUDE_DIRS})
@@ -48,7 +49,7 @@ endif()
 
 # Link C++17 filesystem library.
 if (UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs -Wno-restrict")
 endif()
 
 # ---------- Set VS specific properties. -----------------------
@@ -100,7 +101,8 @@ set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT CACHE INTERNAL FALSE)
 #  Project dependencies which should be compiled.
 add_subdirectory(Dependencies/assimp)
 add_subdirectory(Dependencies/glfw)
-add_subdirectory(Dependencies/picoc)
+add_subdirectory(Dependencies/lua)
+add_subdirectory(Dependencies/sol2)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 # =============================================================
@@ -160,8 +162,9 @@ target_link_libraries(
         gtest
         gtest_main
         assimp
-        picoc
         glfw
+        lua
+        sol2
         yaml-cpp)
 
 target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
@@ -193,7 +196,8 @@ target_link_libraries(
         ${OPENGL_LIBRARIES}
         assimp
         glfw
-        picoc
+        lua
+        sol2
         spdlog
         yaml-cpp
 )

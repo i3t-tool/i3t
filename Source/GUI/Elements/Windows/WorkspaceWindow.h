@@ -32,7 +32,6 @@
 #include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
 
 #include "Logger/Logger.h"
-#include "Scripting/Scripting.h"
 #include "State/StateManager.h"
 
 typedef std::vector<Ptr<WorkspaceNodeWithCoreData>>::iterator coreNodeIter;
@@ -81,7 +80,8 @@ public:
 	 *Sequence)
 	 **/
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getAllNodes() { return m_workspaceCoreNodes; };
+
+	const std::vector<Ptr<WorkspaceNodeWithCoreData>>& getAllNodes() const { return m_workspaceCoreNodes; };
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 
@@ -89,6 +89,15 @@ public:
 	std::vector<WorkspaceCoreLink> m_linksCameraToSequence;
 
 	bool processCreateAndPlugTypeConstructor();
+
+	/**
+	 * O(N) where N is workspace nodes count.
+	 *
+	 * @tparam T
+	 * @param id
+	 * @return
+	 */
+	template <typename T> Result<Ptr<T>, std::string> getNode(Core::ID id) const;
 
 	template <typename T> void addTypeConstructorNode()
 	{
@@ -239,6 +248,30 @@ inline bool connectNodes(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
 	if (result)
 	{
 		App::getModule<StateManager>().takeSnapshot();
+	}
+
+	return result;
+}
+
+//
+
+template <typename T> Result<Ptr<T>, std::string> WorkspaceDiwne::getNode(Core::ID id) const
+{
+	Ptr<GuiNode> node{};
+	for (const auto& n : getAllNodes())
+		if (n->getNodebase()->getId() == id)
+			node = n;
+
+	if (node == nullptr)
+	{
+		return std::string{"cannot find node #" + std::to_string(id)};
+	}
+
+	auto result = std::dynamic_pointer_cast<T>(node);
+
+	if (result == nullptr)
+	{
+		return std::string{"node #" + std::to_string(id) + " is not of given type"};
 	}
 
 	return result;

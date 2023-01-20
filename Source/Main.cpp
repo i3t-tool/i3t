@@ -76,6 +76,7 @@
 #include <unordered_map>
 
 #include "pgr.h"
+#include "sol/sol.hpp"
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
@@ -83,6 +84,7 @@
 #include "Core/Defs.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "Logger/Logger.h"
+
 #include "Utils/Other.h"
 
 int window; ///< current main window
@@ -181,6 +183,8 @@ int main(int argc, char* argv[])
 	}
 
 	app.initModules();
+
+	//
 
 	app.run();
 

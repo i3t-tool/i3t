@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <variant>
 
 #include "magic_enum.hpp"
 #include "spdlog/formatter.h"
@@ -50,6 +51,27 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #define I3T_ABORT(message) assert(false && message)
 #endif
 
+template <typename T, typename E> class Result
+{
+public:
+	Result(T&& val) : m_state(val) {}
+	Result(E&& val) : m_state(val) {}
+
+	bool isOk() const { return m_state.index() == 0; }
+	bool isErr() const { return m_state.index() == 1; }
+
+	T&& unwrap() { return std::get<T>(m_state); }
+	const T& unwrap() const { return std::get<T>(m_state); }
+
+	E&& err() { return std::get<E>(m_state); }
+	const E& err() const { return std::get<E>(m_state); }
+
+private:
+	std::variant<T, E> m_state;
+};
+
+using Void = std::monostate;
+
 /// Definition of more friendly shared_ptr usage.
 template <typename T> using Ptr = std::shared_ptr<T>;
 
@@ -81,6 +103,8 @@ namespace EnumUtils
 template <typename T> auto name(T val) { return n(val); }
 
 template <typename T> std::optional<T> value(const std::string& str) { return magic_enum::enum_cast<T>(str); }
+
+template <typename T> std::optional<T> value(std::string_view str) { return magic_enum::enum_cast<T>(str); }
 } // namespace EnumUtils
 
 #define COND_TO_DEG(x)                                                                                                 \

@@ -1,6 +1,8 @@
 #ifndef DIWNE_LINK_H
 #define DIWNE_LINK_H
 
+#include <algorithm>
+
 #include "diwne_include.h"
 
 namespace DIWNE

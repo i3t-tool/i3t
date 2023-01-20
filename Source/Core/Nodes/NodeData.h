@@ -14,6 +14,7 @@
 #include "glm/gtc/quaternion.hpp"
 
 #include "Utils/Math.h"
+#include "Utils/Variant.h"
 
 /// \todo MH - Will be removed
 namespace Core::Transform
@@ -90,8 +91,8 @@ class DataStore
 public:
 	EValueType opValueType; ///< wire type, such as Float or 4x4 Matrix
 
-protected:
-	std::variant<bool, glm::mat4, std::pair<glm::mat4, glm::mat4>, glm::vec3, glm::vec4, glm::quat, float, void*> m_value;
+	using Storage =
+	    std::variant<bool, glm::mat4, std::pair<glm::mat4, glm::mat4>, glm::vec3, glm::vec4, glm::quat, float, void*>;
 
 public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and
@@ -131,10 +132,31 @@ public:
 
 	//
 
+	template <typename T>
+	std::optional<std::remove_reference_t<T>> getValue() const;
+
+	//
+
 	template <typename T> void setValue(T&& val) { m_value = val; }
 
 	void setValue(const DataStore& other) { *this = other; }
+
+	std::size_t index() const { return m_value.index(); }
+
+private:
+	Storage m_value;
 };
+
+template <typename T>
+std::optional<std::remove_reference_t<T>> DataStore::getValue() const
+{
+	if (index() != variant_index<Storage, std::remove_reference_t<T>>())
+	{
+		return std::nullopt;
+	}
+
+	return std::get<std::remove_reference_t<T>>(m_value);
+}
 
 namespace Core
 {

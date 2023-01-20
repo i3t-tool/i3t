@@ -37,8 +37,11 @@ inline std::string toString(const glm::quat& quat)
 	return fmt::format("[{}, {}, {}, {}]", toString(quat.x), toString(quat.y), toString(quat.z), toString(quat.w));
 }
 
-inline std::string toString(const glm::mat4& mat)
+inline std::string toString(const glm::mat4& mat, bool breakLines = false)
 {
+	if (breakLines)
+		return fmt::format("[{}, \n{}, \n{}, \n{}]", toString(mat[0]), toString(mat[1]), toString(mat[2]), toString(mat[3]));
+
 	return fmt::format("[{}, {}, {}, {}]", toString(mat[0]), toString(mat[1]), toString(mat[2]), toString(mat[3]));
 }
 
