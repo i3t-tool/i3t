@@ -4,7 +4,6 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
-#include "Core/Module.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/MainMenuBar.h"
@@ -14,7 +13,7 @@
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Loader/ConfigLoader.h"
 #include "Logger/Logger.h"
-#include "Scripting/Scripting.h"
+#include "Scripting/ScriptingModule.h"
 #include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Utils/Color.h"
@@ -35,10 +34,10 @@ void Application::init()
 
 	m_isPaused = false;
 
-	// m_modules.push_back(new UIModule());
 	createModule<ResourceManager>();
-	createModule<UIModule>();
 	createModule<StateManager>();
+	createModule<UIModule>();
+	createModule<ScriptingModule>().init();
 
 	// m_scriptInterpreter = new Scripting();
 
@@ -51,10 +50,7 @@ void Application::init()
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
-
-	ConsoleCommand::addListener([this](std::string c) { m_scriptInterpreter->runCommand(c); });
-
-	//
+	ConsoleCommand::addListener([this](std::string c) { getModule<ScriptingModule>().runCommand(c.c_str()); });
 
 	InputManager::init();
 

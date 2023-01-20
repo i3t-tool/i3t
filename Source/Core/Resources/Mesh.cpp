@@ -406,7 +406,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material)
 		aiReturn texFound = material->GetTexture(type, 0, &texPathString);
 		if (texFound != AI_SUCCESS)
 		{
-			LOG_ERROR("Mesh: Failed to load texture {}!", type);
+			LOG_ERROR("Mesh: Failed to load texture {}!", aiTextureTypeToString(type));
 			return 0;
 		}
 

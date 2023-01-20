@@ -101,6 +101,14 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> const& WorkspaceSequence::getInnerWo
 	return m_workspaceInnerTransformations;
 }
 
+std::optional<Ptr<WorkspaceNodeWithCoreData>> WorkspaceSequence::getTransform(int index) const
+{
+	if (index >= m_workspaceInnerTransformations.size())
+		return std::nullopt;
+
+	return m_workspaceInnerTransformations[index];
+}
+
 void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 {
 	m_position_of_dummy_data = positionOfDummyData;

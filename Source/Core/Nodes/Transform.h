@@ -11,6 +11,7 @@
 #include <map>
 
 #include "Node.h"
+#include "Utils/Variant.h"
 
 #if defined(WIN32)
 #undef far
@@ -147,12 +148,22 @@ public:
 	 * \param name Name of the parameter (such as Center)
 	 * \param val New value
 	 */
-	template <typename T> void setDefaultValue(const std::string& name, T&& val)
+	template <typename T> ValueSetResult setDefaultValue(const std::string& name, T&& val)
 	{
-		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
+		if (!m_defaultValues.contains(name))
+		{
+			return ValueSetResult(ValueSetResult::Status::Err_LogicError, "default value with this name does not exist");
+		}
+		if (m_defaultValues.at(name).index() !=
+		    variant_index<Data::Storage, std::remove_const_t<std::remove_reference_t<T>>>())
+		{
+			return ValueSetResult(ValueSetResult::Status::Err_LogicError, "transform does not hold value of given type");
+		}
 
 		m_defaultValues.at(name).setValue(val); // defaults
 		resetMatrixFromDefaults();              // defaults to matrix
+
+		return ValueSetResult();
 	}
 
 	template <typename T> void setDefaultValueNoUpdate(const std::string& name, T&& val)
@@ -161,6 +172,7 @@ public:
 
 		m_defaultValues.at(name).setValue(val);
 	}
+
 	/**
 	 * \return A map of valueName and value pairs.
 	 */

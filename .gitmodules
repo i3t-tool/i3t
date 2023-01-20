@@ -36,3 +36,9 @@
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
 
+[submodule "Dependencies/sol2"]
+	path = Dependencies/sol2
+	url = https://github.com/ThePhD/sol2.git
+[submodule "Dependencies/lua/lua"]
+	path = Dependencies/lua/lua
+	url = https://github.com/lua/lua.git

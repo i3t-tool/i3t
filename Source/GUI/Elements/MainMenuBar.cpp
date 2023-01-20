@@ -14,7 +14,6 @@
 #include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "Scripting/Scripting.h"
 #include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"

@@ -42,7 +42,8 @@ public:
 
 	void setNumberOfVisibleDecimal(int value);
 
-	std::vector<Ptr<WorkspaceNodeWithCoreData>> const& getInnerWorkspaceNodes() const;
+	const std::vector<Ptr<WorkspaceNodeWithCoreData>>& getInnerWorkspaceNodes() const;
+	std::optional<Ptr<WorkspaceNodeWithCoreData>> getTransform(int index) const;
 
 	bool beforeContent();
 	bool afterContent();

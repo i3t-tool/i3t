@@ -6,140 +6,141 @@
 #include "Core/API.h"
 #include "Core/Input/InputManager.h"
 #include "GUI/Elements/IWindow.h"
+#include "GUI/Toolkit.h"
+#include "Scripting/ScriptingModule.h"
 
 using namespace UI;
 
-#define MAX_COMMAND_SIZE 1024
-char command[MAX_COMMAND_SIZE];
-// char command2[MAX_COMMAND_SIZE];
-std::vector<glm::ivec2> commands;
-int selected = 0;
-
-Console::Console(bool show) : IWindow(show)
+static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 {
-	/*InputManager::setInputAction("console_up", Keys::Code::up);
-	InputManager::setInputAction("console_down", Keys::Code::down);
-
-	Input.bindAction("console_up", EKeyState::Released, [this] { onUpKey(); });
-	Input.bindAction("console_down", EKeyState::Pressed, [this] { onDownKey(); });
-	*/
+	auto* console = (Console*)data->UserData;
+	return console->textEditCallback(data);
 }
 
-int history(ImGuiInputTextCallbackData* d)
+Console::Console(bool show) : IWindow(show), m_oss(Application::get().getModule<ScriptingModule>().outputStream())
 {
-	if (d->EventKey == ImGuiKey_UpArrow)
-	{
-		Ptr<Console> console = I3T::getWindowPtr<Console>();
-		console->onUpKey();
-	}
-	else if (d->EventKey == ImGuiKey_DownArrow)
-	{
-		Ptr<Console> console = I3T::getWindowPtr<Console>();
-		console->onDownKey();
-	}
-	d->DeleteChars(0, d->BufTextLen);
-	d->InsertChars(0, command);
-	// printf("command %s\n", command2);
-	return 1;
+	m_oss << "I3T console\n";
 }
+
 void Console::render()
 {
-	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::Begin(setName("Console").c_str(), getShowPtr());
-	ImGui::PopStyleColor();
+	const auto& style = ImGui::GetStyle();
+	m_InputHeight = ImGui::GetFontSize() + 2 * style.FramePadding.y + style.ItemSpacing.y;
 
-	// Reserve enough left-over height for 1 separator + 1 input text
-	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-	ImGui::BeginChild("Output", ImVec2{0, -footerHeightToReserve});
+	drawOutput();
+	drawInput();
+}
 
-	std::stringstream& m_buffer = m_stdoutCapture.GetBuffer();
+int Console::textEditCallback(ImGuiInputTextCallbackData* data)
+{
+	switch (data->EventFlag)
+	{
+	case ImGuiInputTextFlags_CallbackHistory:
+	{
+		const int prev_history_pos = m_HistoryPos;
+		if (data->EventKey == ImGuiKey_UpArrow)
+		{
+			if (m_HistoryPos == -1)
+				m_HistoryPos = m_History.size() - 1;
+			else if (m_HistoryPos > 0)
+				m_HistoryPos--;
+		}
+		else if (data->EventKey == ImGuiKey_DownArrow)
+		{
+			if (m_HistoryPos != -1)
+				if (++m_HistoryPos >= m_History.size())
+					m_HistoryPos = -1;
+		}
 
-	ImGui::TextUnformatted(m_buffer.str().c_str());
+		// A better implementation would preserve the data on the current input line along with cursor position.
+		if (prev_history_pos != m_HistoryPos)
+		{
+			const auto history_str = (m_HistoryPos >= 0) ? m_History[m_HistoryPos] : "";
+			data->DeleteChars(0, data->BufTextLen);
+			data->InsertChars(0, history_str.c_str());
+		}
+	}
+	default:
+		break;
+	}
 
-	// Set scroll to bottom of the child window.
-	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+	return 0;
+}
+
+void Console::drawOutput()
+{
+	const auto flags = ImGuiInputTextFlags_ReadOnly;
+
+	const auto buffer = m_oss.view();
+
+	auto maxSize = ImGui::GetContentRegionAvail();
+	maxSize.y -= m_InputHeight;
+
+	m_oss << "X";
+	m_oss.seekp(0, std::ios::end);
+	int bufferSize = m_oss.tellp();
+
+	const auto str = (char*)buffer.data();
+	str[bufferSize - 2] = '\0';
+	str[bufferSize - 1] = '\0';
+
+	ImGui::InputTextMultiline("##ConsoleOutput", (char*)buffer.data(), bufferSize - 2, maxSize, flags);
+
+	m_oss.seekp(-2, m_oss.cur);
+
+	if (m_ShouldSetFocus)
+	{
+		// Scroll to the bottom.
+		// https://github.com/ocornut/imgui/issues/1523#issuecomment-354003592
+		ImGui::BeginChild("##ConsoleOutput");
 		ImGui::SetScrollHereY(1.0f);
-
-	ImGui::EndChild();
-
-	ImGui::Separator();
-
-	const ImGuiInputTextFlags inputTextFlags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
-	// ImGuiInputTextCallback in=[this]{return this->h();};
-
-	if (ImGui::InputText("Input", command, 1024, inputTextFlags, &history))
-	{
-		bool nonwhite = false;
-		int len = (int)strlen(command);
-		for (int i = 0; i < len; i++)
-		{
-			if (command[i] != '\t' && command[i] != ' ')
-			{
-				nonwhite = true;
-				break;
-			}
-		}
-		if (nonwhite)
-		{
-			commands.push_back(glm::ivec2(m_buffer.str().size(), len));
-		}
-		selected = (int)commands.size();
-
-		m_buffer << command << "\n";
-
-		ConsoleCommand::dispatch(command);
-
-		strcpy(command, "");
-		ImGui::SetKeyboardFocusHere(-1);
-	}
-
-	ImGui::End();
-}
-
-void Console::onUpKey()
-{
-	if (commands.size() > 0)
-	{
-		std::string str = m_stdoutCapture.GetBuffer().str();
-		selected--;
-		if (selected < 0)
-		{
-			selected = 0;
-		}
-		else if (selected >= commands.size())
-		{
-			selected = (int)commands.size() - 1;
-		}
-		std::string ss = str.substr(commands[selected][0], commands[selected][1]);
-
-		memcpy(command, ss.c_str(), ss.size());
-		command[ss.size()] = '\0';
-		// strcpy(command2, command);
-		// printf("up   %d/%lld,,<%s>\n", selected, commands.size()-1, command2);
+		ImGui::EndChild();
 	}
 }
 
-void Console::onDownKey()
+void Console::drawInput()
 {
-	if (commands.size() > 0)
+	if (m_ShouldSetFocus)
 	{
-		std::string str = m_stdoutCapture.GetBuffer().str();
-		selected++;
-		if (selected < 0)
-		{
-			selected = 0;
-		}
-		else if (selected >= commands.size())
-		{
-			command[0] = '\0';
-		}
-		else
-		{
-			std::string ss = str.substr(commands[selected][0], commands[selected][1]);
-			memcpy(command, ss.c_str(), ss.size());
-			command[ss.size()] = '\0';
-		}
-		// strcpy(command2, command);
-		// printf("down %d/%lld,,<%s>\n", selected, commands.size() - 1, command2);
+		ImGui::SetKeyboardFocusHere();
+		m_ShouldSetFocus = false;
 	}
+
+	const auto flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion |
+	                   ImGuiInputTextFlags_CallbackHistory;
+
+	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+	if (GUI::InputText("#Command", &m_Command, flags, &textEditCallbackStub, (void*)this))
+	{
+		execute();
+	}
+}
+
+void Console::execute()
+{
+	m_ShouldSetFocus = true;
+
+	const bool isValid = !m_Command.empty();
+
+	if (!isValid)
+	{
+		return;
+	}
+
+	m_oss << "\n> " << m_Command << "\n";
+
+	ConsoleCommand::dispatch(m_Command);
+
+	m_HistoryPos = -1;
+	for (int i = m_History.size() - 1; i >= 0; i--)
+	{
+		if (m_History[i] == m_Command)
+		{
+			m_History.erase(m_History.begin() + i);
+			break;
+		}
+	}
+	m_History.push_back(m_Command);
+
+	m_Command = "";
 }

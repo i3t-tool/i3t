@@ -45,12 +45,11 @@ struct ValueSetResult
 		Err_LogicError
 	};
 
-	Status status;
+	Status status = Status::Ok;
 	std::string message;
 
-	ValueSetResult() : status(Status::Ok), message("") {}
-
-	explicit ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
+	ValueSetResult() = default;
+	ValueSetResult(Status aStatus, std::string aMessage = "") : status(aStatus), message(std::move(aMessage)) {}
 };
 
 inline constexpr size_t I3T_INPUT0 = 0;

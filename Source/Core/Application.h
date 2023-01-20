@@ -1,12 +1,8 @@
-/**
- * \file	GUI\App.h
- *
- * Application class.
- */
 #pragma once
 
 #include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -113,7 +109,7 @@ public:
 	//===--------------------------------------------------------------------===//
 
 private:
-	template <typename T, typename... Args> static void createModule(Args&&... args);
+	template <typename T, typename... Args> static auto& createModule(Args&&... args);
 
 public:
 	template <typename T> static T& getModule();
@@ -153,7 +149,6 @@ public:
 	 */
 	void onDisplay();
 
-private:
 	/**
 	 * Called when BeforeCloseCommand is received.
 	 *
@@ -176,27 +171,24 @@ private:
 	void logicUpdate();
 };
 
-template <typename T, typename... Args> inline void Application::createModule(Args&&... args)
+template <typename T, typename... Args> inline auto& Application::createModule(Args&&... args)
 {
-	auto& self = Application::get();
-
 	static_assert(std::is_base_of_v<Module, T>, "Class T must be derived from the Module class");
 
 	const auto hash = typeid(T).hash_code();
-
+	auto& self = Application::get();
 	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
+
+	return *self.m_modules[hash];
 }
 
 template <typename T> T& Application::getModule()
 {
+	const auto hash = typeid(T).hash_code();
 	const auto& self = Application::get();
 
-	const auto hash = typeid(T).hash_code();
-
-#ifdef I3T_DEBUG
 	I3T_ASSERT(self.m_modules.count(hash) != 0 && "Module is not created!");
 	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr && "Invalid type.");
-#endif
 
 	return *(T*)self.m_modules.at(hash).get();
 }
