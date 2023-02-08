@@ -1,22 +1,23 @@
 #include "Viewport.h"
 
-#include "Viewport/Camera.h"
-#include "Viewport/Shaper.h"
-#include "Viewport/entity/GameObject.h"
-#include "Viewport/entity/SceneCamera.h"
-#include "Viewport/entity/SceneModel.h"
-#include "Viewport/scene/Lighting.h"
-#include "Viewport/scene/lights/SunLight.h"
-#include "Viewport/shader/ColorShader.h"
-#include "Viewport/shader/FrustumShader.h"
-#include "Viewport/shader/GridShader.h"
-#include "Viewport/shader/PhongShader.h"
+#include "imgui.h"
 
 #include "Core/Resources/ResourceManager.h"
 #include "Logger/Logger.h"
 #include "Utils/Color.h"
 
-#include "imgui.h"
+#include "Viewport/Shaper.h"
+#include "Viewport/entity/GameObject.h"
+#include "Viewport/entity/SceneCamera.h"
+#include "Viewport/entity/SceneModel.h"
+#include "Viewport/scene/Lighting.h"
+#include "Viewport/scene/SceneRenderTarget.h"
+#include "Viewport/scene/lights/SunLight.h"
+#include "Viewport/shader/ColorShader.h"
+#include "Viewport/shader/FrustumShader.h"
+#include "Viewport/shader/GridShader.h"
+#include "Viewport/shader/PhongShader.h"
+#include "Viewport/shader/WBOITCompositeShader.h"
 
 using namespace Vp;
 
@@ -27,43 +28,57 @@ using namespace Vp;
 
 Viewport::Viewport()
 {
-	m_mainScene = std::make_unique<MainScene>(this);
-	m_previewScene = std::make_unique<Scene>(this);
+	// Empty
 }
 
 Viewport::~Viewport() = default;
 
 void Viewport::init()
 {
-	m_phongShader = std::make_unique<PhongShader>(
-	    RM::instance().shader("Data/Shaders/phongVert.glsl", "Data/Shaders/phongFrag.glsl"));
-	m_colorShader = std::make_unique<ColorShader>(
-	    RM::instance().shader("Data/Shaders/colorVert.glsl", "Data/Shaders/colorFrag.glsl"));
-	m_gridShader =
-	    std::make_unique<GridShader>(RM::instance().shader("Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl"));
-	m_frustumShader = std::make_unique<FrustumShader>(
-	    RM::instance().shader("Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl"));
+	// Load shaders
+	m_shaders = std::make_unique<Shaders>();
+	m_shaders->create();
 
-	LOG_INFO("Phong shader size: {}", sizeof(*m_phongShader.get()));
-
+	// Load shapes
 	Shaper::initDefaultShapes();
 
 	// Preload some useful models
 	RMI.mesh("Data/Models/super8.gltf");
 	RMI.mesh("Data/Models/CubeFixed.gltf");
 
+	// Setup scenes
+	m_mainScene = std::make_unique<MainScene>(this);
+	m_previewScene = std::make_unique<Scene>(this);
+
 	m_mainScene->init();
 	initPreviewScene(*m_previewScene);
+
+	// Setup scene render targets
+	RenderOptions previewOptions;
+	previewOptions.framebufferAlpha = true;
+
+	viewportRenderTarget = m_mainScene->createRenderTarget(RenderOptions());
+	screenRenderTarget = m_mainScene->createRenderTarget(RenderOptions());
+	previewRenderTarget = m_previewScene->createRenderTarget(previewOptions);
 }
 
-void Viewport::draw(int width, int height) { m_mainScene->draw(width, height); }
-
-void Viewport::draw(glm::mat4 view, glm::mat4 projection, const DisplayOptions& displayOptions)
+WPtr<Framebuffer> Viewport::drawViewport(int width, int height, const RenderOptions& renderOptions,
+                                         const DisplayOptions& displayOptions)
 {
-	m_mainScene->draw(view, projection, displayOptions);
+	viewportRenderTarget->setRenderOptions(renderOptions);
+	m_mainScene->draw(width, height, *viewportRenderTarget, displayOptions);
+	return viewportRenderTarget->getOutputFramebuffer();
 }
 
-void Viewport::drawPreview(std::weak_ptr<GameObject> gameObject, int width, int height)
+WPtr<Framebuffer> Viewport::drawScreen(int width, int height, glm::mat4 view, glm::mat4 projection,
+                                       const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
+{
+	screenRenderTarget->setRenderOptions(renderOptions);
+	m_mainScene->draw(width, height, view, projection, *screenRenderTarget, displayOptions);
+	return screenRenderTarget->getOutputFramebuffer();
+}
+
+WPtr<Framebuffer> Viewport::drawPreview(int width, int height, std::weak_ptr<GameObject> gameObject)
 {
 	if (auto gameObjectPtr = gameObject.lock())
 	{
@@ -76,21 +91,29 @@ void Viewport::drawPreview(std::weak_ptr<GameObject> gameObject, int width, int 
 		bool visibleTemp = gameObjectPtr->m_visible;
 		gameObjectPtr->m_visible = true;
 
+		DisplayOptions displayOptions;
+		displayOptions.showFrustum = false;
+		displayOptions.showCamera = false;
+		displayOptions.showAxes = false;
+
 		// Temporarily add the game object to the preview scene with a different
 		// model matrix add/removeEntity methods are deliberately not used here
 		glm::mat4 temp = gameObjectPtr->m_modelMatrix;
 		gameObjectPtr->m_modelMatrix = glm::mat4(1.0f);
 		m_previewScene->m_entities.push_back(gameObjectPtr);
-		m_previewScene->draw(width, height);
+		m_previewScene->draw(width, height, *previewRenderTarget, displayOptions);
 		m_previewScene->m_entities.pop_back();
 		gameObjectPtr->m_modelMatrix = temp;
 
 		// Restore object visibility
 		gameObjectPtr->m_visible = visibleTemp;
+
+		return previewRenderTarget->getOutputFramebuffer();
 	}
 	else
 	{
 		LOG_ERROR("Viewport: drawPreview(): Passed game object is NULL!");
+		return WPtr<Framebuffer>();
 	}
 }
 
@@ -108,7 +131,7 @@ void Viewport::processInput() { m_mainScene->processInput(); }
 std::weak_ptr<SceneModel> Viewport::createModel()
 {
 	Core::Mesh* mesh = RM::instance().mesh("Data/Models/CubeFixed.gltf");
-	auto sceneModel = std::make_shared<SceneModel>(mesh, m_phongShader.get());
+	auto sceneModel = std::make_shared<SceneModel>(mesh, m_shaders->m_phongShader.get());
 	m_mainScene->addEntity(sceneModel);
 	return sceneModel;
 }
@@ -116,7 +139,7 @@ std::weak_ptr<SceneModel> Viewport::createModel()
 std::weak_ptr<SceneCamera> Viewport::createCamera()
 {
 	Core::Mesh* mesh = RM::instance().mesh("Data/Models/super8.gltf");
-	auto sceneCamera = std::make_shared<SceneCamera>(mesh, m_phongShader.get());
+	auto sceneCamera = std::make_shared<SceneCamera>(mesh, m_shaders->m_phongShader.get());
 	m_mainScene->addEntity(sceneCamera);
 	return sceneCamera;
 }

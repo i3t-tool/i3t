@@ -13,15 +13,17 @@ class Mesh;
 /**
  * \brief A utility class for constructing simple shapes.
  *
- * Used in Viewport for drawing of world axes, axes of models and wireframe
- * objects (such as projection frustrum)
+ * Used in Viewport for drawing of world axes, axes of models and wireframe objects (such as projection frustrum)
  */
 class Shaper
 {
 public:
-	static std::string xyzAxes;
+	// Some generic default shapes
+	static std::string xyzAxes; ///< Simple three color line axes
+	static std::string unitLineCube;
 	static std::string unitCube;
-	static std::string unitCubeFilled;
+	static std::string plane;
+	static std::string screenQuad; ///< Screen quad for post processing
 
 	static void initDefaultShapes();
 
@@ -98,7 +100,18 @@ public:
 	 */
 	void clear();
 
+	/**
+	 * Create a line mesh from current shaper state and register it with ResourceManager
+	 * @param alias Unique shape identifier
+	 * @return
+	 */
 	Core::Mesh* createLineMesh(const std::string& alias);
+
+	/**
+	 * Create a triangle mesh from current shaper state and register it with ResourceManager
+	 * @param alias Unique shape identifier
+	 * @return
+	 */
 	Core::Mesh* createMesh(const std::string& alias);
 
 public:

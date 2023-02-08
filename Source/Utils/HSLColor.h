@@ -1,6 +1,6 @@
 /**
- * \file        Source\Utils\HSLColor.h
- * \author      Dan Rakušan <rakusdan@fit.cvut.cz>
+ * \file        Source/Utils/HSLColor.h
+ * \author      Dan Rakušan <rakusdan(at)fit.cvut.cz>
  * \date        30.11.2022
  *
  * Utilities for manipulating HSL color

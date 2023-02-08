@@ -6,14 +6,14 @@ using namespace Vp;
 
 FrustumObject::FrustumObject(Core::Mesh* mesh, FrustumShader* shader) : ColoredObject(mesh, shader)
 {
-	m_backFaceCull = true;
 	setDisplayType(DisplayType::Frustum);
 }
 
 void FrustumObject::update(Scene& scene)
 {
 	ColoredObject::update(scene);
-	this->m_modelMatrix = glm::inverse(m_frustumViewMatrix); // TODO: Test if needed
+	// Set model matrix to later retrieve position for transparency sorting
+	this->m_modelMatrix = glm::inverse(m_frustumViewMatrix);
 }
 
 void FrustumObject::render(glm::mat4 view, glm::mat4 projection)

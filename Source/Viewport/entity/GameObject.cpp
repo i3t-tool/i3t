@@ -16,6 +16,11 @@ void GameObject::render(glm::mat4 view, glm::mat4 projection)
 {
 	m_shader->use();
 
+	if (m_shader->hasUniform(m_shader->wboitFlagUniform))
+	{
+		glUniform1i(m_shader->wboitFlagUniform, m_wboit ? GL_TRUE : GL_FALSE);
+	}
+
 	m_shader->m_opacity = m_opaque ? 1.0f : m_opacity;
 	m_shader->setWorldTransform(m_modelMatrix, view, projection);
 
@@ -27,7 +32,6 @@ void GameObject::render(glm::mat4 view, glm::mat4 projection)
 		m_mesh->renderMeshPart(meshPart);
 	}
 	glBindVertexArray(0);
-	CHECK_GL_ERROR();
 }
 
 void GameObject::update(Scene& scene)

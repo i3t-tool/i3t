@@ -31,9 +31,11 @@ public:
 	glm::mat4 m_modelMatrix{1}; ///< Model transformation of the entity
 
 	// Some basic properties
-	bool m_opaque = true;
 	bool m_backFaceCull = false;
 	bool m_visible = true;
+	bool m_opaque = true;
+	bool m_wboit = false; ///< Whether this entity should be rendered using order independent transparency
+	unsigned int m_explicitTransparencyOrder{0}; ///< Explicit order for ordered transparency
 
 	virtual ~Entity() = default;
 

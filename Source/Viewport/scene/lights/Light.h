@@ -6,7 +6,6 @@ namespace Vp
 {
 class PhongShader;
 
-// TODO: (DR) Do not use glGetShaderLocation in lights
 class Light
 {
 public:

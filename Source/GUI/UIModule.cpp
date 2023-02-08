@@ -39,7 +39,7 @@ void UIModule::init()
 	m_menu = new MainMenuBar();
 	m_windowManager.addWindow(std::make_shared<TutorialWindow>(false));
 	m_windowManager.addWindow(std::make_shared<StartWindow>(true));
-	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, App::get().world(), App::get().viewport()));
+	m_windowManager.addWindow(std::make_shared<ViewportWindow>(true, App::get().world()));
 	m_windowManager.addWindow(std::make_shared<WorkspaceWindow>(true));
 	m_windowManager.addWindow(std::make_shared<Console>(false));
 	m_windowManager.addWindow(std::make_shared<LogWindow>());

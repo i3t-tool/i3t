@@ -75,14 +75,20 @@ void PhongShader::bindTextures(Core::Mesh::TextureSet tSet)
 
 void PhongShader::bindTexture(GLuint textureID, const std::string& type, int typeIndex, GLuint textureUnit)
 {
-	// Activate texture unit
-	glActiveTexture(GL_TEXTURE0 + textureUnit);
-	// Find appropriate sampler and set its texture unit
-	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex)).c_str()), textureUnit);
+	std::string samplerName = type + std::to_string(typeIndex);
+	std::string samplerFlagName = type + std::to_string(typeIndex) + "_active";
+	bindTexture2D(textureUnit, textureID, glGetUniformLocation(id, samplerName.c_str()));
 	// Also enable flag saying this sampler is active
-	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex) + "_active").c_str()), GL_TRUE);
-	// Bind the texture to that texture unit
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glUniform1i(glGetUniformLocation(id, samplerFlagName.c_str()), GL_TRUE);
+
+	//	// Activate texture unit
+	//	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	//	// Find appropriate sampler and set its texture unit
+	//	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex)).c_str()), textureUnit);
+	//	// Also enable flag saying this sampler is active
+	//	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex) + "_active").c_str()), GL_TRUE);
+	//	// Bind the texture to that texture unit
+	//	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
 void PhongShader::clearTextures() const

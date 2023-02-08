@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Viewport/Framebuffer.h"
+#include "Viewport/framebuffer/Framebuffer.h"
 #include "WorkspaceElementsWithCoreData.h"
 
 namespace Vp
@@ -19,7 +19,6 @@ class WorkspaceModel : public WorkspaceNodeWithCoreDataWithPins
 {
 private:
 	std::weak_ptr<Vp::SceneModel> m_viewportModel;
-	std::unique_ptr<Vp::Framebuffer> m_framebuffer;
 
 	// initial render texture size - should be large enough or changed during zoom
 	ImVec2 m_textureSize = {84, 100};

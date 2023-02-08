@@ -10,6 +10,7 @@ using namespace Vp;
 
 void Lighting::setUniforms(const PhongShader& shader) const
 {
+	// TODO: (DR) Do not use glGetShaderLocation in lights
 	// TODO: (DR) Refactor this (get rid of dynamic casts) and possibly use UBOs
 	int pointLightCount = 0;
 	int sunLightCount = 0;

@@ -383,7 +383,6 @@ void ResourceManager::createDefaultResources(const std::vector<Resource>& defaul
 {
 	for (const auto& resource : defaultResources)
 	{
-		bool success = false;
 		switch (resource.resourceType)
 		{
 		case ResourceType::Shader:
@@ -391,12 +390,16 @@ void ResourceManager::createDefaultResources(const std::vector<Resource>& defaul
 			// conventionpath);
 			break;
 		case ResourceType::Texture:
-			texture(resource.alias, resource.path) != 0;
-			registerDefault(resource.alias);
+			if (texture(resource.alias, resource.path))
+			{
+				registerDefault(resource.alias);
+			}
 			break;
 		case ResourceType::Model:
-			mesh(resource.alias, resource.path) != nullptr;
-			registerDefault(resource.alias);
+			if (mesh(resource.alias, resource.path))
+			{
+				registerDefault(resource.alias);
+			}
 			break;
 		}
 	}
@@ -413,11 +416,6 @@ GLuint ResourceManager::loadTexture(const std::string& path)
 	}
 	return id;
 }
-
-GLuint ResourceManager::loadShader(const std::string& vertShader, const std::string& fragShader)
-{
-	return loadShader(vertShader, fragShader, "");
-};
 
 GLuint ResourceManager::loadShader(const std::string& vertShader, const std::string& fragShader,
                                    const std::string& geoShader)
