@@ -46,6 +46,7 @@ enum class EColor
 	TutorialScrollbarHovered,
 	TutorialScrollbarActive,
 	TutorialTitleText,
+	TutorialHighlightText,
 	TutorialButtonText,
 	TutorialButtonBg,
 

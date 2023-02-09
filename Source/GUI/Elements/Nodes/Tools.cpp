@@ -26,12 +26,23 @@ Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes)
 	Memento memento;
 
 	SerializationVisitor serializer(memento, true);
+	for (auto node : nodes){
+		node->translateNodePositionDiwne(ImVec2(-10, -10));
+	}
 	serializer.dump(nodes);
-
+	for (auto node : nodes){
+		node->translateNodePositionDiwne(ImVec2(10, 10));
+	}
 	return memento;
 }
 
 void pasteNodes(const Memento& memento) { NodeDeserializer::createFrom(memento); }
+
+void duplicateNode(const Ptr<GuiNode>& node) {
+	std::vector<Ptr<GuiNode>> temp;
+	temp.push_back(node);
+	pasteNodes(copyNodes(temp));
+}
 
 //----------------------------------------------------------------------------//
 

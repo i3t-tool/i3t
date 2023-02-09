@@ -34,6 +34,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cycles"].GetArray())
 	{
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
+		cycle->setSelected(true);
 		NodeDeserializer::assignCommon(value, cycle);
 	}
 
@@ -42,6 +43,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
 		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
+		camera->setSelected(true);
 		NodeDeserializer::assignCommon(value, camera);
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
@@ -56,6 +58,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
 		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
+		screen->setSelected(true);
 		NodeDeserializer::assignCommon(value, screen);
 	}
 
@@ -64,6 +67,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
 		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
+		model->setSelected(true);
 		NodeDeserializer::assignCommon(value, model);
 	}
 
@@ -106,6 +110,7 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 	const auto& type = value["type"].GetString();
 
 	const auto node = g_OperatorBuilder(type);
+	node->setSelected(true);
 	const auto coreNode = node->getNodebase();
 
 	assignCommon(value, node);
@@ -147,7 +152,6 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 			}
 		}
 	}
-
 	return node;
 }
 
@@ -157,7 +161,7 @@ Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 
 	assignCommon(value, sequence);
 	assignSequence(value, sequence);
-
+	sequence->setSelected(true);
 	return sequence;
 }
 
@@ -168,6 +172,7 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 	const auto& type = value["type"].GetString();
 
 	const auto node = g_TransformBuilder(type);
+	node->setSelected(true);
 	const auto coreNode = node->getNodebase()->as<Core::Transformation>();
 
 	assignCommon(value, node);
@@ -226,7 +231,6 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 			break;
 		}
 	}
-
 	return node;
 }
 

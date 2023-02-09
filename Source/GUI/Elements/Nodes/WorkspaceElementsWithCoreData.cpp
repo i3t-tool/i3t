@@ -5,6 +5,7 @@
 #include "State/StateManager.h"
 
 #include "../Windows/WorkspaceWindow.h"
+#include "Tools.h"
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
     : WorkspaceNode(diwne, nodebase->getId(), nodebase->getLabel(), nodebase->getOperation()->defaultLabel),
@@ -143,7 +144,7 @@ void WorkspaceNodeWithCoreData::popupContent()
 
 	if (ImGui::MenuItem("Duplicate"))
 	{
-		ImGui::TextUnformatted("I can not duplicate yet :-(");
+		duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()));
 	} /* \todo Duplicate node */
 
 	WorkspaceNode::popupContent();
