@@ -161,6 +161,8 @@ public:
 	void deleteSelectedNodes();
 	void copySelectedNodes();
 	void pasteSelectedNodes();
+	void duplicateClickedNode();
+	void deselectNodes();
 
 	// bool allowInteraction();
 

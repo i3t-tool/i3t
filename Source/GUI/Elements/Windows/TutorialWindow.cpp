@@ -46,6 +46,8 @@
 
 const int NEXT_BUTTON_SIZE_X = 120;
 const int NEXT_BUTTON_SIZE_Y = 30;
+const int TIP_BUTTON_SIZE_X = 50;
+const int TIP_BUTTON_SIZE_Y = 30;
 const int SIMPLE_SPACE = 10;
 const int SMALL_SPACE = 5;
 const int CONTROLS_SIZE_Y = 90;
@@ -407,7 +409,7 @@ void TutorialWindow::renderTutorialControls()
 void TutorialWindow::renderExplanation(Explanation* explanation)
 {
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
-	ImGui::PushStyleColor(ImGuiCol_TextDisabled, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+	ImGui::PushStyleColor(ImGuiCol_TextDisabled, Application::get().getUI()->getTheme().get(EColor::TutorialHighlightText));
 
 	ImGui::PushStyleColor(ImGuiCol_PopupBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialText));
@@ -480,14 +482,9 @@ void TutorialWindow::renderHint(Hint* hint)
 	// ImGui::SameLine();
 	//  BUTTON
 	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
-	ImGui::Text("Tip");
-	if (ImGui::IsItemHovered())
+	if (ImGui::Button("Tip", ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
 	{
-		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-		{
-			hint->m_expanded = !hint->m_expanded;
-		}
+		hint->m_expanded = !hint->m_expanded;
 	}
 	ImGui::PopStyleColor();
 	ImGui::PopFont();

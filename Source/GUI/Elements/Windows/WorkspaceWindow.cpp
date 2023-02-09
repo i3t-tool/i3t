@@ -134,7 +134,39 @@ void WorkspaceDiwne::copySelectedNodes()
 void WorkspaceDiwne::pasteSelectedNodes()
 {
 	LOG_INFO("Pasting nodes");
+	deselectNodes();
 	pasteNodes(copiedNodes);
+}
+
+void WorkspaceDiwne::duplicateClickedNode()
+{
+	LOG_INFO("Duplicating")
+	auto selectedNodes = getSelectedNodesInnerIncluded();
+
+	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded()){
+		if(node->m_focused){
+			if(node->m_selected)
+			{
+				deselectNodes();
+				for (const Ptr<GuiNode>& selectedNode : selectedNodes)
+				{
+					duplicateNode(selectedNode);
+				}
+			}
+			else
+			{
+				deselectNodes();
+				duplicateNode(node);
+			}
+		}
+	}
+}
+
+
+void WorkspaceDiwne::deselectNodes(){
+	for (auto node : getAllNodesInnerIncluded()){
+		node->setSelected(false);
+	}
 }
 
 void WorkspaceDiwne::popupContent()
@@ -1186,6 +1218,7 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteSelectedNodes(); });
 	Input.bindAction("copy", EKeyState::Pressed, [&]() { g_workspaceDiwne->copySelectedNodes(); });
 	Input.bindAction("paste", EKeyState::Pressed, [&]() { g_workspaceDiwne->pasteSelectedNodes(); });
+	Input.bindAction("duplicate", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateClickedNode(); });
 	//	Input.bindAction("trackingLeft", EKeyState::Pressed, [&]() {
 	// g_workspaceDiwne->trackingLeft(); }); 	Input.bindAction("trackingRight",
 	// EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingRight(); });

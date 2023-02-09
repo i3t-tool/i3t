@@ -224,8 +224,6 @@ ___
 
 ===============================================================================
 */
-
-
 #include <stdint.h>
 
 namespace ImGui
@@ -915,6 +913,7 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 			// normal emphasis
 			if( start_ )
 			{
+				//TODO ADD FONT CHANGE TO BOLD - TASK FONT
 				ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
 			}
 			else
