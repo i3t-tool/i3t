@@ -100,10 +100,11 @@ Abychom mohli naši krychli *škálovat* (měnit velikost), bude třeba všechny
 --
 *Jak propojit bloky?*
 
-*Bloky* fungují podobně jako funkce při programování, mají *vstupy* a *výstupy*. Ty propojujeme barevnými *dráty* a tvoříme tak scénu.
+*Bloky* fungují podobně jako funkce, mají *vstupy* a *výstupy*. Propojujeme je barevnými *dráty* a tvoříme tak scénu.
 ![Blok sekvence](blocks.png)
 
-Barva ikony vstupu a výstupu je *datový typ*, určuje co lze a co nelze předat *bloku*.
+Barva ikony vstupu a výstupu je podobná *datovému typu*, určuje které *bloky* jdou propojit, a které ne.
+
 Například:
     * *Matice* = ![Symbol pro matici](matrixsym.png)
     * *Maticové násobení* = ![Symbol pro vektorové násobení](mult.png)
