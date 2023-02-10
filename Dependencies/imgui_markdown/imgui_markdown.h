@@ -913,11 +913,13 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 			// normal emphasis
 			if( start_ )
 			{
-				//TODO ADD FONT CHANGE TO BOLD - TASK FONT
+				ImGuiIO& io = ImGui::GetIO();
+				ImGui::PushFont(io.Fonts->Fonts[4]);
 				ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
 			}
 			else
 			{
+				ImGui::PopFont();
 				ImGui::PopStyleColor();
 			}
 		}

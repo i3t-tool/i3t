@@ -116,24 +116,44 @@ Rotaci využíváme k *otáčení objektu v prostoru*.
 Hodnoty v matici rotace nastavujeme v závislosti na *ose*, podél které objekt otáčíme *(pro nás X, Y, nebo Z)*:
 ![Matice rotací podle všech os](rotations.png)
 
-Obyčejně v rotacích používáme *sinus* a *kosinus*, proto jsou hodnoty matice uzamčené na množinu *<-1, 1>*.
+Obyčejně v rotacích používáme *sinus* a *kosinus* úhlu rotace, proto jsou hodnoty v matici uzamčené na množinu *<-1, 1>*.
 
-task: Přidej do workplace matici rotace podle osy X
-hint: Klikni pravým tlačítkem do okna workspace myší najeď na "transformations", potom na "rotation" a vyber "eulerAngleX"
+*Problém: Práce se hodnotami sínů a kosínů může být neintuitivní.*
+--
+*Řešení: Set Value*
+Z předchozích lekcí víme, že hodnoty v maticích je možné nastavit *tažením myši*, nebo přepsáním hodnoty *dvojklikem myši*.
+
+Dalším způsobem úpravy hodnot je menu *Set value*, které zobrazíme kliknutím *pravým tlačítkem myši* na libovolnou hodnotu matice.
+![Menu s úhly rotace](anglePopup.png)
+
+V něm můžeš vybrat *požadovaný úhel* z několika nejpoužívanších hodnot, které jsou uvedené ve *stupních*.
 
 --
-*Zkoušíme rotaci*
+*Výměna matic v sekvenci*
 
-task: Myší vytáhni z bloku sekvence *matici škálování* a nahraď ji *maticí rotace*
+task:
+    Úkoly:
+    * Přidej do workspace matici rotace podle osy Y
+    * Myší vytáhni z bloku sekvence *matici škálování* a nahraď ji *maticí rotace*
 
-Kostka se zase zmenší. Teď s ní ale můžeme *otáčet*.
+hint: Klikni pravým tlačítkem do okna workspace myší najeď na "transformations", potom na "rotation" a vyber "eulerAngleY"
 
-task: Změň hodnotu v prvním poli matice rotace na 0.5
+![Vyměněné transformace](swapTransform.png)
+
+Kostka se zase zmenší, protože jsme škálování odebrali, teď s ní ale můžeme *otáčet*.
+
+--
+*Práce s rotací*
+
+task: Otoč model o 30° pomocí Set value menu
+
+hint: Set value menu zobrazíš kliknutím pravým tlačítkem na libovolnou hodnotu matice
 
 ![Otočená kostka](rotated_cube.png)
 
 Kostka se krásně natočí podle *osy Y*.
-Skládáním s *ostatními rotacemi* můžeme model otáčet libovolně. *Skládání transformací se v dalším tutoriálu*.
+
+Skládáním s *ostatními rotacemi* můžeme model otáčet libovolně. *Skládání transformací* uvidíme v dalším tutoriálu.
 
 --
 *Translace*

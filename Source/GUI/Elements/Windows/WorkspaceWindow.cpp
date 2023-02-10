@@ -148,6 +148,7 @@ void WorkspaceDiwne::duplicateClickedNode()
 			if(node->m_selected)
 			{
 				deselectNodes();
+				node->setSelected(true);
 				for (const Ptr<GuiNode>& selectedNode : selectedNodes)
 				{
 					duplicateNode(selectedNode);

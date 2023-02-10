@@ -83,7 +83,7 @@ void Theme::initClassicProperties()
 	set(EColor::TutorialScrollbarGrab, createColor(232, 232, 232, 255));
 	set(EColor::TutorialScrollbarHovered, createColor(240, 240, 240, 255));
 	set(EColor::TutorialTitleText, createColor(14, 98, 175, 255));
-	set(EColor::TutorialHighlightText, createColor(0, 56, 112, 255));
+	set(EColor::TutorialHighlightText, createColor(89, 112, 176, 255));
 	set(EColor::TutorialButtonText, createColor(255, 255, 255, 255));
 	set(EColor::TutorialButtonBg, createColor(8, 187, 230, 255));
 
