@@ -50,7 +50,7 @@ void Application::init()
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
-	ConsoleCommand::addListener([this](std::string c) { getModule<ScriptingModule>().runCommand(c.c_str()); });
+	ConsoleCommand::addListener([this](std::string c) { getModule<ScriptingModule>().runScript(c.c_str()); });
 
 	InputManager::init();
 

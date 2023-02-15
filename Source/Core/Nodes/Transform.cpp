@@ -48,12 +48,35 @@ void Transformation::createDefaults()
 
 	for (const auto& [key, valueType] : transformType.defaultValuesTypes)
 	{
-		m_defaultValues[key] = Data(valueType);
-		m_savedValues[key] = Data(valueType);
+		m_defaultValues.push_back({key, Data(valueType)});
+		m_savedValues.push_back({key, Data(valueType)});
 	}
 }
 
-const Data& Transformation::getDefaultValue(const std::string& name) const { return m_defaultValues.at(name); }
+TransformOperation* Transformation::properties() const
+{
+	return *getTransformOperation(getOperation()->keyWord);
+}
+
+const Data& Transformation::getDefaultValue(const std::string& name) const
+{
+	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(),
+	                             [&name](const auto value) { return value.name == name; });
+
+	I3T_ASSERT(it != m_defaultValues.end() && "Invalid value name!");
+
+	return it->data;
+}
+
+Data& Transformation::getDefaultValueMut(const std::string& name)
+{
+	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(),
+	                             [&name](const auto value) { return value.name == name; });
+
+	I3T_ASSERT(it != m_defaultValues.end() && "Invalid value name!");
+
+	return it->data;
+}
 
 TransformOperation::ValueMap Transformation::getDefaultTypes() const
 {
