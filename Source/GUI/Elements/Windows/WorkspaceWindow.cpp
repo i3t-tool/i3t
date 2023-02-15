@@ -1513,6 +1513,8 @@ void WorkspaceWindow::render()
 	                 g_WindowFlags | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar |
 	                     ImGuiWindowFlags_NoScrollWithMouse))
 	{
+		this->updateWindowInfo();
+
 		if (ImGui::BeginMenuBar())
 		{
 			showEditMenu();
@@ -1520,7 +1522,8 @@ void WorkspaceWindow::render()
 		}
 
 		DIWNE::DrawMode drawMode = DIWNE::DrawMode::JustDraw;
-		if (InputManager::isFocused<WorkspaceWindow>())
+		// TODO: (DR) Make this consistent with ViewportWindow (check for active input rather than focus)
+		if (I3T::getUI()->getWindowManager().isFocused<WorkspaceWindow>())
 		{
 			drawMode = DIWNE::DrawMode::Interacting;
 		}

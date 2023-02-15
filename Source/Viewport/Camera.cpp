@@ -128,7 +128,7 @@ glm::mat4 Camera::createProjectionMatrix(bool nonShrinking)
 	}
 }
 
-void Camera::processInput()
+void Camera::processInput(glm::vec2 mousePos, glm::ivec2 windowSize)
 {
 	float dx = InputManager::m_mouseXDelta;
 	float dy = InputManager::m_mouseYDelta;

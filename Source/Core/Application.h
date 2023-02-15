@@ -119,6 +119,7 @@ private:
 
 	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
 
+	// TODO: (DR) Unused
 	/**
 	 * \brief	Window display flag - if true, it disables the onDisplay callback
 	 * resulting in no window update.
@@ -139,6 +140,8 @@ private:
 	std::vector<ICommand*> m_commands;
 
 public:
+	bool m_debugWindowManager = false; ///< Debug switch for WindowManager, toggled in Help > Debug window manager
+
 	/**
 	 * \brief	GLUT Callback: render the whole I3T window (update the Logic, draw
 	 * 3D scene and 2D workspace)

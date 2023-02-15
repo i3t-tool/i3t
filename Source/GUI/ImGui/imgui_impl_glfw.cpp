@@ -148,6 +148,8 @@ void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int acti
 	if (action == GLFW_PRESS && button >= 0 && button < IM_ARRAYSIZE(g_MouseJustPressed))
 		g_MouseJustPressed[button] = true;
 
+	// TODO: (DR) Why isn't left click set here? Its later set in InputManager update() from imgui
+
 	if (action == GLFW_PRESS)
 	{
 		switch (button)

@@ -158,6 +158,7 @@ void Application::run()
 
 void Application::onDisplay()
 {
+	// TODO: (DR) Figure out what this was about, probably just delete these old comments
 	/*
 	 \todo Pause scene update.
 	if (m_isPaused)
@@ -176,31 +177,30 @@ void Application::onDisplay()
 	for (auto& [_, m] : m_modules)
 		m->endFrame();
 
-	// Input update must be called after rendering.
 	logicUpdate();
+
+	// Input update must be called after rendering. (Due to some values being zero-ed out too early)
+	// Might be better to update inputs before rendering to reduce input lag and retain consistency with ImGui
+	// That would require slight InputManager modifications and testing
+	// TODO: (DR) Enabling window manager debug and setting glfwSwapInterval(10) shows the input lag I mentioned
+	//  (Watch the yellow and purple cursors on the mouse. Purple InputManager position is lagging behind the yellow one,
+	//	which is also kinda lagging, but thats probably normal)
+	//  Not critical but might be worth fixing.
+	InputManager::update();
 
 	// glfwSwapBuffers(m_window);
 	m_window->swapBuffers();
 }
 
-void Application::logicUpdate()
-{
-	InputManager::preUpdate(); ///< update the mouse button state
-
-	viewport()->update();
-
-	InputManager::update(); ///< Update mouseDelta, mousePrev, and the stored
-	                        ///< statuses of the keys in the \a keyMap array
-	                        ///< (JUST_UP -> UP, JUST_DOWN -> DOWN).
-}
+void Application::logicUpdate() { viewport()->update(); }
 
 void Application::finalize()
 {
 	for (auto& [_, m] : m_modules)
 		m->onClose();
 
-	World::end();
-	delete m_world;
+	World::end();      // TODO: (DR) Remove
+	delete m_world;    // TODO: (DR) Remove
 	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
 
 	m_window->finalize();

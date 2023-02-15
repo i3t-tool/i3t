@@ -2,6 +2,7 @@
 
 #include "imgui.h"
 
+#include "Core/API.h"
 #include "Core/Application.h"
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Theme.h"
@@ -43,6 +44,8 @@ void LogWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 	ImGui::Begin(setName("Log View").c_str(), getShowPtr());
 	ImGui::PopStyleColor();
+
+	this->updateWindowInfo();
 
 	ImGui::Text("Log output");
 

@@ -241,12 +241,12 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 	Ptr<SceneRenderTarget> renderTarget = std::make_shared<SceneRenderTarget>();
 	renderTarget->setRenderOptions(options);
 
-	Ptr<Framebuffer> opaqueFramebuffer =
-	    std::shared_ptr<Framebuffer>(Framebuffer::createDefault(options.multisample, options.samples, options.framebufferAlpha));
+	Ptr<Framebuffer> opaqueFramebuffer = std::shared_ptr<Framebuffer>(
+	    Framebuffer::createDefault(options.multisample, options.samples, options.framebufferAlpha));
 	renderTarget->addFramebuffer(opaqueFramebuffer);
 
-	Ptr<Framebuffer> transparentFramebuffer =
-	    std::shared_ptr<Framebuffer>(Framebuffer::createDefault(options.multisample, options.samples, options.framebufferAlpha));
+	Ptr<Framebuffer> transparentFramebuffer = std::shared_ptr<Framebuffer>(
+	    Framebuffer::createDefault(options.multisample, options.samples, options.framebufferAlpha));
 	transparentFramebuffer->addColorAttachment(ColorAttachment(GL_RGBA16F, GL_RGBA, 100, 100, GL_HALF_FLOAT));
 	transparentFramebuffer->addColorAttachment(ColorAttachment(GL_R16F, GL_RED, 100, 100, GL_HALF_FLOAT));
 	renderTarget->addFramebuffer(transparentFramebuffer);
@@ -304,4 +304,6 @@ void Scene::update()
 	}
 }
 
-void Scene::processInput() { m_camera->processInput(); }
+void Scene::processInput(glm::vec2 mousePos, glm::ivec2 windowSize) {
+	m_camera->processInput(mousePos, windowSize);
+}

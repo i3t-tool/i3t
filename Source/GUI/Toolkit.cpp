@@ -54,4 +54,19 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
 	return ImGui::InputText(formattedLabel.c_str(), (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback,
 	                        &cb_user_data);
 }
+
+glm::vec2 imToGlm(const ImVec2& v) { return glm::vec2(v.x, v.y); }
+glm::vec4 imToGlm(const ImVec4& v) { return glm::vec4(v.x, v.y, v.z, v.w); }
+
+ImVec2 glmToIm(const glm::vec2& v) { return ImVec2(v.x, v.y); }
+ImVec4 glmToIm(const glm::vec4& v) { return ImVec4(v.x, v.y, v.z, v.w); }
+
+void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
+{
+	drawList->AddRectFilled(ImVec2(pos.x - floor(thickness / 2), pos.y - floor(size / 2)),
+	                        ImVec2(pos.x + ceil(thickness / 2), pos.y + ceil(size / 2)), color);
+	drawList->AddRectFilled(ImVec2(pos.x - floor(size / 2), pos.y - floor(thickness / 2)),
+	                        ImVec2(pos.x + ceil(size / 2), pos.y + ceil(thickness / 2)), color);
+}
+
 } // namespace GUI

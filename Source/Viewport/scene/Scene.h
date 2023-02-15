@@ -74,8 +74,11 @@ public:
 
 	/**
 	 * Update input logic.
+	 *
+	 * @param mousePos Current mouse position relative to the window
+	 * @param windowSize Current window size
 	 */
-	void processInput();
+	void processInput(glm::vec2 mousePos, glm::ivec2 windowSize);
 
 	/**
 	 * Adds entity to the scene.

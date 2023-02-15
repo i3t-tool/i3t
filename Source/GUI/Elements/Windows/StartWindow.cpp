@@ -134,6 +134,8 @@ void StartWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
 	ImGui::Begin(setName("").c_str(), getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
 	{
+		this->updateWindowInfo();
+
 		// LOGO I3T
 		ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;
 		ImGui::GetForegroundDrawList()->AddImage((ImTextureID)m_i3tImage->m_texID, logoPos,
@@ -442,10 +444,10 @@ void StartWindow::render()
 								LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);
 
-								I3T::getUI()->getWindowManager().showWindow(this, false);
+								I3T::getUI()->getWindowManager().showWindow(shared_from_this(), false);
 								Ptr<IWindow> tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
-								I3T::getUI()->getWindowManager().showWindow(tutorialWindow.get(), true);
-								I3T::getUI()->getWindowManager().focusWindow(tutorialWindow.get());
+								I3T::getUI()->getWindowManager().showWindow(tutorialWindow, true);
+								I3T::getUI()->getWindowManager().focusWindow(tutorialWindow);
 							}
 							else
 							{

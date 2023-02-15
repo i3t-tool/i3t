@@ -215,6 +215,10 @@ void MainMenuBar::showHelpMenu()
 		{
 		}
 
+		ImGui::Separator();
+
+		ImGui::MenuItem("Debug window manager", nullptr, &App::get().m_debugWindowManager);
+
 		ImGui::EndMenu();
 	}
 }

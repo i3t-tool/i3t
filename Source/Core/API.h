@@ -6,7 +6,7 @@
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"
 
-// TODO: (DR) This probably shound't be in the Core (As its basically a global utility namespace)
+// TODO: (DR) This probably shouldn't be in the Core (As its basically a global utility namespace)
 namespace I3T
 {
 inline UIModule* getUI() { return App::get().getUI(); }
@@ -36,7 +36,7 @@ inline float getSize(ESize size) { return getTheme().get(size); }
 
 inline const ImVec2& getSize(ESizeVec2 size) { return getTheme().get(size); }
 
-// TODO: Possibly shouldn't be here, works just like a util
+// TODO: (DR) Possibly shouldn't be here, works just like a util
 /**
  * Get pointer to dockable (unique) window.
  * \tparam T window type
@@ -44,9 +44,6 @@ inline const ImVec2& getSize(ESizeVec2 size) { return getTheme().get(size); }
  */
 template <typename T> Ptr<T> getWindowPtr()
 {
-	Ptr<IWindow> ptr;
-	if ((ptr = getUI()->getWindowManager().getWindowPtr<T>()) == nullptr)
-		return nullptr;
-	return std::dynamic_pointer_cast<T>(ptr);
+	return getUI()->getWindowManager().getWindowPtr<T>();
 }
 } // namespace I3T
