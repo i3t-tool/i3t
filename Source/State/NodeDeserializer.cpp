@@ -199,9 +199,14 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 	{
 		const std::string key(defaultValue.name.GetString());
 
-		I3T_ASSERT(coreNode->getDefaultTypes().count(key) == 1);
+		const auto defaultValueType = coreNode->properties()->getDefaultValueType(key);
+		if (!defaultValueType.has_value())
+		{
+			LOG_ERROR("Unknown default value {}", key);
+			continue;
+		}
 
-		switch (coreNode->getDefaultTypes().at(key))
+		switch (defaultValueType.value().type)
 		{
 		case EValueType::Float:
 		{

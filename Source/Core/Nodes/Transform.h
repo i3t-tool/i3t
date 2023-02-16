@@ -20,20 +20,6 @@
 
 namespace Core
 {
-FORCE_INLINE bool isTransform(const NodePtr& node)
-{
-	/*
-	auto it = std::find_if(g_transforms.begin(), g_transforms.end(),
-	                       [&node](const std::pair<Operation,
-	std::map<std::string, EValueType>>& pair) { return pair.first.keyWord ==
-	node->getOperation()->keyWord; }); return it != g_transforms.end();
-	 */
-	auto& keyWord = node->getOperation()->keyWord;
-	auto type = magic_enum::enum_cast<ETransformType>(keyWord);
-
-	return type.has_value();
-}
-
 template <typename Node> FORCE_INLINE bool isRot(Node&& node)
 {
 	// static_assert(std::is_base_of_v<NodeBase, Node>);
@@ -91,7 +77,12 @@ class Transformation : public Node
 	friend class GraphManager;
 	friend class Storage;
 
-	using DefaultValues = std::map<std::string, Data>;
+	struct DefaultValuePair
+	{
+		std::string name;
+		Data        data;
+	};
+	using DefaultValues = std::vector<DefaultValuePair>;
 
 public:
 	explicit Transformation(const TransformOperation& transformType);
@@ -132,12 +123,21 @@ public:
 
 	//===----------------------------------------------------------------------===//
 
+	TransformOperation* properties() const;
+
+public:
 	/// Get the value which the transform can hold (current value stored in the
 	/// transformation).
 	///	It is not the initial value!
 	///	\todo rename to getCurrentValue?
+	/// \pre Default value with \p name exists.
 	const Data& getDefaultValue(const std::string& name) const;
 
+protected:
+	/// \pre Default value with \p name exists.
+	Data& getDefaultValueMut(const std::string& name);
+
+public:
 	/**
 	 * \brief Setting of one second level parameter defining the transformation
 	 * (in LOD::SetValues).
@@ -150,17 +150,13 @@ public:
 	 */
 	template <typename T> ValueSetResult setDefaultValue(const std::string& name, T&& val)
 	{
-		if (!m_defaultValues.contains(name))
+		const auto* props = properties();
+		if (!props->hasDefaultValue(name))
 		{
 			return ValueSetResult(ValueSetResult::Status::Err_LogicError, "default value with this name does not exist");
 		}
-		if (m_defaultValues.at(name).index() !=
-		    variant_index<Data::Storage, std::remove_const_t<std::remove_reference_t<T>>>())
-		{
-			return ValueSetResult(ValueSetResult::Status::Err_LogicError, "transform does not hold value of given type");
-		}
 
-		m_defaultValues.at(name).setValue(val); // defaults
+		getDefaultValueMut(name).setValue(val); // defaults
 		resetMatrixFromDefaults();              // defaults to matrix
 
 		return ValueSetResult();
@@ -168,9 +164,7 @@ public:
 
 	template <typename T> void setDefaultValueNoUpdate(const std::string& name, T&& val)
 	{
-		I3T_ASSERT(m_defaultValues.find(name) != m_defaultValues.end() && "Default value with this name does not exist.");
-
-		m_defaultValues.at(name).setValue(val);
+		getDefaultValueMut(name).setValue(val);
 	}
 
 	/**
@@ -236,7 +230,7 @@ public:
 
 	const glm::mat4& getSavedValue() const;
 
-	const std::map<std::string, DataStore>& getSavedDefaults() const { return m_savedValues; }
+	const DefaultValues& getSavedDefaults() const { return m_savedValues; }
 
 	/**
 	 * \brief Save the value, read from YAML
@@ -324,8 +318,10 @@ protected:
 
 private:
 	bool m_hasSavedData = false;
-	DataStore m_savedData;
-	std::map<std::string, DataStore> m_savedValues;
+
+	/// \todo Rename to m_savedMatrix
+	DataStore     m_savedData;
+	DefaultValues m_savedValues;
 };
 
 using TransformPtr = Ptr<Transformation>;

@@ -5,6 +5,7 @@
 
 #include <bitset>
 #include <map>
+#include <optional>
 #include <sstream>
 
 #include "glm/gtx/euler_angles.hpp"
@@ -511,6 +512,8 @@ inline static const Operation g_modelProperties = {
     "Model", "model", 1, matrixMulInput, 0, {},
 };
 
+FORCE_INLINE const Operation* getOperationProps(ENodeType type) { return &operations[static_cast<size_t>(type)]; }
+
 //===-- TRANSFORMS --------------------------------------------------------===//
 
 /**
@@ -524,9 +527,19 @@ using TransformMask = std::bitset<16>;
  */
 struct TransformOperation
 {
+	struct NameTypePair
+	{
+		std::string name;
+		EValueType  type;
+	};
+
+	bool hasDefaultValue(const std::string& name) const;
+
+	std::optional<NameTypePair> getDefaultValueType(const std::string& name) const;
+
 	/// Names and types of DefaultValues (parameters for matrix definition in the
 	/// middle LOD, such as fovy in Perspective)
-	using ValueMap = std::map<std::string, EValueType>;
+	using ValueMap = std::vector<NameTypePair>;
 
 	Operation operation;
 	TransformMask mask;
@@ -537,7 +550,7 @@ constexpr TransformMask g_AllLocked = 0b0000000000000000;
 constexpr TransformMask g_AllUnlocked = 0b1111111111111111;
 
 /// All entries must be in the same order as ETransformType enum entries.
-static const std::vector<TransformOperation> g_transforms = {
+static inline const std::vector<TransformOperation> g_transforms = {
     {{n(ETransformType::Free), "free"}, g_AllUnlocked, {}},
     {{n(ETransformType::Translation), "translate"},
      0b0001000100010000, // the last column
@@ -581,18 +594,16 @@ static const std::vector<TransformOperation> g_transforms = {
      {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}},
 };
 
-FORCE_INLINE const Operation* getOperationProps(ENodeType type) { return &operations[static_cast<size_t>(type)]; }
-
 FORCE_INLINE const TransformOperation& getTransformOperation(ETransformType type)
 {
 	return g_transforms[static_cast<size_t>(type)];
 }
 
-FORCE_INLINE const TransformOperation* getTransformProps(ETransformType type) { return &getTransformOperation(type); }
+std::optional<TransformOperation*> getTransformOperation(const std::string& keyWord);
 
-FORCE_INLINE const std::map<std::string, EValueType>& getTransformDefaults(const std::string& keyWord)
+FORCE_INLINE const TransformOperation::ValueMap& getTransformDefaults(const std::string& keyWord)
 {
-	static std::map<std::string, EValueType> noDefaults;
+	static TransformOperation::ValueMap noDefaults;
 
 	auto type = magic_enum::enum_cast<ETransformType>(keyWord);
 	if (type.has_value())

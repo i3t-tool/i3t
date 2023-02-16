@@ -96,7 +96,7 @@ bool TransformImpl<ETransformType::Scale>::isValid() const
 		auto& mat = m_internalData[0].getMat4();
 		result = result && Math::eq(mat[0][0], mat[1][1]) && Math::eq(mat[1][1], mat[2][2]);
 
-		auto& defaultValue = m_defaultValues.at("scale").getVec3();
+		auto& defaultValue = getDefaultValue("scale").getVec3();
 		// auto& defaultValue = m_defaultValues["scale"];
 
 		bool scaleResult = Math::eq(defaultValue[0], defaultValue[1]) && Math::eq(defaultValue[1], defaultValue[2]);
@@ -213,7 +213,7 @@ void TransformImpl<ETransformType::Scale>::resetMatrixFromDefaults()
 		scale.y = scale.x;
 		scale.z = scale.x;
 		/////setDefaultUniformScale(scale.x);  // infinite recursion
-		m_defaultValues.at("scale").setValue(scale);
+		getDefaultValueMut("scale").setValue(scale);
 	}
 
 	setInternalValue(glm::scale(scale));
@@ -686,7 +686,7 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 
 	if (coords.x == 3 && coords.y != 3) // last T column
 	{
-		auto& mapPos = m_defaultValues.at("translation");
+		auto& mapPos = getDefaultValueMut("translation");
 		glm::vec3 v = mapPos.getVec3();
 		v[coords.y] = val;
 		mapPos.setValue(v); // direct set of the default value

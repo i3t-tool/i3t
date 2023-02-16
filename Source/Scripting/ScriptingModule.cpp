@@ -303,7 +303,7 @@ void ScriptingModule::init()
 	m_Lua.set_function("execute",
 	                   [this](const std::string& scriptSource)
 	                   {
-		                   script(scriptSource.c_str());
+		                   runScript(scriptSource.c_str());
 	                   });
 
 	m_Lua.set_function("execute_from_file",
@@ -401,12 +401,7 @@ void ScriptingModule::init()
 	// clang-format on
 }
 
-void ScriptingModule::runCommand(const char* inlineLua)
-{
-	script(inlineLua);
-}
-
-void ScriptingModule::script(const char* luaSource)
+bool ScriptingModule::runScript(const char* luaSource)
 {
 	try
 	{
@@ -415,7 +410,10 @@ void ScriptingModule::script(const char* luaSource)
 	catch (const std::exception& e)
 	{
 		print(e.what());
+		return false;
 	}
+
+	return true;
 }
 
 void ScriptingModule::print(const std::string& str)

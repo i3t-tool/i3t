@@ -12,8 +12,7 @@ class ScriptingModule : public Module
 	void init() override;
 
 public:
-	void runCommand(const char* inlineLua);
-	void script(const char* luaSource);
+	bool runScript(const char* luaSource);
 
 	std::ostringstream& outputStream() { return m_oss; }
 
