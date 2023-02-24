@@ -1,4 +1,5 @@
 #include "WorkspaceTransformation.h"
+#include "Tools.h"
 
 #include "../Windows/WorkspaceWindow.h"
 #include "State/StateManager.h"
@@ -104,33 +105,45 @@ bool WorkspaceTransformation::middleContent()
 
 bool WorkspaceTransformation::afterContent()
 {
-	if (dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingIsOn &&
-	    dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFirstTransformation == this)
+	if (Core::GraphManager::isTrackingEnabled())
 	{
 		ImVec2 topleft = m_middleRectDiwne.Min;
 		ImVec2 bottomright = m_middleRectDiwne.Max;
-		if (m_inactiveMark != 0) /* \todo JH \todo MH? kde prosím přečtu tracking? */
+		bool trackingFromLeft = dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft;
+
+		ImVec2 size = bottomright - topleft;
+		if (trackingFromLeft)
 		{
-			ImVec2 size = bottomright - topleft;
-			if (dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft)
-			{
-				bottomright.x -= (1 - m_inactiveMark) * size.x;
-			}
-			else
-			{
-				topleft.x += m_inactiveMark * size.x;
-			}
+				if(m_inactiveMark != 1) //TODO add left tracking possibility
+				{
+					bottomright.x -= (m_inactiveMark) * size.x;
+					diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
+				}
+				else if(m_inactiveMark == 1) { //accounting for yellow mark placement
+					bottomright.x -= (m_inactiveMark) * size.x;
+				}
+		}
+		else if(m_inactiveMark != 0) //RIGHT TRACKING
+		{
+			topleft.x += (1 - m_inactiveMark) * size.x;
 			diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
-			// ImGui::GetWindowDrawList()->AddRectFilled( topleft, bottomright,
-			// ImColor(0.f, 0.f, 0.f, 0.5f) );
+		}
+		else if(m_inactiveMark == 0)
+		{
+			topleft.x += (1 - m_inactiveMark) * size.x;
 		}
 
-		ImVec2 markCenter = ImVec2(dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft ? bottomright.x : topleft.x,
-		                           m_middleRectDiwne.GetCenter().y);
-		ImVec2 markSize = I3T::getSize(ESizeVec2::Nodes_Transformation_TrackingMarkSize);
+		if(std::dynamic_pointer_cast<WorkspaceTransformation>(findNodeById(
+		        dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
+		        dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID()).value()).get()
+		    == this)
+		{
+			ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
+			ImVec2 markSize = I3T::getSize(ESizeVec2::Nodes_Transformation_TrackingMarkSize);
 
-		diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
-		                         I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+			diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
+			                         I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+		}
 	}
 
 	return false;
@@ -222,10 +235,12 @@ void WorkspaceTransformation::drawMenuDelete()
 
 void WorkspaceTransformation::drawMenuTracking()
 {
-	if (ImGui::MenuItem("Switch tracking on", NULL, false, !dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingIsOn))
+	if (ImGui::MenuItem("Switch tracking on",
+	                    NULL,
+	                    false,
+	                    !Core::GraphManager::isTrackingEnabled()))
 	{
-		dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingIsOn = true;
-		dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFirstTransformation = this;
+
 	}
 }
 

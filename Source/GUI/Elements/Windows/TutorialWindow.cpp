@@ -315,7 +315,7 @@ void TutorialWindow::renderTutorialControls()
 	if (m_tutorial)
 	{
 		// PUSH STYLE
-		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialText));
 		// BEGIN CHILD
 		ImGui::BeginChild("controls", ImVec2(0, 0)); // stretch remaining Y space
 		ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));    // vertical spacing
@@ -345,11 +345,11 @@ void TutorialWindow::renderTutorialControls()
 		ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 
 		// BUTTONS
-		// Back button
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
 		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+		// Back button
 		if (m_currentStep != 0)
 		{
 			if (ImGui::Button("< Back", ImVec2(40, NEXT_BUTTON_SIZE_Y)))
@@ -364,12 +364,21 @@ void TutorialWindow::renderTutorialControls()
 		}
 		else
 		{
-			ImGui::Dummy(ImVec2(1, 1)); // need it for making a space before calling sameline
+			if (ImGui::Button("< Start Menu", ImVec2(100, NEXT_BUTTON_SIZE_Y)))
+			{
+				*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
+				this->hide();
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+			}
 		}
 		ImGui::PopStyleColor(3);
 
-		// spacing
+		//spacing
 		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
+
 		// Next button
 		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
@@ -393,6 +402,10 @@ void TutorialWindow::renderTutorialControls()
 				*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
 				this->hide();
 				// std::cout << m_currentStep << std::endl;
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 			}
 		}
 		ImGui::PopFont();
@@ -481,12 +494,18 @@ void TutorialWindow::renderHint(Hint* hint)
 	// ImGui::PopStyleColor();
 	// ImGui::SameLine();
 	//  BUTTON
-	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
+	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+	ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+
 	if (ImGui::Button("Tip", ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
 	{
 		hint->m_expanded = !hint->m_expanded;
 	}
-	ImGui::PopStyleColor();
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+	}
+	ImGui::PopStyleColor(2);
 	ImGui::PopFont();
 
 	// HINT ITSELF
@@ -496,9 +515,9 @@ void TutorialWindow::renderHint(Hint* hint)
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialHint));
 		// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
 		// ImGui::TextWrapped(tw_hint->m_hint.c_str());
-		// ImGui::Indent();
+		ImGui::Indent();
 		ImGui::Markdown(hint->m_content.c_str(), hint->m_content.length(), m_mdConfig);
-		// ImGui::Unindent();
+		ImGui::Unindent();
 		ImGui::PopFont();
 		ImGui::PopStyleColor();
 	}

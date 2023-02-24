@@ -16,7 +16,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
                                                    child class... */
       ,
       m_inactiveMark(I3T::getTheme().get(ESize::Default_InactiveMark)), m_levelOfDetail(WorkspaceLevelOfDetail::Full),
-      m_floatPopupMode(Angle)
+      m_floatPopupMode(Value)
 {
 }
 

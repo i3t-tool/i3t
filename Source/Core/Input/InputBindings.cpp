@@ -60,11 +60,16 @@ void InputBindings::init()
 	// center? */
 
 	/* tracking */
-	InputManager::setInputAxis("trackingLeft", 1.0f, Keys::left);
-	InputManager::setInputAxis("trackingRight", 1.0f, Keys::right);
-	InputManager::setInputAction("trackingSwitch", Keys::up);
-	InputManager::setInputAction("trackingSwitchOff", Keys::down); /* \todo JH maybe some different key when more than 2
-	                                                                  tracking direction? */
+	InputManager::setInputAxis("trackingSmoothLeft", 1.0f, Keys::left);
+	InputManager::setInputAxis("trackingSmoothRight", 1.0f, Keys::right);
+	InputManager::setInputAction("trackingJaggedLeft", Keys::left);
+	InputManager::setInputAction("trackingJaggedRight", Keys::right);
+	InputManager::setInputAction("trackingSwitch", Keys::t);
+	InputManager::setInputAction("trackingModeSwitch", Keys::p);
+	//InputManager::setInputAction("trackingSwitchOn", Keys::p);
+	//InputManager::setInputAction("trackingSwitchOff", Keys::o); /* \todo JH maybe some different key when more than 2
+	// 																																tracking direction? */
+
 
 	InputManager::setInputAxis("selectionRectangle", 1.0f, Keys::mouseLeft);
 

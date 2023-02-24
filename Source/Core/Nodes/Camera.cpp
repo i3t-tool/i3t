@@ -19,10 +19,10 @@ Camera::Camera() : NodeBase(&g_cameraProperties) {}
 
 void Camera::createComponents()
 {
-	m_proj = Builder::createSequence();
+	m_proj = GraphManager::createSequence();
 	// m_proj->setOwner(getPtr());
 
-	m_view = Builder::createSequence();
+	m_view = GraphManager::createSequence();
 	m_view->setOwner(getPtr());
 
 	if (GraphManager::plug(m_proj, m_view) != ENodePlugResult::Ok)

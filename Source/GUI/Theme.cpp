@@ -72,6 +72,7 @@ void Theme::initClassicProperties()
 	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
+	set(EColor::AddMenuHeader, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
 
 	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
 	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
@@ -89,6 +90,8 @@ void Theme::initClassicProperties()
 
 	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
 	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
+
+	set(EColor::TrackingSequenceTint, ImVec4(1.2, 1.2, 1.2, 1));
 
 	// Node Editor
 	//	set(EColor::Nodes_FloatText, ImVec4(255.0f / 255.0f, 255.0f / 255.0f,
@@ -216,6 +219,9 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
 	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
 
+	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
+	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
+
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
@@ -238,7 +244,7 @@ void Theme::initClassicProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 
-	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(50.f, 50.f);
+	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 }
@@ -255,6 +261,7 @@ void Theme::initModernProperties()
 	set(EColor::FloatBg, ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
 	set(EColor::FloatBgHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 	set(EColor::FloatBgActive, ImVec4(0.26f, 0.59f, 0.98f, 0.67f));
+	set(EColor::AddMenuHeader, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
 
 	// Special color for focused docked windows
 	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
@@ -264,6 +271,8 @@ void Theme::initModernProperties()
 
 	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
 	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
+
+	set(EColor::TrackingSequenceTint, ImVec4(1.2, 1.2, 1.2, 1));
 
 	// Node Editor
 	//	set(EColor::Nodes_FloatText, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
@@ -393,6 +402,9 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
 	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
 
+	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
+	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
+
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
@@ -415,7 +427,7 @@ void Theme::initModernProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 
-	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(50.f, 50.f);
+	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 }

@@ -39,8 +39,6 @@ void Application::init()
 	createModule<UIModule>();
 	createModule<ScriptingModule>().init();
 
-	// m_scriptInterpreter = new Scripting();
-
 	Core::GraphManager::init();
 
 	//

@@ -21,6 +21,7 @@
 #include "Operations.h"
 #include "Pin.h"
 #include "Sequence.h"
+#include "Tracking.h"
 #include "TransformImpl.h"
 
 namespace Core
@@ -44,6 +45,8 @@ public:
 	template <ENodeType T> static Ptr<NodeBase> createNode() { return Builder::createNode<T>(); }
 
 	template <ETransformType T> static Ptr<Transformation> createTransform() { return Builder::createTransform<T>(); }
+
+	static Ptr<Sequence> createSequence();
 
 	static CameraPtr createCamera();
 
@@ -151,138 +154,19 @@ public:
 	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
 	static bool arePlugged(const Pin& input, const Pin& output);
 
+	static bool isTrackingEnabled();
+	static void stopTracking();
+
 private:
 	static GraphManager* s_self;
+
+	MatrixTracker m_tracker;
 
 	/// References to created cycle nodes which need to be regularly updated.
 	std::vector<Ptr<Cycle>> m_cycles;
 };
 
 using gm = GraphManager;
-
-class SequenceTree
-{
-	Ptr<Sequence> m_beginSequence;
-
-public:
-	class MatrixIterator
-	{
-		friend class SequenceTree;
-		SequenceTree* m_tree;
-		Ptr<Sequence> m_currentSequence;
-		Ptr<NodeBase> m_currentMatrix;
-
-	public:
-		explicit MatrixIterator(Ptr<Sequence>& sequence);
-		MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
-
-		MatrixIterator(const MatrixIterator& mt);
-
-		/// Move iterator to root sequence.
-		MatrixIterator& operator++();
-
-		/// Move iterator to root sequence.
-		MatrixIterator operator++(int);
-
-		/// Move iterator towards to the leaf sequence.
-		MatrixIterator& operator--();
-
-		/// Move iterator towards to the leaf sequence.
-		MatrixIterator operator--(int);
-
-		Ptr<NodeBase> operator*() const;
-
-		bool operator==(const MatrixIterator& rhs) const;
-		bool operator!=(const MatrixIterator& rhs) const;
-
-	private:
-		/// Move to the next matrix (to the root).
-		void advance();
-
-		/// Move to the previous matrix (from the root).
-		void withdraw();
-	};
-
-public:
-	explicit SequenceTree(Ptr<NodeBase> sequence);
-
-	/**
-	 * \return Iterator which points to the sequence.
-	 */
-	MatrixIterator begin();
-
-	/**
-	 * \return Iterator which points to the sequence root.
-	 */
-	MatrixIterator end();
-};
-
-//----------------------------------------------------------------------------//
-
-namespace Details
-{
-class MatrixTracker
-{
-	glm::mat4 m_interpolatedMatrix;
-	float m_param = 0.0f;
-	bool m_isReversed = false;
-	SequencePtr m_beginSequence;
-
-public:
-	MatrixTracker() = default;
-
-	/**
-	 * @param beginSequence
-	 * @param valuesOnly
-	 * 	`true` - Use tracker for interpolating values only.
-	 * 	`false` - Use tracker
-	 */
-	explicit MatrixTracker(Ptr<Sequence> beginSequence) : m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence) {}
-
-	const glm::mat4& getInterpolatedMatrix() { return m_interpolatedMatrix; }
-
-	float getParam() const { return m_param; }
-
-	void setMode(bool reversed) { m_isReversed = reversed; }
-
-	void setParam(float param);
-
-private:
-	void track();
-};
-} // namespace Details
-
-class IModelProxy
-{
-public:
-	virtual ~IModelProxy(){};
-	virtual void update(const glm::mat4& modelMatrix) = 0;
-};
-
-class MatrixTracker
-{
-public:
-	MatrixTracker() = default;
-	MatrixTracker(Ptr<Sequence> beginSequence, const std::vector<Ptr<IModelProxy>>& modelsToTrack);
-
-	/**
-	 * Set interpolation parameter and calculate interpolated matrix product.
-	 *
-	 * \param param from -1.0f to 1.0f. Use 0-1 param for tracking from right to
-	 * left.
-	 *
-	 * \warning Call the function only on parameter change. Note that it is
-	 * necessary to change parameter on sequence unplug or on matrix remove
-	 * or add.
-	 */
-	void setParam(float param);
-
-	float getParam() const { return m_internal.getParam(); }
-
-private:
-	std::vector<Ptr<IModelProxy>> m_trackedModels;
-	Details::MatrixTracker m_internal;
-};
 
 //----------------------------------------------------------------------------//
 

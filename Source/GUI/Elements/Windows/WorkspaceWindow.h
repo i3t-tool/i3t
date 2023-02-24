@@ -31,6 +31,7 @@
 #include "GUI/Elements/IWindow.h"
 #include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
 
+#include "GUI/Elements/Nodes/Tools.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
 
@@ -55,6 +56,8 @@ public:
 
 	ImDrawListSplitter m_channelSplitter;
 	Memento copiedNodes;
+	Core::MatrixTracker* tracking;
+	bool smoothTracking;
 
 	void popupContent();
 
@@ -126,8 +129,20 @@ public:
 
 		m_workspaceCoreNodes.push_back(node);
 		m_takeSnap = true; /* JH maybe better in place where this function is called*/
-
+		detectRotationTransformAndSetFloatMode(node);
 		return node;
+	}
+
+	void detectRotationTransformAndSetFloatMode(auto node)
+	{
+		if(std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerX>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerY>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerZ>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::Quat>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::AxisAngle>>(node) != nullptr)
+		{
+			std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
+		}
 	}
 
 	template <class T> auto inline addNodeToPositionOfPopup()
@@ -151,14 +166,19 @@ public:
 	ImRect getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes);
 	void zoomToRectangle(ImRect const& rect);
 
-	void trackingLeft();
-	void trackingRight();
+	void trackingSmoothLeft();
+	void trackingSmoothRight();
+	void trackingJaggedLeft();
+	void trackingJaggedRight();
+	void trackingModeSwitch();
 	void trackingSwitch();
+	void trackingSwitchOn();
 	void trackingSwitchOff();
+	Ptr<WorkspaceModel> getSequenceModel(Ptr<WorkspaceSequence> seq);
 
 	void processTrackingMove();
 
-	void deleteSelectedNodes();
+	void deleteCallback();
 	void copySelectedNodes();
 	void pasteSelectedNodes();
 	void duplicateClickedNode();
@@ -187,8 +207,7 @@ public:
 	bool m_resizeDataWidth;
 	bool m_reconnectCameraToSequence;
 
-	bool m_trackingIsOn, m_trackingFromLeft;
-	WorkspaceTransformation* m_trackingFirstTransformation;
+	bool m_trackingFromLeft;
 };
 
 /*! \class class for Workspace window object

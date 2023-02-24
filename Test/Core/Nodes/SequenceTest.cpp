@@ -23,7 +23,7 @@ TEST(SequenceTest, SequenceCanContainMatrices)
 
 TEST(SequenceTest, AddMatrixToTail)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 	auto mat = Builder::createTransform<ETransformType::Free>();
 
 	seq->addMatrix(mat);
@@ -209,7 +209,7 @@ TEST(SequenceTest, ThreeSequencesComposeMatrices)
 
 TEST(SequenceTest, MultipleNotifyKeepsSameValue)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 	auto transform = GraphManager::createTransform<ETransformType::Free>();
 	const auto initialValue = transform->getData().getMat4();
 
@@ -230,7 +230,7 @@ TEST(SequenceTest, MultipleNotifyKeepsSameValue)
 
 TEST(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 	auto transform = GraphManager::createTransform<ETransformType::Free>();
 	seq->addMatrix(transform);
 

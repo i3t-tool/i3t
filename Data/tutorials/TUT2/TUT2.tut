@@ -13,7 +13,7 @@ Ukážeme si:
     * *Škálování* = změna velikosti objektu
     * *Translaci* = změna pozice objektu
 
-S operací *škálování* jsme pracovali v předchozí lekci, tentokrát se ale podíváme na to, jak vlastně *transformace* fungují.
+S operací *škálování* jsme pracovali v předchozí lekci, tentokrát se ale podíváme na to, jak fungují *transformace* obecně.
 
 Pojďme na to
 
@@ -46,8 +46,8 @@ Ta nám umožní na objekty použít všechny *transformace*, které potřebujem
 
 Postup je jednoduchý:
     * Přidej novou souřadnici *W = 1*
-    * Vynásob nové souřadnice maticí transformace
-    * Převeď zpět z homogenních souřadnic - souřadnicí *W* vyděl zbytek souřadnic
+    * *Vynásob nové souřadnice maticí* transformace
+    * *Převeď zpět* z homogenních souřadnic - souřadnicí *W* vyděl zbytek souřadnic
 
 ![Konverze z homogenních do standardních souřadnic](conversion.png)
 
@@ -60,6 +60,8 @@ Když už víš, jak *transformace* fungují, můžeme si ukázat ty nejčastěj
     * *Rotace* = otočení
     * *Translace* = posunutí
 
+![Vizuální demonstrace transformací pokud jsi ztracený](transformations.png)
+
 Nejlepší ale bude, když si *transformace* vyzkoušíš sám/sama.
 
 --
@@ -68,10 +70,12 @@ Nejlepší ale bude, když si *transformace* vyzkoušíš sám/sama.
 
 task: Přidej do workspace bloky sequence a model a propoj je
 hint:
-    Blok přidej kliknutím pravého tlačítka do workspace a výběrem "model" a "sequence" ve Workspace menu.
-    Propojíme je tažením myši ze zeleného výstupu seq do vstupu modelu.
+Bloky přidáváme z workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace).
+Propojíme je tažením myši
 
 ![Bloky sekvence a modelu](sekvencemodel.png)
+
+Nápověda: Pokud chceš místo kostičky *transformovat něco jiného*, můžeš si pravým tlačítkem model změnit na jiný předmět pomocí *"Change Model"*
 --
 
 *Škálování*
@@ -84,8 +88,8 @@ Tato konkrétní matice rovnoměrně *zvětší objekt dvakrát*.
 
 task: Přidej do workplace matici scale, pak jí vlož do sekvence
 hint:
-      Klikni pravým tlačítkem do okna workspace. V menu najeď na "transformations" a vyber "scale".
-      Matici přetáhni do sekvence myší - uchopením za její horní lištu
+Škálování najdeš ve workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace) pod transformation/scale.
+Matici přetáhni myší do sekvence - uchopením za její horní lištu
 
 --
 *Škálování objektu*
@@ -136,22 +140,22 @@ task:
     * Přidej do workspace matici rotace podle osy Y
     * Myší vytáhni z bloku sekvence *matici škálování* a nahraď ji *maticí rotace*
 
-hint: Klikni pravým tlačítkem do okna workspace myší najeď na "transformations", potom na "rotation" a vyber "eulerAngleY"
+hint: ![pravé tlačítko myši](mouseRight.png)  na Workspace, transformation/rotation/eulerAngleY
 
 ![Vyměněné transformace](swapTransform.png)
 
-Kostka se zase zmenší, protože jsme škálování odebrali, teď s ní ale můžeme *otáčet*.
+Kostka se zase *zmenší* (protože jsme škálování odebrali), teď s ní ale můžeme *otáčet*.
 
 --
 *Práce s rotací*
 
 task: Otoč model o 30° pomocí Set value menu
 
-hint: Set value menu zobrazíš kliknutím pravým tlačítkem na libovolnou hodnotu matice
+hint: ![pravé tlačítko myši](mouseRight.png)  na libovolnou hodnotu matice
 
 ![Otočená kostka](rotated_cube.png)
 
-Kostka se krásně natočí podle *osy Y*.
+Kostka se nádherně natočí podle *osy Y*.
 
 Skládáním s *ostatními rotacemi* můžeme model otáčet libovolně. *Skládání transformací* uvidíme v dalším tutoriálu.
 
@@ -174,12 +178,11 @@ Jdeme si zkusit náš model posunout!
 
 task: Odeber matici rotace ze sekvence a nahraď jí novou maticí translace
 hint:
-    Matici ze sekvence vytáhni myší za horní lištu.
-    Matici translace přidáš ve workspace menu přes "transformations/translation".
+Maticemi manipulujeme tažením myši za jejich horní lištu
 
-Teď pošli kostku *trucovat do rohu* našeho *Scene View*!
+Ta koska se mi už nelíbí, posuň jí mimo *Scene view*, ať už se na ní nemusíme koukat.
 
-task: Nakonec uprav hodnoty v matici translace tak, aby kostka ležela v rohu sítě ve Scene View (jako na obrázku)
+task: Nakonec uprav hodnoty v matici translace tak, aby kostka nebyla vidět ve Scene View (jako na obrázku)
 ![Kostka posunutá do rohu](translated_cube.png)
 --
 *Ta kostka si to zaslouží!*

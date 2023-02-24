@@ -51,17 +51,3 @@ private:
 	void init();
 	glm::vec3 calculateTint(glm::vec3 color);
 };
-
-//----------------------------------------------------------------------------//
-
-class TrackingModelProxy : public Core::IModelProxy
-{
-public:
-	TrackingModelProxy(WorkspaceModel& model);
-	~TrackingModelProxy() override;
-
-private:
-	void update(const glm::mat4& modelMatrix) override;
-
-	WPtr<Vp::SceneModel> m_modelCopy;
-};

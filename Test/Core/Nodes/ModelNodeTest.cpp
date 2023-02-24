@@ -12,7 +12,7 @@ using namespace Core;
 TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
 {
 	// auto sequence = arrangeSequence();
-	auto sequence = Builder::createSequence();
+	auto sequence = GraphManager::createSequence();
 	auto transform = Builder::createTransform<ETransformType::Translation>();
 	transform->as<Node>()->setValue(generateVec3());
 

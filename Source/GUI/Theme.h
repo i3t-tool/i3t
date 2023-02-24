@@ -53,6 +53,10 @@ enum class EColor
 	SelectionRectFull,
 	SelectionRectTouch,
 
+	TrackingSequenceTint,
+
+	AddMenuHeader,
+
 	// 2. Pins
 	PulsePin,
 	FloatPin,
@@ -183,7 +187,10 @@ enum class ESize
 	Float_inactive_alphaMultiplicator,
 
 	Default_VisiblePrecision,
-	Default_InactiveMark
+	Default_InactiveMark,
+
+	Tracking_SmoothScrollSpeed,
+	Tracking_JaggedScrollSpeed
 };
 
 enum class ESizeVec2

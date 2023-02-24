@@ -914,7 +914,7 @@ inline void defaultMarkdownFormatCallback( const MarkdownFormatInfo& markdownFor
 			if( start_ )
 			{
 				ImGuiIO& io = ImGui::GetIO();
-				ImGui::PushFont(io.Fonts->Fonts[4]);
+				ImGui::PushFont(io.Fonts->Fonts[4]); //Bold font for tasks
 				ImGui::PushStyleColor( ImGuiCol_Text, ImGui::GetStyle().Colors[ ImGuiCol_TextDisabled ] );
 			}
 			else

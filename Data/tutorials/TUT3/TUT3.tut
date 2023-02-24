@@ -5,7 +5,7 @@ thumbnail: snehulakThumb.png
 scene: empty
 language: cs
 ---
-*Vítej v druhém tutoriálu!*
+*Vítej v třetím tutoriálu!*
 
 V této lekci se naučíš používat *sekvence*.
 Taky se naučíš skládat několik *transformací* dohromady a dokonce si i postavíš sněhuláka!
@@ -38,8 +38,8 @@ V poslední lekci zase:
 task:
   Přidej do scény model krychle. To budou *sněhulákovy nohy*.
 hint:
-  Pravým tlačítkem myši klikni do workspace a zvol "model"
-  ![Přidání krychle](addCube.png)
+Model najdeš ve workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace)
+![Přidání krychle](addCube.png)
 
 Krychle nám bude sloužit jako základ sněhuláka.
 
@@ -51,7 +51,7 @@ Krychle nám bude sloužit jako základ sněhuláka.
 task: Přidej nový blok sekvence, přejmenuj ho na "nohy".
 
 hint:
-    Blok přejmenuješ kliknutím na jeho nadpis.
+Blok přejmenuješ kliknutím na jeho nadpis.
 
 ![Přejmenovaný blok sekvence](nohySeq.png)
 
@@ -60,10 +60,7 @@ hint:
 
 Pro nohy sněhuláka potřebujeme dvě transformační matice, *matici škálování* a *matici translace*
 
-task: Vlož matici scale a translation do bloku "nohy" a propoj ho s modelem
-hint:
-    Matici uchopíme za lištu s nadpisem, přetáhneme nad sekvenci (nohy) a pustíme.
-    Sekvenci propojíme s modelem tažením myši mezi výstupem sekvence a vstupem modelu.
+task: Vlož matici scale a matici translation do bloku "nohy" a propoj ho s modelem
 
 Transformace do sekvence vlož v tomto pořadí. První si ukážeme *opačné pořadí* (POZOR!), než je korektní a to takhle:
 ![Postup násobení](poradi.png)
@@ -80,7 +77,7 @@ Výslednou *maticí M* se pak *násobí* všechny body modelu.
 
 Z teorie lineární algebry víš (určitě), že je pořadí *násobení matic* důležité a různá pořadí vrací *různé výsledky*. To si ukážeme.
 
-Korektní pořadí násobení je vždy *Rotace, Transformace, Škálování*, zkráceně *RTS*
+Korektní pořadí násobení je vždy *Rotace, Translace, Škálování*, zkráceně *RTS*
 
 --
 *Pojďme si transformace vyzkoušet*
@@ -92,10 +89,7 @@ hint:
     ![Správné hodnoty škálování](skalovani1.png)
 
 task:
-    Posuň model tak, aby ležel "na zemi".
-
-hint:
-    ![Správné hodnoty translace](translace1.png)
+    Posuň model po ose Y tak, aby ležel "na zemi" (cca hodnota 2).
 
 ![Výsledná scéna](nohy.png)
 
@@ -103,7 +97,7 @@ hint:
 
 task: Pojďme prohodit pořadí transformací v sekvenci.
 
-hint: Transformace lze prohodit přetažením za lištu a vložením do levé strany bloku "nohy".
+hint: Prohodíš je přetažením za lištu a vložením do levé strany bloku "nohy".
 
 Podívej se na výsledek prohození:
 ![Prohozené matice](nohy2.png)
@@ -124,7 +118,7 @@ hint:
 
 ![Výsledná scéna](nohy.png)
 
-*Vtipná rada: Kolečkem myši na scene view si můžeš scénu oddálit abys na posouvání lépe viděl/a*
+*Připomínka: Kolečkem myši na scene view si můžeš scénu oddálit abys na posouvání lépe viděl/a!*
 --
 *Přidáme tělo*
 task:
@@ -147,9 +141,9 @@ Sněhulák by měl teda vypadat zhruba takhle:
 ![Náš nádherný skvělý a ikonický sněhulák](snehulak.png)
 
 --
-*Co když ale budu chtít sněhuláka uklidit do garáže? Nebo zmenšit aby tál pomaleji?*
+*Co když ale budu chtít sněhuláka uklidit do garáže? Nebo zmenšit, aby tál pomaleji?*
 
-Využijeme toho, že sekvence jde propojovat s dalšími sekvencemi. Pokud pak změníš původní sekvenci, změní se i všechny navazující sekvence!
+Využijeme toho, že sekvence jde propojovat s dalšími sekvencemi. Pokud pak změníš *původní sekvenci*, změní se i všechny *navazující sekvence*!
 
 Propojit sekvence je jednoduché:
 ![Propojení s několika sekvencemi](multseq.png)

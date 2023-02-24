@@ -9,6 +9,9 @@
 
 namespace Core
 {
+class IModelProxy;
+class MatrixTracker;
+
 using Matrices = std::vector<Ptr<Transformation>>;
 
 constexpr size_t I3T_SEQ_IN_MUL = 0; // owned by multiplier
@@ -26,7 +29,7 @@ class Sequence;
 
 namespace Builder
 {
-Ptr<Sequence> createSequence();
+Ptr<Sequence> createSequence(MatrixTracker* tracker);
 } // namespace Builder
 
 /**
@@ -112,7 +115,8 @@ class Sequence : public Node
 	Ptr<Multiplier> m_multiplier;
 
 public:
-	Sequence();
+	Sequence(MatrixTracker* tracker);
+	~Sequence() override;
 
 	Ptr<Node> clone() override;
 
@@ -159,10 +163,15 @@ public:
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
 
+	MatrixTracker* startTracking(UPtr<IModelProxy> modelProxy);
+	void stopTracking();
+
 	void updateValues(int inputIndex) override;
 
 private:
 	void receiveSignal(int inputIndex) override;
+
+	MatrixTracker* m_tracker;
 };
 
 FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
@@ -181,11 +190,4 @@ FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& mat
 }
 
 using SequencePtr = Ptr<Sequence>;
-
-FORCE_INLINE bool isSequence(const NodePtr& p)
-{
-	auto* op = p->getOperation();
-	auto* expected = &g_sequence;
-	return p->getOperation() == &g_sequence;
-}
 } // namespace Core

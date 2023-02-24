@@ -43,7 +43,7 @@ inline glm::mat4 generateMat4() { return glm::mat4(generateVec4(), generateVec4(
 inline Ptr<Sequence> arrangeSequence(int matrices = 3)
 {
 	// Create seq. and matrices.
-	auto seq = Core::Builder::createSequence();
+	auto seq = Core::GraphManager::createSequence();
 
 	auto mat1 = Core::Builder::createTransform<ETransformType::Free>();
 	auto mat2 = Core::Builder::createTransform<ETransformType::Free>();
