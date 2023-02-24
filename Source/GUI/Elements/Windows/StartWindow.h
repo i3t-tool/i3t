@@ -18,6 +18,7 @@ class StartWindow : public IWindow
 public:
 	I3T_WINDOW(StartWindow)
 	StartWindow(bool show);
+	bool popupActive = false;
 
 	/**
 	 * \brief searches through the tutorial directory and adds all found tutorial
@@ -38,4 +39,5 @@ private:
 	std::shared_ptr<GUIImage> m_i3tImage;
 	std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
 	void renderTutorials();
+	void showTutorialPopup();
 };

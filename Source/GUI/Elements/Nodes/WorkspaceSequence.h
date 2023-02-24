@@ -6,6 +6,7 @@ class WorkspaceSequence : public WorkspaceNodeWithCoreDataWithPins
 {
 private:
 	bool m_isCameraSequence;
+	ImVec4 m_tint;
 
 protected:
 	int m_position_of_dummy_data = -1;
@@ -15,7 +16,7 @@ protected:
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceInnerTransformations;
 
 public:
-	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::Builder::createSequence(),
+	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createSequence(),
 	                  bool drawPins = true, bool isCameraSequence = false);
 
 	//===-- Double dispatch
@@ -31,6 +32,9 @@ public:
 	bool isSequence();
 	int getInnerPosition(ImVec2 point);
 	int getInnerPosition(std::vector<ImVec2> points);
+
+	ImVec4 getTint() { return m_tint; }
+	void setTint(ImVec4 tint) { m_tint = tint; }
 
 	virtual bool allowDrawing();
 

@@ -12,11 +12,16 @@ void Model::updateValues(int inputIndex)
 		// Node's update callback
 		auto& targetStorage = m_inputs[0].getStorage();
 		m_modelMatrix = targetStorage.getMat4();
-		Node::updateValues(inputIndex); // Callback
 	}
+
+	Node::updateValues(inputIndex); // Callback
 }
 
-Ptr<Node> Model::clone() { return GraphManager::createModel(); }
+Ptr<Node> Model::clone()
+{
+	/// \todo MH - assign model on clone
+	return GraphManager::createModel();
+}
 
 void Model::onUnplugInput(size_t index)
 {

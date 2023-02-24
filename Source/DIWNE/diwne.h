@@ -73,12 +73,12 @@ struct SettingsDiwne
 	ImVec4 selectionRectFullColor = ImVec4(0.0, 0.0, 1.0, 0.35);
 	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.35);
 
-	ImVec4 itemSelectedBorderColor = ImVec4(0.35, 0.35, 0.35, 1.0);
-	float itemSelectedBorderThicknessDiwne = 2;
+	ImVec4 itemSelectedBorderColor = ImVec4(0.35, 0.35, 0.35, 0.7);
+	float itemSelectedBorderThicknessDiwne = 3;
 
-	ImVec4 objectFocusBorderColor = ImVec4(0.0, 0.0, 0.0, 0.35);
+	ImVec4 objectFocusBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
 	float objectFocusBorderThicknessDiwne = 1.5;
-	ImVec4 objectFocusForInteractionBorderColor = ImVec4(0.0, 0.0, 0.0, 0.7);
+	ImVec4 objectFocusForInteractionBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
 	float objectFocusForInteractionBorderThicknessDiwne = 1.5;
 
 	float middleAlign = 0.5; /*!< value < 0 , 1 > where is horizontal position of

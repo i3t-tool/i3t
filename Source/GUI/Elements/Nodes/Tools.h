@@ -3,6 +3,7 @@
 #include "Core/Defs.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
+#include "Core/Nodes/Tracking.h"
 #include "State/NodeVisitor.h"
 #include "State/Stateful.h"
 
@@ -14,20 +15,17 @@ void duplicateNode(const Ptr<GuiNode>& node);
 
 void pasteNodes(const Memento& memento);
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------//
 
-class Tracking
+class WorkspaceModelProxy : public Core::IModelProxy
 {
 public:
-	Tracking(Ptr<WorkspaceSequence> beginSequence);
+	WorkspaceModelProxy(Ptr<WorkspaceModel> model);
+	~WorkspaceModelProxy() override;
 
-	/**
-	 * \see Core::Matrix::Tracker::setParam.
-	 */
-	void setParam(float value);
-
-	float getParam() const;
+	void update(const glm::mat4& transform) override;
+	Ptr<Core::Model> getModel() override;
 
 private:
-	Core::MatrixTracker m_internal;
+	Ptr<WorkspaceModel> m_model;
 };

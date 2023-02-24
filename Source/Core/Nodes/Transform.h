@@ -287,6 +287,8 @@ public:
 		m_currentIndex = index;
 	}
 
+	float getActivePart() const { return m_activePart; }
+
 protected:
 	DefaultValues m_defaultValues;
 
@@ -317,6 +319,9 @@ protected:
 	bool m_isLocked = true;
 
 private:
+	friend class MatrixTracker;
+	float m_activePart = 1.0;
+
 	bool m_hasSavedData = false;
 
 	/// \todo Rename to m_savedMatrix

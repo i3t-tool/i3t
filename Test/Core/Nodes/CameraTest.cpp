@@ -30,7 +30,7 @@ TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
 {
 	auto camera = GraphManager::createCamera();
-	auto sequence = Builder::createSequence();
+	auto sequence = GraphManager::createSequence();
 
 	EXPECT_TRUE(camera->getOutPin(I3T_CAMERA_OUT_MUL).isDisabled());
 

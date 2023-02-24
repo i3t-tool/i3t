@@ -2,7 +2,7 @@
 #include "../Windows/WorkspaceWindow.h"
 
 WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
-                                     Ptr<Core::NodeBase> nodebase /*= Core::Builder::createSequence()*/,
+                                     Ptr<Core::NodeBase> nodebase /*= Core::GraphManager::createSequence()*/,
                                      bool drawPins /*=true*/, bool isCameraSequence /*=false*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false), m_drawPins(drawPins),
       m_isCameraSequence(isCameraSequence)
@@ -136,7 +136,7 @@ bool WorkspaceSequence::afterContent()
 
 bool WorkspaceSequence::topContent()
 {
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeaderTranformation),
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeaderTranformation)*m_tint,
 	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_Top);
 
 	return WorkspaceNodeWithCoreData::topContent();

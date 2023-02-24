@@ -55,8 +55,10 @@ public:
 	FloatPopupMode& getFloatPopupMode() { return m_floatPopupMode; };
 	void setFloatPopupMode(FloatPopupMode mode) { m_floatPopupMode = mode; };
 
-	float inactiveMarcToLeft(float step = 0.1) { return m_inactiveMark -= step; };
-	float inactiveMarcToRight(float step = 0.1) { return m_inactiveMark += step; };
+	float setInactiveMark(float val) {
+		m_inactiveMark = val;
+		return m_inactiveMark;
+	};
 
 	virtual int maxLenghtOfData() = 0;
 

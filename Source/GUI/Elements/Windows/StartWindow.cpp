@@ -286,6 +286,10 @@ void StartWindow::render()
 					{
 						this->hide();
 					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+					}
 					// ImGui::SameLine();
 					ImGui::Dummy(ImVec2(0, 2));
 					if (ImGui::Button("Load", ImVec2(loadBtnWidth, buttonHeight)))
@@ -315,6 +319,10 @@ void StartWindow::render()
 						{
 							LOG_FATAL("Open failed: WorkspaceWindow not found");
 						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 					}
 					ImGui::PopStyleColor(2);
 					ImGui::PopFont();
@@ -430,7 +438,7 @@ void StartWindow::render()
 							if (tutorial)
 							{
 								// TODO - DIALOG WINDOW CONFIRMATION
-								App::getModule<StateManager>().clear();
+								//App::getModule<StateManager>().clear();
 								LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);
 
@@ -443,6 +451,10 @@ void StartWindow::render()
 							{
 								LOG_INFO("ERR: Tutorial " + header->m_title + " not loaded");
 							}
+						}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 						}
 						ImGui::PopStyleColor();
 						ImGui::PopFont();
@@ -486,6 +498,38 @@ void StartWindow::render()
 	}
 	ImGui::PopStyleVar(5);
 	ImGui::PopStyleColor(7);
+}
+
+void StartWindow::showTutorialPopup()
+{
+	if(!App::getModule<StateManager>().isDirty()) {
+		popupActive = false;
+		return;
+	}
+	ImGui::OpenPopup("Delete current scene?");
+	LOG_INFO("POPUP INITIATED");
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("All those beautiful nodes will be deleted.\nThis operation cannot be undone!");
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			App::getModule<StateManager>().clear();
+			popupActive = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			popupActive = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
 }
 
 void StartWindow::renderTutorials() {}

@@ -2,7 +2,6 @@
 
 #include "sceneGraph/MeshGeometry.h"
 
-#include "Core/Nodes/Model.h"
 #include "Core/Nodes/Node.h"
 
 namespace Core

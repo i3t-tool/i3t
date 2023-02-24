@@ -170,16 +170,3 @@ void WorkspaceModel::drawMenuLevelOfDetail() // todo
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
 	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 }
-
-//----------------------------------------------------------------------------//
-
-TrackingModelProxy::TrackingModelProxy(WorkspaceModel& modelNode)
-{
-	/// \todo Set properties from \p modelNode.
-
-	m_modelCopy = App::get().viewport()->createModel();
-}
-
-TrackingModelProxy::~TrackingModelProxy() { App::get().viewport()->removeEntity(m_modelCopy); }
-
-void TrackingModelProxy::update(const glm::mat4& modelMatrix) { m_modelCopy.lock()->m_modelMatrix = modelMatrix; }

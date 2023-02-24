@@ -63,10 +63,10 @@ Ptr<NodeBase> getRoot(Ptr<NodeBase> node)
 
 TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
 {
-	auto seq1 = Builder::createSequence();
-	auto seq2 = Builder::createSequence();
-	auto seq3 = Builder::createSequence();
-	auto seq4 = Builder::createSequence();
+	auto seq1 = GraphManager::createSequence();
+	auto seq2 = GraphManager::createSequence();
+	auto seq3 = GraphManager::createSequence();
+	auto seq4 = GraphManager::createSequence();
 
 	plug_expectOk(seq1, seq2, 0, 0);
 	plug_expectOk(seq2, seq3, 0, 0);
@@ -80,7 +80,7 @@ TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
 
 TEST(NodeInterfaceTest, GetParentOfNonexistentPin_ShouldReturnNull)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 
 	EXPECT_EQ(nullptr, gm::getParent(seq, 10));
 	EXPECT_EQ(nullptr, gm::getParent(seq, -10));
@@ -121,7 +121,7 @@ TEST(NodeInterfaceTest, TypeShouldBeDeducedFromOperationType)
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnected)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 
 	auto result = GraphManager::getAllInputNodes(seq);
 
@@ -130,9 +130,9 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnEmptyArrayWhenNoNodesConnec
 
 TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
-	auto inputSeq = Builder::createSequence();
-	auto mySeq = Builder::createSequence();
-	auto mat = Builder::createNode<ENodeType::MatrixToMatrix>();
+	auto inputSeq = GraphManager::createSequence();
+	auto mySeq = GraphManager::createSequence();
+	auto mat = GraphManager::createNode<ENodeType::MatrixToMatrix>();
 
 	plug_expectOk(inputSeq, mySeq, 0, 0);
 	plug_expectOk(mat, mySeq, 0, 1);
@@ -144,7 +144,7 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 
 TEST(NodeInterfaceTest, GetNodesConnectedToNonexistentOutputPin)
 {
-	auto seq = Builder::createSequence();
+	auto seq = GraphManager::createSequence();
 
 	EXPECT_THROW(gm::getOutputNodes(seq, 10).empty(), std::exception);
 }

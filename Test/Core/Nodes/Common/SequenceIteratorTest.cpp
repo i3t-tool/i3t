@@ -24,9 +24,9 @@ struct TestTree
 TestTree arrangeSequenceTree()
 {
 	// Prepare graph.
-	auto root = Builder::createSequence();
-	auto branch1 = Builder::createSequence();
-	auto branch2 = Builder::createSequence();
+	auto root = GraphManager::createSequence();
+	auto branch1 = GraphManager::createSequence();
+	auto branch2 = GraphManager::createSequence();
 
 	std::vector<Ptr<Transformation>> matrices = {
 	    // sequence 1

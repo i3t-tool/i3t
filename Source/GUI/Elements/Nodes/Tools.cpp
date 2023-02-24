@@ -44,34 +44,26 @@ void duplicateNode(const Ptr<GuiNode>& node) {
 	pasteNodes(copyNodes(temp));
 }
 
-//----------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------//
 
-Tracking::Tracking(Ptr<WorkspaceSequence> beginSequence)
+WorkspaceModelProxy::WorkspaceModelProxy(Ptr<WorkspaceModel> model)
 {
-	std::vector<Ptr<Core::IModelProxy>> models;
-
-	// Get model connected to the sequence.
-	const auto& modelOutput = beginSequence->getOutputs()[0];
-
-	// Ugly workaround since workspace output pin has no references to connected nodes.
-	const auto& connectedModelsInputs = modelOutput->getCorePin().getOutComponents();
-
-	for (const auto& connectedModelInput : connectedModelsInputs)
-	{
-		const auto coreModelNode = connectedModelInput->getOwner();
-
-		auto& windowManager = App::getModule<UIModule>().getWindowManager();
-		auto& nodeEditor = windowManager.getWindowPtr<WorkspaceWindow>()->getNodeEditor();
-		auto maybeNode = findNodeById(nodeEditor.m_workspaceCoreNodes, coreModelNode->getId());
-		if (auto node = maybeNode.value())
-		{
-			models.push_back(std::make_shared<TrackingModelProxy>((WorkspaceModel&)node));
-		}
-	}
-
-	m_internal = Core::MatrixTracker(beginSequence->getNodebase()->as<Core::Sequence>(), models);
+	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
+	m_model = std::make_shared<WorkspaceModel>(workspace->getNodeEditor());
 }
 
-void Tracking::setParam(float value) { m_internal.setParam(value); }
+WorkspaceModelProxy::~WorkspaceModelProxy()
+{
+	m_model = nullptr;
+}
 
-float Tracking::getParam() const { return m_internal.getParam(); }
+void WorkspaceModelProxy::update(const glm::mat4& transform)
+{
+	getModel()->m_modelMatrix = transform;
+	getModel()->updateValues(0);
+}
+
+Ptr<Core::Model> WorkspaceModelProxy::getModel()
+{
+	return m_model->getNodebase()->as<Core::Model>();
+}

@@ -1,12 +1,13 @@
 #include "Sequence.h"
 
 #include "GraphManager.h"
+#include "Tracking.h"
 
 using namespace Core;
 
-Ptr<Sequence> Builder::createSequence()
+Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
 {
-	auto ret = std::make_shared<Sequence>();
+	auto ret = std::make_shared<Sequence>(tracker);
 	ret->init();
 	ret->createComponents();
 	ret->updateValues(0);
@@ -168,9 +169,20 @@ void Sequence::Multiplier::updateValues(int inputIndex)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence() : NodeBase(&g_sequence) {}
+Sequence::Sequence(MatrixTracker* tracker) : NodeBase(&g_sequence)
+{
+	m_tracker = tracker;
+}
 
-Ptr<Node> Sequence::clone() { return Builder::createSequence(); }
+Sequence::~Sequence()
+{
+	stopTracking();
+}
+
+Ptr<Node> Sequence::clone()
+{
+	return Builder::createSequence(m_tracker);
+}
 
 Pin& Sequence::getIn(size_t i)
 {
@@ -239,6 +251,21 @@ DataStore& Sequence::getInternalData(size_t index)
 	}
 }
 
+MatrixTracker* Sequence::startTracking(UPtr<IModelProxy> modelProxy)
+{
+	*m_tracker = MatrixTracker(shared_from_this()->as<Sequence>(), std::move(modelProxy));
+
+	return m_tracker;
+}
+
+void Sequence::stopTracking()
+{
+	if (m_tracker->getSequence() == shared_from_this()->as<Sequence>())
+	{
+		*m_tracker = MatrixTracker();
+	}
+}
+
 void Sequence::updateValues(int inputIndex)
 {
 	if (inputIndex == -1)
@@ -248,8 +275,12 @@ void Sequence::updateValues(int inputIndex)
 		m_multiplier->updateValues(inputIndex);
 	}
 
+	m_tracker->update();
+
 	if (m_owner)
+	{
 		notifyOwner();
+	}
 }
 
 void Sequence::receiveSignal(int inputIndex)
