@@ -173,6 +173,8 @@ public:
 	bool isMultisampled();
 	void setMultisampled(bool multisample, unsigned int samples);
 
+	unsigned int getSampleCount() const;
+
 	// TODO: (DR) Docs
 	// MSAA Resolve methods
 	void multisampleResolveColors();
@@ -210,6 +212,9 @@ public:
 	 * New resources are allocated.
 	 */
 	void recreate();
+
+	int getWidth() const;
+	int getHeight() const;
 
 private:
 	/**

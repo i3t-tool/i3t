@@ -22,6 +22,7 @@ private:
 
 	// initial render texture size - should be large enough or changed during zoom
 	ImVec2 m_textureSize = {84, 100};
+	UPtr<Vp::Framebuffer> m_framebuffer = nullptr;
 
 public:
 	bool m_axisOn{true};

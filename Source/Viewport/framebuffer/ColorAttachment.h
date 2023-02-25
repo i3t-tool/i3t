@@ -38,6 +38,11 @@ public:
 	 */
 	ColorAttachment(GLint internalFormat, GLint format, GLsizei width, GLsizei height, GLenum type);
 
+	/**
+	 * Copy constructor
+	 */
+	ColorAttachment(const ColorAttachment& attchmt);
+
 	void create();
 	void resize(int width, int height);
 	void bind() const;
