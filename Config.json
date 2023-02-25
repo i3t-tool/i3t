@@ -7,7 +7,7 @@
     },
     {
       "name": "Cube",
-      "path": "Data/Models/Cube.gltf",
+      "path": "Data/Models/CubeFixed.gltf",
       "type": "Model"
     },
     {

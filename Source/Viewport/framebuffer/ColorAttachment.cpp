@@ -18,6 +18,14 @@ ColorAttachment::ColorAttachment(GLint internalFormat, GLint format, GLsizei wid
 	// Empty
 }
 
+ColorAttachment::ColorAttachment(const ColorAttachment& attchmt)
+    : m_index(attchmt.m_index), m_multisampled(attchmt.m_multisampled), m_samples(attchmt.m_samples),
+      m_format(attchmt.m_format), m_internalFormat(attchmt.m_internalFormat), m_width(attchmt.m_width),
+      m_height(attchmt.m_height), m_type(attchmt.m_type), syncSizeWithFramebuffer(attchmt.syncSizeWithFramebuffer),
+      m_texture(attchmt.m_texture)
+{
+}
+
 void ColorAttachment::create()
 {
 	glGenTextures(1, &m_texture);

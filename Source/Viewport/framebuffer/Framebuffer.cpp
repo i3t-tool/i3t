@@ -197,7 +197,7 @@ void Framebuffer::resize(int width, int height)
 
 	if (FRAMEBUFFER_DEBUG)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width,
-		          m_height, width, height);
+		         m_height, width, height);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -349,6 +349,8 @@ void Framebuffer::setMultisampled(bool multisample, unsigned int samples)
 
 bool Framebuffer::isMultisampled() { return m_multisample; }
 
+unsigned int Framebuffer::getSampleCount() const { return m_samples; }
+
 void Framebuffer::multisampleResolveColors()
 {
 	for (int i = 0; i < m_colorAttachments.size(); i++)
@@ -432,3 +434,6 @@ void Framebuffer::setDrawBuffers()
 		glDrawBuffers(colorBuffers.size(), &colorBuffers[0]);
 	}
 }
+
+int Framebuffer::getWidth() const { return m_width; }
+int Framebuffer::getHeight() const { return m_height; }

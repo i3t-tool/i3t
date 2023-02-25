@@ -146,9 +146,47 @@ bool WorkspaceModel::middleContent()
 	Ptr<Vp::Framebuffer> framebuffer =
 	    App::get().viewport()->drawPreview(m_textureSize.x, m_textureSize.y, m_viewportModel).lock();
 
-	if (framebuffer)
+	// This is the original solution to the duplicate model preview issue, uncomment this and comment the jank one to
+	// return to how things were
+	//	// ORIGINAL START ///////////////////////////////////
+	//	if (framebuffer)
+	//	{
+	//		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
+	//		             ImVec2(1.0f, 0.0f) // vertical flip
+	//		);
+	//	}
+	//	else
+	//	{
+	//		ImGui::Text("Failed to draw preview!");
+	//	}
+	//	// ORIGINAL END /////////////////////////////////////
+
+	// JANK START ///////////////////////////////////////
+	// This is a janky workaround for an issue
+	// TODO: (DR) Make this a proper function of the Vp::Framebuffer class
+
+	if (m_framebuffer == nullptr)
 	{
-		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
+		m_framebuffer = std::make_unique<Vp::Framebuffer>(framebuffer->getWidth(), framebuffer->getHeight(),
+		                                                  framebuffer->isMultisampled(), framebuffer->getSampleCount());
+
+		Vp::ColorAttachment colorAttachment = Vp::ColorAttachment(framebuffer->getColorAttachment(0));
+		m_framebuffer->addColorAttachment(colorAttachment);
+	}
+	// Will break if other parameters change
+	m_framebuffer->update(framebuffer->getWidth(), framebuffer->getHeight());
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer->getId());
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getId());
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glBlitFramebuffer(0, 0, framebuffer->getWidth(), framebuffer->getHeight(), 0, 0, framebuffer->getWidth(),
+	                  framebuffer->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	if (m_framebuffer)
+	{
+		ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
 		             ImVec2(1.0f, 0.0f) // vertical flip
 		);
 	}
@@ -156,6 +194,7 @@ bool WorkspaceModel::middleContent()
 	{
 		ImGui::Text("Failed to draw preview!");
 	}
+	// JANK END ///////////////////////////////////////
 
 	return interaction_happen;
 }
