@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "glm/glm.hpp"
 #include "imgui.h"
@@ -18,5 +19,8 @@ ImVec4 glmToIm(const glm::vec4& v);
 inline glm::vec2 convertCoordinates(glm::vec2 position, glm::vec2 newOrigin) { return position - newOrigin; }
 
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color);
+
+void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,
+                 float thickness = 1.0f);
 
 } // namespace GUI

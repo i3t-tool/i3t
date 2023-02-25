@@ -15,20 +15,23 @@
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Viewport/Viewport.h"
+#include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "World/Components.h"
 #include "World/World.h"
 
 using namespace UI;
 
-ViewportWindow::ViewportWindow(bool show, World* world2) : IWindow(show)
+using CameraMode = Vp::AggregateCamera::CameraMode;
+
+ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show)
 {
-	m_world = world2;
+	m_viewport = viewport;
 	// TODO: (DR) Not sure if binding callbacks to an axis really makes sense
 	//  Binding like this hides where the actual action is meant to occur, like here, binding zoom in the viewport window
 	//  and its difficult to unbind stuff
 	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
-	Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
+	// Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
 	renderOptions.wboit = false;
 	renderOptions.framebufferAlpha = false;
@@ -43,10 +46,6 @@ ViewportWindow::ViewportWindow(bool show, World* world2) : IWindow(show)
 	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// init vectors definig size to display
-	m_wcMin = ImVec2(0, 0);
-	m_wcMax = ImVec2(0, 0);
 
 	/// \todo MH This is example code, it can be removed anytime.
 	InputManager::setInputAction("fire", Keys::b);
@@ -93,10 +92,10 @@ void ViewportWindow::render()
 	if (InputManager::isInputActive(getInputPtr()))
 	{
 		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
-		App::get().viewport()->processInput(relativeMousePos, m_windowSize);
+		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
 	}
 	Ptr<Vp::Framebuffer> framebuffer =
-	    App::get().viewport()->drawViewport(windowWidth, windowHeight, renderOptions, displayOptions).lock();
+	    m_viewport->drawViewport(windowWidth, windowHeight, renderOptions, displayOptions).lock();
 
 	if (framebuffer)
 	{
@@ -150,6 +149,34 @@ void ViewportWindow::showViewportMenu()
 	}
 	if (ImGui::BeginMenu("View"))
 	{
+		if (ImGui::MenuItem("Orbit camera", nullptr, m_viewport->getSettings().mainScene_cameraMode == CameraMode::ORBIT))
+		{
+			if (auto camera = m_viewport->getViewportCamera().lock())
+			{
+				camera->switchMode(CameraMode::ORBIT);
+				m_viewport->getSettings().mainScene_cameraMode = CameraMode::ORBIT;
+			}
+		}
+		if (ImGui::MenuItem("Trackball camera", nullptr,
+		                    m_viewport->getSettings().mainScene_cameraMode == CameraMode::TRACKBALL))
+		{
+			if (auto camera = m_viewport->getViewportCamera().lock())
+			{
+				camera->switchMode(CameraMode::TRACKBALL);
+				m_viewport->getSettings().mainScene_cameraMode = CameraMode::TRACKBALL;
+			}
+		}
+		if (ImGui::MenuItem("Smooth scroll", nullptr, m_viewport->getSettings().camera_smoothScroll))
+		{
+			if (auto camera = m_viewport->getViewportCamera().lock())
+			{
+				m_viewport->getSettings().camera_smoothScroll = !m_viewport->getSettings().camera_smoothScroll;
+				camera->getOrbitCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
+				camera->getTrackballCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
+			}
+		}
+
+		ImGui::Separator();
 		ImGui::MenuItem("Show objects", nullptr, &displayOptions.showDefault);
 		ImGui::MenuItem("Show axes", nullptr, &displayOptions.showAxes);
 		ImGui::MenuItem("Show grid", nullptr, &displayOptions.showGrid);

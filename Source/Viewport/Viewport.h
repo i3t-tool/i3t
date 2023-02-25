@@ -13,10 +13,13 @@
 
 #include "pgr.h"
 
-#include "Viewport/scene/DisplayOptions.h"
-#include "Viewport/scene/MainScene.h"
-#include "Viewport/scene/RenderOptions.h"
+#include "Viewport/camera/ICamera.h"
+#include "Viewport/data/ViewportSettings.h"
+#include "Viewport/data/DisplayOptions.h"
+#include "Viewport/data/RenderOptions.h"
 #include "Viewport/scene/Scene.h"
+#include "Viewport/scene/scenes/MainScene.h"
+#include "Viewport/scene/scenes/PreviewScene.h"
 #include "Viewport/shader/Shaders.h"
 
 namespace Vp
@@ -25,6 +28,7 @@ class Entity;
 class GameObject;
 class SceneModel;
 class SceneCamera;
+class AggregateCamera;
 
 class ColorShader;
 class PhongShader;
@@ -71,16 +75,17 @@ private:
 
 	// Scenes
 	std::unique_ptr<MainScene> m_mainScene;
-	std::unique_ptr<Scene> m_previewScene;
+	std::unique_ptr<PreviewScene> m_previewScene;
 
 	// Scene render targets (buffers scenes are rendered into)
 	Ptr<SceneRenderTarget> viewportRenderTarget;
 	Ptr<SceneRenderTarget> screenRenderTarget;
 	Ptr<SceneRenderTarget> previewRenderTarget;
 
-	// Shaders
 	// TODO: (DR) Should perhaps be a static or singleton class
 	std::unique_ptr<Shaders> m_shaders;
+
+	ViewportSettings m_settings;
 
 public:
 	/**
@@ -93,7 +98,7 @@ public:
 	/**
 	 * Initializes scenes and loads assets.
 	 */
-	void init();
+	void init(ViewportSettings settings);
 
 	/**
 	 * Render viewport's main scene into a framebuffer using its own camera.
@@ -137,22 +142,23 @@ public:
 	/**
 	 * Update scene logic
 	 */
-	void update();
+	void update(double dt);
 
 	// TODO: (DR) A little issue arises if this method were to be called multiple
 	// 	times per frame. I'm not sure if that ever happens (multiple scene viewports of the same scene?).
-	// 	But if so, then this method needs to be called only once per frame as not
-	// 	not speed up controls etc. 	(Eg. mouse movement would be processed twice)
+	// 	But if so, then this method needs to be called only once per frame as not to speed up controls etc.
+	// 	(Eg. mouse movement would be processed twice)
 	/**
 	 * Process viewport user input. Should be called before draw and only if the
 	 * viewport is in focus. InputManager is used to handle input.
 	 *
 	 * Ensure this methods is only called once per frame.
 	 *
+	 * @param dt Time since last frame
 	 * @param mousePos Current mouse position relative to the window
 	 * @param windowSize Current window size
 	 */
-	void processInput(glm::vec2 mousePos, glm::ivec2 windowSize);
+	void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize);
 
 	/**
 	 * Creates a SceneModel in the main scene to represent a Model node.
@@ -177,7 +183,11 @@ public:
 		m_mainScene->removeEntity(entity);
 	}
 
-private:
-	void initPreviewScene(Scene& scene);
+	/**
+	 * Returns the viewport camera of the main scene.
+	 */
+	std::weak_ptr<AggregateCamera> getViewportCamera();
+
+	ViewportSettings& getSettings();
 };
 } // namespace Vp

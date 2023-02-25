@@ -10,8 +10,8 @@
 //---------------
 #include "WorkspaceElementsWithCoreData.h"
 
-#include "Viewport/scene/DisplayOptions.h"
-#include "Viewport/scene/RenderOptions.h"
+#include "Viewport/data/DisplayOptions.h"
+#include "Viewport/data/RenderOptions.h"
 
 class WorkspaceScreen : public WorkspaceNodeWithCoreDataWithPins
 {

@@ -5,6 +5,8 @@
 
 #include "Viewport/Shaper.h"
 #include "Viewport/Viewport.h"
+#include "Viewport/camera/AggregateCamera.h"
+#include "Viewport/camera/ICamera.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/GridShader.h"
 #include "Viewport/shader/PhongShader.h"
@@ -16,8 +18,8 @@ using namespace Vp;
 
 Scene::Scene(Viewport* viewport) : m_viewport(viewport)
 {
-	m_camera = std::make_unique<Camera>();
-	m_lighting = std::make_unique<Lighting>();
+	m_camera = std::make_shared<AggregateCamera>();
+	m_lighting = std::make_shared<Lighting>();
 }
 
 void Scene::draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions)
@@ -25,7 +27,7 @@ void Scene::draw(int width, int height, SceneRenderTarget& renderTarget, const D
 	m_camera->size(width, height);
 	m_camera->update();
 
-	return draw(width, height, m_camera->m_view, m_camera->m_projection, renderTarget, displayOptions);
+	return draw(width, height, m_camera->getView(), m_camera->getProjection(), renderTarget, displayOptions);
 }
 
 // TODO: (DR) Find a way to set glClear color and alpha initial value (should be 0 for transparent buffers and
@@ -296,7 +298,7 @@ void Scene::renderSortedTransparentEntities(glm::mat4 view, glm::mat4 projection
 	}
 }
 
-void Scene::update()
+void Scene::update(double dt)
 {
 	for (auto& entity : m_entities)
 	{
@@ -304,6 +306,7 @@ void Scene::update()
 	}
 }
 
-void Scene::processInput(glm::vec2 mousePos, glm::ivec2 windowSize) {
-	m_camera->processInput(mousePos, windowSize);
+void Scene::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize)
+{
+	m_camera->processInput(dt, mousePos, windowSize);
 }

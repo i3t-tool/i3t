@@ -69,4 +69,33 @@ void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size,
 	                        ImVec2(pos.x + ceil(size / 2), pos.y + ceil(thickness / 2)), color);
 }
 
+void drawEllipse(float cx, float cy, float rx, float ry, int num_segments, ImDrawList* drawList, ImColor color,
+                 float thickness)
+{
+	// Adapted from https://stackoverflow.com/a/34735255/3452003
+	std::vector<ImVec2> points;
+	points.reserve(num_segments);
+
+	float theta = 2 * 3.1415926 / float(num_segments);
+	float c = cosf(theta); // precalculate the sine and cosine
+	float s = sinf(theta);
+	float t;
+
+	float x = 1; // we start at angle = 0
+	float y = 0;
+
+	for (int ii = 0; ii < num_segments; ii++)
+	{
+		// apply radius and offset
+		points.push_back({x * rx + cx, y * ry + cy});
+
+		// apply the rotation matrix
+		t = x;
+		x = c * x - s * y;
+		y = s * t + c * y;
+	}
+
+	drawList->AddPolyline(&points[0], points.size(), color, ImDrawFlags_Closed, thickness);
+}
+
 } // namespace GUI

@@ -1,18 +1,16 @@
 #include "Viewport.h"
 
-#include "imgui.h"
-
 #include "Core/Resources/ResourceManager.h"
 #include "Logger/Logger.h"
 #include "Utils/Color.h"
 
 #include "Viewport/Shaper.h"
+#include "Viewport/camera/AggregateCamera.h"
+#include "Viewport/camera/OrbitCamera.h"
 #include "Viewport/entity/GameObject.h"
 #include "Viewport/entity/SceneCamera.h"
 #include "Viewport/entity/SceneModel.h"
-#include "Viewport/scene/Lighting.h"
 #include "Viewport/scene/SceneRenderTarget.h"
-#include "Viewport/scene/lights/SunLight.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/FrustumShader.h"
 #include "Viewport/shader/GridShader.h"
@@ -21,11 +19,6 @@
 
 using namespace Vp;
 
-#define PREVIEW_RADIUS_FACTOR 1.72f
-#define PREVIEW_ROTATE_SPEED 40.0f
-#define PREVIEW_FOV 60
-#define PREVIEW_CAMERA_X 50.0f
-
 Viewport::Viewport()
 {
 	// Empty
@@ -33,8 +26,10 @@ Viewport::Viewport()
 
 Viewport::~Viewport() = default;
 
-void Viewport::init()
+void Viewport::init(ViewportSettings settings)
 {
+	m_settings = settings;
+
 	// Load shaders
 	m_shaders = std::make_unique<Shaders>();
 	m_shaders->create();
@@ -48,10 +43,10 @@ void Viewport::init()
 
 	// Setup scenes
 	m_mainScene = std::make_unique<MainScene>(this);
-	m_previewScene = std::make_unique<Scene>(this);
+	m_previewScene = std::make_unique<PreviewScene>(this);
 
 	m_mainScene->init();
-	initPreviewScene(*m_previewScene);
+	m_previewScene->init();
 
 	// Setup scene render targets
 	RenderOptions previewOptions;
@@ -85,7 +80,8 @@ WPtr<Framebuffer> Viewport::drawPreview(int width, int height, std::weak_ptr<Gam
 		// Set camera distance
 		float radius =
 		    glm::distance(gameObjectPtr->m_mesh->m_boundingBoxMin, gameObjectPtr->m_mesh->m_boundingBoxMax) / 2.0f;
-		m_previewScene->m_camera->setRadius(radius * PREVIEW_RADIUS_FACTOR);
+
+		m_previewScene->m_orbitCamera->setRadius(radius * m_settings.preview_radiusFactor);
 
 		// Make object visible
 		bool visibleTemp = gameObjectPtr->m_visible;
@@ -117,18 +113,17 @@ WPtr<Framebuffer> Viewport::drawPreview(int width, int height, std::weak_ptr<Gam
 	}
 }
 
-void Viewport::update()
+void Viewport::update(double dt)
 {
-	float dt = ImGui::GetIO().DeltaTime;
+	m_mainScene->update(dt);
 
-	m_mainScene->update();
-
-	m_previewScene->m_camera->setRotationX(m_previewScene->m_camera->getRotationX() + PREVIEW_ROTATE_SPEED * dt);
+	m_previewScene->m_orbitCamera->setRotationX(m_previewScene->m_orbitCamera->getRotationX() +
+	                                            m_settings.preview_rotateSpeed * dt);
 }
 
-void Viewport::processInput(glm::vec2 mousePos, glm::ivec2 windowSize)
+void Viewport::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize)
 {
-	m_mainScene->processInput(mousePos, windowSize);
+	m_mainScene->processInput(dt, mousePos, windowSize);
 }
 
 std::weak_ptr<SceneModel> Viewport::createModel()
@@ -147,23 +142,10 @@ std::weak_ptr<SceneCamera> Viewport::createCamera()
 	return sceneCamera;
 }
 
-void Viewport::initPreviewScene(Scene& scene)
+std::weak_ptr<AggregateCamera> Viewport::getViewportCamera()
 {
-	scene.m_camera->setFov(PREVIEW_FOV);
-	scene.m_camera->setRotationX(PREVIEW_CAMERA_X);
-
-	// Lights
-	SunLight* sun = new SunLight();
-	sun->intensity = 0.8f;
-	sun->color = glm::vec3(0.93, 0.98, 1.0);
-	sun->direction = glm::vec3(-0.73, -0.64, -0.21);
-	sun->pos = glm::vec3(0, 4, 0);
-	scene.m_lighting->addLight(sun);
-
-	SunLight* sun2 = new SunLight();
-	sun2->intensity = 0.12f;
-	sun2->color = glm::vec3(0.69f, 0.91f, 1.0f);
-	sun2->direction = glm::vec3(0.76, 0.58, -0.12);
-	sun->pos = glm::vec3(0, 2, 0);
-	scene.m_lighting->addLight(sun2);
+	std::shared_ptr<AggregateCamera> camera = std::dynamic_pointer_cast<AggregateCamera>(m_mainScene->m_camera);
+	return camera;
 }
+
+ViewportSettings& Viewport::getSettings() { return m_settings; }
