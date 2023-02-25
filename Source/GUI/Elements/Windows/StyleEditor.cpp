@@ -21,6 +21,8 @@ void StyleEditor::render()
 {
 	ImGui::Begin(getID(), getShowPtr(), g_dialogFlags);
 
+	this->updateWindowInfo();
+
 	auto& curr = I3T::getTheme();
 
 	// Theme selector

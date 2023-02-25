@@ -12,6 +12,7 @@
 
 #include "../Nodes/WorkspaceElementsWithCoreData.h"
 
+#include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/framebuffer/Framebuffer.h"
@@ -23,6 +24,10 @@ using namespace UI;
 ViewportWindow::ViewportWindow(bool show, World* world2) : IWindow(show)
 {
 	m_world = world2;
+	// TODO: (DR) Not sure if binding callbacks to an axis really makes sense
+	//  Binding like this hides where the actual action is meant to occur, like here, binding zoom in the viewport window
+	//  and its difficult to unbind stuff
+	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
 	Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
 	renderOptions.wboit = false;
@@ -55,108 +60,59 @@ ViewportWindow::ViewportWindow(bool show, World* world2) : IWindow(show)
 	/// todoend
 }
 
-float localData;
-
 void ViewportWindow::render()
 {
 	// ImVec2 main_viewport_pos = ImGui::GetMainViewport()->Pos;
 	// ImGui::SetNextWindowPos(ImVec2(main_viewport_pos.x + 650,
 	// main_viewport_pos.y + 20), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
+	auto name = setName("Scene View");
+	ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+
+	// Get info about current window's dimensions
+	this->updateWindowInfo();
+
+	int windowWidth = m_windowSize.x;
+	int windowHeight = m_windowSize.y;
+	ImVec2 windowMin = GUI::glmToIm(m_windowMin);
+	ImVec2 windowMax = GUI::glmToIm(m_windowMax);
+
+	if (ImGui::BeginMenuBar())
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
-		auto name = setName("Scene View");
-		ImGui::Begin(name.c_str(), getShowPtr(), g_WindowFlags | ImGuiWindowFlags_MenuBar); // | ImGuiWindowFlags_MenuBar);
-		ImGui::PopStyleColor();
-		ImGui::PopStyleVar();
-
-		if (ImGui::BeginMenuBar())
-		{
-			showViewportsMenu();
-
-			ImGui::EndMenuBar();
-		}
-
-		// TODO: (DR) what is this doing?
-		InputManager::processViewportEvents();
-
-		// get positions of min max points of the window
-		ImVec2 newWcMin = ImGui::GetWindowContentRegionMin();
-		ImVec2 newWcMax = ImGui::GetWindowContentRegionMax();
-		// change them to actual screen positions
-		newWcMin.x += ImGui::GetWindowPos().x;
-		newWcMin.y += ImGui::GetWindowPos().y;
-		newWcMax.x += ImGui::GetWindowPos().x;
-		newWcMax.y += ImGui::GetWindowPos().y;
-
-		m_wcMin = newWcMin;
-		m_wcMax = newWcMax;
-
-		int width = static_cast<int>(abs(newWcMax.x - newWcMin.x));
-		int height = static_cast<int>(abs(newWcMax.y - newWcMin.y));
-
-		// ImGui::GetWindowDrawList()->AddCallback(render_callback, NULL); // Option
-		// 1 (did not manage to get it working correctly - too hard to grasp all the
-		// stuff for it)
-
-		if (InputManager::isFocused<UI::ViewportWindow>())
-		{
-			App::get().viewport()->processInput();
-		}
-		Ptr<Vp::Framebuffer> framebuffer =
-		    App::get().viewport()->drawViewport(width, height, renderOptions, displayOptions).lock();
-
-		// ImGui::GetForegroundDrawList()->AddRect(m_wcMin, m_wcMax, IM_COL32(255,
-		// 255, 0, 255)); // test
-
-		if (framebuffer)
-		{
-
-			// GLuint texture = framebuffer->getColorAttachment(0).m_texture;
-			GLuint texture = framebuffer->getColorTexture();
-			// the uv coordinates flips the picture, since it was upside down at first
-			ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, m_wcMin, m_wcMax, ImVec2(0, 1), ImVec2(1, 0));
-
-			// WIP code for button popups
-			//			if (ImGui::Button("With a menu.."))
-			//				ImGui::OpenPopup("my_file_popup");
-			//			if (ImGui::BeginPopup("my_file_popup", ImGuiWindowFlags_NoMove))
-			//			{
-			//				ImGui::Text("File yeah");
-			//				bool e = true;
-			//				ImGui::Checkbox("Poggers", &e);
-			////				if (ImGui::BeginMenuBar())
-			////				{
-			////					if (ImGui::BeginMenu("File"))
-			////					{
-			////						ImGui::Text("File yeah");
-			////						bool e = true;
-			////						ImGui::Checkbox("Box", &e);
-			////						ImGui::EndMenu();
-			////					}
-			////					if (ImGui::BeginMenu("Edit"))
-			////					{
-			////						ImGui::MenuItem("Dummy");
-			////						ImGui::EndMenu();
-			////					}
-			////					ImGui::EndMenuBar();
-			////				}
-			//				ImGui::Text("Hello from popup!");
-			//				ImGui::Button("This is a dummy button..");
-			//				ImGui::EndPopup();
-			//			}
-		}
-		else
-		{
-			ImGui::Text("Failed to draw viewport!");
-		}
-
-		ImGui::End();
+		showViewportMenu();
+		ImGui::EndMenuBar();
 	}
+
+	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
+	//  the InputManager's active input rather than asking the WindowManager
+	if (InputManager::isInputActive(getInputPtr()))
+	{
+		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
+		App::get().viewport()->processInput(relativeMousePos, m_windowSize);
+	}
+	Ptr<Vp::Framebuffer> framebuffer =
+	    App::get().viewport()->drawViewport(windowWidth, windowHeight, renderOptions, displayOptions).lock();
+
+	if (framebuffer)
+	{
+		GLuint texture = framebuffer->getColorTexture();
+		// the uv coordinates flips the picture, since it was upside down at first
+		ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, windowMin, windowMax, ImVec2(0, 1), ImVec2(1, 0));
+	}
+	else
+	{
+		ImGui::Text("Failed to draw viewport!");
+	}
+
+	ImGui::End();
 }
 
-void ViewportWindow::showViewportsMenu()
+void ViewportWindow::showViewportMenu()
 {
 	if (ImGui::BeginMenu("Settings"))
 	{

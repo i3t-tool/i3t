@@ -82,10 +82,10 @@ public:
 	virtual void popupContent();
 
 	// TODO: (DR) Mouse buttons are "hard-coded" in DiwneObject, presumably JH was
-	// trying to hook them up to
-	// the InputManager. But that change was only made here and not in the
-	// DiwneObject superclass causing inconsistent behaviour. So I commented these
-	// overrides out for the time being
+	//  trying to hook them up to
+	//  the InputManager. But that change was only made here and not in the
+	//  DiwneObject superclass causing inconsistent behaviour. So I commented these
+	//  overrides out for the time being
 
 	// bool bypassDragAction();
 	// bool bypassHoldAction();

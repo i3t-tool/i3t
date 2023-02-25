@@ -4,8 +4,8 @@
 #include "imgui_internal.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Core/Application.h"
 #include "Logger/Logger.h"
+#include "Toolkit.h"
 
 std::string WindowManager::makeIDNice(const char* ID)
 {
@@ -53,16 +53,15 @@ void WindowManager::updateFocus()
 }
 void WindowManager::draw()
 {
+	// Render dockable windows
 	for (auto element : m_dockableWindows)
 	{
 		if (element->isVisible())
 		{
 			element->render();
 		}
-		// if (InputController::isKeyJustPressed(Keys::f)) { printf("UP
-		// %s\n",element->getID()); }
 	}
-	// if (InputController::isKeyJustPressed(Keys::f)) { printf("--- \n"); }
+
 	// Render other windows.
 	for (const auto& [id, w] : m_windows)
 	{
@@ -71,10 +70,36 @@ void WindowManager::draw()
 			w->render();
 		}
 	}
+
+	// Draw debug cursors at mouse position
+	if (App::get().m_debugWindowManager)
+	{
+		float thickness = 1.0f;
+		float size = 32.0f;
+
+		GUI::drawCross({InputManager::m_mouseX, InputManager::m_mouseY}, ImGui::GetForegroundDrawList(), thickness, size,
+		               ImColor(1.f, 0.f, 1.f, 1.0f));
+		GUI::drawCross({ImGui::GetMousePos().x, ImGui::GetMousePos().y}, ImGui::GetForegroundDrawList(), thickness, size,
+		               ImColor(1.f, 1.f, 0.f, 1.0f));
+	}
 }
-void WindowManager::addWindow(Ptr<IWindow> window) { m_dockableWindows.push_back(window); }
+
+void WindowManager::addWindow(Ptr<IWindow> window)
+{
+	m_dockableWindows.push_back(window);
+	window->m_windowManager = this;
+}
+
 void WindowManager::clear()
 {
+	for (auto& window : m_windows)
+	{
+		window.second->m_windowManager = nullptr;
+	}
+	for (auto& window : m_dockableWindows)
+	{
+		window->m_windowManager = nullptr;
+	}
 	m_windows.clear();
 	m_dockableWindows.clear();
 }
@@ -141,11 +166,9 @@ void WindowManager::updateWindowFocus()
 	// LOG_DEBUG("New focused window: {}", (newFocusedWindowName ? newFocusedWindowName : "null"));
 	if (newFocusedWindow != nullptr)
 	{
-		if (newFocusedWindow != InputManager::getFocusedWindow())
+		if (newFocusedWindow != getFocusedWindow())
 		{
-			ImGui::SetWindowFocus(newFocusedWindowName);
-			InputManager::setFocusedWindow(newFocusedWindow);
-			SetFocusedWindowCommand::dispatch(newFocusedWindow);
+			focusWindow(newFocusedWindow);
 		}
 	}
 }
@@ -154,19 +177,28 @@ Ptr<IWindow> WindowManager::findAnyWindow(std::string ID)
 {
 	Ptr<IWindow> window = findWindow(ID.c_str(), m_dockableWindows);
 
-	if (m_windows.count(ID) != 0)
+	if (window == nullptr)
 	{
-		window = m_windows[ID];
-	};
+		auto it = m_windows.find(ID);
+		if (it != m_windows.end())
+		{
+			window = it->second;
+		}
+	}
 	return window;
 }
 
-void WindowManager::popWindow(const std::string& windowId)
+void WindowManager::removeWindow(const std::string& windowId)
 {
-	if (hasWindow(windowId))
-		m_windows.erase(windowId);
+	auto it = m_windows.find(windowId);
+	if (it != m_windows.end())
+	{
+		it->second->m_windowManager = nullptr;
+		m_windows.erase(it);
+	}
 }
 
+// TODO: (DR) This only checks m_windows and not dockable windows, that is not clear from its signature
 bool WindowManager::hasWindow(const std::string& id) { return m_windows.count(id); }
 
 void WindowManager::showWindow(IWindow* window, bool show)
@@ -180,9 +212,18 @@ void WindowManager::showWindow(IWindow* window, bool show)
 	windowVisibilityChangedThisFrame = true;
 }
 
-void WindowManager::focusWindow(IWindow* window)
+void WindowManager::showWindow(Ptr<IWindow> window, bool show) { showWindow(window.get(), show); }
+
+void WindowManager::focusWindow(IWindow* window) { focusWindow(findAnyWindow(window->getID())); }
+
+void WindowManager::focusWindow(Ptr<IWindow> window)
 {
-	Ptr<IWindow> ptr = findAnyWindow(window->getID());
 	ImGui::SetWindowFocus(window->getName().c_str());
-	SetFocusedWindowCommand::dispatch(ptr);
+	m_focusedWindow = window;
+	SetFocusedWindowCommand::dispatch(window);
+}
+
+glm::vec2 WindowManager::getMousePositionForWindow(const IWindow* window)
+{
+	return GUI::convertCoordinates({InputManager::m_mouseX, InputManager::m_mouseY}, window->m_windowPos);
 }

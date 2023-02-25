@@ -1,13 +1,14 @@
 /**
  * \file	GUI/Elements/IWindow.h
  *
- * GUI element class.
+ * ImGui GUI Window abstract class
  */
 #pragma once
 
 #include <string>
 
 #include "spdlog/fmt/fmt.h"
+#include "glm/vec2.hpp"
 
 #include "Core/Input/InputController.h"
 
@@ -16,13 +17,31 @@ public:                                                                         
 	static constexpr const char* ID = #WindowType;                                                                       \
 	[[nodiscard]] const char* getID() const override { return ID; }
 
+class WindowManager;
+
 /**
  * ImGui GUI Window abstract class.
+ * Every window should call its IWindow::updateWindowInfo() method after ImGui::Begin() call.
  *
- * \see ~IWindow for lifecycle information.
+ * \see WindowManager for lifecycle information.
  */
-class IWindow
+class IWindow : public std::enable_shared_from_this<IWindow>
 {
+	friend class WindowManager;
+public:
+	// Window info (updated by updateWindowInfo())
+	glm::vec2 m_windowPos;   ///< Top-left corner of the window in screen coordinates
+	glm::ivec2 m_windowSize; ///< Window width and height dimensions
+
+	glm::vec2 m_windowMin; ///< Top left corner of the window, same as m_windowPos (separate variable for clarity)
+	glm::vec2 m_windowMax; ///< Bottom right corner of the window
+
+protected:
+	bool m_show;
+	std::string m_name;
+	InputController Input;
+
+	WindowManager* m_windowManager = nullptr; ///< Weak reference to a WindowManager set when this window is added to it
 public:
 	friend class Application;
 	friend class InputManager;
@@ -52,7 +71,11 @@ public:
 	InputController* getInputPtr() { return &Input; }
 
 protected:
-	bool m_show;
-	std::string m_name;
-	InputController Input;
+	/**
+	 * Collect information about the current window. Should be called right after ImGui's Begin() function
+	 * to store and supply window's screen position and size to any code being called until another window starts being
+	 * constructed. If this call is omitted after beginning a window anything querying the WindowManager for window
+	 * position and dimensions may receive invalid information.
+	 */
+	void updateWindowInfo();
 };

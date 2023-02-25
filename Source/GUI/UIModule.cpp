@@ -26,12 +26,9 @@ UIModule::~UIModule() { delete m_menu; }
 
 void UIModule::init()
 {
-	SetFocusedWindowCommand::addListener(
-	    [](Ptr<IWindow> window)
-	    {
-		    InputManager::setActiveInput(&(window->getInput()));
-		    InputManager::setFocusedWindow(window);
-	    });
+	// Switch active InputController when window focus changes
+	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window)
+	                                     { InputManager::setActiveInput(&(window->getInput())); });
 
 	Theme::initNames();
 
@@ -45,7 +42,7 @@ void UIModule::init()
 	m_windowManager.addWindow(std::make_shared<LogWindow>());
 	m_windowManager.addWindow(std::make_shared<StyleEditor>());
 
-	HideWindowCommand::addListener([this](const std::string& id) { m_windowManager.popWindow(id); });
+	HideWindowCommand::addListener([this](const std::string& id) { m_windowManager.removeWindow(id); });
 
 	// Setup Dear ImGui context after OpenGL context.
 	IMGUI_CHECKVERSION();
@@ -99,6 +96,7 @@ void UIModule::beginFrame()
 	// Draw windows
 	m_windowManager.draw();
 
+	// TODO: (DR) Unused, resolve, old camera handling
 	queryCameraState();
 
 	// ImGui rendering ----------------------------------------------------------
@@ -297,7 +295,7 @@ void UIModule::buildDockspace()
 void UIModule::queryCameraState()
 {
 	/// \todo This code causes dockspace crash.
-	// TODO: (DR) Resolve
+	// TODO: (DR) Old code used for camera mouse drag handling, unused, probably delete in the future
 	return;
 
 	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))

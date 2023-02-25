@@ -211,6 +211,8 @@ void TutorialWindow::render()
 	ImGui::Begin(window_name.c_str(), getShowPtr());
 	ImGui::PopStyleColor();
 
+	this->updateWindowInfo();
+
 	//// ADD A MENU TO GET TO WELCOME WINDOW
 	// ImVec2 center = ImGui::GetCurrentWindow()->MenuBarRect().GetCenter();
 	// ImGui::GetForegroundDrawList()->AddCircleFilled(center, 50, IM_COL32(0, 0,

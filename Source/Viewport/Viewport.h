@@ -140,14 +140,19 @@ public:
 	void update();
 
 	// TODO: (DR) A little issue arises if this method were to be called multiple
-	//	times per frame. 	I'm not sure if that ever happens (multiple scene viewports of the same scene?).
+	// 	times per frame. I'm not sure if that ever happens (multiple scene viewports of the same scene?).
 	// 	But if so, then this method needs to be called only once per frame as not
 	// 	not speed up controls etc. 	(Eg. mouse movement would be processed twice)
 	/**
 	 * Process viewport user input. Should be called before draw and only if the
 	 * viewport is in focus. InputManager is used to handle input.
+	 *
+	 * Ensure this methods is only called once per frame.
+	 *
+	 * @param mousePos Current mouse position relative to the window
+	 * @param windowSize Current window size
 	 */
-	void processInput();
+	void processInput(glm::vec2 mousePos, glm::ivec2 windowSize);
 
 	/**
 	 * Creates a SceneModel in the main scene to represent a Model node.

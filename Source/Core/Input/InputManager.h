@@ -22,6 +22,11 @@
 
 struct GLFWwindow;
 
+// TODO: (DR) For InputManager to remain in Core, it should be completely separated from ImGui,
+//  that likely means it could only function as an Interface with a ImGuiInputManager implementation or so located in
+//  the GUI package
+// TODO: (DR) Refactoring and doc
+
 /** State of the three mouse buttons (does not store the state of the
  * modificators */
 struct MouseButtonState final
@@ -72,26 +77,26 @@ public:
 	/// changed in update()
 	static std::map<Keys::Code, KeyState> m_keyMap;
 
-	static int m_winWidth, m_winHeight; ///< Window size
-
 	static MouseButtonState m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed)
 	                                            ///< without modifiers.
 	///< \todo passed to all handlers, but probably not used
 
+	// TODO: (DR) Never accessed, unused? Related
 	static bool m_ignoreImGuiEvents;
-	static glm::vec2 m_mouseOffset;
-	static float m_mouseX, m_mouseY, m_mouseXPrev, m_mouseYPrev; ///< mouse cursor position
-	static float m_mouseXDelta, m_mouseYDelta;
-	static float m_mouseXDragDelta, m_mouseYDragDelta;
-	static float m_mouseWheelOffset;
+
+	static float m_mouseX, m_mouseY; ///< Current mouse cursor position in screen coordinates (0 is corner of the monitor)
+	static float m_mouseXPrev, m_mouseYPrev; ///< Previous frame's cursor position
+	static float m_mouseXDelta, m_mouseYDelta; ///< Change of the cursor position across last two frames
+	static float m_mouseXDragDelta, m_mouseYDragDelta; ///< Same as mouse delta but only non-zero during some mouse press
+	static float m_mouseWheelOffset; ///< Immediate mouse scroll change
 
 private:
 	static std::vector<InputController*> m_inputControllers;
-	static Ptr<IWindow> m_focusedWindow;
 
 public:
 	static void init();
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
+	static glm::vec2 getMousePos() { return {m_mouseX, m_mouseY}; }
 
 	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
 
@@ -105,29 +110,15 @@ public:
 	static bool areModifiersActive(Modifiers mods);
 
 	/**
-	 * Set focused window for key input.
-	 *
-	 * \warning Focused window must be set from ImGui Context.
-	 */
-	static void setFocusedWindow(Ptr<IWindow>& window) { m_focusedWindow = window; }
-
-	/**
 	 * Set active input controller (for focused window).
 	 */
 	static void setActiveInput(InputController* input);
 
+	/**
+	 * Check if the specified input controller is active.
+	 * Window input controller will be active when the window is focused.
+	 */
 	static bool isInputActive(InputController* input);
-
-	template <typename T> static bool isFocused()
-	{
-		static_assert(std::is_base_of_v<IWindow, T>, "Template param must be derived from IWindow type.");
-
-		if (m_focusedWindow)
-			return strcmp(m_focusedWindow->getID(), T::ID) == 0;
-		return false;
-	}
-
-	static Ptr<IWindow> getFocusedWindow() { return m_focusedWindow; }
 
 public:
 	//@{
@@ -146,17 +137,19 @@ public:
 	//===----------------------------------------------------------------------===//
 
 	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
-
 	static bool isKeyPressed(const Keys::Code code) { return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN); }
-
 	static bool isKeyJustPressed(const Keys::Code code) { return (m_keyMap[code] == JUST_DOWN); }
-
 	static bool isKeyJustUp(const Keys::Code code) { return (m_keyMap[code] == JUST_UP); }
 
-	/// \returns whether one of three mouse buttons was clicked.
+	/**
+	 * @return Whether any of the mouse buttons was clicked
+	 */
 	static bool isMouseClicked();
+
+	/**
+	 * @return Whether any of the mouse buttons is pressed
+	 */
 	static bool isMouseDown();
-	//@}
 
 	/**
 	 * Locks cursor before camera drag or rotation.
@@ -165,29 +158,6 @@ public:
 
 	/** Unlock the cursor after camera interaction. */
 	static void endCameraControl();
-
-	// TODO: (DR) Unused
-	/**
-	 * Sets screen size - called from GUI::resize(), which is called by
-	 * main.onReshape()
-	 *
-	 * \param width The screen width.
-	 * \param	height The screen height.
-	 */
-	static void setScreenSize(const int width, const int height)
-	{
-		m_winWidth = width;
-		m_winHeight = height;
-	}
-
-	//@{
-	/** \name Handling the mouse */
-	/**
-	 * \brief Copies state of the mouse buttons from keyMap into bool variables of
-	 * the mouseButtonState
-	 */
-	static void preUpdate();
-	//@}
 
 	/**
 	 * Process action and axis events.

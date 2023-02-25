@@ -126,7 +126,10 @@ void Viewport::update()
 	m_previewScene->m_camera->setRotationX(m_previewScene->m_camera->getRotationX() + PREVIEW_ROTATE_SPEED * dt);
 }
 
-void Viewport::processInput() { m_mainScene->processInput(); }
+void Viewport::processInput(glm::vec2 mousePos, glm::ivec2 windowSize)
+{
+	m_mainScene->processInput(mousePos, windowSize);
+}
 
 std::weak_ptr<SceneModel> Viewport::createModel()
 {

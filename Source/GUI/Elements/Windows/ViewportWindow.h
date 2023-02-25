@@ -33,6 +33,6 @@ private:
 	ImVec2 m_wcMin;
 	ImVec2 m_wcMax;
 
-	void showViewportsMenu();
+	void showViewportMenu();
 };
 } // namespace UI

@@ -96,7 +96,7 @@ public:
 	/**
 	 * Updates the internal camera state with user input.
 	 */
-	void processInput();
+	void processInput(glm::vec2 mousePos, glm::ivec2 windowSize);
 
 private:
 	void mouseDrag(float dx, float dy, bool left, bool middle);
