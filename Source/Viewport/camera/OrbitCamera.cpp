@@ -1,0 +1,125 @@
+#include "OrbitCamera.h"
+
+#include "glm/gtc/matrix_transform.hpp"
+
+#include "Core/Input/InputManager.h"
+
+using namespace Vp;
+
+void OrbitCamera::update()
+{
+	glm::mat4 cameraTransform = glm::mat4(1.0f);
+	cameraTransform = glm::translate(cameraTransform, m_pivot);
+	cameraTransform = glm::rotate(cameraTransform, glm::radians(m_rotationX), glm::vec3(0.0f, 1.0f, 0.0f));
+	cameraTransform = glm::rotate(cameraTransform, glm::radians(m_rotationY), glm::vec3(0.0f, 0.0f, 1.0f));
+	cameraTransform = glm::translate(cameraTransform, glm::vec3(m_radius, 0.0f, 0.0f));
+
+	const glm::vec4 cameraPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0);
+	const glm::vec4 cameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0);
+
+	const glm::vec3 cameraPosWorld = glm::vec3(cameraTransform * cameraPos);
+	const glm::vec3 cameraUpWorld = glm::vec3(cameraTransform * cameraUp);
+
+	m_view = glm::lookAt(cameraPosWorld, m_pivot, cameraUpWorld);
+
+	m_projection = createProjectionMatrix(true);
+
+	m_position = cameraPosWorld;
+	m_up = glm::normalize(cameraUpWorld);
+	m_direction = glm::normalize(m_pivot - glm::vec3(cameraPosWorld));
+	m_right = glm::cross(m_up, m_direction);
+}
+
+void OrbitCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize)
+{
+	float dx = InputManager::m_mouseXDelta;
+	float dy = InputManager::m_mouseYDelta;
+
+	// TODO: (DR) Make pan speed dependent on window size
+	// TODO: (DR) Idea: Implement perfect panning on world grid? https://prideout.net/blog/perfect_panning/
+
+	mouseDrag(dx, dy, InputManager::isAxisActive("rotate"), InputManager::isAxisActive("pan"));
+
+	// Scroll zoom
+	if (InputManager::m_mouseWheelOffset != 0)
+	{
+		m_dScroll = InputManager::m_mouseWheelOffset;
+	}
+
+	mouseWheel(m_dScroll * (m_smoothScroll ? 1 : 4));
+
+	m_dScroll *= 0.88f * dt * 144 * (m_smoothScroll ? 1 : 0);
+	if (m_dScroll * m_dScroll < 0.0005f)
+	{
+		m_dScroll = 0.0f;
+	}
+}
+
+void OrbitCamera::mouseDrag(float dx, float dy, bool rotate, bool pan)
+{
+	// Rotate
+	if (rotate)
+	{
+
+		// The code below flips the horizontal rotate direction when the camera
+		// turns "upside-down" That is, when vertical rotation is in the range of
+		// > 90 and < 270 However in case of a continuous mouse drag the direction
+		// isn't flipped until the next drag as to not suddenly change direction
+		float rot = fmodf(abs(m_rotationY), 360.0f);
+		bool upsideDown = rot > 90.0f && rot < 270.0f;
+		if (!m_isRotating)
+		{
+			// Rotation just started
+			m_rotateStartedUpsideDown = upsideDown;
+		}
+		if (m_rotateStartedUpsideDown)
+		{
+			dx *= -1;
+		}
+		m_rotationX += -dx * m_rotateSpeed;
+		m_rotationY += dy * m_rotateSpeed;
+
+		m_isRotating = true;
+	}
+	else
+	{
+		m_isRotating = false;
+	}
+	// Pan
+	if (pan)
+	{
+		glm::vec3 oldPivot = glm::vec3(m_pivot);
+
+		const float ratio = m_radius / m_zNear / 100.0f;
+		m_pivot += glm::vec3(m_right) * (m_translateSpeed * dx * ratio);
+		m_pivot += glm::vec3(m_up) * (m_translateSpeed * dy * ratio);
+	}
+}
+
+void OrbitCamera::mouseWheel(float scroll)
+{
+	if (scroll == 0)
+		return;
+
+	const float ratio = m_radius / m_zNear / 100.0f;
+	m_radius = m_radius - scroll * m_zoomSpeed * ratio;
+	if (m_radius < 0.01f)
+	{
+		m_radius = 0.01f;
+	}
+}
+
+float OrbitCamera::getRotationX() const { return m_rotationX; }
+void OrbitCamera::setRotationX(float rotationX) { m_rotationX = rotationX; }
+
+float OrbitCamera::getRotationY() const { return m_rotationY; }
+void OrbitCamera::setRotationY(float rotationY) { m_rotationY = rotationY; }
+
+float OrbitCamera::getZoomSpeed() const { return m_zoomSpeed; }
+void OrbitCamera::setZoomSpeed(float zoomSpeed) { m_zoomSpeed = zoomSpeed; }
+float OrbitCamera::getRotateSpeed() const { return m_rotateSpeed; }
+void OrbitCamera::setRotateSpeed(float rotateSpeed) { m_rotateSpeed = rotateSpeed; }
+float OrbitCamera::getTranslateSpeed() const { return m_translateSpeed; }
+void OrbitCamera::setTranslateSpeed(float translateSpeed) { m_translateSpeed = translateSpeed; }
+bool OrbitCamera::getSmoothScroll() const { return m_smoothScroll; }
+void OrbitCamera::setSmoothScroll(bool b) { m_smoothScroll = b; }

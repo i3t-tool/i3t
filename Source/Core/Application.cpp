@@ -9,15 +9,11 @@
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/Elements/Modals/BeforeNewModal.h"
-#include "GUI/Elements/Windows/TutorialWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
-#include "Loader/ConfigLoader.h"
 #include "Logger/Logger.h"
 #include "Scripting/ScriptingModule.h"
 #include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
-#include "Utils/Color.h"
-#include "Utils/TextureLoader.h"
 #include "Viewport/Viewport.h"
 #include "World/World.h"
 
@@ -153,6 +149,20 @@ void Application::run()
 
 		// Update and display.
 		onDisplay();
+		logicUpdate(delta);
+
+		// Input update must be called after rendering. (Due to some values being zero-ed out too early)
+		// Might be better to update inputs before rendering to reduce input lag and retain consistency with ImGui
+		// That would require slight InputManager modifications and testing
+		// TODO: (DR) Enabling window manager debug and setting glfwSwapInterval(10) shows the input lag I mentioned
+		//  (Watch the yellow and purple cursors on the mouse. Purple InputManager position is lagging behind the yellow
+		//  one,
+		//	which is also kinda lagging, but thats probably normal)
+		//  Not critical but might be worth fixing.
+		InputManager::update();
+
+		// glfwSwapBuffers(m_window);
+		m_window->swapBuffers();
 	}
 }
 
@@ -176,23 +186,9 @@ void Application::onDisplay()
 
 	for (auto& [_, m] : m_modules)
 		m->endFrame();
-
-	logicUpdate();
-
-	// Input update must be called after rendering. (Due to some values being zero-ed out too early)
-	// Might be better to update inputs before rendering to reduce input lag and retain consistency with ImGui
-	// That would require slight InputManager modifications and testing
-	// TODO: (DR) Enabling window manager debug and setting glfwSwapInterval(10) shows the input lag I mentioned
-	//  (Watch the yellow and purple cursors on the mouse. Purple InputManager position is lagging behind the yellow one,
-	//	which is also kinda lagging, but thats probably normal)
-	//  Not critical but might be worth fixing.
-	InputManager::update();
-
-	// glfwSwapBuffers(m_window);
-	m_window->swapBuffers();
 }
 
-void Application::logicUpdate() { viewport()->update(); }
+void Application::logicUpdate(double delta) { viewport()->update(delta); }
 
 void Application::finalize()
 {
@@ -224,7 +220,7 @@ bool Application::initI3T()
 	// getchar(); printf("c\n");
 
 	m_viewport = new Vp::Viewport();
-	m_viewport->init();
+	m_viewport->init(Vp::ViewportSettings());
 
 	return b;
 }

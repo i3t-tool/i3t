@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 
-#include "Viewport/Camera.h"
 #include "Viewport/shader/ObjectShader.h"
 
 using namespace Vp;

@@ -7,17 +7,16 @@
 
 #include "Logger/Logger.h"
 
-#include "Viewport/Camera.h"
+#include "Viewport/data/DisplayOptions.h"
 #include "Viewport/entity/GameObject.h"
 #include "Viewport/framebuffer/Framebuffer.h"
-#include "Viewport/scene/DisplayOptions.h"
 #include "Viewport/scene/Lighting.h"
 
 namespace Vp
 {
 class Viewport;
 class Entity;
-class Camera;
+class ICamera;
 class Lighting;
 class SceneRenderTarget;
 class RenderOptions;
@@ -32,8 +31,8 @@ public:
 	friend class Viewport;
 	Viewport* m_viewport;
 
-	std::unique_ptr<Camera> m_camera;
-	std::unique_ptr<Lighting> m_lighting;
+	std::shared_ptr<ICamera> m_camera;
+	std::shared_ptr<Lighting> m_lighting;
 
 protected:
 	std::vector<std::shared_ptr<Entity>> m_entities;
@@ -70,15 +69,16 @@ public:
 	/**
 	 * Update entity logic.
 	 */
-	virtual void update();
+	virtual void update(double dt);
 
 	/**
 	 * Update input logic.
 	 *
+	 * @param dt Time since last frame
 	 * @param mousePos Current mouse position relative to the window
 	 * @param windowSize Current window size
 	 */
-	void processInput(glm::vec2 mousePos, glm::ivec2 windowSize);
+	void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize);
 
 	/**
 	 * Adds entity to the scene.

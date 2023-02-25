@@ -43,6 +43,39 @@ void MainScene::init()
 {
 	Scene::init();
 
+	// Camera
+	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera)) {
+		camera->switchMode(m_viewport->m_settings.mainScene_cameraMode);
+		camera->getOrbitCamera()->setRotationX(m_viewport->m_settings.mainScene_orbitCameraRotationX);
+		camera->getOrbitCamera()->setRotationY(m_viewport->m_settings.mainScene_orbitCameraRotationY);
+
+		camera->getOrbitCamera()->setRadius(m_viewport->m_settings.mainScene_iorbitCameraRadius);
+		camera->getTrackballCamera()->setRadius(m_viewport->m_settings.mainScene_iorbitCameraRadius);
+
+		camera->getOrbitCamera()->setPivot(m_viewport->m_settings.mainScene_iorbitCameraPivot);
+		camera->getTrackballCamera()->setPivot(m_viewport->m_settings.mainScene_iorbitCameraPivot);
+
+		camera->getOrbitCamera()->setSmoothScroll(m_viewport->m_settings.camera_smoothScroll);
+		camera->getTrackballCamera()->setSmoothScroll(m_viewport->m_settings.camera_smoothScroll);
+
+		camera->getOrbitCamera()->setFov(m_viewport->m_settings.camera_fov);
+		camera->getTrackballCamera()->setFov(m_viewport->m_settings.camera_fov);
+
+		camera->getOrbitCamera()->setZNear(m_viewport->m_settings.camera_zNear);
+		camera->getTrackballCamera()->setZNear(m_viewport->m_settings.camera_zNear);
+
+		camera->getOrbitCamera()->setZFar(m_viewport->m_settings.camera_zFar);
+		camera->getTrackballCamera()->setZFar(m_viewport->m_settings.camera_zFar);
+
+		camera->getOrbitCamera()->setRotateSpeed(m_viewport->m_settings.orbitCamera_rotateSpeed);
+		camera->getOrbitCamera()->setTranslateSpeed(m_viewport->m_settings.orbitCamera_translateSpeed);
+		camera->getOrbitCamera()->setZoomSpeed(m_viewport->m_settings.orbitCamera_zoomSpeed);
+
+		camera->getTrackballCamera()->setRotateSpeed(m_viewport->m_settings.trackballCamera_rotateSpeed);
+		camera->getTrackballCamera()->setTranslateSpeed(m_viewport->m_settings.trackballCamera_translateSpeed);
+		camera->getTrackballCamera()->setZoomSpeed(m_viewport->m_settings.trackballCamera_zoomSpeed);
+	}
+
 	// Lights
 	SunLight* sun = new SunLight();
 	sun->intensity = 0.8f;

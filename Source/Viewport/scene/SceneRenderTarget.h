@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "Viewport/data/RenderOptions.h"
 #include "Viewport/framebuffer/Framebuffer.h"
-#include "Viewport/scene/RenderOptions.h"
 
 namespace Vp
 {

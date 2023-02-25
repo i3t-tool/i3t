@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene.h"
+#include "Viewport/scene/Scene.h"
 
 namespace Vp
 {

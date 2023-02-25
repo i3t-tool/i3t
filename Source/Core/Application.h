@@ -141,6 +141,7 @@ private:
 
 public:
 	bool m_debugWindowManager = false; ///< Debug switch for WindowManager, toggled in Help > Debug window manager
+	bool m_debugTrackball = false; ///< Debug switch for WindowManager, toggled in Help > Debug trackball
 
 	/**
 	 * \brief	GLUT Callback: render the whole I3T window (update the Logic, draw
@@ -167,11 +168,12 @@ public:
 	 */
 	void onClose();
 
+	// TODO: (DR) Somewhat outdated docs
 	/**
 	 * \brief	Updates the world and the mouse button state, mouseDelta, mousePrev
 	 * and throws JUST_Pressed to PRESSED PreUpdate, world update, update
 	 */
-	void logicUpdate();
+	void logicUpdate(double delta);
 };
 
 template <typename T, typename... Args> inline auto& Application::createModule(Args&&... args)
