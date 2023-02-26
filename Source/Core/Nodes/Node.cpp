@@ -88,6 +88,22 @@ void Node::init()
 			m_OperatorState.push_back(EValueState::Locked);
 }
 
+Ptr<Node> Node::getRootOwner()
+{
+	auto topMost = m_owner;
+	while (topMost)
+	{
+		if (topMost->m_owner == nullptr)
+		{
+			break;
+		}
+
+		topMost = topMost->m_owner;
+	}
+
+	return topMost;
+}
+
 void Node::notifyOwner()
 {
 	if (m_owner)
@@ -203,6 +219,17 @@ ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
 	{
 		// Not a circular edge?
 		return ENodePlugResult::Err_Loopback;
+	}
+	else
+	{
+		// Check node owners in the case of nested nodes.
+		const auto lhsRoot = out->m_master->getRootOwner();
+		const auto rhsRoot = inp->m_master->getRootOwner();
+
+		if (lhsRoot != nullptr && rhsRoot != nullptr && lhsRoot == rhsRoot)
+		{
+			return ENodePlugResult::Err_Loopback;
+		}
 	}
 
 	// cycle detector
