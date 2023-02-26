@@ -12,7 +12,10 @@ Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index)
 	m_id = generator.next();
 }
 
-[[nodiscard]] Ptr<Node> Pin::getOwner() const { return m_master->getPtr(); };
+[[nodiscard]] Ptr<Node> Pin::getOwner() const
+{
+	return m_master->getPtr();
+};
 
 const DataStore& Pin::data() const
 {

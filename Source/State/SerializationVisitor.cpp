@@ -382,7 +382,19 @@ void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::No
 	{
 		if (input.isPluggedIn() && m_ids.contains(input.getParentPin()->getOwner()->getId()))
 		{
-			auto fromId = input.getParentPin()->getOwner()->getId();
+			// tricky part
+			auto parent = input.getParentPin()->getOwner();
+			if (parent->getRootOwner())
+			{
+				parent = parent->getRootOwner();
+			}
+
+			if (!m_ids.contains(parent->getId()))
+			{
+				continue;
+			}
+
+			auto fromId = parent->getId();
 			const int fromPin = input.getParentPin()->getIndex();
 			auto toId = node->getId();
 			const int toPin = input.getIndex();
