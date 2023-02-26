@@ -16,17 +16,21 @@ namespace NodeDeserializer
 {
 void createFrom(const Memento& memento)
 {
+	std::map<Core::ID, Core::ID> oldToNewID;
+
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
-		NodeDeserializer::createOperator(value);
+		const auto node = NodeDeserializer::createOperator(value);
+		oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["sequences"].GetArray())
 	{
-		NodeDeserializer::createSequence(value);
+		const auto node = NodeDeserializer::createSequence(value);
+		oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
 	//
@@ -36,6 +40,7 @@ void createFrom(const Memento& memento)
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
 		cycle->setSelected(true);
 		NodeDeserializer::assignCommon(value, cycle);
+		oldToNewID[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
 
 	//
@@ -45,6 +50,7 @@ void createFrom(const Memento& memento)
 		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
 		camera->setSelected(true);
 		NodeDeserializer::assignCommon(value, camera);
+		oldToNewID[value["id"].GetInt()] = camera->getNodebase()->getId();
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView());
@@ -60,6 +66,7 @@ void createFrom(const Memento& memento)
 		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
 		screen->setSelected(true);
 		NodeDeserializer::assignCommon(value, screen);
+		oldToNewID[value["id"].GetInt()] = screen->getNodebase()->getId();
 	}
 
 	//
@@ -69,6 +76,7 @@ void createFrom(const Memento& memento)
 		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
 		model->setSelected(true);
 		NodeDeserializer::assignCommon(value, model);
+		oldToNewID[value["id"].GetInt()] = model->getNodebase()->getId();
 	}
 
 	//
@@ -76,7 +84,8 @@ void createFrom(const Memento& memento)
 	const auto& transforms = memento["workspace"]["transforms"];
 	for (auto& value : transforms.GetArray())
 	{
-		NodeDeserializer::createTransform(value);
+		const auto transform = NodeDeserializer::createTransform(value);
+		oldToNewID[value["id"].GetInt()] = transform->getNodebase()->getId();
 	}
 
 	// connect edges
@@ -90,8 +99,13 @@ void createFrom(const Memento& memento)
 
 	for (auto& edge : edges.GetArray())
 	{
-		auto maybeLhs = findNodeById(workspaceNodes, edge[0].GetInt());
-		auto maybeRhs = findNodeById(workspaceNodes, edge[2].GetInt());
+		auto oldLhsID = edge[0].GetInt();
+		auto oldRhsID = edge[2].GetInt();
+		auto lhsID = oldToNewID.at(edge[0].GetInt());
+		auto rhsID = oldToNewID.at(edge[2].GetInt());
+
+		auto maybeLhs = findNodeById(workspaceNodes, lhsID);
+		auto maybeRhs = findNodeById(workspaceNodes, rhsID);
 		if (maybeLhs.has_value() && maybeRhs.has_value())
 		{
 			const auto lhs = maybeLhs.value();
@@ -243,10 +257,10 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 
 void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 {
-	const auto id = value["id"].GetInt();
+	// const auto id = value["id"].GetInt();
 	const auto position = JSON::getVec2(value["position"].GetArray());
 
-	node->getNodebase()->changeId(id);
+	// node->getNodebase()->changeId(id);
 	node->setNodePositionDiwne(position);
 }
 

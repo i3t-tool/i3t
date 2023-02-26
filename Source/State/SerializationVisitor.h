@@ -19,24 +19,6 @@ public:
 	{
 	}
 
-	/**
-	 * Get string representation of current scene.
-	 *
-	 * Example output for two operator nodes connected with each other.
-	 * \code
-	 * operators:
-	 *   - id: 1
-	 *     type: FloatToFloat
-	 *     position: [0.0, 0.0]
-	 *     value: 1.0
-	 *   - id: 4
-	 *     type: FloatToFloat
-	 *  	 position: [0.0, 0.0]
-	 *  	 value: -1.0
-	 * edges:
-	 *   - [1, 0, 4, 0]
-	 * \endcode
-	 */
 	void dump(const std::vector<Ptr<GuiNode>>& nodes);
 
 private:
@@ -80,8 +62,3 @@ private:
 	std::unordered_set<Core::ID> m_ids;
 	std::unordered_map<Core::ID, Core::ID> m_oldToNewId;
 };
-
-/**
- * Creates all nodes in the workspace.
- */
-// SceneData buildScene(const std::string& rawScene, GuiNodes& workspaceNodes);

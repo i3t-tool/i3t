@@ -26,6 +26,8 @@
 
 namespace Core
 {
+using ID = std::int64_t;
+
 /**
  * You must manage GraphManager lifecycle.
  * \code

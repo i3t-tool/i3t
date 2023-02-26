@@ -18,7 +18,7 @@ std::optional<Ptr<GuiNode>> findNodeById(const std::vector<Ptr<GuiNode>>& nodes,
 		if (node->getNodebase()->getId() == id)
 			return node;
 
-	return nullptr;
+	return std::nullopt;
 }
 
 Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes)

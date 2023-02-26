@@ -1407,6 +1407,11 @@ Memento WorkspaceWindow::getState()
 
 void WorkspaceWindow::setState(const Memento& memento)
 {
+	getNodeEditor().m_workspaceCoreNodes.clear();
+
+	NodeDeserializer::createFrom(memento);
+
+	/*
 	const auto findNode = [](std::vector<GuiNodePtr>& nodes, Core::ID id) -> GuiNodePtr
 	{
 		for (const auto& node : nodes)
@@ -1418,19 +1423,23 @@ void WorkspaceWindow::setState(const Memento& memento)
 
 	//
 
+	std::map<Core::ID, Core::ID> oldToNewID;
+
 	getNodeEditor().m_workspaceCoreNodes.clear();
 
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
-		NodeDeserializer::createOperator(value);
+		const auto node = NodeDeserializer::createOperator(value);
+		oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["sequences"].GetArray())
 	{
-		NodeDeserializer::createSequence(value);
+		const auto node = NodeDeserializer::createSequence(value);
+		oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
 	//
@@ -1439,6 +1448,7 @@ void WorkspaceWindow::setState(const Memento& memento)
 	{
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
 		NodeDeserializer::assignCommon(value, cycle);
+		oldToNewID[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
 
 	//
@@ -1447,6 +1457,7 @@ void WorkspaceWindow::setState(const Memento& memento)
 	{
 		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
 		NodeDeserializer::assignCommon(value, camera);
+		oldToNewID[value["id"].GetInt()] = camera->getNodebase()->getId();
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView());
@@ -1461,6 +1472,7 @@ void WorkspaceWindow::setState(const Memento& memento)
 	{
 		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
 		NodeDeserializer::assignCommon(value, screen);
+		oldToNewID[value["id"].GetInt()] = screen->getNodebase()->getId();
 	}
 
 	//
@@ -1469,6 +1481,7 @@ void WorkspaceWindow::setState(const Memento& memento)
 	{
 		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
 		NodeDeserializer::assignCommon(value, model);
+		oldToNewID[value["id"].GetInt()] = model->getNodebase()->getId();
 	}
 
 	//
@@ -1476,7 +1489,8 @@ void WorkspaceWindow::setState(const Memento& memento)
 	const auto& transforms = memento["workspace"]["transforms"];
 	for (auto& value : transforms.GetArray())
 	{
-		NodeDeserializer::createTransform(value);
+		const auto transform = NodeDeserializer::createTransform(value);
+		oldToNewID[value["id"].GetInt()] = transform->getNodebase()->getId();
 	}
 
 	// connect edges
@@ -1486,8 +1500,12 @@ void WorkspaceWindow::setState(const Memento& memento)
 
 	for (auto& edge : edges.GetArray())
 	{
-		auto lhs = findNode(workspaceNodes, edge[0].GetInt());
-		auto rhs = findNode(workspaceNodes, edge[2].GetInt());
+		auto oldLhsID = edge[0].GetInt();
+		auto oldRhsID = edge[2].GetInt();
+		auto lhsID = oldToNewID.at(edge[0].GetInt());
+		auto rhsID = oldToNewID.at(edge[2].GetInt());
+		auto lhs = findNode(workspaceNodes, lhsID);
+		auto rhs = findNode(workspaceNodes, rhsID);
 		if (lhs && rhs)
 		{
 			auto lhsPin = edge[1].GetInt();
@@ -1496,6 +1514,7 @@ void WorkspaceWindow::setState(const Memento& memento)
 			connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 		}
 	}
+	 */
 }
 
 void WorkspaceWindow::clear() { getNodeEditor().m_workspaceCoreNodes.clear(); }
