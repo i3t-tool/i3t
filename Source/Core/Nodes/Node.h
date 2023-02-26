@@ -233,7 +233,10 @@ public:
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 public:
+	/// \todo Does it needs to be public?
 	void setOwner(Ptr<Node> owner) { m_owner = owner; }
+
+	Ptr<Node> getRootOwner();
 
 	void notifyOwner();
 

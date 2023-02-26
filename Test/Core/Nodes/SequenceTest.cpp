@@ -255,3 +255,13 @@ TEST(SequenceTest, ResetAndRestoreUpdatesSequenceOutputs)
 	EXPECT_FALSE(Math::eq(afterReset, afterRestore));
 	EXPECT_TRUE(Math::eq(stored, afterRestore));
 }
+
+// Tests #144
+TEST(SequenceTest, SelfCycle)
+{
+	auto seq = GraphManager::createSequence();
+
+	auto result = GraphManager::isPlugCorrect(seq->getOut(I3T_SEQ_OUT_MOD), seq->getIn(I3T_SEQ_IN_MAT));
+
+	EXPECT_EQ(result, ENodePlugResult::Err_Loopback);
+}
