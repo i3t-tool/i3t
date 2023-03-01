@@ -11,6 +11,7 @@
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
+#include "Viewport/entity/SceneModel.h"
 
 std::optional<Ptr<GuiNode>> findNodeById(const std::vector<Ptr<GuiNode>>& nodes, Core::ID id)
 {
@@ -26,11 +27,13 @@ Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes)
 	Memento memento;
 
 	SerializationVisitor serializer(memento, true);
-	for (auto node : nodes){
+	for (auto node : nodes)
+	{
 		node->translateNodePositionDiwne(ImVec2(-10, -10));
 	}
 	serializer.dump(nodes);
-	for (auto node : nodes){
+	for (auto node : nodes)
+	{
 		node->translateNodePositionDiwne(ImVec2(10, 10));
 	}
 	return memento;
@@ -38,10 +41,9 @@ Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes)
 
 void pasteNodes(const Memento& memento) { NodeDeserializer::createFrom(memento); }
 
-void duplicateNode(const Ptr<GuiNode>& node) {
-	std::vector<Ptr<GuiNode>> temp;
-	temp.push_back(node);
-	pasteNodes(copyNodes(temp));
+void duplicateNode(const Ptr<GuiNode>& node)
+{
+	pasteNodes(copyNodes({node}));
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -49,7 +51,10 @@ void duplicateNode(const Ptr<GuiNode>& node) {
 WorkspaceModelProxy::WorkspaceModelProxy(Ptr<WorkspaceModel> model)
 {
 	auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
+
 	m_model = std::make_shared<WorkspaceModel>(workspace->getNodeEditor());
+	const auto alias = model->viewportModel().lock()->getModel();
+	m_model->viewportModel().lock()->setModel(alias);
 }
 
 WorkspaceModelProxy::~WorkspaceModelProxy()

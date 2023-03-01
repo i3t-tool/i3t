@@ -7,6 +7,7 @@
 #include "GUI/Elements/Nodes/WorkspaceScreen.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
+#include "Viewport/entity/SceneModel.h"
 
 using namespace rapidjson;
 
@@ -152,7 +153,8 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	rapidjson::Value model(rapidjson::kObjectType);
 	dumpCommon(model, node);
 
-	/// \todo MH Save model reference!
+	const auto modelAlias = node->viewportModel().lock()->getModel();
+	model.AddMember("model", rapidjson::Value(modelAlias.c_str(), alloc), alloc);
 
 	models.PushBack(model, alloc);
 
