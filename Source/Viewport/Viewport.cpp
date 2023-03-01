@@ -39,7 +39,6 @@ void Viewport::init(ViewportSettings settings)
 
 	// Preload some useful models
 	RMI.mesh("Data/Models/super8.gltf");
-	RMI.mesh("Data/Models/CubeFixed.gltf");
 
 	// Setup scenes
 	m_mainScene = std::make_unique<MainScene>(this);
@@ -128,8 +127,8 @@ void Viewport::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize
 
 std::weak_ptr<SceneModel> Viewport::createModel()
 {
-	Core::Mesh* mesh = RM::instance().mesh("Data/Models/CubeFixed.gltf");
-	auto sceneModel = std::make_shared<SceneModel>(mesh, m_shaders->m_phongShader.get());
+	Core::Mesh* mesh = RM::instance().mesh("default_cube", "Data/Models/CubeFixed.gltf");
+	auto sceneModel = std::make_shared<SceneModel>("default_cube", m_shaders->m_phongShader.get());
 	m_mainScene->addEntity(sceneModel);
 	return sceneModel;
 }

@@ -417,6 +417,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material)
 			texPath = modelFolderPrefix / texPath;
 		}
 
+		// TODO: (DR) Pass resource manager instance to the load method to App:: calls
 		GLuint texture = App::getModule<ResourceManager>().texture(texPath.string());
 		return texture;
 	}

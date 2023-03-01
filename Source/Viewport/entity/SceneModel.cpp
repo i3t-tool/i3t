@@ -18,6 +18,25 @@ SceneModel::SceneModel(Core::Mesh* mesh, PhongShader* shader) : TexturedObject(m
 	// Empty
 }
 
+SceneModel::SceneModel(std::string modelAlias, PhongShader* shader) : TexturedObject(nullptr, shader)
+{
+	setModel(modelAlias);
+}
+
+void SceneModel::setModel(std::string modelAlias)
+{
+	auto newMesh = RMI.meshByAlias(modelAlias);
+	if (!newMesh)
+	{
+		LOG_ERROR("SceneModel: Model alias {} does not exist!", modelAlias);
+		return;
+	}
+	m_modelAlias = modelAlias;
+	m_mesh = newMesh;
+}
+
+std::string SceneModel::getModel() { return m_modelAlias; }
+
 void SceneModel::update(Scene& scene)
 {
 	TexturedObject::update(scene);

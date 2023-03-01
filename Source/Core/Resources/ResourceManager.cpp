@@ -362,9 +362,14 @@ void ResourceManager::registerAlias(const std::string& alias, std::shared_ptr<Re
 		{
 			if (resource->alias != NO_ALIAS && resource->alias != alias)
 			{
-				LOG_ERROR("[RESOURCE MANAGER] Failed to register alias '{}'! Resource "
-				          "already exists under alias '{}'.",
-				          alias, resource->alias);
+				// Resource already has a different alias
+				// We register this new one anyway as an alternative
+				resource->alternativeAliases.push_back(alias);
+				m_aliasMap.insert(std::make_pair(alias, resource));
+				LOG_DEBUG("[RESOURCE MANAGER] Registering alternative alias '{}' for '{}'.", alias, resource->alias);
+				//				LOG_ERROR("[RESOURCE MANAGER] Failed to register alias '{}'! Resource "
+				//				          "already exists under alias '{}'.",
+				//				          alias, resource->alias);
 			}
 			else
 			{
@@ -386,8 +391,7 @@ void ResourceManager::createDefaultResources(const std::vector<Resource>& defaul
 		switch (resource.resourceType)
 		{
 		case ResourceType::Shader:
-			// TODO: (DR) Cannot load shader from a single path, need multiple or some
-			// conventionpath);
+			// TODO: (DR) Cannot load shader from a single path, need multiple or some path convention
 			break;
 		case ResourceType::Texture:
 			if (texture(resource.alias, resource.path))
