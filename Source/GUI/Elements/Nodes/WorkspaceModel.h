@@ -29,7 +29,7 @@ public:
 	bool m_showModel{true};
 	glm::vec3 m_tint{1.0f};
 
-	WPtr<Vp::SceneModel> viewportModel() { m_viewportModel; }
+	WPtr<Vp::SceneModel> viewportModel() { return m_viewportModel; }
 
 	WorkspaceModel(DIWNE::Diwne& diwne);
 	~WorkspaceModel();

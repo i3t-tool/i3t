@@ -4,6 +4,7 @@
 #include "GUI/Elements/Nodes/Builder.h"
 #include "GUI/Elements/Nodes/Tools.h"
 #include "Utils/JSON.h"
+#include "Viewport/entity/SceneModel.h"
 
 #ifdef WIN32
 #undef GetObject
@@ -77,6 +78,16 @@ void createFrom(const Memento& memento)
 		model->setSelected(true);
 		NodeDeserializer::assignCommon(value, model);
 		oldToNewID[value["id"].GetInt()] = model->getNodebase()->getId();
+
+		if (value.HasMember("model"))
+		{
+			const auto* alias = value["model"].GetString();
+			model->viewportModel().lock()->setModel(alias);
+		}
+		else
+		{
+			LOG_WARN("Model node {} has no model set, using the default one.", model->getNodebase()->getId());
+		}
 	}
 
 	//
