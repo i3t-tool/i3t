@@ -28,7 +28,11 @@ public:
 	std::string alias; ///< Resource alias
 	std::string path;  ///< Resource path, used for display only, doesn't need to
 	                   ///< be a valid path
+
 	ResourceType resourceType = ResourceType::Model;
+
+	std::vector<std::string> alternativeAliases; ///< Any additional aliases that got registered after the first one
+	                                             ///< which is not included in this list
 
 private:
 	size_t hashId;              ///< Resource hash, unique identifier

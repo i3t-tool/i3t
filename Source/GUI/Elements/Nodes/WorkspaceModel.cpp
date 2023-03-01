@@ -51,7 +51,7 @@ void WorkspaceModel::popupContent_axis_showmodel()
 		{
 			if (ImGui::MenuItem(resource.alias.c_str()))
 			{
-				m_viewportModel.lock()->m_mesh = RMI.meshByAlias(resource.alias);
+				m_viewportModel.lock()->setModel(resource.alias);
 			}
 		}
 		ImGui::EndMenu();
