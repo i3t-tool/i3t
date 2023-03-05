@@ -109,19 +109,6 @@ static glm::vec3 lerp(glm::vec3 a, glm::vec3 b, float alpha)
 	return inter;
 }
 
-FORCE_INLINE glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false)
-{
-	if (!useQuat)
-	{
-		return glm::interpolate(lhs, rhs, alpha);
-	}
-	auto q1 = glm::quat_cast(lhs);
-	auto q2 = glm::quat_cast(rhs);
-	auto result = glm::mix(q1, q2, alpha);
-
-	return glm::mat4_cast(result);
-}
-
 /**
  * \brief Linear interpolation between two vectors vec4 \a a and \a b
  * \param a
@@ -138,21 +125,11 @@ static glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float alpha)
 }
 
 /**
- * \brief Value base linear interpolation between two matrices \a a and \a b.
- * Incorrect, just for teaching purposes. \param a \param b \param alpha
+ * \brief Value base linear interpolation between two matrices \p lhs and \p rhs.
+ * Incorrect, just for teaching purposes. \param lhs \param rhs \param alpha
  * interpolation parameter - must be from interval (0..1) \return
  */
-static glm::mat4 lerp(glm::mat4 a, glm::mat4 b, float alpha)
-{
-	glm::mat4 res;
-
-	res[0] = lerp(a[0], b[0], alpha);
-	res[1] = lerp(a[1], b[1], alpha);
-	res[2] = lerp(a[2], b[2], alpha);
-	res[3] = lerp(a[3], b[3], alpha);
-
-	return res;
-}
+glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false);
 
 static float smoothAlpha(const float a) { return ((6 * a - 15) * a + 10) * a * a * a; }
 
