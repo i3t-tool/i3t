@@ -72,7 +72,8 @@ void TrackballCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 win
 
 	mouseWheel(m_dScroll * (m_smoothScroll ? 1 : 4));
 
-	m_dScroll *= 0.88f * dt * 144 * (m_smoothScroll ? 1 : 0);
+	m_dScroll *= std::min(std::max(-3.05*dt+0.89, 0.4), 0.93) * (m_smoothScroll ? 1 : 0);
+
 	if (m_dScroll * m_dScroll < 0.0005f)
 	{
 		m_dScroll = 0.0f;
