@@ -1,0 +1,170 @@
+{
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 0,
+                "position": [
+                    579.0,
+                    81.0
+                ],
+                "transforms": [
+                    {
+                        "id": 16,
+                        "position": [
+                            648.0,
+                            109.0
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                1.5,
+                                1.5,
+                                1.5
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.5,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.5,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 17,
+                "position": [
+                    970.0,
+                    166.0
+                ],
+                "model": "default_cube"
+            }
+        ],
+        "transforms": [
+            {
+                "id": 20,
+                "position": [
+                    684.0,
+                    296.0
+                ],
+                "type": "EulerY",
+                "defaultValues": {
+                    "rotation": 0.0
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": true,
+                "locked": true,
+                "LOD": "Full"
+            },
+            {
+                "id": 19,
+                "position": [
+                    421.0,
+                    269.0
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true,
+                "LOD": "Full"
+            }
+        ],
+        "edges": [
+            [
+                0,
+                0,
+                17,
+                0
+            ]
+        ]
+    }
+}

@@ -67,6 +67,7 @@ private:
 	// overrides todo jsou private ale parent classa je ma public, ocividne je to
 	// dulezitejsi
 	void renderExplanation(Explanation* explanation) override;
+	void renderHeadline(Headline* headline) override;
 	void renderChoiceTask(ChoiceTask* choice) override;
 	void renderMultiChoiceTask(MultiChoiceTask* multiChoice) override;
 	void renderInputTask(InputTask* input) override;

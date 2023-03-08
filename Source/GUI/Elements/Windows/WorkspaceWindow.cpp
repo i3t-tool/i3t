@@ -63,12 +63,6 @@ void WorkspaceDiwne::trackingSmoothLeft()
 	{
 		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed)/tracking->getTrackingProgress().size();
 		tracking->setParam(tracking->getParam()+step);
-		auto nodes = getAllNodesInnerIncluded();
-		for (const auto& [id, val] : tracking->getTrackingProgress())
-		{
-			findNodeById(nodes, id).value()->setInactiveMark(val);
-			LOG_INFO(tracking->getInterpolatedTransformID());
-		}
 	}
 }
 
@@ -79,12 +73,6 @@ void WorkspaceDiwne::trackingSmoothRight()
 		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
 
 		tracking->setParam(tracking->getParam()-step);
-		auto nodes = getAllNodesInnerIncluded();
-		for (const auto& [id, val] : tracking->getTrackingProgress())
-		{
-			findNodeById(nodes, id).value()->setInactiveMark(val);
-			LOG_INFO(tracking->getInterpolatedTransformID());
-		}
 	}
 }
 void WorkspaceDiwne::trackingJaggedLeft()
@@ -93,12 +81,6 @@ void WorkspaceDiwne::trackingJaggedLeft()
 	{
 		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed)/tracking->getTrackingProgress().size();
 		tracking->setParam(tracking->getParam()+step);
-		auto nodes = getAllNodesInnerIncluded();
-		for (const auto& [id, val] : tracking->getTrackingProgress())
-		{
-			findNodeById(nodes, id).value()->setInactiveMark(val);
-			LOG_INFO(tracking->getInterpolatedTransformID());
-		}
 	}
 }
 
@@ -109,12 +91,6 @@ void WorkspaceDiwne::trackingJaggedRight()
 		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
 
 		tracking->setParam(tracking->getParam()-step);
-		auto nodes = getAllNodesInnerIncluded();
-		for (const auto& [id, val] : tracking->getTrackingProgress())
-		{
-			findNodeById(nodes, id).value()->setInactiveMark(val);
-			LOG_INFO(tracking->getInterpolatedTransformID());
-		}
 	}
 }
 
@@ -129,28 +105,45 @@ void WorkspaceDiwne::trackingSwitch()
 	else trackingSwitchOn();
 }
 
-void WorkspaceDiwne::trackingSwitchOn()
+void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 {
-	for (auto&& node : getSelectedNodesInnerIncluded())
+	if(sequence == nullptr)
 	{
-		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
-		if (seq)
+		for (auto&& node : getSelectedNodesInnerIncluded())
 		{
-			//m_trackingFirstTransformation = std::dynamic_pointer_cast<WorkspaceTransformation>(seq->getInnerWorkspaceNodes().back());
-			LOG_INFO("TRACKING ON");
-			seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-			const auto model = getSequenceModel(seq);
-			tracking = seq->getNodebase()->as<Core::Sequence>()->startTracking(std::make_unique<WorkspaceModelProxy>(getSequenceModel(seq)));
-			break;
+			Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
+			if (seq)
+			{
+				// m_trackingFirstTransformation = std::dynamic_pointer_cast<WorkspaceTransformation>(seq->getInnerWorkspaceNodes().back());
+				const auto model = getSequenceModel(seq);
+				if (model == nullptr)
+					continue;
+				LOG_INFO("TRACKING ON");
+				seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
+				tracking = seq->getNodebase()->as<Core::Sequence>()->startTracking(
+				    std::make_unique<WorkspaceModelProxy>(model));
+				break;
+			}
 		}
 	}
+	else
+	{
+			const auto model = getSequenceModel(sequence);
+			if (model == nullptr) return;
+			LOG_INFO("TRACKING ON");
+		  sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
+			tracking = sequence->getNodebase()->as<Core::Sequence>()->startTracking(
+			    std::make_unique<WorkspaceModelProxy>(model));
+	}
+
+
 }
 
 void WorkspaceDiwne::trackingSwitchOff()
 {
 			LOG_INFO("TRACKING OFF");
 	    auto seq = findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
-	    std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(0, 0, 0, 0));
+	    std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
 			tracking->getSequence()->stopTracking();
 }
 
@@ -241,6 +234,7 @@ void WorkspaceDiwne::pasteSelectedNodes()
 
 void WorkspaceDiwne::duplicateClickedNode()
 {
+	//TODO add a case for selected inner transform - duplicate both sequence and transform?
 	LOG_INFO("Duplicating")
 	//Preventing double duplication of selected transformations in a sequence
 	for (auto node : getSelectedNodesInnerIncluded())
@@ -264,10 +258,8 @@ void WorkspaceDiwne::duplicateClickedNode()
 			{
 				deselectNodes();
 				node->setSelected(true);
-				for (const Ptr<GuiNode>& selectedNode : selectedNodes)
-				{
-					duplicateNode(selectedNode);
-				}
+				// copy and paste to ensure connections
+				pasteNodes(copyNodes(selectedNodes));
 			}
 			else
 			{
@@ -276,6 +268,34 @@ void WorkspaceDiwne::duplicateClickedNode()
 				duplicateNode(node);
 			}
 		}
+	}
+}
+
+
+void WorkspaceDiwne::duplicateSelectedNodes()
+{
+	LOG_INFO("Duplicating")
+	//Preventing double duplication of selected transformations in a sequence
+	for (auto node : getSelectedNodesInnerIncluded())
+	{
+		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
+		if (seq)
+		{
+			for (auto transform : seq->getInnerWorkspaceNodes())
+			{
+				transform->setSelected(false);
+			}
+		}
+	}
+
+	auto selectedNodes = getSelectedNodesInnerIncluded();
+
+	// copy and paste to ensure connections
+	pasteNodes(copyNodes(selectedNodes));
+
+	for (auto node : selectedNodes)
+	{
+		node->setSelected(false);
 	}
 }
 
@@ -833,11 +853,11 @@ void WorkspaceDiwne::popupContent()
 
 	if (ImGui::BeginMenu("Selection"))
 	{
-		if (ImGui::MenuItem("select all", "ctrl+a"))
+		if (ImGui::MenuItem("select all", "Ctrl+A"))
 		{
 			selectAll();
 		}
-		if (ImGui::MenuItem("invert", "ctrl+i"))
+		if (ImGui::MenuItem("invert", "Ctrl+I"))
 		{
 			invertSelection();
 		}
@@ -845,11 +865,11 @@ void WorkspaceDiwne::popupContent()
 	}
 	if (ImGui::BeginMenu("Zoom"))
 	{
-		if (ImGui::MenuItem("to all", "lshift+a"))
+		if (ImGui::MenuItem("to all", "LShift+A"))
 		{
 			zoomToAll();
 		}
-		if (ImGui::MenuItem("to selection", "lshift+x"))
+		if (ImGui::MenuItem("to selection", "LShift+X"))
 		{
 			zoomToSelected();
 		}
@@ -1374,6 +1394,7 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("copy", EKeyState::Pressed, [&]() { g_workspaceDiwne->copySelectedNodes(); });
 	Input.bindAction("paste", EKeyState::Pressed, [&]() { g_workspaceDiwne->pasteSelectedNodes(); });
 	Input.bindAction("duplicate", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateClickedNode(); });
+	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateSelectedNodes(); });
 	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {g_workspaceDiwne->trackingSmoothLeft(); });
 	Input.bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSmoothRight(); });
 	Input.bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {g_workspaceDiwne->trackingJaggedLeft(); });

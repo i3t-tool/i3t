@@ -40,6 +40,13 @@ struct Explanation : TutorialElement
 	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderExplanation(this); }
 };
 
+struct Headline : TutorialElement
+{
+	Headline(std::string headline) : TutorialElement(std::move(headline)) {}
+
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderHeadline(this); }
+};
+
 struct Task : TutorialElement
 {
 	Task(std::string task) : TutorialElement(std::move(task)), m_completed(false) {}

@@ -123,7 +123,7 @@ void MainMenuBar::showFileMenu()
 			open();
 		}
 
-		if (ImGui::MenuItem("Save"))
+		if (ImGui::MenuItem("Save", "Ctrl+S"))
 		{
 			save();
 		}
@@ -163,11 +163,11 @@ void MainMenuBar::showEditMenu()
 {
 	if (ImGui::BeginMenu("Edit"))
 	{
-		if (ImGui::MenuItem("Undo", nullptr, false, App::getModule<StateManager>().canUndo()))
+		if (ImGui::MenuItem("Undo", "Ctrl+Z", false, App::getModule<StateManager>().canUndo()))
 		{
 			InputManager::triggerAction("undo", EKeyState::Pressed);
 		}
-		if (ImGui::MenuItem("Redo", nullptr, false, App::getModule<StateManager>().canRedo()))
+		if (ImGui::MenuItem("Redo", "Ctrl+Y", false, App::getModule<StateManager>().canRedo()))
 		{
 			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}

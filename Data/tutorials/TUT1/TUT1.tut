@@ -1,50 +1,47 @@
 ---
-title: Začínáme s I3T
+title: 1. Začínáme s I3T
 description: V této lekci se seznámíš se základními funkcionalitami a ovládáním I3T.
-thumbnail: logoi3t.png
+thumbnail: thumbnail.png
 language: cs
 ---
 
-*Vítej v I3T!*
+headline: Vítej v I3T!
 
 *I3T* je program, který slouží k výuce *transformací ve 3D prostoru*.
 
-![I3T](I3Tpreview.png)
+![](I3Tpreview.png)
 
-V tomto tutoriálu se naučíš, jak je program samotný strukturovaný a základy práce v něm.
+V tomto tutoriálu se naučíš, jak je program *strukturovaný* a jak se v něm *pracuje*.
 
-První si ale ukážeme, jak se v tutoriálech orientovat.
-
-*Pokračuj na další stránku stisknutím modrého tlačítka next!*
+První si ale ukážeme, jak se v *tutoriálech orientovat*.
 --
-*"Tasky" a "Tipy"*
+headline: Úkoly a Tipy
 
-Pokud někdy uvidíš černý tučný text odsazený modrým čtverečkem, znamená to *úkol*!
+*Tutoriály jsou interaktivní*. Obsahují *úkoly*, které bys měl splnit hned, co je vidíš.
 
-task: Udělej dřep!
+*Úkoly* značíme takhle:
+task: Takhle vypadá úkol
 
-Úkoly jsou instrukce, které ti nakazují co máš udělat. *Je důležité každý úkol plnit*, většinou na sebe totiž navazují.
+*Je důležité každý úkol plnit*, většinou na sebe totiž navazují.
 
-Kde jsou úkoly tak jsou často i *Tipy*. Na tipy jde *kliknout*.
+*Tipy* ti po kliknutí řeknou jak pokračovat, *pokud si nevíš rady.*
 
-hint: Baf! Tady se ti zobrazí nějaká užitečná rada, pokud bys nevěděl jak dál.
+hint: Tady se zobrazí jak úkol splnit
 
-Když už chápeš *tipy* a *tasky*, můžeme pokračovat na obrázky.
 --
-*Obrázky*
+headline: Obrázky
 
 *Obrázky* slouží k lepšímu pochopení, co se v programu děje.
 
-Pomocí obrázků si můžeme ukázat, v jakém stavu má být program, ale třeba i *králíčka*:
+Na každý *obrázek* taky jde najet myší, zobrazí se ti pak poznámka.
+
 ![Toto je králíček](bunny.png)
 
-Na každý *obrázek* taky jde najet myší, zobrazí se ti pak poznámka, na co se koukáš.
 
-To by bylo k tutoriálům všechno, čas *prozkoumat taje I3T*.
 --
-*Rozhraní*
+headline: Rozhraní
 
-Hlavní rozhraní programu tvoří tato dvě okna:
+*Hlavní rozhraní* programu tvoří tato dvě okna:
 
 ![View a workspace](i3tscreens.png)
 
@@ -52,29 +49,34 @@ Hlavní rozhraní programu tvoří tato dvě okna:
 
 *Workspace* slouží k interakci se scénou pomocí *stavebních bloků* (také někdy *krabičky*).
 
-*Pojďme si vysvětlit jak s nimi zacházet*
+*Okna si můžeš posunout a přizpůsobit* jak potřebuješ, doporučuje se ale nechat si je tak, jak jsou.
 
 --
-*Scene View*
+headline: Scene View
 
 *Scene View* zobrazuje trojrozměrnou scénu (podobně jako Blender nebo Unity)
+
 ![Scene View](viewport.png)
-Ovládání:
-    * *Tažením pravým tlačítkem* myši  ![pravé tlačítko myši](mouseRight.png) se scénou otáčí
-    * *Tažením stisknutým prostředním tlačítkem* myši  ![prostřední tlačítko myši](mouseMiddle.png) se scénou posouvá
-    * *Kolečko myši* slouží k přiblížení a oddálení
+
+Ovládání - podobné jako blender:
+    * *otáčení* = Pravé tlačítko myši  ![pravé tlačítko myši](mouseRight.png)
+    * *posouvání* = Stisknuté prostřední tlačítko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+    * *přiblížení a oddálení* = Kolečko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+
+Přiblížení, oddálení a posouvání má *Workspace* stejné jako *Scene View*
 
 --
-*Workspace*
-V okně *Workspace* se scéna sestavuje. Vkládáme do ní bloky a propojujeme je
+headline: Workspace
+V okně *Workspace* se scéna sestavuje. Vkládáme do ní bloky a propojujeme je.
 
 Stisknutím *pravého tlačítka*  ![pravé tlačítko myši](mouseRight.png)  na plochu *Workspace* se ukáže *"Workspace menu"*.
+
 ![Kontextové menu](menu.png)
 
 To používáme k přidávání a mazání *bloků* a interakci s nimi.
 
 --
-*Stavební bloky*
+headline: Stavební bloky
 *Bloky* jsou základní jednotkou I3T, mohou reprezentovat *matice, modely, nebo funkce* (například cykly).
 
 task:
@@ -87,6 +89,7 @@ Workspace by po přidání *bloků* měl vypadat asi takhle (s bloky jde hýbat 
 ![Model krychle, sekvence a matice transformace velikosti](addStuff.png)
 
 --
+headline: Druhy bloků
 
 *Podívejme se na přidané bloky:*
     * *Model* = model krychle
@@ -98,9 +101,10 @@ Workspace by po přidání *bloků* měl vypadat asi takhle (s bloky jde hýbat 
 Abychom mohli naši krychli *škálovat* (měnit velikost), bude třeba všechny *bloky* správně propojit.
 
 --
-*Jak propojit bloky?*
+headline: Jak propojit bloky?
 
 *Bloky* fungují podobně jako funkce, mají *vstupy* a *výstupy*. Propojujeme je barevnými *dráty* a tvoříme tak scénu.
+
 ![Blok sekvence](blocks.png)
 
 Ikona vstupu a výstupu je podobná *datovému typu*, určuje které *bloky* jdou propojit, a které ne.
@@ -111,59 +115,61 @@ Například:
     * *Maticové násobení* = ![Symbol pro vektorové násobení](mult.png)
 
 --
-*Model*
+headline: Model
 
 *Blok "Model"* v I3T reprezentuje samotný 3D objekt, v základu *krychli*.
 
-Tento blok má pouze jeden *vstup* (místo kam lze zapojit "drát"), konkrétně zelený symbol ![Maticové násobení](mult.png).
+Model má pouze jeden *vstup* (místo kam lze zapojit "drát"), a to zelený symbol ![Maticové násobení](mult.png).
 
-Symbol označuje operaci *maticového násobení*, všechny body modelu se tedy *vynásobí maticí* zapojenou na vstupu.
+Symbol označuje operaci *maticového násobení*, všechny *body modelu* se vynásobí *maticí* zapojenou na vstupu.
 
 ![Blok modelu](model.png)
 --
 
-*Sekvence*
+headline: Sekvence
 
-*Blok sekvence* slouží jako obal pro jednu nebo více *matic*.
+*Blok sekvence* slouží jako pouzdro pro jednu nebo více *matic*.
 
-Má několik *vstupů* a *výstupů*, pro nás je ale důležitý hlavně první výstup shora ![Maticové násobení](mult.png).
-Jelikož je datový typ stejný jako *vstup* modelu, můžeme táhnutím myši spojít oba bloky drátem.
+Má několik *vstupů* a *výstupů*, pro nás je nejdůležtější *výstup* maticového násobení ![Maticové násobení](mult.png).
+
+Jelikož je datový typ stejný jako vstup modelu, můžeme táhnutím myši *spojit* oba bloky drátem.
+
+task: Propoj *sekvenci* a *model*!
 
 ![Sekvence](seq.png)
+
+
 --
 
-*Škálovací matice*
+headline: Škálovací matice
 
-*Bloky* s maticemi slouží k *transformování modelů* (posouvání, rotace nebo změně velikosti - škálování)
+Bloky s maticemi slouží k *transformování modelů* (posouvání, rotace nebo škálování)
 
 Mají podobu matice 4x4:
+
 ![Matice škálování](scale.png)
 
-Bloky matic žádné *vstupy* ani *výstupy* nemají. Abychom mohli *matici* jakkoliv použít, je ji třeba vložit do *sekvence*.
+Bloky matic žádné *vstupy* ani *výstupy* nemají. Abychom mohli *matici* jakkoliv použít, je ji třeba *vložit do sekvence*.
 
 Toho dosáhneme uchopením matice za vrchní lištu a přetažením přímo na blok *sekvence*.
 
---
-*Zvětšení modelu*
-
-Pojďme tedy využít naše znalosti ke *zvětšení* našeho modelu
-task: Vlož matici do sekvence a propoj tuto sekvenci s modelem
-
-Správně propojené bloky vypadají takhle:
-![Matice v sekvenci napojené na model](completed.png)
+task: Vlož matici *scale* do *sekvence*!
 
 --
+headline: Změna hodnoty
 
-task: Nyní zkus změnit modře zvýrazněnou hodnotu v matici tím, že na ní klikneš a potáhneš doprava
+task: Změň první hodnotu v matici *tažením levým tlačítkem myši*
 
-![Kliknutím na hodnotu v matici a tažením myší vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
+![Kliknutím na hodnotu v matici a tažením myši vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
 
-Škálování je *rovnoměrné*, proto se zelené hodnoty mění společně. Samostatně určují, jak objekt roztáhneme po ose *X*, *Y* a *Z*.
+Hodnoty je taky možné měnit *dvojklikem myši* a přepsáním pomocí *klávesnice*.
 
-Hodnoty je taky možné měnit *kliknutím myší* nebo přepsáním pomocí *klávesnice*.
+Škálování je *rovnoměrné*, proto se zelené hodnoty mění *společně*. Jednotlivé hodnoty určují, jak objekt roztáhneme po ose *X*, *Y* a *Z*.
+
 --
-*Jupí!*
+headline: Jupí!
 Už znáš základy práce s I3T a můžeš začít s *transformacemi*!
+
 ![Splněno!](checkbox.png)
 
 Co jsme se naučili:

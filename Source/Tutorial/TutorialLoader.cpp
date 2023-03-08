@@ -146,7 +146,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		// is keyword
 		static const std::unordered_map<std::string, blockType_t> stringToBlockType = {
 		    {"task:", TASK},   {"hint:", HINT},    {"choice:", CHOICE}, {"multichoice:", MULTICHOICE},
-		    {"input:", INPUT}, {"script:", SCRIPT}};
+		    {"input:", INPUT}, {"script:", SCRIPT}, {"headline:", HEADLINE}};
 		if (const auto it{stringToBlockType.find(string)}; it != std::end(stringToBlockType))
 		{
 			return it->second;
@@ -159,7 +159,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		// is keyword
 		static const std::unordered_map<std::string, singleLineType_t> stringToSingleLineType = {
 		    {"task:", TASK_SINGLE}, {"hint:", HINT_SINGLE},    {"x:", CORRECT_ANSWER},
-		    {"o:", WRONG_ANSWER},   {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE}};
+		    {"o:", WRONG_ANSWER},   {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE},
+		    {"headline:", HEADLINE_SINGLE}};
 		if (const auto it{stringToSingleLineType.find(string)}; it != std::end(stringToSingleLineType))
 		{
 			return it->second;
@@ -193,6 +194,9 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 			break;
 		case SCRIPT:
 			addScript(steps[currentStep], textStore);
+			break;
+		case HEADLINE:
+			createHeadline(steps[currentStep], textStore);
 			break;
 		case NOT_BLOCK:
 			// LOG_DEBUG("Ending block when NOT_BLOCK");
@@ -245,6 +249,10 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		case SCRIPT_SIGNLE:
 			endCurrentBlock();
 			addScript(steps[currentStep], content);
+			break;
+		case HEADLINE_SINGLE:
+			endCurrentBlock();
+			createHeadline(steps[currentStep], content);
 			break;
 		default:
 			LOG_INFO("Creation of single-line tutorial element " + std::to_string(type) + " not implemented yet");
@@ -454,6 +462,11 @@ void TutorialLoader::skipSpaces(std::istringstream& stream, unsigned int maxCoun
 std::shared_ptr<TutorialElement>& TutorialLoader::createExplanation(TStep& step, const std::string& string)
 {
 	return step.m_content.emplace_back(std::make_shared<Explanation>(string));
+}
+
+std::shared_ptr<TutorialElement>& TutorialLoader::createHeadline(TStep& step, const std::string& string)
+{
+	return step.m_content.emplace_back(std::make_shared<Headline>(string));
 }
 
 std::shared_ptr<TutorialElement>& TutorialLoader::createTask(TStep& step, const std::string& string)

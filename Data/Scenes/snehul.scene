@@ -1,0 +1,427 @@
+{
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 0,
+                "position": [
+                    452.571533203125,
+                    133.71429443359376
+                ],
+                "transforms": [
+                    {
+                        "id": 16,
+                        "position": [
+                            521.0,
+                            162.0
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.5,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.5,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            },
+            {
+                "id": 17,
+                "position": [
+                    755.1715087890625,
+                    -24.485708236694337
+                ],
+                "transforms": [
+                    {
+                        "id": 34,
+                        "position": [
+                            824.0,
+                            4.0
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                2.0,
+                                2.0,
+                                2.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                2.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                2.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                2.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    },
+                    {
+                        "id": 33,
+                        "position": [
+                            994.0,
+                            4.0
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                2.0,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                2.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            },
+            {
+                "id": 35,
+                "position": [
+                    844.571533203125,
+                    149.71429443359376
+                ],
+                "transforms": [
+                    {
+                        "id": 51,
+                        "position": [
+                            913.0,
+                            178.0
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                5.0,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                5.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            },
+            {
+                "id": 52,
+                "position": [
+                    748.1717529296875,
+                    330.3144226074219
+                ],
+                "transforms": [
+                    {
+                        "id": 69,
+                        "position": [
+                            817.0,
+                            359.0
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.5,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.5,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.5,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    },
+                    {
+                        "id": 68,
+                        "position": [
+                            987.0,
+                            359.0
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                0.0,
+                                6.5,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                6.5,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 70,
+                "position": [
+                    1323.33349609375,
+                    -4.000000953674316
+                ],
+                "model": "default_cube"
+            },
+            {
+                "id": 72,
+                "position": [
+                    1335.3333740234376,
+                    340.6665954589844
+                ],
+                "model": "default_cube"
+            },
+            {
+                "id": 74,
+                "position": [
+                    1341.9993896484376,
+                    168.00009155273438
+                ],
+                "model": "default_cube"
+            }
+        ],
+        "transforms": [
+            {
+                "id": 76,
+                "position": [
+                    795.0761108398438,
+                    354.8189697265625
+                ],
+                "type": "Translation",
+                "defaultValues": {
+                    "translation": [
+                        0.0,
+                        6.5,
+                        0.0
+                    ]
+                },
+                "savedDefaults": {},
+                "value": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        6.5,
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "synergies": false,
+                "locked": true,
+                "LOD": "Full"
+            }
+        ],
+        "edges": [
+            [
+                0,
+                0,
+                17,
+                0
+            ],
+            [
+                0,
+                0,
+                35,
+                0
+            ],
+            [
+                0,
+                0,
+                52,
+                0
+            ],
+            [
+                17,
+                0,
+                70,
+                0
+            ],
+            [
+                52,
+                0,
+                72,
+                0
+            ],
+            [
+                35,
+                0,
+                74,
+                0
+            ]
+        ]
+    }
+}

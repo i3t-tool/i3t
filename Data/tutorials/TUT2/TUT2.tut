@@ -1,10 +1,10 @@
 ---
-title: Základy transformací a práce s nimi
+title: 2. Transformace a práce s nimi
 description: Tady se naučíme jak funguje která transformace v I3T i obecně!
 thumbnail: transform_thumb.png
 language: cs
 ---
-*Vítej ve druhém tutoriálu!*
+headline: Vítej ve druhém tutoriálu!
 
 Podíváme se jak fungují *transformace*!
 
@@ -13,25 +13,26 @@ Ukážeme si:
     * *Škálování* = změna velikosti objektu
     * *Translaci* = změna pozice objektu
 
+![Vizuální demonstrace transformací pokud jsi ztracený](transformations.png)
+
 S operací *škálování* jsme pracovali v předchozí lekci, tentokrát se ale podíváme na to, jak fungují *transformace* obecně.
 
-Pojďme na to
-
 --
 
-*Co to je transformace?*
-Když nějaký objekt *transformujeme*, změníme každý jeho bod. Změnou můžeme myslet otáčení, posunutí atd.
+headline: Co to je transformace?
+Když nějaký objekt *transformujeme*, změníme *každý jeho bod*.
 
 *Transformace* v 3D reprezentujeme maticí *4x4*.
-To, jak se objekt změní po *transformaci* určují hodnoty v matici
+To, jak se objekt změní po *transformaci* určují hodnoty matice
+
 ![Identita - matice s jedničkami na diagonále](matrix.png)
 
-Objekt transformujeme *vynásobením souřadnic* všech jeho bodů *maticí* požadované transformace.
+Bod objektu transformujeme *vynásobením souřadnic maticí transformace*.
 
-*Problém: Matice je 4x4, ale vektor souřadnic je jen 3x1. Není je tedy možné násobit.*
+*Problém:* Matice je *4x4*, ale souřadnice jsou jen *3x1*. Není je možné spolu násobit.
 
 --
-*Řešení: Homogenní souřadnice*
+headline: Řešení: Homogenní souřadnice
 
 Aby bylo možné souřadnice bodů násobit maticí, musíme si souřadnice převést na *homogenní souřadnice*
 
@@ -39,154 +40,148 @@ Aby bylo možné souřadnice bodů násobit maticí, musíme si souřadnice pře
 
 *Homogenní souřadnice* mají oproti standardním souřadnicím jednu hodnotu navíc: *W*
 
-Ta nám umožní na objekty použít všechny *transformace*, které potřebujeme. (Už můžeme násobit souřadnice bodů transformacemi)
+Ta nám umožní na model použít všechny *transformace*, které potřebujeme.
 
 --
-*Transformace s převodem na homogenní souřadnice a zpět*
+headline: Transformace s převodem na homogenní souřadnice a zpět
 
 Postup je jednoduchý:
     * Přidej novou souřadnici *W = 1*
+![Přidání souřadnice W](convertToHomogeneous.png)
     * *Vynásob nové souřadnice maticí* transformace
+![Násobení maticí transformace](transforming.png)
     * *Převeď zpět* z homogenních souřadnic - souřadnicí *W* vyděl zbytek souřadnic
-
 ![Konverze z homogenních do standardních souřadnic](conversion.png)
 
 Výsledné souřadnice jsou *nové souřadnice* transformovaného bodu!
 --
-*Druhy transformací*
 
-Když už víš, jak *transformace* fungují, můžeme si ukázat ty nejčastější:
-    * *Škálování* = změna velikosti
-    * *Rotace* = otočení
-    * *Translace* = posunutí
+headline: Názorná ukázka transformací
 
-![Vizuální demonstrace transformací pokud jsi ztracený](transformations.png)
-
-Nejlepší ale bude, když si *transformace* vyzkoušíš sám/sama.
-
---
-
-*Názorná ukázka transformací*
-
-task: Přidej do workspace bloky sequence a model a propoj je
+task: Přidej do workspace bloky *sequence* a *model* a propoj je
 hint:
 Bloky přidáváme z workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace).
 Propojíme je tažením myši
 
 ![Bloky sekvence a modelu](sekvencemodel.png)
 
-Nápověda: Pokud chceš místo kostičky *transformovat něco jiného*, můžeš si pravým tlačítkem model změnit na jiný předmět pomocí *"Change Model"*
+task: Změň si kostičku na kačenku (jmenuje se *Eduardo*)
+*Nápověda:* Model si změň kliknutím ![pravé tlačítko myši](mouseRight.png)  pravým tlačítkem na *lištu* modelu a vybráním "duck" v *"Change Model"*
 --
 
-*Škálování*
+headline: Škálování
 
 Škálování využíváme ke *změně velikosti* objektu.
 
-Matice škálování vypadá takto:
-![Transformace, která objekt dvakrát zvětší](scale.png)
-Tato konkrétní matice rovnoměrně *zvětší objekt dvakrát*.
+*Matice škálování* má hodnoty na diagonále:
 
-task: Přidej do workplace matici scale, pak jí vlož do sekvence
+![Transformace, která objekt dvakrát zvětší](scale.png)
+
+Tahle konkrétní matice rovnoměrně *zvětší objekt dvakrát*.
+
+--
+
+headline: Škálování objektu
+
+task: Přidej do workplace *matici scale*, pak jí vlož do sekvence a nastav její hodnoty na *dva*
 hint:
 Škálování najdeš ve workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace) pod transformation/scale.
 Matici přetáhni myší do sekvence - uchopením za její horní lištu
 
---
-*Škálování objektu*
+Vidíme, že se nám ve *Scene View* kačka rovnoměrně dvakrát zvětšila.
 
-task: Změn hodnotu v zelených políčkách na 2
-hint: Hodnoty jde upravit tažením myši, nebo dvojklikem a přepsáním
+![Větší kačaba](bigger_model.png)
 
-Vidíme, že se nám ve *Scene View* kostka rovnoměrně dvakrát zvětšila.
-![Větší kostka](bigger_model.png)
-
-Co kdybychom ale chtěli model "roztáhnout" jen podél jedné osy?
+Co kdybychom ale chtěli model "roztáhnout" jen podél *jedné osy*?
 
 --
-*Nerovnoměrné škálování*
+headline: Nerovnoměrné škálování
 
 Pokud chceme měnit *velikost* pro každou osu *samostatně*, tak u naší matice musíme *vypnout "synergie"*
-To uděláme kliknutím pravým tlačítkem myši na lištu matice a vybráním možnosti *"disable synergies"*.
-![Zrušení zámku hodnot](disable_syn.png)
-*Teď už si můžeš vyzkoušet měnit hodnoty po jedné. Vyzkoušej si co to udělá s modelem!*
 
-Až si to vyzkoušíš, pokračuj na rotace.
+To uděláme kliknutím pravým tlačítkem myši na lištu matice a vybráním možnosti *"disable synergies"*.
+
+![Zrušení zámku hodnot](disable_syn.png)
+
+*Teď už si můžeš vyzkoušet měnit hodnoty po jedné. Vyzkoušej si co to udělá s kačenkou a pak pokračuj.*
 
 --
-*Rotace*
+headline: Rotace
 
 Rotaci využíváme k *otáčení objektu v prostoru*.
 
 Hodnoty v matici rotace nastavujeme v závislosti na *ose*, podél které objekt otáčíme *(pro nás X, Y, nebo Z)*:
+
 ![Matice rotací podle všech os](rotations.png)
 
 Obyčejně v rotacích používáme *sinus* a *kosinus* úhlu rotace, proto jsou hodnoty v matici uzamčené na množinu *<-1, 1>*.
-
-*Problém: Práce se hodnotami sínů a kosínů může být neintuitivní.*
 --
-*Řešení: Set Value*
-Z předchozích lekcí víme, že hodnoty v maticích je možné nastavit *tažením myši*, nebo přepsáním hodnoty *dvojklikem myši*.
 
-Dalším způsobem úpravy hodnot je menu *Set value*, které zobrazíme kliknutím *pravým tlačítkem myši* na libovolnou hodnotu matice.
-![Menu s úhly rotace](anglePopup.png)
+headline: Výměna matic v sekvenci
 
-V něm můžeš vybrat *požadovaný úhel* z několika nejpoužívanších hodnot, které jsou uvedené ve *stupních*.
-
---
-*Výměna matic v sekvenci*
-
-task:
-    Úkoly:
-    * Přidej do workspace matici rotace podle osy Y
-    * Myší vytáhni z bloku sekvence *matici škálování* a nahraď ji *maticí rotace*
+task: Přidej do workspace *matici rotace* podle osy *Y*
+task:  Myší vytáhni z bloku sekvence *matici škálování* a nahraď ji *maticí rotace*
 
 hint: ![pravé tlačítko myši](mouseRight.png)  na Workspace, transformation/rotation/eulerAngleY
 
 ![Vyměněné transformace](swapTransform.png)
 
-Kostka se zase *zmenší* (protože jsme škálování odebrali), teď s ní ale můžeme *otáčet*.
-
+*Problém:* K nastavení přesné hodnoty musíme používat *myš i klávesnici*.
 --
-*Práce s rotací*
 
-task: Otoč model o 30° pomocí Set value menu
+headline: Řešení: Set Value
+Určitě víš, že hodnoty v maticích můžeš nastavit *tažením myši*, *dvojklikem*.
+
+Dalším způsobem úpravy hodnot je menu *Set value*, které zobrazíme kliknutím pravým tlačítkem myši na libovolnou *hodnotu matice*.
+
+![Menu s úhly rotace](anglePopup.png)
+
+V něm můžeš vybrat *přesné číslo* ze seznamu nejpoužívanějších hodnot.
+
+ --
+headline: Práce s rotací
+
+task: Otoč model pomocí Set value menu
 
 hint: ![pravé tlačítko myši](mouseRight.png)  na libovolnou hodnotu matice
 
-![Otočená kostka](rotated_cube.png)
+![Otočený Eduardo](rotated_cube.png)
 
 Kostka se nádherně natočí podle *osy Y*.
 
 Skládáním s *ostatními rotacemi* můžeme model otáčet libovolně. *Skládání transformací* uvidíme v dalším tutoriálu.
 
 --
-*Translace*
+headline: Translace
 
 Translací *posouváme* objekt v prostoru.
 
 *Hodnoty posunutí* jsou u matice translace v posledním sloupci:
+
 ![Matice translace](translation.png)
 
-Pro náš případ by se kostka posunula:
-    * *O tři po ose X* (o tři "doprava")
-    * *O dva po ose Y* (o dva "nahoru")
-    * *O čtyři do záporu v ose Z* (o čtyři "od nás")
+*Pro náš případ by se kačka posunula*:
+    * O tři po ose X (o tři "doprava")
+    * O dva po ose Y (o dva "nahoru")
+    * O čtyři do záporu v ose Z (o čtyři "od nás")
 
-Jdeme si zkusit náš model posunout!
+Jdeme si zkusit Eduarda posunout!
 --
-*Práce s translací*
+headline: Práce s translací
 
-task: Odeber matici rotace ze sekvence a nahraď jí novou maticí translace
+task: Odeber *matici rotace* ze sekvence a nahraď jí novou *maticí translace*
 hint:
 Maticemi manipulujeme tažením myši za jejich horní lištu
 
-Ta koska se mi už nelíbí, posuň jí mimo *Scene view*, ať už se na ní nemusíme koukat.
+Nevím, jak to máš ty, ale já mám na kachny alergii.
 
-task: Nakonec uprav hodnoty v matici translace tak, aby kostka nebyla vidět ve Scene View (jako na obrázku)
-![Kostka posunutá do rohu](translated_cube.png)
+task: Uprav hodnoty v *matici translace* tak, aby kačice nebyla vidět ve *Scene View* (jako na obrázku)
+
+![Scéna bez kačky (uff)](translated_cube.png)
 --
-*Ta kostka si to zaslouží!*
+headline: Ta kačena si to zaslouží!
 Super! Už víš co dělá jaká transformace!
+
 ![Splněno!](checkbox.png)
 
 Co jsme se dozvěděli:

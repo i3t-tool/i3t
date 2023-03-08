@@ -73,6 +73,8 @@ TutorialWindow::TutorialWindow(bool show) : IWindow(show)
 
 inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
 {
+	ImGui::GetStyle().WindowRounding = Application::get().getUI()->getTheme().get(ESize::Tooltip_Rounding);
+	ImGui::GetStyle().WindowPadding = Application::get().getUI()->getTheme().get(ESizeVec2::Tooltip_Padding);
 	if (data_.linkData.isImage)
 	{
 		ImGui::SetTooltip("%.*s", data_.linkData.textLength, data_.linkData.text);
@@ -83,6 +85,8 @@ inline void TooltipCallback(ImGui::MarkdownTooltipCallbackData data_)
 		// ImGui::SetTooltip( "%s Open in browser\n%.*s", data_.linkIcon,
 		// data_.linkData.linkLength, data_.linkData.link );
 	}
+	ImGui::GetStyle().WindowRounding = Application::get().getUI()->getTheme().get(ESize::Window_Rounding);
+	ImGui::GetStyle().WindowPadding = Application::get().getUI()->getTheme().get(ESizeVec2::Window_Padding);
 }
 
 inline void DefaultLinkCallback(ImGui::MarkdownLinkCallbackData data_)
@@ -170,12 +174,12 @@ void TutorialWindow::render()
 		        // styles
 
 	// PUSH STYLE
-	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
-
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
-	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 20);
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 15);
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, 5);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(MIN_WIN_WIDTH, MIN_WIN_HEIGHT));
+	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialText));
@@ -186,6 +190,7 @@ void TutorialWindow::render()
 	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarHovered));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,
 	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarActive));
+
 	// ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 150, 250, 255));
 	// ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(66, 150, 250, 205));
 	// ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
@@ -213,18 +218,13 @@ void TutorialWindow::render()
 
 	this->updateWindowInfo();
 
-	//// ADD A MENU TO GET TO WELCOME WINDOW
-	// ImVec2 center = ImGui::GetCurrentWindow()->MenuBarRect().GetCenter();
-	// ImGui::GetForegroundDrawList()->AddCircleFilled(center, 50, IM_COL32(0, 0,
-	// 255, 255));
-
 	// CREATE IMGUI CONTENT
 	renderTutorialHeader();
 	renderTutorialContent();
 	renderTutorialControls();
 
 	// POP STYLE
-	ImGui::PopStyleVar(4);
+	ImGui::PopStyleVar(5);
 	ImGui::PopStyleColor(7);
 	ImGui::PopStyleColor();
 	// END WINDOW
@@ -301,13 +301,20 @@ void TutorialWindow::renderTutorialContent()
 	else
 	{
 		// default content
-		// todo make this nicer
-		// also change spacing to default imgui one
-		if (ImGui::Button("Choose tutorial", ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
+		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialTitle));
+		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		if (ImGui::Button("Open Start Menu", ImVec2(-1, NEXT_BUTTON_SIZE_Y*5)))
 		{
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
 			this->hide();
 		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+		}
+		ImGui::PopStyleColor(2);
+		ImGui::PopFont();
 	}
 	ImGui::EndChild();
 }
@@ -351,6 +358,7 @@ void TutorialWindow::renderTutorialControls()
 		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 		// Back button
 		if (m_currentStep != 0)
 		{
@@ -376,7 +384,7 @@ void TutorialWindow::renderTutorialControls()
 				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 			}
 		}
-		ImGui::PopStyleColor(3);
+		ImGui::PopStyleColor(4);
 
 		//spacing
 		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - NEXT_BUTTON_SIZE_X);
@@ -384,6 +392,7 @@ void TutorialWindow::renderTutorialControls()
 		// Next button
 		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, Application::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
 		if (m_currentStep < m_tutorial->getStepCount() - 1)
 		{
 			if (ImGui::Button("Next", ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
@@ -411,7 +420,7 @@ void TutorialWindow::renderTutorialControls()
 			}
 		}
 		ImGui::PopFont();
-		ImGui::PopStyleColor(2);
+		ImGui::PopStyleColor(3);
 
 		// END CHILD
 		ImGui::EndChild();
@@ -433,6 +442,15 @@ void TutorialWindow::renderExplanation(Explanation* explanation)
 	ImGui::PopFont();
 }
 
+void TutorialWindow::renderHeadline(Headline* headline){
+	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
+	ImGui::SetWindowFontScale(1.1f);
+	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
+	ImGui::Markdown(headline->m_content.c_str(), headline->m_content.length(), m_mdConfig);
+	ImGui::SetWindowFontScale(1.f);
+	ImGui::PopFont();
+}
+
 void TutorialWindow::renderChoiceTask(ChoiceTask* choice) {}
 
 void TutorialWindow::renderMultiChoiceTask(MultiChoiceTask* multiChoice) {}
@@ -441,64 +459,61 @@ void TutorialWindow::renderInputTask(InputTask* input) {}
 
 void TutorialWindow::renderTask(Task* task)
 {
-	// pokus o jine pozadi
-	// ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-	// float bgSizeY = ImGui::CalcTextSize(task->m_content.c_str()).y;
-	// float winXMin = ImGui::GetWindowDrawList()->GetClipRectMin().x;
-	// float winXMax = ImGui::GetWindowDrawList()->GetClipRectMax().x;
-	// ImVec2 p_min = ImVec2(winXMin, cursorPos.y);
-	// ImVec2 p_max = ImVec2(winXMax, cursorPos.y + bgSizeY);
-	// ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, IM_COL32(245, 249,
-	// 252, 255)); ImGui::SetCursorScreenPos(cursorPos);
+	// Calculate font size multiplier relative to default imgui fontsize (10) minus space between paragraphs
+	float fontMult = (ImGui::GetFontSize() - SIMPLE_SPACE/4) / 10;
+	// Rounding to 1 decimal for consistency
+	fontMult = static_cast<float>(static_cast<int>(fontMult * 10.)) / 10.;
 
-	// pokus o zobrazeni ➤
-	// std::wstring_convert<std::codecvt_utf8<wchar_t>> convertor;
-	// ImGui::Text(convertor.to_bytes(L"\x27A4").c_str()); ImGui::SameLine();
-	// ImGui::Text("➤"); ImGui::SameLine();
+	float squareSize = ImGui::GetFontSize() - ImGui::GetStyle().FramePadding.y * fontMult; // zde velikost potrebujeme
+	// Task background rendering
+	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	float winXMin = ImGui::GetWindowDrawList()->GetClipRectMin().x;
+	float winXMax = ImGui::GetWindowDrawList()->GetClipRectMax().x;
+	// Send the window width for calculating wrapping (padding on both sides and simple spaces to account for square
+	float wrapWidth = winXMax - winXMin - squareSize - ImGui::GetStyle().WindowPadding.x * 2;
 
-	// mezera pred
+	// Find the amount of rows the task has
+	float bgY = ImGui::CalcTextSize(task->m_content.c_str(), NULL, false, wrapWidth).y * fontMult;
+
+	// Draw square, accounting for the task offset
+	ImVec2 p_min = ImVec2(cursorPos.x, cursorPos.y + SIMPLE_SPACE);
+	ImVec2 p_max = ImVec2(winXMax, cursorPos.y + SIMPLE_SPACE + SIMPLE_SPACE/2 + bgY);
+	ImU32 bgColor = ImGui::ColorConvertFloat4ToU32(Application::get().getUI()->getTheme().get(EColor::TutorialTaskBg));
+	ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, bgColor);
+	ImGui::SetCursorScreenPos(cursorPos);
+
+	// Space to offset text
 	ImGui::Dummy(ImVec2(0.0f, SIMPLE_SPACE));
 
-	// velikost
-	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
-
-	// zobrazeni ctverecku
-	float size = ImGui::GetFontSize() - ImGui::GetStyle().FramePadding.y * 2.0; // zde velikost potrebujeme
-	ImVec2 drawPos = ImGui::GetCursorScreenPos() + ImVec2(0, ImGui::GetStyle().FramePadding.y);
+	// Draw task blue square
+	ImVec2 drawPos = ImGui::GetCursorScreenPos() +
+	                 ImVec2(Application::get().getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), ImGui::GetStyle().FramePadding.y);
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
 	ImU32 color = ImGui::ColorConvertFloat4ToU32(Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
-	draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + size, drawPos.y + size), color);
-	ImGui::Dummy(ImVec2(size, size));
+	draw_list->AddRectFilled(ImVec2(drawPos.x, drawPos.y), ImVec2(drawPos.x + squareSize, drawPos.y + squareSize), color);
+	ImGui::Dummy(ImVec2(squareSize + Application::get().getUI()->getTheme().get(ESize::TutorialTaskSquareXPadding), squareSize));
 	ImGui::SameLine();
 
-	// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
-	ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
-	// ImGui::PopStyleColor();
+	// Load task font and color
+	ImGui::PushStyleColor(ImGuiCol_TextDisabled, Application::get().getUI()->getTheme().get(EColor::TutorialHighlightText));
+	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
 
+	// Print text from markdown
+	ImGui::Markdown(task->m_content.c_str(), task->m_content.length(), m_mdConfig);
+
+	ImGui::PopStyleColor();
 	ImGui::PopFont(); // velikost zpet
 }
 
 void TutorialWindow::renderHint(Hint* hint)
 {
-	// pokus o cesky napis napoveda
-	// ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(14, 98, 175, 255));
-	// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
-	// std::u8string hintHeaderU8 = u8"Nápověda##";
-	// std::string hintHeader(hintHeaderU8.cbegin(), hintHeaderU8.cend()); // todo
-	// find better solution std::string hintHeader = "Hint##"; hintHeader +=
-	// std::to_string(m_currentStep); smaller spacing before hints
 	ImGui::Dummy(ImVec2(0.0f, SMALL_SPACE));
 
-	// QUESTION MARK
 	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
-	// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(8, 187, 230, 255));
-	// ImGui::Text("?");
-	// ImGui::PopStyleColor();
-	// ImGui::SameLine();
-	//  BUTTON
 	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 	ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
 
+	// Hint button
 	if (ImGui::Button("Tip", ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
 	{
 		hint->m_expanded = !hint->m_expanded;
@@ -510,27 +525,18 @@ void TutorialWindow::renderHint(Hint* hint)
 	ImGui::PopStyleColor(2);
 	ImGui::PopFont();
 
-	// HINT ITSELF
+	// Hint itself
 	if (hint->m_expanded)
 	{
+		ImGui::PushStyleColor(ImGuiCol_PopupBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
 		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialTitleText));
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialHint));
-		// ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
-		// ImGui::TextWrapped(tw_hint->m_hint.c_str());
 		ImGui::Indent();
 		ImGui::Markdown(hint->m_content.c_str(), hint->m_content.length(), m_mdConfig);
 		ImGui::Unindent();
 		ImGui::PopFont();
-		ImGui::PopStyleColor();
+		ImGui::PopStyleColor(2);
 	}
-
-	// if (ImGui::IsItemActive())
-	//{
-	//	ImGui::Text("open");
-	// }
-	// else {
-	//	ImGui::Text("closed");
-	// }
 }
 
 // TODO (later when moving from imgui markdown to a custom solution) - make it

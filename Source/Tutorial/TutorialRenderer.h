@@ -8,6 +8,7 @@
 // #include "Tutorial.h"
 // forward declarations from Tutorial.h to avoid cyclic dependency
 struct Explanation;
+struct Headline;
 struct Task;
 struct ChoiceTask;
 struct MultiChoiceTask;
@@ -20,6 +21,7 @@ public:
 	virtual ~ITutorialRenderer() = default;
 
 	virtual void renderExplanation(Explanation* explanation) = 0;
+	virtual void renderHeadline(Headline* headline) = 0;
 	virtual void renderTask(Task* task) = 0;
 	virtual void renderHint(Hint* hint) = 0;
 	virtual void renderChoiceTask(ChoiceTask* choiceTask) = 0;

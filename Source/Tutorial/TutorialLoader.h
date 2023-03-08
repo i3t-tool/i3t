@@ -32,7 +32,8 @@ private:
 		CHOICE,
 		MULTICHOICE,
 		INPUT,
-		SCRIPT
+		SCRIPT,
+		HEADLINE
 	};
 
 	enum singleLineType_t
@@ -43,7 +44,8 @@ private:
 		CORRECT_ANSWER,
 		WRONG_ANSWER,
 		ANSWER_LIST,
-		SCRIPT_SIGNLE
+		SCRIPT_SIGNLE,
+		HEADLINE_SINGLE
 	};
 
 	/**
@@ -82,6 +84,7 @@ private:
 	 * element
 	 */
 	static std::shared_ptr<TutorialElement>& createExplanation(TStep& step, const std::string& string);
+	static std::shared_ptr<TutorialElement>& createHeadline(TStep& step, const std::string& string);
 	static std::shared_ptr<TutorialElement>& createTask(TStep& step, const std::string& string);
 	static std::shared_ptr<TutorialElement>& createHint(TStep& step, const std::string& string);
 	static std::shared_ptr<TutorialElement>& createChoice(TStep& step, const std::string& question,

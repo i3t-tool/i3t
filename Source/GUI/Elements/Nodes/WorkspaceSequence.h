@@ -6,7 +6,8 @@ class WorkspaceSequence : public WorkspaceNodeWithCoreDataWithPins
 {
 private:
 	bool m_isCameraSequence;
-	ImVec4 m_tint;
+	ImVec4 m_tint = ImVec4(1, 1, 1, 1);
+
 
 protected:
 	int m_position_of_dummy_data = -1;
@@ -28,6 +29,9 @@ public:
 	//===----------------------------------------------------------------------===//
 
 	void setPostionOfDummyData(int positionOfDummyData = -1);
+
+	void popupContentTracking();
+	void popupContent();
 
 	bool isSequence();
 	int getInnerPosition(ImVec2 point);

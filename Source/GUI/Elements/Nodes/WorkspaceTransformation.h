@@ -51,7 +51,6 @@ public:
 	void popupContent();
 	virtual void drawMenuLevelOfDetail() = 0;
 	void drawMenuDelete();
-	void drawMenuTracking();
 	void drawMenuStorevalues();
 
 	void updateSizes();

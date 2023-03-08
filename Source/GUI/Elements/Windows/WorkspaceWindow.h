@@ -172,7 +172,7 @@ public:
 	void trackingJaggedRight();
 	void trackingModeSwitch();
 	void trackingSwitch();
-	void trackingSwitchOn();
+	void trackingSwitchOn(Ptr<WorkspaceSequence> sequence = nullptr);
 	void trackingSwitchOff();
 	Ptr<WorkspaceModel> getSequenceModel(Ptr<WorkspaceSequence> seq);
 
@@ -182,6 +182,7 @@ public:
 	void copySelectedNodes();
 	void pasteSelectedNodes();
 	void duplicateClickedNode();
+	void duplicateSelectedNodes();
 	void deselectNodes();
 
 	// bool allowInteraction();
