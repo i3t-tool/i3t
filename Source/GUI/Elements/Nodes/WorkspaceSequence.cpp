@@ -114,6 +114,38 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 	m_position_of_dummy_data = positionOfDummyData;
 }
 
+void WorkspaceSequence::popupContentTracking()
+{
+	ImGui::Separator();
+	if(Core::GraphManager::isTrackingEnabled())
+	{
+		if (ImGui::MenuItem("Stop tracking", ""))
+		{
+			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOff();
+		}
+		if (ImGui::MenuItem("Smooth tracking", "", dynamic_cast<WorkspaceDiwne&>(diwne).smoothTracking, true))
+		{
+			dynamic_cast<WorkspaceDiwne&>(diwne).trackingModeSwitch();
+		}
+	}
+	else
+	{
+		if (ImGui::MenuItem("Start tracking", ""))
+		{
+			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+		}
+		if (ImGui::MenuItem("Smooth tracking", "", false, false))
+		{
+		}
+	}
+}
+
+void WorkspaceSequence::popupContent()
+{
+	WorkspaceNodeWithCoreDataWithPins::popupContent();
+	popupContentTracking();
+}
+
 bool WorkspaceSequence::beforeContent()
 {
 	/* whole node background */

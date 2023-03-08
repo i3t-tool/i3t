@@ -14,7 +14,7 @@ void InputBindings::init()
 	InputManager::setInputAction("copy", Keys::c, {Keys::ctrll});
 	InputManager::setInputAction("paste", Keys::v, {Keys::ctrll});
 	InputManager::setInputAction("cut", Keys::x, {Keys::ctrll});
-	InputManager::setInputAction("duplicate", Keys::d, {Keys::ctrll});
+	InputManager::setInputAction("duplicateSelected", Keys::d, {Keys::ctrll});
 	InputManager::setInputAction("duplicate", Keys::mouseLeft, {Keys::ctrll});
 	InputManager::setInputAction("delete", Keys::del);
 	// InputManager::setInputAction("delete", Keys::backspace);
@@ -43,7 +43,7 @@ void InputBindings::init()
 #ifdef I3T_DEBUG
 	InputManager::setInputAction("test", Keys::t);                                       /// \todo Will be removed
 	InputManager::setInputAction("TestMouseCtrlAction", Keys::mouseLeft, {Keys::ctrll}); /// \todo Will be removed
-	InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});    /// \todo Will be removed
+	//InputManager::setInputAction("MyTestAction", Keys::t, {Keys::ctrll, Keys::altl});    /// \todo Will be removed
 	InputManager::setInputAxis("MyTestAxis", 1.0f, Keys::p, {Keys::ctrll});              /// \todo Will be removed
 	setAxisKey("MyTestAxis", -1.0f, Keys::mouseRight, {Keys::ctrll});                    /// \todo Will be removed
 #endif
@@ -64,8 +64,8 @@ void InputBindings::init()
 	InputManager::setInputAxis("trackingSmoothRight", 1.0f, Keys::right);
 	InputManager::setInputAction("trackingJaggedLeft", Keys::left);
 	InputManager::setInputAction("trackingJaggedRight", Keys::right);
-	InputManager::setInputAction("trackingSwitch", Keys::t);
-	InputManager::setInputAction("trackingModeSwitch", Keys::p);
+	//InputManager::setInputAction("trackingSwitch", Keys::t, {Keys::ctrll});
+	//InputManager::setInputAction("trackingModeSwitch", Keys::p);
 	//InputManager::setInputAction("trackingSwitchOn", Keys::p);
 	//InputManager::setInputAction("trackingSwitchOff", Keys::o); /* \todo JH maybe some different key when more than 2
 	// 																																tracking direction? */

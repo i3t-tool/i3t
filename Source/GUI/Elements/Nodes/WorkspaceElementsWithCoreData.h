@@ -32,7 +32,7 @@ class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 protected:
 	int m_numberOfVisibleDecimal;
 	float m_dataItemsWidth;
-	float m_inactiveMark;
+	bool m_IsNameBeingEdited = false;
 	FloatPopupMode m_floatPopupMode;
 	WorkspaceLevelOfDetail m_levelOfDetail;
 
@@ -54,11 +54,6 @@ public:
 
 	FloatPopupMode& getFloatPopupMode() { return m_floatPopupMode; };
 	void setFloatPopupMode(FloatPopupMode mode) { m_floatPopupMode = mode; };
-
-	float setInactiveMark(float val) {
-		m_inactiveMark = val;
-		return m_inactiveMark;
-	};
 
 	virtual int maxLenghtOfData() = 0;
 

@@ -1,0 +1,72 @@
+---
+title: 4. Pokročilá práce se scénou
+description: Nauč se jak pracovat s I3T efektivněji!
+thumbnail: thumbnail.png
+language: cs
+---
+*Vítej v tutoriálu na pokročilé ovládání!*
+
+Naučíš se tu líp *manipulovat s objekty* ve scéně, jaké máš možnosti a jak *jednodušeji pracovat s I3T*.
+
+![Ukázka pokročilé manipulace](nahled.png)
+
+Tutoriál bude sloužit spíš jako *manuál*, můžeš skočit vždy na to, co potřebuješ.
+
+
+--
+*Výsledek tutoriálu*
+
+S pomocí zkratek a úprav můžeš z *této sekvence*:
+![Fuj!](worse.png)
+
+Udělat *tuto sekvenci*:
+![Mňam!](better.png)
+
+Mnohem *přehlednější*!
+
+--
+*Hlavní lišta*
+
+![Hlavní lišta programu](lista.png)
+
+Na hlavní liště máme *čtyri* záložky:
+    * *File* = ukládání a načítání scén
+    * *Edit* = undo a redo
+    * *Windows* = správce oken programu
+    * *Help* = dokumentace a credits
+
+Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se ti v náhledu *bude ukazovat*, a co *ne*.
+
+![Menu SceneView](sceneView.png)
+--
+*Hotkeys - Klávesové zkratky*
+
+*I3T* obsahuje většinu známých zkratek:
+    * copy/paste/cut
+        * *Ctrl+C/Ctrl+V/Ctrl+X*
+    * undo
+        * *Ctrl+Z/Ctrl+R*
+    * duplikace bloku
+        * *Ctrl+LClick*
+    * duplikace všech vybraných bloků
+        * *Ctrl+D*
+    * uložení scény
+        * *Ctrl+S*
+    * několikanásobná selekce
+        * *Shift+LClick*
+    * výběr selekčním obdelníkem
+        * *Tažení LClick*
+    * delete
+        * *Delete*
+--
+*Level Of Detail*
+
+Pokud nám bloky *zabírají moc místa* ve scéně, nebo si chceme *ulehčit transformace*, můžeme využít *Level Of Detail*:
+    * *Full* = plný detail, vidíme *všechno*
+    * *Label* = pouze *jméno*, zbytek je schovaný
+    * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic
+
+Detail nastavíme *kliknutím pravým tlačítkem na libovolný blok* pod *"Level of detail"*
+![Menu pro nastavení Level of detail](levelOfDetail.png)
+
+--

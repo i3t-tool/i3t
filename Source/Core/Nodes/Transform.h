@@ -320,7 +320,7 @@ protected:
 
 private:
 	friend class MatrixTracker;
-	float m_activePart = 1.0;
+	float m_activePart = 0.0;
 
 	bool m_hasSavedData = false;
 

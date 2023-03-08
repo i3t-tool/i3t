@@ -1,21 +1,22 @@
 ---
-title: Základy skládání transformací
-description: V této lekci si sestavíme sněhuláka a dozvíme se něco o skládání transformací
+title: 3. Skládání transformací
+description: V této lekci si sestavíme sněhuláka a dozvíme se něco o skládání transformací.
 thumbnail: snehulakThumb.png
 scene: empty
 language: cs
 ---
-*Vítej v třetím tutoriálu!*
+headline: Vítej v třetím tutoriálu!
 
-V této lekci se naučíš používat *sekvence*.
-Taky se naučíš skládat několik *transformací* dohromady a dokonce si i postavíš sněhuláka!
+V této lekci se naučíš stavět *sněhuláka*.
 
-Výsledkem naší práce bude tento krásný *sněhulák* (mimo čepičku a mrkev):
+Taky se naučíš *skládat několik transformací* dohromady!
 
-![Výsledná scéna](snehulakThumb.png)
+Výsledkem naší práce bude tento krásný *sněhulák* (čepičku a mrkev si domyslíme):
+
+![Výsledná scéna](snehulak.png)
 
 --
-*Co už jsme se naučili?*
+headline: Co už jsme se naučili?
 
 ![První lekce](lekce1.png)
 
@@ -31,24 +32,12 @@ V poslední lekci zase:
     * špetku *matematiky*
     * opakování základní práce s *bloky*
 
-
 --
-*Jdeme na sněhuláka!*
+headline: Jdeme na sněhuláka!
 
-task:
-  Přidej do scény model krychle. To budou *sněhulákovy nohy*.
-hint:
-Model najdeš ve workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace)
-![Přidání krychle](addCube.png)
+*Sněhulák* bude potřebovat nohy, musíme si je přidat!
 
-Krychle nám bude sloužit jako základ sněhuláka.
-
---
-*Posunutí krychle*
-
-*Sněhuláka* budeme chtít umístit do scény, musíš si tedy ke krychli připojit *sekvenci* a do ní vložit *transformaci* posunutí.
-
-task: Přidej nový blok sekvence, přejmenuj ho na "nohy".
+task: Přidej nový blok *modelu* a *sekvence*, sekvenci přejmenuj na "nohy" a propoj jí s modelem
 
 hint:
 Blok přejmenuješ kliknutím na jeho nadpis.
@@ -56,116 +45,92 @@ Blok přejmenuješ kliknutím na jeho nadpis.
 ![Přejmenovaný blok sekvence](nohySeq.png)
 
 --
-*Teď už můžeme přidat samotné transformace!*
+headline: Přidáváme transformace!
 
-Pro nohy sněhuláka potřebujeme dvě transformační matice, *matici škálování* a *matici translace*
+task: Vlož *matici scale* a *matici translation* do sekvence "nohy"
 
-task: Vlož matici scale a matici translation do bloku "nohy" a propoj ho s modelem
+Transformace do sekvence *vlož v tomto pořadí*:
 
-Transformace do sekvence vlož v tomto pořadí. První si ukážeme *opačné pořadí* (POZOR!), než je korektní a to takhle:
 ![Postup násobení](poradi.png)
-*Správně transformujeme vždy R, T, S*
+
+Transformace vkládáme do sekvencí vždy v pořadí *Translace, Rotace, Škálování.*
+
+*Proč je vkládáme v tomto pořadí?*
 
 --
-*Proč jsme zvolili zrovna toto pořadí?*
+headline: "Já tak rád TRSám TRSám"
 
-*Transformace* jsou uložené v *maticích*, které se vzájemně násobí. Tím se transformace *skládají* dohromady.
+V sekvencích aplikujeme transformace *ZPRAVA DOLEVA* (opačně, než jak jsou v sekvenci):
 
-![Vynásobení matic A,B,C a D do výsledné matice M](matrixOrder.png)
+![Pořadí, v jakém se aplikují transformace při pořadí TRS](matrixOrder.png)
 
-Výslednou *maticí M* se pak *násobí* všechny body modelu.
-
-Z teorie lineární algebry víš (určitě), že je pořadí *násobení matic* důležité a různá pořadí vrací *různé výsledky*. To si ukážeme.
-
-Korektní pořadí násobení je vždy *Rotace, Translace, Škálování*, zkráceně *RTS*
+Díky pořadí *TRS* zajistíme, že se *translace* provede vždy, jako *poslední*.
 
 --
-*Pojďme si transformace vyzkoušet*
-Hodnoty matic lze upravovat tažením myši.
-task:
-    Změň měřítko "nohou" na dvojnásobnou velikost.
+headline: Stejné transformace, jiné pořadí
 
-hint:
-    ![Správné hodnoty škálování](skalovani1.png)
+Podívej se na jiné pořadí, *SRT*:
 
-task:
-    Posuň model po ose Y tak, aby ležel "na zemi" (cca hodnota 2).
+![Opačné pořadí, vidíme, že se pozice modelu mění s každou transformací](wrongOrder.png)
+
+Vidíš, že výsledek je *jiný*, i když jsem používal *stejné* transformace.
+
+*Doporučení:* Používej jen *TRS*. Transformace se pak chovají předvídatelně!
+
+--
+headline: Pojďme si transformace vyzkoušet
+
+task: Změň měřítko "nohou" na dvojnásobnou velikost.
+task: Posuň model po ose Y tak, aby ležel "na zemi".
 
 ![Výsledná scéna](nohy.png)
 
---
-
-task: Pojďme prohodit pořadí transformací v sekvenci.
-
-hint: Prohodíš je přetažením za lištu a vložením do levé strany bloku "nohy".
-
-Podívej se na výsledek prohození:
-![Prohozené matice](nohy2.png)
-
-Vidíme, že nohy *sněhuláka* už *neleží* na zemi, ale jsou posunuté pod ní - *výsledek se změnil*.
-
-Víme také, že byl první způsob *nekorektní*, teď už ale pravidlo *RTS* splňujeme, a můžeme ve stavbě pokračovat
 
 --
-*Oprava!*
+headline: Přidáme tělo
 
-task:
-   Oprav nohy sněhuláka. Uprav hodnoty v *matici translace* tak aby krychle znovu ležela na zemi
-
-hint:
-   Krychle je moc nízko, musíme jí tedy posunout více "nahoru".
-   To uděláš zvětšením hodnoty translace z 1 na 2!
-
-![Výsledná scéna](nohy.png)
-
-*Připomínka: Kolečkem myši na scene view si můžeš scénu oddálit abys na posouvání lépe viděl/a!*
---
-*Přidáme tělo*
-task:
-    Úkoly:
-    * Stejně jako u *nohou* vytvoř nový *model* a *sekvenci*, tu přejmenuj na "střed" a vlož do ní *matici translace*.
-    * Potom změň hodnoty v *matici translace* tak, aby *střed* ležel na *nohou*
+task: Vytvoř nový *model* a *sekvenci*, tu přejmenuj na "hruď" a vlož do ní *matici translace*.
+task: Změň hodnoty v *matici translace* tak, aby *hruď* ležela na *nohou*
 hint:
     Hodnoty v matici translace by měly vypadat takhle
     ![Hodnoty matice translace](translate.png)
 
-![Správně sestavené modely pro střed](stredModel.png)
+![Správně sestavené modely pro hruď](stredModel.png)
 
 --
 
-*A nakonec hlavu!*
+headline: A nakonec hlavu!
 
-task: Přidej sněhulákovi hlavu, měla by mít poloviční velikost (scale 0.5) a měla by ležet na předchozí krychli (středu).
+task: Přidej sněhulákovi hlavu *zkopírováním nohou* a pojmenuj ji "hlava"
+task: Zmenši hlavu na *poloviční velikost* a polož jí na *střední model* (hruď).
 
-Sněhulák by měl teda vypadat zhruba takhle:
 ![Náš nádherný skvělý a ikonický sněhulák](snehulak.png)
 
 --
-*Co když ale budu chtít sněhuláka uklidit do garáže? Nebo zmenšit, aby tál pomaleji?*
+headline: Manipulace se sněhulákem
 
-Využijeme toho, že sekvence jde propojovat s dalšími sekvencemi. Pokud pak změníš *původní sekvenci*, změní se i všechny *navazující sekvence*!
+*Sekvence můžeme propojovat* s dalšími sekvencemi. Pokud pak změníš *původní sekvenci*, změní se i všechny *navazující sekvence*!
 
 Propojit sekvence je jednoduché:
+
 ![Propojení s několika sekvencemi](multseq.png)
 
 --
-Vyzkoušíme si to!
+headline: Vyzkoušíme si to!
 
-task:
-    Úkoly:
-    * Vytvoř novou *sekvenci* a pojmenuj ji "sněhulák".
-    * Propoj jí se *sekvencemi* všech ostatních částí sněhuláka
-    * Vlož do ní *škálovací matici* a nastav velikost sněhuláka na polovinu (0.5)
-
+task: Vytvoř novou *sekvenci* a pojmenuj ji "sněhulák".
+task: Propoj jí se *sekvencemi* všech ostatních částí sněhuláka
+task: Vlož do ní *matici translace, škálování a rotace podle x* a vyzkoušej si se sněhulákem manipulovat
 
 ![Workspace po propojení matic](propojeni.png)
 
 --
 
-*A je to!*
+headline: A je to!
+
 ![WOOOOOOOOOOO!](checkbox.png)
 
-Na závěr si můžeš se *sněhulákem* pohrát. Můžeš s ním zkusit otáčet, posouvat ho a další zábavné věci (škálovat)!
+task: Na závěr si můžeš se *sněhulákem* pohrát. Zkus si i jiná pořadí transformací!
 
 Shrnutí věcí co jsme se naučili:
   * práce se *sekvencemi*

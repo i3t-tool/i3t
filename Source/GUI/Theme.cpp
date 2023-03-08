@@ -84,9 +84,12 @@ void Theme::initClassicProperties()
 	set(EColor::TutorialScrollbarGrab, createColor(232, 232, 232, 255));
 	set(EColor::TutorialScrollbarHovered, createColor(240, 240, 240, 255));
 	set(EColor::TutorialTitleText, createColor(14, 98, 175, 255));
-	set(EColor::TutorialHighlightText, createColor(89, 112, 176, 255));
+	set(EColor::TutorialHighlightText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialButtonText, createColor(255, 255, 255, 255));
-	set(EColor::TutorialButtonBg, createColor(8, 187, 230, 255));
+	set(EColor::TutorialButtonBg, createColor(14, 98, 175, 255));
+	set(EColor::TutorialButtonActive, createColor(8, 187, 230, 255));
+
+	set(EColor::TutorialTaskBg, createColor(100, 100, 100, 25));
 
 	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
 	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
@@ -138,7 +141,7 @@ void Theme::initClassicProperties()
 
 	// Folta transformation color set
 	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
-	set(EColor::NodeHeaderTranformation, ImVec4(127.0f / 255.0f, 105.0f / 255.0f, 49.0f / 255.0f, 1.00f));
+	set(EColor::NodeHeaderTranformation, ImVec4(0.498f, 0.412f, 0.192f, 1.00f));
 	set(EColor::FloatBgTransformation, ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
@@ -202,6 +205,8 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
+	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
+
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
 
 	m_sizes[ESize::Default_InactiveMark] = 0.0f;
@@ -221,6 +226,9 @@ void Theme::initClassicProperties()
 
 	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
 	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
+
+	m_sizes[ESize::Window_Rounding] = 0.0f;
+	m_sizes[ESize::Tooltip_Rounding] = 10.0f;
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
@@ -247,6 +255,9 @@ void Theme::initClassicProperties()
 	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
+
+	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
+	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
 }
 
 void Theme::initModernProperties()
@@ -268,6 +279,8 @@ void Theme::initModernProperties()
 	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
 
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
+	set(EColor::TutorialButtonActive, createColor(8, 187, 230, 255));
+	set(EColor::TutorialTaskBg, createColor(100, 100, 100, 25));
 
 	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
 	set(EColor::SelectionRectTouch, createColor(0, 255, 0, 100));
@@ -322,7 +335,7 @@ void Theme::initModernProperties()
 
 	// Transform
 	set(EColor::NodeBgTransformation, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
-	set(EColor::NodeHeaderTranformation, ImVec4(0.698f, 0.498f, 0.0f, 1.00f));
+	set(EColor::NodeHeaderTranformation, ImVec4(0.498f, 0.412f, 0.192f, 1.00f));
 	set(EColor::FloatBgTransformation, createColor(255, 255, 255, 255));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
@@ -386,6 +399,8 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
+	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
+
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
 	m_sizes[ESize::Default_InactiveMark] = 0.0f;
 
@@ -404,6 +419,9 @@ void Theme::initModernProperties()
 
 	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
 	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
+
+	m_sizes[ESize::Window_Rounding] = 0.0f;
+	m_sizes[ESize::Tooltip_Rounding] = 10.0f;
 
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
@@ -430,6 +448,9 @@ void Theme::initModernProperties()
 	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
+
+	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
+	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
 }
 
 void Theme::initNames()

@@ -87,7 +87,7 @@ void WorkspaceNode::deleteAction() { m_removeFromWorkspaceWindow = true; }
 
 void WorkspaceNode::drawMenuDelete()
 {
-	if (ImGui::MenuItem("Delete"))
+	if (ImGui::MenuItem("Delete", "Delete"))
 	{
 		deleteActionDiwne();
 	}

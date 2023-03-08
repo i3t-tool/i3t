@@ -49,6 +49,8 @@ enum class EColor
 	TutorialHighlightText,
 	TutorialButtonText,
 	TutorialButtonBg,
+	TutorialButtonActive,
+	TutorialTaskBg,
 
 	SelectionRectFull,
 	SelectionRectTouch,
@@ -170,6 +172,8 @@ enum class ESize
 	Nodes_leftSideSpacing,
 	Nodes_rightSideSpacing,
 
+	TutorialTaskSquareXPadding,
+
 	Links_ControlpointsPositionFraction,
 	Links_ControlpointsPositionMin,
 	Links_Thickness,
@@ -190,12 +194,19 @@ enum class ESize
 	Default_InactiveMark,
 
 	Tracking_SmoothScrollSpeed,
-	Tracking_JaggedScrollSpeed
+	Tracking_JaggedScrollSpeed,
+
+	Tooltip_Rounding,
+
+	Window_Rounding
 };
 
 enum class ESizeVec2
 {
 	Window_FramePadding,
+	Window_Padding,
+
+	Tooltip_Padding,
 
 	Nodes_ItemsSpacing,
 	Nodes_FloatPadding,

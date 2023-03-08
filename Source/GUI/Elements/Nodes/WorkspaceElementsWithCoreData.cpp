@@ -14,8 +14,7 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
                        diwne.getWorkAreaZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
                                                    child class... */
-      ,
-      m_inactiveMark(I3T::getTheme().get(ESize::Default_InactiveMark)), m_levelOfDetail(WorkspaceLevelOfDetail::Full),
+      , m_levelOfDetail(WorkspaceLevelOfDetail::Full),
       m_floatPopupMode(Value)
 {
 }
@@ -62,17 +61,18 @@ bool WorkspaceNodeWithCoreData::topContent()
 	}
 	ImGui::Indent(ImGui::GetStyle().ItemSpacing.x);
 	const char* topLabel = m_topLabel.c_str();
+	bool interaction_happen;
+	ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel)).x + 15);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
 
-	ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel)).x +
-	                     5);                                     /* +5 for reserve if not computed well */
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0)); /* invisible bg */
-	bool interaction_happen = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel));
+	interaction_happen = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel));
 	interaction_happen |= ImGui::IsItemActive();
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
-	ImGui::Dummy(ImVec2(1, 1)); /* dummy for snap some item for same space on left
-	                               and right of label  */
+	// adding dummy space for block interaction
+	ImGui::Dummy(ImVec2(50, 1)); /* dummy for snap some item for same space on left right of label  */
+
 	return interaction_happen;
 }
 
@@ -142,7 +142,7 @@ void WorkspaceNodeWithCoreData::popupContent()
 	drawMenuSetPrecision();
 	drawMenuLevelOfDetail();
 
-	if (ImGui::MenuItem("Duplicate"))
+	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
 	{
 		duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()));
 	} /* \todo Duplicate node */

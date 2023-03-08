@@ -112,25 +112,26 @@ bool WorkspaceTransformation::afterContent()
 		bool trackingFromLeft = dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft;
 
 		ImVec2 size = bottomright - topleft;
+		float inactiveMark = this->getNodebase()->as<Core::Transformation>()->getActivePart();
 		if (trackingFromLeft)
 		{
-				if(m_inactiveMark != 1) //TODO add left tracking possibility
+				if(inactiveMark != 1) //Left tracking
 				{
-					bottomright.x -= (m_inactiveMark) * size.x;
+					bottomright.x -= (inactiveMark) * size.x;
 					diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
 				}
-				else if(m_inactiveMark == 1) { //accounting for yellow mark placement
-					bottomright.x -= (m_inactiveMark) * size.x;
+				else if(inactiveMark == 1) { //accounting for yellow mark placement
+					bottomright.x -= (inactiveMark) * size.x;
 				}
 		}
-		else if(m_inactiveMark != 0) //RIGHT TRACKING
+		else if(inactiveMark != 0) //RIGHT TRACKING
 		{
-			topleft.x += (1 - m_inactiveMark) * size.x;
+			topleft.x += (1 - inactiveMark) * size.x;
 			diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
 		}
-		else if(m_inactiveMark == 0)
+		else if(inactiveMark == 0)
 		{
-			topleft.x += (1 - m_inactiveMark) * size.x;
+			topleft.x += (1 - inactiveMark) * size.x;
 		}
 
 		if(std::dynamic_pointer_cast<WorkspaceTransformation>(findNodeById(
@@ -153,7 +154,6 @@ void WorkspaceTransformation::popupContent()
 {
 	drawMenuSetDataMap();
 	drawMenuStorevalues();
-	drawMenuTracking();
 
 	WorkspaceNodeWithCoreData::popupContent();
 }
@@ -230,17 +230,6 @@ void WorkspaceTransformation::drawMenuDelete()
 	if (ImGui::MenuItem("Delete"))
 	{
 		deleteActionDiwne();
-	}
-}
-
-void WorkspaceTransformation::drawMenuTracking()
-{
-	if (ImGui::MenuItem("Switch tracking on",
-	                    NULL,
-	                    false,
-	                    !Core::GraphManager::isTrackingEnabled()))
-	{
-
 	}
 }
 
