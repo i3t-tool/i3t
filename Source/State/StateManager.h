@@ -68,7 +68,7 @@ private:
 
 	friend class Application;
 
-	void finalize();
+	Memento createMemento();
 
 	fs::path m_currentScene;
 	long m_savedSceneHash{};
