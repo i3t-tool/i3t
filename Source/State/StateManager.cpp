@@ -19,19 +19,7 @@ StateManager::StateManager() { m_recentFiles = readRecentFiles(); }
 
 void StateManager::takeSnapshot()
 {
-	Memento state;
-	state.SetObject();
-
-	if (m_originators.empty())
-	{
-		LOG_WARN("You have no originators set for the StateManager, is it correct?");
-	}
-
-	for (const auto& originator : m_originators)
-	{
-		auto memento = originator->getState();
-		JSON::merge(state, memento, state.GetAllocator());
-	}
+	auto state = createMemento();
 
 	m_mementos.push_back(std::move(state));
 	m_hashes.push_back(randLong());
@@ -135,7 +123,7 @@ bool StateManager::saveScene() { return saveScene(m_currentScene); }
 
 bool StateManager::saveScene(const fs::path& target)
 {
-	const auto result = JSON::save(target, m_mementos[m_currentStateIdx]);
+	const auto result = JSON::save(target, createMemento());
 
 	m_savedSceneHash = m_hashes[m_currentStateIdx];
 
@@ -172,4 +160,21 @@ void StateManager::reset()
 	takeSnapshot();
 }
 
-void StateManager::finalize() {}
+Memento StateManager::createMemento()
+{
+	Memento state;
+	state.SetObject();
+
+	if (m_originators.empty())
+	{
+		LOG_WARN("You have no originators set for the StateManager, is it correct?");
+	}
+
+	for (const auto& originator : m_originators)
+	{
+		auto memento = originator->getState();
+		JSON::merge(state, memento, state.GetAllocator());
+	}
+
+	return state;
+}

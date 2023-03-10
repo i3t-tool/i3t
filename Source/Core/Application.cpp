@@ -200,7 +200,6 @@ void Application::finalize()
 	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
 
 	m_window->finalize();
-	App::getModule<StateManager>().finalize();
 
 	// TODO: Investigate why this was here. Was causing an assertion error on
 	// exit. delete s_instance; s_instance == nullptr;
