@@ -20,6 +20,8 @@
 
 namespace Core
 {
+class Sequence;
+
 template <typename Node> FORCE_INLINE bool isRot(Node&& node)
 {
 	// static_assert(std::is_base_of_v<NodeBase, Node>);
@@ -75,7 +77,7 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix);
 class Transformation : public Node
 {
 	friend class GraphManager;
-	friend class Storage;
+	friend class Sequence;
 
 	struct DefaultValuePair
 	{

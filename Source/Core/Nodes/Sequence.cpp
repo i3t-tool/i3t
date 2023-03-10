@@ -251,6 +251,14 @@ DataStore& Sequence::getInternalData(size_t index)
 	}
 }
 
+[[nodiscard]] Ptr<Transformation> Sequence::popMatrix(const int index)
+{
+	auto result = m_storage->popMatrix(index);
+	result->m_activePart = 0.0f;
+
+	return result;
+}
+
 MatrixTracker* Sequence::startTracking(UPtr<IModelProxy> modelProxy)
 {
 	*m_tracker = MatrixTracker(shared_from_this()->as<Sequence>(), std::move(modelProxy));

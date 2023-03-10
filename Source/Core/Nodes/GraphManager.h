@@ -105,7 +105,7 @@ public:
 	 * myInputPinIndex Index of input pin of this node.
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
-	 */ /* surely not changing the pointer (just object that it points to - Nodebase in Workspacenode is const pointer -> so for calling this function pointers have to be const too) */
+	 */
 	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
 	                                          unsigned parentOutputPinIndex, unsigned myInputPinIndex);
 

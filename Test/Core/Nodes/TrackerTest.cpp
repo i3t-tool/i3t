@@ -177,3 +177,19 @@ TEST(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 
 	EXPECT_FALSE(GraphManager::isTrackingEnabled());
 }
+
+TEST(TrackerTest, EmptySequence)
+{
+	auto sequence = GraphManager::createSequence();
+	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());
+	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());
+
+	// start full tracking
+	auto tracker = sequence->startTracking(std::make_unique<DummyModelProxy>());
+	tracker->setParam(1.0f);
+
+	sequence->popMatrix(0);
+	sequence->popMatrix(0);
+
+	tracker->setParam(1.0f);
+}
