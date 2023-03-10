@@ -7,6 +7,7 @@
 #include "GUI/Elements/Nodes/WorkspaceScreen.h"
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
+#include "Logger/Logger.h"
 #include "Viewport/entity/SceneModel.h"
 
 using namespace rapidjson;
@@ -42,14 +43,6 @@ void SerializationVisitor::dump(const std::vector<Ptr<GuiNode>>& nodes)
 	workspace.AddMember("edges", std::move(edges), m_memento.GetAllocator());
 
 	m_memento.AddMember("workspace", std::move(workspace), m_memento.GetAllocator());
-
-	for (const auto& node : nodes)
-	{
-		const auto id = node->getNodebase()->getId();
-
-		m_ids.insert(id);
-		m_oldToNewId[id] = id; // will be overwritten by dumpCommon when m_assignNewIds is true.
-	}
 
 	for (const auto& node : nodes)
 	{
@@ -171,14 +164,8 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	auto& alloc = m_memento.GetAllocator();
 
 	auto id = coreNode->getId();
-	if (m_assignNewIds)
-	{
-		const auto oldId = id;
-		id = Core::IdGenerator::next();
-		m_oldToNewId[oldId] = id;
-	}
-
 	target.AddMember("id", id, alloc);
+
 	addVector(target, "position", node->getNodePositionDiwne());
 }
 
@@ -382,7 +369,7 @@ void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::No
 {
 	for (const auto& input : node->getInputPins())
 	{
-		if (input.isPluggedIn() && m_ids.contains(input.getParentPin()->getOwner()->getId()))
+		if (input.isPluggedIn())
 		{
 			// tricky part
 			auto parent = input.getParentPin()->getOwner();
@@ -391,21 +378,10 @@ void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::No
 				parent = parent->getRootOwner();
 			}
 
-			if (!m_ids.contains(parent->getId()))
-			{
-				continue;
-			}
-
-			auto fromId = parent->getId();
-			const int fromPin = input.getParentPin()->getIndex();
-			auto toId = node->getId();
-			const int toPin = input.getIndex();
-
-			if (m_assignNewIds)
-			{
-				fromId = m_oldToNewId.at(fromId);
-				toId = m_oldToNewId.at(toId);
-			}
+			const auto fromId = parent->getId();
+			const auto fromPin = input.getParentPin()->getIndex();
+			const auto toId = node->getId();
+			const auto toPin = input.getIndex();
 
 			rapidjson::Value e(kArrayType);
 

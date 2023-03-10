@@ -2,6 +2,17 @@
 
 #include "rapidjson/document.h"
 
+/// @note Nodes are referenced by their index.
+/// ```json
+/// {
+///   "workspace": {
+///     "operators": { ... },
+///     "edges": [
+///       [leftNodeID, pinIndex, righNodeID, pinIndex]
+///     ]
+///   }
+/// }
+/// ```
 using Memento = rapidjson::Document;
 
 class IStateful

@@ -15,7 +15,7 @@
 class SerializationVisitor : public NodeVisitor
 {
 public:
-	SerializationVisitor(Memento& memento, bool assignNewIds = false) : m_memento(memento), m_assignNewIds(assignNewIds)
+	SerializationVisitor(Memento& memento) : m_memento(memento)
 	{
 	}
 
@@ -57,8 +57,4 @@ private:
 	void addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node);
 
 	Memento& m_memento;
-	bool m_assignNewIds;
-
-	std::unordered_set<Core::ID> m_ids;
-	std::unordered_map<Core::ID, Core::ID> m_oldToNewId;
 };
