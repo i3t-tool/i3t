@@ -123,6 +123,9 @@ private:
 	/// \pre m_beginSequence is set
 	void track();
 
+	/// Public interface is in the GraphManager.
+	void stop();
+
 	void setTransform();
 
 	unsigned m_fullMatricesCount = 0;

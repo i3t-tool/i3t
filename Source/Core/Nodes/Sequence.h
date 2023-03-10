@@ -159,7 +159,7 @@ public:
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index) { return m_storage->popMatrix(index); }
+	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
 

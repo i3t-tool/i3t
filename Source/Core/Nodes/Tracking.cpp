@@ -119,8 +119,15 @@ void SequenceTree::MatrixIterator::advance()
 		if (parent)
 		{
 			// Sequence is not the root, there is another parent sequence.
-			m_currentSequence = toSequence(parent);
-			m_currentMatrix = m_currentSequence->getMatrices().back();
+			m_currentSequence = parent->as<Sequence>();
+			if (!m_currentSequence->getMatrices().empty())
+			{
+				m_currentMatrix = m_currentSequence->getMatrices().back();
+			}
+			else
+			{
+				m_currentMatrix = nullptr;
+			}
 		}
 		else
 		{
@@ -218,9 +225,11 @@ void MatrixTracker::track()
 
 	if (matricesCount == 0)
 	{
-		// Empty sequence cannot be tracked.
+		// Empty sequence cannot be tracked, end tracking.
+		stop();
 		return;
 	}
+
 	// Iterator now points to the sequences root.
 
 	float matFactor = 1.0f / (float)matricesCount;
@@ -268,6 +277,12 @@ void MatrixTracker::track()
 	m_interpolatedMatrix = result;
 
 	setTransform();
+}
+
+void MatrixTracker::stop()
+{
+	m_beginSequence = nullptr;
+	m_model = nullptr;
 }
 
 void MatrixTracker::setTransform()
