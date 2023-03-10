@@ -26,7 +26,7 @@ Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes)
 {
 	Memento memento;
 
-	SerializationVisitor serializer(memento, true);
+	SerializationVisitor serializer(memento);
 	for (auto node : nodes)
 	{
 		node->translateNodePositionDiwne(ImVec2(-10, -10));
