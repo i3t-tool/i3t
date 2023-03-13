@@ -282,5 +282,7 @@ inline std::optional<DataStore> getData(const rapidjson::Value& value, EValueTyp
 	case EValueType::Ptr:
 		break;
 	}
+
+	return std::nullopt;
 }
 } // namespace JSON

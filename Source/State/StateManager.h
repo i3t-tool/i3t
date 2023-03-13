@@ -7,9 +7,7 @@
 #include "Core/Module.h"
 #include "State/Stateful.h"
 
-/**
- * Holds global state and takes state snapshots.
- */
+/// Handles app state management.
 class StateManager : public Module
 {
 public:
@@ -37,7 +35,15 @@ public:
 
 	[[nodiscard]] const Memento& getCurrentState() const;
 
-	bool isDirty() const { return m_savedSceneHash != m_hashes[m_currentStateIdx] && m_dirty; }
+	bool isDirty() const
+	{
+		if (m_hashes.empty() || m_currentStateIdx == -1)
+		{
+			return m_dirty;
+		}
+
+		return m_savedSceneHash != m_hashes[m_currentStateIdx] && m_dirty;
+	}
 
 	/// \pre m_originator is set.
 	void createEmptyScene();
@@ -49,8 +55,6 @@ public:
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
 
-	void setScene(const fs::path& scene);
-
 	bool hasScene() { return !m_currentScene.empty(); }
 	auto scenePath() { return m_currentScene; }
 
@@ -60,9 +64,11 @@ public:
 
 	//===--------------------------------------------------------------------===//
 
-	void clear();
+	void newScene();
 
 private:
+	void setWindowTitle();
+
 	/// Resets counters, set clean state and takes initial snapshot.
 	void reset();
 

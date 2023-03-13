@@ -40,7 +40,7 @@ void Application::init()
 	//
 
 	BeforeNewProjectCommand::addListener([this]() { getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>(); });
-	NewProjectCommand::addListener([]() { App::getModule<StateManager>().clear(); });
+	NewProjectCommand::addListener([]() { App::getModule<StateManager>().newScene(); });
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] { onClose(); });
@@ -60,8 +60,6 @@ void Application::init()
 		                               LOG_INFO("redo triggered");
 		                               App::getModule<StateManager>().redo();
 	                               });
-
-	App::getModule<StateManager>().setOriginator(this);
 }
 
 void Application::initModules()
@@ -223,31 +221,6 @@ bool Application::initI3T()
 
 	return b;
 }
-
-//===-- State functions ---------------------------------------------------===//
-
-void Application::onStateChange()
-{
-	auto title = g_baseTitle;
-
-	if (App::getModule<StateManager>().hasScene())
-	{
-		title += ": " + App::getModule<StateManager>().scenePath().filename().string();
-	}
-	else
-	{
-		title += ": New Scene";
-	}
-
-	if (App::getModule<StateManager>().isDirty())
-	{
-		title += "*";
-	}
-
-	setTitle(title);
-}
-
-//===----------------------------------------------------------------------===//
 
 Application& Application::get() { return *s_instance; }
 
