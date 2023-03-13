@@ -1,7 +1,5 @@
 #include "StateManager.h"
 
-#include "yaml-cpp/yaml.h"
-
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
@@ -30,10 +28,7 @@ void StateManager::takeSnapshot()
 		m_dirty = true;
 	}
 
-	for (const auto& originator : m_originators)
-	{
-		originator->onStateChange();
-	}
+	setWindowTitle();
 }
 
 void StateManager::undo()
@@ -50,10 +45,7 @@ void StateManager::undo()
 		originator->setState(memento);
 	}
 
-	for (auto& originator : m_originators)
-	{
-		originator->onStateChange();
-	}
+	setWindowTitle();
 }
 
 void StateManager::redo()
@@ -72,10 +64,7 @@ void StateManager::redo()
 		originator->setState(memento);
 	}
 
-	for (auto& originator : m_originators)
-	{
-		originator->onStateChange();
-	}
+	setWindowTitle();
 }
 
 bool StateManager::canUndo() const { return m_currentStateIdx > 0; }
@@ -105,7 +94,9 @@ bool StateManager::loadScene(const fs::path& scene)
 	const auto maybeScene = JSON::parse(scene, "Data/Schemas/Scene.schema.json");
 
 	if (!maybeScene.has_value())
+	{
 		return false;
+	}
 
 	for (auto* originator : m_originators)
 	{
@@ -126,26 +117,41 @@ bool StateManager::saveScene(const fs::path& target)
 	const auto result = JSON::save(target, createMemento());
 
 	m_savedSceneHash = m_hashes[m_currentStateIdx];
+	m_currentScene = target;
+
+	setWindowTitle();
 
 	return result;
 }
 
-void StateManager::setScene(const fs::path& scene)
-{
-	m_currentScene = scene;
-	const auto newTitle = std::string(g_baseTitle) + ": " + scene.filename().string();
-
-	App::get().setTitle(newTitle);
-}
-
-void StateManager::clear()
+void StateManager::newScene()
 {
 	for (const auto& originator : m_originators)
 	{
 		originator->clear();
 	}
 
+	m_currentScene = "";
+
 	reset();
+}
+
+void StateManager::setWindowTitle()
+{
+	std::string sceneName = "New scene";
+	if (hasScene())
+	{
+		sceneName = scenePath().filename().string();
+
+		if (isDirty())
+		{
+			sceneName += " - Unsaved";
+		}
+	}
+
+	const auto newTitle = std::string(BASE_WINDOW_TITLE) + " - " + sceneName;
+
+	App::get().setTitle(newTitle);
 }
 
 //===----------------------------------------------------------------------===//
@@ -156,6 +162,8 @@ void StateManager::reset()
 	m_dirty = false;
 
 	m_mementos.clear();
+
+	setWindowTitle();
 
 	takeSnapshot();
 }

@@ -24,7 +24,7 @@ void Window::init(const int glVersionMajor, const int glVersionMinor, bool glDeb
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, glDebug ? GLFW_TRUE : GLFW_FALSE);
 
-	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, g_baseTitle.c_str(), nullptr, nullptr);
+	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, BASE_WINDOW_TITLE.c_str(), nullptr, nullptr);
 
 	if (m_mainWindow == nullptr)
 	{
@@ -32,7 +32,7 @@ void Window::init(const int glVersionMajor, const int glVersionMinor, bool glDeb
 		exit(EXIT_FAILURE);
 	}
 
-	setTitle(g_baseTitle.c_str());
+	setTitle(BASE_WINDOW_TITLE.c_str());
 
 	int x, y, channels;
 	constexpr int desiredChannels = 4;

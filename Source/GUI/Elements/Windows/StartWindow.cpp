@@ -287,6 +287,7 @@ void StartWindow::render()
 					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 					{
 						this->hide();
+						BeforeNewProjectCommand::dispatch();
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -519,7 +520,7 @@ void StartWindow::showTutorialPopup()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			App::getModule<StateManager>().clear();
+			App::getModule<StateManager>().newScene();
 			popupActive = false;
 			ImGui::CloseCurrentPopup();
 		}

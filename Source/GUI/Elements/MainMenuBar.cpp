@@ -50,7 +50,6 @@ static void saveAs()
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 
 		App::getModule<StateManager>().saveScene(filename);
-		App::getModule<StateManager>().setScene(filename);
 	}
 }
 

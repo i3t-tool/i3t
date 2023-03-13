@@ -14,7 +14,7 @@
 #include "Core/Window.h"
 #include "State/Stateful.h"
 
-static const std::string g_baseTitle = "I3T - An Interactive Tool for Teaching Transformations";
+static inline const std::string BASE_WINDOW_TITLE = "I3T - An Interactive Tool for Teaching Transformations";
 
 class ICommand;
 class Window;
@@ -32,7 +32,7 @@ class Viewport;
  * Application class.
  * A wrapper for UI windows.
  */
-class Application : public IStateful
+class Application
 {
 public:
 	Application() = default;
@@ -101,12 +101,6 @@ public:
 	 * \brief	Initializes renderer and scene.
 	 */
 	bool initI3T();
-
-	//===--------------------------------------------------------------------===//
-
-	void onStateChange() override;
-
-	//===--------------------------------------------------------------------===//
 
 private:
 	template <typename T, typename... Args> static auto& createModule(Args&&... args);
