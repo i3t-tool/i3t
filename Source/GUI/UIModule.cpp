@@ -303,26 +303,26 @@ void UIModule::queryCameraState()
 	// TODO: (DR) Old code used for camera mouse drag handling, unused, probably delete in the future
 	return;
 
-	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
-		return;
-
-	// ORBIT camera rotation
-	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
-	{
-		InputManager::beginCameraControl();
-	}
-	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
-	{
-		InputManager::endCameraControl();
-	}
-
-	// CAMERA PANNING - set a new orbit center
-	if (InputManager::isActionTriggered("pan", EKeyState::Pressed))
-	{
-		InputManager::beginCameraControl();
-	}
-	if (InputManager::isActionTriggered("pan", EKeyState::Released))
-	{
-		InputManager::endCameraControl();
-	}
+//	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
+//		return;
+//
+//	// ORBIT camera rotation
+//	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
+//	{
+//		InputManager::beginCameraControl();
+//	}
+//	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
+//	{
+//		InputManager::endCameraControl();
+//	}
+//
+//	// CAMERA PANNING - set a new orbit center
+//	if (InputManager::isActionTriggered("pan", EKeyState::Pressed))
+//	{
+//		InputManager::beginCameraControl();
+//	}
+//	if (InputManager::isActionTriggered("pan", EKeyState::Released))
+//	{
+//		InputManager::endCameraControl();
+//	}
 }

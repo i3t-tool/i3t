@@ -25,31 +25,14 @@ struct GLFWwindow;
 // TODO: (DR) For InputManager to remain in Core, it should be completely separated from ImGui,
 //  that likely means it could only function as an Interface with a ImGuiInputManager implementation or so located in
 //  the GUI package
+
+// TODO: (DR) The class probably also shouldn't be static, could be a singleton module like others
+//  This kind of brings up the issue of how would code access input manager, right now its a simple static call but
+//  if it was a module it requires a way to get the Application instance, which can be done statically via App::get()
+//  Is that a good approach? Or would it be better to pass around instance of InputManager for querying input?
+
 // TODO: (DR) Refactoring and doc
 
-/** State of the three mouse buttons (does not store the state of the
- * modificators */
-struct MouseButtonState final
-{
-	bool left, right, middle; ///< mouse buttons
-	// bool shift, alt, ctrl;	///< keyboard modifiers - NOT USED
-
-	MouseButtonState()
-	{
-		left = false;
-		right = false;
-		middle = false;
-	}
-
-	/**
-	 * \brief Is any mouse button pressed?
-	 * The inner state depends on the Keys::mouseLeft, right, middle. It must be
-	 * one step behind the reality... The inner state is set by
-	 * InputController::preUpdate(); in  main.cpp: logicUpdate() \todo Check -
-	 * never used \return true if any button pressed.
-	 */
-	bool isPressed() const { return (left || right || middle); }
-};
 //===----------------------------------------------------------------------===//
 
 /**
@@ -77,24 +60,34 @@ public:
 	/// changed in update()
 	static std::map<Keys::Code, KeyState> m_keyMap;
 
-	static MouseButtonState m_mouseButtonState; ///< status of L,M,R mouse buttons (true for pressed)
-	                                            ///< without modifiers.
 	///< \todo passed to all handlers, but probably not used
 
 	// TODO: (DR) Never accessed, unused? Related
 	static bool m_ignoreImGuiEvents;
 
 	static float m_mouseX, m_mouseY; ///< Current mouse cursor position in screen coordinates (0 is corner of the monitor)
-	static float m_mouseXPrev, m_mouseYPrev; ///< Previous frame's cursor position
-	static float m_mouseXDelta, m_mouseYDelta; ///< Change of the cursor position across last two frames
+	static float m_mouseXPrev, m_mouseYPrev;           ///< Previous frame's cursor position
+	static float m_mouseXDelta, m_mouseYDelta;         ///< Change of the cursor position across last two frames
 	static float m_mouseXDragDelta, m_mouseYDragDelta; ///< Same as mouse delta but only non-zero during some mouse press
-	static float m_mouseWheelOffset; ///< Immediate mouse scroll change
+	static float m_mouseWheelOffset;                   ///< Immediate mouse scroll change
 
 private:
 	static std::vector<InputController*> m_inputControllers;
 
 public:
 	static void init();
+
+	/**
+	 * Updates mouse position and buttons
+	 */
+	static void beginFrame();
+
+	/**
+	 * Updates the stored statuses of the keys in the \a keyMap array (JUST_UP -> UP, JUST_DOWN -> DOWN).
+	 * Processes events.
+	 */
+	static void endFrame();
+
 	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
 	static glm::vec2 getMousePos() { return {m_mouseX, m_mouseY}; }
 
@@ -121,9 +114,6 @@ public:
 	static bool isInputActive(InputController* input);
 
 public:
-	//@{
-	/** \name Handling of the keyboard keys */
-
 	/**
 	 * Sets an entry in the keyMap to justPressed (JUST_DOWN)
 	 *
@@ -152,35 +142,6 @@ public:
 	static bool isMouseDown();
 
 	/**
-	 * Locks cursor before camera drag or rotation.
-	 */
-	static void beginCameraControl();
-
-	/** Unlock the cursor after camera interaction. */
-	static void endCameraControl();
-
-	/**
-	 * Process action and axis events.
-	 */
-	static void processEvents(InputController& controller);
-
-	/**
-	 * \brief Updates \a mouseDelta and \a mousePrev, and updates the stored
-	 * statuses of the keys in the \a keyMap array (JUST_UP -> UP, JUST_DOWN ->
-	 * DOWN).
-	 */
-	static void update();
-
-	/**
-	 * Check ImGui mouse input for current window and set mouse cursor position
-	 * and mouse button map. Use this function after ImGui::Begin(...).
-	 */
-	static void processViewportEvents();
-
-	//@{
-	/** \name Key callbacks */
-public:
-	/**
 	 * \brief Helper function for handling pressed keys.
 	 * \param	keyPressed	The key pressed.
 	 */
@@ -198,6 +159,26 @@ public:
 	 * \return GLFW window.
 	 */
 	static GLFWwindow* getCurrentViewport();
+
+private:
+	/**
+	 * Locks cursor before camera drag or rotation.
+	 */
+	static void beginCameraControl();
+
+	/** Unlock the cursor after camera interaction. */
+	static void endCameraControl();
+
+	/**
+	 * Process action and axis events.
+	 */
+	static void processEvents(InputController& controller);
+
+	/**
+	 * Check ImGui mouse input for current window and set mouse cursor position
+	 * and mouse button map. Use this function after ImGui::Begin(...).
+	 */
+	static void processViewportEvents();
 
 private:
 	static InputController s_globalInputController;

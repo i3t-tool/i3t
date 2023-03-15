@@ -147,34 +147,6 @@ void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int acti
 
 	if (action == GLFW_PRESS && button >= 0 && button < IM_ARRAYSIZE(g_MouseJustPressed))
 		g_MouseJustPressed[button] = true;
-
-	// TODO: (DR) Why isn't left click set here? Its later set in InputManager update() from imgui
-
-	if (action == GLFW_PRESS)
-	{
-		switch (button)
-		{
-		case GLFW_MOUSE_BUTTON_MIDDLE:
-			InputManager::setPressed(Keys::mouseMiddle);
-			break;
-		case GLFW_MOUSE_BUTTON_RIGHT:
-			InputManager::setPressed(Keys::mouseRight);
-			break;
-		}
-	}
-
-	if (action == GLFW_RELEASE)
-	{
-		switch (button)
-		{
-		case GLFW_MOUSE_BUTTON_MIDDLE:
-			InputManager::setUnpressed(Keys::mouseMiddle);
-			break;
-		case GLFW_MOUSE_BUTTON_RIGHT:
-			InputManager::setUnpressed(Keys::mouseRight);
-			break;
-		}
-	}
 }
 
 void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)

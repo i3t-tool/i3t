@@ -25,8 +25,6 @@ InputController InputManager::s_globalInputController;
 std::vector<InputController*> InputManager::m_inputControllers;
 InputController* InputManager::s_activeInput = nullptr;
 
-MouseButtonState InputManager::m_mouseButtonState;
-
 std::map<Keys::Code, InputManager::KeyState> InputManager::m_keyMap;
 
 // TODO: (DR) Never accessed, unused?
@@ -221,12 +219,11 @@ void InputManager::processEvents(InputController& controller)
 	}
 }
 
-void InputManager::update()
+void InputManager::beginFrame()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Update mouse position
-
 	if (ImGui::IsMousePosValid())
 	{
 		m_mouseX = io.MousePos.x;
@@ -254,8 +251,6 @@ void InputManager::update()
 	LOG_EVENT_MOUSE_POS(std::to_string(m_mouseX), std::to_string(m_mouseY));
 
 	// Update left, right and middle button.
-
-	// TODO: (DR) Isn't this supposed to be set from the imgui_impl_glfw? Middle and right clicks are, left click isn't.
 	for (int i = 0; i < IM_MOUSE_KEYS_COUNT; i++)
 	{
 		if (ImGui::IsMouseClicked(i))
@@ -271,19 +266,29 @@ void InputManager::update()
 			setUnpressed(imGuiMouseKeys[i]);
 		}
 	}
+}
 
-	m_mouseButtonState.left = isKeyPressed(Keys::mouseLeft);
-	m_mouseButtonState.right = isKeyPressed(Keys::mouseRight);
-	m_mouseButtonState.middle = isKeyPressed(Keys::mouseMiddle);
+void InputManager::endFrame()
+{
+	// TODO: (DR) REWRITE NEEDED
+	//  The InputManager should be taking input FROM IMGUI ONLY
+	//  We should not be changing the glfw backend whatsoever, its not necessary
+	//  The code updating the InputManager values with ImGui should run at the BEGINNING of a frame, however
+	//  currently its written to partially update at the beginning in glfw backend and then again at the end with this
+	//  code. A relic of the old codebase.
+	//  Also the logging of events needs to be changed and tested.
+	//  I've added beginFrame and endFrame methods (similar to Module) that get called accordingly and started moving
+	//  stuff from this method to beginFrame, starting with mouse button updates which were broken.
+	//  I also moved the mouse position update, hoping that doesn't break something.
+	//  Note that this fixed an issue with actions that caused InputManager::isActionTriggered(pressed) to always return
+	//  false if the action was bound to one of the mouse buttons.
 
-	// Process events
-
+	// Process events (Note: Dispatches callbacks)
 	processEvents(s_globalInputController);
 	if (s_activeInput)
 		processEvents(*s_activeInput);
 
 	// Process keys
-
 	for (std::map<Keys::Code, KeyState>::const_iterator it = m_keyMap.begin(); it != m_keyMap.end(); ++it)
 	{
 		if (it->second == JUST_UP)
