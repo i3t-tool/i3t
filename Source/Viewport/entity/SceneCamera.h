@@ -28,7 +28,6 @@ public:
 
 	SceneCamera(Core::Mesh* mesh, PhongShader* shader);
 
-	void render(glm::mat4 view, glm::mat4 projection) override;
 	void update(Scene& scene) override;
 
 	void onSceneAdd(Scene& scene) override;

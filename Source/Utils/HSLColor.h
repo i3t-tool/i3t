@@ -22,11 +22,13 @@ private:
 	float m_hue, m_saturation, m_lightness;
 
 public:
+	static HSLColor fromRGB(float* rgb);
 	static HSLColor fromRGB(float red, float green, float blue);
+	static HSLColor fromHSL(float* hsl);
 	static HSLColor fromHSL(float hue, float saturation, float lightness);
 
-	std::array<float, 3> getRGB() const;
-	std::array<float, 3> getHSL() const;
+	[[nodiscard]] std::array<float, 3> getRGB() const;
+	[[nodiscard]] std::array<float, 3> getHSL() const;
 
 	/**
 	 * Creates a darker color.
@@ -37,6 +39,11 @@ public:
 	 * Creates a lighter color.
 	 */
 	HSLColor lighten(float factor);
+
+	HSLColor saturate(float factor);
+	HSLColor desaturate(float factor);
+
+	HSLColor shiftHue(float offset);
 
 	HSLColor makeComplementary();
 

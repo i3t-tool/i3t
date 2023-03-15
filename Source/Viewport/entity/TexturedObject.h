@@ -13,6 +13,6 @@ public:
 
 	TexturedObject(Core::Mesh* mesh, PhongShader* shader);
 
-	void render(glm::mat4 view, glm::mat4 projection) override;
+	void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) override;
 };
 } // namespace Vp

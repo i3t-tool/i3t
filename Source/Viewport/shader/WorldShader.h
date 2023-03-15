@@ -26,7 +26,6 @@ public:
 	explicit WorldShader(GLuint id);
 
 	void setUniforms() override;
-	void setUniformsPerMeshPart(Core::Mesh::MeshPart& meshPart) override;
 
 	/**
 	 * \brief Updates MVP matrices.

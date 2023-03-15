@@ -35,6 +35,13 @@ public:
 	float trackballCamera_rotateSpeed;
 	float trackballCamera_translateSpeed;
 
+	float highlight_downscaleFactor;
+	int highlight_kernelSize;
+	float highlight_outlineCutoff;
+	bool highlight_useDepth;
+	float highlight_useDepth_darkenFactor;
+	float highlight_useDepth_desaturateFactor;
+
 	ViewportSettings();
 };
 

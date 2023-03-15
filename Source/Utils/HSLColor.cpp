@@ -7,12 +7,16 @@ HSLColor::HSLColor(float hue, float saturation, float lightness)
 	// Empty
 }
 
+HSLColor HSLColor::fromRGB(float* rgb) { return fromRGB(rgb[0], rgb[1], rgb[2]); }
+
 HSLColor HSLColor::fromRGB(float red, float green, float blue)
 {
 	float h, s, l;
 	rgbToHsl(red, green, blue, &h, &s, &l);
 	return HSLColor(h, s, l);
 }
+
+HSLColor HSLColor::fromHSL(float* hsl) { return fromHSL(hsl[0], hsl[1], hsl[2]); }
 
 HSLColor HSLColor::fromHSL(float hue, float saturation, float lightness)
 {
@@ -28,24 +32,25 @@ std::array<float, 3> HSLColor::getRGB() const
 
 std::array<float, 3> HSLColor::getHSL() const { return {m_hue, m_saturation, m_lightness}; }
 
-HSLColor HSLColor::darken(float factor)
-{
-	setLightness(std::max(0.0f, m_lightness * (1.0f - factor)));
-	return *this;
-}
+HSLColor HSLColor::darken(float factor) { return setLightness(std::max(0.0f, m_lightness * (1.0f - factor))); }
 
 HSLColor HSLColor::lighten(float factor)
 {
 	float multiplier = 1.0f + factor;
-	setLightness(std::min(100.0f, m_lightness * multiplier));
-	return *this;
+	return setLightness(std::min(1.0f, m_lightness * multiplier));
 }
 
-HSLColor HSLColor::makeComplementary()
+HSLColor HSLColor::desaturate(float factor) { return setSaturation(std::max(0.0f, m_saturation * (1.0f - factor))); }
+
+HSLColor HSLColor::saturate(float factor)
 {
-	setHue(fmodf((m_hue + 180.0f), 360.0f));
-	return *this;
+	float multiplier = 1.0f + factor;
+	return setSaturation(std::min(1.0f, m_saturation * multiplier));
 }
+
+HSLColor HSLColor::shiftHue(float offset) { return setHue(fmodf((m_hue + offset), 360.0f)); }
+
+HSLColor HSLColor::makeComplementary() { return setHue(fmodf((m_hue + 180.0f), 360.0f)); }
 
 float HSLColor::getHue() const { return m_hue; }
 

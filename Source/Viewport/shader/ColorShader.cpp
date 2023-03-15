@@ -10,7 +10,7 @@ ColorShader::ColorShader(GLuint id) : ObjectShader(id)
 
 void ColorShader::setUniforms()
 {
-	glUniform1f(useSingleColorId, m_useSingleColor);
+	glUniform1i(useSingleColorId, m_useSingleColor);
 	glUniform3fv(singleColorId, 1, glm::value_ptr(m_singleColor));
 
 	ObjectShader::setUniforms();

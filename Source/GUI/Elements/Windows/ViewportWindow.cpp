@@ -37,13 +37,13 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	renderOptions.framebufferAlpha = false;
 	renderOptions.multisample = true;
 	renderOptions.clearColor = Config::BACKGROUND_COLOR;
+	renderOptions.selection = true;
 
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_MULTISAMPLE);
 	// glCullFace(GL_BACK); //TODO: (DR) Do we need culling? Maybe add a toggle? (Handled by
 	// glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -81,15 +81,16 @@ void ViewportWindow::render()
 	ImVec2 windowMin = GUI::glmToIm(m_windowMin);
 	ImVec2 windowMax = GUI::glmToIm(m_windowMax);
 
+	bool userInteractedWithMenus = false;
 	if (ImGui::BeginMenuBar())
 	{
-		showViewportMenu();
+		userInteractedWithMenus |= showViewportMenu();
 		ImGui::EndMenuBar();
 	}
 
 	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
 	//  the InputManager's active input rather than asking the WindowManager
-	if (InputManager::isInputActive(getInputPtr()))
+	if (InputManager::isInputActive(getInputPtr()) && !userInteractedWithMenus)
 	{
 		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
 		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
@@ -111,10 +112,18 @@ void ViewportWindow::render()
 	ImGui::End();
 }
 
-void ViewportWindow::showViewportMenu()
+bool ViewportWindow::showViewportMenu()
 {
+	// TODO: (DR) Sometimes closing of nested menus causes a debug assertion fail, its a fixed bug as per:
+	//  https://github.com/ocornut/imgui/issues/4640
+	//	Can only be fixed by updating imgui
+
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+
+	bool userInteractedWithMenus = false;
 	if (ImGui::BeginMenu("Settings"))
 	{
+		userInteractedWithMenus = true;
 		ImGui::MenuItem("WBOIT", nullptr, &renderOptions.wboit);
 
 		bool msaaOff = !renderOptions.multisample;
@@ -145,10 +154,71 @@ void ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
+		if (ImGui::BeginMenu("Highlight"))
+		{
+			if (ImGui::BeginMenu("Preset"))
+			{
+				if (ImGui::MenuItem("Ultra", nullptr, nullptr))
+				{
+					m_viewport->getSettings().highlight_downscaleFactor = 1.0f;
+					m_viewport->getSettings().highlight_kernelSize = 4;
+					m_viewport->getSettings().highlight_outlineCutoff = 0.15f;
+					m_viewport->getSettings().highlight_useDepth = true;
+				}
+				if (ImGui::MenuItem("High", nullptr, nullptr))
+				{
+					m_viewport->getSettings().highlight_downscaleFactor = 0.8f;
+					m_viewport->getSettings().highlight_kernelSize = 4;
+					m_viewport->getSettings().highlight_outlineCutoff = 0.18f;
+					m_viewport->getSettings().highlight_useDepth = true;
+				}
+				if (ImGui::MenuItem("Medium", nullptr, nullptr))
+				{
+					m_viewport->getSettings().highlight_downscaleFactor = 0.5f;
+					m_viewport->getSettings().highlight_kernelSize = 2;
+					m_viewport->getSettings().highlight_outlineCutoff = 0.2f;
+					m_viewport->getSettings().highlight_useDepth = true;
+				}
+				if (ImGui::MenuItem("Low", nullptr, nullptr))
+				{
+					m_viewport->getSettings().highlight_downscaleFactor = 1.0f/3;
+					m_viewport->getSettings().highlight_kernelSize = 2;
+					m_viewport->getSettings().highlight_outlineCutoff = 0.3f;
+					m_viewport->getSettings().highlight_useDepth = true;
+				}
+				if (ImGui::MenuItem("Lowest", nullptr, nullptr))
+				{
+					m_viewport->getSettings().highlight_downscaleFactor = 0.25;
+					m_viewport->getSettings().highlight_kernelSize = 2;
+					m_viewport->getSettings().highlight_outlineCutoff = 0.5f;
+					m_viewport->getSettings().highlight_useDepth = false;
+				}
+				ImGui::EndMenu();
+			}
+
+			// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
+			ImGui::SliderFloat("Downscale factor", &m_viewport->getSettings().highlight_downscaleFactor, 0.01f, 1.0f, "%.2f");
+			ImGui::SliderInt("Kernel size", &m_viewport->getSettings().highlight_kernelSize, 1, 10);
+			ImGui::SliderFloat("Blur cutoff", &m_viewport->getSettings().highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
+
+			ImGui::Separator();
+			ImGui::Checkbox("Use depth", &m_viewport->getSettings().highlight_useDepth);
+			ImGui::SliderFloat("Darken factor", &m_viewport->getSettings().highlight_useDepth_darkenFactor, 0.0f, 1.0f,
+			                   "%.2f");
+			ImGui::SliderFloat("Desaturate factor", &m_viewport->getSettings().highlight_useDepth_desaturateFactor, 0.0f,
+			                   1.0f, "%.2f");
+			ImGui::EndMenu();
+		}
+
 		ImGui::EndMenu();
 	}
+
+	// TODO: (DR) To follow the "unified api methodology", the UI here should only update the viewport settings and not
+	// actually perform the changes.
+	//  Although this is more "efficient" in a way. But cumbersome I suppose.
 	if (ImGui::BeginMenu("View"))
 	{
+		userInteractedWithMenus = true;
 		if (ImGui::MenuItem("Orbit camera", nullptr, m_viewport->getSettings().mainScene_cameraMode == CameraMode::ORBIT))
 		{
 			if (auto camera = m_viewport->getViewportCamera().lock())
@@ -184,6 +254,9 @@ void ViewportWindow::showViewportMenu()
 		ImGui::MenuItem("Show frustums", nullptr, &displayOptions.showFrustum);
 		ImGui::EndMenu();
 	}
+	ImGui::PopItemFlag();
+
+	return userInteractedWithMenus;
 
 	//	World* w = App::get().world();
 	//	if (ImGui::BeginMenu("Viewports"))

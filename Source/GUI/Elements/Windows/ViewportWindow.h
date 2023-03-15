@@ -33,6 +33,6 @@ private:
 	Vp::DisplayOptions displayOptions;
 	Vp::RenderOptions renderOptions;
 
-	void showViewportMenu();
+	bool showViewportMenu();
 };
 } // namespace UI

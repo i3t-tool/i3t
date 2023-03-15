@@ -30,5 +30,12 @@ ViewportSettings::ViewportSettings()
 	trackballCamera_zoomSpeed = 0.8f;
 	trackballCamera_rotateSpeed = 0.29f;
 	trackballCamera_translateSpeed = 0.02f;
+
+	highlight_downscaleFactor = 0.5f;
+	highlight_kernelSize = 2;
+	highlight_outlineCutoff = 0.2f;
+	highlight_useDepth = true;
+	highlight_useDepth_darkenFactor = 0.5f;
+	highlight_useDepth_desaturateFactor = 0.4f;
 }
 } // namespace Vp

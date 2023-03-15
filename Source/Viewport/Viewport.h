@@ -14,9 +14,9 @@
 #include "pgr.h"
 
 #include "Viewport/camera/ICamera.h"
-#include "Viewport/data/ViewportSettings.h"
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
+#include "Viewport/data/ViewportSettings.h"
 #include "Viewport/scene/Scene.h"
 #include "Viewport/scene/scenes/MainScene.h"
 #include "Viewport/scene/scenes/PreviewScene.h"
@@ -77,13 +77,10 @@ private:
 	std::unique_ptr<MainScene> m_mainScene;
 	std::unique_ptr<PreviewScene> m_previewScene;
 
-	// Scene render targets (buffers scenes are rendered into)
+	// Scene render targets (buffer(s) scenes are rendered into)
 	Ptr<SceneRenderTarget> viewportRenderTarget;
 	Ptr<SceneRenderTarget> screenRenderTarget;
 	Ptr<SceneRenderTarget> previewRenderTarget;
-
-	// TODO: (DR) Should perhaps be a static or singleton class
-	std::unique_ptr<Shaders> m_shaders;
 
 	ViewportSettings m_settings;
 

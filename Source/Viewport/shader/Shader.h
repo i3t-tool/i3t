@@ -17,8 +17,16 @@ class Shader
 public:
 	GLuint id;
 
+	/**
+	 * Whether to use weighted blended transparency for output if supported
+	 * \see supportsWboit()
+	 */
+	bool m_wboit = false;
+
+protected:
 	GLint wboitFlagUniform{-1}; ///< Uniform id of the wboit enable/disable flag
 
+public:
 	explicit Shader(GLuint id);
 	virtual ~Shader() = default;
 
@@ -27,16 +35,22 @@ public:
 	/**
 	 * Set uniforms before rendering
 	 */
-	virtual void setUniforms(){};
+	virtual void setUniforms();
 
 	/**
 	 * Set uniforms before rendering individual mesh parts
 	 * @param meshPart MeshPart being rendered
 	 */
-	virtual void setUniformsPerMeshPart(Core::Mesh::MeshPart& meshPart){};
+	virtual void setUniformsPerMeshPart(Core::Mesh::MeshPart& meshPart);
 
-	virtual void bindTexture2D(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
+	void bindTexture2D(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
+	void bindTexture2DMS(GLuint textureUnit, GLuint textureID, GLint samplerLocation);
 
-	virtual bool hasUniform(GLint location);
+	bool hasUniform(GLint location);
+
+	/**
+	 * @return Whether this shader supports output to wboit buffers
+	 */
+	bool supportsWboit();
 };
 } // namespace Vp

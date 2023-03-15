@@ -93,6 +93,8 @@ void InputBindings::init()
 	InputManager::setInputAction("touch", Keys::mouseLeft);
 
 	InputManager::setInputAction("raisePopup", Keys::mouseRight);
+
+	InputManager::setInputAction("viewport_select", Keys::mouseLeft);
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)

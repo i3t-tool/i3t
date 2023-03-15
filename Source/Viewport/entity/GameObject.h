@@ -7,7 +7,6 @@
 
 namespace Vp
 {
-class Material;
 class ObjectShader;
 
 /**
@@ -15,9 +14,6 @@ class ObjectShader;
  */
 class GameObject : public Entity
 {
-protected:
-	ObjectShader* m_shader;
-
 public:
 	Core::Mesh* m_mesh;
 
@@ -31,7 +27,7 @@ public:
 
 	GameObject(Core::Mesh* mesh, ObjectShader* shader);
 
-	void render(glm::mat4 view, glm::mat4 projection) override;
+	void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) override;
 	void update(Scene& scene) override;
 	void dispose() override;
 };

@@ -8,6 +8,7 @@
 #include "Core/Types.h"
 #include "Logger/Logger.h"
 
+#include "Viewport/SelectStencil.h"
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/entity/GameObject.h"
 #include "Viewport/framebuffer/Framebuffer.h"
@@ -34,15 +35,24 @@ public:
 
 	std::shared_ptr<ICamera> m_camera;
 	std::shared_ptr<Lighting> m_lighting;
+	std::shared_ptr<SelectStencil> m_selectStencil;
 
 protected:
 	std::vector<std::shared_ptr<Entity>> m_entities;
+	// TODO: (DR) Support for multiple selected entities might be nice, but perhaps not needed
+	// TODO: (DR) It might make more sense to reuse unused ids to keep the below 255
+	//	Also selectable entities should have the lowest id possible
+	//	Right now quickly re-adding entities will make the id explode past 255!!
+	Entity* selectedEntity = nullptr;
+	long m_entityCounter = 0;
 
-private:
 	// Temporary lists for transparency sorting
 	std::vector<Entity*> m_unorderedTransparentEntities;
 	std::vector<Entity*> m_explicitTransparencyOrderEntitiesFirst;
 	std::vector<Entity*> m_explicitTransparencyOrderEntitiesLast;
+
+	// Temporary list for selection/highlighting
+	std::vector<Entity*> m_highlightedEntities;
 
 public:
 	explicit Scene(Viewport* viewport);
@@ -65,6 +75,14 @@ public:
 	virtual void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
 	                  const DisplayOptions& displayOptions);
 
+	/**
+	 * Create and populates a SceneRenderTarget object with expected framebuffer objects for the scenes render pass.
+	 * Individual framebuffers are only identified by their index in the render target framebuffer array.
+	 * It is expected that these indexes are kept track of somewhere else, or just expected to be a certain way.
+	 *
+	 * @param options Relevant render options to take into account during render target creation
+	 * @return Owning pointer to the created render target object
+	 */
 	virtual Ptr<SceneRenderTarget> createRenderTarget(const RenderOptions& options);
 
 	/**
@@ -82,6 +100,18 @@ public:
 	void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize);
 
 	/**
+	 * Update selection logic.
+	 *
+	 * @param renderTarget Scene's render target
+	 * @param mousePos Current mouse position relative to the window
+	 * @param windowSize Current window size
+	 */
+	void processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos, glm::ivec2 windowSize);
+
+	void selectEntity(long id);
+	Entity* getSelectedEntity();
+
+	/**
 	 * Adds entity to the scene.
 	 *
 	 * Entity is added via a shared pointer which is copied and stored.
@@ -97,6 +127,10 @@ public:
 	std::weak_ptr<T> addEntity(std::shared_ptr<T> entity)
 	{
 		m_entities.push_back(entity);
+		if (entity->m_selectable)
+		{
+			entity->m_selectionId = m_selectStencil->registerStencil();
+		}
 		entity->onSceneAdd(*this);
 		return entity;
 	}
@@ -115,6 +149,11 @@ public:
 		{
 			std::erase(m_entities, entityPtr);
 			entityPtr->onSceneRemove(*this);
+			if (entityPtr->m_selectionId != -1)
+			{
+				m_selectStencil->freeStencil(entityPtr->m_selectionId);
+				entityPtr->m_selectionId = -1;
+			}
 		}
 		else
 		{
