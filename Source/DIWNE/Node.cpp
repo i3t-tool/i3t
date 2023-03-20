@@ -138,8 +138,9 @@ bool Node::afterEndDiwne()
 
 		if (m_selected)
 		{
-			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor, 0,
-			                   ImDrawCornerFlags_None, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
+			                   diwne.mp_settingsDiwne->selectionRounding,
+			                   ImDrawCornerFlags_All, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 		}
 
 		if (prev_selected != m_selected)

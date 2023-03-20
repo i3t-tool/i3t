@@ -9,9 +9,9 @@
 
 std::optional<Ptr<GuiNode>> findNodeById(const std::vector<Ptr<GuiNode>>& nodes, Core::ID id);
 
-Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes);
+Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset = 0);
 
-void duplicateNode(const Ptr<GuiNode>& node);
+void duplicateNode(const Ptr<GuiNode>& node, float offset = 0);
 
 void pasteNodes(const Memento& memento);
 

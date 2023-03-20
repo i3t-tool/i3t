@@ -67,6 +67,7 @@ struct SettingsDiwne
 	float maxWorkAreaZoom = 4;             /*!< maximal value of zoom */
 	float workAreaInitialZoom = 1;         /*!< initial value of zoom */
 	float zoomWheelReverseSenzitivity = 8; /*!< Higher number -> smaller change, can not be 0 */
+	float selectionRounding = 0;					 /*!< rounding od selection */
 
 	ImVec2 initPopupPosition = ImVec2(0, 0); /*!< where to show popup when not set later */
 
@@ -74,7 +75,7 @@ struct SettingsDiwne
 	ImVec4 selectionRectTouchColor = ImVec4(0.0, 1.0, 0.0, 0.35);
 
 	ImVec4 itemSelectedBorderColor = ImVec4(1.0, 0.9, 0.4, 0.6);
-	float itemSelectedBorderThicknessDiwne = 2;
+	float itemSelectedBorderThicknessDiwne = 2.5;
 
 	ImVec4 objectFocusBorderColor = ImVec4(0.0, 0.0, 0.0, 0.20);
 	float objectFocusBorderThicknessDiwne = 1.5;
@@ -99,7 +100,7 @@ struct SettingsDiwne
 	ImVec2 linkStartControlOffsetDiwne = ImVec2(10, 0);
 	ImVec2 linkEndControlOffsetDiwne = ImVec2(-10, 0);
 	float linkAlphaHovered = 1;
-	float linkAlpha = 0.5;
+	float linkAlpha = 0.2;
 	float linkAlphaSelectedHovered = 1;
 	float linkAlphaSelected = 0.5;
 };

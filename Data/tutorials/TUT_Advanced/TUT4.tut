@@ -1,10 +1,10 @@
 ---
-title: 4. Pokročilá práce se scénou
+title: Pokročilá práce se scénou
 description: Nauč se jak pracovat s I3T efektivněji!
 thumbnail: thumbnail.png
 language: cs
 ---
-*Vítej v tutoriálu na pokročilé ovládání!*
+headline: Vítej v tutoriálu na pokročilé ovládání!
 
 Naučíš se tu líp *manipulovat s objekty* ve scéně, jaké máš možnosti a jak *jednodušeji pracovat s I3T*.
 
@@ -12,20 +12,8 @@ Naučíš se tu líp *manipulovat s objekty* ve scéně, jaké máš možnosti a
 
 Tutoriál bude sloužit spíš jako *manuál*, můžeš skočit vždy na to, co potřebuješ.
 
-
 --
-*Výsledek tutoriálu*
-
-S pomocí zkratek a úprav můžeš z *této sekvence*:
-![Fuj!](worse.png)
-
-Udělat *tuto sekvenci*:
-![Mňam!](better.png)
-
-Mnohem *přehlednější*!
-
---
-*Hlavní lišta*
+headline: Hlavní lišta
 
 ![Hlavní lišta programu](lista.png)
 
@@ -39,7 +27,7 @@ Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se 
 
 ![Menu SceneView](sceneView.png)
 --
-*Hotkeys - Klávesové zkratky*
+headline: Hotkeys - Klávesové zkratky
 
 *I3T* obsahuje většinu známých zkratek:
     * copy/paste/cut
@@ -59,14 +47,17 @@ Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se 
     * delete
         * *Delete*
 --
-*Level Of Detail*
+headline: Level Of Detail
 
 Pokud nám bloky *zabírají moc místa* ve scéně, nebo si chceme *ulehčit transformace*, můžeme využít *Level Of Detail*:
     * *Full* = plný detail, vidíme *všechno*
     * *Label* = pouze *jméno*, zbytek je schovaný
     * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic
 
-Detail nastavíme *kliknutím pravým tlačítkem na libovolný blok* pod *"Level of detail"*
+*Detail* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*
 ![Menu pro nastavení Level of detail](levelOfDetail.png)
+
+--
+
 
 --

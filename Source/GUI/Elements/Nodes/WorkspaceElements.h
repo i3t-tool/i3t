@@ -93,6 +93,10 @@ public:
 	bool getRemoveFromWorkspace() const { return m_removeFromWorkspaceWindow; };
 	void setRemoveFromWorkspace(bool value) { m_removeFromWorkspaceWindow = value; };
 
+	bool m_duplicateNode = false;
+	bool getDuplicateNode() const { return m_duplicateNode; };
+	void setDuplicateNode(bool value) { m_duplicateNode = value; };
+
 	virtual void drawMenuDelete();
 	virtual void popupContent();
 };

@@ -1,5 +1,6 @@
 #include "Pin.h"
 
+#include "Logger/Logger.h"
 #include "Node.h"
 
 namespace Core
@@ -59,8 +60,7 @@ const char* Pin::getLabel() const
 			label = op->defaultOutputNames[m_index].c_str();
 		}
 	}
-
-	if (label == nullptr)
+	if (label == nullptr && getRenderPins())
 	{
 		label = defaultIoNames[static_cast<size_t>(m_valueType)];
 	}

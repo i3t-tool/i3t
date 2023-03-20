@@ -132,12 +132,11 @@ headline: Sekvence
 
 Má několik *vstupů* a *výstupů*, pro nás je nejdůležtější *výstup* maticového násobení ![Maticové násobení](mult.png).
 
-Jelikož je datový typ stejný jako vstup modelu, můžeme táhnutím myši *spojit* oba bloky drátem.
+Jelikož je datový typ stejný jako vstup modelu, můžeme *táhnutím* myši *spojit* oba bloky drátem.
 
 task: Propoj *sekvenci* a *model*!
 
 ![Sekvence](seq.png)
-
 
 --
 
@@ -158,7 +157,7 @@ task: Vlož matici *scale* do *sekvence*!
 --
 headline: Změna hodnoty
 
-task: Změň první hodnotu v matici *tažením levým tlačítkem myši*
+task: Změň první hodnotu v matici *tažením levým tlačítkem myši* (horizontálně)
 
 ![Kliknutím na hodnotu v matici a tažením myši vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
 

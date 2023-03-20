@@ -33,8 +33,6 @@ WorkspaceModel::~WorkspaceModel()
 
 void WorkspaceModel::popupContent_axis_showmodel()
 {
-	ImGui::Separator();
-
 	if (ImGui::MenuItem("Show axes", NULL, m_axisOn))
 	{
 		m_axisOn = !m_axisOn;
@@ -114,8 +112,19 @@ glm::vec3 WorkspaceModel::calculateTint(glm::vec3 color)
 
 void WorkspaceModel::popupContent()
 {
-	WorkspaceNodeWithCoreDataWithPins::popupContent();
+	WorkspaceNodeWithCoreData::drawMenuSetEditable();
+
+	ImGui::Separator();
+
 	popupContent_axis_showmodel();
+
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	WorkspaceNode::popupContent();
 }
 
 void WorkspaceModel::init()
@@ -137,6 +146,13 @@ void WorkspaceModel::init()
 			    m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
 		    }
 	    });
+}
+bool WorkspaceModel::topContent()
+{
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+
+	return WorkspaceNodeWithCoreData::topContent();
 }
 
 bool WorkspaceModel::middleContent()

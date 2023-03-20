@@ -32,6 +32,28 @@ void WorkspaceScreen::init()
 	renderOptions.clearColor = Config::BACKGROUND_COLOR;
 }
 
+void WorkspaceScreen::popupContent()
+{
+	WorkspaceNodeWithCoreData::drawMenuSetEditable();
+
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	WorkspaceNode::popupContent();
+}
+
+
+bool WorkspaceScreen::topContent()
+{
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+
+	return WorkspaceNodeWithCoreData::topContent();
+}
+
 //  The screen has two triangles for resize:
 //  ----------
 //  |        |

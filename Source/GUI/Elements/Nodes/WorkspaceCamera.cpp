@@ -12,8 +12,33 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
       m_view(std::make_shared<WorkspaceSequence>(diwne, m_nodebase->as<Core::Camera>()->getView(), true, true))
 {
 	(m_view->getInputs().at(0).get())->plug(m_projection->getOutputs().at(0).get());
+
 	m_projection->m_selectable = false;
+	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
+	{
+		if(i != 1) m_projection->getNodebase()->getInputPins()[i].setRenderPins(false);
+	}
+	for (int j = 0; j < m_projection->getNodebase()->getOutputPins().size(); j++)
+	{
+		if(j != 1) m_projection->getNodebase()->getOutputPins()[j].setRenderPins(false);
+	}
+	m_projection->getNodebase()->getInputPins()[1].setRenderPins(true);
+	m_projection->getNodebase()->getOutputPins()[1].setRenderPins(true);
+
 	m_view->m_selectable = false;
+	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
+	{
+		m_view->getNodebase()->getInputPins()[k].setRenderPins(false);
+	}
+	for (int l = 0; l < m_view->getNodebase()->getOutputPins().size(); l++)
+	{
+		m_view->getNodebase()->getOutputPins()[l].setRenderPins(false);
+	}
+	m_view->getNodebase()->getInputPins()[1].setRenderPins(true);
+	m_view->getNodebase()->getOutputPins()[1].setRenderPins(true);
+
+	//Hide multiplication output to discourage interaction
+	//getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRenderPins(false);
 
 	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 
@@ -45,7 +70,7 @@ WorkspaceCamera::~WorkspaceCamera() { App::get().viewport()->removeEntity(m_view
 
 void WorkspaceCamera::popupContent()
 {
-	WorkspaceNodeWithCoreData::popupContent();
+	WorkspaceNodeWithCoreData::drawMenuSetEditable();
 
 	ImGui::Separator();
 
@@ -113,6 +138,13 @@ void WorkspaceCamera::popupContent()
 		}
 		ImGui::EndMenu();
 	}
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	WorkspaceNode::popupContent();
 }
 
 glm::vec3 WorkspaceCamera::calculateFrustumColor(glm::vec3 color)
@@ -123,6 +155,13 @@ glm::vec3 WorkspaceCamera::calculateFrustumColor(glm::vec3 color)
 	hsl.z = 0.25;
 	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
 	return color;
+}
+bool WorkspaceCamera::topContent()
+{
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+
+	return WorkspaceNodeWithCoreData::topContent();
 }
 
 bool WorkspaceCamera::middleContent()

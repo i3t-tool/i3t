@@ -90,6 +90,7 @@ void MainMenuBar::render()
 		showFileMenu();
 		showEditMenu();
 		showWindowsMenu();
+		showTutorialMenu();
 		showHelpMenu();
 
 		ImGui::EndMenuBar();
@@ -117,7 +118,7 @@ void MainMenuBar::showFileMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::MenuItem("Open"))
+		if (ImGui::MenuItem("Load"))
 		{
 			open();
 		}
@@ -187,6 +188,17 @@ void MainMenuBar::showWindowsMenu()
 		ImGui::MenuItem("Console window", nullptr, I3T::getWindowPtr<Console>()->getShowPtr());
 		ImGui::MenuItem("Log window", nullptr, I3T::getWindowPtr<LogWindow>()->getShowPtr());
 
+		ImGui::EndMenu();
+	}
+}
+
+void MainMenuBar::showTutorialMenu()
+{
+	if (ImGui::BeginMenu("Tutorials"))
+	{
+
+		ImGui::MenuItem("Tutorial menu", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::EndMenu();
 	}
 }

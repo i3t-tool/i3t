@@ -77,9 +77,13 @@ void Theme::initClassicProperties()
 	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
 	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
 
+	set(EColor::Workspace_SelectedBorder, createColor(88, 255, 234, 150));
+	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 0));
+	set(EColor::Workspace_InteractionFocusBorder, createColor(0, 0, 0, 75));
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
 	set(EColor::TutorialText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
+	set(EColor::TutorialScrollbarBg, createColor(215, 215, 215, 255));
 	set(EColor::TutorialScrollbarActive, createColor(245, 245, 245, 255));
 	set(EColor::TutorialScrollbarGrab, createColor(232, 232, 232, 255));
 	set(EColor::TutorialScrollbarHovered, createColor(240, 240, 240, 255));
@@ -87,7 +91,8 @@ void Theme::initClassicProperties()
 	set(EColor::TutorialHighlightText, createColor(51, 51, 51, 255));
 	set(EColor::TutorialButtonText, createColor(255, 255, 255, 255));
 	set(EColor::TutorialButtonBg, createColor(14, 98, 175, 255));
-	set(EColor::TutorialButtonActive, createColor(8, 187, 230, 255));
+	set(EColor::TutorialButtonActive, createColor(19, 132, 230, 255));
+	set(EColor::TutorialButtonHovered, createColor(19, 116, 201, 255));
 
 	set(EColor::TutorialTaskBg, createColor(100, 100, 100, 25));
 
@@ -130,7 +135,11 @@ void Theme::initClassicProperties()
 
 	// General unspecified node
 	set(EColor::NodeBg, createColor(255, 200, 50, 255));
-	set(EColor::NodeHeader, createColor(255, 200, 0, 255));
+	set(EColor::NodeHeader, createColor(0, 0, 0, 30));
+
+	// Sequence
+	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
+	set(EColor::NodeHeaderSequence, ImVec4(0.431f, 0.431f, 0.431f, 1.0f));
 
 	// Folta operator color set
 	set(EColor::NodeBgOperator, ImVec4(83.0f / 255.0f, 101.0f / 255.0f, 146.0f / 255.0f, 1.00f));
@@ -184,7 +193,7 @@ void Theme::initClassicProperties()
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
 	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
-	m_sizes[ESize::Nodes_Rounding] = 0.0f;
+	m_sizes[ESize::Nodes_Rounding] = 5.0f;
 	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
 	m_sizes[ESize::Nodes_LabelIndent] = 3.0f;
 	m_sizes[ESize::Nodes_HeaderLabelIndent] = 2.0f;
@@ -205,7 +214,17 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
+	m_sizes[ESize::Workspace_SelectedBorderThickness] = 2.5f;
+	m_sizes[ESize::Workspace_FocusBorderThickness] = 1.5f;
+	m_sizes[ESize::Workspace_InteractionFocusBorderThickness] = 1.5f;
+	m_sizes[ESize::Workspace_CopyPasteOffset] = 25.f;
+
 	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
+	m_sizes[ESize::TutorialWindow_FrameRounding] = 5.0f;
+	m_sizes[ESize::TutorialWindow_ScrollbarRounding] = 5.0f;
+	m_sizes[ESize::TutorialWindow_ScrollbarSize] = 15.0f;
+	m_sizes[ESize::TutorialWindow_BackButtonWidth] = 40.0f;
+	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 80.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
 
@@ -252,10 +271,13 @@ void Theme::initClassicProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 
+	m_sizesVec2[ESizeVec2::Nodes_noPinsSpacing] = ImVec2(0.f, 20.f);
+
 	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 
+	m_sizesVec2[ESizeVec2::TutorialWindow_Padding] = ImVec2(30.f, 35.f);
 	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
 	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
 }
@@ -278,8 +300,23 @@ void Theme::initModernProperties()
 	auto dockTabActive = HSLColor::fromRGB(0.278f, 0.278f, 0.286f).lighten(0.2f).getRGB();
 	set(EColor::DockTabActive, ImVec4(dockTabActive[0], dockTabActive[1], dockTabActive[2], 1.00f));
 
+	set(EColor::Workspace_SelectedBorder, createColor(255, 225, 100, 150));
+	set(EColor::Workspace_FocusBorder, createColor(0, 0, 0, 51));
+	set(EColor::Workspace_InteractionFocusBorder, createColor(0, 0, 0, 51));
 	set(EColor::TutorialBgColor, createColor(232, 232, 232, 255));
-	set(EColor::TutorialButtonActive, createColor(8, 187, 230, 255));
+	set(EColor::TutorialText, createColor(51, 51, 51, 255));
+	set(EColor::TutorialBarBg, createColor(215, 215, 215, 255));
+	set(EColor::TutorialScrollbarBg, createColor(215, 215, 215, 255));
+	set(EColor::TutorialScrollbarActive, createColor(245, 245, 245, 255));
+	set(EColor::TutorialScrollbarGrab, createColor(232, 232, 232, 255));
+	set(EColor::TutorialScrollbarHovered, createColor(240, 240, 240, 255));
+	set(EColor::TutorialTitleText, createColor(14, 98, 175, 255));
+	set(EColor::TutorialHighlightText, createColor(51, 51, 51, 255));
+	set(EColor::TutorialButtonText, createColor(255, 255, 255, 255));
+	set(EColor::TutorialButtonBg, createColor(14, 98, 175, 255));
+	set(EColor::TutorialButtonActive, createColor(19, 132, 230, 255));
+	set(EColor::TutorialButtonHovered, createColor(19, 116, 201, 255));
+
 	set(EColor::TutorialTaskBg, createColor(100, 100, 100, 25));
 
 	set(EColor::SelectionRectFull, createColor(0, 0, 255, 100));
@@ -319,23 +356,23 @@ void Theme::initModernProperties()
 	set(EColor::Item_SelectedBorder, createColor(100, 100, 0, 255));
 
 	// General unspecified node
-	set(EColor::NodeBg, createColor(255, 200, 50, 255));
-	set(EColor::NodeHeader, createColor(255, 200, 0, 255));
+	set(EColor::NodeBg, createColor(70, 104, 134, 255));
+	set(EColor::NodeHeader, createColor(0, 0, 0, 50));
 
 	// Sequence
 	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
 	set(EColor::NodeHeaderSequence, ImVec4(0.431f, 0.431f, 0.431f, 1.0f));
 
 	// Operator
-	set(EColor::NodeBgOperator, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
-	set(EColor::NodeHeaderOperator, ImVec4(73.0f / 255.0f, 91.0f / 255.0f, 136.0f / 255.0f, 1.00f));
+	set(EColor::NodeBgOperator, createColor(62, 72, 83, 255));
+	set(EColor::NodeHeaderOperator, createColor(55, 55, 55, 255));
 	set(EColor::FloatBgOperator, createColor(255, 255, 255, 255));
 	set(EColor::FloatBgOperatorActive, ImVec4(97.0f / 255.0f, 105.0f / 255.0f, 126.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgOperatorHovered, ImVec4(87.0f / 255.0f, 95.0f / 255.0f, 116.0f / 255.0f, 1.00f));
 
 	// Transform
-	set(EColor::NodeBgTransformation, ImVec4(0.816f, 0.816f, 0.816f, 1.00f));
-	set(EColor::NodeHeaderTranformation, ImVec4(0.498f, 0.412f, 0.192f, 1.00f));
+	set(EColor::NodeBgTransformation, createColor(120, 120, 132, 255));
+	set(EColor::NodeHeaderTranformation, createColor(32, 32, 32, 111));
 	set(EColor::FloatBgTransformation, createColor(255, 255, 255, 255));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
@@ -378,30 +415,37 @@ void Theme::initModernProperties()
 
 	m_sizes[ESize::Nodes_FloatMargin] = 1.0f;
 	m_sizes[ESize::Nodes_FloatWidth] = 25.0f;
-	m_sizes[ESize::Nodes_Rounding] = 0.0f;
+	m_sizes[ESize::Nodes_Rounding] = 5.0f;
 	m_sizes[ESize::Nodes_BorderWidth] = 0.0f;
 	m_sizes[ESize::Nodes_LabelIndent] = 3.0f;
 	m_sizes[ESize::Nodes_HeaderLabelIndent] = 2.0f;
 	m_sizes[ESize::Nodes_trackballButtonHeight] = 20.0f;
 	m_sizes[ESize::Nodes_TrackBallSensitivity] = 5.0f;
-
 	m_sizes[ESize::Nodes_FloatInnerPadding] = 1.0f;
-
 	m_sizes[ESize::Nodes_dragSpeedDefaulrRatio] = 0.015f;
 	m_sizes[ESize::Nodes_CtrlMultiplicator] = 0.1f;
 	m_sizes[ESize::Nodes_SHIFTMultiplicator] = 10.0f;
 	m_sizes[ESize::Nodes_ALTMultiplicator] = 0.01f;
-
 	m_sizes[ESize::Nodes_InputsAlignment] = 0.0f;
 	m_sizes[ESize::Nodes_MiddleAlignment] = 0.0f;
 	m_sizes[ESize::Nodes_OutputsAlignment] = 0.0f;
-
 	m_sizes[ESize::Nodes_leftSideSpacing] = 3.0f;
 	m_sizes[ESize::Nodes_rightSideSpacing] = 3.0f;
 
+	m_sizes[ESize::Workspace_SelectedBorderThickness] = 2.5f;
+	m_sizes[ESize::Workspace_FocusBorderThickness] = 1.5f;
+	m_sizes[ESize::Workspace_InteractionFocusBorderThickness] = 1.5f;
+	m_sizes[ESize::Workspace_CopyPasteOffset] = 25.f;
+
 	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
+	m_sizes[ESize::TutorialWindow_FrameRounding] = 5.0f;
+	m_sizes[ESize::TutorialWindow_ScrollbarRounding] = 5.0f;
+	m_sizes[ESize::TutorialWindow_ScrollbarSize] = 15.0f;
+	m_sizes[ESize::TutorialWindow_BackButtonWidth] = 40.0f;
+	m_sizes[ESize::TutorialWindow_MainMenuButtonWidth] = 70.0f;
 
 	m_sizes[ESize::Default_VisiblePrecision] = 1.0f;
+
 	m_sizes[ESize::Default_InactiveMark] = 0.0f;
 
 	m_sizes[ESize::Links_ControlpointsPositionFraction] = 0.2f;
@@ -444,11 +488,13 @@ void Theme::initModernProperties()
 	m_sizesVec2[ESizeVec2::Nodes_Screen_resizeButtonSize] = ImVec2(20.f, 20.f);
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
+	m_sizesVec2[ESizeVec2::Nodes_noPinsSpacing] = ImVec2(0.f, 20.f);
 
 	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 
+	m_sizesVec2[ESizeVec2::TutorialWindow_Padding] = ImVec2(30.f, 35.f);
 	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
 	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
 }
@@ -457,6 +503,7 @@ void Theme::initNames()
 {
 	// All category keys must be I3T_PROPERTY_NAME_OFFSET characters long.
 	g_CategoryNames["glob_"] = "Global";
+	g_CategoryNames["tuts_"] = "Tutorials";
 	g_CategoryNames["ngen_"] = "Node Editor General";
 	g_CategoryNames["npin_"] = "Node Editor Pins";
 	g_CategoryNames["nops_"] = "Node Editor Operators";
@@ -486,6 +533,23 @@ void Theme::initNames()
 	//	g_ColorNames[EColor::NodeEditorBg]		= "ngen_Node Editor Background";
 	//	g_ColorNames[EColor::NodeHeader]			= "ngen_Node Editor Header";
 	//	g_ColorNames[EColor::Nodes_FloatText] = "ngen_Text in cells";
+
+	// Tutorials
+	g_ColorNames[EColor::TutorialBgColor] = "tuts_Background";
+	g_ColorNames[EColor::TutorialText] = "tuts_Text";
+	g_ColorNames[EColor::TutorialBarBg] = "tuts_Bar Background";
+	g_ColorNames[EColor::TutorialScrollbarBg] = "tuts_Scrollbar Background";
+	g_ColorNames[EColor::TutorialScrollbarActive] = "tuts_Scrollbar Active";
+	g_ColorNames[EColor::TutorialScrollbarGrab] = "tuts_Scrollbar Grab";
+	g_ColorNames[EColor::TutorialScrollbarHovered] = "tuts_Scrollbar Hovered";
+	g_ColorNames[EColor::TutorialTitleText] = "tuts_Title Text";
+	g_ColorNames[EColor::TutorialHighlightText] = "tuts_Highlight Text";
+	g_ColorNames[EColor::TutorialButtonText] = "tuts_Button Text";
+	g_ColorNames[EColor::TutorialButtonBg] = "tuts_Button Background";
+	g_ColorNames[EColor::TutorialButtonActive] = "tuts_Button Active";
+	g_ColorNames[EColor::TutorialButtonHovered] = "tuts_Button Hovered";
+
+	g_ColorNames[EColor::TutorialTaskBg] = "tuts_Task Bacground";
 
 	// 2. Pins
 	g_ColorNames[EColor::PulsePin] = "npin_Pulse Pin";

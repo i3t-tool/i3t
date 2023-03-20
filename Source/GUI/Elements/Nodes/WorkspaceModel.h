@@ -43,6 +43,7 @@ public:
 	// bool drawDataFull(, int index);
 	int maxLenghtOfData();        // todo
 	bool middleContent();         // the most important function
+	bool topContent();
 	void drawMenuLevelOfDetail(); // todo
 
 	void popupContent();

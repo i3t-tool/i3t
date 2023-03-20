@@ -65,11 +65,22 @@ Propojíme je tažením myši
 
 ![Bloky sekvence a modelu](sekvencemodel.png)
 
-task: Změň si kostičku na kačenku (jmenuje se *Eduardo*)
-*Nápověda:* Model si změň kliknutím ![pravé tlačítko myši](mouseRight.png)  pravým tlačítkem na *lištu* modelu a vybráním "duck" v *"Change Model"*
+*Problém: *Co když si chci kostičku změnit na *kačenku*?
+--
+headline: Řešení: Kontextové menu bloků
+
+Každý blok má vlastní *kontextové menu*, které se zobrazí po kliknutí pravým tlačítkem ![pravé tlačítko myši](mouseRight.png)  na *lištu* bloku.
+
+![Kontextové menu modelu](context_menu.png)
+
+V menu můžeš blok např. *přejmenovat*, nastavit počet desetinných míst nebo *změnit model*.
 --
 
 headline: Škálování
+
+task: Změň kostku na model "duck" (jmenuje se *Eduardo*)
+task: Přidej do workplace *matici scale*
+hint: Škálování najdeš ve workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace) pod transformation/scale.
 
 Škálování využíváme ke *změně velikosti* objektu.
 
@@ -83,10 +94,8 @@ Tahle konkrétní matice rovnoměrně *zvětší objekt dvakrát*.
 
 headline: Škálování objektu
 
-task: Přidej do workplace *matici scale*, pak jí vlož do sekvence a nastav její hodnoty na *dva*
-hint:
-Škálování najdeš ve workspace menu ( ![pravé tlačítko myši](mouseRight.png)  na Workspace) pod transformation/scale.
-Matici přetáhni myší do sekvence - uchopením za její horní lištu
+task: Vlož matici do sekvence a nastav její hodnoty na *dva*
+hint: Matici přetáhni myší do sekvence - uchopením za její horní lištu
 
 Vidíme, že se nám ve *Scene View* kačka rovnoměrně dvakrát zvětšila.
 
@@ -108,6 +117,8 @@ To uděláme kliknutím pravým tlačítkem myši na lištu matice a vybráním 
 --
 headline: Rotace
 
+task: Přidej do workspace *matici rotace* podle osy *Y*
+
 Rotaci využíváme k *otáčení objektu v prostoru*.
 
 Hodnoty v matici rotace nastavujeme v závislosti na *ose*, podél které objekt otáčíme *(pro nás X, Y, nebo Z)*:
@@ -119,7 +130,6 @@ Obyčejně v rotacích používáme *sinus* a *kosinus* úhlu rotace, proto jsou
 
 headline: Výměna matic v sekvenci
 
-task: Přidej do workspace *matici rotace* podle osy *Y*
 task:  Myší vytáhni z bloku sekvence *matici škálování* a nahraď ji *maticí rotace*
 
 hint: ![pravé tlačítko myši](mouseRight.png)  na Workspace, transformation/rotation/eulerAngleY
@@ -129,10 +139,10 @@ hint: ![pravé tlačítko myši](mouseRight.png)  na Workspace, transformation/r
 *Problém:* K nastavení přesné hodnoty musíme používat *myš i klávesnici*.
 --
 
-headline: Řešení: Set Value
+headline: Řešení: Choose Value
 Určitě víš, že hodnoty v maticích můžeš nastavit *tažením myši*, *dvojklikem*.
 
-Dalším způsobem úpravy hodnot je menu *Set value*, které zobrazíme kliknutím pravým tlačítkem myši na libovolnou *hodnotu matice*.
+Dalším způsobem úpravy hodnot je menu *Choose value*, které zobrazíme kliknutím pravým tlačítkem myši na libovolnou *hodnotu matice*.
 
 ![Menu s úhly rotace](anglePopup.png)
 
@@ -141,18 +151,20 @@ V něm můžeš vybrat *přesné číslo* ze seznamu nejpoužívanějších hodn
  --
 headline: Práce s rotací
 
-task: Otoč model pomocí Set value menu
+task: Otoč model pomocí Choose value menu
 
 hint: ![pravé tlačítko myši](mouseRight.png)  na libovolnou hodnotu matice
 
 ![Otočený Eduardo](rotated_cube.png)
 
-Kostka se nádherně natočí podle *osy Y*.
+Kačka se nádherně natočí podle *osy Y*.
 
 Skládáním s *ostatními rotacemi* můžeme model otáčet libovolně. *Skládání transformací* uvidíme v dalším tutoriálu.
 
 --
 headline: Translace
+
+task: Odeber *matici rotace* ze sekvence a nahraď jí novou *maticí translace*
 
 Translací *posouváme* objekt v prostoru.
 
@@ -165,19 +177,18 @@ Translací *posouváme* objekt v prostoru.
     * O dva po ose Y (o dva "nahoru")
     * O čtyři do záporu v ose Z (o čtyři "od nás")
 
-Jdeme si zkusit Eduarda posunout!
 --
 headline: Práce s translací
-
-task: Odeber *matici rotace* ze sekvence a nahraď jí novou *maticí translace*
-hint:
-Maticemi manipulujeme tažením myši za jejich horní lištu
 
 Nevím, jak to máš ty, ale já mám na kachny alergii.
 
 task: Uprav hodnoty v *matici translace* tak, aby kačice nebyla vidět ve *Scene View* (jako na obrázku)
 
 ![Scéna bez kačky (uff)](translated_cube.png)
+
+*Tip:* kdyby sis chtěl/a hodnoty matice *resetnout*, jde to přes menu lišty matice *(Value/Reset)*
+
+![Menu resetnutí hodnot](reset_value.png)
 --
 headline: Ta kačena si to zaslouží!
 Super! Už víš co dělá jaká transformace!

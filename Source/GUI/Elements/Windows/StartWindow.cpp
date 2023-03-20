@@ -131,7 +131,7 @@ void StartWindow::render()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(202, 202, 202, 255));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(202, 202, 202, 255));
 	ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(202, 202, 202, 255));
-	ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(14, 98, 175, 255));
+	ImGui::PushStyleColor(ImGuiCol_Button, App::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
 	ImGui::Begin(setName("").c_str(), getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
 	{
 		this->updateWindowInfo();
@@ -282,7 +282,7 @@ void StartWindow::render()
 					// ImGui::Spring(1);
 
 					ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-					ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+					ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 					ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
 					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 					{
@@ -432,7 +432,9 @@ void StartWindow::render()
 						// ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
 						// ImGui::Spring(1);
 						ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+						ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, App::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, App::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
 						std::string buttonName = "Start##" + header->m_filename;
 						if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
 						{
@@ -459,7 +461,7 @@ void StartWindow::render()
 						{
 							ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 						}
-						ImGui::PopStyleColor();
+						ImGui::PopStyleColor(3);
 						ImGui::PopFont();
 						// ImGui::Spring(1);
 						// ImGui::EndVertical();

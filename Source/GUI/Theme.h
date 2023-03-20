@@ -39,9 +39,14 @@ enum class EColor
 	Synergies_FloatBgActive,
 	Synergies_FloatBgHovered,
 
+	Workspace_SelectedBorder,
+	Workspace_FocusBorder,
+	Workspace_InteractionFocusBorder,
+
 	TutorialBgColor,
 	TutorialText,
 	TutorialBarBg,
+	TutorialScrollbarBg,
 	TutorialScrollbarGrab,
 	TutorialScrollbarHovered,
 	TutorialScrollbarActive,
@@ -50,6 +55,7 @@ enum class EColor
 	TutorialButtonText,
 	TutorialButtonBg,
 	TutorialButtonActive,
+	TutorialButtonHovered,
 	TutorialTaskBg,
 
 	SelectionRectFull,
@@ -172,7 +178,17 @@ enum class ESize
 	Nodes_leftSideSpacing,
 	Nodes_rightSideSpacing,
 
+	Workspace_SelectedBorderThickness,
+	Workspace_FocusBorderThickness,
+	Workspace_InteractionFocusBorderThickness,
+	Workspace_CopyPasteOffset,
+
 	TutorialTaskSquareXPadding,
+	TutorialWindow_FrameRounding,
+	TutorialWindow_ScrollbarSize,
+	TutorialWindow_ScrollbarRounding,
+	TutorialWindow_BackButtonWidth,
+	TutorialWindow_MainMenuButtonWidth,
 
 	Links_ControlpointsPositionFraction,
 	Links_ControlpointsPositionMin,
@@ -206,6 +222,8 @@ enum class ESizeVec2
 	Window_FramePadding,
 	Window_Padding,
 
+	TutorialWindow_Padding,
+
 	Tooltip_Padding,
 
 	Nodes_ItemsSpacing,
@@ -224,6 +242,8 @@ enum class ESizeVec2
 
 	Nodes_Screen_resizeButtonSize,
 	Nodes_Sequence_DummySpaceSize,
+
+	Nodes_noPinsSpacing,
 
 	Nodes_Transformation_TrackingMarkSize,
 

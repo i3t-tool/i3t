@@ -32,6 +32,17 @@ void UIModule::init()
 
 	Theme::initNames();
 
+	// Setup Dear ImGui context after OpenGL context.
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io;
+
+	// Load themes to be usable in window initializations
+	loadFonts();
+	loadThemes();
+	m_currentTheme->apply();
+
 	// Create GUI Elements.
 	m_menu = new MainMenuBar();
 	m_windowManager.addWindow(std::make_shared<TutorialWindow>(false));
@@ -44,11 +55,6 @@ void UIModule::init()
 
 	HideWindowCommand::addListener([this](const std::string& id) { m_windowManager.removeWindow(id); });
 
-	// Setup Dear ImGui context after OpenGL context.
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	(void)io;
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport /
@@ -70,8 +76,7 @@ void UIModule::init()
 	// Allocate path to the imgui ini file on heap.
 	io.IniFilename = "Data/imgui.ini";
 
-	loadFonts();
-	loadThemes();
+	// Apply theme to windows
 	m_currentTheme->apply();
 
 	// Setup Platform/Renderer bindings

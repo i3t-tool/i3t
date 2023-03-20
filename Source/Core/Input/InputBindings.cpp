@@ -83,6 +83,7 @@ void InputBindings::init()
 	InputManager::setInputAction("unselectAll", Keys::esc);
 	InputManager::setInputAxis("NOTunselectAll", 1.0f, Keys::ctrll);
 	InputManager::setInputAxis("NOTunselectAll", 1.0f, Keys::shiftl);
+	InputManager::setInputAxis("DONTselect", 1.0f, Keys::ctrll);
 	InputManager::setInputAction("select", Keys::mouseLeft);
 
 	InputManager::setInputAction("createAndPlugConstructor", Keys::mouseLeft, {Keys::ctrll});

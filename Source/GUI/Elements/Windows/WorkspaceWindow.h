@@ -181,6 +181,7 @@ public:
 	void deleteCallback();
 	void copySelectedNodes();
 	void pasteSelectedNodes();
+	void cutSelectedNodes();
 	void duplicateClickedNode();
 	void duplicateSelectedNodes();
 	void deselectNodes();
@@ -230,6 +231,8 @@ private:
 	void setState(const Memento& memento) override;
 
 	void clear() override;
+
+	void initDiwneFromTheme();
 	//
 
 public:

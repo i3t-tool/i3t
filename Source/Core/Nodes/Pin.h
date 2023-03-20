@@ -25,6 +25,8 @@ class Pin
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index);
 
+	[[nodiscard]] bool getRenderPins() const { return renderPins; }
+
 	[[nodiscard]] ID getId() const { return m_id; }
 
 	[[nodiscard]] int getIndex() const { return m_index; }
@@ -81,6 +83,7 @@ public:
 
 	[[nodiscard]] bool isDisabled() const { return m_isDisabled; }
 	void setDisabled(bool disabled) { m_isDisabled = disabled; }
+	void setRenderPins(bool value) { renderPins = value; }
 
 private:
 	ID m_id;
@@ -95,6 +98,8 @@ private:
 
 	/// Owner of the pin.
 	Node* m_master;
+
+	bool renderPins = true;
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component

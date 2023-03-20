@@ -32,7 +32,8 @@ class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 protected:
 	int m_numberOfVisibleDecimal;
 	float m_dataItemsWidth;
-	bool m_IsNameBeingEdited = false;
+	bool m_isLabelBeingEdited = false;
+	bool m_isFirstDraw = true;
 	FloatPopupMode m_floatPopupMode;
 	WorkspaceLevelOfDetail m_levelOfDetail;
 
@@ -59,6 +60,7 @@ public:
 
 	float getDataItemsWidth();
 	float setDataItemsWidth();
+	bool getIsLabelBeingEdited(){ return m_isLabelBeingEdited; };
 
 	WorkspaceLevelOfDetail setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail);
 	WorkspaceLevelOfDetail getLevelOfDetail();
@@ -67,6 +69,7 @@ public:
 	Core::Transform::DataMap const* getDataMap();
 
 	bool drawDataLabel();
+	void drawMenuSetEditable();
 
 	/* DIWNE function */
 	virtual bool topContent();
@@ -75,6 +78,7 @@ public:
 	void drawMenuSetPrecision();
 
 	virtual void popupContent();
+	bool processObjectDrag();
 
 	// TODO: (DR) Mouse buttons are "hard-coded" in DiwneObject, presumably JH was
 	//  trying to hook them up to
@@ -88,6 +92,7 @@ public:
 	// bool bypassSelectAction();
 	// bool bypassUnselectAction();
 	// bool bypassTouchAction();
+	void drawMenuDuplicate();
 };
 
 class WorkspaceCoreOutputPin;

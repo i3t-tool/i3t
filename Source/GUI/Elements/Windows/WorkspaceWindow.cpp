@@ -194,15 +194,17 @@ void WorkspaceDiwne::deleteCallback()
 			break;
 		}
 		else */
-		    if(workspaceCoreNode->m_selected)
-		{
-			workspaceCoreNode->deleteActionDiwne();
+		if(workspaceCoreNode->getIsLabelBeingEdited()) return;
+	}
 
-			Ptr<WorkspaceTransformation> trn = std::dynamic_pointer_cast<WorkspaceTransformation>(workspaceCoreNode);
-			if (trn != nullptr)
-			{
-				trn->deleteActionDiwne();
-			}
+	for (auto&& node : getSelectedNodesInnerIncluded())
+	{
+		node->deleteActionDiwne();
+
+		Ptr<WorkspaceTransformation> trn = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
+		if (trn != nullptr)
+		{
+			trn->deleteActionDiwne();
 		}
 	}
 }
@@ -222,7 +224,7 @@ void WorkspaceDiwne::copySelectedNodes()
 			}
 		}
 	}
-	copiedNodes = copyNodes(getSelectedNodesInnerIncluded());
+	copiedNodes = copyNodes(getSelectedNodesInnerIncluded(), App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
@@ -232,9 +234,33 @@ void WorkspaceDiwne::pasteSelectedNodes()
 	pasteNodes(copiedNodes);
 }
 
+void WorkspaceDiwne::cutSelectedNodes()
+{
+	// Prevent double duplication of inner nodes
+	for (auto node : getSelectedNodesInnerIncluded())
+	{
+		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
+		if (seq)
+		{
+			for (auto transform : seq->getInnerWorkspaceNodes())
+			{
+				transform->setSelected(false);
+			}
+		}
+	}
+
+	auto nodes = getSelectedNodesInnerIncluded();
+	copiedNodes = copyNodes(nodes);
+
+	// Delete copied nodes
+	for (auto node : nodes)
+	{
+		node->deleteActionDiwne();
+	}
+}
+
 void WorkspaceDiwne::duplicateClickedNode()
 {
-	//TODO add a case for selected inner transform - duplicate both sequence and transform?
 	LOG_INFO("Duplicating")
 	//Preventing double duplication of selected transformations in a sequence
 	for (auto node : getSelectedNodesInnerIncluded())
@@ -257,15 +283,18 @@ void WorkspaceDiwne::duplicateClickedNode()
 			if(node->m_selected)
 			{
 				deselectNodes();
-				node->setSelected(true);
 				// copy and paste to ensure connections
-				pasteNodes(copyNodes(selectedNodes));
+				for(auto node : selectedNodes)
+				{
+					node->setDuplicateNode(true);
+				}
+				//pasteNodes(copyNodes(selectedNodes, 5));
 			}
 			else
 			{
 				deselectNodes();
-				node->setSelected(true);
-				duplicateNode(node);
+				node->setDuplicateNode(true);
+				//duplicateNode(node, 5);
 			}
 		}
 	}
@@ -291,7 +320,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	auto selectedNodes = getSelectedNodesInnerIncluded();
 
 	// copy and paste to ensure connections
-	pasteNodes(copyNodes(selectedNodes));
+	pasteNodes(copyNodes(selectedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 
 	for (auto node : selectedNodes)
 	{
@@ -920,11 +949,28 @@ bool WorkspaceDiwne::content()
 		return false;
 	}
 
+	//deletion of blocks
 	bool interaction_happen = false;
 	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 	                                          [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
 	                                          { return node->getRemoveFromWorkspace(); }),
 	                           m_workspaceCoreNodes.end());
+
+	//duplication of blocks
+	std::vector<Ptr<WorkspaceNodeWithCoreData>> duplicatedNodes;
+	bool shouldDuplicate = false;
+	for (auto node : getAllNodesInnerIncluded()){
+		if(node->getDuplicateNode())
+		{
+			duplicatedNodes.push_back(node);
+			node->setDuplicateNode(false);
+			shouldDuplicate = true;
+		}
+	}
+	if(shouldDuplicate)
+	{
+		pasteNodes(copyNodes(duplicatedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+	}
 
 	int number_of_nodes = m_workspaceCoreNodes.size();
 	int node_count = number_of_nodes - 1; /* -1 for space for top node drawn above links */
@@ -1273,7 +1319,6 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 		coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 		                                              [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
 		                                              { return node->getId() == nodesToShift.at(i)->getId(); });
-
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
 			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
@@ -1383,8 +1428,8 @@ bool WorkspaceDiwne::processZoom()
 /* ========================================== */
 WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(Application::get())
 {
+	initDiwneFromTheme();
 	g_workspaceDiwne = new WorkspaceDiwne(&settingsDiwne);
-
 	// Input actions for workspace window.
 	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->selectAll(); });
 	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { g_workspaceDiwne->invertSelection(); });
@@ -1393,6 +1438,7 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteCallback(); });
 	Input.bindAction("copy", EKeyState::Pressed, [&]() { g_workspaceDiwne->copySelectedNodes(); });
 	Input.bindAction("paste", EKeyState::Pressed, [&]() { g_workspaceDiwne->pasteSelectedNodes(); });
+	Input.bindAction("cut", EKeyState::Pressed, [&]() { g_workspaceDiwne->cutSelectedNodes(); });
 	Input.bindAction("duplicate", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateClickedNode(); });
 	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateSelectedNodes(); });
 	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {g_workspaceDiwne->trackingSmoothLeft(); });
@@ -1411,6 +1457,25 @@ WorkspaceWindow::~WorkspaceWindow()
 {
 	g_workspaceDiwne->m_workspaceCoreNodes.clear();
 	delete g_workspaceDiwne;
+}
+
+// TODO - Make diwne change settings on theme switch (when Theme::apply() is called)
+void WorkspaceWindow::initDiwneFromTheme()
+{
+	settingsDiwne.selectionRounding =
+	    App::get().getUI()->getTheme().get(ESize::Nodes_Rounding);
+	settingsDiwne.itemSelectedBorderColor =
+	    App::get().getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
+	settingsDiwne.itemSelectedBorderThicknessDiwne =
+	    App::get().getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness);
+	settingsDiwne.objectFocusBorderColor =
+	    App::get().getUI()->getTheme().get(EColor::Workspace_FocusBorder);
+	settingsDiwne.objectFocusBorderThicknessDiwne =
+	    App::get().getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
+	settingsDiwne.objectFocusForInteractionBorderColor =
+	    App::get().getUI()->getTheme().get(EColor::Workspace_InteractionFocusBorder);
+	settingsDiwne.objectFocusForInteractionBorderThicknessDiwne =
+	    App::get().getUI()->getTheme().get(ESize::Workspace_InteractionFocusBorderThickness);
 }
 
 // Node builder functions.

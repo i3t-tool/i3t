@@ -39,7 +39,9 @@ public:
 	// bool drawDataFull(, int index);
 	int maxLenghtOfData();        // todo
 	bool middleContent();         // the most important function
+	bool topContent();						// rendering header part
 	void drawMenuLevelOfDetail(); // todo
+	void popupContent() override;
 
 	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const
 	{
