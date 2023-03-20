@@ -40,7 +40,7 @@ headline: Jdeme na sněhuláka!
 task: Přidej nový blok *modelu* a *sekvence*, sekvenci přejmenuj na "nohy" a propoj jí s modelem
 
 hint:
-Blok přejmenuješ kliknutím na jeho nadpis.
+Přejmenováváme ![pravé tlačítko myši](mouseRight.png)  myši na lištu bloku a výběrem "Rename".
 
 ![Přejmenovaný blok sekvence](nohySeq.png)
 
@@ -85,6 +85,7 @@ task: Posuň model po ose Y tak, aby ležel "na zemi".
 
 ![Výsledná scéna](nohy.png)
 
+*Připomínka:* V rámci *Workspace* můžeš využívat zoom, i posouvání - podobně jako ve *Scene View*
 
 --
 headline: Přidáme tělo
@@ -101,7 +102,7 @@ hint:
 
 headline: A nakonec hlavu!
 
-task: Přidej sněhulákovi hlavu *zkopírováním nohou* a pojmenuj ji "hlava"
+task: Přidej sněhulákovi hlavu *zkopírováním sekvence "nohy"* a pojmenuj ji "hlava"
 task: Zmenši hlavu na *poloviční velikost* a polož jí na *střední model* (hruď).
 
 ![Náš nádherný skvělý a ikonický sněhulák](snehulak.png)
@@ -125,12 +126,21 @@ task: Vlož do ní *matici translace, škálování a rotace podle x* a vyzkouš
 ![Workspace po propojení matic](propojeni.png)
 
 --
+headline: Tracking
+
+Pokud si chceš vizualizovat pořadí transformací sám/sama, můžeš si spustit *tracking*. Ten najdeš v menu *sekvence*, kterou chceš trackovat.
+
+![Kontextové menu sekvence nohy](tracking.png)
+
+*Tracking* do scény přidá *kopii modelu* napojeného na sekvenci, kterou můžeme pomocí šipek *doleva* a *doprava* postupně transformovat!
+
+task: Zapni tracking pro nějakou ze sekvencí napojených na model. Zkus si i proházet pořadí transformací v sekvencích!
+
+--
 
 headline: A je to!
 
 ![WOOOOOOOOOOO!](checkbox.png)
-
-task: Na závěr si můžeš se *sněhulákem* pohrát. Zkus si i jiná pořadí transformací!
 
 Shrnutí věcí co jsme se naučili:
   * práce se *sekvencemi*

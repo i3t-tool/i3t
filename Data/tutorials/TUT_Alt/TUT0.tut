@@ -1,0 +1,146 @@
+---
+title: I3T Ovládání - Bez teorie
+description: Oddělený tutoriál pro ty, kdo chtějí znát jen ovládání I3T
+thumbnail: logoi3t.png
+language: cs
+---
+
+headline: Vítej v I3T!
+
+*I3T* je program, který slouží k výuce *transformací ve 3D prostoru*.
+
+![](I3Tpreview.png)
+
+Tutoriály jsou obyčejně *interaktivní* a obsahují *úkoly*. Pokud bys ti vyhovoval víc tutoriál i s teorií, spusť si *očíslované tutoriály*.
+
+My se ale teorií a úkoly zabývat nebudeme a vrhneme se rovnou na *ovládání*.
+
+--
+headline: Rohraní
+
+*Hlavní rozhraní* programu tvoří tato dvě okna:
+
+![View a workspace](i3tscreens.png)
+
+*Scene View* ukazuje scénu z nezávislé kamery.
+
+*Workspace* slouží k interakci se scénou pomocí *stavebních bloků* (také někdy *krabičky*).
+
+*Okna si můžeš posunout a přizpůsobit* jak potřebuješ, doporučuje se ale nechat si je tak, jak jsou.
+
+--
+headline: Scene View
+
+*Scene View* zobrazuje trojrozměrnou scénu (podobně jako Blender nebo Unity)
+
+![Scene View](viewport.png)
+
+Ovládání - podobné jako blender:
+    * *otáčení* = Pravé tlačítko myši  ![pravé tlačítko myši](mouseRight.png)
+    * *posouvání* = Stisknuté prostřední tlačítko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+    * *přiblížení a oddálení* = Kolečko myši  ![prostřední tlačítko myši](mouseMiddle.png)
+
+Přiblížení, oddálení a posouvání má *Workspace* stejné jako *Scene View*
+
+--
+headline: Workspace
+V okně *Workspace* se scéna sestavuje. Vkládáme do ní bloky a propojujeme je.
+
+Stisknutím *pravého tlačítka*  ![pravé tlačítko myši](mouseRight.png)  na plochu *Workspace* se ukáže *"Workspace menu"*.
+
+![Kontextové menu](menu.png)
+
+To používáme k přidávání a mazání *bloků* a interakci s nimi.
+--
+headline: Stavební bloky
+*Bloky* jsou základní jednotkou I3T, mohou reprezentovat *matice, modely, nebo funkce* (například cykly).
+
+*Příklady bloků:*
+    * *Model* = model krychle
+    * *Sequence* = "pouzdro" na matice transformací, pomocí kterého propojujeme *matice* a *model*
+    * *Scale* = *matice* operace škálování
+
+![Bloky vypadají takhle](addStuff.png)
+
+--
+headline: Jak propojit bloky?
+
+*Bloky* fungují podobně jako funkce, mají *vstupy* a *výstupy*. Propojujeme je tažením myši *(dráty)* a tvoříme tak scénu.
+
+![Blok sekvence](blocks.png)
+
+Ikona vstupu a výstupu je podobná *datovému typu*, určuje které *bloky* jdou propojit, a které ne.
+
+Například:
+    * *Matice* = ![Symbol pro matici](matrixsym.png)
+    * *Trojrozměrný vektor* = ![3D vektor](vec3.png)
+    * *Maticové násobení* = ![Symbol pro vektorové násobení](mult.png)
+--
+headline: Jak pracovat se sekvencí?
+
+*Sekvence* se od ostatních bloků liší. Matice transformací se sekvencí *nepropojujeme*, ale *vkládáme* je do ní tažením myši.
+
+![Vložení transformace do sekvence](sequence_drag.png)
+
+Do *sekvence* můžeme vložit *několik* matic, budou se aplikovat *ZPRAVA DOLEVA* (podobně jako když *násobíme* matice).
+--
+headline: Změna hodnot maticí
+
+Hodnoty v maticích měníme *tažením myši*, nebo *dvojklikem myši* a přepsáním pomocí *klávesnice*.
+
+![Kliknutím na hodnotu v matici a tažením myši vpravo zvětšíš její hodnotu a tímpádem i krychli](hintPosun.png)
+
+Také můžeš použít menu *Set Value* (![pravé tlačítko myši](mouseRight.png)  na hodnotu matice) - menu obsahuje *přesné hodnoty*.
+--
+headline: Kontextové menu bloků
+
+Každý blok má vlastní *kontextové menu*, které se zobrazí po kliknutí pravým tlačítkem na *lištu* bloku.
+
+![Kontextové menu modelu](context_menu.png)
+
+Menu obsahuje možnosti manipulace s blokem jako např. *přejmenování*, nastavení počtu desetinných míst nebo *duplikace*.
+--
+
+headline: Větvení bloků
+
+*Výstupy* je možné *větvit*. To se nám hodí např. když chceme aplikovat stejné *transformace* na *několik* různých *modelů*.
+
+*Větvíme tažením myši za výstup bloku:*
+
+![Propojení sekvence s několika sekvencemi](multseq.png)
+
+--
+
+headline: Tracking
+
+Pokud si chceme *vizualizovat*, v jakém *pořadí* se transformace aplikují, můžeme si v *kontextovém menu* sekvence zapnout *tracking*.
+
+![Kontextové menu sekvence nohy](tracking.png)
+
+*Tracking* ovládáme *šipkami* doleva a doprava, tím postupně aplikujeme transformace.
+
+*Tracking* aplikuje všechny transformace, které jsou *spojené* s trackovanou sekvencí *zleva*, spouštíme ho tedy většinou na *sekvenci přímo propojené s modelem*.
+
+--
+
+headline: Kamera
+
+*Blok kamery* slouží k simulaci nezávislé kamery ve scéně.
+
+*První sekvence* slouží jako *projekce* - ovládáme s ní *frustum kamery*.
+
+*Druhá sekvence* slouží k *transformaci* - posouváme a otáčíme s kamerou.
+
+![Blok kamery](camera.png)
+
+--
+headline: Kamera a Screen
+
+Abychom se podívali na to, co kamera vidí, musíme si k ní připojit *"screen"*, který nám ve *Workspace* ukáže *náhled* pohledu kamery.
+
+![Ukázka použití kamery](camera_screen.png)
+
+*Kamera* se sama propojuje se *všemi přidanými modely* - to znázorňuje, že se bloky se násobí *projekční maticí* kamery.
+
+
+

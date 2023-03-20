@@ -21,7 +21,7 @@ public:
 	{
 		/* whole node background */
 		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgOperator),
-		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawCornerFlags_Top);
+		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawCornerFlags_All);
 		return false;
 	}
 

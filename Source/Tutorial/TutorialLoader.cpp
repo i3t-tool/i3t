@@ -1,5 +1,6 @@
 ﻿#include "TutorialLoader.h"
 #include "Logger/Logger.h"
+#include "State/StateManager.h"
 #include "Tutorial/Tutorial.h"
 #include "imgui.h"
 #include "pgr.h"
@@ -47,6 +48,18 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	{
 		LOG_FATAL("Tutorial description not specified");
 	}
+	// scene
+	std::string scene = "undefined";
+	if (tutorial_yaml["scene"])
+	{
+		scene = "Data/Scenes/" + tutorial_yaml["scene"].as<std::string>();
+		LOG_DEBUG(scene);
+	}
+	else
+	{
+		LOG_FATAL("Tutorial scene not specified");
+	}
+
 	// thumbnail
 	std::shared_ptr<GUIImage> thumbnail = nullptr; // dummy image here? - NOPE rather later when rendering and
 	                                               // encountering a nullptr (safer in case of loader errors)
@@ -77,7 +90,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	// we create our tutorial header object on heap, we are using shared ptr, so
 	// that when there arent any references, we can eg properly free the loaded
 	// image and destroy it
-	return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description),
+	return std::make_shared<TutorialHeader>(std::move(path), std::move(title), std::move(description), std::move(scene),
 	                                        std::move(thumbnail));
 }
 
@@ -380,6 +393,8 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	{
 		LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
 	}
+
+	App::getModule<StateManager>().loadScene(header->m_scene);
 
 	// CREATE THE TUTORIAL
 	std::shared_ptr<Tutorial> tutorial = std::make_shared<Tutorial>(

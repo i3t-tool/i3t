@@ -1,3 +1,4 @@
+#include "Core/Input/InputManager.h"
 #include "diwne_include.h"
 
 namespace DIWNE
@@ -194,8 +195,9 @@ bool DiwneObject::processFocused()
 	{
 		diwne.setDiwneAction(getTouchActionType());
 	}
-	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->objectFocusBorderColor, 0,
-	                   ImDrawCornerFlags_None, diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
+	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->objectFocusBorderColor,
+	                   diwne.mp_settingsDiwne->selectionRounding,
+	                   ImDrawCornerFlags_All, diwne.mp_settingsDiwne->objectFocusBorderThicknessDiwne);
 	return true;
 }
 bool DiwneObject::allowProcessFocused()
@@ -225,7 +227,8 @@ bool DiwneObject::processObjectFocused()
 bool DiwneObject::processFocusedForInteraction()
 {
 	diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max,
-	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor, 0, ImDrawCornerFlags_None,
+	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderColor,
+	                   diwne.mp_settingsDiwne->selectionRounding, ImDrawCornerFlags_All,
 	                   diwne.mp_settingsDiwne->objectFocusForInteractionBorderThicknessDiwne);
 	return true;
 }
@@ -293,7 +296,7 @@ bool DiwneObject::processObjectSelect()
 {
 	// TODO: (DR) node is selected on mouse release, might want to select it on
 	// click; Response (JH): It is select on click (release while not draging)
-	if (bypassSelectAction() && allowProcessSelect())
+	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
 	{
 		setSelected(true);
 		diwne.m_takeSnap = true;

@@ -116,7 +116,6 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 
 void WorkspaceSequence::popupContentTracking()
 {
-	ImGui::Separator();
 	if(Core::GraphManager::isTrackingEnabled())
 	{
 		if (ImGui::MenuItem("Stop tracking", ""))
@@ -142,8 +141,25 @@ void WorkspaceSequence::popupContentTracking()
 
 void WorkspaceSequence::popupContent()
 {
-	WorkspaceNodeWithCoreDataWithPins::popupContent();
+	WorkspaceNodeWithCoreDataWithPins::drawMenuSetEditable();
+
+	ImGui::Separator();
+
 	popupContentTracking();
+
+	ImGui::Separator();
+
+	drawMenuSetPrecision();
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuDuplicate();
+
+	ImGui::Separator();
+
+	WorkspaceNode::popupContent();
+
 }
 
 bool WorkspaceSequence::beforeContent()
@@ -151,7 +167,7 @@ bool WorkspaceSequence::beforeContent()
 	/* whole node background */
 
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgTransformation),
-	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_Top);
+	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_All);
 	return false;
 }
 

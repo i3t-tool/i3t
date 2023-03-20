@@ -42,7 +42,7 @@ public:
 
 	// bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no
 	// data */
-
+	bool topContent() override;
 	bool middleContent() override;
 
 	void drawMenuLevelOfDetail() override;

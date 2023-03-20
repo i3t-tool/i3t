@@ -152,10 +152,26 @@ bool WorkspaceTransformation::afterContent()
 
 void WorkspaceTransformation::popupContent()
 {
+	WorkspaceNodeWithCoreData::drawMenuSetEditable();
+
+	ImGui::Separator();
+
 	drawMenuSetDataMap();
 	drawMenuStorevalues();
 
-	WorkspaceNodeWithCoreData::popupContent();
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuSetPrecision();
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
+	WorkspaceNodeWithCoreData::drawMenuDuplicate();
+
+
+	ImGui::Separator();
+
+	WorkspaceNode::popupContent();
 }
 
 void WorkspaceTransformation::drawMenuStorevalues()

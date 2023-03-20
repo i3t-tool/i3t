@@ -174,27 +174,21 @@ void TutorialWindow::render()
 		        // styles
 
 	// PUSH STYLE
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f, 35.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
-	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 15);
-	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, 5);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, App::get().getUI()->getTheme().get(ESizeVec2::TutorialWindow_Padding));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, App::get().getUI()->getTheme().get(ESize::TutorialWindow_FrameRounding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, App::get().getUI()->getTheme().get(ESize::TutorialWindow_ScrollbarSize));
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, App::get().getUI()->getTheme().get(ESize::TutorialWindow_ScrollbarRounding));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(MIN_WIN_WIDTH, MIN_WIN_HEIGHT));
 	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialText));
-	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, Application::get().getUI()->getTheme().get(EColor::TutorialBarBg));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, App::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, App::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, App::get().getUI()->getTheme().get(EColor::TutorialScrollbarBg));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,
-	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarGrab));
+	                      App::get().getUI()->getTheme().get(EColor::TutorialScrollbarGrab));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,
-	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarHovered));
+	                      App::get().getUI()->getTheme().get(EColor::TutorialScrollbarHovered));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,
-	                      Application::get().getUI()->getTheme().get(EColor::TutorialScrollbarActive));
-
-	// ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 150, 250, 255));
-	// ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(66, 150, 250, 205));
-	// ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(66, 150, 250, 102));
-	// ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(245, 245, 245, 255));
+	                      App::get().getUI()->getTheme().get(EColor::TutorialScrollbarActive));
 	//  BEGIN WINDOW
 	std::string window_name;
 	if (m_tutorial != nullptr)
@@ -212,11 +206,11 @@ void TutorialWindow::render()
 	// START THE WINDOW
 
 	ImGui::SetNextWindowSize(ImVec2(500, 650), ImGuiCond_FirstUseEver);
-	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
 	ImGui::Begin(window_name.c_str(), getShowPtr());
-	ImGui::PopStyleColor();
 
 	this->updateWindowInfo();
+
+	ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::TutorialText));
 
 	// CREATE IMGUI CONTENT
 	renderTutorialHeader();
@@ -233,7 +227,6 @@ void TutorialWindow::render()
 
 void TutorialWindow::renderTutorialHeader()
 {
-	// ImGui::BeginChild("header");
 	std::string title;
 	if (m_tutorial == nullptr)
 	{
@@ -304,6 +297,8 @@ void TutorialWindow::renderTutorialContent()
 		ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialTitle));
 		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, Application::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
 		if (ImGui::Button("Open Start Menu", ImVec2(-1, NEXT_BUTTON_SIZE_Y*5)))
 		{
 			*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
@@ -313,7 +308,7 @@ void TutorialWindow::renderTutorialContent()
 		{
 			ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
-		ImGui::PopStyleColor(2);
+		ImGui::PopStyleColor(4);
 		ImGui::PopFont();
 	}
 	ImGui::EndChild();
@@ -362,7 +357,9 @@ void TutorialWindow::renderTutorialControls()
 		// Back button
 		if (m_currentStep != 0)
 		{
-			if (ImGui::Button("< Back", ImVec2(40, NEXT_BUTTON_SIZE_Y)))
+			if (ImGui::Button("< Back", ImVec2(
+			                                App::get().getUI()->getTheme().get(ESize::TutorialWindow_BackButtonWidth),
+			                                NEXT_BUTTON_SIZE_Y)))
 			{
 				setStep(m_currentStep - 1);
 				// std::cout << m_currentStep << std::endl;
@@ -374,7 +371,9 @@ void TutorialWindow::renderTutorialControls()
 		}
 		else
 		{
-			if (ImGui::Button("< Start Menu", ImVec2(100, NEXT_BUTTON_SIZE_Y)))
+			if (ImGui::Button("< Start Menu", ImVec2(
+			                                      App::get().getUI()->getTheme().get(ESize::TutorialWindow_MainMenuButtonWidth),
+			                                      NEXT_BUTTON_SIZE_Y)))
 			{
 				*I3T::getWindowPtr<StartWindow>()->getShowPtr() = true;
 				this->hide();
@@ -393,6 +392,7 @@ void TutorialWindow::renderTutorialControls()
 		ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, Application::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
 		if (m_currentStep < m_tutorial->getStepCount() - 1)
 		{
 			if (ImGui::Button("Next", ImVec2(-1, NEXT_BUTTON_SIZE_Y)))
@@ -420,7 +420,7 @@ void TutorialWindow::renderTutorialControls()
 			}
 		}
 		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
+		ImGui::PopStyleColor(4);
 
 		// END CHILD
 		ImGui::EndChild();
@@ -511,8 +511,18 @@ void TutorialWindow::renderHint(Hint* hint)
 
 	ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::TutorialAssignment));
 	ImGui::PushStyleColor(ImGuiCol_Text, Application::get().getUI()->getTheme().get(EColor::TutorialButtonText));
-	ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
-
+	if(!hint->m_expanded)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, Application::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, Application::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Application::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, Application::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
+	}
 	// Hint button
 	if (ImGui::Button("Tip", ImVec2(TIP_BUTTON_SIZE_X, TIP_BUTTON_SIZE_Y)))
 	{
@@ -522,7 +532,7 @@ void TutorialWindow::renderHint(Hint* hint)
 	{
 		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 	}
-	ImGui::PopStyleColor(2);
+	ImGui::PopStyleColor(4);
 	ImGui::PopFont();
 
 	// Hint itself

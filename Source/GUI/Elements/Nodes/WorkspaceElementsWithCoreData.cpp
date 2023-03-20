@@ -62,16 +62,39 @@ bool WorkspaceNodeWithCoreData::topContent()
 	ImGui::Indent(ImGui::GetStyle().ItemSpacing.x);
 	const char* topLabel = m_topLabel.c_str();
 	bool interaction_happen;
-	ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel)).x + 15);
+	ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel)).x + 5);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
 
-	interaction_happen = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel));
-	interaction_happen |= ImGui::IsItemActive();
+	if(m_isLabelBeingEdited)
+	{
+		interaction_happen = ImGui::InputText(fmt::format("##{}topLabel",
+		                                                  m_labelDiwne).c_str(),
+		                                      						&(this->m_topLabel),
+		                                      						ImGuiInputTextFlags_NoHorizontalScroll);
+		auto id = ImGui::GetItemID();
+		if(m_isFirstDraw)
+		{
+			ImGui::ActivateItem(id);
+			interaction_happen = true;
+			m_isFirstDraw = false;
+		}
+		interaction_happen |= ImGui::IsItemActive();
+		if(!interaction_happen)
+		{
+			m_isLabelBeingEdited = false;
+			m_isFirstDraw = true;
+		}
+	}
+	else
+	{
+		ImGui::LabelText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), this->m_topLabel.c_str());
+		interaction_happen = false;
+	}
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 	// adding dummy space for block interaction
-	ImGui::Dummy(ImVec2(50, 1)); /* dummy for snap some item for same space on left right of label  */
+	ImGui::Dummy(ImVec2(50, 10)); /* dummy for snap some item for same space on left right of label  */
 
 	return interaction_happen;
 }
@@ -118,6 +141,29 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_
 
 bool WorkspaceNodeWithCoreData::drawDataLabel() { return false; }
 
+void WorkspaceNodeWithCoreData::drawMenuSetEditable()
+{
+	if(ImGui::MenuItem("Rename", nullptr, m_isLabelBeingEdited))
+	{
+		m_isLabelBeingEdited = !m_isLabelBeingEdited;
+	}
+}
+
+void WorkspaceNodeWithCoreData::drawMenuDuplicate()
+{
+	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
+		{
+		  //duplicate
+			static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+			duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+			    App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+		  //move original node behind new one
+		  static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
+
+		}
+
+}
+
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 {
 	if (ImGui::BeginMenu("Decimal digits"))
@@ -138,16 +184,35 @@ void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
 
 void WorkspaceNodeWithCoreData::popupContent()
 {
+	drawMenuSetEditable();
+
+	ImGui::Separator();
 
 	drawMenuSetPrecision();
 	drawMenuLevelOfDetail();
 
-	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
-	{
-		duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()));
-	} /* \todo Duplicate node */
+	ImGui::Separator();
+
+	drawMenuDuplicate();
+
+	ImGui::Separator();
 
 	WorkspaceNode::popupContent();
+}
+
+bool WorkspaceNodeWithCoreData::processObjectDrag()
+{
+	if (bypassDragAction() && allowProcessDrag())
+	{
+		m_isDraged = true;
+		if(!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
+		{
+			static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+		}
+		diwne.setDiwneAction(getDragActionType());
+		return processDrag();
+	}
+	return false;
 }
 
 WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
@@ -169,59 +234,61 @@ WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core
 /* DIWNE function */
 bool WorkspaceCorePin::content()
 {
-	float alpha = ImGui::GetStyle().Alpha;
 	bool interaction_happen = false;
-
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-
-	DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
-	ImColor iconColorBg = I3T::getColor(WorkspacePinColorBackground[getType()]);
-	DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
-	ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
-
-	ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
-
-	float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
-
-	diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-	               ImVec4(padding, padding, padding, padding), isConnected());
-	m_iconRectDiwne = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
-
-	if (getShowLabel())
+	if(getCorePin().getRenderPins())
 	{
-		if (getLabel().empty())
-		{ // it's never empty :(
+		float alpha = ImGui::GetStyle().Alpha;
 
-			auto label = getCorePin().getLabel();
-			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-			    label == "pulse")
-			{
-				ImGui::TextUnformatted("");
-			}
-			else
-			{
-				// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-				ImGui::TextUnformatted(label);
-			}
-		}
-		else
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+		DIWNE::IconType iconTypeBg = WorkspacePinShapeBackground[getType()];
+		ImColor iconColorBg = I3T::getColor(WorkspacePinColorBackground[getType()]);
+		DIWNE::IconType iconTypeFg = WorkspacePinShapeForeground[getType()];
+		ImColor iconColorFg = I3T::getColor(WorkspacePinColorForeground[getType()]);
+
+		ImVec2 iconSize = I3T::getSize(ESizeVec2::Nodes_IconSize) * diwne.getWorkAreaZoom();
+
+		float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
+
+		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
+									 ImVec4(padding, padding, padding, padding), isConnected());
+		m_iconRectDiwne = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+
+		if (getShowLabel())
 		{
+			if (getLabel().empty())
+			{ // it's never empty :(
 
-			auto label = getLabel();
-			if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-			    label == "pulse")
-			{
-				ImGui::TextUnformatted("");
+				auto label = getCorePin().getLabel();
+				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
+						label == "pulse")
+				{
+					ImGui::TextUnformatted("");
+				}
+				else
+				{
+					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+					ImGui::TextUnformatted(label);
+				}
 			}
 			else
 			{
-				// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-				ImGui::TextUnformatted(label.c_str());
+
+				auto label = getLabel();
+				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
+						label == "pulse")
+				{
+					ImGui::TextUnformatted("");
+				}
+				else
+				{
+					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
+					ImGui::TextUnformatted(label.c_str());
+				}
 			}
 		}
-	}
-
 	ImGui::PopStyleVar();
+	}
 	return interaction_happen;
 }
 
@@ -835,32 +902,50 @@ bool WorkspaceNodeWithCoreDataWithPins::finalize()
 bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 {
 	bool inner_interaction_happen = false;
-	WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
+	bool pinsVisible = false;
 
-	if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+	for (auto pin : this->getNodebase()->getInputPins())
 	{
-		ImRect nodeRect = getNodeRectDiwne();
-		ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
-		for (auto const& pin : m_workspaceInputs)
+		if(pin.getRenderPins())
 		{
-			pin->setConnectionPointDiwne(pinConnectionPoint);
-			if (pin->isConnected())
-			{
-				wd.m_linksToDraw.push_back(&pin->getLink());
-			}
+			pinsVisible = true;
+			break;
 		}
 	}
-	else
+
+	if(pinsVisible)
 	{
-		for (auto const& pin : m_workspaceInputs)
+		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
+
+		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
 		{
-			inner_interaction_happen |= pin->drawDiwne();
-			/* is in pin->drawDiwne()
-			      if (pin->isconnected())
-			      {
-			        wd.m_linkstodraw.push_back(&pin->getlink());
-			      }
-			*/
+			ImRect nodeRect = getNodeRectDiwne();
+			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
+			for (auto const& pin : m_workspaceInputs)
+			{
+				if(!pin->getCorePin().getRenderPins())
+					continue;
+				pin->setConnectionPointDiwne(pinConnectionPoint);
+				if (pin->isConnected())
+				{
+					wd.m_linksToDraw.push_back(&pin->getLink());
+				}
+			}
+		}
+		else
+		{
+			for (auto const& pin : m_workspaceInputs)
+			{
+				if(!pin->getCorePin().getRenderPins()) 
+					continue;
+				inner_interaction_happen |= pin->drawDiwne();
+				/* is in pin->drawDiwne()
+				      if (pin->isconnected())
+				      {
+				        wd.m_linkstodraw.push_back(&pin->getlink());
+				      }
+				*/
+			}
 		}
 	}
 	return inner_interaction_happen;
@@ -869,32 +954,50 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 {
 	bool inner_interaction_happen = false;
-	if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+	bool pinsVisible = false;
+
+	for (auto pin : this->getNodebase()->getOutputPins())
 	{
-		ImRect nodeRect = getNodeRectDiwne();
-		ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
-		for (auto const& pin : getOutputs())
+		if(pin.getRenderPins())
 		{
-			pin->setConnectionPointDiwne(pinConnectionPoint);
+			pinsVisible = true;
+			break;
+		}
+	}
+
+	if(pinsVisible)
+	{
+		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+		{
+			ImRect nodeRect = getNodeRectDiwne();
+			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
+			for (auto const& pin : getOutputs())
+			{
+				pin->setConnectionPointDiwne(pinConnectionPoint);
+			}
+		}
+		else
+		{
+			float act_align, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets smaller
+			                                                                     (for example when switch from
+			                                                                     precision 2 to precision 0) */
+			m_minRightAlignOfRightPins = FLT_MAX;
+			for (auto const& pin : getOutputsToShow())
+			{
+				act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *
+				                               diwne.getWorkAreaZoom()); /* no shift to left */
+				m_minRightAlignOfRightPins =
+				    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
+				                                                        between two node sizes */
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align - prev_minRightAlign); /* right align if not all output
+				                                                                                  pins have same width */
+				inner_interaction_happen |= pin->drawDiwne();
+			}
 		}
 	}
 	else
 	{
-		float act_align, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets smaller
-		                                                                     (for example when switch from
-		                                                                     precision 2 to precision 0) */
-		m_minRightAlignOfRightPins = FLT_MAX;
-		for (auto const& pin : getOutputsToShow())
-		{
-			act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *
-			                               diwne.getWorkAreaZoom()); /* no shift to left */
-			m_minRightAlignOfRightPins =
-			    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
-			                                                        between two node sizes */
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align - prev_minRightAlign); /* right align if not all output
-			                                                                                  pins have same width */
-			inner_interaction_happen |= pin->drawDiwne();
-		}
+		ImGui::Dummy(App::get().getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
 	return inner_interaction_happen;
 }
@@ -977,7 +1080,7 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const numberOfVisibleD
 
 void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& valueSelected)
 {
-	ImGui::Text("Set value...                ");
+	ImGui::Text("Choose value...                ");
 	ImGui::Separator();
 
 	if (ImGui::RadioButton("Angle", popupMode == FloatPopupMode::Angle))
@@ -997,85 +1100,85 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-PI/6 (-30°)"))
-			{
-				selectedValue = -M_PI / 6;
-				valueSelected = true;
-			}
-			ImGui::TableNextColumn();
 			if (ImGui::Selectable("PI/6 (30°)"))
 			{
 				selectedValue = M_PI / 6;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-PI/4 (-45°)"))
+			if (ImGui::Selectable("-PI/6 (-30°)"))
 			{
-				selectedValue = -M_PI / 4;
+				selectedValue = -M_PI / 6;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("PI/4 (45°)"))
 			{
 				selectedValue = M_PI / 4;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-PI/3 (-60°)"))
+			if (ImGui::Selectable("-PI/4 (-45°)"))
 			{
-				selectedValue = -M_PI / 3;
+				selectedValue = -M_PI / 4;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("PI/3 (60°)"))
 			{
 				selectedValue = M_PI / 3;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-PI/2 (-90°)"))
+			if (ImGui::Selectable("-PI/3 (-60°)"))
 			{
-				selectedValue = -M_PI / 2;
+				selectedValue = -M_PI / 3;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("PI/2 (90°)"))
 			{
 				selectedValue = M_PI / 2;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-PI (-180°)"))
+			if (ImGui::Selectable("-PI/2 (-90°)"))
 			{
-				selectedValue = -M_PI;
+				selectedValue = -M_PI / 2;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("PI (180°)"))
 			{
 				selectedValue = M_PI;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-3PI/2 (-270°)"))
+			if (ImGui::Selectable("-PI (-180°)"))
 			{
-				selectedValue = -3 * M_PI / 2;
+				selectedValue = -M_PI;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("3PI/2 (270°)"))
 			{
 				selectedValue = 3 * M_PI / 2;
+				valueSelected = true;
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::Selectable("-3PI/2 (-270°)"))
+			{
+				selectedValue = -3 * M_PI / 2;
 				valueSelected = true;
 			}
 
@@ -1097,85 +1200,85 @@ void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& va
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-1/2"))
-			{
-				selectedValue = -1.0f / 2.0f;
-				valueSelected = true;
-			}
-			ImGui::TableNextColumn();
 			if (ImGui::Selectable("1/2"))
 			{
 				selectedValue = 1.0f / 2.0f;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-sqrt(2)/2"))
+			if (ImGui::Selectable("-1/2"))
 			{
-				selectedValue = -sqrtf(2.0f) / 2.0f;
+				selectedValue = -1.0f / 2.0f;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("sqrt(2)/2"))
 			{
 				selectedValue = sqrtf(2.0f) / 2.0f;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-sqrt(3)/2"))
+			if (ImGui::Selectable("-sqrt(2)/2"))
 			{
-				selectedValue = -sqrtf(3.0f) / 2.0f;
+				selectedValue = -sqrtf(2.0f) / 2.0f;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("sqrt(3)/2"))
 			{
 				selectedValue = sqrtf(3.0f) / 2.0f;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-1"))
+			if (ImGui::Selectable("-sqrt(3)/2"))
 			{
-				selectedValue = -1.0f;
+				selectedValue = -sqrtf(3.0f) / 2.0f;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("1"))
 			{
 				selectedValue = 1.0f;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-2"))
+			if (ImGui::Selectable("-1"))
 			{
-				selectedValue = -2.0f;
+				selectedValue = -1.0f;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("2"))
 			{
 				selectedValue = 2.0f;
 				valueSelected = true;
 			}
-
-			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			if (ImGui::Selectable("-3"))
+			if (ImGui::Selectable("-2"))
 			{
-				selectedValue = -3.0f;
+				selectedValue = -2.0f;
 				valueSelected = true;
 			}
+
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			if (ImGui::Selectable("3"))
 			{
 				selectedValue = 3.0f;
+				valueSelected = true;
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::Selectable("-3"))
+			{
+				selectedValue = -3.0f;
 				valueSelected = true;
 			}
 
