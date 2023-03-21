@@ -46,7 +46,16 @@ adresáři projektu.
 Výsledné binární soubory, sdílené knihovny a spustitelný soubor IT3(.exe), jsou
 vytvořeny v adresáři ``Binaries`` do podadresáře odpovídajícímu typu konfigurace.
 
-## Poznámka k překladu ve Visual Studiu 15 2017 (PF)
+## Bundle
+You can create a zip archive containing the ready-to-use I3T and its data, but first, 
+you need to build the I3T.
+```shell
+Scripts/CreateBundle.sh Debug  # or
+Scripts/CreateBundle.sh Release
+```
+
+## Poznámky
+### Visual Studio 15 2017 (PF)
 - Ve Visual studiu jsem musel stáhnout:
   - Vývoj desktopových aplikací pomocí C++ 
 	- Nástroje Visual C++ pro CMake
