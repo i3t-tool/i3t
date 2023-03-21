@@ -166,8 +166,8 @@ private:
 
 		auto result = findWindow(T::ID, windows);
 
-		I3T_ASSERT(result != nullptr && "Unknown window, does your 'T' have I3T_WINDOW body?"
-		                                "Did you create your window instance?");
+		I3T_ASSERT(result != nullptr, "Unknown window, does your 'T' have I3T_WINDOW body?"
+		                              "Did you create your window instance?");
 
 		return result;
 	}

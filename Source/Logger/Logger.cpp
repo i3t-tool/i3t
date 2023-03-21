@@ -10,7 +10,18 @@
 #include "spdlog/sinks/stdout_sinks.h"
 
 #include "Core/Window.h"
+/// \todo Test JustPressed keys in Application and set set logging options there.
+#include "Core/Input/InputManager.h"
 #include "Utils/JSON.h"
+
+struct LoggingToggle final
+{
+	static Keys::Code KEY_LoggingToggle_popUps;
+	static Keys::Code KEY_LoggingToggle_logic;
+	static Keys::Code KEY_LoggingToggle_matrixFields;
+	static Keys::Code KEY_LoggingToggle_mouseMovement;
+	static Keys::Code KEY_Dummy_tutorialStep; // #TUTORIAL
+};
 
 Logger& Logger::getInstance()
 {

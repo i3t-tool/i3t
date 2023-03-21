@@ -4,6 +4,7 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
+#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/AboutDialog.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
@@ -31,6 +32,13 @@ static bool saveSceneDialog(std::string& result, const std::string& title)
 static bool openSceneDialog(std::string& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
+
+	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
+}
+
+static bool importContentDialog(std::string& result, const std::string& title)
+{
+	static std::vector<std::string> filter = {"All files", "*"};
 
 	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 }
@@ -71,6 +79,16 @@ static void open()
 	{
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
 		App::getModule<StateManager>().loadScene(sceneFile);
+	}
+}
+
+static void importModel()
+{
+	std::string modelFile;
+	if (importContentDialog(modelFile, "Import model"))
+	{
+		Application::getModule<Core::ResourceManager>().importResource(modelFile);
+		Application::getModule<StateManager>().takeSnapshot();
 	}
 }
 
@@ -135,10 +153,9 @@ void MainMenuBar::showFileMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Import Content"))
+		if (ImGui::MenuItem("Import Model"))
 		{
-			/// \todo Import custom content? Use Utils/System.h.
-			// Reader::openContentDialog();
+			importModel();
 		}
 
 		ImGui::Separator();

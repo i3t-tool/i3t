@@ -179,7 +179,7 @@ public:
 	template <typename T> Ptr<T> as()
 	{
 		static_assert(std::is_base_of_v<Node, T>, "T must be derived from NodeBase class.");
-		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()) && "Cannot cast to Ptr<T>.");
+		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()), "Cannot cast to Ptr<T>.");
 
 		return std::dynamic_pointer_cast<T>(shared_from_this());
 	}

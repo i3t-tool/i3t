@@ -158,7 +158,7 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 
 void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNode>& node)
 {
-	I3T_ASSERT(target.IsObject());
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	const auto& coreNode = node->getNodebase();
 	auto& alloc = m_memento.GetAllocator();
@@ -171,7 +171,7 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 
 void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiSequence>& node)
 {
-	I3T_ASSERT(target.IsArray());
+	I3T_ASSERT(target.IsArray(), "Invalid value type");
 
 	const auto& coreNode = node->getNodebase()->as<Core::Sequence>();
 	auto& alloc = m_memento.GetAllocator();
@@ -195,7 +195,7 @@ void SerializationVisitor::dumpSequence(rapidjson::Value& target, const Ptr<GuiS
 
 void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<GuiTransform>& node)
 {
-	I3T_ASSERT(target.IsArray() && "Test your code properly!");
+	I3T_ASSERT(target.IsArray(), "Invalid value type");
 
 	const auto& coreNode = node->getNodebase()->as<Core::Transformation>();
 	auto& alloc = m_memento.GetAllocator();
@@ -248,7 +248,7 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 
 void SerializationVisitor::addBool(rapidjson::Value& target, const char* key, bool value)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -257,7 +257,7 @@ void SerializationVisitor::addBool(rapidjson::Value& target, const char* key, bo
 
 void SerializationVisitor::addString(rapidjson::Value& target, const char* key, const std::string& value)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -266,7 +266,7 @@ void SerializationVisitor::addString(rapidjson::Value& target, const char* key, 
 
 void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, const ImVec2& vec)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -279,7 +279,7 @@ void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, 
 
 void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, const glm::vec3& vec)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -293,7 +293,7 @@ void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, 
 
 void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, const glm::vec4& vec)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -308,7 +308,7 @@ void SerializationVisitor::addVector(rapidjson::Value& target, const char* key, 
 
 void SerializationVisitor::addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -332,7 +332,7 @@ void SerializationVisitor::addMatrix(rapidjson::Value& target, const char* key, 
 
 void SerializationVisitor::addData(rapidjson::Value& target, const char* key, const DataStore& data)
 {
-	I3T_ASSERT(target.IsObject() && "Test your code properly!");
+	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();
 
@@ -385,7 +385,7 @@ void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::No
 
 			rapidjson::Value e(kArrayType);
 
-			I3T_ASSERT(target.IsArray() && "Test your code properly!");
+			I3T_ASSERT(target.IsArray(), "Invalid value type");
 
 			auto& alloc = m_memento.GetAllocator();
 

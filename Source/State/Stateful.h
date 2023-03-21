@@ -1,5 +1,6 @@
 #pragma once
 
+#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
 
 /// @note Nodes are referenced by their index.
@@ -30,7 +31,7 @@ public:
 
 	/// Called on scene load, undo and redo.
 	/// @param memento New global state.
-	virtual void setState(const Memento& memento) {}
+	virtual void setState(const Memento& memento, bool newSceneLoaded) {}
 
 	virtual void clear() {}
 };

@@ -86,13 +86,13 @@ bool InputManager::areModifiersActive(Modifiers mods)
 
 void InputManager::setActiveInput(InputController* input)
 {
-	I3T_ASSERT(input != nullptr);
+	I3T_ASSERT(input != nullptr, "Input parameter is null");
 	s_activeInput = input;
 }
 
 bool InputManager::isInputActive(InputController* input)
 {
-	I3T_ASSERT(input != nullptr);
+	I3T_ASSERT(input != nullptr, "Input parameter is null");
 	return s_activeInput == input;
 }
 

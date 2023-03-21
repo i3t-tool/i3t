@@ -3,10 +3,7 @@
 #include <fstream>
 #include <istream>
 
-#include "rapidjson/document.h"
-#include "rapidjson/istreamwrapper.h"
-#include "rapidjson/schema.h"
-
+#include "Core/Resources/ResourceManager.h"
 #include "Logger/Logger.h"
 #include "Utils/JSON.h"
 
@@ -18,20 +15,9 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 
 	const auto& d = *result;
 
-	for (const auto& resource : d["resources"].GetArray())
+	if (auto resources = Core::readResources(d["resources"]))
 	{
-		const auto name = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
-		const auto path = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
-		const auto type = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
-
-		const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(type);
-		if (!maybeType.has_value())
-		{
-			LOG_ERROR("Resource {} has unknown type!", resource["name"].GetString());
-			continue;
-		}
-
-		conf->Resources.emplace_back(name, path, maybeType.value());
+		conf->Resources = *resources;
 	}
 
 	return conf;

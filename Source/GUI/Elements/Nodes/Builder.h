@@ -22,7 +22,7 @@ public:
 
 	auto operator()(const char* type)
 	{
-		I3T_ASSERT(m_createFns.count(type) == 1);
+		I3T_ASSERT(m_createFns.count(type) == 1, "Cannot find factory function for given operator");
 		return m_createFns.at(type)(ImVec2(0.0f, 0.0f));
 	}
 
@@ -54,7 +54,7 @@ public:
 
 	auto operator()(const char* type)
 	{
-		I3T_ASSERT(m_createFns.count(type) == 1);
+		I3T_ASSERT(m_createFns.count(type) == 1, "Cannot find factory function for given transform");
 		return std::static_pointer_cast<WorkspaceTransformation>(m_createFns.at(type)(ImVec2(0.0f, 0.0f)));
 	}
 

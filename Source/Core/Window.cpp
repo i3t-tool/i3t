@@ -3,6 +3,7 @@
 #include "stb_image.h"
 #include <pgr.h>
 
+#include "Config.h"
 #include "Commands/ApplicationCommands.h"
 #include "Logger/Logger.h"
 

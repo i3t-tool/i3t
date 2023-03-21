@@ -37,7 +37,7 @@ public:
 	{
 		if (m_isInput)
 		{
-			I3T_ASSERT(isPluggedIn() && "This input pin is not plugged to any output pin!");
+			I3T_ASSERT(isPluggedIn(), "This input pin is not plugged to any output pin!");
 			return m_input;
 		}
 		else
