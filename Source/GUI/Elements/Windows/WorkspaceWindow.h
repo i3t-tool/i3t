@@ -228,7 +228,7 @@ public:
 private:
 	Memento getState() override;
 
-	void setState(const Memento& memento) override;
+	void setState(const Memento& memento, bool newSceneLoaded) override;
 
 	void clear() override;
 

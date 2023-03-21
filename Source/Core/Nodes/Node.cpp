@@ -174,7 +174,7 @@ void Node::receiveSignal(int inputIndex)
 
 bool Node::areInputsPlugged(int numInputs)
 {
-	I3T_ASSERT(m_inputs.size() >= static_cast<size_t>(numInputs) && "Input pins subscript is out of range!");
+	I3T_ASSERT(m_inputs.size() >= static_cast<size_t>(numInputs), "Input pins subscript is out of range!");
 
 	bool result = true;
 
@@ -308,7 +308,7 @@ void Node::unplugAll()
 
 void Node::unplugInput(size_t index)
 {
-	I3T_ASSERT(m_inputs.size() > static_cast<size_t>(index) &&
+	I3T_ASSERT(m_inputs.size() > static_cast<size_t>(index),
 	           "The node's input pin that you want to unplug does not exists.");
 
 	// auto* otherPin = m_inputs[index].m_input;
@@ -356,7 +356,7 @@ void Node::unplugInput(size_t index)
 
 void Node::unplugOutput(size_t index)
 {
-	I3T_ASSERT(m_outputs.size() > static_cast<size_t>(index) &&
+	I3T_ASSERT(m_outputs.size() > static_cast<size_t>(index),
 	           "The node's output pin that you want to unplug does not exists.");
 
 	// auto& pin = m_outputs[index];

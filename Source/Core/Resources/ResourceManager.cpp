@@ -2,15 +2,39 @@
 
 #include "Logger/Logger.h"
 
-using namespace Core;
-
 #include "Core/Resources/Mesh.h"
+#include "State/StateManager.h"
 #include "Utils/Text.h"
 
 // Used for method overloading to indicate no alias was specified
 #define NO_ALIAS "no_alias_QEYjMrxoOB_rm"
 // Indicates that no hashid was specified
 #define NO_HASHID 0
+
+namespace Core
+{
+std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resources)
+{
+	std::vector<Resource> result;
+
+	for (const auto& resource : resources.GetArray())
+	{
+		const auto name = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
+		const auto path = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
+		const auto type = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
+
+		const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(type);
+		if (!maybeType.has_value())
+		{
+			LOG_ERROR("Resource {} has unknown type!", resource["name"].GetString());
+			continue;
+		}
+
+		result.emplace_back(name, path, maybeType.value());
+	}
+
+	return result;
+}
 
 ResourceManager::~ResourceManager() { dispose(); }
 
@@ -272,6 +296,65 @@ std::vector<Resource> ResourceManager::getDefaultResources(ResourceType type)
 	return resources;
 }
 
+void ResourceManager::importResource(const fs::path& path)
+{
+	const auto resourcePath = path.string();
+	Resource resource(path.stem().string(), resourcePath, ResourceType::Model);
+
+	if (Application::getModule<StateManager>().hasScene())
+	{
+		LOG_ERROR("Scene must be saved before import.");
+		return;
+	}
+
+	/// \todo Copy new file to the scene location.
+
+	if (mesh(resource.alias, resource.path))
+	{
+		m_importedResources.insert(resource.alias);
+	}
+}
+
+Memento ResourceManager::getState()
+{
+	Memento state;
+
+	rapidjson::Value resources(rapidjson::kObjectType);
+
+	resources.AddMember("imported", rapidjson::Value(rapidjson::kArrayType), state.GetAllocator());
+	for (const auto& importedAlias : m_importedResources)
+	{
+		rapidjson::Value resource(rapidjson::kObjectType);
+
+		auto& path = m_aliasMap.at(importedAlias).lock()->path;
+
+		resource.AddMember("name", rapidjson::Value(importedAlias, state.GetAllocator()), state.GetAllocator());
+		resource.AddMember("path", rapidjson::Value(path, state.GetAllocator()), state.GetAllocator());
+		resource.AddMember("type", rapidjson::Value("Mesh", state.GetAllocator()), state.GetAllocator());
+
+		resources["imported"].PushBack(std::move(resource), state.GetAllocator());
+	}
+
+	return state;
+}
+
+void ResourceManager::setState(const Memento &memento, bool newSceneLoaded)
+{
+	if (newSceneLoaded)
+	{
+		if (auto resources = readResources(memento["resources"]["imported"]))
+		{
+			for (const auto& resource : *resources)
+			{
+				if (mesh(resource.alias, resource.path))
+				{
+					m_importedResources.insert(resource.alias);
+				}
+			}
+		}
+	}
+}
+
 std::shared_ptr<void> ResourceManager::getData(const std::string& alias, const size_t id, ResourceType type,
                                                bool* success)
 {
@@ -486,4 +569,5 @@ void ResourceManager::dispose()
 			break;
 		}
 	}
+}
 }

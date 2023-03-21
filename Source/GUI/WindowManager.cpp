@@ -4,6 +4,7 @@
 #include "imgui_internal.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 #include "Toolkit.h"
 

@@ -5,6 +5,7 @@
 
 #include "glm/glm.hpp"
 
+#include "Core/Types.h"
 #include "Logger/Logger.h"
 
 #include "Viewport/data/DisplayOptions.h"

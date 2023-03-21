@@ -87,7 +87,7 @@ SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator--(int)
 
 Ptr<Transformation> SequenceTree::MatrixIterator::operator*() const
 {
-	I3T_ASSERT(m_currentMatrix != nullptr && "Iterator is at the end!");
+	I3T_ASSERT(m_currentMatrix != nullptr, "Iterator is at the end!");
 
 	return m_currentMatrix->as<Transformation>();
 }

@@ -26,12 +26,6 @@
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
 
-#include "Config.h"
-
-/// \todo Logger should not import InputController directly!
-/// \todo Test JustPressed keys in Application and set set logging options there.
-#include "Core/Input/InputManager.h"
-
 #ifdef _DEBUG
 #define LOG_DEBUG(...) Logger::getInstance().getConsoleLogger()->trace(__VA_ARGS__);
 #else
@@ -114,15 +108,6 @@ enum class LoggingOption
 	MOUSE_MOVEMENT,
 	MOUSE_CLICK,
 	TUTORIAL
-};
-
-struct LoggingToggle final
-{
-	static Keys::Code KEY_LoggingToggle_popUps;
-	static Keys::Code KEY_LoggingToggle_logic;
-	static Keys::Code KEY_LoggingToggle_matrixFields;
-	static Keys::Code KEY_LoggingToggle_mouseMovement;
-	static Keys::Code KEY_Dummy_tutorialStep; // #TUTORIAL
 };
 
 class Logger

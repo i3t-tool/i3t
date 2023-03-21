@@ -47,8 +47,8 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
                                    unsigned fromIndex, unsigned myIndex)
 {
-	I3T_ASSERT(rightNode->getInputPins().size() > myIndex && "Node does not have input pin with given index!");
-	I3T_ASSERT(leftNode->getOutputPins().size() > fromIndex && "Node {} does not have output pin with given index!");
+	I3T_ASSERT(rightNode->getInputPins().size() > myIndex, "Node does not have input pin with given index!");
+	I3T_ASSERT(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with given index!");
 
 	auto result = isPlugCorrect(&rightNode->getIn(myIndex), &leftNode->getOut(fromIndex));
 	if (result != ENodePlugResult::Ok)
@@ -149,7 +149,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& 
 
 std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
 {
-	I3T_ASSERT(node->getOutputPins().size() > index && "Out of range.");
+	I3T_ASSERT(node->getOutputPins().size() > index, "Out of range.");
 
 	std::vector<Ptr<NodeBase>> result;
 	auto pin = node->getOutputPins()[index];
@@ -176,7 +176,7 @@ bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs) { return lhs-
 
 bool GraphManager::arePlugged(const Pin& input, const Pin& output)
 {
-	I3T_ASSERT(input.isInput() && "Given input pin is not input pin.");
+	I3T_ASSERT(input.isInput(), "Given input pin is not input pin.");
 	if (!input.isPluggedIn())
 		return false;
 	return input.getParentPin() == &output;

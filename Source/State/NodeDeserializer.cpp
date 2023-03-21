@@ -197,7 +197,7 @@ Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 
 Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 {
-	I3T_ASSERT(value.IsObject());
+	I3T_ASSERT(value.IsObject(), "Invalid value type");
 
 	const auto& type = value["type"].GetString();
 

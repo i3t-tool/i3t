@@ -4,6 +4,7 @@
 
 #include "Core/API.h"
 #include "Core/Application.h"
+#include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "GUI/Theme.h"
 #include "GUI/UIModule.h"

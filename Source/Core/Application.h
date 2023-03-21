@@ -186,8 +186,8 @@ template <typename T> T& Application::getModule()
 	const auto hash = typeid(T).hash_code();
 	const auto& self = Application::get();
 
-	I3T_ASSERT(self.m_modules.count(hash) != 0 && "Module is not created!");
-	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr && "Invalid type.");
+	I3T_ASSERT(self.m_modules.count(hash) != 0, "Module is not created!");
+	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr, "Invalid type.");
 
 	return *(T*)self.m_modules.at(hash).get();
 }

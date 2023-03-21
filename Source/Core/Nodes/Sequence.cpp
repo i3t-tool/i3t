@@ -97,7 +97,7 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t i
 
 Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 {
-	I3T_ASSERT(m_matrices.size() > static_cast<size_t>(index) &&
+	I3T_ASSERT(m_matrices.size() > static_cast<size_t>(index),
 	           "Sequence does not have so many matrices as you are expecting.");
 
 	auto result = std::move(m_matrices.at(index));
@@ -186,7 +186,7 @@ Ptr<Node> Sequence::clone()
 
 Pin& Sequence::getIn(size_t i)
 {
-	I3T_ASSERT(i < g_sequence.inputTypes.size() && "Illegal index.");
+	I3T_ASSERT(i < g_sequence.inputTypes.size(), "Illegal index.");
 
 	if (i == I3T_SEQ_IN_MAT)
 		return m_storage->m_inputs[i];
@@ -195,7 +195,7 @@ Pin& Sequence::getIn(size_t i)
 
 Pin& Sequence::getOut(size_t i)
 {
-	I3T_ASSERT(i < g_sequence.outputTypes.size() && "Illegal index.");
+	I3T_ASSERT(i < g_sequence.outputTypes.size(), "Illegal index.");
 
 	if (i == I3T_SEQ_OUT_MUL || i == I3T_SEQ_OUT_MOD)
 		return m_multiplier->m_outputs[i];

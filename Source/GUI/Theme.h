@@ -345,7 +345,7 @@ public:
 
 	const ImVec2& get(ESizeVec2 sizeVec)
 	{
-		I3T_ASSERT(m_sizesVec2.contains(sizeVec) && "This size is not present in the map.");
+		I3T_ASSERT(m_sizesVec2.contains(sizeVec), "This size is not present in the map.");
 		return m_sizesVec2[sizeVec];
 	}
 

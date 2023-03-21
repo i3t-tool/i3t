@@ -42,7 +42,7 @@ void StateManager::undo()
 
 	for (auto& originator : m_originators)
 	{
-		originator->setState(memento);
+		originator->setState(memento, false);
 	}
 
 	setWindowTitle();
@@ -61,7 +61,7 @@ void StateManager::redo()
 
 	for (auto& originator : m_originators)
 	{
-		originator->setState(memento);
+		originator->setState(memento, false);
 	}
 
 	setWindowTitle();
@@ -100,7 +100,7 @@ bool StateManager::loadScene(const fs::path& scene)
 
 	for (auto* originator : m_originators)
 	{
-		originator->setState(maybeScene.value());
+		originator->setState(maybeScene.value(), true);
 	}
 
 	m_currentScene = scene;

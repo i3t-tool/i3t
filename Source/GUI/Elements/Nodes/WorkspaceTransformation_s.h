@@ -393,7 +393,7 @@ inline /* inline for ability to compile
 				break;
 			}
 			default:
-				I3T_ASSERT(false && "Unknow data type in Scale Transform");
+				I3T_ASSERT(false, "Unknow data type in Scale Transform");
 			}
 		}
 		ImGui::EndTable();

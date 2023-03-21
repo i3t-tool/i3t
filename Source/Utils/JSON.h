@@ -112,13 +112,13 @@ inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc)
 inline std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
-	I3T_ASSERT(schemaFile.good() && "Cannot open schema file!");
+	I3T_ASSERT(schemaFile.good(), "Cannot open schema file!");
 
 	rapidjson::Document schemaDocument;
 
 	rapidjson::IStreamWrapper schemaInputStreamWrapper(schemaFile);
 	auto hasError = schemaDocument.ParseStream(schemaInputStreamWrapper).HasParseError();
-	I3T_ASSERT(!hasError && "Cannot parse schema file!");
+	I3T_ASSERT(!hasError, "Cannot parse schema file!");
 
 	rapidjson::SchemaDocument schema(schemaDocument);
 	rapidjson::SchemaValidator validator(schema);
@@ -188,7 +188,7 @@ inline std::string toString(const rapidjson::Document& document)
 
 inline ImVec2 getVec2(const rapidjson::Value& value)
 {
-	I3T_ASSERT(value.IsArray());
+	I3T_ASSERT(value.IsArray(), "Invalid type");
 
 	ImVec2 result;
 
@@ -200,7 +200,7 @@ inline ImVec2 getVec2(const rapidjson::Value& value)
 
 inline glm::vec3 getVec3(const rapidjson::Value& value)
 {
-	I3T_ASSERT(value.IsArray());
+	I3T_ASSERT(value.IsArray(), "Invalid type");
 
 	glm::vec3 result;
 
@@ -213,7 +213,7 @@ inline glm::vec3 getVec3(const rapidjson::Value& value)
 
 inline glm::vec4 getVec4(const rapidjson::Value& value)
 {
-	I3T_ASSERT(value.IsArray());
+	I3T_ASSERT(value.IsArray(), "Invalid type");
 
 	glm::vec4 result;
 
@@ -227,7 +227,7 @@ inline glm::vec4 getVec4(const rapidjson::Value& value)
 
 inline glm::mat4 getMat(const rapidjson::Value& value)
 {
-	I3T_ASSERT(value.IsArray());
+	I3T_ASSERT(value.IsArray(), "Invalid type");
 
 	glm::mat4 result;
 

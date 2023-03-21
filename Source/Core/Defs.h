@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cassert>
+#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
@@ -18,11 +19,10 @@
 #include "magic_enum.hpp"
 #include "spdlog/formatter.h"
 
+#include "Core/Types.h"
+#include "Logger/Logger.h"
+
 namespace fs = std::filesystem;
-
-constexpr const size_t MAX_PATH_LENGTH = 4096L;
-
-#define I3T_CONST inline constexpr
 
 /// Inlining macro.
 #ifdef _MSC_VER
@@ -43,50 +43,10 @@ constexpr const size_t MAX_PATH_LENGTH = 4096L;
 #undef Assert /* \todo JH due to compile error */
 #endif
 
-#ifdef I3T_DEBUG
-#define I3T_ASSERT(cond) assert(cond)
-#define I3T_ABORT(message) assert(false && message)
-#else
-#define I3T_ASSERT(cond)
-#define I3T_ABORT(message) assert(false && message)
-#endif
-
-template <typename T, typename E> class Result
-{
-public:
-	Result(T&& val) : m_state(val) {}
-	Result(E&& val) : m_state(val) {}
-
-	bool isOk() const { return m_state.index() == 0; }
-	bool isErr() const { return m_state.index() == 1; }
-
-	T&& unwrap() { return std::get<T>(m_state); }
-	const T& unwrap() const { return std::get<T>(m_state); }
-
-	E&& err() { return std::get<E>(m_state); }
-	const E& err() const { return std::get<E>(m_state); }
-
-private:
-	std::variant<T, E> m_state;
-};
-
-using Void = std::monostate;
-
-/// Definition of more friendly shared_ptr usage.
-template <typename T> using Ptr = std::shared_ptr<T>;
-
-/// Unique pointer shortcut.
-template <typename T> using UPtr = std::unique_ptr<T>;
-
-template <typename T> using WPtr = std::weak_ptr<T>;
-
-//
-
-template <typename BaseClass> class ICloneable
-{
-public:
-	virtual Ptr<BaseClass> clone() = 0;
-};
+/// We need to log message here since all assertions are removed
+/// on Windows in Release config.
+#define I3T_ASSERT(cond, message) if (!(cond)) { LOG_FATAL(message); } assert(cond)
+#define I3T_ABORT(message) LOG_FATAL(message); std::abort()
 
 /// Enum utils
 

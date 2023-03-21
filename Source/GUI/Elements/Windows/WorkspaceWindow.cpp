@@ -1491,7 +1491,7 @@ Memento WorkspaceWindow::getState()
 	return memento;
 }
 
-void WorkspaceWindow::setState(const Memento& memento)
+void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
 {
 	getNodeEditor().m_workspaceCoreNodes.clear();
 

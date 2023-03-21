@@ -28,6 +28,8 @@ class Resource;
 // TODO: (DR) Unicode support?
 // TODO: (DR) How to resolve alias conflict? Exception? Silent fail?
 
+std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resources);
+
 /**
  * Resource manager for loading resources from the filesystem.
  * Can be accessed from a singleton ResourceManager::instance()
@@ -47,7 +49,7 @@ class Resource;
  * An RM define is provided to shorten "Core::ResourceManager"
  * An RMI define shortens "Core::ResourceManager::instance()"
  */
-class ResourceManager : public Module
+class ResourceManager : public Module, IStateful
 {
 private:
 	/// Map of hashIds and owning resource pointers [hashid, resource]
@@ -57,6 +59,7 @@ private:
 
 	/// List of default resource aliases
 	std::set<std::string> m_defaultResources;
+	std::set<std::string> m_importedResources;
 
 public:
 	~ResourceManager();
@@ -182,6 +185,12 @@ public:
 	 * Returns default resources of type.
 	 */
 	std::vector<Resource> getDefaultResources(ResourceType type);
+
+	void importResource(const fs::path& path);
+
+	Memento getState() override;
+
+	void setState(const Memento &memento, bool newSceneLoaded) override;
 
 private:
 	/**
