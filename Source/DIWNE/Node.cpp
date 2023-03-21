@@ -155,7 +155,6 @@ bool Node::afterEndDiwne()
 				processUnselect();
 			}
 			diwne.m_takeSnap = true;
-			diwne.setNodesSelectionChanged(true);
 		}
 	}
 

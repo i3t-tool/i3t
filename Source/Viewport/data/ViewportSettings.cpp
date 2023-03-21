@@ -40,5 +40,7 @@ ViewportSettings::ViewportSettings()
 
 	highlight_selectionColor = glm::vec3(0.949, 0.682, 0.18);
 	highlight_highlightColor = glm::vec3(0.18, 0.784, 0.949);
+
+	manipulator_size = 0.12f;
 }
 } // namespace Vp

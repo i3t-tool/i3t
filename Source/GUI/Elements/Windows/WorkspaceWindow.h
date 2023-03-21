@@ -63,6 +63,9 @@ public:
 
 	ViewportHighlightResolver m_viewportHighlightResolver;
 
+	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
+	bool m_viewportSelectionChanged{false};
+
 	void popupContent();
 
 	bool beforeBegin();

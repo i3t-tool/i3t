@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 
 // TODO: (DR) Perhaps add option to use orthographic projection
+// TODO: (DR) Cameras should have an ability to recieve a view matrix and reconstruct parameters from it, or force using
+// it for some time, would allow view changing using buttons or interpolated view rotation.
 
 namespace Vp
 {
@@ -14,8 +16,8 @@ namespace Vp
 class ICamera
 {
 protected:
-	glm::mat4 m_view;
-	glm::mat4 m_projection;
+	glm::mat4 m_view{1.0f};
+	glm::mat4 m_projection{1.0f};
 
 	int m_width{200};  ///< Camera resolution width in pixels
 	int m_height{200}; ///< Camera resolution height in pixels

@@ -81,16 +81,23 @@ void ViewportWindow::render()
 	ImVec2 windowMin = GUI::glmToIm(m_windowMin);
 	ImVec2 windowMax = GUI::glmToIm(m_windowMax);
 
-	bool userInteractedWithMenus = false;
+	bool menuInteraction = false;
 	if (ImGui::BeginMenuBar())
 	{
-		userInteractedWithMenus |= showViewportMenu();
+		menuInteraction |= showViewportMenu();
 		ImGui::EndMenuBar();
 	}
 
+	m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
+	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
+	// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is interacting
+	// with them, hence we draw them beforehand using a channel splitter
+	bool manipulatorInteraction = m_viewport->m_manipulators->draw(m_windowPos, m_windowSize);
+	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
+
 	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
 	//  the InputManager's active input rather than asking the WindowManager
-	if (InputManager::isInputActive(getInputPtr()) && !userInteractedWithMenus)
+	if (InputManager::isInputActive(getInputPtr()) && !menuInteraction && !manipulatorInteraction)
 	{
 		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
 		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
@@ -109,6 +116,8 @@ void ViewportWindow::render()
 	{
 		ImGui::Text("Failed to draw viewport!");
 	}
+
+	m_channelSplitter.Merge(ImGui::GetWindowDrawList());
 
 	ImGui::End();
 }
@@ -257,6 +266,12 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
+		if (ImGui::BeginMenu("Manipulators"))
+		{
+			ImGui::SliderFloat("Size", &m_viewport->getSettings().manipulator_size, 0.01f, 1.0f, "%.2f");
+			ImGui::EndMenu();
+		}
+
 		if (ImGui::MenuItem("Reload shaders", nullptr, nullptr))
 		{
 			bool ok = Vp::Shaders::instance().reload();
@@ -298,6 +313,14 @@ bool ViewportWindow::showViewportMenu()
 				m_viewport->getSettings().camera_smoothScroll = !m_viewport->getSettings().camera_smoothScroll;
 				camera->getOrbitCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
 				camera->getTrackballCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
+			}
+		}
+		if (ImGui::SliderFloat("Camera fov", &m_viewport->getSettings().camera_fov, 1, 1000, "%.2f"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->getOrbitCamera()->setFov(m_viewport->getSettings().camera_fov);
+				camera->getTrackballCamera()->setFov(m_viewport->getSettings().camera_fov);
 			}
 		}
 

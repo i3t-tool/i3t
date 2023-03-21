@@ -3,7 +3,7 @@
 #include "Utils/Math.h"
 #include <math.h>
 
-//#include "pgr.h"
+// #include "pgr.h"
 #include "Utils/Format.h"
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp> // Euler angle rotations
@@ -753,6 +753,58 @@ void TransformImpl<ETransformType::AxisAngle>::resetMatrixFromDefaults()
 	notifySequence();
 }
 
+ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat4& mat)
+{
+	ValueSetResult result;
+
+	// Axis angle cannot set the value individually for each coordinate in the matrix as the 3x3 rotation matrix has to be
+	// evaluated at once, piecewise evaluation would fail as the matrix would be invalid at times (not orthonormal,
+	// skewed etc.)
+
+	// Check if the 3x3 rotation matrix can be edited ((DR) it should always be though?)
+	for (int c = 0; c < 3; ++c)
+	{
+		for (int r = 0; r < 3; ++r)
+		{
+			if (!canSetValue(g_AxisAngleMask, glm::ivec2(c, r), mat[c][r]))
+			{
+				return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+				                      "Cannot set value at given coordinates."};
+			}
+		}
+	}
+
+	glm::mat4 oldValue = getInternalData().getMat4();
+	float oldAngle = getDefaultValue("rotation").getFloat();
+	glm::vec3 oldAxis = getDefaultValue("axis").getVec3();
+
+	// Extract current axis angle from new matrix
+	glm::vec3 axis;
+	float angle;
+	glm::axisAngle(mat, axis, angle);
+	// Recreate the matrix using the extracted axis and angle to reduce imprecision from float math
+	glm::mat4 newMat = glm::rotate(angle, axis);
+
+	// Set the new matrix
+	setInternalValue(newMat);
+
+	// Update default values
+	setDefaultValueNoUpdate("rotation", angle);
+	setDefaultValueNoUpdate("axis", axis);
+
+	// Check validity
+	if (!isValid()) {
+		// Revert changes
+		setInternalValue(oldValue);
+		setDefaultValueNoUpdate("rotation", oldAngle);
+		setDefaultValueNoUpdate("axis", oldAxis);
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "AxisAngle synergy not valid!"};
+	}
+
+	notifySequence();
+	return ValueSetResult{ValueSetResult::Status::Ok};
+}
+
 ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(float rads)
 {
 	setDefaultValue("rotation", rads);
@@ -1195,10 +1247,10 @@ bool TransformImpl<ETransformType::Frustum>::isValid() const
 
 void TransformImpl<ETransformType::Frustum>::initDefaults()
 {
-	setDefaultValueNoUpdate("left", -5.0f);
-	setDefaultValueNoUpdate("right", 5.0f);
-	setDefaultValueNoUpdate("bottom", -5.0f);
-	setDefaultValueNoUpdate("top", 5.0f);
+	setDefaultValueNoUpdate("left", -1.0f);
+	setDefaultValueNoUpdate("right", 1.0f);
+	setDefaultValueNoUpdate("bottom", -1.0f);
+	setDefaultValueNoUpdate("top", 1.0f);
 	setDefaultValueNoUpdate("near", 1.0f);
 	setDefaultValue("far", 10.0f);
 }

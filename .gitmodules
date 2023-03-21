@@ -42,3 +42,6 @@
 [submodule "Dependencies/lua/lua"]
 	path = Dependencies/lua/lua
 	url = https://github.com/lua/lua.git
+[submodule "Dependencies/ImGuizmo/ImGuizmo"]
+	path = Dependencies/ImGuizmo/ImGuizmo
+	url = https://github.com/xDUDSSx/ImGuizmo.git

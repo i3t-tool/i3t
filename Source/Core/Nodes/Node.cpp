@@ -122,6 +122,11 @@ ENodePlugResult Node::plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsig
 	return ENodePlugResult::Ok;
 }
 
+Ptr<Node> Node::getOwner()
+{
+	return m_owner;
+}
+
 Ptr<Node> Node::getRootOwner()
 {
 	auto topMost = m_owner;

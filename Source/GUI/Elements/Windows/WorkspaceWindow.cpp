@@ -1314,9 +1314,6 @@ bool WorkspaceDiwne::afterContent()
 		}
 	}
 
-	/* ===== reaction to actions ===== */
-	manipulatorStartCheck3D();
-
 	/* hold or drag or interacting or new_link  */
 	if ((m_diwneAction == DIWNE::DiwneAction::DragNode || m_diwneAction == DIWNE::DiwneAction::HoldNode ||
 	     m_diwneAction == DIWNE::DiwneAction::InteractingContent || m_diwneAction == DIWNE::DiwneAction::NewLink ||
@@ -1329,6 +1326,48 @@ bool WorkspaceDiwne::afterContent()
 	{
 		processDragAllSelectedNodes();
 	}
+
+	// Handle reaction to selection in viewport
+	if (m_viewportSelectionChanged)
+	{
+		bool validSelection = false;
+		if (m_viewportLastSelectedEntity != nullptr)
+		{
+			if (Vp::SceneModel* sceneObject = dynamic_cast<Vp::SceneModel*>(m_viewportLastSelectedEntity))
+			{
+				auto nodeOpt = findNodeById(g_workspaceDiwne->getAllNodesInnerIncluded(), sceneObject->m_guiNodeId);
+				if (nodeOpt)
+				{
+					Ptr<GuiNode>& node = nodeOpt.value();
+					bool selected = node->getSelected();
+					g_workspaceDiwne->deselectNodes();
+					if (!selected)
+					{
+						// TODO: (DR) These 3 lines and if statement should basically always be together, the setSelected method
+						//   should handle this on its own! This is the case across all uses of Node::setSelected.
+						//   A boolean flag should be used to trigger processSelect and snapshot or not.
+						//   The goal here is that process(Un)Select() gets always called but ONLY once for each state.
+						if (!node->getSelected())
+						{
+							node->setSelected(true);
+							node->processSelect();
+							g_workspaceDiwne->m_takeSnap = true;
+						}
+					}
+					validSelection = true;
+				}
+			}
+		}
+		if (!validSelection)
+		{
+			g_workspaceDiwne->deselectNodes();
+		}
+	}
+	m_viewportSelectionChanged = false;
+
+	// Handle manipulators
+	manipulatorStartCheck3D();
+
 	return interaction_happen;
 }
 
@@ -1508,20 +1547,16 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 {
 	if (getNodesSelectionChanged())
 	{
-		std::vector<Ptr<WorkspaceNodeWithCoreData>> selected_nodes = getSelectedNodesInnerIncluded();
-		if (selected_nodes.size() == 1)
+		Application::get().viewport()->getManipulators().clearManipulators();
+
+		std::vector<Ptr<WorkspaceNodeWithCoreData>> selectedNodes = getSelectedNodesInnerIncluded();
+		for (const auto& node : selectedNodes)
 		{
-			Ptr<WorkspaceTransformation> selected_transformation =
-			    std::dynamic_pointer_cast<WorkspaceTransformation>(selected_nodes[0]);
+			Ptr<WorkspaceTransformation> selected_transformation = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
 			if (selected_transformation != nullptr)
 			{
-				Application::get().world()->manipulatorsSetMatrix(selected_transformation, nullptr);
-			} /* \todo JH \todo MH \todo PF why not pass sequence of transformation?
-			   */
-		}
-		else
-		{
-			Application::get().world()->manipulatorsSetMatrix(nullptr, nullptr);
+				Application::get().viewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
+			}
 		}
 	}
 }
@@ -1607,36 +1642,12 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 
 	// Setup viewport selection callback
 	App::get().viewport()->getMainScene().lock()->addSelectionCallback(
-	    [this](Vp::Entity* newlySelectedEntity)
+	    [](Vp::Entity* newlySelectedEntity)
 	    {
-		    if (newlySelectedEntity != nullptr)
-		    {
-			    if (Vp::SceneModel* sceneObject = dynamic_cast<Vp::SceneModel*>(newlySelectedEntity))
-			    {
-				    auto nodeOpt = findNodeById(g_workspaceDiwne->getAllNodesInnerIncluded(), sceneObject->m_guiNodeId);
-				    if (nodeOpt)
-				    {
-					    Ptr<GuiNode>& node = nodeOpt.value();
-					    bool selected = node->getSelected();
-					    g_workspaceDiwne->deselectNodes();
-					    if (!selected)
-					    {
-						    // TODO: (DR) These 3 lines and if statement should basically always be together, the setSelected method
-						    //   should handle this on its own! This is the case across all uses of Node::setSelected.
-						    //   A boolean flag should be used to trigger processSelect and snapshot or not.
-						    //   The goal here is that process(Un)Select() gets always called but ONLY once for each state.
-						    if (!node->getSelected())
-						    {
-							    node->setSelected(true);
-							    node->processSelect();
-							    g_workspaceDiwne->m_takeSnap = true;
-						    }
-					    }
-					    return;
-				    }
-			    }
-		    }
-		    g_workspaceDiwne->deselectNodes();
+		    // Save information about this callback and perform actions based on it later while in workspace window context.
+		    // This is a workaround due to viewport selection occurring in unknown order at unknown time.
+		    g_workspaceDiwne->m_viewportSelectionChanged = true;
+		    g_workspaceDiwne->m_viewportLastSelectedEntity = newlySelectedEntity;
 	    });
 }
 

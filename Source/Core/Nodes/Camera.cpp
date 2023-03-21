@@ -20,7 +20,7 @@ Camera::Camera() : NodeBase(&g_cameraProperties) {}
 void Camera::createComponents()
 {
 	m_proj = GraphManager::createSequence();
-	// m_proj->setOwner(getPtr());
+	m_proj->setOwner(getPtr());
 
 	m_view = GraphManager::createSequence();
 	m_view->setOwner(getPtr());

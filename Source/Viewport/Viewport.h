@@ -14,7 +14,9 @@
 #include "pgr.h"
 
 #include "Core/Nodes/Id.h"
+#include "Core/Nodes/Node.h"
 
+#include "Viewport/Manipulators.h"
 #include "Viewport/camera/ICamera.h"
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
@@ -75,6 +77,10 @@ private:
 	friend class SceneModel;
 	friend class SceneCamera;
 
+public: // TODO: (DR) Finish manipulator public API
+	std::shared_ptr<Manipulators> m_manipulators;
+
+private:
 	// Scenes
 	std::shared_ptr<MainScene> m_mainScene;
 	std::shared_ptr<PreviewScene> m_previewScene;
@@ -195,5 +201,7 @@ public:
 
 	std::weak_ptr<Scene> getMainScene() { return m_mainScene; };
 	std::weak_ptr<Scene> getPreviewScene() { return m_previewScene; };
+
+	Manipulators& getManipulators();
 };
 } // namespace Vp

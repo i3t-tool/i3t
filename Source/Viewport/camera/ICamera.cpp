@@ -1,4 +1,5 @@
 #include "ICamera.h"
+
 #include "glm/ext/matrix_clip_space.hpp"
 
 using namespace Vp;
@@ -15,7 +16,7 @@ glm::mat4 ICamera::createProjectionMatrix(bool nonShrinking) const
 	{
 		// Non shrinking resizing
 		// Method 1
-		float scale = atan(glm::radians(m_fov)) * m_zNear;
+		float scale = m_zNear * tan(glm::radians(m_fov / 2));
 		float l = -scale;
 		float r = scale;
 		float b = -scale;

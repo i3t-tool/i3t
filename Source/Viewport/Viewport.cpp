@@ -39,6 +39,9 @@ void Viewport::init(ViewportSettings settings)
 	// Preload some useful models
 	RMI.mesh("Data/Models/super8.gltf");
 
+	// Create manipulators
+	m_manipulators = std::make_shared<Manipulators>(this);
+
 	// Setup scenes
 	m_mainScene = std::make_shared<MainScene>(this);
 	m_previewScene = std::make_shared<PreviewScene>(this);
@@ -161,6 +164,8 @@ std::weak_ptr<SceneCamera> Viewport::createCamera(Core::ID guiNodeId)
 	return sceneCamera;
 }
 
+// TODO: (DR) Should probably be something like viewport->getMainScene()->getCamera() since its not clear which camera
+//   we're actually getting here (without reading the doc)
 std::weak_ptr<AggregateCamera> Viewport::getMainViewportCamera()
 {
 	std::shared_ptr<AggregateCamera> camera = std::dynamic_pointer_cast<AggregateCamera>(m_mainScene->m_camera);
@@ -168,3 +173,5 @@ std::weak_ptr<AggregateCamera> Viewport::getMainViewportCamera()
 }
 
 ViewportSettings& Viewport::getSettings() { return m_settings; }
+
+Manipulators& Viewport::getManipulators() { return *m_manipulators; };

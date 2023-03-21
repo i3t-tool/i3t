@@ -243,6 +243,7 @@ public:
 	/// \todo Does it needs to be public?
 	void setOwner(Ptr<Node> owner) { m_owner = owner; }
 
+	Ptr<Node> getOwner();
 	Ptr<Node> getRootOwner();
 
 	void notifyOwner();

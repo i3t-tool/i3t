@@ -31,6 +31,11 @@
       "type": "Model"
     },
     {
+      "name": "Sphere",
+      "path": "Data/Models/sphere.glb",
+      "type": "Model"
+    },
+    {
       "name": "ModelShader",
       "path": "Data/Shaders/Model.glsl",
       "type": "Shader"

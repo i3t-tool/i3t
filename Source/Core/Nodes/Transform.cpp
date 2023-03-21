@@ -170,7 +170,7 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 
 ValueSetResult Transformation::setValue(float val, glm::ivec2 coords) // PF
 {
-	// called by AxisAngle rotate,
+	// Default implementation, potentially overriden by subclasses
 	if (isLocked())
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};

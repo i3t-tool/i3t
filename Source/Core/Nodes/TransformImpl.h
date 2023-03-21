@@ -312,6 +312,7 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
+	ValueSetResult setValue(const glm::mat4& mat) override;
 	ValueSetResult setValue(float rads) override;
 	ValueSetResult setValue(const glm::vec3& axis) override;
 

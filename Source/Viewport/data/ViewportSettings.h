@@ -45,6 +45,8 @@ public:
 	glm::vec3 highlight_selectionColor;
 	glm::vec3 highlight_highlightColor;
 
+	float manipulator_size;
+
 	ViewportSettings();
 };
 

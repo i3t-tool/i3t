@@ -33,6 +33,8 @@ private:
 	Vp::DisplayOptions displayOptions;
 	Vp::RenderOptions renderOptions;
 
+	ImDrawListSplitter m_channelSplitter;
+
 	bool showViewportMenu();
 };
 } // namespace UI
