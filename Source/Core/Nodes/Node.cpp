@@ -308,10 +308,8 @@ void Node::unplugAll()
 
 void Node::unplugInput(size_t index)
 {
-	I3T_ASSERT(m_inputs.size() > static_cast<size_t>(index),
-	           "The node's input pin that you want to unplug does not exists.");
+	I3T_ASSERT(m_inputs.size() > index, "The node's input pin that you want to unplug does not exist.");
 
-	// auto* otherPin = m_inputs[index].m_input;
 	auto inputs = getInputPinsRef();
 	auto* otherPin = inputs[index].m_input;
 
@@ -327,7 +325,9 @@ void Node::unplugInput(size_t index)
 			otherPinOutputs.erase(it);
 		}
 		else
-			I3T_ABORT("Can't find pointer to input pin in other node outputs.");
+		{
+			LOG_FATAL("Can't find pointer to input pin in other node outputs.");
+		}
 
 		auto& myPin = inputs[index];
 		myPin.m_input = nullptr;

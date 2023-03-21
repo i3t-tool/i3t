@@ -279,9 +279,19 @@ void assignCommon(const rapidjson::Value& value, Ptr<GuiNode> node)
 
 void assignSequence(const rapidjson::Value& value, Ptr<GuiSequence> sequence)
 {
+	std::vector<Ptr<WorkspaceTransformation>> transforms;
 	for (const auto& transform : value["transforms"].GetArray())
 	{
-		sequence->moveNodeToSequence(NodeDeserializer::createTransform(transform));
+		transforms.push_back(NodeDeserializer::createTransform(transform));
+	}
+
+	// WorkspaceSequence::moveNodeToSequence function pushes new matrix
+	// at the beginning of the sequence.
+	std::reverse(transforms.begin(), transforms.end());
+
+	for (auto& transform : transforms)
+	{
+		sequence->moveNodeToSequence(transform);
 	}
 }
 } // namespace NodeDeserializer

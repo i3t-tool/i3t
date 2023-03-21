@@ -75,8 +75,9 @@ void Sequence::Storage::updateValues(int inputIndex)
 
 ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
+	/// @todo test this
 	// insert transform to matrix array
-	index = index > m_matrices.size() ? m_matrices.size() : index;
+	index = index >= m_matrices.size() ? m_matrices.size() : index;
 	m_matrices.insert(m_matrices.begin() + index, matrix);
 
 	// mark transform used in sequence
