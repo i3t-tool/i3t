@@ -99,7 +99,8 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t i
 Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 {
 	I3T_ASSERT(m_matrices.size() > static_cast<size_t>(index),
-	           "Sequence does not have so many matrices as you are expecting.");
+	           "Sequence does not have as many matrices as you are expecting.");
+	LOG_INFO("Popping matrix at {} from sequence {}.", index, getId());
 
 	auto result = std::move(m_matrices.at(index));
 	m_matrices.erase(m_matrices.begin() + index);

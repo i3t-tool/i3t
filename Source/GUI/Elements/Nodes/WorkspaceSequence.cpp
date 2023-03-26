@@ -54,17 +54,16 @@ int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
 
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
-
 	auto node_iter =
 	    std::find_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
-	                 [node](Ptr<WorkspaceNodeWithCoreData> const& in_node) -> bool { return node == in_node; });
+	                 [node](auto innerNode) -> bool { return node == innerNode; });
 
 	if (node_iter != m_workspaceInnerTransformations.end())
 	{
 		int index = node_iter - m_workspaceInnerTransformations.begin();
 		std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter)->setRemoveFromSequence(true);
-		//		m_workspaceInnerTransformations.erase(node_iter); is done in next
-		// frame based on setRemoveFromSequence(true)
+		// is done in next frame based on setRemoveFromSequence(true)
+		// m_workspaceInnerTransformations.erase(node_iter);
 		m_nodebase->as<Core::Sequence>()->popMatrix(index);
 	}
 }
@@ -236,21 +235,26 @@ bool WorkspaceSequence::middleContent()
 		}
 	}
 
-	// Better deleting from Sequence -> popMatrix() in popNode() is crucial
-	m_workspaceInnerTransformations.erase(
-	    std::remove_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
-	                   [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-	                   {
-		                   bool remove_from_seq =
-		                       std::dynamic_pointer_cast<WorkspaceTransformation>(node)->getRemoveFromSequence();
-		                   if (remove_from_seq)
-		                   {
-			                   popNode(node);
-		                   }
-		                   return remove_from_seq;
-	                   }),
-	    m_workspaceInnerTransformations.end());
+	// Check if transform is marked for removal.
+	{
+		auto it = m_workspaceInnerTransformations.begin();
+		while (it != m_workspaceInnerTransformations.end())
+		{
+			bool removeFromSeq =
+			    std::dynamic_pointer_cast<WorkspaceTransformation>(*it)->getRemoveFromSequence();
+			if (removeFromSeq)
+			{
+				popNode(*it);
+				it = m_workspaceInnerTransformations.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
 
+	//
 	int i = 0, push_index = -1;
 	bool interaction_with_transformation_happen = false;
 	for (auto const& transformation : m_workspaceInnerTransformations)
