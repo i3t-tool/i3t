@@ -129,9 +129,11 @@ headline: Kamera
 
 *První sekvence* slouží jako *projekce* - ovládáme s ní *frustum kamery*.
 
-*Druhá sekvence* slouží k *transformaci* - posouváme a otáčíme s kamerou.
+*Druhá sekvence* slouží jako *view* matice - posouváme a otáčíme s kamerou.
 
 ![Blok kamery](camera.png)
+
+*Projekční matice* a *lookAt* matici si musíš nastavit na *"Set values"* úroveň detailu
 
 --
 headline: Kamera a Screen
@@ -140,7 +142,7 @@ Abychom se podívali na to, co kamera vidí, musíme si k ní připojit *"screen
 
 ![Ukázka použití kamery](camera_screen.png)
 
-*Kamera* se sama propojuje se *všemi přidanými modely* - to znázorňuje, že se bloky se násobí *projekční maticí* kamery.
+*Kamera* se sama propojuje se *všemi přidanými modely a sekvencemi* - to znázorňuje, že se bloky se násobí *oběma maticí* kamery.
 
 
 

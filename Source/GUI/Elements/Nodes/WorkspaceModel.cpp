@@ -120,6 +120,10 @@ void WorkspaceModel::popupContent()
 
 	ImGui::Separator();
 
+	drawMenuLevelOfDetail();
+
+	ImGui::Separator();
+
 	WorkspaceNodeWithCoreData::drawMenuDuplicate();
 
 	ImGui::Separator();

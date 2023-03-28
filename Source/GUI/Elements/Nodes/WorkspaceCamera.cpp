@@ -24,6 +24,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	}
 	m_projection->getNodebase()->getInputPins()[1].setRenderPins(true);
 	m_projection->getNodebase()->getOutputPins()[1].setRenderPins(true);
+	m_projection->setTopLabel("projection");
 
 	m_view->m_selectable = false;
 	for (int k = 0; k < m_view->getNodebase()->getInputPins().size(); k++)
@@ -36,6 +37,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	}
 	m_view->getNodebase()->getInputPins()[1].setRenderPins(true);
 	m_view->getNodebase()->getOutputPins()[1].setRenderPins(true);
+	m_view->setTopLabel("view");
 
 	//Hide multiplication output to discourage interaction
 	//getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRenderPins(false);

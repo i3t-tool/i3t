@@ -181,6 +181,7 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 
 void WorkspaceDiwne::deleteCallback()
 {
+	LOG_DEBUG("Deleting");
 	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
 	{
 		/*if(workspaceCoreNode->m_focused && !workspaceCoreNode->m_selected)
