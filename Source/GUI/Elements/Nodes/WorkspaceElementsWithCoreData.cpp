@@ -925,6 +925,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			{
 				if(!pin->getCorePin().getRenderPins())
 					continue;
+
 				pin->setConnectionPointDiwne(pinConnectionPoint);
 				if (pin->isConnected())
 				{
@@ -938,6 +939,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			{
 				if(!pin->getCorePin().getRenderPins()) 
 					continue;
+
 				inner_interaction_happen |= pin->drawDiwne();
 				/* is in pin->drawDiwne()
 				      if (pin->isconnected())
@@ -973,6 +975,9 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
 			{
+				if(!pin->getCorePin().getRenderPins())
+					continue;
+
 				pin->setConnectionPointDiwne(pinConnectionPoint);
 			}
 		}
@@ -984,6 +989,9 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 			m_minRightAlignOfRightPins = FLT_MAX;
 			for (auto const& pin : getOutputsToShow())
 			{
+				if(!pin->getCorePin().getRenderPins())
+					continue;
+
 				act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *
 				                               diwne.getWorkAreaZoom()); /* no shift to left */
 				m_minRightAlignOfRightPins =

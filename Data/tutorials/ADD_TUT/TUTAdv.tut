@@ -21,6 +21,7 @@ Na hlavní liště máme *čtyri* záložky:
     * *File* = ukládání a načítání scén
     * *Edit* = undo a redo
     * *Windows* = správce oken programu
+    * *Tutorials* = přístup k oknům tutoriálu
     * *Help* = dokumentace a credits
 
 Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se ti v náhledu *bude ukazovat*, a co *ne*.
@@ -55,9 +56,16 @@ Pokud nám bloky *zabírají moc místa* ve scéně, nebo si chceme *ulehčit tr
     * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic
 
 *Detail* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*
+
 ![Menu pro nastavení Level of detail](levelOfDetail.png)
 
 --
+headline: Operátory
+
+V *add menu* najdeme i záložku *operators*.
+
+![Menu pro přidání operátorů](operators.png)
+
+Ta obsahuje mnoho různých bloků, které nám můžou pomoct s *matematickými operacemi* jako např. *translace* matice, výpočet *determinantu*, *rozklady* matic apod.
 
 
---

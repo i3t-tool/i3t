@@ -394,7 +394,10 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
 	}
 
-	App::getModule<StateManager>().loadScene(header->m_scene);
+	if(header->m_scene != "undefined")
+	{
+		App::getModule<StateManager>().loadScene(header->m_scene);
+	}
 
 	// CREATE THE TUTORIAL
 	std::shared_ptr<Tutorial> tutorial = std::make_shared<Tutorial>(
