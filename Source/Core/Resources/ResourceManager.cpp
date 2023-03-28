@@ -364,6 +364,13 @@ void ResourceManager::setState(const Memento& memento, bool newSceneLoaded)
 std::shared_ptr<void> ResourceManager::getData(const std::string& alias, const size_t id, ResourceType type,
                                                bool* success)
 {
+	if (m_forceReload)
+	{
+		LOG_INFO("[RESOURCE MANAGER] Force reloading resource - HashID: {} Type: {}", id, n(type));
+		*success = true;
+		return nullptr;
+	}
+
 	if (alias.empty())
 	{
 		LOG_ERROR("[RESOURCE MANAGER] Cannot retrieve resource under an empty alias! HashID: {} Type: {}", id, n(type));
@@ -513,30 +520,45 @@ GLuint ResourceManager::loadTexture(const std::string& path)
 GLuint ResourceManager::loadShader(const std::string& vertShader, const std::string& fragShader,
                                    const std::string& geoShader)
 {
+	GLuint id = 1;
 	std::vector<GLuint> shaderList;
 
 	std::string absVert = vertShader;
 	std::string absFrag = fragShader;
 	if (geoShader.empty())
 	{
-		LOG_INFO("[SHADER] Loading mesh: vert: {}, frag: {}", absVert, absFrag);
+		LOG_INFO("[SHADER] Loading shader: vert: {}, frag: {}", absVert, absFrag);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
 		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
 	}
 	else
 	{
 		std::string absGeo = geoShader;
-		LOG_INFO("[SHADER] Loading mesh: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
+		LOG_INFO("[SHADER] Loading shader: vert: {}, frag: {}, geo: {}", absVert, absFrag, absGeo);
 		shaderList.push_back(pgr::createShaderFromFile(GL_VERTEX_SHADER, absVert));
 		shaderList.push_back(pgr::createShaderFromFile(GL_FRAGMENT_SHADER, absFrag));
 		shaderList.push_back(pgr::createShaderFromFile(GL_GEOMETRY_SHADER, absGeo));
 	}
 
-	GLuint id = pgr::createProgram(shaderList);
+	// Check for compilation error
+	for (const auto& stage : shaderList)
+	{
+		if (stage == 0)
+		{
+			id = 0;
+			break;
+		}
+	}
+
+	// Link if compilation was ok
+	if (id != 0)
+	{
+		id = pgr::createProgram(shaderList);
+	}
 
 	if (id == 0)
 	{
-		LOG_ERROR("[SHADER] Failed to load mesh!");
+		LOG_ERROR("[SHADER] Failed to load shader!");
 	}
 	return id;
 }

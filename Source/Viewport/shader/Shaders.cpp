@@ -2,8 +2,6 @@
 
 using namespace Vp;
 
-#include "Core/Resources/ResourceManager.h"
-
 #include "Viewport/shader/BoxBlurShader.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/FrustumShader.h"
@@ -13,37 +11,85 @@ using namespace Vp;
 #include "Viewport/shader/SelectionCompositeShader.h"
 #include "Viewport/shader/WBOITCompositeShader.h"
 
-void Shaders::load()
+#include "Logger/Logger.h"
+
+bool Shaders::load()
 {
 	if (loaded)
-		return;
+		return true;
+
+	bool ok = true;
 
 	// clang-format off
-	m_phongShader = std::make_shared<PhongShader>(
-		RMI.shader("Data/Shaders/phongVert.glsl", "Data/Shaders/phongFrag.glsl")
+	m_phongShader =	loadShader<PhongShader>(ok,
+		"Data/Shaders/phongVert.glsl", "Data/Shaders/phongFrag.glsl"
 	);
-	m_colorShader = std::make_shared<ColorShader>(
-		RMI.shader("Data/Shaders/colorVert.glsl", "Data/Shaders/colorFrag.glsl")
+	m_colorShader =	loadShader<ColorShader>(ok,
+		"Data/Shaders/colorVert.glsl", "Data/Shaders/colorFrag.glsl"
 	);
-	m_gridShader = std::make_shared<GridShader>(
-		RMI.shader("Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl")
+	m_gridShader = loadShader<GridShader>(ok,
+		"Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl"
 	);
-	m_frustumShader = std::make_shared<FrustumShader>(
-		RMI.shader("Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl")
+	m_frustumShader =	loadShader<FrustumShader>(ok,
+		"Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl"
 	);
-	m_wboitCompositeShader = std::make_shared<WBOITCompositeShader>(
-		RMI.shader("Data/Shaders/basicVert.glsl", "Data/Shaders/wboitCompositeFrag.glsl")
+	m_wboitCompositeShader = loadShader<WBOITCompositeShader>(ok,
+		"Data/Shaders/basicVert.glsl", "Data/Shaders/wboitCompositeFrag.glsl"
 	);
-	m_boxBlurShader = std::make_shared<BoxBlurShader>(
-		RMI.shader("Data/Shaders/basicVert.glsl", "Data/Shaders/boxBlurFrag.glsl")
+	m_boxBlurShader =	loadShader<BoxBlurShader>(ok,
+		"Data/Shaders/basicVert.glsl", "Data/Shaders/boxBlurFrag.glsl"
 	);
-	m_selectionCompositeShader = std::make_shared<SelectionCompositeShader>(
-		RMI.shader("Data/Shaders/basicVert.glsl", "Data/Shaders/selectionCompositeFrag.glsl")
+	m_selectionCompositeShader = loadShader<SelectionCompositeShader>(ok,
+		"Data/Shaders/basicVert.glsl", "Data/Shaders/selectionCompositeFrag.glsl"
 	);
-	m_screenOverlayShader = std::make_shared<ScreenOverlayShader>(
-		RMI.shader("Data/Shaders/basicVert.glsl", "Data/Shaders/screenOverlayFrag.glsl")
+	m_screenOverlayShader =	loadShader<ScreenOverlayShader>(ok,
+		"Data/Shaders/basicVert.glsl", "Data/Shaders/screenOverlayFrag.glsl"
 	);
 	// clang-format on
 
 	loaded = true;
+	return ok;
 }
+
+bool Shaders::reload()
+{
+	if (!loaded)
+	{
+		load();
+		return true;
+	}
+
+	RMI.m_forceReload = true;
+
+	bool ok = true;
+	ok &= reloadShader(*m_phongShader, "Data/Shaders/phongVert.glsl", "Data/Shaders/phongFrag.glsl");
+	ok &= reloadShader(*m_colorShader, "Data/Shaders/colorVert.glsl", "Data/Shaders/colorFrag.glsl");
+	ok &= reloadShader(*m_gridShader, "Data/Shaders/gridVert.glsl", "Data/Shaders/gridFrag.glsl");
+	ok &= reloadShader(*m_frustumShader, "Data/Shaders/frustumVert.glsl", "Data/Shaders/colorFrag.glsl");
+	ok &= reloadShader(*m_wboitCompositeShader, "Data/Shaders/basicVert.glsl", "Data/Shaders/wboitCompositeFrag.glsl");
+	ok &= reloadShader(*m_boxBlurShader, "Data/Shaders/basicVert.glsl", "Data/Shaders/boxBlurFrag.glsl");
+	ok &= reloadShader(*m_selectionCompositeShader, "Data/Shaders/basicVert.glsl",
+	                   "Data/Shaders/selectionCompositeFrag.glsl");
+	ok &= reloadShader(*m_screenOverlayShader, "Data/Shaders/basicVert.glsl", "Data/Shaders/screenOverlayFrag.glsl");
+
+	RMI.m_forceReload = false;
+
+	return ok;
+}
+
+bool Shaders::reloadShader(Shader& shader, const std::string& vertSource, const std::string& fragSource)
+{
+	GLuint id = RMI.shader(vertSource, fragSource);
+	if (id != 0)
+	{
+		shader.m_id = id;
+		shader.init(true);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Shaders::checkForError(Shader& shader) { return shader.m_id == 0; }

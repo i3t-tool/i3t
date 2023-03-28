@@ -31,8 +31,9 @@ public:
 	bool m_backFaceCull;
 	bool m_visible;
 	bool m_opaque;
-	bool m_wboit; ///< Whether this entity should be rendered using order independent transparency,
-	              ///< relevant if using a shader that supports wboit
+	bool m_wboit;    ///< Whether this entity should be rendered using order independent transparency,
+	                 ///< relevant if using a shader that supports wboit
+	int m_wboitFunc; ///< Index of the weight function to be used in wboit
 	unsigned int m_explicitTransparencyOrder; ///< Explicit order for ordered transparency
 
 	// Selection properties

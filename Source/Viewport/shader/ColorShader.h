@@ -19,6 +19,7 @@ public:
 
 	explicit ColorShader(GLuint id);
 
+	void init(bool initSuperclass) override;
 	void setUniforms() override;
 };
 } // namespace Vp

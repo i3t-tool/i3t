@@ -1,37 +1,27 @@
 #include "GridShader.h"
 
+#include "Viewport/GfxUtils.h"
+
 using namespace Vp;
 
-GridShader::GridShader(GLuint id) : ObjectShader(id)
+GridShader::GridShader(GLuint id) : ObjectShader(id) { init(false); }
+
+void GridShader::init(bool initSuperclass)
 {
-	m_nearId = glGetUniformLocation(id, "near");
-	m_farId = glGetUniformLocation(id, "far");
+	if (initSuperclass)
+		ObjectShader::init(true);
+
+	m_nearId = glGetUniformLocation(m_id, "u_near");
+	m_farId = glGetUniformLocation(m_id, "u_far");
 }
+
 void GridShader::setUniforms()
 {
-	WorldShader::setUniforms();
+	ObjectShader::setUniforms();
 
-	// Extract near and far values from projection matrix
-	// Note: There is a relatively huge rounding error here
 	float nearVal;
 	float farVal;
-
-	if (m_projection[2][3] == 0)
-	{
-		// Orthographic matrix
-		float m32 = m_projection[3][2];
-		float m22 = m_projection[2][2];
-		nearVal = (m32 + 1) / m22;
-		farVal = (m32 - 1) / m22;
-	}
-	else
-	{
-		// Perspective matrix
-		float m32 = m_projection[3][2];
-		float m22 = m_projection[2][2];
-		nearVal = m32 / (m22 - 1);
-		farVal = m32 / (m22 + 1);
-	}
+	GfxUtils::extractZNearZFar(m_projection, nearVal, farVal);
 	glUniform1f(m_nearId, nearVal);
 	glUniform1f(m_farId, farVal);
 }

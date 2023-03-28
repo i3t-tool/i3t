@@ -6,6 +6,9 @@ layout (location = 0) out vec4 FragColor;
 
 // WBOIT
 uniform bool u_wboitFlag = false;
+uniform int u_wboitFunc = 0;
+uniform float u_wboitNear = 0.1;
+uniform float u_wboitFar = 500;
 layout (location = 1) out vec4 AccumulationBuffer;
 layout (location = 2) out float RevealageBuffer;
 // END WBOIT
@@ -27,20 +30,20 @@ uniform mat4 viewMatrix;
 
 uniform float normalStrength;
 
-uniform sampler2D	diffuse0;
-uniform bool		diffuse0_active = false;
+uniform sampler2D    diffuse0;
+uniform bool        diffuse0_active = false;
 
-uniform sampler2D	specular0;
-uniform bool		specular0_active = false;
+uniform sampler2D    specular0;
+uniform bool        specular0_active = false;
 
-uniform sampler2D	normal0;
-uniform bool		normal0_active = false;
+uniform sampler2D    normal0;
+uniform bool        normal0_active = false;
 
-uniform sampler2D	ao0;
-uniform bool		ao0_active = false;
+uniform sampler2D    ao0;
+uniform bool        ao0_active = false;
 
-uniform sampler2D	emission0;
-uniform bool		emission0_active = false;
+uniform sampler2D    emission0;
+uniform bool        emission0_active = false;
 
 // Material ====================================
 
@@ -57,7 +60,7 @@ uniform Material material;
 
 struct PointLight {
 	vec3 position;
-	
+
 	float radius;
 
 	float intensity;
@@ -66,7 +69,7 @@ struct PointLight {
 
 struct SunLight {
 	vec3 direction;
-	
+
 	float intensity;
 	vec3 color;
 };
@@ -74,7 +77,7 @@ struct SunLight {
 struct SpotLight {
 	vec3 position;
 	vec3 direction;
-	
+
 	float cutoffAngle;
 	float cutoffSoftAngle;
 	float radius;
@@ -83,9 +86,9 @@ struct SpotLight {
 	vec3 color;
 };
 
-#define MAX_POINT_LIGHTS 25
-#define MAX_SUN_LIGHTS 10
-#define MAX_SPOT_LIGHTS 20
+#define MAX_POINT_LIGHTS 20
+#define MAX_SUN_LIGHTS 8
+#define MAX_SPOT_LIGHTS 10
 
 uniform int pointLightsCount;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
@@ -102,7 +105,7 @@ float map(float value, float min1, float max1, float min2, float max2) {
 
 vec2 texCoords() {
 	vec2 coords = TexCoords;
-    //Function for possible further modification of tex coords
+	//Function for possible further modification of tex coords
 	return coords;
 }
 
@@ -113,7 +116,7 @@ vec3 calculateAmbientLight(vec3 lightColor, vec3 ambient) {
 vec3 calculateDiffuseLight(vec3 lightColor, vec3 diffuse, vec3 N, vec3 L) {
 	vec3 res = lightColor * diffuse * max(0.0, dot(N, L));
 	res *= (diffuse0_active ? vec3(texture(diffuse0, texCoords())) : vec3(1));
-	res *= (ao0_active ? vec3(texture(ao0, texCoords()).r) : vec3(1)); //Using just the RED channel for AO (for gltf)
+	res *= (ao0_active ? vec3(texture(ao0, texCoords()).r) : vec3(1));//Using just the RED channel for AO (for gltf)
 	res += (emission0_active ? vec3(texture(emission0, texCoords())) : vec3(0));
 	res *= u_tint;
 	return res;
@@ -130,8 +133,8 @@ vec3 calculateNormalMapping(vec3 normal, vec3 tangent, vec3 binormal) {
 		//Apply normal strength by just mixing with a neutral normal
 		//This can only make normals "weaker"
 		mapNormal = mix(vec3(0.5, 0.5, 1), mapNormal, normalStrength);
-		mapNormal = normalize(mapNormal * 2.0 - 1.0); // from [0, 1] to [-1, 1]
-		normal = normalize(mat3(tangent, binormal, normal) * mapNormal); // from tangent space to view space
+		mapNormal = normalize(mapNormal * 2.0 - 1.0);// from [0, 1] to [-1, 1]
+		normal = normalize(mat3(tangent, binormal, normal) * mapNormal);// from tangent space to view space
 	}
 	return normal;
 }
@@ -162,7 +165,7 @@ vec3 calculateSunLight(SunLight light, Material material, vec3 fragPos, vec3 nor
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
 	vec3 specularLight = calculateSpecularLight(light.color, material.specular, R, V, material.shininess);
 
-	specularLight *= 0.3f; //Turn down sun specular a bit
+	specularLight *= 0.3f;//Turn down sun specular a bit
 
 	return light.intensity * (ambientLight + diffuseLight + specularLight);
 }
@@ -202,6 +205,12 @@ vec3 calculateSpotLight(SpotLight light, Material material, vec3 fragPos, vec3 n
 
 float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123); }
 
+float linearize_depth(float d, float zNear, float zFar)
+{
+	float z_n = 2.0 * d - 1.0;
+	return 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+}
+
 vec3 calculatePointLight(PointLight light, Material material, vec3 fragPos, vec3 normal, vec3 tangent, vec3 binormal) {
 	normal = calculateNormalMapping(normal, tangent, binormal);
 
@@ -223,13 +232,11 @@ vec3 calculatePointLight(PointLight light, Material material, vec3 fragPos, vec3
 }
 
 void main() {
-    float alpha = 1.0;
+	float alpha = 1.0;
 	if (diffuse0_active) {
 		alpha = texture(diffuse0, texCoords()).a;
 	}
-	if (alpha < alphaCutoff) {
-		discard;
-	}
+	alpha = min(alpha, u_opacity);
 
 	vec3 outColor = vec3(0);
 	for (int i = 0; i < sunLightsCount; i++) {
@@ -245,17 +252,55 @@ void main() {
 	float gamma = 1.1;
 	float exposure = 1.6;
 
-	vec3 mapped = vec3(1.0) - exp(-outColor * exposure); // HDR correction
-	mapped = pow(mapped, vec3(1.0 / gamma)); // gamma correction
-	
+	vec3 mapped = vec3(1.0) - exp(-outColor * exposure);// HDR correction
+	mapped = pow(mapped, vec3(1.0 / gamma));// gamma correction
+
 	FragColor = vec4(mapped, alpha);
+
+	//float linearDepth = linearize_depth(gl_FragCoord.z, u_wboitNear, u_wboitFar);
+	//float wboitDepth = map(linearDepth, u_wboitNear, u_wboitFar, 0.1, 500.0);
+	//FragColor = vec4(vec3(gl_FragCoord.z, linearDepth, gl_FragCoord.z / gl_FragCoord.w), 1.0);
 
 	// WBOIT
 	if (u_wboitFlag) {
-		float weight = FragColor.a * max(1e-2, min(3e3, 0.03/(1e-5 + pow(gl_FragCoord.z/200, 4))));
-		//		float weight = clamp(pow(min(1.0, FragColor.a * 10.0) + 0.01, 3.0) * 1e8 *
-		//		pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
-
+		//////// Customize if needed /////////
+		float fragCoordZ = gl_FragCoord.z;
+		float wboitDepth = 1.0;
+		if (u_wboitFunc != 0) {
+			wboitDepth = 2.0 * u_wboitNear * u_wboitFar / (u_wboitFar + u_wboitNear - (2.0 * gl_FragCoord.z - 1.0) * (u_wboitFar - u_wboitNear));
+		}
+		//////////////////////////////////////
+		// Branching based on which weight function is selected
+		float weight = 1.0;
+		switch (u_wboitFunc) {
+			case 0:// Off
+			weight = 1.0;
+			break;
+			case 1:// Wboit paper Eq. 7
+			weight = FragColor.a * max(1e-2, min(3e3, 10/(1e-5 + pow(wboitDepth/5, 2) + pow(wboitDepth/200, 6))));
+			break;
+			case 2:// Wboit paper Eq. 8
+			weight = FragColor.a * max(1e-2, min(3e3, 10/(1e-5 + pow(wboitDepth/10, 3) + pow(wboitDepth/200, 6))));
+			break;
+			case 3:// Wboit paper Eq. 9
+			weight = FragColor.a * max(1e-2, min(3e3, 0.03/(1e-5 + pow(wboitDepth/200, 4))));
+			break;
+			case 4:// Wboit paper Eq. 10
+			weight = FragColor.a * max(1e-2, 3e3 * pow(1 - fragCoordZ, 3));
+			break;
+			case 5:// LearnOpengl example 1 (Eq. 9 with color bias)
+			weight = max(min(1.0, max(max(FragColor.r, FragColor.g), FragColor.b) * FragColor.a), FragColor.a) * clamp(0.03 / (1e-5 + pow(wboitDepth / 200, 4.0)), 1e-2, 3e3);
+			break;
+			case 6:// LearnOpengl example 2 (Eq. 10 with changes)
+			weight = clamp(pow(min(1.0, FragColor.a * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - fragCoordZ * 0.9, 3.0), 1e-2, 3e3);
+			break;
+			case 7:// z^-3
+			weight = pow(wboitDepth, -3);
+			break;
+			case 8:// abs(z - zFar + Eps)
+			weight = abs(wboitDepth - u_wboitFar + 0.00001);
+			break;
+		}
 		// Store accumulation color (RGB) and revealage factor (A)
 		AccumulationBuffer = vec4(FragColor.rgb * FragColor.a * weight, FragColor.a);
 		// Store accumulation alpha (R)

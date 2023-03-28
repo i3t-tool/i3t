@@ -2,11 +2,16 @@
 
 using namespace Vp;
 
-SelectionCompositeShader::SelectionCompositeShader(GLuint id) : Shader(id)
+SelectionCompositeShader::SelectionCompositeShader(GLuint id) : Shader(id) { init(false); }
+
+void SelectionCompositeShader::init(bool initSuperclass)
 {
-	m_sourceSampler = glGetUniformLocation(id, "source");
-	m_resolutionId = glGetUniformLocation(id, "u_resolution");
-	m_cutoffId = glGetUniformLocation(id, "u_cutoff");
+	if (initSuperclass)
+		Shader::init(true);
+
+	m_sourceSampler = glGetUniformLocation(m_id, "source");
+	m_resolutionId = glGetUniformLocation(m_id, "u_resolution");
+	m_cutoffId = glGetUniformLocation(m_id, "u_cutoff");
 }
 
 void SelectionCompositeShader::setUniforms()

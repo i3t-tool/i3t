@@ -5,6 +5,7 @@
 
 #include "Core/Defs.h"
 
+#include "Core/Resources/ResourceManager.h"
 #include "Viewport/shader/Shader.h"
 
 namespace Vp
@@ -30,7 +31,7 @@ public:
 	}
 
 private:
-	Shaders() {}
+	Shaders() = default;
 
 public:
 	Shaders(Shaders const&) = delete;
@@ -38,7 +39,8 @@ public:
 
 	bool loaded{false};
 
-	void load();
+	bool load();
+	bool reload();
 
 	std::shared_ptr<PhongShader> m_phongShader;
 	std::shared_ptr<ColorShader> m_colorShader;
@@ -48,6 +50,21 @@ public:
 	std::shared_ptr<BoxBlurShader> m_boxBlurShader;
 	std::shared_ptr<SelectionCompositeShader> m_selectionCompositeShader;
 	std::shared_ptr<ScreenOverlayShader> m_screenOverlayShader;
+
+private:
+	template <typename T>
+	std::shared_ptr<T> loadShader(bool& success, const std::string& vertSource, const std::string& fragSource)
+	{
+		GLuint id = RMI.shader(vertSource, fragSource);
+		if (id == 0)
+		{
+			success = false;
+		}
+		return std::make_shared<T>(id);
+	}
+
+	bool reloadShader(Shader& shader, const std::string& vertSource, const std::string& fragSource);
+	bool checkForError(Shader& shader);
 };
 
 } // namespace Vp

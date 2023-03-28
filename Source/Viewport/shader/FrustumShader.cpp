@@ -3,9 +3,14 @@
 
 using namespace Vp;
 
-FrustumShader::FrustumShader(GLuint id) : ColorShader(id)
+FrustumShader::FrustumShader(GLuint id) : ColorShader(id) { init(false); }
+
+void FrustumShader::init(bool initSuperclass)
 {
-	inverseProjectionMatrixId = glGetUniformLocation(id, "projectionInverseMatrix");
+	if (initSuperclass)
+		ColorShader::init(true);
+
+	inverseProjectionMatrixId = glGetUniformLocation(m_id, "projectionInverseMatrix");
 }
 
 void FrustumShader::setUniforms()

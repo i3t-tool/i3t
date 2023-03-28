@@ -13,11 +13,13 @@
 
 using namespace Vp;
 
-SceneModel::SceneModel(Core::Mesh* mesh, PhongShader* shader) : TexturedObject(mesh, shader) { m_selectable = true; }
-
-SceneModel::SceneModel(std::string modelAlias, PhongShader* shader) : TexturedObject(nullptr, shader)
-{
+SceneModel::SceneModel(Core::Mesh* mesh, PhongShader* shader) : TexturedObject(mesh, shader) {
 	m_selectable = true;
+	m_backFaceCull = true;
+}
+
+SceneModel::SceneModel(std::string modelAlias, PhongShader* shader) : SceneModel(nullptr, shader)
+{
 	setModel(modelAlias);
 }
 

@@ -25,6 +25,11 @@
       "path": "Data/Models/Teapot.gltf",
       "type": "Model"
     },
+	{
+      "name": "Plane",
+      "path": "Data/Models/Plane.gltf",
+      "type": "Model"
+    },
     {
       "name": "ModelShader",
       "path": "Data/Shaders/Model.glsl",

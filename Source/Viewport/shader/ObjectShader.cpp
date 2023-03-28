@@ -2,7 +2,15 @@
 
 using namespace Vp;
 
-ObjectShader::ObjectShader(GLuint id) : WorldShader(id) { opacityId = glGetUniformLocation(id, "u_opacity"); }
+ObjectShader::ObjectShader(GLuint id) : WorldShader(id) { init(false); }
+
+void ObjectShader::init(bool initSuperclass)
+{
+	if (initSuperclass)
+		WorldShader::init(true);
+
+	opacityId = glGetUniformLocation(m_id, "u_opacity");
+}
 
 void ObjectShader::setUniforms()
 {

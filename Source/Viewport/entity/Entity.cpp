@@ -2,11 +2,13 @@
 
 using namespace Vp;
 
-Entity::Entity() {
+Entity::Entity()
+{
 	m_backFaceCull = false;
 	m_visible = true;
 	m_opaque = true;
 	m_wboit = false;
+	m_wboitFunc = 0;
 	m_explicitTransparencyOrder = 0;
 
 	m_selectable = false;

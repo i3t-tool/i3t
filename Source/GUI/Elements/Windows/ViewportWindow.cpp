@@ -32,7 +32,8 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
 	// Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
-	renderOptions.wboit = false;
+	renderOptions.wboit = true;
+	renderOptions.wboitFunc = 0;
 	renderOptions.framebufferAlpha = false;
 	renderOptions.multisample = true;
 	renderOptions.clearColor = Config::BACKGROUND_COLOR;
@@ -116,7 +117,7 @@ bool ViewportWindow::showViewportMenu()
 {
 	// TODO: (DR) Sometimes closing of nested menus causes a debug assertion fail, its a fixed bug as per:
 	//  https://github.com/ocornut/imgui/issues/4640
-	//	Can only be fixed by updating imgui
+	//  Can only be fixed by updating imgui
 
 	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 
@@ -124,7 +125,52 @@ bool ViewportWindow::showViewportMenu()
 	if (ImGui::BeginMenu("Settings"))
 	{
 		userInteractedWithMenus = true;
-		ImGui::MenuItem("WBOIT", nullptr, &renderOptions.wboit);
+		if (ImGui::BeginMenu("Transparency"))
+		{
+			ImGui::MenuItem("Use WBOIT", nullptr, &renderOptions.wboit);
+			if (ImGui::BeginMenu("WBOIT weight function"))
+			{
+				if (ImGui::MenuItem("OFF", nullptr, renderOptions.wboitFunc == 0))
+				{
+					renderOptions.wboitFunc = 0;
+				}
+				if (ImGui::MenuItem("Equation 7", nullptr, renderOptions.wboitFunc == 1))
+				{
+					renderOptions.wboitFunc = 1;
+				}
+				if (ImGui::MenuItem("Equation 8", nullptr, renderOptions.wboitFunc == 2))
+				{
+					renderOptions.wboitFunc = 2;
+				}
+				if (ImGui::MenuItem("Equation 9", nullptr, renderOptions.wboitFunc == 3))
+				{
+					renderOptions.wboitFunc = 3;
+				}
+				if (ImGui::MenuItem("Equation 10", nullptr, renderOptions.wboitFunc == 4))
+				{
+					renderOptions.wboitFunc = 4;
+				}
+				if (ImGui::MenuItem("LOGL Eq. 9 color bias", nullptr, renderOptions.wboitFunc == 5))
+				{
+					renderOptions.wboitFunc = 5;
+				}
+				if (ImGui::MenuItem("LOGL Eq. 10", nullptr, renderOptions.wboitFunc == 6))
+				{
+					renderOptions.wboitFunc = 6;
+				}
+				if (ImGui::MenuItem("z^-3", nullptr, renderOptions.wboitFunc == 7))
+				{
+					renderOptions.wboitFunc = 7;
+				}
+				if (ImGui::MenuItem("abs(z - zFar + Eps)", nullptr, renderOptions.wboitFunc == 8))
+				{
+					renderOptions.wboitFunc = 8;
+				}
+
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
 
 		bool msaaOff = !renderOptions.multisample;
 		bool msaa2x = renderOptions.multisample && renderOptions.samples == 2;
@@ -156,6 +202,7 @@ bool ViewportWindow::showViewportMenu()
 
 		if (ImGui::BeginMenu("Highlight"))
 		{
+			userInteractedWithMenus = true;
 			if (ImGui::BeginMenu("Preset"))
 			{
 				if (ImGui::MenuItem("Ultra", nullptr, nullptr))
@@ -208,6 +255,14 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::SliderFloat("Desaturate factor", &m_viewport->getSettings().highlight_useDepth_desaturateFactor, 0.0f,
 			                   1.0f, "%.2f");
 			ImGui::EndMenu();
+		}
+
+		if (ImGui::MenuItem("Reload shaders", nullptr, nullptr))
+		{
+			bool ok = Vp::Shaders::instance().reload();
+			// Flash green if all shaders reloaded successfully, red otherwise
+			ImGui::GetForegroundDrawList()->AddRectFilled(GUI::glmToIm(m_windowPos), GUI::glmToIm(m_windowMax),
+			                                              ImColor((ok ? 0 : 255), (ok ? 255 : 0), 0));
 		}
 
 		ImGui::EndMenu();

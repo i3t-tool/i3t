@@ -33,9 +33,9 @@ void Lighting::setUniforms(const PhongShader& shader) const
 			spotLightCount++;
 		}
 	}
-	glUniform1i(glGetUniformLocation(shader.id, "pointLightsCount"), pointLightCount);
-	glUniform1i(glGetUniformLocation(shader.id, "sunLightsCount"), sunLightCount);
-	glUniform1i(glGetUniformLocation(shader.id, "spotLightsCount"), spotLightCount);
+	glUniform1i(glGetUniformLocation(shader.m_id, "pointLightsCount"), pointLightCount);
+	glUniform1i(glGetUniformLocation(shader.m_id, "sunLightsCount"), sunLightCount);
+	glUniform1i(glGetUniformLocation(shader.m_id, "spotLightsCount"), spotLightCount);
 }
 
 void Lighting::addLight(Light* light)

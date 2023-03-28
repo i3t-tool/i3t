@@ -23,8 +23,12 @@ public:
 	glm::mat4 m_view;
 	glm::mat4 m_projection;
 
+	GLint m_wboitNearId;
+	GLint m_wboitFarId;
+
 	explicit WorldShader(GLuint id);
 
+	void init(bool initSuperclass) override;
 	void setUniforms() override;
 
 	/**

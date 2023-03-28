@@ -46,10 +46,10 @@ void main()
 	vec3 average_color = accumulation.rgb / max(accumulation.a, EPSILON);
 
 	// blend pixels
-	FragColor = vec4(average_color, clamp((1.0f - revealage) * 0.5f, 0.0f, 1.0f));
+	// FragColor = vec4(average_color, clamp((1.0f - revealage) * 0.5f, 0.0f, 1.0f));
 	//float val = 1.0f - revealage;
 	//FragColor = vec4(vec3(val), 0.5);
-	FragColor = vec4(average_color, 0.5);
+	// FragColor = vec4(average_color, 0.5);
 
 	FragColor = vec4(average_color, 1.0f - revealage);
 	//FragColor = vec4(accumulation.rgb, 1.0);

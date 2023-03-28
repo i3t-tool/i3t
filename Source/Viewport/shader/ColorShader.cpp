@@ -2,10 +2,15 @@
 
 using namespace Vp;
 
-ColorShader::ColorShader(GLuint id) : ObjectShader(id)
+ColorShader::ColorShader(GLuint id) : ObjectShader(id) { init(false); }
+
+void ColorShader::init(bool initSuperclass)
 {
-	useSingleColorId = glGetUniformLocation(id, "useSingleColor");
-	singleColorId = glGetUniformLocation(id, "singleColor");
+	if (initSuperclass)
+		ObjectShader::init(true);
+
+	useSingleColorId = glGetUniformLocation(m_id, "useSingleColor");
+	singleColorId = glGetUniformLocation(m_id, "singleColor");
 }
 
 void ColorShader::setUniforms()

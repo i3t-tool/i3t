@@ -17,7 +17,8 @@ class GameObject : public Entity
 public:
 	Core::Mesh* m_mesh;
 
-	float m_opacity{1.0f};
+	// TODO: (DR) Move this to entity I suppose
+	float m_opacity{0.5f};
 
 	/**
 	 * Creates an empty GameObject. Before rendering a mesh and a shader need to

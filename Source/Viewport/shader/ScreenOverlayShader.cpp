@@ -2,9 +2,14 @@
 
 using namespace Vp;
 
-ScreenOverlayShader::ScreenOverlayShader(GLuint id) : Shader(id)
+ScreenOverlayShader::ScreenOverlayShader(GLuint id) : Shader(id) { init(false); }
+
+void ScreenOverlayShader::init(bool initSuperclass)
 {
-	m_sourceSampler = glGetUniformLocation(id, "source");
+	if (initSuperclass)
+		Shader::init(true);
+
+	m_sourceSampler = glGetUniformLocation(m_id, "source");
 }
 
 void ScreenOverlayShader::setUniforms()

@@ -8,24 +8,26 @@
 
 using namespace Vp;
 
-PhongShader::PhongShader(GLuint id) : ObjectShader(id)
+PhongShader::PhongShader(GLuint id) : ObjectShader(id) { init(false); }
+
+void PhongShader::init(bool initSuperclass)
 {
-	material_diffuse = glGetUniformLocation(id, "material.diffuse");
-	material_specular = glGetUniformLocation(id, "material.specular");
-	material_ambient = glGetUniformLocation(id, "material.ambient");
-	material_shininess = glGetUniformLocation(id, "material.shininess");
+	if (initSuperclass)
+		ObjectShader::init(true);
 
-	normalStrength = glGetUniformLocation(id, "normalStrength");
+	material_diffuse = glGetUniformLocation(m_id, "material.diffuse");
+	material_specular = glGetUniformLocation(m_id, "material.specular");
+	material_ambient = glGetUniformLocation(m_id, "material.ambient");
+	material_shininess = glGetUniformLocation(m_id, "material.shininess");
 
-	tintId = glGetUniformLocation(id, "u_tint");
+	normalStrength = glGetUniformLocation(m_id, "normalStrength");
+
+	tintId = glGetUniformLocation(m_id, "u_tint");
 }
 
 void PhongShader::setUniforms()
 {
 	glUniform3fv(tintId, 1, glm::value_ptr(m_tint));
-
-	// Alpha cutoff
-	// glUniform1f(glGetUniformLocation(id, "alphaCutoff"), 0.1f);
 
 	ObjectShader::setUniforms();
 }
@@ -76,16 +78,16 @@ void PhongShader::bindTexture(GLuint textureID, const std::string& type, int typ
 {
 	std::string samplerName = type + std::to_string(typeIndex);
 	std::string samplerFlagName = type + std::to_string(typeIndex) + "_active";
-	bindTexture2D(textureUnit, textureID, glGetUniformLocation(id, samplerName.c_str()));
+	bindTexture2D(textureUnit, textureID, glGetUniformLocation(m_id, samplerName.c_str()));
 	// Also enable flag saying this sampler is active
-	glUniform1i(glGetUniformLocation(id, samplerFlagName.c_str()), GL_TRUE);
+	glUniform1i(glGetUniformLocation(m_id, samplerFlagName.c_str()), GL_TRUE);
 
 	//	// Activate texture unit
 	//	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	//	// Find appropriate sampler and set its texture unit
-	//	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex)).c_str()), textureUnit);
+	//	glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(typeIndex)).c_str()), textureUnit);
 	//	// Also enable flag saying this sampler is active
-	//	glUniform1i(glGetUniformLocation(id, (type + std::to_string(typeIndex) + "_active").c_str()), GL_TRUE);
+	//	glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(typeIndex) + "_active").c_str()), GL_TRUE);
 	//	// Bind the texture to that texture unit
 	//	glBindTexture(GL_TEXTURE_2D, textureID);
 }
@@ -96,26 +98,26 @@ void PhongShader::clearTextures() const
 	type = "diffuse";
 	for (int i = 0; i < MAX_DIFFUSE_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
+		glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "specular";
 	for (int i = 0; i < MAX_SPECULAR_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
+		glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "normal";
 	for (int i = 0; i < MAX_NORMAL_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
+		glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "ao";
 	for (int i = 0; i < MAX_AO_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
+		glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 	type = "emission";
 	for (int i = 0; i < MAX_EMISSION_TEXTURES; i++)
 	{
-		glUniform1i(glGetUniformLocation(id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
+		glUniform1i(glGetUniformLocation(m_id, (type + std::to_string(i) + "_active").c_str()), GL_FALSE);
 	}
 }
