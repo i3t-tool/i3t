@@ -115,7 +115,7 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 
 void WorkspaceSequence::popupContentTracking()
 {
-	if(Core::GraphManager::isTrackingEnabled())
+	if(Core::GraphManager::isTrackingEnabled() && dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getSequence()->getId() == this->getNodebase()->getId())
 	{
 		if (ImGui::MenuItem("Stop tracking", ""))
 		{
@@ -130,6 +130,7 @@ void WorkspaceSequence::popupContentTracking()
 	{
 		if (ImGui::MenuItem("Start tracking", ""))
 		{
+			if(Core::GraphManager::isTrackingEnabled()) dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOff();
 			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
 		}
 		if (ImGui::MenuItem("Smooth tracking", "", false, false))

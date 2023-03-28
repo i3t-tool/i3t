@@ -64,6 +64,7 @@ void InputBindings::init()
 	InputManager::setInputAxis("trackingSmoothRight", 1.0f, Keys::right);
 	InputManager::setInputAction("trackingJaggedLeft", Keys::left);
 	InputManager::setInputAction("trackingJaggedRight", Keys::right);
+	InputManager::setInputAction("trackingEscOff", Keys::esc);
 	//InputManager::setInputAction("trackingSwitch", Keys::t, {Keys::ctrll});
 	//InputManager::setInputAction("trackingModeSwitch", Keys::p);
 	//InputManager::setInputAction("trackingSwitchOn", Keys::p);
