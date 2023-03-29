@@ -26,7 +26,7 @@ static Configuration* g_Config = nullptr;
 void Application::init()
 {
 	if (s_instance == nullptr)
-		s_instance = this;
+		s_instance = shared_from_this();
 
 	m_isPaused = false;
 
@@ -202,8 +202,12 @@ void Application::finalize()
 
 	m_window->finalize();
 
-	// TODO: Investigate why this was here. Was causing an assertion error on
-	// exit. delete s_instance; s_instance == nullptr;
+	// TODO: Investigate why this was here. Was causing an assertion error on exit.
+	// TODO: (DR) Test this
+	if (s_instance == nullptr)
+	{
+		s_instance.reset();
+	}
 }
 
 bool Application::initI3T()
@@ -240,4 +244,4 @@ void Application::onClose() { m_bShouldClose = true; }
 void Application::enqueueCommand(ICommand* command) { m_commands.push_back(command); }
 
 // Statics
-Application* Application::s_instance = nullptr;
+std::shared_ptr<Application> Application::s_instance = nullptr;

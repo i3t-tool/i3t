@@ -65,7 +65,7 @@
  */
 
 // Uncomment this to create a standalone release version
-//#define RELEASE_STANDALONE     //PF Nepouzivat!!! Je definovan target Release
+// #define RELEASE_STANDALONE     //PF Nepouzivat!!! Je definovan target Release
 // Standalone a v nem je toto definov�no
 // - outdir je ../release
 // - hleda data v miste, kde je spusten
@@ -162,33 +162,33 @@ int main(int argc, char* argv[])
 	LOG_INFO("Working directory is {}.", std::filesystem::current_path().string());
 
 	// Get application instance.
-	Application app;
+	std::shared_ptr<Application> app = std::make_shared<Application>();
 
 	/// \todo Move this to Application::init function.
 	// I. Create GLFW window and OpenGL context.
-	app.initWindow();
+	app->initWindow();
 
 	// Initialize all modules.
-	app.init();
+	app->init();
 
 	// III. Initialize I3T stuff,
 	// read other config files.
 	// Load objects(geometry and textures), create the world and load the initial
 	// scene. Loads the shaders, updates the camera mode.
-	if (!app.initI3T())
+	if (!app->initI3T())
 	{
 		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_PROGRAM_INIT);
 		LOG_FATAL("Cannot initialize I3T stuffs.");
 		exit(-1);
 	}
 
-	app.initModules();
+	app->initModules();
 
 	//
 
-	app.run();
+	app->run();
 
-	app.finalize();
+	app->finalize();
 
 	LOG_INFO("I3T is now exited.");
 

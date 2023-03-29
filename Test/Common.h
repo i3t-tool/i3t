@@ -2,7 +2,7 @@
 
 #include "glm/matrix.hpp"
 
-void createTestApplication();
+void createTestApplication(bool fullInit = true);
 
 void destroyTestApplication();
 

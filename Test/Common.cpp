@@ -10,13 +10,13 @@
 
 // using namespace Core;
 
-static std::unique_ptr<Application> g_TestApp = nullptr;
+static std::shared_ptr<Application> g_TestApp = nullptr;
 
-void createTestApplication()
+void createTestApplication(bool fullInit)
 {
 	if (g_TestApp != nullptr)
 	{
-		// g_TestApp->finalize();
+		g_TestApp->finalize();
 		g_TestApp = nullptr;
 	}
 
@@ -24,11 +24,14 @@ void createTestApplication()
 	char* argv[] = {(char*)"dummy"};
 	INIT_LOGGER(argc, argv);
 
-	g_TestApp = std::make_unique<Application>();
+	g_TestApp = std::make_shared<Application>();
 
 	g_TestApp->initWindow();
 	g_TestApp->init();
-	ASSERT_TRUE(g_TestApp->initI3T());
+	if (fullInit)
+	{
+		ASSERT_TRUE(g_TestApp->initI3T());
+	}
 	g_TestApp->initModules();
 }
 
