@@ -72,6 +72,30 @@ public:
 	void createDefaultResources(const std::vector<Resource>& defaultResources);
 
 	/**
+	 * Register an alias as a "default" resource.
+	 * The aliased resource must exist.
+	 */
+	void registerDefault(const std::string& alias);
+
+	/**
+	 * Returns default resources of type.
+	 */
+	std::vector<Resource> getDefaultResources(ResourceType type);
+
+	/**
+	 * Dispose the specified resource and delete it from the manager.
+	 * @param managedResource The actual resource returned by fetch methods.
+	 * @return false on failure
+	 */
+	bool dispose(ManagedResource* managedResource);
+
+	void importResource(const fs::path& path);
+
+	Memento getState() override;
+
+	void setState(const Memento &memento, bool newSceneLoaded) override;
+
+	/**
 	 * Get existing texture using an alias
 	 * @return OpenGL id of the texture object
 	 */
@@ -175,23 +199,6 @@ public:
 	           const unsigned int nVertices, const unsigned int* indices, const unsigned int nIndices,
 	           const float* colors, const unsigned int nColors);
 
-	/**
-	 * Register an alias as a "default" resource.
-	 * The aliased resource must exist.
-	 */
-	void registerDefault(const std::string& alias);
-
-	/**
-	 * Returns default resources of type.
-	 */
-	std::vector<Resource> getDefaultResources(ResourceType type);
-
-	void importResource(const fs::path& path);
-
-	Memento getState() override;
-
-	void setState(const Memento &memento, bool newSceneLoaded) override;
-
 private:
 	/**
 	 * Return value:
@@ -224,5 +231,6 @@ private:
 	void disposeModel(Mesh* mesh);
 
 	void dispose();
+	void disposeResource(std::shared_ptr<Resource>& resource);
 };
 } // namespace Core

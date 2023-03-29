@@ -2,6 +2,8 @@
 
 #include "pgr.h"
 
+#include "ManagedResource.h"
+
 namespace Core
 {
 #define aPOS 0
@@ -30,7 +32,7 @@ namespace Core
  *
  * Normals, TexCoords, Tangents and Colors can be individually disabled
  */
-class Mesh
+class Mesh : public ManagedResource
 {
 public:
 	friend class ResourceManager;
@@ -94,6 +96,8 @@ public:
 
 	DrawType m_drawType;
 	PrimitiveType m_primitiveType;
+	std::vector<std::string> m_textureFileList; ///< List of texture file paths this mesh requires
+	                                            ///< (not including embedded textures)
 
 	/// Whether the normal vbo is used
 	bool m_useNormals{false};
@@ -181,9 +185,11 @@ public:
 	static Mesh* load(const std::string& path);
 
 private:
-	static void loadTextures(TextureSet& textureSet, const aiMaterial* material);
-	static GLuint loadTexture(aiTextureType type, const aiMaterial* material);
+	static void loadTextures(TextureSet& textureSet, const aiMaterial* material, const aiScene* scene, Mesh* mesh);
+	static GLuint loadTexture(aiTextureType type, const aiMaterial* material, const aiScene* scene, Mesh* mesh);
+	static GLuint loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap = true);
 	static void loadMaterial(Material& meshMaterial, const aiMaterial* material);
+
 	static void createVaoAndBindAttribs(Mesh* mesh);
 
 	static inline glm::vec3 convertVec3(const aiVector3D& v) { return glm::vec3(v.x, v.y, v.z); }

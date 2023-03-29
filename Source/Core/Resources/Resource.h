@@ -18,7 +18,7 @@ enum class ResourceType
 // TODO: (DR) Absolute / Relative path handling
 
 /**
- * Object representing a resource.
+ * Object holding information about a resource.
  */
 class Resource
 {

@@ -22,6 +22,10 @@ TEST_F(ResourceManagerTest, TextureTest)
 
 	GLuint texture1Id = Core::ResourceManager::instance().texture(texture1);
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
+
+	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture("Texture1", texture1));
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture("Texture1", texture1));
 	ASSERT_EQ(texture1Id, Core::ResourceManager::instance().texture(texture1));
@@ -32,10 +36,10 @@ TEST_F(ResourceManagerTest, TextureTest)
 	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture("Texture2", texture2));
 	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture(texture2));
 
-	// Attempt alias change (will report error but still return resource)
+	// Alternative alias
 	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture("Texture2_newAlias", texture2));
-	// Fail to find resource under the "new" alias without specifying path
-	ASSERT_EQ(0, Core::ResourceManager::instance().textureByAlias("Texture2_newAlias"));
+	// Find resource under the new alternative alias without specifying path
+	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().textureByAlias("Texture2_newAlias"));
 	// The original alias remains unchanged
 	ASSERT_EQ(texture2Id, Core::ResourceManager::instance().texture("Texture2", texture2));
 
@@ -65,8 +69,8 @@ TEST_F(ResourceManagerTest, ShaderTest)
 
 	// Attempt alias change (will report error but still return resource)
 	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader("Shader2_newAlias", shader2Vert, shader2Frag));
-	// Fail to find resource under the "new" alias without specifying path
-	ASSERT_EQ(0, Core::ResourceManager::instance().shaderByAlias("Shader2_newAlias"));
+	// Find resource under the new alternative alias without specifying path
+	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shaderByAlias("Shader2_newAlias"));
 	// The original alias remains unchanged
 	ASSERT_EQ(shader2Id, Core::ResourceManager::instance().shader("Shader2", shader2Vert, shader2Frag));
 
@@ -131,8 +135,8 @@ TEST_F(ResourceManagerTest, ModelFromFileTest)
 
 	// Attempt alias change (will report error but still return resource)
 	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().mesh("Teapot_new", teapot));
-	// Fail to find resource under the "new" alias without specifying path
-	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Teapot_new"));
+	// Find resource under the new alternative alias without specifying path
+	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().meshByAlias("Teapot_new"));
 	// The original alias remains unchanged
 	ASSERT_EQ(teapotmesh, Core::ResourceManager::instance().meshByAlias("Teapot"));
 
@@ -177,15 +181,52 @@ TEST_F(ResourceManagerTest, ModelFromDataTest)
 	          Core::ResourceManager::instance().meshByAlias("Shape1Triangles"));
 
 	ASSERT_EQ(shape1Lines, shaper.createLineMesh("Shape1Lines"));
-
-	// TODO: (DR) As a "temporary" measure, aliases are part of direct mesh hashes
-	//	 thus the following call will create a new mesh under GIBBERISH alias,
-	//	 the mesh content will be the same but with a different pointer
-	// ASSERT_EQ(shape1Lines, shaper.createLineMesh("GIBBERISH"));
-	// ASSERT_EQ(nullptr,
-	// Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
-	ASSERT_NE(shape1Lines, shaper.createLineMesh("GIBBERISH"));
-	ASSERT_NE(nullptr, Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
-
+	ASSERT_EQ(shape1Lines, shaper.createLineMesh("GIBBERISH"));
+	ASSERT_EQ(shape1Lines, Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
+	ASSERT_EQ(shape1Lines, Core::ResourceManager::instance().meshByAlias("GIBBERISH"));
 	ASSERT_EQ(shape1Lines, Core::ResourceManager::instance().meshByAlias("Shape1Lines"));
+}
+
+TEST_F(ResourceManagerTest, DisposeTest)
+{
+	std::string box = "Data/Models/box_metal.gltf";
+	std::string teapot = "Data/Models/Teapot.gltf";
+	std::string bunny = "Data/Models/Bunny.gltf";
+
+	Core::Mesh* boxMesh = Core::ResourceManager::instance().mesh(box);
+	ASSERT_EQ(boxMesh, Core::ResourceManager::instance().mesh("Box box", box));
+	ASSERT_EQ(boxMesh, Core::ResourceManager::instance().mesh("Second Box", box));
+	ASSERT_EQ(boxMesh, Core::ResourceManager::instance().mesh("Third box even", box));
+
+	Core::Mesh* teapotMesh = Core::ResourceManager::instance().mesh("Teapot", teapot);
+	ASSERT_EQ(teapotMesh, Core::ResourceManager::instance().mesh("Teapot2", teapot));
+	Core::ResourceManager::instance().registerDefault("Teapot");
+	bool found = false;
+	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model)) {
+		if (res.alias == "Teapot") {
+			found = true;
+			break;
+		}
+	}
+	ASSERT_TRUE(found);
+
+	Core::Mesh* bunnyMesh = Core::ResourceManager::instance().mesh("bUnny", bunny);
+
+	Core::ResourceManager::instance().dispose(teapotMesh);
+	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Teapot2"));
+	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model)) {
+		ASSERT_NE(res.alias, "Teapot");
+	}
+
+	Core::ResourceManager::instance().dispose(bunnyMesh);
+	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("bUnny"));
+
+	Core::ResourceManager::instance().dispose(boxMesh);
+	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Second Box"));
+	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Third box even"));
+	Core::Mesh* newBox = Core::ResourceManager::instance().mesh("New box", box);
+	ASSERT_NE(nullptr, newBox);
+	ASSERT_EQ(newBox, Core::ResourceManager::instance().meshByAlias("New box"));
+	Core::ResourceManager::instance().dispose(newBox);
+	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("New box"));
 }
