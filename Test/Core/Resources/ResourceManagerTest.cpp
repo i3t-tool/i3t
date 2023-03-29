@@ -1,9 +1,8 @@
 #include "gtest/gtest.h"
 
-#include "Config.h"
+#include "Common.h"
 #include "Core/Resources/ResourceManager.h"
 #include "Core/Window.h"
-#include "GLFW/glfw3.h"
 #include "Logger/Logger.h"
 #include "Utils/Color.h"
 #include "Viewport/Shaper.h"
@@ -11,26 +10,9 @@
 class ResourceManagerTest : public ::testing::Test
 {
 protected:
-	Window* m_window;
+	void SetUp() override { createTestApplication(false); }
 
-	void SetUp() override
-	{
-		int argc = 1;
-		char* argv[] = {(char*)"dummy"};
-		INIT_LOGGER(argc, argv);
-
-		m_window = new Window();
-		m_window->init(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, false, true);
-
-		// PGR and OpenGL initializing.
-		if (!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR, pgr::DEBUG_OFF))
-		{
-			LOG_ERROR("Failed to initialize opengl / pgr!");
-			FAIL();
-		}
-	}
-
-	void TearDown() override { delete m_window; }
+	void TearDown() override {}
 };
 
 TEST_F(ResourceManagerTest, TextureTest)

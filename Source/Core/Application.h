@@ -32,7 +32,7 @@ class Viewport;
  * Application class.
  * A wrapper for UI windows.
  */
-class Application
+class Application : public std::enable_shared_from_this<Application>
 {
 public:
 	Application() = default;
@@ -109,7 +109,7 @@ public:
 	template <typename T> static T& getModule();
 
 private:
-	static Application* s_instance;
+	static std::shared_ptr<Application> s_instance;
 
 	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
 
