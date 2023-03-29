@@ -2,11 +2,12 @@
 
 using namespace Core;
 
+#include "stb_image.h"
+#include <assimp/GltfMaterial.h>
+
 #include "pgr.h"
 
 #include "Logger/Logger.h"
-#include <assimp/GltfMaterial.h>
-
 #include "ResourceManager.h"
 
 Mesh::Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords,
@@ -156,13 +157,13 @@ Mesh* Mesh::load(const std::string& path)
 
 	if (!scn)
 	{
-		LOG_ERROR(importer.GetErrorString());
+		LOG_ERROR("Mesh: Failed to load scene: {}", importer.GetErrorString());
 		return nullptr;
 	}
 
 	if (scn->mNumMeshes < 1)
 	{
-		LOG_ERROR("no meshes found in scene" + path);
+		LOG_ERROR("Mesh: No meshes found in scene " + path);
 		return nullptr;
 	}
 
@@ -182,7 +183,7 @@ Mesh* Mesh::load(const std::string& path)
 
 	if ((nVertices == 0) || (nIndices < FACE_VERT_COUNT))
 	{
-		LOG_INFO("no triangles found in scene " + path);
+		LOG_INFO("Mesh: No triangles found in scene " + path);
 		return nullptr;
 	}
 
@@ -267,7 +268,7 @@ Mesh* Mesh::load(const std::string& path)
 		// Material and textures
 		const aiMaterial* mat = scn->mMaterials[aiMesh->mMaterialIndex];
 		loadMaterial(meshPart.material, mat);
-		loadTextures(meshPart.textureSet, mat);
+		loadTextures(meshPart.textureSet, mat, scn, mesh);
 
 		// - indices to the element array
 		meshPart.nIndices = aiMesh->mNumFaces * FACE_VERT_COUNT;
@@ -361,15 +362,15 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 	meshMaterial.shininess = shininess * strength;
 }
 
-void Mesh::loadTextures(TextureSet& textureSet, const aiMaterial* material)
+void Mesh::loadTextures(TextureSet& textureSet, const aiMaterial* material, const aiScene* scene, Mesh* mesh)
 {
 	// Diffuse texture
-	textureSet.texture = loadTexture(aiTextureType_DIFFUSE, material);
+	textureSet.texture = loadTexture(aiTextureType_DIFFUSE, material, scene, mesh);
 	if (!textureSet.texture)
-		textureSet.texture = loadTexture(aiTextureType_BASE_COLOR, material);
+		textureSet.texture = loadTexture(aiTextureType_BASE_COLOR, material, scene, mesh);
 
 	// Normal texture
-	textureSet.normalMap = loadTexture(aiTextureType_NORMALS, material);
+	textureSet.normalMap = loadTexture(aiTextureType_NORMALS, material, scene, mesh);
 	// Normal map strength
 	float normalStrength;
 	if (aiGetMaterialFloat(material, AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), &normalStrength) !=
@@ -380,12 +381,12 @@ void Mesh::loadTextures(TextureSet& textureSet, const aiMaterial* material)
 	textureSet.normalStrength = normalStrength;
 
 	// Specular or roughness
-	textureSet.specularMap = loadTexture(aiTextureType_SPECULAR, material);
+	textureSet.specularMap = loadTexture(aiTextureType_SPECULAR, material, scene, mesh);
 	if (!textureSet.specularMap)
-		textureSet.specularMap = loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, material);
+		textureSet.specularMap = loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, material, scene, mesh);
 
 	// Ambient occlusion
-	textureSet.aoMap = loadTexture(aiTextureType_LIGHTMAP, material);
+	textureSet.aoMap = loadTexture(aiTextureType_LIGHTMAP, material, scene, mesh);
 	// Ambient occlusion strength
 	float occlusionStrength;
 	if (aiGetMaterialFloat(material, AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), &occlusionStrength) !=
@@ -395,10 +396,10 @@ void Mesh::loadTextures(TextureSet& textureSet, const aiMaterial* material)
 	}
 	textureSet.aoStrength = occlusionStrength;
 
-	// we ignore AI_MATKEY  OPACITY, REFRACTI, SHADING_MODEL
+	// we ignore AI_MATKEY OPACITY, REFRACTION, SHADING_MODEL
 }
 
-GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material)
+GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const aiScene* scene, Mesh* mesh)
 {
 	if (material->GetTextureCount(type) > 0)
 	{
@@ -410,21 +411,86 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material)
 			return 0;
 		}
 
-		std::filesystem::path texPath(texPathString.C_Str());
-		if (texPath.is_relative())
+		GLuint texId;
+		const aiTexture* aiTex = scene->GetEmbeddedTexture(texPathString.C_Str());
+		if (aiTex == nullptr)
 		{
-			std::filesystem::path modelFolderPrefix("Data/Models");
-			texPath = modelFolderPrefix / texPath;
+			// Regular file texture
+			std::filesystem::path texPath(texPathString.C_Str());
+			if (texPath.is_relative())
+			{
+				std::filesystem::path modelFolderPrefix("Data/Models");
+				texPath = modelFolderPrefix.make_preferred() / texPath;
+			}
+			mesh->m_textureFileList.push_back(texPath.string());
+			// TODO: (DR) Pass resource manager instance to the load method to App:: calls
+			texId = App::getModule<ResourceManager>().texture(texPath.string());
 		}
-
-		// TODO: (DR) Pass resource manager instance to the load method to App:: calls
-		GLuint texture = App::getModule<ResourceManager>().texture(texPath.string());
-		return texture;
+		else
+		{
+			// The texture is embedded
+			if (aiTex->mHeight == 0)
+			{
+				// Texture is compressed (As per assimp docs, mWidth contains the length)
+				LOG_INFO("Mesh: Loading embedded texture");
+				texId = loadEmbeddedTexture((unsigned char*)&*aiTex->pcData, aiTex->mWidth);
+			}
+			else
+			{
+				LOG_ERROR("Mesh: Failed to load embedded texture: Uncompressed embedded textures are not currently supported.");
+			}
+		}
+		return texId;
 	}
 	else
 	{
 		return 0;
 	}
+}
+
+GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap)
+{
+	// generate and bind one texture
+	GLuint tex = 0;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	// set linear filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// upload our image data to OpenGL
+	bool result = false;
+
+	stbi_set_flip_vertically_on_load(false);
+
+	int width, height, Bpp;
+	unsigned char* imageData = stbi_load_from_memory(data, length, &width, &height, &Bpp, STBI_rgb_alpha);
+
+	if (imageData)
+	{
+		// printf("%s,bpp %d\n",fileName.c_str(),Bpp);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+		result = true;
+	}
+	else
+	{
+		const char* error = stbi_failure_reason();
+		LOG_ERROR("Mesh: Failed to load embedded texture: {}", error);
+	}
+	stbi_image_free(imageData);
+
+	if (!result)
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDeleteTextures(1, &tex);
+		return 0;
+	}
+	// create mipmaps
+	if (mipmap)
+		glGenerateMipmap(GL_TEXTURE_2D);
+	// unbind the texture (just in case someone will mess up with texture calls later)
+	glBindTexture(GL_TEXTURE_2D, 0);
+	CHECK_GL_ERROR();
+	return tex;
 }
 
 void Mesh::createVaoAndBindAttribs(Mesh* mesh)

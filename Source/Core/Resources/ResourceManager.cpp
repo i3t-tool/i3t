@@ -2,6 +2,10 @@
 
 #include "Logger/Logger.h"
 
+using namespace Core;
+
+#include "magic_enum.hpp"
+
 #include "Core/Resources/Mesh.h"
 #include "State/StateManager.h"
 #include "Utils/Text.h"
@@ -130,7 +134,8 @@ GLuint ResourceManager::shaderG(const std::string& alias, const std::string& ver
 			GLuint shaderId = loadShader(vertShader, fragShader, geoShader);
 			if (shaderId)
 			{
-				std::string path = "Vert: " + vertShader + "\n" + "Frag: " + fragShader + "\n" + "Geo: " + geoShader + "\n";
+				std::string path =
+				    "Vert: " + vertShader + ", Frag: " + fragShader + (geoShader.empty() ? "" : (", Geo: " + geoShader));
 				std::shared_ptr<Resource> shaderResource = std::make_shared<Resource>(alias, path, ResourceType::Shader);
 				shaderResource->hashId = id;
 				shaderResource->data = std::make_shared<GLuint>(shaderId);
@@ -175,6 +180,7 @@ Mesh* ResourceManager::mesh(const std::string& alias, const std::string& path)
 			Mesh* mesh = loadModel(path);
 			if (mesh)
 			{
+				mesh->m_resourceId = id;
 				std::shared_ptr<Resource> modelResource = std::make_shared<Resource>(alias, path, ResourceType::Model);
 				modelResource->hashId = id;
 				modelResource->data = std::make_shared<Mesh*>(mesh);
@@ -209,8 +215,6 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 	// didn't think this through enough
 
 	size_t seed = 0;
-	hash_combine(seed, alias); // TODO: (DR) Remove this, hash all the data
-	                           // instead
 	hash_combine(seed, static_cast<int>(primitiveType));
 	hash_combine(seed, nVertices);
 	if (useIndices)
@@ -239,8 +243,10 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 			{
 				mesh = Mesh::create(primitiveType, verts, nVertices, colors, nColors);
 			}
+
 			if (mesh)
 			{
+				mesh->m_resourceId = id;
 				std::string path = std::string("Generated from data") + dataSummary;
 				std::shared_ptr<Resource> modelResource = std::make_shared<Resource>(alias, path, ResourceType::Model);
 				modelResource->hashId = id;
@@ -338,7 +344,7 @@ Memento ResourceManager::getState()
 	return state;
 }
 
-void ResourceManager::setState(const Memento &memento, bool newSceneLoaded)
+void ResourceManager::setState(const Memento& memento, bool newSceneLoaded)
 {
 	if (newSceneLoaded)
 	{
@@ -556,18 +562,62 @@ void ResourceManager::dispose()
 {
 	for (auto& entry : m_resourceMap)
 	{
-		switch (entry.second->resourceType)
-		{
-		case ResourceType::Texture:
-			disposeTexture(*(std::static_pointer_cast<GLuint>(entry.second->data).get()));
-			break;
-		case ResourceType::Shader:
-			disposeShader(*(std::static_pointer_cast<GLuint>(entry.second->data).get()));
-			break;
-		case ResourceType::Model:
-			disposeModel(*(std::static_pointer_cast<Mesh*>(entry.second->data).get()));
-			break;
-		}
+		disposeResource(entry.second);
 	}
 }
+
+void ResourceManager::disposeResource(std::shared_ptr<Resource>& resource)
+{
+	switch (resource->resourceType)
+	{
+	case ResourceType::Texture:
+		LOG_INFO("[TEXTURE] Disposing texture '{}'", resource->path);
+		disposeTexture(*(std::static_pointer_cast<GLuint>(resource->data).get()));
+		break;
+	case ResourceType::Shader:
+		LOG_INFO("[SHADER] Disposing shader '{}'", resource->path);
+		disposeShader(*(std::static_pointer_cast<GLuint>(resource->data).get()));
+		break;
+	case ResourceType::Model:
+		LOG_INFO("[MODEL] Disposing model '{}'", resource->path);
+		disposeModel(*(std::static_pointer_cast<Mesh*>(resource->data).get()));
+		break;
+	default:
+		LOG_WARN("[RESOURCE MANAGER] Unknown resource type to dispose! Id: {}, Type: {}, Path: {}", resource->hashId,
+		         std::string(magic_enum::enum_name(resource->resourceType)), resource->path);
+		break;
+	}
 }
+
+bool ResourceManager::dispose(ManagedResource* managedResource)
+{
+	size_t id = managedResource->m_resourceId;
+	auto resourceIt = m_resourceMap.find(id);
+	if (resourceIt != m_resourceMap.end())
+	{
+		std::shared_ptr<Resource> resource = resourceIt->second;
+		// Remove alias and alternative aliases, remove default aliases too
+		m_aliasMap.erase(resource->alias);
+		m_defaultResources.erase(resource->alias);
+		std::string alternativeAliases;
+		for (const auto& alias : resource->alternativeAliases)
+		{
+			alternativeAliases += "|" + alias;
+			m_aliasMap.erase(alias);
+			m_defaultResources.erase(alias);
+		}
+
+		// Remove resource
+		disposeResource(resource);
+		m_resourceMap.erase(resourceIt);
+
+		LOG_INFO("[RESOURCE MANAGER] Deleted resource id: {}, alias: {}{}.", id, resource->alias, alternativeAliases);
+		return true;
+	}
+	else
+	{
+		LOG_WARN("[RESOURCE MANAGER] Cannot dispose resource! Resource with id {} does not exist.", id);
+		return false;
+	}
+}
+} // namespace Core
