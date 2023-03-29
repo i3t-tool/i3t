@@ -143,7 +143,9 @@ void Application::run()
 		Core::GraphManager::update(delta);
 		lastFrameSeconds = current;
 
-		Logger::getInstance().update();
+		InputManager::beginFrame();
+
+		Logger::getInstance().update(); // (DR) I'm assuming this should update after input manager since it uses it?
 
 		// Update and display.
 		onDisplay();
@@ -157,7 +159,8 @@ void Application::run()
 		//  one,
 		//	which is also kinda lagging, but thats probably normal)
 		//  Not critical but might be worth fixing.
-		InputManager::update();
+		// InputManager::update();
+		InputManager::endFrame();
 
 		// glfwSwapBuffers(m_window);
 		m_window->swapBuffers();
