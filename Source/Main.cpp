@@ -189,6 +189,7 @@ int main(int argc, char* argv[])
 	app->run();
 
 	app->finalize();
+	app.reset();
 
 	LOG_INFO("I3T is now exited.");
 

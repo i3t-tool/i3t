@@ -14,11 +14,7 @@ static std::shared_ptr<Application> g_TestApp = nullptr;
 
 void createTestApplication(bool fullInit)
 {
-	if (g_TestApp != nullptr)
-	{
-		g_TestApp->finalize();
-		g_TestApp = nullptr;
-	}
+	ASSERT_TRUE(g_TestApp == nullptr);
 
 	int argc = 1;
 	char* argv[] = {(char*)"dummy"};
@@ -37,12 +33,13 @@ void createTestApplication(bool fullInit)
 
 void destroyTestApplication()
 {
-	/*
 	ASSERT_TRUE(g_TestApp != nullptr);
-	g_TestApp->finalize();
 
-	g_TestApp = nullptr;
-	 */
+	if (g_TestApp != nullptr)
+	{
+		g_TestApp->finalize();
+		g_TestApp.reset();
+	}
 }
 
 bool compare(const glm::mat4& lhs, const glm::mat4& rhs, float epsilon)

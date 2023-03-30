@@ -12,7 +12,7 @@ class ResourceManagerTest : public ::testing::Test
 protected:
 	void SetUp() override { createTestApplication(false); }
 
-	void TearDown() override {}
+	void TearDown() override { destroyTestApplication(); }
 };
 
 TEST_F(ResourceManagerTest, TextureTest)
@@ -202,8 +202,10 @@ TEST_F(ResourceManagerTest, DisposeTest)
 	ASSERT_EQ(teapotMesh, Core::ResourceManager::instance().mesh("Teapot2", teapot));
 	Core::ResourceManager::instance().registerDefault("Teapot");
 	bool found = false;
-	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model)) {
-		if (res.alias == "Teapot") {
+	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model))
+	{
+		if (res.alias == "Teapot")
+		{
 			found = true;
 			break;
 		}
@@ -214,7 +216,8 @@ TEST_F(ResourceManagerTest, DisposeTest)
 
 	Core::ResourceManager::instance().dispose(teapotMesh);
 	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Teapot2"));
-	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model)) {
+	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model))
+	{
 		ASSERT_NE(res.alias, "Teapot");
 	}
 
