@@ -157,13 +157,13 @@ Mesh* Mesh::load(const std::string& path)
 
 	if (!scn)
 	{
-		LOG_ERROR("Mesh: Failed to load scene: {}", importer.GetErrorString());
+		LOG_ERROR("Mesh: Failed to load the scene '{}': {}", path, importer.GetErrorString());
 		return nullptr;
 	}
 
 	if (scn->mNumMeshes < 1)
 	{
-		LOG_ERROR("Mesh: No meshes found in scene " + path);
+		LOG_ERROR("Mesh: No meshes found in the scene '{}'", path);
 		return nullptr;
 	}
 
@@ -183,7 +183,7 @@ Mesh* Mesh::load(const std::string& path)
 
 	if ((nVertices == 0) || (nIndices < FACE_VERT_COUNT))
 	{
-		LOG_INFO("Mesh: No triangles found in scene " + path);
+		LOG_INFO("Mesh: No triangles found in the scene '{}'", path);
 		return nullptr;
 	}
 
@@ -407,7 +407,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 		aiReturn texFound = material->GetTexture(type, 0, &texPathString);
 		if (texFound != AI_SUCCESS)
 		{
-			LOG_ERROR("Mesh: Failed to load texture {}!", aiTextureTypeToString(type));
+			LOG_ERROR("Mesh: Failed to fetch a texture of type '{}'!", aiTextureTypeToString(type));
 			return 0;
 		}
 
@@ -432,12 +432,14 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 			if (aiTex->mHeight == 0)
 			{
 				// Texture is compressed (As per assimp docs, mWidth contains the length)
-				LOG_INFO("Mesh: Loading embedded texture");
+				LOG_INFO("Mesh: Loading an embedded texture of type '{}'", aiTextureTypeToString(type));
 				texId = loadEmbeddedTexture((unsigned char*)&*aiTex->pcData, aiTex->mWidth);
 			}
 			else
 			{
-				LOG_ERROR("Mesh: Failed to load embedded texture: Uncompressed embedded textures are not currently supported.");
+				LOG_ERROR("Mesh: Failed to load an embedded texture of type '{}': Uncompressed embedded textures are not "
+				          "currently supported.",
+				          aiTextureTypeToString(type));
 			}
 		}
 		return texId;
@@ -474,7 +476,7 @@ GLuint Mesh::loadEmbeddedTexture(const unsigned char* data, int length, bool mip
 	else
 	{
 		const char* error = stbi_failure_reason();
-		LOG_ERROR("Mesh: Failed to load embedded texture: {}", error);
+		LOG_ERROR("Mesh: Failed to load an embedded texture: {}", error);
 	}
 	stbi_image_free(imageData);
 
