@@ -9,7 +9,7 @@
 
 void glfwErrorCallback(int error, const char* description) { pgr::dieWithError(description); }
 
-void Window::init(const int glVersionMajor, const int glVersionMinor, bool glDebug, bool glForwardCompat)
+void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool oglDebug, bool oglForwardCompat)
 {
 	glfwSetErrorCallback(glfwErrorCallback);
 	if (!glfwInit())
@@ -18,12 +18,12 @@ void Window::init(const int glVersionMajor, const int glVersionMinor, bool glDeb
 		exit(EXIT_FAILURE);
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glVersionMajor);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glVersionMinor);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, glForwardCompat ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, oglVersionMajor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, oglVersionMinor);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, oglForwardCompat ? GLFW_TRUE : GLFW_FALSE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, glDebug ? GLFW_TRUE : GLFW_FALSE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, oglDebug ? GLFW_TRUE : GLFW_FALSE);
 
 	m_mainWindow = glfwCreateWindow(Config::WIN_WIDTH, Config::WIN_HEIGHT, BASE_WINDOW_TITLE.c_str(), nullptr, nullptr);
 
