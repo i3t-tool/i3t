@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "diwne_include.h"
 
 namespace DIWNE
@@ -139,12 +140,20 @@ bool Node::afterEndDiwne()
 		if (m_selected)
 		{
 			diwne.AddRectDiwne(getRectDiwne().Min, getRectDiwne().Max, diwne.mp_settingsDiwne->itemSelectedBorderColor,
-			                   diwne.mp_settingsDiwne->selectionRounding,
-			                   ImDrawCornerFlags_All, diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
+			                   diwne.mp_settingsDiwne->selectionRounding, ImDrawCornerFlags_All,
+			                   diwne.mp_settingsDiwne->itemSelectedBorderThicknessDiwne);
 		}
 
 		if (prev_selected != m_selected)
 		{
+			if (m_selected)
+			{
+				processSelect();
+			}
+			else
+			{
+				processUnselect();
+			}
 			diwne.m_takeSnap = true;
 			diwne.setNodesSelectionChanged(true);
 		}

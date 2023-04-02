@@ -37,5 +37,8 @@ ViewportSettings::ViewportSettings()
 	highlight_useDepth = true;
 	highlight_useDepth_darkenFactor = 0.5f;
 	highlight_useDepth_desaturateFactor = 0.4f;
+
+	highlight_selectionColor = glm::vec3(0.949, 0.682, 0.18);
+	highlight_highlightColor = glm::vec3(0.18, 0.784, 0.949);
 }
 } // namespace Vp

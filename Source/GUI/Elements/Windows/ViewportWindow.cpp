@@ -18,7 +18,6 @@
 #include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "World/Components.h"
-#include "World/World.h"
 
 using namespace UI;
 
@@ -94,6 +93,7 @@ void ViewportWindow::render()
 	{
 		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
 		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
+		m_viewport->processSelection(relativeMousePos, m_windowSize);
 	}
 	Ptr<Vp::Framebuffer> framebuffer =
 	    m_viewport->drawViewport(windowWidth, windowHeight, renderOptions, displayOptions).lock();
@@ -176,12 +176,12 @@ bool ViewportWindow::showViewportMenu()
 				{
 					m_viewport->getSettings().highlight_downscaleFactor = 0.5f;
 					m_viewport->getSettings().highlight_kernelSize = 2;
-					m_viewport->getSettings().highlight_outlineCutoff = 0.2f;
+					m_viewport->getSettings().highlight_outlineCutoff = 0.23f;
 					m_viewport->getSettings().highlight_useDepth = true;
 				}
 				if (ImGui::MenuItem("Low", nullptr, nullptr))
 				{
-					m_viewport->getSettings().highlight_downscaleFactor = 1.0f/3;
+					m_viewport->getSettings().highlight_downscaleFactor = 1.0f / 3;
 					m_viewport->getSettings().highlight_kernelSize = 2;
 					m_viewport->getSettings().highlight_outlineCutoff = 0.3f;
 					m_viewport->getSettings().highlight_useDepth = true;
@@ -221,7 +221,7 @@ bool ViewportWindow::showViewportMenu()
 		userInteractedWithMenus = true;
 		if (ImGui::MenuItem("Orbit camera", nullptr, m_viewport->getSettings().mainScene_cameraMode == CameraMode::ORBIT))
 		{
-			if (auto camera = m_viewport->getViewportCamera().lock())
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->switchMode(CameraMode::ORBIT);
 				m_viewport->getSettings().mainScene_cameraMode = CameraMode::ORBIT;
@@ -230,7 +230,7 @@ bool ViewportWindow::showViewportMenu()
 		if (ImGui::MenuItem("Trackball camera", nullptr,
 		                    m_viewport->getSettings().mainScene_cameraMode == CameraMode::TRACKBALL))
 		{
-			if (auto camera = m_viewport->getViewportCamera().lock())
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				camera->switchMode(CameraMode::TRACKBALL);
 				m_viewport->getSettings().mainScene_cameraMode = CameraMode::TRACKBALL;
@@ -238,7 +238,7 @@ bool ViewportWindow::showViewportMenu()
 		}
 		if (ImGui::MenuItem("Smooth scroll", nullptr, m_viewport->getSettings().camera_smoothScroll))
 		{
-			if (auto camera = m_viewport->getViewportCamera().lock())
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
 				m_viewport->getSettings().camera_smoothScroll = !m_viewport->getSettings().camera_smoothScroll;
 				camera->getOrbitCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);

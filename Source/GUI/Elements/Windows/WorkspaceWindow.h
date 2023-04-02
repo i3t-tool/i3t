@@ -175,6 +175,7 @@ public:
 	void trackingSwitchOn(Ptr<WorkspaceSequence> sequence = nullptr);
 	void trackingSwitchOff();
 	Ptr<WorkspaceModel> getSequenceModel(Ptr<WorkspaceSequence> seq);
+	std::vector<Ptr<WorkspaceModel>> getSequenceModels(Ptr<WorkspaceSequence> seq);
 
 	void processTrackingMove();
 

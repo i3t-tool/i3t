@@ -8,8 +8,8 @@
 #include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/camera/OrbitCamera.h"
 #include "Viewport/entity/GameObject.h"
-#include "Viewport/entity/SceneCamera.h"
-#include "Viewport/entity/SceneModel.h"
+#include "Viewport/entity/nodes/SceneCamera.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 #include "Viewport/scene/SceneRenderTarget.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/FrustumShader.h"
@@ -40,8 +40,8 @@ void Viewport::init(ViewportSettings settings)
 	RMI.mesh("Data/Models/super8.gltf");
 
 	// Setup scenes
-	m_mainScene = std::make_unique<MainScene>(this);
-	m_previewScene = std::make_unique<PreviewScene>(this);
+	m_mainScene = std::make_shared<MainScene>(this);
+	m_previewScene = std::make_shared<PreviewScene>(this);
 
 	m_mainScene->init();
 	m_previewScene->init();
@@ -134,26 +134,34 @@ void Viewport::update(double dt)
 void Viewport::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize)
 {
 	m_mainScene->processInput(dt, mousePos, windowSize);
+}
+
+void Viewport::processSelection(glm::vec2 mousePos, glm::ivec2 windowSize)
+{
 	m_mainScene->processSelection(*viewportRenderTarget, mousePos, windowSize);
 }
 
-std::weak_ptr<SceneModel> Viewport::createModel()
+std::weak_ptr<SceneModel> Viewport::createModel(Core::ID guiNodeId)
 {
 	Core::Mesh* mesh = RM::instance().mesh("default_cube", "Data/Models/CubeFixed.gltf");
 	auto sceneModel = std::make_shared<SceneModel>("default_cube", Shaders::instance().m_phongShader.get());
+	sceneModel->m_guiNodeId = guiNodeId;
 	m_mainScene->addEntity(sceneModel);
 	return sceneModel;
 }
 
-std::weak_ptr<SceneCamera> Viewport::createCamera()
+std::weak_ptr<SceneCamera> Viewport::createCamera(Core::ID guiNodeId)
 {
+	// TODO: (DR) It'd be nice to use a camera model with a lens assembly looking similar to a frustum
+	//  Key word being an old projector or some old grain film movie cameras.
 	Core::Mesh* mesh = RM::instance().mesh("Data/Models/super8.gltf");
 	auto sceneCamera = std::make_shared<SceneCamera>(mesh, Shaders::instance().m_phongShader.get());
+	sceneCamera->m_guiNodeId = guiNodeId;
 	m_mainScene->addEntity(sceneCamera);
 	return sceneCamera;
 }
 
-std::weak_ptr<AggregateCamera> Viewport::getViewportCamera()
+std::weak_ptr<AggregateCamera> Viewport::getMainViewportCamera()
 {
 	std::shared_ptr<AggregateCamera> camera = std::dynamic_pointer_cast<AggregateCamera>(m_mainScene->m_camera);
 	return camera;

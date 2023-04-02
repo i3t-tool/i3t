@@ -4,7 +4,7 @@
 #include "Core/Resources/ResourceManager.h"
 
 #include "Viewport/Viewport.h"
-#include "Viewport/entity/SceneModel.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
@@ -18,13 +18,6 @@ WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
 
 WorkspaceModel::~WorkspaceModel()
 {
-	// TODO: (DR) Not working properly! Not due to the viewport though
-	//	There is an issue with shared_ptr reference counting somewhere in the
-	// DIWNE code 	Perhaps the methods that retrieve selected nodes 	Or the
-	// delete action lambda 	Destructor doesnt get called right away, rather
-	// until some other event happens 	Like hovering over another node with the
-	// mouse
-
 	const auto node = getNodebase()->as<Core::Model>();
 	node->resetModelPosition();
 
@@ -133,7 +126,7 @@ void WorkspaceModel::popupContent()
 
 void WorkspaceModel::init()
 {
-	m_viewportModel = App::get().viewport()->createModel();
+	m_viewportModel = App::get().viewport()->createModel(getId());
 	auto modelPtr = m_viewportModel.lock();
 	modelPtr->m_showAxes = m_axisOn;
 	modelPtr->m_visible = m_showModel;
@@ -151,6 +144,7 @@ void WorkspaceModel::init()
 		    }
 	    });
 }
+
 bool WorkspaceModel::topContent()
 {
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
@@ -228,4 +222,29 @@ void WorkspaceModel::drawMenuLevelOfDetail() // todo
 {
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
 	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+}
+
+bool WorkspaceModel::processSelect()
+{
+	auto model = m_viewportModel.lock();
+	model->m_highlight = true;
+	model->m_highlightColor = App::get().viewport()->getSettings().highlight_selectionColor;
+
+	return WorkspaceNodeWithCoreDataWithPins::processSelect();
+}
+
+bool WorkspaceModel::processUnselect()
+{
+	auto model = m_viewportModel.lock();
+	if (m_highlightCounter > 0)
+	{
+		model->m_highlight = true;
+		model->m_highlightColor = App::get().viewport()->getSettings().highlight_highlightColor;
+	}
+	else
+	{
+		model->m_highlight = false;
+	}
+
+	return WorkspaceNodeWithCoreDataWithPins::processUnselect();
 }

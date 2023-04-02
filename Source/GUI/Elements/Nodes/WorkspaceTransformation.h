@@ -4,6 +4,8 @@
 class WorkspaceTransformation : public WorkspaceNodeWithCoreData
 {
 public:
+	WPtr<WorkspaceSequence> m_parentSequence{};
+
 	WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase);
 
 	//===-- Double dispatch
@@ -62,4 +64,7 @@ public:
 	                                            std::vector<std::string> const& rowLabels,
 	                                            std::vector<float*> const& local_data, bool& value_changed,
 	                                            int& index_of_change);
+
+	bool processSelect() override;
+	bool processUnselect() override;
 };

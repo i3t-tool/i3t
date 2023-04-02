@@ -18,16 +18,18 @@ class SceneModel;
 class WorkspaceModel : public WorkspaceNodeWithCoreDataWithPins
 {
 private:
-	std::weak_ptr<Vp::SceneModel> m_viewportModel;
-
 	// initial render texture size - should be large enough or changed during zoom
 	ImVec2 m_textureSize = {84, 100};
 	UPtr<Vp::Framebuffer> m_framebuffer = nullptr;
 
 public:
+	std::weak_ptr<Vp::SceneModel> m_viewportModel;
+
 	bool m_axisOn{true};
 	bool m_showModel{true};
 	glm::vec3 m_tint{1.0f};
+
+	int m_highlightCounter{0};
 
 	WPtr<Vp::SceneModel> viewportModel() { return m_viewportModel; }
 
@@ -41,15 +43,19 @@ public:
 	}
 
 	// bool drawDataFull(, int index);
-	int maxLenghtOfData();        // todo
-	bool middleContent();         // the most important function
+	int maxLenghtOfData(); // todo
+	bool middleContent();  // the most important function
 	bool topContent();
 	void drawMenuLevelOfDetail(); // todo
 
 	void popupContent();
 	void popupContent_axis_showmodel();
 
+	bool processSelect() override;
+	bool processUnselect() override;
+
 private:
 	void init();
 	glm::vec3 calculateTint(glm::vec3 color);
+
 };

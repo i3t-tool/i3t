@@ -524,7 +524,6 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 		Ptr<Framebuffer> selectionFBO = std::make_shared<Framebuffer>(100, 100, options.multisample, options.samples);
 		// Ptr<Framebuffer> selectionFBO = std::make_shared<Framebuffer>(100, 100, false, 1);
 		selectionFBO->setDepthAttachment(DepthAttachment(GL_DEPTH24_STENCIL8, true, 100, 100));
-		// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< revert to RGBA16F and HALF_FLOAT
 		auto c1 = ColorAttachment(GL_RGBA16F, GL_RGBA, 100, 100, GL_HALF_FLOAT);
 		c1.m_minFilter = GL_LINEAR;
 		c1.m_magFilter = GL_LINEAR;
@@ -534,14 +533,14 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 		renderTarget->addFramebuffer(selectionFBO);
 
 		Ptr<Framebuffer> selectionBlurFirstPassFBO = std::make_shared<Framebuffer>(100, 100, false, 1);
-		auto c2 = ColorAttachment(GL_RGBA32F, GL_RGBA, 100, 100, GL_FLOAT);
+		auto c2 = ColorAttachment(GL_RGBA16F, GL_RGBA, 100, 100, GL_HALF_FLOAT);
 		c2.m_textureWrapS = GL_CLAMP_TO_EDGE;
 		c2.m_textureWrapT = GL_CLAMP_TO_EDGE;
 		selectionBlurFirstPassFBO->addColorAttachment(c2);
 		renderTarget->addFramebuffer(selectionBlurFirstPassFBO);
 
 		Ptr<Framebuffer> selectionBlurSecondPassFBO = std::make_shared<Framebuffer>(100, 100, false, 1);
-		auto c3 = ColorAttachment(GL_RGBA32F, GL_RGBA, 100, 100, GL_FLOAT);
+		auto c3 = ColorAttachment(GL_RGBA16F, GL_RGBA, 100, 100, GL_HALF_FLOAT);
 		c3.m_minFilter = GL_LINEAR;
 		c3.m_magFilter = GL_LINEAR;
 		c3.m_textureWrapS = GL_CLAMP_TO_EDGE;
@@ -628,10 +627,13 @@ void Scene::processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos
 		uint8_t id = 0;
 
 		std::shared_ptr<Framebuffer> framebuffer;
-		if (renderTarget.getRenderOptions().wboit) {
+		if (renderTarget.getRenderOptions().wboit)
+		{
 			// Use stencil buffer of the transparent pass if wboit is enabled
 			framebuffer = renderTarget.getFramebuffer(1).lock();
-		} else {
+		}
+		else
+		{
 			// Use the main FBO
 			framebuffer = renderTarget.getFramebuffer(0).lock();
 		}
@@ -645,49 +647,34 @@ void Scene::processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos
 		glReadPixels(mousePos.x, windowSize.y - mousePos.y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &id);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		// LOG_INFO("SELECTION at {},{}. Clicked id: {}", mousePos.x, mousePos.y, id);
-		selectEntity(id);
+
+		Entity* previousSelectedEntity = m_selectedEntity;
+		Entity* newlySelectedEntity = nullptr;
+		if (id != 0) {
+			for (auto& e : m_entities)
+			{
+				if (e->m_selectionId == id)
+				{
+					newlySelectedEntity = e.get();
+					break;
+				}
+			}
+			if (newlySelectedEntity == nullptr)
+			{
+				LOG_ERROR("Viewport: Failed to select entity id: {}", id);
+			}
+		}
+		m_selectedEntity = newlySelectedEntity;
+
+		// Select entity anywhere elsewhere
+		triggerSelectionCallbacks(newlySelectedEntity);
 	}
 }
 
-void Scene::selectEntity(long id)
+void Scene::triggerSelectionCallbacks(Entity* entity)
 {
-	if (id == 0)
+	for (const auto& callback : m_selectionCallbacks)
 	{
-		if (selectedEntity != nullptr)
-		{
-			selectedEntity->m_highlight = false;
-			selectedEntity = nullptr;
-		}
-		return;
+		callback(entity);
 	}
-
-	if (selectedEntity != nullptr && selectedEntity->m_selectionId == id)
-	{
-		selectedEntity->m_highlight = false;
-		selectedEntity = nullptr;
-		return;
-	}
-
-	// TODO: (DR) This loop could be avoided if we stored entities as a <id, entity> map but not worth the time right now
-	Entity* entity = nullptr;
-	for (auto& e : m_entities)
-	{
-		if (e->m_selectionId == id)
-		{
-			entity = e.get();
-		}
-	}
-	if (entity == nullptr)
-	{
-		LOG_ERROR("Viewport: Failed to select entity id: {}", id);
-		return;
-	}
-	if (selectedEntity != nullptr)
-	{
-		selectedEntity->m_highlight = false;
-	}
-	selectedEntity = entity;
-	selectedEntity->m_highlight = true;
 }
-
-Entity* Scene::getSelectedEntity() { return selectedEntity; }

@@ -6,10 +6,12 @@
 #include "GUI/Elements/Nodes/Builder.h"
 #include "GUI/Elements/Nodes/Tools.h"
 #include "GUI/WindowManager.h"
+#include "Logger/Logger.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 #include "Utils/JSON.h"
-#include "Logger/Logger.h"
+#include "Viewport/Viewport.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 #ifdef DIWNE_DEBUG
 bool s_diwneDebug_on;
@@ -41,7 +43,12 @@ void WorkspaceDiwne::selectAll()
 {
 	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
 	{
-		workspaceCoreNode->setSelected(true);
+		if (!workspaceCoreNode->getSelected())
+		{
+			workspaceCoreNode->setSelected(true);
+			workspaceCoreNode->processSelect();
+			g_workspaceDiwne->m_takeSnap = true;
+		}
 	}
 }
 
@@ -49,7 +56,20 @@ void WorkspaceDiwne::invertSelection()
 {
 	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
 	{
-		workspaceCoreNode->setSelected(!workspaceCoreNode->getSelected());
+		bool selected = !workspaceCoreNode->getSelected();
+		if (workspaceCoreNode->getSelected() != selected)
+		{
+			workspaceCoreNode->setSelected(selected);
+			if (selected)
+			{
+				workspaceCoreNode->processSelect();
+			}
+			else
+			{
+				workspaceCoreNode->processUnselect();
+			}
+			g_workspaceDiwne->m_takeSnap = true;
+		}
 	}
 }
 
@@ -61,8 +81,8 @@ void WorkspaceDiwne::trackingSmoothLeft()
 {
 	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
 	{
-		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed)/tracking->getTrackingProgress().size();
-		tracking->setParam(tracking->getParam()+step);
+		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
+		tracking->setParam(tracking->getParam() + step);
 	}
 }
 
@@ -72,15 +92,15 @@ void WorkspaceDiwne::trackingSmoothRight()
 	{
 		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
 
-		tracking->setParam(tracking->getParam()-step);
+		tracking->setParam(tracking->getParam() - step);
 	}
 }
 void WorkspaceDiwne::trackingJaggedLeft()
 {
 	if (Core::GraphManager::isTrackingEnabled() && !smoothTracking)
 	{
-		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed)/tracking->getTrackingProgress().size();
-		tracking->setParam(tracking->getParam()+step);
+		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
+		tracking->setParam(tracking->getParam() + step);
 	}
 }
 
@@ -90,61 +110,61 @@ void WorkspaceDiwne::trackingJaggedRight()
 	{
 		float step = I3T::getSize(ESize::Tracking_JaggedScrollSpeed) / tracking->getTrackingProgress().size();
 
-		tracking->setParam(tracking->getParam()-step);
+		tracking->setParam(tracking->getParam() - step);
 	}
 }
 
-void WorkspaceDiwne::trackingModeSwitch(){
-	smoothTracking = !smoothTracking;
-}
+void WorkspaceDiwne::trackingModeSwitch() { smoothTracking = !smoothTracking; }
 
 void WorkspaceDiwne::trackingSwitch()
 {
 	LOG_INFO("TRACKING CALLED");
-	if(Core::GraphManager::isTrackingEnabled()) trackingSwitchOff();
-	else trackingSwitchOn();
+	if (Core::GraphManager::isTrackingEnabled())
+		trackingSwitchOff();
+	else
+		trackingSwitchOn();
 }
 
 void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 {
-	if(sequence == nullptr)
+	if (sequence == nullptr)
 	{
 		for (auto&& node : getSelectedNodesInnerIncluded())
 		{
 			Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
 			if (seq)
 			{
-				// m_trackingFirstTransformation = std::dynamic_pointer_cast<WorkspaceTransformation>(seq->getInnerWorkspaceNodes().back());
+				// m_trackingFirstTransformation =
+				// std::dynamic_pointer_cast<WorkspaceTransformation>(seq->getInnerWorkspaceNodes().back());
 				const auto model = getSequenceModel(seq);
 				if (model == nullptr)
 					continue;
 				LOG_INFO("TRACKING ON");
 				seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-				tracking = seq->getNodebase()->as<Core::Sequence>()->startTracking(
-				    std::make_unique<WorkspaceModelProxy>(model));
+				tracking =
+				    seq->getNodebase()->as<Core::Sequence>()->startTracking(std::make_unique<WorkspaceModelProxy>(model));
 				break;
 			}
 		}
 	}
 	else
 	{
-			const auto model = getSequenceModel(sequence);
-			if (model == nullptr) return;
-			LOG_INFO("TRACKING ON");
-		  sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-			tracking = sequence->getNodebase()->as<Core::Sequence>()->startTracking(
-			    std::make_unique<WorkspaceModelProxy>(model));
+		const auto model = getSequenceModel(sequence);
+		if (model == nullptr)
+			return;
+		LOG_INFO("TRACKING ON");
+		sequence->setTint(I3T::getColor(EColor::TrackingSequenceTint));
+		tracking =
+		    sequence->getNodebase()->as<Core::Sequence>()->startTracking(std::make_unique<WorkspaceModelProxy>(model));
 	}
-
-
 }
 
 void WorkspaceDiwne::trackingSwitchOff()
 {
-			LOG_INFO("TRACKING OFF");
-	    auto seq = findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
-	    std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
-			tracking->getSequence()->stopTracking();
+	LOG_INFO("TRACKING OFF");
+	auto seq = findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
+	std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
+	tracking->getSequence()->stopTracking();
 }
 
 ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes)
@@ -186,16 +206,17 @@ void WorkspaceDiwne::deleteCallback()
 	{
 		/*if(workspaceCoreNode->m_focused && !workspaceCoreNode->m_selected)
 		{
-			workspaceCoreNode->deleteActionDiwne();
-			Ptr<WorkspaceTransformation> trn = std::dynamic_pointer_cast<WorkspaceTransformation>(workspaceCoreNode);
-			if (trn != nullptr)
-			{
-				trn->deleteActionDiwne();
-			}
-			break;
+		  workspaceCoreNode->deleteActionDiwne();
+		  Ptr<WorkspaceTransformation> trn = std::dynamic_pointer_cast<WorkspaceTransformation>(workspaceCoreNode);
+		  if (trn != nullptr)
+		  {
+		    trn->deleteActionDiwne();
+		  }
+		  break;
 		}
 		else */
-		if(workspaceCoreNode->getIsLabelBeingEdited()) return;
+		if (workspaceCoreNode->getIsLabelBeingEdited())
+			return;
 	}
 
 	for (auto&& node : getSelectedNodesInnerIncluded())
@@ -213,7 +234,7 @@ void WorkspaceDiwne::deleteCallback()
 void WorkspaceDiwne::copySelectedNodes()
 {
 	LOG_INFO("Copying nodes");
-	//Preventing double duplication of selected transformations in a sequence
+	// Preventing double duplication of selected transformations in a sequence
 	for (auto node : getSelectedNodesInnerIncluded())
 	{
 		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
@@ -221,11 +242,17 @@ void WorkspaceDiwne::copySelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				transform->setSelected(false);
+				if (transform->getSelected())
+				{
+					transform->setSelected(false);
+					transform->processUnselect();
+					g_workspaceDiwne->m_takeSnap = true;
+				}
 			}
 		}
 	}
-	copiedNodes = copyNodes(getSelectedNodesInnerIncluded(), App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+	copiedNodes =
+	    copyNodes(getSelectedNodesInnerIncluded(), App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
@@ -245,7 +272,12 @@ void WorkspaceDiwne::cutSelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				transform->setSelected(false);
+				if (transform->getSelected())
+				{
+					transform->setSelected(false);
+					transform->processUnselect();
+					g_workspaceDiwne->m_takeSnap = true;
+				}
 			}
 		}
 	}
@@ -263,7 +295,7 @@ void WorkspaceDiwne::cutSelectedNodes()
 void WorkspaceDiwne::duplicateClickedNode()
 {
 	LOG_INFO("Duplicating")
-	//Preventing double duplication of selected transformations in a sequence
+	// Preventing double duplication of selected transformations in a sequence
 	for (auto node : getSelectedNodesInnerIncluded())
 	{
 		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
@@ -271,41 +303,47 @@ void WorkspaceDiwne::duplicateClickedNode()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				transform->setSelected(false);
+				if (transform->getSelected())
+				{
+					transform->setSelected(false);
+					transform->processUnselect();
+					g_workspaceDiwne->m_takeSnap = true;
+				}
 			}
 		}
 	}
 
-	//Duplicating either focused node or all selected nodes
+	// Duplicating either focused node or all selected nodes
 	auto selectedNodes = getSelectedNodesInnerIncluded();
 
-	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded()){
-		if(node->m_focused){
-			if(node->m_selected)
+	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
+	{
+		if (node->m_focused)
+		{
+			if (node->m_selected)
 			{
 				deselectNodes();
 				// copy and paste to ensure connections
-				for(auto node : selectedNodes)
+				for (auto node : selectedNodes)
 				{
 					node->setDuplicateNode(true);
 				}
-				//pasteNodes(copyNodes(selectedNodes, 5));
+				// pasteNodes(copyNodes(selectedNodes, 5));
 			}
 			else
 			{
 				deselectNodes();
 				node->setDuplicateNode(true);
-				//duplicateNode(node, 5);
+				// duplicateNode(node, 5);
 			}
 		}
 	}
 }
 
-
 void WorkspaceDiwne::duplicateSelectedNodes()
 {
 	LOG_INFO("Duplicating")
-	//Preventing double duplication of selected transformations in a sequence
+	// Preventing double duplication of selected transformations in a sequence
 	for (auto node : getSelectedNodesInnerIncluded())
 	{
 		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
@@ -313,7 +351,12 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				transform->setSelected(false);
+				if (transform->getSelected())
+				{
+					transform->setSelected(false);
+					transform->processUnselect();
+					g_workspaceDiwne->m_takeSnap = true;
+				}
 			}
 		}
 	}
@@ -325,14 +368,25 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 
 	for (auto node : selectedNodes)
 	{
-		node->setSelected(false);
+		if (node->getSelected())
+		{
+			node->setSelected(false);
+			node->processUnselect();
+			g_workspaceDiwne->m_takeSnap = true;
+		}
 	}
 }
 
-
-void WorkspaceDiwne::deselectNodes(){
-	for (auto node : getAllNodesInnerIncluded()){
-		node->setSelected(false);
+void WorkspaceDiwne::deselectNodes()
+{
+	for (auto node : getAllNodesInnerIncluded())
+	{
+		if (node->getSelected())
+		{
+			node->setSelected(false);
+			node->processUnselect();
+			g_workspaceDiwne->m_takeSnap = true;
+		}
 	}
 }
 
@@ -950,25 +1004,26 @@ bool WorkspaceDiwne::content()
 		return false;
 	}
 
-	//deletion of blocks
+	// deletion of blocks
 	bool interaction_happen = false;
 	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
 	                                          [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
 	                                          { return node->getRemoveFromWorkspace(); }),
 	                           m_workspaceCoreNodes.end());
 
-	//duplication of blocks
+	// duplication of blocks
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> duplicatedNodes;
 	bool shouldDuplicate = false;
-	for (auto node : getAllNodesInnerIncluded()){
-		if(node->getDuplicateNode())
+	for (auto node : getAllNodesInnerIncluded())
+	{
+		if (node->getDuplicateNode())
 		{
 			duplicatedNodes.push_back(node);
 			node->setDuplicateNode(false);
 			shouldDuplicate = true;
 		}
 	}
-	if(shouldDuplicate)
+	if (shouldDuplicate)
 	{
 		pasteNodes(copyNodes(duplicatedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 	}
@@ -1092,14 +1147,17 @@ Ptr<WorkspaceModel> WorkspaceDiwne::getSequenceModel(Ptr<WorkspaceSequence> seq)
 		};
 	}
 
-	for (auto const& model : models){
+	for (auto const& model : models)
+	{
 		WorkspaceCoreOutputPin* pin = model->getInputs()[0]->getLink().getStartPin();
 		WorkspaceSequence* tempSeq;
-		while (pin != nullptr){
+		while (pin != nullptr)
+		{
 			tempSeq = dynamic_cast<WorkspaceSequence*>(&(pin->getNode()));
-			if(tempSeq == nullptr) break;
+			if (tempSeq == nullptr)
+				break;
 
-			if(tempSeq->getId() == seq->getId())
+			if (tempSeq->getId() == seq->getId())
 			{
 				ret = model;
 				break;
@@ -1108,6 +1166,40 @@ Ptr<WorkspaceModel> WorkspaceDiwne::getSequenceModel(Ptr<WorkspaceSequence> seq)
 		}
 	}
 	return ret;
+}
+
+std::vector<Ptr<WorkspaceModel>> WorkspaceDiwne::getSequenceModels(Ptr<WorkspaceSequence> seq)
+{
+	std::vector<Ptr<WorkspaceModel>> models;
+	for (auto const& node : m_workspaceCoreNodes)
+	{
+		Ptr<WorkspaceModel> model = std::dynamic_pointer_cast<WorkspaceModel>(node);
+		if (model && model->getInputs()[0]->isConnected())
+		{
+			models.push_back(std::dynamic_pointer_cast<WorkspaceModel>(node));
+		};
+	}
+
+	std::vector<Ptr<WorkspaceModel>> retModels;
+	for (auto const& model : models)
+	{
+		WorkspaceCoreOutputPin* pin = model->getInputs()[0]->getLink().getStartPin();
+		WorkspaceSequence* tempSeq;
+		while (pin != nullptr)
+		{
+			tempSeq = dynamic_cast<WorkspaceSequence*>(&(pin->getNode()));
+			if (tempSeq == nullptr)
+				break;
+
+			if (tempSeq->getId() == seq->getId())
+			{
+				retModels.push_back(model);
+				break;
+			}
+			pin = tempSeq->getInputs()[0]->getLink().getStartPin();
+		}
+	}
+	return retModels;
 }
 
 std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllInputFreeSequence()
@@ -1161,7 +1253,14 @@ bool WorkspaceDiwne::afterContent()
 			for (auto node : getAllNodesInnerIncluded())
 			{
 				if (node != getLastActiveNode<WorkspaceNodeWithCoreData>())
-					node->setSelected(false);
+				{
+					if (node->getSelected())
+					{
+						node->setSelected(false);
+						node->processUnselect();
+						g_workspaceDiwne->m_takeSnap = true;
+					}
+				}
 			}
 		}
 	}
@@ -1443,10 +1542,10 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("duplicate", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateClickedNode(); });
 	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateSelectedNodes(); });
 
-	Input.bindAction("trackingEscOff", EKeyState::Pressed, [&]() {g_workspaceDiwne->trackingSwitchOff(); });
-	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {g_workspaceDiwne->trackingSmoothLeft(); });
+	Input.bindAction("trackingEscOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
+	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSmoothLeft(); });
 	Input.bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSmoothRight(); });
-	Input.bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {g_workspaceDiwne->trackingJaggedLeft(); });
+	Input.bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingJaggedLeft(); });
 	Input.bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingJaggedRight(); });
 	Input.bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingModeSwitch(); });
 	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitch(); });
@@ -1454,6 +1553,40 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
 
 	App::getModule<StateManager>().setOriginator(this);
+
+	// Setup viewport selection callback
+	App::get().viewport()->getMainScene().lock()->addSelectionCallback(
+	    [this](Vp::Entity* newlySelectedEntity)
+	    {
+		    if (newlySelectedEntity != nullptr)
+		    {
+			    if (Vp::SceneModel* sceneObject = dynamic_cast<Vp::SceneModel*>(newlySelectedEntity))
+			    {
+				    auto nodeOpt = findNodeById(g_workspaceDiwne->getAllNodesInnerIncluded(), sceneObject->m_guiNodeId);
+				    if (nodeOpt)
+				    {
+					    Ptr<GuiNode>& node = nodeOpt.value();
+					    bool selected = node->getSelected();
+					    g_workspaceDiwne->deselectNodes();
+					    if (!selected)
+					    {
+						    // TODO: (DR) These 3 lines and if statement should basically always be together, the setSelected method
+						    //   should handle this on its own! This is the case across all uses of Node::setSelected.
+						    //   A boolean flag should be used to trigger processSelect and snapshot or not.
+						    //   The goal here is that process(Un)Select() gets always called but ONLY once for each state.
+						    if (!node->getSelected())
+						    {
+							    node->setSelected(true);
+							    node->processSelect();
+							    g_workspaceDiwne->m_takeSnap = true;
+						    }
+					    }
+					    return;
+				    }
+			    }
+		    }
+		    g_workspaceDiwne->deselectNodes();
+	    });
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -1465,14 +1598,11 @@ WorkspaceWindow::~WorkspaceWindow()
 // TODO - Make diwne change settings on theme switch (when Theme::apply() is called)
 void WorkspaceWindow::initDiwneFromTheme()
 {
-	settingsDiwne.selectionRounding =
-	    App::get().getUI()->getTheme().get(ESize::Nodes_Rounding);
-	settingsDiwne.itemSelectedBorderColor =
-	    App::get().getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
+	settingsDiwne.selectionRounding = App::get().getUI()->getTheme().get(ESize::Nodes_Rounding);
+	settingsDiwne.itemSelectedBorderColor = App::get().getUI()->getTheme().get(EColor::Workspace_SelectedBorder);
 	settingsDiwne.itemSelectedBorderThicknessDiwne =
 	    App::get().getUI()->getTheme().get(ESize::Workspace_SelectedBorderThickness);
-	settingsDiwne.objectFocusBorderColor =
-	    App::get().getUI()->getTheme().get(EColor::Workspace_FocusBorder);
+	settingsDiwne.objectFocusBorderColor = App::get().getUI()->getTheme().get(EColor::Workspace_FocusBorder);
 	settingsDiwne.objectFocusBorderThicknessDiwne =
 	    App::get().getUI()->getTheme().get(ESize::Workspace_FocusBorderThickness);
 	settingsDiwne.objectFocusForInteractionBorderColor =
@@ -1503,11 +1633,11 @@ void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
 	/*
 	const auto findNode = [](std::vector<GuiNodePtr>& nodes, Core::ID id) -> GuiNodePtr
 	{
-		for (const auto& node : nodes)
-			if (node->getNodebase()->getId() == id)
-				return node;
+	  for (const auto& node : nodes)
+	    if (node->getNodebase()->getId() == id)
+	      return node;
 
-		return nullptr;
+	  return nullptr;
 	};
 
 	//
@@ -1519,58 +1649,58 @@ void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
-		const auto node = NodeDeserializer::createOperator(value);
-		oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
+	  const auto node = NodeDeserializer::createOperator(value);
+	  oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["sequences"].GetArray())
 	{
-		const auto node = NodeDeserializer::createSequence(value);
-		oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
+	  const auto node = NodeDeserializer::createSequence(value);
+	  oldToNewID[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["cycles"].GetArray())
 	{
-		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
-		NodeDeserializer::assignCommon(value, cycle);
-		oldToNewID[value["id"].GetInt()] = cycle->getNodebase()->getId();
+	  const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
+	  NodeDeserializer::assignCommon(value, cycle);
+	  oldToNewID[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
-		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
-		NodeDeserializer::assignCommon(value, camera);
-		oldToNewID[value["id"].GetInt()] = camera->getNodebase()->getId();
+	  const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
+	  NodeDeserializer::assignCommon(value, camera);
+	  oldToNewID[value["id"].GetInt()] = camera->getNodebase()->getId();
 
-		const auto& viewValue = value["sequences"].GetArray()[0];
-		NodeDeserializer::assignSequence(viewValue, camera->getView());
+	  const auto& viewValue = value["sequences"].GetArray()[0];
+	  NodeDeserializer::assignSequence(viewValue, camera->getView());
 
-		const auto& projValue = value["sequences"].GetArray()[1];
-		NodeDeserializer::assignSequence(projValue, camera->getProjection());
+	  const auto& projValue = value["sequences"].GetArray()[1];
+	  NodeDeserializer::assignSequence(projValue, camera->getProjection());
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
-		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
-		NodeDeserializer::assignCommon(value, screen);
-		oldToNewID[value["id"].GetInt()] = screen->getNodebase()->getId();
+	  const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
+	  NodeDeserializer::assignCommon(value, screen);
+	  oldToNewID[value["id"].GetInt()] = screen->getNodebase()->getId();
 	}
 
 	//
 
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
-		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
-		NodeDeserializer::assignCommon(value, model);
-		oldToNewID[value["id"].GetInt()] = model->getNodebase()->getId();
+	  const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
+	  NodeDeserializer::assignCommon(value, model);
+	  oldToNewID[value["id"].GetInt()] = model->getNodebase()->getId();
 	}
 
 	//
@@ -1578,8 +1708,8 @@ void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
 	const auto& transforms = memento["workspace"]["transforms"];
 	for (auto& value : transforms.GetArray())
 	{
-		const auto transform = NodeDeserializer::createTransform(value);
-		oldToNewID[value["id"].GetInt()] = transform->getNodebase()->getId();
+	  const auto transform = NodeDeserializer::createTransform(value);
+	  oldToNewID[value["id"].GetInt()] = transform->getNodebase()->getId();
 	}
 
 	// connect edges
@@ -1589,19 +1719,19 @@ void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
 
 	for (auto& edge : edges.GetArray())
 	{
-		auto oldLhsID = edge[0].GetInt();
-		auto oldRhsID = edge[2].GetInt();
-		auto lhsID = oldToNewID.at(edge[0].GetInt());
-		auto rhsID = oldToNewID.at(edge[2].GetInt());
-		auto lhs = findNode(workspaceNodes, lhsID);
-		auto rhs = findNode(workspaceNodes, rhsID);
-		if (lhs && rhs)
-		{
-			auto lhsPin = edge[1].GetInt();
-			auto rhsPin = edge[3].GetInt();
+	  auto oldLhsID = edge[0].GetInt();
+	  auto oldRhsID = edge[2].GetInt();
+	  auto lhsID = oldToNewID.at(edge[0].GetInt());
+	  auto rhsID = oldToNewID.at(edge[2].GetInt());
+	  auto lhs = findNode(workspaceNodes, lhsID);
+	  auto rhs = findNode(workspaceNodes, rhsID);
+	  if (lhs && rhs)
+	  {
+	    auto lhsPin = edge[1].GetInt();
+	    auto rhsPin = edge[3].GetInt();
 
-			connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
-		}
+	    connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
+	  }
 	}
 	 */
 }

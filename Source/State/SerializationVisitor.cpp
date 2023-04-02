@@ -8,7 +8,7 @@
 #include "GUI/Elements/Nodes/WorkspaceSequence.h"
 #include "GUI/Elements/Nodes/WorkspaceTransformation.h"
 #include "Logger/Logger.h"
-#include "Viewport/entity/SceneModel.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 using namespace rapidjson;
 

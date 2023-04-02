@@ -13,6 +13,8 @@
 
 #include "pgr.h"
 
+#include "Core/Nodes/Id.h"
+
 #include "Viewport/camera/ICamera.h"
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
@@ -74,8 +76,8 @@ private:
 	friend class SceneCamera;
 
 	// Scenes
-	std::unique_ptr<MainScene> m_mainScene;
-	std::unique_ptr<PreviewScene> m_previewScene;
+	std::shared_ptr<MainScene> m_mainScene;
+	std::shared_ptr<PreviewScene> m_previewScene;
 
 	// Scene render targets (buffer(s) scenes are rendered into)
 	Ptr<SceneRenderTarget> viewportRenderTarget;
@@ -157,19 +159,23 @@ public:
 	 */
 	void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize);
 
+	void processSelection(glm::vec2 mousePos, glm::ivec2 windowSize);
+
 	/**
 	 * Creates a SceneModel in the main scene to represent a Model node.
 	 * Can be later removed with removeEntity()
+	 * @param id Id of the gui node equivalent.
 	 * @return Weak pointer to it.
 	 */
-	std::weak_ptr<SceneModel> createModel();
+	std::weak_ptr<SceneModel> createModel(Core::ID guiNodeId);
 
 	/**
 	 * Creates a SceneCamera in the main scene to represent a Camera node.
 	 * Can be later removed with removeEntity()
+	 * @param Id of the gui node equivalent.
 	 * @return Weak pointer to it.
 	 */
-	std::weak_ptr<SceneCamera> createCamera();
+	std::weak_ptr<SceneCamera> createCamera(Core::ID guiNodeId);
 
 	/**
 	 * Remove an entity from the main scene.
@@ -183,8 +189,11 @@ public:
 	/**
 	 * Returns the viewport camera of the main scene.
 	 */
-	std::weak_ptr<AggregateCamera> getViewportCamera();
+	std::weak_ptr<AggregateCamera> getMainViewportCamera();
 
 	ViewportSettings& getSettings();
+
+	std::weak_ptr<Scene> getMainScene() { return m_mainScene; };
+	std::weak_ptr<Scene> getPreviewScene() { return m_previewScene; };
 };
 } // namespace Vp

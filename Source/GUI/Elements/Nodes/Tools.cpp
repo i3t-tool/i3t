@@ -11,7 +11,7 @@
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
-#include "Viewport/entity/SceneModel.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 std::optional<Ptr<GuiNode>> findNodeById(const std::vector<Ptr<GuiNode>>& nodes, Core::ID id)
 {

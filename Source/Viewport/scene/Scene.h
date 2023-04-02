@@ -43,8 +43,9 @@ protected:
 	// TODO: (DR) It might make more sense to reuse unused ids to keep the below 255
 	//	Also selectable entities should have the lowest id possible
 	//	Right now quickly re-adding entities will make the id explode past 255!!
-	Entity* selectedEntity = nullptr;
-	long m_entityCounter = 0;
+	Entity* m_selectedEntity = nullptr;
+
+	std::vector<std::function<void(Entity*)>> m_selectionCallbacks; ///< Callbacks that get triggered on entity selection
 
 	// Temporary lists for transparency sorting
 	std::vector<Entity*> m_unorderedTransparentEntities;
@@ -102,14 +103,15 @@ public:
 	/**
 	 * Update selection logic.
 	 *
+	 * @param diwne
 	 * @param renderTarget Scene's render target
 	 * @param mousePos Current mouse position relative to the window
 	 * @param windowSize Current window size
 	 */
 	void processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos, glm::ivec2 windowSize);
 
-	void selectEntity(long id);
-	Entity* getSelectedEntity();
+	void addSelectionCallback(std::function<void(Entity*)> callback) { this->m_selectionCallbacks.push_back(callback); }
+	void triggerSelectionCallbacks(Entity* entity);
 
 	/**
 	 * Adds entity to the scene.
