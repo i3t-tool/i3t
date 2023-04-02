@@ -4,6 +4,9 @@
 
 namespace Vp
 {
+/**
+ * Color attachment using a 2D Texture
+ */
 class ColorAttachment
 {
 public:
@@ -20,17 +23,16 @@ public:
 
 	GLenum m_type; ///< Pixel data type (see OpenGL docs)
 
-	// TODO: (DR) Test / Implement
-	bool syncSizeWithFramebuffer{true};
+	GLint m_minFilter{GL_NEAREST};
+	GLint m_magFilter{GL_NEAREST};
+
+	GLint m_textureWrapS{GL_REPEAT};
+	GLint m_textureWrapT{GL_REPEAT};
+
+	// TODO: (DR) Test / Implement, generally its easier to use a second FBO
+	bool m_syncSize{true};
 
 	GLuint m_texture{0}; ///< ID of the created texture
-
-	/**
-	 * Creates a color attachment with the specified index.
-	 * Parameters mimic an OpenGL image texture color attachment.
-	 */
-	ColorAttachment(unsigned int index, GLint internalFormat, GLint format, GLsizei width, GLsizei height, GLenum type,
-	                bool multisampled, unsigned int samples);
 
 	/**
 	 * Creates a color attachment with index 0.

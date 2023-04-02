@@ -14,7 +14,7 @@ public:
 
 	FrustumObject(Core::Mesh* mesh, FrustumShader* shader);
 
-	void render(glm::mat4 view, glm::mat4 projection) override;
+	void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) override;
 	void update(Scene& scene) override;
 };
 } // namespace Vp

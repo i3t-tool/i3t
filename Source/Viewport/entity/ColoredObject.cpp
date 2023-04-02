@@ -9,12 +9,12 @@ ColoredObject::ColoredObject(Core::Mesh* mesh, ColorShader* shader) : GameObject
 	// Empty
 }
 
-void ColoredObject::render(glm::mat4 view, glm::mat4 projection)
+void ColoredObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette)
 {
-	ColorShader* colorShader = static_cast<ColorShader*>(m_shader);
-	colorShader->m_useSingleColor = m_useSingleColor;
-	colorShader->m_singleColor = m_singleColor;
-	GameObject::render(view, projection);
+	ColorShader* colorShader = static_cast<ColorShader*>(shader);
+	colorShader->m_useSingleColor = m_useSingleColor || silhouette;
+	colorShader->m_singleColor = silhouette ? m_highlightColor : m_singleColor;
+	GameObject::render(shader, view, projection, silhouette);
 }
 
 const glm::vec3& ColoredObject::getColor() const { return m_singleColor; }

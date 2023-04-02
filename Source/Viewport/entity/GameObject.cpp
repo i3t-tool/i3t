@@ -3,31 +3,25 @@
 #include <glm/glm.hpp>
 
 #include "Viewport/shader/ObjectShader.h"
+#include "Viewport/shader/Shaders.h"
 
 using namespace Vp;
 
-GameObject::GameObject(Core::Mesh* mesh, ObjectShader* shader) : m_mesh(mesh), m_shader(shader)
+GameObject::GameObject(Core::Mesh* mesh, ObjectShader* shader) : m_mesh(mesh) { m_shader = shader; }
+
+void GameObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette)
 {
-	// Empty
-}
+	auto objectShader = static_cast<ObjectShader*>(shader);
+	objectShader->use();
+	objectShader->m_wboit = m_wboit;
+	objectShader->m_opacity = m_opaque || silhouette ? 1.0f : m_opacity;
+	objectShader->setWorldTransform(m_modelMatrix, view, projection);
+	objectShader->setUniforms();
 
-void GameObject::render(glm::mat4 view, glm::mat4 projection)
-{
-	m_shader->use();
-
-	if (m_shader->hasUniform(m_shader->wboitFlagUniform))
-	{
-		glUniform1i(m_shader->wboitFlagUniform, m_wboit ? GL_TRUE : GL_FALSE);
-	}
-
-	m_shader->m_opacity = m_opaque ? 1.0f : m_opacity;
-	m_shader->setWorldTransform(m_modelMatrix, view, projection);
-
-	m_shader->setUniforms();
 	glBindVertexArray(m_mesh->m_vao);
 	for (auto& meshPart : m_mesh->m_meshParts)
 	{
-		m_shader->setUniformsPerMeshPart(meshPart);
+		objectShader->setUniformsPerMeshPart(meshPart);
 		m_mesh->renderMeshPart(meshPart);
 	}
 	glBindVertexArray(0);

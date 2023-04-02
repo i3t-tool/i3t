@@ -21,7 +21,7 @@ float max3(vec3 v)
 
 void main()
 {
-	// fragment coordination
+	// fragment coordinates
 	ivec2 coords = ivec2(gl_FragCoord.xy);
 
 	// fragment revealage

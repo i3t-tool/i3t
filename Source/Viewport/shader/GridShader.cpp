@@ -12,6 +12,7 @@ void GridShader::setUniforms()
 	WorldShader::setUniforms();
 
 	// Extract near and far values from projection matrix
+	// Note: There is a relatively huge rounding error here
 	float nearVal;
 	float farVal;
 

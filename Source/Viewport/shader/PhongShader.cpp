@@ -25,8 +25,7 @@ void PhongShader::setUniforms()
 	glUniform3fv(tintId, 1, glm::value_ptr(m_tint));
 
 	// Alpha cutoff
-	// glUniform1f(glGetUniformLocation(id, "alphaCutoff"), 0.1f); // Default
-	// value
+	// glUniform1f(glGetUniformLocation(id, "alphaCutoff"), 0.1f);
 
 	ObjectShader::setUniforms();
 }

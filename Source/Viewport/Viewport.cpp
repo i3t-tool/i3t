@@ -31,8 +31,7 @@ void Viewport::init(ViewportSettings settings)
 	m_settings = settings;
 
 	// Load shaders
-	m_shaders = std::make_unique<Shaders>();
-	m_shaders->create();
+	Shaders::instance().load();
 
 	// Load shapes
 	Shaper::initDefaultShapes();
@@ -47,19 +46,24 @@ void Viewport::init(ViewportSettings settings)
 	m_mainScene->init();
 	m_previewScene->init();
 
-	// Setup scene render targets
+	// Setup scene render targets (some are lazy initialized)
 	RenderOptions previewOptions;
 	previewOptions.framebufferAlpha = true;
 
-	viewportRenderTarget = m_mainScene->createRenderTarget(RenderOptions());
-	screenRenderTarget = m_mainScene->createRenderTarget(RenderOptions());
 	previewRenderTarget = m_previewScene->createRenderTarget(previewOptions);
 }
 
 WPtr<Framebuffer> Viewport::drawViewport(int width, int height, const RenderOptions& renderOptions,
                                          const DisplayOptions& displayOptions)
 {
-	viewportRenderTarget->setRenderOptions(renderOptions);
+	if (!viewportRenderTarget)
+	{
+		viewportRenderTarget = m_mainScene->createRenderTarget(renderOptions);
+	}
+	else
+	{
+		viewportRenderTarget->setRenderOptions(renderOptions);
+	}
 	m_mainScene->draw(width, height, *viewportRenderTarget, displayOptions);
 	return viewportRenderTarget->getOutputFramebuffer();
 }
@@ -67,7 +71,14 @@ WPtr<Framebuffer> Viewport::drawViewport(int width, int height, const RenderOpti
 WPtr<Framebuffer> Viewport::drawScreen(int width, int height, glm::mat4 view, glm::mat4 projection,
                                        const RenderOptions& renderOptions, const DisplayOptions& displayOptions)
 {
-	screenRenderTarget->setRenderOptions(renderOptions);
+	if (!screenRenderTarget)
+	{
+		screenRenderTarget = m_mainScene->createRenderTarget(renderOptions);
+	}
+	else
+	{
+		screenRenderTarget->setRenderOptions(renderOptions);
+	}
 	m_mainScene->draw(width, height, view, projection, *screenRenderTarget, displayOptions);
 	return screenRenderTarget->getOutputFramebuffer();
 }
@@ -123,12 +134,13 @@ void Viewport::update(double dt)
 void Viewport::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize)
 {
 	m_mainScene->processInput(dt, mousePos, windowSize);
+	m_mainScene->processSelection(*viewportRenderTarget, mousePos, windowSize);
 }
 
 std::weak_ptr<SceneModel> Viewport::createModel()
 {
 	Core::Mesh* mesh = RM::instance().mesh("default_cube", "Data/Models/CubeFixed.gltf");
-	auto sceneModel = std::make_shared<SceneModel>("default_cube", m_shaders->m_phongShader.get());
+	auto sceneModel = std::make_shared<SceneModel>("default_cube", Shaders::instance().m_phongShader.get());
 	m_mainScene->addEntity(sceneModel);
 	return sceneModel;
 }
@@ -136,7 +148,7 @@ std::weak_ptr<SceneModel> Viewport::createModel()
 std::weak_ptr<SceneCamera> Viewport::createCamera()
 {
 	Core::Mesh* mesh = RM::instance().mesh("Data/Models/super8.gltf");
-	auto sceneCamera = std::make_shared<SceneCamera>(mesh, m_shaders->m_phongShader.get());
+	auto sceneCamera = std::make_shared<SceneCamera>(mesh, Shaders::instance().m_phongShader.get());
 	m_mainScene->addEntity(sceneCamera);
 	return sceneCamera;
 }

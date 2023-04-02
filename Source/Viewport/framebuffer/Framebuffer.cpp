@@ -6,6 +6,18 @@ using namespace Vp;
 
 #define FRAMEBUFFER_DEBUG false
 
+/*
+ * IMPLEMENTATION NOTES, LIMITATIONS AND TODOS:
+ * - Multisampled depth buffer can be resolved with multisampleResolveDepth()
+ * - ColorAttachments ALWAYS use glTexImage2D
+ * - DepthAttachment ALWAYS uses a renderbuffer
+ * - Framebuffer manages its color attachments lifetime, they cannot be shared currently
+ *  -- Framebuffer dispose disposes of its color attachments
+ *  -- Attachments are also stored with values not pointers, so to share them they should be standalone objects
+ *  -- However that might be tricky when mutlisample resolving comes into play, not sure
+ * - glDrawBuffers is called for all color attachements, eg. it is expected you are using all of them
+ */
+
 Framebuffer* Framebuffer::createDefault(bool multisample, unsigned int samples, bool alpha)
 {
 	return createDefault(FBO_DEFAULT_WIDTH, FBO_DEFAULT_HEIGHT, multisample, samples, alpha);
@@ -109,7 +121,7 @@ void Framebuffer::initImpl(int width, int height)
 
 	if (m_multisample)
 	{
-		m_multisampleResolveFBO = std::make_unique<Framebuffer>(width, height, false, 0);
+		m_multisampleResolveFBO = std::make_shared<Framebuffer>(width, height, false, 0);
 	}
 
 	glGenFramebuffers(1, &m_fbo);
@@ -119,7 +131,7 @@ void Framebuffer::initImpl(int width, int height)
 	{
 		// Init color attachment
 		ColorAttachment& attachment = m_colorAttachments[i];
-		if (attachment.syncSizeWithFramebuffer)
+		if (attachment.m_syncSize)
 		{
 			attachment.m_width = m_width;
 			attachment.m_height = m_height;
@@ -133,7 +145,7 @@ void Framebuffer::initImpl(int width, int height)
 		// Init resolve color attachment
 		if (attachment.m_multisampled)
 		{
-			ColorAttachment resolveAttachment = attachment; // Explicit copy to be sure
+			ColorAttachment resolveAttachment = ColorAttachment(attachment); // Explicit copy to be sure
 			m_multisampleResolveFBO->addColorAttachment(resolveAttachment);
 		}
 	}
@@ -141,13 +153,24 @@ void Framebuffer::initImpl(int width, int height)
 
 	if (m_depthAttachment)
 	{
-		m_depthAttachment->m_width = m_width;
-		m_depthAttachment->m_height = m_height;
+		if (m_depthAttachment->m_syncSize)
+		{
+			m_depthAttachment->m_width = m_width;
+			m_depthAttachment->m_height = m_height;
+		}
+
 		m_depthAttachment->m_multisampled = m_multisample;
 		m_depthAttachment->m_samples = m_samples;
 
 		m_depthAttachment->create();
 		m_depthAttachment->bind();
+
+		// Init resolve depth/stencil attachment
+		if (m_depthAttachment->m_multisampled)
+		{
+			DepthAttachment resolveAttachment = DepthAttachment(m_depthAttachment.value()); // Explicit copy to be sure
+			m_multisampleResolveFBO->setDepthAttachment(resolveAttachment);
+		}
 	}
 
 	if (!checkFramebuffer())
@@ -170,12 +193,12 @@ void Framebuffer::start(int width, int height)
 
 void Framebuffer::end(bool resolveMultisample)
 {
-	if (m_multisample && resolveMultisample)
+	if (m_multisample && resolveMultisample && !m_colorAttachments.empty())
 	{
 		// Resolve current multisampled color buffers into a single sampled intermediate ones
-		multisampleResolveColors();
+		multisampleResolveColor(0);
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Redundant if resolving multisampling but better safe than sorry
 }
 
 void Framebuffer::resize(int width, int height)
@@ -203,7 +226,7 @@ void Framebuffer::resize(int width, int height)
 
 	for (auto& colorAttachment : m_colorAttachments)
 	{
-		if (colorAttachment.syncSizeWithFramebuffer)
+		if (colorAttachment.m_syncSize)
 		{
 			colorAttachment.resize(width, height);
 		}
@@ -301,17 +324,33 @@ bool Framebuffer::checkFramebuffer()
 
 bool Framebuffer::isInitialized() const { return m_fbo != 0; }
 
+std::weak_ptr<Framebuffer> Framebuffer::getResolvedFramebuffer()
+{
+	if (m_multisample)
+	{
+		if (!m_multisampleResolveFBO->isInitialized())
+		{
+			throw std::runtime_error("Framebuffer: getResolvedFramebuffer(): Multisampled buffer has not been resolved yet!");
+		}
+		return m_multisampleResolveFBO;
+	}
+	else
+	{
+		return shared_from_this();
+	}
+}
+
 GLuint Framebuffer::getColorTexture(unsigned int index, bool multisampled) const
 {
 	if (m_colorAttachments.empty())
 	{
-		throw std::runtime_error("Framebuffer: Framebuffer has no color attachments!");
+		throw std::runtime_error("Framebuffer: getColorTexture(): Framebuffer has no color attachments!");
 	}
-	if (m_multisample && multisampled)
+	if (m_multisample && !multisampled)
 	{
 		if (!m_multisampleResolveFBO->isInitialized())
 		{
-			throw std::runtime_error("Framebuffer: Multisampled buffer has not been resolved yet!");
+			throw std::runtime_error("Framebuffer: getColorTexture(): Multisampled buffer has not been resolved yet!");
 		}
 		return m_multisampleResolveFBO->getColorTexture(index);
 	}
@@ -357,23 +396,52 @@ void Framebuffer::multisampleResolveColors()
 	{
 		multisampleResolveColor(i);
 	}
+	if (m_colorAttachments.empty())
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind FBO just to stay consistent
+	}
 }
 
 void Framebuffer::multisampleResolveColor(unsigned int colorAttachmentIndex)
 {
+	// TODO: (DR) Add attachment index error checking
 	if (!m_multisample)
 	{
-		throw std::runtime_error("Framebuffer: Cannot resolve single sampled FBO!");
+		throw std::runtime_error("Framebuffer: Cannot resolve single sampled color FBO!");
 	}
 
 	m_multisampleResolveFBO->update(m_width, m_height);
 
 	// Resolve multisampled buffer into a single sampled intermediate one
+	if (FRAMEBUFFER_DEBUG)
+		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO color ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, getId());
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + colorAttachmentIndex);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_multisampleResolveFBO->getId());
 	glDrawBuffer(GL_COLOR_ATTACHMENT0 + colorAttachmentIndex);
 	glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Framebuffer::multisampleResolveDepth()
+{
+	if (!m_multisample)
+	{
+		throw std::runtime_error("Framebuffer: Cannot resolve single sampled depth FBO!");
+	}
+
+	m_multisampleResolveFBO->update(m_width, m_height);
+
+	// Resolve multisampled buffer into a single sampled intermediate one
+	if (FRAMEBUFFER_DEBUG)
+		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO depth ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, getId());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_multisampleResolveFBO->getId());
+	glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height,
+	                  GL_DEPTH_BUFFER_BIT | (m_depthAttachment->m_stencil ? GL_STENCIL_BUFFER_BIT : 0x00), GL_NEAREST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Framebuffer::removeAllColorAttachments()
@@ -428,6 +496,27 @@ void Framebuffer::setDrawBuffers()
 	for (int i = 0; i < m_colorAttachments.size(); i++)
 	{
 		colorBuffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+	}
+	if (!colorBuffers.empty())
+	{
+		glDrawBuffers(colorBuffers.size(), &colorBuffers[0]);
+	}
+}
+
+void Framebuffer::setDrawBuffers(std::vector<unsigned int> indices)
+{
+	if (indices.empty() || indices.size() > m_colorAttachments.size())
+	{
+		throw std::invalid_argument("Framebuffer: setDrawBuffers(): Invalid indices array!");
+	}
+	std::vector<GLenum> colorBuffers;
+	for (int i = 0; i < m_colorAttachments.size(); i++)
+	{
+		colorBuffers.push_back(GL_NONE);
+	}
+	for (unsigned int index : indices)
+	{
+		colorBuffers[index] = GL_COLOR_ATTACHMENT0 + index;
 	}
 	if (!colorBuffers.empty())
 	{

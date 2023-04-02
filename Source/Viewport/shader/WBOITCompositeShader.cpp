@@ -12,4 +12,5 @@ void WBOITCompositeShader::setUniforms()
 {
 	bindTexture2D(0, accumulationTextureID, accumulationSampler);
 	bindTexture2D(1, revealageTextureID, revealageSampler);
+	Shader::setUniforms();
 }

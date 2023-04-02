@@ -29,23 +29,25 @@ namespace Vp
  * - //Create fbo object\n
  * - fbo.start(); //The fbo is lazily initialized here if necessary\n
  * - //Render stuff\n
- * - fbo.end(); //<b>The fbo is unbound by BINDING THE DEFAULT (0)
- * FRAMEBUFFER!</b>\n
+ * - fbo.end(); //<b>The fbo is unbound by BINDING THE DEFAULT (0) FRAMEBUFFER!</b>\n
  * - //Multisampling is resolved here unless fbo.end(false) is called\n
  * - //Get color texture using fbo.getColorTexture()\n
  * <br>
- * Supports multi sampled antialiasing (MSAA) which can be enabled in the
- * constructor. When MSAA is enabled, the framebuffer creates a second intermediate framebuffer instance which is used
+ * Supports multi sampled antialiasing (MSAA) which can be enabled in the constructor.
+ * When MSAA is enabled, the framebuffer creates a second intermediate framebuffer instance which is used
  * to "resolve" the multisampled framebuffer into a regular one.
  * <br><br>
- * Multisampled framebuffers with multiple color
- * attachments are also supported. In that case the intermediate framebuffer creates an equivalent singlesampled color
- * attachment for each multisampled one.
+ * Multisampled framebuffers with multiple color attachments are also supported.
+ * In that case the intermediate framebuffer creates equivalent single-sampled color
+ * attachment(s) for each multisampled one.
  * <br><br>
  * Note that the framebuffer sampling settings overwrite any attachment
  * settings as all attachments must have the same sample count and either be all multisampled or none.
+ * <br><br>
+ * After resolving multisampling the resolved framebuffer can be accessed using getResolvedFramebuffer() and further
+ * used.
  */
-class Framebuffer
+class Framebuffer : public std::enable_shared_from_this<Framebuffer>
 {
 private:
 	int m_width{FBO_DEFAULT_WIDTH};   ///< Buffer pixel width
@@ -56,7 +58,7 @@ private:
 	GLuint m_fbo{0}; ///< The created framebuffer object
 
 	/// An intermediate single sample FBO used for resolving the multisampled one
-	std::unique_ptr<Framebuffer> m_multisampleResolveFBO;
+	std::shared_ptr<Framebuffer> m_multisampleResolveFBO;
 
 	/// List of all attached color attachments
 	std::vector<ColorAttachment> m_colorAttachments;
@@ -135,8 +137,10 @@ public:
 	/**
 	 * Finalizes the FBO and unbinds it.\n
 	 * <b>The DEFAULT (0) frame buffer is bound after this call!</b>\n
-	 * \param resolveMultisample If multisample and this argument is true this call resolves the multisampled buffer
-	 * into an intermediate regular (single sampled) one. Whose color texture is then returned via getColorTexture()
+	 * \param resolveMultisample If the fbo is multisampled and this argument is true this call resolves the multisampled buffer
+	 * into an intermediate regular (single sampled) one. Whose color texture is then returned via getColorTexture().
+	 * Note that only the first (index 0) color attachment gets resolved by this call.
+	 * To resolve multiple color buffers or the depth buffer you can use the multisampleResolveXXX() methods.
 	 */
 	void end(bool resolveMultisample = true);
 
@@ -153,6 +157,9 @@ public:
 	 */
 	void resize(int width, int height);
 
+	/**
+	 * Binds the FBO
+	 */
 	void bind() const;
 
 	/**
@@ -161,7 +168,7 @@ public:
 	 * \param multisampled Optional flag specifying if the multisampled or resolved single sampled texture should be
 	 * returned. If multisampling is disabled the single sampled texture will be always returned.
 	 */
-	GLuint getColorTexture(unsigned int index = 0, bool multisampled = true) const;
+	GLuint getColorTexture(unsigned int index = 0, bool multisampled = false) const;
 
 	/**
 	 * @return The id of the Frame Buffer Object
@@ -170,6 +177,13 @@ public:
 
 	bool isInitialized() const;
 
+	/**
+	 * If this framebuffer is multisampled this methods returns a weak pointer to the internal single sampled framebuffer
+	 * that was used to resolve it.
+	 * Otherwise it just returns a weak pointer to itself.
+	 */
+	std::weak_ptr<Framebuffer> getResolvedFramebuffer();
+
 	bool isMultisampled();
 	void setMultisampled(bool multisample, unsigned int samples);
 
@@ -177,13 +191,29 @@ public:
 
 	// TODO: (DR) Docs
 	// MSAA Resolve methods
+
+	/**
+	 * <b>The DEFAULT (0) frame buffer is bound after this call!</b>\n
+	 */
 	void multisampleResolveColors();
+
+	/**
+	 * <b>The DEFAULT (0) frame buffer is bound after this call!</b>\n
+	 */
 	void multisampleResolveColor(unsigned int colorAttachmentIndex);
+
+	/**
+	 * <b>The DEFAULT (0) frame buffer is bound after this call!</b>\n
+	 */
+	void multisampleResolveDepth();
 
 	/**
 	 * Add a color attachment.
 	 * Color attachment index is set to its current order in the color attachments list.
 	 * Multisampling settings are synced with the framebuffer multisampling settings.
+	 * \n
+	 * Note that color attachments are meant to be setup before using the framebuffer.
+	 *
 	 * @param colorAttachment
 	 */
 	void addColorAttachment(ColorAttachment colorAttachment);
@@ -216,13 +246,14 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
+	void setDrawBuffers();
+	void setDrawBuffers(std::vector<unsigned int> indices);
+
 private:
 	/**
 	 * Initialise the fbo. Does NOT check if initialised previously.
 	 */
 	void initImpl(int width, int height);
-
-	void setDrawBuffers();
 	bool checkFramebuffer();
 };
 } // namespace Vp

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "Core/Resources/ResourceManager.h"
 #include "Viewport/Shaper.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/ColoredObject.h"
@@ -9,17 +10,13 @@
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/PhongShader.h"
 
-#include "Core/Resources/ResourceManager.h"
-
 using namespace Vp;
 
-SceneModel::SceneModel(Core::Mesh* mesh, PhongShader* shader) : TexturedObject(mesh, shader)
-{
-	// Empty
-}
+SceneModel::SceneModel(Core::Mesh* mesh, PhongShader* shader) : TexturedObject(mesh, shader) { m_selectable = true; }
 
 SceneModel::SceneModel(std::string modelAlias, PhongShader* shader) : TexturedObject(nullptr, shader)
 {
+	m_selectable = true;
 	setModel(modelAlias);
 }
 
@@ -48,8 +45,8 @@ void SceneModel::update(Scene& scene)
 void SceneModel::onSceneAdd(Scene& scene)
 {
 	TexturedObject::onSceneAdd(scene);
-	auto axes = std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::xyzAxes),
-	                                            scene.m_viewport->m_shaders->m_colorShader.get());
+	auto axes =
+	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::xyzAxes), Shaders::instance().m_colorShader.get());
 	axes->setDisplayType(DisplayType::Axes);
 	m_axes = scene.addEntity(axes);
 }

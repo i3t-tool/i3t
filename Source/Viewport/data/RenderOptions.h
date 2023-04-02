@@ -10,15 +10,15 @@ namespace Vp
 class RenderOptions
 {
 public:
-	bool multisample{false};
-	unsigned int samples{4};
-	bool framebufferAlpha{false};
-	bool wboit{false};
+	bool multisample;
+	unsigned int samples;
+	bool framebufferAlpha;
+	bool wboit;
+	bool selection;
 
-	glm::vec3 clearColor{0.2f, 0.2f, 0.2f};
+	glm::vec3 clearColor;
 
-	RenderOptions() = default;
-	RenderOptions(bool multisample, int samples, bool framebufferAlpha, bool wboit);
+	RenderOptions();
 };
 
 } // namespace Vp

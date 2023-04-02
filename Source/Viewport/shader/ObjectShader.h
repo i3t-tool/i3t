@@ -10,7 +10,7 @@ protected:
 	GLint opacityId;
 
 public:
-	float m_opacity;
+	float m_opacity{1.0f};
 
 	explicit ObjectShader(GLuint id);
 

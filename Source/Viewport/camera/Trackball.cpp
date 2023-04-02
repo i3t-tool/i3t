@@ -152,12 +152,10 @@ float Trackball::projectToSphere(float radius, float x, float y)
 	d = sqrt(x * x + y * y);
 	if (d < radius * 0.70710678118654752440)
 	{ /* Inside sphere */
-		LOG_INFO("INSIDE");
 		z = sqrt(radius * radius - d * d);
 	}
 	else
 	{ /* On hyperbola */
-		LOG_INFO("OUTSIDE");
 		t = radius / 1.41421356237309504880;
 		z = t * t / d;
 	}

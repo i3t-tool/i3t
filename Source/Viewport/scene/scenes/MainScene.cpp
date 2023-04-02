@@ -13,6 +13,7 @@
 #include "Viewport/scene/lights/SunLight.h"
 #include "Viewport/shader/ColorShader.h"
 #include "Viewport/shader/GridShader.h"
+#include "Viewport/shader/PhongShader.h"
 
 using namespace Vp;
 
@@ -43,8 +44,10 @@ void MainScene::init()
 {
 	Scene::init();
 
+	// TODO: (DR) Some of these settings should be updated dynamically, not on init only
 	// Camera
-	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera)) {
+	if (auto camera = std::dynamic_pointer_cast<AggregateCamera>(m_camera))
+	{
 		camera->switchMode(m_viewport->m_settings.mainScene_cameraMode);
 		camera->getOrbitCamera()->setRotationX(m_viewport->m_settings.mainScene_orbitCameraRotationX);
 		camera->getOrbitCamera()->setRotationY(m_viewport->m_settings.mainScene_orbitCameraRotationY);
@@ -92,7 +95,7 @@ void MainScene::init()
 	m_lighting->addLight(sun2);
 
 	m_gridObject =
-	    std::make_shared<GameObject>(RMI.meshByAlias(Shaper::screenQuad), m_viewport->m_shaders->m_gridShader.get());
+	    std::make_shared<GameObject>(RMI.meshByAlias(Shaper::screenQuad), Shaders::instance().m_gridShader.get());
 	m_gridObject->m_opaque = false;
 	m_gridObject->m_explicitTransparencyOrder = 1;
 	m_gridObject->setDisplayType(DisplayType::Grid);
@@ -100,7 +103,7 @@ void MainScene::init()
 
 	//	// Transparency test
 	//	Ptr<ColoredObject> a =
-	//	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::plane), m_viewport->m_shaders->m_colorShader.get());
+	//	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::plane), Shaders::instance().m_colorShader.get());
 	//	a->m_opaque = false;
 	//	a->m_opacity = 0.6f;
 	//	a->m_explicitTransparencyOrder = 1;
@@ -111,7 +114,7 @@ void MainScene::init()
 	//	addEntity(a);
 	//
 	//	Ptr<ColoredObject> b =
-	//	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::plane), m_viewport->m_shaders->m_colorShader.get());
+	//	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::plane), Shaders::instance().m_colorShader.get());
 	//	b->m_opaque = false;
 	//	b->m_opacity = 0.3f;
 	//	b->m_explicitTransparencyOrder = 2;
@@ -129,7 +132,7 @@ void MainScene::init()
 	//		for (int x = 0; x < 10; x++)
 	//		{
 	//			Ptr<ColoredObject> cube = std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::unitCube),
-	//			                                                          m_viewport->m_shaders->m_colorShader.get());
+	//			                                                          Shaders::instance().m_colorShader.get());
 	//			cube->m_opaque = false;
 	//			cube->m_opacity = generateFloat(0.2f, 0.6f);
 	//			cube->m_modelMatrix = glm::translate(cube->m_modelMatrix, glm::vec3(step * x, 0.0f, step * y));

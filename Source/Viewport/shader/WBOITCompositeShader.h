@@ -1,15 +1,16 @@
 #pragma once
 
-#include "ColorShader.h"
+#include "Shader.h"
 
 namespace Vp
 {
 class WBOITCompositeShader : public Shader
 {
-public:
+protected:
 	GLint accumulationSampler;
 	GLint revealageSampler;
 
+public:
 	GLuint accumulationTextureID{0};
 	GLuint revealageTextureID{0};
 

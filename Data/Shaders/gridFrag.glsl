@@ -38,10 +38,11 @@ vec4 grid(vec3 worldPos) {
 	return color;
 }
 
-float linearize_depth(float d,float zNear,float zFar)
+float linearize_depth(float d, float zNear, float zFar)
 {
-	float z_n = 2.0 * d - 1.0;
-	return 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+	float z_ndc = 2.0 * d - 1.0;
+	float depth = 2.0 * zNear * zFar / (zFar + zNear - z_ndc * (zFar - zNear));
+	return depth / zFar;// Normalize depth range
 }
 
 void main()
@@ -54,9 +55,8 @@ void main()
 	float clipSpaceDepth = (clipSpacePos.z / clipSpacePos.w);
 	gl_FragDepth = 0.5 + 0.5 * clipSpaceDepth;
 
-	float linearDepth = (2.0 * near * far) / (far + near - clipSpaceDepth * (far - near));
-	float linearDepthNormalized = linearDepth / far;
-	float fading = max(0, (0.5 - linearDepthNormalized));
+	float linearDepth = linearize_depth(clipSpaceDepth, near, far);
+	float fading = max(0, (0.5 - linearDepth));
 
 	FragColor = grid(worldPos) * float(t > 0);
 	FragColor.a *= fading;
