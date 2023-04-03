@@ -16,9 +16,6 @@ build-app:
     paths:
       - Binaries
     expire_in: 1 week
-  cache:
-    paths:
-      - Binaries
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
 
@@ -26,15 +23,12 @@ build-tests:
   stage: build
   script:
     - mkdir out && cd out
-    - cmake ..
+    - cmake -DCMAKE_BUILD_TYPE=Debug ..
     - cmake --build . -j 8 --target I3TTest
   artifacts:
     paths:
       - Binaries
     expire_in: 1 week
-  cache:
-    paths:
-      - Binaries
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
 
@@ -66,10 +60,11 @@ release:
     - master
   script:
     - mkdir relase-out && cd release-out
-    - cmake -DCMAKE_BUILD_TYPE=ReleaseStandalone .. 
+    - cmake -DCMAKE_BUILD_TYPE=Release ..
     - cmake --build . -j 8 --target I3T
+    - bash Scripts/CreateBundle.sh
   artifacts:
     paths:
-      - Binaries/Release*
+      - I3T*.zip
   dependencies:
-    - build-app
+    - test

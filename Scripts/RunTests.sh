@@ -5,6 +5,11 @@ cd "$SCRIPT_DIR" && cd ..
 
 TEST="Binaries/Debug/I3TTest"
 
+if [ ! -f $TEST ]; then
+  echo "Binary $TEST does not exists!"
+  exit 1
+fi
+
 $TEST --gtest_filter=*-StateTest.*:GLTFResourcesTest.*:UndoRedoTest.*:ResourceManagerTest.*:NodeToolsTest.*
 
 if [ -z ${DISPLAY+x} ]; then
