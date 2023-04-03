@@ -30,7 +30,7 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 
 # ========== BUILD CONFIGURATION ==============================
 # ---------- Setup compiler parameters. ------------------------
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # ==== Organize files into groups in Visual Studio based on directories (ideal goal)
