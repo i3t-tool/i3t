@@ -294,8 +294,6 @@ bool DiwneObject::processSelect() { return true; }
 bool DiwneObject::allowProcessSelect() { return m_isHeld && !m_isDraged; }
 bool DiwneObject::processObjectSelect()
 {
-	// TODO: (DR) node is selected on mouse release, might want to select it on
-	// click; Response (JH): It is select on click (release while not draging)
 	if (bypassSelectAction() && allowProcessSelect() && !InputManager::isAxisActive("DONTselect"))
 	{
 		setSelected(true);

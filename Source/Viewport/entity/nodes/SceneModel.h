@@ -1,6 +1,8 @@
 #pragma once
 
-#include "TexturedObject.h"
+#include "Core/Nodes/Id.h"
+
+#include "Viewport/entity/TexturedObject.h"
 
 namespace Vp
 {
@@ -13,8 +15,9 @@ class ColoredObject;
 class SceneModel : public TexturedObject
 {
 public:
+	Core::ID m_guiNodeId; ///< ID of the gui node object is representing
+
 	bool m_showAxes{true};
-	bool m_transparent{false}; // TODO: Implement
 
 	std::string m_modelAlias{};
 

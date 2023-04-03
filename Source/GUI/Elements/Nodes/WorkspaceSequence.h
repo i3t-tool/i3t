@@ -8,7 +8,6 @@ private:
 	bool m_isCameraSequence;
 	ImVec4 m_tint = ImVec4(1, 1, 1, 1);
 
-
 protected:
 	int m_position_of_dummy_data = -1;
 	ImVec2 m_sizeOfDummy = ImVec2(100, 1); /* \todo width from some setting */
@@ -61,4 +60,9 @@ public:
 	void drawMenuLevelOfDetail();
 
 	int maxLenghtOfData();
+
+	void updateViewportHighlight(bool selected);
+
+	bool processSelect() override;
+	bool processUnselect() override;
 };

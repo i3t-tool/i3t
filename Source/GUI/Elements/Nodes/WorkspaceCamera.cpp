@@ -1,7 +1,7 @@
 #include "WorkspaceCamera.h"
 
 #include "Viewport/Viewport.h"
-#include "Viewport/entity/SceneCamera.h"
+#include "Viewport/entity/nodes/SceneCamera.h"
 
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
@@ -44,7 +44,7 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 
 	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 
-	m_viewportCamera = App::get().viewport()->createCamera();
+	m_viewportCamera = App::get().viewport()->createCamera(getId());
 	auto cameraPtr = m_viewportCamera.lock();
 	cameraPtr->m_showAxes = m_axisOn;
 	cameraPtr->m_visible = m_showCamera;

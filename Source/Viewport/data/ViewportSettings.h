@@ -42,6 +42,9 @@ public:
 	float highlight_useDepth_darkenFactor;
 	float highlight_useDepth_desaturateFactor;
 
+	glm::vec3 highlight_selectionColor;
+	glm::vec3 highlight_highlightColor;
+
 	ViewportSettings();
 };
 

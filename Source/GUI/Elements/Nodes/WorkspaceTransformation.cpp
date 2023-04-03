@@ -115,29 +115,31 @@ bool WorkspaceTransformation::afterContent()
 		float inactiveMark = this->getNodebase()->as<Core::Transformation>()->getActivePart();
 		if (trackingFromLeft)
 		{
-				if(inactiveMark != 1) //Left tracking
-				{
-					bottomright.x -= (inactiveMark) * size.x;
-					diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
-				}
-				else if(inactiveMark == 1) { //accounting for yellow mark placement
-					bottomright.x -= (inactiveMark) * size.x;
-				}
+			if (inactiveMark != 1) // Left tracking
+			{
+				bottomright.x -= (inactiveMark)*size.x;
+				diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
+			}
+			else if (inactiveMark == 1)
+			{ // accounting for yellow mark placement
+				bottomright.x -= (inactiveMark)*size.x;
+			}
 		}
-		else if(inactiveMark != 0) //RIGHT TRACKING
+		else if (inactiveMark != 0) // RIGHT TRACKING
 		{
 			topleft.x += (1 - inactiveMark) * size.x;
 			diwne.AddRectFilledDiwne(topleft, bottomright, ImColor(0.f, 0.f, 0.f, 0.3f));
 		}
-		else if(inactiveMark == 0)
+		else if (inactiveMark == 0)
 		{
 			topleft.x += (1 - inactiveMark) * size.x;
 		}
 
-		if(std::dynamic_pointer_cast<WorkspaceTransformation>(findNodeById(
-		        dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
-		        dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID()).value()).get()
-		    == this)
+		if (std::dynamic_pointer_cast<WorkspaceTransformation>(
+		        findNodeById(dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
+		                     dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID())
+		            .value())
+		        .get() == this)
 		{
 			ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
 			ImVec2 markSize = I3T::getSize(ESizeVec2::Nodes_Transformation_TrackingMarkSize);
@@ -167,7 +169,6 @@ void WorkspaceTransformation::popupContent()
 	ImGui::Separator();
 
 	WorkspaceNodeWithCoreData::drawMenuDuplicate();
-
 
 	ImGui::Separator();
 
@@ -239,6 +240,7 @@ void WorkspaceTransformation::deleteAction()
 {
 	m_removeFromWorkspaceWindow = true;
 	m_removeFromSequence = true;
+	m_parentSequence.reset();
 }
 
 void WorkspaceTransformation::drawMenuDelete()
@@ -415,4 +417,22 @@ bool WorkspaceTransformation::isInSequence() { return m_nodebase->as<Core::Trans
 Ptr<Core::NodeBase> WorkspaceTransformation::getNodebaseSequence()
 {
 	return m_nodebase->as<Core::Transformation>()->getCurrentSequence();
+}
+
+bool WorkspaceTransformation::processSelect()
+{
+	if (auto sequence = m_parentSequence.lock())
+	{
+		sequence->updateViewportHighlight(true);
+	}
+	return WorkspaceNodeWithCoreData::processSelect();
+}
+
+bool WorkspaceTransformation::processUnselect()
+{
+	if (auto sequence = m_parentSequence.lock())
+	{
+		sequence->updateViewportHighlight(false);
+	}
+	return WorkspaceNodeWithCoreData::processUnselect();
 }

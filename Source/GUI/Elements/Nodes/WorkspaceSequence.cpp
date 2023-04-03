@@ -1,5 +1,8 @@
 #include "WorkspaceSequence.h"
+
 #include "../Windows/WorkspaceWindow.h"
+#include "Viewport/Viewport.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
                                      Ptr<Core::NodeBase> nodebase /*= Core::GraphManager::createSequence()*/,
@@ -54,14 +57,16 @@ int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
 
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
-	auto node_iter =
-	    std::find_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
-	                 [node](auto innerNode) -> bool { return node == innerNode; });
+	auto node_iter = std::find_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
+	                              [node](auto innerNode) -> bool { return node == innerNode; });
 
 	if (node_iter != m_workspaceInnerTransformations.end())
 	{
 		int index = node_iter - m_workspaceInnerTransformations.begin();
-		std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter)->setRemoveFromSequence(true);
+		std::shared_ptr<WorkspaceTransformation> transformation =
+		    std::dynamic_pointer_cast<WorkspaceTransformation>(*node_iter);
+		transformation->setRemoveFromSequence(true);
+		transformation->m_parentSequence.reset();
 		// is done in next frame based on setRemoveFromSequence(true)
 		// m_workspaceInnerTransformations.erase(node_iter);
 		m_nodebase->as<Core::Sequence>()->popMatrix(index);
@@ -76,6 +81,7 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 		node_t->setRemoveFromSequence(false);
 		m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin() + index, node_t);
 		m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
+		node_t->m_parentSequence = std::static_pointer_cast<WorkspaceSequence>(shared_from_this());
 	}
 }
 
@@ -115,7 +121,8 @@ void WorkspaceSequence::setPostionOfDummyData(int positionOfDummyData)
 
 void WorkspaceSequence::popupContentTracking()
 {
-	if(Core::GraphManager::isTrackingEnabled() && dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getSequence()->getId() == this->getNodebase()->getId())
+	if (Core::GraphManager::isTrackingEnabled() &&
+	    dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getSequence()->getId() == this->getNodebase()->getId())
 	{
 		if (ImGui::MenuItem("Stop tracking", ""))
 		{
@@ -130,8 +137,10 @@ void WorkspaceSequence::popupContentTracking()
 	{
 		if (ImGui::MenuItem("Start tracking", ""))
 		{
-			if(Core::GraphManager::isTrackingEnabled()) dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOff();
-			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOn(std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+			if (Core::GraphManager::isTrackingEnabled())
+				dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOff();
+			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOn(
+			    std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
 		}
 		if (ImGui::MenuItem("Smooth tracking", "", false, false))
 		{
@@ -159,7 +168,6 @@ void WorkspaceSequence::popupContent()
 	ImGui::Separator();
 
 	WorkspaceNode::popupContent();
-
 }
 
 bool WorkspaceSequence::beforeContent()
@@ -184,7 +192,8 @@ bool WorkspaceSequence::afterContent()
 
 bool WorkspaceSequence::topContent()
 {
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeaderTranformation)*m_tint,
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeHeaderTranformation) * m_tint,
 	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_Top);
 
 	return WorkspaceNodeWithCoreData::topContent();
@@ -241,8 +250,7 @@ bool WorkspaceSequence::middleContent()
 		auto it = m_workspaceInnerTransformations.begin();
 		while (it != m_workspaceInnerTransformations.end())
 		{
-			bool removeFromSeq =
-			    std::dynamic_pointer_cast<WorkspaceTransformation>(*it)->getRemoveFromSequence();
+			bool removeFromSeq = std::dynamic_pointer_cast<WorkspaceTransformation>(*it)->getRemoveFromSequence();
 			if (removeFromSeq)
 			{
 				popNode(*it);
@@ -350,4 +358,46 @@ int WorkspaceSequence::maxLenghtOfData()
 		                          m_numberOfVisibleDecimal);
 	}
 	return 0;
+}
+
+void WorkspaceSequence::updateViewportHighlight(bool selected)
+{
+	// TODO: (DR) getSequenceModels() is not very appropriate to use. A simpler method could work if output pins had a
+	//   reference to their link!
+	std::vector<Ptr<WorkspaceModel>> modelNodes = dynamic_cast<WorkspaceDiwne&>(diwne).getSequenceModels(
+	    static_pointer_cast<WorkspaceSequence>(shared_from_this()));
+	for (const auto& modelNode : modelNodes)
+	{
+		if (selected)
+		{
+			modelNode->m_highlightCounter++;
+			auto model = modelNode->m_viewportModel.lock();
+			if (!modelNode->m_selected && modelNode->m_highlightCounter > 0)
+			{
+				model->m_highlight = true;
+				model->m_highlightColor = App::get().viewport()->getSettings().highlight_highlightColor;
+			}
+		}
+		else
+		{
+			modelNode->m_highlightCounter = std::max(0, --modelNode->m_highlightCounter);
+			auto model = modelNode->m_viewportModel.lock();
+			if (!modelNode->m_selected && modelNode->m_highlightCounter <= 0)
+			{
+				model->m_highlight = false;
+			}
+		}
+	}
+}
+
+bool WorkspaceSequence::processSelect()
+{
+	updateViewportHighlight(true);
+	return WorkspaceNodeWithCoreDataWithPins::processSelect();
+}
+
+bool WorkspaceSequence::processUnselect()
+{
+	updateViewportHighlight(false);
+	return WorkspaceNodeWithCoreDataWithPins::processUnselect();
 }

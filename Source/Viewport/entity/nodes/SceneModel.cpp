@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Core/Resources/ResourceManager.h"
+
 #include "Viewport/Shaper.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/ColoredObject.h"

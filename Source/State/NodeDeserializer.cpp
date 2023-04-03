@@ -4,7 +4,7 @@
 #include "GUI/Elements/Nodes/Builder.h"
 #include "GUI/Elements/Nodes/Tools.h"
 #include "Utils/JSON.h"
-#include "Viewport/entity/SceneModel.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 
 #ifdef WIN32
 #undef GetObject

@@ -62,6 +62,7 @@ public:                             /* \todo some atributes should be private/pr
 		return !m_inner_interaction_happen && m_inner_interaction_happen_previous_draw;
 	};
 
+	// TODO: (DR) Why aren't these functions virtual? There are redefinitions in Node.h.
 	/*! \brief Setter of selection state
 	 *
 	 * \param selected is new state of object
