@@ -123,7 +123,6 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 					}
 					entity->render(view, projection);
 				}
-				entity->m_wboit = true; // Next pass should be using wboit
 			}
 		}
 		mainFBO->end(false);
@@ -163,6 +162,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 			// Render transparent objects with their WBOIT flag enabled (enabled after opaque pass)
 			for (auto& entity : m_unorderedTransparentEntities)
 			{
+				entity->m_wboit = true;
+				entity->m_wboitFunc = renderOptions.wboitFunc;
 				if (entity->m_selectable)
 				{
 					glStencilMask(0xFF);

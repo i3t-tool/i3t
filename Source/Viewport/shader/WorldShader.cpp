@@ -1,14 +1,24 @@
 #include "WorldShader.h"
 
+#include "Viewport/GfxUtils.h"
+
 using namespace Vp;
 
-WorldShader::WorldShader(GLuint id) : Shader(id)
+WorldShader::WorldShader(GLuint id) : Shader(id) { init(false); }
+
+void WorldShader::init(bool initSuperclass)
 {
-	pvmMatrixId = glGetUniformLocation(id, "pvmMatrix");
-	projectionMatrixId = glGetUniformLocation(id, "projectionMatrix");
-	modelMatrixId = glGetUniformLocation(id, "modelMatrix");
-	viewMatrixId = glGetUniformLocation(id, "viewMatrix");
-	normalMatrixId = glGetUniformLocation(id, "normalMatrix");
+	if (initSuperclass)
+		Shader::init(true);
+
+	pvmMatrixId = glGetUniformLocation(m_id, "pvmMatrix");
+	projectionMatrixId = glGetUniformLocation(m_id, "projectionMatrix");
+	modelMatrixId = glGetUniformLocation(m_id, "modelMatrix");
+	viewMatrixId = glGetUniformLocation(m_id, "viewMatrix");
+	normalMatrixId = glGetUniformLocation(m_id, "normalMatrix");
+
+	m_wboitNearId = glGetUniformLocation(m_id, "u_wboitNear");
+	m_wboitFarId = glGetUniformLocation(m_id, "u_wboitFar");
 }
 
 void WorldShader::setUniforms()
@@ -23,6 +33,15 @@ void WorldShader::setUniforms()
 	glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, glm::value_ptr(m_view));
 	glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, glm::value_ptr(m_model));
 	glUniformMatrix4fv(normalMatrixId, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+	if (supportsWboit() && m_wboit)
+	{
+		float nearVal;
+		float farVal;
+		GfxUtils::extractZNearZFar(m_projection, nearVal, farVal);
+		glUniform1f(m_wboitNearId, nearVal);
+		glUniform1f(m_wboitFarId, farVal);
+	}
 
 	Shader::setUniforms();
 }

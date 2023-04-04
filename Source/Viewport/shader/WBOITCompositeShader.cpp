@@ -2,10 +2,15 @@
 
 using namespace Vp;
 
-WBOITCompositeShader::WBOITCompositeShader(GLuint id) : Shader(id)
+WBOITCompositeShader::WBOITCompositeShader(GLuint id) : Shader(id) { init(false); }
+
+void WBOITCompositeShader::init(bool initSuperclass)
 {
-	accumulationSampler = glGetUniformLocation(id, "accum");
-	revealageSampler = glGetUniformLocation(id, "reveal");
+	if (initSuperclass)
+		Shader::init(true);
+
+	accumulationSampler = glGetUniformLocation(m_id, "accum");
+	revealageSampler = glGetUniformLocation(m_id, "reveal");
 }
 
 void WBOITCompositeShader::setUniforms()

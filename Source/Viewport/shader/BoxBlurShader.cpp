@@ -2,12 +2,17 @@
 
 using namespace Vp;
 
-BoxBlurShader::BoxBlurShader(GLuint id) : Shader(id)
+BoxBlurShader::BoxBlurShader(GLuint id) : Shader(id) { init(false); }
+
+void BoxBlurShader::init(bool initSuperclass)
 {
-	m_sourceSampler = glGetUniformLocation(id, "source");
-	m_kernelSizeId = glGetUniformLocation(id, "u_kernelSize");
-	m_verticalId = glGetUniformLocation(id, "u_vertical");
-	m_resolutionId = glGetUniformLocation(id, "u_resolution");
+	if (initSuperclass)
+		Shader::init(true);
+
+	m_sourceSampler = glGetUniformLocation(m_id, "source");
+	m_kernelSizeId = glGetUniformLocation(m_id, "u_kernelSize");
+	m_verticalId = glGetUniformLocation(m_id, "u_vertical");
+	m_resolutionId = glGetUniformLocation(m_id, "u_resolution");
 }
 
 void BoxBlurShader::setUniforms()

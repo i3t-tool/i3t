@@ -14,6 +14,7 @@ public:
 
 	explicit ObjectShader(GLuint id);
 
+	void init(bool initSuperclass) override;
 	void setUniforms() override;
 };
 

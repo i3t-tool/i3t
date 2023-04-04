@@ -26,25 +26,29 @@ WorkspaceModel::~WorkspaceModel()
 
 void WorkspaceModel::popupContent_axis_showmodel()
 {
+	auto model = m_viewportModel.lock();
+
+	ImGui::Separator();
+
 	if (ImGui::MenuItem("Show axes", NULL, m_axisOn))
 	{
 		m_axisOn = !m_axisOn;
-		m_viewportModel.lock()->m_showAxes = m_axisOn;
+		model->m_showAxes = m_axisOn;
 	}
 	if (ImGui::MenuItem("Show model", NULL, m_showModel))
 	{
 		m_showModel = !m_showModel;
-		m_viewportModel.lock()->m_visible = m_showModel;
+		model->m_visible = m_showModel;
 	}
-	if (ImGui::BeginMenu("Change model"))
+	if (ImGui::BeginMenu("Transparency"))
 	{
-		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
+		bool transparent = !model->m_opaque;
+		if (ImGui::Checkbox("Transparent", &transparent))
 		{
-			if (ImGui::MenuItem(resource.alias.c_str()))
-			{
-				m_viewportModel.lock()->setModel(resource.alias);
-			}
+			model->m_opaque = !model->m_opaque;
 		}
+		ImGui::Checkbox("Back-face cull", &model->m_backFaceCull);
+		ImGui::SliderFloat("Opacity", &model->m_opacity, 0.0f, 1.0f, "%.2f");
 		ImGui::EndMenu();
 	}
 	if (ImGui::BeginMenu("Set tint"))
@@ -52,42 +56,53 @@ void WorkspaceModel::popupContent_axis_showmodel()
 		if (ImGui::MenuItem("None"))
 		{
 			m_tint = glm::vec3(1.0f);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Red"))
 		{
 			m_tint = calculateTint(Color::RED);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Blue"))
 		{
 			m_tint = calculateTint(Color::BLUE);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Green"))
 		{
 			m_tint = calculateTint(Color::GREEN);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Yellow"))
 		{
 			m_tint = calculateTint(Color::YELLOW);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Orange"))
 		{
 			m_tint = calculateTint(Color::ORANGE);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Magenta"))
 		{
 			m_tint = calculateTint(Color::MAGENTA);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
 		}
 		if (ImGui::MenuItem("Teal"))
 		{
 			m_tint = calculateTint(Color::TEAL);
-			m_viewportModel.lock()->m_tint = m_tint;
+			model->m_tint = m_tint;
+		}
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Change model"))
+	{
+		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
+		{
+			if (ImGui::MenuItem(resource.alias.c_str()))
+			{
+				model->setModel(resource.alias);
+			}
 		}
 		ImGui::EndMenu();
 	}

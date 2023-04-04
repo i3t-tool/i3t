@@ -62,6 +62,8 @@ private:
 	std::set<std::string> m_importedResources;
 
 public:
+	bool m_forceReload{false}; /// If true any resource fetches will not be cached
+
 	~ResourceManager();
 
 	static ResourceManager& instance();

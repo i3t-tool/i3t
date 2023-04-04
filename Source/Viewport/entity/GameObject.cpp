@@ -14,6 +14,7 @@ void GameObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bo
 	auto objectShader = static_cast<ObjectShader*>(shader);
 	objectShader->use();
 	objectShader->m_wboit = m_wboit;
+	objectShader->m_wboitFunc = m_wboitFunc;
 	objectShader->m_opacity = m_opaque || silhouette ? 1.0f : m_opacity;
 	objectShader->setWorldTransform(m_modelMatrix, view, projection);
 	objectShader->setUniforms();

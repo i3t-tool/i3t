@@ -28,6 +28,8 @@ public:
 
 	explicit PhongShader(GLuint id);
 
+	void init(bool initSuperclass) override;
+
 	void setUniforms() override;
 	void setUniformsPerMeshPart(Core::Mesh::MeshPart& meshPart) override;
 

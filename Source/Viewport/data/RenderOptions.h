@@ -14,6 +14,7 @@ public:
 	unsigned int samples;
 	bool framebufferAlpha;
 	bool wboit;
+	int wboitFunc;
 	bool selection;
 
 	glm::vec3 clearColor;
