@@ -161,10 +161,13 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 
 void WorkspaceDiwne::trackingSwitchOff()
 {
-	LOG_INFO("TRACKING OFF");
-	auto seq = findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
-	std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
-	tracking->getSequence()->stopTracking();
+	LOG_INFO("TRACKING OFF CALLED");
+	if(Core::GraphManager::isTrackingEnabled())
+	{
+		auto seq = findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
+		std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
+		tracking->getSequence()->stopTracking();
+	}
 }
 
 ImRect WorkspaceDiwne::getOverNodesRectangleDiwne(std::vector<Ptr<WorkspaceNodeWithCoreData>> nodes)
