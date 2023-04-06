@@ -32,7 +32,7 @@ WorkspaceDiwne* g_workspaceDiwne = nullptr;
 WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     : Diwne(settingsDiwne), m_workspaceDiwneAction(WorkspaceDiwneAction::None),
       m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_resizeDataWidth(false),
-      m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true)
+      m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
 
 {
 }
@@ -162,7 +162,7 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 void WorkspaceDiwne::trackingSwitchOff()
 {
 	LOG_INFO("TRACKING OFF CALLED");
-	if(Core::GraphManager::isTrackingEnabled())
+	if (Core::GraphManager::isTrackingEnabled())
 	{
 		auto seq = findNodeById(getAllNodesInnerIncluded(), tracking->getSequence()->getId()).value();
 		std::dynamic_pointer_cast<WorkspaceSequence>(seq)->setTint(ImVec4(1, 1, 1, 1));
@@ -1137,6 +1137,19 @@ std::vector<Ptr<WorkspaceNodeWithCoreData>> WorkspaceDiwne::getAllCameras()
 	return cameras;
 }
 
+std::vector<Ptr<WorkspaceModel>> WorkspaceDiwne::getAllModels()
+{
+	std::vector<Ptr<WorkspaceModel>> models;
+	for (auto const& node : m_workspaceCoreNodes)
+	{
+		if (auto model = std::dynamic_pointer_cast<WorkspaceModel>(node))
+		{
+			models.push_back(model);
+		};
+	}
+	return models;
+}
+
 Ptr<WorkspaceModel> WorkspaceDiwne::getSequenceModel(Ptr<WorkspaceSequence> seq)
 {
 	std::vector<Ptr<WorkspaceModel>> models;
@@ -1171,6 +1184,7 @@ Ptr<WorkspaceModel> WorkspaceDiwne::getSequenceModel(Ptr<WorkspaceSequence> seq)
 	return ret;
 }
 
+// TODO: (DR) This method is no longer used, replaced with ViewportHighlightResolver
 std::vector<Ptr<WorkspaceModel>> WorkspaceDiwne::getSequenceModels(Ptr<WorkspaceSequence> seq)
 {
 	std::vector<Ptr<WorkspaceModel>> models;
@@ -1289,6 +1303,7 @@ bool WorkspaceDiwne::afterContent()
 bool WorkspaceDiwne::afterEnd()
 {
 	m_workspaceDiwneActionPreviousFrame = m_workspaceDiwneAction;
+	m_viewportHighlightResolver.resolve();
 	return false;
 }
 

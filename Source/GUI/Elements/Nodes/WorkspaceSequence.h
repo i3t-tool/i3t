@@ -60,9 +60,4 @@ public:
 	void drawMenuLevelOfDetail();
 
 	int maxLenghtOfData();
-
-	void updateViewportHighlight(bool selected);
-
-	bool processSelect() override;
-	bool processUnselect() override;
 };

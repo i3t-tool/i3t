@@ -27,11 +27,12 @@
 #include "Core/API.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
+#include "Core/Nodes/Id.h"
 
 #include "GUI/Elements/IWindow.h"
-#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
-
 #include "GUI/Elements/Nodes/Tools.h"
+#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
+#include "GUI/ViewportHighlightResolver.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
 
@@ -59,6 +60,8 @@ public:
 	Core::MatrixTracker* tracking;
 	bool smoothTracking;
 
+	ViewportHighlightResolver m_viewportHighlightResolver;
+
 	void popupContent();
 
 	bool beforeBegin();
@@ -78,11 +81,17 @@ public:
 		                                                            : m_workspaceDiwneAction;
 	}
 
-	/** * \brief All WorkspaceNodes
-	 * \note Nodes inside Sequentions are not directly in this vector (they are in
-	 *Sequence)
+	/**
+	 * \brief All WorkspaceNodes
+	 * \note Nodes inside Sequentions are not directly in this vector (they are in Sequence)
 	 **/
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceCoreNodes;
+
+	/**
+	 * A map connecting Core node id's with equivalent gui nodes.
+	 * Contains raw pointers as values so it can be populated in constructors.
+	 */
+	std::unordered_map<Core::ID, WorkspaceNodeWithCoreData*> m_coreIdMap;
 
 	const std::vector<Ptr<WorkspaceNodeWithCoreData>>& getAllNodes() const { return m_workspaceCoreNodes; };
 
@@ -135,7 +144,7 @@ public:
 
 	void detectRotationTransformAndSetFloatMode(auto node)
 	{
-		if(std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerX>>(node) != nullptr ||
+		if (std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerX>>(node) != nullptr ||
 		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerY>>(node) != nullptr ||
 		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerZ>>(node) != nullptr ||
 		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::Quat>>(node) != nullptr ||
@@ -193,6 +202,7 @@ public:
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllNodesInnerIncluded();
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllCameras();
+	std::vector<Ptr<WorkspaceModel>> getAllModels();
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllInputFreeSequence();
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getAllInputFreeModel();
 

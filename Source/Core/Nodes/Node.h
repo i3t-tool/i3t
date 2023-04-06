@@ -425,14 +425,14 @@ public:
 	 * The callback parameters:<br>
 	 * Node* = node that has been updated<br>
 	 */
-	void addUpdateCallback(std::function<void(Node*)> callback);
+	virtual void addUpdateCallback(std::function<void(Node*)> callback);
 
 	/**
 	 * <br><br>
 	 * The callback parameters:<br>
 	 * Node* = node that has been deleted<br>
 	 */
-	void addDeleteCallback(std::function<void(Node*)> callback);
+	virtual void addDeleteCallback(std::function<void(Node*)> callback);
 
 	/**
 	 * Registers a callback that gets called when the node's output or input pins get plugged in.
@@ -443,7 +443,7 @@ public:
 	 * size_t = Start node's output pin index<br>
 	 * size_t = End node's input pin index<br>
 	 */
-	void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
+	virtual void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
 	/**
 	 * Registers a callback that gets called when the node's output or input pins get unplugged.
@@ -454,7 +454,7 @@ public:
 	 * size_t = Start node's output pin index<br>
 	 * size_t = End node's input pin index<br>
 	 */
-	void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
+	virtual void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
 protected:
 	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);

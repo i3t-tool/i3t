@@ -14,9 +14,13 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
                        diwne.getWorkAreaZoom()) /* just for safe if someone not call
                                                    setDataItemsWidth() in constructor of
                                                    child class... */
-      , m_levelOfDetail(WorkspaceLevelOfDetail::Full),
-      m_floatPopupMode(Value)
+      ,
+      m_levelOfDetail(WorkspaceLevelOfDetail::Full), m_floatPopupMode(Value)
 {
+	// Register connection between core node and gui node
+	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.insert(std::make_pair(m_nodebase->getId(), this));
+	// Register core node calbacks
+	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.registerNodeCallbacks(m_nodebase.get());
 }
 
 // TODO: (DR) Commented out for now, more info in the header file
@@ -51,7 +55,12 @@ WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Co
 // 	return InputManager::isActionTriggered("touch", EKeyState::Released);
 // }
 
-WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData() { m_nodebase->finalize(); }
+WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
+{
+	m_nodebase->finalize();
+	// Unregister connection between core node and gui node
+	static_cast<WorkspaceDiwne&>(diwne).m_coreIdMap.erase(m_nodebase->getId());
+}
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
@@ -65,21 +74,19 @@ bool WorkspaceNodeWithCoreData::topContent()
 	ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel)).x + 5);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
 
-	if(m_isLabelBeingEdited)
+	if (m_isLabelBeingEdited)
 	{
-		interaction_happen = ImGui::InputText(fmt::format("##{}topLabel",
-		                                                  m_labelDiwne).c_str(),
-		                                      						&(this->m_topLabel),
-		                                      						ImGuiInputTextFlags_NoHorizontalScroll);
+		interaction_happen = ImGui::InputText(fmt::format("##{}topLabel", m_labelDiwne).c_str(), &(this->m_topLabel),
+		                                      ImGuiInputTextFlags_NoHorizontalScroll);
 		auto id = ImGui::GetItemID();
-		if(m_isFirstDraw)
+		if (m_isFirstDraw)
 		{
 			ImGui::ActivateItem(id);
 			interaction_happen = true;
 			m_isFirstDraw = false;
 		}
 		interaction_happen |= ImGui::IsItemActive();
-		if(!interaction_happen)
+		if (!interaction_happen)
 		{
 			m_isLabelBeingEdited = false;
 			m_isFirstDraw = true;
@@ -143,7 +150,7 @@ bool WorkspaceNodeWithCoreData::drawDataLabel() { return false; }
 
 void WorkspaceNodeWithCoreData::drawMenuSetEditable()
 {
-	if(ImGui::MenuItem("Rename", nullptr, m_isLabelBeingEdited))
+	if (ImGui::MenuItem("Rename", nullptr, m_isLabelBeingEdited))
 	{
 		m_isLabelBeingEdited = !m_isLabelBeingEdited;
 	}
@@ -152,16 +159,14 @@ void WorkspaceNodeWithCoreData::drawMenuSetEditable()
 void WorkspaceNodeWithCoreData::drawMenuDuplicate()
 {
 	if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
-		{
-		  //duplicate
-			static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
-			duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-			    App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
-		  //move original node behind new one
-		  static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
-
-		}
-
+	{
+		// duplicate
+		static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
+		duplicateNode(std::static_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
+		              App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+		// move original node behind new one
+		static_cast<WorkspaceDiwne&>(diwne).shiftNodesToBegin(static_cast<WorkspaceDiwne&>(diwne).getSelectedNodes());
+	}
 }
 
 void WorkspaceNodeWithCoreData::drawMenuSetPrecision()
@@ -205,7 +210,7 @@ bool WorkspaceNodeWithCoreData::processObjectDrag()
 	if (bypassDragAction() && allowProcessDrag())
 	{
 		m_isDraged = true;
-		if(!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
+		if (!getSelected() && diwne.getDiwneActionPreviousFrame() == getDragActionType())
 		{
 			static_cast<WorkspaceDiwne&>(diwne).deselectNodes();
 		}
@@ -213,6 +218,18 @@ bool WorkspaceNodeWithCoreData::processObjectDrag()
 		return processDrag();
 	}
 	return false;
+}
+
+bool WorkspaceNodeWithCoreData::processSelect()
+{
+	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
+	return WorkspaceNode::processSelect();
+}
+
+bool WorkspaceNodeWithCoreData::processUnselect()
+{
+	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
+	return WorkspaceNode::processUnselect();
 }
 
 WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
@@ -235,7 +252,7 @@ WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core
 bool WorkspaceCorePin::content()
 {
 	bool interaction_happen = false;
-	if(getCorePin().getRenderPins())
+	if (getCorePin().getRenderPins())
 	{
 		float alpha = ImGui::GetStyle().Alpha;
 
@@ -251,7 +268,7 @@ bool WorkspaceCorePin::content()
 		float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
-									 ImVec4(padding, padding, padding, padding), isConnected());
+		               ImVec4(padding, padding, padding, padding), isConnected());
 		m_iconRectDiwne = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
 
 		if (getShowLabel())
@@ -261,7 +278,7 @@ bool WorkspaceCorePin::content()
 
 				auto label = getCorePin().getLabel();
 				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-						label == "pulse")
+				    label == "pulse")
 				{
 					ImGui::TextUnformatted("");
 				}
@@ -276,7 +293,7 @@ bool WorkspaceCorePin::content()
 
 				auto label = getLabel();
 				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-						label == "pulse")
+				    label == "pulse")
 				{
 					ImGui::TextUnformatted("");
 				}
@@ -287,7 +304,7 @@ bool WorkspaceCorePin::content()
 				}
 			}
 		}
-	ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
 	}
 	return interaction_happen;
 }
@@ -906,14 +923,14 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 
 	for (auto pin : this->getNodebase()->getInputPins())
 	{
-		if(pin.getRenderPins())
+		if (pin.getRenderPins())
 		{
 			pinsVisible = true;
 			break;
 		}
 	}
 
-	if(pinsVisible)
+	if (pinsVisible)
 	{
 		WorkspaceDiwne& wd = static_cast<WorkspaceDiwne&>(diwne);
 
@@ -923,7 +940,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Min.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : m_workspaceInputs)
 			{
-				if(!pin->getCorePin().getRenderPins())
+				if (!pin->getCorePin().getRenderPins())
 					continue;
 
 				pin->setConnectionPointDiwne(pinConnectionPoint);
@@ -937,7 +954,7 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 		{
 			for (auto const& pin : m_workspaceInputs)
 			{
-				if(!pin->getCorePin().getRenderPins()) 
+				if (!pin->getCorePin().getRenderPins())
 					continue;
 
 				inner_interaction_happen |= pin->drawDiwne();
@@ -960,14 +977,14 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 
 	for (auto pin : this->getNodebase()->getOutputPins())
 	{
-		if(pin.getRenderPins())
+		if (pin.getRenderPins())
 		{
 			pinsVisible = true;
 			break;
 		}
 	}
 
-	if(pinsVisible)
+	if (pinsVisible)
 	{
 		if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
 		{
@@ -975,7 +992,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 			ImVec2 pinConnectionPoint = ImVec2(nodeRect.Max.x, (nodeRect.Min.y + nodeRect.Max.y) / 2);
 			for (auto const& pin : getOutputs())
 			{
-				if(!pin->getCorePin().getRenderPins())
+				if (!pin->getCorePin().getRenderPins())
 					continue;
 
 				pin->setConnectionPointDiwne(pinConnectionPoint);
@@ -989,7 +1006,7 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 			m_minRightAlignOfRightPins = FLT_MAX;
 			for (auto const& pin : getOutputsToShow())
 			{
-				if(!pin->getCorePin().getRenderPins())
+				if (!pin->getCorePin().getRenderPins())
 					continue;
 
 				act_align = std::max(0.0f, (m_rightRectDiwne.GetWidth() - pin->getRectDiwne().GetWidth()) *

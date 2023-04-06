@@ -171,20 +171,11 @@ void Sequence::Multiplier::updateValues(int inputIndex)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence(MatrixTracker* tracker) : NodeBase(&g_sequence)
-{
-	m_tracker = tracker;
-}
+Sequence::Sequence(MatrixTracker* tracker) : NodeBase(&g_sequence) { m_tracker = tracker; }
 
-Sequence::~Sequence()
-{
-	stopTracking();
-}
+Sequence::~Sequence() { stopTracking(); }
 
-Ptr<Node> Sequence::clone()
-{
-	return Builder::createSequence(m_tracker);
-}
+Ptr<Node> Sequence::clone() { return Builder::createSequence(m_tracker); }
 
 Pin& Sequence::getIn(size_t i)
 {
@@ -303,4 +294,15 @@ void Sequence::receiveSignal(int inputIndex)
 	{
 		spreadSignal(1);
 	}
+}
+
+void Sequence::addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback)
+{
+	m_multiplier->addPlugCallback(callback);
+	Node::addPlugCallback(callback);
+}
+void Sequence::addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback)
+{
+	m_multiplier->addUnplugCallback(callback);
+	Node::addUnplugCallback(callback);
 }
