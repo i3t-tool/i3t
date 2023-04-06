@@ -418,21 +418,3 @@ Ptr<Core::NodeBase> WorkspaceTransformation::getNodebaseSequence()
 {
 	return m_nodebase->as<Core::Transformation>()->getCurrentSequence();
 }
-
-bool WorkspaceTransformation::processSelect()
-{
-	if (auto sequence = m_parentSequence.lock())
-	{
-		sequence->updateViewportHighlight(true);
-	}
-	return WorkspaceNodeWithCoreData::processSelect();
-}
-
-bool WorkspaceTransformation::processUnselect()
-{
-	if (auto sequence = m_parentSequence.lock())
-	{
-		sequence->updateViewportHighlight(false);
-	}
-	return WorkspaceNodeWithCoreData::processUnselect();
-}

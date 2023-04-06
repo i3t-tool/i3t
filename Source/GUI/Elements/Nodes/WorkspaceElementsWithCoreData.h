@@ -80,6 +80,9 @@ public:
 	virtual void popupContent();
 	bool processObjectDrag();
 
+	bool processSelect() override;
+	bool processUnselect() override;
+
 	// TODO: (DR) Mouse buttons are "hard-coded" in DiwneObject, presumably JH was
 	//  trying to hook them up to
 	//  the InputManager. But that change was only made here and not in the

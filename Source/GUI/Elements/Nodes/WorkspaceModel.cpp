@@ -6,6 +6,7 @@
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
 
@@ -251,7 +252,7 @@ bool WorkspaceModel::processSelect()
 bool WorkspaceModel::processUnselect()
 {
 	auto model = m_viewportModel.lock();
-	if (m_highlightCounter > 0)
+	if (m_influenceHighlight)
 	{
 		model->m_highlight = true;
 		model->m_highlightColor = App::get().viewport()->getSettings().highlight_highlightColor;

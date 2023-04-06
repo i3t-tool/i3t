@@ -29,7 +29,8 @@ public:
 	bool m_showModel{true};
 	glm::vec3 m_tint{1.0f};
 
-	int m_highlightCounter{0};
+	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
+	                                  ///< Set by ViewportHighlightResolver.
 
 	WPtr<Vp::SceneModel> viewportModel() { return m_viewportModel; }
 
@@ -51,11 +52,17 @@ public:
 	void popupContent();
 	void popupContent_axis_showmodel();
 
+	/**
+	 * Overridden function for viewport model selection highlight.
+	 */
 	bool processSelect() override;
+
+	/**
+	 * Overridden function for viewport model selection highlight.
+	 */
 	bool processUnselect() override;
 
 private:
 	void init();
 	glm::vec3 calculateTint(glm::vec3 color);
-
 };

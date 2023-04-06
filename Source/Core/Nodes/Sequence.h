@@ -168,6 +168,16 @@ public:
 
 	void updateValues(int inputIndex) override;
 
+	/**
+	 * Overridden function to also notify when the sequence's multiplier is plugged in
+	 */
+	void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback) override;
+
+	/**
+	 * Overridden function to also notify when the sequence's multiplier is unplugged
+	 */
+	void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback) override;
+
 private:
 	void receiveSignal(int inputIndex) override;
 

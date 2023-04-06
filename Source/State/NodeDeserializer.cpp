@@ -41,6 +41,7 @@ void createFrom(const Memento& memento)
 	{
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
 		cycle->setSelected(true);
+		cycle->processSelect();
 		NodeDeserializer::assignCommon(value, cycle);
 		oldToNewId[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
@@ -51,6 +52,7 @@ void createFrom(const Memento& memento)
 	{
 		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
 		camera->setSelected(true);
+		camera->processSelect();
 		NodeDeserializer::assignCommon(value, camera);
 		oldToNewId[value["id"].GetInt()] = camera->getNodebase()->getId();
 
@@ -67,6 +69,7 @@ void createFrom(const Memento& memento)
 	{
 		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
 		screen->setSelected(true);
+		screen->processSelect();
 		NodeDeserializer::assignCommon(value, screen);
 		oldToNewId[value["id"].GetInt()] = screen->getNodebase()->getId();
 	}
@@ -77,6 +80,7 @@ void createFrom(const Memento& memento)
 	{
 		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
 		model->setSelected(true);
+		model->processSelect();
 		NodeDeserializer::assignCommon(value, model);
 		oldToNewId[value["id"].GetInt()] = model->getNodebase()->getId();
 
@@ -141,6 +145,7 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 
 	const auto node = g_OperatorBuilder(type);
 	node->setSelected(true);
+	node->processSelect();
 	const auto coreNode = node->getNodebase();
 
 	assignCommon(value, node);
@@ -192,6 +197,7 @@ Ptr<GuiSequence> createSequence(const rapidjson::Value& value)
 	assignCommon(value, sequence);
 	assignSequence(value, sequence);
 	sequence->setSelected(true);
+	sequence->processSelect();
 	return sequence;
 }
 
@@ -203,6 +209,7 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 
 	const auto node = g_TransformBuilder(type);
 	node->setSelected(true);
+	node->processSelect();
 	const auto coreNode = node->getNodebase()->as<Core::Transformation>();
 
 	assignCommon(value, node);
