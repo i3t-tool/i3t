@@ -45,33 +45,9 @@ ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Cor
 }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
-                                   unsigned fromIndex, unsigned myIndex)
+                                   unsigned fromIndex, unsigned toIndex)
 {
-	I3T_ASSERT(rightNode->getInputPins().size() > myIndex, "Node does not have input pin with given index!");
-	I3T_ASSERT(leftNode->getOutputPins().size() > fromIndex, "Node {} does not have output pin with given index!");
-
-	auto result = isPlugCorrect(&rightNode->getIn(myIndex), &leftNode->getOut(fromIndex));
-	if (result != ENodePlugResult::Ok)
-		return result;
-
-	auto& output = leftNode->getOut(fromIndex);
-	auto& input = rightNode->getIn(myIndex);
-
-	// Insert to toPlug output pin outputs this operator input pin.
-	output.m_outputs.push_back(&input);
-
-	// Attach given operator output pin to this operator input pin.
-	input.m_input = &output;
-
-	for (auto& state : rightNode->m_OperatorState)
-		state = EValueState::Locked;
-
-	if (leftNode->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
-	{
-		leftNode->spreadSignal(fromIndex);
-	}
-
-	return ENodePlugResult::Ok;
+	return leftNode->plug(rightNode, fromIndex, toIndex);
 }
 
 ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
@@ -182,13 +158,7 @@ bool GraphManager::arePlugged(const Pin& input, const Pin& output)
 	return input.getParentPin() == &output;
 }
 
-bool GraphManager::isTrackingEnabled()
-{
-	return s_self->m_tracker.getSequence() != nullptr;
-}
+bool GraphManager::isTrackingEnabled() { return s_self->m_tracker.getSequence() != nullptr; }
 
-void GraphManager::stopTracking()
-{
-	s_self->m_tracker = MatrixTracker{};
-}
+void GraphManager::stopTracking() { s_self->m_tracker = MatrixTracker{}; }
 } // namespace Core

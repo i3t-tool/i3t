@@ -106,8 +106,8 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */
-	[[nodiscard]] static ENodePlugResult plug(const NodePtr& leftNode, const NodePtr& rightNode,
-	                                          unsigned parentOutputPinIndex, unsigned myInputPinIndex);
+	[[nodiscard]] static ENodePlugResult plug(const NodePtr& fromNode, const NodePtr& toNode, unsigned fromIndex,
+	                                          unsigned toIndex);
 
 	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
 	                                                            unsigned nodeOutputIndex = 0);
