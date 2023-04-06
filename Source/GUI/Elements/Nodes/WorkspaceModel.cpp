@@ -150,9 +150,9 @@ void WorkspaceModel::init()
 	// The Model node also updates a public model matrix variable which we can
 	// read
 	m_nodebase->addUpdateCallback(
-	    [this]()
+	    [this](Core::Node* node)
 	    {
-		    std::shared_ptr<Core::Model> modelNode = dynamic_pointer_cast<Core::Model>(m_nodebase);
+		    Core::Model* modelNode = dynamic_cast<Core::Model*>(node);
 		    if (modelNode)
 		    {
 			    m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;

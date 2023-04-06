@@ -16,11 +16,13 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	m_projection->m_selectable = false;
 	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
 	{
-		if(i != 1) m_projection->getNodebase()->getInputPins()[i].setRenderPins(false);
+		if (i != 1)
+			m_projection->getNodebase()->getInputPins()[i].setRenderPins(false);
 	}
 	for (int j = 0; j < m_projection->getNodebase()->getOutputPins().size(); j++)
 	{
-		if(j != 1) m_projection->getNodebase()->getOutputPins()[j].setRenderPins(false);
+		if (j != 1)
+			m_projection->getNodebase()->getOutputPins()[j].setRenderPins(false);
 	}
 	m_projection->getNodebase()->getInputPins()[1].setRenderPins(true);
 	m_projection->getNodebase()->getOutputPins()[1].setRenderPins(true);
@@ -39,8 +41,8 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	m_view->getNodebase()->getOutputPins()[1].setRenderPins(true);
 	m_view->setTopLabel("view");
 
-	//Hide multiplication output to discourage interaction
-	//getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRenderPins(false);
+	// Hide multiplication output to discourage interaction
+	// getNodebase()->getOutputPins()[Core::I3T_CAMERA_OUT_MUL].setRenderPins(false);
 
 	getOutputs()[Core::I3T_CAMERA_OUT_MUL]->m_drawMode = DIWNE::DrawMode::JustDraw;
 
@@ -56,9 +58,9 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	// The Camera node also updates public projection and view matrix variables
 	// which we can read
 	m_nodebase->addUpdateCallback(
-	    [this]()
+	    [this](Core::Node* node)
 	    {
-		    std::shared_ptr<Core::Camera> cameraNode = dynamic_pointer_cast<Core::Camera>(m_nodebase);
+		    Core::Camera* cameraNode = dynamic_cast<Core::Camera*>(node);
 		    if (cameraNode)
 		    {
 			    auto viewportCameraPtr = m_viewportCamera.lock();

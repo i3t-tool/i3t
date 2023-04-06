@@ -47,7 +47,11 @@ const Pin& Node::PinView::operator[](size_t i) const
 	return node->getOut(i);
 }
 
-void Node::finalize() { unplugAll(); }
+void Node::finalize()
+{
+	unplugAll();
+	triggerDeleteCallback(this);
+}
 
 void Node::init()
 {
@@ -86,6 +90,36 @@ void Node::init()
 	else
 		for (int i = 0; i < m_operation->numberOfOutputs; i++)
 			m_OperatorState.push_back(EValueState::Locked);
+}
+
+ENodePlugResult Node::plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex)
+{
+	I3T_ASSERT(rightNode->getInputPins().size() > toIndex, "Node does not have input pin with given index!");
+	I3T_ASSERT(this->getOutputPins().size() > fromIndex, "Node {} does not have output pin with given index!");
+
+	auto& input = rightNode->getIn(toIndex);
+	auto& output = this->getOut(fromIndex);
+
+	auto result = input.m_master->isPlugCorrect(&input, &output);
+	if (result != ENodePlugResult::Ok)
+		return result;
+
+	// Insert to toPlug output pin outputs this operator input pin.
+	output.m_outputs.push_back(&input);
+
+	// Attach given operator output pin to this operator input pin.
+	input.m_input = &output;
+
+	for (auto& state : rightNode->m_OperatorState)
+		state = EValueState::Locked;
+
+	if (this->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
+	{
+		this->spreadSignal(fromIndex);
+	}
+
+	triggerPlugCallback(this, rightNode.get(), fromIndex, toIndex);
+	return ENodePlugResult::Ok;
 }
 
 Ptr<Node> Node::getRootOwner()
@@ -275,7 +309,10 @@ void Node::unplugAll()
 
 	for (size_t i = 0L; i < inputsView.size(); ++i)
 	{
-		unplugInput(i);
+		if (inputsView[i].isPluggedIn())
+		{
+			unplugInput(i);
+		}
 	}
 
 	for (size_t i = 0L; i < outputsView.size(); ++i)
@@ -312,9 +349,14 @@ void Node::unplugInput(size_t index)
 
 	auto inputs = getInputPinsRef();
 	auto* otherPin = inputs[index].m_input;
+	size_t otherPinIndex = -1;
+	Node* otherPinOwner = nullptr;
 
 	if (otherPin)
 	{
+		otherPinOwner = otherPin->getOwner().get();
+		otherPinIndex = otherPin->m_index;
+
 		// Erase pointer to my input pin in connected node outputs.
 		auto& otherPinOutputs = otherPin->m_outputs;
 
@@ -328,7 +370,6 @@ void Node::unplugInput(size_t index)
 		{
 			LOG_FATAL("Can't find pointer to input pin in other node outputs.");
 		}
-
 		auto& myPin = inputs[index];
 		myPin.m_input = nullptr;
 	}
@@ -352,6 +393,8 @@ void Node::unplugInput(size_t index)
 	}
 
 	onUnplugInput(index);
+
+	triggerUnplugCallback(otherPinOwner, this, otherPinIndex, index);
 }
 
 void Node::unplugOutput(size_t index)
@@ -364,7 +407,10 @@ void Node::unplugOutput(size_t index)
 
 	// Set all connected nodes input as nullptr.
 	for (const auto& otherPin : pin.m_outputs)
+	{
 		otherPin->m_input = nullptr;
+		triggerUnplugCallback(this, otherPin->getOwner().get(), index, otherPin->m_index);
+	}
 
 	pin.m_outputs.clear();
 }
@@ -385,12 +431,46 @@ const Transform::DataMap& Node::getDataMapRef()
 	return map;
 }
 
-void Node::updateValues(int inputIndex)
+void Node::updateValues(int inputIndex) { triggerUpdateCallback(this); }
+
+void Node::addUpdateCallback(std::function<void(Node*)> callback) { this->m_updateCallbacks.push_back(callback); }
+void Node::triggerUpdateCallback(Node* node)
 {
 	for (const auto& callback : m_updateCallbacks)
 	{
-		callback();
+		callback(node);
 	}
 }
 
-void Node::addUpdateCallback(std::function<void()> callback) { this->m_updateCallbacks.push_back(callback); }
+void Node::addDeleteCallback(std::function<void(Node*)> callback) { this->m_deleteCallbacks.push_back(callback); }
+void Node::triggerDeleteCallback(Node* node)
+{
+	for (const auto& callback : m_deleteCallbacks)
+	{
+		callback(node);
+	}
+}
+
+void Node::addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback)
+{
+	this->m_plugCallbacks.push_back(callback);
+}
+void Node::triggerPlugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
+{
+	for (const auto& callback : m_plugCallbacks)
+	{
+		callback(fromNode, toNode, fromIndex, toIndex);
+	}
+}
+
+void Node::addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback)
+{
+	this->m_unplugCallbacks.push_back(callback);
+}
+void Node::triggerUnplugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
+{
+	for (const auto& callback : m_unplugCallbacks)
+	{
+		callback(fromNode, toNode, fromIndex, toIndex);
+	}
+}

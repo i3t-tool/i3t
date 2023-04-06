@@ -153,6 +153,13 @@ public:
 	 */
 	void finalize();
 
+	/**
+	 * Connect this node's output pin to another node's input pin.
+	 *
+	 * \return Result enum is returned from the function. \see ENodePlugResult.
+	 */
+	ENodePlugResult plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex);
+
 	//===-- Helper functions
 	//--------------------------------------------------===//
 
@@ -358,13 +365,6 @@ public:
 	 */
 	virtual void updateValues(int inputIndex = 0);
 
-	/**
-	 * Registers a callback that should get called after any updateValues() call.
-	 * Note that some derived nodes might not always call this callback.
-	 * @param callback Callback to call on value update.
-	 */
-	void addUpdateCallback(std::function<void()> callback);
-
 	/// Spread signal to all outputs.
 	/// \todo Does not use operators for calling each follower just once
 	void spreadSignal();
@@ -407,6 +407,56 @@ public:
 	};
 
 protected:
+	std::list<std::function<void(Node*)>> m_updateCallbacks;
+	std::list<std::function<void(Node*)>> m_deleteCallbacks;
+	std::list<std::function<void(Node*, Node*, size_t, size_t)>> m_plugCallbacks;
+	std::list<std::function<void(Node*, Node*, size_t, size_t)>> m_unplugCallbacks;
+
+	void triggerUpdateCallback(Node* node);
+	void triggerDeleteCallback(Node* node);
+	void triggerPlugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex);
+	void triggerUnplugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex);
+
+public:
+	/**
+	 * Registers a callback that gets called on any updateValues() call.
+	 * Note that some derived nodes might not always call this callback.
+	 * <br><br>
+	 * The callback parameters:<br>
+	 * Node* = node that has been updated<br>
+	 */
+	void addUpdateCallback(std::function<void(Node*)> callback);
+
+	/**
+	 * <br><br>
+	 * The callback parameters:<br>
+	 * Node* = node that has been deleted<br>
+	 */
+	void addDeleteCallback(std::function<void(Node*)> callback);
+
+	/**
+	 * Registers a callback that gets called when the node's output or input pins get plugged in.
+	 * <br><br>
+	 * The callback parameters:<br>
+	 * Node* = Start node<br>
+	 * Node* = End node<br>
+	 * size_t = Start node's output pin index<br>
+	 * size_t = End node's input pin index<br>
+	 */
+	void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
+
+	/**
+	 * Registers a callback that gets called when the node's output or input pins get unplugged.
+	 * <br><br>
+	 * The callback parameters:<br>
+	 * Node* = Start node<br>
+	 * Node* = End node<br>
+	 * size_t = Start node's output pin index<br>
+	 * size_t = End node's input pin index<br>
+	 */
+	void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
+
+protected:
 	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
 
 private:
@@ -439,9 +489,6 @@ protected:
 	 * camera.
 	 */
 	Ptr<Node> m_owner = nullptr;
-
-	/// List of callbacks to call after updateValues() is called
-	std::list<std::function<void()>> m_updateCallbacks;
 };
 
 using NodePtr = Ptr<Node>;
