@@ -39,7 +39,15 @@ Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
 	return memento;
 }
 
-void pasteNodes(const Memento& memento) { NodeDeserializer::createFrom(memento); }
+void pasteNodes(const Memento& memento)
+{
+	auto newNodes = NodeDeserializer::createFrom(memento);
+	for (const auto& node : newNodes)
+	{
+		node->setSelected(true);
+		node->processSelect();
+	}
+}
 
 void duplicateNode(const Ptr<GuiNode>& node, float offset)
 {

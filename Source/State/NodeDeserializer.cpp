@@ -15,15 +15,17 @@ static TransformBuilder g_TransformBuilder;
 
 namespace NodeDeserializer
 {
-void createFrom(const Memento& memento)
+std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 {
 	// for edges between nodes
 	std::map<std::size_t, Core::ID> oldToNewId;
+	std::vector<Ptr<GuiNode>> createdNodes;
 
 	const auto& operators = memento["workspace"]["operators"];
 	for (auto& value : operators.GetArray())
 	{
 		const auto node = NodeDeserializer::createOperator(value);
+		createdNodes.push_back(node);
 		oldToNewId[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
@@ -32,6 +34,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["sequences"].GetArray())
 	{
 		const auto node = NodeDeserializer::createSequence(value);
+		createdNodes.push_back(node);
 		oldToNewId[value["id"].GetInt()] = node->getNodebase()->getId();
 	}
 
@@ -40,8 +43,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cycles"].GetArray())
 	{
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
-		cycle->setSelected(true);
-		cycle->processSelect();
+		createdNodes.push_back(cycle);
 		NodeDeserializer::assignCommon(value, cycle);
 		oldToNewId[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
@@ -51,8 +53,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cameras"].GetArray())
 	{
 		const auto camera = addNodeToNodeEditorNoSave<WorkspaceCamera>();
-		camera->setSelected(true);
-		camera->processSelect();
+		createdNodes.push_back(camera);
 		NodeDeserializer::assignCommon(value, camera);
 		oldToNewId[value["id"].GetInt()] = camera->getNodebase()->getId();
 
@@ -68,8 +69,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["screens"].GetArray())
 	{
 		const auto screen = addNodeToNodeEditorNoSave<WorkspaceScreen>();
-		screen->setSelected(true);
-		screen->processSelect();
+		createdNodes.push_back(screen);
 		NodeDeserializer::assignCommon(value, screen);
 		oldToNewId[value["id"].GetInt()] = screen->getNodebase()->getId();
 	}
@@ -79,8 +79,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["models"].GetArray())
 	{
 		const auto model = addNodeToNodeEditorNoSave<WorkspaceModel>();
-		model->setSelected(true);
-		model->processSelect();
+		createdNodes.push_back(model);
 		NodeDeserializer::assignCommon(value, model);
 		oldToNewId[value["id"].GetInt()] = model->getNodebase()->getId();
 
@@ -101,6 +100,7 @@ void createFrom(const Memento& memento)
 	for (auto& value : transforms.GetArray())
 	{
 		const auto transform = NodeDeserializer::createTransform(value);
+		createdNodes.push_back(transform);
 		oldToNewId[value["id"].GetInt()] = transform->getNodebase()->getId();
 	}
 
@@ -137,6 +137,8 @@ void createFrom(const Memento& memento)
 			connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 		}
 	}
+
+	return createdNodes;
 }
 
 Ptr<GuiOperator> createOperator(const rapidjson::Value& value)

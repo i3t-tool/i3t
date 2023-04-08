@@ -8,7 +8,7 @@
 namespace NodeDeserializer
 {
 /// @pre DIWNE and WorkspaceWindow are initialized.
-void createFrom(const Memento& memento);
+std::vector<Ptr<GuiNode>> createFrom(const Memento& memento);
 
 Ptr<GuiOperator> createOperator(const rapidjson::Value& value);
 Ptr<GuiSequence> createSequence(const rapidjson::Value& value);
