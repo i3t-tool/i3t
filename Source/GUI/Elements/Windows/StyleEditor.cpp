@@ -138,7 +138,9 @@ void UI::showColors()
 
 		auto& color = curr.getColorsRef()[key];
 		ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
-		if (ImGui::ColorEdit4(str + I3T_PROPERTY_NAME_OFFSET, (float*)(&color)))
+
+		const auto label = fmt::format("{}##{}", str + I3T_PROPERTY_NAME_OFFSET, (unsigned) key);
+		if (ImGui::ColorEdit4(label.c_str(), (float*)(&color)))
 		{
 			curr.apply();
 		}
@@ -165,7 +167,7 @@ void UI::showDimensions()
 
 		auto& val = curr.getSizesRef()[key];
 		ImGui::SetNextItemWidth(DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, 0.0f, "%.0f"))
+		if (ImGui::DragFloat(str + I3T_PROPERTY_NAME_OFFSET, &val, 1.0f, 0.0f, FLT_MAX, "%.0f"))
 		{
 			curr.apply();
 		}
@@ -183,7 +185,7 @@ void UI::showDimensions()
 
 		auto& val = curr.getSizesVecRef()[key];
 		ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f, 0.0f, "%.0f"))
+		if (ImGui::DragFloat2(str + I3T_PROPERTY_NAME_OFFSET, &val[0], 1.0f, 0.0f, FLT_MAX, "%.0f"))
 		{
 			curr.apply();
 		}
