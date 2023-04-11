@@ -58,6 +58,7 @@ public:
 	ImDrawListSplitter m_channelSplitter;
 	Memento copiedNodes;
 	Core::MatrixTracker* tracking;
+	float timeUntilNextTrack = 0;
 	bool smoothTracking;
 
 	ViewportHighlightResolver m_viewportHighlightResolver;

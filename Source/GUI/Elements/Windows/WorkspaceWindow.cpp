@@ -81,6 +81,13 @@ void WorkspaceDiwne::trackingSmoothLeft()
 {
 	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
 	{
+		if(timeUntilNextTrack > 0)
+		{
+			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
+			return;
+		}
+		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
+
 		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
 		tracking->setParam(tracking->getParam() + step);
 	}
@@ -90,8 +97,14 @@ void WorkspaceDiwne::trackingSmoothRight()
 {
 	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
 	{
-		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
+		if(timeUntilNextTrack > 0)
+		{
+			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
+			return;
+		}
+		timeUntilNextTrack = I3T::getSize(ESize::Workspace_TrackingTimeBetweenTracks);
 
+		float step = I3T::getSize(ESize::Tracking_SmoothScrollSpeed) / tracking->getTrackingProgress().size();
 		tracking->setParam(tracking->getParam() - step);
 	}
 }

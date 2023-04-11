@@ -261,7 +261,7 @@ void StartWindow::render()
 					ImGui::Text("Your scene");
 					ImGui::PopFont();
 					ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemDescription));
-					ImGui::Text("Start with an empty scene or load your previous work.");
+					ImGui::Text("Start with an empty scene or open your previous work.");
 					ImGui::PopFont();
 					ImGui::PopStyleColor();
 
@@ -295,9 +295,9 @@ void StartWindow::render()
 					}
 					// ImGui::SameLine();
 					ImGui::Dummy(ImVec2(0, 2));
-					if (ImGui::Button("Load", ImVec2(loadBtnWidth, buttonHeight)))
+					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight)))
 					{
-						// load from file (taken from main menu bar)
+						// open from file (taken from main menu bar)
 						std::string result;
 						std::string title = "Open I3T script...";
 						std::vector<std::string> filter;
