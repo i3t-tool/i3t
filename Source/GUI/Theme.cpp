@@ -218,6 +218,7 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Workspace_FocusBorderThickness] = 1.5f;
 	m_sizes[ESize::Workspace_InteractionFocusBorderThickness] = 1.5f;
 	m_sizes[ESize::Workspace_CopyPasteOffset] = 25.f;
+	m_sizes[ESize::Workspace_TrackingTimeBetweenTracks] = 0.0005f;
 
 	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
 	m_sizes[ESize::TutorialWindow_FrameRounding] = 5.0f;
@@ -436,6 +437,7 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Workspace_FocusBorderThickness] = 1.5f;
 	m_sizes[ESize::Workspace_InteractionFocusBorderThickness] = 1.5f;
 	m_sizes[ESize::Workspace_CopyPasteOffset] = 25.f;
+	m_sizes[ESize::Workspace_TrackingTimeBetweenTracks] = 0.0005f;
 
 	m_sizes[ESize::TutorialTaskSquareXPadding] = 10.0f;
 	m_sizes[ESize::TutorialWindow_FrameRounding] = 5.0f;

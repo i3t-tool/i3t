@@ -57,7 +57,7 @@ std::shared_ptr<TutorialHeader> TutorialLoader::loadTutorialHeader(std::string& 
 	}
 	else
 	{
-		LOG_FATAL("Tutorial scene not specified");
+		LOG_DEBUG("Tutorial scene not specified");
 	}
 
 	// thumbnail

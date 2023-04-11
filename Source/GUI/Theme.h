@@ -182,6 +182,7 @@ enum class ESize
 	Workspace_FocusBorderThickness,
 	Workspace_InteractionFocusBorderThickness,
 	Workspace_CopyPasteOffset,
+	Workspace_TrackingTimeBetweenTracks,
 
 	TutorialTaskSquareXPadding,
 	TutorialWindow_FrameRounding,

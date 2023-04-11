@@ -136,7 +136,7 @@ void MainMenuBar::showFileMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::MenuItem("Load"))
+		if (ImGui::MenuItem("Open", "Ctrl+O"))
 		{
 			open();
 		}
