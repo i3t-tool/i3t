@@ -172,7 +172,8 @@ void Theme::initClassicProperties()
 	set(EColor::Nodes_Transformation_ValidIcon_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
 
-	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
@@ -244,6 +245,8 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
 	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
 
+	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = 5.f;
+
 	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
 	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
 
@@ -273,8 +276,6 @@ void Theme::initClassicProperties()
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 
 	m_sizesVec2[ESizeVec2::Nodes_noPinsSpacing] = ImVec2(0.f, 20.f);
-
-	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 
@@ -395,7 +396,8 @@ void Theme::initModernProperties()
 	set(EColor::Nodes_Transformation_ValidIcon_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(5.0f, 5.0f, 5.0f, 5.0f));
 
-	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
+	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
@@ -463,6 +465,8 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
 	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
 
+	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = 5.f;
+
 	m_sizes[ESize::Tracking_SmoothScrollSpeed] = 0.03;
 	m_sizes[ESize::Tracking_JaggedScrollSpeed] = 0.2;
 
@@ -491,8 +495,6 @@ void Theme::initModernProperties()
 
 	m_sizesVec2[ESizeVec2::Nodes_Sequence_DummySpaceSize] = ImVec2(100.f, 1.f);
 	m_sizesVec2[ESizeVec2::Nodes_noPinsSpacing] = ImVec2(0.f, 20.f);
-
-	m_sizesVec2[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = ImVec2(30.f, 30.f);
 
 	m_sizesVec2[ESizeVec2::NewNode_positionShift] = ImVec2(10.f, 0.f);
 
@@ -645,6 +647,8 @@ void Theme::initNames()
 	g_SizeNames[ESize::Nodes_leftSideSpacing] = "ngen_Nodes left side spacing";
 	g_SizeNames[ESize::Nodes_rightSideSpacing] = "ngen_Nodes right side spacing";
 
+	g_SizeNames[ESize::Nodes_Transformation_TrackingMarkSize] = "ngen_Nodes_Transformation_TrackingMarkSize";
+
 	g_SizeNames[ESize::Default_VisiblePrecision] = "ngen_Nodes default visible precision";
 	g_SizeNames[ESize::Default_InactiveMark] = "ngen_Nodes default inactive part marker";
 
@@ -662,7 +666,6 @@ void Theme::initNames()
 
 	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes_Screen_resizeButtonSize";
 	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes_Sequence_DummySpaceSize";
-	g_SizeVecNames[ESizeVec2::Nodes_Transformation_TrackingMarkSize] = "ngen_Nodes_Transformation_TrackingMarkSize";
 	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode_positionShift";
 
 	g_SizeVecNames[ESizeVec2::Window_FramePadding] = "glob_Windows Frame Padding";

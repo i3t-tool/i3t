@@ -121,6 +121,7 @@ enum class EColor
 	Nodes_Screen_resizeBtn_fgShape,
 	Nodes_Screen_resizeBtn_fgInner,
 
+	Nodes_Transformation_TrackingMarkColor,
 	Nodes_Transformation_TrackingColor,
 
 	Nodes_Transformation_ValidIcon_bgShape,
@@ -205,6 +206,8 @@ enum class ESize
 	Nodes_Operators_Rounding,
 	Nodes_Sequence_Rounding,
 
+	Nodes_Transformation_TrackingMarkSize,
+
 	Float_inactive_alphaMultiplicator,
 
 	Default_VisiblePrecision,
@@ -245,8 +248,6 @@ enum class ESizeVec2
 	Nodes_Sequence_DummySpaceSize,
 
 	Nodes_noPinsSpacing,
-
-	Nodes_Transformation_TrackingMarkSize,
 
 	NewNode_positionShift,
 
