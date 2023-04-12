@@ -62,7 +62,7 @@ headline: "Já tak rád TRSám TRSám"
 
 V sekvencích aplikujeme transformace *ZPRAVA DOLEVA* (opačně, než jak jsou v sekvenci):
 
-![Pořadí, v jakém se aplikují transformace při pořadí TRS](matrixOrder.png)
+![Pořadí, v jakém se aplikují transformace při pořadí TRS](matrixOrderAlt.png)
 
 Díky pořadí *TRS* zajistíme, že se *translace* provede vždy, jako *poslední*.
 
@@ -71,7 +71,7 @@ headline: Stejné transformace, jiné pořadí
 
 Podívej se na jiné pořadí, *SRT*:
 
-![Opačné pořadí, vidíme, že se pozice modelu mění s každou transformací](wrongOrder.png)
+![Opačné pořadí, vidíme, že se pozice modelu mění s každou transformací](wrongOrderAlt.png)
 
 Vidíš, že výsledek je *jiný*, i když jsem používal *stejné* transformace.
 
