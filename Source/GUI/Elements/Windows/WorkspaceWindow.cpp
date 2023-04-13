@@ -77,6 +77,25 @@ void WorkspaceDiwne::zoomToAll() { zoomToRectangle(getOverNodesRectangleDiwne(ge
 
 void WorkspaceDiwne::zoomToSelected() { zoomToRectangle(getOverNodesRectangleDiwne(getSelectedNodesInnerIncluded())); }
 
+void WorkspaceDiwne::toggleSelectedNodesVisibility()
+{
+	auto selected = getSelectedNodesInnerIncluded();
+	if(selected.empty())
+	{
+		for (auto node : getAllNodesInnerIncluded())
+		{
+			node->setRender(true);
+		}
+	}
+	else
+	{
+		for (auto node : selected)
+		{
+			node->setRender(false);
+		}
+	}
+}
+
 void WorkspaceDiwne::trackingSmoothLeft()
 {
 	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
@@ -1582,6 +1601,7 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitch(); });
 	Input.bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOn(); });
 	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
+	Input.bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() { g_workspaceDiwne->toggleSelectedNodesVisibility(); });
 
 	App::getModule<StateManager>().setOriginator(this);
 

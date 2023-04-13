@@ -95,6 +95,8 @@ void InputBindings::init()
 	InputManager::setInputAction("raisePopup", Keys::mouseRight);
 
 	InputManager::setInputAction("viewport_select", Keys::mouseLeft);
+
+	InputManager::setInputAction("toggleNodeWorkspaceVisibility", Keys::i, {Keys::ctrlr});
 }
 
 const std::vector<InputBindings::ActionMapping>& InputBindings::getActionMapping(const char* name)
