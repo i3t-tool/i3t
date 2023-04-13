@@ -69,6 +69,9 @@ public:
 		m_nodePosMode = nodePosMode;
 		m_drawMode = drawMode;
 
+
+		if(!getRender()) return false;
+
 		bool interaction_happen = drawDiwne(drawMode);
 
 		if (interaction_happen && !m_toDelete)
@@ -122,6 +125,9 @@ public:
 	bool getSelected() const { return m_selected; };
 	void setSelected(bool selected) { m_selected = selected; };
 
+	bool getRender(){ return m_render; };
+	void setRender(bool render){ m_render = render; };
+
 	float m_drawAnywhere; /*!< you have to draw node anywhere for example in first
 	                         frame after you created it -> for obtain its real
 	                         size */
@@ -137,6 +143,7 @@ protected:
 	float m_centerDummySpace;
 	DrawModeNodePosition m_nodePosMode;
 	bool m_toDelete;
+	bool m_render = true;
 
 private:
 	void setNodeRectsPositionDiwne(ImVec2 const& position);

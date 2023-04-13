@@ -184,6 +184,7 @@ public:
 	void trackingSwitch();
 	void trackingSwitchOn(Ptr<WorkspaceSequence> sequence = nullptr);
 	void trackingSwitchOff();
+	void toggleSelectedNodesVisibility();
 	Ptr<WorkspaceModel> getSequenceModel(Ptr<WorkspaceSequence> seq);
 	std::vector<Ptr<WorkspaceModel>> getSequenceModels(Ptr<WorkspaceSequence> seq);
 
