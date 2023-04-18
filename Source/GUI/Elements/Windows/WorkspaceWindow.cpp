@@ -92,6 +92,7 @@ void WorkspaceDiwne::toggleSelectedNodesVisibility()
 		for (auto node : selected)
 		{
 			node->setRender(false);
+			node->setSelected(false);
 		}
 	}
 }
