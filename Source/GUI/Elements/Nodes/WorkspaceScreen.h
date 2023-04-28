@@ -13,6 +13,11 @@
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
 
+namespace Vp
+{
+class SceneRenderTarget;
+}
+
 class WorkspaceScreen : public WorkspaceNodeWithCoreDataWithPins
 {
 private:
@@ -21,6 +26,7 @@ private:
 	ImVec2 m_textureSize = {100, 100}; // initial render texture size - should be
 	                                   // large enough or changed during zoo
 
+	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 	Vp::DisplayOptions displayOptions;
 	Vp::RenderOptions renderOptions;
 

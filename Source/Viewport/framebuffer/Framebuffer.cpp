@@ -4,7 +4,8 @@
 
 using namespace Vp;
 
-#define FRAMEBUFFER_DEBUG false
+#define FB_DEBUG false
+#define FB_DEBUG_VERBOSE false
 
 /*
  * IMPLEMENTATION NOTES, LIMITATIONS AND TODOS:
@@ -72,7 +73,7 @@ void Framebuffer::update(int width, int height)
 
 void Framebuffer::dispose()
 {
-	if (FRAMEBUFFER_DEBUG)
+	if (FB_DEBUG)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Disposing {}FBO ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 	for (auto& colorAttachment : m_colorAttachments)
 	{
@@ -95,7 +96,7 @@ void Framebuffer::dispose()
 
 void Framebuffer::recreate()
 {
-	if (FRAMEBUFFER_DEBUG)
+	if (FB_DEBUG)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Recreating {}FBO ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 
 	if (isInitialized())
@@ -178,7 +179,7 @@ void Framebuffer::initImpl(int width, int height)
 		throw std::runtime_error("Framebuffer: Bad status on init!");
 	}
 
-	if (FRAMEBUFFER_DEBUG)
+	if (FB_DEBUG)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Created {}FBO ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 }
 
@@ -215,12 +216,13 @@ void Framebuffer::resize(int width, int height)
 	{
 		return;
 	}
-	m_width = width;
-	m_height = height;
 
-	if (FRAMEBUFFER_DEBUG)
+	if (FB_DEBUG)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width,
 		         m_height, width, height);
+
+	m_width = width;
+	m_height = height;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -380,7 +382,7 @@ void Framebuffer::setMultisampled(bool multisample, unsigned int samples)
 
 	if (recreateNeeded)
 	{
-		if (FRAMEBUFFER_DEBUG)
+		if (FB_DEBUG)
 			LOG_INFO("[FRAMEBUFFER DEBUG] FBO recreate needed after multisampling change!");
 		recreate();
 	}
@@ -413,7 +415,7 @@ void Framebuffer::multisampleResolveColor(unsigned int colorAttachmentIndex)
 	m_multisampleResolveFBO->update(m_width, m_height);
 
 	// Resolve multisampled buffer into a single sampled intermediate one
-	if (FRAMEBUFFER_DEBUG)
+	if (FB_DEBUG && FB_DEBUG_VERBOSE)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO color ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, getId());
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + colorAttachmentIndex);
@@ -434,7 +436,7 @@ void Framebuffer::multisampleResolveDepth()
 	m_multisampleResolveFBO->update(m_width, m_height);
 
 	// Resolve multisampled buffer into a single sampled intermediate one
-	if (FRAMEBUFFER_DEBUG)
+	if (FB_DEBUG && FB_DEBUG_VERBOSE)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO depth ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, getId());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_multisampleResolveFBO->getId());

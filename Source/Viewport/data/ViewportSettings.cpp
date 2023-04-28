@@ -19,7 +19,7 @@ ViewportSettings::ViewportSettings()
 	preview_radiusFactor = 2.3f;
 	preview_rotateSpeed = 30.0f;
 
-	camera_smoothScroll = true;
+	camera_smoothScroll = false;
 	camera_fov = 90.0f;
 	camera_zNear = 0.2f;
 	camera_zFar = 270.0f;

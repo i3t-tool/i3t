@@ -13,6 +13,7 @@
 namespace Vp
 {
 class SceneModel;
+class SceneRenderTarget;
 }
 
 class WorkspaceModel : public WorkspaceNodeWithCoreDataWithPins
@@ -20,7 +21,7 @@ class WorkspaceModel : public WorkspaceNodeWithCoreDataWithPins
 private:
 	// initial render texture size - should be large enough or changed during zoom
 	ImVec2 m_textureSize = {84, 100};
-	UPtr<Vp::Framebuffer> m_framebuffer = nullptr;
+	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 
 public:
 	std::weak_ptr<Vp::SceneModel> m_viewportModel;

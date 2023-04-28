@@ -173,50 +173,18 @@ bool WorkspaceModel::middleContent()
 {
 	bool interaction_happen = false;
 
-	Ptr<Vp::Framebuffer> framebuffer =
-	    App::get().viewport()->drawPreview(m_textureSize.x, m_textureSize.y, m_viewportModel).lock();
+	int width = m_textureSize.x * diwne.getWorkAreaZoom();
+	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-	// This is the original solution to the duplicate model preview issue, uncomment this and comment the jank one to
-	// return to how things were
-	//	// ORIGINAL START ///////////////////////////////////
-	//	if (framebuffer)
-	//	{
-	//		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
-	//		             ImVec2(1.0f, 0.0f) // vertical flip
-	//		);
-	//	}
-	//	else
-	//	{
-	//		ImGui::Text("Failed to draw preview!");
-	//	}
-	//	// ORIGINAL END /////////////////////////////////////
+#define FLOOR_VEC2(_VAL) (ImVec2((float)(int)((_VAL).x), (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
+	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
 
-	// JANK START ///////////////////////////////////////
-	// This is a janky workaround for an issue
-	// TODO: (DR) Make this a proper function of the Vp::Framebuffer class
+	App::get().viewport()->drawPreview(m_renderTarget, width, height, m_viewportModel);
+	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
-	if (m_framebuffer == nullptr)
+	if (framebuffer)
 	{
-		m_framebuffer = std::make_unique<Vp::Framebuffer>(framebuffer->getWidth(), framebuffer->getHeight(),
-		                                                  framebuffer->isMultisampled(), framebuffer->getSampleCount());
-
-		Vp::ColorAttachment colorAttachment = Vp::ColorAttachment(framebuffer->getColorAttachment(0));
-		m_framebuffer->addColorAttachment(colorAttachment);
-	}
-	// Will break if other parameters change
-	m_framebuffer->update(framebuffer->getWidth(), framebuffer->getHeight());
-
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer->getId());
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getId());
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glBlitFramebuffer(0, 0, framebuffer->getWidth(), framebuffer->getHeight(), 0, 0, framebuffer->getWidth(),
-	                  framebuffer->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	if (m_framebuffer)
-	{
-		ImGui::Image((void*)(intptr_t)m_framebuffer->getColorTexture(), m_textureSize, ImVec2(0.0f, 1.0f),
+		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
 		             ImVec2(1.0f, 0.0f) // vertical flip
 		);
 	}
@@ -224,7 +192,6 @@ bool WorkspaceModel::middleContent()
 	{
 		ImGui::Text("Failed to draw preview!");
 	}
-	// JANK END ///////////////////////////////////////
 
 	return interaction_happen;
 }

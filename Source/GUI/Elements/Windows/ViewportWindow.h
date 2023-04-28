@@ -15,7 +15,8 @@
 namespace Vp
 {
 class Viewport;
-}
+class SceneRenderTarget;
+} // namespace Vp
 
 namespace UI
 {
@@ -32,6 +33,8 @@ private:
 
 	Vp::DisplayOptions displayOptions;
 	Vp::RenderOptions renderOptions;
+
+	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 
 	ImDrawListSplitter m_channelSplitter;
 

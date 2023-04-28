@@ -100,14 +100,15 @@ void ViewportWindow::render()
 
 	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
 	//  the InputManager's active input rather than asking the WindowManager
-	if (InputManager::isInputActive(getInputPtr()) && !menuInteraction && !manipulatorInteraction)
+	if (InputManager::isInputActive(getInputPtr()) && !menuInteraction && !manipulatorInteraction && m_renderTarget)
 	{
 		glm::vec2 relativeMousePos = WindowManager::getMousePositionForWindow(this);
 		m_viewport->processInput(ImGui::GetIO().DeltaTime, relativeMousePos, m_windowSize);
-		m_viewport->processSelection(relativeMousePos, m_windowSize);
+		m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
 	}
-	Ptr<Vp::Framebuffer> framebuffer =
-	    m_viewport->drawViewport(windowWidth, windowHeight, renderOptions, displayOptions).lock();
+
+	m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, renderOptions, displayOptions);
+	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
 	{

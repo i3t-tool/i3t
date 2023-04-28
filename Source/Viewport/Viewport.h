@@ -21,7 +21,9 @@
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
 #include "Viewport/data/ViewportSettings.h"
+#include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/scene/Scene.h"
+#include "Viewport/scene/SceneRenderTarget.h"
 #include "Viewport/scene/scenes/MainScene.h"
 #include "Viewport/scene/scenes/PreviewScene.h"
 #include "Viewport/shader/Shaders.h"
@@ -78,17 +80,12 @@ private:
 	friend class SceneCamera;
 
 public: // TODO: (DR) Finish manipulator public API
-	std::shared_ptr<Manipulators> m_manipulators;
+	Ptr<Manipulators> m_manipulators;
 
 private:
 	// Scenes
-	std::shared_ptr<MainScene> m_mainScene;
-	std::shared_ptr<PreviewScene> m_previewScene;
-
-	// Scene render targets (buffer(s) scenes are rendered into)
-	Ptr<SceneRenderTarget> viewportRenderTarget;
-	Ptr<SceneRenderTarget> screenRenderTarget;
-	Ptr<SceneRenderTarget> previewRenderTarget;
+	Ptr<MainScene> m_mainScene;
+	Ptr<PreviewScene> m_previewScene;
 
 	ViewportSettings m_settings;
 
@@ -108,19 +105,25 @@ public:
 	/**
 	 * Render viewport's main scene into a framebuffer using its own camera.
 	 *
+	 * @param renderTarget A reference to a shared pointer containing the desired render target.
+	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
 	 * renderOptions per frame.
 	 * @param displayOptions Optional display options. These can change without restriction.
-	 * @return Weak pointer to a Framebuffer object. Use getColorTexture() to get the resulting texture.
+	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
+	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	WPtr<Framebuffer> drawViewport(int width, int height, const RenderOptions& renderOptions = RenderOptions(),
-	                               const DisplayOptions& displayOptions = DisplayOptions());
+	void drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
+	                  const RenderOptions& renderOptions = RenderOptions(),
+	                  const DisplayOptions& displayOptions = DisplayOptions());
 
 	/**
 	 * Render viewport's main scene into a framebuffer with the specified camera matrices.
 	 *
+	 * @param renderTarget A reference to a shared pointer containing the desired render target.
+	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
 	 * @param view View matrix of the camera
@@ -128,21 +131,25 @@ public:
 	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
 	 * renderOptions per frame.
 	 * @param displayOptions Optional display options. These can change without restriction.
-	 * @return Weak pointer to a Framebuffer object. Use getColorTexture() to get the resulting texture.
+	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
+	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	WPtr<Framebuffer> drawScreen(int width, int height, glm::mat4 view, glm::mat4 projection,
-	                             const RenderOptions& renderOptions = RenderOptions(),
-	                             const DisplayOptions& displayOptions = DisplayOptions());
+	void drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int height, glm::mat4 view, glm::mat4 projection,
+	                const RenderOptions& renderOptions = RenderOptions(),
+	                const DisplayOptions& displayOptions = DisplayOptions());
 
 	/**
 	 * Draw a preview of an object into a framebuffer.
 	 *
+	 * @param renderTarget A reference to a shared pointer containing the desired render target.
+	 * An empty pointer can be passed and it will be filled with an appropriate render target.
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
 	 * @param gameObject Game object to preview
-	 * @return Weak pointer to a Framebuffer object. Use getColorTexture() to get the resulting texture.
+	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
+	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	WPtr<Framebuffer> drawPreview(int width, int height, std::weak_ptr<GameObject> gameObject);
+	void drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int height, WPtr<GameObject> gameObject);
 
 	/**
 	 * Update scene logic
@@ -165,7 +172,7 @@ public:
 	 */
 	void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize);
 
-	void processSelection(glm::vec2 mousePos, glm::ivec2 windowSize);
+	void processSelection(Ptr<SceneRenderTarget> renderTarget, glm::vec2 mousePos, glm::ivec2 windowSize);
 
 	/**
 	 * Creates a SceneModel in the main scene to represent a Model node.
@@ -173,7 +180,7 @@ public:
 	 * @param id Id of the gui node equivalent.
 	 * @return Weak pointer to it.
 	 */
-	std::weak_ptr<SceneModel> createModel(Core::ID guiNodeId);
+	WPtr<SceneModel> createModel(Core::ID guiNodeId);
 
 	/**
 	 * Creates a SceneCamera in the main scene to represent a Camera node.
@@ -181,13 +188,13 @@ public:
 	 * @param Id of the gui node equivalent.
 	 * @return Weak pointer to it.
 	 */
-	std::weak_ptr<SceneCamera> createCamera(Core::ID guiNodeId);
+	WPtr<SceneCamera> createCamera(Core::ID guiNodeId);
 
 	/**
 	 * Remove an entity from the main scene.
 	 */
 	template <typename T, typename std::enable_if<std::is_base_of<Entity, T>::value, bool>::type = true>
-	void removeEntity(std::weak_ptr<T>& entity)
+	void removeEntity(WPtr<T>& entity)
 	{
 		m_mainScene->removeEntity(entity);
 	}
@@ -195,12 +202,12 @@ public:
 	/**
 	 * Returns the viewport camera of the main scene.
 	 */
-	std::weak_ptr<AggregateCamera> getMainViewportCamera();
+	WPtr<AggregateCamera> getMainViewportCamera();
 
 	ViewportSettings& getSettings();
 
-	std::weak_ptr<Scene> getMainScene() { return m_mainScene; };
-	std::weak_ptr<Scene> getPreviewScene() { return m_previewScene; };
+	WPtr<Scene> getMainScene() { return m_mainScene; };
+	WPtr<Scene> getPreviewScene() { return m_previewScene; };
 
 	Manipulators& getManipulators();
 };

@@ -45,7 +45,6 @@ void WorkspaceScreen::popupContent()
 	WorkspaceNode::popupContent();
 }
 
-
 bool WorkspaceScreen::topContent()
 {
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
@@ -76,11 +75,9 @@ bool WorkspaceScreen::middleContent()
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-	Ptr<Vp::Framebuffer> framebuffer =
-	    App::get()
-	        .viewport()
-	        ->drawScreen(width, height, screenValue.second, screenValue.first, renderOptions, displayOptions)
-	        .lock();
+	App::get().viewport()->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first, renderOptions,
+	                                  displayOptions);
+	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 // Problem: ImGui uses int values for DC.CursorPos. Triangle positions not in
 // int coordinates are rounded one pixel out of the texture rectangle solution
