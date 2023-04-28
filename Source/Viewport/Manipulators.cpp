@@ -14,11 +14,6 @@
 
 using namespace Vp;
 
-// TODO: (DR) MOVE MANIPULATORS INTO THE GUI PACKAGE ALONG WITH VIEWPORT HIGHLIGHTER
-//  This class builds upon viewport but also manages nodes, thus it shouldn't be in the viewport package
-//  WorkspaceDiwne should also probably be the one holding a reference to it as it invokes it and callbacks will need to
-//  be registered with nodes
-
 Manipulators::Manipulators(Viewport* viewport) : m_viewport(viewport)
 {
 	m_operationMap.insert(std::make_pair("Translation", ManipulatorType::TRANSLATE));
@@ -37,13 +32,11 @@ Manipulators::Manipulators(Viewport* viewport) : m_viewport(viewport)
 	m_operationMap.insert(std::make_pair("Free", ManipulatorType::UNIMPLEMENTED));
 }
 
-bool Manipulators::draw(glm::vec2 windowPos, glm::vec2 windowSize)
+bool Manipulators::drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize)
 {
-	// ImGizmo test
 	glm::mat4 view = m_viewport->getMainViewportCamera().lock()->getView();
 	glm::mat4 projection = m_viewport->getMainViewportCamera().lock()->getProjection();
 
-	glm::mat4 objectMatrix = glm::mat4(1);
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
@@ -56,6 +49,18 @@ bool Manipulators::draw(glm::vec2 windowPos, glm::vec2 windowSize)
 
 	// ImGuizmo::ViewManipulate(glm::value_ptr(view), 9, GUI::glmToIm(windowPos), ImVec2(128, 128), 0x10101010);
 	ImGuizmo::ViewAxes(glm::value_ptr(view), glm::value_ptr(projection), 9, axesPosition, ImVec2(axesSize, axesSize));
+
+	return false;
+}
+
+bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
+{
+	glm::mat4 view = m_viewport->getMainViewportCamera().lock()->getView();
+	glm::mat4 projection = m_viewport->getMainViewportCamera().lock()->getProjection();
+
+	glm::mat4 objectMatrix = glm::mat4(1);
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
 	bool interactedWithManipulator = false;
 
@@ -79,7 +84,8 @@ bool Manipulators::draw(glm::vec2 windowPos, glm::vec2 windowSize)
 
 		ImGuizmo::SetGizmoSizeClipSpace(m_viewport->getSettings().manipulator_size);
 		// ImGuizmo::GetStyle().RotationOuterLineThickness = 4.0f;
-		ImGuizmo::GetStyle().RotationLineThickness = 2.5f;
+		ImGuizmo::GetStyle().RotationLineThickness = 3.0f;
+		ImGuizmo::GetStyle().CircleSegmentCount = 48;
 
 		if (type == ManipulatorType::LOOKAT)
 		{

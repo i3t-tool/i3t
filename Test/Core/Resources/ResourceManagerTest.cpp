@@ -147,7 +147,7 @@ TEST_F(ResourceManagerTest, ModelFromFileTest)
 
 TEST_F(ResourceManagerTest, ModelFromDataTest)
 {
-	Shaper shaper;
+	Vp::Shaper shaper;
 	glm::vec3 pos = glm::vec3(0, 0, 0);
 	float size = 1.0f;
 	shaper.line(pos, pos + glm::vec3(1.0f, 0.0f, 0.0f) * size, Color::RED);

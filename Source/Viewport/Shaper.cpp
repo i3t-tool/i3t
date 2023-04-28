@@ -4,6 +4,8 @@
 #include "Core/Resources/ResourceManager.h"
 #include "Utils/Color.h"
 
+using namespace Vp;
+
 std::string Shaper::xyzAxes;
 std::string Shaper::unitLineCube;
 std::string Shaper::unitCube;

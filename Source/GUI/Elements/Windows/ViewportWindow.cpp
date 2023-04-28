@@ -17,7 +17,6 @@
 #include "Viewport/Viewport.h"
 #include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/framebuffer/Framebuffer.h"
-#include "World/Components.h"
 
 using namespace UI;
 
@@ -92,7 +91,11 @@ void ViewportWindow::render()
 	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
 	// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is interacting
 	// with them, hence we draw them beforehand using a channel splitter
-	bool manipulatorInteraction = m_viewport->m_manipulators->draw(m_windowPos, m_windowSize);
+	bool manipulatorInteraction = m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize);
+	if (m_viewport->getSettings().manipulator_enabled)
+	{
+		manipulatorInteraction |= m_viewport->m_manipulators->drawManipulators(m_windowPos, m_windowSize);
+	}
 	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 0);
 
 	// TODO: (DR) This is somewhat unclear, might need a comment, we're checking if this window is focused, but through
