@@ -36,6 +36,36 @@
       "type": "Model"
     },
     {
+      "name": "ArmStand",
+      "path": "Data/Models/armstand.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "ArmBase",
+      "path": "Data/Models/armbase.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Arm1",
+      "path": "Data/Models/arm1.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Arm2",
+      "path": "Data/Models/arm2.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "Arm3",
+      "path": "Data/Models/arm3.gltf",
+      "type": "Model"
+    },
+    {
+      "name": "ArmClaw",
+      "path": "Data/Models/claw.gltf",
+      "type": "Model"
+    },
+    {
       "name": "ModelShader",
       "path": "Data/Shaders/Model.glsl",
       "type": "Shader"

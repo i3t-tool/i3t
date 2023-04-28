@@ -119,9 +119,9 @@ Mesh* Mesh::load(const std::string& path)
 	Mesh* mesh = new Mesh(TRIANGLES, ELEMENTS, true, true, true, false);
 
 	// Unitize object in size
-	importer.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE,
-	                            1); // used by aiProcess_PreTransformVertices to
-	                                // normalize vertices to fit into (-1..1)^3
+//	importer.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE,
+//	                            1); // used by aiProcess_PreTransformVertices to
+//	                                // normalize vertices to fit into (-1..1)^3
 
 	// Load asset from the file - you can play with various processing steps
 	const aiScene* scn =

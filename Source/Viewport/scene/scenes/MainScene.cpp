@@ -101,6 +101,20 @@ void MainScene::init()
 	m_gridObject->setDisplayType(DisplayType::Grid);
 	addEntity(m_gridObject);
 
+	Shaper shaper;
+	glm::vec3 pos = glm::vec3(0, 0, 0);
+	int count = 1000;
+	glm::vec3 color = glm::vec3(0.45, 0.49, 0.53);
+	for (int i = 0; i < count; i++) {
+		shaper.line(pos + glm::vec3(i, 0.0f, 0.0f), pos + glm::vec3(i, 0.0f, count), color);
+	}
+	for (int i = 0; i < count; i++) {
+		shaper.line(pos + glm::vec3(0.0f, 0.0f, i), pos + glm::vec3(count, 0.0f, i), color);
+	}
+	shaper.createLineMesh("grido");
+	std::shared_ptr<GameObject> obj = std::make_shared<GameObject>(RMI.meshByAlias("grido"), Shaders::instance().m_colorShader.get());
+	addEntity(obj);
+
 	//	// Transparency test
 	//	Ptr<ColoredObject> a =
 	//	    std::make_shared<ColoredObject>(RMI.meshByAlias(Shaper::plane), Shaders::instance().m_colorShader.get());
@@ -142,4 +156,15 @@ void MainScene::init()
 	//			addEntity(cube);
 	//		}
 	//	}
+}
+
+void MainScene::update(double dt) {
+	Scene::update(dt);
+
+	GridShader* gridShader = static_cast<GridShader*>(m_gridObject->m_shader);
+	gridShader->m_gridColor = m_viewport->getSettings().grid_color;
+	gridShader->m_gridSize = m_viewport->getSettings().grid_size;
+	gridShader->m_axisWidth = m_viewport->getSettings().grid_axisWidth;
+	gridShader->m_gridStrength = m_viewport->getSettings().grid_strength;
+	gridShader->m_gridFadeOffset = m_viewport->getSettings().grid_fadeOffset;
 }

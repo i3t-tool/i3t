@@ -55,6 +55,10 @@ public:
 
 	//	bool leftContent(DIWNE::Diwne &diwne);
 	//	bool rightContent(DIWNE::Diwne &diwne);
+
+	bool processSelect();
+	bool processUnselect();
+
 private:
 	glm::vec3 calculateFrustumColor(glm::vec3 color);
 };

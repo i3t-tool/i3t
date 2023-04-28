@@ -94,6 +94,7 @@ WPtr<Framebuffer> Viewport::drawPreview(int width, int height, std::weak_ptr<Gam
 		float radius =
 		    glm::distance(gameObjectPtr->m_mesh->m_boundingBoxMin, gameObjectPtr->m_mesh->m_boundingBoxMax) / 2.0f;
 
+		m_previewScene->m_orbitCamera->setFov(m_settings.preview_fov);
 		m_previewScene->m_orbitCamera->setRadius(radius * m_settings.preview_radiusFactor);
 
 		// Make object visible

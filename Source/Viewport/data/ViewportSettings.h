@@ -19,6 +19,7 @@ public:
 	float mainScene_iorbitCameraRadius;
 	glm::vec3 mainScene_iorbitCameraPivot;
 
+	float preview_fov;
 	float preview_radiusFactor;
 	float preview_rotateSpeed;
 
@@ -45,7 +46,14 @@ public:
 	glm::vec3 highlight_selectionColor;
 	glm::vec3 highlight_highlightColor;
 
+	bool manipulator_enabled;
 	float manipulator_size;
+
+	glm::vec3 grid_color;
+	float grid_size;
+	float grid_axisWidth;
+	float grid_strength;
+	float grid_fadeOffset;
 
 	ViewportSettings();
 };

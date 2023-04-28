@@ -13,5 +13,6 @@ public:
 	explicit MainScene(Viewport* viewport);
 
 	void init() override;
+	void update(double dt) override;
 };
 } // namespace Vp

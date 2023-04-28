@@ -193,3 +193,20 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 int WorkspaceCamera::maxLenghtOfData() { return 0; }
 
 bool WorkspaceCamera::isCamera() { return true; }
+
+bool WorkspaceCamera::processSelect()
+{
+	auto model = m_viewportCamera.lock();
+	model->m_highlightColor = App::get().viewport()->getSettings().highlight_selectionColor;
+	model->m_highlight = true;
+
+	return WorkspaceNodeWithCoreDataWithPins::processSelect();
+}
+
+bool WorkspaceCamera::processUnselect()
+{
+	auto model = m_viewportCamera.lock();
+	model->m_highlight = false;
+
+	return WorkspaceNodeWithCoreDataWithPins::processUnselect();
+}
