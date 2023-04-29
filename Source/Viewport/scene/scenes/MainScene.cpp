@@ -101,19 +101,23 @@ void MainScene::init()
 	m_gridObject->setDisplayType(DisplayType::Grid);
 	addEntity(m_gridObject);
 
-	Shaper shaper;
-	glm::vec3 pos = glm::vec3(0, 0, 0);
-	int count = 1000;
-	glm::vec3 color = glm::vec3(0.45, 0.49, 0.53);
-	for (int i = 0; i < count; i++) {
-		shaper.line(pos + glm::vec3(i, 0.0f, 0.0f), pos + glm::vec3(i, 0.0f, count), color);
-	}
-	for (int i = 0; i < count; i++) {
-		shaper.line(pos + glm::vec3(0.0f, 0.0f, i), pos + glm::vec3(count, 0.0f, i), color);
-	}
-	shaper.createLineMesh("grido");
-	std::shared_ptr<GameObject> obj = std::make_shared<GameObject>(RMI.meshByAlias("grido"), Shaders::instance().m_colorShader.get());
-	addEntity(obj);
+	//  // Test: Drawing grid using shaper
+	//	Shaper shaper;
+	//	glm::vec3 pos = glm::vec3(0, 0, 0);
+	//	int count = 1000;
+	//	glm::vec3 color = glm::vec3(0.45, 0.49, 0.53);
+	//	for (int i = 0; i < count; i++)
+	//	{
+	//		shaper.line(pos + glm::vec3(i, 0.0f, 0.0f), pos + glm::vec3(i, 0.0f, count), color);
+	//	}
+	//	for (int i = 0; i < count; i++)
+	//	{
+	//		shaper.line(pos + glm::vec3(0.0f, 0.0f, i), pos + glm::vec3(count, 0.0f, i), color);
+	//	}
+	//	shaper.createLineMesh("grido");
+	//	std::shared_ptr<ColoredObject> obj =
+	//	    std::make_shared<ColoredObject>(RMI.meshByAlias("grido"), Shaders::instance().m_colorShader.get());
+	//	addEntity(obj);
 
 	//	// Transparency test
 	//	Ptr<ColoredObject> a =
@@ -158,13 +162,44 @@ void MainScene::init()
 	//	}
 }
 
-void MainScene::update(double dt) {
+void MainScene::draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions)
+{
+	m_camera->size(width, height);
+	m_camera->update();
+
+	return draw(width, height, m_camera->getView(), m_camera->getProjection(), renderTarget, displayOptions);
+}
+
+void MainScene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
+                     const DisplayOptions& displayOptions)
+{
+	GridShader* gridShader = static_cast<GridShader*>(m_gridObject->m_shader);
+	gridShader->m_showGrid = displayOptions.showGridLines;
+	gridShader->m_showXAxis = displayOptions.showGridXAxis;
+	gridShader->m_showYAxis = displayOptions.showGridYAxis;
+	gridShader->m_showZAxis = displayOptions.showGridZAxis;
+	m_gridObject->m_visible = displayOptions.showGridLines || displayOptions.showGridXAxis ||
+	                          displayOptions.showGridYAxis || displayOptions.showGridZAxis;
+
+	Scene::draw(width, height, view, projection, renderTarget, displayOptions);
+}
+
+void MainScene::update(double dt)
+{
 	Scene::update(dt);
 
 	GridShader* gridShader = static_cast<GridShader*>(m_gridObject->m_shader);
 	gridShader->m_gridColor = m_viewport->getSettings().grid_color;
+	gridShader->m_axisXColor = m_viewport->getSettings().grid_axisXColor;
+	gridShader->m_axisYColor = m_viewport->getSettings().grid_axisYColor;
+	gridShader->m_axisZColor = m_viewport->getSettings().grid_axisZColor;
+
 	gridShader->m_gridSize = m_viewport->getSettings().grid_size;
-	gridShader->m_axisWidth = m_viewport->getSettings().grid_axisWidth;
 	gridShader->m_gridStrength = m_viewport->getSettings().grid_strength;
-	gridShader->m_gridFadeOffset = m_viewport->getSettings().grid_fadeOffset;
+	gridShader->m_lineWidth = m_viewport->getSettings().grid_lineWidth;
+
+	gridShader->m_grid1FadeStart = m_viewport->getSettings().grid_grid1FadeStart;
+	gridShader->m_grid1FadeEnd = m_viewport->getSettings().grid_grid1FadeEnd;
+	gridShader->m_grid2FadeStart = m_viewport->getSettings().grid_grid2FadeStart;
+	gridShader->m_grid2FadeEnd = m_viewport->getSettings().grid_grid2FadeEnd;
 }

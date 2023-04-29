@@ -46,9 +46,16 @@ ViewportSettings::ViewportSettings()
 	manipulator_size = 0.12f;
 
 	grid_color = glm::vec3(0.45, 0.49, 0.53);
+	grid_axisXColor = glm::vec3(1.0, 0.49, 0.53);
+	grid_axisYColor = glm::vec3(0.41, 0.96, 0.49);
+	grid_axisZColor = glm::vec3(0.45, 0.49, 1.0);
+
 	grid_size = 1.0f;
-	grid_axisWidth = 0.9f;
 	grid_strength = 0.5f;
-	grid_fadeOffset = 0.2f;
+	grid_lineWidth = 1.0f;
+	grid_grid1FadeStart = 0.0f;
+	grid_grid1FadeEnd = 0.34f;
+	grid_grid2FadeStart = 0.1f;
+	grid_grid2FadeEnd = 1.0f;
 }
 } // namespace Vp

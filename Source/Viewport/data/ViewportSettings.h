@@ -50,10 +50,17 @@ public:
 	float manipulator_size;
 
 	glm::vec3 grid_color;
+	glm::vec3 grid_axisXColor;
+	glm::vec3 grid_axisYColor;
+	glm::vec3 grid_axisZColor;
 	float grid_size;
-	float grid_axisWidth;
 	float grid_strength;
-	float grid_fadeOffset;
+	float grid_lineWidth;
+
+	float grid_grid1FadeStart;
+	float grid_grid1FadeEnd;
+	float grid_grid2FadeStart;
+	float grid_grid2FadeEnd;
 
 	ViewportSettings();
 };

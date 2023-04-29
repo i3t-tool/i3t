@@ -17,6 +17,7 @@
 #include "Viewport/Viewport.h"
 #include "Viewport/camera/AggregateCamera.h"
 #include "Viewport/framebuffer/Framebuffer.h"
+#include "Viewport/shader/GridShader.h"
 
 using namespace UI;
 
@@ -276,6 +277,7 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
+		// TODO: (DR) Probably move to preferences or help/debug menu
 		if (ImGui::MenuItem("Reload shaders", nullptr, nullptr))
 		{
 			bool ok = Vp::Shaders::instance().reload();
@@ -283,6 +285,19 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::GetForegroundDrawList()->AddRectFilled(GUI::glmToIm(m_windowPos), GUI::glmToIm(m_windowMax),
 			                                              ImColor((ok ? 0 : 255), (ok ? 255 : 0), 0));
 		}
+
+		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
+		ImGui::Checkbox("Show grid", &displayOptions.showGrid);
+		ImGui::SameLine();
+		GUI::ToggleButton("XZ", displayOptions.showGridLines, gridButtonSize);
+		ImGui::SameLine();
+		ImGui::Dummy(ImVec2(4.0f, 0.0f));
+		ImGui::SameLine();
+		GUI::ToggleButton("X", displayOptions.showGridXAxis, gridButtonSize);
+		ImGui::SameLine();
+		GUI::ToggleButton("Y", displayOptions.showGridYAxis, gridButtonSize);
+		ImGui::SameLine();
+		GUI::ToggleButton("Z", displayOptions.showGridZAxis, gridButtonSize);
 
 		ImGui::EndMenu();
 	}

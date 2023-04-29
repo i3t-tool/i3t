@@ -14,5 +14,8 @@ public:
 
 	void init() override;
 	void update(double dt) override;
+	void draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
+	          const DisplayOptions& displayOptions) override;
+	void draw(int width, int height, SceneRenderTarget& renderTarget, const DisplayOptions& displayOptions) override;
 };
 } // namespace Vp
