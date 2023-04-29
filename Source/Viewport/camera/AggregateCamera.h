@@ -49,13 +49,18 @@ public:
 
 	void viewpoint(ICamera::Viewpoint viewpoint) override;
 
-	const glm::mat4 getView() const override;
-	const glm::mat4 getProjection() const override;
+	void centerOnScene(const Scene& scene) override;
+	void centerOnSelection(const Scene& scene) override;
+	void centerOnObjects(const std::vector<const GameObject*> objects) override;
+	void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) override;
 
-	const glm::vec3 getPosition() const override;
-	const glm::vec3 getDirection() const override;
-	const glm::vec3 getUp() const override;
-	const glm::vec3 getRight() const override;
+	glm::mat4 getView() const override;
+	glm::mat4 getProjection() const override;
+
+	glm::vec3 getPosition() const override;
+	glm::vec3 getDirection() const override;
+	glm::vec3 getUp() const override;
+	glm::vec3 getRight() const override;
 
 	float getZNear() const override;
 	void setZNear(float zNear) override;

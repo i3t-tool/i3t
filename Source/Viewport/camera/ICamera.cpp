@@ -1,8 +1,16 @@
 #include "ICamera.h"
 
-#include "Core/Defs.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtx/matrix_interpolation.hpp"
+
+#include "Core/Application.h"
+#include "Core/Defs.h"
+
+#include "GUI/Elements/Windows/WorkspaceWindow.h"
+
+#include "Viewport/GfxUtils.h"
+#include "Viewport/entity/nodes/SceneModel.h"
+#include "Viewport/scene/Scene.h"
 
 using namespace Vp;
 using namespace std::chrono;
@@ -56,7 +64,7 @@ glm::mat4 ICamera::createProjectionMatrix(bool nonShrinking) const
 	}
 }
 
-void ICamera::viewpoint(ICamera::Viewpoint viewpoint){};
+void ICamera::viewpoint(ICamera::Viewpoint viewpoint) {}
 
 void ICamera::interpolate(glm::mat4 from, glm::mat4 to)
 {
@@ -86,7 +94,86 @@ bool ICamera::isInterpolating(float& progress) const
 	return false;
 }
 
-const glm::mat4 ICamera::getView() const
+void ICamera::centerOnScene(const Scene& scene)
+{
+	std::vector<const GameObject*> objects;
+	for (const auto& entity : scene.getEntities())
+	{
+		DisplayType type = entity->getDisplayType();
+		if (type != DisplayType::Default && type != DisplayType::Camera)
+		{
+			continue;
+		}
+		// TODO: (DR) GameObject should probably be just turned into Entity, it really serves no purpose and some casts like
+		//   this could be avoided
+		if (auto gameObject = std::dynamic_pointer_cast<GameObject>(entity))
+		{
+			objects.push_back(gameObject.get());
+		}
+	}
+	centerOnObjects(objects);
+}
+
+void ICamera::centerOnSelection(const Scene& scene)
+{
+	// TODO: (DR) FIX THIS, this is a quick workaround for the fact that viewport doesn't keep an updated list of all
+	//  selected objects. This feature is important but I don't have time to refine it right now. Fix is to keep a list of
+	//  selected objects in the scene which we have access to here.
+	std::vector<const GameObject*> selectedObjects;
+	for (const auto& modelNode : g_workspaceDiwne->getAllModels())
+	{
+		if (!modelNode->m_selected)
+		{
+			continue;
+		}
+		Ptr<SceneModel> model = modelNode->m_viewportModel.lock();
+		DisplayType type = model->getDisplayType();
+		if (type != DisplayType::Default && type != DisplayType::Camera)
+		{
+			continue;
+		}
+		selectedObjects.push_back(model.get());
+	}
+	centerOnObjects(selectedObjects);
+}
+
+void ICamera::centerOnObjects(const std::vector<const GameObject*> objects)
+{
+	if (objects.empty())
+		return;
+	// Convert all bounding box points to world space and encompass them with one axis aligned bounding box
+	// (Note: The w coordinate is ignored)
+	std::vector<glm::vec3> points;
+	for (const auto& object : objects)
+	{
+		std::vector<glm::vec3> entityPoints = createBoundingBoxWorldPoints(
+		    object->m_mesh->m_boundingBoxMin, object->m_mesh->m_boundingBoxMax, object->m_modelMatrix);
+		points.insert(points.end(), entityPoints.begin(), entityPoints.end());
+	}
+
+	// Create world space axis aligned bounding box containing all the points
+	auto aaBox = GfxUtils::createBoundingBox(points);
+	centerOnBox(aaBox.first, aaBox.second);
+}
+
+void ICamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) {}
+
+std::vector<glm::vec3> ICamera::createBoundingBoxWorldPoints(glm::vec3 boxMin, glm::vec3 boxMax, glm::mat4 modelMatrix)
+{
+	// List of all points of the bounding box in world space
+	std::vector<glm::vec3> points;
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMin, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMax, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMin.x, boxMin.y, boxMax.z, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMin.x, boxMax.y, boxMin.z, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMax.x, boxMin.y, boxMin.z, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMax.x, boxMax.y, boxMin.z, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMax.x, boxMin.y, boxMax.z, 1.0f)));
+	points.push_back(glm::vec3(modelMatrix * glm::vec4(boxMin.x, boxMax.y, boxMax.z, 1.0f)));
+	return points;
+}
+
+glm::mat4 ICamera::getView() const
 {
 	float progress = 0;
 	if (isInterpolating(progress))
@@ -96,15 +183,15 @@ const glm::mat4 ICamera::getView() const
 	return m_view;
 }
 
-const glm::mat4 ICamera::getProjection() const { return m_projection; }
+glm::mat4 ICamera::getProjection() const { return m_projection; }
 
 int ICamera::getWidth() const { return m_width; }
 int ICamera::getHeight() const { return m_height; }
 
-const glm::vec3 ICamera::getPosition() const { return m_position; }
-const glm::vec3 ICamera::getDirection() const { return m_direction; }
-const glm::vec3 ICamera::getUp() const { return m_up; }
-const glm::vec3 ICamera::getRight() const { return m_right; }
+glm::vec3 ICamera::getPosition() const { return m_position; }
+glm::vec3 ICamera::getDirection() const { return m_direction; }
+glm::vec3 ICamera::getUp() const { return m_up; }
+glm::vec3 ICamera::getRight() const { return m_right; }
 
 float ICamera::getZNear() const { return m_zNear; }
 void ICamera::setZNear(float zNear) { this->m_zNear = zNear; }

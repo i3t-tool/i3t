@@ -95,8 +95,16 @@ const std::shared_ptr<TrackballCamera>& AggregateCamera::getTrackballCamera() co
 
 void AggregateCamera::viewpoint(ICamera::Viewpoint viewpoint) { m_activeCamera->viewpoint(viewpoint); }
 
-const glm::mat4 AggregateCamera::getView() const { return m_activeCamera->getView(); }
-const glm::mat4 AggregateCamera::getProjection() const { return m_activeCamera->getProjection(); }
+void AggregateCamera::centerOnScene(const Scene& scene) { m_activeCamera->centerOnScene(scene); }
+void AggregateCamera::centerOnSelection(const Scene& scene) { m_activeCamera->centerOnSelection(scene); }
+void AggregateCamera::centerOnObjects(const std::vector<const GameObject*> objects)
+{
+	m_activeCamera->centerOnObjects(objects);
+}
+void AggregateCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) { m_activeCamera->centerOnBox(boxMin, boxMax); }
+
+glm::mat4 AggregateCamera::getView() const { return m_activeCamera->getView(); }
+glm::mat4 AggregateCamera::getProjection() const { return m_activeCamera->getProjection(); }
 
 float AggregateCamera::getZNear() const { return m_activeCamera->getZNear(); }
 void AggregateCamera::setZNear(float zNear) { m_activeCamera->setZNear(zNear); }
@@ -108,7 +116,7 @@ void AggregateCamera::setFov(float fov) { m_activeCamera->setFov(fov); }
 int AggregateCamera::getWidth() const { return m_activeCamera->getWidth(); }
 int AggregateCamera::getHeight() const { return m_activeCamera->getHeight(); }
 
-const glm::vec3 AggregateCamera::getPosition() const { return m_activeCamera->getPosition(); }
-const glm::vec3 AggregateCamera::getDirection() const { return m_activeCamera->getDirection(); }
-const glm::vec3 AggregateCamera::getUp() const { return m_activeCamera->getUp(); }
-const glm::vec3 AggregateCamera::getRight() const { return m_activeCamera->getRight(); }
+glm::vec3 AggregateCamera::getPosition() const { return m_activeCamera->getPosition(); }
+glm::vec3 AggregateCamera::getDirection() const { return m_activeCamera->getDirection(); }
+glm::vec3 AggregateCamera::getUp() const { return m_activeCamera->getUp(); }
+glm::vec3 AggregateCamera::getRight() const { return m_activeCamera->getRight(); }

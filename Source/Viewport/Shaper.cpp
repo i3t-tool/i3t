@@ -170,6 +170,23 @@ void Shaper::quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const
 	addColor(color, 3);
 }
 
+void Shaper::lineBox(glm::vec3 from, glm::vec3 to) {
+	glm::vec3 unitCubeArr[24] = {
+	    glm::vec3(to.x, to.y, to.z),    glm::vec3(to.x, to.y, from.z),  glm::vec3(to.x, to.y, from.z),
+	    glm::vec3(from.x, to.y, from.z),  glm::vec3(from.x, to.y, from.z), glm::vec3(from.x, to.y, to.z),
+	    glm::vec3(from.x, to.y, to.z),   glm::vec3(to.x, to.y, to.z),   glm::vec3(to.x, from.y, to.z),
+	    glm::vec3(to.x, from.y, from.z),  glm::vec3(to.x, from.y, from.z), glm::vec3(from.x, from.y, from.z),
+	    glm::vec3(from.x, from.y, from.z), glm::vec3(from.x, from.y, to.z), glm::vec3(from.x, from.y, to.z),
+	    glm::vec3(to.x, from.y, to.z),   glm::vec3(from.x, to.y, to.z),  glm::vec3(from.x, from.y, to.z),
+	    glm::vec3(to.x, to.y, to.z),    glm::vec3(to.x, from.y, to.z),  glm::vec3(to.x, to.y, from.z),
+	    glm::vec3(to.x, from.y, from.z),  glm::vec3(from.x, to.y, from.z), glm::vec3(from.x, from.y, from.z),
+	};
+	for (int i = 0; i < 24; i += 2)
+	{
+		line(glm::vec3(glm::vec4(unitCubeArr[i], 1.0f)), glm::vec3(glm::vec4(unitCubeArr[i + 1], 1.0f)), currentColor);
+	}
+}
+
 void Shaper::clear()
 {
 	vertices.clear();
@@ -187,8 +204,17 @@ Core::Mesh* Shaper::createLineMesh(const std::string& alias)
 		throw std::runtime_error("Shaper: Can't create line mesh with 0 vertices / colors!");
 	}
 
-	Core::Mesh* mesh = RMI.mesh(alias, Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
-	                            getColors().size() / 3);
+	Core::Mesh* mesh;
+	if (alias.empty())
+	{
+		mesh = Core::Mesh::create(Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+		                          getColors().size() / 3);
+	}
+	else
+	{
+		mesh = RMI.mesh(alias, Core::Mesh::LINES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+		                getColors().size() / 3);
+	}
 	return mesh;
 }
 
@@ -199,7 +225,16 @@ Core::Mesh* Shaper::createMesh(const std::string& alias)
 		throw std::runtime_error("Shaper: Can't create mesh with 0 vertices / colors!");
 	}
 
-	Core::Mesh* mesh = RMI.mesh(alias, Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3,
-	                            &getColors()[0], getColors().size() / 3);
+	Core::Mesh* mesh;
+	if (alias.empty())
+	{
+		mesh = Core::Mesh::create(Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+		                          getColors().size() / 3);
+	}
+	else
+	{
+		mesh = RMI.mesh(alias, Core::Mesh::TRIANGLES, &getVertices()[0], getVertices().size() / 3, &getColors()[0],
+		                getColors().size() / 3);
+	}
 	return mesh;
 }

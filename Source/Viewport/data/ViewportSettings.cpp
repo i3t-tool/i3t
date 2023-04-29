@@ -54,8 +54,8 @@ ViewportSettings::ViewportSettings()
 	grid_strength = 0.5f;
 	grid_lineWidth = 1.0f;
 	grid_grid1FadeStart = 0.0f;
-	grid_grid1FadeEnd = 0.34f;
+	grid_grid1FadeEnd = 0.25f;
 	grid_grid2FadeStart = 0.1f;
-	grid_grid2FadeEnd = 1.0f;
+	grid_grid2FadeEnd = 0.9f;
 }
 } // namespace Vp

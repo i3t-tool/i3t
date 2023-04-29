@@ -163,6 +163,8 @@ public:
 		}
 	}
 
+	const std::vector<std::shared_ptr<Entity>>& getEntities() const { return m_entities; }
+
 protected:
 	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);
 	void sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entities);

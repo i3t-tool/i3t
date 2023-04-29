@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "Viewport/entity/GameObject.h"
 #include <glm/glm.hpp>
 
 // TODO: (DR) Perhaps add option to use orthographic projection
@@ -78,26 +79,65 @@ public:
 	/**
 	 * @return The camera view matrix
 	 */
-	virtual const glm::mat4 getView() const;
+	virtual glm::mat4 getView() const;
 
 	/**
 	 *
 	 * @return The camera projection matrix
 	 */
-	virtual const glm::mat4 getProjection() const;
+	virtual glm::mat4 getProjection() const;
 
+	/**
+	 * Moves the camera to the specified viewpoint. Subclasses need to provide their own implementations.
+	 * @param viewpoint
+	 */
 	virtual void viewpoint(ICamera::Viewpoint viewpoint);
 
+	/**
+	 * Moves camera so that all objects in the scene are visible.
+	 */
+	virtual void centerOnScene(const Scene& scene);
+
+	/**
+	 * Moves camera so that all selected objects in the scene are visible.
+	 */
+	virtual void centerOnSelection(const Scene& scene);
+
+	/**
+	 * Moves camera so that the specified objects are visible.
+	 */
+	virtual void centerOnObjects(const std::vector<const GameObject*> objects);
+
+	/**
+	 * Moves camera so that the specified axis aligned bounding box is visible.
+	 */
+	virtual void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax);
+
+	/**
+	 * Begin interpolation from one view matrix to another, the interpolation will take m_interpolationPeriod seconds in
+	 * realtime. During that period the getView() method will be returning the interpolated view matrix rather than the
+	 * one actually stored. This interpolation is independent from any internal parameters of the camera and does not
+	 * modify it.
+	 * @param from Start view matrix
+	 * @param to End view matrix
+	 */
 	void interpolate(glm::mat4 from, glm::mat4 to);
+
+	/**
+	 * Checks whether interpolation between view matrices is currently happening.
+	 * If interpolating, the progress argument is set to the current progress in range <0, 1>.
+	 * @param progress Reference to which progress is written.
+	 * @return true if interpolating, false otherwise
+	 */
 	bool isInterpolating(float& progress) const;
 
 	virtual int getWidth() const;
 	virtual int getHeight() const;
 
-	virtual const glm::vec3 getPosition() const;
-	virtual const glm::vec3 getDirection() const;
-	virtual const glm::vec3 getUp() const;
-	virtual const glm::vec3 getRight() const;
+	virtual glm::vec3 getPosition() const;
+	virtual glm::vec3 getDirection() const;
+	virtual glm::vec3 getUp() const;
+	virtual glm::vec3 getRight() const;
 
 	virtual float getZNear() const;
 	virtual void setZNear(float zNear);
@@ -108,6 +148,7 @@ public:
 
 protected:
 	glm::mat4 createProjectionMatrix(bool nonShrinking) const;
+	std::vector<glm::vec3> createBoundingBoxWorldPoints(glm::vec3 boxMin, glm::vec3 boxMax, glm::mat4 modelMatrix);
 };
 
 } // namespace Vp

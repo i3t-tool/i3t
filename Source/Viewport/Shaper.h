@@ -97,6 +97,8 @@ public:
 	 */
 	void quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const glm::vec3 d, const glm::vec3 color);
 
+	void lineBox(glm::vec3 from, glm::vec3 to);
+
 	/**
 	 * \brief Clear prepared geometry (vertices and colors).
 	 */
@@ -107,14 +109,14 @@ public:
 	 * @param alias Unique shape identifier
 	 * @return
 	 */
-	Core::Mesh* createLineMesh(const std::string& alias);
+	Core::Mesh* createLineMesh(const std::string& alias = "");
 
 	/**
 	 * Create a triangle mesh from current shaper state and register it with ResourceManager
 	 * @param alias Unique shape identifier
 	 * @return
 	 */
-	Core::Mesh* createMesh(const std::string& alias);
+	Core::Mesh* createMesh(const std::string& alias = "");
 
 public:
 	const std::vector<float>& getVertices() const;

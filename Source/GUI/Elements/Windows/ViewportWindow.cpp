@@ -48,6 +48,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// TODO: (DR) Move actions to methods so we dont repeat code here
 	InputManager::setInputAction("viewpoint-right", Keys::n3);
 	Input.bindAction("viewpoint-right", EKeyState::Pressed,
 	                 [&]()
@@ -100,6 +101,24 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
 			                 camera->viewpoint(Vp::ICamera::Viewpoint::BACK);
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-center-scene", Keys::home);
+	Input.bindAction("viewpoint-center-scene", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->centerOnScene(*m_viewport->getMainScene().lock().get());
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-center-selection", Keys::n0);
+	Input.bindAction("viewpoint-center-selection", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
 		                 }
 	                 });
 
@@ -445,6 +464,25 @@ bool ViewportWindow::showViewportMenu()
 		}
 
 		ImGui::Separator();
+
+		if (ImGui::MenuItem("Center camera on selection", "Num0"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
+			}
+		}
+
+		if (ImGui::MenuItem("Center camera on scene", "Home"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->centerOnScene(*m_viewport->getMainScene().lock().get());
+			}
+		}
+
+		ImGui::Separator();
+
 		ImGui::MenuItem("Show objects", nullptr, &displayOptions.showDefault);
 		ImGui::MenuItem("Show axes", nullptr, &displayOptions.showAxes);
 		ImGui::MenuItem("Show grid", nullptr, &displayOptions.showGrid);
