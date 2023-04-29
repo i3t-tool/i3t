@@ -22,7 +22,7 @@ public:
 	std::string m_modelAlias{};
 
 	std::weak_ptr<ColoredObject> m_axes; ///< Visualisation of the basis vectors
-	std::weak_ptr<ColoredObject> m_boundingBox; ///< For debug purposes
+	// std::weak_ptr<ColoredObject> m_boundingBox; ///< For debug purposes
 
 	SceneModel(Core::Mesh* mesh, PhongShader* shader);
 
@@ -36,7 +36,7 @@ public:
 
 	void update(Scene& scene) override;
 
-	void updateBoundingBox();
+	// void updateBoundingBox();
 
 	void onSceneAdd(Scene& scene) override;
 	void onSceneRemove(Scene& scene) override;

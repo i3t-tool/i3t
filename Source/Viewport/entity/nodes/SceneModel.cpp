@@ -37,7 +37,7 @@ void SceneModel::setModel(std::string modelAlias)
 	}
 	m_modelAlias = modelAlias;
 	m_mesh = newMesh;
-	updateBoundingBox();
+	// updateBoundingBox();
 }
 
 std::string SceneModel::getModel() { return m_modelAlias; }
@@ -49,9 +49,9 @@ void SceneModel::update(Scene& scene)
 	axesPtr->m_visible = m_showAxes;
 	axesPtr->m_modelMatrix = this->m_modelMatrix * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 
-	auto boundingBoxPtr = m_boundingBox.lock();;
-	boundingBoxPtr->m_modelMatrix = glm::mat4(1.0f);
-	updateBoundingBox();
+	//	auto boundingBoxPtr = m_boundingBox.lock();;
+	//	boundingBoxPtr->m_modelMatrix = glm::mat4(1.0f);
+	//	updateBoundingBox();
 }
 
 void SceneModel::onSceneAdd(Scene& scene)
@@ -62,45 +62,46 @@ void SceneModel::onSceneAdd(Scene& scene)
 	axes->setDisplayType(DisplayType::Axes);
 	m_axes = scene.addEntity(axes);
 
-	auto boundingBox = std::make_shared<ColoredObject>(nullptr, Shaders::instance().m_colorShader.get());
-	boundingBox->setDisplayType(DisplayType::Axes);
-	m_boundingBox = scene.addEntity(boundingBox);
-	updateBoundingBox();
+	//	auto boundingBox = std::make_shared<ColoredObject>(nullptr, Shaders::instance().m_colorShader.get());
+	//	boundingBox->setDisplayType(DisplayType::Axes);
+	//	m_boundingBox = scene.addEntity(boundingBox);
+	//	updateBoundingBox();
 }
 
-void SceneModel::updateBoundingBox()
-{
-	if (auto box = m_boundingBox.lock())
-	{
-		std::vector<glm::vec3> points;
-		glm::vec3 boxMin = m_mesh->m_boundingBoxMin;
-		glm::vec3 boxMax = m_mesh->m_boundingBoxMax;
-
-		// Convert all bounding box points to world space and encompass them with one axis aligned bounding box
-		// (Note: The w coordinate is ignored)
-
-		// List of all points of the bounding box in world space
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin.x, boxMin.y, boxMax.z, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin.x, boxMax.y, boxMin.z, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax.x, boxMin.y, boxMin.z, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax.x, boxMax.y, boxMin.z, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax.x, boxMin.y, boxMax.z, 1.0f)));
-		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin.x, boxMax.y, boxMax.z, 1.0f)));
-		// Create world space axis aligned bounding box containing the original bounding box
-		auto aaBox = GfxUtils::createBoundingBox(points);
-
-		Shaper shaper;
-		shaper.setColor(glm::vec3(1.0, 0.0, 1.0));
-		shaper.lineBox(aaBox.first, aaBox.second);
-		box->m_mesh = shaper.createLineMesh();
-	}
-}
+// Was used for testing, can be removed
+// void SceneModel::updateBoundingBox()
+//{
+//	if (auto box = m_boundingBox.lock())
+//	{
+//		std::vector<glm::vec3> points;
+//		glm::vec3 boxMin = m_mesh->m_boundingBoxMin;
+//		glm::vec3 boxMax = m_mesh->m_boundingBoxMax;
+//
+//		// Convert all bounding box points to world space and encompass them with one axis aligned bounding box
+//		// (Note: The w coordinate is ignored)
+//
+//		// List of all points of the bounding box in world space
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin.x, boxMin.y, boxMax.z, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin.x, boxMax.y, boxMin.z, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax.x, boxMin.y, boxMin.z, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax.x, boxMax.y, boxMin.z, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMax.x, boxMin.y, boxMax.z, 1.0f)));
+//		points.push_back(glm::vec3(this->m_modelMatrix * glm::vec4(boxMin.x, boxMax.y, boxMax.z, 1.0f)));
+//		// Create world space axis aligned bounding box containing the original bounding box
+//		auto aaBox = GfxUtils::createBoundingBox(points);
+//
+//		Shaper shaper;
+//		shaper.setColor(glm::vec3(1.0, 0.0, 1.0));
+//		shaper.lineBox(aaBox.first, aaBox.second);
+//		box->m_mesh = shaper.createLineMesh();
+//	}
+//}
 
 void SceneModel::onSceneRemove(Scene& scene)
 {
 	TexturedObject::onSceneRemove(scene);
 	scene.removeEntity(m_axes);
-	scene.removeEntity(m_boundingBox);
+	// scene.removeEntity(m_boundingBox);
 }
