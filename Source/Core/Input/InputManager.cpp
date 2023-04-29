@@ -75,9 +75,9 @@ void InputManager::setInputAxis(const char* action, float scale, Keys::Code code
 
 bool InputManager::areModifiersActive(Modifiers mods)
 {
-	bool active = mods[0] ? isKeyPressed(Keys::Code::ctrll) : true;
-	active &= mods[1] ? isKeyPressed(Keys::Code::altl) : true;
-	active &= mods[2] ? isKeyPressed(Keys::Code::shiftl) : true;
+	bool active = mods[0] == isKeyPressed(Keys::Code::ctrll);
+	active &= mods[1] == isKeyPressed(Keys::Code::altl);
+	active &= mods[2] == isKeyPressed(Keys::Code::shiftl);
 
 	return active;
 }

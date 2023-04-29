@@ -1,8 +1,11 @@
 #include "ICamera.h"
 
+#include "Core/Defs.h"
 #include "glm/ext/matrix_clip_space.hpp"
+#include "glm/gtx/matrix_interpolation.hpp"
 
 using namespace Vp;
+using namespace std::chrono;
 
 void ICamera::size(int width, int height)
 {
@@ -53,18 +56,59 @@ glm::mat4 ICamera::createProjectionMatrix(bool nonShrinking) const
 	}
 }
 
+void ICamera::viewpoint(ICamera::Viewpoint viewpoint){};
+
+void ICamera::interpolate(glm::mat4 from, glm::mat4 to)
+{
+	// If already interpolating pickup from the current location
+	float progress = 0;
+	if (isInterpolating(progress))
+	{
+		interpolationFrom = glm::interpolate(interpolationFrom, interpolationTo, progress);
+	}
+	else
+	{
+		interpolationFrom = from;
+	}
+	interpolationTo = to;
+	interpolationStart = std::chrono::steady_clock::now();
+}
+
+bool ICamera::isInterpolating(float& progress) const
+{
+	double elapsed =
+	    std::chrono::duration_cast<std::chrono::duration<double>>(steady_clock::now() - interpolationStart).count();
+	if (elapsed < interpolationPeriod)
+	{
+		progress = static_cast<float>(elapsed / interpolationPeriod);
+		return true;
+	}
+	return false;
+}
+
+const glm::mat4 ICamera::getView() const
+{
+	float progress = 0;
+	if (isInterpolating(progress))
+	{
+		return glm::interpolate(interpolationFrom, interpolationTo, progress);
+	}
+	return m_view;
+}
+
+const glm::mat4 ICamera::getProjection() const { return m_projection; }
+
+int ICamera::getWidth() const { return m_width; }
+int ICamera::getHeight() const { return m_height; }
+
+const glm::vec3 ICamera::getPosition() const { return m_position; }
+const glm::vec3 ICamera::getDirection() const { return m_direction; }
+const glm::vec3 ICamera::getUp() const { return m_up; }
+const glm::vec3 ICamera::getRight() const { return m_right; }
+
 float ICamera::getZNear() const { return m_zNear; }
 void ICamera::setZNear(float zNear) { this->m_zNear = zNear; }
 float ICamera::getZFar() const { return m_zFar; }
 void ICamera::setZFar(float zFar) { this->m_zFar = zFar; }
 float ICamera::getFov() const { return m_fov; }
 void ICamera::setFov(float fov) { this->m_fov = fov; }
-
-const glm::mat4& ICamera::getView() const { return m_view; }
-const glm::mat4& ICamera::getProjection() const { return m_projection; }
-int ICamera::getWidth() const { return m_width; }
-int ICamera::getHeight() const { return m_height; }
-const glm::vec3& ICamera::getPosition() const { return m_position; }
-const glm::vec3& ICamera::getDirection() const { return m_direction; }
-const glm::vec3& ICamera::getUp() const { return m_up; }
-const glm::vec3& ICamera::getRight() const { return m_right; }

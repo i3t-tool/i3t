@@ -34,6 +34,8 @@ public:
 	virtual float getRotationY() const;
 	virtual void setRotationY(float rotationY);
 
+	void viewpoint(ICamera::Viewpoint viewpoint) override;
+
 	float getZoomSpeed() const;
 	void setZoomSpeed(float zoomSpeed);
 	float getRotateSpeed() const;

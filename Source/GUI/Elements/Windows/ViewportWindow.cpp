@@ -39,6 +39,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	renderOptions.clearColor = Config::BACKGROUND_COLOR;
 	renderOptions.selection = true;
 
+	// TODO: (DR) Delete this or move to viewport
 	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_MULTISAMPLE);
 	// glCullFace(GL_BACK); //TODO: (DR) Do we need culling? Maybe add a toggle? (Handled by
@@ -47,15 +48,70 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	/// \todo MH This is example code, it can be removed anytime.
-	InputManager::setInputAction("fire", Keys::b);
-	InputManager::setInputAction("fire", Keys::m);
-	InputManager::setInputAxis("move", 1.0f, Keys::o);
-	InputManager::setInputAxis("move", -1.0f, Keys::p);
+	InputManager::setInputAction("viewpoint-right", Keys::n3);
+	Input.bindAction("viewpoint-right", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->viewpoint(Vp::ICamera::Viewpoint::RIGHT);
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-left", Keys::n3, {Keys::ctrll});
+	Input.bindAction("viewpoint-left", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->viewpoint(Vp::ICamera::Viewpoint::LEFT);
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-top", Keys::n7);
+	Input.bindAction("viewpoint-top", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->viewpoint(Vp::ICamera::Viewpoint::TOP);
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-bottom", Keys::n7, {Keys::ctrll});
+	Input.bindAction("viewpoint-bottom", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->viewpoint(Vp::ICamera::Viewpoint::BOTTOM);
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-front", Keys::n1);
+	Input.bindAction("viewpoint-front", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->viewpoint(Vp::ICamera::Viewpoint::FRONT);
+		                 }
+	                 });
+	InputManager::setInputAction("viewpoint-back", Keys::n1, {Keys::ctrll});
+	Input.bindAction("viewpoint-back", EKeyState::Pressed,
+	                 [&]()
+	                 {
+		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
+		                 {
+			                 camera->viewpoint(Vp::ICamera::Viewpoint::BACK);
+		                 }
+	                 });
 
-	Input.bindAction("fire", EKeyState::Pressed, []() { LOG_INFO("Action fired."); });
-	Input.bindAction("fire", EKeyState::Released, []() { LOG_INFO("Action released."); });
-	Input.bindAxis("move", [](float val) { LOG_INFO("move: {}", val); });
+	/// \todo MH This is example code, it can be removed anytime.
+	//	InputManager::setInputAction("fire", Keys::b);
+	//	InputManager::setInputAction("fire", Keys::m);
+	//	InputManager::setInputAxis("move", 1.0f, Keys::o);
+	//	InputManager::setInputAxis("move", -1.0f, Keys::p);
+	//
+	//	Input.bindAction("fire", EKeyState::Pressed, []() { LOG_INFO("Action fired."); });
+	//	Input.bindAction("fire", EKeyState::Released, []() { LOG_INFO("Action released."); });
+	//	Input.bindAxis("move", [](float val) { LOG_INFO("move: {}", val); });
 	/// todoend
 }
 
@@ -340,6 +396,51 @@ bool ViewportWindow::showViewportMenu()
 			{
 				camera->getOrbitCamera()->setFov(m_viewport->getSettings().camera_fov);
 				camera->getTrackballCamera()->setFov(m_viewport->getSettings().camera_fov);
+			}
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::MenuItem("Viewpoint right", "Num3"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->viewpoint(Vp::ICamera::Viewpoint::RIGHT);
+			}
+		}
+		if (ImGui::MenuItem("Viewpoint left", "Ctrl+Num3"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->viewpoint(Vp::ICamera::Viewpoint::LEFT);
+			}
+		}
+		if (ImGui::MenuItem("Viewpoint top", "Num7"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->viewpoint(Vp::ICamera::Viewpoint::TOP);
+			}
+		}
+		if (ImGui::MenuItem("Viewpoint bottom", "Ctrl+Num7"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->viewpoint(Vp::ICamera::Viewpoint::BOTTOM);
+			}
+		}
+		if (ImGui::MenuItem("Viewpoint front", "Num1"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->viewpoint(Vp::ICamera::Viewpoint::FRONT);
+			}
+		}
+		if (ImGui::MenuItem("Viewpoint back", "Ctrl+Num1"))
+		{
+			if (auto camera = m_viewport->getMainViewportCamera().lock())
+			{
+				camera->viewpoint(Vp::ICamera::Viewpoint::BACK);
 			}
 		}
 

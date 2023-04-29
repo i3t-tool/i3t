@@ -21,6 +21,7 @@ using ModifiersList = std::vector<Keys::Code>;
  */
 FORCE_INLINE Modifiers createModifiers(const ModifiersList& list)
 {
+	// TODO: (DR) Add right versions of modifiers
 	Modifiers mods = {false, false, false, false};
 	for (auto mod : list)
 	{

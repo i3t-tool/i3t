@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <glm/glm.hpp>
 
 // TODO: (DR) Perhaps add option to use orthographic projection
@@ -15,6 +17,17 @@ namespace Vp
  */
 class ICamera
 {
+public:
+	enum class Viewpoint
+	{
+		LEFT,
+		RIGHT,
+		TOP,
+		BOTTOM,
+		FRONT,
+		BACK
+	};
+
 protected:
 	glm::mat4 m_view{1.0f};
 	glm::mat4 m_projection{1.0f};
@@ -32,19 +45,13 @@ protected:
 	glm::vec3 m_up = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 m_right = glm::vec3(0.0f, 1.0f, 0.0f);
 
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double>> interpolationStart{};
+	double interpolationPeriod{0.14f};
+	glm::mat4 interpolationFrom;
+	glm::mat4 interpolationTo;
+
 public:
 	virtual ~ICamera() = default;
-
-	/**
-	 * @return The camera view matrix
-	 */
-	virtual const glm::mat4& getView() const;
-
-	/**
-	 *
-	 * @return The camera projection matrix
-	 */
-	virtual const glm::mat4& getProjection() const;
 
 	/**
 	 * Sets the camera resolution in pixels.
@@ -68,20 +75,36 @@ public:
 	 */
 	virtual void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize) = 0;
 
+	/**
+	 * @return The camera view matrix
+	 */
+	virtual const glm::mat4 getView() const;
+
+	/**
+	 *
+	 * @return The camera projection matrix
+	 */
+	virtual const glm::mat4 getProjection() const;
+
+	virtual void viewpoint(ICamera::Viewpoint viewpoint);
+
+	void interpolate(glm::mat4 from, glm::mat4 to);
+	bool isInterpolating(float& progress) const;
+
+	virtual int getWidth() const;
+	virtual int getHeight() const;
+
+	virtual const glm::vec3 getPosition() const;
+	virtual const glm::vec3 getDirection() const;
+	virtual const glm::vec3 getUp() const;
+	virtual const glm::vec3 getRight() const;
+
 	virtual float getZNear() const;
 	virtual void setZNear(float zNear);
 	virtual float getZFar() const;
 	virtual void setZFar(float zFar);
 	virtual float getFov() const;
 	virtual void setFov(float fov);
-
-	virtual int getWidth() const;
-	virtual int getHeight() const;
-
-	virtual const glm::vec3& getPosition() const;
-	virtual const glm::vec3& getDirection() const;
-	virtual const glm::vec3& getUp() const;
-	virtual const glm::vec3& getRight() const;
 
 protected:
 	glm::mat4 createProjectionMatrix(bool nonShrinking) const;

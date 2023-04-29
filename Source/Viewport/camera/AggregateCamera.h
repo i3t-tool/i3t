@@ -19,9 +19,13 @@ namespace Vp
 class AggregateCamera : public ICamera
 {
 public:
-	enum CameraMode {
-		ORBIT, TRACKBALL, NONE
+	enum CameraMode
+	{
+		ORBIT,
+		TRACKBALL,
+		NONE
 	};
+
 protected:
 	CameraMode m_activeMode = CameraMode::NONE;
 	std::shared_ptr<ICamera> m_activeCamera = nullptr;
@@ -43,8 +47,16 @@ public:
 	const std::shared_ptr<OrbitCamera>& getOrbitCamera() const;
 	const std::shared_ptr<TrackballCamera>& getTrackballCamera() const;
 
-	const glm::mat4& getView() const override;
-	const glm::mat4& getProjection() const override;
+	void viewpoint(ICamera::Viewpoint viewpoint) override;
+
+	const glm::mat4 getView() const override;
+	const glm::mat4 getProjection() const override;
+
+	const glm::vec3 getPosition() const override;
+	const glm::vec3 getDirection() const override;
+	const glm::vec3 getUp() const override;
+	const glm::vec3 getRight() const override;
+
 	float getZNear() const override;
 	void setZNear(float zNear) override;
 	float getZFar() const override;
@@ -53,9 +65,5 @@ public:
 	void setFov(float fov) override;
 	int getWidth() const override;
 	int getHeight() const override;
-	const glm::vec3& getPosition() const override;
-	const glm::vec3& getDirection() const override;
-	const glm::vec3& getUp() const override;
-	const glm::vec3& getRight() const override;
 };
 } // namespace Vp

@@ -66,7 +66,7 @@ void AggregateCamera::switchMode(CameraMode newMode)
 		glm::vec3 dir = m_trackballCamera->getDirection();
 		float angleX = -glm::degrees(glm::atan(dir.z, dir.x));
 		angleX = -glm::sign(angleX) * (180 - glm::abs(angleX)); // Adjust range
-		float angleY = -glm::degrees(glm::atan(dir.y, (float) hypot(dir.x, dir.z)));
+		float angleY = -glm::degrees(glm::atan(dir.y, (float)hypot(dir.x, dir.z)));
 		m_orbitCamera->setRotationX(angleX);
 		m_orbitCamera->setRotationY(angleY);
 
@@ -93,17 +93,22 @@ const std::shared_ptr<ICamera>& AggregateCamera::getActiveCamera() const { retur
 const std::shared_ptr<OrbitCamera>& AggregateCamera::getOrbitCamera() const { return m_orbitCamera; }
 const std::shared_ptr<TrackballCamera>& AggregateCamera::getTrackballCamera() const { return m_trackballCamera; }
 
-const glm::mat4& AggregateCamera::getView() const { return m_activeCamera->getView(); }
-const glm::mat4& AggregateCamera::getProjection() const { return m_activeCamera->getProjection(); }
+void AggregateCamera::viewpoint(ICamera::Viewpoint viewpoint) { m_activeCamera->viewpoint(viewpoint); }
+
+const glm::mat4 AggregateCamera::getView() const { return m_activeCamera->getView(); }
+const glm::mat4 AggregateCamera::getProjection() const { return m_activeCamera->getProjection(); }
+
 float AggregateCamera::getZNear() const { return m_activeCamera->getZNear(); }
 void AggregateCamera::setZNear(float zNear) { m_activeCamera->setZNear(zNear); }
 float AggregateCamera::getZFar() const { return m_activeCamera->getZFar(); }
 void AggregateCamera::setZFar(float zFar) { m_activeCamera->setZFar(zFar); }
 float AggregateCamera::getFov() const { return m_activeCamera->getFov(); }
 void AggregateCamera::setFov(float fov) { m_activeCamera->setFov(fov); }
+
 int AggregateCamera::getWidth() const { return m_activeCamera->getWidth(); }
 int AggregateCamera::getHeight() const { return m_activeCamera->getHeight(); }
-const glm::vec3& AggregateCamera::getPosition() const { return m_activeCamera->getPosition(); }
-const glm::vec3& AggregateCamera::getDirection() const { return m_activeCamera->getDirection(); }
-const glm::vec3& AggregateCamera::getUp() const { return m_activeCamera->getUp(); }
-const glm::vec3& AggregateCamera::getRight() const { return m_activeCamera->getRight(); }
+
+const glm::vec3 AggregateCamera::getPosition() const { return m_activeCamera->getPosition(); }
+const glm::vec3 AggregateCamera::getDirection() const { return m_activeCamera->getDirection(); }
+const glm::vec3 AggregateCamera::getUp() const { return m_activeCamera->getUp(); }
+const glm::vec3 AggregateCamera::getRight() const { return m_activeCamera->getRight(); }
