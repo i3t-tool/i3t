@@ -37,7 +37,7 @@ void Viewport::init(ViewportSettings settings)
 	Shaper::initDefaultShapes();
 
 	// Preload some useful models
-	RMI.mesh("Data/Models/super8n.gltf");
+	RMI.mesh("Data/Models/camera.gltf");
 
 	// Create manipulators
 	m_manipulators = std::make_shared<Manipulators>(this);
@@ -162,7 +162,7 @@ WPtr<SceneCamera> Viewport::createCamera(Core::ID guiNodeId)
 {
 	// TODO: (DR) It'd be nice to use a camera model with a lens assembly looking similar to a frustum
 	//  Key word being an old projector or some old grain film movie cameras.
-	Core::Mesh* mesh = RM::instance().mesh("Data/Models/super8n.gltf");
+	Core::Mesh* mesh = RM::instance().mesh("Data/Models/camera.gltf");
 	auto sceneCamera = std::make_shared<SceneCamera>(mesh, Shaders::instance().m_phongShader.get());
 	sceneCamera->m_guiNodeId = guiNodeId;
 	m_mainScene->addEntity(sceneCamera);

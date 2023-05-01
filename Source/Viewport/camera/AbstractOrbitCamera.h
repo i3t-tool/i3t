@@ -1,13 +1,13 @@
 #pragma once
 
-#include "ICamera.h"
+#include "AbstractCamera.h"
 
 namespace Vp
 {
 /**
  * Abstract camera that turns around a point (pivot) at a certain distance (radius).
  */
-class IOrbitCamera : public ICamera
+class AbstractOrbitCamera : public AbstractCamera
 {
 protected:
 	glm::vec3 m_pivot = glm::vec3(0.0f, 0.0f, 0.0f);

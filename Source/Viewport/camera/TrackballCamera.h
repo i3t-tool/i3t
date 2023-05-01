@@ -1,13 +1,13 @@
 #pragma once
 
-#include "IOrbitCamera.h"
+#include "AbstractOrbitCamera.h"
 
 namespace Vp
 {
 /**
  * Camera turning around a point using a virtual screen-space trackball.
  */
-class TrackballCamera : public IOrbitCamera
+class TrackballCamera : public AbstractOrbitCamera
 {
 protected:
 	glm::mat4 m_accumulatedRotation = glm::mat4(1);

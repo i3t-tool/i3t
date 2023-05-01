@@ -89,11 +89,11 @@ void AggregateCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 win
 }
 
 AggregateCamera::CameraMode AggregateCamera::getMode() const { return m_activeMode; }
-const std::shared_ptr<ICamera>& AggregateCamera::getActiveCamera() const { return m_activeCamera; }
+const std::shared_ptr<AbstractCamera>& AggregateCamera::getActiveCamera() const { return m_activeCamera; }
 const std::shared_ptr<OrbitCamera>& AggregateCamera::getOrbitCamera() const { return m_orbitCamera; }
 const std::shared_ptr<TrackballCamera>& AggregateCamera::getTrackballCamera() const { return m_trackballCamera; }
 
-void AggregateCamera::viewpoint(ICamera::Viewpoint viewpoint) { m_activeCamera->viewpoint(viewpoint); }
+void AggregateCamera::viewpoint(AbstractCamera::Viewpoint viewpoint) { m_activeCamera->viewpoint(viewpoint); }
 
 void AggregateCamera::centerOnScene(const Scene& scene) { m_activeCamera->centerOnScene(scene); }
 void AggregateCamera::centerOnSelection(const Scene& scene) { m_activeCamera->centerOnSelection(scene); }

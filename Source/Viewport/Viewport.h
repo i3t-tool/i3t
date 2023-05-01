@@ -17,7 +17,7 @@
 #include "Core/Nodes/Node.h"
 
 #include "Viewport/Manipulators.h"
-#include "Viewport/camera/ICamera.h"
+#include "Viewport/camera/AbstractCamera.h"
 #include "Viewport/data/DisplayOptions.h"
 #include "Viewport/data/RenderOptions.h"
 #include "Viewport/data/ViewportSettings.h"

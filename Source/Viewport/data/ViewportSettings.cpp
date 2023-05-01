@@ -16,7 +16,7 @@ ViewportSettings::ViewportSettings()
 	mainScene_iorbitCameraPivot = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	preview_fov = 30.0f;
-	preview_radiusFactor = 2.1f;
+	preview_radiusFactor = 1.38f;
 	preview_rotateSpeed = 28.0f;
 
 	camera_smoothScroll = false;
@@ -43,7 +43,7 @@ ViewportSettings::ViewportSettings()
 	highlight_highlightColor = glm::vec3(0.18, 0.784, 0.949);
 
 	manipulator_enabled = true;
-	manipulator_size = 0.12f;
+	manipulator_size = 0.14f;
 
 	grid_color = glm::vec3(0.45, 0.49, 0.53);
 	grid_axisXColor = glm::vec3(1.0, 0.49, 0.53);
@@ -54,8 +54,8 @@ ViewportSettings::ViewportSettings()
 	grid_strength = 0.5f;
 	grid_lineWidth = 1.0f;
 	grid_grid1FadeStart = 0.0f;
-	grid_grid1FadeEnd = 0.25f;
-	grid_grid2FadeStart = 0.1f;
+	grid_grid1FadeEnd = 0.23f;
+	grid_grid2FadeStart = 0.0f;
 	grid_grid2FadeEnd = 0.9f;
 }
 } // namespace Vp

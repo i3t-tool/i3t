@@ -4,7 +4,7 @@
 
 #include "Viewport/data/DisplayOptions.h"
 
-#include "ICamera.h"
+#include "AbstractCamera.h"
 #include "OrbitCamera.h"
 #include "TrackballCamera.h"
 
@@ -16,7 +16,7 @@ namespace Vp
  * Camera with multiple modes that it can seamlessly switch between.
  * Delegates actual "camera work" to one of the cameras that corresponds to the current mode.
  */
-class AggregateCamera : public ICamera
+class AggregateCamera : public AbstractCamera
 {
 public:
 	enum CameraMode
@@ -28,7 +28,7 @@ public:
 
 protected:
 	CameraMode m_activeMode = CameraMode::NONE;
-	std::shared_ptr<ICamera> m_activeCamera = nullptr;
+	std::shared_ptr<AbstractCamera> m_activeCamera = nullptr;
 
 	std::shared_ptr<OrbitCamera> m_orbitCamera = nullptr;
 	std::shared_ptr<TrackballCamera> m_trackballCamera = nullptr;
@@ -43,11 +43,11 @@ public:
 	void processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize) override;
 
 	CameraMode getMode() const;
-	const std::shared_ptr<ICamera>& getActiveCamera() const;
+	const std::shared_ptr<AbstractCamera>& getActiveCamera() const;
 	const std::shared_ptr<OrbitCamera>& getOrbitCamera() const;
 	const std::shared_ptr<TrackballCamera>& getTrackballCamera() const;
 
-	void viewpoint(ICamera::Viewpoint viewpoint) override;
+	void viewpoint(AbstractCamera::Viewpoint viewpoint) override;
 
 	void centerOnScene(const Scene& scene) override;
 	void centerOnSelection(const Scene& scene) override;

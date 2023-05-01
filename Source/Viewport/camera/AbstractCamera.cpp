@@ -1,4 +1,4 @@
-#include "ICamera.h"
+#include "AbstractCamera.h"
 
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtx/matrix_interpolation.hpp"
@@ -15,13 +15,13 @@
 using namespace Vp;
 using namespace std::chrono;
 
-void ICamera::size(int width, int height)
+void AbstractCamera::size(int width, int height)
 {
 	this->m_width = width;
 	this->m_height = height;
 }
 
-glm::mat4 ICamera::createProjectionMatrix(bool nonShrinking) const
+glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 {
 	if (nonShrinking)
 	{
@@ -64,9 +64,9 @@ glm::mat4 ICamera::createProjectionMatrix(bool nonShrinking) const
 	}
 }
 
-void ICamera::viewpoint(ICamera::Viewpoint viewpoint) {}
+void AbstractCamera::viewpoint(AbstractCamera::Viewpoint viewpoint) {}
 
-void ICamera::interpolate(glm::mat4 from, glm::mat4 to)
+void AbstractCamera::interpolate(glm::mat4 from, glm::mat4 to)
 {
 	// If already interpolating pickup from the current location
 	float progress = 0;
@@ -82,7 +82,7 @@ void ICamera::interpolate(glm::mat4 from, glm::mat4 to)
 	interpolationStart = std::chrono::steady_clock::now();
 }
 
-bool ICamera::isInterpolating(float& progress) const
+bool AbstractCamera::isInterpolating(float& progress) const
 {
 	double elapsed =
 	    std::chrono::duration_cast<std::chrono::duration<double>>(steady_clock::now() - interpolationStart).count();
@@ -94,8 +94,9 @@ bool ICamera::isInterpolating(float& progress) const
 	return false;
 }
 
-void ICamera::centerOnScene(const Scene& scene)
+void AbstractCamera::centerOnScene(const Scene& scene)
 {
+	int count = 0;
 	std::vector<const GameObject*> objects;
 	for (const auto& entity : scene.getEntities())
 	{
@@ -109,12 +110,20 @@ void ICamera::centerOnScene(const Scene& scene)
 		if (auto gameObject = std::dynamic_pointer_cast<GameObject>(entity))
 		{
 			objects.push_back(gameObject.get());
+			count++;
 		}
 	}
-	centerOnObjects(objects);
+	if (count == 0)
+	{
+		centerOnBox({-1, -1, -1}, {1, 1, 1}, true); // Center on world origin
+	}
+	else
+	{
+		centerOnObjects(objects);
+	}
 }
 
-void ICamera::centerOnSelection(const Scene& scene)
+void AbstractCamera::centerOnSelection(const Scene& scene)
 {
 	// TODO: (DR) FIX THIS, this is a quick workaround for the fact that viewport doesn't keep an updated list of all
 	//  selected objects. This feature is important but I don't have time to refine it right now. Fix is to keep a list of
@@ -137,7 +146,7 @@ void ICamera::centerOnSelection(const Scene& scene)
 	centerOnObjects(selectedObjects);
 }
 
-void ICamera::centerOnObjects(const std::vector<const GameObject*> objects)
+void AbstractCamera::centerOnObjects(const std::vector<const GameObject*> objects)
 {
 	if (objects.empty())
 		return;
@@ -156,9 +165,10 @@ void ICamera::centerOnObjects(const std::vector<const GameObject*> objects)
 	centerOnBox(aaBox.first, aaBox.second, true);
 }
 
-void ICamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate) {}
+void AbstractCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate) {}
 
-std::vector<glm::vec3> ICamera::createBoundingBoxWorldPoints(glm::vec3 boxMin, glm::vec3 boxMax, glm::mat4 modelMatrix)
+std::vector<glm::vec3> AbstractCamera::createBoundingBoxWorldPoints(glm::vec3 boxMin, glm::vec3 boxMax,
+                                                                    glm::mat4 modelMatrix)
 {
 	// List of all points of the bounding box in world space
 	std::vector<glm::vec3> points;
@@ -173,7 +183,7 @@ std::vector<glm::vec3> ICamera::createBoundingBoxWorldPoints(glm::vec3 boxMin, g
 	return points;
 }
 
-glm::mat4 ICamera::getView() const
+glm::mat4 AbstractCamera::getView() const
 {
 	float progress = 0;
 	if (isInterpolating(progress))
@@ -183,19 +193,19 @@ glm::mat4 ICamera::getView() const
 	return m_view;
 }
 
-glm::mat4 ICamera::getProjection() const { return m_projection; }
+glm::mat4 AbstractCamera::getProjection() const { return m_projection; }
 
-int ICamera::getWidth() const { return m_width; }
-int ICamera::getHeight() const { return m_height; }
+int AbstractCamera::getWidth() const { return m_width; }
+int AbstractCamera::getHeight() const { return m_height; }
 
-glm::vec3 ICamera::getPosition() const { return m_position; }
-glm::vec3 ICamera::getDirection() const { return m_direction; }
-glm::vec3 ICamera::getUp() const { return m_up; }
-glm::vec3 ICamera::getRight() const { return m_right; }
+glm::vec3 AbstractCamera::getPosition() const { return m_position; }
+glm::vec3 AbstractCamera::getDirection() const { return m_direction; }
+glm::vec3 AbstractCamera::getUp() const { return m_up; }
+glm::vec3 AbstractCamera::getRight() const { return m_right; }
 
-float ICamera::getZNear() const { return m_zNear; }
-void ICamera::setZNear(float zNear) { this->m_zNear = zNear; }
-float ICamera::getZFar() const { return m_zFar; }
-void ICamera::setZFar(float zFar) { this->m_zFar = zFar; }
-float ICamera::getFov() const { return m_fov; }
-void ICamera::setFov(float fov) { this->m_fov = fov; }
+float AbstractCamera::getZNear() const { return m_zNear; }
+void AbstractCamera::setZNear(float zNear) { this->m_zNear = zNear; }
+float AbstractCamera::getZFar() const { return m_zFar; }
+void AbstractCamera::setZFar(float zFar) { this->m_zFar = zFar; }
+float AbstractCamera::getFov() const { return m_fov; }
+void AbstractCamera::setFov(float fov) { this->m_fov = fov; }

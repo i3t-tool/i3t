@@ -351,13 +351,13 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 	unsigned int max; // changed: to unsigned
 	max = 1;
 	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max)) != AI_SUCCESS)
-		shininess = 1.0f;
+		shininess = defaultMaterial.shininess;
 	// Presumably we don't want shininess to be < 1.0
 	shininess = std::max(1.0f, shininess);
 
 	max = 1;
 	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS_STRENGTH, &strength, &max)) != AI_SUCCESS)
-		strength = defaultMaterial.shininess;
+		strength = 1.0;
 
 	meshMaterial.shininess = shininess * strength;
 }

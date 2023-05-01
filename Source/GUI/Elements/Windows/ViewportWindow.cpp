@@ -46,7 +46,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	                 {
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
-			                 camera->viewpoint(Vp::ICamera::Viewpoint::RIGHT);
+			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 		                 }
 	                 });
 	InputManager::setInputAction("viewpoint-left", Keys::n3, {Keys::ctrll});
@@ -55,7 +55,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	                 {
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
-			                 camera->viewpoint(Vp::ICamera::Viewpoint::LEFT);
+			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 		                 }
 	                 });
 	InputManager::setInputAction("viewpoint-top", Keys::n7);
@@ -64,7 +64,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	                 {
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
-			                 camera->viewpoint(Vp::ICamera::Viewpoint::TOP);
+			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 		                 }
 	                 });
 	InputManager::setInputAction("viewpoint-bottom", Keys::n7, {Keys::ctrll});
@@ -73,7 +73,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	                 {
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
-			                 camera->viewpoint(Vp::ICamera::Viewpoint::BOTTOM);
+			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 		                 }
 	                 });
 	InputManager::setInputAction("viewpoint-front", Keys::n1);
@@ -82,7 +82,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	                 {
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
-			                 camera->viewpoint(Vp::ICamera::Viewpoint::FRONT);
+			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 		                 }
 	                 });
 	InputManager::setInputAction("viewpoint-back", Keys::n1, {Keys::ctrll});
@@ -91,7 +91,7 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	                 {
 		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
 		                 {
-			                 camera->viewpoint(Vp::ICamera::Viewpoint::BACK);
+			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
 		                 }
 	                 });
 	InputManager::setInputAction("viewpoint-center-scene", Keys::home);
@@ -415,42 +415,42 @@ bool ViewportWindow::showViewportMenu()
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->viewpoint(Vp::ICamera::Viewpoint::RIGHT);
+				camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
 			}
 		}
 		if (ImGui::MenuItem("Viewpoint left", "Ctrl+Num3"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->viewpoint(Vp::ICamera::Viewpoint::LEFT);
+				camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
 			}
 		}
 		if (ImGui::MenuItem("Viewpoint top", "Num7"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->viewpoint(Vp::ICamera::Viewpoint::TOP);
+				camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
 			}
 		}
 		if (ImGui::MenuItem("Viewpoint bottom", "Ctrl+Num7"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->viewpoint(Vp::ICamera::Viewpoint::BOTTOM);
+				camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
 			}
 		}
 		if (ImGui::MenuItem("Viewpoint front", "Num1"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->viewpoint(Vp::ICamera::Viewpoint::FRONT);
+				camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
 			}
 		}
 		if (ImGui::MenuItem("Viewpoint back", "Ctrl+Num1"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{
-				camera->viewpoint(Vp::ICamera::Viewpoint::BACK);
+				camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
 			}
 		}
 

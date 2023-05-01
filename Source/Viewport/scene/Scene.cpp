@@ -6,8 +6,8 @@
 
 #include "Viewport/Shaper.h"
 #include "Viewport/Viewport.h"
+#include "Viewport/camera/AbstractCamera.h"
 #include "Viewport/camera/AggregateCamera.h"
-#include "Viewport/camera/ICamera.h"
 #include "Viewport/shader/BoxBlurShader.h"
 #include "Viewport/shader/GridShader.h"
 #include "Viewport/shader/PhongShader.h"

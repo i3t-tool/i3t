@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IOrbitCamera.h"
+#include "AbstractOrbitCamera.h"
 
 namespace Vp
 {
@@ -8,7 +8,7 @@ namespace Vp
  * Camera turning around a point using an azimuth and elevation angle.
  * It doesn't roll.
  */
-class OrbitCamera : public IOrbitCamera
+class OrbitCamera : public AbstractOrbitCamera
 {
 protected:
 	float m_rotationX = -90.0f;
@@ -34,7 +34,7 @@ public:
 	virtual float getRotationY() const;
 	virtual void setRotationY(float rotationY);
 
-	void viewpoint(ICamera::Viewpoint viewpoint) override;
+	void viewpoint(AbstractCamera::Viewpoint viewpoint) override;
 
 	float getZoomSpeed() const;
 	void setZoomSpeed(float zoomSpeed);

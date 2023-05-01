@@ -110,32 +110,32 @@ void OrbitCamera::mouseWheel(float scroll)
 	}
 }
 
-void OrbitCamera::viewpoint(ICamera::Viewpoint viewpoint)
+void OrbitCamera::viewpoint(AbstractCamera::Viewpoint viewpoint)
 {
 	glm::mat4 from = m_view;
 	switch (viewpoint)
 	{
-	case ICamera::Viewpoint::RIGHT:
+	case AbstractCamera::Viewpoint::RIGHT:
 		this->setRotationX(0);
 		this->setRotationY(0);
 		break;
-	case ICamera::Viewpoint::LEFT:
+	case AbstractCamera::Viewpoint::LEFT:
 		this->setRotationX(180);
 		this->setRotationY(0);
 		break;
-	case ICamera::Viewpoint::TOP:
+	case AbstractCamera::Viewpoint::TOP:
 		this->setRotationX(-90);
 		this->setRotationY(90);
 		break;
-	case ICamera::Viewpoint::BOTTOM:
+	case AbstractCamera::Viewpoint::BOTTOM:
 		this->setRotationX(-90);
 		this->setRotationY(-90);
 		break;
-	case ICamera::Viewpoint::FRONT:
+	case AbstractCamera::Viewpoint::FRONT:
 		this->setRotationX(-90);
 		this->setRotationY(0);
 		break;
-	case ICamera::Viewpoint::BACK:
+	case AbstractCamera::Viewpoint::BACK:
 		this->setRotationX(90);
 		this->setRotationY(0);
 		break;

@@ -16,7 +16,7 @@ namespace Vp
  * Holds a view matrix and projection information.
  * Also contains further information about its view space (position, direction, up and right vectors)
  */
-class ICamera
+class AbstractCamera
 {
 public:
 	enum class Viewpoint
@@ -52,7 +52,7 @@ protected:
 	glm::mat4 interpolationTo;
 
 public:
-	virtual ~ICamera() = default;
+	virtual ~AbstractCamera() = default;
 
 	/**
 	 * Sets the camera resolution in pixels.
@@ -91,7 +91,7 @@ public:
 	 * Moves the camera to the specified viewpoint. Subclasses need to provide their own implementations.
 	 * @param viewpoint
 	 */
-	virtual void viewpoint(ICamera::Viewpoint viewpoint);
+	virtual void viewpoint(AbstractCamera::Viewpoint viewpoint);
 
 	/**
 	 * Moves camera so that all objects in the scene are visible.
