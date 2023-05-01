@@ -14,7 +14,7 @@ protected:
 	float m_radius = 7.0f;
 
 public:
-	void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) override;
+	void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate) override;
 
 	glm::vec3 getPivot() const;
 	void setPivot(const glm::vec3& pivot);

@@ -132,11 +132,11 @@ void OrbitCamera::viewpoint(ICamera::Viewpoint viewpoint)
 		this->setRotationY(-90);
 		break;
 	case ICamera::Viewpoint::FRONT:
-		this->setRotationX(90);
+		this->setRotationX(-90);
 		this->setRotationY(0);
 		break;
 	case ICamera::Viewpoint::BACK:
-		this->setRotationX(-90);
+		this->setRotationX(90);
 		this->setRotationY(0);
 		break;
 	}

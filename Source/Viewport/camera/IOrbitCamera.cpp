@@ -2,7 +2,7 @@
 
 using namespace Vp;
 
-void IOrbitCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax)
+void IOrbitCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate)
 {
 	glm::vec3 centerVector = 0.5f * (boxMax - boxMin);
 	glm::vec3 centerWorldPos = boxMin + centerVector;
@@ -11,8 +11,11 @@ void IOrbitCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax)
 	glm::mat4 from = m_view;
 	this->setPivot(centerWorldPos);
 	this->setRadius(glm::length(centerVector) * radiusFactor);
-	update();
-	interpolate(from, m_view);
+	if (interpolate)
+	{
+		update();
+		this->interpolate(from, m_view);
+	}
 }
 
 glm::vec3 IOrbitCamera::getPivot() const { return m_pivot; }

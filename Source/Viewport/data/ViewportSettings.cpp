@@ -15,9 +15,9 @@ ViewportSettings::ViewportSettings()
 	mainScene_iorbitCameraRadius = 12.0f;
 	mainScene_iorbitCameraPivot = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	preview_fov = 65.0f;
-	preview_radiusFactor = 2.3f;
-	preview_rotateSpeed = 30.0f;
+	preview_fov = 30.0f;
+	preview_radiusFactor = 2.1f;
+	preview_rotateSpeed = 28.0f;
 
 	camera_smoothScroll = false;
 	camera_fov = 90.0f;

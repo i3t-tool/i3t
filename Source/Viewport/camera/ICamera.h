@@ -111,7 +111,7 @@ public:
 	/**
 	 * Moves camera so that the specified axis aligned bounding box is visible.
 	 */
-	virtual void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax);
+	virtual void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate);
 
 	/**
 	 * Begin interpolation from one view matrix to another, the interpolation will take m_interpolationPeriod seconds in

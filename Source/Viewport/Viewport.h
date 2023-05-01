@@ -146,10 +146,13 @@ public:
 	 * @param width Framebuffer width in pixels
 	 * @param height Framebuffer height in pixels
 	 * @param gameObject Game object to preview
+	 * @param renderOptions Optional rendering options. DON'T call this function multiple times with different
+	 * renderOptions per frame.
 	 * @return Void. The drawn framebuffer can be retrieved with renderTarget->getOutputFramebuffer().
 	 * Use outputFramebuffer.lock()->getColorTexture() to get the resulting texture.
 	 */
-	void drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int height, WPtr<GameObject> gameObject);
+	void drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int height, WPtr<GameObject> gameObject,
+	                 const RenderOptions& renderOptions);
 
 	/**
 	 * Update scene logic

@@ -39,15 +39,6 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	renderOptions.clearColor = Config::BACKGROUND_COLOR;
 	renderOptions.selection = true;
 
-	// TODO: (DR) Delete this or move to viewport
-	glEnable(GL_STENCIL_TEST);
-	glEnable(GL_MULTISAMPLE);
-	// glCullFace(GL_BACK); //TODO: (DR) Do we need culling? Maybe add a toggle? (Handled by
-	// glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// TODO: (DR) Move actions to methods so we dont repeat code here
 	InputManager::setInputAction("viewpoint-right", Keys::n3);
 	Input.bindAction("viewpoint-right", EKeyState::Pressed,
@@ -409,7 +400,7 @@ bool ViewportWindow::showViewportMenu()
 				camera->getTrackballCamera()->setSmoothScroll(m_viewport->getSettings().camera_smoothScroll);
 			}
 		}
-		if (ImGui::SliderFloat("Camera fov", &m_viewport->getSettings().camera_fov, 1, 1000, "%.2f"))
+		if (ImGui::SliderFloat("Camera fov", &m_viewport->getSettings().camera_fov, 1, 180, "%.1f"))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{

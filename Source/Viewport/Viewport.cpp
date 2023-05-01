@@ -37,7 +37,7 @@ void Viewport::init(ViewportSettings settings)
 	Shaper::initDefaultShapes();
 
 	// Preload some useful models
-	RMI.mesh("Data/Models/super8.gltf");
+	RMI.mesh("Data/Models/super8n.gltf");
 
 	// Create manipulators
 	m_manipulators = std::make_shared<Manipulators>(this);
@@ -48,6 +48,12 @@ void Viewport::init(ViewportSettings settings)
 
 	m_mainScene->init();
 	m_previewScene->init();
+
+	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_STENCIL_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Viewport::drawViewport(Ptr<SceneRenderTarget>& renderTarget, int width, int height,
@@ -79,21 +85,23 @@ void Viewport::drawScreen(Ptr<SceneRenderTarget>& renderTarget, int width, int h
 	m_mainScene->draw(width, height, view, projection, *renderTarget, displayOptions);
 }
 
-void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int height, WPtr<GameObject> gameObject)
+void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int height, WPtr<GameObject> gameObject,
+                           const RenderOptions& renderOptions)
 {
 	if (!renderTarget)
 	{
-		RenderOptions previewOptions;
-		previewOptions.framebufferAlpha = true;
-		renderTarget = m_previewScene->createRenderTarget(previewOptions);
+		renderTarget = m_previewScene->createRenderTarget(renderOptions);
+	}
+	else
+	{
+		renderTarget->setRenderOptions(renderOptions);
 	}
 	if (auto gameObjectPtr = gameObject.lock())
 	{
-		// Set camera distance
-		float radius =
-		    glm::distance(gameObjectPtr->m_mesh->m_boundingBoxMin, gameObjectPtr->m_mesh->m_boundingBoxMax) / 2.0f;
-
+		// Center camera on game object
 		m_previewScene->m_orbitCamera->setFov(m_settings.preview_fov);
+		m_previewScene->m_orbitCamera->centerOnBox(gameObjectPtr->m_mesh->m_boundingBoxMin, gameObjectPtr->m_mesh->m_boundingBoxMax, false);
+		float radius = m_previewScene->m_orbitCamera->getRadius();
 		m_previewScene->m_orbitCamera->setRadius(radius * m_settings.preview_radiusFactor);
 
 		// Make object visible
@@ -154,7 +162,7 @@ WPtr<SceneCamera> Viewport::createCamera(Core::ID guiNodeId)
 {
 	// TODO: (DR) It'd be nice to use a camera model with a lens assembly looking similar to a frustum
 	//  Key word being an old projector or some old grain film movie cameras.
-	Core::Mesh* mesh = RM::instance().mesh("Data/Models/super8.gltf");
+	Core::Mesh* mesh = RM::instance().mesh("Data/Models/super8n.gltf");
 	auto sceneCamera = std::make_shared<SceneCamera>(mesh, Shaders::instance().m_phongShader.get());
 	sceneCamera->m_guiNodeId = guiNodeId;
 	m_mainScene->addEntity(sceneCamera);

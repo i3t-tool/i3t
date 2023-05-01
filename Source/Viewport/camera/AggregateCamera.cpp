@@ -101,7 +101,10 @@ void AggregateCamera::centerOnObjects(const std::vector<const GameObject*> objec
 {
 	m_activeCamera->centerOnObjects(objects);
 }
-void AggregateCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) { m_activeCamera->centerOnBox(boxMin, boxMax); }
+void AggregateCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate)
+{
+	m_activeCamera->centerOnBox(boxMin, boxMax, interpolate);
+}
 
 glm::mat4 AggregateCamera::getView() const { return m_activeCamera->getView(); }
 glm::mat4 AggregateCamera::getProjection() const { return m_activeCamera->getProjection(); }

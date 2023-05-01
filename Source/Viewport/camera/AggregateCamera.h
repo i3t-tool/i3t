@@ -52,7 +52,7 @@ public:
 	void centerOnScene(const Scene& scene) override;
 	void centerOnSelection(const Scene& scene) override;
 	void centerOnObjects(const std::vector<const GameObject*> objects) override;
-	void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) override;
+	void centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate) override;
 
 	glm::mat4 getView() const override;
 	glm::mat4 getProjection() const override;

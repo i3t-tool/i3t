@@ -153,10 +153,10 @@ void ICamera::centerOnObjects(const std::vector<const GameObject*> objects)
 
 	// Create world space axis aligned bounding box containing all the points
 	auto aaBox = GfxUtils::createBoundingBox(points);
-	centerOnBox(aaBox.first, aaBox.second);
+	centerOnBox(aaBox.first, aaBox.second, true);
 }
 
-void ICamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax) {}
+void ICamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool interpolate) {}
 
 std::vector<glm::vec3> ICamera::createBoundingBoxWorldPoints(glm::vec3 boxMin, glm::vec3 boxMax, glm::mat4 modelMatrix)
 {
