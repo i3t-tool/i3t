@@ -129,7 +129,8 @@ void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 	rapidjson::Value screen(rapidjson::kObjectType);
 	dumpCommon(screen, node);
 
-	/// \todo MH Save aspect
+    // screen.AddMember("aspect", node->, alloc);
+    addVector(screen, "aspect", node->getAspect());
 
 	screens.PushBack(screen, alloc);
 

@@ -72,6 +72,12 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes.push_back(screen);
 		NodeDeserializer::assignCommon(value, screen);
 		oldToNewId[value["id"].GetInt()] = screen->getNodebase()->getId();
+
+        if (value.HasMember("aspect"))
+        {
+            const auto aspect = JSON::getVec2(value["aspect"].GetArray());
+            screen->setAspect(aspect);
+        }
 	}
 
 	//
