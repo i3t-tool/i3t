@@ -25,10 +25,6 @@ private:
 public:
 	std::weak_ptr<Vp::SceneModel> m_viewportModel;
 
-	bool m_axisOn{true};
-	bool m_showModel{true};
-	glm::vec3 m_tint{1.0f};
-
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.
 

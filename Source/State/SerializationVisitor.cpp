@@ -147,8 +147,15 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	rapidjson::Value model(rapidjson::kObjectType);
 	dumpCommon(model, node);
 
-	const auto modelAlias = node->viewportModel().lock()->getModel();
+    const auto mesh = node->viewportModel().lock();
+	const auto modelAlias = mesh->getModel();
 	model.AddMember("model", rapidjson::Value(modelAlias.c_str(), alloc), alloc);
+
+    model.AddMember("visible", mesh->m_visible, alloc);
+    model.AddMember("showAxes", mesh->m_showAxes, alloc);
+    model.AddMember("opaque", mesh->m_opaque, alloc);
+    model.AddMember("opacity", mesh->m_opacity, alloc);
+    addVector(model, "tint", mesh->m_tint);
 
 	models.PushBack(model, alloc);
 
