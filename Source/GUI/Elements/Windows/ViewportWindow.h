@@ -31,8 +31,8 @@ public:
 private:
 	Vp::Viewport* m_viewport;
 
-	Vp::DisplayOptions displayOptions;
-	Vp::RenderOptions renderOptions;
+	Vp::DisplayOptions m_displayOptions;
+	Vp::RenderOptions m_renderOptions;
 
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
 

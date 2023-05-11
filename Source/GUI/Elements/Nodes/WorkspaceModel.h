@@ -23,14 +23,14 @@ private:
 	// initial render texture size - should be large enough or changed during zoom
 	ImVec2 m_textureSize = {84, 100};
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
-	Vp::RenderOptions renderOptions;
+	Vp::RenderOptions m_renderOptions;
 
 public:
-	std::weak_ptr<Vp::SceneModel> m_viewportModel;
-
 	bool m_axisOn{true};
 	bool m_showModel{true};
 	glm::vec3 m_tint{1.0f};
+
+	std::weak_ptr<Vp::SceneModel> m_viewportModel;
 
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.

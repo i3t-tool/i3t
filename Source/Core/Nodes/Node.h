@@ -442,7 +442,7 @@ public:
 	virtual void addDeleteCallback(std::function<void(Node*)> callback);
 
 	/**
-	 * Registers a callback that gets called when the node's output or input pins get plugged in.
+	 * Registers a callback that gets called when the node's output pins get plugged in.
 	 * <br><br>
 	 * The callback parameters:<br>
 	 * Node* = Start node<br>
@@ -453,7 +453,7 @@ public:
 	virtual void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
 	/**
-	 * Registers a callback that gets called when the node's output or input pins get unplugged.
+	 * Registers a callback that gets called when the node's input pins get unplugged.
 	 * <br><br>
 	 * The callback parameters:<br>
 	 * Node* = Start node<br>

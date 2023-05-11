@@ -11,12 +11,11 @@ using namespace Vp;
  * IMPLEMENTATION NOTES, LIMITATIONS AND TODOS:
  * - Multisampled depth buffer can be resolved with multisampleResolveDepth()
  * - ColorAttachments ALWAYS use glTexImage2D
- * - DepthAttachment ALWAYS uses a renderbuffer
+ * - DepthAttachment can use glTexImage2D or a renderbuffer
  * - Framebuffer manages its color attachments lifetime, they cannot be shared currently
  *  -- Framebuffer dispose disposes of its color attachments
  *  -- Attachments are also stored with values not pointers, so to share them they should be standalone objects
  *  -- However that might be tricky when mutlisample resolving comes into play, not sure
- * - glDrawBuffers is called for all color attachements, eg. it is expected you are using all of them
  */
 
 Framebuffer* Framebuffer::createDefault(bool multisample, unsigned int samples, bool alpha)
@@ -33,8 +32,7 @@ Framebuffer* Framebuffer::createDefault(int width, int height, bool multisample,
 	framebuffer->addColorAttachment(
 	    ColorAttachment(format, format, framebuffer->m_width, framebuffer->m_height, GL_UNSIGNED_BYTE));
 	// Create default depth attachment
-	framebuffer->setDepthAttachment(
-	    DepthAttachment(GL_DEPTH24_STENCIL8, true, framebuffer->m_width, framebuffer->m_height));
+	framebuffer->setDepthAttachment(DepthAttachment(true, framebuffer->m_width, framebuffer->m_height, true));
 
 	return framebuffer;
 }
@@ -236,7 +234,10 @@ void Framebuffer::resize(int width, int height)
 
 	if (m_depthAttachment)
 	{
-		m_depthAttachment->resize(width, height);
+		if (m_depthAttachment->m_syncSize)
+		{
+			m_depthAttachment->resize(width, height);
+		}
 	}
 
 	if (!checkFramebuffer())

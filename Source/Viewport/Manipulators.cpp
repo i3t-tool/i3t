@@ -315,6 +315,7 @@ bool Manipulators::drawLookAt(Ptr<Manipulators::Manipulator> manipulator, glm::m
 
 	// Draw line between eye and center
 	// TODO: (DR) Add some indication of direction (a cube? a point? an arrow?, is a little tricky with imguizmo)
+	// TODO: (DR) Could just add icons, or use the viewport to draw the arrows or a wireframe model of the camera
 	ImGuizmo::DrawInit(glm::value_ptr(view), glm::value_ptr(projection));
 	ImGuizmo::DrawLine(glm::value_ptr(points[0]), glm::value_ptr(points[1]), IM_COL32(0xFF, 0xFF, 0xFF, 200), 2.0f);
 

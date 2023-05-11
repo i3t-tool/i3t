@@ -27,8 +27,8 @@ private:
 	                                   // large enough or changed during zoo
 
 	std::shared_ptr<Vp::SceneRenderTarget> m_renderTarget;
-	Vp::DisplayOptions displayOptions;
-	Vp::RenderOptions renderOptions;
+	Vp::DisplayOptions m_displayOptions;
+	Vp::RenderOptions m_renderOptions;
 
 public:
 	WorkspaceScreen(DIWNE::Diwne& diwne);

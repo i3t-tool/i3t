@@ -143,7 +143,7 @@ void Application::run()
 		Core::GraphManager::update(delta);
 		lastFrameSeconds = current;
 
-		InputManager::beginFrame();
+		InputManager::beginFrame(); // Must be called *before* rendering.
 
 		Logger::getInstance().update(); // (DR) I'm assuming this should update after input manager since it uses it?
 
@@ -151,16 +151,7 @@ void Application::run()
 		onDisplay();
 		logicUpdate(delta);
 
-		// Input update must be called after rendering. (Due to some values being zero-ed out too early)
-		// Might be better to update inputs before rendering to reduce input lag and retain consistency with ImGui
-		// That would require slight InputManager modifications and testing
-		// TODO: (DR) Enabling window manager debug and setting glfwSwapInterval(10) shows the input lag I mentioned
-		//  (Watch the yellow and purple cursors on the mouse. Purple InputManager position is lagging behind the yellow
-		//  one,
-		//	which is also kinda lagging, but thats probably normal)
-		//  Not critical but might be worth fixing.
-		// InputManager::update();
-		InputManager::endFrame();
+		InputManager::endFrame(); // Must be called *after* rendering.
 
 		// glfwSwapBuffers(m_window);
 		m_window->swapBuffers();

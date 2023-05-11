@@ -27,6 +27,19 @@ void SetupDialog::render()
 			ImGui::SliderFloat("Model preview radius", &settings.preview_radiusFactor, 0.1f, 10.0f, "%.2f");
 			ImGui::SliderFloat("Model preview rotate speed", &settings.preview_rotateSpeed, 0.f, 100.f, "%f");
 
+			if (ImGui::CollapsingHeader("Highlight"))
+			{
+				ImGui::Indent();
+				// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
+				ImGui::SliderFloat("Downscale factor", &settings.highlight_downscaleFactor, 0.01f, 1.0f, "%.2f");
+				ImGui::SliderInt("Kernel size", &settings.highlight_kernelSize, 1, 10);
+				ImGui::SliderFloat("Blur cutoff", &settings.highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
+				ImGui::Checkbox("Use depth", &settings.highlight_useDepth);
+				ImGui::SliderFloat("Darken factor", &settings.highlight_useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
+				ImGui::SliderFloat("Desaturate factor", &settings.highlight_useDepth_desaturateFactor, 0.0f, 1.0f, "%.2f");
+				ImGui::Unindent();
+			}
+
 			if (ImGui::CollapsingHeader("Grid"))
 			{
 				ImGui::Indent();
@@ -44,6 +57,7 @@ void SetupDialog::render()
 				ImGui::SliderFloat("Fade 2 end", &settings.grid_grid2FadeEnd, 0.0f, 1.f, "%.2f");
 				ImGui::Unindent();
 			}
+
 			ImGui::Unindent();
 			ImGui::Spacing();
 		}

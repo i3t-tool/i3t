@@ -360,6 +360,7 @@ public:
 
 	ValueSetResult setValue(const glm::quat& vec) override;
 	ValueSetResult setValue(const glm::vec4& vec) override;
+	ValueSetResult setValue(const glm::mat4& mat) override;
 
 	/**
 	 * \brief Update matrix to match the default "quat" value. As a side effect,

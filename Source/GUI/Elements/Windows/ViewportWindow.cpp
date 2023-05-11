@@ -32,12 +32,12 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
 	// Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
-	renderOptions.wboit = true;
-	renderOptions.wboitFunc = 0;
-	renderOptions.framebufferAlpha = false;
-	renderOptions.multisample = true;
-	renderOptions.clearColor = Config::BACKGROUND_COLOR;
-	renderOptions.selection = true;
+	m_renderOptions.wboit = true;
+	m_renderOptions.wboitFunc = 0;
+	m_renderOptions.framebufferAlpha = false;
+	m_renderOptions.multisample = true;
+	m_renderOptions.clearColor = Config::BACKGROUND_COLOR;
+	m_renderOptions.selection = true;
 
 	// TODO: (DR) Move actions to methods so we dont repeat code here
 	InputManager::setInputAction("viewpoint-right", Keys::n3);
@@ -174,7 +174,7 @@ void ViewportWindow::render()
 		m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
 	}
 
-	m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, renderOptions, displayOptions);
+	m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_renderOptions, m_displayOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
@@ -207,44 +207,44 @@ bool ViewportWindow::showViewportMenu()
 		userInteractedWithMenus = true;
 		if (ImGui::BeginMenu("Transparency"))
 		{
-			ImGui::MenuItem("Use WBOIT", nullptr, &renderOptions.wboit);
+			ImGui::MenuItem("Use WBOIT", nullptr, &m_renderOptions.wboit);
 			if (ImGui::BeginMenu("WBOIT weight function"))
 			{
-				if (ImGui::MenuItem("OFF", nullptr, renderOptions.wboitFunc == 0))
+				if (ImGui::MenuItem("OFF", nullptr, m_renderOptions.wboitFunc == 0))
 				{
-					renderOptions.wboitFunc = 0;
+					m_renderOptions.wboitFunc = 0;
 				}
-				if (ImGui::MenuItem("Equation 7", nullptr, renderOptions.wboitFunc == 1))
+				if (ImGui::MenuItem("Equation 7", nullptr, m_renderOptions.wboitFunc == 1))
 				{
-					renderOptions.wboitFunc = 1;
+					m_renderOptions.wboitFunc = 1;
 				}
-				if (ImGui::MenuItem("Equation 8", nullptr, renderOptions.wboitFunc == 2))
+				if (ImGui::MenuItem("Equation 8", nullptr, m_renderOptions.wboitFunc == 2))
 				{
-					renderOptions.wboitFunc = 2;
+					m_renderOptions.wboitFunc = 2;
 				}
-				if (ImGui::MenuItem("Equation 9", nullptr, renderOptions.wboitFunc == 3))
+				if (ImGui::MenuItem("Equation 9", nullptr, m_renderOptions.wboitFunc == 3))
 				{
-					renderOptions.wboitFunc = 3;
+					m_renderOptions.wboitFunc = 3;
 				}
-				if (ImGui::MenuItem("Equation 10", nullptr, renderOptions.wboitFunc == 4))
+				if (ImGui::MenuItem("Equation 10", nullptr, m_renderOptions.wboitFunc == 4))
 				{
-					renderOptions.wboitFunc = 4;
+					m_renderOptions.wboitFunc = 4;
 				}
-				if (ImGui::MenuItem("LOGL Eq. 9 color bias", nullptr, renderOptions.wboitFunc == 5))
+				if (ImGui::MenuItem("LOGL Eq. 9 color bias", nullptr, m_renderOptions.wboitFunc == 5))
 				{
-					renderOptions.wboitFunc = 5;
+					m_renderOptions.wboitFunc = 5;
 				}
-				if (ImGui::MenuItem("LOGL Eq. 10", nullptr, renderOptions.wboitFunc == 6))
+				if (ImGui::MenuItem("LOGL Eq. 10", nullptr, m_renderOptions.wboitFunc == 6))
 				{
-					renderOptions.wboitFunc = 6;
+					m_renderOptions.wboitFunc = 6;
 				}
-				if (ImGui::MenuItem("z^-3", nullptr, renderOptions.wboitFunc == 7))
+				if (ImGui::MenuItem("z^-3", nullptr, m_renderOptions.wboitFunc == 7))
 				{
-					renderOptions.wboitFunc = 7;
+					m_renderOptions.wboitFunc = 7;
 				}
-				if (ImGui::MenuItem("abs(z - zFar + Eps)", nullptr, renderOptions.wboitFunc == 8))
+				if (ImGui::MenuItem("abs(z - zFar + Eps)", nullptr, m_renderOptions.wboitFunc == 8))
 				{
-					renderOptions.wboitFunc = 8;
+					m_renderOptions.wboitFunc = 8;
 				}
 
 				ImGui::EndMenu();
@@ -252,30 +252,30 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
-		bool msaaOff = !renderOptions.multisample;
-		bool msaa2x = renderOptions.multisample && renderOptions.samples == 2;
-		bool msaa4x = renderOptions.multisample && renderOptions.samples == 4;
-		bool msaa8x = renderOptions.multisample && renderOptions.samples == 8;
+		bool msaaOff = !m_renderOptions.multisample;
+		bool msaa2x = m_renderOptions.multisample && m_renderOptions.samples == 2;
+		bool msaa4x = m_renderOptions.multisample && m_renderOptions.samples == 4;
+		bool msaa8x = m_renderOptions.multisample && m_renderOptions.samples == 8;
 		if (ImGui::BeginMenu("MSAA"))
 		{
 			if (ImGui::MenuItem("OFF", nullptr, &msaaOff))
 			{
-				renderOptions.multisample = false;
+				m_renderOptions.multisample = false;
 			}
 			if (ImGui::MenuItem("2x", nullptr, &msaa2x))
 			{
-				renderOptions.multisample = true;
-				renderOptions.samples = 2;
+				m_renderOptions.multisample = true;
+				m_renderOptions.samples = 2;
 			}
 			if (ImGui::MenuItem("4x", nullptr, &msaa4x))
 			{
-				renderOptions.multisample = true;
-				renderOptions.samples = 4;
+				m_renderOptions.multisample = true;
+				m_renderOptions.samples = 4;
 			}
 			if (ImGui::MenuItem("8x", nullptr, &msaa8x))
 			{
-				renderOptions.multisample = true;
-				renderOptions.samples = 8;
+				m_renderOptions.multisample = true;
+				m_renderOptions.samples = 8;
 			}
 			ImGui::EndMenu();
 		}
@@ -283,62 +283,47 @@ bool ViewportWindow::showViewportMenu()
 		if (ImGui::BeginMenu("Highlight"))
 		{
 			userInteractedWithMenus = true;
-			if (ImGui::BeginMenu("Preset"))
+			if (ImGui::MenuItem("Ultra", nullptr, nullptr))
 			{
-				if (ImGui::MenuItem("Ultra", nullptr, nullptr))
-				{
-					m_viewport->getSettings().highlight_downscaleFactor = 1.0f;
-					m_viewport->getSettings().highlight_kernelSize = 4;
-					m_viewport->getSettings().highlight_outlineCutoff = 0.15f;
-					m_viewport->getSettings().highlight_useDepth = true;
-				}
-				if (ImGui::MenuItem("High", nullptr, nullptr))
-				{
-					m_viewport->getSettings().highlight_downscaleFactor = 0.8f;
-					m_viewport->getSettings().highlight_kernelSize = 4;
-					m_viewport->getSettings().highlight_outlineCutoff = 0.18f;
-					m_viewport->getSettings().highlight_useDepth = true;
-				}
-				if (ImGui::MenuItem("Medium", nullptr, nullptr))
-				{
-					m_viewport->getSettings().highlight_downscaleFactor = 0.5f;
-					m_viewport->getSettings().highlight_kernelSize = 2;
-					m_viewport->getSettings().highlight_outlineCutoff = 0.23f;
-					m_viewport->getSettings().highlight_useDepth = true;
-				}
-				if (ImGui::MenuItem("Low", nullptr, nullptr))
-				{
-					m_viewport->getSettings().highlight_downscaleFactor = 1.0f / 3;
-					m_viewport->getSettings().highlight_kernelSize = 2;
-					m_viewport->getSettings().highlight_outlineCutoff = 0.3f;
-					m_viewport->getSettings().highlight_useDepth = true;
-				}
-				if (ImGui::MenuItem("Lowest", nullptr, nullptr))
-				{
-					m_viewport->getSettings().highlight_downscaleFactor = 0.25;
-					m_viewport->getSettings().highlight_kernelSize = 2;
-					m_viewport->getSettings().highlight_outlineCutoff = 0.5f;
-					m_viewport->getSettings().highlight_useDepth = false;
-				}
-				ImGui::EndMenu();
+				m_viewport->getSettings().highlight_downscaleFactor = 1.0f;
+				m_viewport->getSettings().highlight_kernelSize = 4;
+				m_viewport->getSettings().highlight_outlineCutoff = 0.15f;
+				m_viewport->getSettings().highlight_useDepth = true;
 			}
-
-			// ImGuiSliderFlags flags = ImGuiSliderFlags_AlwaysClamp;
-			ImGui::SliderFloat("Downscale factor", &m_viewport->getSettings().highlight_downscaleFactor, 0.01f, 1.0f, "%.2f");
-			ImGui::SliderInt("Kernel size", &m_viewport->getSettings().highlight_kernelSize, 1, 10);
-			ImGui::SliderFloat("Blur cutoff", &m_viewport->getSettings().highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
-
-			ImGui::Separator();
-			ImGui::Checkbox("Use depth", &m_viewport->getSettings().highlight_useDepth);
-			ImGui::SliderFloat("Darken factor", &m_viewport->getSettings().highlight_useDepth_darkenFactor, 0.0f, 1.0f,
-			                   "%.2f");
-			ImGui::SliderFloat("Desaturate factor", &m_viewport->getSettings().highlight_useDepth_desaturateFactor, 0.0f,
-			                   1.0f, "%.2f");
+			if (ImGui::MenuItem("High", nullptr, nullptr))
+			{
+				m_viewport->getSettings().highlight_downscaleFactor = 0.8f;
+				m_viewport->getSettings().highlight_kernelSize = 4;
+				m_viewport->getSettings().highlight_outlineCutoff = 0.18f;
+				m_viewport->getSettings().highlight_useDepth = true;
+			}
+			if (ImGui::MenuItem("Medium", nullptr, nullptr))
+			{
+				m_viewport->getSettings().highlight_downscaleFactor = 0.5f;
+				m_viewport->getSettings().highlight_kernelSize = 2;
+				m_viewport->getSettings().highlight_outlineCutoff = 0.23f;
+				m_viewport->getSettings().highlight_useDepth = true;
+			}
+			if (ImGui::MenuItem("Low", nullptr, nullptr))
+			{
+				m_viewport->getSettings().highlight_downscaleFactor = 1.0f / 3;
+				m_viewport->getSettings().highlight_kernelSize = 2;
+				m_viewport->getSettings().highlight_outlineCutoff = 0.3f;
+				m_viewport->getSettings().highlight_useDepth = true;
+			}
+			if (ImGui::MenuItem("Lowest", nullptr, nullptr))
+			{
+				m_viewport->getSettings().highlight_downscaleFactor = 0.25;
+				m_viewport->getSettings().highlight_kernelSize = 2;
+				m_viewport->getSettings().highlight_outlineCutoff = 0.5f;
+				m_viewport->getSettings().highlight_useDepth = false;
+			}
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Manipulators"))
 		{
+			ImGui::Checkbox("Show manipulators", &m_viewport->getSettings().manipulator_enabled);
 			ImGui::SliderFloat("Size", &m_viewport->getSettings().manipulator_size, 0.01f, 1.0f, "%.2f");
 			ImGui::EndMenu();
 		}
@@ -351,19 +336,6 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::GetForegroundDrawList()->AddRectFilled(GUI::glmToIm(m_windowPos), GUI::glmToIm(m_windowMax),
 			                                              ImColor((ok ? 0 : 255), (ok ? 255 : 0), 0));
 		}
-
-		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
-		ImGui::Checkbox("Show grid", &displayOptions.showGrid);
-		ImGui::SameLine();
-		GUI::ToggleButton("XZ", displayOptions.showGridLines, gridButtonSize);
-		ImGui::SameLine();
-		ImGui::Dummy(ImVec2(4.0f, 0.0f));
-		ImGui::SameLine();
-		GUI::ToggleButton("X", displayOptions.showGridXAxis, gridButtonSize);
-		ImGui::SameLine();
-		GUI::ToggleButton("Y", displayOptions.showGridYAxis, gridButtonSize);
-		ImGui::SameLine();
-		GUI::ToggleButton("Z", displayOptions.showGridZAxis, gridButtonSize);
 
 		ImGui::EndMenu();
 	}
@@ -408,6 +380,19 @@ bool ViewportWindow::showViewportMenu()
 				camera->getTrackballCamera()->setFov(m_viewport->getSettings().camera_fov);
 			}
 		}
+
+		ImVec2 gridButtonSize = ImVec2(ImGui::GetFontSize() * 2, 0.0f);
+		ImGui::Checkbox("Show grid", &m_displayOptions.showGrid);
+		ImGui::SameLine();
+		GUI::ToggleButton("XZ", m_displayOptions.showGridLines, gridButtonSize);
+		ImGui::SameLine();
+		ImGui::Dummy(ImVec2(4.0f, 0.0f));
+		ImGui::SameLine();
+		GUI::ToggleButton("X", m_displayOptions.showGridXAxis, gridButtonSize);
+		ImGui::SameLine();
+		GUI::ToggleButton("Y", m_displayOptions.showGridYAxis, gridButtonSize);
+		ImGui::SameLine();
+		GUI::ToggleButton("Z", m_displayOptions.showGridZAxis, gridButtonSize);
 
 		ImGui::Separator();
 
@@ -474,11 +459,12 @@ bool ViewportWindow::showViewportMenu()
 
 		ImGui::Separator();
 
-		ImGui::MenuItem("Show objects", nullptr, &displayOptions.showDefault);
-		ImGui::MenuItem("Show axes", nullptr, &displayOptions.showAxes);
-		ImGui::MenuItem("Show grid", nullptr, &displayOptions.showGrid);
-		ImGui::MenuItem("Show cameras", nullptr, &displayOptions.showCamera);
-		ImGui::MenuItem("Show frustums", nullptr, &displayOptions.showFrustum);
+		ImGui::MenuItem("Show objects", nullptr, &m_displayOptions.showDefault);
+		ImGui::MenuItem("Show axes", nullptr, &m_displayOptions.showAxes);
+		ImGui::MenuItem("Show grid", nullptr, &m_displayOptions.showGrid);
+		ImGui::MenuItem("Show cameras", nullptr, &m_displayOptions.showCamera);
+		ImGui::MenuItem("Show frustums", nullptr, &m_displayOptions.showFrustum);
+
 		ImGui::EndMenu();
 	}
 	ImGui::PopItemFlag();

@@ -52,10 +52,12 @@ public:
 		explicit Manipulator(std::shared_ptr<Core::Transformation> node) { m_node = node; }
 	};
 
+private:
 	Viewport* m_viewport;
 	std::vector<std::shared_ptr<Manipulator>> m_activeManipulators;
 	std::unordered_map<std::string, ManipulatorType> m_operationMap;
 
+public:
 	explicit Manipulators(Viewport* viewport);
 
 	bool drawViewAxes(glm::vec2 windowPos, glm::vec2 windowSize);
@@ -70,9 +72,9 @@ public:
 	// WIP method to set the active manipulator
 	void clearManipulators();
 	void addManipulator(std::shared_ptr<Core::Node> node);
-	ManipulatorType determineManipulatorType(std::shared_ptr<Core::Node> node);
 
 private:
+	ManipulatorType determineManipulatorType(std::shared_ptr<Core::Node> node);
 	bool drawLookAt(Ptr<Manipulators::Manipulator> manipulator, glm::mat4 view, glm::mat4 projection);
 	void updateManipulatorMatrices(Manipulator& manipulator, std::shared_ptr<Core::Node> node);
 };

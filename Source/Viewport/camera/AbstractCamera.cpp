@@ -10,6 +10,7 @@
 
 #include "Viewport/GfxUtils.h"
 #include "Viewport/entity/nodes/SceneModel.h"
+#include "Viewport/entity/nodes/SceneCamera.h"
 #include "Viewport/scene/Scene.h"
 
 using namespace Vp;
@@ -28,10 +29,9 @@ glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 		// Non shrinking resizing
 		// Method 1
 		float scale = m_zNear * tan(glm::radians(m_fov / 2));
-		float l = -scale;
-		float r = scale;
-		float b = -scale;
-		float t = scale;
+		float l, r, b, t;
+		r = t = scale;
+		l = b = -scale;
 		float aspect = std::min(m_width, m_height) / (float)std::max(m_width, m_height);
 		if (m_width > m_height)
 		{
@@ -142,6 +142,21 @@ void AbstractCamera::centerOnSelection(const Scene& scene)
 			continue;
 		}
 		selectedObjects.push_back(model.get());
+	}
+	for (const auto& cameraNode : g_workspaceDiwne->getAllCameras())
+	{
+		if (!cameraNode->m_selected)
+		{
+			continue;
+		}
+		Ptr<WorkspaceCamera> cameraPtr = std::static_pointer_cast<WorkspaceCamera>(cameraNode);
+		Ptr<SceneCamera> camera = cameraPtr->m_viewportCamera.lock();
+		DisplayType type = camera->getDisplayType();
+		if (type != DisplayType::Default && type != DisplayType::Camera)
+		{
+			continue;
+		}
+		selectedObjects.push_back(camera.get());
 	}
 	centerOnObjects(selectedObjects);
 }

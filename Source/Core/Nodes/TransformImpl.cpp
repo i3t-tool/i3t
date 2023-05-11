@@ -900,6 +900,11 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& ve
 	return setValue(glm::quat(q));
 }
 
+ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::mat4& mat)
+{
+	return setValue(glm::quat_cast(mat));
+}
+
 //===-- Orthographic projection -------------------------------------------===//
 
 bool TransformImpl<ETransformType::Ortho>::isValid() const

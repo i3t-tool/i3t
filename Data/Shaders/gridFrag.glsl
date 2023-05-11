@@ -161,7 +161,7 @@ vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool
 	vec2 derivative = fwidth(coord) * lineWidth;
 
 	// Grid
-	vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative;
+	vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative; // Visualize using (pow(worldPos.x, 2) / 100.0f)
 	float line = min(grid.x, grid.y);
 	vec4 color = vec4(gridColor, 1.0 - min(line, 1.0));
 

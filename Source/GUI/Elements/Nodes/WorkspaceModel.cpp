@@ -148,7 +148,7 @@ void WorkspaceModel::init()
 	modelPtr->m_visible = m_showModel;
 
 	// Setup preview render options
-	renderOptions.framebufferAlpha = true;
+	m_renderOptions.framebufferAlpha = true;
 
 	// Callback that gets called when the underlying Model node updates values
 	// The Model node also updates a public model matrix variable which we can
@@ -182,7 +182,7 @@ bool WorkspaceModel::middleContent()
 #define FLOOR_VEC2(_VAL) (ImVec2((float)(int)((_VAL).x), (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
 	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
 
-	App::get().viewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, renderOptions);
+	App::get().viewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
