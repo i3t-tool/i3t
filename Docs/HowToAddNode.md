@@ -49,8 +49,8 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerToQuat>::updateValues(int
 	{
 
 		setInternalValue(
-				glm::quat(glm::vec3(m_inputs[0].getStorage().getFloat(), m_inputs[1].getStorage().getFloat(),
-														m_inputs[2].getStorage().getFloat())));
+				glm::quat(glm::vec3(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(),
+														m_inputs[2].data().getFloat())));
 	}
 	else
 	{

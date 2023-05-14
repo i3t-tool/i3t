@@ -10,7 +10,7 @@ void Model::updateValues(int inputIndex)
 	{
 		// Models m_modelMatrix value is updated and then can be read from the
 		// Node's update callback
-		auto& targetStorage = m_inputs[0].getStorage();
+		auto& targetStorage = m_inputs[0].data();
 		m_modelMatrix = targetStorage.getMat4();
 	}
 

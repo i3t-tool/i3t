@@ -113,14 +113,16 @@ public:
 	//===----------------------------------------------------------------------===//
 
 private:
-	/// \todo MH Use Node::m_owner.
-	Ptr<NodeBase> m_currentSequence = nullptr; ///< pointer to the sequence the transform matrix is in (or
-	                                           ///< nullptr if without)
-	int m_currentIndex = -1;                   ///< index of the transform in the sequence
+	/// Pointer to the sequence the transform matrix is in (or nullptr if without).
+	/// Cannot be smart pointer, because of cyclic dependency!
+	Node* m_currentSequence = nullptr;
+
+	/// index of the transform in the sequence
+	int m_currentIndex = -1;
 
 public:
 	bool isInSequence() const { return m_currentSequence != nullptr; }
-	Ptr<NodeBase> getCurrentSequence() { return m_currentSequence; }
+	Ptr<NodeBase> getCurrentSequence();
 	int getCurrentIndex() const { return m_currentIndex; }
 
 	//===----------------------------------------------------------------------===//
@@ -218,7 +220,7 @@ public:
 	 *       - for Scale When setting X value in non-uniform scale -> this switch
 	 * to uniform scale (due to enable synergies)
 	 */
-	void resetMatrixFromDefaults() override = 0; // PF Pure virtual, defined in TransformImpl for each transformation
+	virtual void resetMatrixFromDefaults() = 0; // PF Pure virtual, defined in TransformImpl for each transformation
 
 	//===----------------------------------------------------------------------===//
 
@@ -277,13 +279,7 @@ public:
 		m_currentIndex = -1;
 	}
 
-	void setSequence(Ptr<NodeBase>&& s, int index)
-	{
-		m_currentSequence = s;
-		m_currentIndex = index;
-	}
-
-	void setSequence(Ptr<NodeBase>& s, int index)
+	void setSequence(NodeBase* s, int index)
 	{
 		m_currentSequence = s;
 		m_currentIndex = index;

@@ -9,7 +9,9 @@
 
 using namespace Core;
 
-TEST(ModelNodeTest, ShouldConsumeTransformMatrix)
+class ModelNodeTest : public GraphManagerTestFixture {};
+
+TEST_F(ModelNodeTest, ShouldConsumeTransformMatrix)
 {
 	// auto sequence = arrangeSequence();
 	auto sequence = GraphManager::createSequence();

@@ -61,6 +61,20 @@ private:
 	Ptr<Model> m_model;
 };
 
+class TrackerTest : public ::testing::Test
+{
+protected:
+	void SetUp() override
+	{
+		GraphManager::init();
+	}
+
+	void TearDown() override
+	{
+		GraphManager::destroy();
+	}
+};
+
 /**
  * Classic tracking.
  *
@@ -68,7 +82,7 @@ private:
  * | M1 | M2 | --- | M3 | M4 |
  * ///////////     ///////////
  */
-TEST(TrackerTest, TrackingRightToLeft)
+TEST_F(TrackerTest, TrackingRightToLeft)
 {
 	auto t = arrange();
 
@@ -139,7 +153,7 @@ TEST(TrackerTest, TrackingRightToLeft)
 	}
 }
 
-TEST(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
+TEST_F(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 {
 	auto sequence = GraphManager::createSequence();
 	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());
@@ -157,7 +171,7 @@ TEST(TrackerTest, TrackedModelIsUpdatedOnSequenceChange)
 	EXPECT_TRUE(compare(mat->getData().getMat4(), tracker->getModel()->getData().getMat4()));
 }
 
-TEST(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
+TEST_F(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 {
 	EXPECT_FALSE(GraphManager::isTrackingEnabled());
 	{
@@ -178,7 +192,7 @@ TEST(TrackerTest, TrackingIsDisabledAfterSequenceRemoval)
 	EXPECT_FALSE(GraphManager::isTrackingEnabled());
 }
 
-TEST(TrackerTest, EmptySequence)
+TEST_F(TrackerTest, EmptySequence)
 {
 	auto sequence = GraphManager::createSequence();
 	sequence->addMatrix(Builder::createTransform<ETransformType::Translation>());

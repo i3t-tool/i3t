@@ -42,9 +42,9 @@ TEST(NodeToolsTest, CopyNodes)
 		addNode = f5;
 	}
 
-	const auto& connectedToFloat = valueNode->getNodebase()->getOut(0).getOutComponents();
+	const auto& connectedToFloat = valueNode->getNodebase()->getOutput(0).getOutComponents();
 	EXPECT_TRUE(connectedToFloat.size() == 1);
-	const auto addNodeInput = addNode->getNodebase()->getIn(0);
+	const auto addNodeInput = addNode->getNodebase()->getInput(0);
 	EXPECT_TRUE(addNodeInput.isPluggedIn());
 	EXPECT_EQ(addNodeInput.getParentPin()->getOwner()->getId(), valueNode->getNodebase()->getId());
 

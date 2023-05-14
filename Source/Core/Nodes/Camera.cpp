@@ -20,13 +20,16 @@ Camera::Camera() : NodeBase(&g_cameraProperties) {}
 void Camera::createComponents()
 {
 	m_proj = GraphManager::createSequence();
+	/// \todo MH Uncomment this and test.
 	// m_proj->setOwner(getPtr());
 
 	m_view = GraphManager::createSequence();
-	m_view->setOwner(getPtr());
+	m_view->setOwner(getPtr().get());
 
 	if (GraphManager::plug(m_proj, m_view) != ENodePlugResult::Ok)
+	{
 		LOG_DEBUG("Components of a sequence could not be connected.");
+	}
 
 	getOutputPins()[I3T_CAMERA_OUT_MUL].setDisabled(true);
 }

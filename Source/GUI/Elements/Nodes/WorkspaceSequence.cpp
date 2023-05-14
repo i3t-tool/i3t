@@ -216,7 +216,6 @@ bool WorkspaceSequence::middleContent()
 		int rowOfChange, columnOfChange;
 		float valueOfChange;
 		return drawData4x4(
-
 		    diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
 		    m_nodebase->getData(0).getMat4() /* \todo JM \todo HM better selection (index) of data*/,
 		    {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,

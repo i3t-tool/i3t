@@ -7,112 +7,127 @@ namespace Core
 {
 class Node;
 
+enum class ENodePlugResult
+{
+	Ok = 0,
+	Err_MismatchedPinTypes,
+	Err_MismatchedPinKind,
+	Err_Loopback, /// Same nodes.
+	Err_NonexistentPin,
+	Err_Loop,
+	Err_DisabledPin
+};
+
 /**
  * Pin used for connecting nodes.
  *
  * OperatorCurveTab from I3T v1.
  */
-class Node; /* JH without this it is not compile: unknown ty*/
-
 class Pin
 {
-	friend class GraphManager;
-	friend class Node;
-
-	/// \todo MH do not access pin directly.
-	friend class Sequence;
-
 public:
 	Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index);
 
-	[[nodiscard]] bool getRenderPins() const { return renderPins; }
+	Ptr<Node> getOwner() const;
 
-	[[nodiscard]] ID getId() const { return m_id; }
+	/// \returns Mapped pin owner or this->Owner if this pin is not mapped to any other node.
+	Ptr<Node> getMappedOwner() const;
 
-	[[nodiscard]] int getIndex() const { return m_index; }
-
-	[[nodiscard]] Ptr<Node> getOwner() const;
-
-	[[nodiscard]] const Pin* getParentPin() const
-	{
-		if (m_isInput)
-		{
-			I3T_ASSERT(isPluggedIn(), "This input pin is not plugged to any output pin!");
-			return m_input;
-		}
-		else
-		{
-			I3T_ABORT("Output pin cannot have a parent pin!");
-			return nullptr;
-		}
-	}
+	/// \returns nullptr if input is not plugged in.
+	[[nodiscard]] const Pin* getParentPin() const;
 
 	/**
 	 * \return Input pins of connected nodes.
 	 */
-	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const { return m_outputs; }
-
-	/**
-	 * \return Storage which belongs to this pin.
-	 */
-	[[nodiscard]] const DataStore& data() const;
+	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const
+	{
+		return get()->m_outputs;
+	}
 
 	/**
 	 * Get stored data based on pin type.
 	 *
-	 * \returns data storage owner by node connected to this input pin. If pin is
+	 * \return data storage owner by node connected to this input pin. If pin is
 	 * output pin, it returns data storage of pin owner.
+	 *
+	 * \pre If pin is input, it must be plugged to some output pin.
 	 */
-	[[nodiscard]] const DataStore& getStorage(unsigned id = 0);
+	const DataStore& data() const;
+
+	DataStore& dataMut();
 
 	const char* getLabel() const;
 
 	/// "pin {index} of {node signature}"
 	std::string getSignature() const;
 
-	[[nodiscard]] EValueType getType() const { return m_valueType; }
+	ENodePlugResult plug(Pin& other);
+	static ENodePlugResult plug(Pin& input, Pin& output);
+
+	void unplug();
+
+public:
+	static ENodePlugResult isPlugCorrect(const Pin& input, const Pin& output);
 
 	/**
 	 * Query if input of this object is plugged to any parent output.
 	 *
 	 * \return True if plugged to parent, false if not.
 	 */
-	[[nodiscard]] bool isPluggedIn() const { return m_input != nullptr; }
-
-	[[nodiscard]] bool isInput() const { return m_isInput; }
+	[[nodiscard]] bool isPluggedIn() const;
 
 	[[nodiscard]] bool isDisabled() const { return m_isDisabled; }
 	void setDisabled(bool disabled) { m_isDisabled = disabled; }
-	void setRenderPins(bool value) { renderPins = value; }
 
-private:
-	ID m_id;
+	[[nodiscard]] bool shouldRenderPins() const { return m_renderPins; }
+	void setRenderPins(bool value) { m_renderPins = value; }
+
+	/// Get this or mapped pin recursively.
+	Pin* get() const;
+
+	bool isMapped() const { return m_mappedTo != nullptr; }
+
+	/// \pre pin must have same type (input/output, value) as this pin.
+	void mapTo(Pin* pin);
+
+public:
+	ID Id;
 
 	/// Index within a node.
-	int m_index = -1;
+	int Index = -1;
 
 	/// Pin type.
-	const bool m_isInput;
+	const bool IsInput;
 
+	const EValueType ValueType = EValueType::Pulse;
+
+	Node& Owner;
+
+private:
 	bool m_isDisabled = false;
 
-	/// Owner of the pin.
-	Node* m_master;
+	/// Inner node pin can be mapped to owner node pin.
+	Pin* m_mappedTo = nullptr;
 
-	bool renderPins = true;
+	bool m_renderPins = true;
 
 	/**
 	 * The box can have a single parent. Therefore, just a single input component
 	 * (a single connected wire) to output tab of the parent node).
+	 *
+	 * \note Valid only for input pins.
 	 */
 	Pin* m_input = nullptr;
 
 	/**
 	 * Child boxes in the scene graph (coming out to the right).
 	 * A pointer to input pins of boxes connected to this box output.
+	 *
+	 * \note Valid only for output pins.
 	 */
 	std::vector<Pin*> m_outputs;
 
-	const EValueType m_valueType = EValueType::Pulse;
+	/// \todo MH Remove after refactoring.
+	friend class GraphManager;
 };
 } // namespace Core
