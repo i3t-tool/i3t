@@ -44,7 +44,7 @@ public:
 	static void init();
 	static void destroy();
 
-	template <ENodeType T> static Ptr<NodeBase> createNode() { return Builder::createNode<T>(); }
+	template <ENodeType T> static Ptr<NodeBase> createNode() { return Builder::createOperator<T>(); }
 
 	template <ETransformType T> static Ptr<Transformation> createTransform() { return Builder::createTransform<T>(); }
 
@@ -76,8 +76,7 @@ public:
 	 * \param input Pin of right node.
 	 * \param output Pin of left node.
 	 */
-	static ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
-	static ENodePlugResult isPlugCorrect(Pin& input, Pin& output);
+	static ENodePlugResult isPlugCorrect(const Pin& input, const Pin& output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
 	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
@@ -88,10 +87,10 @@ public:
 	 * Usage:
 	 * \code
 	 *    // Create nodes.
-	 *    auto vec1    = Core::Builder::createNode<OperationType::Vector3>();
-	 *    auto vec2    = Core::Builder::createNode<OperationType::Vector3>();
+	 *    auto vec1    = Core::Builder::createOperator<OperationType::Vector3>();
+	 *    auto vec2    = Core::Builder::createOperator<OperationType::Vector3>();
 	 *    auto dotNode =
-	 * Core::Builder::createNode<OperationType::Vector3DotVector3>();
+	 * Core::Builder::createOperator<OperationType::Vector3DotVector3>();
 	 *
 	 *    // Plug vector nodes output to dot node inputs.
 	 *    GraphManager::plug(vec1, dotNode, 0, 0);
@@ -133,7 +132,14 @@ public:
 	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
 
 	/**
+	 * Returns parent node of given node (the topmost one).
+	 *
+	 * For example for a node plugged into a sequence node, the real parent
+	 * would be the multiplier node, but the sequence node would be returned.
+	 *
 	 * \param index input pin index.
+	 *
+	 * \todo Move me to NodeUtils.
 	 */
 	static Ptr<NodeBase> getParent(const NodePtr& node, size_t index = 0);
 
@@ -153,8 +159,6 @@ public:
 	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
 
 	static const Operation* getOperation(const Pin* pin);
-	static bool areFromSameNode(const Pin* lhs, const Pin* rhs);
-	static bool arePlugged(const Pin& input, const Pin& output);
 
 	static bool isTrackingEnabled();
 	static void stopTracking();

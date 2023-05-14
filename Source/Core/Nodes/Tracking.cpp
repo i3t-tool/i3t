@@ -4,7 +4,16 @@
 
 namespace Core
 {
-SequenceTree::SequenceTree(Ptr<NodeBase> sequence) { m_beginSequence = toSequence(sequence); }
+SequenceTree::SequenceTree(Ptr<NodeBase> sequence)
+{
+	if (sequence == nullptr)
+	{
+		m_beginSequence = nullptr;
+		return;
+	}
+
+	m_beginSequence = sequence->as<Sequence>().get();
+}
 
 SequenceTree::MatrixIterator SequenceTree::begin()
 {
@@ -18,9 +27,9 @@ SequenceTree::MatrixIterator SequenceTree::end()
 {
 	auto cur = m_beginSequence;
 	Ptr<Sequence> parent;
-	while ((parent = toSequence(GraphManager::getParent(cur, 0))) != nullptr)
+	while ((parent = toSequence(GraphManager::getParent(cur->getPtr(), 0))) != nullptr)
 	{
-		cur = parent;
+		cur = parent.get();
 	}
 
 	auto it = MatrixIterator(cur, nullptr);
@@ -29,13 +38,13 @@ SequenceTree::MatrixIterator SequenceTree::end()
 	return it;
 }
 
-SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence)
+SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence)
 {
 	m_currentSequence = sequence;
 	m_currentMatrix = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
 }
 
-SequenceTree::MatrixIterator::MatrixIterator(Ptr<Sequence>& sequence, NodePtr node)
+SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, NodePtr node)
 {
 	m_currentSequence = sequence;
 	m_currentMatrix = node;
@@ -113,13 +122,13 @@ void SequenceTree::MatrixIterator::advance()
 
 	if (index == 0)
 	{
-		auto parent = GraphManager::getParent(m_currentSequence);
+		auto parent = GraphManager::getParent(m_currentSequence->getPtr());
 
 		// Check if current matrix is not first in the graph.
 		if (parent)
 		{
 			// Sequence is not the root, there is another parent sequence.
-			m_currentSequence = parent->as<Sequence>();
+			m_currentSequence = parent->as<Sequence>().get();
 			if (!m_currentSequence->getMatrices().empty())
 			{
 				m_currentMatrix = m_currentSequence->getMatrices().back();
@@ -157,7 +166,18 @@ void SequenceTree::MatrixIterator::withdraw()
 		// Current matrix is last matrix in a sequence. Go to the previous sequence.
 		auto prev = m_tree->m_beginSequence;
 		auto prevsParent = m_tree->m_beginSequence;
-		while ((prevsParent = toSequence(GraphManager::getParent(prev))) != m_currentSequence)
+
+		auto toSequenceFn = [](Ptr<Node> node) -> Sequence*
+		{
+			if (node == nullptr)
+			{
+				return nullptr;
+			}
+
+			return node->as<Sequence>().get();
+		};
+
+		while ((prevsParent = toSequenceFn(GraphManager::getParent(prev->getPtr()))) != m_currentSequence)
 		{
 			prev = prevsParent;
 		}
@@ -172,7 +192,7 @@ void SequenceTree::MatrixIterator::withdraw()
 
 //------------------------------------------------------------------------------------------------//
 
-MatrixTracker::MatrixTracker(Ptr<Sequence> beginSequence, UPtr<IModelProxy> model)
+MatrixTracker::MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model)
     : m_model(std::move(model)), m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
 {
 }
@@ -180,6 +200,26 @@ MatrixTracker::MatrixTracker(Ptr<Sequence> beginSequence, UPtr<IModelProxy> mode
 void MatrixTracker::update()
 {
 	track();
+}
+
+Ptr<Sequence> MatrixTracker::getSequence() const
+{
+	if (m_beginSequence == nullptr)
+	{
+		return nullptr;
+	}
+
+	return m_beginSequence->getPtr()->as<Sequence>();
+}
+
+ID MatrixTracker::getSequenceID() const
+{
+	if (m_beginSequence == nullptr)
+	{
+		return NIL_ID;
+	}
+
+	return m_beginSequence->getId();
 }
 
 bool MatrixTracker::setParam(float param)
@@ -207,7 +247,7 @@ void MatrixTracker::track()
 	m_trackingProgress.clear();
 
 	// Create iterator for traversing sequence branch.
-	auto st = SequenceTree(m_beginSequence);
+	auto st = SequenceTree(m_beginSequence->getPtr());
 
 	int matricesCount = 0; // to the root
 	{

@@ -9,7 +9,7 @@ using namespace Core;
 TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 {
 	auto cameraNode = GraphManager::createCamera();
-	auto screenNode = Builder::createNode<ENodeType::Screen>();
+	auto screenNode = Builder::createOperator<ENodeType::Screen>();
 
 	auto perspectiveProj = Builder::createTransform<ETransformType::Perspective>();
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
@@ -32,7 +32,7 @@ TEST(CameraNodeTest, CameraAndSequenceCannotBeConnected)
 	auto camera = GraphManager::createCamera();
 	auto sequence = GraphManager::createSequence();
 
-	EXPECT_TRUE(camera->getOutPin(I3T_CAMERA_OUT_MUL).isDisabled());
+	EXPECT_TRUE(camera->getOutput(I3T_CAMERA_OUT_MUL).isDisabled());
 
 	const auto result = GraphManager::plug(camera, sequence, I3T_CAMERA_OUT_MUL, I3T_SEQ_IN_MUL);
 	EXPECT_EQ(result, ENodePlugResult::Err_DisabledPin);

@@ -4,7 +4,7 @@
 
 TEST(PinViewTest, RangeFor)
 {
-	auto node = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto node = Core::Builder::createOperator<ENodeType::Vector3ToVector3>();
 
 	auto outputs = node->getOutputPins();
 	auto begin = outputs.begin();

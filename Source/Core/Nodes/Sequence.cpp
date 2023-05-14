@@ -9,7 +9,6 @@ Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
 {
 	auto ret = std::make_shared<Sequence>(tracker);
 	ret->init();
-	ret->createComponents();
 	ret->updateValues(0);
 
 	return ret;
@@ -20,62 +19,42 @@ Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
 const Operation g_storageOp = {"SeqStor", "_", 1, {EValueType::Matrix}, 1, {EValueType::Matrix}};
 
 Sequence::Storage::Storage()
-    : // 		Node(&g_storageOp)
-      Node(&g_sequence)
+    : Node(&g_storageOp)
 {
-}
-
-Pin& Sequence::Storage::getIn(size_t i) { return m_owner->getIn(i); }
-
-Pin& Sequence::Storage::getOut(size_t i) { return m_owner->getOut(i); }
-
-/// \todo MH Check if this function should be used.
-DataStore& Sequence::Storage::getInternalData(size_t index)
-{
-	return m_owner->as<Sequence>()->getInternalData(index);
-	// return m_internalData[index];
 }
 
 void Sequence::Storage::updateValues(int inputIndex)
 {
-	auto in0 = getIn(I3T_SEQ_MAT);
-
-	/*
-	 * \todo MH pin mismatch.
-	if (inputIndex == I3T_SEQ_IN_MAT)
+	if (m_inputs[0].isPluggedIn())
 	{
-	    // Matrix is directly set from outside.
-	    mat = getIn(I3T_SEQ_IN_MAT).getStorage(I3T_SEQ_MAT).getMat4();
-	}
-	 */
-
-	if (in0.isPluggedIn())
-	{
-		// Read value from outside.
-		// in0.data().setValue(in0.);
-		auto newVal = in0.data().getMat4();
-		setInternalValue(newVal, I3T_SEQ_MAT);
+		// read matrix from input
+		auto newVal = m_inputs[0].data().getMat4();
+		setInternalValue(newVal, 0);
 	}
 	else
 	{
+		// recompute matrix product
 		auto mat = getMatProduct(m_matrices);
 
+		/*
 		if (inputIndex != -1)
 		{
-			mat = getIn(I3T_SEQ_IN_MAT).data().getMat4();
+			mat = getInput(I3T_SEQ_IN_MAT).data().getMat4();
 		}
+		 */
 
 		// Set storage value.
-		setInternalValue(mat, I3T_SEQ_MAT);
+		setInternalValue(mat, 0);
 	}
 
 	// Notify multiplier about change.
-	m_owner->as<Sequence>()->m_multiplier->updateValues(-1);
+	auto sequence = m_owner->as<Sequence>();
+	sequence->m_multiplier->updateValues(-1);
+	sequence->m_tracker->update();
 }
 
 ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
 {
-	/// @todo test this
 	// insert transform to matrix array
 	index = index >= m_matrices.size() ? m_matrices.size() : index;
 	m_matrices.insert(m_matrices.begin() + index, matrix);
@@ -98,7 +77,7 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t i
 
 Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
 {
-	I3T_ASSERT(m_matrices.size() > static_cast<size_t>(index),
+	I3T_ASSERT(index < m_matrices.size(),
 	           "Sequence does not have as many matrices as you are expecting.");
 	LOG_INFO("Popping matrix at {} from sequence {}.", index, getId());
 
@@ -134,39 +113,29 @@ const Operation g_multiplerOp = {
     "SeqMul", "_", 1, {EValueType::MatrixMul}, 2, {EValueType::MatrixMul, EValueType::Matrix}};
 
 Sequence::Multiplier::Multiplier()
-    : // 		Node(&g_multiplerOp)
-      Node(&g_sequence)
+    : Node(&g_multiplerOp)
 {
-}
-
-Pin& Sequence::Multiplier::getIn(size_t i) { return m_owner->getIn(i); }
-
-Pin& Sequence::Multiplier::getOut(size_t i) { return m_owner->getOut(i); }
-
-DataStore& Sequence::Multiplier::getInternalData(size_t index)
-{
-	return m_owner->as<Sequence>()->getInternalData(index);
 }
 
 void Sequence::Multiplier::updateValues(int inputIndex)
 {
-	auto product = m_owner->as<Sequence>()->getData(I3T_SEQ_MAT).getMat4();
 	glm::mat4 mult(1.0f);
 
-	if (getIn(I3T_SEQ_IN_MUL).isPluggedIn())
+	if (getInput(I3T_SEQ_IN_MUL).isPluggedIn())
 	{
 		// Get world transform from parent sequence.
-		mult = getIn(I3T_SEQ_IN_MUL).getStorage(I3T_SEQ_MUL).getMat4();
+		mult = getInput(I3T_SEQ_IN_MUL).data().getMat4();
 	}
+
+	auto storageNode = m_owner->as<Sequence>()->m_storage;
+	auto product = storageNode->getData(0).getMat4();
 	auto result = mult * product;
 
 	// Mul. output
-	setInternalValue(result, I3T_SEQ_MUL);
+	setInternalValue(result, 0);
 
 	// Model matrix
-	setInternalValue(result, I3T_SEQ_MOD);
-
-	notifyOwner();
+	setInternalValue(result, 1);
 }
 
 //===-- Sequence ----------------------------------------------------------===//
@@ -175,74 +144,19 @@ Sequence::Sequence(MatrixTracker* tracker) : NodeBase(&g_sequence) { m_tracker =
 
 Sequence::~Sequence() { stopTracking(); }
 
+void Sequence::onInit()
+{
+	m_storage = Builder::createNode<Sequence::Storage>(this);
+	m_inputs[I3T_SEQ_IN_MAT].mapTo(&m_storage->m_inputs[0]);
+	m_outputs[I3T_SEQ_OUT_MAT].mapTo(&m_storage->m_outputs[0]);
+
+	m_multiplier = Builder::createNode<Sequence::Multiplier>(this);
+	m_inputs[I3T_SEQ_IN_MUL].mapTo(&m_multiplier->m_inputs[0]);
+	m_outputs[I3T_SEQ_OUT_MUL].mapTo(&m_multiplier->m_outputs[0]);
+	m_outputs[I3T_SEQ_OUT_MOD].mapTo(&m_multiplier->m_outputs[1]);
+}
+
 Ptr<Node> Sequence::clone() { return Builder::createSequence(m_tracker); }
-
-Pin& Sequence::getIn(size_t i)
-{
-	I3T_ASSERT(i < g_sequence.inputTypes.size(), "Illegal index.");
-
-	if (i == I3T_SEQ_IN_MAT)
-		return m_storage->m_inputs[i];
-	return m_multiplier->m_inputs[i];
-}
-
-Pin& Sequence::getOut(size_t i)
-{
-	I3T_ASSERT(i < g_sequence.outputTypes.size(), "Illegal index.");
-
-	if (i == I3T_SEQ_OUT_MUL || i == I3T_SEQ_OUT_MOD)
-		return m_multiplier->m_outputs[i];
-	else
-	{
-		// Model matrix output.
-		return m_storage->m_outputs[i];
-	}
-}
-
-void Sequence::createComponents()
-{
-	m_storage = std::make_shared<Sequence::Storage>();
-	m_storage->m_id = getId();
-
-	m_storage->m_inputs.emplace_back(EValueType::MatrixMul, true, m_storage->getPtr(), 0);
-	m_storage->m_inputs.emplace_back(EValueType::Matrix, true, m_storage->getPtr(), 1);
-	m_storage->m_outputs.emplace_back(EValueType::MatrixMul, false, m_storage->getPtr(), 0);
-	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 1);
-	m_storage->m_outputs.emplace_back(EValueType::Matrix, false, m_storage->getPtr(), 2);
-
-	m_storage->m_internalData.emplace_back(EValueType::MatrixMul);
-	m_storage->m_internalData.emplace_back(EValueType::Matrix);
-	m_storage->m_internalData.emplace_back(EValueType::Matrix);
-
-	m_storage->m_owner = getPtr();
-
-	m_multiplier = std::make_shared<Sequence::Multiplier>();
-	m_multiplier->m_id = getId();
-
-	m_multiplier->m_inputs.emplace_back(EValueType::MatrixMul, true, m_multiplier->getPtr(), 0);
-	m_multiplier->m_inputs.emplace_back(EValueType::Matrix, true, m_multiplier->getPtr(), 1);
-
-	m_multiplier->m_outputs.emplace_back(EValueType::MatrixMul, false, m_multiplier->getPtr(), 0);
-	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false, m_multiplier->getPtr(), 1);
-	m_multiplier->m_outputs.emplace_back(EValueType::Matrix, false, m_multiplier->getPtr(), 2);
-
-	m_multiplier->m_internalData.emplace_back(EValueType::MatrixMul);
-	m_multiplier->m_internalData.emplace_back(EValueType::Matrix);
-	m_multiplier->m_internalData.emplace_back(EValueType::Matrix);
-
-	m_multiplier->m_owner = getPtr();
-}
-
-DataStore& Sequence::getInternalData(size_t index)
-{
-	if (index == I3T_SEQ_MUL || index == I3T_SEQ_MOD)
-		return m_multiplier->m_internalData[index];
-	else
-	{
-		// index == I3T_SEQ_MAT
-		return m_storage->m_internalData[index];
-	}
-}
 
 [[nodiscard]] Ptr<Transformation> Sequence::popMatrix(const int index)
 {
@@ -252,47 +166,29 @@ DataStore& Sequence::getInternalData(size_t index)
 	return result;
 }
 
+void Sequence::updateValues(int inputIndex)
+{
+	if (inputIndex == -1)
+	{
+		// value of sequence changed
+		m_storage->updateValues(-1);
+		m_tracker->update();
+	}
+}
+
 MatrixTracker* Sequence::startTracking(UPtr<IModelProxy> modelProxy)
 {
-	*m_tracker = MatrixTracker(shared_from_this()->as<Sequence>(), std::move(modelProxy));
+	*m_tracker = MatrixTracker(this, std::move(modelProxy));
 
 	return m_tracker;
 }
 
 void Sequence::stopTracking()
 {
-	if (m_tracker->getSequence() == shared_from_this()->as<Sequence>())
+	// Called in destructor, cannot use shared_from_this() here.
+	if (m_tracker->getSequenceID() == getId())
 	{
 		*m_tracker = MatrixTracker();
-	}
-}
-
-void Sequence::updateValues(int inputIndex)
-{
-	if (inputIndex == -1)
-	{
-		// Got update from nested transform.
-		m_storage->updateValues(inputIndex);
-		m_multiplier->updateValues(inputIndex);
-	}
-
-	m_tracker->update();
-
-	if (m_owner)
-	{
-		notifyOwner();
-	}
-}
-
-void Sequence::receiveSignal(int inputIndex)
-{
-	updateValues(inputIndex);
-
-	/// \todo MH check this expression.
-	spreadSignal(0);
-	if (inputIndex != 0)
-	{
-		spreadSignal(1);
 	}
 }
 
@@ -301,6 +197,7 @@ void Sequence::addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)>
 	m_multiplier->addPlugCallback(callback);
 	Node::addPlugCallback(callback);
 }
+
 void Sequence::addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback)
 {
 	m_multiplier->addUnplugCallback(callback);

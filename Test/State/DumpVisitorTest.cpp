@@ -10,7 +10,7 @@
 //	SerializationVisitor visitor;
 //
 //	auto result = visitor.dump({
-// Core::GraphManager::createNode<ENodeType::FloatToFloat>() }); // \todo JH
+// Core::GraphManager::createOperator<ENodeType::FloatToFloat>() }); // \todo JH
 //\todo MH not work
 //
 //	std::string expected = fmt::format("- {}"
@@ -21,8 +21,8 @@
 
 // TEST(SerializationVisitor, SimpleSceneGetsSerializedCorrectly)
 //{
-//	auto float1 = Core::GraphManager::createNode<ENodeType::FloatToFloat>();
-//	auto float2 = Core::GraphManager::createNode<ENodeType::FloatToFloat>();
+//	auto float1 = Core::GraphManager::createOperator<ENodeType::FloatToFloat>();
+//	auto float2 = Core::GraphManager::createOperator<ENodeType::FloatToFloat>();
 //
 //	plug_expectOk(float1, float2, 0, 0);
 //

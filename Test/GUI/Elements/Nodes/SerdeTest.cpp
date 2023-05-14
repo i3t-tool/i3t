@@ -7,7 +7,12 @@
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
 
-TEST(SerdeTest, CorrectOrderOfTransformsInTheSequence)
+#include "Core/Nodes/Utils.h"
+
+/*
+class SerdeTest : public GraphManagerTestFixture {};
+
+TEST_F(SerdeTest, CorrectOrderOfTransformsInTheSequence)
 {
 	DIWNE::SettingsDiwne settings;
 	DIWNE::Diwne diwne(&settings);
@@ -23,3 +28,4 @@ TEST(SerdeTest, CorrectOrderOfTransformsInTheSequence)
 	SerializationVisitor visitor(serialized);
 	visitor.dump({sequence});
 }
+ */

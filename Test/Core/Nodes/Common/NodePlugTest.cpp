@@ -8,9 +8,9 @@ using namespace Core;
 
 TEST(PlugTest, DotProductOfTwoVec3NodesShouldBeCorrect)
 {
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto dotNode = Builder::createNode<ENodeType::Vector3DotVector3>();
+	auto vec1 = Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto dotNode = Builder::createOperator<ENodeType::Vector3DotVector3>();
 
 	// Plug vec1 and vec2 to dotNode inputs.
 	plug_expectOk(vec1, dotNode, 0, 0);
@@ -24,8 +24,8 @@ TEST(PlugTest, DotProductOfTwoVec3NodesShouldBeCorrect)
 
 TEST(PlugTest, DifferentPinTypes_NodeShouldNotBeConnected)
 {
-	auto fl = Builder::createNode<ENodeType::FloatToFloat>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto fl = Builder::createOperator<ENodeType::FloatToFloat>();
+	auto vec3 = Builder::createOperator<ENodeType::Vector3ToVector3>();
 
 	auto result = GraphManager::plug(vec3, fl, 0, 0);
 
@@ -34,7 +34,7 @@ TEST(PlugTest, DifferentPinTypes_NodeShouldNotBeConnected)
 
 TEST(PlugTest, PlugNodeOuputToTheSameNodeInput_NodeShouldNotBeConnected)
 {
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec3 = Builder::createOperator<ENodeType::Vector3ToVector3>();
 
 	auto result = GraphManager::plug(vec3, vec3, 0, 0);
 
@@ -49,10 +49,10 @@ TEST(PlugTest, PlugNodeOuputToTheSameNodeInput_NodeShouldNotBeConnected)
  */
 TEST(PlugTest, PlugCannotCreateCycle)
 {
-	auto f1 = Builder::createNode<ENodeType::FloatToFloat>();
-	auto f2 = Builder::createNode<ENodeType::FloatToFloat>();
-	auto f3 = Builder::createNode<ENodeType::FloatToFloat>();
-	auto f4 = Builder::createNode<ENodeType::FloatToFloat>();
+	auto f1 = Builder::createOperator<ENodeType::FloatToFloat>();
+	auto f2 = Builder::createOperator<ENodeType::FloatToFloat>();
+	auto f3 = Builder::createOperator<ENodeType::FloatToFloat>();
+	auto f4 = Builder::createOperator<ENodeType::FloatToFloat>();
 
 	plug_expectOk(f2, f1, 0, 0);
 	plug_expectOk(f3, f2, 0, 0);
@@ -65,8 +65,8 @@ TEST(PlugTest, PlugCannotCreateCycle)
 
 TEST(PlugTest, UnplugMeFromPluggedNode)
 {
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec1 = Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<ENodeType::Vector3ToVector3>();
 
 	plug_expectOk(vec1, vec2, 0, 0);
 
@@ -82,9 +82,9 @@ TEST(PlugTest, UnplugMeFromPluggedNode)
 
 TEST(PlugTest, UnplugInTheMiddleOfChainShouldBePossible)
 {
-	auto vec1 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2 = Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec3 = Builder::createNode<ENodeType::Vector3ToVector3>();
+	auto vec1 = Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto vec2 = Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto vec3 = Builder::createOperator<ENodeType::Vector3ToVector3>();
 
 	plug_expectOk(vec1, vec2, 0, 0);
 	plug_expectOk(vec2, vec3, 0, 0);

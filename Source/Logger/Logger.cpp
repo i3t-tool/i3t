@@ -23,6 +23,18 @@ struct LoggingToggle final
 	static Keys::Code KEY_Dummy_tutorialStep; // #TUTORIAL
 };
 
+Logger::Logger()
+{
+	std::vector<spdlog::sink_ptr> sinks;
+	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+	sinks[0]->set_level(spdlog::level::trace);
+	sinks[0]->set_pattern("[%l]: %v");
+
+	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
+	logger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
+	mouseLogger = std::make_shared<spdlog::logger>("mouse_logger", sinks.begin(), sinks.end());
+}
+
 Logger& Logger::getInstance()
 {
 	static Logger instance;

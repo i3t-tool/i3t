@@ -8,5 +8,5 @@ TEST(NestedNodesTest, _)
 {
 	auto seq = GraphManager::createSequence();
 
-	EXPECT_EQ(seq->getId(), seq->getIn(0).getOwner()->getId());
+	EXPECT_EQ(seq->getId(), seq->getInput(0).getOwner()->getId());
 }

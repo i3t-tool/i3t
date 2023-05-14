@@ -6,25 +6,27 @@
 #include "glm/matrix.hpp"
 
 #include "Model.h"
-#include "Sequence.h"
 
 namespace Core
 {
+class Sequence;
+class Transformation;
+
 class SequenceTree
 {
-	Ptr<Sequence> m_beginSequence;
+	Sequence* m_beginSequence;
 
 public:
 	class MatrixIterator
 	{
 		friend class SequenceTree;
 		SequenceTree* m_tree;
-		Ptr<Sequence> m_currentSequence;
+		Sequence*     m_currentSequence;
 		Ptr<NodeBase> m_currentMatrix;
 
 	public:
-		explicit MatrixIterator(Ptr<Sequence>& sequence);
-		MatrixIterator(Ptr<Sequence>& sequence, NodePtr node);
+		explicit MatrixIterator(Sequence* sequence);
+		MatrixIterator(Sequence* sequence, NodePtr node);
 
 		MatrixIterator(const MatrixIterator& mt);
 
@@ -87,11 +89,13 @@ public:
 	/**
 	 * @param beginSequence
 	 */
-	explicit MatrixTracker(Ptr<Sequence> beginSequence, UPtr<IModelProxy> model);
+	explicit MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model);
 
 	void update();
 
-	Ptr<Sequence> getSequence() const { return m_beginSequence; }
+	Ptr<Sequence> getSequence() const;
+	ID            getSequenceID() const;
+
 	Ptr<Model>    getModel() const { return m_model->getModel(); }
 
 	const glm::mat4& getInterpolatedMatrix() { return m_interpolatedMatrix; }
@@ -134,7 +138,9 @@ private:
 	float m_param = 0.0f;
 
 	UPtr<IModelProxy> m_model;
-	Ptr<Sequence>     m_beginSequence = nullptr;
+
+	/// On sequence destruction, tracker is destroyed too.
+	Sequence* m_beginSequence = nullptr;
 
 	ID m_interpolatedTransformID = 0;
 	std::map<ID, float> m_trackingProgress;

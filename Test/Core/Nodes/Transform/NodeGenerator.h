@@ -21,7 +21,7 @@ generateFloatInputs(Ptr<Core::NodeBase> node)
 	for (unsigned int i = 0; i < Size; ++i)
 	{
 		inputValues[i] = generateFloat();
-		inputNodes[i] = Builder::createNode<ENodeType::FloatToFloat>();
+		inputNodes[i] = Builder::createOperator<ENodeType::FloatToFloat>();
 		auto valueSetResult = inputNodes[i]->setValue(inputValues[i]);
 		auto plugResult = GraphManager::plug(inputNodes[i], node, 0, i);
 		EXPECT_EQ(ValueSetResult::Status::Ok, valueSetResult.status);

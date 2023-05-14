@@ -41,7 +41,7 @@
 /// std::string headerLabel, std::string nodeLabel)
 ////		//TODO change create Node when MH make Trackball in Core.
 ////		: WorkspaceMatrix4x4(headerBackground,
-/// Core::Builder::createNode<ENodeType::Matrix>(), headerLabel,
+/// Core::Builder::createOperator<ENodeType::Matrix>(), headerLabel,
 /// nodeLabel){
 ////
 ////	buttonSize = ImVec2(
@@ -69,9 +69,9 @@
 ////}
 //
 // WorkspaceTrackball::WorkspaceTrackball()
-//		//: WorkspaceMatrix4x4(Core::Builder::createNode<ENodeType::TrackBall>())
+//		//: WorkspaceMatrix4x4(Core::Builder::createOperator<ENodeType::TrackBall>())
 ///* \todo JH trackball not exist */ 		:
-// WorkspaceMatrix4x4(Core::Builder::createNode<ENodeType::MatrixToMatrix>())
+// WorkspaceMatrix4x4(Core::Builder::createOperator<ENodeType::MatrixToMatrix>())
 //{
 //	buttonSize = ImVec2(
 ////			getDataItemsWidth(diwne)*4.0f/3.0f,

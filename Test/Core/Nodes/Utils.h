@@ -40,3 +40,11 @@ protected:
 
 	static void TearDownTestSuite() { GraphManager::destroy(); }
 };
+
+class GraphManagerTestFixture : public ::testing::Test
+{
+protected:
+	static void SetUpTestSuite() { GraphManager::init(); }
+
+	static void TearDownTestSuite() { GraphManager::destroy(); }
+};

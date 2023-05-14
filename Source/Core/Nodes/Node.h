@@ -22,19 +22,28 @@
 
 namespace Core
 {
+class Node;
+
 constexpr inline size_t MAX_NODES_COUNT = 1024;
+
+namespace Builder
+{
+template <typename T>
+Ptr<T> createNode(Node* owner = nullptr)
+{
+	static_assert(std::is_base_of_v<Node, T>, "T must be derived from Node");
+	auto node = std::make_shared<T>();
+	if (owner != nullptr)
+	{
+		node->m_owner = owner;
+	}
+	node->init();
+
+	return node;
+} // namespace Builder
+}
 }
 
-enum class ENodePlugResult
-{
-	Ok = 0,
-	Err_MismatchedPinTypes,
-	Err_MismatchedPinKind,
-	Err_Loopback, /// Same nodes.
-	Err_NonexistentPin,
-	Err_Loop,
-	Err_DisabledPin
-};
 
 struct ValueSetResult
 {
@@ -74,52 +83,9 @@ class Pin;
 class Node : public ICloneable<Node>, public std::enable_shared_from_this<Node>
 {
 	friend class GraphManager;
+	friend class Pin;
 
-public:
-	struct PinView
-	{
-		enum class EStrategy
-		{
-			Output,
-			Input
-		};
-
-		PinView() = default;
-		PinView(EStrategy strategy, Ptr<Node> node)
-		{
-			this->strategy = strategy;
-			this->node = node;
-		}
-
-		PinView(EStrategy strategy, Ptr<Node> node, int index)
-		{
-			this->strategy = strategy;
-			this->node = node;
-			this->index = index;
-		}
-
-		PinView begin() const;
-		PinView end() const;
-
-		size_t size() const;
-		bool empty() const;
-
-		PinView& operator++();
-		const Pin& operator*();
-		bool operator==(const PinView& view) const;
-		bool operator!=(const PinView& view) const;
-
-		Pin& operator[](size_t i);
-		const Pin& operator[](size_t i) const;
-
-	private:
-		EStrategy strategy;
-		Ptr<Node> node;
-		int index;
-	};
-
-	//===-- Lifecycle functions
-	//-----------------------------------------------===//
+	//===-- Lifecycle functions -----------------------------------------------===//
 protected:
 	/**
 	 * Node is never constructed directory.
@@ -139,6 +105,16 @@ protected:
 	virtual ~Node() = default;
 
 public:
+	bool operator==(const Node& other) const
+	{
+		return getId() == other.getId();
+	}
+
+	bool operator!=(const Node& other) const
+	{
+		return !(*this == other);
+	}
+
 	/**
 	 * Initialize node id, inputs, and outputs according to the preset node type.
 	 *
@@ -147,6 +123,8 @@ public:
 	 * \todo MH Override in derived classes (Sequence).
 	 */
 	void init();
+
+	virtual void onInit() {}
 
 	/**
 	 * Prepares node for its destruction, after that the destructor can be called.
@@ -160,18 +138,12 @@ public:
 	 */
 	ENodePlugResult plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex);
 
-	//===-- Helper functions
-	//--------------------------------------------------===//
+	//===-- Helper functions --------------------------------------------------===//
 
 	/**
 	 * \return Application unique ID.
 	 */
 	ID getId() const;
-
-	/**
-	 * @param newId Make sure the new ID is not used by another node.
-	 */
-	void changeId(ID newId);
 
 	const Operation* getOperation() const { return m_operation; }
 
@@ -193,29 +165,19 @@ public:
 
 	//===----------------------------------------------------------------------===//
 	/// \todo Break chain Node -> Transform.
+	/// \todo This is pin related, move to Pin class.
 	std::vector<EValueState> m_OperatorState;
 
 	EValueState getState(size_t pinIndex = 0);
 	//===----------------------------------------------------------------------===//
 
-	virtual Pin& getIn(size_t i) { return m_inputs[i]; }
-	virtual Pin& getOut(size_t i) { return m_outputs[i]; }
+	Pin& getInput(size_t i) { return m_inputs[i]; }
+	Pin& getOutput(size_t i) { return m_outputs[i]; }
 
-	/// \deprecated Will be removed
-	const Pin& getInPin(int index) { return getInputPins()[index]; }
+	std::vector<Pin>& getInputPins() { return m_inputs; }
+	std::vector<Pin>& getOutputPins() { return m_outputs; }
 
-	/// \deprecated Will be removed
-	const Pin& getOutPin(int index) { return getOutputPins()[index]; }
-
-	[[nodiscard]] PinView getInputPins() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
-	[[nodiscard]] PinView getOutputPins() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
-
-protected:
-	[[nodiscard]] PinView getInputPinsRef() { return PinView(PinView::EStrategy::Input, shared_from_this()); }
-	[[nodiscard]] PinView getOutputPinsRef() { return PinView(PinView::EStrategy::Output, shared_from_this()); }
-
-	//===-- Obtaining value functions.
-	//----------------------------------------===//
+	//===-- Obtaining value functions. ----------------------------------------===//
 	/**
 	 * Get data storage for read and write purposes. No written value validation
 	 * is performed.
@@ -223,13 +185,9 @@ protected:
 	 * Overridden in Sequence class.
 	 */
 public:
+	/// This function won't work for mapped pins.
 	/// \todo Make this function non public.
-	virtual DataStore& getInternalData(size_t index = 0)
-	{
-		assert(index < m_internalData.size() && "Desired data storage does not exist!");
-
-		return m_internalData[index];
-	}
+	DataStore& getInternalData(size_t index = 0);
 
 	/**
 	 * Get Node contents, read only.
@@ -240,9 +198,15 @@ public:
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
 
 public:
-	/// \todo Does it needs to be public?
-	void setOwner(Ptr<Node> owner) { m_owner = owner; }
+	/// Get direct owner of this node.
+	///
+	/// \returns nullptr if owner is not set.
+	Ptr<Node> getOwner() const;
 
+	/// \todo Does it needs to be public?
+	void setOwner(Node* owner) { m_owner = owner; }
+
+	/// Get the topmost owner of this node.
 	Ptr<Node> getRootOwner();
 
 	void notifyOwner();
@@ -335,8 +299,6 @@ protected:
 	bool shouldPulse(size_t inputIndex, size_t outputIndex);
 
 public:
-	virtual void resetMatrixFromDefaults() {} // - defined in Transform, calls TransformImpl::onReset...
-
 	/// \todo MH will be removed.
 	static const Transform::DataMap* getDataMap();
 	static const Transform::DataMap& getDataMapRef();
@@ -392,6 +354,7 @@ public:
 
 	bool areInputsPlugged(int numInputs);
 	bool areAllInputsPlugged();
+	bool areAllInputsUnplugged() const;
 
 	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
 
@@ -457,7 +420,7 @@ public:
 	virtual void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
 protected:
-	virtual ENodePlugResult isPlugCorrect(Pin const* input, Pin const* output);
+	virtual ENodePlugResult isPlugCorrect(const Pin& input, const Pin& output);
 
 private:
 	void unplugAll();
@@ -484,15 +447,19 @@ protected:
 	/// Results of operations.
 	std::vector<DataStore> m_internalData;
 
-	/**
-	 * Owner of the node, used in complex type of nodes, such as sequence or
-	 * camera.
-	 */
-	Ptr<Node> m_owner = nullptr;
+	/// Owner of the node, used in complex type of nodes, such as sequence or
+	/// camera.
+	Node* m_owner = nullptr;
+
+	/// Friends:
+	template <typename T>
+	friend Ptr<T> Builder::createNode(Node* owner);
 };
 
+/// \todo MH Remove!
 using NodePtr = Ptr<Node>;
 
+/// \todo MH Remove!
 /// \warning Will be removed, use Node type instead.
 using NodeBase = Node;
 } // namespace Core

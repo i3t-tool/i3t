@@ -9,7 +9,7 @@ using namespace Core;
 
 TEST(CloneNodeTest, NodeCanBeCloned)
 {
-	auto node = Builder::createNode<ENodeType::FloatToFloat>();
+	auto node = Builder::createOperator<ENodeType::FloatToFloat>();
 
 	const float expectedValue = generateFloat();
 	setValue_expectOk(node, expectedValue);
