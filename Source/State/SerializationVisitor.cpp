@@ -129,7 +129,8 @@ void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 	rapidjson::Value screen(rapidjson::kObjectType);
 	dumpCommon(screen, node);
 
-	/// \todo MH Save aspect
+    // screen.AddMember("aspect", node->, alloc);
+    addVector(screen, "aspect", node->getAspect());
 
 	screens.PushBack(screen, alloc);
 
@@ -146,8 +147,15 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	rapidjson::Value model(rapidjson::kObjectType);
 	dumpCommon(model, node);
 
-	const auto modelAlias = node->viewportModel().lock()->getModel();
+    const auto mesh = node->viewportModel().lock();
+	const auto modelAlias = mesh->getModel();
 	model.AddMember("model", rapidjson::Value(modelAlias.c_str(), alloc), alloc);
+
+    model.AddMember("visible", mesh->m_visible, alloc);
+    model.AddMember("showAxes", mesh->m_showAxes, alloc);
+    model.AddMember("opaque", mesh->m_opaque, alloc);
+    model.AddMember("opacity", mesh->m_opacity, alloc);
+    addVector(model, "tint", mesh->m_tint);
 
 	models.PushBack(model, alloc);
 
@@ -367,34 +375,31 @@ void SerializationVisitor::addData(rapidjson::Value& target, const char* key, co
 
 void SerializationVisitor::addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node)
 {
+	I3T_ASSERT(target.IsArray(), "Invalid value type");
+
 	for (const auto& input : node->getInputPins())
 	{
-		if (input.isPluggedIn())
+		if (!input.isPluggedIn())
 		{
-			// tricky part
-			auto parent = input.getParentPin()->getOwner();
-			if (parent->getRootOwner())
-			{
-				parent = parent->getRootOwner();
-			}
-
-			const auto fromId = parent->getId();
-			const auto fromPin = input.getParentPin()->getIndex();
-			const auto toId = node->getId();
-			const auto toPin = input.getIndex();
-
-			rapidjson::Value e(kArrayType);
-
-			I3T_ASSERT(target.IsArray(), "Invalid value type");
-
-			auto& alloc = m_memento.GetAllocator();
-
-			e.PushBack(fromId, alloc);
-			e.PushBack(fromPin, alloc);
-			e.PushBack(toId, alloc);
-			e.PushBack(toPin, alloc);
-
-			target.PushBack(e.Move(), alloc);
+			continue;
 		}
+
+		auto parent = input.getParentPin()->getOwner();
+
+		const auto fromId = parent->getId();
+		const auto fromPin = input.getParentPin()->Index;
+		const auto toId = node->getId();
+		const auto toPin = input.Index;
+
+		rapidjson::Value e(kArrayType);
+
+		auto& alloc = m_memento.GetAllocator();
+
+		e.PushBack(fromId, alloc);
+		e.PushBack(fromPin, alloc);
+		e.PushBack(toId, alloc);
+		e.PushBack(toPin, alloc);
+
+		target.PushBack(e.Move(), alloc);
 	}
 }

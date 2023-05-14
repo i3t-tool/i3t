@@ -1,13 +1,11 @@
-#pragma once
-//----------------
 /**
  * \file WorkspaceScreen.h
  * \author Petr Felkel, Martin Herich, Dan Rakušan
  * \brief screen box in the workspace
  * Based on WorkspaceScreen
- *
  */
-//---------------
+#pragma once
+
 #include "WorkspaceElementsWithCoreData.h"
 
 #include "Viewport/data/DisplayOptions.h"
@@ -53,6 +51,9 @@ public:
 	{
 		return {getOutputs()[1]};
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
+
+    ImVec2 getAspect() const;
+    void setAspect(ImVec2 aspect);
 
 private:
 	void init();

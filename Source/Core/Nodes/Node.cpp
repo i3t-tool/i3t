@@ -7,46 +7,6 @@ using namespace Core;
 
 static IdGenerator generator;
 
-Node::PinView Node::PinView::begin() const { return Node::PinView(strategy, node, 0); }
-
-Node::PinView Node::PinView::end() const { return Node::PinView(strategy, node, size()); }
-
-size_t Node::PinView::size() const
-{
-	if (strategy == Node::PinView::EStrategy::Input)
-		return node->m_operation->inputTypes.size();
-	return node->m_operation->outputTypes.size();
-}
-
-bool Node::PinView::empty() const { return size() == 0; }
-
-Node::PinView& Node::PinView::operator++()
-{
-	index++;
-
-	return *this;
-}
-
-const Pin& Node::PinView::operator*() { return (*this)[index]; }
-
-bool Node::PinView::operator==(const PinView& view) const { return index == view.index; }
-
-bool Node::PinView::operator!=(const PinView& view) const { return !(*this == view); }
-
-Pin& Node::PinView::operator[](size_t i)
-{
-	if (strategy == Node::PinView::EStrategy::Input)
-		return node->getIn(i);
-	return node->getOut(i);
-}
-
-const Pin& Node::PinView::operator[](size_t i) const
-{
-	if (strategy == Node::PinView::EStrategy::Input)
-		return node->getIn(i);
-	return node->getOut(i);
-}
-
 void Node::finalize()
 {
 	unplugAll();
@@ -90,46 +50,42 @@ void Node::init()
 	else
 		for (int i = 0; i < m_operation->numberOfOutputs; i++)
 			m_OperatorState.push_back(EValueState::Locked);
+
+	onInit();
 }
 
 ENodePlugResult Node::plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex)
 {
 	I3T_ASSERT(rightNode->getInputPins().size() > toIndex, "Node does not have input pin with given index!");
-	I3T_ASSERT(this->getOutputPins().size() > fromIndex, "Node {} does not have output pin with given index!");
+	I3T_ASSERT(getOutputPins().size() > fromIndex, "Node does not have output pin with given index!");
 
-	auto& input = rightNode->getIn(toIndex);
-	auto& output = this->getOut(fromIndex);
+	auto& input = rightNode->getInput(toIndex);
+	auto& output = getOutput(fromIndex);
 
-	auto result = input.m_master->isPlugCorrect(&input, &output);
-	if (result != ENodePlugResult::Ok)
-		return result;
+	const auto result = output.plug(input);
 
-	// Insert to toPlug output pin outputs this operator input pin.
-	output.m_outputs.push_back(&input);
-
-	// Attach given operator output pin to this operator input pin.
-	input.m_input = &output;
-
-	for (auto& state : rightNode->m_OperatorState)
-		state = EValueState::Locked;
-
-	if (this->getOutputPinsRef()[fromIndex].getType() != EValueType::Pulse)
+	if (result == ENodePlugResult::Ok)
 	{
-		this->spreadSignal(fromIndex);
+		for (auto& state : rightNode->m_OperatorState)
+		{
+			state = EValueState::Locked;
+		}
+
+		if (this->getOutputPins()[fromIndex].ValueType != EValueType::Pulse)
+		{
+			this->spreadSignal(fromIndex);
+		}
+
+		triggerPlugCallback(this, rightNode.get(), fromIndex, toIndex);
 	}
 
-	triggerPlugCallback(this, rightNode.get(), fromIndex, toIndex);
-	return ENodePlugResult::Ok;
-}
-
-Ptr<Node> Node::getOwner()
-{
-	return m_owner;
+	return result;
 }
 
 Ptr<Node> Node::getRootOwner()
 {
 	auto topMost = m_owner;
+
 	while (topMost)
 	{
 		if (topMost->m_owner == nullptr)
@@ -140,23 +96,24 @@ Ptr<Node> Node::getRootOwner()
 		topMost = topMost->m_owner;
 	}
 
-	return topMost;
+	if (topMost == nullptr)
+	{
+		return nullptr;
+	}
+
+	return topMost->getPtr();
 }
 
 void Node::notifyOwner()
 {
 	if (m_owner)
 	{
-		m_owner->spreadSignal();
-
-		// \todo MH Which index should be used when notifying parent node?
-		m_owner->updateValues(0);
+		m_owner->updateValues(-1);
+		m_owner->notifyOwner();
 	}
 }
 
 ID Node::getId() const { return m_id; }
-
-void Node::changeId(ID newId) { m_id = newId; }
 
 EValueState Node::getState(size_t pinIndex) { return m_OperatorState[pinIndex]; }
 
@@ -166,12 +123,34 @@ void Node::pulse(size_t index)
 	setInternalValue(false, index);
 }
 
+DataStore& Node::getInternalData(size_t index)
+{
+	I3T_ASSERT(index < m_internalData.size(), "Desired data storage does not exist!");
+
+	if (index < m_outputs.size() && m_outputs[index].isMapped())
+	{
+		return m_outputs[index].dataMut();
+	}
+
+	return m_internalData[index];
+}
+
+Ptr<Node> Node::getOwner() const
+{
+	if (m_owner == nullptr)
+	{
+		return nullptr;
+	}
+
+	return m_owner->getPtr();
+}
+
 bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
 {
-	auto outputPinIndex = getIn(inputIndex).getParentPin()->getIndex();
-	auto& storage = getIn(inputIndex).getStorage(outputPinIndex);
+	auto outputPinIndex = getInput(inputIndex).getParentPin()->Index;
+	auto& storage = getInput(inputIndex).data();
 
-	if (getIn(inputIndex).isPluggedIn() && storage.isPulseTriggered())
+	if (getInput(inputIndex).isPluggedIn() && storage.isPulseTriggered())
 	{
 		return true;
 	}
@@ -180,35 +159,39 @@ bool Node::shouldPulse(size_t inputIndex, size_t outputIndex)
 
 void Node::spreadSignal()
 {
-	for (auto& operatorOutput : getOutputPinsRef())
+	for (auto& operatorOutput : getOutputPins())
 	{
 		for (auto* oct : operatorOutput.getOutComponents())
 		{
 			// I3T_DEBUG_LOG("Spreading signal from {} to {}:{}.", getSig(),
-			// oct->m_master->getSig(), oct->getSig());
-			oct->m_master->receiveSignal(oct->getIndex());
+			// oct->Owner.getSig(), oct->getSig());
+
+			/// \todo MH Correct the owner of the pin.
+			oct->getMappedOwner()->receiveSignal(oct->Index);
 		}
 	}
 }
 
 void Node::spreadSignal(size_t outIndex)
 {
-	if (getOutputPinsRef().empty())
+	/// \todo MH This should not happen, remove it.
+	if (getOutputPins().empty())
+	{
 		return;
+	}
 
-	auto& outputPin = getOut(outIndex);
+	auto& outputPin = getOutput(outIndex);
 
 	for (auto* inPin : outputPin.getOutComponents())
-		inPin->m_master->receiveSignal(outIndex);
+	{
+		inPin->getMappedOwner()->receiveSignal(outIndex);
+	}
 }
 
 void Node::receiveSignal(int inputIndex)
 {
 	updateValues(inputIndex);
-
-	/// \todo MH this call is unnecessary, but
-	/// SpreadSignalTest.ValuesShouldBeSpreadThroughConnectedNodes fails.
-	// spreadSignal();
+	notifyOwner();
 }
 
 bool Node::areInputsPlugged(int numInputs)
@@ -227,124 +210,34 @@ bool Node::areInputsPlugged(int numInputs)
 
 bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
 
-ENodePlugResult Node::isPlugCorrect(Pin const* input, Pin const* output)
+bool Node::areAllInputsUnplugged() const
 {
-	if (input->isDisabled() || output->isDisabled())
-		return ENodePlugResult::Err_DisabledPin;
-
-	/* \todo JH switch input and output if output is inputPin and input is
-	 * outputPin here? I have to do it anyway ...*/
-	auto* inp = input;
-	if (!inp)
-		return ENodePlugResult::Err_NonexistentPin;
-
-	auto* out = output;
-	if (!out)
-		return ENodePlugResult::Err_NonexistentPin;
-
-	if (inp->m_valueType != out->m_valueType)
+	for (auto& input : m_inputs)
 	{
-		// Do the input and output data types match?
-		return ENodePlugResult::Err_MismatchedPinTypes;
-	}
-
-	if (inp->m_isInput == out->m_isInput)
-	{
-		// Do the input and output kind match?
-		return ENodePlugResult::Err_MismatchedPinKind;
-	}
-
-	if (inp->m_master == out->m_master)
-	{
-		// Not a circular edge?
-		return ENodePlugResult::Err_Loopback;
-	}
-	else
-	{
-		// Check node owners in the case of nested nodes.
-		const auto lhsRoot = out->m_master->getRootOwner();
-		const auto rhsRoot = inp->m_master->getRootOwner();
-
-		if (lhsRoot != nullptr && rhsRoot != nullptr && lhsRoot == rhsRoot)
+		if (input.isPluggedIn())
 		{
-			return ENodePlugResult::Err_Loopback;
+			return false;
 		}
 	}
 
-	// cycle detector
-	auto toFind = inp->getOwner(); // INPUT
+	return true;
+}
 
-	// stack in vector - TOS is at the vector back.
-	std::vector<Ptr<Node>> stack;
-
-	// PUSH(output) insert element at end.
-	stack.push_back(out->getOwner());
-
-	while (!stack.empty())
-	{
-		// Return last element of mutable sequence.
-		auto act = stack.back();
-		stack.pop_back();
-
-		if (act == toFind)
-			return ENodePlugResult::Err_Loop;
-
-		for (auto& pin : act->m_inputs)
-		{
-			if (pin.isPluggedIn())
-			{
-				Pin* ct = pin.m_input;
-				stack.push_back(ct->getOwner());
-			}
-		}
-	}
-
-	/*
-	  if (isOperatorPlugCorrectMod != NULL)
-	    return isOperatorPlugCorrectMod(inp, out);
-	*/
-
-	return ENodePlugResult::Ok;
+ENodePlugResult Node::isPlugCorrect(const Pin& input, const Pin& output)
+{
+	return Pin::isPlugCorrect(input, output);
 }
 
 void Node::unplugAll()
 {
-	auto inputsView = getInputPins();
-	auto outputsView = getOutputPins();
-
-	for (size_t i = 0L; i < inputsView.size(); ++i)
+	for (size_t i = 0L; i < m_inputs.size(); ++i)
 	{
-		if (inputsView[i].isPluggedIn())
-		{
-			unplugInput(i);
-		}
+		unplugInput(i);
 	}
 
-	for (size_t i = 0L; i < outputsView.size(); ++i)
+	for (size_t i = 0L; i < m_outputs.size(); ++i)
 	{
-		for (const auto& connected : outputsView[i].m_outputs)
-		{
-			unplugOutput(i);
-
-			const auto node = connected->m_master;
-			if (node->m_operation->isConstructor)
-			{
-				bool allUnplugged = true;
-
-				for (const auto& input : node->m_inputs)
-				{
-					if (input.isPluggedIn())
-					{
-						allUnplugged = false;
-						break;
-					}
-				}
-
-				if (allUnplugged)
-					for (auto& state : node->m_OperatorState)
-						state = EValueState::Editable;
-			}
-		}
+		unplugOutput(i);
 	}
 }
 
@@ -352,50 +245,19 @@ void Node::unplugInput(size_t index)
 {
 	I3T_ASSERT(m_inputs.size() > index, "The node's input pin that you want to unplug does not exist.");
 
-	auto inputs = getInputPinsRef();
-	auto* otherPin = inputs[index].m_input;
-	size_t otherPinIndex = -1;
-	Node* otherPinOwner = nullptr;
+	auto& input = m_inputs[index];
 
-	if (otherPin)
+	if (!input.isPluggedIn())
 	{
-		otherPinOwner = otherPin->getOwner().get();
-		otherPinIndex = otherPin->m_index;
-
-		// Erase pointer to my input pin in connected node outputs.
-		auto& otherPinOutputs = otherPin->m_outputs;
-
-		auto it = std::find(otherPinOutputs.begin(), otherPinOutputs.end(), &inputs[index]);
-		if (it != otherPinOutputs.end())
-		{
-			/// \todo LOG_EVENT_DISCONNECT(this, m_inComponent);
-			otherPinOutputs.erase(it);
-		}
-		else
-		{
-			LOG_FATAL("Can't find pointer to input pin in other node outputs.");
-		}
-		auto& myPin = inputs[index];
-		myPin.m_input = nullptr;
+		// already unplugged
+		return;
 	}
 
-	if (m_operation->isConstructor)
-	{
-		bool allUnplugged = true;
+	auto* otherPin = input.getParentPin();
+	auto otherPinOwner = otherPin->getMappedOwner().get();
+	auto otherPinIndex = otherPin->Index;
 
-		for (const auto& input : m_inputs)
-		{
-			if (input.isPluggedIn())
-			{
-				allUnplugged = false;
-				break;
-			}
-		}
-
-		if (allUnplugged)
-			for (auto& state : m_OperatorState)
-				state = EValueState::Editable;
-	}
+	m_inputs[index].unplug();
 
 	onUnplugInput(index);
 
@@ -404,20 +266,10 @@ void Node::unplugInput(size_t index)
 
 void Node::unplugOutput(size_t index)
 {
-	I3T_ASSERT(m_outputs.size() > static_cast<size_t>(index),
+	I3T_ASSERT(index < m_outputs.size(),
 	           "The node's output pin that you want to unplug does not exists.");
 
-	// auto& pin = m_outputs[index];
-	auto& pin = getOut(index);
-
-	// Set all connected nodes input as nullptr.
-	for (const auto& otherPin : pin.m_outputs)
-	{
-		otherPin->m_input = nullptr;
-		triggerUnplugCallback(this, otherPin->getOwner().get(), index, otherPin->m_index);
-	}
-
-	pin.m_outputs.clear();
+	m_outputs[index].unplug();
 }
 
 const Transform::DataMap* Node::getDataMap()
@@ -472,6 +324,7 @@ void Node::addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> c
 {
 	this->m_unplugCallbacks.push_back(callback);
 }
+
 void Node::triggerUnplugCallback(Node* fromNode, Node* toNode, size_t fromIndex, size_t toIndex)
 {
 	for (const auto& callback : m_unplugCallbacks)

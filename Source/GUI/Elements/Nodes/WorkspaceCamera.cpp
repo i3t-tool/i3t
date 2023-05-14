@@ -17,12 +17,16 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	for (int i = 0; i < m_projection->getNodebase()->getInputPins().size(); i++)
 	{
 		if (i != 1)
+		{
 			m_projection->getNodebase()->getInputPins()[i].setRenderPins(false);
+		}
 	}
 	for (int j = 0; j < m_projection->getNodebase()->getOutputPins().size(); j++)
 	{
 		if (j != 1)
+		{
 			m_projection->getNodebase()->getOutputPins()[j].setRenderPins(false);
+		}
 	}
 	m_projection->getNodebase()->getInputPins()[1].setRenderPins(true);
 	m_projection->getNodebase()->getOutputPins()[1].setRenderPins(true);

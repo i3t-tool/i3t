@@ -31,22 +31,19 @@ void WorkspaceModel::popupContent_axis_showmodel()
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem("Show axes", NULL, m_axisOn))
+	if (ImGui::MenuItem("Show axes", NULL, model->m_showAxes))
 	{
-		m_axisOn = !m_axisOn;
-		model->m_showAxes = m_axisOn;
+        model->m_showAxes = !model->m_showAxes;
 	}
-	if (ImGui::MenuItem("Show model", NULL, m_showModel))
+	if (ImGui::MenuItem("Show model", NULL, model->m_visible))
 	{
-		m_showModel = !m_showModel;
-		model->m_visible = m_showModel;
+		model->m_visible = !model->m_visible;
 	}
 	if (ImGui::BeginMenu("Transparency"))
 	{
-		bool transparent = !model->m_opaque;
-		if (ImGui::Checkbox("Transparent", &transparent))
+		if (ImGui::Checkbox("Opaque", &model->m_opaque))
 		{
-			model->m_opaque = !model->m_opaque;
+			// model->m_opaque = !model->m_opaque;
 		}
 		ImGui::Checkbox("Back-face cull", &model->m_backFaceCull);
 		ImGui::SliderFloat("Opacity", &model->m_opacity, 0.0f, 1.0f, "%.2f");
@@ -56,43 +53,35 @@ void WorkspaceModel::popupContent_axis_showmodel()
 	{
 		if (ImGui::MenuItem("None"))
 		{
-			m_tint = glm::vec3(1.0f);
-			model->m_tint = m_tint;
+			model->m_tint = glm::vec3(1.0f);
 		}
 		if (ImGui::MenuItem("Red"))
 		{
-			m_tint = calculateTint(Color::RED);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::RED);
 		}
 		if (ImGui::MenuItem("Blue"))
 		{
-			m_tint = calculateTint(Color::BLUE);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::BLUE);
 		}
 		if (ImGui::MenuItem("Green"))
 		{
-			m_tint = calculateTint(Color::GREEN);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::GREEN);
 		}
 		if (ImGui::MenuItem("Yellow"))
 		{
-			m_tint = calculateTint(Color::YELLOW);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::YELLOW);
 		}
 		if (ImGui::MenuItem("Orange"))
 		{
-			m_tint = calculateTint(Color::ORANGE);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::ORANGE);
 		}
 		if (ImGui::MenuItem("Magenta"))
 		{
-			m_tint = calculateTint(Color::MAGENTA);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::MAGENTA);
 		}
 		if (ImGui::MenuItem("Teal"))
 		{
-			m_tint = calculateTint(Color::TEAL);
-			model->m_tint = m_tint;
+			model->m_tint = calculateTint(Color::TEAL);
 		}
 		ImGui::EndMenu();
 	}
@@ -144,8 +133,8 @@ void WorkspaceModel::init()
 {
 	m_viewportModel = App::get().viewport()->createModel(getId());
 	auto modelPtr = m_viewportModel.lock();
-	modelPtr->m_showAxes = m_axisOn;
-	modelPtr->m_visible = m_showModel;
+	modelPtr->m_showAxes = true;
+	modelPtr->m_visible = true;
 
 	// Setup preview render options
 	m_renderOptions.framebufferAlpha = true;

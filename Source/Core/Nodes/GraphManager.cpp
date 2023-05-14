@@ -8,7 +8,10 @@ namespace Core
 {
 GraphManager* GraphManager::s_self = nullptr;
 
-void GraphManager::init() { s_self = new GraphManager; }
+void GraphManager::init()
+{
+	s_self = new GraphManager;
+}
 
 void GraphManager::destroy()
 {
@@ -20,7 +23,7 @@ void GraphManager::destroy()
 
 Ptr<Sequence> GraphManager::createSequence()
 {
-	// Temporary workaround:
+	/// \todo MH Temporary workaround:
 	if (!s_self)
 	{
 		GraphManager::init();
@@ -31,13 +34,11 @@ Ptr<Sequence> GraphManager::createSequence()
 
 Ptr<Model> GraphManager::createModel() { return Builder::createModelNode(); }
 
-ENodePlugResult GraphManager::isPlugCorrect(Pin const* input, Pin const* output)
+ENodePlugResult GraphManager::isPlugCorrect(const Pin& input, const Pin& output)
 {
-	auto lhs = input->m_master;
-	return lhs->isPlugCorrect(input, output);
+	auto& lhs = input.Owner;
+	return lhs.isPlugCorrect(input, output);
 }
-
-ENodePlugResult GraphManager::isPlugCorrect(Pin& input, Pin& output) { return isPlugCorrect(&input, &output); }
 
 ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
 {
@@ -90,24 +91,27 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
 {
 	auto pins = node->getInputPins();
 
-	if (index > pins.size())
-		return nullptr;
-
-	if (pins.empty() || pins[index].m_input == nullptr)
+	if (index >= pins.size())
 	{
 		return nullptr;
 	}
 
-	auto expected = pins[index].m_input->getOwner();
+	auto& input = pins[index];
 
-	if (expected->m_owner != nullptr)
+	if (!input.isPluggedIn())
 	{
-		return expected->m_owner;
+		return nullptr;
 	}
-	else
+
+	// Can result in nested node, check is node is owned by another node.
+	auto expected = input.getParentPin()->getOwner();
+
+	if (expected->getRootOwner())
 	{
-		return expected;
+		return expected->getRootOwner();
 	}
+
+	return expected;
 }
 
 std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
@@ -125,13 +129,15 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& 
 
 std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
 {
-	I3T_ASSERT(node->getOutputPins().size() > index, "Out of range.");
+	I3T_ASSERT(index < node->getOutputPins().size(), "Out of range.");
 
 	std::vector<Ptr<NodeBase>> result;
 	auto pin = node->getOutputPins()[index];
 	auto othersInputs = pin.getOutComponents();
 	for (const auto& other : othersInputs)
+	{
 		result.push_back(other->getOwner());
+	}
 
 	return result;
 }
@@ -146,19 +152,12 @@ void GraphManager::update(double tick)
 	s_self->m_tracker.update();
 }
 
-const Operation* GraphManager::getOperation(const Pin* pin) { return pin->m_master->getOperation(); }
+const Operation* GraphManager::getOperation(const Pin* pin) { return pin->Owner.getOperation(); }
 
-bool GraphManager::areFromSameNode(const Pin* lhs, const Pin* rhs) { return lhs->m_master == rhs->m_master; }
-
-bool GraphManager::arePlugged(const Pin& input, const Pin& output)
+bool GraphManager::isTrackingEnabled()
 {
-	I3T_ASSERT(input.isInput(), "Given input pin is not input pin.");
-	if (!input.isPluggedIn())
-		return false;
-	return input.getParentPin() == &output;
+	return s_self->m_tracker.getSequence() != nullptr;
 }
-
-bool GraphManager::isTrackingEnabled() { return s_self->m_tracker.getSequence() != nullptr; }
 
 void GraphManager::stopTracking() { s_self->m_tracker = MatrixTracker{}; }
 } // namespace Core

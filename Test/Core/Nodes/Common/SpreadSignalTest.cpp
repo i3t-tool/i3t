@@ -16,10 +16,10 @@ using namespace Core;
  */
 TEST(SpreadSignalTest, ValuesShouldBeSpreadThroughConnectedNodes)
 {
-	auto vec1Node = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto vec2Node = Core::Builder::createNode<ENodeType::Vector3ToVector3>();
-	auto dotNode = Core::Builder::createNode<ENodeType::Vector3DotVector3>();
-	auto floatNode = Core::Builder::createNode<ENodeType::FloatToFloat>();
+	auto vec1Node = Core::Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto vec2Node = Core::Builder::createOperator<ENodeType::Vector3ToVector3>();
+	auto dotNode = Core::Builder::createOperator<ENodeType::Vector3DotVector3>();
+	auto floatNode = Core::Builder::createOperator<ENodeType::FloatToFloat>();
 
 	// Plug vec1 and vec2 to dotNode inputs.
 	plug_expectOk(vec1Node, dotNode, 0, 0);

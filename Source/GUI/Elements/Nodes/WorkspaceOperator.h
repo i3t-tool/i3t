@@ -4,7 +4,7 @@
 template <ENodeType T> class WorkspaceOperator : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-	WorkspaceOperator(DIWNE::Diwne& diwne) : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<T>())
+	WorkspaceOperator(DIWNE::Diwne& diwne) : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<T>())
 	{
 		setDataItemsWidth();
 	}

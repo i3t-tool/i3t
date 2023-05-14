@@ -181,8 +181,8 @@ void WorkspaceTransformation::drawMenuStorevalues()
 	{
 		if (ImGui::MenuItem("Reset"))
 		{
-			m_nodebase->as<Core::Transformation>()->initDefaults();
-		} // reset()
+			m_nodebase->as<Core::Transformation>()->resetMatrixFromDefaults();
+		}
 		if (ImGui::MenuItem("Store"))
 		{
 			m_nodebase->as<Core::Transformation>()->saveValue();

@@ -92,6 +92,7 @@ void WorkspaceDiwne::toggleSelectedNodesVisibility()
 		for (auto node : selected)
 		{
 			node->setRender(false);
+			node->setSelected(false);
 		}
 	}
 }
@@ -1755,7 +1756,7 @@ void WorkspaceWindow::showEditMenu()
 bool connectNodesNoSave(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
 {
 	auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
-	if (plugResult != ENodePlugResult::Ok)
+	if (plugResult != Core::ENodePlugResult::Ok)
 	{
 		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
 		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);

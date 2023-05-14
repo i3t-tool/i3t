@@ -112,7 +112,8 @@ enum class LoggingOption
 
 class Logger
 {
-	Logger() = default;
+	/// Creates default logger, custom one can be created by Logger::initLogger.
+	Logger();
 	~Logger() = default;
 
 public:
@@ -143,6 +144,8 @@ public:
 
 private:
 	std::shared_ptr<spdlog::logger> appLogger;
+
+	/// \todo MH Merge logger and appLogger?
 	std::shared_ptr<spdlog::logger> logger;
 	std::shared_ptr<spdlog::logger> mouseLogger;
 

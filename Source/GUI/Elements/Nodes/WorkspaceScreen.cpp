@@ -7,7 +7,7 @@
 #define TEST
 
 WorkspaceScreen::WorkspaceScreen(DIWNE::Diwne& diwne)
-    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createNode<ENodeType::Screen>())
+    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<ENodeType::Screen>())
 {
 	init();
 }
@@ -178,12 +178,11 @@ bool WorkspaceScreen::middleContent()
 		m_textureSize.y = std::max(buttonSize.y + ImGui::GetStyle().ItemSpacing.y / diwne.getWorkAreaZoom(),
 		                           m_textureSize.y + dragDelta.y);
 
+        // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
+        getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);
+
 		ImGui::ResetMouseDragDelta(0);
 	}
-
-	getNodebase()->setValue(m_textureSize.x / m_textureSize.y,
-	                        1); // must be index 1, as there is a hidden output
-	                            // index 0, storing the incoming PV matrix
 
 	return interaction_happen;
 }
@@ -199,4 +198,15 @@ void WorkspaceScreen::drawMenuLevelOfDetail() // todo
 {
 	drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
 	                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
+}
+
+ImVec2 WorkspaceScreen::getAspect() const
+{
+    return m_textureSize;
+}
+
+void WorkspaceScreen::setAspect(ImVec2 aspect)
+{
+    m_textureSize = aspect;
+    getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);
 }

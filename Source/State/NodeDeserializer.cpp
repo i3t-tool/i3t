@@ -72,6 +72,12 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes.push_back(screen);
 		NodeDeserializer::assignCommon(value, screen);
 		oldToNewId[value["id"].GetInt()] = screen->getNodebase()->getId();
+
+        if (value.HasMember("aspect"))
+        {
+            const auto aspect = JSON::getVec2(value["aspect"].GetArray());
+            screen->setAspect(aspect);
+        }
 	}
 
 	//
@@ -83,15 +89,42 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		NodeDeserializer::assignCommon(value, model);
 		oldToNewId[value["id"].GetInt()] = model->getNodebase()->getId();
 
+        auto mesh = model->viewportModel().lock();
+
 		if (value.HasMember("model"))
 		{
 			const auto* alias = value["model"].GetString();
-			model->viewportModel().lock()->setModel(alias);
+            mesh->setModel(alias);
 		}
 		else
 		{
 			LOG_WARN("Model node {} has no model set, using the default one.", model->getNodebase()->getId());
 		}
+
+        if (value.HasMember("visible"))
+        {
+            mesh->m_visible = value["visible"].GetBool();
+        }
+
+        if (value.HasMember("showAxes"))
+        {
+            mesh->m_showAxes = value["showAxes"].GetBool();
+        }
+
+        if (value.HasMember("opaque"))
+        {
+            mesh->m_opaque = value["opaque"].GetBool();
+        }
+
+        if (value.HasMember("opacity"))
+        {
+            mesh->m_opacity = value["opacity"].GetFloat();
+        }
+
+        if (value.HasMember("tint"))
+        {
+            mesh->m_tint = JSON::getVec3(value["tint"].GetArray());
+        }
 	}
 
 	//

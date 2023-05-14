@@ -69,10 +69,6 @@ class Sequence : public Node
 			return nullptr;
 		}
 
-		Pin& getIn(size_t i) override;
-		Pin& getOut(size_t i) override;
-		DataStore& getInternalData(size_t index = 0) override;
-
 		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
 		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 		Ptr<Transformation> popMatrix(const int index);
@@ -100,10 +96,6 @@ class Sequence : public Node
 			return nullptr;
 		}
 
-		Pin& getIn(size_t i) override;
-		Pin& getOut(size_t i) override;
-		DataStore& getInternalData(size_t index = 0) override;
-
 		/**
 		 * Updates mul. output and world transform.
 		 * @param inputIndex
@@ -118,12 +110,9 @@ public:
 	Sequence(MatrixTracker* tracker);
 	~Sequence() override;
 
+	void onInit() override;
+
 	Ptr<Node> clone() override;
-
-	Pin& getIn(size_t i) override;
-	Pin& getOut(size_t i) override;
-
-	void createComponents();
 
 	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept
 	{
@@ -140,8 +129,6 @@ public:
 	{
 		return m_storage->addMatrix(matrix, index);
 	}
-
-	DataStore& getInternalData(size_t index = 0) override;
 
 	const Matrices& getMatrices() const { return m_storage->m_matrices; }
 
@@ -163,10 +150,10 @@ public:
 
 	void swap(int from, int to) { return m_storage->swap(from, to); }
 
+	void updateValues(int inputIndex) override;
+
 	MatrixTracker* startTracking(UPtr<IModelProxy> modelProxy);
 	void stopTracking();
-
-	void updateValues(int inputIndex) override;
 
 	/**
 	 * Overridden function to also notify when the sequence's multiplier is plugged in
@@ -179,8 +166,6 @@ public:
 	void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback) override;
 
 private:
-	void receiveSignal(int inputIndex) override;
-
 	MatrixTracker* m_tracker;
 };
 

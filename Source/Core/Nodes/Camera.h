@@ -26,8 +26,8 @@ class Camera : public Node
 {
 	friend class GraphManager;
 
-	SequencePtr m_proj;
-	SequencePtr m_view;
+	Ptr<Sequence> m_proj;
+	Ptr<Sequence> m_view;
 
 public:
 	/// Latest projection matrix value

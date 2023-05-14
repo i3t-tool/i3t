@@ -53,10 +53,16 @@ void Transformation::createDefaults()
 	}
 }
 
-TransformOperation* Transformation::properties() const
+Ptr<NodeBase> Transformation::getCurrentSequence()
 {
-	return *getTransformOperation(getOperation()->keyWord);
+	if (m_currentSequence == nullptr)
+	{
+		return nullptr;
+	}
+	return m_currentSequence->getPtr();
 }
+
+TransformOperation* Transformation::properties() const { return *getTransformOperation(getOperation()->keyWord); }
 
 const Data& Transformation::getDefaultValue(const std::string& name) const
 {
@@ -118,7 +124,9 @@ void Transformation::saveValue()
 void Transformation::reloadValue()
 {
 	if (!m_hasSavedData)
+	{
 		return;
+	}
 
 	setInternalValue(m_savedData.getMat4(), 0);
 	m_defaultValues = m_savedValues;
@@ -186,7 +194,7 @@ void Transformation::notifySequence()
 {
 	if (m_currentSequence)
 	{
-		m_currentSequence->updateValues(-1);
+		m_currentSequence->receiveSignal(-1);
 	}
 }
 

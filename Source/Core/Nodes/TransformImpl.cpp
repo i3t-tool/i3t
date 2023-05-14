@@ -705,8 +705,8 @@ void TransformImpl<ETransformType::Translation>::initDefaults()
 void TransformImpl<ETransformType::Translation>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
-
-	setInternalValue(glm::translate(getDefaultValue("translation").getVec3()));
+	const auto& translation = getDefaultValue("translation").getVec3();
+	setInternalValue(glm::translate(translation));
 	notifySequence();
 }
 
