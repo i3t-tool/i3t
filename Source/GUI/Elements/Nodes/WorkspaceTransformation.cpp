@@ -135,11 +135,16 @@ bool WorkspaceTransformation::afterContent()
 			topleft.x += (1 - inactiveMark) * size.x;
 		}
 
-		if (std::dynamic_pointer_cast<WorkspaceTransformation>(
-		        findNodeById(dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
-		                     dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID())
-		            .value())
-		        .get() == this)
+		auto maybeInterpolatedTransform = findNodeById(dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
+			dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID());
+
+		if (!maybeInterpolatedTransform)
+		{
+			Core::GraphManager::stopTracking();
+			return false;
+		}
+
+		if (std::dynamic_pointer_cast<WorkspaceTransformation>(maybeInterpolatedTransform.value()).get() == this)
 		{
 			ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
 			ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
