@@ -48,7 +48,7 @@ void OrbitCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowS
 
 	mouseWheel(m_dScroll * (m_smoothScroll ? 1 : 4));
 
-	m_dScroll *= std::min(std::max(-3.05*dt+0.89, 0.4), 0.93) * (m_smoothScroll ? 1 : 0);
+	m_dScroll *= std::min(std::max(-3.05 * dt + 0.89, 0.4), 0.93) * (m_smoothScroll ? 1 : 0);
 
 	if (m_dScroll * m_dScroll < 0.0005f)
 	{
@@ -108,6 +108,40 @@ void OrbitCamera::mouseWheel(float scroll)
 	{
 		m_radius = 0.01f;
 	}
+}
+
+void OrbitCamera::viewpoint(AbstractCamera::Viewpoint viewpoint)
+{
+	glm::mat4 from = m_view;
+	switch (viewpoint)
+	{
+	case AbstractCamera::Viewpoint::RIGHT:
+		this->setRotationX(0);
+		this->setRotationY(0);
+		break;
+	case AbstractCamera::Viewpoint::LEFT:
+		this->setRotationX(180);
+		this->setRotationY(0);
+		break;
+	case AbstractCamera::Viewpoint::TOP:
+		this->setRotationX(-90);
+		this->setRotationY(90);
+		break;
+	case AbstractCamera::Viewpoint::BOTTOM:
+		this->setRotationX(-90);
+		this->setRotationY(-90);
+		break;
+	case AbstractCamera::Viewpoint::FRONT:
+		this->setRotationX(-90);
+		this->setRotationY(0);
+		break;
+	case AbstractCamera::Viewpoint::BACK:
+		this->setRotationX(90);
+		this->setRotationY(0);
+		break;
+	}
+	update();
+	interpolate(from, m_view);
 }
 
 float OrbitCamera::getRotationX() const { return m_rotationX; }

@@ -146,6 +146,45 @@ void WorkspaceCamera::popupContent()
 		}
 		ImGui::EndMenu();
 	}
+	if (ImGui::BeginMenu("Frustum outline color"))
+	{
+		if (ImGui::MenuItem("Red"))
+		{
+			m_frustumOutlineColor = Color::RED;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		if (ImGui::MenuItem("Blue"))
+		{
+			m_frustumOutlineColor = Color::BLUE;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		if (ImGui::MenuItem("Green"))
+		{
+			m_frustumOutlineColor = Color::GREEN;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		if (ImGui::MenuItem("Yellow"))
+		{
+			m_frustumOutlineColor = Color::YELLOW;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		if (ImGui::MenuItem("Orange"))
+		{
+			m_frustumOutlineColor = Color::ORANGE;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		if (ImGui::MenuItem("Magenta"))
+		{
+			m_frustumOutlineColor = Color::MAGENTA;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		if (ImGui::MenuItem("Teal"))
+		{
+			m_frustumOutlineColor = Color::TEAL;
+			m_viewportCamera.lock()->m_frustumOutlineColor = m_frustumOutlineColor;
+		}
+		ImGui::EndMenu();
+	}
 	ImGui::Separator();
 
 	WorkspaceNodeWithCoreData::drawMenuDuplicate();
@@ -197,3 +236,20 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 int WorkspaceCamera::maxLenghtOfData() { return 0; }
 
 bool WorkspaceCamera::isCamera() { return true; }
+
+bool WorkspaceCamera::processSelect()
+{
+	auto model = m_viewportCamera.lock();
+	model->m_highlightColor = App::get().viewport()->getSettings().highlight_selectionColor;
+	model->m_highlight = true;
+
+	return WorkspaceNodeWithCoreDataWithPins::processSelect();
+}
+
+bool WorkspaceCamera::processUnselect()
+{
+	auto model = m_viewportCamera.lock();
+	model->m_highlight = false;
+
+	return WorkspaceNodeWithCoreDataWithPins::processUnselect();
+}

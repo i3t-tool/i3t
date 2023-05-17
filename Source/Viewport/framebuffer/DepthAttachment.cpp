@@ -4,24 +4,17 @@
 
 using namespace Vp;
 
-DepthAttachment::DepthAttachment(GLint internalFormat, bool stencil, GLsizei width, GLsizei height)
-    : m_internalFormat(internalFormat), m_stencil(stencil), m_width(width), m_height(height)
-{
-	m_useRenderbuffer = true;
-}
-
-DepthAttachment::DepthAttachment(bool stencil, GLsizei width, GLsizei height)
+DepthAttachment::DepthAttachment(bool stencil, GLsizei width, GLsizei height, bool useRenderbuffer)
     : m_stencil(stencil), m_width(width), m_height(height)
 {
-	m_useRenderbuffer = false;
+	m_useRenderbuffer = useRenderbuffer;
 }
 
 DepthAttachment::DepthAttachment(const DepthAttachment& attchmt)
     : m_multisampled(attchmt.m_multisampled), m_samples(attchmt.m_samples),
-      m_useRenderbuffer(attchmt.m_useRenderbuffer), m_internalFormat(attchmt.m_internalFormat),
-      m_stencil(attchmt.m_stencil), m_width(attchmt.m_width), m_height(attchmt.m_height),
-      m_minFilter(attchmt.m_minFilter), m_magFilter(attchmt.m_magFilter), m_textureWrapS(attchmt.m_textureWrapS),
-      m_textureWrapT(attchmt.m_textureWrapT), m_syncSize(attchmt.m_syncSize)
+      m_useRenderbuffer(attchmt.m_useRenderbuffer), m_stencil(attchmt.m_stencil), m_width(attchmt.m_width),
+      m_height(attchmt.m_height), m_minFilter(attchmt.m_minFilter), m_magFilter(attchmt.m_magFilter),
+      m_textureWrapS(attchmt.m_textureWrapS), m_textureWrapT(attchmt.m_textureWrapT), m_syncSize(attchmt.m_syncSize)
 {
 	// Empty
 }
@@ -52,11 +45,12 @@ void DepthAttachment::resize(int width, int height)
 		glBindRenderbuffer(GL_RENDERBUFFER, m_id);
 		if (m_multisampled)
 		{
-			glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, m_internalFormat, m_width, m_height);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT,
+			                                 m_width, m_height);
 		}
 		else
 		{
-			glRenderbufferStorage(GL_RENDERBUFFER, m_internalFormat, m_width, m_height);
+			glRenderbufferStorage(GL_RENDERBUFFER, m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT, m_width, m_height);
 		}
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}

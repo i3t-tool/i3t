@@ -18,7 +18,7 @@ namespace Vp
 {
 class Viewport;
 class Entity;
-class ICamera;
+class AbstractCamera;
 class Lighting;
 class SceneRenderTarget;
 class RenderOptions;
@@ -33,7 +33,7 @@ public:
 	friend class Viewport;
 	Viewport* m_viewport;
 
-	std::shared_ptr<ICamera> m_camera;
+	std::shared_ptr<AbstractCamera> m_camera;
 	std::shared_ptr<Lighting> m_lighting;
 	std::shared_ptr<SelectStencil> m_selectStencil;
 
@@ -162,6 +162,8 @@ public:
 			LOG_ERROR("Scene: Cannot remove a NULL entity!");
 		}
 	}
+
+	const std::vector<std::shared_ptr<Entity>>& getEntities() const { return m_entities; }
 
 protected:
 	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);

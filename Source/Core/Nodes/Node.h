@@ -370,6 +370,12 @@ public:
 	};
 
 protected:
+	// TODO: (DR) Callbacks cannot be unregistered! That could cause issues when lifetime of listener ends before the
+	//   dispatcher.
+	//   Callbacks are very primitively implemented using std::function, std::function instances cannot be compared and
+	//   thus can't be unregistered. Possible fix is to pack std::function into a listener object that also contains some
+	//   id or pointer to the callback owner and compare those
+
 	std::list<std::function<void(Node*)>> m_updateCallbacks;
 	std::list<std::function<void(Node*)>> m_deleteCallbacks;
 	std::list<std::function<void(Node*, Node*, size_t, size_t)>> m_plugCallbacks;
@@ -398,7 +404,7 @@ public:
 	virtual void addDeleteCallback(std::function<void(Node*)> callback);
 
 	/**
-	 * Registers a callback that gets called when the node's output or input pins get plugged in.
+	 * Registers a callback that gets called when the node's output pins get plugged in.
 	 * <br><br>
 	 * The callback parameters:<br>
 	 * Node* = Start node<br>
@@ -409,7 +415,7 @@ public:
 	virtual void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback);
 
 	/**
-	 * Registers a callback that gets called when the node's output or input pins get unplugged.
+	 * Registers a callback that gets called when the node's input pins get unplugged.
 	 * <br><br>
 	 * The callback parameters:<br>
 	 * Node* = Start node<br>

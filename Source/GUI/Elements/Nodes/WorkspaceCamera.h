@@ -17,14 +17,15 @@ protected:
 	Ptr<WorkspaceSequence> m_projection = nullptr;
 	Ptr<WorkspaceSequence> m_view = nullptr;
 
-	std::weak_ptr<Vp::SceneCamera> m_viewportCamera;
-
 public:
 	bool m_axisOn{true};
 	bool m_showCamera{true};
 	bool m_showFrustum{true};
 	bool m_fillFrustum{true};
 	glm::vec3 m_frustumColor{0.35f, 0.27f, 0.06f};
+	glm::vec3 m_frustumOutlineColor{1.f, 0.f, 0.f};
+
+	std::weak_ptr<Vp::SceneCamera> m_viewportCamera;
 
 	WorkspaceCamera(DIWNE::Diwne& diwne);
 	~WorkspaceCamera();
@@ -55,6 +56,10 @@ public:
 
 	//	bool leftContent(DIWNE::Diwne &diwne);
 	//	bool rightContent(DIWNE::Diwne &diwne);
+
+	bool processSelect();
+	bool processUnselect();
+
 private:
 	glm::vec3 calculateFrustumColor(glm::vec3 color);
 };

@@ -152,12 +152,6 @@ public:
 	void update(int width, int height);
 
 	/**
-	 * Resize the fbo to the specified dimensions.
-	 * Has no effect if the fbo is already that size.
-	 */
-	void resize(int width, int height);
-
-	/**
 	 * Binds the FBO
 	 */
 	void bind() const;
@@ -250,6 +244,12 @@ public:
 	void setDrawBuffers(std::vector<unsigned int> indices);
 
 private:
+	/**
+	 * Resize the fbo to the specified dimensions.
+	 * Has no effect if the fbo is already that size.
+	 */
+	void resize(int width, int height);
+
 	/**
 	 * Initialise the fbo. Does NOT check if initialised previously.
 	 */

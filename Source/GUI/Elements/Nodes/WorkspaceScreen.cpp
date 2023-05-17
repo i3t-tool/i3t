@@ -21,15 +21,15 @@ void WorkspaceScreen::init()
 {
 	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1); /* \todo Jh always 1? */
 
-	displayOptions.showAxes = false;
-	displayOptions.showGrid = false;
-	displayOptions.showCamera = false;
-	displayOptions.showFrustum = false;
+	m_displayOptions.showAxes = false;
+	m_displayOptions.showGrid = false;
+	m_displayOptions.showCamera = false;
+	m_displayOptions.showFrustum = false;
 
-	renderOptions.multisample = false;
-	renderOptions.framebufferAlpha = false;
-	renderOptions.wboit = false;
-	renderOptions.clearColor = Config::BACKGROUND_COLOR;
+	m_renderOptions.multisample = false;
+	m_renderOptions.framebufferAlpha = false;
+	m_renderOptions.wboit = false;
+	m_renderOptions.clearColor = Config::BACKGROUND_COLOR;
 }
 
 void WorkspaceScreen::popupContent()
@@ -44,7 +44,6 @@ void WorkspaceScreen::popupContent()
 
 	WorkspaceNode::popupContent();
 }
-
 
 bool WorkspaceScreen::topContent()
 {
@@ -76,11 +75,9 @@ bool WorkspaceScreen::middleContent()
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-	Ptr<Vp::Framebuffer> framebuffer =
-	    App::get()
-	        .viewport()
-	        ->drawScreen(width, height, screenValue.second, screenValue.first, renderOptions, displayOptions)
-	        .lock();
+	App::get().viewport()->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first,
+	                                  m_renderOptions, m_displayOptions);
+	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 // Problem: ImGui uses int values for DC.CursorPos. Triangle positions not in
 // int coordinates are rounded one pixel out of the texture rectangle solution

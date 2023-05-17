@@ -6,8 +6,8 @@
 
 #include "Viewport/Shaper.h"
 #include "Viewport/Viewport.h"
+#include "Viewport/camera/AbstractCamera.h"
 #include "Viewport/camera/AggregateCamera.h"
-#include "Viewport/camera/ICamera.h"
 #include "Viewport/shader/BoxBlurShader.h"
 #include "Viewport/shader/GridShader.h"
 #include "Viewport/shader/PhongShader.h"
@@ -509,7 +509,8 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 	mainFramebuffer->addColorAttachment(
 	    ColorAttachment(format, format, mainFramebuffer->getWidth(), mainFramebuffer->getHeight(), GL_UNSIGNED_BYTE));
 	// Depth buffer which we can sample from
-	mainFramebuffer->setDepthAttachment(DepthAttachment(true, mainFramebuffer->getWidth(), mainFramebuffer->getHeight()));
+	mainFramebuffer->setDepthAttachment(
+	    DepthAttachment(true, mainFramebuffer->getWidth(), mainFramebuffer->getHeight(), false));
 	//	mainFramebuffer->setDepthAttachment(
 	//	    DepthAttachment(GL_DEPTH24_STENCIL8, true, mainFramebuffer->getWidth(), mainFramebuffer->getHeight()));
 	renderTarget->addFramebuffer(mainFramebuffer);
@@ -524,7 +525,7 @@ Ptr<SceneRenderTarget> Scene::createRenderTarget(const RenderOptions& options)
 	{
 		Ptr<Framebuffer> selectionFBO = std::make_shared<Framebuffer>(100, 100, options.multisample, options.samples);
 		// Ptr<Framebuffer> selectionFBO = std::make_shared<Framebuffer>(100, 100, false, 1);
-		selectionFBO->setDepthAttachment(DepthAttachment(GL_DEPTH24_STENCIL8, true, 100, 100));
+		selectionFBO->setDepthAttachment(DepthAttachment(true, 100, 100, true));
 		auto c1 = ColorAttachment(GL_RGBA16F, GL_RGBA, 100, 100, GL_HALF_FLOAT);
 		c1.m_minFilter = GL_LINEAR;
 		c1.m_magFilter = GL_LINEAR;
@@ -651,7 +652,8 @@ void Scene::processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos
 
 		Entity* previousSelectedEntity = m_selectedEntity;
 		Entity* newlySelectedEntity = nullptr;
-		if (id != 0) {
+		if (id != 0)
+		{
 			for (auto& e : m_entities)
 			{
 				if (e->m_selectionId == id)

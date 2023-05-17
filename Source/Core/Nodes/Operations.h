@@ -562,7 +562,7 @@ static inline const std::vector<TransformOperation> g_transforms = {
      0b1000010000100000, // the diagonal
      {{"scale", EValueType::Vec3}}},
     {{n(ETransformType::AxisAngle), "rotate"},
-     g_AllLocked,
+     0b1110111011100000,
      {{"axis", EValueType::Vec3}, {"rotation", EValueType::Float}}},
     {{n(ETransformType::Quat), "quat"}, g_AllLocked, {{"quat", EValueType::Quat}}},
     {{n(ETransformType::Ortho), "ortho"},

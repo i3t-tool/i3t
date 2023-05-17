@@ -4,12 +4,17 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+
 #include "imgui.h"
+
+#include "Core/API.h"
 
 namespace GUI
 {
 bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
                void* user_data);
+
+void ToggleButton(const char* label, bool& toggled, ImVec2 size = ImVec2(0.0f, 0.0f));
 
 glm::vec2 imToGlm(const ImVec2& v);
 glm::vec4 imToGlm(const ImVec4& v);

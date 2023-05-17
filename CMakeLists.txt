@@ -26,6 +26,7 @@ include_directories(Dependencies/portable-file-dialogs)
 include_directories(Dependencies/sol2/include)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
+include_directories(Dependencies/ImGuizmo/ImGuizmo)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
 # ========== BUILD CONFIGURATION ==============================
@@ -105,6 +106,7 @@ add_subdirectory(Dependencies/lua)
 add_subdirectory(Dependencies/sol2)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
+add_subdirectory(Dependencies/ImGuizmo)
 # =============================================================
 
 # ======== Source groups ======================================
@@ -165,7 +167,9 @@ target_link_libraries(
         glfw
         lua
         sol2
-        yaml-cpp)
+        yaml-cpp
+        ImGuizmo
+)
 
 target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:I3T_DEBUG>)
@@ -200,6 +204,7 @@ target_link_libraries(
         sol2
         spdlog
         yaml-cpp
+        ImGuizmo
 )
 
 set_target_properties(assimp PROPERTIES

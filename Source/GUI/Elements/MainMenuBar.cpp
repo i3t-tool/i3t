@@ -160,13 +160,6 @@ void MainMenuBar::showFileMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Setup"))
-		{
-			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
-		}
-
-		ImGui::Separator();
-
 		if (ImGui::MenuItem("Exit"))
 		{
 			BeforeCloseCommand::dispatch();
@@ -188,7 +181,10 @@ void MainMenuBar::showEditMenu()
 		{
 			InputManager::triggerAction("redo", EKeyState::Pressed);
 		}
-
+		if (ImGui::MenuItem("Preferences"))
+		{
+			I3T::getUI()->getWindowManager().showUniqueWindow<SetupDialog>();
+		}
 		ImGui::EndMenu();
 	}
 }

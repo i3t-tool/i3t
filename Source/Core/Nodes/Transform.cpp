@@ -55,13 +55,14 @@ void Transformation::createDefaults()
 
 Ptr<NodeBase> Transformation::getCurrentSequence()
 {
+	if (m_currentSequence == nullptr)
+	{
+		return nullptr;
+	}
 	return m_currentSequence->getPtr();
 }
 
-TransformOperation* Transformation::properties() const
-{
-	return *getTransformOperation(getOperation()->keyWord);
-}
+TransformOperation* Transformation::properties() const { return *getTransformOperation(getOperation()->keyWord); }
 
 const Data& Transformation::getDefaultValue(const std::string& name) const
 {
@@ -177,7 +178,7 @@ ValueSetResult Transformation::setValue(const glm::mat4& mat)
 
 ValueSetResult Transformation::setValue(float val, glm::ivec2 coords) // PF
 {
-	// called by AxisAngle rotate,
+	// Default implementation, potentially overriden by subclasses
 	if (isLocked())
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Invalid position!"};

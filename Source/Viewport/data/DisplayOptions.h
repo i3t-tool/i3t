@@ -17,6 +17,12 @@ public:
 	bool showCamera{true};
 	bool showFrustum{true};
 
+	// Grid options
+	bool showGridLines{true};
+	bool showGridXAxis{true};
+	bool showGridYAxis{false};
+	bool showGridZAxis{true};
+
 	DisplayOptions() = default;
 
 	bool shouldDraw(const Entity& entity) const;

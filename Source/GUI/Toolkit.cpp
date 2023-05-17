@@ -55,6 +55,27 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
 	                        &cb_user_data);
 }
 
+void ToggleButton(const char* label, bool& toggled, ImVec2 size)
+{
+	int colorsPushed = 0;
+	if (toggled)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::ActiveColor));
+		colorsPushed++;
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::TutorialButtonBg));
+		colorsPushed++;
+	}
+	if (ImGui::Button(label, size))
+	{
+		toggled = !toggled;
+	}
+	ImGui::PopStyleColor(colorsPushed);
+	colorsPushed = 0;
+}
+
 glm::vec2 imToGlm(const ImVec2& v) { return glm::vec2(v.x, v.y); }
 glm::vec4 imToGlm(const ImVec4& v) { return glm::vec4(v.x, v.y, v.z, v.w); }
 

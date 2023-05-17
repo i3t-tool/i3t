@@ -10,13 +10,12 @@ namespace Vp
 class DepthAttachment
 {
 public:
-	bool m_multisampled{false};    ///< Use MSAA texture
-	unsigned int m_samples{4}; ///< Number of MSAA samples if multisampled
+	bool m_multisampled{false}; ///< Use MSAA texture
+	unsigned int m_samples{4};  ///< Number of MSAA samples if multisampled
 
 	bool m_useRenderbuffer{true};
 
-	GLenum m_internalFormat; ///< Depth format (see OpenGL docs)
-	bool m_stencil;          ///< Whether the specified depth format includes a stencil buffer
+	bool m_stencil; ///< Whether the specified depth format includes a stencil buffer
 
 	int m_width;  ///< Width in pixels
 	int m_height; ///< Height in pixels
@@ -33,14 +32,10 @@ public:
 	GLuint m_id{0}; ///< ID of the created object (renderbuffer or texture)
 
 	/**
-	 * Creates a depth buffer using a read-only renderbuffer.
+	 * Creates a depth buffer using a 2D texture or read-only renderbuffer.
+	 * \param useRenderbuffer Whether to use a renderbuffer or a 2D texture for storage.
 	 */
-	DepthAttachment(GLint internalFormat, bool stencil, GLsizei width, GLsizei height);
-
-	/**
-	 * Creates a depth buffer using a 2D texture.
-	 */
-	DepthAttachment(bool stencil, GLsizei width, GLsizei height);
+	DepthAttachment(bool stencil, GLsizei width, GLsizei height, bool useRenderbuffer);
 
 	/**
 	 * Copy constructor // TODO: (DR)(CRIT) Update this
