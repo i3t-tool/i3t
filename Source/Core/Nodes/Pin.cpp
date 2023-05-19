@@ -18,11 +18,6 @@ Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index)
 	return Owner.getPtr();
 }
 
-Ptr<Node> Pin::getMappedOwner() const
-{
-	return get()->Owner.getPtr();
-}
-
 [[nodiscard]] const Pin* Pin::getParentPin() const
 {
 	if (!IsInput)
@@ -35,36 +30,32 @@ Ptr<Node> Pin::getMappedOwner() const
 		return nullptr;
 	}
 
-	return get()->m_input;
+	return m_input;
 }
 
 const DataStore& Pin::data() const
 {
-	auto* realPin = get();
-
 	if (IsInput)
 	{
 		I3T_ASSERT(isPluggedIn(), "This input pin is not plugged to any output pin!");
-		return realPin->m_input->dataMut();
+		return m_input->dataMut();
 	}
 	else
 	{
-		return realPin->Owner.getInternalData(realPin->Index);
+		return Owner.getInternalData(Index);
 	}
 }
 
 DataStore& Pin::dataMut()
 {
-	auto* realPin = get();
-
 	if (IsInput)
 	{
 		I3T_ASSERT(isPluggedIn(), "This input pin is not plugged to any output pin!");
-		return realPin->m_input->dataMut();
+		return m_input->dataMut();
 	}
 	else
 	{
-		return realPin->Owner.getInternalData(realPin->Index);
+		return Owner.getInternalData(Index);
 	}
 }
 
@@ -112,10 +103,10 @@ ENodePlugResult Pin::plug(Pin& input, Pin& output)
 	}
 
 	// Insert to toPlug output pin outputs this operator input pin.
-	output.get()->m_outputs.push_back(&input);
+	output.m_outputs.push_back(&input);
 
 	// Attach given operator output pin to this operator input pin.
-	input.get()->m_input = &output;
+	input.m_input = &output;
 
 	return ENodePlugResult::Ok;
 }
@@ -129,7 +120,7 @@ void Pin::unplug()
 
 	if (IsInput)
 	{
-		auto* output = get()->m_input->get();
+		auto* output = m_input;
 
 		auto it = std::find(output->m_outputs.begin(), output->m_outputs.end(), this);
 		if (it != output->m_outputs.end())
@@ -142,7 +133,7 @@ void Pin::unplug()
 			I3T_ABORT("Can't find pointer to input pin in other node outputs!");
 		}
 
-		get()->m_input = nullptr;
+		m_input = nullptr;
 
 		if (Owner.m_operation->isConstructor)
 		{
@@ -159,9 +150,9 @@ void Pin::unplug()
 	{
 		// pin is output
 		// Set all connected nodes input as nullptr.
-		for (const auto& otherPin : get()->m_outputs)
+		for (const auto& otherPin : m_outputs)
 		{
-			otherPin->get()->m_input = nullptr;
+			otherPin->m_input = nullptr;
 			Owner.triggerUnplugCallback(&Owner, otherPin->getOwner().get(), Index, otherPin->Index);
 		}
 
@@ -206,13 +197,13 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 	}
 
 	// cycle detector
-	auto toFind = input.getMappedOwner(); // INPUT
+	auto toFind = input.getOwner(); // INPUT
 
 	// stack in vector - TOS is at the vector back.
 	std::vector<Ptr<Node>> stack;
 
 	// PUSH(output) insert element at end.
-	stack.push_back(output.getMappedOwner());
+	stack.push_back(output.getOwner());
 
 	while (!stack.empty())
 	{
@@ -229,8 +220,8 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 		{
 			if (pin.isPluggedIn())
 			{
-				Pin* ct = pin.get()->m_input;
-				stack.push_back(ct->getMappedOwner());
+				Pin* ct = pin.m_input;
+				stack.push_back(ct->getOwner());
 			}
 		}
 	}
@@ -252,30 +243,11 @@ std::string Pin::getSignature() const
 {
 	if (IsInput)
 	{
-		return get()->m_input != nullptr;
+		return m_input != nullptr;
 	}
 	else
 	{
-		return !get()->m_outputs.empty();
+		return !m_outputs.empty();
 	}
-}
-
-Pin* Pin::get() const
-{
-	if (m_mappedTo != nullptr)
-	{
-		return m_mappedTo->get();
-	}
-	else
-	{
-		return (Pin*) this;
-	}
-}
-
-void Pin::mapTo(Pin* pin)
-{
-	I3T_ASSERT(pin->IsInput == IsInput && pin->ValueType == ValueType, "Pin types must match!");
-
-	m_mappedTo = pin;
 }
 } // namespace Core

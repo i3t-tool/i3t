@@ -127,11 +127,6 @@ DataStore& Node::getInternalData(size_t index)
 {
 	I3T_ASSERT(index < m_internalData.size(), "Desired data storage does not exist!");
 
-	if (index < m_outputs.size() && m_outputs[index].isMapped())
-	{
-		return m_outputs[index].dataMut();
-	}
-
 	return m_internalData[index];
 }
 
@@ -167,7 +162,7 @@ void Node::spreadSignal()
 			// oct->Owner.getSig(), oct->getSig());
 
 			/// \todo MH Correct the owner of the pin.
-			oct->getMappedOwner()->receiveSignal(oct->Index);
+			oct->getOwner()->receiveSignal(oct->Index);
 		}
 	}
 }
@@ -184,7 +179,7 @@ void Node::spreadSignal(size_t outIndex)
 
 	for (auto* inPin : outputPin.getOutComponents())
 	{
-		inPin->getMappedOwner()->receiveSignal(outIndex);
+		inPin->getOwner()->receiveSignal(outIndex);
 	}
 }
 
@@ -254,7 +249,7 @@ void Node::unplugInput(size_t index)
 	}
 
 	auto* otherPin = input.getParentPin();
-	auto otherPinOwner = otherPin->getMappedOwner().get();
+	auto otherPinOwner = otherPin->getOwner().get();
 	auto otherPinIndex = otherPin->Index;
 
 	m_inputs[index].unplug();
