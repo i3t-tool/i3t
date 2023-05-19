@@ -131,11 +131,9 @@ public:
 	 */
 	void finalize();
 
-	/**
-	 * Connect this node's output pin to another node's input pin.
-	 *
-	 * \return Result enum is returned from the function. \see ENodePlugResult.
-	 */
+	/// Connect this node's output pin to another node's input pin.
+	///
+	/// \return Result enum is returned from the function. \see ENodePlugResult.
 	ENodePlugResult plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex);
 
 	//===-- Helper functions --------------------------------------------------===//
@@ -196,6 +194,9 @@ public:
 	 * \return Struct which holds data
 	 */
 	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
+
+	/// \todo MH Replace getData with this function.
+	const Data& data(size_t index = 0) { return getData(index); }
 
 public:
 	/// Get direct owner of this node.

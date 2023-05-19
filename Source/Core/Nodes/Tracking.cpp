@@ -41,7 +41,18 @@ SequenceTree::MatrixIterator SequenceTree::end()
 SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence)
 {
 	m_currentSequence = sequence;
-	m_currentMatrix = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
+
+	auto inputOperator = GraphManager::getParent(m_currentSequence->getPtr(), I3T_SEQ_IN_MAT);
+	if (inputOperator != nullptr)
+	{
+		// there is matrix output plugged into this sequence
+		m_currentMatrix = inputOperator;
+	}
+	else
+	{
+		// normal case
+		m_currentMatrix = sequence->getMatrices().empty() ? nullptr : sequence->getMatrices().back();
+	}
 }
 
 SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, NodePtr node)
@@ -94,41 +105,51 @@ SequenceTree::MatrixIterator SequenceTree::MatrixIterator::operator--(int)
 	return *this;
 }
 
-Ptr<Transformation> SequenceTree::MatrixIterator::operator*() const
+Ptr<Node> SequenceTree::MatrixIterator::operator*() const
 {
 	I3T_ASSERT(m_currentMatrix != nullptr, "Iterator is at the end!");
 
-	return m_currentMatrix->as<Transformation>();
+	return m_currentMatrix;
 }
 
 bool SequenceTree::MatrixIterator::operator==(const SequenceTree::MatrixIterator& rhs) const
 {
-	return m_currentMatrix == rhs.m_currentMatrix;
+	return m_currentMatrix == rhs.m_currentMatrix && m_currentSequence == rhs.m_currentSequence;
 }
 
 bool SequenceTree::MatrixIterator::operator!=(const SequenceTree::MatrixIterator& rhs) const
 {
-	return m_currentMatrix != rhs.m_currentMatrix;
+	return !(*this == rhs);
 }
 
 void SequenceTree::MatrixIterator::advance()
 {
+	const auto parentSequence = GraphManager::getParent(m_currentSequence->getPtr());
+
 	// Find index of current matrix in current sequence.
 	auto& matrices = m_currentSequence->getMatrices();
 	auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
 	auto index = std::distance(matrices.begin(), it);
 
-	/// \todo MH handle case when matrix is not in a sequence.
-
 	if (index == 0)
 	{
-		auto parent = GraphManager::getParent(m_currentSequence->getPtr());
+		// We are at the beginning of the sequence. Go to the next sequence.
 
 		// Check if current matrix is not first in the graph.
-		if (parent)
+		if (parentSequence)
 		{
+			// Check if there is a node plugged into parent sequence matrix input.
+			auto parentNode = GraphManager::getParent(parentSequence, I3T_SEQ_IN_MAT);
+			if (parentNode)
+			{
+				m_currentSequence = parentSequence->as<Sequence>().get();
+				m_currentMatrix = parentNode;
+
+				return;
+			}
+
 			// Sequence is not the root, there is another parent sequence.
-			m_currentSequence = parent->as<Sequence>().get();
+			m_currentSequence = parentSequence->as<Sequence>().get();
 			if (!m_currentSequence->getMatrices().empty())
 			{
 				m_currentMatrix = m_currentSequence->getMatrices().back();
@@ -151,38 +172,62 @@ void SequenceTree::MatrixIterator::advance()
 
 void SequenceTree::MatrixIterator::withdraw()
 {
+	// helper function
+	const auto toSequenceFn = [](Ptr<Node> node) -> Sequence*
+	{
+		if (node == nullptr)
+		{
+			return nullptr;
+		}
+
+		return node->as<Sequence>().get();
+	};
+
 	// Find index of current matrix in current sequence.
 	auto& matrices = m_currentSequence->getMatrices();
 	auto it = std::find(matrices.begin(), matrices.end(), m_currentMatrix);
 	auto index = std::distance(matrices.begin(), it);
 
+	// Not C++ standard compliant, but we need to be able to decrement end iterator.
+	// m_currentMatrix == nullptr when iterator is at the end.
 	if (m_currentMatrix == nullptr)
+	{
 		index = -1;
+	}
 
-	/// \todo MH handle case when matrix is not in a sequence.
-
-	if (m_currentMatrix == matrices.back())
+	if (matrices.empty() || m_currentMatrix == matrices.back())
 	{
 		// Current matrix is last matrix in a sequence. Go to the previous sequence.
-		auto prev = m_tree->m_beginSequence;
-		auto prevsParent = m_tree->m_beginSequence;
 
-		auto toSequenceFn = [](Ptr<Node> node) -> Sequence*
+		auto prevSequence = m_tree->m_beginSequence;
+		auto prevSequenceParent = m_tree->m_beginSequence;
+
+		// Find previous sequence.
+		// We must begin from the root sequence, because parent sequence may have multiple children.
+		while ((prevSequenceParent = toSequenceFn(GraphManager::getParent(prevSequence->getPtr()))) != m_currentSequence)
 		{
-			if (node == nullptr)
-			{
-				return nullptr;
-			}
-
-			return node->as<Sequence>().get();
-		};
-
-		while ((prevsParent = toSequenceFn(GraphManager::getParent(prev->getPtr()))) != m_currentSequence)
-		{
-			prev = prevsParent;
+			prevSequence = prevSequenceParent;
 		}
-		m_currentSequence = prev;
-		m_currentMatrix = m_currentSequence->getMatrices().front();
+
+		// Check if there is a node plugged into parent sequence matrix input.
+		auto parentNode = GraphManager::getParent(prevSequence->getPtr(), I3T_SEQ_IN_MAT);
+		if (parentNode)
+		{
+			m_currentMatrix = parentNode;
+			m_currentSequence = prevSequence;
+
+			return;
+		}
+
+		m_currentSequence = prevSequence;
+		if (m_currentSequence->getMatrices().empty())
+		{
+			m_currentMatrix = nullptr;
+		}
+		else
+		{
+			m_currentMatrix = m_currentSequence->getMatrices().front();
+		}
 	}
 	else
 	{
@@ -191,6 +236,15 @@ void SequenceTree::MatrixIterator::withdraw()
 }
 
 //------------------------------------------------------------------------------------------------//
+
+void setActivePart(Ptr<Node> node, float value)
+{
+	const auto maybeTransform = std::dynamic_pointer_cast<Transformation>(node);
+	if (maybeTransform)
+	{
+		maybeTransform->m_activePart = value;
+	}
+}
 
 MatrixTracker::MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model)
     : m_model(std::move(model)), m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
@@ -257,7 +311,7 @@ void MatrixTracker::track()
 		while (it != st.end())
 		{
 			m_trackingProgress[(*it)->getId()] = 0.0f;
-			(*it)->m_activePart = 0.0f;
+			setActivePart(*it, 0.0f);
 			++it;
 			++matricesCount;
 		}
@@ -298,7 +352,7 @@ void MatrixTracker::track()
 		for (int i = 0; i < m_fullMatricesCount; ++i)
 		{
 			m_trackingProgress[(*it)->getId()] = 1.0f;
-			(*it)->m_activePart = 1.0f;
+			setActivePart(*it, 1.0f);
 			result = (*it)->getData().getMat4() * result;
 			++it;
 		}
@@ -307,7 +361,7 @@ void MatrixTracker::track()
 		{
 			// Interpolate last matrix.
 			m_trackingProgress[(*it)->getId()] = interpParam;
-			(*it)->m_activePart = interpParam;
+			setActivePart(*it, interpParam);
 			rhs = (*it)->getData().getMat4();
 			result = Math::lerp(lhs, rhs, interpParam, isRot(*it)) * result;
 			m_interpolatedTransformID = (*it)->getId();

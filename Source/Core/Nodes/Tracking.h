@@ -44,7 +44,10 @@ public:
 		/// Move iterator towards to the leaf sequence.
 		MatrixIterator operator--(int);
 
-		Ptr<Transformation> operator*() const;
+		/// Get current matrix, can be transformation or other node with matrix output.
+		///
+		/// \warning You have to extract data from the node by yourself.
+		Ptr<Node> operator*() const;
 
 		bool operator==(const MatrixIterator& rhs) const;
 		bool operator!=(const MatrixIterator& rhs) const;
@@ -54,6 +57,8 @@ public:
 		void advance();
 
 		/// Move to the previous matrix (from the root).
+		///
+		/// \todo Not implemented correctly for sequences with matrix input plugged.
 		void withdraw();
 	};
 
