@@ -30,9 +30,6 @@ public:
 
 	Ptr<Node> getOwner() const;
 
-	/// \returns Mapped pin owner or this->Owner if this pin is not mapped to any other node.
-	Ptr<Node> getMappedOwner() const;
-
 	/// \returns nullptr if input is not plugged in.
 	[[nodiscard]] const Pin* getParentPin() const;
 
@@ -41,7 +38,7 @@ public:
 	 */
 	[[nodiscard]] const std::vector<Pin*>& getOutComponents() const
 	{
-		return get()->m_outputs;
+		return m_outputs;
 	}
 
 	/**
@@ -82,14 +79,6 @@ public:
 	[[nodiscard]] bool shouldRenderPins() const { return m_renderPins; }
 	void setRenderPins(bool value) { m_renderPins = value; }
 
-	/// Get this or mapped pin recursively.
-	Pin* get() const;
-
-	bool isMapped() const { return m_mappedTo != nullptr; }
-
-	/// \pre pin must have same type (input/output, value) as this pin.
-	void mapTo(Pin* pin);
-
 public:
 	ID Id;
 
@@ -105,9 +94,6 @@ public:
 
 private:
 	bool m_isDisabled = false;
-
-	/// Inner node pin can be mapped to owner node pin.
-	Pin* m_mappedTo = nullptr;
 
 	bool m_renderPins = true;
 

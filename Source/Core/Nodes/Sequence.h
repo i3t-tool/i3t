@@ -46,78 +46,35 @@ class Sequence : public Node
 	friend class GraphManager;
 
 	using Matrix = NodeBase;
-	using SequencePins = std::vector<Pin>;
 
-	friend class Multiplier;
 	friend class Storage;
 
 	/** Structure for storing transform matrices. */
-	class Storage : public Node
+	class Storage
 	{
 		friend class Core::Sequence;
-		friend class Multiplier;
-
-		Matrices m_matrices;
 
 	public:
-		Storage();
-
-		Ptr<Node> clone() override
-		{
-			I3T_ABORT("Don't clone this class!");
-
-			return nullptr;
-		}
+		Storage(Sequence& sequence) : m_sequence(sequence) {}
 
 		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
 		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 		Ptr<Transformation> popMatrix(const int index);
 		void swap(int from, int to);
 
-		/**
-		 * Updates local transform.
-		 * @param inputIndex
-		 */
-		void updateValues(int inputIndex) override;
+	private:
+		std::vector<Ptr<Transformation>> m_matrices;
+
+		Sequence& m_sequence;
 	};
-
-	/** Structure which represents sequences multiplication. */
-	class Multiplier : public Node
-	{
-		friend class Core::Sequence;
-
-	public:
-		Multiplier();
-
-		Ptr<Node> clone() override
-		{
-			I3T_ABORT("Don't clone this class!");
-
-			return nullptr;
-		}
-
-		/**
-		 * Updates mul. output and world transform.
-		 * @param inputIndex
-		 */
-		void updateValues(int inputIndex) override;
-	};
-
-	Ptr<Storage> m_storage;
-	Ptr<Multiplier> m_multiplier;
 
 public:
 	Sequence(MatrixTracker* tracker);
 	~Sequence() override;
 
-	void onInit() override;
-
 	Ptr<Node> clone() override;
 
-	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept
-	{
-		return addMatrix(matrix, m_storage->m_matrices.size());
-	}
+	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept;
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -125,12 +82,9 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
-	{
-		return m_storage->addMatrix(matrix, index);
-	}
+	ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
 
-	const Matrices& getMatrices() const { return m_storage->m_matrices; }
+	const Matrices& getMatrices() const { return m_storage.m_matrices; }
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -141,31 +95,23 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage->m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage.m_matrices.at(idx); }
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
 	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);
 
-	void swap(int from, int to) { return m_storage->swap(from, to); }
+	void swap(int from, int to);
 
 	void updateValues(int inputIndex) override;
 
 	MatrixTracker* startTracking(UPtr<IModelProxy> modelProxy);
 	void stopTracking();
 
-	/**
-	 * Overridden function to also notify when the sequence's multiplier is plugged in
-	 */
-	void addPlugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback) override;
-
-	/**
-	 * Overridden function to also notify when the sequence's multiplier is unplugged
-	 */
-	void addUnplugCallback(std::function<void(Node*, Node*, size_t, size_t)> callback) override;
-
 private:
+	Storage m_storage;
+
 	MatrixTracker* m_tracker;
 };
 
