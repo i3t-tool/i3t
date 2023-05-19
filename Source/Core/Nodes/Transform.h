@@ -318,6 +318,9 @@ protected:
 
 private:
 	friend class MatrixTracker;
+
+	friend void setActivePart(Ptr<Node> node, float value);
+
 	float m_activePart = 0.0;
 
 	bool m_hasSavedData = false;
