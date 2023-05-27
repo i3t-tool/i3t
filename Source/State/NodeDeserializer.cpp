@@ -187,37 +187,39 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 
 	if (value.HasMember("value"))
 	{
+		using namespace Core;
+
 		const auto maybeData = JSON::getData(value["value"], coreNode->getOperation()->inputTypes[0]);
 		if (maybeData.has_value())
 		{
 			const auto& data = *maybeData;
 			switch (data.opValueType)
 			{
-			case EValueType::Float:
+			case Core::EValueType::Float:
 			{
 				coreNode->setValue(data.getFloat());
 				break;
 			}
-			case EValueType::Vec3:
+			case Core::EValueType::Vec3:
 			{
 				coreNode->setValue(data.getVec3());
 				break;
 			}
-			case EValueType::Vec4:
+			case Core::EValueType::Vec4:
 			{
 				coreNode->setValue(data.getVec4());
 				break;
 			}
-			case EValueType::Matrix:
+			case Core::EValueType::Matrix:
 			{
 				coreNode->setValue(data.getMat4());
 				break;
 			}
-			case EValueType::Quat:
-			case EValueType::Pulse:
-			case EValueType::MatrixMul:
-			case EValueType::Screen:
-			case EValueType::Ptr:
+			case Core::EValueType::Quat:
+			case Core::EValueType::Pulse:
+			case Core::EValueType::MatrixMul:
+			case Core::EValueType::Screen:
+			case Core::EValueType::Ptr:
 				break;
 			}
 		}
@@ -245,7 +247,7 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 	const auto node = g_TransformBuilder(type);
 	node->setSelected(true);
 	node->processSelect();
-	const auto coreNode = node->getNodebase()->as<Core::Transformation>();
+	const auto coreNode = node->getNodebase()->as<Core::Transform>();
 
 	assignCommon(value, node);
 
@@ -265,7 +267,9 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 	coreNode->setValue(JSON::getMat(value["value"]));
 
 	if (!value.HasMember("defaultValues"))
+	{
 		return node;
+	}
 
 	for (const auto& defaultValue : value["defaultValues"].GetObject())
 	{
@@ -280,31 +284,31 @@ Ptr<GuiTransform> createTransform(const rapidjson::Value& value)
 
 		switch (defaultValueType.value().type)
 		{
-		case EValueType::Float:
+		case Core::EValueType::Float:
 		{
 			coreNode->setDefaultValue(key, defaultValue.value.GetFloat());
 			break;
 		}
-		case EValueType::Vec3:
+		case Core::EValueType::Vec3:
 		{
 			coreNode->setDefaultValue(key, JSON::getVec3(defaultValue.value));
 			break;
 		}
-		case EValueType::Vec4:
+		case Core::EValueType::Vec4:
 		{
 			coreNode->setDefaultValue(key, JSON::getVec4(defaultValue.value));
 			break;
 		}
-		case EValueType::Matrix:
+		case Core::EValueType::Matrix:
 		{
 			coreNode->setDefaultValue(key, JSON::getMat(defaultValue.value));
 			break;
 		}
-		case EValueType::Quat:
-		case EValueType::Pulse:
-		case EValueType::MatrixMul:
-		case EValueType::Screen:
-		case EValueType::Ptr:
+		case Core::EValueType::Quat:
+		case Core::EValueType::Pulse:
+		case Core::EValueType::MatrixMul:
+		case Core::EValueType::Screen:
+		case Core::EValueType::Ptr:
 			break;
 		}
 	}

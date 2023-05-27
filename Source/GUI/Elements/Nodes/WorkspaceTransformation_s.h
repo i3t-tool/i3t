@@ -2,13 +2,13 @@
 
 #include "WorkspaceTransformation.h"
 
-template <ETransformType T> class WorkspaceTransformation_s : public WorkspaceTransformation
+template <Core::ETransformType T> class WorkspaceTransformation_s : public WorkspaceTransformation
 {
 public:
 	WorkspaceTransformation_s(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<T>())
 	{
 		setDataItemsWidth();
-		if (ETransformType::Quat == T)
+		if (Core::ETransformType::Quat == T)
 			setLevelOfDetail(WorkspaceLevelOfDetail::SetValues);
 	}
 
@@ -24,7 +24,7 @@ public:
 
 	int maxLenghtOfData()
 	{
-		//    if (ETransformType::Quat == T)
+		//    if (Core::ETransformType::Quat == T)
 		//        return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(),
 		//        m_numberOfVisibleDecimal);
 		//    else
@@ -33,7 +33,7 @@ public:
 
 	void drawMenuLevelOfDetail()
 	{
-		if (ETransformType::Free == T)
+		if (Core::ETransformType::Free == T)
 		{
 			drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
 			                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
@@ -46,7 +46,7 @@ public:
 		}
 
 		//    drawMenuLevelOfDetail_builder(std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(shared_from_this()),
-		//                                  (ETransformType::Free == T) ?
+		//                                  (Core::ETransformType::Free == T) ?
 		//                                  {WorkspaceLevelOfDetail::Full,
 		//                                  WorkspaceLevelOfDetail::Label}
 		//                                                              :
@@ -70,7 +70,7 @@ public:
 			{
 				switch (valueStore.opValueType)
 				{
-				case EValueType::Vec3:
+				case Core::EValueType::Vec3:
 				{
 					auto localData = valueStore.getVec3();
 
@@ -86,7 +86,7 @@ public:
 					}
 					break;
 				}
-				case EValueType::Vec4:
+				case Core::EValueType::Vec4:
 				{
 					auto localData = valueStore.getVec4();
 
@@ -102,7 +102,7 @@ public:
 					}
 					break;
 				}
-				case EValueType::Quat:
+				case Core::EValueType::Quat:
 				{
 					auto localData = valueStore.getQuat(); // the default "quat" value
 
@@ -125,12 +125,12 @@ public:
 					}
 					break;
 				}
-				case EValueType::Matrix:
+				case Core::EValueType::Matrix:
 				{
 					inner_interaction_happen |= drawDataFull();
 					break;
 				}
-				case EValueType::Float:
+				case Core::EValueType::Float:
 				{
 					auto localData = valueStore.getFloat();
 
@@ -155,7 +155,7 @@ public:
 	void drawMenuSetDataMap() override
 	{
 		WorkspaceTransformation::drawMenuSetDataMap();
-	} /* thus we can specify it for ETransformType::Free  */
+	} /* thus we can specify it for Core::ETransformType::Free  */
 };
 
 template <>
@@ -163,7 +163,7 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     void
-    WorkspaceTransformation_s<ETransformType::Free>::drawMenuSetDataMap()
+    WorkspaceTransformation_s<Core::ETransformType::Free>::drawMenuSetDataMap()
 {
 	ImGui::MenuItem("Lock", NULL, false, false); /* no change DataMap in Free transformation */
 	ImGui::MenuItem("Enable synergies", NULL, false, false);
@@ -174,36 +174,36 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     void
-    WorkspaceTransformation_s<ETransformType::Scale>::drawMenuSetDataMap()
+    WorkspaceTransformation_s<Core::ETransformType::Scale>::drawMenuSetDataMap()
 {
-	if (m_nodebase->as<Core::Transformation>()->isLocked())
+	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
 		if (ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->unlock();
+			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->lock();
+			m_nodebase->as<Core::Transform>()->lock();
 		}
 	}
 
 	// the one of two with synergies in WorkspaceLevelOfDetail::FUll and SetValues
-	if (m_nodebase->as<Core::Transformation>()->hasSynergies())
+	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
 		if (ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail() != WorkspaceLevelOfDetail::Label))
 		{
-			m_nodebase->as<Core::Transformation>()->disableSynergies();
+			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail() != WorkspaceLevelOfDetail::Label))
 		{
-			m_nodebase->as<Core::Transformation>()->enableSynergies();
+			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
 }
@@ -213,20 +213,20 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     void
-    WorkspaceTransformation_s<ETransformType::Quat>::drawMenuSetDataMap()
+    WorkspaceTransformation_s<Core::ETransformType::Quat>::drawMenuSetDataMap()
 {
-	if (m_nodebase->as<Core::Transformation>()->isLocked())
+	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
 		if (ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->unlock();
+			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->lock();
+			m_nodebase->as<Core::Transform>()->lock();
 		}
 	}
 
@@ -237,18 +237,18 @@ inline /* inline for ability to compile
 	//	int i = 7;
 	// auto hasMenuSyn =
 	// m_nodebase->as<Core::Transformation>()->hasMenuSynergies();
-	if (m_nodebase->as<Core::Transformation>()->hasSynergies())
+	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
 		if (ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues))
 		{
-			m_nodebase->as<Core::Transformation>()->disableSynergies();
+			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues))
 		{
-			m_nodebase->as<Core::Transformation>()->enableSynergies();
+			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
 }
@@ -257,20 +257,20 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     void
-    WorkspaceTransformation_s<ETransformType::Ortho>::drawMenuSetDataMap()
+    WorkspaceTransformation_s<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 {
-	if (m_nodebase->as<Core::Transformation>()->isLocked())
+	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
 		if (ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->unlock();
+			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->lock();
+			m_nodebase->as<Core::Transform>()->lock();
 		}
 	}
 
@@ -281,18 +281,18 @@ inline /* inline for ability to compile
 	//	int i = 7;
 	// auto hasMenuSyn =
 	// m_nodebase->as<Core::Transformation>()->hasMenuSynergies();
-	if (m_nodebase->as<Core::Transformation>()->hasSynergies())
+	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
 		if (ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues))
 		{
-			m_nodebase->as<Core::Transformation>()->disableSynergies();
+			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues))
 		{
-			m_nodebase->as<Core::Transformation>()->enableSynergies();
+			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
 }
@@ -301,20 +301,20 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     void
-    WorkspaceTransformation_s<ETransformType::Frustum>::drawMenuSetDataMap()
+    WorkspaceTransformation_s<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 {
-	if (m_nodebase->as<Core::Transformation>()->isLocked())
+	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
 		if (ImGui::MenuItem("Unlock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->unlock();
+			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Lock", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::Full))
 		{
-			m_nodebase->as<Core::Transformation>()->lock();
+			m_nodebase->as<Core::Transform>()->lock();
 		}
 	}
 
@@ -325,18 +325,18 @@ inline /* inline for ability to compile
 	//	int i = 7;
 	// auto hasMenuSyn =
 	// m_nodebase->as<Core::Transformation>()->hasMenuSynergies();
-	if (m_nodebase->as<Core::Transformation>()->hasSynergies())
+	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
 		if (ImGui::MenuItem("Disable synergies", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues))
 		{
-			m_nodebase->as<Core::Transformation>()->disableSynergies();
+			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Enable synergies", NULL, false, getLevelOfDetail() == WorkspaceLevelOfDetail::SetValues))
 		{
-			m_nodebase->as<Core::Transformation>()->enableSynergies();
+			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
 }
@@ -345,10 +345,10 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     bool
-    WorkspaceTransformation_s<ETransformType::Scale>::drawDataSetValues()
+    WorkspaceTransformation_s<Core::ETransformType::Scale>::drawDataSetValues()
 {
 	bool inner_interaction_happen = false, value_changed = false;
-	auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::Scale>>();
+	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::Scale>>();
 	if (ImGui::BeginTable(fmt::format("##LoD{}", getIdDiwne()).c_str(), 2 /* label, value */,
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
@@ -356,11 +356,11 @@ inline /* inline for ability to compile
 		{
 			switch (valueStore.opValueType)
 			{
-			case EValueType::Vec3:
+			case Core::EValueType::Vec3:
 			{
 				auto localData = valueStore.getVec3();
 
-				if (m_nodebase->as<Core::Transformation>()->hasSynergies()) /* uniform */
+				if (m_nodebase->as<Core::Transform>()->hasSynergies()) /* uniform */
 				{
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{}", key.c_str())}
 					                                                                 /* \todo MH all/whole labels from core? */
@@ -406,10 +406,10 @@ inline /* inline for ability to compile
           https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
         */
     bool
-    WorkspaceTransformation_s<ETransformType::LookAt>::drawDataSetValues()
+    WorkspaceTransformation_s<Core::ETransformType::LookAt>::drawDataSetValues()
 {
 	bool inner_interaction_happen = false, value_changed = false;
-	auto nodebase = m_nodebase->as<Core::TransformImpl<ETransformType::LookAt>>();
+	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::LookAt>>();
 	int index_of_change;
 
 	std::string cornerLabel = "";

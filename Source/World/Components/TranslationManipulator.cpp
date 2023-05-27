@@ -259,7 +259,7 @@ void TranslationManipulator::update()
 	///
 	if (m_editednode != nullptr)
 	{
-		ValueSetResult v = m_editednode->setValue((glm::vec3)m_edited[3]);
+		auto v = m_editednode->setValue((glm::vec3)m_edited[3]);
 	}
 
 	m_handlespace = getNormalized(getNodeTransform(&m_editednode, &m_parent) * m_editednode->getData().getMat4());

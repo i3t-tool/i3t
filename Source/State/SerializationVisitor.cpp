@@ -121,7 +121,7 @@ void SerializationVisitor::visit(const Ptr<GuiTransform>& node)
 
 void SerializationVisitor::visit(const Ptr<GuiScreen>& node)
 {
-	const auto& coreNode = node->getNodebase()->as<Core::NodeImpl<ENodeType::Screen>>();
+	const auto& coreNode = node->getNodebase()->as<Core::Operator<Core::EOperatorType::Screen>>();
 	auto& alloc = m_memento.GetAllocator();
 	auto& screens = m_memento["workspace"]["screens"];
 	auto& edges = m_memento["workspace"]["edges"];
@@ -205,7 +205,7 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 {
 	I3T_ASSERT(target.IsArray(), "Invalid value type");
 
-	const auto& coreNode = node->getNodebase()->as<Core::Transformation>();
+	const auto& coreNode = node->getNodebase()->as<Core::Transform>();
 	auto& alloc = m_memento.GetAllocator();
 
 	const auto* props = coreNode->getOperation();
@@ -338,8 +338,10 @@ void SerializationVisitor::addMatrix(rapidjson::Value& target, const char* key, 
 	target.AddMember(rapidjson::Value(key, alloc).Move(), std::move(matrix), alloc);
 }
 
-void SerializationVisitor::addData(rapidjson::Value& target, const char* key, const DataStore& data)
+void SerializationVisitor::addData(rapidjson::Value& target, const char* key, const Core::Data& data)
 {
+	using namespace Core;
+
 	I3T_ASSERT(target.IsObject(), "Invalid value type");
 
 	auto& alloc = m_memento.GetAllocator();

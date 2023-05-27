@@ -3,8 +3,8 @@
 #include "GraphManager.h"
 #include "Tracking.h"
 
-using namespace Core;
-
+namespace Core
+{
 Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
 {
 	auto ret = std::make_shared<Sequence>(tracker);
@@ -15,19 +15,19 @@ Ptr<Sequence> Builder::createSequence(MatrixTracker* tracker)
 }
 
 //===-- Storage -----------------------------------------------------------===//
-ValueSetResult Sequence::Storage::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
+ValueSetResult Sequence::Storage::addMatrix(Ptr<Transform> matrix, size_t index) noexcept
 {
 	// insert transform to matrix array
 	index = index >= m_matrices.size() ? m_matrices.size() : index;
 	m_matrices.insert(m_matrices.begin() + index, matrix);
 
 	// mark transform as used in a sequence
-	matrix->as<Transformation>()->setSequence(&m_sequence, index);
+	matrix->as<Transform>()->setSequence(&m_sequence, index);
 
 	return ValueSetResult{};
 }
 
-Ptr<Transformation> Sequence::Storage::popMatrix(const int index)
+Ptr<Transform> Sequence::Storage::popMatrix(const int index)
 {
 	I3T_ASSERT(index < m_matrices.size(),
 	           "Sequence does not have as many matrices as you are expecting.");
@@ -55,7 +55,7 @@ void Sequence::Storage::swap(int from, int to)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence(MatrixTracker* tracker) : NodeBase(&g_sequence), m_storage(*this), m_tracker(tracker)
+Sequence::Sequence(MatrixTracker* tracker) : Node(&g_sequence), m_storage(*this), m_tracker(tracker)
 {
 }
 
@@ -63,7 +63,7 @@ Sequence::~Sequence() { stopTracking(); }
 
 Ptr<Node> Sequence::clone() { return Builder::createSequence(m_tracker); }
 
-ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix) noexcept
+ValueSetResult Sequence::addMatrix(Ptr<Transform> matrix) noexcept
 {
 	const auto result = addMatrix(matrix, m_storage.m_matrices.size());
 	updateValues(-1);
@@ -71,7 +71,7 @@ ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix) noexcept
 	return result;
 }
 
-ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix, size_t index) noexcept
+ValueSetResult Sequence::addMatrix(Ptr<Transform> matrix, size_t index) noexcept
 {
 	const auto result = m_storage.addMatrix(matrix, index);
 	updateValues(-1);
@@ -79,7 +79,7 @@ ValueSetResult Sequence::addMatrix(Ptr<Transformation> matrix, size_t index) noe
 	return result;
 }
 
-[[nodiscard]] Ptr<Transformation> Sequence::popMatrix(const int index)
+[[nodiscard]] Ptr<Transform> Sequence::popMatrix(const int index)
 {
 	const auto result = m_storage.popMatrix(index);
 	result->m_activePart = 0.0f;
@@ -145,3 +145,4 @@ void Sequence::stopTracking()
 		*m_tracker = MatrixTracker();
 	}
 }
+} // namespace Core

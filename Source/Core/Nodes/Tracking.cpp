@@ -4,7 +4,7 @@
 
 namespace Core
 {
-SequenceTree::SequenceTree(Ptr<NodeBase> sequence)
+SequenceTree::SequenceTree(Ptr<Node> sequence)
 {
 	if (sequence == nullptr)
 	{
@@ -55,7 +55,7 @@ SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence)
 	}
 }
 
-SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, NodePtr node)
+SequenceTree::MatrixIterator::MatrixIterator(Sequence* sequence, Ptr<Node> node)
 {
 	m_currentSequence = sequence;
 	m_currentMatrix = node;
@@ -239,7 +239,7 @@ void SequenceTree::MatrixIterator::withdraw()
 
 void setActivePart(Ptr<Node> node, float value)
 {
-	const auto maybeTransform = std::dynamic_pointer_cast<Transformation>(node);
+	const auto maybeTransform = std::dynamic_pointer_cast<Transform>(node);
 	if (maybeTransform)
 	{
 		maybeTransform->m_activePart = value;
@@ -384,4 +384,4 @@ void MatrixTracker::setTransform()
 	// m_model->getModel()->setValue(m_interpolatedMatrix);
 	m_model->update(m_interpolatedMatrix);
 }
-}
+} // namespace erm

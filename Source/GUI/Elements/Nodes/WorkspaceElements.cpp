@@ -6,29 +6,29 @@
 /* DIWNE - \todo JH to remove, but I need something what use instead -> from
  * Type get Shape and Color */
 /* \todo MH is it possible to store std::map in Theme? */
-std::map<EValueType, EColor> WorkspacePinColorBackground = {
-    {EValueType::Float, EColor::FloatPin},         {EValueType::Matrix, EColor::MatrixPin},
-    {EValueType::MatrixMul, EColor::MatrixMulPin}, {EValueType::Pulse, EColor::PulsePin},
-    {EValueType::Quat, EColor::QuatPin},           {EValueType::Screen, EColor::ScreenPin},
-    {EValueType::Vec3, EColor::Vec3Pin},           {EValueType::Vec4, EColor::Vec4Pin}};
+std::map<Core::EValueType, EColor> WorkspacePinColorBackground = {
+    {Core::EValueType::Float, EColor::FloatPin},         {Core::EValueType::Matrix, EColor::MatrixPin},
+    {Core::EValueType::MatrixMul, EColor::MatrixMulPin}, {Core::EValueType::Pulse, EColor::PulsePin},
+    {Core::EValueType::Quat, EColor::QuatPin},           {Core::EValueType::Screen, EColor::ScreenPin},
+    {Core::EValueType::Vec3, EColor::Vec3Pin},           {Core::EValueType::Vec4, EColor::Vec4Pin}};
 
-std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground = {
-    {EValueType::Float, DIWNE::IconType::Rectangle},     {EValueType::Matrix, DIWNE::IconType::Rectangle},
-    {EValueType::MatrixMul, DIWNE::IconType::Rectangle}, {EValueType::Pulse, DIWNE::IconType::Rectangle},
-    {EValueType::Quat, DIWNE::IconType::Rectangle},      {EValueType::Screen, DIWNE::IconType::Rectangle},
-    {EValueType::Vec3, DIWNE::IconType::Rectangle},      {EValueType::Vec4, DIWNE::IconType::Rectangle}};
+std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeBackground = {
+    {Core::EValueType::Float, DIWNE::IconType::Rectangle},     {Core::EValueType::Matrix, DIWNE::IconType::Rectangle},
+    {Core::EValueType::MatrixMul, DIWNE::IconType::Rectangle}, {Core::EValueType::Pulse, DIWNE::IconType::Rectangle},
+    {Core::EValueType::Quat, DIWNE::IconType::Rectangle},      {Core::EValueType::Screen, DIWNE::IconType::Rectangle},
+    {Core::EValueType::Vec3, DIWNE::IconType::Rectangle},      {Core::EValueType::Vec4, DIWNE::IconType::Rectangle}};
 
-std::map<EValueType, DIWNE::IconType> WorkspacePinShapeForeground = {
-    {EValueType::Float, DIWNE::IconType::TriangleRight}, {EValueType::Matrix, DIWNE::IconType::TriangleRight},
-    {EValueType::MatrixMul, DIWNE::IconType::Cross},     {EValueType::Pulse, DIWNE::IconType::TriangleRight},
-    {EValueType::Quat, DIWNE::IconType::TriangleRight},  {EValueType::Screen, DIWNE::IconType::TriangleRight},
-    {EValueType::Vec3, DIWNE::IconType::TriangleRight},  {EValueType::Vec4, DIWNE::IconType::TriangleRight}};
+std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeForeground = {
+    {Core::EValueType::Float, DIWNE::IconType::TriangleRight}, {Core::EValueType::Matrix, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::MatrixMul, DIWNE::IconType::Cross},     {Core::EValueType::Pulse, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Quat, DIWNE::IconType::TriangleRight},  {Core::EValueType::Screen, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Vec3, DIWNE::IconType::TriangleRight},  {Core::EValueType::Vec4, DIWNE::IconType::TriangleRight}};
 
-std::map<EValueType, EColor> WorkspacePinColorForeground = {
-    {EValueType::Float, EColor::InnerFloatPin},         {EValueType::Matrix, EColor::InnerMatrixPin},
-    {EValueType::MatrixMul, EColor::InnerMatrixMulPin}, {EValueType::Pulse, EColor::InnerPulsePin},
-    {EValueType::Quat, EColor::InnerQuatPin},           {EValueType::Screen, EColor::InnerScreenPin},
-    {EValueType::Vec3, EColor::InnerVec3Pin},           {EValueType::Vec4, EColor::InnerVec4Pin}};
+std::map<Core::EValueType, EColor> WorkspacePinColorForeground = {
+    {Core::EValueType::Float, EColor::InnerFloatPin},         {Core::EValueType::Matrix, EColor::InnerMatrixPin},
+    {Core::EValueType::MatrixMul, EColor::InnerMatrixMulPin}, {Core::EValueType::Pulse, EColor::InnerPulsePin},
+    {Core::EValueType::Quat, EColor::InnerQuatPin},           {Core::EValueType::Screen, EColor::InnerScreenPin},
+    {Core::EValueType::Vec3, EColor::InnerVec3Pin},           {Core::EValueType::Vec4, EColor::InnerVec4Pin}};
 
 std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
     {WorkspaceLevelOfDetail::Full, "Full"},

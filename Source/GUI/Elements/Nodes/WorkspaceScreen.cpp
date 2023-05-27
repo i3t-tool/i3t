@@ -7,7 +7,7 @@
 #define TEST
 
 WorkspaceScreen::WorkspaceScreen(DIWNE::Diwne& diwne)
-    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<ENodeType::Screen>())
+    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<Core::EOperatorType::Screen>())
 {
 	init();
 }

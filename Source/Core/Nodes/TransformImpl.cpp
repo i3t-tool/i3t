@@ -128,7 +128,7 @@ bool TransformImpl<ETransformType::Scale>::isValid() const
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val)
 {
 	// notifySequence();
-	// return NodeBase::setValue(glm::vec3(val));
+	// return Node::setValue(glm::vec3(val));
 
 	return setValue(glm::vec3(val));
 }
@@ -190,7 +190,7 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::iv
 }
 void TransformImpl<ETransformType::Scale>::setDefaultUniformScale(float val)
 {
-	Transformation::setDefaultValue("scale", glm::vec3(val));
+	Transform::setDefaultValue("scale", glm::vec3(val));
 };
 
 void TransformImpl<ETransformType::Scale>::initDefaults() { setDefaultValue("scale", glm::vec3{1.0f, 1.0f, 1.0f}); }

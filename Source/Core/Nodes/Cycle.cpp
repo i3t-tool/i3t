@@ -1,8 +1,8 @@
 #include "Cycle.h"
 #include "GraphManager.h"
 
-using namespace Core;
-
+namespace Core
+{
 Ptr<Cycle> Builder::createCycle()
 {
 	auto ret = std::make_shared<Cycle>();
@@ -197,3 +197,4 @@ void Cycle::updateValue(float increment)
 
 	setInternalValue(newValue);
 }
+} // namespace Core

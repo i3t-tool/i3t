@@ -7,7 +7,7 @@ using namespace Core;
 
 TEST_F(CycleTestFixture, PulseNodeCanTriggerCycle)
 {
-	auto pulse = Builder::createOperator<ENodeType::Pulse>();
+	auto pulse = Builder::createOperator<EOperatorType::Pulse>();
 	auto cycle = GraphManager::createCycle();
 
 	plug_expectOk(pulse, cycle, I3T_OUTPUT0, I3T_CYCLE_IN_PLAY);

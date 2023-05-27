@@ -17,7 +17,7 @@ public:
 	static const char* componentType() { return ScaleManipulator::s_type; };
 	const char* getComponentType() { return ScaleManipulator::s_type; };
 
-	Ptr<Core::NodeBase> m_editednode;
+	Ptr<Core::Node> m_editednode;
 	Ptr<Core::Sequence> m_parent;
 
 private:

@@ -40,42 +40,42 @@ ENodePlugResult GraphManager::isPlugCorrect(const Pin& input, const Pin& output)
 	return lhs.isPlugCorrect(input, output);
 }
 
-ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs)
+ENodePlugResult GraphManager::plug(const Ptr<Core::Node>& lhs, const Ptr<Core::Node>& rhs)
 {
 	return GraphManager::plug(lhs, rhs, 0, 0);
 }
 
-ENodePlugResult GraphManager::plug(const Ptr<Core::NodeBase>& leftNode, const Ptr<Core::NodeBase>& rightNode,
+ENodePlugResult GraphManager::plug(const Ptr<Core::Node>& leftNode, const Ptr<Core::Node>& rightNode,
                                    unsigned fromIndex, unsigned toIndex)
 {
 	return leftNode->plug(rightNode, fromIndex, toIndex);
 }
 
-ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
+ENodePlugResult GraphManager::plugSequenceValueInput(const Ptr<Core::Node>& seq, const Ptr<Core::Node>& node,
                                                      unsigned nodeIndex)
 {
 	return plug(node, seq, nodeIndex, 1);
 }
 
-ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::NodeBase>& seq, const Ptr<Core::NodeBase>& node,
+ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::Node>& seq, const Ptr<Core::Node>& node,
                                                       unsigned nodeIndex)
 {
 	return plug(seq, node, 1, nodeIndex);
 }
 
-void GraphManager::unplugAll(const Ptr<Core::NodeBase>& node) { node.get()->unplugAll(); }
+void GraphManager::unplugAll(const Ptr<Core::Node>& node) { node.get()->unplugAll(); }
 
-void GraphManager::unplugInput(const Ptr<Core::NodeBase>& node, int index) { node.get()->unplugInput(index); }
+void GraphManager::unplugInput(const Ptr<Core::Node>& node, int index) { node.get()->unplugInput(index); }
 
-void GraphManager::unplugOutput(Ptr<Core::NodeBase>& node, int index)
+void GraphManager::unplugOutput(Ptr<Core::Node>& node, int index)
 {
 	node.get()->unplugOutput(index);
 	// tryToDoSequenceProcedure(node);
 }
 
-std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)
+std::vector<Ptr<Node>> GraphManager::getAllInputNodes(const Ptr<Node>& node)
 {
-	std::vector<Ptr<NodeBase>> result;
+	std::vector<Ptr<Node>> result;
 	size_t inputsCount = node->getInputPins().size();
 	for (size_t i = 0; i < inputsCount; ++i)
 	{
@@ -87,7 +87,7 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllInputNodes(const NodePtr& node)
 	return result;
 }
 
-Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
+Ptr<Node> GraphManager::getParent(const Ptr<Node>& node, size_t index)
 {
 	auto pins = node->getInputPins();
 
@@ -114,9 +114,9 @@ Ptr<NodeBase> GraphManager::getParent(const NodePtr& node, size_t index)
 	return expected;
 }
 
-std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& node)
+std::vector<Ptr<Node>> GraphManager::getAllOutputNodes(Ptr<Core::Node>& node)
 {
-	std::vector<Ptr<NodeBase>> result;
+	std::vector<Ptr<Node>> result;
 	auto pins = node->getOutputPins();
 	for (size_t i = 0; i < pins.size(); ++i)
 	{
@@ -127,11 +127,11 @@ std::vector<Ptr<NodeBase>> GraphManager::getAllOutputNodes(Ptr<Core::NodeBase>& 
 	return result;
 }
 
-std::vector<Ptr<NodeBase>> GraphManager::getOutputNodes(const Ptr<Core::NodeBase>& node, size_t index)
+std::vector<Ptr<Node>> GraphManager::getOutputNodes(const Ptr<Core::Node>& node, size_t index)
 {
 	I3T_ASSERT(index < node->getOutputPins().size(), "Out of range.");
 
-	std::vector<Ptr<NodeBase>> result;
+	std::vector<Ptr<Node>> result;
 	auto pin = node->getOutputPins()[index];
 	auto othersInputs = pin.getOutComponents();
 	for (const auto& other : othersInputs)

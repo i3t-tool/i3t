@@ -183,9 +183,9 @@ void World::manipulatorsSetMatrix(std::shared_ptr<WorkspaceTransformation> matno
 	}
 	// if(matnode->get()==nullptr){return;}
 
-	Ptr<Core::NodeBase> nodebase = matnode->getNodebase();
-	const Core::Transform::DataMap* data = nodebase->getDataMap();   // printf("a");
-	const Operation* operation = nodebase->getOperation();           // printf("b");
+	Ptr<Core::Node> nodebase = matnode->getNodebase();
+	const Core::DataMap* data = nodebase->getDataMap();   // printf("a");
+	const Core::Operation* operation = nodebase->getOperation();           // printf("b");
 	const char* keyword = nodebase->getOperation()->keyWord.c_str(); // printf("c");
 
 	if (this->manipulators.count(keyword) == 1)

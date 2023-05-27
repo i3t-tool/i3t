@@ -43,13 +43,13 @@ public:
 		// TODO: (DR) Should probably be a weak ptr
 		// Currently only Transformations are manipulated, can easily be generalized later, this is so that we don't dynamic
 		// cast for no reason
-		std::shared_ptr<Core::Transformation> m_node; ///< Reference to the selected/manipulated node
+		std::shared_ptr<Core::Transform> m_node; ///< Reference to the selected/manipulated node
 
 		glm::mat4 m_editedMatrix{glm::mat4(1)};    ///< Matrix of the currently selected transformation, the "local" space
 		glm::mat4 m_referenceSpace{glm::mat4(1)};  ///< Combined matrix of all transformations prior to selection
 		glm::mat4 m_auxillaryMatrix{glm::mat4(1)}; ///< Currently used to store view matrix for projection matrices
 
-		explicit Manipulator(std::shared_ptr<Core::Transformation> node) { m_node = node; }
+		explicit Manipulator(std::shared_ptr<Core::Transform> node) { m_node = node; }
 	};
 
 private:

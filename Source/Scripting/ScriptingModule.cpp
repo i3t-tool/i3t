@@ -61,7 +61,7 @@ static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 	}
 
 	const auto result = node->setValue(value);
-	if (result.status != ValueSetResult::Status::Ok)
+	if (result.status != Core::ValueSetResult::Status::Ok)
 	{
 		g_printRef(result.message);
 		return false;
@@ -75,7 +75,7 @@ static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 template <typename T>
 static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name)
 {
-	const auto transform = guiNode->getNodebase()->as<Core::Transformation>();
+	const auto transform = guiNode->getNodebase()->as<Core::Transform>();
 	const auto maybeValue = transform->getDefaultValue(name).getValue<T>();
 	if (!maybeValue.has_value())
 	{
@@ -88,9 +88,9 @@ static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::st
 template <typename T>
 static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, const T& value)
 {
-	const auto node = guiNode->getNodebase()->as<Core::Transformation>();
+	const auto node = guiNode->getNodebase()->as<Core::Transform>();
 	const auto result = node->setDefaultValue(name, value);
-	if (result.status != ValueSetResult::Status::Ok)
+	if (result.status != Core::ValueSetResult::Status::Ok)
 	{
 		g_printRef(result.message);
 
@@ -165,7 +165,7 @@ void ScriptingModule::init()
 	                                },
 	                                sol::meta_function::construct, [this](const std::string& type) -> Ptr<GuiOperator>
 																	{
-		                                const auto maybeType = EnumUtils::value<ENodeType>(type);
+		                                const auto maybeType = EnumUtils::value<Core::EOperatorType>(type);
 		                                if (!maybeType.has_value())
 		                                {
 			                                print(fmt::format("Unknown operator \"{}\".", type));
@@ -189,7 +189,7 @@ void ScriptingModule::init()
 	    														 {
 		                                 const auto glmCoords = glm::vec2(coords.x, coords.y);
 		                                 const auto result = self->getNodebase()->setValue(value, glmCoords);
-		                                 if (result.status != ValueSetResult::Status::Ok)
+		                                 if (result.status != Core::ValueSetResult::Status::Ok)
 		                                 {
 			                                 print(result.message);
 		                                 }
@@ -203,17 +203,17 @@ void ScriptingModule::init()
                                    "set_vec3", &setDefaultValue<glm::vec3>,
                                    "set_vec4", &setDefaultValue<glm::vec4>,
 	                                 // synergies, ...
-                                   "is_valid", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transformation>()->isValid(); },
-                                   "is_locked", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transformation>()->isLocked(); },
-                                   "is_in_sequence", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transformation>()->isInSequence(); },
-                                   "lock", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transformation>()->lock(); },
-                                   "unlock", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transformation>()->unlock(); },
-                                   "has_synergies", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transformation>()->hasSynergies(); },
-                                   "enable_synergies", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transformation>()->enableSynergies(); },
-                                   "disable_synergies", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transformation>()->disableSynergies(); },
+                                   "is_valid", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transform>()->isValid(); },
+                                   "is_locked", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transform>()->isLocked(); },
+                                   "is_in_sequence", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transform>()->isInSequence(); },
+                                   "lock", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transform>()->lock(); },
+                                   "unlock", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transform>()->unlock(); },
+                                   "has_synergies", [](Ptr<GuiTransform> self) { return self->getNodebase()->as<Core::Transform>()->hasSynergies(); },
+                                   "enable_synergies", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transform>()->enableSynergies(); },
+                                   "disable_synergies", [](Ptr<GuiTransform> self) { self->getNodebase()->as<Core::Transform>()->disableSynergies(); },
 	                                 sol::meta_function::construct, [this](const std::string& type) -> Ptr<GuiTransform>
 	                                 {
-		                                 const auto maybeType = EnumUtils::value<ETransformType>(type);
+		                                 const auto maybeType = EnumUtils::value<Core::ETransformType>(type);
 		                                 if (!maybeType.has_value())
 		                                 {
 			                                 print(fmt::format("Unknown transform \"{}\".", type));
@@ -359,7 +359,7 @@ void ScriptingModule::init()
 	m_Lua.set_function("print_operator_types",
 	                   [this]()
 	                   {
-		                   const auto types = magic_enum::enum_names<ENodeType>();
+		                   const auto types = magic_enum::enum_names<Core::EOperatorType>();
 		                   for (const auto& t : types)
 		                   {
 			                   print(std::string(t));
@@ -367,7 +367,7 @@ void ScriptingModule::init()
 	                   });
 
 	m_Lua.set_function("print_transform_types", [this]() {
-		                   const auto types = magic_enum::enum_names<ETransformType>();
+		                   const auto types = magic_enum::enum_names<Core::ETransformType>();
 		                   for (const auto& t : types)
 		                   {
 			                   print(std::string(t));

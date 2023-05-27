@@ -4,7 +4,7 @@
 
 TEST(TransformMaskTest, _)
 {
-	auto scale = Core::Builder::createTransform<ETransformType::Scale>();
+	auto scale = Core::Builder::createTransform<Core::ETransformType::Scale>();
 
 	scale->lock();
 	scale->enableSynergies();

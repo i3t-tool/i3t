@@ -6,7 +6,7 @@ class WorkspaceTransformation : public WorkspaceNodeWithCoreData
 public:
 	WPtr<WorkspaceSequence> m_parentSequence{};
 
-	WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase);
+	WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase);
 
 	//===-- Double dispatch
 	//---------------------------------------------------===//
@@ -25,7 +25,7 @@ public:
 	DIWNE::ID aboveSequence;
 	float m_topOversizeSpace;
 
-	Ptr<Core::NodeBase> getNodebaseSequence();
+	Ptr<Core::Node> getNodebaseSequence();
 
 	/**
 	 * \brief helper function used for decision about showing the corrupted

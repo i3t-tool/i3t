@@ -23,27 +23,7 @@
 namespace Core
 {
 class Node;
-
-constexpr inline size_t MAX_NODES_COUNT = 1024;
-
-namespace Builder
-{
-template <typename T>
-Ptr<T> createNode(Node* owner = nullptr)
-{
-	static_assert(std::is_base_of_v<Node, T>, "T must be derived from Node");
-	auto node = std::make_shared<T>();
-	if (owner != nullptr)
-	{
-		node->m_owner = owner;
-	}
-	node->init();
-
-	return node;
-} // namespace Builder
-}
-}
-
+class Pin;
 
 struct ValueSetResult
 {
@@ -72,10 +52,6 @@ inline constexpr size_t I3T_OUTPUT2 = 2;
 inline constexpr size_t I3T_DATA0 = 0;
 inline constexpr size_t I3T_DATA1 = 1;
 inline constexpr size_t I3T_DATA2 = 2;
-
-namespace Core
-{
-class Pin;
 
 /**
  * Base class interface for all boxes.
@@ -155,7 +131,7 @@ public:
 
 	template <typename T> Ptr<T> as()
 	{
-		static_assert(std::is_base_of_v<Node, T>, "T must be derived from NodeBase class.");
+		static_assert(std::is_base_of_v<Node, T>, "T must be derived from Node class.");
 		I3T_ASSERT(std::dynamic_pointer_cast<T>(shared_from_this()), "Cannot cast to Ptr<T>.");
 
 		return std::dynamic_pointer_cast<T>(shared_from_this());
@@ -185,7 +161,7 @@ public:
 public:
 	/// This function won't work for mapped pins.
 	/// \todo Make this function non public.
-	DataStore& getInternalData(size_t index = 0);
+	Data& getInternalData(size_t index = 0);
 
 	/**
 	 * Get Node contents, read only.
@@ -193,7 +169,7 @@ public:
 	 * two vectors). Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data
 	 */
-	const DataStore& getData(size_t index = 0) { return getInternalData(index); }
+	const Data& getData(size_t index = 0) { return getInternalData(index); }
 
 	/// \todo MH Replace getData with this function.
 	const Data& data(size_t index = 0) { return getData(index); }
@@ -251,7 +227,7 @@ public:
 	 * Smart set function, used with constrained transformation for value
 	 * checking. \param mat \param map array of 16 chars.
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const Transform::DataMap& map)
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat, const DataMap& map)
 	{
 		return ValueSetResult{ValueSetResult::Status::Err_LogicError, "Unsupported operation on non transform object."};
 	}
@@ -281,10 +257,6 @@ protected:
 	{
 		getInternalData(index).setValue(value);
 		spreadSignal(index);
-
-		/// \todo MH
-		// if (m_owner)
-		// m_owner->updateValues(-1);
 	}
 
 	void setInternalValue(float value, glm::ivec2 coordinates, size_t index = 0)
@@ -301,12 +273,13 @@ protected:
 
 public:
 	/// \todo MH will be removed.
-	static const Transform::DataMap* getDataMap();
-	static const Transform::DataMap& getDataMapRef();
+	static const DataMap* getDataMap();
+
+	/// \todo MH will be removed.
+	static const DataMap& getDataMapRef();
 
 public:
-	//===-- Values updating functions.
-	//----------------------------------------===//
+	//===-- Values updating functions. ----------------------------------------===//
 	/**
 	 * Computes new values of outputs based on inputs.
 	 *
@@ -433,13 +406,12 @@ private:
 	void unplugAll();
 	void unplugInput(size_t index);
 
-protected:
-	virtual void onUnplugInput(size_t index) {}
-
 private:
 	void unplugOutput(size_t index);
 
 protected:
+	virtual void onUnplugInput(size_t index) {}
+
 	ID m_id{};
 
 	/// Operator node properties.
@@ -452,21 +424,10 @@ protected:
 	std::vector<Pin> m_outputs;
 
 	/// Results of operations.
-	std::vector<DataStore> m_internalData;
+	std::vector<Data> m_internalData;
 
 	/// Owner of the node, used in complex type of nodes, such as sequence or
 	/// camera.
 	Node* m_owner = nullptr;
-
-	/// Friends:
-	template <typename T>
-	friend Ptr<T> Builder::createNode(Node* owner);
 };
-
-/// \todo MH Remove!
-using NodePtr = Ptr<Node>;
-
-/// \todo MH Remove!
-/// \warning Will be removed, use Node type instead.
-using NodeBase = Node;
 } // namespace Core

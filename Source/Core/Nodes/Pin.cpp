@@ -33,7 +33,7 @@ Pin::Pin(EValueType valueType, bool isInput, Ptr<Node> owner, int index)
 	return m_input;
 }
 
-const DataStore& Pin::data() const
+const Data& Pin::data() const
 {
 	if (IsInput)
 	{
@@ -46,7 +46,7 @@ const DataStore& Pin::data() const
 	}
 }
 
-DataStore& Pin::dataMut()
+Data& Pin::dataMut()
 {
 	if (IsInput)
 	{

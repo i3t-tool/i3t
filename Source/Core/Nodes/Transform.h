@@ -24,7 +24,7 @@ class Sequence;
 
 template <typename Node> FORCE_INLINE bool isRot(Node&& node)
 {
-	// static_assert(std::is_base_of_v<NodeBase, Node>);
+	// static_assert(std::is_base_of_v<Node, Node>);
 
 	auto& type = node->getOperation()->keyWord;
 	return type == "EulerX" || type == "EulerY" || type == "EulerZ" || type == "AxisAngle";
@@ -74,7 +74,7 @@ bool validateValues(const ValueMask& mask, const glm::mat4& matrix);
 
 //===-- Base Transform class ----------------------------------------------===//
 
-class Transformation : public Node
+class Transform : public Node
 {
 	friend class GraphManager;
 	friend class Sequence;
@@ -87,7 +87,7 @@ class Transformation : public Node
 	using DefaultValues = std::vector<DefaultValuePair>;
 
 public:
-	explicit Transformation(const TransformOperation& transformType);
+	explicit Transform(const TransformOperation& transformType);
 
 	//===-- Construct functions
 	//-----------------------------------------------===//
@@ -122,7 +122,7 @@ private:
 
 public:
 	bool isInSequence() const { return m_currentSequence != nullptr; }
-	Ptr<NodeBase> getCurrentSequence();
+	Ptr<Node> getCurrentSequence();
 	int getCurrentIndex() const { return m_currentIndex; }
 
 	//===----------------------------------------------------------------------===//
@@ -279,7 +279,7 @@ public:
 		m_currentIndex = -1;
 	}
 
-	void setSequence(NodeBase* s, int index)
+	void setSequence(Node* s, int index)
 	{
 		m_currentSequence = s;
 		m_currentIndex = index;
@@ -326,9 +326,9 @@ private:
 	bool m_hasSavedData = false;
 
 	/// \todo Rename to m_savedMatrix
-	DataStore     m_savedData;
+	Data m_savedData;
 	DefaultValues m_savedValues;
 };
 
-using TransformPtr = Ptr<Transformation>;
+using TransformPtr = Ptr<Transform>;
 } // namespace Core

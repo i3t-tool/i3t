@@ -9,7 +9,7 @@ using namespace Core;
 
 TEST(CloneNodeTest, NodeCanBeCloned)
 {
-	auto node = Builder::createOperator<ENodeType::FloatToFloat>();
+	auto node = Builder::createOperator<EOperatorType::FloatToFloat>();
 
 	const float expectedValue = generateFloat();
 	setValue_expectOk(node, expectedValue);
@@ -28,6 +28,6 @@ TEST(CloneNodeTest, TransformCanBeCloned)
 
 	auto cloned = transform->clone();
 
-	EXPECT_EQ(expectedValue, cloned->as<Transformation>()->getDefaultValue("translation").getVec3());
+	EXPECT_EQ(expectedValue, cloned->as<Transform>()->getDefaultValue("translation").getVec3());
 	EXPECT_TRUE(Math::eq(transform->getData().getMat4(), cloned->getData().getMat4()));
 }

@@ -26,7 +26,7 @@ RotationManipulator::RotationManipulator()
 	m_threeaxis->primitive = GL_LINES;
 	m_edited = glm::mat4(1.0f);
 
-	m_editednode = Ptr<Core::NodeBase>();
+	m_editednode = Ptr<Core::Node>();
 	m_parent = Ptr<Core::Sequence>();
 }
 void RotationManipulator::render(glm::mat4* parent, bool renderTransparent)

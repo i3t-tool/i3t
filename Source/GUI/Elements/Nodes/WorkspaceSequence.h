@@ -16,7 +16,7 @@ protected:
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> m_workspaceInnerTransformations;
 
 public:
-	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase = Core::GraphManager::createSequence(),
+	WorkspaceSequence(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase = Core::GraphManager::createSequence(),
 	                  bool drawPins = true, bool isCameraSequence = false);
 
 	//===-- Double dispatch

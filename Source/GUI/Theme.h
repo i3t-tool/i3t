@@ -254,7 +254,7 @@ enum class ESizeVec2
 	Builder_ItemSpacing,
 };
 
-constexpr inline EColor asColor(EValueType type) { return EColor(type); }
+constexpr inline EColor asColor(Core::EValueType type) { return EColor(type); }
 
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {

@@ -150,7 +150,7 @@ void OrthoManipulator::update()
 	{
 		return;
 	}
-	auto* editedortho = (Core::TransformImpl<ETransformType::Ortho>*)m_editednode.get();
+	auto* editedortho = (Core::TransformImpl<Core::ETransformType::Ortho>*)m_editednode.get();
 	m_edited = m_editednode->getData().getMat4();
 
 	unsigned char sel =

@@ -13,8 +13,8 @@ auto initialTransl = glm::vec3(-1.0f, 2.0f, 5.0f);
 
 struct TestData
 {
-	Ptr<NodeBase> scale1, scale2, rotX, translation;
-	Ptr<NodeBase> mul1, mul2, mul3;
+	Ptr<Node> scale1, scale2, rotX, translation;
+	Ptr<Node> mul1, mul2, mul3;
 };
 
 /**
@@ -28,16 +28,16 @@ TestData prepareEnvironment()
 {
 	TestData ctx;
 
-	ctx.scale1 = Builder::createOperator<ENodeType::MakeScale>();
-	ctx.rotX = Builder::createOperator<ENodeType::MakeEulerX>();
-	ctx.scale2 = Builder::createOperator<ENodeType::MakeScale>();
-	ctx.translation = Builder::createOperator<ENodeType::MakeTranslation>();
+	ctx.scale1 = Builder::createOperator<EOperatorType::MakeScale>();
+	ctx.rotX = Builder::createOperator<EOperatorType::MakeEulerX>();
+	ctx.scale2 = Builder::createOperator<EOperatorType::MakeScale>();
+	ctx.translation = Builder::createOperator<EOperatorType::MakeTranslation>();
 
 	// Multiplicate matrices using matrix * matrix node. (Sequence is may not be
 	// complete yet!)
-	ctx.mul1 = Builder::createOperator<ENodeType::MatrixMulMatrix>();
-	ctx.mul2 = Builder::createOperator<ENodeType::MatrixMulMatrix>();
-	ctx.mul3 = Builder::createOperator<ENodeType::MatrixMulMatrix>();
+	ctx.mul1 = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
+	ctx.mul2 = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
+	ctx.mul3 = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
 
 	plug_expectOk(ctx.scale1, ctx.mul1, 0, 0);
 	plug_expectOk(ctx.rotX, ctx.mul1, 0, 1);
@@ -51,7 +51,7 @@ TestData prepareEnvironment()
 	return ctx;
 }
 
-Ptr<NodeBase> getRoot(Ptr<NodeBase> node)
+Ptr<Node> getRoot(Ptr<Node> node)
 {
 	auto parent = GraphManager::getParent(node);
 	if (parent == nullptr)
@@ -97,8 +97,8 @@ TEST(NodeIntefaceTest, GetNodeInputsAndOutputs_OnComplexGraph_ReturnsValidResult
 	EXPECT_TRUE(GraphManager::getAllOutputNodes(lastNode).empty());
 
 	auto root = getRoot(lastNode);
-	auto anotherMatNode1 = Builder::createOperator<ENodeType::MatrixAddMatrix>();
-	auto anotherMatNode2 = Builder::createOperator<ENodeType::MatrixAddMatrix>();
+	auto anotherMatNode1 = Builder::createOperator<EOperatorType::MatrixAddMatrix>();
+	auto anotherMatNode2 = Builder::createOperator<EOperatorType::MatrixAddMatrix>();
 	plug_expectOk(root, anotherMatNode1, 0, 0);
 	plug_expectOk(root, anotherMatNode2, 0, 0);
 
@@ -132,7 +132,7 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 {
 	auto leftSequence = GraphManager::createSequence();
 	auto rightSequence = GraphManager::createSequence();
-	auto matrix = GraphManager::createNode<ENodeType::MatrixToMatrix>();
+	auto matrix = GraphManager::createNode<EOperatorType::MatrixToMatrix>();
 
 	plug_expectOk(leftSequence, rightSequence, 0, 0);
 	plug_expectOk(matrix, rightSequence, 0, 1);
@@ -144,7 +144,7 @@ TEST(NodeInterfaceTest, GetAllInputNodes_ShouldReturnNodesConnectedMyInputs)
 
 TEST(NodeInterfaceTest, SetValueWithIndex)
 {
-	auto screen = GraphManager::createNode<ENodeType::Screen>();
+	auto screen = GraphManager::createNode<EOperatorType::Screen>();
 
 	auto result = screen->setValue((float)1920 / 1080, I3T_OUTPUT1);
 	EXPECT_EQ(result.status, ValueSetResult::Status::Ok);

@@ -112,7 +112,7 @@ void FrustumManipulator::update()
 	{
 		return;
 	}
-	auto* editedfrustum = (Core::TransformImpl<ETransformType::Frustum>*)m_editednode.get();
+	auto* editedfrustum = (Core::TransformImpl<Core::ETransformType::Frustum>*)m_editednode.get();
 	m_edited = m_editednode->getData().getMat4();
 
 	unsigned char sel =

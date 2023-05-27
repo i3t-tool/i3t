@@ -16,8 +16,7 @@
 #include "Utils/Math.h"
 #include "Utils/Variant.h"
 
-/// \todo MH - Will be removed
-namespace Core::Transform
+namespace Core
 {
 /// In column-major order.
 class DataMap
@@ -33,7 +32,6 @@ public:
 
 	unsigned char operator[](size_t i) const { return m_data[i]; };
 };
-} // namespace Core::Transform
 
 /** An operator value type = type of the interconnection wire. */
 enum class EValueType
@@ -50,8 +48,6 @@ enum class EValueType
 	Ptr,
 };
 
-namespace Core
-{
 /**
  * \brief Float value editable status: b1, b2 - b1 is editable bit, b2 is
  * synergies bit
@@ -68,16 +64,7 @@ enum class EValueState
 	Locked = 0x0000,      ///< 00
 	LockedSyn = 0x0001,   ///< 01
 };
-} // namespace Core
 
-/**
- * \brief string name of the wire type
- * \param type Enum of the value of the wire
- * \return string name of the wire type
- */
-const std::string& valueTypeToString(EValueType type);
-
-/// \todo MH Add to the Core namespace.
 /**
  * Representation of the interconnection wire value
  * (Shared piece of memory - union of all data types passed along the wire)
@@ -86,7 +73,7 @@ const std::string& valueTypeToString(EValueType type);
  *
  * Old name was Transmitter in I3T v1.
  */
-class DataStore
+class Data
 {
 public:
 	EValueType opValueType; ///< wire type, such as Float or 4x4 Matrix
@@ -97,17 +84,17 @@ public:
 public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and
 	 * undefined value (a unit matrix) */
-	DataStore() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
+	Data() : opValueType(EValueType::Matrix) { m_value = glm::mat4(1.0f); }
 
-	explicit DataStore(float val) : opValueType(EValueType::Float) { m_value = val; }
+	explicit Data(float val) : opValueType(EValueType::Float) { m_value = val; }
 
-	explicit DataStore(const glm::vec3& val) : opValueType(EValueType::Vec3) { m_value = val; }
+	explicit Data(const glm::vec3& val) : opValueType(EValueType::Vec3) { m_value = val; }
 
-	explicit DataStore(const glm::vec4& val) : opValueType(EValueType::Vec4) { m_value = val; }
+	explicit Data(const glm::vec4& val) : opValueType(EValueType::Vec4) { m_value = val; }
 
-	explicit DataStore(const glm::mat4& val) : opValueType(EValueType::Matrix) { m_value = val; }
+	explicit Data(const glm::mat4& val) : opValueType(EValueType::Matrix) { m_value = val; }
 
-	explicit DataStore(EValueType valueType);
+	explicit Data(EValueType valueType);
 
 	[[nodiscard]] bool isPulseTriggered() const { return std::get<bool>(m_value); }
 
@@ -139,7 +126,7 @@ public:
 
 	template <typename T> void setValue(T&& val) { m_value = val; }
 
-	void setValue(const DataStore& other) { *this = other; }
+	void setValue(const Data& other) { *this = other; }
 
 	std::size_t index() const { return m_value.index(); }
 
@@ -148,7 +135,7 @@ private:
 };
 
 template <typename T>
-std::optional<std::remove_reference_t<T>> DataStore::getValue() const
+std::optional<std::remove_reference_t<T>> Data::getValue() const
 {
 	if (index() != variant_index<Storage, std::remove_reference_t<T>>())
 	{
@@ -157,11 +144,4 @@ std::optional<std::remove_reference_t<T>> DataStore::getValue() const
 
 	return std::get<std::remove_reference_t<T>>(m_value);
 }
-
-namespace Core
-{
-/**
- * \brief A synonym for DataStore - used for storage of DefaultValues[key]
- */
-using Data = DataStore;
 } // namespace Core

@@ -3,8 +3,8 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Logger/Logger.h"
 
-using namespace Core;
-
+namespace Core
+{
 static IdGenerator generator;
 
 void Node::finalize()
@@ -123,7 +123,7 @@ void Node::pulse(size_t index)
 	setInternalValue(false, index);
 }
 
-DataStore& Node::getInternalData(size_t index)
+Data& Node::getInternalData(size_t index)
 {
 	I3T_ASSERT(index < m_internalData.size(), "Desired data storage does not exist!");
 
@@ -267,18 +267,18 @@ void Node::unplugOutput(size_t index)
 	m_outputs[index].unplug();
 }
 
-const Transform::DataMap* Node::getDataMap()
+const DataMap* Node::getDataMap()
 {
 	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-	static Transform::DataMap map(mapData);
+	static DataMap map(mapData);
 
 	return &map;
 }
 
-const Transform::DataMap& Node::getDataMapRef()
+const DataMap& Node::getDataMapRef()
 {
 	static std::array<const unsigned char, 16> mapData = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-	static Transform::DataMap map(mapData);
+	static DataMap map(mapData);
 
 	return map;
 }
@@ -326,4 +326,5 @@ void Node::triggerUnplugCallback(Node* fromNode, Node* toNode, size_t fromIndex,
 	{
 		callback(fromNode, toNode, fromIndex, toIndex);
 	}
+}
 }

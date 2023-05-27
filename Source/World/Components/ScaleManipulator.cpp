@@ -132,7 +132,7 @@ void ScaleManipulator::update()
 		return;
 	}
 	m_edited = m_editednode->getData().getMat4();
-	m_uniformscale = (m_editednode->as<Core::Transformation>()->hasSynergies());
+	m_uniformscale = (m_editednode->as<Core::Transform>()->hasSynergies());
 	///
 	bool transactionBegin = false;
 
@@ -318,7 +318,7 @@ void ScaleManipulator::update()
 	// v=m_editednode->setValue(glm::vec3(m_edited[0][0], m_edited[1][1],
 	// m_edited[2][2]));} if(m_editednode!=nullptr){ValueSetResult
 	// v=m_editednode->get()->setValue(glm::vec3(m_edited[0][0]));}
-	auto* editedscale = (Core::TransformImpl<ETransformType::Scale>*)m_editednode.get();
+	auto* editedscale = (Core::TransformImpl<Core::ETransformType::Scale>*)m_editednode.get();
 
 	glm::vec3 scale = {m_edited[0][0], m_edited[1][1], m_edited[2][2]};
 	editedscale->setDefaultValue("scale", scale);

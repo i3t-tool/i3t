@@ -5,7 +5,7 @@
 #include "Viewport/entity/nodes/SceneModel.h"
 
 WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
-                                     Ptr<Core::NodeBase> nodebase /*= Core::GraphManager::createSequence()*/,
+                                     Ptr<Core::Node> nodebase /*= Core::GraphManager::createSequence()*/,
                                      bool drawPins /*=true*/, bool isCameraSequence /*=false*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false), m_drawPins(drawPins),
       m_isCameraSequence(isCameraSequence)
@@ -80,7 +80,7 @@ void WorkspaceSequence::pushNode(Ptr<WorkspaceNodeWithCoreData> node, int index)
 	{
 		node_t->setRemoveFromSequence(false);
 		m_workspaceInnerTransformations.insert(m_workspaceInnerTransformations.begin() + index, node_t);
-		m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transformation>(), index);
+		m_nodebase->as<Core::Sequence>()->addMatrix(node_t->getNodebase()->as<Core::Transform>(), index);
 		node_t->m_parentSequence = std::static_pointer_cast<WorkspaceSequence>(shared_from_this());
 	}
 }

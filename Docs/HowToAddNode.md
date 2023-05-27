@@ -18,7 +18,7 @@ There are three node types
 ### Adding a new box to ``Operations.h``:
 
 a) Operators:
-- create a new enum in ``enum class ENodeType``
+- create a new enum in ``enum class EOperatorType``
 	- simple nodes that just compute output from given inputs
 	- constructors create a matrix of given type (such as translation or EulerX rotation)
 
@@ -29,8 +29,8 @@ b) Matrices (Transformations):
 - Prepare list of pin names into ``static const std::vector<std::string>s``
 
 - Add the new node into the vector of operations ()
-  - Operator: ``{n(ENodeType::Inversion), "inversion", 1, matrixInput, 1, matrixInput},``
-	- Transformation: ``{n(ENodeType::MakeTranslation), "translate", 1, vector3Input, 1, matrixInput}, // translate``
+  - Operator: ``{n(EOperatorType::Inversion), "inversion", 1, matrixInput, 1, matrixInput},``
+	- Transformation: ``{n(EOperatorType::MakeTranslation), "translate", 1, vector3Input, 1, matrixInput}, // translate``
 	- Use one of predefined version of ''Operation'' constructor, depending on existence of inputs, outputs, hover tag and explicit pin labels
 
 - Transform matrices have one more configuration vector ''ETransformType'' 
@@ -39,11 +39,11 @@ b) Matrices (Transformations):
 	- vector of editable parameters in the middle LOD (SetValues) - pairs param_name data_type EValueType)
 	
 ### Writing the operator logic in Core
-Prepare the function ``updateValues()`` of the operator (specialization of the ``NodeImpl`` template). 
+Prepare the function ``updateValues()`` of the operator (specialization of the ``Operator`` template). 
 
 An example for conversion from Euler angles to Quaternion:
 ```// EulerToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::EulerToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{

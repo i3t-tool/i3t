@@ -86,8 +86,8 @@ TEST_F(SequenceTest, UpdateIsCalledOnMatrixValueChange)
 TEST_F(SequenceTest, InternalValueCanBeReadByOperator)
 {
 	auto seq = arrangeSequence();
-	auto matMulMatNode = Core::Builder::createOperator<ENodeType::MatrixMulMatrix>();
-	auto identityMatNode = Core::Builder::createOperator<ENodeType::MatrixToMatrix>();
+	auto matMulMatNode = Core::Builder::createOperator<EOperatorType::MatrixMulMatrix>();
+	auto identityMatNode = Core::Builder::createOperator<EOperatorType::MatrixToMatrix>();
 
 	{
 		setValue_expectOk(identityMatNode, glm::mat4(1.0f));
@@ -108,7 +108,7 @@ TEST_F(SequenceTest, InternalValueCanBeSetFromOutside)
 {
 	auto seq = arrangeSequence();
 
-	auto matNode = Builder::createOperator<ENodeType::MatrixToMatrix>();
+	auto matNode = Builder::createOperator<EOperatorType::MatrixToMatrix>();
 	setValue_expectOk(matNode, generateMat4());
 
 	plug_expectOk(matNode, seq, I3T_OUTPUT0, I3T_SEQ_IN_MAT);
@@ -154,7 +154,7 @@ TEST_F(SequenceTest, RightSequenceValueOutputCanBePluggedToParentSequenceValueIn
 
 	auto seq1 = arrangeSequence();
 	auto seq2 = arrangeSequence();
-	auto mat = Builder::createOperator<ENodeType::MatrixToMatrix>();
+	auto mat = Builder::createOperator<EOperatorType::MatrixToMatrix>();
 
 	plug_expectOk(seq1, seq2, I3T_SEQ_OUT_MUL, I3T_SEQ_IN_MUL);
 
