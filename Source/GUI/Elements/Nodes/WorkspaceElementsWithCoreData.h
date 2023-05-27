@@ -11,11 +11,6 @@
 
 #include "State/NodeVisitor.h"
 
-#include <World/Components/Camera.h>
-#include <World/Components/Renderer.h>
-#include <World/HardcodedMeshes.h>
-#include <World/RenderTexture.h>
-
 class WorkspaceCorePin;
 class WorkspaceLink;
 class WorkspaceWindow;
@@ -285,8 +280,6 @@ class WorkspaceCoreOutputPinScreen : public WorkspaceCoreOutputPinWithData
 {
 private:
 	GLuint renderTexture;
-	RenderTexture* rend;
-	Camera* cam;
 
 public:
 	WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,

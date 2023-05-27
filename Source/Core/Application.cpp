@@ -15,7 +15,6 @@
 #include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
-#include "World/World.h"
 
 using namespace Core;
 
@@ -187,8 +186,6 @@ void Application::finalize()
 	for (auto& [_, m] : m_modules)
 		m->onClose();
 
-	World::end();      // TODO: (DR) Remove
-	delete m_world;    // TODO: (DR) Remove
 	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
 
 	m_window->finalize();
@@ -203,16 +200,10 @@ bool Application::initI3T()
 	const auto conf = loadConfig("Config.json");
 	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
 
-	// new scene scheme
-	bool b = World::init(); // getchar(); printf("b\n");
-	m_world = new World();
-	m_world->onStart();
-	// getchar(); printf("c\n");
-
 	m_viewport = new Vp::Viewport();
 	m_viewport->init(Vp::ViewportSettings());
 
-	return b;
+	return true;
 }
 
 Application& Application::get() { return *s_instance; }

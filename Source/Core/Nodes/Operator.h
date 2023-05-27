@@ -10,8 +10,6 @@
 
 #include "Core/Nodes/Node.h"
 
-#include "World/GameObject.h"
-
 namespace Core
 {
 template <EOperatorType T> class Operator;

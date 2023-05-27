@@ -8,8 +8,6 @@
 #include "Core/Input/InputManager.h"
 #include "Logger/Logger.h"
 
-#include "../../../World/Select.h"
-
 #include "../Nodes/WorkspaceElementsWithCoreData.h"
 
 #include "GUI/Toolkit.h"
