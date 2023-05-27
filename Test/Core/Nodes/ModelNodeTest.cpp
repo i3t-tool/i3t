@@ -5,7 +5,6 @@
 #include "Generator.h"
 #include "Utils.h"
 #include "Viewport/entity/GameObject.h"
-#include "World/GameObject.h"
 
 using namespace Core;
 

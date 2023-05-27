@@ -563,31 +563,16 @@ WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, 
                                                            Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
     : WorkspaceCoreOutputPinWithData(diwne, id, pin, node)
 {
-	// tohle nema smysl tady - muselo by se v camera update, resp. v render()
-	// glClearColor(Config::BACKGROUND_COLOR.x, Config::BACKGROUND_COLOR.y,
-	// Config::BACKGROUND_COLOR.z, 1.0f); glClear(GL_COLOR_BUFFER_BIT |
-	// GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	// TODO: (DR) Maybe remove? Not sure what this is doing, screen is drawn in
-	// the WorkspaceScreen node content
-
-	// todo - size dle velikosti krabicky a dle zoomu
-	rend = new RenderTexture(&renderTexture, 256,
-	                         256); // create FBO and texture as attachment
-	cam = new Camera(60.0f, Application::get().world()->sceneRoot,
-	                 rend); // connet textre with camera
-	cam->update();
 }
+
 bool WorkspaceCoreOutputPinScreen::drawData()
 {
 	// TODO: (DR) This seems unused?
+	// TODO: (DR) Remove this or whole class, maybe?
 	if (getCorePin().isPluggedIn())
 	{
 		glm::mat4 camera =
 		    Core::GraphManager::getParent(getNode().getNodebase())->getData(2).getMat4(); /* JH why magic 2? */
-
-		cam->m_perspective = camera;
-		cam->update();
 
 		// ImGui::Image((void*)(intptr_t)renderTexture,I3T::getSize(ESizeVec2::Nodes_ScreenTextureSize),ImVec2(0.0f,1.0f),
 		// ImVec2(1,0));
