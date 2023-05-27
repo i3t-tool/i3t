@@ -52,7 +52,7 @@ private:
 	EMode m_mode = EMode::Repeat;
 
 public:
-	Cycle() : NodeBase(&g_CycleProperties) {}
+	Cycle() : Node(&g_CycleProperties) {}
 
 	Ptr<Node> clone() override;
 
@@ -110,5 +110,5 @@ private:
 	void updateValue(float increment);
 };
 
-FORCE_INLINE bool isCycle(const NodePtr& node) { return node->getOperation()->keyWord == g_CycleProperties.keyWord; }
+FORCE_INLINE bool isCycle(const Ptr<Node>& node) { return node->getOperation()->keyWord == g_CycleProperties.keyWord; }
 } // namespace Core

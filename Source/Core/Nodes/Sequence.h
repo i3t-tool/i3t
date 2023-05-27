@@ -12,7 +12,7 @@ namespace Core
 class IModelProxy;
 class MatrixTracker;
 
-using Matrices = std::vector<Ptr<Transformation>>;
+using Matrices = std::vector<Ptr<Transform>>;
 
 constexpr size_t I3T_SEQ_IN_MUL = 0; // owned by multiplier
 constexpr size_t I3T_SEQ_IN_MAT = 1; // owned by storage
@@ -45,7 +45,7 @@ class Sequence : public Node
 {
 	friend class GraphManager;
 
-	using Matrix = NodeBase;
+	using Matrix = Node;
 
 	friend class Storage;
 
@@ -57,13 +57,13 @@ class Sequence : public Node
 	public:
 		Storage(Sequence& sequence) : m_sequence(sequence) {}
 
-		ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept { return addMatrix(matrix, 0); };
-		ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
-		Ptr<Transformation> popMatrix(const int index);
+		ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept { return addMatrix(matrix, 0); };
+		ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
+		Ptr<Transform> popMatrix(const int index);
 		void swap(int from, int to);
 
 	private:
-		std::vector<Ptr<Transformation>> m_matrices;
+		std::vector<Ptr<Transform>> m_matrices;
 
 		Sequence& m_sequence;
 	};
@@ -74,7 +74,7 @@ public:
 
 	Ptr<Node> clone() override;
 
-	ValueSetResult addMatrix(Ptr<Transformation> matrix) noexcept;
+	ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept;
 
 	/**
 	 * Pass matrix to a sequence. Sequence takes ownership of matrix.
@@ -82,7 +82,7 @@ public:
 	 * \param matrix Matrix to transfer.
 	 * \param index New position of matrix.
 	 */
-	ValueSetResult addMatrix(Ptr<Transformation> matrix, size_t index) noexcept;
+	ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
 
 	const Matrices& getMatrices() const { return m_storage.m_matrices; }
 
@@ -95,12 +95,12 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transformation>& getMatRef(size_t idx) { return m_storage.m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Transform>& getMatRef(size_t idx) { return m_storage.m_matrices.at(idx); }
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.
 	 */
-	[[nodiscard]] Ptr<Transformation> popMatrix(const int index);
+	[[nodiscard]] Ptr<Transform> popMatrix(const int index);
 
 	void swap(int from, int to);
 
@@ -115,14 +115,14 @@ private:
 	MatrixTracker* m_tracker;
 };
 
-FORCE_INLINE Ptr<Sequence> toSequence(Ptr<NodeBase> node)
+FORCE_INLINE Ptr<Sequence> toSequence(Ptr<Node> node)
 {
 	if (node == nullptr)
 		return nullptr;
 	return node->as<Sequence>();
 }
 
-FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transformation>>& matrices)
+FORCE_INLINE glm::mat4 getMatProduct(const std::vector<Ptr<Transform>>& matrices)
 {
 	glm::mat4 result(1.0f);
 	for (const auto& mat : matrices)

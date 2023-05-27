@@ -561,7 +561,7 @@ TEST(EulerTest, XYZAngleSetShouldBeCorrect)
 {
 	// setting of euler angles to matrices creates the as matrices as rotating
 	// around individual axes
-	std::array<NodePtr, 3> rots = {
+	std::array<Ptr<Node>, 3> rots = {
 	    Builder::createTransform<ETransformType::EulerX>(),
 	    Builder::createTransform<ETransformType::EulerY>(),
 	    Builder::createTransform<ETransformType::EulerZ>(),

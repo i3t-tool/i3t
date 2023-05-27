@@ -60,7 +60,7 @@ TEST(ScaleTest, ResetToInitialValues)
 	glm::mat4 mat(1.0f);
 	mat[1][3] = 165.0f;
 
-	setValue_expectOk(scaleNode->as<Transformation>(), mat);
+	setValue_expectOk(scaleNode->as<Transform>(), mat);
 	{
 		const glm::mat4 data = scaleNode->getData().getMat4();
 

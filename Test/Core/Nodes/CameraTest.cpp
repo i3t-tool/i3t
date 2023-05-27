@@ -9,7 +9,7 @@ using namespace Core;
 TEST(CameraNodeTest, CameraNodeCanBePluggedToScreenNode)
 {
 	auto cameraNode = GraphManager::createCamera();
-	auto screenNode = Builder::createOperator<ENodeType::Screen>();
+	auto screenNode = Builder::createOperator<EOperatorType::Screen>();
 
 	auto perspectiveProj = Builder::createTransform<ETransformType::Perspective>();
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();

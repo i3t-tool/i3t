@@ -1,7 +1,7 @@
 #pragma once
 #include "WorkspaceElementsWithCoreData.h"
 
-template <ENodeType T> class WorkspaceOperator : public WorkspaceNodeWithCoreDataWithPins
+template <Core::EOperatorType T> class WorkspaceOperator : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
 	WorkspaceOperator(DIWNE::Diwne& diwne) : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<T>())
@@ -52,12 +52,12 @@ public:
 	}
 };
 
-class WorkspaceAngleAxisToQuat : public WorkspaceOperator<ENodeType::AngleAxisToQuat>
+class WorkspaceAngleAxisToQuat : public WorkspaceOperator<Core::EOperatorType::AngleAxisToQuat>
 {
 public:
 	bool m_halfAngle;
 	WorkspaceAngleAxisToQuat(DIWNE::Diwne& diwne)
-	    : WorkspaceOperator<ENodeType::AngleAxisToQuat>(diwne),
+	    : WorkspaceOperator<Core::EOperatorType::AngleAxisToQuat>(diwne),
 	      m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
 	{
 	}

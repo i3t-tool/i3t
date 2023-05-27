@@ -19,7 +19,7 @@ public:
 	const char* getComponentType() { return LookAtManipulator::s_type; };
 
 	static const int EDIT_CENTER = 1, EDIT_EYE = 2;
-	Ptr<Core::NodeBase> m_editednode;
+	Ptr<Core::Node> m_editednode;
 	Ptr<Core::Sequence> m_parent;
 
 private:

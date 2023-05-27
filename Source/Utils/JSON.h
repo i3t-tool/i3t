@@ -243,43 +243,43 @@ inline glm::mat4 getMat(const rapidjson::Value& value)
 
 //
 
-inline std::optional<DataStore> getData(const rapidjson::Value& value, EValueType dataType)
+inline std::optional<Core::Data> getData(const rapidjson::Value& value, Core::EValueType dataType)
 {
 	switch (dataType)
 	{
-	case EValueType::Float:
+	case Core::EValueType::Float:
 	{
 		if (!value.IsFloat())
 			return std::nullopt;
 
-		return DataStore{value.GetFloat()};
+		return Core::Data{value.GetFloat()};
 	}
-	case EValueType::Vec3:
+	case Core::EValueType::Vec3:
 	{
 		if (!value.IsArray() || value.GetArray().Size() != 3)
 			return std::nullopt;
 
-		return DataStore{getVec3(value)};
+		return Core::Data{getVec3(value)};
 	}
-	case EValueType::Vec4:
+	case Core::EValueType::Vec4:
 	{
 		if (!value.IsArray() || value.GetArray().Size() != 4)
 			return std::nullopt;
 
-		return DataStore{getVec4(value)};
+		return Core::Data{getVec4(value)};
 	}
-	case EValueType::Matrix:
+	case Core::EValueType::Matrix:
 	{
 		if (!value.IsArray() || value.GetArray().Size() != 4)
 			return std::nullopt;
 
-		return DataStore{getMat(value)};
+		return Core::Data{getMat(value)};
 	}
-	case EValueType::Quat:
-	case EValueType::Pulse:
-	case EValueType::MatrixMul:
-	case EValueType::Screen:
-	case EValueType::Ptr:
+	case Core::EValueType::Quat:
+	case Core::EValueType::Pulse:
+	case Core::EValueType::MatrixMul:
+	case Core::EValueType::Screen:
+	case Core::EValueType::Ptr:
 		break;
 	}
 

@@ -148,11 +148,11 @@ public:
 
 	void detectRotationTransformAndSetFloatMode(auto node)
 	{
-		if (std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerX>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerY>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::EulerZ>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::Quat>>(node) != nullptr ||
-		    std::dynamic_pointer_cast<WorkspaceTransformation_s<ETransformType::AxisAngle>>(node) != nullptr)
+		if (std::dynamic_pointer_cast<WorkspaceTransformation_s<Core::ETransformType::EulerX>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<Core::ETransformType::EulerY>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<Core::ETransformType::EulerZ>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<Core::ETransformType::Quat>>(node) != nullptr ||
+		    std::dynamic_pointer_cast<WorkspaceTransformation_s<Core::ETransformType::AxisAngle>>(node) != nullptr)
 		{
 			std::dynamic_pointer_cast<WorkspaceNodeWithCoreData>(node).get()->setFloatPopupMode(FloatPopupMode::Angle);
 		}
@@ -281,9 +281,9 @@ template <typename T> auto inline addNodeToNodeEditorNoSave(ImVec2 const positio
 
 //
 
-bool connectNodesNoSave(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin);
+bool connectNodesNoSave(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWithCoreData> rhs, int lhsPin, int rhsPin);
 
-inline bool connectNodes(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
+inline bool connectNodes(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWithCoreData> rhs, int lhsPin, int rhsPin)
 {
 	const auto result = connectNodesNoSave(lhs, rhs, lhsPin, rhsPin);
 	if (result)

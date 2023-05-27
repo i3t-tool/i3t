@@ -125,13 +125,13 @@ namespace Core
 
 // PF todo: hasSynergies have only nodes with m_hasMenuSynergies
 
-template <ETransformType T> class TransformImpl : public Transformation
+template <ETransformType T> class TransformImpl : public Transform
 {
 };
 
 namespace Builder
 {
-template <ETransformType T> Ptr<Transformation> createTransform()
+template <ETransformType T> Ptr<Transform> createTransform()
 {
 	// const auto defaultValues = getTransformDefaults(T);  //\todo PF - not
 	// used????
@@ -144,10 +144,10 @@ template <ETransformType T> Ptr<Transformation> createTransform()
 }
 } // namespace Builder
 
-template <> class TransformImpl<ETransformType::Free> : public Transformation
+template <> class TransformImpl<ETransformType::Free> : public Transform
 {
 public:
-	TransformImpl() : Transformation(getTransformOperation(ETransformType::Free)) {}
+	TransformImpl() : Transform(getTransformOperation(ETransformType::Free)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Free)
 
@@ -169,10 +169,10 @@ public:
 	};
 };
 
-template <> class TransformImpl<ETransformType::Scale> : public Transformation
+template <> class TransformImpl<ETransformType::Scale> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Scale))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Scale))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -200,10 +200,10 @@ public:
  *   0      0       0       1
  * \endcode
  */
-template <> class TransformImpl<ETransformType::EulerX> : public Transformation
+template <> class TransformImpl<ETransformType::EulerX> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerX))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::EulerX))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -230,10 +230,10 @@ public:
  *    0      0     0      1
  * \endcode
  */
-template <> class TransformImpl<ETransformType::EulerY> : public Transformation
+template <> class TransformImpl<ETransformType::EulerY> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerY))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::EulerY))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -260,10 +260,10 @@ public:
  *     0        0      0    1
  * \endcode
  */
-template <> class TransformImpl<ETransformType::EulerZ> : public Transformation
+template <> class TransformImpl<ETransformType::EulerZ> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::EulerZ))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::EulerZ))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -282,10 +282,10 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Translation> : public Transformation
+template <> class TransformImpl<ETransformType::Translation> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Translation)) {}
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Translation)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Translation)
 
@@ -302,10 +302,10 @@ public:
 
 //===-- Other transformations ---------------------------------------------===//
 
-template <> class TransformImpl<ETransformType::AxisAngle> : public Transformation
+template <> class TransformImpl<ETransformType::AxisAngle> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::AxisAngle)) {}
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::AxisAngle)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::AxisAngle)
 
@@ -329,13 +329,13 @@ public:
  * of the default quaternion (and matrix determinant, which should be 1 all the
  * times).
  */
-template <> class TransformImpl<ETransformType::Quat> : public Transformation
+template <> class TransformImpl<ETransformType::Quat> : public Transform
 {
 	// glm::quat m_initialQuat;  // stored as the defaultValue "quat"
 	glm::quat m_normalized;
 
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Quat))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Quat))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies(); ///> PF: enableSynergies(); means "normalize" the set
@@ -369,10 +369,10 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Ortho> : public Transformation
+template <> class TransformImpl<ETransformType::Ortho> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Ortho))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Ortho))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -388,10 +388,10 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Perspective> : public Transformation
+template <> class TransformImpl<ETransformType::Perspective> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Perspective)) {}
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Perspective)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::Perspective)
 
@@ -403,10 +403,10 @@ public:
 	void resetMatrixFromDefaults() override;
 };
 
-template <> class TransformImpl<ETransformType::Frustum> : public Transformation
+template <> class TransformImpl<ETransformType::Frustum> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::Frustum))
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::Frustum))
 	{
 		m_hasMenuSynergies = true;
 		enableSynergies();
@@ -425,10 +425,10 @@ public:
 /**
  * Same as perspective projection node, but all values are locked.
  */
-template <> class TransformImpl<ETransformType::LookAt> : public Transformation
+template <> class TransformImpl<ETransformType::LookAt> : public Transform
 {
 public:
-	explicit TransformImpl() : Transformation(getTransformOperation(ETransformType::LookAt)) {}
+	explicit TransformImpl() : Transform(getTransformOperation(ETransformType::LookAt)) {}
 
 	I3T_TRANSFORM_CLONE(ETransformType::LookAt)
 

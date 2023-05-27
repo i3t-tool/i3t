@@ -2,6 +2,8 @@
 
 #include "Core/Nodes/GraphManager.h"
 
+using namespace Core;
+
 /**
  * This code demonstrates how to use default values of transforms.
  */

@@ -1,5 +1,5 @@
 /**
- * \file Core/NodeImpl.h
+ * \file Core/Operator.h
  * \author Martin Herich, hericmar@fel.cvut.cz
  * \date 18.11.2020
  */
@@ -14,7 +14,7 @@
 
 namespace Core
 {
-template <ENodeType T> class NodeImpl;
+template <EOperatorType T> class Operator;
 
 namespace Builder
 {
@@ -24,9 +24,9 @@ namespace Builder
  * \tparam T Operation type from OperationType enum.
  * \return Unique pointer to newly created logic operator.
  */
-template <ENodeType T> Ptr<NodeBase> createOperator()
+template <EOperatorType T> Ptr<Node> createOperator()
 {
-	auto ret = std::make_shared<::Core::NodeImpl<T>>();
+	auto ret = std::make_shared<::Core::Operator<T>>();
 	ret->init();
 	ret->updateValues(0);
 
@@ -35,11 +35,11 @@ template <ENodeType T> Ptr<NodeBase> createOperator()
 } // namespace Builder
 
 /**
- * Implementation of NodeBase class.
+ * Implementation of Node class.
  *
  * \tparam T Type of node to be created.
  */
-template <ENodeType T> class NodeImpl : public Node
+template <EOperatorType T> class Operator : public Node
 {
 public:
 	/**
@@ -48,12 +48,12 @@ public:
 	 * <b>DON'T</b> construct object directly, use Core::Builder::createOperator()
 	 * function.
 	 *
-	 * Code taken from I3T v1 NodeImpl<OperatorType>::NodeImpl(...).
+	 * Code taken from I3T v1 Operator<OperatorType>::Operator(...).
 	 * Operator is no more associated with GUI, as used to be, so no input
 	 * or output names are assigned here.
 	 */
-	NodeImpl();
-	~NodeImpl() override = default;
+	Operator();
+	~Operator() override = default;
 
 	Ptr<Node> clone() override
 	{
@@ -71,7 +71,7 @@ public:
 	}
 
 	/**
-	 * Implementation of virtual function NodeBase::updateValues(int).
+	 * Implementation of virtual function Node::updateValues(int).
 	 *
 	 * Implementation differs for each template parameter. See end of the file
 	 * for more details.
@@ -84,17 +84,17 @@ public:
 //===-- Member template function definitions.
 //------------------------------===//
 
-template <ENodeType T> NodeImpl<T>::NodeImpl() : NodeBase(&operations[static_cast<unsigned>(T)]) {}
+template <EOperatorType T> Operator<T>::Operator() : Node(&operations[static_cast<unsigned>(T)]) {}
 
 //===-----------------------------------------------------------------------===//
 
-template <ENodeType T> void NodeImpl<T>::updateValues(int inputIndex)
+template <EOperatorType T> void Operator<T>::updateValues(int inputIndex)
 {
 	I3T_ABORT("This function should be specialized!");
 }
 
 // inversion
-template <> FORCE_INLINE void NodeImpl<ENodeType::Inversion>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Inversion>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -107,7 +107,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Inversion>::updateValues(int i
 }
 
 // transpose
-template <> FORCE_INLINE void NodeImpl<ENodeType::Transpose>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Transpose>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -120,7 +120,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Transpose>::updateValues(int i
 }
 
 // determinant
-template <> FORCE_INLINE void NodeImpl<ENodeType::Determinant>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Determinant>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -133,7 +133,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Determinant>::updateValues(int
 }
 
 // mat * mat
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -156,7 +156,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulMatrix>::updateValues
 }
 
 // MatrixAddMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixAddMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixAddMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -177,7 +177,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixAddMatrix>::updateValues
 }
 
 // MatrixMulVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -194,7 +194,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulVector>::updateValues
 }
 
 // VectorMulMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorMulMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -214,7 +214,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulMatrix>::updateValues
 }
 
 // FloatMulMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -236,7 +236,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixMulFloat>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorDotVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorDotVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -251,7 +251,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorDotVector>::updateValues
 }
 
 // VectorAddVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorAddVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorAddVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -272,7 +272,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorAddVector>::updateValues
 }
 
 // VectorSubVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorSubVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorSubVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -293,7 +293,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorSubVector>::updateValues
 }
 
 // VectorMulFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -310,7 +310,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorMulFloat>::updateValues(
 }
 
 // VectorPerspectiveDivision
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorPerspectiveDivision>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorPerspectiveDivision>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -324,7 +324,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorPerspectiveDivision>::up
 }
 
 // NormalizeVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::NormalizeVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -337,7 +337,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeVector>::updateValues
 }
 
 // MixVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::MixVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MixVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -359,7 +359,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MixVector>::updateValues(int i
 }
 
 // Vector3CrossVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3CrossVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3CrossVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -379,7 +379,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3CrossVector3>::updateVa
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3DotVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3DotVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -395,7 +395,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3DotVector3>::updateValu
 }
 
 // Vector3AddVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3AddVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3AddVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -416,7 +416,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3AddVector3>::updateValu
 }
 
 // Vector3SubVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3SubVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3SubVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -437,7 +437,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3SubVector3>::updateValu
 }
 
 // Vector3MulFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3MulFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3MulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -454,7 +454,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3MulFloat>::updateValues
 }
 
 // NormalizeVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::NormalizeVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -467,7 +467,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeVector3>::updateValue
 }
 
 // Vector3Length
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3Length>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3Length>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -480,7 +480,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3Length>::updateValues(i
 }
 
 // ShowVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::ShowVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::ShowVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -513,7 +513,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ShowVector3>::updateValues(int
 }
 
 // MixVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::MixVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MixVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -535,7 +535,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MixVector3>::updateValues(int 
 }
 
 // ConjQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::ConjQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::ConjQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -548,7 +548,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ConjQuat>::updateValues(int in
 }
 
 // FloatVecToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatVecToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatVecToQuat>::updateValues(int inputIndex)
 {
 	// PF (1,0,0,0) if (nothing connected) w=1; else w=0;
 
@@ -569,7 +569,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatVecToQuat>::updateValues(
 }
 
 // AngleAxisToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::AngleAxisToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::AngleAxisToQuat>::updateValues(int inputIndex)
 {
 	/*
 \todo
@@ -614,7 +614,7 @@ else {
 }
 
 // VecVecToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::VecVecToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VecVecToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -628,7 +628,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VecVecToQuat>::updateValues(in
 }
 
 // QuatToFloatVec
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToFloatVec>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloatVec>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -643,7 +643,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToFloatVec>::updateValues(
 }
 
 // QuatToAngleAxis
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToAngleAxis>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatToAngleAxis>::updateValues(int inputIndex)
 {
 	// angle
 	if (m_inputs[0].isPluggedIn())
@@ -664,7 +664,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToAngleAxis>::updateValues
 }
 
 // QuatToEuler
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToEuler>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatToEuler>::updateValues(int inputIndex)
 {
 	// angle
 	if (m_inputs[0].isPluggedIn())
@@ -685,7 +685,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToEuler>::updateValues(int
 }
 
 // EulerToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::EulerToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -700,7 +700,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::EulerToQuat>::updateValues(int
 }
 
 // QuatInverse
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatInverse>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatInverse>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -713,7 +713,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatInverse>::updateValues(int
 }
 
 // QuatSlerp
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatSlerp>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatSlerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -780,7 +780,7 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 }
 
 // QuatLongWaySlerp
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLongWaySlerp>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatLongWaySlerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -797,7 +797,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLongWaySlerp>::updateValue
 }
 
 // QuatLerp
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLerp>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatLerp>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -820,7 +820,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLerp>::updateValues(int in
 }
 
 // FloatMulQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatMulQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatMulQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -841,7 +841,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatMulQuat>::updateValues(in
 }
 
 // QuatMulQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatMulQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatMulQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -862,7 +862,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatMulQuat>::updateValues(int
 }
 
 // QuatVecConjQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatVecConjQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatVecConjQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -891,7 +891,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatVecConjQuat>::updateValues
 }
 
 // QuatLength
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLength>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatLength>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -904,7 +904,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatLength>::updateValues(int 
 }
 
 // ClampFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::ClampFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::ClampFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -930,7 +930,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ClampFloat>::updateValues(int 
 }
 
 // FloatMulFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatMulFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatMulFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -951,7 +951,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatMulFloat>::updateValues(i
 }
 
 // FloatDivFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatDivFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatDivFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -971,7 +971,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatDivFloat>::updateValues(i
 	}
 }
 // FloatAddFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatAddFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatAddFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -992,7 +992,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatAddFloat>::updateValues(i
 }
 
 // FloatPowFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatPowFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatPowFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -1013,7 +1013,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatPowFloat>::updateValues(i
 }
 
 // MixFloat
-template <> FORCE_INLINE void NodeImpl<ENodeType::MixFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MixFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -1035,7 +1035,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MixFloat>::updateValues(int in
 }
 
 // FloatSinCos
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatSinCos>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatSinCos>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1050,7 +1050,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatSinCos>::updateValues(int
 }
 
 // ASinACos
-template <> FORCE_INLINE void NodeImpl<ENodeType::ASinACos>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::ASinACos>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1065,7 +1065,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::ASinACos>::updateValues(int in
 }
 
 // Signum
-template <> FORCE_INLINE void NodeImpl<ENodeType::Signum>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Signum>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1079,7 +1079,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Signum>::updateValues(int inpu
 }
 
 // MatrixToVectors
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToVectors>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixToVectors>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1098,7 +1098,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToVectors>::updateValues
 }
 
 // Vectors3ToMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vectors3ToMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vectors3ToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4();
 
@@ -1115,7 +1115,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vectors3ToMatrix>::updateValue
 }
 
 // VectorsToMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorsToMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorsToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4();
 
@@ -1132,7 +1132,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorsToMatrix>::updateValues
 }
 
 // MatrixToFloats
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToFloats>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixToFloats>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4();
 
@@ -1151,7 +1151,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToFloats>::updateValues(
 }
 
 // FloatsToMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatsToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4();
 
@@ -1168,7 +1168,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToMatrix>::updateValues(
 }
 
 // MatrixToTR
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToTR>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixToTR>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1185,7 +1185,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToTR>::updateValues(int 
 }
 
 // TRToMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::TRToMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::TRToMatrix>::updateValues(int inputIndex)
 {
 	glm::mat4 tmp = glm::mat4();
 
@@ -1205,7 +1205,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::TRToMatrix>::updateValues(int 
 }
 
 // MatrixToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1218,7 +1218,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToQuat>::updateValues(in
 }
 
 // QuatToMatrix
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatToMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1231,7 +1231,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToMatrix>::updateValues(in
 }
 
 // VectorToFloats
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToFloats>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorToFloats>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1250,7 +1250,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToFloats>::updateValues(
 }
 
 // FloatsToVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatsToVector>::updateValues(int inputIndex)
 {
 	glm::vec4 tmp = glm::vec4();
 
@@ -1267,7 +1267,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToVector>::updateValues(
 }
 
 // VectorTVector3ToFloatsoFloats
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToFloats>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToFloats>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1284,7 +1284,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToFloats>::updateValues
 }
 
 // FloatsToVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatsToVector3>::updateValues(int inputIndex)
 {
 	glm::vec3 tmp = glm::vec3();
 
@@ -1299,7 +1299,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToVector3>::updateValues
 }
 
 // VectorToVector3
-template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::VectorToVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1312,7 +1312,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::VectorToVector3>::updateValues
 }
 
 // Vector3ToVector
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToVector>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -1331,7 +1331,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector>::updateValues
 }
 
 // QuatToFloats
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToFloats>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloats>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1350,7 +1350,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToFloats>::updateValues(in
 }
 
 // FloatsToQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatsToQuat>::updateValues(int inputIndex)
 {
 	glm::quat tmp = glm::quat(); // PF (1,0,0,0) if (nothing connected) w=1; else w=0;
 
@@ -1370,7 +1370,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatsToQuat>::updateValues(in
 }
 
 // NormalizeQuat
-template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::NormalizeQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1382,7 +1382,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::NormalizeQuat>::updateValues(i
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::FloatToFloat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::FloatToFloat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1390,7 +1390,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::FloatToFloat>::updateValues(in
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector3>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector3ToVector3>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1398,7 +1398,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector3ToVector3>::updateValue
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Vector4ToVector4>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Vector4ToVector4>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1406,7 +1406,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Vector4ToVector4>::updateValue
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToQuat>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::QuatToQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1414,7 +1414,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::QuatToQuat>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToMatrix>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MatrixToMatrix>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1422,7 +1422,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MatrixToMatrix>::updateValues(
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeTranslation>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeTranslation>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1430,7 +1430,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeTranslation>::updateValues
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerX>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerX>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1438,7 +1438,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerX>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerY>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerY>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1446,7 +1446,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerY>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerZ>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeEulerZ>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1454,7 +1454,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeEulerZ>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeScale>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeScale>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn())
 	{
@@ -1462,7 +1462,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeScale>::updateValues(int i
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeAxisAngle>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeAxisAngle>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1470,7 +1470,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeAxisAngle>::updateValues(i
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeOrtho>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeOrtho>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1480,7 +1480,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeOrtho>::updateValues(int i
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakePerspective>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakePerspective>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1489,7 +1489,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakePerspective>::updateValues
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeFrustum>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeFrustum>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1499,7 +1499,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeFrustum>::updateValues(int
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::MakeLookAt>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1508,7 +1508,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::MakeLookAt>::updateValues(int 
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Screen>::updateValues(int inputIndex)
 {
 	if (areAllInputsPlugged())
 	{
@@ -1516,7 +1516,7 @@ template <> FORCE_INLINE void NodeImpl<ENodeType::Screen>::updateValues(int inpu
 	}
 }
 
-template <> FORCE_INLINE void NodeImpl<ENodeType::Pulse>::updateValues(int inputIndex)
+template <> FORCE_INLINE void Operator<EOperatorType::Pulse>::updateValues(int inputIndex)
 {
 	/*
 if (m_outputs[0].isPluggedIn())

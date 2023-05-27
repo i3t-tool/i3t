@@ -16,7 +16,7 @@ class OperatorBuilder
 public:
 	OperatorBuilder() noexcept
 	{
-		constexpr std::size_t maxCount = magic_enum::enum_count<ENodeType>() - 1;
+		constexpr std::size_t maxCount = magic_enum::enum_count<Core::EOperatorType>() - 1;
 		doFor<0, maxCount>();
 	}
 
@@ -29,7 +29,7 @@ public:
 private:
 	template <int N, int Max> constexpr void doFor() noexcept
 	{
-		constexpr auto enumValue = static_cast<ENodeType>(N);
+		constexpr auto enumValue = static_cast<Core::EOperatorType>(N);
 		m_createFns[magic_enum::enum_name(enumValue)] = addNodeToNodeEditorNoSave<WorkspaceOperator<enumValue>>;
 
 		if constexpr (N < Max)
@@ -48,7 +48,7 @@ class TransformBuilder
 public:
 	TransformBuilder() noexcept
 	{
-		constexpr std::size_t maxCount = magic_enum::enum_count<ETransformType>() - 1;
+		constexpr std::size_t maxCount = magic_enum::enum_count<Core::ETransformType>() - 1;
 		doFor<0, maxCount>();
 	}
 
@@ -61,7 +61,7 @@ public:
 private:
 	template <int N, int Max> constexpr void doFor() noexcept
 	{
-		constexpr auto enumValue = static_cast<ETransformType>(N);
+		constexpr auto enumValue = static_cast<Core::ETransformType>(N);
 		m_createFns[magic_enum::enum_name(enumValue)] = addNodeToNodeEditorNoSave<WorkspaceTransformation_s<enumValue>>;
 
 		if constexpr (N < Max)

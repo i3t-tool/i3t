@@ -443,11 +443,11 @@ void WorkspaceDiwne::popupContent()
 		 * with group (transformation, operator, ...) and label*/
 		if (ImGui::MenuItem("free"))
 		{
-			addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Free>>();
+			addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Free>>();
 		}
 		if (ImGui::MenuItem("translation"))
 		{
-			addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Translation>>();
+			addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Translation>>();
 		}
 
 		if (ImGui::BeginMenu("rotation"))
@@ -455,52 +455,52 @@ void WorkspaceDiwne::popupContent()
 
 			if (ImGui::MenuItem("eulerAngleX"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerX>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::EulerX>>();
 			}
 			if (ImGui::MenuItem("eulerAngleY"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerY>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::EulerY>>();
 			}
 			if (ImGui::MenuItem("eulerAngleZ"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::EulerZ>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::EulerZ>>();
 			}
 			if (ImGui::MenuItem("axisAngle"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::AxisAngle>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::AxisAngle>>();
 			}
 			if (ImGui::MenuItem("quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Quat>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Quat>>();
 			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::MenuItem("scale"))
 		{
-			addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
+			addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Scale>>();
 		}
 		//            if (ImGui::MenuItem("non-uniform scale"))
 		//            {
-		//                addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Scale>>();
+		//                addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Scale>>();
 		//                m_workspaceCoreNodes.back()->getNodebase()->as<Core::Transformation>()->disableSynergies();
 		//            }
 		if (ImGui::MenuItem("lookAt"))
 		{
-			addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::LookAt>>();
+			addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::LookAt>>();
 		}
 		if (ImGui::BeginMenu("projection"))
 		{
 			if (ImGui::MenuItem("ortho"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Ortho>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Ortho>>();
 			}
 			if (ImGui::MenuItem("perspective"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Perspective>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Perspective>>();
 			}
 			if (ImGui::MenuItem("frustrum"))
 			{
-				addNodeToPositionOfPopup<WorkspaceTransformation_s<ETransformType::Frustum>>();
+				addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Frustum>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -512,43 +512,43 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("translate"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeTranslation>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeTranslation>>();
 			}
 			if (ImGui::MenuItem("euler AngleX"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeEulerX>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeEulerX>>();
 			}
 			if (ImGui::MenuItem("euler AngleY"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeEulerY>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeEulerY>>();
 			}
 			if (ImGui::MenuItem("euler AngleZ"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeEulerZ>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeEulerZ>>();
 			}
 			if (ImGui::MenuItem("rotate"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeAxisAngle>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeAxisAngle>>();
 			}
 			if (ImGui::MenuItem("scale"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeScale>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeScale>>();
 			}
 			if (ImGui::MenuItem("ortho"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeOrtho>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeOrtho>>();
 			}
 			if (ImGui::MenuItem("perspective"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakePerspective>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakePerspective>>();
 			}
 			if (ImGui::MenuItem("frustrum"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeFrustum>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeFrustum>>();
 			}
 			if (ImGui::MenuItem("lookAt"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MakeLookAt>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeLookAt>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -556,7 +556,7 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("matrix"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixToMatrix>>();
 			}
 			/*
 			    if (ImGui::MenuItem("trackball"))
@@ -566,35 +566,35 @@ void WorkspaceDiwne::popupContent()
 			     */
 			if (ImGui::MenuItem("inversion"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Inversion>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Inversion>>();
 			}
 			if (ImGui::MenuItem("transpose"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Transpose>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Transpose>>();
 			}
 			if (ImGui::MenuItem("determinant"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Determinant>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Determinant>>();
 			}
 			if (ImGui::MenuItem("mat * mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixMulMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixMulMatrix>>();
 			}
 			if (ImGui::MenuItem("mat + mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixAddMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixAddMatrix>>();
 			}
 			if (ImGui::MenuItem("mat * vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixMulVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixMulVector>>();
 			}
 			if (ImGui::MenuItem("vec4 * mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorMulMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorMulMatrix>>();
 			}
 			if (ImGui::MenuItem("float * mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixMulFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixMulFloat>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -602,43 +602,43 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3ToVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3ToVector3>>();
 			}
 			if (ImGui::MenuItem("show vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ShowVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::ShowVector3>>();
 			}
 			if (ImGui::MenuItem("vec3 x vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3CrossVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3CrossVector3>>();
 			}
 			if (ImGui::MenuItem("vec3 . vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3DotVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3DotVector3>>();
 			}
 			if (ImGui::MenuItem("vec3 + vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3AddVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3AddVector3>>();
 			}
 			if (ImGui::MenuItem("vec3 - vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3SubVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3SubVector3>>();
 			}
 			if (ImGui::MenuItem("float * vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3MulFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3MulFloat>>();
 			}
 			if (ImGui::MenuItem("normalize vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::NormalizeVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::NormalizeVector3>>();
 			}
 			if (ImGui::MenuItem("length(vec3)"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3Length>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3Length>>();
 			}
 			if (ImGui::MenuItem("mix vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MixVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MixVector3>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -646,35 +646,35 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector4ToVector4>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector4ToVector4>>();
 			}
 			if (ImGui::MenuItem("vec4 . vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorDotVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorDotVector>>();
 			}
 			if (ImGui::MenuItem("vec4 + vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorAddVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorAddVector>>();
 			}
 			if (ImGui::MenuItem("vec4 - vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorSubVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorSubVector>>();
 			}
 			if (ImGui::MenuItem("float * vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorMulFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorMulFloat>>();
 			}
 			if (ImGui::MenuItem("normalize vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::NormalizeVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::NormalizeVector>>();
 			}
 			if (ImGui::MenuItem("perspective division"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorPerspectiveDivision>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorPerspectiveDivision>>();
 			}
 			if (ImGui::MenuItem("mix vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MixVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MixVector>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -682,76 +682,76 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatToQuat>>();
 			}
 			if (ImGui::MenuItem("quat(float, vec3)"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatVecToQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatVecToQuat>>();
 			}
 			if (ImGui::MenuItem("quat(angle, axis)"))
 			{
-				// addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::AngleAxisToQuat>>();
+				// addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::AngleAxisToQuat>>();
 				addNodeToPositionOfPopup<WorkspaceAngleAxisToQuat>();
 			}
 			if (ImGui::MenuItem("quat(vec3, vec3)"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VecVecToQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VecVecToQuat>>();
 			}
 			if (ImGui::MenuItem("quat -> float, vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToFloatVec>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatToFloatVec>>();
 			}
 			if (ImGui::MenuItem("quat -> angle, axis"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToAngleAxis>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatToAngleAxis>>();
 			}
 			if (ImGui::MenuItem("float * quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatMulQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatMulQuat>>();
 			}
 			if (ImGui::MenuItem("quat * quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatMulQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatMulQuat>>();
 			}
 			if (ImGui::MenuItem("quat -> euler"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToEuler>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatToEuler>>();
 			}
 			if (ImGui::MenuItem("euler -> quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::EulerToQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::EulerToQuat>>();
 			}
 			if (ImGui::MenuItem("slerp"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatSlerp>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatSlerp>>();
 			}
 			if (ImGui::MenuItem("long way slerp"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatLongWaySlerp>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatLongWaySlerp>>();
 			}
 			if (ImGui::MenuItem("lerp"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatLerp>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatLerp>>();
 			}
 			if (ImGui::MenuItem("quat conjugate"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ConjQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::ConjQuat>>();
 			}
 			if (ImGui::MenuItem("qvq*"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatVecConjQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatVecConjQuat>>();
 			}
 			if (ImGui::MenuItem("inverse quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatInverse>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatInverse>>();
 			}
 			if (ImGui::MenuItem("normalize quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::NormalizeQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::NormalizeQuat>>();
 			}
 			if (ImGui::MenuItem("length(quat)"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatLength>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatLength>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -759,11 +759,11 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatToFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatToFloat>>();
 			}
 			if (ImGui::MenuItem("clamp float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ClampFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::ClampFloat>>();
 			}
 			if (ImGui::MenuItem("float cycle"))
 			{
@@ -771,35 +771,35 @@ void WorkspaceDiwne::popupContent()
 			}
 			if (ImGui::MenuItem("float * float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatMulFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatMulFloat>>();
 			}
 			if (ImGui::MenuItem("float / float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatDivFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatDivFloat>>();
 			}
 			if (ImGui::MenuItem("float + float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatAddFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatAddFloat>>();
 			}
 			if (ImGui::MenuItem("float ^ float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatPowFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatPowFloat>>();
 			}
 			if (ImGui::MenuItem("mix float"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MixFloat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MixFloat>>();
 			}
 			if (ImGui::MenuItem("sin & cos(float)"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatSinCos>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatSinCos>>();
 			}
 			if (ImGui::MenuItem("asin & acos(float)"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::ASinACos>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::ASinACos>>();
 			}
 			if (ImGui::MenuItem("signum"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Signum>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Signum>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -807,71 +807,71 @@ void WorkspaceDiwne::popupContent()
 		{
 			if (ImGui::MenuItem("mat -> TR"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToTR>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixToTR>>();
 			}
 			if (ImGui::MenuItem("TR -> mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::TRToMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::TRToMatrix>>();
 			}
 			if (ImGui::MenuItem("mat -> vecs4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToVectors>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixToVectors>>();
 			}
 			if (ImGui::MenuItem("mat -> quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixToQuat>>();
 			}
 			if (ImGui::MenuItem("mat -> floats"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::MatrixToFloats>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MatrixToFloats>>();
 			}
 			if (ImGui::MenuItem("vecs4 -> mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorsToMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorsToMatrix>>();
 			}
 			if (ImGui::MenuItem("vec4 -> vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorToVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorToVector3>>();
 			}
 			if (ImGui::MenuItem("vec4 -> floats"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::VectorToFloats>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::VectorToFloats>>();
 			}
 			if (ImGui::MenuItem("vecs3 -> mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vectors3ToMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vectors3ToMatrix>>();
 			}
 			if (ImGui::MenuItem("vec3 -> vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3ToVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3ToVector>>();
 			}
 			if (ImGui::MenuItem("vec3 -> floats"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Vector3ToFloats>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Vector3ToFloats>>();
 			}
 			if (ImGui::MenuItem("quat -> mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatToMatrix>>();
 			}
 			if (ImGui::MenuItem("quat -> floats"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::QuatToFloats>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::QuatToFloats>>();
 			}
 			if (ImGui::MenuItem("floats -> mat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToMatrix>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatsToMatrix>>();
 			}
 			if (ImGui::MenuItem("floats -> vec4"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToVector>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatsToVector>>();
 			}
 			if (ImGui::MenuItem("floats -> vec3"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToVector3>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatsToVector3>>();
 			}
 			if (ImGui::MenuItem("floats -> quat"))
 			{
-				addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::FloatsToQuat>>();
+				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatsToQuat>>();
 			}
 			ImGui::EndMenu();
 		}
@@ -891,7 +891,7 @@ void WorkspaceDiwne::popupContent()
 	}
 	if (ImGui::MenuItem("pulse"))
 	{
-		addNodeToPositionOfPopup<WorkspaceOperator<ENodeType::Pulse>>();
+		addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::Pulse>>();
 	}
 	if (ImGui::MenuItem("screen"))
 	{
@@ -1403,28 +1403,28 @@ bool WorkspaceDiwne::processCreateAndPlugTypeConstructor()
 	{
 		switch (getLastActivePin<WorkspaceCoreInputPin>()->getType())
 		{
-		case EValueType::Matrix:
-			addTypeConstructorNode<WorkspaceOperator<ENodeType::MatrixToMatrix>>();
+		case Core::EValueType::Matrix:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::MatrixToMatrix>>();
 			break;
-		case EValueType::Vec3:
-			addTypeConstructorNode<WorkspaceOperator<ENodeType::Vector3ToVector3>>();
+		case Core::EValueType::Vec3:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::Vector3ToVector3>>();
 			break;
-		case EValueType::Vec4:
-			addTypeConstructorNode<WorkspaceOperator<ENodeType::Vector4ToVector4>>();
+		case Core::EValueType::Vec4:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::Vector4ToVector4>>();
 			break;
-		case EValueType::Quat:
-			addTypeConstructorNode<WorkspaceOperator<ENodeType::QuatToQuat>>();
+		case Core::EValueType::Quat:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::QuatToQuat>>();
 			break;
-		case EValueType::Float:
-			addTypeConstructorNode<WorkspaceOperator<ENodeType::FloatToFloat>>();
+		case Core::EValueType::Float:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::FloatToFloat>>();
 			break;
-		case EValueType::Pulse:
-			addTypeConstructorNode<WorkspaceOperator<ENodeType::Pulse>>();
+		case Core::EValueType::Pulse:
+			addTypeConstructorNode<WorkspaceOperator<Core::EOperatorType::Pulse>>();
 			break;
-		case EValueType::Screen:
+		case Core::EValueType::Screen:
 			addTypeConstructorNode<WorkspaceCamera>();
 			break;
-		case EValueType::MatrixMul:
+		case Core::EValueType::MatrixMul:
 			addTypeConstructorNode<WorkspaceSequence>();
 			break;
 		}
@@ -1753,7 +1753,7 @@ void WorkspaceWindow::showEditMenu()
 
 //
 
-bool connectNodesNoSave(GuiNodePtr lhs, GuiNodePtr rhs, int lhsPin, int rhsPin)
+bool connectNodesNoSave(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWithCoreData> rhs, int lhsPin, int rhsPin)
 {
 	auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
 	if (plugResult != Core::ENodePlugResult::Ok)

@@ -68,5 +68,5 @@ inline std::vector<std::string> concat(const std::map<std::string, std::string>&
 	return vec;
 }
 
-std::vector<std::string> concat(const std::map<std::string, DataStore>& map, const std::string& delimiter);
+std::vector<std::string> concat(const std::map<std::string, Core::Data>& map, const std::string& delimiter);
 } // namespace Utils

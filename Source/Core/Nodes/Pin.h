@@ -49,18 +49,19 @@ public:
 	 *
 	 * \pre If pin is input, it must be plugged to some output pin.
 	 */
-	const DataStore& data() const;
+	const Data& data() const;
 
-	DataStore& dataMut();
+	Data& dataMut();
 
 	const char* getLabel() const;
 
 	/// "pin {index} of {node signature}"
 	std::string getSignature() const;
 
+private:
 	ENodePlugResult plug(Pin& other);
-	static ENodePlugResult plug(Pin& input, Pin& output);
 
+	static ENodePlugResult plug(Pin& input, Pin& output);
 	void unplug();
 
 public:
@@ -115,5 +116,6 @@ private:
 
 	/// \todo MH Remove after refactoring.
 	friend class GraphManager;
+	friend class Node;
 };
 } // namespace Core

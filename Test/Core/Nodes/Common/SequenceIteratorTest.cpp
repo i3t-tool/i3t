@@ -13,7 +13,7 @@ struct TestTree
 	Ptr<Sequence> branch1Sequence;
 	Ptr<Sequence> branch2Sequence;
 
-	std::vector<NodePtr> branch1ToRootMatrices;
+	std::vector<Ptr<Node>> branch1ToRootMatrices;
 };
 
 /**
@@ -29,7 +29,7 @@ TestTree arrangeSequenceTree()
 	auto branch1 = GraphManager::createSequence();
 	auto branch2 = GraphManager::createSequence();
 
-	std::vector<Ptr<Transformation>> matrices = {
+	std::vector<Ptr<Transform>> matrices = {
 	    // sequence 1
 	    Builder::createTransform<ETransformType::EulerX>(),
 	    Builder::createTransform<ETransformType::Scale>(),
@@ -58,7 +58,7 @@ TestTree arrangeSequenceTree()
 	branch2->addMatrix(matrices[5]);
 	branch2->addMatrix(matrices[6]);
 
-	std::vector<NodePtr> expectedMatrices = {
+	std::vector<Ptr<Node>> expectedMatrices = {
 	    matrices[4], matrices[3], matrices[2], matrices[1], matrices[0],
 	};
 
@@ -72,11 +72,11 @@ TEST(SequenceIteratorTest, MatrixIterator)
 	// Create sequence–root path from "branch1" sequence to root sequence.
 	SequenceTree tree(s.branch1Sequence);
 
-	std::vector<NodePtr> expectedMatrices = s.branch1ToRootMatrices;
+	std::vector<Ptr<Node>> expectedMatrices = s.branch1ToRootMatrices;
 
 	// Iterate through matrices.
 	{
-		std::vector<NodePtr> result;
+		std::vector<Ptr<Node>> result;
 
 		// Get iterator which points to last matrix in branch1.
 		auto it = tree.begin();
@@ -86,7 +86,7 @@ TEST(SequenceIteratorTest, MatrixIterator)
 		// Collect all matrices until iterator is out of tree.
 		while (it != tree.end())
 		{
-			NodePtr matrix = *it;
+			Ptr<Node> matrix = *it;
 			result.push_back(matrix);
 			++it;
 		}
@@ -95,7 +95,7 @@ TEST(SequenceIteratorTest, MatrixIterator)
 	}
 	{
 		// Reverse direction.
-		std::vector<NodePtr> result;
+		std::vector<Ptr<Node>> result;
 
 		// Get iterator which points to last matrix in branch1.
 		auto it = tree.begin();
@@ -110,7 +110,7 @@ TEST(SequenceIteratorTest, MatrixIterator)
 		while (it != tree.begin())
 		{
 			--it;
-			NodePtr matrix = *it;
+			Ptr<Node> matrix = *it;
 			result.push_back(matrix);
 		}
 		std::reverse(result.begin(), result.end());
@@ -146,7 +146,7 @@ struct TestChain
 
 TestChain arrangeTestChain()
 {
-	auto leftOperator = Builder::createOperator<ENodeType::MatrixToMatrix>();
+	auto leftOperator = Builder::createOperator<EOperatorType::MatrixToMatrix>();
 	leftOperator->setValue(generateMat4());
 	auto leftSequence = GraphManager::createSequence();
 	leftOperator->plug(leftSequence, 0, I3T_SEQ_IN_MAT);
@@ -161,7 +161,7 @@ TestChain arrangeTestChain()
 	translation->setValue(glm::translate(generateVec3()));
 	middleSequence->addMatrix(translation);
 
-	auto rightOperator = Builder::createOperator<ENodeType::MatrixToMatrix>();
+	auto rightOperator = Builder::createOperator<EOperatorType::MatrixToMatrix>();
 	rightOperator->setValue(generateMat4());
 	auto rightSequence = GraphManager::createSequence();
 	rightOperator->plug(rightSequence, 0, I3T_SEQ_IN_MAT);

@@ -52,13 +52,13 @@ extern std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName;
 
 /* DIWNE - \todo JH \todo MH see in .cpp to remove, but I need something what
  * use instead -> from Type get Shape and Color */
-extern std::map<EValueType, EColor> WorkspacePinColorBackground;
+extern std::map<Core::EValueType, EColor> WorkspacePinColorBackground;
 
-extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeBackground;
+extern std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeBackground;
 
-extern std::map<EValueType, DIWNE::IconType> WorkspacePinShapeForeground;
+extern std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeForeground;
 
-extern std::map<EValueType, EColor> WorkspacePinColorForeground;
+extern std::map<Core::EValueType, EColor> WorkspacePinColorForeground;
 
 // endtodo
 

@@ -41,7 +41,7 @@
 /// std::string headerLabel, std::string nodeLabel)
 ////		//TODO change create Node when MH make Trackball in Core.
 ////		: WorkspaceMatrix4x4(headerBackground,
-/// Core::Builder::createOperator<ENodeType::Matrix>(), headerLabel,
+/// Core::Builder::createOperator<EOperatorType::Matrix>(), headerLabel,
 /// nodeLabel){
 ////
 ////	buttonSize = ImVec2(
@@ -69,9 +69,9 @@
 ////}
 //
 // WorkspaceTrackball::WorkspaceTrackball()
-//		//: WorkspaceMatrix4x4(Core::Builder::createOperator<ENodeType::TrackBall>())
+//		//: WorkspaceMatrix4x4(Core::Builder::createOperator<EOperatorType::TrackBall>())
 ///* \todo JH trackball not exist */ 		:
-// WorkspaceMatrix4x4(Core::Builder::createOperator<ENodeType::MatrixToMatrix>())
+// WorkspaceMatrix4x4(Core::Builder::createOperator<EOperatorType::MatrixToMatrix>())
 //{
 //	buttonSize = ImVec2(
 ////			getDataItemsWidth(diwne)*4.0f/3.0f,
@@ -175,7 +175,7 @@
 ////	}else{
 ////		//Matrix (in output)
 ////		const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
-////		const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
+////		const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
 ////		int const idOfNode = this->m_id.Get();
 ////
 ////		bool valueChanged = false;
@@ -304,7 +304,7 @@
 //	    /* \todo JH draw it from some existing source? */
 //		//Matrix (in output)
 //		const glm::mat4& coreData = m_nodebase->getData(index).getMat4();
-//		const Core::Transform::DataMap& coreMap = m_nodebase->getDataMapRef();
+//		const Core::DataMap& coreMap = m_nodebase->getDataMapRef();
 //
 //		bool valueChanged = false;
 //		float localData;

@@ -10,7 +10,7 @@
 namespace Core
 {
 class Sequence;
-class Transformation;
+class Transform;
 
 class SequenceTree
 {
@@ -22,11 +22,11 @@ public:
 		friend class SequenceTree;
 		SequenceTree* m_tree;
 		Sequence*     m_currentSequence;
-		Ptr<NodeBase> m_currentMatrix;
+		Ptr<Node> m_currentMatrix;
 
 	public:
 		explicit MatrixIterator(Sequence* sequence);
-		MatrixIterator(Sequence* sequence, NodePtr node);
+		MatrixIterator(Sequence* sequence, Ptr<Node> node);
 
 		MatrixIterator(const MatrixIterator& mt);
 
@@ -63,7 +63,7 @@ public:
 	};
 
 public:
-	explicit SequenceTree(Ptr<NodeBase> sequence);
+	explicit SequenceTree(Ptr<Node> sequence);
 
 	/**
 	 * \return Iterator which points to the sequence.

@@ -11,7 +11,7 @@ class ScreenTest : public GraphManagerTestFixture {};
 
 TEST_F(ScreenTest, _)
 {
-	auto screen = Builder::createOperator<ENodeType::Screen>();
+	auto screen = Builder::createOperator<EOperatorType::Screen>();
 	auto camera = GraphManager::createCamera();
 
 	auto t1 = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();

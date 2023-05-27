@@ -41,15 +41,15 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 		// StateManager contains the initial state only.
 		EXPECT_TRUE(App::getModule<StateManager>().getMementosCount() == 1);
 
-		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
+		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>(ImVec2(1.0f, 0.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 1);
 
-		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(ImVec2(-1.0f, 1.0f)));
+		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>(ImVec2(-1.0f, 1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 2);
 
-		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>(ImVec2(0.0f, -1.0f)));
+		nodes.push_back(addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>(ImVec2(0.0f, -1.0f)));
 		EXPECT_TRUE(App::getModule<StateManager>().canUndo());
 		EXPECT_TRUE(App::getModule<StateManager>().getPossibleUndosCount() == 3);
 
@@ -111,8 +111,8 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 	const auto randomVec3 = generateVec3();
 
 	{
-		const auto scaleNode = getNodes(workspace)[0]->getNodebase()->as<Core::Transformation>();
-		const auto freeNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transformation>();
+		const auto scaleNode = getNodes(workspace)[0]->getNodebase()->as<Core::Transform>();
+		const auto freeNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transform>();
 		const auto sequenceNode = getNodes(workspace)[2]->getNodebase()->as<Core::Sequence>();
 
 		scaleNode->disableSynergies();
@@ -155,7 +155,7 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 
 		//
 
-		const auto scaleNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transformation>();
+		const auto scaleNode = getNodes(workspace)[1]->getNodebase()->as<Core::Transform>();
 
 		EXPECT_TRUE(scaleNode->hasSavedValue());
 		EXPECT_TRUE(Math::eq(scaleNode->getData().getMat4(), glm::scale(glm::vec3(1.0f, 1.0f, 1.0f))));

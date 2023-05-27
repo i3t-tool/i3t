@@ -17,8 +17,8 @@
 #include "Model.h"
 #include "Node.h"
 #include "NodeData.h"
-#include "NodeImpl.h"
 #include "Operations.h"
+#include "Operator.h"
 #include "Pin.h"
 #include "Sequence.h"
 #include "Tracking.h"
@@ -44,9 +44,9 @@ public:
 	static void init();
 	static void destroy();
 
-	template <ENodeType T> static Ptr<NodeBase> createNode() { return Builder::createOperator<T>(); }
+	template <EOperatorType T> static Ptr<Node> createNode() { return Builder::createOperator<T>(); }
 
-	template <ETransformType T> static Ptr<Transformation> createTransform() { return Builder::createTransform<T>(); }
+	template <ETransformType T> static Ptr<Transform> createTransform() { return Builder::createTransform<T>(); }
 
 	static Ptr<Sequence> createSequence();
 
@@ -79,7 +79,7 @@ public:
 	static ENodePlugResult isPlugCorrect(const Pin& input, const Pin& output);
 
 	/// Plug first output pin of lhs to the first input pin of rhs.
-	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::NodeBase>& lhs, const Ptr<Core::NodeBase>& rhs);
+	[[nodiscard]] static ENodePlugResult plug(const Ptr<Core::Node>& lhs, const Ptr<Core::Node>& rhs);
 
 	/**
 	 * Connect given node output pin to this operator input pin.
@@ -105,23 +105,23 @@ public:
 	 *
 	 * \return Result enum is returned from the function. \see ENodePlugResult.
 	 */
-	[[nodiscard]] static ENodePlugResult plug(const NodePtr& fromNode, const NodePtr& toNode, unsigned fromIndex,
+	[[nodiscard]] static ENodePlugResult plug(const Ptr<Node>& fromNode, const Ptr<Node>& toNode, unsigned fromIndex,
 	                                          unsigned toIndex);
 
-	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const NodePtr& seq, const NodePtr& node,
+	[[nodiscard]] static ENodePlugResult plugSequenceValueInput(const Ptr<Node>& seq, const Ptr<Node>& node,
 	                                                            unsigned nodeOutputIndex = 0);
-	[[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const NodePtr& seq, const NodePtr& node,
+	[[nodiscard]] static ENodePlugResult plugSequenceValueOutput(const Ptr<Node>& seq, const Ptr<Node>& node,
 	                                                             unsigned nodeInputIndex = 0);
 
 	/// Unplug all inputs and outputs.
-	static void unplugAll(const NodePtr& node);
+	static void unplugAll(const Ptr<Node>& node);
 
 	/**
 	 * Unplug plugged node from given input pin of this node.
 	 *
 	 * \param index Index of the input pin
 	 */
-	static void unplugInput(const Ptr<Core::NodeBase>& node, int index);
+	static void unplugInput(const Ptr<Core::Node>& node, int index);
 
 	/**
 	 * Unplug all nodes connected to given output pin of this node.
@@ -129,7 +129,7 @@ public:
 	 * \param node \todo Why single node here?
 	 * \param index Index of the output pin
 	 */
-	static void unplugOutput(Ptr<Core::NodeBase>& node, int index);
+	static void unplugOutput(Ptr<Core::Node>& node, int index);
 
 	/**
 	 * Returns parent node of given node (the topmost one).
@@ -141,22 +141,22 @@ public:
 	 *
 	 * \todo Move me to NodeUtils.
 	 */
-	static Ptr<NodeBase> getParent(const NodePtr& node, size_t index = 0);
+	static Ptr<Node> getParent(const Ptr<Node>& node, size_t index = 0);
 
 	/**
 	 * \return All nodes connected to given node inputs.
 	 */
-	static std::vector<NodePtr> getAllInputNodes(const NodePtr& node);
+	static std::vector<Ptr<Node>> getAllInputNodes(const Ptr<Node>& node);
 
 	/**
 	 * \return All nodes plugged into given node output pins.
 	 */
-	static std::vector<Ptr<NodeBase>> getAllOutputNodes(NodePtr& node);
+	static std::vector<Ptr<Node>> getAllOutputNodes(Ptr<Node>& node);
 
 	/**
 	 * \return All nodes plugged into node input pin on given index.
 	 */
-	static std::vector<Ptr<NodeBase>> getOutputNodes(const NodePtr& node, size_t index);
+	static std::vector<Ptr<Node>> getOutputNodes(const Ptr<Node>& node, size_t index);
 
 	static const Operation* getOperation(const Pin* pin);
 

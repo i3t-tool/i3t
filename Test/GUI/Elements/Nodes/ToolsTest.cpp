@@ -5,14 +5,16 @@
 
 #include "Common.h"
 
+using namespace Core;
+
 TEST(NodeToolsTest, CopyNodes)
 {
 	createTestApplication();
 
-	const auto f1 = addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>();
-	const auto f2 = addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>();
-	const auto f3 = addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatAddFloat>>();
-	const auto f4 = addNodeToNodeEditor<WorkspaceOperator<ENodeType::FloatToFloat>>();
+	const auto f1 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
+	const auto f2 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
+	const auto f3 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatAddFloat>>();
+	const auto f4 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
 
 	connectNodes(f1, f2, 0, 0);
 	connectNodes(f2, f3, 0, 0);

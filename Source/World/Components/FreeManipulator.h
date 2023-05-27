@@ -20,7 +20,7 @@ public:
 	const char* getComponentType() { return FreeManipulator::s_type; };
 
 	static const int EDIT_ROTATION = 7, EDIT_SCALE = 8, EDIT_POSITION = 9;
-	Ptr<Core::NodeBase> m_editednode;
+	Ptr<Core::Node> m_editednode;
 	Ptr<Core::Sequence> m_parent;
 
 private:

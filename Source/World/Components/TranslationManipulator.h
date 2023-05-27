@@ -17,7 +17,7 @@ public:
 	static const char* componentType() { return TranslationManipulator::s_type; };
 	const char* getComponentType() { return TranslationManipulator::s_type; };
 
-	Ptr<Core::NodeBase> m_editednode;
+	Ptr<Core::Node> m_editednode;
 	Ptr<Core::Sequence> m_parent;
 
 private:

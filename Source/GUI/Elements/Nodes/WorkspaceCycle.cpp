@@ -5,7 +5,7 @@
 #include "WorkspaceCycle.h"
 #include "../Windows/WorkspaceWindow.h"
 
-WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase /*=Core::GraphManager::createCycle()*/,
+WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*=Core::GraphManager::createCycle()*/,
                                bool drawPins /*=true*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
 {

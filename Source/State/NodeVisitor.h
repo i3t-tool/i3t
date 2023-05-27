@@ -20,10 +20,6 @@ using GuiSequence = WorkspaceSequence;
 using GuiScreen = WorkspaceScreen;
 using GuiModel = WorkspaceModel;
 
-using GuiNodePtr = std::shared_ptr<GuiNode>;
-
-using GuiNodes = std::vector<Ptr<GuiNode>>;
-
 class NodeVisitor
 {
 public:

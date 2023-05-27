@@ -51,7 +51,7 @@ private:
 	void addVector(rapidjson::Value& target, const char* key, const glm::vec3& vec);
 	void addVector(rapidjson::Value& target, const char* key, const glm::vec4& vec);
 	void addMatrix(rapidjson::Value& target, const char* key, const glm::mat4& mat);
-	void addData(rapidjson::Value& target, const char* key, const DataStore& data);
+	void addData(rapidjson::Value& target, const char* key, const Core::Data& data);
 
 	/// \param target document["edges"] or any JSON array.
 	void addEdges(rapidjson::Value& target, const Ptr<Core::Node>& node);

@@ -1,23 +1,8 @@
 #include "NodeData.h"
 
-const std::string& valueTypeToString(EValueType type)
+namespace Core
 {
-	static const std::string names[] = {
-	    "Pulse",
-	    "Float", ///< standard data type
-	    "Vec3",
-	    "Vec4",
-	    "Matrix",
-	    "Quat",
-	    "MatrixMul", ///< connection of sequences in the scene graph - represents
-	                 ///< a matrix multiplication
-	    "Screen",    ///< projection and camera view transformation
-	    "Ptr",
-	};
-	return names[static_cast<int>(type)];
-}
-
-DataStore::DataStore(EValueType valueType) : opValueType(valueType)
+Data::Data(EValueType valueType) : opValueType(valueType)
 {
 	switch (valueType)
 	{
@@ -27,7 +12,6 @@ DataStore::DataStore(EValueType valueType) : opValueType(valueType)
 	case EValueType::Ptr:
 	case EValueType::Screen:
 		setValue(std::make_pair(glm::mat4(1.0f), glm::mat4(1.0f)));
-		// setValue((void*)nullptr);
 		break;
 	case EValueType::Float:
 		setValue(0.0f);
@@ -47,4 +31,5 @@ DataStore::DataStore(EValueType valueType) : opValueType(valueType)
 	default:
 		break;
 	}
+}
 }

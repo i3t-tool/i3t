@@ -4,7 +4,7 @@
 #include "../Windows/WorkspaceWindow.h"
 #include "State/StateManager.h"
 
-WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase)
+WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
     : WorkspaceNodeWithCoreData(diwne, nodebase), aboveSequence(0), m_topOversizeSpace(0)
 {
 	setDataItemsWidth();
@@ -112,7 +112,7 @@ bool WorkspaceTransformation::afterContent()
 		bool trackingFromLeft = dynamic_cast<WorkspaceDiwne&>(diwne).m_trackingFromLeft;
 
 		ImVec2 size = bottomright - topleft;
-		float inactiveMark = this->getNodebase()->as<Core::Transformation>()->getActivePart();
+		float inactiveMark = this->getNodebase()->as<Core::Transform>()->getActivePart();
 		if (trackingFromLeft)
 		{
 			if (inactiveMark != 1) // Left tracking
@@ -186,15 +186,15 @@ void WorkspaceTransformation::drawMenuStorevalues()
 	{
 		if (ImGui::MenuItem("Reset"))
 		{
-			m_nodebase->as<Core::Transformation>()->resetMatrixFromDefaults();
+			m_nodebase->as<Core::Transform>()->resetMatrixFromDefaults();
 		}
 		if (ImGui::MenuItem("Store"))
 		{
-			m_nodebase->as<Core::Transformation>()->saveValue();
+			m_nodebase->as<Core::Transform>()->saveValue();
 		}
-		if (ImGui::MenuItem("Restore", nullptr, false, m_nodebase->as<Core::Transformation>()->hasSavedValue()))
+		if (ImGui::MenuItem("Restore", nullptr, false, m_nodebase->as<Core::Transform>()->hasSavedValue()))
 		{
-			m_nodebase->as<Core::Transformation>()->reloadValue();
+			m_nodebase->as<Core::Transform>()->reloadValue();
 		}
 
 		ImGui::EndMenu();
@@ -207,36 +207,36 @@ void WorkspaceTransformation::drawMenuSetDataMap()
 	bool fullLOD = (getLevelOfDetail() == WorkspaceLevelOfDetail::Full);
 	bool enableLockMenuItem = fullLOD;
 	bool enableSynergiesMenuItem =
-	    fullLOD && (m_nodebase->as<Core::Transformation>()->hasMenuSynergies()); // only some transformations have
+	    fullLOD && (m_nodebase->as<Core::Transform>()->hasMenuSynergies()); // only some transformations have
 	                                                                             // the possibility to set synergies
 
-	if (m_nodebase->as<Core::Transformation>()->isLocked())
+	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
 		if (ImGui::MenuItem("Unlock", NULL, false, enableLockMenuItem))
 		{
-			m_nodebase->as<Core::Transformation>()->unlock();
+			m_nodebase->as<Core::Transform>()->unlock();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Lock", NULL, false, enableLockMenuItem))
 		{
-			m_nodebase->as<Core::Transformation>()->lock();
+			m_nodebase->as<Core::Transform>()->lock();
 		}
 	}
 
-	if (m_nodebase->as<Core::Transformation>()->hasSynergies())
+	if (m_nodebase->as<Core::Transform>()->hasSynergies())
 	{
 		if (ImGui::MenuItem("Disable synergies", NULL, false, enableSynergiesMenuItem))
 		{
-			m_nodebase->as<Core::Transformation>()->disableSynergies();
+			m_nodebase->as<Core::Transform>()->disableSynergies();
 		}
 	}
 	else
 	{
 		if (ImGui::MenuItem("Enable synergies", NULL, false, enableSynergiesMenuItem))
 		{
-			m_nodebase->as<Core::Transformation>()->enableSynergies();
+			m_nodebase->as<Core::Transform>()->enableSynergies();
 		}
 	}
 }
@@ -278,22 +278,22 @@ bool WorkspaceTransformation::drawDataFull()
 
 	interaction_happen = drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
 	                                 m_nodebase->getData().getMat4(),
-	                                 {m_nodebase->as<Core::Transformation>()->getValueState({0, 0}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({1, 0}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({2, 0}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({3, 0}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({0, 1}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({1, 1}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({2, 1}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({3, 1}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({0, 2}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({1, 2}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({2, 2}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({3, 2}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({0, 3}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({1, 3}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({2, 3}),
-	                                  m_nodebase->as<Core::Transformation>()->getValueState({3, 3})},
+	                                 {m_nodebase->as<Core::Transform>()->getValueState({0, 0}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({1, 0}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({2, 0}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({3, 0}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({0, 1}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({1, 1}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({2, 1}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({3, 1}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({0, 2}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({1, 2}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({2, 2}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({3, 2}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({0, 3}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({1, 3}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({2, 3}),
+	                                  m_nodebase->as<Core::Transform>()->getValueState({3, 3})},
 	                                 valueChanged, rowOfChange, columnOfChange, valueOfChange);
 
 	ImGui::PopStyleColor();
@@ -343,7 +343,7 @@ bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(
 		inner_interaction_happen |= drawDragFloatWithMap_Inline(
 		    diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]),
 		    *local_data[i],
-		    m_nodebase->as<Core::Transformation>()->hasSynergies() ? Core::EValueState::EditableSyn
+		    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
 		                                                           : Core::EValueState::Editable,
 		    actual_value_changed);
 		value_changed |= actual_value_changed;
@@ -397,7 +397,7 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const c
 				inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(),
 				                                                        fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
 				                                                        *(local_data[rows * columnLabels.size() + columns]),
-				                                                        m_nodebase->as<Core::Transformation>()->hasSynergies()
+				                                                        m_nodebase->as<Core::Transform>()->hasSynergies()
 				                                                            ? Core::EValueState::EditableSyn
 				                                                            : Core::EValueState::Editable,
 				                                                        actual_value_changed);
@@ -417,9 +417,9 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const c
 	return inner_interaction_happen;
 }
 
-bool WorkspaceTransformation::isInSequence() { return m_nodebase->as<Core::Transformation>()->isInSequence(); }
+bool WorkspaceTransformation::isInSequence() { return m_nodebase->as<Core::Transform>()->isInSequence(); }
 
-Ptr<Core::NodeBase> WorkspaceTransformation::getNodebaseSequence()
+Ptr<Core::Node> WorkspaceTransformation::getNodebaseSequence()
 {
-	return m_nodebase->as<Core::Transformation>()->getCurrentSequence();
+	return m_nodebase->as<Core::Transform>()->getCurrentSequence();
 }

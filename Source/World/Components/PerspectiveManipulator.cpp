@@ -112,7 +112,7 @@ void PerspectiveManipulator::update()
 	{
 		return;
 	}
-	auto* editedpersp = (Core::TransformImpl<ETransformType::Perspective>*)m_editednode.get();
+	auto* editedpersp = (Core::TransformImpl<Core::ETransformType::Perspective>*)m_editednode.get();
 	m_edited = m_editednode->getData().getMat4();
 
 	unsigned char sel =

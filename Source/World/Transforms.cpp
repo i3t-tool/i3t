@@ -184,7 +184,7 @@ glm::mat4 getFullTransform(GameObject* obj)
 	}
 	return transform;
 }
-glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node, const Ptr<Core::Sequence>* parent, bool invLookAt)
+glm::mat4 getNodeTransform(const Ptr<Core::Node>* node, const Ptr<Core::Sequence>* parent, bool invLookAt)
 {
 	glm::mat4 m = glm::mat4(1.0f);
 	// return m;
@@ -200,7 +200,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node, const Ptr<Core::Sequ
 
 	Core::SequenceTree tree(*parent);
 	Core::SequenceTree::MatrixIterator it = tree.begin();
-	Ptr<Core::NodeBase> nodeindex = Ptr<Core::NodeBase>();
+	Ptr<Core::Node> nodeindex = Ptr<Core::Node>();
 
 	// printf("sel %s\n", node->get()->getOperation()->keyWord.c_str());//this
 	// node
@@ -216,7 +216,7 @@ glm::mat4 getNodeTransform(const Ptr<Core::NodeBase>* node, const Ptr<Core::Sequ
 	while (it != tree.end())
 	{ // mul left of this node
 		nodeindex = *it;
-		DataStore d = nodeindex->getData();
+		Core::Data d = nodeindex->getData();
 		// printf("mul %s\n", nodeindex.get()->getOperation()->keyWord.c_str());
 		if (strcmp(nodeindex->getOperation()->keyWord.c_str(), "LookAt") == 0 && invLookAt)
 		{

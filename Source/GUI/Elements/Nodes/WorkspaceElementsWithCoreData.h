@@ -25,7 +25,7 @@ typedef std::vector<Ptr<WorkspaceCorePin>>::const_iterator workspacePinIter;
 typedef std::vector<Ptr<WorkspaceLink>>::const_iterator workspaceLinkIter;
 
 typedef std::function<float()> getter_function_pointer;
-typedef std::function<ValueSetResult(float)> setter_function_pointer;
+typedef std::function<Core::ValueSetResult(float)> setter_function_pointer;
 
 class WorkspaceNodeWithCoreData : public WorkspaceNode, public IVisitable
 {
@@ -42,13 +42,13 @@ protected:
 	 *
 	 * WorkspaceNodeWithCoreData is owner
 	 */
-	Ptr<Core::NodeBase> const m_nodebase;
+	Ptr<Core::Node> const m_nodebase;
 
 public:
-	WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase);
+	WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase);
 	~WorkspaceNodeWithCoreData() override;
 
-	Ptr<Core::NodeBase> const getNodebase() const;
+	Ptr<Core::Node> const getNodebase() const;
 
 	int getNumberOfVisibleDecimal();
 	virtual void setNumberOfVisibleDecimal(int value);
@@ -65,8 +65,8 @@ public:
 	WorkspaceLevelOfDetail setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail);
 	WorkspaceLevelOfDetail getLevelOfDetail();
 
-	Core::Transform::DataMap const* setDataMap(const Core::Transform::DataMap* mapToSet);
-	Core::Transform::DataMap const* getDataMap();
+	Core::DataMap const* setDataMap(const Core::DataMap* mapToSet);
+	Core::DataMap const* getDataMap();
 
 	bool drawDataLabel();
 	void drawMenuSetEditable();
@@ -145,7 +145,7 @@ public:
 
 	int getIndex() const;
 	PinKind getKind() const;
-	EValueType getType() const;
+	Core::EValueType getType() const;
 	bool isConnected() const;
 
 	/* DIWNE function */
@@ -330,7 +330,7 @@ public:
 
 	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const { return getOutputs(); };
 
-	WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::NodeBase> nodebase, bool showDataOnPins = true);
+	WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 
 	virtual bool leftContent();
 	virtual bool rightContent();
@@ -368,7 +368,7 @@ extern bool drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int number
                         int& rowOfChange, int& columnOfChange, float& valueOfChange);
 // extern bool drawData4x4(DIWNE::Diwne &diwne, DIWNE::ID const node_id, int
 // const numberOfVisibleDecimals, float dataWidth, FloatPopupMode&
-// floatPopupMode, const glm::mat4& data, const Core::Transform::DataMap&
+// floatPopupMode, const glm::mat4& data, const Core::DataMap&
 // dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float&
 // valueOfChange );
 extern int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);

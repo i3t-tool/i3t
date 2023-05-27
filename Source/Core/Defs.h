@@ -52,7 +52,7 @@ namespace fs = std::filesystem;
 
 /**
  * Get string name from enum value.
- * \tparam T enum definition (such as ENodeType or ETransformType)
+ * \tparam T enum definition (such as EOperatorType or ETransformType)
  * \param val Enum value
  * \return String name of the enum value
  */

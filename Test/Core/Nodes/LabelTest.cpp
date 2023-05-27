@@ -6,7 +6,7 @@ using namespace Core;
 
 TEST(LabelTest, GetLabelReturnNamedPinLabelOnNamedPin)
 {
-	auto node = Builder::createOperator<ENodeType::MatrixMulMatrix>();
+	auto node = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
 
 	const char* label = node->getInputPins()[0].getLabel();
 	const char* expected = defaultIoNames[static_cast<size_t>(EValueType::Matrix)];
@@ -16,7 +16,7 @@ TEST(LabelTest, GetLabelReturnNamedPinLabelOnNamedPin)
 
 TEST(LabelTest, GetLabelReturnDefaultPinLabelOnUnnamedPin)
 {
-	auto node = Builder::createOperator<ENodeType::FloatsToVector3>();
+	auto node = Builder::createOperator<EOperatorType::FloatsToVector3>();
 
 	const char* label = node->getInputPins()[0].getLabel();
 	const char* expected = "x";
