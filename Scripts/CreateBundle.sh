@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Assume this is the project root
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )"

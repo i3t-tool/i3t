@@ -1,6 +1,9 @@
 #include "StyleEditor.h"
 
+#include <regex>
+
 #include "imgui.h"
+#include "misc/cpp/imgui_stdlib.h"
 
 #include "Config.h"
 #include "GUI/Shortcuts.h"
@@ -9,13 +12,9 @@
 #include "Utils/Filesystem.h"
 #include "Utils/Other.h"
 
-using namespace UI;
-
+namespace UI
+{
 constexpr float DRAG_FLOAT_WIDTH = 100.0f;
-constexpr size_t BUFF_LEN = 4096;
-
-char g_newThemeName[BUFF_LEN];
-char g_saveMessageBuff[BUFF_LEN];
 
 void StyleEditor::render()
 {
@@ -50,13 +49,6 @@ void StyleEditor::render()
 		}
 		ImGui::EndCombo();
 	}
-	ImGui::SameLine();
-
-	// Reload themes from Data/themes
-	if (GUI::Button("Refresh"))
-	{
-		I3T::getUI()->reloadThemes();
-	}
 
 	renderSaveRevertField();
 
@@ -72,23 +64,52 @@ void StyleEditor::renderSaveRevertField()
 {
 	auto& curr = I3T::getTheme();
 
+	if (curr.getName() != "classic" && curr.getName() != "modern")
+	{
+		if (ImGui::Button("Overwrite"))
+		{
+			auto path = std::string("Data/themes/") + curr.getName() + ".yml";
+			m_infoMessage = "Theme saved!";
+			saveTheme(path, curr);
+		}
+		ImGui::SameLine();
+	}
+
+	// Reload themes from Data/themes
+	if (GUI::Button("Reload from file"))
+	{
+		I3T::getUI()->reloadThemes();
+	}
+
+	ImGui::Separator();
+
 	ImGui::TextUnformatted("Save current modifications to file.");
 
 	/// \todo MH check for illegal characters.
 	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-	ImGui::InputText("New theme name", g_newThemeName, BUFF_LEN);
+	ImGui::InputText("New theme name", &m_newThemeName);
 
 	// Save current theme to file.
-	if (ImGui::Button("Save"))
+	if (ImGui::Button("Save as"))
 	{
-		auto path = std::string("Data/themes/") + std::string(g_newThemeName) + ".yml";
-		if (doesFileExists(path))
+		auto path = std::string("Data/themes/") + m_newThemeName + ".yml";
+		static std::regex invalidCharsRe(R"([\\\/\:\*\?\"\<\>\|])");
+
+		if (m_newThemeName.empty())
 		{
-			strcpy(g_saveMessageBuff, "Theme with this name already exists.");
+			m_infoMessage = "Theme name cannot be empty.";
+		}
+		else if (std::regex_search(m_newThemeName, invalidCharsRe))
+		{
+			m_infoMessage = "Theme name contains invalid characters.";
+		}
+		else if (doesFileExist(path))
+		{
+			m_infoMessage = "Theme with this name already exists.";
 		}
 		else
 		{
-			strcpy(g_saveMessageBuff, "Theme saved!");
+			m_infoMessage = "Theme saved!";
 			saveTheme(path, curr);
 		}
 	}
@@ -115,10 +136,10 @@ void StyleEditor::renderSaveRevertField()
 		}
 	}
 
-	ImGui::TextUnformatted(g_saveMessageBuff);
+	ImGui::TextUnformatted(m_infoMessage.c_str());
 }
 
-void UI::showColors()
+void showColors()
 {
 	auto& curr = I3T::getTheme();
 
@@ -147,7 +168,7 @@ void UI::showColors()
 	}
 }
 
-void UI::showDimensions()
+void showDimensions()
 {
 	auto& curr = I3T::getTheme();
 
@@ -190,4 +211,5 @@ void UI::showDimensions()
 			curr.apply();
 		}
 	}
+}
 }

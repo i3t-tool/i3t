@@ -267,11 +267,13 @@ inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	return color;
 }
 
-template <typename T> const char* enumToStr(std::map<T, const char*>& map, T en)
+template <typename T> const char* enumToStr(const std::map<T, const char*>& map, T en)
 {
 	if (!map.contains(en))
+	{
 		return nullptr;
-	return map[en];
+	}
+	return map.at(en);
 }
 
 /**

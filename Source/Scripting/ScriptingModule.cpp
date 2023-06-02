@@ -309,7 +309,7 @@ void ScriptingModule::init()
 	m_Lua.set_function("execute_from_file",
 	                   [this](const std::string& path)
 	                   {
-		                   if (!doesFileExists(path))
+		                   if (!doesFileExist(path))
 		                   {
 			                   print("file does not exists");
 			                   return false;

@@ -69,7 +69,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 	{
 		if (auto str = enumToStr(Theme::getColorNames(), key))
 		{
-			out << YAML::Key << *str;
+			out << YAML::Key << str;
 			out << YAML::Value;
 			dumpVec4(out, (const float*)&val);
 		}
@@ -80,9 +80,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 	out << YAML::Value << YAML::BeginMap;
 	for (const auto& [key, val] : theme.getSizesRef())
 	{
-		if (auto str = enumToStr(Theme::getSizeNames(), key))
+		if (auto* str = enumToStr(Theme::getSizeNames(), key))
 		{
-			out << YAML::Key << *str;
+			out << YAML::Key << str;
 			out << YAML::Value << val;
 		}
 	}
@@ -92,9 +92,9 @@ void saveTheme(const fs::path& path, Theme& theme)
 	out << YAML::Value << YAML::BeginMap;
 	for (const auto& [key, val] : theme.getSizesVecRef())
 	{
-		if (auto str = enumToStr(Theme::getSizeVecNames(), key))
+		if (auto* str = enumToStr(Theme::getSizeVecNames(), key))
 		{
-			out << YAML::Key << *str;
+			out << YAML::Key << str;
 			out << YAML::Value;
 			dumpVec2(out, (const float*)&val);
 		}
