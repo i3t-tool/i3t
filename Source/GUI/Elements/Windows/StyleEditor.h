@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <string>
 
 #include "GUI/Elements/IWindow.h"
 
@@ -17,11 +17,13 @@ public:
 	I3T_WINDOW(StyleEditor)
 
 	StyleEditor() = default;
-	~StyleEditor() override = default;
 
 	void render() override;
 
 private:
 	void renderSaveRevertField();
+
+	std::string m_newThemeName;
+	std::string m_infoMessage;
 };
 } // namespace UI

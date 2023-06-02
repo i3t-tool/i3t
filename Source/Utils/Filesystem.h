@@ -17,7 +17,7 @@ inline bool doesFileExists(const char* filename)
  * @param path Absolute
  * @return
  */
-inline bool doesFileExists(const std::string& path) { return doesFileExists(path.c_str()); }
+inline bool doesFileExist(const std::string& path) { return doesFileExists(path.c_str()); }
 
 /**
  *
