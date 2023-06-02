@@ -145,9 +145,14 @@ void UIModule::loadThemes()
 	bool canLoadDefault = false;
 	for (auto& entry : fs::directory_iterator(themesDir))
 	{
+		if (entry.path().filename().string()[0] == '.' || entry.is_directory())
+		{
+			continue;
+		}
+
 		if (auto theme = loadTheme(entry))
 		{
-			// Check if theme name doesn't collides with default themes names.
+			// Check if theme name doesn't collide with default themes names.
 			bool canLoadTheme = true;
 			for (auto i = 0L; i < defaultThemesCount; ++i)
 			{

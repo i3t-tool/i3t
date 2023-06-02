@@ -25,30 +25,33 @@ void StyleEditor::render()
 	auto& curr = I3T::getTheme();
 
 	// Theme selector
-	static int currentThemeIdx = 0;
 	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
 	if (ImGui::BeginCombo("Themes", curr.getName().c_str()))
 	{
 		for (size_t n = 0; n < I3T::getThemes().size(); ++n)
 		{
-			const bool isSelected = (currentThemeIdx == n);
+			const bool isSelected = (m_currentThemeIdx == n);
 			if (ImGui::Selectable(I3T::getThemes()[n].getName().c_str(), isSelected))
 			{
 				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) { return t.getName() == curr.getName(); });
 				if (n != currIndex)
 				{
 					I3T::getUI()->setTheme(I3T::getThemes()[n]);
-					currentThemeIdx = (int)n;
+					m_currentThemeIdx = (int)n;
 				}
 			}
 
 			// Set the initial focus when opening the combo (scrolling + keyboard
 			// navigation focus)
 			if (isSelected)
+			{
 				ImGui::SetItemDefaultFocus();
+			}
 		}
 		ImGui::EndCombo();
 	}
+
+	ImGui::Separator();
 
 	renderSaveRevertField();
 
@@ -64,30 +67,32 @@ void StyleEditor::renderSaveRevertField()
 {
 	auto& curr = I3T::getTheme();
 
+	if (ImGui::Button("Revert changes"))
+	{
+		revertChangesOnCurrentTheme();
+	}
+	ImGui::SameLine();
+
+	if (GUI::Button("Reload all themes"))
+	{
+		// Reload themes from Data/themes
+		I3T::getUI()->reloadThemes();
+	}
+	ImGui::SameLine();
+	ImGui::Text("(Discards all unsaved changes)");
+
+	ImGui::Separator();
+
+	ImGui::TextUnformatted("Save current modifications to file (discards unsaved changes on other themes)");
+
 	if (curr.getName() != "classic" && curr.getName() != "modern")
 	{
 		if (ImGui::Button("Overwrite"))
 		{
-			auto path = std::string("Data/themes/") + curr.getName() + ".yml";
-			m_infoMessage = "Theme saved!";
-			saveTheme(path, curr);
+			saveCurrentTheme(curr.getName());
 		}
 		ImGui::SameLine();
 	}
-
-	// Reload themes from Data/themes
-	if (GUI::Button("Reload from file"))
-	{
-		I3T::getUI()->reloadThemes();
-	}
-
-	ImGui::Separator();
-
-	ImGui::TextUnformatted("Save current modifications to file.");
-
-	/// \todo MH check for illegal characters.
-	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
-	ImGui::InputText("New theme name", &m_newThemeName);
 
 	// Save current theme to file.
 	if (ImGui::Button("Save as"))
@@ -98,6 +103,10 @@ void StyleEditor::renderSaveRevertField()
 		if (m_newThemeName.empty())
 		{
 			m_infoMessage = "Theme name cannot be empty.";
+		}
+		else if (m_newThemeName == "classic" || m_newThemeName == "modern")
+		{
+			m_infoMessage = "Cannot overwrite default themes.";
 		}
 		else if (std::regex_search(m_newThemeName, invalidCharsRe))
 		{
@@ -110,33 +119,63 @@ void StyleEditor::renderSaveRevertField()
 		else
 		{
 			m_infoMessage = "Theme saved!";
-			saveTheme(path, curr);
+			saveCurrentTheme();
 		}
 	}
 	ImGui::SameLine();
 
-	// Revert all changes.
-	if (ImGui::Button("Revert changes"))
-	{
-		if (curr.getName() == "classic")
-		{
-			I3T::emplaceTheme(Theme::createDefaultClassic());
-		}
-		else if (curr.getName() == "modern")
-		{
-			I3T::emplaceTheme(Theme::createDefaultModern());
-		}
-		else
-		{
-			auto path = std::string("Data/themes/") + curr.getName() + ".yml";
-			if (auto theme = loadTheme(path))
-			{
-				I3T::emplaceTheme(*theme);
-			}
-		}
-	}
+	ImGui::SetNextItemWidth(2 * DRAG_FLOAT_WIDTH);
+	ImGui::InputText("New theme name", &m_newThemeName);
 
 	ImGui::TextUnformatted(m_infoMessage.c_str());
+}
+
+void StyleEditor::saveCurrentTheme(const std::string& name)
+{
+	auto& curr = I3T::getTheme();
+	auto themeName = name;
+	if (themeName.empty())
+	{
+		themeName = m_newThemeName;
+	}
+	auto path = std::string("Data/themes/") + themeName + ".yml";
+
+	saveTheme(path, curr);
+	I3T::getUI()->reloadThemes();
+
+	auto& themes = I3T::getThemes();
+
+	// newly saved theme is now the current theme
+	m_currentThemeIdx = Utils::indexOf(themes, [&curr, &themeName](Theme& t) { return t.getName() == themeName; });
+	if (m_currentThemeIdx != -1)
+	{
+		I3T::getUI()->setTheme(themes[m_currentThemeIdx]);
+	}
+
+	m_infoMessage = "";
+	m_newThemeName = "";
+}
+
+void StyleEditor::revertChangesOnCurrentTheme()
+{
+	auto& curr = I3T::getTheme();
+
+	if (curr.getName() == "classic")
+	{
+		I3T::emplaceTheme(Theme::createDefaultClassic());
+	}
+	else if (curr.getName() == "modern")
+	{
+		I3T::emplaceTheme(Theme::createDefaultModern());
+	}
+	else
+	{
+		auto path = std::string("Data/themes/") + curr.getName() + ".yml";
+		if (auto theme = loadTheme(path))
+		{
+			I3T::emplaceTheme(*theme);
+		}
+	}
 }
 
 void showColors()

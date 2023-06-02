@@ -60,6 +60,11 @@ ImVec4 parseVec4(YAML::Node& node)
 
 void saveTheme(const fs::path& path, Theme& theme)
 {
+	if (path.empty())
+	{
+		return;
+	}
+
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 
