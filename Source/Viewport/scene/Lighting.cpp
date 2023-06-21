@@ -43,7 +43,10 @@ void Lighting::addLight(Light* light)
 	const auto newLight = std::shared_ptr<Light>(light);
 	lights.push_back(newLight);
 }
-void Lighting::addLight(const std::shared_ptr<Light>& light) { lights.push_back(light); }
+void Lighting::addLight(const std::shared_ptr<Light>& light)
+{
+	lights.push_back(light);
+}
 void Lighting::removeLight(std::shared_ptr<Light>& light)
 {
 	auto it = std::find(lights.begin(), lights.end(), light);
@@ -52,4 +55,7 @@ void Lighting::removeLight(std::shared_ptr<Light>& light)
 		lights.erase(it);
 	}
 }
-std::vector<std::shared_ptr<Light>> Lighting::getLights() const { return lights; }
+std::vector<std::shared_ptr<Light>> Lighting::getLights() const
+{
+	return lights;
+}

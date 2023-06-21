@@ -41,8 +41,14 @@ public:
 
 	void createComponents();
 
-	const SequencePtr& getProj() { return m_proj; }
-	const SequencePtr& getView() { return m_view; }
+	const SequencePtr& getProj()
+	{
+		return m_proj;
+	}
+	const SequencePtr& getView()
+	{
+		return m_view;
+	}
 
 	void updateValues(int inputIndex) override;
 };

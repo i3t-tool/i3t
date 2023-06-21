@@ -64,10 +64,13 @@ public:
 	void draw();
 
 	/**
-	 * Returns the last window that started being constructed (eg. the last window that called IWindow::updateWindowInfo()
-	 * after its ImGui::Begin() call).
+	 * Returns the last window that started being constructed (eg. the last window that called
+	 * IWindow::updateWindowInfo() after its ImGui::Begin() call).
 	 */
-	Ptr<IWindow> getCurrentWindow() { return m_currentWindow; }
+	Ptr<IWindow> getCurrentWindow()
+	{
+		return m_currentWindow;
+	}
 
 	/**
 	 * Remove all managed windows
@@ -112,7 +115,10 @@ public:
 	 * @tparam T
 	 * @return
 	 */
-	template <typename T> Ptr<T> getWindowPtr() { return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows)); }
+	template <typename T> Ptr<T> getWindowPtr()
+	{
+		return std::dynamic_pointer_cast<T>(findWindow<T>(m_dockableWindows));
+	}
 
 	void showWindow(IWindow* window, bool show);
 	void showWindow(Ptr<IWindow> window, bool show);
@@ -128,7 +134,10 @@ public:
 		return false;
 	}
 
-	Ptr<IWindow> getFocusedWindow() { return m_focusedWindow; }
+	Ptr<IWindow> getFocusedWindow()
+	{
+		return m_focusedWindow;
+	}
 
 	/**
 	 * Returns relative mouse position for a specified window.

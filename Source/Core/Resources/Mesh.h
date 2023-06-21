@@ -134,8 +134,8 @@ public:
 
 private:
 	Mesh() = default;
-	Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords, bool useTangents,
-	     bool useColors);
+	Mesh(Mesh::PrimitiveType primitiveType, Mesh::DrawType drawType, bool useNormals, bool useTexcoords,
+	     bool useTangents, bool useColors);
 
 public:
 	/**
@@ -192,7 +192,10 @@ private:
 
 	static void createVaoAndBindAttribs(Mesh* mesh);
 
-	static inline glm::vec3 convertVec3(const aiVector3D& v) { return glm::vec3(v.x, v.y, v.z); }
+	static inline glm::vec3 convertVec3(const aiVector3D& v)
+	{
+		return glm::vec3(v.x, v.y, v.z);
+	}
 	static inline glm::vec3 vec3min(const glm::vec3& v1, const glm::vec3& v2)
 	{
 		return glm::vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));

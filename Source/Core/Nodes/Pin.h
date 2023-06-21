@@ -74,11 +74,23 @@ public:
 	 */
 	[[nodiscard]] bool isPluggedIn() const;
 
-	[[nodiscard]] bool isDisabled() const { return m_isDisabled; }
-	void setDisabled(bool disabled) { m_isDisabled = disabled; }
+	[[nodiscard]] bool isDisabled() const
+	{
+		return m_isDisabled;
+	}
+	void setDisabled(bool disabled)
+	{
+		m_isDisabled = disabled;
+	}
 
-	[[nodiscard]] bool shouldRenderPins() const { return m_renderPins; }
-	void setRenderPins(bool value) { m_renderPins = value; }
+	[[nodiscard]] bool shouldRenderPins() const
+	{
+		return m_renderPins;
+	}
+	void setRenderPins(bool value)
+	{
+		m_renderPins = value;
+	}
 
 public:
 	ID Id;

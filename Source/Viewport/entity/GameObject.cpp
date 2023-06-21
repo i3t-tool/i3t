@@ -7,7 +7,10 @@
 
 using namespace Vp;
 
-GameObject::GameObject(Core::Mesh* mesh, ObjectShader* shader) : m_mesh(mesh) { m_shader = shader; }
+GameObject::GameObject(Core::Mesh* mesh, ObjectShader* shader) : m_mesh(mesh)
+{
+	m_shader = shader;
+}
 
 void GameObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette)
 {

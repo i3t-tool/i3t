@@ -25,8 +25,8 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 {
 	m_viewport = viewport;
 	// TODO: (DR) Not sure if binding callbacks to an axis really makes sense
-	//  Binding like this hides where the actual action is meant to occur, like here, binding zoom in the viewport window
-	//  and its difficult to unbind stuff
+	//  Binding like this hides where the actual action is meant to occur, like here, binding zoom in the viewport
+	//  window and its difficult to unbind stuff
 	// TODO: (DR) In fact the whole axis/axes system is a little odd to me
 	// Input.bindAxis("scroll", [this](float val) { m_world->sceneZoom(val); });
 
@@ -39,77 +39,61 @@ ViewportWindow::ViewportWindow(bool show, Vp::Viewport* viewport) : IWindow(show
 
 	// TODO: (DR) Move actions to methods so we dont repeat code here
 	InputManager::setInputAction("viewpoint-right", Keys::n3);
-	Input.bindAction("viewpoint-right", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
-		                 }
-	                 });
+	Input.bindAction("viewpoint-right", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->viewpoint(Vp::AbstractCamera::Viewpoint::RIGHT);
+		}
+	});
 	InputManager::setInputAction("viewpoint-left", Keys::n3, {Keys::ctrll});
-	Input.bindAction("viewpoint-left", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
-		                 }
-	                 });
+	Input.bindAction("viewpoint-left", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->viewpoint(Vp::AbstractCamera::Viewpoint::LEFT);
+		}
+	});
 	InputManager::setInputAction("viewpoint-top", Keys::n7);
-	Input.bindAction("viewpoint-top", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
-		                 }
-	                 });
+	Input.bindAction("viewpoint-top", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->viewpoint(Vp::AbstractCamera::Viewpoint::TOP);
+		}
+	});
 	InputManager::setInputAction("viewpoint-bottom", Keys::n7, {Keys::ctrll});
-	Input.bindAction("viewpoint-bottom", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
-		                 }
-	                 });
+	Input.bindAction("viewpoint-bottom", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->viewpoint(Vp::AbstractCamera::Viewpoint::BOTTOM);
+		}
+	});
 	InputManager::setInputAction("viewpoint-front", Keys::n1);
-	Input.bindAction("viewpoint-front", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
-		                 }
-	                 });
+	Input.bindAction("viewpoint-front", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->viewpoint(Vp::AbstractCamera::Viewpoint::FRONT);
+		}
+	});
 	InputManager::setInputAction("viewpoint-back", Keys::n1, {Keys::ctrll});
-	Input.bindAction("viewpoint-back", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
-		                 }
-	                 });
+	Input.bindAction("viewpoint-back", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->viewpoint(Vp::AbstractCamera::Viewpoint::BACK);
+		}
+	});
 	InputManager::setInputAction("viewpoint-center-scene", Keys::home);
-	Input.bindAction("viewpoint-center-scene", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->centerOnScene(*m_viewport->getMainScene().lock().get());
-		                 }
-	                 });
+	Input.bindAction("viewpoint-center-scene", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->centerOnScene(*m_viewport->getMainScene().lock().get());
+		}
+	});
 	InputManager::setInputAction("viewpoint-center-selection", Keys::n0);
-	Input.bindAction("viewpoint-center-selection", EKeyState::Pressed,
-	                 [&]()
-	                 {
-		                 if (auto camera = m_viewport->getMainViewportCamera().lock())
-		                 {
-			                 camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
-		                 }
-	                 });
+	Input.bindAction("viewpoint-center-selection", EKeyState::Pressed, [&]() {
+		if (auto camera = m_viewport->getMainViewportCamera().lock())
+		{
+			camera->centerOnSelection(*m_viewport->getMainScene().lock().get());
+		}
+	});
 
 	/// \todo MH This is example code, it can be removed anytime.
 	//	InputManager::setInputAction("fire", Keys::b);
@@ -154,8 +138,8 @@ void ViewportWindow::render()
 
 	m_channelSplitter.Split(ImGui::GetWindowDrawList(), 2);
 	m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), 1);
-	// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is interacting
-	// with them, hence we draw them beforehand using a channel splitter
+	// Manipulators need to get drawn last, but here, before viewport drawing, we want to know if the user is
+	// interacting with them, hence we draw them beforehand using a channel splitter
 	bool manipulatorInteraction = m_viewport->m_manipulators->drawViewAxes(m_windowPos, m_windowSize);
 	if (m_viewport->getSettings().manipulator_enabled)
 	{
@@ -179,7 +163,8 @@ void ViewportWindow::render()
 	{
 		GLuint texture = framebuffer->getColorTexture();
 		// the uv coordinates flips the picture, since it was upside down at first
-		ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, windowMin, windowMax, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::GetWindowDrawList()->AddImage((void*) (intptr_t) texture, windowMin, windowMax, ImVec2(0, 1),
+		                                     ImVec2(1, 0));
 	}
 	else
 	{
@@ -344,7 +329,8 @@ bool ViewportWindow::showViewportMenu()
 	if (ImGui::BeginMenu("View"))
 	{
 		userInteractedWithMenus = true;
-		if (ImGui::MenuItem("Orbit camera", nullptr, m_viewport->getSettings().mainScene_cameraMode == CameraMode::ORBIT))
+		if (ImGui::MenuItem("Orbit camera", nullptr,
+		                    m_viewport->getSettings().mainScene_cameraMode == CameraMode::ORBIT))
 		{
 			if (auto camera = m_viewport->getMainViewportCamera().lock())
 			{

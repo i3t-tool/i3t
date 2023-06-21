@@ -137,10 +137,10 @@ public:
 	/**
 	 * Finalizes the FBO and unbinds it.\n
 	 * <b>The DEFAULT (0) frame buffer is bound after this call!</b>\n
-	 * \param resolveMultisample If the fbo is multisampled and this argument is true this call resolves the multisampled buffer
-	 * into an intermediate regular (single sampled) one. Whose color texture is then returned via getColorTexture().
-	 * Note that only the first (index 0) color attachment gets resolved by this call.
-	 * To resolve multiple color buffers or the depth buffer you can use the multisampleResolveXXX() methods.
+	 * \param resolveMultisample If the fbo is multisampled and this argument is true this call resolves the
+	 * multisampled buffer into an intermediate regular (single sampled) one. Whose color texture is then returned via
+	 * getColorTexture(). Note that only the first (index 0) color attachment gets resolved by this call. To resolve
+	 * multiple color buffers or the depth buffer you can use the multisampleResolveXXX() methods.
 	 */
 	void end(bool resolveMultisample = true);
 
@@ -172,9 +172,8 @@ public:
 	bool isInitialized() const;
 
 	/**
-	 * If this framebuffer is multisampled this methods returns a weak pointer to the internal single sampled framebuffer
-	 * that was used to resolve it.
-	 * Otherwise it just returns a weak pointer to itself.
+	 * If this framebuffer is multisampled this methods returns a weak pointer to the internal single sampled
+	 * framebuffer that was used to resolve it. Otherwise it just returns a weak pointer to itself.
 	 */
 	std::weak_ptr<Framebuffer> getResolvedFramebuffer();
 

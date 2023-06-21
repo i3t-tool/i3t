@@ -38,8 +38,9 @@ void Scene::draw(int width, int height, SceneRenderTarget& renderTarget, const D
 void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, SceneRenderTarget& renderTarget,
                  const DisplayOptions& displayOptions)
 {
-	// TODO: (DR) This method seems a LITTLE too long, maybe cut it up into more methods or some outright renderer class?
-	// 	On the other hand, what its doing is by principle somewhat related to each other and having the whole render
+	// TODO: (DR) This method seems a LITTLE too long, maybe cut it up into more methods or some outright renderer
+	// class? 	On the other hand, what its doing is by principle somewhat related to each other and having the whole
+	// render
 	//  process in one place might be beneficial
 
 	auto renderOptions = renderTarget.getRenderOptions();
@@ -392,7 +393,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 			// #### 1.2 "Uncovered" depth-based silhouette render, render uncovered silhouette portions
 			//  Note that many attempts were made to make this effect happen within a single pass using a shader, but
 			//  ultimately this is the most simple and robust solution I've found.
-			// 	Unfortunately with multisampled buffers it requires the selection fbos are multisampled as well in order to
+			// 	Unfortunately with multisampled buffers it requires the selection fbos are multisampled as well in order
+			// to
 			//  compare depth values properly.
 			if (atLeastOneEntityHighlightUsesDepth && useDepth)
 			{
@@ -559,8 +561,7 @@ void Scene::sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*
 	// Sort by distance to camera
 	glm::vec3 cameraPos(glm::inverse(view)[3]);
 
-	auto sortByDistanceToCamera = [&](Entity* e1, Entity* e2) -> bool
-	{
+	auto sortByDistanceToCamera = [&](Entity* e1, Entity* e2) -> bool {
 		glm::vec3 entity1Pos = glm::vec3(e1->m_modelMatrix[3][0], e1->m_modelMatrix[3][1], e1->m_modelMatrix[3][2]);
 		glm::vec3 entity2Pos = glm::vec3(e2->m_modelMatrix[3][0], e2->m_modelMatrix[3][1], e2->m_modelMatrix[3][2]);
 		const float e1dist = glm::distance(cameraPos, entity1Pos);
@@ -571,8 +572,9 @@ void Scene::sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*
 }
 void Scene::sortExplicitlyOrderedTransparentEntities(std::vector<Entity*>& entities)
 {
-	auto sortByExplicitTransparencyOrder = [&](Entity* e1, Entity* e2) -> bool
-	{ return e1->m_explicitTransparencyOrder > e2->m_explicitTransparencyOrder; };
+	auto sortByExplicitTransparencyOrder = [&](Entity* e1, Entity* e2) -> bool {
+		return e1->m_explicitTransparencyOrder > e2->m_explicitTransparencyOrder;
+	};
 
 	std::sort(m_explicitTransparencyOrderEntitiesFirst.begin(), m_explicitTransparencyOrderEntitiesFirst.end(),
 	          sortByExplicitTransparencyOrder);
@@ -641,7 +643,8 @@ void Scene::processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos
 		}
 		if (framebuffer->isMultisampled())
 		{
-			// glReadPixels only works on single sampled buffers, the stencil buffer must first be resolved if multisampled
+			// glReadPixels only works on single sampled buffers, the stencil buffer must first be resolved if
+			// multisampled
 			framebuffer->multisampleResolveDepth();
 		}
 		auto resolvedFramebuffer = framebuffer->getResolvedFramebuffer().lock();

@@ -32,7 +32,10 @@ Ptr<Sequence> GraphManager::createSequence()
 	return Builder::createSequence(&(s_self->m_tracker));
 }
 
-Ptr<Model> GraphManager::createModel() { return Builder::createModelNode(); }
+Ptr<Model> GraphManager::createModel()
+{
+	return Builder::createModelNode();
+}
 
 ENodePlugResult GraphManager::isPlugCorrect(const Pin& input, const Pin& output)
 {
@@ -63,9 +66,15 @@ ENodePlugResult GraphManager::plugSequenceValueOutput(const Ptr<Core::Node>& seq
 	return plug(seq, node, 1, nodeIndex);
 }
 
-void GraphManager::unplugAll(const Ptr<Core::Node>& node) { node.get()->unplugAll(); }
+void GraphManager::unplugAll(const Ptr<Core::Node>& node)
+{
+	node.get()->unplugAll();
+}
 
-void GraphManager::unplugInput(const Ptr<Core::Node>& node, int index) { node.get()->unplugInput(index); }
+void GraphManager::unplugInput(const Ptr<Core::Node>& node, int index)
+{
+	node.get()->unplugInput(index);
+}
 
 void GraphManager::unplugOutput(Ptr<Core::Node>& node, int index)
 {
@@ -152,12 +161,18 @@ void GraphManager::update(double tick)
 	s_self->m_tracker.update();
 }
 
-const Operation* GraphManager::getOperation(const Pin* pin) { return pin->Owner.getOperation(); }
+const Operation* GraphManager::getOperation(const Pin* pin)
+{
+	return pin->Owner.getOperation();
+}
 
 bool GraphManager::isTrackingEnabled()
 {
 	return s_self->m_tracker.getSequence() != nullptr;
 }
 
-void GraphManager::stopTracking() { s_self->m_tracker = MatrixTracker{}; }
+void GraphManager::stopTracking()
+{
+	s_self->m_tracker = MatrixTracker{};
+}
 } // namespace Core

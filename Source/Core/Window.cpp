@@ -3,11 +3,14 @@
 #include "stb_image.h"
 #include <pgr.h>
 
-#include "Config.h"
 #include "Commands/ApplicationCommands.h"
+#include "Config.h"
 #include "Logger/Logger.h"
 
-void glfwErrorCallback(int error, const char* description) { pgr::dieWithError(description); }
+void glfwErrorCallback(int error, const char* description)
+{
+	pgr::dieWithError(description);
+}
 
 void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool oglDebug, bool oglForwardCompat)
 {
@@ -48,12 +51,20 @@ void Window::init(const int oglVersionMajor, const int oglVersionMinor, bool ogl
 	glfwMakeContextCurrent(m_mainWindow);
 	glfwSwapInterval(1); // Enable vsync.
 
-	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) { BeforeCloseCommand::dispatch(); });
+	glfwSetWindowCloseCallback(m_mainWindow, [](GLFWwindow* window) {
+		BeforeCloseCommand::dispatch();
+	});
 }
 
-GLFWwindow* Window::get() { return m_mainWindow; }
+GLFWwindow* Window::get()
+{
+	return m_mainWindow;
+}
 
-const std::string& Window::getTitle() { return m_title; }
+const std::string& Window::getTitle()
+{
+	return m_title;
+}
 
 void Window::setTitle(const char* title)
 {
@@ -61,6 +72,12 @@ void Window::setTitle(const char* title)
 	glfwSetWindowTitle(m_mainWindow, title);
 }
 
-void Window::swapBuffers() { glfwSwapBuffers(m_mainWindow); }
+void Window::swapBuffers()
+{
+	glfwSwapBuffers(m_mainWindow);
+}
 
-void Window::finalize() { glfwTerminate(); }
+void Window::finalize()
+{
+	glfwTerminate();
+}

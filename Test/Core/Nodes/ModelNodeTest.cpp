@@ -8,7 +8,8 @@
 
 using namespace Core;
 
-class ModelNodeTest : public GraphManagerTestFixture {};
+class ModelNodeTest : public GraphManagerTestFixture
+{};
 
 TEST_F(ModelNodeTest, ShouldConsumeTransformMatrix)
 {
@@ -23,8 +24,9 @@ TEST_F(ModelNodeTest, ShouldConsumeTransformMatrix)
 
 	auto modelNode = Builder::createModelNode();
 
-	modelNode->addUpdateCallback([&gameObjectVp, &modelNode](Node* node)
-	                             { gameObjectVp->m_modelMatrix = modelNode->m_modelMatrix; });
+	modelNode->addUpdateCallback([&gameObjectVp, &modelNode](Node* node) {
+		gameObjectVp->m_modelMatrix = modelNode->m_modelMatrix;
+	});
 
 	plug_expectOk(sequence, modelNode, 0, 0);
 	{

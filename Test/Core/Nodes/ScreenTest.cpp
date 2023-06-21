@@ -7,7 +7,8 @@
 
 using namespace Core;
 
-class ScreenTest : public GraphManagerTestFixture {};
+class ScreenTest : public GraphManagerTestFixture
+{};
 
 TEST_F(ScreenTest, _)
 {

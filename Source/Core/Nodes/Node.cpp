@@ -113,9 +113,15 @@ void Node::notifyOwner()
 	}
 }
 
-ID Node::getId() const { return m_id; }
+ID Node::getId() const
+{
+	return m_id;
+}
 
-EValueState Node::getState(size_t pinIndex) { return m_OperatorState[pinIndex]; }
+EValueState Node::getState(size_t pinIndex)
+{
+	return m_OperatorState[pinIndex];
+}
 
 void Node::pulse(size_t index)
 {
@@ -203,7 +209,10 @@ bool Node::areInputsPlugged(int numInputs)
 	return result;
 }
 
-bool Node::areAllInputsPlugged() { return areInputsPlugged(m_operation->numberOfInputs); }
+bool Node::areAllInputsPlugged()
+{
+	return areInputsPlugged(m_operation->numberOfInputs);
+}
 
 bool Node::areAllInputsUnplugged() const
 {
@@ -261,8 +270,7 @@ void Node::unplugInput(size_t index)
 
 void Node::unplugOutput(size_t index)
 {
-	I3T_ASSERT(index < m_outputs.size(),
-	           "The node's output pin that you want to unplug does not exists.");
+	I3T_ASSERT(index < m_outputs.size(), "The node's output pin that you want to unplug does not exists.");
 
 	m_outputs[index].unplug();
 }
@@ -283,9 +291,15 @@ const DataMap& Node::getDataMapRef()
 	return map;
 }
 
-void Node::updateValues(int inputIndex) { triggerUpdateCallback(this); }
+void Node::updateValues(int inputIndex)
+{
+	triggerUpdateCallback(this);
+}
 
-void Node::addUpdateCallback(std::function<void(Node*)> callback) { this->m_updateCallbacks.push_back(callback); }
+void Node::addUpdateCallback(std::function<void(Node*)> callback)
+{
+	this->m_updateCallbacks.push_back(callback);
+}
 void Node::triggerUpdateCallback(Node* node)
 {
 	for (const auto& callback : m_updateCallbacks)
@@ -294,7 +308,10 @@ void Node::triggerUpdateCallback(Node* node)
 	}
 }
 
-void Node::addDeleteCallback(std::function<void(Node*)> callback) { this->m_deleteCallbacks.push_back(callback); }
+void Node::addDeleteCallback(std::function<void(Node*)> callback)
+{
+	this->m_deleteCallbacks.push_back(callback);
+}
 void Node::triggerDeleteCallback(Node* node)
 {
 	for (const auto& callback : m_deleteCallbacks)
@@ -327,4 +344,4 @@ void Node::triggerUnplugCallback(Node* fromNode, Node* toNode, size_t fromIndex,
 		callback(fromNode, toNode, fromIndex, toIndex);
 	}
 }
-}
+} // namespace Core

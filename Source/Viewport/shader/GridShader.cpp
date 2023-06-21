@@ -4,7 +4,10 @@
 
 using namespace Vp;
 
-GridShader::GridShader(GLuint id) : ObjectShader(id) { init(false); }
+GridShader::GridShader(GLuint id) : ObjectShader(id)
+{
+	init(false);
+}
 
 void GridShader::init(bool initSuperclass)
 {

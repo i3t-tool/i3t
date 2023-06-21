@@ -57,7 +57,10 @@ class Sequence : public Node
 	public:
 		Storage(Sequence& sequence) : m_sequence(sequence) {}
 
-		ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept { return addMatrix(matrix, 0); };
+		ValueSetResult addMatrix(Ptr<Transform> matrix) noexcept
+		{
+			return addMatrix(matrix, 0);
+		};
 		ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
 		Ptr<Transform> popMatrix(const int index);
 		void swap(int from, int to);
@@ -84,7 +87,10 @@ public:
 	 */
 	ValueSetResult addMatrix(Ptr<Transform> matrix, size_t index) noexcept;
 
-	const Matrices& getMatrices() const { return m_storage.m_matrices; }
+	const Matrices& getMatrices() const
+	{
+		return m_storage.m_matrices;
+	}
 
 	/**
 	 * \brief Get reference to matrix in a sequence at given position.
@@ -95,7 +101,10 @@ public:
 	 * \param idx Index of matrix.
 	 * \return Reference to matrix holt in m_matrices vector.
 	 */
-	[[nodiscard]] Ptr<Transform>& getMatRef(size_t idx) { return m_storage.m_matrices.at(idx); }
+	[[nodiscard]] Ptr<Transform>& getMatRef(size_t idx)
+	{
+		return m_storage.m_matrices.at(idx);
+	}
 
 	/**
 	 * Pop matrix from a sequence. Caller takes ownership of returned matrix.

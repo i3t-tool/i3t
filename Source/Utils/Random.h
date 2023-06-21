@@ -7,7 +7,10 @@ namespace
 {
 struct RandInitializer
 {
-	RandInitializer() noexcept { srand(time(0)); }
+	RandInitializer() noexcept
+	{
+		srand(time(0));
+	}
 };
 
 static RandInitializer randInitializer;

@@ -30,7 +30,10 @@ public:
 	 * Trigger a highlight resolve during resolve() call.
 	 * Should be called when selection or structure of the node tree changes.
 	 */
-	void resolveNeeded() { m_runResolveThisFrame = true; }
+	void resolveNeeded()
+	{
+		m_runResolveThisFrame = true;
+	}
 
 	/**
 	 * If needed, updates highlight status of all model nodes by starting a breadth-first search for selected nodes at

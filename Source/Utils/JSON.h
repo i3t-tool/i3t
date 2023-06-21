@@ -178,8 +178,7 @@ inline std::string toString(const rapidjson::Document& document)
 		return std::string(data);
 	}
 	catch (...)
-	{
-	}
+	{}
 
 	return "";
 }

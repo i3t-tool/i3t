@@ -109,25 +109,24 @@ initDefaults(), resetMatrixFromDefaults use default|
 namespace Core
 {
 #define I3T_TRANSFORM_CLONE(T)                                                                                         \
-	Ptr<Node> clone() override                                                                                           \
-	{                                                                                                                    \
-		auto node = Builder::createTransform<T>();                                                                         \
+	Ptr<Node> clone() override                                                                                         \
+	{                                                                                                                  \
+		auto node = Builder::createTransform<T>();                                                                     \
                                                                                                                        \
-		isLocked() ? node->lock() : node->unlock();                                                                        \
-		(hasMenuSynergies() && hasSynergies()) ? node->enableSynergies() : node->disableSynergies();                       \
+		isLocked() ? node->lock() : node->unlock();                                                                    \
+		(hasMenuSynergies() && hasSynergies()) ? node->enableSynergies() : node->disableSynergies();                   \
                                                                                                                        \
-		node->setDefaultValues(getDefaultValues());                                                                        \
-		node->setValue(getData(0).getMat4());                                                                              \
+		node->setDefaultValues(getDefaultValues());                                                                    \
+		node->setValue(getData(0).getMat4());                                                                          \
                                                                                                                        \
-		return node;                                                                                                       \
+		return node;                                                                                                   \
 	}
 //hasSynergies() ? node->enableSynergies() : node->disableSynergies();                                               \
 
 // PF todo: hasSynergies have only nodes with m_hasMenuSynergies
 
 template <ETransformType T> class TransformImpl : public Transform
-{
-};
+{};
 
 namespace Builder
 {
@@ -151,7 +150,10 @@ public:
 
 	I3T_TRANSFORM_CLONE(ETransformType::Free)
 
-	bool isValid() const override { return true; }
+	bool isValid() const override
+	{
+		return true;
+	}
 
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override
 	{

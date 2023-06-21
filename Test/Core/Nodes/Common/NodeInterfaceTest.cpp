@@ -146,6 +146,6 @@ TEST(NodeInterfaceTest, SetValueWithIndex)
 {
 	auto screen = GraphManager::createNode<EOperatorType::Screen>();
 
-	auto result = screen->setValue((float)1920 / 1080, I3T_OUTPUT1);
+	auto result = screen->setValue((float) 1920 / 1080, I3T_OUTPUT1);
 	EXPECT_EQ(result.status, ValueSetResult::Status::Ok);
 }

@@ -7,15 +7,15 @@
 
 #pragma once
 
+#include "Viewport/data/RenderOptions.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "WorkspaceElementsWithCoreData.h"
-#include "Viewport/data/RenderOptions.h"
 
 namespace Vp
 {
 class SceneModel;
 class SceneRenderTarget;
-}
+} // namespace Vp
 
 class WorkspaceModel : public WorkspaceNodeWithCoreDataWithPins
 {
@@ -31,7 +31,10 @@ public:
 	bool m_influenceHighlight{false}; ///< Whether the model is being influenced by node selection.
 	                                  ///< Set by ViewportHighlightResolver.
 
-	WPtr<Vp::SceneModel> viewportModel() { return m_viewportModel; }
+	WPtr<Vp::SceneModel> viewportModel()
+	{
+		return m_viewportModel;
+	}
 
 	WorkspaceModel(DIWNE::Diwne& diwne);
 	~WorkspaceModel();

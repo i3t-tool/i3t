@@ -22,13 +22,17 @@
 
 using namespace UI;
 
-UIModule::~UIModule() { delete m_menu; }
+UIModule::~UIModule()
+{
+	delete m_menu;
+}
 
 void UIModule::init()
 {
 	// Switch active InputController when window focus changes
-	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window)
-	                                     { InputManager::setActiveInput(&(window->getInput())); });
+	SetFocusedWindowCommand::addListener([](Ptr<IWindow> window) {
+		InputManager::setActiveInput(&(window->getInput()));
+	});
 
 	Theme::initNames();
 
@@ -36,7 +40,7 @@ void UIModule::init()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	(void)io;
+	(void) io;
 
 	// Load themes to be usable in window initializations
 	loadFonts();
@@ -53,12 +57,14 @@ void UIModule::init()
 	m_windowManager.addWindow(std::make_shared<LogWindow>());
 	m_windowManager.addWindow(std::make_shared<StyleEditor>());
 
-	HideWindowCommand::addListener([this](const std::string& id) { m_windowManager.removeWindow(id); });
+	HideWindowCommand::addListener([this](const std::string& id) {
+		m_windowManager.removeWindow(id);
+	});
 
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport /
-	                                                      // Platform Windows
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
+	                                                    // Platform Windows
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Setup Dear ImGui style
@@ -115,7 +121,7 @@ void UIModule::beginFrame()
 	//  glfwMakeContextCurrent(window) directly)
 	// ImGuiIO& io = ImGui::GetIO(); (void)io;
 	auto& io = ImGui::GetIO();
-	(void)io;
+	(void) io;
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -189,7 +195,7 @@ void UIModule::reloadThemes()
 
 void UIModule::setTheme(const Theme& theme)
 {
-	m_currentTheme = (Theme*)&theme;
+	m_currentTheme = (Theme*) &theme;
 	m_currentTheme->apply();
 
 	Config::DEFAULT_THEME = theme.getName();
@@ -260,8 +266,8 @@ void UIModule::buildDockspace()
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		window_flags |=
-		    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+		                ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
 
@@ -308,26 +314,26 @@ void UIModule::queryCameraState()
 	// TODO: (DR) Old code used for camera mouse drag handling, unused, probably delete in the future
 	return;
 
-//	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
-//		return;
-//
-//	// ORBIT camera rotation
-//	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
-//	{
-//		InputManager::beginCameraControl();
-//	}
-//	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
-//	{
-//		InputManager::endCameraControl();
-//	}
-//
-//	// CAMERA PANNING - set a new orbit center
-//	if (InputManager::isActionTriggered("pan", EKeyState::Pressed))
-//	{
-//		InputManager::beginCameraControl();
-//	}
-//	if (InputManager::isActionTriggered("pan", EKeyState::Released))
-//	{
-//		InputManager::endCameraControl();
-//	}
+	//	if (!InputManager::isInputActive(getWindowManager().getWindowPtr<UI::ViewportWindow>()->getInputPtr()))
+	//		return;
+	//
+	//	// ORBIT camera rotation
+	//	if (InputManager::isActionTriggered("rotate", EKeyState::Pressed))
+	//	{
+	//		InputManager::beginCameraControl();
+	//	}
+	//	if (InputManager::isActionTriggered("rotate", EKeyState::Released))
+	//	{
+	//		InputManager::endCameraControl();
+	//	}
+	//
+	//	// CAMERA PANNING - set a new orbit center
+	//	if (InputManager::isActionTriggered("pan", EKeyState::Pressed))
+	//	{
+	//		InputManager::beginCameraControl();
+	//	}
+	//	if (InputManager::isActionTriggered("pan", EKeyState::Released))
+	//	{
+	//		InputManager::endCameraControl();
+	//	}
 }

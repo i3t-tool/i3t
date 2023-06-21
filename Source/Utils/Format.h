@@ -40,7 +40,8 @@ inline std::string toString(const glm::quat& quat)
 inline std::string toString(const glm::mat4& mat, bool breakLines = false)
 {
 	if (breakLines)
-		return fmt::format("[{}, \n{}, \n{}, \n{}]", toString(mat[0]), toString(mat[1]), toString(mat[2]), toString(mat[3]));
+		return fmt::format("[{}, \n{}, \n{}, \n{}]", toString(mat[0]), toString(mat[1]), toString(mat[2]),
+		                   toString(mat[3]));
 
 	return fmt::format("[{}, {}, {}, {}]", toString(mat[0]), toString(mat[1]), toString(mat[2]), toString(mat[3]));
 }

@@ -48,7 +48,8 @@ TEST(ScaleTest, ResetToInitialValues)
 	const auto scale = generateVec3();
 
 	// Create non-uniform scale with initial value.
-	auto scaleNode = Core::Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
+	auto scaleNode =
+	    Core::Builder::createTransform<ETransformType::Scale>()->as<TransformImpl<ETransformType::Scale>>();
 
 	scaleNode->disableSynergies();              // to avoid uniform scale
 	scaleNode->setDefaultValue("scale", scale); // default and matrix

@@ -36,7 +36,8 @@ void SetupDialog::render()
 				ImGui::SliderFloat("Blur cutoff", &settings.highlight_outlineCutoff, 0.01f, 1.0f, "%.2f");
 				ImGui::Checkbox("Use depth", &settings.highlight_useDepth);
 				ImGui::SliderFloat("Darken factor", &settings.highlight_useDepth_darkenFactor, 0.0f, 1.0f, "%.2f");
-				ImGui::SliderFloat("Desaturate factor", &settings.highlight_useDepth_desaturateFactor, 0.0f, 1.0f, "%.2f");
+				ImGui::SliderFloat("Desaturate factor", &settings.highlight_useDepth_desaturateFactor, 0.0f, 1.0f,
+				                   "%.2f");
 				ImGui::Unindent();
 			}
 

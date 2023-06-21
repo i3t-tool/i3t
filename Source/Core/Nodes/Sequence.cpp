@@ -29,8 +29,7 @@ ValueSetResult Sequence::Storage::addMatrix(Ptr<Transform> matrix, size_t index)
 
 Ptr<Transform> Sequence::Storage::popMatrix(const int index)
 {
-	I3T_ASSERT(index < m_matrices.size(),
-	           "Sequence does not have as many matrices as you are expecting.");
+	I3T_ASSERT(index < m_matrices.size(), "Sequence does not have as many matrices as you are expecting.");
 	LOG_INFO("Popping matrix at {} from sequence {}.", index, m_sequence.getId());
 
 	auto result = std::move(m_matrices.at(index));
@@ -55,13 +54,17 @@ void Sequence::Storage::swap(int from, int to)
 
 //===-- Sequence ----------------------------------------------------------===//
 
-Sequence::Sequence(MatrixTracker* tracker) : Node(&g_sequence), m_storage(*this), m_tracker(tracker)
+Sequence::Sequence(MatrixTracker* tracker) : Node(&g_sequence), m_storage(*this), m_tracker(tracker) {}
+
+Sequence::~Sequence()
 {
+	stopTracking();
 }
 
-Sequence::~Sequence() { stopTracking(); }
-
-Ptr<Node> Sequence::clone() { return Builder::createSequence(m_tracker); }
+Ptr<Node> Sequence::clone()
+{
+	return Builder::createSequence(m_tracker);
+}
 
 ValueSetResult Sequence::addMatrix(Ptr<Transform> matrix) noexcept
 {

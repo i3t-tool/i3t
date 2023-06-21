@@ -37,7 +37,10 @@ DiwneAction Diwne::getDiwneActionActive() const
 	return m_diwneAction == DiwneAction::None ? m_diwneAction_previousFrame : m_diwneAction;
 }
 
-bool Diwne::allowDrawing() { return m_drawing; }
+bool Diwne::allowDrawing()
+{
+	return m_drawing;
+}
 
 bool Diwne::initializeDiwne()
 {
@@ -79,8 +82,9 @@ void Diwne::begin()
 		ImGui::GetWindowDrawList()->AddRect(m_workAreaScreen.Min, m_workAreaScreen.Max, ImColor(255, 0, 0), 0,
 		                                    ImDrawCornerFlags_None, 10);
 		ImGui::Text(fmt::format("\tWADiwne: {}-{}  -  {}-{}\n\tWAScreen: {}-{}  -  {}-{}", m_workAreaDiwne.Min.x,
-		                        m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y, m_workAreaScreen.Min.x,
-		                        m_workAreaScreen.Min.y, m_workAreaScreen.Max.x, m_workAreaScreen.Max.y)
+		                        m_workAreaDiwne.Min.y, m_workAreaDiwne.Max.x, m_workAreaDiwne.Max.y,
+		                        m_workAreaScreen.Min.x, m_workAreaScreen.Min.y, m_workAreaScreen.Max.x,
+		                        m_workAreaScreen.Max.y)
 		                .c_str());
 
 		ImGui::Text(fmt::format("MousePos: {}-{}", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y).c_str());
@@ -142,8 +146,8 @@ void Diwne::begin()
 		default:
 			ImGui::Text("PrevDiwneAction: Unknown");
 		}
-	});  /* close of macro */
-#endif // DIWNE_DEBUG
+	}); /* close of macro */
+#endif  // DIWNE_DEBUG
 }
 
 bool Diwne::afterContentDiwne()
@@ -178,13 +182,17 @@ bool Diwne::afterEndDiwne()
 bool Diwne::allowProcessFocused()
 {
 	return m_isActive /* object is active from previous frame */
-	       || (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) ||
+	       ||
+	       (diwne.getDiwneActionActive() == SelectionRectFull || diwne.getDiwneActionActive() == SelectionRectTouch) ||
 	       (!diwne.m_objectFocused /* only one object can be focused */
 	        && (diwne.getDiwneAction() == None ||
 	            diwne.getDiwneActionActive() == NewLink /* we want focus of other object while new link */));
 }
 
-bool Diwne::processInteractions() { return processDiwneSelectionRectangle(); }
+bool Diwne::processInteractions()
+{
+	return processDiwneSelectionRectangle();
+}
 
 bool Diwne::processInteractionsDiwne()
 {
@@ -192,9 +200,9 @@ bool Diwne::processInteractionsDiwne()
 
 	interaction_happen |= DiwneObject::processInteractionsDiwne();
 
-	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction (focus
-	                                                                                 on node) is no problem with this
-	                                                                                 actions */
+	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction
+	                                                                                 (focus on node) is no problem with
+	                                                                                 this actions */
 	{
 		interaction_happen |= processDiwneZoom();
 	}
@@ -218,7 +226,10 @@ bool Diwne::blockRaisePopup()
 }
 
 /* be careful for same mouse button in this functions */
-bool Diwne::allowProcessSelectionRectangle() { return m_focusedForInteraction; }
+bool Diwne::allowProcessSelectionRectangle()
+{
+	return m_focusedForInteraction;
+}
 bool Diwne::bypassSelectionRectangleAction()
 {
 	return bypassIsMouseDragging1();
@@ -352,7 +363,10 @@ void Diwne::translateWorkAreaDiwneZoomed(ImVec2 const& distance)
 	translateWorkAreaDiwne(ImVec2(distance.x / m_workAreaZoom, distance.y / m_workAreaZoom));
 }
 
-void Diwne::translateWorkAreaDiwne(ImVec2 const& distance) { m_workAreaDiwne.Translate(distance); }
+void Diwne::translateWorkAreaDiwne(ImVec2 const& distance)
+{
+	m_workAreaDiwne.Translate(distance);
+}
 
 void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, float rounding /*=0.0f*/,
                                ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/) const
@@ -469,8 +483,8 @@ void Diwne::DrawIconCross(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColo
 	if (!filled)
 	{
 		idl->AddLine(topLeft + thicknesDiffVec, bottomRight - thicknesDiffVec, InnerColor, thicknesInner);
-		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknesDiffVec, ImVec2(bottomRight.x, topLeft.y) - thicknesDiffVec,
-		             InnerColor, thicknesInner);
+		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknesDiffVec,
+		             ImVec2(bottomRight.x, topLeft.y) - thicknesDiffVec, InnerColor, thicknesInner);
 	}
 }
 
@@ -550,58 +564,181 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 	ImGui::Dummy(size);
 }
 
-ImVec2 Diwne::screen2workArea(const ImVec2& point) const { return point - m_workAreaScreen.Min; }
+ImVec2 Diwne::screen2workArea(const ImVec2& point) const
+{
+	return point - m_workAreaScreen.Min;
+}
 
-ImVec2 Diwne::workArea2screen(const ImVec2& point) const { return point + m_workAreaScreen.Min; }
+ImVec2 Diwne::workArea2screen(const ImVec2& point) const
+{
+	return point + m_workAreaScreen.Min;
+}
 
-ImVec2 Diwne::diwne2workArea(const ImVec2& point) const { return diwne2workArea_noZoom(point) * m_workAreaZoom; }
+ImVec2 Diwne::diwne2workArea(const ImVec2& point) const
+{
+	return diwne2workArea_noZoom(point) * m_workAreaZoom;
+}
 
-ImVec2 Diwne::workArea2diwne(const ImVec2& point) const { return workArea2diwne_noZoom(point / m_workAreaZoom); }
+ImVec2 Diwne::workArea2diwne(const ImVec2& point) const
+{
+	return workArea2diwne_noZoom(point / m_workAreaZoom);
+}
 
-ImVec2 Diwne::screen2diwne(const ImVec2& point) const { return workArea2diwne(screen2workArea(point)); }
+ImVec2 Diwne::screen2diwne(const ImVec2& point) const
+{
+	return workArea2diwne(screen2workArea(point));
+}
 
-ImVec2 Diwne::diwne2screen(const ImVec2& point) const { return workArea2screen(diwne2workArea(point)); }
+ImVec2 Diwne::diwne2screen(const ImVec2& point) const
+{
+	return workArea2screen(diwne2workArea(point));
+}
 
-ImVec2 Diwne::diwne2workArea_noZoom(const ImVec2& point) const { return point - m_workAreaDiwne.Min; }
+ImVec2 Diwne::diwne2workArea_noZoom(const ImVec2& point) const
+{
+	return point - m_workAreaDiwne.Min;
+}
 
-ImVec2 Diwne::workArea2diwne_noZoom(const ImVec2& point) const { return point + m_workAreaDiwne.Min; }
+ImVec2 Diwne::workArea2diwne_noZoom(const ImVec2& point) const
+{
+	return point + m_workAreaDiwne.Min;
+}
 
-ImVec2 Diwne::screen2diwne_noZoom(const ImVec2& point) const { return workArea2diwne_noZoom(screen2workArea(point)); }
+ImVec2 Diwne::screen2diwne_noZoom(const ImVec2& point) const
+{
+	return workArea2diwne_noZoom(screen2workArea(point));
+}
 
-ImVec2 Diwne::diwne2screen_noZoom(const ImVec2& point) const { return workArea2screen(diwne2workArea_noZoom(point)); }
+ImVec2 Diwne::diwne2screen_noZoom(const ImVec2& point) const
+{
+	return workArea2screen(diwne2workArea_noZoom(point));
+}
 
-bool Diwne::bypassIsItemClicked0() { return ImGui::IsItemClicked(0); }
-bool Diwne::bypassIsItemClicked1() { return ImGui::IsItemClicked(1); }
-bool Diwne::bypassIsItemClicked2() { return ImGui::IsItemClicked(2); }
-bool Diwne::bypassIsMouseDown0() { return ImGui::IsMouseDown(0); }
-bool Diwne::bypassIsMouseDown1() { return ImGui::IsMouseDown(1); }
-bool Diwne::bypassIsMouseDown2() { return ImGui::IsMouseDown(2); }
-bool Diwne::bypassIsMouseClicked0() { return ImGui::IsMouseClicked(0); }
-bool Diwne::bypassIsMouseClicked1() { return ImGui::IsMouseClicked(1); }
-bool Diwne::bypassIsMouseClicked2() { return ImGui::IsMouseClicked(2); }
-bool Diwne::bypassIsMouseReleased0() { return ImGui::IsMouseReleased(0); }
-bool Diwne::bypassIsMouseReleased1() { return ImGui::IsMouseReleased(1); }
-bool Diwne::bypassIsMouseReleased2() { return ImGui::IsMouseReleased(2); }
-ImVec2 Diwne::bypassMouseClickedPos0() { return ImGui::GetIO().MouseClickedPos[0]; }
-ImVec2 Diwne::bypassMouseClickedPos1() { return ImGui::GetIO().MouseClickedPos[1]; }
-ImVec2 Diwne::bypassMouseClickedPos2() { return ImGui::GetIO().MouseClickedPos[2]; }
-bool Diwne::bypassIsItemActive() { return ImGui::IsItemActive(); }
-bool Diwne::bypassIsMouseDragging0() { return ImGui::IsMouseDragging(0); }
-bool Diwne::bypassIsMouseDragging1() { return ImGui::IsMouseDragging(1); }
-bool Diwne::bypassIsMouseDragging2() { return ImGui::IsMouseDragging(2); }
-ImVec2 Diwne::bypassGetMouseDragDelta0() { return ImGui::GetMouseDragDelta(0); }
-ImVec2 Diwne::bypassGetMouseDragDelta1() { return ImGui::GetMouseDragDelta(1); }
-ImVec2 Diwne::bypassGetMouseDragDelta2() { return ImGui::GetMouseDragDelta(2); }
-ImVec2 Diwne::bypassGetMouseDelta() { return ImGui::GetIO().MouseDelta; }
-ImVec2 Diwne::bypassGetMousePos() { return ImGui::GetIO().MousePos; }
-float Diwne::bypassGetMouseWheel() { return ImGui::GetIO().MouseWheel; }
-float Diwne::bypassGetZoomDelta() { return bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity; }
+bool Diwne::bypassIsItemClicked0()
+{
+	return ImGui::IsItemClicked(0);
+}
+bool Diwne::bypassIsItemClicked1()
+{
+	return ImGui::IsItemClicked(1);
+}
+bool Diwne::bypassIsItemClicked2()
+{
+	return ImGui::IsItemClicked(2);
+}
+bool Diwne::bypassIsMouseDown0()
+{
+	return ImGui::IsMouseDown(0);
+}
+bool Diwne::bypassIsMouseDown1()
+{
+	return ImGui::IsMouseDown(1);
+}
+bool Diwne::bypassIsMouseDown2()
+{
+	return ImGui::IsMouseDown(2);
+}
+bool Diwne::bypassIsMouseClicked0()
+{
+	return ImGui::IsMouseClicked(0);
+}
+bool Diwne::bypassIsMouseClicked1()
+{
+	return ImGui::IsMouseClicked(1);
+}
+bool Diwne::bypassIsMouseClicked2()
+{
+	return ImGui::IsMouseClicked(2);
+}
+bool Diwne::bypassIsMouseReleased0()
+{
+	return ImGui::IsMouseReleased(0);
+}
+bool Diwne::bypassIsMouseReleased1()
+{
+	return ImGui::IsMouseReleased(1);
+}
+bool Diwne::bypassIsMouseReleased2()
+{
+	return ImGui::IsMouseReleased(2);
+}
+ImVec2 Diwne::bypassMouseClickedPos0()
+{
+	return ImGui::GetIO().MouseClickedPos[0];
+}
+ImVec2 Diwne::bypassMouseClickedPos1()
+{
+	return ImGui::GetIO().MouseClickedPos[1];
+}
+ImVec2 Diwne::bypassMouseClickedPos2()
+{
+	return ImGui::GetIO().MouseClickedPos[2];
+}
+bool Diwne::bypassIsItemActive()
+{
+	return ImGui::IsItemActive();
+}
+bool Diwne::bypassIsMouseDragging0()
+{
+	return ImGui::IsMouseDragging(0);
+}
+bool Diwne::bypassIsMouseDragging1()
+{
+	return ImGui::IsMouseDragging(1);
+}
+bool Diwne::bypassIsMouseDragging2()
+{
+	return ImGui::IsMouseDragging(2);
+}
+ImVec2 Diwne::bypassGetMouseDragDelta0()
+{
+	return ImGui::GetMouseDragDelta(0);
+}
+ImVec2 Diwne::bypassGetMouseDragDelta1()
+{
+	return ImGui::GetMouseDragDelta(1);
+}
+ImVec2 Diwne::bypassGetMouseDragDelta2()
+{
+	return ImGui::GetMouseDragDelta(2);
+}
+ImVec2 Diwne::bypassGetMouseDelta()
+{
+	return ImGui::GetIO().MouseDelta;
+}
+ImVec2 Diwne::bypassGetMousePos()
+{
+	return ImGui::GetIO().MousePos;
+}
+float Diwne::bypassGetMouseWheel()
+{
+	return ImGui::GetIO().MouseWheel;
+}
+float Diwne::bypassGetZoomDelta()
+{
+	return bypassGetMouseWheel() / mp_settingsDiwne->zoomWheelReverseSenzitivity;
+}
 
-bool Diwne::allowProcessZoom() { return true; }
-bool Diwne::bypassZoomAction() { return diwne.bypassGetZoomDelta() != 0; }
-bool Diwne::bypassDiwneSetPopupPositionAction() { return bypassIsMouseClicked1(); }
-ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction() { return bypassGetMousePos(); }
+bool Diwne::allowProcessZoom()
+{
+	return true;
+}
+bool Diwne::bypassZoomAction()
+{
+	return diwne.bypassGetZoomDelta() != 0;
+}
+bool Diwne::bypassDiwneSetPopupPositionAction()
+{
+	return bypassIsMouseClicked1();
+}
+ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction()
+{
+	return bypassGetMousePos();
+}
 
-ImRect Diwne::getSelectionRectangleDiwne() { return m_selectionRectangeDiwne; }
+ImRect Diwne::getSelectionRectangleDiwne()
+{
+	return m_selectionRectangeDiwne;
+}
 
 } /* namespace DIWNE */

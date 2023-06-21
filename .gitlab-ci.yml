@@ -9,8 +9,8 @@ stages:
 build-app:
   stage: build
   script:
-    - mkdir out && cd out 
-    - cmake .. 
+    - mkdir out && cd out
+    - cmake ..
     - cmake --build . -j 8 --target I3T
   artifacts:
     paths:
@@ -50,7 +50,6 @@ check format:
     - bash Scripts/CheckFormat.sh
   dependencies:
     - test
-  allow_failure: true
 
 ###
 

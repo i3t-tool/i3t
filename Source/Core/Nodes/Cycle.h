@@ -64,7 +64,10 @@ public:
 	void stepBack();
 	void stepNext();
 
-	EMode getMode() { return m_mode; }
+	EMode getMode()
+	{
+		return m_mode;
+	}
 	void setMode(EMode mode)
 	{
 		if (m_mode != mode)
@@ -110,5 +113,8 @@ private:
 	void updateValue(float increment);
 };
 
-FORCE_INLINE bool isCycle(const Ptr<Node>& node) { return node->getOperation()->keyWord == g_CycleProperties.keyWord; }
+FORCE_INLINE bool isCycle(const Ptr<Node>& node)
+{
+	return node->getOperation()->keyWord == g_CycleProperties.keyWord;
+}
 } // namespace Core

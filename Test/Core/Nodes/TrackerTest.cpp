@@ -51,11 +51,20 @@ MyTree arrange()
 class DummyModelProxy : public Core::IModelProxy
 {
 public:
-	DummyModelProxy() { m_model = GraphManager::createModel(); }
+	DummyModelProxy()
+	{
+		m_model = GraphManager::createModel();
+	}
 	~DummyModelProxy() override = default;
 
-	void update(const glm::mat4& transform) override { m_model->setValue(transform); };
-	Ptr<Core::Model> getModel() override { return m_model; };
+	void update(const glm::mat4& transform) override
+	{
+		m_model->setValue(transform);
+	};
+	Ptr<Core::Model> getModel() override
+	{
+		return m_model;
+	};
 
 private:
 	Ptr<Model> m_model;
@@ -113,7 +122,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 		                t.mat2->getData().getMat4() * t.mat3->getData().getMat4() * t.mat4->getData().getMat4();
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 3);
-	  EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
 
 		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), interpParam);
 		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
@@ -126,8 +135,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 
 		float interpParam = (abs(trackingParam) - 0.25f) * 4;
 		auto expected =
-		    glm::interpolate(glm::mat4(1.0f), t.mat3->getData().getMat4(), interpParam) *
-		    t.mat4->getData().getMat4();
+		    glm::interpolate(glm::mat4(1.0f), t.mat3->getData().getMat4(), interpParam) * t.mat4->getData().getMat4();
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 1);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));

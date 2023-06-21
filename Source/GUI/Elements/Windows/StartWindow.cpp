@@ -138,7 +138,7 @@ void StartWindow::render()
 
 		// LOGO I3T
 		ImVec2 logoPos = ImGui::GetWindowPos() + logoOffset;
-		ImGui::GetForegroundDrawList()->AddImage((ImTextureID)m_i3tImage->m_texID, logoPos,
+		ImGui::GetForegroundDrawList()->AddImage((ImTextureID) m_i3tImage->m_texID, logoPos,
 		                                         logoPos + ImVec2(m_i3tImage->m_width, m_i3tImage->m_height));
 		// LEFT CHILD WINDOW
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30, 30));
@@ -184,7 +184,7 @@ void StartWindow::render()
 			if (m_cvutImage)
 			{
 				ImGui::SetCursorPosY(ImGui::GetContentRegionMax().y - m_cvutImage->m_height);
-				ImGui::Image((ImTextureID)m_cvutImage->m_texID, ImVec2(m_cvutImage->m_width, m_cvutImage->m_height));
+				ImGui::Image((ImTextureID) m_cvutImage->m_texID, ImVec2(m_cvutImage->m_width, m_cvutImage->m_height));
 			}
 
 			ImGui::EndChild();
@@ -242,11 +242,10 @@ void StartWindow::render()
 					// folderImage->m_width)/2,ImGui::GetCursorPosY() + (thumbImageSize -
 					// folderImage->m_height)/2); ImGui::Dummy(ImVec2(thumbImageSize,
 					// thumbImageSize)); ImGui::SetCursorPos(offset);
-					ImGui::Image((ImTextureID)m_folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+					ImGui::Image((ImTextureID) m_folderImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 				}
 				else
-				{
-				}
+				{}
 				ImGui::SameLine();
 				// YOUR SCENE TEXT
 				// ImGui::AlignTextToFramePadding();
@@ -282,7 +281,8 @@ void StartWindow::render()
 					// ImGui::Spring(1);
 
 					ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-					ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+					ImGui::PushStyleColor(ImGuiCol_Text,
+					                      App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
 					ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
 					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 					{
@@ -360,14 +360,14 @@ void StartWindow::render()
 					auto img = header->m_thumbnailImage;
 					if (img)
 					{
-						ImGui::Image((ImTextureID)img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+						ImGui::Image((ImTextureID) img->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 					}
 					else
 					{
 						// todo load dummy at introwindow init
 						if (m_dummyImage)
 						{
-							ImGui::Image((ImTextureID)m_dummyImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
+							ImGui::Image((ImTextureID) m_dummyImage->m_texID, ImVec2(thumbImageSize, thumbImageSize));
 						}
 						else
 						{
@@ -396,8 +396,9 @@ void StartWindow::render()
 						// DESCRIPTIONS
 						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
 						ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemDescription));
-						float predictedTextSize =
-						    ImGui::CalcTextSize(header->m_description.c_str(), nullptr, false, ImGui::GetContentRegionAvail().x).y;
+						float predictedTextSize = ImGui::CalcTextSize(header->m_description.c_str(), nullptr, false,
+						                                              ImGui::GetContentRegionAvail().x)
+						                              .y;
 						bool willTextFit = ImGui::GetContentRegionAvail().y - predictedTextSize >= 0;
 						// std::string debug = fmt::format("{} - {} = {}",
 						// ImGui::GetContentRegionAvail().y, predictedTextSize,
@@ -425,16 +426,20 @@ void StartWindow::render()
 					ImGui::PopStyleVar();
 
 					// ImGui::NextColumn();
-					ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - innerPadding.x - outerPadding.x);
+					ImGui::SameLine(ImGui::GetContentRegionMax().x - startNewBtnWidth - innerPadding.x -
+					                outerPadding.x);
 					// START BUTTON
 					ImGui::BeginGroup();
 					{
 						// ImGui::BeginVertical("start button", ImVec2(0, thumbImageSize));
 						// ImGui::Spring(1);
 						ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
-						ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, App::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, App::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
+						ImGui::PushStyleColor(ImGuiCol_Text,
+						                      App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+						                      App::get().getUI()->getTheme().get(EColor::TutorialButtonActive));
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+						                      App::get().getUI()->getTheme().get(EColor::TutorialButtonHovered));
 						std::string buttonName = "Start##" + header->m_filename;
 						if (ImGui::Button(buttonName.c_str(), ImVec2(startBtnWidth, buttonHeight)))
 						{
@@ -443,7 +448,7 @@ void StartWindow::render()
 							if (tutorial)
 							{
 								// TODO - DIALOG WINDOW CONFIRMATION
-								//App::getModule<StateManager>().clear();
+								// App::getModule<StateManager>().clear();
 								LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 								SetTutorialCommand::dispatch(tutorial);
 
@@ -507,7 +512,8 @@ void StartWindow::render()
 
 void StartWindow::showTutorialPopup()
 {
-	if(!App::getModule<StateManager>().isDirty()) {
+	if (!App::getModule<StateManager>().isDirty())
+	{
 		popupActive = false;
 		return;
 	}

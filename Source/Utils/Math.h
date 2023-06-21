@@ -89,11 +89,20 @@ FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float eps
 	return true;
 }
 
-template <typename T> bool isNormalized(const T& val) { return eq(glm::length2(val), 1.0f); }
+template <typename T> bool isNormalized(const T& val)
+{
+	return eq(glm::length2(val), 1.0f);
+}
 
-FORCE_INLINE bool areElementsSame(const glm::vec3 vec) { return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]); }
+FORCE_INLINE bool areElementsSame(const glm::vec3 vec)
+{
+	return Math::eq(vec[0], vec[1]) && Math::eq(vec[1], vec[2]);
+}
 
-FORCE_INLINE bool withinInterval(float val, float from, float to) { return from <= val && val <= to; }
+FORCE_INLINE bool withinInterval(float val, float from, float to)
+{
+	return from <= val && val <= to;
+}
 
 /**
  * \brief Linear interpolation between two vectors vec3 \a a and \a b
@@ -131,26 +140,38 @@ static glm::vec4 lerp(glm::vec4 a, glm::vec4 b, float alpha)
  */
 glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat = false);
 
-static float smoothAlpha(const float a) { return ((6 * a - 15) * a + 10) * a * a * a; }
+static float smoothAlpha(const float a)
+{
+	return ((6 * a - 15) * a + 10) * a * a * a;
+}
 
 /**
  * \brief Random float from interval 0 .. 0.999
  * \return random float
  */
-static float randomf() { return (float)((rand() % 1000) / 1000.0f); }
+static float randomf()
+{
+	return (float) ((rand() % 1000) / 1000.0f);
+}
 
 /**
  * \brief Random float from interval -0.5 .. +0.499
  * \return random float
  */
-static float randomfHalf() { return -0.5f + randomf(); }
+static float randomfHalf()
+{
+	return -0.5f + randomf();
+}
 
 /**
  * \brief Random integer from interval 0..\a topNotInclude
  * \param topNotInclude
  * \return Random integer
  */
-static int randomi(const int topNotInclude) { return rand() % topNotInclude; }
+static int randomi(const int topNotInclude)
+{
+	return rand() % topNotInclude;
+}
 
 /**
  * \brief Random integer from interval \a downIncluded .. \a topNotInclude
@@ -158,9 +179,15 @@ static int randomi(const int topNotInclude) { return rand() % topNotInclude; }
  * \param topNotInclude max) generated value
  * \return Random integer
  */
-static int randomi(const int downIncluded, const int topNotInclude) { return rand() % topNotInclude + downIncluded; }
+static int randomi(const int downIncluded, const int topNotInclude)
+{
+	return rand() % topNotInclude + downIncluded;
+}
 
-static glm::vec3 randomVec() { return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf())); }
+static glm::vec3 randomVec()
+{
+	return glm::normalize(glm::vec3(randomfHalf(), randomfHalf(), randomfHalf()));
+}
 
 static void prefixSum(std::vector<int>& arr)
 {

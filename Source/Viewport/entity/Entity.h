@@ -50,11 +50,20 @@ public:
 
 	virtual void update(Scene& scene) = 0;
 
-	void render(glm::mat4 view, glm::mat4 projection) { render(view, projection, false); }
-	void render(glm::mat4 view, glm::mat4 projection, bool silhouette) { render(m_shader, view, projection, silhouette); }
+	void render(glm::mat4 view, glm::mat4 projection)
+	{
+		render(view, projection, false);
+	}
+	void render(glm::mat4 view, glm::mat4 projection, bool silhouette)
+	{
+		render(m_shader, view, projection, silhouette);
+	}
 
 protected:
-	void render(Shader* shader, glm::mat4 view, glm::mat4 projection) { render(shader, view, projection, false); }
+	void render(Shader* shader, glm::mat4 view, glm::mat4 projection)
+	{
+		render(shader, view, projection, false);
+	}
 
 	/**
 	 * IMPLEMENTATION NOTE:
@@ -72,9 +81,9 @@ protected:
 	 * use dynamic cast). But that approach ignores inheritance which we need and having multiple types of shaders and
 	 * entity member variable seems very inflexible.
 	 *
-	 * The true elegant solution probably doesn't involve inheritance at all and rather uses composition, together with an
-	 * ECS or something. But it was decided to not dive into that realm and so we are stuck with this seemingly simple but
-	 * not very flexible inheritance structure.
+	 * The true elegant solution probably doesn't involve inheritance at all and rather uses composition, together with
+	 * an ECS or something. But it was decided to not dive into that realm and so we are stuck with this seemingly
+	 * simple but not very flexible inheritance structure.
 	 */
 	virtual void render(Shader* shader, glm::mat4 view, glm::mat4 projection, bool silhouette) = 0;
 
@@ -93,13 +102,31 @@ public:
 	 */
 	virtual void onSceneRemove(Scene& scene) {}
 
-	virtual void setDisplayType(DisplayType type) { m_displayType = type; }
-	virtual DisplayType getDisplayType() const { return m_displayType; }
+	virtual void setDisplayType(DisplayType type)
+	{
+		m_displayType = type;
+	}
+	virtual DisplayType getDisplayType() const
+	{
+		return m_displayType;
+	}
 
-	virtual void setHighlighted(bool highlight) { m_highlight = highlight; }
-	virtual bool isHighlighted() const { return m_highlight; }
+	virtual void setHighlighted(bool highlight)
+	{
+		m_highlight = highlight;
+	}
+	virtual bool isHighlighted() const
+	{
+		return m_highlight;
+	}
 
-	virtual void setHighlightColor(glm::vec3 highlightColor) { m_highlightColor = highlightColor; }
-	virtual glm::vec3 getHighlightColor() const { return m_highlightColor; }
+	virtual void setHighlightColor(glm::vec3 highlightColor)
+	{
+		m_highlightColor = highlightColor;
+	}
+	virtual glm::vec3 getHighlightColor() const
+	{
+		return m_highlightColor;
+	}
 };
 } // namespace Vp

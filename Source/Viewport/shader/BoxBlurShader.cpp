@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-BoxBlurShader::BoxBlurShader(GLuint id) : Shader(id) { init(false); }
+BoxBlurShader::BoxBlurShader(GLuint id) : Shader(id)
+{
+	init(false);
+}
 
 void BoxBlurShader::init(bool initSuperclass)
 {

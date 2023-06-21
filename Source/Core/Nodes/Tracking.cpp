@@ -173,8 +173,7 @@ void SequenceTree::MatrixIterator::advance()
 void SequenceTree::MatrixIterator::withdraw()
 {
 	// helper function
-	const auto toSequenceFn = [](Ptr<Node> node) -> Sequence*
-	{
+	const auto toSequenceFn = [](Ptr<Node> node) -> Sequence* {
 		if (node == nullptr)
 		{
 			return nullptr;
@@ -204,7 +203,8 @@ void SequenceTree::MatrixIterator::withdraw()
 
 		// Find previous sequence.
 		// We must begin from the root sequence, because parent sequence may have multiple children.
-		while ((prevSequenceParent = toSequenceFn(GraphManager::getParent(prevSequence->getPtr()))) != m_currentSequence)
+		while ((prevSequenceParent = toSequenceFn(GraphManager::getParent(prevSequence->getPtr()))) !=
+		       m_currentSequence)
 		{
 			prevSequence = prevSequenceParent;
 		}
@@ -248,8 +248,7 @@ void setActivePart(Ptr<Node> node, float value)
 
 MatrixTracker::MatrixTracker(Sequence* beginSequence, UPtr<IModelProxy> model)
     : m_model(std::move(model)), m_interpolatedMatrix(1.0f), m_beginSequence(beginSequence)
-{
-}
+{}
 
 void MatrixTracker::update()
 {
@@ -326,8 +325,8 @@ void MatrixTracker::track()
 
 	// Iterator now points to the sequences root.
 
-	float matFactor = 1.0f / (float)matricesCount;
-	int matricesBefore = (int)(m_param * (float)matricesCount);
+	float matFactor = 1.0f / (float) matricesCount;
+	int matricesBefore = (int) (m_param * (float) matricesCount);
 	m_fullMatricesCount = matricesBefore;
 
 	float interpParam = fmod(m_param, matFactor) / matFactor;
@@ -384,4 +383,4 @@ void MatrixTracker::setTransform()
 	// m_model->getModel()->setValue(m_interpolatedMatrix);
 	m_model->update(m_interpolatedMatrix);
 }
-} // namespace erm
+} // namespace Core

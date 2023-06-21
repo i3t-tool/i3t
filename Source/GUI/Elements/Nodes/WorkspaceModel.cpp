@@ -33,7 +33,7 @@ void WorkspaceModel::popupContent_axis_showmodel()
 
 	if (ImGui::MenuItem("Show axes", NULL, model->m_showAxes))
 	{
-        model->m_showAxes = !model->m_showAxes;
+		model->m_showAxes = !model->m_showAxes;
 	}
 	if (ImGui::MenuItem("Show model", NULL, model->m_visible))
 	{
@@ -142,15 +142,13 @@ void WorkspaceModel::init()
 	// Callback that gets called when the underlying Model node updates values
 	// The Model node also updates a public model matrix variable which we can
 	// read
-	m_nodebase->addUpdateCallback(
-	    [this](Core::Node* node)
-	    {
-		    Core::Model* modelNode = dynamic_cast<Core::Model*>(node);
-		    if (modelNode)
-		    {
-			    m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
-		    }
-	    });
+	m_nodebase->addUpdateCallback([this](Core::Node* node) {
+		Core::Model* modelNode = dynamic_cast<Core::Model*>(node);
+		if (modelNode)
+		{
+			m_viewportModel.lock()->m_modelMatrix = modelNode->m_modelMatrix;
+		}
+	});
 }
 
 bool WorkspaceModel::topContent()
@@ -168,15 +166,16 @@ bool WorkspaceModel::middleContent()
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
-#define FLOOR_VEC2(_VAL) (ImVec2((float)(int)((_VAL).x), (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
-	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
+#define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
+	ImVec2 zoomedTextureSize =
+	    FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
 
 	App::get().viewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 
 	if (framebuffer)
 	{
-		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
+		ImGui::Image((void*) (intptr_t) framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
 		             ImVec2(1.0f, 0.0f) // vertical flip
 		);
 	}

@@ -15,9 +15,7 @@
 class SerializationVisitor : public NodeVisitor
 {
 public:
-	SerializationVisitor(Memento& memento) : m_memento(memento)
-	{
-	}
+	SerializationVisitor(Memento& memento) : m_memento(memento) {}
 
 	void dump(const std::vector<Ptr<GuiNode>>& nodes);
 

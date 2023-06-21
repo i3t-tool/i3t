@@ -33,7 +33,10 @@ struct Color final
 	static glm::vec3 ORANGE;
 	static glm::vec3 BROWN;
 
-	static glm::vec3 getColor(const float r, const float g, const float b) { return glm::vec3(r, g, b); }
+	static glm::vec3 getColor(const float r, const float g, const float b)
+	{
+		return glm::vec3(r, g, b);
+	}
 
 	static glm::vec3 randomColor()
 	{

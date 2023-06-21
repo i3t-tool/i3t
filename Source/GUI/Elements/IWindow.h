@@ -7,15 +7,18 @@
 
 #include <string>
 
-#include "spdlog/fmt/fmt.h"
 #include "glm/vec2.hpp"
+#include "spdlog/fmt/fmt.h"
 
 #include "Core/Input/InputController.h"
 
 #define I3T_WINDOW(WindowType)                                                                                         \
 public:                                                                                                                \
-	static constexpr const char* ID = #WindowType;                                                                       \
-	[[nodiscard]] const char* getID() const override { return ID; }
+	static constexpr const char* ID = #WindowType;                                                                     \
+	[[nodiscard]] const char* getID() const override                                                                   \
+	{                                                                                                                  \
+		return ID;                                                                                                     \
+	}
 
 class WindowManager;
 
@@ -28,6 +31,7 @@ class WindowManager;
 class IWindow : public std::enable_shared_from_this<IWindow>
 {
 	friend class WindowManager;
+
 public:
 	// Window info (updated by updateWindowInfo())
 	glm::vec2 m_windowPos;   ///< Top-left corner of the window in screen coordinates
@@ -56,10 +60,22 @@ public:
 
 	virtual const char* getID() const = 0;
 
-	void hide() { m_show = false; }
-	void show() { m_show = true; }
-	bool isVisible() const { return m_show; }
-	bool* getShowPtr() { return &m_show; }
+	void hide()
+	{
+		m_show = false;
+	}
+	void show()
+	{
+		m_show = true;
+	}
+	bool isVisible() const
+	{
+		return m_show;
+	}
+	bool* getShowPtr()
+	{
+		return &m_show;
+	}
 
 	std::string getName() const;
 	std::string setName(const char* name);
@@ -67,8 +83,14 @@ public:
 	/**
 	 * Returns window input controller.
 	 */
-	InputController& getInput() { return Input; }
-	InputController* getInputPtr() { return &Input; }
+	InputController& getInput()
+	{
+		return Input;
+	}
+	InputController* getInputPtr()
+	{
+		return &Input;
+	}
 
 protected:
 	/**

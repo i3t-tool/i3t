@@ -6,8 +6,7 @@ Link::Link(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="D
     : DiwneObject(diwne, id, labelDiwne), m_startDiwne(ImVec2(0, 0)) /* only initialize value - see initializeDiwne() */
       ,
       m_endDiwne(ImVec2(0, 0)), m_just_pluged(false)
-{
-}
+{}
 
 void Link::updateSquareDistanceMouseFromLink()
 {
@@ -25,7 +24,10 @@ void Link::updateControlPoints()
 	m_controlPointEndDiwne = m_endDiwne + diwne.mp_settingsDiwne->linkEndControlOffsetDiwne;
 }
 
-bool Link::isLinkOnWorkArea() { return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne()); }
+bool Link::isLinkOnWorkArea()
+{
+	return diwne.getWorkAreaDiwne().Overlaps(getRectDiwne());
+}
 
 bool Link::initialize()
 {
@@ -51,7 +53,10 @@ bool Link::bypassFocusAction()
 	return m_squaredDistanceMouseFromLink <
 	       (diwne.mp_settingsDiwne->linkThicknessDiwne * diwne.mp_settingsDiwne->linkThicknessDiwne);
 }
-bool Link::bypassFocusForInteractionAction() { return bypassFocusAction(); }
+bool Link::bypassFocusForInteractionAction()
+{
+	return bypassFocusAction();
+}
 
 bool Link::processFocused()
 {

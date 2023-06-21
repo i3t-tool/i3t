@@ -3,7 +3,10 @@
 
 using namespace Vp;
 
-FrustumShader::FrustumShader(GLuint id) : ColorShader(id) { init(false); }
+FrustumShader::FrustumShader(GLuint id) : ColorShader(id)
+{
+	init(false);
+}
 
 void FrustumShader::init(bool initSuperclass)
 {

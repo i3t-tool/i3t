@@ -35,17 +35,26 @@ public:
 		auto* curr = m_currentTheme;
 		return *curr;
 	}
-	std::vector<Theme>& getThemes() { return m_allThemes; }
+	std::vector<Theme>& getThemes()
+	{
+		return m_allThemes;
+	}
 
 	void loadThemes();
 	void reloadThemes();
 
 	void setTheme(const Theme& theme);
 
-	Fonts& getFonts() { return m_fonts; }
+	Fonts& getFonts()
+	{
+		return m_fonts;
+	}
 	void loadFonts();
 
-	WindowManager& getWindowManager() { return m_windowManager; }
+	WindowManager& getWindowManager()
+	{
+		return m_windowManager;
+	}
 
 private:
 	void buildDockspace();

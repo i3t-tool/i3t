@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-Shader::Shader(GLuint id) : m_id(id) { init(false); }
+Shader::Shader(GLuint id) : m_id(id)
+{
+	init(false);
+}
 
 void Shader::init(bool initSuperclass)
 {
@@ -10,7 +13,10 @@ void Shader::init(bool initSuperclass)
 	m_wboitFuncId = glGetUniformLocation(m_id, "u_wboitFunc");
 }
 
-void Shader::use() const { glUseProgram(m_id); }
+void Shader::use() const
+{
+	glUseProgram(m_id);
+}
 
 void Shader::setUniforms()
 {
@@ -43,6 +49,12 @@ void Shader::bindTexture2DMS(GLuint textureUnit, GLuint textureID, GLint sampler
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
 }
 
-bool Shader::hasUniform(GLint location) { return location != -1; }
+bool Shader::hasUniform(GLint location)
+{
+	return location != -1;
+}
 
-bool Shader::supportsWboit() { return hasUniform(m_wboitFlagId); }
+bool Shader::supportsWboit()
+{
+	return hasUniform(m_wboitFlagId);
+}

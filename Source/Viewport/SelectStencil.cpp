@@ -72,7 +72,7 @@ unsigned char SelectStencil::getStencilAt(int x, int y, int r, int filter)
 		return 0;
 	}
 
-	unsigned int* read = (unsigned int*)malloc(size_t(w * h * sizeof(unsigned int)));
+	unsigned int* read = (unsigned int*) malloc(size_t(w * h * sizeof(unsigned int)));
 	glReadPixels(x, y, w, h, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, read);
 
 	unsigned char stencilnum = 0;

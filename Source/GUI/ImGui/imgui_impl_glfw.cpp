@@ -83,12 +83,12 @@
 #define GLFW_HAS_MONITOR_WORK_AREA                                                                                     \
 	(GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3300) // 3.3+ glfwGetMonitorWorkarea
 #define GLFW_HAS_OSX_WINDOW_POS_FIX                                                                                    \
-	(GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 + GLFW_VERSION_REVISION * 10 >=                                \
-	 3310)                       // 3.3.1+ Fixed: Resizing window repositions it on MacOS #1553
+	(GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 + GLFW_VERSION_REVISION * 10 >=                              \
+	 3310)                     // 3.3.1+ Fixed: Resizing window repositions it on MacOS #1553
 #ifdef GLFW_RESIZE_NESW_CURSOR // Let's be nice to people who pulled GLFW between 2019-04-16 (3.4 define) and          \
                                // 2019-11-29 (cursors defines) // FIXME: Remove when GLFW 3.4 is released?
 #define GLFW_HAS_NEW_CURSORS                                                                                           \
-	(GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >=                                                             \
+	(GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >=                                                           \
 	 3400) // 3.4+ GLFW_RESIZE_ALL_CURSOR, GLFW_RESIZE_NESW_CURSOR,
 	       // GLFW_RESIZE_NWSE_CURSOR, GLFW_NOT_ALLOWED_CURSOR
 #else
@@ -132,12 +132,12 @@ static void ImGui_ImplGlfw_ShutdownPlatformInterface();
 
 static const char* ImGui_ImplGlfw_GetClipboardText(void* user_data)
 {
-	return glfwGetClipboardString((GLFWwindow*)user_data);
+	return glfwGetClipboardString((GLFWwindow*) user_data);
 }
 
 static void ImGui_ImplGlfw_SetClipboardText(void* user_data, const char* text)
 {
-	glfwSetClipboardString((GLFWwindow*)user_data, text);
+	glfwSetClipboardString((GLFWwindow*) user_data, text);
 }
 
 void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -172,8 +172,8 @@ void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yo
 	InputManager::m_mouseWheelOffset = yoffset;
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.MouseWheelH += (float)xoffset;
-	io.MouseWheel += (float)yoffset;
+	io.MouseWheelH += (float) xoffset;
+	io.MouseWheel += (float) yoffset;
 }
 
 void ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -213,7 +213,10 @@ void ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c)
 	io.AddInputCharacter(c);
 }
 
-void ImGui_ImplGlfw_MonitorCallback(GLFWmonitor*, int) { g_WantUpdateMonitors = true; }
+void ImGui_ImplGlfw_MonitorCallback(GLFWmonitor*, int)
+{
+	g_WantUpdateMonitors = true;
+}
 
 static bool ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, GlfwClientApi client_api)
 {
@@ -315,7 +318,7 @@ static bool ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, Glfw
 	// Our mouse update function expect PlatformHandle to be filled for the main
 	// viewport
 	ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-	main_viewport->PlatformHandle = (void*)g_Window;
+	main_viewport->PlatformHandle = (void*) g_Window;
 #ifdef _WIN32
 	main_viewport->PlatformHandleRaw = glfwGetWin32Window(g_Window);
 #endif
@@ -377,7 +380,7 @@ static void ImGui_ImplGlfw_UpdateMousePosAndButtons()
 	for (int n = 0; n < platform_io.Viewports.Size; n++)
 	{
 		ImGuiViewport* viewport = platform_io.Viewports[n];
-		GLFWwindow* window = (GLFWwindow*)viewport->PlatformHandle;
+		GLFWwindow* window = (GLFWwindow*) viewport->PlatformHandle;
 		IM_ASSERT(window != NULL);
 #ifdef __EMSCRIPTEN__
 		const bool focused = true;
@@ -389,8 +392,8 @@ static void ImGui_ImplGlfw_UpdateMousePosAndButtons()
 		{
 			if (io.WantSetMousePos)
 			{
-				glfwSetCursorPos(window, (double)(mouse_pos_backup.x - viewport->Pos.x),
-				                 (double)(mouse_pos_backup.y - viewport->Pos.y));
+				glfwSetCursorPos(window, (double) (mouse_pos_backup.x - viewport->Pos.x),
+				                 (double) (mouse_pos_backup.y - viewport->Pos.y));
 			}
 			else
 			{
@@ -403,14 +406,14 @@ static void ImGui_ImplGlfw_UpdateMousePosAndButtons()
 					// primary monitor)
 					int window_x, window_y;
 					glfwGetWindowPos(window, &window_x, &window_y);
-					io.MousePos = ImVec2((float)mouse_x + window_x, (float)mouse_y + window_y);
+					io.MousePos = ImVec2((float) mouse_x + window_x, (float) mouse_y + window_y);
 				}
 				else
 				{
 					// Single viewport mode: mouse position in client window coordinates
 					// (io.MousePos is (0,0) when the mouse is on the upper-left corner of
 					// the app window)
-					io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
+					io.MousePos = ImVec2((float) mouse_x, (float) mouse_y);
 				}
 			}
 			for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++)
@@ -455,7 +458,7 @@ static void ImGui_ImplGlfw_UpdateMouseCursor()
 	ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 	for (int n = 0; n < platform_io.Viewports.Size; n++)
 	{
-		GLFWwindow* window = (GLFWwindow*)platform_io.Viewports[n]->PlatformHandle;
+		GLFWwindow* window = (GLFWwindow*) platform_io.Viewports[n]->PlatformHandle;
 		if (imgui_cursor == ImGuiMouseCursor_None || io.MouseDrawCursor)
 		{
 			// Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
@@ -482,18 +485,18 @@ static void ImGui_ImplGlfw_UpdateGamepads()
 
 // Update gamepad inputs
 #define MAP_BUTTON(NAV_NO, BUTTON_NO)                                                                                  \
-	{                                                                                                                    \
-		if (buttons_count > BUTTON_NO && buttons[BUTTON_NO] == GLFW_PRESS)                                                 \
-			io.NavInputs[NAV_NO] = 1.0f;                                                                                     \
+	{                                                                                                                  \
+		if (buttons_count > BUTTON_NO && buttons[BUTTON_NO] == GLFW_PRESS)                                             \
+			io.NavInputs[NAV_NO] = 1.0f;                                                                               \
 	}
 #define MAP_ANALOG(NAV_NO, AXIS_NO, V0, V1)                                                                            \
-	{                                                                                                                    \
-		float v = (axes_count > AXIS_NO) ? axes[AXIS_NO] : V0;                                                             \
-		v = (v - V0) / (V1 - V0);                                                                                          \
-		if (v > 1.0f)                                                                                                      \
-			v = 1.0f;                                                                                                        \
-		if (io.NavInputs[NAV_NO] < v)                                                                                      \
-			io.NavInputs[NAV_NO] = v;                                                                                        \
+	{                                                                                                                  \
+		float v = (axes_count > AXIS_NO) ? axes[AXIS_NO] : V0;                                                         \
+		v = (v - V0) / (V1 - V0);                                                                                      \
+		if (v > 1.0f)                                                                                                  \
+			v = 1.0f;                                                                                                  \
+		if (io.NavInputs[NAV_NO] < v)                                                                                  \
+			io.NavInputs[NAV_NO] = v;                                                                                  \
 	}
 	int axes_count = 0, buttons_count = 0;
 	const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axes_count);
@@ -535,16 +538,16 @@ static void ImGui_ImplGlfw_UpdateMonitors()
 		glfwGetMonitorPos(glfw_monitors[n], &x, &y);
 		const GLFWvidmode* vid_mode = glfwGetVideoMode(glfw_monitors[n]);
 #if GLFW_HAS_MONITOR_WORK_AREA
-		monitor.MainPos = ImVec2((float)x, (float)y);
-		monitor.MainSize = ImVec2((float)vid_mode->width, (float)vid_mode->height);
+		monitor.MainPos = ImVec2((float) x, (float) y);
+		monitor.MainSize = ImVec2((float) vid_mode->width, (float) vid_mode->height);
 		int w, h;
 		glfwGetMonitorWorkarea(glfw_monitors[n], &x, &y, &w, &h);
-		monitor.WorkPos = ImVec2((float)x, (float)y);
+		monitor.WorkPos = ImVec2((float) x, (float) y);
 		;
-		monitor.WorkSize = ImVec2((float)w, (float)h);
+		monitor.WorkSize = ImVec2((float) w, (float) h);
 #else
-		monitor.MainPos = monitor.WorkPos = ImVec2((float)x, (float)y);
-		monitor.MainSize = monitor.WorkSize = ImVec2((float)vid_mode->width, (float)vid_mode->height);
+		monitor.MainPos = monitor.WorkPos = ImVec2((float) x, (float) y);
+		monitor.MainSize = monitor.WorkSize = ImVec2((float) vid_mode->width, (float) vid_mode->height);
 #endif
 #if GLFW_HAS_PER_MONITOR_DPI
 		// Warning: the validity of monitor DPI information on Windows depends on
@@ -572,15 +575,15 @@ void ImGui_ImplGlfw_NewFrame()
 	int display_w, display_h;
 	glfwGetWindowSize(g_Window, &w, &h);
 	glfwGetFramebufferSize(g_Window, &display_w, &display_h);
-	io.DisplaySize = ImVec2((float)w, (float)h);
+	io.DisplaySize = ImVec2((float) w, (float) h);
 	if (w > 0 && h > 0)
-		io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
+		io.DisplayFramebufferScale = ImVec2((float) display_w / w, (float) display_h / h);
 	if (g_WantUpdateMonitors)
 		ImGui_ImplGlfw_UpdateMonitors();
 
 	// Setup time step
 	double current_time = glfwGetTime();
-	io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f / 60.0f);
+	io.DeltaTime = g_Time > 0.0 ? (float) (current_time - g_Time) : (float) (1.0f / 60.0f);
 	g_Time = current_time;
 
 	ImGui_ImplGlfw_UpdateMousePosAndButtons();
@@ -613,7 +616,10 @@ struct ImGuiViewportDataGlfw
 		WindowOwned = false;
 		IgnoreWindowSizeEventFrame = IgnoreWindowPosEventFrame = -1;
 	}
-	~ImGuiViewportDataGlfw() { IM_ASSERT(Window == NULL); }
+	~ImGuiViewportDataGlfw()
+	{
+		IM_ASSERT(Window == NULL);
+	}
 };
 
 static void ImGui_ImplGlfw_WindowCloseCallback(GLFWwindow* window)
@@ -634,7 +640,7 @@ static void ImGui_ImplGlfw_WindowPosCallback(GLFWwindow* window, int, int)
 {
 	if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
 	{
-		if (ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData)
+		if (ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData)
 		{
 			bool ignore_event = (ImGui::GetFrameCount() <= data->IgnoreWindowPosEventFrame + 1);
 			// data->IgnoreWindowPosEventFrame = -1;
@@ -649,7 +655,7 @@ static void ImGui_ImplGlfw_WindowSizeCallback(GLFWwindow* window, int, int)
 {
 	if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
 	{
-		if (ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData)
+		if (ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData)
 		{
 			bool ignore_event = (ImGui::GetFrameCount() <= data->IgnoreWindowSizeEventFrame + 1);
 			// data->IgnoreWindowSizeEventFrame = -1;
@@ -678,13 +684,13 @@ static void ImGui_ImplGlfw_CreateWindow(ImGuiViewport* viewport)
 	glfwWindowHint(GLFW_FLOATING, (viewport->Flags & ImGuiViewportFlags_TopMost) ? true : false);
 #endif
 	GLFWwindow* share_window = (g_ClientApi == GlfwClientApi_OpenGL) ? g_Window : NULL;
-	data->Window = glfwCreateWindow((int)viewport->Size.x, (int)viewport->Size.y, "No Title Yet", NULL, share_window);
+	data->Window = glfwCreateWindow((int) viewport->Size.x, (int) viewport->Size.y, "No Title Yet", NULL, share_window);
 	data->WindowOwned = true;
-	viewport->PlatformHandle = (void*)data->Window;
+	viewport->PlatformHandle = (void*) data->Window;
 #ifdef _WIN32
 	viewport->PlatformHandleRaw = glfwGetWin32Window(data->Window);
 #endif
-	glfwSetWindowPos(data->Window, (int)viewport->Pos.x, (int)viewport->Pos.y);
+	glfwSetWindowPos(data->Window, (int) viewport->Pos.x, (int) viewport->Pos.y);
 
 	// Install GLFW callbacks for secondary viewports
 	glfwSetMouseButtonCallback(data->Window, ImGui_ImplGlfw_MouseButtonCallback);
@@ -703,12 +709,12 @@ static void ImGui_ImplGlfw_CreateWindow(ImGuiViewport* viewport)
 
 static void ImGui_ImplGlfw_DestroyWindow(ImGuiViewport* viewport)
 {
-	if (ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData)
+	if (ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData)
 	{
 		if (data->WindowOwned)
 		{
 #if !GLFW_HAS_MOUSE_PASSTHROUGH && GLFW_HAS_WINDOW_HOVERED && defined(_WIN32)
-			HWND hwnd = (HWND)viewport->PlatformHandleRaw;
+			HWND hwnd = (HWND) viewport->PlatformHandleRaw;
 			::RemovePropA(hwnd, "IMGUI_VIEWPORT");
 #endif
 			glfwDestroyWindow(data->Window);
@@ -737,7 +743,7 @@ static LRESULT CALLBACK WndProcNoInputs(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 		// may manually synchronize its state e.g. in your main loop after calling
 		// UpdatePlatformWindows(). Iterate all viewports/platform windows and pass
 		// the flag to your windowing system.
-		ImGuiViewport* viewport = (ImGuiViewport*)::GetPropA(hWnd, "IMGUI_VIEWPORT");
+		ImGuiViewport* viewport = (ImGuiViewport*) ::GetPropA(hWnd, "IMGUI_VIEWPORT");
 		if (viewport->Flags & ImGuiViewportFlags_NoInputs)
 			return HTTRANSPARENT;
 	}
@@ -747,11 +753,11 @@ static LRESULT CALLBACK WndProcNoInputs(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 
 static void ImGui_ImplGlfw_ShowWindow(ImGuiViewport* viewport)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 
 #if defined(_WIN32)
 	// GLFW hack: Hide icon from task bar
-	HWND hwnd = (HWND)viewport->PlatformHandleRaw;
+	HWND hwnd = (HWND) viewport->PlatformHandleRaw;
 	if (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon)
 	{
 		LONG ex_style = ::GetWindowLong(hwnd, GWL_EXSTYLE);
@@ -765,7 +771,7 @@ static void ImGui_ImplGlfw_ShowWindow(ImGuiViewport* viewport)
 	::SetPropA(hwnd, "IMGUI_VIEWPORT", viewport);
 	if (g_GlfwWndProc == NULL)
 		g_GlfwWndProc = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
-	::SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)WndProcNoInputs);
+	::SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR) WndProcNoInputs);
 #endif
 
 #if !GLFW_HAS_FOCUS_ON_SHOW
@@ -787,30 +793,30 @@ static void ImGui_ImplGlfw_ShowWindow(ImGuiViewport* viewport)
 
 static ImVec2 ImGui_ImplGlfw_GetWindowPos(ImGuiViewport* viewport)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	int x = 0, y = 0;
 	glfwGetWindowPos(data->Window, &x, &y);
-	return ImVec2((float)x, (float)y);
+	return ImVec2((float) x, (float) y);
 }
 
 static void ImGui_ImplGlfw_SetWindowPos(ImGuiViewport* viewport, ImVec2 pos)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	data->IgnoreWindowPosEventFrame = ImGui::GetFrameCount();
-	glfwSetWindowPos(data->Window, (int)pos.x, (int)pos.y);
+	glfwSetWindowPos(data->Window, (int) pos.x, (int) pos.y);
 }
 
 static ImVec2 ImGui_ImplGlfw_GetWindowSize(ImGuiViewport* viewport)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	int w = 0, h = 0;
 	glfwGetWindowSize(data->Window, &w, &h);
-	return ImVec2((float)w, (float)h);
+	return ImVec2((float) w, (float) h);
 }
 
 static void ImGui_ImplGlfw_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 #if __APPLE__ && !GLFW_HAS_OSX_WINDOW_POS_FIX
 	// Native OS windows are positioned from the bottom-left corner on macOS,
 	// whereas on other platforms they are positioned from the upper-left corner.
@@ -823,58 +829,58 @@ static void ImGui_ImplGlfw_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
 	glfwSetWindowPos(data->Window, x, y - height + size.y);
 #endif
 	data->IgnoreWindowSizeEventFrame = ImGui::GetFrameCount();
-	glfwSetWindowSize(data->Window, (int)size.x, (int)size.y);
+	glfwSetWindowSize(data->Window, (int) size.x, (int) size.y);
 }
 
 static void ImGui_ImplGlfw_SetWindowTitle(ImGuiViewport* viewport, const char* title)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	glfwSetWindowTitle(data->Window, title);
 }
 
 static void ImGui_ImplGlfw_SetWindowFocus(ImGuiViewport* viewport)
 {
 #if GLFW_HAS_FOCUS_WINDOW
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	glfwFocusWindow(data->Window);
 #else
 	// FIXME: What are the effect of not having this function? At the moment imgui
 	// doesn't actually call SetWindowFocus
 	// - we set that up ahead, will answer that question later.
-	(void)viewport;
+	(void) viewport;
 #endif
 }
 
 static bool ImGui_ImplGlfw_GetWindowFocus(ImGuiViewport* viewport)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	return glfwGetWindowAttrib(data->Window, GLFW_FOCUSED) != 0;
 }
 
 static bool ImGui_ImplGlfw_GetWindowMinimized(ImGuiViewport* viewport)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	return glfwGetWindowAttrib(data->Window, GLFW_ICONIFIED) != 0;
 }
 
 #if GLFW_HAS_WINDOW_ALPHA
 static void ImGui_ImplGlfw_SetWindowAlpha(ImGuiViewport* viewport, float alpha)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	glfwSetWindowOpacity(data->Window, alpha);
 }
 #endif
 
 static void ImGui_ImplGlfw_RenderWindow(ImGuiViewport* viewport, void*)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	if (g_ClientApi == GlfwClientApi_OpenGL)
 		glfwMakeContextCurrent(data->Window);
 }
 
 static void ImGui_ImplGlfw_SwapBuffers(ImGuiViewport* viewport, void*)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	if (g_ClientApi == GlfwClientApi_OpenGL)
 	{
 		glfwMakeContextCurrent(data->Window);
@@ -898,8 +904,8 @@ static void ImGui_ImplGlfw_SwapBuffers(ImGuiViewport* viewport, void*)
 static void ImGui_ImplWin32_SetImeInputPos(ImGuiViewport* viewport, ImVec2 pos)
 {
 	COMPOSITIONFORM cf = {
-	    CFS_FORCE_POSITION, {(LONG)(pos.x - viewport->Pos.x), (LONG)(pos.y - viewport->Pos.y)}, {0, 0, 0, 0}};
-	if (HWND hwnd = (HWND)viewport->PlatformHandleRaw)
+	    CFS_FORCE_POSITION, {(LONG) (pos.x - viewport->Pos.x), (LONG) (pos.y - viewport->Pos.y)}, {0, 0, 0, 0}};
+	if (HWND hwnd = (HWND) viewport->PlatformHandleRaw)
 		if (HIMC himc = ::ImmGetContext(hwnd))
 		{
 			::ImmSetCompositionWindow(himc, &cf);
@@ -941,11 +947,11 @@ extern "C"
 static int ImGui_ImplGlfw_CreateVkSurface(ImGuiViewport* viewport, ImU64 vk_instance, const void* vk_allocator,
                                           ImU64* out_vk_surface)
 {
-	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*)viewport->PlatformUserData;
+	ImGuiViewportDataGlfw* data = (ImGuiViewportDataGlfw*) viewport->PlatformUserData;
 	IM_ASSERT(g_ClientApi == GlfwClientApi_Vulkan);
-	VkResult err = glfwCreateWindowSurface((VkInstance)vk_instance, data->Window,
-	                                       (const VkAllocationCallbacks*)vk_allocator, (VkSurfaceKHR*)out_vk_surface);
-	return (int)err;
+	VkResult err = glfwCreateWindowSurface((VkInstance) vk_instance, data->Window,
+	                                       (const VkAllocationCallbacks*) vk_allocator, (VkSurfaceKHR*) out_vk_surface);
+	return (int) err;
 }
 #endif // GLFW_HAS_VULKAN
 
@@ -984,7 +990,7 @@ static void ImGui_ImplGlfw_InitPlatformInterface()
 	data->Window = g_Window;
 	data->WindowOwned = false;
 	main_viewport->PlatformUserData = data;
-	main_viewport->PlatformHandle = (void*)g_Window;
+	main_viewport->PlatformHandle = (void*) g_Window;
 }
 
 static void ImGui_ImplGlfw_ShutdownPlatformInterface() {}

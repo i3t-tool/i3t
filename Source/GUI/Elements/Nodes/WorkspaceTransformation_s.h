@@ -20,7 +20,10 @@ public:
 	 *
 	 * \return Core::ETransformState:: Valid, Invalid, or Unknown
 	 */
-	virtual bool isMatrixValid() override { return m_nodebase->as<Core::TransformImpl<T>>()->isValid(); }
+	virtual bool isMatrixValid() override
+	{
+		return m_nodebase->as<Core::TransformImpl<T>>()->isValid();
+	}
 
 	int maxLenghtOfData()
 	{
@@ -75,8 +78,8 @@ public:
 					auto localData = valueStore.getVec3();
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
-					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()), fmt::format("{} Z", key.c_str())}
-					    /* \todo MH all/whole labels from core? */
+					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
+					     fmt::format("{} Z", key.c_str())} /* \todo MH all/whole labels from core? */
 					    ,
 					    {&localData[0], &localData[1], &localData[2]}, value_changed);
 					if (value_changed)
@@ -91,8 +94,9 @@ public:
 					auto localData = valueStore.getVec4();
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
-					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()), fmt::format("{} Z", key.c_str()),
-					     fmt::format("{} W", key.c_str())} /* \todo MH all/whole labels from core? */
+					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
+					     fmt::format("{} Z", key.c_str()), fmt::format("{} W", key.c_str())}
+					    /* \todo MH all/whole labels from core? */
 					    ,
 					    {&localData[0], &localData[1], &localData[2], &localData[3]}, value_changed);
 					if (value_changed)
@@ -107,8 +111,9 @@ public:
 					auto localData = valueStore.getQuat(); // the default "quat" value
 
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
-					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()), fmt::format("{} Z", key.c_str()),
-					     fmt::format("{} W", key.c_str())} /* \todo MH all/whole labels from core? */
+					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
+					     fmt::format("{} Z", key.c_str()), fmt::format("{} W", key.c_str())}
+					    /* \todo MH all/whole labels from core? */
 					    ,
 					    {&localData[0], &localData[1], &localData[2], &localData[3]}, value_changed);
 					if (value_changed)
@@ -134,8 +139,8 @@ public:
 				{
 					auto localData = valueStore.getFloat();
 
-					inner_interaction_happen |=
-					    drawDataSetValues_InsideTablebuilder({fmt::format("{}", key.c_str())}, {&localData}, value_changed);
+					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{}", key.c_str())},
+					                                                                 {&localData}, value_changed);
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
@@ -362,10 +367,10 @@ inline /* inline for ability to compile
 
 				if (m_nodebase->as<Core::Transform>()->hasSynergies()) /* uniform */
 				{
-					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder({fmt::format("{}", key.c_str())}
-					                                                                 /* \todo MH all/whole labels from core? */
-					                                                                 ,
-					                                                                 {&localData[0]}, value_changed);
+					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
+					    {fmt::format("{}", key.c_str())} /* \todo MH all/whole labels from core? */
+					    ,
+					    {&localData[0]}, value_changed);
 					if (value_changed)
 					{
 						// localData[1] = localData[2] = localData[0]; /* \todo JH \todo JH
@@ -380,8 +385,8 @@ inline /* inline for ability to compile
 				else /* non-uniform */
 				{
 					inner_interaction_happen |= drawDataSetValues_InsideTablebuilder(
-					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()), fmt::format("{} Z", key.c_str())}
-					    /* \todo MH all/whole labels from core? */
+					    {fmt::format("{} X", key.c_str()), fmt::format("{} Y", key.c_str()),
+					     fmt::format("{} Z", key.c_str())} /* \todo MH all/whole labels from core? */
 					    ,
 					    {&localData[0], &localData[1], &localData[2]}, value_changed);
 					if (value_changed)
@@ -425,11 +430,11 @@ inline /* inline for ability to compile
 		local_data.push_back(valueStore.getVec3());
 	}
 
-	inner_interaction_happen |= drawDataSetValuesTable_builder(cornerLabel, columnLabels, rowLabels,
-	                                                           {&local_data[0][0], &local_data[1][0], &local_data[2][0],
-	                                                            &local_data[0][1], &local_data[1][1], &local_data[2][1],
-	                                                            &local_data[0][2], &local_data[1][2], &local_data[2][2]},
-	                                                           value_changed, index_of_change);
+	inner_interaction_happen |= drawDataSetValuesTable_builder(
+	    cornerLabel, columnLabels, rowLabels,
+	    {&local_data[0][0], &local_data[1][0], &local_data[2][0], &local_data[0][1], &local_data[1][1],
+	     &local_data[2][1], &local_data[0][2], &local_data[1][2], &local_data[2][2]},
+	    value_changed, index_of_change);
 	if (value_changed)
 	{
 		index_of_change %= columnLabels.size(); /* move to index of nodebase data column */

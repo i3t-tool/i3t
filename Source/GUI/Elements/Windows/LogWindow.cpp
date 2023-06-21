@@ -13,30 +13,38 @@
 LogWindow::LogWindow()
 {
 #ifdef I3T_DEBUG
-	Input.bindAction("MyTestAction", EKeyState::Pressed, [] { LOG_INFO("MyTestAction triggered!"); });
+	Input.bindAction("MyTestAction", EKeyState::Pressed, [] {
+		LOG_INFO("MyTestAction triggered!");
+	});
 
-	Input.bindAxis("MyTestAxis", [](float val) { LOG_INFO("MyTestAxis triggered: {}!", val); });
+	Input.bindAxis("MyTestAxis", [](float val) {
+		LOG_INFO("MyTestAxis triggered: {}!", val);
+	});
 
 	////
-	Input.bindAction("createAndPlugConstructor", EKeyState::Released,
-	                 []
-	                 {
-		                 const auto isActionTriggered =
-		                     InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
-		                 LOG_INFO("InputManager::isActionTriggered("
-		                          "\"createAndPlugConstructor\") = {}",
-		                          isActionTriggered);
-	                 });
+	Input.bindAction("createAndPlugConstructor", EKeyState::Released, [] {
+		const auto isActionTriggered = InputManager::isActionTriggered("createAndPlugConstructor", EKeyState::Released);
+		LOG_INFO("InputManager::isActionTriggered("
+		         "\"createAndPlugConstructor\") = {}",
+		         isActionTriggered);
+	});
 	////
 
-	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed,
-	                 [] { LOG_INFO("bind: (mouse click + left ctrl) pressed"); });
+	Input.bindAction("TestMouseCtrlAction", EKeyState::Pressed, [] {
+		LOG_INFO("bind: (mouse click + left ctrl) pressed");
+	});
 
-	Input.bindAction("scrollUp", EKeyState::Pressed, []() { LOG_INFO("scrollUp"); });
+	Input.bindAction("scrollUp", EKeyState::Pressed, []() {
+		LOG_INFO("scrollUp");
+	});
 
-	Input.bindAction("scrollDown", EKeyState::Pressed, []() { LOG_INFO("scrollDown"); });
+	Input.bindAction("scrollDown", EKeyState::Pressed, []() {
+		LOG_INFO("scrollDown");
+	});
 
-	Input.bindAxis("scroll", [](float val) { LOG_INFO("scroll: {}", val); });
+	Input.bindAxis("scroll", [](float val) {
+		LOG_INFO("scroll: {}", val);
+	});
 #endif
 }
 

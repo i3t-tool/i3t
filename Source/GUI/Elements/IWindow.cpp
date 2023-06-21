@@ -7,7 +7,10 @@
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
 
-std::string IWindow::getName() const { return m_name; };
+std::string IWindow::getName() const
+{
+	return m_name;
+};
 
 std::string IWindow::setName(const char* name)
 {
@@ -54,8 +57,8 @@ void IWindow::updateWindowInfo()
 		                                              ImColor(0.f, 0.f, 0.f, 0.35f));
 		ImGui::GetForegroundDrawList()->AddRect(GUI::glmToIm(m_windowMin), GUI::glmToIm(m_windowMax),
 		                                        ImColor(1.f, 0.f, 0.f, 1.f));
-		// ImGui::GetForegroundDrawList()->AddRect(windowMin, ImVec2(windowMin.x + windowWidth, windowMin.y + windowHeight),
-		// ImColor(0.f, 1.f, 0.f, 0.7f));
+		// ImGui::GetForegroundDrawList()->AddRect(windowMin, ImVec2(windowMin.x + windowWidth, windowMin.y +
+		// windowHeight), ImColor(0.f, 1.f, 0.f, 0.7f));
 
 		glm::vec2 padding = glm::vec2(4.0f);
 		ImColor color = ImColor(0.27f, 0.96f, 0.09f, 1.f);

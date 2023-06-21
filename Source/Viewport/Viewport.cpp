@@ -100,7 +100,8 @@ void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int 
 	{
 		// Center camera on game object
 		m_previewScene->m_orbitCamera->setFov(m_settings.preview_fov);
-		m_previewScene->m_orbitCamera->centerOnBox(gameObjectPtr->m_mesh->m_boundingBoxMin, gameObjectPtr->m_mesh->m_boundingBoxMax, false);
+		m_previewScene->m_orbitCamera->centerOnBox(gameObjectPtr->m_mesh->m_boundingBoxMin,
+		                                           gameObjectPtr->m_mesh->m_boundingBoxMax, false);
 		float radius = m_previewScene->m_orbitCamera->getRadius();
 		m_previewScene->m_orbitCamera->setRadius(radius * m_settings.preview_radiusFactor);
 
@@ -177,6 +178,12 @@ WPtr<AggregateCamera> Viewport::getMainViewportCamera()
 	return camera;
 }
 
-ViewportSettings& Viewport::getSettings() { return m_settings; }
+ViewportSettings& Viewport::getSettings()
+{
+	return m_settings;
+}
 
-Manipulators& Viewport::getManipulators() { return *m_manipulators; };
+Manipulators& Viewport::getManipulators()
+{
+	return *m_manipulators;
+};

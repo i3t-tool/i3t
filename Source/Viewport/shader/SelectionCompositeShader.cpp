@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-SelectionCompositeShader::SelectionCompositeShader(GLuint id) : Shader(id) { init(false); }
+SelectionCompositeShader::SelectionCompositeShader(GLuint id) : Shader(id)
+{
+	init(false);
+}
 
 void SelectionCompositeShader::init(bool initSuperclass)
 {

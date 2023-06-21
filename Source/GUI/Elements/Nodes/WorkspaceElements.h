@@ -73,11 +73,23 @@ public:
 	              std::string const middleLabel = "Content");
 	~WorkspaceNode();
 
-	std::string getTopLabel() { return m_topLabel; };
-	std::string getMiddleLabel() { return m_middleLabel; };
+	std::string getTopLabel()
+	{
+		return m_topLabel;
+	};
+	std::string getMiddleLabel()
+	{
+		return m_middleLabel;
+	};
 
-	void setTopLabel(std::string label) { m_topLabel = label; };
-	void setMiddleLabel(std::string label) { m_middleLabel = label; };
+	void setTopLabel(std::string label)
+	{
+		m_topLabel = label;
+	};
+	void setMiddleLabel(std::string label)
+	{
+		m_middleLabel = label;
+	};
 
 	/* DIWNE function */
 	virtual bool bypassFocusForInteractionAction();
@@ -90,12 +102,24 @@ public:
 	virtual void deleteAction();
 
 	bool m_removeFromWorkspaceWindow;
-	bool getRemoveFromWorkspace() const { return m_removeFromWorkspaceWindow; };
-	void setRemoveFromWorkspace(bool value) { m_removeFromWorkspaceWindow = value; };
+	bool getRemoveFromWorkspace() const
+	{
+		return m_removeFromWorkspaceWindow;
+	};
+	void setRemoveFromWorkspace(bool value)
+	{
+		m_removeFromWorkspaceWindow = value;
+	};
 
 	bool m_duplicateNode = false;
-	bool getDuplicateNode() const { return m_duplicateNode; };
-	void setDuplicateNode(bool value) { m_duplicateNode = value; };
+	bool getDuplicateNode() const
+	{
+		return m_duplicateNode;
+	};
+	void setDuplicateNode(bool value)
+	{
+		m_duplicateNode = value;
+	};
 
 	virtual void drawMenuDelete();
 	virtual void popupContent();
@@ -110,11 +134,23 @@ protected:
 public:
 	WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label);
 
-	bool getShowLabel() const { return m_showLabel; };
-	std::string const getLabel() const { return m_label; };
+	bool getShowLabel() const
+	{
+		return m_showLabel;
+	};
+	std::string const getLabel() const
+	{
+		return m_label;
+	};
 
-	void setShowLabel(bool showLabel) { m_showLabel = showLabel; };
-	void setLabel(std::string label) { m_label = label; };
+	void setShowLabel(bool showLabel)
+	{
+		m_showLabel = showLabel;
+	};
+	void setLabel(std::string label)
+	{
+		m_label = label;
+	};
 };
 
 /* static functions */

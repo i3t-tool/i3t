@@ -65,11 +65,13 @@ public:
 	// TODO: (DR) Never accessed, unused? Related
 	static bool m_ignoreImGuiEvents;
 
-	static float m_mouseX, m_mouseY; ///< Current mouse cursor position in screen coordinates (0 is corner of the monitor)
-	static float m_mouseXPrev, m_mouseYPrev;           ///< Previous frame's cursor position
-	static float m_mouseXDelta, m_mouseYDelta;         ///< Change of the cursor position across last two frames
-	static float m_mouseXDragDelta, m_mouseYDragDelta; ///< Same as mouse delta but only non-zero during some mouse press
-	static float m_mouseWheelOffset;                   ///< Immediate mouse scroll change
+	static float m_mouseX,
+	    m_mouseY; ///< Current mouse cursor position in screen coordinates (0 is corner of the monitor)
+	static float m_mouseXPrev, m_mouseYPrev;   ///< Previous frame's cursor position
+	static float m_mouseXDelta, m_mouseYDelta; ///< Change of the cursor position across last two frames
+	static float m_mouseXDragDelta,
+	    m_mouseYDragDelta;           ///< Same as mouse delta but only non-zero during some mouse press
+	static float m_mouseWheelOffset; ///< Immediate mouse scroll change
 
 private:
 	static std::vector<InputController*> m_inputControllers;
@@ -88,8 +90,14 @@ public:
 	 */
 	static void endFrame();
 
-	static glm::vec2 getMouseDelta() { return {m_mouseXDelta, m_mouseYDelta}; }
-	static glm::vec2 getMousePos() { return {m_mouseX, m_mouseY}; }
+	static glm::vec2 getMouseDelta()
+	{
+		return {m_mouseXDelta, m_mouseYDelta};
+	}
+	static glm::vec2 getMousePos()
+	{
+		return {m_mouseX, m_mouseY};
+	}
 
 	static void bindGlobalAction(const char* action, EKeyState state, KeyCallback fn);
 
@@ -98,7 +106,10 @@ public:
 	static void setInputAction(const char* action, Keys::Code code, ModifiersList mods = ModifiersList());
 	static void setInputAxis(const char* action, float scale, Keys::Code code, ModifiersList mods = ModifiersList());
 
-	static void addInputController(InputController* controller) { m_inputControllers.push_back(controller); }
+	static void addInputController(InputController* controller)
+	{
+		m_inputControllers.push_back(controller);
+	}
 
 	static bool areModifiersActive(Modifiers mods);
 
@@ -119,17 +130,32 @@ public:
 	 *
 	 * \param	code The enum code of the key.
 	 */
-	static void setPressed(const Keys::Code code) { m_keyMap[code] = JUST_DOWN; }
+	static void setPressed(const Keys::Code code)
+	{
+		m_keyMap[code] = JUST_DOWN;
+	}
 
 	//===----------------------------------------------------------------------===//
 	static bool isActionTriggered(const char* name, EKeyState state);
 	static bool isAxisActive(const char* name);
 	//===----------------------------------------------------------------------===//
 
-	static void setUnpressed(const Keys::Code code) { m_keyMap[code] = JUST_UP; }
-	static bool isKeyPressed(const Keys::Code code) { return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN); }
-	static bool isKeyJustPressed(const Keys::Code code) { return (m_keyMap[code] == JUST_DOWN); }
-	static bool isKeyJustUp(const Keys::Code code) { return (m_keyMap[code] == JUST_UP); }
+	static void setUnpressed(const Keys::Code code)
+	{
+		m_keyMap[code] = JUST_UP;
+	}
+	static bool isKeyPressed(const Keys::Code code)
+	{
+		return (m_keyMap[code] == DOWN || m_keyMap[code] == JUST_DOWN);
+	}
+	static bool isKeyJustPressed(const Keys::Code code)
+	{
+		return (m_keyMap[code] == JUST_DOWN);
+	}
+	static bool isKeyJustUp(const Keys::Code code)
+	{
+		return (m_keyMap[code] == JUST_UP);
+	}
 
 	/**
 	 * @return Whether any of the mouse buttons was clicked

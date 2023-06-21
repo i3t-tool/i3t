@@ -146,7 +146,7 @@ bool Logger::shouldLogMouse()
 {
 	// Current time in milliseconds.
 	// const int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	const int currentTime = (int)(glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
+	const int currentTime = (int) (glfwGetTime() * 1000.0f); ///< \todo Check if value is correct.
 	bool shouldLog = currentTime - previousTime > MOUSE_MOVEMENT_LOG_INTERVALS;
 	if (shouldLog)
 	{

@@ -13,7 +13,7 @@ using namespace UI;
 
 static int textEditCallbackStub(ImGuiInputTextCallbackData* data)
 {
-	auto* console = (Console*)data->UserData;
+	auto* console = (Console*) data->UserData;
 	return console->textEditCallback(data);
 }
 
@@ -80,11 +80,11 @@ void Console::drawOutput()
 	m_oss.seekp(0, std::ios::end);
 	int bufferSize = m_oss.tellp();
 
-	const auto str = (char*)buffer.data();
+	const auto str = (char*) buffer.data();
 	str[bufferSize - 2] = '\0';
 	str[bufferSize - 1] = '\0';
 
-	ImGui::InputTextMultiline("##ConsoleOutput", (char*)buffer.data(), bufferSize - 2, maxSize, flags);
+	ImGui::InputTextMultiline("##ConsoleOutput", (char*) buffer.data(), bufferSize - 2, maxSize, flags);
 
 	m_oss.seekp(-2, m_oss.cur);
 
@@ -110,7 +110,7 @@ void Console::drawInput()
 	                   ImGuiInputTextFlags_CallbackHistory;
 
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-	if (GUI::InputText("#Command", &m_Command, flags, &textEditCallbackStub, (void*)this))
+	if (GUI::InputText("#Command", &m_Command, flags, &textEditCallbackStub, (void*) this))
 	{
 		execute();
 	}

@@ -19,10 +19,14 @@ std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeBackground = {
     {Core::EValueType::Vec3, DIWNE::IconType::Rectangle},      {Core::EValueType::Vec4, DIWNE::IconType::Rectangle}};
 
 std::map<Core::EValueType, DIWNE::IconType> WorkspacePinShapeForeground = {
-    {Core::EValueType::Float, DIWNE::IconType::TriangleRight}, {Core::EValueType::Matrix, DIWNE::IconType::TriangleRight},
-    {Core::EValueType::MatrixMul, DIWNE::IconType::Cross},     {Core::EValueType::Pulse, DIWNE::IconType::TriangleRight},
-    {Core::EValueType::Quat, DIWNE::IconType::TriangleRight},  {Core::EValueType::Screen, DIWNE::IconType::TriangleRight},
-    {Core::EValueType::Vec3, DIWNE::IconType::TriangleRight},  {Core::EValueType::Vec4, DIWNE::IconType::TriangleRight}};
+    {Core::EValueType::Float, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Matrix, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::MatrixMul, DIWNE::IconType::Cross},
+    {Core::EValueType::Pulse, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Quat, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Screen, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Vec3, DIWNE::IconType::TriangleRight},
+    {Core::EValueType::Vec4, DIWNE::IconType::TriangleRight}};
 
 std::map<Core::EValueType, EColor> WorkspacePinColorForeground = {
     {Core::EValueType::Float, EColor::InnerFloatPin},         {Core::EValueType::Matrix, EColor::InnerMatrixPin},
@@ -39,10 +43,12 @@ std::map<WorkspaceLevelOfDetail, std::string> WorkspaceLevelOfDetailName = {
 WorkspaceNode::WorkspaceNode(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const topLabel,
                              std::string const middleLabel)
     : DIWNE::Node(diwne, id), m_topLabel(topLabel), m_middleLabel(middleLabel), m_removeFromWorkspaceWindow(false)
-{
-}
+{}
 
-WorkspaceNode::~WorkspaceNode() { diwne.m_takeSnap = true; }
+WorkspaceNode::~WorkspaceNode()
+{
+	diwne.m_takeSnap = true;
+}
 
 bool WorkspaceNode::beforeContent()
 {
@@ -74,16 +80,28 @@ bool WorkspaceNode::middleContent()
 	return interaction_happen;
 }
 
-bool WorkspaceNode::leftContent() { return false; }
-bool WorkspaceNode::rightContent() { return false; }
-bool WorkspaceNode::bottomContent() { return false; }
+bool WorkspaceNode::leftContent()
+{
+	return false;
+}
+bool WorkspaceNode::rightContent()
+{
+	return false;
+}
+bool WorkspaceNode::bottomContent()
+{
+	return false;
+}
 
 bool WorkspaceNode::bypassFocusForInteractionAction()
 {
 	return (m_isHeld || m_topRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos())));
 }
 
-void WorkspaceNode::deleteAction() { m_removeFromWorkspaceWindow = true; }
+void WorkspaceNode::deleteAction()
+{
+	m_removeFromWorkspaceWindow = true;
+}
 
 void WorkspaceNode::drawMenuDelete()
 {
@@ -93,12 +111,14 @@ void WorkspaceNode::drawMenuDelete()
 	}
 }
 
-void WorkspaceNode::popupContent() { drawMenuDelete(); }
+void WorkspaceNode::popupContent()
+{
+	drawMenuDelete();
+}
 
 WorkspacePin::WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label)
     : DIWNE::Pin(diwne, id), m_label(label), m_showLabel(false)
-{
-}
+{}
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
 
@@ -113,7 +133,7 @@ int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)
 	result++; /* always space for sign to avoid changing size of / alternatively
 	             move it inside if above */
 
-	int_value = (int)value;
+	int_value = (int) value;
 	while (int_value >= border)
 	{
 		result++;

@@ -16,33 +16,25 @@
 struct Tutorial;
 
 class BeforeNewProjectCommand : public Command<BeforeNewProjectCommand>
-{
-};
+{};
 
 class NewProjectCommand : public Command<NewProjectCommand>
-{
-};
+{};
 
 class BeforeCloseCommand : public Command<BeforeCloseCommand>
-{
-};
+{};
 
 class CloseCommand : public Command<CloseCommand>
-{
-};
+{};
 
 class HideWindowCommand : public Command<HideWindowCommand, std::string>
-{
-};
+{};
 
 class ConsoleCommand : public Command<ConsoleCommand, std::string>
-{
-};
+{};
 
 class SetFocusedWindowCommand : public Command<SetFocusedWindowCommand, Ptr<IWindow>>
-{
-};
+{};
 
 class SetTutorialCommand : public Command<SetTutorialCommand, std::shared_ptr<Tutorial>>
-{
-};
+{};

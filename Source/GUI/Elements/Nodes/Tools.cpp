@@ -51,7 +51,7 @@ void pasteNodes(const Memento& memento)
 
 void duplicateNode(const Ptr<GuiNode>& node, float offset)
 {
-	//TODO - DUPLICATES BEHIND NODE INSTEAD OF INFRONT
+	// TODO - DUPLICATES BEHIND NODE INSTEAD OF INFRONT
 	pasteNodes(copyNodes({node}, offset));
 }
 

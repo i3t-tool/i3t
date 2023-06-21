@@ -18,8 +18,20 @@ void AbstractOrbitCamera::centerOnBox(glm::vec3 boxMin, glm::vec3 boxMax, bool i
 	}
 }
 
-glm::vec3 AbstractOrbitCamera::getPivot() const { return m_pivot; }
-void AbstractOrbitCamera::setPivot(const glm::vec3& pivot) { this->m_pivot = pivot; }
+glm::vec3 AbstractOrbitCamera::getPivot() const
+{
+	return m_pivot;
+}
+void AbstractOrbitCamera::setPivot(const glm::vec3& pivot)
+{
+	this->m_pivot = pivot;
+}
 
-float AbstractOrbitCamera::getRadius() const { return m_radius; }
-void AbstractOrbitCamera::setRadius(float radius) { m_radius = radius; }
+float AbstractOrbitCamera::getRadius() const
+{
+	return m_radius;
+}
+void AbstractOrbitCamera::setRadius(float radius)
+{
+	m_radius = radius;
+}

@@ -45,7 +45,8 @@ protected:
 	//	Right now quickly re-adding entities will make the id explode past 255!!
 	Entity* m_selectedEntity = nullptr;
 
-	std::vector<std::function<void(Entity*)>> m_selectionCallbacks; ///< Callbacks that get triggered on entity selection
+	std::vector<std::function<void(Entity*)>>
+	    m_selectionCallbacks; ///< Callbacks that get triggered on entity selection
 
 	// Temporary lists for transparency sorting
 	std::vector<Entity*> m_unorderedTransparentEntities;
@@ -110,7 +111,10 @@ public:
 	 */
 	void processSelection(SceneRenderTarget& renderTarget, glm::vec2 mousePos, glm::ivec2 windowSize);
 
-	void addSelectionCallback(std::function<void(Entity*)> callback) { this->m_selectionCallbacks.push_back(callback); }
+	void addSelectionCallback(std::function<void(Entity*)> callback)
+	{
+		this->m_selectionCallbacks.push_back(callback);
+	}
 	void triggerSelectionCallbacks(Entity* entity);
 
 	/**
@@ -163,7 +167,10 @@ public:
 		}
 	}
 
-	const std::vector<std::shared_ptr<Entity>>& getEntities() const { return m_entities; }
+	const std::vector<std::shared_ptr<Entity>>& getEntities() const
+	{
+		return m_entities;
+	}
 
 protected:
 	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);

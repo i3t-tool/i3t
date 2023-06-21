@@ -22,7 +22,10 @@ public:
 
 	//
 
-	void setOriginator(IStateful* originator) { m_originators.push_back(originator); }
+	void setOriginator(IStateful* originator)
+	{
+		m_originators.push_back(originator);
+	}
 
 	//
 
@@ -55,12 +58,21 @@ public:
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
 
-	bool hasScene() { return !m_currentScene.empty(); }
-	auto scenePath() { return m_currentScene; }
+	bool hasScene()
+	{
+		return !m_currentScene.empty();
+	}
+	auto scenePath()
+	{
+		return m_currentScene;
+	}
 
 	//===-- Recent files ----------------------------------------------------===//
 
-	const std::vector<std::string>& getRecentFiles() { return m_recentFiles; }
+	const std::vector<std::string>& getRecentFiles()
+	{
+		return m_recentFiles;
+	}
 
 	//===--------------------------------------------------------------------===//
 

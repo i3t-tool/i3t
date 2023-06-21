@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-ScreenOverlayShader::ScreenOverlayShader(GLuint id) : Shader(id) { init(false); }
+ScreenOverlayShader::ScreenOverlayShader(GLuint id) : Shader(id)
+{
+	init(false);
+}
 
 void ScreenOverlayShader::init(bool initSuperclass)
 {

@@ -139,9 +139,9 @@ struct TestChain
 	Ptr<Sequence> leftSequence;
 	Ptr<Sequence> middleSequence;
 	Ptr<Sequence> rightSequence;
-	Ptr<Node>     leftOperator;
-	Ptr<Node>     rightOperator;
-	glm::mat4     expected;
+	Ptr<Node> leftOperator;
+	Ptr<Node> rightOperator;
+	glm::mat4 expected;
 };
 
 TestChain arrangeTestChain()
@@ -169,9 +169,7 @@ TestChain arrangeTestChain()
 	plug_expectOk(leftSequence, middleSequence, 0, 0);
 	plug_expectOk(middleSequence, rightSequence, 0, 0);
 
-	const auto expected = leftOperator->data().getMat4() *
-	                      scale->data().getMat4() *
-	                      translation->data().getMat4() *
+	const auto expected = leftOperator->data().getMat4() * scale->data().getMat4() * translation->data().getMat4() *
 	                      rightOperator->data().getMat4();
 
 	return TestChain{leftSequence, middleSequence, rightSequence, leftOperator, rightOperator, expected};
@@ -181,25 +179,25 @@ TestChain arrangeTestChain()
 /*
 TEST(SequenceIteratorTest, MatrixIteratorOnSequenceWithOperatorInput)
 {
-	auto s = arrangeTestChain();
+    auto s = arrangeTestChain();
 
-	SequenceTree tree(s.rightSequence);
+    SequenceTree tree(s.rightSequence);
 
-	// Get iterator which points to last matrix in branch1.
-	auto it = tree.begin();
+    // Get iterator which points to last matrix in branch1.
+    auto it = tree.begin();
 
-	EXPECT_TRUE(it != tree.end());
+    EXPECT_TRUE(it != tree.end());
 
-	// Collect all matrices until iterator is out of tree.
-	auto result = glm::mat4(1.0f);
-	while (it != tree.end())
-	{
-		Ptr<Node> matrix = *it;
-		result = matrix->data().getMat4() * result;
-		++it;
-	}
+    // Collect all matrices until iterator is out of tree.
+    auto result = glm::mat4(1.0f);
+    while (it != tree.end())
+    {
+        Ptr<Node> matrix = *it;
+        result = matrix->data().getMat4() * result;
+        ++it;
+    }
 
-	EXPECT_TRUE(Math::eq(s.expected, result, 0.001f));
+    EXPECT_TRUE(Math::eq(s.expected, result, 0.001f));
 }
  */
 
@@ -207,30 +205,30 @@ TEST(SequenceIteratorTest, MatrixIteratorOnSequenceWithOperatorInput)
 /*
 TEST(SequenceIteratorTest, ReversedMatrixIteratorOnSequenceWithOperatorInput)
 {
-	auto s = arrangeTestChain();
+    auto s = arrangeTestChain();
 
-	SequenceTree tree(s.rightSequence);
+    SequenceTree tree(s.rightSequence);
 
-	// Get iterator which points to last matrix in branch1.
-	auto it = tree.begin();
+    // Get iterator which points to last matrix in branch1.
+    auto it = tree.begin();
 
-	EXPECT_TRUE(it != tree.end());
+    EXPECT_TRUE(it != tree.end());
 
-	// Go to the root.
-	while (it != tree.end())
-	{
-		++it;
-	}
+    // Go to the root.
+    while (it != tree.end())
+    {
+        ++it;
+    }
 
-	// Collect all matrices from root to the last matrix in "branch1" sequence.
-	auto result = glm::mat4(1.0f);
-	while (it != tree.begin())
-	{
-		--it;
-		Ptr<Node> node = *it;
-		result = node->data().getMat4() * result;
-	}
+    // Collect all matrices from root to the last matrix in "branch1" sequence.
+    auto result = glm::mat4(1.0f);
+    while (it != tree.begin())
+    {
+        --it;
+        Ptr<Node> node = *it;
+        result = node->data().getMat4() * result;
+    }
 
-	EXPECT_TRUE(Math::eq(s.expected, result, 0.001f));
+    EXPECT_TRUE(Math::eq(s.expected, result, 0.001f));
 }
  */

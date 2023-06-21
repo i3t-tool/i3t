@@ -122,4 +122,4 @@ public:
 	const std::vector<float>& getVertices() const;
 	const std::vector<float>& getColors() const;
 };
-}
+} // namespace Vp

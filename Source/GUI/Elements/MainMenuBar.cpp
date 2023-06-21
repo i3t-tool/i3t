@@ -96,7 +96,9 @@ static void importModel()
 
 MainMenuBar::MainMenuBar()
 {
-	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&]() { save(); });
+	InputManager::bindGlobalAction("save", EKeyState::Pressed, [&]() {
+		save();
+	});
 }
 
 void MainMenuBar::render()
@@ -233,11 +235,9 @@ void MainMenuBar::showHelpMenu()
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Show demo window", nullptr, &m_showDemoWindow))
-		{
-		}
+		{}
 		if (ImGui::MenuItem("Show style editor", nullptr, I3T::getWindowPtr<StyleEditor>()->getShowPtr()))
-		{
-		}
+		{}
 
 		ImGui::Separator();
 

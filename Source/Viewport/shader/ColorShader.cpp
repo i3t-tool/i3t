@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-ColorShader::ColorShader(GLuint id) : ObjectShader(id) { init(false); }
+ColorShader::ColorShader(GLuint id) : ObjectShader(id)
+{
+	init(false);
+}
 
 void ColorShader::init(bool initSuperclass)
 {

@@ -95,7 +95,7 @@ public:
 
 	Memento getState() override;
 
-	void setState(const Memento &memento, bool newSceneLoaded) override;
+	void setState(const Memento& memento, bool newSceneLoaded) override;
 
 	/**
 	 * Get existing texture using an alias

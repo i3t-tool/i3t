@@ -13,7 +13,10 @@ public:
 	/** Default destructor */
 	virtual ~Pin(){};
 
-	DIWNE::ID const getId() const { return m_idDiwne; };
+	DIWNE::ID const getId() const
+	{
+		return m_idDiwne;
+	};
 
 	virtual bool content()
 	{
@@ -21,16 +24,28 @@ public:
 		return false;
 	};
 
-	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldPin; };
-	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragPin; };
-	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchPin; };
+	DIWNE::DiwneAction getHoldActionType() const final
+	{
+		return DiwneAction::HoldPin;
+	};
+	DIWNE::DiwneAction getDragActionType() const final
+	{
+		return DiwneAction::DragPin;
+	};
+	DIWNE::DiwneAction getTouchActionType() const final
+	{
+		return DiwneAction::TouchPin;
+	};
 
 	virtual void begin();
 	virtual void end();
 	virtual void updateSizes();
 	virtual bool processInteractionsAlways();
 
-	virtual const ImVec2& getLinkConnectionPointDiwne() { return m_connectionPointDiwne; };
+	virtual const ImVec2& getLinkConnectionPointDiwne()
+	{
+		return m_connectionPointDiwne;
+	};
 
 	virtual bool processDrag();
 
@@ -47,9 +62,15 @@ public:
 	virtual bool processConnectionPrepared(); /*!< your content/actions when new link hovered
 	                                             goal pin but not released yet */
 
-	virtual void setConnectionPointDiwne(ImVec2 value) { m_connectionPointDiwne = value; };
+	virtual void setConnectionPointDiwne(ImVec2 value)
+	{
+		m_connectionPointDiwne = value;
+	};
 
-	virtual ImRect getRectDiwne() const { return m_pinRectDiwne; };
+	virtual ImRect getRectDiwne() const
+	{
+		return m_pinRectDiwne;
+	};
 
 protected:
 	ImRect m_pinRectDiwne;
