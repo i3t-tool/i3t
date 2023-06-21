@@ -40,9 +40,15 @@ std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resou
 	return result;
 }
 
-ResourceManager::~ResourceManager() { dispose(); }
+ResourceManager::~ResourceManager()
+{
+	dispose();
+}
 
-ResourceManager& ResourceManager::instance() { return App::getModule<ResourceManager>(); }
+ResourceManager& ResourceManager::instance()
+{
+	return App::getModule<ResourceManager>();
+}
 
 GLuint ResourceManager::textureByAlias(const std::string& alias)
 {
@@ -58,7 +64,10 @@ GLuint ResourceManager::textureByAlias(const std::string& alias)
 	return 0;
 }
 
-GLuint ResourceManager::texture(const std::string& path) { return texture(NO_ALIAS, path); }
+GLuint ResourceManager::texture(const std::string& path)
+{
+	return texture(NO_ALIAS, path);
+}
 
 GLuint ResourceManager::texture(const std::string& alias, const std::string& path)
 {
@@ -73,7 +82,8 @@ GLuint ResourceManager::texture(const std::string& alias, const std::string& pat
 			GLuint textureId = loadTexture(path);
 			if (textureId)
 			{
-				std::shared_ptr<Resource> textureResource = std::make_shared<Resource>(alias, path, ResourceType::Texture);
+				std::shared_ptr<Resource> textureResource =
+				    std::make_shared<Resource>(alias, path, ResourceType::Texture);
 				textureResource->hashId = id;
 				textureResource->data = std::make_shared<GLuint>(textureId);
 				m_resourceMap.insert(std::make_pair(id, textureResource));
@@ -134,9 +144,10 @@ GLuint ResourceManager::shaderG(const std::string& alias, const std::string& ver
 			GLuint shaderId = loadShader(vertShader, fragShader, geoShader);
 			if (shaderId)
 			{
-				std::string path =
-				    "Vert: " + vertShader + ", Frag: " + fragShader + (geoShader.empty() ? "" : (", Geo: " + geoShader));
-				std::shared_ptr<Resource> shaderResource = std::make_shared<Resource>(alias, path, ResourceType::Shader);
+				std::string path = "Vert: " + vertShader + ", Frag: " + fragShader +
+				                   (geoShader.empty() ? "" : (", Geo: " + geoShader));
+				std::shared_ptr<Resource> shaderResource =
+				    std::make_shared<Resource>(alias, path, ResourceType::Shader);
 				shaderResource->hashId = id;
 				shaderResource->data = std::make_shared<GLuint>(shaderId);
 				m_resourceMap.insert(std::make_pair(id, shaderResource));
@@ -166,7 +177,10 @@ Mesh* ResourceManager::meshByAlias(const std::string& alias)
 	}
 	return nullptr;
 }
-Mesh* ResourceManager::mesh(const std::string& path) { return mesh(NO_ALIAS, path); }
+Mesh* ResourceManager::mesh(const std::string& path)
+{
+	return mesh(NO_ALIAS, path);
+}
 Mesh* ResourceManager::mesh(const std::string& alias, const std::string& path)
 {
 	size_t id = hash_string(path);
@@ -229,9 +243,10 @@ Mesh* ResourceManager::mesh(const std::string& alias, Mesh::PrimitiveType primit
 		if (data.get() == nullptr)
 		{
 			// Load model
-			std::string dataSummary =
-			    " type: " + std::to_string(static_cast<int>(primitiveType)) + " vertices: " + std::to_string(nVertices) +
-			    (useIndices ? (" indices: " + std::to_string(nIndices)) : "") + " colors: " + std::to_string(nColors);
+			std::string dataSummary = " type: " + std::to_string(static_cast<int>(primitiveType)) +
+			                          " vertices: " + std::to_string(nVertices) +
+			                          (useIndices ? (" indices: " + std::to_string(nIndices)) : "") +
+			                          " colors: " + std::to_string(nColors);
 			LOG_INFO("[MODEL] Loading model '{}' from data:{}", alias, dataSummary);
 
 			Mesh* mesh = nullptr;
@@ -574,11 +589,20 @@ Mesh* ResourceManager::loadModel(const std::string& path)
 	return mesh;
 }
 
-void ResourceManager::disposeTexture(GLuint id) { glDeleteTextures(1, &id); }
+void ResourceManager::disposeTexture(GLuint id)
+{
+	glDeleteTextures(1, &id);
+}
 
-void ResourceManager::disposeShader(GLuint id) { pgr::deleteProgramAndShaders(id); }
+void ResourceManager::disposeShader(GLuint id)
+{
+	pgr::deleteProgramAndShaders(id);
+}
 
-void ResourceManager::disposeModel(Mesh* mesh) { mesh->dispose(); }
+void ResourceManager::disposeModel(Mesh* mesh)
+{
+	mesh->dispose();
+}
 
 void ResourceManager::dispose()
 {

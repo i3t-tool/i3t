@@ -144,17 +144,53 @@ void OrbitCamera::viewpoint(AbstractCamera::Viewpoint viewpoint)
 	interpolate(from, m_view);
 }
 
-float OrbitCamera::getRotationX() const { return m_rotationX; }
-void OrbitCamera::setRotationX(float rotationX) { m_rotationX = rotationX; }
+float OrbitCamera::getRotationX() const
+{
+	return m_rotationX;
+}
+void OrbitCamera::setRotationX(float rotationX)
+{
+	m_rotationX = rotationX;
+}
 
-float OrbitCamera::getRotationY() const { return m_rotationY; }
-void OrbitCamera::setRotationY(float rotationY) { m_rotationY = rotationY; }
+float OrbitCamera::getRotationY() const
+{
+	return m_rotationY;
+}
+void OrbitCamera::setRotationY(float rotationY)
+{
+	m_rotationY = rotationY;
+}
 
-float OrbitCamera::getZoomSpeed() const { return m_zoomSpeed; }
-void OrbitCamera::setZoomSpeed(float zoomSpeed) { m_zoomSpeed = zoomSpeed; }
-float OrbitCamera::getRotateSpeed() const { return m_rotateSpeed; }
-void OrbitCamera::setRotateSpeed(float rotateSpeed) { m_rotateSpeed = rotateSpeed; }
-float OrbitCamera::getTranslateSpeed() const { return m_translateSpeed; }
-void OrbitCamera::setTranslateSpeed(float translateSpeed) { m_translateSpeed = translateSpeed; }
-bool OrbitCamera::getSmoothScroll() const { return m_smoothScroll; }
-void OrbitCamera::setSmoothScroll(bool b) { m_smoothScroll = b; }
+float OrbitCamera::getZoomSpeed() const
+{
+	return m_zoomSpeed;
+}
+void OrbitCamera::setZoomSpeed(float zoomSpeed)
+{
+	m_zoomSpeed = zoomSpeed;
+}
+float OrbitCamera::getRotateSpeed() const
+{
+	return m_rotateSpeed;
+}
+void OrbitCamera::setRotateSpeed(float rotateSpeed)
+{
+	m_rotateSpeed = rotateSpeed;
+}
+float OrbitCamera::getTranslateSpeed() const
+{
+	return m_translateSpeed;
+}
+void OrbitCamera::setTranslateSpeed(float translateSpeed)
+{
+	m_translateSpeed = translateSpeed;
+}
+bool OrbitCamera::getSmoothScroll() const
+{
+	return m_smoothScroll;
+}
+void OrbitCamera::setSmoothScroll(bool b)
+{
+	m_smoothScroll = b;
+}

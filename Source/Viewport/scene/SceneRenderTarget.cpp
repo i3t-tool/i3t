@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-std::weak_ptr<Framebuffer> SceneRenderTarget::getOutputFramebuffer() { return outputFramebuffer; }
+std::weak_ptr<Framebuffer> SceneRenderTarget::getOutputFramebuffer()
+{
+	return outputFramebuffer;
+}
 
 void SceneRenderTarget::setOutputFramebuffer(std::weak_ptr<Framebuffer> framebuffer)
 {
@@ -21,9 +24,15 @@ std::weak_ptr<Framebuffer> SceneRenderTarget::getFramebuffer(unsigned int index)
 	}
 }
 
-const RenderOptions& SceneRenderTarget::getRenderOptions() const { return renderOptions; }
+const RenderOptions& SceneRenderTarget::getRenderOptions() const
+{
+	return renderOptions;
+}
 
-void SceneRenderTarget::setRenderOptions(const RenderOptions& renderOptions) { this->renderOptions = renderOptions; }
+void SceneRenderTarget::setRenderOptions(const RenderOptions& renderOptions)
+{
+	this->renderOptions = renderOptions;
+}
 
 void SceneRenderTarget::addFramebuffer(std::shared_ptr<Framebuffer> framebuffer)
 {

@@ -43,7 +43,7 @@ public:
 	// bool drawDataFull(, int index);
 	int maxLenghtOfData();        // todo
 	bool middleContent();         // the most important function
-	bool topContent();						// rendering header part
+	bool topContent();            // rendering header part
 	void drawMenuLevelOfDetail(); // todo
 	void popupContent() override;
 
@@ -52,8 +52,8 @@ public:
 		return {getOutputs()[1]};
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
 
-    ImVec2 getAspect() const;
-    void setAspect(ImVec2 aspect);
+	ImVec2 getAspect() const;
+	void setAspect(ImVec2 aspect);
 
 private:
 	void init();

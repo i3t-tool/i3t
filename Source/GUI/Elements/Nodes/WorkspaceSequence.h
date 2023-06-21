@@ -36,8 +36,14 @@ public:
 	int getInnerPosition(ImVec2 point);
 	int getInnerPosition(std::vector<ImVec2> points);
 
-	ImVec4 getTint() { return m_tint; }
-	void setTint(ImVec4 tint) { m_tint = tint; }
+	ImVec4 getTint()
+	{
+		return m_tint;
+	}
+	void setTint(ImVec4 tint)
+	{
+		m_tint = tint;
+	}
 
 	virtual bool allowDrawing();
 

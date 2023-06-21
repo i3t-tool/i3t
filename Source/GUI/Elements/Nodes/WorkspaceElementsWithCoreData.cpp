@@ -106,9 +106,15 @@ bool WorkspaceNodeWithCoreData::topContent()
 	return interaction_happen;
 }
 
-Ptr<Core::Node> const WorkspaceNodeWithCoreData::getNodebase() const { return m_nodebase; }
+Ptr<Core::Node> const WorkspaceNodeWithCoreData::getNodebase() const
+{
+	return m_nodebase;
+}
 
-int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal() { return m_numberOfVisibleDecimal; }
+int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
+{
+	return m_numberOfVisibleDecimal;
+}
 
 void WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 {
@@ -116,7 +122,10 @@ void WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 	setDataItemsWidth();
 }
 
-float WorkspaceNodeWithCoreData::getDataItemsWidth() { return m_dataItemsWidth; }
+float WorkspaceNodeWithCoreData::getDataItemsWidth()
+{
+	return m_dataItemsWidth;
+}
 
 float WorkspaceNodeWithCoreData::setDataItemsWidth()
 {
@@ -126,7 +135,7 @@ float WorkspaceNodeWithCoreData::setDataItemsWidth()
 	                                   // */ get current font size (= height in pixels) of
 	                                   // current font with current scale applied
 	float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
-	m_dataItemsWidth = (float)(maxLenghtOfData()) * oneCharWidth + 2 * padding;
+	m_dataItemsWidth = (float) (maxLenghtOfData()) * oneCharWidth + 2 * padding;
 	return m_dataItemsWidth;
 }
 
@@ -136,7 +145,10 @@ Core::DataMap const* WorkspaceNodeWithCoreData::setDataMap(Core::DataMap const* 
 	return getDataMap();
 }
 
-Core::DataMap const* WorkspaceNodeWithCoreData::getDataMap() { return m_nodebase->getDataMap(); }
+Core::DataMap const* WorkspaceNodeWithCoreData::getDataMap()
+{
+	return m_nodebase->getDataMap();
+}
 
 WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail)
 {
@@ -144,9 +156,15 @@ WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::setLevelOfDetail(WorkspaceLeve
 	return getLevelOfDetail();
 }
 
-WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail() { return m_levelOfDetail; }
+WorkspaceLevelOfDetail WorkspaceNodeWithCoreData::getLevelOfDetail()
+{
+	return m_levelOfDetail;
+}
 
-bool WorkspaceNodeWithCoreData::drawDataLabel() { return false; }
+bool WorkspaceNodeWithCoreData::drawDataLabel()
+{
+	return false;
+}
 
 void WorkspaceNodeWithCoreData::drawMenuSetEditable()
 {
@@ -235,8 +253,7 @@ bool WorkspaceNodeWithCoreData::processUnselect()
 WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
                                    WorkspaceNodeWithCoreData& node)
     : WorkspacePin(diwne, id, ""), m_pin(pin), m_node(node), m_iconRectDiwne(ImRect(0, 0, 0, 0))
-{
-}
+{}
 
 // bool WorkspaceCorePin::allowInteraction()
 //{
@@ -269,7 +286,8 @@ bool WorkspaceCorePin::content()
 
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 		               ImVec4(padding, padding, padding, padding), isConnected());
-		m_iconRectDiwne = ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
+		m_iconRectDiwne =
+		    ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
 
 		if (getShowLabel())
 		{
@@ -314,16 +332,31 @@ bool WorkspaceCorePin::bypassFocusForInteractionAction()
 	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));
 }
 
-Core::Pin const& WorkspaceCorePin::getCorePin() const { return m_pin; }
+Core::Pin const& WorkspaceCorePin::getCorePin() const
+{
+	return m_pin;
+}
 
-int WorkspaceCorePin::getIndex() const { return m_pin.Index; }
+int WorkspaceCorePin::getIndex() const
+{
+	return m_pin.Index;
+}
 
-PinKind WorkspaceCorePin::getKind() const { return m_pin.IsInput ? PinKind::Input : PinKind::Output; }
+PinKind WorkspaceCorePin::getKind() const
+{
+	return m_pin.IsInput ? PinKind::Input : PinKind::Output;
+}
 
-Core::EValueType WorkspaceCorePin::getType() const { return m_pin.ValueType; }
+Core::EValueType WorkspaceCorePin::getType() const
+{
+	return m_pin.ValueType;
+}
 
 /* \todo JH \todo MH implement this function in Core? */
-bool WorkspaceCorePin::isConnected() const { return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0)); }
+bool WorkspaceCorePin::isConnected() const
+{
+	return (m_pin.isPluggedIn() || (m_pin.getOutComponents().size() > 0));
+}
 
 bool WorkspaceCorePin::processDrag()
 {
@@ -399,14 +432,12 @@ bool WorkspaceCorePin::processConnectionPrepared()
 WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
                                                WorkspaceNodeWithCoreData& node)
     : WorkspaceCorePin(diwne, id, pin, node)
-{
-}
+{}
 
 WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diwne, DIWNE::ID const id,
                                                                Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
     : WorkspaceCoreOutputPin(diwne, id, pin, node)
-{
-}
+{}
 
 bool WorkspaceCoreOutputPinWithData::content()
 {
@@ -557,13 +588,15 @@ bool WorkspaceCoreOutputPinPulse::drawData()
 	}
 	return false;
 }
-int WorkspaceCoreOutputPinPulse::maxLengthOfData() { return 0; } /* no data with length here*/
+int WorkspaceCoreOutputPinPulse::maxLengthOfData()
+{
+	return 0;
+} /* no data with length here*/
 
 WorkspaceCoreOutputPinScreen::WorkspaceCoreOutputPinScreen(DIWNE::Diwne& diwne, DIWNE::ID const id,
                                                            Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
     : WorkspaceCoreOutputPinWithData(diwne, id, pin, node)
-{
-}
+{}
 
 bool WorkspaceCoreOutputPinScreen::drawData()
 {
@@ -582,17 +615,22 @@ bool WorkspaceCoreOutputPinScreen::drawData()
 	}
 	return false;
 }
-int WorkspaceCoreOutputPinScreen::maxLengthOfData() { return 0; } /* no data with length here*/
+int WorkspaceCoreOutputPinScreen::maxLengthOfData()
+{
+	return 0;
+} /* no data with length here*/
 
 /* >>>> WorkspaceCoreInputPin <<<< */
 
 WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
                                              WorkspaceNodeWithCoreData& node)
     : WorkspaceCorePin(diwne, id, pin, node), m_link(diwne, id, this)
-{
-}
+{}
 
-void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou) { m_link.setStartPin(ou); }
+void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou)
+{
+	m_link.setStartPin(ou);
+}
 
 void WorkspaceCoreInputPin::unplug()
 {
@@ -624,8 +662,8 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
 	Core::Pin const* coreInput = &(getCorePin());
 	Core::Pin const* coreOutput = &(ou->getCorePin());
 
-	if (Core::ENodePlugResult::Ok == Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(),
-	                                                    coreOutput->Index, coreInput->Index))
+	if (Core::ENodePlugResult::Ok ==
+	    Core::GraphManager::plug(coreOutput->getOwner(), coreInput->getOwner(), coreOutput->Index, coreInput->Index))
 	{
 		setConnectedWorkspaceOutput(ou);
 		m_link.m_just_pluged = true;
@@ -655,8 +693,10 @@ bool WorkspaceCoreInputPin::processCreateAndPlugConstrutorNode()
 {
 	if (allowCreateAndPlugConstrutorNodeAction() && bypassCreateAndPlugConstrutorNodeAction())
 	{
-		dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction = WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
-		diwne.setLastActivePin<WorkspaceCoreInputPin>(std::static_pointer_cast<WorkspaceCoreInputPin>(shared_from_this()));
+		dynamic_cast<WorkspaceDiwne&>(diwne).m_workspaceDiwneAction =
+		    WorkspaceDiwneAction::CreateAndPlugTypeConstructor;
+		diwne.setLastActivePin<WorkspaceCoreInputPin>(
+		    std::static_pointer_cast<WorkspaceCoreInputPin>(shared_from_this()));
 		diwne.m_takeSnap = true;
 		return true;
 	}
@@ -688,8 +728,7 @@ bool WorkspaceCoreInputPin::processInteractions()
 
 WorkspaceCoreLink::WorkspaceCoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, WorkspaceCoreInputPin* endPin)
     : DIWNE::Link(diwne, id), m_endPin(endPin), m_startPin(nullptr)
-{
-}
+{}
 
 void WorkspaceCoreLink::unplug()
 {
@@ -842,13 +881,16 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwn
 			switch (pin.ValueType)
 			{
 			case Core::EValueType::Matrix:
-				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrix4x4>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(
+				    std::make_unique<WorkspaceCoreOutputPinMatrix4x4>(diwne, pin.Id, pin, *this));
 				break;
 			case Core::EValueType::Vec4:
-				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector4>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(
+				    std::make_unique<WorkspaceCoreOutputPinVector4>(diwne, pin.Id, pin, *this));
 				break;
 			case Core::EValueType::Vec3:
-				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinVector3>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(
+				    std::make_unique<WorkspaceCoreOutputPinVector3>(diwne, pin.Id, pin, *this));
 				break;
 			case Core::EValueType::Float:
 				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinFloat>(diwne, pin.Id, pin, *this));
@@ -861,7 +903,8 @@ WorkspaceNodeWithCoreDataWithPins::WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwn
 				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinPulse>(diwne, pin.Id, pin, *this));
 				break;
 			case Core::EValueType::MatrixMul:
-				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinMatrixMul>(diwne, pin.Id, pin, *this));
+				m_workspaceOutputs.push_back(
+				    std::make_unique<WorkspaceCoreOutputPinMatrixMul>(diwne, pin.Id, pin, *this));
 				break;
 			case Core::EValueType::Screen:
 				m_workspaceOutputs.push_back(std::make_unique<WorkspaceCoreOutputPinScreen>(diwne, pin.Id, pin, *this));
@@ -999,8 +1042,9 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 				m_minRightAlignOfRightPins =
 				    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
 				                                                        between two node sizes */
-				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align - prev_minRightAlign); /* right align if not all output
-				                                                                                  pins have same width */
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align -
+				                     prev_minRightAlign); /* right align if not all output
+				                                             pins have same width */
 				inner_interaction_happen |= pin->drawDiwne();
 			}
 		}
@@ -1013,8 +1057,14 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 }
 
 /* >>>>> STATIC FUNCTIONS <<<<< */
-bool bypassFloatFocusAction() { return ImGui::IsItemHovered(); }
-bool bypassFloatRaisePopupAction() { return InputManager::isActionTriggered("raisePopup", EKeyState::Released); }
+bool bypassFloatFocusAction()
+{
+	return ImGui::IsItemHovered();
+}
+bool bypassFloatRaisePopupAction()
+{
+	return InputManager::isActionTriggered("raisePopup", EKeyState::Released);
+}
 
 bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const numberOfVisibleDecimals, FloatPopupMode& floatPopupMode,
                                  std::string const label, float& value, Core::EValueState const& valueState,
@@ -1065,8 +1115,8 @@ bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const numberOfVisibleD
 			diwne.setPopupPosition(diwne.bypassDiwneGetPopupNewPositionAction());
 		}
 
-		diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode, value,
-		                                       valueChangedByPopup);
+		diwne.m_popupDrawn = DIWNE::popupDiwne(label, diwne.getPopupPosition(), &popupFloatContent, floatPopupMode,
+		                                       value, valueChangedByPopup);
 		inner_interaction_happen |= diwne.m_popupDrawn;
 
 		valueChanged |= valueChangedByPopup;
@@ -1326,14 +1376,15 @@ bool drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisib
 	for (int rows = 0; rows < 4; rows++)
 	{
 		if (rows == 1)
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetStyle().ItemSpacing.y); /*\todo JH hard to say why...*/
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() -
+			                     ImGui::GetStyle().ItemSpacing.y); /*\todo JH hard to say why...*/
 		for (int columns = 0; columns < 4; columns++)
 		{
 			localData = data[columns][rows]; /* Data are column-wise */
 
-			inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, numberOfVisibleDecimals, floatPopupMode,
-			                                                        fmt::format("##{}:r{}c{}", node_id, rows, columns),
-			                                                        localData, dataState[rows][columns], actualValueChanged);
+			inner_interaction_happen |= drawDragFloatWithMap_Inline(
+			    diwne, numberOfVisibleDecimals, floatPopupMode, fmt::format("##{}:r{}c{}", node_id, rows, columns),
+			    localData, dataState[rows][columns], actualValueChanged);
 
 			if (actualValueChanged)
 			{

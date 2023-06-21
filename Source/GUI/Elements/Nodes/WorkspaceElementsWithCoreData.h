@@ -48,14 +48,23 @@ public:
 	int getNumberOfVisibleDecimal();
 	virtual void setNumberOfVisibleDecimal(int value);
 
-	FloatPopupMode& getFloatPopupMode() { return m_floatPopupMode; };
-	void setFloatPopupMode(FloatPopupMode mode) { m_floatPopupMode = mode; };
+	FloatPopupMode& getFloatPopupMode()
+	{
+		return m_floatPopupMode;
+	};
+	void setFloatPopupMode(FloatPopupMode mode)
+	{
+		m_floatPopupMode = mode;
+	};
 
 	virtual int maxLenghtOfData() = 0;
 
 	float getDataItemsWidth();
 	float setDataItemsWidth();
-	bool getIsLabelBeingEdited(){ return m_isLabelBeingEdited; };
+	bool getIsLabelBeingEdited()
+	{
+		return m_isLabelBeingEdited;
+	};
 
 	WorkspaceLevelOfDetail setLevelOfDetail(WorkspaceLevelOfDetail levelOfDetail);
 	WorkspaceLevelOfDetail getLevelOfDetail();
@@ -105,9 +114,18 @@ protected:
 public:
 	WorkspaceCoreLink(DIWNE::Diwne& diwne, DIWNE::ID id, WorkspaceCoreInputPin* endPin);
 
-	WorkspaceCoreOutputPin* getStartPin() const { return m_startPin; };
-	WorkspaceCoreInputPin* const getEndPin() const { return m_endPin; };
-	void setStartPin(WorkspaceCoreOutputPin* startPin) { m_startPin = startPin; };
+	WorkspaceCoreOutputPin* getStartPin() const
+	{
+		return m_startPin;
+	};
+	WorkspaceCoreInputPin* const getEndPin() const
+	{
+		return m_endPin;
+	};
+	void setStartPin(WorkspaceCoreOutputPin* startPin)
+	{
+		m_startPin = startPin;
+	};
 	void unplug();
 
 	virtual void popupContent();
@@ -135,8 +153,14 @@ public:
 
 	Core::Pin const& getCorePin() const;
 
-	WorkspaceNodeWithCoreData& getNode() { return m_node; }
-	const WorkspaceNodeWithCoreData& getNode() const { return m_node; };
+	WorkspaceNodeWithCoreData& getNode()
+	{
+		return m_node;
+	}
+	const WorkspaceNodeWithCoreData& getNode() const
+	{
+		return m_node;
+	};
 
 	int getIndex() const;
 	PinKind getKind() const;
@@ -157,8 +181,12 @@ protected:
 	WorkspaceCoreLink m_link;
 
 public:
-	WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin, WorkspaceNodeWithCoreData& node);
-	WorkspaceCoreLink& getLink() { return m_link; };
+	WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
+	                      WorkspaceNodeWithCoreData& node);
+	WorkspaceCoreLink& getLink()
+	{
+		return m_link;
+	};
 	void updateConnectionPointDiwne()
 	{
 		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Min.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
@@ -318,10 +346,19 @@ protected:
 	bool m_showDataOnPins;
 
 public:
-	std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const { return m_workspaceInputs; };
-	std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const { return m_workspaceOutputs; };
+	std::vector<Ptr<WorkspaceCoreInputPin>> const& getInputs() const
+	{
+		return m_workspaceInputs;
+	};
+	std::vector<Ptr<WorkspaceCoreOutputPin>> const& getOutputs() const
+	{
+		return m_workspaceOutputs;
+	};
 
-	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const { return getOutputs(); };
+	virtual std::vector<Ptr<WorkspaceCoreOutputPin>> const getOutputsToShow() const
+	{
+		return getOutputs();
+	};
 
 	WorkspaceNodeWithCoreDataWithPins(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase, bool showDataOnPins = true);
 

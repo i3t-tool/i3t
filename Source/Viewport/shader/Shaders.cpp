@@ -92,4 +92,7 @@ bool Shaders::reloadShader(Shader& shader, const std::string& vertSource, const 
 	}
 }
 
-bool Shaders::checkForError(Shader& shader) { return shader.m_id == 0; }
+bool Shaders::checkForError(Shader& shader)
+{
+	return shader.m_id == 0;
+}

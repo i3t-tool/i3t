@@ -58,7 +58,10 @@ Framebuffer::Framebuffer(int width, int height, bool multisample, unsigned int s
 	// Empty
 }
 
-Framebuffer::~Framebuffer() { dispose(); }
+Framebuffer::~Framebuffer()
+{
+	dispose();
+}
 
 void Framebuffer::update(int width, int height)
 {
@@ -181,7 +184,10 @@ void Framebuffer::initImpl(int width, int height)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Created {}FBO ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
 }
 
-void Framebuffer::start() { return start(m_width, m_height); }
+void Framebuffer::start()
+{
+	return start(m_width, m_height);
+}
 
 void Framebuffer::start(int width, int height)
 {
@@ -281,7 +287,10 @@ void Framebuffer::resize(int width, int height)
 	}*/
 }
 
-void Framebuffer::bind() const { glBindFramebuffer(GL_FRAMEBUFFER, m_fbo); }
+void Framebuffer::bind() const
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+}
 
 bool Framebuffer::checkFramebuffer()
 {
@@ -325,7 +334,10 @@ bool Framebuffer::checkFramebuffer()
 	return result;
 }
 
-bool Framebuffer::isInitialized() const { return m_fbo != 0; }
+bool Framebuffer::isInitialized() const
+{
+	return m_fbo != 0;
+}
 
 std::weak_ptr<Framebuffer> Framebuffer::getResolvedFramebuffer()
 {
@@ -333,7 +345,8 @@ std::weak_ptr<Framebuffer> Framebuffer::getResolvedFramebuffer()
 	{
 		if (!m_multisampleResolveFBO->isInitialized())
 		{
-			throw std::runtime_error("Framebuffer: getResolvedFramebuffer(): Multisampled buffer has not been resolved yet!");
+			throw std::runtime_error(
+			    "Framebuffer: getResolvedFramebuffer(): Multisampled buffer has not been resolved yet!");
 		}
 		return m_multisampleResolveFBO;
 	}
@@ -363,7 +376,10 @@ GLuint Framebuffer::getColorTexture(unsigned int index, bool multisampled) const
 	}
 }
 
-GLuint Framebuffer::getId() const { return m_fbo; }
+GLuint Framebuffer::getId() const
+{
+	return m_fbo;
+}
 
 void Framebuffer::setMultisampled(bool multisample, unsigned int samples)
 {
@@ -389,9 +405,15 @@ void Framebuffer::setMultisampled(bool multisample, unsigned int samples)
 	}
 }
 
-bool Framebuffer::isMultisampled() { return m_multisample; }
+bool Framebuffer::isMultisampled()
+{
+	return m_multisample;
+}
 
-unsigned int Framebuffer::getSampleCount() const { return m_samples; }
+unsigned int Framebuffer::getSampleCount() const
+{
+	return m_samples;
+}
 
 void Framebuffer::multisampleResolveColors()
 {
@@ -417,7 +439,8 @@ void Framebuffer::multisampleResolveColor(unsigned int colorAttachmentIndex)
 
 	// Resolve multisampled buffer into a single sampled intermediate one
 	if (FB_DEBUG && FB_DEBUG_VERBOSE)
-		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO color ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
+		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO color ({} : {})", (m_multisample ? "AA " : ""), m_width,
+		         m_height);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, getId());
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + colorAttachmentIndex);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_multisampleResolveFBO->getId());
@@ -438,7 +461,8 @@ void Framebuffer::multisampleResolveDepth()
 
 	// Resolve multisampled buffer into a single sampled intermediate one
 	if (FB_DEBUG && FB_DEBUG_VERBOSE)
-		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO depth ({} : {})", (m_multisample ? "AA " : ""), m_width, m_height);
+		LOG_INFO("[FRAMEBUFFER DEBUG] Resolving {}FBO depth ({} : {})", (m_multisample ? "AA " : ""), m_width,
+		         m_height);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, getId());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_multisampleResolveFBO->getId());
 	glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height,
@@ -482,7 +506,10 @@ void Framebuffer::setDepthAttachment(DepthAttachment depthAttachment)
 	m_depthAttachment = depthAttachment;
 }
 
-std::optional<DepthAttachment>& Framebuffer::getDepthAttachment() { return m_depthAttachment; }
+std::optional<DepthAttachment>& Framebuffer::getDepthAttachment()
+{
+	return m_depthAttachment;
+}
 
 void Framebuffer::removeDepthAttachment()
 {
@@ -527,5 +554,11 @@ void Framebuffer::setDrawBuffers(std::vector<unsigned int> indices)
 	}
 }
 
-int Framebuffer::getWidth() const { return m_width; }
-int Framebuffer::getHeight() const { return m_height; }
+int Framebuffer::getWidth() const
+{
+	return m_width;
+}
+int Framebuffer::getHeight() const
+{
+	return m_height;
+}

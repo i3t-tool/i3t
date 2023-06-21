@@ -33,11 +33,13 @@ void StyleEditor::render()
 			const bool isSelected = (m_currentThemeIdx == n);
 			if (ImGui::Selectable(I3T::getThemes()[n].getName().c_str(), isSelected))
 			{
-				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) { return t.getName() == curr.getName(); });
+				auto currIndex = Utils::indexOf(I3T::getThemes(), [&curr](Theme& t) {
+					return t.getName() == curr.getName();
+				});
 				if (n != currIndex)
 				{
 					I3T::getUI()->setTheme(I3T::getThemes()[n]);
-					m_currentThemeIdx = (int)n;
+					m_currentThemeIdx = (int) n;
 				}
 			}
 
@@ -146,7 +148,9 @@ void StyleEditor::saveCurrentTheme(const std::string& name)
 	auto& themes = I3T::getThemes();
 
 	// newly saved theme is now the current theme
-	m_currentThemeIdx = Utils::indexOf(themes, [&curr, &themeName](Theme& t) { return t.getName() == themeName; });
+	m_currentThemeIdx = Utils::indexOf(themes, [&curr, &themeName](Theme& t) {
+		return t.getName() == themeName;
+	});
 	if (m_currentThemeIdx != -1)
 	{
 		I3T::getUI()->setTheme(themes[m_currentThemeIdx]);
@@ -200,7 +204,7 @@ void showColors()
 		ImGui::SetNextItemWidth(4 * DRAG_FLOAT_WIDTH);
 
 		const auto label = fmt::format("{}##{}", str + I3T_PROPERTY_NAME_OFFSET, (unsigned) key);
-		if (ImGui::ColorEdit4(label.c_str(), (float*)(&color)))
+		if (ImGui::ColorEdit4(label.c_str(), (float*) (&color)))
 		{
 			curr.apply();
 		}
@@ -251,4 +255,4 @@ void showDimensions()
 		}
 	}
 }
-}
+} // namespace UI

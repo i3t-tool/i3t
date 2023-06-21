@@ -13,7 +13,10 @@ Ptr<Cycle> Builder::createCycle()
 	return ret;
 }
 
-Ptr<Node> Cycle::clone() { return Builder::createCycle(); }
+Ptr<Node> Cycle::clone()
+{
+	return Builder::createCycle();
+}
 
 void Cycle::update(double seconds)
 {
@@ -66,26 +69,50 @@ void Cycle::stepNext()
 	pulse(I3T_CYCLE_OUT_NEXT);
 }
 
-void Cycle::setFrom(float from) { m_from = from; }
+void Cycle::setFrom(float from)
+{
+	m_from = from;
+}
 
-void Cycle::setTo(float to) { m_to = to; }
+void Cycle::setTo(float to)
+{
+	m_to = to;
+}
 
 void Cycle::setMultiplier(float v) //\todo PF Change to setStep
 {
 	m_multiplier = abs(v);
 }
 
-void Cycle::setManualStep(float v) { m_manualStep = v; }
+void Cycle::setManualStep(float v)
+{
+	m_manualStep = v;
+}
 
-bool Cycle::isRunning() const { return m_isRunning; }
+bool Cycle::isRunning() const
+{
+	return m_isRunning;
+}
 
-float Cycle::getFrom() const { return m_from; }
+float Cycle::getFrom() const
+{
+	return m_from;
+}
 
-float Cycle::getTo() const { return m_to; }
+float Cycle::getTo() const
+{
+	return m_to;
+}
 
-float Cycle::getMultiplier() const { return m_multiplier; }
+float Cycle::getMultiplier() const
+{
+	return m_multiplier;
+}
 
-float Cycle::getManualStep() const { return m_manualStep; }
+float Cycle::getManualStep() const
+{
+	return m_manualStep;
+}
 
 void Cycle::updateValues(int inputIndex)
 {
@@ -133,8 +160,7 @@ void Cycle::updateValues(int inputIndex)
 }
 
 void Cycle::onCycleFinish() // \todo not used => remove?
-{
-}
+{}
 
 void Cycle::updateValue(float increment)
 {

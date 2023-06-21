@@ -9,8 +9,9 @@ bool TransformOperation::hasDefaultValue(const std::string& name) const
 
 std::optional<TransformOperation::NameTypePair> TransformOperation::getDefaultValueType(const std::string& name) const
 {
-	const auto it = std::find_if(defaultValuesTypes.begin(), defaultValuesTypes.end(),
-	                             [&name](const auto& value) { return value.name == name; });
+	const auto it = std::find_if(defaultValuesTypes.begin(), defaultValuesTypes.end(), [&name](const auto& value) {
+		return value.name == name;
+	});
 
 	if (it == defaultValuesTypes.end())
 	{

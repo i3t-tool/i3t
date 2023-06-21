@@ -339,8 +339,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MixVector>::updateValues(i
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		setInternalValue(glm::mix(m_inputs[0].data().getVec4(), m_inputs[1].data().getVec4(),
-		                          m_inputs[2].data().getFloat()));
+		setInternalValue(
+		    glm::mix(m_inputs[0].data().getVec4(), m_inputs[1].data().getVec4(), m_inputs[2].data().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
@@ -515,8 +515,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MixVector3>::updateValues(
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		setInternalValue(glm::mix(m_inputs[0].data().getVec3(), m_inputs[1].data().getVec3(),
-		                          m_inputs[2].data().getFloat()));
+		setInternalValue(
+		    glm::mix(m_inputs[0].data().getVec3(), m_inputs[1].data().getVec3(), m_inputs[2].data().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
@@ -589,8 +589,7 @@ else {
 	// angle - is divided by 2 in angleAxes
 	if (m_inputs[0].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		setInternalValue(
-		    glm::angleAxis(m_inputs[0].data().getFloat(), glm::normalize(m_inputs[2].data().getVec3())));
+		setInternalValue(glm::angleAxis(m_inputs[0].data().getFloat(), glm::normalize(m_inputs[2].data().getVec3())));
 	}
 	else if (m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
@@ -603,7 +602,7 @@ else {
 	{
 		// setInternalValue(glm::quat(0.0f, m_inputs[2].data().getVec3()));
 		setInternalValue(glm::angleAxis(0.0f, glm::normalize(m_inputs[2].data().getVec3()))); // bud zadat 1.0f, nebo
-		                                                                                            // angleAxis(0.0f,...)
+		                                                                                      // angleAxis(0.0f,...)
 	}
 	else
 	{
@@ -616,8 +615,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::VecVecToQuat>::updateValue
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		setInternalValue(glm::quat(glm::normalize(m_inputs[0].data().getVec3()),
-		                           glm::normalize(m_inputs[1].data().getVec3())));
+		setInternalValue(
+		    glm::quat(glm::normalize(m_inputs[0].data().getVec3()), glm::normalize(m_inputs[1].data().getVec3())));
 	}
 	else
 	{
@@ -688,8 +687,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::EulerToQuat>::updateValues
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 
-		setInternalValue(glm::quat(glm::vec3(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(),
-		                                     m_inputs[2].data().getFloat())));
+		setInternalValue(glm::quat(
+		    glm::vec3(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(), m_inputs[2].data().getFloat())));
 	}
 	else
 	{
@@ -718,8 +717,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatSlerp>::updateValues(i
 		// setInternalValue(glm::mix(m_inputs[0].data().getQuat(),
 		// m_inputs[1].data().getQuat(),
 		// m_inputs[2].data().getFloat()));
-		setInternalValue(glm::slerp(m_inputs[0].data().getQuat(), m_inputs[1].data().getQuat(),
-		                            m_inputs[2].data().getFloat()));
+		setInternalValue(
+		    glm::slerp(m_inputs[0].data().getQuat(), m_inputs[1].data().getQuat(), m_inputs[2].data().getFloat()));
 	}
 	else
 	{
@@ -762,7 +761,8 @@ GLM_FUNC_QUALIFIER glm::tquat<T, P> longWaySlerp(glm::tquat<T, P> const& x, glm:
 	if (cosTheta > T(1) - glm::epsilon<T>())
 	{
 		// Linear interpolation
-		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a), glm::mix(x.z, z.z, a));
+		return glm::tquat<T, P>(glm::mix(x.w, z.w, a), glm::mix(x.x, z.x, a), glm::mix(x.y, z.y, a),
+		                        glm::mix(x.z, z.z, a));
 	}
 	else
 	{
@@ -785,8 +785,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatLongWaySlerp>::updateV
 		// setInternalValue(glm::mix(m_inputs[0].data().getQuat(),
 		// m_inputs[1].data().getQuat(),
 		// m_inputs[2].data().getFloat()));
-		setInternalValue(longWaySlerp(m_inputs[0].data().getQuat(), m_inputs[1].data().getQuat(),
-		                              m_inputs[2].data().getFloat()));
+		setInternalValue(
+		    longWaySlerp(m_inputs[0].data().getQuat(), m_inputs[1].data().getQuat(), m_inputs[2].data().getFloat()));
 	}
 	else
 	{
@@ -800,14 +800,14 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatLerp>::updateValues(in
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 
-		float w = glm::mix(m_inputs[0].data().getQuat().w, m_inputs[1].data().getQuat().w,
-		                   m_inputs[2].data().getFloat());
-		float x = glm::mix(m_inputs[0].data().getQuat().x, m_inputs[1].data().getQuat().x,
-		                   m_inputs[2].data().getFloat());
-		float y = glm::mix(m_inputs[0].data().getQuat().y, m_inputs[1].data().getQuat().y,
-		                   m_inputs[2].data().getFloat());
-		float z = glm::mix(m_inputs[0].data().getQuat().z, m_inputs[1].data().getQuat().z,
-		                   m_inputs[2].data().getFloat());
+		float w =
+		    glm::mix(m_inputs[0].data().getQuat().w, m_inputs[1].data().getQuat().w, m_inputs[2].data().getFloat());
+		float x =
+		    glm::mix(m_inputs[0].data().getQuat().x, m_inputs[1].data().getQuat().x, m_inputs[2].data().getFloat());
+		float y =
+		    glm::mix(m_inputs[0].data().getQuat().y, m_inputs[1].data().getQuat().y, m_inputs[2].data().getFloat());
+		float z =
+		    glm::mix(m_inputs[0].data().getQuat().z, m_inputs[1].data().getQuat().z, m_inputs[2].data().getFloat());
 
 		setInternalValue(glm::quat(w, x, y, z));
 	}
@@ -906,8 +906,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::ClampFloat>::updateValues(
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		setInternalValue(glm::clamp(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(),
-		                            m_inputs[2].data().getFloat()));
+		setInternalValue(
+		    glm::clamp(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(), m_inputs[2].data().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
@@ -1015,8 +1015,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MixFloat>::updateValues(in
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
-		setInternalValue(glm::mix(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(),
-		                          m_inputs[2].data().getFloat()));
+		setInternalValue(
+		    glm::mix(m_inputs[0].data().getFloat(), m_inputs[1].data().getFloat(), m_inputs[2].data().getFloat()));
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
@@ -1501,8 +1501,8 @@ template <> FORCE_INLINE void Operator<EOperatorType::MakeLookAt>::updateValues(
 {
 	if (areAllInputsPlugged())
 	{
-		setInternalValue(glm::lookAt(m_inputs[0].data().getVec3(), m_inputs[1].data().getVec3(),
-		                             m_inputs[2].data().getVec3()));
+		setInternalValue(
+		    glm::lookAt(m_inputs[0].data().getVec3(), m_inputs[1].data().getVec3(), m_inputs[2].data().getVec3()));
 	}
 }
 

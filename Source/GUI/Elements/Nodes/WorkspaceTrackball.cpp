@@ -2,8 +2,8 @@
 //// Created by Sofie on 16.05.2021.
 ////
 //
-//#include "WorkspaceTrackball.h"
-//#include "Core/Input/InputManager.h"
+// #include "WorkspaceTrackball.h"
+// #include "Core/Input/InputManager.h"
 //
 //
 ////WorkspaceTrackball::WorkspaceTrackball(ImTextureID headerBackground,

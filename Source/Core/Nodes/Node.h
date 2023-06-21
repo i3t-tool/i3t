@@ -119,7 +119,10 @@ public:
 	 */
 	ID getId() const;
 
-	const Operation* getOperation() const { return m_operation; }
+	const Operation* getOperation() const
+	{
+		return m_operation;
+	}
 
 	/**
 	 * Get reference to this node instance.
@@ -127,7 +130,10 @@ public:
 	 * Note that this operation may be slower. A new shared pointer must be
 	 * created, it obtains atomic counter increment.
 	 */
-	Ptr<Node> getPtr() { return shared_from_this(); }
+	Ptr<Node> getPtr()
+	{
+		return shared_from_this();
+	}
 
 	template <typename T> Ptr<T> as()
 	{
@@ -145,11 +151,23 @@ public:
 	EValueState getState(size_t pinIndex = 0);
 	//===----------------------------------------------------------------------===//
 
-	Pin& getInput(size_t i) { return m_inputs[i]; }
-	Pin& getOutput(size_t i) { return m_outputs[i]; }
+	Pin& getInput(size_t i)
+	{
+		return m_inputs[i];
+	}
+	Pin& getOutput(size_t i)
+	{
+		return m_outputs[i];
+	}
 
-	std::vector<Pin>& getInputPins() { return m_inputs; }
-	std::vector<Pin>& getOutputPins() { return m_outputs; }
+	std::vector<Pin>& getInputPins()
+	{
+		return m_inputs;
+	}
+	std::vector<Pin>& getOutputPins()
+	{
+		return m_outputs;
+	}
 
 	//===-- Obtaining value functions. ----------------------------------------===//
 	/**
@@ -169,10 +187,16 @@ public:
 	 * two vectors). Value of field[0] is returned if this parameter omitted)
 	 * \return Struct which holds data
 	 */
-	const Data& getData(size_t index = 0) { return getInternalData(index); }
+	const Data& getData(size_t index = 0)
+	{
+		return getInternalData(index);
+	}
 
 	/// \todo MH Replace getData with this function.
-	const Data& data(size_t index = 0) { return getData(index); }
+	const Data& data(size_t index = 0)
+	{
+		return getData(index);
+	}
 
 public:
 	/// Get direct owner of this node.
@@ -181,7 +205,10 @@ public:
 	Ptr<Node> getOwner() const;
 
 	/// \todo Does it needs to be public?
-	void setOwner(Node* owner) { m_owner = owner; }
+	void setOwner(Node* owner)
+	{
+		m_owner = owner;
+	}
 
 	/// Get the topmost owner of this node.
 	Ptr<Node> getRootOwner();
@@ -204,11 +231,26 @@ public:
 	 *
 	 * \param val
 	 */
-	[[nodiscard]] virtual ValueSetResult setValue(float val) { return setValueEx(val); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec) { return setValueEx(vec); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec) { return setValueEx(vec); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q) { return setValueEx(q); }
-	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat) { return setValueEx(mat); }
+	[[nodiscard]] virtual ValueSetResult setValue(float val)
+	{
+		return setValueEx(val);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec3& vec)
+	{
+		return setValueEx(vec);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::vec4& vec)
+	{
+		return setValueEx(vec);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::quat& q)
+	{
+		return setValueEx(q);
+	}
+	[[nodiscard]] virtual ValueSetResult setValue(const glm::mat4& mat)
+	{
+		return setValueEx(mat);
+	}
 
 	/**
 	 * \param val new value
@@ -330,7 +372,10 @@ public:
 	bool areAllInputsPlugged();
 	bool areAllInputsUnplugged() const;
 
-	const char* getLabel() const { return m_operation->defaultLabel.c_str(); }
+	const char* getLabel() const
+	{
+		return m_operation->defaultLabel.c_str();
+	}
 
 	/// "{node type} #{node ID}"
 	std::string getSignature()
@@ -347,8 +392,8 @@ protected:
 	// TODO: (DR) Callbacks cannot be unregistered! That could cause issues when lifetime of listener ends before the
 	//   dispatcher.
 	//   Callbacks are very primitively implemented using std::function, std::function instances cannot be compared and
-	//   thus can't be unregistered. Possible fix is to pack std::function into a listener object that also contains some
-	//   id or pointer to the callback owner and compare those
+	//   thus can't be unregistered. Possible fix is to pack std::function into a listener object that also contains
+	//   some id or pointer to the callback owner and compare those
 
 	std::list<std::function<void(Node*)>> m_updateCallbacks;
 	std::list<std::function<void(Node*)>> m_deleteCallbacks;

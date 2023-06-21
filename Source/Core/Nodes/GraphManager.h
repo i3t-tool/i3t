@@ -44,9 +44,15 @@ public:
 	static void init();
 	static void destroy();
 
-	template <EOperatorType T> static Ptr<Node> createNode() { return Builder::createOperator<T>(); }
+	template <EOperatorType T> static Ptr<Node> createNode()
+	{
+		return Builder::createOperator<T>();
+	}
 
-	template <ETransformType T> static Ptr<Transform> createTransform() { return Builder::createTransform<T>(); }
+	template <ETransformType T> static Ptr<Transform> createTransform()
+	{
+		return Builder::createTransform<T>();
+	}
 
 	static Ptr<Sequence> createSequence();
 
@@ -64,7 +70,10 @@ public:
 	 */
 	static void update(double tick);
 
-	[[nodiscard]] std::vector<Ptr<Core::Cycle>>& getCycles() { return m_cycles; }
+	[[nodiscard]] std::vector<Ptr<Core::Cycle>>& getCycles()
+	{
+		return m_cycles;
+	}
 
 	/**
 	 * Is used to check before connecting to avoid cycles in the node graph.
@@ -176,7 +185,10 @@ using gm = GraphManager;
 
 //----------------------------------------------------------------------------//
 
-inline CameraPtr GraphManager::createCamera() { return Builder::createCamera(); }
+inline CameraPtr GraphManager::createCamera()
+{
+	return Builder::createCamera();
+}
 
 inline Ptr<Core::Cycle> GraphManager::createCycle()
 {

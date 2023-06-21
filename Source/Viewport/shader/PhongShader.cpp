@@ -8,7 +8,10 @@
 
 using namespace Vp;
 
-PhongShader::PhongShader(GLuint id) : ObjectShader(id) { init(false); }
+PhongShader::PhongShader(GLuint id) : ObjectShader(id)
+{
+	init(false);
+}
 
 void PhongShader::init(bool initSuperclass)
 {

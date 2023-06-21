@@ -28,8 +28,7 @@
 struct TextureRecord
 {
 	TextureRecord() : flag(false), textureId(0) // PF initialization added
-	{
-	}
+	{}
 
 	TextureRecord(const bool _flag, const GLuint _textureId)
 	{
@@ -144,18 +143,30 @@ public:
 	 * repository \param name Name (key) of the texture in the repository \return
 	 * OpenGL texture object name
 	 */
-	static GLuint getId(const std::string& name) { return textures[name].textureId; }
+	static GLuint getId(const std::string& name)
+	{
+		return textures[name].textureId;
+	}
 
 	/**
 	 * \brief Replace the OpenGL texture object name in the repository
 	 * \param name Name (key) of the texture in the repository
 	 * \param id New OpenGL texture object name
 	 */
-	static void setTextureID(const std::string& name, const int id) { textures[name].textureId = id; }
+	static void setTextureID(const std::string& name, const int id)
+	{
+		textures[name].textureId = id;
+	}
 
-	static GLuint getHCId(const std::string& name) { return hcTextures[name].textureId; }
+	static GLuint getHCId(const std::string& name)
+	{
+		return hcTextures[name].textureId;
+	}
 
-	static void setHCTextureID(const std::string& name, const int id) { hcTextures[name].textureId = id; }
+	static void setHCTextureID(const std::string& name, const int id)
+	{
+		hcTextures[name].textureId = id;
+	}
 
 	/**
 	 * \brief Set the flag of all textures in the repository (\a textures) to

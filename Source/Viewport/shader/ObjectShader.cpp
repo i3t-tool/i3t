@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-ObjectShader::ObjectShader(GLuint id) : WorldShader(id) { init(false); }
+ObjectShader::ObjectShader(GLuint id) : WorldShader(id)
+{
+	init(false);
+}
 
 void ObjectShader::init(bool initSuperclass)
 {

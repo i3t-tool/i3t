@@ -154,11 +154,10 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	// -------------------------------------------------------
 
 	// [FUNCS] DETERMINING ELEMENT TYPES
-	auto isBlockType = [](const std::string& string)
-	{
+	auto isBlockType = [](const std::string& string) {
 		// is keyword
 		static const std::unordered_map<std::string, blockType_t> stringToBlockType = {
-		    {"task:", TASK},   {"hint:", HINT},    {"choice:", CHOICE}, {"multichoice:", MULTICHOICE},
+		    {"task:", TASK},   {"hint:", HINT},     {"choice:", CHOICE},    {"multichoice:", MULTICHOICE},
 		    {"input:", INPUT}, {"script:", SCRIPT}, {"headline:", HEADLINE}};
 		if (const auto it{stringToBlockType.find(string)}; it != std::end(stringToBlockType))
 		{
@@ -167,13 +166,11 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		// is anything else
 		return NOT_BLOCK;
 	};
-	auto isSingleLineType = [](const std::string& string)
-	{
+	auto isSingleLineType = [](const std::string& string) {
 		// is keyword
 		static const std::unordered_map<std::string, singleLineType_t> stringToSingleLineType = {
-		    {"task:", TASK_SINGLE}, {"hint:", HINT_SINGLE},    {"x:", CORRECT_ANSWER},
-		    {"o:", WRONG_ANSWER},   {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE},
-		    {"headline:", HEADLINE_SINGLE}};
+		    {"task:", TASK_SINGLE},    {"hint:", HINT_SINGLE},     {"x:", CORRECT_ANSWER},        {"o:", WRONG_ANSWER},
+		    {"answers:", ANSWER_LIST}, {"script:", SCRIPT_SIGNLE}, {"headline:", HEADLINE_SINGLE}};
 		if (const auto it{stringToSingleLineType.find(string)}; it != std::end(stringToSingleLineType))
 		{
 			return it->second;
@@ -192,8 +189,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	//};
 
 	// [FUNC] FILLING THE STEP CLASS WITH COMPLETED BLOCK ELEMENTS
-	auto endCurrentBlock = [&]() -> void
-	{
+	auto endCurrentBlock = [&]() -> void {
 		switch (currentBlock)
 		{
 		case EXPLANATION:
@@ -222,8 +218,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	};
 
 	// [FUNC] INITIATING BLOCK ELEMENTS
-	auto beginBlock = [&](blockType_t blockType) -> void
-	{
+	auto beginBlock = [&](blockType_t blockType) -> void {
 		// drop current block if any (safety check)
 		if (currentBlock)
 		{
@@ -240,8 +235,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 	};
 
 	// [FUNC] FILLING THE STEP CLASS WITH SINGLE-LINE ELEMENTS
-	auto handleSingleLine = [&](singleLineType_t type, const std::string& content) -> void
-	{
+	auto handleSingleLine = [&](singleLineType_t type, const std::string& content) -> void {
 		// check also for current state, and show error when calling singlelines
 		// which do not match nektere pripady ponechavaji state, jine ho musi
 		// resetovat!
@@ -394,7 +388,7 @@ std::shared_ptr<Tutorial> TutorialLoader::loadTutorial(std::shared_ptr<TutorialH
 		LOG_FATAL("Tutorial file '" + header->m_filename + "' I/O error");
 	}
 
-	if(header->m_scene != "undefined")
+	if (header->m_scene != "undefined")
 	{
 		App::getModule<StateManager>().loadScene(header->m_scene);
 	}
@@ -457,7 +451,7 @@ std::string TutorialLoader::getDirectory(std::string& path)
 void TutorialLoader::skipSpaces(std::istringstream& stream)
 {
 	while (stream.peek() == ' ' || stream.peek() == '\t')
-	{                  // check if space
+	{                    // check if space
 		stream.ignore(); // skip the character
 	}
 }
@@ -467,7 +461,7 @@ void TutorialLoader::skipSpaces(std::istringstream& stream, unsigned int maxCoun
 	for (int i = 0; i < maxCount; i++)
 	{
 		if (stream.peek() == ' ' || stream.peek() == '\t')
-		{                  // check if space
+		{                    // check if space
 			stream.ignore(); // skip the character
 		}
 		else
@@ -518,7 +512,10 @@ std::shared_ptr<TutorialElement>& TutorialLoader::createInput(TStep& step, const
 	return step.m_content.emplace_back(std::make_shared<InputTask>(question, correctAnswers));
 }
 
-void TutorialLoader::addScript(TStep& step, const std::string& script) { step.m_scriptToRunWhenShown += script; }
+void TutorialLoader::addScript(TStep& step, const std::string& script)
+{
+	step.m_scriptToRunWhenShown += script;
+}
 
 /*
   // nicely fill it at that heap place ^^

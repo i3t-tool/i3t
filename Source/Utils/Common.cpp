@@ -1,6 +1,6 @@
 #include "Common.h"
 #include <sys/timeb.h>
-//#include <sys/types.h>
+// #include <sys/types.h>
 
 /**
  * \fn	long GetTime()
@@ -16,7 +16,7 @@ long GetTime()
 	static struct timeb mtime;
 	//_ftime64_s(&mtime);
 	ftime(&mtime);
-	return (long)(1000 * (1000 * mtime.time + mtime.millitm));
+	return (long) (1000 * (1000 * mtime.time + mtime.millitm));
 }
 
 /**
@@ -34,7 +34,7 @@ long GetRealTime()
 
 	//_ftime64_s(&mtime);
 	ftime(&mtime);
-	return (long)(1000 * (1000 * mtime.time + mtime.millitm));
+	return (long) (1000 * (1000 * mtime.time + mtime.millitm));
 }
 
 /**

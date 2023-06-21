@@ -13,7 +13,10 @@ static std::vector<std::string> readRecentFiles()
 	/// \todo Implement!
 }
 
-StateManager::StateManager() { m_recentFiles = readRecentFiles(); }
+StateManager::StateManager()
+{
+	m_recentFiles = readRecentFiles();
+}
 
 void StateManager::takeSnapshot()
 {
@@ -67,13 +70,25 @@ void StateManager::redo()
 	setWindowTitle();
 }
 
-bool StateManager::canUndo() const { return m_currentStateIdx > 0; }
+bool StateManager::canUndo() const
+{
+	return m_currentStateIdx > 0;
+}
 
-bool StateManager::canRedo() const { return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx; }
+bool StateManager::canRedo() const
+{
+	return m_mementos.size() != 1 && m_mementos.size() - 1 != m_currentStateIdx;
+}
 
-int StateManager::getMementosCount() const { return m_mementos.size(); }
+int StateManager::getMementosCount() const
+{
+	return m_mementos.size();
+}
 
-int StateManager::getPossibleUndosCount() const { return m_mementos.size() - 1; }
+int StateManager::getPossibleUndosCount() const
+{
+	return m_mementos.size() - 1;
+}
 
 int StateManager::getPossibleRedosCount() const
 {
@@ -83,9 +98,15 @@ int StateManager::getPossibleRedosCount() const
 
 //
 
-const Memento& StateManager::getCurrentState() const { return m_mementos[m_currentStateIdx]; }
+const Memento& StateManager::getCurrentState() const
+{
+	return m_mementos[m_currentStateIdx];
+}
 
-void StateManager::createEmptyScene() { reset(); }
+void StateManager::createEmptyScene()
+{
+	reset();
+}
 
 //===-- Files manipulation functions --------------------------------------===//
 
@@ -110,7 +131,10 @@ bool StateManager::loadScene(const fs::path& scene)
 	return true;
 }
 
-bool StateManager::saveScene() { return saveScene(m_currentScene); }
+bool StateManager::saveScene()
+{
+	return saveScene(m_currentScene);
+}
 
 bool StateManager::saveScene(const fs::path& target)
 {

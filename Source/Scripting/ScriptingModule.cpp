@@ -10,7 +10,7 @@
 #include "Utils/Format.h"
 #include "Utils/Variant.h"
 
-static OperatorBuilder  g_OperatorBuilder;
+static OperatorBuilder g_OperatorBuilder;
 static TransformBuilder g_TransformBuilder;
 
 std::function<void(const std::string& str)> g_printRef;
@@ -23,8 +23,7 @@ static WorkspaceDiwne& getNodeEditor()
 
 //----------------------------------------------------------------------------//
 
-template <typename T>
-static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
+template <typename T> static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
 {
 	const auto node = guiNode->getNodebase();
 
@@ -44,8 +43,7 @@ static std::optional<T> getValue(Ptr<GuiNode> guiNode, int index = 0)
 	return maybeValue;
 }
 
-template <typename T>
-static bool setValue(Ptr<GuiNode> guiNode, const T& value)
+template <typename T> static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 {
 	const auto node = guiNode->getNodebase();
 
@@ -72,8 +70,7 @@ static bool setValue(Ptr<GuiNode> guiNode, const T& value)
 
 //----------------------------------------------------------------------------//
 
-template <typename T>
-static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name)
+template <typename T> static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name)
 {
 	const auto transform = guiNode->getNodebase()->as<Core::Transform>();
 	const auto maybeValue = transform->getDefaultValue(name).getValue<T>();
@@ -85,8 +82,7 @@ static std::optional<T> getDefaultValue(Ptr<GuiTransform> guiNode, const std::st
 	return maybeValue;
 }
 
-template <typename T>
-static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, const T& value)
+template <typename T> static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, const T& value)
 {
 	const auto node = guiNode->getNodebase()->as<Core::Transform>();
 	const auto result = node->setDefaultValue(name, value);
@@ -104,7 +100,9 @@ static bool setDefaultValue(Ptr<GuiTransform> guiNode, const std::string& name, 
 
 void ScriptingModule::init()
 {
-	g_printRef = [this](const std::string& str) { print(str); };
+	g_printRef = [this](const std::string& str) {
+		print(str);
+	};
 
 	//
 

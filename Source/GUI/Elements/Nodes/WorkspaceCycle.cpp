@@ -13,7 +13,10 @@ WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*=
 	                        and run settings data width in it */
 }
 
-bool WorkspaceCycle::isCycle() { return true; }
+bool WorkspaceCycle::isCycle()
+{
+	return true;
+}
 
 void WorkspaceCycle::drawMenuLevelOfDetail()
 {

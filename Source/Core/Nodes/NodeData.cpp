@@ -32,4 +32,4 @@ Data::Data(EValueType valueType) : opValueType(valueType)
 		break;
 	}
 }
-}
+} // namespace Core

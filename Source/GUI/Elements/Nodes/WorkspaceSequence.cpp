@@ -9,12 +9,17 @@ WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
                                      bool drawPins /*=true*/, bool isCameraSequence /*=false*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false), m_drawPins(drawPins),
       m_isCameraSequence(isCameraSequence)
+{}
+
+bool WorkspaceSequence::allowDrawing()
 {
+	return m_isCameraSequence || WorkspaceNodeWithCoreData::allowDrawing();
 }
 
-bool WorkspaceSequence::allowDrawing() { return m_isCameraSequence || WorkspaceNodeWithCoreData::allowDrawing(); }
-
-bool WorkspaceSequence::isSequence() { return true; }
+bool WorkspaceSequence::isSequence()
+{
+	return true;
+}
 
 void WorkspaceSequence::drawMenuLevelOfDetail()
 {
@@ -58,7 +63,9 @@ int WorkspaceSequence::getInnerPosition(std::vector<ImVec2> points)
 void WorkspaceSequence::popNode(Ptr<WorkspaceNodeWithCoreData> node)
 {
 	auto node_iter = std::find_if(m_workspaceInnerTransformations.begin(), m_workspaceInnerTransformations.end(),
-	                              [node](auto innerNode) -> bool { return node == innerNode; });
+	                              [node](auto innerNode) -> bool {
+		                              return node == innerNode;
+	                              });
 
 	if (node_iter != m_workspaceInnerTransformations.end())
 	{
@@ -143,8 +150,7 @@ void WorkspaceSequence::popupContentTracking()
 			    std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
 		}
 		if (ImGui::MenuItem("Smooth tracking", "", false, false))
-		{
-		}
+		{}
 	}
 }
 
@@ -174,7 +180,8 @@ bool WorkspaceSequence::beforeContent()
 {
 	/* whole node background */
 
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgTransformation),
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeBgTransformation),
 	                         I3T::getSize(ESize::Nodes_Sequence_Rounding), ImDrawCornerFlags_All);
 	return false;
 }
@@ -215,23 +222,25 @@ bool WorkspaceSequence::middleContent()
 		bool valueChanged = false;
 		int rowOfChange, columnOfChange;
 		float valueOfChange;
-		return drawData4x4(
-		    diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
-		    m_nodebase->getData(0).getMat4() /* \todo JM \todo HM better selection (index) of data*/,
-		    {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
-		     Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked},
-		    valueChanged, rowOfChange, columnOfChange, valueOfChange);
+		return drawData4x4(diwne, getId(), m_numberOfVisibleDecimal, getDataItemsWidth(), m_floatPopupMode,
+		                   m_nodebase->getData(0).getMat4() /* \todo JM \todo HM better selection (index) of data*/,
+		                   {Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                    Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                    Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                    Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                    Core::EValueState::Locked, Core::EValueState::Locked, Core::EValueState::Locked,
+		                    Core::EValueState::Locked},
+		                   valueChanged, rowOfChange, columnOfChange, valueOfChange);
 	}
 
 	if (diwne.getDiwneAction() == DIWNE::DiwneAction::DragNode ||
 	    diwne.getDiwneActionPreviousFrame() == DIWNE::DiwneAction::DragNode)
 	{
 		dragedNode = diwne.getLastActiveNode<WorkspaceTransformation>();
-		if (dragedNode != nullptr && (dragedNode->aboveSequence == 0 ||
-		                              dragedNode->aboveSequence == getIdDiwne())) /* only transformation can be in Sequence
-		                                                                             && not above other sequence */
+		if (dragedNode != nullptr &&
+		    (dragedNode->aboveSequence == 0 ||
+		     dragedNode->aboveSequence == getIdDiwne())) /* only transformation can be in Sequence
+		                                                    && not above other sequence */
 		{
 			position_of_draged_node_in_sequence = getInnerPosition(dragedNode->getInteractionPointsWithSequence());
 			if (position_of_draged_node_in_sequence >= 0)
@@ -285,8 +294,9 @@ bool WorkspaceSequence::middleContent()
 		 * pushing, poping) -> use dynamic_cast<WorkspaceDiwne&>(diwne) and mark
 		 * action to do and in WorkspaceDiwne react to this action  */
 		interaction_with_transformation_happen |= transformation->drawNodeDiwne<WorkspaceTransformation>(
-		    DIWNE::DrawModeNodePosition::OnCoursorPosition,
-		    m_isHeld || m_drawMode == DIWNE::DrawMode::JustDraw ? DIWNE::DrawMode::JustDraw : DIWNE::DrawMode::Interacting);
+		    DIWNE::DrawModeNodePosition::OnCoursorPosition, m_isHeld || m_drawMode == DIWNE::DrawMode::JustDraw
+		                                                        ? DIWNE::DrawMode::JustDraw
+		                                                        : DIWNE::DrawMode::Interacting);
 
 		ImGui::SameLine();
 

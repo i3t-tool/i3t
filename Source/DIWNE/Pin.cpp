@@ -40,7 +40,10 @@ bool Pin::processInteractionsAlways()
 	return interaction_happen;
 }
 
-bool Pin::bypassPinLinkConnectionPreparedAction() { return bypassFocusForInteractionAction(); }
+bool Pin::bypassPinLinkConnectionPreparedAction()
+{
+	return bypassFocusForInteractionAction();
+}
 
 bool Pin::allowProcessPin_Pre_ConnectLink()
 {

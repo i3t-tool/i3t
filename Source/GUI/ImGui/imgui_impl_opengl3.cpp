@@ -184,7 +184,7 @@ bool ImGui_ImplOpenGL3_Init(const char* glsl_version)
 	GLint major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
-	g_GlVersion = (GLuint)(major * 100 + minor * 10);
+	g_GlVersion = (GLuint) (major * 100 + minor * 10);
 #else
 	g_GlVersion = 200; // GLES 2
 #endif
@@ -217,7 +217,7 @@ bool ImGui_ImplOpenGL3_Init(const char* glsl_version)
 	if (glsl_version == NULL)
 		glsl_version = "#version 130";
 #endif
-	IM_ASSERT((int)strlen(glsl_version) + 2 < IM_ARRAYSIZE(g_GlslVersionString));
+	IM_ASSERT((int) strlen(glsl_version) + 2 < IM_ARRAYSIZE(g_GlslVersionString));
 	strcpy(g_GlslVersionString, glsl_version);
 	strcat(g_GlslVersionString, "\n");
 
@@ -292,7 +292,7 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
 	bool clip_origin_lower_left = true;
 #if defined(GL_CLIP_ORIGIN) && !defined(__APPLE__)
 	GLenum current_clip_origin = 0;
-	glGetIntegerv(GL_CLIP_ORIGIN, (GLint*)&current_clip_origin);
+	glGetIntegerv(GL_CLIP_ORIGIN, (GLint*) &current_clip_origin);
 	if (current_clip_origin == GL_UPPER_LEFT)
 		clip_origin_lower_left = false;
 #endif
@@ -301,7 +301,7 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
 	// Our visible imgui space lies from draw_data->DisplayPos (top left) to
 	// draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos is
 	// (0,0) for single viewport apps.
-	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
+	glViewport(0, 0, (GLsizei) fb_width, (GLsizei) fb_height);
 	float L = draw_data->DisplayPos.x;
 	float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
 	float T = draw_data->DisplayPos.y;
@@ -326,7 +326,7 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
 	                     // using GL 3.3 may set that otherwise.
 #endif
 
-	(void)vertex_array_object;
+	(void) vertex_array_object;
 #ifndef IMGUI_IMPL_OPENGL_ES2
 	glBindVertexArray(vertex_array_object);
 #endif
@@ -338,11 +338,11 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
 	glEnableVertexAttribArray(g_AttribLocationVtxUV);
 	glEnableVertexAttribArray(g_AttribLocationVtxColor);
 	glVertexAttribPointer(g_AttribLocationVtxPos, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert),
-	                      (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
+	                      (GLvoid*) IM_OFFSETOF(ImDrawVert, pos));
 	glVertexAttribPointer(g_AttribLocationVtxUV, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert),
-	                      (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
+	                      (GLvoid*) IM_OFFSETOF(ImDrawVert, uv));
 	glVertexAttribPointer(g_AttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(ImDrawVert),
-	                      (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
+	                      (GLvoid*) IM_OFFSETOF(ImDrawVert, col));
 }
 
 // OpenGL3 Render function.
@@ -355,28 +355,28 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 {
 	// Avoid rendering when minimized, scale coordinates for retina displays
 	// (screen coordinates != framebuffer coordinates)
-	int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
-	int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
+	int fb_width = (int) (draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
+	int fb_height = (int) (draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
 	if (fb_width <= 0 || fb_height <= 0)
 		return;
 
 	// Backup GL state
 	GLenum last_active_texture;
-	glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&last_active_texture);
+	glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*) &last_active_texture);
 	glActiveTexture(GL_TEXTURE0);
 	GLuint last_program;
-	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&last_program);
+	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*) &last_program);
 	GLuint last_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, (GLint*)&last_texture);
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, (GLint*) &last_texture);
 #ifdef GL_SAMPLER_BINDING
 	GLuint last_sampler;
-	glGetIntegerv(GL_SAMPLER_BINDING, (GLint*)&last_sampler);
+	glGetIntegerv(GL_SAMPLER_BINDING, (GLint*) &last_sampler);
 #endif
 	GLuint last_array_buffer;
-	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (GLint*)&last_array_buffer);
+	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (GLint*) &last_array_buffer);
 #ifndef IMGUI_IMPL_OPENGL_ES2
 	GLuint last_vertex_array_object;
-	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (GLint*)&last_vertex_array_object);
+	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (GLint*) &last_vertex_array_object);
 #endif
 #ifdef GL_POLYGON_MODE
 	GLint last_polygon_mode[2];
@@ -387,17 +387,17 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 	GLint last_scissor_box[4];
 	glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
 	GLenum last_blend_src_rgb;
-	glGetIntegerv(GL_BLEND_SRC_RGB, (GLint*)&last_blend_src_rgb);
+	glGetIntegerv(GL_BLEND_SRC_RGB, (GLint*) &last_blend_src_rgb);
 	GLenum last_blend_dst_rgb;
-	glGetIntegerv(GL_BLEND_DST_RGB, (GLint*)&last_blend_dst_rgb);
+	glGetIntegerv(GL_BLEND_DST_RGB, (GLint*) &last_blend_dst_rgb);
 	GLenum last_blend_src_alpha;
-	glGetIntegerv(GL_BLEND_SRC_ALPHA, (GLint*)&last_blend_src_alpha);
+	glGetIntegerv(GL_BLEND_SRC_ALPHA, (GLint*) &last_blend_src_alpha);
 	GLenum last_blend_dst_alpha;
-	glGetIntegerv(GL_BLEND_DST_ALPHA, (GLint*)&last_blend_dst_alpha);
+	glGetIntegerv(GL_BLEND_DST_ALPHA, (GLint*) &last_blend_dst_alpha);
 	GLenum last_blend_equation_rgb;
-	glGetIntegerv(GL_BLEND_EQUATION_RGB, (GLint*)&last_blend_equation_rgb);
+	glGetIntegerv(GL_BLEND_EQUATION_RGB, (GLint*) &last_blend_equation_rgb);
 	GLenum last_blend_equation_alpha;
-	glGetIntegerv(GL_BLEND_EQUATION_ALPHA, (GLint*)&last_blend_equation_alpha);
+	glGetIntegerv(GL_BLEND_EQUATION_ALPHA, (GLint*) &last_blend_equation_alpha);
 	GLboolean last_enable_blend = glIsEnabled(GL_BLEND);
 	GLboolean last_enable_cull_face = glIsEnabled(GL_CULL_FACE);
 	GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
@@ -425,10 +425,10 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
 
 		// Upload vertex/index buffers
-		glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * (int)sizeof(ImDrawVert),
-		             (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * (int)sizeof(ImDrawIdx),
-		             (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) cmd_list->VtxBuffer.Size * (int) sizeof(ImDrawVert),
+		             (const GLvoid*) cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr) cmd_list->IdxBuffer.Size * (int) sizeof(ImDrawIdx),
+		             (const GLvoid*) cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
 
 		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
 		{
@@ -455,21 +455,22 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 				if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
 				{
 					// Apply scissor/clipping rectangle
-					glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w), (int)(clip_rect.z - clip_rect.x),
-					          (int)(clip_rect.w - clip_rect.y));
+					glScissor((int) clip_rect.x, (int) (fb_height - clip_rect.w), (int) (clip_rect.z - clip_rect.x),
+					          (int) (clip_rect.w - clip_rect.y));
 
 					// Bind texture, Draw
-					glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+					glBindTexture(GL_TEXTURE_2D, (GLuint) (intptr_t) pcmd->TextureId);
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET
 					if (g_GlVersion >= 320)
-						glDrawElementsBaseVertex(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
+						glDrawElementsBaseVertex(GL_TRIANGLES, (GLsizei) pcmd->ElemCount,
 						                         sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
-						                         (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)), (GLint)pcmd->VtxOffset);
+						                         (void*) (intptr_t) (pcmd->IdxOffset * sizeof(ImDrawIdx)),
+						                         (GLint) pcmd->VtxOffset);
 					else
 #endif
-						glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
+						glDrawElements(GL_TRIANGLES, (GLsizei) pcmd->ElemCount,
 						               sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
-						               (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
+						               (void*) (intptr_t) (pcmd->IdxOffset * sizeof(ImDrawIdx)));
 				}
 			}
 		}
@@ -510,10 +511,10 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 	else
 		glDisable(GL_SCISSOR_TEST);
 #ifdef GL_POLYGON_MODE
-	glPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
+	glPolygonMode(GL_FRONT_AND_BACK, (GLenum) last_polygon_mode[0]);
 #endif
-	glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-	glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+	glViewport(last_viewport[0], last_viewport[1], (GLsizei) last_viewport[2], (GLsizei) last_viewport[3]);
+	glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei) last_scissor_box[2], (GLsizei) last_scissor_box[3]);
 }
 
 bool ImGui_ImplOpenGL3_CreateFontsTexture()
@@ -542,7 +543,7 @@ bool ImGui_ImplOpenGL3_CreateFontsTexture()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	// Store our identifier
-	io.Fonts->TexID = (ImTextureID)(intptr_t)g_FontTexture;
+	io.Fonts->TexID = (ImTextureID) (intptr_t) g_FontTexture;
 
 	// Restore state
 	glBindTexture(GL_TEXTURE_2D, last_texture);
@@ -568,16 +569,16 @@ static bool CheckShader(GLuint handle, const char* desc)
 	GLint status = 0, log_length = 0;
 	glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
 	glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
-	if ((GLboolean)status == GL_FALSE)
+	if ((GLboolean) status == GL_FALSE)
 		fprintf(stderr, "ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to compile %s!\n", desc);
 	if (log_length > 1)
 	{
 		ImVector<char> buf;
-		buf.resize((int)(log_length + 1));
-		glGetShaderInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+		buf.resize((int) (log_length + 1));
+		glGetShaderInfoLog(handle, log_length, NULL, (GLchar*) buf.begin());
 		fprintf(stderr, "%s\n", buf.begin());
 	}
-	return (GLboolean)status == GL_TRUE;
+	return (GLboolean) status == GL_TRUE;
 }
 
 // If you get an error please report on GitHub. You may try different GL context
@@ -587,7 +588,7 @@ static bool CheckProgram(GLuint handle, const char* desc)
 	GLint status = 0, log_length = 0;
 	glGetProgramiv(handle, GL_LINK_STATUS, &status);
 	glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
-	if ((GLboolean)status == GL_FALSE)
+	if ((GLboolean) status == GL_FALSE)
 		fprintf(stderr,
 		        "ERROR: ImGui_ImplOpenGL3_CreateDeviceObjects: failed to link %s! "
 		        "(with GLSL '%s')\n",
@@ -595,11 +596,11 @@ static bool CheckProgram(GLuint handle, const char* desc)
 	if (log_length > 1)
 	{
 		ImVector<char> buf;
-		buf.resize((int)(log_length + 1));
-		glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+		buf.resize((int) (log_length + 1));
+		glGetProgramInfoLog(handle, log_length, NULL, (GLchar*) buf.begin());
 		fprintf(stderr, "%s\n", buf.begin());
 	}
-	return (GLboolean)status == GL_TRUE;
+	return (GLboolean) status == GL_TRUE;
 }
 
 bool ImGui_ImplOpenGL3_CreateDeviceObjects()
@@ -754,9 +755,9 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
 
 	g_AttribLocationTex = glGetUniformLocation(g_ShaderHandle, "Texture");
 	g_AttribLocationProjMtx = glGetUniformLocation(g_ShaderHandle, "ProjMtx");
-	g_AttribLocationVtxPos = (GLuint)glGetAttribLocation(g_ShaderHandle, "Position");
-	g_AttribLocationVtxUV = (GLuint)glGetAttribLocation(g_ShaderHandle, "UV");
-	g_AttribLocationVtxColor = (GLuint)glGetAttribLocation(g_ShaderHandle, "Color");
+	g_AttribLocationVtxPos = (GLuint) glGetAttribLocation(g_ShaderHandle, "Position");
+	g_AttribLocationVtxUV = (GLuint) glGetAttribLocation(g_ShaderHandle, "UV");
+	g_AttribLocationVtxColor = (GLuint) glGetAttribLocation(g_ShaderHandle, "Color");
 
 	// Create buffers
 	glGenBuffers(1, &g_VboHandle);
@@ -838,4 +839,7 @@ static void ImGui_ImplOpenGL3_InitPlatformInterface()
 	platform_io.Renderer_RenderWindow = ImGui_ImplOpenGL3_RenderWindow;
 }
 
-static void ImGui_ImplOpenGL3_ShutdownPlatformInterface() { ImGui::DestroyPlatformWindows(); }
+static void ImGui_ImplOpenGL3_ShutdownPlatformInterface()
+{
+	ImGui::DestroyPlatformWindows();
+}

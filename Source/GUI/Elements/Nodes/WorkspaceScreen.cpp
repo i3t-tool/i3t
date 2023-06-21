@@ -86,9 +86,10 @@ bool WorkspaceScreen::middleContent()
 
 // #define IM_FLOOR(_VAL) ((float) (int) (_VAL))    // this macro is used in
 //  ImGui.cpp:8155 for DC.CursorPos
-#define FLOOR_VEC2(_VAL) (ImVec2((float)(int)((_VAL).x), (float)(int)((_VAL).y))) // version of IM_FLOOR for Vec2
+#define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
 	float zoom = diwne.getWorkAreaZoom();
-	ImVec2 zoomedTextureSize = FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
+	ImVec2 zoomedTextureSize =
+	    FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
 	ImVec2 zoomedButtonSize = FLOOR_VEC2(buttonSize * diwne.getWorkAreaZoom());
 
 	ImVec2 topLeftCursorPos = FLOOR_VEC2(ImGui::GetCursorScreenPos());
@@ -98,7 +99,7 @@ bool WorkspaceScreen::middleContent()
 	// ImVec2(1.0f,0.0f)); //vertical flip
 	if (framebuffer)
 	{
-		ImGui::Image((void*)(intptr_t)framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
+		ImGui::Image((void*) (intptr_t) framebuffer->getColorTexture(), zoomedTextureSize, ImVec2(0.0f, 1.0f),
 		             ImVec2(1.0f, 0.0f)); // vertical flip
 	}
 	else
@@ -178,8 +179,8 @@ bool WorkspaceScreen::middleContent()
 		m_textureSize.y = std::max(buttonSize.y + ImGui::GetStyle().ItemSpacing.y / diwne.getWorkAreaZoom(),
 		                           m_textureSize.y + dragDelta.y);
 
-        // must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
-        getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);
+		// must be index 1, as there is a hidden output index 0, storing the incoming PV matrix
+		getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);
 
 		ImGui::ResetMouseDragDelta(0);
 	}
@@ -202,11 +203,11 @@ void WorkspaceScreen::drawMenuLevelOfDetail() // todo
 
 ImVec2 WorkspaceScreen::getAspect() const
 {
-    return m_textureSize;
+	return m_textureSize;
 }
 
 void WorkspaceScreen::setAspect(ImVec2 aspect)
 {
-    m_textureSize = aspect;
-    getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);
+	m_textureSize = aspect;
+	getNodebase()->setValue(m_textureSize.x / m_textureSize.y, 1);
 }

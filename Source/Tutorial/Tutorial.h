@@ -23,7 +23,10 @@ enum class Language
 
 struct TutorialElement
 {
-	TutorialElement() { m_content = ""; }
+	TutorialElement()
+	{
+		m_content = "";
+	}
 	TutorialElement(std::string content) : m_content(std::move(content)) {}
 	virtual ~TutorialElement() = default;
 
@@ -37,14 +40,20 @@ struct Explanation : TutorialElement
 {
 	Explanation(std::string explanation) : TutorialElement(std::move(explanation)) {}
 
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderExplanation(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderExplanation(this);
+	}
 };
 
 struct Headline : TutorialElement
 {
 	Headline(std::string headline) : TutorialElement(std::move(headline)) {}
 
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderHeadline(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderHeadline(this);
+	}
 };
 
 struct Task : TutorialElement
@@ -53,46 +62,59 @@ struct Task : TutorialElement
 
 	bool m_completed; // todo future feature
 
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderTask(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderTask(this);
+	}
 };
 
 struct Hint : TutorialElement
 {
 	Hint(std::string hint) : TutorialElement(std::move(hint)), m_expanded(false) {}
 	bool m_expanded;
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderHint(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderHint(this);
+	}
 };
 
 struct ChoiceTask : TutorialElement
 {
 	ChoiceTask(std::string question, std::vector<std::string> choices, int correctChoice)
 	    : TutorialElement(std::move(question)), m_choices(std::move(choices)), m_correctChoice(correctChoice)
-	{
-	}
+	{}
 	std::vector<std::string> m_choices;
 	int m_correctChoice;
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderChoiceTask(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderChoiceTask(this);
+	}
 };
 
 struct MultiChoiceTask : TutorialElement
 {
 	MultiChoiceTask(std::string question, std::vector<std::string> choices, std::vector<int> correctChoices)
-	    : TutorialElement(std::move(question)), m_choices(std::move(choices)), m_correctChoices(std::move(correctChoices))
-	{
-	}
+	    : TutorialElement(std::move(question)), m_choices(std::move(choices)),
+	      m_correctChoices(std::move(correctChoices))
+	{}
 	std::vector<std::string> m_choices;
 	std::vector<int> m_correctChoices;
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderMultiChoiceTask(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderMultiChoiceTask(this);
+	}
 };
 
 struct InputTask : TutorialElement
 {
 	InputTask(std::string question, std::unordered_set<std::string> correctAnswers)
 	    : TutorialElement(std::move(question)), m_correctAnswers(std::move(correctAnswers))
-	{
-	}
+	{}
 	std::unordered_set<std::string> m_correctAnswers;
-	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override { tutorialRenderer->renderInputTask(this); }
+	void acceptRenderer(ITutorialRenderer* tutorialRenderer) override
+	{
+		tutorialRenderer->renderInputTask(this);
+	}
 };
 
 struct TStep
@@ -113,11 +135,11 @@ struct TStep
 
 struct TutorialHeader
 {
-	TutorialHeader(std::string filename, std::string title, std::string description, std::string scene, std::shared_ptr<GUIImage> thumbnail)
-	    : m_filename(std::move(filename)), m_title(std::move(title)), m_description(std::move(description)), m_scene(std::move(scene)),
-	      m_thumbnailImage(std::move(thumbnail))
-	{
-	}
+	TutorialHeader(std::string filename, std::string title, std::string description, std::string scene,
+	               std::shared_ptr<GUIImage> thumbnail)
+	    : m_filename(std::move(filename)), m_title(std::move(title)), m_description(std::move(description)),
+	      m_scene(std::move(scene)), m_thumbnailImage(std::move(thumbnail))
+	{}
 	~TutorialHeader() = default;
 
 	std::string m_filename;
@@ -136,8 +158,7 @@ struct Tutorial
 	Tutorial(std::shared_ptr<TutorialHeader> header, std::vector<TStep> steps,
 	         std::unordered_map<std::string, std::shared_ptr<GUIImage>> filenameToImageMap)
 	    : m_header(std::move(header)), m_steps(std::move(steps)), m_filenameToImage(std::move(filenameToImageMap))
-	{
-	}
+	{}
 	~Tutorial() = default;
 	// general
 	std::shared_ptr<TutorialHeader> m_header;
@@ -147,5 +168,8 @@ struct Tutorial
 	std::unordered_map<std::string, std::shared_ptr<GUIImage>>
 	    m_filenameToImage; // filename to GUIImage (including GLuint id)
 	// other properties
-	int getStepCount() const { return m_steps.size(); }
+	int getStepCount() const
+	{
+		return m_steps.size();
+	}
 };

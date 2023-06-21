@@ -21,7 +21,7 @@ public:
 	{
 		friend class SequenceTree;
 		SequenceTree* m_tree;
-		Sequence*     m_currentSequence;
+		Sequence* m_currentSequence;
 		Ptr<Node> m_currentMatrix;
 
 	public:
@@ -99,15 +99,27 @@ public:
 	void update();
 
 	Ptr<Sequence> getSequence() const;
-	ID            getSequenceID() const;
+	ID getSequenceID() const;
 
-	Ptr<Model>    getModel() const { return m_model->getModel(); }
+	Ptr<Model> getModel() const
+	{
+		return m_model->getModel();
+	}
 
-	const glm::mat4& getInterpolatedMatrix() { return m_interpolatedMatrix; }
+	const glm::mat4& getInterpolatedMatrix()
+	{
+		return m_interpolatedMatrix;
+	}
 
-	unsigned fullMatricesCount() const { return m_fullMatricesCount; }
+	unsigned fullMatricesCount() const
+	{
+		return m_fullMatricesCount;
+	}
 
-	float getParam() const { return m_param; }
+	float getParam() const
+	{
+		return m_param;
+	}
 
 	bool setParam(float param);
 
@@ -126,7 +138,10 @@ public:
 		return m_trackingProgress.at(transformID);
 	}
 
-	ID getInterpolatedTransformID() const { return m_interpolatedTransformID; }
+	ID getInterpolatedTransformID() const
+	{
+		return m_interpolatedTransformID;
+	}
 
 private:
 	/// \pre m_beginSequence is set
@@ -150,4 +165,4 @@ private:
 	ID m_interpolatedTransformID = 0;
 	std::map<ID, float> m_trackingProgress;
 };
-}
+} // namespace Core

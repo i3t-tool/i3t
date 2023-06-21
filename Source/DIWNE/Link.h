@@ -20,9 +20,18 @@ public:
 	virtual void begin(){}; /*!< link is not ImGui element - it is just picture of line */
 	virtual void end(){};
 	virtual bool content();
-	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldLink; };
-	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragLink; };
-	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchLink; };
+	DIWNE::DiwneAction getHoldActionType() const final
+	{
+		return DiwneAction::HoldLink;
+	};
+	DIWNE::DiwneAction getDragActionType() const final
+	{
+		return DiwneAction::DragLink;
+	};
+	DIWNE::DiwneAction getTouchActionType() const final
+	{
+		return DiwneAction::TouchLink;
+	};
 
 	virtual void updateEndpoints(){};
 	void updateControlPoints();
@@ -36,10 +45,22 @@ public:
 		              std::max({m_controlPointStartDiwne.y, m_startDiwne.y, m_controlPointEndDiwne.y, m_endDiwne.y}));
 	};
 
-	ImVec2 getStartpoint() { return m_startDiwne; };
-	ImVec2 getEndpoint() { return m_endDiwne; };
-	ImVec2 getStartControlPoint() { return m_controlPointStartDiwne; };
-	ImVec2 getEndControlPoint() { return m_controlPointEndDiwne; };
+	ImVec2 getStartpoint()
+	{
+		return m_startDiwne;
+	};
+	ImVec2 getEndpoint()
+	{
+		return m_endDiwne;
+	};
+	ImVec2 getStartControlPoint()
+	{
+		return m_controlPointStartDiwne;
+	};
+	ImVec2 getEndControlPoint()
+	{
+		return m_controlPointEndDiwne;
+	};
 
 	void setLinkEndpointsDiwne(const ImVec2 start, const ImVec2 end)
 	{

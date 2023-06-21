@@ -40,7 +40,10 @@ void SceneModel::setModel(std::string modelAlias)
 	// updateBoundingBox();
 }
 
-std::string SceneModel::getModel() { return m_modelAlias; }
+std::string SceneModel::getModel()
+{
+	return m_modelAlias;
+}
 
 void SceneModel::update(Scene& scene)
 {

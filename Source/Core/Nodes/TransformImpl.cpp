@@ -150,13 +150,17 @@ ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec3& v
 	return ValueSetResult{ValueSetResult::Status::Ok};
 }
 
-ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec) { return setValue(glm::vec3(vec)); }
+ValueSetResult TransformImpl<ETransformType::Scale>::setValue(const glm::vec4& vec)
+{
+	return setValue(glm::vec3(vec));
+}
 
 ValueSetResult TransformImpl<ETransformType::Scale>::setValue(float val, glm::ivec2 coords)
 {
 	if (!canSetValue(g_ScaleMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 	/// if (isLocked()) // can change the diagonal only - done by canSetValue()
 
@@ -193,7 +197,10 @@ void TransformImpl<ETransformType::Scale>::setDefaultUniformScale(float val)
 	Transform::setDefaultValue("scale", glm::vec3(val));
 };
 
-void TransformImpl<ETransformType::Scale>::initDefaults() { setDefaultValue("scale", glm::vec3{1.0f, 1.0f, 1.0f}); }
+void TransformImpl<ETransformType::Scale>::initDefaults()
+{
+	setDefaultValue("scale", glm::vec3{1.0f, 1.0f, 1.0f});
+}
 
 // void TransformImpl<ETransformType::Scale>::onResetMatrixFromDefaults()
 void TransformImpl<ETransformType::Scale>::resetMatrixFromDefaults()
@@ -269,7 +276,8 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 {
 	if (!canSetValue(g_RotateXMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 
 	auto mat = getData().getMat4();
@@ -409,7 +417,8 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 	// if (!validateValue(g_RotateYMask, coords, val))
 	if (!canSetValue(g_RotateYMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 
 	auto mat = getData().getMat4();
@@ -545,7 +554,8 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 	// if (!validateValue(g_RotateZMask, coords, val))
 	if (!canSetValue(g_RotateZMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 
 	// PF: remembering the halfspace sign for each box to avoid jumps during
@@ -678,7 +688,8 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 {
 	if (!canSetValue(g_TranslateMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 	setInternalValue(val, coords);
 
@@ -757,8 +768,8 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 {
 	ValueSetResult result;
 
-	// Axis angle cannot set the value individually for each coordinate in the matrix as the 3x3 rotation matrix has to be
-	// evaluated at once, piecewise evaluation would fail as the matrix would be invalid at times (not orthonormal,
+	// Axis angle cannot set the value individually for each coordinate in the matrix as the 3x3 rotation matrix has to
+	// be evaluated at once, piecewise evaluation would fail as the matrix would be invalid at times (not orthonormal,
 	// skewed etc.)
 
 	// Check if the 3x3 rotation matrix can be edited ((DR) it should always be though?)
@@ -793,7 +804,8 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::mat
 	setDefaultValueNoUpdate("axis", axis);
 
 	// Check validity
-	if (!isValid()) {
+	if (!isValid())
+	{
 		// Revert changes
 		setInternalValue(oldValue);
 		setDefaultValueNoUpdate("rotation", oldAngle);
@@ -850,7 +862,10 @@ bool TransformImpl<ETransformType::Quat>::isValid() const
 	return result;
 }
 
-void TransformImpl<ETransformType::Quat>::initDefaults() { setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f}); }
+void TransformImpl<ETransformType::Quat>::initDefaults()
+{
+	setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
+}
 
 void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()
 {
@@ -877,7 +892,10 @@ const glm::quat& TransformImpl<ETransformType::Quat>::getQuat() const
 	return getDefaultValue("quat").getQuat();
 };
 
-const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const { return m_normalized; };
+const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const
+{
+	return m_normalized;
+};
 
 ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 {
@@ -968,7 +986,8 @@ ValueSetResult TransformImpl<ETransformType::Ortho>::setValue(float val, glm::iv
 {
 	if (!canSetValue(g_OrthoMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 
 	setInternalValue(val, coords);
@@ -1143,7 +1162,8 @@ ValueSetResult TransformImpl<ETransformType::Perspective>::setValue(float val, g
 {
 	if (!canSetValue(g_PerspectiveMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 
 	setInternalValue(val, coords);
@@ -1286,7 +1306,8 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 {
 	if (!canSetValue(g_FrustumMask, coords, val))
 	{
-		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation, "Cannot set value on given coordinates."};
+		return ValueSetResult{ValueSetResult::Status::Err_ConstraintViolation,
+		                      "Cannot set value on given coordinates."};
 	}
 
 	setInternalValue(val, coords);

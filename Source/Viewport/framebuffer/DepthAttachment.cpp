@@ -45,12 +45,13 @@ void DepthAttachment::resize(int width, int height)
 		glBindRenderbuffer(GL_RENDERBUFFER, m_id);
 		if (m_multisampled)
 		{
-			glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT,
-			                                 m_width, m_height);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples,
+			                                 m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT, m_width, m_height);
 		}
 		else
 		{
-			glRenderbufferStorage(GL_RENDERBUFFER, m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT, m_width, m_height);
+			glRenderbufferStorage(GL_RENDERBUFFER, m_stencil ? GL_DEPTH24_STENCIL8 : GL_DEPTH_COMPONENT, m_width,
+			                      m_height);
 		}
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}

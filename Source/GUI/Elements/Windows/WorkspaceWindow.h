@@ -76,9 +76,18 @@ public:
 	bool finalize();
 
 	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
-	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda) { m_workspaceDiwneAction = wda; }
-	WorkspaceDiwneAction getWorkspaceDiwneAction() { return m_workspaceDiwneAction; }
-	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame() { return m_workspaceDiwneActionPreviousFrame; }
+	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda)
+	{
+		m_workspaceDiwneAction = wda;
+	}
+	WorkspaceDiwneAction getWorkspaceDiwneAction()
+	{
+		return m_workspaceDiwneAction;
+	}
+	WorkspaceDiwneAction getWorkspaceDiwneAction_previousFrame()
+	{
+		return m_workspaceDiwneActionPreviousFrame;
+	}
 	WorkspaceDiwneAction getWorkspaceDiwneActionActive() const
 	{
 		return m_workspaceDiwneAction == WorkspaceDiwneAction::None ? m_workspaceDiwneActionPreviousFrame
@@ -97,7 +106,10 @@ public:
 	 */
 	std::unordered_map<Core::ID, WorkspaceNodeWithCoreData*> m_coreIdMap;
 
-	const std::vector<Ptr<WorkspaceNodeWithCoreData>>& getAllNodes() const { return m_workspaceCoreNodes; };
+	const std::vector<Ptr<WorkspaceNodeWithCoreData>>& getAllNodes() const
+	{
+		return m_workspaceCoreNodes;
+	};
 
 	std::vector<Ptr<WorkspaceNodeWithCoreData>> getSelectedNodes();
 

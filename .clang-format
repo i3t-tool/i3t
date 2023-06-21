@@ -1,8 +1,27 @@
-BasedOnStyle: LLVM
+BasedOnStyle: Microsoft
 
-BreakBeforeBraces: Allman
-PointerAlignment: Left
-TabWidth: 2
-UseTab: ForIndentation
+MaxEmptyLinesToKeep: 2
 
 ColumnLimit: 120
+
+IndentWidth: 4
+NamespaceIndentation: None
+
+TabWidth: 4
+UseTab: ForIndentation
+AccessModifierOffset: -4
+
+PointerAlignment: Left
+SpaceAfterCStyleCast: true
+
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortLambdasOnASingleLine: None
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  BeforeLambdaBody: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+

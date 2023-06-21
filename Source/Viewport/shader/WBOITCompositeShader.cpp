@@ -2,7 +2,10 @@
 
 using namespace Vp;
 
-WBOITCompositeShader::WBOITCompositeShader(GLuint id) : Shader(id) { init(false); }
+WBOITCompositeShader::WBOITCompositeShader(GLuint id) : Shader(id)
+{
+	init(false);
+}
 
 void WBOITCompositeShader::init(bool initSuperclass)
 {

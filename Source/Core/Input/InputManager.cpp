@@ -40,7 +40,10 @@ float InputManager::m_mouseXDragDelta = 0;
 float InputManager::m_mouseYDragDelta = 0;
 float InputManager::m_mouseWheelOffset = 0;
 
-void InputManager::init() { InputBindings::init(); }
+void InputManager::init()
+{
+	InputBindings::init();
+}
 
 void InputManager::bindGlobalAction(const char* action, EKeyState state, KeyCallback fn)
 {
@@ -255,7 +258,8 @@ void InputManager::beginFrame()
 	{
 		if (ImGui::IsMouseClicked(i))
 		{
-			LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX), std::to_string(m_mouseY));
+			LOG_EVENT_MOUSE_CLICK(Keys::getKeyString(imGuiMouseKeys[i]), std::to_string(m_mouseX),
+			                      std::to_string(m_mouseY));
 			setPressed(imGuiMouseKeys[i]);
 		}
 
@@ -747,7 +751,7 @@ GLFWwindow* InputManager::getCurrentViewport()
 	{
 		if (platformIO.Viewports[n]->ID == g->MouseViewport->ID)
 		{
-			window = (GLFWwindow*)platformIO.Viewports[n]->PlatformHandle;
+			window = (GLFWwindow*) platformIO.Viewports[n]->PlatformHandle;
 		}
 	}
 

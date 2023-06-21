@@ -1,6 +1,6 @@
 #include "Theme.h"
 
-//#include "imgui_node_editor.h"
+// #include "imgui_node_editor.h"
 
 #include "Config.h"
 #include "Core/API.h"
@@ -739,7 +739,10 @@ void Theme::apply()
 	//---------------------------------------------------------------------------------------
 }
 
-ImFont* Theme::get(EFont font) { return I3T::getUI()->getFonts()[m_fontsAssoc[font]]; }
+ImFont* Theme::get(EFont font)
+{
+	return I3T::getUI()->getFonts()[m_fontsAssoc[font]];
+}
 
 const char* Theme::getCategoryName(const std::string& key)
 {
@@ -749,13 +752,25 @@ const char* Theme::getCategoryName(const std::string& key)
 	return name;
 }
 
-Theme::CategoryNames& Theme::getCategoryNames() { return g_CategoryNames; }
+Theme::CategoryNames& Theme::getCategoryNames()
+{
+	return g_CategoryNames;
+}
 
-std::map<EColor, const char*>& Theme::getColorNames() { return g_ColorNames; }
+std::map<EColor, const char*>& Theme::getColorNames()
+{
+	return g_ColorNames;
+}
 
-std::map<ESize, const char*>& Theme::getSizeNames() { return g_SizeNames; }
+std::map<ESize, const char*>& Theme::getSizeNames()
+{
+	return g_SizeNames;
+}
 
-std::map<ESizeVec2, const char*>& Theme::getSizeVecNames() { return g_SizeVecNames; }
+std::map<ESizeVec2, const char*>& Theme::getSizeVecNames()
+{
+	return g_SizeVecNames;
+}
 
 // JH unused
 // void Theme::operatorColorTheme()

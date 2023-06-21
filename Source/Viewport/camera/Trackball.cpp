@@ -48,8 +48,8 @@ void Trackball::computeRotationAxisAndAngle(glm::vec3& axis, float& angle, glm::
 	 *
 	 * The trackball size is also changed depending on the aspect ratio. It should fit inside the visible rectangle.
 	 * So the smaller of the two sides (width and height) is used to determine its size.
-	 * However, with large aspect ratios the trackball gets too small, so as the aspect ratio grows the trackball is made
-	 * larger and larger.
+	 * However, with large aspect ratios the trackball gets too small, so as the aspect ratio grows the trackball is
+	 * made larger and larger.
 	 */
 
 	float trackballSize = TRACKBALLSIZE;
@@ -62,14 +62,14 @@ void Trackball::computeRotationAxisAndAngle(glm::vec3& axis, float& angle, glm::
 
 	if (screenSize.x >= screenSize.y)
 	{
-		aspectRatio = (float)screenSize.x / screenSize.y;
+		aspectRatio = (float) screenSize.x / screenSize.y;
 		trackballScreenSizeX = trackballSize * 1 / aspectRatio;
 		trackballScreenSizeY = trackballSize;
 		xAspectFactor = aspectRatio;
 	}
 	else
 	{
-		aspectRatio = (float)screenSize.y / screenSize.x;
+		aspectRatio = (float) screenSize.y / screenSize.x;
 		trackballScreenSizeX = trackballSize;
 		trackballScreenSizeY = trackballSize * 1 / aspectRatio;
 		yAspectFactor = aspectRatio;
@@ -160,7 +160,7 @@ float Trackball::projectToSphere(float radius, float x, float y)
 		z = t * t / d;
 	}
 
-	return (float)z;
+	return (float) z;
 }
 
 glm::vec2 Trackball::debug_trackballScreenSize = glm::vec2(0);

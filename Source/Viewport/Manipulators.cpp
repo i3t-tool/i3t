@@ -73,8 +73,8 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 		if (type == ManipulatorType::UNKNOWN || type == ManipulatorType::UNIMPLEMENTED)
 			continue;
 
-		// TODO: (DR) This shouldn't run every frame!! Needs to be called on updateValues, so could use the update callback?
-		// Update the manipulator with the latest data
+		// TODO: (DR) This shouldn't run every frame!! Needs to be called on updateValues, so could use the update
+		// callback? Update the manipulator with the latest data
 		updateManipulatorMatrices(*manipulator, manipulator->m_node);
 
 		// IMGUIZMO NOTE:
@@ -182,11 +182,12 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 				if (Math::eq(projectionParams[i], 0))
 					continue;
 				Core::ValueSetResult result = manipulator->m_node->setDefaultValue(
-				    paramNames[i], manipulator->m_node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
+				    paramNames[i],
+				    manipulator->m_node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
 				if (result.status != Core::ValueSetResult::Status::Ok)
 				{
-					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}", n(type),
-					         n(result.status), result.message);
+					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
+					         n(type), n(result.status), result.message);
 				}
 				break;
 			}
@@ -241,12 +242,13 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 				if (i == 4 || i == 5)
 				{
 					result = manipulator->m_node->setDefaultValue(
-					    paramNames[i], manipulator->m_node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
+					    paramNames[i],
+					    manipulator->m_node->getDefaultValue(paramNames[i]).getFloat() + projectionParams[i]);
 				}
 				if (result.status != Core::ValueSetResult::Status::Ok)
 				{
-					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}", n(type),
-					         n(result.status), result.message);
+					LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
+					         n(type), n(result.status), result.message);
 				}
 				break;
 			}
@@ -297,8 +299,8 @@ bool Manipulators::drawManipulators(glm::vec2 windowPos, glm::vec2 windowSize)
 			Core::ValueSetResult result = manipulator->m_node->setValue(resultMatrix);
 			if (result.status != Core::ValueSetResult::Status::Ok)
 			{
-				LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}", n(type),
-				         n(result.status), result.message);
+				LOG_WARN("Manipulators: Failed to set value for manipulator of type: {}! Status: {}, Message: {}",
+				         n(type), n(result.status), result.message);
 			}
 		}
 	}
@@ -358,7 +360,10 @@ bool Manipulators::drawLookAt(Ptr<Manipulators::Manipulator> manipulator, glm::m
 	return interacted;
 }
 
-void Manipulators::clearManipulators() { m_activeManipulators.clear(); }
+void Manipulators::clearManipulators()
+{
+	m_activeManipulators.clear();
+}
 
 void Manipulators::addManipulator(Ptr<Core::Node> node)
 {

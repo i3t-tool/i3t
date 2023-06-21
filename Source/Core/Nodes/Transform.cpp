@@ -13,7 +13,7 @@ bool validateValue(const ValueMask& mask, glm::ivec2 coords, float value)
 	if (maskValue == VM_ANY)
 		return true;
 
-	return Math::eq((float)maskValue, value);
+	return Math::eq((float) maskValue, value);
 }
 
 bool validateValues(const ValueMask& mask, const glm::mat4& matrix)
@@ -62,12 +62,16 @@ Ptr<Node> Transform::getCurrentSequence()
 	return m_currentSequence->getPtr();
 }
 
-TransformOperation* Transform::properties() const { return *getTransformOperation(getOperation()->keyWord); }
+TransformOperation* Transform::properties() const
+{
+	return *getTransformOperation(getOperation()->keyWord);
+}
 
 const Data& Transform::getDefaultValue(const std::string& name) const
 {
-	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(),
-	                             [&name](const auto value) { return value.name == name; });
+	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(), [&name](const auto value) {
+		return value.name == name;
+	});
 
 	I3T_ASSERT(it != m_defaultValues.end(), "Invalid value name!");
 
@@ -76,8 +80,9 @@ const Data& Transform::getDefaultValue(const std::string& name) const
 
 Data& Transform::getDefaultValueMut(const std::string& name)
 {
-	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(),
-	                             [&name](const auto value) { return value.name == name; });
+	const auto it = std::find_if(m_defaultValues.begin(), m_defaultValues.end(), [&name](const auto value) {
+		return value.name == name;
+	});
 
 	I3T_ASSERT(it != m_defaultValues.end(), "Invalid value name!");
 
@@ -89,7 +94,10 @@ TransformOperation::ValueMap Transform::getDefaultTypes() const
 	return getTransformDefaults(getOperation()->keyWord);
 }
 
-Transform::DefaultValues& Transform::getDefaultValues() { return m_defaultValues; }
+Transform::DefaultValues& Transform::getDefaultValues()
+{
+	return m_defaultValues;
+}
 
 EValueState Transform::getValueState(glm::ivec2 coords) const
 {
@@ -107,11 +115,20 @@ EValueState Transform::getValueState(glm::ivec2 coords) const
 
 //===----------------------------------------------------------------------===//
 
-bool Transform::isLocked() const { return m_isLocked; }
+bool Transform::isLocked() const
+{
+	return m_isLocked;
+}
 
-void Transform::lock() { m_isLocked = true; }
+void Transform::lock()
+{
+	m_isLocked = true;
+}
 
-void Transform::unlock() { m_isLocked = false; }
+void Transform::unlock()
+{
+	m_isLocked = false;
+}
 
 void Transform::saveValue()
 {
@@ -134,7 +151,10 @@ void Transform::reloadValue()
 	notifySequence();
 }
 
-const glm::mat4& Transform::getSavedValue() const { return m_savedData.getMat4(); }
+const glm::mat4& Transform::getSavedValue() const
+{
+	return m_savedData.getMat4();
+}
 
 void Transform::setSavedValue(const glm::mat4& values)
 {

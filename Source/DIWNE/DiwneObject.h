@@ -20,7 +20,7 @@ namespace DIWNE
  */
 class DiwneObject : public std::enable_shared_from_this<DiwneObject>
 {
-public:                             /* \todo some atributes should be private/protected */
+public:                               /* \todo some atributes should be private/protected */
 	DIWNE::Diwne& diwne;              /*!< Every object have access to Diwne - is used for
 	                                     share information if needed */
 	DIWNE::ID const m_idDiwne;        /*!< Used for creating ImGui id/labels */
@@ -67,12 +67,18 @@ public:                             /* \todo some atributes should be private/pr
 	 *
 	 * \param selected is new state of object
 	 */
-	void setSelected(bool const selected) { m_selected = m_selectable ? selected : false; };
+	void setSelected(bool const selected)
+	{
+		m_selected = m_selectable ? selected : false;
+	};
 
 	/*! \brief Getter
 	 * \return actual selection state of object
 	 */
-	bool getSelected() const { return m_selected; };
+	bool getSelected() const
+	{
+		return m_selected;
+	};
 
 	/*! \brief Content of popup menu raise on this object
 	 */
@@ -169,7 +175,10 @@ public:                             /* \todo some atributes should be private/pr
 	virtual bool processObjectSelect();
 	virtual bool processObjectUnselect();
 
-	inline DIWNE::ID const getIdDiwne() const { return m_idDiwne; };
+	inline DIWNE::ID const getIdDiwne() const
+	{
+		return m_idDiwne;
+	};
 
 	/*! \brief Show colored text for example for imediate hints
 	 * \param label is text to show

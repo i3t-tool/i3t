@@ -14,7 +14,10 @@ class ScriptingModule : public Module
 public:
 	bool runScript(const char* luaSource);
 
-	std::ostringstream& outputStream() { return m_oss; }
+	std::ostringstream& outputStream()
+	{
+		return m_oss;
+	}
 
 private:
 	/**

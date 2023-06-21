@@ -72,7 +72,7 @@ void TrackballCamera::processInput(double dt, glm::vec2 mousePos, glm::ivec2 win
 
 	mouseWheel(m_dScroll * (m_smoothScroll ? 1 : 4));
 
-	m_dScroll *= std::min(std::max(-3.05*dt+0.89, 0.4), 0.93) * (m_smoothScroll ? 1 : 0);
+	m_dScroll *= std::min(std::max(-3.05 * dt + 0.89, 0.4), 0.93) * (m_smoothScroll ? 1 : 0);
 
 	if (m_dScroll * m_dScroll < 0.0005f)
 	{
@@ -93,14 +93,44 @@ void TrackballCamera::mouseWheel(float scroll)
 	}
 }
 
-glm::mat4 TrackballCamera::getRotation() const { return m_accumulatedRotation; }
-void TrackballCamera::setRotation(glm::mat4 rotation) { m_accumulatedRotation = rotation; }
+glm::mat4 TrackballCamera::getRotation() const
+{
+	return m_accumulatedRotation;
+}
+void TrackballCamera::setRotation(glm::mat4 rotation)
+{
+	m_accumulatedRotation = rotation;
+}
 
-float TrackballCamera::getZoomSpeed() const { return m_zoomSpeed; }
-void TrackballCamera::setZoomSpeed(float zoomSpeed) { m_zoomSpeed = zoomSpeed; }
-float TrackballCamera::getRotateSpeed() const { return m_rotateSpeed; }
-void TrackballCamera::setRotateSpeed(float rotateSpeed) { m_rotateSpeed = rotateSpeed; }
-float TrackballCamera::getTranslateSpeed() const { return m_translateSpeed; }
-void TrackballCamera::setTranslateSpeed(float translateSpeed) { m_translateSpeed = translateSpeed; }
-bool TrackballCamera::getSmoothScroll() const { return m_smoothScroll; }
-void TrackballCamera::setSmoothScroll(bool b) { m_smoothScroll = b; }
+float TrackballCamera::getZoomSpeed() const
+{
+	return m_zoomSpeed;
+}
+void TrackballCamera::setZoomSpeed(float zoomSpeed)
+{
+	m_zoomSpeed = zoomSpeed;
+}
+float TrackballCamera::getRotateSpeed() const
+{
+	return m_rotateSpeed;
+}
+void TrackballCamera::setRotateSpeed(float rotateSpeed)
+{
+	m_rotateSpeed = rotateSpeed;
+}
+float TrackballCamera::getTranslateSpeed() const
+{
+	return m_translateSpeed;
+}
+void TrackballCamera::setTranslateSpeed(float translateSpeed)
+{
+	m_translateSpeed = translateSpeed;
+}
+bool TrackballCamera::getSmoothScroll() const
+{
+	return m_smoothScroll;
+}
+void TrackballCamera::setSmoothScroll(bool b)
+{
+	m_smoothScroll = b;
+}

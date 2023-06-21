@@ -135,7 +135,7 @@ private:
 
 public:
 	bool m_debugWindowManager = false; ///< Debug switch for WindowManager, toggled in Help > Debug window manager
-	bool m_debugTrackball = false; ///< Debug switch for WindowManager, toggled in Help > Debug trackball
+	bool m_debugTrackball = false;     ///< Debug switch for WindowManager, toggled in Help > Debug trackball
 
 	/**
 	 * \brief	GLUT Callback: render the whole I3T window (update the Logic, draw
@@ -189,7 +189,7 @@ template <typename T> T& Application::getModule()
 	I3T_ASSERT(self.m_modules.count(hash) != 0, "Module is not created!");
 	I3T_ASSERT(dynamic_cast<T*>(self.m_modules.at(hash).get()) != nullptr, "Invalid type.");
 
-	return *(T*)self.m_modules.at(hash).get();
+	return *(T*) self.m_modules.at(hash).get();
 }
 
 typedef Application App;

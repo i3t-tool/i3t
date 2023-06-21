@@ -38,27 +38,31 @@ void Application::init()
 
 	//
 
-	BeforeNewProjectCommand::addListener([this]() { getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>(); });
-	NewProjectCommand::addListener([]() { App::getModule<StateManager>().newScene(); });
+	BeforeNewProjectCommand::addListener([this]() {
+		getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>();
+	});
+	NewProjectCommand::addListener([]() {
+		App::getModule<StateManager>().newScene();
+	});
 
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
-	CloseCommand::addListener([this] { onClose(); });
-	ConsoleCommand::addListener([this](std::string c) { getModule<ScriptingModule>().runScript(c.c_str()); });
+	CloseCommand::addListener([this] {
+		onClose();
+	});
+	ConsoleCommand::addListener([this](std::string c) {
+		getModule<ScriptingModule>().runScript(c.c_str());
+	});
 
 	InputManager::init();
 
-	InputManager::bindGlobalAction("undo", EKeyState::Pressed,
-	                               [&]()
-	                               {
-		                               LOG_INFO("undo triggered");
-		                               App::getModule<StateManager>().undo();
-	                               });
-	InputManager::bindGlobalAction("redo", EKeyState::Pressed,
-	                               [&]()
-	                               {
-		                               LOG_INFO("redo triggered");
-		                               App::getModule<StateManager>().redo();
-	                               });
+	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
+		LOG_INFO("undo triggered");
+		App::getModule<StateManager>().undo();
+	});
+	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
+		LOG_INFO("redo triggered");
+		App::getModule<StateManager>().redo();
+	});
 }
 
 void Application::initModules()
@@ -115,11 +119,20 @@ void Application::initWindow()
 	}
 }
 
-GLFWwindow* Application::mainWindow() { return m_window->get(); }
+GLFWwindow* Application::mainWindow()
+{
+	return m_window->get();
+}
 
-const std::string& Application::getTitle() { return m_window->getTitle(); }
+const std::string& Application::getTitle()
+{
+	return m_window->getTitle();
+}
 
-void Application::setTitle(const std::string& title) { m_window->setTitle(title.c_str()); }
+void Application::setTitle(const std::string& title)
+{
+	m_window->setTitle(title.c_str());
+}
 
 //===----------------------------------------------------------------------===//
 
@@ -179,7 +192,10 @@ void Application::onDisplay()
 		m->endFrame();
 }
 
-void Application::logicUpdate(double delta) { viewport()->update(delta); }
+void Application::logicUpdate(double delta)
+{
+	viewport()->update(delta);
+}
 
 void Application::finalize()
 {
@@ -206,19 +222,40 @@ bool Application::initI3T()
 	return true;
 }
 
-Application& Application::get() { return *s_instance; }
+Application& Application::get()
+{
+	return *s_instance;
+}
 
-UIModule* Application::getUI() { return &getModule<UIModule>(); }
+UIModule* Application::getUI()
+{
+	return &getModule<UIModule>();
+}
 
-World* Application::world() { return m_world; }
+World* Application::world()
+{
+	return m_world;
+}
 
-Vp::Viewport* Application::viewport() { return m_viewport; }
+Vp::Viewport* Application::viewport()
+{
+	return m_viewport;
+}
 
-void Application::onBeforeClose() { getUI()->getWindowManager().showUniqueWindow<BeforeCloseModal>(); }
+void Application::onBeforeClose()
+{
+	getUI()->getWindowManager().showUniqueWindow<BeforeCloseModal>();
+}
 
-void Application::onClose() { m_bShouldClose = true; }
+void Application::onClose()
+{
+	m_bShouldClose = true;
+}
 
-void Application::enqueueCommand(ICommand* command) { m_commands.push_back(command); }
+void Application::enqueueCommand(ICommand* command)
+{
+	m_commands.push_back(command);
+}
 
 // Statics
 std::shared_ptr<Application> Application::s_instance = nullptr;

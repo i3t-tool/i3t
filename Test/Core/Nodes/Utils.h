@@ -36,15 +36,27 @@ template <typename T1, typename T2> inline void plug_expectOk(T1&& lhs, T2&& rhs
 class CycleTestFixture : public ::testing::Test
 {
 protected:
-	static void SetUpTestSuite() { GraphManager::init(); }
+	static void SetUpTestSuite()
+	{
+		GraphManager::init();
+	}
 
-	static void TearDownTestSuite() { GraphManager::destroy(); }
+	static void TearDownTestSuite()
+	{
+		GraphManager::destroy();
+	}
 };
 
 class GraphManagerTestFixture : public ::testing::Test
 {
 protected:
-	static void SetUpTestSuite() { GraphManager::init(); }
+	static void SetUpTestSuite()
+	{
+		GraphManager::init();
+	}
 
-	static void TearDownTestSuite() { GraphManager::destroy(); }
+	static void TearDownTestSuite()
+	{
+		GraphManager::destroy();
+	}
 };

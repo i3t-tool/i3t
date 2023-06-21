@@ -10,9 +10,15 @@
 class ResourceManagerTest : public ::testing::Test
 {
 protected:
-	void SetUp() override { createTestApplication(false); }
+	void SetUp() override
+	{
+		createTestApplication(false);
+	}
 
-	void TearDown() override { destroyTestApplication(); }
+	void TearDown() override
+	{
+		destroyTestApplication();
+	}
 };
 
 TEST_F(ResourceManagerTest, TextureTest)

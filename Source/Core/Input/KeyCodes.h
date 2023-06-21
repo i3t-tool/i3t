@@ -86,7 +86,10 @@ public:
 		mouseScrlDown
 	};
 
-	static const char* getKeyString(int enumVal) { return keyStrings[enumVal]; }
+	static const char* getKeyString(int enumVal)
+	{
+		return keyStrings[enumVal];
+	}
 
 	static constexpr const char* keyStrings[] = {
 	    "key a",    "key b", "key c",     "key d",      "key e",       "key f",       "key g",        "key h", "key i",

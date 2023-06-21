@@ -45,11 +45,23 @@ public:
 	 */
 	Node& operator=(const Node& other);
 
-	DIWNE::ID const getId() const { return m_idDiwne; };
+	DIWNE::ID const getId() const
+	{
+		return m_idDiwne;
+	};
 
-	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldNode; };
-	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragNode; };
-	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchNode; };
+	DIWNE::DiwneAction getHoldActionType() const final
+	{
+		return DiwneAction::HoldNode;
+	};
+	DIWNE::DiwneAction getDragActionType() const final
+	{
+		return DiwneAction::DragNode;
+	};
+	DIWNE::DiwneAction getTouchActionType() const final
+	{
+		return DiwneAction::TouchNode;
+	};
 
 	void updateSizes();
 	void deleteActionDiwne();
@@ -70,7 +82,8 @@ public:
 		m_drawMode = drawMode;
 
 
-		if(!getRender()) return false;
+		if (!getRender())
+			return false;
 
 		bool interaction_happen = drawDiwne(drawMode);
 
@@ -94,7 +107,10 @@ public:
 	bool rightContentDiwne();
 	bool bottomContentDiwne();
 
-	virtual ImRect getRectDiwne() const { return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max); };
+	virtual ImRect getRectDiwne() const
+	{
+		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
+	};
 
 	virtual bool processSelect();
 	virtual bool processUnselect();
@@ -112,21 +128,42 @@ public:
 		m_nodePositionDiwne = position;
 		setNodeRectsPositionDiwne(position);
 	};
-	ImVec2 getNodePositionDiwne() const { return m_nodePositionDiwne; };
+	ImVec2 getNodePositionDiwne() const
+	{
+		return m_nodePositionDiwne;
+	};
 	void translateNodePositionDiwne(ImVec2 const amount)
 	{
 		m_nodePositionDiwne += amount;
 		translateNodeRectsDiwne(amount);
 	};
 
-	ImRect getNodeRectDiwne() { return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max); };
-	ImVec2 getNodeRectSizeDiwne() { return m_bottomRectDiwne.Max - m_topRectDiwne.Min; };
+	ImRect getNodeRectDiwne()
+	{
+		return ImRect(m_topRectDiwne.Min, m_bottomRectDiwne.Max);
+	};
+	ImVec2 getNodeRectSizeDiwne()
+	{
+		return m_bottomRectDiwne.Max - m_topRectDiwne.Min;
+	};
 
-	bool getSelected() const { return m_selected; };
-	void setSelected(bool selected) { m_selected = selected; };
+	bool getSelected() const
+	{
+		return m_selected;
+	};
+	void setSelected(bool selected)
+	{
+		m_selected = selected;
+	};
 
-	bool getRender(){ return m_render; };
-	void setRender(bool render){ m_render = render; };
+	bool getRender()
+	{
+		return m_render;
+	};
+	void setRender(bool render)
+	{
+		m_render = render;
+	};
 
 	float m_drawAnywhere; /*!< you have to draw node anywhere for example in first
 	                         frame after you created it -> for obtain its real

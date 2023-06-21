@@ -43,7 +43,10 @@ public:
 	 *
 	 * \todo Check how std::bind handle `this` reference.
 	 */
-	static void addListener(Callback function) { s_listeners.push_back(function); };
+	static void addListener(Callback function)
+	{
+		s_listeners.push_back(function);
+	};
 
 	/**
 	 * Call all callbacks.
@@ -55,7 +58,11 @@ public:
 	{
 		for (Callback callback : s_listeners)
 		{
-			std::apply([callback](auto... args) { callback(args...); }, m_args);
+			std::apply(
+			    [callback](auto... args) {
+				    callback(args...);
+			    },
+			    m_args);
 		}
 	};
 
@@ -77,7 +84,10 @@ protected:
 	 *
 	 * \param args command arguments.
 	 */
-	explicit Command(const std::tuple<Args...>& args) { m_args = args; }
+	explicit Command(const std::tuple<Args...>& args)
+	{
+		m_args = args;
+	}
 
 private:
 	static std::vector<Callback> s_listeners;

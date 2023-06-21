@@ -170,16 +170,17 @@ void Shaper::quad(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c, const
 	addColor(color, 3);
 }
 
-void Shaper::lineBox(glm::vec3 from, glm::vec3 to) {
+void Shaper::lineBox(glm::vec3 from, glm::vec3 to)
+{
 	glm::vec3 unitCubeArr[24] = {
-	    glm::vec3(to.x, to.y, to.z),    glm::vec3(to.x, to.y, from.z),  glm::vec3(to.x, to.y, from.z),
-	    glm::vec3(from.x, to.y, from.z),  glm::vec3(from.x, to.y, from.z), glm::vec3(from.x, to.y, to.z),
-	    glm::vec3(from.x, to.y, to.z),   glm::vec3(to.x, to.y, to.z),   glm::vec3(to.x, from.y, to.z),
-	    glm::vec3(to.x, from.y, from.z),  glm::vec3(to.x, from.y, from.z), glm::vec3(from.x, from.y, from.z),
+	    glm::vec3(to.x, to.y, to.z),       glm::vec3(to.x, to.y, from.z),   glm::vec3(to.x, to.y, from.z),
+	    glm::vec3(from.x, to.y, from.z),   glm::vec3(from.x, to.y, from.z), glm::vec3(from.x, to.y, to.z),
+	    glm::vec3(from.x, to.y, to.z),     glm::vec3(to.x, to.y, to.z),     glm::vec3(to.x, from.y, to.z),
+	    glm::vec3(to.x, from.y, from.z),   glm::vec3(to.x, from.y, from.z), glm::vec3(from.x, from.y, from.z),
 	    glm::vec3(from.x, from.y, from.z), glm::vec3(from.x, from.y, to.z), glm::vec3(from.x, from.y, to.z),
-	    glm::vec3(to.x, from.y, to.z),   glm::vec3(from.x, to.y, to.z),  glm::vec3(from.x, from.y, to.z),
-	    glm::vec3(to.x, to.y, to.z),    glm::vec3(to.x, from.y, to.z),  glm::vec3(to.x, to.y, from.z),
-	    glm::vec3(to.x, from.y, from.z),  glm::vec3(from.x, to.y, from.z), glm::vec3(from.x, from.y, from.z),
+	    glm::vec3(to.x, from.y, to.z),     glm::vec3(from.x, to.y, to.z),   glm::vec3(from.x, from.y, to.z),
+	    glm::vec3(to.x, to.y, to.z),       glm::vec3(to.x, from.y, to.z),   glm::vec3(to.x, to.y, from.z),
+	    glm::vec3(to.x, from.y, from.z),   glm::vec3(from.x, to.y, from.z), glm::vec3(from.x, from.y, from.z),
 	};
 	for (int i = 0; i < 24; i += 2)
 	{
@@ -193,9 +194,15 @@ void Shaper::clear()
 	colors.clear();
 }
 
-const std::vector<float>& Shaper::getVertices() const { return vertices; }
+const std::vector<float>& Shaper::getVertices() const
+{
+	return vertices;
+}
 
-const std::vector<float>& Shaper::getColors() const { return colors; }
+const std::vector<float>& Shaper::getColors() const
+{
+	return colors;
+}
 
 Core::Mesh* Shaper::createLineMesh(const std::string& alias)
 {

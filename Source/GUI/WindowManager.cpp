@@ -78,10 +78,10 @@ void WindowManager::draw()
 		float thickness = 1.0f;
 		float size = 32.0f;
 
-		GUI::drawCross({InputManager::m_mouseX, InputManager::m_mouseY}, ImGui::GetForegroundDrawList(), thickness, size,
-		               ImColor(1.f, 0.f, 1.f, 1.0f));
-		GUI::drawCross({ImGui::GetMousePos().x, ImGui::GetMousePos().y}, ImGui::GetForegroundDrawList(), thickness, size,
-		               ImColor(1.f, 1.f, 0.f, 1.0f));
+		GUI::drawCross({InputManager::m_mouseX, InputManager::m_mouseY}, ImGui::GetForegroundDrawList(), thickness,
+		               size, ImColor(1.f, 0.f, 1.f, 1.0f));
+		GUI::drawCross({ImGui::GetMousePos().x, ImGui::GetMousePos().y}, ImGui::GetForegroundDrawList(), thickness,
+		               size, ImColor(1.f, 1.f, 0.f, 1.0f));
 	}
 }
 
@@ -200,7 +200,10 @@ void WindowManager::removeWindow(const std::string& windowId)
 }
 
 // TODO: (DR) This only checks m_windows and not dockable windows, that is not clear from its signature
-bool WindowManager::hasWindow(const std::string& id) { return m_windows.count(id); }
+bool WindowManager::hasWindow(const std::string& id)
+{
+	return m_windows.count(id);
+}
 
 void WindowManager::showWindow(IWindow* window, bool show)
 {
@@ -213,9 +216,15 @@ void WindowManager::showWindow(IWindow* window, bool show)
 	windowVisibilityChangedThisFrame = true;
 }
 
-void WindowManager::showWindow(Ptr<IWindow> window, bool show) { showWindow(window.get(), show); }
+void WindowManager::showWindow(Ptr<IWindow> window, bool show)
+{
+	showWindow(window.get(), show);
+}
 
-void WindowManager::focusWindow(IWindow* window) { focusWindow(findAnyWindow(window->getID())); }
+void WindowManager::focusWindow(IWindow* window)
+{
+	focusWindow(findAnyWindow(window->getID()));
+}
 
 void WindowManager::focusWindow(Ptr<IWindow> window)
 {

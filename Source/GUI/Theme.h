@@ -254,15 +254,18 @@ enum class ESizeVec2
 	Builder_ItemSpacing,
 };
 
-constexpr inline EColor asColor(Core::EValueType type) { return EColor(type); }
+constexpr inline EColor asColor(Core::EValueType type)
+{
+	return EColor(type);
+}
 
 inline ImVec4 createColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	ImVec4 color;
-	color.x = (float)r / 255.0f;
-	color.y = (float)g / 255.0f;
-	color.z = (float)b / 255.0f;
-	color.w = (float)a / 255.0f;
+	color.x = (float) r / 255.0f;
+	color.y = (float) g / 255.0f;
+	color.z = (float) b / 255.0f;
+	color.w = (float) a / 255.0f;
 
 	return color;
 }
@@ -345,7 +348,10 @@ public:
 
 	ImFont* get(EFont font);
 
-	float get(ESize size) { return m_sizes[size]; }
+	float get(ESize size)
+	{
+		return m_sizes[size];
+	}
 
 	const ImVec2& get(ESizeVec2 sizeVec)
 	{
@@ -359,16 +365,37 @@ public:
 	static std::map<ESize, const char*>& getSizeNames();
 	static std::map<ESizeVec2, const char*>& getSizeVecNames();
 
-	const std::string& getName() const { return m_name; }
+	const std::string& getName() const
+	{
+		return m_name;
+	}
 
-	void set(EColor color, ImVec4 value) { m_colors.insert(std::pair(color, value)); }
+	void set(EColor color, ImVec4 value)
+	{
+		m_colors.insert(std::pair(color, value));
+	}
 
-	[[nodiscard]] const Colors& getColors() const { return m_colors; }
-	Colors& getColorsRef() { return m_colors; }
-	void setColors(const Colors& colors) { m_colors = colors; }
+	[[nodiscard]] const Colors& getColors() const
+	{
+		return m_colors;
+	}
+	Colors& getColorsRef()
+	{
+		return m_colors;
+	}
+	void setColors(const Colors& colors)
+	{
+		m_colors = colors;
+	}
 
-	Sizes& getSizesRef() { return m_sizes; }
-	SizesVec& getSizesVecRef() { return m_sizesVec2; }
+	Sizes& getSizesRef()
+	{
+		return m_sizes;
+	}
+	SizesVec& getSizesVecRef()
+	{
+		return m_sizesVec2;
+	}
 
 	// JH unused -> maybe for "InputItems" only - drag float etc... but probably
 	// not needed

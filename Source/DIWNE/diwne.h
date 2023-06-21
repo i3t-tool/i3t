@@ -56,18 +56,18 @@ static bool popupDiwne(std::string const popupID, ImVec2 const& popupPos, void (
  */
 struct SettingsDiwne
 {
-	DIWNE::ID const editorId = 0;                      /*!< as well as all other DiwneObject, Diwne has to have id too */
+	DIWNE::ID const editorId = 0; /*!< as well as all other DiwneObject, Diwne has to have id too */
 	std::string const editorlabel = "diwneBackground"; /*!< as well as all other DiwneObject, Diwne has to
 	                                                      have identification label too */
-	ImRect const workAreaDiwne = ImRect(0, 0, 0, 0); /*!< workarea in Diwne coordinates (so what part of infinite space of
-	                                                    node editor is on window) only initial value - mostly based on
-	                                                    window size ( \see updateWorkAreaRectangles() ) */
+	ImRect const workAreaDiwne = ImRect(0, 0, 0, 0); /*!< workarea in Diwne coordinates (so what part of infinite space
+	                                                    of node editor is on window) only initial value - mostly based
+	                                                    on window size ( \see updateWorkAreaRectangles() ) */
 
 	float minWorkAreaZoom = 0.25;          /*!< minimal value of zoom */
 	float maxWorkAreaZoom = 4;             /*!< maximal value of zoom */
 	float workAreaInitialZoom = 1;         /*!< initial value of zoom */
 	float zoomWheelReverseSenzitivity = 8; /*!< Higher number -> smaller change, can not be 0 */
-	float selectionRounding = 0;					 /*!< rounding od selection */
+	float selectionRounding = 0;           /*!< rounding od selection */
 
 	ImVec2 initPopupPosition = ImVec2(0, 0); /*!< where to show popup when not set later */
 
@@ -130,9 +130,18 @@ public:
 
 	/** Default destructor */
 	virtual ~Diwne() = default;
-	DIWNE::DiwneAction getHoldActionType() const final { return DiwneAction::HoldWorkarea; };
-	DIWNE::DiwneAction getDragActionType() const final { return DiwneAction::DragWorkarea; };
-	DIWNE::DiwneAction getTouchActionType() const final { return DiwneAction::TouchWorkarea; };
+	DIWNE::DiwneAction getHoldActionType() const final
+	{
+		return DiwneAction::HoldWorkarea;
+	};
+	DIWNE::DiwneAction getDragActionType() const final
+	{
+		return DiwneAction::DragWorkarea;
+	};
+	DIWNE::DiwneAction getTouchActionType() const final
+	{
+		return DiwneAction::TouchWorkarea;
+	};
 
 	bool m_takeSnap;
 
@@ -149,7 +158,10 @@ public:
 	bool blockRaisePopup(); /*!< sometimes we do not want to raise popup - here specify
 	                           it ( now it is when selecting action run ) */
 
-	virtual ImRect getRectDiwne() const { return getWorkAreaDiwne(); };
+	virtual ImRect getRectDiwne() const
+	{
+		return getWorkAreaDiwne();
+	};
 
 	virtual bool processDrag();
 
@@ -158,13 +170,28 @@ public:
 	void updateWorkAreaRectangles(); /*! \brief Update position and size of work
 	                                    area on screen and on diwne */
 
-	ImRect getWorkAreaDiwne() const { return m_workAreaDiwne; };
-	ImRect getWorkAreaScreen() const { return m_workAreaScreen; };
-	float getWorkAreaZoom() const { return m_workAreaZoom; };
+	ImRect getWorkAreaDiwne() const
+	{
+		return m_workAreaDiwne;
+	};
+	ImRect getWorkAreaScreen() const
+	{
+		return m_workAreaScreen;
+	};
+	float getWorkAreaZoom() const
+	{
+		return m_workAreaZoom;
+	};
 	void setWorkAreaZoom(float val = 1);
 
-	ImVec2 const& getPopupPosition() const { return m_popupPosition; };
-	void setPopupPosition(ImVec2 position) { m_popupPosition = position; };
+	ImVec2 const& getPopupPosition() const
+	{
+		return m_popupPosition;
+	};
+	void setPopupPosition(ImVec2 position)
+	{
+		m_popupPosition = position;
+	};
 
 	void translateWorkAreaDiwneZoomed(ImVec2 const& distance);
 	void translateWorkAreaDiwne(ImVec2 const& distance);
@@ -262,8 +289,8 @@ public:
 	                       bool filled, ImVec2 thicknes = ImVec2(1, 1), float rounding = 0) const;
 	/*! \brief \see DrawIconCircle
 	 */
-	void DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft, ImVec2 bottomRight,
-	                          bool filled, float thicknes = 1) const;
+	void DrawIconTriangleLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+	                          ImVec2 bottomRight, bool filled, float thicknes = 1) const;
 	/*! \brief \see DrawIconCircle
 	 */
 	void DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
@@ -279,14 +306,26 @@ public:
 	void DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
 	                               ImVec2 bottomRight, bool filled, float thicknes = 1) const;
 
-	DiwneAction getDiwneAction() const { return m_diwneAction; };
-	void setDiwneAction(DiwneAction action) { m_diwneAction = action; };
+	DiwneAction getDiwneAction() const
+	{
+		return m_diwneAction;
+	};
+	void setDiwneAction(DiwneAction action)
+	{
+		m_diwneAction = action;
+	};
 
-	DiwneAction getDiwneActionPreviousFrame() const { return m_diwneAction_previousFrame; };
+	DiwneAction getDiwneActionPreviousFrame() const
+	{
+		return m_diwneAction_previousFrame;
+	};
 
 	DiwneAction getDiwneActionActive() const;
 
-	DIWNE::Link& getHelperLink() { return m_helperLink; };
+	DIWNE::Link& getHelperLink()
+	{
+		return m_helperLink;
+	};
 
 	template <typename T> std::shared_ptr<T> getLastActivePin()
 	{
@@ -316,8 +355,14 @@ public:
 		mp_lastActiveNode = node;
 	}
 
-	void setNodesSelectionChanged(bool value) { m_nodesSelectionChanged = value; };
-	bool getNodesSelectionChanged() { return m_nodesSelectionChanged; };
+	void setNodesSelectionChanged(bool value)
+	{
+		m_nodesSelectionChanged = value;
+	};
+	bool getNodesSelectionChanged()
+	{
+		return m_nodesSelectionChanged;
+	};
 
 	virtual bool bypassIsItemClicked0();
 	virtual bool bypassIsItemClicked1();

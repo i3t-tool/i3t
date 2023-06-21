@@ -15,7 +15,7 @@ TEST_F(CycleTestFixture, CycleIsUpdatetedAndResetAfterMaxValueIsGained)
 	cycle->setTo(1.0f);
 	cycle->setMultiplier(0.1f);
 
-	int expectedUpdates = (int)((cycle->getTo() / sPerFrame) / cycle->getMultiplier()) + 2;
+	int expectedUpdates = (int) ((cycle->getTo() / sPerFrame) / cycle->getMultiplier()) + 2;
 	{
 		// Cycle is not running.
 		for (int i = 1; i < expectedUpdates; ++i)

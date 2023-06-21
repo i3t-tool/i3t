@@ -13,7 +13,10 @@
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
-ViewportHighlightResolver::ViewportHighlightResolver(WorkspaceDiwne* diwne) { m_diwne = diwne; }
+ViewportHighlightResolver::ViewportHighlightResolver(WorkspaceDiwne* diwne)
+{
+	m_diwne = diwne;
+}
 
 void ViewportHighlightResolver::resolve()
 {
@@ -114,8 +117,8 @@ bool ViewportHighlightResolver::searchForSelectedNode(Ptr<WorkspaceModel>& rootG
 					}
 					else
 					{
-						throw std::runtime_error(
-						    "Failed to find corresponding gui node for core node id: " + std::to_string(neighbourId) + "!");
+						throw std::runtime_error("Failed to find corresponding gui node for core node id: " +
+						                         std::to_string(neighbourId) + "!");
 					}
 				}
 			}
@@ -126,11 +129,15 @@ bool ViewportHighlightResolver::searchForSelectedNode(Ptr<WorkspaceModel>& rootG
 
 void ViewportHighlightResolver::registerNodeCallbacks(Core::Node* node)
 {
-	node->addDeleteCallback([this](Core::Node* node) { resolveNeeded(); });
-	node->addPlugCallback([this](Core::Node* fromNode, Core::Node* toNode, size_t fromIndex, size_t toIndex)
-	                      { resolveNeeded(); });
-	node->addUnplugCallback([this](Core::Node* fromNode, Core::Node* toNode, size_t fromIndex, size_t toIndex)
-	                        { resolveNeeded(); });
+	node->addDeleteCallback([this](Core::Node* node) {
+		resolveNeeded();
+	});
+	node->addPlugCallback([this](Core::Node* fromNode, Core::Node* toNode, size_t fromIndex, size_t toIndex) {
+		resolveNeeded();
+	});
+	node->addUnplugCallback([this](Core::Node* fromNode, Core::Node* toNode, size_t fromIndex, size_t toIndex) {
+		resolveNeeded();
+	});
 }
 
 bool ViewportHighlightResolver::anyInSequenceSelected(WorkspaceSequence* sequence)
@@ -141,10 +148,13 @@ bool ViewportHighlightResolver::anyInSequenceSelected(WorkspaceSequence* sequenc
 	if (sequence->getSelected())
 		return true;
 
-	if (sequence->getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected()) {
+	if (sequence->getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
+	{
 		// Matrix data inputted from somewhere else
 		return false;
-	} else {
+	}
+	else
+	{
 		for (const auto& transformation : sequence->getInnerWorkspaceNodes())
 		{
 			if (transformation->getSelected())

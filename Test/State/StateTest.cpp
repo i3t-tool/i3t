@@ -11,7 +11,10 @@
 
 using namespace Core;
 
-const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow) { return workspaceWindow->getNodeEditor().getAllNodes(); }
+const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow)
+{
+	return workspaceWindow->getNodeEditor().getAllNodes();
+}
 
 /// \todo This test may require the OpenGL context!
 TEST(StateTest, SceneCanBeSavedAndLoaded)

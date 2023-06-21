@@ -4,7 +4,8 @@
 template <Core::EOperatorType T> class WorkspaceOperator : public WorkspaceNodeWithCoreDataWithPins
 {
 public:
-	WorkspaceOperator(DIWNE::Diwne& diwne) : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<T>())
+	WorkspaceOperator(DIWNE::Diwne& diwne)
+	    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<T>())
 	{
 		setDataItemsWidth();
 	}
@@ -27,13 +28,17 @@ public:
 
 	virtual bool topContent()
 	{
-		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeaderOperator),
+		diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+		                         I3T::getTheme().get(EColor::NodeHeaderOperator),
 		                         I3T::getSize(ESize::Nodes_Operators_Rounding), ImDrawCornerFlags_Top);
 
 		return WorkspaceNodeWithCoreData::topContent();
 	}
 
-	virtual bool inline middleContent() { return false; }
+	virtual bool inline middleContent()
+	{
+		return false;
+	}
 
 	void drawMenuLevelOfDetail()
 	{
@@ -46,7 +51,8 @@ public:
 		int maxLen = 0;
 		for (auto const& pin : m_workspaceOutputs)
 		{
-			maxLen = std::max(maxLen, std::dynamic_pointer_cast<WorkspaceCoreOutputPinWithData>(pin)->maxLengthOfData());
+			maxLen =
+			    std::max(maxLen, std::dynamic_pointer_cast<WorkspaceCoreOutputPinWithData>(pin)->maxLengthOfData());
 		}
 		return maxLen;
 	}
@@ -59,8 +65,7 @@ public:
 	WorkspaceAngleAxisToQuat(DIWNE::Diwne& diwne)
 	    : WorkspaceOperator<Core::EOperatorType::AngleAxisToQuat>(diwne),
 	      m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
-	{
-	}
+	{}
 
 	bool leftContent()
 	{

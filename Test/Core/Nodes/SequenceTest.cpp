@@ -7,7 +7,8 @@
 
 using namespace Core;
 
-class SequenceTest : public GraphManagerTestFixture {};
+class SequenceTest : public GraphManagerTestFixture
+{};
 
 TEST_F(SequenceTest, SequenceCanContainMatrices)
 {
@@ -203,8 +204,8 @@ TEST_F(SequenceTest, ThreeSequencesComposeMatrices)
 	}
 	{
 		plug_expectOk(seq2, seq3, 0, 0);
-		auto expectedMat =
-		    getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices()) * getMatProduct(seq3->getMatrices());
+		auto expectedMat = getMatProduct(seq1->getMatrices()) * getMatProduct(seq2->getMatrices()) *
+		                   getMatProduct(seq3->getMatrices());
 		EXPECT_EQ(expectedMat, seq3->getData().getMat4());
 	}
 }

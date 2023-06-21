@@ -38,8 +38,14 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
-	Ptr<WorkspaceSequence> const& getProjection() const { return m_projection; };
-	Ptr<WorkspaceSequence> const& getView() const { return m_view; };
+	Ptr<WorkspaceSequence> const& getProjection() const
+	{
+		return m_projection;
+	};
+	Ptr<WorkspaceSequence> const& getView() const
+	{
+		return m_view;
+	};
 
 	// bool drawDataFull(DIWNE::Diwne &diwne){return false;}; /* camera has no
 	// data */

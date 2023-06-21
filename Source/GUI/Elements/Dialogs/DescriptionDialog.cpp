@@ -5,7 +5,10 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/Application.h"
 
-DescriptionDialog::DescriptionDialog() { m_isEditState = false; }
+DescriptionDialog::DescriptionDialog()
+{
+	m_isEditState = false;
+}
 
 void DescriptionDialog::render()
 {

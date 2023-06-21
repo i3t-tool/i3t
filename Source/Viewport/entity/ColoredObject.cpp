@@ -17,7 +17,10 @@ void ColoredObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection,
 	GameObject::render(shader, view, projection, silhouette);
 }
 
-const glm::vec3& ColoredObject::getColor() const { return m_singleColor; }
+const glm::vec3& ColoredObject::getColor() const
+{
+	return m_singleColor;
+}
 
 void ColoredObject::setColor(const glm::vec3* color)
 {

@@ -9,8 +9,8 @@
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
 #include "Viewport/GfxUtils.h"
-#include "Viewport/entity/nodes/SceneModel.h"
 #include "Viewport/entity/nodes/SceneCamera.h"
+#include "Viewport/entity/nodes/SceneModel.h"
 #include "Viewport/scene/Scene.h"
 
 using namespace Vp;
@@ -32,7 +32,7 @@ glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 		float l, r, b, t;
 		r = t = scale;
 		l = b = -scale;
-		float aspect = std::min(m_width, m_height) / (float)std::max(m_width, m_height);
+		float aspect = std::min(m_width, m_height) / (float) std::max(m_width, m_height);
 		if (m_width > m_height)
 		{
 			t *= aspect;
@@ -60,7 +60,7 @@ glm::mat4 AbstractCamera::createProjectionMatrix(bool nonShrinking) const
 	}
 	else
 	{
-		return glm::perspective(glm::radians(m_fov), m_width / (float)m_height, m_zNear, m_zFar);
+		return glm::perspective(glm::radians(m_fov), m_width / (float) m_height, m_zNear, m_zFar);
 	}
 }
 
@@ -105,7 +105,8 @@ void AbstractCamera::centerOnScene(const Scene& scene)
 		{
 			continue;
 		}
-		// TODO: (DR) GameObject should probably be just turned into Entity, it really serves no purpose and some casts like
+		// TODO: (DR) GameObject should probably be just turned into Entity, it really serves no purpose and some casts
+		// like
 		//   this could be avoided
 		if (auto gameObject = std::dynamic_pointer_cast<GameObject>(entity))
 		{
@@ -126,8 +127,8 @@ void AbstractCamera::centerOnScene(const Scene& scene)
 void AbstractCamera::centerOnSelection(const Scene& scene)
 {
 	// TODO: (DR) FIX THIS, this is a quick workaround for the fact that viewport doesn't keep an updated list of all
-	//  selected objects. This feature is important but I don't have time to refine it right now. Fix is to keep a list of
-	//  selected objects in the scene which we have access to here.
+	//  selected objects. This feature is important but I don't have time to refine it right now. Fix is to keep a list
+	//  of selected objects in the scene which we have access to here.
 	std::vector<const GameObject*> selectedObjects;
 	for (const auto& modelNode : g_workspaceDiwne->getAllModels())
 	{
@@ -208,19 +209,58 @@ glm::mat4 AbstractCamera::getView() const
 	return m_view;
 }
 
-glm::mat4 AbstractCamera::getProjection() const { return m_projection; }
+glm::mat4 AbstractCamera::getProjection() const
+{
+	return m_projection;
+}
 
-int AbstractCamera::getWidth() const { return m_width; }
-int AbstractCamera::getHeight() const { return m_height; }
+int AbstractCamera::getWidth() const
+{
+	return m_width;
+}
+int AbstractCamera::getHeight() const
+{
+	return m_height;
+}
 
-glm::vec3 AbstractCamera::getPosition() const { return m_position; }
-glm::vec3 AbstractCamera::getDirection() const { return m_direction; }
-glm::vec3 AbstractCamera::getUp() const { return m_up; }
-glm::vec3 AbstractCamera::getRight() const { return m_right; }
+glm::vec3 AbstractCamera::getPosition() const
+{
+	return m_position;
+}
+glm::vec3 AbstractCamera::getDirection() const
+{
+	return m_direction;
+}
+glm::vec3 AbstractCamera::getUp() const
+{
+	return m_up;
+}
+glm::vec3 AbstractCamera::getRight() const
+{
+	return m_right;
+}
 
-float AbstractCamera::getZNear() const { return m_zNear; }
-void AbstractCamera::setZNear(float zNear) { this->m_zNear = zNear; }
-float AbstractCamera::getZFar() const { return m_zFar; }
-void AbstractCamera::setZFar(float zFar) { this->m_zFar = zFar; }
-float AbstractCamera::getFov() const { return m_fov; }
-void AbstractCamera::setFov(float fov) { this->m_fov = fov; }
+float AbstractCamera::getZNear() const
+{
+	return m_zNear;
+}
+void AbstractCamera::setZNear(float zNear)
+{
+	this->m_zNear = zNear;
+}
+float AbstractCamera::getZFar() const
+{
+	return m_zFar;
+}
+void AbstractCamera::setZFar(float zFar)
+{
+	this->m_zFar = zFar;
+}
+float AbstractCamera::getFov() const
+{
+	return m_fov;
+}
+void AbstractCamera::setFov(float fov)
+{
+	this->m_fov = fov;
+}

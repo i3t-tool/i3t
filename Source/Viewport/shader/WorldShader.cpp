@@ -4,7 +4,10 @@
 
 using namespace Vp;
 
-WorldShader::WorldShader(GLuint id) : Shader(id) { init(false); }
+WorldShader::WorldShader(GLuint id) : Shader(id)
+{
+	init(false);
+}
 
 void WorldShader::init(bool initSuperclass)
 {

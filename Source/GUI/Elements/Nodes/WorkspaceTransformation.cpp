@@ -10,7 +10,10 @@ WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::
 	setDataItemsWidth();
 }
 
-bool WorkspaceTransformation::allowDrawing() { return isInSequence() || WorkspaceNodeWithCoreData::allowDrawing(); }
+bool WorkspaceTransformation::allowDrawing()
+{
+	return isInSequence() || WorkspaceNodeWithCoreData::allowDrawing();
+}
 
 void WorkspaceTransformation::updateSizes()
 {
@@ -36,16 +39,18 @@ bool WorkspaceTransformation::beforeBegin()
 bool WorkspaceTransformation::beforeContent()
 {
 	/* whole node background */
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBgTransformation),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeBgTransformation), I3T::getSize(ESize::Nodes_Rounding),
+	                         ImDrawCornerFlags_Top);
 	return false;
 }
 
 bool WorkspaceTransformation::topContent()
 {
 	bool interaction_happen = false;
-	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeaderTranformation),
-	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max,
+	                         I3T::getTheme().get(EColor::NodeHeaderTranformation), I3T::getSize(ESize::Nodes_Rounding),
+	                         ImDrawCornerFlags_Top);
 
 	interaction_happen |= WorkspaceNodeWithCoreData::topContent();
 	ImGui::SameLine();
@@ -117,12 +122,13 @@ bool WorkspaceTransformation::afterContent()
 		{
 			if (inactiveMark != 1) // Left tracking
 			{
-				bottomright.x -= (inactiveMark)*size.x;
-				diwne.AddRectFilledDiwne(topleft, bottomright, I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
+				bottomright.x -= (inactiveMark) *size.x;
+				diwne.AddRectFilledDiwne(topleft, bottomright,
+				                         I3T::getColor(EColor::Nodes_Transformation_TrackingColor));
 			}
 			else if (inactiveMark == 1)
 			{ // accounting for yellow mark placement
-				bottomright.x -= (inactiveMark)*size.x;
+				bottomright.x -= (inactiveMark) *size.x;
 			}
 		}
 		else if (inactiveMark != 0) // RIGHT TRACKING
@@ -135,8 +141,9 @@ bool WorkspaceTransformation::afterContent()
 			topleft.x += (1 - inactiveMark) * size.x;
 		}
 
-		auto maybeInterpolatedTransform = findNodeById(dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
-			dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID());
+		auto maybeInterpolatedTransform =
+		    findNodeById(dynamic_cast<WorkspaceDiwne&>(diwne).getAllNodesInnerIncluded(),
+		                 dynamic_cast<WorkspaceDiwne&>(diwne).tracking->getInterpolatedTransformID());
 
 		if (!maybeInterpolatedTransform)
 		{
@@ -147,7 +154,8 @@ bool WorkspaceTransformation::afterContent()
 		if (std::dynamic_pointer_cast<WorkspaceTransformation>(maybeInterpolatedTransform.value()).get() == this)
 		{
 			ImVec2 markCenter = ImVec2(trackingFromLeft ? bottomright.x : topleft.x, m_middleRectDiwne.GetCenter().y);
-			ImVec2 markSize = ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
+			ImVec2 markSize =
+			    ImVec2(I3T::getSize(ESize::Nodes_Transformation_TrackingMarkSize), topleft.y - bottomright.y);
 
 			diwne.AddRectFilledDiwne(markCenter - markSize / 2, markCenter + markSize / 2,
 			                         I3T::getColor(EColor::Nodes_Transformation_TrackingMarkColor));
@@ -208,7 +216,7 @@ void WorkspaceTransformation::drawMenuSetDataMap()
 	bool enableLockMenuItem = fullLOD;
 	bool enableSynergiesMenuItem =
 	    fullLOD && (m_nodebase->as<Core::Transform>()->hasMenuSynergies()); // only some transformations have
-	                                                                             // the possibility to set synergies
+	                                                                        // the possibility to set synergies
 
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
@@ -344,7 +352,7 @@ bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(
 		    diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(), fmt::format("##{}:ch{}", m_labelDiwne, labels[i]),
 		    *local_data[i],
 		    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
-		                                                           : Core::EValueState::Editable,
+		                                                      : Core::EValueState::Editable,
 		    actual_value_changed);
 		value_changed |= actual_value_changed;
 		ImGui::PopItemWidth();
@@ -394,13 +402,13 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const c
 				ImGui::TableNextColumn();
 
 				ImGui::PushItemWidth(getDataItemsWidth());
-				inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(),
-				                                                        fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
-				                                                        *(local_data[rows * columnLabels.size() + columns]),
-				                                                        m_nodebase->as<Core::Transform>()->hasSynergies()
-				                                                            ? Core::EValueState::EditableSyn
-				                                                            : Core::EValueState::Editable,
-				                                                        actual_value_changed);
+				inner_interaction_happen |= drawDragFloatWithMap_Inline(
+				    diwne, getNumberOfVisibleDecimal(), getFloatPopupMode(),
+				    fmt::format("##{}:r{}c{}", m_labelDiwne, rows, columns),
+				    *(local_data[rows * columnLabels.size() + columns]),
+				    m_nodebase->as<Core::Transform>()->hasSynergies() ? Core::EValueState::EditableSyn
+				                                                      : Core::EValueState::Editable,
+				    actual_value_changed);
 
 				ImGui::PopItemWidth();
 				if (actual_value_changed)
@@ -417,7 +425,10 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const c
 	return inner_interaction_happen;
 }
 
-bool WorkspaceTransformation::isInSequence() { return m_nodebase->as<Core::Transform>()->isInSequence(); }
+bool WorkspaceTransformation::isInSequence()
+{
+	return m_nodebase->as<Core::Transform>()->isInSequence();
+}
 
 Ptr<Core::Node> WorkspaceTransformation::getNodebaseSequence()
 {

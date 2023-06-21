@@ -3,7 +3,10 @@
 #include "InputBindings.h"
 #include "InputManager.h"
 
-InputController::InputController() { InputManager::addInputController(this); }
+InputController::InputController()
+{
+	InputManager::addInputController(this);
+}
 
 void InputController::bindAction(const char* name, EKeyState state, KeyCallback fn)
 {

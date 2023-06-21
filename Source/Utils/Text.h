@@ -32,6 +32,12 @@ inline size_t hash_string(const std::string& a, const std::string& b, const std:
 	return hash_range(input, input + (sizeof(input) / sizeof(*input)));
 }
 
-inline size_t hash_string(const std::string& a, const std::string& b) { return hash_string(a, b, ""); }
+inline size_t hash_string(const std::string& a, const std::string& b)
+{
+	return hash_string(a, b, "");
+}
 
-inline size_t hash_string(const std::string& a) { return hash_string(a, "", ""); }
+inline size_t hash_string(const std::string& a)
+{
+	return hash_string(a, "", "");
+}

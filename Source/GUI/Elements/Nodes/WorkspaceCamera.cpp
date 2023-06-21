@@ -61,20 +61,21 @@ WorkspaceCamera::WorkspaceCamera(DIWNE::Diwne& diwne)
 	// Callback that gets called when the underlying Camera node updates values
 	// The Camera node also updates public projection and view matrix variables
 	// which we can read
-	m_nodebase->addUpdateCallback(
-	    [this](Core::Node* node)
-	    {
-		    Core::Camera* cameraNode = dynamic_cast<Core::Camera*>(node);
-		    if (cameraNode)
-		    {
-			    auto viewportCameraPtr = m_viewportCamera.lock();
-			    viewportCameraPtr->m_projectionMatrix = cameraNode->m_projectionMatrix;
-			    viewportCameraPtr->m_viewMatrix = cameraNode->m_viewMatrix;
-		    }
-	    });
+	m_nodebase->addUpdateCallback([this](Core::Node* node) {
+		Core::Camera* cameraNode = dynamic_cast<Core::Camera*>(node);
+		if (cameraNode)
+		{
+			auto viewportCameraPtr = m_viewportCamera.lock();
+			viewportCameraPtr->m_projectionMatrix = cameraNode->m_projectionMatrix;
+			viewportCameraPtr->m_viewMatrix = cameraNode->m_viewMatrix;
+		}
+	});
 }
 
-WorkspaceCamera::~WorkspaceCamera() { App::get().viewport()->removeEntity(m_viewportCamera); }
+WorkspaceCamera::~WorkspaceCamera()
+{
+	App::get().viewport()->removeEntity(m_viewportCamera);
+}
 
 void WorkspaceCamera::popupContent()
 {
@@ -233,9 +234,15 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 // WorkspaceNodeWithCoreDataWithPins::rightContent();}; /* draw camera pin on
 // opposite side */
 
-int WorkspaceCamera::maxLenghtOfData() { return 0; }
+int WorkspaceCamera::maxLenghtOfData()
+{
+	return 0;
+}
 
-bool WorkspaceCamera::isCamera() { return true; }
+bool WorkspaceCamera::isCamera()
+{
+	return true;
+}
 
 bool WorkspaceCamera::processSelect()
 {

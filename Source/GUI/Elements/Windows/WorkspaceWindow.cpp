@@ -34,10 +34,12 @@ WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
       m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_resizeDataWidth(false),
       m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
 
-{
-}
+{}
 
-WorkspaceDiwne::~WorkspaceDiwne() { m_workspaceCoreNodes.clear(); }
+WorkspaceDiwne::~WorkspaceDiwne()
+{
+	m_workspaceCoreNodes.clear();
+}
 
 void WorkspaceDiwne::selectAll()
 {
@@ -73,14 +75,20 @@ void WorkspaceDiwne::invertSelection()
 	}
 }
 
-void WorkspaceDiwne::zoomToAll() { zoomToRectangle(getOverNodesRectangleDiwne(getAllNodesInnerIncluded())); }
+void WorkspaceDiwne::zoomToAll()
+{
+	zoomToRectangle(getOverNodesRectangleDiwne(getAllNodesInnerIncluded()));
+}
 
-void WorkspaceDiwne::zoomToSelected() { zoomToRectangle(getOverNodesRectangleDiwne(getSelectedNodesInnerIncluded())); }
+void WorkspaceDiwne::zoomToSelected()
+{
+	zoomToRectangle(getOverNodesRectangleDiwne(getSelectedNodesInnerIncluded()));
+}
 
 void WorkspaceDiwne::toggleSelectedNodesVisibility()
 {
 	auto selected = getSelectedNodesInnerIncluded();
-	if(selected.empty())
+	if (selected.empty())
 	{
 		for (auto node : getAllNodesInnerIncluded())
 		{
@@ -101,7 +109,7 @@ void WorkspaceDiwne::trackingSmoothLeft()
 {
 	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
 	{
-		if(timeUntilNextTrack > 0)
+		if (timeUntilNextTrack > 0)
 		{
 			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
 			return;
@@ -117,7 +125,7 @@ void WorkspaceDiwne::trackingSmoothRight()
 {
 	if (Core::GraphManager::isTrackingEnabled() && smoothTracking)
 	{
-		if(timeUntilNextTrack > 0)
+		if (timeUntilNextTrack > 0)
 		{
 			timeUntilNextTrack -= ImGui::GetIO().DeltaTime;
 			return;
@@ -147,7 +155,10 @@ void WorkspaceDiwne::trackingJaggedRight()
 	}
 }
 
-void WorkspaceDiwne::trackingModeSwitch() { smoothTracking = !smoothTracking; }
+void WorkspaceDiwne::trackingModeSwitch()
+{
+	smoothTracking = !smoothTracking;
+}
 
 void WorkspaceDiwne::trackingSwitch()
 {
@@ -174,8 +185,8 @@ void WorkspaceDiwne::trackingSwitchOn(Ptr<WorkspaceSequence> sequence)
 					continue;
 				LOG_INFO("TRACKING ON");
 				seq->setTint(I3T::getColor(EColor::TrackingSequenceTint));
-				tracking =
-				    seq->getNodebase()->as<Core::Sequence>()->startTracking(std::make_unique<WorkspaceModelProxy>(model));
+				tracking = seq->getNodebase()->as<Core::Sequence>()->startTracking(
+				    std::make_unique<WorkspaceModelProxy>(model));
 				break;
 			}
 		}
@@ -287,8 +298,8 @@ void WorkspaceDiwne::copySelectedNodes()
 			}
 		}
 	}
-	copiedNodes =
-	    copyNodes(getSelectedNodesInnerIncluded(), App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+	copiedNodes = copyNodes(getSelectedNodesInnerIncluded(),
+	                        App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
@@ -1043,8 +1054,9 @@ bool WorkspaceDiwne::content()
 	// deletion of blocks
 	bool interaction_happen = false;
 	m_workspaceCoreNodes.erase(std::remove_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-	                                          [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-	                                          { return node->getRemoveFromWorkspace(); }),
+	                                          [](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+		                                          return node->getRemoveFromWorkspace();
+	                                          }),
 	                           m_workspaceCoreNodes.end());
 
 	// duplication of blocks
@@ -1078,7 +1090,8 @@ bool WorkspaceDiwne::content()
 		{
 			if (it == m_workspaceCoreNodes.rbegin()) /* node on top */
 			{
-				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(), number_of_nodes); /* top node is above links */
+				m_channelSplitter.SetCurrentChannel(ImGui::GetWindowDrawList(),
+				                                    number_of_nodes); /* top node is above links */
 			}
 			else
 			{
@@ -1344,7 +1357,8 @@ bool WorkspaceDiwne::afterContent()
 					g_workspaceDiwne->deselectNodes();
 					if (!selected)
 					{
-						// TODO: (DR) These 3 lines and if statement should basically always be together, the setSelected method
+						// TODO: (DR) These 3 lines and if statement should basically always be together, the
+						// setSelected method
 						//   should handle this on its own! This is the case across all uses of Node::setSelected.
 						//   A boolean flag should be used to trigger processSelect and snapshot or not.
 						//   The goal here is that process(Un)Select() gets always called but ONLY once for each state.
@@ -1486,9 +1500,11 @@ void WorkspaceDiwne::shiftNodesToBegin(std::vector<Ptr<WorkspaceNodeWithCoreData
 
 	for (int i = 0; i < nodesToShift.size(); i++)
 	{
-		coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                              [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-		                                              { return node->getId() == nodesToShift.at(i)->getId(); });
+		coreNodeIter ith_selected_node =
+		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+		                 [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+			                 return node->getId() == nodesToShift.at(i)->getId();
+		                 });
 
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
@@ -1506,9 +1522,11 @@ void WorkspaceDiwne::shiftNodesToEnd(std::vector<Ptr<WorkspaceNodeWithCoreData>>
 	//    a.erase(std::remove_if(a.begin(), a.end(), predicate), a.end());
 	for (int i = 0; i < node_num; i++)
 	{
-		coreNodeIter ith_selected_node = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                              [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-		                                              { return node->getId() == nodesToShift.at(i)->getId(); });
+		coreNodeIter ith_selected_node =
+		    std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
+		                 [nodesToShift, i](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+			                 return node->getId() == nodesToShift.at(i)->getId();
+		                 });
 		if (ith_selected_node != m_workspaceCoreNodes.end())
 		{
 			std::iter_swap(m_workspaceCoreNodes.end() - node_num + i, ith_selected_node);
@@ -1521,8 +1539,9 @@ void WorkspaceDiwne::shiftInteractingNodeToEnd()
 	if (mp_lastActiveNode != nullptr && mp_lastActiveNode.get() != m_workspaceCoreNodes.back().get())
 	{
 		coreNodeIter draged_node_it = std::find_if(m_workspaceCoreNodes.begin(), m_workspaceCoreNodes.end(),
-		                                           [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool
-		                                           { return node.get() == this->mp_lastActiveNode.get(); });
+		                                           [this](Ptr<WorkspaceNodeWithCoreData> const& node) -> bool {
+			                                           return node.get() == this->mp_lastActiveNode.get();
+		                                           });
 
 		if (draged_node_it != m_workspaceCoreNodes.end() && draged_node_it != m_workspaceCoreNodes.end() - 1)
 		{
@@ -1553,7 +1572,8 @@ void WorkspaceDiwne::manipulatorStartCheck3D()
 		std::vector<Ptr<WorkspaceNodeWithCoreData>> selectedNodes = getSelectedNodesInnerIncluded();
 		for (const auto& node : selectedNodes)
 		{
-			Ptr<WorkspaceTransformation> selected_transformation = std::dynamic_pointer_cast<WorkspaceTransformation>(node);
+			Ptr<WorkspaceTransformation> selected_transformation =
+			    std::dynamic_pointer_cast<WorkspaceTransformation>(node);
 			if (selected_transformation != nullptr)
 			{
 				Application::get().viewport()->getManipulators().addManipulator(selected_transformation->getNodebase());
@@ -1577,10 +1597,22 @@ void WorkspaceDiwne::processTrackingMove()
 	}
 }
 
-bool WorkspaceDiwne::bypassZoomAction() { return InputManager::isAxisActive("scroll") != 0; }
-bool WorkspaceDiwne::bypassDragAction() { return InputManager::isAxisActive("pan") != 0; }
-bool WorkspaceDiwne::bypassHoldAction() { return InputManager::isAxisActive("pan") != 0; }
-bool WorkspaceDiwne::bypassUnholdAction() { return InputManager::isAxisActive("pan") == 0; }
+bool WorkspaceDiwne::bypassZoomAction()
+{
+	return InputManager::isAxisActive("scroll") != 0;
+}
+bool WorkspaceDiwne::bypassDragAction()
+{
+	return InputManager::isAxisActive("pan") != 0;
+}
+bool WorkspaceDiwne::bypassHoldAction()
+{
+	return InputManager::isAxisActive("pan") != 0;
+}
+bool WorkspaceDiwne::bypassUnholdAction()
+{
+	return InputManager::isAxisActive("pan") == 0;
+}
 
 bool WorkspaceDiwne::bypassSelectionRectangleAction()
 {
@@ -1617,39 +1649,77 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	initDiwneFromTheme();
 	g_workspaceDiwne = new WorkspaceDiwne(&settingsDiwne);
 	// Input actions for workspace window.
-	Input.bindAction("selectAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->selectAll(); });
-	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() { g_workspaceDiwne->invertSelection(); });
-	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToAll(); });
-	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->zoomToSelected(); });
-	Input.bindAction("delete", EKeyState::Pressed, [&]() { g_workspaceDiwne->deleteCallback(); });
-	Input.bindAction("copy", EKeyState::Pressed, [&]() { g_workspaceDiwne->copySelectedNodes(); });
-	Input.bindAction("paste", EKeyState::Pressed, [&]() { g_workspaceDiwne->pasteSelectedNodes(); });
-	Input.bindAction("cut", EKeyState::Pressed, [&]() { g_workspaceDiwne->cutSelectedNodes(); });
-	Input.bindAction("duplicate", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateClickedNode(); });
-	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() { g_workspaceDiwne->duplicateSelectedNodes(); });
+	Input.bindAction("selectAll", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->selectAll();
+	});
+	Input.bindAction("invertSelection", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->invertSelection();
+	});
+	Input.bindAction("zoomToAll", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->zoomToAll();
+	});
+	Input.bindAction("zoomToSelected", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->zoomToSelected();
+	});
+	Input.bindAction("delete", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->deleteCallback();
+	});
+	Input.bindAction("copy", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->copySelectedNodes();
+	});
+	Input.bindAction("paste", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->pasteSelectedNodes();
+	});
+	Input.bindAction("cut", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->cutSelectedNodes();
+	});
+	Input.bindAction("duplicate", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->duplicateClickedNode();
+	});
+	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->duplicateSelectedNodes();
+	});
 
-	Input.bindAction("trackingEscOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
-	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSmoothLeft(); });
-	Input.bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSmoothRight(); });
-	Input.bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingJaggedLeft(); });
-	Input.bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingJaggedRight(); });
-	Input.bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingModeSwitch(); });
-	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitch(); });
-	Input.bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOn(); });
-	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() { g_workspaceDiwne->trackingSwitchOff(); });
-	Input.bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() { g_workspaceDiwne->toggleSelectedNodesVisibility(); });
+	Input.bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingSwitchOff();
+	});
+	Input.bindAction("trackingSmoothLeft", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingSmoothLeft();
+	});
+	Input.bindAction("trackingSmoothRight", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingSmoothRight();
+	});
+	Input.bindAction("trackingJaggedLeft", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingJaggedLeft();
+	});
+	Input.bindAction("trackingJaggedRight", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingJaggedRight();
+	});
+	Input.bindAction("trackingModeSwitch", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingModeSwitch();
+	});
+	Input.bindAction("trackingSwitch", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingSwitch();
+	});
+	Input.bindAction("trackingSwitchOn", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingSwitchOn();
+	});
+	Input.bindAction("trackingSwitchOff", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->trackingSwitchOff();
+	});
+	Input.bindAction("toggleNodeWorkspaceVisibility", EKeyState::Pressed, [&]() {
+		g_workspaceDiwne->toggleSelectedNodesVisibility();
+	});
 
 	App::getModule<StateManager>().setOriginator(this);
 
 	// Setup viewport selection callback
-	App::get().viewport()->getMainScene().lock()->addSelectionCallback(
-	    [](Vp::Entity* newlySelectedEntity)
-	    {
-		    // Save information about this callback and perform actions based on it later while in workspace window context.
-		    // This is a workaround due to viewport selection occurring in unknown order at unknown time.
-		    g_workspaceDiwne->m_viewportSelectionChanged = true;
-		    g_workspaceDiwne->m_viewportLastSelectedEntity = newlySelectedEntity;
-	    });
+	App::get().viewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
+		// Save information about this callback and perform actions based on it later while in workspace window context.
+		// This is a workaround due to viewport selection occurring in unknown order at unknown time.
+		g_workspaceDiwne->m_viewportSelectionChanged = true;
+		g_workspaceDiwne->m_viewportLastSelectedEntity = newlySelectedEntity;
+	});
 }
 
 WorkspaceWindow::~WorkspaceWindow()
@@ -1694,11 +1764,17 @@ void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
 	NodeDeserializer::createFrom(memento);
 }
 
-void WorkspaceWindow::clear() { getNodeEditor().m_workspaceCoreNodes.clear(); }
+void WorkspaceWindow::clear()
+{
+	getNodeEditor().m_workspaceCoreNodes.clear();
+}
 
 //
 
-WorkspaceDiwne& WorkspaceWindow::getNodeEditor() { return *g_workspaceDiwne; }
+WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
+{
+	return *g_workspaceDiwne;
+}
 
 void WorkspaceWindow::render()
 {

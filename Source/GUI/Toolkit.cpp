@@ -16,16 +16,16 @@ struct InputTextCallback_UserData
 
 static int InputTextCallback(ImGuiInputTextCallbackData* data)
 {
-	InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
+	InputTextCallback_UserData* user_data = (InputTextCallback_UserData*) data->UserData;
 	if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
 	{
 		// Resize string callback
-		// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to
-		// what we want.
+		// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back
+		// to what we want.
 		std::string* str = user_data->Str;
 		IM_ASSERT(data->Buf == str->c_str());
 		str->resize(data->BufTextLen);
-		data->Buf = (char*)str->c_str();
+		data->Buf = (char*) str->c_str();
 	}
 	else if (user_data->ChainCallback)
 	{
@@ -51,7 +51,7 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
 
 	const auto formattedLabel = "##" + std::string(label);
 
-	return ImGui::InputText(formattedLabel.c_str(), (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback,
+	return ImGui::InputText(formattedLabel.c_str(), (char*) str->c_str(), str->capacity() + 1, flags, InputTextCallback,
 	                        &cb_user_data);
 }
 
@@ -76,11 +76,23 @@ void ToggleButton(const char* label, bool& toggled, ImVec2 size)
 	colorsPushed = 0;
 }
 
-glm::vec2 imToGlm(const ImVec2& v) { return glm::vec2(v.x, v.y); }
-glm::vec4 imToGlm(const ImVec4& v) { return glm::vec4(v.x, v.y, v.z, v.w); }
+glm::vec2 imToGlm(const ImVec2& v)
+{
+	return glm::vec2(v.x, v.y);
+}
+glm::vec4 imToGlm(const ImVec4& v)
+{
+	return glm::vec4(v.x, v.y, v.z, v.w);
+}
 
-ImVec2 glmToIm(const glm::vec2& v) { return ImVec2(v.x, v.y); }
-ImVec4 glmToIm(const glm::vec4& v) { return ImVec4(v.x, v.y, v.z, v.w); }
+ImVec2 glmToIm(const glm::vec2& v)
+{
+	return ImVec2(v.x, v.y);
+}
+ImVec4 glmToIm(const glm::vec4& v)
+{
+	return ImVec4(v.x, v.y, v.z, v.w);
+}
 
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
 {

@@ -82,7 +82,7 @@ class Transform : public Node
 	struct DefaultValuePair
 	{
 		std::string name;
-		Data        data;
+		Data data;
 	};
 	using DefaultValues = std::vector<DefaultValuePair>;
 
@@ -121,9 +121,15 @@ private:
 	int m_currentIndex = -1;
 
 public:
-	bool isInSequence() const { return m_currentSequence != nullptr; }
+	bool isInSequence() const
+	{
+		return m_currentSequence != nullptr;
+	}
 	Ptr<Node> getCurrentSequence();
-	int getCurrentIndex() const { return m_currentIndex; }
+	int getCurrentIndex() const
+	{
+		return m_currentIndex;
+	}
 
 	//===----------------------------------------------------------------------===//
 
@@ -157,7 +163,8 @@ public:
 		const auto* props = properties();
 		if (!props->hasDefaultValue(name))
 		{
-			return ValueSetResult(ValueSetResult::Status::Err_LogicError, "default value with this name does not exist");
+			return ValueSetResult(ValueSetResult::Status::Err_LogicError,
+			                      "default value with this name does not exist");
 		}
 
 		getDefaultValueMut(name).setValue(val); // defaults
@@ -177,7 +184,10 @@ public:
 	TransformOperation::ValueMap getDefaultTypes() const;
 	DefaultValues& getDefaultValues();
 
-	void setDefaultValues(const DefaultValues& values) { m_defaultValues = values; }
+	void setDefaultValues(const DefaultValues& values)
+	{
+		m_defaultValues = values;
+	}
 
 	EValueState getValueState(glm::ivec2 coords) const;
 
@@ -196,10 +206,22 @@ public:
 	bool isLocked() const;
 	void lock();
 	void unlock();
-	bool hasMenuSynergies() const { return m_hasMenuSynergies; } // PF TODO should be const for the given Transformation
-	bool hasSynergies() const { return m_hasSynergies; }
-	void disableSynergies() { m_hasSynergies = false; }
-	void enableSynergies() { m_hasSynergies = m_hasMenuSynergies ? true : false; }
+	bool hasMenuSynergies() const
+	{
+		return m_hasMenuSynergies;
+	} // PF TODO should be const for the given Transformation
+	bool hasSynergies() const
+	{
+		return m_hasSynergies;
+	}
+	void disableSynergies()
+	{
+		m_hasSynergies = false;
+	}
+	void enableSynergies()
+	{
+		m_hasSynergies = m_hasMenuSynergies ? true : false;
+	}
 	void free()
 	{
 		unlock();
@@ -224,7 +246,10 @@ public:
 
 	//===----------------------------------------------------------------------===//
 
-	bool hasSavedValue() const { return m_hasSavedData; }
+	bool hasSavedValue() const
+	{
+		return m_hasSavedData;
+	}
 
 	/** Save current values of the transformation for future reloading. */
 	void saveValue();
@@ -234,7 +259,10 @@ public:
 
 	const glm::mat4& getSavedValue() const;
 
-	const DefaultValues& getSavedDefaults() const { return m_savedValues; }
+	const DefaultValues& getSavedDefaults() const
+	{
+		return m_savedValues;
+	}
 
 	/**
 	 * \brief Save the value, read from YAML
@@ -285,7 +313,10 @@ public:
 		m_currentIndex = index;
 	}
 
-	float getActivePart() const { return m_activePart; }
+	float getActivePart() const
+	{
+		return m_activePart;
+	}
 
 protected:
 	DefaultValues m_defaultValues;

@@ -19,8 +19,14 @@ public:
 	std::vector<ImVec2> getInteractionPointsWithSequence();
 
 	bool m_removeFromSequence;
-	bool getRemoveFromSequence() const { return m_removeFromSequence; };
-	void setRemoveFromSequence(bool value) { m_removeFromSequence = value; };
+	bool getRemoveFromSequence() const
+	{
+		return m_removeFromSequence;
+	};
+	void setRemoveFromSequence(bool value)
+	{
+		m_removeFromSequence = value;
+	};
 	bool isInSequence();
 	DIWNE::ID aboveSequence;
 	float m_topOversizeSpace;
@@ -38,7 +44,10 @@ public:
 	virtual void drawMenuSetDataMap();
 
 	virtual bool drawDataFull();
-	virtual bool inline drawDataSetValues() { return drawDataFull(); };
+	virtual bool inline drawDataSetValues()
+	{
+		return drawDataFull();
+	};
 
 	virtual int maxLenghtOfData();
 

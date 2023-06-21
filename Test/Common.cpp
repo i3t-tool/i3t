@@ -17,7 +17,7 @@ void createTestApplication(bool fullInit)
 	ASSERT_TRUE(g_TestApp == nullptr);
 
 	int argc = 1;
-	char* argv[] = {(char*)"dummy"};
+	char* argv[] = {(char*) "dummy"};
 	INIT_LOGGER(argc, argv);
 
 	g_TestApp = std::make_shared<Application>();

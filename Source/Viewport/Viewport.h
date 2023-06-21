@@ -209,8 +209,14 @@ public:
 
 	ViewportSettings& getSettings();
 
-	WPtr<Scene> getMainScene() { return m_mainScene; };
-	WPtr<Scene> getPreviewScene() { return m_previewScene; };
+	WPtr<Scene> getMainScene()
+	{
+		return m_mainScene;
+	};
+	WPtr<Scene> getPreviewScene()
+	{
+		return m_previewScene;
+	};
 
 	Manipulators& getManipulators();
 };

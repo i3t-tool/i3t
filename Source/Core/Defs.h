@@ -45,8 +45,15 @@ namespace fs = std::filesystem;
 
 /// We need to log message here since all assertions are removed
 /// on Windows in Release config.
-#define I3T_ASSERT(cond, message) if (!(cond)) { LOG_FATAL(message); } assert(cond)
-#define I3T_ABORT(message) LOG_FATAL(message); std::abort()
+#define I3T_ASSERT(cond, message)                                                                                      \
+	if (!(cond))                                                                                                       \
+	{                                                                                                                  \
+		LOG_FATAL(message);                                                                                            \
+	}                                                                                                                  \
+	assert(cond)
+#define I3T_ABORT(message)                                                                                             \
+	LOG_FATAL(message);                                                                                                \
+	std::abort()
 
 /// Enum utils
 
@@ -56,15 +63,27 @@ namespace fs = std::filesystem;
  * \param val Enum value
  * \return String name of the enum value
  */
-template <typename T> auto n(T val) { return std::string(magic_enum::enum_name(val)); }
+template <typename T> auto n(T val)
+{
+	return std::string(magic_enum::enum_name(val));
+}
 
 namespace EnumUtils
 {
-template <typename T> auto name(T val) { return n(val); }
+template <typename T> auto name(T val)
+{
+	return n(val);
+}
 
-template <typename T> std::optional<T> value(const std::string& str) { return magic_enum::enum_cast<T>(str); }
+template <typename T> std::optional<T> value(const std::string& str)
+{
+	return magic_enum::enum_cast<T>(str);
+}
 
-template <typename T> std::optional<T> value(std::string_view str) { return magic_enum::enum_cast<T>(str); }
+template <typename T> std::optional<T> value(std::string_view str)
+{
+	return magic_enum::enum_cast<T>(str);
+}
 } // namespace EnumUtils
 
 #define COND_TO_DEG(x)                                                                                                 \
