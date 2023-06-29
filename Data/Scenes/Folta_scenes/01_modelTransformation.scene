@@ -1,0 +1,178 @@
+{
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 9,
+                "position": [
+                    400.0,
+                    157.0
+                ],
+                "transforms": [
+                    {
+                        "id": 17,
+                        "position": [
+                            469.0,
+                            185.0
+                        ],
+                        "type": "Translation",
+                        "defaultValues": {
+                            "translation": [
+                                4.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                4.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": false,
+                        "locked": true,
+                        "LOD": "Full"
+                    },
+                    {
+                        "id": 19,
+                        "position": [
+                            639.0,
+                            185.0
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "rotation": -0.9272952675819397
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                0.5999999642372131,
+                                0.0,
+                                0.800000011920929,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -0.800000011920929,
+                                0.0,
+                                0.5999999642372131,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    },
+                    {
+                        "id": 18,
+                        "position": [
+                            809.0,
+                            185.0
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                2.0,
+                                2.0,
+                                2.0
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                2.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                2.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                2.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 15,
+                "position": [
+                    1092.0,
+                    178.0
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                9,
+                0,
+                15,
+                0
+            ]
+        ]
+    }
+}

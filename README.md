@@ -72,3 +72,6 @@ private:
 
 ## Tvorba nových krabiček
 Při tvorbě nových krabiček postupujte [takto](Docs/HowToAddNode.md).
+
+## Manuál programu
+Manuál programu je dostupný [zde](Docs/I3Tmanual.md).

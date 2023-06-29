@@ -45,6 +45,11 @@ void WorkspaceDiwne::selectAll()
 {
 	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
 	{
+		if (workspaceCoreNode->getIsLabelBeingEdited())
+			return;
+	}
+	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+	{
 		if (!workspaceCoreNode->getSelected())
 		{
 			workspaceCoreNode->setSelected(true);
@@ -249,22 +254,8 @@ void WorkspaceDiwne::zoomToRectangle(ImRect const& rect)
 void WorkspaceDiwne::deleteCallback()
 {
 	LOG_DEBUG("Deleting");
-	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
-	{
-		/*if(workspaceCoreNode->m_focused && !workspaceCoreNode->m_selected)
-		{
-		  workspaceCoreNode->deleteActionDiwne();
-		  Ptr<WorkspaceTransformation> trn = std::dynamic_pointer_cast<WorkspaceTransformation>(workspaceCoreNode);
-		  if (trn != nullptr)
-		  {
-		    trn->deleteActionDiwne();
-		  }
-		  break;
-		}
-		else */
-		if (workspaceCoreNode->getIsLabelBeingEdited())
-			return;
-	}
+	if (isNodeLabelBeingEdited())
+		return;
 
 	for (auto&& node : getSelectedNodesInnerIncluded())
 	{
@@ -278,9 +269,21 @@ void WorkspaceDiwne::deleteCallback()
 	}
 }
 
+bool WorkspaceDiwne::isNodeLabelBeingEdited()
+{
+	for (auto&& workspaceCoreNode : getAllNodesInnerIncluded())
+	{
+		if (workspaceCoreNode->getIsLabelBeingEdited())
+			return true;
+	}
+	return false;
+}
+
 void WorkspaceDiwne::copySelectedNodes()
 {
 	LOG_INFO("Copying nodes");
+	if (isNodeLabelBeingEdited())
+		return;
 	// Preventing double duplication of selected transformations in a sequence
 	for (auto node : getSelectedNodesInnerIncluded())
 	{
@@ -327,13 +330,19 @@ void WorkspaceDiwne::deselectWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> transf
 void WorkspaceDiwne::pasteSelectedNodes()
 {
 	LOG_INFO("Pasting nodes");
+	if (copiedNodes == nullptr)
+		return;
+	if (isNodeLabelBeingEdited())
+		return;
 	deselectNodes();
-	pasteNodes(copiedNodes);
+	pasteNodes(*copiedNodes);
 }
 
 void WorkspaceDiwne::cutSelectedNodes()
 {
 	// Prevent double duplication of inner nodes
+	if (isNodeLabelBeingEdited())
+		return;
 	for (auto node : getSelectedNodesInnerIncluded())
 	{
 		Ptr<WorkspaceSequence> seq = std::dynamic_pointer_cast<WorkspaceSequence>(node);
@@ -418,7 +427,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 	auto selectedNodes = getSelectedNodesInnerIncluded();
 
 	// copy and paste to ensure connections
-	pasteNodes(copyNodes(selectedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+	pasteNodes(*copyNodes(selectedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 
 	for (auto node : selectedNodes)
 	{
@@ -1070,7 +1079,7 @@ bool WorkspaceDiwne::content()
 	}
 	if (shouldDuplicate)
 	{
-		pasteNodes(copyNodes(duplicatedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
+		pasteNodes(*copyNodes(duplicatedNodes, App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset)));
 	}
 
 	int number_of_nodes = m_workspaceCoreNodes.size();
