@@ -149,8 +149,6 @@ void WorkspaceSequence::popupContentTracking()
 			dynamic_cast<WorkspaceDiwne&>(diwne).trackingSwitchOn(
 			    std::static_pointer_cast<WorkspaceSequence>(shared_from_this()));
 		}
-		if (ImGui::MenuItem("Smooth tracking", "", false, false))
-		{}
 	}
 }
 

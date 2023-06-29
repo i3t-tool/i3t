@@ -12,6 +12,7 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
 #include "Tutorial/TutorialLoader.h"
@@ -447,15 +448,7 @@ void StartWindow::render()
 							auto tutorial = TutorialLoader::loadTutorial(header);
 							if (tutorial)
 							{
-								// TODO - DIALOG WINDOW CONFIRMATION
-								// App::getModule<StateManager>().clear();
-								LOG_DEBUG("Tutorial " + header->m_title + " loaded");
-								SetTutorialCommand::dispatch(tutorial);
-
-								I3T::getUI()->getWindowManager().showWindow(shared_from_this(), false);
-								Ptr<IWindow> tutorialWindow = I3T::getWindowPtr<TutorialWindow>();
-								I3T::getUI()->getWindowManager().showWindow(tutorialWindow, true);
-								I3T::getUI()->getWindowManager().focusWindow(tutorialWindow);
+								loadTutorialAndShowWindow(header, tutorial);
 							}
 							else
 							{
@@ -508,6 +501,14 @@ void StartWindow::render()
 	}
 	ImGui::PopStyleVar(5);
 	ImGui::PopStyleColor(7);
+}
+
+void StartWindow::loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut)
+{
+	I3T::getUI()->getWindowManager().showWindow(shared_from_this(), false);
+	setTutorial(tut);
+	BeforeNewTutCommand::dispatch();
+	LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 }
 
 void StartWindow::showTutorialPopup()

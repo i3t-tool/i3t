@@ -9,6 +9,7 @@
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/Elements/Modals/BeforeNewModal.h"
+#include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Logger/Logger.h"
 #include "Scripting/ScriptingModule.h"
@@ -41,6 +42,19 @@ void Application::init()
 	BeforeNewProjectCommand::addListener([this]() {
 		getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>();
 	});
+
+	BeforeNewTutCommand::addListener([this]() {
+		I3T::getUI()->getWindowManager().showUniqueWindow<BeforeNewTutModal>();
+	});
+
+	NewProjectCommand::addListener([]() {
+		App::getModule<StateManager>().newScene();
+	});
+
+	BeforeNewProjectCommand::addListener([this]() {
+		getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>();
+	});
+
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
 	});

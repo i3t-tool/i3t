@@ -32,6 +32,7 @@
 #include <filesystem>
 
 #ifdef _WIN32
+#include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "Shellapi.h"
 #include <Windows.h>
 #endif // _WIN32

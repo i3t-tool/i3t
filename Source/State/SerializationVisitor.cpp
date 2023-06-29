@@ -172,7 +172,9 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	auto& alloc = m_memento.GetAllocator();
 
 	auto id = coreNode->getId();
+	auto render = node->getRender();
 	target.AddMember("id", id, alloc);
+	target.AddMember("render", render, alloc);
 
 	addVector(target, "position", node->getNodePositionDiwne());
 }
