@@ -22,11 +22,11 @@ std::optional<Ptr<GuiNode>> findNodeById(const std::vector<Ptr<GuiNode>>& nodes,
 	return std::nullopt;
 }
 
-Memento copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
+Memento* copyNodes(const std::vector<Ptr<GuiNode>>& nodes, float offset)
 {
-	Memento memento;
+	Memento* memento = new Memento();
 
-	SerializationVisitor serializer(memento);
+	SerializationVisitor serializer(*memento);
 	for (auto node : nodes)
 	{
 		node->translateNodePositionDiwne(ImVec2(-offset, -offset));
@@ -52,7 +52,7 @@ void pasteNodes(const Memento& memento)
 void duplicateNode(const Ptr<GuiNode>& node, float offset)
 {
 	// TODO - DUPLICATES BEHIND NODE INSTEAD OF INFRONT
-	pasteNodes(copyNodes({node}, offset));
+	pasteNodes(*copyNodes({node}, offset));
 }
 
 //------------------------------------------------------------------------------------------------//

@@ -56,7 +56,7 @@ public:
 	~WorkspaceDiwne() override;
 
 	ImDrawListSplitter m_channelSplitter;
-	Memento copiedNodes;
+	Memento* copiedNodes = nullptr;
 	Core::MatrixTracker* tracking;
 	float timeUntilNextTrack = 0;
 	bool smoothTracking;
@@ -213,6 +213,7 @@ public:
 	void duplicateSelectedNodes();
 	void deselectNodes();
 	void deselectWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> transform);
+	bool isNodeLabelBeingEdited();
 
 	// bool allowInteraction();
 

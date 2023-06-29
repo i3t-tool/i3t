@@ -211,8 +211,7 @@ void MainMenuBar::showTutorialMenu()
 {
 	if (ImGui::BeginMenu("Tutorials"))
 	{
-
-		ImGui::MenuItem("Tutorial menu", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
+		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
 		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
 		ImGui::EndMenu();
 	}

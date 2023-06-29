@@ -1,0 +1,269 @@
+{
+    "workspace": {
+        "operators": [],
+        "sequences": [
+            {
+                "id": 113,
+                "position": [
+                    807.0,
+                    168.0
+                ],
+                "transforms": [
+                    {
+                        "id": 110,
+                        "position": [
+                            876.0,
+                            196.0
+                        ],
+                        "type": "EulerX",
+                        "defaultValues": {
+                            "rotation": 0.0
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                -0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            },
+            {
+                "id": 102,
+                "position": [
+                    510.8572998046875,
+                    174.85716247558595
+                ],
+                "transforms": [
+                    {
+                        "id": 109,
+                        "position": [
+                            579.0,
+                            203.0
+                        ],
+                        "type": "EulerZ",
+                        "defaultValues": {
+                            "rotation": 0.0
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            },
+            {
+                "id": 119,
+                "position": [
+                    201.0,
+                    171.0
+                ],
+                "transforms": [
+                    {
+                        "id": 108,
+                        "position": [
+                            270.0,
+                            199.0
+                        ],
+                        "type": "EulerY",
+                        "defaultValues": {
+                            "rotation": 0.0
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                1.0,
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true,
+                        "LOD": "Full"
+                    }
+                ]
+            }
+        ],
+        "cycles": [],
+        "cameras": [],
+        "screens": [],
+        "models": [
+            {
+                "id": 111,
+                "position": [
+                    1187.000732421875,
+                    172.00003051757813
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": true,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            {
+                "id": 129,
+                "position": [
+                    797.0,
+                    27.0
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": false,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            {
+                "id": 125,
+                "position": [
+                    1084.0,
+                    17.0
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": false,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            {
+                "id": 127,
+                "position": [
+                    491.0,
+                    20.0
+                ],
+                "model": "default_cube",
+                "visible": true,
+                "showAxes": true,
+                "opaque": false,
+                "opacity": 0.5,
+                "tint": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        ],
+        "transforms": [],
+        "edges": [
+            [
+                113,
+                0,
+                111,
+                0
+            ],
+            [
+                102,
+                0,
+                129,
+                0
+            ],
+            [
+                113,
+                0,
+                125,
+                0
+            ],
+            [
+                119,
+                0,
+                127,
+                0
+            ],
+            [
+                102,
+                0,
+                113,
+                0
+            ],
+            [
+                119,
+                0,
+                102,
+                0
+            ]
+        ]
+    }
+}
