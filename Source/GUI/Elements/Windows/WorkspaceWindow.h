@@ -212,6 +212,7 @@ public:
 	void duplicateClickedNode();
 	void duplicateSelectedNodes();
 	void deselectNodes();
+	void deselectWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> transform);
 
 	// bool allowInteraction();
 
