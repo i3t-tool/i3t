@@ -289,17 +289,39 @@ void WorkspaceDiwne::copySelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				if (transform->getSelected())
+				deselectWorkspaceNode(transform);
+			}
+		}
+		else
+		{
+			Ptr<WorkspaceCamera> cam = std::dynamic_pointer_cast<WorkspaceCamera>(node);
+			if (cam)
+			{
+				Ptr<WorkspaceSequence> proj = cam->getProjection();
+				Ptr<WorkspaceSequence> view = cam->getView();
+				for (auto transform : proj->getInnerWorkspaceNodes())
 				{
-					transform->setSelected(false);
-					transform->processUnselect();
-					g_workspaceDiwne->m_takeSnap = true;
+					deselectWorkspaceNode(transform);
+				}
+				for (auto transform : view->getInnerWorkspaceNodes())
+				{
+					deselectWorkspaceNode(transform);
 				}
 			}
 		}
 	}
 	copiedNodes = copyNodes(getSelectedNodesInnerIncluded(),
 	                        App::get().getUI()->getTheme().get(ESize::Workspace_CopyPasteOffset));
+}
+
+void WorkspaceDiwne::deselectWorkspaceNode(Ptr<WorkspaceNodeWithCoreData> transform)
+{
+	if (transform->getSelected())
+	{
+		transform->setSelected(false);
+		transform->processUnselect();
+		g_workspaceDiwne->m_takeSnap = true;
+	}
 }
 
 void WorkspaceDiwne::pasteSelectedNodes()
@@ -319,12 +341,7 @@ void WorkspaceDiwne::cutSelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				if (transform->getSelected())
-				{
-					transform->setSelected(false);
-					transform->processUnselect();
-					g_workspaceDiwne->m_takeSnap = true;
-				}
+				deselectWorkspaceNode(transform);
 			}
 		}
 	}
@@ -350,12 +367,7 @@ void WorkspaceDiwne::duplicateClickedNode()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				if (transform->getSelected())
-				{
-					transform->setSelected(false);
-					transform->processUnselect();
-					g_workspaceDiwne->m_takeSnap = true;
-				}
+				deselectWorkspaceNode(transform);
 			}
 		}
 	}
@@ -398,12 +410,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 		{
 			for (auto transform : seq->getInnerWorkspaceNodes())
 			{
-				if (transform->getSelected())
-				{
-					transform->setSelected(false);
-					transform->processUnselect();
-					g_workspaceDiwne->m_takeSnap = true;
-				}
+				deselectWorkspaceNode(transform);
 			}
 		}
 	}
@@ -415,12 +422,7 @@ void WorkspaceDiwne::duplicateSelectedNodes()
 
 	for (auto node : selectedNodes)
 	{
-		if (node->getSelected())
-		{
-			node->setSelected(false);
-			node->processUnselect();
-			g_workspaceDiwne->m_takeSnap = true;
-		}
+		deselectWorkspaceNode(node);
 	}
 }
 
@@ -428,12 +430,7 @@ void WorkspaceDiwne::deselectNodes()
 {
 	for (auto node : getAllNodesInnerIncluded())
 	{
-		if (node->getSelected())
-		{
-			node->setSelected(false);
-			node->processUnselect();
-			g_workspaceDiwne->m_takeSnap = true;
-		}
+		deselectWorkspaceNode(node);
 	}
 }
 
