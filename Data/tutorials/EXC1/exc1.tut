@@ -3,32 +3,33 @@ title: Cvičení - Stůl
 description: Procvičení práce s I3T kde vytvoříme stůl!
 thumbnail: table_thumb.png
 language: cs
+scene: exc1.scene
 ---
 headline: První cvičení
 
 Vítej u *prvního cvičení*!
 
-Cvičení budou *podobné tutoriálům*, rozdíl bude v tom, že se bude skládat jen z *úkolů*.
+Cvičení budou *podobná tutoriálům*, rozdíl bude v tom, že se budou skládat jen z *úkolů*.
 
 V tomto cvičení si vyzkoušíme tvorbu *stolu* z objektů v *I3T*.
 
 ![Stůl s konvičkou](table.png)
 
-*P.S.* V modelování se tomuto principu říká *"blocking"*.
+*P.S.* V modelování se tomuto principu říká *"hierarchické modelování"*.
 
 --
 headline: Deska stolu
 
-task: Přidej stolu desku a uprav ji tak, aby vypadala jako na obrázku
+task: Přidej stolu desku a uprav ji tak, aby pasovala na nohy ducha
 
 ![Deska stolu](table_board.png)
 
-task: Pojmenuj si blok "Deska"
+task: Přejmeuj si blok na "Deska"
 
 --
 headline: Noha
 
-task: Přidej do scény nový blok a uprav ho tak, aby vypadal jako noha stolu
+task: Přidej do scény novou kostku a uprav ji tak, aby vypadala jako noha stolu
 
 ![Deska stolu s nohou](leg.png)
 
@@ -49,23 +50,16 @@ task: Dodej stolu další nohy
 --
 headline: Jednotný stůl
 
-task: Posuň celý stůl aby stál na ploše "y = 0"
+task: Posuň celý stůl do úrovně ducha pomocí jedné matice translace
 
 ![Stůl posunutý na úroveň země](table_translated.png)
 
 --
 headline: Konvička
 
-task: Přidej konvičku na stůl tak, aby byla jeho součástí a ležela na desce, zvětši jí a pootoč
+task: Přidej konvičku na stůl tak, aby byla součástí stolu a pasovala do ducha konvičky
 
 ![Stůl s pootočenou konvičou ](table_teapot.png)
-
---
-headline: Otočení stolu
-
-task: Nakonec pootoč stůl i s konvičkou o 45 stupňů
-
-![Pootočený stůl](table_finished.png)
 
 --
 headline: A máme hotovo!
@@ -74,5 +68,5 @@ headline: A máme hotovo!
 
 ![Topologie workspace](scene.png)
 
-Vidíš, že využíváme hlavně možnost *větvit sekvence*.
+Vidíš, že využíváme hlavně možnost *větvit sekvence*, čímž můžeme měnit několik modelů *stejnými transformacemi*.
 

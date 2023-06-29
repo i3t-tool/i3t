@@ -27,6 +27,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		const auto node = NodeDeserializer::createOperator(value);
 		createdNodes.push_back(node);
 		oldToNewId[value["id"].GetInt()] = node->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			node->setRender(value["render"].GetBool());
+		}
 	}
 
 	//
@@ -36,6 +40,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		const auto node = NodeDeserializer::createSequence(value);
 		createdNodes.push_back(node);
 		oldToNewId[value["id"].GetInt()] = node->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			node->setRender(value["render"].GetBool());
+		}
 	}
 
 	//
@@ -46,6 +54,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes.push_back(cycle);
 		NodeDeserializer::assignCommon(value, cycle);
 		oldToNewId[value["id"].GetInt()] = cycle->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			cycle->setRender(value["render"].GetBool());
+		}
 	}
 
 	//
@@ -56,6 +68,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes.push_back(camera);
 		NodeDeserializer::assignCommon(value, camera);
 		oldToNewId[value["id"].GetInt()] = camera->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			camera->setRender(value["render"].GetBool());
+		}
 
 		const auto& viewValue = value["sequences"].GetArray()[0];
 		NodeDeserializer::assignSequence(viewValue, camera->getView());
@@ -72,6 +88,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes.push_back(screen);
 		NodeDeserializer::assignCommon(value, screen);
 		oldToNewId[value["id"].GetInt()] = screen->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			screen->setRender(value["render"].GetBool());
+		}
 
 		if (value.HasMember("aspect"))
 		{
@@ -88,6 +108,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		createdNodes.push_back(model);
 		NodeDeserializer::assignCommon(value, model);
 		oldToNewId[value["id"].GetInt()] = model->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			model->setRender(value["render"].GetBool());
+		}
 
 		auto mesh = model->viewportModel().lock();
 
@@ -135,6 +159,10 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		const auto transform = NodeDeserializer::createTransform(value);
 		createdNodes.push_back(transform);
 		oldToNewId[value["id"].GetInt()] = transform->getNodebase()->getId();
+		if (value.HasMember("render"))
+		{
+			transform->setRender(value["render"].GetBool());
+		}
 	}
 
 	// connect edges

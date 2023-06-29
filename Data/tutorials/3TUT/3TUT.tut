@@ -2,12 +2,11 @@
 title: 3. Skládání transformací
 description: V této lekci si sestavíme sněhuláka a dozvíme se něco o skládání transformací.
 thumbnail: snehulakThumb.png
-scene: empty
 language: cs
 ---
-headline: Vítej v třetím tutoriálu!
+headline: Vítej ve třetím tutoriálu!
 
-V této lekci se naučíš stavět *sněhuláka*.
+V této lekci se naučíš stavět hranatého *sněhuláka*.
 
 Taky se naučíš *skládat několik transformací* dohromady!
 
@@ -27,7 +26,7 @@ V první lekci jsi se naučil/a:
 
 ![Druhá lekce](lekce2.png)
 
-V poslední lekci zase:
+V druhé lekci zase:
     * základy práce s *transformacemi*
     * špetku *matematiky*
     * opakování základní práce s *bloky*
@@ -53,7 +52,7 @@ Transformace do sekvence *vlož v tomto pořadí*:
 
 ![Postup násobení](poradi.png)
 
-Transformace vkládáme do sekvencí vždy v pořadí *Translace, Rotace, Škálování.*
+Transformace vkládáme do sekvencí vždy v pořadí *Translace, Rotace, Škálování* (tedy *TRS*).
 
 *Proč je vkládáme v tomto pořadí?*
 
@@ -64,7 +63,7 @@ V sekvencích aplikujeme transformace *ZPRAVA DOLEVA* (opačně, než jak jsou v
 
 ![Pořadí, v jakém se aplikují transformace při pořadí TRS](matrixOrderAlt.png)
 
-Díky pořadí *TRS* zajistíme, že se *translace* provede vždy, jako *poslední*.
+Díky pořadí *TRS* zajistíme, že se *translace* provede vždy jako *poslední*.
 
 --
 headline: Stejné transformace, jiné pořadí
@@ -85,12 +84,12 @@ task: Posuň model po ose Y tak, aby ležel "na zemi".
 
 ![Výsledná scéna](nohy.png)
 
-*Připomínka:* V rámci *Workspace* můžeš využívat zoom, i posouvání - podobně jako ve *Scene View*
+*Připomínka:* V rámci *Workspace* můžeš využívat zoom, i posouvání - podobně jako ve *Scene View*.
 
 --
 headline: Přidáme tělo
 
-task: Vytvoř nový *model* a *sekvenci*, tu přejmenuj na "hruď" a vlož do ní *matici translace*.
+task: Vytvoř nový *model* kostky a *sekvenci*, tu přejmenuj na "hruď" a vlož do ní *matici translace*
 task: Změň hodnoty v *matici translace* tak, aby *hruď* ležela na *nohou*
 hint:
     Hodnoty v matici translace by měly vypadat takhle
@@ -103,6 +102,7 @@ hint:
 headline: A nakonec hlavu!
 
 task: Přidej sněhulákovi hlavu *zkopírováním sekvence "nohy"* a pojmenuj ji "hlava"
+hint: Selektované bloky zkopíruješ pomocí Ctrl+C a Ctrl+V nebo Ctrl+LClick
 task: Zmenši hlavu na *poloviční velikost* a polož jí na *střední model* (hruď).
 
 ![Náš nádherný skvělý a ikonický sněhulák](snehulak.png)
@@ -110,7 +110,7 @@ task: Zmenši hlavu na *poloviční velikost* a polož jí na *střední model* 
 --
 headline: Manipulace se sněhulákem
 
-*Sekvence můžeme propojovat* s dalšími sekvencemi. Pokud pak změníš *původní sekvenci*, změní se i všechny *navazující sekvence*!
+*Sekvence můžeme propojovat* s dalšími sekvencemi. Pokud pak změníš *sekvenci vlevo*, ovlivní to i všechny *navazující sekvence*!
 
 Propojit sekvence je jednoduché:
 
@@ -119,7 +119,7 @@ Propojit sekvence je jednoduché:
 --
 headline: Vyzkoušíme si to!
 
-task: Vytvoř novou *sekvenci* a pojmenuj ji "sněhulák".
+task: Vytvoř novou *sekvenci* a pojmenuj ji "sněhulák"
 task: Propoj jí se *sekvencemi* všech ostatních částí sněhuláka
 task: Vlož do ní *matici translace, škálování a rotace podle x* a vyzkoušej si se sněhulákem manipulovat
 
@@ -128,11 +128,11 @@ task: Vlož do ní *matici translace, škálování a rotace podle x* a vyzkouš
 --
 headline: Tracking
 
-Pokud si chceš vizualizovat pořadí transformací sám/sama, můžeš si spustit *tracking*. Ten najdeš v menu *sekvence*, kterou chceš trackovat.
+Pokud si chceš vizualizovat důsledek pořadí transformací sám/sama, můžeš si spustit *tracking*. Ten najdeš v menu *sekvence*, kterou chceš sledovat.
 
 ![Kontextové menu sekvence nohy](tracking.png)
 
-*Tracking* do scény přidá *kopii modelu* napojeného na sekvenci, kterou můžeme pomocí šipek *doleva* a *doprava* postupně transformovat!
+*Tracking* do scény přidá *kopii modelu* napojeného na sekvenci, a pomocí šipek *doleva* a *doprava* můžeme sledovat, jak se transformace postupně aplikují!
 
 task: Zapni tracking pro nějakou ze sekvencí napojených na model. Zkus si i proházet pořadí transformací v sekvencích!
 
@@ -142,10 +142,10 @@ headline: A je to!
 
 ![WOOOOOOOOOOO!](checkbox.png)
 
-Shrnutí věcí co jsme se naučili:
+Co jsme se naučili:
   * práce se *sekvencemi*
   * *matice*
-  * několikanásobné *transformace*
+  * složené *transformace*
   * složitější práce v I3T
 
-Klikni na Finish pro návrat do úvodního okna ![dole :)](down.png)
+Klikni na Finish pro návrat do úvodního okna ![dole :)](down.png).

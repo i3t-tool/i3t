@@ -31,6 +31,15 @@ public:
 	 */
 	void render() override;
 
+	Ptr<Tutorial> getTutorial()
+	{
+		return m_currentTutorial;
+	}
+	void setTutorial(Ptr<Tutorial> tut)
+	{
+		m_currentTutorial = tut;
+	}
+
 private:
 	std::shared_ptr<GUIImage> m_dummyImage;
 	std::shared_ptr<GUIImage> m_folderImage;
@@ -38,6 +47,8 @@ private:
 	std::shared_ptr<GUIImage> m_cvutImage;
 	std::shared_ptr<GUIImage> m_i3tImage;
 	std::vector<std::shared_ptr<TutorialHeader>> m_tutorial_headers;
+	Ptr<Tutorial> m_currentTutorial;
 	void renderTutorials();
 	void showTutorialPopup();
+	void loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tutorial> tut);
 };

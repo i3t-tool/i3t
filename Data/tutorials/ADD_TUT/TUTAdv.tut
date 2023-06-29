@@ -1,16 +1,16 @@
 ---
-title: Pokročilá práce se scénou
-description: Nauč se jak pracovat s I3T efektivněji!
+title: 5. Pokročilé funkce programu
+description: Prozkoumej pokročilejší pracovní postupy a klávesové zkratky
 thumbnail: thumbnail.png
 language: cs
 ---
 headline: Vítej v tutoriálu na pokročilé ovládání!
 
-Naučíš se tu líp *manipulovat s objekty* ve scéně, jaké máš možnosti a jak *jednodušeji pracovat s I3T*.
+Naučíš se tu líp *manipulovat s objekty* ve scéně a jak *jednodušeji pracovat s I3T*.
 
 ![Ukázka pokročilé manipulace](nahled.png)
 
-Tutoriál bude sloužit spíš jako *manuál*, můžeš skočit vždy na to, co potřebuješ.
+Tutoriál bude sloužit spíš jako *manuál*, můžeš skočit vždy na to, co zrovna potřebuješ.
 
 --
 headline: Hlavní lišta
@@ -22,19 +22,19 @@ Na hlavní liště máme *čtyri* záložky:
     * *Edit* = undo a redo
     * *Windows* = správce oken programu
     * *Tutorials* = přístup k oknům tutoriálu
-    * *Help* = dokumentace a credits
+    * *Help* = dokumentace a seznam autorů
 
-Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se ti v náhledu *bude ukazovat*, a co *ne*.
+Scene view má *svojí oddělenou lištu*. Přes tu si můžeš nastavit, co se ti v náhledu *bude ukazovat* a co *ne*.
 
 ![Menu SceneView](sceneView.png)
 --
-headline: Hotkeys - Klávesové zkratky
+headline: Workspace - Klávesové zkratky
 
 *I3T* obsahuje většinu známých zkratek:
     * copy/paste/cut
         * *Ctrl+C/Ctrl+V/Ctrl+X*
-    * undo
-        * *Ctrl+Z/Ctrl+R*
+    * undo/redo
+        * *Ctrl+Y/Ctrl+R*/Ctrl+Z
     * duplikace bloku
         * *Ctrl+LClick*
     * duplikace všech vybraných bloků
@@ -43,29 +43,44 @@ headline: Hotkeys - Klávesové zkratky
         * *Ctrl+S*
     * několikanásobná selekce
         * *Shift+LClick*
-    * výběr selekčním obdelníkem
-        * *Tažení LClick*
+    * selekce všech bloků dotýkajících se obdélníku
+        * *Tažení LClick doleva*
+    * selekce všech bloků obsažených v obdélníku
+        * *Tažení LClick doprava*
     * delete
         * *Delete*
 --
 headline: Level Of Detail
 
-Pokud nám bloky *zabírají moc místa* ve scéně, nebo si chceme *ulehčit transformace*, můžeme využít *Level Of Detail*:
+Pokud nám bloky *zabírají moc místa* ve scéně, nebo chceme *zjednodušit proces transformace*, můžeme využít *Level Of Detail*:
     * *Full* = plný detail, vidíme *všechno*
     * *Label* = pouze *jméno*, zbytek je schovaný
-    * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic
+    * *Set values* = pouze *měnitelné hodnoty*, nastavitelné jen u matic.
 
-*Detail* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*
+*Úroveň detailu* bloku nastavíme kliknutím pravým tlačítkem na *lištu* pod *"Level of detail"*
 
 ![Menu pro nastavení Level of detail](levelOfDetail.png)
 
 --
 headline: Operátory
 
-V *add menu* najdeme i záložku *operators*.
+V *Add menu* najdeme i položku *operators*.
 
 ![Menu pro přidání operátorů](operators.png)
 
-Ta obsahuje mnoho různých bloků, které nám můžou pomoct s *matematickými operacemi* jako např. *translace* matice, výpočet *determinantu*, *rozklady* matic apod.
+Ta obsahuje mnoho různých výpočetních bloků, které nám můžou pomoct s *matematickými operacemi* jako např. *translace* matice, výpočet *determinantu*, *rozklady* matic apod.
+
+--
+headline: Tracking
+
+Pokud chceme *vizualizovat*, v jakém *pořadí* se transformace aplikují, můžeme si v *kontextovém menu* sekvence zapnout *tracking*.
+
+![Kontextové menu sekvence nohy](tracking.png)
+
+*Tracking* ovládáme *šipkami* doleva a doprava na klávesnici a tím postupně aplikujeme transformace.
+
+U *trackingu* máš možnost vypnout *smooth tracking*, ukazatel trackingu pak bude skákat po *větších* částech.
+
+*Tracking* provádí všechny transformace, které jsou *napojené* na trackovanou sekvenci *zleva*. Spouštíme ho tedy většinou na *sekvenci přímo propojené s modelem*.
 
 
