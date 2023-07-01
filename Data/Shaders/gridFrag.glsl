@@ -90,73 +90,24 @@ float linearize_depth(float d, float zNear, float zFar)
 	return 2.0 * zNear * zFar / (zFar + zNear - z_ndc * (zFar - zNear));
 }
 
-//vec4 axis(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool drawSecondAxis)
-//{
-//	vec2 coord;
-//	coord.x = worldPos[firstAxis] * gridSize;
-//	coord.y = worldPos[secondAxis] * gridSize;
-//
-//	vec2 derivative = fwidth(coord) * lineWidth;
-//	float size = 1.5f;
-//	float xAxis = size - clamp(abs(coord.x), 0, size) / min(derivative.x, 0.5f);
-//	float yAxis = size - clamp(abs(coord.y), 0, size) / min(derivative.y, 0.5f);
-//	float line = max(xAxis, yAxis);
-//
-//	vec4 color = vec4(gridColor, line);
-//
-//	if (xAxis > yAxis) {
-//		color[secondAxis] = 1.0;
-//	} else {
-//		color[firstAxis] = 1.0;
-//	}
-//	return color;
-//}
-//
-//vec4 drawAxis(int gridType, bool drawFirstAxis, bool drawSecondAxis, bool axesOnly, out float depth, out float linearDepth)
-//{
-//	int firstAxis;
-//	int secondAxis;
-//	int otherAxis;
-//	if (gridType == GRID_XY) {
-//		firstAxis = 0;
-//		secondAxis = 1;
-//		otherAxis = 2;
-//	} else if (gridType == GRID_YZ) {
-//		firstAxis = 1;
-//		secondAxis = 2;
-//		otherAxis = 0;
-//	} else {
-//		firstAxis = 0;
-//		secondAxis = 2;
-//		otherAxis = 1;
-//	}
-//
-//	// Figure out where camera ray intersects world plane
-//	float t = -nearPoint[otherAxis] / (farPoint[otherAxis] - nearPoint[otherAxis]);
-//	vec3 worldPos = nearPoint + t * (farPoint - nearPoint);
-//
-//	// Compute depth from world position
-//	vec4 clipSpacePos = projectionMatrix * viewMatrix * vec4(worldPos.xyz, 1.0);
-//	float clipSpaceDepth = (clipSpacePos.z / clipSpacePos.w);
-//	depth = 0.5 + 0.5 * clipSpaceDepth;
-//
-//	vec4 color = axis(worldPos, firstAxis, secondAxis, drawFirstAxis, drawSecondAxis) * float(t > 0);
-//
-//	linearDepth = linearize_depth(clipSpaceDepth, u_near, u_far);
-//	float linearDepthNormalized = linearDepth / u_far;
-//
-//	float fading = max(0, (0.5 - linearDepthNormalized));
-//	fading = smoothstep(1.0f - gridFadeOffset, 0.2f, linearDepthNormalized + gridFadeOffset);
-//	color.a *= fading * gridStrength;
-//
-//	return color;
-//}
+// int i = 0; vec3 v; v[i] <-- THIS created undefined behavior on a mobile rtx 3050Ti  for some reason, thus tthese functions
+// Get vector component at index, for compability reasons to avoid variable indexing issues
+float vc(vec3 v, int i)
+{
+	return (i == 0) ? v.x : (i == 1) ? v.y : v.z;
+}
+
+// Get vector component at index, for compability reasons to avoid variable indexing issues
+float vc(vec4 v, int i)
+{
+	return (i == 0) ? v.x : (i == 1) ? v.y : (i == 2) ? v.z : v.w;
+}
 
 vec4 grid(vec3 worldPos, int firstAxis, int secondAxis, bool drawFirstAxis, bool drawSecondAxis, bool axisOnly)
 {
 	vec2 coord;
-	coord.x = worldPos[firstAxis] * gridSize;
-	coord.y = worldPos[secondAxis] * gridSize;
+	coord.x = vc(worldPos, firstAxis) * gridSize;
+	coord.y = vc(worldPos, secondAxis) * gridSize;
 
 	vec2 derivative = fwidth(coord) * lineWidth;
 
@@ -221,7 +172,7 @@ vec4 drawGrid(int gridType, bool drawFirstAxis, bool drawSecondAxis, bool axesOn
 	}
 
 	// Figure out where camera ray intersects world plane
-	float t = -nearPoint[otherAxis] / (farPoint[otherAxis] - nearPoint[otherAxis]);
+	float t = -vc(nearPoint, otherAxis) / (vc(farPoint, otherAxis) - vc(nearPoint, otherAxis));
 	vec3 worldPos = nearPoint + t * (farPoint - nearPoint);
 
 	// Compute depth from world position
@@ -297,68 +248,6 @@ void drawWboit(float linearDepth)
 		RevealageBuffer = FragColor.a * weight;
 	}
 	// END WBOIT
-}
-
-// Unused, perhaps for future use
-void drawAllGrids() {
-	int gridPlanes[3];
-	gridPlanes[0] = GRID_XZ;
-	gridPlanes[1] = GRID_XY;
-	gridPlanes[2] = GRID_YZ;
-
-	float depths[3];
-	float linearDepths[3];
-	vec4 colors[3];
-
-	for (int i = 0; i < 3; i++) {
-		float depth;
-		float linearDepth;
-		vec4 color;
-		color = drawGrid(gridPlanes[i], true, true, depth, linearDepth);
-		depths[i] = depth;
-		linearDepths[i] = linearDepth;
-		colors[i] = color;
-	}
-
-	float firstDepth = depths[0];
-	float secondDepth = depths[1];
-	float thirdDepth = depths[2];
-	int firstIndex = 0;
-	int secondIndex = 1;
-	int thirdIndex = 2;
-
-	// Sort the three planes by depth
-	if (firstDepth > thirdDepth) {
-		swap(firstDepth, thirdDepth);
-		swap(firstIndex, thirdIndex);
-	}
-	if (firstDepth > secondDepth) {
-		swap(firstDepth, secondDepth);
-		swap(firstIndex, secondIndex);
-	}
-	if (secondDepth > thirdDepth) {
-		swap(secondDepth, thirdDepth);
-		swap(secondIndex, thirdIndex);
-	}
-
-	float linearDepth; // For wboit
-
-	// Render sorted (or render only the first layer to only show in the current octant)
-	if (colors[firstIndex].a > ALPHA_CUTOFF) {
-		gl_FragDepth = firstDepth;
-		linearDepth = linearDepths[firstIndex];
-		FragColor = colors[firstIndex];
-	} else if (colors[secondIndex].a > ALPHA_CUTOFF) {
-		gl_FragDepth = secondDepth;
-		linearDepth = linearDepths[secondIndex];
-		FragColor = colors[secondIndex];
-	} else {
-		gl_FragDepth = thirdDepth;
-		linearDepth = linearDepths[thirdIndex];
-		FragColor = colors[thirdIndex];
-	}
-
-	drawWboit(linearDepth);
 }
 
 void main()
