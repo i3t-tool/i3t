@@ -118,8 +118,7 @@ void Framebuffer::initImpl(int width, int height)
 		return;
 	}
 
-	m_width = width;
-	m_height = height;
+	setSize(width, height);
 
 	if (m_multisample)
 	{
@@ -213,9 +212,9 @@ void Framebuffer::resize(int width, int height)
 		throw std::runtime_error("Framebuffer: Cannot resize uninitialized framebuffer!");
 	}
 
-	assert(width > 0);
-	assert(height > 0);
+	validateSize(width, height);
 
+	// Ignore resize if dimensions haven't changed
 	if (width == m_width && height == m_height)
 	{
 		return;
@@ -225,8 +224,7 @@ void Framebuffer::resize(int width, int height)
 		LOG_INFO("[FRAMEBUFFER DEBUG] Resizing {}FBO ({} : {}) -> ({} : {})", (m_multisample ? "AA " : ""), m_width,
 		         m_height, width, height);
 
-	m_width = width;
-	m_height = height;
+	setSize(width, height);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -561,4 +559,23 @@ int Framebuffer::getWidth() const
 int Framebuffer::getHeight() const
 {
 	return m_height;
+}
+
+void Framebuffer::setSize(int& width, int& height)
+{
+	validateSize(width, height);
+	m_width = width;
+	m_height = height;
+}
+
+void Framebuffer::validateSize(int& width, int& height)
+{
+	if (width <= 0)
+	{
+		width = 1;
+	}
+	if (height <= 0)
+	{
+		height = 1;
+	}
 }

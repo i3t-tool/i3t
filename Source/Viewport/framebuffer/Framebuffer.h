@@ -253,6 +253,14 @@ private:
 	 * Initialise the fbo. Does NOT check if initialised previously.
 	 */
 	void initImpl(int width, int height);
+
+	void setSize(int& width, int& height);
+	void validateSize(int& width, int& height);
+
+	/**
+	 * Checks OpenGL framebuffer state for errors
+	 * @return
+	 */
 	bool checkFramebuffer();
 };
 } // namespace Vp
