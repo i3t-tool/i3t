@@ -145,6 +145,8 @@ void Pin::unplug()
 				}
 			}
 		}
+
+		Owner.updateValues(Index);
 	}
 	else
 	{
