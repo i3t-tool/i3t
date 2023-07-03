@@ -58,8 +58,9 @@ bool Diwne::beforeBeginDiwne() /* \todo redesign to
 	m_nodesSelectionChanged = false;
 
 	/* zoom */
-	ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
-	//    ImGui::SetWindowFontScale(m_workAreaZoom);
+	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes are
+	// ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
+	// ImGui::SetWindowFontScale(m_workAreaZoom);
 	m_StoreFontScale = ImGui::GetFont()->Scale;
 	ImGui::GetFont()->Scale = m_workAreaZoom;
 	ImGui::PushFont(ImGui::GetFont());
@@ -172,9 +173,8 @@ bool Diwne::afterEndDiwne()
 {
 	ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
 
+	ImGui::GetFont()->Scale = m_StoreFontScale; // Need to reset default font BEFORE popping font
 	ImGui::PopFont();
-	ImGui::GetFont()->Scale = m_StoreFontScale;
-	//    ImGui::PushFont(NULL);
 
 	return DiwneObject::afterEndDiwne();
 }
