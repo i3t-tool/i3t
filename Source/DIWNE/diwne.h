@@ -437,20 +437,18 @@ protected:
 	bool m_drawing /*!< store whether ImGui window is ready to draw to it */;
 
 private:
-	ImRect m_workAreaScreen; /*! \brief Rectangle of work area on screen */
-	ImRect m_workAreaDiwne;  /*! \brief Rectangle of work area on diwne - .Min is set
-	                            by user, .Max is computed from m_workAreaScreen */
-	float m_workAreaZoom;
+	ImRect m_workAreaScreen; ///< Rectangle of work area on screen
+	ImRect m_workAreaDiwne;  ///< Rectangle of work area on diwne
+	                         ///< - .Min is set by user, .Max is computed from m_workAreaScreen */
+	float m_workAreaZoom;    ///< Workspace zoom factor
 
 	ImVec2 m_popupPosition;
 
-	ImDrawListSplitter m_splitter; /*! \brief Every nodes should be draw to its own channel */
+	ImDrawListSplitter m_splitter; ///< Every nodes should be draw to its own channel
 
 	/* restore information */
-	ImVec2 m_StoreItemSpacing; /*! \brief For restore value after this window is
-	                              done */
-	float m_StoreFontScale;    /*! \brief For restore value after this window is done
-	                            */
+	ImVec2 m_StoreItemSpacing; ///< For restore value after this window is done
+	float m_StoreFontScale;    ///< For restore value after this window is done
 };
 
 } /* namespace DIWNE */
