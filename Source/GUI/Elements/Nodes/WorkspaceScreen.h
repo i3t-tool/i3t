@@ -40,6 +40,8 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
+	/////////////////////////////////////////////////////////////
+
 	// bool drawDataFull(, int index);
 	int maxLenghtOfData();        // todo
 	bool middleContent();         // the most important function
@@ -52,9 +54,13 @@ public:
 		return {getOutputs()[1]};
 	}; /* \todo Some name for pin -> similar to I3T_CAM_MUL */
 
+	/////////////////////////////////////////////////////////////
+
 	ImVec2 getAspect() const;
 	void setAspect(ImVec2 aspect);
 
 private:
 	void init();
+
+	bool drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTextureSize);
 };

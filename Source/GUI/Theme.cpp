@@ -161,10 +161,10 @@ void Theme::initClassicProperties()
 	set(EColor::Synergies_FloatBgHovered, ImVec4(0.0f, 0.4f, 0.2f, 1.0f));
 	set(EColor::Synergies_FloatBgActive, ImVec4(0.0f, 0.4f, 0.4f, 1.0f));
 
-	set(EColor::Nodes_Screen_resizeBtn_bgShape, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
-	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.4f, 0.2f, 0.2f, 0.6f));
-	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
-	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(0.4f, 0.4f, 0.6f, 0.6f));
+	set(EColor::Nodes_Screen_resizeBtn_bgShape, ImVec4(0.70f, 0.70f, 0.70f, 0.5f));
+	set(EColor::Nodes_Screen_resizeBtn_bgInner, ImVec4(0.70f, 0.70f, 0.70f, 0.5f));
+	set(EColor::Nodes_Screen_resizeBtn_fgShape, ImVec4(1.0f, 1.0f, 1.0f, 0.82f));
+	set(EColor::Nodes_Screen_resizeBtn_fgInner, ImVec4(1.0f, 1.0f, 1.0f, 0.82f));
 
 	set(EColor::Nodes_Transformation_ValidIcon_bgShape, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_ValidIcon_bgInner, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));

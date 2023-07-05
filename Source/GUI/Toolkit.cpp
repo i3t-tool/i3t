@@ -55,6 +55,25 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
 	                        &cb_user_data);
 }
 
+bool Button(const char* id, bool disabled)
+{
+	if (disabled)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	}
+
+	const auto result = ImGui::Button(id);
+
+	if (disabled)
+	{
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
+	}
+
+	return result;
+}
+
 void ToggleButton(const char* label, bool& toggled, ImVec2 size)
 {
 	int colorsPushed = 0;
@@ -74,24 +93,6 @@ void ToggleButton(const char* label, bool& toggled, ImVec2 size)
 	}
 	ImGui::PopStyleColor(colorsPushed);
 	colorsPushed = 0;
-}
-
-glm::vec2 imToGlm(const ImVec2& v)
-{
-	return glm::vec2(v.x, v.y);
-}
-glm::vec4 imToGlm(const ImVec4& v)
-{
-	return glm::vec4(v.x, v.y, v.z, v.w);
-}
-
-ImVec2 glmToIm(const glm::vec2& v)
-{
-	return ImVec2(v.x, v.y);
-}
-ImVec4 glmToIm(const glm::vec4& v)
-{
-	return ImVec4(v.x, v.y, v.z, v.w);
 }
 
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
