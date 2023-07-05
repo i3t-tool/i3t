@@ -6,7 +6,7 @@
 #include "misc/cpp/imgui_stdlib.h"
 
 #include "Config.h"
-#include "GUI/Shortcuts.h"
+#include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Loader/ThemeLoader.h"
 #include "Utils/Filesystem.h"

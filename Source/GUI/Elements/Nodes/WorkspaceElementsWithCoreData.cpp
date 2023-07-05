@@ -284,6 +284,8 @@ bool WorkspaceCorePin::content()
 
 		float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
+		// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
+		// not visible anyway so we're just drawing stuff twice for no reason
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 		               ImVec4(padding, padding, padding, padding), isConnected());
 		m_iconRectDiwne =

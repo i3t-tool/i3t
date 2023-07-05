@@ -244,7 +244,15 @@ public:
 	void AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
 	                         float thickness, int num_segments = 0) const;
 
-	/*! \brief Add ImGui Button with icon on it \see DrawIcon()
+	/*!
+	 * Add ImGui Button with icon on it \see DrawIcon()
+	 * \return true if interaction with button happen, false otherwise
+	 */
+	bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size, ImVec4 padding,
+	                bool filled, std::string const id) const;
+
+	/*!
+	 * Add ImGui Button with icon on it \see DrawIcon()
 	 * \return true if interaction with button happen, false otherwise
 	 */
 	bool IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, DIWNE::IconType fgIconType,
@@ -298,13 +306,19 @@ public:
 	/*! \brief \see DrawIconCircle
 	 */
 	void DrawIconCross(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft, ImVec2 bottomRight,
-	                   bool filled, float thicknesShape = 4, float thicknesInner = 2) const;
+	                   bool filled, float thicknesShape = 2, float thicknesInner = 1) const;
 
 	void DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
 	                              ImVec2 bottomRight, bool filled, float thicknes = 1) const;
 
 	void DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
 	                               ImVec2 bottomRight, bool filled, float thicknes = 1) const;
+
+	void DrawIconGrabDownLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+	                          ImVec2 bottomRight, bool filled, float thickness = 1) const;
+
+	void DrawIconGrabDownRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+	                           ImVec2 bottomRight, bool filled, float thickness = 1) const;
 
 	DiwneAction getDiwneAction() const
 	{

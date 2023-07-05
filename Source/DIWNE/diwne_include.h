@@ -61,12 +61,15 @@ enum DrawMode
 
 enum IconType
 {
+	NoIcon,
 	Circle,
 	Rectangle,
 	TriangleLeft,
 	TriangleRight,
 	TriangleDownLeft,
 	TriangleDownRight,
+	GrabDownLeft,
+	GrabDownRight,
 	Cross
 };
 

@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "diwne_include.h"
 
 namespace DIWNE
@@ -450,42 +451,119 @@ void Diwne::DrawIconTriangleRight(ImDrawList* idl, ImColor ShapeColor, ImColor I
 void Diwne::DrawIconTriangleDownRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
                                       ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
 {
-	idl->AddTriangleFilled(ImVec2(topLeft.x, bottomRight.y), bottomRight, ImVec2(bottomRight.x, topLeft.y), ShapeColor);
+	ImVec2 p1 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
+	ImVec2 p2 = bottomRight - ImVec2(0.5f, 0.5f);
+	ImVec2 p3 = ImVec2(bottomRight.x - 0.5f, topLeft.y + 0.5f);
 
+	idl->AddTriangleFilled(p1, p2, p3, ShapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(ImVec2(topLeft.x + 2 * thicknes, bottomRight.y - thicknes),
-		                       bottomRight - ImVec2(thicknes, thicknes),
-		                       ImVec2(bottomRight.x - 2 * thicknes, topLeft.y + thicknes), InnerColor);
+		idl->AddTriangleFilled(p1 + ImVec2(2 * thicknes, -thicknes), p2 - ImVec2(thicknes, thicknes),
+		                       p3 + ImVec2(-thicknes, 2 * thicknes), InnerColor);
 	}
 }
 
 void Diwne::DrawIconTriangleDownLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
                                      ImVec2 bottomRight, bool filled, float thicknes /*= 1*/) const
 {
-	idl->AddTriangleFilled(topLeft, ImVec2(topLeft.x, bottomRight.y), bottomRight, ShapeColor);
+	ImVec2 p1 = topLeft + ImVec2(0.5f, 0.5f);
+	ImVec2 p2 = ImVec2(topLeft.x + 0.5f, bottomRight.y - 0.5f);
+	ImVec2 p3 = bottomRight - ImVec2(0.5f, 0.5f);
+
+	idl->AddTriangleFilled(p1, p2, p3, ShapeColor);
 	if (!filled)
 	{
-		idl->AddTriangleFilled(topLeft + ImVec2(thicknes, 2 * thicknes),
-		                       ImVec2(topLeft.x + thicknes, bottomRight.y - thicknes),
-		                       bottomRight - ImVec2(2 * thicknes, thicknes), InnerColor);
+		idl->AddTriangleFilled(p1 + ImVec2(thicknes, 2 * thicknes), p2 + ImVec2(thicknes, -thicknes),
+		                       p3 - ImVec2(2 * thicknes, thicknes), InnerColor);
+	}
+}
+
+void Diwne::DrawIconGrabDownLeft(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                                 ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+{
+	topLeft = topLeft + ImVec2(0.5f, 0.5f);
+	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
+
+	int lineCount = 3;
+	float padding = 1.5f * m_workAreaZoom;
+	float squaredPadding = sqrt(2) * padding;
+	float pointOffsetLong = 2 * squaredPadding;
+	float pointOffsetShort = padding;
+	float size = abs(bottomRight.y - topLeft.y) - pointOffsetLong - pointOffsetShort;
+	float step = size / lineCount;
+
+	for (int i = 0; i < lineCount; i++)
+	{
+		idl->AddLine(ImVec2(bottomRight.x - 1.2f * pointOffsetLong - (i * step), bottomRight.y - pointOffsetShort),
+		             ImVec2(topLeft.x + pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)), ShapeColor,
+		             thickness * m_workAreaZoom);
+	}
+}
+
+void Diwne::DrawIconGrabDownRight(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft,
+                                  ImVec2 bottomRight, bool filled, float thickness /*= 1*/) const
+{
+	topLeft = topLeft + ImVec2(0.5f, 0.5f);
+	bottomRight = bottomRight - ImVec2(0.5f, 0.5f);
+
+	int lineCount = 3;
+	float padding = 1.5f * m_workAreaZoom;
+	float squaredPadding = sqrt(2) * padding;
+	float pointOffsetLong = 2 * squaredPadding;
+	float pointOffsetShort = padding;
+	float size = abs(bottomRight.y - topLeft.y) - pointOffsetLong - pointOffsetShort;
+	float step = size / lineCount;
+
+	for (int i = 0; i < lineCount; i++)
+	{
+		idl->AddLine(ImVec2(topLeft.x + 1.2f * pointOffsetLong + (i * step), bottomRight.y - pointOffsetShort),
+		             ImVec2(bottomRight.x - pointOffsetShort, topLeft.y + 1.2f * pointOffsetLong + (i * step)),
+		             ShapeColor, thickness * m_workAreaZoom);
 	}
 }
 
 void Diwne::DrawIconCross(ImDrawList* idl, ImColor ShapeColor, ImColor InnerColor, ImVec2 topLeft, ImVec2 bottomRight,
                           bool filled, float thicknesShape /*=4*/, float thicknesInner /*=2*/) const
 {
-	float thicknesDiff = (thicknesShape - thicknesInner) / 2;
-	ImVec2 thicknesDiffVec = ImVec2(thicknesDiff, thicknesDiff);
+	bottomRight = bottomRight - ImVec2(1.0f, 1.0f);
 
-	idl->AddLine(topLeft, bottomRight, ShapeColor, thicknesShape);
-	idl->AddLine(ImVec2(topLeft.x, bottomRight.y), ImVec2(bottomRight.x, topLeft.y), ShapeColor, thicknesShape);
-	if (!filled)
-	{
-		idl->AddLine(topLeft + thicknesDiffVec, bottomRight - thicknesDiffVec, InnerColor, thicknesInner);
-		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknesDiffVec,
-		             ImVec2(bottomRight.x, topLeft.y) - thicknesDiffVec, InnerColor, thicknesInner);
-	}
+	thicknesInner *= m_workAreaZoom;
+	thicknesShape *= m_workAreaZoom;
+
+	ImVec2 pTL = topLeft;
+	ImVec2 pBR = bottomRight;
+	ImVec2 pTR = ImVec2(bottomRight.x, topLeft.y);
+	ImVec2 pBL = ImVec2(topLeft.x, bottomRight.y);
+
+	// (DR): This is janky, but it seems to help making the cross look more symmetrical
+	//   The true reason for the asymmetry probably lies in the zoom level value, on my machine it steps in 0.125
+	//   intervals, every other zoom level is fine, the ones between can cause asymmetry, might be a good idea to
+	//   investigate this further and maybe restrict what values the zoom can have
+	pTR = pTR + ImVec2(0.01f, -0.01f);
+	pBR = pBR + ImVec2(0.01f, 0.01f);
+
+	//	LOG_INFO("zoom: {}", m_workAreaZoom);
+	//	LOG_INFO("pTL: {:10.3f},{:10.3f}  pBR: {:10.3f},{:10.3f}", pTL.x, pTL.y, pBR.x, pBR.y);
+	idl->AddLine(pTL, pBR, ShapeColor, thicknesShape);
+	idl->AddLine(pBL, pTR, ShapeColor, thicknesShape);
+
+	// TODO: (DR) Commenting this out for the time being as it isn't used anyway, needs to be rewritten to support
+	//   zooming like the code above
+	//	float thicknesDiff = (thicknesShape - thicknesInner) / 2;
+	//	ImVec2 thicknesDiffVec = ImVec2(thicknesDiff, thicknesDiff);
+	//	if (!filled)
+	//	{
+	//				idl->AddLine(topLeft + thicknesDiffVec, bottomRight - thicknesDiffVec, InnerColor, thicknesInner);
+	//		idl->AddLine(ImVec2(topLeft.x, bottomRight.y) + thicknesDiffVec,
+	//		             ImVec2(bottomRight.x, topLeft.y) - thicknesDiffVec, InnerColor, thicknesInner);
+	//	}
+}
+
+bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor, ImVec2 size,
+                       ImVec4 padding, bool filled, std::string const id) const
+{
+	return IconButton(bgIconType, bgShapeColor, bgInnerColor, DIWNE::IconType::NoIcon, IM_COL32_BLACK, IM_COL32_BLACK,
+	                  size, padding, filled, id);
 }
 
 bool Diwne::IconButton(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor bgInnerColor,
@@ -514,25 +592,34 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 	switch (bgIconType)
 	{
 	case Circle:
-		DrawIconCircle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconCircle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case Rectangle:
-		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconRectangle(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleLeft:
-		DrawIconTriangleLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconTriangleLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleRight:
-		DrawIconTriangleRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconTriangleRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case Cross:
-		DrawIconCross(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconCross(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleDownLeft:
-		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleDownRight:
-		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, false);
+		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+		break;
+	case GrabDownLeft:
+		DrawIconGrabDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+		break;
+	case GrabDownRight:
+		DrawIconGrabDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+		break;
+	case NoIcon:
+	default:
 		break;
 	}
 
@@ -554,10 +641,19 @@ void Diwne::DrawIcon(DIWNE::IconType bgIconType, ImColor bgShapeColor, ImColor b
 		DrawIconCross(idl, fgShapeColor, fgInnerColor, inner_icon_min, inner_icon_max, filled);
 		break;
 	case TriangleDownLeft:
-		DrawIconTriangleDownLeft(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+		DrawIconTriangleDownLeft(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
 		break;
 	case TriangleDownRight:
-		DrawIconTriangleDownRight(idl, bgShapeColor, bgInnerColor, icon_min, icon_max, filled);
+		DrawIconTriangleDownRight(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
+		break;
+	case GrabDownLeft:
+		DrawIconGrabDownLeft(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
+		break;
+	case GrabDownRight:
+		DrawIconGrabDownRight(idl, fgShapeColor, fgInnerColor, icon_min, icon_max, filled);
+		break;
+	case NoIcon:
+	default:
 		break;
 	}
 
