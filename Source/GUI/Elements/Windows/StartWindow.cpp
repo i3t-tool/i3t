@@ -299,7 +299,7 @@ void StartWindow::render()
 					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight)))
 					{
 						// open from file (taken from main menu bar)
-						std::string result;
+						std::filesystem::path result;
 						std::string title = "Open I3T script...";
 						std::vector<std::string> filter;
 						filter.push_back("I3T scene files");
