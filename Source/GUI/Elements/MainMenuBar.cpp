@@ -22,21 +22,21 @@
 
 using namespace UI;
 
-static bool saveSceneDialog(std::string& result, const std::string& title)
+static bool saveSceneDialog(std::filesystem::path& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
 
 	return SystemDialogs::SaveSingleFileDialog(result, title, "./", filter);
 }
 
-static bool openSceneDialog(std::string& result, const std::string& title)
+static bool openSceneDialog(std::filesystem::path& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
 
 	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 }
 
-static bool importContentDialog(std::string& result, const std::string& title)
+static bool importContentDialog(std::filesystem::path& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"All files", "*"};
 
@@ -45,7 +45,7 @@ static bool importContentDialog(std::string& result, const std::string& title)
 
 static void saveAs()
 {
-	std::string filename;
+	std::filesystem::path filename;
 	bool hasFilename = saveSceneDialog(filename, "Save I3T scene");
 	if (hasFilename)
 	{
@@ -73,7 +73,7 @@ static void save()
 
 static void open()
 {
-	std::string sceneFile;
+	std::filesystem::path sceneFile;
 	bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
 	if (hasFile)
 	{
@@ -84,7 +84,7 @@ static void open()
 
 static void importModel()
 {
-	std::string modelFile;
+	std::filesystem::path modelFile;
 	if (importContentDialog(modelFile, "Import model"))
 	{
 		Application::getModule<Core::ResourceManager>().importResource(modelFile);

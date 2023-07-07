@@ -1,9 +1,11 @@
 #include "SystemDialogs.h"
 
+#include <codecvt>
+
 #include "portable-file-dialogs.h"
 
-bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string& title, const std::string& root,
-                                         const std::vector<std::string>& filter)
+bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const std::string& title,
+                                         const std::string& root, const std::vector<std::string>& filter)
 {
 	auto dialog = pfd::open_file(title, root, filter);
 
@@ -11,7 +13,13 @@ bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string&
 	{
 		if (dialog.result().size() > 0)
 		{
-			result = dialog.result()[0];
+			const auto resultStr = dialog.result()[0];
+#ifdef _WIN32
+			std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+			std::wstring wideFilename = converter.from_bytes(resultStr);
+			result = wideFilename;
+#endif
+
 			return true;
 		}
 	}
@@ -19,8 +27,8 @@ bool SystemDialogs::OpenSingleFileDialog(std::string& result, const std::string&
 	return false;
 }
 
-bool SystemDialogs::SaveSingleFileDialog(std::string& result, const std::string& title, const std::string& root,
-                                         const std::vector<std::string>& filter)
+bool SystemDialogs::SaveSingleFileDialog(std::filesystem::path& result, const std::string& title,
+                                         const std::string& root, const std::vector<std::string>& filter)
 {
 	auto destination = pfd::save_file(title, root, filter).result();
 	if (!destination.empty())

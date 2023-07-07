@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -29,7 +30,7 @@ namespace SystemDialogs
  *
  * \return Whether file was selected or not.
  */
-bool OpenSingleFileDialog(std::string& result, const std::string& title, const std::string& root = "",
+bool OpenSingleFileDialog(std::filesystem::path& result, const std::string& title, const std::string& root = "",
                           const std::vector<std::string>& filter = {"All Files", "*"});
 
 /**
@@ -42,7 +43,7 @@ bool OpenSingleFileDialog(std::string& result, const std::string& title, const s
  *
  * \return Whether file was selected or not.
  */
-bool SaveSingleFileDialog(std::string& filename, const std::string& title, const std::string& root = "",
+bool SaveSingleFileDialog(std::filesystem::path& filename, const std::string& title, const std::string& root = "",
                           const std::vector<std::string>& filter = {"All Files", "*"});
 
 /**
