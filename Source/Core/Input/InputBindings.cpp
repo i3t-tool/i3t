@@ -1,7 +1,5 @@
 #include "InputBindings.h"
 
-#include "InputManager.h"
-
 std::vector<InputBindings::ActionMapping> g_defaultAction;
 std::vector<InputBindings::AxisMapping> g_defaultAxis;
 
@@ -124,7 +122,7 @@ void InputBindings::setActionKey(const char* name, Keys::Code code, ModifiersLis
 	/// \todo MH Check for conflicts.
 	if (isActionCreated(name))
 	{
-		m_inputActions[name].push_back({code, createModifiers(modifiers)});
+		m_inputActions[name].push_back({code, InputManager::createModifiers(modifiers)});
 	}
 }
 
@@ -161,7 +159,7 @@ void InputBindings::setAxisKey(const char* name, float scale, Keys::Code code, M
 {
 	if (InputBindings::isAxisCreated(name))
 	{
-		m_inputAxis[name].push_back({code, scale, createModifiers(modifiers)});
+		m_inputAxis[name].push_back({code, scale, InputManager::createModifiers(modifiers)});
 	}
 }
 

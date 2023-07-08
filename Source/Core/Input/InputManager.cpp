@@ -76,12 +76,51 @@ void InputManager::setInputAxis(const char* action, float scale, Keys::Code code
 	InputBindings::m_inputAxis[action].push_back({code, scale, createModifiers(mods)});
 }
 
+/**
+ * If you change order of modifiers, change it also in
+ * InputManager::areModifiersActive function.
+ */
+Modifiers InputManager::createModifiers(ModifiersList& list)
+{
+	Modifiers mods = {false, false, false, false, false, false};
+	for (auto mod : list)
+	{
+		switch (mod)
+		{
+		case Keys::Code::ctrll:
+			mods[0] = true;
+			break;
+		case Keys::Code::altl:
+			mods[1] = true;
+			break;
+		case Keys::Code::shiftl:
+			mods[2] = true;
+			break;
+		case Keys::Code::ctrlr:
+			mods[3] = true;
+			break;
+		case Keys::Code::altr:
+			mods[4] = true;
+			break;
+		case Keys::Code::shiftr:
+			mods[5] = true;
+			break;
+		default:
+			break;
+		}
+	}
+
+	return mods;
+}
+
 bool InputManager::areModifiersActive(Modifiers mods)
 {
 	bool active = mods[0] == isKeyPressed(Keys::Code::ctrll);
 	active &= mods[1] == isKeyPressed(Keys::Code::altl);
 	active &= mods[2] == isKeyPressed(Keys::Code::shiftl);
-
+	active &= mods[3] == isKeyPressed(Keys::Code::ctrlr);
+	active &= mods[4] == isKeyPressed(Keys::Code::altr);
+	active &= mods[5] == isKeyPressed(Keys::Code::shiftr);
 	return active;
 }
 
