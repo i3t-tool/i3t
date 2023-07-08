@@ -16,7 +16,6 @@
 
 #include "Core/Defs.h"
 #include "GUI/Elements/IWindow.h"
-#include "InputBindings.h"
 #include "InputController.h"
 #include "KeyCodes.h"
 
@@ -34,6 +33,9 @@ struct GLFWwindow;
 // TODO: (DR) Refactoring and doc
 
 //===----------------------------------------------------------------------===//
+
+using Modifiers = std::array<bool, 6L>;
+using ModifiersList = std::vector<Keys::Code>;
 
 /**
  * \brief Class handling all GLUT interaction events (mouse and keyboard) and
@@ -111,7 +113,9 @@ public:
 		m_inputControllers.push_back(controller);
 	}
 
-	static bool areModifiersActive(Modifiers mods);
+	static Modifiers createModifiers(ModifiersList& list);
+
+	static bool areModifiersActive(const Modifiers mods);
 
 	/**
 	 * Set active input controller (for focused window).

@@ -9,40 +9,8 @@
 #include <vector>
 
 #include "Core/Defs.h"
-
+#include "InputManager.h"
 #include "KeyCodes.h"
-
-using Modifiers = std::array<bool, 4L>;
-using ModifiersList = std::vector<Keys::Code>;
-
-/**
- * If you change order of modifiers, change it also in
- * InputManager::areModifiersActive function.
- */
-FORCE_INLINE Modifiers createModifiers(const ModifiersList& list)
-{
-	// TODO: (DR) Add right versions of modifiers
-	Modifiers mods = {false, false, false, false};
-	for (auto mod : list)
-	{
-		switch (mod)
-		{
-		case Keys::Code::ctrll:
-			mods[0] = true;
-			break;
-		case Keys::Code::altl:
-			mods[1] = true;
-			break;
-		case Keys::Code::shiftl:
-			mods[2] = true;
-			break;
-		default:
-			break;
-		}
-	}
-
-	return mods;
-}
 
 struct InputBindings final
 {
