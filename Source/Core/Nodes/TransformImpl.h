@@ -222,6 +222,9 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
+
+private:
+	HalfspaceSign halfspaceSign;
 };
 
 /**
@@ -252,6 +255,9 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
+
+private:
+	HalfspaceSign halfspaceSign;
 };
 
 /**
@@ -282,6 +288,9 @@ public:
 	[[nodiscard]] ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
 	void resetMatrixFromDefaults() override;
+
+private:
+	HalfspaceSign halfspaceSign;
 };
 
 template <> class TransformImpl<ETransformType::Translation> : public Transform

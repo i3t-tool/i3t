@@ -15,10 +15,10 @@ struct MyTree
 	SequencePtr s1;
 	SequencePtr s2;
 
-	TransformPtr mat1;
-	TransformPtr mat2;
-	TransformPtr mat3;
-	TransformPtr mat4;
+	Ptr<Transform> mat1;
+	Ptr<Transform> mat2;
+	Ptr<Transform> mat3;
+	Ptr<Transform> mat4;
 };
 
 MyTree arrange()

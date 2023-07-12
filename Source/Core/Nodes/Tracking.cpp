@@ -359,11 +359,19 @@ void MatrixTracker::track()
 		if (!Math::eq(1.0f, m_param))
 		{
 			// Interpolate last matrix.
-			m_trackingProgress[(*it)->getId()] = interpParam;
-			setActivePart(*it, interpParam);
-			rhs = (*it)->getData().getMat4();
-			result = Math::lerp(lhs, rhs, interpParam, isRot(*it)) * result;
-			m_interpolatedTransformID = (*it)->getId();
+			const auto transform = *it;
+			m_trackingProgress[transform->getId()] = interpParam;
+			setActivePart(transform, interpParam);
+			rhs = transform->getData().getMat4();
+
+			auto useQuat = false;
+			if (const auto reallyTransform = std::dynamic_pointer_cast<Transform>(transform))
+			{
+				useQuat = reallyTransform->properties()->isRotation;
+			}
+			result = Math::lerp(lhs, rhs, interpParam, useQuat) * result;
+
+			m_interpolatedTransformID = transform->getId();
 		}
 	}
 
