@@ -557,27 +557,59 @@ struct TransformOperation
 	Operation operation;
 	TransformMask mask;
 	ValueMap defaultValuesTypes;
+	bool isRotation = false;
 };
 
 constexpr TransformMask g_AllLocked = 0b0000000000000000;
 constexpr TransformMask g_AllUnlocked = 0b1111111111111111;
 
 /// All entries must be in the same order as ETransformType enum entries.
+// clang-format off
 static inline const std::vector<TransformOperation> g_transforms = {
     {{n(ETransformType::Free), "free"}, g_AllUnlocked, {}},
     {{n(ETransformType::Translation), "translate"},
      0b0001000100010000, // the last column
      {{"translation", EValueType::Vec3}}},
-    {{n(ETransformType::EulerX), "eulerAngleX"}, 0b0000011001100000, {{"rotation", EValueType::Float}}},
-    {{n(ETransformType::EulerY), "eulerAngleY"}, 0b1010000010100000, {{"rotation", EValueType::Float}}},
-    {{n(ETransformType::EulerZ), "eulerAngleZ"}, 0b1100110000000000, {{"rotation", EValueType::Float}}},
-    {{n(ETransformType::Scale), "scale"},
+    {
+        {n(ETransformType::EulerX), "eulerAngleX"},
+        0b0000011001100000,
+        {{"rotation", EValueType::Float}},
+        true
+    },
+    {
+        {n(ETransformType::EulerY), "eulerAngleY"},
+        0b1010000010100000,
+        {{"rotation", EValueType::Float}},
+        true
+    },
+    {
+        {n(ETransformType::EulerZ), "eulerAngleZ"},
+        0b1100110000000000,
+        {{"rotation", EValueType::Float}},
+        true
+    },
+    {
+        {n(ETransformType::Scale), "scale"},
      0b1000010000100000, // the diagonal
-     {{"scale", EValueType::Vec3}}},
-    {{n(ETransformType::AxisAngle), "rotate"},
-     0b1110111011100000,
-     {{"axis", EValueType::Vec3}, {"rotation", EValueType::Float}}},
-    {{n(ETransformType::Quat), "quat"}, g_AllLocked, {{"quat", EValueType::Quat}}},
+     {{"scale", EValueType::Vec3}}
+    },
+    {
+        {n(ETransformType::AxisAngle), "rotate"},
+        0b1110111011100000,
+        {
+            {"axis", EValueType::Vec3},
+            {"rotation", EValueType::Float}
+        },
+        true
+    },
+    {
+        {n(ETransformType::Quat), "quat"},
+        g_AllLocked,
+        {
+            {"quat", EValueType::Quat}
+        },
+        true
+    },
     {{n(ETransformType::Ortho), "ortho"},
      0b1001010100110000,
      {{"left", EValueType::Float},
@@ -606,6 +638,7 @@ static inline const std::vector<TransformOperation> g_transforms = {
      g_AllLocked,
      {{"eye", EValueType::Vec3}, {"center", EValueType::Vec3}, {"up", EValueType::Vec3}}},
 };
+// clang-format on
 
 FORCE_INLINE const TransformOperation& getTransformOperation(ETransformType type)
 {

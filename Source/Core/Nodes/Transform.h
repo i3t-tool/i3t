@@ -22,15 +22,6 @@ namespace Core
 {
 class Sequence;
 
-template <typename Node> FORCE_INLINE bool isRot(Node&& node)
-{
-	// static_assert(std::is_base_of_v<Node, Node>);
-
-	auto& type = node->getOperation()->keyWord;
-	return type == "EulerX" || type == "EulerY" || type == "EulerZ" || type == "AxisAngle";
-	// \todo Q: and what about quaternions?
-}
-
 //===-- Value masks -------------------------------------------------------===//
 
 /**
@@ -286,14 +277,6 @@ public:
 	ValueSetResult setValue(const glm::mat4& mat) override;
 	ValueSetResult setValue(float val, glm::ivec2 coords) override; // PF
 
-	//===----------------------------------------------------------------------===//
-	struct HalfspaceSign
-	{
-		float cos = 1.0f; // Initially in the first quadrant
-		float sin = 1.0f;
-	} halfspaceSign; // remember the quadrant for eulerRotations
-	//===----------------------------------------------------------------------===//
-
 	void notifySequence();
 
 protected:
@@ -361,5 +344,9 @@ private:
 	DefaultValues m_savedValues;
 };
 
-using TransformPtr = Ptr<Transform>;
+struct HalfspaceSign
+{
+	float cos = 1.0f; // Initially in the first quadrant
+	float sin = 1.0f;
+};
 } // namespace Core
