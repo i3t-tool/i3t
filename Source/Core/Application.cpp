@@ -4,16 +4,13 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Config.h"
+#include "Core/Input/InputManager.h"
+#include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
-#include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
-#include "GUI/Elements/Modals/BeforeNewModal.h"
-#include "GUI/Elements/Modals/BeforeNewTutModal.h"
-#include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "GUI/UIModule.h" /// \todo Remove this dependency
 #include "Logger/Logger.h"
-#include "Scripting/ScriptingModule.h"
-#include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
@@ -23,48 +20,34 @@ double lastFrameSeconds = 0.0; // PF changed to double
 
 static Configuration* g_Config = nullptr;
 
+Application::Application()
+{
+	s_instance = this;
+}
+
+Application::~Application()
+{
+	for (auto& [_, m] : m_modules)
+	{
+		m->onClose();
+	}
+
+	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
+
+	m_window->finalize();
+}
+
 void Application::init()
 {
-	if (s_instance == nullptr)
-		s_instance = shared_from_this();
-
-	m_isPaused = false;
-
-	createModule<ResourceManager>();
-	createModule<StateManager>();
-	createModule<UIModule>();
-	createModule<ScriptingModule>().init();
+	initWindow();
 
 	Core::GraphManager::init();
 
 	//
 
-	BeforeNewProjectCommand::addListener([this]() {
-		getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>();
-	});
-
-	BeforeNewTutCommand::addListener([this]() {
-		I3T::getUI()->getWindowManager().showUniqueWindow<BeforeNewTutModal>();
-	});
-
-	NewProjectCommand::addListener([]() {
-		App::getModule<StateManager>().newScene();
-	});
-
-	BeforeNewProjectCommand::addListener([this]() {
-		getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>();
-	});
-
-	NewProjectCommand::addListener([]() {
-		App::getModule<StateManager>().newScene();
-	});
-
 	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] {
 		onClose();
-	});
-	ConsoleCommand::addListener([this](std::string c) {
-		getModule<ScriptingModule>().runScript(c.c_str());
 	});
 
 	InputManager::init();
@@ -77,16 +60,17 @@ void Application::init()
 		LOG_INFO("redo triggered");
 		App::getModule<StateManager>().redo();
 	});
-}
 
-void Application::initModules()
-{
-	for (auto& [_, m] : m_modules)
-	{
-		m->init();
-	}
+	// Former initI3T member function
+	const auto conf = loadConfig("Config.json");
+	createModule<Core::ResourceManager>();
+	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
 
-	App::getModule<StateManager>().createEmptyScene();
+	m_viewport = new Vp::Viewport();
+	m_viewport->init(Vp::ViewportSettings());
+
+	// Call implementation of init() in derived class
+	onInit();
 }
 
 //===----------------------------------------------------------------------===//
@@ -211,44 +195,15 @@ void Application::logicUpdate(double delta)
 	viewport()->update(delta);
 }
 
-void Application::finalize()
-{
-	for (auto& [_, m] : m_modules)
-		m->onClose();
-
-	delete m_viewport; // TODO: (DR) Maybe turn into a smart pointer
-
-	m_window->finalize();
-
-	s_instance.reset();
-}
-
-bool Application::initI3T()
-{
-	// getchar();printf("a\n");
-	// loadConfig();
-	const auto conf = loadConfig("Config.json");
-	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
-
-	m_viewport = new Vp::Viewport();
-	m_viewport->init(Vp::ViewportSettings());
-
-	return true;
-}
-
 Application& Application::get()
 {
 	return *s_instance;
 }
 
+/// \todo Remove this dependency
 UIModule* Application::getUI()
 {
 	return &getModule<UIModule>();
-}
-
-World* Application::world()
-{
-	return m_world;
 }
 
 Vp::Viewport* Application::viewport()
@@ -258,6 +213,7 @@ Vp::Viewport* Application::viewport()
 
 void Application::onBeforeClose()
 {
+	/// \todo MH move this to the UI module
 	getUI()->getWindowManager().showUniqueWindow<BeforeCloseModal>();
 }
 
@@ -272,4 +228,4 @@ void Application::enqueueCommand(ICommand* command)
 }
 
 // Statics
-std::shared_ptr<Application> Application::s_instance = nullptr;
+Application* Application::s_instance = nullptr;

@@ -3,14 +3,15 @@
 #include "Core/Nodes/Operations.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 
-#include "Common.h"
 #include "Core/Nodes/Utils.h"
 #include "Generator.h"
+#include "I3T.h"
 
 /// Needs to be read carefully!
 TEST(UndoRedoTest, Basic)
 {
-	createTestApplication();
+	I3TApplication app;
+	app.init();
 
 	const auto workspace = I3T::getWindowPtr<WorkspaceWindow>();
 	ASSERT_TRUE(workspace != nullptr);
@@ -87,6 +88,4 @@ TEST(UndoRedoTest, Basic)
 	App::getModule<StateManager>().undo();
 	App::getModule<StateManager>().redo();
 	EXPECT_TRUE(Math::eq(mat, nodes[2]->getNodebase()->getData().getMat4()));
-
-	destroyTestApplication();
 }

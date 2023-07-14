@@ -64,30 +64,14 @@
  *        If selected, gives warnings about stale code.
  */
 
-// Uncomment this to create a standalone release version
-// #define RELEASE_STANDALONE     //PF Nepouzivat!!! Je definovan target Release
-// Standalone a v nem je toto definov�no
-// - outdir je ../release
-// - hleda data v miste, kde je spusten
-// - negeneruje pdb
-
 #include <filesystem>
 #include <string>
-#include <unordered_map>
-
-#include "pgr.h"
-#include "sol/sol.hpp"
 
 #include "Commands/ApplicationCommands.h"
-#include "Config.h"
-#include "Core/Application.h"
-#include "Core/Defs.h"
-#include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "I3T.h"
 #include "Logger/Logger.h"
 
 #include "Utils/Other.h"
-
-int window; ///< current main window
 
 static const std::string DIE_SEND_MAIL = "If it does not help, send me an email to felkepet@fel.cvut.cz with the "
                                          "snapshot of the program messages "
@@ -132,15 +116,6 @@ static const std::string DIE_TEXT_PROGRAM_INIT =
     " \n" +
     DIE_SEND_MAIL;
 
-// Dal�� sd�len�
-//- jako v�ukov� sc�ny pou�ijte 01xxx ... 0nxxx
-//- ostatn� sc�ny jsou taky u�ite�n� a demonstruj� dal�� transformace a �lohy z
-// grafiky a schopnosti n�stroje I3T, ale
-// nejsou sou��st� testov�n�
-//- vydr�te se pros�m s nik�m z jin�ch cvi�en� n�sleduj�c� 2 t�dny nebavit o
-// testov�n� a o n�stroji I3T, zkreslilo by
-// to v�sledek testov�n�
-//"
 /**
  * \brief	Main entry-point for this application
  *
@@ -162,34 +137,14 @@ int main(int argc, char* argv[])
 	LOG_INFO("Working directory is {}.", std::filesystem::current_path().string());
 
 	// Get application instance.
-	std::shared_ptr<Application> app = std::make_shared<Application>();
-
-	/// \todo Move this to Application::init function.
-	// I. Create GLFW window and OpenGL context.
-	app->initWindow();
-
-	// Initialize all modules.
-	app->init();
-
-	// III. Initialize I3T stuff,
-	// read other config files.
-	// Load objects(geometry and textures), create the world and load the initial
-	// scene. Loads the shaders, updates the camera mode.
-	if (!app->initI3T())
 	{
-		SystemDialogs::FireErrorMessageDialog("I3T", DIE_TEXT_PROGRAM_INIT);
-		LOG_FATAL("Cannot initialize I3T stuffs.");
-		exit(-1);
+		I3TApplication app;
+
+		// Initialize all modules.
+		app.init();
+
+		app.run();
 	}
-
-	app->initModules();
-
-	//
-
-	app->run();
-
-	app->finalize();
-	app.reset();
 
 	LOG_INFO("I3T is now exited.");
 

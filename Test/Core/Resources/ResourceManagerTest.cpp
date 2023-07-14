@@ -3,22 +3,21 @@
 #include "Common.h"
 #include "Core/Resources/ResourceManager.h"
 #include "Core/Window.h"
+#include "I3T.h"
 #include "Logger/Logger.h"
 #include "Utils/Color.h"
 #include "Viewport/Shaper.h"
 
 class ResourceManagerTest : public ::testing::Test
 {
-protected:
-	void SetUp() override
+public:
+	ResourceManagerTest()
 	{
-		createTestApplication(false);
+		app.init();
 	}
 
-	void TearDown() override
-	{
-		destroyTestApplication();
-	}
+private:
+	I3TApplication app;
 };
 
 TEST_F(ResourceManagerTest, TextureTest)

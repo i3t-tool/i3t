@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Core/API.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "I3T.h"
 #include "State/StateManager.h"
 #include "State/Stateful.h"
 
@@ -19,7 +20,8 @@ const auto& getNodes(Ptr<WorkspaceWindow> workspaceWindow)
 /// \todo This test may require the OpenGL context!
 TEST(StateTest, SceneCanBeSavedAndLoaded)
 {
-	createTestApplication();
+	I3TApplication app;
+	app.init();
 
 	const auto scenePath = "Test/State/TestScene.json";
 	const auto emptyScenePath = "Test/State/EmptyScene.json";
@@ -88,13 +90,12 @@ TEST(StateTest, SceneCanBeSavedAndLoaded)
 
 		// ASSERT_TRUE(getNodes(workspace).size() == nodes.size());
 	}
-
-	destroyTestApplication();
 }
 
 TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 {
-	createTestApplication();
+	I3TApplication app;
+	app.init();
 
 	const auto scenePath = "Test/State/TestScene.json";
 
@@ -165,6 +166,4 @@ TEST(StateTest, TransformsAreSavedAndLoadedProperly)
 		EXPECT_TRUE(!scaleNode->hasSynergies());
 		EXPECT_TRUE(Math::eq(scaleNode->getSavedValue(), glm::scale(randomVec3)));
 	}
-
-	destroyTestApplication();
 }

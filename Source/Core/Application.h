@@ -1,26 +1,19 @@
 #pragma once
 
-#include <array>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "gl_core_4_4.h"
-#include "imgui.h"
-
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "Core/Window.h"
-#include "State/Stateful.h"
 
 static inline const std::string BASE_WINDOW_TITLE = "I3T - An Interactive Tool for Teaching Transformations";
 
 class ICommand;
 class Window;
 class MainMenuBar;
-class World;
-class Scripting;
 class UIModule;
 
 namespace Vp
@@ -32,21 +25,17 @@ class Viewport;
  * Application class.
  * A wrapper for UI windows.
  */
-class Application : public std::enable_shared_from_this<Application>
+class Application
 {
-public:
-	Application() = default;
-	~Application() = default;
+protected:
+	Application();
 
-	/**
-	 * \fn	void finalize()
-	 *
-	 * \brief	Finalize application
-	 *
-	 * 			Delete the object tree, world, shaders, textures, geometries,
-	 * tabSpace, shaper.
-	 */
-	void finalize();
+private:
+	Application(const Application&) = default;
+	Application& operator=(const Application&) = default;
+
+public:
+	~Application();
 
 	static Application& get();
 	UIModule* getUI();
@@ -79,8 +68,6 @@ public:
 	 */
 	void run();
 
-	World* world();
-
 	Vp::Viewport* viewport();
 
 	/**
@@ -92,41 +79,29 @@ public:
 	 */
 	void enqueueCommand(ICommand* command);
 
+	/// Performs initialization of the application.
+	/// 1. Initializes the window and OpenGL context.
 	void init();
 
-	/// \todo MH This function must be called after world instantiation.
-	void initModules();
+protected:
+	virtual void onInit() {}
 
-	/**
-	 * \brief	Initializes renderer and scene.
-	 */
-	bool initI3T();
-
-private:
+public:
+	/// Creates instance of module, registers it to the application, and calls its init() method.
 	template <typename T, typename... Args> static auto& createModule(Args&&... args);
 
 public:
 	template <typename T> static T& getModule();
 
 private:
-	static std::shared_ptr<Application> s_instance;
+	static Application* s_instance;
 
 	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;
 
-	// TODO: (DR) Unused
-	/**
-	 * \brief	Window display flag - if true, it disables the onDisplay callback
-	 * resulting in no window update.
-	 */
-	bool m_isPaused;
-
 	bool m_bShouldClose = false;
 
-	World* m_world;
 	Vp::Viewport* m_viewport;
 
-	Scripting* m_scriptInterpreter;
-	// GLFWwindow* m_window;
 	Window* m_window;
 
 	/// Array of commands which the application is going to process in its main
@@ -177,6 +152,7 @@ template <typename T, typename... Args> inline auto& Application::createModule(A
 	const auto hash = typeid(T).hash_code();
 	auto& self = Application::get();
 	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
+	self.m_modules[hash]->init();
 
 	return *self.m_modules[hash];
 }

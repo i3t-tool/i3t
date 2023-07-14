@@ -2,6 +2,7 @@
 
 #include "GUI/Elements/Nodes/Tools.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
+#include "I3T.h"
 
 #include "Common.h"
 
@@ -9,7 +10,8 @@ using namespace Core;
 
 TEST(NodeToolsTest, CopyNodes)
 {
-	createTestApplication();
+	I3TApplication app;
+	app.init();
 
 	const auto f1 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
 	const auto f2 = addNodeToNodeEditor<WorkspaceOperator<EOperatorType::FloatToFloat>>();
@@ -49,6 +51,4 @@ TEST(NodeToolsTest, CopyNodes)
 	const auto addNodeInput = addNode->getNodebase()->getInput(0);
 	EXPECT_TRUE(addNodeInput.isPluggedIn());
 	EXPECT_EQ(addNodeInput.getParentPin()->getOwner()->getId(), valueNode->getNodebase()->getId());
-
-	destroyTestApplication();
 }

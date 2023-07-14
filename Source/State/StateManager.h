@@ -16,6 +16,8 @@ public:
 	/// \warning Class is statically initialized, originators are not set!
 	StateManager();
 
+	void init() override;
+
 	void takeSnapshot();
 	void undo();
 	void redo();

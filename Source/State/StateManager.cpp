@@ -1,5 +1,6 @@
 #include "StateManager.h"
 
+#include "Commands/ApplicationCommands.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
@@ -16,6 +17,15 @@ static std::vector<std::string> readRecentFiles()
 StateManager::StateManager()
 {
 	m_recentFiles = readRecentFiles();
+}
+
+void StateManager::init()
+{
+	NewProjectCommand::addListener([]() {
+		App::getModule<StateManager>().newScene();
+	});
+
+	createEmptyScene();
 }
 
 void StateManager::takeSnapshot()

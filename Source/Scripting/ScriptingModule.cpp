@@ -3,6 +3,7 @@
 #include <functional>
 #include <string_view>
 
+#include "Commands/ApplicationCommands.h"
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
 #include "Core/Nodes/Operations.h"
@@ -100,6 +101,13 @@ template <typename T> static bool setDefaultValue(Ptr<GuiTransform> guiNode, con
 
 void ScriptingModule::init()
 {
+	// Setup I3T commands
+	ConsoleCommand::addListener([this](std::string c) {
+		runScript(c.c_str());
+	});
+
+	// Setup Lua
+
 	g_printRef = [this](const std::string& str) {
 		print(str);
 	};
