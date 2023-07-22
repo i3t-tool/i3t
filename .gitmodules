@@ -46,3 +46,6 @@
 [submodule "Dependencies/ImGuizmo/ImGuizmo"]
 	path = Dependencies/ImGuizmo/ImGuizmo
 	url = https://github.com/xDUDSSx/ImGuizmo.git
+[submodule "Dependencies/rttr"]
+	path = Dependencies/rttr
+	url = https://github.com/rttrorg/rttr.git

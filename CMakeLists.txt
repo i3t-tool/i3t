@@ -23,6 +23,8 @@ include_directories(Dependencies/lua/lua)
 include_directories(Dependencies/magic_enum/include)
 include_directories(Dependencies/pgr-framework/include)
 include_directories(Dependencies/portable-file-dialogs)
+include_directories(Dependencies/rttr/src)
+include_directories(Dependencies/rttr-generated/src)
 include_directories(Dependencies/sol2/include)
 include_directories(Dependencies/spdlog/include)
 include_directories(Dependencies/yaml-cpp/include)
@@ -107,6 +109,17 @@ add_subdirectory(Dependencies/sol2)
 add_subdirectory(Dependencies/spdlog)
 add_subdirectory(Dependencies/yaml-cpp)
 add_subdirectory(Dependencies/ImGuizmo)
+
+set(BUILD_RTTR_DYNAMIC OFF CACHE BOOL "Build rttr as dynamic library.")
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "Build unit tests.")
+set(BUILD_WITH_STATIC_RUNTIME_LIBS ON CACHE BOOL "Build with static runtime libraries.")
+set(BUILD_STATIC ON CACHE BOOL "Build static libraries.")
+set(BUILD_BENCHMARKS OFF CACHE BOOL "Build benchmarks.")
+set(BUILD_EXAMPLES OFF CACHE BOOL "Build examples.")
+set(BUILD_DOCUMENTATION OFF CACHE BOOL "Build documentation.")
+set(BUILD_INSTALLER OFF CACHE BOOL "Build installer.")
+set(BUILD_PACKAGE OFF CACHE BOOL "Build package.")
+add_subdirectory(Dependencies/rttr)
 # =============================================================
 
 # ======== Source groups ======================================
@@ -166,6 +179,7 @@ target_link_libraries(
         assimp
         glfw
         lua
+        RTTR::Core_Lib
         sol2
         yaml-cpp
         ImGuizmo
@@ -201,6 +215,7 @@ target_link_libraries(
         assimp
         glfw
         lua
+        RTTR::Core_Lib
         sol2
         spdlog
         yaml-cpp
