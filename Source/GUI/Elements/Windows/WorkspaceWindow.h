@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 #include "Config.h"
 
@@ -28,6 +28,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Nodes/Id.h"
+#include "Core/Result.h"
 
 #include "GUI/Elements/IWindow.h"
 #include "GUI/Elements/Nodes/Tools.h"
@@ -125,7 +126,7 @@ public:
 	 * @param id
 	 * @return
 	 */
-	template <typename T> Result<Ptr<T>, std::string> getNode(Core::ID id) const;
+	template <typename T> Result<Ptr<T>, Error> getNode(Core::ID id) const;
 
 	template <typename T> void addTypeConstructorNode()
 	{
@@ -310,23 +311,27 @@ inline bool connectNodes(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWi
 
 //
 
-template <typename T> Result<Ptr<T>, std::string> WorkspaceDiwne::getNode(Core::ID id) const
+template <typename T> Result<Ptr<T>, Error> WorkspaceDiwne::getNode(Core::ID id) const
 {
 	Ptr<GuiNode> node{};
 	for (const auto& n : getAllNodes())
+	{
 		if (n->getNodebase()->getId() == id)
+		{
 			node = n;
+		}
+	}
 
 	if (node == nullptr)
 	{
-		return std::string{"cannot find node #" + std::to_string(id)};
+		return Err("cannot find node #" + std::to_string(id));
 	}
 
 	auto result = std::dynamic_pointer_cast<T>(node);
 
 	if (result == nullptr)
 	{
-		return std::string{"node #" + std::to_string(id) + " is not of given type"};
+		return Err("node #" + std::to_string(id) + " is not of given type");
 	}
 
 	return result;

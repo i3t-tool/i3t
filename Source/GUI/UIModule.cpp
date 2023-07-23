@@ -16,7 +16,6 @@
 #include "GUI/Elements/Windows/ViewportWindow.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "GUI/WindowManager.h"
-#include "Loader/ConfigLoader.h"
 #include "Loader/ThemeLoader.h"
 #include "Utils/HSLColor.h"
 
@@ -42,7 +41,7 @@ void UIModule::init()
 	ImGuiIO& io = ImGui::GetIO();
 	(void) io;
 
-	// Load themes to be usable in window initializations
+	// Load Themes to be usable in window initializations
 	loadFonts();
 	loadThemes();
 	m_currentTheme->apply();
@@ -142,27 +141,46 @@ void UIModule::onClose()
 
 void UIModule::loadThemes()
 {
-	std::string themesDir = "Data/themes";
+	constexpr auto MAX_THEMES_COUNT = 10;
+	const std::string themesDir = "Data/Themes";
 
 	m_allThemes.push_back(Theme::createDefaultClassic());
 	m_allThemes.push_back(Theme::createDefaultModern());
-	auto defaultThemesCount = m_allThemes.size();
 
+	// Load all themes at Data/Themes directory.
 	bool canLoadDefault = false;
-	for (auto& entry : fs::directory_iterator(themesDir))
+	const auto entries = fs::directory_iterator(themesDir);
+
+	//
+	m_allThemes.reserve(MAX_THEMES_COUNT);
+
+	for (auto& entry : entries)
 	{
+		if (m_allThemes.size() >= MAX_THEMES_COUNT)
+		{
+			LOG_WARN("Maximum number ({}) of loaded themes reached.", MAX_THEMES_COUNT)
+			break;
+		}
+
 		if (entry.path().filename().string()[0] == '.' || entry.is_directory())
 		{
 			continue;
 		}
 
-		if (auto theme = loadTheme(entry))
+		if (auto maybeTheme = loadTheme(entry))
 		{
-			// Check if theme name doesn't collide with default themes names.
-			bool canLoadTheme = true;
-			for (auto i = 0L; i < defaultThemesCount; ++i)
+			if (!maybeTheme)
 			{
-				if (m_allThemes[i].getName() == (*theme).getName())
+				continue;
+			}
+
+			const auto& theme = maybeTheme.value();
+
+			// Check if theme name doesn't collide with default Themes names.
+			bool canLoadTheme = true;
+			for (const auto& otherTheme : m_allThemes)
+			{
+				if (otherTheme.getName() == theme.getName())
 				{
 					canLoadTheme = false;
 				}
@@ -170,12 +188,14 @@ void UIModule::loadThemes()
 
 			if (canLoadTheme)
 			{
-				m_allThemes.push_back(*theme);
-				if (m_allThemes.back().getName() == Config::DEFAULT_THEME)
+				m_allThemes.push_back(theme);
+				if (theme.getName() == getUserData().themeName)
 				{
 					canLoadDefault = true;
 					m_currentTheme = &m_allThemes.back();
 					setTheme(m_allThemes.back());
+
+					LOG_INFO("Set default theme: {}", theme.getName());
 				}
 			}
 		}
@@ -198,8 +218,8 @@ void UIModule::setTheme(const Theme& theme)
 	m_currentTheme = (Theme*) &theme;
 	m_currentTheme->apply();
 
-	Config::DEFAULT_THEME = theme.getName();
-	saveConfig();
+	getUserData().themeName = theme.getName();
+	Application::getModule<StateManager>().saveUserData();
 }
 
 void UIModule::loadFonts()

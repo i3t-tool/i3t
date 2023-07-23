@@ -1,20 +1,19 @@
 #pragma once
 
 #include <deque>
+#include <filesystem>
 #include <vector>
 
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "State/Stateful.h"
+#include "UserData.h"
 
 /// Handles app state management.
 class StateManager : public Module
 {
 public:
-	/// Implicitly creates the initial state (Memento with index 0).
-	///
-	/// \warning Class is statically initialized, originators are not set!
-	StateManager();
+	StateManager() = default;
 
 	void init() override;
 
@@ -55,7 +54,7 @@ public:
 
 	//===-- Files manipulation functions ------------------------------------===//
 
-	bool loadScene(const fs::path& scene);
+	bool loadScene(const fs::path& path);
 
 	bool saveScene();
 	bool saveScene(const fs::path& scene);
@@ -69,16 +68,10 @@ public:
 		return m_currentScene;
 	}
 
-	//===-- Recent files ----------------------------------------------------===//
-
-	const std::vector<std::string>& getRecentFiles()
-	{
-		return m_recentFiles;
-	}
-
-	//===--------------------------------------------------------------------===//
-
 	void newScene();
+
+	void loadUserData();
+	void saveUserData();
 
 private:
 	void setWindowTitle();
@@ -100,6 +93,4 @@ private:
 	int m_currentStateIdx;
 	std::deque<Memento> m_mementos;
 	std::deque<long> m_hashes;
-
-	std::vector<std::string> m_recentFiles;
 };

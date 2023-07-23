@@ -275,28 +275,28 @@ void ScriptingModule::init()
 	                   {
 		                   const auto result = getNodeEditor().getNode<GuiNode>(id);
 
-		                   if (result.isErr())
+		                   if (!result)
 		                   {
-			                   print(result.err());
+			                   print(result.error().str());
 
 			                   return nullptr;
 		                   }
 
-		                   return result.unwrap();
+		                   return result.value();
 	                   });
 
 	m_Lua.set_function("get_transform", [this](Core::ID id) -> Ptr<GuiTransform>
 	                   {
 		                   const auto result = getNodeEditor().getNode<GuiTransform>(id);
 
-		                   if (result.isErr())
+		                   if (!result)
 		                   {
-			                   print(result.err());
+			                   print(result.error().str());
 
 			                   return nullptr;
 		                   }
 
-		                   return result.unwrap();
+		                   return result.value();
 	                   });
 
 	m_Lua.set_function("delete", [](const Core::ID id)

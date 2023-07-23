@@ -27,7 +27,10 @@ TEST(SerdeTest, SimpleStruct)
 {
 	TestStruct data{"test", "/tmp/test", 1, 1.0f};
 
-	std::string json = JSON::serialize(data);
+	auto serdeResult = JSON::serialize(data);
+	ASSERT_TRUE(serdeResult);
+
+	auto json = serdeResult.value();
 	std::cout << json << std::endl;
 
 	TestStruct result;

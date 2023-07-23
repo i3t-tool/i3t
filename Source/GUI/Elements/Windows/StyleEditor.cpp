@@ -75,9 +75,9 @@ void StyleEditor::renderSaveRevertField()
 	}
 	ImGui::SameLine();
 
-	if (GUI::Button("Reload all themes"))
+	if (GUI::Button("Reload all Themes"))
 	{
-		// Reload themes from Data/themes
+		// Reload Themes from Data/Themes
 		I3T::getUI()->reloadThemes();
 	}
 	ImGui::SameLine();
@@ -85,7 +85,7 @@ void StyleEditor::renderSaveRevertField()
 
 	ImGui::Separator();
 
-	ImGui::TextUnformatted("Save current modifications to file (discards unsaved changes on other themes)");
+	ImGui::TextUnformatted("Save current modifications to file (discards unsaved changes on other Themes)");
 
 	if (curr.getName() != "classic" && curr.getName() != "modern")
 	{
@@ -99,7 +99,7 @@ void StyleEditor::renderSaveRevertField()
 	// Save current theme to file.
 	if (ImGui::Button("Save as"))
 	{
-		auto path = std::string("Data/themes/") + m_newThemeName + ".yml";
+		auto path = std::string("Data/Themes/") + m_newThemeName + ".yml";
 		static std::regex invalidCharsRe(R"([\\\/\:\*\?\"\<\>\|])");
 
 		if (m_newThemeName.empty())
@@ -108,7 +108,7 @@ void StyleEditor::renderSaveRevertField()
 		}
 		else if (m_newThemeName == "classic" || m_newThemeName == "modern")
 		{
-			m_infoMessage = "Cannot overwrite default themes.";
+			m_infoMessage = "Cannot overwrite default Themes.";
 		}
 		else if (std::regex_search(m_newThemeName, invalidCharsRe))
 		{
@@ -140,7 +140,7 @@ void StyleEditor::saveCurrentTheme(const std::string& name)
 	{
 		themeName = m_newThemeName;
 	}
-	auto path = std::string("Data/themes/") + themeName + ".yml";
+	auto path = std::string("Data/Themes/") + themeName + ".yml";
 
 	saveTheme(path, curr);
 	I3T::getUI()->reloadThemes();
@@ -174,7 +174,7 @@ void StyleEditor::revertChangesOnCurrentTheme()
 	}
 	else
 	{
-		auto path = std::string("Data/themes/") + curr.getName() + ".yml";
+		auto path = std::string("Data/Themes/") + curr.getName() + ".yml";
 		if (auto theme = loadTheme(path))
 		{
 			I3T::emplaceTheme(*theme);

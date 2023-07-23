@@ -7,23 +7,22 @@
 #include "Utils/Random.h"
 #include "Utils/Text.h"
 
-static std::vector<std::string> readRecentFiles()
-{
-	return {};
-
-	/// \todo Implement!
-}
-
-StateManager::StateManager()
-{
-	m_recentFiles = readRecentFiles();
-}
-
 void StateManager::init()
 {
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
 	});
+
+	// Create UserData folder if it doesn't exist.
+	fs::create_directory(USER_DATA_DIR);
+
+	// Create UserData/Global.json if it doesn't exist.
+	if (!fs::exists(USER_DATA_FILE))
+	{
+		saveUserData();
+	}
+
+	loadUserData();
 
 	createEmptyScene();
 }
@@ -120,9 +119,9 @@ void StateManager::createEmptyScene()
 
 //===-- Files manipulation functions --------------------------------------===//
 
-bool StateManager::loadScene(const fs::path& scene)
+bool StateManager::loadScene(const fs::path& path)
 {
-	const auto maybeScene = JSON::parse(scene, "Data/Schemas/Scene.schema.json");
+	const auto maybeScene = JSON::parse(path, "Data/Schemas/Scene.schema.json");
 
 	if (!maybeScene.has_value())
 	{
@@ -134,7 +133,9 @@ bool StateManager::loadScene(const fs::path& scene)
 		originator->setState(maybeScene.value(), true);
 	}
 
-	m_currentScene = scene;
+	m_currentScene = path;
+	getUserData().pushRecentFile(path.string());
+	saveUserData();
 
 	reset();
 
@@ -168,6 +169,44 @@ void StateManager::newScene()
 	m_currentScene = "";
 
 	reset();
+}
+
+void StateManager::loadUserData()
+{
+	auto& data = getUserData();
+
+	// Load UserData/Global.json.
+	auto result = JSON::deserialize(fs::path(USER_DATA_FILE), data);
+	if (!result)
+	{
+		LOG_ERROR("Failed to load UserData/Global.json: {}", result.error());
+	}
+
+	// Prune non-existing recent files.
+	for (auto it = data.recentFiles.begin(); it != data.recentFiles.end();)
+	{
+		auto path = fs::path(*it);
+		if (!fs::exists(path))
+		{
+			LOG_INFO("Pruning non-existing recent file: {}", path.string())
+			it = data.recentFiles.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+
+void StateManager::saveUserData()
+{
+	auto& data = getUserData();
+
+	auto result = JSON::serialize(data, USER_DATA_FILE);
+	if (!result)
+	{
+		LOG_ERROR("Failed to create initial UserData/Global.json: {}", result.error());
+	}
 }
 
 void StateManager::setWindowTitle()
