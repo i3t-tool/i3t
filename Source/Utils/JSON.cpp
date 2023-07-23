@@ -476,10 +476,12 @@ bool save(const fs::path& path, const rapidjson::Document& document)
 	return true;
 }
 
-std::string serialize(rttr::instance obj)
+Result<std::string, Error> serialize(rttr::instance obj)
 {
 	if (!obj.is_valid())
-		return std::string();
+	{
+		return Err("invalid reflected object to serialize");
+	}
 
 	StringBuffer sb;
 	PrettyWriter<StringBuffer> writer(sb);
@@ -489,19 +491,61 @@ std::string serialize(rttr::instance obj)
 	return sb.GetString();
 }
 
-bool deserialize(const std::string& json, rttr::instance obj)
+Result<Void, Error> serialize(rttr::instance obj, const fs::path& path)
+{
+	auto result = serialize(obj);
+	if (!result)
+	{
+		return Err(result.error());
+	}
+
+	try
+	{
+		std::ofstream file(path);
+		file << result.value();
+	}
+	catch (...)
+	{
+		return Err("unable to save serialized JSON to file " + path.string() + "!");
+	}
+
+	return Void{};
+}
+
+Result<Void, Error> deserialize(const std::string& json, rttr::instance obj)
 {
 	Document document; // Default template parameter uses UTF8 and MemoryPoolAllocator.
 
 	// "normal" parsing, decode strings to new buffers. Can use other input stream via ParseStream().
 	if (document.Parse(json.c_str()).HasParseError())
 	{
-		return false;
+		return Err("unable to parse JSON");
 	}
 
 	fromjson_recursively(obj, document);
 
-	return true;
+	return deserialize(document, obj);
+}
+
+Result<Void, Error> deserialize(rapidjson::Value& document, rttr::instance obj)
+{
+#ifdef GetObject
+#undef GetObject
+#endif
+
+	fromjson_recursively(obj, document);
+
+	return Void{};
+}
+
+Result<Void, Error> deserialize(const fs::path& path, rttr::instance obj)
+{
+	if (auto maybeJson = parse(path))
+	{
+		return deserialize(maybeJson.value(), obj);
+	}
+
+	return Err("unable to open JSON file " + path.string());
 }
 
 bool merge(rapidjson::Value& dstObject, rapidjson::Value& srcObject, rapidjson::Document::AllocatorType& allocator)

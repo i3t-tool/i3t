@@ -86,8 +86,6 @@ struct Config
 	static std::string TUTORIALS_FOLDER;
 	static std::string TEXTURE_FOLDER;
 
-	static std::string DEFAULT_THEME;
-
 	//@{
 
 	/**

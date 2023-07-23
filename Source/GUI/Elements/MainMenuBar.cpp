@@ -43,6 +43,31 @@ static bool importContentDialog(std::filesystem::path& result, const std::string
 	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 }
 
+//
+
+static void showRecentFiles()
+{
+	const auto& recentFiles = getUserData().recentFiles;
+	if (recentFiles.empty())
+	{
+		ImGui::Text("No recent files");
+	}
+
+	std::optional<std::string> sceneToOpen;
+	for (auto it = recentFiles.rbegin(); it != recentFiles.rend(); ++it)
+	{
+		if (ImGui::MenuItem(it->c_str()))
+		{
+			sceneToOpen = *it;
+		}
+	}
+
+	if (sceneToOpen)
+	{
+		App::getModule<StateManager>().loadScene(*sceneToOpen);
+	}
+}
+
 static void saveAs()
 {
 	std::filesystem::path filename;
@@ -132,16 +157,18 @@ void MainMenuBar::showFileMenu()
 		}
 		ImGui::Separator();
 
-		if (ImGui::BeginMenu("Recent"))
-		{
-			/// \todo Handle recent files.
-			ImGui::EndMenu();
-		}
-
 		if (ImGui::MenuItem("Open", "Ctrl+O"))
 		{
 			open();
 		}
+
+		if (ImGui::BeginMenu("Recent"))
+		{
+			showRecentFiles();
+
+			ImGui::EndMenu();
+		}
+		ImGui::Separator();
 
 		if (ImGui::MenuItem("Save", "Ctrl+S"))
 		{

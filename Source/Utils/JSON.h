@@ -16,6 +16,7 @@
 
 #include "Core/Defs.h"
 #include "Core/Nodes/NodeData.h"
+#include "Core/Result.h"
 #include "Logger/Logger.h"
 #include "Utils/Filesystem.h"
 
@@ -127,9 +128,15 @@ inline std::optional<Core::Data> getData(const rapidjson::Value& value, Core::EV
 	return std::nullopt;
 }
 
-std::string serialize(rttr::instance obj);
+Result<std::string, Error> serialize(rttr::instance obj);
 
-bool deserialize(const std::string& json, rttr::instance obj);
+Result<Void, Error> serialize(rttr::instance obj, const fs::path& path);
+
+Result<Void, Error> deserialize(const std::string& json, rttr::instance obj);
+
+Result<Void, Error> deserialize(rapidjson::Value& document, rttr::instance obj);
+
+Result<Void, Error> deserialize(const fs::path& path, rttr::instance obj);
 
 /// Don't know how to implement this without copying...
 /*
