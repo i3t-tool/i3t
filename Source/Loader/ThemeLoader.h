@@ -1,7 +1,8 @@
 #pragma once
 
 #include <filesystem>
-#include <optional>
+
+#include "Core/Result.h"
 
 namespace fs = std::filesystem;
 
@@ -13,8 +14,4 @@ class Theme;
  */
 void saveTheme(const fs::path& path, Theme& theme);
 
-/**
- *
- * \return True on success, false if file does not exit.
- */
-std::optional<Theme> loadTheme(const fs::path& path);
+std::expected<Theme, Error> loadTheme(const fs::path& path);

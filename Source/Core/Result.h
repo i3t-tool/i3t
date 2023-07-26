@@ -7,6 +7,7 @@
 #include <expected>
 #include <string>
 
+#include "Core/Format.h"
 #include "Core/Types.h"
 
 struct Error

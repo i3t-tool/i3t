@@ -113,12 +113,22 @@ void saveTheme(const fs::path& path, Theme& theme)
 	outfile.close();
 }
 
-std::optional<Theme> loadTheme(const fs::path& path)
+std::expected<Theme, Error> loadTheme(const fs::path& path)
 {
 	if (!doesFileExists(path.string().c_str()))
-		return std::nullopt;
+	{
+		return Err("File does not exist");
+	}
 
-	auto yaml = YAML::LoadFile(path.string());
+	YAML::Node yaml;
+	try
+	{
+		yaml = YAML::LoadFile(path.string());
+	}
+	catch (const std::exception& e)
+	{
+		return Err(std::string(e.what()));
+	}
 
 	auto name = path.stem().string();
 

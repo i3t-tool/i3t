@@ -4,9 +4,9 @@
 #include "GUI/ImGui/imgui_impl_opengl3.h"
 
 #include "Commands/ApplicationCommands.h"
-#include "Config.h"
 #include "Core/Input/InputBindings.h"
 #include "Core/Input/InputManager.h"
+#include "Core/Result.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
@@ -167,36 +167,36 @@ void UIModule::loadThemes()
 			continue;
 		}
 
-		if (auto maybeTheme = loadTheme(entry))
+		auto result = loadTheme(entry);
+
+		if (!result)
 		{
-			if (!maybeTheme)
+			LOG_WARN("Failed to load theme {}: {}", entry.path().string(), result.error());
+			continue;
+		}
+
+		const auto& theme = result.value();
+
+		// Check if theme name doesn't collide with default Themes names.
+		bool canLoadTheme = true;
+		for (const auto& otherTheme : m_allThemes)
+		{
+			if (otherTheme.getName() == theme.getName())
 			{
-				continue;
+				canLoadTheme = false;
 			}
+		}
 
-			const auto& theme = maybeTheme.value();
-
-			// Check if theme name doesn't collide with default Themes names.
-			bool canLoadTheme = true;
-			for (const auto& otherTheme : m_allThemes)
+		if (canLoadTheme)
+		{
+			m_allThemes.push_back(theme);
+			if (theme.getName() == getUserData().themeName)
 			{
-				if (otherTheme.getName() == theme.getName())
-				{
-					canLoadTheme = false;
-				}
-			}
+				canLoadDefault = true;
+				m_currentTheme = &m_allThemes.back();
+				setTheme(m_allThemes.back());
 
-			if (canLoadTheme)
-			{
-				m_allThemes.push_back(theme);
-				if (theme.getName() == getUserData().themeName)
-				{
-					canLoadDefault = true;
-					m_currentTheme = &m_allThemes.back();
-					setTheme(m_allThemes.back());
-
-					LOG_INFO("Set default theme: {}", theme.getName());
-				}
+				LOG_INFO("Set default theme: {}", theme.getName());
 			}
 		}
 	}

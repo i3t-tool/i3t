@@ -1,17 +1,12 @@
 # I3T
 Věnujte prosím velkou pozornost [programovacím konvencím projektu](Docs/Conventions.md).
 
-## Sestavení
-Následující tabulka popisuje, na jaké platformě s jakými nástroji je projekt možné sestavit.
-Naší ambicí je, aby fungoval na všech uvedených platformách.
+## Build
+You will need C++23 compiler with support for `std::expected`, 
+see [compiler support](https://en.cppreference.com/w/cpp/compiler_support) for more information
+about compiler versions.
 
-| Platforma  | Arch.       | Konfigurace | CMake generátor      | Kompilátor | Stav  |
-|------------|-------------|-------------|----------------------|------------|-------|
-| Windows    | Win32, x64  | Všechny     | Visual Studio        | cl.exe     | ✅    |
-| Windows    | Win32, x64  | Všechny     | NMake Makefiles      | cl.exe     | ✅    |
-| Unix-like  | x86/x64     | Všechny     | Unix Makefiles       | g++, clang | ✅    |
-
-Pro sestavení postupujte prosím dle [návodu](Docs/Build.md).
+For more information about building the project, see [build instructions](Docs/Build.md).
 
 ## Struktura projektu
 ````
