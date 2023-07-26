@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "glm/glm.hpp"
-#include "spdlog/fmt/fmt.h"
 
+#include "Core/Format.h"
 #include "Core/Nodes/NodeData.h"
 
 namespace Utils
