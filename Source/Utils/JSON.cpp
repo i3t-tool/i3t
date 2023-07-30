@@ -423,7 +423,8 @@ std::optional<rapidjson::Document> parse(const fs::path& inputSrc)
 std::optional<rapidjson::Document> parse(const fs::path& inputSrc, const fs::path& schemaSrc)
 {
 	std::ifstream schemaFile(schemaSrc);
-	I3T_ASSERT(schemaFile.good(), "Cannot open schema file!");
+	I3T_ASSERT(schemaFile.good(), fmt::format("Cannot open schema file {}: {}, working directory is {}",
+	                                          schemaSrc.string(), strerror(errno), fs::current_path().string()));
 
 	rapidjson::Document schemaDocument;
 
