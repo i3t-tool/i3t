@@ -89,6 +89,7 @@ enum class EColor
 	// General unspecified node
 	NodeBg,
 	NodeHeader,
+	NodeFont,
 
 	// Sequence
 	NodeBgSequence,
@@ -107,8 +108,6 @@ enum class EColor
 	FloatBgTransformation,
 	FloatBgTransformationActive,
 	FloatBgTransformationHovered,
-
-	Nodes_Font,
 
 	// 5. Popups
 	Nodes_ConnectionPossible,

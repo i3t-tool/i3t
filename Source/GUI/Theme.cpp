@@ -136,6 +136,7 @@ void Theme::initClassicProperties()
 	// General unspecified node
 	set(EColor::NodeBg, createColor(255, 200, 50, 255));
 	set(EColor::NodeHeader, createColor(0, 0, 0, 30));
+	set(EColor::NodeFont, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	// Sequence
 	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
@@ -360,6 +361,7 @@ void Theme::initModernProperties()
 	// General unspecified node
 	set(EColor::NodeBg, createColor(70, 104, 134, 255));
 	set(EColor::NodeHeader, createColor(0, 0, 0, 50));
+	set(EColor::NodeFont, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	// Sequence
 	set(EColor::NodeBgSequence, ImVec4(0.541f, 0.541f, 0.541f, 1.0f));
@@ -508,8 +510,8 @@ void Theme::initNames()
 	// All category keys must be I3T_PROPERTY_NAME_OFFSET characters long.
 	g_CategoryNames["glob_"] = "Global";
 	g_CategoryNames["tuts_"] = "Tutorials";
-	g_CategoryNames["ngen_"] = "Node Editor General";
 	g_CategoryNames["npin_"] = "Node Editor Pins";
+	g_CategoryNames["ngen_"] = "Node Editor General";
 	g_CategoryNames["nops_"] = "Node Editor Operators";
 	g_CategoryNames["ntrs_"] = "Node Editor Transformations";
 	g_CategoryNames["npop_"] = "Node Editor Popups";
@@ -532,12 +534,6 @@ void Theme::initNames()
 	g_ColorNames[EColor::SelectionRectFull] = "glob_Selection rectangle full";
 	g_ColorNames[EColor::SelectionRectTouch] = "glob_Selection rectangle touch";
 
-	// Node editor colors.
-	// 1. General
-	//	g_ColorNames[EColor::NodeEditorBg]		= "ngen_Node Editor Background";
-	//	g_ColorNames[EColor::NodeHeader]			= "ngen_Node Editor Header";
-	//	g_ColorNames[EColor::Nodes_FloatText] = "ngen_Text in cells";
-
 	// Tutorials
 	g_ColorNames[EColor::TutorialBgColor] = "tuts_Background";
 	g_ColorNames[EColor::TutorialText] = "tuts_Text";
@@ -552,10 +548,12 @@ void Theme::initNames()
 	g_ColorNames[EColor::TutorialButtonBg] = "tuts_Button Background";
 	g_ColorNames[EColor::TutorialButtonActive] = "tuts_Button Active";
 	g_ColorNames[EColor::TutorialButtonHovered] = "tuts_Button Hovered";
+	g_ColorNames[EColor::TutorialTaskBg] = "tuts_Task Background";
 
-	g_ColorNames[EColor::TutorialTaskBg] = "tuts_Task Bacground";
+	// Node editor colors
+	// ------------------
 
-	// 2. Pins
+	// 1. Pins
 	g_ColorNames[EColor::PulsePin] = "npin_Pulse Pin";
 	g_ColorNames[EColor::FloatPin] = "npin_Float Pin";
 	g_ColorNames[EColor::MatrixPin] = "npin_Matrix Pin";
@@ -573,11 +571,12 @@ void Theme::initNames()
 	g_ColorNames[EColor::InnerMatrixMulPin] = "npin_Inner Color MatrixMul";
 	g_ColorNames[EColor::InnerScreenPin] = "npin_Inner Color Screen";
 
-	g_ColorNames[EColor::Item_SelectedBorder] = "nops_Item selected border";
 
-	// General unspecified node
-	g_ColorNames[EColor::NodeBg] = "nops_General node Background";
-	g_ColorNames[EColor::NodeHeader] = "nops_General node Header";
+	// 2. General unspecified node
+	g_ColorNames[EColor::NodeBg] = "ngen_General node Background";
+	g_ColorNames[EColor::NodeHeader] = "ngen_General node Header";
+	g_ColorNames[EColor::NodeFont] = "ngen_General node font (text)";
+	g_ColorNames[EColor::Item_SelectedBorder] = "ngen_Item selected border";
 
 	// 3. Operator
 	g_ColorNames[EColor::NodeBgOperator] = "nops_Operator Background";
@@ -592,26 +591,31 @@ void Theme::initNames()
 	g_ColorNames[EColor::FloatBgTransformation] = "ntrs_Transform Float Background";
 	g_ColorNames[EColor::FloatBgTransformationActive] = "ntrs_Transform Float Active";
 	g_ColorNames[EColor::FloatBgTransformationHovered] = "ntrs_Transform Float Hovered";
-
-	// 5. Popups
-	g_ColorNames[EColor::Nodes_ConnectionPossible] = "npop_Connection is possible";
-	g_ColorNames[EColor::Nodes_ConnectionNotPossible] = "npop_Connection is not possible";
-	g_ColorNames[EColor::Nodes_CreateNode] = "npop_Create node popup";
-
-	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
-	g_ColorNames[EColor::Synergies_FloatBg] = "nflo_Synergies_FloatBg";
-	g_ColorNames[EColor::Synergies_FloatBgHovered] = "nflo_Synergies_FloatBgHovered";
-	g_ColorNames[EColor::Synergies_FloatBgActive] = "nflo_Synergies_FloatBgActive";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] = "nscr_Nodes_Screen_resizeBtn_bgShape";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] = "nscr_Nodes_Screen_resizeBtn_bgInner";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] = "nscr_Nodes_Screen_resizeBtn_fgShape";
-	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] = "nscr_Nodes_Screen_resizeBtn_fgInner";
 	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgShape] = "ntrs_Nodes_Transformation_ValidIcon_bgShape";
 	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_bgInner] = "ntrs_Nodes_Transformation_ValidIcon_bgInner";
 	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgShape] = "ntrs_Nodes_Transformation_ValidIcon_fgShape";
 	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_fgInner] = "ntrs_Nodes_Transformation_ValidIcon_fgInner";
 	g_ColorNames[EColor::Nodes_Transformation_ValidIcon_padding] = "ntrs_Nodes_Transformation_ValidIcon_padding";
 	g_ColorNames[EColor::Nodes_Transformation_TrackingColor] = "ntrs_Nodes_Transformation_TrackingColor";
+
+	// 5. Popups
+	g_ColorNames[EColor::Nodes_ConnectionPossible] = "npop_Connection is possible (text)";
+	g_ColorNames[EColor::Nodes_ConnectionNotPossible] = "npop_Connection is not possible (text)";
+	g_ColorNames[EColor::Nodes_CreateNode] = "npop_Create node popup";
+
+	// Floats
+	g_ColorNames[EColor::Synergies_FloatBg] = "nflo_Synergies_FloatBg";
+	g_ColorNames[EColor::Synergies_FloatBgHovered] = "nflo_Synergies_FloatBgHovered";
+	g_ColorNames[EColor::Synergies_FloatBgActive] = "nflo_Synergies_FloatBgActive";
+
+	// Screen
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgShape] = "nscr_Nodes_Screen_resizeBtn_bgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_bgInner] = "nscr_Nodes_Screen_resizeBtn_bgInner";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgShape] = "nscr_Nodes_Screen_resizeBtn_fgShape";
+	g_ColorNames[EColor::Nodes_Screen_resizeBtn_fgInner] = "nscr_Nodes_Screen_resizeBtn_fgInner";
+
+	// Links
+	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
 
 	/// \todo ???
 	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a

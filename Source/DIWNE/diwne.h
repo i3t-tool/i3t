@@ -103,6 +103,7 @@ struct SettingsDiwne
 	float linkAlpha = 0.2;
 	float linkAlphaSelectedHovered = 1;
 	float linkAlphaSelected = 0.5;
+	ImVec4 fontColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); ///< Color of the text in the node
 };
 // \todo   void setMiddleAlign(float v) {assert(v>=0 && v<=1); m_middleAlign =
 // v;}; /* from 0==left to 1==right */
