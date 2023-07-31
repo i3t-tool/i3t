@@ -23,7 +23,7 @@ bool DiwneObject::allowDrawing()
 {
 	return true;
 }
-bool DiwneObject::drawDiwne(DrawMode drawMode /*=DrawMode::Interacting*/)
+bool DiwneObject::drawDiwne(DrawMode drawMode /* = DrawMode::Interacting */)
 {
 	bool other_object_focused = diwne.m_objectFocused;
 	m_inner_interaction_happen_previous_draw = m_inner_interaction_happen;
@@ -35,10 +35,13 @@ bool DiwneObject::drawDiwne(DrawMode drawMode /*=DrawMode::Interacting*/)
 		m_inner_interaction_happen |= beforeBeginDiwne();
 		begin();
 
+		ImGui::PushStyleColor(ImGuiCol_Text, diwne.mp_settingsDiwne->fontColor);
+
 		m_inner_interaction_happen |= beforeContentDiwne();
 		m_inner_interaction_happen |= contentDiwne();
 		m_inner_interaction_happen |= afterContentDiwne();
 
+		ImGui::PopStyleColor();
 #ifdef DIWNE_DEBUG
 		DIWNE_DEBUG((diwne), {
 			switch (m_drawMode)
@@ -75,6 +78,7 @@ bool DiwneObject::drawDiwne(DrawMode drawMode /*=DrawMode::Interacting*/)
 	m_inner_interaction_happen |= finalizeDiwne();
 
 	m_isActive = other_object_focused ? false : m_inner_interaction_happen;
+
 	return m_inner_interaction_happen;
 }
 
@@ -445,7 +449,7 @@ bool DiwneObject::processShowPopupDiwne()
 	else
 	{
 		diwne.m_popupDrawn = popupDiwne(m_popupIDDiwne, diwne.getPopupPosition(), &expandPopupContent, *this);
-		;
+
 		return diwne.m_popupDrawn;
 	}
 }

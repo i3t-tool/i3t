@@ -1016,6 +1016,8 @@ void WorkspaceDiwne::popupContent()
 
 bool WorkspaceDiwne::beforeBegin()
 {
+	diwne.mp_settingsDiwne->fontColor = I3T::getColor(EColor::NodeFont);
+
 	m_workspaceDiwneAction = WorkspaceDiwneAction::None;
 	m_linksToDraw.clear();
 	m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
@@ -1088,8 +1090,8 @@ bool WorkspaceDiwne::content()
 	{
 		m_channelSplitter.Split(ImGui::GetWindowDrawList(), number_of_nodes + 1 /*+1 for links channel on top */);
 
-		/* draw nodes from back to begin (front to back) for catch interactions in
-		 * right order */
+		/* draw nodes from back to begin (front to back) to catch interactions in
+		 * correct order */
 		int prev_size = m_workspaceCoreNodes.size();
 		bool takeSnap = false;
 		for (auto it = m_workspaceCoreNodes.rbegin(); it != m_workspaceCoreNodes.rend(); ++it)
