@@ -1419,9 +1419,16 @@ ValueSetResult TransformImpl<ETransformType::Frustum>::setValue(float val, glm::
 }
 
 //===-- Look At -----------------------------------------------------------===//
+#define MY_ASSERT(condition, message)                                                                                  \
+	if (!(condition))                                                                                                  \
+	{                                                                                                                  \
+		std::cerr << "Line: " << message << std::endl;                                                                 \
+	}
 
 bool TransformImpl<ETransformType::LookAt>::isValid() const
 {
+	// todo DEBUG matrix comparisons
+
 	auto& mat = m_internalData[0].getMat4();
 	auto matL = glm::mat3(mat);       // linear 3x3 part
 	auto matT = glm::transpose(matL); // linear 3x3 part - rows to columns
@@ -1430,14 +1437,16 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 	// check (0,0,0,1) in the last row only
 	bool result = validateValues(g_LookAtMask, mat); // rotation + translation
 
+	MY_ASSERT(result, "LookAt::isValid(): validateValues(g_LookAtMask, mat) failed"); // todo remove
+
 	// matrix inner consistency
 	// check the Linear part - must have normalized rows }
 	result = result && Math::eq(glm::determinant(mat), 1.0f); // linearly independent
-	result = result && Math::eq(glm::length2(matT[0]),
-	                            1.0f); // unit camera axes - rows in linear part
-	result = result && Math::eq(glm::length2(matT[1]), 1.0f);
+	result = result && Math::eq(glm::length2(matT[0]), 1.0f); // unit camera axes
+	result = result && Math::eq(glm::length2(matT[1]), 1.0f); // - rows in linear part
 	result = result && Math::eq(glm::length2(matT[2]), 1.0f);
 
+	MY_ASSERT(result, "LookAt::isValid(): Orthonormality tests failed"); // todo remove
 	// consistency of defaults
 	glm::vec3 eye = getDefaultValue("eye").getVec3();
 	glm::vec3 center = getDefaultValue("center").getVec3();
@@ -1461,13 +1470,17 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 		result = result && (glm::dot(direction, up) != 1.0f); // not parallel
 	}
 
+	MY_ASSERT(result, "LookAt::isValid(): Direction or up vector tests failed"); // todo remove
+
 	// consistency defaults <--> matrix
 	//  expected matrix - this is a more rigid test
 	//  - good for resetMatrixFromDefaults
 	//  - does not allow to edit the matrix in Full mode
-	//  todo LookaAt: use the rigid test or not?
+	//  todo LookAt: use the rigid test or not?
 	auto expectedMat = glm::lookAt(eye, center, up);
 	result = result && Math::eq(expectedMat, mat);
+
+	MY_ASSERT(result, "LookAt::isValid(): Matrix comparison failed"); // todo remove
 
 	return result;
 }

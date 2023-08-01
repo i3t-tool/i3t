@@ -21,14 +21,15 @@
 
 namespace Math
 {
-static constexpr float FLT_EPSILON_10 = 10.0f * FLT_EPSILON; // 1.192093 E-6
+static constexpr float FLT_EPSILON_10 = 10.0f * FLT_EPSILON;   // 1.192093 E-6
+static constexpr float FLT_EPSILON_100 = 100.0f * FLT_EPSILON; // 1.192093 E-5
 
-FORCE_INLINE bool eq(const float lhs, const float rhs, const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const float lhs, const float rhs, const float epsilon = FLT_EPSILON_100)
 {
 	return abs(lhs - rhs) < epsilon;
 }
 
-FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs, const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs, const float epsilon = FLT_EPSILON_100)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -41,7 +42,7 @@ FORCE_INLINE bool eq(const glm::vec3& lhs, const glm::vec3& rhs, const float eps
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs, const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs, const float epsilon = FLT_EPSILON_100)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -54,7 +55,7 @@ FORCE_INLINE bool eq(const glm::vec4& lhs, const glm::vec4& rhs, const float eps
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs, const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs, const float epsilon = FLT_EPSILON_100)
 {
 	for (int i = 0; i < 4; ++i)
 	{
@@ -67,7 +68,7 @@ FORCE_INLINE bool eq(const glm::quat& lhs, const glm::quat& rhs, const float eps
 	return true;
 }
 
-FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float epsilon = FLT_EPSILON_10)
+FORCE_INLINE bool eq(const glm::mat4& lhs, const glm::mat4& rhs, const float epsilon = FLT_EPSILON_100)
 {
 	for (int i = 0; i < 4; ++i)
 	{

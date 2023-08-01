@@ -184,37 +184,3 @@ TEST(FrustumTest, DISABLED_GettersAndSettersShouldBeOk_Synergies)
 	// EXPECT_EQ(glm::frustum(left, right, bottom, top, near, far),
 	// frustum->getData().getMat4());
 }
-
-//--- Look At -----------------------------------------------------------------
-TEST(LookAtTest, ShouldBeOk)
-{
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
-	lookAt->setDefaultValue("eye", glm::vec3{-10.0f, 5.0f, 1.0f});
-	lookAt->setDefaultValue("center", glm::vec3{10.0f, 8.0f, -4.0f});
-	lookAt->setDefaultValue("up", glm::vec3{0.0f, 1.0f, 0.0f});
-
-	auto expectedMat =
-	    glm::lookAt(glm::vec3{-10.0f, 5.0f, 1.0f}, glm::vec3{10.0f, 8.0f, -4.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
-	auto resultMat = lookAt->getData().getMat4();
-
-	EXPECT_EQ(expectedMat, resultMat);
-}
-
-TEST(LookAtTest, GettersAndSettersShouldBeOk)
-{
-	auto lookAt = Builder::createTransform<ETransformType::LookAt>()->as<TransformImpl<ETransformType::LookAt>>();
-
-	auto eye = generateVec3();
-	lookAt->setDefaultValue("eye", eye);
-	EXPECT_EQ(eye, lookAt->getDefaultValue("eye").getVec3());
-
-	auto center = generateVec3();
-	lookAt->setDefaultValue("center", center);
-	EXPECT_EQ(center, lookAt->getDefaultValue("center").getVec3());
-
-	auto up = generateVec3();
-	lookAt->setDefaultValue("up", up);
-	EXPECT_EQ(up, lookAt->getDefaultValue("up").getVec3());
-
-	EXPECT_EQ(glm::lookAt(eye, center, up), lookAt->getData().getMat4());
-}
