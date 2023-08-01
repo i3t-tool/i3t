@@ -144,19 +144,24 @@ TEST(EulerYTest, MatrixToDefaultsUpdateWithSynergies)
 	rotYNode->setValue(c, {0, 0});
 	val = rotYNode->getData().getMat4()[0][0];
 	EXPECT_TRUE(Math::eq(c, val));
+	// ASSERT_EQ(c, val);
 
 	val = rotYNode->getData().getMat4()[2][2];
 	EXPECT_TRUE(Math::eq(c, val));
+	// ASSERT_EQ(c, val);
 
 	val = rotYNode->getData().getMat4()[2][0];
 	EXPECT_TRUE(Math::eq(s, val));
+	// ASSERT_EQ(s, val);
 
 	val = rotYNode->getData().getMat4()[0][2];
 	EXPECT_TRUE(Math::eq(-s, val));
+	// ASSERT_EQ(-s, val);
 
 	// The rotation
 	float r = rotYNode->getDefaultValue("rotation").getFloat();
 	EXPECT_TRUE(Math::eq(r, angle));
+	// ASSERT_EQ(r, angle);
 }
 
 TEST(EulerYTest, MatrixToDefaultsUpdateWithoutSynergies)
@@ -183,7 +188,7 @@ TEST(EulerYTest, MatrixToDefaultsUpdateWithoutSynergies)
 	val = rotYNode->getData().getMat4()[0][2];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
-	// The rotation schould be unchanged
+	// The rotation should be unchanged
 	float r = rotYNode->getDefaultValue("rotation").getFloat();
 	EXPECT_TRUE(Math::eq(0.0f, r));
 }
@@ -211,7 +216,7 @@ TEST(EulerZTest, MatrixToDefaultsUpdateWithSynergies)
 	val = rotZNode->getData().getMat4()[0][1];
 	EXPECT_TRUE(Math::eq(s, val));
 
-	// The rotation
+	// The rotation should be updated to the angle (from the cosine(angle) value)
 	float r = rotZNode->getDefaultValue("rotation").getFloat();
 	EXPECT_TRUE(Math::eq(r, angle));
 }
@@ -240,7 +245,7 @@ TEST(EulerZTest, MatrixToDefaultsUpdateWithoutSynergies)
 	val = rotZNode->getData().getMat4()[1][0];
 	EXPECT_TRUE(Math::eq(0.0f, val));
 
-	// The rotation schould be unchanged
+	// The rotation should be unchanged
 	float r = rotZNode->getDefaultValue("rotation").getFloat();
 	EXPECT_TRUE(Math::eq(0.0f, r));
 }
