@@ -1,0 +1,431 @@
+colors:
+  glob_Text:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  glob_Window Background:
+    x: 0.930843711
+    y: 0.930843711
+    z: 0.930843711
+    w: 1
+  glob_Popup Background:
+    x: 0.840940535
+    y: 0.840940535
+    z: 0.840940535
+    w: 1
+  npop_Connection is possible:
+    x: 0.118354835
+    y: 0.786676645
+    z: 0.118354835
+    w: 1
+  glob_Menu Bar Background:
+    x: 0.913554668
+    y: 0.913554668
+    z: 0.913554668
+    w: 1
+  glob_Border:
+    x: 0.000691592693
+    y: 0.000691592693
+    z: 0.000691592693
+    w: 1
+  npop_Connection is not possible:
+    x: 0.880239546
+    y: 0.214789003
+    z: 0.214789003
+    w: 1
+  glob_Primary Color (tabs, tiles, ...):
+    x: 0.716459215
+    y: 0.716459215
+    z: 0.716459215
+    w: 1
+  npop_Create node popup:
+    x: 0.125490203
+    y: 0.176470593
+    z: 0.125490203
+    w: 0.70588237
+  glob_Active Color:
+    x: 0.201919198
+    y: 0.395685673
+    z: 0.626556039
+    w: 1
+  glob_Dock Active Color:
+    x: 0.910096824
+    y: 0.910096824
+    z: 0.910096824
+    w: 1
+  tuts_Background:
+    x: 0.909803927
+    y: 0.909803927
+    z: 0.909803927
+    w: 1
+  tuts_Text:
+    x: 0.200000003
+    y: 0.200000003
+    z: 0.200000003
+    w: 1
+  tuts_Bar Background:
+    x: 0.843137264
+    y: 0.843137264
+    z: 0.843137264
+    w: 1
+  tuts_Scrollbar Background:
+    x: 0.843137264
+    y: 0.843137264
+    z: 0.843137264
+    w: 1
+  tuts_Scrollbar Active:
+    x: 0.960784316
+    y: 0.960784316
+    z: 0.960784316
+    w: 1
+  tuts_Scrollbar Grab:
+    x: 0.909803927
+    y: 0.909803927
+    z: 0.909803927
+    w: 1
+  tuts_Scrollbar Hovered:
+    x: 0.941176474
+    y: 0.941176474
+    z: 0.941176474
+    w: 1
+  tuts_Title Text:
+    x: 0.0549019612
+    y: 0.384313732
+    z: 0.686274529
+    w: 1
+  tuts_Highlight Text:
+    x: 0.200000003
+    y: 0.200000003
+    z: 0.200000003
+    w: 1
+  tuts_Button Text:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  tuts_Button Background:
+    x: 0.0549019612
+    y: 0.384313732
+    z: 0.686274529
+    w: 1
+  tuts_Button Active:
+    x: 0.0745098069
+    y: 0.517647088
+    z: 0.90196079
+    w: 1
+  tuts_Button Hovered:
+    x: 0.0745098069
+    y: 0.454901963
+    z: 0.788235307
+    w: 1
+  tuts_Task Background:
+    x: 0.392156869
+    y: 0.392156869
+    z: 0.392156869
+    w: 0.0980392173
+  glob_Selection rectangle full:
+    x: 0
+    y: 0.419910192
+    z: 0.150237262
+    w: 0.392156869
+  glob_Selection rectangle touch:
+    x: 0.0124690849
+    y: 0.640718579
+    z: 0.378320754
+    w: 0.392156869
+  npin_Pulse Pin:
+    x: 0.656789899
+    y: 0.0751900598
+    z: 0.799446762
+    w: 1
+  npin_Float Pin:
+    x: 0.0392156877
+    y: 0.701960802
+    z: 0.0274509806
+    w: 1
+  npin_Matrix Pin:
+    x: 0.709803939
+    y: 0.00784313772
+    z: 0.0235294122
+    w: 1
+  npin_Quaternion Pin:
+    x: 0.712580919
+    y: 0.723374844
+    z: 0.0730378851
+    w: 1
+  npin_Vector 3 Pin:
+    x: 0.227450982
+    y: 0.329411775
+    z: 0.733333349
+    w: 1
+  npin_Vector 4 Pin:
+    x: 0.436376214
+    y: 0.324484855
+    z: 0
+    w: 1
+  npin_Screen Pin:
+    x: 0
+    y: 0.502825022
+    z: 1
+    w: 1
+  npin_Inner Color Pulse:
+    x: 0.9688797
+    y: 0.9688797
+    z: 0.9688797
+    w: 1
+  npin_Inner Color Float:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  npin_Inner Color Matrix:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  npin_Inner Color Quat:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  npin_Inner Color Vec3:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  npin_Inner Color Vec4:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  npin_Inner Color Screen:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  npin_Inner Color MatrixMul:
+    x: 0.968627453
+    y: 0.968627453
+    z: 0.968627453
+    w: 1
+  nops_Item selected border:
+    x: 0.756736517
+    y: 0.756736517
+    z: 0.756736517
+    w: 1
+  nops_General node Background:
+    x: 0.694117665
+    y: 0.694117665
+    z: 0.694117665
+    w: 1
+  nops_General node Header:
+    x: 0.0196078438
+    y: 0.34117648
+    z: 0.0117647061
+    w: 1
+  nops_Operator Background:
+    x: 0.692254543
+    y: 0.692254543
+    z: 0.692254543
+    w: 1
+  nops_Operator Header:
+    x: 0.00392156886
+    y: 0.400000006
+    z: 0.490196079
+    w: 1
+  nops_Operator Float Background:
+    x: 0.301960796
+    y: 0.333333343
+    z: 0.41568628
+    w: 1
+  nops_Operator Active Float Background:
+    x: 0.380392164
+    y: 0.411764711
+    z: 0.494117647
+    w: 1
+  nops_Operator Hovered Float Background:
+    x: 0.34117648
+    y: 0.372549027
+    z: 0.454901963
+    w: 1
+  ntrs_Transform Background:
+    x: 0.694117665
+    y: 0.694117665
+    z: 0.694117665
+    w: 1
+  ntrs_Transform Header:
+    x: 0.490196079
+    y: 0.113725491
+    z: 0.152941182
+    w: 1
+  ntrs_Transform Float Background:
+    x: 0.356862754
+    y: 0.329411775
+    z: 0.262745112
+    w: 1
+  ntrs_Transform Float Active:
+    x: 0.435294122
+    y: 0.407843143
+    z: 0.34117648
+    w: 1
+  ntrs_Transform Float Hovered:
+    x: 0.396078438
+    y: 0.368627459
+    z: 0.301960796
+    w: 1
+  nlnk_selected_colorShift:
+    x: 0.200000003
+    y: 0.200000003
+    z: 0.200000003
+    w: 0
+  nflo_Synergies_FloatBg:
+    x: 0.0549019612
+    y: 0.53725493
+    z: 0.0549019612
+    w: 1
+  nflo_Synergies_FloatBgHovered:
+    x: 0.0855012983
+    y: 0.647302926
+    z: 0.0855012983
+    w: 1
+  nflo_Synergies_FloatBgActive:
+    x: 0
+    y: 0.702627957
+    z: 0
+    w: 1
+  nscr_Nodes_Screen_resizeBtn_bgShape:
+    x: 1
+    y: 1
+    z: 1
+    w: 0.600000024
+  nscr_Nodes_Screen_resizeBtn_bgInner:
+    x: 0.400000006
+    y: 0.200000003
+    z: 0.200000003
+    w: 0.600000024
+  nscr_Nodes_Screen_resizeBtn_fgShape:
+    x: 0.400000006
+    y: 0.400000006
+    z: 0.600000024
+    w: 0.600000024
+  nscr_Nodes_Screen_resizeBtn_fgInner:
+    x: 0.400000006
+    y: 0.400000006
+    z: 0.600000024
+    w: 0.600000024
+  ntrs_Nodes_Transformation_ValidIcon_bgShape:
+    x: 1
+    y: 0
+    z: 0
+    w: 1
+  ntrs_Nodes_Transformation_ValidIcon_bgInner:
+    x: 1
+    y: 0
+    z: 0
+    w: 1
+  ntrs_Nodes_Transformation_ValidIcon_fgShape:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  ntrs_Nodes_Transformation_ValidIcon_fgInner:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  ntrs_Nodes_Transformation_ValidIcon_padding:
+    x: 5
+    y: 5
+    z: 5
+    w: 5
+  ntrs_Nodes_Transformation_TrackingColor:
+    x: 0.300000012
+    y: 0.300000012
+    z: 0.100000001
+    w: 0.600000024
+  glob_Tab Color:
+    x: 0
+    y: 0
+    z: 0
+    w: 0
+sizes:
+  ngen_Nodes Float Margin: 5
+  ngen_Nodes Float Width: 45
+  ngen_Nodes Rounding: 7
+  ngen_Nodes BorderWidth: 0
+  ngen_Pin labels Indent: 12
+  ngen_Header Label Indent: 2
+  ngen_Trackball button height: 20
+  ngen_Trackball Sensitivity: 5
+  ngen_Float inner padding: 1
+  ngen_Drag speed fo float: 0.0149999997
+  ngen_CTRL Multiplicator: 0.100000001
+  ngen_SHIFT Multiplicator: 10
+  ngen_ALT Multiplicator: 0.00999999978
+  ngen_Nodes Inputs Alignment: 0
+  ngen_Nodes Middle Alignment: 0
+  ngen_Nodes Outputs Alignment: 0
+  ngen_Nodes left side spacing: 3
+  ngen_Nodes right side spacing: 3
+  ngen_Nodes default visible precision: 1
+  ngen_Nodes default inactive part marker: 0
+  ngen_Link x distance between controlpoint and start/end of link - fraction of start to end x distance: 0.200000003
+  ngen_Link minimal x distance between controlpoint and start/end of link: 50
+  ngen_Link Thickness: 5
+  ngen_Link Additional thickness when selected: 2
+  ngen_Pins_IconPadding: 2
+  ngen_Links_selected_alpha: 0.800000012
+  ngen_Float_inactive_alphaMultiplicator: 0.5
+  ngen_Nodes_Operators_Rounding: 5
+  ngen_Nodes_Sequence_Rounding: 5
+  ngen_Nodes_Transformation_TrackingMarkSize: 5
+size vectors:
+  ngen_Nodes Pivot size:
+    x: 0
+    y: 0
+  glob_Windows Frame Padding:
+    x: 5
+    y: 5
+  ngen_Nodes Items Spacing:
+    x: 4
+    y: 4
+  ngen_Nodes Float Padding:
+    x: 0
+    y: 1
+  ngen_Nodes Pin Spacing:
+    x: 0
+    y: 0
+  ngen_Nodes Pivot Alignment:
+    x: 0
+    y: 0.5
+  ngen_Nodes Inputs Size:
+    x: 0
+    y: 0
+  ngen_Nodes Middle Size:
+    x: 0
+    y: 0
+  ngen_Nodes Output Size:
+    x: 0
+    y: 0
+  ngen_Nodes Icon Size:
+    x: 12
+    y: 12
+  ngen_Nodes Float Cycle button size:
+    x: 32
+    y: 32
+  ngen_Nodes Screen Texture Size:
+    x: 130
+    y: 130
+  ngen_Builder Item Spacing:
+    x: 0
+    y: 0
+  ngen_Nodes_Screen_resizeButtonSize:
+    x: 20
+    y: 20
+  ngen_Nodes_Sequence_DummySpaceSize:
+    x: 100
+    y: 1
+  ngen_NewNode_positionShift:
+    x: 10
+    y: 0
