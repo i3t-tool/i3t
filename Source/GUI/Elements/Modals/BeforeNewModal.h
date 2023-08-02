@@ -7,18 +7,13 @@
 
 #include "GUI/Elements/IWindow.h"
 
-class BeforeNewModal : public IWindow
+class BeforeNewModal : public ModalWindow
 {
 public:
-	I3T_WINDOW(BeforeNewModal)
-
-	BeforeNewModal() = default;
+	BeforeNewModal() : ModalWindow("Create new project?") {}
 
 	/**
 	 * Show Close? modal centered in main window.
 	 */
-	void render() override;
-
-private:
-	void submit();
+	void onImGui() override;
 };

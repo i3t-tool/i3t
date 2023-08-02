@@ -8,7 +8,6 @@
 #include "Core/Nodes/GraphManager.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
-#include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/UIModule.h" /// \todo Remove this dependency
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
@@ -45,7 +44,6 @@ void Application::init()
 
 	//
 
-	BeforeCloseCommand::addListener(std::bind(&App::onBeforeClose, this));
 	CloseCommand::addListener([this] {
 		onClose();
 	});
@@ -209,12 +207,6 @@ UIModule* Application::getUI()
 Vp::Viewport* Application::viewport()
 {
 	return m_viewport;
-}
-
-void Application::onBeforeClose()
-{
-	/// \todo MH move this to the UI module
-	getUI()->getWindowManager().showUniqueWindow<BeforeCloseModal>();
 }
 
 void Application::onClose()

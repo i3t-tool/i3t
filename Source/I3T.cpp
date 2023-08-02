@@ -15,12 +15,4 @@ void I3TApplication::onInit()
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();
 	});
-
-	BeforeNewProjectCommand::addListener([this]() {
-		I3T::getUI()->getWindowManager().showUniqueWindow<BeforeNewModal>();
-	});
-
-	BeforeNewTutCommand::addListener([this]() {
-		I3T::getUI()->getWindowManager().showUniqueWindow<BeforeNewTutModal>();
-	});
 }

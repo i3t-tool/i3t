@@ -6,6 +6,13 @@
  */
 #pragma once
 
+#include "Core/Result.h"
+
+namespace MenuBarDialogs
+{
+Result<Void, Error> open();
+}
+
 /**
  * Top menu bar.
  * The bar also contains dialogs and other windows associated with menu items.

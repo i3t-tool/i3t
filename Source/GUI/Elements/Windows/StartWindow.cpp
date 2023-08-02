@@ -12,6 +12,8 @@
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "GUI/Elements/MainMenuBar.h"
+#include "GUI/Elements/Modals/BeforeNewModal.h"
 #include "GUI/Elements/Modals/BeforeNewTutModal.h"
 #include "GUI/UIModule.h"
 #include "Logger/Logger.h"
@@ -288,7 +290,7 @@ void StartWindow::render()
 					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 					{
 						this->hide();
-						BeforeNewProjectCommand::dispatch();
+						App::getModule<UIModule>().openModal<BeforeNewModal>();
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -298,30 +300,9 @@ void StartWindow::render()
 					ImGui::Dummy(ImVec2(0, 2));
 					if (ImGui::Button("Open", ImVec2(loadBtnWidth, buttonHeight)))
 					{
-						// open from file (taken from main menu bar)
-						std::filesystem::path result;
-						std::string title = "Open I3T script...";
-						std::vector<std::string> filter;
-						filter.push_back("I3T scene files");
-						filter.push_back("*.scene");
-						bool success = SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
-						auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-						if (ww != nullptr)
+						if (MenuBarDialogs::open())
 						{
-							if (success && !result.empty())
-							{
-								ww->getNodeEditor().m_workspaceCoreNodes.clear();
-								App::getModule<StateManager>().loadScene(result);
-								this->hide();
-							}
-							else
-							{
-								LOG_INFO("Opening file unsuccesful");
-							}
-						}
-						else
-						{
-							LOG_FATAL("Open failed: WorkspaceWindow not found");
+							this->hide();
 						}
 					}
 					if (ImGui::IsItemHovered())
@@ -507,7 +488,7 @@ void StartWindow::loadTutorialAndShowWindow(Ptr<TutorialHeader> header, Ptr<Tuto
 {
 	I3T::getUI()->getWindowManager().showWindow(shared_from_this(), false);
 	setTutorial(tut);
-	BeforeNewTutCommand::dispatch();
+	m_windowManager->openModal<BeforeNewTutModal>();
 	LOG_DEBUG("Tutorial " + header->m_title + " loaded");
 }
 
