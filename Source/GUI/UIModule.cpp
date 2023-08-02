@@ -167,6 +167,11 @@ void UIModule::loadThemes()
 			continue;
 		}
 
+		if (!entry.path().filename().string().ends_with(".yml"))
+		{
+			continue;
+		}
+
 		auto result = loadTheme(entry);
 
 		if (!result)
