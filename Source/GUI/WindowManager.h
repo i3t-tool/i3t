@@ -146,6 +146,8 @@ public:
 	 */
 	static glm::vec2 getMousePositionForWindow(const IWindow* window);
 
+	template <typename T> void openModal();
+
 private:
 	void updateWindowFocus();
 
@@ -185,4 +187,13 @@ private:
 	{
 		static_assert(std::is_base_of<IWindow, T>::value, "Type parameter must be derived from IWindow class.");
 	}
+
+	std::vector<UPtr<IWindow>> m_modalStack;
 };
+
+template <typename T> void WindowManager::openModal()
+{
+	auto modal = std::make_unique<T>();
+	modal->show();
+	m_modalStack.push_back(std::move(modal));
+}

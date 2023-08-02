@@ -72,6 +72,20 @@ void WindowManager::draw()
 		}
 	}
 
+	// Render dialog windows
+	for (auto idx = 0; idx != m_modalStack.size(); ++idx)
+	{
+		auto& modal = m_modalStack[idx];
+
+		if (!modal->isVisible())
+		{
+			m_modalStack.resize(idx);
+			break;
+		}
+
+		modal->render();
+	}
+
 	// Draw debug cursors at mouse position
 	if (App::get().m_debugWindowManager)
 	{
@@ -228,7 +242,7 @@ void WindowManager::focusWindow(IWindow* window)
 
 void WindowManager::focusWindow(Ptr<IWindow> window)
 {
-	ImGui::SetWindowFocus(window->getName().c_str());
+	ImGui::SetWindowFocus(window->getName());
 	m_focusedWindow = window;
 	SetFocusedWindowCommand::dispatch(window);
 }

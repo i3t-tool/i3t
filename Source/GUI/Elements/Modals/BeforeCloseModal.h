@@ -7,15 +7,13 @@
 
 #include "GUI/Elements/IWindow.h"
 
-class BeforeCloseModal : public IWindow
+class BeforeCloseModal : public ModalWindow
 {
 public:
-	I3T_WINDOW(BeforeCloseModal)
-
-	BeforeCloseModal() = default;
+	BeforeCloseModal() : ModalWindow("Close?") {}
 
 	/**
 	 * Show Close? modal centered in main window.
 	 */
-	void render() override;
+	void onImGui() override;
 };

@@ -7,15 +7,16 @@
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
 
-std::string IWindow::getName() const
+const char* IWindow::getName() const
 {
-	return m_name;
+	return imGuiName.c_str();
 };
 
-std::string IWindow::setName(const char* name)
+const std::string& IWindow::setName(const char* name)
 {
-	m_name = fmt::format("{}###{}", name, getID());
-	return m_name;
+	imGuiName = fmt::format("{}###{}", name, getID());
+
+	return imGuiName;
 }
 
 void IWindow::updateWindowInfo()
@@ -48,7 +49,7 @@ void IWindow::updateWindowInfo()
 	}
 	else
 	{
-		LOG_WARN("IWindow '{}' does not have a window manager assigned! (in updateWindowInfo())", m_name);
+		LOG_WARN("IWindow '{}' does not have a window manager assigned! (in updateWindowInfo())", imGuiName);
 	}
 
 	if (App::get().m_debugWindowManager)
@@ -88,3 +89,56 @@ void IWindow::updateWindowInfo()
 		                                        windowManager.c_str());
 	}
 };
+
+//
+
+ModalWindow::ModalWindow(const std::string& title)
+{
+	setName(title.c_str());
+}
+
+void ModalWindow::render()
+{
+	if (!ImGui::IsPopupOpen(getName()))
+	{
+		ImGui::OpenPopup(getName());
+	}
+
+	// OnBeginFrame();
+
+	// Always center this window when appearing
+	ImVec2 center = ImGui::GetMainViewport()->GetWorkCenter();
+	// center.x *= 0.5f;
+	// center.y *= 0.5f;
+
+	// ImVec2 parent_pos = ImGui::GetWindowPos();
+	// ImVec2 parent_size = ImGui::GetWindowSize();
+	// ImVec2 center(parent_pos.x + parent_size.x * 0.5f, parent_pos.y +
+	// parent_size.y * 0.5f);
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal(getName(), nullptr, 0 | ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		onImGui();
+
+		ImGui::EndPopup();
+	}
+}
+
+void ModalWindow::open()
+{
+	if (!isVisible())
+	{
+		ImGui::OpenPopup(getName());
+		show();
+	}
+}
+
+void ModalWindow::close()
+{
+	if (isVisible())
+	{
+		ImGui::CloseCurrentPopup();
+		hide();
+	}
+}

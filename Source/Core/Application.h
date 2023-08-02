@@ -123,14 +123,6 @@ public:
 	void onDisplay();
 
 	/**
-	 * Called when BeforeCloseCommand is received.
-	 *
-	 * If current project is in unsaved state, a modal window "Do your really want
-	 * to leave?" is displayed. Otherwise, the CloseCommand is issued.
-	 */
-	void onBeforeClose();
-
-	/**
 	 * Called when CloseCommand is received.
 	 *
 	 * Shutdown whole application.

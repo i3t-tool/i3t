@@ -33,31 +33,16 @@ class IWindow : public std::enable_shared_from_this<IWindow>
 	friend class WindowManager;
 
 public:
-	// Window info (updated by updateWindowInfo())
-	glm::vec2 m_windowPos;   ///< Top-left corner of the window in screen coordinates
-	glm::ivec2 m_windowSize; ///< Window width and height dimensions
-
-	glm::vec2 m_windowMin; ///< Top left corner of the window, same as m_windowPos (separate variable for clarity)
-	glm::vec2 m_windowMax; ///< Bottom right corner of the window
-
-protected:
-	bool m_show;
-	std::string m_name;
-	InputController Input;
-
-	WindowManager* m_windowManager = nullptr; ///< Weak reference to a WindowManager set when this window is added to it
-public:
-	friend class Application;
-	friend class InputManager;
-
 	explicit IWindow(bool show = false) : m_show(show) {}
 
 	/**
 	 * \pre Window cannot be destroyed at runtime. It may cause crash.
 	 */
 	virtual ~IWindow() = default;
+
 	virtual void render() = 0;
 
+public:
 	virtual const char* getID() const = 0;
 
 	void hide()
@@ -77,8 +62,11 @@ public:
 		return &m_show;
 	}
 
-	std::string getName() const;
-	std::string setName(const char* name);
+	/**
+	 * @return ImGui window name.
+	 */
+	const char* getName() const;
+	const std::string& setName(const char* name);
 
 	/**
 	 * Returns window input controller.
@@ -87,6 +75,7 @@ public:
 	{
 		return Input;
 	}
+
 	InputController* getInputPtr()
 	{
 		return &Input;
@@ -100,4 +89,45 @@ protected:
 	 * position and dimensions may receive invalid information.
 	 */
 	void updateWindowInfo();
+
+public:
+	// Window info (updated by updateWindowInfo())
+	glm::vec2 m_windowPos;   ///< Top-left corner of the window in screen coordinates
+	glm::ivec2 m_windowSize; ///< Window width and height dimensions
+
+	glm::vec2 m_windowMin; ///< Top left corner of the window, same as m_windowPos (separate variable for clarity)
+	glm::vec2 m_windowMax; ///< Bottom right corner of the window
+
+protected:
+	bool m_show;
+	std::string imGuiName;
+	InputController Input;
+
+	WindowManager* m_windowManager = nullptr; ///< Weak reference to a WindowManager set when this window is added to it
+};
+
+
+class ModalWindow : public IWindow
+{
+public:
+	ModalWindow(const std::string& title);
+
+protected:
+	virtual void onImGui() = 0;
+
+public:
+	void open();
+
+	/**
+	 * Hides this dialog and all its children.
+	 */
+	void close();
+
+private:
+	void render() override;
+
+	const char* getID() const override
+	{
+		return "ModalWindow";
+	}
 };

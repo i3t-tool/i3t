@@ -56,6 +56,11 @@ public:
 		return m_windowManager;
 	}
 
+	template <typename T> void openModal()
+	{
+		m_windowManager.openModal<T>();
+	}
+
 private:
 	void buildDockspace();
 	void queryCameraState();

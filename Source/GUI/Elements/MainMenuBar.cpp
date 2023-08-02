@@ -9,6 +9,7 @@
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
+#include "GUI/Elements/Modals/BeforeNewModal.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
@@ -96,17 +97,6 @@ static void save()
 		saveAs();
 }
 
-static void open()
-{
-	std::filesystem::path sceneFile;
-	bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
-	if (hasFile)
-	{
-		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
-		App::getModule<StateManager>().loadScene(sceneFile);
-	}
-}
-
 static void importModel()
 {
 	std::filesystem::path modelFile;
@@ -115,6 +105,19 @@ static void importModel()
 		Application::getModule<Core::ResourceManager>().importResource(modelFile);
 		Application::getModule<StateManager>().takeSnapshot();
 	}
+}
+
+Result<Void, Error> MenuBarDialogs::open()
+{
+	std::filesystem::path sceneFile;
+	bool hasFile = openSceneDialog(sceneFile, "Open I3T scene");
+	if (hasFile)
+	{
+		App::getModule<StateManager>().loadScene(sceneFile);
+		return Void{};
+	}
+
+	return Err("No file selected");
 }
 
 //===----------------------------------------------------------------------===//
@@ -144,7 +147,9 @@ void MainMenuBar::render()
 	ImGui::End();
 
 	if (m_showDemoWindow)
+	{
 		ImGui::ShowDemoWindow(&m_showDemoWindow);
+	}
 }
 
 void MainMenuBar::showFileMenu()
@@ -153,13 +158,13 @@ void MainMenuBar::showFileMenu()
 	{
 		if (ImGui::MenuItem("New"))
 		{
-			BeforeNewProjectCommand::dispatch();
+			App::getModule<UIModule>().openModal<BeforeNewModal>();
 		}
 		ImGui::Separator();
 
 		if (ImGui::MenuItem("Open", "Ctrl+O"))
 		{
-			open();
+			MenuBarDialogs::open();
 		}
 
 		if (ImGui::BeginMenu("Recent"))

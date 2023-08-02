@@ -3,14 +3,12 @@
 #include "GUI/Elements/IWindow.h"
 #include "Tutorial/Tutorial.h"
 
-class BeforeNewTutModal : public IWindow
+class BeforeNewTutModal : public ModalWindow
 {
 public:
-	I3T_WINDOW(BeforeNewTutModal)
+	BeforeNewTutModal() : ModalWindow("Opening a new tutorial") {}
 
-	BeforeNewTutModal() = default;
-
-	void render() override;
+	void onImGui() override;
 
 private:
 	void submit();

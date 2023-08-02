@@ -8,6 +8,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Result.h"
 #include "GUI/Elements/MainMenuBar.h"
+#include "GUI/Elements/Modals/BeforeCloseModal.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StartWindow.h"
@@ -58,6 +59,10 @@ void UIModule::init()
 
 	HideWindowCommand::addListener([this](const std::string& id) {
 		m_windowManager.removeWindow(id);
+	});
+
+	BeforeCloseCommand::addListener([this]() {
+		m_windowManager.openModal<BeforeCloseModal>();
 	});
 
 	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
