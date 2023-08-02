@@ -147,6 +147,8 @@ std::expected<Theme, Error> loadTheme(const fs::path& path)
 			{
 				colors[*en] = parseVec4(node);
 			}
+			else
+				LOG_ERROR("[loadTheme] Invalid name {} in file: {}", it->first.as<std::string>(), name);
 		}
 	}
 	if (yaml["sizes"])

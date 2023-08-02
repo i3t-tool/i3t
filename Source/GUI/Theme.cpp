@@ -560,6 +560,7 @@ void Theme::initNames()
 	g_ColorNames[EColor::QuatPin] = "npin_Quaternion Pin";
 	g_ColorNames[EColor::Vec3Pin] = "npin_Vector 3 Pin";
 	g_ColorNames[EColor::Vec4Pin] = "npin_Vector 4 Pin";
+	g_ColorNames[EColor::MatrixMulPin] = "npin_MatrixMul Pin";
 	g_ColorNames[EColor::ScreenPin] = "npin_Screen Pin";
 
 	g_ColorNames[EColor::InnerPulsePin] = "npin_Inner Color Pulse";
