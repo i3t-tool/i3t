@@ -163,6 +163,11 @@ bool WorkspaceModel::middleContent()
 {
 	bool interaction_happen = false;
 
+	if (m_levelOfDetail == WorkspaceLevelOfDetail::Label)
+	{
+		return interaction_happen;
+	}
+
 	int width = m_textureSize.x * diwne.getWorkAreaZoom();
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
