@@ -112,7 +112,7 @@ void Sequence::updateValues(int inputIndex)
 		// read matrix from input
 		auto newVal = m_inputs[I3T_SEQ_IN_MAT].data().getMat4();
 
-		setInternalValue(newVal, I3T_SEQ_OUT_MUL);
+		setInternalValue(parentMatrix * newVal, I3T_SEQ_OUT_MUL);
 		setInternalValue(newVal, I3T_SEQ_OUT_MAT);
 		setInternalValue(parentMatrix * newVal, I3T_SEQ_OUT_MOD);
 	}
