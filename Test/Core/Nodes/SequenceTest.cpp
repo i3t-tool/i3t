@@ -266,3 +266,26 @@ TEST_F(SequenceTest, SelfCycle)
 
 	EXPECT_EQ(result, ENodePlugResult::Err_Loopback);
 }
+
+// Tests #228
+/**
+ * seq1 --- seq2 --- seq3
+ * mat ----/
+ */
+TEST_F(SequenceTest, WhenPluggingSequenceWithMatrixInputToSequenceWithMatrixInside_ThenLastSequenceOutputsAreCorrect)
+{
+	auto transform = GraphManager::createTransform<ETransformType::Free>();
+	transform->setValue(2.0f, {0, 0});
+	auto seq1 = GraphManager::createSequence();
+	seq1->addMatrix(transform);
+
+	auto seq2 = GraphManager::createSequence();
+	plug_expectOk(seq1, seq2, 0, 0);
+
+	auto mat = Core::Builder::createOperator<EOperatorType::MatrixToMatrix>();
+	plug_expectOk(mat, seq2, 0, 1);
+	mat->setValue(2.0f, {3, 0});
+
+	const auto expected = transform->getData().getMat4() * mat->getData().getMat4();
+	EXPECT_TRUE(Math::eq(seq2->getData().getMat4(), expected));
+}
