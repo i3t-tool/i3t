@@ -59,31 +59,35 @@ Data& Pin::dataMut()
 	}
 }
 
-const char* Pin::getLabel() const
+const std::string& Pin::getLabel() const
 {
 	auto* op = getOwner()->getOperation();
-	const char* label = nullptr;
 
 	if (IsInput)
 	{
 		if (!op->defaultInputNames.empty())
 		{
-			label = op->defaultInputNames[Index].c_str();
+			return op->defaultInputNames[Index];
 		}
 	}
 	else
 	{
 		if (!op->defaultOutputNames.empty())
 		{
-			label = op->defaultOutputNames[Index].c_str();
+			return op->defaultOutputNames[Index];
 		}
 	}
-	if (label == nullptr && shouldRenderPins())
-	{
-		label = defaultIoNames[static_cast<size_t>(ValueType)];
-	}
 
-	return label;
+	/*
+	// default names for pins, we don't show them in the UI
+	if (shouldRenderPins())
+	{
+	    return defaultIoNames[static_cast<size_t>(ValueType)];
+	}
+	 */
+
+	static std::string empty;
+	return empty;
 }
 
 ENodePlugResult Pin::plug(Pin& other)

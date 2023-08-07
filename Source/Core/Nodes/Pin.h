@@ -53,7 +53,7 @@ public:
 
 	Data& dataMut();
 
-	const char* getLabel() const;
+	const std::string& getLabel() const;
 
 	/// "pin {index} of {node signature}"
 	std::string getSignature() const;

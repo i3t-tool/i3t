@@ -266,7 +266,7 @@ enum class ETransformType
 };
 
 // default string name of each OpValueType (defined in NodeData.h)
-static const std::array<const char*, 8> defaultIoNames = {
+static const std::array<std::string, 8> defaultIoNames = {
     "pulse",  // PULSE		MN dodelat
     "float",  // Float
     "vec3",   // Vec3

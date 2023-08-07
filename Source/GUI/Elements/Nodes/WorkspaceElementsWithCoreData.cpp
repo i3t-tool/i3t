@@ -252,7 +252,7 @@ bool WorkspaceNodeWithCoreData::processUnselect()
 
 WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
                                    WorkspaceNodeWithCoreData& node)
-    : WorkspacePin(diwne, id, ""), m_pin(pin), m_node(node), m_iconRectDiwne(ImRect(0, 0, 0, 0))
+    : DIWNE::Pin(diwne, id), m_pin(pin), m_node(node), m_iconRectDiwne(ImRect(0, 0, 0, 0))
 {}
 
 // bool WorkspaceCorePin::allowInteraction()
@@ -291,39 +291,6 @@ bool WorkspaceCorePin::content()
 		m_iconRectDiwne =
 		    ImRect(diwne.screen2diwne(ImGui::GetItemRectMin()), diwne.screen2diwne(ImGui::GetItemRectMax()));
 
-		if (getShowLabel())
-		{
-			if (getLabel().empty())
-			{ // it's never empty :(
-
-				auto label = getCorePin().getLabel();
-				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-				    label == "pulse")
-				{
-					ImGui::TextUnformatted("");
-				}
-				else
-				{
-					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-					ImGui::TextUnformatted(label);
-				}
-			}
-			else
-			{
-
-				auto label = getLabel();
-				if (label == "float" || label == "vec3" || label == "vec4" || label == "matrix" || label == "quat" ||
-				    label == "pulse")
-				{
-					ImGui::TextUnformatted("");
-				}
-				else
-				{
-					// ImGui::Spring(0, I3T::getSize(ESize::Nodes_LabelIndent));
-					ImGui::TextUnformatted(label.c_str());
-				}
-			}
-		}
 		ImGui::PopStyleVar();
 	}
 	return interaction_happen;
@@ -435,6 +402,15 @@ WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID co
                                                WorkspaceNodeWithCoreData& node)
     : WorkspaceCorePin(diwne, id, pin, node)
 {}
+
+bool WorkspaceCoreOutputPin::content()
+{
+	ImGui::TextUnformatted(m_pin.getLabel().c_str());
+	ImGui::SameLine();
+
+	const auto inner_interaction_happen = WorkspaceCorePin::content();
+	return inner_interaction_happen;
+}
 
 WorkspaceCoreOutputPinWithData::WorkspaceCoreOutputPinWithData(DIWNE::Diwne& diwne, DIWNE::ID const id,
                                                                Core::Pin const& pin, WorkspaceNodeWithCoreData& node)
@@ -679,7 +655,7 @@ bool WorkspaceCoreInputPin::content()
 {
 	float inner_interaction_happen = WorkspaceCorePin::content();
 	ImGui::SameLine();
-	ImGui::TextUnformatted(m_pin.getLabel());
+	ImGui::TextUnformatted(m_pin.getLabel().c_str());
 	return inner_interaction_happen;
 }
 
@@ -985,7 +961,9 @@ bool WorkspaceNodeWithCoreDataWithPins::leftContent()
 			for (auto const& pin : m_workspaceInputs)
 			{
 				if (!pin->getCorePin().shouldRenderPins())
+				{
 					continue;
+				}
 
 				inner_interaction_happen |= pin->drawDiwne();
 				/* is in pin->drawDiwne()
