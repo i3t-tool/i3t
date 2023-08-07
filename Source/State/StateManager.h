@@ -81,7 +81,7 @@ private:
 
 	friend class Application;
 
-	Memento createMemento();
+	std::optional<Memento> createMemento();
 
 	fs::path m_currentScene;
 	long m_savedSceneHash{};

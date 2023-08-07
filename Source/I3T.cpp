@@ -8,9 +8,11 @@
 
 void I3TApplication::onInit()
 {
-	createModule<StateManager>();
+	auto* stateManager = createModule<StateManager>();
 	createModule<ScriptingModule>();
 	createModule<UIModule>();
+
+	stateManager->createEmptyScene();
 
 	NewProjectCommand::addListener([]() {
 		App::getModule<StateManager>().newScene();

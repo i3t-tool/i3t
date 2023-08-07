@@ -88,7 +88,7 @@ protected:
 
 public:
 	/// Creates instance of module, registers it to the application, and calls its init() method.
-	template <typename T, typename... Args> static auto& createModule(Args&&... args);
+	template <typename T, typename... Args> static T* createModule(Args&&... args);
 
 public:
 	template <typename T> static T& getModule();
@@ -137,7 +137,7 @@ public:
 	void logicUpdate(double delta);
 };
 
-template <typename T, typename... Args> inline auto& Application::createModule(Args&&... args)
+template <typename T, typename... Args> inline T* Application::createModule(Args&&... args)
 {
 	static_assert(std::is_base_of_v<Module, T>, "Class T must be derived from the Module class");
 
@@ -146,7 +146,7 @@ template <typename T, typename... Args> inline auto& Application::createModule(A
 	self.m_modules[hash] = std::make_unique<T>(std::forward(args)...);
 	self.m_modules[hash]->init();
 
-	return *self.m_modules[hash];
+	return (T*) self.m_modules[hash].get();
 }
 
 template <typename T> T& Application::getModule()

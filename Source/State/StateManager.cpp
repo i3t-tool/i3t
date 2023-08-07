@@ -23,24 +23,23 @@ void StateManager::init()
 	}
 
 	loadUserData();
-
-	createEmptyScene();
 }
 
 void StateManager::takeSnapshot()
 {
-	auto state = createMemento();
-
-	m_mementos.push_back(std::move(state));
-	m_hashes.push_back(randLong());
-	m_currentStateIdx = m_mementos.size() - 1;
-
-	if (m_mementos.size() != 1)
+	if (auto state = createMemento())
 	{
-		m_dirty = true;
-	}
+		m_mementos.push_back(std::move(*state));
+		m_hashes.push_back(randLong());
+		m_currentStateIdx = m_mementos.size() - 1;
 
-	setWindowTitle();
+		if (m_mementos.size() != 1)
+		{
+			m_dirty = true;
+		}
+
+		setWindowTitle();
+	}
 }
 
 void StateManager::undo()
@@ -149,7 +148,7 @@ bool StateManager::saveScene()
 
 bool StateManager::saveScene(const fs::path& target)
 {
-	const auto result = JSON::save(target, createMemento());
+	const auto result = JSON::save(target, *createMemento());
 
 	m_savedSceneHash = m_hashes[m_currentStateIdx];
 	m_currentScene = target;
@@ -241,14 +240,15 @@ void StateManager::reset()
 	takeSnapshot();
 }
 
-Memento StateManager::createMemento()
+std::optional<Memento> StateManager::createMemento()
 {
 	Memento state;
 	state.SetObject();
 
 	if (m_originators.empty())
 	{
-		LOG_WARN("You have no originators set for the StateManager, is it correct?");
+		LOG_WARN("You have no originators set for the StateManager, cannot take snapshot.");
+		return std::nullopt;
 	}
 
 	for (const auto& originator : m_originators)
