@@ -73,7 +73,9 @@ bool WorkspaceTransformation::topContent()
 		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_bgInner), DIWNE::IconType::Cross,
 		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgShape),
 		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_fgInner), iconSize,
-		               I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding), false);
+		               ImVec4(iconSize.x, iconSize.x, iconSize.x, iconSize.x) *
+		                   I3T::getColor(EColor::Nodes_Transformation_ValidIcon_padding),
+		               false);
 
 		// case Core::ETransformState::Unknown:
 		//	diwne.DrawIcon(DIWNE::IconType::Circle, ImColor(255, 0, 255),
