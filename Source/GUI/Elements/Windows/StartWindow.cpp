@@ -177,7 +177,7 @@ void StartWindow::render()
 			// DESCRIPTION
 			ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeDescription));
 			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
-			ImGui::TextWrapped("I3T is an educational application which enables the "
+			ImGui::TextWrapped("I3T is an educational application that allows the "
 			                   "study of 3D transformations and their "
 			                   "hierarchy in an illustrative way.");
 			ImGui::PopStyleColor();
