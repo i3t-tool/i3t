@@ -95,8 +95,6 @@ public:
 	 * Initialize node id, inputs, and outputs according to the preset node type.
 	 *
 	 * Called in create node function.
-	 *
-	 * \todo MH Override in derived classes (Sequence).
 	 */
 	void init();
 
@@ -107,10 +105,10 @@ public:
 	 */
 	void finalize();
 
-	/// Connect this node's output pin to another node's input pin.
+	/// Connect this node output to \p childNode input.
 	///
 	/// \return Result enum is returned from the function. \see ENodePlugResult.
-	ENodePlugResult plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex);
+	ENodePlugResult plug(const Ptr<Node>& childNode, unsigned fromIndex, unsigned toIndex);
 
 	//===-- Helper functions --------------------------------------------------===//
 
