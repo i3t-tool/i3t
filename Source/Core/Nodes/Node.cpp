@@ -54,19 +54,19 @@ void Node::init()
 	onInit();
 }
 
-ENodePlugResult Node::plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsigned toIndex)
+ENodePlugResult Node::plug(const Ptr<Node>& childNode, unsigned fromIndex, unsigned toIndex)
 {
-	I3T_ASSERT(rightNode->getInputPins().size() > toIndex, "Node does not have input pin with given index!");
+	I3T_ASSERT(childNode->getInputPins().size() > toIndex, "Node does not have input pin with given index!");
 	I3T_ASSERT(getOutputPins().size() > fromIndex, "Node does not have output pin with given index!");
 
-	auto& input = rightNode->getInput(toIndex);
+	auto& input = childNode->getInput(toIndex);
 	auto& output = getOutput(fromIndex);
 
 	const auto result = output.plug(input);
 
 	if (result == ENodePlugResult::Ok)
 	{
-		for (auto& state : rightNode->m_OperatorState)
+		for (auto& state : childNode->m_OperatorState)
 		{
 			state = EValueState::Locked;
 		}
@@ -76,7 +76,7 @@ ENodePlugResult Node::plug(const Ptr<Node>& rightNode, unsigned fromIndex, unsig
 			this->spreadSignal(fromIndex);
 		}
 
-		triggerPlugCallback(this, rightNode.get(), fromIndex, toIndex);
+		triggerPlugCallback(this, childNode.get(), fromIndex, toIndex);
 	}
 
 	return result;
