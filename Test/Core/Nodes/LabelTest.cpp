@@ -8,18 +8,20 @@ TEST(LabelTest, GetLabelReturnNamedPinLabelOnNamedPin)
 {
 	auto node = Builder::createOperator<EOperatorType::MatrixMulMatrix>();
 
-	const char* label = node->getInputPins()[0].getLabel();
-	const char* expected = defaultIoNames[static_cast<size_t>(EValueType::Matrix)];
+	const auto& label = node->getInputPins()[0].getLabel();
+	// Now it returns empty string for non-custom pin names.
+	// const auto& expected = defaultIoNames[static_cast<size_t>(EValueType::Matrix)];
+	const auto expected = "";
 
-	EXPECT_TRUE(strcmp(label, expected) == 0);
+	EXPECT_EQ(label, expected);
 }
 
 TEST(LabelTest, GetLabelReturnDefaultPinLabelOnUnnamedPin)
 {
 	auto node = Builder::createOperator<EOperatorType::FloatsToVector3>();
 
-	const char* label = node->getInputPins()[0].getLabel();
-	const char* expected = "x";
+	const auto& label = node->getInputPins()[0].getLabel();
+	const auto& expected = "x";
 
-	EXPECT_TRUE(strcmp(label, expected) == 0);
+	EXPECT_EQ(label, expected);
 }

@@ -138,7 +138,7 @@ public:
 /*! \class WorkspaceCorePinProperties
     \brief Information of Pin for graphic
  */
-class WorkspaceCorePin : public WorkspacePin
+class WorkspaceCorePin : public DIWNE::Pin
 {
 protected:
 	Core::Pin const& m_pin;
@@ -216,10 +216,13 @@ protected:
 public:
 	WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                       WorkspaceNodeWithCoreData& node);
+
 	void updateConnectionPointDiwne()
 	{
 		m_connectionPointDiwne = ImVec2(m_iconRectDiwne.Max.x, (m_iconRectDiwne.Min.y + m_iconRectDiwne.Max.y) / 2);
 	};
+
+	bool content() override;
 };
 
 class WorkspaceCoreOutputPinWithData : public WorkspaceCoreOutputPin

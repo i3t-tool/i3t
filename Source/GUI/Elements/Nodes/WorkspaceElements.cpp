@@ -116,10 +116,6 @@ void WorkspaceNode::popupContent()
 	drawMenuDelete();
 }
 
-WorkspacePin::WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label)
-    : DIWNE::Pin(diwne, id), m_label(label), m_showLabel(false)
-{}
-
 /* >>>>> STATIC FUNCTIONS <<<<< */
 
 int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal)

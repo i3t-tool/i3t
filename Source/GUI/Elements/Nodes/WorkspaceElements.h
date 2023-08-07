@@ -126,32 +126,7 @@ public:
 };
 
 class WorkspacePin : public DIWNE::Pin
-{
-protected:
-	bool m_showLabel;
-	std::string m_label; /*! \brief Name of Pin */
-
-public:
-	WorkspacePin(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const label);
-
-	bool getShowLabel() const
-	{
-		return m_showLabel;
-	};
-	std::string const getLabel() const
-	{
-		return m_label;
-	};
-
-	void setShowLabel(bool showLabel)
-	{
-		m_showLabel = showLabel;
-	};
-	void setLabel(std::string label)
-	{
-		m_label = label;
-	};
-};
+{};
 
 /* static functions */
 extern int numberOfCharWithDecimalPoint(float value, int numberOfVisibleDecimal);
