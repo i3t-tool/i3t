@@ -54,12 +54,13 @@ bool WorkspaceScreen::topContent()
 	return WorkspaceNodeWithCoreData::topContent();
 }
 
-//  The screen has two triangles for resize:
+//  The screen has one (formerly two) triangles for resize:
+//  (DR): Reworked to only have one in the bottom right corner as per usual UI conventions
 //  ----------
 //  |        |
 //  |        |
-//  |\      /|
-//  | \    / |
+//  |       /|
+//  |      / |
 //  ----------
 bool WorkspaceScreen::middleContent()
 {
@@ -92,7 +93,7 @@ bool WorkspaceScreen::middleContent()
 	return interaction_happen;
 }
 
-int WorkspaceScreen::maxLenghtOfData() // todo
+int WorkspaceScreen::maxLengthOfData() // todo
 {
 	return numberOfCharWithDecimalPoint(getOutputs()[1]->getCorePin().data().getFloat(),
 	                                    getNumberOfVisibleDecimal()); /* \todo JH \todo MH not 1 but some
@@ -113,6 +114,7 @@ bool WorkspaceScreen::drawResizeHandles(ImVec2 topLeftCursorPos, ImVec2 zoomedTe
 	                             /// size too to avoid blurring
 	ImVec2 dragDelta;            /// zoom-scaled mouse move
 	ImVec2 buttonSize = I3T::getSize(ESizeVec2::Nodes_Screen_resizeButtonSize);
+	buttonSize = ImMax(ImVec2(1, 1), buttonSize);
 	float buttonIconPadding = 0.f; /// not used 2*diwne.getWorkAreaZoom();
 
 	// floored position - same as in ImGui

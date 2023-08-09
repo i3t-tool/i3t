@@ -9,7 +9,9 @@ WorkspaceSequence::WorkspaceSequence(DIWNE::Diwne& diwne,
                                      bool drawPins /*=true*/, bool isCameraSequence /*=false*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, false), m_drawPins(drawPins),
       m_isCameraSequence(isCameraSequence)
-{}
+{
+	updateDataItemsWidth();
+}
 
 bool WorkspaceSequence::allowDrawing()
 {
@@ -189,7 +191,7 @@ bool WorkspaceSequence::afterContent()
 	//    for (WorkspaceCoreInputPin & inputPin : getInputs())
 	//    {
 	//        if
-	//        (inputPin.m_connection_changed){dynamic_cast<WorkspaceDiwne&>(diwne).m_reconnectCameraToSequence
+	//        (inputPin.m_connectionChanged){dynamic_cast<WorkspaceDiwne&>(diwne).m_reconnectCameraToSequence
 	//        = true;}
 	//    }
 	return false;
@@ -217,6 +219,11 @@ bool WorkspaceSequence::middleContent()
 
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
+		if (getInputs().at(Core::I3T_SEQ_IN_MAT)->connectionChanged())
+		{
+			// Ensure that width is recalculated the first time data is shown prompted by a new input connection
+			updateDataItemsWidth();
+		}
 		bool valueChanged = false;
 		int rowOfChange, columnOfChange;
 		float valueOfChange;
@@ -346,7 +353,7 @@ void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
 		m_numberOfVisibleDecimal = value;
-		setDataItemsWidth();
+		updateDataItemsWidth();
 	}
 	else
 	{
@@ -357,11 +364,11 @@ void WorkspaceSequence::setNumberOfVisibleDecimal(int value)
 	}
 }
 
-int WorkspaceSequence::maxLenghtOfData()
+int WorkspaceSequence::maxLengthOfData()
 {
 	if (getInputs().at(Core::I3T_SEQ_IN_MAT)->isConnected())
 	{
-		return maxLenghtOfData4x4(m_nodebase->getData(0).getMat4() /*\todo JM HM better selection (index) of data*/,
+		return maxLengthOfData4x4(m_nodebase->getData(0).getMat4() /*\todo JM HM better selection (index) of data*/,
 		                          m_numberOfVisibleDecimal);
 	}
 	return 0;

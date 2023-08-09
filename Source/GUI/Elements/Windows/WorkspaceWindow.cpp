@@ -3,13 +3,11 @@
 */
 #include "WorkspaceWindow.h"
 
-#include "GUI/Elements/Nodes/Builder.h"
 #include "GUI/Elements/Nodes/Tools.h"
 #include "GUI/WindowManager.h"
 #include "Logger/Logger.h"
 #include "State/NodeDeserializer.h"
 #include "State/SerializationVisitor.h"
-#include "Utils/JSON.h"
 #include "Viewport/Viewport.h"
 #include "Viewport/entity/nodes/SceneModel.h"
 
@@ -1027,7 +1025,7 @@ bool WorkspaceDiwne::beforeBegin()
 		m_resizeDataWidth = false;
 		for (auto node : getAllNodesInnerIncluded())
 		{
-			node->setDataItemsWidth();
+			node->updateDataItemsWidth();
 		}
 	}
 
@@ -1786,7 +1784,6 @@ WorkspaceDiwne& WorkspaceWindow::getNodeEditor()
 
 void WorkspaceWindow::render()
 {
-
 	ImGui::PushStyleColor(ImGuiCol_TabActive, App::get().getUI()->getTheme().get(EColor::DockTabActive));
 	/* Draw to window only if is visible - call ImGui::End() everytime */
 	if (ImGui::Begin(setName("Workspace").c_str(), getShowPtr(),
@@ -1839,20 +1836,14 @@ void WorkspaceWindow::showEditMenu()
 
 bool connectNodesNoSave(Ptr<WorkspaceNodeWithCoreData> lhs, Ptr<WorkspaceNodeWithCoreData> rhs, int lhsPin, int rhsPin)
 {
-	auto plugResult = Core::GraphManager::plug(lhs->getNodebase(), rhs->getNodebase(), lhsPin, rhsPin);
-	if (plugResult != Core::ENodePlugResult::Ok)
+	bool success = std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(rhs)->getInputs().at(rhsPin)->plug(
+	    std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(lhs)->getOutputs().at(lhsPin).get(), false);
+	if (!success)
 	{
 		LOG_INFO("Cannot connect pin{} to pin{} of nodes {} and {}", lhs->getNodebase()->getSignature(),
 		         rhs->getNodebase()->getSignature(), lhsPin, rhsPin);
-		return false;
 	}
-	else
-	{
-		std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(rhs)
-		    ->getInputs()
-		    .at(rhsPin)
-		    ->setConnectedWorkspaceOutput(
-		        std::static_pointer_cast<WorkspaceNodeWithCoreDataWithPins>(lhs)->getOutputs().at(lhsPin).get());
-		return true;
-	}
+	rhs->updateDataItemsWidth();
+	lhs->updateDataItemsWidth();
+	return success;
 }

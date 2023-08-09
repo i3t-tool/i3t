@@ -34,8 +34,8 @@ bool Pin::processInteractionsAlways()
 	bool interaction_happen = false;
 
 	interaction_happen |= processPin_Pre_ConnectLinkDiwne();
-	interaction_happen |= DiwneObject::processInteractionsAlways(); /* Selection rectangle block
-	                                                                   showing popup etc. */
+	// Selection rectangle block showing popup etc.
+	interaction_happen |= DiwneObject::processInteractionsAlways();
 
 	return interaction_happen;
 }

@@ -299,14 +299,16 @@ bool Node::bottomContentDiwne()
 
 void Node::updateSizes()
 {
+	ImGuiStyle& style = ImGui::GetStyle();
+
 	/* \todo can use ImGui::ItemMax/Min */
 	setNodeRectsPositionDiwne(m_nodePositionDiwne);
-	ImVec2 spacing =
-	    ImGui::GetStyle().ItemSpacing / diwne.getWorkAreaZoom(); /* in BeginDiwne() is ItemSpacing scaled */
+	/* ItemSpacing is already scaled, node rects are using unscaled coordinates, thus the divison */
+	ImVec2 spacing = ImGui::GetStyle().ItemSpacing / diwne.getWorkAreaZoom();
 
 	float rightWidth = m_rightRectDiwne.GetWidth();
-	float centerWidth = m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() + rightWidth +
-	                    spacing.x * 2; /* space is between left-middle and middle-right */
+	/* space is between left-middle and middle-right */
+	float centerWidth = m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() + rightWidth + (spacing.x * 2);
 	float maxWidth = std::max(m_topRectDiwne.GetWidth(), std::max(centerWidth, m_bottomRectDiwne.GetWidth()));
 
 	float bottomYOfCentre = m_bottomRectDiwne.Min.y - spacing.y;

@@ -111,6 +111,14 @@ void UIModule::beginFrame()
 	// Draw windows
 	m_windowManager.draw();
 
+	// Run queued delayed UI calls scheduled with UIModule::invokeLater()
+	std::list<Runnable>::iterator it = queuedCalls.begin();
+	while (it != queuedCalls.end())
+	{
+		(*it)(); // Run call
+		queuedCalls.erase(it++);
+	}
+
 	// TODO: (DR) Unused, resolve, old camera handling
 	queryCameraState();
 

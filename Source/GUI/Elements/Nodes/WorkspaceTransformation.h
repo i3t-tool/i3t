@@ -16,6 +16,22 @@ public:
 	}
 	//===----------------------------------------------------------------------===//
 
+	bool beforeBegin() override;
+	bool beforeContent() override;
+	bool topContent() override;
+	bool middleContent() override;
+	bool afterContent() override;
+	virtual void deleteAction() override;
+	virtual bool allowDrawing() override;
+
+	void popupContent() override;
+	virtual void drawMenuLevelOfDetail() override = 0;
+	void drawMenuDelete() override;
+
+	void updateSizes() override;
+
+	//
+
 	std::vector<ImVec2> getInteractionPointsWithSequence();
 
 	bool m_removeFromSequence;
@@ -49,22 +65,9 @@ public:
 		return drawDataFull();
 	};
 
-	virtual int maxLenghtOfData();
+	virtual int maxLengthOfData() override;
 
-	bool beforeBegin();
-	bool beforeContent();
-	bool topContent();
-	bool middleContent();
-	bool afterContent();
-	virtual void deleteAction();
-	virtual bool allowDrawing();
-
-	void popupContent();
-	virtual void drawMenuLevelOfDetail() = 0;
-	void drawMenuDelete();
 	void drawMenuStorevalues();
-
-	void updateSizes();
 
 	virtual bool drawDataSetValues_InsideTablebuilder(std::vector<std::string> const& labels,
 	                                                  std::vector<float*> const& local_data, bool& value_changed);

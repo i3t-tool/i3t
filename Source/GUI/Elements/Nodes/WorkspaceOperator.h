@@ -7,7 +7,7 @@ public:
 	WorkspaceOperator(DIWNE::Diwne& diwne)
 	    : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createOperator<T>())
 	{
-		setDataItemsWidth();
+		updateDataItemsWidth();
 	}
 
 	//===-- Double dispatch
@@ -46,7 +46,7 @@ public:
 		                              {WorkspaceLevelOfDetail::Full, WorkspaceLevelOfDetail::Label});
 	}
 
-	int maxLenghtOfData()
+	int maxLengthOfData()
 	{
 		int maxLen = 0;
 		for (auto const& pin : m_workspaceOutputs)

@@ -7,7 +7,7 @@ template <Core::ETransformType T> class WorkspaceTransformation_s : public Works
 public:
 	WorkspaceTransformation_s(DIWNE::Diwne& diwne) : WorkspaceTransformation(diwne, Core::Builder::createTransform<T>())
 	{
-		setDataItemsWidth();
+		updateDataItemsWidth();
 		if (Core::ETransformType::Quat == T)
 			setLevelOfDetail(WorkspaceLevelOfDetail::SetValues);
 	}
@@ -25,13 +25,13 @@ public:
 		return m_nodebase->as<Core::TransformImpl<T>>()->isValid();
 	}
 
-	int maxLenghtOfData()
+	int maxLengthOfData()
 	{
 		//    if (Core::ETransformType::Quat == T)
-		//        return maxLenghtOfDataQuaternion( m_nodebase->getData().getQuat(),
+		//        return maxLengthOfDataQuaternion( m_nodebase->getData().getQuat(),
 		//        m_numberOfVisibleDecimal);
 		//    else
-		return maxLenghtOfData4x4(m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
+		return maxLengthOfData4x4(m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 	}
 
 	void drawMenuLevelOfDetail()
@@ -85,7 +85,7 @@ public:
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						setDataItemsWidth();
+						updateDataItemsWidth();
 					}
 					break;
 				}
@@ -102,7 +102,7 @@ public:
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						setDataItemsWidth();
+						updateDataItemsWidth();
 					}
 					break;
 				}
@@ -126,7 +126,7 @@ public:
 						// error 	else 		localData = glm::normalize(localData);
 						//           }
 						nodebase->setDefaultValue(key, localData);
-						setDataItemsWidth();
+						updateDataItemsWidth();
 					}
 					break;
 				}
@@ -144,7 +144,7 @@ public:
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						setDataItemsWidth();
+						updateDataItemsWidth();
 					}
 					break;
 				}
@@ -163,23 +163,17 @@ public:
 	} /* thus we can specify it for Core::ETransformType::Free  */
 };
 
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    void
-    WorkspaceTransformation_s<Core::ETransformType::Free>::drawMenuSetDataMap()
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline void WorkspaceTransformation_s<Core::ETransformType::Free>::drawMenuSetDataMap()
 {
 	ImGui::MenuItem("Lock", NULL, false, false); /* no change DataMap in Free transformation */
 	ImGui::MenuItem("Enable synergies", NULL, false, false);
 }
 
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    void
-    WorkspaceTransformation_s<Core::ETransformType::Scale>::drawMenuSetDataMap()
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline void WorkspaceTransformation_s<Core::ETransformType::Scale>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
@@ -213,12 +207,9 @@ inline /* inline for ability to compile
 	}
 }
 
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    void
-    WorkspaceTransformation_s<Core::ETransformType::Quat>::drawMenuSetDataMap()
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline void WorkspaceTransformation_s<Core::ETransformType::Quat>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
@@ -257,12 +248,10 @@ inline /* inline for ability to compile
 		}
 	}
 }
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    void
-    WorkspaceTransformation_s<Core::ETransformType::Ortho>::drawMenuSetDataMap()
+
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline void WorkspaceTransformation_s<Core::ETransformType::Ortho>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
@@ -301,12 +290,10 @@ inline /* inline for ability to compile
 		}
 	}
 }
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    void
-    WorkspaceTransformation_s<Core::ETransformType::Frustum>::drawMenuSetDataMap()
+
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline void WorkspaceTransformation_s<Core::ETransformType::Frustum>::drawMenuSetDataMap()
 {
 	if (m_nodebase->as<Core::Transform>()->isLocked())
 	{
@@ -345,12 +332,10 @@ inline /* inline for ability to compile
 		}
 	}
 }
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    bool
-    WorkspaceTransformation_s<Core::ETransformType::Scale>::drawDataSetValues()
+
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline bool WorkspaceTransformation_s<Core::ETransformType::Scale>::drawDataSetValues()
 {
 	bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::Scale>>();
@@ -379,7 +364,7 @@ inline /* inline for ability to compile
 						// nodebase->setDefaultValue(key, localData[0]);  // Sets float
 						// instead of vec3 - may be based on synergies??
 						nodebase->setDefaultUniformScale(localData.x);
-						setDataItemsWidth();
+						updateDataItemsWidth();
 					}
 				}
 				else /* non-uniform */
@@ -392,7 +377,7 @@ inline /* inline for ability to compile
 					if (value_changed)
 					{
 						nodebase->setDefaultValue(key, localData);
-						setDataItemsWidth();
+						updateDataItemsWidth();
 					}
 				}
 				break;
@@ -406,12 +391,9 @@ inline /* inline for ability to compile
 	return inner_interaction_happen;
 }
 
-template <>
-inline /* inline for ability to compile
-          https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
-        */
-    bool
-    WorkspaceTransformation_s<Core::ETransformType::LookAt>::drawDataSetValues()
+// inline for ability to compile
+// https://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+template <> inline bool WorkspaceTransformation_s<Core::ETransformType::LookAt>::drawDataSetValues()
 {
 	bool inner_interaction_happen = false, value_changed = false;
 	auto nodebase = m_nodebase->as<Core::TransformImpl<Core::ETransformType::LookAt>>();
@@ -439,7 +421,7 @@ inline /* inline for ability to compile
 	{
 		index_of_change %= columnLabels.size(); /* move to index of nodebase data column */
 		nodebase->setDefaultValue(columnLabels[index_of_change], local_data[index_of_change]);
-		setDataItemsWidth();
+		updateDataItemsWidth();
 	}
 
 	return inner_interaction_happen;

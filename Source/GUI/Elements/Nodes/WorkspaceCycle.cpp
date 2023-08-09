@@ -9,7 +9,7 @@ WorkspaceCycle::WorkspaceCycle(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase /*=
                                bool drawPins /*=true*/)
     : WorkspaceNodeWithCoreDataWithPins(diwne, nodebase, drawPins)
 {
-	setDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node
+	updateDataItemsWidth(); /* \todo Jh make "processinfirstframe" function in Node
 	                        and run settings data width in it */
 }
 
@@ -150,8 +150,10 @@ bool WorkspaceCycle::middleContent()
 	float localData;
 	bool valueChanged;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	switch (m_levelOfDetail)
 	{
@@ -176,7 +178,7 @@ bool WorkspaceCycle::middleContent()
 		{
 			// ask MH \\ \todo SetValue does not call setDirectionMultiplier()
 			m_nodebase->setValue(localData);
-			setDataItemsWidth();
+			updateDataItemsWidth();
 		}
 
 		break;
@@ -205,7 +207,7 @@ bool WorkspaceCycle::middleContent()
 		{
 			// ask MH \\ \todo SetValue does not call setDirectionMultiplier()
 			m_nodebase->setValue(localData);
-			setDataItemsWidth();
+			updateDataItemsWidth();
 		}
 
 		/* =================================== */
@@ -289,7 +291,7 @@ bool WorkspaceCycle::middleContent()
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setFrom(localData);
-			setDataItemsWidth();
+			updateDataItemsWidth();
 		}
 		ImGui::TableNextColumn();
 		localData = m_nodebase->as<Core::Cycle>()->getTo();
@@ -307,7 +309,7 @@ bool WorkspaceCycle::middleContent()
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setTo(localData);
-			setDataItemsWidth();
+			updateDataItemsWidth();
 		}
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
@@ -326,7 +328,7 @@ bool WorkspaceCycle::middleContent()
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
-			setDataItemsWidth();
+			updateDataItemsWidth();
 		}
 		ImGui::TableNextColumn();
 		localData = m_nodebase->as<Core::Cycle>()->getManualStep();
@@ -342,7 +344,7 @@ bool WorkspaceCycle::middleContent()
 		if (valueChanged)
 		{
 			m_nodebase->as<Core::Cycle>()->setManualStep(localData);
-			setDataItemsWidth();
+			updateDataItemsWidth();
 		}
 		ImGui::EndTable();
 		break;
@@ -352,7 +354,7 @@ bool WorkspaceCycle::middleContent()
 	return inner_interaction_happen;
 }
 
-int WorkspaceCycle::maxLenghtOfData()
+int WorkspaceCycle::maxLengthOfData()
 {
 	Ptr<Core::Cycle> nodebase = m_nodebase->as<Core::Cycle>();
 	return std::max({numberOfCharWithDecimalPoint(nodebase->getFrom(), m_numberOfVisibleDecimal),

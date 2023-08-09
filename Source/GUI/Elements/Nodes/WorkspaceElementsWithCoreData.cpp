@@ -64,14 +64,28 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
+	bool interaction_happen = false;
+
+	float zoom = diwne.getWorkAreaZoom();
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	//	// Left frame padding, shouldn't be necessary as LabelText already includes frame padding
+	//	float paddingWidth = ImGui::GetStyle().FramePadding.x; // Already scaled
+	//	ImGui::Indent(paddingWidth);
+
+	// Top label
 	if (m_topLabel.empty())
 	{
 		m_topLabel = m_nodebase->getLabel();
 	}
-	ImGui::Indent(ImGui::GetStyle().ItemSpacing.x);
 	const char* topLabel = m_topLabel.c_str();
-	bool interaction_happen;
-	ImGui::PushItemWidth(ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel)).x + 5);
+	ImVec2 textSize = ImGui::CalcTextSize(topLabel, topLabel + strlen(topLabel));
+
+	//	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+	//	ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + style.FramePadding, cursorPos + textSize +
+	//  style.FramePadding, IM_COL32(0, 255, 255, 120));
+
+	ImGui::PushItemWidth(textSize.x + style.FramePadding.x * 2);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0.00)); /* invisible bg */
 
 	if (m_isLabelBeingEdited)
@@ -99,9 +113,10 @@ bool WorkspaceNodeWithCoreData::topContent()
 	}
 	ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
+
+	// Adding dummy space for grabbing the header
 	ImGui::SameLine();
-	// adding dummy space for block interaction
-	ImGui::Dummy(ImVec2(50, 10)); /* dummy for snap some item for same space on left right of label  */
+	ImGui::Dummy(ImVec2(50 * zoom, 0)); /* dummy for snap some item for same space on left right of label  */
 
 	return interaction_happen;
 }
@@ -119,7 +134,7 @@ int WorkspaceNodeWithCoreData::getNumberOfVisibleDecimal()
 void WorkspaceNodeWithCoreData::setNumberOfVisibleDecimal(int value)
 {
 	m_numberOfVisibleDecimal = (value >= 0 ? value : 0);
-	setDataItemsWidth();
+	updateDataItemsWidth();
 }
 
 float WorkspaceNodeWithCoreData::getDataItemsWidth()
@@ -127,15 +142,17 @@ float WorkspaceNodeWithCoreData::getDataItemsWidth()
 	return m_dataItemsWidth;
 }
 
-float WorkspaceNodeWithCoreData::setDataItemsWidth()
+float WorkspaceNodeWithCoreData::updateDataItemsWidth()
 {
-	float size = ImGui::GetFontSize(); // /* \todo JH do not know why return incorrect
-	                                   // value when zoom and than add node, but after
-	                                   // changing value return correct one...  get width
-	                                   // */ get current font size (= height in pixels) of
-	                                   // current font with current scale applied
-	float oneCharWidth = size / 2, padding = I3T::getSize(ESize::Nodes_FloatInnerPadding);
-	m_dataItemsWidth = (float) (maxLenghtOfData()) * oneCharWidth + 2 * padding;
+	bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
+	float fontSize = ImGui::GetFontSize();
+	float oneCharWidth = fontSize / 2;
+	float padding = I3T::getSize(ESize::Nodes_FloatInnerPadding) * diwne.getWorkAreaZoom();
+	float maxLength = maxLengthOfData();
+	m_dataItemsWidth = (float) (maxLength) *oneCharWidth + 2 * padding;
+	// LOG_INFO("SetDataItemsWidth() in node: '{}'\nfS: {}, oCW: {}, mLOD: {}, dataWidth: {}",
+	//         this->getNodebase()->getLabel(), fontSize, oneCharWidth, maxLengthOfData, m_dataItemsWidth);
+	diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
 	return m_dataItemsWidth;
 }
 
@@ -285,7 +302,7 @@ bool WorkspaceCorePin::content()
 		float padding = I3T::getSize(ESize::Pins_IconPadding) * diwne.getWorkAreaZoom();
 
 		// TODO: (DR) Don't really see why the "filled" parameters depends on isConnected(), currently the outlines are
-		// not visible anyway so we're just drawing stuff twice for no reason
+		//   not visible anyway so we're just drawing stuff twice for no reason
 		diwne.DrawIcon(iconTypeBg, iconColorBg, iconColorBg, iconTypeFg, iconColorFg, iconColorFg, iconSize,
 		               ImVec4(padding, padding, padding, padding), isConnected());
 		m_iconRectDiwne =
@@ -369,7 +386,6 @@ bool WorkspaceCorePin::processConnectionPrepared()
 		{
 			WorkspaceCoreInputPin* in = dynamic_cast<WorkspaceCoreInputPin*>(input);
 			in->plug(dynamic_cast<WorkspaceCoreOutputPin*>(output));
-			diwne.m_takeSnap = true;
 		}
 		break;
 
@@ -451,14 +467,14 @@ bool WorkspaceCoreOutputPinMatrix4x4::drawData()
 	{
 		/* \todo JM MH set values to given (this) pin*/
 		node.getNodebase()->setValue(valueOfChange, {columnOfChange, rowOfChange});
-		node.setDataItemsWidth();
+		node.updateDataItemsWidth();
 	}
 	return interaction_happen;
 }
 
 int WorkspaceCoreOutputPinMatrix4x4::maxLengthOfData()
 {
-	return maxLenghtOfData4x4(getCorePin().data().getMat4(), getNode().getNumberOfVisibleDecimal());
+	return maxLengthOfData4x4(getCorePin().data().getMat4(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinVector4::drawData()
@@ -476,14 +492,14 @@ bool WorkspaceCoreOutputPinVector4::drawData()
 	if (valueChanged)
 	{
 		node.getNodebase()->setValue(valueOfChange);
-		node.setDataItemsWidth();
+		node.updateDataItemsWidth();
 	}
 	return interaction_happen;
 }
 
 int WorkspaceCoreOutputPinVector4::maxLengthOfData()
 {
-	return maxLenghtOfDataVec4(getCorePin().data().getVec4(), getNode().getNumberOfVisibleDecimal());
+	return maxLengthOfDataVec4(getCorePin().data().getVec4(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinVector3::drawData()
@@ -501,14 +517,14 @@ bool WorkspaceCoreOutputPinVector3::drawData()
 	if (valueChanged)
 	{
 		node.getNodebase()->setValue(valueOfChange);
-		node.setDataItemsWidth();
+		node.updateDataItemsWidth();
 	}
 	return interaction_happen;
 }
 
 int WorkspaceCoreOutputPinVector3::maxLengthOfData()
 {
-	return maxLenghtOfDataVec3(getCorePin().data().getVec3(), getNode().getNumberOfVisibleDecimal());
+	return maxLengthOfDataVec3(getCorePin().data().getVec3(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinFloat::drawData()
@@ -525,14 +541,14 @@ bool WorkspaceCoreOutputPinFloat::drawData()
 	if (valueChanged)
 	{
 		node.getNodebase()->setValue(valueOfChange);
-		node.setDataItemsWidth();
+		node.updateDataItemsWidth();
 	}
 	return interaction_happen;
 }
 
 int WorkspaceCoreOutputPinFloat::maxLengthOfData()
 {
-	return maxLenghtOfDataFloat(getCorePin().data().getFloat(), getNode().getNumberOfVisibleDecimal());
+	return maxLengthOfDataFloat(getCorePin().data().getFloat(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinQuaternion::drawData()
@@ -550,14 +566,14 @@ bool WorkspaceCoreOutputPinQuaternion::drawData()
 	if (valueChanged)
 	{
 		node.getNodebase()->setValue(valueOfChange);
-		node.setDataItemsWidth();
+		node.updateDataItemsWidth();
 	}
 	return interaction_happen;
 }
 
 int WorkspaceCoreOutputPinQuaternion::maxLengthOfData()
 {
-	return maxLenghtOfDataQuaternion(getCorePin().data().getQuat(), getNode().getNumberOfVisibleDecimal());
+	return maxLengthOfDataQuaternion(getCorePin().data().getQuat(), getNode().getNumberOfVisibleDecimal());
 }
 
 bool WorkspaceCoreOutputPinPulse::drawData()
@@ -608,27 +624,9 @@ WorkspaceCoreInputPin::WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID cons
     : WorkspaceCorePin(diwne, id, pin, node), m_link(diwne, id, this)
 {}
 
-void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou)
-{
-	m_link.setStartPin(ou);
-}
-
-void WorkspaceCoreInputPin::unplug()
-{
-	const auto rightNode = getNode().getNodebase();
-	const auto* inputPin = &rightNode->getInputPins()[getIndex()];
-
-	LOG_EVENT_DISCONNECT(inputPin->getParentPin(), inputPin);
-
-	Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
-	m_link.setStartPin(nullptr);
-	diwne.m_takeSnap = true;
-	m_connection_changed = true;
-}
-
 bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode /*=DIWNE::DrawMode::Interacting*/)
 {
-	m_connection_changed = false;
+	m_connectionChanged = false;
 	bool inner_interaction_happen = WorkspaceCorePin::drawDiwne(m_drawMode);
 	if (isConnected())
 	{
@@ -638,7 +636,28 @@ bool WorkspaceCoreInputPin::drawDiwne(DIWNE::DrawMode drawMode /*=DIWNE::DrawMod
 	return inner_interaction_happen;
 }
 
-void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
+void WorkspaceCoreInputPin::setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou)
+{
+	m_link.setStartPin(ou);
+}
+
+void WorkspaceCoreInputPin::unplug(bool logEvent)
+{
+	const auto rightNode = getNode().getNodebase();
+	const auto* inputPin = &rightNode->getInputPins()[getIndex()];
+
+	if (logEvent)
+	{
+		LOG_EVENT_DISCONNECT(inputPin->getParentPin(), inputPin);
+		diwne.m_takeSnap = true;
+	}
+
+	Core::GraphManager::unplugInput(getNode().getNodebase(), getIndex());
+	m_link.setStartPin(nullptr);
+	m_connectionChanged = true;
+}
+
+bool WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou, bool logEvent)
 {
 	Core::Pin const* coreInput = &(getCorePin());
 	Core::Pin const* coreOutput = &(ou->getCorePin());
@@ -648,10 +667,21 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
 	{
 		setConnectedWorkspaceOutput(ou);
 		m_link.m_just_pluged = true;
-		m_connection_changed = true;
+		m_connectionChanged = true;
 
-		LOG_EVENT_CONNECT(coreOutput, coreInput);
+		if (logEvent)
+		{
+			LOG_EVENT_CONNECT(coreOutput, coreInput);
+			diwne.m_takeSnap = true;
+		}
+		return true;
 	}
+	return false;
+}
+
+bool WorkspaceCoreInputPin::connectionChanged() const
+{
+	return m_connectionChanged;
 }
 
 bool WorkspaceCoreInputPin::content()
@@ -1038,7 +1068,8 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 	}
 	else
 	{
-		ImGui::Dummy(App::get().getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
+		// TODO: (DR) (zoom-aware) Uncomment perhaps
+		// ImGui::Dummy(App::get().getUI()->getTheme().get(ESizeVec2::Nodes_noPinsSpacing));
 	}
 	return inner_interaction_happen;
 }
@@ -1353,18 +1384,22 @@ bool drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisib
 	float localData; /* user can change just one value at the moment */
 
 	ImGui::PushItemWidth(dataWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
-
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 	valueChanged = false;
 
 	/* Drawing is row-wise */
 	ImGui::BeginGroup();
 	for (int rows = 0; rows < 4; rows++)
 	{
-		if (rows == 1)
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() -
-			                     ImGui::GetStyle().ItemSpacing.y); /*\todo JH hard to say why...*/
+		// To be quite honest I don't know why this call is necessary but window text baseline offset is alwazs set here
+		// to ~4 (FramePadding.y) when it really should be 0, causes any text to be too high and then it works fine
+		// after the next ImGui::SameLine() call. This created a vertical gap between the first and second matrix rows.
+		// JH solved this (haphazardly like me) by moving the Y cursor position by ItemSpacing which however broke down
+		// at other zoom levels.
+		ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset = 0.0f;
 		for (int columns = 0; columns < 4; columns++)
 		{
 			localData = data[columns][rows]; /* Data are column-wise */
@@ -1430,7 +1465,7 @@ bool drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisib
 	return inner_interaction_happen;
 }
 
-int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
+int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal)
 {
 	int act, maximal = 0;
 	for (int column = 0; column < 4; column++)
@@ -1458,8 +1493,10 @@ bool drawDataVec4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisi
 	bool inner_interaction_happen = false;
 
 	ImGui::PushItemWidth(dataWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	valueChanged = false;
 	// valueOfChange = data; /* will this work? */
@@ -1482,7 +1519,7 @@ bool drawDataVec4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisi
 	return inner_interaction_happen;
 }
 
-int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal)
+int maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal)
 {
 	int act, maximal = 0;
 
@@ -1506,8 +1543,10 @@ bool drawDataVec3(DIWNE::Diwne& diwne, DIWNE::ID node_id, int numberOfVisibleDec
 	bool inner_interaction_happen = false;
 
 	ImGui::PushItemWidth(dataWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	valueChanged = false;
 	ImGui::BeginGroup();
@@ -1528,7 +1567,7 @@ bool drawDataVec3(DIWNE::Diwne& diwne, DIWNE::ID node_id, int numberOfVisibleDec
 
 	return inner_interaction_happen;
 }
-int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal)
+int maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal)
 {
 	int act, maximal = 0;
 
@@ -1551,8 +1590,10 @@ bool drawDataFloat(DIWNE::Diwne& diwne, DIWNE::ID node_id, int numberOfVisibleDe
 	bool inner_interaction_happen = false;
 
 	ImGui::PushItemWidth(dataWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	valueChanged = false;
 	valueOfChange = data;
@@ -1566,7 +1607,7 @@ bool drawDataFloat(DIWNE::Diwne& diwne, DIWNE::ID node_id, int numberOfVisibleDe
 
 	return inner_interaction_happen;
 }
-int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal)
+int maxLengthOfDataFloat(const float& data, int numberOfVisibleDecimal)
 {
 	return numberOfCharWithDecimalPoint(data, numberOfVisibleDecimal);
 }
@@ -1579,8 +1620,10 @@ bool drawDataQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const 
 	bool actualValueChanged = false;
 
 	ImGui::PushItemWidth(dataWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	valueChanged = false;
 	ImGui::BeginGroup();
@@ -1604,7 +1647,7 @@ bool drawDataQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const 
 	return inner_interaction_happen;
 }
 
-int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal)
+int maxLengthOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal)
 {
 	int act, maximal = 0;
 
