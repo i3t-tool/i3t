@@ -405,9 +405,12 @@ WorkspaceCoreOutputPin::WorkspaceCoreOutputPin(DIWNE::Diwne& diwne, DIWNE::ID co
 
 bool WorkspaceCoreOutputPin::content()
 {
-	ImGui::TextUnformatted(m_pin.getLabel().c_str());
-	ImGui::SameLine();
-
+	const std::string& label = m_pin.getLabel();
+	if (!label.empty())
+	{
+		ImGui::TextUnformatted(label.c_str());
+		ImGui::SameLine();
+	}
 	const auto inner_interaction_happen = WorkspaceCorePin::content();
 	return inner_interaction_happen;
 }
@@ -654,8 +657,12 @@ void WorkspaceCoreInputPin::plug(WorkspaceCoreOutputPin* ou)
 bool WorkspaceCoreInputPin::content()
 {
 	float inner_interaction_happen = WorkspaceCorePin::content();
-	ImGui::SameLine();
-	ImGui::TextUnformatted(m_pin.getLabel().c_str());
+	const std::string& label = m_pin.getLabel();
+	if (!label.empty())
+	{
+		ImGui::SameLine();
+		ImGui::TextUnformatted(label.c_str());
+	}
 	return inner_interaction_happen;
 }
 
