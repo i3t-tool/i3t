@@ -29,7 +29,7 @@ WorkspaceDiwne* g_workspaceDiwne = nullptr;
 /* ======================================== */
 WorkspaceDiwne::WorkspaceDiwne(DIWNE::SettingsDiwne* settingsDiwne)
     : Diwne(settingsDiwne), m_workspaceDiwneAction(WorkspaceDiwneAction::None),
-      m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_resizeDataWidth(false),
+      m_workspaceDiwneActionPreviousFrame(WorkspaceDiwneAction::None), m_updateDataItemsWidth(false),
       m_trackingFromLeft(false), tracking(nullptr), smoothTracking(true), m_viewportHighlightResolver(this)
 
 {}
@@ -1000,11 +1000,11 @@ void WorkspaceDiwne::popupContent()
 	}
 	if (ImGui::BeginMenu("Zoom"))
 	{
-		if (ImGui::MenuItem("to all", "LShift+A"))
+		if (ImGui::MenuItem("to all", "Ctrl+Alt+A"))
 		{
 			zoomToAll();
 		}
-		if (ImGui::MenuItem("to selection", "LShift+X"))
+		if (ImGui::MenuItem("to selection", "Ctrl+Alt+S"))
 		{
 			zoomToSelected();
 		}
@@ -1020,9 +1020,9 @@ bool WorkspaceDiwne::beforeBegin()
 	m_linksToDraw.clear();
 	m_allowUnselectingNodes = !InputManager::isAxisActive("NOTunselectAll");
 	m_reconnectCameraToSequence = false;
-	if (m_resizeDataWidth)
+	if (m_updateDataItemsWidth)
 	{
-		m_resizeDataWidth = false;
+		m_updateDataItemsWidth = false;
 		for (auto node : getAllNodesInnerIncluded())
 		{
 			node->updateDataItemsWidth();
@@ -1643,8 +1643,18 @@ ImVec2 WorkspaceDiwne::bypassDiwneGetSelectionRectangleSize()
 
 bool WorkspaceDiwne::processZoom()
 {
-	m_resizeDataWidth = true;
+	m_updateDataItemsWidth = true;
 	return Diwne::processZoom();
+}
+
+void WorkspaceDiwne::setWorkAreaZoom(float val)
+{
+	float old = m_workAreaZoom;
+	Diwne::setWorkAreaZoom(val);
+	if (old != val)
+	{
+		m_updateDataItemsWidth = true;
+	}
 }
 
 /* ========================================== */
