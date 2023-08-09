@@ -76,8 +76,8 @@ void InputBindings::init()
 	InputManager::setInputAction("unplugInputPin", Keys::mouseLeft);
 	InputManager::setInputAction("hold", Keys::mouseLeft);
 	InputManager::setInputAxis("drag", 1.0f, Keys::mouseLeft);
-	InputManager::setInputAction("zoomToAll", Keys::a, {Keys::shiftl});
-	InputManager::setInputAction("zoomToSelected", Keys::x, {Keys::shiftl});
+	InputManager::setInputAction("zoomToAll", Keys::a, {Keys::ctrll, Keys::altl});
+	InputManager::setInputAction("zoomToSelected", Keys::s, {Keys::ctrll, Keys::altl});
 
 	// InputManager::setInputAction("unselectAll", Keys::mouseLeft);
 	InputManager::setInputAction("unselectAll", Keys::esc);

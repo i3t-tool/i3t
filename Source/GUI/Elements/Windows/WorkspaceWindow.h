@@ -75,14 +75,16 @@ public:
 	Vp::Entity* m_viewportLastSelectedEntity{nullptr};
 	bool m_viewportSelectionChanged{false};
 
-	void popupContent();
+	void popupContent() override;
 
-	bool beforeBegin();
-	bool beforeContent();
-	bool content();
-	bool afterContent();
-	bool afterEnd();
-	bool finalize();
+	bool beforeBegin() override;
+	bool beforeContent() override;
+	bool content() override;
+	bool afterContent() override;
+	bool afterEnd() override;
+	bool finalize() override;
+
+	void setWorkAreaZoom(float val = 1) override;
 
 	WorkspaceDiwneAction m_workspaceDiwneAction, m_workspaceDiwneActionPreviousFrame;
 	void setWorkspaceDiwneAction(WorkspaceDiwneAction wda)
@@ -254,7 +256,7 @@ public:
 	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
 	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 
-	bool m_resizeDataWidth; ///< Indicates a change in zoom level this frame
+	bool m_updateDataItemsWidth; ///< Indicates a change in zoom level this frame
 	bool m_reconnectCameraToSequence;
 
 	bool m_trackingFromLeft;

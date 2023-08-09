@@ -183,7 +183,7 @@ public:
 	{
 		return m_workAreaZoom;
 	};
-	void setWorkAreaZoom(float val = 1);
+	virtual void setWorkAreaZoom(float val = 1);
 
 	ImVec2 const& getPopupPosition() const
 	{
@@ -470,7 +470,7 @@ protected:
 
 	bool m_drawing /*!< store whether ImGui window is ready to draw to it */;
 
-private:
+protected:
 	ImRect m_workAreaScreen; ///< Rectangle of work area on screen
 	ImRect m_workAreaDiwne;  ///< Rectangle of work area on diwne
 	                         ///< - .Min is set by user, .Max is computed from m_workAreaScreen */
