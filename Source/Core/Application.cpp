@@ -52,11 +52,15 @@ void Application::init()
 
 	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
 		LOG_INFO("undo triggered");
-		App::getModule<StateManager>().undo();
+		App::getUI()->invokeLater([]() {
+			App::getModule<StateManager>().undo();
+		});
 	});
 	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
 		LOG_INFO("redo triggered");
-		App::getModule<StateManager>().redo();
+		App::getUI()->invokeLater([]() {
+			App::getModule<StateManager>().redo();
+		});
 	});
 
 	// Former initI3T member function

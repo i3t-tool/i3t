@@ -56,7 +56,7 @@ public:
 
 	void popupContent() override;
 
-	int maxLenghtOfData() override;
+	int maxLengthOfData() override;
 
 	bool isCamera();
 

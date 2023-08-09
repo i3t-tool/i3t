@@ -52,23 +52,63 @@ bool Diwne::initializeDiwne()
 	return initialize();
 }
 
+void ScaleAllSizes(ImGuiStyle& style, float scale_factor)
+{
+	//	style.WindowPadding = ImFloor(style.WindowPadding * scale_factor);
+	//	style.WindowRounding = ImFloor(style.WindowRounding * scale_factor);
+	//	style.WindowMinSize = ImFloor(style.WindowMinSize * scale_factor);
+	//	style.ChildRounding = ImFloor(style.ChildRounding * scale_factor);
+	//	style.PopupRounding = ImFloor(style.PopupRounding * scale_factor);
+	//	style.FramePadding = ImFloor(style.FramePadding * scale_factor);
+	//	style.FrameRounding = ImFloor(style.FrameRounding * scale_factor);
+	//	style.ItemSpacing = ImFloor(style.ItemSpacing * scale_factor);
+	//	style.ItemInnerSpacing = ImFloor(style.ItemInnerSpacing * scale_factor);
+	//	style.CellPadding = ImFloor(style.CellPadding * scale_factor);
+	//	style.TouchExtraPadding = ImFloor(style.TouchExtraPadding * scale_factor);
+	//	style.IndentSpacing = ImFloor(style.IndentSpacing * scale_factor);
+	//	style.ColumnsMinSpacing = ImFloor(style.ColumnsMinSpacing * scale_factor);
+	//	style.ScrollbarSize = ImFloor(style.ScrollbarSize * scale_factor);
+	//	style.ScrollbarRounding = ImFloor(style.ScrollbarRounding * scale_factor);
+	//	style.GrabMinSize = ImFloor(style.GrabMinSize * scale_factor);
+	//	style.GrabRounding = ImFloor(style.GrabRounding * scale_factor);
+	//	style.LogSliderDeadzone = ImFloor(style.LogSliderDeadzone * scale_factor);
+	//	style.TabRounding = ImFloor(style.TabRounding * scale_factor);
+	//	style.TabMinWidthForCloseButton = (style.TabMinWidthForCloseButton != FLT_MAX) ?
+	// ImFloor(style.TabMinWidthForCloseButton * scale_factor) : FLT_MAX; 	style.DisplayWindowPadding =
+	// ImFloor(style.DisplayWindowPadding * scale_factor); 	style.DisplaySafeAreaPadding =
+	// ImFloor(style.DisplaySafeAreaPadding * scale_factor); 	style.MouseCursorScale = ImFloor(style.MouseCursorScale
+	// * scale_factor);
+	style.WindowPadding = style.WindowPadding * scale_factor;
+	style.WindowRounding = style.WindowRounding * scale_factor;
+	style.WindowMinSize = style.WindowMinSize * scale_factor;
+	style.ChildRounding = style.ChildRounding * scale_factor;
+	style.PopupRounding = style.PopupRounding * scale_factor;
+	style.FramePadding = style.FramePadding * scale_factor;
+	style.FrameRounding = style.FrameRounding * scale_factor;
+	style.ItemSpacing = style.ItemSpacing * scale_factor;
+	style.ItemInnerSpacing = style.ItemInnerSpacing * scale_factor;
+	style.CellPadding = style.CellPadding * scale_factor;
+	style.TouchExtraPadding = style.TouchExtraPadding * scale_factor;
+	style.IndentSpacing = style.IndentSpacing * scale_factor;
+	style.ColumnsMinSpacing = style.ColumnsMinSpacing * scale_factor;
+	style.ScrollbarSize = style.ScrollbarSize * scale_factor;
+	style.ScrollbarRounding = style.ScrollbarRounding * scale_factor;
+	style.GrabMinSize = style.GrabMinSize * scale_factor;
+	style.GrabRounding = style.GrabRounding * scale_factor;
+	style.LogSliderDeadzone = style.LogSliderDeadzone * scale_factor;
+	style.TabRounding = style.TabRounding * scale_factor;
+	style.TabMinWidthForCloseButton =
+	    (style.TabMinWidthForCloseButton != FLT_MAX) ? style.TabMinWidthForCloseButton * scale_factor : FLT_MAX;
+	style.DisplayWindowPadding = style.DisplayWindowPadding * scale_factor;
+	style.DisplaySafeAreaPadding = style.DisplaySafeAreaPadding * scale_factor;
+	style.MouseCursorScale = style.MouseCursorScale * scale_factor;
+}
+
 bool Diwne::beforeBeginDiwne() /* \todo redesign to
                                   https://en.wikipedia.org/wiki/Call_super */
 {
 	updateWorkAreaRectangles();
 	m_nodesSelectionChanged = false;
-
-	/* zoom */
-	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes are
-	// ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
-	// ImGui::SetWindowFontScale(m_workAreaZoom);
-	m_StoreFontScale = ImGui::GetFont()->Scale;
-	ImGui::GetFont()->Scale = m_workAreaZoom;
-	ImGui::PushFont(ImGui::GetFont());
-
-	m_StoreItemSpacing = ImGui::GetStyle().ItemSpacing;
-	ImGui::GetStyle().ItemSpacing *= m_workAreaZoom;
-
 	return beforeBegin();
 }
 
@@ -172,11 +212,6 @@ void Diwne::end()
 
 bool Diwne::afterEndDiwne()
 {
-	ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
-
-	ImGui::GetFont()->Scale = m_StoreFontScale; // Need to reset default font BEFORE popping font
-	ImGui::PopFont();
-
 	return DiwneObject::afterEndDiwne();
 }
 
@@ -201,9 +236,8 @@ bool Diwne::processInteractionsDiwne()
 
 	interaction_happen |= DiwneObject::processInteractionsDiwne();
 
-	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction()) /* for example inner interaction
-	                                                                                 (focus on node) is no problem with
-	                                                                                 this actions */
+	// for example inner interaction (focus on node) is no problem with this actions
+	if (m_drawMode == DrawMode::Interacting && bypassFocusForInteractionAction())
 	{
 		interaction_happen |= processDiwneZoom();
 	}
@@ -375,7 +409,8 @@ void Diwne::AddRectFilledDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 
 	ImDrawList* idl = ImGui::GetWindowDrawList(); /* \todo maybe use other channel with correct
 	                                                 Clip rect for drawing of manual shapes, but
 	                                                 be careful with order of drew elements */
-	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding,
+	float zoom = diwne.getWorkAreaZoom();
+	idl->AddRectFilled(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding * zoom,
 	                   rounding_corners);
 }
 
@@ -383,8 +418,9 @@ void Diwne::AddRectDiwne(const ImVec2& p_min, const ImVec2& p_max, ImVec4 col, f
                          ImDrawCornerFlags rounding_corners /*=ImDrawCornerFlags_All*/, float thickness /*=1.0f*/) const
 {
 	ImDrawList* idl = ImGui::GetWindowDrawList();
-	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding,
-	             rounding_corners, thickness * m_workAreaZoom);
+	float zoom = diwne.getWorkAreaZoom();
+	idl->AddRect(diwne2screen(p_min), diwne2screen(p_max), ImGui::ColorConvertFloat4ToU32(col), rounding * zoom,
+	             rounding_corners, thickness * zoom);
 }
 
 void Diwne::AddBezierCurveDiwne(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImVec4 col,
@@ -835,6 +871,66 @@ ImVec2 Diwne::bypassDiwneGetPopupNewPositionAction()
 ImRect Diwne::getSelectionRectangleDiwne()
 {
 	return m_selectionRectangeDiwne;
+}
+
+bool Diwne::applyZoomScaling()
+{
+	if (m_zoomScalingApplied)
+		return true;
+
+	// Fringe scale can stay at 1 (default), it's a parameter that specifies how "blurry" anti aliased lines/shapes are
+	// ImGui::GetCurrentWindow()->DrawList->_FringeScale = 1 / m_workAreaZoom;
+	// ImGui::SetWindowFontScale(m_workAreaZoom);
+	m_zoomOriginalFontScale = ImGui::GetFont()->Scale;
+	ImGui::GetFont()->Scale = m_workAreaZoom;
+	ImGui::PushFont(ImGui::GetFont());
+
+	//	static int d = 0;
+	//	int dMax = 120;
+	//	d++;
+
+	// Scale the whole ImGui style, will be restored later
+	m_zoomOriginalStyle = ImGui::GetStyle();
+	//	ImGui::GetStyle().ScaleAllSizes(d > dMax ? m_workAreaZoom : 1.0f);
+	// ScaleAllSizes(ImGui::GetStyle(), d > dMax ? m_workAreaZoom : 1.0f);
+	ScaleAllSizes(ImGui::GetStyle(), m_workAreaZoom);
+
+	//	d %= dMax * 2;
+
+	m_zoomScalingApplied = true;
+	return false;
+}
+
+bool Diwne::restoreZoomScaling()
+{
+	if (!m_zoomScalingApplied)
+		return false;
+
+	ImGui::GetCurrentContext()->Style = m_zoomOriginalStyle;
+	// ImGui::GetStyle().ItemSpacing = m_StoreItemSpacing;
+
+	ImGui::GetFont()->Scale = m_zoomOriginalFontScale; // Need to reset default font BEFORE popping font
+	ImGui::PopFont();
+
+	m_zoomScalingApplied = false;
+	return true;
+}
+
+bool Diwne::ensureZoomScaling(bool active)
+{
+	bool activeBefore = m_zoomScalingApplied;
+	if (activeBefore != active)
+	{
+		if (active)
+		{
+			applyZoomScaling();
+		}
+		else
+		{
+			restoreZoomScaling();
+		}
+	}
+	return activeBefore;
 }
 
 } /* namespace DIWNE */

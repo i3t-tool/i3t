@@ -32,6 +32,10 @@ bool DiwneObject::drawDiwne(DrawMode drawMode /* = DrawMode::Interacting */)
 	m_inner_interaction_happen |= initializeDiwne();
 	if (allowDrawing())
 	{
+		if (this == &diwne)
+		{
+			diwne.applyZoomScaling();
+		}
 		m_inner_interaction_happen |= beforeBeginDiwne();
 		begin();
 
@@ -74,6 +78,10 @@ bool DiwneObject::drawDiwne(DrawMode drawMode /* = DrawMode::Interacting */)
 
 		m_inner_interaction_happen |= afterEndDiwne();
 		m_inner_interaction_happen |= processInteractionsDiwne();
+		if (this == &diwne)
+		{
+			diwne.restoreZoomScaling();
+		}
 	}
 	m_inner_interaction_happen |= finalizeDiwne();
 
@@ -448,8 +456,9 @@ bool DiwneObject::processShowPopupDiwne()
 	}
 	else
 	{
+		diwne.restoreZoomScaling();
 		diwne.m_popupDrawn = popupDiwne(m_popupIDDiwne, diwne.getPopupPosition(), &expandPopupContent, *this);
-
+		diwne.applyZoomScaling();
 		return diwne.m_popupDrawn;
 	}
 }

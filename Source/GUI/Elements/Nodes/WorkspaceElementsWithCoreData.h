@@ -57,10 +57,10 @@ public:
 		m_floatPopupMode = mode;
 	};
 
-	virtual int maxLenghtOfData() = 0;
+	virtual int maxLengthOfData() = 0;
 
 	float getDataItemsWidth();
-	float setDataItemsWidth();
+	float updateDataItemsWidth();
 	bool getIsLabelBeingEdited()
 	{
 		return m_isLabelBeingEdited;
@@ -87,6 +87,7 @@ public:
 	bool processSelect() override;
 	bool processUnselect() override;
 
+	// TODO: (DR) Figure out what this was about
 	// TODO: (DR) Mouse buttons are "hard-coded" in DiwneObject, presumably JH was
 	//  trying to hook them up to
 	//  the InputManager. But that change was only made here and not in the
@@ -179,10 +180,17 @@ class WorkspaceCoreInputPin : public WorkspaceCorePin
 {
 protected:
 	WorkspaceCoreLink m_link;
+	bool m_connectionChanged; ///< Flag indicating that the pin has been plugged or unplugged this frame
+	                          ///< Note: This flag gets reset the moment the pin is drawn, which is kinda dumb,
+	                          ///< don't rely on this too much, it is currently used for a rather specific purpose
+
 
 public:
 	WorkspaceCoreInputPin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
 	                      WorkspaceNodeWithCoreData& node);
+
+	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting);
+
 	WorkspaceCoreLink& getLink()
 	{
 		return m_link;
@@ -193,11 +201,9 @@ public:
 	};
 	void setConnectedWorkspaceOutput(WorkspaceCoreOutputPin* ou);
 
-	void unplug();
-	void plug(WorkspaceCoreOutputPin* ou);
-	bool m_connection_changed;
-
-	bool drawDiwne(DIWNE::DrawMode = DIWNE::DrawMode::Interacting);
+	void unplug(bool logEvent = true);
+	bool plug(WorkspaceCoreOutputPin* ou, bool logEvent = true);
+	bool connectionChanged() const;
 
 	/* DIWNE function */
 	virtual bool content();
@@ -388,12 +394,9 @@ extern bool drawDragFloatWithMap_Inline(DIWNE::Diwne& diwne, int const numberOfV
                                         Core::EValueState const& valueState, bool& valueChanged);
 extern void popupFloatContent(FloatPopupMode& popupMode, float& selectedValue, bool& valueSelected);
 
-/** \brief
- *
- * \param
+/**
  * \param valueOfChange is set to value setted by user if so - not touched if no
  * user change heppen \return whether some interaction happen
- *
  */
 extern bool drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int numberOfVisibleDecimals, float dataWidth,
                         FloatPopupMode& floatPopupMode, const glm::mat4& data,
@@ -404,30 +407,30 @@ extern bool drawData4x4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int number
 // floatPopupMode, const glm::mat4& data, const Core::DataMap&
 // dataMap, bool& valueChanged, int& rowOfChange, int& columnOfChange, float&
 // valueOfChange );
-extern int maxLenghtOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
+extern int maxLengthOfData4x4(const glm::mat4& data, int numberOfVisibleDecimal);
 
 extern bool drawDataVec4(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
                          float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec4& data,
                          std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
                          glm::vec4& valueOfChange);
-extern int maxLenghtOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal);
+extern int maxLengthOfDataVec4(const glm::vec4& data, int numberOfVisibleDecimal);
 
 extern bool drawDataVec3(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
                          float dataWidth, FloatPopupMode& floatPopupMode, const glm::vec3& data,
                          std::array<Core::EValueState, 3> const& dataState, bool& valueChanged,
                          glm::vec3& valueOfChange);
-extern int maxLenghtOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal);
+extern int maxLengthOfDataVec3(const glm::vec3& data, int numberOfVisibleDecimal);
 
 extern bool drawDataFloat(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
                           float dataWidth, FloatPopupMode& floatPopupMode, const float& data,
                           Core::EValueState const& dataState, bool& valueChanged, float& valueOfChange);
-extern int maxLenghtOfDataFloat(const float& data, int numberOfVisibleDecimal);
+extern int maxLengthOfDataFloat(const float& data, int numberOfVisibleDecimal);
 
 extern bool drawDataQuaternion(DIWNE::Diwne& diwne, DIWNE::ID const node_id, int const numberOfVisibleDecimals,
                                float dataWidth, FloatPopupMode floatPopupMode, const glm::quat& data,
                                std::array<Core::EValueState, 4> const& dataState, bool& valueChanged,
                                glm::quat& valueOfChange);
-extern int maxLenghtOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal);
+extern int maxLengthOfDataQuaternion(const glm::quat& data, int numberOfVisibleDecimal);
 
 extern void drawMenuLevelOfDetail_builder(Ptr<WorkspaceNodeWithCoreData> node,
                                           std::vector<WorkspaceLevelOfDetail> const& levels_of_detail);

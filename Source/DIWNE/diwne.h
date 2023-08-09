@@ -422,6 +422,25 @@ public:
 	virtual ImVec2 bypassDiwneGetSelectionRectangleSize();
 	virtual bool processDiwneSelectionRectangle();
 
+	/**
+	 * Modifies the current ImGuiStyle and Font depending on the current diwne zoom level.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	bool applyZoomScaling();
+
+	/**
+	 * Restores the current ImGuiStyle and Font back to its state before applyZoomScaling() was last called.
+	 * @return Whether zoom scaling was active before making this call
+	 */
+	bool restoreZoomScaling();
+
+	/**
+	 * Ensure that zoom scaling is active or not based on a passed parameter
+	 * @return Whether zoom scaling was active before making this call, can be later passed to this method again to
+	 * restore original state
+	 */
+	bool ensureZoomScaling(bool active);
+
 	DIWNE::SettingsDiwne* mp_settingsDiwne;
 
 	bool m_popupDrawn /*!< not draw popup two times \todo maybe unused when every
@@ -461,9 +480,11 @@ private:
 
 	ImDrawListSplitter m_splitter; ///< Every nodes should be draw to its own channel
 
-	/* restore information */
-	ImVec2 m_StoreItemSpacing; ///< For restore value after this window is done
-	float m_StoreFontScale;    ///< For restore value after this window is done
+	/* zoom scaling restore information */
+	bool m_zoomScalingApplied = false;
+
+	float m_zoomOriginalFontScale; ///< For restore value after this window is done
+	ImGuiStyle m_zoomOriginalStyle;
 };
 
 } /* namespace DIWNE */

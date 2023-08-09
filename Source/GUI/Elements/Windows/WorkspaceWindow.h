@@ -32,7 +32,15 @@
 
 #include "GUI/Elements/IWindow.h"
 #include "GUI/Elements/Nodes/Tools.h"
-#include "GUI/Elements/Nodes/WorkspaceSingleInclude.h"
+
+#include "GUI/Elements/Nodes/WorkspaceCamera.h"
+#include "GUI/Elements/Nodes/WorkspaceCycle.h"
+#include "GUI/Elements/Nodes/WorkspaceModel.h"
+#include "GUI/Elements/Nodes/WorkspaceOperator.h"
+#include "GUI/Elements/Nodes/WorkspaceScreen.h"
+#include "GUI/Elements/Nodes/WorkspaceSequence.h"
+#include "GUI/Elements/Nodes/WorkspaceTransformation_s.h"
+
 #include "GUI/ViewportHighlightResolver.h"
 #include "Logger/Logger.h"
 #include "State/StateManager.h"
@@ -141,6 +149,12 @@ public:
 	template <class T>
 	auto inline addNodeToPosition(ImVec2 const position = ImVec2(0, 0), bool shiftToLeftByNodeWidth = false)
 	{
+		// Nodes should be created in the diwne zoom scaling environment (so ImGui calls return scaled values like font
+		// size, padding etc.)
+		// Hence scaling is applied here if not active, and then restored to its original state at the end of this
+		// method
+		bool zoomScalingWasActive = diwne.ensureZoomScaling(true);
+
 		auto node = std::make_shared<T>(*this);
 
 		node->setNodePositionDiwne(position);
@@ -156,6 +170,9 @@ public:
 		m_workspaceCoreNodes.push_back(node);
 		m_takeSnap = true; /* JH maybe better in place where this function is called*/
 		detectRotationTransformAndSetFloatMode(node);
+
+		diwne.ensureZoomScaling(zoomScalingWasActive); // Restore zoom scaling to original state
+
 		return node;
 	}
 
@@ -237,7 +254,7 @@ public:
 	ImVec2 bypassDiwneGetSelectionRectangleStartPosition() override;
 	ImVec2 bypassDiwneGetSelectionRectangleSize() override;
 
-	bool m_resizeDataWidth;
+	bool m_resizeDataWidth; ///< Indicates a change in zoom level this frame
 	bool m_reconnectCameraToSequence;
 
 	bool m_trackingFromLeft;

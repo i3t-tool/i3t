@@ -46,7 +46,7 @@ public:
 	}
 
 	// bool drawDataFull(, int index);
-	int maxLenghtOfData(); // todo
+	int maxLengthOfData(); // todo
 	bool middleContent();  // the most important function
 	bool topContent();
 	void drawMenuLevelOfDetail(); // todo

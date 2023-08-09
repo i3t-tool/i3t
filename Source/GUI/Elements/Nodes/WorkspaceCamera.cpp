@@ -234,7 +234,7 @@ void WorkspaceCamera::drawMenuLevelOfDetail()
 // WorkspaceNodeWithCoreDataWithPins::rightContent();}; /* draw camera pin on
 // opposite side */
 
-int WorkspaceCamera::maxLenghtOfData()
+int WorkspaceCamera::maxLengthOfData()
 {
 	return 0;
 }

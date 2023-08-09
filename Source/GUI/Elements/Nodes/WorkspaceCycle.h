@@ -30,5 +30,5 @@ public:
 
 	void drawMenuLevelOfDetail();
 
-	int maxLenghtOfData();
+	int maxLengthOfData();
 };

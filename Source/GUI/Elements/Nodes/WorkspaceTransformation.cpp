@@ -7,7 +7,7 @@
 WorkspaceTransformation::WorkspaceTransformation(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
     : WorkspaceNodeWithCoreData(diwne, nodebase), aboveSequence(0), m_topOversizeSpace(0)
 {
-	setDataItemsWidth();
+	updateDataItemsWidth();
 }
 
 bool WorkspaceTransformation::allowDrawing()
@@ -19,15 +19,12 @@ void WorkspaceTransformation::updateSizes()
 {
 	/* right align - have to be computed before DIWNE::Node::updateSizes(),
 	 * because after that are sizes updated */
-	m_topOversizeSpace = std::max(
-	    0.0f,
-	    m_topRectDiwne.GetWidth() -
-	        std::max(m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() + m_rightRectDiwne.GetWidth() +
-	                     ImGui::GetStyle().ItemSpacing.x * 2 / diwne.getWorkAreaZoom() /* space is between left-middle
-	                                                                                      and middle-right, spacing is
-	                                                                                      scaled in begin of frame */
-	                 ,
-	                 m_bottomRectDiwne.GetWidth()));
+	/* space is between left-middle and middle-right, spacing is scaled in begin of frame */
+	m_topOversizeSpace = std::max(0.0f, m_topRectDiwne.GetWidth() -
+	                                        std::max(m_leftRectDiwne.GetWidth() + m_middleRectDiwne.GetWidth() +
+	                                                     m_rightRectDiwne.GetWidth() +
+	                                                     ImGui::GetStyle().ItemSpacing.x * 2 / diwne.getWorkAreaZoom(),
+	                                                 m_bottomRectDiwne.GetWidth()));
 	WorkspaceNodeWithCoreData::updateSizes();
 }
 bool WorkspaceTransformation::beforeBegin()
@@ -41,7 +38,7 @@ bool WorkspaceTransformation::beforeContent()
 	/* whole node background */
 	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max,
 	                         I3T::getTheme().get(EColor::NodeBgTransformation), I3T::getSize(ESize::Nodes_Rounding),
-	                         ImDrawCornerFlags_Top);
+	                         ImDrawCornerFlags_All);
 	return false;
 }
 
@@ -315,14 +312,14 @@ bool WorkspaceTransformation::drawDataFull()
 		// is taken in the end of frame
 		//*/ 				App::getModule<StateManager>().takeSnapshot();
 		//				//////////////////////////////////////////////////////////
-		setDataItemsWidth();
+		updateDataItemsWidth();
 	}
 	return interaction_happen;
 }
 
-int WorkspaceTransformation::maxLenghtOfData()
+int WorkspaceTransformation::maxLengthOfData()
 {
-	return maxLenghtOfData4x4(m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
+	return maxLengthOfData4x4(m_nodebase->getData().getMat4(), m_numberOfVisibleDecimal);
 }
 
 bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(
@@ -338,8 +335,10 @@ bool WorkspaceTransformation::drawDataSetValues_InsideTablebuilder(
 	value_changed = false;
 	bool inner_interaction_happen = false, actual_value_changed = false;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+	                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+	                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 
 	ImGui::TableNextRow();
 
@@ -381,8 +380,10 @@ bool WorkspaceTransformation::drawDataSetValuesTable_builder(std::string const c
 	if (ImGui::BeginTable(fmt::format("##{}{}", cornerLabel, getIdDiwne()).c_str(), columnLabels.size() + 1,
 	                      ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit))
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, I3T::getSize(ESizeVec2::Nodes_FloatPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, I3T::getSize(ESizeVec2::Nodes_ItemsSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+		                    I3T::getSize(ESizeVec2::Nodes_FloatPadding) * diwne.getWorkAreaZoom());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+		                    I3T::getSize(ESizeVec2::Nodes_ItemsSpacing) * diwne.getWorkAreaZoom());
 		/* header labels */
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
