@@ -3,17 +3,19 @@
         "operators": [],
         "sequences": [
             {
-                "id": 9,
+                "id": 84,
+                "render": true,
                 "position": [
-                    400.0,
-                    157.0
+                    352.0001220703125,
+                    -89.85713958740235
                 ],
                 "transforms": [
                     {
-                        "id": 17,
+                        "id": 90,
+                        "render": true,
                         "position": [
-                            469.0,
-                            185.0
+                            371.8462219238281,
+                            -59.58447265625
                         ],
                         "type": "Translation",
                         "defaultValues": {
@@ -55,10 +57,11 @@
                         "LOD": "Full"
                     },
                     {
-                        "id": 19,
+                        "id": 91,
+                        "render": true,
                         "position": [
-                            639.0,
-                            185.0
+                            549.560546875,
+                            -59.58447265625
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -96,10 +99,11 @@
                         "LOD": "Full"
                     },
                     {
-                        "id": 18,
+                        "id": 92,
+                        "render": true,
                         "position": [
-                            809.0,
-                            185.0
+                            727.2747802734375,
+                            -59.58447265625
                         ],
                         "type": "Scale",
                         "defaultValues": {
@@ -148,10 +152,11 @@
         "screens": [],
         "models": [
             {
-                "id": 15,
+                "id": 93,
+                "render": true,
                 "position": [
-                    1092.0,
-                    178.0
+                    985.7138671875,
+                    -90.57146453857422
                 ],
                 "model": "default_cube",
                 "visible": true,
@@ -168,9 +173,9 @@
         "transforms": [],
         "edges": [
             [
-                9,
+                84,
                 0,
-                15,
+                93,
                 0
             ]
         ]
