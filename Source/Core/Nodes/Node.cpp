@@ -84,24 +84,16 @@ ENodePlugResult Node::plug(const Ptr<Node>& childNode, unsigned fromIndex, unsig
 
 Ptr<Node> Node::getRootOwner()
 {
-	auto topMost = m_owner;
+	auto* me = this;
+	auto* parent = m_owner;
 
-	while (topMost)
+	while (parent)
 	{
-		if (topMost->m_owner == nullptr)
-		{
-			break;
-		}
-
-		topMost = topMost->m_owner;
+		me = parent;
+		parent = parent->m_owner;
 	}
 
-	if (topMost == nullptr)
-	{
-		return nullptr;
-	}
-
-	return topMost->getPtr();
+	return me->getPtr();
 }
 
 void Node::notifyOwner()

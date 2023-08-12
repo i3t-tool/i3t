@@ -203,21 +203,18 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 	}
 
 	// cycle detector
-	auto toFind = input.getOwner(); // INPUT
+	auto toFind = input.Owner.getRootOwner(); // input
 
-	// stack in vector - TOS is at the vector back.
 	std::vector<Ptr<Node>> stack;
 
-	// PUSH(output) insert element at end.
 	stack.push_back(output.getOwner());
 
 	while (!stack.empty())
 	{
-		// Return last element of mutable sequence.
 		auto act = stack.back();
 		stack.pop_back();
 
-		if (act == toFind)
+		if (act->getRootOwner() == toFind)
 		{
 			return ENodePlugResult::Err_Loop;
 		}
@@ -227,15 +224,16 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 			if (pin.isPluggedIn())
 			{
 				Pin* ct = pin.m_input;
+				// stack.push_back(ct->Owner.getRootOwner());
 				stack.push_back(ct->getOwner());
 			}
 		}
 	}
 
-	/*
-	  if (isOperatorPlugCorrectMod != NULL)
-	    return isOperatorPlugCorrectMod(inp, out);
-	*/
+	if (input.Owner.m_isPlugCorrectFn)
+	{
+		return input.Owner.m_isPlugCorrectFn(input, output);
+	}
 
 	return ENodePlugResult::Ok;
 }
