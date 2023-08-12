@@ -61,6 +61,13 @@ Ptr<Node> getRoot(Ptr<Node> node)
 	return getRoot(parent);
 }
 
+TEST(NodeInterfaceTest, GetRootOwner_ShouldReturnRootNode)
+{
+	auto camera = GraphManager::createCamera();
+	EXPECT_EQ(camera->getProj()->getRootOwner(), camera);
+	EXPECT_EQ(camera->getView()->getRootOwner(), camera);
+}
+
 TEST(NodeInterfaceTest, GetParentShouldGiveValidParentNode)
 {
 	auto seq1 = GraphManager::createSequence();

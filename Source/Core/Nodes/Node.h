@@ -384,7 +384,7 @@ public:
 		}
 
 		return fmt::format("{} #{}", m_operation->keyWord, m_id);
-	};
+	}
 
 protected:
 	// TODO: (DR) Callbacks cannot be unregistered! That could cause issues when lifetime of listener ends before the
@@ -472,5 +472,8 @@ protected:
 	/// Owner of the node, used in complex type of nodes, such as sequence or
 	/// camera.
 	Node* m_owner = nullptr;
+
+	/// Used by Camera
+	ENodePlugResult (*m_isPlugCorrectFn)(const Pin& input, const Pin& output) = nullptr;
 };
 } // namespace Core

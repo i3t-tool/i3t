@@ -51,6 +51,8 @@ public:
 	}
 
 	void updateValues(int inputIndex) override;
+
+	// void isPlugCorrectMod(const Pin& input, const Pin& output);
 };
 
 using CameraPtr = Ptr<Camera>;
