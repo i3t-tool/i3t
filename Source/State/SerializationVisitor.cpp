@@ -175,6 +175,7 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	auto render = node->getRender();
 	target.AddMember("id", id, alloc);
 	target.AddMember("render", render, alloc);
+	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
 
 	addVector(target, "position", node->getNodePositionDiwne());
 }
@@ -248,8 +249,6 @@ void SerializationVisitor::dumpTransform(rapidjson::Value& target, const Ptr<Gui
 
 	addBool(transform, "synergies", coreNode->hasSynergies());
 	addBool(transform, "locked", coreNode->isLocked());
-
-	addString(transform, "LOD", EnumUtils::name(node->getLevelOfDetail()));
 
 	target.PushBack(transform, alloc);
 }
