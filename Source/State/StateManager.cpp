@@ -133,8 +133,7 @@ bool StateManager::loadScene(const fs::path& path)
 	}
 
 	m_currentScene = path;
-	getUserData().pushRecentFile(path.string());
-	saveUserData();
+	pushRecentFile(path);
 
 	reset();
 
@@ -151,6 +150,11 @@ bool StateManager::saveScene(const fs::path& target)
 	const auto result = JSON::save(target, *createMemento());
 
 	m_savedSceneHash = m_hashes[m_currentStateIdx];
+	if (m_currentScene != target)
+	{
+		// save as with different name, add original scene to recent files
+		pushRecentFile(target);
+	}
 	m_currentScene = target;
 
 	setWindowTitle();
@@ -224,6 +228,12 @@ void StateManager::setWindowTitle()
 	const auto newTitle = std::string(BASE_WINDOW_TITLE) + " - " + sceneName;
 
 	App::get().setTitle(newTitle);
+}
+
+void StateManager::pushRecentFile(const fs::path& file)
+{
+	getUserData().pushRecentFile(file.string());
+	saveUserData();
 }
 
 //===----------------------------------------------------------------------===//

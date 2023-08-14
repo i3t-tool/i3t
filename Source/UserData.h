@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -12,9 +13,9 @@ struct UserData
 	std::string themeName = "classic";
 
 	/// Last file is the most recent.
-	std::vector<std::string> recentFiles;
+	std::vector<std::filesystem::path> recentFiles;
 
-	void pushRecentFile(const std::string& file);
+	void pushRecentFile(const std::filesystem::path& file);
 };
 
 UserData& getUserData();

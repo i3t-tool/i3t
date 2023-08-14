@@ -54,10 +54,10 @@ static void showRecentFiles()
 		ImGui::Text("No recent files");
 	}
 
-	std::optional<std::string> sceneToOpen;
+	std::optional<std::filesystem::path> sceneToOpen;
 	for (auto it = recentFiles.rbegin(); it != recentFiles.rend(); ++it)
 	{
-		if (ImGui::MenuItem(it->c_str()))
+		if (ImGui::MenuItem(it->string().c_str()))
 		{
 			sceneToOpen = *it;
 		}

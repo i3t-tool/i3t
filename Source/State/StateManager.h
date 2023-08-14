@@ -75,6 +75,7 @@ public:
 
 private:
 	void setWindowTitle();
+	void pushRecentFile(const fs::path& file);
 
 	/// Resets counters, set clean state and takes initial snapshot.
 	void reset();

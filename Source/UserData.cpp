@@ -11,7 +11,7 @@ RTTR_REGISTRATION
 	    .property("recentFiles", &UserData::recentFiles);
 }
 
-void UserData::pushRecentFile(const std::string& file)
+void UserData::pushRecentFile(const std::filesystem::path& file)
 {
 	const auto it = std::find(recentFiles.begin(), recentFiles.end(), file);
 	if (it != recentFiles.end())
