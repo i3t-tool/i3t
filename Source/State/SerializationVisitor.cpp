@@ -171,10 +171,13 @@ void SerializationVisitor::dumpCommon(rapidjson::Value& target, const Ptr<GuiNod
 	const auto& coreNode = node->getNodebase();
 	auto& alloc = m_memento.GetAllocator();
 
-	auto id = coreNode->getId();
-	auto render = node->getRender();
-	target.AddMember("id", id, alloc);
-	target.AddMember("render", render, alloc);
+	target.AddMember("id", coreNode->getId(), alloc);
+	if (node->getTopLabel() != node->getNodebase()->getLabel())
+	{
+		target.AddMember("label", node->getTopLabel(), alloc);
+	}
+	target.AddMember("render", node->getRender(), alloc);
+	target.AddMember("numberOfDecimals", node->getNumberOfVisibleDecimal(), alloc);
 	target.AddMember("LOD", EnumUtils::name(node->getLevelOfDetail()), alloc);
 
 	addVector(target, "position", node->getNodePositionDiwne());

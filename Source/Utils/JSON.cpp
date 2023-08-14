@@ -66,7 +66,7 @@ bool write_atomic_types_to_json(const type& t, const variant& var, PrettyWriter<
 
 		return true;
 	}
-	else if (t == type::get<std::string>())
+	else if (var.can_convert<std::string>())
 	{
 		writer.String(var.to_string());
 		return true;
@@ -90,7 +90,8 @@ static void write_array(const variant_sequential_view& view, PrettyWriter<String
 		{
 			variant wrapped_var = item.extract_wrapped_value();
 			type value_type = wrapped_var.get_type();
-			if (value_type.is_arithmetic() || value_type == type::get<std::string>() || value_type.is_enumeration())
+
+			if (value_type.is_arithmetic() || wrapped_var.can_convert<std::string>() || value_type.is_enumeration())
 			{
 				write_atomic_types_to_json(value_type, wrapped_var, writer);
 			}
