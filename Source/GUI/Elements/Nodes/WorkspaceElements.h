@@ -76,20 +76,22 @@ public:
 	std::string getTopLabel()
 	{
 		return m_topLabel;
-	};
+	}
+
 	std::string getMiddleLabel()
 	{
 		return m_middleLabel;
-	};
+	}
 
 	void setTopLabel(std::string label)
 	{
 		m_topLabel = label;
-	};
+	}
+
 	void setMiddleLabel(std::string label)
 	{
 		m_middleLabel = label;
-	};
+	}
 
 	/* DIWNE function */
 	virtual bool bypassFocusForInteractionAction();
