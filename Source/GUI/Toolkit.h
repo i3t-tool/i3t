@@ -5,6 +5,9 @@
 
 #include "glm/glm.hpp"
 
+#ifndef IMGUI_DEFINE_MATH_OPERATORS
+#define IMGUI_DEFINE_MATH_OPERATORS
+#endif
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -30,6 +33,15 @@ bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, I
                void* user_data);
 
 void ToggleButton(const char* label, bool& toggled, ImVec2 size = ImVec2(0.0f, 0.0f));
+
+bool ButtonWithCorners(const char* label, ImDrawFlags corners, const ImVec2& size = ImVec2(0, 0));
+
+bool ButtonWithCornersEx(const char* label, ImDrawFlags corners, const ImVec2& size_arg = ImVec2(0, 0),
+                         ImGuiButtonFlags flags = 0);
+
+// Render a rectangle shaped with optional rounding, corners and borders
+void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border, float rounding,
+                            ImDrawFlags corners);
 
 inline ImVec2 floorImVec2(const ImVec2& v)
 {

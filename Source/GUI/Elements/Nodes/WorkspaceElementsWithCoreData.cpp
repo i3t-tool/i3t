@@ -5,6 +5,7 @@
 #include "State/StateManager.h"
 
 #include "../Windows/WorkspaceWindow.h"
+#include "GUI/Toolkit.h"
 #include "Tools.h"
 
 WorkspaceNodeWithCoreData::WorkspaceNodeWithCoreData(DIWNE::Diwne& diwne, Ptr<Core::Node> nodebase)
@@ -69,15 +70,16 @@ bool WorkspaceNodeWithCoreData::topContent()
 	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawCornerFlags_All,
 	                   I3T::getTheme().get(ESize::Nodes_Border_Thickness));
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+	                    I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding) * diwne.getWorkAreaZoom());
 	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::NodeLODButtonColorText));
 	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
 
 	WorkspaceLevelOfDetail detail = getLevelOfDetail();
-	if (ImGui::Button(getButtonSymbolFromLOD(detail),
-	                  I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getWorkAreaZoom()))
+	if (GUI::ButtonWithCorners(getButtonSymbolFromLOD(detail), ImDrawFlags_RoundCornersTopLeft,
+	                           I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getWorkAreaZoom()))
 	{
 		if (detail == WorkspaceLevelOfDetail::Full)
 		{
