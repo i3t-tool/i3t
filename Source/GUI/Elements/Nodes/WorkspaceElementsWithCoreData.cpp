@@ -64,6 +64,50 @@ WorkspaceNodeWithCoreData::~WorkspaceNodeWithCoreData()
 
 bool WorkspaceNodeWithCoreData::topContent()
 {
+	// adding a border
+	diwne.AddRectDiwne(m_topRectDiwne.Min, m_bottomRectDiwne.Max, I3T::getTheme().get(EColor::NodeBorder),
+	                   I3T::getTheme().get(ESize::Nodes_Border_Rounding), ImDrawCornerFlags_All,
+	                   I3T::getTheme().get(ESize::Nodes_Border_Thickness));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, I3T::getTheme().get(ESize::Nodes_LOD_Button_Rounding));
+	ImGui::PushStyleColor(ImGuiCol_Text, I3T::getTheme().get(EColor::NodeLODButtonColorText));
+	ImGui::PushStyleColor(ImGuiCol_Button, I3T::getTheme().get(EColor::NodeLODButtonColor));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, I3T::getTheme().get(EColor::NodeLODButtonColorHovered));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, I3T::getTheme().get(EColor::NodeLODButtonColorActive));
+
+	WorkspaceLevelOfDetail detail = getLevelOfDetail();
+	if (ImGui::Button(getButtonSymbolFromLOD(detail),
+	                  I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize) * diwne.getWorkAreaZoom()))
+	{
+		if (detail == WorkspaceLevelOfDetail::Full)
+		{
+			if (std::dynamic_pointer_cast<WorkspaceTransformation>(shared_from_this()))
+			{
+				setLevelOfDetail(WorkspaceLevelOfDetail::SetValues);
+			}
+			else
+			{
+				setLevelOfDetail(WorkspaceLevelOfDetail::Label);
+			}
+		}
+		else if (detail == WorkspaceLevelOfDetail::SetValues)
+		{
+			setLevelOfDetail(WorkspaceLevelOfDetail::Label);
+		}
+		else if (detail == WorkspaceLevelOfDetail::Label)
+		{
+			setLevelOfDetail(WorkspaceLevelOfDetail::Full);
+		}
+		// TODO: replace with a layer that blocks interaction
+		this->setSelected(!this->getSelected());
+	}
+	ImGui::PopStyleColor(4);
+	ImGui::PopStyleVar();
+
+	ImGui::Indent((I3T::getTheme().get(ESizeVec2::Nodes_LODButtonSize)[0] - 5) * diwne.getWorkAreaZoom());
+
+	ImGui::SameLine();
+
 	bool interaction_happen = false;
 
 	float zoom = diwne.getWorkAreaZoom();
@@ -265,6 +309,20 @@ bool WorkspaceNodeWithCoreData::processUnselect()
 {
 	static_cast<WorkspaceDiwne&>(diwne).m_viewportHighlightResolver.resolveNeeded();
 	return WorkspaceNode::processUnselect();
+}
+
+const char* WorkspaceNodeWithCoreData::getButtonSymbolFromLOD(WorkspaceLevelOfDetail detail)
+{
+	if (detail == WorkspaceLevelOfDetail::Full)
+		return "v";
+	if (detail == WorkspaceLevelOfDetail::SetValues)
+		return "s";
+	if (detail == WorkspaceLevelOfDetail::Label)
+		return ">";
+	if (detail == WorkspaceLevelOfDetail::LightCycle)
+		return "lightcycle error";
+
+	return "missingLOD";
 }
 
 WorkspaceCorePin::WorkspaceCorePin(DIWNE::Diwne& diwne, DIWNE::ID const id, Core::Pin const& pin,
@@ -1045,8 +1103,8 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 		}
 		else
 		{
-			float act_align, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets smaller
-			                                                                     (for example when switch from
+			float act_align, cursor_pos, prev_minRightAlign = m_minRightAlignOfRightPins; /* prev is used when node gets
+			                                                                     smaller (for example when switch from
 			                                                                     precision 2 to precision 0) */
 			m_minRightAlignOfRightPins = FLT_MAX;
 			for (auto const& pin : getOutputsToShow())
@@ -1059,9 +1117,10 @@ bool WorkspaceNodeWithCoreDataWithPins::rightContent()
 				m_minRightAlignOfRightPins =
 				    std::min(m_minRightAlignOfRightPins, act_align); /* over all min align is 0 when no switching
 				                                                        between two node sizes */
-				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + act_align -
-				                     prev_minRightAlign); /* right align if not all output
-				                                             pins have same width */
+				cursor_pos = ImGui::GetCursorPosX();
+				// LOG_INFO(cursor_pos);
+				ImGui::SetCursorPosX(cursor_pos + act_align - prev_minRightAlign); /* right align if not all output
+				                                                                      pins have same width */
 				inner_interaction_happen |= pin->drawDiwne();
 			}
 		}
