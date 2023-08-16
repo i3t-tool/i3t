@@ -104,7 +104,12 @@ enum class EColor
 
 	// 4. Transform
 	NodeBgTransformation,
+	NodeBorder,
 	NodeHeaderTranformation,
+	NodeLODButtonColorText,
+	NodeLODButtonColor,
+	NodeLODButtonColorActive,
+	NodeLODButtonColorHovered,
 	FloatBgTransformation,
 	FloatBgTransformationActive,
 	FloatBgTransformationHovered,
@@ -204,6 +209,9 @@ enum class ESize
 
 	Nodes_Operators_Rounding,
 	Nodes_Sequence_Rounding,
+	Nodes_LOD_Button_Rounding,
+	Nodes_Border_Rounding,
+	Nodes_Border_Thickness,
 
 	Nodes_Transformation_TrackingMarkSize,
 
@@ -238,6 +246,8 @@ enum class ESizeVec2
 	Nodes_InputsSize,
 	Nodes_MiddleSize,
 	Nodes_OutputSize,
+
+	Nodes_LODButtonSize,
 
 	Nodes_IconSize,
 	Nodes_FloatCycleButtonSize,

@@ -101,6 +101,9 @@ public:
 	// bool bypassUnselectAction();
 	// bool bypassTouchAction();
 	void drawMenuDuplicate();
+
+private:
+	const char* getButtonSymbolFromLOD(WorkspaceLevelOfDetail detail);
 };
 
 class WorkspaceCoreOutputPin;

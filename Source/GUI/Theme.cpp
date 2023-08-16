@@ -152,6 +152,11 @@ void Theme::initClassicProperties()
 	// Folta transformation color set
 	set(EColor::NodeBgTransformation, ImVec4(137.0f / 255.0f, 115.0f / 255.0f, 59.0f / 255.0f, 1.00f));
 	set(EColor::NodeHeaderTranformation, ImVec4(0.498f, 0.412f, 0.192f, 1.00f));
+	set(EColor::NodeBorder, ImVec4(0.0f, 0.0f, 0.0f, 0.10f));
+	set(EColor::NodeLODButtonColorText, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::NodeLODButtonColor, ImVec4(0.0f, 0.0f, 0.0f, 0.1f));
+	set(EColor::NodeLODButtonColorActive, ImVec4(0.0f, 0.0f, 0.0f, 0.05f));
+	set(EColor::NodeLODButtonColorHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.20f));
 	set(EColor::FloatBgTransformation, ImVec4(91.0f / 255.0f, 84.0f / 255.0f, 67.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
@@ -247,6 +252,9 @@ void Theme::initClassicProperties()
 
 	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
 	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_LOD_Button_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_Border_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_Border_Thickness] = 1.5;
 
 	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = 5.f;
 
@@ -267,6 +275,8 @@ void Theme::initClassicProperties()
 	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = ImVec2(25.0f, 25.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);
 	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = ImVec2(32.0f, 32.0f);
@@ -379,6 +389,11 @@ void Theme::initModernProperties()
 	// Transform
 	set(EColor::NodeBgTransformation, createColor(120, 120, 132, 255));
 	set(EColor::NodeHeaderTranformation, createColor(32, 32, 32, 111));
+	set(EColor::NodeBorder, ImVec4(0.0f, 0.0f, 0.0f, 0.10f));
+	set(EColor::NodeLODButtonColorText, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	set(EColor::NodeLODButtonColor, ImVec4(0.0f, 0.0f, 0.0f, 0.1f));
+	set(EColor::NodeLODButtonColorActive, ImVec4(0.0f, 0.0f, 0.0f, 0.05f));
+	set(EColor::NodeLODButtonColorHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.20f));
 	set(EColor::FloatBgTransformation, createColor(255, 255, 255, 255));
 	set(EColor::FloatBgTransformationActive, ImVec4(111.0f / 255.0f, 104.0f / 255.0f, 87.0f / 255.0f, 1.00f));
 	set(EColor::FloatBgTransformationHovered, createColor(101, 94, 77, 255));
@@ -471,6 +486,9 @@ void Theme::initModernProperties()
 
 	m_sizes[ESize::Nodes_Operators_Rounding] = 5.0;
 	m_sizes[ESize::Nodes_Sequence_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_LOD_Button_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_Border_Rounding] = 5.0;
+	m_sizes[ESize::Nodes_Border_Thickness] = 1.5;
 
 	m_sizes[ESize::Nodes_Transformation_TrackingMarkSize] = 5.f;
 
@@ -491,6 +509,8 @@ void Theme::initModernProperties()
 	m_sizesVec2[ESizeVec2::Nodes_InputsSize] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_MiddleSize] = ImVec2(0.0f, 0.0f);
 	m_sizesVec2[ESizeVec2::Nodes_OutputSize] = ImVec2(0.0f, 0.0f);
+
+	m_sizesVec2[ESizeVec2::Nodes_LODButtonSize] = ImVec2(25.0f, 25.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_IconSize] = ImVec2(12.0f, 12.0f);
 	m_sizesVec2[ESizeVec2::Nodes_FloatCycleButtonSize] = ImVec2(32.0f, 32.0f);
@@ -594,6 +614,11 @@ void Theme::initNames()
 	// 4. Transforms
 	g_ColorNames[EColor::NodeBgTransformation] = "ntrs_Transform Background";
 	g_ColorNames[EColor::NodeHeaderTranformation] = "ntrs_Transform Header";
+	g_ColorNames[EColor::NodeBorder] = "ntrs_Transform Border";
+	g_ColorNames[EColor::NodeLODButtonColorText] = "ntrs_Transform LOD Button Text";
+	g_ColorNames[EColor::NodeLODButtonColor] = "ntrs_Transform LOD Button Color";
+	g_ColorNames[EColor::NodeLODButtonColorActive] = "ntrs_Transform LOD Button Active Color";
+	g_ColorNames[EColor::NodeLODButtonColorHovered] = "ntrs_Transform LOD Button Hover Color";
 	g_ColorNames[EColor::FloatBgTransformation] = "ntrs_Transform Float Background";
 	g_ColorNames[EColor::FloatBgTransformationActive] = "ntrs_Transform Float Active";
 	g_ColorNames[EColor::FloatBgTransformationHovered] = "ntrs_Transform Float Hovered";
@@ -633,6 +658,9 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Nodes_Operators_Rounding] = "ngen_Nodes_Operators_Rounding";
 	g_SizeNames[ESize::Nodes_Sequence_Rounding] = "ngen_Nodes_Sequence_Rounding";
+	g_SizeNames[ESize::Nodes_LOD_Button_Rounding] = "ngen_Nodes LOD Button Rounding";
+	g_SizeNames[ESize::Nodes_Border_Rounding] = "ngen_Nodes_Border_Rounding";
+	g_SizeNames[ESize::Nodes_Border_Thickness] = "ngen_Nodes_Border_Thickness";
 
 	g_SizeNames[ESize::Nodes_Rounding] = "ngen_Nodes Rounding";
 	g_SizeNames[ESize::Nodes_FloatWidth] = "ngen_Nodes Float Width";
@@ -692,6 +720,8 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Nodes_InputsSize] = "ngen_Nodes Inputs Size";
 	g_SizeVecNames[ESizeVec2::Nodes_MiddleSize] = "ngen_Nodes Middle Size";
 	g_SizeVecNames[ESizeVec2::Nodes_OutputSize] = "ngen_Nodes Output Size";
+
+	g_SizeVecNames[ESizeVec2::Nodes_LODButtonSize] = "ngen_Nodes LOD Button Size";
 
 	g_SizeVecNames[ESizeVec2::Nodes_FloatCycleButtonSize] = "ngen_Nodes Float Cycle button size";
 	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "ngen_Nodes Screen Texture Size";
