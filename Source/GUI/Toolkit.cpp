@@ -1,8 +1,5 @@
 #include "Toolkit.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
-
 #include "Utils/Format.h"
 
 namespace GUI
@@ -94,6 +91,82 @@ void ToggleButton(const char* label, bool& toggled, ImVec2 size)
 	ImGui::PopStyleColor(colorsPushed);
 	colorsPushed = 0;
 }
+
+bool ButtonWithCorners(const char* label, ImDrawFlags corners, const ImVec2& size_arg)
+{
+	return ButtonWithCornersEx(label, corners, size_arg, ImGuiButtonFlags_None);
+}
+
+bool ButtonWithCornersEx(const char* label, ImDrawFlags corners, const ImVec2& size_arg, ImGuiButtonFlags flags)
+{
+	using namespace ImGui;
+
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	ImGuiContext& g = *GImGui;
+	const ImGuiStyle& style = g.Style;
+	const ImGuiID id = window->GetID(label);
+	const ImVec2 label_size = CalcTextSize(label, NULL, true);
+
+	ImVec2 pos = window->DC.CursorPos;
+	if ((flags & ImGuiButtonFlags_AlignTextBaseLine) &&
+	    style.FramePadding.y <
+	        window->DC.CurrLineTextBaseOffset) // Try to vertically align buttons that are smaller/have no padding so
+	                                           // that text baseline matches (bit hacky, since it shouldn't be a flag)
+		pos.y += window->DC.CurrLineTextBaseOffset - style.FramePadding.y;
+	ImVec2 size =
+	    CalcItemSize(size_arg, label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
+
+	const ImRect bb(pos, pos + size);
+	ItemSize(size, style.FramePadding.y);
+	if (!ItemAdd(bb, id))
+		return false;
+
+	if (g.LastItemData.InFlags & ImGuiItemFlags_ButtonRepeat)
+		flags |= ImGuiButtonFlags_Repeat;
+
+	bool hovered, held;
+	bool pressed = ButtonBehavior(bb, id, &hovered, &held, flags);
+
+	// Render
+	const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_ButtonActive
+	                              : hovered         ? ImGuiCol_ButtonHovered
+	                                                : ImGuiCol_Button);
+	RenderNavHighlight(bb, id);
+	RenderFrameWithCorners(bb.Min, bb.Max, col, true, style.FrameRounding, corners);
+
+	if (g.LogEnabled)
+		LogSetNextTextDecoration("[", "]");
+	RenderTextClipped(bb.Min + style.FramePadding, bb.Max - style.FramePadding, label, NULL, &label_size,
+	                  style.ButtonTextAlign, &bb);
+
+	// Automatically close popups
+	// if (pressed && !(flags & ImGuiButtonFlags_DontClosePopups) && (window->Flags & ImGuiWindowFlags_Popup))
+	//    CloseCurrentPopup();
+
+	IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
+	return pressed;
+}
+
+void RenderFrameWithCorners(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border, float rounding,
+                            ImDrawFlags corners)
+{
+	using namespace ImGui;
+
+	ImGuiContext& g = *GImGui;
+	ImGuiWindow* window = g.CurrentWindow;
+	window->DrawList->AddRectFilled(p_min, p_max, fill_col, rounding, corners);
+	const float border_size = g.Style.FrameBorderSize;
+	if (border && border_size > 0.0f)
+	{
+		window->DrawList->AddRect(p_min + ImVec2(1, 1), p_max + ImVec2(1, 1), GetColorU32(ImGuiCol_BorderShadow),
+		                          rounding, corners, border_size);
+		window->DrawList->AddRect(p_min, p_max, GetColorU32(ImGuiCol_Border), rounding, corners, border_size);
+	}
+}
+
 
 void drawCross(glm::vec2 pos, ImDrawList* drawList, float thickness, float size, ImColor color)
 {
