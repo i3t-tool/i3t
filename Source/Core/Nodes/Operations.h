@@ -483,7 +483,7 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::MakeLookAt), "lookAt", 3, threeVector3Input, 1, matrixInput, NO_TAG, lookAtInputNames}, // lookAt
 
     {n(EOperatorType::Screen), "screen", 1, {EValueType::Screen}, 2, {EValueType::Screen, EValueType::Float}},
-    {n(EOperatorType::Pulse), "pulse", 0, {}, 1, {EValueType::Pulse}}};
+    {n(EOperatorType::Pulse), "pulse", 1, {EValueType::Pulse}, 1, {EValueType::Pulse}}};
 
 /**
  * From, to, multiplier, receive (play, pause, stopAndReset, prev, next).

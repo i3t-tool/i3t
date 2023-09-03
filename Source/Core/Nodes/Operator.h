@@ -1516,12 +1516,9 @@ template <> FORCE_INLINE void Operator<EOperatorType::Screen>::updateValues(int 
 
 template <> FORCE_INLINE void Operator<EOperatorType::Pulse>::updateValues(int inputIndex)
 {
-	/*
-if (m_outputs[0].isPluggedIn())
-{
-	int pinIndex = m_outputs[0].getOutComponents()[0]->getIndex();
-	m_outputs[0].getOutComponents()[0]->getOwner()->updateValues(pinIndex);
-}
- */
+	if (m_outputs[0].isPluggedIn())
+	{
+		pulse(0);
+	}
 }
 } // namespace Core
