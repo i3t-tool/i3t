@@ -181,7 +181,7 @@ template <> FORCE_INLINE void Operator<EOperatorType::MatrixMulVector>::updateVa
 	{
 		setInternalValue(m_inputs[0].data().getMat4() * m_inputs[1].data().getVec4());
 	}
-	else if (m_inputs[0].isPluggedIn())
+	else if (m_inputs[1].isPluggedIn())
 	{
 		setInternalValue(m_inputs[1].data().getVec4());
 	}
@@ -859,32 +859,21 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatMulQuat>::updateValues
 	}
 }
 
-// QuatVecConjQuat
+// QuatVecConjQuat = qvq*
 template <> FORCE_INLINE void Operator<EOperatorType::QuatVecConjQuat>::updateValues(int inputIndex)
 {
 	if (m_inputs[0].isPluggedIn() && m_inputs[1].isPluggedIn())
 	{
-		// chybna varianta - - nasobi qv jako (quat * vec3) * conj(q), tj. 2x za
-		// sebou vec3 * quat -> otoci o 2x uhel
-		// setInternalValue(m_inputs[0].data().getQuat() *
-		// m_inputs[1].data().getVec3() *
-		// glm::conjugate(m_inputs[0].data().getQuat())); // chyba
-
-		// spravna varianta, vycislujici vzorec qvq* jako q * quat(v) * q*
-		setInternalValue(m_inputs[0].data().getQuat() * glm::quat(0.0f, m_inputs[1].data().getVec3()) *
-		                 glm::conjugate(m_inputs[0].data().getQuat()));
-
-		// spravna varianta vyuzivajici glm::rotate
-		// setInternalValue(m_inputs[0].data().getQuat() *
-		// m_inputs[1].data().getVec3() );   // 1x q * v
+		// operator * is overloaded in glm - (quat * vec3) does the sandwich multiplication (quat vec3 quatConjugate)
+		setInternalValue(m_inputs[1].data().getQuat() * m_inputs[0].data().getVec3()); // q * v   means   qvq*
 	}
 	else if (m_inputs[0].isPluggedIn())
 	{
-		setInternalValue(m_inputs[0].data().getQuat());
+		setInternalValue(m_inputs[0].data().getVec3());
 	}
 	else
 	{
-		setInternalValue(glm::quat());
+		setInternalValue(glm::vec3());
 	}
 }
 

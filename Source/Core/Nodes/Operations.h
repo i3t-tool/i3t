@@ -316,12 +316,13 @@ static const std::vector<EValueType> twoQuatFloatInput = {EValueType::Quat, EVal
 static const std::vector<EValueType> matrixVectorInput = {EValueType::Matrix, EValueType::Vec4};
 static const std::vector<EValueType> vectorMatrixInput = {EValueType::Vec4, EValueType::Matrix};
 static const std::vector<EValueType> vector3FloatInput = {EValueType::Vec3, EValueType::Float};
+static const std::vector<EValueType> vector3QuatInput = {EValueType::Vec3, EValueType::Quat};
 static const std::vector<EValueType> floatMatrixInput = {EValueType::Float, EValueType::Matrix};
 static const std::vector<EValueType> floatVectorInput = {EValueType::Float,
                                                          EValueType::Vec4}; // PF: vec3 changed to vec4
 static const std::vector<EValueType> floatVector3Input = {EValueType::Float, EValueType::Vec3};
 static const std::vector<EValueType> floatQuatInput = {EValueType::Float, EValueType::Quat};
-static const std::vector<EValueType> quatVector3Input = {EValueType::Quat, EValueType::Vec3};
+// static const std::vector<EValueType> quatVector3Input = {EValueType::Quat, EValueType::Vec3};
 
 static const std::vector<EValueType> matrixMulAndMatrixInput = {EValueType::MatrixMul, EValueType::Matrix};
 static const std::vector<EValueType> matrixMulInput = {EValueType::MatrixMul};
@@ -413,7 +414,9 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::QuatLerp), "quat lerp", 3, twoQuatFloatInput, 1, quatInput},     // quat lerp
     {n(EOperatorType::FloatMulQuat), "float * quat", 2, floatQuatInput, 1, quatInput}, // float * quat
     {n(EOperatorType::QuatMulQuat), "quat * quat", 2, twoQuatInput, 1, quatInput},     // quat * quat
-    {n(EOperatorType::QuatVecConjQuat), "qvq*", 2, quatVector3Input, 1, vector3Input}, // qvq*
+    // {n(EOperatorType::QuatVecConjQuat), "qvq*", 2, quatVector3Input, 1, vector3Input}, // qvq*
+    {n(EOperatorType::QuatVecConjQuat), "qvq*", 2, vector3QuatInput, 1, vector3Input}, // qvq*
+
     {n(EOperatorType::QuatLength), "lengthquat", 1, quatInput, 1, floatInput,
      "l = sqrt(w*w + x*x + y*y + z*z)"}, // lengthquat
     {n(EOperatorType::ClampFloat), "clamp float", 3, threeFloatInput, 1, floatInput,
