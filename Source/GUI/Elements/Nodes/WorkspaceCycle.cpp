@@ -327,7 +327,7 @@ bool WorkspaceCycle::middleContent()
 		}
 		if (valueChanged)
 		{
-			m_nodebase->as<Core::Cycle>()->setMultiplier(localData);
+			m_nodebase->as<Core::Cycle>()->setStep(localData);
 			updateDataItemsWidth();
 		}
 		ImGui::TableNextColumn();
@@ -346,6 +346,34 @@ bool WorkspaceCycle::middleContent()
 			m_nodebase->as<Core::Cycle>()->setManualStep(localData);
 			updateDataItemsWidth();
 		}
+
+		ImGui::TableNextRow();
+
+		// smooth checkbox
+		ImGui::TableNextColumn();
+		auto smooth = m_nodebase->as<Core::Cycle>()->getSmoothStep();
+		if (ImGui::Checkbox(fmt::format("Smooth##{}smooth", getId()).c_str(), &smooth))
+		{
+			m_nodebase->as<Core::Cycle>()->setSmoothStep(smooth);
+		}
+
+		// step duration
+		ImGui::TableNextColumn();
+		localData = m_nodebase->as<Core::Cycle>()->getStepDuration();
+		valueChanged = false;
+		inner_interaction_happen |= drawDragFloatWithMap_Inline(diwne, getNumberOfVisibleDecimal(), m_floatPopupMode,
+		                                                        fmt::format("##{}stepduration", getId()), localData,
+		                                                        Core::EValueState::Editable, valueChanged);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Step duration");
+		}
+		if (valueChanged)
+		{
+			m_nodebase->as<Core::Cycle>()->setStepDuration(localData);
+			updateDataItemsWidth();
+		}
+
 		ImGui::EndTable();
 		break;
 	}

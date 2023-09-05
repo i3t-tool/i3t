@@ -78,6 +78,11 @@ const std::string& Pin::getLabel() const
 		}
 	}
 
+	if (!IsInput && ValueType == EValueType::Pulse)
+	{
+		return defaultIoNames[static_cast<size_t>(ValueType)];
+	}
+
 	/*
 	// default names for pins, we don't show them in the UI
 	if (shouldRenderPins())
@@ -183,6 +188,12 @@ ENodePlugResult Pin::isPlugCorrect(const Pin& input, const Pin& output)
 	{
 		// Do the input and output kind match?
 		return ENodePlugResult::Err_MismatchedPinKind;
+	}
+
+	if (input.ValueType == EValueType::Pulse)
+	{
+		// No restrictions on pulse pins.
+		return ENodePlugResult::Ok;
 	}
 
 	if (input.Owner == output.Owner)

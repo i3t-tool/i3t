@@ -18,12 +18,26 @@ Ptr<Node> Cycle::clone()
 	return Builder::createCycle();
 }
 
-void Cycle::update(double seconds)
+void Cycle::update(double deltaSeconds)
 {
-	if (m_isRunning)
+	if (!m_isRunning)
 	{
-		updateValue(static_cast<float>(seconds) * m_multiplier); // smooth step
+		return;
 	}
+
+	if (m_smoothStep)
+	{
+		const auto increment = static_cast<float>(deltaSeconds * m_step / m_stepDuration);
+		updateValue(increment);
+	}
+	else if (m_secondsSinceLastStep >= m_stepDuration)
+	{
+		const auto increment = static_cast<float>(m_step);
+		updateValue(increment);
+		m_secondsSinceLastStep = 0.0f;
+	}
+
+	m_secondsSinceLastStep += deltaSeconds;
 }
 
 void Cycle::play()
@@ -32,7 +46,7 @@ void Cycle::play()
 
 	if (m_mode == EMode::Once)
 	{
-		// revind to start (to m_from) after stop at m_to
+		// rewind to start (to m_from) after stop at m_to
 		if ((m_from <= m_to && currentValue >= m_to) || (m_from > m_to && currentValue <= m_to))
 		{
 			setInternalValue(m_from);
@@ -46,6 +60,7 @@ void Cycle::play()
 void Cycle::pause()
 {
 	m_isRunning = false;
+
 	pulse(I3T_CYCLE_OUT_PAUSE);
 }
 
@@ -79,9 +94,9 @@ void Cycle::setTo(float to)
 	m_to = to;
 }
 
-void Cycle::setMultiplier(float v) //\todo PF Change to setStep
+void Cycle::setStep(float v)
 {
-	m_multiplier = abs(v);
+	m_step = abs(v);
 }
 
 void Cycle::setManualStep(float v)
@@ -106,7 +121,7 @@ float Cycle::getTo() const
 
 float Cycle::getMultiplier() const
 {
-	return m_multiplier;
+	return m_step;
 }
 
 float Cycle::getManualStep() const
@@ -133,7 +148,7 @@ void Cycle::updateValues(int inputIndex)
 	if (m_inputs[I3T_CYCLE_IN_MULT].isPluggedIn())
 	{
 		float val = getInput(I3T_CYCLE_IN_MULT).data().getFloat();
-		setMultiplier(val);
+		setStep(val);
 		setInternalValue(val, I3T_CYCLE_IN_MULT);
 	}
 
@@ -159,9 +174,6 @@ void Cycle::updateValues(int inputIndex)
 	}
 }
 
-void Cycle::onCycleFinish() // \todo not used => remove?
-{}
-
 void Cycle::updateValue(float increment)
 {
 	const float currentValue = getData().getFloat();
@@ -177,6 +189,7 @@ void Cycle::updateValue(float increment)
 		{
 		case EMode::Once:
 			pause();
+
 			// clamp
 			if (m_from <= m_to)
 			{
@@ -186,11 +199,12 @@ void Cycle::updateValue(float increment)
 			{
 				newValue = newValue < m_to ? m_to : m_from;
 			}
+
+			pulse(I3T_CYCLE_OUT_END);
+
 			break;
 		case EMode::Repeat:
 			// New iteration.
-			// newValue = m_from < m_to ? m_from : m_to; // + fmod(newValue,
-			// m_manualStep);
 
 			if (m_from <= m_to)
 			{
@@ -199,13 +213,12 @@ void Cycle::updateValue(float increment)
 			else
 			{
 				newValue = newValue < m_to ? m_from : m_to;
-				;
 			}
+
+			pulse(I3T_CYCLE_OUT_END);
+
 			break;
 		case EMode::PingPong:
-
-			// fprintf(stdout, "DirectionMultiplier =%3.f \n",m_directionMultiplier);
-
 			if (m_from <= m_to) // and out of the range <m_from, m_to> or <m_to, m_from>
 			{
 				newValue = newValue > m_to ? m_to : m_from;
@@ -216,6 +229,8 @@ void Cycle::updateValue(float increment)
 			}
 
 			m_directionMultiplier *= -1.0f;
+
+			pulse(I3T_CYCLE_OUT_END);
 
 			break;
 		}
