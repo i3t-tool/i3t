@@ -4,6 +4,8 @@
 
 namespace Core
 {
+constexpr auto I3T_CYCLE_STEP_DURATION_SECONDS = 0.5f;
+
 constexpr size_t I3T_CYCLE_IN_FROM = 0;
 constexpr size_t I3T_CYCLE_IN_TO = 1;
 constexpr size_t I3T_CYCLE_IN_MULT = 2; /* JH is not step + instead of *  ??? */
@@ -38,25 +40,12 @@ public:
 		PingPong
 	};
 
-private:
-	float m_from = 0.0f;
-	float m_to = 10.0f;
-	float m_manualStep = 0.1f; //< step after pressing of Prev or Next button
-	float m_multiplier = 0.1f; //< current step for one tick + sign represents the step direction
-
-	float m_directionMultiplier = 1.0f; //< reverse the increment if (from > to)
-	                                    // and flip in the PingPong mode
-
-	bool m_isRunning = false;
-
-	EMode m_mode = EMode::Repeat;
-
 public:
 	Cycle() : Node(&g_CycleProperties) {}
 
 	Ptr<Node> clone() override;
 
-	void update(double seconds); //< seconds means time delta from the last update
+	void update(double deltaSeconds);
 
 	void play();
 	void pause();
@@ -68,6 +57,7 @@ public:
 	{
 		return m_mode;
 	}
+
 	void setMode(EMode mode)
 	{
 		if (m_mode != mode)
@@ -76,8 +66,6 @@ public:
 			m_directionMultiplier = 1.0f;
 		}
 	}
-
-	void onCycleFinish();
 
 	bool isRunning() const;
 	float getFrom() const;
@@ -98,7 +86,7 @@ public:
 	/**
 	 * \param v should be a loop increment - \todo to be renamed to setStep
 	 */
-	void setMultiplier(float v);
+	void setStep(float v);
 
 	/**
 	 * \param v increment added to/subtracted from the cycle value after user
@@ -106,15 +94,52 @@ public:
 	 */
 	void setManualStep(float v);
 
-	void updateValues(int inputIndex) override; //< update inner state from connected
-	                                            // inputs (values and pulse inputs)
+	void setSmoothStep(bool smoothStep)
+	{
+		m_smoothStep = smoothStep;
+	}
+
+	bool getSmoothStep() const
+	{
+		return m_smoothStep;
+	}
+
+	void setStepDuration(float stepDuration)
+	{
+		m_stepDuration = stepDuration;
+	}
+
+	float getStepDuration() const
+	{
+		return m_stepDuration;
+	}
+
+	/**
+	 * update inner state from connected inputs (values and pulse inputs)
+	 */
+	void updateValues(int inputIndex) override;
 
 private:
 	void updateValue(float increment);
-};
 
-FORCE_INLINE bool isCycle(const Ptr<Node>& node)
-{
-	return node->getOperation()->keyWord == g_CycleProperties.keyWord;
-}
+	float m_from = 0.0f;
+	float m_to = 10.0f;
+	/// step after pressing of Prev or Next button
+	float m_manualStep = 0.1f;
+	/// increment per second
+	float m_step = 0.2f;
+
+	/// reverse the increment if (from > to) and flip in the PingPong mode
+	float m_directionMultiplier = 1.0f;
+
+	bool m_isRunning = false;
+
+	float m_stepDuration = I3T_CYCLE_STEP_DURATION_SECONDS;
+
+	float m_secondsSinceLastStep = 0.0f;
+
+	bool m_smoothStep = true;
+
+	EMode m_mode = EMode::Repeat;
+};
 } // namespace Core

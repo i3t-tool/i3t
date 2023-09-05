@@ -13,7 +13,8 @@ TEST_F(CycleTestFixture, CycleIsUpdatetedAndResetAfterMaxValueIsGained)
 
 	cycle->setFrom(0.0f);
 	cycle->setTo(1.0f);
-	cycle->setMultiplier(0.1f);
+	cycle->setStep(0.1f);
+	cycle->setStepDuration(1.0f);
 
 	int expectedUpdates = (int) ((cycle->getTo() / sPerFrame) / cycle->getMultiplier()) + 2;
 	{

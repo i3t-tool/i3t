@@ -45,8 +45,46 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 	for (auto& value : memento["workspace"]["cycles"].GetArray())
 	{
 		const auto cycle = addNodeToNodeEditorNoSave<WorkspaceCycle>();
+		const auto coreCycle = cycle->getNodebase()->as<Core::Cycle>();
 		createdNodes.push_back(cycle);
 		NodeDeserializer::assignCommon(value, cycle);
+
+		if (value.HasMember("from"))
+		{
+			const auto from = value["from"].GetFloat();
+			coreCycle->setFrom(from);
+		}
+
+		if (value.HasMember("to"))
+		{
+			const auto to = value["to"].GetFloat();
+			coreCycle->setTo(to);
+		}
+
+		if (value.HasMember("manualStep"))
+		{
+			const auto step = value["manualStep"].GetFloat();
+			coreCycle->setManualStep(step);
+		}
+
+		if (value.HasMember("step"))
+		{
+			const auto multiplier = value["step"].GetFloat();
+			coreCycle->setStep(multiplier);
+		}
+
+		if (value.HasMember("stepDuration"))
+		{
+			const auto duration = value["stepDuration"].GetFloat();
+			coreCycle->setStepDuration(duration);
+		}
+
+		if (value.HasMember("smooth"))
+		{
+			const auto smooth = value["smooth"].GetBool();
+			coreCycle->setSmoothStep(smooth);
+		}
+
 		oldToNewId[value["id"].GetInt()] = cycle->getNodebase()->getId();
 	}
 

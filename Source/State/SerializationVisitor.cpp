@@ -80,6 +80,13 @@ void SerializationVisitor::visit(const Ptr<GuiCycle>& node)
 	rapidjson::Value cycle(rapidjson::kObjectType);
 	dumpCommon(cycle, node);
 
+	cycle.AddMember("from", coreNode->getFrom(), alloc);
+	cycle.AddMember("to", coreNode->getTo(), alloc);
+	cycle.AddMember("manualStep", coreNode->getManualStep(), alloc);
+	cycle.AddMember("step", coreNode->getMultiplier(), alloc);
+	cycle.AddMember("stepDuration", coreNode->getStepDuration(), alloc);
+	cycle.AddMember("smooth", coreNode->getSmoothStep(), alloc);
+
 	cycles.PushBack(cycle, alloc);
 
 	addEdges(edges, coreNode);
