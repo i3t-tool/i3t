@@ -373,6 +373,8 @@ bool WorkspaceCorePin::content()
 	return interaction_happen;
 }
 
+void WorkspaceCorePin::popupContent() {}
+
 bool WorkspaceCorePin::bypassFocusForInteractionAction()
 {
 	return m_iconRectDiwne.Contains(diwne.screen2diwne(diwne.bypassGetMousePos()));

@@ -170,6 +170,7 @@ public:
 	PinKind getKind() const;
 	Core::EValueType getType() const;
 	bool isConnected() const;
+	void popupContent();
 
 	/* DIWNE function */
 	virtual bool content();
