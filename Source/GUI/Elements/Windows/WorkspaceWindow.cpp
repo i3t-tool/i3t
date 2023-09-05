@@ -384,7 +384,7 @@ void WorkspaceDiwne::duplicateClickedNode()
 
 	for (const Ptr<GuiNode>& node : getAllNodesInnerIncluded())
 	{
-		if (node->m_focused)
+		if (node->m_focusedForInteraction)
 		{
 			if (node->m_selected)
 			{
@@ -1695,7 +1695,6 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 	Input.bindAction("duplicateSelected", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->duplicateSelectedNodes();
 	});
-
 	Input.bindAction("trackingEscOff", EKeyState::Pressed, [&]() {
 		g_workspaceDiwne->trackingSwitchOff();
 	});
