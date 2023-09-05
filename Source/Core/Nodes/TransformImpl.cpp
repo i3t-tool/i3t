@@ -1447,7 +1447,8 @@ bool TransformImpl<ETransformType::LookAt>::isValid() const
 	result = result && Math::eq(glm::length2(matT[2]), 1.0f);
 
 	MY_ASSERT(result, "LookAt::isValid(): Orthonormality tests failed"); // todo remove
-	// consistency of defaults
+
+	// consistency of the defaults
 	glm::vec3 eye = getDefaultValue("eye").getVec3();
 	glm::vec3 center = getDefaultValue("center").getVec3();
 	glm::vec3 up = getDefaultValue("up").getVec3();

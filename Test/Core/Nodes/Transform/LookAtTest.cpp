@@ -44,7 +44,7 @@ TEST(LookAtTest, GettersAndSettersShouldBeOk)
 
 TEST(LookAtTest, SetValue_and_Lock_Unlock)
 {
-	// Create uniform scale.
+	// Create an identity matrix
 	auto lookAt = Builder::createTransform<ETransformType::LookAt>();
 	EXPECT_TRUE(lookAt->isValid());
 
@@ -63,7 +63,7 @@ TEST(LookAtTest, SetValue_and_Lock_Unlock)
 	EXPECT_EQ(expectedMat, mat);
 
 	// nothing can be set
-	lookAt->lock();
+	lookAt->lock(); // isLocked==true is a default value
 	auto val = generateFloat();
 	setValue_expectWrong(lookAt, val, {1, 1});
 	EXPECT_TRUE(lookAt->isValid());
@@ -72,5 +72,10 @@ TEST(LookAtTest, SetValue_and_Lock_Unlock)
 	// PF - todo - dava na gitlabu true, na PC dava false
 	lookAt->unlock();
 	setValue_expectOk(lookAt, val, {1, 1});
+
+	auto wrongValue = lookAt->getData().getMat4()[1][1];
+	EXPECT_NE(wrongValue, 1.0f);
+	EXPECT_EQ(wrongValue, val);
+
 	EXPECT_FALSE(lookAt->isValid());
 }
