@@ -146,8 +146,12 @@ void Transform::reloadValue()
 	}
 
 	setInternalValue(m_savedData.getMat4(), 0);
-	m_defaultValues = m_savedValues;
-	resetMatrixFromDefaults();
+	if (!m_defaultValues.empty())
+	{
+		m_defaultValues = m_savedValues;
+		resetMatrixFromDefaults();
+	}
+
 	notifySequence();
 }
 
