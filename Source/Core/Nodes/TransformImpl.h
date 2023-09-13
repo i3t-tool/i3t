@@ -369,7 +369,7 @@ public:
 	const glm::quat& getQuat() const;
 	const glm::quat& getNormalized() const;
 
-	ValueSetResult setValue(const glm::quat& vec) override;
+	ValueSetResult setValue(const glm::quat& q) override;
 	ValueSetResult setValue(const glm::vec4& vec) override;
 	ValueSetResult setValue(const glm::mat4& mat) override;
 

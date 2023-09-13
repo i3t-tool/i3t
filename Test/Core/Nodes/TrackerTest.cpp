@@ -107,6 +107,7 @@ TEST_F(TrackerTest, TrackingRightToLeft)
 
 		EXPECT_EQ(tracker->fullMatricesCount(), 4);
 		EXPECT_TRUE(compare(expected, tracker->getInterpolatedMatrix()));
+		EXPECT_PRED_FORMAT2(AssertEqualMatrices, expected, tracker->getInterpolatedMatrix());
 
 		EXPECT_FLOAT_EQ(t.mat1->getActivePart(), 1.0f);
 		EXPECT_FLOAT_EQ(t.mat2->getActivePart(), 1.0f);
