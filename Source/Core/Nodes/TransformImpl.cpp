@@ -831,33 +831,87 @@ ValueSetResult TransformImpl<ETransformType::AxisAngle>::setValue(const glm::vec
 	return ValueSetResult{};
 }
 
-//===-- Quaternion rotation -----------------------------------------------===//
+#define PF_DEBUG
 
+//===-- Quaternion rotation -----------------------------------------------===//
 // todo - what should isValid without synergies return ofr |q| != 1?
+// most probably a corrupted quaternion
 bool TransformImpl<ETransformType::Quat>::isValid() const
 {
+#ifdef PF_DEBUG
+	std::cerr << "Entering isValid() ===============" << std::endl;
+#endif
+
+
 	// check the basic matrix values 0, 1, -1, any
 	// any linear transformation (3x3) may be a rotation
 	auto& mat = m_internalData[0].getMat4();
+	// auto& mat = getInternalData().getMat4();
+	// auto& mat = data().getMat4();
 	bool result = validateValues(g_AxisAngleMask, mat); // 3x3 rotational matrix
 
+#ifdef PF_DEBUG
+	if (!result)
+	{
+		std::cerr << "validateValues" << std::endl;
+		std::cerr << Utils::toString(mat, true) << std::endl;
+	}
+#endif
+
+
 	// matrix inner consistency
-	result = result && Math::eq(glm::determinant(mat), 1.0f); // det == 1
+	// result = result && Math::eq(glm::determinant(mat), 1.0f); // det == 1
+	// result = result && Math::eq(glm::determinant(mat), 1.0f, Math::FACTOR_FOR_DETERMINANT); // det == 1
+	result = result && Math::eqToOne(glm::determinant(mat)); // det == 1
+
+#ifdef PF_DEBUG
+	if (!result)
+	{
+		std::cerr << std::endl;
+		std::cerr << "determinant " << glm::determinant(mat) << " != 1" << std::endl;
+		std::cerr << Utils::toString(mat, true) << std::endl;
+	}
+#endif
 
 	// consistency of defaults
 	// 1) Check, if the default quaternion is of unit length?
 	const glm::quat quaternion = getDefaultValue("quat").getQuat();
 
 	result = result && Math::isNormalized(quaternion);
+#ifdef PF_DEBUG
+	if (!result)
+	{
+		std::cerr << "quat NOT normalized" << std::endl;
+		std::cerr << Utils::toString(quaternion) << std::endl;
+		return result;
+	}
+#endif
+
 
 	// 2) normalized helper
-	result = result && Math::eq(m_normalized, glm::normalize(quaternion));
+	result = result && Math::eq(m_normalized, glm::normalize(quaternion), Math::FACTOR_SIMILAR);
+#ifdef PF_DEBUG
+	if (!result)
+	{
+		std::cerr << "m_normalized != normalized(quaternion)" << std::endl;
+		std::cerr << Utils::toString(mat, true) << std::endl;
+		return result;
+	}
+#endif
+
 
 	// \todo check the angle too...
 	// consistency defaults <--> matrix
 	// matrix from a non-unit quaternion would also be wrong (non-unity of quat is
 	// tested above)
 	result = result && Math::eq(mat, glm::toMat4(quaternion));
+#ifdef PF_DEBUG
+	if (!result)
+	{
+		std::cerr << "stored mat != mat(quaternion)" << std::endl;
+		std::cerr << Utils::toString(mat, true) << std::endl;
+	}
+#endif
 
 	return result;
 }
@@ -903,9 +957,9 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 	m_normalized = glm::normalize(q);
 
 	if (hasSynergies())
-		setDefaultValueNoUpdate("quat", m_normalized); // probably not normalized
+		setDefaultValueNoUpdate("quat", m_normalized); // normalized
 	else
-		setDefaultValueNoUpdate("quat", q); // probably not normalized
+		setDefaultValueNoUpdate("quat", q); // not normalized
 
 	setInternalValue(glm::toMat4(m_normalized)); // matrix
 
@@ -914,8 +968,9 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 
 ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
 {
-	glm::quat q(vec);
-	return setValue(glm::quat(q));
+	// glm::quat q(vec);
+	// return setValue(glm::quat(q));
+	return setValue(glm::quat(vec));
 }
 
 ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::mat4& mat)

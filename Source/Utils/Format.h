@@ -34,7 +34,7 @@ inline std::string toString(const glm::vec4& vec)
 
 inline std::string toString(const glm::quat& quat)
 {
-	return fmt::format("[{}, {}, {}, {}]", toString(quat.x), toString(quat.y), toString(quat.z), toString(quat.w));
+	return fmt::format("[{}, ({}, {}, {})]", toString(quat.w), toString(quat.x), toString(quat.y), toString(quat.z));
 }
 
 inline std::string toString(const glm::mat4& mat, bool breakLines = false)

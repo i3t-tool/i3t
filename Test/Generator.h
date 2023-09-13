@@ -41,6 +41,28 @@ inline glm::vec4 generateVec4()
 	return glm::vec4(generateFloat(), generateFloat(), generateFloat(), generateFloat());
 }
 
+inline glm::vec4 generateUnitVec4()
+{
+	return (glm::normalize(generateVec4()));
+}
+
+inline glm::vec4 generateNonUnitVec4()
+{
+	glm::vec4 vec;
+
+	do
+	{
+		vec = generateVec4();
+#ifdef PF_DEBUG
+		std::cerr << "regenerate vector" << std::endl;
+#endif
+
+	} while (glm::length2(vec) <= 1.0f);
+
+	return (vec);
+}
+
+
 inline glm::mat4 generateMat4()
 {
 	return glm::mat4(generateVec4(), generateVec4(), generateVec4(), generateVec4());
