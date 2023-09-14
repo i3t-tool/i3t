@@ -6,7 +6,7 @@
 #include "yaml-cpp/yaml.h"
 
 #include "GUI/Theme.h"
-#include "Utils/Filesystem.h"
+#include "Utils/FilesystemUtils.h"
 
 template <typename T> std::optional<T> strToEnum(std::map<T, const char*>& map, std::string&& name)
 {
@@ -115,7 +115,7 @@ void saveTheme(const fs::path& path, Theme& theme)
 
 std::expected<Theme, Error> loadTheme(const fs::path& path)
 {
-	if (!doesFileExists(path.string().c_str()))
+	if (!FilesystemUtils::doesFileExists(path.string().c_str()))
 	{
 		return Err("File does not exist");
 	}

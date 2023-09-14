@@ -9,7 +9,7 @@
 #include "GUI/Toolkit.h"
 #include "GUI/WindowManager.h"
 #include "Loader/ThemeLoader.h"
-#include "Utils/Filesystem.h"
+#include "Utils/FilesystemUtils.h"
 #include "Utils/Other.h"
 
 namespace UI
@@ -114,7 +114,7 @@ void StyleEditor::renderSaveRevertField()
 		{
 			m_infoMessage = "Theme name contains invalid characters.";
 		}
-		else if (doesFileExist(path))
+		else if (FilesystemUtils::doesFileExist(path))
 		{
 			m_infoMessage = "Theme with this name already exists.";
 		}

@@ -6,18 +6,14 @@
 #include "Config.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Nodes/GraphManager.h"
-#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/UIModule.h" /// \todo Remove this dependency
 #include "Logger/Logger.h"
-#include "State/StateManager.h"
 #include "Viewport/Viewport.h"
 
 using namespace Core;
 
 double lastFrameSeconds = 0.0; // PF changed to double
-
-static Configuration* g_Config = nullptr;
 
 Application::Application()
 {
@@ -39,37 +35,6 @@ Application::~Application()
 void Application::init()
 {
 	initWindow();
-
-	Core::GraphManager::init();
-
-	//
-
-	CloseCommand::addListener([this] {
-		onClose();
-	});
-
-	InputManager::init();
-
-	InputManager::bindGlobalAction("undo", EKeyState::Pressed, [&]() {
-		LOG_INFO("undo triggered");
-		App::getUI()->invokeLater([]() {
-			App::getModule<StateManager>().undo();
-		});
-	});
-	InputManager::bindGlobalAction("redo", EKeyState::Pressed, [&]() {
-		LOG_INFO("redo triggered");
-		App::getUI()->invokeLater([]() {
-			App::getModule<StateManager>().redo();
-		});
-	});
-
-	// Former initI3T member function
-	const auto conf = loadConfig("Config.json");
-	createModule<Core::ResourceManager>();
-	App::getModule<ResourceManager>().createDefaultResources(conf->Resources);
-
-	m_viewport = new Vp::Viewport();
-	m_viewport->init(Vp::ViewportSettings());
 
 	// Call implementation of init() in derived class
 	onInit();

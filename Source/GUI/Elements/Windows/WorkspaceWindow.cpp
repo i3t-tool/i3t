@@ -1726,7 +1726,7 @@ WorkspaceWindow::WorkspaceWindow(bool show) : IWindow(show), m_wholeApplication(
 		g_workspaceDiwne->toggleSelectedNodesVisibility();
 	});
 
-	App::getModule<StateManager>().setOriginator(this);
+	App::getModule<StateManager>().addOriginator(this);
 
 	// Setup viewport selection callback
 	App::get().viewport()->getMainScene().lock()->addSelectionCallback([](Vp::Entity* newlySelectedEntity) {
@@ -1762,7 +1762,7 @@ void WorkspaceWindow::initDiwneFromTheme()
 // Node builder functions.
 //
 
-Memento WorkspaceWindow::getState()
+Memento WorkspaceWindow::saveState(Scene* scene)
 {
 	Memento memento;
 
@@ -1772,14 +1772,14 @@ Memento WorkspaceWindow::getState()
 	return memento;
 }
 
-void WorkspaceWindow::setState(const Memento& memento, bool newSceneLoaded)
+void WorkspaceWindow::loadState(const Memento& memento, Scene* scene)
 {
 	getNodeEditor().m_workspaceCoreNodes.clear();
 
 	NodeDeserializer::createFrom(memento);
 }
 
-void WorkspaceWindow::clear()
+void WorkspaceWindow::clearState()
 {
 	getNodeEditor().m_workspaceCoreNodes.clear();
 }

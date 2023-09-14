@@ -18,7 +18,8 @@
 #include "SceneRenderTarget.h"
 #include "Utils/HSLColor.h"
 
-using namespace Vp;
+namespace Vp
+{
 
 Scene::Scene(Viewport* viewport) : m_viewport(viewport)
 {
@@ -684,3 +685,5 @@ void Scene::triggerSelectionCallbacks(Entity* entity)
 		callback(entity);
 	}
 }
+
+} // namespace Vp

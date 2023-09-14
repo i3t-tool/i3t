@@ -276,11 +276,11 @@ public:
 	//
 
 private:
-	Memento getState() override;
+	Memento saveState(Scene* scene) override;
 
-	void setState(const Memento& memento, bool newSceneLoaded) override;
+	void loadState(const Memento& memento, Scene* scene) override;
 
-	void clear() override;
+	void clearState() override;
 
 	void initDiwneFromTheme();
 	//

@@ -7,6 +7,8 @@
  * \author 	Michal Folta, CTU Prague
  */
 
+// TODO: (DR) Pretty sure this is all obsolete at this point and some parts of it should be moved somewhere else
+
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
@@ -19,7 +21,7 @@
 #include <vector>
 
 #include "Core/Resources/Resource.h"
-#include "Utils/Filesystem.h"
+#include "Utils/FilesystemUtils.h"
 
 struct Configuration
 {

@@ -251,3 +251,9 @@ glm::vec2 WindowManager::getMousePositionForWindow(const IWindow* window)
 {
 	return GUI::convertCoordinates({InputManager::m_mouseX, InputManager::m_mouseY}, window->m_windowPos);
 }
+
+void WindowManager::openModal(UPtr<IWindow> modal)
+{
+	modal->show();
+	m_modalStack.push_back(std::move(modal));
+}

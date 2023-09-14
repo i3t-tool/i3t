@@ -3,7 +3,8 @@
 #include <string>
 
 #include "Core/Defs.h"
-#include "Utils/Filesystem.h"
+#include "ResourceFiles.h"
+#include "Utils/FilesystemUtils.h"
 
 namespace Core
 {
@@ -26,13 +27,15 @@ public:
 	friend class ResourceManager;
 
 	std::string alias; ///< Resource alias
-	std::string path;  ///< Resource path, used for display only, doesn't need to
-	                   ///< be a valid path
+	std::string path;  ///< Arbitrary resource file path, doesn't necessary need to be valid
 
 	ResourceType resourceType = ResourceType::Model;
 
 	std::vector<std::string> alternativeAliases; ///< Any additional aliases that got registered after the first one
 	                                             ///< which is not included in this list
+
+	Ptr<ResourceFiles>
+	    resourceFiles; ///< The resource CAN have an assigned ResourceFiles instance tracking any associated files
 
 private:
 	size_t hashId;              ///< Resource hash, unique identifier

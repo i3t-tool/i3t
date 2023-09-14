@@ -1,7 +1,10 @@
 #pragma once
 
+#include <set>
+
 #include "pgr.h"
 
+#include "Core/Defs.h"
 #include "ManagedResource.h"
 
 namespace Core
@@ -96,8 +99,6 @@ public:
 
 	DrawType m_drawType;
 	PrimitiveType m_primitiveType;
-	std::vector<std::string> m_textureFileList; ///< List of texture file paths this mesh requires
-	                                            ///< (not including embedded textures)
 
 	/// Whether the normal vbo is used
 	bool m_useNormals{false};
@@ -131,6 +132,12 @@ public:
 	unsigned int m_nIndices{0};
 
 	GLuint m_vao;
+
+	// Filesystem
+	std::string m_path;                      ///< If applicable, file path to the primary source file
+	std::set<std::string> m_textureFileList; ///< List of texture file paths this mesh requires
+	                                         ///< (not including embedded textures)
+
 
 private:
 	Mesh() = default;
@@ -179,18 +186,27 @@ public:
 	 * Load mesh from a model file using assimp
 	 * Fills normal, texcoord and tangent vertex buffers.
 	 * @param path Path to the model file.
+	 * @param minimalLoad If true, only the bare minimum of the model is loaded. Used to quickly aquire basic
+	 * information from assimp without actually meaning to use the mesh.
 	 * @return Pointer to the new Mesh object (newly allocated, to be managed
 	 * externally)
 	 */
-	static Mesh* load(const std::string& path);
+	static Mesh* load(const std::string& path, bool minimalLoad = false);
 
 private:
-	static void loadTextures(TextureSet& textureSet, const aiMaterial* material, const aiScene* scene, Mesh* mesh);
-	static GLuint loadTexture(aiTextureType type, const aiMaterial* material, const aiScene* scene, Mesh* mesh);
+	static void loadGeometry(Mesh* mesh, const aiScene* scn);
+	static void loadIndices(Mesh* mesh, const aiScene* scn);
+	static void createVaoAndBindAttribs(Mesh* mesh);
+
+	static void loadTextureCoordinates(Mesh* mesh, const aiScene* scn);
+	static void loadTextures(Mesh* mesh, const aiScene* scn, const fs::path rootPath, bool minimalLoad);
+
+	static void loadTextureSet(TextureSet& textureSet, const aiMaterial* material, const aiScene* scene, Mesh* mesh,
+	                           const fs::path& rootPath, bool minimalLoad);
+	static GLuint loadTexture(aiTextureType type, const aiMaterial* material, const aiScene* scene, Mesh* mesh,
+	                          const fs::path& rootPath, bool minimalLoad);
 	static GLuint loadEmbeddedTexture(const unsigned char* data, int length, bool mipmap = true);
 	static void loadMaterial(Material& meshMaterial, const aiMaterial* material);
-
-	static void createVaoAndBindAttribs(Mesh* mesh);
 
 	static inline glm::vec3 convertVec3(const aiVector3D& v)
 	{

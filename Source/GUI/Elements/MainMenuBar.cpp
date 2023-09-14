@@ -4,9 +4,9 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
-#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/AboutDialog.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
+#include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Modals/BeforeNewModal.h"
@@ -19,27 +19,19 @@
 #include "State/SerializationVisitor.h"
 #include "State/StateManager.h"
 #include "Windows/StartWindow.h"
-// #include "RecentFiles.h"
 
 using namespace UI;
 
 static bool saveSceneDialog(std::filesystem::path& result, const std::string& title)
 {
-	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
+	static std::vector<std::string> filter = {"I3T scene files", "*" I3T_SCENE_EXTENSION};
 
 	return SystemDialogs::SaveSingleFileDialog(result, title, "./", filter);
 }
 
 static bool openSceneDialog(std::filesystem::path& result, const std::string& title)
 {
-	static std::vector<std::string> filter = {"I3T scene files", "*.scene"};
-
-	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
-}
-
-static bool importContentDialog(std::filesystem::path& result, const std::string& title)
-{
-	static std::vector<std::string> filter = {"All files", "*"};
+	static std::vector<std::string> filter = {"I3T scene files", "*" I3T_SCENE_EXTENSION};
 
 	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 }
@@ -76,9 +68,9 @@ static void saveAs()
 	if (hasFilename)
 	{
 		fs::path path(filename);
-		if (path.extension().string() != ".scene")
+		if (path.extension().string() != I3T_SCENE_EXTENSION)
 		{
-			filename += ".scene";
+			filename += I3T_SCENE_EXTENSION;
 		}
 
 		auto ww = I3T::getWindowPtr<WorkspaceWindow>();
@@ -95,16 +87,6 @@ static void save()
 		sm.saveScene();
 	else
 		saveAs();
-}
-
-static void importModel()
-{
-	std::filesystem::path modelFile;
-	if (importContentDialog(modelFile, "Import model"))
-	{
-		Application::getModule<Core::ResourceManager>().importResource(modelFile);
-		Application::getModule<StateManager>().takeSnapshot();
-	}
 }
 
 Result<Void, Error> MenuBarDialogs::open()
@@ -189,7 +171,7 @@ void MainMenuBar::showFileMenu()
 
 		if (ImGui::MenuItem("Import Model"))
 		{
-			importModel();
+			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
 		}
 
 		ImGui::Separator();
