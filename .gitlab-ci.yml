@@ -1,3 +1,10 @@
+# Run pipeline only on master branch, tags and merge requests
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "develop"
+
 image: cvutdcgi/i3t-ci
 
 stages:
