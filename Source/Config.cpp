@@ -15,7 +15,7 @@ Ptr<Configuration> loadConfig(const fs::path& filename)
 
 	const auto& d = *result;
 
-	if (auto resources = Core::readResources(d["resources"]))
+	if (auto resources = Core::ResourceManager::readResources(d["resources"]))
 	{
 		conf->Resources = *resources;
 	}

@@ -1,20 +1,25 @@
 #pragma once
 
+#include <algorithm>
+#include <set>
+#include <unordered_map>
+#include <vector>
+
+#include "pgr.h"
+
 #include "Core/Application.h"
 #include "Core/Defs.h"
 #include "Core/Module.h"
 #include "Core/Resources/Mesh.h"
 #include "Core/Resources/Resource.h"
+#include "ResourceFiles.h"
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 
-#include "pgr.h"
-
-#include <algorithm>
-#include <set>
-
 #define RM Core::ResourceManager
 #define RMI Core::ResourceManager::instance()
+
+class StateManager;
 
 namespace Core
 {
@@ -29,8 +34,6 @@ class Resource;
 // 	Any provided path is used as a key, even if the file was loaded from a different path already.
 // TODO: (DR) Unicode support?
 // TODO: (DR) How to resolve alias conflict? Exception? Silent fail?
-
-std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resources);
 
 /**
  * Resource manager for loading resources from the filesystem.
@@ -51,7 +54,7 @@ std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resou
  * An RM define is provided to shorten "Core::ResourceManager"
  * An RMI define shortens "Core::ResourceManager::instance()"
  */
-class ResourceManager : public Module, IStateful
+class ResourceManager : public Module, public IStateful
 {
 private:
 	/// Map of hashIds and owning resource pointers [hashid, resource]
@@ -59,16 +62,28 @@ private:
 	/// Map of aliases and weak resource pointers [alias, resource]
 	std::unordered_map<std::string, std::weak_ptr<Resource>> m_aliasMap;
 
-	/// List of default resource aliases
+	/// List of default resource aliases [alias]
 	std::set<std::string> m_defaultResources;
-	std::set<std::string> m_importedResources;
+
+	/// List of resources imported into the current scene [alias]
+	std::vector<std::string> m_importedResources;
+
+	// Comparator for ResourceFiles sets
+	static constexpr auto resFilesCmp = [](Ptr<ResourceFiles> lhs, Ptr<ResourceFiles> rhs) {
+		return *lhs < *rhs;
+	};
+	/// List of lists of files of newly added resources whose files should be moved to data dir on next save
+	std::set<Ptr<ResourceFiles>, decltype(resFilesCmp)> m_filesToAddOnSave;
 
 public:
-	bool m_forceReload{false}; /// If true any resource fetches will not be cached
+	bool m_forceReload{false};      /// If true any resource fetches will not be cached
+	bool m_forceMinimumLoad{false}; /// If true just the bare minimum of resources is loaded
 
 	~ResourceManager();
 
 	static ResourceManager& instance();
+
+	bool resourceExists(std::string& alias);
 
 	/**
 	 * Loads provided resources and marks them as default.
@@ -86,19 +101,24 @@ public:
 	 */
 	std::vector<Resource> getDefaultResources(ResourceType type);
 
+	std::vector<std::string> getImportedResourceAliases();
+
 	/**
-	 * Dispose the specified resource and delete it from the manager.
+	 * Dispose the specified resource and remove it from the manager.
 	 * @param managedResource The actual resource returned by fetch methods.
 	 * @return false on failure
 	 */
-	bool dispose(ManagedResource* managedResource);
+	bool removeResource(ManagedResource* managedResource, bool force = false);
 
-	void importResource(const fs::path& path);
+private:
+	/**
+	 * Remove resource = Dispose resource and remove it from all applicable data structures
+	 * Dispose resource = Just deallocate the resource's memory
+	 * @param force Whether to remove default resources
+	 */
+	bool removeResource(std::shared_ptr<Resource>& resource, bool force = false);
 
-	Memento getState() override;
-
-	void setState(const Memento& memento, bool newSceneLoaded) override;
-
+public:
 	/**
 	 * Get existing texture using an alias
 	 * @return OpenGL id of the texture object
@@ -203,6 +223,20 @@ public:
 	           const unsigned int nVertices, const unsigned int* indices, const unsigned int nIndices,
 	           const float* colors, const unsigned int nColors);
 
+	//////////////////////////////////////////////////////
+	// SCENE LOAD/SAVE
+	//////////////////////////////////////////////////////
+
+	bool importModel(const fs::path& path);
+	bool removeImportedModel(const std::string& alias);
+
+	Memento saveState(Scene* scene) override;
+	bool cleanUpModelFiles(Scene* scene);
+	void loadState(const Memento& memento, Scene* scene) override;
+	void clearState() override;
+
+	static std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resources);
+
 private:
 	/**
 	 * Return value:
@@ -217,6 +251,8 @@ private:
 	 * Assumes alias doesn't exist and the resource does
 	 */
 	void registerAlias(const std::string& alias, std::shared_ptr<Resource> resource);
+
+	Ptr<Resource> resourceByAlias(const std::string& alias);
 
 	GLuint loadTexture(const std::string& path);
 

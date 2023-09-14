@@ -32,7 +32,7 @@ void SceneModel::setModel(std::string modelAlias)
 	auto newMesh = RMI.meshByAlias(modelAlias);
 	if (!newMesh)
 	{
-		LOG_ERROR("SceneModel: Model alias {} does not exist!", modelAlias);
+		LOG_ERROR("SceneModel: Model alias '{}' does not exist!", modelAlias);
 		return;
 	}
 	m_modelAlias = modelAlias;

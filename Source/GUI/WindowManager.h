@@ -147,6 +147,7 @@ public:
 	static glm::vec2 getMousePositionForWindow(const IWindow* window);
 
 	template <typename T> void openModal();
+	void openModal(UPtr<IWindow> modalInstance);
 
 private:
 	void updateWindowFocus();

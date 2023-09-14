@@ -3,6 +3,8 @@
 #define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
 
+#include "Scene.h"
+
 /// @note Nodes are referenced by their index.
 /// ```json
 /// {
@@ -16,22 +18,26 @@
 /// ```
 using Memento = rapidjson::Document;
 
+using namespace State;
+
 class IStateful
 {
 public:
+	virtual ~IStateful(){};
+
 	/// Get state of a stateful object, the result will be merged
 	/// into one global memento.
-	virtual Memento getState()
-	{
-		auto memento = Memento{};
-		memento.SetObject();
 
-		return memento;
-	};
+	/**
+	 * Get state of a stateful object, the result will be merged into one global memento.
+	 */
+	virtual Memento saveState(State::Scene* scene) = 0;
 
-	/// Called on scene load, undo and redo.
-	/// @param memento New global state.
-	virtual void setState(const Memento& memento, bool newSceneLoaded) {}
+	/**
+	 * Called on scene load, undo and redo.
+	 * @param memento New global state
+	 */
+	virtual void loadState(const Memento& memento, State::Scene* scene) = 0;
 
-	virtual void clear() {}
+	virtual void clearState() = 0;
 };

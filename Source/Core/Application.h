@@ -93,7 +93,7 @@ public:
 public:
 	template <typename T> static T& getModule();
 
-private:
+protected:
 	static Application* s_instance;
 
 	std::unordered_map<std::size_t, std::unique_ptr<Module>> m_modules;

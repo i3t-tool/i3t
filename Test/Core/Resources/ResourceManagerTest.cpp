@@ -219,22 +219,22 @@ TEST_F(ResourceManagerTest, DisposeTest)
 
 	Core::Mesh* bunnyMesh = Core::ResourceManager::instance().mesh("bUnny", bunny);
 
-	Core::ResourceManager::instance().dispose(teapotMesh);
+	Core::ResourceManager::instance().removeResource(teapotMesh, true);
 	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Teapot2"));
 	for (const auto& res : Core::ResourceManager::instance().getDefaultResources(Core::ResourceType::Model))
 	{
 		ASSERT_NE(res.alias, "Teapot");
 	}
 
-	Core::ResourceManager::instance().dispose(bunnyMesh);
+	Core::ResourceManager::instance().removeResource(bunnyMesh, true);
 	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("bUnny"));
 
-	Core::ResourceManager::instance().dispose(boxMesh);
+	Core::ResourceManager::instance().removeResource(boxMesh, true);
 	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Second Box"));
 	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("Third box even"));
 	Core::Mesh* newBox = Core::ResourceManager::instance().mesh("New box", box);
 	ASSERT_NE(nullptr, newBox);
 	ASSERT_EQ(newBox, Core::ResourceManager::instance().meshByAlias("New box"));
-	Core::ResourceManager::instance().dispose(newBox);
+	Core::ResourceManager::instance().removeResource(newBox, true);
 	ASSERT_EQ(nullptr, Core::ResourceManager::instance().meshByAlias("New box"));
 }

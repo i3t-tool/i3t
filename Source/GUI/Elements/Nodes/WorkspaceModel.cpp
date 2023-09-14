@@ -92,6 +92,26 @@ void WorkspaceModel::popupContent_axis_showmodel()
 				model->setModel(resource.alias);
 			}
 		}
+		std::vector<std::string> importedResources = RMI.getImportedResourceAliases();
+		if (!importedResources.empty())
+		{
+			ImGui::Separator();
+			for (const auto& alias : importedResources)
+			{
+				Core::Mesh* importedModel = RMI.meshByAlias(alias);
+				if (importedModel)
+				{
+					if (ImGui::MenuItem(alias.c_str()))
+					{
+						model->setModel(alias);
+					}
+				}
+				else
+				{
+					ImGui::MenuItem(alias.c_str(), NULL, false, false);
+				}
+			}
+		}
 		ImGui::EndMenu();
 	}
 }

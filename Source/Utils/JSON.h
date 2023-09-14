@@ -18,7 +18,7 @@
 #include "Core/Nodes/NodeData.h"
 #include "Core/Result.h"
 #include "Logger/Logger.h"
-#include "Utils/Filesystem.h"
+#include "Utils/FilesystemUtils.h"
 
 namespace JSON
 {
