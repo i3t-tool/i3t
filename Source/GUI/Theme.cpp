@@ -183,6 +183,20 @@ void Theme::initClassicProperties()
 	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
 
+	set(EColor::StartWindow_DescriptionBackground, createColor(255, 255, 255, 255));
+	set(EColor::StartWindow_WindowBackground, createColor(232, 232, 232, 255));
+	set(EColor::StartWindow_ScrollbarBackground, createColor(232, 232, 232, 255));
+	set(EColor::StartWindow_ScrollbarGrab, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_ScrollbarGrabHovered, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_ScrollbarGrabActive, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_Separator, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_DefaultButton, createColor(14, 98, 175, 255));
+	set(EColor::StartWindow_NewSceneButton, createColor(8, 187, 230, 255));
+	set(EColor::StartWindow_NewSceneButtonFont, createColor(255, 255, 255, 255));
+	set(EColor::StartWindow_TitleFont, createColor(14, 98, 175, 255));
+	set(EColor::StartWindow_DescriptionFont, createColor(65, 65, 66, 255));
+	set(EColor::StartWindow_YourSceneWinBackground, createColor(255, 255, 255, 255));
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
 	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
@@ -264,6 +278,22 @@ void Theme::initClassicProperties()
 	m_sizes[ESize::Window_Rounding] = 0.0f;
 	m_sizes[ESize::Tooltip_Rounding] = 10.0f;
 
+	m_sizes[ESize::StartWindow_WinWidth] = 850.0f;
+	m_sizes[ESize::StartWindow_WinHeight] = 500.0f;
+	m_sizes[ESize::StartWindow_WinRounding] = 6.0f;
+	m_sizes[ESize::StartWindow_TitleVerticalOffset] = 130.0f;
+	m_sizes[ESize::StartWindow_LeftBarWidth] = 330.0f;
+	m_sizes[ESize::StartWindow_LoadButtonWidth] = 120.0f;
+	m_sizes[ESize::StartWindow_StartNewButtonWidth] = 120.0f;
+	m_sizes[ESize::StartWindow_ButtonHeight] = 30.0f;
+	m_sizes[ESize::StartWindow_ThumbImageSize] = 80.0f;
+	m_sizes[ESize::StartWindow_StartButtonWidth] = 120.0f;
+	m_sizes[ESize::StartWindow_FrameRounding] = 4.0f;
+	m_sizes[ESize::StartWindow_ScrollbarSize] = 14.0f;
+	m_sizes[ESize::StartWindow_YourSceneWinRounding] = 6.0f;
+	m_sizes[ESize::StartWindow_DotSize] = 10.0f;
+	m_sizes[ESize::StartWindow_DotSpacing] = 7.0f;
+
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
@@ -295,6 +325,13 @@ void Theme::initClassicProperties()
 	m_sizesVec2[ESizeVec2::TutorialWindow_Padding] = ImVec2(30.f, 35.f);
 	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
 	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
+
+	m_sizesVec2[ESizeVec2::StartWindow_WinSize] = ImVec2(1020.f, 600.f);
+	m_sizesVec2[ESizeVec2::StartWindow_LogoOffset] = ImVec2(5.f, -20.f);
+	m_sizesVec2[ESizeVec2::StartWindow_WinPadding] = ImVec2(0.f, 0.f);
+	m_sizesVec2[ESizeVec2::StartWindow_LeftWinPadding] = ImVec2(30.f, 30.f);
+	m_sizesVec2[ESizeVec2::StartWindow_RightWinOuterPadding] = ImVec2(10.f, 10.f);
+	m_sizesVec2[ESizeVec2::StartWindow_RightWinInnerPadding] = ImVec2(10.f, 10.f);
 }
 
 void Theme::initModernProperties()
@@ -417,9 +454,23 @@ void Theme::initModernProperties()
 	// is now multiplied by the fontSize in WorkspaceTransformation::topContent(), diwne.DrawIcon()
 	set(EColor::Nodes_Transformation_ValidIcon_padding, ImVec4(0.7216f, 0.7686f, 0.7255f, 0.7686f));
 
-
 	set(EColor::Nodes_Transformation_TrackingMarkColor, ImVec4(0.7f, 0.7f, 0.0f, 1.0f));
 	set(EColor::Nodes_Transformation_TrackingColor, ImVec4(0.3f, 0.3f, 0.1f, 0.6f));
+
+	set(EColor::StartWindow_DescriptionBackground, createColor(255, 255, 255, 255));
+	set(EColor::StartWindow_WindowBackground, createColor(232, 232, 232, 255));
+	set(EColor::StartWindow_ScrollbarBackground, createColor(232, 232, 232, 255));
+	set(EColor::StartWindow_ScrollbarGrab, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_ScrollbarGrabHovered, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_ScrollbarGrabActive, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_Separator, createColor(202, 202, 202, 255));
+	set(EColor::StartWindow_DefaultButton, createColor(14, 98, 175, 255));
+	set(EColor::StartWindow_NewSceneButton, createColor(8, 187, 230, 255));
+	set(EColor::StartWindow_NewSceneButtonFont, createColor(255, 255, 255, 255));
+	set(EColor::StartWindow_TitleFont, createColor(14, 98, 175, 255));
+	set(EColor::StartWindow_DescriptionFont, createColor(65, 65, 66, 255));
+	set(EColor::StartWindow_YourSceneWinBackground, createColor(255, 255, 255, 255));
+
 
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
@@ -498,6 +549,22 @@ void Theme::initModernProperties()
 	m_sizes[ESize::Window_Rounding] = 0.0f;
 	m_sizes[ESize::Tooltip_Rounding] = 10.0f;
 
+	m_sizes[ESize::StartWindow_WinWidth] = 850.0f;
+	m_sizes[ESize::StartWindow_WinHeight] = 500.0f;
+	m_sizes[ESize::StartWindow_WinRounding] = 6.0f;
+	m_sizes[ESize::StartWindow_TitleVerticalOffset] = 130.0f;
+	m_sizes[ESize::StartWindow_LeftBarWidth] = 330.0f;
+	m_sizes[ESize::StartWindow_LoadButtonWidth] = 120.0f;
+	m_sizes[ESize::StartWindow_StartNewButtonWidth] = 120.0f;
+	m_sizes[ESize::StartWindow_ButtonHeight] = 30.0f;
+	m_sizes[ESize::StartWindow_ThumbImageSize] = 80.0f;
+	m_sizes[ESize::StartWindow_StartButtonWidth] = 120.0f;
+	m_sizes[ESize::StartWindow_FrameRounding] = 4.0f;
+	m_sizes[ESize::StartWindow_ScrollbarSize] = 14.0f;
+	m_sizes[ESize::StartWindow_YourSceneWinRounding] = 6.0f;
+	m_sizes[ESize::StartWindow_DotSize] = 10.0f;
+	m_sizes[ESize::StartWindow_DotSpacing] = 7.0f;
+
 	m_sizesVec2[ESizeVec2::Window_FramePadding] = ImVec2(4.0f, 4.0f);
 
 	m_sizesVec2[ESizeVec2::Nodes_ItemsSpacing] = ImVec2(2.0f, 3.0f);
@@ -528,6 +595,13 @@ void Theme::initModernProperties()
 	m_sizesVec2[ESizeVec2::TutorialWindow_Padding] = ImVec2(30.f, 35.f);
 	m_sizesVec2[ESizeVec2::Tooltip_Padding] = ImVec2(10.f, 10.f);
 	m_sizesVec2[ESizeVec2::Window_Padding] = ImVec2(0.f, 0.f);
+
+	m_sizesVec2[ESizeVec2::StartWindow_WinSize] = ImVec2(1020.f, 600.f);
+	m_sizesVec2[ESizeVec2::StartWindow_LogoOffset] = ImVec2(5.f, -20.f);
+	m_sizesVec2[ESizeVec2::StartWindow_WinPadding] = ImVec2(0.f, 0.f);
+	m_sizesVec2[ESizeVec2::StartWindow_LeftWinPadding] = ImVec2(30.f, 30.f);
+	m_sizesVec2[ESizeVec2::StartWindow_RightWinOuterPadding] = ImVec2(10.f, 10.f);
+	m_sizesVec2[ESizeVec2::StartWindow_RightWinInnerPadding] = ImVec2(10.f, 10.f);
 }
 
 void Theme::initNames()
@@ -649,6 +723,20 @@ void Theme::initNames()
 	// Links
 	g_ColorNames[EColor::Links_selected_colorShift] = "nlnk_selected_colorShift";
 
+	g_ColorNames[EColor::StartWindow_DescriptionBackground] = "glob_StartWindow_DescriptionBackground";
+	g_ColorNames[EColor::StartWindow_WindowBackground] = "glob_StartWindow_WinBackground";
+	g_ColorNames[EColor::StartWindow_ScrollbarBackground] = "glob_StartWindow_ScrollbarBackground";
+	g_ColorNames[EColor::StartWindow_ScrollbarGrab] = "glob_StartWindow_ScrollbarGrab";
+	g_ColorNames[EColor::StartWindow_ScrollbarGrabHovered] = "glob_StartWindow_ScrollbarGrabHovered";
+	g_ColorNames[EColor::StartWindow_ScrollbarGrabActive] = "glob_StartWindow_ScrollbarGrabActive";
+	g_ColorNames[EColor::StartWindow_Separator] = "glob_StartWindow_Separator";
+	g_ColorNames[EColor::StartWindow_DefaultButton] = "glob_StartWindow_DefaultButton";
+	g_ColorNames[EColor::StartWindow_NewSceneButton] = "glob_StartWindow_NewSceneButton";
+	g_ColorNames[EColor::StartWindow_NewSceneButtonFont] = "glob_StartWindow_NewSceneButtonFont";
+	g_ColorNames[EColor::StartWindow_TitleFont] = "glob_StartWindow_TitleFontColor";
+	g_ColorNames[EColor::StartWindow_DescriptionFont] = "glob_StartWindow_DescriptionFontColor";
+	g_ColorNames[EColor::StartWindow_YourSceneWinBackground] = "glob_StartWindow_YourSceneWinBackground";
+
 	/// \todo ???
 	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a
 	// color!)";
@@ -703,6 +791,22 @@ void Theme::initNames()
 
 	g_SizeNames[ESize::Pins_IconPadding] = "ngen_Pins_IconPadding";
 
+	g_SizeNames[ESize::StartWindow_WinWidth] = "glob_StartWindow_WinWidth";
+	g_SizeNames[ESize::StartWindow_WinHeight] = "glob_StartWindow_WinHeight";
+	g_SizeNames[ESize::StartWindow_WinRounding] = "glob_StartWindow_WinRounding";
+	g_SizeNames[ESize::StartWindow_TitleVerticalOffset] = "glob_StartWindow_TitleVerticalOffset";
+	g_SizeNames[ESize::StartWindow_LeftBarWidth] = "glob_StartWindow_LeftBarWidth";
+	g_SizeNames[ESize::StartWindow_LoadButtonWidth] = "glob_StartWindow_LoadButtonWidth";
+	g_SizeNames[ESize::StartWindow_StartNewButtonWidth] = "glob_StartWindow_StartNewButtonWidth";
+	g_SizeNames[ESize::StartWindow_ButtonHeight] = "glob_StartWindow_ButtonHeight";
+	g_SizeNames[ESize::StartWindow_ThumbImageSize] = "glob_StartWindow_ThumbImageSize";
+	g_SizeNames[ESize::StartWindow_StartButtonWidth] = "glob_StartWindow_StartButtonWidth";
+	g_SizeNames[ESize::StartWindow_FrameRounding] = "glob_StartWindow_FrameRounding";
+	g_SizeNames[ESize::StartWindow_ScrollbarSize] = "glob_StartWindow_ScrollbarSize";
+	g_SizeNames[ESize::StartWindow_YourSceneWinRounding] = "glob_StartWindow_YourSceneWinRounding";
+	g_SizeNames[ESize::StartWindow_DotSize] = "glob_StartWindow_DotSize";
+	g_SizeNames[ESize::StartWindow_DotSpacing] = "glob_StartWindow_DotSpacing";
+
 	g_SizeVecNames[ESizeVec2::Nodes_Screen_resizeButtonSize] = "ngen_Nodes_Screen_resizeButtonSize";
 	g_SizeVecNames[ESizeVec2::Nodes_Sequence_DummySpaceSize] = "ngen_Nodes_Sequence_DummySpaceSize";
 	g_SizeVecNames[ESizeVec2::NewNode_positionShift] = "ngen_NewNode_positionShift";
@@ -727,6 +831,13 @@ void Theme::initNames()
 	g_SizeVecNames[ESizeVec2::Nodes_ScreenTextureSize] = "ngen_Nodes Screen Texture Size";
 
 	g_SizeVecNames[ESizeVec2::Builder_ItemSpacing] = "ngen_Builder Item Spacing";
+
+	g_SizeVecNames[ESizeVec2::StartWindow_WinSize] = "glob_StartWindow_WinSize";
+	g_SizeVecNames[ESizeVec2::StartWindow_LogoOffset] = "glob_StartWindow_LogoOffset";
+	g_SizeVecNames[ESizeVec2::StartWindow_WinPadding] = "glob_StartWindow_WinPadding";
+	g_SizeVecNames[ESizeVec2::StartWindow_LeftWinPadding] = "glob_StartWindow_LeftWinPadding";
+	g_SizeVecNames[ESizeVec2::StartWindow_RightWinOuterPadding] = "glob_StartWindow_RightWinOuterPadding";
+	g_SizeVecNames[ESizeVec2::StartWindow_RightWinInnerPadding] = "glob_StartWindow_RightWinInnerPadding";
 }
 
 void Theme::apply()

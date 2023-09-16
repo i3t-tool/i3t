@@ -138,6 +138,20 @@ enum class EColor
 	Links_selected_colorShift,
 
 	Builder_NodePadding, // not a color but i need a vec4
+
+	StartWindow_DescriptionBackground,
+	StartWindow_WindowBackground,
+	StartWindow_ScrollbarBackground,
+	StartWindow_ScrollbarGrab,
+	StartWindow_ScrollbarGrabHovered,
+	StartWindow_ScrollbarGrabActive,
+	StartWindow_Separator,
+	StartWindow_DefaultButton,
+	StartWindow_NewSceneButton,
+	StartWindow_NewSceneButtonFont,
+	StartWindow_TitleFont,
+	StartWindow_DescriptionFont,
+	StartWindow_YourSceneWinBackground
 };
 
 enum class EFont
@@ -225,7 +239,23 @@ enum class ESize
 
 	Tooltip_Rounding,
 
-	Window_Rounding
+	Window_Rounding,
+
+	StartWindow_WinWidth,
+	StartWindow_WinHeight,
+	StartWindow_WinRounding,
+	StartWindow_TitleVerticalOffset,
+	StartWindow_LeftBarWidth,
+	StartWindow_LoadButtonWidth,
+	StartWindow_StartNewButtonWidth,
+	StartWindow_ButtonHeight,
+	StartWindow_ThumbImageSize,
+	StartWindow_StartButtonWidth,
+	StartWindow_FrameRounding,
+	StartWindow_ScrollbarSize,
+	StartWindow_YourSceneWinRounding,
+	StartWindow_DotSize,
+	StartWindow_DotSpacing
 };
 
 enum class ESizeVec2
@@ -261,6 +291,13 @@ enum class ESizeVec2
 	NewNode_positionShift,
 
 	Builder_ItemSpacing,
+
+	StartWindow_WinSize,
+	StartWindow_LogoOffset,
+	StartWindow_WinPadding,
+	StartWindow_LeftWinPadding,
+	StartWindow_RightWinOuterPadding,
+	StartWindow_RightWinInnerPadding
 };
 
 constexpr inline EColor asColor(Core::EValueType type)
