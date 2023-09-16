@@ -1,11 +1,4 @@
 /**
- * \file       main.cpp
- * \author     Michal Folta
- * \date
- * \brief      Here is the main procedure.
- */
-
-/**
  * \brief	\mainpage Documentation before refactoring
  *
  *  I3T is an educational application which enables the study of 3D
