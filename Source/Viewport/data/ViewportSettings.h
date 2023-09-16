@@ -19,6 +19,8 @@ public:
 	float mainScene_iorbitCameraRadius;
 	glm::vec3 mainScene_iorbitCameraPivot;
 
+	bool mainScene_lightFollowsCamera;
+
 	float preview_fov;
 	float preview_radiusFactor;
 	float preview_rotateSpeed;

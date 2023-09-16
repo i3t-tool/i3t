@@ -19,7 +19,10 @@ using namespace Vp;
 
 MainScene::MainScene(Viewport* viewport) : Scene(viewport)
 {
-	// Empty
+	m_sun1_dir = glm::vec3(-0.73, -0.64, -0.21);
+	m_sun2_dir = glm::vec3(0.76, 0.58, -0.12);
+
+	m_sun2_intensity = 0.08f;
 }
 
 std::default_random_engine& randomEngine();
@@ -80,19 +83,19 @@ void MainScene::init()
 	}
 
 	// Lights
-	SunLight* sun = new SunLight();
-	sun->intensity = 0.8f;
-	sun->color = glm::vec3(0.93, 0.98, 1.0);
-	sun->direction = glm::vec3(-0.73, -0.64, -0.21);
-	sun->pos = glm::vec3(0, 4, 0);
-	m_lighting->addLight(sun);
+	m_sun1 = new SunLight();
+	m_sun1->intensity = 0.8f;
+	m_sun1->color = glm::vec3(0.93, 0.98, 1.0);
+	m_sun1->direction = m_sun1_dir;
+	m_sun1->pos = glm::vec3(0, 4, 0);
+	m_lighting->addLight(m_sun1);
 
-	SunLight* sun2 = new SunLight();
-	sun2->intensity = 0.12f;
-	sun2->color = glm::vec3(0.69f, 0.91f, 1.0f);
-	sun2->direction = glm::vec3(0.76, 0.58, -0.12);
-	sun->pos = glm::vec3(0, 2, 0);
-	m_lighting->addLight(sun2);
+	m_sun2 = new SunLight();
+	m_sun2->intensity = m_sun2_intensity;
+	m_sun2->color = glm::vec3(0.804, 0.945, 1);
+	m_sun2->direction = m_sun2_dir;
+	m_sun2->pos = glm::vec3(0, 2, 0);
+	m_lighting->addLight(m_sun2);
 
 	m_gridObject =
 	    std::make_shared<GameObject>(RMI.meshByAlias(Shaper::screenQuad), Shaders::instance().m_gridShader.get());
@@ -202,4 +205,15 @@ void MainScene::update(double dt)
 	gridShader->m_grid1FadeEnd = m_viewport->getSettings().grid_grid1FadeEnd;
 	gridShader->m_grid2FadeStart = m_viewport->getSettings().grid_grid2FadeStart;
 	gridShader->m_grid2FadeEnd = m_viewport->getSettings().grid_grid2FadeEnd;
+
+	if (m_viewport->getSettings().mainScene_lightFollowsCamera)
+	{
+		m_sun1->direction = glm::inverse(m_camera->getView()) * glm::normalize(glm::vec4(-0.4f, -0.5f, -1.0f, 0.0f));
+		m_sun2->intensity = 0.0f;
+	}
+	else
+	{
+		m_sun1->direction = m_sun1_dir;
+		m_sun2->intensity = m_sun2_intensity;
+	}
 }
