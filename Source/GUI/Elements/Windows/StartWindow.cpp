@@ -108,33 +108,42 @@ void StartWindow::render()
 	}
 	// Styling constants todo move all constants here, possibly load from theme or
 	// other styling settings
-	const float minWinWidth = 850;
-	const float minWinHeight = 500;
-	const ImVec2 logoOffset = ImVec2(5, -20);
-	const float titleVerticalOffset = 130;
-	const float leftBarWidth = 330;
-	const float loadBtnWidth = 120;
-	const float startNewBtnWidth = loadBtnWidth;
-	const float buttonHeight = 30;
-	const float thumbImageSize = 80;
-	const float startBtnWidth = 120;
+	const float minWinWidth = App::get().getUI()->getTheme().get(ESize::StartWindow_WinWidth);
+	const float minWinHeight = App::get().getUI()->getTheme().get(ESize::StartWindow_WinHeight);
+	const ImVec2 logoOffset = App::get().getUI()->getTheme().get(ESizeVec2::StartWindow_LogoOffset);
+	const float titleVerticalOffset = App::get().getUI()->getTheme().get(ESize::StartWindow_TitleVerticalOffset);
+	const float leftBarWidth = App::get().getUI()->getTheme().get(ESize::StartWindow_LeftBarWidth);
+	const float loadBtnWidth = App::get().getUI()->getTheme().get(ESize::StartWindow_LoadButtonWidth);
+	const float startNewBtnWidth = App::get().getUI()->getTheme().get(ESize::StartWindow_StartNewButtonWidth);
+	const float buttonHeight = App::get().getUI()->getTheme().get(ESize::StartWindow_ButtonHeight);
+	const float thumbImageSize = App::get().getUI()->getTheme().get(ESize::StartWindow_ThumbImageSize);
+	const float startBtnWidth = App::get().getUI()->getTheme().get(ESize::StartWindow_StartButtonWidth);
 
 	// todo change all color specifications to
 	// Application::get().getUI()->getTheme().get(EColor::DesiredColor) WINDOW
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6);
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
-	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 14);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+	                    App::get().getUI()->getTheme().get(ESizeVec2::StartWindow_WinPadding));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding,
+	                    App::get().getUI()->getTheme().get(ESize::StartWindow_WinRounding));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,
+	                    App::get().getUI()->getTheme().get(ESize::StartWindow_FrameRounding));
+	ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize,
+	                    App::get().getUI()->getTheme().get(ESize::StartWindow_ScrollbarSize));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(minWinWidth, minWinHeight));
 	// ImGui::PushStyleColor(ImGuiCol_TitleBg,
 	// Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32_WHITE);
-	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
-	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(202, 202, 202, 255));
-	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(202, 202, 202, 255));
-	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(202, 202, 202, 255));
-	ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(202, 202, 202, 255));
-	ImGui::PushStyleColor(ImGuiCol_Button, App::get().getUI()->getTheme().get(EColor::TutorialButtonBg));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg,
+	                      App::get().getUI()->getTheme().get(EColor::StartWindow_DescriptionBackground));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg,
+	                      Application::get().getUI()->getTheme().get(EColor::StartWindow_ScrollbarBackground));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,
+	                      App::get().getUI()->getTheme().get(EColor::StartWindow_ScrollbarGrab));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,
+	                      App::get().getUI()->getTheme().get(EColor::StartWindow_ScrollbarGrabHovered));
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,
+	                      App::get().getUI()->getTheme().get(EColor::StartWindow_ScrollbarGrabActive));
+	ImGui::PushStyleColor(ImGuiCol_Separator, App::get().getUI()->getTheme().get(EColor::StartWindow_Separator));
+	ImGui::PushStyleColor(ImGuiCol_Button, App::get().getUI()->getTheme().get(EColor::StartWindow_DefaultButton));
 	ImGui::Begin(setName("").c_str(), getShowPtr(), ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
 	{
 		this->updateWindowInfo();
@@ -144,7 +153,8 @@ void StartWindow::render()
 		ImGui::GetForegroundDrawList()->AddImage((ImTextureID) m_i3tImage->m_texID, logoPos,
 		                                         logoPos + ImVec2(m_i3tImage->m_width, m_i3tImage->m_height));
 		// LEFT CHILD WINDOW
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30, 30));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+		                    App::get().getUI()->getTheme().get(ESizeVec2::StartWindow_LeftWinPadding));
 		ImGui::BeginChild("left", ImVec2(leftBarWidth, 0), false,
 		                  ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollbar |
 		                      ImGuiWindowFlags_NoScrollWithMouse);
@@ -153,22 +163,24 @@ void StartWindow::render()
 
 			// TITLE
 			ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeTitle));
-			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+			ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(EColor::StartWindow_TitleFont));
 			ImGui::Text("Learn\nTransformations");
 			ImGui::PopStyleColor();
 			ImGui::PopFont();
 
 			ImGui::Dummy(ImVec2(0, 10));
 			// DOTS
-			float size = 10.f;
-			float space = 7.f;
+			float size = App::get().getUI()->getTheme().get(ESize::StartWindow_DotSize);
+			float space = App::get().getUI()->getTheme().get(ESize::StartWindow_DotSpacing);
 			ImVec2 screenPos = ImGui::GetCursorScreenPos();
 			float x = screenPos.x;
 			float y = screenPos.y;
 			ImDrawList* draw_list = ImGui::GetWindowDrawList();
 			for (int i = 0; i < 3; i++)
 			{
-				draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x + size, y + size), IM_COL32(8, 187, 230, 255));
+				auto dotColor = ImGui::ColorConvertFloat4ToU32(
+				    App::get().getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
+				draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x + size, y + size), dotColor);
 				x += size + space;
 			}
 			ImGui::Dummy(ImVec2(0, size));
@@ -176,7 +188,8 @@ void StartWindow::render()
 			ImGui::Dummy(ImVec2(0, 10));
 			// DESCRIPTION
 			ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeDescription));
-			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
+			ImGui::PushStyleColor(ImGuiCol_Text,
+			                      App::get().getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 			ImGui::TextWrapped("I3T is an educational application that allows the "
 			                   "study of 3D transformations and their "
 			                   "hierarchy in an illustrative way.");
@@ -223,17 +236,20 @@ void StartWindow::render()
 		// }
 
 		// RIGHT CHILD WINDOW
-		const ImVec2 outerPadding = ImVec2(10, 10);
-		const ImVec2 innerPadding = ImVec2(10, 10);
+		const ImVec2 outerPadding = App::get().getUI()->getTheme().get(ESizeVec2::StartWindow_RightWinOuterPadding);
+		const ImVec2 innerPadding = App::get().getUI()->getTheme().get(ESizeVec2::StartWindow_RightWinInnerPadding);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, outerPadding);
 		// ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12);
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, Application::get().getUI()->getTheme().get(EColor::TutorialBgColor));
+		ImGui::PushStyleColor(ImGuiCol_ChildBg,
+		                      Application::get().getUI()->getTheme().get(EColor::StartWindow_WindowBackground));
 		ImGui::BeginChild("panel", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 		{
 			// YOUR SCENE CHILD WINDOW
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, innerPadding);
-			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6);
-			ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32_WHITE);
+			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding,
+			                    App::get().getUI()->getTheme().get(ESize::StartWindow_YourSceneWinRounding));
+			ImGui::PushStyleColor(ImGuiCol_ChildBg,
+			                      App::get().getUI()->getTheme().get(EColor::StartWindow_YourSceneWinBackground));
 			ImGui::BeginChild("header", ImVec2(0, thumbImageSize + 2 * innerPadding.y), true,
 			                  ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollWithMouse |
 			                      ImGuiWindowFlags_NoScrollbar);
@@ -258,7 +274,8 @@ void StartWindow::render()
 					// ImGui::Spring(1);  // not working
 
 					ImGui::Dummy(ImVec2(0, 10));
-					ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
+					ImGui::PushStyleColor(ImGuiCol_Text,
+					                      App::get().getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 					ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemTitle));
 					ImGui::Text("Your scene");
 					ImGui::PopFont();
@@ -285,8 +302,9 @@ void StartWindow::render()
 
 					ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::Button));
 					ImGui::PushStyleColor(ImGuiCol_Text,
-					                      App::get().getUI()->getTheme().get(EColor::TutorialButtonText));
-					ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(8, 187, 230, 255));
+					                      App::get().getUI()->getTheme().get(EColor::StartWindow_NewSceneButtonFont));
+					ImGui::PushStyleColor(ImGuiCol_Button,
+					                      App::get().getUI()->getTheme().get(EColor::StartWindow_NewSceneButton));
 					if (ImGui::Button("New", ImVec2(startNewBtnWidth, buttonHeight)))
 					{
 						this->hide();
@@ -370,13 +388,15 @@ void StartWindow::render()
 					                  ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
 					{
 						// TITLE
-						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(14, 98, 175, 255));
+						ImGui::PushStyleColor(ImGuiCol_Text,
+						                      App::get().getUI()->getTheme().get(EColor::StartWindow_TitleFont));
 						ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemTitle));
 						ImGui::TextWrapped(header->m_title.c_str());
 						ImGui::PopStyleColor();
 						ImGui::PopFont();
 						// DESCRIPTIONS
-						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(65, 65, 66, 255));
+						ImGui::PushStyleColor(ImGuiCol_Text,
+						                      App::get().getUI()->getTheme().get(EColor::StartWindow_DescriptionFont));
 						ImGui::PushFont(Application::get().getUI()->getTheme().get(EFont::WelcomeItemDescription));
 						float predictedTextSize = ImGui::CalcTextSize(header->m_description.c_str(), nullptr, false,
 						                                              ImGui::GetContentRegionAvail().x)
@@ -392,7 +412,8 @@ void StartWindow::render()
 							ImGui::BeginTooltip();
 							{
 								ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
-								ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_WHITE);
+								ImGui::PushStyleColor(ImGuiCol_Text, App::get().getUI()->getTheme().get(
+								                                         EColor::StartWindow_DescriptionFont));
 								ImGui::TextUnformatted(header->m_description.c_str());
 								ImGui::PopTextWrapPos();
 								ImGui::PopStyleColor();
@@ -451,9 +472,10 @@ void StartWindow::render()
 					// CUSTOM SEPARATOR
 					float thickness_draw = 1.0f;
 					float thickness_layout = 0.0f;
-					ImVec2 sceenPos = ImGui::GetCursorScreenPos();
-					const ImRect bb(sceenPos, ImVec2(sceenPos.x + ImGui::GetContentRegionAvailWidth() - innerPadding.x,
-					                                 sceenPos.y + thickness_draw));
+					ImVec2 screenPos = ImGui::GetCursorScreenPos();
+					const ImRect bb(screenPos,
+					                ImVec2(screenPos.x + ImGui::GetContentRegionAvailWidth() - innerPadding.x,
+					                       screenPos.y + thickness_draw));
 					ImGui::ItemSize(ImVec2(0.0f, thickness_layout));
 					if (ImGui::ItemAdd(bb, 0))
 					{
