@@ -12,9 +12,10 @@ ViewportSettings::ViewportSettings()
 
 	mainScene_orbitCameraRotationX = -90.0f;
 	mainScene_orbitCameraRotationY = 30.0f;
-
 	mainScene_iorbitCameraRadius = 12.0f;
 	mainScene_iorbitCameraPivot = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	mainScene_lightFollowsCamera = true;
 
 	preview_fov = 30.0f;
 	preview_radiusFactor = 1.38f;

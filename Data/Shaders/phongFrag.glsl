@@ -189,6 +189,10 @@ vec3 calculateSpecularLight(vec3 lightColor, vec3 specular, vec3 L, vec3 V, vec3
 }
 
 vec3 calculateSunLight(SunLight light, Material material, vec3 fragPos, vec3 normal, vec3 tangent, vec3 binormal) {
+	if (light.intensity <= 0) {
+		return vec3(0);
+	}
+
 	normal = calculateNormalMapping(normal, tangent, binormal);
 
 	vec3 lightDir = (viewMatrix * vec4(light.direction, 0.0)).xyz;
@@ -208,6 +212,10 @@ vec3 calculateSunLight(SunLight light, Material material, vec3 fragPos, vec3 nor
 }
 
 vec3 calculateSpotLight(SpotLight light, Material material, vec3 fragPos, vec3 normal, vec3 tangent, vec3 binormal) {
+	if (light.intensity <= 0) {
+		return vec3(0);
+	}
+
 	normal = calculateNormalMapping(normal, tangent, binormal);
 
 	vec3 lightPos = (viewMatrix * vec4(light.position, 1.0)).xyz;
@@ -241,6 +249,10 @@ vec3 calculateSpotLight(SpotLight light, Material material, vec3 fragPos, vec3 n
 }
 
 vec3 calculatePointLight(PointLight light, Material material, vec3 fragPos, vec3 normal, vec3 tangent, vec3 binormal) {
+	if (light.intensity <= 0) {
+		return vec3(0);
+	}
+
 	normal = calculateNormalMapping(normal, tangent, binormal);
 
 	vec3 lightPos = (viewMatrix * vec4(light.position, 1.0)).xyz;

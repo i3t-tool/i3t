@@ -189,50 +189,17 @@ bool ViewportWindow::showViewportMenu()
 	if (ImGui::BeginMenu("Settings"))
 	{
 		userInteractedWithMenus = true;
-		if (ImGui::BeginMenu("Transparency"))
-		{
-			ImGui::MenuItem("Use WBOIT", nullptr, &m_renderOptions.wboit);
-			if (ImGui::BeginMenu("WBOIT weight function"))
-			{
-				if (ImGui::MenuItem("OFF", nullptr, m_renderOptions.wboitFunc == 0))
-				{
-					m_renderOptions.wboitFunc = 0;
-				}
-				if (ImGui::MenuItem("Equation 7", nullptr, m_renderOptions.wboitFunc == 1))
-				{
-					m_renderOptions.wboitFunc = 1;
-				}
-				if (ImGui::MenuItem("Equation 8", nullptr, m_renderOptions.wboitFunc == 2))
-				{
-					m_renderOptions.wboitFunc = 2;
-				}
-				if (ImGui::MenuItem("Equation 9", nullptr, m_renderOptions.wboitFunc == 3))
-				{
-					m_renderOptions.wboitFunc = 3;
-				}
-				if (ImGui::MenuItem("Equation 10", nullptr, m_renderOptions.wboitFunc == 4))
-				{
-					m_renderOptions.wboitFunc = 4;
-				}
-				if (ImGui::MenuItem("LOGL Eq. 9 color bias", nullptr, m_renderOptions.wboitFunc == 5))
-				{
-					m_renderOptions.wboitFunc = 5;
-				}
-				if (ImGui::MenuItem("LOGL Eq. 10", nullptr, m_renderOptions.wboitFunc == 6))
-				{
-					m_renderOptions.wboitFunc = 6;
-				}
-				if (ImGui::MenuItem("z^-3", nullptr, m_renderOptions.wboitFunc == 7))
-				{
-					m_renderOptions.wboitFunc = 7;
-				}
-				if (ImGui::MenuItem("abs(z - zFar + Eps)", nullptr, m_renderOptions.wboitFunc == 8))
-				{
-					m_renderOptions.wboitFunc = 8;
-				}
 
-				ImGui::EndMenu();
-			}
+		if (ImGui::BeginMenu("Scene"))
+		{
+			ImGui::Checkbox("World space lighting", &m_viewport->getSettings().mainScene_lightFollowsCamera);
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Manipulators"))
+		{
+			ImGui::Checkbox("Show manipulators", &m_viewport->getSettings().manipulator_enabled);
+			ImGui::SliderFloat("Size", &m_viewport->getSettings().manipulator_size, 0.01f, 1.0f, "%.2f");
 			ImGui::EndMenu();
 		}
 
@@ -305,10 +272,50 @@ bool ViewportWindow::showViewportMenu()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Manipulators"))
+		if (ImGui::BeginMenu("Transparency"))
 		{
-			ImGui::Checkbox("Show manipulators", &m_viewport->getSettings().manipulator_enabled);
-			ImGui::SliderFloat("Size", &m_viewport->getSettings().manipulator_size, 0.01f, 1.0f, "%.2f");
+			ImGui::MenuItem("Use WBOIT", nullptr, &m_renderOptions.wboit);
+			if (ImGui::BeginMenu("WBOIT weight function"))
+			{
+				if (ImGui::MenuItem("OFF", nullptr, m_renderOptions.wboitFunc == 0))
+				{
+					m_renderOptions.wboitFunc = 0;
+				}
+				if (ImGui::MenuItem("Equation 7", nullptr, m_renderOptions.wboitFunc == 1))
+				{
+					m_renderOptions.wboitFunc = 1;
+				}
+				if (ImGui::MenuItem("Equation 8", nullptr, m_renderOptions.wboitFunc == 2))
+				{
+					m_renderOptions.wboitFunc = 2;
+				}
+				if (ImGui::MenuItem("Equation 9", nullptr, m_renderOptions.wboitFunc == 3))
+				{
+					m_renderOptions.wboitFunc = 3;
+				}
+				if (ImGui::MenuItem("Equation 10", nullptr, m_renderOptions.wboitFunc == 4))
+				{
+					m_renderOptions.wboitFunc = 4;
+				}
+				if (ImGui::MenuItem("LOGL Eq. 9 color bias", nullptr, m_renderOptions.wboitFunc == 5))
+				{
+					m_renderOptions.wboitFunc = 5;
+				}
+				if (ImGui::MenuItem("LOGL Eq. 10", nullptr, m_renderOptions.wboitFunc == 6))
+				{
+					m_renderOptions.wboitFunc = 6;
+				}
+				if (ImGui::MenuItem("z^-3", nullptr, m_renderOptions.wboitFunc == 7))
+				{
+					m_renderOptions.wboitFunc = 7;
+				}
+				if (ImGui::MenuItem("abs(z - zFar + Eps)", nullptr, m_renderOptions.wboitFunc == 8))
+				{
+					m_renderOptions.wboitFunc = 8;
+				}
+
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenu();
 		}
 
