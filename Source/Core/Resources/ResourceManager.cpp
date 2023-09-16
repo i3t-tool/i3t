@@ -847,7 +847,7 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 				continue;
 
 			// Parse the scene file
-			const auto maybeDoc = JSON::parse(entry.path(), "Data/Schemas/Scene.schema.json");
+			const auto maybeDoc = JSON::parse(entry.path(), I3T_SCENE_SCHEMA);
 			if (!maybeDoc.has_value())
 			{
 				LOG_ERROR("[RESOURCE CLEANUP]: Failed to parse scene file at '{}'!", entry.path().string());
@@ -872,15 +872,18 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 
 		// Delete models that are not used
 		bool error = false;
-		fs::path sceneDataPath = scene->m_dataPath;
-		for (const auto& entry : std::filesystem::directory_iterator(sceneDataPath))
+		const auto& sceneDataPath = scene->m_dataPath;
+		if (fs::is_directory(sceneDataPath))
 		{
-			if (!entry.is_directory())
-				continue;
-
-			if (!usedModels.contains(entry.path().filename().string()))
+			for (const auto& entry : std::filesystem::directory_iterator(sceneDataPath))
 			{
-				error |= !FilesystemUtils::deleteFileOrDir(entry.path(), true);
+				if (!entry.is_directory())
+					continue;
+
+				if (!usedModels.contains(entry.path().filename().string()))
+				{
+					error |= !FilesystemUtils::deleteFileOrDir(entry.path(), true);
+				}
 			}
 		}
 	}

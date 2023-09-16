@@ -8,6 +8,7 @@ workflow:
       - CMakeLists.txt
       - .clang-format
       - .clang-tidy
+      - Dependencies
       - "*.{cpp|h}"
       - "**/*.{cpp|h}"
 

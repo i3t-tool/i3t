@@ -10,7 +10,9 @@
 #include "State/Stateful.h"
 #include "UserData.h"
 
-#define I3T_SCENE_EXTENSION ".scene"
+using namespace std::literals;
+
+constexpr auto I3T_SCENE_EXTENSION = ".scene";
 
 /// Handles app state management.
 class StateManager : public Module
@@ -111,7 +113,7 @@ private:
 
 	Ptr<State::Scene> m_currentScene;
 
-	bool setCurrentScene(fs::path scenePath = "");
+	bool setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath = "");
 
 	// Temporary directory _____________________________________________________________________________________________
 
