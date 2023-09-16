@@ -829,8 +829,14 @@ Memento ResourceManager::saveState(Scene* scene)
 
 bool ResourceManager::cleanUpModelFiles(Scene* scene)
 {
-	if (scene->isSaved())
+	try
 	{
+		if (!scene->isSaved())
+			return true;
+
+		if (!fs::exists(scene->m_dataPath) || !fs::is_directory(scene->m_dataPath))
+			return true;
+
 		// Add all models used by this scene
 		std::set<std::string> usedModels(m_importedResources.begin(), m_importedResources.end());
 
@@ -847,7 +853,7 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 				continue;
 
 			// Parse the scene file
-			const auto maybeDoc = JSON::parse(entry.path(), I3T_SCENE_SCHEMA);
+			const auto maybeDoc = JSON::parse(entry.path(), "Data/Schemas/Scene.schema.json");
 			if (!maybeDoc.has_value())
 			{
 				LOG_ERROR("[RESOURCE CLEANUP]: Failed to parse scene file at '{}'!", entry.path().string());
@@ -872,20 +878,23 @@ bool ResourceManager::cleanUpModelFiles(Scene* scene)
 
 		// Delete models that are not used
 		bool error = false;
-		const auto& sceneDataPath = scene->m_dataPath;
-		if (fs::is_directory(sceneDataPath))
+		fs::path sceneDataPath = scene->m_dataPath;
+		for (const auto& entry : std::filesystem::directory_iterator(sceneDataPath))
 		{
-			for (const auto& entry : std::filesystem::directory_iterator(sceneDataPath))
-			{
-				if (!entry.is_directory())
-					continue;
+			if (!entry.is_directory())
+				continue;
 
-				if (!usedModels.contains(entry.path().filename().string()))
-				{
-					error |= !FilesystemUtils::deleteFileOrDir(entry.path(), true);
-				}
+			if (!usedModels.contains(entry.path().filename().string()))
+			{
+				error |= !FilesystemUtils::deleteFileOrDir(entry.path(), true);
 			}
 		}
+	}
+	catch (const std::filesystem::filesystem_error& e)
+	{
+		FilesystemUtils::reportFilesystemException(e);
+		LOG_ERROR("[RESOURCE CLEANUP] An exception occurred during resource cleanup!");
+		return false;
 	}
 	return true;
 }

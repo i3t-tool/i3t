@@ -21,6 +21,7 @@ in vec3 Binormal;
 
 uniform float u_opacity = 1.0;
 uniform vec3 u_tint = vec3(1.0);
+uniform int u_lightingModel = 0;
 
 uniform float alphaCutoff = 0.1;
 
@@ -103,10 +104,22 @@ float map(float value, float min1, float max1, float min2, float max2) {
 	return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
 }
 
+float easeOutPower(float x, float power) {
+	return 1.0 - pow(1.0 - x, power);
+}
+
 vec2 texCoords() {
 	vec2 coords = TexCoords;
 	//Function for possible further modification of tex coords
 	return coords;
+}
+
+float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123); }
+
+float linearize_depth(float d, float zNear, float zFar)
+{
+	float z_n = 2.0 * d - 1.0;
+	return 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
 }
 
 vec3 calculateAmbientLight(vec3 lightColor, vec3 ambient) {
@@ -120,11 +133,6 @@ vec3 calculateDiffuseLight(vec3 lightColor, vec3 diffuse, vec3 N, vec3 L) {
 	res += (emission0_active ? vec3(texture(emission0, texCoords())) : vec3(0));
 	res *= u_tint;
 	return res;
-}
-
-vec3 calculateSpecularLight(vec3 lightColor, vec3 specular, vec3 R, vec3 V, float shininess) {
-	// Using GREEN channel for specular texture (for gltf)
-	return lightColor * specular * pow(max(0.0, dot(R, V)), material.shininess) * (specular0_active ? vec3(texture(specular0, texCoords()).g) : vec3(1)) * u_tint;
 }
 
 vec3 calculateNormalMapping(vec3 normal, vec3 tangent, vec3 binormal) {
@@ -151,6 +159,35 @@ float calculateAttenuation(float dist, float radius) {
 	return attenuation;
 }
 
+vec3 phongSpecular(vec3 lightColor, vec3 specular, vec3 L, vec3 V, vec3 N, vec3 R, float shininess) {
+	float specDot = max(dot(R, V), 0.0);
+	// Using the GREEN channel for specular texture (for gltf)
+	float specularTextureFactor = (specular0_active ? texture(specular0, texCoords()).g : 1.0);
+	return lightColor * specular * pow(specDot, shininess) * specularTextureFactor * u_tint;
+}
+
+vec3 blinnPhongSpecular(vec3 lightColor, vec3 specular, vec3 L, vec3 V, vec3 N, float shininess) {
+	vec3 H = normalize(L + V);// Halfway vector
+	float specDot = max(dot(N, H), 0.0);
+	// Assuming a closed object thus normal facing away from the light should NOT have any specular presents, helps with artifacts
+	float facingAwayFactor = max(dot(N, L), 0.0);
+	float facingAwayFactorAdj = easeOutPower(facingAwayFactor, 6.0);
+	// Using the GREEN channel for specular texture (for gltf)
+	float specularTextureFactor = (specular0_active ? texture(specular0, texCoords()).g : 1.0);
+	return lightColor * specular * pow(specDot, shininess) * facingAwayFactorAdj * specularTextureFactor * u_tint;
+}
+
+vec3 calculateSpecularLight(vec3 lightColor, vec3 specular, vec3 L, vec3 V, vec3 N, vec3 R, float shininess) {
+	if (u_lightingModel == 1) {
+		if (!gl_FrontFacing) { // No specular on backfaces (suppresses artefacts)
+			return vec3(0);
+		}
+		return blinnPhongSpecular(lightColor, specular, L, V, N, shininess);
+	} else {
+		return phongSpecular(lightColor, specular, L, V, N, R, shininess);
+	}
+}
+
 vec3 calculateSunLight(SunLight light, Material material, vec3 fragPos, vec3 normal, vec3 tangent, vec3 binormal) {
 	normal = calculateNormalMapping(normal, tangent, binormal);
 
@@ -163,9 +200,9 @@ vec3 calculateSunLight(SunLight light, Material material, vec3 fragPos, vec3 nor
 
 	vec3 ambientLight = calculateAmbientLight(light.color, material.ambient);
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
-	vec3 specularLight = calculateSpecularLight(light.color, material.specular, R, V, material.shininess);
+	vec3 specularLight = calculateSpecularLight(light.color, material.specular, L, V, N, R, material.shininess);
 
-	specularLight *= 0.3f;//Turn down sun specular a bit
+	//specularLight *= 0.3f;//Turn down sun specular a bit
 
 	return light.intensity * (ambientLight + diffuseLight + specularLight);
 }
@@ -187,7 +224,7 @@ vec3 calculateSpotLight(SpotLight light, Material material, vec3 fragPos, vec3 n
 
 	vec3 ambientLight = calculateAmbientLight(light.color, material.ambient);
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
-	vec3 specularLight = calculateSpecularLight(light.color, material.specular, R, V, material.shininess);
+	vec3 specularLight = calculateSpecularLight(light.color, material.specular, L, V, N, R, material.shininess);
 
 	vec3 outColor = vec3(0);
 
@@ -201,14 +238,6 @@ vec3 calculateSpotLight(SpotLight light, Material material, vec3 fragPos, vec3 n
 		outColor *= 0;
 	}
 	return outColor;
-}
-
-float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123); }
-
-float linearize_depth(float d, float zNear, float zFar)
-{
-	float z_n = 2.0 * d - 1.0;
-	return 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
 }
 
 vec3 calculatePointLight(PointLight light, Material material, vec3 fragPos, vec3 normal, vec3 tangent, vec3 binormal) {
@@ -225,7 +254,7 @@ vec3 calculatePointLight(PointLight light, Material material, vec3 fragPos, vec3
 
 	vec3 ambientLight = calculateAmbientLight(light.color, material.ambient);
 	vec3 diffuseLight = calculateDiffuseLight(light.color, material.diffuse, N, L);
-	vec3 specularLight = calculateSpecularLight(light.color, material.specular, R, V, material.shininess);
+	vec3 specularLight = calculateSpecularLight(light.color, material.specular, L, V, N, R, material.shininess);
 
 	float attenuation = calculateAttenuation(lightDist, lightRadius);
 	return light.intensity * attenuation * (ambientLight + diffuseLight + specularLight);

@@ -156,6 +156,7 @@ void ViewportWindow::render()
 		m_viewport->processSelection(m_renderTarget, relativeMousePos, m_windowSize);
 	}
 
+	m_renderOptions.lightingModel = m_viewport->getSettings().lighting_lightingModel;
 	m_viewport->drawViewport(m_renderTarget, windowWidth, windowHeight, m_renderOptions, m_displayOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();
 

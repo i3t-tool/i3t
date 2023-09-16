@@ -36,6 +36,8 @@ public:
 	float trackballCamera_rotateSpeed;
 	float trackballCamera_translateSpeed;
 
+	int lighting_lightingModel;
+
 	float highlight_downscaleFactor;
 	int highlight_kernelSize;
 	float highlight_outlineCutoff;
