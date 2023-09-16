@@ -182,13 +182,21 @@ bool StateManager::loadScene(const fs::path& path)
 		return false;
 	}
 
-	const auto maybeScene = JSON::parse(path, "Data/Schemas/Scene.schema.json");
+	const auto maybeScene = JSON::parse(path, I3T_SCENE_SCHEMA);
 	if (!maybeScene.has_value())
 	{
 		return false;
 	}
 
-	setCurrentScene(path);
+	bool readOnly = false;
+	if (maybeScene.value().HasMember("readOnly"))
+	{
+		readOnly = maybeScene.value()["readOnly"].GetBool();
+	}
+
+	Ptr<Scene> newScene = std::make_shared<Scene>(this, readOnly);
+
+	setCurrentScene(newScene, path);
 
 	createTmpDirectory();
 	wipeTmpDirectory();
@@ -212,12 +220,18 @@ bool StateManager::saveScene()
 
 bool StateManager::saveScene(const fs::path& target)
 {
+	if (isReadOnly(target))
+	{
+		LOG_ERROR("No save performed, target scene {} is read-only!", target.string());
+		return false;
+	}
+
 	LOG_INFO("");
 	LOG_INFO("Saving scene to '{}'.", target.string());
 
 	createTmpDirectory();
 
-	setCurrentScene(target);
+	setCurrentScene(std::make_shared<Scene>(this, false), target);
 
 	// Create scene .json file
 	const auto result = JSON::save(target, *createMemento(m_currentScene.get()));
@@ -234,7 +248,7 @@ bool StateManager::saveScene(const fs::path& target)
 	return result;
 }
 
-bool StateManager::setCurrentScene(fs::path newScenePath)
+bool StateManager::setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath)
 {
 	if (m_currentScene && m_currentScene->m_path == newScenePath)
 	{
@@ -247,7 +261,6 @@ bool StateManager::setCurrentScene(fs::path newScenePath)
 		return false;
 	}
 
-	Ptr<Scene> newScene = std::make_shared<Scene>(this);
 	if (!newScenePath.empty())
 	{
 		// Gather information about previous scene so that ResourceManager saveState can copy over all files properly
@@ -272,7 +285,7 @@ void StateManager::newScene()
 		originator->clearState();
 	}
 
-	setCurrentScene();
+	setCurrentScene(std::make_shared<Scene>(this, false));
 
 	createTmpDirectory();
 	wipeTmpDirectory();
@@ -357,9 +370,16 @@ void StateManager::setWindowTitle()
 	{
 		sceneName = m_currentScene->m_path.filename().string();
 
-		if (isDirty())
+		if (getCurrentScene()->m_readOnly)
 		{
-			sceneName += " - Unsaved";
+			sceneName += " (Read-only)";
+		}
+		else
+		{
+			if (isDirty())
+			{
+				sceneName += " - Unsaved";
+			}
 		}
 	}
 
@@ -392,7 +412,7 @@ void StateManager::createTmpDirectory()
 	unsigned int index = 0;
 	while (true)
 	{
-		fs::path tmpDirectoryPath =
+		const fs::path tmpDirectoryPath =
 		    fs::path(m_tmpDirectoryRootName / m_tmpDirectoryDefaultName).concat(std::to_string(index));
 		try
 		{
@@ -459,79 +479,80 @@ void StateManager::purgeTmpDirectories()
 	// -> compare its content to the current minutesSinceEpoch
 	// -> if diff is bigger than threshold -> delete that tmp folder
 
-	if (fs::exists(m_tmpDirectoryRootName))
+	if (!fs::exists(m_tmpDirectoryRootName))
 	{
-		for (auto const& maybeTmpDir : std::filesystem::directory_iterator{m_tmpDirectoryRootName})
-		{
-			bool purge = false;
-			std::string purgeReason;
-			if (maybeTmpDir.path().compare(m_tmpDirectory) == 0)
-				continue; // Not interested in deleting our own tmp dir
+		return;
+	}
 
-			if (maybeTmpDir.path().filename().string().starts_with(m_tmpDirectoryDefaultName.string()))
+	for (auto const& maybeTmpDir : std::filesystem::directory_iterator{m_tmpDirectoryRootName})
+	{
+		bool purge = false;
+		std::string purgeReason;
+		if (maybeTmpDir.path().compare(m_tmpDirectory) == 0)
+			continue; // Not interested in deleting our own tmp dir
+
+		if (maybeTmpDir.path().filename().string().starts_with(m_tmpDirectoryDefaultName.string()))
+		{
+			const fs::path lockFilePath = maybeTmpDir.path() / m_tmpDirectoryLockFileName;
+			if (!fs::exists(lockFilePath))
 			{
-				fs::path lockFilePath = maybeTmpDir.path() / m_tmpDirectoryLockFileName;
-				if (!fs::exists(lockFilePath))
+				purge = true;
+				purgeReason = "No lock file";
+			}
+			else
+			{
+				// Read lock file
+				std::string data;
+				std::ifstream ifs;
+				ifs.open(lockFilePath);
+
+				if (!ifs.is_open())
 				{
+					LOG_ERROR("Failed to open lock file at '{}'. Cannot purge tmp dir.", lockFilePath.string());
+					continue;
+				}
+
+				std::getline(ifs, data);
+				ifs.close();
+
+				// Compare lock timestamp to current time
+				const long long minutesSinceEpoch = TimeUtils::minutesSinceEpoch();
+				long long lockMinutesSinceEpoch = 0;
+				try
+				{
+					lockMinutesSinceEpoch = std::stoll(data);
+				}
+				catch (std::exception& e)
+				{
+					LOG_ERROR("Failed to parse lock file at '{}'. Cannot purge tmp dir. Lock file contents:\n'{}'",
+					          lockFilePath.string(), data);
+					continue;
+				}
+				const long long timeDiff = abs(lockMinutesSinceEpoch - minutesSinceEpoch);
+				if (timeDiff >= m_tmpDirectoryLockFileTimeout)
+				{
+					// Lock file has timed out, purge
 					purge = true;
-					purgeReason = "No lock file";
+					purgeReason = "Lock file timed out";
 				}
 				else
 				{
-					// Read lock file
-					std::string data;
-					std::ifstream ifs;
-					ifs.open(lockFilePath);
-					if (ifs.is_open())
-					{
-						std::getline(ifs, data);
-						ifs.close();
-
-						// Compare lock timestamp to current time
-						long long minutesSinceEpoch = TimeUtils::minutesSinceEpoch();
-						long long lockMinutesSinceEpoch = 0;
-						try
-						{
-							lockMinutesSinceEpoch = std::stoll(data);
-						}
-						catch (std::exception& e)
-						{
-							LOG_ERROR(
-							    "Failed to parse lock file at '{}'. Cannot purge tmp dir. Lock file contents:\n'{}'",
-							    lockFilePath.string(), data);
-							continue;
-						}
-						long long timeDiff = abs(lockMinutesSinceEpoch - minutesSinceEpoch);
-						if (timeDiff >= m_tmpDirectoryLockFileTimeout)
-						{
-							// Lock file has timed out, purge
-							purge = true;
-							purgeReason = "Lock file timed out";
-						}
-						else
-						{
-							LOG_INFO("Parallel tmp directory '{}' lock time: {}", lockFilePath.string(), timeDiff);
-						}
-					}
-					else
-					{
-						LOG_ERROR("Failed to open lock file at '{}'. Cannot purge tmp dir.", lockFilePath.string());
-					}
+					LOG_INFO("Parallel tmp directory '{}' lock time: {}", lockFilePath.string(), timeDiff);
 				}
 			}
+		}
 
-			if (purge)
+		if (purge)
+		{
+			// Delete tmp dir
+			LOG_INFO("Purging tmp dir '{}': {}", maybeTmpDir.path().string(), purgeReason);
+			try
 			{
-				// Delete tmp dir
-				LOG_INFO("Purging tmp dir '{}': {}", maybeTmpDir.path().string(), purgeReason);
-				try
-				{
-					fs::remove_all(maybeTmpDir.path());
-				}
-				catch (std::filesystem::filesystem_error& e)
-				{
-					FilesystemUtils::reportFilesystemException(e);
-				}
+				fs::remove_all(maybeTmpDir.path());
+			}
+			catch (std::filesystem::filesystem_error& e)
+			{
+				FilesystemUtils::reportFilesystemException(e);
 			}
 		}
 	}

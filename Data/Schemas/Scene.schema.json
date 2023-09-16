@@ -4,6 +4,9 @@
   "title": "Scene",
   "type": "object",
   "properties": {
+    "readOnly": {
+      "type": "boolean"
+    },
     "workspace": {
       "operators": {
         "type": "array",

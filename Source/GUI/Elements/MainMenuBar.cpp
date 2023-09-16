@@ -22,16 +22,18 @@
 
 using namespace UI;
 
+using namespace std::literals;
+
 static bool saveSceneDialog(std::filesystem::path& result, const std::string& title)
 {
-	static std::vector<std::string> filter = {"I3T scene files", "*" I3T_SCENE_EXTENSION};
+	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
 
 	return SystemDialogs::SaveSingleFileDialog(result, title, "./", filter);
 }
 
 static bool openSceneDialog(std::filesystem::path& result, const std::string& title)
 {
-	static std::vector<std::string> filter = {"I3T scene files", "*" I3T_SCENE_EXTENSION};
+	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
 
 	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
 }
@@ -157,7 +159,7 @@ void MainMenuBar::showFileMenu()
 		}
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Save", "Ctrl+S"))
+		if (ImGui::MenuItem("Save", "Ctrl+S", false, !App::getModule<StateManager>().getCurrentScene()->m_readOnly))
 		{
 			save();
 		}

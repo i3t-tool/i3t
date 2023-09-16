@@ -1,9 +1,15 @@
 #pragma once
 
+#include <filesystem>
+
 class StateManager;
+
+namespace fs = std::filesystem;
 
 namespace State
 {
+
+constexpr auto I3T_SCENE_SCHEMA = "Data/Schemas/Scene.schema.json";
 
 class Scene
 {
@@ -21,12 +27,17 @@ public:
 
 	StateManager* m_stateManager; ///< Reference to the state manager this scene is managed by
 
-	Scene(StateManager* stateManager) : m_stateManager(stateManager) {}
+	const bool m_readOnly;
+
+	Scene(StateManager* stateManager, bool readOnly) : m_stateManager(stateManager), m_readOnly(readOnly) {}
 
 	bool isSaved() const
 	{
 		return !m_path.empty();
 	}
 };
+
+/// Returns true if target scene is an I3T scene and is read-only.
+bool isReadOnly(const fs::path& scene);
 
 } // namespace State
