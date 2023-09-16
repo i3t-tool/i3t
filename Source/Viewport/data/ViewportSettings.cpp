@@ -1,4 +1,5 @@
 #include "ViewportSettings.h"
+#include "Viewport/shader/PhongShader.h"
 
 namespace Vp
 {
@@ -31,6 +32,8 @@ ViewportSettings::ViewportSettings()
 	trackballCamera_zoomSpeed = 0.8f;
 	trackballCamera_rotateSpeed = 0.29f;
 	trackballCamera_translateSpeed = 0.02f;
+
+	lighting_lightingModel = PhongShader::LightingModel::BLINN_PHONG;
 
 	highlight_downscaleFactor = 0.5f;
 	highlight_kernelSize = 2;

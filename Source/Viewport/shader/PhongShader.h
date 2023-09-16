@@ -11,6 +11,13 @@ namespace Vp
  */
 class PhongShader : public ObjectShader
 {
+public:
+	enum LightingModel
+	{
+		PHONG,
+		BLINN_PHONG
+	};
+
 protected:
 	// Material uniforms
 	GLint material_diffuse;
@@ -23,8 +30,11 @@ protected:
 
 	GLint tintId;
 
+	GLint m_lightingModelId;
+
 public:
 	glm::vec3 m_tint{1.0f};
+	LightingModel m_lightingModel{BLINN_PHONG};
 
 	explicit PhongShader(GLuint id);
 

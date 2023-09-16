@@ -103,7 +103,12 @@ void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int 
 		m_previewScene->m_orbitCamera->centerOnBox(gameObjectPtr->m_mesh->m_boundingBoxMin,
 		                                           gameObjectPtr->m_mesh->m_boundingBoxMax, false);
 		float radius = m_previewScene->m_orbitCamera->getRadius();
-		m_previewScene->m_orbitCamera->setRadius(radius * m_settings.preview_radiusFactor);
+		float enlargedRadius = radius * m_settings.preview_radiusFactor;
+		m_previewScene->m_orbitCamera->setRadius(enlargedRadius);
+
+		// Adjust zFar/zNear
+		m_previewScene->m_orbitCamera->setZFar(enlargedRadius * 2);
+		m_previewScene->m_orbitCamera->setZNear((enlargedRadius - radius) * 0.1f);
 
 		// Make object visible
 		bool visibleTemp = gameObjectPtr->m_visible;

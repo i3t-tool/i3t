@@ -27,6 +27,8 @@ void SetupDialog::render()
 			ImGui::SliderFloat("Model preview radius", &settings.preview_radiusFactor, 0.1f, 10.0f, "%.2f");
 			ImGui::SliderFloat("Model preview rotate speed", &settings.preview_rotateSpeed, 0.f, 100.f, "%f");
 
+			ImGui::Combo("Lighting model", &settings.lighting_lightingModel, "Phong\0Blinn-Phong\0\0");
+
 			if (ImGui::CollapsingHeader("Highlight"))
 			{
 				ImGui::Indent();

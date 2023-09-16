@@ -97,8 +97,10 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			// Setup phong shader, later, shaders are switched for each object
-			Shaders::instance().m_phongShader->use();
-			m_lighting->setUniforms(*Shaders::instance().m_phongShader);
+			PhongShader* phongShader = Shaders::instance().m_phongShader.get();
+			phongShader->m_lightingModel = static_cast<PhongShader::LightingModel>(renderOptions.lightingModel);
+			phongShader->use();
+			m_lighting->setUniforms(*phongShader);
 
 			m_unorderedTransparentEntities.clear();
 			for (auto& entity : m_entities)
@@ -228,7 +230,9 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			// Setup phong shader, later, shaders are switched for each object
-			Shaders::instance().m_phongShader->use();
+			PhongShader* phongShader = Shaders::instance().m_phongShader.get();
+			phongShader->m_lightingModel = static_cast<PhongShader::LightingModel>(renderOptions.lightingModel);
+			phongShader->use();
 			m_lighting->setUniforms(*Shaders::instance().m_phongShader);
 
 			m_unorderedTransparentEntities.clear();

@@ -2,13 +2,12 @@
 
 #include "Commands/Command.h"
 #include "Core/Resources/ResourceManager.h"
-
-#include "Viewport/Viewport.h"
-#include "Viewport/entity/nodes/SceneModel.h"
-
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
 #include "Utils/Color.h"
 #include "Utils/HSLColor.h"
+#include "Viewport/Viewport.h"
+#include "Viewport/entity/nodes/SceneModel.h"
+#include "Viewport/shader/PhongShader.h"
 
 WorkspaceModel::WorkspaceModel(DIWNE::Diwne& diwne)
     : WorkspaceNodeWithCoreDataWithPins(diwne, Core::Builder::createModelNode())
@@ -194,6 +193,8 @@ bool WorkspaceModel::middleContent()
 #define FLOOR_VEC2(_VAL) (ImVec2((float) (int) ((_VAL).x), (float) (int) ((_VAL).y))) // version of IM_FLOOR for Vec2
 	ImVec2 zoomedTextureSize =
 	    FLOOR_VEC2(m_textureSize * diwne.getWorkAreaZoom()); // floored position - same as in ImGui
+
+	m_renderOptions.lightingModel = Vp::PhongShader::LightingModel::PHONG;
 
 	App::get().viewport()->drawPreview(m_renderTarget, width, height, m_viewportModel, m_renderOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();

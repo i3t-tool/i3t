@@ -35,7 +35,7 @@ inline bool doesFileExists(fs::path& path)
 	return doesFileExists(path.string().c_str());
 }
 
-inline void reportFilesystemException(fs::filesystem_error& e)
+inline void reportFilesystemException(const fs::filesystem_error& e)
 {
 	LOG_ERROR("Filesystem error: {}, path1: {}, path2: {}, code: {}", e.what(), e.path1().string(), e.path2().string(),
 	          e.code().value());

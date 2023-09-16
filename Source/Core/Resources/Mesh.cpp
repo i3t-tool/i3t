@@ -434,7 +434,6 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 {
 	Material defaultMaterial;
 
-	aiColor4D color;
 	aiString name;
 	aiReturn retValue = AI_SUCCESS;
 
@@ -450,19 +449,21 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 	// the input mesh processing. Must be aiString type! subMesh_p->name =
 	// name.data;
 
-	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color)) != AI_SUCCESS)
-		color = aiColor4D(defaultMaterial.ambient.r, defaultMaterial.ambient.g, defaultMaterial.ambient.b, 1.0f);
-
-	meshMaterial.ambient[0] = color.r;
-	meshMaterial.ambient[1] = color.g;
-	meshMaterial.ambient[2] = color.b;
-
+	aiColor4D color;
 	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color)) != AI_SUCCESS)
 		color = aiColor4D(defaultMaterial.diffuse.r, defaultMaterial.diffuse.g, defaultMaterial.diffuse.b, 1.0f);
 
 	meshMaterial.diffuse[0] = color.r;
 	meshMaterial.diffuse[1] = color.g;
 	meshMaterial.diffuse[2] = color.b;
+
+	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color)) != AI_SUCCESS)
+		color = aiColor4D(meshMaterial.diffuse.r * 0.1f, meshMaterial.diffuse.g * 0.1f, meshMaterial.diffuse.b * 0.1f,
+		                  1.0f);
+
+	meshMaterial.ambient[0] = color.r;
+	meshMaterial.ambient[1] = color.g;
+	meshMaterial.ambient[2] = color.b;
 
 	if ((retValue = aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color)) != AI_SUCCESS)
 		color = aiColor4D(defaultMaterial.specular.r, defaultMaterial.specular.g, defaultMaterial.specular.b, 1.0f);
@@ -476,8 +477,16 @@ void Mesh::loadMaterial(Material& meshMaterial, const aiMaterial* material)
 	max = 1;
 	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max)) != AI_SUCCESS)
 		shininess = defaultMaterial.shininess;
-	// Presumably we don't want shininess to be < 1.0
-	shininess = std::max(1.0f, shininess);
+
+	// Presumably we don't want shininess to be < 1.0, 0.0 seems to be default invalid
+	if (shininess < 1.0f)
+	{
+		shininess = defaultMaterial.shininess;
+	}
+	else
+	{
+		shininess = std::max(1.0f, shininess);
+	}
 
 	max = 1;
 	if ((retValue = aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS_STRENGTH, &strength, &max)) != AI_SUCCESS)

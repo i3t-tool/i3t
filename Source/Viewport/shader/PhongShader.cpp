@@ -26,11 +26,13 @@ void PhongShader::init(bool initSuperclass)
 	normalStrength = glGetUniformLocation(m_id, "normalStrength");
 
 	tintId = glGetUniformLocation(m_id, "u_tint");
+	m_lightingModelId = glGetUniformLocation(m_id, "u_lightingModel");
 }
 
 void PhongShader::setUniforms()
 {
 	glUniform3fv(tintId, 1, glm::value_ptr(m_tint));
+	glUniform1i(m_lightingModelId, m_lightingModel);
 
 	ObjectShader::setUniforms();
 }
