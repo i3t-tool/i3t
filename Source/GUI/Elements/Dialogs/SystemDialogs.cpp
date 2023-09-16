@@ -18,6 +18,8 @@ bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const st
 			std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 			std::wstring wideFilename = converter.from_bytes(resultStr);
 			result = wideFilename;
+#else
+			result = resultStr;
 #endif
 
 			return true;
