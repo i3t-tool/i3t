@@ -258,6 +258,9 @@ Ptr<GuiOperator> createOperator(const rapidjson::Value& value)
 				break;
 			}
 			case Core::EValueType::Quat:
+			{
+				coreNode->setValue(data.getQuat());
+			}
 			case Core::EValueType::Pulse:
 			case Core::EValueType::MatrixMul:
 			case Core::EValueType::Screen:
