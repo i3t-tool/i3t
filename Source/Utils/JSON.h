@@ -117,14 +117,14 @@ inline std::optional<Core::Data> getData(const rapidjson::Value& value, Core::EV
 
 		return Core::Data{getMat(value)};
 	}
-	case Core::EValueType::Quat:
+	case Core::EValueType::Quat: // PF: is it OK this way?
 	{
 		if (!value.IsArray() || value.GetArray().Size() != 4)
 			return std::nullopt;
 
-		return Core::Data{glm::quat(getVec4(value))}; // PF: is it OK this way?
+		glm::vec4 v = getVec4(value); // to avoid guat(vec4) misuse as euler angles
+		return Core::Data{glm::quat(v.w, glm::vec3(v))};
 	}
-
 	case Core::EValueType::Pulse:
 	case Core::EValueType::MatrixMul:
 	case Core::EValueType::Screen:
