@@ -92,7 +92,7 @@ public:
 	 * \brief Init the (non-zero) second level parameters (from LOD::SetValues)
 	 * via their initDefaults and update the internal transformation matrix).
 	 * It is overriden in all transforms with their default values.
-	 * This version is for nodes without the default value (now only teh Free node)
+	 * This version is for nodes without the default value (now only the Free node)
 	 * - It resets the matrix to identity.
 	 * - this is done in free->resetMatrixFromDefaults()
 	 */
@@ -102,6 +102,7 @@ public:
 	}
 
 	//===----------------------------------------------------------------------===//
+
 
 private:
 	/// Pointer to the sequence the transform matrix is in (or nullptr if without).
@@ -138,7 +139,52 @@ protected:
 	/// \pre Default value with \p name exists.
 	Data& getDefaultValueMut(const std::string& name);
 
+	/**
+	 * \brief Function for setting values in the Set Defaults LOD. Performs default data correction based on synergies
+	 *        Do not use - use setDefaultValue() instead!!!
+	 * \param name changed data field
+	 * \param val newValue as Core::Data(newValue)!!! (as we cannot have virtual template functions)
+	 */
+	virtual void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
+	{
+		// getDefaultValueMut(name).setValue(val); // defaults
+		// std::cout << "Nepretizena virtualni funkce" << std::endl;
+
+		switch (val.opValueType)
+		{
+		case EValueType::Float:
+			getDefaultValueMut(name).setValue(val.getFloat());
+			break;
+		case EValueType::Vec3:
+			getDefaultValueMut(name).setValue(val.getVec3());
+			break;
+		case EValueType::Quat:
+			getDefaultValueMut(name).setValue(val.getQuat());
+			break;
+		case EValueType::Vec4:
+			getDefaultValueMut(name).setValue(val.getVec4());
+			break;
+		case EValueType::Matrix:
+			getDefaultValueMut(name).setValue(val.getMat4());
+			break;
+		case EValueType::MatrixMul:
+			getDefaultValueMut(name).setValue(val.getMat4());
+			break;
+		case EValueType::Screen:
+			getDefaultValueMut(name).setValue(val.getScreen());
+			break;
+		case EValueType::Ptr:
+			getDefaultValueMut(name).setValue(val.getPointer());
+			break;
+		case EValueType::Pulse:
+		default:
+			std::cout << "Error in setDefaultValueWithSynergies - undefined value type." << std::endl;
+			break;
+		}
+	}
+
 public:
+	// template <typename T> void setDefaultValueWithSynergies(const std::string& name, T&& val);
 	/**
 	 * \brief Setting of one second level parameter defining the transformation
 	 * (in LOD::SetValues).
@@ -158,8 +204,16 @@ public:
 			                      "default value with this name does not exist");
 		}
 
-		getDefaultValueMut(name).setValue(val); // defaults
-		resetMatrixFromDefaults();              // defaults to matrix
+		if (hasSynergies())
+		{
+			// setDefaultValueWithSynergiesT(name, val); // impossible, we cannot create a template virtual function
+			setDefaultValueWithSynergies(name, Core::Data(val)); // as rvalue reference
+		}
+		else
+		{
+			setDefaultValueNoUpdate(name, val);
+		}
+		resetMatrixFromDefaults(); // defaults to matrix
 
 		return ValueSetResult();
 	}

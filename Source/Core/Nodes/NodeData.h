@@ -46,7 +46,7 @@ enum class EValueType
 	Matrix,
 	Quat,
 	MatrixMul, ///< connection of sequences in the scene graph - represents a
-	           ///< matrix multiplication
+	           ///< matrix multiplication - stores a matrix
 	Screen,    ///< projection and camera view transformation
 	Ptr,
 };
@@ -86,10 +86,19 @@ public:
 
 public:
 	/** Default constructor constructs a signal of type OpValueType::MATRIX and
-	 * undefined value (a unit matrix) */
+	 * with an undefined value (a unit matrix) */
 	Data() : opValueType(EValueType::Matrix)
 	{
 		m_value = glm::mat4(1.0f);
+	}
+
+	/**
+	 * \brief Explicit constructors from given data values
+	 */
+	///@{
+	explicit Data(const bool val) : opValueType(EValueType::Pulse)
+	{
+		m_value = val;
 	}
 
 	explicit Data(float val) : opValueType(EValueType::Float)
@@ -112,6 +121,19 @@ public:
 		m_value = val;
 	}
 
+	explicit Data(const glm::quat val) : opValueType(EValueType::Quat)
+	{
+		m_value = val;
+	}
+	explicit Data(const std::pair<glm::mat4, glm::mat4> val) : opValueType(EValueType::Screen)
+	{
+		m_value = val;
+	}
+	explicit Data(const void* val) : opValueType(EValueType::Ptr) {}
+	// todo check this - the pointer is not stored !!!
+	///@}
+
+	/** Constructor of given signal type with an undefined value (identity) */
 	explicit Data(EValueType valueType);
 
 	[[nodiscard]] bool isPulseTriggered() const

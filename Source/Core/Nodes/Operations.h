@@ -601,7 +601,7 @@ static inline const std::vector<TransformOperation> g_transforms = {
         0b1110111011100000,
         {
             {"axis", EValueType::Vec3},
-            {"rotation", EValueType::Float}
+            {"rotation", EValueType::Float} // todo - change it to angle
         },
         true
     },
