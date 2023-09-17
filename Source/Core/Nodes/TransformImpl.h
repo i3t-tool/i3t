@@ -138,6 +138,7 @@ template <ETransformType T> Ptr<Transform> createTransform()
 	ret->init();
 	ret->createDefaults();
 	ret->initDefaults();
+	ret->resetMatrixFromDefaults();
 
 	return ret;
 }
@@ -162,6 +163,10 @@ public:
 		return ValueSetResult{};
 	}
 
+	/**
+	 * \brief Lock the matrix (except for thr Free), reset the internal values to default ones and notify
+	 * This not-overriden version is used for Free only
+	 */
 	void resetMatrixFromDefaults() override
 	{
 		// m_isLocked = true; Free is never locked
@@ -370,12 +375,17 @@ public:
 	const glm::quat& getNormalized() const;
 
 	ValueSetResult setValue(const glm::quat& q) override;
-	ValueSetResult setValue(const glm::vec4& vec) override;
+	// ValueSetResult setValue(const glm::vec4& vec) override; // probably not used, test order correctness
 	ValueSetResult setValue(const glm::mat4& mat) override;
 
 	/**
-	 * \brief Update matrix to match the default "quat" value. As a side effect,
-	 * it normalizes the default "quat" for synergies enabled!
+	 * \brief set new quat \a val, and normalize the default "quat" if synergies enabled!
+	 * \param name quat
+	 * \param val new quat value
+	 */
+	void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val) override;
+	/**
+	 * \brief Update matrix to match the default "quat" value.
 	 */
 	void resetMatrixFromDefaults() override;
 };
@@ -393,9 +403,14 @@ public:
 
 	bool isValid() const override;
 	void initDefaults() override;
-	/// No synergies required.
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 
+	/**
+	 * \brief Make the frustum axis-symmetric (left = -right, top = -bottom)
+	 * \param name default value name
+	 * \param val new Value
+	 */
+	void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val) override;
 	void resetMatrixFromDefaults() override;
 };
 
@@ -428,10 +443,17 @@ public:
 	bool isValid() const override;
 	void initDefaults() override;
 
+	/**
+	 * \brief Make the frustum axis-symmetric (left = -right, top = -bottom)
+	 * \param name default value name
+	 * \param val new Value
+	 */
+	void setDefaultValueWithSynergies(const std::string& name, Core::Data&& val) override;
 	void resetMatrixFromDefaults() override;
 
 	ValueSetResult setValue(float val, glm::ivec2 coords) override;
 };
+
 
 /**
  * Same as perspective projection node, but all values are locked.

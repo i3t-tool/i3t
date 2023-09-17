@@ -199,7 +199,7 @@ void TransformImpl<ETransformType::Scale>::setDefaultUniformScale(float val)
 
 void TransformImpl<ETransformType::Scale>::initDefaults()
 {
-	setDefaultValue("scale", glm::vec3{1.0f, 1.0f, 1.0f});
+	setDefaultValueNoUpdate("scale", glm::vec3{1.0f, 1.0f, 1.0f});
 }
 
 // void TransformImpl<ETransformType::Scale>::onResetMatrixFromDefaults()
@@ -213,6 +213,8 @@ void TransformImpl<ETransformType::Scale>::resetMatrixFromDefaults()
 
 	auto scale = getDefaultValue("scale").getVec3();
 
+
+	// delete this check?
 	if (m_hasSynergies && !Math::areElementsSame(scale))
 	{
 		// \todo - this should never happen - the synergies must be checked in
@@ -222,6 +224,7 @@ void TransformImpl<ETransformType::Scale>::resetMatrixFromDefaults()
 		/////setDefaultUniformScale(scale.x);  // infinite recursion
 		getDefaultValueMut("scale").setValue(scale);
 	}
+
 
 	setInternalValue(glm::scale(scale));
 	notifySequence();
@@ -352,8 +355,7 @@ ValueSetResult TransformImpl<ETransformType::EulerX>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerX>::initDefaults()
 {
-	// Transformation::initDefaults();
-	setDefaultValue("rotation", 0.0f);
+	setDefaultValueNoUpdate("rotation", 0.0f);
 }
 
 void TransformImpl<ETransformType::EulerX>::resetMatrixFromDefaults()
@@ -490,8 +492,7 @@ ValueSetResult TransformImpl<ETransformType::EulerY>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerY>::initDefaults()
 {
-	// Transformation::initDefaults();
-	setDefaultValue("rotation", 0.0f);
+	setDefaultValueNoUpdate("rotation", 0.0f);
 }
 void TransformImpl<ETransformType::EulerY>::resetMatrixFromDefaults()
 {
@@ -630,8 +631,7 @@ ValueSetResult TransformImpl<ETransformType::EulerZ>::setValue(float val, glm::i
 
 void TransformImpl<ETransformType::EulerZ>::initDefaults()
 {
-	// Transformation::initDefaults();
-	setDefaultValue("rotation", 0.0f);
+	setDefaultValueNoUpdate("rotation", 0.0f);
 }
 
 void TransformImpl<ETransformType::EulerZ>::resetMatrixFromDefaults()
@@ -710,14 +710,14 @@ ValueSetResult TransformImpl<ETransformType::Translation>::setValue(float val, g
 
 void TransformImpl<ETransformType::Translation>::initDefaults()
 {
-	setDefaultValue("translation", glm::vec3{0.0f, 0.0f, 0.0f});
+	setDefaultValueNoUpdate("translation", glm::vec3{0.0f, 0.0f, 0.0f});
 }
 
 void TransformImpl<ETransformType::Translation>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
-	const auto& translation = getDefaultValue("translation").getVec3();
-	setInternalValue(glm::translate(translation));
+
+	setInternalValue(glm::translate(getDefaultValue("translation").getVec3()));
 	notifySequence();
 }
 
@@ -752,8 +752,7 @@ bool TransformImpl<ETransformType::AxisAngle>::isValid() const
 void TransformImpl<ETransformType::AxisAngle>::initDefaults()
 {
 	setDefaultValueNoUpdate("axis", glm::vec3{0.0f, 1.0f, 0.0f});
-	setDefaultValue("rotation",
-	                0.0f); // needed for menu reset...  \\todo change rotation to angle
+	setDefaultValueNoUpdate("rotation", 0.0f);
 }
 
 void TransformImpl<ETransformType::AxisAngle>::resetMatrixFromDefaults()
@@ -918,21 +917,13 @@ bool TransformImpl<ETransformType::Quat>::isValid() const
 
 void TransformImpl<ETransformType::Quat>::initDefaults()
 {
-	setDefaultValue("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
+	setDefaultValueNoUpdate("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
+	m_normalized = glm::quat{1.0f, 0.0f, 0.0f, 0.0f};
 }
 
 void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()
 {
-	// m_isLocked = true; quaternion is never locked
-	// m_hasSynergies = true; ///////////////// \todo PF split reset and set
-
-	auto& q = getDefaultValue("quat").getQuat(); // default - to be checked for synergies and
-	                                             // eventually replaced by normalized
-	m_normalized = glm::normalize(q);
-
-	// normalization if hasSynergies()
-	if (hasSynergies())
-		setDefaultValueNoUpdate("quat", m_normalized);
+	m_isLocked = true;
 
 	setInternalValue(glm::toMat4(m_normalized)); // matrix
 	notifySequence();
@@ -966,16 +957,68 @@ ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::quat& q)
 	return ValueSetResult{};
 }
 
-ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
-{
-	// glm::quat q(vec);
-	// return setValue(glm::quat(q));
-	return setValue(glm::quat(vec));
-}
+// ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::vec4& vec)
+//{
+//	// glm::quat q(vec);
+//	// return setValue(glm::quat(q));
+//	return setValue(glm::quat(vec)); // todo - is wrong - replace with (w,x,y,z)
+// }
 
 ValueSetResult TransformImpl<ETransformType::Quat>::setValue(const glm::mat4& mat)
 {
 	return setValue(glm::quat_cast(mat));
+}
+
+void TransformImpl<ETransformType::Quat>::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
+{
+	constexpr float HYSTERESIS_ONE = 1.2f;
+	assert(hasSynergies());                      // called from setValues after this check
+	assert(val.opValueType == EValueType::Quat); // \todo future - add float for w,x,y,z
+
+	// std::cout << "Pretizena virtualni funkce pro Quat" << std::endl;
+
+	if (name != "quat")
+		return;
+
+	const glm::quat& oldVal = getDefaultValue("quat").getQuat();
+	const glm::quat newVal = val.getQuat();
+
+	glm::quat correctedNewVal = glm::normalize(newVal); // replaces 0000 with 1000
+
+	if (abs(newVal.x) > HYSTERESIS_ONE)
+	{
+		correctedNewVal.x = glm::clamp(newVal.x, -1.0f, 1.0f);
+		correctedNewVal.y = 0.0f;
+		correctedNewVal.z = 0.0f;
+		correctedNewVal.w = 0.0f;
+	}
+	else if (abs(newVal.y) > HYSTERESIS_ONE)
+	{
+		correctedNewVal.y = glm::clamp(newVal.y, -1.0f, 1.0f);
+		correctedNewVal.x = 0.0f;
+		correctedNewVal.z = 0.0f;
+		correctedNewVal.w = 0.0f;
+	}
+	else if (abs(newVal.z) > HYSTERESIS_ONE)
+	{
+		correctedNewVal.z = glm::clamp(newVal.z, -1.0f, 1.0f);
+		correctedNewVal.x = 0.0f;
+		correctedNewVal.y = 0.0f;
+		correctedNewVal.w = 0.0f;
+	}
+	else if (abs(newVal.w) > HYSTERESIS_ONE)
+	{
+		correctedNewVal.w = glm::clamp(newVal.w, -1.0f, 1.0f);
+		correctedNewVal.x = 0.0f;
+		correctedNewVal.y = 0.0f;
+		correctedNewVal.z = 0.0f;
+	}
+
+	// Process the synergies
+	m_normalized = glm::normalize(correctedNewVal); /// todo do it per partes
+
+	// setDefaultValueNoUpdate(name, newVal);
+	setDefaultValueNoUpdate(name, m_normalized);
 }
 
 //===-- Orthographic projection -------------------------------------------===//
@@ -1011,25 +1054,42 @@ void TransformImpl<ETransformType::Ortho>::initDefaults()
 	setDefaultValueNoUpdate("bottom", -5.0f);
 	setDefaultValueNoUpdate("top", 5.0f);
 	setDefaultValueNoUpdate("near", 1.0f);
-	setDefaultValue("far", 10.0f);
+	setDefaultValueNoUpdate("far", 10.0f);
 }
 
+
+void TransformImpl<ETransformType::Ortho>::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
+{
+	assert(hasSynergies()); // called from setValues after this check
+	assert(val.opValueType == EValueType::Float);
+
+	std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
+
+	float newVal = val.getFloat();
+	setDefaultValueNoUpdate(name, newVal);
+
+	// Process the synergies
+	if (name == "left")
+	{
+		setDefaultValueNoUpdate("right", -newVal);
+	}
+	else if (name == "right")
+	{
+		setDefaultValueNoUpdate("left", -newVal);
+	}
+	else if (name == "top")
+	{
+		setDefaultValueNoUpdate("bottom", -newVal);
+	}
+	else if (name == "bottom")
+	{
+		setDefaultValueNoUpdate("top", -newVal);
+	}
+	// "near" and "far" are not updated
+}
 void TransformImpl<ETransformType::Ortho>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
-
-	if (hasSynergies())
-	{
-
-		// todo - Ortho - do synergies symmetrically
-		const auto left = getDefaultValue("left").getFloat();
-		const auto bottom = getDefaultValue("bottom").getFloat();
-
-		if (!Math::eq(left, -getDefaultValue("right").getFloat()))
-			setDefaultValueNoUpdate("right", -left);
-		if (!Math::eq(bottom, -getDefaultValue("top").getFloat()))
-			setDefaultValueNoUpdate("top", -bottom);
-	}
 
 	setInternalValue(glm::ortho(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
 	                            getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
@@ -1199,7 +1259,7 @@ void TransformImpl<ETransformType::Perspective>::initDefaults()
 	setDefaultValueNoUpdate("fovy", glm::radians(70.0f));
 	setDefaultValueNoUpdate("aspect", 1.33f);
 	setDefaultValueNoUpdate("near", 1.0f);
-	setDefaultValue("far", 10.0f); //  update matrix
+	setDefaultValueNoUpdate("far", 10.0f); //  update matrix
 }
 
 void TransformImpl<ETransformType::Perspective>::resetMatrixFromDefaults()
@@ -1332,25 +1392,56 @@ void TransformImpl<ETransformType::Frustum>::initDefaults()
 	setDefaultValueNoUpdate("bottom", -1.0f);
 	setDefaultValueNoUpdate("top", 1.0f);
 	setDefaultValueNoUpdate("near", 1.0f);
-	setDefaultValue("far", 10.0f);
+	setDefaultValueNoUpdate("far", 10.0f);
 }
+
+void TransformImpl<ETransformType::Frustum>::setDefaultValueWithSynergies(const std::string& name, Core::Data&& val)
+{
+	assert(hasSynergies()); // called from setValues after this check
+	assert(val.opValueType == EValueType::Float);
+
+	std::cout << "Pretizena virtualni funkce pro Frustum" << std::endl;
+
+	float newVal = val.getFloat();
+	setDefaultValueNoUpdate(name, newVal);
+
+	// Process the synergies
+	if (name == "left")
+	{
+		setDefaultValueNoUpdate("right", -newVal);
+	}
+	else if (name == "right")
+	{
+		setDefaultValueNoUpdate("left", -newVal);
+	}
+	else if (name == "top")
+	{
+		setDefaultValueNoUpdate("bottom", -newVal);
+	}
+	else if (name == "bottom")
+	{
+		setDefaultValueNoUpdate("top", -newVal);
+	}
+	// "near" and "far" are not updated
+}
+
+// template <typename T>
+// void TransformImpl<ETransformType::Frustum>::setDefaultValueWithSynergies(const std::string& name, T&& val)
+// {
+//	getDefaultValueMut(name).setValue(val);
+// }
+
+// void TransformImpl<ETransformType::Frustum>::setDefaultValueWithSynergies(const std::string& name, float val)
+//{
+//	// getDefaultValueMut(name).setValue(val); // defaults
+//	setDefaultValueNoUpdate(name, val);
+// };
+
 
 void TransformImpl<ETransformType::Frustum>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
-	if (hasSynergies())
-	{
-
-		// todo - do it symmetrically
-		const auto left = getDefaultValue("left").getFloat();
-		const auto bottom = getDefaultValue("bottom").getFloat();
-
-		if (!Math::eq(left, -getDefaultValue("right").getFloat()))
-			setDefaultValueNoUpdate("right", -left);
-		if (!Math::eq(bottom, -getDefaultValue("top").getFloat()))
-			setDefaultValueNoUpdate("top", -bottom);
-	}
 	setInternalValue(glm::frustum(getDefaultValue("left").getFloat(), getDefaultValue("right").getFloat(),
 	                              getDefaultValue("bottom").getFloat(), getDefaultValue("top").getFloat(),
 	                              getDefaultValue("near").getFloat(), getDefaultValue("far").getFloat()));
@@ -1545,7 +1636,7 @@ void TransformImpl<ETransformType::LookAt>::initDefaults()
 {
 	setDefaultValueNoUpdate("eye", glm::vec3{0.0, 0.0, 10.0});
 	setDefaultValueNoUpdate("center", glm::vec3{0.0, 0.0, 0.0});
-	setDefaultValue("up", glm::vec3{0.0, 1.0, 0.0});
+	setDefaultValueNoUpdate("up", glm::vec3{0.0, 1.0, 0.0});
 }
 void TransformImpl<ETransformType::LookAt>::resetMatrixFromDefaults()
 {
