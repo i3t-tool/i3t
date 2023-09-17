@@ -118,6 +118,13 @@ inline std::optional<Core::Data> getData(const rapidjson::Value& value, Core::EV
 		return Core::Data{getMat(value)};
 	}
 	case Core::EValueType::Quat:
+	{
+		if (!value.IsArray() || value.GetArray().Size() != 4)
+			return std::nullopt;
+
+		return Core::Data{glm::quat(getVec4(value))}; // PF: is it OK this way?
+	}
+
 	case Core::EValueType::Pulse:
 	case Core::EValueType::MatrixMul:
 	case Core::EValueType::Screen:
