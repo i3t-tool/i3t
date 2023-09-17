@@ -919,6 +919,7 @@ void TransformImpl<ETransformType::Quat>::initDefaults()
 {
 	setDefaultValueNoUpdate("quat", glm::quat{1.0f, 0.0f, 0.0f, 0.0f});
 	m_normalized = glm::quat{1.0f, 0.0f, 0.0f, 0.0f};
+	enableSynergies();
 }
 
 void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()

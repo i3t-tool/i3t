@@ -378,11 +378,11 @@ protected:
 	 * | EulerX,Y,Z     | yes              | yes              | no | cos and sins
 	 * |
 	 */
-	bool m_hasMenuSynergies = false;
-	bool m_hasSynergies = false; ///< applicable for: uniform scale, eulerAngleXYZ, ortho, frustum,
+	bool m_hasMenuSynergies = false; 
+	bool m_hasSynergies = false; ///< applicable for: uniform scale, eulerAngleXYZ, ortho, frustum, and quat
 	                             ///< and quaternion. All other undefined (false)
 
-	bool m_isLocked = true;
+	bool m_isLocked = true; ///< Edit of the matrix is limited to editable values - defined in Operations.h g_transforms 
 
 private:
 	friend class MatrixTracker;
