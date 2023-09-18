@@ -42,6 +42,7 @@ TEST(ScaleTest, NewNodePredicates)
 	EXPECT_TRUE(scale->isLocked());
 	EXPECT_TRUE(scale->isValid());
 	EXPECT_FALSE(scale->isInSequence());
+	EXPECT_FALSE(scale->hasSavedValue());
 }
 TEST(ScaleTest, ResetToInitialValues)
 {

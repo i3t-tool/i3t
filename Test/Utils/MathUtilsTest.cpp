@@ -1,10 +1,12 @@
 // #include "Common.h"
+#include "Common.h"
 #include "glm/gtx/euler_angles.hpp"
 #include "gtest/gtest.h"
 
 #include "Generator.h"
 #include "Utils/Format.h"
 #include "Utils/Math.h"
+
 
 TEST(MathUtilsTest, QuatLerp)
 {
@@ -37,4 +39,13 @@ TEST(MathUtilsTest, QuatLerp)
 		EXPECT_TRUE(Math::eq(expected, result, Math::FLT_EPSILON_FIVE_DECIMALS));
 		// EXPECT_PRED_FORMAT2(AssertRoughlyEqualMatrices, expected, result, Math::FACTOR_ROUGHLY_SIMILAR);
 	}
+}
+
+// test of comparison assert from common.h
+TEST(MathUtilsTest, MatrixComparison)
+{
+	const glm::mat4 a = generateMat4();
+	const glm::mat4 b = generateMat4();
+	EXPECT_PRED_FORMAT2(AssertEqualMatrices, a, a);  // Succeeds
+	EXPECT_PRED_FORMAT2(!AssertEqualMatrices, a, b); // !Fails
 }

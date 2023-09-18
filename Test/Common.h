@@ -9,3 +9,5 @@
 bool compare(const glm::mat4& lhs, const glm::mat4& rhs, int factor = Math::FACTOR_SIMILAR);
 testing::AssertionResult AssertEqualMatrices(const char* m_expr, const char* n_expr, glm::mat4 m, glm::mat4 n);
 testing::AssertionResult AssertRoughlyEqualMatrices(const char* m_expr, const char* n_expr, glm::mat4 m, glm::mat4 n);
+testing::AssertionResult assertionCompare(const glm::mat4& lhs, const glm::mat4& rhs, int factor);
+testing::AssertionResult assertionCompare(const glm::quat& lhs, const glm::quat& rhs, int factor);

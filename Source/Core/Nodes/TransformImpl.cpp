@@ -5,6 +5,7 @@
 
 // #include "pgr.h"
 #include "Utils/Format.h"
+#include <glm/gtx/matrix_interpolation.hpp> // AxisAngle
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp> // Euler angle rotations
 
@@ -926,6 +927,9 @@ void TransformImpl<ETransformType::Quat>::resetMatrixFromDefaults()
 {
 	m_isLocked = true;
 
+	// todo - remove from here and unify the setters - setValue() and setDefaultValueNoUpdate()
+	m_normalized = glm::normalize(getQuat());
+
 	setInternalValue(glm::toMat4(m_normalized)); // matrix
 	notifySequence();
 }
@@ -938,7 +942,7 @@ const glm::quat& TransformImpl<ETransformType::Quat>::getQuat() const
 	return getDefaultValue("quat").getQuat();
 };
 
-const glm::quat& TransformImpl<ETransformType::Quat>::getNormalized() const
+const glm::quat& TransformImpl<ETransformType::Quat>::getNormalizedQuat() const
 {
 	return m_normalized;
 };
