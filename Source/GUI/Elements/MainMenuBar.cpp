@@ -28,14 +28,14 @@ static bool saveSceneDialog(std::filesystem::path& result, const std::string& ti
 {
 	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
 
-	return SystemDialogs::SaveSingleFileDialog(result, title, "./", filter);
+	return SystemDialogs::SaveSingleFileDialog(result, title, Configuration::sceneRoot.string(), filter);
 }
 
 static bool openSceneDialog(std::filesystem::path& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"I3T scene files", "*"s + I3T_SCENE_EXTENSION};
 
-	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
+	return SystemDialogs::OpenSingleFileDialog(result, title, Configuration::sceneRoot.string(), filter);
 }
 
 //

@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 /**
  * A bunch of system dialogs.
  */
@@ -30,7 +32,7 @@ namespace SystemDialogs
  *
  * \return Whether file was selected or not.
  */
-bool OpenSingleFileDialog(std::filesystem::path& result, const std::string& title, const std::string& root = "",
+bool OpenSingleFileDialog(fs::path& result, const std::string& title, fs::path root = "",
                           const std::vector<std::string>& filter = {"All Files", "*"});
 
 /**
@@ -43,7 +45,7 @@ bool OpenSingleFileDialog(std::filesystem::path& result, const std::string& titl
  *
  * \return Whether file was selected or not.
  */
-bool SaveSingleFileDialog(std::filesystem::path& filename, const std::string& title, const std::string& root = "",
+bool SaveSingleFileDialog(std::filesystem::path& filename, const std::string& title, fs::path root = "",
                           const std::vector<std::string>& filter = {"All Files", "*"});
 
 /**
