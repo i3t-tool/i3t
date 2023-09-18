@@ -19,91 +19,140 @@ ImportedModelsDialog::ImportedModelsDialog() {}
 
 void ImportedModelsDialog::render()
 {
+	bool modelIndexChanged = false;
+	int newModelIndex;
+
+	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec2 center = ImGui::GetMainViewport()->GetWorkCenter();
-	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 20, ImGui::GetFontSize() * 14);
+	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 30, ImGui::GetFontSize() * 24);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Once, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-	ImGui::Begin(setName("Imported Models").c_str(), &m_show, g_dialogFlags | ImGuiWindowFlags_NoResize);
+	ImGui::Begin(setName("Imported Models").c_str(), &m_show, g_dialogFlags);
 	{
 		std::vector<std::string> resourceAliases = RMI.getImportedResourceAliases();
 
-		// Could use a listbox here instead
-		//		if (ImGui::BeginListBox("List", size))
-		//		{
-		//			ImGui::Selectable("Selected", true);
-		//			ImGui::Selectable("Not Selected", false);
-		//			ImGui::EndListBox();
-		//		}
-
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
-		ImGui::BeginChild("ModelList", ImVec2(windowSize.x * 0.7f, windowSize.y * 0.65f), true);
-
-		if (resourceAliases.size() > 0)
+		// Update the selected model
+		if (m_selectedModelIndex >= 0 && resourceAliases.size() > 0)
 		{
-			int index = 0;
-			for (auto& alias : resourceAliases)
+			if (m_selectedModelIndex >= resourceAliases.size())
 			{
-				if (ImGui::Selectable(alias.c_str(), m_selectedModelIndex == index))
-					m_selectedModelIndex = index;
-				index++;
+				m_selectedModelIndex = resourceAliases.size() - 1;
 			}
+			m_selectedModelAlias = resourceAliases.at(m_selectedModelIndex);
 		}
 		else
 		{
-			ImGui::BeginDisabled(true);
-			ImGui::Selectable("No models imported");
-			ImGui::EndDisabled();
+			m_selectedModelIndex = -1;
+			m_selectedModelAlias = "";
 		}
 
-		ImGui::EndChild();
-		ImGui::PopStyleColor();
+		static ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Resizable;
 
-		ImGui::SameLine();
-
-		if (ImGui::BeginTable("buttonColumn", 1, ImGuiTableFlags_NoSavedSettings))
+		if (ImGui::BeginTable("ImportedModelsTable", 2, flags))
 		{
 			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			if (ImGui::Button("Import", ImVec2(-FLT_MIN, 0.0f)))
+			for (int column = 0; column < 2; column++)
 			{
-				importModel();
-			}
-			ImGui::SetItemDefaultFocus();
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			if (ImGui::Button("Remove", ImVec2(-FLT_MIN, 0.0f)))
-			{
-				if (m_selectedModelIndex >= 0)
+				ImGui::TableSetColumnIndex(column);
+				if (column == 0)
 				{
-					maybeRemoveModel(resourceAliases.at(m_selectedModelIndex));
+					ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
+					ImGui::BeginChild("ModelList", ImVec2(0, -1), true, ImGuiWindowFlags_HorizontalScrollbar);
+
+					if (resourceAliases.size() > 0)
+					{
+						int index = 0;
+						for (auto& alias : resourceAliases)
+						{
+							if (ImGui::Selectable(alias.c_str(), m_selectedModelIndex == index))
+							{
+								modelIndexChanged = true;
+								newModelIndex = index;
+							}
+							index++;
+						}
+					}
+					else
+					{
+						ImGui::BeginDisabled(true);
+						ImGui::Selectable("No models imported");
+						ImGui::EndDisabled();
+					}
+
+					ImGui::EndChild();
+					ImGui::PopStyleColor();
 				}
 				else
 				{
-					LOG_INFO("No model selected!");
+					ImGui::BeginChild("ModelRightPane", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
+
+					if (ImGui::Button("Import", ImVec2(-FLT_MIN, 0)))
+					{
+						importModel(m_normalizeImportedModels);
+					}
+					ImGui::SetItemDefaultFocus();
+
+					if (ImGui::Button("Remove", ImVec2(-FLT_MIN, 0)))
+					{
+						if (m_selectedModelIndex >= 0)
+						{
+							maybeRemoveModel(resourceAliases.at(m_selectedModelIndex));
+						}
+						else
+						{
+							LOG_INFO("No model selected!");
+						}
+					}
+					ImGui::Checkbox("Normalize model size", &m_normalizeImportedModels);
+
+					ImGui::Separator();
+
+					ImGui::Text("Model details:");
+					if (!m_selectedModelAlias.empty())
+					{
+						if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_FittingPolicyScroll |
+						                                     ImGuiTabBarFlags_TabListPopupButton))
+						{
+							Core::Mesh* mesh = RMI.meshByAlias(m_selectedModelAlias);
+							if (mesh)
+							{
+								int counter = 0;
+								for (auto& meshPart : mesh->m_meshParts)
+								{
+									std::string meshPartName =
+									    meshPart.name.empty() ? "Mesh " + std::to_string(counter) : meshPart.name;
+									if (ImGui::BeginTabItem(meshPartName.c_str()))
+									{
+										ImGui::Text("Material:");
+										ImGui::ColorEdit3("Diffuse", glm::value_ptr(meshPart.material.diffuse));
+										ImGui::ColorEdit3("Specular", glm::value_ptr(meshPart.material.specular));
+										ImGui::ColorEdit3("Ambient", glm::value_ptr(meshPart.material.ambient));
+										ImGui::DragFloat("Shininess", &meshPart.material.shininess, 0.3f, 1.0f, 1000.0f,
+										                 "%.1f", ImGuiSliderFlags_Logarithmic);
+
+										ImGui::EndTabItem();
+									}
+									counter++;
+								}
+							}
+						}
+						ImGui::EndTabBar();
+					}
+					else
+					{
+						ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(IM_COL32(200, 200, 200, 255)),
+						                   "No model selected");
+					}
+					ImGui::EndChild();
 				}
 			}
 			ImGui::EndTable();
 		}
-
-
-		//		ImGui::GetWindowDrawList()->AddRectFilled(
-		//		    ImGui::GetCurrentWindow()->DC.CursorPos,
-		//		    ImGui::GetCurrentWindow()->DC.CursorPos + ImGui::GetContentRegionAvail(), IM_COL32(255, 0, 0, 100));
-
-		// Push bottom separator and button to the bottom, gotta calculate their size manually
-		ImGuiStyle& style = ImGui::GetStyle();
-		ImGui::Dummy(ImVec2(0, ImGui::GetContentRegionAvail().y - (style.ItemSpacing.y * 3) - ImGui::GetFontSize() -
-		                           (style.FramePadding.y * 2)));
-		ImGui::Separator();
-		ImGui::Dummy(ImVec2(0, 0));
-
-		if (ImGui::Button("Close"))
-		{
-			m_show = false;
-		}
 	}
 	ImGui::End();
+
+	if (modelIndexChanged)
+		m_selectedModelIndex = newModelIndex;
 
 	if (!m_show)
 	{
@@ -111,13 +160,13 @@ void ImportedModelsDialog::render()
 	}
 }
 
-void ImportedModelsDialog::importModel()
+void ImportedModelsDialog::importModel(bool normalize)
 {
 	std::filesystem::path modelFile;
 	if (importContentDialog(modelFile, "Import model"))
 	{
 		StateManager& stateManager = Application::getModule<StateManager>();
-		Application::getModule<Core::ResourceManager>().importModel(modelFile);
+		Application::getModule<Core::ResourceManager>().importModel(modelFile, normalize);
 		stateManager.takeSnapshot();
 		// TODO: (DR) Is undoing model import a good idea? Does taking snapshots even make sens in
 		//   the context of physical model files?

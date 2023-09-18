@@ -13,6 +13,8 @@ class ImportedModelsDialog : public IWindow
 {
 private:
 	int m_selectedModelIndex{-1};
+	std::string m_selectedModelAlias{};
+	bool m_normalizeImportedModels{true};
 
 public:
 	I3T_WINDOW(ImportedModelsDialog)
@@ -20,7 +22,7 @@ public:
 	ImportedModelsDialog();
 	void render() override;
 
-	static void importModel();
+	static void importModel(bool normalize);
 	static bool importContentDialog(std::filesystem::path& result, const std::string& title);
 
 	static void maybeRemoveModel(const std::string& alias);

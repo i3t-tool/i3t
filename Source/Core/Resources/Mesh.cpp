@@ -160,12 +160,12 @@ void Mesh::renderMeshPart(const MeshPart& meshPart) const
 	}
 }
 
-Mesh* Mesh::load(const std::string& path, bool minimalLoad)
+Mesh* Mesh::load(const std::string& path, bool normalize, bool minimalLoad)
 {
-	// TODO: (DR) Refactor and separate into methods
-
 	Assimp::Importer importer;
 	Mesh* mesh = new Mesh(TRIANGLES, ELEMENTS, true, true, true, false);
+	mesh->m_normalized = normalize;
+
 	fs::path modelRootPath = fs::path(path).parent_path();
 
 	// Unitize object in size
@@ -173,8 +173,7 @@ Mesh* Mesh::load(const std::string& path, bool minimalLoad)
 	//	                            1); // used by aiProcess_PreTransformVertices to
 	//	                                // normalize vertices to fit into (-1..1)^3
 
-	// Load asset from the file - you can play with various processing steps
-
+	// Load asset from the file using assimp
 	unsigned int pFlags = 0;
 	if (!minimalLoad)
 	{
@@ -242,7 +241,36 @@ Mesh* Mesh::load(const std::string& path, bool minimalLoad)
 
 	if (!minimalLoad)
 	{
-		loadGeometry(mesh, scn);
+		// Bounding box and misc
+		for (unsigned m = 0; m < scn->mNumMeshes; ++m)
+		{
+			const aiMesh* aiMesh = scn->mMeshes[m];
+			Mesh::MeshPart& meshPart = mesh->m_meshParts[m];
+
+			meshPart.name = std::string(aiMesh->mName.C_Str());
+
+			meshPart.boundingBoxMin = convertVec3(aiMesh->mAABB.mMin);
+			meshPart.boundingBoxMax = convertVec3(aiMesh->mAABB.mMax);
+			mesh->m_boundingBoxMin = vec3min(mesh->m_boundingBoxMin, meshPart.boundingBoxMin);
+			mesh->m_boundingBoxMax = vec3max(mesh->m_boundingBoxMax, meshPart.boundingBoxMax);
+		}
+
+		// Normalization
+		float normalizationFactor = 1.0f;
+		if (normalize)
+		{
+			glm::vec3 min = mesh->m_boundingBoxMin;
+			glm::vec3 max = mesh->m_boundingBoxMax;
+			float largestBoundingBoxSideLength =
+			    std::max(std::max(abs(min.x - max.x), abs(min.y - max.y)), abs(min.z - max.z));
+			normalizationFactor = 2.0f / largestBoundingBoxSideLength;
+
+			mesh->m_boundingBoxMin *= normalizationFactor;
+			mesh->m_boundingBoxMax *= normalizationFactor;
+		}
+
+		// Load stuff
+		loadGeometry(mesh, scn, normalizationFactor);
 		loadIndices(mesh, scn);
 		loadTextureCoordinates(mesh, scn);
 		createVaoAndBindAttribs(mesh);
@@ -253,7 +281,7 @@ Mesh* Mesh::load(const std::string& path, bool minimalLoad)
 	return mesh;
 }
 
-void Mesh::loadGeometry(Mesh* mesh, const aiScene* scn)
+void Mesh::loadGeometry(Mesh* mesh, const aiScene* scn, float scalingFactor)
 {
 	// vertices
 	glGenBuffers(1, &mesh->m_vertex_vbo);
@@ -262,6 +290,14 @@ void Mesh::loadGeometry(Mesh* mesh, const aiScene* scn)
 	for (unsigned m = 0, offset = 0; m < scn->mNumMeshes; ++m)
 	{
 		unsigned size = scn->mMeshes[m]->mNumVertices * 3 * sizeof(float);
+		if (scalingFactor != 1.0f)
+		{
+			for (int i = 0; i < scn->mMeshes[m]->mNumVertices; i++)
+			{
+				aiVector3D* vec = &scn->mMeshes[m]->mVertices[i];
+				*vec *= scalingFactor;
+			}
+		}
 		glBufferSubData(GL_ARRAY_BUFFER, offset, size, scn->mMeshes[m]->mVertices);
 		offset += size;
 	}
@@ -313,11 +349,6 @@ void Mesh::loadIndices(Mesh* mesh, const aiScene* scn)
 		meshPart.nIndices = aiMesh->mNumFaces * FACE_VERT_COUNT;
 		meshPart.startIndex = startIndex;
 		meshPart.baseVertex = baseVertex;
-
-		meshPart.boundingBoxMin = convertVec3(aiMesh->mAABB.mMin);
-		meshPart.boundingBoxMax = convertVec3(aiMesh->mAABB.mMax);
-		mesh->m_boundingBoxMin = vec3min(mesh->m_boundingBoxMin, meshPart.boundingBoxMin);
-		mesh->m_boundingBoxMax = vec3max(mesh->m_boundingBoxMax, meshPart.boundingBoxMax);
 
 		startIndex += aiMesh->mNumFaces * FACE_VERT_COUNT;
 		baseVertex += aiMesh->mNumVertices;

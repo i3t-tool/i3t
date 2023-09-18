@@ -208,7 +208,7 @@ void MainScene::update(double dt)
 
 	if (m_viewport->getSettings().mainScene_lightFollowsCamera)
 	{
-		m_sun1->direction = glm::inverse(m_camera->getView()) * glm::normalize(glm::vec4(-0.4f, -0.5f, -1.0f, 0.0f));
+		m_sun1->direction = glm::inverse(m_camera->getView()) * glm::normalize(glm::vec4(-0.3f, -0.4f, -1.0f, 0.0f));
 		m_sun2->intensity = 0.0f;
 	}
 	else

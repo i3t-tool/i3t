@@ -83,6 +83,8 @@ public:
 	 */
 	struct MeshPart
 	{
+		std::string name;
+
 		Material material;
 		TextureSet textureSet;
 
@@ -112,6 +114,8 @@ public:
 	/// List of mesh parts making up this mesh
 	std::vector<MeshPart> m_meshParts;
 
+	/// Whether the mesh geometry has been normalized on load
+	bool m_normalized{false};
 	/// Mesh bounding box min, derived from bounding boxes of mesh parts.
 	glm::vec3 m_boundingBoxMin{0.0f};
 	/// Mesh bounding box max, derived from bounding boxes of mesh parts.
@@ -191,10 +195,10 @@ public:
 	 * @return Pointer to the new Mesh object (newly allocated, to be managed
 	 * externally)
 	 */
-	static Mesh* load(const std::string& path, bool minimalLoad = false);
+	static Mesh* load(const std::string& path, bool normalize = false, bool minimalLoad = false);
 
 private:
-	static void loadGeometry(Mesh* mesh, const aiScene* scn);
+	static void loadGeometry(Mesh* mesh, const aiScene* scn, float scalingFactor);
 	static void loadIndices(Mesh* mesh, const aiScene* scn);
 	static void createVaoAndBindAttribs(Mesh* mesh);
 
