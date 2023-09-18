@@ -64,7 +64,7 @@ inline bool copy(const fs::path& from, const fs::path& to,
 		fs::copy(from, to, options);
 		return true;
 	}
-	catch (fs::filesystem_error e)
+	catch (const fs::filesystem_error& e)
 	{
 		reportFilesystemException(e);
 		return false;
@@ -107,7 +107,7 @@ inline bool copyFile(const fs::path& from, const fs::path& to,
 		fs::copy_file(from, to, options);
 		return true;
 	}
-	catch (fs::filesystem_error e)
+	catch (const fs::filesystem_error& e)
 	{
 		reportFilesystemException(e);
 		return false;
@@ -140,7 +140,7 @@ inline bool deleteFileOrDir(const fs::path& path, bool deleteEmptyFolders = fals
 		}
 		return true;
 	}
-	catch (fs::filesystem_error e)
+	catch (const fs::filesystem_error& e)
 	{
 		reportFilesystemException(e);
 		return false;
@@ -169,7 +169,7 @@ inline bool equivalent(const fs::path& path1, const fs::path& path2)
 	{
 		return fs::equivalent(path1, path2);
 	}
-	catch (fs::filesystem_error e)
+	catch (const fs::filesystem_error& e)
 	{
 		reportFilesystemException(e);
 		return false;
@@ -207,7 +207,7 @@ inline bool weaklyEquivalent(const fs::path& path1, const fs::path& path2)
 		fs::path path2N = normalizePath(path2);
 		return path1N == path2N;
 	}
-	catch (fs::filesystem_error e)
+	catch (const fs::filesystem_error& e)
 	{
 		reportFilesystemException(e);
 		return false;
