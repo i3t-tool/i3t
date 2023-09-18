@@ -3,6 +3,7 @@
 
 #include "Utils/Format.h"
 
+
 namespace Math
 {
 glm::mat4 lerp(const glm::mat4& lhs, const glm::mat4& rhs, float alpha, bool useQuat)

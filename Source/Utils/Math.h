@@ -15,15 +15,13 @@
 //---------------------------------------------------------------------------
 #pragma once
 
+#include "Core/Defs.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtx/norm.hpp"
 #include <iostream>
 #include <random>
 #include <vector>
-
-#include "glm/glm.hpp"
-#include "glm/gtx/matrix_interpolation.hpp"
-#include "glm/gtx/norm.hpp"
-
-#include "Core/Defs.h"
 
 // ----------------------- A better way for float comparison -------------
 // based on https://stackoverflow.com/questions/4548004/how-to-correctly-and-standardly-compare-floats
@@ -108,6 +106,11 @@ FORCE_INLINE bool eqToOne(const float value, const float epsilon = FLT_EPSILON_F
 {
 	return (1.0f - epsilon) <= abs(value) && abs(value) <= (1.0f + epsilon);
 }
+FORCE_INLINE bool eqToZero(const float value, const float epsilon = FLT_EPSILON_FIVE_DECIMALS)
+{
+	return abs(value) <= epsilon;
+}
+
 
 // Two variants of eq - they differ by the last parameter int or float.
 // - int uses the factor and is considered default

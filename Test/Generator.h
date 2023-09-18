@@ -3,8 +3,9 @@
 #include <random>
 
 #include "glm/glm.hpp"
-
+// #include "glm/gtx/quaternion.hpp"
 #include "Core/Nodes/GraphManager.h"
+#include "glm/ext/quaternion_geometric.hpp" // normalize
 
 using namespace Core;
 
@@ -96,4 +97,34 @@ inline Ptr<Sequence> arrangeSequence(int matrices = 3)
 	seq->addMatrix(std::move(mat3), 2);
 
 	return seq;
+}
+
+inline glm::quat generateQuat()
+{
+	return {generateFloat(), generateFloat(), generateFloat(), generateFloat()};
+}
+
+inline glm::quat generateUnitQuat()
+{
+	return (glm::normalize(generateQuat()));
+}
+
+/**
+ * \brief generate quaternion of length > 1
+ * \return quaternion of length > 1
+ */
+inline glm::quat generateNonUnitQuat()
+{
+	glm::quat quat;
+
+	do
+	{
+		quat = generateQuat();
+#ifdef PF_DEBUG
+		std::cerr << "regenerate quat" << std::endl;
+#endif
+
+	} while (glm::length2(quat) <= 1.0f);
+
+	return (quat);
 }

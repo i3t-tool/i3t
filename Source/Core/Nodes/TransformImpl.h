@@ -372,7 +372,7 @@ public:
 	 * \return quaternion
 	 */
 	const glm::quat& getQuat() const;
-	const glm::quat& getNormalized() const;
+	const glm::quat& getNormalizedQuat() const;
 
 	ValueSetResult setValue(const glm::quat& q) override;
 	// ValueSetResult setValue(const glm::vec4& vec) override; // probably not used, test order correctness

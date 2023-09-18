@@ -4,7 +4,6 @@
 
 #include "../Test/Generator.h"
 #include "Config.h"
-#include "Core/Application.h"
 #include "Logger/Logger.h"
 #include "Utils/Format.h"
 #include "Utils/Math.h"
@@ -24,6 +23,38 @@ bool compare(const glm::mat4& lhs, const glm::mat4& rhs, int factor)
 	}
 
 	return result;
+}
+
+// usage EXPECT_TRUE(assertionCompare(lhs, rhs, ))
+testing::AssertionResult assertionCompare(const glm::mat4& lhs, const glm::mat4& rhs, int factor)
+{
+	if (Math::eq(lhs, rhs, factor))
+	{
+		return testing::AssertionSuccess();
+	}
+	else
+	{
+		return testing::AssertionFailure() << Utils::toString(lhs) << std::endl
+		                                   << "!=\n"
+		                                   << Utils::toString(rhs) << std::endl;
+	}
+}
+
+// https://google.github.io/googletest/advanced.html
+// usage EXPECT_TRUE(assertionCompare(lhs, rhs, ))
+testing::AssertionResult assertionCompare(const glm::quat& lhs, const glm::quat& rhs, int factor)
+{
+
+	if (Math::eq(lhs, rhs, factor))
+	{
+		return testing::AssertionSuccess() << Utils::toString(lhs) << std::endl;
+	}
+	else
+	{
+		return testing::AssertionFailure() << Utils::toString(lhs) << std::endl
+		                                   << "!=\n"
+		                                   << Utils::toString(rhs) << std::endl;
+	}
 }
 
 // A predicate-formatter for asserting that two matrices are equal.
@@ -51,12 +82,4 @@ testing::AssertionResult AssertRoughlyEqualMatrices(const char* m_expr, const ch
 	                                   << "\t!=" << std::endl
 	                                   << Utils::toString(n, true) << std::endl
 	                                   << std::endl;
-}
-
-TEST(Math, MatrixComparison)
-{
-	const glm::mat4 a = generateMat4();
-	const glm::mat4 b = generateMat4();
-	EXPECT_PRED_FORMAT2(AssertEqualMatrices, a, a);  // Succeeds
-	EXPECT_PRED_FORMAT2(!AssertEqualMatrices, a, b); // !Fails
 }
