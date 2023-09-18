@@ -100,6 +100,7 @@ bool WorkspaceNode::bypassFocusForInteractionAction()
 
 void WorkspaceNode::deleteAction()
 {
+	// TODO: (DR) A little confused why we don't use the superclass m_toDelete boolean flag for this but whatever
 	m_removeFromWorkspaceWindow = true;
 }
 

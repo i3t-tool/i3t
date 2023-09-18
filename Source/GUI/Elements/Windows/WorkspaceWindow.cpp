@@ -1774,13 +1774,17 @@ Memento WorkspaceWindow::saveState(Scene* scene)
 
 void WorkspaceWindow::loadState(const Memento& memento, Scene* scene)
 {
-	getNodeEditor().m_workspaceCoreNodes.clear();
+	clearState();
 
 	NodeDeserializer::createFrom(memento);
 }
 
 void WorkspaceWindow::clearState()
 {
+	for (auto& node : getNodeEditor().m_workspaceCoreNodes)
+	{
+		node->deleteActionDiwne();
+	}
 	getNodeEditor().m_workspaceCoreNodes.clear();
 }
 

@@ -251,7 +251,7 @@ void WorkspaceTransformation::drawMenuSetDataMap()
 
 void WorkspaceTransformation::deleteAction()
 {
-	m_removeFromWorkspaceWindow = true;
+	WorkspaceNode::deleteAction();
 	m_removeFromSequence = true;
 	m_parentSequence.reset();
 }

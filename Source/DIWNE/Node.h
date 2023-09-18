@@ -179,7 +179,7 @@ protected:
 
 	float m_centerDummySpace;
 	DrawModeNodePosition m_nodePosMode;
-	bool m_toDelete;
+	bool m_toDelete; ///< Set to true after node delete action
 	bool m_render = true;
 
 private:

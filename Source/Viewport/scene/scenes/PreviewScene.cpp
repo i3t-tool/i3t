@@ -30,8 +30,8 @@ void PreviewScene::init()
 	m_lighting->addLight(sun);
 
 	SunLight* sun2 = new SunLight();
-	sun2->intensity = 0.12f;
-	sun2->color = glm::vec3(0.69f, 0.91f, 1.0f);
+	sun2->intensity = 0.08f;
+	sun2->color = glm::vec3(0.804, 0.945, 1);
 	sun2->direction = glm::vec3(0.76, 0.58, -0.12);
 	sun->pos = glm::vec3(0, 2, 0);
 	m_lighting->addLight(sun2);
