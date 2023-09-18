@@ -24,7 +24,7 @@ void StateManager::init()
 	}
 
 	loadUserData();
-	LOG_INFO("Checking for unused tmp directories (timeout {}) ...", m_tmpDirectoryLockFileTimeout);
+	LOG_INFO("[STATE MANAGER] Checking for unused tmp directories (timeout {}) ...", m_tmpDirectoryLockFileTimeout);
 	purgeTmpDirectories();
 }
 
@@ -56,13 +56,15 @@ void StateManager::beginFrame()
 				}
 				else
 				{
-					LOG_ERROR("Failed to open tmp directory LOCK file for writing! Path: {}", lockFile.string());
+					LOG_ERROR("[STATE MANAGER] Failed to open tmp directory LOCK file for writing! Path: {}",
+					          lockFile.string());
 				}
 			}
 			catch (std::exception& e)
 			{
-				LOG_ERROR("An exception occurred while writing to the tmp directory LOCK file: {}, code: {}", e.what(),
-				          strerror(errno));
+				LOG_ERROR(
+				    "[STATE MANAGER] An exception occurred while writing to the tmp directory LOCK file: {}, code: {}",
+				    e.what(), strerror(errno));
 			}
 
 			// Schedule next write
@@ -396,7 +398,6 @@ void StateManager::pushRecentFile(const fs::path& file)
 
 void StateManager::createTmpDirectory()
 {
-	// TODO: (DR) Perhaps some error handling
 	if (!m_tmpDirectory.empty())
 	{
 		return;
@@ -437,36 +438,46 @@ void StateManager::createTmpDirectory()
 	}
 	catch (std::filesystem::filesystem_error& e)
 	{
-		LOG_ERROR("Failed to create tmp directory!");
+		LOG_ERROR("[STATE MANAGER] Failed to create tmp directory! Path: '{}'", m_tmpDirectory.string());
 		FilesystemUtils::reportFilesystemException(e);
 	}
 }
 
 void StateManager::deleteTmpDirectory()
 {
-	// TODO: (DR) Perhaps some error handling
 	if (m_tmpDirectory.empty())
 	{
 		return;
 	}
 
 	// Delete tmp directory
-	fs::remove_all(m_tmpDirectory);
+	if (!FilesystemUtils::deleteFileOrDir(m_tmpDirectory, false))
+	{
+		LOG_ERROR("[STATE MANAGER] Failed to delete tmp directory! Path: '{}'", m_tmpDirectory.string());
+	}
 }
 
 void StateManager::wipeTmpDirectory()
 {
 	if (m_tmpDirectory.empty())
 	{
-		LOG_WARN("Cannot wipe tmp directory before creating it!");
+		LOG_WARN("[STATE MANAGER] Cannot wipe tmp directory before creating it!");
 		return;
 	}
 
 	// Delete content of tmp directory
-	for (const auto& entry : std::filesystem::directory_iterator(m_tmpDirectory))
+	try
 	{
-		if (entry.path().filename() != m_tmpDirectoryLockFileName) // Ignore lock file
-			fs::remove_all(entry.path());
+		for (const auto& entry : std::filesystem::directory_iterator(m_tmpDirectory))
+		{
+			if (entry.path().filename() != m_tmpDirectoryLockFileName) // Ignore lock file
+				fs::remove_all(entry.path());
+		}
+	}
+	catch (const fs::filesystem_error& e)
+	{
+		FilesystemUtils::reportFilesystemException(e);
+		LOG_ERROR("[STATE MANAGER] Failed to wipe tmp directory! Path: '{}'", m_tmpDirectory.string());
 	}
 }
 
@@ -508,7 +519,8 @@ void StateManager::purgeTmpDirectories()
 
 				if (!ifs.is_open())
 				{
-					LOG_ERROR("Failed to open lock file at '{}'. Cannot purge tmp dir.", lockFilePath.string());
+					LOG_ERROR("[STATE MANAGER] Failed to open lock file at '{}'. Cannot purge tmp dir.",
+					          lockFilePath.string());
 					continue;
 				}
 
@@ -524,7 +536,8 @@ void StateManager::purgeTmpDirectories()
 				}
 				catch (std::exception& e)
 				{
-					LOG_ERROR("Failed to parse lock file at '{}'. Cannot purge tmp dir. Lock file contents:\n'{}'",
+					LOG_ERROR("[STATE MANAGER] Failed to parse lock file at '{}'. Cannot purge tmp dir. Lock file "
+					          "contents:\n'{}'",
 					          lockFilePath.string(), data);
 					continue;
 				}
@@ -537,7 +550,8 @@ void StateManager::purgeTmpDirectories()
 				}
 				else
 				{
-					LOG_INFO("Parallel tmp directory '{}' lock time: {}", lockFilePath.string(), timeDiff);
+					LOG_INFO("[STATE MANAGER] Parallel tmp directory '{}' lock time: {}", lockFilePath.string(),
+					         timeDiff);
 				}
 			}
 		}
@@ -545,7 +559,7 @@ void StateManager::purgeTmpDirectories()
 		if (purge)
 		{
 			// Delete tmp dir
-			LOG_INFO("Purging tmp dir '{}': {}", maybeTmpDir.path().string(), purgeReason);
+			LOG_INFO("[STATE MANAGER] Purging tmp dir '{}': {}", maybeTmpDir.path().string(), purgeReason);
 			try
 			{
 				fs::remove_all(maybeTmpDir.path());
