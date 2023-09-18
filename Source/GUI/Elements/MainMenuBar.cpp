@@ -171,7 +171,7 @@ void MainMenuBar::showFileMenu()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Import Model"))
+		if (ImGui::MenuItem("Manage Models"))
 		{
 			App::getModule<UIModule>().getWindowManager().showUniqueWindow<ImportedModelsDialog>();
 		}

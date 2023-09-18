@@ -22,13 +22,16 @@ void GameObject::render(Shader* shader, glm::mat4 view, glm::mat4 projection, bo
 	objectShader->setWorldTransform(m_modelMatrix, view, projection);
 	objectShader->setUniforms();
 
-	glBindVertexArray(m_mesh->m_vao);
-	for (auto& meshPart : m_mesh->m_meshParts)
+	if (m_mesh)
 	{
-		objectShader->setUniformsPerMeshPart(meshPart);
-		m_mesh->renderMeshPart(meshPart);
+		glBindVertexArray(m_mesh->m_vao);
+		for (auto& meshPart : m_mesh->m_meshParts)
+		{
+			objectShader->setUniformsPerMeshPart(meshPart);
+			m_mesh->renderMeshPart(meshPart);
+		}
+		glBindVertexArray(0);
 	}
-	glBindVertexArray(0);
 }
 
 void GameObject::update(Scene& scene)

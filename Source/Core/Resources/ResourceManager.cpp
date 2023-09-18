@@ -26,6 +26,12 @@ ResourceManager& ResourceManager::instance()
 	return App::getModule<ResourceManager>();
 }
 
+bool ResourceManager::resourceExists(size_t id)
+{
+	auto it = m_resourceMap.find(id);
+	return it != m_resourceMap.end();
+}
+
 bool ResourceManager::resourceExists(std::string& alias)
 {
 	auto it = m_aliasMap.find(alias);
@@ -452,10 +458,12 @@ void ResourceManager::createDefaultResources(const std::vector<Resource>& defaul
 			}
 			break;
 		case ResourceType::Model:
+			m_forceModelNormalize = true;
 			if (mesh(resource.alias, resource.path))
 			{
 				registerDefault(resource.alias);
 			}
+			m_forceModelNormalize = false;
 			break;
 		}
 	}
@@ -522,7 +530,7 @@ GLuint ResourceManager::loadShader(const std::string& vertShader, const std::str
 Mesh* ResourceManager::loadModel(const std::string& path)
 {
 	LOG_INFO("[MODEL] Loading model from file: {}", path);
-	Mesh* mesh = Mesh::load(path, m_forceMinimumLoad);
+	Mesh* mesh = Mesh::load(path, m_forceModelNormalize, m_forceMinimumLoad);
 	if (mesh == nullptr)
 	{
 		LOG_ERROR("[MODEL] Failed to load model at '{}'!", path);
@@ -653,7 +661,7 @@ bool ResourceManager::removeResource(std::shared_ptr<Resource>& resource, bool f
 	return true;
 }
 
-bool ResourceManager::importModel(const fs::path& path)
+bool ResourceManager::importModel(const fs::path& path, bool normalize)
 {
 	StateManager& stateManager = App::getModule<StateManager>();
 
@@ -697,7 +705,12 @@ bool ResourceManager::importModel(const fs::path& path)
 
 	// Load the model from the tmp folder
 	LOG_INFO("[IMPORT] Loading model from scene data location ...");
+	if (normalize)
+		m_forceModelNormalize = true;
 	Mesh* newMesh = mesh(modelAlias, modelFiles->m_path.string());
+	if (normalize)
+		m_forceModelNormalize = false;
+
 	if (newMesh)
 	{
 		// Save the ResourceFile instance for later
@@ -757,6 +770,7 @@ Memento ResourceManager::saveState(Scene* scene)
 	resources.AddMember("imported", rapidjson::Value(rapidjson::kArrayType), a);
 	for (const auto& importedAlias : m_importedResources)
 	{
+		// We're assuming all Resources are models right now, as only models can be imported as of now
 		rapidjson::Value resource(rapidjson::kObjectType);
 
 		Ptr<Resource> resourcePtr = m_aliasMap.at(importedAlias).lock();
@@ -781,6 +795,9 @@ Memento ResourceManager::saveState(Scene* scene)
 		resource.AddMember("name", rapidjson::Value(importedAlias, a), a);
 		resource.AddMember("path", rapidjson::Value(path.string(), a), a);
 		resource.AddMember("type", rapidjson::Value(EnumUtils::name(ResourceType::Model), a), a);
+
+		Mesh* mesh = std::static_pointer_cast<Mesh>(resourcePtr->data).get();
+		resource.AddMember("normalize", rapidjson::Value().SetBool(mesh->m_normalized), a);
 
 		resources["imported"].PushBack(std::move(resource), a);
 	}
@@ -919,36 +936,60 @@ void ResourceManager::loadState(const Memento& memento, Scene* scene)
 			    "[LOAD] Loaded scene does not have a 'resources' entry. Might be an older save. Consider updating it.")
 			return;
 		}
-		if (auto resources = readResources(memento["resources"]["imported"]))
+
+		for (const auto& resource : memento["resources"]["imported"].GetArray())
 		{
-			for (const auto& resource : *resources)
+			const auto resourceName = std::string(resource["name"].GetString(), resource["name"].GetStringLength());
+			const auto resourcePath = std::string(resource["path"].GetString(), resource["path"].GetStringLength());
+			const auto resourceType = std::string(resource["type"].GetString(), resource["type"].GetStringLength());
+
+			// Model specific
+			bool normalize = false;
+			if (resource.HasMember("normalize"))
 			{
-				// The resource path should be relative to the .scene file's parent folder
-				fs::path path = scene->m_path.parent_path() / fs::path(resource.path);
-				Mesh* newMesh = mesh(resource.alias, path.string());
-				if (newMesh)
+				normalize = resource["normalize"].GetBool();
+			}
+
+			const auto maybeType = magic_enum::enum_cast<Core::ResourceType>(resourceType);
+			if (!maybeType.has_value())
+			{
+				LOG_ERROR("Resource {} has unknown type!", resource["name"].GetString());
+				continue;
+			}
+
+			// The resource path should be relative to the .scene file's parent folder
+			fs::path path = scene->m_path.parent_path() / fs::path(resourcePath);
+
+			// Load model resource
+			if (normalize)
+				RMI.m_forceModelNormalize = true;
+			Mesh* newMesh = mesh(resourceName, path.string());
+			if (normalize)
+				RMI.m_forceModelNormalize = false;
+
+			if (newMesh)
+			{
+				// Fetch files for the mesh for future use
+				Ptr<ResourceFiles> modelFiles = std::make_shared<ModelResourceFiles>(path.string(), resourceName);
+				if (!modelFiles->fetchFiles(newMesh))
 				{
-					// Fetch files for the mesh for future use
-					Ptr<ResourceFiles> modelFiles = std::make_shared<ModelResourceFiles>(path.string(), resource.alias);
-					if (!modelFiles->fetchFiles(newMesh))
-					{
-						LOG_ERROR("[IMPORT] Failed to fetch files for imported model '{}'!", resource.alias);
-					}
-					else
-					{
-						Ptr<Resource> modelResource = resourceByAlias(resource.alias);
-						modelResource->resourceFiles = modelFiles;
-					}
-					counter++;
-					m_importedResources.push_back(resource.alias);
+					LOG_ERROR("[IMPORT] Failed to fetch files for imported model '{}'!", resourceName);
 				}
 				else
 				{
-					LOG_ERROR("[IMPORT] Failed to load imported model '{}'!", resource.alias);
-					failCounter++;
+					Ptr<Resource> modelResource = resourceByAlias(resourceName);
+					modelResource->resourceFiles = modelFiles;
 				}
+				counter++;
+				m_importedResources.push_back(resourceName);
+			}
+			else
+			{
+				LOG_ERROR("[IMPORT] Failed to load imported model '{}'!", resourceName);
+				failCounter++;
 			}
 		}
+
 		LOG_INFO("");
 		LOG_INFO("[RESOURCE MANAGER] Loaded {} imported resources.{}", std::to_string(counter),
 		         (failCounter > 0 ? std::string(" Failed to load ") + std::to_string(failCounter) + " resource" +

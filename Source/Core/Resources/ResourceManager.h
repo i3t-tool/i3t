@@ -76,13 +76,16 @@ private:
 	std::set<Ptr<ResourceFiles>, decltype(resFilesCmp)> m_filesToAddOnSave;
 
 public:
-	bool m_forceReload{false};      /// If true any resource fetches will not be cached
-	bool m_forceMinimumLoad{false}; /// If true just the bare minimum of resources is loaded
+	// NOTE: That these flags are NOT atomic
+	bool m_forceReload{false};         /// If true any resource fetches will not be cached
+	bool m_forceMinimumLoad{false};    /// If true just the bare minimum of resources is loaded
+	bool m_forceModelNormalize{false}; /// If true loaded models will be normalized
 
 	~ResourceManager();
 
 	static ResourceManager& instance();
 
+	bool resourceExists(size_t id);
 	bool resourceExists(std::string& alias);
 
 	/**
@@ -227,7 +230,7 @@ public:
 	// SCENE LOAD/SAVE
 	//////////////////////////////////////////////////////
 
-	bool importModel(const fs::path& path);
+	bool importModel(const fs::path& path, bool normalize);
 	bool removeImportedModel(const std::string& alias);
 
 	Memento saveState(Scene* scene) override;
