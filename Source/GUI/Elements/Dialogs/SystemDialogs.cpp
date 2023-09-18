@@ -4,10 +4,10 @@
 
 #include "portable-file-dialogs.h"
 
-bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const std::string& title,
-                                         const std::string& root, const std::vector<std::string>& filter)
+bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
+                                         const std::vector<std::string>& filter)
 {
-	auto dialog = pfd::open_file(title, root, filter);
+	auto dialog = pfd::open_file(title, root.make_preferred().string(), filter, pfd::opt::force_path);
 
 	while (!dialog.ready(40) && result.empty())
 	{
@@ -29,10 +29,11 @@ bool SystemDialogs::OpenSingleFileDialog(std::filesystem::path& result, const st
 	return false;
 }
 
-bool SystemDialogs::SaveSingleFileDialog(std::filesystem::path& result, const std::string& title,
-                                         const std::string& root, const std::vector<std::string>& filter)
+bool SystemDialogs::SaveSingleFileDialog(std::filesystem::path& result, const std::string& title, fs::path root,
+                                         const std::vector<std::string>& filter)
 {
-	auto destination = pfd::save_file(title, root, filter).result();
+	auto destination = pfd::save_file(title, root.make_preferred().string(), filter, pfd::opt::force_path).result();
+
 	if (!destination.empty())
 	{
 		result = destination;

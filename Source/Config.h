@@ -26,6 +26,9 @@
 struct Configuration
 {
 	std::vector<Core::Resource> Resources;
+
+	static inline const fs::path root = fs::current_path();
+	static inline const fs::path sceneRoot = root / "Data/Scenes";
 };
 
 Ptr<Configuration> loadConfig(const fs::path& filename);

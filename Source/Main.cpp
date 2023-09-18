@@ -61,6 +61,7 @@
 #include <string>
 
 #include "Commands/ApplicationCommands.h"
+#include "Config.h"
 #include "I3T.h"
 #include "Logger/Logger.h"
 
@@ -127,7 +128,7 @@ int main(int argc, char* argv[])
 	// init the logging library
 	INIT_LOGGER(argc, argv);
 
-	LOG_INFO("Working directory is {}.", std::filesystem::current_path().string());
+	LOG_INFO("Working directory is {}.", Configuration::root.string());
 
 	// Get application instance.
 	{
