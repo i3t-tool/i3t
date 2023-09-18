@@ -1,3 +1,5 @@
+#include "Node.h"
+
 #include "Logger/Logger.h"
 #include "diwne_include.h"
 
@@ -13,10 +15,7 @@ Node::Node(DIWNE::Diwne& diwne, DIWNE::ID id, std::string const labelDiwne /*="D
 
 Node::~Node()
 {
-	if (m_selected)
-	{
-		diwne.setNodesSelectionChanged(true);
-	}
+	deleteActionDiwne();
 }
 
 Node& Node::operator=(const Node& rhs)
@@ -29,7 +28,16 @@ Node& Node::operator=(const Node& rhs)
 
 void Node::deleteActionDiwne()
 {
+	if (m_toDelete) // Only delete once
+		return;
+
 	deleteAction();
+
+	if (m_selected)
+	{
+		diwne.setNodesSelectionChanged(true);
+	}
+
 	if (diwne.getLastActiveNode<DIWNE::Node>().get() == this)
 	{
 		diwne.setLastActiveNode<DIWNE::Node>(nullptr);
