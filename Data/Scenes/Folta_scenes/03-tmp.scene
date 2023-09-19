@@ -10,171 +10,91 @@
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    596.3330078125,
-                    -75.2381362915039
+                    543.0,
+                    252.0
                 ],
                 "type": "Inversion"
-            }
-        ],
-        "sequences": [
+            },
+            {
+                "id": 8,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    242.0,
+                    203.0
+                ],
+                "type": "MakeTranslation"
+            },
+            {
+                "id": 11,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    87.0,
+                    164.0
+                ],
+                "type": "Vector3ToVector3",
+                "value": [
+                    -0.20000000298023225,
+                    0.699999988079071,
+                    -10.199999809265137
+                ]
+            },
             {
                 "id": 4,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    853.3804931640625,
-                    130.71426391601563
+                    919.0,
+                    204.0
+                ],
+                "type": "MatrixMulMatrix"
+            }
+        ],
+        "sequences": [
+            {
+                "id": 14,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    1193.0,
+                    193.0
                 ],
                 "transforms": []
             },
             {
-                "id": 10,
+                "id": 20,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    71.2381820678711,
-                    -76.28573608398438
-                ],
-                "transforms": [
-                    {
-                        "id": 16,
-                        "render": true,
-                        "numberOfDecimals": 1,
-                        "LOD": "Full",
-                        "position": [
-                            91.0,
-                            -46.0
-                        ],
-                        "type": "Translation",
-                        "defaultValues": {
-                            "translation": [
-                                -3.0999999046325685,
-                                0.0,
-                                2.0
-                            ]
-                        },
-                        "savedDefaults": {},
-                        "value": [
-                            [
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0
-                            ],
-                            [
-                                -3.0999999046325685,
-                                0.0,
-                                2.0,
-                                1.0
-                            ]
-                        ],
-                        "synergies": false,
-                        "locked": true
-                    }
-                ]
-            },
-            {
-                "id": 17,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    319.76171875,
-                    131.6666259765625
+                    418.857177734375,
+                    30.5714111328125
                 ],
                 "transforms": []
             },
             {
-                "id": 30,
+                "id": 26,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    596.0758666992188,
-                    -418.3620300292969
+                    727.000244140625,
+                    10.59999942779541
                 ],
                 "transforms": [
                     {
-                        "id": 36,
+                        "id": 32,
                         "render": true,
                         "numberOfDecimals": 1,
                         "LOD": "Full",
                         "position": [
-                            616.0,
-                            -388.0
-                        ],
-                        "type": "Scale",
-                        "defaultValues": {
-                            "scale": [
-                                2.5,
-                                2.5,
-                                2.5
-                            ]
-                        },
-                        "savedDefaults": {},
-                        "value": [
-                            [
-                                2.5,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                2.5,
-                                0.0,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                0.0,
-                                2.5,
-                                0.0
-                            ],
-                            [
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0
-                            ]
-                        ],
-                        "synergies": true,
-                        "locked": true
-                    }
-                ]
-            },
-            {
-                "id": 23,
-                "render": true,
-                "numberOfDecimals": 1,
-                "LOD": "Full",
-                "position": [
-                    584.3330078125,
-                    132.31422424316407
-                ],
-                "transforms": [
-                    {
-                        "id": 29,
-                        "render": true,
-                        "numberOfDecimals": 1,
-                        "LOD": "Full",
-                        "position": [
-                            604.0,
-                            163.0
+                            747.0,
+                            41.0
                         ],
                         "type": "EulerY",
                         "defaultValues": {
@@ -211,6 +131,65 @@
                         "locked": true
                     }
                 ]
+            },
+            {
+                "id": 33,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    685.028564453125,
+                    -266.74285888671877
+                ],
+                "transforms": [
+                    {
+                        "id": 39,
+                        "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
+                        "position": [
+                            705.0,
+                            -236.0
+                        ],
+                        "type": "Scale",
+                        "defaultValues": {
+                            "scale": [
+                                2.5999999046325685,
+                                2.5999999046325685,
+                                2.5999999046325685
+                            ]
+                        },
+                        "savedDefaults": {},
+                        "value": [
+                            [
+                                2.5999999046325685,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                2.5999999046325685,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                2.5999999046325685,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        ],
+                        "synergies": true,
+                        "locked": true
+                    }
+                ]
             }
         ],
         "cycles": [],
@@ -218,16 +197,16 @@
         "screens": [],
         "models": [
             {
-                "id": 39,
+                "id": 40,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    843.6559448242188,
-                    -416.8954162597656
+                    1430.0,
+                    156.0
                 ],
-                "model": "Duck",
-                "visible": false,
+                "model": "default_cube",
+                "visible": true,
                 "showAxes": true,
                 "opaque": true,
                 "opacity": 0.5,
@@ -238,16 +217,16 @@
                 ]
             },
             {
-                "id": 37,
+                "id": 42,
                 "render": true,
                 "numberOfDecimals": 1,
                 "LOD": "Full",
                 "position": [
-                    1082.9521484375,
-                    129.7142791748047
+                    960.228515625,
+                    -267.9428405761719
                 ],
-                "model": "default_cube",
-                "visible": true,
+                "model": "Teapot",
+                "visible": false,
                 "showAxes": true,
                 "opaque": true,
                 "opacity": 0.5,
@@ -261,14 +240,56 @@
         "transforms": [],
         "edges": [
             [
-                10,
-                1,
+                8,
+                0,
                 1,
                 0
             ],
             [
-                23,
+                11,
                 0,
+                8,
+                0
+            ],
+            [
+                4,
+                0,
+                14,
+                1
+            ],
+            [
+                8,
+                0,
+                20,
+                1
+            ],
+            [
+                20,
+                0,
+                26,
+                0
+            ],
+            [
+                20,
+                0,
+                33,
+                0
+            ],
+            [
+                14,
+                0,
+                40,
+                0
+            ],
+            [
+                33,
+                0,
+                42,
+                0
+            ],
+            [
+                26,
+                2,
                 4,
                 0
             ],
@@ -277,36 +298,6 @@
                 0,
                 4,
                 1
-            ],
-            [
-                10,
-                1,
-                17,
-                1
-            ],
-            [
-                30,
-                0,
-                39,
-                0
-            ],
-            [
-                4,
-                0,
-                37,
-                0
-            ],
-            [
-                10,
-                0,
-                30,
-                0
-            ],
-            [
-                17,
-                0,
-                23,
-                0
             ]
         ]
     }

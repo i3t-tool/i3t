@@ -1,27 +1,15 @@
 {
+    "readOnly": true,
+    "resources": {
+        "imported": []
+    },
     "workspace": {
         "operators": [
             {
-                "id": 1839,
+                "id": 3336,
                 "render": true,
-                "position": [
-                    246.4626007080078,
-                    -16.713502883911134
-                ],
-                "type": "NormalizeVector3"
-            },
-            {
-                "id": 1842,
-                "render": true,
-                "position": [
-                    507.1294860839844,
-                    -10.7135009765625
-                ],
-                "type": "Vector3MulFloat"
-            },
-            {
-                "id": 1846,
-                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     684.8624267578125,
                     -9.646833419799805
@@ -29,8 +17,10 @@
                 "type": "Vector3ToFloats"
             },
             {
-                "id": 1851,
+                "id": 3341,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     896.1298217773438,
                     -10.380169868469239
@@ -38,26 +28,10 @@
                 "type": "FloatsToQuat"
             },
             {
-                "id": 1857,
+                "id": 3355,
                 "render": true,
-                "position": [
-                    245.86265563964845,
-                    481.21978759765627
-                ],
-                "type": "FloatDivFloat"
-            },
-            {
-                "id": 1864,
-                "render": true,
-                "position": [
-                    438.8627014160156,
-                    482.21978759765627
-                ],
-                "type": "FloatSinCos"
-            },
-            {
-                "id": 1868,
-                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     896.7967529296875,
                     114.61984252929688
@@ -65,8 +39,10 @@
                 "type": "NormalizeQuat"
             },
             {
-                "id": 1871,
+                "id": 3358,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     900.7958984375,
                     176.28651428222657
@@ -74,17 +50,22 @@
                 "type": "QuatToMatrix"
             },
             {
-                "id": 1874,
+                "id": 3371,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
-                    900.5963134765625,
-                    518.9528198242188
+                    246.4626007080078,
+                    -16.713502883911134
                 ],
-                "type": "MakeAxisAngle"
+                "type": "NormalizeVector3"
             },
             {
-                "id": 1878,
+                "id": 3368,
+                "label": "Osa otáčení",
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     107.12939453125,
                     -15.7135009765625
@@ -97,20 +78,70 @@
                 ]
             },
             {
-                "id": 1861,
+                "id": 3332,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    507.1294860839844,
+                    -10.7135009765625
+                ],
+                "type": "Vector3MulFloat"
+            },
+            {
+                "id": 3365,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     17.862743377685548,
                     499.2197570800781
                 ],
                 "type": "FloatToFloat",
                 "value": 2.0
+            },
+            {
+                "id": 3351,
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    438.8627014160156,
+                    482.21978759765627
+                ],
+                "type": "FloatSinCos"
+            },
+            {
+                "id": 3347,
+                "label": "Úhel / 2",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    245.86265563964845,
+                    481.21978759765627
+                ],
+                "type": "FloatDivFloat"
+            },
+            {
+                "id": 3361,
+                "label": " rotace jako rotační matice",
+                "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
+                "position": [
+                    900.5963134765625,
+                    518.9528198242188
+                ],
+                "type": "MakeAxisAngle"
             }
         ],
         "sequences": [
             {
-                "id": 1881,
+                "id": 3374,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     1170.5333251953126,
                     157.86679077148438
@@ -118,8 +149,10 @@
                 "transforms": []
             },
             {
-                "id": 1901,
+                "id": 3380,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     1491.200439453125,
                     499.5332946777344
@@ -127,24 +160,29 @@
                 "transforms": []
             },
             {
-                "id": 1887,
+                "id": 3393,
+                "label": "Společný posun obou kostek",
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     863.5327758789063,
                     326.5333557128906
                 ],
                 "transforms": [
                     {
-                        "id": 1893,
+                        "id": 3399,
                         "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            882.9529418945313,
-                            357.1136779785156
+                            922.5670166015625,
+                            357.2003479003906
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
-                                2.200000047683716,
+                                2.0999999046325685,
                                 0.0,
                                 2.700000047683716
                             ]
@@ -170,37 +208,41 @@
                                 0.0
                             ],
                             [
-                                2.200000047683716,
+                                2.0999999046325685,
                                 0.0,
                                 2.700000047683716,
                                 1.0
                             ]
                         ],
                         "synergies": false,
-                        "locked": true,
-                        "LOD": "Full"
+                        "locked": true
                     }
                 ]
             },
             {
-                "id": 1894,
+                "id": 3386,
+                "label": "Relativní posun zelené",
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     1218.533447265625,
                     328.1996765136719
                 ],
                 "transforms": [
                     {
-                        "id": 1900,
+                        "id": 3392,
                         "render": true,
+                        "numberOfDecimals": 1,
+                        "LOD": "Full",
                         "position": [
-                            1238.3814697265626,
-                            358.25653076171877
+                            1256.5670166015626,
+                            358.5336608886719
                         ],
                         "type": "Translation",
                         "defaultValues": {
                             "translation": [
-                                2.700000047683716,
+                                0.30000001192092898,
                                 0.0,
                                 0.0
                             ]
@@ -226,35 +268,45 @@
                                 0.0
                             ],
                             [
-                                2.700000047683716,
+                                0.30000001192092898,
                                 0.0,
                                 0.0,
                                 1.0
                             ]
                         ],
                         "synergies": false,
-                        "locked": true,
-                        "LOD": "Full"
+                        "locked": true
                     }
                 ]
             }
         ],
         "cycles": [
             {
-                "id": 1907,
+                "id": 3400,
+                "label": "cycle - Úhel natočení",
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     -2.87060546875,
                     169.2864990234375
-                ]
+                ],
+                "from": 0.0,
+                "to": 10.0,
+                "manualStep": 0.10000000149011612,
+                "step": 0.699999988079071,
+                "stepDuration": 0.5,
+                "smooth": true
             }
         ],
         "cameras": [],
         "screens": [],
         "models": [
             {
-                "id": 1923,
+                "id": 3418,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     1528.06591796875,
                     142.2666473388672
@@ -271,8 +323,10 @@
                 ]
             },
             {
-                "id": 1925,
+                "id": 3416,
                 "render": true,
+                "numberOfDecimals": 1,
+                "LOD": "Full",
                 "position": [
                     1765.331787109375,
                     505.33343505859377
@@ -292,136 +346,136 @@
         "transforms": [],
         "edges": [
             [
-                1881,
+                3374,
                 0,
-                1923,
+                3418,
                 0
             ],
             [
-                1901,
+                3380,
                 0,
-                1925,
+                3416,
                 0
             ],
             [
-                1878,
+                3332,
                 0,
-                1839,
+                3336,
                 0
             ],
             [
-                1864,
+                3336,
                 0,
-                1842,
+                3341,
                 0
             ],
             [
-                1839,
-                0,
-                1842,
-                1
-            ],
-            [
-                1842,
-                0,
-                1846,
-                0
-            ],
-            [
-                1846,
-                0,
-                1851,
-                0
-            ],
-            [
-                1846,
+                3336,
                 1,
-                1851,
+                3341,
                 1
             ],
             [
-                1846,
+                3336,
                 2,
-                1851,
+                3341,
                 2
             ],
             [
-                1864,
+                3351,
                 1,
-                1851,
+                3341,
                 3
             ],
             [
-                1907,
+                3341,
                 0,
-                1857,
+                3355,
                 0
             ],
             [
-                1861,
+                3355,
                 0,
-                1857,
+                3358,
+                0
+            ],
+            [
+                3368,
+                0,
+                3371,
+                0
+            ],
+            [
+                3393,
+                0,
+                3374,
+                0
+            ],
+            [
+                3358,
+                0,
+                3374,
                 1
             ],
             [
-                1857,
+                3386,
                 0,
-                1864,
+                3380,
                 0
             ],
             [
-                1851,
+                3361,
                 0,
-                1868,
-                0
-            ],
-            [
-                1868,
-                0,
-                1871,
-                0
-            ],
-            [
-                1907,
-                0,
-                1874,
-                0
-            ],
-            [
-                1839,
-                0,
-                1874,
+                3380,
                 1
             ],
             [
-                1887,
+                3351,
                 0,
-                1881,
+                3332,
                 0
             ],
             [
-                1871,
+                3371,
                 0,
-                1881,
+                3332,
                 1
             ],
             [
-                1894,
+                3393,
                 0,
-                1901,
+                3386,
                 0
             ],
             [
-                1874,
+                3347,
                 0,
-                1901,
+                3351,
+                0
+            ],
+            [
+                3400,
+                0,
+                3347,
+                0
+            ],
+            [
+                3365,
+                0,
+                3347,
                 1
             ],
             [
-                1887,
+                3400,
                 0,
-                1894,
+                3361,
                 0
+            ],
+            [
+                3371,
+                0,
+                3361,
+                1
             ]
         ]
     }
