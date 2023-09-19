@@ -66,6 +66,10 @@ bool Core::ModelResourceFiles::fetchFiles(void* data)
 				}
 			}
 		}
+		else if (ext.string() == ".glb")
+		{
+			// No need to copy anything
+		}
 		else if (ext.string() == ".obj")
 		{
 			// Need to also copy matching .mtl file

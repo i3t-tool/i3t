@@ -691,8 +691,8 @@ bool ResourceManager::importModel(const fs::path& path, bool normalize)
 	Ptr<ResourceFiles> modelFiles = std::make_shared<ModelResourceFiles>(path, modelAlias);
 	if (!modelFiles->fetchFiles())
 	{
-		LOG_ERROR("[IMPORT] Failed to fetch model files for model at '{}'! The model import will likely fail.",
-		          path.string());
+		LOG_ERROR("[IMPORT] Failed to fetch model files for model at '{}'! Cannot import model.", path.string());
+		return false;
 	}
 
 	// Move model files to the tmp folder
