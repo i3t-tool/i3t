@@ -376,12 +376,10 @@ void StateManager::setWindowTitle()
 		{
 			sceneName += " (Read-only)";
 		}
-		else
+
+		if (isDirty())
 		{
-			if (isDirty())
-			{
-				sceneName += " - Unsaved";
-			}
+			sceneName += " - Unsaved";
 		}
 	}
 
