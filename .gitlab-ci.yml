@@ -1,16 +1,9 @@
 # Run pipeline only on master branch, tags and merge requests
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "develop"
-    - changes:
-      - CMakeLists.txt
-      - .clang-format
-      - .clang-tidy
-      - Dependencies
-      - "*.{cpp|h}"
-      - "**/*.{cpp|h}"
+    - if: ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "develop")
 
 image: cvutdcgi/i3t-ci
 
@@ -21,9 +14,23 @@ stages:
   - test
   - release
 
+# How to write paths: https://stackoverflow.com/a/55391444
+.changes-rules:
+  cpp:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - CMakeLists.txt
+        - .clang-format
+        - .clang-tidy
+        - Dependencies
+        - "**/*.{h,cpp}"
+        - "**/*.{h,cpp}"
+
 # Linting phase
 check-format:
   stage: pre-lint
+  rules:
+    - !reference [.changes-rules, cpp]
   script:
     - bash Scripts/CheckFormat.sh
 
@@ -31,6 +38,8 @@ check-format:
 
 build-app:
   stage: build
+  rules:
+    - !reference [.changes-rules, cpp]
   script:
     - mkdir out && cd out
     - cmake ..
@@ -46,6 +55,8 @@ build-app:
 
 build-tests:
   stage: build
+  rules:
+    - !reference [.changes-rules, cpp]
   script:
     - mkdir out && cd out
     - cmake -DCMAKE_BUILD_TYPE=Debug ..
@@ -64,6 +75,8 @@ build-tests:
 # run tests using the binary built before
 test:
   stage: test
+  rules:
+    - !reference [.changes-rules, cpp]
   script:
     - bash Scripts/RunTests.sh
   dependencies:
