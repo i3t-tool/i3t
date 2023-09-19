@@ -84,7 +84,7 @@ void MainScene::init()
 
 	// Lights
 	m_sun1 = new SunLight();
-	m_sun1->intensity = 0.8f;
+	m_sun1->intensity = 1.0f;
 	m_sun1->color = glm::vec3(0.93, 0.98, 1.0);
 	m_sun1->direction = m_sun1_dir;
 	m_sun1->pos = glm::vec3(0, 4, 0);
