@@ -7,6 +7,7 @@
 #include "imgui_internal.h"
 
 #include "Commands/ApplicationCommands.h"
+#include "Core/Defs.h"
 #include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Modals/RemoveModelModal.h"
 #include "GUI/Elements/Windows/WorkspaceWindow.h"
@@ -27,7 +28,7 @@ void ImportedModelsDialog::render()
 	ImVec2 windowSize = ImVec2(ImGui::GetFontSize() * 30, ImGui::GetFontSize() * 24);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Once, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-	ImGui::Begin(setName("Imported Models").c_str(), &m_show, g_dialogFlags);
+	ImGui::Begin(setName("Manage Models").c_str(), &m_show, g_dialogFlags);
 	{
 		std::vector<std::string> resourceAliases = RMI.getImportedResourceAliases();
 
@@ -162,22 +163,37 @@ void ImportedModelsDialog::render()
 
 void ImportedModelsDialog::importModel(bool normalize)
 {
-	std::filesystem::path modelFile;
-	if (importContentDialog(modelFile, "Import model"))
+	int counter = 0;
+	int failCounter = 0;
+	std::vector<fs::path> modelFiles;
+	if (importContentDialog(modelFiles, "Import model(s)"))
 	{
 		StateManager& stateManager = Application::getModule<StateManager>();
-		Application::getModule<Core::ResourceManager>().importModel(modelFile, normalize);
-		stateManager.takeSnapshot();
+		for (const auto& modelFile : modelFiles)
+		{
+			if (Application::getModule<Core::ResourceManager>().importModel(modelFile, normalize))
+				counter++;
+			else
+				failCounter++;
+		}
+
 		// TODO: (DR) Is undoing model import a good idea? Does taking snapshots even make sens in
 		//   the context of physical model files?
+		stateManager.takeSnapshot();
 	}
+	LOG_INFO("");
+	LOG_INFO("[IMPORT] Imported {} resources.{}", std::to_string(counter),
+	         (failCounter > 0 ? std::string(" Failed to import ") + std::to_string(failCounter) + " resource" +
+	                                (failCounter == 1 ? "" : "s") + "."
+	                          : ""));
+	LOG_INFO("");
 }
 
-bool ImportedModelsDialog::importContentDialog(std::filesystem::path& result, const std::string& title)
+bool ImportedModelsDialog::importContentDialog(std::vector<fs::path>& result, const std::string& title)
 {
 	static std::vector<std::string> filter = {"All files", "*"};
 
-	return SystemDialogs::OpenSingleFileDialog(result, title, "./", filter);
+	return SystemDialogs::OpenFilesDialog(result, title, "./", filter);
 }
 
 void ImportedModelsDialog::maybeRemoveModel(const std::string& alias)

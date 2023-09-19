@@ -23,7 +23,7 @@ public:
 	void render() override;
 
 	static void importModel(bool normalize);
-	static bool importContentDialog(std::filesystem::path& result, const std::string& title);
+	static bool importContentDialog(std::vector<std::filesystem::path>& result, const std::string& title);
 
 	static void maybeRemoveModel(const std::string& alias);
 	static void removeModel(const std::string& alias);
