@@ -14,6 +14,8 @@
 #include "Core/Input/InputManager.h"
 #include "Utils/JSON.h"
 
+#define DEFAULT_LOG_PATTERN "[%H:%M:%S] [%l]: %v"
+
 struct LoggingToggle final
 {
 	static Keys::Code KEY_LoggingToggle_popUps;
@@ -28,7 +30,7 @@ Logger::Logger()
 	std::vector<spdlog::sink_ptr> sinks;
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
 	sinks[0]->set_level(spdlog::level::trace);
-	sinks[0]->set_pattern("[%l]: %v");
+	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
 	logger = std::make_shared<spdlog::logger>("basic_logger", sinks.begin(), sinks.end());
@@ -58,15 +60,14 @@ void Logger::initLogger(int argc, char* argv[])
 {
 	loadStrings();
 
-	spdlog::set_pattern("[%l]: %v");
+	spdlog::set_pattern(DEFAULT_LOG_PATTERN);
 
 	// Console sink.
 	std::vector<spdlog::sink_ptr> sinks;
 	sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
 	// sinks.push_back(std::make_shared<spdlog::sinks::ostream_sink_st>(m_buffer));
 	sinks[0]->set_level(spdlog::level::trace);
-	// sinks[0]->set_pattern("[%d.%m.%Y %T:%e]: %v");
-	sinks[0]->set_pattern("[%l]: %v");
+	sinks[0]->set_pattern(DEFAULT_LOG_PATTERN);
 
 	appLogger = std::make_shared<spdlog::logger>("app_logger", sinks.begin(), sinks.end());
 	appLogger->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/main.log"));
