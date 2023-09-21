@@ -1,44 +1,72 @@
-Test/State/TestScene.json
-/UserData/
-/*.zip
+# reordered .gitignore file
 
+
+# Compilation directory
+# ----------------------------------------------------------------------
+/Binaries/
+
+
+# IDE - are all necessary? Most of them are in already ignored /Binaries
+# ----------------------------------------------------------------------
 .idea/
-/Docs/Doxygen/html/
-*.swp
-
+bin/
+lib/
+x64/
+out/
+.vs/
 *.sln
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+
+
+# cmake and doxygen
+# ----------------------------------------------------------------------
 *.cmake
+cmake-*
 cmake_install.cmake
 CMakeFiles/
 CMakeDoxyfile.in
 CMakeCache.txt
-Dependencies/picoc/cmake_install.cmake
+/CmakeOutputDebug/
+CMakeSettings.json
+/CMakeSettings.json
+/Docs/Doxygen/html/
+
+# system and other generated files
+# ----------------------------------------------------------------------
 *.bak
 *.lnk
-
-/Binaries/
-I3T.dir/
-I3TTEST.dir/
-picoc.dir/
-bin/
-lib/
-x64/
-cmake-*
-Solution/
-out/
+*.swp
 *.dll
 *.lib
 *.exe
 *.obj
-!/data/models/*.obj
-/CmakeOutputDebug/
-CMakeSettings.json
+/*.zip
+
+# Working files while the program is running
+# ----------------------------------------------------------------------
+Test/State/TestScene.json
+/UserData/
 Data/imgui.ini
-.vs/
 logs/
-/CMakeSettings.json
+
+
+# Obsolete entries - to be removed
+# ----------------------------------------------------------------------
+Dependencies/picoc/cmake_install.cmake
+picoc.dir/
+!/data/models/*.obj
 /Data/tutorials/tutorial
+
+# Temporary entries during development - to be removed 
+# ----------------------------------------------------------------------
 temp/
+I3T.dir/
+I3TTEST.dir/
+Solution/
+# PF:
+/Data/Scenes/tests-PF
+/Data/Scenes/scenes-new
+/Data/Scenes/Folta_scenes/tests
+/Data/Scenes/Folta_scenes/new-236-kill
