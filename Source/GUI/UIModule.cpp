@@ -9,6 +9,7 @@
 #include "Core/Result.h"
 #include "GUI/Elements/MainMenuBar.h"
 #include "GUI/Elements/Modals/BeforeCloseModal.h"
+#include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StartWindow.h"
@@ -56,6 +57,7 @@ void UIModule::init()
 	m_windowManager.addWindow(std::make_shared<Console>(false));
 	m_windowManager.addWindow(std::make_shared<LogWindow>());
 	m_windowManager.addWindow(std::make_shared<StyleEditor>());
+	m_windowManager.addWindow(std::make_shared<AboutWindow>());
 
 	HideWindowCommand::addListener([this](const std::string& id) {
 		m_windowManager.removeWindow(id);
