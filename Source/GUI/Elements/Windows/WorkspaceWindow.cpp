@@ -460,12 +460,12 @@ void WorkspaceDiwne::popupContent()
 		{
 			addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Free>>();
 		}
-		if (ImGui::MenuItem("translation"))
+		if (ImGui::MenuItem("translate"))
 		{
 			addNodeToPositionOfPopup<WorkspaceTransformation_s<Core::ETransformType::Translation>>();
 		}
 
-		if (ImGui::BeginMenu("rotation"))
+		if (ImGui::BeginMenu("rotate"))
 		{
 
 			if (ImGui::MenuItem("eulerAngleX"))
@@ -529,15 +529,15 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeTranslation>>();
 			}
-			if (ImGui::MenuItem("euler AngleX"))
+			if (ImGui::MenuItem("eulerAngleX"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeEulerX>>();
 			}
-			if (ImGui::MenuItem("euler AngleY"))
+			if (ImGui::MenuItem("eulerAngleY"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeEulerY>>();
 			}
-			if (ImGui::MenuItem("euler AngleZ"))
+			if (ImGui::MenuItem("eulerAngleZ"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::MakeEulerZ>>();
 			}
@@ -780,10 +780,6 @@ void WorkspaceDiwne::popupContent()
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::ClampFloat>>();
 			}
-			if (ImGui::MenuItem("float cycle"))
-			{
-				addNodeToPositionOfPopup<WorkspaceCycle>();
-			}
 			if (ImGui::MenuItem("float * float"))
 			{
 				addNodeToPositionOfPopup<WorkspaceOperator<Core::EOperatorType::FloatMulFloat>>();
@@ -911,6 +907,10 @@ void WorkspaceDiwne::popupContent()
 	if (ImGui::MenuItem("screen"))
 	{
 		addNodeToPositionOfPopup<WorkspaceScreen>();
+	}
+	if (ImGui::MenuItem("cycle"))
+	{
+		addNodeToPositionOfPopup<WorkspaceCycle>();
 	}
 
 	ImGui::Separator();
