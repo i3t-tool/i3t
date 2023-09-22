@@ -61,13 +61,13 @@ public:
 class WorkspaceAngleAxisToQuat : public WorkspaceOperator<Core::EOperatorType::AngleAxisToQuat>
 {
 public:
-	bool m_halfAngle;
+	bool m_halfAngle; ///< true == pin index 1, false == pin index 0 (full angle)
 	WorkspaceAngleAxisToQuat(DIWNE::Diwne& diwne)
 	    : WorkspaceOperator<Core::EOperatorType::AngleAxisToQuat>(diwne),
 	      m_halfAngle(false) /* true == pin index 1, false == pin index 0 */
 	{}
 
-	bool leftContent()
+	bool leftContent() override
 	{
 		bool interaction_happen = false;
 

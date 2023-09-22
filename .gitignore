@@ -44,6 +44,11 @@ CMakeSettings.json
 *.obj
 /*.zip
 
+# Files used during development - to be preserved, but not put to release
+# ----------------------------------------------------------------------
+# /Data/Scenes/todo
+# /Data/Scenes/unit-tests
+
 # Working files while the program is running
 # ----------------------------------------------------------------------
 Test/State/TestScene.json
