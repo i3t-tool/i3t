@@ -463,7 +463,7 @@ static const std::vector<Operation> operations = {
     {n(EOperatorType::FloatToFloat), "float", true, 1, floatInput, 1, floatInput},
     {n(EOperatorType::Vector3ToVector3), "vec3", true, 1, vector3Input, 1, vector3Input},
     {n(EOperatorType::Vector4ToVector4), "vec4", true, 1, vectorInput, 1, vectorInput},
-    {n(EOperatorType::MatrixToMatrix), "mat", true, 1, matrixInput, 1, matrixInput},
+    {n(EOperatorType::MatrixToMatrix), "matrix", true, 1, matrixInput, 1, matrixInput},
     {n(EOperatorType::QuatToQuat), "quat", true, 1, {EValueType::Quat}, 1, {EValueType::Quat}},
 
     // Transform matrices constructors
@@ -515,8 +515,9 @@ static const Operation g_CycleProperties = {
 };
 // clang-format on
 
-inline const Operation g_sequence = {
-    "Sequence", "seq", 2, matrixMulAndMatrixInput, 3, {EValueType::MatrixMul, EValueType::Matrix, EValueType::Matrix}};
+inline const Operation g_sequence = {"Sequence", "sequence",
+                                     2,          matrixMulAndMatrixInput,
+                                     3,          {EValueType::MatrixMul, EValueType::Matrix, EValueType::Matrix}};
 
 inline const Operation g_cameraProperties = {
     "Camera", "camera", 0, {}, 3, {EValueType::Screen, EValueType::Matrix, EValueType::MatrixMul}};
