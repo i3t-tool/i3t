@@ -165,6 +165,11 @@ std::vector<Ptr<GuiNode>> createFrom(const Memento& memento)
 		{
 			mesh->m_tint = JSON::getVec3(value["tint"].GetArray());
 		}
+
+		if (value.HasMember("tintStrength"))
+		{
+			mesh->m_tintStrength = value["tintStrength"].GetFloat();
+		}
 	}
 
 	//

@@ -142,6 +142,7 @@ public:
 	std::set<std::string> m_textureFileList; ///< List of texture file paths this mesh requires
 	                                         ///< (not including embedded textures)
 
+	int m_textureCount{0}; ///< Number of loaded textures for this mesh (files or embedded)
 
 private:
 	Mesh() = default;

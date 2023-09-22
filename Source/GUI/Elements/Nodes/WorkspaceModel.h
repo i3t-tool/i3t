@@ -66,5 +66,5 @@ public:
 
 private:
 	void init();
-	glm::vec3 calculateTint(glm::vec3 color);
+	glm::vec3 calculateTint(glm::vec3 color, Ptr<Vp::SceneModel> model);
 };
