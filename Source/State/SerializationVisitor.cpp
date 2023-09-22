@@ -163,6 +163,7 @@ void SerializationVisitor::visit(const Ptr<GuiModel>& node)
 	model.AddMember("opaque", mesh->m_opaque, alloc);
 	model.AddMember("opacity", mesh->m_opacity, alloc);
 	addVector(model, "tint", mesh->m_tint);
+	model.AddMember("tintStrength", mesh->m_tintStrength, alloc);
 
 	models.PushBack(model, alloc);
 

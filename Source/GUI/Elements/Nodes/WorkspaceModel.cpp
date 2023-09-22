@@ -46,42 +46,70 @@ void WorkspaceModel::popupContent_axis_showmodel()
 		ImGui::SliderFloat("Opacity", &model->m_opacity, 0.0f, 1.0f, "%.2f");
 		ImGui::EndMenu();
 	}
+
+	ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 	if (ImGui::BeginMenu("Set tint"))
 	{
-		if (ImGui::MenuItem("None"))
+		if (ImGui::BeginMenu("Color"))
 		{
-			model->m_tint = glm::vec3(1.0f);
+			if (ImGui::MenuItem("None"))
+			{
+				model->m_tint = glm::vec3(1.0f);
+			}
+			static glm::vec3 RED;
+			static glm::vec3 GREEN;
+			static glm::vec3 BLUE;
+			static glm::vec3 YELLOW;
+			static glm::vec3 TEAL;
+			static glm::vec3 MAGENTA;
+			static glm::vec3 LIGHT_BLUE;
+			static glm::vec3 ORANGE;
+			static glm::vec3 BROWN;
+
+			if (ImGui::MenuItem("Red"))
+			{
+				model->m_tint = calculateTint(Color::RED, model);
+			}
+			if (ImGui::MenuItem("Green"))
+			{
+				model->m_tint = calculateTint(Color::GREEN, model);
+			}
+			if (ImGui::MenuItem("Blue"))
+			{
+				model->m_tint = calculateTint(Color::BLUE, model);
+			}
+			if (ImGui::MenuItem("Yellow"))
+			{
+				model->m_tint = calculateTint(Color::YELLOW, model);
+			}
+			if (ImGui::MenuItem("Teal"))
+			{
+				model->m_tint = calculateTint(Color::TEAL, model);
+			}
+			if (ImGui::MenuItem("Magenta"))
+			{
+				model->m_tint = calculateTint(Color::MAGENTA, model);
+			}
+			if (ImGui::MenuItem("Light Blue"))
+			{
+				model->m_tint = calculateTint(Color::LIGHT_BLUE, model);
+			}
+			if (ImGui::MenuItem("Orange"))
+			{
+				model->m_tint = calculateTint(Color::ORANGE, model);
+			}
+			if (ImGui::MenuItem("Brown"))
+			{
+				model->m_tint = calculateTint(Color::BROWN, model);
+			}
+			ImGui::EndMenu();
 		}
-		if (ImGui::MenuItem("Red"))
-		{
-			model->m_tint = calculateTint(Color::RED);
-		}
-		if (ImGui::MenuItem("Blue"))
-		{
-			model->m_tint = calculateTint(Color::BLUE);
-		}
-		if (ImGui::MenuItem("Green"))
-		{
-			model->m_tint = calculateTint(Color::GREEN);
-		}
-		if (ImGui::MenuItem("Yellow"))
-		{
-			model->m_tint = calculateTint(Color::YELLOW);
-		}
-		if (ImGui::MenuItem("Orange"))
-		{
-			model->m_tint = calculateTint(Color::ORANGE);
-		}
-		if (ImGui::MenuItem("Magenta"))
-		{
-			model->m_tint = calculateTint(Color::MAGENTA);
-		}
-		if (ImGui::MenuItem("Teal"))
-		{
-			model->m_tint = calculateTint(Color::TEAL);
-		}
+		ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+		ImGui::SliderFloat("Strength", &model->m_tintStrength, 0.0f, 1.0f, "%.2f");
 		ImGui::EndMenu();
 	}
+	ImGui::PopItemFlag();
+
 	if (ImGui::BeginMenu("Change model"))
 	{
 		for (const auto& resource : RMI.getDefaultResources(Core::ResourceType::Model))
@@ -115,13 +143,16 @@ void WorkspaceModel::popupContent_axis_showmodel()
 	}
 }
 
-glm::vec3 WorkspaceModel::calculateTint(glm::vec3 color)
+glm::vec3 WorkspaceModel::calculateTint(glm::vec3 color, Ptr<Vp::SceneModel> model)
 {
-	glm::vec3 hsl;
-	rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
-	hsl.y = 0.8;
-	hsl.z = 0.8;
-	hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
+	//	if (model->m_mesh->m_textureCount > 0)
+	//	{
+	//		glm::vec3 hsl;
+	//		rgbToHsl(color.r, color.g, color.b, &hsl.x, &hsl.y, &hsl.z);
+	//		hsl.y = 0.8;
+	//		hsl.z = 0.8;
+	//		hslToRgb(hsl.x, hsl.y, hsl.z, &color.r, &color.g, &color.b);
+	//	}
 	return color;
 }
 

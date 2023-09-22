@@ -596,6 +596,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 				texPath = rootPath / texPath;
 			}
 			mesh->m_textureFileList.insert(texPath.string());
+			mesh->m_textureCount++;
 			// TODO: (DR) Pass resource manager instance to the load method to avoid App:: calls
 			if (!minimalLoad)
 			{
@@ -607,6 +608,7 @@ GLuint Mesh::loadTexture(aiTextureType type, const aiMaterial* material, const a
 			// The texture is embedded
 			if (aiTex->mHeight == 0)
 			{
+				mesh->m_textureCount++;
 				if (!minimalLoad)
 				{
 					// Texture is compressed (As per assimp docs, mWidth contains the length)
