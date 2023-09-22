@@ -586,7 +586,7 @@ else {
 }
  */
 
-	// angle - is divided by 2 in angleAxes
+	// angle - is divided by 2 in glm::angleAxes()
 	if (m_inputs[0].isPluggedIn() && m_inputs[2].isPluggedIn())
 	{
 		setInternalValue(glm::angleAxis(m_inputs[0].data().getFloat(), glm::normalize(m_inputs[2].data().getVec3())));
@@ -629,13 +629,15 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloatVec>::updateVal
 {
 	if (m_inputs[0].isPluggedIn())
 	{
-		setInternalValue(m_inputs[0].data().getQuat()[3]); // w
-		setInternalValue(m_inputs[0].data().getVec3(), 1); //(x,y,z)
+		auto q = m_inputs[0].data().getQuat();
+		setInternalValue(q.w);                         // w
+		setInternalValue(glm::vec3(q.x, q.y, q.z), 1); //(x,y,z)
 	}
 	else
 	{
-		setInternalValue(1.0f); // PF - to return a unit quaternion
-		setInternalValue(glm::vec3(0.0f, 0.0f, 0.0f), 1);
+		// a unit quaternion [1,(0,0,0)]
+		setInternalValue(1.0f);                           // w
+		setInternalValue(glm::vec3(0.0f, 0.0f, 0.0f), 1); //(x,y,z)
 	}
 }
 
@@ -1339,10 +1341,11 @@ template <> FORCE_INLINE void Operator<EOperatorType::QuatToFloats>::updateValue
 // FloatsToQuat
 template <> FORCE_INLINE void Operator<EOperatorType::FloatsToQuat>::updateValues(int inputIndex)
 {
-	glm::quat tmp = glm::quat(); // PF (1,0,0,0) if (nothing connected) w=1; else w=0;
+	glm::quat tmp = glm::quat(); // (0,0,0,0) is the default value after construction
 
-	if (m_inputs[0].isPluggedIn() || m_inputs[1].isPluggedIn() || m_inputs[2].isPluggedIn())
-		tmp[3] = 0.0f;
+	// setup of w=0 is therefore redundant
+	// if (m_inputs[0].isPluggedIn() || m_inputs[1].isPluggedIn() || m_inputs[2].isPluggedIn())
+	//	tmp[3] = 0.0f;
 
 	if (m_inputs[0].isPluggedIn())
 		tmp[0] = m_inputs[0].data().getFloat();
