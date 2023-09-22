@@ -24,6 +24,7 @@ public:
 	bool buttonStopAndReset();
 	bool buttonPlayPause();
 
+	bool topContent();
 	bool middleContent();
 	bool leftContent();
 	bool rightContent();

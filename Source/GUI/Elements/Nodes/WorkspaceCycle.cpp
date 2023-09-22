@@ -136,6 +136,14 @@ bool WorkspaceCycle::rightContent()
 	return inner_interaction_happen;
 }
 
+bool WorkspaceCycle::topContent()
+{
+	diwne.AddRectFilledDiwne(m_topRectDiwne.Min, m_topRectDiwne.Max, I3T::getTheme().get(EColor::NodeHeader),
+	                         I3T::getSize(ESize::Nodes_Rounding), ImDrawCornerFlags_Top);
+
+	return WorkspaceNodeWithCoreData::topContent();
+}
+
 bool WorkspaceCycle::middleContent()
 {
 	// \todo Add icons to buttons
