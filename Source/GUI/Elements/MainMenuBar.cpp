@@ -4,12 +4,13 @@
 
 #include "Commands/ApplicationCommands.h"
 #include "Core/API.h"
-#include "GUI/Elements/Dialogs/AboutDialog.h"
+#include "Core/Resources/ResourceManager.h"
 #include "GUI/Elements/Dialogs/DescriptionDialog.h"
 #include "GUI/Elements/Dialogs/ImportedModelsDialog.h"
 #include "GUI/Elements/Dialogs/SetupDialog.h"
 #include "GUI/Elements/Dialogs/SystemDialogs.h"
 #include "GUI/Elements/Modals/BeforeNewModal.h"
+#include "GUI/Elements/Windows/AboutWindow.h"
 #include "GUI/Elements/Windows/Console.h"
 #include "GUI/Elements/Windows/LogWindow.h"
 #include "GUI/Elements/Windows/StyleEditor.h"
@@ -228,7 +229,7 @@ void MainMenuBar::showTutorialMenu()
 	if (ImGui::BeginMenu("Tutorials"))
 	{
 		ImGui::MenuItem("Start window", nullptr, I3T::getWindowPtr<StartWindow>()->getShowPtr());
-		ImGui::MenuItem("Tutorial window", nullptr, I3T::getWindowPtr<TutorialWindow>()->getShowPtr());
+
 		ImGui::EndMenu();
 	}
 }
@@ -242,10 +243,7 @@ void MainMenuBar::showHelpMenu()
 			I3T::getUI()->getWindowManager().showUniqueWindow<DescriptionDialog>();
 		}
 
-		if (ImGui::MenuItem("About"))
-		{
-			I3T::getUI()->getWindowManager().showUniqueWindow<AboutDialog>();
-		}
+		ImGui::MenuItem("About", nullptr, I3T::getWindowPtr<AboutWindow>()->getShowPtr());
 
 		ImGui::Separator();
 

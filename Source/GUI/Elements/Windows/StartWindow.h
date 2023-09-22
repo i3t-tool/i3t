@@ -26,6 +26,8 @@ public:
 	 */
 	void reloadTutorials();
 
+	void renderLeftPanel() const;
+	void renderRightPanel();
 	/**
 	 * \brief Renders the Start window using ImGui.
 	 */

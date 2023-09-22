@@ -6,12 +6,12 @@
 
 class TextureRegion;
 
-class AboutDialog : public IWindow
+class AboutWindow : public IWindow
 {
 public:
-	I3T_WINDOW(AboutDialog)
+	I3T_WINDOW(AboutWindow)
 	std::shared_ptr<TextureRegion> dcgiReg;
 
-	AboutDialog();
+	AboutWindow();
 	void render() override;
 };

@@ -151,7 +151,11 @@ enum class EColor
 	StartWindow_NewSceneButtonFont,
 	StartWindow_TitleFont,
 	StartWindow_DescriptionFont,
-	StartWindow_YourSceneWinBackground
+	StartWindow_YourSceneWinBackground,
+
+	AboutWindow_BackgroundLeft,
+	AboutWindow_BackgroundRight,
+	AboutWindow_Text
 };
 
 enum class EFont

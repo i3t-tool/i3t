@@ -197,6 +197,10 @@ void Theme::initClassicProperties()
 	set(EColor::StartWindow_DescriptionFont, createColor(65, 65, 66, 255));
 	set(EColor::StartWindow_YourSceneWinBackground, createColor(255, 255, 255, 255));
 
+	set(EColor::AboutWindow_BackgroundLeft, createColor(255, 255, 255, 255));
+	set(EColor::AboutWindow_BackgroundRight, createColor(255, 255, 255, 255));
+	set(EColor::AboutWindow_Text, createColor(0, 0, 0, 255));
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
 	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
@@ -472,6 +476,10 @@ void Theme::initModernProperties()
 	set(EColor::StartWindow_YourSceneWinBackground, createColor(255, 255, 255, 255));
 
 
+	set(EColor::AboutWindow_BackgroundLeft, createColor(255, 255, 255, 255));
+	set(EColor::AboutWindow_BackgroundRight, createColor(255, 255, 255, 255));
+	set(EColor::AboutWindow_Text, createColor(0, 0, 0, 255));
+
 	m_fontsAssoc.insert(std::pair(EFont::MenuLarge, 0));
 	m_fontsAssoc.insert(std::pair(EFont::Button, 1));
 	m_fontsAssoc.insert(std::pair(EFont::Tab, 1));
@@ -736,6 +744,10 @@ void Theme::initNames()
 	g_ColorNames[EColor::StartWindow_TitleFont] = "glob_StartWindow_TitleFontColor";
 	g_ColorNames[EColor::StartWindow_DescriptionFont] = "glob_StartWindow_DescriptionFontColor";
 	g_ColorNames[EColor::StartWindow_YourSceneWinBackground] = "glob_StartWindow_YourSceneWinBackground";
+
+	g_ColorNames[EColor::AboutWindow_BackgroundLeft] = "glob_AboutWindow_BackgroundLeft";
+	g_ColorNames[EColor::AboutWindow_BackgroundRight] = "glob_AboutWindow_BackgroundRight";
+	g_ColorNames[EColor::AboutWindow_Text] = "glob_AboutWindow_Text";
 
 	/// \todo ???
 	// g_ColorNames[EColor::Builder_NodePadding] = "node_Builder Padding (Not a
