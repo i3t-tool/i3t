@@ -236,6 +236,7 @@ enum class ESize
 	Float_inactive_alphaMultiplicator,
 
 	Default_VisiblePrecision,
+	Default_VisibleQuaternionPrecision,
 	Default_InactiveMark,
 
 	Tracking_SmoothScrollSpeed,
