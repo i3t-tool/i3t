@@ -19,10 +19,12 @@ stages:
   cpp:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - CMakeLists.txt
+        - "Dependencies/*"
         - .clang-format
         - .clang-tidy
-        - Dependencies
+        - .gitlab-ci.yml
+        - .gitmodules
+        - CMakeLists.txt
         - "**/*.{h,cpp}"
         - "**/*.{h,cpp}"
 

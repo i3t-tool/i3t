@@ -48,5 +48,5 @@
 	url = https://github.com/xDUDSSx/ImGuizmo.git
 [submodule "Dependencies/rttr"]
 	path = Dependencies/rttr
-	url = https://github.com/rttrorg/rttr.git
+	url = https://github.com/i3t-tool/rttr.git
 
