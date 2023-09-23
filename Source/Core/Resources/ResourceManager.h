@@ -69,11 +69,12 @@ private:
 	std::vector<std::string> m_importedResources;
 
 	// Comparator for ResourceFiles sets
-	static constexpr auto resFilesCmp = [](Ptr<ResourceFiles> lhs, Ptr<ResourceFiles> rhs) {
-		return *lhs < *rhs;
+	struct ResFilesCmp
+	{
+		bool operator()(Ptr<ResourceFiles> lhs, Ptr<ResourceFiles> rhs) const;
 	};
 	/// List of lists of files of newly added resources whose files should be moved to data dir on next save
-	std::set<Ptr<ResourceFiles>, decltype(resFilesCmp)> m_filesToAddOnSave;
+	std::set<Ptr<ResourceFiles>, ResFilesCmp> m_filesToAddOnSave;
 
 public:
 	// NOTE: That these flags are NOT atomic

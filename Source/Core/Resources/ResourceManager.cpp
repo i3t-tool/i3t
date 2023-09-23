@@ -26,6 +26,11 @@ ResourceManager& ResourceManager::instance()
 	return App::getModule<ResourceManager>();
 }
 
+bool ResourceManager::ResFilesCmp::operator()(Ptr<ResourceFiles> lhs, Ptr<ResourceFiles> rhs) const
+{
+	return *lhs < *rhs;
+}
+
 bool ResourceManager::resourceExists(size_t id)
 {
 	auto it = m_resourceMap.find(id);
@@ -1038,5 +1043,4 @@ std::optional<std::vector<Resource>> ResourceManager::readResources(const rapidj
 
 	return result;
 }
-
 } // namespace Core
