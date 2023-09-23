@@ -234,10 +234,14 @@ public:
 	bool importModel(const fs::path& path, bool normalize);
 	bool removeImportedModel(const std::string& alias);
 
-	Memento saveState(Scene* scene) override;
+	Memento saveScene(Scene* scene) override;
 	bool cleanUpModelFiles(Scene* scene);
-	void loadState(const Memento& memento, Scene* scene) override;
-	void clearState() override;
+	void loadScene(const Memento& memento, Scene* scene) override;
+	void clearScene() override;
+
+	Memento saveGlobal() override;
+	void loadGlobal(const Memento& memento) override;
+	void clearGlobal() override;
 
 	static std::optional<std::vector<Resource>> readResources(const rapidjson::Value& resources);
 

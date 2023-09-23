@@ -276,12 +276,18 @@ public:
 	//
 
 private:
-	Memento saveState(Scene* scene) override;
+	Memento saveScene(Scene* scene) override;
 
-	void loadState(const Memento& memento, Scene* scene) override;
+	void loadScene(const Memento& memento, Scene* scene) override;
 
-	void clearState() override;
+	void clearScene() override;
 
+public:
+	Memento saveGlobal() override;
+	void loadGlobal(const Memento& memento) override;
+	void clearGlobal() override;
+
+private:
 	void initDiwneFromTheme();
 	//
 

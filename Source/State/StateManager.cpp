@@ -5,7 +5,6 @@
 #include "State/Stateful.h"
 #include "Utils/JSON.h"
 #include "Utils/Random.h"
-#include "Utils/Text.h"
 #include "Utils/TimeUtils.h"
 
 void StateManager::init()
@@ -22,8 +21,8 @@ void StateManager::init()
 	{
 		saveUserData();
 	}
-
 	loadUserData();
+
 	LOG_INFO("[STATE MANAGER] Checking for unused tmp directories (timeout {}) ...", m_tmpDirectoryLockFileTimeout);
 	purgeTmpDirectories();
 }
@@ -84,12 +83,13 @@ void StateManager::beginFrame()
 
 void StateManager::onClose()
 {
+	saveGlobal();
 	deleteTmpDirectory();
 }
 
 void StateManager::takeSnapshot()
 {
-	if (auto state = createMemento(nullptr))
+	if (auto state = createSceneMemento(nullptr))
 	{
 		m_mementos.push_back(std::move(*state));
 		m_hashes.push_back(randLong());
@@ -115,7 +115,7 @@ void StateManager::undo()
 
 	for (auto& originator : m_originators)
 	{
-		originator->loadState(memento, nullptr);
+		originator->loadScene(memento, nullptr);
 	}
 
 	setWindowTitle();
@@ -134,7 +134,7 @@ void StateManager::redo()
 
 	for (auto& originator : m_originators)
 	{
-		originator->loadState(memento, nullptr);
+		originator->loadScene(memento, nullptr);
 	}
 
 	setWindowTitle();
@@ -173,46 +173,44 @@ const Memento& StateManager::getCurrentState() const
 	return m_mementos[m_currentStateIdx];
 }
 
-bool StateManager::loadScene(const fs::path& path)
+std::optional<Memento> StateManager::createSceneMemento(Scene* scene)
 {
-	LOG_INFO("");
-	LOG_INFO("Loading scene from '{}'.", path.string());
+	Memento state;
+	state.SetObject();
 
-	if (!fs::exists(path))
+	if (m_originators.empty())
 	{
-		LOG_ERROR("Scene file at '{}' does not exist!", path.string());
-		return false;
+		LOG_WARN("You have no originators set for the StateManager. Cannot take scene snapshot.");
+		return std::nullopt;
 	}
 
-	const auto maybeScene = JSON::parse(path, I3T_SCENE_SCHEMA);
-	if (!maybeScene.has_value())
+	for (const auto& originator : m_originators)
 	{
-		return false;
+		auto memento = originator->saveScene(scene);
+		JSON::merge(state, memento, state.GetAllocator());
 	}
 
-	bool readOnly = false;
-	if (maybeScene.value().HasMember("readOnly"))
+	return state;
+}
+
+std::optional<Memento> StateManager::createGlobalMemento()
+{
+	Memento state;
+	state.SetObject();
+
+	if (m_originators.empty())
 	{
-		readOnly = maybeScene.value()["readOnly"].GetBool();
+		LOG_WARN("You have no originators set for the StateManager. Cannot create global state memento.");
+		return std::nullopt;
 	}
 
-	Ptr<Scene> newScene = std::make_shared<Scene>(this, readOnly);
-
-	setCurrentScene(newScene, path);
-
-	createTmpDirectory();
-	wipeTmpDirectory();
-
-	for (auto* originator : m_originators)
+	for (const auto& originator : m_originators)
 	{
-		originator->loadState(maybeScene.value(), m_currentScene.get());
+		auto memento = originator->saveGlobal();
+		JSON::merge(state, memento, state.GetAllocator());
 	}
 
-	pushRecentFile(path);
-
-	reset();
-
-	return true;
+	return state;
 }
 
 bool StateManager::saveScene()
@@ -236,7 +234,7 @@ bool StateManager::saveScene(const fs::path& target)
 	setCurrentScene(std::make_shared<Scene>(this, false), target);
 
 	// Create scene .json file
-	const auto result = JSON::save(target, *createMemento(m_currentScene.get()));
+	const auto result = JSON::save(target, *createSceneMemento(m_currentScene.get()));
 
 	m_currentScene->m_hash = m_hashes[m_currentStateIdx];
 	if (m_currentScene->m_prevPath != target)
@@ -248,6 +246,49 @@ bool StateManager::saveScene(const fs::path& target)
 	setWindowTitle();
 
 	return result;
+}
+
+bool StateManager::loadScene(const fs::path& path)
+{
+	LOG_INFO("");
+	LOG_INFO("Loading scene from '{}'.", path.string());
+
+	if (!fs::exists(path))
+	{
+		LOG_ERROR("Scene file at '{}' does not exist!", path.string());
+		return false;
+	}
+
+	const auto maybeScene = JSON::parse(path, I3T_SCENE_SCHEMA);
+	if (!maybeScene.has_value())
+	{
+		LOG_ERROR("Failed to parse the scene file!");
+		return false;
+	}
+
+	bool readOnly = false;
+	if (maybeScene.value().HasMember("readOnly"))
+	{
+		readOnly = maybeScene.value()["readOnly"].GetBool();
+	}
+
+	Ptr<Scene> newScene = std::make_shared<Scene>(this, readOnly);
+
+	setCurrentScene(newScene, path);
+
+	createTmpDirectory();
+	wipeTmpDirectory();
+
+	for (auto* originator : m_originators)
+	{
+		originator->loadScene(maybeScene.value(), m_currentScene.get());
+	}
+
+	pushRecentFile(path);
+
+	reset();
+
+	return true;
 }
 
 bool StateManager::setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath)
@@ -265,7 +306,7 @@ bool StateManager::setCurrentScene(Ptr<Scene> newScene, fs::path newScenePath)
 
 	if (!newScenePath.empty())
 	{
-		// Gather information about previous scene so that ResourceManager saveState can copy over all files properly
+		// Gather information about previous scene so that ResourceManager saveScene can copy over all files properly
 		if (m_currentScene->isSaved() && !FilesystemUtils::weaklyEquivalent(m_currentScene->m_path, newScenePath))
 		{
 			newScene->m_sceneLocationChanged = true;
@@ -284,7 +325,7 @@ void StateManager::newScene()
 {
 	for (const auto& originator : m_originators)
 	{
-		originator->clearState();
+		originator->clearScene();
 	}
 
 	setCurrentScene(std::make_shared<Scene>(this, false));
@@ -295,17 +336,100 @@ void StateManager::newScene()
 	reset();
 }
 
+bool StateManager::saveGlobal()
+{
+	fs::path target = m_globalFilePath;
+
+	std::string absolutePath;
+	try
+	{
+		absolutePath = fs::absolute(target).string();
+	}
+	catch (const fs::filesystem_error& e)
+	{
+		FilesystemUtils::reportFilesystemException(e);
+		absolutePath = target.string() + " (Failed to resolve absolute path)";
+	}
+
+	LOG_INFO("");
+	LOG_INFO("Saving global data to '{}'.", absolutePath);
+
+	// Create global data .json file
+	const auto result = JSON::save(target, *createGlobalMemento());
+
+	return result;
+}
+
+bool StateManager::loadGlobal()
+{
+	fs::path target = m_globalFilePath;
+
+	std::string absolutePath;
+	try
+	{
+		absolutePath = fs::absolute(target).string();
+	}
+	catch (const fs::filesystem_error& e)
+	{
+		FilesystemUtils::reportFilesystemException(e);
+		absolutePath = target.string() + " (Failed to resolve absolute path)";
+	}
+
+	LOG_INFO("");
+	LOG_INFO("Loading global data from '{}'.", absolutePath);
+
+	if (!fs::exists(target))
+	{
+		LOG_WARN("Global data file at '{}' does not exist!", target.string());
+		return false;
+	}
+
+	const auto maybeDoc = JSON::parse(target, I3T_SCENE_SCHEMA);
+	if (!maybeDoc.has_value())
+	{
+		LOG_WARN("Failed to parse global data file!");
+		return false;
+	}
+
+	for (auto* originator : m_originators)
+	{
+		originator->loadGlobal(maybeDoc.value());
+	}
+
+	return true;
+}
+
+void StateManager::resetGlobal()
+{
+	for (const auto& originator : m_originators)
+	{
+		originator->clearGlobal();
+	}
+}
+
+void StateManager::saveUserData()
+{
+	auto& data = getUserData();
+
+	auto result = JSON::serializeToFile(data, USER_DATA_FILE);
+	if (!result)
+	{
+		LOG_ERROR("Failed to create initial UserData/Global.json: {}", result.error());
+	}
+}
+
 void StateManager::loadUserData()
 {
 	auto& data = getUserData();
 
 	// Load UserData/Global.json.
-	auto result = JSON::deserialize(fs::path(USER_DATA_FILE), data);
+	auto result = JSON::deserializeFile(fs::path(USER_DATA_FILE), data);
 	if (!result)
 	{
 		LOG_ERROR("Failed to load UserData/Global.json: {}", result.error());
 	}
 
+	// TODO: (DR) There should be a limit of how many recent files there can be
 	// Prune non-existing recent files.
 	for (auto it = data.recentFiles.begin(); it != data.recentFiles.end();)
 	{
@@ -320,37 +444,6 @@ void StateManager::loadUserData()
 			++it;
 		}
 	}
-}
-
-void StateManager::saveUserData()
-{
-	auto& data = getUserData();
-
-	auto result = JSON::serialize(data, USER_DATA_FILE);
-	if (!result)
-	{
-		LOG_ERROR("Failed to create initial UserData/Global.json: {}", result.error());
-	}
-}
-
-std::optional<Memento> StateManager::createMemento(Scene* scene)
-{
-	Memento state;
-	state.SetObject();
-
-	if (m_originators.empty())
-	{
-		LOG_WARN("You have no originators set for the StateManager, cannot take snapshot.");
-		return std::nullopt;
-	}
-
-	for (const auto& originator : m_originators)
-	{
-		auto memento = originator->saveState(scene);
-		JSON::merge(state, memento, state.GetAllocator());
-	}
-
-	return state;
 }
 
 void StateManager::reset()
@@ -392,6 +485,7 @@ void StateManager::pushRecentFile(const fs::path& file)
 {
 	getUserData().pushRecentFile(file.string());
 	saveUserData();
+	saveGlobal();
 }
 
 void StateManager::createTmpDirectory()

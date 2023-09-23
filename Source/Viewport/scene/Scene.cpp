@@ -44,6 +44,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 	// render
 	//  process in one place might be beneficial
 
+	ViewportSettings& stg = m_viewport->getSettings();
+
 	auto renderOptions = renderTarget.getRenderOptions();
 	bool drawSelection = renderOptions.selection;
 	bool alpha = renderOptions.framebufferAlpha;
@@ -313,7 +315,7 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 	// Note that the term "selection" and "highlight" is used interchangeably here
 	if (drawSelection)
 	{
-		bool useDepth = m_viewport->getSettings().highlight_useDepth;
+		bool useDepth = stg.global().highlight_useDepth;
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -377,8 +379,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 					m_highlightedEntities.push_back(entity.get());
 
 					// Render the whole silhouette with the "covered" color, the uncovered portions will be drawn later.
-					float darkenFactor = m_viewport->getSettings().highlight_useDepth_darkenFactor;
-					float saturationFactor = m_viewport->getSettings().highlight_useDepth_desaturateFactor;
+					float darkenFactor = stg.global().highlight_useDepth_darkenFactor;
+					float saturationFactor = stg.global().highlight_useDepth_desaturateFactor;
 					auto coveredColor = HSLColor::fromRGB(glm::value_ptr(entity->m_highlightColor))
 					                        .desaturate(saturationFactor)
 					                        .darken(darkenFactor)
@@ -416,8 +418,8 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 		if (atLeastOneEntityHighlighted)
 		{
 			auto boxBlurShader = Shaders::instance().m_boxBlurShader;
-			int kernelSize = m_viewport->getSettings().highlight_kernelSize;
-			float blurFactor = m_viewport->getSettings().highlight_downscaleFactor;
+			int kernelSize = stg.global().highlight_kernelSize;
+			float blurFactor = stg.global().highlight_downscaleFactor;
 			int blurWidth = width * blurFactor;
 			int blurHeight = height * blurFactor;
 
@@ -473,7 +475,7 @@ void Scene::draw(int width, int height, glm::mat4 view, glm::mat4 projection, Sc
 				selectionCompositeShader->use();
 				selectionCompositeShader->m_sourceTextureId = selectionBlurSecondPassFBO->getColorTexture(0);
 				selectionCompositeShader->m_resolution = glm::vec2(width, height);
-				selectionCompositeShader->m_cutoff = m_viewport->getSettings().highlight_outlineCutoff;
+				selectionCompositeShader->m_cutoff = stg.global().highlight_outlineCutoff;
 				selectionCompositeShader->setUniforms();
 
 				// Upscale selection buffer and apply stencil

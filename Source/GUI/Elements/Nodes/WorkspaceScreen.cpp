@@ -73,7 +73,7 @@ bool WorkspaceScreen::middleContent()
 	int height = m_textureSize.y * diwne.getWorkAreaZoom();
 
 	Vp::Viewport* viewport = App::get().viewport();
-	m_renderOptions.lightingModel = viewport->getSettings().lighting_lightingModel;
+	m_renderOptions.lightingModel = viewport->getSettings().global().lighting_lightingModel;
 	viewport->drawScreen(m_renderTarget, width, height, screenValue.second, screenValue.first, m_renderOptions,
 	                     m_displayOptions);
 	Ptr<Vp::Framebuffer> framebuffer = m_renderTarget->getOutputFramebuffer().lock();

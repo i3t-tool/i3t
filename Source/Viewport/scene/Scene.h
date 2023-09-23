@@ -10,6 +10,7 @@
 
 #include "Viewport/SelectStencil.h"
 #include "Viewport/data/DisplayOptions.h"
+#include "Viewport/data/ViewportSettings.h"
 #include "Viewport/entity/GameObject.h"
 #include "Viewport/framebuffer/Framebuffer.h"
 #include "Viewport/scene/Lighting.h"
@@ -171,6 +172,13 @@ public:
 	{
 		return m_entities;
 	}
+
+	/////////////////////////////////////////
+	// State save/load
+	/////////////////////////////////////////
+
+	virtual void loadSettings(ViewportSettings& stg, bool scene, bool global){};
+	virtual void saveSettings(ViewportSettings& stg, bool scene, bool global){};
 
 protected:
 	void sortUnorderedTransparentEntities(glm::mat4 view, std::vector<Entity*>& entities);

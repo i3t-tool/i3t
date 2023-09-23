@@ -16,6 +16,8 @@
 #include "Core/Nodes/Id.h"
 #include "Core/Nodes/Node.h"
 
+#include "State/Stateful.h"
+
 #include "Viewport/Manipulators.h"
 #include "Viewport/camera/AbstractCamera.h"
 #include "Viewport/data/DisplayOptions.h"
@@ -71,7 +73,7 @@ class WBOITCompositeShader;
  *
  * Further, DisplayOptions are used to toggle visibility of certain objects.
  */
-class Viewport
+class Viewport : public IStateful
 {
 private:
 	friend class Scene;
@@ -219,5 +221,17 @@ public:
 	};
 
 	Manipulators& getManipulators();
+
+	/////////////////////////////////////////
+	// State save/load
+	/////////////////////////////////////////
+
+	Memento saveScene(State::Scene* scene) override;
+	void loadScene(const Memento& memento, State::Scene* scene) override;
+	void clearScene() override;
+
+	Memento saveGlobal() override;
+	void loadGlobal(const Memento& memento) override;
+	void clearGlobal() override;
 };
 } // namespace Vp

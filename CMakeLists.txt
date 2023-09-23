@@ -190,6 +190,10 @@ target_compile_definitions(${TEST_PROJECT_NAME} PRIVATE
 
 target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC
         IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
+
+# Allow rapidjson to use std::string as it'll be always present
+target_compile_definitions(${TEST_PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
+
 # =============================================================
 
 # ===== Create target executable from I3T source files. =======
@@ -206,6 +210,9 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 # Tell ImGui which header file contains OpenGL functions signatures.
 target_compile_definitions(${PROJECT_NAME}
         PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<gl_core_4_4.h> GL_GLEXT_PROTOTYPES=1 _CRT_SECURE_NO_WARNINGS)
+
+# Allow rapidjson to use std::string as it'll be always present
+target_compile_definitions(${PROJECT_NAME} PUBLIC RAPIDJSON_HAS_STDSTRING=1)
 
 # Link I3T with following binaries.
 target_link_libraries(

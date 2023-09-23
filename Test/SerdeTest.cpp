@@ -27,14 +27,14 @@ TEST(SerdeTest, SimpleStruct)
 {
 	TestStruct data{"test", "/tmp/test", 1, 1.0f};
 
-	auto serdeResult = JSON::serialize(data);
+	auto serdeResult = JSON::serializeToString(data);
 	ASSERT_TRUE(serdeResult);
 
 	auto json = serdeResult.value();
 	std::cout << json << std::endl;
 
 	TestStruct result;
-	EXPECT_TRUE(JSON::deserialize(json, result));
+	EXPECT_TRUE(JSON::deserializeString(json, result));
 
 	EXPECT_EQ(data.name, result.name);
 	EXPECT_EQ(data.path, result.path);

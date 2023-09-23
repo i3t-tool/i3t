@@ -99,11 +99,11 @@ void Viewport::drawPreview(Ptr<SceneRenderTarget>& renderTarget, int width, int 
 	if (auto gameObjectPtr = gameObject.lock())
 	{
 		// Center camera on game object
-		m_previewScene->m_orbitCamera->setFov(m_settings.preview_fov);
+		m_previewScene->m_orbitCamera->setFov(m_settings.global().preview_fov);
 		m_previewScene->m_orbitCamera->centerOnBox(gameObjectPtr->m_mesh->m_boundingBoxMin,
 		                                           gameObjectPtr->m_mesh->m_boundingBoxMax, false);
 		float radius = m_previewScene->m_orbitCamera->getRadius();
-		float enlargedRadius = radius * m_settings.preview_radiusFactor;
+		float enlargedRadius = radius * m_settings.global().preview_radiusFactor;
 		m_previewScene->m_orbitCamera->setRadius(enlargedRadius);
 
 		// Adjust zFar/zNear
@@ -142,7 +142,7 @@ void Viewport::update(double dt)
 	m_mainScene->update(dt);
 
 	m_previewScene->m_orbitCamera->setRotationX(m_previewScene->m_orbitCamera->getRotationX() +
-	                                            m_settings.preview_rotateSpeed * dt);
+	                                            m_settings.global().preview_rotateSpeed * dt);
 }
 
 void Viewport::processInput(double dt, glm::vec2 mousePos, glm::ivec2 windowSize)
@@ -191,4 +191,94 @@ ViewportSettings& Viewport::getSettings()
 Manipulators& Viewport::getManipulators()
 {
 	return *m_manipulators;
+}
+
+/////////////////////////////////////////
+// State save/load
+/////////////////////////////////////////
+
+Memento Viewport::saveScene(State::Scene* scene)
+{
+	rapidjson::Document jsonDoc;
+	jsonDoc.SetObject();
+
+	// Save viewport settings
+	// TODO: (DR) We need some global save location too
+	//  Maybe IStateful should be expanded with saveScene() split into two:
+	//	- saveScene(Scene* scene) for saving scene specific data
+	//  - saveGlobal() for saving global data
+	//
+	// Other things aside from Viewport that would use the saveGlobal method:
+	// - Default models are a global setting and are loaded using the outdated "Config" class
+	// - Themes could be rewritten to use this global mechanism rather than the "ThemeLoader" class
+
+	// Update current settings data with current values
+	m_mainScene->saveSettings(m_settings, true, false);
+
+	// Serialize scene settings
+	auto jsonDocOpt = JSON::serializeToDocument(m_settings.scene());
+	if (!jsonDocOpt)
+	{
+		return jsonDoc;
+	}
+	jsonDoc.Swap(jsonDocOpt.value());
+
+	return jsonDoc;
+}
+
+void Viewport::loadScene(const Memento& memento, State::Scene* scene)
+{
+	JSON::deserializeDocument(memento, m_settings.scene());
+
+	// Update scene values
+	m_mainScene->loadSettings(m_settings, true, false);
+}
+
+void Viewport::clearScene()
+{
+	// Clear the scene specific settings
+	m_settings.scene() = ViewportSceneSettings();
+
+	// Update scene values
+	m_mainScene->loadSettings(m_settings, true, false);
+}
+
+Memento Viewport::saveGlobal()
+{
+	rapidjson::Document jsonDoc;
+	jsonDoc.SetObject();
+
+	// Update current settings data with current values
+	m_mainScene->saveSettings(m_settings, false, true);
+
+	// Serialize global settings
+	auto jsonDocOpt = JSON::serializeToDocument(m_settings.global());
+	if (!jsonDocOpt)
+	{
+		return jsonDoc;
+	}
+	jsonDoc.Swap(jsonDocOpt.value());
+
+	return jsonDoc;
+}
+
+void Viewport::loadGlobal(const Memento& memento)
+{
+	JSON::deserializeDocument(memento, m_settings.global());
+
+	// TODO: (DR) Global settings probably shouldn't (or dont need to) be loaded from within a scene object.
+	//  Although it probably doesn't matter too much and allows scenes to quickly change which settings are scene or
+	//  global specific.
+
+	// Update scene values
+	m_mainScene->loadSettings(m_settings, false, true);
+}
+
+void Viewport::clearGlobal()
+{
+	// Clear the global settings
+	m_settings.global() = ViewportGlobalSettings();
+
+	// Update scene values
+	m_mainScene->loadSettings(m_settings, false, true);
 };

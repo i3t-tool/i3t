@@ -14,7 +14,7 @@ class ImportedModelsDialog : public IWindow
 private:
 	int m_selectedModelIndex{-1};
 	std::string m_selectedModelAlias{};
-	bool m_normalizeImportedModels{true};
+	bool m_normalizeImportedModels{false}; // TODO: (DR) This should be saved in a global config
 
 public:
 	I3T_WINDOW(ImportedModelsDialog)

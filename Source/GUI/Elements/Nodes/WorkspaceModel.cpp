@@ -259,7 +259,7 @@ bool WorkspaceModel::processSelect()
 {
 	auto model = m_viewportModel.lock();
 	model->m_highlight = true;
-	model->m_highlightColor = App::get().viewport()->getSettings().highlight_selectionColor;
+	model->m_highlightColor = App::get().viewport()->getSettings().global().highlight_selectionColor;
 
 	return WorkspaceNodeWithCoreDataWithPins::processSelect();
 }
@@ -270,7 +270,7 @@ bool WorkspaceModel::processUnselect()
 	if (m_influenceHighlight)
 	{
 		model->m_highlight = true;
-		model->m_highlightColor = App::get().viewport()->getSettings().highlight_highlightColor;
+		model->m_highlightColor = App::get().viewport()->getSettings().global().highlight_highlightColor;
 	}
 	else
 	{
